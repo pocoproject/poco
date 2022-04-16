@@ -38,6 +38,16 @@ template <class T> class VarHolderImpl;
 }
 
 
+template <class T, std::size_t S>
+struct TypeSizeLE:
+	std::integral_constant<bool, (sizeof(T) <= S)>{};
+
+
+template <class T, std::size_t S>
+struct TypeSizeGT:
+	std::integral_constant<bool, (sizeof(T) > S)>{};
+
+
 #ifndef POCO_NO_SOO
 
 
@@ -58,14 +68,38 @@ public:
 		static const unsigned int value = SizeV;
 	};
 
-	Placeholder()
+	Placeholder(const Placeholder&) = delete;
+	Placeholder(Placeholder&&) = delete;
+	Placeholder& operator=(const Placeholder&) = delete;
+	Placeholder& operator=(Placeholder&&) = delete;
+
+	Placeholder(): pHolder(0)
 	{
-		erase();
+		std::memset(holder, 0, sizeof(Placeholder));
+	}
+
+	~Placeholder()
+	{
+		destruct(false);
+	}
+
+	void swap(Placeholder& other)
+	{
+		if (!isLocal() && !other.isLocal())
+			std::swap(pHolder, other.pHolder);
+		else
+			throw Poco::InvalidAccessException("Placeholder::swap()");
 	}
 
 	void erase()
 	{
-		std::memset(holder, 0, sizeof(Placeholder));
+		destruct(true);
+	}
+
+	bool isEmpty() const
+	{
+		char buf[POCO_SMALL_OBJECT_SIZE] = {};
+		return 0 == std::memcmp(holder, buf, POCO_SMALL_OBJECT_SIZE);
 	}
 
 	bool isLocal() const
@@ -78,6 +112,24 @@ public:
 		holder[SizeV] = local ? 1 : 0;
 	}
 
+	template <typename T, typename V>
+	PlaceholderT* assignStack(const V& value)
+	{
+		erase();
+		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
+		setLocal(true);
+		return reinterpret_cast<PlaceholderT*>(holder);
+	}
+
+	template <typename T, typename V>
+	PlaceholderT* assignHeap(const V& value)
+	{
+		erase();
+		pHolder = new T(value);
+		setLocal(false);
+		return pHolder;
+	}
+
 	PlaceholderT* content() const
 	{
 		if (isLocal())
@@ -86,20 +138,25 @@ public:
 			return pHolder;
 	}
 
-// MSVC71,80 won't extend friendship to nested class (Any::Holder)
-#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
 private:
-#endif
-	typedef typename std::aligned_storage<SizeV + 1>::type AlignerType;
+	typedef typename std::aligned_storage<SizeV+1>::type AlignerType;
 
-	PlaceholderT* pHolder;
-	mutable char  holder[SizeV + 1];
-	AlignerType   aligner;
+	void destruct(bool clear)
+	{
+		if (!isEmpty())
+		{
+			if (!isLocal())
+				delete pHolder;
+			else
+				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
 
-	friend class Any;
-	friend class Dynamic::Var;
-	friend class Dynamic::VarHolder;
-	template <class> friend class Dynamic::VarHolderImpl;
+			if (clear) std::memset(holder, 0, sizeof(Placeholder));
+		}
+	}
+
+	PlaceholderT*         pHolder;
+	mutable unsigned char holder[SizeV+1];
+	AlignerType           aligner;
 };
 
 
@@ -185,13 +242,6 @@ public:
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
 	{
-		if (!empty())
-		{
-			if (_valueHolder.isLocal())
-				destruct();
-			else
-				delete content();
-		}
 	}
 
 	Any& swap(Any& other)
@@ -205,14 +255,13 @@ public:
 
 		if (!_valueHolder.isLocal() && !other._valueHolder.isLocal())
 		{
-			std::swap(_valueHolder.pHolder, other._valueHolder.pHolder);
+			_valueHolder.swap(other._valueHolder);
 		}
 		else
 		{
 			Any tmp(*this);
 			try
 			{
-				if (_valueHolder.isLocal()) destruct();
 				construct(other);
 				other = tmp;
 			}
@@ -252,8 +301,7 @@ public:
 	bool empty() const
 		/// Returns true if the Any is empty.
 	{
-		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
-		return 0 == std::memcmp(_valueHolder.holder, buf, POCO_SMALL_OBJECT_SIZE);
+		return _valueHolder.isEmpty();
 	}
 
 	const std::type_info & type() const
@@ -290,21 +338,27 @@ private:
 
 		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
 		{
-			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
-			{
-				new ((ValueHolder*) pPlaceholder->holder) Holder(_held);
-				pPlaceholder->setLocal(true);
-			}
-			else
-			{
-				pPlaceholder->pHolder = new Holder(_held);
-				pPlaceholder->setLocal(false);
-			}
+			cloneSOO(pPlaceholder, _held);
 		}
 
 		ValueType _held;
 
 	private:
+
+		template<typename VT,
+				 typename std::enable_if<TypeSizeLE<Holder<VT>, Placeholder<VT>::Size::value>::value>::type* = nullptr>
+		static void cloneSOO(Placeholder<ValueHolder>* pPlaceholder, VT& held)
+		{
+			pPlaceholder->assignStack<Holder<ValueType>, ValueType>(held);
+		}
+
+		template<typename VT,
+				 typename std::enable_if<TypeSizeGT<Holder<VT>, Placeholder<VT>::Size::value>::value>::type* = nullptr>
+		static void cloneSOO(Placeholder<ValueHolder>* pPlaceholder, VT& held)
+		{
+			pPlaceholder->assignHeap<Holder<ValueType>, ValueType>(held);
+		}
+
 		Holder & operator = (const Holder &);
 	};
 
@@ -313,19 +367,18 @@ private:
 		return _valueHolder.content();
 	}
 
-	template<typename ValueType>
+	template<typename ValueType,
+		 typename std::enable_if<TypeSizeLE<Holder<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(Holder<ValueType>) <= Placeholder<ValueType>::Size::value)
-		{
-			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder)) Holder<ValueType>(value);
-			_valueHolder.setLocal(true);
-		}
-		else
-		{
-			_valueHolder.pHolder = new Holder<ValueType>(value);
-			_valueHolder.setLocal(false);
-		}
+		_valueHolder.assignStack<Holder<ValueType>, ValueType>(value);
+	}
+
+	template<typename ValueType,
+		 typename std::enable_if<TypeSizeGT<Holder<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
+	void construct(const ValueType& value)
+	{
+		_valueHolder.assignHeap<Holder<ValueType>, ValueType>(value);
 	}
 
 	void construct(const Any& other)
@@ -334,11 +387,6 @@ private:
 			other.content()->clone(&_valueHolder);
 		else
 			_valueHolder.erase();
-	}
-
-	void destruct()
-	{
-		content()->~ValueHolder();
 	}
 
 	Placeholder<ValueHolder> _valueHolder;

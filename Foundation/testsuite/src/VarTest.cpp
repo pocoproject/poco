@@ -29,6 +29,9 @@ using namespace Poco;
 using namespace Poco::Dynamic;
 
 
+namespace {
+
+
 class Dummy
 {
 public:
@@ -53,6 +56,8 @@ public:
 private:
 	int _val;
 };
+
+}
 
 
 VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -3068,6 +3073,20 @@ void VarTest::testIterator()
 }
 
 
+void VarTest::testSharedPtr()
+{
+	Poco::SharedPtr<int> p = new int(42);
+	{
+		Var v;
+		v = p;
+		Var v1;
+		v = v1;
+		v1 = v;
+	}
+	assertTrue(p.referenceCount() == 1);
+}
+
+
 void VarTest::setUp()
 {
 }
@@ -3116,6 +3135,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructInt);
+	CppUnit_addTest(pSuite, VarTest, testSharedPtr);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
 	CppUnit_addTest(pSuite, VarTest, testArrayToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);

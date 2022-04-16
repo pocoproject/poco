@@ -77,6 +77,7 @@ public:
 	void testUUID();
 	void testEmpty();
 	void testIterator();
+	void testSharedPtr();
 
 	void setUp();
 	void tearDown();

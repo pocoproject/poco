@@ -36,7 +36,9 @@ public:
 	void testInt();
 	void testComplexType();
 	void testVector();
-	
+
+	void testPlaceholder();
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();

@@ -295,31 +295,22 @@ protected:
 
 	template <typename T>
 	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
-		/// Instantiates value holder wrapper. If size of the wrapper is
-		/// larger than POCO_SMALL_OBJECT_SIZE, holder is instantiated on
+		/// Instantiates value holder wrapper.
+		///
+		/// Called from clone() member function of the implementation.
+		///
+		/// When the smal object optimization is enabled (POCO_NO_SOO not
+		/// defined), if size of the wrapper is larger than
+		/// POCO_SMALL_OBJECT_SIZE, holder is instantiated on
 		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
-		///
-		/// Called from clone() member function of the implementation when
-		/// small object optimization is enabled.
 	{
 #ifdef POCO_NO_SOO
 		(void)pVarHolder;
 		return new VarHolderImpl<T>(val);
 #else
 		poco_check_ptr (pVarHolder);
-		if ((sizeof(VarHolderImpl<T>) <= Placeholder<T>::Size::value))
-		{
-			new ((VarHolder*) pVarHolder->holder) VarHolderImpl<T>(val);
-			pVarHolder->setLocal(true);
-			return (VarHolder*) pVarHolder->holder;
-		}
-		else
-		{
-			pVarHolder->pHolder = new VarHolderImpl<T>(val);
-			pVarHolder->setLocal(false);
-			return pVarHolder->pHolder;
-		}
+		return makeSOOHolder(pVarHolder, val);
 #endif
 	}
 
@@ -420,6 +411,25 @@ protected:
 	}
 
 private:
+
+#ifndef POCO_NO_SOO
+	template<typename T,
+			 typename std::enable_if<TypeSizeLE<VarHolderImpl<T>, Placeholder<T>::Size::value>::value>::type* = nullptr>
+	VarHolder* makeSOOHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
+	{
+		poco_check_ptr (pVarHolder);
+		return pVarHolder->assignStack<VarHolderImpl<T>, T>(val);
+	}
+
+	template<typename T,
+			 typename std::enable_if<TypeSizeGT<VarHolderImpl<T>, Placeholder<T>::Size::value>::value>::type* = nullptr>
+	VarHolder* makeSOOHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
+	{
+		poco_check_ptr (pVarHolder);
+		return pVarHolder->assignHeap<VarHolderImpl<T>, T>(val);
+	}
+#endif
+
 	template <typename F, typename T>
 	void checkUpperLimit(const F& from) const
 	{

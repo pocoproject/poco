@@ -621,10 +621,10 @@ private:
 
 	void destruct()
 	{
-		if (!isEmpty()) delete content();
+		delete _pHolder;
 	}
 
-	VarHolder* _pHolder;
+	VarHolder* _pHolder = nullptr;
 
 #else
 
@@ -633,53 +633,41 @@ private:
 		return _placeholder.content();
 	}
 
+	void destruct()
+	{
+	}
+
+	template<typename ValueType,
+			 typename std::enable_if<TypeSizeLE<VarHolderImpl<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
+	void constructSOO(const ValueType& value)
+	{
+		_placeholder.assignStack<VarHolderImpl<ValueType>, ValueType>(value);
+	}
+
+	template<typename ValueType,
+			 typename std::enable_if<TypeSizeGT<VarHolderImpl<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
+	void constructSOO(const ValueType& value)
+	{
+		_placeholder.assignHeap<VarHolderImpl<ValueType>, ValueType>(value);
+	}
+
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(VarHolderImpl<ValueType>) <= Placeholder<ValueType>::Size::value)
-		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<ValueType>(value);
-			_placeholder.setLocal(true);
-		}
-		else
-		{
-			_placeholder.pHolder = new VarHolderImpl<ValueType>(value);
-			_placeholder.setLocal(false);
-		}
+		constructSOO(value);
 	}
 
 	void construct(const char* value)
 	{
 		std::string val(value);
-		if (sizeof(VarHolderImpl<std::string>) <= Placeholder<std::string>::Size::value)
-		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<std::string>(val);
-			_placeholder.setLocal(true);
-		}
-		else
-		{
-			_placeholder.pHolder = new VarHolderImpl<std::string>(val);
-			_placeholder.setLocal(false);
-		}
+		constructSOO(val);
 	}
 
 	void construct(const Var& other)
 	{
+		_placeholder.erase();
 		if (!other.isEmpty())
 			other.content()->clone(&_placeholder);
-		else
-			_placeholder.erase();
-	}
-
-	void destruct()
-	{
-		if (!isEmpty())
-		{
-			if (_placeholder.isLocal())
-				content()->~VarHolder();
-			else
-				delete content();
-		}
 	}
 
 	Placeholder<VarHolder> _placeholder;
@@ -709,14 +697,13 @@ inline void Var::swap(Var& other)
 
 	if (!_placeholder.isLocal() && !other._placeholder.isLocal())
 	{
-		std::swap(_placeholder.pHolder, other._placeholder.pHolder);
+		_placeholder.swap(other._placeholder);
 	}
 	else
 	{
 		Var tmp(*this);
 		try
 		{
-			if (_placeholder.isLocal()) destruct();
 			construct(other);
 			other = tmp;
 		}
