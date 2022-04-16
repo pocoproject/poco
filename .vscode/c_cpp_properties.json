@@ -29,7 +29,7 @@
     {
       "name": "Mac",
       "intelliSenseMode": "clang-x64",
-      "includePath": ["${pocoIncludePath}"],
+      "includePath": ["${pocoIncludePath}", "/usr/local/opt/openssl@3/include"],
       "macFrameworkPath": ["/System/Library/Frameworks"],
       "defines": [],
       "forcedInclude": [],

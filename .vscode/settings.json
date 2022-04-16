@@ -80,7 +80,8 @@
 		"unordered_map": "cpp",
 		"unordered_set": "cpp",
 		"utility": "cpp",
-		"vector": "cpp"
+		"vector": "cpp",
+		"__bits": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
