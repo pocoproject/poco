@@ -36,7 +36,7 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
-#include <iostream>
+
 
 using namespace Poco::Net;
 using Poco::Util::Application;
