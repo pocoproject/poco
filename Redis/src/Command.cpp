@@ -479,7 +479,7 @@ Command Command::set(const std::string& key, const std::string& value, bool over
 	cmd << key << value;
 	if (! overwrite) cmd << "NX";
 	if (! create) cmd << "XX";
-	if (expireTime.totalMicroseconds() > 0) cmd << "PX" << expireTime.totalMilliseconds();
+	if (expireTime.totalMicroseconds() > 0) cmd << "PX" << NumberFormatter::format(expireTime.totalMilliseconds());
 
 	return cmd;
 }

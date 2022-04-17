@@ -314,7 +314,7 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 
 	int tzd = -1;
 	DateTime dateTime;
-	if (!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
+	if (!DateTimeParser::tryParse("%Y-%m-%d %H:%M:%s", outputParameter.pData(), dateTime, tzd))
 	{
 		return false;
 	}

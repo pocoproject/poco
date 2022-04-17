@@ -157,12 +157,10 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
 
-#if OPENSSL_VERSION_NUMBER >= 0x0908060L && !defined(OPENSSL_NO_TLSEXT)
 	if (!_peerHostName.empty())
 	{
 		SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str());
 	}
-#endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
 	if(_pContext->ocspStaplingResponseVerificationEnabled())
@@ -467,7 +465,7 @@ int SecureSocketImpl::handleError(int rc)
 	if (rc > 0) return rc;
 
 	int sslError = SSL_get_error(_pSSL, rc);
-	int error = SocketImpl::lastError();
+	int socketError = SocketImpl::lastError();
 
 	switch (sslError)
 	{
@@ -483,16 +481,36 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
+	// SSL_GET_ERROR(3ossl):
+ 	// On an unexpected EOF, versions before OpenSSL 3.0 returned
+ 	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
+ 	// errno was 0.  Since OpenSSL 3.0 the returned error is
+ 	// SSL_ERROR_SSL with a meaningful error on the error stack.
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	case SSL_ERROR_SSL:
+#else
 	case SSL_ERROR_SYSCALL:
-		if (error != 0)
+#endif
+		if (socketError)
 		{
-			SocketImpl::error(error);
+			SocketImpl::error(socketError);
 		}
 		// fallthrough
 	default:
 		{
 			long lastError = ERR_get_error();
+			std::string msg;
+			if (lastError)
+			{
+				char buffer[256];
+				ERR_error_string_n(lastError, buffer, sizeof(buffer));
+				msg = buffer;
+			}
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+			if (sslError == SSL_ERROR_SSL)
+#else
 			if (lastError == 0)
+#endif
 			{
 				if (rc == 0)
 				{
@@ -500,22 +518,19 @@ int SecureSocketImpl::handleError(int rc)
 					if (_pContext->isForServerUse())
 						return 0;
 					else
-						throw SSLConnectionUnexpectedlyClosedException();
+						throw SSLConnectionUnexpectedlyClosedException(msg);
 				}
 				else if (rc == -1)
 				{
-					throw SSLConnectionUnexpectedlyClosedException();
+					throw SSLConnectionUnexpectedlyClosedException(msg);
 				}
 				else
 				{
 					SecureStreamSocketImpl::error(Poco::format("The BIO reported an error: %d", rc));
 				}
 			}
-			else
+			else if (lastError)
 			{
-				char buffer[256];
-				ERR_error_string_n(lastError, buffer, sizeof(buffer));
-				std::string msg(buffer);
 				throw SSLException(msg);
 			}
 		}

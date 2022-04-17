@@ -54,7 +54,7 @@ jobs:
           sudo apt-get update &&
           sudo apt-get install crossbuild-essential-armhf
       - run: >-
-          ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL &&
+          ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
           make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
   macos-clang-make:
@@ -74,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
           sudo -s
@@ -82,8 +82,33 @@ jobs:
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
-  windows-msvc-cmake:
+  macos-clang-cmake-openssl3:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: >-
+          cd cmake-build &&
+          sudo -s
+          CPPUNIT_IGNORE="N7CppUnit10TestCallerI10ThreadTestEE.testTrySleep,N7CppUnit10TestCallerI13TimestampTestEE.testTimestamp,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
+          PWD=`pwd`
+          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+
+  windows-2019-msvc-cmake:
     runs-on: windows-2019
+    env:
+      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+    steps:
+      - uses: actions/checkout@v2
+      - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
+      - run: cmake --build cmake-build --config Release
+      - run: >-
+          cd cmake-build;
+          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+
+  windows-2022-msvc-cmake-2022:
+    runs-on: windows-2022
     env:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:

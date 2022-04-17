@@ -1,6 +1,41 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.11.2
+
+!!Summary of Changes
+
+  - GH #2882: Handle negative DST offset
+  - GH #3268: Poco redis command set have a bug when you want to set nx ex or expireTime
+  - GH #3338: NamedMutex does not work on Linux distributions where fs.protected_regular=1
+  - GH #3448: Basic support for OpenSSL 3.0.0
+  - GH #3458: encryptString() crash on redhat/centos 8 with FIPS enabled using md5 default digest
+  - GH #3465: NetSSL_Win: bad error handling when decodeMessage() fails
+  - GH #3466: DefinePlatformSpecific.cmake: handle RelWithDebInfo and MinSizeRel configurations
+  - GH #3470: bug in JSON ParseHandler.cpp (RFC 7159 should be valid)
+  - GH #3472: Add Windows 11 detection to Environment_WIN32U
+  - GH #3483: Adds Windows 11 and Server 2022 to Environment::osDisplayName()
+  - GH #3485: Adds Visual Studio 2022 (v170) to buildwin.cmd
+  - GH #3495: Should the Array::operator[] throw?
+  - GH #3500: Sandbox all iFrames in PocoDoc
+  - GH #3504: OpenSSL 3 compatibility
+  - GH #3505: JSON::PrintHandler.value(bool) prints incorrect value
+  - GH #3507: Reference counting for bound configuration in Util::Option is broken
+  - GH #3508: #3507: Fix bound configuration reference counting in Poco::Util::Option.
+  - GH #3509: fix dst and utcOffset handling for Dublin time zone
+  - GH #3515: NetSSL_OpenSSL Testsuite: testInterop() and testProxy() fail due to changed certificate
+  - GH #3518: Expat version check in #defines incorrect.
+  - GH #3519: Add convertation to string in Redis Command#set
+  - GH #3524: [linux] Why is Poco::XML linked to Poco::Zip target?
+  - GH #3525: Bad management of file in case of OpenSSLException in X509Certificate::readPEM and X509Certificate::writePEM
+  - GH #3538: Upgrade bundled expat to 2.4.7
+  - GH #3544: Add back NIOS2 double conversion detection to fix compile errors
+  - GH #3549: Test against the correct signatures in the JWT ES384 and ES512 tests
+  - GH #3553: Upgrade bundled zlib to 1.2.12
+  - GH #3559: Poco::Data::PostgreSQL - DateTime extraction truncates fractional seconds
+  - GH #3563: Remove support for OpenSSL < 1.0
+
+
 !!!Release 1.11.1
 
 !!Summary of Changes

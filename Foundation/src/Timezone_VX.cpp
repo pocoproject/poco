@@ -45,6 +45,12 @@ int Timezone::dst()
 }
 
 
+int Timezone::dst(const Poco::Timestamp& timestamp)
+{
+	return isDst(timestamp) ? 3600 : 0;
+}
+
+
 bool Timezone::isDst(const Timestamp& timestamp)
 {
 	std::time_t time = timestamp.epochTime();

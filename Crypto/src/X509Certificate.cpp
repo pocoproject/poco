@@ -416,10 +416,14 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 {
 	List caCertList;
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
-	if (pBIO == NULL) throw OpenFileException("X509Certificate::readPEM()");
+	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
 	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
-	if (!x) throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
-	while(x)
+	if (!x)
+	{
+		BIO_free(pBIO);
+		throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
+	}
+	while (x)
 	{
 		caCertList.push_back(X509Certificate(x));
 		x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
@@ -432,14 +436,15 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
 {
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "a");
-	if (pBIO == NULL) throw OpenFileException("X509Certificate::writePEM()");
+	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 	List::const_iterator it = list.begin();
 	List::const_iterator end = list.end();
 	for (; it != end; ++it)
 	{
 		if (!PEM_write_bio_X509(pBIO, const_cast<X509*>(it->certificate())))
 		{
-			throw OpenSSLException("X509Certificate::writePEM()");
+			BIO_free(pBIO);
+			throw OpenSSLException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 		}
 	}
 	BIO_free(pBIO);

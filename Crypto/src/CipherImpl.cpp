@@ -98,20 +98,22 @@ namespace
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		_pContext = EVP_CIPHER_CTX_new();
-		EVP_CipherInit(
+		if (!_pContext) throwError();
+		int rc = EVP_CipherInit(
 			_pContext,
 			_pCipher,
 			&_key[0],
 			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #else
-		EVP_CipherInit(
+		int rc = EVP_CipherInit(
 			&_context,
 			_pCipher,
 			&_key[0],
 			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #endif
+		if (rc == 0) throwError();
 
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
