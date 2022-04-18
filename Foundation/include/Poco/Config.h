@@ -83,7 +83,7 @@
 // objects larger than this value will be alocated on the heap,
 // while those smaller will be placement new-ed into an
 // internal stack-auto-allocated buffer.
-#if !defined(POCO_SMALL_OBJECT_SIZE) && !defined(POCO_NO_SOO)
+#if !defined(POCO_SMALL_OBJECT_SIZE)
 	#define POCO_SMALL_OBJECT_SIZE 32
 #endif
 

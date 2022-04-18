@@ -74,6 +74,10 @@ Options:
     Compile with -DPOCO_NET_NO_IPv6.
     For systems that don't support IPv6.
 
+  --no-soo
+    Compile with -DPOCO_NO_SOO.
+    Disables small object optimization.
+
   --sqlite-fts=<path>
     Compile with -DPOCO_DATA_SQLITE_FTS.
     Compile SQLite with Full Text Search support.
@@ -225,6 +229,9 @@ while [ $# -ge 1 ]; do
 
 	--no-ipv6)
 		flags="$flags -DPOCO_NET_NO_IPv6" ;;
+
+	--no-soo)
+		flags="$flags -DPOCO_NO_SOO" ;;
 
 	--sqlite-thread-safe=*)
 		flags="$flags -DSQLITE_THREADSAFE=`echo ${1} | awk '{print substr($0,22)}'`" ;;

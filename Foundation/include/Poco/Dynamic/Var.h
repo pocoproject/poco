@@ -91,15 +91,9 @@ public:
 	template <typename T>
 	Var(const T& val)
 		/// Creates the Var from the given value.
-#ifdef POCO_NO_SOO
-		: _pHolder(new VarHolderImpl<T>(val))
-	{
-	}
-#else
 	{
 		construct(val);
 	}
-#endif
 
 	Var(const char* pVal);
 		// Convenience constructor for const char* which gets mapped to a std::string internally, i.e. pVal is deep-copied.
@@ -231,12 +225,7 @@ public:
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
-#ifdef POCO_NO_SOO
-		Var tmp(other);
-		swap(tmp);
-#else
 		construct(other);
-#endif
 		return *this;
 	}
 
@@ -612,22 +601,6 @@ private:
 		return pStr->operator[](n);
 	}
 
-#ifdef POCO_NO_SOO
-
-	VarHolder* content() const
-	{
-		return _pHolder;
-	}
-
-	void destruct()
-	{
-		delete _pHolder;
-	}
-
-	VarHolder* _pHolder = nullptr;
-
-#else
-
 	VarHolder* content() const
 	{
 		return _placeholder.content();
@@ -671,8 +644,6 @@ private:
 	}
 
 	Placeholder<VarHolder> _placeholder;
-
-#endif // POCO_NO_SOO
 };
 
 
@@ -687,12 +658,6 @@ private:
 
 inline void Var::swap(Var& other)
 {
-#ifdef POCO_NO_SOO
-
-	std::swap(_pHolder, other._pHolder);
-
-#else
-
 	if (this == &other) return;
 
 	if (!_placeholder.isLocal() && !other._placeholder.isLocal())
@@ -713,8 +678,6 @@ inline void Var::swap(Var& other)
 			throw;
 		}
 	}
-
-#endif
 }
 
 

@@ -23,6 +23,17 @@ jobs:
           EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
+  linux-gcc-make-asan-no-soo:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --omit=PDF --no-soo && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
+      - run: >-
+          sudo -s
+          EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
+          ./ci/runtests.sh
+
   linux-gcc-make-ubsan:
     runs-on: ubuntu-20.04
     steps:
