@@ -305,13 +305,8 @@ protected:
 		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
 	{
-#ifdef POCO_NO_SOO
-		(void)pVarHolder;
-		return new VarHolderImpl<T>(val);
-#else
 		poco_check_ptr (pVarHolder);
 		return makeSOOHolder(pVarHolder, val);
-#endif
 	}
 
 	template <typename F, typename T>
@@ -411,8 +406,6 @@ protected:
 	}
 
 private:
-
-#ifndef POCO_NO_SOO
 	template<typename T,
 			 typename std::enable_if<TypeSizeLE<VarHolderImpl<T>, Placeholder<T>::Size::value>::value>::type* = nullptr>
 	VarHolder* makeSOOHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
@@ -428,7 +421,6 @@ private:
 		poco_check_ptr (pVarHolder);
 		return pVarHolder->assignHeap<VarHolderImpl<T>, T>(val);
 	}
-#endif
 
 	template <typename F, typename T>
 	void checkUpperLimit(const F& from) const
