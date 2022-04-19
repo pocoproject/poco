@@ -225,6 +225,7 @@ public:
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
+		clear();
 		construct(other);
 		return *this;
 	}
@@ -610,35 +611,20 @@ private:
 	{
 	}
 
-	template<typename ValueType,
-			 typename std::enable_if<TypeSizeLE<VarHolderImpl<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
-	void constructSOO(const ValueType& value)
-	{
-		_placeholder.assignStack<VarHolderImpl<ValueType>, ValueType>(value);
-	}
-
-	template<typename ValueType,
-			 typename std::enable_if<TypeSizeGT<VarHolderImpl<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
-	void constructSOO(const ValueType& value)
-	{
-		_placeholder.assignHeap<VarHolderImpl<ValueType>, ValueType>(value);
-	}
-
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		constructSOO(value);
+		_placeholder.assign<VarHolderImpl<ValueType>, ValueType>(value);
 	}
 
 	void construct(const char* value)
 	{
 		std::string val(value);
-		constructSOO(val);
+		_placeholder.assign<VarHolderImpl<std::string>, std::string>(val);
 	}
 
 	void construct(const Var& other)
 	{
-		_placeholder.erase();
 		if (!other.isEmpty())
 			other.content()->clone(&_placeholder);
 	}

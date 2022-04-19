@@ -306,7 +306,7 @@ protected:
 		/// pre-allocated buffer inside the holder).
 	{
 		poco_check_ptr (pVarHolder);
-		return makeSOOHolder(pVarHolder, val);
+		return pVarHolder->assign<VarHolderImpl<T>, T>(val);
 	}
 
 	template <typename F, typename T>
@@ -406,21 +406,6 @@ protected:
 	}
 
 private:
-	template<typename T,
-			 typename std::enable_if<TypeSizeLE<VarHolderImpl<T>, Placeholder<T>::Size::value>::value>::type* = nullptr>
-	VarHolder* makeSOOHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
-	{
-		poco_check_ptr (pVarHolder);
-		return pVarHolder->assignStack<VarHolderImpl<T>, T>(val);
-	}
-
-	template<typename T,
-			 typename std::enable_if<TypeSizeGT<VarHolderImpl<T>, Placeholder<T>::Size::value>::value>::type* = nullptr>
-	VarHolder* makeSOOHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
-	{
-		poco_check_ptr (pVarHolder);
-		return pVarHolder->assignHeap<VarHolderImpl<T>, T>(val);
-	}
 
 	template <typename F, typename T>
 	void checkUpperLimit(const F& from) const

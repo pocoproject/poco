@@ -52,11 +52,8 @@ Var::~Var()
 Var& Var::operator = (const Var& rhs)
 {
 	if (this == &rhs) return *this;
-	if (!rhs.isEmpty())
-		construct(rhs);
-	else
-		_placeholder.erase();
-
+	clear();
+	if (!rhs.isEmpty()) construct(rhs);
 	return *this;
 }
 

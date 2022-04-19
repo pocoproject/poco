@@ -71,12 +71,7 @@
 // cases when value holder fits into POCO_SMALL_OBJECT_SIZE
 // (see below).
 //
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!! NOTE: Any/Dynamic::Var SOO will NOT work reliably   !!!
-// !!! without C++11 (std::aligned_storage in particular). !!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//
-//#define POCO_NO_SOO
+// #define POCO_NO_SOO
 
 
 // Small object size in bytes. When assigned to Any or Var,

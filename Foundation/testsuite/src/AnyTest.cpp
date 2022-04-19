@@ -281,72 +281,42 @@ void AnyTest::testPlaceholder()
 	assertTrue(ph.isEmpty());
 	assertFalse(ph.isLocal());
 
-	char c = *ph.assignStack<char, char>(1);
+	char c = *ph.assign<char, char>(1);
 	assertTrue(1 == c);
 	assertFalse(ph.isEmpty());
 	assertTrue(ph.isLocal());
-
-	c = *ph.assignHeap<char, char>(2);
-	assertTrue(2 == c);
-	assertFalse(ph.isEmpty());
-	assertFalse(ph.isLocal());
 
 	ph.erase();
 	assertTrue(ph.isEmpty());
 	assertFalse(ph.isLocal());
 
-	if (sizeof(std::shared_ptr<int>) <= POCO_SMALL_OBJECT_SIZE)
-	{
 		Placeholder<std::shared_ptr<int>> sph;
 		assertTrue(sph.isEmpty());
 		assertFalse(sph.isLocal());
 
-		int i = **sph.assignStack<std::shared_ptr<int>, int*>(new int(1));
+		int i = **sph.assign<std::shared_ptr<int>, int*>(new int(1));
 		assertTrue(1 == i);
 		assertFalse(sph.isEmpty());
 		assertTrue(sph.isLocal());
 
-		i = **sph.assignHeap<std::shared_ptr<int>, int*>(new int(1));
-		assertTrue(1 == i);
-		assertFalse(sph.isEmpty());
-		assertFalse(sph.isLocal());
-	}
-
-	if (sizeof(Poco::SharedPtr<int>) <= POCO_SMALL_OBJECT_SIZE)
-	{
 		Placeholder<Poco::SharedPtr<int>> psph;
 		assertTrue(psph.isEmpty());
 		assertFalse(psph.isLocal());
 
-		int i = **psph.assignStack<Poco::SharedPtr<int>, int*>(new int(1));
-		assertTrue(1 == i);
+		i = **psph.assign<Poco::SharedPtr<int>, int*>(new int(2));
+		assertTrue(2 == i);
 		assertFalse(psph.isEmpty());
 		assertTrue(psph.isLocal());
 
-		i = **psph.assignHeap<Poco::SharedPtr<int>, int*>(new int(1));
-		assertTrue(1 == i);
-		assertFalse(psph.isEmpty());
-		assertFalse(psph.isLocal());
-	}
-
-	if (sizeof(std::vector<int>) <= POCO_SMALL_OBJECT_SIZE)
-	{
 		Placeholder<std::vector<int>> vph;
 		assertTrue(vph.isEmpty());
 		assertFalse(vph.isLocal());
 
 		std::vector<int> inv{1,2,3};
-		std::vector<int> outv = *vph.assignStack<std::vector<int>, std::vector<int>>(inv);
+		std::vector<int> outv = *vph.assign<std::vector<int>, std::vector<int>>(inv);
 		assertTrue(inv == outv);
 		assertFalse(vph.isEmpty());
 		assertTrue(vph.isLocal());
-
-		outv.clear();
-		outv = *vph.assignHeap<std::vector<int>, std::vector<int>>(inv);
-		assertTrue(inv == outv);
-		assertFalse(vph.isEmpty());
-		assertFalse(vph.isLocal());
-	}
 
 	// ...
 #endif

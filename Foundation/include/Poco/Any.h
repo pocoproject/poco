@@ -97,8 +97,8 @@ public:
 
 	bool isEmpty() const
 	{
-		char buf[POCO_SMALL_OBJECT_SIZE] = {};
-		return 0 == std::memcmp(holder, buf, POCO_SMALL_OBJECT_SIZE);
+		char buf[SizeV] = {};
+		return 0 == std::memcmp(holder, buf, SizeV);
 	}
 
 	bool isLocal() const
@@ -106,13 +106,9 @@ public:
 		return holder[SizeV] != 0;
 	}
 
-	void setLocal(bool local) const
-	{
-		holder[SizeV] = local ? 1 : 0;
-	}
-
-	template <typename T, typename V>
-	PlaceholderT* assignStack(const V& value)
+	template<typename T, typename V,
+		typename std::enable_if<TypeSizeLE<T, Placeholder::Size::value>::value>::type* = nullptr>
+	PlaceholderT* assign(const V& value)
 	{
 		erase();
 		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
@@ -120,8 +116,9 @@ public:
 		return reinterpret_cast<PlaceholderT*>(holder);
 	}
 
-	template <typename T, typename V>
-	PlaceholderT* assignHeap(const V& value)
+	template<typename T, typename V,
+		typename std::enable_if<TypeSizeGT<T, Placeholder::Size::value>::value>::type* = nullptr>
+	PlaceholderT* assign(const V& value)
 	{
 		erase();
 		pHolder = new T(value);
@@ -139,6 +136,11 @@ public:
 
 private:
 	typedef typename std::aligned_storage<SizeV+1>::type AlignerType;
+
+	void setLocal(bool local) const
+	{
+		holder[SizeV] = local ? 1 : 0;
+	}
 
 	void destruct(bool clear)
 	{
@@ -189,13 +191,7 @@ private:
 	}
 
 	template <typename T, typename V>
-	PlaceholderT* assignStack(const V& value)
-	{
-		return assignHeap<T, V>(value);
-	}
-
-	template <typename T, typename V>
-	PlaceholderT* assignHeap(const V& value)
+	PlaceholderT* assign(const V& value)
 	{
 		erase();
 		return pHolder = new T(value);
@@ -346,26 +342,12 @@ private:
 
 		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
 		{
-			cloneSOO(pPlaceholder, _held);
+			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}
 
 		ValueType _held;
 
 	private:
-
-		template<typename VT,
-				 typename std::enable_if<TypeSizeLE<Holder<VT>, Placeholder<VT>::Size::value>::value>::type* = nullptr>
-		static void cloneSOO(Placeholder<ValueHolder>* pPlaceholder, VT& held)
-		{
-			pPlaceholder->assignStack<Holder<ValueType>, ValueType>(held);
-		}
-
-		template<typename VT,
-				 typename std::enable_if<TypeSizeGT<Holder<VT>, Placeholder<VT>::Size::value>::value>::type* = nullptr>
-		static void cloneSOO(Placeholder<ValueHolder>* pPlaceholder, VT& held)
-		{
-			pPlaceholder->assignHeap<Holder<ValueType>, ValueType>(held);
-		}
 
 		Holder & operator = (const Holder &);
 	};
@@ -375,18 +357,10 @@ private:
 		return _valueHolder.content();
 	}
 
-	template<typename ValueType,
-		 typename std::enable_if<TypeSizeLE<Holder<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
+	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		_valueHolder.assignStack<Holder<ValueType>, ValueType>(value);
-	}
-
-	template<typename ValueType,
-		 typename std::enable_if<TypeSizeGT<Holder<ValueType>, Placeholder<ValueType>::Size::value>::value>::type* = nullptr>
-	void construct(const ValueType& value)
-	{
-		_valueHolder.assignHeap<Holder<ValueType>, ValueType>(value);
+		_valueHolder.assign<Holder<ValueType>, ValueType>(value);
 	}
 
 	void construct(const Any& other)
