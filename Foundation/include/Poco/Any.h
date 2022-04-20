@@ -25,9 +25,7 @@
 
 namespace Poco {
 
-
 class Any;
-
 
 namespace Dynamic {
 
@@ -97,8 +95,8 @@ public:
 
 	bool isEmpty() const
 	{
-		char buf[SizeV] = {};
-		return 0 == std::memcmp(holder, buf, SizeV);
+		static char buf[SizeV+1] = {};
+		return 0 == std::memcmp(holder, buf, SizeV+1);
 	}
 
 	bool isLocal() const
@@ -202,6 +200,7 @@ private:
 		return pHolder;
 	}
 
+private:
 #endif // POCO_NO_SOO
 	PlaceholderT* pHolder;
 };
