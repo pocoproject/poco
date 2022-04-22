@@ -30,6 +30,7 @@
 #include <openssl/core_names.h>
 #include <openssl/decoder.h>
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <iostream>
 
 
 namespace Poco {
@@ -738,10 +739,12 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 	EVP_PKEY_CTX* pKeyCtx = NULL;
 	OSSL_DECODER_CTX* pOSSLDecodeCtx = NULL;
 	EVP_PKEY* pKey = NULL;
+	bool freeEVPPKey = true;
 	if (!dhParamsFile.empty())
 	{
-		pOSSLDecodeCtx = OSSL_DECODER_CTX_new_for_pkey(&pKey, NULL, NULL, NULL,
-				OSSL_KEYMGMT_SELECT_KEYPAIR, NULL, NULL);
+		freeEVPPKey = false;
+		pOSSLDecodeCtx = OSSL_DECODER_CTX_new_for_pkey(&pKey, NULL, NULL, "DH",
+				OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS, NULL, NULL);
 
 		if (!pOSSLDecodeCtx)
 		{
@@ -750,11 +753,12 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			throw Poco::NullPointerException(Poco::Crypto::getError(err));
 		}
 
-		if (!pKey)
+		if (!OSSL_DECODER_CTX_get_num_decoders(pOSSLDecodeCtx))
 		{
-			std::string err = Poco::format(
-					"Context::initDH(%s):OSSL_DECODER_CTX_new_for_pkey():EVP_PKEY*\n", dhParamsFile);
-			throw Poco::NullPointerException(Poco::Crypto::getError(err));
+			OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+			throw Poco::Crypto::OpenSSLException(
+				Poco::format("Context::initDH(%s):OSSL_DECODER_CTX_get_num_decoders()=0",
+					dhParamsFile));
 		}
 
 		FILE* pFile = fopen(dhParamsFile.c_str(), "r");
@@ -768,10 +772,20 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 
 		if (!OSSL_DECODER_from_fp(pOSSLDecodeCtx, pFile))
 		{
+			fclose(pFile);
 			OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
 			std::string err = Poco::format(
 					"Context::initDH(%s):OSSL_DECODER_from_fp()\n%s", dhParamsFile);
 			throw Poco::Crypto::OpenSSLException(Poco::Crypto::getError(err));
+		}
+		fclose(pFile);
+		OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+
+		if (!pKey)
+		{
+			std::string err = Poco::format(
+					"Context::initDH(%s):OSSL_DECODER_CTX_new_for_pkey():EVP_PKEY*\n", dhParamsFile);
+			throw Poco::NullPointerException(Poco::Crypto::getError(err));
 		}
 	}
 	else
@@ -809,6 +823,7 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
 			throw SSLContextException(Poco::Crypto::getError(err));
 		}
+		EVP_PKEY_CTX_free(pKeyCtx);
 	}
 
 	if (!pKey)
@@ -819,9 +834,7 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 	SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey);
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 
-	EVP_PKEY_free(pKey);
-	if (pKeyCtx) EVP_PKEY_CTX_free(pKeyCtx);
-	if (pOSSLDecodeCtx) OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+	if (freeEVPPKey) EVP_PKEY_free(pKey);
 
 #else // OPENSSL_VERSION_NUMBER >= 0x30000000L
 
