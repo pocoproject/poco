@@ -35,7 +35,7 @@ public:
 
 	int countTestCases() const;
 
-	void run(TestResult* result);
+	void run(TestResult* result, const Test::Callback& cb);
 
 	std::string toString() const;
 

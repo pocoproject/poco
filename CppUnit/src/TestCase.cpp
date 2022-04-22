@@ -106,7 +106,7 @@ void TestCase::warn(const std::string& message, long lineNumber, const std::stri
 
 
 // Run the test and catch any exceptions that are triggered by it
-void TestCase::run(TestResult *result)
+void TestCase::run(TestResult *result, const Test::Callback& cb)
 {
 	result->startTest(this);
 
@@ -123,8 +123,7 @@ void TestCase::run(TestResult *result)
 	catch (std::exception& e)
 	{
 		std::string msg(typeid(e).name());
-		msg.append(": ");
-		msg.append(e.what());
+		msg.append(":\n").append(cb(e));
 		result->addError(this, new CppUnitException(msg));
 	}
 	catch (...)

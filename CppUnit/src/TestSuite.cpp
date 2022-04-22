@@ -19,7 +19,7 @@ void TestSuite::deleteContents()
 
 
 // Runs the tests and collects their result in a TestResult.
-void TestSuite::run(TestResult *result)
+void TestSuite::run(TestResult *result, const Test::Callback& cb)
 {
 	for (std::vector<Test*>::iterator it = _tests.begin(); it != _tests.end(); ++it) 
 	{
@@ -29,7 +29,7 @@ void TestSuite::run(TestResult *result)
 		Test *test = *it;
 		if (!setup().empty())
 			test->addSetup(setup());
-		test->run(result);
+		test->run(result, cb);
 	}
 }
 
