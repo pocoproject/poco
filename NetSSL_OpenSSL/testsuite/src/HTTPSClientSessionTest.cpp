@@ -33,8 +33,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
 #include "HTTPSTestServer.h"
-#include <istream>
-#include <ostream>
+#include <iostream>
 #include <sstream>
 
 
@@ -89,17 +88,25 @@ HTTPSClientSessionTest::~HTTPSClientSessionTest()
 
 void HTTPSClientSessionTest::testGetSmall()
 {
-	HTTPSTestServer srv;
-	HTTPSClientSession s("127.0.0.1", srv.port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
-	s.sendRequest(request);
-	HTTPResponse response;
-	std::istream& rs = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	try
+	{
+		HTTPSTestServer srv;
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
