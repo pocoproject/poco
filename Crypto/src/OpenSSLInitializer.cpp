@@ -157,7 +157,16 @@ void OpenSSLInitializer::uninitialize()
 #endif
 		delete [] _mutexes;
 #endif
-
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+		if (_defaultProvider)
+		{
+			OSSL_PROVIDER_unload(_defaultProvider);
+		}
+		if (_legacyProvider)
+		{
+			OSSL_PROVIDER_unload(_legacyProvider);
+		}
+#endif
 	}
 }
 
