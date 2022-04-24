@@ -90,7 +90,7 @@ public:
 	TestCase(const std::string& Name, Test::Type testType = Test::Normal);
 	~TestCase();
 
-	virtual void run(TestResult* result, const Test::Callback& cb = nullptr);
+	virtual void run(TestResult* result, const Test::Callback& callback = nullptr);
 	virtual TestResult* run();
 	virtual int countTestCases() const;
 	virtual std::string toString() const;

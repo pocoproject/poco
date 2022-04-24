@@ -45,7 +45,7 @@ public:
 	TestRunner(std::ostream& ostr);
 	~TestRunner();
 
-	bool run(const std::vector<std::string>& args, const Test::Callback& cb = nullptr);
+	bool run(const std::vector<std::string>& args, const Test::Callback& callback = nullptr);
 	void addTest(const std::string& name, Test* test);
 
 protected:

@@ -37,7 +37,7 @@ public:
 	using Callback = std::function<std::string(const std::exception&)>;
 
 	virtual ~Test() = 0;
-	virtual void run(TestResult* result, const Callback& cb = nullptr) = 0;
+	virtual void run(TestResult* result, const Callback& callback = nullptr) = 0;
 	virtual int countTestCases() const = 0;
 	virtual std::string toString() const = 0;
 	virtual Test::Type getType() const = 0;
@@ -56,7 +56,7 @@ inline Test::~Test()
 
 
 // Runs a test and collects its result in a TestResult instance.
-inline void Test::run(TestResult *result, const Callback& cb)
+inline void Test::run(TestResult *result, const Callback& callback)
 {
 }
 
