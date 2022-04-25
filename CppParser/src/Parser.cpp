@@ -133,6 +133,7 @@ inline void Parser::append(std::string& decl, const std::string& token)
 	 || token == "static"
 	 || token == "mutable"
 	 || token == "inline"
+	 || token == "virtual"
 	 || token == "volatile"
 	 || token == "register"
 	 || token == "thread_local")
