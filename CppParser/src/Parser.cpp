@@ -379,7 +379,7 @@ const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
 
 	pNext = next();
-	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_COMPL))
+	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_COMPL) || isOperator(pNext, OperatorToken::OP_DBL_COLON))
 	{
 		switch (pNext->asInteger())
 		{
