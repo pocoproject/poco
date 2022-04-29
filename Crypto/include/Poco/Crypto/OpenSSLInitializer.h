@@ -24,6 +24,7 @@
 #include <openssl/crypto.h>
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 #include <openssl/provider.h>
+#include <atomic>
 #endif
 #if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
 #include <openssl/fips.h>
@@ -63,10 +64,10 @@ public:
 		/// Shuts down the OpenSSL machinery.
 
 	static bool isFIPSEnabled();
-		// Returns true if FIPS mode is enabled, false otherwise.
+		/// Returns true if FIPS mode is enabled, false otherwise.
 
 	static void enableFIPSMode(bool enabled);
-		// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
+		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
 
 protected:
 	enum
@@ -91,8 +92,8 @@ private:
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-	static OSSL_PROVIDER* _defaultProvider;
-	static OSSL_PROVIDER* _legacyProvider;
+	static std::atomic<OSSL_PROVIDER*> _defaultProvider;
+	static std::atomic<OSSL_PROVIDER*> _legacyProvider;
 #endif
 };
 

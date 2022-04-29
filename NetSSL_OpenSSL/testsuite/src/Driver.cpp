@@ -37,7 +37,8 @@ public:
 	{
 		CppUnit::TestRunner runner;
 		runner.addTest("NetSSLTestSuite", NetSSLTestSuite::suite());
-		return runner.run(_targs) ? 0 : 1;
+		CppUnitPocoExceptionText (exc);
+		return runner.run(_targs, exc) ? 0 : 1;
 	}
 	
 	void setup(int argc, char** argv)

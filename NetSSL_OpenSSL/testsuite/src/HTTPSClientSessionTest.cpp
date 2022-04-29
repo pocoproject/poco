@@ -33,8 +33,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
 #include "HTTPSTestServer.h"
-#include <istream>
-#include <ostream>
+#include <iostream>
 #include <sstream>
 
 

@@ -66,8 +66,8 @@ Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(0);
-OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
+std::atomic<OSSL_PROVIDER*> OpenSSLInitializer::_defaultProvider(0);
+std::atomic<OSSL_PROVIDER*> OpenSSLInitializer::_legacyProvider(0);
 #endif
 
 
@@ -136,8 +136,8 @@ void OpenSSLInitializer::initialize()
 		}
 		if (!_legacyProvider)
 		{
-			_legacyProvider  = OSSL_PROVIDER_load(NULL, "legacy");
-			if (!_defaultProvider) throw CryptoException("Failed to load OpenSSL legacy provider");
+			_legacyProvider = OSSL_PROVIDER_load(NULL, "legacy");
+			if (!_legacyProvider) throw CryptoException("Failed to load OpenSSL legacy provider");
 		}
 #endif
 	}
@@ -157,7 +157,17 @@ void OpenSSLInitializer::uninitialize()
 #endif
 		delete [] _mutexes;
 #endif
-
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+		OSSL_PROVIDER* provider = nullptr;
+		if ((provider = _defaultProvider.exchange(nullptr)))
+		{
+			OSSL_PROVIDER_unload(provider);
+		}
+		if ((provider = _legacyProvider.exchange(nullptr)))
+		{
+			OSSL_PROVIDER_unload(provider);
+		}
+#endif
 	}
 }
 
