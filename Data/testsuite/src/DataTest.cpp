@@ -9,6 +9,7 @@
 
 
 #include "DataTest.h"
+#include "Extractor.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
@@ -29,6 +30,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/DynamicLOB.h"
 #include "Poco/Data/DynamicDateTime.h"
+#include "Poco/Latin1Encoding.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
@@ -45,6 +47,7 @@ using Poco::UInt32;
 using Poco::Int64;
 using Poco::UInt64;
 using Poco::DateTime;
+using Poco::Latin1Encoding;
 using Poco::Dynamic::Var;
 using Poco::InvalidAccessException;
 using Poco::IllegalStateException;
@@ -65,6 +68,7 @@ using Poco::Data::Row;
 using Poco::Data::SimpleRowFormatter;
 using Poco::Data::Date;
 using Poco::Data::Time;
+using Poco::Data::AbstractExtractor;
 using Poco::Data::AbstractExtraction;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
@@ -1358,6 +1362,29 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
+void DataTest::testTranscode()
+{
+	Latin1Encoding::Ptr pL2E = new Latin1Encoding();
+
+	const unsigned char latin1Chars[] = { 'g', 252, 'n', 't', 'e', 'r', 0 };
+	const unsigned char utf8Chars[] = { 'g', 195, 188, 'n', 't', 'e', 'r', 0 };
+	std::string latin1Text((const char*)latin1Chars);
+	std::string utf8Text((const char*)utf8Chars);
+
+	Poco::Data::Test::Extractor ext;
+	ext.setString(latin1Text);
+	std::string utf8Out;
+	assertTrue (ext.extract(0, utf8Out));
+	assertTrue(utf8Out == latin1Text);
+
+	Poco::Data::Test::Extractor ext2(new Latin1Encoding());
+	ext2.setString(latin1Text);
+	utf8Out.clear();
+	assertTrue(ext2.extract(0, utf8Out));
+	assertTrue(utf8Out == utf8Text);
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1388,6 +1415,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testRowFormat);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
+	CppUnit_addTest(pSuite, DataTest, testTranscode);
 
 	return pSuite;
 }

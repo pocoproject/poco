@@ -20,8 +20,18 @@ namespace Poco {
 namespace Data {
 
 
-AbstractExtractor::AbstractExtractor()
+AbstractExtractor::AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding,
+	Poco::TextEncoding::Ptr pToEncoding):
+	_pDBEncoding(pDBEncoding),
+	_pToEncoding(pToEncoding ?
+		pToEncoding : _pDBEncoding ?
+			Poco::TextEncoding::find("UTF-8") : nullptr),
+	_pConverter(_pDBEncoding ?
+		new Poco::TextConverter(*pDBEncoding, *_pToEncoding) :
+		nullptr)
 {
+	poco_assert_dbg((!_pDBEncoding && !_pToEncoding) ||
+		(_pDBEncoding && _pToEncoding));
 }
 
 

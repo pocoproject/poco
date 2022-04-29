@@ -23,6 +23,9 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/UUID.h"
 #include "Poco/UTFString.h"
+#include "Poco/TextConverter.h"
+#include "Poco/TextEncoding.h"
+#include <memory>
 #include <vector>
 #include <deque>
 #include <list>
@@ -54,7 +57,8 @@ class Data_API AbstractExtractor
 public:
 	using Ptr = SharedPtr<AbstractExtractor>;
 
-	AbstractExtractor();
+	AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr,
+		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Creates the AbstractExtractor.
 
 	virtual ~AbstractExtractor();
@@ -346,6 +350,15 @@ public:
 
 	virtual void reset();
 		/// Resets any information internally cached by the extractor.
+
+protected:
+	bool transcodeRequired() const;
+	void transcode(const std::string& val1, std::string& val2);
+
+private:
+	Poco::TextEncoding::Ptr _pDBEncoding;
+	Poco::TextEncoding::Ptr _pToEncoding;
+	std::unique_ptr<Poco::TextConverter> _pConverter;
 };
 
 
@@ -355,6 +368,22 @@ public:
 inline void AbstractExtractor::reset()
 {
 	//default no-op
+}
+
+
+inline bool AbstractExtractor::transcodeRequired() const
+{
+	return _pConverter.operator bool();
+}
+
+
+inline void AbstractExtractor::transcode(const std::string& val1, std::string& val2)
+{
+	if (_pConverter)
+	{
+		val2.clear();
+		_pConverter->convert(val1, val2);
+	}
 }
 
 

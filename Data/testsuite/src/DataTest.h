@@ -43,6 +43,7 @@ public:
 	void testRowFormat();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
+	void testTranscode();
 
 	void setUp();
 	void tearDown();
