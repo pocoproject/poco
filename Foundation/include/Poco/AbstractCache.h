@@ -19,7 +19,7 @@
 
 
 #include "Poco/KeyValueArgs.h"
-#include "Poco/ValidArgs.h" 
+#include "Poco/ValidArgs.h"
 #include "Poco/Mutex.h"
 #include "Poco/Exception.h"
 #include "Poco/FIFOEvent.h"
@@ -34,9 +34,9 @@
 namespace Poco {
 
 
-template <class TKey, class TValue, class TStrategy, class TMutex = FastMutex, class TEventMutex = FastMutex> 
+template <class TKey, class TValue, class TStrategy, class TMutex = FastMutex, class TEventMutex = FastMutex>
 class AbstractCache
-	/// An AbstractCache is the interface of all caches. 
+	/// An AbstractCache is the interface of all caches.
 {
 public:
 	FIFOEvent<const KeyValueArgs<TKey, TValue>, TEventMutex> Add;
@@ -83,7 +83,7 @@ public:
 	void update(const TKey& key, const TValue& val)
 		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten.
-		/// The difference to add is that no remove or add events are thrown in this case, 
+		/// The difference to add is that no remove or add events are thrown in this case,
 		/// just a simply silent update is performed
 		/// If the key does not exist the behavior is equal to add, ie. an add event is thrown
 	{
@@ -103,7 +103,7 @@ public:
 	void update(const TKey& key, SharedPtr<TValue > val)
 		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten.
-		/// The difference to add is that no remove or add events are thrown in this case, 
+		/// The difference to add is that no remove or add events are thrown in this case,
 		/// just an Update is thrown
 		/// If the key does not exist the behavior is equal to add, ie. an add event is thrown
 	{
@@ -176,6 +176,23 @@ public:
 		return result;
 	}
 
+	template <typename Fn>
+	void forEach(Fn&& fn) const
+		/// Iterates over all key-value pairs in the
+		/// cache, using a functor or lambda expression.
+		///
+		/// The given functor must take the key and value
+		/// as parameters. Note that the value is passed
+		/// as the actual value (or reference),
+		/// not a Poco::SharedPtr.
+	{
+		typename TMutex::ScopedLock lock(_mutex);
+		for (const auto& p: _data)
+		{
+			fn(p.first, *p.second);
+		}
+	}
+
 protected:
 	mutable FIFOEvent<ValidArgs<TKey>> IsValid;
 	mutable FIFOEvent<KeySet>          Replace;
@@ -214,7 +231,7 @@ protected:
 		KeyValueArgs<TKey, TValue> args(key, val);
 		Add.notify(this, args);
 		_data.insert(std::make_pair(key, SharedPtr<TValue>(new TValue(val))));
-		
+
 		doReplace();
 	}
 
@@ -228,7 +245,7 @@ protected:
 		KeyValueArgs<TKey, TValue> args(key, *val);
 		Add.notify(this, args);
 		_data.insert(std::make_pair(key, val));
-		
+
 		doReplace();
 	}
 
@@ -248,7 +265,7 @@ protected:
 			Update.notify(this, args);
 			it->second = SharedPtr<TValue>(new TValue(val));
 		}
-		
+
 		doReplace();
 	}
 
@@ -268,11 +285,11 @@ protected:
 			Update.notify(this, args);
 			it->second = val;
 		}
-		
+
 		doReplace();
 	}
 
-	void doRemove(Iterator it) 
+	void doRemove(Iterator it)
 		/// Removes an entry from the cache. If the entry is not found
 		/// the remove is ignored.
 	{
@@ -300,7 +317,7 @@ protected:
 		return result;
 	}
 
-	SharedPtr<TValue> doGet(const TKey& key) 
+	SharedPtr<TValue> doGet(const TKey& key)
 		/// Returns a SharedPtr of the cache entry, returns 0 if for
 		/// the key no value was found
 	{
@@ -308,7 +325,7 @@ protected:
 		SharedPtr<TValue> result;
 
 		if (it != _data.end())
-		{	
+		{
 			// inform all strategies that a read-access to an element happens
 			Get.notify(this, key);
 			// ask all strategies if the key is valid

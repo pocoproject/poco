@@ -47,7 +47,7 @@ public:
 	{
 		return new C;
 	}
-	
+
 	bool validateObject(P pObject)
 		/// Checks whether the object is still valid
 		/// and can be reused.
@@ -60,14 +60,14 @@ public:
 	{
 		return true;
 	}
-	
+
 	void activateObject(P pObject)
 		/// Called before an object is handed out by the pool.
 		/// Also called for newly created objects, before
 		/// they are given out for the first time.
 	{
 	}
-	
+
 	void deactivateObject(P pObject)
 		/// Called after an object has been given back to the
 		/// pool and the object is still valid (a prior call
@@ -77,7 +77,7 @@ public:
 		/// must not throw an exception.
 	{
 	}
-	
+
 	void destroyObject(P pObject)
 		/// Destroy an object.
 		///
@@ -97,20 +97,20 @@ public:
 	{
 		return new C;
 	}
-	
+
 	bool validateObject(Poco::AutoPtr<C> pObject)
 	{
 		return true;
 	}
-	
+
 	void activateObject(Poco::AutoPtr<C> pObject)
 	{
 	}
-	
+
 	void deactivateObject(Poco::AutoPtr<C> pObject)
 	{
 	}
-	
+
 	void destroyObject(Poco::AutoPtr<C> pObject)
 	{
 	}
@@ -125,20 +125,20 @@ public:
 	{
 		return new C;
 	}
-	
+
 	bool validateObject(Poco::SharedPtr<C> pObject)
 	{
 		return true;
 	}
-	
+
 	void activateObject(Poco::SharedPtr<C> pObject)
 	{
 	}
-	
+
 	void deactivateObject(Poco::SharedPtr<C> pObject)
 	{
 	}
-	
+
 	void destroyObject(Poco::SharedPtr<C> pObject)
 	{
 	}
@@ -177,7 +177,7 @@ public:
 	{
 		poco_assert (capacity <= peakCapacity);
 	}
-	
+
 	ObjectPool(const F& factory, std::size_t capacity, std::size_t peakCapacity):
 		/// Creates a new ObjectPool with the given PoolableObjectFactory,
 		/// capacity and peak capacity. The PoolableObjectFactory must have
@@ -189,7 +189,7 @@ public:
 	{
 		poco_assert (capacity <= peakCapacity);
 	}
-	
+
 	~ObjectPool()
 		/// Destroys the ObjectPool.
 	{
@@ -205,7 +205,7 @@ public:
 			poco_unexpected();
 		}
 	}
-		
+
 	P borrowObject(long timeoutMilliseconds = 0)
 		/// Obtains an object from the pool, or creates a new object if
 		/// possible.
@@ -217,22 +217,15 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
-		if (!_pool.empty())
-		{
-			P pObject = _pool.back();
-			_pool.pop_back();
-			return activateObject(pObject);
-		}
-
-		if (_size >= _peakCapacity)
+		if (_size >= _peakCapacity && _pool.empty())
 		{
 			if (timeoutMilliseconds == 0)
 			{
 				return 0;
 			}
-			while (_size >= _peakCapacity)
+			while (_size >= _peakCapacity && _pool.empty())
 			{
-				if ( !_availableCondition.tryWait(_mutex, timeoutMilliseconds))
+				if (!_availableCondition.tryWait(_mutex, timeoutMilliseconds))
 				{
 					// timeout
 					return 0;
@@ -240,10 +233,19 @@ public:
 			}
 		}
 
+		if (!_pool.empty())
+		{
+			P pObject = _pool.back();
+			_pool.pop_back();
+
+			return activateObject(pObject);
+		}
+
 		// _size < _peakCapacity
 		P pObject = _factory.createObject();
 		activateObject(pObject);
 		_size++;
+
 		return pObject;
 	}
 
@@ -260,6 +262,7 @@ public:
 				try
 				{
 					_pool.push_back(pObject);
+					_availableCondition.signal();
 					return;
 				}
 				catch (...)
@@ -276,19 +279,19 @@ public:
 	{
 		return _capacity;
 	}
-	
+
 	std::size_t peakCapacity() const
 	{
 		return _peakCapacity;
 	}
-	
+
 	std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		
+
 		return _size;
 	}
-	
+
 	std::size_t available() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -310,12 +313,12 @@ protected:
 		}
 		return pObject;
 	}
-	
+
 private:
 	ObjectPool();
 	ObjectPool(const ObjectPool&);
 	ObjectPool& operator = (const ObjectPool&);
-	
+
 	F _factory;
 	std::size_t _capacity;
 	std::size_t _peakCapacity;

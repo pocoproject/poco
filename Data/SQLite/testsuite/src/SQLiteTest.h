@@ -100,6 +100,8 @@ public:
 
 	void testDateTime();
 
+	void testUUID();
+
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
 	void testNullable();

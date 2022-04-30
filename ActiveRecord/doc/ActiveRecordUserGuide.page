@@ -1,0 +1,400 @@
+POCO ActiveRecord User Guide
+POCO ActiveRecord Framework
+
+!!!Introduction
+
+POCO ActiveRecord is a simple and lightweight object-relational mapping (ORM) framework
+built on top of the POCO Data library. The main goal of POCO ActiveRecord is
+to relieve developers from having to write lots of boilerplate database
+query code for common operations like finding an object by ID, updating an object, deleting
+an object or running paged queries. As its name implies, the framework follows
+the well-known [[https://en.wikipedia.org/wiki/Active_record_pattern Active Record]]
+architectural pattern. It's based on a code generator (named <*ActiveRecord Compiler*>,
+or <[arc]>) and uses a convention-over-configuration approach.
+
+
+!!!Getting Started
+
+The starting point for using the ActiveRecord framework is an XML file.
+The XML file describes the classes that correspond to database tables,
+and their relationships. From that XML file, the ActiveRecord Compiler
+generates corresponding header and source files defining and implementing
+the respective C++ classes, as well as type handlers for the POCO Data
+library.
+
+Following is an example for such an XML file. The file defines two
+classes, an `Employee` class (mapped to a table named `employees`), and
+a `Role` class (mapped to a table named `roles`).
+
+  <project namespace="Sample">
+    <class name="Employee" table="employees">
+      <property name="id" type="uuid"/>
+      <property name="name" type="string"/>
+      <property name="ssn" type="string"/>
+      <property name="role" type="int16" references="Role"/>
+      <property name="manager" type="uuid" references="Employee" cardinality="?"/>
+    </class>
+
+    <class name="Role" table="roles" autoIncrementID="true">
+      <property name="id" type="int16"/>
+      <property name="name" type="string"/>
+      <property name="description" type="string"/>
+    </class>
+  </project>
+----
+
+There is a n:1 relationship between `Employee` and `Role` (each employee
+has exactly one role). Furthermore, each employee can optionally have
+a manager, which is again an `Employee`.
+
+Properties named `id` are considered to be primary keys, unless a different
+property has been designated the primary key (with the `key` attribute in
+the `class` element). It's also possible to have objects without a primary key
+or ID column (keyless active records).
+
+The generated C++ classes will be in the `Sample` namespace, as specified
+in the <[project]> element.
+
+The definitions in the XML file correspond to the database schema built
+by the following <[CREATE TABLE]> statements:
+
+  CREATE TABLE employees (
+    id CHAR(36) PRIMARY KEY,
+    name VARCHAR(64),
+    ssn VARCHAR(32),
+    role INTEGER,
+    manager CHAR(36)
+  );
+
+  CREATE TABLE roles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(64),
+    description VARCHAR(256)
+  );
+----
+
+If the database engine supports it, the `id` column of the `employees` table can be
+an UUID as well.
+
+Running the ActiveRecord Compiler with the above XML file (sample.xml) with the
+following statement:
+
+  $ arc sample.xml
+----
+
+will create the following files in the current working directory:
+
+  include/
+    Sample/
+      Employee.h
+      Role.h
+  src/
+    Employee.cpp
+    Role.cpp
+----
+
+The generated classes are derived from the Poco::ActiveRecord::ActiveRecord class
+template and have accessor methods for all properties defined in the XML file,
+as well as methods for creating, updating and deleting instances in the database.
+
+ActiveRecord objects are reference counted, and every generated class contains
+a `Ptr` type alias for an appropriate Poco::AutoPtr<>.
+
+!!The Context
+
+ActiveRecord uses a Context (Poco::ActiveRecord::Context) class to bind objects to
+a database session (Poco::Data::Session). In addition to the database session,
+the Context also holds a connector-specific
+Poco::ActiveRecord::StatementPlaceholderProvider. This class makes sure generated
+SQL statements have the correct placeholders for the respective database backend.
+For most database backends, the `?` placeholders will be fine, but PostgreSQL
+has a different placeholder format (`$1`, `$2`, etc). The Context's StatementPlaceholderProvider
+takes care of that.
+
+Every ActiveRecord object must be associated with a Context, before any database
+operations can take place. Context objects are relatively lightweight, so they
+can be created whenever needed. Context objects are reference-counted, so a Context
+object will be kept alive as long as at least one ActiveRecord object still references it.
+
+!!Creating an Object
+
+The following code snippet shows how to create a new `Role` object and insert it into
+the `roles` table.
+
+    Poco::Data::Session session("SQLite", "data.sqlite");
+    Context::Ptr pContext = new Context(session);
+
+    Role::Ptr pDeveloper = new Role;
+    pDeveloper->name("Developer")
+        .description("Developer role");
+
+    pDeveloper->create(pContext);
+----
+
+As can be seen, setters (`name()`, `description()` in this case) can be chained.
+The `create()` method will bind the object to a Context and then execute
+an `INSERT` statement to insert the object into the `roles` table.
+
+!!Finding an Object
+
+The following code snippet shows how to find a `Role` object by its ID (1).
+
+    Poco::Data::Session session("SQLite", "data.sqlite");
+    Context::Ptr pContext = new Context(session);
+
+    Role::Ptr pRole = Role::find(pContext, 1);
+    std::cout
+        << "name: " << pRole->name() << "\n"
+        << "description: " << pRole->description() << std::endl;
+----
+
+!!Updating an Object
+
+Updating an object involves first updating the respective properties using
+the setter functions, then calling the `update()` method. To update an
+ActiveRecord object, the object must already be bound to a Context.
+Objects returned from `find()`, or from a query will already be bound to a Context.
+Note that the following snippets will omit the session and context setup code.
+
+    Role::Ptr pRole = Role::find(pContext, 1);
+    pRole->description("New developer role");
+    pRole->update();
+----
+
+!!Deleting an Object
+
+An object bound to a Context can be deleted by calling the `remove()` method.
+
+    Role::Ptr pRole = Role::find(pContext, 1);
+    pRole->remove();
+----
+
+!!Queries
+
+Finding objects by their IDs alone is fine if the respective IDs are already known.
+However, in most cases, ActiveRecord objects will be obtained by executing
+a query. To do that, the ActiveRecord framework provides the
+Poco::ActiveRecord::Query class template. The Query template must be instantiated
+with the class of the resulting objects. The Query class will generate a
+`SELECT` statement. Query parameters can be specified via data binding. The
+`?` placeholder can be used regardless of the underlying database backend. The
+Query class will replace it with the appropriate placeholder for the backend.
+Actual query parameters are bound with the `bind()` method. The query is then
+executed by calling the `execute()` method.
+
+The result of a Query is a `std::vector` containing pointers (Poco::AutoPtr)
+to returned objects.
+
+    Poco::ActiveRecord::Query<Role> query(pContext);
+    const auto result = query
+        .where("name = ?")
+        .bind("Developer"s)
+        .execute();
+    for (const auto& pRole: result)
+    {
+        std::cout << pRole->description() << std::endl;
+    }
+----
+
+The argument to the `where()` method can be any SQL WHERE clause. Please note
+that you must use column names from the actual database tables in the WHERE
+clause, not property names.
+
+!Ordering
+
+The results of a Query can be ordered, by calling the `orderBy()` method.
+Note that the argument to `orderBy` must be the actual column name in the table,
+not the property name of the object. The column name can be followed by
+`ASC` or `DESC` to specify the direction.
+
+    Poco::ActiveRecord::Query<Role> query(pContext);
+    const auto result = query
+        .where("name = ?")
+        .bind("Developer"s)
+        .orderBy("name ASC")
+        .execute();
+    for (const auto& pRole: result)
+    {
+        std::cout << pRole->description() << std::endl;
+    }
+----
+
+!Paging
+
+The result of a query can be paged, by specifying an offset and a limit.
+The offset specifies the index of the first result to be returned, the
+limit specifies the maximum number of objects returned.
+
+To retrieve all roles, split up into pages of 10 roles, the following
+code could be used:
+
+    std::size_t offset = 0;
+    const std::size_t pageSize = 10;
+    Poco::ActiveRecord::Query<Role> query(pContext);
+    bool done = false;
+    while (!done)
+    {
+        const auto result = query
+            .orderBy("name")
+            .offset(offset)
+            .limit(pageSize)
+            .execute();
+
+        offset += result.size();
+        done = result.empty();
+
+        for (const auto& pRole: result)
+        {
+            // ...
+        }
+
+        query.reset();
+    }
+----
+
+In order to re-execute a Query, the `reset()` method must be called first, as is
+shown above at the end of the `while` loop.
+
+!Filtering Results
+
+In addition to filtering results with a `WHERE` clause, it's also possible to
+filter results with a lambda expression. While `WHERE` is evaluated in the
+database engine, and therefore much more efficient, the `filter()` method
+allows some additional flexibility.
+
+    Poco::ActiveRecord::Query<Role> query(pContext);
+    query.filter(
+        [](const Role& role)
+        {
+            return role.name() == "Senior Developer";
+        }
+    );
+
+    const auto result = query.execute();
+----
+
+The lambda expression is passed a const reference to an ActiveRecord object and
+must return a `bool`. If `true` is returned, the object is included in the result,
+otherwise not.
+
+!Relations
+
+Relations (defined in the XML file as properties with a `references` attribute)
+can be accessed via two kinds accessor methods. The first accepts an
+ActiveObject::Ptr as parameter or returns it, the second kind takes a key as
+parameter or returns it. Accessors that take a key/ID value instead of an
+ActiveRecord have their method name suffixed with `ID`.
+
+In the following sample, the `role` property is set with the key value, whereas the
+`manager` property is set via the ActiveRecord object.
+
+    Employee::Ptr pManager = new Employee;
+    pManager->name("Bill Lumbergh").ssn("23452343").roleID(3);
+    pManager->create(pContext);
+
+    Employee::Ptr pEmployee = new Employee;
+    pEmployee->name("Michael Bolton").ssn("123987123").roleID(2).manager(pManager);
+    pEmployee->create(pContext);
+----
+
+!Auto-Increment Keys and Auto-Generated UUIDs on Insert
+
+ActiveRecord supports auto-incrementing keys when inserting an ActiveRecord. T
+o enable this feature, the `autoIncrementID` attribute in the `class` element needs
+to be set to `true`.
+When inserting such an ActiveRecord object, after executing the `INSERT` statement, the
+actual value of the key will be obtained from the database. This is currently
+implemented for SQLite, MySQL/MariaDB and PostgreSQL, using appropriate database-specific
+mechanisms.
+
+When inserting an ActiveRecord with an all-null UUID, a random UUID will be generated
+before executing the `INSERT` statement.
+
+!Keyless Active Records
+
+It is possible to define classes without an ID or primary key property. For these objects,
+no `find()` method will be generated, and updating these objects is also not possible
+(`update()` will throw a Poco::NotImplementedException).
+
+Keyless ActiveRecord objects can be retrieved by executing a Poco::ActiveRecord::Query.
+
+
+!!!Compiler XML Reference
+
+!!Supported Data Types
+
+The following data types can be specified for properties in the `type` attribute
+and are mapped to the indicated C++ types.
+
+    Type in XML     C++ Type
+    ----------------------------
+    bool            bool
+    char            char
+    int8            Poco::Int8
+    uint8           Poco::UInt8
+    int16           Poco::Int16
+    uint16          Poco::UInt16
+    int32           Poco::Int32
+    uint32          Poco::UInt32
+    int64           Poco::Int64
+    uint64          Poco::UInt64
+    float           float
+    double          double
+    dateTime        Poco::DateTime
+    timestamp       Poco::Timestamp
+    time            Poco::Data::Time
+    date            Poco::Data::Date
+    uuid            Poco::UUID
+    string          std::string
+----
+
+Note: When creating the underlying database schema, it's the developer's responsibility
+to use a database-specific column type compatible with the data type specified in the XML.
+
+!!Elements and Attributes
+
+!The project Element
+
+The `project` element must be the root element in the XML file.
+The `project` element accepts the following attributes:
+
+   - `namespace`: Specifies the C++ namespace for the generated classes. A multi-level
+     namespace can be specified, e.g. "MyProject::Data".
+   - `convertCamelCase`: If set to `true`, property and class names specified in
+     camel case (e.g., `firstName`) will be converted to snake case (`first_name`) to
+     identify the respective column or table. Defaults to `false`.
+
+!The class Element
+
+The `class` element must be inside of a `project` element and accepts the following attributes:
+
+  - `name`: Specifies the name of the class. Must be a valid C++ class name. Required.
+  - `table`: Specifies the name of the related database table. If not specified, the
+    table name will be derived from the class name (see the `convertCamelCase` attribute
+    in the `project` element).
+  - `key`: Specifies the name of the primary key column. If not specified, defaults
+    to `id`.
+  - `autoIncrementID`: If set to `true`, the primary key is considered to be
+    auto-incremented. A new ActiveObject is inserted with a NULL primary key, which
+    causes the database to assign a new key value. The actual key value is then
+    obtained from the database after executing the `INSERT` statement.
+
+!The property Element
+
+The `property` element must be inside of a `class` element and accepts the following attributes:
+
+  - `name`: Specifies the name of the variable, which is also used for the getter and setter
+    methods. Must be a valid C++ variable or method name. Required.
+  - `column`: Specifies the name of the related database column. If not specified, the
+    column name will be derived from the property name (see the `convertCamelCase` attribute
+    in the `project` element).
+  - `type`: Specifies the data type of the property. See <*Supported Data Types*> for
+    a list of supported values. Required.
+  - `references`: Specifies the name of the target class for a relation. Must be the name
+    of another class defined in the same XML document.
+  - `cardinality`: Specifies the cardinality of the relation. The following values can be
+    specified: `?` means zero or one, `1` means exactly one (default). Additionally, `*` means zero
+    or more and `+` means one or more, but no accessor is currently generated for the latter
+    two cardinalities.
+  - `nullable`: If set to `true`, marks the property or column as nullable. In this case,
+    the accessor methods will accept or return a Poco::Nullable<> value.

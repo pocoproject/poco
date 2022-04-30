@@ -42,7 +42,7 @@ void WinServiceTest::testServiceReturnsFailureActionConfigured()
 	WinService spoolerService{"Spooler"};
 
 	auto failureActions = spoolerService.getFailureActions();
-	assertEqual(3, failureActions.size());
+	assertEqual(3, static_cast<int>(failureActions.size()));
 
 	assertEqual(WinService::SVC_RESTART, failureActions[0]);
 	assertEqual(WinService::SVC_RESTART, failureActions[1]);

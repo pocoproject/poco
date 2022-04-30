@@ -2438,14 +2438,14 @@ void VarTest::testDynamicPair()
 	catch (InvalidAccessException&) { }
 
 	Var va(aPair);
-	assertTrue ("{ \"0\" : null }" == va.convert<std::string>());
+	assertTrue ("{ \"0\": null }" == va.convert<std::string>());
 	assertTrue (aPair.toString() == va.convert<std::string>());
 
 	aPair = Pair<int>(4, "123");
 	assertTrue ("123" == aPair.second());
 
 	va = aPair;
-	assertTrue ("{ \"4\" : \"123\" }" == va.convert<std::string>());
+	assertTrue ("{ \"4\": \"123\" }" == va.convert<std::string>());
 	assertTrue (aPair.toString() == va.convert<std::string>());
 
 	int i = 1;
@@ -2464,11 +2464,11 @@ void VarTest::testDynamicPair()
 	assertTrue ("2" == pPair.second());
 
 	Var vp(pPair);
-	assertTrue ("{ \"1\" : \"2\" }" == vp.convert<std::string>());
+	assertTrue ("{ \"1\": \"2\" }" == vp.convert<std::string>());
 	assertTrue (pPair.toString() == vp.convert<std::string>());
 
 	Var vs(sPair);
-	assertTrue ("{ \"2\" : 1 }" == vs.convert<std::string>());
+	assertTrue ("{ \"2\": 1 }" == vs.convert<std::string>());
 	assertTrue (sPair.toString() == vs.convert<std::string>());
 }
 
@@ -2509,7 +2509,7 @@ void VarTest::testStructToString()
 	aStruct["Age"] = 1;
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
-	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
+	std::string expected = "{ \"Age\": 1, \"First Name\": \"Junior\", \"Last Name\": \"POCO\" }";
 	assertTrue (res == expected);
 	assertTrue (aStruct.toString() == res);
 }
@@ -2523,7 +2523,7 @@ void VarTest::testOrderedStructToString()
 	aStruct["Age"] = 1;
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
-	std::string expected = "{ \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\", \"Age\" : 1 }";
+	std::string expected = "{ \"First Name\": \"Junior\", \"Last Name\": \"POCO\", \"Age\": 1 }";
 	assertTrue(res == expected);
 	assertTrue(aStruct.toString() == res);
 }
@@ -2535,7 +2535,7 @@ void VarTest::testStructToStringEscape()
 	aStruct["Value"] = "Value with \" and \n";
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
-	std::string expected = "{ \"Value\" : \"Value with \\\" and \\n\" }";
+	std::string expected = "{ \"Value\": \"Value with \\\" and \\n\" }";
 	assertTrue (res == expected);
 	assertTrue (aStruct.toString() == res);
 }
@@ -2560,14 +2560,14 @@ void VarTest::testArrayOfStructsToString()
 	Var a1(s16);
 	std::string res = a1.convert<std::string>();
 	std::string expected = "[ "
-						"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
-						"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" }, "
+						"{ \"Age\": 1, \"First Name\": \"Junior\", \"Last Name\": \"POCO\" }, "
+						"{ \"Age\": 100, \"First Name\": \"Senior\", \"Last Name\": \"POCO\" }, "
 							"[ "
-							"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
-							"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" }, "
+							"{ \"Age\": 1, \"First Name\": \"Junior\", \"Last Name\": \"POCO\" }, "
+							"{ \"Age\": 100, \"First Name\": \"Senior\", \"Last Name\": \"POCO\" }, "
 								"[ "
-								"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
-								"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" } "
+								"{ \"Age\": 1, \"First Name\": \"Junior\", \"Last Name\": \"POCO\" }, "
+								"{ \"Age\": 100, \"First Name\": \"Senior\", \"Last Name\": \"POCO\" } "
 								"] ] ]";
 
 	assertTrue (res == expected);
@@ -2594,8 +2594,8 @@ void VarTest::testStructWithArraysToString()
 	aStruct["Address"] = addr;
 	Var a2(aStruct);
 	std::string res = a2.convert<std::string>();
-	std::string expected = "{ \"Address\" : { \"Country\" : \"Carinthia\", \"Number\" : 4, \"Street\" : \"Unknown\" }, "
-								"\"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : [ \"string\", 23 ] }";
+	std::string expected = "{ \"Address\": { \"Country\": \"Carinthia\", \"Number\": 4, \"Street\": \"Unknown\" }, "
+								"\"Age\": 1, \"First Name\": \"Junior\", \"Last Name\": [ \"string\", 23 ] }";
 
 	assertTrue (res == expected);
 	assertTrue (aStruct.toString() == res);
@@ -2615,17 +2615,17 @@ void VarTest::testJSONDeserializeString()
 	char cc = b2.convert<char>();
 	assertTrue (cc == 'c');
 
-	tst = "{ \"a\" : \"1\", \"b\" : \"2\" \n}";
+	tst = "{ \"a\": \"1\", \"b\": \"2\" \n}";
 	a = Var::parse(tst);
-	assertTrue (a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
+	assertTrue (a.toString() == "{ \"a\": \"1\", \"b\": \"2\" }");
 
-	tst = "{ \"a\" : \"1\", \"b\" : \"2\"\n}";
+	tst = "{ \"a\": \"1\", \"b\": \"2\"\n}";
 	a = Var::parse(tst);
-	assertTrue (a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
+	assertTrue (a.toString() == "{ \"a\": \"1\", \"b\": \"2\" }");
 
-	tst = "{ \"message\" : \"escape\\b\\f\\n\\r\\t\", \"path\" : \"\\/dev\\/null\" }";
+	tst = "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"\\/dev\\/null\", \"zero\": null }";
 	a = Var::parse(tst);
-	assertTrue(a.toString() == "{ \"message\" : \"escape\\b\\f\\n\\r\\t\", \"path\" : \"\\/dev\\/null\" }");
+	assertTrue(a.toString() == "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"/dev/null\", \"zero\": null }");
 }
 
 
@@ -2859,6 +2859,32 @@ void VarTest::testDate()
 }
 
 
+void VarTest::testUUID()
+{
+	Poco::UUID uuid("f1881be4-c3b7-4a47-9619-5169db5108a7");
+
+	Var vuuid(uuid);
+	assertTrue (vuuid.isUUID());
+
+	assert (vuuid.convert<std::string>() == "f1881be4-c3b7-4a47-9619-5169db5108a7");
+
+	assert (vuuid.extract<Poco::UUID>() == uuid);
+
+	Var vstr(std::string("f1881be4-c3b7-4a47-9619-5169db5108a7"));
+	assert (vstr.convert<Poco::UUID>() == uuid);
+
+	Var vstr2(std::string("notAnUUID"));
+	try
+	{
+		Poco::UUID uuid2 = vstr2.convert<Poco::UUID>();
+		fail("not a valid UUID, must fail");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+}
+
+
 void VarTest::testGetIdxNoThrow(Var& a1, std::vector<Var>::size_type n)
 {
 	Var val1 = a1[n];
@@ -2973,8 +2999,15 @@ void VarTest::testEmpty()
 void VarTest::testIterator()
 {
 	Var da;
-	assertTrue (da.isEmpty());
-	assertTrue (da.begin() == da.end());
+	try
+	{
+		auto it = da.begin();
+		fail("calling begin() on empty Var must throw");
+	}
+	catch (const InvalidAccessException&) { }
+
+	da = Poco::Dynamic::Array();
+	assertTrue(da.begin() == da.end());
 
 	da = 1;
 	assertTrue (!da.isEmpty());
@@ -3097,6 +3130,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
 	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
+	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
 

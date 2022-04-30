@@ -272,11 +272,20 @@ protected:
 		/// The request is delegated to the PrivatekeyPassword event. This method returns the
 		/// length of the password.
 
+	static int verifyOCSPResponseCallback(SSL* pSSL, void* arg);
+		/// The return value of this method defines how errors in
+		/// verification are handled. Return 0 to terminate the handshake,
+		/// or 1 to continue despite the error.
+
 	static Poco::Util::AbstractConfiguration& appConfig();
 		/// Returns the application configuration.
 		///
 		/// Throws a InvalidStateException if not application instance
 		/// is available.
+
+	int contextIndex() const;
+		/// Returns the index for SSL_CTX_set_ex_data() and SSL_CTX_get_ex_data() to
+		/// store the Context* in the underlying SSL_CTX.
 
 private:
 	SSLManager();
@@ -310,6 +319,7 @@ private:
 	Context::Ptr                     _ptrDefaultClientContext;
 	PrivateKeyPassphraseHandlerPtr   _ptrClientPassphraseHandler;
 	InvalidCertificateHandlerPtr     _ptrClientCertificateHandler;
+	int                              _contextIndex;
 	Poco::FastMutex                  _mutex;
 
 	static const std::string CFG_PRIV_KEY_FILE;
@@ -386,6 +396,12 @@ inline int SSLManager::verifyServerCallback(int ok, X509_STORE_CTX* pStore)
 inline int SSLManager::verifyClientCallback(int ok, X509_STORE_CTX* pStore)
 {
 	return SSLManager::verifyCallback(false, ok, pStore);
+}
+
+
+inline int SSLManager::contextIndex() const
+{
+	return _contextIndex;
 }
 
 

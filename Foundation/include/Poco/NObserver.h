@@ -94,9 +94,9 @@ public:
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	bool accepts(Notification* pNf) const
+	bool accepts(Notification* pNf, const char* pName = 0) const
 	{
-		return dynamic_cast<N*>(pNf) != 0;
+		return dynamic_cast<N*>(pNf) && (!pName || pNf->name() == pName);
 	}
 	
 	AbstractObserver* clone() const

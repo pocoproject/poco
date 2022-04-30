@@ -419,6 +419,7 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 	std::ostringstream recipient;
 	if (pRecipients)
 	{
+		if (pRecipients->empty()) throw Poco::InvalidArgumentException("attempting to send message with empty recipients list");
 		for (const auto& rec: *pRecipients)
 		{
 			recipient << '<' << rec << '>';
@@ -429,6 +430,7 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 	}
 	else
 	{
+		if (message.recipients().empty()) throw Poco::InvalidArgumentException("attempting to send message with empty recipients list");
 		for (const auto& rec: message.recipients())
 		{
 			recipient << '<' << rec.getAddress() << '>';
@@ -465,6 +467,7 @@ void SMTPClientSession::sendAddresses(const std::string& from, const Recipients&
 
 	std::ostringstream recipient;
 
+	if (recipients.empty()) throw Poco::InvalidArgumentException("attempting to send message with empty recipients list");
 	for (const auto& rec: recipients)
 	{
 		recipient << '<' << rec << '>';

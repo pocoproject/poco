@@ -41,7 +41,7 @@ class Foundation_API ThreadPool
 	/// Threads in a thread pool are re-used once they become
 	/// available again.
 	/// The thread pool always keeps a minimum number of threads
-	/// running. If the demans for threads increases, additional
+	/// running. If the demand for threads increases, additional
 	/// threads are created. Once the demand for threads sinks
 	/// again, no-longer used threads are stopped and removed
 	/// from the pool.
@@ -72,8 +72,8 @@ public:
 
 	~ThreadPool();
 		/// Currently running threads will remain active
-		/// until they complete. 
-	
+		/// until they complete.
+
 	void addCapacity(int n);
 		/// Increases (or decreases, if n is negative)
 		/// the maximum number of threads.
@@ -126,7 +126,7 @@ public:
 		/// If used, this method should be the last action before
 		/// the thread pool is deleted.
 		///
-		/// Note: If a thread fails to stop within 10 seconds 
+		/// Note: If a thread fails to stop within 10 seconds
 		/// (due to a programming error, for example), the
 		/// underlying thread object will not be deleted and
 		/// this method will return anyway. This allows for a

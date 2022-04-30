@@ -287,7 +287,7 @@ public:
 		/// such as in a Windows path containing a drive letter, a dot segment (./)
 		/// is prepended in accordance with section 3.3 of RFC 3986.
 
-	void getPathSegments(std::vector<std::string>& segments);
+	void getPathSegments(std::vector<std::string>& segments) const;
 		/// Places the single path segments (delimited by slashes) into the
 		/// given vector.
 

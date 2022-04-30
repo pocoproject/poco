@@ -111,6 +111,13 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 }
 
 
+void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
+{
+	std::string str(val.toString());
+	bind(pos, str, dir);
+}
+
+
 void Binder::bind(std::size_t pos, const NullData&, Direction)
 {
 	sqlite3_bind_null(_pStmt, static_cast<int>(pos));

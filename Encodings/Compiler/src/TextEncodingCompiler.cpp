@@ -117,7 +117,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Text Encodings Compiler.\n"
-			"Copyright (c) 2018 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2018-2021 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles Unicode character encoding tables "
 			"from http://www.unicode.org/Public/MAPPINGS/ to TextEncoding "

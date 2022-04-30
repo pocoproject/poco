@@ -55,6 +55,13 @@ public:
 		/// Depending on the address family, the socket
 		/// will be either an IPv4 or an IPv6 socket.
 
+	DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort);
+		/// Creates a datagram socket and binds it
+		/// to the given address.
+		///
+		/// Depending on the address family, the socket
+		/// will be either an IPv4 or an IPv6 socket.
+
 	DatagramSocket(const Socket& socket);
 		/// Creates the DatagramSocket with the SocketImpl
 		/// from another socket. The SocketImpl must be

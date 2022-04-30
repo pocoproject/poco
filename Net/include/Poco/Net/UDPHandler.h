@@ -313,7 +313,7 @@ public:
 	virtual void processData(char*)
 		/// Caled when data is received by reader.
 		///
-		/// No-op here, must be overriden by inheriting
+		/// No-op here, must be overridden by inheriting
 		/// class in order to do useful work.
 	{
 	};
@@ -322,7 +322,7 @@ public:
 		/// Caled when error is detected by reader.
 		///
 		/// Only functional if stream pointer is provided
-		/// to the handler, otherwise it must be overriden
+		/// to the handler, otherwise it must be overridden
 		/// by inheriting class in order to do useful work.
 	{
 		if (_pErr) *_pErr << error(buf) << std::endl;

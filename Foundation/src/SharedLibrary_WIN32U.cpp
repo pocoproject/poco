@@ -16,6 +16,9 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Path.h"
 #include "Poco/UnWindows.h"
+#include "Poco/Error.h"
+#include "Poco/Format.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -48,7 +51,13 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
 	_handle = LoadLibraryExW(upath.c_str(), 0, flags);
-	if (!_handle) throw LibraryLoadException(path);
+	if (!_handle)
+	{
+		DWORD errn = Error::last();
+		std::string err;
+		Poco::format(err, "Error %ul while loading [%s]: [%s]", errn, path, Poco::trim(Error::getMessage(errn)));
+		throw LibraryLoadException(err);
+	}
 	_path = path;
 }
 
