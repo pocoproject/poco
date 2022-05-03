@@ -15,6 +15,8 @@
 #include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/Error.h"
+#include "Poco/Debugger.h"
 
 
 namespace Poco {
@@ -42,10 +44,11 @@ ConnectionHandle::~ConnectionHandle()
 	{
 		SQLDisconnect(_hdbc);
 		SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
-
 		if (_ownsEnvironment) delete _pEnvironment;
-
-		poco_assert (!Utility::isError(rc));
+#if defined(_DEBUG)
+		if (Utility::isError(rc))
+			Debugger::enter(Poco::Error::getMessage(Poco::Error::last()), __FILE__, __LINE__);
+#endif
 	}
 	catch (...)
 	{

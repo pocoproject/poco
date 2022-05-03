@@ -1252,6 +1252,25 @@ void ODBCTest::testUnicode()
 }
 
 
+void ODBCTest::testEncoding()
+{
+#if defined (POCO_ODBC_UNICODE)
+	if (!_pSession) fail("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateEncodingTables();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i + 1));
+		_pExecutor->encoding(_rConnectString);
+		i += 2;
+	}
+#else
+	std::cout << "Not an UNICODE build, skipping." << std::endl;
+#endif
+}
+
+
 void ODBCTest::testReconnect()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1341,7 +1360,8 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	std::string& uid,
 	std::string& pwd,
 	std::string& dbConnString,
-	const std::string& db)
+	const std::string& db,
+	const std::string& dbEncoding)
 {
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
@@ -1349,7 +1369,10 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	try
 	{
 		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
-		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
+		SessionPtr ptr = new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
+		if (!dbEncoding.empty())
+			ptr->setProperty("dbEncoding", dbEncoding);
+		return ptr;
 	}catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;

@@ -71,7 +71,9 @@ public:
 	Binder(const StatementHandle& rStmt,
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding = PB_IMMEDIATE,
-		const TypeInfo* pDataTypes = 0);
+		const TypeInfo* pDataTypes = 0,
+		Poco::TextEncoding::Ptr pFromEncoding = nullptr,
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Binder.
 
 	~Binder();
@@ -538,7 +540,7 @@ private:
 	}
 
 	template <typename C>
-	void bindImplContainerString(std::size_t pos, const C& val, Direction dir)
+	void bindImplContainerString(std::size_t pos, const C& valC, Direction dir)
 		/// Utility function to bind containers of strings.
 	{
 		if (isOutBound(dir) || !isInBound(dir))
@@ -547,7 +549,19 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		std::size_t length = val.size();
+		const C* pVal = 0;
+		if (!transcodeRequired()) pVal = &valC;
+		else
+		{
+			pVal = new C(valC.size());
+			typename C::const_iterator valIt = valC.begin();
+			typename C::const_iterator valEnd = valC.end();
+			typename C::iterator tcIt = const_cast<C*>(pVal)->begin();
+			for (; valIt != valEnd; ++valIt, ++tcIt)
+				transcode(*valIt, *tcIt);
+		}
+
+		std::size_t length = pVal->size();
 
 		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
@@ -560,7 +574,7 @@ private:
 
 		if (size == _maxFieldSize)
 		{
-			getMinValueSize(val, size);
+			getMinValueSize(*pVal, size);
 			// accomodate for terminating zero
 			if (size != _maxFieldSize) ++size;
 		}
@@ -574,20 +588,25 @@ private:
 		if (_charPtrs.size() <= pos)
 			_charPtrs.resize(pos + 1, 0);
 
-		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
+		_charPtrs[pos] = (char*) std::calloc(pVal->size() * size, sizeof(char));
 
+		std::string typeID = typeid(*pVal).name();
 		std::size_t strSize;
 		std::size_t offset = 0;
-		typename C::const_iterator it = val.begin();
-		typename C::const_iterator end = val.end();
+		typename C::const_iterator it = pVal->begin();
+		typename C::const_iterator end = pVal->end();
 		for (; it != end; ++it)
 		{
 			strSize = it->size();
 			if (strSize > size)
-				throw LengthExceededException("SQLBindParameter(std::vector<std::string>)");
+			{
+				if (transcodeRequired()) delete pVal;
+				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
+			}
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
 			offset += size;
 		}
+		if (transcodeRequired()) delete pVal;
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
@@ -600,7 +619,7 @@ private:
 			(SQLINTEGER) size,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(std::vector<std::string>)");
+			throw StatementException(_rStmt, Poco::format("SQLBindParameter(%s)", typeID));
 		}
 	}
 

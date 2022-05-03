@@ -13,6 +13,7 @@
 
 
 #include "Poco/Data/AbstractExtractor.h"
+#include "Poco/Data/Transcoder.h"
 #include "Poco/Exception.h"
 
 
@@ -22,21 +23,27 @@ namespace Data {
 
 AbstractExtractor::AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding,
 	Poco::TextEncoding::Ptr pToEncoding):
-	_pDBEncoding(pDBEncoding),
-	_pToEncoding(pToEncoding ?
-		pToEncoding : _pDBEncoding ?
-			Poco::TextEncoding::find("UTF-8") : nullptr),
-	_pConverter(_pDBEncoding ?
-		new Poco::TextConverter(*pDBEncoding, *_pToEncoding) :
-		nullptr)
+	_pTranscoder(Transcoder::create(pDBEncoding, pToEncoding))
 {
-	poco_assert_dbg((!_pDBEncoding && !_pToEncoding) ||
-		(_pDBEncoding && _pToEncoding));
 }
 
 
 AbstractExtractor::~AbstractExtractor()
 {
+}
+
+
+void AbstractExtractor::transcode(const std::string& from, std::string& to)
+{
+	if (_pTranscoder)
+		_pTranscoder->transcode(from, to);
+}
+
+
+void AbstractExtractor::reverseTranscode(const std::string& from, std::string& to)
+{
+	if (_pTranscoder)
+		_pTranscoder->reverseTranscode(from, to);
 }
 
 

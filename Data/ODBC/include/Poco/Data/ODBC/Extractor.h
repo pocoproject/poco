@@ -55,7 +55,8 @@ public:
 
 	Extractor(const StatementHandle& rStmt,
 		Preparator::Ptr pPreparator,
-		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr,
+		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Creates the Extractor.
 
 	~Extractor();

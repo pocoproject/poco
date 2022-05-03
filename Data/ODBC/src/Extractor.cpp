@@ -35,7 +35,8 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 
 Extractor::Extractor(const StatementHandle& rStmt,
 	Preparator::Ptr pPreparator,
-	TextEncoding::Ptr pDBEncoding): AbstractExtractor(pDBEncoding),
+	TextEncoding::Ptr pDBEncoding,
+	Poco::TextEncoding::Ptr pToEncoding): AbstractExtractor(pDBEncoding, pToEncoding),
 	_rStmt(rStmt),
 	_pPreparator(pPreparator),
 	_dataExtraction(pPreparator->getDataExtraction())
@@ -719,6 +720,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 		else
 			ret = extractBoundImpl(pos, result);
 		transcode(result, val);
+		
 	}
 
 	return ret;

@@ -23,7 +23,6 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/UUID.h"
 #include "Poco/UTFString.h"
-#include "Poco/TextConverter.h"
 #include "Poco/TextEncoding.h"
 #include <memory>
 #include <vector>
@@ -34,7 +33,6 @@
 
 
 namespace Poco {
-
 
 class DateTime;
 class Any;
@@ -48,6 +46,7 @@ namespace Data {
 
 class Date;
 class Time;
+class Transcoder;
 
 
 class Data_API AbstractExtractor
@@ -353,18 +352,18 @@ public:
 
 protected:
 	bool transcodeRequired() const;
-	void transcode(const std::string& val1, std::string& val2);
+	void transcode(const std::string& from, std::string& to);
+	void reverseTranscode(const std::string& from, std::string& to);
 
 private:
-	Poco::TextEncoding::Ptr _pDBEncoding;
-	Poco::TextEncoding::Ptr _pToEncoding;
-	std::unique_ptr<Poco::TextConverter> _pConverter;
+	std::unique_ptr<Transcoder> _pTranscoder;
 };
 
 
 ///
 /// inlines
 ///
+
 inline void AbstractExtractor::reset()
 {
 	//default no-op
@@ -373,17 +372,7 @@ inline void AbstractExtractor::reset()
 
 inline bool AbstractExtractor::transcodeRequired() const
 {
-	return _pConverter.operator bool();
-}
-
-
-inline void AbstractExtractor::transcode(const std::string& val1, std::string& val2)
-{
-	if (_pConverter)
-	{
-		val2.clear();
-		_pConverter->convert(val1, val2);
-	}
+	return _pTranscoder.operator bool();
 }
 
 

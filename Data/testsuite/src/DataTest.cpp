@@ -1377,6 +1377,9 @@ void DataTest::testTranscode()
 	assertTrue (ext.extract(0, utf8Out));
 	assertTrue(utf8Out == latin1Text);
 
+	Latin1Encoding::Ptr pe = new Latin1Encoding();
+	auto pUTF8E = Poco::TextEncoding::find("UTF-8");
+
 	Poco::Data::Test::Extractor ext2(new Latin1Encoding());
 	ext2.setString(latin1Text);
 	utf8Out.clear();
