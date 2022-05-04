@@ -19,15 +19,12 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/HTTPClientSession.h"
 #include "Poco/URI.h"
 
 
 namespace Poco {
 namespace Net {
-
-
-class HTTPClientSession;
 
 
 class Net_API HTTPSessionInstantiator
@@ -55,31 +52,15 @@ public:
 		/// Unregisters the factory with the global HTTPSessionFactory.
 
 protected:
-	void setProxy(const std::string& host, Poco::UInt16 port);
-		/// Sets the proxy host and port.
-		/// Called by HTTPSessionFactory.
-			
-	const std::string& proxyHost() const;
-		/// Returns the proxy post.
+	void setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig);
+		/// Sets the proxy configuration.
 
-	Poco::UInt16 proxyPort() const;
-		/// Returns the proxy port.
-
-	void setProxyCredentials(const std::string& username, const std::string& password);
-		/// Sets the username and password for proxy authorization (Basic auth only).
-
-	const std::string& proxyUsername() const;
-		/// Returns the username for proxy authorization.
-		
-	const std::string& proxyPassword() const;
-		/// Returns the password for proxy authorization.
+	const HTTPClientSession::ProxyConfig& getProxyConfig() const;
+		/// Returns the proxy configuration.
 
 private:
-	std::string  _proxyHost;
-	Poco::UInt16 _proxyPort;
-	std::string  _proxyUsername;
-	std::string  _proxyPassword;
-	
+	HTTPClientSession::ProxyConfig _proxyConfig;
+
 	friend class HTTPSessionFactory;
 };
 
@@ -87,27 +68,9 @@ private:
 //
 // inlines
 //
-inline const std::string& HTTPSessionInstantiator::proxyHost() const
+inline const HTTPClientSession::ProxyConfig& HTTPSessionInstantiator::getProxyConfig() const
 {
-	return _proxyHost;
-}
-
-
-inline Poco::UInt16 HTTPSessionInstantiator::proxyPort() const
-{
-	return _proxyPort;
-}
-
-
-inline const std::string& HTTPSessionInstantiator::proxyUsername() const
-{
-	return _proxyUsername;
-}
-
-
-inline const std::string& HTTPSessionInstantiator::proxyPassword() const
-{
-	return _proxyPassword;
+	return _proxyConfig;
 }
 
 

@@ -108,8 +108,7 @@ bool PostgreSQLStatementImpl::canBind() const
 {
 	bool ret = false;
 
-	if ((_statementExecutor.state() >= StatementExecutor::STMT_COMPILED)
-		 && !bindings().empty())
+	if ((_statementExecutor.state() >= StatementExecutor::STMT_COMPILED) && !bindings().empty())
 	{
 		ret = (*bindings().begin())->canBind();
 	}

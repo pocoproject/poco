@@ -284,7 +284,7 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 	}
 
 	ac.dwResetPeriod = 0;
-	ac.cActions = failureActions.size();
+	ac.cActions = static_cast<DWORD>(failureActions.size());
 	ac.lpsaActions = actions;
 
 	if (!ChangeServiceConfig2W(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, &ac))

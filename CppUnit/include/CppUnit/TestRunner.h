@@ -8,18 +8,17 @@
 
 
 #include "CppUnit/CppUnit.h"
+#include "CppUnit/Test.h"
 #include <vector>
 #include <string>
 #include <ostream>
 #if defined(POCO_VXWORKS)
 #include <cstdarg>
 #endif
+#include "Poco/Exception.h"
 
 
 namespace CppUnit {
-
-
-class Test;
 
 
 /*
@@ -46,7 +45,7 @@ public:
 	TestRunner(std::ostream& ostr);
 	~TestRunner();
 
-	bool run(const std::vector<std::string>& args);
+	bool run(const std::vector<std::string>& args, const Test::Callback& callback = nullptr);
 	void addTest(const std::string& name, Test* test);
 
 protected:
@@ -85,6 +84,16 @@ private:
 		return runner.run(args) ? 0 : 1; \
 	}
 #else
+#define CppUnitPocoExceptionText(exc) \
+	CppUnit::Test::Callback exc = [] (const std::exception& ex) \
+	{ \
+		std::string text; \
+		const Poco::Exception* pEx = dynamic_cast<const Poco::Exception*>(&ex); \
+		if (pEx) text = pEx->displayText(); \
+		else text = ex.what(); \
+		return text; \
+	}
+
 #define CppUnitMain(testCase) \
 	int main(int ac, char **av)							\
 	{													\
@@ -93,7 +102,8 @@ private:
 			args.push_back(std::string(av[i]));			\
 		CppUnit::TestRunner runner;						\
 		runner.addTest(#testCase, testCase::suite());	\
-		return runner.run(args) ? 0 : 1;				\
+		CppUnitPocoExceptionText(exc);					\
+		return runner.run(args, exc) ? 0 : 1;			\
 	}
 #endif
 

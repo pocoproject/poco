@@ -140,7 +140,7 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	if (getProxyHost().empty() || bypassProxy())
 	{
 		SecureStreamSocket sss(socket());
-		if (sss.getPeerHostName().empty()) 
+		if (sss.getPeerHostName().empty())
 		{
 			sss.setPeerHostName(getHost());
 		}
@@ -172,8 +172,8 @@ int HTTPSClientSession::read(char* buffer, std::streamsize length)
 	try
 	{
 		return HTTPSession::read(buffer, length);
-	} 
-	catch(SSLConnectionUnexpectedlyClosedException&)
+	}
+	catch (SSLConnectionUnexpectedlyClosedException&)
 	{
 		return 0;
 	}

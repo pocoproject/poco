@@ -25,9 +25,7 @@
 
 namespace Poco {
 
-
 class Any;
-
 
 namespace Dynamic {
 
@@ -38,7 +36,14 @@ template <class T> class VarHolderImpl;
 }
 
 
-#ifndef POCO_NO_SOO
+template <class T, std::size_t S>
+struct TypeSizeLE:
+	std::integral_constant<bool, (sizeof(T) <= S)>{};
+
+
+template <class T, std::size_t S>
+struct TypeSizeGT:
+	std::integral_constant<bool, (sizeof(T) > S)>{};
 
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
@@ -58,14 +63,40 @@ public:
 		static const unsigned int value = SizeV;
 	};
 
-	Placeholder()
+	Placeholder(const Placeholder&) = delete;
+	Placeholder(Placeholder&&) = delete;
+	Placeholder& operator=(const Placeholder&) = delete;
+	Placeholder& operator=(Placeholder&&) = delete;
+
+#ifndef POCO_NO_SOO
+
+	Placeholder(): pHolder(0)
 	{
-		erase();
+		std::memset(holder, 0, sizeof(Placeholder));
+	}
+
+	~Placeholder()
+	{
+		destruct(false);
+	}
+
+	void swap(Placeholder& other)
+	{
+		if (!isLocal() && !other.isLocal())
+			std::swap(pHolder, other.pHolder);
+		else
+			throw Poco::InvalidAccessException("Placeholder::swap()");
 	}
 
 	void erase()
 	{
-		std::memset(holder, 0, sizeof(Placeholder));
+		destruct(true);
+	}
+
+	bool isEmpty() const
+	{
+		static char buf[SizeV+1] = {};
+		return 0 == std::memcmp(holder, buf, SizeV+1);
 	}
 
 	bool isLocal() const
@@ -73,9 +104,24 @@ public:
 		return holder[SizeV] != 0;
 	}
 
-	void setLocal(bool local) const
+	template<typename T, typename V,
+		typename std::enable_if<TypeSizeLE<T, Placeholder::Size::value>::value>::type* = nullptr>
+	PlaceholderT* assign(const V& value)
 	{
-		holder[SizeV] = local ? 1 : 0;
+		erase();
+		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
+		setLocal(true);
+		return reinterpret_cast<PlaceholderT*>(holder);
+	}
+
+	template<typename T, typename V,
+		typename std::enable_if<TypeSizeGT<T, Placeholder::Size::value>::value>::type* = nullptr>
+	PlaceholderT* assign(const V& value)
+	{
+		erase();
+		pHolder = new T(value);
+		setLocal(false);
+		return pHolder;
 	}
 
 	PlaceholderT* content() const
@@ -86,40 +132,67 @@ public:
 			return pHolder;
 	}
 
-// MSVC71,80 won't extend friendship to nested class (Any::Holder)
-#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
 private:
-#endif
-	typedef typename std::aligned_storage<SizeV + 1>::type AlignerType;
+	typedef typename std::aligned_storage<SizeV+1>::type AlignerType;
 
-	PlaceholderT* pHolder;
-	mutable char  holder[SizeV + 1];
-	AlignerType   aligner;
-
-	friend class Any;
-	friend class Dynamic::Var;
-	friend class Dynamic::VarHolder;
-	template <class> friend class Dynamic::VarHolderImpl;
-};
-
-
-#else // !POCO_NO_SOO
-
-
-template <typename PlaceholderT>
-union Placeholder
-	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
-	/// object optimization, when enabled).
-	///
-	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
-	/// it will be placement-new-allocated into the local buffer
-	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
-	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
-	/// where the object was allocated (0 => heap, 1 => local).
-{
-public:
-	Placeholder ()
+	void setLocal(bool local) const
 	{
+		holder[SizeV] = local ? 1 : 0;
+	}
+
+	void destruct(bool clear)
+	{
+		if (!isEmpty())
+		{
+			if (!isLocal())
+				delete pHolder;
+			else
+				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
+
+			if (clear) std::memset(holder, 0, sizeof(Placeholder));
+		}
+	}
+
+	mutable unsigned char holder[SizeV+1];
+	AlignerType           aligner;
+
+#else // POCO_NO_SOO
+
+	Placeholder(): pHolder(0)
+	{
+	}
+
+	~Placeholder()
+	{
+		delete pHolder;
+	}
+
+	void swap(Placeholder& other)
+	{
+		std::swap(pHolder, other.pHolder);
+	}
+
+	void erase()
+	{
+		delete pHolder;
+		pHolder = 0;
+	}
+
+	bool isEmpty() const
+	{
+		return 0 == pHolder;
+	}
+
+	bool isLocal() const
+	{
+		return false;
+	}
+
+	template <typename T, typename V>
+	PlaceholderT* assign(const V& value)
+	{
+		erase();
+		return pHolder = new T(value);
 	}
 
 	PlaceholderT* content() const
@@ -127,21 +200,10 @@ public:
 		return pHolder;
 	}
 
-// MSVC71,80 won't extend friendship to nested class (Any::Holder)
-#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
 private:
-#endif
-
-	PlaceholderT* pHolder;
-
-	friend class Any;
-	friend class Dynamic::Var;
-	friend class Dynamic::VarHolder;
-	template <class> friend class Dynamic::VarHolderImpl;
-};
-
-
 #endif // POCO_NO_SOO
+	PlaceholderT* pHolder;
+};
 
 
 class Any
@@ -155,8 +217,6 @@ class Any
 	/// by Alex Fabijanic.
 {
 public:
-
-#ifndef POCO_NO_SOO
 
 	Any()
 		/// Creates an empty any type.
@@ -185,13 +245,6 @@ public:
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
 	{
-		if (!empty())
-		{
-			if (_valueHolder.isLocal())
-				destruct();
-			else
-				delete content();
-		}
 	}
 
 	Any& swap(Any& other)
@@ -205,14 +258,13 @@ public:
 
 		if (!_valueHolder.isLocal() && !other._valueHolder.isLocal())
 		{
-			std::swap(_valueHolder.pHolder, other._valueHolder.pHolder);
+			_valueHolder.swap(other._valueHolder);
 		}
 		else
 		{
 			Any tmp(*this);
 			try
 			{
-				if (_valueHolder.isLocal()) destruct();
 				construct(other);
 				other = tmp;
 			}
@@ -252,8 +304,7 @@ public:
 	bool empty() const
 		/// Returns true if the Any is empty.
 	{
-		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
-		return 0 == std::memcmp(_valueHolder.holder, buf, POCO_SMALL_OBJECT_SIZE);
+		return _valueHolder.isEmpty();
 	}
 
 	const std::type_info & type() const
@@ -290,21 +341,13 @@ private:
 
 		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
 		{
-			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
-			{
-				new ((ValueHolder*) pPlaceholder->holder) Holder(_held);
-				pPlaceholder->setLocal(true);
-			}
-			else
-			{
-				pPlaceholder->pHolder = new Holder(_held);
-				pPlaceholder->setLocal(false);
-			}
+			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}
 
 		ValueType _held;
 
 	private:
+
 		Holder & operator = (const Holder &);
 	};
 
@@ -316,16 +359,7 @@ private:
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(Holder<ValueType>) <= Placeholder<ValueType>::Size::value)
-		{
-			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder)) Holder<ValueType>(value);
-			_valueHolder.setLocal(true);
-		}
-		else
-		{
-			_valueHolder.pHolder = new Holder<ValueType>(value);
-			_valueHolder.setLocal(false);
-		}
+		_valueHolder.assign<Holder<ValueType>, ValueType>(value);
 	}
 
 	void construct(const Any& other)
@@ -336,129 +370,7 @@ private:
 			_valueHolder.erase();
 	}
 
-	void destruct()
-	{
-		content()->~ValueHolder();
-	}
-
 	Placeholder<ValueHolder> _valueHolder;
-
-
-#else // if POCO_NO_SOO
-
-
-	Any(): _pHolder(0)
-		/// Creates an empty any type.
-	{
-	}
-
-	template <typename ValueType>
-	Any(const ValueType& value):
-		_pHolder(new Holder<ValueType>(value))
-		/// Creates an any which stores the init parameter inside.
-		///
-		/// Example:
-		///	 Any a(13);
-		///	 Any a(string("12345"));
-	{
-	}
-
-	Any(const Any& other):
-		_pHolder(other._pHolder ? other._pHolder->clone() : 0)
-		/// Copy constructor, works with both empty and initialized Any values.
-	{
-	}
-
-	~Any()
-	{
-		delete _pHolder;
-	}
-
-	Any& swap(Any& rhs)
-		/// Swaps the content of the two Anys.
-	{
-		std::swap(_pHolder, rhs._pHolder);
-		return *this;
-	}
-
-	template <typename ValueType>
-	Any& operator = (const ValueType& rhs)
-		/// Assignment operator for all types != Any.
-		///
-		/// Example:
-		///   Any a = 13;
-		///   Any a = string("12345");
-	{
-		Any(rhs).swap(*this);
-		return *this;
-	}
-
-	Any& operator = (const Any& rhs)
-		/// Assignment operator for Any.
-	{
-		Any(rhs).swap(*this);
-		return *this;
-	}
-
-	bool empty() const
-		/// Returns true if the Any is empty.
-	{
-		return !_pHolder;
-	}
-
-	const std::type_info& type() const
-		/// Returns the type information of the stored content.
-		/// If the Any is empty typeid(void) is returned.
-		/// It is recommended to always query an Any for its type info before
-		/// trying to extract data via an AnyCast/RefAnyCast.
-	{
-		return _pHolder ? _pHolder->type() : typeid(void);
-	}
-
-private:
-	class ValueHolder
-	{
-	public:
-		virtual ~ValueHolder() = default;
-
-		virtual const std::type_info& type() const = 0;
-		virtual ValueHolder* clone() const = 0;
-	};
-
-	template <typename ValueType>
-	class Holder: public ValueHolder
-	{
-	public:
-		Holder(const ValueType& value):
-			_held(value)
-		{
-		}
-
-		virtual const std::type_info& type() const
-		{
-			return typeid(ValueType);
-		}
-
-		virtual ValueHolder* clone() const
-		{
-			return new Holder(_held);
-		}
-
-		ValueType _held;
-
-	private:
-		Holder & operator = (const Holder &);
-	};
-
-	ValueHolder* content() const
-	{
-		return _pHolder;
-	}
-
-private:
-	ValueHolder* _pHolder;
-
-#endif // POCO_NO_SOO
 
 	template <typename ValueType>
 	friend ValueType* AnyCast(Any*);
@@ -522,10 +434,10 @@ ValueType AnyCast(Any& operand)
 	if (!result)
 	{
 		std::string s = "RefAnyCast: Failed to convert between Any types ";
-		if (operand._pHolder)
+		if (operand.content())
 		{
 			s.append(1, '(');
-			s.append(operand._pHolder->type().name());
+			s.append(operand.content()->type().name());
 			s.append(" => ");
 			s.append(typeid(ValueType).name());
 			s.append(1, ')');
@@ -564,10 +476,10 @@ const ValueType& RefAnyCast(const Any & operand)
 	if (!result)
 	{
 		std::string s = "RefAnyCast: Failed to convert between Any types ";
-		if (operand._pHolder)
+		if (operand.content())
 		{
 			s.append(1, '(');
-			s.append(operand._pHolder->type().name());
+			s.append(operand.content()->type().name());
 			s.append(" => ");
 			s.append(typeid(ValueType).name());
 			s.append(1, ')');
@@ -589,10 +501,10 @@ ValueType& RefAnyCast(Any& operand)
 	if (!result)
 	{
 		std::string s = "RefAnyCast: Failed to convert between Any types ";
-		if (operand._pHolder)
+		if (operand.content())
 		{
 			s.append(1, '(');
-			s.append(operand._pHolder->type().name());
+			s.append(operand.content()->type().name());
 			s.append(" => ");
 			s.append(typeid(ValueType).name());
 			s.append(1, ')');

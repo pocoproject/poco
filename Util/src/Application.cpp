@@ -193,10 +193,10 @@ void Application::uninitialize()
 {
 	if (_initialized)
 	{
-		for (auto& pSub: _subsystems)
+		for (SubsystemVec::reverse_iterator it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
 		{
-			_pLogger->debug(std::string("Uninitializing subsystem: ") + pSub->name());
-			pSub->uninitialize();
+			_pLogger->debug(std::string("Uninitializing subsystem: ") + (*it)->name());
+			(*it)->uninitialize();
 		}
 		_initialized = false;
 	}

@@ -173,6 +173,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 #if !defined(POCO_NO_FORK_EXEC)
+	// On some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number,
+	// which would closing all file descriptors up to that number extremely slow.
+	// We therefore limit the maximum number of file descriptors we close.
+	const long CLOSE_FD_MAX = 100000;
+
 	// We must not allocated memory after fork(),
 	// therefore allocate all required buffers first.
 	std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
@@ -223,7 +228,10 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
 		// close all open file descriptors other than stdin, stdout, stderr
-		for (int i = 3; i < sysconf(_SC_OPEN_MAX); ++i)
+		long fdMax = sysconf(_SC_OPEN_MAX);
+		// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
+		if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
+		for (long i = 3; i < fdMax; ++i)
 		{
 			close(i);
 		}

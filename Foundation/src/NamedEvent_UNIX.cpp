@@ -58,7 +58,9 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	if ((long) _sem == (long) SEM_FAILED)
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
-	int fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	int fd = open(fileName.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if (fd == -1 && errno == ENOENT)
+		fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
 		close(fd);
 	else

@@ -107,10 +107,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 		_pData->policy = SCHED_OTHER;
 		if (isRunningImpl())
 		{
-			struct sched_param par; struct MyStruct
-			{
-
-			};
+			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
 			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
 				throw SystemException("cannot set thread priority");

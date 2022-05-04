@@ -324,6 +324,7 @@ namespace
 			_data.resize(1);
 			_reactor.addEventHandler(_socket, Observer<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
 			_reactor.addEventHandler(_socket, Observer<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
+			_socket.setBlocking(false);
 		}
 
 		~DataServiceHandler()
@@ -336,28 +337,32 @@ namespace
 		{
 			pNf->release();
 			char buffer[64];
-			int n = _socket.receiveBytes(&buffer[0], sizeof(buffer));
-			if (n > 0)
+			int n = 0;
+			do
 			{
-				_data[_pos].append(buffer, n);
-				std::size_t pos;
-				pos = _data[_pos].find('\n');
-				if(pos != std::string::npos)
+				n = _socket.receiveBytes(&buffer[0], sizeof(buffer));
+				if (n > 0)
 				{
-					if (pos == _data[_pos].size() - 1)
+					_data[_pos].append(buffer, n);
+					std::size_t pos;
+					pos = _data[_pos].find('\n');
+					if (pos != std::string::npos)
 					{
-						_data[_pos].erase(pos, 1);
-						_data.push_back(std::string());
+						if (pos == _data[_pos].size() - 1)
+						{
+							_data[_pos].erase(pos, 1);
+							_data.push_back(std::string());
+						}
+						else
+						{
+							_data.push_back(_data[_pos].substr(pos + 1));
+							_data[_pos].erase(pos);
+						}
+						++_pos;
 					}
-					else
-					{
-						_data.push_back(_data[_pos].substr(pos + 1));
-						_data[_pos].erase(pos);
-					}
-					++_pos;
 				}
-			}
-			else return;
+				else break;
+			} while (true);
 		}
 
 		void onShutdown(ShutdownNotification* pNf)
@@ -500,7 +505,6 @@ void SocketReactorTest::testDataCollection()
 					  "  \"data\":123"
 					  "}\n");
 	sock.sendBytes(data0.data(), static_cast<int>(data0.size()));
-
 	std::string data1("{"
 					  "  \"src\":\"127.0.0.1\","
 					  "  \"id\":\"test1\","
@@ -517,7 +521,6 @@ void SocketReactorTest::testDataCollection()
 					  "  ]"
 					  "}\n");
 	sock.sendBytes(data1.data(), static_cast<int>(data1.size()));
-
 	std::string data2 = "{"
 						"  \"src\":\"127.0.0.1\","
 						"  \"id\":\"test2\","

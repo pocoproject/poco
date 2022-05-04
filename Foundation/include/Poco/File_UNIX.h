@@ -27,7 +27,7 @@ namespace Poco {
 class FileImpl
 {
 protected:
-	enum Options 
+	enum Options
 	{
 		OPT_FAIL_ON_OVERWRITE_IMPL = 0x01
 	};
@@ -65,6 +65,7 @@ protected:
 	FileSizeImpl totalSpaceImpl() const;
 	FileSizeImpl usableSpaceImpl() const;
 	FileSizeImpl freeSpaceImpl() const;
+	static void handleLastErrorImpl(int err, const std::string& path);
 	static void handleLastErrorImpl(const std::string& path);
 
 private:

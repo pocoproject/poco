@@ -1,12 +1,9 @@
 #
 # Darwin-clang-libc++
 #
-# Build settings for Mac OS X 10.9 (clang, libc++, x86_64)
+# Build settings for Mac OS X 10.11 and later (clang, libc++, x86_64/arm64)
 # The build settings defined in this file are compatible
 # with XCode C++ projects.
-#
-# NOTE: This build configuration will build 64-bit binaries.
-# Use the Darwin32-clang-libc++ build configuration to build 32-bit binaries.
 #
 
 #
@@ -14,16 +11,11 @@
 #
 LINKMODE ?= SHARED
 
-POCO_TARGET_OSARCH ?= x86_64
-POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
-ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
-OSFLAGS            ?= -mmacosx-version-min=10.9 -isysroot $(shell xcrun --show-sdk-path)
+ARCHFLAGS          ?= -arch $(OSARCH)
+SANITIZEFLAGS      ?=
+OSFLAGS            ?= -mmacosx-version-min=10.11 -isysroot $(shell xcrun --show-sdk-path)
 
 OPENSSL_DIR        ?= /usr/local/opt/openssl
-
-ifeq ($(POCO_TARGET_OSARCH),i386)
-RORELOCS = -read_only_relocs suppress
-endif
 
 #
 # Tools
@@ -52,11 +44,11 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) -std=c99
-CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++14 -stdlib=libc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
-LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
-SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
-DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
+CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c11
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c++14 -stdlib=libc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =

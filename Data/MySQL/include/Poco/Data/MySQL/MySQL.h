@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <mysql/mysql.h>
 
 
 //
@@ -54,7 +55,11 @@
 	#if !defined(MySQL_EXPORTS)
 		#pragma comment(lib, "PocoDataMySQL" POCO_LIB_SUFFIX)
 	#endif
-	#pragma comment(lib, "libmysql")
+	#if defined(LIBMARIADB)
+		#pragma comment(lib, "libmariadb")
+	#else
+		#pragma comment(lib, "libmysql")
+	#endif
 #endif
 
 

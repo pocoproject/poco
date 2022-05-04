@@ -18,8 +18,8 @@
 #define Data_MySQL_SessionHandle_INCLUDED
 
 
-#include <mysql.h>
 #include "Poco/Data/MySQL/MySQLException.h"
+#include <mysql/mysql.h>
 
 
 namespace Poco {

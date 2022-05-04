@@ -64,6 +64,7 @@ private:
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
+	void recreateUUIDsTable();
 	void recreateTuplesTable();
 	void recreateVectorTable();
 	void recreateVectorsTable();
@@ -73,8 +74,10 @@ private:
 	void recreateMiscTable();
 	void recreateLogTable();
 	void recreateUnicodeTable();
+	void recreateEncodingTables();
 
 	static SessionPtr  _pSession;
+	static SessionPtr  _pEncSession;
 	static ExecPtr     _pExecutor;
 	static std::string _driver;
 	static std::string _dsn;

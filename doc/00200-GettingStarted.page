@@ -23,6 +23,9 @@ team and may not always be up to date.*>
 Up-to-date [[https://conan.io Conan]] packages are available via
 [[https://bintray.com/pocoproject/conan/Poco%3Apocoproject Bintray]].
 
+<%
+<?-PocoDoc.adContent?>
+%>
 
 !!Source Code Distribution Format
 
@@ -366,6 +369,7 @@ Here an overview of POCO build options:
     * ENABLE_NET                       Set to OFF|ON (default is ON) to build Net support library
     * ENABLE_NETSSL                    Set to OFF|ON (default is ON) to build NetSSL support library (Need installed openssl libraries)
     * ENABLE_CRYPTO                    Set to OFF|ON (default is ON) to build Crypto support library (Need installed openssl libraries)
+    * ENABLE_JWT                       Set to OFF|ON (default is ON, if OpenSSL is present) to build JWT (JSON Web Token) library
     * ENABLE_DATA                      Set to OFF|ON (default is ON) to build Data support library
     * ENABLE_DATA_SQLITE               Set to OFF|ON (default is ON) to build Data SQlite support library
     * ENABLE_DATA_MYSQL                Set to OFF|ON (default is ON) to build Data MySQL or MariaDB support library (Need installed MySQL or MariaDB client libraries)
@@ -378,8 +382,8 @@ Here an overview of POCO build options:
     * ENABLE_ZIP                       Set to OFF|ON (default is ON) to build Zip support library
     * ENABLE_SEVENZIP                  Set to OFF|ON (default is OFF) to build SevenZip support library
     * ENABLE_APACHECONNECTOR           Set to OFF|ON (default is ON) to build ApacheConnector support library (Need installed apache and apr libraries)
-    * ENABLE_CPPPARSER                 Set to OFF|ON (default is OFF) to build C++ parser
-    * ENABLE_ENCODINGS                 Set to OFF|ON (default is ON) to build with Encodings
+    * ENABLE_CPPPARSER                 Set to OFF|ON (default is OFF) to build C++ parser library
+    * ENABLE_ENCODINGS                 Set to OFF|ON (default is ON) to build Encodings library
     * ENABLE_ENCODINGS_COMPILER        Set to OFF|ON (default is OFF) to build Encodings Compiler
     * ENABLE_PAGECOMPILER              Set to OFF|ON (default is ON) to build PageCompiler
     * ENABLE_PAGECOMPILER_FILE2PAGE    Set to OFF|ON (default is ON) to build File2Page
