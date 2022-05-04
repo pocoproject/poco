@@ -147,6 +147,9 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
 
+	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).length() == 0 && !extractLongLOB(pos))
+		return false;
+
 	val.assignRaw(_metadata.rawData(pos), _metadata.length(pos));
 	return true;
 }
@@ -162,6 +165,9 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
+
+	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).length() == 0 && !extractLongLOB(pos))
+		return false;
 
 	val.assignRaw(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
@@ -261,6 +267,22 @@ bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* b
 		return false;
 
 	return isNull == 0;
+}
+
+bool Extractor::extractLongLOB(std::size_t pos)
+{
+	// Large LOBs (LONGBLOB and LONGTEXT) are fetched
+	// with a zero-length buffer to avoid allocating
+	// huge amounts of memory. Therefore, when extracting
+	// the buffers need to be adjusted.
+	
+	_metadata.adjustColumnSizeToFit(pos);
+	
+	MYSQL_BIND* row = _metadata.row();
+	if (!_stmt.fetchColumn(pos, &row[pos]))
+		return false;
+	
+	return true;
 }
 
 
