@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{50b5d6b1-711a-40b7-85fb-33c942328403}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e893dccc-0b77-4350-9d63-692dd9dde5fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated Header Files">
+      <UniqueIdentifier>{333120d3-2230-44ba-a64d-d480996fa66d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated Source Files">
+      <UniqueIdentifier>{39342b6b-82bb-4269-a9c6-42525f863ec3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ActiveRecordTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActiveRecordTestSuite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Employee.cpp">
+      <Filter>Generated Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Role.cpp">
+      <Filter>Generated Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ActiveRecordTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ActiveRecordTestSuite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ORM\Employee.h">
+      <Filter>Generated Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ORM\Role.h">
+      <Filter>Generated Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

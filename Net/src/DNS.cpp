@@ -117,7 +117,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 
 #if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
-	static char fqname[1024];
+	char fqname[1024];
 	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD);
 	if (rc == 0)
 	{

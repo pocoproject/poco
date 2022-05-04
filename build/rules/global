@@ -197,6 +197,7 @@ COMPONENT := $(shell $(POCO_BASE)/build/script/projname "$(PROJECT_BASE)")
 #
 SRCDIR   = src
 INCDIR   = include
+GENDIR   = gen
 LIBDIR   = lib/$(OSNAME)/$(OSARCH)
 BINDIR   = bin/$(OSNAME)/$(OSARCH)
 OBJDIR   = obj/$(OSNAME)/$(OSARCH)
@@ -227,6 +228,14 @@ ifeq ($(POCO_BASE),$(PROJECT_BASE))
 POCO_LIBRARY =
 else
 POCO_LIBRARY = -L$(POCO_BASE)/$(LIBDIR)
+endif
+
+ifeq ($(MACCHINA_BASE),)
+MACCHINA_LIBRARY =
+else ifeq ($(MACCHINA_BASE),$(PROJECT_BASE))
+MACCHINA_LIBRARY =
+else
+MACCHINA_LIBRARY = -L$(MACCHINA_BASE)/$(LIBDIR)
 endif
 
 ifndef LIBPREFIX
@@ -309,7 +318,7 @@ INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(f
 #
 # Build Library Directory List
 #
-LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(foreach p,$(POCO_ADD_LIBRARY),-L$(p))
+LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(MACCHINA_LIBRARY) $(foreach p,$(POCO_ADD_LIBRARY),-L$(p))
 
 #
 # Strip Command definition

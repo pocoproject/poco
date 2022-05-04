@@ -13,6 +13,7 @@
 #include "CppUnit/TestRunner.h"
 #include "CryptoTestSuite.h"
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Exception.h"
 
 
 class CryptoInitializer
@@ -39,5 +40,6 @@ int main(int ac, char **av)
 		args.push_back(std::string(av[i]));
 	CppUnit::TestRunner runner;
 	runner.addTest("CryptoTestSuite", CryptoTestSuite::suite());
-	return runner.run(args) ? 0 : 1;
+	CppUnitPocoExceptionText (exc);
+	return runner.run(args, exc) ? 0 : 1;
 }

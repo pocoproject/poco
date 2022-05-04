@@ -211,10 +211,19 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	bool result = true;
-	DWORD exitCode;
-	BOOL rc = GetExitCodeProcess(hProc, &exitCode);
-	if (!rc || exitCode != STILL_ACTIVE) result = false;
-	return result;}
+	if (hProc)
+	{
+		DWORD exitCode;
+		BOOL rc = GetExitCodeProcess(hProc, &exitCode);
+		if (!rc || exitCode != STILL_ACTIVE) result = false;
+		CloseHandle(hProc);
+	}
+	else
+	{
+		result = false;
+	}
+	return result;
+}
 
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)

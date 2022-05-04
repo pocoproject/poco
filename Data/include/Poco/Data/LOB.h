@@ -130,7 +130,18 @@ public:
 		if (_pContent->empty())
 			return 0;
 		else
-			return &(*_pContent)[0];
+			return _pContent->data();
+	}
+
+	T* rawContent()
+		/// Returns the raw content.
+		///
+		/// If the LOB is empty, returns NULL.
+	{
+		if (_pContent->empty())
+			return 0;
+		else
+			return _pContent->data();
 	}
 
 	void assignVal(std::size_t count, const T& val)
@@ -153,6 +164,18 @@ public:
 	{
 		poco_assert_dbg (pChar);
 		_pContent->insert(_pContent->end(), pChar, pChar+count);
+	}
+
+	void reserve(std::size_t size)
+		/// Sets the capacity of the internal buffer.
+	{
+		_pContent->reserve(size);
+	}
+
+	void resize(std::size_t size)
+		/// Resizes the internal buffer.
+	{
+		_pContent->resize(size);
 	}
 
 	void clear(bool doCompact = false)
@@ -183,6 +206,12 @@ public:
 		/// Returns the size of the LOB in bytes.
 	{
 		return static_cast<std::size_t>(_pContent->size());
+	}
+
+	std::size_t capacity() const
+		/// Returns the capacity of the underlying buffer.
+	{
+		return static_cast<std::size_t>(_pContent->capacity());
 	}
 
 private:

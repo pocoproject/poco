@@ -21,6 +21,25 @@
 #include <openssl/evp.h>
 
 
+namespace
+{
+	void throwError()
+	{
+		unsigned long err;
+		std::string msg;
+
+		while ((err = ERR_get_error()))
+		{
+			if (!msg.empty())
+				msg.append("; ");
+			msg.append(ERR_error_string(err, 0));
+		}
+
+		throw Poco::IOException(msg);
+	}
+}
+
+
 namespace Poco {
 namespace Crypto {
 
@@ -185,6 +204,8 @@ void CipherKeyImpl::generateKey(
 		iterationCount,
 		keyBytes,
 		ivBytes);
+
+	if (!keySize) throwError();
 
 	// Copy the buffers to our member byte vectors.
 	_key.assign(keyBytes, keyBytes + keySize);

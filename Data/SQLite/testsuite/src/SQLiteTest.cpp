@@ -30,6 +30,7 @@
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
+#include "Poco/UUIDGenerator.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
@@ -1958,6 +1959,21 @@ void SQLiteTest::testDateTime()
 }
 
 
+void SQLiteTest::testUUID()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Ids", now;
+	tmp << "CREATE TABLE Ids (id0 UUID)", now;
+
+	Poco::UUID uuid = Poco::UUIDGenerator::defaultGenerator().createRandom();
+	tmp << "INSERT INTO Ids VALUES (?)", use(uuid), now;
+
+	Poco::UUID ruuid;
+	tmp << "SELECT * FROM Ids", into(ruuid), now;
+	assertTrue (ruuid == uuid);
+}
+
+
 void SQLiteTest::testInternalExtraction()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -3496,6 +3512,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple1);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector1);
 	CppUnit_addTest(pSuite, SQLiteTest, testDateTime);
+	CppUnit_addTest(pSuite, SQLiteTest, testUUID);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);

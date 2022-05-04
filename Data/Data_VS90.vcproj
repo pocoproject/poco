@@ -668,6 +668,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Transcoder.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\TypeHandler.h"
 					>
 				</File>
@@ -789,6 +793,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Transaction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Transcoder.cpp"
 					>
 				</File>
 			</Filter>

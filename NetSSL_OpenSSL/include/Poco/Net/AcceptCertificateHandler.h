@@ -27,7 +27,7 @@ namespace Net {
 
 
 class NetSSL_API AcceptCertificateHandler: public InvalidCertificateHandler
-	/// A AcceptCertificateHandler is invoked whenever an error 
+	/// A AcceptCertificateHandler is invoked whenever an error
 	/// occurs verifying the certificate. It always accepts
 	/// the certificate.
 	///

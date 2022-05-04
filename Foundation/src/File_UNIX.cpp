@@ -336,20 +336,22 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 	struct stat st;
 	if (fstat(sd, &st) != 0)
 	{
+		int err = errno;
 		close(sd);
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	}
 	const long blockSize = st.st_blksize;
 	int dd;
 	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
-		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode); 
+		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode);
 	} else {
 		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
 	}
 	if (dd == -1)
 	{
+		int err = errno;
 		close(sd);
-		handleLastErrorImpl(path);
+		handleLastErrorImpl(err, path);
 	}
 	Buffer<char> buffer(blockSize);
 	try
@@ -361,7 +363,9 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
+		{
 			handleLastErrorImpl(_path);
+		}
 	}
 	catch (...)
 	{
@@ -372,11 +376,14 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 	close(sd);
 	if (fsync(dd) != 0)
 	{
+		int err = errno;
 		close(dd);
-		handleLastErrorImpl(path);
+		handleLastErrorImpl(err, path);
 	}
 	if (close(dd) != 0)
+	{
 		handleLastErrorImpl(path);
+	}
 }
 
 
@@ -387,7 +394,7 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 	struct stat st;
 
 	if (stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
-		throw FileExistsException(path, EEXIST);		
+		throw FileExistsException(path, EEXIST);
 
 	if (rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);
@@ -490,42 +497,48 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 }
 
 
-void FileImpl::handleLastErrorImpl(const std::string& path)
+void FileImpl::handleLastErrorImpl(int err, const std::string& path)
 {
-	switch (errno)
+	switch (err)
 	{
 	case EIO:
-		throw IOException(path, errno);
+		throw IOException(path, err);
 	case EPERM:
-		throw FileAccessDeniedException("insufficient permissions", path, errno);
+		throw FileAccessDeniedException("insufficient permissions", path, err);
 	case EACCES:
-		throw FileAccessDeniedException(path, errno);
+		throw FileAccessDeniedException(path, err);
 	case ENOENT:
-		throw FileNotFoundException(path, errno);
+		throw FileNotFoundException(path, err);
 	case ENOTDIR:
-		throw OpenFileException("not a directory", path, errno);
+		throw OpenFileException("not a directory", path, err);
 	case EISDIR:
-		throw OpenFileException("not a file", path, errno);
+		throw OpenFileException("not a file", path, err);
 	case EROFS:
-		throw FileReadOnlyException(path, errno);
+		throw FileReadOnlyException(path, err);
 	case EEXIST:
-		throw FileExistsException(path, errno);
+		throw FileExistsException(path, err);
 	case ENOSPC:
-		throw FileException("no space left on device", path, errno);
+		throw FileException("no space left on device", path, err);
 	case EDQUOT:
-		throw FileException("disk quota exceeded", path, errno);
+		throw FileException("disk quota exceeded", path, err);
 #if !defined(_AIX)
 	case ENOTEMPTY:
-		throw DirectoryNotEmptyException(path, errno);
+		throw DirectoryNotEmptyException(path, err);
 #endif
 	case ENAMETOOLONG:
-		throw PathSyntaxException(path, errno);
+		throw PathSyntaxException(path, err);
 	case ENFILE:
 	case EMFILE:
-		throw FileException("too many open files", path, errno);
+		throw FileException("too many open files", path, err);
 	default:
-		throw FileException(Error::getMessage(errno), path, errno);
+		throw FileException(Error::getMessage(err), path, err);
 	}
+}
+
+
+void FileImpl::handleLastErrorImpl(const std::string& path)
+{
+	handleLastErrorImpl(errno, path);
 }
 
 

@@ -20,9 +20,9 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/DataException.h"
+#include <mysql/mysql.h>
 #include <typeinfo>
 #include <string>
-#include <mysql.h>
 
 
 namespace Poco {

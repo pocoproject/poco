@@ -40,6 +40,12 @@ DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress):
 }
 
 
+DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort): Socket(new DatagramSocketImpl(address.family()))
+{
+	bind(address, reuseAddress, reusePort);
+}
+
+
 DatagramSocket::DatagramSocket(const Socket& socket): Socket(socket)
 {
 	if (!dynamic_cast<DatagramSocketImpl*>(impl()))

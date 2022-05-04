@@ -19,7 +19,8 @@ endif
 
 objects = CryptoTestSuite Driver \
 	CryptoTest DigestEngineTest ECTest \
-	EVPTest RSATest PKCS12ContainerTest
+	EVPTest RSATest PKCS12ContainerTest \
+	EnvelopeTest
 
 target         = testrunner
 target_version = 1

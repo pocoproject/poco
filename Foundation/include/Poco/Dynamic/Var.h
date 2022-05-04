@@ -91,15 +91,9 @@ public:
 	template <typename T>
 	Var(const T& val)
 		/// Creates the Var from the given value.
-#ifdef POCO_NO_SOO
-		: _pHolder(new VarHolderImpl<T>(val))
-	{
-	}
-#else
 	{
 		construct(val);
 	}
-#endif
 
 	Var(const char* pVal);
 		// Convenience constructor for const char* which gets mapped to a std::string internally, i.e. pVal is deep-copied.
@@ -231,12 +225,8 @@ public:
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
-#ifdef POCO_NO_SOO
-		Var tmp(other);
-		swap(tmp);
-#else
+		clear();
 		construct(other);
-#endif
 		return *this;
 	}
 
@@ -523,6 +513,9 @@ public:
 	bool isDateTime() const;
 		/// Returns true if stored value represents a date/time.
 
+	bool isUUID() const;
+		/// Returns true if stored value is a Poco::UUID.
+
 	std::size_t size() const;
 		/// Returns the size of this Var.
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
@@ -609,79 +602,34 @@ private:
 		return pStr->operator[](n);
 	}
 
-#ifdef POCO_NO_SOO
-
-	VarHolder* content() const
-	{
-		return _pHolder;
-	}
-
-	void destruct()
-	{
-		if (!isEmpty()) delete content();
-	}
-
-	VarHolder* _pHolder;
-
-#else
-
 	VarHolder* content() const
 	{
 		return _placeholder.content();
 	}
 
+	void destruct()
+	{
+	}
+
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(VarHolderImpl<ValueType>) <= Placeholder<ValueType>::Size::value)
-		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<ValueType>(value);
-			_placeholder.setLocal(true);
-		}
-		else
-		{
-			_placeholder.pHolder = new VarHolderImpl<ValueType>(value);
-			_placeholder.setLocal(false);
-		}
+		_placeholder.assign<VarHolderImpl<ValueType>, ValueType>(value);
 	}
 
 	void construct(const char* value)
 	{
 		std::string val(value);
-		if (sizeof(VarHolderImpl<std::string>) <= Placeholder<std::string>::Size::value)
-		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<std::string>(val);
-			_placeholder.setLocal(true);
-		}
-		else
-		{
-			_placeholder.pHolder = new VarHolderImpl<std::string>(val);
-			_placeholder.setLocal(false);
-		}
+		_placeholder.assign<VarHolderImpl<std::string>, std::string>(val);
 	}
 
 	void construct(const Var& other)
 	{
 		if (!other.isEmpty())
 			other.content()->clone(&_placeholder);
-		else
-			_placeholder.erase();
-	}
-
-	void destruct()
-	{
-		if (!isEmpty())
-		{
-			if (_placeholder.isLocal())
-				content()->~VarHolder();
-			else
-				delete content();
-		}
 	}
 
 	Placeholder<VarHolder> _placeholder;
-
-#endif // POCO_NO_SOO
 };
 
 
@@ -696,24 +644,17 @@ private:
 
 inline void Var::swap(Var& other)
 {
-#ifdef POCO_NO_SOO
-
-	std::swap(_pHolder, other._pHolder);
-
-#else
-
 	if (this == &other) return;
 
 	if (!_placeholder.isLocal() && !other._placeholder.isLocal())
 	{
-		std::swap(_placeholder.pHolder, other._placeholder.pHolder);
+		_placeholder.swap(other._placeholder);
 	}
 	else
 	{
 		Var tmp(*this);
 		try
 		{
-			if (_placeholder.isLocal()) destruct();
 			construct(other);
 			other = tmp;
 		}
@@ -723,8 +664,6 @@ inline void Var::swap(Var& other)
 			throw;
 		}
 	}
-
-#endif
 }
 
 
@@ -893,6 +832,13 @@ inline bool Var::isDateTime() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isDateTime() : false;
+}
+
+
+inline bool Var::isUUID() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isUUID() : false;
 }
 
 

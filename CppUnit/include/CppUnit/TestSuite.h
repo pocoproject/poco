@@ -41,7 +41,7 @@ public:
 	TestSuite(const std::string& name = "");
 	~TestSuite();
 
-	void run(TestResult* result);
+	void run(TestResult* result, const Test::Callback& callback = nullptr);
 	int countTestCases() const;
 	void addTest(Test* test);
 	std::string toString() const;
