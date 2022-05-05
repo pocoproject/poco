@@ -33,6 +33,19 @@ AbstractBinder::AbstractBinder()
 
 AbstractBinder::~AbstractBinder()
 {
+	if (_pStrings)
+	{
+		for (auto& s : *_pStrings)
+			delete s;
+	}
+}
+
+
+const std::string& AbstractBinder::toString(const UUID& uuid)
+{
+	if (!_pStrings) _pStrings.reset(new StringList);
+	_pStrings->push_back(new std::string(uuid.toString()));
+	return *_pStrings->back();
 }
 
 
