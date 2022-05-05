@@ -5,11 +5,14 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server mariadb-server libmariadb-dev
       - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: sudo Data/MySQL/testsuite/run-db-setup.sh
+      - run: sudo ln -s /usr/include/mariadb/ /usr/include/mysql
+      - run: sudo ln -s /usr/lib/x86_64-linux-gnu/libmariadb.so /usr/lib/libmysqlclient.so
       - run: >-
           sudo -s
-          EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
+          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
   linux-gcc-make-asan:
