@@ -20,10 +20,12 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SocketDefs.h"
+#include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
 #include <cstdlib>
@@ -124,6 +126,16 @@ public:
 		PROTO_TLSV1_3 = 0x20
 	};
 
+	enum SecurityLevel
+	{
+		SECURITY_LEVEL_NONE     = 0,
+		SECURITY_LEVEL_80_BITS  = 1,
+		SECURITY_LEVEL_112_BITS = 2,
+		SECURITY_LEVEL_128_BITS = 3,
+		SECURITY_LEVEL_192_BITS = 4,
+		SECURITY_LEVEL_256_BITS = 5
+	};
+
 	struct NetSSL_API Params
 	{
 		Params();
@@ -135,6 +147,7 @@ public:
 
 		std::string certificateFile;
 			/// Path to the certificate file (in PEM format).
+			///
 			/// If the private key and the certificate are stored in the same file, this
 			/// can be empty if privateKeyFile is given.
 
@@ -190,7 +203,14 @@ public:
 			///   and other TLSv1.3 ephemeral key negotiation, based
 			///   on the group names defined by OpenSSL. Defaults to
 			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
+
+		SecurityLevel securityLevel;
+			/// Defines minimal number of security bits allowed.
+			/// Requires OpenSSL >= 1.1 to be effective.
+
 	};
+
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Context(Usage usage, const Params& params);
 		/// Creates a Context using the given parameters.
@@ -269,6 +289,7 @@ public:
 	void addCertificateAuthority(const Poco::Crypto::X509Certificate& certificate);
 		/// Add one trusted certification authority to be used by the Context.
 
+	//@deprecated
 	void usePrivateKey(const Poco::Crypto::RSAKey& key);
 		/// Sets the private key to be used by the Context.
 		///
@@ -405,6 +426,19 @@ public:
 		/// Returns true if automatic OCSP response
 		/// reception and verification is enabled for client connections
 
+	void setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificageHandler);
+		/// Sets a Context-specific InvalidCertificateHandler.
+		///
+		/// If specified, this InvalidCertificateHandler will be used instead of the
+		/// one globally set in the SSLManager.
+
+	InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
+		/// Returns the InvalidCertificateHandler set for this Context,
+		/// or a null pointer if none has been set.
+
+	void setSecurityLevel(SecurityLevel level);
+		/// Sets the security level.
+
 private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
@@ -424,6 +458,7 @@ private:
 	SSL_CTX* _pSSLContext;
 	bool _extendedCertificateVerification;
 	bool _ocspStaplingResponseVerification;
+	InvalidCertificateHandlerPtr _pInvalidCertificateHandler;
 };
 
 
@@ -468,6 +503,12 @@ inline bool Context::extendedCertificateVerificationEnabled() const
 inline bool Context::ocspStaplingResponseVerificationEnabled() const
 {
 	return _ocspStaplingResponseVerification;
+}
+
+
+inline Context::InvalidCertificateHandlerPtr Context::getInvalidCertificateHandler() const
+{
+	return _pInvalidCertificateHandler;
 }
 
 

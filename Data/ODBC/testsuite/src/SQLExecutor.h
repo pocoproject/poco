@@ -87,7 +87,7 @@ public:
 		DE_BOUND
 	};
 
-	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession);
+	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = 0);
 	~SQLExecutor();
 
 	void execute(const std::string& sql);
@@ -469,6 +469,7 @@ public:
 	void time();
 	void floats();
 	void doubles();
+	void uuids();
 	void tuples();
 	void tupleVector();
 
@@ -504,6 +505,7 @@ public:
 	void nullable();
 
 	void unicode(const std::string& dbConnString);
+	void encoding(const std::string& dbConnString);
 
 	void reconnect();
 
@@ -513,15 +515,24 @@ private:
 
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
 
-	Poco::Data::Session& session();
+	Poco::Data::Session& session(bool enc = false);
 	Poco::Data::Session* _pSession;
+	Poco::Data::Session* _pEncSession;
 };
 
 
-inline Poco::Data::Session& SQLExecutor::session()
+inline Poco::Data::Session& SQLExecutor::session(bool enc)
 {
-	poco_check_ptr (_pSession);
-	return *_pSession;
+	if (!enc)
+	{
+		poco_check_ptr(_pSession);
+		return *_pSession;
+	}
+	else
+	{
+		poco_check_ptr(_pEncSession);
+		return *_pEncSession;
+	}
 }
 
 

@@ -24,8 +24,18 @@
 #define POCO_EXTERNAL_OPENSSL_SLPRO 2
 
 
+//
+// Temporarily suppress deprecation warnings coming
+// from OpenSSL 3.0, until we have updated our code.
+//
+#if !defined(POCO_DONT_SUPPRESS_OPENSSL_DEPRECATED)
+#define OPENSSL_SUPPRESS_DEPRECATED
+#endif
+
+
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
+#include <openssl/err.h>
 
 
 #ifndef OPENSSL_VERSION_PREREQ
@@ -39,24 +49,25 @@
 #endif
 
 
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+#error "OpenSSL version too old. At least OpenSSL 1.0.0 is required."
+#endif
+
+
 enum RSAPaddingMode
 	/// The padding mode used for RSA public key encryption.
 {
 	RSA_PADDING_PKCS1,
-		/// PKCS #1 v1.5 padding. This currently is the most widely used mode. 
-		
+		/// PKCS #1 v1.5 padding. This currently is the most widely used mode.
+
 	RSA_PADDING_PKCS1_OAEP,
-		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty 
+		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty
 		/// encoding parameter. This mode is recommended for all new applications.
-		
-	RSA_PADDING_SSLV23,
-		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes 
-		/// that the server is SSL3 capable. 
-		
+
 	RSA_PADDING_NONE
-		/// Raw RSA encryption. This mode should only be used to implement cryptographically 
-		/// sound padding modes in the application code. Encrypting user data directly with RSA 
-		/// is insecure. 
+		/// Raw RSA encryption. This mode should only be used to implement cryptographically
+		/// sound padding modes in the application code. Encrypting user data directly with RSA
+		/// is insecure.
 };
 
 
@@ -166,6 +177,20 @@ enum RSAPaddingMode
 
 namespace Poco {
 namespace Crypto {
+
+
+inline std::string& getError(std::string& msg)
+	/// Appends OpenSSL error(s) to msg and
+	/// returns the augmented error description.
+{
+	unsigned long err;
+	while ((err = ERR_get_error()))
+	{
+		if (!msg.empty()) msg.append(1, '\n');
+		msg.append(ERR_error_string(err, 0));
+	}
+	return msg;
+}
 
 
 void Crypto_API initializeCrypto();

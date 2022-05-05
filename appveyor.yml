@@ -1,9 +1,0 @@
-version: poco-{branch}-{build}
-
-install:
-  - cinst cmake
-
-build_script:
-  - set PATH=C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\bin;%PATH%
-  - cmake -H. -Bcmake-build -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF
-  - cmake --build cmake-build

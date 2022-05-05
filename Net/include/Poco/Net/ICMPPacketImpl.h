@@ -43,7 +43,7 @@ public:
 
 	virtual int packetSize() const = 0;
 		/// Returns the total size of packet (ICMP header + data) in number of octets.
-		/// Must be overriden.
+		/// Must be overridden.
 
 	virtual int maxPacketSize() const;
 		/// Returns the maximum permitted size of packet in number of octets.
@@ -60,16 +60,16 @@ public:
 	virtual struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const = 0;
 		/// Returns current epoch time if either argument is equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
-		/// 
+		///
 		/// Supplied buffer includes IP header, ICMP header and data.
-		/// Must be overriden.
+		/// Must be overridden.
 
 	virtual bool validReplyID(unsigned char* buffer, int length) const = 0;
-		/// Returns true if the extracted id is recognized 
+		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
-		///	
+		///
 		/// Supplied buffer includes IP header, ICMP header and data.
-		/// Must be overriden.
+		/// Must be overridden.
 
 	virtual std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code) = 0;
 		/// Returns error description string.
@@ -79,11 +79,11 @@ public:
 		/// assigned to the type and code respectively.
 		///
 		/// Supplied buffer includes IP header, ICMP header and data.
-		/// Must be overriden.
+		/// Must be overridden.
 
 	virtual std::string typeDescription(int typeId) = 0;
 		/// Returns the description of the packet type.
-		/// Must be overriden.
+		/// Must be overridden.
 
 	static const Poco::UInt16 MAX_PACKET_SIZE;
 	static const Poco::UInt16 MAX_PAYLOAD_SIZE;
@@ -98,7 +98,7 @@ protected:
 
 	virtual void initPacket() = 0;
 		/// (Re)assembles the packet.
-		/// Must be overriden.
+		/// Must be overridden.
 
 	Poco::UInt16 checksum(Poco::UInt16 *addr, Poco::Int32 len);
 		/// Calculates the checksum for supplied buffer.
@@ -107,7 +107,7 @@ private:
 	Poco::UInt16 _seq;
 	Poco::UInt8* _pPacket;
 	int _dataSize;
-	
+
 };
 
 

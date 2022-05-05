@@ -45,7 +45,7 @@ public:
 	MemoryPool(std::size_t blockSize, int preAlloc = 0, int maxAlloc = 0);
 		/// Creates a MemoryPool for blocks with the given blockSize.
 		/// The number of blocks given in preAlloc are preallocated.
-		
+
 	~MemoryPool();
 
 	void* get();
@@ -54,16 +54,16 @@ public:
 		///
 		/// If maxAlloc blocks are already allocated, an
 		/// OutOfMemoryException is thrown.
-		
+
 	void release(void* ptr);
 		/// Releases a memory block and returns it to the pool.
-	
+
 	std::size_t blockSize() const;
 		/// Returns the block size.
-		
+
 	int allocated() const;
 		/// Returns the number of allocated blocks.
-		
+
 	int available() const;
 		/// Returns the number of available blocks in the pool.
 
@@ -71,16 +71,16 @@ private:
 	MemoryPool();
 	MemoryPool(const MemoryPool&);
 	MemoryPool& operator = (const MemoryPool&);
-	
+
 	void clear();
-	
+
 	enum
 	{
 		BLOCK_RESERVE = 128
 	};
-	
+
 	typedef std::vector<char*> BlockVec;
-	
+
 	std::size_t _blockSize;
 	int         _maxAlloc;
 	int         _allocated;
@@ -94,7 +94,7 @@ private:
 //
 
 // Macro defining the default initial size of any
-// FastMemoryPool; can be overriden by specifying
+// FastMemoryPool; can be overridden by specifying
 // FastMemoryPool pre-alloc at runtime.
 #define POCO_FAST_MEMORY_POOL_PREALLOC 1000
 

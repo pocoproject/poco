@@ -28,6 +28,7 @@ namespace Crypto {
 class Cipher;
 class CipherKey;
 class RSAKey;
+class EVPPKey;
 
 
 class Crypto_API CipherFactory
@@ -58,6 +59,10 @@ public:
 
 	Cipher* createCipher(const RSAKey& key, RSAPaddingMode paddingMode = RSA_PADDING_PKCS1);
 		/// Creates a RSACipher using the given RSA key and padding mode
+		/// for public key encryption/private key decryption.
+
+	Cipher* createCipher(const EVPPKey& key);
+		/// Creates an EVPCipher using the given EVP key
 		/// for public key encryption/private key decryption.
 	
 	static CipherFactory& defaultFactory();

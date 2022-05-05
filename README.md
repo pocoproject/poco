@@ -1,8 +1,6 @@
 ![alt text][logo]
 
-
-[![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=devel)](https://travis-ci.org/pocoproject/poco)
-[![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/master?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/devel)
+[![poco-ci](https://github.com/pocoproject/poco/actions/workflows/ci.yml/badge.svg?branch=poco-1.11.2)](https://github.com/pocoproject/poco/actions/workflows/ci.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
 

@@ -212,7 +212,33 @@ void SecureSocketImpl::connectNB(const SocketAddress& address)
 
 void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
+	poco_check_ptr (_pSocket);
+
 	_pSocket->bind(address, reuseAddress);
+}
+
+
+void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind(address, reuseAddress, reusePort);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, ipV6Only);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, reusePort, ipV6Only);
 }
 
 
@@ -700,7 +726,7 @@ void SecureSocketImpl::connectSSL(bool completeHandshake)
 
 	if (_peerHostName.empty())
 	{
-		_peerHostName = _pSocket->address().host().toString();
+		_peerHostName = _pSocket->peerAddress().host().toString();
 	}
 
 	initClientContext();
@@ -1291,7 +1317,7 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 
 			// Revocation check of the root certificate may fail due to missing CRL points, etc.
 			// We ignore all errors checking the root certificate except CRYPT_E_REVOKED.
-			if (!ok && (revStat.dwIndex < certs.size() - 1 || revStat.dwError == CRYPT_E_REVOKED))
+			if (!ok && revStat.dwIndex < certs.size() - 1 && revStat.dwError == CRYPT_E_REVOKED)
 			{
 				VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwError));
 				SSLManager::instance().ClientVerificationError(this, args);
@@ -1395,7 +1421,10 @@ void SecureSocketImpl::serverVerifyCertificate()
 						CERT_VERIFY_REV_CHAIN_FLAG,
 						NULL,
 						&revStat);
-		if (!ok && (revStat.dwIndex < certs.size() - 1 || revStat.dwError == CRYPT_E_REVOKED))
+
+		// Revocation check of the root certificate may fail due to missing CRL points, etc.
+		// We ignore all errors checking the root certificate except CRYPT_E_REVOKED.
+		if (!ok && revStat.dwIndex < certs.size() - 1 && revStat.dwError == CRYPT_E_REVOKED)
 		{
 			VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwReason));
 			SSLManager::instance().ServerVerificationError(this, args);
@@ -1522,7 +1551,7 @@ void SecureSocketImpl::stateIllegal()
 
 void SecureSocketImpl::stateConnected()
 {
-	_peerHostName = _pSocket->address().host().toString();
+	_peerHostName = _pSocket->peerAddress().host().toString();
 	initClientContext();
 	performInitialClientHandshake();
 }

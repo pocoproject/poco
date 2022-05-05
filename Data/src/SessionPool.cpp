@@ -65,7 +65,7 @@ Session SessionPool::get()
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
     if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
-	
+
 	purgeDeadSessions();
 
 	if (_idleSessions.empty())
@@ -85,7 +85,7 @@ Session SessionPool::get()
 
 	PooledSessionHolderPtr pHolder(_idleSessions.front());
 	PooledSessionImplPtr pPSI(new PooledSessionImpl(pHolder));
-	
+
 	_activeSessions.push_front(pHolder);
 	_idleSessions.pop_front();
 	return Session(pPSI);
@@ -115,14 +115,14 @@ int SessionPool::capacity() const
 	return _maxSessions;
 }
 
-	
+
 int SessionPool::used() const
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
 	return (int) _activeSessions.size();
 }
 
-	
+
 int SessionPool::idle() const
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
@@ -153,7 +153,7 @@ int SessionPool::allocated() const
 	return _nSessions;
 }
 
-	
+
 int SessionPool::available() const
 {
 	if (_shutdown) return 0;
@@ -233,28 +233,43 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
 	if (it != _activeSessions.end())
 	{
-		if (pHolder->session()->isGood())
+		try
 		{
-			pHolder->session()->reset();
+			if (pHolder->session()->isGood())
+			{
+				pHolder->session()->reset();
 
-			// reverse settings applied at acquisition time, if any
-			AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
-			if (pIt != _addPropertyMap.end())
-				pHolder->session()->setProperty(pIt->second.first, pIt->second.second);
+				// reverse settings applied at acquisition time, if any
+				AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
+				if (pIt != _addPropertyMap.end())
+					pHolder->session()->setProperty(pIt->second.first, pIt->second.second);
 
-			AddFeatureMap::iterator fIt = _addFeatureMap.find(pHolder->session());
-			if (fIt != _addFeatureMap.end())
-				pHolder->session()->setFeature(fIt->second.first, fIt->second.second);
+				AddFeatureMap::iterator fIt = _addFeatureMap.find(pHolder->session());
+				if (fIt != _addFeatureMap.end())
+					pHolder->session()->setFeature(fIt->second.first, fIt->second.second);
 
-			// re-apply the default pool settings
-			applySettings(pHolder->session());
+				// re-apply the default pool settings
+				applySettings(pHolder->session());
 
-			pHolder->access();
-			_idleSessions.push_front(pHolder);
+				pHolder->access();
+				_idleSessions.push_front(pHolder);
+			}
+			else --_nSessions;
+
+			_activeSessions.erase(it);
 		}
-		else --_nSessions;
-
-		_activeSessions.erase(it);
+		catch (const Poco::Exception& e)
+		{
+			--_nSessions;
+			_activeSessions.erase(it);
+			poco_bugcheck_msg(format("Exception in SessionPool::putBack(): %s", e.displayText()).c_str());
+		}
+		catch (...)
+		{
+			--_nSessions;
+			_activeSessions.erase(it);
+			poco_bugcheck_msg("Unknown exception in SessionPool::putBack()");
+		}
 	}
 	else
 	{
@@ -268,13 +283,18 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
-	SessionList::iterator it = _idleSessions.begin(); 
+	SessionList::iterator it = _idleSessions.begin();
 	while (_nSessions > _minSessions && it != _idleSessions.end())
 	{
 		if ((*it)->idle() > _idleTime || !(*it)->session()->isGood())
-		{	
-			try	{ (*it)->session()->close(); }
-			catch (...) { }
+		{
+			try
+			{
+				(*it)->session()->close();
+			}
+			catch (...)
+			{
+			}
 			it = _idleSessions.erase(it);
 			--_nSessions;
 		}
@@ -296,11 +316,16 @@ void SessionPool::shutdown()
 
 void SessionPool::closeAll(SessionList& sessionList)
 {
-	SessionList::iterator it = sessionList.begin(); 
+	SessionList::iterator it = sessionList.begin();
 	for (; it != sessionList.end();)
 	{
-		try	{ (*it)->session()->close(); }
-		catch (...) { }
+		try
+		{
+			(*it)->session()->close();
+		}
+		catch (...)
+		{
+		}
 		it = sessionList.erase(it);
 		if (_nSessions > 0) --_nSessions;
 	}

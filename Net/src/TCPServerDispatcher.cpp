@@ -50,6 +50,11 @@ private:
 };
 
 
+class StopNotification: public Notification
+{
+};
+
+
 TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, TCPServerParams::Ptr pParams):
 	_rc(1),
 	_pParams(pParams),
@@ -166,9 +171,10 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 
 void TCPServerDispatcher::stop()
 {
+	FastMutex::ScopedLock lock(_mutex);
 	_stopped = true;
 	_queue.clear();
-	_queue.wakeUpAll();
+	_queue.enqueueNotification(new StopNotification);
 }
 
 

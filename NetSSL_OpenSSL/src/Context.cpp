@@ -20,10 +20,17 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Format.h"
+#include "Poco/Error.h"
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/core_names.h>
+#include <openssl/decoder.h>
+#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <iostream>
 
 
 namespace Poco {
@@ -36,7 +43,8 @@ Context::Params::Params():
 	loadDefaultCAs(false),
 	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
-	dhUse2048Bits(false)
+	dhUse2048Bits(false),
+	securityLevel(SECURITY_LEVEL_NONE)
 {
 }
 
@@ -125,6 +133,9 @@ void Context::init(const Params& params)
 	try
 	{
 		int errCode = 0;
+
+		setSecurityLevel(params.securityLevel);
+
 		if (!params.caLocation.empty())
 		{
 			Poco::File aFile(params.caLocation);
@@ -159,13 +170,15 @@ void Context::init(const Params& params)
 			}
 		}
 
-		if (!params.certificateFile.empty())
+		std::string certificateFile = params.certificateFile;
+		if (certificateFile.empty()) certificateFile = params.privateKeyFile;
+		if (!certificateFile.empty())
 		{
-			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(params.certificateFile).c_str());
+			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
 			if (errCode != 1)
 			{
 				std::string errMsg = Utility::getLastError();
-				throw SSLContextException(std::string("Error loading certificate from file ") + params.certificateFile, errMsg);
+				throw SSLContextException(std::string("Error loading certificate from file ") + certificateFile, errMsg);
 			}
 		}
 
@@ -178,6 +191,7 @@ void Context::init(const Params& params)
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+		SSL_CTX_set_ex_data(_pSSLContext, SSLManager::instance().contextIndex(), this);
 
 		if (!isForServerUse() && params.ocspStaplingVerification)
 		{
@@ -198,6 +212,14 @@ void Context::init(const Params& params)
 		SSL_CTX_free(_pSSLContext);
 		throw;
 	}
+}
+
+
+void Context::setSecurityLevel(SecurityLevel level)
+{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	SSL_CTX_set_security_level(_pSSLContext, static_cast<int>(level));
+#endif
 }
 
 
@@ -410,7 +432,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	case PROTO_SSLV2:
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
 	case PROTO_SSLV3:
-		version = SSL3_VERSION;
+		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
 		break;
 	case PROTO_TLSV1:
 		version = TLS1_VERSION;
@@ -439,7 +461,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
 
 	case PROTO_SSLV3:
-		disableProtocols(PROTO_SSLV2);
+		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
 		break;
 
 	case PROTO_TLSV1:
@@ -475,6 +497,12 @@ void Context::preferServerCiphers()
 #if defined(SSL_OP_CIPHER_SERVER_PREFERENCE)
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_CIPHER_SERVER_PREFERENCE);
 #endif
+}
+
+
+void Context::setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificateHandler)
+{
+	_pInvalidCertificateHandler = pInvalidCertificateHandler;
 }
 
 
@@ -706,6 +734,110 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 		0x6C,0xC4,0x16,0x59,
 	};
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+
+	EVP_PKEY_CTX* pKeyCtx = NULL;
+	OSSL_DECODER_CTX* pOSSLDecodeCtx = NULL;
+	EVP_PKEY* pKey = NULL;
+	bool freeEVPPKey = true;
+	if (!dhParamsFile.empty())
+	{
+		freeEVPPKey = false;
+		pOSSLDecodeCtx = OSSL_DECODER_CTX_new_for_pkey(&pKey, NULL, NULL, "DH",
+				OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS, NULL, NULL);
+
+		if (!pOSSLDecodeCtx)
+		{
+			std::string err = Poco::format(
+					"Context::initDH(%s):OSSL_DECODER_CTX_new_for_pkey():OSSL_DECODER_CTX*\n", dhParamsFile);
+			throw Poco::NullPointerException(Poco::Crypto::getError(err));
+		}
+
+		if (!OSSL_DECODER_CTX_get_num_decoders(pOSSLDecodeCtx))
+		{
+			OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+			throw Poco::Crypto::OpenSSLException(
+				Poco::format("Context::initDH(%s):OSSL_DECODER_CTX_get_num_decoders()=0",
+					dhParamsFile));
+		}
+
+		FILE* pFile = fopen(dhParamsFile.c_str(), "r");
+		if (!pFile)
+		{
+			OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+			throw Poco::NullPointerException(
+				Poco::format("Context::initDH(%s):fopen()\n%s",
+					dhParamsFile, Poco::Error::getMessage(Poco::Error::last())));
+		}
+
+		if (!OSSL_DECODER_from_fp(pOSSLDecodeCtx, pFile))
+		{
+			fclose(pFile);
+			OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+			std::string err = Poco::format(
+					"Context::initDH(%s):OSSL_DECODER_from_fp()\n%s", dhParamsFile);
+			throw Poco::Crypto::OpenSSLException(Poco::Crypto::getError(err));
+		}
+		fclose(pFile);
+		OSSL_DECODER_CTX_free(pOSSLDecodeCtx);
+
+		if (!pKey)
+		{
+			std::string err = Poco::format(
+					"Context::initDH(%s):OSSL_DECODER_CTX_new_for_pkey():EVP_PKEY*\n", dhParamsFile);
+			throw Poco::NullPointerException(Poco::Crypto::getError(err));
+		}
+	}
+	else
+	{
+		pKeyCtx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
+		if (!pKeyCtx)
+		{
+			std::string err = "Context::initDH():EVP_PKEY_CTX_new_from_name()\n";
+			throw Poco::NullPointerException(Poco::Crypto::getError(err));
+		}
+
+		size_t keyLength = use2048Bits ? 256 : 160;
+		unsigned char* pDH_p = const_cast<unsigned char*>(use2048Bits ? dh2048_p : dh1024_p);
+		std::size_t sz_p = use2048Bits ? sizeof(dh2048_p) : sizeof(dh1024_p);
+		unsigned char* pDH_g = const_cast<unsigned char*>(use2048Bits ? dh2048_g : dh1024_g);
+		std::size_t sz_g = use2048Bits ? sizeof(dh2048_g) : sizeof(dh1024_g);
+		OSSL_PARAM params[]
+		{
+			OSSL_PARAM_size_t(OSSL_PKEY_PARAM_FFC_PBITS, &keyLength),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_P, pDH_p, sz_p),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_G, pDH_g, sz_g),
+			OSSL_PARAM_END
+		};
+
+		if (1 != EVP_PKEY_fromdata_init(pKeyCtx))
+		{
+			EVP_PKEY_CTX_free(pKeyCtx);
+			std::string err = "Context::initDH():EVP_PKEY_fromdata_init()\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
+
+		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEYPAIR, params))
+		{
+			EVP_PKEY_CTX_free(pKeyCtx);
+			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
+		EVP_PKEY_CTX_free(pKeyCtx);
+	}
+
+	if (!pKey)
+	{
+		throw SSLContextException(Poco::format("Context::initDH(%s):EVP_PKEY*", dhParamsFile));
+	}
+
+	SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey);
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
+
+	if (freeEVPPKey) EVP_PKEY_free(pKey);
+
+#else // OPENSSL_VERSION_NUMBER >= 0x30000000L
+
 	DH* dh = 0;
 	if (!dhParamsFile.empty())
 	{
@@ -731,7 +863,9 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
+
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
 		BIGNUM* p = nullptr;
 		BIGNUM* g = nullptr;
 		if (use2048Bits)
@@ -753,7 +887,9 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
-#else
+
+#else // OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
 		if (use2048Bits)
 		{
 			dh->p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
@@ -771,15 +907,23 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
-#endif
+
+#endif // OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 	DH_free(dh);
-#else
+
+#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+
+#else // OPENSSL_NO_DH
+
 	if (!dhParamsFile.empty())
-		throw SSLContextException("OpenSSL does not support DH");
-#endif
+		throw SSLContextException("Implementation does not support DH");
+
+#endif // OPENSSL_NO_DH
+
 }
 
 
@@ -803,7 +947,7 @@ void Context::initECDH(const std::string& curve)
  		throw SSLContextException("Cannot set ECDH groups", groups);
  	}
  	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
- #elif OPENSSL_VERSION_NUMBER >= 0x0090800fL
+ #else
 	int nid = 0;
 	if (!curve.empty())
 	{

@@ -61,7 +61,6 @@ void ParseHandler::startObject()
 		}
 		else if (parent.type() == typeid(Object::Ptr))
 		{
-			poco_assert_dbg(!_key.empty());
 			Object::Ptr obj = parent.extract<Object::Ptr>();
 			obj->set(_key, newObj);
 			_key.clear();
@@ -97,7 +96,6 @@ void ParseHandler::startArray()
 		}
 		else if (parent.type() == typeid(Object::Ptr))
 		{
-			poco_assert_dbg(!_key.empty());
 			Object::Ptr obj = parent.extract<Object::Ptr>();
 			obj->set(_key, newArr);
 			_key.clear();
@@ -138,10 +136,7 @@ void ParseHandler::setValue(const Var& value)
 			_key.clear();
 		}
 	}
-	else
-	{
-		throw JSONException("Attempt to set value on an empty stack");
-	}
+	else throw JSONException("Attempt to set value on an empty stack");
 }
 
 

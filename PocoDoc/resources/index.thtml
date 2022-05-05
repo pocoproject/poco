@@ -7,6 +7,7 @@
 <meta name="generator" content="PocoDoc"/>
 <link rel="stylesheet" href="css/styles.css" type="text/css"/>
 <script type="text/javascript" src="js/iframeResizer.min.js"></script>
+${PocoDoc.customHeadHTML}
 </head>
 <body>
 <div class="header">
@@ -15,7 +16,7 @@
 </div>
 <div class="body">
 <div id="navigation">
-<iframe src="navigation.html" onload="iFrameResize(this);" scrolling="no"></iframe>
+<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation allow-same-origin" src="navigation.html" onload="iFrameResize(this);" scrolling="no"></iframe>
 </div>
 <div id="content">
 <h2>User Guides And Tutorials</h2>
@@ -28,5 +29,6 @@ ${PocoDoc.nameSpaceIndex}
 Copyright &copy; ${PocoDoc.year}, <a href="${PocoDoc.companyURI}" target="_top">${PocoDoc.company}</a></p>
 </div>
 </div>
+${PocoDoc.customBodyHTML}
 </body>
 </html>

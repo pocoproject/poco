@@ -35,9 +35,10 @@ public:
 
 	static CppUnit::Test* suite();
 
-private:
-	std::string getTestFilesPath(const std::string& name,
+	static std::string getTestFilesPath(const std::string& name,
 		const std::string& ext = "p12");
+
+private:
 	void certsOnly(const Poco::Crypto::PKCS12Container& pkcs12);
 	void certsOnlyList(const Poco::Crypto::PKCS12Container::CAList& caList,
 		const Poco::Crypto::PKCS12Container::CANameList& caNamesList,

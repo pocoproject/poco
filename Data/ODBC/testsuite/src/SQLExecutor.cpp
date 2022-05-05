@@ -296,9 +296,10 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
-SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession): 
+SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_pEncSession(pEncSession)
 {
 }
 
@@ -1522,6 +1523,29 @@ void SQLExecutor::doubles()
 	std::string funct = "floats()";
 	double data = 1.5;
 	double ret = 0.0;
+
+	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+
+	try { session() << "SELECT str FROM Strings", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assertTrue (ret == data);
+}
+
+
+void SQLExecutor::uuids()
+{
+	std::string funct = "uuids()";
+	Poco::UUID data("49cf6461-9b62-4163-9659-5472ef73153d");
+	Poco::UUID ret;
 
 	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -3507,6 +3531,7 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 		rs.moveNext();
 		assertTrue ("TestSQLChannel" == rs["Source"]);
 		assertTrue ("b Warning message" == rs["Text"]);
+		root.setChannel(nullptr);
 	} 
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlLogger()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlLogger()"); }
@@ -4010,4 +4035,55 @@ void SQLExecutor::unicode(const std::string& dbConnString)
 	session() << "SELECT str FROM UnicodeTable", into(wtext), now;
 	Poco::UnicodeConverter::convert(wtext, text);
 	assertTrue (text == std::string((const char*)supp));
+}
+
+
+void SQLExecutor::encoding(const std::string& dbConnString)
+{
+	try
+	{
+		const unsigned char latinChars[] = { 'g', 252, 'n', 't', 'e', 'r', 0 };
+		const unsigned char utf8Chars[] = { 'g', 195, 188, 'n', 't', 'e', 'r', 0 };
+		std::string latinText((const char*)latinChars);
+		std::string utf8TextIn((const char*)utf8Chars);
+
+		session(true) << "INSERT INTO Latin1Table VALUES (?)", use(utf8TextIn), now;
+
+		std::string latinTextOut;
+		session() << "SELECT str FROM Latin1Table", into(latinTextOut), now;
+		assertTrue(latinText == latinTextOut);
+
+		std::string utf8TextOut;
+		session(true) << "SELECT str FROM Latin1Table", into(utf8TextOut), now;
+		assertTrue(utf8TextIn == utf8TextOut);
+
+		const unsigned char latinChars2[] = { 'G', 220, 'N', 'T', 'E', 'R', 0 };
+		const unsigned char utf8Chars2[] = { 'G', 195, 156, 'N', 'T', 'E', 'R', 0 };
+		std::string latinText2 = (const char*)latinChars2;
+		std::string utf8TextIn2 = (const char*)utf8Chars2;
+
+		session(true) << "INSERT INTO Latin1Table VALUES (?)", use(utf8TextIn2), now;
+
+		std::vector<std::string> textOutVec;
+		session() << "SELECT str FROM Latin1Table", into(textOutVec), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == latinText);
+		assertTrue(textOutVec[1] == latinText2);
+
+		textOutVec.clear();
+		session(true) << "SELECT str FROM Latin1Table", into(textOutVec), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == utf8TextIn);
+		assertTrue(textOutVec[1] == utf8TextIn2);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+		throw;
+	}
+	catch (std::exception& ex)
+	{
+		std::cout << ex.what() << std::endl;
+		throw;
+	}
 }

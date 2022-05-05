@@ -29,6 +29,9 @@ using namespace Poco;
 using namespace Poco::Dynamic;
 
 
+namespace {
+
+
 class Dummy
 {
 public:
@@ -53,6 +56,8 @@ public:
 private:
 	int _val;
 };
+
+}
 
 
 VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -2623,9 +2628,9 @@ void VarTest::testJSONDeserializeString()
 	a = Var::parse(tst);
 	assertTrue (a.toString() == "{ \"a\": \"1\", \"b\": \"2\" }");
 
-	tst = "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"\\/dev\\/null\" }";
+	tst = "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"\\/dev\\/null\", \"zero\": null }";
 	a = Var::parse(tst);
-	assertTrue(a.toString() == "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"/dev/null\" }");
+	assertTrue(a.toString() == "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"/dev/null\", \"zero\": null }");
 }
 
 
@@ -2859,6 +2864,32 @@ void VarTest::testDate()
 }
 
 
+void VarTest::testUUID()
+{
+	Poco::UUID uuid("f1881be4-c3b7-4a47-9619-5169db5108a7");
+
+	Var vuuid(uuid);
+	assertTrue (vuuid.isUUID());
+
+	assert (vuuid.convert<std::string>() == "f1881be4-c3b7-4a47-9619-5169db5108a7");
+
+	assert (vuuid.extract<Poco::UUID>() == uuid);
+
+	Var vstr(std::string("f1881be4-c3b7-4a47-9619-5169db5108a7"));
+	assert (vstr.convert<Poco::UUID>() == uuid);
+
+	Var vstr2(std::string("notAnUUID"));
+	try
+	{
+		Poco::UUID uuid2 = vstr2.convert<Poco::UUID>();
+		fail("not a valid UUID, must fail");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+}
+
+
 void VarTest::testGetIdxNoThrow(Var& a1, std::vector<Var>::size_type n)
 {
 	Var val1 = a1[n];
@@ -3042,6 +3073,20 @@ void VarTest::testIterator()
 }
 
 
+void VarTest::testSharedPtr()
+{
+	Poco::SharedPtr<int> p = new int(42);
+	{
+		Var v;
+		v = p;
+		Var v1;
+		v = v1;
+		v1 = v;
+	}
+	assertTrue(p.referenceCount() == 1);
+}
+
+
 void VarTest::setUp()
 {
 }
@@ -3090,6 +3135,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructInt);
+	CppUnit_addTest(pSuite, VarTest, testSharedPtr);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
 	CppUnit_addTest(pSuite, VarTest, testArrayToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);
@@ -3104,6 +3150,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
 	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
+	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
 

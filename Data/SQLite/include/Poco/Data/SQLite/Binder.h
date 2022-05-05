@@ -106,6 +106,9 @@ public:
 	void bind(std::size_t pos, const DateTime& val, Direction dir);
 		/// Binds a DateTime.
 
+	void bind(std::size_t pos, const UUID& val, Direction dir);
+		/// Binds a UUID.
+
 	void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null.
 

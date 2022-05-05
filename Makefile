@@ -78,7 +78,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis
+COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit
@@ -115,10 +115,10 @@ endif
 	find $(INSTALLDIR)/lib -name "libPoco*" -type f -exec rm -f  {} \;
 	find $(INSTALLDIR)/lib -name "libPoco*" -type l -exec rm -f {} \;
 
-libexecs =  Foundation-libexec Encodings-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec JWT-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec MongoDB-libexec Redis-libexec
-tests    =  Foundation-tests Encodings-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests JWT-tests Zip-tests CppParser-tests PDF-tests MongoDB-tests Redis-tests
+libexecs =  Foundation-libexec Encodings-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Data/PostgreSQL-libexec ActiveRecord-libexec ActiveRecord/Compiler-libexec Zip-libexec JWT-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec MongoDB-libexec Redis-libexec
+tests    =  Foundation-tests Encodings-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Data/PostgreSQL-tests ActiveRecord-tests JWT-tests Zip-tests CppParser-tests PDF-tests MongoDB-tests Redis-tests
 samples  =  Foundation-samples Encodings-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
-cleans   =  Foundation-clean Encodings-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean JWT-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean MongoDB-clean Redis-clean
+cleans   =  Foundation-clean Encodings-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean Data/PostgreSQL-clean ActiveRecord-clean ActiveRecord/Compiler-clean JWT-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean MongoDB-clean Redis-clean
 
 .PHONY: $(libexecs)
 .PHONY: $(tests)
@@ -144,7 +144,7 @@ Foundation-clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples clean
 
-Encodings-libexec:  Foundation-libexec
+Encodings-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Encodings
 
 Encodings-tests: Encodings-libexec cppunit
@@ -158,7 +158,7 @@ Encodings-clean:
 	$(MAKE) -C $(POCO_BASE)/Encodings/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Encodings/samples clean
 
-XML-libexec:  Foundation-libexec
+XML-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/XML
 
 XML-tests: XML-libexec cppunit
@@ -172,7 +172,7 @@ XML-clean:
 	$(MAKE) -C $(POCO_BASE)/XML/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/XML/samples clean
 
-JSON-libexec:  Foundation-libexec
+JSON-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/JSON
 
 JSON-tests: JSON-libexec cppunit
@@ -186,7 +186,7 @@ JSON-clean:
 	$(MAKE) -C $(POCO_BASE)/JSON/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/JSON/samples clean
 
-Util-libexec:  Foundation-libexec XML-libexec JSON-libexec
+Util-libexec: Foundation-libexec XML-libexec JSON-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
 
 Util-tests: Util-libexec cppunit
@@ -200,7 +200,7 @@ Util-clean:
 	$(MAKE) -C $(POCO_BASE)/Util/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Util/samples clean
 
-Net-libexec:  Foundation-libexec
+Net-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Net
 
 Net-tests: Net-libexec cppunit
@@ -214,7 +214,7 @@ Net-clean:
 	$(MAKE) -C $(POCO_BASE)/Net/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Net/samples clean
 
-Crypto-libexec:  Foundation-libexec
+Crypto-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Crypto
 
 Crypto-tests: Crypto-libexec cppunit
@@ -228,7 +228,7 @@ Crypto-clean:
 	$(MAKE) -C $(POCO_BASE)/Crypto/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Crypto/samples clean
 
-NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec Crypto-libexec
+NetSSL_OpenSSL-libexec: Foundation-libexec Net-libexec Util-libexec Crypto-libexec
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL
 
 NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
@@ -242,7 +242,7 @@ NetSSL_OpenSSL-clean:
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples clean
 
-Data-libexec:  Foundation-libexec
+Data-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
 Data-tests: Data-libexec cppunit
@@ -256,7 +256,7 @@ Data-clean:
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Data/samples clean
 
-Data/SQLite-libexec:  Foundation-libexec Data-libexec
+Data/SQLite-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite
 
 Data/SQLite-tests: Data/SQLite-libexec cppunit
@@ -266,7 +266,7 @@ Data/SQLite-clean:
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite clean
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite clean
 
-Data/ODBC-libexec:  Foundation-libexec Data-libexec
+Data/ODBC-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC
 
 Data/ODBC-tests: Data/ODBC-libexec cppunit
@@ -276,7 +276,7 @@ Data/ODBC-clean:
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC clean
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite clean
 
-Data/MySQL-libexec:  Foundation-libexec Data-libexec
+Data/MySQL-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL
 
 Data/MySQL-tests: Data/MySQL-libexec cppunit
@@ -286,7 +286,33 @@ Data/MySQL-clean:
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL clean
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite clean
 
-Zip-libexec:  Foundation-libexec Net-libexec Util-libexec XML-libexec
+Data/PostgreSQL-libexec: Foundation-libexec Data-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL
+
+Data/PostgreSQL-tests: Data/PostgreSQL-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite
+
+Data/PostgreSQL-clean:
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL clean
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite clean
+
+ActiveRecord-libexec: Foundation-libexec Data-libexec
+	$(MAKE) -C $(POCO_BASE)/ActiveRecord
+
+ActiveRecord-tests: ActiveRecord-libexec Data/SQLite-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/ActiveRecord/testsuite
+
+ActiveRecord-clean:
+	$(MAKE) -C $(POCO_BASE)/ActiveRecord clean
+	$(MAKE) -C $(POCO_BASE)/ActiveRecord/testsuite clean
+
+ActiveRecord/Compiler-libexec: Foundation-libexec Util-libexec
+	$(MAKE) -C $(POCO_BASE)/ActiveRecord/Compiler
+
+ActiveRecord/Compiler-clean:
+	$(MAKE) -C $(POCO_BASE)/ActiveRecord/Compiler clean
+
+Zip-libexec: Foundation-libexec Net-libexec Util-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Zip
 
 Zip-tests: Zip-libexec cppunit
@@ -300,7 +326,7 @@ Zip-clean:
 	$(MAKE) -C $(POCO_BASE)/Zip/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Zip/samples clean
 
-PageCompiler-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
+PageCompiler-libexec: Net-libexec Util-libexec XML-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PageCompiler
 
 PageCompiler-samples: PageCompiler-libexec
@@ -310,13 +336,13 @@ PageCompiler-clean:
 	$(MAKE) -C $(POCO_BASE)/PageCompiler clean
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples clean
 
-PageCompiler/File2Page-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
+PageCompiler/File2Page-libexec: Net-libexec Util-libexec XML-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page
 
 PageCompiler/File2Page-clean:
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page clean
 
-JWT-libexec:  Foundation-libexec JSON-libexec Crypto-libexec
+JWT-libexec: Foundation-libexec JSON-libexec Crypto-libexec
 	$(MAKE) -C $(POCO_BASE)/JWT
 
 JWT-tests: JWT-libexec cppunit
@@ -326,7 +352,7 @@ JWT-clean:
 	$(MAKE) -C $(POCO_BASE)/JWT clean
 	$(MAKE) -C $(POCO_BASE)/JWT/testsuite clean
 
-CppParser-libexec:  Foundation-libexec
+CppParser-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/CppParser
 
 CppParser-tests: CppParser-libexec cppunit
@@ -336,7 +362,7 @@ CppParser-clean:
 	$(MAKE) -C $(POCO_BASE)/CppParser clean
 	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite clean
 
-PDF-libexec:  Util-libexec XML-libexec JSON-libexec Foundation-libexec
+PDF-libexec: Util-libexec XML-libexec JSON-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PDF
 
 PDF-tests: PDF-libexec cppunit
@@ -350,7 +376,7 @@ PDF-clean:
 	$(MAKE) -C $(POCO_BASE)/PDF/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/PDF/samples clean
 
-MongoDB-libexec:  Foundation-libexec Net-libexec
+MongoDB-libexec: Foundation-libexec Net-libexec
 	$(MAKE) -C $(POCO_BASE)/MongoDB
 
 MongoDB-tests: MongoDB-libexec cppunit
@@ -364,7 +390,7 @@ MongoDB-clean:
 	$(MAKE) -C $(POCO_BASE)/MongoDB/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/MongoDB/samples clean
 
-Redis-libexec:  Foundation-libexec Net-libexec
+Redis-libexec: Foundation-libexec Net-libexec
 	$(MAKE) -C $(POCO_BASE)/Redis
 
 Redis-tests: Redis-libexec cppunit
