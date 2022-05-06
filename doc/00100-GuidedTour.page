@@ -32,6 +32,9 @@ standard library. The contributors attempt to find a good balance
 between using advanced C++ features and keeping the classes
 comprehensible and the code clean, consistent and easy to maintain.
 
+<%
+<?-PocoDoc.adContent?>
+%>
 
 !!! The Foundation Library
 

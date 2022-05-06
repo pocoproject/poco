@@ -328,6 +328,12 @@ public:
 			Poco::Timestamp start;
 #ifdef _WIN32
 			rc = WSAPoll(&_pollfds[0], static_cast<ULONG>(_pollfds.size()), static_cast<INT>(remainingTime.totalMilliseconds()));
+			// see https://github.com/pocoproject/poco/issues/3248
+			if ((remainingTime > 0) && (rc > 0) && !hasSignaledFDs())
+			{
+				rc = -1;
+				WSASetLastError(WSAEINTR);
+			}
 #else
 			rc = ::poll(&_pollfds[0], _pollfds.size(), remainingTime.totalMilliseconds());
 #endif
@@ -360,7 +366,11 @@ public:
 #endif
 							)
 							result[its->second] |= PollSet::POLL_READ;
-						if (it->revents & POLLOUT)
+						if ((it->revents & POLLOUT)
+#ifdef _WIN32
+							&& (_wantPOLLOUT.find(it->fd) != _wantPOLLOUT.end())
+#endif
+							)
 							result[its->second] |= PollSet::POLL_WRITE;
 						if (it->revents & POLLERR)
 							result[its->second] |= PollSet::POLL_ERROR;
@@ -379,6 +389,36 @@ public:
 	}
 
 private:
+
+#ifdef _WIN32
+
+	void setMode(poco_socket_t fd, short& target, int mode)
+	{
+		if (mode & PollSet::POLL_READ)
+			target |= POLLIN;
+
+		if (mode & PollSet::POLL_WRITE)
+			_wantPOLLOUT.insert(fd);
+		else
+			_wantPOLLOUT.erase(fd);
+		target |= POLLOUT;
+	}
+
+	bool hasSignaledFDs()
+	{
+		for (const auto& pollfd : _pollfds)
+		{
+			if ((pollfd.revents | POLLOUT) &&
+				(_wantPOLLOUT.find(pollfd.fd) != _wantPOLLOUT.end()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+#else
+
 	void setMode(poco_socket_t fd, short& target, int mode)
 	{
 		if (mode & PollSet::POLL_READ)
@@ -388,8 +428,13 @@ private:
 			target |= POLLOUT;
 	}
 
+#endif
+
 	mutable Poco::FastMutex         _mutex;
 	std::map<poco_socket_t, Socket> _socketMap;
+#ifdef _WIN32
+	std::set<poco_socket_t>         _wantPOLLOUT;
+#endif
 	std::map<poco_socket_t, int>    _addMap;
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;

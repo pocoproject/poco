@@ -93,7 +93,6 @@ public:
 		ENC_BINHEX       = 0x02, /// BinHex-encoded output
 		ENC_BASE64_NO_LF = 0x81, /// Base64-encoded output, no linefeeds
 		ENC_BINHEX_NO_LF = 0x82  /// BinHex-encoded output, no linefeeds
-
 	};
 
 	virtual ~Cipher();

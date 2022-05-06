@@ -113,6 +113,8 @@ public:
 	virtual void testFloat();
 	virtual void testDouble();
 
+	virtual void testUUID();
+
 	virtual void testTuple();
 	virtual void testTupleVector();
 
@@ -149,6 +151,7 @@ public:
 	virtual void testNullable();
 
 	virtual void testUnicode();
+	virtual void testEncoding();
 
 	virtual void testReconnect();
 
@@ -166,6 +169,7 @@ protected:
 	virtual void recreateStringsTable();
 	virtual void recreateIntsTable();
 	virtual void recreateFloatsTable();
+	virtual void recreateUUIDsTable();
 	virtual void recreateTuplesTable();
 	virtual void recreateVectorsTable();
 	virtual void recreateAnysTable();
@@ -174,13 +178,15 @@ protected:
 	virtual void recreateMiscTable();
 	virtual void recreateLogTable();
 	virtual void recreateUnicodeTable();
+	virtual void recreateEncodingTables();
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,
 		std::string& uid,
 		std::string& pwd,
 		std::string& dbConnString,
-		const std::string& db = "");
+		const std::string& db = "",
+		const std::string& dbEncoding = "");
 
 	static bool canConnect(const std::string& driver,
 		std::string& dsn,
@@ -317,6 +323,12 @@ inline void ODBCTest::recreateFloatsTable()
 }
 
 
+inline void ODBCTest::recreateUUIDsTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateUUIDsTable()");
+}
+
+
 inline void ODBCTest::recreateTuplesTable()
 { 
 	throw Poco::NotImplementedException("ODBCTest::recreateTuplesTable()");
@@ -362,6 +374,12 @@ inline void ODBCTest::recreateLogTable()
 inline void ODBCTest::recreateUnicodeTable()
 {
 	throw Poco::NotImplementedException("ODBCTest::recreateUnicodeTable()");
+}
+
+
+inline void ODBCTest::recreateEncodingTables()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateUnicodeTables()");
 }
 
 

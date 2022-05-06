@@ -38,7 +38,7 @@ namespace
 	{
 		std::string connectionString;
 
-		for (std::map<std::string, std::string>::const_iterator citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
+		for (auto citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
 		{
 			connectionString.append(citr->first);
 			connectionString.append("=");
@@ -93,7 +93,7 @@ void SessionImpl::open(const std::string& aConnectionString)
 			throw ConnectionException("Session already connected");
 		}
 
-		if (! aConnectionString.empty())
+		if (!aConnectionString.empty())
 		{
 			setConnectionString(aConnectionString);
 		}

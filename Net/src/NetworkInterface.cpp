@@ -38,6 +38,11 @@
 #include <iomanip>
 
 
+#if defined(_MSC_VER)
+#pragma warning(disable:4996) // deprecation warnings
+#endif
+
+
 using Poco::NumberFormatter;
 using Poco::FastMutex;
 using Poco::format;

@@ -110,6 +110,9 @@ public:
 	virtual bool extract(std::size_t pos, Time& val);
 		/// Extracts a Time. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, UUID& val);
+		/// Extracts a UUID. Returns false if null was received.
+
 	virtual bool extract(std::size_t pos, Any& val);
 		/// Extracts an Any. Returns false if null was received.
 
@@ -319,6 +322,8 @@ public:
 
 private:
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);
+
+	bool extractLongLOB(std::size_t pos);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);

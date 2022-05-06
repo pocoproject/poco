@@ -25,13 +25,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdarg.h>
-#include <limits.h>
+#include <climits>
+#include <cstdarg>
 
-#include "strtod.h"
 #include "bignum.h"
 #include "cached-powers.h"
 #include "ieee.h"
+#include "strtod.h"
 
 namespace double_conversion {
 
@@ -205,7 +205,7 @@ static bool DoubleStrtod(Vector<const char> trimmed,
   // Note that the ARM simulator is compiled for 32bits. It therefore exhibits
   // the same problem.
   return false;
-#endif
+#else
   if (trimmed.length() <= kMaxExactDoubleIntegerDecimalDigits) {
     int read_digits;
     // The trimmed input fits into a double.
@@ -243,6 +243,7 @@ static bool DoubleStrtod(Vector<const char> trimmed,
     }
   }
   return false;
+#endif
 }
 
 
@@ -264,7 +265,6 @@ static DiyFp AdjustmentPowerOfTen(int exponent) {
     case 7: return DiyFp(UINT64_2PART_C(0x98968000, 00000000), -40);
     default:
       UNREACHABLE();
-      return DiyFp(0, 0);
   }
 }
 
@@ -287,7 +287,7 @@ static bool DiyFpStrtod(Vector<const char> buffer,
   const int kDenominator = 1 << kDenominatorLog;
   // Move the remaining decimals into the exponent.
   exponent += remaining_decimals;
-  int error = (remaining_decimals == 0 ? 0 : kDenominator / 2);
+  uint64_t error = (remaining_decimals == 0 ? 0 : kDenominator / 2);
 
   int old_e = input.e();
   input.Normalize();
@@ -472,6 +472,30 @@ double Strtod(Vector<const char> buffer, int exponent) {
   }
 }
 
+static float SanitizedDoubletof(double d) {
+  ASSERT(d >= 0.0);
+  // ASAN has a sanitize check that disallows casting doubles to floats if
+  // they are too big.
+  // https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#available-checks
+  // The behavior should be covered by IEEE 754, but some projects use this
+  // flag, so work around it.
+  float max_finite = 3.4028234663852885981170418348451692544e+38;
+  // The half-way point between the max-finite and infinity value.
+  // Since infinity has an even significand everything equal or greater than
+  // this value should become infinity.
+  double half_max_finite_infinity =
+      3.40282356779733661637539395458142568448e+38;
+  if (d >= max_finite) {
+    if (d >= half_max_finite_infinity) {
+      return Single::Infinity();
+    } else {
+      return max_finite;
+    }
+  } else {
+    return static_cast<float>(d);
+  }
+}
+
 float Strtof(Vector<const char> buffer, int exponent) {
   char copy_buffer[kMaxSignificantDecimalDigits];
   Vector<const char> trimmed;
@@ -483,7 +507,7 @@ float Strtof(Vector<const char> buffer, int exponent) {
   double double_guess;
   bool is_correct = ComputeGuess(trimmed, exponent, &double_guess);
 
-  float float_guess = static_cast<float>(double_guess);
+  float float_guess = SanitizedDoubletof(double_guess);
   if (float_guess == double_guess) {
     // This shortcut triggers for integer values.
     return float_guess;
@@ -506,15 +530,15 @@ float Strtof(Vector<const char> buffer, int exponent) {
   double double_next = Double(double_guess).NextDouble();
   double double_previous = Double(double_guess).PreviousDouble();
 
-  float f1 = static_cast<float>(double_previous);
+  float f1 = SanitizedDoubletof(double_previous);
   float f2 = float_guess;
-  float f3 = static_cast<float>(double_next);
+  float f3 = SanitizedDoubletof(double_next);
   float f4;
   if (is_correct) {
     f4 = f3;
   } else {
     double double_next2 = Double(double_next).NextDouble();
-    f4 = static_cast<float>(double_next2);
+    f4 = SanitizedDoubletof(double_next2);
   }
   (void) f2;  // Mark variable as used.
   ASSERT(f1 <= f2 && f2 <= f3 && f3 <= f4);
@@ -529,7 +553,7 @@ float Strtof(Vector<const char> buffer, int exponent) {
          (f1 == f2 && f2 != f3 && f3 == f4) ||
          (f1 == f2 && f2 == f3 && f3 != f4));
 
-  // guess and next are the two possible canditates (in the same way that
+  // guess and next are the two possible candidates (in the same way that
   // double_guess was the lower candidate for a double-precision guess).
   float guess = f1;
   float next = f4;

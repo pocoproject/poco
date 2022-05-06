@@ -89,8 +89,7 @@ public:
 
 	void connect(const char* aConnectionString);
 
-	void connect(const char* aHost, const char* aUser, const char* aPassword,
-		const char* aDatabase, unsigned short aPort, unsigned int aConnectionTimeout);
+	void connect(const char* aHost, const char* aUser, const char* aPassword, const char* aDatabase, unsigned short aPort, unsigned int aConnectionTimeout);
 
 	bool isConnected() const;
 		/// is a connection established?

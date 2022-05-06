@@ -48,7 +48,7 @@ public:
 		/// The socket will be created for the
 		/// given address family.
 
-	DatagramSocket(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+	DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort = false, bool ipV6Only = false);
 		/// Creates a datagram socket and binds it
 		/// to the given address.
 		///

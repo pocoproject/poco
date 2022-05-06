@@ -157,7 +157,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
+    <_ProjectFileVersion>16.0.32002.118</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoDatad</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoDatamdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoDatamtd</TargetName>
@@ -595,6 +595,7 @@
     <ClInclude Include="include\Poco\Data\StatementImpl.h"/>
     <ClInclude Include="include\Poco\Data\Time.h"/>
     <ClInclude Include="include\Poco\Data\Transaction.h"/>
+    <ClInclude Include="include\Poco\Data\Transcoder.h"/>
     <ClInclude Include="include\Poco\Data\TypeHandler.h"/>
   </ItemGroup>
   <ItemGroup>
@@ -701,6 +702,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\Transaction.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\Transcoder.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
   </ItemGroup>

@@ -13,6 +13,7 @@
 
 
 #include "Poco/Data/AbstractExtractor.h"
+#include "Poco/Data/Transcoder.h"
 #include "Poco/Exception.h"
 
 
@@ -20,13 +21,29 @@ namespace Poco {
 namespace Data {
 
 
-AbstractExtractor::AbstractExtractor()
+AbstractExtractor::AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding,
+	Poco::TextEncoding::Ptr pToEncoding):
+	_pTranscoder(Transcoder::create(pDBEncoding, pToEncoding))
 {
 }
 
 
 AbstractExtractor::~AbstractExtractor()
 {
+}
+
+
+void AbstractExtractor::transcode(const std::string& from, std::string& to)
+{
+	if (_pTranscoder)
+		_pTranscoder->transcode(from, to);
+}
+
+
+void AbstractExtractor::reverseTranscode(const std::string& from, std::string& to)
+{
+	if (_pTranscoder)
+		_pTranscoder->reverseTranscode(from, to);
 }
 
 
@@ -393,6 +410,24 @@ bool AbstractExtractor::extract(std::size_t pos, std::deque<Time>& val)
 
 
 bool AbstractExtractor::extract(std::size_t pos, std::list<Time>& val)
+{
+	throw NotImplementedException("std::list extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<UUID>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::deque<UUID>& val)
+{
+	throw NotImplementedException("std::deque extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::list<UUID>& val)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }

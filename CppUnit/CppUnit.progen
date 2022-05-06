@@ -1,6 +1,6 @@
 vc.project.guid = 138BB448-808A-4FE5-A66D-78D1F8770F59
 vc.project.name = CppUnit
-vc.project.target = Poco${vc.project.name}
+vc.project.target = ${vc.project.name}
 vc.project.type = library
 vc.project.pocobase = ..
 vc.project.outdir = ${vc.project.pocobase}

@@ -259,6 +259,14 @@ SocketProactor::~SocketProactor()
 {
 	_ioCompletion.stop();
 	wait();
+	for (auto& pS : _writeHandlers)
+	{
+		for (auto& pH : pS.second)
+		{
+			if (pH->_pBuf && pH->_owner)
+				delete pH->_pBuf;
+		}
+	}
 }
 
 
@@ -452,10 +460,12 @@ int SocketProactor::send(Socket& sock)
 		else if (sock.isStream())
 			send(*sock.impl(), it);
 		else
+		{
+			deleteHandler(handlers, it);
 			throw Poco::InvalidArgumentException("Unknown socket type.");
+		}
+		deleteHandler(handlers, it);
 
-		++it;
-		handlers.pop_front();
 		// end iterator is invalidated when the last member
 		// is removed, so make sure we don't check for it
 		if (handlers.empty()) break;
@@ -482,11 +492,6 @@ void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 			err = Socket::lastError();
 		}
 		enqueueIONotification(std::move((*it)->_onCompletion), n, err);
-		if ((*it)->_owner)
-		{
-			delete pBuf; (*it)->_pBuf = nullptr;
-			delete pAddr; (*it)->_pAddr = nullptr;
-		}
 	}
 	else
 	{
@@ -515,10 +520,6 @@ void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 			err = Socket::lastError();
 		}
 		enqueueIONotification(std::move((*it)->_onCompletion), n, err);
-		if ((*it)->_owner)
-		{
-			delete pBuf; (*it)->_pBuf = nullptr;
-		}
 	}
 	else
 	{
@@ -768,6 +769,26 @@ void SocketProactor::onShutdown()
 	_pollSet.wakeUp();
 	_ioCompletion.stop();
 	_ioCompletion.wait();
+}
+
+
+void SocketProactor::deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it)
+{
+	if ((*it)->_owner)
+	{
+		if ((*it)->_pBuf)
+		{
+			delete (*it)->_pBuf;
+			(*it)->_pBuf = nullptr;
+		}
+		if ((*it)->_pAddr)
+		{
+			delete (*it)->_pAddr;
+			(*it)->_pAddr = nullptr;
+		}
+	}
+	++it;
+	handlers.pop_front();
 }
 
 

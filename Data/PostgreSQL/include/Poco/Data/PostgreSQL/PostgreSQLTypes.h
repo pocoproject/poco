@@ -271,6 +271,7 @@ inline const void* InputParameter::pInternalRepresentation() const
 	case Poco::Data::MetaColumn::FDT_DATE:
 	case Poco::Data::MetaColumn::FDT_TIME:
 	case Poco::Data::MetaColumn::FDT_TIMESTAMP:
+	case Poco::Data::MetaColumn::FDT_UUID:
 		return _stringVersionRepresentation.c_str();
 
 	case Poco::Data::MetaColumn::FDT_BLOB:
@@ -278,7 +279,8 @@ inline const void* InputParameter::pInternalRepresentation() const
 		return _pNonStringVersionRepresentation;
 
 	case Poco::Data::MetaColumn::FDT_UNKNOWN:
-	default: return 0;
+	default:
+		return 0;
     }
 }
 

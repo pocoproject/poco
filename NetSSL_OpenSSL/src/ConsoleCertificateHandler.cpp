@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/ConsoleCertificateHandler.h"
+#include "Poco/Net/VerificationErrorArgs.h"
 #include <iostream>
 
 

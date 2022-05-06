@@ -55,7 +55,7 @@ class Data_API SQLChannel: public Poco::Channel
 	/// To provide as non-intrusive operation as possbile, the log entries are cached and
 	/// inserted into the target database asynchronously by default. The blocking, however, will occur
 	/// before the next entry insertion with default timeout of 1 second. The default settings can be
-	/// overriden (see async, timeout and throw properties for details).
+	/// overridden (see async, timeout and throw properties for details).
 	/// If throw property is false, insertion timeouts are ignored, otherwise a TimeoutException is thrown.
 	/// To force insertion of every entry, set timeout to 0. This setting, however, introduces
 	/// a risk of long blocking periods in case of remote server communication delays.

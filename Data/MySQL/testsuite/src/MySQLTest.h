@@ -24,7 +24,7 @@
 class MySQLTest: public CppUnit::TestCase
 	/// MySQL test class
 	/// Tested:
-	/// 
+	///
 	/// Driver          |            DB             | OS
 	/// ----------------+---------------------------+------------------------------------------
 	/// 03.51.12.00     | MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1
@@ -79,10 +79,13 @@ public:
 	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
+	void testLongBLOB();
 
 	void testUnsignedInts();
 	void testFloat();
 	void testDouble();
+
+	void testUUID();
 
 	void testTuple();
 	void testTupleVector();
@@ -115,10 +118,12 @@ private:
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
+	void recreatePersonLongBLOBTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();
 	void recreateFloatsTable();
+	void recreateUUIDsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateNullableIntTable();

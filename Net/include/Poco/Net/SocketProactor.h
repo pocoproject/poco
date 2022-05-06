@@ -376,6 +376,8 @@ private:
 		/// them from the handlers list after the operation
 		/// successfully completes.
 
+	void deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it);
+
 	template <typename T>
 	int errorImpl(Socket& sock, T& handlerMap, Poco::Mutex& mutex)
 	{
@@ -391,8 +393,7 @@ private:
 		while (it != end)
 		{
 			enqueueIONotification(std::move((*it)->_onCompletion), 0, err);
-			++it;
-			handlers.pop_front();
+			deleteHandler(handlers, it);
 			// end iterator is invalidated when the last member
 			// is removed, so make sure we don't check for it
 			if (handlers.empty()) break;

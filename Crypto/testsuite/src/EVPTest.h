@@ -34,6 +34,16 @@ public:
 	void testECEVPSaveLoadFile();
 	void testECEVPSaveLoadFileNoPass();
 
+	void testRSAEVPKeyFromX509();
+	void testRSAEVPKeyFromPKCS12();
+
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+	void testRSAEVPKeyByLength();
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	void testECEVPKeyByLength();
+#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+
 	void setUp();
 	void tearDown();
 

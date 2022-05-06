@@ -21,7 +21,10 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Constants.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/UUID.h"
 #include "Poco/UTFString.h"
+#include "Poco/TextEncoding.h"
+#include <memory>
 #include <vector>
 #include <deque>
 #include <list>
@@ -30,7 +33,6 @@
 
 
 namespace Poco {
-
 
 class DateTime;
 class Any;
@@ -44,6 +46,7 @@ namespace Data {
 
 class Date;
 class Time;
+class Transcoder;
 
 
 class Data_API AbstractExtractor
@@ -53,7 +56,8 @@ class Data_API AbstractExtractor
 public:
 	using Ptr = SharedPtr<AbstractExtractor>;
 
-	AbstractExtractor();
+	AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr,
+		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Creates the AbstractExtractor.
 
 	virtual ~AbstractExtractor();
@@ -304,6 +308,18 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Time>& val);
 		/// Extracts a Time list.
 
+	virtual bool extract(std::size_t pos, UUID& val) = 0;
+		/// Extracts a UUID. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<UUID>& val);
+		/// Extracts a UUID vector.
+
+	virtual bool extract(std::size_t pos, std::deque<UUID>& val);
+		/// Extracts a UUID deque.
+
+	virtual bool extract(std::size_t pos, std::list<UUID>& val);
+		/// Extracts a UUID list.
+
 	virtual bool extract(std::size_t pos, Any& val) = 0;
 		/// Extracts an Any. Returns false if null was received.
 
@@ -333,15 +349,30 @@ public:
 
 	virtual void reset();
 		/// Resets any information internally cached by the extractor.
+
+protected:
+	bool transcodeRequired() const;
+	void transcode(const std::string& from, std::string& to);
+	void reverseTranscode(const std::string& from, std::string& to);
+
+private:
+	std::unique_ptr<Transcoder> _pTranscoder;
 };
 
 
 ///
 /// inlines
 ///
+
 inline void AbstractExtractor::reset()
 {
 	//default no-op
+}
+
+
+inline bool AbstractExtractor::transcodeRequired() const
+{
+	return _pTranscoder.operator bool();
 }
 
 

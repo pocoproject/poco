@@ -47,7 +47,8 @@ bool isJSONString(const Var& any)
 		any.type() == typeid(char*) ||
 		any.type() == typeid(Poco::DateTime) ||
 		any.type() == typeid(Poco::LocalDateTime) ||
-		any.type() == typeid(Poco::Timestamp);
+		any.type() == typeid(Poco::Timestamp) ||
+		any.type() == typeid(Poco::UUID);
 }
 
 

@@ -1,9 +1,9 @@
 /* zconf.h -- configuration of the zlib compression library
- * Copyright (C) 1995-2013 Jean-loup Gailly.
+ * Copyright (C) 1995-2016 Jean-loup Gailly, Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/1.4/Foundation/include/Poco/zconf.h#5 $ */
+/* @(#) $Id$ */
 
 #ifndef ZCONF_H
 #define ZCONF_H
@@ -439,12 +439,10 @@ typedef uLong FAR uLongf;
 #  define Z_HAVE_STDARG_H
 #endif
 
-#ifndef _WIN32_WCE
 #ifdef STDC
 #  ifndef Z_SOLO
 #    include <sys/types.h>      /* for off_t */
 #  endif
-#endif
 #endif
 
 #if defined(STDC) || defined(Z_HAVE_STDARG_H)
