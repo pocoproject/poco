@@ -376,6 +376,7 @@ private:
 		/// them from the handlers list after the operation
 		/// successfully completes.
 
+	bool hasHandlers(SubscriberMap& handlers, int sockfd);
 	void deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it);
 
 	template <typename T>

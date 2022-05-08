@@ -277,6 +277,15 @@ void SocketProactor::wait()
 }
 
 
+bool SocketProactor::hasHandlers(SubscriberMap& handlers, int sockfd)
+{
+	Poco::Mutex::ScopedLock l(_writeMutex);
+	if (handlers.end() == handlers.find(sockfd))
+		return false;
+	return true;
+}
+
+
 int SocketProactor::poll(int* pHandled)
 {
 	int handled = 0;
@@ -291,12 +300,14 @@ int SocketProactor::poll(int* pHandled)
 			if (it->second & PollSet::POLL_READ)
 			{
 				Socket sock = it->first;
-				handled += receive(sock);
+				if (hasHandlers(_readHandlers, sock.impl()->sockfd()))
+					handled += receive(sock);
 			}
 			if (it->second & PollSet::POLL_WRITE)
 			{
 				Socket sock = it->first;
-				handled += send(sock);
+				if (hasHandlers(_writeHandlers, sock.impl()->sockfd()))
+					handled += send(sock);
 			}
 			if (it->second & PollSet::POLL_ERROR)
 			{
@@ -384,6 +395,7 @@ void SocketProactor::addReceive(Socket sock, Buffer& buf, Callback&& onCompletio
 
 	Poco::Mutex::ScopedLock l(_readMutex);
 	_readHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
+	if (!has(sock)) addSocket(sock, PollSet::POLL_READ);
 }
 
 
@@ -433,6 +445,7 @@ void SocketProactor::addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr
 
 	Poco::Mutex::ScopedLock l(_writeMutex);
 	_writeHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
+	if (!has(sock)) addSocket(sock, PollSet::POLL_WRITE);
 }
 
 

@@ -104,9 +104,8 @@ void SocketProactorTest::testTCPSocketProactor()
 	};
 
 	StreamSocket errSock(SocketAddress::IPv4);
-	proactor.addSocket(errSock, SocketProactor::POLL_ERROR);
-	proactor.addSend(errSock, SocketProactor::Buffer(hello.begin(), hello.end()), onError);
 	errSock.connectNB(SocketAddress("127.0.0.1", 0xFFEE));
+	proactor.addSend(errSock, SocketProactor::Buffer(hello.begin(), hello.end()), onError);
 	Thread::sleep(100);
 	while (!error) proactor.poll();
 	assertTrue (error);

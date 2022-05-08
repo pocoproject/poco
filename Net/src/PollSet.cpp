@@ -372,7 +372,7 @@ public:
 #endif
 							)
 							result[its->second] |= PollSet::POLL_WRITE;
-						if (it->revents & POLLERR)
+						if (it->revents & POLLERR || (it->revents & POLLHUP))
 							result[its->second] |= PollSet::POLL_ERROR;
 					}
 					it->revents = 0;
