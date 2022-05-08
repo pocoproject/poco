@@ -56,7 +56,7 @@ void ICMPSocketTest::testSendToReceiveFrom()
 {
 	ICMPSocket ss(IPAddress::IPv4);
 
-	SocketAddress sa("www.appinf.com", 0);
+	SocketAddress sa("github.com", 0);
 	SocketAddress sr(sa);
 
 	try
