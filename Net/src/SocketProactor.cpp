@@ -300,13 +300,13 @@ int SocketProactor::poll(int* pHandled)
 			if (it->second & PollSet::POLL_READ)
 			{
 				Socket sock = it->first;
-				if (hasHandlers(_readHandlers, sock.impl()->sockfd()))
+				if (hasHandlers(_readHandlers, static_cast<int>(sock.impl()->sockfd())))
 					handled += receive(sock);
 			}
 			if (it->second & PollSet::POLL_WRITE)
 			{
 				Socket sock = it->first;
-				if (hasHandlers(_writeHandlers, sock.impl()->sockfd()))
+				if (hasHandlers(_writeHandlers, static_cast<int>(sock.impl()->sockfd())))
 					handled += send(sock);
 			}
 			if (it->second & PollSet::POLL_ERROR)

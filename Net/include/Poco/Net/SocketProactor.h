@@ -462,7 +462,7 @@ private:
 
 inline void SocketProactor::addSocket(Socket sock, int mode)
 {
-	_pollSet.add(sock, mode);
+	_pollSet.add(sock, mode | PollSet::POLL_ERROR);
 }
 
 

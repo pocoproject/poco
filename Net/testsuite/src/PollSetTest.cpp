@@ -195,8 +195,8 @@ void PollSetTest::testPollNoServer()
 	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
 	PollSet ps;
 	assertTrue(ps.empty());
-	ps.add(ss1, PollSet::POLL_READ);
-	ps.add(ss2, PollSet::POLL_READ);
+	ps.add(ss1, PollSet::POLL_READ | PollSet::POLL_ERROR);
+	ps.add(ss2, PollSet::POLL_READ | PollSet::POLL_ERROR);
 	assertTrue(!ps.empty());
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
