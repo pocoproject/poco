@@ -610,6 +610,13 @@ int SocketImpl::available()
 {
 	int result = 0;
 	ioctl(FIONREAD, result);
+#if (POCO_OS != POCO_OS_LINUX)
+	if (type() == SOCKET_TYPE_DATAGRAM)
+	{
+		char buf[result];
+		result = recvfrom(sockfd(), buf, result, MSG_PEEK, NULL, NULL);
+	}
+#endif
 	return result;
 }
 

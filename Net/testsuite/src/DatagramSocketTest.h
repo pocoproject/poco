@@ -28,6 +28,7 @@ public:
 	void testEcho();
 	void testMoveDatagramSocket();
 	void testEchoBuffer();
+	void testReceiveFromAvailable();
 	void testSendToReceiveFrom();
 	void testUnbound();
 	void testReuseAddressPortWildcard();

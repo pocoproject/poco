@@ -18,6 +18,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Thread.h"
 #include <cstring>
 
 
@@ -34,6 +35,7 @@ using Poco::Stopwatch;
 using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::IOException;
+using Poco::Thread;
 
 
 DatagramSocketTest::DatagramSocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -116,6 +118,25 @@ void DatagramSocketTest::testEchoBuffer()
 	assertTrue (n == 5);
 	assertTrue (buffer.size() == 5);
 	assertTrue (std::string(buffer.begin(), n) == "hello");
+	ss.close();
+}
+
+
+void DatagramSocketTest::testReceiveFromAvailable()
+{
+	UDPEchoServer echoServer(SocketAddress("127.0.0.1", 0));
+	DatagramSocket ss(SocketAddress::IPv4);
+	int n = ss.sendTo("hello", 5, SocketAddress("127.0.0.1", echoServer.port()));
+	assertTrue (n == 5);
+	Thread::sleep(100);
+	char buffer[256];
+	SocketAddress sa;
+	assertTrue (ss.available() == 5);
+	n = ss.receiveFrom(buffer, sizeof(buffer), sa);
+	assertTrue (sa.host() == echoServer.address().host());
+	assertTrue (sa.port() == echoServer.port());
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
 }
 
@@ -800,6 +821,7 @@ CppUnit::Test* DatagramSocketTest::suite()
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testMoveDatagramSocket);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEchoBuffer);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testReceiveFromAvailable);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testUnbound);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testReuseAddressPortWildcard);
