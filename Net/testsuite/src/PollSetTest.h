@@ -25,6 +25,7 @@ public:
 	~PollSetTest();
 
 	void testTimeout();
+	void testPollNB();
 	void testPoll();
 	void testPollNoServer();
 	void testPollClosedServer();

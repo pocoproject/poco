@@ -132,4 +132,24 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif
 
 
+#if defined(POCO_OS_FAMILY_BSD)
+	#ifndef POCO_HAVE_FD_POLL
+		#define POCO_HAVE_FD_POLL 1
+	#endif
+#endif
+
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#ifndef POCO_HAVE_FD_POLL
+		// WSAPoll wants POLLOUT flag in order to return POLERR when there is no
+		// server on the other side. Windows default is multi-fd_set select, WSAPoll
+		// is disabled and not considered a production-grade code.
+		// see https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll
+		// This is the version where the WSAPoll was (allegedly) fixed.
+		#if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN10_VB)
+			//#define POCO_HAVE_FD_POLL 1
+		#endif
+	#endif
+#endif
+
 #endif // Net_Net_INCLUDED

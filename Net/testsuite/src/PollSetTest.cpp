@@ -85,19 +85,55 @@ void PollSetTest::testTimeout()
 	Stopwatch sw; sw.start();
 	PollSet::SocketModeMap sm = ps.poll(timeout);
 	sw.stop();
-	assertTrue(ps.poll(timeout).empty());
-	assertTrue(sw.elapsed() >= 999000);
+	assertTrue(sm.empty());
+	assertTrue(sw.elapsed() >= 900000);
 
 	ss.sendBytes("hello", 5);
 	sw.restart();
 	sm = ps.poll(timeout);
 	sw.stop();
 	assertTrue(ps.poll(timeout).size() == 1);
-	assertTrue(sw.elapsed() < 900000);
 
 	// just here to prevent server exception on connection reset
 	char buffer[5];
 	ss.receiveBytes(buffer, sizeof(buffer));
+}
+
+
+void PollSetTest::testPollNB()
+{
+	EchoServer echoServer1;
+	StreamSocket ss1;
+
+	ss1.connectNB(SocketAddress("127.0.0.1", echoServer1.port()));
+
+	PollSet ps;
+	assertTrue(ps.empty());
+	ps.add(ss1, PollSet::POLL_READ);
+	ps.add(ss1, PollSet::POLL_WRITE);
+	assertTrue(!ps.empty());
+	assertTrue(ps.has(ss1));
+
+	while (!ss1.poll(Timespan(0, 10000), Socket::SELECT_WRITE))
+		Poco::Thread::sleep(10);
+
+	Timespan timeout(1000000);
+	PollSet::SocketModeMap sm;
+	while (sm.empty()) sm = ps.poll(timeout);
+	assertTrue(sm.find(ss1) != sm.end());
+	assertTrue(sm.find(ss1)->second | PollSet::POLL_WRITE);
+
+	ss1.setBlocking(true);
+	ss1.sendBytes("hello", 5);
+	char buffer[256];
+
+	sm = ps.poll(timeout);
+	assertTrue(sm.find(ss1) != sm.end());
+	assertTrue(sm.find(ss1)->second | PollSet::POLL_READ);
+
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue(n == 5);
+	assertTrue(std::string(buffer, n) == "hello");
 }
 
 
@@ -136,31 +172,32 @@ void PollSetTest::testPoll()
 	PollSet::SocketModeMap sm = ps.poll(timeout);
 	assertTrue (sm.find(ss1) != sm.end());
 	assertTrue (sm.find(ss2) == sm.end());
-	assertTrue (sm.find(ss1)->second == PollSet::POLL_WRITE);
+	assertTrue (sm.find(ss1)->second | PollSet::POLL_WRITE);
 	assertTrue (sw.elapsed() < 1100000);
 
 	ps.update(ss1, PollSet::POLL_READ);
 
+	ss1.setBlocking(true);
 	ss1.sendBytes("hello", 5);
 	char buffer[256];
 	sw.restart();
 	sm = ps.poll(timeout);
 	assertTrue (sm.find(ss1) != sm.end());
 	assertTrue (sm.find(ss2) == sm.end());
-	assertTrue (sm.find(ss1)->second == PollSet::POLL_READ);
+	assertTrue (sm.find(ss1)->second | PollSet::POLL_READ);
 	assertTrue (sw.elapsed() < 1100000);
 
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 
-
+	ss2.setBlocking(true);
 	ss2.sendBytes("HELLO", 5);
 	sw.restart();
 	sm = ps.poll(timeout);
 	assertTrue (sm.find(ss1) == sm.end());
 	assertTrue (sm.find(ss2) != sm.end());
-	assertTrue (sm.find(ss2)->second == PollSet::POLL_READ);
+	assertTrue (sm.find(ss2)->second | PollSet::POLL_READ);
 	assertTrue (sw.elapsed() < 1100000);
 
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
@@ -190,13 +227,12 @@ void PollSetTest::testPollNoServer()
 {
 	StreamSocket ss1;
 	StreamSocket ss2;
-
 	ss1.connectNB(SocketAddress("127.0.0.1", 0xFEFE));
 	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
 	PollSet ps;
 	assertTrue(ps.empty());
-	ps.add(ss1, PollSet::POLL_READ | PollSet::POLL_ERROR);
-	ps.add(ss2, PollSet::POLL_READ | PollSet::POLL_ERROR);
+	ps.add(ss1, PollSet::POLL_READ | PollSet::POLL_WRITE | PollSet::POLL_ERROR);
+	ps.add(ss2, PollSet::POLL_READ | PollSet::POLL_WRITE | PollSet::POLL_ERROR);
 	assertTrue(!ps.empty());
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
@@ -266,7 +302,7 @@ void PollSetTest::testPollSetWakeUp()
 	assertFalse (poller.isRunning());
 	assertTrue(sw.elapsedSeconds() < 1);
 #else // TODO: other implementations
-	std::cout << "not implemented" << std::endl;
+	std::cout << "not implemented";
 #endif // POCO_HAVE_FD_EPOLL
 }
 
@@ -286,6 +322,7 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PollSetTest");
 
 	CppUnit_addTest(pSuite, PollSetTest, testTimeout);
+	CppUnit_addTest(pSuite, PollSetTest, testPollNB);
 	CppUnit_addTest(pSuite, PollSetTest, testPoll);
 	CppUnit_addTest(pSuite, PollSetTest, testPollNoServer);
 	CppUnit_addTest(pSuite, PollSetTest, testPollClosedServer);

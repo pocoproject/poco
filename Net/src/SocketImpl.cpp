@@ -20,23 +20,12 @@
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
-#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
-#ifndef POCO_HAVE_FD_POLL
-#define POCO_HAVE_FD_POLL 1
-#endif
-#elif defined(POCO_OS_FAMILY_BSD)
-#ifndef POCO_HAVE_FD_POLL
-#define POCO_HAVE_FD_POLL 1
-#endif
-#endif
-
-
 #if defined(POCO_HAVE_FD_EPOLL)
-#include <sys/epoll.h>
+	#include <sys/epoll.h>
 #elif defined(POCO_HAVE_FD_POLL)
-#ifndef _WIN32
-#include <poll.h>
-#endif
+	#ifndef _WIN32
+		#include <poll.h>
+	#endif
 #endif
 
 
