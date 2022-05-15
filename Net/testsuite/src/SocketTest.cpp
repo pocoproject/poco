@@ -64,6 +64,41 @@ void SocketTest::testEcho()
 }
 
 
+void SocketTest::testMoveStreamSocket()
+{
+	EchoServer echoServer;
+	StreamSocket ss0 = StreamSocket();
+	ss0.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	StreamSocket ss(std::move(ss0));
+#if POCO_NEW_STATE_ON_MOVE
+	assertTrue (ss0.isNull());
+#else
+	assertFalse (ss0.isNull());
+#endif
+
+	char buffer[256];
+	std::memset(buffer, 0, sizeof(buffer));
+	ss0 = ss;
+	assertTrue (ss0.impl());
+	assertTrue (ss.impl());
+	assertTrue (ss0.impl() == ss.impl());
+	ss = std::move(ss0);
+#if POCO_NEW_STATE_ON_MOVE
+	assertTrue (ss0.isNull());
+#else
+	assertFalse (ss0.isNull());
+#endif
+	assertTrue (ss.impl());
+	int n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	ss.close();
+	ss0.close();
+}
+
+
 void SocketTest::testPoll()
 {
 	EchoServer echoServer;
@@ -559,6 +594,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SocketTest");
 
 	CppUnit_addTest(pSuite, SocketTest, testEcho);
+	CppUnit_addTest(pSuite, SocketTest, testMoveStreamSocket);
 	CppUnit_addTest(pSuite, SocketTest, testPoll);
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
 	CppUnit_addTest(pSuite, SocketTest, testFIFOBuffer);

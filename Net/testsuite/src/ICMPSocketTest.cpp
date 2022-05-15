@@ -56,7 +56,7 @@ void ICMPSocketTest::testSendToReceiveFrom()
 {
 	ICMPSocket ss(IPAddress::IPv4);
 
-	SocketAddress sa("www.appinf.com", 0);
+	SocketAddress sa("github.com", 0);
 	SocketAddress sr(sa);
 
 	try
@@ -90,7 +90,7 @@ void ICMPSocketTest::testMTU()
 		std::cout << addr.toString() << " : MTU=" << mtu << std::endl;
 		assertTrue (mtu != 0);
 		sz = 1500;
-		addr = SocketAddress("www.appinf.com:0");
+		addr = SocketAddress("github.com:0");
 		mtu = ICMPSocket::mtu(addr, sz);
 		std::cout << addr.toString() << " : MTU=" << mtu << std::endl;
 		assertTrue (mtu != 0 && mtu <= sz);

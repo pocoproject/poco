@@ -13,12 +13,12 @@
 #include "CppUnit/TestSuite.h"
 #include "UDPEchoServer.h"
 #include "Poco/Net/DatagramSocket.h"
-#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Thread.h"
 #include <cstring>
 
 
@@ -35,6 +35,7 @@ using Poco::Stopwatch;
 using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::IOException;
+using Poco::Thread;
 
 
 DatagramSocketTest::DatagramSocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -62,6 +63,46 @@ void DatagramSocketTest::testEcho()
 }
 
 
+void DatagramSocketTest::testMoveDatagramSocket()
+{
+	UDPEchoServer echoServer;
+	DatagramSocket ss0 = DatagramSocket();
+	char buffer[256];
+	ss0.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	DatagramSocket ss(std::move(ss0));
+#if POCO_NEW_STATE_ON_MOVE
+	assertTrue (ss0.isNull());
+#else
+	assertFalse (ss0.isNull());
+#endif
+	int n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+
+	std::memset(buffer, 0, sizeof(buffer));
+	ss0 = ss;
+	assertTrue (ss0.impl());
+	assertTrue (ss.impl());
+	assertTrue (ss0.impl() == ss.impl());
+	ss = std::move(ss0);
+#if POCO_NEW_STATE_ON_MOVE
+	assertTrue (ss0.isNull());
+#else
+	assertFalse (ss0.isNull());
+#endif
+	assertTrue (ss.impl());
+	n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	ss.close();
+	ss0.close();
+}
+
+
 void DatagramSocketTest::testEchoBuffer()
 {
 	UDPEchoServer echoServer;
@@ -77,6 +118,25 @@ void DatagramSocketTest::testEchoBuffer()
 	assertTrue (n == 5);
 	assertTrue (buffer.size() == 5);
 	assertTrue (std::string(buffer.begin(), n) == "hello");
+	ss.close();
+}
+
+
+void DatagramSocketTest::testReceiveFromAvailable()
+{
+	UDPEchoServer echoServer(SocketAddress("127.0.0.1", 0));
+	DatagramSocket ss(SocketAddress::IPv4);
+	int n = ss.sendTo("hello", 5, SocketAddress("127.0.0.1", echoServer.port()));
+	assertTrue (n == 5);
+	Thread::sleep(100);
+	char buffer[256];
+	SocketAddress sa;
+	assertTrue (ss.available() == 5);
+	n = ss.receiveFrom(buffer, sizeof(buffer), sa);
+	assertTrue (sa.host() == echoServer.address().host());
+	assertTrue (sa.port() == echoServer.port());
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
 }
 
@@ -110,6 +170,158 @@ void DatagramSocketTest::testUnbound()
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
+}
+
+
+Poco::UInt16 DatagramSocketTest::getFreePort(SocketAddress::Family family, Poco::UInt16 port)
+{
+	bool failed = false;
+	poco_assert_dbg(port > 0);
+	--port;
+	DatagramSocket sock(family);
+	do
+	{
+		failed = false;
+		SocketAddress sa(family, ++port);
+		try
+		{
+			sock.bind(sa, false);
+		}
+		catch (Poco::Net::NetException&)
+		{
+			failed = true;
+		}
+	} while (failed && sock.getError() == POCO_EADDRINUSE);
+	return port;
+}
+
+
+void DatagramSocketTest::testReuseAddressPortWildcard()
+{
+	Poco::UInt16 port = getFreePort(SocketAddress::IPv4, 1234);
+	Poco::UInt16 port6 = getFreePort(SocketAddress::IPv6, 1234);
+	assertTrue(port >= 1234);
+	assertTrue(port6 >= 1234);
+
+	// reuse
+	{
+		DatagramSocket ds1(SocketAddress::IPv4);
+		ds1.bind(SocketAddress(port), true);
+		assertTrue(ds1.getReuseAddress());
+		DatagramSocket ds2;
+		ds2.bind(SocketAddress(port), true);
+		assertTrue(ds2.getReuseAddress());
+#ifdef POCO_HAVE_IPv6
+		DatagramSocket ds3(SocketAddress::IPv6);
+		ds3.bind6(SocketAddress(SocketAddress::IPv6, port6), true, true, false);
+		assertTrue(ds3.getReuseAddress());
+#endif
+	}
+
+#ifdef POCO_HAVE_IPv6
+	{
+		DatagramSocket ds1(SocketAddress::IPv6);
+		ds1.bind6(SocketAddress(SocketAddress::IPv6, port6), true, true, false);
+		assertTrue(ds1.getReuseAddress());
+		DatagramSocket ds2;
+		ds2.bind6(SocketAddress(SocketAddress::IPv6, port6), true, true, false);
+		assertTrue(ds2.getReuseAddress());
+		DatagramSocket ds3;
+		ds3.bind(SocketAddress(port), true, true);
+		assertTrue(ds3.getReuseAddress());
+	}
+#endif
+
+#ifdef POCO_HAVE_IPv6
+	{
+		DatagramSocket ds1(SocketAddress::IPv6);
+		ds1.bind6(SocketAddress(SocketAddress::IPv6, port), true, true, true);
+		assertTrue(ds1.getReuseAddress());
+		DatagramSocket ds2;
+		ds2.bind6(SocketAddress(SocketAddress::IPv6, port), true, true, true);
+		assertTrue(ds2.getReuseAddress());
+	}
+#endif
+
+	// not reuse
+	{
+		DatagramSocket ds1(SocketAddress::IPv4);
+		ds1.bind(SocketAddress(port), false);
+		assertTrue(!ds1.getReuseAddress());
+		DatagramSocket ds2;
+		try
+		{
+			ds2.bind(SocketAddress(port), false);
+			fail("binding to non-reuse address must throw");
+		}
+		catch (Poco::IOException&) {}
+
+#ifdef POCO_HAVE_IPv6
+		{
+			DatagramSocket ds1(SocketAddress::IPv6);
+			ds1.bind6(SocketAddress(SocketAddress::IPv6, port), false, false, true);
+			assertTrue(!ds1.getReuseAddress());
+			DatagramSocket ds2(SocketAddress::IPv6);
+			try
+			{
+				ds2.bind6(SocketAddress(SocketAddress::IPv6, port), false, false, true);
+				fail("binding to non-reuse address must throw");
+			}
+			catch (Poco::IOException&) {}
+		}
+#endif
+	}
+}
+
+
+void DatagramSocketTest::testReuseAddressPortSpecific()
+{
+	Poco::UInt16 port = getFreePort(SocketAddress::IPv4, 1234);
+	assertTrue(port >= 1234);
+
+	// reuse
+	{
+		DatagramSocket ds1(SocketAddress::IPv4);
+		ds1.bind(SocketAddress(port), true);
+		assertTrue(ds1.getReuseAddress());
+		DatagramSocket ds2;
+		ds2.bind(SocketAddress("127.0.0.1", port), true);
+		assertTrue(ds2.getReuseAddress());
+#ifdef POCO_HAVE_IPv6
+		DatagramSocket ds3(SocketAddress::IPv6);
+		ds3.bind6(SocketAddress("::1", port), true, true, false);
+		assertTrue(ds3.getReuseAddress());
+#endif
+	}
+
+	// not reuse
+	{
+		DatagramSocket ds1(SocketAddress::IPv4);
+		ds1.bind(SocketAddress("0.0.0.0", port), false);
+		assertTrue(!ds1.getReuseAddress());
+		DatagramSocket ds2;
+		try
+		{
+			ds2.bind(SocketAddress("127.0.0.1", port), false);
+			fail("binding to non-reuse IPv4 address must throw");
+		}
+		catch (Poco::IOException&) {}
+
+#ifdef POCO_HAVE_IPv6
+		{
+			DatagramSocket ds1(SocketAddress::IPv6);
+			ds1.bind6(SocketAddress("::", port), false, false, true);
+			assertTrue(!ds1.getReuseAddress());
+			DatagramSocket ds2(SocketAddress::IPv6);
+			try
+			{
+				ds2.bind6(SocketAddress("::1", port), false, false, true);
+				fail("binding to non-reuse IPv6 address must throw");
+			}
+			catch (Poco::IOException&) {}
+		}
+#endif
+	}
 }
 
 
@@ -607,9 +819,13 @@ CppUnit::Test* DatagramSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DatagramSocketTest");
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testMoveDatagramSocket);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEchoBuffer);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testReceiveFromAvailable);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testUnbound);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testReuseAddressPortWildcard);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testReuseAddressPortSpecific);
 #if (POCO_OS != POCO_OS_FREE_BSD) // works only with local net bcast and very randomly
 	CppUnit_addTest(pSuite, DatagramSocketTest, testBroadcast);
 #endif

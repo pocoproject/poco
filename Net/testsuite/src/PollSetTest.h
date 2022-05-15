@@ -24,9 +24,12 @@ public:
 	PollSetTest(const std::string& name);
 	~PollSetTest();
 
+	void testTimeout();
+	void testPollNB();
 	void testPoll();
 	void testPollNoServer();
 	void testPollClosedServer();
+	void testPollSetWakeUp();
 
 	void setUp();
 	void tearDown();

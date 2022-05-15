@@ -353,6 +353,8 @@ void StatementImpl::makeExtractors(std::size_t count)
 				addInternalExtract<DateTime>(mc); break;
 			case MetaColumn::FDT_UUID:
 				addInternalExtract<UUID>(mc); break;
+			case MetaColumn::FDT_JSON:
+				addInternalExtract<std::string>(mc); break;
 			default:
 				throw Poco::InvalidArgumentException("Data type not supported.");
 		}

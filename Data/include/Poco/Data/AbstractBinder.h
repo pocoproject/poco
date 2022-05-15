@@ -363,9 +363,12 @@ protected:
 	bool transcodeRequired() const;
 	void transcode(const std::string& from, std::string& to);
 	void reverseTranscode(const std::string& from, std::string& to);
+	const std::string& toString(const UUID& uuid);
 
 private:
+	using StringList = std::vector<std::string*>;
 	std::unique_ptr<Transcoder> _pTranscoder;
+	std::unique_ptr<StringList> _pStrings;
 };
 
 

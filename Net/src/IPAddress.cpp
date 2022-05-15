@@ -19,6 +19,7 @@
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/String.h"
+#include "Poco/Format.h"
 #include "Poco/Types.h"
 
 
@@ -69,6 +70,11 @@ IPAddress::IPAddress(const IPAddress& addr)
 }
 
 
+IPAddress::IPAddress(IPAddress&& addr): _pImpl(std::move(addr._pImpl))
+{
+}
+
+
 IPAddress::IPAddress(Family family)
 {
 	if (family == IPv4)
@@ -99,7 +105,7 @@ IPAddress::IPAddress(const std::string& addr)
 
 #if defined(POCO_HAVE_IPv6)
 	IPv6AddressImpl empty6 = IPv6AddressImpl();
-	if (addr.empty() || trim(addr) == "::")
+	if (addr.empty() || trimIPv6(addr) == "::")
 	{
 		newIPv6(empty6.addr());
 		return;
@@ -233,6 +239,13 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		else 
 			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
 	}
+	return *this;
+}
+
+
+IPAddress& IPAddress::operator = (IPAddress&& addr)
+{
+	_pImpl = std::move(addr._pImpl);
 	return *this;
 }
 
@@ -519,6 +532,47 @@ unsigned IPAddress::prefixLength() const
 }
 
 
+std::string& IPAddress::compressV6(std::string& v6addr)
+{
+	// get rid of leading zeros at the beginning
+	while (v6addr.size() && v6addr[0] == '0') v6addr.erase(v6addr.begin());
+
+	// get rid of leading zeros in the middle
+	while (v6addr.find(":0") != std::string::npos)
+		Poco::replaceInPlace(v6addr, ":0", ":");
+
+	// get rid of extraneous colons
+	while (v6addr.find(":::") != std::string::npos)
+		Poco::replaceInPlace(v6addr, ":::", "::");
+
+	return v6addr;
+}
+
+
+std::string IPAddress::trimIPv6(const std::string v6Addr)
+{
+	std::string v6addr(v6Addr);
+	std::string::size_type len = v6addr.length();
+	int dblColOcc = 0;
+	auto pos = v6addr.find("::");
+	while ((pos <= len-2) && (pos != std::string::npos))
+	{
+		++dblColOcc;
+		pos = v6addr.find("::", pos + 2);
+	}
+
+	if ((dblColOcc > 1) ||
+		(std::count(v6addr.begin(), v6addr.end(), ':') > 8) ||
+		(v6addr.find(":::") != std::string::npos) ||
+		((len >= 2) && ((v6addr[len-1] == ':') && v6addr[len-2] != ':')))
+	{
+		return v6addr;
+	}
+
+	return compressV6(v6addr);
+}
+
+
 IPAddress IPAddress::parse(const std::string& addr)
 {
 	return IPAddress(addr);
@@ -535,7 +589,7 @@ bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 	}
 #if defined(POCO_HAVE_IPv6)
 	IPv6AddressImpl impl6(IPv6AddressImpl::parse(addr));
-	if (impl6 != IPv6AddressImpl())
+	if (impl6 != IPv6AddressImpl() || trimIPv6(addr) == "::")
 	{
 		result.newIPv6(impl6.addr(), impl6.scope());
 		return true;
@@ -569,6 +623,54 @@ IPAddress IPAddress::broadcast()
 	struct in_addr ia;
 	ia.s_addr = INADDR_NONE;
 	return IPAddress(&ia, sizeof(ia));
+}
+
+
+IPAddress::RawIPv4 IPAddress::toV4Bytes() const
+{
+	if (family() != IPv4)
+		throw Poco::InvalidAccessException(Poco::format("IPAddress::toV4Bytes(%d)", (int)family()));
+
+	RawIPv4 bytes;
+	std::memcpy(&bytes[0], addr(), IPv4Size);
+	return bytes;
+}
+
+
+IPAddress::RawIPv6 IPAddress::toV6Bytes() const
+{
+	if (family() != IPv6)
+		throw Poco::InvalidAccessException(Poco::format("IPAddress::toV6Bytes(%d)", (int)family()));
+
+	RawIPv6 bytes;
+	std::memcpy(&bytes[0], addr(), IPv6Size);
+	return bytes;
+}
+
+
+std::vector<unsigned char> IPAddress::toBytes() const
+{
+	std::size_t sz = 0;
+	std::vector<unsigned char> bytes;
+	const void* ptr = 0;
+	switch (family())
+	{
+		case IPv4:
+			sz = sizeof(in_addr);
+			ptr = addr();
+			break;
+#if defined(POCO_HAVE_IPv6)
+		case IPv6:
+			sz = sizeof(in6_addr);
+			ptr = addr();
+			break;
+#endif
+		default:
+			throw Poco::IllegalStateException(Poco::format("IPAddress::toBytes(%d)", (int)family()));
+	}
+	bytes.resize(sz);
+	std::memcpy(&bytes[0], ptr, sz);
+	return bytes;
 }
 
 

@@ -84,6 +84,31 @@ void RawSocketTest::testSendToReceiveFromIPv4()
 }
 
 
+void RawSocketTest::testEchoIPv4Move()
+{
+	SocketAddress sa("127.0.0.1", 0);
+	RawSocket rs0 = RawSocket(IPAddress::IPv4);
+	rs0.connect(sa);
+
+	RawSocket rs(std::move(rs0));
+	assertTrue (rs0.impl() == nullptr);
+	int n = rs.sendBytes("hello", 5);
+	assertTrue (5 == n);
+
+	char buffer[256] = "";
+	unsigned char* ptr = (unsigned char*) buffer;
+
+	n = rs.receiveBytes(buffer, sizeof(buffer));
+	int shift = ((buffer[0] & 0x0F) * 4);
+	ptr += shift;
+
+	assertTrue (5 == (n - shift));
+	assertTrue ("hello" == std::string((char*)ptr, 5));
+
+	rs.close();
+}
+
+
 void RawSocketTest::setUp()
 {
 }
@@ -100,6 +125,7 @@ CppUnit::Test* RawSocketTest::suite()
 
 	CppUnit_addTest(pSuite, RawSocketTest, testEchoIPv4);
 	CppUnit_addTest(pSuite, RawSocketTest, testSendToReceiveFromIPv4);
+	CppUnit_addTest(pSuite, RawSocketTest, testEchoIPv4Move);
 
 	return pSuite;
 }

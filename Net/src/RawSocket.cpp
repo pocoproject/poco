@@ -50,6 +50,16 @@ RawSocket::RawSocket(const Socket& socket): Socket(socket)
 }
 
 
+RawSocket::RawSocket(const RawSocket& socket): Socket(socket)
+{
+}
+
+
+RawSocket::RawSocket(RawSocket&& socket): Socket(std::move(socket))
+{
+}
+
+
 RawSocket::RawSocket(SocketImpl* pImpl): Socket(pImpl)
 {
 	if (!dynamic_cast<RawSocketImpl*>(impl()))
@@ -68,6 +78,30 @@ RawSocket& RawSocket::operator = (const Socket& socket)
 		Socket::operator = (socket);
 	else
 		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
+}
+
+
+RawSocket& RawSocket::operator = (Socket&& socket)
+{
+	if (dynamic_cast<RawSocketImpl*>(socket.impl()))
+		Socket::operator = (std::move(socket));
+	else
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
+}
+
+
+RawSocket& RawSocket::operator = (const RawSocket& socket)
+{
+	Socket::operator = (socket);
+	return *this;
+}
+
+
+RawSocket& RawSocket::operator = (RawSocket&& socket)
+{
+	Socket::operator = (std::move(socket));
 	return *this;
 }
 

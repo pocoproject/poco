@@ -24,6 +24,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include <vector>
+#include <array>
 #include <ostream>
 
 
@@ -56,6 +57,13 @@ class Net_API IPAddress
 public:
 	using List = std::vector<IPAddress>;
 
+	using RawIP = std::vector<unsigned char>;
+
+	static const unsigned IPv4Size = sizeof(in_addr);
+	static const unsigned IPv6Size = sizeof(in6_addr);
+	using RawIPv4 = std::array<unsigned char, IPv4Size>;
+	using RawIPv6 = std::array<unsigned char, IPv6Size>;
+
 	// The following declarations keep the Family type
 	// backwards compatible with the previously used
 	// enum declaration.
@@ -70,6 +78,9 @@ public:
 
 	IPAddress(const IPAddress& addr);
 		/// Creates an IPAddress by copying another one.
+
+	IPAddress(IPAddress&& addr);
+		/// Creates an IPAddress by moving another one.
 
 	explicit IPAddress(Family family);
 		/// Creates a wildcard (zero) IPAddress for the
@@ -121,7 +132,16 @@ public:
 
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
-		
+
+	IPAddress& operator = (IPAddress&& addr);
+		/// Move-assigns an IPAddress.
+
+	bool isV4() const;
+	bool isV6() const;
+	RawIPv4 toV4Bytes() const;
+	RawIPv6 toV6Bytes() const;
+	RawIP toBytes() const;
+
 	Family family() const;
 		/// Returns the address family (IPv4 or IPv6) of the address.
 
@@ -376,6 +396,8 @@ private:
 	void newIPv6(const void* hostAddr);
 	void newIPv6(const void* hostAddr, Poco::UInt32 scope);
 	void newIPv6(unsigned prefix);
+	static std::string& compressV6(std::string& v6addr);
+	static std::string trimIPv6(const std::string v6Addr);
 #endif
 	Ptr _pImpl;
 };
@@ -384,6 +406,19 @@ private:
 //
 // inlines
 //
+
+inline bool IPAddress::isV4() const
+{
+	return family() == IPv4;
+}
+
+
+inline bool IPAddress::isV6() const
+{
+	return family() == IPv6;
+}
+
+
 inline IPAddress::Ptr IPAddress::pImpl() const
 {
 	if (_pImpl) return _pImpl;

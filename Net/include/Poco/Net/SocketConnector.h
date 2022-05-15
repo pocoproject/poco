@@ -82,7 +82,7 @@ public:
 
 	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
 		_pReactor(0)
-		/// Creates an acceptor, using the given ServerSocket.
+		/// Creates an connector, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
 		_socket.connectNB(address);
@@ -152,21 +152,22 @@ public:
 		pNotification->release();
 		onConnect();
 	}
-	
+
 	void onConnect()
 	{
 		_socket.setBlocking(true);
 		createServiceHandler();
 		unregisterConnector();
 	}
-	
+
 	void onError(ErrorNotification* pNotification)
 	{
 		pNotification->release();
 		onError(_socket.impl()->socketError());
 		unregisterConnector();
 	}
-	
+
+
 protected:
 	virtual ServiceHandler* createServiceHandler()
 		/// Create and initialize a new ServiceHandler instance.
@@ -191,7 +192,7 @@ protected:
 	{
 		return _pReactor;
 	}
-	
+
 	StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{
