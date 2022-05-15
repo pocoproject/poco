@@ -80,6 +80,7 @@ public:
 	void testBLOB();
 	void testBLOBStmt();
 	void testLongBLOB();
+	void testJSON();
 
 	void testUnsignedInts();
 	void testFloat();
@@ -119,6 +120,7 @@ private:
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
 	void recreatePersonLongBLOBTable();
+	void recreatePersonJSONTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();

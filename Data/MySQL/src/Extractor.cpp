@@ -128,8 +128,11 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 	//mysql reports TEXT types as FDT_BLOB when being extracted
 	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
-	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB)
+	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB && columnType != Poco::Data::MetaColumn::FDT_JSON)
 		throw MySQLException("Extractor: not a string");
+
+	if (columnType == Poco::Data::MetaColumn::FDT_JSON && !extractJSON(pos))
+		return false;
 
 	val.assign(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
@@ -142,7 +145,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
 
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
-	return false;
+		return false;
 
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
@@ -285,6 +288,21 @@ bool Extractor::extractLongLOB(std::size_t pos)
 	return true;
 }
 
+bool Extractor::extractJSON(std::size_t pos)
+{
+	// JSON columns are fetched with a zero-length
+	// buffer to avoid allocating huge amounts of memory.
+	// Therefore, when extracting the buffers need to be adjusted.
+
+	_metadata.adjustColumnSizeToFit(pos);
+
+	MYSQL_BIND* row = _metadata.row();
+	row->buffer_type = MYSQL_TYPE_JSON;
+	if (!_stmt.fetchColumn(pos, &row[pos]))
+		return false;
+
+	return true;
+}
 
 //////////////
 // Not implemented

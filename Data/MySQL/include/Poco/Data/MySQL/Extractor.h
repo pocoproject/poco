@@ -325,6 +325,8 @@ private:
 
 	bool extractLongLOB(std::size_t pos);
 
+	bool extractJSON(std::size_t pos);
+
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
 
