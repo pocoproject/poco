@@ -290,10 +290,9 @@ bool Extractor::extractLongLOB(std::size_t pos)
 
 bool Extractor::extractJSON(std::size_t pos)
 {
-	// Large LOBs (LONGBLOB and LONGTEXT) are fetched
-	// with a zero-length buffer to avoid allocating
-	// huge amounts of memory. Therefore, when extracting
-	// the buffers need to be adjusted.
+	// JSON columns are fetched with a zero-length
+	// buffer to avoid allocating huge amounts of memory.
+	// Therefore, when extracting the buffers need to be adjusted.
 
 	_metadata.adjustColumnSizeToFit(pos);
 
