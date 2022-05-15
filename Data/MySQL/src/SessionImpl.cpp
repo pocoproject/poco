@@ -258,9 +258,14 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 	std::string isolation;
 	unsigned long version = Utility::serverVersion(_handle);
 	if (version >= 80000)
+	{
 		getSetting("transaction_isolation", isolation);
+		isolation = isolation.c_str();
+	}
 	else
+	{
 		getSetting("tx_isolation", isolation);
+	}
 	Poco::replaceInPlace(isolation, "-", " ");
 	if (MYSQL_READ_UNCOMMITTED == isolation)
 		return Session::TRANSACTION_READ_UNCOMMITTED;
