@@ -11,6 +11,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BinaryExtractor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Binder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +46,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\BinaryExtractor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Data\PostgreSQL\Binder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
