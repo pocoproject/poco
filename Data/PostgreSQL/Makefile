@@ -8,7 +8,7 @@ include $(POCO_BASE)/build/rules/global
 
 include PostgreSQL.make
 
-objects = Extractor Binder SessionImpl Connector \
+objects = Extractor BinaryExtractor Binder SessionImpl Connector \
 	PostgreSQLStatementImpl PostgreSQLException \
 	SessionHandle StatementExecutor PostgreSQLTypes Utility
 

@@ -21,9 +21,9 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/PostgreSQL/SessionImpl.h"
 #include "Poco/Data/PostgreSQL/Binder.h"
-#include "Poco/Data/PostgreSQL/Extractor.h"
 #include "Poco/Data/PostgreSQL/StatementExecutor.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/AbstractExtractor.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Format.h"
 
@@ -89,7 +89,7 @@ private:
 
 	StatementExecutor _statementExecutor;
 	Binder::Ptr       _pBinder;
-	Extractor::Ptr    _pExtractor;
+	AbstractExtractor::Ptr _pExtractor;
 	NextState         _hasNext;
 };
 
