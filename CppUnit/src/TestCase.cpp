@@ -48,14 +48,6 @@ void TestCase::loop2assertImplementation(bool condition, const std::string& cond
 
 
 // Check for a failed equality assertion
-void TestCase::assertEquals(long expected, long actual, long lineNumber, const std::string& fileName)
-{
-	if (expected != actual)
-		assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
-}
-
-
-// Check for a failed equality assertion
 void TestCase::assertEquals(double expected, double actual, double delta, long lineNumber, const std::string& fileName)
 {
 	if (fabs(expected - actual) > delta)
@@ -76,6 +68,14 @@ void TestCase::assertEquals(const std::string& expected, const std::string& actu
 {
 	if (expected != actual)
 		assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
+}
+
+
+// Check for a failed equality assertion
+void TestCase::assertEquals(const char* expected, const std::string& actual, long lineNumber, const std::string& fileName)
+{
+	if (std::string(expected) != actual)
+		assertImplementation(false, notEqualsMessage(std::string(expected), actual), lineNumber, fileName);
 }
 
 
@@ -149,20 +149,6 @@ TestResult* TestCase::run()
 // All the work for runTest is deferred to subclasses
 void TestCase::runTest()
 {
-}
-
-
-// Build a message about a failed equality check
-std::string TestCase::notEqualsMessage(long expected, long actual)
-{
-	return "expected: " + estring(expected) + " but was: " + estring(actual);
-}
-
-
-// Build a message about a failed equality check
-std::string TestCase::notEqualsMessage(double expected, double actual)
-{
-	return "expected: " + estring(expected) + " but was: " + estring(actual);
 }
 
 
