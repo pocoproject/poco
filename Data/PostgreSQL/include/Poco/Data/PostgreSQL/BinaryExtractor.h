@@ -1,11 +1,11 @@
 //
-// Extractor.h
+// BinaryExtractor.h
 //
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Extractor
 //
-// Definition of the Extractor class.
+// Definition of the BinaryExtractor class.
 //
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -14,8 +14,8 @@
 //
 
 
-#ifndef SQL_PostgreSQL_Extractor_INCLUDED
-#define SQL_PostgreSQL_Extractor_INCLUDED
+#ifndef SQL_PostgreSQL_BinaryExtractor_INCLUDED
+#define SQL_PostgreSQL_BinaryExtractor_INCLUDED
 
 
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
@@ -34,17 +34,17 @@ namespace Data {
 namespace PostgreSQL {
 
 
-class PostgreSQL_API Extractor: public Poco::Data::AbstractExtractor
+class PostgreSQL_API BinaryExtractor: public Poco::Data::AbstractExtractor
 	/// Extracts and converts data values from the result row returned by PostgreSQL.
 	/// If NULL is received, the incoming val value is not changed and false is returned
 {
 public:
-	using Ptr = SharedPtr<Extractor>;
+	using Ptr = SharedPtr<BinaryExtractor>;
 
-	Extractor(StatementExecutor& st);
+	BinaryExtractor(StatementExecutor& st);
 		/// Creates the Extractor.
 
-	virtual ~Extractor();
+	virtual ~BinaryExtractor();
 		/// Destroys the Extractor.
 
 	virtual bool extract(std::size_t pos, Poco::Int8& val);
@@ -323,28 +323,8 @@ private:
 	const OutputParameter& extractPreamble(std::size_t aPosition) const;
 	bool isColumnNull(const OutputParameter& anOutputParameter) const;
 
-	template <typename T>
-	bool extractStringImpl(std::size_t pos, T& val)
-		/// Utility function for extraction of Any and DynamicAny.
-	{
-		OutputParameter outputParameter = extractPreamble(pos);
-
-		if (isColumnNull(outputParameter)) return false;
-
-		std::string tempString;  // since the postgreSQL API in use is all about strings...
-		bool returnValue = extract(pos, tempString);
-		if (returnValue)
-		{
-			val = tempString;
-		}
-
-		return returnValue;
-	}
-
-	bool extractToDynamic(std::size_t pos, Dynamic::Var& val);
-
 	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator = (const Extractor&);
+	BinaryExtractor& operator = (const BinaryExtractor&);
 
 private:
 	StatementExecutor& _statementExecutor;
@@ -354,7 +334,7 @@ private:
 //
 // inlines
 //
-inline bool Extractor::isColumnNull(const OutputParameter& anOutputParameter) const
+inline bool BinaryExtractor::isColumnNull(const OutputParameter& anOutputParameter) const
 {
 	return anOutputParameter.isNull() || 0 == anOutputParameter.pData();
 }
@@ -363,4 +343,4 @@ inline bool Extractor::isColumnNull(const OutputParameter& anOutputParameter) co
 } } } // namespace Poco::Data::PostgreSQL
 
 
-#endif // SQL_PostgreSQL_Extractor_INCLUDED
+#endif // SQL_PostgreSQL_BinaryExtractor_INCLUDED
