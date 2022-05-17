@@ -1428,14 +1428,16 @@ void SQLiteTest::testBLOB()
 	Session tmp(Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
-	typedef struct
+
+	struct DataStruct
 	{
 		int i = 0;
 		Poco::Int64 i64 = 1;
 		float f = 2.5;
 		double d = 3.5;
 		char c[16] = {0};
-	} DataStruct;
+	};
+
 	DataStruct ds;
 	strcpy(ds.c, "123456789ABCDEF");
 	BLOB img(reinterpret_cast<unsigned char*>(&ds), sizeof(ds));
