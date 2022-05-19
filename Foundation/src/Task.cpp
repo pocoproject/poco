@@ -131,9 +131,9 @@ void Task::postNotification(Notification* pNf)
 	FastMutex::ScopedLock lock(_mutex);
 	
 	if (_pOwner)
-	{
 		_pOwner->postNotification(pNf);
-	}
+	else if (pNf)
+		pNf->release();
 }
 
 
