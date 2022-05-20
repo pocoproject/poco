@@ -163,8 +163,12 @@ protected:
 		
 	virtual void connect(const SocketAddress& address);
 		/// Connects the underlying socket to the given address
-		/// and sets the socket's receive timeout.	
-		
+		/// and sets the socket's receive timeout.
+
+	void connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress);
+		/// Binds the underlying socket to the source address
+		/// and connects to the targetAddress.
+
 	void attachSocket(const StreamSocket& socket);
 		/// Attaches a socket to the session, replacing the
 		/// previously attached socket.
