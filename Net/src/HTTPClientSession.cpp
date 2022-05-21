@@ -456,20 +456,16 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
-	SocketAddress addr(_host, _port);
+	SocketAddress addr;
 	if (_proxyConfig.host.empty() || bypassProxy())
 		addr = SocketAddress(_host, _port);
 	else
 		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
 
-	SocketAddress sourceAddr;
-	if (addr.family() == IPAddress::IPv4)
-		sourceAddr = _sourceAddress4;
-	else
-		sourceAddr = _sourceAddress6;
-
-	if ((!sourceAddr.host().isWildcard()) || (sourceAddr.port() != 0))
-		connect(addr, sourceAddr);
+	if ((!_sourceAddress4.host().isWildcard()) || (_sourceAddress4.port() != 0))
+		connect(addr, _sourceAddress4);
+	else if ((!_sourceAddress6.host().isWildcard()) || (_sourceAddress6.port() != 0))
+		connect(addr, _sourceAddress6);
 	else
 		connect(addr);
 }
