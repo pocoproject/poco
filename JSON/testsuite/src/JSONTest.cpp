@@ -1701,6 +1701,43 @@ void JSONTest::testStringifyPreserveOrder()
 }
 
 
+void JSONTest::testVarConvert()
+{
+	std::string json = "{ \"foo\" : { \"bar\" : \"baz\", \"arr\": [1, 2, 3]} }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		result = parser.parse(json);
+	}
+	catch (JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assertTrue(false);
+	}
+
+	assertTrue(result.type() == typeid(Object::Ptr));
+
+	std::string cvt;
+	result.convert(cvt);
+	assertTrue(cvt == "{\"foo\":{\"arr\":[1,2,3],\"bar\":\"baz\"}}");
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Object::Ptr f = object->getObject("foo");
+
+	Var o = f;
+	cvt.clear();
+	o.convert(cvt);
+	assertTrue(cvt == "{\"arr\":[1,2,3],\"bar\":\"baz\"}");
+
+	Var a = f->get("arr");
+	cvt.clear();
+	a.convert(cvt);
+	assertTrue(cvt == "[1,2,3]");
+}
+
+
 void JSONTest::testValidJanssonFiles()
 {
 	Poco::Path pathPattern(getTestFilesPath("valid"));
@@ -2249,6 +2286,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testPrintHandler);
 	CppUnit_addTest(pSuite, JSONTest, testStringify);
 	CppUnit_addTest(pSuite, JSONTest, testStringifyPreserveOrder);
+	CppUnit_addTest(pSuite, JSONTest, testVarConvert);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
