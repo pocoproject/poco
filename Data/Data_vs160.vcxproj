@@ -569,6 +569,7 @@
     <ClInclude Include="include\Poco\Data\DynamicDateTime.h"/>
     <ClInclude Include="include\Poco\Data\DynamicLOB.h"/>
     <ClInclude Include="include\Poco\Data\Extraction.h"/>
+    <ClInclude Include="include\Poco\Data\JSONRowFormatter.h"/>
     <ClInclude Include="include\Poco\Data\Limit.h"/>
     <ClInclude Include="include\Poco\Data\LOB.h"/>
     <ClInclude Include="include\Poco\Data\LOBStream.h"/>
@@ -633,6 +634,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\DynamicLOB.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\JSONRowFormatter.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\Limit.cpp">
