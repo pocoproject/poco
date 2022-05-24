@@ -5,7 +5,7 @@ rem
 rem buildwin.cmd
 rem
 rem POCO C++ Libraries command-line build script
-rem for MS Visual Studio 2015 to 2019
+rem for MS Visual Studio 2015 to 2022
 rem
 rem Copyright (c) 2006-2020 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
