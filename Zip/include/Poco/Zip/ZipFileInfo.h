@@ -22,7 +22,6 @@
 #include "Poco/Zip/ZipCommon.h"
 #include "Poco/Zip/ZipUtil.h"
 
-
 namespace Poco {
 namespace Zip {
 
