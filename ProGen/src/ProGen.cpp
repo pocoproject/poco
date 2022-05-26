@@ -585,6 +585,17 @@ protected:
 	void fix2022Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
 	{
 		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v143");
+		Poco::AutoPtr<Poco::XML::NodeList> pLinkList = pProjectDoc->getElementsByTagName("Link");
+		for (unsigned long i = 0; i < pLinkList->length(); i++)
+		{
+			Poco::XML::Element* pLinkElem = static_cast<Poco::XML::Element*>(pLinkList->item(i));
+			Poco::XML::Element* pItemDefinitionGroupElem = static_cast<Poco::XML::Element*>(pLinkElem->parentNode());
+			Poco::XML::XMLString condition = pItemDefinitionGroupElem->getAttribute("Condition");
+			if (Poco::endsWith(condition, Poco::XML::XMLString("ARM64'")))
+			{
+				appendElement(pLinkElem, "TargetMachine", "MachineARM64");
+			}
+		}
 	}
 
 	void appendElement(Poco::XML::Node* pParentNode, const std::string& elemName, const std::string& text)
