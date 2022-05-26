@@ -15,6 +15,9 @@
 		<Platform
 			Name="x64"
 		/>
+		<Platform
+			Name="ARM64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
