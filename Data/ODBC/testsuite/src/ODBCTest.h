@@ -151,6 +151,7 @@ public:
 	virtual void testNullable();
 
 	virtual void testUnicode();
+	virtual void testEncoding();
 
 	virtual void testReconnect();
 
@@ -177,13 +178,15 @@ protected:
 	virtual void recreateMiscTable();
 	virtual void recreateLogTable();
 	virtual void recreateUnicodeTable();
+	virtual void recreateEncodingTables();
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,
 		std::string& uid,
 		std::string& pwd,
 		std::string& dbConnString,
-		const std::string& db = "");
+		const std::string& db = "",
+		const std::string& dbEncoding = "");
 
 	static bool canConnect(const std::string& driver,
 		std::string& dsn,
@@ -371,6 +374,12 @@ inline void ODBCTest::recreateLogTable()
 inline void ODBCTest::recreateUnicodeTable()
 {
 	throw Poco::NotImplementedException("ODBCTest::recreateUnicodeTable()");
+}
+
+
+inline void ODBCTest::recreateEncodingTables()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateUnicodeTables()");
 }
 
 

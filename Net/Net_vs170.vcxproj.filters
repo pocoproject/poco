@@ -1,0 +1,837 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="NetCore">
+      <UniqueIdentifier>{911f56bb-049d-4d4d-a0d5-7f938744fc02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetCore\Header Files">
+      <UniqueIdentifier>{b3a5feb8-1e61-4684-93b2-e6e2729f8f59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetCore\Source Files">
+      <UniqueIdentifier>{acb399c5-f26f-47fa-ae8b-2570e98fc6b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sockets">
+      <UniqueIdentifier>{0d3e56ff-4aae-41e7-a383-c640af227a92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sockets\Header Files">
+      <UniqueIdentifier>{a33c960c-5992-4770-9228-d803934a6f7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sockets\Source Files">
+      <UniqueIdentifier>{035f2f4c-6b45-45b6-92ad-80609486fb63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Messages">
+      <UniqueIdentifier>{801e176c-77da-4180-91bf-fbe0ba5777b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Messages\Header Files">
+      <UniqueIdentifier>{8398e24c-7330-4b20-a610-52070c69f3b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Messages\Source Files">
+      <UniqueIdentifier>{2d6e12d0-4024-4fe6-9b2f-c174efe3cea0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP">
+      <UniqueIdentifier>{1b40f490-ba0b-4f0b-8def-9270a19b4aa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP\Header Files">
+      <UniqueIdentifier>{df2c3e2b-730a-4c92-b084-ba4d680bb196}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP\Source Files">
+      <UniqueIdentifier>{7ca5f53a-9e26-4600-a44d-5d32483dec8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TCPServer">
+      <UniqueIdentifier>{c8d8d59a-1fe7-4317-8f5f-c3b8195f0eac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TCPServer\Header Files">
+      <UniqueIdentifier>{63058a84-fcdc-48f2-816a-1011c8c1b4fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TCPServer\Source Files">
+      <UniqueIdentifier>{9df64c47-e030-42e2-b244-3d53f3e75fcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTPServer">
+      <UniqueIdentifier>{e9b7c2f2-04a3-4bb6-bb80-e31d0fab6173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTPServer\Header Files">
+      <UniqueIdentifier>{07e92825-c445-4add-b93d-b6f019a103c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTPServer\Source Files">
+      <UniqueIdentifier>{b886e732-7fce-4910-8681-e352fb440b7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTPClient">
+      <UniqueIdentifier>{c33c3241-ea4c-4279-bf67-407b0e61c5a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTPClient\Header Files">
+      <UniqueIdentifier>{0190ed6f-cc86-4218-9d17-f5717b6cf6d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTPClient\Source Files">
+      <UniqueIdentifier>{15a6d403-4a28-4c2a-a2e6-0d6e80deadfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTML">
+      <UniqueIdentifier>{dd132ecb-6d2c-4b5c-b4d6-5fd8302348e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTML\Header Files">
+      <UniqueIdentifier>{8ba0d9dc-036b-46b5-a0ba-0ed450f82293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTML\Source Files">
+      <UniqueIdentifier>{d152a8b3-c193-4b2e-af7f-b24e0c8f2d0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPClient">
+      <UniqueIdentifier>{5501c616-f154-4401-9a21-cdca08ee50c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPClient\Header Files">
+      <UniqueIdentifier>{6da235cd-b41f-4ecb-a9d5-a338a7213736}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPClient\Source Files">
+      <UniqueIdentifier>{3dfcda0f-7d4a-4f52-8efc-2307230d83f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor">
+      <UniqueIdentifier>{989410e5-21d1-42e7-bfa9-c44acaebc029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor\Header Files">
+      <UniqueIdentifier>{08bf7247-0028-44e5-918e-2ed119a8234b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor\Source Files">
+      <UniqueIdentifier>{9c5dc8c9-aabb-4cd8-8b74-5a17da821f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail">
+      <UniqueIdentifier>{f938b867-060d-4737-9f49-25ccea5b957a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail\Header Files">
+      <UniqueIdentifier>{dd698354-21c3-4309-a998-e37acf21a217}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail\Source Files">
+      <UniqueIdentifier>{1c10f00f-d776-4da4-83e7-b41182e08a28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP">
+      <UniqueIdentifier>{fce5e7ec-6fd9-439e-8df8-6b908390c741}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP\Header Files">
+      <UniqueIdentifier>{c181296a-fc76-4b0e-a31b-418fe46a1360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP\Source Files">
+      <UniqueIdentifier>{5648a9a9-bc9b-42b5-9cdd-9c17e1437178}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP">
+      <UniqueIdentifier>{be4fd9fd-85d4-4586-9e59-2b0622b04505}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Header Files">
+      <UniqueIdentifier>{54237d6d-6d2e-4f79-ab14-58e8dede50cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Source Files">
+      <UniqueIdentifier>{ff1c12e6-cd02-4643-8c60-b7e651413022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logging">
+      <UniqueIdentifier>{78b905a0-35ff-46f7-8062-13555ff1894f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logging\Header Files">
+      <UniqueIdentifier>{7d1ea7cf-6355-420b-99a7-addeeca4370c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logging\Source Files">
+      <UniqueIdentifier>{b4c88a7d-7bea-4f64-a1bb-c3c9b8e24245}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket">
+      <UniqueIdentifier>{02df74a1-bdc6-4076-b273-fc43fd4975da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Header Files">
+      <UniqueIdentifier>{56b6fa19-3510-4cdb-b80e-6a31d62a2aa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Source Files">
+      <UniqueIdentifier>{e6cf0135-83ac-4cb5-98c0-11491870d830}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OAuth">
+      <UniqueIdentifier>{ecdb88cc-206a-407e-9f06-addbf0b0728d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OAuth\Header Files">
+      <UniqueIdentifier>{b543122a-99ec-4dcb-b84f-db57f26fdeca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OAuth\Source Files">
+      <UniqueIdentifier>{fbced114-043b-4618-9cac-9257023a2ccb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UDP">
+      <UniqueIdentifier>{3ffb60fe-8666-4130-ae45-84381cacb212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UDP\Source Files">
+      <UniqueIdentifier>{abed7288-dfb0-4381-994d-62683940ca49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UDP\Header Files">
+      <UniqueIdentifier>{049036d6-7e2b-451f-9f8b-b665375bb258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTLM">
+      <UniqueIdentifier>{d9e0f5f8-1057-49f5-ae66-4a9db6e73d67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTLM\Header Files">
+      <UniqueIdentifier>{f9788d4b-3688-4a29-8856-b6246c49da88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTLM\Source Files">
+      <UniqueIdentifier>{169fb8fb-c41c-480e-a4a6-e13f271cc754}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\Net\DNS.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HostEntry.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\IPAddress.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\IPAddressImpl.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\Net.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NetException.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NetworkInterface.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketAddress.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketAddressImpl.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketDefs.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\DatagramSocket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\DatagramSocketImpl.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\DialogSocket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MulticastSocket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PollSet.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\RawSocket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\RawSocketImpl.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ServerSocket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ServerSocketImpl.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\Socket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketImpl.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketStream.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\StreamSocket.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\StreamSocketImpl.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\FilePartSource.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MediaType.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MessageHeader.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MultipartReader.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MultipartWriter.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NameValueCollection.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NullPartHandler.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PartHandler.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PartSource.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PartStore.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\QuotedPrintableDecoder.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\QuotedPrintableEncoder.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\StringPartSource.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPAuthenticationParams.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPBasicCredentials.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPBasicStreamBuf.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPBufferAllocator.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPChunkedStream.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPCookie.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPCredentials.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPDigestCredentials.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPFixedLengthStream.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPHeaderStream.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPMessage.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPNTLMCredentials.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPRequest.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPResponse.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPSession.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPStream.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\TCPServer.h">
+      <Filter>TCPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\TCPServerConnection.h">
+      <Filter>TCPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\TCPServerConnectionFactory.h">
+      <Filter>TCPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\TCPServerDispatcher.h">
+      <Filter>TCPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\TCPServerParams.h">
+      <Filter>TCPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\AbstractHTTPRequestHandler.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPRequestHandler.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPRequestHandlerFactory.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServer.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerConnection.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerConnectionFactory.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerParams.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerRequest.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerRequestImpl.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerResponse.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerResponseImpl.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPServerSession.h">
+      <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPClientSession.h">
+      <Filter>HTTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPIOStream.h">
+      <Filter>HTTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPSessionFactory.h">
+      <Filter>HTTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPSessionInstantiator.h">
+      <Filter>HTTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTTPStreamFactory.h">
+      <Filter>HTTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\HTMLForm.h">
+      <Filter>HTML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPClientSession.h">
+      <Filter>FTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPStreamFactory.h">
+      <Filter>FTPClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketAcceptor.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketConnector.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketNotification.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketNotifier.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketReactor.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MailMessage.h">
+      <Filter>Mail\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MailRecipient.h">
+      <Filter>Mail\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MailStream.h">
+      <Filter>Mail\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\POP3ClientSession.h">
+      <Filter>Mail\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SMTPClientSession.h">
+      <Filter>Mail\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPClient.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPEventArgs.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPPacket.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPPacketImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPSocket.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPSocketImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPClient.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPEventArgs.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPPacket.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h">
+      <Filter>Logging\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h">
+      <Filter>Logging\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SMTPChannel.h">
+      <Filter>Logging\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\WebSocket.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\WebSocketImpl.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\OAuth10Credentials.h">
+      <Filter>OAuth\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\OAuth20Credentials.h">
+      <Filter>OAuth\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\MultiSocketPoller.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SingleSocketPoller.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\UDPClient.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\UDPHandler.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\UDPServer.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\UDPServerParams.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\UDPSocketReader.h">
+      <Filter>UDP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTLMCredentials.h">
+      <Filter>NTLM\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h">
+      <Filter>NTLM\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DNS.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HostEntry.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IPAddress.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IPAddressImpl.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Net.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NetException.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NetworkInterface.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketAddress.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketAddressImpl.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatagramSocket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatagramSocketImpl.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DialogSocket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MulticastSocket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PollSet.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RawSocket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RawSocketImpl.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServerSocket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServerSocketImpl.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Socket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketImpl.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketStream.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StreamSocket.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StreamSocketImpl.cpp">
+      <Filter>Sockets\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FilePartSource.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MediaType.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageHeader.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultipartReader.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultipartWriter.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NameValueCollection.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NullPartHandler.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PartHandler.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PartSource.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PartStore.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QuotedPrintableDecoder.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QuotedPrintableEncoder.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringPartSource.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPAuthenticationParams.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPBasicCredentials.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPBufferAllocator.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPChunkedStream.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPCookie.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPCredentials.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPDigestCredentials.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPFixedLengthStream.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPHeaderStream.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPMessage.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPNTLMCredentials.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPRequest.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPResponse.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPSession.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPStream.cpp">
+      <Filter>HTTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TCPServer.cpp">
+      <Filter>TCPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TCPServerConnection.cpp">
+      <Filter>TCPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TCPServerConnectionFactory.cpp">
+      <Filter>TCPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TCPServerDispatcher.cpp">
+      <Filter>TCPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TCPServerParams.cpp">
+      <Filter>TCPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AbstractHTTPRequestHandler.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPRequestHandler.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPRequestHandlerFactory.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServer.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerConnection.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerConnectionFactory.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerParams.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerRequest.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerRequestImpl.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerResponse.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerResponseImpl.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPServerSession.cpp">
+      <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPClientSession.cpp">
+      <Filter>HTTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPIOStream.cpp">
+      <Filter>HTTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPSessionFactory.cpp">
+      <Filter>HTTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPSessionInstantiator.cpp">
+      <Filter>HTTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPStreamFactory.cpp">
+      <Filter>HTTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTMLForm.cpp">
+      <Filter>HTML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPClientSession.cpp">
+      <Filter>FTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPStreamFactory.cpp">
+      <Filter>FTPClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketNotification.cpp">
+      <Filter>Reactor\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketNotifier.cpp">
+      <Filter>Reactor\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketReactor.cpp">
+      <Filter>Reactor\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MailMessage.cpp">
+      <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MailRecipient.cpp">
+      <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MailStream.cpp">
+      <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\POP3ClientSession.cpp">
+      <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SMTPClientSession.cpp">
+      <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPClient.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPEventArgs.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPPacket.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPPacketImpl.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPSocket.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPSocketImpl.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPv4PacketImpl.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPClient.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPEventArgs.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPPacket.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RemoteSyslogChannel.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RemoteSyslogListener.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SMTPChannel.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocket.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketImpl.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OAuth10Credentials.cpp">
+      <Filter>OAuth\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OAuth20Credentials.cpp">
+      <Filter>OAuth\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UDPClient.cpp">
+      <Filter>UDP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UDPServerParams.cpp">
+      <Filter>UDP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTLMCredentials.cpp">
+      <Filter>NTLM\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SSPINTLMCredentials.cpp">
+      <Filter>NTLM\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
+  </ItemGroup>
+</Project>

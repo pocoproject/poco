@@ -47,7 +47,7 @@ class Binding: public AbstractBinding
 	/// is passed to binding, the storage it refers to must be valid at the statement execution time.
 	/// To pass a copy of a variable, constant or string literal, use utility function bind().
 	/// Variables can be passed as either copies or references (i.e. using either use() or bind()).
-	/// Constants, however, can only be passed as copies. this is best achieved using bind() utility 
+	/// Constants, however, can only be passed as copies. This is best achieved using bind() utility
 	/// function. An attempt to pass a constant by reference shall result in compile-time error.
 {
 public:

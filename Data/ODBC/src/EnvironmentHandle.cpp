@@ -15,6 +15,8 @@
 #include "Poco/Data/ODBC/EnvironmentHandle.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/Error.h"
+#include "Poco/Debugger.h"
 
 
 namespace Poco {
@@ -42,7 +44,10 @@ EnvironmentHandle::~EnvironmentHandle()
 	try
 	{
 		SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_ENV, _henv);
-		poco_assert (!Utility::isError(rc));
+#if defined(_DEBUG)
+		if (Utility::isError(rc))
+			Debugger::enter(Poco::Error::getMessage(Poco::Error::last()), __FILE__, __LINE__);
+#endif
 	}
 	catch (...)
 	{

@@ -51,6 +51,7 @@ public:
 		FDT_TIME,
 		FDT_TIMESTAMP,
 		FDT_UUID,
+		FDT_JSON,
 		FDT_UNKNOWN
 	};
 

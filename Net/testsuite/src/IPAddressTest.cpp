@@ -31,11 +31,13 @@ IPAddressTest::~IPAddressTest()
 
 void IPAddressTest::testStringConv()
 {
-	IPAddress ia1("127.0.0.1");
+	IPAddress ia01 = IPAddress("127.0.0.1");
+	IPAddress ia1(std::move(ia01));
 	assertTrue (ia1.family() == IPAddress::IPv4);
 	assertTrue (ia1.toString() == "127.0.0.1");
 	
-	IPAddress ia2("192.168.1.120");
+	IPAddress ia02 = IPAddress("192.168.1.120");
+	IPAddress ia2(std::move(ia02));
 	assertTrue (ia2.family() == IPAddress::IPv4);
 	assertTrue (ia2.toString() == "192.168.1.120");
 	
@@ -56,15 +58,18 @@ void IPAddressTest::testStringConv()
 void IPAddressTest::testStringConv6()
 {
 #ifdef POCO_HAVE_IPv6
-	IPAddress ia0("::1");
+	IPAddress ia00 = IPAddress("::1");
+	IPAddress ia0(std::move(ia00));
 	assertTrue (ia0.family() == IPAddress::IPv6);
 	assertTrue (ia0.toString() == "::1");
 
-	IPAddress ia1("1080:0:0:0:8:600:200a:425c");
+	IPAddress ia01 = IPAddress("1080:0:0:0:8:600:200a:425c");
+	IPAddress ia1(std::move(ia01));
 	assertTrue (ia1.family() == IPAddress::IPv6);
 	assertTrue (ia1.toString() == "1080::8:600:200a:425c");
 	
-	IPAddress ia2("1080::8:600:200A:425C");
+	IPAddress ia02 = IPAddress("1080::8:600:200A:425C");
+	IPAddress ia2(std::move(ia02));
 	assertTrue (ia2.family() == IPAddress::IPv6);
 	assertTrue (ia2.toString() == "1080::8:600:200a:425c");
 	
@@ -94,8 +99,9 @@ void IPAddressTest::testStringConv6()
 void IPAddressTest::testParse()
 {
 	IPAddress ip;
+	assertTrue (IPAddress::tryParse("0.0.0.0", ip));
+	assertTrue (IPAddress::tryParse("255.255.255.255", ip));
 	assertTrue (IPAddress::tryParse("192.168.1.120", ip));
-	
 	assertTrue (!IPAddress::tryParse("192.168.1.280", ip));
 
 	ip = IPAddress::parse("192.168.1.120");
@@ -103,10 +109,37 @@ void IPAddressTest::testParse()
 	{
 		ip = IPAddress::parse("192.168.1.280");
 		fail("bad address - must throw");
-	}	
+	}
 	catch (InvalidAddressException&)
 	{
 	}
+
+#ifdef POCO_HAVE_IPv6
+	assertTrue (IPAddress::tryParse("::", ip));
+	assertFalse (IPAddress::tryParse(":::", ip));
+	assertTrue (IPAddress::tryParse("0::", ip));
+	assertTrue (IPAddress::tryParse("0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0:0:0:0", ip));
+	assertFalse (IPAddress::tryParse("0:0:0:0:0:0:0:0:", ip));
+	assertFalse (IPAddress::tryParse("::0:0::", ip));
+	assertFalse (IPAddress::tryParse("::0::0::", ip));
+
+	assertTrue (IPAddress::tryParse("::1", ip));
+	assertTrue (IPAddress::tryParse("1080:0:0:0:8:600:200a:425c", ip));
+	assertTrue (IPAddress::tryParse("1080::8:600:200a:425c", ip));
+	assertTrue (IPAddress::tryParse("1080::8:600:200A:425C", ip));
+	assertTrue (IPAddress::tryParse("1080::8:600:200a:425c", ip));
+	assertTrue (IPAddress::tryParse("::192.168.1.120", ip));
+	assertTrue (IPAddress::tryParse("::ffff:192.168.1.120", ip));
+	assertTrue (IPAddress::tryParse("::ffff:192.168.1.120", ip));
+	assertTrue (IPAddress::tryParse("ffff:ffff:ffff:ffff::", ip));
+	assertTrue (IPAddress::tryParse("ffff:ffff::", ip));
+#endif
 }
 
 
@@ -420,6 +453,36 @@ void IPAddressTest::testClassification6()
 	assertTrue (!ip7.isSiteLocalMC());
 	assertTrue (!ip7.isOrgLocalMC());
 	assertTrue (!ip7.isGlobalMC());
+
+	IPAddress ip8("::ffff:127.0.0.1"); // IPv4-mapped loopback
+	assertTrue (!ip3.isWildcard());
+	assertTrue (!ip3.isBroadcast());
+	assertTrue (ip3.isLoopback());
+	assertTrue (!ip3.isMulticast());
+	assertTrue (ip3.isUnicast());
+	assertTrue (!ip3.isLinkLocal());
+	assertTrue (!ip3.isSiteLocal());
+	assertTrue (!ip3.isWellKnownMC());
+	assertTrue (!ip3.isNodeLocalMC());
+	assertTrue (!ip3.isLinkLocalMC());
+	assertTrue (!ip3.isSiteLocalMC());
+	assertTrue (!ip3.isOrgLocalMC());
+	assertTrue (!ip3.isGlobalMC());
+
+	IPAddress ip9("::ffff:127.255.255.254"); // IPv4-mapped loopback
+	assertTrue (!ip3.isWildcard());
+	assertTrue (!ip3.isBroadcast());
+	assertTrue (ip3.isLoopback());
+	assertTrue (!ip3.isMulticast());
+	assertTrue (ip3.isUnicast());
+	assertTrue (!ip3.isLinkLocal());
+	assertTrue (!ip3.isSiteLocal());
+	assertTrue (!ip3.isWellKnownMC());
+	assertTrue (!ip3.isNodeLocalMC());
+	assertTrue (!ip3.isLinkLocalMC());
+	assertTrue (!ip3.isSiteLocalMC());
+	assertTrue (!ip3.isOrgLocalMC());
+	assertTrue (!ip3.isGlobalMC());
 #endif
 }
 

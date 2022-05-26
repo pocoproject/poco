@@ -116,6 +116,9 @@ public:
 	HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig);
 		/// Creates a HTTPClientSession using the given host, port and proxy configuration.
 
+	HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig);
+		/// Creates a HTTPClientSession using the given socket and proxy configuration.
+
 	virtual ~HTTPClientSession();
 		/// Destroys the HTTPClientSession and closes
 		/// the underlying socket.
@@ -137,6 +140,32 @@ public:
 
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
+
+	void setSourceAddress(const SocketAddress& address);
+		/// Sets the source IP address and source port for the HTTPClientSession
+		/// socket.
+		///
+		/// Function can be called repeatedly to set one source address value for
+		/// IPv4 and one for IPv6, in the case where it is not known ahead of time
+		/// which type of address family the target host is part of.
+		///
+		/// The source address must not be changed once there
+		/// is an open connection to the server.
+		///
+		/// Note: Both the source IP address and source port can be set
+		/// using this function, but the typical client use is to set
+		/// the source IP address only and the source port portion
+		/// would normally be passed as 0 meaning that any port value
+		/// can be used on the source side of the socket.
+
+	const SocketAddress& getSourceAddress();
+		/// Returns the last source address set with setSourceAddress
+
+	const SocketAddress& getSourceAddress4();
+		/// Returns the last IPv4 source address set with setSourceAddress
+
+	const SocketAddress& getSourceAddress6();
+		/// Returns the last IPV6 source address set with setSourceAddress
 
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Sets the proxy host name and port number.
@@ -335,21 +364,27 @@ protected:
 		/// to the HTTPClientSession.
 
 private:
-	std::string     _host;
-	Poco::UInt16    _port;
-	ProxyConfig     _proxyConfig;
-	Poco::Timespan  _keepAliveTimeout;
-	Poco::Timestamp _lastRequest;
-	bool            _reconnect;
-	bool            _mustReconnect;
-	bool            _expectResponseBody;
-	bool            _responseReceived;
-	Poco::SharedPtr<std::ostream> _pRequestStream;
-	Poco::SharedPtr<std::istream> _pResponseStream;
+	using OStreamPtr = Poco::SharedPtr<std::ostream>;
+	using IStreamPtr = Poco::SharedPtr<std::istream>;
+
+	std::string           _host;
+	Poco::UInt16          _port;
+	SocketAddress         _sourceAddress;
+	SocketAddress         _sourceAddress4;
+	SocketAddress         _sourceAddress6;
+	ProxyConfig           _proxyConfig;
+	Poco::Timespan        _keepAliveTimeout;
+	Poco::Timestamp       _lastRequest;
+	bool                  _reconnect;
+	bool                  _mustReconnect;
+	bool                  _expectResponseBody;
+	bool                  _responseReceived;
+	OStreamPtr            _pRequestStream;
+	IStreamPtr            _pResponseStream;
 	HTTPBasicCredentials  _proxyBasicCreds;
 	HTTPDigestCredentials _proxyDigestCreds;
 	HTTPNTLMCredentials   _proxyNTLMCreds;
-	bool            _ntlmProxyAuthenticated;
+	bool                  _ntlmProxyAuthenticated;
 
 	static ProxyConfig _globalProxyConfig;
 

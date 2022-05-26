@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
@@ -56,7 +56,7 @@
     <RootNamespace>TestSuite</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -117,45 +117,45 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
-  <ImportGroup Label="ExtensionSettings"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">TestSuited</TargetName>
@@ -243,7 +243,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -275,9 +275,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -304,7 +304,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -336,9 +336,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -365,7 +365,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -397,9 +397,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -426,7 +426,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -458,9 +458,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -487,7 +487,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -519,9 +519,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -548,7 +548,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -580,9 +580,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -598,70 +598,71 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\DatagramSocketTest.h"/>
-    <ClInclude Include="src\DialogServer.h"/>
-    <ClInclude Include="src\DialogSocketTest.h"/>
-    <ClInclude Include="src\DNSTest.h"/>
-    <ClInclude Include="src\EchoServer.h"/>
-    <ClInclude Include="src\FTPClientSessionTest.h"/>
-    <ClInclude Include="src\FTPClientTestSuite.h"/>
-    <ClInclude Include="src\FTPStreamFactoryTest.h"/>
-    <ClInclude Include="src\HTMLFormTest.h"/>
-    <ClInclude Include="src\HTMLTestSuite.h"/>
-    <ClInclude Include="src\HTTPClientSessionTest.h"/>
-    <ClInclude Include="src\HTTPClientTestSuite.h"/>
-    <ClInclude Include="src\HTTPCookieTest.h"/>
-    <ClInclude Include="src\HTTPCredentialsTest.h"/>
-    <ClInclude Include="src\HTTPRequestTest.h"/>
-    <ClInclude Include="src\HTTPResponseTest.h"/>
-    <ClInclude Include="src\HTTPServerTest.h"/>
-    <ClInclude Include="src\HTTPServerTestSuite.h"/>
-    <ClInclude Include="src\HTTPStreamFactoryTest.h"/>
-    <ClInclude Include="src\HTTPTestServer.h"/>
-    <ClInclude Include="src\HTTPTestSuite.h"/>
-    <ClInclude Include="src\ICMPClientTest.h"/>
-    <ClInclude Include="src\ICMPClientTestSuite.h"/>
-    <ClInclude Include="src\ICMPSocketTest.h"/>
-    <ClInclude Include="src\IPAddressTest.h"/>
-    <ClInclude Include="src\MailMessageTest.h"/>
-    <ClInclude Include="src\MailStreamTest.h"/>
-    <ClInclude Include="src\MailTestSuite.h"/>
-    <ClInclude Include="src\MediaTypeTest.h"/>
-    <ClInclude Include="src\MessageHeaderTest.h"/>
-    <ClInclude Include="src\MessagesTestSuite.h"/>
-    <ClInclude Include="src\MulticastEchoServer.h"/>
-    <ClInclude Include="src\MulticastSocketTest.h"/>
-    <ClInclude Include="src\MultipartReaderTest.h"/>
-    <ClInclude Include="src\MultipartWriterTest.h"/>
-    <ClInclude Include="src\NameValueCollectionTest.h"/>
-    <ClInclude Include="src\NetCoreTestSuite.h"/>
-    <ClInclude Include="src\NetTestSuite.h"/>
-    <ClInclude Include="src\NetworkInterfaceTest.h"/>
-    <ClInclude Include="src\NTLMCredentialsTest.h"/>
-    <ClInclude Include="src\NTPClientTest.h"/>
-    <ClInclude Include="src\NTPClientTestSuite.h"/>
-    <ClInclude Include="src\OAuth10CredentialsTest.h"/>
-    <ClInclude Include="src\OAuth20CredentialsTest.h"/>
-    <ClInclude Include="src\OAuthTestSuite.h"/>
-    <ClInclude Include="src\PollSetTest.h"/>
-    <ClInclude Include="src\POP3ClientSessionTest.h"/>
-    <ClInclude Include="src\QuotedPrintableTest.h"/>
-    <ClInclude Include="src\RawSocketTest.h"/>
-    <ClInclude Include="src\ReactorTestSuite.h"/>
-    <ClInclude Include="src\SMTPClientSessionTest.h"/>
-    <ClInclude Include="src\SocketAddressTest.h"/>
-    <ClInclude Include="src\SocketReactorTest.h"/>
-    <ClInclude Include="src\SocketsTestSuite.h"/>
-    <ClInclude Include="src\SocketStreamTest.h"/>
-    <ClInclude Include="src\SocketTest.h"/>
-    <ClInclude Include="src\SyslogTest.h"/>
-    <ClInclude Include="src\TCPServerTest.h"/>
-    <ClInclude Include="src\TCPServerTestSuite.h"/>
-    <ClInclude Include="src\UDPEchoServer.h"/>
-    <ClInclude Include="src\UDPServerTest.h"/>
-    <ClInclude Include="src\UDPServerTestSuite.h"/>
-    <ClInclude Include="src\WebSocketTest.h"/>
-    <ClInclude Include="src\WebSocketTestSuite.h"/>
+    <ClInclude Include="src\DatagramSocketTest.h" />
+    <ClInclude Include="src\DialogServer.h" />
+    <ClInclude Include="src\DialogSocketTest.h" />
+    <ClInclude Include="src\DNSTest.h" />
+    <ClInclude Include="src\EchoServer.h" />
+    <ClInclude Include="src\FTPClientSessionTest.h" />
+    <ClInclude Include="src\FTPClientTestSuite.h" />
+    <ClInclude Include="src\FTPStreamFactoryTest.h" />
+    <ClInclude Include="src\HTMLFormTest.h" />
+    <ClInclude Include="src\HTMLTestSuite.h" />
+    <ClInclude Include="src\HTTPClientSessionTest.h" />
+    <ClInclude Include="src\HTTPClientTestSuite.h" />
+    <ClInclude Include="src\HTTPCookieTest.h" />
+    <ClInclude Include="src\HTTPCredentialsTest.h" />
+    <ClInclude Include="src\HTTPRequestTest.h" />
+    <ClInclude Include="src\HTTPResponseTest.h" />
+    <ClInclude Include="src\HTTPServerTest.h" />
+    <ClInclude Include="src\HTTPServerTestSuite.h" />
+    <ClInclude Include="src\HTTPStreamFactoryTest.h" />
+    <ClInclude Include="src\HTTPTestServer.h" />
+    <ClInclude Include="src\HTTPTestSuite.h" />
+    <ClInclude Include="src\ICMPClientTest.h" />
+    <ClInclude Include="src\ICMPClientTestSuite.h" />
+    <ClInclude Include="src\ICMPSocketTest.h" />
+    <ClInclude Include="src\IPAddressTest.h" />
+    <ClInclude Include="src\MailMessageTest.h" />
+    <ClInclude Include="src\MailStreamTest.h" />
+    <ClInclude Include="src\MailTestSuite.h" />
+    <ClInclude Include="src\MediaTypeTest.h" />
+    <ClInclude Include="src\MessageHeaderTest.h" />
+    <ClInclude Include="src\MessagesTestSuite.h" />
+    <ClInclude Include="src\MulticastEchoServer.h" />
+    <ClInclude Include="src\MulticastSocketTest.h" />
+    <ClInclude Include="src\MultipartReaderTest.h" />
+    <ClInclude Include="src\MultipartWriterTest.h" />
+    <ClInclude Include="src\NameValueCollectionTest.h" />
+    <ClInclude Include="src\NetCoreTestSuite.h" />
+    <ClInclude Include="src\NetTestSuite.h" />
+    <ClInclude Include="src\NetworkInterfaceTest.h" />
+    <ClInclude Include="src\NTLMCredentialsTest.h" />
+    <ClInclude Include="src\NTPClientTest.h" />
+    <ClInclude Include="src\NTPClientTestSuite.h" />
+    <ClInclude Include="src\OAuth10CredentialsTest.h" />
+    <ClInclude Include="src\OAuth20CredentialsTest.h" />
+    <ClInclude Include="src\OAuthTestSuite.h" />
+    <ClInclude Include="src\PollSetTest.h" />
+    <ClInclude Include="src\POP3ClientSessionTest.h" />
+    <ClInclude Include="src\QuotedPrintableTest.h" />
+    <ClInclude Include="src\RawSocketTest.h" />
+    <ClInclude Include="src\ReactorTestSuite.h" />
+    <ClInclude Include="src\SMTPClientSessionTest.h" />
+    <ClInclude Include="src\SocketAddressTest.h" />
+    <ClInclude Include="src\SocketProactorTest.h" />
+    <ClInclude Include="src\SocketReactorTest.h" />
+    <ClInclude Include="src\SocketsTestSuite.h" />
+    <ClInclude Include="src\SocketStreamTest.h" />
+    <ClInclude Include="src\SocketTest.h" />
+    <ClInclude Include="src\SyslogTest.h" />
+    <ClInclude Include="src\TCPServerTest.h" />
+    <ClInclude Include="src\TCPServerTestSuite.h" />
+    <ClInclude Include="src\UDPEchoServer.h" />
+    <ClInclude Include="src\UDPServerTest.h" />
+    <ClInclude Include="src\UDPServerTestSuite.h" />
+    <ClInclude Include="src\WebSocketTest.h" />
+    <ClInclude Include="src\WebSocketTestSuite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DatagramSocketTest.cpp">
@@ -823,6 +824,7 @@
     <ClCompile Include="src\SocketAddressTest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
+    <ClCompile Include="src\SocketProactorTest.cpp" />
     <ClCompile Include="src\SocketReactorTest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -860,6 +862,6 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
-  <ImportGroup Label="ExtensionTargets"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

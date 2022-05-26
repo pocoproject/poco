@@ -24,8 +24,18 @@
 #define POCO_EXTERNAL_OPENSSL_SLPRO 2
 
 
+//
+// Temporarily suppress deprecation warnings coming
+// from OpenSSL 3.0, until we have updated our code.
+//
+#if !defined(POCO_DONT_SUPPRESS_OPENSSL_DEPRECATED)
+#define OPENSSL_SUPPRESS_DEPRECATED
+#endif
+
+
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
+#include <openssl/err.h>
 
 
 #ifndef OPENSSL_VERSION_PREREQ
@@ -36,6 +46,11 @@
 		#define OPENSSL_VERSION_PREREQ(maj, min) \
 			(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20)))
 	#endif
+#endif
+
+
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+#error "OpenSSL version too old. At least OpenSSL 1.0.0 is required."
 #endif
 
 
@@ -162,6 +177,20 @@ enum RSAPaddingMode
 
 namespace Poco {
 namespace Crypto {
+
+
+inline std::string& getError(std::string& msg)
+	/// Appends OpenSSL error(s) to msg and
+	/// returns the augmented error description.
+{
+	unsigned long err;
+	while ((err = ERR_get_error()))
+	{
+		if (!msg.empty()) msg.append(1, '\n');
+		msg.append(ERR_error_string(err, 0));
+	}
+	return msg;
+}
 
 
 void Crypto_API initializeCrypto();

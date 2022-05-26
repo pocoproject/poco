@@ -363,6 +363,9 @@
     <ClInclude Include="src\UDPServerTestSuite.h">
       <Filter>UDP\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\SocketProactorTest.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNSTest.cpp">
@@ -559,6 +562,9 @@
     </ClCompile>
     <ClCompile Include="src\UDPServerTestSuite.cpp">
       <Filter>UDP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketProactorTest.cpp">
+      <Filter>Sockets\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

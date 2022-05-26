@@ -31,36 +31,37 @@ namespace PostgreSQL {
 /// Oid constants duplicated from PostgreSQL "include/postgresql/server/catalog/pg_type.h"
 /// because PostgreSQL compile time definitions are too onerous to reproduce for this module
 
+const Oid INVALIDOID     = 0;
 
-const Oid BOOLOID		= 16;
+const Oid BOOLOID        = 16;
 
-const Oid INT2OID		= 21;
-const Oid INT4OID		= 23;
-const Oid INT8OID		= 20;
+const Oid INT2OID        = 21;
+const Oid INT4OID        = 23;
+const Oid INT8OID        = 20;
 
-const Oid FLOAT8OID		= 701; // double
-const Oid FLOAT4OID		= 700;
-const Oid NUMERICOID	= 1700;
+const Oid FLOAT8OID      = 701; // double
+const Oid FLOAT4OID      = 700;
+const Oid NUMERICOID     = 1700;
 
-const Oid CHAROID		= 18;
-const Oid BPCHAROID		= 1042; // fixed length char
-const Oid VARCHAROID	= 1043;
+const Oid CHAROID        = 18;
+const Oid BPCHAROID      = 1042; // fixed length char
+const Oid VARCHAROID     = 1043;
 
-const Oid BYTEAOID		= 17; // BLOB
-const Oid TEXTOID		= 25; // CLOB
+const Oid BYTEAOID       = 17; // BLOB
+const Oid TEXTOID        = 25; // CLOB
 
-const Oid DATEOID		= 1082;
-const Oid TIMEOID		= 1083;
-const Oid TIMETZOID		= 1266;
-const Oid TIMESTAMPOID	= 1114;
-const Oid TIMESTAMPZOID	= 1184;
+const Oid DATEOID        = 1082;
+const Oid TIMEOID        = 1083;
+const Oid TIMETZOID      = 1266;
+const Oid TIMESTAMPOID   = 1114;
+const Oid TIMESTAMPTZOID = 1184;
 
 // future use
-const Oid BITOID		= 1560;
-const Oid VARYBITOID	= 1562;
-const Oid CASHOID		= 790;
-const Oid MACADDROID	= 829;
-const Oid UUIDOID		= 2950;
+const Oid BITOID         = 1560;
+const Oid VARYBITOID     = 1562;
+const Oid CASHOID        = 790;
+const Oid MACADDROID     = 829;
+const Oid UUIDOID        = 2950;
 
 
 Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
@@ -132,7 +133,7 @@ private:
 };
 
 
-using OutputParameterVector = std::vector <OutputParameter>;
+using OutputParameterVector = std::vector<OutputParameter>;
 
 
 class PQConnectionInfoOptionsFree

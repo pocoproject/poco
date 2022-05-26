@@ -71,6 +71,7 @@ namespace
 		case MYSQL_TYPE_MEDIUM_BLOB:
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
+		case MYSQL_TYPE_JSON:
 			return field.length;
 
 		default:
@@ -128,6 +129,8 @@ namespace
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
 			return Poco::Data::MetaColumn::FDT_BLOB;
+		case MYSQL_TYPE_JSON:
+			return Poco::Data::MetaColumn::FDT_JSON;
 		default:
 			return Poco::Data::MetaColumn::FDT_UNKNOWN;
 		}
@@ -138,6 +141,13 @@ namespace
 namespace Poco {
 namespace Data {
 namespace MySQL {
+
+
+ResultMetadata::~ResultMetadata()
+{
+	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
+		std::free(*it);
+}
 
 
 void ResultMetadata::reset()
@@ -165,7 +175,6 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	std::size_t count = mysql_num_fields(h);
 	MYSQL_FIELD* fields = mysql_fetch_fields(h);
 
-	std::size_t commonSize = 0;
 	_columns.reserve(count);
 
 	for (std::size_t i = 0; i < count; i++)
@@ -181,29 +190,24 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 			0,                               // TODO: precision
 			!IS_NOT_NULL(fields[i].flags)    // nullable
 			));
-
-		commonSize += _columns[i].length();
 	}
 
-	_buffer.resize(commonSize);
+	_buffer.resize(count);
 	_row.resize(count);
 	_lengths.resize(count);
 	_isNull.resize(count);
-
-	std::size_t offset = 0;
 
 	for (std::size_t i = 0; i < count; i++)
 	{
 		std::memset(&_row[i], 0, sizeof(MYSQL_BIND));
 		unsigned int len = static_cast<unsigned int>(_columns[i].length());
+		_buffer[i] = (char*) std::calloc(len, sizeof(char));
 		_row[i].buffer_type   = fields[i].type;
 		_row[i].buffer_length = len;
-		_row[i].buffer        = (len > 0) ? (&_buffer[0] + offset) : 0;
+		_row[i].buffer        = _buffer[i];
 		_row[i].length        = &_lengths[i];
 		_row[i].is_null       = reinterpret_cast<my_bool*>(&_isNull[i]); // workaround to make it work with both MySQL 8 and earlier
 		_row[i].is_unsigned   = (fields[i].flags & UNSIGNED_FLAG) > 0;
-		
-		offset += _row[i].buffer_length;
 	}
 }
 
@@ -241,6 +245,15 @@ const unsigned char* ResultMetadata::rawData(std::size_t pos) const
 bool ResultMetadata::isNull(std::size_t pos) const 
 {
 	return (_isNull[pos] != 0);
+}
+
+
+void ResultMetadata::adjustColumnSizeToFit(std::size_t pos)
+{
+	std::free(_buffer[pos]);
+	_buffer[pos] = (char*) std::calloc(_lengths[pos], sizeof(char));
+	_row[pos].buffer = _buffer[pos];
+	_row[pos].buffer_length = _lengths[pos];
 }
 
 

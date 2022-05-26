@@ -35,13 +35,11 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 
 Extractor::Extractor(const StatementHandle& rStmt,
 	Preparator::Ptr pPreparator,
-	TextEncoding::Ptr pDBEncoding):
+	TextEncoding::Ptr pDBEncoding,
+	Poco::TextEncoding::Ptr pToEncoding): AbstractExtractor(pDBEncoding, pToEncoding),
 	_rStmt(rStmt),
 	_pPreparator(pPreparator),
-	_dataExtraction(pPreparator->getDataExtraction()),
-	_pDBEncoding(pDBEncoding),
-	_transcode(_pDBEncoding && !_pDBEncoding->isA("UTF-8")),
-	_pToEncoding(_transcode ? Poco::TextEncoding::find("UTF-8") : nullptr)
+	_dataExtraction(pPreparator->getDataExtraction())
 {
 }
 
@@ -707,7 +705,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 {
 	bool ret = false;
 
-	if (!_transcode)
+	if (!transcodeRequired())
 	{
 		if (Preparator::DE_MANUAL == _dataExtraction)
 			ret = extractManualImpl(pos, val, SQL_C_CHAR);
@@ -721,8 +719,8 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 			ret = extractManualImpl(pos, result, SQL_C_CHAR);
 		else
 			ret = extractBoundImpl(pos, result);
-		Poco::TextConverter converter(*_pDBEncoding, *_pToEncoding);
-		converter.convert(result, val);
+		transcode(result, val);
+		
 	}
 
 	return ret;

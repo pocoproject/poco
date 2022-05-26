@@ -78,6 +78,13 @@ public:
 		/// Returns a PollMap containing the sockets that have had
 		/// their state changed.
 
+	int count() const;
+		/// Returns the numberof sockets monitored.
+
+	void wakeUp();
+		/// Wakes up a waiting PollSet.
+		/// On platforms/implementations where this functionality
+		/// is not available, it does nothing.
 private:
 	PollSetImpl* _pImpl;
 

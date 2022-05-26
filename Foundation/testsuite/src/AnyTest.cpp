@@ -13,8 +13,10 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Bugcheck.h"
 #include <vector>
+#include <memory>
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
@@ -50,7 +52,7 @@ AnyTest::~AnyTest()
 }
 
 
-void AnyTest::testDefaultCtor()
+void AnyTest::testAnyDefaultCtor()
 {
 	const Any value;
 
@@ -60,7 +62,7 @@ void AnyTest::testDefaultCtor()
 }
 
 
-void AnyTest::testConvertingCtor()
+void AnyTest::testAnyConvertingCtor()
 {
 	std::string text = "test message";
 	Any value = text;
@@ -74,7 +76,7 @@ void AnyTest::testConvertingCtor()
 }
 
 
-void AnyTest::testCopyCtor()
+void AnyTest::testAnyCopyCtor()
 {
 	std::string text = "test message";
 	Any original = text, copy = original;
@@ -87,7 +89,7 @@ void AnyTest::testCopyCtor()
 }
 
 
-void AnyTest::testCopyAssign()
+void AnyTest::testAnyCopyAssign()
 {
 	std::string text = "test message";
 	Any original = text, copy;
@@ -109,7 +111,7 @@ void AnyTest::testCopyAssign()
 }
 
 
-void AnyTest::testConvertingAssign()
+void AnyTest::testAnyConvertingAssign()
 {
 	std::string text = "test message";
 	Any value;
@@ -125,7 +127,7 @@ void AnyTest::testConvertingAssign()
 }
 
 
-void AnyTest::testCastToReference()
+void AnyTest::testAnyCastToReference()
 {
 	Any a(137);
 	const Any b(a);
@@ -166,7 +168,7 @@ void AnyTest::testCastToReference()
 }
 
 
-void AnyTest::testBadCast()
+void AnyTest::testAnyBadCast()
 {
 	std::string text = "test message";
 	Any value = text;
@@ -180,7 +182,7 @@ void AnyTest::testBadCast()
 }
 
 
-void AnyTest::testSwap()
+void AnyTest::testAnySwap()
 {
 	std::string text = "test message";
 	Any original = text, swapped;
@@ -199,7 +201,7 @@ void AnyTest::testSwap()
 }
 
 
-void AnyTest::testEmptyCopy()
+void AnyTest::testAnyEmptyCopy()
 {
 	const Any null;
 	Any copied = null, assigned;
@@ -211,10 +213,12 @@ void AnyTest::testEmptyCopy()
 }
 
 
-void AnyTest::testInt()
+void AnyTest::testAnyInt()
 {
 	Any e;
 	assertTrue (e.empty());
+	e = 0;
+	assertFalse (e.empty());
 
 	Any a = 13;
 	assertTrue (a.type() == typeid(int));
@@ -235,7 +239,7 @@ void AnyTest::testInt()
 }
 
 
-void AnyTest::testComplexType()
+void AnyTest::testAnyComplexType()
 {
 	SomeClass str(13,std::string("hello"));
 	Any a = str;
@@ -251,7 +255,7 @@ void AnyTest::testComplexType()
 }
 
 
-void AnyTest::testVector()
+void AnyTest::testAnyVector()
 {
 	std::vector<int> tmp;
 	tmp.push_back(1);
@@ -272,6 +276,68 @@ void AnyTest::testVector()
 }
 
 
+void AnyTest::testPlaceholder()
+{
+#ifndef POCO_NO_SOO
+	Placeholder<char> ph;
+	assertTrue(ph.isEmpty());
+	assertFalse(ph.isLocal());
+
+	char c = *ph.assign<char, char>(1);
+	assertTrue(1 == c);
+	assertFalse(ph.isEmpty());
+	assertTrue(ph.isLocal());
+
+	ph.erase();
+	assertTrue(ph.isEmpty());
+	assertFalse(ph.isLocal());
+
+	Placeholder<int> phi;
+	assertTrue(phi.isEmpty());
+	assertFalse(phi.isLocal());
+
+	int i = *phi.assign<int, int>(0);
+	assertTrue(0 == i);
+	assertFalse(phi.isEmpty());
+	assertTrue(phi.isLocal());
+
+	phi.erase();
+	assertTrue(phi.isEmpty());
+	assertFalse(phi.isLocal());
+
+	Placeholder<std::shared_ptr<int>> sph;
+	assertTrue(sph.isEmpty());
+	assertFalse(sph.isLocal());
+
+	i = **sph.assign<std::shared_ptr<int>, int*>(new int(1));
+	assertTrue(1 == i);
+	assertFalse(sph.isEmpty());
+	assertTrue(sph.isLocal());
+
+	Placeholder<Poco::SharedPtr<int>> psph;
+	assertTrue(psph.isEmpty());
+	assertFalse(psph.isLocal());
+
+	i = **psph.assign<Poco::SharedPtr<int>, int*>(new int(2));
+	assertTrue(2 == i);
+	assertFalse(psph.isEmpty());
+	assertTrue(psph.isLocal());
+
+	Placeholder<std::vector<int>> vph;
+	assertTrue(vph.isEmpty());
+	assertFalse(vph.isLocal());
+
+	std::vector<int> inv{1,2,3};
+	std::vector<int> outv = *vph.assign<std::vector<int>, std::vector<int>>(inv);
+	assertTrue(inv == outv);
+	assertFalse(vph.isEmpty());
+	assertTrue(vph.isLocal());
+
+	// ...
+#endif
+}
+
+
 void AnyTest::setUp()
 {
 }
@@ -286,18 +352,19 @@ CppUnit::Test* AnyTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("AnyTest");
 
-	CppUnit_addTest(pSuite, AnyTest, testConvertingCtor);
-	CppUnit_addTest(pSuite, AnyTest, testDefaultCtor);
-	CppUnit_addTest(pSuite, AnyTest, testCopyCtor);
-	CppUnit_addTest(pSuite, AnyTest, testCopyAssign);
-	CppUnit_addTest(pSuite, AnyTest, testConvertingAssign);
-	CppUnit_addTest(pSuite, AnyTest, testBadCast);
-	CppUnit_addTest(pSuite, AnyTest, testSwap);
-	CppUnit_addTest(pSuite, AnyTest, testEmptyCopy);
-	CppUnit_addTest(pSuite, AnyTest, testCastToReference);
-	CppUnit_addTest(pSuite, AnyTest, testInt);
-	CppUnit_addTest(pSuite, AnyTest, testComplexType);
-	CppUnit_addTest(pSuite, AnyTest, testVector);
+	CppUnit_addTest(pSuite, AnyTest, testAnyConvertingCtor);
+	CppUnit_addTest(pSuite, AnyTest, testAnyDefaultCtor);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCopyCtor);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCopyAssign);
+	CppUnit_addTest(pSuite, AnyTest, testAnyConvertingAssign);
+	CppUnit_addTest(pSuite, AnyTest, testAnyBadCast);
+	CppUnit_addTest(pSuite, AnyTest, testAnySwap);
+	CppUnit_addTest(pSuite, AnyTest, testAnyEmptyCopy);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCastToReference);
+	CppUnit_addTest(pSuite, AnyTest, testAnyInt);
+	CppUnit_addTest(pSuite, AnyTest, testAnyComplexType);
+	CppUnit_addTest(pSuite, AnyTest, testAnyVector);
+	CppUnit_addTest(pSuite, AnyTest, testPlaceholder);
 
 	return pSuite;
 }

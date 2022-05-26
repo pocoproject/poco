@@ -50,6 +50,9 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
+# Enable standard installation directories
+include(GNUInstallDirs)
+
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
@@ -164,6 +167,7 @@ option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
 option(ENABLE_REDIS "Enable Redis" ON)
+option(ENABLE_PROMETHEUS "Enable Prometheus" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
@@ -218,10 +222,6 @@ if(ENABLE_TESTS)
 	add_subdirectory(CppUnit)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
-
-	if(ENABLE_ZIP)
-		set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
-	endif()
 endif()
 
 if(ENABLE_ENCODINGS_COMPILER OR ENABLE_APACHECONNECTOR)
@@ -238,7 +238,7 @@ if(ENABLE_PAGECOMPILER)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
-if(ENABLE_MONGODB OR ENABLE_REDIS)
+if(ENABLE_MONGODB OR ENABLE_REDIS OR ENABLE_PROMETHEUS)
 	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 endif()
 
@@ -292,11 +292,6 @@ if(ENABLE_POCODOC)
 	set(ENABLE_CPPPARSER ON CACHE BOOL "Enable C++ parser" FORCE)
 endif()
 
-if(ENABLE_SEVENZIP OR ENABLE_ZIP)
-	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
-endif()
-
 if(ENABLE_UTIL AND ENABLE_TESTS)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
@@ -344,6 +339,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Redis AND ENABLE_REDIS)
 	add_subdirectory(Redis)
 	list(APPEND Poco_COMPONENTS "Redis")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Prometheus AND ENABLE_PROMETHEUS)
+	add_subdirectory(Prometheus)
+	list(APPEND Poco_COMPONENTS "Prometheus")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PDF AND ENABLE_PDF)
@@ -445,7 +445,9 @@ add_custom_target(uninstall
 #############################################################
 # Enable packaging
 
-include(InstallRequiredSystemLibraries)
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+	include(InstallRequiredSystemLibraries)
+endif()
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
 set(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
@@ -471,7 +473,7 @@ write_basic_package_version_file(
 if(WIN32)
 	set(PocoConfigPackageLocation "cmake")
 else()
-	set(PocoConfigPackageLocation "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}")
+	set(PocoConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 endif()
 
 configure_file(cmake/${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake" @ONLY)

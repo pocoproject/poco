@@ -78,6 +78,7 @@ public:
 	const DigestEngine::Digest& digest()
 	{
 		const DigestEngine::Digest& d = _engine.digest();
+		poco_assert (d.size() == DIGEST_SIZE);
 		char db[DIGEST_SIZE];
 		char* pdb = db;
 		for (auto v: d) *pdb++ = v;

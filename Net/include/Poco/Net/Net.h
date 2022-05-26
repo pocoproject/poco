@@ -67,6 +67,14 @@
 #endif // POCO_NET_NO_IPv6, POCO_HAVE_IPv6
 
 
+// Default to enabled local socket support if not explicitly disabled
+#if !defined(POCO_NET_NO_UNIX_SOCKET) && !defined (POCO_HAVE_UNIX_SOCKET)
+	#define POCO_HAVE_UNIX_SOCKET
+#elif defined(POCO_NET_NO_UNIX_SOCKET) && defined (POCO_HAVE_UNIX_SOCKET)
+	#undef POCO_HAVE_UNIX_SOCKET
+#endif // POCO_NET_NO_UNIX_SOCKET, POCO_HAVE_UNIX_SOCKET
+
+
 namespace Poco {
 namespace Net {
 
@@ -123,5 +131,25 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 	#define POCO_NET_HAS_INTERFACE
 #endif
 
+
+#if defined(POCO_OS_FAMILY_BSD)
+	#ifndef POCO_HAVE_FD_POLL
+		#define POCO_HAVE_FD_POLL 1
+	#endif
+#endif
+
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#ifndef POCO_HAVE_FD_POLL
+		// WSAPoll wants POLLOUT flag in order to return POLERR when there is no
+		// server on the other side. Windows default is multi-fd_set select, WSAPoll
+		// is disabled and not considered a production-grade code.
+		// see https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll
+		// This is the version where the WSAPoll was (allegedly) fixed.
+		#if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN10_VB)
+			//#define POCO_HAVE_FD_POLL 1
+		#endif
+	#endif
+#endif
 
 #endif // Net_Net_INCLUDED
