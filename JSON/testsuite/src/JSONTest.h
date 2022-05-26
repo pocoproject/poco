@@ -68,6 +68,7 @@ public:
 	void testPrintHandler();
 	void testStringify();
 	void testStringifyPreserveOrder();
+	void testVarConvert();
 
 	void testValidJanssonFiles();
 	void testInvalidJanssonFiles();

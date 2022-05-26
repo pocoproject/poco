@@ -43,7 +43,7 @@ public:
 		STMT_EXECUTED
 	};
 
-	explicit StatementExecutor(SessionHandle& aSessionHandle);
+	explicit StatementExecutor(SessionHandle& aSessionHandle, bool binaryExtraction);
 		/// Creates the StatementExecutor.
 
 	~StatementExecutor();
@@ -90,6 +90,7 @@ private:
 	typedef std::vector<MetaColumn> ColVec;
 
 	SessionHandle& _sessionHandle;
+	bool           _binaryExtraction;
 	State          _state;
 	PGresult*      _pResultHandle;
 	std::string    _SQLStatement;

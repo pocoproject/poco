@@ -43,6 +43,7 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %P - message process identifier
 	///   * %T - message thread name
 	///   * %I - message thread identifier (numeric)
+	///   * %J - message thread OS identifier (numeric)
 	///   * %N - node or host name
 	///   * %U - message source file path (empty string if not set)
 	///	  * %O - message source file filename (empty string if not set)

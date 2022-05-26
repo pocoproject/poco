@@ -6,6 +6,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPSTimeServer", "HTTPSTim
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mail", "Mail\Mail_vs160.vcxproj", "{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SetSourceIP", "SetSourceIP\SetSourceIP_vs160.vcxproj", "{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterClient\TwitterClient_vs160.vcxproj", "{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}"
 EndProject
 Global
@@ -132,6 +134,42 @@ Global
 		{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}.release_static_md|x64.ActiveCfg = release_static_md|x64
 		{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}.release_static_md|x64.Build.0 = release_static_md|x64
 		{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}.release_static_md|x64.Deploy.0 = release_static_md|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_shared|Win32.Deploy.0 = debug_shared|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_shared|Win32.Build.0 = release_shared|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_shared|Win32.Deploy.0 = release_shared|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_mt|Win32.ActiveCfg = debug_static_mt|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_mt|Win32.Build.0 = debug_static_mt|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_mt|Win32.Deploy.0 = debug_static_mt|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_mt|Win32.ActiveCfg = release_static_mt|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_mt|Win32.Build.0 = release_static_mt|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_mt|Win32.Deploy.0 = release_static_mt|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_md|Win32.ActiveCfg = debug_static_md|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_md|Win32.Build.0 = debug_static_md|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_md|Win32.Deploy.0 = debug_static_md|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_md|Win32.ActiveCfg = release_static_md|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_md|Win32.Build.0 = release_static_md|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_md|Win32.Deploy.0 = release_static_md|Win32
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_shared|x64.Build.0 = debug_shared|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_shared|x64.ActiveCfg = release_shared|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_shared|x64.Build.0 = release_shared|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_shared|x64.Deploy.0 = release_shared|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_mt|x64.ActiveCfg = debug_static_mt|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_mt|x64.Build.0 = debug_static_mt|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_mt|x64.Deploy.0 = debug_static_mt|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_mt|x64.ActiveCfg = release_static_mt|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_mt|x64.Build.0 = release_static_mt|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_mt|x64.Deploy.0 = release_static_mt|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_md|x64.ActiveCfg = debug_static_md|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_md|x64.Build.0 = debug_static_md|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.debug_static_md|x64.Deploy.0 = debug_static_md|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_md|x64.ActiveCfg = release_static_md|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_md|x64.Build.0 = release_static_md|x64
+		{1B02F8D6-3C35-33BC-A793-05B5BA54B9AB}.release_static_md|x64.Deploy.0 = release_static_md|x64
 		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
 		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared|Win32.Deploy.0 = debug_shared|Win32

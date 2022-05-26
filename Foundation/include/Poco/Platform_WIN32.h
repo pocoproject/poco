@@ -30,11 +30,6 @@
 #endif
 
 
-// Check debug/release settings consistency
-#if defined(NDEBUG) && defined(_DEBUG)
-	#error Inconsistent build settings (check for /MD[d])
-#endif
-
 // https://en.wikipedia.org/wiki/Microsoft_Visual_C++
 #if (_MSC_VER >= 1300) && (_MSC_VER < 1400)   // Visual Studio 2003, MSVC++ 7.1
 	#define POCO_MSVS_VERSION 2003

@@ -564,6 +564,9 @@ bool IPv6AddressImpl::isBroadcast() const
 
 bool IPv6AddressImpl::isLoopback() const
 {
+	if (isIPv4Mapped())
+    	return (ByteOrder::fromNetwork(_addr.s6_addr[6]) & 0xFF000000) == 0x7F000000;
+
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 && 
 		words[4] == 0 && words[5] == 0 && words[6] == 0 && ByteOrder::fromNetwork(words[7]) == 0x0001;

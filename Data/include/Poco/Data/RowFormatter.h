@@ -139,7 +139,12 @@ public:
 
 protected:
 
-	void setPrefix(const std::string& prefix);
+	virtual void adjustPrefix() const;
+		/// Adjusts the prefix, if needed
+		/// (eg. to contain the total row count);
+		/// default no-op.
+
+	void setPrefix(const std::string& prefix) const;
 		/// Sets the prefix for the formatter.
 
 	void setPostfix(const std::string& postfix);
@@ -175,7 +180,7 @@ inline void RowFormatter::setTotalRowCount(int count)
 }
 
 
-inline void RowFormatter::setPrefix(const std::string& prefix)
+inline void RowFormatter::setPrefix(const std::string& prefix) const
 {
 	_prefix = prefix;
 }
@@ -189,6 +194,7 @@ inline void RowFormatter::setPostfix(const std::string& postfix)
 
 inline const std::string& RowFormatter::prefix() const
 {
+	adjustPrefix();
 	return _prefix;
 }
 

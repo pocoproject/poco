@@ -72,8 +72,9 @@ namespace Data {
 namespace PostgreSQL {
 
 
-StatementExecutor::StatementExecutor(SessionHandle& sessionHandle):
+StatementExecutor::StatementExecutor(SessionHandle& sessionHandle, bool binaryExtraction):
 	_sessionHandle(sessionHandle),
+	_binaryExtraction(binaryExtraction),
 	_state(STMT_INITED),
 	_pResultHandle(0),
 	_countPlaceholdersInSQLStatement(0),
@@ -248,11 +249,12 @@ void StatementExecutor::execute()
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
-		ptrPGResult = PQexecPrepared (_sessionHandle,
+		ptrPGResult = PQexecPrepared(_sessionHandle,
 			_preparedStatementName.c_str(), (int)_countPlaceholdersInSQLStatement,
 			_inputParameterVector.size() != 0 ? &pParameterVector[ 0 ] : 0,
 			_inputParameterVector.size() != 0 ? &parameterLengthVector[ 0 ] : 0,
-			_inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : 0, 0);
+			_inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : 0,
+			_binaryExtraction ? 1 : 0);
 	}
 
 	// Don't setup to auto clear the result (ptrPGResult).  It is required to retrieve the results later.

@@ -77,4 +77,10 @@ void RowFormatter::reset()
 }
 
 
+void RowFormatter::adjustPrefix() const
+{
+	return;
+}
+
+
 } } // namespace Poco::Data

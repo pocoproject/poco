@@ -17,6 +17,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowFormatter.h"
+#include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include <iostream>
 
@@ -27,6 +28,7 @@ using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 using Poco::Data::RowFormatter;
+using Poco::Data::JSONRowFormatter;
 
 
 class HTMLTableFormatter : public RowFormatter
@@ -116,6 +118,12 @@ int main(int argc, char** argv)
 	// simple formatting example (uses the default SimpleRowFormatter provided by framework)
 	std::cout << std::endl << "Simple formatting:" << std::endl << std::endl;
 	std::cout << RecordSet(session, "SELECT * FROM Simpsons");
+
+	// JSON formatting example (uses the JSONRowFormatter provided by framework)
+	std::cout << std::endl << "JSON formatting:" << std::endl << std::endl;
+	JSONRowFormatter jsonRowFormatter;
+	jsonRowFormatter.setJSONMode((RowFormatter::Mode)(JSONRowFormatter::JSON_FMT_MODE_ROW_COUNT | JSONRowFormatter::JSON_FMT_MODE_COLUMN_NAMES));
+	std::cout << RecordSet(session, "SELECT * FROM Simpsons", jsonRowFormatter);
 
 	return 0;
 }

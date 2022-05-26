@@ -453,6 +453,36 @@ void IPAddressTest::testClassification6()
 	assertTrue (!ip7.isSiteLocalMC());
 	assertTrue (!ip7.isOrgLocalMC());
 	assertTrue (!ip7.isGlobalMC());
+
+	IPAddress ip8("::ffff:127.0.0.1"); // IPv4-mapped loopback
+	assertTrue (!ip3.isWildcard());
+	assertTrue (!ip3.isBroadcast());
+	assertTrue (ip3.isLoopback());
+	assertTrue (!ip3.isMulticast());
+	assertTrue (ip3.isUnicast());
+	assertTrue (!ip3.isLinkLocal());
+	assertTrue (!ip3.isSiteLocal());
+	assertTrue (!ip3.isWellKnownMC());
+	assertTrue (!ip3.isNodeLocalMC());
+	assertTrue (!ip3.isLinkLocalMC());
+	assertTrue (!ip3.isSiteLocalMC());
+	assertTrue (!ip3.isOrgLocalMC());
+	assertTrue (!ip3.isGlobalMC());
+
+	IPAddress ip9("::ffff:127.255.255.254"); // IPv4-mapped loopback
+	assertTrue (!ip3.isWildcard());
+	assertTrue (!ip3.isBroadcast());
+	assertTrue (ip3.isLoopback());
+	assertTrue (!ip3.isMulticast());
+	assertTrue (ip3.isUnicast());
+	assertTrue (!ip3.isLinkLocal());
+	assertTrue (!ip3.isSiteLocal());
+	assertTrue (!ip3.isWellKnownMC());
+	assertTrue (!ip3.isNodeLocalMC());
+	assertTrue (!ip3.isLinkLocalMC());
+	assertTrue (!ip3.isSiteLocalMC());
+	assertTrue (!ip3.isOrgLocalMC());
+	assertTrue (!ip3.isGlobalMC());
 #endif
 }
 
