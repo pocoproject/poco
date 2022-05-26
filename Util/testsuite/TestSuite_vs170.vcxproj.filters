@@ -93,6 +93,9 @@
     <ClInclude Include="src\LoggingConfiguratorTest.h">
       <Filter>Configuration\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\LocalConfigurationViewTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\MapConfigurationTest.h">
       <Filter>Configuration\Header Files</Filter>
     </ClInclude>
@@ -171,6 +174,9 @@
       <Filter>Configuration\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LayeredConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LocalConfigurationViewTest.cpp">
       <Filter>Configuration\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LoggingConfiguratorTest.cpp">
