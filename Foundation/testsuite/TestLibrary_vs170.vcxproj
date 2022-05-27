@@ -22,7 +22,6 @@
     <ProjectName>TestLibrary</ProjectName>
     <ProjectGuid>{0955EB03-544B-4BD4-9C10-89CF38078F5F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="Configuration">
