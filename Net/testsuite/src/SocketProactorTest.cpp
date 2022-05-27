@@ -16,6 +16,7 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Stopwatch.h"
 #include <iostream>
 
 using Poco::Net::SocketProactor;
@@ -25,6 +26,7 @@ using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Thread;
 using Poco::Timestamp;
+using Poco::Stopwatch;
 
 
 SocketProactorTest::SocketProactorTest(const std::string& name): CppUnit::TestCase(name)
@@ -145,7 +147,14 @@ void SocketProactorTest::testUDPSocketProactor()
 		received = true;
 	};
 	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
-	while (!received) proactor.poll();
+	Stopwatch sw;
+	sw.start();
+	while (!received)
+	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor receive completion timed out.", __LINE__, __FILE__);
+		proactor.poll();
+	}
 
 	assertTrue (sent);
 	assertTrue (sendPassed);
@@ -167,8 +176,11 @@ void SocketProactorTest::testUDPSocketProactor()
 		nullptr);
 	proactor.addReceiveFrom(s, buf, sa, nullptr);
 	int handled = 0, handledTot = 0;
+	sw.restart();
 	do
 	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor receiveFrom timed out.", __LINE__, __FILE__);
 		proactor.poll(&handled);
 		handledTot += handled;
 	} while (handledTot < 2);

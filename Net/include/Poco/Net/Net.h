@@ -132,6 +132,11 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif
 
 
+#if POCO_OS == POCO_OS_LINUX
+	#define POCO_HAVE_FD_EPOLL 1
+#endif
+
+
 #if defined(POCO_OS_FAMILY_BSD)
 	#ifndef POCO_HAVE_FD_POLL
 		#define POCO_HAVE_FD_POLL 1
