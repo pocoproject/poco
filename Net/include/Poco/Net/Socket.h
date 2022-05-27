@@ -22,6 +22,11 @@
 #include "Poco/Net/SocketImpl.h"
 #include <vector>
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+	#define POCO_CHECK_NEW_STATE_ON_MOVE poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+#else
+	#define POCO_CHECK_NEW_STATE_ON_MOVE
+#endif
 
 namespace Poco {
 namespace Net {
@@ -485,7 +490,7 @@ inline void Socket::close()
 
 inline bool Socket::poll(const Poco::Timespan& timeout, int mode) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->poll(timeout, mode);
 }
@@ -493,7 +498,7 @@ inline bool Socket::poll(const Poco::Timespan& timeout, int mode) const
 
 inline int Socket::available() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->available();
 }
@@ -501,7 +506,7 @@ inline int Socket::available() const
 
 inline int Socket::getError() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getError();
 }
@@ -509,7 +514,7 @@ inline int Socket::getError() const
 
 inline void Socket::setSendBufferSize(int size)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setSendBufferSize(size);
 }
@@ -517,7 +522,7 @@ inline void Socket::setSendBufferSize(int size)
 	
 inline int Socket::getSendBufferSize() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getSendBufferSize();
 }
@@ -525,7 +530,7 @@ inline int Socket::getSendBufferSize() const
 
 inline void Socket::setReceiveBufferSize(int size)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setReceiveBufferSize(size);
 }
@@ -533,7 +538,7 @@ inline void Socket::setReceiveBufferSize(int size)
 	
 inline int Socket::getReceiveBufferSize() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getReceiveBufferSize();
 }
@@ -541,7 +546,7 @@ inline int Socket::getReceiveBufferSize() const
 
 inline void Socket::setSendTimeout(const Poco::Timespan& timeout)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setSendTimeout(timeout);
 }
@@ -549,7 +554,7 @@ inline void Socket::setSendTimeout(const Poco::Timespan& timeout)
 
 inline Poco::Timespan Socket::getSendTimeout() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getSendTimeout();
 }
@@ -557,7 +562,7 @@ inline Poco::Timespan Socket::getSendTimeout() const
 
 inline void Socket::setReceiveTimeout(const Poco::Timespan& timeout)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setReceiveTimeout(timeout);
 }
@@ -565,7 +570,7 @@ inline void Socket::setReceiveTimeout(const Poco::Timespan& timeout)
 
 inline Poco::Timespan Socket::getReceiveTimeout() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getReceiveTimeout();
 }
@@ -573,7 +578,7 @@ inline Poco::Timespan Socket::getReceiveTimeout() const
 
 inline void Socket::setOption(int level, int option, int value)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setOption(level, option, value);
 }
@@ -581,7 +586,7 @@ inline void Socket::setOption(int level, int option, int value)
 
 inline void Socket::setOption(int level, int option, unsigned value)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setOption(level, option, value);
 }
@@ -589,7 +594,7 @@ inline void Socket::setOption(int level, int option, unsigned value)
 
 inline void Socket::setOption(int level, int option, unsigned char value)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setOption(level, option, value);
 }
@@ -597,7 +602,7 @@ inline void Socket::setOption(int level, int option, unsigned char value)
 
 inline void Socket::setOption(int level, int option, const Poco::Timespan& value)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setOption(level, option, value);
 }
@@ -605,7 +610,7 @@ inline void Socket::setOption(int level, int option, const Poco::Timespan& value
 
 inline void Socket::setOption(int level, int option, const IPAddress& value)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setOption(level, option, value);
 }
@@ -613,7 +618,7 @@ inline void Socket::setOption(int level, int option, const IPAddress& value)
 
 inline void Socket::getOption(int level, int option, int& value) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->getOption(level, option, value);
 }
@@ -621,7 +626,7 @@ inline void Socket::getOption(int level, int option, int& value) const
 
 inline void Socket::getOption(int level, int option, unsigned& value) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->getOption(level, option, value);
 }
@@ -629,7 +634,7 @@ inline void Socket::getOption(int level, int option, unsigned& value) const
 
 inline void Socket::getOption(int level, int option, unsigned char& value) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->getOption(level, option, value);
 }
@@ -637,7 +642,7 @@ inline void Socket::getOption(int level, int option, unsigned char& value) const
 
 inline void Socket::getOption(int level, int option, Poco::Timespan& value) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->getOption(level, option, value);
 }
@@ -645,7 +650,7 @@ inline void Socket::getOption(int level, int option, Poco::Timespan& value) cons
 
 inline void Socket::getOption(int level, int option, IPAddress& value) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->getOption(level, option, value);
 }
@@ -653,7 +658,7 @@ inline void Socket::getOption(int level, int option, IPAddress& value) const
 
 inline void Socket::setLinger(bool on, int seconds)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setLinger(on, seconds);
 }
@@ -661,7 +666,7 @@ inline void Socket::setLinger(bool on, int seconds)
 	
 inline void Socket::getLinger(bool& on, int& seconds) const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->getLinger(on, seconds);
 }
@@ -669,7 +674,7 @@ inline void Socket::getLinger(bool& on, int& seconds) const
 
 inline void Socket::setNoDelay(bool flag)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setNoDelay(flag);
 }
@@ -677,7 +682,7 @@ inline void Socket::setNoDelay(bool flag)
 	
 inline bool Socket::getNoDelay() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getNoDelay();
 }
@@ -685,7 +690,7 @@ inline bool Socket::getNoDelay() const
 
 inline void Socket::setKeepAlive(bool flag)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setKeepAlive(flag);
 }
@@ -693,7 +698,7 @@ inline void Socket::setKeepAlive(bool flag)
 	
 inline bool Socket::getKeepAlive() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getKeepAlive();
 }
@@ -701,7 +706,7 @@ inline bool Socket::getKeepAlive() const
 
 inline void Socket::setReuseAddress(bool flag)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setReuseAddress(flag);
 }
@@ -709,7 +714,7 @@ inline void Socket::setReuseAddress(bool flag)
 
 inline bool Socket::getReuseAddress() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getReuseAddress();
 }
@@ -717,7 +722,7 @@ inline bool Socket::getReuseAddress() const
 
 inline void Socket::setReusePort(bool flag)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setReusePort(flag);
 }
@@ -725,7 +730,7 @@ inline void Socket::setReusePort(bool flag)
 
 inline bool Socket::getReusePort() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getReusePort();
 }
@@ -733,7 +738,7 @@ inline bool Socket::getReusePort() const
 	
 inline void Socket::setOOBInline(bool flag)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setOOBInline(flag);
 }
@@ -741,7 +746,7 @@ inline void Socket::setOOBInline(bool flag)
 
 inline bool Socket::getOOBInline() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getOOBInline();
 }
@@ -749,7 +754,7 @@ inline bool Socket::getOOBInline() const
 
 inline void Socket::setBlocking(bool flag)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->setBlocking(flag);
 }
@@ -757,7 +762,7 @@ inline void Socket::setBlocking(bool flag)
 
 inline bool Socket::getBlocking() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->getBlocking();
 }
@@ -771,7 +776,7 @@ inline SocketImpl* Socket::impl() const
 
 inline poco_socket_t Socket::sockfd() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->sockfd();
 }
@@ -779,7 +784,7 @@ inline poco_socket_t Socket::sockfd() const
 
 inline SocketAddress Socket::address() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->address();
 }
@@ -787,7 +792,7 @@ inline SocketAddress Socket::address() const
 
 inline SocketAddress Socket::peerAddress() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->peerAddress();
 }
@@ -795,7 +800,7 @@ inline SocketAddress Socket::peerAddress() const
 
 inline bool Socket::secure() const
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	return _pImpl->secure();
 }
@@ -819,7 +824,7 @@ inline bool Socket::supportsIPv6()
 
 inline void Socket::init(int af)
 {
-	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+	POCO_CHECK_NEW_STATE_ON_MOVE;
 
 	_pImpl->init(af);
 }

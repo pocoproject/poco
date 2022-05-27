@@ -91,7 +91,10 @@ void RawSocketTest::testEchoIPv4Move()
 	rs0.connect(sa);
 
 	RawSocket rs(std::move(rs0));
+#ifdef POCO_NEW_STATE_ON_MOVE
 	assertTrue (rs0.impl() == nullptr);
+#endif // POCO_NEW_STATE_ON_MOVE
+
 	int n = rs.sendBytes("hello", 5);
 	assertTrue (5 == n);
 

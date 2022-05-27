@@ -65,7 +65,14 @@ void SocketProactorTest::testTCPSocketProactor()
 		received = true;
 	};
 	proactor.addReceive(s, buf, onRecvCompletion);
-	while (!received) proactor.poll();
+	Stopwatch sw;
+	sw.start();
+	while (!received)
+	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor receive completion timed out.", __LINE__, __FILE__);
+		proactor.poll();
+	}
 
 	assertTrue (sent);
 	assertTrue (sendPassed);
@@ -84,8 +91,11 @@ void SocketProactorTest::testTCPSocketProactor()
 	proactor.addSend(s, SocketProactor::Buffer(hello.begin(), hello.end()), nullptr);
 	proactor.addReceive(s, buf, nullptr);
 	int handled = 0, handledTot = 0;
+	sw.restart();
 	do
 	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor receive completion timed out.", __LINE__, __FILE__);
 		proactor.poll(&handled);
 		handledTot += handled;
 	}
@@ -109,7 +119,13 @@ void SocketProactorTest::testTCPSocketProactor()
 	errSock.connectNB(SocketAddress("127.0.0.1", 0xFFEE));
 	proactor.addSend(errSock, SocketProactor::Buffer(hello.begin(), hello.end()), onError);
 	Thread::sleep(100);
-	while (!error) proactor.poll();
+	sw.restart();
+	while (!error)
+	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor send completion timed out.", __LINE__, __FILE__);
+		proactor.poll();
+	}
 	assertTrue (error);
 	assertTrue(errorPassed);
 }
@@ -227,7 +243,14 @@ void SocketProactorTest::testSocketProactorStartStop()
 	};
 	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
 
-	while (!received) proactor.poll();
+	Stopwatch sw;
+	sw.start();
+	while (!received)
+	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor receiveFrom timed out.", __LINE__, __FILE__);
+		proactor.poll();
+	}
 
 	assertTrue (sent);
 	assertTrue (sendPassed);
@@ -253,7 +276,13 @@ void SocketProactorTest::testSocketProactorStartStop()
 		SocketAddress("127.0.0.1", echoServer.port()),
 		onSendCompletion);
 	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
-	while (!received) proactor.poll();
+	sw.restart();
+	while (!received)
+	{
+		if (sw.elapsedSeconds() > 1)
+			fail("SocketProactor receiveFrom timed out.", __LINE__, __FILE__);
+		proactor.poll();
+	}
 
 	assertTrue(std::string(buf.begin(), buf.end()) == hello);
 	assertTrue (sent);
