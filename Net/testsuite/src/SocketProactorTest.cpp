@@ -56,7 +56,7 @@ void SocketProactorTest::testTCPSocketProactor()
 	};
 	proactor.addSend(s, SocketProactor::Buffer(hello.begin(), hello.end()), onSendCompletion);
 	SocketProactor::Buffer buf(hello.size(), 0);
-	bool received = false, receivePassed = false;
+	std::atomic<bool> received(false), receivePassed(false);
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
 	{
 		receivePassed = (err.value() == 0) &&
@@ -107,8 +107,8 @@ void SocketProactorTest::testTCPSocketProactor()
 	assertFalse (received);
 	assertFalse (receivePassed);
 
-	bool error = false;
-	bool errorPassed = false;
+	std::atomic<bool> error(false);
+	std::atomic<bool> errorPassed(false);
 	auto onError = [&](std::error_code err, int bytes)
 	{
 		errorPassed = (err.value() != 0) && (bytes == 0);
@@ -151,7 +151,7 @@ void SocketProactorTest::testUDPSocketProactor()
 		SocketAddress("127.0.0.1", echoServer.port()),
 		onSendCompletion);
 	Poco::Net::SocketProactor::Buffer buf(hello.size(), 0);
-	bool received = false, receivePassed = false;
+	std::atomic<bool> received(false), receivePassed(false);
 	SocketAddress sa;
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
 	{
@@ -229,7 +229,7 @@ void SocketProactorTest::testSocketProactorStartStop()
 		SocketAddress("127.0.0.1", echoServer.port()),
 		onSendCompletion);
 	Poco::Net::SocketProactor::Buffer buf(hello.size(), 0);
-	bool received = false, receivePassed = false;
+	std::atomic<bool> received(false), receivePassed(false);
 	SocketAddress sa;
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
 	{

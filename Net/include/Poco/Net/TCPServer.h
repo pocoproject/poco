@@ -27,6 +27,7 @@
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -227,7 +228,7 @@ private:
 	TCPServerDispatcher* _pDispatcher;
 	TCPServerConnectionFilter::Ptr _pConnectionFilter;
 	Poco::Thread _thread;
-	bool _stopped;
+	std::atomic<bool> _stopped;
 };
 
 

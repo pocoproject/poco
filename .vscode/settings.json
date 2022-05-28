@@ -89,12 +89,15 @@
 		"ranges": "cpp",
 		"cfenv": "cpp",
 		"__bits": "cpp",
-		"variant": "cpp"
+		"variant": "cpp",
+		"condition_variable": "cpp",
+		"valarray": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
         "**/bin": true,
         "**/obj": true
 	},
-	"git.ignoreLimitWarning": true
+	"git.ignoreLimitWarning": true,
+	"cmake.configureOnOpen": false
 }

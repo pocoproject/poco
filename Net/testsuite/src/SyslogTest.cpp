@@ -63,6 +63,7 @@ std::size_t CachingChannel::getMaxSize() const
 
 std::size_t CachingChannel::getCurrentSize() const
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	return _size;
 }
 

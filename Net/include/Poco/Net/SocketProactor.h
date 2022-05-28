@@ -319,6 +319,7 @@ private:
 			/// Runs the next I/O completion handler in the queue.
 		{
 			IONotification* pNf = dynamic_cast<IONotification*>(_nq.waitDequeueNotification());
+			if (_activity.isStopped()) return false;
 			if (pNf)
 			{
 				try

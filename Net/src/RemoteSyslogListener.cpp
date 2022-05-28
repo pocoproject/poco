@@ -96,7 +96,7 @@ public:
 private:
 	Poco::NotificationQueue& _queue;
 	DatagramSocket           _socket;
-	bool                     _stopped;
+	std::atomic<bool>        _stopped;
 };
 
 
@@ -190,7 +190,7 @@ private:
 
 private:
 	Poco::NotificationQueue& _queue;
-	bool                     _stopped;
+	std::atomic<bool>        _stopped;
 	RemoteSyslogListener*    _pListener;
 };
 

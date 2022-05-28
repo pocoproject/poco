@@ -38,7 +38,8 @@ class Poller : public Poco::Runnable
 {
 public:
 	Poller(PollSet& pollSet, const Timespan& timeout): _pollSet(pollSet),
-		_timeout(timeout)
+		_timeout(timeout),
+		_running(false)
 	{
 	}
 
@@ -57,7 +58,7 @@ public:
 private:
 	PollSet& _pollSet;
 	Timespan _timeout;
-	bool _running = false;
+	std::atomic<bool> _running;
 };
 
 
