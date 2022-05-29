@@ -119,6 +119,7 @@ private:
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
+	void recreatePersonTimestampTable();
 	void recreatePersonLongBLOBTable();
 	void recreatePersonJSONTable();
 	void recreateStringsTable();

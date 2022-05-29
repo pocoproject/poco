@@ -83,6 +83,7 @@ public:
 	void dateTime();
 	void date();
 	void time();
+	void timestamp();
 	void longBlob();
 	void json();
 	void unsignedInts();
