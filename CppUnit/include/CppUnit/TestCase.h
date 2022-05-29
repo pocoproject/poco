@@ -155,7 +155,9 @@ protected:
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	template <typename T1, typename T2>
+	template <typename T1, typename T2,
+		typename = typename std::enable_if<std::is_arithmetic<T1>::value, T1>::type,
+		typename = typename std::enable_if<std::is_arithmetic<T2>::value, T2>::type>
 	std::string notEqualsMessage(T1 expected, T2 actual)
 	{
 		return "expected: " + std::to_string(expected) + " but was: " + std::to_string(actual);
