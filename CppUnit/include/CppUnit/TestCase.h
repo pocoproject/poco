@@ -124,7 +124,9 @@ protected:
                                    long data2LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	template <typename T1, typename T2>
+	template <typename T1, typename T2,
+		typename = typename std::enable_if<std::is_arithmetic<T1>::value, T1>::type,
+		typename = typename std::enable_if<std::is_arithmetic<T2>::value, T2>::type>
 	void assertEquals(T1 expected,
 	                  T2 actual,
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
