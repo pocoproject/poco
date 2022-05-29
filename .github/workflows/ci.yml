@@ -1,5 +1,5 @@
 name: poco-ci
-on: [push]
+on: [push, pull_request]
 jobs:
   linux-gcc-make:
     runs-on: ubuntu-20.04
