@@ -52,7 +52,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_pDB(0),
 	_connected(false),
 	_isTransaction(false),
-	_transactionType(TransactionType::deferred)
+	_transactionType(TransactionType::DEFERRED)
 {
 	open();
 	setConnectionTimeout(loginTimeout);
@@ -91,13 +91,13 @@ void SessionImpl::begin()
 	SQLiteStatementImpl tmp(*this, _pDB);
 	switch (_transactionType)
 	{
-	case TransactionType::deferred:
+	case TransactionType::DEFERRED:
 		tmp.add(DEFERRED_BEGIN_TRANSACTION);
 		break;
-	case TransactionType::exclusive:
+	case TransactionType::EXCLUSIVE:
 		tmp.add(EXCLUSIVE_BEGIN_TRANSACTION);
 		break;
-	case TransactionType::immediate:
+	case TransactionType::IMMEDIATE:
 		tmp.add(IMMEDIATE_BEGIN_TRANSACTION);
 		break;
 	}

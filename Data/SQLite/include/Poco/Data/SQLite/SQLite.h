@@ -68,10 +68,11 @@ namespace SQLite {
 
 	extern const std::string TRANSACTION_TYPE_PROPERTY_KEY;
 
-	enum class TransactionType {
-		deferred,
-		exclusive,
-		immediate
+	enum class TransactionType
+	{
+		DEFERRED,
+		EXCLUSIVE,
+		IMMEDIATE
 	};
 
 } } } // namespace Poco::Data::SQLite

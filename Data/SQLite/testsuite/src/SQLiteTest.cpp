@@ -464,7 +464,7 @@ void SQLiteTest::testInsertCharPointer()
 
 	pc = (const char*) std::calloc(9, sizeof(char));
 	poco_check_ptr (pc);
-	std::strncpy((char*) pc, "lastname", 8);
+	std::strncpy((char*) pc, "lastname", 9);
 	Statement stmt = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
 		bind(pc),
 		bind("firstname"),
@@ -3205,7 +3205,7 @@ void SQLiteTest::testTransaction()
 	std::string result;
 
 	session.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
-	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::exclusive);
+	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::EXCLUSIVE);
 	{
 		Transaction trans(session);
 		assertTrue (trans.isActive());
@@ -3227,7 +3227,7 @@ void SQLiteTest::testTransaction()
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 	assertTrue (!session.isTransaction());
-	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::immediate);
+	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::IMMEDIATE);
 	{
 		Transaction trans(session);
 		session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
@@ -3442,10 +3442,10 @@ void SQLiteTest::testTransactionTypeProperty()
 		using namespace Poco::Data::SQLite;
 
 		Session tmp(Connector::KEY, "dummy.db");
-		tmp.setProperty(TRANSACTION_TYPE_PROPERTY_KEY, TransactionType::exclusive);
+		tmp.setProperty(TRANSACTION_TYPE_PROPERTY_KEY, TransactionType::EXCLUSIVE);
 		Poco::Any property = tmp.getProperty(TRANSACTION_TYPE_PROPERTY_KEY);
 		TransactionType value = Poco::RefAnyCast<TransactionType>(property);
-		assertTrue(value == TransactionType::exclusive);
+		assertTrue(value == TransactionType::EXCLUSIVE);
 	} catch (Poco::Exception&) {}
 }
 
