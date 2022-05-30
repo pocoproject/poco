@@ -43,9 +43,9 @@ class Foundation_API Message
 	/// caused the message.
 {
 public:
-    typedef std::map<std::string, std::string> StringMap;
-    
-    enum Priority
+	typedef std::map<std::string, std::string> StringMap;
+
+	enum Priority
 	{
 		PRIO_FATAL = 1,   /// A fatal error. The application will most likely terminate. This is the highest priority.
 		PRIO_CRITICAL,    /// A critical error. The application might not be able to continue running successfully.
@@ -180,10 +180,10 @@ public:
 		/// with the given name. If the parameter with the given name
 		/// does not exist, then defaultValue is returned.
 
-    const StringMap& getAll() const;
-    /// Returns a const reference to all the values
-    
-    void set(const std::string& param, const std::string& value);
+	const StringMap& getAll() const;
+		/// Returns a const reference to all the values
+
+	void set(const std::string& param, const std::string& value);
 		/// Sets the value for a parameter. If the parameter does
 		/// not exist, then it is created.
 

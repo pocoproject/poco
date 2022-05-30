@@ -277,12 +277,12 @@ const std::string& Message::get(const std::string& param, const std::string& def
 
 const Message::StringMap& Message::getAll() const
 {
-    static StringMap empty;
+	static StringMap empty;
 
-    if (_pMap)
-        return *_pMap;
+	if (_pMap)
+		return *_pMap;
 
-    return empty;
+	return empty;
 }
 
 void Message::set(const std::string& param, const std::string& value)
