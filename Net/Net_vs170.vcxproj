@@ -909,6 +909,7 @@
     <ClInclude Include="include\Poco\Net\SocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotification.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotifier.h"/>
+    <ClInclude Include="include\Poco\Net\SocketProactor.h"/>
     <ClInclude Include="include\Poco\Net\SocketReactor.h"/>
     <ClInclude Include="include\Poco\Net\SocketStream.h"/>
     <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h"/>
@@ -1197,6 +1198,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\SocketNotifier.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\SocketProactor.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\SocketReactor.cpp">
