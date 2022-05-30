@@ -326,7 +326,7 @@ std::size_t SHA2Engine::digestLength() const
 
 	switch (_algorithm)
 	{
-    case SHA_224:
+	case SHA_224:
 		result = 224;
 		break;
 	case SHA_256:
