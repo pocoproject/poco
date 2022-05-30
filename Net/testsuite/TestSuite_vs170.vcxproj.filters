@@ -309,6 +309,9 @@
     <ClInclude Include="src\SocketReactorTest.h">
       <Filter>Reactor\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\SocketProactorTest.h">
+      <Filter>Reactor\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\MailMessageTest.h">
       <Filter>Mail\Header Files</Filter>
     </ClInclude>
@@ -504,6 +507,9 @@
       <Filter>Reactor\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SocketReactorTest.cpp">
+      <Filter>Reactor\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketProactorTest.cpp">
       <Filter>Reactor\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MailMessageTest.cpp">

@@ -942,6 +942,7 @@
     <ClInclude Include="src\ReactorTestSuite.h"/>
     <ClInclude Include="src\SMTPClientSessionTest.h"/>
     <ClInclude Include="src\SocketAddressTest.h"/>
+    <ClInclude Include="src\SocketProactorTest.h"/>
     <ClInclude Include="src\SocketReactorTest.h"/>
     <ClInclude Include="src\SocketsTestSuite.h"/>
     <ClInclude Include="src\SocketStreamTest.h"/>
@@ -1113,6 +1114,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\SocketAddressTest.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\SocketProactorTest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\SocketReactorTest.cpp">
