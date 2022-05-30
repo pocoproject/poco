@@ -169,11 +169,11 @@ namespace
 		}
 		
 	private:
-		bool       _started;
-		bool       _cancelled;
-		bool       _finished;
-		Exception* _pException;
-		float      _progress;
+		std::atomic<bool> _started;
+		std::atomic<bool> _cancelled;
+		std::atomic<bool> _finished;
+		Exception*        _pException;
+		float             _progress;
 	};
 
 
