@@ -74,7 +74,7 @@ private:
 	Poco::Thread             _thread;
 	Poco::Event              _ready;
 	mutable Poco::FastMutex  _mutex;
-	bool                     _stop;
+	std::atomic<bool>        _stop;
 	std::vector<std::string> _nextResponses;
 	std::vector<std::string> _lastCommands;
 	bool                     _acceptCommands;
