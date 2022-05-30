@@ -93,6 +93,7 @@ public:
 		HTTP_UNPROCESSABLE_ENTITY            = 422,
 		HTTP_LOCKED                          = 423,
 		HTTP_FAILED_DEPENDENCY               = 424,
+		HTTP_TOO_EARLY                       = 425,
 		HTTP_UPGRADE_REQUIRED                = 426,
 		HTTP_PRECONDITION_REQUIRED           = 428,
 		HTTP_TOO_MANY_REQUESTS               = 429,
@@ -243,6 +244,7 @@ public:
 	static const std::string HTTP_REASON_UNPROCESSABLE_ENTITY;
 	static const std::string HTTP_REASON_LOCKED;
 	static const std::string HTTP_REASON_FAILED_DEPENDENCY;
+	static const std::string HTTP_REASON_TOO_EARLY;
 	static const std::string HTTP_REASON_UPGRADE_REQUIRED;
 	static const std::string HTTP_REASON_PRECONDITION_REQUIRED;
 	static const std::string HTTP_REASON_TOO_MANY_REQUESTS;
