@@ -148,7 +148,7 @@ private:
 	std::string       _name;
 	TaskManager*      _pOwner;
 	float             _progress;
-	TaskState         _state;
+	std::atomic<TaskState> _state;
 	Event             _cancelEvent;
 	mutable FastMutex _mutex;
 	
