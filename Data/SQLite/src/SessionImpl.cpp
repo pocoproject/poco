@@ -38,7 +38,7 @@ namespace Poco {
 namespace Data {
 namespace SQLite {
 
-const std::string TRANSACTION_TYPE_PROPERTY_KEY = "transactionType";
+
 const std::string SessionImpl::DEFERRED_BEGIN_TRANSACTION("BEGIN DEFERRED");
 const std::string SessionImpl::EXCLUSIVE_BEGIN_TRANSACTION("BEGIN EXCLUSIVE");
 const std::string SessionImpl::IMMEDIATE_BEGIN_TRANSACTION("BEGIN IMMEDIATE");
@@ -61,7 +61,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 	addProperty("connectionTimeout", &SessionImpl::setConnectionTimeout, &SessionImpl::getConnectionTimeout);
-	addProperty(TRANSACTION_TYPE_PROPERTY_KEY, &SessionImpl::setTransactionType, &SessionImpl::getTransactionType);
+	addProperty(Utility::TRANSACTION_TYPE_PROPERTY_KEY, &SessionImpl::setTransactionType, &SessionImpl::getTransactionType);
 }
 
 

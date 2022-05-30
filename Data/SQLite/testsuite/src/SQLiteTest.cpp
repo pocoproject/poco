@@ -3205,7 +3205,8 @@ void SQLiteTest::testTransaction()
 	std::string result;
 
 	session.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
-	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::EXCLUSIVE);
+	session.setProperty(Poco::Data::SQLite::Utility::TRANSACTION_TYPE_PROPERTY_KEY,
+		Poco::Data::SQLite::TransactionType::EXCLUSIVE);
 	{
 		Transaction trans(session);
 		assertTrue (trans.isActive());
@@ -3227,7 +3228,8 @@ void SQLiteTest::testTransaction()
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 	assertTrue (!session.isTransaction());
-	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::IMMEDIATE);
+	session.setProperty(Utility::TRANSACTION_TYPE_PROPERTY_KEY,
+		Poco::Data::SQLite::TransactionType::IMMEDIATE);
 	{
 		Transaction trans(session);
 		session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
@@ -3442,8 +3444,8 @@ void SQLiteTest::testTransactionTypeProperty()
 		using namespace Poco::Data::SQLite;
 
 		Session tmp(Connector::KEY, "dummy.db");
-		tmp.setProperty(TRANSACTION_TYPE_PROPERTY_KEY, TransactionType::EXCLUSIVE);
-		Poco::Any property = tmp.getProperty(TRANSACTION_TYPE_PROPERTY_KEY);
+		tmp.setProperty(Utility::TRANSACTION_TYPE_PROPERTY_KEY, TransactionType::EXCLUSIVE);
+		Poco::Any property = tmp.getProperty(Utility::TRANSACTION_TYPE_PROPERTY_KEY);
 		TransactionType value = Poco::RefAnyCast<TransactionType>(property);
 		assertTrue(value == TransactionType::EXCLUSIVE);
 	} catch (Poco::Exception&) {}

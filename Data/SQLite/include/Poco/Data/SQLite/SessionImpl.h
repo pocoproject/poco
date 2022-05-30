@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/AbstractSessionImpl.h"
@@ -119,6 +120,7 @@ public:
 
 	void setTransactionType(TransactionType transactionType);
 		/// Sets begin transaction type for the session.
+
 	TransactionType getTransactionType() const;
 		/// Returns begin transaction type.
 

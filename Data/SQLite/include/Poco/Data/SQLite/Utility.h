@@ -43,6 +43,17 @@ class SQLite_API Utility
 	/// Various utility functions for SQLite.
 {
 public:
+
+	// SQLite Transaction type
+	static const std::string TRANSACTION_TYPE_PROPERTY_KEY;
+
+	enum class TransactionType
+	{
+		DEFERRED,
+		EXCLUSIVE,
+		IMMEDIATE
+	};
+
 	static const std::string SQLITE_DATE_FORMAT;
 	static const std::string SQLITE_TIME_FORMAT;
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
@@ -208,6 +219,9 @@ private:
 	static Poco::Mutex _mutex;
 	static int         _threadMode;
 };
+
+
+using TransactionType = Utility::TransactionType;
 
 
 //
