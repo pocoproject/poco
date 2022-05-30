@@ -137,6 +137,7 @@ public:
 	void testFTS3();
 
 	void testIllegalFilePath();
+	void testTransactionTypeProperty();
 
 	void setUp();
 	void tearDown();

@@ -3205,7 +3205,7 @@ void SQLiteTest::testTransaction()
 	std::string result;
 
 	session.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
-
+	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::exclusive);
 	{
 		Transaction trans(session);
 		assertTrue (trans.isActive());
@@ -3227,7 +3227,7 @@ void SQLiteTest::testTransaction()
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 	assertTrue (!session.isTransaction());
-
+	session.setProperty(Poco::Data::SQLite::TRANSACTION_TYPE_PROPERTY_KEY, Poco::Data::SQLite::TransactionType::immediate);
 	{
 		Transaction trans(session);
 		session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
@@ -3436,6 +3436,19 @@ void SQLiteTest::testIllegalFilePath()
 	}
 }
 
+void SQLiteTest::testTransactionTypeProperty() 
+{
+	try {
+		using namespace Poco::Data::SQLite;
+
+		Session tmp(Connector::KEY, "dummy.db");
+		tmp.setProperty(TRANSACTION_TYPE_PROPERTY_KEY, TransactionType::exclusive);
+		Poco::Any property = tmp.getProperty(TRANSACTION_TYPE_PROPERTY_KEY);
+		TransactionType value = Poco::RefAnyCast<TransactionType>(property);
+		assertTrue(value == TransactionType::exclusive);
+	} catch (Poco::Exception&) {}
+}
+
 
 void SQLiteTest::setUp()
 {
@@ -3540,6 +3553,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
+	CppUnit_addTest(pSuite, SQLiteTest, testTransactionTypeProperty);
 
 	return pSuite;
 }
