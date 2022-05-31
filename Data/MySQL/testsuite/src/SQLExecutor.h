@@ -85,6 +85,7 @@ public:
 	void time();
 	void timestamp();
 	void longBlob();
+	void longText();
 	void json();
 	void unsignedInts();
 	void floats();

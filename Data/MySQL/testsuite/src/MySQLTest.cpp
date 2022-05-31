@@ -479,6 +479,14 @@ void MySQLTest::testLongBLOB()
 	_pExecutor->longBlob();
 }
 
+void MySQLTest::testLongTEXT()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonLongBLOBTable();
+	_pExecutor->longText();
+}
+
 void MySQLTest::testJSON()
 {
 	if (!_pSession) fail("Test not available.");
@@ -966,6 +974,7 @@ CppUnit::Test* MySQLTest::suite()
 	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, MySQLTest, testLongBLOB);
+	CppUnit_addTest(pSuite, MySQLTest, testLongTEXT);
 	CppUnit_addTest(pSuite, MySQLTest, testJSON);
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
