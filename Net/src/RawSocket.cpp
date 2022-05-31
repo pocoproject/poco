@@ -54,11 +54,13 @@ RawSocket::RawSocket(const RawSocket& socket): Socket(socket)
 {
 }
 
+#ifdef POCO_NEW_STATE_ON_MOVE
 
 RawSocket::RawSocket(RawSocket&& socket): Socket(std::move(socket))
 {
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 RawSocket::RawSocket(SocketImpl* pImpl): Socket(pImpl)
 {
@@ -82,6 +84,8 @@ RawSocket& RawSocket::operator = (const Socket& socket)
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
 RawSocket& RawSocket::operator = (Socket&& socket)
 {
 	if (dynamic_cast<RawSocketImpl*>(socket.impl()))
@@ -91,6 +95,7 @@ RawSocket& RawSocket::operator = (Socket&& socket)
 	return *this;
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 RawSocket& RawSocket::operator = (const RawSocket& socket)
 {
@@ -99,12 +104,15 @@ RawSocket& RawSocket::operator = (const RawSocket& socket)
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
 RawSocket& RawSocket::operator = (RawSocket&& socket)
 {
 	Socket::operator = (std::move(socket));
 	return *this;
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 void RawSocket::connect(const SocketAddress& address)
 {

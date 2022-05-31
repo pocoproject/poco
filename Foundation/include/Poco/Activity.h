@@ -143,6 +143,7 @@ public:
 		if (_running)
 		{
 			_done.wait();
+			_running = false;
 		}
 	}
 
@@ -154,6 +155,7 @@ public:
 		if (_running)
 		{
 			_done.wait(milliseconds);
+			_running = false;
 		}
 	}
 	
@@ -178,11 +180,9 @@ protected:
 		}
 		catch (...)
 		{
-			_running = false;
 			_done.set();
 			throw;
 		}
-		_running = false;
 		_done.set();
 	}
 	

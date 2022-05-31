@@ -112,6 +112,16 @@ StreamSocket& StreamSocket::operator = (StreamSocket&& socket)
 
 #endif // POCO_NEW_STATE_ON_MOVE
 
+
+void StreamSocket::bind(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	if (address.family() == IPAddress::IPv4)
+		impl()->bind(address, reuseAddress);
+	else
+		impl()->bind6(address, reuseAddress, ipV6Only);
+}
+
+
 void StreamSocket::connect(const SocketAddress& address)
 {
 	impl()->connect(address);

@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/AbstractSessionImpl.h"
@@ -117,6 +118,12 @@ public:
 	bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
 
+	void setTransactionType(TransactionType transactionType);
+		/// Sets begin transaction type for the session.
+
+	TransactionType getTransactionType() const;
+		/// Returns begin transaction type.
+
 	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
@@ -124,16 +131,20 @@ protected:
 	void setConnectionTimeout(const std::string& prop, const Poco::Any& value);
 	Poco::Any getConnectionTimeout(const std::string& prop) const;
 
+	void setTransactionType(const std::string &prop, const Poco::Any& value);
+	Poco::Any getTransactionType(const std::string& prop) const;
 private:
 	std::string _connector;
 	sqlite3*    _pDB;
 	bool        _connected;
 	bool        _isTransaction;
+	TransactionType _transactionType;
 	int         _timeout;
 	mutable
 	Poco::Mutex _mutex;
-
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
+	static const std::string EXCLUSIVE_BEGIN_TRANSACTION;
+	static const std::string IMMEDIATE_BEGIN_TRANSACTION; 
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
 };
@@ -148,7 +159,7 @@ inline bool SessionImpl::canTransact() const
 }
 
 
-inline 	bool SessionImpl::isTransaction() const
+inline bool SessionImpl::isTransaction() const
 {
 	return _isTransaction;
 }
@@ -165,6 +176,10 @@ inline std::size_t SessionImpl::getConnectionTimeout() const
 	return static_cast<std::size_t>(_timeout/1000);
 }
 
+inline TransactionType SessionImpl::getTransactionType() const
+{
+	return _transactionType;
+}
 
 } } } // namespace Poco::Data::SQLite
 

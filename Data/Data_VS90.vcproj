@@ -584,6 +584,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\JSONRowFormatter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Limit.h"
 					>
 				</File>
@@ -721,6 +725,10 @@
 				</File>
 				<File
 					RelativePath=".\src\DynamicLOB.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\JSONRowFormatter.cpp"
 					>
 				</File>
 				<File

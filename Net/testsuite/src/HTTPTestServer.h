@@ -51,7 +51,7 @@ private:
 	Poco::Net::ServerSocket  _socket;
 	Poco::Thread _thread;
 	Poco::Event  _ready;
-	bool         _stop;
+	std::atomic<bool> _stop;
 	std::string  _lastRequest;
 };
 

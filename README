@@ -186,8 +186,8 @@ BUILDING ON UNIX/LINUX/macOS
 ============================
 
 For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 3.80 (or newer), with the help
-from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on
+build system. The build system is based on GNU Make 5.0 (or newer), with the help
+from a few shell scripts. If you do not have GNU Make 5.0 (or later) installed on
 your machine, you will need to download it from
 http://directory.fsf.org/devel/build/make.html>,
 build and install it prior to building the POCO C++ Libraries.

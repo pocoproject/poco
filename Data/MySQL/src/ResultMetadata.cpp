@@ -61,6 +61,7 @@ namespace
 		case MYSQL_TYPE_DATE:
 		case MYSQL_TYPE_TIME:
 		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			return sizeof(MYSQL_TIME);
 
 		case MYSQL_TYPE_DECIMAL:
@@ -118,6 +119,7 @@ namespace
 			return Poco::Data::MetaColumn::FDT_TIME;
 			
 		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			return Poco::Data::MetaColumn::FDT_TIMESTAMP;
 			
 		case MYSQL_TYPE_STRING:

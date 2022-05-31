@@ -134,39 +134,32 @@ public:
 
 	void onReadable(ReadableNotification* pNotification)
 	{
+		unregisterConnector();
 		pNotification->release();
 		int err = _socket.impl()->socketError(); 
-		if (err)
-		{
-			onError(err);
-			unregisterConnector();
-		}
-		else
-		{
-			onConnect();
-		}
+		if (err) onError(err);
+		else onConnect();
 	}
 	
 	void onWritable(WritableNotification* pNotification)
 	{
+		unregisterConnector();
 		pNotification->release();
 		onConnect();
+	}
+
+	void onError(ErrorNotification* pNotification)
+	{
+		unregisterConnector();
+		pNotification->release();
+		onError(_socket.impl()->socketError());
 	}
 
 	void onConnect()
 	{
 		_socket.setBlocking(true);
 		createServiceHandler();
-		unregisterConnector();
 	}
-
-	void onError(ErrorNotification* pNotification)
-	{
-		pNotification->release();
-		onError(_socket.impl()->socketError());
-		unregisterConnector();
-	}
-
 
 protected:
 	virtual ServiceHandler* createServiceHandler()

@@ -28,6 +28,8 @@ public:
 	void testSHA256();
 	void testSHA384();
 	void testSHA512();
+	void testSHA512_224();
+	void testSHA512_256();
 
 	void setUp();
 	void tearDown();

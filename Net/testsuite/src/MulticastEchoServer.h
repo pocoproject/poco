@@ -61,7 +61,7 @@ private:
 	Poco::Net::NetworkInterface _if;
 	Poco::Thread _thread;
 	Poco::Event  _ready;
-	bool         _stop;
+	std::atomic<bool> _stop;
 };
 
 

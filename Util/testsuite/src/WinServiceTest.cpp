@@ -44,9 +44,9 @@ void WinServiceTest::testServiceReturnsFailureActionConfigured()
 	auto failureActions = spoolerService.getFailureActions();
 	assertEqual(3, static_cast<int>(failureActions.size()));
 
-	assertEqual(WinService::SVC_RESTART, failureActions[0]);
-	assertEqual(WinService::SVC_RESTART, failureActions[1]);
-	assertEqual(WinService::SVC_NONE, failureActions[2]);
+	assertTrue(WinService::SVC_RESTART == failureActions[0]);
+	assertTrue(WinService::SVC_RESTART == failureActions[1]);
+	assertTrue(WinService::SVC_NONE == failureActions[2]);
 }
 
 

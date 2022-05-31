@@ -384,6 +384,15 @@ namespace
 	};
 
 	DataServiceHandler::Data DataServiceHandler::_data;
+
+	class SleepClientServiceHandler
+	{
+	public:
+		SleepClientServiceHandler(Poco::Net::StreamSocket& socket, Poco::Net::SocketReactor& reactor)
+		{
+			Poco::Thread::sleep(500);
+		}
+	};
 }
 
 
@@ -576,6 +585,25 @@ void SocketReactorTest::testDataCollection()
 }
 
 
+void SocketReactorTest::testSocketConnectorDeadlock()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	SocketReactor reactor;
+	Thread thread;
+	int i = 0;
+	while (++i < 10)
+	{
+		auto sc = new SocketConnector<SleepClientServiceHandler>(sa, reactor);
+		thread.startFunc([&reactor]() { reactor.run(); });
+		reactor.stop();
+		thread.join();
+		delete sc;
+	}
+}
+
+
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -597,6 +625,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorFail);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorTimeout);
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
+	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
 
 	return pSuite;
 }

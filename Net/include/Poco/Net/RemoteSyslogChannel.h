@@ -132,6 +132,9 @@ public:
 	static void registerChannel();
 		/// Registers the channel with the global LoggingFactory.
 
+	static const char* facilityToString(Facility facility);
+		/// Returns the string describing the SyslogFacility
+
 	static const std::string PROP_NAME;
 	static const std::string PROP_FACILITY;
 	static const std::string PROP_FORMAT;

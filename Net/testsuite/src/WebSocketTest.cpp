@@ -123,7 +123,9 @@ void WebSocketTest::testWebSocket()
 	HTTPResponse response;
 	WebSocket ws0 = WebSocket(cs, request, response);
 	WebSocket ws(std::move(ws0));
+#ifdef POCO_NEW_STATE_ON_MOVE
 	assertTrue(ws0.impl() == nullptr);
+#endif
 
 	std::string payload("x");
 	ws.sendFrame(payload.data(), (int) payload.size());

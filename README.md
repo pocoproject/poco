@@ -1,6 +1,7 @@
 ![alt text][logo]
 
 [![poco-ci](https://github.com/pocoproject/poco/actions/workflows/ci.yml/badge.svg?branch=poco-1.11.2)](https://github.com/pocoproject/poco/actions/workflows/ci.yml)
+
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
 

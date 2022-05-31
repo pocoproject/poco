@@ -49,7 +49,7 @@ private:
 	Poco::Net::DatagramSocket _socket;
 	Poco::Thread _thread;
 	Poco::Event  _ready;
-	bool         _stop;
+	std::atomic<bool> _stop;
 };
 
 

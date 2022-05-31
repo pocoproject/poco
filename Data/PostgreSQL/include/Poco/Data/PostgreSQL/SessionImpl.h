@@ -111,6 +111,19 @@ public:
 	bool isAsynchronousCommit(const std::string& aName = std::string()) const;
 		/// is the connection in Asynchronous commit mode?
 
+	void setBinaryExtraction(const std::string& feature, bool enabled);
+		/// Sets the "binaryExtraction" feature. If set, column values received from
+		/// PostgreSQL client will be extracted as binary values. This improves
+		/// extraction performance, but will not work with all types.
+		///
+		/// If not set, all column values will be extracted as strings. This gives
+		/// lower performance, but allows to extract also types not supported
+		/// directly by Poco::Data.
+
+	bool isBinaryExtraction(const std::string& feature = std::string()) const;
+		/// Returns true if binary extraction is enabled, otherwise false.
+		/// See setBinaryExtraction() for more information.
+
 	SessionHandle& handle();
 		/// Get handle
 
@@ -120,7 +133,8 @@ public:
 private:
 	std::string	          _connectorName;
 	mutable SessionHandle _sessionHandle;
-	std::size_t           _timeout;
+	std::size_t           _timeout = 0;
+	bool                  _binaryExtraction = false;
 };
 
 
@@ -156,6 +170,12 @@ inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 aTI) const
 inline std::size_t SessionImpl::getConnectionTimeout() const
 {
 	return _timeout;
+}
+
+
+inline bool SessionImpl::isBinaryExtraction(const std::string&) const
+{
+	return _binaryExtraction;
 }
 
 

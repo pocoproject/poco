@@ -425,15 +425,33 @@ private:
 	template <typename F, typename T>
 	void checkUpperLimitFloat(const F& from) const
 	{
-		if (from > std::numeric_limits<T>::max())
-			throw RangeException("Value too large.");
+		if (std::is_floating_point<T>::value)
+		{
+			if (from > std::numeric_limits<T>::max())
+				throw RangeException("Value too large.");
+		}
+		else
+		{
+			// Avoid clang -Wimplicit-int-float-conversion warning with an explicit cast.
+			if (from > static_cast<F>(std::numeric_limits<T>::max()))
+				throw RangeException("Value too large.");
+		}
 	}
 
 	template <typename F, typename T>
 	void checkLowerLimitFloat(const F& from) const
 	{
-		if (from < -std::numeric_limits<T>::max())
-			throw RangeException("Value too small.");
+		if (std::is_floating_point<T>::value)
+		{
+			if (from < -std::numeric_limits<T>::max())
+				throw RangeException("Value too small.");
+		}
+		else
+		{
+			// Avoid clang -Wimplicit-int-float-conversion warning with an explicit cast.
+			if (from < static_cast<F>(std::numeric_limits<T>::min()))
+				throw RangeException("Value too small.");
+		}
 	}
 
 	template <typename F, typename T>

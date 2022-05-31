@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
       <Configuration>debug_shared</Configuration>
@@ -157,7 +157,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>14.0.25420.1</_ProjectFileVersion>
+    <_ProjectFileVersion>16.0.32002.118</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoNetd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetmtd</TargetName>
@@ -644,6 +644,7 @@
     <ClInclude Include="include\Poco\Net\SocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotification.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotifier.h"/>
+    <ClInclude Include="include\Poco\Net\SocketProactor.h"/>
     <ClInclude Include="include\Poco\Net\SocketReactor.h"/>
     <ClInclude Include="include\Poco\Net\SocketStream.h"/>
     <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h"/>
@@ -932,6 +933,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\SocketNotifier.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\SocketProactor.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\SocketReactor.cpp">

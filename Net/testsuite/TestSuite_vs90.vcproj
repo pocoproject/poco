@@ -1054,6 +1054,10 @@
 					RelativePath=".\src\SocketReactorTest.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\SocketProactorTest.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -1064,6 +1068,10 @@
 				</File>
 				<File
 					RelativePath=".\src\SocketReactorTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SocketProactorTest.cpp"
 					>
 				</File>
 			</Filter>

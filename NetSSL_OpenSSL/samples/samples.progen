@@ -5,4 +5,5 @@ vc.solution.include = \
 	download\\download;\
 	HTTPSTimeServer\\HTTPSTimeServer;\
 	Mail\\Mail;\
+	SetSourceIP\\SetSourceIP;\
 	TwitterClient\\TwitterClient

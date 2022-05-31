@@ -116,7 +116,24 @@ public:
 		return _connection;
 	}
 
+#if defined(POCO_ENABLE_CPP11)
+	// Disable copy to prevent unwanted release of resources: C++11 way
+    PooledConnection(const PooledConnection&) = delete;
+    PooledConnection& operator=(const PooledConnection&) = delete;
+
+    // Enable move semantics
+    PooledConnection(PooledConnection&& other) = default;
+    PooledConnection& operator=(PooledConnection&&) = default;
+#endif
+
 private:
+
+#if ! defined(POCO_ENABLE_CPP11)
+	// Disable copy to prevent unwanted release of resources: pre C++11 way
+    PooledConnection(const PooledConnection&);
+    PooledConnection& operator=(const PooledConnection&);
+#endif
+
 	Poco::ObjectPool<Connection, Connection::Ptr>& _pool;
 	Connection::Ptr _connection;
 };
