@@ -80,6 +80,7 @@ public:
 	void testBLOB();
 	void testBLOBStmt();
 	void testLongBLOB();
+	void testLongTEXT();
 	void testJSON();
 
 	void testUnsignedInts();
