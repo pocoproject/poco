@@ -255,16 +255,28 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
+	const std::string MARIADB_SERVERINFO = "MariaDB";
+
 	std::string isolation;
+	std::string serverInfo = Utility::serverInfo(_handle);
 	unsigned long version = Utility::serverVersion(_handle);
-	if (version >= 80000)
-	{
-		getSetting("transaction_isolation", isolation);
-		isolation = isolation.c_str();
-	}
-	else
+
+	if (serverInfo.find(MARIADB_SERVERINFO) != std::string::npos) //MariaDB
 	{
 		getSetting("tx_isolation", isolation);
+		isolation = isolation.c_str();
+	}
+	else //MySQL
+	{
+		if (version >= 80000)
+		{
+			getSetting("transaction_isolation", isolation);
+			isolation = isolation.c_str();
+		}
+		else
+		{
+			getSetting("tx_isolation", isolation);
+		}
 	}
 	Poco::replaceInPlace(isolation, "-", " ");
 	if (MYSQL_READ_UNCOMMITTED == isolation)
