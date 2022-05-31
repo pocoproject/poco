@@ -255,13 +255,13 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
-	const std::string MARIADB_HOSTINFO_SUFFIX = "MariaDB";
+	const std::string MARIADB_SERVERINFO_SUFFIX = "MariaDB";
 
 	std::string isolation;
 	std::string serverInfo = Utility::serverInfo(_handle);
 	unsigned long version = Utility::serverVersion(_handle);
 
-	if (Poco::endsWith(serverInfo, MARIADB_HOSTINFO_SUFFIX)) //MariaDB
+	if (Poco::endsWith(serverInfo, MARIADB_SERVERINFO_SUFFIX)) //MariaDB
 	{
 		getSetting("tx_isolation", isolation);
 		isolation = isolation.c_str();
