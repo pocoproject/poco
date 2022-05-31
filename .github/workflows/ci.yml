@@ -60,11 +60,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
+      - run: POCO_BASE=`pwd` ./configure --everything --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
       - run: >-
           sudo -s
           EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
-          TSAN_OPTIONS="suppressions=./tsan.supress,second_deadlock_stack=1"
+          TSAN_OPTIONS="suppressions=$POCO_BASE/tsan.supress,second_deadlock_stack=1"
           ./ci/runtests.sh
 
   linux-gcc-cmake:

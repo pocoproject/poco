@@ -28,6 +28,7 @@ public:
 	void testVoid();
 	void testVoidIn();
 	void testVoidInOut();
+	void testActiveDispatcher();
 
 	void setUp();
 	void tearDown();
