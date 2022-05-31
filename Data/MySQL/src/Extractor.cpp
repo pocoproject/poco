@@ -134,6 +134,9 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 	if (columnType == Poco::Data::MetaColumn::FDT_JSON && !extractJSON(pos))
 		return false;
 
+	if (columnType == Poco::Data::MetaColumn::FDT_BLOB && !extractLongLOB(pos))
+		return false;
+
 	val.assign(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
 }
