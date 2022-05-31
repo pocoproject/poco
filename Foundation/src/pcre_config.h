@@ -101,11 +101,6 @@ sure both macros are undefined; an emulation function will then be used. */
 #define HAVE_MEMMOVE 0
 #endif
 
-/* Define to 1 if you have the <memory.h> header file. */
-#ifndef HAVE_MEMORY_H
-#define HAVE_MEMORY_H 1
-#endif
-
 /* Define if you have POSIX threads libraries and header files. */
 #ifndef HAVE_PTHREAD
 #define HAVE_PTHREAD 0
@@ -129,6 +124,11 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to 1 if you have the <stdint.h> header file. */
 #ifndef HAVE_STDINT_H
 #define HAVE_STDINT_H 0
+#endif
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#ifndef HAVE_STDIO_H
+#define HAVE_STDIO_H 1
 #endif
 
 /* Define to 1 if you have the <stdlib.h> header file. */
@@ -215,8 +215,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define LINK_SIZE 2
 #endif
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 /* This is ignored unless you are using libtool. */
 #ifndef LT_OBJDIR
 #define LT_OBJDIR ".libs/"
@@ -347,7 +346,9 @@ sure both macros are undefined; an emulation function will then be used. */
    your system. */
 /* #undef PTHREAD_CREATE_JOINABLE */
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #ifndef STDC_HEADERS
 #define STDC_HEADERS 1
 #endif
@@ -400,7 +401,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* #undef SUPPORT_VALGRIND */
 
 /* Version number of package */
-#define VERSION "8.44"
+#define VERSION "8.45"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
