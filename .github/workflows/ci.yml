@@ -32,6 +32,8 @@ jobs:
           MYSQL_USER: pocotest
           MYSQL_PASSWORD: pocotest
           MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
