@@ -793,8 +793,8 @@ void MySQLTest::recreatePersonJSONTable()
 {
 	dropTable("Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Biography JSON)", now; }
-	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail("recreatePersonLongBLOBTable()"); }
-	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail("recreatePersonLongBLOBTable()"); }
+	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail("recreatePersonJSONTable()"); }
+	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail("recreatePersonJSONTable()"); }
 }
 
 
