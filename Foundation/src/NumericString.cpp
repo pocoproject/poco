@@ -13,7 +13,7 @@
 
 
 #include "Poco/Bugcheck.h"
-
+#include "Poco/NumericString.h"
 
 // +++ double conversion +++
 // don't collide with standalone double_conversion library
@@ -30,7 +30,6 @@
 #include "string-to-double.cc"
 // --- double conversion ---
 
-#include "Poco/NumericString.h"
 poco_static_assert(POCO_MAX_FLT_STRING_LEN == double_conversion::kMaxSignificantDecimalDigits);
 #include "Poco/String.h"
 #include <memory>
