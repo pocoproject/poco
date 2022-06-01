@@ -19,14 +19,15 @@
 // don't collide with standalone double_conversion library
 #define double_conversion poco_double_conversion
 #define UNIMPLEMENTED poco_bugcheck
-#include "diy-fp.cc"
+#include "double-conversion.h"
 #include "cached-powers.cc"
 #include "bignum-dtoa.cc"
 #include "bignum.cc"
 #include "fast-dtoa.cc"
 #include "fixed-dtoa.cc"
 #include "strtod.cc"
-#include "double-conversion.cc"
+#include "double-to-string.cc"
+#include "string-to-double.cc"
 // --- double conversion ---
 
 #include "Poco/NumericString.h"
