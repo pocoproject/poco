@@ -308,6 +308,35 @@ void PollSetTest::testPollSetWakeUp()
 }
 
 
+void PollSetTest::testClear()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	PollSet ps;
+
+	ps.add(ss, PollSet::POLL_READ);
+	PollSet::SocketModeMap sm = ps.poll(0);
+	assertTrue(sm.empty());
+
+	ss.sendBytes("hello", 5);
+	assertTrue(ps.poll(100000).size() == 1);
+
+	char buffer[5];
+	ss.receiveBytes(buffer, sizeof(buffer));
+
+	ps.clear();
+	ps.add(ss, PollSet::POLL_READ);
+	sm = ps.poll(0);
+	assertTrue(sm.empty());
+
+	ss.sendBytes(buffer, 5);
+	assertTrue(ps.poll(100000).size() == 1);
+
+	ss.receiveBytes(buffer, sizeof(buffer));
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -328,6 +357,7 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testPollNoServer);
 	CppUnit_addTest(pSuite, PollSetTest, testPollClosedServer);
 	CppUnit_addTest(pSuite, PollSetTest, testPollSetWakeUp);
+	CppUnit_addTest(pSuite, PollSetTest, testClear);
 
 	return pSuite;
 }

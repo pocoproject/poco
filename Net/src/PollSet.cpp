@@ -129,15 +129,17 @@ public:
 
 	void clear()
 	{
-		ScopedLock lock(_mutex);
-
-		::close(_epollfd);
-		_socketMap.clear();
-		_epollfd = epoll_create(1);
-		if (_epollfd < 0)
 		{
-			SocketImpl::error();
+			ScopedLock lock(_mutex);
+
+			::close(_epollfd);
+			_socketMap.clear();
+			_epollfd = epoll_create(1);
+			if (_epollfd < 0) SocketImpl::error();
 		}
+		::close(_eventfd.exchange(0));
+		_eventfd = eventfd(0, 0);
+		addImpl(_eventfd, PollSet::POLL_READ, 0);
 	}
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)

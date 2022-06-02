@@ -30,6 +30,7 @@ public:
 	void testPollNoServer();
 	void testPollClosedServer();
 	void testPollSetWakeUp();
+	void testClear();
 
 	void setUp();
 	void tearDown();
