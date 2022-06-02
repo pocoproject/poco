@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
     defined(__hppa__) || defined(__ia64__) || \
     defined(__mips__) || \
     defined(__loongarch__) || \
-    defined(__nios2__) || defined(__ghs) || \
+    defined(nios2) || defined(__nios2) || defined(__nios2__) || defined(__ghs) || \
     defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
     defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \
     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
