@@ -78,6 +78,7 @@ public:
 	using ResultPtr = SharedPtr<Result>;
 	using AsyncExecMethod = ActiveMethod<std::size_t, bool, StatementImpl>;
 	using AsyncExecMethodPtr = SharedPtr<AsyncExecMethod>;
+	using State = StatementImpl::State;
 
 	static const int WAIT_FOREVER = -1;
 
@@ -384,6 +385,9 @@ public:
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
+
+	State state() const;
+		/// Returns the statement state.
 
 protected:
 	using ImplPtr = StatementImpl::Ptr;
@@ -788,6 +792,12 @@ inline bool Statement::isBulkExtraction() const
 inline bool Statement::isAsync() const
 {
 	return _async;
+}
+
+
+inline Statement::State Statement::state() const
+{
+	return _pImpl->getState();
 }
 
 

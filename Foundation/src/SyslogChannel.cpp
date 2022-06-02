@@ -69,7 +69,8 @@ void SyslogChannel::close()
 void SyslogChannel::log(const Message& msg)
 {
 	if (!_open) open();
-	syslog(getPrio(msg), "%s", msg.getText().c_str());
+	const int pri = getPrio(msg) + _facility;
+	syslog(pri, "%s", msg.getText().c_str());
 }
 
 

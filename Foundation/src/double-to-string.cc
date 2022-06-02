@@ -108,7 +108,7 @@ void DoubleToStringConverter::CreateExponentialRepresentation(
   }
   // Add prefix '0' to make exponent width >= min(min_exponent_with_, kMaxExponentLength)
   // For example: convert 1e+9 -> 1e+09, if min_exponent_with_ is set to 2
-  while(kMaxExponentLength - first_char_pos < (std::min)(min_exponent_width_, kMaxExponentLength)) {
+  while(kMaxExponentLength - first_char_pos < std::min(min_exponent_width_, kMaxExponentLength)) {
     buffer[--first_char_pos] = '0';
   }
   result_builder->AddSubstring(&buffer[first_char_pos],
@@ -334,12 +334,12 @@ bool DoubleToStringConverter::ToPrecision(double value,
   if ((flags_ & NO_TRAILING_ZERO) != 0) {
     // Truncate trailing zeros that occur after the decimal point (if exponential,
     // that is everything after the first digit).
-    int stop = as_exponential ? 1 : (std::max)(1, decimal_point);
+    int stop = as_exponential ? 1 : std::max(1, decimal_point);
     while (decimal_rep_length > stop && decimal_rep[decimal_rep_length - 1] == '0') {
       --decimal_rep_length;
     }
     // Clamp precision to avoid the code below re-adding the zeros.
-    precision = (std::min)(precision, decimal_rep_length);
+    precision = std::min(precision, decimal_rep_length);
   }
   if (as_exponential) {
     // Fill buffer to contain 'precision' digits.

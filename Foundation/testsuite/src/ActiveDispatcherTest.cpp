@@ -16,6 +16,8 @@
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
+#include "Poco/Environment.h"
+#include <iostream>
 
 
 using Poco::ActiveDispatcher;
@@ -25,6 +27,7 @@ using Poco::ActiveStarter;
 using Poco::Thread;
 using Poco::Event;
 using Poco::Exception;
+using Poco::Environment;
 
 
 namespace
@@ -195,6 +198,12 @@ void ActiveDispatcherTest::testVoidIn()
 }
 
 
+void ActiveDispatcherTest::testActiveDispatcher()
+{
+	std::cout << "(disabled on TSAN runs)";
+}
+
+
 void ActiveDispatcherTest::setUp()
 {
 }
@@ -209,13 +218,19 @@ CppUnit::Test* ActiveDispatcherTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ActiveDispatcherTest");
 
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testWait);
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testWaitInterval);
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testTryWait);
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testFailure);
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoid);
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidIn);
-	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidInOut);
+	// see https://github.com/pocoproject/poco/pull/3617
+	if (!Environment::has("TSAN_OPTIONS"))
+	{
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testWait);
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testWaitInterval);
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testTryWait);
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testFailure);
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoid);
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidIn);
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidInOut);
+	}
+	else
+		CppUnit_addTest(pSuite, ActiveDispatcherTest, testActiveDispatcher);
 
 	return pSuite;
 }

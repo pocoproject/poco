@@ -17,9 +17,10 @@ namespace Data {
 namespace Test {
 
 
-TestStatementImpl::TestStatementImpl(SessionImpl& rSession):
+TestStatementImpl::TestStatementImpl(SessionImpl& rSession, bool throwOnHasNext):
 	Poco::Data::StatementImpl(rSession),
-	_compiled(false)
+	_compiled(false),
+	_throwOnHasNext(throwOnHasNext)
 {
 }
 
@@ -79,6 +80,8 @@ const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos) const
 
 bool TestStatementImpl::hasNext()
 {
+	if (_throwOnHasNext)
+		throw Poco::Data::UnknownDataBaseException();
 	return false;
 }
 

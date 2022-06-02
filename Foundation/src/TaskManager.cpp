@@ -43,10 +43,10 @@ TaskManager::~TaskManager()
 void TaskManager::start(Task* pTask)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
-	FastMutex::ScopedLock lock(_mutex);
-
 	pAutoTask->setOwner(this);
 	pAutoTask->setState(Task::TASK_STARTING);
+
+	FastMutex::ScopedLock lock(_mutex);
 	_taskList.push_back(pAutoTask);
 	try
 	{

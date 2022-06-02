@@ -127,6 +127,8 @@ void DataTest::testSession()
 		fail ("must fail");
 	} catch (NotConnectedException&) { }
 
+	assertTrue(stmt.done());
+
 	try
 	{
 		sess << "SELECT * FROM Strings", now; 
@@ -137,6 +139,21 @@ void DataTest::testSession()
 	assertTrue (sess.getFeature("connected"));
 	assertTrue (sess.isConnected());
 	
+	// ensure that throwing during execution leaves
+	// statement in valid state (ST_DONE)
+	sess.setFeature("throwOnHasNext", true);
+	Statement stmt1 = (sess << "SELECT * FROM Strings", into(str), limit(50));
+	assertTrue (sess.getFeature("throwOnHasNext"));
+	try
+	{
+		stmt1.execute();
+		fail ("must trow UnknownDataBaseException");
+	}
+	catch(const Poco::Data::UnknownDataBaseException&) {}
+	assertTrue(stmt1.done());
+
+	// reset session back to normal operation
+	sess.setFeature("throwOnHasNext", false);
 	sess << "SELECT * FROM Strings", now; 
 	stmt.execute();
 
