@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include <pthread.h>
 #include <errno.h>
+#include <atomic>
 
 
 namespace Poco {
@@ -38,10 +39,10 @@ protected:
 	void resetImpl();
 	
 private:
-	bool            _auto;
-	volatile bool   _state;
-	pthread_mutex_t _mutex;
-	pthread_cond_t  _cond;
+	bool              _auto;
+	std::atomic<bool> _state;
+	pthread_mutex_t   _mutex;
+	pthread_cond_t    _cond;
 };
 
 
@@ -50,7 +51,7 @@ private:
 //
 inline void EventImpl::setImpl()
 {
-	if (pthread_mutex_lock(&_mutex))	
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot signal event (lock)");
 	_state = true;
 	if (pthread_cond_broadcast(&_cond))
