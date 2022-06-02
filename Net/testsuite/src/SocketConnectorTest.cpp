@@ -19,6 +19,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Observer.h"
+#include <iostream>
 
 
 using Poco::Net::SocketReactor;
@@ -57,10 +58,8 @@ namespace
 			pNf->release();
 			char buffer[8];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
-			if (n > 0)
-			{
-				_socket.sendBytes(buffer, n);
-			}
+			if (n > 0) _socket.sendBytes(buffer, n);
+			else delete this;
 		}
 		
 	private:
@@ -81,7 +80,6 @@ namespace
 			_reactor.addEventHandler(_socket, _ow);
 
 			doSomething();
-			_reactor.stop();
 		}
 		
 		~ClientServiceHandler()
@@ -90,23 +88,28 @@ namespace
 
 		void doSomething()
 		{
-			volatile long i = 0;
-			while(true){
-				i++;
-				if(i >= 10000000) break;
-			}
+			Thread::sleep(100);
 		}
 
 		void onReadable(ReadableNotification* pNf)
 		{
 			pNf->release();
-			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
+			char buffer[32];
+			int n = _socket.receiveBytes(buffer, sizeof(buffer));
+			if (n <= 0)
+			{
+				_reactor.removeEventHandler(_socket, _or);
+				delete this;
+			}
 		}
 		
 		void onWritable(WritableNotification* pNf)
 		{
 			pNf->release();
-			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
+			_reactor.removeEventHandler(_socket, _ow);
+			std::string data(5, 'x');
+			_socket.sendBytes(data.data(), (int) data.length());
+			_socket.shutdownSend();
 		}
 		
 		StreamSocket                                         _socket;
@@ -139,6 +142,7 @@ void SocketConnectorTest::testUnregisterConnector()
 	SocketConnector<ClientServiceHandler> connector(sa, reactor2);
 	Poco::Thread th2;
 	th2.start(reactor2);
+	Thread::sleep(200);
 	reactor1.stop();
 	reactor2.stop();
 	th.join();
