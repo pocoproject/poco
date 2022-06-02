@@ -57,15 +57,13 @@ public:
 
 	~PollSetImpl()
 	{
+		::close(_eventfd.exchange(0));
 		ScopedLock l(_mutex);
 		if (_epollfd >= 0) ::close(_epollfd);
-		if (_eventfd >= 0) ::close(_eventfd);
 	}
 
 	void add(const Socket& socket, int mode)
 	{
-		ScopedLock lock(_mutex);
-
 		SocketImpl* sockImpl = socket.impl();
 
 		int err = addImpl(sockImpl->sockfd(), mode, sockImpl);
@@ -76,28 +74,28 @@ public:
 			else SocketImpl::error();
 		}
 
+		ScopedLock lock(_mutex);
 		if (_socketMap.find(sockImpl) == _socketMap.end())
 			_socketMap[sockImpl] = socket;
 	}
 
 	void remove(const Socket& socket)
 	{
-		ScopedLock lock(_mutex);
-
 		poco_socket_t fd = socket.impl()->sockfd();
 		struct epoll_event ev;
 		ev.events = 0;
 		ev.data.ptr = 0;
+
+		ScopedLock lock(_mutex);
 		int err = epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev);
 		if (err) SocketImpl::error();
-
 		_socketMap.erase(socket.impl());
 	}
 
 	bool has(const Socket& socket) const
 	{
-		ScopedLock lock(_mutex);
 		SocketImpl* sockImpl = socket.impl();
+		ScopedLock lock(_mutex);
 		return sockImpl &&
 			(_socketMap.find(sockImpl) != _socketMap.end());
 	}
@@ -120,11 +118,13 @@ public:
 		if (mode & PollSet::POLL_ERROR)
 			ev.events |= EPOLLERR;
 		ev.data.ptr = socket.impl();
-		int err = epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &ev);
-		if (err)
+
+		int err = 0;
 		{
-			SocketImpl::error();
+			ScopedLock lock(_mutex);
+			err = epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &ev);
 		}
+		if (err) SocketImpl::error();
 	}
 
 	void clear()
@@ -187,8 +187,10 @@ public:
 	void wakeUp()
 	{
 		uint64_t val = 1;
-		int n = ::write(_eventfd, &val, sizeof(val));
-		if (n < 0) Socket::error();
+		// This is guaranteed to write into a valid fd,
+		// or 0 (meaning PollSet is being destroyed).
+		// Errors are ignored.
+		::write(_eventfd, &val, sizeof(val));
 	}
 
 	int count() const
@@ -209,11 +211,12 @@ private:
 		if (mode & PollSet::POLL_ERROR)
 			ev.events |= EPOLLERR;
 		ev.data.ptr = ptr;
+		ScopedLock lock(_mutex);
 		return epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
 	}
 
 	mutable Mutex _mutex;
-	std::atomic<int> _epollfd;
+	int _epollfd;
 	std::map<void*, Socket> _socketMap;
 	std::vector<struct epoll_event> _events;
 	std::atomic<int> _eventfd;

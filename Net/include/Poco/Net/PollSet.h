@@ -83,6 +83,7 @@ public:
 
 	void wakeUp();
 		/// Wakes up a waiting PollSet.
+		/// Any errors that occur during this call are ignored.
 		/// On platforms/implementations where this functionality
 		/// is not available, it does nothing.
 private:
