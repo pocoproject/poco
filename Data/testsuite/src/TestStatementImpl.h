@@ -34,7 +34,7 @@ class TestStatementImpl: public Poco::Data::StatementImpl
 	/// A no-op implementation of TestStatementImpl for testing.
 {
 public:
-	TestStatementImpl(SessionImpl& rSession);
+	TestStatementImpl(SessionImpl& rSession, bool throwOnHasNext = false);
 		/// Creates the TestStatementImpl.
 
 	~TestStatementImpl();
@@ -80,7 +80,8 @@ private:
 	Poco::SharedPtr<Binder>     _ptrBinder;
 	Poco::SharedPtr<Extractor>  _ptrExtractor;
 	Poco::SharedPtr<Preparator> _ptrPreparation;
-	bool                        _compiled; 
+	bool                        _compiled;
+	bool                        _throwOnHasNext = false;
 };
 
 
