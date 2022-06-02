@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
     defined(__hppa__) || defined(__ia64__) || \
     defined(__mips__) || \
     defined(__loongarch__) || \
-    defined(__nios2__) || defined(__ghs) || \
+    defined(nios2) || defined(__nios2) || defined(__nios2__) || defined(__ghs) || \
     defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
     defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \
     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
@@ -141,7 +141,6 @@ int main(int argc, char** argv) {
     defined(_MIPS_ARCH_MIPS32R2) || defined(__ARMEB__) ||\
     defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
     defined(__riscv) || defined(__e2k__) || \
-    defined(__loongarch64) || \
     defined(__or1k__) || defined(__arc__) || defined(__ARC64__) || \
     defined(__microblaze__) || defined(__XTENSA__) || \
     defined(__EMSCRIPTEN__) || defined(__wasm32__)
