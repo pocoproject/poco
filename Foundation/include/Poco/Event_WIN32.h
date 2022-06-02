@@ -21,7 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/UnWindows.h"
-
+#include <atomic>
 
 namespace Poco {
 
@@ -37,7 +37,7 @@ protected:
 	void resetImpl();
 	
 private:
-	HANDLE _event;
+	std::atomic<HANDLE> _event;
 };
 
 
