@@ -115,7 +115,10 @@ namespace Poco {
 
 
 	template <
-		typename T, typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+		typename T, 
+#if _HAS_CXX20
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 		typename... Args>
 	void format(std::string& result, const std::string& fmt, T arg1, Args... args)
 		/// Appends the formatted string to result.
@@ -129,7 +132,10 @@ namespace Poco {
 
 
 	template <
-		typename T, typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+		typename T, 
+#if _HAS_CXX20
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 		typename... Args>
 	void format(std::string& result, const char* fmt, T arg1, Args... args)
 		/// Appends the formatted string to result.
@@ -143,7 +149,10 @@ namespace Poco {
 
 
 	template <
-		typename T, typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+		typename T,
+#if _HAS_CXX20
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 		typename... Args>
 	std::string format(const std::string& fmt, T arg1, Args... args)
 		/// Returns the formatted string.
@@ -159,7 +168,10 @@ namespace Poco {
 
 
 	template <
-		typename T, typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+		typename T,
+#if _HAS_CXX20
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 		typename... Args>
 	std::string format(const char* fmt, T arg1, Args... args)
 		/// Returns the formatted string.
