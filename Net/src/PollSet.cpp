@@ -41,6 +41,9 @@ namespace Net {
 class PollSetImpl
 {
 public:
+	using Mutex = Poco::SpinlockMutex;
+	using ScopedLock = Mutex::ScopedLock;
+
 	PollSetImpl(): _epollfd(epoll_create(1)),
 		_events(1024),
 		_eventfd(eventfd(0, 0))
@@ -54,13 +57,14 @@ public:
 
 	~PollSetImpl()
 	{
+		ScopedLock l(_mutex);
 		if (_epollfd >= 0) ::close(_epollfd);
 		if (_eventfd >= 0) ::close(_eventfd);
 	}
 
 	void add(const Socket& socket, int mode)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 
 		SocketImpl* sockImpl = socket.impl();
 
@@ -78,7 +82,7 @@ public:
 
 	void remove(const Socket& socket)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 
 		poco_socket_t fd = socket.impl()->sockfd();
 		struct epoll_event ev;
@@ -92,7 +96,7 @@ public:
 
 	bool has(const Socket& socket) const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 		SocketImpl* sockImpl = socket.impl();
 		return sockImpl &&
 			(_socketMap.find(sockImpl) != _socketMap.end());
@@ -100,7 +104,7 @@ public:
 
 	bool empty() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 		return _socketMap.empty();
 	}
 
@@ -125,7 +129,7 @@ public:
 
 	void clear()
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 
 		::close(_epollfd);
 		_socketMap.clear();
@@ -141,6 +145,7 @@ public:
 		PollSet::SocketModeMap result;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+		ScopedLock lock(_mutex);
 		do
 		{
 			Poco::Timestamp start;
@@ -158,8 +163,6 @@ public:
 		}
 		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 		if (rc < 0) SocketImpl::error();
-
-		Poco::FastMutex::ScopedLock lock(_mutex);
 
 		for (int i = 0; i < rc; i++)
 		{
@@ -190,7 +193,7 @@ public:
 
 	int count() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 		return static_cast<int>(_socketMap.size());
 	}
 
@@ -209,11 +212,11 @@ private:
 		return epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
 	}
 
-	mutable Poco::FastMutex         _mutex;
-	int                             _epollfd;
-	std::map<void*, Socket>         _socketMap;
+	mutable Mutex _mutex;
+	std::atomic<int> _epollfd;
+	std::map<void*, Socket> _socketMap;
 	std::vector<struct epoll_event> _events;
-	int                             _eventfd;
+	std::atomic<int> _eventfd;
 };
 
 
