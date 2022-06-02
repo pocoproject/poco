@@ -9,12 +9,12 @@
 extern "C" {
 #else
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-		#include <stdbool.h>
-	#else
-	#ifndef bool
-		#define bool int
-		#define true 1
-		#define false 0
+    #include <stdbool.h>
+#else
+    #ifndef bool
+        #define bool int
+        #define true 1
+        #define false 0
     #endif /* bool */
 #endif /* __STDC_VERSION__ */
 #endif /* __cplusplus */
@@ -33,7 +33,7 @@ struct json_allocator {
     void (*free)(void *);
 };
 
-typedef int (*json_user_io) (void *user);
+typedef int (*json_user_io)(void *user);
 
 typedef struct json_stream json_stream;
 typedef struct json_allocator json_allocator;
@@ -69,8 +69,8 @@ PDJSON_SYMEXPORT bool json_isspace(int c);
 /* internal */
 
 struct json_source {
-    int (*get) (struct json_source *);
-    int (*peek) (struct json_source *);
+    int (*get)(struct json_source *);
+    int (*peek)(struct json_source *);
     size_t position;
     union {
         struct {

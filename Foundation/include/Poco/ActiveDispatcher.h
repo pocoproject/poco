@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
+#include "Poco/Event.h"
 #include "Poco/ActiveStarter.h"
 #include "Poco/ActiveRunnable.h"
 #include "Poco/NotificationQueue.h"

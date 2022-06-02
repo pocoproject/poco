@@ -85,7 +85,7 @@ void pocoInitializeLibrary()
 
 void pocoUninitializeLibrary()
 {
-	std::cout << "TestLibrary uninitialzing" << std::endl;
+	std::cout << "TestLibrary uninitializing" << std::endl;
 }
 
 

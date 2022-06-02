@@ -56,6 +56,7 @@ void DirectoryWatcherTest::testAdded()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemAdded");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -87,6 +88,7 @@ void DirectoryWatcherTest::testRemoved()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemRemoved");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -119,6 +121,7 @@ void DirectoryWatcherTest::testModified()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemModified");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -152,6 +155,7 @@ void DirectoryWatcherTest::testMoved()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	if (dw.supportsMoveEvents())
 	{
 		assertTrue (_events.size() >= 2);
@@ -214,6 +218,7 @@ void DirectoryWatcherTest::testSuspend()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue (_events.size() == 0);
 	assertTrue (!_error);
 }
@@ -243,8 +248,11 @@ void DirectoryWatcherTest::testResume()
 	fos2 << "Again!";
 	fos2.close();
 
-	assertTrue (_events.size() == 0);
-	assertTrue (!_error);
+	{
+		Poco::Mutex::ScopedLock l(_mutex);
+		assertTrue (_events.size() == 0);
+		assertTrue (!_error);
+	}
 
 	dw.resumeEvents();
 
@@ -254,6 +262,7 @@ void DirectoryWatcherTest::testResume()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemModified");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -301,8 +310,11 @@ void DirectoryWatcherTest::testSuspendMultipleTimes()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	assertTrue (_events.size() == 0);
-	assertTrue (!_error);
+	{
+		Poco::Mutex::ScopedLock l(_mutex);
+		assertTrue (_events.size() == 0);
+		assertTrue (!_error);
+	}
 
 	dw.resumeEvents();
 	dw.resumeEvents();
@@ -313,6 +325,7 @@ void DirectoryWatcherTest::testSuspendMultipleTimes()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
+	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemModified");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -359,6 +372,8 @@ void DirectoryWatcherTest::onItemAdded(const Poco::DirectoryWatcher::DirectoryEv
 	de.callback = "onItemAdded";
 	de.path = ev.item.path();
 	de.type = ev.event;
+
+	Poco::Mutex::ScopedLock l(_mutex);
 	_events.push_back(de);
 }
 
@@ -369,6 +384,8 @@ void DirectoryWatcherTest::onItemRemoved(const Poco::DirectoryWatcher::Directory
 	de.callback = "onItemRemoved";
 	de.path = ev.item.path();
 	de.type = ev.event;
+
+	Poco::Mutex::ScopedLock l(_mutex);
 	_events.push_back(de);
 }
 
@@ -379,6 +396,8 @@ void DirectoryWatcherTest::onItemModified(const Poco::DirectoryWatcher::Director
 	de.callback = "onItemModified";
 	de.path = ev.item.path();
 	de.type = ev.event;
+
+	Poco::Mutex::ScopedLock l(_mutex);
 	_events.push_back(de);
 }
 
@@ -389,6 +408,8 @@ void DirectoryWatcherTest::onItemMovedFrom(const Poco::DirectoryWatcher::Directo
 	de.callback = "onItemMovedFrom";
 	de.path = ev.item.path();
 	de.type = ev.event;
+
+	Poco::Mutex::ScopedLock l(_mutex);
 	_events.push_back(de);
 }
 
@@ -399,12 +420,15 @@ void DirectoryWatcherTest::onItemMovedTo(const Poco::DirectoryWatcher::Directory
 	de.callback = "onItemMovedTo";
 	de.path = ev.item.path();
 	de.type = ev.event;
+
+	Poco::Mutex::ScopedLock l(_mutex);
 	_events.push_back(de);
 }
 
 
 void DirectoryWatcherTest::onError(const Poco::Exception& exc)
 {
+
 	_error = true;
 }
 

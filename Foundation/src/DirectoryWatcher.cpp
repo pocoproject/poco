@@ -371,8 +371,8 @@ public:
 	}
 
 private:
-	int _fd;
-	bool _stopped;
+	std::atomic<int> _fd;
+	std::atomic<bool> _stopped;
 };
 
 

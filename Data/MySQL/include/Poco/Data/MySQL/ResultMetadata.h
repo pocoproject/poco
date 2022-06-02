@@ -71,6 +71,8 @@ public:
 		/// Expands the size allocated for column to fit the length of the data.
 
 private:
+	void freeMemory();
+
 	std::vector<MetaColumn>    _columns;
 	std::vector<MYSQL_BIND>    _row;
 	std::vector<char*>         _buffer;

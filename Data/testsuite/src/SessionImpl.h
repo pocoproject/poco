@@ -98,11 +98,14 @@ public:
 
 	void setF(const std::string& name, bool value);
 	bool getF(const std::string& name) const;
+	void setThrowOnHasNext(const std::string& name, bool value);
+	bool getThrowOnHasNext(const std::string& name) const;
 	void setP(const std::string& name, const Poco::Any& value);
 	Poco::Any getP(const std::string& name) const;
 
 private:
 	bool         _f;
+	bool         _throwOnHasNext = false;
 	Poco::Any    _p;
 	bool         _connected;
 	std::string  _connectionString;

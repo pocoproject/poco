@@ -22,6 +22,7 @@
 
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Path.h"
+#include "Poco/Mutex.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -63,6 +64,7 @@ private:
 	};
 	std::vector<DirEvent> _events;
 	bool _error;
+	Poco::Mutex _mutex;
 };
 
 

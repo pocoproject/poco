@@ -147,18 +147,25 @@ namespace MySQL {
 
 ResultMetadata::~ResultMetadata()
 {
-	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
-		std::free(*it);
+	freeMemory();
 }
 
 
 void ResultMetadata::reset()
 {
+	freeMemory();
 	_columns.resize(0);
 	_row.resize(0);
 	_buffer.resize(0);
 	_lengths.resize(0);
 	_isNull.resize(0);
+}
+
+
+void ResultMetadata::freeMemory()
+{
+	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
+		std::free(*it);
 }
 
 
@@ -168,8 +175,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 
 	if (!h)
 	{
-		// all right, it is normal
-		// querys such an "INSERT INTO" just does not have result at all
+		// some queries (eg. INSERT) don't have result
 		reset();
 		return;
 	}
