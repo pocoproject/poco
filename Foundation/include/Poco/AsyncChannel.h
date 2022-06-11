@@ -25,6 +25,7 @@
 #include "Poco/Runnable.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/NotificationQueue.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -110,6 +111,7 @@ private:
 	NotificationQueue _queue;
 	std::size_t _queueSize = 0;
 	std::size_t _dropCount = 0;
+	std::atomic<bool> _closed;
 };
 
 
