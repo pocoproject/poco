@@ -87,6 +87,11 @@ public:
 	Client(const Net::SocketAddress& addrs);
 		/// Constructor which connects to the given Redis host/port.
 
+	Client(const Net::StreamSocket& socket);
+		/// Constructor which connects using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
+
 	virtual ~Client();
 		/// Destroys the Client.
 
@@ -112,6 +117,11 @@ public:
 
 	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
 		/// Connects to the given Redis server.
+
+	void connect(const Net::StreamSocket& socket);
+		/// Connects to the given Redis server using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
 
 	void disconnect();
 		/// Disconnects from the Redis server.

@@ -1,5 +1,14 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.11.3 (2022-06-12)
+===========================
+
+- GH #3567: fix(openssl-initializer): check legacy provider existence for legacy exception
+- GH #3587: MySQL UUID binding temporary string
+- GH #3632: Redis - add TLS support
+- updated a few copyright dates
+
+
 Release 1.11.2 (2022-04-16)
 ===========================
 
