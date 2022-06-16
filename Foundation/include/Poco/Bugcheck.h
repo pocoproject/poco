@@ -39,19 +39,19 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	static void assertion(const char* cond, const char* file, int line, const char* text = 0);
+	[[noreturn]] static void assertion(const char* cond, const char* file, int line, const char* text = 0);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	static void nullPointer(const char* ptr, const char* file, int line);
+	[[noreturn]] static void nullPointer(const char* ptr, const char* file, int line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	static void bugcheck(const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void bugcheck(const char* msg, const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* msg, const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
