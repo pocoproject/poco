@@ -63,10 +63,10 @@ public:
 		/// Shuts down the OpenSSL machinery.
 
 	static bool isFIPSEnabled();
-		// Returns true if FIPS mode is enabled, false otherwise.
+		/// Returns true if FIPS mode is enabled, false otherwise.
 
 	static void enableFIPSMode(bool enabled);
-		// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
+		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
 
 protected:
 	enum

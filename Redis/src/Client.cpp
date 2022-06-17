@@ -61,6 +61,16 @@ Client::Client(const Net::SocketAddress& addrs):
 }
 
 
+Client::Client(const Net::StreamSocket& socket):
+	_address(),
+	_socket(),
+	_input(0),
+	_output(0)
+{
+	connect(socket);
+}
+
+
 Client::~Client()
 {
 	delete _input;
@@ -130,6 +140,18 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 {
 	_address = addrs;
 	connect(timeout);
+}
+
+
+void Client::connect(const Poco::Net::StreamSocket& socket)
+{
+	poco_assert(! _input);
+	poco_assert(! _output);
+
+	_address = socket.peerAddress();
+	_socket = socket;
+	_input = new RedisInputStream(_socket);
+	_output = new RedisOutputStream(_socket);
 }
 
 
