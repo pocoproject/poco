@@ -71,7 +71,8 @@ public:
 		const std::string& connectionString, 
 		int minSessions = 1, 
 		int maxSessions = 32, 
-		int idleTime = 60);
+		int idleTime = 60,
+		int connTimeout = 60);
 		/// Creates the SessionPool for sessions with the given connector
 		/// and connectionString.
 		///
@@ -123,6 +124,9 @@ public:
 	int idle() const;
 		/// Returns the number of idle sessions.
 		
+	int connTimeout() const;
+		/// Returns the connection timeout.
+
 	int dead();
 		/// Returns the number of not connected active sessions.
 
@@ -192,6 +196,7 @@ private:
 	int            _minSessions;
 	int            _maxSessions;
 	int            _idleTime;
+	int            _connTimeout;
 	int            _nSessions;
 	SessionList    _idleSessions;
 	SessionList    _activeSessions;

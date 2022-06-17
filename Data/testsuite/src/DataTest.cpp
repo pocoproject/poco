@@ -522,7 +522,7 @@ void DataTest::testColumnVector()
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -625,7 +625,7 @@ void DataTest::testColumnVectorBool()
 
 	try
 	{
-		bool b; b = c[100]; // to silence gcc
+		POCO_UNUSED bool b; b = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -701,7 +701,7 @@ void DataTest::testColumnDeque()
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -818,7 +818,7 @@ void DataTest::testColumnList()
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -925,13 +925,13 @@ void DataTest::testRow()
 
 	try
 	{
-		int i; i = row[5].convert<int>(); // to silence gcc
+		POCO_UNUSED int i; i = row[5].convert<int>();
 		fail ("must fail");
 	}catch (RangeException&) {}
 
 	try
 	{
-		int i; i = row["a bad name"].convert<int>(); // to silence gcc
+		POCO_UNUSED int i; i = row["a bad name"].convert<int>();
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
