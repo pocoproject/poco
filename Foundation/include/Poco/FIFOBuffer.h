@@ -418,8 +418,8 @@ public:
 		{
 			bool f = false;
 			Mutex::ScopedLock lock(_mutex);
-			if (error && isReadable() && _notify) readable.notify(this, f);
-			if (error && isWritable() && _notify) writable.notify(this, f);
+			if (isReadable() && _notify) readable.notify(this, f);
+			if (isWritable() && _notify) writable.notify(this, f);
 			_error = error;
 			_used = 0;
 		}
