@@ -1,6 +1,16 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.11.3
+
+!!Summary of Changes
+
+  - GH #3567: fix(openssl-initializer): check legacy provider existence for legacy exception
+  - GH #3587: MySQL UUID binding temporary string
+  - GH #3632: Redis - add TLS support
+  - updated a few copyright dates
+
+
 !!!Release 1.11.2
 
 !!Summary of Changes

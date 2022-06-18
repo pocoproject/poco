@@ -356,6 +356,13 @@ public:
 
 	static bool isInBound(Direction dir);
 		/// Returns true if direction is in bound;
+
+protected:
+	const std::string& toString(const UUID& uuid);
+
+private:
+	using StringList = std::vector<std::string*>;
+	std::unique_ptr<StringList> _pStrings;
 };
 
 
