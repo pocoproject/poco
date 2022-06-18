@@ -1351,6 +1351,44 @@ void JSONTest::testPrintHandler()
 	parser.parse(json);
 	assertTrue (json == ostr.str());
 
+	json=
+		"{"
+			"\"a\":100,"
+			"\"b\":234.456,"
+			"\"child\":"
+			"["
+				"{"
+					"\"id\":0,"
+					"\"name\":\"lucy_0\""
+				"},"
+				"{"
+					"\"id\":1,"
+					"\"name\":\"lucy_1\""
+				"},"
+				"{"
+					"\"id\":2,"
+					"\"name\":\"lucy_4\""
+				"},"
+				"{"
+					"\"id\":3,"
+					"\"name\":\"lucy_9\""
+				"},"
+				"{"
+					"\"id\":4,"
+					"\"name\":\"lucy_16\""
+				"}"
+			"],"
+			"\"pair\":{"
+				"\"a\":123213,"
+				"\"b\":\"weoifweifj\""
+			"},"
+			"\"str\":\"sdfsdf\""
+		"}";
+	ostr.str("");
+	pHandler->setIndent(0);
+	parser.reset();
+	parser.parse(json);
+	assertTrue (json == ostr.str());
 }
 
 
