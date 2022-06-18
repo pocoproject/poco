@@ -27,7 +27,7 @@
 namespace Poco {
 
 
-std::string Foundation_API format(const std::string& fmt, const Any& value);
+	std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// This function implements sprintf-style formatting in a typesafe way.
 	/// Various variants of the function are available, supporting a
 	/// different number of arguments (up to six).
@@ -105,73 +105,85 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///     std::string s1 = format("The answer to life, the universe, and everything is %d", 42);
 	///     std::string s2 = format("second: %[1]d, first: %[0]d", 1, 2);
 
-void Foundation_API format(std::string& result, const char *fmt, const std::vector<Any>& values);
+	void Foundation_API format(std::string& result, const char* fmt, const std::vector<Any>& values);
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 
-void Foundation_API format(std::string& result, const std::string& fmt, const std::vector<Any>& values);
+	void Foundation_API format(std::string& result, const std::string& fmt, const std::vector<Any>& values);
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 
 
-template <
-	typename T,
-	typename... Args>
-void format(std::string& result, const std::string& fmt, T arg1, Args... args)
-	/// Appends the formatted string to result.
-{
-	std::vector<Any> values;
-	values.reserve(sizeof...(Args) + 1);
-	values.emplace_back(arg1);
-	values.insert(values.end(), { args... });
-	format(result, fmt, values);
-}
+	template <
+		typename T, 
+#ifdef __cpp_lib_remove_cvref
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
+		typename... Args>
+	void format(std::string& result, const std::string& fmt, T arg1, Args... args)
+		/// Appends the formatted string to result.
+	{
+		std::vector<Any> values;
+		values.reserve(sizeof...(Args) + 1);
+		values.emplace_back(arg1);
+		values.insert(values.end(), { args... });
+		::format(result, fmt, values);
+	}
 
 
-template <
-	typename T,
-	typename... Args>
-void format(std::string& result, const char* fmt, T arg1, Args... args)
-	/// Appends the formatted string to result.
-{
-	std::vector<Any> values;
-	values.reserve(sizeof...(Args) + 1);
-	values.emplace_back(arg1);
-	values.insert(values.end(), { args... });
-	format(result, fmt, values);
-}
+	template <
+		typename T, 
+#ifdef __cpp_lib_remove_cvref
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
+		typename... Args>
+	void format(std::string& result, const char* fmt, T arg1, Args... args)
+		/// Appends the formatted string to result.
+	{
+		std::vector<Any> values;
+		values.reserve(sizeof...(Args) + 1);
+		values.emplace_back(arg1);
+		values.insert(values.end(), { args... });
+		::format(result, fmt, values);
+	}
 
 
-template <
-	typename T,
-	typename... Args>
-std::string format(const std::string& fmt, T arg1, Args... args)
-	/// Returns the formatted string.
-{
-	std::vector<Any> values;
-	values.reserve(sizeof...(Args) + 1);
-	values.emplace_back(arg1);
-	values.insert(values.end(), { args... });
-	std::string result;
-	format(result, fmt, values);
-	return result;
-}
+	template <
+		typename T,
+#ifdef __cpp_lib_remove_cvref
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
+		typename... Args>
+	std::string format(const std::string& fmt, T arg1, Args... args)
+		/// Returns the formatted string.
+	{
+		std::vector<Any> values;
+		values.reserve(sizeof...(Args) + 1);
+		values.emplace_back(arg1);
+		values.insert(values.end(), { args... });
+		std::string result;
+		::format(result, fmt, values);
+		return result;
+	}
 
 
-template <
-	typename T,
-	typename... Args>
-std::string format(const char* fmt, T arg1, Args... args)
-	/// Returns the formatted string.
-{
-	std::vector<Any> values;
-	values.reserve(sizeof...(Args) + 1);
-	values.emplace_back(arg1);
-	values.insert(values.end(), { args... });
-	std::string result;
-	format(result, fmt, values);
-	return result;
-}
+	template <
+		typename T,
+#ifdef __cpp_lib_remove_cvref
+		typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
+		typename... Args>
+	std::string format(const char* fmt, T arg1, Args... args)
+		/// Returns the formatted string.
+	{
+		std::vector<Any> values;
+		values.reserve(sizeof...(Args) + 1);
+		values.emplace_back(arg1);
+		values.insert(values.end(), { args... });
+		std::string result;
+		::format(result, fmt, values);
+		return result;
+	}
 
 
 } // namespace Poco
