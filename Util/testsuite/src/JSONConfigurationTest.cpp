@@ -113,6 +113,26 @@ void JSONConfigurationTest::testSetArrayElement()
 }
 
 
+void JSONConfigurationTest::testConfigurationView()
+{
+	std::string json = R"json({ "foo" : [ "bar" ] })json";
+	Poco::Util::JSONConfiguration config;
+	std::istringstream stream(json);
+	config.load(stream);
+
+	Poco::Util::AbstractConfiguration::Ptr pView = config.createView("foo");
+
+	assertTrue (pView->getString("[0]") == "bar");
+
+	try
+	{
+		pView->getString("[1]");
+		fail ("must throw on index out of bounds");
+	}
+	catch(Poco::NotFoundException&){}
+}
+
+
 AbstractConfiguration::Ptr JSONConfigurationTest::allocConfiguration() const
 {
 	return new JSONConfiguration;
@@ -136,6 +156,7 @@ CppUnit::Test* JSONConfigurationTest::suite()
 	AbstractConfigurationTest_addTests(pSuite, JSONConfigurationTest);
 	CppUnit_addTest(pSuite, JSONConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, JSONConfigurationTest, testSetArrayElement);
+	CppUnit_addTest(pSuite, JSONConfigurationTest, testConfigurationView);
 
 	return pSuite;
 }

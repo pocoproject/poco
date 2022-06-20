@@ -1141,6 +1141,10 @@ void JSONTest::testQuery()
 
 	std::string firstChild = query.findValue("children[0]", "");
 	assertTrue (firstChild.compare("Jonas") == 0);
+	std::string secondChild = query.findValue("children[1]", "");
+	assertTrue (secondChild.compare("Ellen") == 0);
+	std::string thirdChild = query.findValue("children[2]", "");
+	assertTrue (thirdChild.empty());
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
 	assertTrue (ds["name"] == "Franky");
@@ -1195,6 +1199,22 @@ void JSONTest::testQuery()
 		fail ("must throw");
 	}
 	catch (Poco::InvalidArgumentException&) { }
+
+	json = R"json({"foo":["bar"]})json";
+	try { result = parser.parse(json); }
+	catch(JSONException& jsone)
+	{
+		fail (jsone.message());
+	}
+	Query queryFoo(result);
+	result = queryFoo.find("foo[0]");
+	assertTrue (!result.isEmpty());
+	result = queryFoo.find("foo[1]");
+	assertTrue (result.isEmpty());
+	result = queryFoo.find("[1]");
+	assertTrue (result.isEmpty());
+	result = queryFoo.find("");
+	assertTrue (result.convert<std::string>() == json);
 }
 
 
