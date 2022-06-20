@@ -334,7 +334,7 @@ public:
 		/// Should be called AFTER the data 
 		/// was copied into the buffer.
 	{
-        if (0 == length) return;
+		if (0 == length) return;
 		Mutex::ScopedLock lock(_mutex);
 
 		if (length > available())
