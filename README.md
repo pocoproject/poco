@@ -125,6 +125,22 @@ The default install location is `/usr/local/` on Linux and macOS and
 the `CMAKE_INSTALL_PREFIX` CMake variable.
 
 
+#### Building and Installing - Using vcpkg
+
+You can download and install poco using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+```
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh
+$ ./vcpkg integrate install
+$ ./vcpkg install poco
+```
+The poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
+If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg)
+on the vcpkg repository.
+
+
 ### Building Without CMake
 
 If you do not want to or cannot use CMake, POCO can also be built with Visual Studio
