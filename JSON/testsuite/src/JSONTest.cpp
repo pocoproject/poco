@@ -2085,6 +2085,24 @@ void JSONTest::testNonEscapeUnicode()
 	Var longEscape = object->get("longEscape");
 	assertTrue (shortEscape.convert<std::string>() == shortEscapeStr);
 	assertTrue (longEscape.convert<std::string>() == longEscapeStr);
+
+	Poco::JSON::Object::Ptr json = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
+	Poco::JSON::Object::Ptr json2 = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
+
+	json->set("value", 15);
+	json->set("unit", "°C");
+
+	assertFalse (json->getEscapeUnicode());
+	assertFalse (json2->getEscapeUnicode());
+	json2->set("Temperature", json);
+	std::ostringstream buffer {};
+	json->stringify(buffer);
+	std::string str = buffer.str();
+	assertEqual (str, R"({"value":15,"unit":"°C"})");
+	std::ostringstream buffer2 {};
+	json2->stringify(buffer2);
+	std::string str2 = buffer2.str();
+	assertEqual (str2, R"({"Temperature":{"value":15,"unit":"°C"}})");
 }
 
 
