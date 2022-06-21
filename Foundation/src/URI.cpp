@@ -370,7 +370,7 @@ std::string URI::getQuery() const
 }
 
 
-URI::QueryParameters URI::getQueryParameters() const
+URI::QueryParameters URI::getQueryParameters(bool plusIsSpace) const
 {
 	QueryParameters result;
 	std::string::const_iterator it(_query.begin());
@@ -381,7 +381,7 @@ URI::QueryParameters URI::getQueryParameters() const
 		std::string value;
 		while (it != end && *it != '=' && *it != '&')
 		{
-			if (*it == '+')
+			if (plusIsSpace && (*it == '+'))
 				name += ' ';
 			else
 				name += *it;
@@ -392,7 +392,7 @@ URI::QueryParameters URI::getQueryParameters() const
 			++it;
 			while (it != end && *it != '&')
 			{
-				if (*it == '+')
+				if (plusIsSpace && (*it == '+'))
 					value += ' ';
 				else
 					value += *it;

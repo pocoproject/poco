@@ -220,7 +220,7 @@ public:
 		///
 		/// The given query string must be properly percent-encoded.
 
-	QueryParameters getQueryParameters() const;
+	QueryParameters getQueryParameters(bool plusIsSpace = true) const;
 		/// Returns the decoded query string parameters as a vector
 		/// of name-value pairs.
 
