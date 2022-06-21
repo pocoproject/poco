@@ -216,7 +216,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
 			{
-				char add = (*pStr - '0');
+				unsigned char add = (*pStr - '0');
 				if ((limitCheck - result) < add) return false;
 				result = result * base + add;
 			}
@@ -225,7 +225,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		case '8': case '9':
 			if ((base == 10) || (base == 0x10))
 			{
-				char  add = (*pStr - '0');
+				unsigned char add = (*pStr - '0');
 				if ((limitCheck - result) < add) return false;
 				result = result * base + add;
 			}
@@ -236,7 +236,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
 			{
 				if (base != 0x10) return false;
-				char  add = (*pStr - 'a');
+				unsigned char add = (*pStr - 'a');
 				if ((limitCheck - result) < add) return false;
 				result = result * base + (10 + add);
 			}
@@ -245,7 +245,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
 			{
 				if (base != 0x10) return false;
-				char add = (*pStr - 'A');
+				unsigned char add = (*pStr - 'A');
 				if ((limitCheck - result) < add) return false;
 				result = result * base + (10 + add);
 			}
