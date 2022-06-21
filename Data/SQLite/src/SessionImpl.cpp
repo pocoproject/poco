@@ -176,6 +176,8 @@ void SessionImpl::open(const std::string& connect)
 			rc = sqlite3_open_v2(connectionString().c_str(), &_pDB,
 				SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
 			if (rc == SQLITE_OK) break;
+			if (!_pDB)
+				throw ConnectionFailedException(std::string(sqlite3_errstr(rc)));
 			if (sw.elapsedSeconds() >= tout)
 			{
 				Utility::throwException(_pDB, rc);
