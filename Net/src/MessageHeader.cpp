@@ -108,7 +108,8 @@ void MessageHeader::read(std::istream& istr)
 		add(name, decodeWord(value));
 		++fields;
 	}
-	istr.putback(ch);
+	if (istr.good() && ch != eof)
+		istr.putback(ch);
 }
 
 
