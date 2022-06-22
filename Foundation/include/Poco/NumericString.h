@@ -45,7 +45,6 @@ typedef Poco::Int64 intmax_t;
 #pragma warning(disable : 4146)
 #endif // POCO_COMPILER_MSVC
 
-
 // binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
 #define POCO_MAX_INT_STRING_LEN 65
 // value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
@@ -235,6 +234,11 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	unsigned char add = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
+		if (*pStr == thSep)
+		{
+			if (base == 10) continue;
+			throw Poco::SyntaxException("strToInt: thousand separators only allowed for base 10");
+		}
 		if (result > (limitCheck / base)) return false;
 		if (!safeMultiply(result, result, base)) return false;
 		switch (*pStr)
@@ -258,17 +262,6 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 			if (base != 0x10) return false;
 			add = (*pStr - 'A') + 10;
 			break;
-
-		case '.':
-			if ((base == 10) && (thSep == '.')) break;
-			else return false;
-
-		case ',':
-			if ((base == 10) && (thSep == ',')) break;
-			else return false;
-
-		case ' ':
-			if ((base == 10) && (thSep == ' ')) break;
 
 		default:
 			return false;

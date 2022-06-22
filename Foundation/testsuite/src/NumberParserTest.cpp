@@ -58,9 +58,9 @@ void NumberParserTest::testParse()
 	{
 		char ts = sep[i];
 
-		assertTrue (NumberParser::parse("123") == 123);
-		assertTrue (NumberParser::parse(format("123%c456", ts), ts) == 123456);
-		assertTrue (NumberParser::parse(format("1%c234%c567", ts, ts), ts) == 1234567);
+		assertEqual (NumberParser::parse("123"), 123);
+		assertEqual (NumberParser::parse(format("123%c456", ts), ts), 123456);
+		assertEqual (NumberParser::parse(format("1%c234%c567", ts, ts), ts), 1234567);
 	}
 
 	assertTrue (NumberParser::parse("+123") == 123);
