@@ -70,6 +70,10 @@ void TimespanTest::testConversions()
 	assertTrue (ts.minutes() == 30);
 	assertTrue (ts.hours() == 12);
 	assertTrue (ts.days() == 1);
+
+	ts.assign(std::chrono::minutes(62));
+	assertTrue(ts.hours() == 1);
+	assertTrue(ts.minutes() == 2);
 }
 
 
