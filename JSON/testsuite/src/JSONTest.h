@@ -67,6 +67,7 @@ public:
 	void testComment();
 	void testPrintHandler();
 	void testStringify();
+	void testStringifyNaN();
 	void testStringifyPreserveOrder();
 	void testVarConvert();
 

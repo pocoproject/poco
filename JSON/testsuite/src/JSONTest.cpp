@@ -1586,6 +1586,17 @@ void JSONTest::testStringify()
 }
 
 
+void JSONTest::testStringifyNaN()
+{
+	Object::Ptr o = new Object;
+	o->set("NaN", NAN);
+	o->set("Infinity", INFINITY);
+	std::ostringstream stream;
+	o->stringify(stream, 0);
+	assertEqual (stream.str(), std::string(R"({"Infinity":null,"NaN":null})"));
+}
+
+
 void JSONTest::testStringifyPreserveOrder()
 {
 	Object presObj(Poco::JSON_PRESERVE_KEY_ORDER);
@@ -2361,6 +2372,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testComment);
 	CppUnit_addTest(pSuite, JSONTest, testPrintHandler);
 	CppUnit_addTest(pSuite, JSONTest, testStringify);
+	CppUnit_addTest(pSuite, JSONTest, testStringifyNaN);
 	CppUnit_addTest(pSuite, JSONTest, testStringifyPreserveOrder);
 	CppUnit_addTest(pSuite, JSONTest, testVarConvert);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
