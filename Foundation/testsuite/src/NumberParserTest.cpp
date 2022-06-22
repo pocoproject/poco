@@ -188,6 +188,19 @@ void NumberParserTest::testLimits()
 	assertTrue (testLowerLimit64<Int64>());
 	assertTrue (testUpperLimit64<UInt64>());
 #endif
+
+	Poco::Int64 val1, val2;
+	// smallest 64-bit int is actually -9223372036854775808
+	// but the sign and number are parsed as two tokens,
+	// resulting in compiler warning, for explanation see
+	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52661
+	NumberParser::tryParse64("-9223372036854775807", val1);
+	NumberParser::tryParse64("9223372036854775807", val2);
+	assertTrue (val1 == -9223372036854775807LL);
+	assertTrue (val2 == 9223372036854775807LL);
+	int i;
+	assertFalse (NumberParser::tryParse("-9223372036854775807", i));
+	assertFalse (NumberParser::tryParse("9223372036854775807", i));
 }
 
 

@@ -33,7 +33,8 @@
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
-
+#include <iostream>
+#include <iomanip>
 #if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
 typedef Poco::Int64 intmax_t;
@@ -188,26 +189,10 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	}
 	else if (*pStr == '+') ++pStr;
 
-	// all numbers are parsed as positive; the sign
-	// for negative numbers is adjusted after parsing
-	uintmax_t limitCheck = std::numeric_limits<I>::max();
-	if (negative)
-	{
-		poco_assert_dbg(std::numeric_limits<I>::is_signed);
-		// to cover the entire range, (-min > max) has to be
-		// taken into account;
-		// to avoid overflow for the largest int size,
-		// we resort to FPEnvironment::copySign() (ie. floating-point)
-		if (sizeof(I) == sizeof(intmax_t))
-			limitCheck = static_cast<uintmax_t>(FPEnvironment::copySign(static_cast<double>(std::numeric_limits<I>::min()), 1));
-		else
-		{
-			intmax_t i = std::numeric_limits<I>::min();
-			limitCheck = -i;
-		}
-	}
-
-	uintmax_t result = 0;
+	// numbers are parsed as unsigned, for negative numbers the sign is applied after parsing
+	// overflow is checked in every parse step
+	uintmax_t limitCheck = negative ? -std::numeric_limits<I>::min() : std::numeric_limits<I>::max();
+	I result = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
 		if  (result > (limitCheck / base)) return false;
@@ -268,21 +253,9 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	}
 
 	if (negative && (base == 10))
-	{
-		poco_assert_dbg(std::numeric_limits<I>::is_signed);
-		intmax_t i;
-		if (sizeof(I) == sizeof(intmax_t))
-			i = static_cast<intmax_t>(FPEnvironment::copySign(static_cast<double>(result), -1));
-		else
-			i = static_cast<intmax_t>(-result);
-		if (isIntOverflow<I>(i)) return false;
-		outResult = static_cast<I>(i);
-	}
+		outResult = static_cast<I>(-result);
 	else
-	{
-		if (isIntOverflow<I>(result)) return false;
 		outResult = static_cast<I>(result);
-	}
 
 	return true;
 }
