@@ -33,8 +33,6 @@
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
-#include <iostream>
-#include <iomanip>
 #if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
 typedef Poco::Int64 intmax_t;
@@ -113,6 +111,46 @@ inline bool isIntOverflow(From val)
 }
 
 
+template<typename R, typename F, typename S>
+bool safeMultiply(R& result, F f, S s)
+{
+	if ((f == 0) || (s==0))
+	{
+		result = 0;
+		return true;
+	}
+
+	if (f > 0)
+	{
+		if (s > 0)
+		{
+			if (f > (std::numeric_limits<R>::max() / s))
+				return false;
+		}
+		else
+		{
+			if (s < (std::numeric_limits<R>::min() / f))
+				return false;
+		}
+	}
+	else
+	{
+		if (s > 0)
+		{
+			if (f < (std::numeric_limits<R>::min() / s))
+				return false;
+		}
+		else
+		{
+			if (s < (std::numeric_limits<R>::max() / f))
+				return false;
+		}
+	}
+	result = f * s;
+	return true;
+}
+
+
 template <typename F, typename T>
 inline T& isSafeIntCast(F from)
 	/// Returns true if it is safe to cast
@@ -125,7 +163,7 @@ inline T& isSafeIntCast(F from)
 
 template <typename F, typename T>
 inline T& safeIntCast(F from, T& to)
-	/// Returns csted value if it is safe
+	/// Returns cast value if it is safe
 	/// to cast integer from F to T,
 	/// otherwise throws BadCastException.
 {
@@ -191,49 +229,34 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 
 	// numbers are parsed as unsigned, for negative numbers the sign is applied after parsing
 	// overflow is checked in every parse step
-	uintmax_t limitCheck = negative ? -std::numeric_limits<I>::min() : std::numeric_limits<I>::max();
-	I result = 0;
+	uintmax_t limitCheck = std::numeric_limits<I>::max();
+	if (negative) ++limitCheck;
+	uintmax_t result = 0;
+	unsigned char add = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
-		if  (result > (limitCheck / base)) return false;
+		if (result > (limitCheck / base)) return false;
+		if (!safeMultiply(result, result, base)) return false;
 		switch (*pStr)
 		{
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
-			{
-				unsigned char add = (*pStr - '0');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + add;
-			}
+			add = (*pStr - '0');
 			break;
 
 		case '8': case '9':
-			if ((base == 10) || (base == 0x10))
-			{
-				unsigned char add = (*pStr - '0');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + add;
-			}
+			if ((base == 10) || (base == 0x10)) add = (*pStr - '0');
 			else return false;
-
 			break;
 
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			{
-				if (base != 0x10) return false;
-				unsigned char add = (*pStr - 'a');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + (10 + add);
-			}
+			if (base != 0x10) return false;
+			add = (*pStr - 'a') + 10;
 			break;
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			{
-				if (base != 0x10) return false;
-				unsigned char add = (*pStr - 'A');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + (10 + add);
-			}
+			if (base != 0x10) return false;
+			add = (*pStr - 'A') + 10;
 			break;
 
 		case '.':
@@ -250,6 +273,8 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		default:
 			return false;
 		}
+		if ((limitCheck - static_cast<uintmax_t>(result)) < add) return false;
+		result += add;
 	}
 
 	if (negative && (base == 10))
