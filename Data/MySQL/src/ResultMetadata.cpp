@@ -246,6 +246,10 @@ std::size_t ResultMetadata::length(std::size_t pos) const
 
 const unsigned char* ResultMetadata::rawData(std::size_t pos) const 
 {
+	if ((_lengths[pos] == 0) && (_row[pos].buffer == nullptr))
+		return reinterpret_cast<const unsigned char*>("");
+	else
+		poco_check_ptr (_row[pos].buffer);
 	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
 
