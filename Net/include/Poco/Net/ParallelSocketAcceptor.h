@@ -57,7 +57,9 @@ public:
 	using Observer = Poco::Observer<ParallelSocketAcceptor, ReadableNotification>;
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
-		unsigned threads = Poco::Environment::processorCount()):
+		unsigned threads = Poco::Environment::processorCount(),
+        const std::string& threadName):
+        _threadName(threadName),
 		_socket(socket),
 		_pReactor(0),
 		_threads(threads),
@@ -70,7 +72,8 @@ public:
 
 	ParallelSocketAcceptor(ServerSocket& socket,
 		SocketReactor& reactor,
-		unsigned threads = Poco::Environment::processorCount()):
+		unsigned threads = Poco::Environment::processorCount(), const std::string& threadName):
+        _threadName(threadName),
 		_socket(socket),
 		_pReactor(&reactor),
 		_threads(threads),
@@ -202,7 +205,7 @@ protected:
 		poco_assert (_threads > 0);
 
 		for (unsigned i = 0; i < _threads; ++i)
-			_reactors.push_back(new ParallelReactor);
+			_reactors.push_back(new ParallelReactor(_threadName + "#" + std::to_string(i)));
 	}
 
 	ReactorVec& reactors()
@@ -228,6 +231,8 @@ private:
 	ParallelSocketAcceptor(const ParallelSocketAcceptor&);
 	ParallelSocketAcceptor& operator = (const ParallelSocketAcceptor&);
 
+    std::string _threadName;
+        /// Name prefix of sub SocketReactor threads
 	ServerSocket   _socket;
 	SocketReactor* _pReactor;
 	unsigned       _threads;
