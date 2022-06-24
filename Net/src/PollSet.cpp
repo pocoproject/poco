@@ -24,6 +24,7 @@
 #elif defined(POCO_HAVE_FD_POLL)
 	#ifndef _WIN32
 		#include <poll.h>
+		#include "Poco/Pipe.h"
 	#endif
 #endif
 
@@ -226,6 +227,17 @@ private:
 class PollSetImpl
 {
 public:
+	PollSetImpl()
+		{
+		pollfd fd{_pipe.readHandle(), POLLIN, 0};
+		_pollfds[0] = fd;
+	}
+
+	~PollSetImpl()
+	{
+		_pipe.close();
+	}
+
 	void add(const Socket& socket, int mode)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -280,7 +292,7 @@ public:
 		_socketMap.clear();
 		_addMap.clear();
 		_removeSet.clear();
-		_pollfds.clear();
+		_pollfds.reserve(1);
 	}
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
@@ -345,7 +357,7 @@ public:
 
 			if (!_socketMap.empty())
 			{
-				for (auto it = _pollfds.begin(); it != _pollfds.end(); ++it)
+				for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
 				{
 					std::map<poco_socket_t, Socket>::const_iterator its = _socketMap.find(it->fd);
 					if (its != _socketMap.end())
@@ -371,7 +383,8 @@ public:
 
 	void wakeUp()
 	{
-		// TODO
+		char c = 1;
+		_pipe.writeBytes(&c, 1);
 	}
 
 	int count() const
@@ -396,6 +409,8 @@ private:
 	std::map<poco_socket_t, int>    _addMap;
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;
+	Poco::Pipe _pipe;
+		/// Add _pipe to head of _pollfds used to wake up poll blocking
 };
 
 
