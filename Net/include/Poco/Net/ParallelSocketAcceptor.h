@@ -58,7 +58,7 @@ public:
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
 		unsigned threads = Poco::Environment::processorCount(),
-        const std::string& threadName):
+        const std::string& threadName = ""):
         _threadName(threadName),
 		_socket(socket),
 		_pReactor(0),
@@ -72,7 +72,7 @@ public:
 
 	ParallelSocketAcceptor(ServerSocket& socket,
 		SocketReactor& reactor,
-		unsigned threads = Poco::Environment::processorCount(), const std::string& threadName):
+		unsigned threads = Poco::Environment::processorCount(), const std::string& threadName = ""):
         _threadName(threadName),
 		_socket(socket),
 		_pReactor(&reactor),
