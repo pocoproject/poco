@@ -849,6 +849,8 @@ inline std::string NumberFormatter::format(float value)
 
 inline std::string NumberFormatter::format(float value, int precision)
 {
+	if (precision < 0)
+		throw InvalidArgumentException("NumberFormatter::format() requires non-negative precision.");
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	floatToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
 	return std::string(buffer);
@@ -857,6 +859,8 @@ inline std::string NumberFormatter::format(float value, int precision)
 
 inline std::string NumberFormatter::format(float value, int width, int precision)
 {
+	if (precision < 0)
+		throw InvalidArgumentException("NumberFormatter::format() requires non-negative precision.");
 	std::string result;
 	floatToFixedStr(result, value, precision, width);
 	return result;
@@ -873,6 +877,8 @@ inline std::string NumberFormatter::format(double value)
 
 inline std::string NumberFormatter::format(double value, int precision)
 {
+	if (precision < 0)
+		throw InvalidArgumentException("NumberFormatter::format() requires non-negative precision.");
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	doubleToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
 	return std::string(buffer);
@@ -881,6 +887,8 @@ inline std::string NumberFormatter::format(double value, int precision)
 
 inline std::string NumberFormatter::format(double value, int width, int precision)
 {
+	if (precision < 0)
+		throw InvalidArgumentException("NumberFormatter::format() requires non-negative precision.");
 	std::string result;
 	doubleToFixedStr(result, value, precision, width);
 	return result;

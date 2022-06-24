@@ -263,6 +263,20 @@ void NumberFormatterTest::testFormatFloat()
 	assertTrue (NumberFormatter::format(50.546, 0) == "51");
 	assertTrue (NumberFormatter::format(50.546f, 0) == "51");
 	assertTrue (NumberFormatter::format(50.546f, 2) == "50.55");
+
+	try
+	{
+		Poco::NumberFormatter::format(0.1, -1);
+		fail ("NumberFormatter::format() must throw on negative precision");
+	}
+	catch(Poco::InvalidArgumentException&){}
+
+	try
+	{
+		Poco::NumberFormatter::format(0.1, 2, -1);
+		fail ("NumberFormatter::format() must throw on negative precision");
+	}
+	catch(Poco::InvalidArgumentException&){}
 }
 
 
