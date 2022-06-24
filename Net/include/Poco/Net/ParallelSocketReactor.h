@@ -51,16 +51,16 @@ public:
 	ParallelSocketReactor(const std::string& threadName = "")
 	{
 		_thread.start(*this);
-        if (!threadName.empty())
-            _thread.setName(threadName);
+		if (!threadName.empty())
+			_thread.setName(threadName);
 	}
 	
 	ParallelSocketReactor(const Poco::Timespan& timeout, const std::string& threadName = ""):
 		SR(timeout)
 	{
 		_thread.start(*this);
-        if (!threadName.empty())
-            _thread.setName(threadName);
+		if (!threadName.empty())
+			_thread.setName(threadName);
 	}
 	
 	~ParallelSocketReactor()
