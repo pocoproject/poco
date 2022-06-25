@@ -151,6 +151,29 @@ bool Client::isConnected() const
 }
 
 
+bool Client::sendAuth(const std::string& password)
+{
+	Array cmd;
+	cmd << "AUTH" << password;
+
+	bool ret = true;
+	std::string response;
+
+	try
+	{
+		response = execute<std::string>(cmd);
+	}
+	catch (...)
+	{
+		ret = false;
+	}
+
+	_authenticated = (ret && (response == "OK"));
+
+	return _authenticated;
+}
+
+
 void Client::writeCommand(const Array& command, bool doFlush)
 {
 	poco_assert(_output);
