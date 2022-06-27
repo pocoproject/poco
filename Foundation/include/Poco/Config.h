@@ -79,7 +79,7 @@
 // while those smaller will be placement new-ed into an
 // internal stack-auto-allocated buffer.
 #if !defined(POCO_SMALL_OBJECT_SIZE)
-	#define POCO_SMALL_OBJECT_SIZE 32
+	#define POCO_SMALL_OBJECT_SIZE 64
 #endif
 
 

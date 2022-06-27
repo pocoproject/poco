@@ -186,6 +186,14 @@ void AnyTest::testAnySwap()
 {
 	std::string text = "test message";
 	Any original = text, swapped;
+#ifdef POCO_NO_SOO
+	assertFalse (original.local());
+#else
+	assertTrue (original.local());
+#endif
+	assertFalse (original.empty());
+	assertFalse (swapped.local());
+	assertTrue (swapped.empty());
 	std::string* originalPtr = AnyCast<std::string>(&original);
 	Any* swapResult = &original.swap(swapped);
 
@@ -194,10 +202,49 @@ void AnyTest::testAnySwap()
 	assertTrue (swapped.type() == typeid(std::string));
 	assertTrue (text == AnyCast<std::string>(swapped));
 	assertTrue (0 != originalPtr);
-#ifdef POCO_NO_SOO // pointers only match when heap-allocated
-	assertTrue (originalPtr == AnyCast<std::string>(&swapped));
-#endif
 	assertTrue (swapResult == &original);
+
+	struct BigObject
+	{
+		Poco::UInt64 one = 1;
+		Poco::UInt64 two = 2;
+		Poco::UInt64 three = 3;
+		Poco::UInt64 four = 4;
+		Poco::UInt64 five = 5;
+		Poco::UInt64 six = 6;
+		Poco::UInt64 seven = 7;
+		Poco::UInt64 eight = 8;
+		Poco::UInt64 nine = 9;
+
+		bool operator==(const BigObject& other)
+		{
+			return one == other.one &&
+				two == other.two &&
+				three == other.three &&
+				four == other.four &&
+				five == other.five &&
+				six == other.six &&
+				seven == other.seven &&
+				eight == other.eight &&
+				nine == other.nine;
+		}
+	};
+
+	BigObject bigObject;
+	Any bigOriginal = bigObject, swappedBig;
+	assertFalse (bigOriginal.local());
+	assertFalse (bigOriginal.empty());
+	assertFalse (swappedBig.local());
+	assertTrue (swappedBig.empty());
+	BigObject* bigPtr = AnyCast<BigObject>(&bigOriginal);
+	Any* swapBigResult = &bigOriginal.swap(swappedBig);
+
+	assertTrue (bigOriginal.empty());
+	assertTrue (!swappedBig.empty());
+	assertTrue (swappedBig.type() == typeid(BigObject));
+	assertTrue (bigObject == AnyCast<BigObject>(swappedBig));
+	assertTrue (0 != bigPtr);
+	assertTrue (swapBigResult == &bigOriginal);
 }
 
 

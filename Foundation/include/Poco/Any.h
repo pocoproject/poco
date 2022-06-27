@@ -23,6 +23,9 @@
 #include <cstring>
 
 
+#define poco_any_assert(cond) do { if (!(cond)) std::abort(); } while (0)
+
+
 namespace Poco {
 
 class Any;
@@ -56,6 +59,9 @@ union Placeholder
 	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
 	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
 	/// where the object was allocated (0 => heap, 1 => local).
+	///
+	/// Important: for SOO builds, only same-type (or trivial both-empty no-op)
+	/// swap operation is allowed.
 {
 public:
 	struct Size
@@ -82,8 +88,22 @@ public:
 
 	void swap(Placeholder& other) noexcept
 	{
-		poco_assert (isLocal() && other.isLocal());
-		std::swap(pHolder, other.pHolder);
+		bool empty = isEmpty();
+		bool otherEmpty = other.isEmpty();
+		bool local = isLocal();
+		bool otherLocal = other.isLocal();
+
+		if (empty && otherEmpty) return;
+		poco_any_assert (local == otherLocal);
+		if (!local) std::swap(pHolder, other.pHolder);
+		else
+		{
+			unsigned int sz = SizeV + 1;
+			unsigned char tmpHolder[sz] = {};
+			std::memcpy(tmpHolder, holder, sz);
+			std::memcpy(holder, other.holder, sz);
+			std::memcpy(other.holder, tmpHolder, sz);
+		}
 	}
 
 	void erase()
@@ -312,6 +332,11 @@ public:
 		/// trying to extract data via an AnyCast/RefAnyCast.
 	{
 		return empty() ? typeid(void) : content()->type();
+	}
+
+	bool local() const
+	{
+		return _valueHolder.isLocal();
 	}
 
 private:
