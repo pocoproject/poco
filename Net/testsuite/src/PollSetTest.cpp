@@ -18,6 +18,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/PollSet.h"
 #include "Poco/Stopwatch.h"
+#include <iostream>
 
 
 using Poco::Net::Socket;
