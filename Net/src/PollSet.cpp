@@ -228,9 +228,9 @@ class PollSetImpl
 {
 public:
 	PollSetImpl()
-		{
+	{
 		pollfd fd{_pipe.readHandle(), POLLIN, 0};
-		_pollfds[0] = fd;
+		_pollfds.push_back(fd);
 	}
 
 	~PollSetImpl()
@@ -353,6 +353,12 @@ public:
 		if (rc < 0) SocketImpl::error();
 
 		{
+			if (_pollfds[0].revents & POLLIN)
+			{
+				char c;
+				_pipe.readBytes(&c, 1);
+			}
+
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
 			if (!_socketMap.empty())

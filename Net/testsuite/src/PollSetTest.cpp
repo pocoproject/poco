@@ -18,7 +18,6 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/PollSet.h"
 #include "Poco/Stopwatch.h"
-#include <iostream>
 
 
 using Poco::Net::Socket;
@@ -288,7 +287,6 @@ void PollSetTest::testPollClosedServer()
 
 void PollSetTest::testPollSetWakeUp()
 {
-#if defined(POCO_HAVE_FD_EPOLL)
 	PollSet ps;
 	Timespan timeout(100000000); // 100 seconds
 	Poller poller(ps, timeout);
@@ -302,9 +300,6 @@ void PollSetTest::testPollSetWakeUp()
 	sw.stop();
 	assertFalse (poller.isRunning());
 	assertTrue(sw.elapsedSeconds() < 1);
-#else // TODO: other implementations
-	std::cout << "not implemented";
-#endif // POCO_HAVE_FD_EPOLL
 }
 
 
