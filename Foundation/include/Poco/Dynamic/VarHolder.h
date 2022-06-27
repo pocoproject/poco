@@ -410,16 +410,15 @@ private:
 	template <typename F, typename T>
 	void checkUpperLimit(const F& from) const
 	{
-		if ((sizeof(T) < sizeof(F)) &&
-			(from > static_cast<F>(std::numeric_limits<T>::max())))
-		{
-			throw RangeException("Value too large.");
-		}
-		else
 		if (from > std::numeric_limits<T>::max())
-		{
 			throw RangeException("Value too large.");
-		}
+	}
+
+	template <typename F, typename T>
+	void checkLowerLimit(const F& from) const
+	{
+		if (from < std::numeric_limits<T>::min())
+			throw RangeException("Value too small.");
 	}
 
 	template <typename F, typename T>
@@ -452,13 +451,6 @@ private:
 			if (from < static_cast<F>(std::numeric_limits<T>::min()))
 				throw RangeException("Value too small.");
 		}
-	}
-
-	template <typename F, typename T>
-	void checkLowerLimit(const F& from) const
-	{
-		if (from < std::numeric_limits<T>::min())
-			throw RangeException("Value too small.");
 	}
 };
 
