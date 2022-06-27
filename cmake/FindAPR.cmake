@@ -39,8 +39,14 @@ find_path(APR_INCLUDE_DIR apr.h
 		apr-1.0
 )
 
+if(WIN32)
+	set(APR_PRIMARY_NAME "libapr-1")
+else(WIN32)
+	set(APR_PRIMARY_NAME "apr-1")
+endif(WIN32)
+
 find_library(APR_LIBRARY
-  NAMES apr-1 ${APR_NAMES}
+	NAMES ${APR_PRIMARY_NAME} ${APR_NAMES}
   HINTS
 	${APR_ROOT_DIR}/lib
 	${APR_ROOT_LIBRARY_DIRS}
