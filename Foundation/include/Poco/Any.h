@@ -82,10 +82,8 @@ public:
 
 	void swap(Placeholder& other) noexcept
 	{
-		if (!isLocal() && !other.isLocal())
-			std::swap(pHolder, other.pHolder);
-		else
-			throw Poco::InvalidAccessException("Placeholder::swap()");
+		poco_assert (isLocal() && other.isLocal());
+		std::swap(pHolder, other.pHolder);
 	}
 
 	void erase()
