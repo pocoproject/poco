@@ -88,22 +88,8 @@ public:
 
 	void swap(Placeholder& other) noexcept
 	{
-		bool empty = isEmpty();
-		bool otherEmpty = other.isEmpty();
-		bool local = isLocal();
-		bool otherLocal = other.isLocal();
-
-		if (empty && otherEmpty) return;
-		poco_any_assert (local == otherLocal);
-		if (!local) std::swap(pHolder, other.pHolder);
-		else
-		{
-			const unsigned int sz = SizeV + 1;
-			unsigned char tmpHolder[sz] = {};
-			std::memcpy(tmpHolder, holder, sz);
-			std::memcpy(holder, other.holder, sz);
-			std::memcpy(other.holder, tmpHolder, sz);
-		}
+		if (!isEmpty() || !other.isEmpty())
+			std::swap(holder, other.holder);
 	}
 
 	void erase()
@@ -225,7 +211,7 @@ private:
 
 
 class Any
-	/// An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
+	/// Any class represents a general type and is capable of storing any type, supporting type-safe extraction
 	/// of the internally stored data.
 	///
 	/// Code taken from the Boost 1.33.1 library. Original copyright by Kevlin Henney. Modified for Poco
@@ -265,12 +251,11 @@ public:
 	{
 	}
 
-	Any& swap(Any& other)
+	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.
 		///
-		/// When small object optimization is enabled, swap only
-		/// has no-throw guarantee when both (*this and other)
-		/// objects are allocated on the heap.
+		/// If an exception occurs during swapping, the program
+		/// execution is aborted.
 	{
 		if (this == &other) return *this;
 
@@ -280,16 +265,15 @@ public:
 		}
 		else
 		{
-			Any tmp(*this);
 			try
 			{
+				Any tmp(*this);
 				construct(other);
 				other = tmp;
 			}
 			catch (...)
 			{
-				construct(tmp);
-				throw;
+				std::abort();
 			}
 		}
 
@@ -325,7 +309,7 @@ public:
 		return _valueHolder.isEmpty();
 	}
 
-	const std::type_info & type() const
+	const std::type_info& type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
 		/// It is recommended to always query an Any for its type info before
@@ -357,7 +341,7 @@ private:
 		{
 		}
 
-		virtual const std::type_info & type() const
+		virtual const std::type_info& type() const
 		{
 			return typeid(ValueType);
 		}

@@ -184,7 +184,24 @@ void AnyTest::testAnyBadCast()
 
 void AnyTest::testAnySwap()
 {
+	Any empty1, empty2;
+	assertTrue (empty1.empty());
+	assertTrue (empty2.empty());
+	empty1.swap(empty2);
+	assertTrue (empty1.empty());
+	assertTrue (empty2.empty());
+
 	std::string text = "test message";
+	empty1 = text;
+	assertTrue (!empty1.empty());
+	assertTrue (empty2.empty());
+	assertTrue (text == AnyCast<std::string>(empty1));
+
+	empty1.swap(empty2);
+	assertTrue (empty1.empty());
+	assertTrue (!empty2.empty());
+	assertTrue (text == AnyCast<std::string>(empty2));
+
 	Any original = text, swapped;
 #ifdef POCO_NO_SOO
 	assertFalse (original.local());
@@ -230,6 +247,8 @@ void AnyTest::testAnySwap()
 		}
 	};
 
+	poco_assert (sizeof(BigObject) > POCO_SMALL_OBJECT_SIZE);
+
 	BigObject bigObject;
 	Any bigOriginal = bigObject, swappedBig;
 	assertFalse (bigOriginal.local());
@@ -245,6 +264,23 @@ void AnyTest::testAnySwap()
 	assertTrue (bigObject == AnyCast<BigObject>(swappedBig));
 	assertTrue (0 != bigPtr);
 	assertTrue (swapBigResult == &bigOriginal);
+
+	// assure proper assignment behavior after swapping
+	original = text;
+	bigOriginal = bigObject;
+	assertTrue (original.local());
+	assertFalse (bigOriginal.local());
+
+	Any temp = original;
+	assertTrue (temp.local());
+
+	original = bigOriginal;
+	assertTrue (bigObject == AnyCast<BigObject>(original));
+	assertFalse (original.local());
+
+	bigOriginal = temp;
+	assertTrue (text == AnyCast<std::string>(bigOriginal));
+	assertTrue (bigOriginal.local());
 }
 
 
