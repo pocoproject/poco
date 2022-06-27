@@ -120,7 +120,7 @@ public:
 		return *this;
 	}
 	
-	void swap(HashMap& map)
+	void swap(HashMap& map) noexcept
 		/// Swaps the HashMap with another one.
 	{
 		_table.swap(map._table);

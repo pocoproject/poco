@@ -106,7 +106,7 @@ public:
 		return *this;
 	}
 
-	void swap(ActiveMethod& other)
+	void swap(ActiveMethod& other) noexcept
 	{
 		std::swap(_pOwner, other._pOwner);
 		std::swap(_method, other._method);
@@ -198,7 +198,7 @@ public:
 		return *this;
 	}
 
-	void swap(ActiveMethod& other)
+	void swap(ActiveMethod& other) noexcept
 	{
 		std::swap(_pOwner, other._pOwner);
 		std::swap(_method, other._method);

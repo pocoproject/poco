@@ -277,7 +277,7 @@ inline int Message::getSourceLine() const
 }
 
 
-inline void swap(Message& m1, Message& m2)
+inline void swap(Message& m1, Message& m2) noexcept
 {
 	m1.swap(m2);
 }

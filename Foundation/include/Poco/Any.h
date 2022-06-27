@@ -80,7 +80,7 @@ public:
 		destruct(false);
 	}
 
-	void swap(Placeholder& other)
+	void swap(Placeholder& other) noexcept
 	{
 		if (!isLocal() && !other.isLocal())
 			std::swap(pHolder, other.pHolder);
@@ -167,7 +167,7 @@ private:
 		delete pHolder;
 	}
 
-	void swap(Placeholder& other)
+	void swap(Placeholder& other) noexcept
 	{
 		std::swap(pHolder, other.pHolder);
 	}

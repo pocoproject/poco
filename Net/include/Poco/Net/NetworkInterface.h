@@ -126,7 +126,7 @@ public:
 	bool operator == (const NetworkInterface& other) const;
 		/// Operator equal. Compares interface indices.
 
-	void swap(NetworkInterface& other);
+	void swap(NetworkInterface& other) noexcept;
 		/// Swaps the NetworkInterface with another one.	
 		
 	unsigned index() const;

@@ -248,7 +248,7 @@ public:
 		return _capacity * sizeof(T);
 	}
 
-	void swap(Buffer& other)
+	void swap(Buffer& other) noexcept
 	/// Swaps the buffer with another one.
 	{
 		using std::swap;

@@ -102,7 +102,7 @@ public:
 	Path& operator = (const char* path);
 		/// Assigns a string containing a path in native format.
 
-	void swap(Path& path);
+	void swap(Path& path) noexcept;
 		/// Swaps the path with another one.
 
 	Path& assign(const std::string& path);
@@ -495,7 +495,7 @@ inline char Path::pathSeparator()
 }
 
 
-inline void swap(Path& p1, Path& p2)
+inline void swap(Path& p1, Path& p2) noexcept
 {
 	p1.swap(p2);
 }

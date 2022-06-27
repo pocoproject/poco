@@ -59,7 +59,7 @@ public:
 	Name& operator = (Name&& name) noexcept;
 		/// Move assignment.
 		
-	void swap(Name& name);
+	void swap(Name& name) noexcept;
 		/// Swaps the name with another one.	
 		
 	void assign(const XMLString& qname);
@@ -132,7 +132,7 @@ inline const XMLString& Name::localName() const
 }
 
 
-inline void swap(Name& n1, Name& n2)
+inline void swap(Name& n1, Name& n2) noexcept
 {
 	n1.swap(n2);
 }

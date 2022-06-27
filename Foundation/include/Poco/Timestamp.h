@@ -77,7 +77,7 @@ public:
 	Timestamp& operator = (const Timestamp& other);
 	Timestamp& operator = (TimeVal tv);
 	
-	void swap(Timestamp& timestamp);
+	void swap(Timestamp& timestamp) noexcept;
 		/// Swaps the Timestamp with another one.
 	
 	void update();
@@ -260,7 +260,7 @@ inline Timestamp::TimeDiff Timestamp::resolution()
 }
 
 
-inline void swap(Timestamp& s1, Timestamp& s2)
+inline void swap(Timestamp& s1, Timestamp& s2) noexcept
 {
 	s1.swap(s2);
 }

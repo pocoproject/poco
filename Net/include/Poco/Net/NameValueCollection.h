@@ -60,7 +60,7 @@ public:
 	NameValueCollection& operator = (NameValueCollection&& nvc) noexcept;
 		/// Moves the name-value pairs of another NameValueCollection to this one.
 		
-	void swap(NameValueCollection& nvc);
+	void swap(NameValueCollection& nvc) noexcept;
 		/// Swaps the NameValueCollection with another one.
 		
 	const std::string& operator [] (const std::string& name) const;
@@ -120,7 +120,7 @@ private:
 //
 // inlines
 //
-inline void swap(NameValueCollection& nvc1, NameValueCollection& nvc2)
+inline void swap(NameValueCollection& nvc1, NameValueCollection& nvc2) noexcept
 {
 	nvc1.swap(nvc2);
 }

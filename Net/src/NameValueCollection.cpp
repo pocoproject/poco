@@ -63,7 +63,7 @@ NameValueCollection& NameValueCollection::operator = (NameValueCollection&& nvc)
 }
 
 
-void NameValueCollection::swap(NameValueCollection& nvc)
+void NameValueCollection::swap(NameValueCollection& nvc) noexcept
 {
 	std::swap(_map, nvc._map);
 }

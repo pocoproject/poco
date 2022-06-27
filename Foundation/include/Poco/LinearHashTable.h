@@ -98,7 +98,7 @@ public:
 			return *this;
 		}
 		
-		void swap(ConstIterator& it)
+		void swap(ConstIterator& it) noexcept
 		{
 			using std::swap;
 			// uninitialized iterators crash when swapped
@@ -192,7 +192,7 @@ public:
 			return *this;
 		}
 		
-		void swap(Iterator& it)
+		void swap(Iterator& it) noexcept
 		{
 			ConstIterator::swap(it);
 		}
@@ -265,7 +265,7 @@ public:
 		return *this;
 	}
 	
-	void swap(LinearHashTable& table)
+	void swap(LinearHashTable& table) noexcept
 		/// Swaps the LinearHashTable with another one.
 	{
 		using std::swap;

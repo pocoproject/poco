@@ -177,7 +177,7 @@ public:
 		return *this;
 	}
 
-	void swap(Nullable& other)
+	void swap(Nullable& other) noexcept
 		/// Swaps this Nullable with other.
 	{
 		std::swap(_value, other._value);
@@ -310,7 +310,7 @@ private:
 
 
 template <typename C>
-inline void swap(Nullable<C>& n1, Nullable<C>& n2)
+inline void swap(Nullable<C>& n1, Nullable<C>& n2) noexcept
 {
 	n1.swap(n2);
 }

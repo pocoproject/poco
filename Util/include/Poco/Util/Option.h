@@ -91,7 +91,7 @@ public:
 	Option& operator = (const Option& option);
 		/// Assignment operator.
 
-	void swap(Option& option);
+	void swap(Option& option) noexcept;
 		/// Swaps the option with another one.
 
 	Option& shortName(const std::string& name);

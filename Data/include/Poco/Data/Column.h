@@ -90,7 +90,7 @@ public:
 		return *this;
 	}
 
-	void swap(Column& other)
+	void swap(Column& other) noexcept
 		/// Swaps the column with another one.
 	{
 		using std::swap;
@@ -237,7 +237,7 @@ public:
 		return *this;
 	}
 
-	void swap(Column& other)
+	void swap(Column& other) noexcept
 		/// Swaps the column with another one.
 	{
 		using std::swap;
@@ -378,7 +378,7 @@ public:
 		return *this;
 	}
 
-	void swap(Column& other)
+	void swap(Column& other) noexcept
 		/// Swaps the column with another one.
 	{
 		using std::swap;
@@ -492,7 +492,7 @@ private:
 
 
 template <typename C>
-inline void swap(Column<C>& c1, Column<C>& c2)
+inline void swap(Column<C>& c1, Column<C>& c2) noexcept
 {
 	c1.swap(c2);
 }

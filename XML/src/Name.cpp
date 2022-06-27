@@ -93,7 +93,7 @@ Name& Name::operator = (Name&& name) noexcept
 }
 
 
-void Name::swap(Name& name)
+void Name::swap(Name& name) noexcept
 {
 	std::swap(_qname, name._qname);
 	std::swap(_namespaceURI, name._namespaceURI);

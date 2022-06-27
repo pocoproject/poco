@@ -84,7 +84,7 @@ Timespan& Timespan::assign(long seconds, long microSeconds)
 }
 
 
-void Timespan::swap(Timespan& timespan)
+void Timespan::swap(Timespan& timespan) noexcept
 {
 	std::swap(_span, timespan._span);
 }

@@ -91,7 +91,7 @@ public:
 		return *this;
 	}
 	
-	void swap(SimpleHashTable& ht)
+	void swap(SimpleHashTable& ht) noexcept
 	{
 		using std::swap;
 		swap(_entries, ht._entries);

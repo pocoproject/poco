@@ -85,7 +85,7 @@ Clock& Clock::operator = (ClockVal tv)
 }
 
 
-void Clock::swap(Clock& timestamp)
+void Clock::swap(Clock& timestamp) noexcept
 {
 	std::swap(_clock, timestamp._clock);
 }

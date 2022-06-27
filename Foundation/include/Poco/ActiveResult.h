@@ -269,7 +269,7 @@ public:
 		return *this;
 	}
 	
-	void swap(ActiveResult& result)
+	void swap(ActiveResult& result) noexcept
 	{
 		using std::swap;
 		swap(_pHolder, result._pHolder);
@@ -407,7 +407,7 @@ public:
 		return *this;
 	}
 	
-	void swap(ActiveResult& result)
+	void swap(ActiveResult& result) noexcept
 	{
 		using std::swap;
 		swap(_pHolder, result._pHolder);

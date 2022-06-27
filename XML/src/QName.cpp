@@ -83,7 +83,7 @@ QName& QName::operator = (QName&& qname) noexcept
 }
 
 
-void QName::swap(QName& qname)
+void QName::swap(QName& qname) noexcept
 {
 	std::swap(_ns, qname._ns);
 	std::swap(_name, qname._name);

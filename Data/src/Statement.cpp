@@ -89,7 +89,7 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 	return *this;
 }
 
-void Statement::swap(Statement& other)
+void Statement::swap(Statement& other) noexcept
 {
 	using std::swap;
 	

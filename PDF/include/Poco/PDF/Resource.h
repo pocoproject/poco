@@ -74,7 +74,7 @@ public:
 		return _pPDF == other._pPDF && _resource == other._resource;
 	}
 
-	void swap(Resource& other)
+	void swap(Resource& other) noexcept
 	{
 		using std::swap;
 		

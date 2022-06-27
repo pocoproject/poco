@@ -77,7 +77,7 @@ public:
 	TextIterator& operator = (const TextIterator& it);
 		/// Assignment operator.
 		
-	void swap(TextIterator& it);
+	void swap(TextIterator& it) noexcept;
 		/// Swaps the iterator with another one.
 	
 	int operator * () const;
@@ -123,7 +123,7 @@ inline bool TextIterator::operator != (const TextIterator& it) const
 }
 
 
-inline void swap(TextIterator& it1, TextIterator& it2)
+inline void swap(TextIterator& it1, TextIterator& it2) noexcept
 {
 	it1.swap(it2);
 }

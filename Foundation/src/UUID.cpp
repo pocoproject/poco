@@ -109,7 +109,7 @@ UUID& UUID::operator = (const UUID& uuid)
 }
 
 
-void UUID::swap(UUID& uuid)
+void UUID::swap(UUID& uuid) noexcept
 {
 	std::swap(_timeLow, uuid._timeLow);
 	std::swap(_timeMid, uuid._timeMid);

@@ -177,7 +177,7 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 }
 
 
-void DateTime::swap(DateTime& dateTime)
+void DateTime::swap(DateTime& dateTime) noexcept
 {
 	std::swap(_utcTime, dateTime._utcTime);
 	std::swap(_year, dateTime._year);

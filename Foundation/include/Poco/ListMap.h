@@ -87,7 +87,7 @@ public:
 		return *this;
 	}
 	
-	void swap(ListMap& map)
+	void swap(ListMap& map) noexcept
 		/// Swaps the ListMap with another one.
 	{
 		_container.swap(map._container);

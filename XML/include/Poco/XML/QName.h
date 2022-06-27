@@ -47,7 +47,7 @@ public:
 
 	QName& operator = (const QName& qname);
 	QName& operator = (QName&& qname) noexcept;
-	void swap(QName& qname);
+	void swap(QName& qname) noexcept;
 
 	const std::string& namespaceURI() const;
 		/// Returns the namespace URI part of the name.

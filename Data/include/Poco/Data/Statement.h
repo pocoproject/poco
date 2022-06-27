@@ -125,7 +125,7 @@ public:
 	Statement& operator = (Statement&& stmt) noexcept;
 		/// Move assignment.
 
-	void swap(Statement& other);
+	void swap(Statement& other) noexcept;
 		/// Swaps the statement with another one.
 
 	template <typename T>
@@ -814,7 +814,7 @@ inline const RowFormatter::Ptr& Statement::getRowFormatter()
 }
 
 
-inline void swap(Statement& s1, Statement& s2)
+inline void swap(Statement& s1, Statement& s2) noexcept
 {
 	s1.swap(s2);
 }
