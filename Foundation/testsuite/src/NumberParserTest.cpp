@@ -313,6 +313,13 @@ void NumberParserTest::testParseError()
 	} catch (SyntaxException&) { }
 
 #endif // POCO_NO_FPENVIRONMENT
+
+	try
+	{
+		const char test[] = { -23, -108, -103, -24, -81, -81, 0 };
+		Poco::NumberParser::parse(test);
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
 }
 
 

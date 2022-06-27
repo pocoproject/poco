@@ -119,6 +119,12 @@ public:
 	bool isConnected() const;
 		/// Returns true iff the Client is connected to a Redis server.
 
+	bool sendAuth(const std::string& password);
+		/// Sends password to Redis server
+
+	bool isAuthenticated();
+		/// Returns true when the client is authenticated
+
 	template<typename T>
 	T execute(const Array& command)
 		/// Sends the Redis Command to the server. It gets the reply
@@ -199,6 +205,7 @@ private:
 	Net::StreamSocket _socket;
 	RedisInputStream* _input;
 	RedisOutputStream* _output;
+	bool _authenticated = false;
 };
 
 
@@ -230,6 +237,12 @@ inline void Client::flush()
 inline void Client::setReceiveTimeout(const Timespan& timeout)
 {
 	_socket.setReceiveTimeout(timeout);
+}
+
+
+inline bool Client::isAuthenticated()
+{
+    return _authenticated;
 }
 
 
