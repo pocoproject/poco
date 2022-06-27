@@ -53,6 +53,7 @@ private:
 	openmode        _mode;
 	std::streamsize _chunk;
 	std::string     _chunkBuffer;
+	bool            _finished;
 };
 
 

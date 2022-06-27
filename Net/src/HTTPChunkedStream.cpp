@@ -36,7 +36,8 @@ HTTPChunkedStreamBuf::HTTPChunkedStreamBuf(HTTPSession& session, openmode mode):
 	HTTPBasicStreamBuf(HTTPBufferAllocator::BUFFER_SIZE, mode),
 	_session(session),
 	_mode(mode),
-	_chunk(0)
+	_chunk(0),
+	_finished(false)
 {
 }
 
@@ -60,19 +61,31 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	static const int eof = std::char_traits<char>::eof();
 
+	if (_finished)
+		return eof;
+
 	if (_chunk == 0)
 	{
 		int ch = _session.get();
 		while (Poco::Ascii::isSpace(ch)) ch = _session.get();
 		std::string chunkLen;
 		while (Poco::Ascii::isHexDigit(ch) && chunkLen.size() < 8) { chunkLen += (char) ch; ch = _session.get(); }
-		if (ch != eof && !(Poco::Ascii::isSpace(ch) || ch == ';')) return eof;
+		if (ch != eof && !(Poco::Ascii::isSpace(ch) || ch == ';'))
+		{
+			_finished = true;
+			return eof;
+		}
 		while (ch != eof && ch != '\n') ch = _session.get();
 		unsigned chunk;
 		if (NumberParser::tryParseHex(chunkLen, chunk))
+		{
 			_chunk = (std::streamsize) chunk;
+		}
 		else
+		{
+			_finished = true;
 			return eof;
+		}
 	}
 	if (_chunk > 0)
 	{
@@ -85,6 +98,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	{
 		int ch = _session.get();
 		while (ch != eof && ch != '\n') ch = _session.get();
+		_finished = true;
 		return 0;
 	}
 }
