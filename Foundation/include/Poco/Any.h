@@ -98,7 +98,7 @@ public:
 		if (!local) std::swap(pHolder, other.pHolder);
 		else
 		{
-			unsigned int sz = SizeV + 1;
+			const unsigned int sz = SizeV + 1;
 			unsigned char tmpHolder[sz] = {};
 			std::memcpy(tmpHolder, holder, sz);
 			std::memcpy(holder, other.holder, sz);
