@@ -61,6 +61,24 @@ public:
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for the HTTP session.
 
+	void setConnectTimeout(const Poco::Timespan& timeout);
+		/// Sets the connect timeout.
+
+	Poco::Timespan getConnectTimeout() const;
+		/// Gets the connect timeout.
+
+	void setSendTimeout(const Poco::Timespan& timeout);
+		/// Sets the send timeout.
+
+	Poco::Timespan getSendTimeout() const;
+		/// Gets the send timeout.
+
+	void setReceiveTimeout(const Poco::Timespan& timeout);
+		/// Sets the receive timeout.
+
+	Poco::Timespan getReceiveTimeout() const;
+		/// Gets the receive timeout.
+
 	bool connected() const;
 		/// Returns true if the underlying socket is connected.
 
@@ -220,6 +238,42 @@ inline bool HTTPSession::getKeepAlive() const
 
 
 inline Poco::Timespan HTTPSession::getTimeout() const
+{
+	return _receiveTimeout;
+}
+
+
+inline void HTTPSession::setConnectTimeout(const Poco::Timespan& timeout)
+{
+	_connectionTimeout = timeout;
+}
+
+
+inline Poco::Timespan HTTPSession::getConnectTimeout() const
+{
+	return _connectionTimeout;
+}
+
+
+inline void HTTPSession::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_sendTimeout = timeout;
+}
+
+
+inline Poco::Timespan HTTPSession::getSendTimeout() const
+{
+	return _sendTimeout;
+}
+
+
+inline void HTTPSession::setReceiveTimeout(const Poco::Timespan& timeout)
+{
+	_receiveTimeout = timeout;
+}
+
+
+inline Poco::Timespan HTTPSession::getReceiveTimeout() const
 {
 	return _receiveTimeout;
 }
