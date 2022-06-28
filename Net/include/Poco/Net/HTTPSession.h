@@ -62,22 +62,22 @@ public:
 		/// Returns the timeout for the HTTP session.
 
 	void setConnectTimeout(const Poco::Timespan& timeout);
-		/// sets the connect timeout
+		/// Sets the connect timeout.
 
 	Poco::Timespan getConnectTimeout() const;
-		/// gets the connect timeout
+		/// Gets the connect timeout.
 
 	void setSendTimeout(const Poco::Timespan& timeout);
-		/// set the send timeout
+		/// Sets the send timeout.
 
 	Poco::Timespan getSendTimeout() const;
-		/// get the send timeout
+		/// Gets the send timeout.
 
 	void setReceiveTimeout(const Poco::Timespan& timeout);
-		/// set the receive timeout
+		/// Sets the receive timeout.
 
 	Poco::Timespan getReceiveTimeout() const;
-		/// get the receive timeout
+		/// Gets the receive timeout.
 
 	bool connected() const;
 		/// Returns true if the underlying socket is connected.
