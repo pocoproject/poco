@@ -85,7 +85,7 @@ public:
 	X509Certificate& operator = (X509Certificate&& cert) noexcept;
 		/// Move-assigns a certificate.
  
-	void swap(X509Certificate& cert);
+	void swap(X509Certificate& cert) noexcept;
 		/// Exchanges the certificate with another one.
 
 	~X509Certificate();

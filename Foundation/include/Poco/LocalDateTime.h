@@ -376,7 +376,7 @@ inline void LocalDateTime::adjustForTzd()
 }
 
 
-inline void swap(LocalDateTime& d1, LocalDateTime& d2)
+inline void swap(LocalDateTime& d1, LocalDateTime& d2) noexcept
 {
 	d1.swap(d2);
 }

@@ -109,7 +109,7 @@ public:
 		/// Parses and assigns an URI from the given string. Throws a
 		/// SyntaxException if the uri is not valid.
 
-	void swap(URI& uri);
+	void swap(URI& uri) noexcept;
 		/// Swaps the URI with another one.
 
 	void clear();
@@ -412,7 +412,7 @@ inline unsigned short URI::getSpecifiedPort() const
 }
 
 
-inline void swap(URI& u1, URI& u2)
+inline void swap(URI& u1, URI& u2) noexcept
 {
 	u1.swap(u2);
 }

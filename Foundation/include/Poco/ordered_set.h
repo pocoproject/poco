@@ -324,7 +324,7 @@ public:
     
     
     
-    void swap(ordered_set& other) { other.m_ht.swap(m_ht); }
+    void swap(ordered_set& other) noexcept { other.m_ht.swap(m_ht); }
     
     /*
      * Lookup

@@ -197,7 +197,7 @@ URI& URI::operator = (const char* uri)
 }
 
 
-void URI::swap(URI& uri)
+void URI::swap(URI& uri) noexcept
 {
 	std::swap(_scheme, uri._scheme);
 	std::swap(_userInfo, uri._userInfo);

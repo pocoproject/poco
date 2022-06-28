@@ -62,7 +62,7 @@ public:
 	ArchiveEntry& operator = (const ArchiveEntry& entry);
 		/// Assignment operator.
 	
-	void swap(ArchiveEntry& entry);
+	void swap(ArchiveEntry& entry) noexcept;
 		/// Swaps the entry with another one.
 	
 	EntryType type() const;

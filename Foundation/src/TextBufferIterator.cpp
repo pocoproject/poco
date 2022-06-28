@@ -86,7 +86,7 @@ TextBufferIterator& TextBufferIterator::operator = (const TextBufferIterator& it
 }
 
 
-void TextBufferIterator::swap(TextBufferIterator& it)
+void TextBufferIterator::swap(TextBufferIterator& it) noexcept
 {
 	std::swap(_pEncoding, it._pEncoding);
 	std::swap(_it, it._it);

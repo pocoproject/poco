@@ -70,7 +70,7 @@ public:
 	UUID& operator = (const UUID& uuid);
 		/// Assignment operator.
 		
-	void swap(UUID& uuid);
+	void swap(UUID& uuid) noexcept;
 		/// Swaps the UUID with another one.	
 		
 	void parse(const std::string& uuid);
@@ -207,7 +207,7 @@ inline bool UUID::isNull() const
 }
 
 
-inline void swap(UUID& u1, UUID& u2)
+inline void swap(UUID& u1, UUID& u2) noexcept
 {
 	u1.swap(u2);
 }

@@ -67,7 +67,7 @@ bool Page::operator == (const Page& other) const
 }
 
 
-void Page::swap(Page& other)
+void Page::swap(Page& other) noexcept
 {
 	using std::swap;
 

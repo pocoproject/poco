@@ -149,7 +149,7 @@ public:
 		///
 		/// Throws an InvalidArgumentException if an argument date is out of range.
 
-	void swap(DateTime& dateTime);
+	void swap(DateTime& dateTime) noexcept;
 		/// Swaps the DateTime with another one.
 
 	int year() const;
@@ -431,7 +431,7 @@ inline bool DateTime::isLeapYear(int year)
 }
 
 
-inline void swap(DateTime& d1, DateTime& d2)
+inline void swap(DateTime& d1, DateTime& d2) noexcept
 {
 	d1.swap(d2);
 }

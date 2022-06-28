@@ -81,7 +81,7 @@ public:
 	TextBufferIterator& operator = (const TextBufferIterator& it);
 		/// Assignment operator.
 		
-	void swap(TextBufferIterator& it);
+	void swap(TextBufferIterator& it) noexcept;
 		/// Swaps the iterator with another one.
 	
 	int operator * () const;
@@ -127,7 +127,7 @@ inline bool TextBufferIterator::operator != (const TextBufferIterator& it) const
 }
 
 
-inline void swap(TextBufferIterator& it1, TextBufferIterator& it2)
+inline void swap(TextBufferIterator& it1, TextBufferIterator& it2) noexcept
 {
 	it1.swap(it2);
 }

@@ -53,7 +53,7 @@ public:
 	StatementCreator& operator = (StatementCreator&& other) noexcept;
 		/// Assignment operator.
 		
-	void swap(StatementCreator& other);
+	void swap(StatementCreator& other) noexcept;
 		/// Swaps the StatementCreator with another one.	
 		
 	template <typename T>

@@ -59,7 +59,7 @@ public:
 	MediaType& operator = (const std::string& mediaType);
 		/// Assigns another media type.
 		
-	void swap(MediaType& mediaType);
+	void swap(MediaType& mediaType) noexcept;
 		/// Swaps the MediaType with another one.
 		
 	void setType(const std::string& type);
@@ -163,7 +163,7 @@ inline const NameValueCollection& MediaType::parameters() const
 }
 
 
-inline void swap(MediaType& m1, MediaType& m2)
+inline void swap(MediaType& m1, MediaType& m2) noexcept
 {
 	m1.swap(m2);
 }

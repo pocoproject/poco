@@ -59,7 +59,7 @@ public:
 	MailRecipient& operator = (const MailRecipient& recipient);
 		/// Assigns another recipient.
 		
-	void swap(MailRecipient& recipient);
+	void swap(MailRecipient& recipient) noexcept;
 		/// Exchanges the content of two recipients.
 
 	RecipientType getType() const;
@@ -108,7 +108,7 @@ inline const std::string& MailRecipient::getRealName() const
 }
 
 
-inline void swap(MailRecipient& r1, MailRecipient& r2)
+inline void swap(MailRecipient& r1, MailRecipient& r2) noexcept
 {
 	r1.swap(r2);
 }

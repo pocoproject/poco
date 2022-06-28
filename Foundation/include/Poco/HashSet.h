@@ -74,7 +74,7 @@ public:
 		return *this;
 	}
 	
-	void swap(HashSet& set)
+	void swap(HashSet& set) noexcept
 		/// Swaps the HashSet with another one.
 	{
 		_table.swap(set._table);

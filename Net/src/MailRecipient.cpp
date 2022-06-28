@@ -65,7 +65,7 @@ MailRecipient& MailRecipient::operator = (const MailRecipient& recipient)
 }
 
 
-void MailRecipient::swap(MailRecipient& recipient)
+void MailRecipient::swap(MailRecipient& recipient) noexcept
 {
 	std::swap(_type, recipient._type);
 	std::swap(_address, recipient._address);

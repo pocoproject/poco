@@ -78,7 +78,7 @@ public:
 	MetaColumn& operator = (MetaColumn&& other) noexcept;
 		/// Assignment operator.
 
-	void swap(MetaColumn& other);
+	void swap(MetaColumn& other) noexcept;
 		/// Swaps the contents with another instance.
 
 	~MetaColumn();

@@ -123,7 +123,7 @@ HostEntry& HostEntry::operator = (const HostEntry& entry)
 }
 
 
-void HostEntry::swap(HostEntry& hostEntry)
+void HostEntry::swap(HostEntry& hostEntry) noexcept
 {
 	std::swap(_name, hostEntry._name);
 	std::swap(_aliases, hostEntry._aliases);

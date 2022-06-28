@@ -49,7 +49,7 @@ SimpleRowFormatter& SimpleRowFormatter::operator = (const SimpleRowFormatter& ro
 }
 
 
-void SimpleRowFormatter::swap(SimpleRowFormatter& other)
+void SimpleRowFormatter::swap(SimpleRowFormatter& other) noexcept
 {
 	using std::swap;
 

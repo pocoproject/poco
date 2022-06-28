@@ -637,7 +637,7 @@ NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interfc)
 }
 
 
-void NetworkInterface::swap(NetworkInterface& other)
+void NetworkInterface::swap(NetworkInterface& other) noexcept
 {
 	using std::swap;
 	swap(_pImpl, other._pImpl);

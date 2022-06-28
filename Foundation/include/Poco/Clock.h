@@ -67,7 +67,7 @@ public:
 	Clock& operator = (const Clock& other);
 	Clock& operator = (ClockVal tv);
 	
-	void swap(Clock& clock);
+	void swap(Clock& clock) noexcept;
 		/// Swaps the Clock with another one.
 	
 	void update();
@@ -220,7 +220,7 @@ inline Clock::ClockDiff Clock::resolution()
 }
 
 
-inline void swap(Clock& s1, Clock& s2)
+inline void swap(Clock& s1, Clock& s2) noexcept
 {
 	s1.swap(s2);
 }

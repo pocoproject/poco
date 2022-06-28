@@ -622,7 +622,7 @@ public:
         return erase_impl(key, hash);
     }
     
-    void swap(ordered_hash& other) {
+    void swap(ordered_hash& other) noexcept {
         using std::swap;
         
         swap(static_cast<Hash&>(*this), static_cast<Hash&>(other));

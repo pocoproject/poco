@@ -77,7 +77,7 @@ public:
 		return *this;
 	}
 
-	void swap(Timespan& timespan);
+	void swap(Timespan& timespan) noexcept;
 		/// Swaps the Timespan with another one.
 
 	bool operator == (const Timespan& ts) const;
@@ -300,7 +300,7 @@ inline bool Timespan::operator <= (TimeDiff microSeconds) const
 }
 
 
-inline void swap(Timespan& s1, Timespan& s2)
+inline void swap(Timespan& s1, Timespan& s2) noexcept
 {
 	s1.swap(s2);
 }

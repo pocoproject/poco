@@ -67,7 +67,7 @@ RowIterator& RowIterator::operator = (RowIterator&& other) noexcept
 }
 
 
-void RowIterator::swap(RowIterator& other)
+void RowIterator::swap(RowIterator& other) noexcept
 {
 	using std::swap;
 	

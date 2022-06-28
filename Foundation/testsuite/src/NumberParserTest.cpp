@@ -316,7 +316,7 @@ void NumberParserTest::testParseError()
 
 	try
 	{
-		const char test[] = { -23, -108, -103, -24, -81, -81, 0 };
+		const char test[] = { char(-23), char(-108), char(-103), char(-24), char(-81), char(-81), 0 };
 		Poco::NumberParser::parse(test);
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }

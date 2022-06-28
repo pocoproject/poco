@@ -81,7 +81,7 @@ public:
 	SharedMemory& operator = (const SharedMemory& other);
 		/// Assigns another SharedMemory object.
 
-	void swap(SharedMemory& other);
+	void swap(SharedMemory& other) noexcept;
 		/// Swaps the SharedMemory object with another one.
 
 	char* begin() const;
@@ -100,7 +100,7 @@ private:
 //
 // inlines
 //
-inline void SharedMemory::swap(SharedMemory& other)
+inline void SharedMemory::swap(SharedMemory& other) noexcept
 {
 	using std::swap;
 	swap(_pImpl, other._pImpl);

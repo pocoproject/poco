@@ -400,7 +400,7 @@ public:
     
     
     
-    void swap(ordered_map& other) { other.m_ht.swap(m_ht); }
+    void swap(ordered_map& other) noexcept { other.m_ht.swap(m_ht); }
     
     /*
      * Lookup
