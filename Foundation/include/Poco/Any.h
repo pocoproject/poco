@@ -319,6 +319,9 @@ public:
 	}
 
 	bool local() const
+		/// Returns true if data is held locally (ie. not allocated on the heap).
+		/// If POCO_NO_SOO is defined, it always return false.
+		/// The main purpose of this function is use for testing.
 	{
 		return _valueHolder.isLocal();
 	}

@@ -268,11 +268,19 @@ void AnyTest::testAnySwap()
 	// assure proper assignment behavior after swapping
 	original = text;
 	bigOriginal = bigObject;
+#ifdef POCO_NO_SOO
+	assertFalse (original.local());
+#else
 	assertTrue (original.local());
+#endif
 	assertFalse (bigOriginal.local());
 
 	Any temp = original;
+#ifdef POCO_NO_SOO
+	assertFalse (temp.local());
+#else
 	assertTrue (temp.local());
+#endif
 
 	original = bigOriginal;
 	assertTrue (bigObject == AnyCast<BigObject>(original));
@@ -280,7 +288,11 @@ void AnyTest::testAnySwap()
 
 	bigOriginal = temp;
 	assertTrue (text == AnyCast<std::string>(bigOriginal));
+#ifdef POCO_NO_SOO
+	assertFalse (bigOriginal.local());
+#else
 	assertTrue (bigOriginal.local());
+#endif
 }
 
 
