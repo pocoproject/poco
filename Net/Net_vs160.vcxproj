@@ -157,7 +157,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>16.0.32002.118</_ProjectFileVersion>
+    <_ProjectFileVersion>16.0.32602.291</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoNetd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetmtd</TargetName>
@@ -663,6 +663,7 @@
     <ClInclude Include="include\Poco\Net\UDPSocketReader.h"/>
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
+    <ClInclude Include="src\wepoll.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AbstractHTTPRequestHandler.cpp">
@@ -981,6 +982,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\WebSocketImpl.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\wepoll.c">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
   </ItemGroup>

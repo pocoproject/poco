@@ -29,12 +29,19 @@
 #endif
 
 
+#ifdef POCO_OS_FAMILY_WINDOWS
+	#include "wepoll.h"
+	#define POCO_HAVE_FD_EPOLL 1
+#endif
+
+
 namespace Poco {
 namespace Net {
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
 
+#ifndef POCO_OS_FAMILY_WINDOWS
 
 //
 // Linux implementation using epoll
@@ -217,6 +224,186 @@ private:
 	int                             _eventfd;
 };
 
+#else
+
+//
+// windows implementation using epoll
+//
+
+class PollSetImpl
+{
+public:
+	PollSetImpl() : _epollfd(epoll_create(1)),
+		_events(1024)
+	{
+		if (_epollfd < 0)
+		{
+			SocketImpl::error();
+		}
+	}
+
+	~PollSetImpl()
+	{
+		if (_epollfd >= 0) ::close(_epollfd);
+	}
+
+	void add(const Socket& socket, int mode)
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		SocketImpl* sockImpl = socket.impl();
+
+		int err = addImpl(static_cast<int>(sockImpl->sockfd()), mode, sockImpl);
+
+		if (err)
+		{
+			if (errno == EEXIST) update(socket, mode);
+			else SocketImpl::error();
+		}
+
+		if (_socketMap.find(sockImpl) == _socketMap.end())
+			_socketMap[sockImpl] = socket;
+	}
+
+	void remove(const Socket& socket)
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		poco_socket_t fd = socket.impl()->sockfd();
+		struct epoll_event ev;
+		ev.events = 0;
+		ev.data.ptr = 0;
+		int err = epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev);
+		if (err) SocketImpl::error();
+
+		_socketMap.erase(socket.impl());
+	}
+
+	bool has(const Socket& socket) const
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		SocketImpl* sockImpl = socket.impl();
+		return sockImpl &&
+			(_socketMap.find(sockImpl) != _socketMap.end());
+	}
+
+	bool empty() const
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		return _socketMap.empty();
+	}
+
+	void update(const Socket& socket, int mode)
+	{
+		poco_socket_t fd = socket.impl()->sockfd();
+		struct epoll_event ev;
+		ev.events = 0;
+		if (mode & PollSet::POLL_READ)
+			ev.events |= EPOLLIN;
+		if (mode & PollSet::POLL_WRITE)
+			ev.events |= EPOLLOUT;
+		if (mode & PollSet::POLL_ERROR)
+			ev.events |= EPOLLERR;
+		ev.data.ptr = socket.impl();
+		int err = epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &ev);
+		if (err)
+		{
+			SocketImpl::error();
+		}
+	}
+
+	void clear()
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		::close(_epollfd);
+		_socketMap.clear();
+		_epollfd = epoll_create(1);
+		if (_epollfd < 0)
+		{
+			SocketImpl::error();
+		}
+	}
+
+	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
+	{
+		PollSet::SocketModeMap result;
+		Poco::Timespan remainingTime(timeout);
+		int rc;
+		do
+		{
+			Poco::Timestamp start;
+			rc = epoll_wait(_epollfd, &_events[0],
+				static_cast<int>(_events.size()),
+				static_cast<int>(remainingTime.totalMilliseconds()));
+			if (rc == 0) return result;
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			{
+				Poco::Timestamp end;
+				Poco::Timespan waited = end - start;
+				if (waited < remainingTime)
+					remainingTime -= waited;
+				else
+					remainingTime = 0;
+			}
+		} while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+		if (rc < 0) SocketImpl::error();
+
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		for (int i = 0; i < rc; i++)
+		{
+			if (_events[i].data.ptr) // skip eventfd
+			{
+				std::map<void*, Socket>::iterator it = _socketMap.find(_events[i].data.ptr);
+				if (it != _socketMap.end())
+				{
+					if (_events[i].events & EPOLLIN)
+						result[it->second] |= PollSet::POLL_READ;
+					if (_events[i].events & EPOLLOUT)
+						result[it->second] |= PollSet::POLL_WRITE;
+					if (_events[i].events & EPOLLERR)
+						result[it->second] |= PollSet::POLL_ERROR;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	void wakeUp()
+	{
+	}
+
+	int count() const
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		return static_cast<int>(_socketMap.size());
+	}
+
+private:
+	int addImpl(int fd, int mode, void* ptr)
+	{
+		struct epoll_event ev;
+		ev.events = 0;
+		if (mode & PollSet::POLL_READ)
+			ev.events |= EPOLLIN;
+		if (mode & PollSet::POLL_WRITE)
+			ev.events |= EPOLLOUT;
+		if (mode & PollSet::POLL_ERROR)
+			ev.events |= EPOLLERR;
+		ev.data.ptr = ptr;
+		return epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
+	}
+
+	mutable Poco::FastMutex         _mutex;
+	HANDLE                          _epollfd;
+	std::map<void*, Socket>         _socketMap;
+	std::vector<struct epoll_event> _events;
+	int                             _eventfd;
+};
+
+#endif // POCO_OS_FAMILY_WINDOWS
 
 #elif defined(POCO_HAVE_FD_POLL)
 
