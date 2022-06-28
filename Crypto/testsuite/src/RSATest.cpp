@@ -230,6 +230,9 @@ void RSATest::testRSACipher()
     auto enc = iengine->encryptString(ss);
     auto dec = oengine->decryptString(enc);
     assertEqual (ss, dec);
+
+	delete iengine;
+	delete oengine;
 }
 
 
