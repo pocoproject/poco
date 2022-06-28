@@ -227,7 +227,7 @@ private:
 #else
 
 //
-// windows implementation using epoll
+// Windows implementation using wepoll
 //
 
 class PollSetImpl
