@@ -137,7 +137,6 @@ void SocketReactor::stop()
 
 
 void SocketReactor::wakeUp()
-	/// Wake up reactor, if invoker running in event loop thread there is no need to wake up.
 {
 	if (_pThread && _pThread != Thread::current())
 	{
