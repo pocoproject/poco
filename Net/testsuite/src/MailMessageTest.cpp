@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailStream.h"
 #include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/StringPartSource.h"
@@ -24,9 +25,12 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <iostream>
 
 
 using Poco::Net::MailMessage;
+using Poco::Net::MailInputStream;
+using Poco::Net::MailOutputStream;
 using Poco::Net::MailRecipient;
 using Poco::Net::MessageHeader;
 using Poco::Net::PartHandler;
@@ -361,6 +365,55 @@ void MailMessageTest::testReadDefaultTransferEncoding()
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 	);
+}
+
+
+void MailMessageTest::testContentDisposition()
+{
+	/*
+	// see https://github.com/pocoproject/poco/issues/3650
+	// Note "Content-disposition" casing,
+	// "Content-type" or "Content-transfer-encoding" do not cause problem
+	auto rawMessage =
+		"Date: Wed, 29 Jun 2022 08:25:48 GMT" "\r\n"
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_5DBC66DE2780DE93" "\r\n"
+		"From: mySenderName<sender@send.pl>" "\r\n"
+		"Subject: mySubjct" "\r\n"
+		"To: <aja@o.pl>" "\r\n"
+		"Mime-Version: 1.0" "\r\n"
+		"\r\n"
+		"--MIME_boundary_5DBC66DE2780DE93" "\r\n"
+		"Content-Type: text/plain; charset=UTF-8" "\r\n"
+		"Content-Transfer-Encoding: quoted-printable" "\r\n"
+		"Content-Disposition: inline" "\r\n"
+		"\r\n"
+		"MyRealContent" "\r\n"
+		"--MIME_boundary_5DBC66DE2780DE93" "\r\n"
+		"Content-Type: text/plain; name=Plik" "\r\n"
+		"Content-Transfer-Encoding: base64" "\r\n"
+		"Content-disposition: attachment; filename=attachment.txt" "\r\n"
+		"\r\n"
+		"TXlBdHRhY2htZW50" "\r\n"
+		"--MIME_boundary_5DBC66DE2780DE93--" "\r\n"
+		"." "\r\n";
+
+	Poco::Net::MailMessage  message;
+	//Convert raw message to message
+	std::istringstream is(rawMessage);
+	MailInputStream mis(is);
+	message.read(mis);
+
+	//get raw message again:
+	std::ostringstream oss;
+	MailOutputStream mos(oss);
+	message.write(mos);
+	mos.close();
+	auto plainMessage = oss.str();
+
+	assertEqual(rawMessage, plainMessage);
+
+	//std::cout << plain_message <<std::endl;
+*/
 }
 
 
@@ -705,6 +758,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadDefaultTransferEncoding);
+	CppUnit_addTest(pSuite, MailMessageTest, testContentDisposition);
 	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
