@@ -222,7 +222,7 @@ if(ANDROID)
 			POCO_NO_WSTRING
 			POCO_NO_SHAREDMEMORY
 	)
-	target_link_libraries(Foundation PUBLIC log)
+	target_link_libraries(Foundation PUBLIC -llog)
 endif()
 
 POCO_INSTALL(Foundation)
