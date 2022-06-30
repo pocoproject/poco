@@ -155,6 +155,7 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 			//#define POCO_HAVE_FD_POLL 1
 		#endif
 	#endif
+	//#define POCO_HAVE_FD_EPOLL 1
 #endif
 
 #endif // Net_Net_INCLUDED

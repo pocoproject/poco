@@ -18,20 +18,26 @@
 #include <set>
 
 
+// temporarily, only local enable epoll on windows until we decide on 
+// https://github.com/pocoproject/poco/issues/1459
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#define POCO_HAVE_FD_EPOLL
+#endif
+
 #if defined(POCO_HAVE_FD_EPOLL)
-	#include <sys/epoll.h>
-	#include <sys/eventfd.h>
+	#ifdef POCO_OS_FAMILY_WINDOWS
+		#include "Poco/Net/ServerSocket.h"
+		#include "Poco/Net/SocketAddress.h"
+		#include "wepoll.h"
+	#else
+		#include <sys/epoll.h>
+		#include <sys/eventfd.h>
+	#endif
 #elif defined(POCO_HAVE_FD_POLL)
 	#ifndef _WIN32
 		#include <poll.h>
 		#include "Poco/Pipe.h"
 	#endif
-#endif
-
-
-#ifdef POCO_OS_FAMILY_WINDOWS
-	#include "wepoll.h"
-	#define POCO_HAVE_FD_EPOLL 1
 #endif
 
 
@@ -41,17 +47,72 @@ namespace Net {
 
 #if defined(POCO_HAVE_FD_EPOLL)
 
-#ifndef POCO_OS_FAMILY_WINDOWS
 
 //
-// Linux implementation using epoll
+// Implementation using epoll (Linux) or wepoll (Windows)
 //
+
+
+#ifdef WEPOLL_H_
+
+
+namespace {
+
+	int close(HANDLE h)
+	{
+		return epoll_close(h);
+	}
+
+};
+
+
+class ServerSockets
+{
+public:
+	int add(int& port)
+	{
+		_sockets.push_back(ServerSocket(SocketAddress("127.0.0.1", 0)));
+		port = _sockets.back().address().port();
+		return static_cast<int>(_sockets.back().impl()->sockfd());
+	}
+
+	int remove(int fd)
+	{
+		for (auto it = _sockets.begin(); it != _sockets.end(); ++it)
+		{
+			if (it->impl()->sockfd() == fd)
+			{
+				_sockets.erase(it);
+				return fd;
+			}
+		}
+		return 0;
+	}
+
+private:
+	std::vector<ServerSocket> _sockets;
+};
+
+
+int eventfd(int& port, int rmFD = 0)
+{
+	static ServerSockets serverSockets;
+	if (rmFD == 0)
+		return serverSockets.add(port);
+	else
+		return serverSockets.remove(rmFD);
+}
+
+
+#endif // WEPOLL_H_
+
+
 class PollSetImpl
 {
 public:
-	PollSetImpl(): _epollfd(epoll_create(1)),
-		_events(1024),
-		_eventfd(eventfd(0, 0))
+	PollSetImpl(): _events(1024),
+		_eventfd(eventfd(_port, 0)),
+		_epollfd(epoll_create(1))
 	{
 		int err = addImpl(_eventfd, PollSet::POLL_READ, 0);
 		if ((err) || (_epollfd < 0))
@@ -62,189 +123,12 @@ public:
 
 	~PollSetImpl()
 	{
-		if (_epollfd >= 0) ::close(_epollfd);
-		if (_eventfd >= 0) ::close(_eventfd);
-	}
-
-	void add(const Socket& socket, int mode)
-	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
-		SocketImpl* sockImpl = socket.impl();
-
-		int err = addImpl(sockImpl->sockfd(), mode, sockImpl);
-
-		if (err)
-		{
-			if (errno == EEXIST) update(socket, mode);
-			else SocketImpl::error();
-		}
-
-		if (_socketMap.find(sockImpl) == _socketMap.end())
-			_socketMap[sockImpl] = socket;
-	}
-
-	void remove(const Socket& socket)
-	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
-		poco_socket_t fd = socket.impl()->sockfd();
-		struct epoll_event ev;
-		ev.events = 0;
-		ev.data.ptr = 0;
-		int err = epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev);
-		if (err) SocketImpl::error();
-
-		_socketMap.erase(socket.impl());
-	}
-
-	bool has(const Socket& socket) const
-	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-		SocketImpl* sockImpl = socket.impl();
-		return sockImpl &&
-			(_socketMap.find(sockImpl) != _socketMap.end());
-	}
-
-	bool empty() const
-	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-		return _socketMap.empty();
-	}
-
-	void update(const Socket& socket, int mode)
-	{
-		poco_socket_t fd = socket.impl()->sockfd();
-		struct epoll_event ev;
-		ev.events = 0;
-		if (mode & PollSet::POLL_READ)
-			ev.events |= EPOLLIN;
-		if (mode & PollSet::POLL_WRITE)
-			ev.events |= EPOLLOUT;
-		if (mode & PollSet::POLL_ERROR)
-			ev.events |= EPOLLERR;
-		ev.data.ptr = socket.impl();
-		int err = epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &ev);
-		if (err)
-		{
-			SocketImpl::error();
-		}
-	}
-
-	void clear()
-	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
-		::close(_epollfd);
-		_socketMap.clear();
-		_epollfd = epoll_create(1);
-		if (_epollfd < 0)
-		{
-			SocketImpl::error();
-		}
-	}
-
-	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
-	{
-		PollSet::SocketModeMap result;
-		Poco::Timespan remainingTime(timeout);
-		int rc;
-		do
-		{
-			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, &_events[0], _events.size(), remainingTime.totalMilliseconds());
-			if (rc == 0) return result;
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
-			{
-				Poco::Timestamp end;
-				Poco::Timespan waited = end - start;
-				if (waited < remainingTime)
-					remainingTime -= waited;
-				else
-					remainingTime = 0;
-			}
-		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
-		if (rc < 0) SocketImpl::error();
-
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
-		for (int i = 0; i < rc; i++)
-		{
-			if (_events[i].data.ptr) // skip eventfd
-			{
-				std::map<void *, Socket>::iterator it = _socketMap.find(_events[i].data.ptr);
-				if (it != _socketMap.end())
-				{
-					if (_events[i].events & EPOLLIN)
-						result[it->second] |= PollSet::POLL_READ;
-					if (_events[i].events & EPOLLOUT)
-						result[it->second] |= PollSet::POLL_WRITE;
-					if (_events[i].events & EPOLLERR)
-						result[it->second] |= PollSet::POLL_ERROR;
-				}
-			}
-		}
-
-		return result;
-	}
-
-	void wakeUp()
-	{
-		uint64_t val = 1;
-		int n = ::write(_eventfd, &val, sizeof(val));
-		if (n < 0) Socket::error();
-	}
-
-	int count() const
-	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-		return static_cast<int>(_socketMap.size());
-	}
-
-private:
-	int addImpl(int fd, int mode, void* ptr)
-	{
-		struct epoll_event ev;
-		ev.events = 0;
-		if (mode & PollSet::POLL_READ)
-			ev.events |= EPOLLIN;
-		if (mode & PollSet::POLL_WRITE)
-			ev.events |= EPOLLOUT;
-		if (mode & PollSet::POLL_ERROR)
-			ev.events |= EPOLLERR;
-		ev.data.ptr = ptr;
-		return epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
-	}
-
-	mutable Poco::FastMutex         _mutex;
-	int                             _epollfd;
-	std::map<void*, Socket>         _socketMap;
-	std::vector<struct epoll_event> _events;
-	int                             _eventfd;
-};
-
+		if (_epollfd >= 0) close(_epollfd);
+#ifdef WEPOLL_H_
+		if (_eventfd >= 0) eventfd(_port, _eventfd);
 #else
-
-//
-// Windows implementation using wepoll
-//
-
-class PollSetImpl
-{
-public:
-	PollSetImpl() : _epollfd(epoll_create(1)),
-		_events(1024)
-	{
-		if (_epollfd < 0)
-		{
-			SocketImpl::error();
-		}
-	}
-
-	~PollSetImpl()
-	{
-		if (_epollfd >= 0) ::close(_epollfd);
+		if (_eventfd >= 0) close(_eventfd);
+#endif
 	}
 
 	void add(const Socket& socket, int mode)
@@ -316,7 +200,7 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
-		::close(_epollfd);
+		close(_epollfd);
 		_socketMap.clear();
 		_epollfd = epoll_create(1);
 		if (_epollfd < 0)
@@ -333,9 +217,7 @@ public:
 		do
 		{
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, &_events[0],
-				static_cast<int>(_events.size()),
-				static_cast<int>(remainingTime.totalMilliseconds()));
+			rc = epoll_wait(_epollfd, &_events[0], _events.size(), static_cast<int>(remainingTime.totalMilliseconds()));
 			if (rc == 0) return result;
 			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
@@ -346,7 +228,8 @@ public:
 				else
 					remainingTime = 0;
 			}
-		} while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+		}
+		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 		if (rc < 0) SocketImpl::error();
 
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -355,7 +238,7 @@ public:
 		{
 			if (_events[i].data.ptr) // skip eventfd
 			{
-				std::map<void*, Socket>::iterator it = _socketMap.find(_events[i].data.ptr);
+				std::map<void *, Socket>::iterator it = _socketMap.find(_events[i].data.ptr);
 				if (it != _socketMap.end())
 				{
 					if (_events[i].events & EPOLLIN)
@@ -373,6 +256,12 @@ public:
 
 	void wakeUp()
 	{
+#ifdef WEPOLL_H_
+		StreamSocket ss(SocketAddress("127.0.0.1", _port));
+#else
+		uint64_t val = 1;
+		write(_eventfd, &val, sizeof(val));
+#endif
 	}
 
 	int count() const
@@ -397,13 +286,17 @@ private:
 	}
 
 	mutable Poco::FastMutex         _mutex;
-	HANDLE                          _epollfd;
 	std::map<void*, Socket>         _socketMap;
 	std::vector<struct epoll_event> _events;
-	int                             _eventfd;
+	int _port = 0;
+	int _eventfd;
+#ifdef WEPOLL_H_
+	HANDLE _epollfd;
+#else
+	int _epollfd;
+#endif
 };
 
-#endif // POCO_OS_FAMILY_WINDOWS
 
 #elif defined(POCO_HAVE_FD_POLL)
 

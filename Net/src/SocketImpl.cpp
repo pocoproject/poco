@@ -21,7 +21,11 @@
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
-	#include <sys/epoll.h>
+	#ifdef POCO_OS_FAMILY_WINDOWS
+		#include "wepoll.h"
+	#else
+		#include <sys/epoll.h>
+	#endif
 #elif defined(POCO_HAVE_FD_POLL)
 	#ifndef _WIN32
 		#include <poll.h>

@@ -285,7 +285,7 @@ void PollSetTest::testPollClosedServer()
 	assertTrue(0 == ss2.receiveBytes(0, 0));
 }
 
-
+#define POCO_HAVE_FD_EPOLL 1
 void PollSetTest::testPollSetWakeUp()
 {
 #if defined(POCO_HAVE_FD_EPOLL) || defined (POCO_HAVE_FD_POLL)
