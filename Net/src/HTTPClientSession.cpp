@@ -515,8 +515,13 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 {
 	std::string result("http://");
 	result.append(_host);
-	result.append(":");
-	NumberFormatter::append(result, _port);
+	/// Do not append default by default, since this may break some servers.
+	/// One example of such server is GCS (Google Cloud Storage).
+	if (_port != HTTPSession::HTTP_PORT)
+	{
+		result.append(":");
+		NumberFormatter::append(result, _port);
+	}
 	return result;
 }
 
