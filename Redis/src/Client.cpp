@@ -61,6 +61,16 @@ Client::Client(const Net::SocketAddress& addrs):
 }
 
 
+Client::Client(const Net::StreamSocket& socket):
+	_address(),
+	_socket(),
+	_input(0),
+	_output(0)
+{
+	connect(socket);
+}
+
+
 Client::~Client()
 {
 	delete _input;
@@ -133,6 +143,18 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 }
 
 
+void Client::connect(const Poco::Net::StreamSocket& socket)
+{
+	poco_assert(! _input);
+	poco_assert(! _output);
+
+	_address = socket.peerAddress();
+	_socket = socket;
+	_input = new RedisInputStream(_socket);
+	_output = new RedisOutputStream(_socket);
+}
+
+
 void Client::disconnect()
 {
 	delete _input;
@@ -148,29 +170,6 @@ void Client::disconnect()
 bool Client::isConnected() const
 {
 	return _input != 0;
-}
-
-
-bool Client::sendAuth(const std::string& password)
-{
-	Array cmd;
-	cmd << "AUTH" << password;
-
-	bool ret = true;
-	std::string response;
-
-	try
-	{
-		response = execute<std::string>(cmd);
-	}
-	catch (...)
-	{
-		ret = false;
-	}
-
-	_authenticated = (ret && (response == "OK"));
-
-	return _authenticated;
 }
 
 

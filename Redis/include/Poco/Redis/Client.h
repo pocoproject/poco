@@ -87,6 +87,11 @@ public:
 	Client(const Net::SocketAddress& addrs);
 		/// Constructor which connects to the given Redis host/port.
 
+	Client(const Net::StreamSocket& socket);
+		/// Constructor which connects using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
+
 	virtual ~Client();
 		/// Destroys the Client.
 
@@ -113,17 +118,16 @@ public:
 	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
 		/// Connects to the given Redis server.
 
+	void connect(const Net::StreamSocket& socket);
+		/// Connects to the given Redis server using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
+
 	void disconnect();
 		/// Disconnects from the Redis server.
 
 	bool isConnected() const;
 		/// Returns true iff the Client is connected to a Redis server.
-
-	bool sendAuth(const std::string& password);
-		/// Sends password to Redis server
-
-	bool isAuthenticated();
-		/// Returns true when the client is authenticated
 
 	template<typename T>
 	T execute(const Array& command)
@@ -205,7 +209,6 @@ private:
 	Net::StreamSocket _socket;
 	RedisInputStream* _input;
 	RedisOutputStream* _output;
-	bool _authenticated = false;
 };
 
 
@@ -237,12 +240,6 @@ inline void Client::flush()
 inline void Client::setReceiveTimeout(const Timespan& timeout)
 {
 	_socket.setReceiveTimeout(timeout);
-}
-
-
-inline bool Client::isAuthenticated()
-{
-    return _authenticated;
 }
 
 
