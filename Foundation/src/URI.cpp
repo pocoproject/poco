@@ -257,7 +257,7 @@ std::string URI::toString() const
 	if (!_fragment.empty())
 	{
 		uri += '#';
-		encode(_fragment, RESERVED_FRAGMENT, uri);
+		uri.append(_fragment);
 	}
 	return uri;
 }
@@ -420,10 +420,24 @@ void URI::setQueryParameters(const QueryParameters& params)
 }
 
 
+std::string URI::getFragment() const
+{
+	std::string fragment;
+	decode(_fragment, fragment);
+	return fragment;
+}
+
+
 void URI::setFragment(const std::string& fragment)
 {
 	_fragment.clear();
-	decode(fragment, _fragment);
+	encode(fragment, RESERVED_FRAGMENT, _fragment);
+}
+
+
+void URI::setRawFragment(const std::string& fragment)
+{
+	_fragment = fragment;
 }
 
 
@@ -450,7 +464,7 @@ std::string URI::getPathEtc() const
 	if (!_fragment.empty())
 	{
 		pathEtc += '#';
-		encode(_fragment, RESERVED_FRAGMENT, pathEtc);
+		pathEtc += _fragment;
 	}
 	return pathEtc;
 }
@@ -882,9 +896,8 @@ void URI::parseQuery(std::string::const_iterator& it, const std::string::const_i
 
 void URI::parseFragment(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
-	std::string fragment;
-	while (it != end) fragment += *it++;
-	decode(fragment, _fragment);
+	_fragment.clear();
+	while (it != end) _fragment += *it++;
 }
 
 
