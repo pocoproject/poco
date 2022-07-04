@@ -29,7 +29,7 @@ HTTPHeaderStreamBuf::HTTPHeaderStreamBuf(HTTPSession& session, openmode mode):
 	HTTPBasicStreamBuf(HTTPBufferAllocator::BUFFER_SIZE, mode),
 	_session(session),
 	_end(false),
-	_line_ended(true)
+	_lineEnd(true)
 {
 }
 
@@ -56,9 +56,9 @@ int HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (ch != eof)
 	{
 		*buffer++ = (char) ch; ++n;
-		if (n == 2) _end = _line_ended;
+		if (n == 2) _end = _lineEnd;
 	}
-	_line_ended = (ch == '\n');
+	_lineEnd = (ch == '\n');
 	return n;
 }
 
