@@ -219,12 +219,14 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	SocketList readyExceptList;
 	for (int n = 0; n < rc; ++n)
 	{
-		if (eventsOut[n].events & EPOLLERR)
-			readyExceptList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
+		Socket sock = *reinterpret_cast<Socket*>(eventsOut[n].data.ptr);
+		if ((eventsOut[n].events & EPOLLERR) &&
+			(std::end(exceptList) != std::find(exceptList.begin(), exceptList.end(), sock)))
+			readyExceptList.push_back(sock);
 		if (eventsOut[n].events & EPOLLIN)
-			readyReadList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
+			readyReadList.push_back(sock);
 		if (eventsOut[n].events & EPOLLOUT)
-			readyWriteList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
+			readyWriteList.push_back(sock);
 	}
 	std::swap(readList, readyReadList);
 	std::swap(writeList, readyWriteList);
