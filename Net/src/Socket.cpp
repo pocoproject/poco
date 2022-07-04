@@ -15,6 +15,7 @@
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -499,6 +500,12 @@ SocketBufVec Socket::makeBufVec(const std::vector<std::string>& vec)
 int Socket::lastError()
 {
 	return SocketImpl::lastError();
+}
+
+
+std::string Socket::lastErrorDesc()
+{
+	return Error::getMessage(SocketImpl::lastError());
 }
 
 

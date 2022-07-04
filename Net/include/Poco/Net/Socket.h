@@ -380,6 +380,9 @@ public:
 	static int lastError();
 		/// Returns the last error code.
 
+	static std::string lastErrorDesc();
+		/// Returns the last error description.
+
 	static void error();
 		/// Throws an appropriate exception for the last error.
 
