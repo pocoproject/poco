@@ -50,7 +50,7 @@ protected:
 private:
 	HTTPSession& _session;
 	bool         _end;
-	bool         _line_ended;
+	bool         _lineEnd;
 };
 
 
