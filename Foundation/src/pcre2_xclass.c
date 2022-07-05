@@ -6,7 +6,8 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2013 University of Cambridge
+     Original API code Copyright (c) 1997-2012 University of Cambridge
+          New API code Copyright (c) 2016-2022 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -37,42 +38,42 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-
 /* This module contains an internal function that is used to match an extended
-class. It is used by both pcre_exec() and pcre_def_exec(). */
+class. It is used by pcre2_auto_possessify() and by both pcre2_match() and
+pcre2_def_match(). */
 
-#include "pcre_config.h"
-#include "pcre_internal.h"
 
+#include "pcre2_config.h"
+#include "pcre2_internal.h"
 
 /*************************************************
 *       Match character against an XCLASS        *
 *************************************************/
 
 /* This function is called to match a character against an extended class that
-might contain values > 255 and/or Unicode properties.
+might contain codepoints above 255 and/or Unicode properties.
 
 Arguments:
   c           the character
-  data        points to the flag byte of the XCLASS data
+  data        points to the flag code unit of the XCLASS data
+  utf         TRUE if in UTF mode
 
 Returns:      TRUE if character matches, else FALSE
 */
 
 BOOL
-PRIV(xclass)(pcre_uint32 c, const pcre_uchar *data, BOOL utf)
+PRIV(xclass)(uint32_t c, PCRE2_SPTR data, BOOL utf)
 {
-pcre_uchar t;
+PCRE2_UCHAR t;
 BOOL negated = (*data & XCL_NOT) != 0;
 
-(void)utf;
-#ifdef COMPILE_PCRE8
+#if PCRE2_CODE_UNIT_WIDTH == 8
 /* In 8 bit mode, this must always be TRUE. Help the compiler to know that. */
 utf = TRUE;
 #endif
 
-/* Character values < 256 are matched against a bitmap, if one is present. If
-not, we still carry on, because there may be ranges that start below 256 in the
+/* Code points < 256 are matched against a bitmap, if one is present. If not,
+we still carry on, because there may be ranges that start below 256 in the
 additional data. */
 
 if (c < 256)
@@ -80,37 +81,37 @@ if (c < 256)
   if ((*data & XCL_HASPROP) == 0)
     {
     if ((*data & XCL_MAP) == 0) return negated;
-    return (((pcre_uint8 *)(data + 1))[c/8] & (1 << (c&7))) != 0;
+    return (((uint8_t *)(data + 1))[c/8] & (1u << (c&7))) != 0;
     }
   if ((*data & XCL_MAP) != 0 &&
-    (((pcre_uint8 *)(data + 1))[c/8] & (1 << (c&7))) != 0)
+    (((uint8_t *)(data + 1))[c/8] & (1u << (c&7))) != 0)
     return !negated; /* char found */
   }
 
 /* First skip the bit map if present. Then match against the list of Unicode
 properties or large chars or ranges that end with a large char. We won't ever
-encounter XCL_PROP or XCL_NOTPROP when UCP support is not compiled. */
+encounter XCL_PROP or XCL_NOTPROP when UTF support is not compiled. */
 
-if ((*data++ & XCL_MAP) != 0) data += 32 / sizeof(pcre_uchar);
+if ((*data++ & XCL_MAP) != 0) data += 32 / sizeof(PCRE2_UCHAR);
 
 while ((t = *data++) != XCL_END)
   {
-  pcre_uint32 x, y;
+  uint32_t x, y;
   if (t == XCL_SINGLE)
     {
-#ifdef SUPPORT_UTF
+#ifdef SUPPORT_UNICODE
     if (utf)
       {
       GETCHARINC(x, data); /* macro generates multiple statements */
       }
     else
 #endif
-      x = *data++;
+    x = *data++;
     if (c == x) return !negated;
     }
   else if (t == XCL_RANGE)
     {
-#ifdef SUPPORT_UTF
+#ifdef SUPPORT_UNICODE
     if (utf)
       {
       GETCHARINC(x, data); /* macro generates multiple statements */
@@ -125,11 +126,12 @@ while ((t = *data++) != XCL_END)
     if (c >= x && c <= y) return !negated;
     }
 
-#ifdef SUPPORT_UCP
+#ifdef SUPPORT_UNICODE
   else  /* XCL_PROP & XCL_NOTPROP */
     {
     const ucd_record *prop = GET_UCD(c);
     BOOL isprop = t == XCL_PROP;
+    BOOL ok;
 
     switch(*data)
       {
@@ -153,6 +155,12 @@ while ((t = *data++) != XCL_END)
 
       case PT_SC:
       if ((data[1] == prop->script) == isprop) return !negated;
+      break;
+
+      case PT_SCX:
+      ok = (data[1] == prop->script ||
+            MAPBIT(PRIV(ucd_script_sets) + UCD_SCRIPTX_PROP(prop), data[1]) != 0);
+      if (ok == isprop) return !negated;
       break;
 
       case PT_ALNUM:
@@ -200,6 +208,17 @@ while ((t = *data++) != XCL_END)
         if ((c < 0xd800 || c > 0xdfff) == isprop)
           return !negated;
         }
+      break;
+
+      case PT_BIDICL:
+      if ((UCD_BIDICLASS_PROP(prop) == data[1]) == isprop)
+        return !negated;
+      break;
+
+      case PT_BOOL:
+      ok = MAPBIT(PRIV(ucd_boolprop_sets) +
+        UCD_BPROPS_PROP(prop), data[1]) != 0;
+      if (ok == isprop) return !negated;
       break;
 
       /* The following three properties can occur only in an XCLASS, as there
@@ -255,10 +274,12 @@ while ((t = *data++) != XCL_END)
 
     data += 2;
     }
-#endif  /* SUPPORT_UCP */
+#else
+  (void)utf;  /* Avoid compiler warning */
+#endif  /* SUPPORT_UNICODE */
   }
 
 return negated;   /* char did not match */
 }
 
-/* End of pcre_xclass.c */
+/* End of pcre2_xclass.c */
