@@ -16,6 +16,7 @@
 #include "Poco/Exception.h"
 #include <sstream>
 #if defined(POCO_UNBUNDLED)
+#define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #else
 #include "pcre2_config.h"
