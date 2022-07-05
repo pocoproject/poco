@@ -514,8 +514,8 @@ void SocketTest::testSelect2()
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 2);
 	assertTrue (readList.empty());
 	assertTrue (writeList.size() == 2);
-	assertTrue (writeList[0] == ss1);
-	assertTrue (writeList[1] == ss2);
+	assertTrue (writeList[0] == ss1 || writeList[1] == ss1);
+	assertTrue (writeList[0] == ss2 || writeList[1] == ss2);
 	assertTrue (exceptList.empty());
 
 	ss1.close();

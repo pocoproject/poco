@@ -24,6 +24,7 @@ public:
 	PollSetTest(const std::string& name);
 	~PollSetTest();
 
+	void testAddUpdate();
 	void testTimeout();
 	void testPollNB();
 	void testPoll();
