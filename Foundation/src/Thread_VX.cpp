@@ -20,6 +20,19 @@
 #include <timers.h>
 
 
+namespace
+{
+	void setThreadName(const std::string& threadName)
+	{
+		/// TODO
+	}
+
+	std::string getThreadName()
+	{
+		/// TODO
+	}
+}
+
 namespace Poco {
 
 
@@ -34,6 +47,35 @@ ThreadImpl::ThreadImpl():
 			
 ThreadImpl::~ThreadImpl()
 {
+}
+
+
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN) {
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	if (realName != _pData->name) {
+		_pData->name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	return _pData->name;
+}
+
+
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	return isRunningImpl() ? getThreadName() : "";
 }
 
 
@@ -181,6 +223,7 @@ void ThreadImpl::runnableEntry(void* pThread, int, int, int, int, int, int, int,
 	_pCurrent = reinterpret_cast<ThreadImpl*>(pThread);
 
 	AutoPtr<ThreadData> pData = _pCurrent->_pData;
+	setThreadName(pData->name);
 	try
 	{
 		pData->pRunnableTarget->run();

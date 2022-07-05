@@ -18,9 +18,6 @@
 #include <process.h>
 
 
-#if defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
-
-
 namespace
 {
 	/// See <http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx> 
@@ -39,11 +36,11 @@ namespace
 	} THREADNAME_INFO;
 	#pragma pack(pop)
 	
-	void setThreadName(DWORD dwThreadID, const char* threadName)
+	void setThreadName(DWORD dwThreadID, const std::string& threadName)
 	{
         THREADNAME_INFO info;
         info.dwType     = 0x1000;
-        info.szName     = threadName;
+        info.szName     = threadName.c_str();
         info.dwThreadID = dwThreadID;
         info.dwFlags    = 0;
     
@@ -55,10 +52,12 @@ namespace
         {
         }
 	}
+
+	std::string getThreadName()
+	{
+		/// TODO
+	}
 }
-
-
-#endif
 
 
 namespace Poco {
@@ -79,6 +78,35 @@ ThreadImpl::ThreadImpl():
 ThreadImpl::~ThreadImpl()
 {
 	if (_thread) CloseHandle(_thread);
+}
+
+
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN) {
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	if (realName != _name) {
+		_name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	return _name;
+}
+
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	// TODO
+	return isRunningImpl() ? _name : "";
 }
 
 
@@ -200,10 +228,9 @@ DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
 #endif
 {
-	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
-#if defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
-	setThreadName(-1, reinterpret_cast<Thread*>(pThread)->getName().c_str());
-#endif
+	auto * pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	_currentThreadHolder.set(pThreadImpl);
+	setThreadName(-1, pThreadImpl->_name);
 	try
 	{
 		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();

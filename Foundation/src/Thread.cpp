@@ -90,19 +90,19 @@ private:
 
 Thread::Thread():
 	_id(uniqueId()),
-	_name(makeName()),
 	_pTLS(0),
 	_event(true)
 {
+	setNameImpl(makeName());
 }
 
 
 Thread::Thread(const std::string& name):
 	_id(uniqueId()),
-	_name(name),
 	_pTLS(0),
 	_event(true)
 {
+	setNameImpl(name);
 }
 
 
@@ -210,9 +210,7 @@ int Thread::uniqueId()
 
 void Thread::setName(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	_name = name;
+	setNameImpl(name);
 }
 
 
