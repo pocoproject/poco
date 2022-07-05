@@ -45,7 +45,7 @@ pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_compile pcre2_config \
 pcre_utf8_objects = pcre2_ucd pcre2_tables
 
 ifdef POCO_UNBUNDLED
-	SYSLIBS += -lpcre -lz
+	SYSLIBS += -lpcre2-8 -lz
 	objects += $(pcre_utf8_objects)
 else
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
