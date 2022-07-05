@@ -42,6 +42,9 @@ namespace Net {
 class PollSetImpl
 {
 public:
+	using Mutex = Poco::SpinlockMutex;
+	using ScopedLock = Mutex::ScopedLock;
+
 	PollSetImpl(): _epollfd(epoll_create(1)),
 		_events(1024),
 		_eventfd(eventfd(0, 0))
@@ -55,14 +58,13 @@ public:
 
 	~PollSetImpl()
 	{
+		::close(_eventfd.exchange(0));
+		ScopedLock l(_mutex);
 		if (_epollfd >= 0) ::close(_epollfd);
-		if (_eventfd >= 0) ::close(_eventfd);
 	}
 
 	void add(const Socket& socket, int mode)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
 		SocketImpl* sockImpl = socket.impl();
 
 		int err = addImpl(sockImpl->sockfd(), mode, sockImpl);
@@ -73,35 +75,35 @@ public:
 			else SocketImpl::error();
 		}
 
+		ScopedLock lock(_mutex);
 		if (_socketMap.find(sockImpl) == _socketMap.end())
 			_socketMap[sockImpl] = socket;
 	}
 
 	void remove(const Socket& socket)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
 		poco_socket_t fd = socket.impl()->sockfd();
 		struct epoll_event ev;
 		ev.events = 0;
 		ev.data.ptr = 0;
+
+		ScopedLock lock(_mutex);
 		int err = epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev);
 		if (err) SocketImpl::error();
-
 		_socketMap.erase(socket.impl());
 	}
 
 	bool has(const Socket& socket) const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		SocketImpl* sockImpl = socket.impl();
+		ScopedLock lock(_mutex);
 		return sockImpl &&
 			(_socketMap.find(sockImpl) != _socketMap.end());
 	}
 
 	bool empty() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 		return _socketMap.empty();
 	}
 
@@ -117,24 +119,28 @@ public:
 		if (mode & PollSet::POLL_ERROR)
 			ev.events |= EPOLLERR;
 		ev.data.ptr = socket.impl();
-		int err = epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &ev);
-		if (err)
+
+		int err = 0;
 		{
-			SocketImpl::error();
+			ScopedLock lock(_mutex);
+			err = epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &ev);
 		}
+		if (err) SocketImpl::error();
 	}
 
 	void clear()
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
-
-		::close(_epollfd);
-		_socketMap.clear();
-		_epollfd = epoll_create(1);
-		if (_epollfd < 0)
 		{
-			SocketImpl::error();
+			ScopedLock lock(_mutex);
+
+			::close(_epollfd);
+			_socketMap.clear();
+			_epollfd = epoll_create(1);
+			if (_epollfd < 0) SocketImpl::error();
 		}
+		::close(_eventfd.exchange(0));
+		_eventfd = eventfd(0, 0);
+		addImpl(_eventfd, PollSet::POLL_READ, 0);
 	}
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
@@ -142,6 +148,7 @@ public:
 		PollSet::SocketModeMap result;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+		ScopedLock lock(_mutex);
 		do
 		{
 			Poco::Timestamp start;
@@ -159,8 +166,6 @@ public:
 		}
 		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 		if (rc < 0) SocketImpl::error();
-
-		Poco::FastMutex::ScopedLock lock(_mutex);
 
 		for (int i = 0; i < rc; i++)
 		{
@@ -185,13 +190,15 @@ public:
 	void wakeUp()
 	{
 		uint64_t val = 1;
-		int n = ::write(_eventfd, &val, sizeof(val));
-		if (n < 0) Socket::error();
+		// This is guaranteed to write into a valid fd,
+		// or 0 (meaning PollSet is being destroyed).
+		// Errors are ignored.
+		::write(_eventfd, &val, sizeof(val));
 	}
 
 	int count() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 		return static_cast<int>(_socketMap.size());
 	}
 
@@ -207,14 +214,15 @@ private:
 		if (mode & PollSet::POLL_ERROR)
 			ev.events |= EPOLLERR;
 		ev.data.ptr = ptr;
+		ScopedLock lock(_mutex);
 		return epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
 	}
 
-	mutable Poco::FastMutex         _mutex;
-	int                             _epollfd;
-	std::map<void*, Socket>         _socketMap;
+	mutable Mutex _mutex;
+	int _epollfd;
+	std::map<void*, Socket> _socketMap;
 	std::vector<struct epoll_event> _events;
-	int                             _eventfd;
+	std::atomic<int> _eventfd;
 };
 
 
