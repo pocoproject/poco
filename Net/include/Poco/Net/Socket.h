@@ -130,6 +130,7 @@ public:
 	void close();
 		/// Closes the socket.
 
+	//@deprecated
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
 		/// Determines the status of one or more sockets, 
 		/// using a call to select().
@@ -159,6 +160,9 @@ public:
 		/// the closed socket will not be included in any list.
 		/// In this case, the return value may be greater than the sum
 		/// of all sockets in all list.
+		///
+		/// This function is deprecated and may be removed in the future releases,
+		/// please use PollSet class instead.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
 		/// Determines the status of the socket, using a 
@@ -379,6 +383,9 @@ public:
 
 	static int lastError();
 		/// Returns the last error code.
+
+	static std::string lastErrorDesc();
+		/// Returns the last error description.
 
 	static void error();
 		/// Throws an appropriate exception for the last error.

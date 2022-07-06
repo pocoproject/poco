@@ -374,7 +374,8 @@ bool intToStr(T value,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
-	char thSep = 0)
+	char thSep = 0,
+	bool upper = true)
 	/// Converts integer to string. Numeric bases from binary to hexadecimal are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
@@ -396,7 +397,10 @@ bool intToStr(T value,
 	{
 		tmpVal = value;
 		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		if (upper)
+			*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		else
+			*ptr++ = "fedcba9876543210123456789abcdef"[15 + (tmpVal - value * base)];
 		if (thSep && (base == 10) && (++thCount == 3))
 		{
 			*ptr++ = thSep;
@@ -452,7 +456,8 @@ bool uIntToStr(T value,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
-	char thSep = 0)
+	char thSep = 0,
+	bool upper = true)
 	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
@@ -474,7 +479,10 @@ bool uIntToStr(T value,
 	{
 		tmpVal = value;
 		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		if (upper)
+			*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		else
+			*ptr++ = "fedcba9876543210123456789abcdef"[15 + (tmpVal - value * base)];
 		if (thSep && (base == 10) && (++thCount == 3))
 		{
 			*ptr++ = thSep;
@@ -520,26 +528,26 @@ bool uIntToStr(T value,
 
 
 template <typename T>
-bool intToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+bool intToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0, bool upper = true)
 	/// Converts integer to string; This is a wrapper function, for details see see the
 	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
+	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, upper);
 	result.assign(res, size);
 	return ret;
 }
 
 
 template <typename T>
-bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0, bool upper = true)
 	/// Converts unsigned integer to string; This is a wrapper function, for details see see the
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
+	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep, upper);
 	result.assign(res, size);
 	return ret;
 }
