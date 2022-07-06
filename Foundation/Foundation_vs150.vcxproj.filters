@@ -52,17 +52,11 @@
     <Filter Include="RegularExpression">
       <UniqueIdentifier>{8d90af25-6c9f-45fb-8af0-7463fab03c44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RegularExpression\PCRE Header Files">
-      <UniqueIdentifier>{8bd7fdba-6cdf-4cc7-8ffd-e0eef416d7b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="RegularExpression\Source Files">
       <UniqueIdentifier>{3b04a0e6-f311-428b-af8f-c1a7a3d9fd10}</UniqueIdentifier>
     </Filter>
     <Filter Include="RegularExpression\Header Files">
       <UniqueIdentifier>{5f191b86-441f-4da7-8b2f-02513d443466}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RegularExpression\PCRE Source Files">
-      <UniqueIdentifier>{f19826b3-7a4b-4d64-aaa3-eb1e084a71b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
       <UniqueIdentifier>{f98d18b5-dfbc-4c35-8654-bf0c3fc815e9}</UniqueIdentifier>
@@ -186,6 +180,12 @@
     </Filter>
     <Filter Include="Dynamic\Source Files">
       <UniqueIdentifier>{7df1fa35-122a-4152-b81f-35be1aabd290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegularExpression\PCRE2 Header Files">
+      <UniqueIdentifier>{8bd7fdba-6cdf-4cc7-8ffd-e0eef416d7b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegularExpression\PCRE2 Source Files">
+      <UniqueIdentifier>{f19826b3-7a4b-4d64-aaa3-eb1e084a71b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -488,69 +488,6 @@
     </ClCompile>
     <ClCompile Include="src\RegularExpression.cpp">
       <Filter>RegularExpression\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_byte_order.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_chartables.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_compile.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_config.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_dfa_exec.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_exec.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_fullinfo.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_get.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_globals.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_jit_compile.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_maketables.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_newline.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_ord2utf8.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_refcount.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_string_utils.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_study.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_tables.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_ucd.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_valid_utf8.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_version.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pcre_xclass.c">
-      <Filter>RegularExpression\PCRE Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ArchiveStrategy.cpp">
       <Filter>Logging\Source Files</Filter>
@@ -887,6 +824,96 @@
     </ClCompile>
     <ClCompile Include="src\DataURIStreamFactory.cpp">
       <Filter>URI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_auto_possess.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_chartables.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_compile.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_config.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_context.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_convert.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_dfa_match.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_error.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_extuni.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_find_bracket.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_jit_compile.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_jit_match.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_jit_misc.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_maketables.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_match.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_match_data.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_newline.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_ord2utf.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_pattern_info.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_script_run.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_serialize.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_string_utils.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_study.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_substitute.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_substring.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_tables.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_ucd.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_ucptables.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_valid_utf.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_xclass.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1321,18 +1348,6 @@
     </ClInclude>
     <ClInclude Include="include\Poco\SharedLibrary_WIN32U.h">
       <Filter>SharedLibrary\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pcre.h">
-      <Filter>RegularExpression\PCRE Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pcre_config.h">
-      <Filter>RegularExpression\PCRE Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pcre_internal.h">
-      <Filter>RegularExpression\PCRE Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ucp.h">
-      <Filter>RegularExpression\PCRE Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\RegularExpression.h">
       <Filter>RegularExpression\Header Files</Filter>
@@ -1822,6 +1837,21 @@
     </ClInclude>
     <ClInclude Include="include\Poco\DataURIStreamFactory.h">
       <Filter>URI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pcre2.h">
+      <Filter>RegularExpression\PCRE2 Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pcre2_config.h">
+      <Filter>RegularExpression\PCRE2 Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pcre2_internal.h">
+      <Filter>RegularExpression\PCRE2 Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pcre2_intmodedep.h">
+      <Filter>RegularExpression\PCRE2 Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pcre2_ucp.h">
+      <Filter>RegularExpression\PCRE2 Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

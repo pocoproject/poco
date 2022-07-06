@@ -35,39 +35,45 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
 if(POCO_UNBUNDLED)
-	find_package(PCRE REQUIRED)
+	find_package(PCRE2 REQUIRED)
 	find_package(ZLIB REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES(SRCS RegExp
-		src/pcre_ucd.c
-		src/pcre_tables.c
+		src/pcre2_ucd.c
+		src/pcre2_tables.c
 	)
 
 else()
-	# pcre
-	POCO_SOURCES(SRCS pcre
-		src/pcre_config.c
-		src/pcre_byte_order.c
-		src/pcre_chartables.c
-		src/pcre_compile.c
-		src/pcre_exec.c
-		src/pcre_fullinfo.c
-		src/pcre_globals.c
-		src/pcre_maketables.c
-		src/pcre_newline.c
-		src/pcre_ord2utf8.c
-		src/pcre_study.c
-		src/pcre_tables.c
-		src/pcre_dfa_exec.c
-		src/pcre_get.c
-		src/pcre_jit_compile.c
-		src/pcre_refcount.c
-		src/pcre_string_utils.c
-		src/pcre_version.c
-		src/pcre_ucd.c
-		src/pcre_valid_utf8.c
-		src/pcre_xclass.c
+	# pcre2
+	POCO_SOURCES(SRCS pcre2
+		src/pcre2_auto_possess.c
+		src/pcre2_chartables.c
+		src/pcre2_compile.c
+		src/pcre2_config.c
+		src/pcre2_context.c
+		src/pcre2_convert.c
+		src/pcre2_dfa_match.c
+		src/pcre2_error.c
+		src/pcre2_extuni.c
+		src/pcre2_find_bracket.c
+		src/pcre2_jit_compile.c
+		src/pcre2_maketables.c
+		src/pcre2_match.c
+		src/pcre2_match_data.c
+		src/pcre2_newline.c
+		src/pcre2_ord2utf.c
+		src/pcre2_pattern_info.c
+		src/pcre2_script_run.c
+		src/pcre2_serialize.c
+		src/pcre2_string_utils.c
+		src/pcre2_study.c
+		src/pcre2_substitute.c
+		src/pcre2_substring.c
+		src/pcre2_tables.c
+		src/pcre2_ucd.c
+		src/pcre2_valid_utf.c
+		src/pcre2_xclass.c
 	)
 
 	# zlib
@@ -101,7 +107,7 @@ set_target_properties(Foundation
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PUBLIC Pcre::Pcre ZLIB::ZLIB)
+	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif(POCO_UNBUNDLED)
 
