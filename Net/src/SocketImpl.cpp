@@ -21,7 +21,12 @@
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
-	#include <sys/epoll.h>
+	#ifdef POCO_OS_FAMILY_WINDOWS
+		#include "wepoll.h"
+	#else
+		#include <sys/epoll.h>
+		#include <sys/eventfd.h>
+	#endif
 #elif defined(POCO_HAVE_FD_POLL)
 	#ifndef _WIN32
 		#include <poll.h>
@@ -50,6 +55,20 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::NumberFormatter;
 using Poco::Timespan;
+
+
+#ifdef WEPOLL_H_
+
+namespace {
+
+	int close(HANDLE h)
+	{
+		return epoll_close(h);
+	}
+
+}
+
+#endif // WEPOLL_H_
 
 
 namespace Poco {
@@ -622,8 +641,11 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	if (sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 #if defined(POCO_HAVE_FD_EPOLL)
-
+#ifdef WEPOLL_H_
+	HANDLE epollfd = epoll_create(1);
+#else
 	int epollfd = epoll_create(1);
+#endif
 	if (epollfd < 0)
 	{
 		error("Can't create epoll queue");
