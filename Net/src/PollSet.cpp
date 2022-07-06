@@ -69,7 +69,7 @@ public:
 	using SocketMap = std::map<void*, SocketMode>;
 
 	PollSetImpl(): _events(1024),
-		_eventfd(eventfd(_port)),
+		_eventfd(eventfd(_port, 0)),
 		_epollfd(epoll_create(1))
 	{
 		int err = addFD(_eventfd, PollSet::POLL_READ, EPOLL_CTL_ADD);
