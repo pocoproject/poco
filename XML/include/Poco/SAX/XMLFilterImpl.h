@@ -33,25 +33,25 @@ namespace XML {
 class XML_API XMLFilterImpl: public XMLFilter, public EntityResolver, public DTDHandler, public ContentHandler, public ErrorHandler
 	/// Base class for deriving an XML filter.
 	///
-	/// This class is designed to sit between an XMLReader and the client application's event 
-	/// handlers. By default, it does nothing but pass requests up to the reader and events on to 
-	/// the handlers unmodified, but subclasses can override specific methods to modify the event 
+	/// This class is designed to sit between an XMLReader and the client application's event
+	/// handlers. By default, it does nothing but pass requests up to the reader and events on to
+	/// the handlers unmodified, but subclasses can override specific methods to modify the event
 	/// stream or the configuration requests as they pass through.
 {
 public:
 	XMLFilterImpl();
 		/// Construct an empty XML filter, with no parent.
 		///
-		/// This filter will have no parent: you must assign a parent before you start a parse or do any 
-		/// configuration with setFeature or setProperty, unless you use this as a pure event consumer rather 
+		/// This filter will have no parent: you must assign a parent before you start a parse or do any
+		/// configuration with setFeature or setProperty, unless you use this as a pure event consumer rather
 		/// than as an XMLReader.
-		
+
 	XMLFilterImpl(XMLReader* pParent);
 		/// Construct an XML filter with the specified parent.
-		
+
 	~XMLFilterImpl();
 		/// Destroys the XMLFilterImpl.
-	
+
 	// XMLFilter
 	XMLReader* getParent() const;
 	void setParent(XMLReader* pParent);
@@ -77,7 +77,7 @@ public:
 	// EntityResolver
 	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);
 	void releaseInputSource(InputSource* pSource);
-	
+
 	// DTDHandler
 	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId);
 	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
@@ -104,10 +104,10 @@ protected:
 		/// Subclasses can use this method instead of
 		/// getParent() for better performance - this method
 		/// is non-virtual and implemented as inline.
-	
+
 	virtual void setupParse();
 		/// Setup the event handlers in the parent reader.
-	
+
 private:
 	XMLReader*      _pParent;
 	EntityResolver* _pEntityResolver;

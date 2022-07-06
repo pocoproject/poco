@@ -29,7 +29,7 @@ XMLFilterImpl::XMLFilterImpl():
 {
 }
 
-	
+
 XMLFilterImpl::XMLFilterImpl(XMLReader* pParent):
 	_pParent(pParent),
 	_pEntityResolver(0),
@@ -39,7 +39,7 @@ XMLFilterImpl::XMLFilterImpl(XMLReader* pParent):
 {
 }
 
-	
+
 XMLFilterImpl::~XMLFilterImpl()
 {
 }

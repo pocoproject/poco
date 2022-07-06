@@ -11,25 +11,25 @@ Just implement the following interfaces:
   * Poco::Data::Connector
   * optional: Poco::Data::AbstractPreparation
 
-It is recommended to implement the classes from top to down (ie. start with Binder and Extractor) and to use a 
+It is recommended to implement the classes from top to down (ie. start with Binder and Extractor) and to use a
 namespace that has <[ Poco::Data ]> as parent, e.g.<[ Poco::Data::SQLite ]>.
 
 !!!AbstractBinder
-An <[AbstractBinder]> is a class that maps values to placeholders. It is also responsible to bind primitive C++ data types to database 
-data types. The constructor of the subclass should receive everything needed to bind variables to 
+An <[AbstractBinder]> is a class that maps values to placeholders. It is also responsible to bind primitive C++ data types to database
+data types. The constructor of the subclass should receive everything needed to bind variables to
 placeholders by position. An example taken from the SQLite implementation would be:
 
     Binder::Binder(sqlite3_stmt* pStmt):
         _pStmt(pStmt)
     {
     }
-    
+
     void Binder::bind(std::size_t pos, const Poco::Int32& val)
     {
         int rc = sqlite3_bind_int(_pStmt, (int)pos, val);
         checkReturn(rc);
     }
-    
+
     void Binder::bind(std::size_t pos, const Poco::Int16& val)
     {
         Poco::Int32 tmp = val;
@@ -43,55 +43,55 @@ All methods are public.
 
     AbstractBinder();
         /// Creates the AbstractBinder.
-    
+
     virtual ~AbstractBinder();
         /// Destroys the AbstractBinder.
-    
+
     virtual void bind(std::size_t pos, const Poco::Int8 &val) = 0;
         /// Binds an Int8.
-    
+
     virtual void bind(std::size_t pos, const Poco::UInt8 &val) = 0;
         /// Binds an UInt8.
-    
+
     virtual void bind(std::size_t pos, const Poco::Int16 &val) = 0;
         /// Binds an Int16.
-    
+
     virtual void bind(std::size_t pos, const Poco::UInt16 &val) = 0;
         /// Binds an UInt16.
-    
+
     virtual void bind(std::size_t pos, const Poco::Int32 &val) = 0;
         /// Binds an Int32.
-    
+
     virtual void bind(std::size_t pos, const Poco::UInt32 &val) = 0;
         /// Binds an UInt32.
-    
+
     virtual void bind(std::size_t pos, const Poco::Int64 &val) = 0;
         /// Binds an Int64.
-    
+
     virtual void bind(std::size_t pos, const Poco::UInt64 &val) = 0;
         /// Binds an UInt64.
-    
+
     virtual void bind(std::size_t pos, const bool &val) = 0;
         /// Binds a boolean.
-    
+
     virtual void bind(std::size_t pos, const float &val) = 0;
         /// Binds a float.
-    
+
     virtual void bind(std::size_t pos, const double &val) = 0;
         /// Binds a double.
-    
+
     virtual void bind(std::size_t pos, const char &val) = 0;
         /// Binds a single character.
-    
+
     virtual void bind(std::size_t pos, const char* const &pVal) = 0;
         /// Binds a const char ptr.
-    
+
     virtual void bind(std::size_t pos, const std::string& val) = 0;
         /// Binds a string.
-    
+
     virtual void bind(std::size_t pos, const BLOB& val) = 0;
         /// Binds a BLOB.
-    
+
     virtual void reset() = 0;
         /// Resets the internal state, called before a rebind
 ----
@@ -105,7 +105,7 @@ the incoming value but will simply return false. An example taken from the SQLit
         _pStmt(pStmt)
     {
     }
-    
+
     bool Extractor::extract(std::size_t pos, Poco::Int32& val)
     {
         if (isNull(pos<[
@@ -113,7 +113,7 @@ the incoming value but will simply return false. An example taken from the SQLit
         val = sqlite3_column_int(_pStmt, (int)pos);
         return true;
     }
-    
+
     bool Extractor::extract(std::size_t pos, Poco::Int16& val)
     {
         if (isNull(pos<[
@@ -128,49 +128,49 @@ All methods are public.
 
     AbstractExtractor();
         /// Creates the AbstractExtractor.
-    
+
     virtual ~AbstractExtractor();
         /// Destroys the AbstractExtractor.
-    
+
     virtual bool extract(std::size_t pos, Poco::Int8& val) = 0;
         /// Extracts an Int8. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::UInt8& val) = 0;
         /// Extracts an UInt8. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::Int16& val) = 0;
         /// Extracts an Int16. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::UInt16& val) = 0;
         /// Extracts an UInt16. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::Int32& val) = 0;
         /// Extracts an Int32. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::UInt32& val) = 0;
         /// Extracts an UInt32. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::Int64& val) = 0;
         /// Extracts an Int64. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, Poco::UInt64& val) = 0;
         /// Extracts an UInt64. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, bool& val) = 0;
         /// Extracts a boolean. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, float& val) = 0;
         /// Extracts a float. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, double& val) = 0;
         /// Extracts a double. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, char& val) = 0;
         /// Extracts a single character. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, std::string& val) = 0;
         /// Extracts a string. Returns false if null was received.
-    
+
     virtual bool extract(std::size_t pos, BLOB& val) = 0;
         /// Extracts a BLOB. Returns false if null was received.
 ----
@@ -196,7 +196,7 @@ The ODBC implementation is different:
        _myVec[pos] =  Poco::Any a(val);
        int* i = AnyCast<int>(&_myVec[pos]);
        //register int* i for output, Db specific
-    } 
+    }
 ----
 Extract now changes to:
 
@@ -213,49 +213,49 @@ Extract now changes to:
 
     AbstractPreparation();
         /// Creates the AbstractPreparation.
-    
+
     virtual ~AbstractPreparation();
         /// Destroys the AbstractPreparation.
-    
+
     virtual void prepare(std::size_t pos, Poco::Int8) = 0;
         /// Prepares an Int8.
-    
+
     virtual void prepare(std::size_t pos, Poco::UInt8) = 0;
         /// Prepares an UInt8.
-    
+
     virtual void prepare(std::size_t pos, Poco::Int16) = 0;
         /// Prepares an Int16.
-    
+
     virtual void prepare(std::size_t pos, Poco::UInt16) = 0;
         /// Prepares an UInt16.
-    
+
     virtual void prepare(std::size_t pos, Poco::Int32) = 0;
         /// Prepares an Int32.
-    
+
     virtual void prepare(std::size_t pos, Poco::UInt32) = 0;
         /// Prepares an UInt32.
-    
+
     virtual void prepare(std::size_t pos, Poco::Int64) = 0;
         /// Prepares an Int64.
-    
+
     virtual void prepare(std::size_t pos, Poco::UInt64) = 0;
         /// Prepares an UInt64.
-    
+
     virtual void prepare(std::size_t pos, bool) = 0;
         /// Prepares a boolean.
-    
+
     virtual void prepare(std::size_t pos, float) = 0;
         /// Prepares a float.
-    
+
     virtual void prepare(std::size_t pos, double) = 0;
         /// Prepares a double.
-    
+
     virtual void prepare(std::size_t pos, char) = 0;
         /// Prepares a single character.
-    
+
     virtual void prepare(std::size_t pos, const std::string& ) = 0;
         /// Prepares a string.
-    
+
     virtual void prepare(std::size_t pos, const BLOB&) = 0;
 ----
 
@@ -280,38 +280,38 @@ The interface it has to implement is given as:
     public:
         StatementImpl();
             /// Creates the StatementImpl.
-        
+
         virtual ~StatementImpl();
             /// Destroys the StatementImpl.
-    
+
     protected:
         virtual bool hasNext() = 0;
-            /// Returns true if a call to next() will return data. Note that the 
-            /// implementation must support several consecutive calls to hasNext 
-            /// without data getting lost, ie. hasNext(); hasNext(); next() must 
+            /// Returns true if a call to next() will return data. Note that the
+            /// implementation must support several consecutive calls to hasNext
+            /// without data getting lost, ie. hasNext(); hasNext(); next() must
             /// be equal to hasNext(); next();
-    
+
         virtual void next() = 0;
             /// Retrieves the next row from the resultset.
             /// Will throw, if the resultset is empty.
             /// Expects the statement to be compiled and bound
-    
+
         virtual bool canBind() const = 0;
             /// Returns if another bind is possible.
-    
+
         virtual void compileImpl() = 0;
             /// Compiles the statement, doesn't bind yet.
-            /// From now on AbstractBinder and AbstractExtractor 
+            /// From now on AbstractBinder and AbstractExtractor
             /// will be used
-    
+
         virtual void bindImpl() = 0;
             /// Binds parameters.
-    
+
         virtual AbstractExtractor& extractor() = 0;
             /// Returns the concrete extractor used by the statement.
-    
+
         virtual AbstractBinder& binder() = 0;
-            /// Returns the concrete binder used by the statement.  
+            /// Returns the concrete binder used by the statement.
 ----
 
 The Extracting and Binding objects can be accessed via the calls to the super-class methods <*extractings()*> and <*bindings()*>.
@@ -334,7 +334,7 @@ A high-level <*next*> implementation:
     if (!hasNext())
         throw Poco::Data::DataException("No data received");
     int nCol = countColumnsInResult...;
-    poco_assert (columnsHandled() == nCol); 
+    poco_assert (columnsHandled() == nCol);
     Poco::Data::AbstractExtractingVec::iterator it = extractings().begin();
     Poco::Data::AbstractExtractingVec::iterator itEnd = extractings().end();
     std::size_t pos = 0; // sqlite starts with pos 0 for results! your DB maybe with 1
@@ -354,7 +354,7 @@ A high-level <*hasNext*> implementation:
         cacheResult
         disablehasNext()
     }
-    
+
     return cachedResult;
 ----
 
@@ -362,13 +362,13 @@ A high-level <*compileImpl*>:
 
     if (compiled)
         return;
-    
+
     std::string sqlStmt(toString());
 
    if database expects placeholders in different format than ":name", parse and replace them
 
     compile statement;
-    
+
     create Binder;
     create Extractor;
 ----
@@ -378,7 +378,7 @@ A high-level <*canBind*>:
     bool ret = false;
     if (!bindings().empty() && validCompiledStatement)
         ret = (*bindings().begin())->canBind();
-    
+
     return ret;
 ----
 
@@ -388,13 +388,13 @@ The connection is opened in the constructor, and closed in the destructor.
 
     Poco::Data::StatementImpl* createStatementImpl();
         /// Returns an SQLite StatementImpl
-    
+
     void begin();
         /// Starts a transaction
-    
+
     void commit();
         /// Commits and ends a transaction
-    
+
     void rollback();
         /// Aborts a transaction
 ----
@@ -410,19 +410,19 @@ It should also have a static <*addToFactory()*> and a static <*removeFromFactory
     public:
         static const std::string KEY;
             /// Keyword for creating sessions
-    
+
         Connector();
             /// Creates the Connector.
-    
+
         ~Connector();
         /// Destroys the Connector.
-    
+
         Poco::AutoPtr < Poco::Data::SessionImpl > createSession(const std::string& connectionString);
             /// Creates a SessionImpl object and initializes it with the given connectionString.
-    
+
         static void registerConnector();
             /// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
-    
+
         static void unregisterConnector();
             /// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
     };

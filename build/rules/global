@@ -328,7 +328,7 @@ LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(MACCHINA_LIBRARY) $(foreach p,$(POCO_AD
 # Strip Command definition
 #
 ifeq ($(strip $(STRIP)),)
-STRIPCMD = 
+STRIPCMD =
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
 endif

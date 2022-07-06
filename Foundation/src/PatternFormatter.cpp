@@ -198,7 +198,7 @@ void PatternFormatter::parsePattern()
 	}
 }
 
-	
+
 void PatternFormatter::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_PATTERN)
@@ -215,7 +215,7 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 		_priorityNames = value;
 		parsePriorityNames();
 	}
-	else 
+	else
 	{
 		Formatter::setProperty(name, value);
 	}
@@ -251,7 +251,7 @@ void PatternFormatter::parsePriorityNames()
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {
-	poco_assert (1 <= prio && prio <= 8);	
+	poco_assert (1 <= prio && prio <= 8);
 	return _priorities[prio];
 }
 

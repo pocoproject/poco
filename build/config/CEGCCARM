@@ -1,7 +1,7 @@
 #
 # CYGWIN
 #
-# Make settings for Cygwin on WinXP/gcc 3.4 
+# Make settings for Cygwin on WinXP/gcc 3.4
 # for cross compiling to WinCE ARM with CEGCC
 #
 #
@@ -42,7 +42,7 @@ SHAREDLIBLINKEXT = .dll
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        =
@@ -54,9 +54,9 @@ LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
-SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = 
+SHAREDOPT_CC    =
+SHAREDOPT_CXX   =
+SHAREDOPT_LINK  =
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g

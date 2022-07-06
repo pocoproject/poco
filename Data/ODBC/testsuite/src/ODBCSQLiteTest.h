@@ -21,7 +21,7 @@
 class ODBCSQLiteTest: public ODBCTest
 	/// SQLite3 ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB			| OS
 	/// ------------+---------------+------------------------------------------
 	///	00.70.00.00	| SQLite 3.*	| MS Windows XP Professional x64 v.2003/SP1

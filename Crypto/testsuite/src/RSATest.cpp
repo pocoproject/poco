@@ -251,7 +251,7 @@ void RSATest::testRSACipherLarge()
 	sizes.push_back (16383);
 	sizes.push_back (16384);
 	sizes.push_back (16385);
-	
+
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
 	for (std::vector<std::size_t>::const_iterator it = sizes.begin(); it != sizes.end(); ++it)
 	{
@@ -273,7 +273,7 @@ void RSATest::testCertificate()
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(publicKey);
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(privateKey);
 	std::string val("lets do some encryption");
-	
+
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
 	assertTrue (dec == val);

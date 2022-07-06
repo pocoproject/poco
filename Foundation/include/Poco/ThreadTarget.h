@@ -26,7 +26,7 @@ namespace Poco {
 
 
 class Foundation_API ThreadTarget: public Runnable
-	/// This adapter simplifies using static member functions as well as 
+	/// This adapter simplifies using static member functions as well as
 	/// standalone functions as targets for threads.
 	/// Note that it is possible to pass those entities directly to Thread::start().
 	/// This adapter is provided as a convenience for higher abstraction level
@@ -34,7 +34,7 @@ class Foundation_API ThreadTarget: public Runnable
 	///
 	/// For using a non-static member function as a thread target, please
 	/// see the RunnableAdapter class.
-	/// 
+	///
 	/// Usage:
 	///    class MyObject
 	///    {
@@ -45,18 +45,18 @@ class Foundation_API ThreadTarget: public Runnable
 	///    thr.start(ra);
 	///
 	/// or:
-	/// 
+	///
 	///    void doSomething() {}
-	/// 
+	///
 	///    ThreadTarget ra(doSomething);
 	///    Thread thr;
 	///    thr.start(ra);
 {
 public:
 	typedef void (*Callback)();
-	
+
 	ThreadTarget(Callback method);
-	
+
 	ThreadTarget(const ThreadTarget& te);
 
 	~ThreadTarget();
@@ -64,7 +64,7 @@ public:
 	ThreadTarget& operator = (const ThreadTarget& te);
 
 	void run();
-	
+
 private:
 	ThreadTarget();
 

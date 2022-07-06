@@ -83,7 +83,7 @@ public:
 	{
 		poco_check_ptr (pOwner);
 	}
-	
+
 	ActiveResultType operator () (const ArgType& arg)
 		/// Invokes the ActiveMethod.
 	{
@@ -92,7 +92,7 @@ public:
 		StarterType::start(_pOwner, pRunnable);
 		return result;
 	}
-		
+
 	ActiveMethod(const ActiveMethod& other):
 		_pOwner(other._pOwner),
 		_method(other._method)
@@ -175,7 +175,7 @@ public:
 	{
 		poco_check_ptr (pOwner);
 	}
-	
+
 	ActiveResultType operator () (void)
 		/// Invokes the ActiveMethod.
 	{
@@ -184,7 +184,7 @@ public:
 		StarterType::start(_pOwner, pRunnable);
 		return result;
 	}
-		
+
 	ActiveMethod(const ActiveMethod& other):
 		_pOwner(other._pOwner),
 		_method(other._method)

@@ -30,14 +30,14 @@ class HTTPServerResponse;
 
 
 class Net_API HTTPRequestHandler
-	/// The abstract base class for HTTPRequestHandlers 
+	/// The abstract base class for HTTPRequestHandlers
 	/// created by HTTPServer.
 	///
 	/// Derived classes must override the handleRequest() method.
 	/// Furthermore, a HTTPRequestHandlerFactory must be provided.
 	///
 	/// The handleRequest() method must perform the complete handling
-	/// of the HTTP request connection. As soon as the handleRequest() 
+	/// of the HTTP request connection. As soon as the handleRequest()
 	/// method returns, the request handler object is destroyed.
 	///
 	/// A new HTTPRequestHandler object will be created for

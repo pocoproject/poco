@@ -45,7 +45,7 @@ void MailStreamTest::testMailInputStream()
 		"..\r\n"
 		".\r\n"
 	);
-	
+
 	MailInputStream mis(istr);
 	std::ostringstream ostr;
 	StreamCopier::copyStream(mis, ostr);
@@ -60,7 +60,7 @@ void MailStreamTest::testMailInputStream()
 		".This line starts with a period.\r\n"
 		".and this one too\r\n"
 		".\r\n"
-	);	
+	);
 }
 
 
@@ -78,13 +78,13 @@ void MailStreamTest::testMailOutputStream()
 		".and this one too\r\n"
 		".\r\n"
 	);
-	
+
 	std::ostringstream ostr;
 	MailOutputStream mos(ostr);
 	mos << msg;
 	mos.close();
 	std::string s(ostr.str());
-	assertTrue (s == 
+	assertTrue (s ==
 		"From: john.doe@no.domain\r\n"
 		"To: jane.doe@no.domain\r\n"
 		"Subject: test\r\n"

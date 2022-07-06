@@ -43,7 +43,7 @@ class Foundation_API FileChannel: public Channel
 	/// by a newline.
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is in the text. 
+	/// appropriate Formatter to control what is in the text.
 	///
 	/// The FileChannel support log file rotation based
 	/// on log file size or time intervals.
@@ -66,7 +66,7 @@ class Foundation_API FileChannel: public Channel
 	///   * daily:         the file is rotated daily
 	///   * weekly:        the file is rotated every seven days
 	///   * monthly:       the file is rotated every 30 days
-	///   * <n> minutes:   the file is rotated every <n> minutes, 
+	///   * <n> minutes:   the file is rotated every <n> minutes,
 	///                    where <n> is an integer greater than zero.
 	///   * <n> hours:     the file is rotated every <n> hours, where
 	///                    <n> is an integer greater than zero.
@@ -128,7 +128,7 @@ class Foundation_API FileChannel: public Channel
 	///
 	/// Archived log files can be automatically purged, either if
 	/// they reach a certain age, or if the number of archived
-	/// log files reaches a given maximum number. This is 
+	/// log files reaches a given maximum number. This is
 	/// controlled by the purgeAge and purgeCount properties.
 	///
 	/// The purgeAge property can have the following values:
@@ -148,18 +148,18 @@ class Foundation_API FileChannel: public Channel
 	/// The flush property specifies whether each log message is flushed
 	/// immediately to the log file (which may hurt application performance,
 	/// but ensures that everything is in the log in case of a system crash),
-	//  or whether it's allowed to stay in the system's file buffer for some time. 
+	//  or whether it's allowed to stay in the system's file buffer for some time.
 	/// Valid values are:
 	///
 	///   * true:  Every essages is immediately flushed to the log file (default).
 	///   * false: Messages are not immediately flushed to the log file.
 	///
-	/// The rotateOnOpen property specifies whether an existing log file should be 
+	/// The rotateOnOpen property specifies whether an existing log file should be
 	/// rotated (and archived) when the channel is opened. Valid values are:
 	///
 	///   * true:  The log file is rotated (and archived) when the channel is opened.
 	///   * false: Log messages will be appended to an existing log file,
-	///            if it exists (unless other conditions for a rotation are met). 
+	///            if it exists (unless other conditions for a rotation are met).
 	///            This is the default.
 	///
 	/// For a more lightweight file channel class, see SimpleFileChannel.
@@ -173,19 +173,19 @@ public:
 
 	void open();
 		/// Opens the FileChannel and creates the log file if necessary.
-		
+
 	void close();
 		/// Closes the FileChannel.
 
 	void log(const Message& msg);
 		/// Logs the given message to the file.
-		
+
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets the property with the given name. 
-		/// 
+		/// Sets the property with the given name.
+		///
 		/// The following properties are supported:
 		///   * path:         The log file's path.
-		///   * rotation:     The log file's rotation mode. See the 
+		///   * rotation:     The log file's rotation mode. See the
 		///                   FileChannel class for details.
 		///   * archive:      The log file's archive mode. See the
 		///                   FileChannel class for details.
@@ -203,7 +203,7 @@ public:
 		///   * flush:        Specifies whether messages are immediately
 		///                   flushed to the log file. See the FileChannel class
 		///                   for details.
-		///   * rotateOnOpen: Specifies whether an existing log file should be 
+		///   * rotateOnOpen: Specifies whether an existing log file should be
 		///                   rotated and archived when the channel is opened.
 
 	std::string getProperty(const std::string& name) const;
@@ -213,7 +213,7 @@ public:
 
 	Timestamp creationDate() const;
 		/// Returns the log file's creation date.
-		
+
 	UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 

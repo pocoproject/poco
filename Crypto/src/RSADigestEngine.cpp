@@ -51,7 +51,7 @@ void RSADigestEngine::reset()
 	_signature.clear();
 }
 
-	
+
 const DigestEngine::Digest& RSADigestEngine::digest()
 {
 	if (_digest.empty())
@@ -77,7 +77,7 @@ const DigestEngine::Digest& RSADigestEngine::signature()
     return _signature;
 }
 
-	
+
 bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
 	digest();

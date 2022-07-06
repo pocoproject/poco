@@ -111,14 +111,14 @@ int HTTPSession::get()
 {
 	if (_pCurrent == _pEnd)
 		refill();
-	
+
 	if (_pCurrent < _pEnd)
 		return *_pCurrent++;
 	else
 		return std::char_traits<char>::eof();
 }
 
-	
+
 int HTTPSession::peek()
 {
 	if (_pCurrent == _pEnd)
@@ -130,7 +130,7 @@ int HTTPSession::peek()
 		return std::char_traits<char>::eof();
 }
 
-	
+
 int HTTPSession::read(char* buffer, std::streamsize length)
 {
 	if (_pCurrent < _pEnd)

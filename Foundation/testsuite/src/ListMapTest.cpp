@@ -35,9 +35,9 @@ void ListMapTest::testInsert()
 
 	typedef ListMap<int, int> IntMap;
 	IntMap hm;
-	
+
 	assertTrue (hm.empty());
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator res = hm.insert(IntMap::ValueType(i, i*2));
@@ -48,10 +48,10 @@ void ListMapTest::testInsert()
 		assertTrue (it->first == i);
 		assertTrue (it->second == i*2);
 		assertTrue (hm.size() == i + 1);
-	}		
-	
+	}
+
 	assertTrue (!hm.empty());
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator it = hm.find(i);
@@ -59,14 +59,14 @@ void ListMapTest::testInsert()
 		assertTrue (it->first == i);
 		assertTrue (it->second == i*2);
 	}
-	
+
 	hm.clear();
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator res = hm.insert(IntMap::ValueType(i, 0));
 		assertTrue (res->first == i);
 		assertTrue (res->second == 0);
-	}		
+	}
 }
 
 
@@ -101,7 +101,7 @@ void ListMapTest::testInsertOrder()
 	assertTrue (it != lm.end() && it->first == "bar" && it->second == 43);
 
 	++it;
-	assertTrue (it == lm.end());	 
+	assertTrue (it == lm.end());
 }
 
 
@@ -117,7 +117,7 @@ void ListMapTest::testErase()
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
 	assertTrue (hm.size() == N);
-	
+
 	for (int i = 0; i < N; i += 2)
 	{
 		hm.erase(i);
@@ -125,13 +125,13 @@ void ListMapTest::testErase()
 		assertTrue (it == hm.end());
 	}
 	assertTrue (hm.size() == N/2);
-	
+
 	for (int i = 0; i < N; i += 2)
 	{
 		IntMap::Iterator it = hm.find(i);
 		assertTrue (it == hm.end());
 	}
-	
+
 	for (int i = 1; i < N; i += 2)
 	{
 		IntMap::Iterator it = hm.find(i);
@@ -143,13 +143,13 @@ void ListMapTest::testErase()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator it = hm.find(i);
 		assertTrue (it != hm.end());
 		assertTrue (it->first == i);
-		assertTrue (it->second == i*2);		
+		assertTrue (it->second == i*2);
 	}
 }
 
@@ -165,7 +165,7 @@ void ListMapTest::testIterator()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	
+
 	std::map<int, int> values;
 	IntMap::Iterator it; // do not initialize here to test proper behavior of uninitialized iterators
 	it = hm.begin();
@@ -175,7 +175,7 @@ void ListMapTest::testIterator()
 		values[it->first] = it->second;
 		++it;
 	}
-	
+
 	assertTrue (values.size() == N);
 }
 
@@ -191,7 +191,7 @@ void ListMapTest::testConstIterator()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	
+
 	std::map<int, int> values;
 	IntMap::ConstIterator it = hm.begin();
 	while (it != hm.end())
@@ -200,7 +200,7 @@ void ListMapTest::testConstIterator()
 		values[it->first] = it->second;
 		++it;
 	}
-	
+
 	assertTrue (values.size() == N);
 }
 
@@ -239,12 +239,12 @@ void ListMapTest::testStringIndex()
 	hm["index1"] = "value2";
 	hm["index2"] = "value4";
 	hm["index3"] = "value6";
-	
+
 	assertTrue (hm.size() == 3);
 	assertTrue (hm["index1"] == "value2");
 	assertTrue (hm["Index2"] == "value4");
 	assertTrue (hm["inDeX3"] == "value6");
-	
+
 	try
 	{
 		const StringMap& im = hm;

@@ -102,7 +102,7 @@ void LoggingConfigurator::configureLoggers(AbstractConfiguration::Ptr pConfig)
 	AbstractConfiguration::Keys loggers;
 	pConfig->keys(loggers);
 	// use a map to sort loggers by their name, ensuring initialization in correct order (parents before children)
-	LoggerMap loggerMap; 
+	LoggerMap loggerMap;
 	for (const auto& l: loggers)
 	{
 		AutoPtr<AbstractConfiguration> pLoggerConfig(pConfig->createView(l));
@@ -123,7 +123,7 @@ Formatter::Ptr LoggingConfigurator::createFormatter(AbstractConfiguration::Ptr p
 	for (const auto& p: props)
 	{
 		if (p != "class")
-			pFormatter->setProperty(p, pConfig->getString(p));		
+			pFormatter->setProperty(p, pConfig->getString(p));
 	}
 	return pFormatter;
 }
@@ -147,7 +147,7 @@ Channel::Ptr LoggingConfigurator::createChannel(AbstractConfiguration::Ptr pConf
 			AutoPtr<FormattingChannel> pFormattingChannel(new FormattingChannel(0, pChannel));
 			if (pConfig->hasProperty("formatter.class"))
 			{
-				AutoPtr<AbstractConfiguration> pFormatterConfig(pConfig->createView(p));	
+				AutoPtr<AbstractConfiguration> pFormatterConfig(pConfig->createView(p));
 				AutoPtr<Formatter> pFormatter(createFormatter(pFormatterConfig));
 				pFormattingChannel->setFormatter(pFormatter);
 			}
@@ -182,7 +182,7 @@ void LoggingConfigurator::configureLogger(AbstractConfiguration::Ptr pConfig)
 	{
 		if (p == "channel" && pConfig->hasProperty("channel.class"))
 		{
-			AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(p));	
+			AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(p));
 			AutoPtr<Channel> pChannel(createChannel(pChannelConfig));
 			configureChannel(pChannel, pChannelConfig);
 			Logger::setChannel(logger.name(), pChannel);

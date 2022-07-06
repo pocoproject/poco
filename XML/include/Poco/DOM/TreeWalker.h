@@ -35,7 +35,7 @@ class XML_API TreeWalker
 	/// the view of the document defined by their whatToShow flags and filter (if
 	/// any). Any function which performs navigation using a TreeWalker will automatically
 	/// support any view defined by a TreeWalker.
-	/// 
+	///
 	/// Omitting nodes from the logical view of a subtree can result in a structure
 	/// that is substantially different from the same subtree in the complete, unfiltered
 	/// document. Nodes that are siblings in the TreeWalker view may be children
@@ -50,22 +50,22 @@ class XML_API TreeWalker
 	/// Unlike most other DOM classes, TreeWalker supports value semantics.
 	///
 	/// If the TreeWalker's current node is removed from the document, the
-	/// result of calling any of the movement methods is undefined. This behavior 
+	/// result of calling any of the movement methods is undefined. This behavior
 	/// does not conform to the DOM Level 2 Traversal specification.
 {
 public:
 	TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
 		/// Creates a TreeWalker over the subtree rooted at the specified node.
-		
+
 	TreeWalker(const TreeWalker& walker);
 		/// Creates a TreeWalker by copying another TreeWalker.
-		
+
 	TreeWalker& operator = (const TreeWalker& walker);
 		/// Assignment operator.
-	
+
 	~TreeWalker();
 		/// Destroys the TreeWalker.
-	
+
 	Node* root() const;
 		/// The root node of the TreeWalker, as specified when it was created.
 
@@ -86,7 +86,7 @@ public:
 		/// and the filter. Also note that this is currently the only situation where
 		/// NodeIterators may reject a complete subtree rather than skipping individual
 		/// nodes.
-		/// 
+		///
 		/// To produce a view of the document that has entity references expanded and
 		/// does not expose the entity reference node itself, use the whatToShow flags
 		/// to hide the entity reference node and set expandEntityReferences to true
@@ -109,7 +109,7 @@ public:
 
 	Node* getCurrentNode() const;
 		/// See currentNode().
-		
+
 	void setCurrentNode(Node* pNode);
 		/// Sets the current node.
 
@@ -158,7 +158,7 @@ protected:
 
 private:
 	TreeWalker();
-	
+
 	Node*         _pRoot;
 	unsigned long _whatToShow;
 	NodeFilter*   _pFilter;

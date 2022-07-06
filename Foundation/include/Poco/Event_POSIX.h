@@ -31,13 +31,13 @@ namespace Poco {
 class Foundation_API EventImpl
 {
 protected:
-	EventImpl(bool autoReset);		
+	EventImpl(bool autoReset);
 	~EventImpl();
 	void setImpl();
 	void waitImpl();
 	bool waitImpl(long milliseconds);
 	void resetImpl();
-	
+
 private:
 	bool              _auto;
 	std::atomic<bool> _state;
@@ -65,7 +65,7 @@ inline void EventImpl::setImpl()
 
 inline void EventImpl::resetImpl()
 {
-	if (pthread_mutex_lock(&_mutex))	
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot reset event");
 	_state = false;
 	pthread_mutex_unlock(&_mutex);

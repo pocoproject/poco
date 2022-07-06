@@ -42,11 +42,11 @@ namespace
 			testVoidIn(this, &ActiveObject::testVoidInImpl)
 		{
 		}
-		
+
 		~ActiveObject()
 		{
 		}
-		
+
 		ActiveMethod<int, int, ActiveObject, ActiveStarter<ActiveDispatcher> > testMethod;
 
 		ActiveMethod<void, int, ActiveObject, ActiveStarter<ActiveDispatcher> > testVoid;
@@ -54,12 +54,12 @@ namespace
 		ActiveMethod<void, void, ActiveObject, ActiveStarter<ActiveDispatcher> > testVoidInOut;
 
 		ActiveMethod<int, void, ActiveObject, ActiveStarter<ActiveDispatcher> > testVoidIn;
-		
+
 		void cont()
 		{
 			_continue.set();
 		}
-		
+
 	protected:
 		int testMethodImpl(const int& n)
 		{
@@ -84,7 +84,7 @@ namespace
 			_continue.wait();
 			return 123;
 		}
-		
+
 	private:
 		Event _continue;
 	};

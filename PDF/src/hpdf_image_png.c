@@ -474,7 +474,7 @@ LoadPngData  (HPDF_Dict     image,
 		HPDF_Dict smask;
 		png_bytep smask_data;
 
-		if (!png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) || 
+		if (!png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ||
 			!png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, NULL)) {
 			goto no_transparent_color_in_palette;
 		}
@@ -534,7 +534,7 @@ LoadPngData  (HPDF_Dict     image,
 
 no_transparent_color_in_palette:
 
-	/* read images with alpha channel right away 
+	/* read images with alpha channel right away
 	   we have to do this because image transparent mask must be added to the Xref */
 	if (xref && PNG_COLOR_MASK_ALPHA & color_type) {
 		HPDF_Dict smask;

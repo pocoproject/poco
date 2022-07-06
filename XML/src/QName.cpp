@@ -78,7 +78,7 @@ QName& QName::operator = (QName&& qname) noexcept
 	_ns = std::move(qname._ns);
 	_name = std::move(qname._name);
 	_prefix = std::move(qname._prefix);
-	
+
 	return *this;
 }
 

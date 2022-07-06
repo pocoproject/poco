@@ -27,7 +27,7 @@ NullStreamBuf::~NullStreamBuf()
 {
 }
 
-	
+
 int NullStreamBuf::readFromDevice()
 {
 	return -1;

@@ -44,7 +44,7 @@ public:
 
 	SHA1Engine();
 	~SHA1Engine();
-		
+
 	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();

@@ -23,7 +23,7 @@ public:
 	{
 		Poco::Crypto::initializeCrypto();
 	}
-	
+
 	~CryptoInitializer()
 	{
 		Poco::Crypto::uninitializeCrypto();
@@ -42,7 +42,7 @@ int _tmain(int argc, wchar_t* argv[])
 		std::wcstombs(buffer, argv[i], sizeof(buffer));
 		args.push_back(std::string(buffer));
 	}
-	CppUnit::TestRunner runner;	
+	CppUnit::TestRunner runner;
 	runner.addTest("CryptoTestSuite", CryptoTestSuite::suite());
 	return runner.run(args) ? 0 : 1;
 }

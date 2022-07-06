@@ -145,7 +145,7 @@ void StreamSocket::shutdownReceive()
 	impl()->shutdownReceive();
 }
 
-	
+
 void StreamSocket::shutdownSend()
 {
 	impl()->shutdownSend();

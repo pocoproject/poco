@@ -174,7 +174,7 @@ public:
 	~VarHolderImpl()
 	{
 	}
-	
+
 	const std::type_info& type() const
 	{
 		return typeid(Poco::Data::Time);
@@ -211,7 +211,7 @@ public:
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
-	
+
 	const Poco::Data::Time& value() const
 	{
 		return _val;

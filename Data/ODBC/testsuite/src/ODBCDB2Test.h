@@ -21,7 +21,7 @@
 class ODBCDB2Test: public ODBCTest
 	/// IBM DB2 UDB ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB				| OS
 	/// ------------+-------------------+------------------------------------------
 	///	9.01.00.356 | DB2 Express-C 9.1	| MS Windows XP Professional x64 v.2003/SP1

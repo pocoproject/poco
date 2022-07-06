@@ -33,7 +33,7 @@ class Resource
 public:
 	typedef R Type;
 
-	Resource(HPDF_Doc* pPDF, const R& resource, const std::string& name = ""): 
+	Resource(HPDF_Doc* pPDF, const R& resource, const std::string& name = ""):
 		_pPDF(pPDF),
 		_resource(resource),
 		_name(name)
@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	Resource(const Resource& other): 
+	Resource(const Resource& other):
 		_pPDF(other._pPDF),
 		_resource(other._resource),
 		_name(other._name)
@@ -77,7 +77,7 @@ public:
 	void swap(Resource& other) noexcept
 	{
 		using std::swap;
-		
+
 		swap(_pPDF, other._pPDF);
 		swap(_resource, other._resource);
 		swap(_name, other._name);

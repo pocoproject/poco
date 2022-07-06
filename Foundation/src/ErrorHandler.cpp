@@ -38,7 +38,7 @@ void ErrorHandler::exception(const Exception& exc)
 	poco_debugger_msg(exc.what());
 }
 
-	
+
 void ErrorHandler::exception(const std::exception& exc)
 {
 	poco_debugger_msg(exc.what());
@@ -63,7 +63,7 @@ void ErrorHandler::handle(const Exception& exc)
 	}
 }
 
-	
+
 void ErrorHandler::handle(const std::exception& exc)
 {
 	FastMutex::ScopedLock lock(_mutex);

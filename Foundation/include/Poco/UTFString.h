@@ -39,12 +39,12 @@ struct UTF16CharTraits
 	{
 		c1 = c2;
 	}
-	
+
 	static bool eq(char_type c1, char_type c2)
 	{
 		return c1 == c2;
 	}
-	
+
 	static bool lt(char_type c1, char_type c2)
 	{
 		return c1 < c2;
@@ -120,22 +120,22 @@ struct UTF16CharTraits
 	{
 		return eq_int_type(c, eof()) ? ~eof() : c;
 	}
-	
+
 	static char_type to_char_type(int_type c)
 	{
 		return char_type(c);
 	}
-	
+
 	static int_type to_int_type(char_type c)
 	{
 		return int_type(c);
 	}
-	
+
 	static bool eq_int_type(int_type c1, int_type c2)
 	{
 		return c1 == c2;
 	}
-	
+
 	static int_type eof()
 	{
 		return int_type(0xDFFF);
@@ -156,12 +156,12 @@ struct UTF32CharTraits
 	{
 		c1 = c2;
 	}
-	
+
 	static bool eq(char_type c1, char_type c2)
 	{
 		return c1 == c2;
 	}
-	
+
 	static bool lt(char_type c1, char_type c2)
 	{
 		return c1 < c2;
@@ -237,22 +237,22 @@ struct UTF32CharTraits
 	{
 		return eq_int_type(c, eof()) ? ~eof() : c;
 	}
-	
+
 	static char_type to_char_type(int_type c)
 	{
 		return char_type(c);
 	}
-	
+
 	static int_type to_int_type(char_type c)
 	{
 		return int_type(c);
 	}
-	
+
 	static bool eq_int_type(int_type c1, int_type c2)
 	{
 		return c1 == c2;
 	}
-	
+
 	static int_type eof()
 	{
 		return int_type(0xDFFF);

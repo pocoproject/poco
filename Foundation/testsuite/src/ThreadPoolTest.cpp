@@ -76,7 +76,7 @@ void ThreadPoolTest::testThreadPool()
 	{
 		pool.start(ra);
 		failmsg("thread pool exhausted - must throw exception");
-	}	
+	}
 	catch (Poco::NoThreadAvailableException&)
 	{
 	}
@@ -84,17 +84,17 @@ void ThreadPoolTest::testThreadPool()
 	{
 		failmsg("wrong exception thrown");
 	}
-	
+
 	_event.set(); // go!!!
 	pool.joinAll();
-	
+
 	assertTrue (_count == 40000);
-	
+
 	assertTrue (pool.allocated() == 4);
 	assertTrue (pool.used() == 0);
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.available() == 4);
-	
+
 	Thread::sleep(4000);
 
 	pool.collect();
@@ -102,7 +102,7 @@ void ThreadPoolTest::testThreadPool()
 	assertTrue (pool.used() == 0);
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.available() == 4);
-	
+
 	_count = 0;
 	_event.reset();
 	pool.start(ra);
@@ -120,7 +120,7 @@ void ThreadPoolTest::testThreadPool()
 	pool.joinAll();
 
 	assertTrue (_count == 20000);
-	
+
 	assertTrue (pool.allocated() == 2);
 	assertTrue (pool.used() == 0);
 	assertTrue (pool.capacity() == 4);

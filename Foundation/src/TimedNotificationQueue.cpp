@@ -132,7 +132,7 @@ Notification* TimedNotificationQueue::waitDequeueNotification(long milliseconds)
 				{
 					return dequeueOne(it).duplicate();
 				}
-				else 
+				else
 				{
 					milliseconds -= static_cast<long>((now.elapsed() + 999)/1000);
 					continue;
@@ -176,7 +176,7 @@ bool TimedNotificationQueue::empty() const
 	return _nfQueue.empty();
 }
 
-	
+
 int TimedNotificationQueue::size() const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -187,7 +187,7 @@ int TimedNotificationQueue::size() const
 void TimedNotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	_nfQueue.clear();	
+	_nfQueue.clear();
 }
 
 

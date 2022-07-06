@@ -31,7 +31,7 @@ class NDCScope;
 
 class Foundation_API NestedDiagnosticContext
 	/// This class implements a Nested Diagnostic Context (NDC),
-	/// as described in Neil Harrison's article "Patterns for Logging 
+	/// as described in Neil Harrison's article "Patterns for Logging
 	/// Diagnostic Messages" in "Pattern Languages of Program Design 3"
 	/// (Addison-Wesley).
 	///
@@ -61,29 +61,29 @@ public:
 
 	~NestedDiagnosticContext();
 		/// Destroys the NestedDiagnosticContext.
-		
+
 	NestedDiagnosticContext& operator = (const NestedDiagnosticContext& ctx);
 		/// Assignment operator.
-		
+
 	void push(const std::string& info);
 		/// Pushes a context (without line number and filename) onto the stack.
-		
+
 	void push(const std::string& info, int line, const char* filename);
-		/// Pushes a context (including line number and filename) 
+		/// Pushes a context (including line number and filename)
 		/// onto the stack. Filename must be a static string, such as the
 		/// one produced by the __FILE__ preprocessor macro.
 
 	void pop();
 		/// Pops the top-most context off the stack.
-		
+
 	int depth() const;
 		/// Returns the depth (number of contexts) of the stack.
-	
+
 	std::string toString() const;
 		/// Returns the stack as a string with entries
 		/// delimited by colons. The string does not contain
 		/// line numbers and filenames.
-		
+
 	void dump(std::ostream& ostr) const;
 		/// Dumps the stack (including line number and filenames)
 		/// to the given stream. The entries are delimited by
@@ -92,10 +92,10 @@ public:
 	void dump(std::ostream& ostr, const std::string& delimiter) const;
 		/// Dumps the stack (including line number and filenames)
 		/// to the given stream.
-		
+
 	void clear();
 		/// Clears the NDC stack.
-	
+
 	static NestedDiagnosticContext& current();
 		/// Returns the current thread's NDC.
 
@@ -107,7 +107,7 @@ private:
 		int         line;
 	};
 	typedef std::vector<Context> Stack;
-	
+
 	Stack _stack;
 };
 
@@ -123,7 +123,7 @@ class Foundation_API NDCScope
 public:
 	NDCScope(const std::string& info);
 		/// Pushes a context on the stack.
-		
+
 	NDCScope(const std::string& info, int line, const char* filename);
 		/// Pushes a context on the stack.
 
@@ -140,7 +140,7 @@ inline NDCScope::NDCScope(const std::string& info)
 	NestedDiagnosticContext::current().push(info);
 }
 
-	
+
 inline NDCScope::NDCScope(const std::string& info, int line, const char* filename)
 {
 	NestedDiagnosticContext::current().push(info, line, filename);

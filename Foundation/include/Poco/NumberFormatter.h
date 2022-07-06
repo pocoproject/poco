@@ -192,7 +192,7 @@ public:
 
 	static std::string formatHex(unsigned long long value, bool prefix = false);
 		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
 	static std::string formatHex(unsigned long long value, int width, bool prefix = false);
@@ -217,7 +217,7 @@ public:
 
 	static std::string formatHex(Int64 value, bool prefix = false);
 		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 

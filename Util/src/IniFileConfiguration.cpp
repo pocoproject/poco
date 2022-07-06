@@ -45,7 +45,7 @@ IniFileConfiguration::IniFileConfiguration(std::istream& istr)
 	load(istr);
 }
 
-	
+
 IniFileConfiguration::IniFileConfiguration(const std::string& path)
 {
 	load(path);
@@ -66,7 +66,7 @@ void IniFileConfiguration::load(std::istream& istr)
 		parseLine(istr);
 	}
 }
-	
+
 
 void IniFileConfiguration::load(const std::string& path)
 {
@@ -148,7 +148,7 @@ bool IniFileConfiguration::ICompare::operator () (const std::string& s1, const s
 
 void IniFileConfiguration::parseLine(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof(); 
+	static const int eof = std::char_traits<char>::eof();
 
 	int c = istr.get();
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();

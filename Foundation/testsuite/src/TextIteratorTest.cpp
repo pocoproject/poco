@@ -39,7 +39,7 @@ void TextIteratorTest::testEmptyLatin1()
 	std::string text;
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it == end);
 }
 
@@ -50,7 +50,7 @@ void TextIteratorTest::testOneLatin1()
 	std::string text("x");
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it == 'x');
 	++it;
@@ -64,7 +64,7 @@ void TextIteratorTest::testLatin1()
 	std::string text("Latin1");
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 'L');
 	assertTrue (it != end);
@@ -78,7 +78,7 @@ void TextIteratorTest::testLatin1()
 	assertTrue (it != end);
 	assertTrue (*it++ == '1');
 	assertTrue (it == end);
-	
+
 	std::string empty;
 	it  = TextIterator(empty, encoding);
 	end = TextIterator(empty);
@@ -92,7 +92,7 @@ void TextIteratorTest::testEmptyUTF8()
 	std::string text;
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it == end);
 }
 
@@ -100,26 +100,26 @@ void TextIteratorTest::testEmptyUTF8()
 void TextIteratorTest::testOneUTF8()
 {
 	UTF8Encoding encoding;
-	
+
 	// 1 byte sequence
 	std::string text("x");
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it == 'x');
 	++it;
 	assertTrue (it == end);
-	
+
 	unsigned char data[Poco::TextEncoding::MAX_SEQUENCE_LENGTH];
-	
+
 	// 2 byte sequence
 	int n = encoding.convert(0xab, data, sizeof(data));
 	assertTrue (n == 2);
 	text.assign((char*) data, n);
 	it  = TextIterator(text, encoding);
 	end = TextIterator(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0xab);
 	assertTrue (it == end);
@@ -130,7 +130,7 @@ void TextIteratorTest::testOneUTF8()
 	text.assign((char*) data, n);
 	it  = TextIterator(text, encoding);
 	end = TextIterator(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0xabcd);
 	assertTrue (it == end);
@@ -141,11 +141,11 @@ void TextIteratorTest::testOneUTF8()
 	text.assign((char*) data, n);
 	it  = TextIterator(text, encoding);
 	end = TextIterator(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0xabcde);
 	assertTrue (it == end);
-	
+
 	// 5 byte sequence - not supported
 	n = encoding.convert(0xabcdef, data, sizeof(data));
 	assertTrue (n == 0);
@@ -163,7 +163,7 @@ void TextIteratorTest::testUTF8()
 	std::string text((const char*) greek);
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0x0020);
 	assertTrue (it != end);
@@ -184,12 +184,12 @@ void TextIteratorTest::testUTF8()
 
 void TextIteratorTest::testUTF8Supplementary()
 {
-	UTF8Encoding encoding; 
+	UTF8Encoding encoding;
 	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
 	std::string text((const char*) supp);
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0x0041);
 	assertTrue (it != end);
@@ -206,12 +206,12 @@ void TextIteratorTest::testUTF8Supplementary()
 
 void TextIteratorTest::testUTF16Supplementary()
 {
-	UTF16Encoding encoding; 
+	UTF16Encoding encoding;
 	const Poco::UInt16 supp [] = { 0x0041, 0x0042, 0xD800, 0xDCA4, 0xD87E, 0xDDA0, 0xD87E, 0xDE1D, 0x00};
 	std::string text((const char*) supp, 16);
 	TextIterator it(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0x0041);
 	assertTrue (it != end);
@@ -233,7 +233,7 @@ void TextIteratorTest::testSwap()
 	TextIterator it1(text, encoding);
 	TextIterator it2(text, encoding);
 	TextIterator end(text);
-	
+
 	assertTrue (it1 == it2);
 	it2.swap(end);
 	assertTrue (it1 != it2);

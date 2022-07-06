@@ -47,7 +47,7 @@ void DigestEngineTest::testMD5()
 
 	engine.update("abcdefghijklmnopqrstuvwxyz");
 	assertTrue (DigestEngine::digestToHex(engine.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
-	
+
 	engine.update("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	engine.update("abcdefghijklmnopqrstuvwxyz0123456789");
 	assertTrue (DigestEngine::digestToHex(engine.digest()) == "d174ab98d277d9f5a5611c2c9f419d9f");

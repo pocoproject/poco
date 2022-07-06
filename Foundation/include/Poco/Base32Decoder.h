@@ -30,8 +30,8 @@ class Foundation_API Base32DecoderBuf: public UnbufferedStreamBuf
 	/// This streambuf base32-decodes all data read
 	/// from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
@@ -39,7 +39,7 @@ class Foundation_API Base32DecoderBuf: public UnbufferedStreamBuf
 public:
 	Base32DecoderBuf(std::istream& istr);
 	~Base32DecoderBuf();
-	
+
 private:
 	int readFromDevice();
 	int readOne();
@@ -48,10 +48,10 @@ private:
 	int             _groupLength;
 	int             _groupIndex;
 	std::streambuf& _buf;
-	
+
 	static unsigned char IN_ENCODING[256];
 	static bool          IN_ENCODING_INIT;
-	
+
 private:
 	Base32DecoderBuf(const Base32DecoderBuf&);
 	Base32DecoderBuf& operator = (const Base32DecoderBuf&);
@@ -71,7 +71,7 @@ public:
 
 protected:
 	Base32DecoderBuf _buf;
-	
+
 private:
 	Base32DecoderIOS(const Base32DecoderIOS&);
 	Base32DecoderIOS& operator = (const Base32DecoderIOS&);
@@ -84,8 +84,8 @@ class Foundation_API Base32Decoder: public Base32DecoderIOS, public std::istream
 	///
 	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.

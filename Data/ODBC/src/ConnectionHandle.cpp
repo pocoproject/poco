@@ -24,14 +24,14 @@ namespace Data {
 namespace ODBC {
 
 
-ConnectionHandle::ConnectionHandle(EnvironmentHandle* pEnvironment): 
+ConnectionHandle::ConnectionHandle(EnvironmentHandle* pEnvironment):
 	_pEnvironment(pEnvironment ? pEnvironment : new EnvironmentHandle),
-	_hdbc(SQL_NULL_HDBC), 
+	_hdbc(SQL_NULL_HDBC),
 	_ownsEnvironment(pEnvironment ? false : true)
 {
-	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC, 
-		_pEnvironment->handle(), 
-		&_hdbc))) 
+	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC,
+		_pEnvironment->handle(),
+		&_hdbc)))
 	{
 		throw ODBCException("Could not allocate connection handle.");
 	}

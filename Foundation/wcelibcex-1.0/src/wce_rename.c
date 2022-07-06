@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -50,7 +50,7 @@
 * Return:
 *
 * Upon successful completion, rename() returns 0. Otherwise, -1 is returned.
-* 
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition
@@ -58,19 +58,19 @@
 *******************************************************************************/
 int wceex_rename(const char *oldfile, const char *newfile)
 {
-    int res;    
+    int res;
     size_t lenold;
     size_t lennew;
     wchar_t *wsold;
     wchar_t *wsnew;
-    
+
     /* Covert filename buffer to Unicode. */
 
     /* Old filename */
     lenold = MultiByteToWideChar (CP_ACP, 0, oldfile, -1, NULL, 0) ;
     wsold = (wchar_t*)malloc(sizeof(wchar_t) * lenold);
     MultiByteToWideChar( CP_ACP, 0, oldfile, -1, wsold, lenold);
-    
+
     /* New filename */
     lennew = MultiByteToWideChar (CP_ACP, 0, newfile, -1, NULL, 0) ;
     wsnew = (wchar_t*)malloc(sizeof(wchar_t) * lennew);
@@ -78,11 +78,11 @@ int wceex_rename(const char *oldfile, const char *newfile)
 
     /* Delete file using Win32 CE API call */
     res = MoveFile(wsold, wsnew);
-    
+
     /* Free wide-char string */
     free(wsold);
     free(wsnew);
-    
+
     if (res)
         return 0; /* success */
     else

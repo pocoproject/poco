@@ -99,7 +99,7 @@ struct _HPDF_CCITT_Data {
 	tsize_t		tif_rawdatasize;/* # of bytes in raw data buffer */
 	tsize_t		tif_rawcc;	/* bytes unread from raw buffer */
 	tidata_t	tif_rawcp;	/* current spot in raw buffer */
-	tidata_t	tif_rawdata;	/* raw data buffer */	
+	tidata_t	tif_rawdata;	/* raw data buffer */
 
 } HPDF_CCITT_Data;
 
@@ -124,7 +124,7 @@ static HPDF_STATUS HPDF_InitCCITTFax3(struct _HPDF_CCITT_Data *pData)
 	/*
 	 * Override parent get/set field methods.
 	 */
-	sp->groupoptions = 0;	
+	sp->groupoptions = 0;
 	sp->recvparams = 0;
 	sp->subaddress = NULL;
 	sp->faxdcs = NULL;
@@ -209,7 +209,7 @@ HPDF_Fax3SetupState(struct _HPDF_CCITT_Data *pData, HPDF_UINT          width,
 /*
  * Reset encoding state at the start of a strip.
  */
-static HPDF_STATUS 
+static HPDF_STATUS
 HPDF_Fax3PreEncode(struct _HPDF_CCITT_Data *pData/*, tsample_t s*/)
 {
 	HPDF_Fax3CodecState* sp = EncoderState(pData);
@@ -230,8 +230,8 @@ HPDF_Fax3PreEncode(struct _HPDF_CCITT_Data *pData/*, tsample_t s*/)
 	return HPDF_OK;
 }
 
-static HPDF_STATUS 
-HPDF_CCITT_AppendToStream(HPDF_Stream  dst, 	
+static HPDF_STATUS
+HPDF_CCITT_AppendToStream(HPDF_Stream  dst,
 						  tidata_t	tif_rawdata,
 						  tsize_t	tif_rawcc)
 {
@@ -245,7 +245,7 @@ HPDF_CCITT_AppendToStream(HPDF_Stream  dst,
  * called by ``encodestrip routines'' w/o concern
  * for infinite recursion.
  */
-static HPDF_STATUS 
+static HPDF_STATUS
 HPDF_CCITT_FlushData(struct _HPDF_CCITT_Data *pData)
 {
 	if (pData->tif_rawcc > 0) {
@@ -533,7 +533,7 @@ find1span(unsigned char* bp, int32 bs, int32 be)
 
 
 /*
-void 
+void
 HPDF_Fax3PostEncode(struct _HPDF_CCITT_Data *pData)
 {
 	HPDF_Fax3CodecState* sp = EncoderState(pData);
@@ -561,7 +561,7 @@ static const tableentry vcodes[7] = {
  * 2d-encode a row of pixels.  Consult the CCITT
  * documentation for the algorithm.
  */
-static HPDF_STATUS 
+static HPDF_STATUS
 HPDF_Fax3Encode2DRow(struct _HPDF_CCITT_Data *pData, unsigned char* bp, unsigned char* rp, uint32 bits)
 {
 #define	PIXEL(buf,ix)	((((buf)[(ix)>>3]) >> (7-((ix)&7))) & 1)
@@ -606,7 +606,7 @@ HPDF_Fax3Encode2DRow(struct _HPDF_CCITT_Data *pData, unsigned char* bp, unsigned
 /*
  * Encode the requested amount of data.
  */
-static HPDF_STATUS 
+static HPDF_STATUS
 HPDF_Fax4Encode(struct _HPDF_CCITT_Data *pData, tidata_t bp, tsize_t cc/*, tsample_t s*/)
 {
 	HPDF_Fax3CodecState *sp = EncoderState(pData);
@@ -631,14 +631,14 @@ HPDF_Fax4PostEncode(struct _HPDF_CCITT_Data *pData)
 	HPDF_Fax3PutBits(pData, EOL, 12);
 	HPDF_Fax3PutBits(pData, EOL, 12);
 	/*if (sp->bit != 8)
-		HPDF_Fax3FlushBits(pData, sp);	
+		HPDF_Fax3FlushBits(pData, sp);
 		*/
 	HPDF_CCITT_FlushData(pData);
 }
 
 
 
-HPDF_STATUS 
+HPDF_STATUS
 HPDF_Stream_CcittToStream( const HPDF_BYTE   *buf,
                             HPDF_Stream  dst,
 							HPDF_Encrypt  e,
@@ -663,7 +663,7 @@ HPDF_Stream_CcittToStream( const HPDF_BYTE   *buf,
 		pBufPos = buf+(line_width*(height-1));
 		pBufEnd= buf-line_width;
 		lineIncrement = -((int)line_width);
-	}	
+	}
 
 	memset(&data, 0, sizeof(struct _HPDF_CCITT_Data));
 	data.dst = dst;
@@ -750,7 +750,7 @@ HPDF_Image_Load1BitImageFromMem  (HPDF_MMgr        mmgr,
 /*
  * Load image from buffer
  * line_width - width of the line in bytes
- * top_is_first - image orientation: 
+ * top_is_first - image orientation:
  *      TRUE if image is oriented TOP-BOTTOM;
  *      FALSE if image is oriented BOTTOM-TOP
  */
@@ -783,7 +783,7 @@ HPDF_Image_LoadRaw1BitImageFromMem  (HPDF_Doc           pdf,
 		if(image->filterParams==NULL) {
 			return NULL;
 		}
-		
+
 		/* pure 2D encoding, default is 0 */
 		HPDF_Dict_AddNumber (image->filterParams, "K", -1);
 		/* default is 1728 */

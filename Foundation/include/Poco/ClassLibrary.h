@@ -40,7 +40,7 @@ extern "C"
 	bool POCO_LIBRARY_API pocoBuildManifest(Poco::ManifestBase* pManifest);
 	void POCO_LIBRARY_API pocoInitializeLibrary();
 	void POCO_LIBRARY_API pocoUninitializeLibrary();
-} 
+}
 
 
 //

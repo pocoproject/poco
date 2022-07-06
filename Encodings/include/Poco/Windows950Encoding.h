@@ -33,7 +33,7 @@ class Encodings_API Windows950Encoding: public DoubleByteEncoding
 public:
 	Windows950Encoding();
 	~Windows950Encoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

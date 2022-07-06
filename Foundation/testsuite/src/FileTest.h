@@ -42,7 +42,7 @@ public:
 	void testRenameFailIfExists();
 	void testRootDir();
 	void testLongPath();
-	
+
 	void setUp();
 	void tearDown();
 

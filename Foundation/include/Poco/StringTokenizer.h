@@ -38,10 +38,10 @@ public:
 		TOK_IGNORE_EMPTY = 1, /// ignore empty tokens
 		TOK_TRIM         = 2  /// remove leading and trailing whitespace from tokens
 	};
-	
+
 	typedef std::vector<std::string> TokenVec;
 	typedef TokenVec::const_iterator Iterator;
-	
+
 	StringTokenizer(const std::string& str, const std::string& separators, int options = 0);
 		/// Splits the given string into tokens. The tokens are expected to be
 		/// separated by one of the separator characters given in separators.
@@ -51,10 +51,10 @@ public:
 
 	~StringTokenizer();
 		/// Destroys the tokenizer.
-	
+
 	Iterator begin() const;
 	Iterator end() const;
-	
+
 	const std::string& operator [] (std::size_t index) const;
 		/// Returns const reference the index'th token.
 		/// Throws a RangeException if the index is out of range.
@@ -72,10 +72,10 @@ public:
 		/// Throws a NotFoundException if the token is not found.
 
 	std::size_t replace(const std::string& oldToken, const std::string& newToken, std::string::size_type pos = 0);
-		/// Starting at position pos, replaces all subsequent tokens having value 
+		/// Starting at position pos, replaces all subsequent tokens having value
 		/// equal to oldToken with newToken.
 		/// Returns the number of modified tokens.
-		
+
 	std::size_t count() const;
 		/// Returns the total number of tokens.
 

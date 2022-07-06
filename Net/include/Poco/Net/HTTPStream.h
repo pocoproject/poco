@@ -43,7 +43,7 @@ public:
 	HTTPStreamBuf(HTTPSession& session, openmode mode);
 	~HTTPStreamBuf();
 	void close();
-	
+
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
@@ -76,7 +76,7 @@ public:
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };
@@ -91,7 +91,7 @@ public:
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };

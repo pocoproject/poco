@@ -220,7 +220,7 @@ private:
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4996) // deprecation warnings
-#endif				
+#endif
 				pFile = fopen(keyFile.c_str(), "r");
 #if defined(_MSC_VER)
 #pragma warning(pop)

@@ -28,7 +28,7 @@ namespace Net {
 
 
 class Net_API ICMPPacket
-	/// This class is the ICMP packet abstraction. 
+	/// This class is the ICMP packet abstraction.
 {
 public:
 	ICMPPacket(SocketAddress::Family family, int dataSize = 48);
@@ -57,13 +57,13 @@ public:
 
 	struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.
-		/// Otherwise, it extracts the time value from the supplied buffer and 
+		/// Otherwise, it extracts the time value from the supplied buffer and
 		/// returns the extracted value.
 		///
 		/// Supplied buffer includes IP header, ICMP header and data.
 
 	bool validReplyID(Poco::UInt8* buffer, int length) const;
-		/// Returns true if the extracted id is recognized 
+		/// Returns true if the extracted id is recognized
 		/// (equals the process id).
 		///
 		/// Supplied buffer includes IP header, ICMP header and data.

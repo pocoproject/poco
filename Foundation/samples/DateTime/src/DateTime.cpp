@@ -28,7 +28,7 @@ using Poco::DateTimeParser;
 int main(int argc, char** argv)
 {
 	LocalDateTime now;
-	
+
 	std::string str = DateTimeFormatter::format(now, DateTimeFormat::ISO8601_FORMAT);
 	DateTime dt;
 	int tzd;

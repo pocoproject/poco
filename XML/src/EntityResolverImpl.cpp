@@ -58,7 +58,7 @@ InputSource* EntityResolverImpl::resolveEntity(const XMLString* publicId, const 
 	return pInputSource;
 }
 
-		
+
 void EntityResolverImpl::releaseInputSource(InputSource* pSource)
 {
 	poco_check_ptr (pSource);

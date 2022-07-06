@@ -32,10 +32,10 @@ class TimeRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	TimeRequestHandler() 
+	TimeRequestHandler()
 	{
 	}
-	
+
 	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 	{
 		Timestamp now;

@@ -340,7 +340,7 @@ ZipArchive Compress::close()
 		_offset += entrySize;
 	}
 	if (!_out) throw Poco::IOException("Bad output stream");
-	
+
 	Poco::UInt64 numEntries64 = _infos.size();
 	needZip64 = needZip64 || _offset >= ZipCommon::ZIP64_MAGIC;
 	if (needZip64)

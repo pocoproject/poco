@@ -65,7 +65,7 @@ Object& Query::findObject(const std::string& path, Object& obj) const
 		obj = *result.extract<Object::Ptr>();
 	else if (result.type() == typeid(Object))
 		obj = result.extract<Object>();
-	
+
 	return obj;
 }
 
@@ -93,7 +93,7 @@ Array& Query::findArray(const std::string& path, Array& arr) const
 		arr = *result.extract<Array::Ptr>();
 	else if (result.type() == typeid(Array))
 		arr = result.extract<Array>();
-	
+
 	return arr;
 }
 

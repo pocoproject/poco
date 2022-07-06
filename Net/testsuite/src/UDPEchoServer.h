@@ -38,10 +38,10 @@ public:
 	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
-		
+
 	Poco::Net::SocketAddress address() const;
-		/// Returns the address of the server.	
-		
+		/// Returns the address of the server.
+
 	void run();
 		/// Does the work.
 

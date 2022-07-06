@@ -42,7 +42,7 @@ protected:
 	void writeLockImpl();
 	bool tryWriteLockImpl(DWORD timeout = 1);
 	void unlockImpl();
-	
+
 private:
 	DWORD _readerCount;
 	DWORD _readerWaiting;

@@ -54,7 +54,7 @@ inline void SHA1Engine::byteReverse(UInt32* buffer, int byteCount)
 #endif // POCO_ARCH_LITTLE_ENDIAN
 }
 
-	
+
 void SHA1Engine::updateImpl(const void* buffer_, std::size_t count)
 {
 	const BYTE* buffer = (const BYTE*) buffer_;
@@ -71,7 +71,7 @@ void SHA1Engine::updateImpl(const void* buffer_, std::size_t count)
 	{
 		db[_context.slop++] = *(buffer++);
 		if (_context.slop == BLOCK_SIZE)
-		{ 
+		{
 			/* transform this one block */
 			SHA1_BYTE_REVERSE(_context.data, BLOCK_SIZE);
 			transform();
