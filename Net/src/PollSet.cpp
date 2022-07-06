@@ -329,7 +329,7 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
-		_addMap[fd] = mode;
+		_addMap[fd] |= mode;
 		_removeSet.erase(fd);
 		_socketMap[fd] = socket;
 	}
