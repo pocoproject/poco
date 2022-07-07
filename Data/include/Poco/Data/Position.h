@@ -38,7 +38,7 @@ public:
 
 	Poco::UInt32 value() const;
 		/// Returns the position value.
-	
+
 private:
 	Position();
 
@@ -49,9 +49,9 @@ private:
 ///
 /// inlines
 ///
-inline Poco::UInt32 Position::value() const 
-{ 
-	return _value; 
+inline Poco::UInt32 Position::value() const
+{
+	return _value;
 }
 
 

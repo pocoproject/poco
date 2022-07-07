@@ -20,8 +20,8 @@ class CppUnit_API CppUnitException: public std::exception
 	/// descriptive strings through its what() method
 {
 public:
-	CppUnitException(const std::string& message = "", 
-	                 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER, 
+	CppUnitException(const std::string& message = "",
+	                 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
 	                 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
 	CppUnitException(const std::string& message,
 	                 long lineNumber,
@@ -110,26 +110,26 @@ inline const char* CppUnitException::what() const throw ()
 
 inline long CppUnitException::lineNumber() const
 {
-	return _lineNumber; 
+	return _lineNumber;
 }
 
 
 inline long CppUnitException::data1LineNumber() const
 {
-	return _data1lineNumber; 
+	return _data1lineNumber;
 }
 
 
 inline long CppUnitException::data2LineNumber() const
 {
-	return _data2lineNumber; 
+	return _data2lineNumber;
 }
 
 
 // The file in which the error occurred
 inline const std::string& CppUnitException::fileName() const
 {
-	return _fileName; 
+	return _fileName;
 }
 
 

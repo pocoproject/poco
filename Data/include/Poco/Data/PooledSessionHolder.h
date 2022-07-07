@@ -80,7 +80,7 @@ inline SessionPool& PooledSessionHolder::owner()
 inline void PooledSessionHolder::access()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	
+
 	_lastUsed.update();
 }
 

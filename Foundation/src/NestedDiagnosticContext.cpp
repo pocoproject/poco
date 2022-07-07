@@ -43,7 +43,7 @@ NestedDiagnosticContext& NestedDiagnosticContext::operator = (const NestedDiagno
 	return *this;
 }
 
-	
+
 void NestedDiagnosticContext::push(const std::string& info)
 {
 	Context ctx;
@@ -53,7 +53,7 @@ void NestedDiagnosticContext::push(const std::string& info)
 	_stack.push_back(ctx);
 }
 
-	
+
 void NestedDiagnosticContext::push(const std::string& info, int line, const char* filename)
 {
 	Context ctx;
@@ -70,7 +70,7 @@ void NestedDiagnosticContext::pop()
 		_stack.pop_back();
 }
 
-	
+
 int NestedDiagnosticContext::depth() const
 {
 	return int(_stack.size());
@@ -89,7 +89,7 @@ std::string NestedDiagnosticContext::toString() const
 	return result;
 }
 
-	
+
 void NestedDiagnosticContext::dump(std::ostream& ostr) const
 {
 	dump(ostr, "\n");

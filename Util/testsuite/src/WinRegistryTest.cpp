@@ -52,7 +52,7 @@ void WinRegistryTest::testRegistry()
 	assertTrue (regKey.exists("name1"));
 	assertTrue (regKey.exists("name2"));
 	assertTrue (regKey.exists());
-	
+
 	WinRegistryKey regKeyRO("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test", true);
 	assertTrue (regKeyRO.getString("name1") == "Value1");
 	try
@@ -64,7 +64,7 @@ void WinRegistryTest::testRegistry()
 		std::string msg = exc.displayText();
 	}
 	assertTrue (regKey.getString("name1") == "Value1");
-	
+
 	WinRegistryKey::Values vals;
 	regKey.values(vals);
 	assertTrue (vals.size() == 2);
@@ -75,14 +75,14 @@ void WinRegistryTest::testRegistry()
 	Environment::set("FOO", "bar");
 	regKey.setStringExpand("name3", "%FOO%");
 	assertTrue (regKey.getStringExpand("name3") == "bar");
-	
+
 	regKey.setInt("name4", 42);
 	assertTrue (regKey.getInt("name4") == 42);
-	
+
 	assertTrue (regKey.exists("name4"));
 	regKey.deleteValue("name4");
 	assertTrue (!regKey.exists("name4"));
-	
+
 #if defined(POCO_HAVE_INT64)
 	regKey.setInt64("name5", std::numeric_limits<Int64>::max());
 	assertTrue (regKey.getInt64("name5") == std::numeric_limits<Int64>::max());

@@ -56,17 +56,17 @@ public:
 	IniFileConfiguration(std::istream& istr);
 		/// Creates an IniFileConfiguration and loads the configuration data
 		/// from the given stream, which must be in initialization file format.
-		
+
 	IniFileConfiguration(const std::string& path);
 		/// Creates an IniFileConfiguration and loads the configuration data
 		/// from the given file, which must be in initialization file format.
-		
+
 	void load(std::istream& istr);
-		/// Loads the configuration data from the given stream, which 
+		/// Loads the configuration data from the given stream, which
 		/// must be in initialization file format.
-		
+
 	void load(const std::string& path);
-		/// Loads the configuration data from the given file, which 
+		/// Loads the configuration data from the given file, which
 		/// must be in initialization file format.
 
 protected:
@@ -84,7 +84,7 @@ private:
 		bool operator () (const std::string& s1, const std::string& s2) const;
 	};
 	typedef std::map<std::string, std::string, ICompare> IStringMap;
-	
+
 	IStringMap _map;
 	std::string _sectionKey;
 };

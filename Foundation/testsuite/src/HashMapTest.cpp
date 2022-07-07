@@ -35,9 +35,9 @@ void HashMapTest::testInsert()
 
 	typedef HashMap<int, int> IntMap;
 	IntMap hm;
-	
+
 	assertTrue (hm.empty());
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		std::pair<IntMap::Iterator, bool> res = hm.insert(IntMap::ValueType(i, i*2));
@@ -50,10 +50,10 @@ void HashMapTest::testInsert()
 		assertTrue (it->second == i*2);
 		assertTrue (hm.count(i) == 1);
 		assertTrue (hm.size() == i + 1);
-	}		
-	
+	}
+
 	assertTrue (!hm.empty());
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator it = hm.find(i);
@@ -61,14 +61,14 @@ void HashMapTest::testInsert()
 		assertTrue (it->first == i);
 		assertTrue (it->second == i*2);
 	}
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		std::pair<IntMap::Iterator, bool> res = hm.insert(IntMap::ValueType(i, 0));
 		assertTrue (res.first->first == i);
 		assertTrue (res.first->second == i*2);
 		assertTrue (!res.second);
-	}		
+	}
 }
 
 
@@ -84,7 +84,7 @@ void HashMapTest::testErase()
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
 	assertTrue (hm.size() == N);
-	
+
 	for (int i = 0; i < N; i += 2)
 	{
 		hm.erase(i);
@@ -92,13 +92,13 @@ void HashMapTest::testErase()
 		assertTrue (it == hm.end());
 	}
 	assertTrue (hm.size() == N/2);
-	
+
 	for (int i = 0; i < N; i += 2)
 	{
 		IntMap::Iterator it = hm.find(i);
 		assertTrue (it == hm.end());
 	}
-	
+
 	for (int i = 1; i < N; i += 2)
 	{
 		IntMap::Iterator it = hm.find(i);
@@ -110,13 +110,13 @@ void HashMapTest::testErase()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator it = hm.find(i);
 		assertTrue (it != hm.end());
 		assertTrue (it->first == i);
-		assertTrue (it->second == i*2);		
+		assertTrue (it->second == i*2);
 	}
 }
 
@@ -132,7 +132,7 @@ void HashMapTest::testIterator()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	
+
 	std::map<int, int> values;
 	IntMap::Iterator it; // do not initialize here to test proper behavior of uninitialized iterators
 	it = hm.begin();
@@ -142,7 +142,7 @@ void HashMapTest::testIterator()
 		values[it->first] = it->second;
 		++it;
 	}
-	
+
 	assertTrue (values.size() == N);
 }
 
@@ -158,7 +158,7 @@ void HashMapTest::testConstIterator()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	
+
 	std::map<int, int> values;
 	IntMap::ConstIterator it = hm.begin();
 	while (it != hm.end())
@@ -167,7 +167,7 @@ void HashMapTest::testConstIterator()
 		values[it->first] = it->second;
 		++it;
 	}
-	
+
 	assertTrue (values.size() == N);
 }
 
@@ -180,12 +180,12 @@ void HashMapTest::testIndex()
 	hm[1] = 2;
 	hm[2] = 4;
 	hm[3] = 6;
-	
+
 	assertTrue (hm.size() == 3);
 	assertTrue (hm[1] == 2);
 	assertTrue (hm[2] == 4);
 	assertTrue (hm[3] == 6);
-	
+
 	try
 	{
 		const IntMap& im = hm;

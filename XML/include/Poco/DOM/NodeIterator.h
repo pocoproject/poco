@@ -48,13 +48,13 @@ class XML_API NodeIterator
 public:
 	NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
 		/// Creates a NodeIterator over the subtree rooted at the specified node.
-		
+
 	NodeIterator(const NodeIterator& iterator);
 		/// Creates a NodeIterator by copying another NodeIterator.
-		
+
 	NodeIterator& operator = (const NodeIterator& iterator);
 		/// Assignment operator.
-		
+
 	~NodeIterator();
 		/// Destroys the NodeIterator.
 
@@ -62,10 +62,10 @@ public:
 		/// The root node of the NodeIterator, as specified when it was created.
 
 	unsigned long whatToShow() const;
-		/// This attribute determines which node types are presented via the iterator. 
-		/// The available set of constants is defined in the NodeFilter interface. 
-		/// Nodes not accepted by whatToShow will be skipped, but their children may 
-		/// still be considered. Note that this skip takes precedence over the filter, 
+		/// This attribute determines which node types are presented via the iterator.
+		/// The available set of constants is defined in the NodeFilter interface.
+		/// Nodes not accepted by whatToShow will be skipped, but their children may
+		/// still be considered. Note that this skip takes precedence over the filter,
 		/// if any.
 
 	NodeFilter* filter() const;
@@ -78,7 +78,7 @@ public:
 		/// and the filter. Also note that this is currently the only situation where
 		/// NodeIterators may reject a complete subtree rather than skipping individual
 		/// nodes.
-		/// 
+		///
 		/// To produce a view of the document that has entity references expanded and
 		/// does not expose the entity reference node itself, use the whatToShow flags
 		/// to hide the entity reference node and set expandEntityReferences to true
@@ -120,7 +120,7 @@ protected:
 
 private:
 	NodeIterator();
-	
+
 	Node*         _pRoot;
 	unsigned long _whatToShow;
 	NodeFilter*   _pFilter;

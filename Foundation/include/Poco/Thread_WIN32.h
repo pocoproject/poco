@@ -29,7 +29,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
 	typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -53,7 +53,7 @@ public:
 		POLICY_DEFAULT_IMPL = 0
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
@@ -106,7 +106,7 @@ private:
 		{
 			TlsSetValue(_slot, pThread);
 		}
-	
+
 	private:
 		DWORD _slot;
 	};

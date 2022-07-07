@@ -26,9 +26,9 @@
 namespace Poco {
 
 
-template <class TArgs, bool useSender = true, bool senderIsConst = true> 
+template <class TArgs, bool useSender = true, bool senderIsConst = true>
 class FunctionPriorityDelegate: public AbstractPriorityDelegate<TArgs>
-	/// Wraps a freestanding function or static member function 
+	/// Wraps a freestanding function or static member function
 	/// for use as a PriorityDelegate.
 {
 public:
@@ -39,13 +39,13 @@ public:
 		_function(function)
 	{
 	}
-	
+
 	FunctionPriorityDelegate(const FunctionPriorityDelegate& delegate):
 		AbstractPriorityDelegate<TArgs>(delegate),
 		_function(delegate._function)
 	{
 	}
-	
+
 	FunctionPriorityDelegate& operator = (const FunctionPriorityDelegate& delegate)
 	{
 		if (&delegate != this)
@@ -97,7 +97,7 @@ private:
 };
 
 
-template <class TArgs> 
+template <class TArgs>
 class FunctionPriorityDelegate<TArgs, true, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -108,13 +108,13 @@ public:
 		_function(function)
 	{
 	}
-	
+
 	FunctionPriorityDelegate(const FunctionPriorityDelegate& delegate):
 		AbstractPriorityDelegate<TArgs>(delegate),
 		_function(delegate._function)
 	{
 	}
-	
+
 	FunctionPriorityDelegate& operator = (const FunctionPriorityDelegate& delegate)
 	{
 		if (&delegate != this)
@@ -166,7 +166,7 @@ private:
 };
 
 
-template <class TArgs> 
+template <class TArgs>
 class FunctionPriorityDelegate<TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -177,13 +177,13 @@ public:
 		_function(function)
 	{
 	}
-	
+
 	FunctionPriorityDelegate(const FunctionPriorityDelegate& delegate):
 		AbstractPriorityDelegate<TArgs>(delegate),
 		_function(delegate._function)
 	{
 	}
-	
+
 	FunctionPriorityDelegate& operator = (const FunctionPriorityDelegate& delegate)
 	{
 		if (&delegate != this)

@@ -78,7 +78,7 @@ public:
 	void value(unsigned v);
 		/// An unsigned value is read. This will only be triggered if the
 		/// value cannot fit into a signed int.
-		
+
 #if defined(POCO_HAVE_INT64)
 	void value(Int64 v);
 		/// A 64-bit integer value is read; it will be written to the output.

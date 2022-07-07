@@ -28,7 +28,7 @@ class CachingChannel: public Poco::Channel
 {
 public:
 	typedef std::list<Poco::Message> Messages;
-	
+
 	CachingChannel(std::size_t n = 100);
 		/// Creates the CachingChannel. Caches n messages in memory
 

@@ -100,7 +100,7 @@ public:
 		{
 			return _it->second;
 		}
-		
+
 	private:
 		typename MetaMap::const_iterator _it;
 	};

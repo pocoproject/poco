@@ -43,7 +43,7 @@ public:
 
 	virtual ~HTTPServerConnection();
 		/// Destroys the HTTPServerConnection.
-		
+
 	void run();
 		/// Handles all HTTP requests coming in.
 

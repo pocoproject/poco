@@ -108,10 +108,10 @@ public:
 
 
 	virtual void setString(const std::string& key, const std::string& value);
-	
 
-	virtual void removeRaw(const std::string& key);	
-	
+
+	virtual void removeRaw(const std::string& key);
+
 
 protected:
 

@@ -36,11 +36,11 @@ MemoryPoolTest::~MemoryPoolTest()
 void MemoryPoolTest::testMemoryPool()
 {
 	MemoryPool pool1(100, 0, 10);
-	
+
 	assertTrue (pool1.blockSize() == 100);
 	assertTrue (pool1.allocated() == 0);
 	assertTrue (pool1.available() == 0);
-	
+
 	std::vector<void*> ptrs;
 	for (int i = 0; i < 10; ++i)
 	{
@@ -48,7 +48,7 @@ void MemoryPoolTest::testMemoryPool()
 		assertTrue (pool1.allocated() == i + 1);
 		assertTrue (pool1.available() == 0);
 	}
-	
+
 	try
 	{
 		pool1.get();
@@ -57,7 +57,7 @@ void MemoryPoolTest::testMemoryPool()
 	catch (Poco::OutOfMemoryException&)
 	{
 	}
-	
+
 	int av = 0;
 	for (std::vector<void*>::iterator it = ptrs.begin(); it != ptrs.end(); ++it)
 	{
@@ -65,7 +65,7 @@ void MemoryPoolTest::testMemoryPool()
 		++av;
 		assertTrue (pool1.available() == av);
 	}
-	
+
 	MemoryPool pool2(32, 5, 10);
 	assertTrue (pool2.available() == 5);
 	assertTrue (pool2.blockSize() == 32);

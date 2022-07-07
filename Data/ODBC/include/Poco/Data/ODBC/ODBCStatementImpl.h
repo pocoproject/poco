@@ -76,7 +76,7 @@ protected:
 		/// Returns true if another compile is possible.
 
 	void compileImpl();
-		/// Compiles the statement, doesn't bind yet. 
+		/// Compiles the statement, doesn't bind yet.
 		/// Does nothing if the statement has already been compiled.
 
 	void bindImpl();
@@ -101,12 +101,12 @@ private:
 	typedef std::vector<ExtractorPtr>         ExtractorVec;
 	typedef std::vector<ODBCMetaColumn*>      ColumnPtrVec;
 	typedef std::vector<ColumnPtrVec>         ColumnPtrVecVec;
-	
+
 	static const std::string INVALID_CURSOR_STATE;
 
 	void clear();
 		/// Closes the cursor and resets indicator variables.
-	
+
 	void doBind();
 		/// Binds parameters.
 
@@ -119,8 +119,8 @@ private:
 	void doPrepare();
 		/// Prepares placeholders for data returned by statement.
 		/// It is called during statement compilation for SQL statements
-		/// returning data. For stored procedures returning datasets, 
-		/// it is called upon the first check for data availability 
+		/// returning data. For stored procedures returning datasets,
+		/// it is called upon the first check for data availability
 		/// (see hasNext() function).
 
 	bool hasData() const;
@@ -133,8 +133,8 @@ private:
 		/// Returns true if there is a row fetched but not yet extracted.
 
 	void putData();
-		/// Called whenever SQLExecute returns SQL_NEED_DATA. This is expected 
-		/// behavior for PB_AT_EXEC binding mode. 
+		/// Called whenever SQLExecute returns SQL_NEED_DATA. This is expected
+		/// behavior for PB_AT_EXEC binding mode.
 
 	void addPreparator();
 	void fillColumns();

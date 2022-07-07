@@ -43,8 +43,8 @@ public:
 		/// Destroys the CipherFactory.
 
 	Cipher* createCipher(const CipherKey& key);
-		/// Creates a Cipher object for the given Cipher name. Valid cipher 
-		/// names depend on the OpenSSL version the library is linked with;  
+		/// Creates a Cipher object for the given Cipher name. Valid cipher
+		/// names depend on the OpenSSL version the library is linked with;
 		/// see the output of
 		///
 		///     openssl enc --help
@@ -64,7 +64,7 @@ public:
 	Cipher* createCipher(const EVPPKey& key);
 		/// Creates an EVPCipher using the given EVP key
 		/// for public key encryption/private key decryption.
-	
+
 	static CipherFactory& defaultFactory();
 		/// Returns the default CipherFactory.
 

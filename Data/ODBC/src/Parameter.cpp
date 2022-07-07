@@ -23,14 +23,14 @@ namespace Data {
 namespace ODBC {
 
 
-Parameter::Parameter(const StatementHandle& rStmt, std::size_t colNum) : 
-	_rStmt(rStmt), 
+Parameter::Parameter(const StatementHandle& rStmt, std::size_t colNum) :
+	_rStmt(rStmt),
 	_number(colNum)
 {
 	init();
 }
 
-	
+
 Parameter::~Parameter()
 {
 }
@@ -38,8 +38,8 @@ Parameter::~Parameter()
 
 void Parameter::init()
 {
-	if (Utility::isError(SQLDescribeParam(_rStmt, 
-		(SQLUSMALLINT) _number + 1, 
+	if (Utility::isError(SQLDescribeParam(_rStmt,
+		(SQLUSMALLINT) _number + 1,
 		&_dataType,
 		&_columnSize,
 		&_decimalDigits,

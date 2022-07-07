@@ -27,7 +27,7 @@ public:
 	void testTimeBased();
 	void testRandom();
 	void testNameBased();
-	
+
 	void setUp();
 	void tearDown();
 

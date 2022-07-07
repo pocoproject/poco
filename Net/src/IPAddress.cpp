@@ -236,7 +236,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		else if (addr.family() == IPAddress::IPv6)
 			newIPv6(addr.addr(), addr.scope());
 #endif
-		else 
+		else
 			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
 	}
 	return *this;
@@ -261,7 +261,7 @@ Poco::UInt32 IPAddress::scope() const
 	return pImpl()->scope();
 }
 
-	
+
 std::string IPAddress::toString() const
 {
 	return pImpl()->toString();
@@ -291,13 +291,13 @@ bool IPAddress::isMulticast() const
 	return pImpl()->isMulticast();
 }
 
-	
+
 bool IPAddress::isUnicast() const
 {
 	return !isWildcard() && !isBroadcast() && !isMulticast();
 }
 
-	
+
 bool IPAddress::isLinkLocal() const
 {
 	return pImpl()->isLinkLocal();
@@ -513,7 +513,7 @@ poco_socklen_t IPAddress::length() const
 	return pImpl()->length();
 }
 
-	
+
 const void* IPAddress::addr() const
 {
 	return pImpl()->addr();

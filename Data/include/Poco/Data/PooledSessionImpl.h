@@ -62,11 +62,11 @@ public:
 	bool hasTransactionIsolation(Poco::UInt32) const;
 	bool isTransactionIsolation(Poco::UInt32) const;
 	const std::string& connectorName() const;
-	void setFeature(const std::string& name, bool state);	
+	void setFeature(const std::string& name, bool state);
 	bool getFeature(const std::string& name);
 	void setProperty(const std::string& name, const Poco::Any& value);
 	Poco::Any getProperty(const std::string& name);
-	
+
 protected:
 	SessionImpl* access() const;
 		/// Updates the last access timestamp,
@@ -75,11 +75,11 @@ protected:
 		///
 		/// Throws an SessionUnavailableException if the
 		/// session is no longer valid.
-		
+
 	SessionImpl* impl() const;
 		/// Returns a pointer to the SessionImpl.
-				
-private:	
+
+private:
 	mutable Poco::AutoPtr<PooledSessionHolder> _pHolder;
 };
 

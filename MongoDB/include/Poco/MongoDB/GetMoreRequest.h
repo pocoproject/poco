@@ -27,16 +27,16 @@ namespace MongoDB {
 
 
 class MongoDB_API GetMoreRequest: public RequestMessage
-	/// A GetMoreRequest is used to query the database for more documents in a collection 
+	/// A GetMoreRequest is used to query the database for more documents in a collection
 	/// after a query request is send (OP_GETMORE).
 {
 public:
 	GetMoreRequest(const std::string& collectionName, Int64 cursorID);
-		/// Creates a GetMoreRequest for the give collection and cursor. 
+		/// Creates a GetMoreRequest for the give collection and cursor.
 		///
-		/// The full collection name is the concatenation of the database 
-		/// name with the collection name, using a "." for the concatenation. For example, 
-		/// for the database "foo" and the collection "bar", the full collection name is 
+		/// The full collection name is the concatenation of the database
+		/// name with the collection name, using a "." for the concatenation. For example,
+		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar". The cursorID has been returned by the response on the query request.
 		/// By default the numberToReturn is set to 100.
 

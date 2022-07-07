@@ -33,18 +33,18 @@ class XML_API CharacterData: public AbstractNode
 	/// here rather than on each object that uses these attributes and methods.
 	/// No DOM objects correspond directly to CharacterData, though Text and others
 	/// do inherit the interface from it. All offsets in this interface start from 0.
-	/// 
+	///
 	/// Text strings in the DOM are represented in either UTF-8 (if XML_UNICODE_WCHAR_T is
 	/// not defined) or in UTF-16 (if XML_UNICODE_WCHAR_T is defined).
 	/// Indexing on character data is done in XMLChar units.
 {
 public:
 	const XMLString& data() const;
-		/// Returns the character data of the node that 
+		/// Returns the character data of the node that
 		/// implements the interface.
-	
+
 	const XMLString& getData() const;
-		/// Returns the character data of the node that 
+		/// Returns the character data of the node that
 		/// implements the interface.
 
 	void setData(const XMLString& data);

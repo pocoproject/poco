@@ -36,10 +36,10 @@ public:
 	explicit StreamSocketImpl(SocketAddress::Family addressFamily);
 		/// Creates a SocketImpl, with the underlying
 		/// socket initialized for the given address family.
-		
+
 	StreamSocketImpl(poco_socket_t sockfd);
 		/// Creates a StreamSocketImpl using the given native socket.
-		
+
 	virtual int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Ensures that all data in buffer is sent if the socket
 		/// is blocking. In case of a non-blocking socket, sends as

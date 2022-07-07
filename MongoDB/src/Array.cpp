@@ -20,7 +20,7 @@ namespace Poco {
 namespace MongoDB {
 
 
-Array::Array(): 
+Array::Array():
 	Document()
 {
 }

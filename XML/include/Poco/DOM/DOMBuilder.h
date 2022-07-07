@@ -47,7 +47,7 @@ class XML_API DOMBuilder: protected DTDHandler, protected ContentHandler, protec
 {
 public:
 	DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool = 0);
-		/// Creates a DOMBuilder using the given XMLReader. 
+		/// Creates a DOMBuilder using the given XMLReader.
 		/// If a NamePool is given, it becomes the Document's NamePool.
 
 	virtual ~DOMBuilder();
@@ -87,10 +87,10 @@ protected:
 	void endEntity(const XMLString& name);
 	void startCDATA();
 	void endCDATA();
-	void comment(const XMLChar ch[], int start, int length); 
+	void comment(const XMLChar ch[], int start, int length);
 
 	void appendNode(AbstractNode* pNode);
-	
+
 	void setupParse();
 
 private:

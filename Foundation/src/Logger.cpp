@@ -69,7 +69,7 @@ void Logger::setProperty(const std::string& name, const std::string& value)
 		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
 	else if (name == "level")
 		setLevel(value);
-	else 
+	else
 		Channel::setProperty(name, value);
 }
 

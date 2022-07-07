@@ -91,7 +91,7 @@ std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string&
 		if (it != vals.begin()) str << space;
 		if (it->isNumeric())
 		{
-			str << std::right 
+			str << std::right
 				<< std::fixed
 				<< std::setprecision(2);
 		}

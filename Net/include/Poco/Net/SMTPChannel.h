@@ -36,19 +36,19 @@ public:
 
 	SMTPChannel();
 		/// Creates a SMTPChannel.
-		
+
 	SMTPChannel(const std::string& mailhost, const std::string& sender, const std::string& recipient);
 		/// Creates a SMTPChannel with the given target mailhost, sender, and recipient.
-	
+
 	void open();
 		/// Opens the SMTPChannel.
-		
+
 	void close();
 		/// Closes the SMTPChannel.
-		
+
 	void log(const Message& msg);
 		/// Sends the message's text to the recipient.
-		
+
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given value.
 		///
@@ -59,11 +59,11 @@ public:
 		///     * local:      If true, local time is used. Default is true.
 		///     * attachment: Filename of the file to attach.
 		///     * type:       Content type of the file to attach.
-		///     * delete:     Boolean value indicating whether to delete 
+		///     * delete:     Boolean value indicating whether to delete
 		///                   the attachment file after sending.
-		///     * throw:      Boolean value indicating whether to throw 
+		///     * throw:      Boolean value indicating whether to throw
 		///                   exception upon failure.
-		
+
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 

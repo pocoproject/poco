@@ -28,11 +28,11 @@ namespace Net {
 
 
 class Net_API QuotedPrintableDecoderBuf: public Poco::UnbufferedStreamBuf
-	/// This streambuf decodes all quoted-printable (see RFC 2045) 
+	/// This streambuf decodes all quoted-printable (see RFC 2045)
 	/// encoded data read from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
@@ -40,7 +40,7 @@ class Net_API QuotedPrintableDecoderBuf: public Poco::UnbufferedStreamBuf
 public:
 	QuotedPrintableDecoderBuf(std::istream& istr);
 	~QuotedPrintableDecoderBuf();
-	
+
 private:
 	int readFromDevice();
 
@@ -68,8 +68,8 @@ class Net_API QuotedPrintableDecoder: public QuotedPrintableDecoderIOS, public s
 	/// This istream decodes all quoted-printable (see RFC 2045)
 	/// encoded data read from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.

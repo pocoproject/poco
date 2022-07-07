@@ -22,11 +22,11 @@ public:
 	PluginA()
 	{
 	}
-	
+
 	~PluginA()
 	{
 	}
-	
+
 	std::string name() const
 	{
 		return "PluginA";
@@ -40,11 +40,11 @@ public:
 	PluginB()
 	{
 	}
-	
+
 	~PluginB()
 	{
 	}
-	
+
 	std::string name() const
 	{
 		return "PluginB";
@@ -58,11 +58,11 @@ public:
 	PluginC()
 	{
 	}
-	
+
 	~PluginC()
 	{
 	}
-	
+
 	std::string name() const
 	{
 		return "PluginC";

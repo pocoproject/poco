@@ -41,9 +41,9 @@ void LinearHashTableTest::testInsert()
 	const int N = 1000;
 
 	LinearHashTable<int, Hash<int> > ht;
-	
+
 	assertTrue (ht.empty());
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		std::pair<LinearHashTable<int, Hash<int> >::Iterator, bool> res = ht.insert(i);
@@ -53,18 +53,18 @@ void LinearHashTableTest::testInsert()
 		assertTrue (it != ht.end());
 		assertTrue (*it == i);
 		assertTrue (ht.size() == i + 1);
-	}		
+	}
 	assertTrue (ht.buckets() == N + 1);
-	
+
 	assertTrue (!ht.empty());
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		LinearHashTable<int, Hash<int> >::Iterator it = ht.find(i);
 		assertTrue (it != ht.end());
 		assertTrue (*it == i);
 	}
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		std::pair<LinearHashTable<int, Hash<int> >::Iterator, bool> res = ht.insert(i);
@@ -72,7 +72,7 @@ void LinearHashTableTest::testInsert()
 		assertTrue (!res.second);
 		assertTrue (ht.size() == N);
 		assertTrue (ht.buckets() == N + 1);
-	}		
+	}
 }
 
 
@@ -87,7 +87,7 @@ void LinearHashTableTest::testErase()
 		ht.insert(i);
 	}
 	assertTrue (ht.size() == N);
-	
+
 	for (int i = 0; i < N; i += 2)
 	{
 		ht.erase(i);
@@ -95,13 +95,13 @@ void LinearHashTableTest::testErase()
 		assertTrue (it == ht.end());
 	}
 	assertTrue (ht.size() == N/2);
-	
+
 	for (int i = 0; i < N; i += 2)
 	{
 		LinearHashTable<int, Hash<int> >::Iterator it = ht.find(i);
 		assertTrue (it == ht.end());
 	}
-	
+
 	for (int i = 1; i < N; i += 2)
 	{
 		LinearHashTable<int, Hash<int> >::Iterator it = ht.find(i);
@@ -113,7 +113,7 @@ void LinearHashTableTest::testErase()
 	{
 		ht.insert(i);
 	}
-	
+
 	for (int i = 0; i < N; ++i)
 	{
 		LinearHashTable<int, Hash<int> >::Iterator it = ht.find(i);
@@ -133,7 +133,7 @@ void LinearHashTableTest::testIterator()
 	{
 		ht.insert(i);
 	}
-	
+
 	std::set<int> values;
 	LinearHashTable<int, Hash<int> >::Iterator it = ht.begin();
 	while (it != ht.end())
@@ -142,7 +142,7 @@ void LinearHashTableTest::testIterator()
 		values.insert(*it);
 		++it;
 	}
-	
+
 	assertTrue (values.size() == N);
 }
 
@@ -166,9 +166,9 @@ void LinearHashTableTest::testConstIterator()
 		values.insert(*it);
 		++it;
 	}
-	
+
 	assertTrue (values.size() == N);
-	
+
 	values.clear();
 	const LinearHashTable<int, Hash<int> > cht(ht);
 
@@ -179,8 +179,8 @@ void LinearHashTableTest::testConstIterator()
 		values.insert(*cit);
 		++cit;
 	}
-	
-	assertTrue (values.size() == N);	
+
+	assertTrue (values.size() == N);
 }
 
 
@@ -199,7 +199,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.stop();
 		std::cout << "Insert LHT: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -212,7 +212,7 @@ void LinearHashTableTest::testPerformanceInt()
 
 	{
 		HashTable<int, int> ht;
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -221,7 +221,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.stop();
 		std::cout << "Insert HT: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -230,7 +230,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.stop();
 		std::cout << "Find HT: " << sw.elapsedSeconds() << std::endl;
 	}
-	
+
 	{
 		std::set<int> s;
 		sw.start();
@@ -241,7 +241,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.stop();
 		std::cout << "Insert set: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -251,7 +251,7 @@ void LinearHashTableTest::testPerformanceInt()
 		std::cout << "Find set: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
 	}
-	
+
 }
 
 
@@ -259,7 +259,7 @@ void LinearHashTableTest::testPerformanceStr()
 {
 	const int N = 5000000;
 	Stopwatch sw;
-	
+
 	std::vector<std::string> values;
 	for (int i = 0; i < N; ++i)
 	{
@@ -276,7 +276,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.stop();
 		std::cout << "Insert LHT: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -289,7 +289,7 @@ void LinearHashTableTest::testPerformanceStr()
 
 	{
 		HashTable<std::string, int> ht;
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -298,7 +298,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.stop();
 		std::cout << "Insert HT: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
@@ -307,7 +307,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.stop();
 		std::cout << "Find HT: " << sw.elapsedSeconds() << std::endl;
 	}
-	
+
 	{
 		std::set<std::string> s;
 		sw.start();
@@ -318,7 +318,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.stop();
 		std::cout << "Insert set: " << sw.elapsedSeconds() << std::endl;
 		sw.reset();
-		
+
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{

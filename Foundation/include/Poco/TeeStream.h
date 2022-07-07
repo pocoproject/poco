@@ -36,7 +36,7 @@ public:
 	TeeStreamBuf();
 		/// Creates an unconnected CountingStreamBuf.
 		/// Use addStream() to attach output streams.
-	
+
 	TeeStreamBuf(std::istream& istr);
 		/// Creates the CountingStreamBuf and connects it
 		/// to the given input stream.
@@ -57,7 +57,7 @@ protected:
 
 private:
 	typedef std::vector<std::ostream*> StreamVec;
-	
+
 	std::istream* _pIstr;
 	StreamVec     _streams;
 };
@@ -116,7 +116,7 @@ class Foundation_API TeeOutputStream: public TeeIOS, public std::ostream
 public:
 	TeeOutputStream();
 		/// Creates an unconnected TeeOutputStream.
-	
+
 	TeeOutputStream(std::ostream& ostr);
 		/// Creates the TeeOutputStream and connects it
 		/// to the given input stream.

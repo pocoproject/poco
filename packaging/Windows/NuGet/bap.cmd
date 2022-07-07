@@ -1,7 +1,7 @@
 echo off
 rem  Usage:
 rem  ------
-rem  bap [vsvers] [release]       // bpp 150 1.10.1 
+rem  bap [vsvers] [release]       // bpp 150 1.10.1
 rem  ------
 setlocal
 if "%1"=="" goto usage
@@ -18,7 +18,7 @@ goto exit
 :usage
 echo Usage:
 echo ------
-echo bap [vsvers] [release]      // bpp 150 1.10.1 
+echo bap [vsvers] [release]      // bpp 150 1.10.1
 echo ------
 :exit
 endlocal

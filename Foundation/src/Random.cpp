@@ -14,7 +14,7 @@
 //
 //
 // Based on the FreeBSD random number generator.
-// src/lib/libc/stdlib/random.c,v 1.25 
+// src/lib/libc/stdlib/random.c,v 1.25
 //
 // Copyright (c) 1983, 1993
 // The Regents of the University of California.  All rights reserved.
@@ -206,7 +206,7 @@ void Random::seed(UInt32 x)
 	_state[0] = x;
 	if (_randType == TYPE_0)
 		lim = NSHUFF;
-	else 
+	else
 	{
 		for (i = 1; i < _randDeg; i++)
 			_state[i] = goodRand(_state[i - 1]);
@@ -267,36 +267,36 @@ void Random::initState(UInt32 s, char* argState, Int32 n)
 {
 	UInt32* intArgState = (UInt32*) argState;
 
-	if (n < BREAK_0) 
+	if (n < BREAK_0)
 	{
 		poco_bugcheck_msg("not enough state");
 		return;
 	}
-	if (n < BREAK_1) 
+	if (n < BREAK_1)
 	{
 		_randType = TYPE_0;
 		_randDeg  = DEG_0;
 		_randSep  = SEP_0;
-	} 
-	else if (n < BREAK_2) 
+	}
+	else if (n < BREAK_2)
 	{
 		_randType = TYPE_1;
 		_randDeg  = DEG_1;
 		_randSep  = SEP_1;
-	} 
-	else if (n < BREAK_3) 
+	}
+	else if (n < BREAK_3)
 	{
 		_randType = TYPE_2;
 		_randDeg  = DEG_2;
 		_randSep  = SEP_2;
-	} 
-	else if (n < BREAK_4) 
+	}
+	else if (n < BREAK_4)
 	{
 		_randType = TYPE_3;
 		_randDeg  = DEG_3;
 		_randSep  = SEP_3;
-	} 
-	else 
+	}
+	else
 	{
 		_randType = TYPE_4;
 		_randDeg = DEG_4;
@@ -334,12 +334,12 @@ UInt32 Random::next()
 	UInt32 i;
 	UInt32 *f, *r;
 
-	if (_randType == TYPE_0) 
+	if (_randType == TYPE_0)
 	{
 		i = _state[0];
 		_state[0] = i = goodRand(i) & 0x7FFFFFFF;
-	} 
-	else 
+	}
+	else
 	{
 		/*
 		 * Use local variables rather than static variables for speed.

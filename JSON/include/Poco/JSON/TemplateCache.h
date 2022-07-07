@@ -42,7 +42,7 @@ public:
 	TemplateCache();
 		/// Creates an empty TemplateCache.
 		///
-		/// The cache must be created and not destroyed 
+		/// The cache must be created and not destroyed
 		/// as long as it is used.
 
 	virtual ~TemplateCache();

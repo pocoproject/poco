@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -48,11 +48,11 @@
 * Return:
 *
 *   XXX
-*       
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition
-*   
+*
 *******************************************************************************/
 int wceex_findclose(intptr_t hFile)
 {
@@ -75,7 +75,7 @@ int wceex_findclose(intptr_t hFile)
 * Return:
 *
 *   XXX
-*       
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition
@@ -87,11 +87,11 @@ intptr_t wceex_findfirst(const char *filespec, struct _finddata_t *fileinfo)
     HANDLE          hFile;
     DWORD           err;
     wchar_t         wfilename[MAX_PATH];
-    
+
     mbstowcs(wfilename, filespec, strlen(filespec) + 1);
-    
+
     /* XXX - mloskot - set errno values! */
-    
+
     hFile = FindFirstFile(wfilename, &wfd);
     if(hFile == INVALID_HANDLE_VALUE)
     {
@@ -103,26 +103,26 @@ intptr_t wceex_findfirst(const char *filespec, struct _finddata_t *fileinfo)
         case ERROR_PATH_NOT_FOUND:
             //errno = ENOENT;
             break;
-            
+
         case ERROR_NOT_ENOUGH_MEMORY:
             //errno = ENOMEM;
             break;
-            
+
         default:
             //errno = EINVAL;
             break;
         }
         return (-1);
     }
-    
+
     fileinfo->attrib = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL) ? 0 : wfd.dwFileAttributes;
     fileinfo->time_create  = wceex_filetime_to_time(&wfd.ftCreationTime);
     fileinfo->time_access  = wceex_filetime_to_time(&wfd.ftLastAccessTime);
     fileinfo->time_write   = wceex_filetime_to_time(&wfd.ftLastWriteTime);
-    
+
     fileinfo->size = wfd.nFileSizeLow;
     wcstombs(fileinfo->name, wfd.cFileName, wcslen(wfd.cFileName) + 1);
-    
+
     return (intptr_t)hFile;
 }
 
@@ -136,7 +136,7 @@ intptr_t wceex_findfirst(const char *filespec, struct _finddata_t *fileinfo)
 * Return:
 *
 *   XXX
-*       
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition
@@ -158,26 +158,26 @@ int wceex_findnext(intptr_t handle, struct _finddata_t *fileinfo)
         case ERROR_PATH_NOT_FOUND:
             //errno = ENOENT;
             break;
-            
+
         case ERROR_NOT_ENOUGH_MEMORY:
             //errno = ENOMEM;
             break;
-            
+
         default:
             //errno = EINVAL;
             break;
         }
         return (-1);
     }
-    
+
     fileinfo->attrib = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)? 0 : wfd.dwFileAttributes;
     fileinfo->time_create  = wceex_filetime_to_time(&wfd.ftCreationTime);
     fileinfo->time_access  = wceex_filetime_to_time(&wfd.ftLastAccessTime);
     fileinfo->time_write   = wceex_filetime_to_time(&wfd.ftLastWriteTime);
-    
+
     fileinfo->size = wfd.nFileSizeLow;
     wcstombs(fileinfo->name, wfd.cFileName, wcslen(wfd.cFileName)+1);
-    
+
     return 0;
 }
 

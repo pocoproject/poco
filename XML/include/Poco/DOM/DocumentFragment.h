@@ -37,12 +37,12 @@ class XML_API DocumentFragment: public AbstractContainerNode
 	/// could fulfill this role, a Document object can potentially be a heavyweight
 	/// object, depending on the underlying implementation. What is really needed
 	/// for this is a very lightweight object. DocumentFragment is such an object.
-	/// 
+	///
 	/// Furthermore, various operations -- such as inserting nodes as children of
 	/// another Node -- may take DocumentFragment objects as arguments; this results
 	/// in all the child nodes of the DocumentFragment being moved to the child
 	/// list of this node.
-	/// 
+	///
 	/// The children of a DocumentFragment node are zero or more nodes representing
 	/// the tops of any sub-trees defining the structure of the document. DocumentFragment
 	/// nodes do not need to be well-formed XML documents (although they do need
@@ -50,7 +50,7 @@ class XML_API DocumentFragment: public AbstractContainerNode
 	/// can have multiple top nodes). For example, a DocumentFragment might have
 	/// only one child and that child node could be a Text node. Such a structure
 	/// model represents neither an HTML document nor a well-formed XML document.
-	/// 
+	///
 	/// When a DocumentFragment is inserted into a Document (or indeed any other
 	/// Node that may take children) the children of the DocumentFragment and not
 	/// the DocumentFragment itself are inserted into the Node. This makes the DocumentFragment
@@ -68,12 +68,12 @@ protected:
 	DocumentFragment(Document* pOwnerDocument);
 	DocumentFragment(Document* pOwnerDocument, const DocumentFragment& fragment);
 	~DocumentFragment();
-	
+
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;
-	
+
 	friend class Document;
 };
 

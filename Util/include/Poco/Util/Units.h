@@ -42,8 +42,8 @@ namespace Units {
 
 namespace Internal
 {
-	template <typename T1, typename T2> struct Convert;	
-	struct None; 
+	template <typename T1, typename T2> struct Convert;
+	struct None;
 	template <int Num, int Den, int Div=Num/Den, int Mod=Num%Den>
 	struct FixedPower;
 }
@@ -80,7 +80,7 @@ class Value
 	///   - U is the unit of the Value
 	///
 	/// This class is usually not used directly;
-	/// client code should use the typedef'd 
+	/// client code should use the typedef'd
 	/// instantiations defined in the Values and
 	/// Constants namespace.
 	///
@@ -103,25 +103,25 @@ public:
 	typedef V ValueType;
 	typedef U Unit;
 
-	Value(): _rep() 
-	{ 
+	Value(): _rep()
+	{
 	}
 
-	explicit Value(const ValueType& v): _rep(v) 
-	{ 
+	explicit Value(const ValueType& v): _rep(v)
+	{
 	}
-	
+
 	template <typename OV, typename OU>
 	Value(const Value<OV, OU>& v):
 		_rep(Internal::Convert<OU, U>::fn(v.get()))
 	{
 	}
 
-	const ValueType& get() const 
-	{ 
-		return _rep; 
+	const ValueType& get() const
+	{
+		return _rep;
 	}
-	 
+
 	template <typename OV, typename OU>
 	Value& operator = (const Value<OV, OU>& other)
 	{
@@ -231,30 +231,30 @@ public:
 		return get() >= Value(other).get();
 	}
 
-	Value& operator ++ () 
-	{ 
-		++_rep; 
-		return *this; 
+	Value& operator ++ ()
+	{
+		++_rep;
+		return *this;
 	}
 
-	Value operator ++ (int) 
-	{ 
-		Value v = *this; 
-		++_rep; 
-		return v; 
+	Value operator ++ (int)
+	{
+		Value v = *this;
+		++_rep;
+		return v;
 	}
 
-	Value& operator -- () 
-	{ 
-		--_rep; 
-		return *this; 
+	Value& operator -- ()
+	{
+		--_rep;
+		return *this;
 	}
 
-	Value operator -- (int) 
-	{ 
-		Value v = *this; 
-		--_rep; 
-		return v; 
+	Value operator -- (int)
+	{
+		Value v = *this;
+		--_rep;
+		return v;
 	}
 
 private:
@@ -312,7 +312,7 @@ namespace Internal
 	template <typename U>
 	struct ScalingFactor;
 
-	template <typename T1, typename T2> 
+	template <typename T1, typename T2>
 	struct Convert3
 		/// Converts T1 to T2.
 		/// Stage 3 - performed after Stage 1 and Stage 2.
@@ -328,7 +328,7 @@ namespace Internal
 		}
 	};
 
-	template <typename T1, typename T2> 
+	template <typename T1, typename T2>
 	struct Convert2
 		/// Converts T1 to T2.
 		/// Template matches the first argument (T1),
@@ -341,7 +341,7 @@ namespace Internal
 		}
 	};
 
-	template <typename T1, typename T2> 
+	template <typename T1, typename T2>
 	struct Convert
 		/// Converts T1 to T2.
 		/// If you really want to implement your own conversion routine,
@@ -365,7 +365,7 @@ namespace Internal
 		template <typename U>
 		static const U& fn(const U& u) { return u; }
 	};
-	
+
 	template <typename T>
 	struct Convert3<T, T>
 		// Convert to same type.
@@ -384,7 +384,7 @@ namespace Internal
 			return Convert<T, U>::fn((v * Den)/Num);
 		}
 	};
-	
+
 	template <typename T, typename U, int Num, int Den>
 	struct Convert3<T, Scale<U, Num, Den> >
 		// Convert to a scaled Unit.
@@ -433,8 +433,8 @@ namespace Internal
 	{
 		static const int num = 1;
 		static const int den = 1;
-	}; 
- 
+	};
+
 	template <typename Term, typename U, int N, int D>
 	struct CountTerms<Term, Scale<U, N, D> >
 		// CountTerms ignores scaling factors - that is taken care of by ScalingFactor.
@@ -476,7 +476,7 @@ namespace Internal
 	struct CheckTermsEqual
 		/// Counts the power of the Unit Term in Units T1 and T2.
 		/// Reports if they are equal, using equality of fractions.
-		/// Does a depth-first search of the Unit "Term", 
+		/// Does a depth-first search of the Unit "Term",
 		/// or counts the terms in the default case.
 	{
 		typedef CountTerms<Term, T1> count1;
@@ -526,7 +526,7 @@ namespace Internal
 	template <int Num, int Den, int Div, int Mod>
 	struct FixedPower
 		/// A functor that raises a Value to the power Num/Den.
-		/// The template is specialised for efficiency 
+		/// The template is specialised for efficiency
 		/// so that we don't always have to call the std::power function.
 	{
 		template <typename T> static T Power(const T& t)
@@ -678,7 +678,7 @@ namespace Internal
 		/// The default Unit formatting mechanism.
 	{
 		template <typename Stream>
-		static void fn(Stream &os) 
+		static void fn(Stream &os)
 		{
 			os << "Units";
 		}
@@ -691,7 +691,7 @@ struct OutputUnit
 	/// Functor to write Unit text to stream.
 {
 	template <typename Stream>
-	static void fn(Stream &os) 
+	static void fn(Stream &os)
 	{
 		Internal::OutputUnit2<U>::fn(os);
 	}
@@ -707,11 +707,11 @@ namespace Internal
 	struct OutputUnit2< Compose<U1,U2> >
 	{
 		template <typename Stream>
-		static void fn(Stream &os) 
-		{ 
-			OutputUnit<U1>::fn(os); 
+		static void fn(Stream &os)
+		{
+			OutputUnit<U1>::fn(os);
 			os << '.';
-			OutputUnit<U2>::fn(os); 
+			OutputUnit<U2>::fn(os);
 		}
 	};
 
@@ -719,10 +719,10 @@ namespace Internal
 	struct OutputUnit2< Power<U, Num, Den > >
 	{
 		template <typename Stream>
-		static void fn(Stream &os) 
-		{ 
+		static void fn(Stream &os)
+		{
 			if(Num!=Den) os << '(';
-			OutputUnit<U>::fn(os); 
+			OutputUnit<U>::fn(os);
 			if(Num!=Den)
 			{
 				os << ')';
@@ -739,10 +739,10 @@ namespace Internal
 	struct OutputUnit2< Translate<U, Num, Den > >
 	{
 		template <typename Stream>
-		static void fn(Stream &os) 
-		{ 
+		static void fn(Stream &os)
+		{
 			os << '(';
-			OutputUnit<U>::fn(os); 
+			OutputUnit<U>::fn(os);
 			os << '+' << Num;
 			if(Den!=1) os << '/' << Den;
 			os << ')';
@@ -753,13 +753,13 @@ namespace Internal
 	struct OutputUnit2< Scale<U, Num, Den > >
 	{
 		template <typename Stream>
-		static void fn(Stream &os) 
-		{ 
+		static void fn(Stream &os)
+		{
 			os << Den;
 			if(Num != 1)
 				os << '/' << Num;
 			os << '.';
-			OutputUnit<U>::fn(os); 
+			OutputUnit<U>::fn(os);
 		}
 	};
 } // namespace Internal
@@ -893,15 +893,15 @@ namespace Units
 	{
 	public:
 		template <typename T>
-		Prefix(const T& val, double multiplier = 1, const std::string& prefix = ""): 
+		Prefix(const T& val, double multiplier = 1, const std::string& prefix = ""):
 			_pHolder(new Holder<T>(val)),
 			_multiplier(multiplier),
 			_prefix(prefix)
-		{ 
+		{
 		}
 
 		double value() const
-		{ 
+		{
 			return _pHolder->get() * _multiplier;
 		}
 
@@ -931,7 +931,7 @@ namespace Units
 		{
 			typedef Value<typename U::ValueType, typename U::Unit> ValueType;
 
-			Holder (const U& val): _val(ValueType(val)) 
+			Holder (const U& val): _val(ValueType(val))
 			{
 			}
 
@@ -997,7 +997,7 @@ namespace Units
 	typedef Scale<minute, 1, 60> hour;
 	typedef Scale<hour, 1, 24> day;
 	typedef Scale<day, 1, 7> week;
-	struct month;	// No fixed ratio with week 
+	struct month;	// No fixed ratio with week
 	typedef Scale<month, 1, 12> year;
 	typedef Scale<year, 1, 100> century;
 	typedef Scale<year, 1, 1000> millennium;
@@ -1213,7 +1213,7 @@ namespace Values
 	DEFINE_PREFIX_CLASS (kilo, .001, "k")
 	DEFINE_PREFIX_CLASS (mega, 1e-6, "M")
 	DEFINE_PREFIX_CLASS (giga, 1e-9, "G")
-	DEFINE_PREFIX_CLASS (tera, 1e-12, "T") 
+	DEFINE_PREFIX_CLASS (tera, 1e-12, "T")
 	DEFINE_PREFIX_CLASS (peta, 1e-15, "P")
 	DEFINE_PREFIX_CLASS (exa, 1e-18, "E")
 	DEFINE_PREFIX_CLASS (zetta, 1e-21, "Z")

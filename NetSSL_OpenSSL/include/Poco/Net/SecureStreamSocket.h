@@ -34,7 +34,7 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	///
 	/// A few notes about nonblocking IO:
 	/// sendBytes() and receiveBytes() can return a
-	/// negative value when using a nonblocking socket, which means 
+	/// negative value when using a nonblocking socket, which means
 	/// a SSL handshake is currently in progress and more data
 	/// needs to be read or written for the handshake to continue.
 	/// If sendBytes() or receiveBytes() return ERR_SSL_WANT_WRITE,
@@ -43,7 +43,7 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// ERR_SSL_WANT_READ is returned, receiveBytes() must be called
 	/// as soon as data is available for reading (indicated by select()).
 	///
-	/// The SSL handshake is delayed until the first sendBytes() or 
+	/// The SSL handshake is delayed until the first sendBytes() or
 	/// receiveBytes() operation is performed on the socket. No automatic
 	/// post connection check (checking the peer certificate for a valid
 	/// hostname) is performed when using nonblocking I/O. To manually
@@ -56,7 +56,7 @@ public:
 		ERR_SSL_WANT_READ  = -1,
 		ERR_SSL_WANT_WRITE = -2
 	};
-	
+
 	SecureStreamSocket();
 		/// Creates an unconnected secure stream socket
 		/// using the default client SSL context.
@@ -83,17 +83,17 @@ public:
 		/// agrees to reuse the session).
 
 	explicit SecureStreamSocket(const SocketAddress& address);
-		/// Creates a secure stream socket using the default 
+		/// Creates a secure stream socket using the default
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 
 	SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 
 	SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
@@ -102,21 +102,21 @@ public:
 		/// agrees to reuse the session).
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName);
-		/// Creates a secure stream socket using the default 
+		/// Creates a secure stream socket using the default
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
 		/// The given host name is used for certificate verification.
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
 		/// The given host name is used for certificate verification.
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
@@ -140,8 +140,8 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
-	
+		/// increments the reference count of the SocketImpl.
+
 	bool havePeerCertificate() const;
 		/// Returns true iff the peer has presented a
 		/// certificate.
@@ -151,10 +151,10 @@ public:
 		///
 		/// Throws a SSLException if the peer did not
 		/// present a certificate.
-		
+
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer's host name used for certificate validation.
-		
+
 	const std::string& getPeerHostName() const;
 		/// Returns the peer's host name used for certificate validation.
 
@@ -198,15 +198,15 @@ public:
 
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
-		
+
 	void setLazyHandshake(bool flag = true);
 		/// Enable lazy SSL handshake. If enabled, the SSL handshake
 		/// will be performed the first time date is sent or
 		/// received over the connection.
-		
+
 	bool getLazyHandshake() const;
 		/// Returns true if setLazyHandshake(true) has been called.
-		
+
 	void verifyPeerCertificate();
 		/// Performs post-connect (or post-accept) peer certificate validation,
 		/// using the peer host name set with setPeerHostName(), or the peer's
@@ -221,7 +221,7 @@ public:
 		///
 		/// Should only be used for non-blocking connections, after the
 		/// initial SSL handshake has been performed (see completeHandshake()).
-		
+
 	int completeHandshake();
 		/// Completes the SSL handshake.
 		///
@@ -240,7 +240,7 @@ public:
 		/// is enabled).
 		///
 		/// If no connection is established, returns null.
-		
+
 	void useSession(Session::Ptr pSession);
 		/// Sets the SSL session to use for the next
 		/// connection. Setting a previously saved Session
@@ -250,15 +250,15 @@ public:
 		/// can be given.
 		///
 		/// Must be called before connect() to be effective.
-		
+
 	bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
-		
+
 	void abort();
 		/// Aborts the SSL connection by closing the underlying
 		/// TCP connection. No orderly SSL shutdown is performed.
-		
+
 protected:
 	SecureStreamSocket(SocketImpl* pImpl);
 

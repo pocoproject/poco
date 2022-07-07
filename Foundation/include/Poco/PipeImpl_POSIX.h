@@ -40,7 +40,7 @@ public:
 	Handle writeHandle() const;
 	void closeRead();
 	void closeWrite();
-	
+
 private:
 	int _readfd;
 	int _writefd;

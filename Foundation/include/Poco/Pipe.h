@@ -35,7 +35,7 @@ class Foundation_API Pipe
 	/// that data only flows in one direction.
 	/// Pipes have a read-end and a write-end. One process writes to
 	/// the pipe and another process reads the data written by
-	/// its peer. 
+	/// its peer.
 	/// Read and write operations are always synchronous. A read will
 	/// block until data is available and a write will block until
 	/// the reader reads the data.
@@ -49,20 +49,20 @@ class Foundation_API Pipe
 {
 public:
 	typedef PipeImpl::Handle Handle; /// The read/write handle or file descriptor.
-	
+
 	enum CloseMode /// used by close()
 	{
 		CLOSE_READ  = 0x01, /// Close reading end of pipe.
 		CLOSE_WRITE = 0x02, /// Close writing end of pipe.
 		CLOSE_BOTH  = 0x03  /// Close both ends of pipe.
 	};
-	
+
 	Pipe();
 		/// Creates the Pipe.
 		///
 		/// Throws a CreateFileException if the pipe cannot be
 		/// created.
-		
+
 	Pipe(const Pipe& pipe);
 		/// Creates the Pipe using the PipeImpl from another one.
 
@@ -94,7 +94,7 @@ public:
 	Handle readHandle() const;
 		/// Returns the read handle or file descriptor
 		/// for the Pipe. For internal use only.
-		
+
 	Handle writeHandle() const;
 		/// Returns the write handle or file descriptor
 		/// for the Pipe. For internal use only.
@@ -103,7 +103,7 @@ public:
 		/// Depending on the argument, closes either the
 		/// reading end, the writing end, or both ends
 		/// of the Pipe.
-		
+
 private:
 	PipeImpl* _pImpl;
 };

@@ -60,14 +60,14 @@ void RawSocketTest::testEchoIPv4()
 	assertTrue (5 == (n - shift));
 	assertTrue ("hello" == std::string((char*)ptr, 5));
 
-	rs.close(); 
+	rs.close();
 }
 
 
 void RawSocketTest::testSendToReceiveFromIPv4()
 {
 	RawSocket rs(IPAddress::IPv4);
-	
+
 	int n = rs.sendTo("hello", 5, SocketAddress("127.0.0.1", 0));
 	assertTrue (n == 5);
 

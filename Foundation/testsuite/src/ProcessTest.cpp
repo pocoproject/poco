@@ -208,7 +208,7 @@ void ProcessTest::testLaunchArgs()
 			std::string expectedArg = args[argNumber];
 			if (expectedArg.npos != expectedArg.find("already quoted")) {
 				expectedArg = "already quoted \" \\";
-			} 
+			}
 			assertTrue (receivedArg == expectedArg);
 			++argNumber;
 			receivedArg = "";
