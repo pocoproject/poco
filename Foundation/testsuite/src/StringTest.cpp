@@ -1005,10 +1005,6 @@ void StringTest::testIntToString()
 	assertTrue (result == "0xFFFFFFFFFFFFFFFF");
 #endif
 
-	// hexadecimal with lower case
-	assertTrue (uIntToStr(0x1234567890ABCDEF, 0x10, result, true, -1, ' ', 0, false));
-	assertTrue (result == "0x1234567890abcdef");
-
 	try
 	{
 		char pResult[POCO_MAX_INT_STRING_LEN];
