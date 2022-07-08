@@ -78,7 +78,7 @@ private:
 		/// Stores directory info for all found disks
 	DirectoryInfos64 _disks64;
 		/// Stores directory info for all found disks
-		
+
 	static const std::string EMPTY_COMMENT;
 
 	friend class Compress;

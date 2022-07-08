@@ -35,8 +35,8 @@ class Foundation_API Clock
 	/// The monotonic() function can be used to check whether
 	/// the system's clock is monotonic.
 	///
-	/// Monotonic Clock is available on Windows, Linux, OS X 
-	/// and on POSIX platforms supporting clock_gettime() with CLOCK_MONOTONIC.	  
+	/// Monotonic Clock is available on Windows, Linux, OS X
+	/// and on POSIX platforms supporting clock_gettime() with CLOCK_MONOTONIC.
 	///
 	/// Clock values are relative to a system-dependent epoch time
 	/// (usually the system's startup time) and have no relation
@@ -54,22 +54,22 @@ public:
 
 	Clock();
 		/// Creates a Clock with the current system clock value.
-		
+
 	Clock(ClockVal tv);
 		/// Creates a Clock from the given clock value.
-		
+
 	Clock(const Clock& other);
 		/// Copy constructor.
-		
+
 	~Clock();
 		/// Destroys the Clock.
-		
+
 	Clock& operator = (const Clock& other);
 	Clock& operator = (ClockVal tv);
-	
-	void swap(Clock& clock);
+
+	void swap(Clock& clock) noexcept;
 		/// Swaps the Clock with another one.
-	
+
 	void update();
 		/// Updates the Clock with the current system clock.
 
@@ -79,13 +79,13 @@ public:
 	bool operator >= (const Clock& ts) const;
 	bool operator <  (const Clock& ts) const;
 	bool operator <= (const Clock& ts) const;
-	
+
 	Clock  operator +  (ClockDiff d) const;
 	Clock  operator -  (ClockDiff d) const;
 	ClockDiff operator - (const Clock& ts) const;
 	Clock& operator += (ClockDiff d);
 	Clock& operator -= (ClockDiff d);
-	
+
 	ClockVal microseconds() const;
 		/// Returns the clock value expressed in microseconds
 		/// since the system-specific epoch time (usually system
@@ -97,23 +97,23 @@ public:
 		/// startup).
 		///
 		/// Same as microseconds().
-	
+
 	ClockDiff elapsed() const;
 		/// Returns the time elapsed since the time denoted by
 		/// the Clock instance. Equivalent to Clock() - *this.
-	
+
 	bool isElapsed(ClockDiff interval) const;
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the Clock instance.
-	
+
 	static ClockDiff resolution();
 		/// Returns the resolution in units per second.
 		/// Since the Clock class has microsecond resolution,
 		/// the returned value is always 1000000.
-		
+
 	static ClockDiff accuracy();
 		/// Returns the system's clock accuracy in microseconds.
-		
+
 	static bool monotonic();
 		/// Returns true iff the system's clock is monotonic.
 
@@ -220,7 +220,7 @@ inline Clock::ClockDiff Clock::resolution()
 }
 
 
-inline void swap(Clock& s1, Clock& s2)
+inline void swap(Clock& s1, Clock& s2) noexcept
 {
 	s1.swap(s2);
 }

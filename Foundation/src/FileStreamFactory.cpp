@@ -50,13 +50,13 @@ std::istream* FileStreamFactory::open(const Path& path)
 {
 	File file(path);
 	if (!file.exists()) throw FileNotFoundException(path.toString());
-	
+
 	FileInputStream* istr = new FileInputStream(path.toString(), std::ios::binary);
 	if (!istr->good())
 	{
 		delete istr;
 		throw OpenFileException(path.toString());
-	}	
+	}
 	return istr;
 }
 

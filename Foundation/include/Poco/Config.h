@@ -79,7 +79,7 @@
 // while those smaller will be placement new-ed into an
 // internal stack-auto-allocated buffer.
 #if !defined(POCO_SMALL_OBJECT_SIZE)
-	#define POCO_SMALL_OBJECT_SIZE 32
+	#define POCO_SMALL_OBJECT_SIZE 64
 #endif
 
 
@@ -87,7 +87,7 @@
 // on platforms with no inotify.
 // #define POCO_NO_INOTIFY
 
-// Define to force the use of PollingDirectoryWatcher 
+// Define to force the use of PollingDirectoryWatcher
 // #define POCO_DW_FORCE_POLLING
 
 
@@ -147,13 +147,12 @@
 // #define POCO_NET_NO_UNIX_SOCKET
 
 
-// Define to nonzero to enable move
-// semantics on classes where it
-// introduces a new state.
-// For explanation, see
+// Define to nonzero to enable move semantics
+// on classes where it introduces a new state.
+// For explanation, see:
 // https://github.com/pocoproject/poco/wiki/Move-Semantics-in-POCO
 #ifndef POCO_NEW_STATE_ON_MOVE
-#define POCO_NEW_STATE_ON_MOVE 1
+// #define POCO_NEW_STATE_ON_MOVE 1
 #endif
 
 
@@ -191,7 +190,7 @@
 //   empty or other value:
 //     Do not link any OpenSSL libraries automatically. You will have to edit the
 //     Visual C++ project files for Crypto and NetSSL_OpenSSL.
-#ifndef POCO_EXTERNAL_OPENSSL
+#if !defined(POCO_EXTERNAL_OPENSSL) && defined(POCO_EXTERNAL_OPENSSL_SLPRO)
 	#define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
 #endif
 

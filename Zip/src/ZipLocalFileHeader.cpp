@@ -243,7 +243,8 @@ void ZipLocalFileHeader::init(const Poco::Path& fName, ZipCommon::CompressionMet
     }
     else
         setCompressionMethod(ZipCommon::CM_STORE);
-    if (_forceZip64)
+
+    if (needsZip64())
         setZip64Data();
 
     _rawHeader[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.

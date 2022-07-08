@@ -45,9 +45,9 @@ void ClassLoaderTest::testClassLoader1()
 	assertTrue (cl.begin() == cl.end());
 	assertNullPtr (cl.findClass("PluginA"));
 	assertNullPtr (cl.findManifest(path));
-	
+
 	assertTrue (!cl.isLibraryLoaded(path));
-	
+
 	try
 	{
 		const ClassLoader<TestPlugin>::Meta& POCO_UNUSED meta = cl.classFor("PluginA");
@@ -89,17 +89,17 @@ void ClassLoaderTest::testClassLoader2()
 	assertNotNullPtr (cl.findClass("PluginB"));
 	assertNotNullPtr (cl.findClass("PluginC"));
 	assertNotNullPtr (cl.findManifest(path));
-	
+
 	assertTrue (cl.isLibraryLoaded(path));
 	assertTrue (cl.manifestFor(path).size() == 3);
-	
+
 	ClassLoader<TestPlugin>::Iterator it = cl.begin();
 	assertTrue (it != cl.end());
 	assertTrue (it->first == path);
 	assertTrue (it->second->size() == 3);
 	++it;
 	assertTrue (it == cl.end());
-	
+
 	TestPlugin* pPluginA = cl.classFor("PluginA").create();
 	assertTrue (pPluginA->name() == "PluginA");
 	assertTrue (!cl.classFor("PluginA").isAutoDelete(pPluginA));
@@ -108,18 +108,18 @@ void ClassLoaderTest::testClassLoader2()
 	TestPlugin* pPluginB = cl.classFor("PluginB").create();
 	assertTrue (pPluginB->name() == "PluginB");
 	delete pPluginB;
-	
+
 	pPluginB = cl.create("PluginB");
 	assertTrue (pPluginB->name() == "PluginB");
 	delete pPluginB;
-	
+
 	assertTrue (cl.canCreate("PluginA"));
 	assertTrue (cl.canCreate("PluginB"));
 	assertTrue (!cl.canCreate("PluginC"));
 
 	TestPlugin& pluginC = cl.instance("PluginC");
 	assertTrue (pluginC.name() == "PluginC");
-	
+
 	try
 	{
 		TestPlugin& POCO_UNUSED plgB = cl.instance("PluginB");
@@ -128,7 +128,7 @@ void ClassLoaderTest::testClassLoader2()
 	catch (InvalidAccessException&)
 	{
 	}
-	
+
 	try
 	{
 		TestPlugin* POCO_UNUSED pPluginC = cl.create("PluginC");
@@ -147,7 +147,7 @@ void ClassLoaderTest::testClassLoader2()
 	catch (InvalidAccessException&)
 	{
 	}
-	
+
 	const AbstractMetaObject<TestPlugin>& meta1 = cl.classFor("PluginC");
 	assertTrue (meta1.isAutoDelete(&(meta1.instance())));
 
@@ -175,16 +175,16 @@ void ClassLoaderTest::testClassLoader3()
 	cl.loadLibrary(path);
 	cl.loadLibrary(path);
 	cl.unloadLibrary(path);
-	
+
 	assertTrue (cl.manifestFor(path).size() == 3);
-	
+
 	ClassLoader<TestPlugin>::Iterator it = cl.begin();
 	assertTrue (it != cl.end());
 	assertTrue (it->first == path);
 	assertTrue (it->second->size() == 3);
 	++it;
 	assertTrue (it == cl.end());
-	
+
 	cl.unloadLibrary(path);
 	assertNullPtr (cl.findManifest(path));
 }

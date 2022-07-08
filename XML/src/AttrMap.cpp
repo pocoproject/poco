@@ -27,7 +27,7 @@ AttrMap::AttrMap(Element* pElement):
 	_pElement(pElement)
 {
 	poco_check_ptr (pElement);
-	
+
 	_pElement->duplicate();
 }
 
@@ -50,7 +50,7 @@ Node* AttrMap::setNamedItem(Node* arg)
 
 	if (arg->nodeType() != Node::ATTRIBUTE_NODE)
 		throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
-		
+
 	return _pElement->setAttributeNode(static_cast<Attr*>(arg));
 }
 
@@ -77,7 +77,7 @@ unsigned long AttrMap::length() const
 {
 	unsigned long result = 0;
 	AbstractNode* pAttr = _pElement->_pFirstAttr;
-	while (pAttr) 
+	while (pAttr)
 	{
 		pAttr = static_cast<AbstractNode*>(pAttr->nextSibling());
 		++result;

@@ -44,7 +44,7 @@ public:
 private:
 	RegExpValidator();
 
-	std::string _regexp;	
+	std::string _regexp;
 };
 
 

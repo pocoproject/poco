@@ -26,9 +26,9 @@ WindowsConsoleChannel::WindowsConsoleChannel():
 	_isFile(false),
 	_hConsole(INVALID_HANDLE_VALUE)
 {
-	_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	_hConsole = GetStdHandle(STD_ERROR_HANDLE);
 	// check whether the console has been redirected
-	DWORD mode;	
+	DWORD mode;
 	_isFile = (GetConsoleMode(_hConsole, &mode) == 0);
 }
 
@@ -42,11 +42,11 @@ void WindowsConsoleChannel::log(const Message& msg)
 {
 	std::string text = msg.getText();
 	text += "\r\n";
-	
+
 	if (_isFile)
 	{
 		DWORD written;
-		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);	
+		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);
 	}
 	else
 	{
@@ -63,9 +63,9 @@ WindowsColorConsoleChannel::WindowsColorConsoleChannel():
 	_isFile(false),
 	_hConsole(INVALID_HANDLE_VALUE)
 {
-	_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	_hConsole = GetStdHandle(STD_ERROR_HANDLE);
 	// check whether the console has been redirected
-	DWORD mode;	
+	DWORD mode;
 	_isFile = (GetConsoleMode(_hConsole, &mode) == 0);
 	initColors();
 }
@@ -92,7 +92,7 @@ void WindowsColorConsoleChannel::log(const Message& msg)
 	if (_isFile)
 	{
 		DWORD written;
-		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);	
+		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);
 	}
 	else
 	{

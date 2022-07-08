@@ -1517,7 +1517,7 @@ void VarTest::testLongLong()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		POCO_UNUSED Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1611,7 +1611,7 @@ void VarTest::testULongLong()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		POCO_UNUSED Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)

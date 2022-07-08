@@ -27,7 +27,7 @@ namespace Dynamic {
 const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-VarIterator::VarIterator(Var* pVar, bool positionEnd): 
+VarIterator::VarIterator(Var* pVar, bool positionEnd):
 	_pVar(pVar),
 	_position(positionEnd ? POSITION_END : 0)
 {
@@ -73,7 +73,7 @@ VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
 void VarIterator::swap(VarIterator& other)
 {
 	using std::swap;
-	
+
 	swap(_pVar, other._pVar);
 	swap(_position, other._position);
 }

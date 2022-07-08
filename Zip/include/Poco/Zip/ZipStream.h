@@ -41,7 +41,7 @@ class Zip_API ZipStreamBuf: public Poco::BufferedStreamBuf
 public:
 	ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEntry, bool reposition);
 		/// Creates the ZipStreamBuf. Set reposition to false, if you do on-the-fly decompression.
-	
+
 	ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bool reposition);
 		/// Creates the ZipStreamBuf. Set reposition to false, if you do on-the-fly compression.
 

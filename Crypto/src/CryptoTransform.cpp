@@ -28,7 +28,7 @@ CryptoTransform::~CryptoTransform()
 {
 }
 
-  
+
 int CryptoTransform::setPadding(int padding)
 {
 	return 1;

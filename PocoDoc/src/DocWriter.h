@@ -47,13 +47,13 @@ public:
 
 	~DocWriter();
 		/// Destroys the DocWriter.
-		
+
 	void write();
 		/// Writes all documentation files.
-		
+
 	void writeEclipseTOC();
 		/// Write Eclipse Table-Of-Contents XML files.
-		
+
 	void addPage(const std::string& path);
 		/// Adds a page.
 
@@ -66,7 +66,7 @@ protected:
 		TEXT_LITERAL,
 		TEXT_WHITESPACE
 	};
-	
+
 	struct Page
 	{
 		std::string path;
@@ -74,14 +74,14 @@ protected:
 		std::string title;
 		std::string category;
 	};
-	
+
 	enum
 	{
 		MAX_TITLE_LEVEL = 3,
 		PAGE_INDEX_COLUMNS = 2,
 		NAMESPACE_INDEX_COLUMNS = 4
 	};
-	
+
 	enum
 	{
 		NO_CUSTOM_HTML = 1,
@@ -94,10 +94,10 @@ protected:
 		int level;
 		int id;
 	};
-	
+
 	typedef std::vector<TOCEntry> TOC;
-	typedef std::map<std::string, Poco::CppParser::Function*> MethodMap;	
-	typedef std::map<std::string, std::string> StringMap;	
+	typedef std::map<std::string, Poco::CppParser::Function*> MethodMap;
+	typedef std::map<std::string, std::string> StringMap;
 	typedef std::map<std::string, Page> PageMap;
 
 	void writePages();
@@ -108,10 +108,10 @@ protected:
 	void writeCategoryIndex(std::ostream& ostr, const std::string& category, const std::string& target);
 	void writePageIndex(std::ostream& ostr);
 	void writeNameSpaceIndex(std::ostream& ostr);
-	
+
 	void writeClass(const Poco::CppParser::Struct* pStruct);
 	void writeNameSpace(const Poco::CppParser::NameSpace* pNameSpace);
-	
+
 	void writeNavigation();
 	void writePackage(const std::string& file, const std::string& library, const std::string& package);
 
@@ -196,11 +196,11 @@ protected:
 	static std::string projectURI(const std::string& id);
 
 	static Poco::Logger& logger();
-	
+
 	static const std::string RFC_URI;
 	static const std::string GITHUB_POCO_URI;
-	
-private:	
+
+private:
 	bool _prettifyCode;
 	bool _noFrames;
 	bool _htmlMode;
@@ -212,10 +212,10 @@ private:
 	bool _pendingLine;
 	int  _indent;
 	int  _titleId;
-	
+
 	static std::string _language;
 	static StringMap   _strings;
-	
+
 	static Poco::Logger* _pLogger;
 };
 

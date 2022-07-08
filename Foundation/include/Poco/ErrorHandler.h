@@ -32,7 +32,7 @@ class Foundation_API ErrorHandler
 	/// An unhandled exception that causes a thread to terminate is usually
 	/// silently ignored, since the class library cannot do anything meaningful
 	/// about it.
-	/// 
+	///
 	/// The Thread class provides the possibility to register a
 	/// global ErrorHandler that is invoked whenever a thread has
 	/// been terminated by an unhandled exception.
@@ -57,10 +57,10 @@ public:
 		/// be silently ignored.
 		///
 		/// The default implementation just breaks into the debugger.
-		
+
 	virtual void exception(const std::exception& exc);
 		/// Called when a std::exception (or a subclass)
-		/// caused the thread to terminate.		
+		/// caused the thread to terminate.
 		///
 		/// This method should not throw any exception - it would
 		/// be silently ignored.
@@ -76,16 +76,16 @@ public:
 		/// be silently ignored.
 		///
 		/// The default implementation just breaks into the debugger.
-		
+
 	static void handle(const Exception& exc);
 		/// Invokes the currently registered ErrorHandler.
-		
+
 	static void handle(const std::exception& exc);
 		/// Invokes the currently registered ErrorHandler.
-	
+
 	static void handle();
 		/// Invokes the currently registered ErrorHandler.
-	
+
 	static ErrorHandler* set(ErrorHandler* pHandler);
 		/// Registers the given handler as the current error handler.
 		///
@@ -95,10 +95,10 @@ public:
 		/// Returns a pointer to the currently registered
 		/// ErrorHandler.
 
-protected:	
+protected:
 	static ErrorHandler* defaultHandler();
-		/// Returns the default ErrorHandler.	
-		
+		/// Returns the default ErrorHandler.
+
 private:
 	static ErrorHandler* _pHandler;
 	static FastMutex     _mutex;

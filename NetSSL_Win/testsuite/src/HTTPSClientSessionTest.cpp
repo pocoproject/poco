@@ -50,7 +50,7 @@ public:
 	TestRequestHandler()
 	{
 	}
-	
+
 	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 	{
 		response.setChunkedTransferEncoding(true);
@@ -251,7 +251,7 @@ void HTTPSClientSessionTest::testKeepAlive()
 	assertTrue (response.getKeepAlive());
 	std::ostringstream ostr1;
 	assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
-	
+
 	request.setMethod(HTTPRequest::HTTP_GET);
 	request.setURI("/small");
 	s.sendRequest(request);
@@ -261,7 +261,7 @@ void HTTPSClientSessionTest::testKeepAlive()
 	std::ostringstream ostr2;
 	StreamCopier::copyStream(rs2, ostr2);
 	assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
-	
+
 	request.setMethod(HTTPRequest::HTTP_GET);
 	request.setURI("/large");
 	s.sendRequest(request);
@@ -304,7 +304,7 @@ void HTTPSClientSessionTest::testInterop()
 	cert.extractNames(commonName, domainNames);
 
 	assertTrue (commonName == "secure.appinf.com" || commonName == "*.appinf.com");
-	assertTrue (domainNames.find("appinf.com") != domainNames.end() 
+	assertTrue (domainNames.find("appinf.com") != domainNames.end()
 		 || domainNames.find("*.appinf.com") != domainNames.end());
 }
 
@@ -314,7 +314,7 @@ void HTTPSClientSessionTest::testProxy()
 	HTTPSTestServer srv;
 	HTTPSClientSession s("secure.appinf.com");
 	s.setProxy(
-		Application::instance().config().getString("testsuite.proxy.host"), 
+		Application::instance().config().getString("testsuite.proxy.host"),
 		Application::instance().config().getInt("testsuite.proxy.port")
 	);
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
@@ -335,10 +335,10 @@ void HTTPSClientSessionTest::testCachedSession()
 	// ensure OpenSSL machinery is fully setup
 	Context::Ptr pDefaultServerContext = SSLManager::instance().defaultServerContext();
 	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
-	
+
 	Context::Ptr pServerContext = new Context(
 		Context::SERVER_USE,
-		"");	
+		"");
 	//pServerContext->enableSessionCache(true, "TestSuite");
 	//pServerContext->setSessionTimeout(10);
 	//pServerContext->setSessionCacheSize(1000);
@@ -347,7 +347,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	HTTPSTestServer srv(pServerContext);
 
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		"");
 	//pClientContext->enableSessionCache(true);
 
@@ -374,7 +374,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	std::ostringstream ostr2;
 	StreamCopier::copyStream(rs2, ostr2);
 	assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
-	
+
 	assertTrue (pSession1 == pSession2);
 
 	HTTPRequest request3(HTTPRequest::HTTP_GET, "/small");
@@ -392,7 +392,7 @@ void HTTPSClientSessionTest::testCachedSession()
 
 	Thread::sleep(15000); // wait for session to expire
 	//pServerContext->flushSessionCache();
-	
+
 	HTTPRequest request4(HTTPRequest::HTTP_GET, "/small");
 	s2.sendRequest(request4);
 	Session::Ptr pSession4 = s2.sslSession();

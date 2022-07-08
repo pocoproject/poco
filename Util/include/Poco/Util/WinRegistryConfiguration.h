@@ -36,7 +36,7 @@ class Util_API WinRegistryConfiguration: public AbstractConfiguration
 {
 public:
 	WinRegistryConfiguration(const std::string& rootPath, REGSAM extraSam = 0);
-		/// Creates the WinRegistryConfiguration. 
+		/// Creates the WinRegistryConfiguration.
 		/// The rootPath must start with one of the root key names
 		/// like HKEY_CLASSES_ROOT, e.g. HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services.
 		/// All further keys are relative to the root path and can be

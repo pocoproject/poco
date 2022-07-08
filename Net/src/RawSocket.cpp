@@ -24,19 +24,19 @@ namespace Poco {
 namespace Net {
 
 
-RawSocket::RawSocket(): 
+RawSocket::RawSocket():
 	Socket(new RawSocketImpl)
 {
 }
 
 
-RawSocket::RawSocket(SocketAddress::Family family, int proto): 
+RawSocket::RawSocket(SocketAddress::Family family, int proto):
 	Socket(new RawSocketImpl(family, proto))
 {
 }
 
 
-RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress): 
+RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress):
 	Socket(new RawSocketImpl(address.family()))
 {
 	bind(address, reuseAddress);
@@ -54,11 +54,13 @@ RawSocket::RawSocket(const RawSocket& socket): Socket(socket)
 {
 }
 
+#ifdef POCO_NEW_STATE_ON_MOVE
 
 RawSocket::RawSocket(RawSocket&& socket): Socket(std::move(socket))
 {
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 RawSocket::RawSocket(SocketImpl* pImpl): Socket(pImpl)
 {
@@ -82,6 +84,8 @@ RawSocket& RawSocket::operator = (const Socket& socket)
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
 RawSocket& RawSocket::operator = (Socket&& socket)
 {
 	if (dynamic_cast<RawSocketImpl*>(socket.impl()))
@@ -91,6 +95,7 @@ RawSocket& RawSocket::operator = (Socket&& socket)
 	return *this;
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 RawSocket& RawSocket::operator = (const RawSocket& socket)
 {
@@ -99,12 +104,15 @@ RawSocket& RawSocket::operator = (const RawSocket& socket)
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
 RawSocket& RawSocket::operator = (RawSocket&& socket)
 {
 	Socket::operator = (std::move(socket));
 	return *this;
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 void RawSocket::connect(const SocketAddress& address)
 {

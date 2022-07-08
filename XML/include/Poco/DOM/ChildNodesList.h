@@ -39,12 +39,12 @@ public:
 protected:
 	ChildNodesList(const Node* pParent);
 	~ChildNodesList();
-	
+
 private:
 	ChildNodesList();
 
 	const Node* _pParent;
-	
+
 	friend class AbstractNode;
 };
 

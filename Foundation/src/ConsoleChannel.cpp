@@ -43,7 +43,7 @@ ConsoleChannel::~ConsoleChannel()
 void ConsoleChannel::log(const Message& msg)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	_str << msg.getText() << std::endl;
 }
 
@@ -52,7 +52,7 @@ FastMutex ColorConsoleChannel::_mutex;
 const std::string ColorConsoleChannel::CSI("\033[");
 
 
-ColorConsoleChannel::ColorConsoleChannel(): 
+ColorConsoleChannel::ColorConsoleChannel():
 	_str(std::clog),
 	_enableColors(true)
 {
@@ -60,7 +60,7 @@ ColorConsoleChannel::ColorConsoleChannel():
 }
 
 
-ColorConsoleChannel::ColorConsoleChannel(std::ostream& str): 
+ColorConsoleChannel::ColorConsoleChannel(std::ostream& str):
 	_str(str),
 	_enableColors(true)
 {
@@ -76,7 +76,7 @@ ColorConsoleChannel::~ColorConsoleChannel()
 void ColorConsoleChannel::log(const Message& msg)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (_enableColors)
 	{
 		int color = _colors[msg.getPriority()];
@@ -87,14 +87,14 @@ void ColorConsoleChannel::log(const Message& msg)
 		color &= 0xff;
 		_str << CSI << color << "m";
 	}
-	
+
 	_str << msg.getText();
-	
+
 	if (_enableColors)
 	{
 		_str << CSI << "0m";
 	}
-	
+
 	_str << std::endl;
 }
 

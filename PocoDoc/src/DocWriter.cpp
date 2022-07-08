@@ -1400,7 +1400,10 @@ void DocWriter::nextToken(std::string::const_iterator& it, const std::string::co
 	{
 		token += *it++;
 		if (it != end && std::ispunct(*it)) token += *it++;
-		if (it != end && std::ispunct(*it)) token += *it++;
+		if (token != "<[" && token != "<*" && token != "<!")
+		{
+			if (it != end && std::ispunct(*it)) token += *it++;
+		}
 	}
 	else if (it != end && *it == '[')
 	{

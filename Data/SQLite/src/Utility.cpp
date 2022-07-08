@@ -37,6 +37,8 @@ namespace Data {
 namespace SQLite {
 
 
+const std::string Utility::TRANSACTION_TYPE_PROPERTY_KEY = "transactionType";
+
 const int Utility::THREAD_MODE_SINGLE = SQLITE_CONFIG_SINGLETHREAD;
 const int Utility::THREAD_MODE_MULTI = SQLITE_CONFIG_MULTITHREAD;
 const int Utility::THREAD_MODE_SERIAL = SQLITE_CONFIG_SERIALIZED;

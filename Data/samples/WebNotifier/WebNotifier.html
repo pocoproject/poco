@@ -8,10 +8,10 @@
       var div = document.getElementById("output");
       div.innerHTML = div.innerHTML + "<pre style='color:" + color + "'>" + msg + "</pre>";
     }
-	  
+
     function WebSocketOpen()
     {
-      if ("WebSocket" in window) 
+      if ("WebSocket" in window)
       {
         ws = new WebSocket("ws://localhost:9980/ws");
 
@@ -20,7 +20,7 @@
           ws.send("Hello, world!");
 		  log("WebSocket opened.", "green");
         };
-    
+
         ws.onmessage = function(evt)
         {
           var arr = evt.data.split(",");
@@ -32,7 +32,7 @@
           else
             log("Unknown message received: " + evt.data, "red");
         };
-        
+
         ws.onclose = function()
         {
           log("WebSocket closed.", "red");
@@ -43,22 +43,22 @@
         log("This browser does not support WebSockets.", "red");
       }
     }
-    
+
     function WebSocketSend(msg)
     {
       ws.send("hello");
     }
-    
+
     function WebSocketClose()
     {
       ws.close();
     }
-    
+
     function updateTable(id, name, address, age)
     {
       var table = document.getElementById("dataTable");
-      
-      
+
+
       if (table.rows.length > 1)
       {
         for (r = 1; r < table.rows.length; r++)
@@ -72,18 +72,18 @@
           }
         }
       }
-      
+
       var row = table.insertRow(table.rows.length);
-      
+
       var cell1 = row.insertCell(0);
       cell1.innerHTML = id;
-      
+
       var cell2 = row.insertCell(1);
       cell2.innerHTML = name;
-      
+
       var cell3 = row.insertCell(2);
       cell3.innerHTML = address;
-      
+
       var cell4 = row.insertCell(3);
       cell4.innerHTML = age;
     }

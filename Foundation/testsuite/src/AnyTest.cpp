@@ -184,8 +184,33 @@ void AnyTest::testAnyBadCast()
 
 void AnyTest::testAnySwap()
 {
+	Any empty1, empty2;
+	assertTrue (empty1.empty());
+	assertTrue (empty2.empty());
+	empty1.swap(empty2);
+	assertTrue (empty1.empty());
+	assertTrue (empty2.empty());
+
 	std::string text = "test message";
+	empty1 = text;
+	assertTrue (!empty1.empty());
+	assertTrue (empty2.empty());
+	assertTrue (text == AnyCast<std::string>(empty1));
+
+	empty1.swap(empty2);
+	assertTrue (empty1.empty());
+	assertTrue (!empty2.empty());
+	assertTrue (text == AnyCast<std::string>(empty2));
+
 	Any original = text, swapped;
+#ifdef POCO_NO_SOO
+	assertFalse (original.local());
+#else
+	assertTrue (original.local());
+#endif
+	assertFalse (original.empty());
+	assertFalse (swapped.local());
+	assertTrue (swapped.empty());
 	std::string* originalPtr = AnyCast<std::string>(&original);
 	Any* swapResult = &original.swap(swapped);
 
@@ -194,10 +219,80 @@ void AnyTest::testAnySwap()
 	assertTrue (swapped.type() == typeid(std::string));
 	assertTrue (text == AnyCast<std::string>(swapped));
 	assertTrue (0 != originalPtr);
-#ifdef POCO_NO_SOO // pointers only match when heap-allocated
-	assertTrue (originalPtr == AnyCast<std::string>(&swapped));
-#endif
 	assertTrue (swapResult == &original);
+
+	struct BigObject
+	{
+		Poco::UInt64 one = 1;
+		Poco::UInt64 two = 2;
+		Poco::UInt64 three = 3;
+		Poco::UInt64 four = 4;
+		Poco::UInt64 five = 5;
+		Poco::UInt64 six = 6;
+		Poco::UInt64 seven = 7;
+		Poco::UInt64 eight = 8;
+		Poco::UInt64 nine = 9;
+
+		bool operator==(const BigObject& other)
+		{
+			return one == other.one &&
+				two == other.two &&
+				three == other.three &&
+				four == other.four &&
+				five == other.five &&
+				six == other.six &&
+				seven == other.seven &&
+				eight == other.eight &&
+				nine == other.nine;
+		}
+	};
+
+	poco_assert (sizeof(BigObject) > POCO_SMALL_OBJECT_SIZE);
+
+	BigObject bigObject;
+	Any bigOriginal = bigObject, swappedBig;
+	assertFalse (bigOriginal.local());
+	assertFalse (bigOriginal.empty());
+	assertFalse (swappedBig.local());
+	assertTrue (swappedBig.empty());
+	BigObject* bigPtr = AnyCast<BigObject>(&bigOriginal);
+	Any* swapBigResult = &bigOriginal.swap(swappedBig);
+
+	assertTrue (bigOriginal.empty());
+	assertTrue (!swappedBig.empty());
+	assertTrue (swappedBig.type() == typeid(BigObject));
+	assertTrue (bigObject == AnyCast<BigObject>(swappedBig));
+	assertTrue (0 != bigPtr);
+	assertTrue (swapBigResult == &bigOriginal);
+
+	// assure proper assignment behavior after swapping
+	original = text;
+	bigOriginal = bigObject;
+#ifdef POCO_NO_SOO
+	assertFalse (original.local());
+#else
+	assertTrue (original.local());
+#endif
+	assertFalse (bigOriginal.local());
+
+	Any temp = original;
+#ifdef POCO_NO_SOO
+	assertFalse (temp.local());
+#else
+	assertTrue (temp.local());
+#endif
+
+	original = bigOriginal;
+	assertTrue (bigObject == AnyCast<BigObject>(original));
+	assertFalse (original.local());
+
+	bigOriginal = temp;
+	assertTrue (text == AnyCast<std::string>(bigOriginal));
+#ifdef POCO_NO_SOO
+	assertFalse (bigOriginal.local());
+#else
+	assertTrue (bigOriginal.local());
+#endif
 }
 
 

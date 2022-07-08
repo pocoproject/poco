@@ -58,9 +58,9 @@ void NumberParserTest::testParse()
 	{
 		char ts = sep[i];
 
-		assertTrue (NumberParser::parse("123") == 123);
-		assertTrue (NumberParser::parse(format("123%c456", ts), ts) == 123456);
-		assertTrue (NumberParser::parse(format("1%c234%c567", ts, ts), ts) == 1234567);
+		assertEqual (NumberParser::parse("123"), 123);
+		assertEqual (NumberParser::parse(format("123%c456", ts), ts), 123456);
+		assertEqual (NumberParser::parse(format("1%c234%c567", ts, ts), ts), 1234567);
 	}
 
 	assertTrue (NumberParser::parse("+123") == 123);
@@ -137,14 +137,14 @@ void NumberParserTest::testParse()
 				double d = 1.234e100;
 				assertEqualDelta(d, NumberParser::parseFloat(format("1%c234e100", dp), dp, ts), 0.01);
 				assertEqualDelta(d, NumberParser::parseFloat(format("1%c234E+100", dp), dp, ts), 0.01);
-		
+
 				d = 1.234e-100;
 				assertEqualDelta(d, NumberParser::parseFloat(format("1%c234E-100", dp), dp, ts), 0.01);
-		
+
 				d = -1.234e100;
 				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234e+100", dp), dp, ts), 0.01);
 				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234E100", dp), dp, ts), 0.01);
-		
+
 				d = 1234.234e-100;
 				assertEqualDelta(d, NumberParser::parseFloat(format("1%c234%c234e-100", ts, dp), dp, ts), 0.01);
 				d = 12345.234e-100;
@@ -163,7 +163,7 @@ void NumberParserTest::testParse()
 			double d = 12.34e-10;
 			assertEqualDelta(d, NumberParser::parseFloat(format("12%c34e-10", dp), dp, ts), 0.01);
 			assertEqualDelta(-12.34, NumberParser::parseFloat(format("-12%c34", dp), dp, ts), 0.01);
-	
+
 			assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34", dp), dp, ts), 0.01);
 		}
 	}
@@ -188,6 +188,19 @@ void NumberParserTest::testLimits()
 	assertTrue (testLowerLimit64<Int64>());
 	assertTrue (testUpperLimit64<UInt64>());
 #endif
+
+	Poco::Int64 val1, val2;
+	// smallest 64-bit int is actually -9223372036854775808
+	// but the sign and number are parsed as two tokens,
+	// resulting in compiler warning, for explanation see
+	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52661
+	NumberParser::tryParse64("-9223372036854775807", val1);
+	NumberParser::tryParse64("9223372036854775807", val2);
+	assertTrue (val1 == -9223372036854775807LL);
+	assertTrue (val2 == 9223372036854775807LL);
+	int i;
+	assertFalse (NumberParser::tryParse("-9223372036854775807", i));
+	assertFalse (NumberParser::tryParse("9223372036854775807", i));
 }
 
 
@@ -257,7 +270,7 @@ void NumberParserTest::testParseError()
 		NumberParser::parseHex("23z");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
-	
+
 #if defined(POCO_HAVE_INT64)
 
 	try
@@ -283,7 +296,7 @@ void NumberParserTest::testParseError()
 		NumberParser::parseHex64("12345z");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
-	
+
 	try
 	{
 		NumberParser::parseHex64(format("123%c45", ts));
@@ -300,6 +313,13 @@ void NumberParserTest::testParseError()
 	} catch (SyntaxException&) { }
 
 #endif // POCO_NO_FPENVIRONMENT
+
+	try
+	{
+		const char test[] = { char(-23), char(-108), char(-103), char(-24), char(-81), char(-81), 0 };
+		Poco::NumberParser::parse(test);
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
 }
 
 

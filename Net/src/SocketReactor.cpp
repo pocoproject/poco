@@ -138,7 +138,11 @@ void SocketReactor::stop()
 
 void SocketReactor::wakeUp()
 {
-	if (_pThread) _pThread->wakeUp();
+	if (_pThread && _pThread != Thread::current())
+	{
+		_pThread->wakeUp();
+		_pollSet.wakeUp();
+	}
 }
 
 

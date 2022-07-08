@@ -27,10 +27,10 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue,
-	class TMutex = FastMutex, 
+	class TMutex = FastMutex,
 	class TEventMutex = FastMutex
 >
 class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
@@ -38,9 +38,9 @@ class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCol
 	/// One can define for each cache entry a separate timepoint
 	/// but also limit the size of the cache (per default: 1024).
 	/// Each TValue object must thus offer the following method:
-	///    
+	///
 	///    const Poco::Timespan& getTimeout() const;
-	///    
+	///
 	/// which returns the relative timespan for how long the entry should be valid without being accessed!
 	/// The absolute expire timepoint is calculated as now() + getTimeout().
 	/// Accessing an object will update this absolute expire timepoint.
@@ -48,7 +48,7 @@ class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCol
 	/// method to values that do not have a getExpiration function.
 {
 public:
-	UniqueAccessExpireLRUCache(std::size_t cacheSize = 1024): 
+	UniqueAccessExpireLRUCache(std::size_t cacheSize = 1024):
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));

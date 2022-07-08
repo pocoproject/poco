@@ -6,7 +6,7 @@
 #
 
 if [ "$POCO_BASE" == "" ] ; then
-	echo $0": POCO_BASE is not set." 
+	echo $0": POCO_BASE is not set."
 	exit 1
 fi
 

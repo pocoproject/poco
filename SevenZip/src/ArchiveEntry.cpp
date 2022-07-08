@@ -51,12 +51,12 @@ ArchiveEntry::ArchiveEntry(const ArchiveEntry& entry):
 {
 }
 
-	
+
 ArchiveEntry::~ArchiveEntry()
 {
 }
 
-	
+
 ArchiveEntry& ArchiveEntry::operator = (const ArchiveEntry& entry)
 {
 	ArchiveEntry temp(entry);
@@ -65,7 +65,7 @@ ArchiveEntry& ArchiveEntry::operator = (const ArchiveEntry& entry)
 }
 
 
-void ArchiveEntry::swap(ArchiveEntry& entry)
+void ArchiveEntry::swap(ArchiveEntry& entry) noexcept
 {
 	std::swap(_type, entry._type);
 	std::swap(_path, entry._path);

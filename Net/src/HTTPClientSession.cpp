@@ -309,7 +309,7 @@ std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 	{
 		HTTPHeaderOutputStream hos(*this);
 		request.write(hos);
-		_pRequestStream = new HTTPChunkedOutputStream(*this);
+		_pRequestStream = new HTTPChunkedOutputStream(*this, &requestTrailer());
 	}
 	else if (request.hasContentLength())
 	{
@@ -349,6 +349,7 @@ void HTTPClientSession::flushRequest()
 std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 {
 	flushRequest();
+	responseTrailer().clear();
 	if (!_responseReceived)
 	{
 		do
@@ -376,7 +377,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 	if (!_expectResponseBody || response.getStatus() < 200 || response.getStatus() == HTTPResponse::HTTP_NO_CONTENT || response.getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, 0);
 	else if (response.getChunkedTransferEncoding())
-		_pResponseStream = new HTTPChunkedInputStream(*this);
+		_pResponseStream = new HTTPChunkedInputStream(*this, &responseTrailer());
 	else if (response.hasContentLength())
 #if defined(POCO_HAVE_INT64)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, response.getContentLength64());

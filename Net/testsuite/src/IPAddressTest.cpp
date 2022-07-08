@@ -40,7 +40,7 @@ void IPAddressTest::testStringConv()
 	IPAddress ia2(std::move(ia02));
 	assertTrue (ia2.family() == IPAddress::IPv4);
 	assertTrue (ia2.toString() == "192.168.1.120");
-	
+
 	IPAddress ia3("255.255.255.255");
 	assertTrue (ia3.family() == IPAddress::IPv4);
 	assertTrue (ia3.toString() == "255.255.255.255");
@@ -72,7 +72,7 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia2(std::move(ia02));
 	assertTrue (ia2.family() == IPAddress::IPv6);
 	assertTrue (ia2.toString() == "1080::8:600:200a:425c");
-	
+
 	IPAddress ia3("::192.168.1.120");
 	assertTrue (ia3.family() == IPAddress::IPv6);
 	assertTrue (ia3.toString() == "::192.168.1.120");
@@ -159,7 +159,7 @@ void IPAddressTest::testClassification()
 	assertTrue (!ip1.isSiteLocalMC());
 	assertTrue (!ip1.isOrgLocalMC());
 	assertTrue (!ip1.isGlobalMC());
-		
+
 	IPAddress ip2("255.255.255.255"); // broadcast
 	assertTrue (!ip2.isWildcard());
 	assertTrue (ip2.isBroadcast());
@@ -174,7 +174,7 @@ void IPAddressTest::testClassification()
 	assertTrue (!ip2.isSiteLocalMC());
 	assertTrue (!ip2.isOrgLocalMC());
 	assertTrue (!ip2.isGlobalMC());
-	
+
 	IPAddress ip3("127.0.0.1"); // loopback
 	assertTrue (!ip3.isWildcard());
 	assertTrue (!ip3.isBroadcast());
@@ -363,7 +363,7 @@ void IPAddressTest::testClassification6()
 	assertTrue (!ip1.isSiteLocalMC());
 	assertTrue (!ip1.isOrgLocalMC());
 	assertTrue (!ip1.isGlobalMC());
-		
+
 	IPAddress ip3("::1"); // loopback
 	assertTrue (!ip3.isWildcard());
 	assertTrue (!ip3.isBroadcast());
@@ -500,7 +500,7 @@ void IPAddressTest::testMCClassification6()
 	assertTrue (!ip1.isSiteLocal());
 	assertTrue (ip1.isWellKnownMC());
 	assertTrue (!ip1.isNodeLocalMC());
-	assertTrue (ip1.isLinkLocalMC()); 
+	assertTrue (ip1.isLinkLocalMC());
 	assertTrue (!ip1.isSiteLocalMC());
 	assertTrue (!ip1.isOrgLocalMC());
 	assertTrue (!ip1.isGlobalMC());
@@ -518,7 +518,7 @@ void IPAddressTest::testMCClassification6()
 	assertTrue (!ip2.isLinkLocalMC());
 	assertTrue (!ip2.isSiteLocalMC());
 	assertTrue (!ip2.isOrgLocalMC());
-	assertTrue (!ip2.isGlobalMC()); 
+	assertTrue (!ip2.isGlobalMC());
 
 	IPAddress ip3("ff05:0:0:0:0:0:0:FB"); // site local unicast
 	assertTrue (!ip3.isWildcard());
@@ -560,7 +560,7 @@ void IPAddressTest::testMCClassification6()
 	assertTrue (!ip5.isSiteLocal());
 	assertTrue (!ip5.isWellKnownMC());
 	assertTrue (!ip5.isNodeLocalMC());
-	assertTrue (!ip5.isLinkLocalMC()); 
+	assertTrue (!ip5.isLinkLocalMC());
 	assertTrue (!ip5.isSiteLocalMC());
 	assertTrue (!ip5.isOrgLocalMC());
 	assertTrue (ip5.isGlobalMC());
@@ -574,7 +574,7 @@ void IPAddressTest::testRelationals()
 	IPAddress ip2(ip1);
 	IPAddress ip3;
 	IPAddress ip4("10.0.0.138");
-	
+
 	assertTrue (ip1 != ip4);
 	assertTrue (ip1 == ip2);
 	assertTrue (!(ip1 != ip2));
@@ -587,7 +587,7 @@ void IPAddressTest::testRelationals()
 	assertTrue (!(ip1 <= ip4));
 	assertTrue (!(ip4 > ip1));
 	assertTrue (!(ip4 >= ip1));
-	
+
 	ip3 = ip1;
 	assertTrue (ip1 == ip3);
 	ip3 = ip4;

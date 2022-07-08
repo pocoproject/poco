@@ -35,7 +35,7 @@ class XML_API EventListener
 	/// EventTarget using the AddEventListener method. The users should also remove
 	/// their EventListener from its EventTarget after they have completed using
 	/// the listener.
-	/// 
+	///
 	/// When a Node is copied using the cloneNode method the EventListeners attached
 	/// to the source Node are not attached to the copied Node. If the user wishes
 	/// the same EventListeners to be added to the newly created copy the user must
@@ -43,7 +43,7 @@ class XML_API EventListener
 {
 public:
 	virtual void handleEvent(Event* evt) = 0;
-		/// This method is called whenever an event occurs of the 
+		/// This method is called whenever an event occurs of the
 		/// type for which the EventListener interface was registered.
 
 protected:

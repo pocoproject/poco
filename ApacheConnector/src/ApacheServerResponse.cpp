@@ -52,7 +52,7 @@ void ApacheServerResponse::initApacheOutputStream()
 
 	std::vector<HTTPCookie> cookies;
 	getCookies(cookies);
-	
+
 	std::size_t cnt = cookies.size();
 	for (int c = 0; c < cnt; c++)
 	{
@@ -77,7 +77,7 @@ void ApacheServerResponse::sendContinue()
 std::ostream& ApacheServerResponse::send()
 {
 	poco_assert (!_pStream);
-		
+
 	initApacheOutputStream();
 
 	return *_pStream;
@@ -124,7 +124,7 @@ void ApacheServerResponse::redirect(const std::string& uri, HTTPStatus status)
 
 
 void ApacheServerResponse::sendErrorResponse(int status)
-{		
+{
 	initApacheOutputStream();
 
 	_pApacheRequest->sendErrorResponse(status);

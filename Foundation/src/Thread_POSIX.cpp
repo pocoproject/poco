@@ -62,9 +62,6 @@ namespace
 #endif
 
 
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-
-
 namespace {
 void setThreadName(pthread_t thread, const std::string& threadName)
 {
@@ -81,9 +78,6 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 #endif
 }
 }
-
-
-#endif
 
 
 namespace Poco {
@@ -188,8 +182,11 @@ void ThreadImpl::setStackSizeImpl(int size)
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
-	if (_pData->pRunnableTarget)
-		throw SystemException("thread already running");
+	{
+		FastMutex::ScopedLock l(_pData->mutex);
+		if (_pData->pRunnableTarget)
+			throw SystemException("thread already running");
+	}
 
 	pthread_attr_t attributes;
 	pthread_attr_init(&attributes);
@@ -203,12 +200,15 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		}
 	}
 
-	_pData->pRunnableTarget = pTarget;
-	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
-		_pData->pRunnableTarget = 0;
-		pthread_attr_destroy(&attributes);
-		throw SystemException("cannot start thread");
+		FastMutex::ScopedLock l(_pData->mutex);
+		_pData->pRunnableTarget = pTarget;
+		if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
+		{
+			_pData->pRunnableTarget = 0;
+			pthread_attr_destroy(&attributes);
+			throw SystemException("cannot start thread");
+		}
 	}
 	_pData->started = true;
 	pthread_attr_destroy(&attributes);
@@ -351,9 +351,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
-#endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
@@ -372,6 +370,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 		ErrorHandler::handle();
 	}
 
+	FastMutex::ScopedLock l(pData->mutex);
 	pData->pRunnableTarget = 0;
 	pData->done.set();
 	return 0;

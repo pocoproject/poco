@@ -33,22 +33,22 @@ class Foundation_API PipeStreamBuf: public BufferedStreamBuf
 {
 public:
 	typedef BufferedStreamBuf::openmode openmode;
-	
+
 	PipeStreamBuf(const Pipe& pipe, openmode mode);
 		/// Creates a PipeStreamBuf with the given Pipe.
 
 	~PipeStreamBuf();
 		/// Destroys the PipeStreamBuf.
-		
+
 	void close();
 		/// Closes the pipe.
-		
+
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -67,15 +67,15 @@ class Foundation_API PipeIOS: public virtual std::ios
 public:
 	PipeIOS(const Pipe& pipe, openmode mode);
 		/// Creates the PipeIOS with the given Pipe.
-		
+
 	~PipeIOS();
 		/// Destroys the PipeIOS.
 		///
 		/// Flushes the buffer, but does not close the pipe.
-		
+
 	PipeStreamBuf* rdbuf();
 		/// Returns a pointer to the internal PipeStreamBuf.
-		
+
 	void close();
 		/// Flushes the stream and closes the pipe.
 

@@ -83,8 +83,8 @@ Session SessionFactory::create(const std::string& uri,
 }
 
 
-SessionFactory::SessionInfo::SessionInfo(Connector* pSI): 
-	cnt(1), 
+SessionFactory::SessionInfo::SessionInfo(Connector* pSI):
+	cnt(1),
 	ptrSI(pSI)
 {
 }

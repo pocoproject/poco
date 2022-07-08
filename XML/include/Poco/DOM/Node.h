@@ -40,7 +40,7 @@ class XML_API Node: public EventTarget
 	/// not all objects implementing the Node interface may have children. For
 	/// example, Text nodes may not have children, and adding children to such
 	/// nodes results in a DOMException being raised.
-	/// 
+	///
 	/// The attributes nodeName, nodeValue and attributes are included as a mechanism
 	/// to get at node information without casting down to the specific derived
 	/// interface. In cases where there is no obvious mapping of these attributes
@@ -117,7 +117,7 @@ public:
 	virtual NamedNodeMap* attributes() const = 0;
 		/// Returns a NamedNodeMap containing the attributes of this
 		/// node (if it is an Element) or null otherwise.
-		/// 
+		///
 		/// The returned NamedNodeMap must be released with a call
 		/// to release() when no longer needed.
 
@@ -143,14 +143,14 @@ public:
 
 	virtual Node* removeChild(Node* oldChild) = 0;
 		/// Removes the child node indicated by oldChild from the list of children
-		/// and returns it. 
+		/// and returns it.
 
 	virtual Node* appendChild(Node* newChild) = 0;
 		/// Appends the node newChild to the end of the list of children of this node.
 		/// If newChild is already in the tree, it is first removed.
 
 	virtual bool hasChildNodes() const = 0;
-		/// This is a convenience method to allow easy determination of whether a 
+		/// This is a convenience method to allow easy determination of whether a
 		/// node has any children.
 		/// Returns true if the node has any children, false otherwise.
 
@@ -168,7 +168,7 @@ public:
 		/// children of an EntityReference clone are readonly. In addition, clones of
 		/// unspecified Attr nodes are specified. And, cloning Document, DocumentType,
 		/// Entity, and Notation nodes is implementation dependent.
-	
+
 	// DOM Level 2
 	virtual void normalize() = 0;
 		/// Puts all Text nodes in the full depth of the sub-tree underneath this Node,
@@ -179,22 +179,22 @@ public:
 		/// of a document is the same as if it were saved and re-loaded, and is useful
 		/// when operations (such as XPointer lookups) that depend on a particular
 		/// document tree structure are to be used.
-		/// 
+		///
 		/// Note: In cases where the document contains CDATASections, the normalize
 		/// operation alone may not be sufficient, since XPointers do not differentiate
 		/// between Text nodes and CDATASection nodes.
 
 	virtual bool isSupported(const XMLString& feature, const XMLString& version) const = 0;
-		/// Tests whether the DOM implementation implements a specific 
+		/// Tests whether the DOM implementation implements a specific
 		/// feature and that feature is supported by this node.
 
 	virtual const XMLString& namespaceURI() const = 0;
 		/// Returns the namespace URI of the node.
-		/// This is not a computed value that is the result of a namespace lookup based on an 
-		/// examination of the namespace declarations in scope. It is merely the namespace URI 
+		/// This is not a computed value that is the result of a namespace lookup based on an
+		/// examination of the namespace declarations in scope. It is merely the namespace URI
 		/// given at creation time.
 		///
-		/// For nodes of any type other than ELEMENT_NODE and ATTRIBUTE_NODE and nodes created with a 
+		/// For nodes of any type other than ELEMENT_NODE and ATTRIBUTE_NODE and nodes created with a
 		/// DOM Level 1 method, such as createElement from the Document interface, this is always the
 		/// empty string.
 
@@ -206,27 +206,27 @@ public:
 
 	virtual bool hasAttributes() const = 0;
 		/// Returns whether this node (if it is an element) has any attributes.
-		
+
 	// Extensions
 	using NSMap = Poco::XML::NamespaceSupport;
 
 	virtual XMLString innerText() const = 0;
 		/// Returns a string containing the concatenated values of the node
-		/// and all its child nodes. 
+		/// and all its child nodes.
 		///
 		/// This method is not part of the W3C Document Object Model.
-		
+
 	virtual Node* getNodeByPath(const XMLString& path) const = 0;
-		/// Searches a node (element or attribute) based on a simplified XPath 
+		/// Searches a node (element or attribute) based on a simplified XPath
 		/// expression.
 		///
 		/// Only simple XPath expressions are supported. These are the slash
 		/// notation for specifying paths to elements, and the square bracket
-		/// expression for finding elements by their index, by attribute value, 
+		/// expression for finding elements by their index, by attribute value,
 		/// or finding attributes by names.
 		///
 		/// The slash at the beginning is optional, the evaluation always starts
-		/// at this element. A double-slash at the beginning recursively searches 
+		/// at this element. A double-slash at the beginning recursively searches
 		/// the entire subtree for the first element.
 		///
 		/// Examples:
@@ -241,18 +241,18 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 	virtual Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const = 0;
-		/// Searches a node (element or attribute) based on a simplified XPath 
+		/// Searches a node (element or attribute) based on a simplified XPath
 		/// expression. The given NSMap must contain mappings from namespace
-		/// prefixes to namespace URIs for all namespace prefixes used in 
+		/// prefixes to namespace URIs for all namespace prefixes used in
 		/// the path expression.
 		///
 		/// Only simple XPath expressions are supported. These are the slash
 		/// notation for specifying paths to elements, and the square bracket
-		/// expression for finding elements by their index, by attribute value, 
+		/// expression for finding elements by their index, by attribute value,
 		/// or finding attributes by names.
 		///
 		/// The slash at the beginning is optional, the evaluation always starts
-		/// at this element. A double-slash at the beginning recursively searches 
+		/// at this element. A double-slash at the beginning recursively searches
 		/// the entire subtree for the first element.
 		///
 		/// Examples:

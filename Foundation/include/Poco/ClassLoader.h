@@ -140,7 +140,7 @@ public:
 	}
 
 	void loadLibrary(const std::string& path, const std::string& manifest)
-		/// Loads a library from the given path, using the given manifest. 
+		/// Loads a library from the given path, using the given manifest.
 		/// Does nothing if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
 		/// cannot be loaded or does not have a Manifest.
@@ -208,9 +208,9 @@ public:
 	{
 		loadLibrary(path, "");
 	}
-		
+
 	void unloadLibrary(const std::string& path)
-		/// Unloads the given library. 
+		/// Unloads the given library.
 		/// Be extremely cautious when unloading shared libraries.
 		/// If objects from the library are still referenced somewhere,
 		/// a total crash is very likely.
@@ -256,7 +256,7 @@ public:
 		}
 		return 0;
 	}
-	
+
 	const Meta& classFor(const std::string& className) const
 		/// Returns a reference to the MetaObject for the given
 		/// class. Throws a NotFoundException if the class
@@ -268,7 +268,7 @@ public:
 		else
 			throw NotFoundException(className);
 	}
-	
+
 	Base* create(const std::string& className) const
 		/// Creates an instance of the given class.
 		/// Throws a NotFoundException if the class
@@ -276,7 +276,7 @@ public:
 	{
 		return classFor(className).create();
 	}
-	
+
 	Base& instance(const std::string& className) const
 		/// Returns a reference to the sole instance of
 		/// the given class. The class must be a singleton,
@@ -286,7 +286,7 @@ public:
 	{
 		return classFor(className).instance();
 	}
-	
+
 	bool canCreate(const std::string& className) const
 		/// Returns true if create() can create new instances
 		/// of the class.
@@ -307,7 +307,7 @@ public:
 	{
 		return classFor(className).isAutoDelete(pObject);
 	}
-	
+
 	const Manif* findManifest(const std::string& path) const
 		/// Returns a pointer to the Manifest for the given
 		/// library, or a null pointer if the library has not been loaded.
@@ -320,7 +320,7 @@ public:
 		else
 			return 0;
 	}
-	
+
 	const Manif& manifestFor(const std::string& path) const
 		/// Returns a reference to the Manifest for the given library
 		/// Throws a NotFoundException if the library has not been loaded.

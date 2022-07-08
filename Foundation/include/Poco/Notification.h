@@ -36,7 +36,7 @@ class Foundation_API Notification: public RefCountedObject
 {
 public:
 	using Ptr = AutoPtr<Notification>;
-	
+
 	Notification();
 		/// Creates the notification.
 

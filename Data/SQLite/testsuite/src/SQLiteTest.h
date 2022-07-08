@@ -74,6 +74,7 @@ public:
 	void testIllegalRange();
 	void testSingleSelect();
 	void testEmptyDB();
+	void testNonexistingDB();
 
 	void testCLOB();
 	void testBLOB();
@@ -137,6 +138,7 @@ public:
 	void testFTS3();
 
 	void testIllegalFilePath();
+	void testTransactionTypeProperty();
 
 	void setUp();
 	void tearDown();

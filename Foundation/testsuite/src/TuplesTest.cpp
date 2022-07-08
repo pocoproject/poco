@@ -60,7 +60,7 @@ void TuplesTest::testTuple1()
 	assertTrue (t.length == 1);
 	t.set<0>(-1);
 	assertTrue (t.get<0>() == -1);
-	
+
 	Tuple<int> t2(-1);
 	assertTrue (t2.get<0>() == -1);
 
@@ -228,7 +228,7 @@ void TuplesTest::testTuple6()
 {
 	Tuple<std::string, int, bool, float, char, long> aTuple;
 	assertTrue (aTuple.length == 6);
-	Tuple<std::string, int, bool, float, char, long> 
+	Tuple<std::string, int, bool, float, char, long>
 		aTuple2("1", 1, true, 3.14f, 'c', 999);
 	assertTrue (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -242,7 +242,7 @@ void TuplesTest::testTuple7()
 {
 	Tuple<std::string, int, bool, float, char, long, double> aTuple;
 	assertTrue (aTuple.length == 7);
-	Tuple<std::string, int, bool, float, char, long, double> 
+	Tuple<std::string, int, bool, float, char, long, double>
 		aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14);
 	assertTrue (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -256,7 +256,7 @@ void TuplesTest::testTuple8()
 {
 	Tuple<std::string, int, bool, float, char, long, double, short> aTuple;
 	assertTrue (aTuple.length == 8);
-	Tuple<std::string, int, bool, float, char, long, double, short> 
+	Tuple<std::string, int, bool, float, char, long, double, short>
 		aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700);
 	assertTrue (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -269,7 +269,7 @@ void TuplesTest::testTuple9()
 {
 	Tuple<std::string, int, bool, float, char, long, double, short, std::string> aTuple;
 	assertTrue (aTuple.length == 9);
-	Tuple<std::string, int, bool, float, char, long, double, short, std::string> 
+	Tuple<std::string, int, bool, float, char, long, double, short, std::string>
 		aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2");
 	assertTrue (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -296,7 +296,7 @@ void TuplesTest::testTuple10()
 
 void TuplesTest::testTuple11()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string> TupleType;
 
 	TupleType aTuple;
@@ -312,7 +312,7 @@ void TuplesTest::testTuple11()
 
 void TuplesTest::testTuple12()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int> TupleType;
 
 	TupleType aTuple;
@@ -328,7 +328,7 @@ void TuplesTest::testTuple12()
 
 void TuplesTest::testTuple13()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool> TupleType;
 
 	TupleType aTuple;
@@ -344,7 +344,7 @@ void TuplesTest::testTuple13()
 
 void TuplesTest::testTuple14()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float> TupleType;
 
 	TupleType aTuple;
@@ -360,7 +360,7 @@ void TuplesTest::testTuple14()
 
 void TuplesTest::testTuple15()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char> TupleType;
 
 	TupleType aTuple;
@@ -376,7 +376,7 @@ void TuplesTest::testTuple15()
 
 void TuplesTest::testTuple16()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long> TupleType;
 
 	TupleType aTuple;
@@ -392,7 +392,7 @@ void TuplesTest::testTuple16()
 
 void TuplesTest::testTuple17()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double> TupleType;
 
 	TupleType aTuple;
@@ -408,7 +408,7 @@ void TuplesTest::testTuple17()
 
 void TuplesTest::testTuple18()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short> TupleType;
 
 	TupleType aTuple;
@@ -424,7 +424,7 @@ void TuplesTest::testTuple18()
 
 void TuplesTest::testTuple19()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short, std::string> TupleType;
 
 	TupleType aTuple;
@@ -440,12 +440,12 @@ void TuplesTest::testTuple19()
 
 void TuplesTest::testTuple20()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short, std::string, int> TupleType;
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 20);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2", 2,
 					  "1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2", 2);
 	assertTrue (aTuple != aTuple2);
@@ -464,7 +464,7 @@ void TuplesTest::testTuple21()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 21);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5");
@@ -486,7 +486,7 @@ void TuplesTest::testTuple22()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 22);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5);
@@ -508,7 +508,7 @@ void TuplesTest::testTuple23()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 23);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true);
@@ -530,7 +530,7 @@ void TuplesTest::testTuple24()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 24);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f);
@@ -552,7 +552,7 @@ void TuplesTest::testTuple25()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 25);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c');
@@ -574,7 +574,7 @@ void TuplesTest::testTuple26()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 26);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999);
@@ -596,7 +596,7 @@ void TuplesTest::testTuple27()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 27);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14);
@@ -618,7 +618,7 @@ void TuplesTest::testTuple28()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 28);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700);
@@ -640,7 +640,7 @@ void TuplesTest::testTuple29()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 29);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6");
@@ -662,7 +662,7 @@ void TuplesTest::testTuple30()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 30);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6);
@@ -685,7 +685,7 @@ void TuplesTest::testTuple31()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 31);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -709,7 +709,7 @@ void TuplesTest::testTuple32()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 32);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -733,7 +733,7 @@ void TuplesTest::testTuple33()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 33);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -757,7 +757,7 @@ void TuplesTest::testTuple34()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 34);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -781,7 +781,7 @@ void TuplesTest::testTuple35()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 35);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -805,7 +805,7 @@ void TuplesTest::testTuple36()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 36);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -829,7 +829,7 @@ void TuplesTest::testTuple37()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 37);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -853,7 +853,7 @@ void TuplesTest::testTuple38()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 38);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -877,7 +877,7 @@ void TuplesTest::testTuple39()
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 39);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -938,7 +938,7 @@ void TuplesTest::testTuple40()
 	assertTrue (aTuple.get<38>() == "");
 	assertTrue (aTuple.get<39>() == 0);
 
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'a', 999, 33.14, 32700, "2", 2,
 					  "3", 3, true, 3.14f, 'b', 999, 33.14, 32700, "4", 4,
 					  "5", 5, true, 3.14f, 'c', 999, 33.14, 32700, "6", 6,
@@ -1063,12 +1063,12 @@ void TuplesTest::testTuple40()
 
 void TuplesTest::testTupleOrder()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short, std::string, int> TupleType;
 
 	TupleType aTuple;
 	assertTrue (aTuple.length == 20);
-	
+
 	TupleType aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2", 2, "1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2", 2);
 	assertTrue (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -1093,7 +1093,7 @@ void TuplesTest::testTupleOrder()
 	assertTrue (tv[2] == aTuple2);
 
 	std::sort(tv.begin(), tv.end());
-	
+
 	assertTrue (tv[0] == aTuple);
 	assertTrue (tv[1] == aTuple2);
 	assertTrue (tv[2] == aTuple3);

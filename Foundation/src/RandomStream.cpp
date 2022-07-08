@@ -51,7 +51,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 #else
 	#if defined(POCO_OS_FAMILY_UNIX)
 	int fd = open("/dev/urandom", O_RDONLY, 0);
-	if (fd >= 0) 
+	if (fd >= 0)
 	{
 		n = read(fd, buffer, length);
 		close(fd);
@@ -65,7 +65,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 		Random rnd1(256);
 		Random rnd2(64);
 		x += rnd1.next();
- 
+
 		n = 0;
 		SHA1Engine engine;
 		UInt32 t = (UInt32) std::time(NULL);

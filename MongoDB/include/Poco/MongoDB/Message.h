@@ -36,7 +36,7 @@ class MongoDB_API Message
 public:
 	explicit Message(MessageHeader::OpCode opcode);
 		/// Creates a Message using the given OpCode.
-	
+
 	virtual ~Message();
 		/// Destructor
 

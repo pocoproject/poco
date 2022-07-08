@@ -40,19 +40,19 @@ public:
 
 	virtual ~SocketNotification();
 		/// Destroys the SocketNotification.
-		
+
 	SocketReactor& source() const;
-		/// Returns the SocketReactor that generated the notification.	
-		
+		/// Returns the SocketReactor that generated the notification.
+
 	Socket socket() const;
 		/// Returns the socket that caused the notification.
 
 private:
 	void setSocket(const Socket& socket);
-	
+
 	SocketReactor* _pReactor;
 	Socket         _socket;
-	
+
 	friend class SocketNotifier;
 };
 
@@ -140,7 +140,7 @@ inline SocketReactor& SocketNotification::source() const
 	return *_pReactor;
 }
 
-	
+
 inline Socket SocketNotification::socket() const
 {
 	return _socket;

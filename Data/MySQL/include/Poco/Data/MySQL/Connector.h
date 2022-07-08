@@ -35,7 +35,7 @@ public:
 
 	Connector();
 		/// Creates the Connector.
-	
+
 	virtual ~Connector();
 		/// Destroys the Connector.
 

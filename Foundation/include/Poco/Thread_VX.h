@@ -33,7 +33,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
 	typedef int TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -63,7 +63,7 @@ public:
 		}
 
 		Callable  callback;
-		void*     pData; 
+		void*     pData;
 	};
 
 	ThreadImpl();

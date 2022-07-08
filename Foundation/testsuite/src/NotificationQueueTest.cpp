@@ -72,7 +72,7 @@ void NotificationQueueTest::testQueueDequeue()
 	assertTrue (queue.empty());
 	assertTrue (queue.size() == 0);
 	pNf->release();
-	
+
 	queue.enqueueNotification(new QTestNotification("first"));
 	queue.enqueueNotification(new QTestNotification("second"));
 	assertTrue (!queue.empty());
@@ -97,7 +97,7 @@ void NotificationQueueTest::testQueueDequeue()
 
 void NotificationQueueTest::testQueueDequeueUrgent()
 {
-	NotificationQueue queue;	
+	NotificationQueue queue;
 	queue.enqueueNotification(new QTestNotification("first"));
 	queue.enqueueNotification(new QTestNotification("second"));
 	queue.enqueueUrgentNotification(new QTestNotification("third"));
@@ -158,7 +158,7 @@ void NotificationQueueTest::testThreads()
 	Thread t1("thread1");
 	Thread t2("thread2");
 	Thread t3("thread3");
-	
+
 	RunnableAdapter<NotificationQueueTest> ra(*this, &NotificationQueueTest::work);
 	t1.start(ra);
 	t2.start(ra);

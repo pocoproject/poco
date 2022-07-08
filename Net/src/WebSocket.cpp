@@ -65,6 +65,8 @@ WebSocket::WebSocket(const Socket& socket):
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
 WebSocket::WebSocket(Socket&& socket):
 	StreamSocket(std::move(socket))
 {
@@ -73,14 +75,16 @@ WebSocket::WebSocket(Socket&& socket):
 }
 
 
-WebSocket::WebSocket(const WebSocket& socket):
-	StreamSocket(socket)
+WebSocket::WebSocket(WebSocket&& socket):
+	StreamSocket(std::move(socket))
 {
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
-WebSocket::WebSocket(WebSocket&& socket):
-	StreamSocket(std::move(socket))
+
+WebSocket::WebSocket(const WebSocket& socket):
+	StreamSocket(socket)
 {
 }
 
@@ -100,6 +104,8 @@ WebSocket& WebSocket::operator = (const Socket& socket)
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
 WebSocket& WebSocket::operator = (Socket&& socket)
 {
 	if (dynamic_cast<WebSocketImpl*>(socket.impl()))
@@ -110,16 +116,18 @@ WebSocket& WebSocket::operator = (Socket&& socket)
 }
 
 
-WebSocket& WebSocket::operator = (const WebSocket& socket)
-{
-	Socket::operator = (socket);
-	return *this;
-}
-
-
 WebSocket& WebSocket::operator = (WebSocket&& socket)
 {
 	Socket::operator = (std::move(socket));
+	return *this;
+}
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+
+WebSocket& WebSocket::operator = (const WebSocket& socket)
+{
+	Socket::operator = (socket);
 	return *this;
 }
 

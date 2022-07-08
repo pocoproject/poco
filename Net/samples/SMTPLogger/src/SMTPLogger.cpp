@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 		std::cerr << "       the SMTP server at <mailhost>." << std::endl;
 		return 1;
 	}
-	
+
 	std::string mailhost(argv[1]);
 	std::string sender(argv[2]);
 	std::string recipient(argv[3]);

@@ -34,7 +34,7 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-NTPClientTest::NTPClientTest(const std::string& name): 
+NTPClientTest::NTPClientTest(const std::string& name):
 	CppUnit::TestCase(name),
 	_ntpClient(IPAddress::IPv4)
 {
@@ -75,8 +75,8 @@ void NTPClientTest::tearDown()
 void NTPClientTest::onResponse(const void* pSender, NTPEventArgs& args)
 {
 	std::ostringstream os;
-	os << std::endl << "Received from " << args.hostName() << " [" << args.hostAddress() << "] with " 
-		<< Poco::DateTimeFormatter::format(args.packet().referenceTime(), Poco::DateTimeFormat::ISO8601_FORMAT) << " reference typestamp" 
+	os << std::endl << "Received from " << args.hostName() << " [" << args.hostAddress() << "] with "
+		<< Poco::DateTimeFormatter::format(args.packet().referenceTime(), Poco::DateTimeFormat::ISO8601_FORMAT) << " reference typestamp"
 		<< std::endl;
 	std::cout << os.str() << std::endl;
 }

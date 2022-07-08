@@ -31,7 +31,7 @@ Timespan::Timespan():
 {
 }
 
-	
+
 Timespan::Timespan(TimeDiff microSeconds):
 	_span(microSeconds)
 {
@@ -43,7 +43,7 @@ Timespan::Timespan(long seconds, long microSeconds):
 {
 }
 
-	
+
 Timespan::Timespan(int days, int hours, int minutes, int seconds, int microSeconds):
 	_span(TimeDiff(microSeconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS)
 {
@@ -84,7 +84,7 @@ Timespan& Timespan::assign(long seconds, long microSeconds)
 }
 
 
-void Timespan::swap(Timespan& timespan)
+void Timespan::swap(Timespan& timespan) noexcept
 {
 	std::swap(_span, timespan._span);
 }

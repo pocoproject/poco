@@ -18,6 +18,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
+#include <atomic>
 
 
 class EchoServer: public Poco::Runnable
@@ -50,8 +51,8 @@ private:
 	Poco::Net::ServerSocket _socket;
 	Poco::Thread _thread;
 	Poco::Event  _ready;
-	bool         _stop;
-	bool         _done;
+	std::atomic<bool> _stop;
+	std::atomic<bool> _done;
 };
 
 

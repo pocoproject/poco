@@ -121,7 +121,7 @@ X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
 }
 
 
-void X509Certificate::swap(X509Certificate& cert)
+void X509Certificate::swap(X509Certificate& cert) noexcept
 {
 	using std::swap;
 	swap(cert._issuerName, _issuerName);

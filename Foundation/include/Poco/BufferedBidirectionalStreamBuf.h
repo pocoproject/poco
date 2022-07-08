@@ -29,9 +29,9 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch>> 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch>>
 class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
-	/// This is an implementation of a buffered bidirectional 
+	/// This is an implementation of a buffered bidirectional
 	/// streambuf that greatly simplifies the implementation of
 	/// custom streambufs of various kinds.
 	/// Derived classes only have to override the methods
@@ -68,13 +68,13 @@ public:
 		Allocator::deallocate(_pReadBuffer, _bufsize);
 		Allocator::deallocate(_pWriteBuffer, _bufsize);
 	}
-	
+
 	virtual int_type overflow(int_type c)
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
 		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
-		if (c != char_traits::eof()) 
+		if (c != char_traits::eof())
 		{
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
@@ -101,12 +101,12 @@ public:
 		this->setg(_pReadBuffer + (4 - putback), _pReadBuffer + 4, _pReadBuffer + 4 + n);
 
 		// return next character
-		return char_traits::to_int_type(*this->gptr());    
+		return char_traits::to_int_type(*this->gptr());
 	}
 
 	virtual int sync()
 	{
-		if (this->pptr() && this->pptr() > this->pbase()) 
+		if (this->pptr() && this->pptr() > this->pbase())
 		{
 			if (flushBuffer() == -1) return -1;
 		}
@@ -123,7 +123,7 @@ protected:
 	{
 		return _mode;
 	}
-	
+
 	void resetBuffers()
 	{
 		this->setg(_pReadBuffer + 4, _pReadBuffer + 4, _pReadBuffer + 4);
@@ -144,7 +144,7 @@ private:
 	int flushBuffer()
 	{
 		int n = int(this->pptr() - this->pbase());
-		if (writeToDevice(this->pbase(), n) == n) 
+		if (writeToDevice(this->pbase(), n) == n)
 		{
 			this->pbump(-n);
 			return n;
@@ -169,7 +169,7 @@ private:
 // instantiation - to avoid duplicate symbols due to multiple
 // instantiations in different libraries.
 //
-#if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS) 
+#if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
 template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 #endif
 typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>> BufferedBidirectionalStreamBuf;

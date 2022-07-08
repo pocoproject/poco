@@ -61,6 +61,7 @@ namespace
 		case MYSQL_TYPE_DATE:
 		case MYSQL_TYPE_TIME:
 		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			return sizeof(MYSQL_TIME);
 
 		case MYSQL_TYPE_DECIMAL:
@@ -77,16 +78,16 @@ namespace
 		default:
 			throw Poco::Data::MySQL::StatementException("unknown field type");
 		}
-	}	
+	}
 
 	Poco::Data::MetaColumn::ColumnDataType fieldType(const MYSQL_FIELD& field)
-		/// Convert field MySQL-type to Poco-type	
+		/// Convert field MySQL-type to Poco-type
 	{
 		bool unsig = ((field.flags & UNSIGNED_FLAG) == UNSIGNED_FLAG);
 
 		switch (field.type)
 		{
-		case MYSQL_TYPE_TINY:     
+		case MYSQL_TYPE_TINY:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT8;
 			return Poco::Data::MetaColumn::FDT_INT8;
 
@@ -95,31 +96,32 @@ namespace
 			return Poco::Data::MetaColumn::FDT_INT16;
 
 		case MYSQL_TYPE_INT24:
-		case MYSQL_TYPE_LONG:     
+		case MYSQL_TYPE_LONG:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT32;
 			return Poco::Data::MetaColumn::FDT_INT32;
 
-		case MYSQL_TYPE_FLOAT:    
+		case MYSQL_TYPE_FLOAT:
 			return Poco::Data::MetaColumn::FDT_FLOAT;
 
 		case MYSQL_TYPE_DECIMAL:
 		case MYSQL_TYPE_NEWDECIMAL:
-		case MYSQL_TYPE_DOUBLE:   
+		case MYSQL_TYPE_DOUBLE:
 			return Poco::Data::MetaColumn::FDT_DOUBLE;
 
-		case MYSQL_TYPE_LONGLONG: 
+		case MYSQL_TYPE_LONGLONG:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT64;
 			return Poco::Data::MetaColumn::FDT_INT64;
-			
+
 		case MYSQL_TYPE_DATE:
 			return Poco::Data::MetaColumn::FDT_DATE;
-			
+
 		case MYSQL_TYPE_TIME:
 			return Poco::Data::MetaColumn::FDT_TIME;
-			
+
 		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			return Poco::Data::MetaColumn::FDT_TIMESTAMP;
-			
+
 		case MYSQL_TYPE_STRING:
 		case MYSQL_TYPE_VAR_STRING:
 			return Poco::Data::MetaColumn::FDT_STRING;
@@ -145,18 +147,25 @@ namespace MySQL {
 
 ResultMetadata::~ResultMetadata()
 {
-	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
-		std::free(*it);
+	freeMemory();
 }
 
 
 void ResultMetadata::reset()
 {
+	freeMemory();
 	_columns.resize(0);
 	_row.resize(0);
 	_buffer.resize(0);
 	_lengths.resize(0);
 	_isNull.resize(0);
+}
+
+
+void ResultMetadata::freeMemory()
+{
+	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
+		std::free(*it);
 }
 
 
@@ -166,8 +175,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 
 	if (!h)
 	{
-		// all right, it is normal
-		// querys such an "INSERT INTO" just does not have result at all
+		// some queries (eg. INSERT) don't have result
 		reset();
 		return;
 	}
@@ -236,13 +244,17 @@ std::size_t ResultMetadata::length(std::size_t pos) const
 }
 
 
-const unsigned char* ResultMetadata::rawData(std::size_t pos) const 
+const unsigned char* ResultMetadata::rawData(std::size_t pos) const
 {
+	if ((_lengths[pos] == 0) && (_row[pos].buffer == nullptr))
+		return reinterpret_cast<const unsigned char*>("");
+	else
+		poco_check_ptr (_row[pos].buffer);
 	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
 
 
-bool ResultMetadata::isNull(std::size_t pos) const 
+bool ResultMetadata::isNull(std::size_t pos) const
 {
 	return (_isNull[pos] != 0);
 }

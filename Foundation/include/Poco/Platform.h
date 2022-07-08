@@ -234,6 +234,9 @@
 		#define POCO_ARCH POCO_ARCH_RISCV32
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
+#elif defined(__loongarch64)
+	#define POCO_ARCH POCO_ARCH_LOONGARCH64
+	#define POCO_ARCH_LITTLE_ENDIAN 1
 #endif
 
 
@@ -243,6 +246,9 @@
 	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
+	#if defined (__MINGW32__) || defined (__MINGW64__)
+		#define POCO_COMPILER_MINGW
+	#endif
 #elif defined (__MINGW32__) || defined (__MINGW64__)
 	#define POCO_COMPILER_MINGW
 #elif defined (__INTEL_COMPILER) || defined(__ICC) || defined(__ECC) || defined(__ICL)

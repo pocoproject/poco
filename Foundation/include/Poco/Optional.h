@@ -141,7 +141,7 @@ public:
 		return *this;
 	}
 
-	void swap(Optional& other)
+	void swap(Optional& other) noexcept
 	{
 		std::swap(_value, other._value);
 		std::swap(_isSpecified, other._isSpecified);
@@ -185,7 +185,7 @@ private:
 
 
 template <typename C>
-inline void swap(Optional<C>& n1, Optional<C>& n2)
+inline void swap(Optional<C>& n1, Optional<C>& n2) noexcept
 {
 	n1.swap(n2);
 }

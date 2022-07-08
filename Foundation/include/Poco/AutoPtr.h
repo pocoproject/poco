@@ -194,7 +194,7 @@ public:
 		return assign<Other>(ptr);
 	}
 
-	void swap(AutoPtr& ptr)
+	void swap(AutoPtr& ptr) noexcept
 	{
 		std::swap(_ptr, ptr._ptr);
 	}
@@ -398,7 +398,7 @@ private:
 
 
 template <class C>
-inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2)
+inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2) noexcept
 {
 	p1.swap(p2);
 }

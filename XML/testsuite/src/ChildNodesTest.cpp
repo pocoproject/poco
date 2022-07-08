@@ -42,11 +42,11 @@ void ChildNodesTest::testChildNodes()
 	assertTrue (!pRoot->hasChildNodes());
 	AutoPtr<NodeList> pNL = pRoot->childNodes();
 	assertTrue (pNL->length() == 0);
-	
+
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
 	assertTrue (pRoot->hasChildNodes());
-	
+
 	assertTrue (pNL->length() == 1);
 	assertTrue (pNL->item(0) == pChild1);
 
@@ -56,7 +56,7 @@ void ChildNodesTest::testChildNodes()
 	assertTrue (pNL->length() == 2);
 	assertTrue (pNL->item(0) == pChild1);
 	assertTrue (pNL->item(1) == pChild2);
-	
+
 	AutoPtr<Element> pChild0 = pDoc->createElement("child0");
 	pRoot->insertBefore(pChild0, pChild1);
 

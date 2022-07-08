@@ -25,7 +25,7 @@ namespace Poco {
 
 
 class Foundation_API Void
-	/// A dummy class with value-type semantics, 
+	/// A dummy class with value-type semantics,
 	/// mostly useful as a template argument.
 	///
 	/// This class is typically used together with ActiveMethod,
@@ -38,9 +38,9 @@ public:
 	Void(const Void& v);
 		/// Creates the Void from another Void.
 		///
-		/// The philosophical aspects of this operation 
+		/// The philosophical aspects of this operation
 		/// remain undiscussed for now.
-		
+
 	~Void();
 		/// Destroys the Void.
 

@@ -209,22 +209,22 @@ void HTTPRequestTest::testCookies()
 	cookies1.add("cookie1", "value1");
 	request1.setCookies(cookies1);
 	assertTrue (request1["Cookie"] == "cookie1=value1");
-	
+
 	HTTPRequest request2;
 	NameValueCollection cookies2;
 	cookies2.add("cookie2", "value2");
 	cookies2.add("cookie3", "value3");
 	request2.setCookies(cookies2);
 	assertTrue (request2["Cookie"] == "cookie2=value2; cookie3=value3");
-	
+
 	request1.setCookies(cookies2);
 	NameValueCollection cookies3;
 	request1.getCookies(cookies3);
 	assertTrue (cookies3.size() == 3);
 	assertTrue (cookies3["cookie1"] == "value1");
 	assertTrue (cookies3["cookie2"] == "value2");
-	assertTrue (cookies3["cookie3"] == "value3");	
-	
+	assertTrue (cookies3["cookie3"] == "value3");
+
 	HTTPRequest request3;
 	request3.add("Cookie", "cookie1=value1");
 	request3.add("cookie", "cookie2=value2");
@@ -232,7 +232,7 @@ void HTTPRequestTest::testCookies()
 	request3.getCookies(cookies4);
 	assertTrue (cookies4.size() == 2);
 	assertTrue (cookies4["cookie1"] == "value1");
-	assertTrue (cookies4["cookie2"] == "value2");	
+	assertTrue (cookies4["cookie2"] == "value2");
 }
 
 

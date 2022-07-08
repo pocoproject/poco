@@ -78,7 +78,7 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 	poco_assert (second >= 0 && second <= 60); // allow leap seconds
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
-	
+
 	_utcTime = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
 }
 
@@ -134,7 +134,7 @@ DateTime& DateTime::operator = (const DateTime& dateTime)
 	return *this;
 }
 
-	
+
 DateTime& DateTime::operator = (const Timestamp& timestamp)
 {
 	_utcTime = timestamp.utcTime();
@@ -172,12 +172,12 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 	_second      = second;
 	_millisecond = millisecond;
 	_microsecond = microsecond;
-	
+
 	return *this;
 }
 
 
-void DateTime::swap(DateTime& dateTime)
+void DateTime::swap(DateTime& dateTime) noexcept
 {
 	std::swap(_utcTime, dateTime._utcTime);
 	std::swap(_year, dateTime._year);
@@ -212,7 +212,7 @@ int DateTime::daysOfMonth(int year, int month)
 	poco_assert (month >= 1 && month <= 12);
 
 	static int daysOfMonthTable[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	
+
 	if (month == 2 && isLeapYear(year))
 		return 29;
 	else
@@ -243,7 +243,7 @@ int DateTime::week(int firstDayOfWeek) const
 	while (DateTime(_year, 1, baseDay).dayOfWeek() != firstDayOfWeek) ++baseDay;
 
 	int doy  = dayOfYear();
-	int offs = baseDay <= 4 ? 0 : 1; 
+	int offs = baseDay <= 4 ? 0 : 1;
 	if (doy < baseDay)
 		return offs;
 	else
@@ -320,7 +320,7 @@ void DateTime::makeUTC(int tzd)
 	operator -= (Timespan(((Timestamp::TimeDiff) tzd)*Timespan::SECONDS));
 }
 
-	
+
 void DateTime::makeLocal(int tzd)
 {
 	operator += (Timespan(((Timestamp::TimeDiff) tzd)*Timespan::SECONDS));
@@ -331,7 +331,7 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 {
 	// lookup table for (153*month - 457)/5 - note that 3 <= month <= 14.
 	static int lookup[] = {-91, -60, -30, 0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337};
- 
+
 	// day to double
 	double dday = double(day) + ((double((hour*60 + minute)*60 + second)*1000 + millisecond)*1000 + microsecond)/86400000000.0;
 	if (month < 3)
