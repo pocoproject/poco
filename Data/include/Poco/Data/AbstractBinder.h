@@ -28,6 +28,7 @@
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/UTFString.h"
+#include "Poco/TextEncoding.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -39,7 +40,7 @@ namespace Data {
 
 
 using NullData = NullType;
-
+class Transcoder;
 
 namespace Keywords {
 
@@ -64,7 +65,8 @@ public:
 		PD_IN_OUT
 	};
 
-	AbstractBinder();
+	AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the AbstractBinder.
 
 	virtual ~AbstractBinder();
@@ -358,10 +360,16 @@ public:
 		/// Returns true if direction is in bound;
 
 protected:
+	bool transcodeRequired() const;
+	void transcode(const std::string& from, std::string& to);
+	void reverseTranscode(const std::string& from, std::string& to);
+
 	const std::string& toString(const UUID& uuid);
 
 private:
 	using StringList = std::vector<std::string*>;
+  
+	std::unique_ptr<Transcoder> _pTranscoder;
 	std::unique_ptr<StringList> _pStrings;
 };
 
@@ -384,6 +392,12 @@ inline bool AbstractBinder::isOutBound(Direction dir)
 inline bool AbstractBinder::isInBound(Direction dir)
 {
 	return PD_IN == dir || PD_IN_OUT == dir;
+}
+
+
+inline bool AbstractBinder::transcodeRequired() const
+{
+	return _pTranscoder.operator bool();
 }
 
 

@@ -99,7 +99,7 @@ void SessionImpl::open(const std::string& aConnectionString)
 		}
 	}
 
-	poco_assert_dbg (! connectionString().empty());
+	poco_assert_dbg (!connectionString().empty());
 
 	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 
@@ -140,6 +140,10 @@ void SessionImpl::open(const std::string& aConnectionString)
 	addFeature("asynchronousCommit",
 		&SessionImpl::setAutoCommit,
 		&SessionImpl::isAutoCommit);
+
+	addFeature("binaryExtraction",
+		&SessionImpl::setBinaryExtraction,
+		&SessionImpl::isBinaryExtraction);
 }
 
 
@@ -241,6 +245,15 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 bool SessionImpl::hasTransactionIsolation(Poco::UInt32 aTI) const
 {
 	return _sessionHandle.hasTransactionIsolation(aTI);
+}
+
+
+void SessionImpl::setBinaryExtraction(const std::string& feature, bool enabled)
+{
+	if (enabled && _sessionHandle.parameterStatus("integer_datetimes") != "on")
+		throw PostgreSQLException("binary extraction is not supported with this server (ingeger_datetimes must be enabled on the server)");
+
+	_binaryExtraction = enabled;
 }
 
 

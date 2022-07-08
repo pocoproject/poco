@@ -584,6 +584,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\JSONRowFormatter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Limit.h"
 					>
 				</File>
@@ -668,6 +672,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Transcoder.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\TypeHandler.h"
 					>
 				</File>
@@ -717,6 +725,10 @@
 				</File>
 				<File
 					RelativePath=".\src\DynamicLOB.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\JSONRowFormatter.cpp"
 					>
 				</File>
 				<File
@@ -789,6 +801,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Transaction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Transcoder.cpp"
 					>
 				</File>
 			</Filter>

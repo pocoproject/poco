@@ -43,7 +43,7 @@ class SocketConnector
 	/// The Acceptor-Connector design pattern decouples connection
 	/// establishment and service initialization in a distributed system
 	/// from the processing performed once a service is initialized.
-	/// This decoupling is achieved with three components: Acceptors, 
+	/// This decoupling is achieved with three components: Acceptors,
 	/// Connectors and Service Handlers.
 	/// The Connector actively establishes a connection with a remote
 	/// server socket (usually managed by an Acceptor) and initializes
@@ -51,10 +51,10 @@ class SocketConnector
 	///
 	/// The SocketConnector sets up a StreamSocket, initiates a non-blocking
 	/// connect operation and registers itself for ReadableNotification, WritableNotification
-	/// and ErrorNotification. ReadableNotification or WritableNotification denote the successful 
+	/// and ErrorNotification. ReadableNotification or WritableNotification denote the successful
 	/// establishment of the connection.
 	///
-	/// When the StreamSocket becomes readable or writeable, the SocketConnector 
+	/// When the StreamSocket becomes readable or writeable, the SocketConnector
 	/// creates a ServiceHandler to service the connection and unregisters
 	/// itself.
 	///
@@ -82,7 +82,7 @@ public:
 
 	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
 		_pReactor(0)
-		/// Creates an acceptor, using the given ServerSocket.
+		/// Creates an connector, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
 		_socket.connectNB(address);
@@ -134,39 +134,33 @@ public:
 
 	void onReadable(ReadableNotification* pNotification)
 	{
+		unregisterConnector();
 		pNotification->release();
 		int err = _socket.impl()->socketError(); 
-		if (err)
-		{
-			onError(err);
-			unregisterConnector();
-		}
-		else
-		{
-			onConnect();
-		}
+		if (err) onError(err);
+		else onConnect();
 	}
-	
+
 	void onWritable(WritableNotification* pNotification)
 	{
+		unregisterConnector();
 		pNotification->release();
 		onConnect();
 	}
-	
+
+	void onError(ErrorNotification* pNotification)
+	{
+		unregisterConnector();
+		pNotification->release();
+		onError(_socket.impl()->socketError());
+	}
+
 	void onConnect()
 	{
 		_socket.setBlocking(true);
 		createServiceHandler();
-		unregisterConnector();
 	}
-	
-	void onError(ErrorNotification* pNotification)
-	{
-		pNotification->release();
-		onError(_socket.impl()->socketError());
-		unregisterConnector();
-	}
-	
+
 protected:
 	virtual ServiceHandler* createServiceHandler()
 		/// Create and initialize a new ServiceHandler instance.
@@ -182,7 +176,7 @@ protected:
 		/// Subclasses can override this method.
 	{
 	}
-	
+
 	SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketConnector is registered.
@@ -191,7 +185,7 @@ protected:
 	{
 		return _pReactor;
 	}
-	
+
 	StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{

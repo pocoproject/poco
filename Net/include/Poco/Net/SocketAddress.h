@@ -138,6 +138,9 @@ public:
 	SocketAddress(const SocketAddress& addr);
 		/// Creates a SocketAddress by copying another one.
 
+	SocketAddress(SocketAddress&& addr);
+		/// Creates a SocketAddress by moving another one.
+
 	SocketAddress(const struct sockaddr* addr, poco_socklen_t length);
 		/// Creates a SocketAddress from a native socket address.
 
@@ -146,6 +149,9 @@ public:
 
 	SocketAddress& operator = (const SocketAddress& socketAddress);
 		/// Assigns another SocketAddress.
+
+	SocketAddress& operator = (SocketAddress&& socketAddress);
+		/// Move-assigns another SocketAddress.
 
 	IPAddress host() const;
 		/// Returns the host IP address.

@@ -104,5 +104,5 @@
 				<pattern>%s: [%p] %t</pattern>
 			</c1>
 		</channels>
-	</logging>	
+	</logging>
 </AppConfig>

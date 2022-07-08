@@ -48,46 +48,46 @@ int main()
 
 	m l = cm(42);
 	std::cout << cm(42) << " == " << l << " == " << milli(l) << std::endl;
-	std::cout << "Area of circle with radius " << l << 
+	std::cout << "Area of circle with radius " << l <<
 		" is " << mm2(square(l) * pi) << std::endl;
 
 	SpecificWeight sw(9.81); // water
 
-	std::cout << "Volume of a water cube with side size " << m(0.1) << 
-		" is " << liter(cube(m(0.1))) << 
+	std::cout << "Volume of a water cube with side size " << m(0.1) <<
+		" is " << liter(cube(m(0.1))) <<
 		" and weighs " << N(sw * cube(m(.1))) << std::endl;
 
 	m radius_equator(6378135);
 	m radius_pole(6356750);
 	m3 vol((pi * square(radius_equator) * radius_pole) * 4/3);
 
-	std::cout << "Volume of Earth is " << vol 
+	std::cout << "Volume of Earth is " << vol
 		<< " (" << yotta(liter(vol)) << ")" << std::endl;
 	std::cout << "It takes " << minute(AU/c) << " for a Sun beam to reach Earth." << std::endl;
 
 
-	std::cout << std::endl << m(1) << " is:" << std::endl; 
-	std::cout << "-------------" << std::endl; 
+	std::cout << std::endl << m(1) << " is:" << std::endl;
+	std::cout << "-------------" << std::endl;
 
-	std::cout << deca(m(1)) << std::endl; 
+	std::cout << deca(m(1)) << std::endl;
 	std::cout << hecto(m(1)) << std::endl;
-	std::cout << kilo(m(1)) << std::endl; 
-	std::cout << mega(m(1)) << std::endl; 
-	std::cout << giga(m(1)) << std::endl; 
-	std::cout << tera(m(1)) << std::endl; 
-	std::cout << peta(m(1)) << std::endl; 
-	std::cout << exa(m(1)) << std::endl; 
+	std::cout << kilo(m(1)) << std::endl;
+	std::cout << mega(m(1)) << std::endl;
+	std::cout << giga(m(1)) << std::endl;
+	std::cout << tera(m(1)) << std::endl;
+	std::cout << peta(m(1)) << std::endl;
+	std::cout << exa(m(1)) << std::endl;
 	std::cout << zetta(m(1)) << std::endl;
 	std::cout << yotta(m(1)) << std::endl;
-				 
-	std::cout << deci(m(1)) << std::endl; 
+
+	std::cout << deci(m(1)) << std::endl;
 	std::cout << centi(m(1)) << std::endl;
 	std::cout << milli(m(1)) << std::endl;
 	std::cout << micro(m(1)) << std::endl;
-	std::cout << nano(m(1)) << std::endl; 
-	std::cout << pico(m(1)) << std::endl; 
+	std::cout << nano(m(1)) << std::endl;
+	std::cout << pico(m(1)) << std::endl;
 	std::cout << femto(m(1)) << std::endl;
-	std::cout << atto(m(1)) << std::endl; 
+	std::cout << atto(m(1)) << std::endl;
 	std::cout << zepto(m(1)) << std::endl;
 	std::cout << yocto(m(1)) << std::endl;
 

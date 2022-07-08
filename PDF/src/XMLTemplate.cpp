@@ -457,7 +457,7 @@ public:
 		AttributedString::Alignment align = AttributedString::ALIGN_LEFT;
 		int style = AttributedString::STYLE_PLAIN;
 
-		
+
 		std::string fontFamily = _styles.getString("font-family");
 		float       fontSize = _styles.getFloat("font-size");
 		std::string textAlign = _styles.getString("text-align", "left");

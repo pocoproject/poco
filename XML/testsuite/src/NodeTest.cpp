@@ -48,10 +48,10 @@ void NodeTest::testInsert()
 	assertTrue (pRoot->hasChildNodes());
 	assertTrue (pRoot->firstChild() == pChild1);
 	assertTrue (pRoot->lastChild() == pChild1);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild3 = pDoc->createElement("child3");
 	pRoot->insertBefore(pChild3, 0);
 	assertTrue (pRoot->firstChild() == pChild1);
@@ -66,14 +66,14 @@ void NodeTest::testInsert()
 	pRoot->insertBefore(pChild0, pChild1);
 	assertTrue (pRoot->firstChild() == pChild0);
 	assertTrue (pRoot->lastChild() == pChild3);
-	
+
 	assertTrue (pChild0->previousSibling() == 0);
 	assertTrue (pChild0->nextSibling() == pChild1);
 	assertTrue (pChild1->previousSibling() == pChild0);
 	assertTrue (pChild1->nextSibling() == pChild3);
 	assertTrue (pChild3->previousSibling() == pChild1);
 	assertTrue (pChild3->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
 	pRoot->insertBefore(pChild2, pChild3);
 	assertTrue (pRoot->firstChild() == pChild0);
@@ -143,11 +143,11 @@ void NodeTest::testRemove()
 
 	AutoPtr<Element> pChild4 = pDoc->createElement("child4");
 	pRoot->appendChild(pChild4);
-	
+
 	pRoot->removeChild(pChild2);
 	assertTrue (pChild2->previousSibling() == 0);
 	assertTrue (pChild2->nextSibling() == 0);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == pChild3);
 	assertTrue (pChild3->previousSibling() == pChild1);
@@ -158,7 +158,7 @@ void NodeTest::testRemove()
 	pRoot->removeChild(pChild4);
 	assertTrue (pChild4->previousSibling() == 0);
 	assertTrue (pChild4->nextSibling() == 0);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == pChild3);
 	assertTrue (pChild3->previousSibling() == pChild1);
@@ -170,10 +170,10 @@ void NodeTest::testRemove()
 	pRoot->removeChild(pChild1);
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
-	
+
 	assertTrue (pRoot->firstChild() == pChild3);
 	assertTrue (pRoot->lastChild() == pChild3);
-	
+
 	pRoot->removeChild(pChild3);
 	assertTrue (pChild3->previousSibling() == 0);
 	assertTrue (pChild3->nextSibling() == 0);
@@ -201,7 +201,7 @@ void NodeTest::testReplace()
 
 	AutoPtr<Element> pChild11 = pDoc->createElement("child11");
 	pRoot->replaceChild(pChild11, pChild1);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
 	assertTrue (pRoot->firstChild() == pChild11);
@@ -282,10 +282,10 @@ void NodeTest::testInsertFragment1()
 	assertTrue (pFrag->lastChild() == 0);
 	assertTrue (pRoot->firstChild() == pChild1);
 	assertTrue (pRoot->lastChild() == pChild1);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild3 = pDoc->createElement("child3");
 	pFrag->appendChild(pChild3);
 	pRoot->insertBefore(pFrag, 0);
@@ -302,14 +302,14 @@ void NodeTest::testInsertFragment1()
 	pRoot->insertBefore(pFrag, pChild1);
 	assertTrue (pRoot->firstChild() == pChild0);
 	assertTrue (pRoot->lastChild() == pChild3);
-	
+
 	assertTrue (pChild0->previousSibling() == 0);
 	assertTrue (pChild0->nextSibling() == pChild1);
 	assertTrue (pChild1->previousSibling() == pChild0);
 	assertTrue (pChild1->nextSibling() == pChild3);
 	assertTrue (pChild3->previousSibling() == pChild1);
 	assertTrue (pChild3->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
 	pFrag->appendChild(pChild2);
 	pRoot->insertBefore(pFrag, pChild3);
@@ -346,12 +346,12 @@ void NodeTest::testInsertFragment2()
 	assertTrue (pFrag->lastChild() == 0);
 	assertTrue (pRoot->firstChild() == pChild2);
 	assertTrue (pRoot->lastChild() == pChild3);
-	
+
 	assertTrue (pChild2->previousSibling() == 0);
 	assertTrue (pChild2->nextSibling() == pChild3);
 	assertTrue (pChild3->previousSibling() == pChild2);
 	assertTrue (pChild3->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild6 = pDoc->createElement("child6");
 	AutoPtr<Element> pChild7 = pDoc->createElement("child7");
 	pFrag->appendChild(pChild6);
@@ -376,7 +376,7 @@ void NodeTest::testInsertFragment2()
 	pRoot->insertBefore(pFrag, pChild2);
 	assertTrue (pRoot->firstChild() == pChild0);
 	assertTrue (pRoot->lastChild() == pChild7);
-	
+
 	assertTrue (pChild0->previousSibling() == 0);
 	assertTrue (pChild0->nextSibling() == pChild1);
 	assertTrue (pChild1->previousSibling() == pChild0);
@@ -389,7 +389,7 @@ void NodeTest::testInsertFragment2()
 	assertTrue (pChild6->nextSibling() == pChild7);
 	assertTrue (pChild7->previousSibling() == pChild6);
 	assertTrue (pChild7->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild4 = pDoc->createElement("child4");
 	AutoPtr<Element> pChild5 = pDoc->createElement("child5");
 	pFrag->appendChild(pChild4);
@@ -438,14 +438,14 @@ void NodeTest::testInsertFragment3()
 	assertTrue (pFrag->lastChild() == 0);
 	assertTrue (pRoot->firstChild() == pChild3);
 	assertTrue (pRoot->lastChild() == pChild5);
-	
+
 	assertTrue (pChild3->previousSibling() == 0);
 	assertTrue (pChild3->nextSibling() == pChild4);
 	assertTrue (pChild4->previousSibling() == pChild3);
 	assertTrue (pChild4->nextSibling() == pChild5);
 	assertTrue (pChild5->previousSibling() == pChild4);
 	assertTrue (pChild5->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild9  = pDoc->createElement("child9");
 	AutoPtr<Element> pChild10 = pDoc->createElement("child10");
 	AutoPtr<Element> pChild11 = pDoc->createElement("child11");
@@ -478,7 +478,7 @@ void NodeTest::testInsertFragment3()
 	pRoot->insertBefore(pFrag, pChild3);
 	assertTrue (pRoot->firstChild() == pChild0);
 	assertTrue (pRoot->lastChild() == pChild11);
-	
+
 	assertTrue (pChild0->previousSibling() == 0);
 	assertTrue (pChild0->nextSibling() == pChild1);
 	assertTrue (pChild1->previousSibling() == pChild0);
@@ -497,7 +497,7 @@ void NodeTest::testInsertFragment3()
 	assertTrue (pChild10->nextSibling() == pChild11);
 	assertTrue (pChild11->previousSibling() == pChild10);
 	assertTrue (pChild11->nextSibling() == 0);
-	
+
 	AutoPtr<Element> pChild6 = pDoc->createElement("child6");
 	AutoPtr<Element> pChild7 = pDoc->createElement("child7");
 	AutoPtr<Element> pChild8 = pDoc->createElement("child8");
@@ -539,7 +539,7 @@ void NodeTest::testAppendFragment1()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
-	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();	
+	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();
 
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pFrag->appendChild(pChild1);
@@ -582,7 +582,7 @@ void NodeTest::testAppendFragment2()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
-	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();	
+	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();
 
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
@@ -643,7 +643,7 @@ void NodeTest::testAppendFragment3()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
-	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();	
+	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();
 
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
@@ -722,7 +722,7 @@ void NodeTest::testReplaceFragment1()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
-	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();	
+	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();
 
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
@@ -741,7 +741,7 @@ void NodeTest::testReplaceFragment1()
 	pRoot->replaceChild(pFrag, pChild1);
 	assertTrue (pFrag->firstChild() == 0);
 	assertTrue (pFrag->lastChild() == 0);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
 	assertTrue (pRoot->firstChild() == pChild11);
@@ -812,7 +812,7 @@ void NodeTest::testReplaceFragment2()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
-	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();	
+	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();
 
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
@@ -833,7 +833,7 @@ void NodeTest::testReplaceFragment2()
 	pRoot->replaceChild(pFrag, pChild1);
 	assertTrue (pFrag->firstChild() == 0);
 	assertTrue (pFrag->lastChild() == 0);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
 	assertTrue (pRoot->firstChild() == pChild11);
@@ -930,7 +930,7 @@ void NodeTest::testReplaceFragment3()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
-	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();	
+	AutoPtr<DocumentFragment> pFrag = pDoc->createDocumentFragment();
 
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
@@ -953,7 +953,7 @@ void NodeTest::testReplaceFragment3()
 	pRoot->replaceChild(pFrag, pChild1);
 	assertTrue (pFrag->firstChild() == 0);
 	assertTrue (pFrag->lastChild() == 0);
-	
+
 	assertTrue (pChild1->previousSibling() == 0);
 	assertTrue (pChild1->nextSibling() == 0);
 	assertTrue (pRoot->firstChild() == pChild11);

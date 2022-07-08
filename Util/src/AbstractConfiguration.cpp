@@ -14,6 +14,7 @@
 
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/ConfigurationView.h"
+#include "Poco/Util/LocalConfigurationView.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
@@ -33,7 +34,7 @@ namespace Poco {
 namespace Util {
 
 
-AbstractConfiguration::AbstractConfiguration(): 
+AbstractConfiguration::AbstractConfiguration():
 	_depth(0),
 	_eventsEnabled(true)
 {
@@ -65,7 +66,7 @@ bool AbstractConfiguration::has(const std::string& key) const
 	return hasProperty(key);
 }
 
-	
+
 std::string AbstractConfiguration::getString(const std::string& key) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -77,7 +78,7 @@ std::string AbstractConfiguration::getString(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 std::string AbstractConfiguration::getString(const std::string& key, const std::string& defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -101,10 +102,10 @@ std::string AbstractConfiguration::getRawString(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 std::string AbstractConfiguration::getRawString(const std::string& key, const std::string& defaultValue) const
 {
-	
+
 	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
@@ -114,7 +115,7 @@ std::string AbstractConfiguration::getRawString(const std::string& key, const st
 		return defaultValue;
 }
 
-	
+
 int AbstractConfiguration::getInt(const std::string& key) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -126,7 +127,7 @@ int AbstractConfiguration::getInt(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 int AbstractConfiguration::getInt(const std::string& key, int defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -228,7 +229,7 @@ double AbstractConfiguration::getDouble(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 double AbstractConfiguration::getDouble(const std::string& key, double defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -270,13 +271,13 @@ void AbstractConfiguration::setString(const std::string& key, const std::string&
 	setRawWithEvent(key, value);
 }
 
-	
+
 void AbstractConfiguration::setInt(const std::string& key, int value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt(const std::string& key, unsigned int value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
@@ -348,6 +349,18 @@ AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& 
 }
 
 
+const AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::string& prefix) const
+{
+	return new LocalConfigurationView(prefix, AbstractConfiguration::Ptr(const_cast<AbstractConfiguration*>(this), true));
+}
+
+
+AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::string& prefix)
+{
+	return new LocalConfigurationView(prefix, AbstractConfiguration::Ptr(this, true));
+}
+
+
 namespace
 {
 	class AutoCounter
@@ -357,12 +370,12 @@ namespace
 		{
 			++_count;
 		}
-		
+
 		~AutoCounter()
 		{
 			--_count;
 		}
-		
+
 	private:
 		int& _count;
 	};
@@ -384,7 +397,7 @@ void AbstractConfiguration::remove(const std::string& key)
 		propertyRemoving(this, key);
 	}
 	{
-		
+
 		Mutex::ScopedLock lock(_mutex);
 		removeRaw(key);
 	}
@@ -400,7 +413,7 @@ void AbstractConfiguration::enableEvents(bool enable)
 	_eventsEnabled = enable;
 }
 
-	
+
 bool AbstractConfiguration::eventsEnabled() const
 {
 	return _eventsEnabled;
@@ -510,7 +523,7 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 		return false;
 	else if (icompare(value, "off") == 0)
 		return false;
-	else 
+	else
 		throw SyntaxException("Cannot convert to boolean", value);
 }
 

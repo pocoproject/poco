@@ -43,6 +43,17 @@ class SQLite_API Utility
 	/// Various utility functions for SQLite.
 {
 public:
+
+	// SQLite Transaction type
+	static const std::string TRANSACTION_TYPE_PROPERTY_KEY;
+
+	enum class TransactionType
+	{
+		DEFERRED,
+		EXCLUSIVE,
+		IMMEDIATE
+	};
+
 	static const std::string SQLITE_DATE_FORMAT;
 	static const std::string SQLITE_TIME_FORMAT;
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
@@ -73,37 +84,37 @@ public:
 	static bool fileToMemory(sqlite3* pInMemory, const std::string& fileName);
 		/// Loads the contents of a database file on disk into an opened
 		/// database in memory.
-		/// 
+		///
 		/// Returns true if succesful.
 
 	static bool fileToMemory(const Session& session, const std::string& fileName);
 		/// Loads the contents of a database file on disk into an opened
 		/// database in memory.
-		/// 
+		///
 		/// Returns true if succesful.
 
 	static bool memoryToFile(const std::string& fileName, sqlite3* pInMemory);
 		/// Saves the contents of an opened database in memory to the
 		/// database on disk.
-		/// 
+		///
 		/// Returns true if succesful.
 
 	static bool memoryToFile(const std::string& fileName, const Session& session);
 		/// Saves the contents of an opened database in memory to the
 		/// database on disk.
-		/// 
+		///
 		/// Returns true if succesful.
 
 	static bool isThreadSafe();
 		/// Returns true if SQLite was compiled in multi-thread or serialized mode.
 		/// See http://www.sqlite.org/c3ref/threadsafe.html for details.
-		/// 
+		///
 		/// Returns true if succesful
 
 	static bool setThreadMode(int mode);
 		/// Sets the threading mode to single, multi or serialized.
 		/// See http://www.sqlite.org/threadsafe.html for details.
-		/// 
+		///
 		/// Returns true if succesful
 
 	static int getThreadMode();
@@ -111,7 +122,7 @@ public:
 
 	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, Poco::Int64);
 		/// Update callback function type.
- 
+
 	typedef int(*CommitCallbackType)(void*);
 		/// Commit callback function type.
 
@@ -120,13 +131,13 @@ public:
 
 	template <typename T, typename CBT>
 	static bool registerUpdateHandler(sqlite3* pDB, CBT callbackFn, T* pParam)
-		/// Registers the callback for (1)(insert, delete, update), (2)(commit) or 
+		/// Registers the callback for (1)(insert, delete, update), (2)(commit) or
 		/// or (3)(rollback) events. Only one function per group can be registered
 		/// at a time. Registration is not thread-safe. Storage pointed to by pParam
 		/// must remain valid as long as registration is active. Registering with
 		/// callbackFn set to zero disables notifications.
-		/// 
-		/// See http://www.sqlite.org/c3ref/update_hook.html and 
+		///
+		/// See http://www.sqlite.org/c3ref/update_hook.html and
 		/// http://www.sqlite.org/c3ref/commit_hook.html for details.
 	{
 		typedef std::pair<CBT, T*> CBPair;
@@ -190,11 +201,11 @@ private:
 	Utility();
 		/// Maps SQLite column declared types to Poco::Data types through
 		/// static TypeMap member.
-		/// 
+		///
 		/// Note: SQLite is type-agnostic and it is the end-user responsibility
-		/// to ensure that column declared data type corresponds to the type of 
+		/// to ensure that column declared data type corresponds to the type of
 		/// data actually held in the database.
-		/// 
+		///
 		/// Column types are case-insensitive.
 
 	Utility(const Utility&);
@@ -208,6 +219,9 @@ private:
 	static Poco::Mutex _mutex;
 	static int         _threadMode;
 };
+
+
+using TransactionType = Utility::TransactionType;
 
 
 //

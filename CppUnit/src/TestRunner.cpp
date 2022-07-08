@@ -41,7 +41,7 @@ void TestRunner::printBanner()
 }
 
 
-bool TestRunner::run(const std::vector<std::string>& args)
+bool TestRunner::run(const std::vector<std::string>& args, const Test::Callback& callback)
 {
 	std::string testCase;
 	int numberOfTests = 0;
@@ -139,7 +139,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		if (setup.size() > 0)
 			testToRun->addSetup(setup);
 
-		testToRun->run(&result);
+		testToRun->run(&result, callback);
 		numberOfTests++;
 	}
 	_ostr << result << std::endl;

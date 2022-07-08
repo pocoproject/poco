@@ -49,7 +49,7 @@ using Poco::NotFoundException;
 
 
 ODBCTest::Drivers ODBCTest::_drivers;
-const bool        ODBCTest::_bindValues[8] = 
+const bool        ODBCTest::_bindValues[8] =
 	{true, true, true, false, false, true, false, false};
 
 
@@ -59,7 +59,7 @@ ODBCTest::ODBCTest(const std::string& name,
 	std::string& rDSN,
 	std::string& rUID,
 	std::string& rPwd,
-	std::string& rConnectString): 
+	std::string& rConnectString):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
 	_pExecutor(pExecutor),
@@ -212,7 +212,7 @@ void ODBCTest::testInsertVector()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertVector();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -227,7 +227,7 @@ void ODBCTest::testInsertEmptyVector()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertEmptyVector();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -257,7 +257,7 @@ void ODBCTest::testComplexTypeList()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->complexTypeList();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -272,7 +272,7 @@ void ODBCTest::testInsertList()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertList();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -287,7 +287,7 @@ void ODBCTest::testInsertEmptyList()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertEmptyList();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -317,7 +317,7 @@ void ODBCTest::testComplexTypeDeque()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->complexTypeDeque();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -332,7 +332,7 @@ void ODBCTest::testInsertDeque()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertDeque();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -347,7 +347,7 @@ void ODBCTest::testInsertEmptyDeque()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertEmptyDeque();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -362,7 +362,7 @@ void ODBCTest::testAffectedRows()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->affectedRows();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -377,7 +377,7 @@ void ODBCTest::testInsertSingleBulk()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertSingleBulk();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -392,7 +392,7 @@ void ODBCTest::testInsertSingleBulkVec()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->insertSingleBulkVec();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -422,7 +422,7 @@ void ODBCTest::testLimitZero()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->limitZero();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -432,7 +432,7 @@ void ODBCTest::testLimitOnce()
 
 	recreateIntsTable();
 	_pExecutor->limitOnce();
-	
+
 }
 
 
@@ -579,7 +579,7 @@ void ODBCTest::testMultiSetComplex()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->multiSetComplex();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -654,7 +654,7 @@ void ODBCTest::testSelectIntoSingleStep()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->selectIntoSingleStep();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -669,7 +669,7 @@ void ODBCTest::testSelectIntoSingleFail()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->selectIntoSingleFail();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -684,7 +684,7 @@ void ODBCTest::testLowerLimitOk()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->lowerLimitOk();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -699,7 +699,7 @@ void ODBCTest::testSingleSelect()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->singleSelect();
 		i += 2;
-	}	
+	}
 }
 
 
@@ -1252,6 +1252,25 @@ void ODBCTest::testUnicode()
 }
 
 
+void ODBCTest::testEncoding()
+{
+#if defined (POCO_ODBC_UNICODE)
+	if (!_pSession) fail("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateEncodingTables();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i + 1));
+		_pExecutor->encoding(_rConnectString);
+		i += 2;
+	}
+#else
+	std::cout << "Not an UNICODE build, skipping." << std::endl;
+#endif
+}
+
+
 void ODBCTest::testReconnect()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1281,13 +1300,13 @@ bool ODBCTest::canConnect(const std::string& driver,
 	{
 		if (((itDrv->first).find(driver) != std::string::npos))
 		{
-			std::cout << "Driver found: " << itDrv->first 
+			std::cout << "Driver found: " << itDrv->first
 				<< " (" << itDrv->second << ')' << std::endl;
 			break;
 		}
 	}
 
-	if (_drivers.end() == itDrv) 
+	if (_drivers.end() == itDrv)
 	{
 		dsn = "";
 		uid = "";
@@ -1341,15 +1360,19 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	std::string& uid,
 	std::string& pwd,
 	std::string& dbConnString,
-	const std::string& db)
+	const std::string& db,
+	const std::string& dbEncoding)
 {
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
-	
+
 	try
 	{
 		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
-		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
+		SessionPtr ptr = new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
+		if (!dbEncoding.empty())
+			ptr->setProperty("dbEncoding", dbEncoding);
+		return ptr;
 	}catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;

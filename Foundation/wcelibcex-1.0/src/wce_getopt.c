@@ -74,8 +74,8 @@ int optreset;       /* reset getopt */
 *   A question mark (?) is returned if getopt() encounters an option
 *   character not in optstring or detects a missing argument and the first
 *   character of optstring was not a colon (:).
-*   Otherwise getopt() returns -1 when all command line options are parsed. 
-* 
+*   Otherwise getopt() returns -1 when all command line options are parsed.
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition

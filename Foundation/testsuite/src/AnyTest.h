@@ -23,20 +23,22 @@ public:
 	AnyTest(const std::string& name);
 	~AnyTest();
 
-	void testConvertingCtor();
-	void testDefaultCtor();
-	void testCopyCtor();
-	void testCopyAssign();
-	void testConvertingAssign();
-	void testBadCast();
-	void testSwap();
-	void testEmptyCopy();
-	void testCastToReference();
+	void testAnyConvertingCtor();
+	void testAnyDefaultCtor();
+	void testAnyCopyCtor();
+	void testAnyCopyAssign();
+	void testAnyConvertingAssign();
+	void testAnyBadCast();
+	void testAnySwap();
+	void testAnyEmptyCopy();
+	void testAnyCastToReference();
 
-	void testInt();
-	void testComplexType();
-	void testVector();
-	
+	void testAnyInt();
+	void testAnyComplexType();
+	void testAnyVector();
+
+	void testPlaceholder();
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();

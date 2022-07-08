@@ -93,7 +93,7 @@ File& File::operator = (const Path& path)
 }
 
 
-void File::swap(File& file)
+void File::swap(File& file) noexcept
 {
 	swapImpl(file);
 }

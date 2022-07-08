@@ -29,24 +29,24 @@ namespace XML {
 class XML_API Attributes
 	/// Interface for a list of XML attributes.
 	/// This interface allows access to a list of attributes in three different ways:
-	///   1.by attribute index; 
-	///   2.by Namespace-qualified name; or 
-	///   3.by qualified (prefixed) name. 
-	/// 
-	/// The list will not contain attributes that were declared #IMPLIED but not 
+	///   1.by attribute index;
+	///   2.by Namespace-qualified name; or
+	///   3.by qualified (prefixed) name.
+	///
+	/// The list will not contain attributes that were declared #IMPLIED but not
 	/// specified in the start tag. It will also not contain
-	/// attributes used as Namespace declarations (xmlns*) unless the 
+	/// attributes used as Namespace declarations (xmlns*) unless the
 	/// http://xml.org/sax/features/namespace-prefixes
 	/// feature is set to true (it is false by default).
-	/// 
-	/// If the namespace-prefixes feature (see above) is false, access by 
+	///
+	/// If the namespace-prefixes feature (see above) is false, access by
 	/// qualified name may not be available; if the
-	/// http://xml.org/sax/features/namespaces feature is false, access by 
+	/// http://xml.org/sax/features/namespaces feature is false, access by
 	/// Namespace-qualified names may not be available.
-	/// This interface replaces the now-deprecated SAX1 AttributeList interface, 
+	/// This interface replaces the now-deprecated SAX1 AttributeList interface,
 	/// which does not contain Namespace support. In
 	/// addition to Namespace support, it adds the getIndex methods (below).
-	/// The order of attributes in the list is unspecified, and will vary from 
+	/// The order of attributes in the list is unspecified, and will vary from
 	/// implementation to implementation.
 {
 public:
@@ -60,7 +60,7 @@ public:
 		/// Return the number of attributes in the list.
 		///
 		/// Once you know the number of attributes, you can iterate through the list.
-		
+
 	virtual const XMLString& getLocalName(int i) const = 0;
 		/// Look up a local attribute name by index.
 
@@ -70,14 +70,14 @@ public:
 	virtual const XMLString& getType(int i) const = 0;
 		/// Look up an attribute type by index.
 		///
-		/// The attribute type is one of the strings "CDATA", "ID", "IDREF", "IDREFS", "NMTOKEN", 
+		/// The attribute type is one of the strings "CDATA", "ID", "IDREF", "IDREFS", "NMTOKEN",
 		/// "NMTOKENS", "ENTITY", "ENTITIES", or "NOTATION" (always in upper case).
 		///
-		/// If the parser has not read a declaration for the attribute, or if the parser does not 
-		/// report attribute types, then it must return the value "CDATA" as stated in the XML 1.0 
+		/// If the parser has not read a declaration for the attribute, or if the parser does not
+		/// report attribute types, then it must return the value "CDATA" as stated in the XML 1.0
 		/// Recommendation (clause 3.3.3, "Attribute-Value Normalization").
-		/// 
-		/// For an enumerated attribute that is not a notation, the parser will report the type 
+		///
+		/// For an enumerated attribute that is not a notation, the parser will report the type
 		/// as "NMTOKEN".
 
 	virtual const XMLString& getType(const XMLString& qname) const = 0;
@@ -93,7 +93,7 @@ public:
 	virtual const XMLString& getValue(int i) const = 0;
 		/// Look up an attribute value by index.
 		///
-		/// If the attribute value is a list of tokens (IDREFS, ENTITIES, or NMTOKENS), the tokens 
+		/// If the attribute value is a list of tokens (IDREFS, ENTITIES, or NMTOKENS), the tokens
 		/// will be concatenated into a single string with each token separated by a single space.
 
 	virtual const XMLString& getValue(const XMLString& qname) const = 0;

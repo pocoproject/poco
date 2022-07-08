@@ -31,7 +31,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 
 	for (; it != end; ++it)
 	{
-		if (separators.find(*it) != std::string::npos) 
+		if (separators.find(*it) != std::string::npos)
 		{
 			if (doTrim) trim(token);
 			if (!token.empty() || !ignoreEmpty) _tokens.push_back(token);
@@ -50,7 +50,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 		if (doTrim) trim(token);
 		if (!token.empty() || !ignoreEmpty) _tokens.push_back(token);
 	}
-	else if (lastToken) 
+	else if (lastToken)
 	{
 		_tokens.push_back(std::string());
 	}
@@ -100,7 +100,7 @@ std::size_t StringTokenizer::count(const std::string& token) const
 
 
 std::string::size_type StringTokenizer::find(const std::string& token, std::string::size_type pos) const
-{	
+{
 	TokenVec::const_iterator it = std::find(_tokens.begin() + pos, _tokens.end(), token);
 	if (it != _tokens.end())
 	{

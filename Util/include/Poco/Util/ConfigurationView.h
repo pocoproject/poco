@@ -27,9 +27,9 @@ namespace Util {
 
 
 class Util_API ConfigurationView: public AbstractConfiguration
-	/// This configuration implements a "view" into a sub-hierarchy 
+	/// This configuration implements a "view" into a sub-hierarchy
 	/// of another configuration.
-	/// 
+	///
 	/// For example, given a configuration with the following properties:
 	///     config.value1
 	///     config.value2
@@ -62,9 +62,9 @@ protected:
 	void setRaw(const std::string& key, const std::string& value);
 	void enumerate(const std::string& key, Keys& range) const;
 	void removeRaw(const std::string& key);
-	
+
 	std::string translateKey(const std::string& key) const;
-	
+
 	~ConfigurationView();
 
 private:

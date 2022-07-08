@@ -30,7 +30,10 @@ namespace ODBC {
 Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
-	const TypeInfo* pDataTypes):
+	const TypeInfo* pDataTypes,
+	Poco::TextEncoding::Ptr pFromEncoding,
+	Poco::TextEncoding::Ptr pDBEncoding):
+	Poco::Data::AbstractBinder(pFromEncoding, pDBEncoding),
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
@@ -99,13 +102,30 @@ void Binder::freeMemory()
 	DateTimeVecVec::iterator itDateTimeVec = _dateTimeVecVec.begin();
 	DateTimeVecVec::iterator itDateTimeVecEnd = _dateTimeVecVec.end();
 	for (; itDateTimeVec != itDateTimeVecEnd; ++itDateTimeVec) delete *itDateTimeVec;
+
+	if (transcodeRequired() && _inParams.size())
+	{
+		ParamMap::iterator itInParams = _inParams.begin();
+		ParamMap::iterator itInParamsEnd = _inParams.end();
+		for (; itInParams != itInParamsEnd; ++itInParams) free(itInParams->first);
+	}
 }
 
 
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
+	char* pTCVal = 0;
+	SQLINTEGER size = 0;
+	if (transcodeRequired())
+	{
+		std::string tcVal;
+		transcode(val, tcVal);
+		size = (SQLINTEGER)tcVal.size();
+		pTCVal = reinterpret_cast<char*>(std::calloc((size_t)size+1, 1));
+		std::memcpy(pTCVal, tcVal.data(), size);
+	}
+	else size = (SQLINTEGER)val.size();
 	SQLPOINTER pVal = 0;
-	SQLINTEGER size = (SQLINTEGER) val.size();
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits, val.size());
@@ -120,8 +140,16 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	}
 	else if (isInBound(dir))
 	{
-		pVal = (SQLPOINTER) val.c_str();
-		_inParams.insert(ParamMap::value_type(pVal, size));
+		if (!pTCVal)
+		{
+			pVal = (SQLPOINTER)val.c_str();
+			_inParams.insert(ParamMap::value_type(pVal, size));
+		}
+		else
+		{
+			pVal = (SQLPOINTER)pTCVal;
+			_inParams.insert(ParamMap::value_type(pVal, size));
+		}
 	}
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
@@ -421,12 +449,28 @@ void Binder::synchronize()
 			Utility::dateTimeSync(*it->second, *it->first);
 	}
 
-	if (_strings.size())
+	if (!transcodeRequired())
 	{
-		StringMap::iterator it = _strings.begin();
-		StringMap::iterator end = _strings.end();
-		for(; it != end; ++it)
-			it->second->assign(it->first, std::strlen(it->first));
+		if (_strings.size())
+		{
+			StringMap::iterator it = _strings.begin();
+			StringMap::iterator end = _strings.end();
+			for (; it != end; ++it)
+				it->second->assign(it->first, std::strlen(it->first));
+		}
+	}
+	else
+	{
+		if (_strings.size())
+		{
+			StringMap::iterator it = _strings.begin();
+			StringMap::iterator end = _strings.end();
+			for (; it != end; ++it)
+			{
+				std::string str(it->first, std::strlen(it->first));
+				reverseTranscode(str, *it->second);
+			}
+		}
 	}
 
 	if (_uuids.size())

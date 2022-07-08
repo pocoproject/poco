@@ -37,12 +37,12 @@ public:
 	MultipartStreamBuf(std::istream& istr, const std::string& boundary);
 	~MultipartStreamBuf();
 	bool lastPart() const;
-	
+
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -98,7 +98,7 @@ class Net_API MultipartReader
 public:
 	explicit MultipartReader(std::istream& istr);
 		/// Creates the MultipartReader and attaches it to the
-		/// given input stream. 
+		/// given input stream.
 		///
 		/// The boundary string is determined from the input
 		/// stream. The message must not contain a preamble
@@ -119,13 +119,13 @@ public:
 		/// Throws an MultipartException if there are no more parts
 		/// available, or if no boundary line can be found in
 		/// the input stream.
-		
+
 	bool hasNextPart();
 		/// Returns true iff more parts are available.
 		///
 		/// Before the first call to nextPart(), returns
 		/// always true.
-		
+
 	std::istream& stream() const;
 		/// Returns a reference to the reader's stream that
 		/// can be used to read the current part.
@@ -142,7 +142,7 @@ protected:
 	void guessBoundary();
 	void parseHeader(MessageHeader& messageHeader);
 	bool readLine(std::string& line, std::string::size_type n);
-	
+
 private:
 	MultipartReader();
 	MultipartReader(const MultipartReader&);

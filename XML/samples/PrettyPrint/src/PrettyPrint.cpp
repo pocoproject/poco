@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 
 	SAXParser parser;
 	WhitespaceFilter filter(&parser);
-	
+
 	XMLWriter writer(std::cout, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
 	writer.setNewLine(XMLWriter::NEWLINE_LF);
 

@@ -39,7 +39,7 @@ void TextBufferIteratorTest::testEmptyLatin1()
 	const char* text = "";
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it == end);
 }
 
@@ -50,7 +50,7 @@ void TextBufferIteratorTest::testOneLatin1()
 	const char* text = "x";
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it != end);
 	assertTrue (*it == 'x');
 	++it;
@@ -64,7 +64,7 @@ void TextBufferIteratorTest::testLatin1()
 	const char* text = "Latin1";
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 'L');
 	assertTrue (it != end);
@@ -78,7 +78,7 @@ void TextBufferIteratorTest::testLatin1()
 	assertTrue (it != end);
 	assertTrue (*it++ == '1');
 	assertTrue (it == end);
-	
+
 	const char* empty = "";
 	it  = TextBufferIterator(empty, encoding);
 	end = it.end();
@@ -92,7 +92,7 @@ void TextBufferIteratorTest::testEmptyUTF8()
 	const char* text = "";
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(text);
-	
+
 	assertTrue (it == end);
 }
 
@@ -100,25 +100,25 @@ void TextBufferIteratorTest::testEmptyUTF8()
 void TextBufferIteratorTest::testOneUTF8()
 {
 	UTF8Encoding encoding;
-	
+
 	// 1 byte sequence
 	const char* text = "x";
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it != end);
 	assertTrue (*it == 'x');
 	++it;
 	assertTrue (it == end);
-	
+
 	unsigned char data[Poco::TextEncoding::MAX_SEQUENCE_LENGTH];
-	
+
 	// 2 byte sequence
 	int n = encoding.convert(0xab, data, sizeof(data));
 	assertTrue (n == 2);
 	it  = TextBufferIterator(reinterpret_cast<const char*>(data), n, encoding);
 	end = it.end();
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0xab);
 	assertTrue (it == end);
@@ -128,7 +128,7 @@ void TextBufferIteratorTest::testOneUTF8()
 	assertTrue (n == 3);
 	it  = TextBufferIterator(reinterpret_cast<const char*>(data), n, encoding);
 	end = it.end();
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0xabcd);
 	assertTrue (it == end);
@@ -138,11 +138,11 @@ void TextBufferIteratorTest::testOneUTF8()
 	assertTrue (n == 4);
 	it  = TextBufferIterator(reinterpret_cast<const char*>(data), n, encoding);
 	end = it.end();
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0xabcde);
 	assertTrue (it == end);
-	
+
 	// 5 byte sequence - not supported
 	n = encoding.convert(0xabcdef, data, sizeof(data));
 	assertTrue (n == 0);
@@ -159,7 +159,7 @@ void TextBufferIteratorTest::testUTF8()
 	const unsigned char text[] = {0x20, 0xce, 0xba, 0xe1, 0xbd, 0xb9, 0xcf, 0x83, 0xce, 0xbc, 0xce, 0xb5, 0x20, 0x00};
 	TextBufferIterator it(reinterpret_cast<const char*>(text), encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0x0020);
 	assertTrue (it != end);
@@ -180,11 +180,11 @@ void TextBufferIteratorTest::testUTF8()
 
 void TextBufferIteratorTest::testUTF8Supplementary()
 {
-	UTF8Encoding encoding; 
+	UTF8Encoding encoding;
 	const unsigned char text[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
 	TextBufferIterator it(reinterpret_cast<const char*>(text), encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0x0041);
 	assertTrue (it != end);
@@ -201,11 +201,11 @@ void TextBufferIteratorTest::testUTF8Supplementary()
 
 void TextBufferIteratorTest::testUTF16Supplementary()
 {
-	UTF16Encoding encoding; 
+	UTF16Encoding encoding;
 	const Poco::UInt16 text[] = { 0x0041, 0x0042, 0xD800, 0xDCA4, 0xD87E, 0xDDA0, 0xD87E, 0xDE1D};
 	TextBufferIterator it(reinterpret_cast<const char*>(text), sizeof(text), encoding);
 	TextBufferIterator end(it.end());
-	
+
 	assertTrue (it != end);
 	assertTrue (*it++ == 0x0041);
 	assertTrue (it != end);
@@ -227,7 +227,7 @@ void TextBufferIteratorTest::testSwap()
 	TextBufferIterator it1(text, encoding);
 	TextBufferIterator it2(text, encoding);
 	TextBufferIterator end(it1.end());
-	
+
 	assertTrue (it1 == it2);
 	it2.swap(end);
 	assertTrue (it1 != it2);

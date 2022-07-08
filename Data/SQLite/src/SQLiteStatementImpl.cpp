@@ -46,7 +46,7 @@ SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqli
 {
 	_columns.resize(1);
 }
-	
+
 
 SQLiteStatementImpl::~SQLiteStatementImpl()
 {
@@ -287,7 +287,7 @@ std::size_t SQLiteStatementImpl::next()
 	{
 		Utility::throwException(_pDB, _nextResponse, std::string("Iterator Error: trying to access the next value"));
 	}
-	
+
 	return 1u;
 }
 

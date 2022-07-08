@@ -2830,7 +2830,7 @@ HPDF_Page_New_Content_Stream  (HPDF_Page page,
 
     /* check if there is already an array of contents */
     contents_array = (HPDF_Array) HPDF_Dict_GetItem(page,"Contents", HPDF_OCLASS_ARRAY);
-    if (!contents_array) {	
+    if (!contents_array) {
         HPDF_Error_Reset (page->error);
         /* no contents_array already -- create one
            and replace current single contents item */
@@ -2851,7 +2851,7 @@ HPDF_Page_New_Content_Stream  (HPDF_Page page,
 
     ret += HPDF_Array_Add (contents_array,attr->contents);
 
-    /* return the value of the new stream, so that 
+    /* return the value of the new stream, so that
        the application can use it as a shared contents stream */
     if (ret == HPDF_OK && new_stream != NULL)
         *new_stream = attr->contents;
@@ -2879,7 +2879,7 @@ HPDF_Page_Insert_Shared_Content_Stream  (HPDF_Page page,
 
     /* check if there is already an array of contents */
     contents_array = (HPDF_Array) HPDF_Dict_GetItem(page,"Contents", HPDF_OCLASS_ARRAY);
-    if (!contents_array) {	
+    if (!contents_array) {
         HPDF_PageAttr attr;
         HPDF_Error_Reset (page->error);
         /* no contents_array already -- create one

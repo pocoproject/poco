@@ -52,10 +52,10 @@ void ConfigurationMapperTest::testMapper1()
 	assertTrue (std::find(keys.begin(), keys.end(), "string2") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
-	
+
 	assertTrue (pMapper->getString("prop5.string1") == "foo");
 	assertTrue (pMapper->getString("prop5.sub1.string1") == "FOO");
-	
+
 	pMapper->setString("prop5.string3", "baz");
 	assertTrue (pMapper->getString("prop5.string3") == "baz");
 	assertTrue (pConf->getString("prop5.string3") == "baz");
@@ -92,7 +92,7 @@ void ConfigurationMapperTest::testMapper2()
 
 	assertTrue (pMapper->getString("root.conf.string1") == "foo");
 	assertTrue (pMapper->getString("root.conf.sub1.string1") == "FOO");
-	
+
 	pMapper->setString("root.conf.string3", "baz");
 	assertTrue (pMapper->getString("root.conf.string3") == "baz");
 	assertTrue (pConf->getString("prop5.string3") == "baz");
@@ -126,10 +126,10 @@ void ConfigurationMapperTest::testMapper3()
 	assertTrue (std::find(keys.begin(), keys.end(), "string2") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
-	
+
 	assertTrue (pMapper->getString("root.prop5.string1") == "foo");
 	assertTrue (pMapper->getString("root.prop5.sub1.string1") == "FOO");
-	
+
 	pMapper->setString("root.prop5.string3", "baz");
 	assertTrue (pMapper->getString("root.prop5.string3") == "baz");
 	assertTrue (pConf->getString("prop5.string3") == "baz");
@@ -155,10 +155,10 @@ void ConfigurationMapperTest::testMapper4()
 	assertTrue (std::find(keys.begin(), keys.end(), "string2") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
-	
+
 	assertTrue (pMapper->getString("string1") == "foo");
 	assertTrue (pMapper->getString("sub1.string1") == "FOO");
-	
+
 	pMapper->setString("string3", "baz");
 	assertTrue (pMapper->getString("string3") == "baz");
 	assertTrue (pConf->getString("prop5.string3") == "baz");

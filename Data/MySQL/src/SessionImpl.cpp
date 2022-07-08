@@ -14,6 +14,7 @@
 
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
+#include "Poco/Data/MySQL/Utility.h"
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
@@ -254,8 +255,29 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
+	const std::string MARIADB_SERVERINFO = "MariaDB";
+
 	std::string isolation;
-	getSetting("tx_isolation", isolation);
+	std::string serverInfo = Utility::serverInfo(_handle);
+	unsigned long version = Utility::serverVersion(_handle);
+
+	if (serverInfo.find(MARIADB_SERVERINFO) != std::string::npos) //MariaDB
+	{
+		getSetting("tx_isolation", isolation);
+		isolation = isolation.c_str();
+	}
+	else //MySQL
+	{
+		if (version >= 80000)
+		{
+			getSetting("transaction_isolation", isolation);
+			isolation = isolation.c_str();
+		}
+		else
+		{
+			getSetting("tx_isolation", isolation);
+		}
+	}
 	Poco::replaceInPlace(isolation, "-", " ");
 	if (MYSQL_READ_UNCOMMITTED == isolation)
 		return Session::TRANSACTION_READ_UNCOMMITTED;

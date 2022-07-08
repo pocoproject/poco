@@ -24,6 +24,7 @@
 #include <openssl/crypto.h>
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 #include <openssl/provider.h>
+#include <atomic>
 #endif
 #if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
 #include <openssl/fips.h>
@@ -91,8 +92,8 @@ private:
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-	static OSSL_PROVIDER* _defaultProvider;
-	static OSSL_PROVIDER* _legacyProvider;
+	static std::atomic<OSSL_PROVIDER*> _defaultProvider;
+	static std::atomic<OSSL_PROVIDER*> _legacyProvider;
 #endif
 };
 

@@ -12,5 +12,5 @@ vc.project.compiler.defines =
 vc.project.compiler.defines.shared =
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
-vc.project.linker.dependencies = 
+vc.project.linker.dependencies =
 vc.solution.create = true

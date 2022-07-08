@@ -23,6 +23,8 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/UUID.h"
 #include "Poco/UTFString.h"
+#include "Poco/TextEncoding.h"
+#include <memory>
 #include <vector>
 #include <deque>
 #include <list>
@@ -31,7 +33,6 @@
 
 
 namespace Poco {
-
 
 class DateTime;
 class Any;
@@ -45,6 +46,7 @@ namespace Data {
 
 class Date;
 class Time;
+class Transcoder;
 
 
 class Data_API AbstractExtractor
@@ -54,7 +56,8 @@ class Data_API AbstractExtractor
 public:
 	using Ptr = SharedPtr<AbstractExtractor>;
 
-	AbstractExtractor();
+	AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr,
+		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Creates the AbstractExtractor.
 
 	virtual ~AbstractExtractor();
@@ -346,15 +349,30 @@ public:
 
 	virtual void reset();
 		/// Resets any information internally cached by the extractor.
+
+protected:
+	bool transcodeRequired() const;
+	void transcode(const std::string& from, std::string& to);
+	void reverseTranscode(const std::string& from, std::string& to);
+
+private:
+	std::unique_ptr<Transcoder> _pTranscoder;
 };
 
 
 ///
 /// inlines
 ///
+
 inline void AbstractExtractor::reset()
 {
 	//default no-op
+}
+
+
+inline bool AbstractExtractor::transcodeRequired() const
+{
+	return _pTranscoder.operator bool();
 }
 
 

@@ -26,7 +26,7 @@ class Extractor: public Poco::Data::AbstractExtractor
 	/// A no-op implementation of AbstractExtractor for testing.
 {
 public:
-	Extractor();
+	Extractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -110,6 +110,14 @@ public:
 		/// Returns true if the current row value at pos column is null.
 
 	void reset();
+
+	void setString(const std::string& str)
+	{
+		_stringValue = str;
+	}
+
+private:
+	std::string _stringValue;
 };
 
 

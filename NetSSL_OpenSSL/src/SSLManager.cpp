@@ -119,6 +119,7 @@ SSLManager& SSLManager::instance()
 
 void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	_ptrServerPassphraseHandler  = ptrPassphraseHandler;
 	_ptrServerCertificateHandler = ptrHandler;
 	_ptrDefaultServerContext     = ptrContext;
@@ -127,6 +128,7 @@ void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHa
 
 void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	_ptrClientPassphraseHandler  = ptrPassphraseHandler;
 	_ptrClientCertificateHandler = ptrHandler;
 	_ptrDefaultClientContext     = ptrContext;

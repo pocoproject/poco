@@ -33,13 +33,13 @@ struct HashMapEntry
 {
 	Key   first;
 	Value second;
-	
+
 	HashMapEntry():
 		first(),
 		second()
 	{
 	}
-	
+
 	HashMapEntry(const Key& key):
 		first(key),
 		second()
@@ -51,7 +51,7 @@ struct HashMapEntry
 		second(value)
 	{
 	}
-	
+
 	bool operator == (const HashMapEntry& entry) const
 	{
 		return first == entry.first;
@@ -91,27 +91,27 @@ public:
 	typedef const Mapped&       ConstReference;
 	typedef Mapped*             Pointer;
 	typedef const Mapped*       ConstPointer;
-	
+
 	typedef HashMapEntry<Key, Mapped>      ValueType;
 	typedef std::pair<KeyType, MappedType> PairType;
-	
+
 	typedef HashMapEntryHash<ValueType, HashFunc> HashType;
 	typedef LinearHashTable<ValueType, HashType>  HashTable;
-	
+
 	typedef typename HashTable::Iterator      Iterator;
 	typedef typename HashTable::ConstIterator ConstIterator;
-	
+
 	HashMap()
 		/// Creates an empty HashMap.
 	{
 	}
-	
+
 	HashMap(std::size_t initialReserve):
 		_table(initialReserve)
 		/// Creates the HashMap with room for initialReserve entries.
 	{
 	}
-	
+
 	HashMap& operator = (const HashMap& map)
 		/// Assigns another HashMap.
 	{
@@ -119,33 +119,33 @@ public:
 		swap(tmp);
 		return *this;
 	}
-	
-	void swap(HashMap& map)
+
+	void swap(HashMap& map) noexcept
 		/// Swaps the HashMap with another one.
 	{
 		_table.swap(map._table);
 	}
-	
+
 	ConstIterator begin() const
 	{
 		return _table.begin();
 	}
-	
+
 	ConstIterator end() const
 	{
 		return _table.end();
 	}
-	
+
 	Iterator begin()
 	{
 		return _table.begin();
 	}
-	
+
 	Iterator end()
 	{
 		return _table.end();
 	}
-	
+
 	ConstIterator find(const KeyType& key) const
 	{
 		ValueType value(key);
@@ -174,18 +174,18 @@ public:
 	{
 		return _table.insert(value);
 	}
-	
+
 	void erase(Iterator it)
 	{
 		_table.erase(it);
 	}
-	
+
 	void erase(const KeyType& key)
 	{
 		Iterator it = find(key);
 		_table.erase(it);
 	}
-	
+
 	void clear()
 	{
 		_table.clear();

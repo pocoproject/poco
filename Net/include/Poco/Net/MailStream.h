@@ -29,7 +29,7 @@ namespace Net {
 
 
 class Net_API MailStreamBuf: public Poco::UnbufferedStreamBuf
-	/// The sole purpose of this stream buffer is to replace 
+	/// The sole purpose of this stream buffer is to replace
 	/// a "\r\n.\r\n" character sequence with a "\r\n..\r\n" sequence for
 	/// output streams and vice-versa for input streams.
 	///
@@ -50,11 +50,11 @@ public:
 
 	~MailStreamBuf();
 		/// Destroys the MailStreamBuf.
-		
+
 	void close();
 		/// Writes the terminating period, followed by
 		/// CR-LF.
-		
+
 protected:
 	int readFromDevice();
 	int writeToDevice(char c);
@@ -71,7 +71,7 @@ private:
 		ST_CR_LF_DOT_CR,
 		ST_CR_LF_DOT_CR_LF
 	};
-	
+
 	std::istream* _pIstr;
 	std::ostream* _pOstr;
 	std::string   _buffer;
@@ -82,7 +82,7 @@ private:
 class Net_API MailIOS: public virtual std::ios
 	/// The base class for MailInputStream and MailOutputStream.
 	///
-	/// This class provides common methods and is also needed to ensure 
+	/// This class provides common methods and is also needed to ensure
 	/// the correct initialization order of the stream buffer and base classes.
 {
 public:

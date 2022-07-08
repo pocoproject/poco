@@ -57,9 +57,9 @@ void DateTimeFormatter::append(std::string& str, const DateTime& dateTime, const
 				case 'A': str.append(dateTime.isAM() ? "AM" : "PM"); break;
 				case 'M': NumberFormatter::append0(str, dateTime.minute(), 2); break;
 				case 'S': NumberFormatter::append0(str, dateTime.second(), 2); break;
-				case 's': NumberFormatter::append0(str, dateTime.second(), 2); 
-				          str += '.'; 
-				          NumberFormatter::append0(str, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); 
+				case 's': NumberFormatter::append0(str, dateTime.second(), 2);
+				          str += '.';
+				          NumberFormatter::append0(str, dateTime.millisecond()*1000 + dateTime.microsecond(), 6);
 				          break;
 				case 'i': NumberFormatter::append0(str, dateTime.millisecond(), 3); break;
 				case 'c': NumberFormatter::append(str, dateTime.millisecond()/100); break;
@@ -146,7 +146,7 @@ void DateTimeFormatter::tzdRFC(std::string& str, int timeZoneDifferential)
 			str += '-';
 			NumberFormatter::append0(str, -timeZoneDifferential/3600, 2);
 			NumberFormatter::append0(str, (-timeZoneDifferential%3600)/60, 2);
-		}		
+		}
 	}
 	else str += "GMT";
 }

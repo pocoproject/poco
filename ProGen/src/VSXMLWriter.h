@@ -28,7 +28,7 @@ class VSXMLWriter: public Poco::XML::ContentHandler
 public:
 	VSXMLWriter(std::ostream& ostr, bool convertBool);
 	~VSXMLWriter();
-		
+
 	// ContentHandler
 	void setDocumentLocator(const Poco::XML::Locator* loc);
 	void startDocument();

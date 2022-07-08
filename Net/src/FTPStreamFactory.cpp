@@ -41,17 +41,17 @@ public:
 		// make sure exceptions from underlying string propagate
 		_istr.exceptions(std::ios::badbit);
 	}
-	
+
 	~FTPStreamBuf()
 	{
 	}
-		
+
 private:
 	int readFromDevice()
 	{
 		return _istr.get();
 	}
-	
+
 	std::istream& _istr;
 };
 
@@ -64,11 +64,11 @@ public:
 	{
 		poco_ios_init(&_buf);
 	}
-	
+
 	~FTPIOS()
 	{
 	}
-	
+
 	FTPStreamBuf* rdbuf()
 	{
 		return &_buf;
@@ -88,12 +88,12 @@ public:
 		_pSession(pSession)
 	{
 	}
-		
+
 	~FTPStream()
 	{
 		delete _pSession;
 	}
-	
+
 private:
 	FTPClientSession* _pSession;
 };
@@ -133,15 +133,15 @@ std::istream* FTPStreamFactory::open(const URI& uri)
 		std::string username;
 		std::string password;
 		getUserInfo(uri, username, password);
-		
+
 		std::string path;
 		char        type;
 		getPathAndType(uri, path, type);
-			
+
 		pSession->login(username, password);
 		if (type == 'a')
 			pSession->setFileType(FTPClientSession::TYPE_TEXT);
-			
+
 		Path p(path, Path::PATH_UNIX);
 		p.makeFile();
 		for (int i = 0; i < p.depth(); ++i)
@@ -163,19 +163,19 @@ void FTPStreamFactory::setAnonymousPassword(const std::string& password)
 	_anonymousPassword = password;
 }
 
-	
+
 const std::string& FTPStreamFactory::getAnonymousPassword()
 {
 	return _anonymousPassword;
 }
 
-	
+
 void FTPStreamFactory::setPasswordProvider(FTPPasswordProvider* pProvider)
 {
 	_pPasswordProvider = pProvider;
 }
 
-	
+
 FTPPasswordProvider* FTPStreamFactory::getPasswordProvider()
 {
 	return _pPasswordProvider;

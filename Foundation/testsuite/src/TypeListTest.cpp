@@ -247,7 +247,7 @@ const int i = 0;
 	assertTrue (typeid(TypeGetter<37, TypeVoid>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<38, TypeVoid>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<39, TypeVoid>::HeadType) == typeid(Void));
-	
+
 
 	typedef TypeOneReplacer<TypeVoid, Void, Int8>::HeadType TypeFirstReplacer;
 	assertTrue (typeid(TypeGetter<0, TypeFirstReplacer>::HeadType) == typeid(Int8));

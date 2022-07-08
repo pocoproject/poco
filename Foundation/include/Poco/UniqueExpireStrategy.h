@@ -31,18 +31,18 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue
 >
 class UniqueExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// An UniqueExpireStrategy implements time based expiration of cache entries. In contrast
-	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define 
+	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
-	///    
+	///
 	///    const Poco::Timestamp& getExpiration() const;
-	///    
+	///
 	/// which returns the absolute timepoint when the entry will be invalidated.
 {
 public:

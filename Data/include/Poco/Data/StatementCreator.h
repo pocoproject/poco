@@ -34,7 +34,7 @@ class Data_API StatementCreator
 public:
 	StatementCreator();
 		/// Creates an unitialized StatementCreator.
-		
+
 	StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates a StatementCreator.
 
@@ -52,10 +52,10 @@ public:
 
 	StatementCreator& operator = (StatementCreator&& other) noexcept;
 		/// Assignment operator.
-		
-	void swap(StatementCreator& other);
-		/// Swaps the StatementCreator with another one.	
-		
+
+	void swap(StatementCreator& other) noexcept;
+		/// Swaps the StatementCreator with another one.
+
 	template <typename T>
 	Statement operator << (const T& t)
 		/// Creates a Statement.

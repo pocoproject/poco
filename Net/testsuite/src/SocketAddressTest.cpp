@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include <iostream>
 
 
 using Poco::Net::SocketAddress;
@@ -41,19 +42,22 @@ void SocketAddressTest::testSocketAddress()
 	assertTrue (wild.host().isWildcard());
 	assertTrue (wild.port() == 0);
 
-	SocketAddress sa1("192.168.1.100", 100);
+	SocketAddress sa01 = SocketAddress("192.168.1.100", 100);
+	SocketAddress sa1(std::move(sa01));
 	assertTrue (sa1.af() == AF_INET);
 	assertTrue (sa1.family() == SocketAddress::IPv4);
 	assertTrue (sa1.host().toString() == "192.168.1.100");
 	assertTrue (sa1.port() == 100);
 	assertTrue (sa1.toString() == "192.168.1.100:100");
 
-	SocketAddress sa2("192.168.1.100", "100");
+	SocketAddress sa02 = SocketAddress("192.168.1.100", "100");
+	SocketAddress sa2(std::move(sa02));
 	assertTrue (sa2.host().toString() == "192.168.1.100");
 	assertTrue (sa2.port() == 100);
 
 #if !defined(_WIN32_WCE)
-	SocketAddress sa3("192.168.1.100", "ftp");
+	SocketAddress sa03 = SocketAddress("192.168.1.100", "ftp");
+	SocketAddress sa3(std::move(sa03));
 	assertTrue (sa3.host().toString() == "192.168.1.100");
 	assertTrue (sa3.port() == 21);
 #endif
@@ -67,7 +71,8 @@ void SocketAddressTest::testSocketAddress()
 	{
 	}
 
-	SocketAddress sa4("pocoproject.org", 80);
+	SocketAddress sa04 = SocketAddress("pocoproject.org", 80);
+	SocketAddress sa4(std::move(sa04));
 	assertTrue (sa4.host().toString() == "54.93.62.90");
 	assertTrue (sa4.port() == 80);
 
@@ -92,11 +97,13 @@ void SocketAddressTest::testSocketAddress()
 	{
 	}
 
-	SocketAddress sa7("192.168.2.120:88");
+	SocketAddress sa07 = SocketAddress("192.168.2.120:88");
+	SocketAddress sa7(std::move(sa07));
 	assertTrue (sa7.host().toString() == "192.168.2.120");
 	assertTrue (sa7.port() == 88);
 
-	SocketAddress sa8("[192.168.2.120]:88");
+	SocketAddress sa08 = SocketAddress("[192.168.2.120]:88");
+	SocketAddress sa8(std::move(sa08));
 	assertTrue (sa8.host().toString() == "192.168.2.120");
 	assertTrue (sa8.port() == 88);
 
@@ -121,7 +128,8 @@ void SocketAddressTest::testSocketAddress()
 	SocketAddress sa10("www6.pocoproject.org", 80);
 	assertTrue (sa10.host().toString() == "54.93.62.90" || sa10.host().toString() == "2001:4801:7828:101:be76:4eff:fe10:1455");
 
-	SocketAddress sa11(SocketAddress::IPv4, "www6.pocoproject.org", 80);
+	SocketAddress sa011 = SocketAddress(SocketAddress::IPv4, "www6.pocoproject.org", 80);
+	SocketAddress sa11(std::move(sa011));
 	assertTrue (sa11.host().toString() == "54.93.62.90");
 
 #ifdef POCO_HAVE_IPv6
@@ -168,6 +176,8 @@ void SocketAddressTest::testSocketAddress6()
 	assertTrue (sa2.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
 	assertTrue (sa2.port() == 100);
 	assertTrue (sa2.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
+#else
+	std::cout << "[IPv6 DISABLED]" << std::endl;
 #endif
 }
 
@@ -191,6 +201,8 @@ void SocketAddressTest::testSocketAddressUnixLocal()
 	SocketAddress sa4("/tmp/sock1");
 	assertTrue (sa1 == sa4);
 	assertTrue (sa4.toString() == "/tmp/sock1");
+#else
+	std::cout << "[UNIX LOCAL DISABLED]" << std::endl;
 #endif
 }
 

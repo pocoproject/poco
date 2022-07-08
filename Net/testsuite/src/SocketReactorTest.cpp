@@ -44,6 +44,10 @@ using Poco::Thread;
 
 namespace
 {
+	int DATA_SIZE = 1024;
+	int REACTORS_COUNT = 8;
+	int MAX_DATA_SIZE = DATA_SIZE * REACTORS_COUNT;
+
 	class EchoServiceHandler
 	{
 	public:
@@ -130,7 +134,7 @@ namespace
 				checkReadableObserverCount(1);
 				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
 				checkReadableObserverCount(0);
-				if (_once || _data.size() == 8192)
+				if (_once || _data.size() == MAX_DATA_SIZE)
 				{
 					_reactor.stop();
 					delete this;
@@ -144,7 +148,7 @@ namespace
 			checkWritableObserverCount(1);
 			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
 			checkWritableObserverCount(0);
-			std::string data(1024, 'x');
+			std::string data(DATA_SIZE, 'x');
 			_socket.sendBytes(data.data(), (int) data.length());
 			_socket.shutdownSend();
 		}
@@ -380,6 +384,15 @@ namespace
 	};
 
 	DataServiceHandler::Data DataServiceHandler::_data;
+
+	class SleepClientServiceHandler
+	{
+	public:
+		SleepClientServiceHandler(Poco::Net::StreamSocket& socket, Poco::Net::SocketReactor& reactor)
+		{
+			Poco::Thread::sleep(500);
+		}
+	};
 }
 
 
@@ -405,7 +418,7 @@ void SocketReactorTest::testSocketReactor()
 	ClientServiceHandler::resetData();
 	reactor.run();
 	std::string data(ClientServiceHandler::data());
-	assertTrue (data.size() == 1024);
+	assertTrue (data.size() == DATA_SIZE);
 	assertTrue (!ClientServiceHandler::readableError());
 	assertTrue (!ClientServiceHandler::writableError());
 	assertTrue (!ClientServiceHandler::timeoutError());
@@ -425,7 +438,7 @@ void SocketReactorTest::testSetSocketReactor()
 	ClientServiceHandler::resetData();
 	reactor.run();
 	std::string data(ClientServiceHandler::data());
-	assertTrue (data.size() == 1024);
+	assertTrue (data.size() == DATA_SIZE);
 	assertTrue (!ClientServiceHandler::readableError());
 	assertTrue (!ClientServiceHandler::writableError());
 	assertTrue (!ClientServiceHandler::timeoutError());
@@ -434,27 +447,26 @@ void SocketReactorTest::testSetSocketReactor()
 
 void SocketReactorTest::testParallelSocketReactor()
 {
-	SocketAddress ssa;
+	SocketAddress ssa("127.0.0.1:22087");
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
-	ParallelSocketAcceptor<EchoServiceHandler, SocketReactor> acceptor(ss, reactor);
+	ParallelSocketAcceptor<EchoServiceHandler, SocketReactor> acceptor(ss, reactor, REACTORS_COUNT);
+
 	SocketAddress sa("127.0.0.1", ss.address().port());
-	SocketConnector<ClientServiceHandler> connector1(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector2(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector3(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector4(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector5(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector6(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector7(sa, reactor);
-	SocketConnector<ClientServiceHandler> connector8(sa, reactor);
+	std::vector<SocketConnector<ClientServiceHandler>*> connectors;
+	for (int i = 0; i < REACTORS_COUNT; ++i)
+		connectors.push_back(new SocketConnector<ClientServiceHandler>(sa, reactor));
+
 	ClientServiceHandler::setOnce(false);
 	ClientServiceHandler::resetData();
 	reactor.run();
+
 	std::string data(ClientServiceHandler::data());
-	assertTrue (data.size() == 8192);
+	assertTrue (data.size() == MAX_DATA_SIZE);
 	assertTrue (!ClientServiceHandler::readableError());
 	assertTrue (!ClientServiceHandler::writableError());
 	assertTrue (!ClientServiceHandler::timeoutError());
+	for (auto& c : connectors) delete c;
 }
 
 
@@ -573,6 +585,25 @@ void SocketReactorTest::testDataCollection()
 }
 
 
+void SocketReactorTest::testSocketConnectorDeadlock()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	SocketReactor reactor;
+	Thread thread;
+	int i = 0;
+	while (++i < 10)
+	{
+		auto sc = new SocketConnector<SleepClientServiceHandler>(sa, reactor);
+		thread.startFunc([&reactor]() { reactor.run(); });
+		reactor.stop();
+		thread.join();
+		delete sc;
+	}
+}
+
+
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -594,6 +625,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorFail);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorTimeout);
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
+	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
 
 	return pSuite;
 }

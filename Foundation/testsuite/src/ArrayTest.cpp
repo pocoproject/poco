@@ -90,7 +90,7 @@ void ArrayTest::testOperations()
 	}
 
 	// swap
-	Array b; 
+	Array b;
 	b.assign(10);
 	for(int i=0; i<SIZE; i++){
 		assertTrue (a[i] == 100);
@@ -226,6 +226,6 @@ CppUnit::Test* ArrayTest::suite()
 	CppUnit_addTest(pSuite, ArrayTest, testIterator);
 	CppUnit_addTest(pSuite, ArrayTest, testAlgorithm);
 	CppUnit_addTest(pSuite, ArrayTest, testMultiLevelArray);
-	
+
 	return pSuite;
 }

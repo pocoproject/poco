@@ -34,15 +34,12 @@ DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new Datagra
 }
 
 
-DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress): Socket(new DatagramSocketImpl(address.family()))
+DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only):
+	Socket(new DatagramSocketImpl(address.family()))
 {
-	bind(address, reuseAddress);
-}
-
-
-DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort): Socket(new DatagramSocketImpl(address.family()))
-{
-	bind(address, reuseAddress, reusePort);
+	if (address.family() == SocketAddress::IPv6)
+		bind6(address, reuseAddress, reusePort, ipV6Only);
+	else bind(address, reuseAddress, reusePort);
 }
 
 
@@ -50,6 +47,11 @@ DatagramSocket::DatagramSocket(const Socket& socket): Socket(socket)
 {
 	if (!dynamic_cast<DatagramSocketImpl*>(impl()))
 		throw InvalidArgumentException("Cannot assign incompatible socket");
+}
+
+
+DatagramSocket::DatagramSocket(const DatagramSocket& socket): Socket(socket)
+{
 }
 
 
@@ -74,6 +76,44 @@ DatagramSocket& DatagramSocket::operator = (const Socket& socket)
 	return *this;
 }
 
+#if POCO_NEW_STATE_ON_MOVE
+
+DatagramSocket::DatagramSocket(DatagramSocket&& socket): Socket(std::move(socket))
+{
+}
+
+
+DatagramSocket::DatagramSocket(Socket&& socket): Socket(std::move(socket))
+{
+	if (!dynamic_cast<DatagramSocketImpl*>(impl()))
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+}
+
+
+DatagramSocket& DatagramSocket::operator = (Socket&& socket)
+{
+	if (dynamic_cast<DatagramSocketImpl*>(socket.impl()))
+		Socket::operator = (std::move(socket));
+	else
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
+}
+
+
+DatagramSocket& DatagramSocket::operator = (DatagramSocket&& socket)
+{
+	Socket::operator = (std::move(socket));
+	return *this;
+}
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+DatagramSocket& DatagramSocket::operator = (const DatagramSocket& socket)
+{
+	Socket::operator = (socket);
+	return *this;
+}
+
 
 void DatagramSocket::connect(const SocketAddress& address)
 {
@@ -90,6 +130,12 @@ void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress)
 void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
 	impl()->bind(address, reuseAddress, reusePort);
+}
+
+
+void DatagramSocket::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	impl()->bind6(address, reuseAddress, reusePort, ipV6Only);
 }
 
 

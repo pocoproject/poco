@@ -30,11 +30,11 @@ namespace Poco {
 class Foundation_API NamedEventImpl
 {
 protected:
-	NamedEventImpl(const std::string& name);	
+	NamedEventImpl(const std::string& name);
 	~NamedEventImpl();
 	void setImpl();
 	void waitImpl();
-	
+
 private:
 	std::string getFileName();
 

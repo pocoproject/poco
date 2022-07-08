@@ -40,31 +40,31 @@ public:
 
 	FormattingChannel();
 		/// Creates a FormattingChannel.
-		
+
 	FormattingChannel(Formatter::Ptr pFormatter);
 		/// Creates a FormattingChannel and attaches a Formatter.
-		
+
 	FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel);
 		/// Creates a FormattingChannel and attaches a Formatter
 		/// and a Channel.
-		
+
 	void setFormatter(Formatter::Ptr pFormatter);
 		/// Sets the Formatter used to format the messages
 		/// before they are passed on. If null, the message
 		/// is passed on unmodified.
-		
+
 	Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
 		/// which may be null.
 
 	void setChannel(Channel::Ptr pChannel);
-		/// Sets the destination channel to which the formatted 
+		/// Sets the destination channel to which the formatted
 		/// messages are passed on.
-		
+
 	Channel::Ptr getChannel() const;
 		/// Returns the channel to which the formatted
 		/// messages are passed on.
-		
+
 	void log(const Message& msg);
 		/// Formats the given Message using the Formatter and
 		/// passes the formatted message on to the destination
@@ -81,7 +81,7 @@ public:
 
 	void open();
 		/// Opens the attached channel.
-		
+
 	void close();
 		/// Closes the attached channel.
 

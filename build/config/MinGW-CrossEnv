@@ -24,7 +24,7 @@ RANLIB  = $(CROSSENV)-ranlib
 SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(basename $(notdir $@))).a
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = $(CROSSENV)-strip
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp

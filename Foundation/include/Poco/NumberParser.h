@@ -44,19 +44,19 @@ public:
 	static int parse(const std::string& s, char thousandSeparator = ',');
 		/// Parses an integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
-	
+
 	static bool tryParse(const std::string& s, int& value, char thousandSeparator = ',');
 		/// Parses an integer value in decimal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
-	
+
 	static unsigned parseUnsigned(const std::string& s, char thousandSeparator = ',');
 		/// Parses an unsigned integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
 
 	static bool tryParseUnsigned(const std::string& s, unsigned& value, char thousandSeparator = ',');
 		/// Parses an unsigned integer value in decimal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 	static unsigned parseHex(const std::string& s);
@@ -66,7 +66,7 @@ public:
 
 	static bool tryParseHex(const std::string& s, unsigned& value);
 		/// Parses an unsigned integer value in hexadecimal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 	static unsigned parseOct(const std::string& s);
@@ -76,7 +76,7 @@ public:
 
 	static bool tryParseOct(const std::string& s, unsigned& value);
 		/// Parses an unsigned integer value in octal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 #if defined(POCO_HAVE_INT64)
@@ -87,7 +87,7 @@ public:
 
 	static bool tryParse64(const std::string& s, Int64& value, char thousandSeparator = ',');
 		/// Parses a 64-bit integer value in decimal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 	static UInt64 parseUnsigned64(const std::string& s, char thousandSeparator = ',');
@@ -96,7 +96,7 @@ public:
 
 	static bool tryParseUnsigned64(const std::string& s, UInt64& value, char thousandSeparator = ',');
 		/// Parses an unsigned 64-bit integer value in decimal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 	static UInt64 parseHex64(const std::string& s);
@@ -105,7 +105,7 @@ public:
 
 	static bool tryParseHex64(const std::string& s, UInt64& value);
 		/// Parses an unsigned 64-bit integer value in hexadecimal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 	static UInt64 parseOct64(const std::string& s);
@@ -114,7 +114,7 @@ public:
 
 	static bool tryParseOct64(const std::string& s, UInt64& value);
 		/// Parses an unsigned 64-bit integer value in octal notation from the given string.
-		/// Returns true if a valid integer has been found, false otherwise. 
+		/// Returns true if a valid integer has been found, false otherwise.
 		/// If parsing was not successful, value is undefined.
 
 #endif // defined(POCO_HAVE_INT64)
@@ -122,9 +122,9 @@ public:
 	static double parseFloat(const std::string& s, char decimalSeparator = '.', char thousandSeparator = ',');
 		/// Parses a double value in decimal floating point notation
 		/// from the given string.
-		/// Throws a SyntaxException if the string does not hold a floating-point 
+		/// Throws a SyntaxException if the string does not hold a floating-point
 		/// number in decimal notation.
-		
+
 	static bool tryParseFloat(const std::string& s, double& value, char decimalSeparator = '.', char thousandSeparator = ',');
 		/// Parses a double value in decimal floating point notation
 		/// from the given string.

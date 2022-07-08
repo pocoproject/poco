@@ -43,6 +43,8 @@ class Foundation_API Message
 	/// caused the message.
 {
 public:
+	typedef std::map<std::string, std::string> StringMap;
+
 	enum Priority
 	{
 		PRIO_FATAL = 1,   /// A fatal error. The application will most likely terminate. This is the highest priority.
@@ -132,6 +134,9 @@ public:
 	long getTid() const;
 		/// Returns the numeric thread identifier for the message.
 
+	long getOsTid() const;
+		/// Returns the numeric thread identifier for the message.
+
 	void setPid(long pid);
 		/// Sets the process identifier for the message.
 
@@ -175,6 +180,9 @@ public:
 		/// with the given name. If the parameter with the given name
 		/// does not exist, then defaultValue is returned.
 
+	const StringMap& getAll() const;
+		/// Returns a const reference to all the values
+
 	void set(const std::string& param, const std::string& value);
 		/// Sets the value for a parameter. If the parameter does
 		/// not exist, then it is created.
@@ -192,7 +200,6 @@ public:
 
 protected:
 	void init();
-	typedef std::map<std::string, std::string> StringMap;
 
 private:
 	std::string _source;
@@ -200,6 +207,7 @@ private:
 	Priority    _prio;
 	Timestamp   _time;
 	long        _tid;
+	long        _ostid;
 	std::string _thread;
 	long        _pid;
 	const char* _file;
@@ -246,6 +254,10 @@ inline long Message::getTid() const
 	return _tid;
 }
 
+inline long Message::getOsTid() const
+{
+	return _ostid;
+}
 
 inline long Message::getPid() const
 {
@@ -265,7 +277,7 @@ inline int Message::getSourceLine() const
 }
 
 
-inline void swap(Message& m1, Message& m2)
+inline void swap(Message& m1, Message& m2) noexcept
 {
 	m1.swap(m2);
 }

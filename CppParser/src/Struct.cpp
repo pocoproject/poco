@@ -62,7 +62,7 @@ void Struct::addBase(const std::string& name, Symbol::Access access, bool isVirt
 	_bases.push_back(base);
 }
 
-	
+
 Struct::BaseIterator Struct::baseBegin() const
 {
 	return _bases.begin();
@@ -78,7 +78,7 @@ Struct::BaseIterator Struct::baseEnd() const
 void Struct::addDerived(Struct* pClass)
 {
 	poco_check_ptr (pClass);
-	
+
 	_derived.push_back(pClass);
 }
 

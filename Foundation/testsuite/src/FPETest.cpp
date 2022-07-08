@@ -34,7 +34,7 @@ void FPETest::testClassify()
 		float b = 0.0f;
 		float nan = a/b;
 		float inf = 1.0f/b;
-		
+
 		assertTrue (FPE::isNaN(nan));
 		assertTrue (!FPE::isNaN(a));
 		assertTrue (FPE::isInfinite(inf));
@@ -45,7 +45,7 @@ void FPETest::testClassify()
 		double b = 0;
 		double nan = a/b;
 		double inf = 1.0/b;
-		
+
 		assertTrue (FPE::isNaN(nan));
 		assertTrue (!FPE::isNaN(a));
 		assertTrue (FPE::isInfinite(inf));
@@ -89,7 +89,7 @@ void FPETest::testFlags()
 #if !defined(POCO_NO_FPENVIRONMENT)
     assertTrue (FPE::isFlag(FPE::FP_DIVIDE_BY_ZERO));
 #endif
-	assertTrue (FPE::isInfinite(c)); 
+	assertTrue (FPE::isInfinite(c));
 
 	FPE::clearFlags();
 	a = 1.23456789e210;
@@ -103,7 +103,7 @@ void FPETest::testFlags()
 	FPE::clearFlags();
 	a = 1.23456789e-99;
 	b = 9.87654321e210;
-	c = div(a, b);	
+	c = div(a, b);
 #if !defined(POCO_NO_FPENVIRONMENT)
 	assertTrue (FPE::isFlag(FPE::FP_UNDERFLOW));
 #endif
@@ -123,13 +123,13 @@ void FPETest::testFlags()
 void FPETest::testRound()
 {
 #if !defined(__osf__) && !defined(__VMS) && !defined(POCO_NO_FPENVIRONMENT)
-	FPE::setRoundingMode(FPE::FP_ROUND_TONEAREST);			
+	FPE::setRoundingMode(FPE::FP_ROUND_TONEAREST);
 	assertTrue (FPE::getRoundingMode() == FPE::FP_ROUND_TONEAREST);
 	{
 		FPE env(FPE::FP_ROUND_TOWARDZERO);
 		assertTrue (FPE::getRoundingMode() == FPE::FP_ROUND_TOWARDZERO);
 	}
-	assertTrue (FPE::getRoundingMode() == FPE::FP_ROUND_TONEAREST);	
+	assertTrue (FPE::getRoundingMode() == FPE::FP_ROUND_TONEAREST);
 #endif
 }
 

@@ -33,7 +33,7 @@ public:
 	AbstractObserver();
 	AbstractObserver(const AbstractObserver& observer);
 	virtual ~AbstractObserver();
-	
+
 	AbstractObserver& operator = (const AbstractObserver& observer);
 
 	virtual void notify(Notification* pNf) const = 0;

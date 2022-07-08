@@ -1,0 +1,10 @@
+vc.project.guid = 04B69538-1444-4A22-A98D-3C69CD7B44DA
+vc.project.name = TestSuite
+vc.project.target = TestSuite
+vc.project.type = testsuite
+vc.project.pocobase = ..\\..
+vc.project.platforms = Win32
+vc.project.configurations = debug_shared, release_shared, debug_static_mt, release_static_mt, debug_static_md, release_static_md
+vc.project.prototype = TestSuite_vs90.vcproj
+vc.project.compiler.include = ..\\..\\Foundation\\include;..\\..\\Net\\include;..\\..\\Prometheus\\include;.\\include
+vc.project.compiler.additionalOptions = /Zc:__cplusplus

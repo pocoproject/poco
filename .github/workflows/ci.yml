@@ -1,23 +1,54 @@
 name: poco-ci
-on: [push]
+on: [push, pull_request]
 jobs:
   linux-gcc-make:
     runs-on: ubuntu-20.04
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: pocotest
+          MYSQL_PASSWORD: pocotest
+          MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
       - run: >-
           sudo -s
-          EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
+          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
   linux-gcc-make-asan:
     runs-on: ubuntu-20.04
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: pocotest
+          MYSQL_PASSWORD: pocotest
+          MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
+      - run: >-
+          sudo -s
+          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
+          ./ci/runtests.sh
+
+  linux-gcc-make-asan-no-soo:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=PDF --no-soo && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - run: >-
           sudo -s
           EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
@@ -27,18 +58,28 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
       - run: >-
           sudo -s
           EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
+  linux-gcc-make-tsan:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
+      - run: >-
+          sudo -s
+          ./ci/runtests.sh TSAN
+
   linux-gcc-cmake:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
@@ -51,8 +92,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: >-
-          sudo apt-get update &&
-          sudo apt-get install crossbuild-essential-armhf
+          sudo apt-get -y update &&
+          sudo apt-get -y install crossbuild-essential-armhf
       - run: >-
           ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
           make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
@@ -118,3 +159,16 @@ jobs:
       - run: >-
           cd cmake-build;
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+
+# missing asan dll path
+#  windows-2022-msvc-cmake-2022-asan:
+#    runs-on: windows-2022
+#    env:
+#      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+#    steps:
+#      - uses: actions/checkout@v2
+#      - run: cmake -S. -Bcmake-build -DPOCO_SANITIZE_ASAN=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
+#      - run: cmake --build cmake-build --config Debug
+#      - run: >-
+#          cd cmake-build;
+#          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Debug

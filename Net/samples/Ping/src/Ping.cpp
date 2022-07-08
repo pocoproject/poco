@@ -41,33 +41,33 @@ using Poco::Delegate;
 
 
 class Ping: public Application
-	/// This sample demonstrates the Poco::Net::ICMPClient in conjunction with 
+	/// This sample demonstrates the Poco::Net::ICMPClient in conjunction with
 	/// Poco Foundation C#-like events functionality.
 	///
 	/// Try Ping --help (on Unix platforms) or Ping /help (elsewhere) for
 	/// more information.
 {
 public:
-	Ping(): 
-		_helpRequested(false), 
+	Ping():
+		_helpRequested(false),
 		_icmpClient(IPAddress::IPv4),
-		_repetitions(4), 
+		_repetitions(4),
 		_target("localhost")
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
-		
+
 		_icmpClient.pingBegin += delegate(this, &Ping::onBegin);
 		_icmpClient.pingReply += delegate(this, &Ping::onReply);
 		_icmpClient.pingError += delegate(this, &Ping::onError);
 		_icmpClient.pingEnd   += delegate(this, &Ping::onEnd);
 	}
-	
+
 	void uninitialize()
 	{
 		_icmpClient.pingBegin -= delegate(this, &Ping::onBegin);
@@ -92,14 +92,14 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.argument("repetitions"));
-				
+
 		options.addOption(
 			Option("target", "t", "define the target address")
 				.required(false)
 				.repeatable(false)
 				.argument("target"));
 	}
-	
+
 	void handleOption(const std::string& name, const std::string& value)
 	{
 		Application::handleOption(name, value);
@@ -111,7 +111,7 @@ protected:
 		else if (name == "target")
 			_target = value;
 	}
-	
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -126,11 +126,11 @@ protected:
 
 	int main(const std::vector<std::string>& args)
 	{
-		if (_helpRequested) 
+		if (_helpRequested)
 			displayHelp();
-		else 
+		else
 			_icmpClient.ping(_target, _repetitions);
-		
+
 		return Application::EXIT_OK;
 	}
 
@@ -138,7 +138,7 @@ protected:
 	void onBegin(const void* pSender, ICMPEventArgs& args)
 	{
 		std::ostringstream os;
-		os << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " << args.dataSize() << " bytes of data:" 
+		os << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " << args.dataSize() << " bytes of data:"
 		   << std::endl << "---------------------------------------------" << std::endl;
 		logger().information(os.str());
 	}
@@ -147,7 +147,7 @@ protected:
 	{
 		std::ostringstream os;
 		os << "Reply from " << args.hostAddress()
-		   << " bytes=" << args.dataSize() 
+		   << " bytes=" << args.dataSize()
 		   << " time=" << args.replyTime() << "ms"
 		   << " TTL=" << args.ttl();
 		logger().information(os.str());
@@ -167,8 +167,8 @@ protected:
 		   << std::endl << "Packets: Sent=" << args.sent() << ", Received=" << args.received()
 		   << " Lost=" << args.repetitions() - args.received() << " (" << 100.0 - args.percent() << "% loss),"
 		   << std::endl << "Approximate round trip times in milliseconds: " << std::endl
-		   << "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()  
-		   << "ms, Average=" << args.avgRTT() << "ms" 
+		   << "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()
+		   << "ms, Average=" << args.avgRTT() << "ms"
 		   << std::endl << "------------------------------------------";
 		logger().information(os.str());
 	}

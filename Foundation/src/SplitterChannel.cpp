@@ -97,7 +97,7 @@ void SplitterChannel::close()
 int SplitterChannel::count() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return (int) _channels.size();
 }
 

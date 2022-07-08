@@ -39,7 +39,7 @@ class Foundation_API Base32EncoderBuf: public UnbufferedStreamBuf
 public:
 	Base32EncoderBuf(std::ostream& ostr, bool padding = true);
 	~Base32EncoderBuf();
-	
+
 	int close();
 		/// Closes the stream buffer.
 
@@ -50,9 +50,9 @@ private:
 	int             _groupLength;
 	std::streambuf& _buf;
 	bool		_doPadding;
-	
+
 	static const unsigned char OUT_ENCODING[32];
-	
+
 	friend class Base32DecoderBuf;
 
 	Base32EncoderBuf(const Base32EncoderBuf&);

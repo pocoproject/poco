@@ -253,7 +253,41 @@ void SecureSocketImpl::shutdown()
 			// most web browsers, so we just set the shutdown
 			// flag by calling SSL_shutdown() once and be
 			// done with it.
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+			int rc = 0;
+			if (!_bidirectShutdown)
+				rc = SSL_shutdown(_pSSL);
+			else
+			{
+				Poco::Timespan recvTimeout = _pSocket->getReceiveTimeout();
+				Poco::Timespan pollTimeout(0, 100000);
+				Poco::Timestamp tsNow;
+				do
+				{
+					rc = SSL_shutdown(_pSSL);
+					if (rc == 1) break;
+					if (rc < 0)
+					{
+						int err = SSL_get_error(_pSSL, rc);
+						if (err == SSL_ERROR_WANT_READ)
+							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+						else if (err == SSL_ERROR_WANT_WRITE)
+							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+						else
+						{
+							int socketError = SocketImpl::lastError();
+							long lastError = ERR_get_error();
+							if ((err == SSL_ERROR_SSL) && (socketError == 0) && (lastError == 0x0A000123))
+								rc = 0;
+							break;
+						}
+					}
+					else _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+				} while (!tsNow.isElapsed(recvTimeout.totalMicroseconds()));
+			}
+#else
 			int rc = SSL_shutdown(_pSSL);
+#endif
 			if (rc < 0) handleError(rc);
 			if (_pSocket->getBlocking())
 			{
@@ -274,6 +308,22 @@ void SecureSocketImpl::close()
 	{
 	}
 	_pSocket->close();
+}
+
+
+void SecureSocketImpl::setBlocking(bool flag)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->setBlocking(flag);
+}
+
+
+bool SecureSocketImpl::getBlocking() const
+{
+	poco_check_ptr (_pSocket);
+
+	return _pSocket->getBlocking();
 }
 
 
@@ -326,6 +376,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		rc = SSL_read(_pSSL, buffer, length);
 	}
 	while (mustRetry(rc));
+	_bidirectShutdown = false;
 	if (rc <= 0)
 	{
 		return handleError(rc);
@@ -482,10 +533,10 @@ int SecureSocketImpl::handleError(int rc)
 		poco_bugcheck();
 		return rc;
 	// SSL_GET_ERROR(3ossl):
- 	// On an unexpected EOF, versions before OpenSSL 3.0 returned
- 	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
- 	// errno was 0.  Since OpenSSL 3.0 the returned error is
- 	// SSL_ERROR_SSL with a meaningful error on the error stack.
+	// On an unexpected EOF, versions before OpenSSL 3.0 returned
+	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
+	// errno was 0.  Since OpenSSL 3.0 the returned error is
+	// SSL_ERROR_SSL with a meaningful error on the error stack.
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	case SSL_ERROR_SSL:
 #else

@@ -206,7 +206,7 @@ void HTTPClientSessionTest::testKeepAlive()
 	assertTrue (response.getKeepAlive());
 	std::ostringstream ostr1;
 	assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
-	
+
 	request.setMethod(HTTPRequest::HTTP_GET);
 	request.setURI("/small");
 	s.sendRequest(request);
@@ -216,7 +216,7 @@ void HTTPClientSessionTest::testKeepAlive()
 	std::ostringstream ostr2;
 	StreamCopier::copyStream(rs2, ostr2);
 	assertTrue (ostr2.str() == HTTPTestServer::SMALL_BODY);
-	
+
 	request.setMethod(HTTPRequest::HTTP_GET);
 	request.setURI("/large");
 	s.sendRequest(request);
@@ -237,6 +237,25 @@ void HTTPClientSessionTest::testKeepAlive()
 	assertTrue (!response.getKeepAlive());
 	std::ostringstream ostr4;
 	assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+}
+
+
+void HTTPClientSessionTest::testTrailer()
+{
+	HTTPTestServer srv;
+	HTTPClientSession s("127.0.0.1", srv.port());
+	s.setKeepAlive(true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/trailer", HTTPMessage::HTTP_1_1);
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (!s.responseTrailer().empty());
+	assertTrue (s.responseTrailer().get("Trailer-1") == "Value 1");
+	assertTrue (s.responseTrailer().get("Trailer-2") == "Value 2");
 }
 
 
@@ -273,7 +292,7 @@ void HTTPClientSessionTest::testProxyAuth()
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 	std::string r = srv.lastRequest();
-	assertTrue (r.find("Proxy-Authorization: Basic dXNlcjpwYXNz\r\n") != std::string::npos);	
+	assertTrue (r.find("Proxy-Authorization: Basic dXNlcjpwYXNz\r\n") != std::string::npos);
 }
 
 
@@ -283,15 +302,15 @@ void HTTPClientSessionTest::testBypassProxy()
 	proxyConfig.host = "proxy.domain.com";
 	proxyConfig.port = 80;
 	proxyConfig.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
-	
+
 	HTTPClientSession s1("127.0.0.1", 80);
 	s1.setProxyConfig(proxyConfig);
 	assertTrue (s1.bypassProxy());
-	
+
 	HTTPClientSession s2("127.0.0.1", 80);
 	s2.setProxyConfig(proxyConfig);
 	assertTrue (s2.bypassProxy());
-	
+
 	HTTPClientSession s3("www.appinf.com", 80);
 	s3.setProxyConfig(proxyConfig);
 	assertTrue (!s3.bypassProxy());
@@ -363,6 +382,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostSmallClose);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeClose);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testKeepAlive);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testTrailer);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyAuth);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxy);

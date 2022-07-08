@@ -52,7 +52,7 @@ namespace Net {
 namespace
 {
 	class MultiPartHandler: public PartHandler
-		/// This is a default part handler for multipart messages, used when there 
+		/// This is a default part handler for multipart messages, used when there
 		/// is no external handler provided to he MailMessage. This handler
 		/// will handle all types of message parts, including attachments.
 	{
@@ -65,14 +65,14 @@ namespace
 			/// in its entirety, including attachments.
 		{
 		}
-		
+
 		~MultiPartHandler()
 			/// Destroys string part handler.
 		{
 		}
-		
+
 		void handlePart(const MessageHeader& header, std::istream& stream)
-			/// Handles a part. If message pointer was provided at construction time, 
+			/// Handles a part. If message pointer was provided at construction time,
 			/// the message pointed to will be properly populated so it could be written
 			/// back out at a later point in time.
 		{
@@ -97,7 +97,7 @@ namespace
 				std::string filename;
 				if (!contentDisp.empty())
 					filename = getParamFromHeader(contentDisp, "filename");
-				if (filename.empty()) 
+				if (filename.empty())
 					filename = getParamFromHeader(contentType, "name");
 				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
 				poco_check_ptr (pPS);
@@ -108,13 +108,13 @@ namespace
 				{
 					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
 					{
-						if (it->second == "inline") 
+						if (it->second == "inline")
 							_pMsg->addContent(pPS, cte);
-						else 
+						else
 							_pMsg->addAttachment("", pPS, cte);
 						added = true;
 					}
-					
+
 					pPS->headers().set(it->first, it->second);
 				}
 
@@ -127,7 +127,7 @@ namespace
 				if (!added) delete pPS;
 			}
 		}
-		
+
 	private:
 		std::string getParamFromHeader(const std::string& header, const std::string& param)
 		{
@@ -159,12 +159,12 @@ namespace
 			/// The content parameter represents the part content.
 		{
 		}
-		
+
 		~StringPartHandler()
 			/// Destroys string part handler.
 		{
 		}
-		
+
 		void handlePart(const MessageHeader& header, std::istream& stream)
 			/// Handles a part.
 		{
@@ -172,7 +172,7 @@ namespace
 			Poco::StreamCopier::copyToString(stream, tmp);
 			_str.append(tmp);
 		}
-		
+
 	private:
 		std::string& _str;
 	};
@@ -198,7 +198,7 @@ const std::string MailMessage::CTE_QUOTED_PRINTABLE("quoted-printable");
 const std::string MailMessage::CTE_BASE64("base64");
 
 
-MailMessage::MailMessage(PartStoreFactory* pStoreFactory): 
+MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 	_encoding(),
 	_pStoreFactory(pStoreFactory)
 {
@@ -216,7 +216,7 @@ MailMessage::~MailMessage()
 	}
 }
 
-	
+
 void MailMessage::addRecipient(const MailRecipient& recipient)
 {
 	_recipients.push_back(recipient);
@@ -234,7 +234,7 @@ void MailMessage::setSender(const std::string& sender)
 	set(HEADER_FROM, sender);
 }
 
-	
+
 const std::string& MailMessage::getSender() const
 {
 	if (has(HEADER_FROM))
@@ -243,13 +243,13 @@ const std::string& MailMessage::getSender() const
 		return EMPTY_HEADER;
 }
 
-	
+
 void MailMessage::setSubject(const std::string& subject)
 {
 	set(HEADER_SUBJECT, subject);
 }
 
-	
+
 const std::string& MailMessage::getSubject() const
 {
 	if (has(HEADER_SUBJECT))
@@ -272,13 +272,13 @@ void MailMessage::setContentType(const std::string& mediaType)
 	set(HEADER_CONTENT_TYPE, mediaType);
 }
 
-	
+
 void MailMessage::setContentType(const MediaType& mediaType)
 {
 	setContentType(mediaType.toString());
 }
 
-	
+
 const std::string& MailMessage::getContentType() const
 {
 	if (has(HEADER_CONTENT_TYPE))
@@ -293,7 +293,7 @@ void MailMessage::setDate(const Poco::Timestamp& dateTime)
 	set(HEADER_DATE, DateTimeFormatter::format(dateTime, DateTimeFormat::RFC1123_FORMAT));
 }
 
-	
+
 Poco::Timestamp MailMessage::getDate() const
 {
 	const std::string& dateTime = get(HEADER_DATE);
@@ -301,7 +301,7 @@ Poco::Timestamp MailMessage::getDate() const
 	return DateTimeParser::parse(dateTime, tzd).timestamp();
 }
 
-	
+
 bool MailMessage::isMultipart() const
 {
 	MediaType mediaType = getContentType();
@@ -328,7 +328,7 @@ void MailMessage::addContent(PartSource* pSource, ContentTransferEncoding encodi
 	addPart("", pSource, CONTENT_INLINE, encoding);
 }
 
-	
+
 void MailMessage::addAttachment(const std::string& name, PartSource* pSource, ContentTransferEncoding encoding)
 {
 	addPart(name, pSource, CONTENT_ATTACHMENT, encoding);
@@ -388,7 +388,7 @@ void MailMessage::makeMultipart()
 	if (!isMultipart())
 	{
 		MediaType mediaType("multipart", "mixed");
-		setContentType(mediaType);	
+		setContentType(mediaType);
 	}
 }
 
@@ -408,7 +408,7 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 	header.set(HEADER_CONTENT_TYPE, mediaType.toString());
 	header.set(HEADER_MIME_VERSION, "1.0");
 	writeHeader(header, ostr);
-	
+
 	MultipartWriter writer(ostr, _boundary);
 	for (const auto& part: _parts)
 	{
@@ -542,7 +542,7 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 	std::string to;
 	std::string cc;
 	std::string bcc;
-	
+
 	for (const auto& rec: _recipients)
 	{
 		switch (rec.getType())
@@ -622,7 +622,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 		}
 	}
 	if (!containsNonASCII) return text;
-	
+
 	std::string encodedText;
 	std::string::size_type lineLength = 0;
 	for (auto ch: text)
@@ -680,7 +680,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 	if (lineLength > 0)
 	{
 		encodedText += "?=";
-	}	
+	}
 	return encodedText;
 }
 

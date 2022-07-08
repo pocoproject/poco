@@ -111,11 +111,11 @@ void SocketStreamTest::testEOF()
 		assertTrue (str.gcount() == 5);
 		assertTrue (std::string(buffer, 5) == "hello");
 	}
-	
+
 	int c = str.get();
 	assertTrue (c == -1);
 	assertTrue (str.eof());
-	
+
 	ss.close();
 }
 

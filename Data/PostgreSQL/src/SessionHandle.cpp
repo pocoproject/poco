@@ -493,6 +493,23 @@ std::string SessionHandle::clientEncoding() const
 }
 
 
+std::string SessionHandle::parameterStatus(const std::string& param) const
+{
+	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+
+	if (!isConnectedNoLock())
+	{
+		throw NotConnectedException();
+	}
+
+	const char* pValue = PQparameterStatus(_pConnection, param.c_str());
+	if (pValue)
+		return std::string(pValue);
+	else
+		return std::string();
+}
+
+
 int SessionHandle::libpqVersion() const
 {
 	return PQlibVersion();

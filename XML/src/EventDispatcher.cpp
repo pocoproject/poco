@@ -17,7 +17,7 @@
 #include "Poco/DOM/EventListener.h"
 
 
-namespace 
+namespace
 {
 	class DispatchGuard
 	{
@@ -27,12 +27,12 @@ namespace
 		{
 			++_count;
 		}
-		
+
 		~DispatchGuard()
 		{
 			--_count;
 		}
-		
+
 	private:
 		int& _count;
 	};
@@ -48,7 +48,7 @@ EventDispatcher::EventDispatcher():
 {
 }
 
-	
+
 EventDispatcher::~EventDispatcher()
 {
 }

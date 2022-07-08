@@ -22,7 +22,7 @@ public:
 	{
 		Poco::Crypto::initializeCrypto();
 	}
-	
+
 	~CryptoInitializer()
 	{
 		Poco::Crypto::uninitializeCrypto();

@@ -22,9 +22,10 @@ include(FindPackageHandleStandardArgs)
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_ODBC QUIET odbc)
 
-if(WIN32)
+if(WIN32 AND NOT MINGW)
 	get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
 	get_filename_component(kit81_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot81]" REALPATH)
+	set(_odbc_kit_include_dirs "${kit_dir}/Include/um" "${kit81_dir}/Include/um")
 endif()
 
 find_path(ODBC_INCLUDE_DIR
@@ -42,8 +43,7 @@ find_path(ODBC_INCLUDE_DIR
 		"C:/Program Files/Microsoft SDKs/Windows/v7.0/include"
 		"C:/Program Files/Microsoft SDKs/Windows/v6.0a/include"
 		"C:/ODBC/include"
-		"${kit_dir}/Include/um"
-		"${kit81_dir}/Include/um"
+		${_odbc_kit_include_dirs}
 	PATH_SUFFIXES
 		odbc
 		iodbc

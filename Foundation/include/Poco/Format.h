@@ -116,6 +116,9 @@ void Foundation_API format(std::string& result, const std::string& fmt, const st
 
 template <
 	typename T,
+#ifdef __cpp_lib_remove_cvref
+	typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 	typename... Args>
 void format(std::string& result, const std::string& fmt, T arg1, Args... args)
 	/// Appends the formatted string to result.
@@ -130,6 +133,9 @@ void format(std::string& result, const std::string& fmt, T arg1, Args... args)
 
 template <
 	typename T,
+#ifdef __cpp_lib_remove_cvref
+	typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 	typename... Args>
 void format(std::string& result, const char* fmt, T arg1, Args... args)
 	/// Appends the formatted string to result.
@@ -144,6 +150,9 @@ void format(std::string& result, const char* fmt, T arg1, Args... args)
 
 template <
 	typename T,
+#ifdef __cpp_lib_remove_cvref
+	typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 	typename... Args>
 std::string format(const std::string& fmt, T arg1, Args... args)
 	/// Returns the formatted string.
@@ -160,6 +169,9 @@ std::string format(const std::string& fmt, T arg1, Args... args)
 
 template <
 	typename T,
+#ifdef __cpp_lib_remove_cvref
+	typename std::enable_if_t<!std::is_same_v<std::remove_cvref_t<T>, std::vector<Any>>>,
+#endif
 	typename... Args>
 std::string format(const char* fmt, T arg1, Args... args)
 	/// Returns the formatted string.

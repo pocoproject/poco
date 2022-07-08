@@ -97,7 +97,7 @@ SQLRETURN SQLConnect(SQLHDBC hdbc,
 
 	std::wstring sqlPWD;
 	makeUTF16(szAuthStr, cbAuthStr, sqlPWD);
-	
+
 	return SQLConnectW(hdbc,
 		(SQLWCHAR*) sqlDSN.c_str(),
 		(SQLSMALLINT) sqlDSN.size(),
@@ -155,8 +155,8 @@ SQLRETURN SQLExecDirect(SQLHSTMT hstmt,
 	std::wstring sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLExecDirectW(hstmt, 
-		(SQLWCHAR*) sqlStr.c_str(), 
+	return SQLExecDirectW(hstmt,
+		(SQLWCHAR*) sqlStr.c_str(),
 		(SQLINTEGER) sqlStr.size());
 }
 
@@ -180,7 +180,7 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
 		return rc;
 	}
-	
+
 
 	return SQLGetConnectAttrW(hdbc,
 		fAttribute,
@@ -200,9 +200,9 @@ SQLRETURN SQLGetCursorName(SQLHSTMT hstmt,
 
 
 SQLRETURN SQLSetDescField(SQLHDESC hdesc,
-	SQLSMALLINT iRecord, 
+	SQLSMALLINT iRecord,
 	SQLSMALLINT iField,
-	SQLPOINTER  rgbValue, 
+	SQLPOINTER  rgbValue,
 	SQLINTEGER  cbValueMax)
 {
 	if (isString(rgbValue, cbValueMax))
@@ -211,18 +211,18 @@ SQLRETURN SQLSetDescField(SQLHDESC hdesc,
 		makeUTF16((SQLCHAR*) rgbValue, cbValueMax, str);
 
 		SQLRETURN rc = SQLSetDescFieldW(hdesc,
-			iRecord, 
+			iRecord,
 			iField,
-			(SQLPOINTER) str.c_str(), 
+			(SQLPOINTER) str.c_str(),
 			(SQLINTEGER) str.size() * sizeof(std::wstring::value_type));
 
 		return rc;
 	}
 
 	return SQLSetDescFieldW(hdesc,
-		iRecord, 
+		iRecord,
 		iField,
-		rgbValue, 
+		rgbValue,
 		cbValueMax);
 }
 
@@ -266,7 +266,7 @@ SQLRETURN SQLGetDescRec(SQLHDESC hdesc,
 	SQLSMALLINT* pfType,
 	SQLSMALLINT* pfSubType,
 	SQLLEN*      pLength,
-	SQLSMALLINT* pPrecision, 
+	SQLSMALLINT* pPrecision,
 	SQLSMALLINT* pScale,
 	SQLSMALLINT* pNullable)
 {
@@ -344,8 +344,8 @@ SQLRETURN SQLPrepare(SQLHSTMT hstmt,
 	std::wstring sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLPrepareW(hstmt, 
-		(SQLWCHAR*) sqlStr.c_str(), 
+	return SQLPrepareW(hstmt,
+		(SQLWCHAR*) sqlStr.c_str(),
 		(SQLINTEGER) sqlStr.size());
 }
 
@@ -362,13 +362,13 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 
 		return SQLSetConnectAttrW(hdbc,
 			fAttribute,
-			(SQLWCHAR*) str.c_str(), 
+			(SQLWCHAR*) str.c_str(),
 			(SQLINTEGER) str.size() * sizeof(std::wstring::value_type));
 	}
 
 	return SQLSetConnectAttrW(hdbc,
 		fAttribute,
-		rgbValue, 
+		rgbValue,
 		cbValue);
 }
 
@@ -576,7 +576,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 {
 	std::wstring connStrIn;
 	int len = cbConnStrIn;
-	if (SQL_NTS == len) 
+	if (SQL_NTS == len)
 		len = (int) std::strlen((const char*) szConnStrIn);
 
 	Poco::UnicodeConverter::toUTF16((const char *) szConnStrIn, len, connStrIn);

@@ -1,5 +1,133 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.12.0 (2022-07-08)
+===========================
+
+- This release introduces Prometheus library
+- Upgraded bundled PCRE to PCRE2 10.40
+- Small object optimization for Any and Dynamic::Var (compile-time option, enabled by default)
+- All swap operations are noexcept now
+- PollSet::add() is mode-cumulative now
+- UDPServer now requires explicit starting
+- Move semantics for sockets and SocketAddress (compile-time option, disabled by default)
+
+- GH #709: Poco::Dynamic::Var memory leak
+- GH #1039 Race condition in AsyncChannel close/log
+- GH #1459 Fix Socket::select() epoll and poll implementations
+- GH #1687 SQLite Notifier has no table information
+- GH #1884 TCPServerDispatcher::run() issue
+- GH #2084 LogFile_STD (LogFileImpl) fails to recover from getting out of space
+- GH #2085 Crash due to race condition in TCPServerDispatcher
+- GH #2091 Integrate windows poll
+- GH #2222 Warning when compiling my that's use VarHolder
+- GH #2270 HTTPClientSession not supporting binding source address for proxy connect
+- GH #2271 HTTPClientSession source IP address
+- GH #2285 SQLite::Connector::open() crashes on db file with non existing directory
+- GH #2287 Poco::Data::Statement becomes unusable after exception
+- GH #2352 Allow setting the socket of SecureSocketImpl to no-blocking
+- GH #2386 As of C++11, std::swap is noexcept
+- GH #2401 Net::MailMessage::read hangs on missing final multipart boundary
+- GH #2457 Poco::Redis after executing "auth" command next command always return "OK"
+- GH #2465 Operating system specific thread ID is not available any more in Logger/Formatter
+- GH #2470 Can't use Poco::MongoDB::Cursor on aggregation cursor
+- GH #2511 Negative precision in NumberFormatter::format()
+- GH #2513 Poco::Net::SocketConnector unregistering
+- GH #2516 SHA3Engine hard to use with HMACEngine duplicate enhancement
+- GH #2521 MySQL Extractor null value extraction
+- GH #2538 Poco::Data::Session::connector() returns empty string for MySQL session
+- GH #2569 MySQL timestamp
+- GH #2576 Add std::chrono support to Timespan
+- GH #2590 Zip 64-bit extensions not set
+- GH #2614 NTPClient ignores second fractions enhancement
+- GH #2619 Decoding URI query parameters incompatible with Spring 5
+- GH #2638 Upgrade Windows SDK Used for Building Poco
+- GH #2688 Static code analyzer warnings
+- GH #2691 MinGW: fatal error: kernelspecs.h: No such file
+- GH #2706 [windows bug] pollset WSAPoll with non blocking socket will not report error
+- GH #2755 MySQL LONGTEXT
+- GH #2821 Poco::Buffer: full on creation
+- GH #2849 setPadding does nothing when OpenSSL 1.1.x is used
+- GH #2864 SessionImpl begin
+- GH #2940 Add vcpkg installation instructions
+- GH #2943 Avoid clang 10 -Wimplicit-int-float-conversion warning/error when converting int into float
+- GH #2959 Fix percent-encoded fragment modification in Poco::URI
+- GH #2980 Memory leaks in Poco::Any
+- GH #2986 Once exhausted, Poco::ObjectPool does not lend out returned objects
+- GH #3016 MongoDB::Array interface improvements
+- GH #3026 HTTPDigestCredentials added support for RFC7616 algorithms
+- GH #3039 Poco errors with _DEBUG and NDEBUG
+- GH #3052 Fix constness of URI::getPathSegments
+- GH #3088 Fix error in find_package example
+- GH #3056 Inconsistent behavior ConsoleChannel vs. WindowsConsoleChannel
+- GH #3062 Makefile: space(s) following target name will break build (during link)
+- GH #3073 libPocoCrypto.so: undefined reference to `pthread_atfork' when linking statically with OpenSSL 1.1
+- GH #3104 Publicly expose Poco::Message parameters
+- GH #3105 CMake: use GNUInstallDirs
+- GH #3175 SharedLibrary::isLoaded() not thread safe
+- GH #3195 MinGW also defines __GNUC__
+- GH #3240 Task::postNotification possible leak
+- GH #3241 Poco::Data::SessionPool change connection timeout
+- GH #3251 JSON Serializing NAN
+- GH #3253 Arbitrary indent of 2 applied to JSON string objects Var conversion
+- GH #3261 Upgrade to PCRE2 latest version
+- GH #3283 DatagramSocket does not allow IPV6_V6ONLY
+- GH #3296 Add move semantics to Net (sockets and addresses)
+- GH #3297 Poco Foundation Fails to Compile With POCO_ENABLE_SOO Defined
+- GH #3323 Extend format patterns %T and %I to support native threads
+- GH #3342 DB into() does not compile for more than 20 members in a tuple
+- GH #3357 Add socket proactor
+- GH #3359 Make PollSet::poll() interruptible
+- GH #3371 SocketReactor::getNotifier() does not use socket.impl()
+- GH #3372 FTPClientSession::activeDataConnection 1.11.0 cannot set specific data port
+- GH #3374 No access to padding in Cipher
+- GH #3375 PollSet::SocketModeMap poll(const Poco::Timespan& timeout) hasSignaledFDs issue slow down connections
+- GH #3378 PollSet function setMode 1.11.0 cause while(1) on windows
+- GH #3380 Windows SO_REUSEADDR is neither reliable nor safe
+- GH #3384 Always set thread names on POSIX platforms
+- GH #3385 IPAddress::tryParse does not work for "::"
+- GH #3396 Poco::Data::ODBC - dbEncoding property not used for insert/update
+- GH #3399 IPAddress::isLoopback() returns false for IPv4 mapped in IPv6
+- GH #3404 Net: make MessageHeader limits configurable
+- GH #3415 OpenSSL 3.0 support
+- GH #3417 Calling SocketReactor's run() method in a program's main thread yields a lot of null pointer exceptions
+- GH #3421 Cannot use HMACEngine with SHA2Engine
+- GH #3452 Syslog: Include Facility to Syslog Message
+- GH #3453 added facility to SyslogChannel
+- GH #3460 LoongArch support
+- GH #3481 JSON DataType support for MySQL
+- GH #3482 Visual Studio 2022 (v170) missing from buildwin.cmd
+- GH #3486 Windows on ARM64 support
+- GH #3516 Fix OpenSSL 3.0 deprecated warnings
+- GH #3529 Added LocalConfigurationView to only search inside the viewed scope
+- GH #3543 Visual Studio Warning C4244
+- GH #3558 Race condition in SSLManager
+- GH #3561 Add envelope to crypto
+- GH #3569 Readded named substring support for regexes
+- GH #3580 Rounds very large negative numbers to the incorrect values
+- GH #3592 Add 425 / HTTP_TOO_EARLY to HTTPResponse::HTTPStatus
+- GH #3598 Socket::available does not always return correct value for UDP
+- GH #3602 Add Data::JSONRowFormatter
+- GH #3603 Update minimum GCC version information
+- GH #3611 VS2022 Arm64 projects missing or do not load
+- GH #3613 UDPHandler data race
+- GH #3620 MariaDB still uses tx_isolation for transaction isolation unlike MySQL 8+ which uses transaction_isolation
+- GH #3624 Upgrade double-conversion to v3.2.0
+- GH #3628 PollSet data race
+- GH #3629 Event data race
+- GH #3633 Redis: Support Authentication
+- GH #3635 ConfigurationView and JSON is broken for array access
+- GH #3639 Bugcheck: indicate compiler that functions will never return
+- GH #3640 fix warning C4717: 'format<vector<any>': recursive on all control paths, function will cause runtime stack overflow
+- GH #3641 FifoBuffer.advance method not throw exception when length==0
+- GH #3642 Make ParallelSocketReactor thread namable
+- GH #3651 TCPserver missing from Net/samples/CMakeLists.txt
+- GH #3652 Linking with Foundation on Android gives error
+- GH #3655 Socket::select EPOLL implementation returns socket in exceptList when empty list is given
+- GH #3658 Support for chunked transfer encoding trailer
+- GH #3661 PollSet::add()/update() semantics
+- GH #3665 MSVC does not properly recognize std version
+
+
 Release 1.11.3 (2022-06-12)
 ===========================
 

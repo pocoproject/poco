@@ -323,6 +323,10 @@ public:
 private:
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);
 
+	bool extractLongLOB(std::size_t pos);
+
+	bool extractJSON(std::size_t pos);
+
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
 
