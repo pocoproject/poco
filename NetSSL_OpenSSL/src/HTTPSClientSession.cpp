@@ -140,9 +140,10 @@ std::string HTTPSClientSession::proxyRequestPrefix() const
     result.append(getHost());
     /// Do not append default by default, since this may break some servers.
 	/// One example of such server is GCS (Google Cloud Storage).
-	if (getPort() != HTTPS_PORT)
-	{result.append(":");
-    NumberFormatter::append(result, getPort());}
+	if (getPort() != HTTPS_PORT) {
+        result.append(":");
+        NumberFormatter::append(result, getPort());
+    }
     return result;
 }
 
