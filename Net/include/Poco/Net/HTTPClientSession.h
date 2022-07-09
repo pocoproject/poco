@@ -79,9 +79,9 @@ public:
 	{
 		ProxyConfig():
 			port(HTTP_PORT),
-            protocol("http"),
-            tunnel(true),
-			authMethod(PROXY_AUTH_HTTP_BASIC)
+                        protocol("http"),
+                        tunnel(true),
+                        authMethod(PROXY_AUTH_HTTP_BASIC)
 		{
 		}
 
@@ -91,9 +91,9 @@ public:
 			/// Proxy server TCP port.
 		std::string  protocol;
 		    /// Protocol to use (http or https).
-        bool tunnel;
-            /// Use proxy as tunnel (establish 2-way communication through CONNECT request).
-            /// If tunnel option is 'false' request will be send directly to proxy without CONNECT request.
+                bool tunnel;
+                    /// Use proxy as tunnel (establish 2-way communication through CONNECT request).
+                    /// If tunnel option is 'false' request will be send directly to proxy without CONNECT request.
 		std::string  username;
 			/// Proxy server username.
 		std::string  password;
