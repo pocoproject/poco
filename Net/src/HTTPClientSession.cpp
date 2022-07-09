@@ -628,9 +628,9 @@ void HTTPClientSession::sendChallengeRequest(const HTTPRequest& request, HTTPRes
 StreamSocket HTTPClientSession::proxyConnect()
 {
 	URI proxyUri;
-    proxyUri.setScheme(getProxyProtocol());
-    proxyUri.setHost(getProxyHost());
-    proxyUri.setPort(getProxyPort());
+        proxyUri.setScheme(getProxyProtocol());
+        proxyUri.setHost(getProxyHost());
+        proxyUri.setPort(getProxyPort());
 
 	SharedPtr<HTTPClientSession> proxySession (_proxySessionFactory.createClientSession(proxyUri));
 
@@ -642,10 +642,10 @@ StreamSocket HTTPClientSession::proxyConnect()
 	HTTPResponse proxyResponse;
 	proxyRequest.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
 	proxyRequest.set(HTTPRequest::HOST, targetAddress);
-	proxySession.proxyAuthenticateImpl(proxyRequest, _proxyConfig);
+	proxySession->proxyAuthenticateImpl(proxyRequest, _proxyConfig);
 	proxySession->setKeepAlive(true);
-	proxySession.setSourceAddress(_sourceAddress4);
-	proxySession.setSourceAddress(_sourceAddress6);
+	proxySession->setSourceAddress(_sourceAddress4);
+	proxySession->setSourceAddress(_sourceAddress6);
 	proxySession->sendRequest(proxyRequest);
 	proxySession->receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
