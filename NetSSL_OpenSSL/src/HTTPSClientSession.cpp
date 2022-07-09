@@ -57,7 +57,7 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session
 	_pSession(pSession)
 {
 	setPort(HTTPS_PORT);
-    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+        _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
 }
 
 
@@ -67,7 +67,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+        _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
 }
 
 
@@ -75,7 +75,7 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext):
 	HTTPClientSession(SecureStreamSocket(pContext)),
 	_pContext(pContext)
 {
-    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+        _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
@@ -84,7 +84,7 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext, Session::Ptr pSess
 	_pContext(pContext),
 	_pSession(pSession)
 {
-    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+        _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
@@ -94,7 +94,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+        _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
@@ -105,13 +105,13 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+        _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
 HTTPSClientSession::~HTTPSClientSession()
 {
-    _proxySessionFactory.unregisterProtocol("https");
+        _proxySessionFactory.unregisterProtocol("https");
 }
 
 
