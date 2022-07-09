@@ -627,7 +627,7 @@ StreamSocket HTTPClientSession::proxyConnect()
     proxyUri.setHost(getProxyHost());
     proxyUri.setPort(getProxyPort());
 
-	SharedPtr<HTTPClientSession> proxySession (HTTPSessionFactory::defaultFactory().createClientSession(proxyUri));
+	SharedPtr<HTTPClientSession> proxySession (_proxySessionFactory.createClientSession(proxyUri));
 
 	proxySession->setTimeout(getTimeout());
 	std::string targetAddress(_host);
