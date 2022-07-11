@@ -47,14 +47,14 @@ class Notation;
 
 
 class XML_API Document: public AbstractContainerNode, public DocumentEvent
-	/// The Document interface represents the entire HTML or XML document. Conceptually, 
-	/// it is the root of the document tree, and provides the primary access to the 
+	/// The Document interface represents the entire HTML or XML document. Conceptually,
+	/// it is the root of the document tree, and provides the primary access to the
 	/// document's data.
 	///
-	/// Since elements, text nodes, comments, processing instructions, etc. cannot exist 
-	/// outside the context of a Document, the Document interface also contains the 
-	/// factory methods needed to create these objects. The Node objects created have a 
-	/// ownerDocument attribute which associates them with the Document within whose 
+	/// Since elements, text nodes, comments, processing instructions, etc. cannot exist
+	/// outside the context of a Document, the Document interface also contains the
+	/// factory methods needed to create these objects. The Node objects created have a
+	/// ownerDocument attribute which associates them with the Document within whose
 	/// context they were created.
 {
 public:
@@ -65,7 +65,7 @@ public:
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances
 		/// of the same schema, thus reducing memory usage.
-		
+
 	explicit Document(unsigned long namePoolSize);
 		/// Creates a new document using a name pool with the given size, which
 		/// should be a prime number (e.g., 251, 509, 1021, 4093).
@@ -141,9 +141,9 @@ public:
 	ProcessingInstruction* createProcessingInstruction(const XMLString& target, const XMLString& data) const;
 		/// Creates a ProcessingInstruction node given the specified target and data strings.
 
-	Attr* createAttribute(const XMLString& name) const;	
+	Attr* createAttribute(const XMLString& name) const;
 		/// Creates an Attr of the given name. Note that the Attr instance can then
-		/// be set on an Element using the setAttributeNode method.	
+		/// be set on an Element using the setAttributeNode method.
 
 	EntityReference* createEntityReference(const XMLString& name) const;
 		/// Creates an EntityReference object. In addition, if the referenced entity
@@ -181,18 +181,18 @@ public:
 		/// Creates an attribute of the given qualified name and namespace URI.
 
 	NodeList* getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const;
-		/// Returns a NodeList of all the Elements with a given local name and 
-		/// namespace URI in the order in which they are encountered in a 
+		/// Returns a NodeList of all the Elements with a given local name and
+		/// namespace URI in the order in which they are encountered in a
 		/// preorder traversal of the Document tree.
 
 	Element* getElementById(const XMLString& elementId) const;
-		/// Returns the Element whose ID is given by elementId. If no such 
+		/// Returns the Element whose ID is given by elementId. If no such
 		/// element exists, returns null. Behavior is not defined if more
-		/// than one element has this ID. 
+		/// than one element has this ID.
 		///
-		/// Note: The DOM implementation must have information that says 
+		/// Note: The DOM implementation must have information that says
 		/// which attributes are of type ID. Attributes with the name "ID"
-		/// are not of type ID unless so defined. Implementations that do 
+		/// are not of type ID unless so defined. Implementations that do
 		/// not know whether attributes are of type ID or not are expected to
 		/// return null. This implementation therefore returns null.
 		///
@@ -208,7 +208,7 @@ public:
 
 	// EventTarget
 	bool dispatchEvent(Event* evt);
-	
+
 	// Extensions
 	Entity* createEntity(const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName) const;
 		/// Creates an Entity with the given name, publicId, systemId and notationName.
@@ -222,13 +222,13 @@ public:
 
 	Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
 		/// Returns the first Element whose ID attribute (given in idAttribute)
-		/// has the given elementId. If no such element exists, returns null. 
+		/// has the given elementId. If no such element exists, returns null.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
 	Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
 		/// Returns the first Element whose ID attribute (given in idAttributeURI and idAttributeLocalName)
-		/// has the given elementId. If no such element exists, returns null. 
+		/// has the given elementId. If no such element exists, returns null.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
@@ -236,7 +236,7 @@ protected:
 	~Document();
 
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
-	
+
 	DocumentType* getDoctype();
 	void setDoctype(DocumentType* pDoctype);
 
@@ -247,7 +247,7 @@ private:
 	int             _eventSuspendLevel;
 
 	static const XMLString NODE_NAME;
-	
+
 	friend class DOMBuilder;
 };
 

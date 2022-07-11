@@ -43,13 +43,13 @@ ParserWriterTest::~ParserWriterTest()
 void ParserWriterTest::testParseWriteXHTML()
 {
 	std::ostringstream ostr;
-	
+
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
 	AutoPtr<Document> pDoc = parser.parseString(XHTML);
 	writer.writeNode(ostr, pDoc);
-	
+
 	std::string xml = ostr.str();
 	assertTrue (xml == XHTML);
 }
@@ -58,13 +58,13 @@ void ParserWriterTest::testParseWriteXHTML()
 void ParserWriterTest::testParseWriteXHTML2()
 {
 	std::ostringstream ostr;
-	
+
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 	DOMWriter writer;
 	AutoPtr<Document> pDoc = parser.parseString(XHTML2);
 	writer.writeNode(ostr, pDoc);
-	
+
 	std::string xml = ostr.str();
 	assertTrue (xml == XHTML2);
 }

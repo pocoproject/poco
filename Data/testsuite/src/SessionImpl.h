@@ -49,7 +49,7 @@ public:
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
 	bool isConnected() const;
-		/// Returns true if session is connected to the database, 
+		/// Returns true if session is connected to the database,
 		/// false otherwise.
 
 	void setConnectionTimeout(std::size_t timeout);

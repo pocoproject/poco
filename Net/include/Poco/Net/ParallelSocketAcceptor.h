@@ -42,14 +42,14 @@ namespace Net {
 template <class ServiceHandler, class SR>
 class ParallelSocketAcceptor
 	/// This class implements the Acceptor part of the Acceptor-Connector design pattern.
-	/// Only the difference from single-threaded version is documented here, For full 
+	/// Only the difference from single-threaded version is documented here, For full
 	/// description see Poco::Net::SocketAcceptor documentation.
-	/// 
+	///
 	/// This is a multi-threaded version of SocketAcceptor, it differs from the
 	/// single-threaded version in number of reactors (defaulting to number of processors)
 	/// that can be specified at construction time and is rotated in a round-robin fashion
-	/// by event handler. See ParallelSocketAcceptor::onAccept and 
-	/// ParallelSocketAcceptor::createServiceHandler documentation and implementation for 
+	/// by event handler. See ParallelSocketAcceptor::onAccept and
+	/// ParallelSocketAcceptor::createServiceHandler documentation and implementation for
 	/// details.
 {
 public:
@@ -64,7 +64,7 @@ public:
 		_pReactor(0),
 		_threads(threads),
 		_next(0)
-		/// Creates a ParallelSocketAcceptor using the given ServerSocket, 
+		/// Creates a ParallelSocketAcceptor using the given ServerSocket,
 		/// sets number of threads and populates the reactors vector.
 	{
 		init();
@@ -78,8 +78,8 @@ public:
 		_pReactor(&reactor),
 		_threads(threads),
 		_next(0)
-		/// Creates a ParallelSocketAcceptor using the given ServerSocket, sets the 
-		/// number of threads, populates the reactors vector and registers itself 
+		/// Creates a ParallelSocketAcceptor using the given ServerSocket, sets the
+		/// number of threads, populates the reactors vector and registers itself
 		/// with the given SocketReactor.
 	{
 		init();
@@ -113,7 +113,7 @@ public:
 		///
 		/// A subclass can override this function to e.g.
 		/// register an event handler for timeout event.
-		/// 
+		///
 		/// The overriding method must either call the base class
 		/// implementation or register the accept handler on its own.
 	{
@@ -123,13 +123,13 @@ public:
 			_pReactor->addEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept));
 		}
 	}
-	
+
 	virtual void unregisterAcceptor()
 		/// Unregisters the ParallelSocketAcceptor.
 		///
 		/// A subclass can override this function to e.g.
 		/// unregister its event handler for a timeout event.
-		/// 
+		///
 		/// The overriding method must either call the base class
 		/// implementation or unregister the accept handler on its own.
 	{
@@ -138,7 +138,7 @@ public:
 			_pReactor->removeEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept));
 		}
 	}
-	
+
 	void onAccept(ReadableNotification* pNotification)
 		/// Accepts connection and creates event handler.
 	{

@@ -32,7 +32,7 @@ class PDF_API Encoder: public Resource<HPDF_Encoder>
 {
 public:
 	enum Type
-	{		
+	{
 		ENCODER_TYPE_SINGLE_BYTE = HPDF_ENCODER_TYPE_SINGLE_BYTE,
 			/// This encoder is an encoder for single byte characters.
 		ENCODER_TYPE_DOUBLE_BYTE = HPDF_ENCODER_TYPE_DOUBLE_BYTE,
@@ -73,10 +73,10 @@ public:
 		/// Returns the type of an encoding object.
 
 	ByteType getByteType(const std::string& text, int index = 0) const;
-		/// Returns the type of byte in the text at position index 
+		/// Returns the type of byte in the text at position index
 
 	WriteMode writeMode();
-		/// Returns the writing mode for the encoding object. 
+		/// Returns the writing mode for the encoding object.
 };
 
 
@@ -95,7 +95,7 @@ inline Encoder::ByteType Encoder::getByteType(const std::string& text, int index
 	if (index < 0)
 		throw InvalidArgumentException("Negative values not allowed.");
 
-	return static_cast<ByteType>(HPDF_Encoder_GetByteType(handle(), 
+	return static_cast<ByteType>(HPDF_Encoder_GetByteType(handle(),
 		text.c_str(),
 		static_cast<HPDF_UINT>(index)));
 }

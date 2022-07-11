@@ -35,7 +35,7 @@ namespace
 		StringStreamFactory()
 		{
 		}
-		
+
 		std::istream* open(const URI& uri)
 		{
 			return new std::istringstream(uri.toString());
@@ -62,12 +62,12 @@ void URIStreamOpenerTest::testStreamOpenerFile()
 	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
-	
+
 	URI uri;
 	uri.setScheme("file");
 	uri.setPath(Path(path).toString(Path::PATH_UNIX));
 	std::string uriString = uri.toString();
-	
+
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
 	assertTrue (istr != 0);
@@ -84,10 +84,10 @@ void URIStreamOpenerTest::testStreamOpenerRelative()
 	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
-	
+
 	URI uri(Path(path).toString(Path::PATH_UNIX));
 	std::string uriString = uri.toString();
-	
+
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
 	assertTrue (istr != 0);
@@ -104,12 +104,12 @@ void URIStreamOpenerTest::testStreamOpenerURI()
 	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
-	
+
 	URI uri;
 	uri.setScheme("file");
 	uri.setPath(Path(path).toString(Path::PATH_UNIX));
 	std::string uriString = uri.toString();
-	
+
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString);
 	assertTrue (istr != 0);
@@ -126,16 +126,16 @@ void URIStreamOpenerTest::testStreamOpenerURIResolve()
 	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
-	
+
 	Path p(path);
 	p.makeAbsolute();
 	Path parent(p.parent());
-	
+
 	URI uri;
 	uri.setScheme("file");
 	uri.setPath(parent.toString(Path::PATH_UNIX));
 	std::string uriString = uri.toString();
-	
+
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString, p.getFileName());
 	assertTrue (istr != 0);
@@ -152,7 +152,7 @@ void URIStreamOpenerTest::testStreamOpenerPath()
 	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
-		
+
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(path);
 	assertTrue (istr != 0);
@@ -169,11 +169,11 @@ void URIStreamOpenerTest::testStreamOpenerPathResolve()
 	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
-	
+
 	Path p(path);
 	Path parent(p.parent());
 	std::string base = parent.toString();
-		
+
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(base, p.getFileName());
 	assertTrue (istr != 0);

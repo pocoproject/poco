@@ -33,24 +33,24 @@ class AbstractObserver;
 
 
 class Foundation_API NotificationCenter
-	/// A NotificationCenter is essentially a notification dispatcher. 
+	/// A NotificationCenter is essentially a notification dispatcher.
 	/// It notifies all observers of notifications meeting specific criteria.
 	/// This information is encapsulated in Notification objects.
-	/// Client objects register themselves with the notification center as observers of 
-	/// specific notifications posted by other objects. When an event occurs, an object 
-	/// posts an appropriate notification to the notification center. The notification  
-	/// center invokes the registered method on each matching observer, passing the notification 
+	/// Client objects register themselves with the notification center as observers of
+	/// specific notifications posted by other objects. When an event occurs, an object
+	/// posts an appropriate notification to the notification center. The notification
+	/// center invokes the registered method on each matching observer, passing the notification
 	/// as argument.
 	///
-	/// The order in which observers receive notifications is undefined. 
+	/// The order in which observers receive notifications is undefined.
 	/// It is possible for the posting object and the observing object to be the same.
-	/// The NotificationCenter delivers notifications to observers synchronously. 
-	/// In other words the postNotification() method does not return until all observers have 
-	/// received and processed the notification. 
+	/// The NotificationCenter delivers notifications to observers synchronously.
+	/// In other words the postNotification() method does not return until all observers have
+	/// received and processed the notification.
 	/// If an observer throws an exception while handling a notification, the NotificationCenter
 	/// stops dispatching the notification and postNotification() rethrows the exception.
 	///
-	/// In a multithreaded scenario, notifications are always delivered in the thread in which the 
+	/// In a multithreaded scenario, notifications are always delivered in the thread in which the
 	/// notification was posted, which may not be the same thread in which an observer registered itself.
 	///
 	/// The NotificationCenter class is basically a C++ implementation of the NSNotificationCenter class
@@ -116,10 +116,10 @@ public:
 		///
 		/// Can be used to improve performance if an expensive notification
 		/// shall only be created and posted if there are any observers.
-		
+
 	std::size_t countObservers() const;
 		/// Returns the number of registered observers.
-		
+
 	static NotificationCenter& defaultCenter();
 		/// Returns a reference to the default
 		/// NotificationCenter.

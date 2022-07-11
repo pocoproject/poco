@@ -2,7 +2,7 @@
 # iPhoneSimulator-clang-libc++
 #
 # Build settings for iPhone Simulator, using Apple's iPhone SDK
-# 
+#
 
 IPHONE_SDK         = iPhoneSimulator
 POCO_TARGET_OSARCH = i686

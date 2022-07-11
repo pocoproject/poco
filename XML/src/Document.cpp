@@ -38,7 +38,7 @@ namespace XML {
 const XMLString Document::NODE_NAME = toXMLString("#document");
 
 
-Document::Document(NamePool* pNamePool): 
+Document::Document(NamePool* pNamePool):
 	AbstractContainerNode(0),
 	_pDocumentType(0),
 	_eventSuspendLevel(0)
@@ -55,7 +55,7 @@ Document::Document(NamePool* pNamePool):
 }
 
 
-Document::Document(unsigned long namePoolSize): 
+Document::Document(unsigned long namePoolSize):
 	AbstractContainerNode(0),
 	_pDocumentType(0),
 	_pNamePool(new NamePool(namePoolSize)),
@@ -64,7 +64,7 @@ Document::Document(unsigned long namePoolSize):
 }
 
 
-Document::Document(DocumentType* pDocumentType, NamePool* pNamePool): 
+Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
 	AbstractContainerNode(0),
 	_pDocumentType(pDocumentType),
 	_eventSuspendLevel(0)
@@ -86,7 +86,7 @@ Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
 }
 
 
-Document::Document(DocumentType* pDocumentType, unsigned long namePoolSize): 
+Document::Document(DocumentType* pDocumentType, unsigned long namePoolSize):
 	AbstractContainerNode(0),
 	_pDocumentType(pDocumentType),
 	_pNamePool(new NamePool(namePoolSize)),
@@ -155,7 +155,7 @@ Element* Document::documentElement() const
 
 Element* Document::createElement(const XMLString& tagName) const
 {
-	return new Element(const_cast<Document*>(this), EMPTY_STRING, EMPTY_STRING, tagName); 
+	return new Element(const_cast<Document*>(this), EMPTY_STRING, EMPTY_STRING, tagName);
 }
 
 
@@ -203,7 +203,7 @@ EntityReference* Document::createEntityReference(const XMLString& name) const
 
 NodeList* Document::getElementsByTagName(const XMLString& name) const
 {
-	return new ElementsByTagNameList(const_cast<Document*>(this), name);	
+	return new ElementsByTagNameList(const_cast<Document*>(this), name);
 }
 
 
@@ -239,7 +239,7 @@ Attr* Document::createAttributeNS(const XMLString& namespaceURI, const XMLString
 
 NodeList* Document::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return new ElementsByTagNameListNS(const_cast<Document*>(this), namespaceURI, localName);	
+	return new ElementsByTagNameListNS(const_cast<Document*>(this), namespaceURI, localName);
 }
 
 

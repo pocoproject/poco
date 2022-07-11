@@ -72,7 +72,7 @@ ThreadImpl::ThreadImpl():
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
 	if (_thread) CloseHandle(_thread);

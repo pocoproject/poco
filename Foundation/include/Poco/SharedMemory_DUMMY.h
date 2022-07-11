@@ -54,7 +54,7 @@ public:
 		/// Returns the start address of the shared memory segment.
 
 	char* end() const;
-		/// Returns the one-past-end end address of the shared memory segment. 
+		/// Returns the one-past-end end address of the shared memory segment.
 
 protected:
 	~SharedMemoryImpl();

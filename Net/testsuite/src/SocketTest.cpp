@@ -179,7 +179,7 @@ void SocketTest::testFIFOBuffer()
 
 	n = ss.receiveBytes(f);
 	assertTrue (n == 5);
-	
+
 	assertTrue (2 == _notToReadable);
 	assertTrue (1 == _readableToNot);
 	assertTrue (1 == _notToWritable);
@@ -292,14 +292,14 @@ void SocketTest::testAssign()
 	ServerSocket serv;
 	StreamSocket ss1;
 	StreamSocket ss2;
-	
+
 	assertTrue (ss1 != ss2);
 	StreamSocket ss3(ss1);
 	assertTrue (ss1 == ss3);
 	ss3 = ss2;
 	assertTrue (ss1 != ss3);
 	assertTrue (ss2 == ss3);
-	
+
 	try
 	{
 		ss1 = serv;
@@ -308,7 +308,7 @@ void SocketTest::testAssign()
 	catch (InvalidArgumentException&)
 	{
 	}
-	
+
 	try
 	{
 		StreamSocket ss4(serv);
@@ -326,7 +326,7 @@ void SocketTest::testAssign()
 	catch (InvalidArgumentException&)
 	{
 	}
-	
+
 	try
 	{
 		ServerSocket serv2(ss1);
@@ -343,7 +343,7 @@ void SocketTest::testTimeout()
 	EchoServer echoServer;
 	StreamSocket ss;
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
-	
+
 	Timespan timeout0 = ss.getReceiveTimeout();
 	Timespan timeout(250000);
 	ss.setReceiveTimeout(timeout);
@@ -351,7 +351,7 @@ void SocketTest::testTimeout()
 	std::cout << "original receive timeout:  " << timeout0.totalMicroseconds() << std::endl;
 	std::cout << "requested receive timeout: " << timeout.totalMicroseconds() << std::endl;
 	std::cout << "actual receive timeout:    " << timeout1.totalMicroseconds() << std::endl;
-	
+
 	// some socket implementations adjust the timeout value
 	// assertTrue (ss.getReceiveTimeout() == timeout);
 	Stopwatch sw;
@@ -366,7 +366,7 @@ void SocketTest::testTimeout()
 	{
 	}
 	assertTrue (sw.elapsed() < 1000000);
-	
+
 	timeout0 = ss.getSendTimeout();
 	ss.setSendTimeout(timeout);
 	timeout1 = ss.getSendTimeout();
@@ -382,7 +382,7 @@ void SocketTest::testBufferSize()
 	EchoServer echoServer;
 	SocketAddress sa("127.0.0.1", 1234);
 	StreamSocket ss(sa.family());
-	
+
 	int osz = ss.getSendBufferSize();
 	int rsz = 32000;
 	ss.setSendBufferSize(rsz);
@@ -390,7 +390,7 @@ void SocketTest::testBufferSize()
 	std::cout << "original send buffer size:  " << osz << std::endl;
 	std::cout << "requested send buffer size: " << rsz << std::endl;
 	std::cout << "actual send buffer size:    " << asz << std::endl;
-	
+
 	osz = ss.getReceiveBufferSize();
 	ss.setReceiveBufferSize(rsz);
 	asz = ss.getReceiveBufferSize();
@@ -414,17 +414,17 @@ void SocketTest::testOptions()
 	ss.setLinger(false, 0);
 	ss.getLinger(f, t);
 	assertTrue (!f);
-	
+
 	ss.setNoDelay(true);
 	assertTrue (ss.getNoDelay());
 	ss.setNoDelay(false);
 	assertTrue (!ss.getNoDelay());
-	
+
 	ss.setKeepAlive(true);
 	assertTrue (ss.getKeepAlive());
 	ss.setKeepAlive(false);
 	assertTrue (!ss.getKeepAlive());
-	
+
 	ss.setOOBInline(true);
 	assertTrue (ss.getOOBInline());
 	ss.setOOBInline(false);
@@ -449,7 +449,7 @@ void SocketTest::testSelect()
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
-	
+
 	ss.sendBytes("hello", 5);
 
 	ss.poll(timeout, Socket::SELECT_READ);
@@ -477,7 +477,7 @@ void SocketTest::testSelect2()
 	EchoServer echoServer2;
 	StreamSocket ss1(SocketAddress("127.0.0.1", echoServer1.port()));
 	StreamSocket ss2(SocketAddress("127.0.0.1", echoServer2.port()));
-	
+
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
@@ -488,7 +488,7 @@ void SocketTest::testSelect2()
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
-	
+
 	ss1.sendBytes("hello", 5);
 
 	ss1.poll(timeout, Socket::SELECT_READ);

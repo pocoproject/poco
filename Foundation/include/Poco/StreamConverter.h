@@ -91,7 +91,7 @@ class Foundation_API InputStreamConverter: public StreamConverterIOS, public std
 	/// underlying istream from one character encoding into another.
 	/// If a character cannot be represented in outEncoding, defaultChar
 	/// is used instead.
-	/// If a byte sequence read from the underlying stream is not valid in inEncoding, 
+	/// If a byte sequence read from the underlying stream is not valid in inEncoding,
 	/// defaultChar is used instead and the encoding error count is incremented.
 {
 public:
@@ -109,7 +109,7 @@ class Foundation_API OutputStreamConverter: public StreamConverterIOS, public st
 	/// underlying ostream from one character encoding into another.
 	/// If a character cannot be represented in outEncoding, defaultChar
 	/// is used instead.
-	/// If a byte sequence written to the stream is not valid in inEncoding, 
+	/// If a byte sequence written to the stream is not valid in inEncoding,
 	/// defaultChar is used instead and the encoding error count is incremented.
 {
 public:

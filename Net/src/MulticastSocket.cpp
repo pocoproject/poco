@@ -24,10 +24,10 @@
 
 #if defined(hpux) && defined(_XOPEN_SOURCE_EXTENDED) && defined(POCO_HPUX_IP_MREQ_HACK)
 // netinet/in.h does not define struct ip_mreq if
-// _XOPEN_SOURCE_EXTENDED is #define'd in HP-UX 11.x 
+// _XOPEN_SOURCE_EXTENDED is #define'd in HP-UX 11.x
 // versions prior to 11.30. Compile with -DPOCO_HPUX_IP_MREQ_HACK
 // if you experience problems.
-struct ip_mreq 
+struct ip_mreq
 {
 	struct in_addr imr_multiaddr;
 	struct in_addr imr_interface;
@@ -97,7 +97,7 @@ void MulticastSocket::setInterface(const NetworkInterface& interfc)
 	else throw UnsupportedFamilyException("Unknown or unsupported socket family.");
 }
 
-	
+
 NetworkInterface MulticastSocket::getInterface() const
 {
 	try
@@ -118,7 +118,7 @@ NetworkInterface MulticastSocket::getInterface() const
 	}
 }
 
-	
+
 void MulticastSocket::setLoopback(bool flag)
 {
 	if (address().af() == AF_INET)
@@ -135,7 +135,7 @@ void MulticastSocket::setLoopback(bool flag)
 	}
 }
 
-	
+
 bool MulticastSocket::getLoopback() const
 {
 	bool flag = false;
@@ -156,7 +156,7 @@ bool MulticastSocket::getLoopback() const
 	return flag;
 }
 
-	
+
 void MulticastSocket::setTimeToLive(unsigned value)
 {
 	if (address().af() == AF_INET)
@@ -172,7 +172,7 @@ void MulticastSocket::setTimeToLive(unsigned value)
 	}
 }
 
-	
+
 unsigned MulticastSocket::getTimeToLive() const
 {
 	unsigned ttl(0);
@@ -191,13 +191,13 @@ unsigned MulticastSocket::getTimeToLive() const
 	return ttl;
 }
 
-	
+
 void MulticastSocket::joinGroup(const IPAddress& groupAddress)
 {
 	joinGroup(groupAddress, findFirstInterface(groupAddress));
 }
 
-	
+
 void MulticastSocket::joinGroup(const IPAddress& groupAddress, const NetworkInterface& interfc)
 {
 	if (groupAddress.af() == AF_INET)
@@ -254,14 +254,14 @@ NetworkInterface MulticastSocket::findFirstInterface(const IPAddress& groupAddre
 	throw NotFoundException("No multicast-eligible network interface found.");
 }
 
-	
+
 void MulticastSocket::leaveGroup(const IPAddress& groupAddress)
 {
 	NetworkInterface intf;
 	leaveGroup(groupAddress, intf);
 }
 
-	
+
 void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interfc)
 {
 	if (groupAddress.af() == AF_INET)

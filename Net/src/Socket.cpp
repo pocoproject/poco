@@ -19,9 +19,9 @@
 #include "Poco/Error.h"
 #include <algorithm>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
-#if defined(POCO_HAVE_FD_EPOLL)
-	#include <sys/epoll.h>
-#elif defined(POCO_HAVE_FD_POLL)
+
+
+#if defined(POCO_HAVE_FD_POLL)
 	#include "Poco/SharedPtr.h"
 	#ifndef _WIN32
 		#include <poll.h>

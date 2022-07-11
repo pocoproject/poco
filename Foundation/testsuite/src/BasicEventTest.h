@@ -44,7 +44,7 @@ public:
 	void testOverwriteDelegate();
 	void testAsyncNotify();
 	void testNullMutex();
-	
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();

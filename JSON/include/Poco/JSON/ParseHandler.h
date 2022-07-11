@@ -45,7 +45,7 @@ public:
 
 	virtual void reset();
 		/// Resets the handler state.
-		
+
 	void startObject();
 		/// Handles a '{'; a new object is started.
 

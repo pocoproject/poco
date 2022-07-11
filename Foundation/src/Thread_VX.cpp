@@ -44,7 +44,7 @@ ThreadImpl::ThreadImpl():
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
 }
@@ -133,7 +133,7 @@ void ThreadImpl::startImpl(Runnable& target)
 		throw SystemException("thread already running");
 
 	_pData->pRunnableTarget = &target;
-	
+
 	int stackSize = _pData->stackSize == 0 ? DEFAULT_THREAD_STACK_SIZE : _pData->stackSize;
 	int id = taskSpawn(NULL, _pData->osPrio, VX_FP_TASK, stackSize, reinterpret_cast<FUNCPTR>(runnableEntry), reinterpret_cast<int>(this), 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	if (id == ERROR)

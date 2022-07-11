@@ -301,7 +301,7 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 		if (MoveFileW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
 			handleLastErrorImpl(_path);
 	}
-	
+
 }
 
 

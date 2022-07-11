@@ -33,23 +33,23 @@ int main(int argc, char** argv)
 		          << "       create the HMAC-MD5 for <input_file>, using <passphrase>" << std::endl;
 		return 1;
 	}
-	
+
 	std::string passphrase(argv[1]);
-	
+
 	std::ifstream istr(argv[2], std::ios::binary);
 	if (!istr)
 	{
 		std::cerr << "cannot open input file: " << argv[2] << std::endl;
 		return 2;
 	}
-	
+
 	HMACEngine<MD5Engine> hmac(passphrase);
 	DigestOutputStream dos(hmac);
-	
+
 	StreamCopier::copyStream(istr, dos);
 	dos.close();
-	
+
 	std::cout << DigestEngine::digestToHex(hmac.digest()) << std::endl;
-	
+
 	return 0;
 }

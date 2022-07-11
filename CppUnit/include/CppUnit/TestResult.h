@@ -67,7 +67,7 @@ public:
 		SynchronizationObject()
 		{
 		}
-		
+
 		virtual ~SynchronizationObject()
 		{
 		}
@@ -75,7 +75,7 @@ public:
 		virtual void lock()
 		{
 		}
-		
+
 		virtual void unlock()
 		{
 		}
@@ -112,7 +112,7 @@ protected:
 // Construct a TestResult
 inline TestResult::TestResult(): _syncObject(new SynchronizationObject())
 {
-	_runTests = 0; 
+	_runTests = 0;
 	_stop = false;
 }
 
@@ -121,7 +121,7 @@ inline TestResult::TestResult(): _syncObject(new SynchronizationObject())
 // caused the error
 inline void TestResult::addError(Test* test, CppUnitException* e)
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	_errors.push_back(new TestFailure(test, e));
 }
 
@@ -130,7 +130,7 @@ inline void TestResult::addError(Test* test, CppUnitException* e)
 // caused the failure.
 inline void TestResult::addFailure(Test* test, CppUnitException* e)
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	_failures.push_back(new TestFailure(test, e));
 }
 
@@ -138,7 +138,7 @@ inline void TestResult::addFailure(Test* test, CppUnitException* e)
 // Informs the result that a test will be started.
 inline void TestResult::startTest(Test* test)
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	_runTests++;
 }
 
@@ -153,7 +153,7 @@ inline void TestResult::endTest(Test* test)
 // Gets the number of run tests.
 inline int TestResult::runTests()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	return _runTests;
 }
 
@@ -161,7 +161,7 @@ inline int TestResult::runTests()
 // Gets the number of detected errors.
 inline int TestResult::testErrors()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	return (int) _errors.size();
 }
 
@@ -169,7 +169,7 @@ inline int TestResult::testErrors()
 // Gets the number of detected failures.
 inline int TestResult::testFailures()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	return (int) _failures.size();
 }
 
@@ -177,15 +177,15 @@ inline int TestResult::testFailures()
 // Returns whether the entire test was successful or not.
 inline bool TestResult::wasSuccessful()
 {
-	ExclusiveZone zone(_syncObject); 
-	return _failures.size() == 0 && _errors.size () == 0; 
+	ExclusiveZone zone(_syncObject);
+	return _failures.size() == 0 && _errors.size () == 0;
 }
 
 
 // Returns a std::vector of the errors.
 inline std::vector<TestFailure*>& TestResult::errors()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	return _errors;
 }
 
@@ -193,7 +193,7 @@ inline std::vector<TestFailure*>& TestResult::errors()
 // Returns a std::vector of the failures.
 inline std::vector<TestFailure*>& TestResult::failures()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	return _failures;
 }
 
@@ -201,7 +201,7 @@ inline std::vector<TestFailure*>& TestResult::failures()
 // Returns whether testing should be stopped
 inline bool TestResult::shouldStop()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	return _stop;
 }
 
@@ -209,7 +209,7 @@ inline bool TestResult::shouldStop()
 // Stop testing
 inline void TestResult::stop()
 {
-	ExclusiveZone zone(_syncObject); 
+	ExclusiveZone zone(_syncObject);
 	_stop = true;
 }
 
@@ -218,7 +218,7 @@ inline void TestResult::stop()
 // TestResult assumes ownership of the object
 inline void TestResult::setSynchronizationObject(SynchronizationObject* syncObject)
 {
-	delete _syncObject; 
+	delete _syncObject;
 	_syncObject = syncObject;
 }
 

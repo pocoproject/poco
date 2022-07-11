@@ -51,7 +51,7 @@ std::istream& StringPartSource::stream()
 	return _istr;
 }
 
-	
+
 const std::string& StringPartSource::filename() const
 {
 	return _filename;

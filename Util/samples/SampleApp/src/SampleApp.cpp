@@ -41,26 +41,26 @@ public:
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		// add your own initialization code here
 	}
-	
+
 	void uninitialize()
 	{
 		// add your own uninitialization code here
 		Application::uninitialize();
 	}
-	
+
 	void reinitialize(Application& self)
 	{
 		Application::reinitialize(self);
 		// add your own reinitialization code here
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -77,7 +77,7 @@ protected:
 				.repeatable(true)
 				.argument("name=value")
 				.callback(OptionCallback<SampleApp>(this, &SampleApp::handleDefine)));
-				
+
 		options.addOption(
 			Option("config-file", "f", "load configuration data from a file")
 				.required(false)
@@ -92,24 +92,24 @@ protected:
 				.argument("value")
 				.binding("test.property"));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
 	}
-	
+
 	void handleDefine(const std::string& name, const std::string& value)
 	{
 		defineProperty(value);
 	}
-	
+
 	void handleConfig(const std::string& name, const std::string& value)
 	{
 		loadConfiguration(value);
 	}
-		
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -118,7 +118,7 @@ protected:
 		helpFormatter.setHeader("A sample application that demonstrates some of the features of the Poco::Util::Application class.");
 		helpFormatter.format(std::cout);
 	}
-	
+
 	void defineProperty(const std::string& def)
 	{
 		std::string name;
@@ -154,7 +154,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 	void printProperties(const std::string& base)
 	{
 		AbstractConfiguration::Keys keys;
@@ -181,7 +181,7 @@ protected:
 			}
 		}
 	}
-	
+
 private:
 	bool _helpRequested;
 };

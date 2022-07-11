@@ -32,10 +32,10 @@ class Net_API NullPartHandler: public PartHandler
 public:
 	NullPartHandler();
 		/// Creates the NullPartHandler.
-	
+
 	~NullPartHandler();
 		/// Destroys the NullPartHandler.
-	
+
 	void handlePart(const MessageHeader& header, std::istream& stream);
 		/// Reads and discards all data from the stream.
 };

@@ -31,7 +31,7 @@ namespace
 		TestTask(): Task("TestTask")
 		{
 		}
-		
+
 		void runTask()
 		{
 			_event.wait();
@@ -44,12 +44,12 @@ namespace
 			setProgress(1.0);
 			_event.wait();
 		}
-		
+
 		void cont()
 		{
 			_event.set();
 		}
-		
+
 	private:
 		Event _event;
 	};

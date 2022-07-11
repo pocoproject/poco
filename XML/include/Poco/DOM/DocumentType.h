@@ -35,12 +35,12 @@ class XML_API DocumentType: public AbstractContainerNode
 	/// interface to the list of entities that are defined for the document, and
 	/// little else because the effect of namespaces and the various XML scheme
 	/// efforts on DTD representation are not clearly understood as of this writing.
-	/// 
+	///
 	/// The DOM Level 1 doesn't support editing DocumentType nodes.
 {
 public:
 	const XMLString& name() const;
-		/// The name of the DTD; i.e., the name immediately following the 
+		/// The name of the DTD; i.e., the name immediately following the
 		/// DOCTYPE keyword.
 
 	NamedNodeMap* entities() const;
@@ -52,7 +52,7 @@ public:
 		/// external entities are reported.
 		/// Every node in this map also implements the
 		/// Entity interface.
-		/// 
+		///
 		/// The returned NamedNodeMap must be released with a call
 		/// to release() when no longer needed.
 
@@ -61,7 +61,7 @@ public:
 		/// are discarded. Every node in this map also implements the Notation interface.
 		/// The DOM Level 1 does not support editing notations, therefore notations
 		/// cannot be altered in any way.
-		/// 
+		///
 		/// The returned NamedNodeMap must be released with a call
 		/// to release() when no longer needed.
 
@@ -91,7 +91,7 @@ private:
 	XMLString _name;
 	XMLString _publicId;
 	XMLString _systemId;
-	
+
 	friend class DOMImplementation;
 	friend class Document;
 	friend class DOMBuilder;

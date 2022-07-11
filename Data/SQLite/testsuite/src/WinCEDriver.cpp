@@ -24,7 +24,7 @@ int wmain(int argc, wchar_t* argv[])
 		std::wcstombs(buffer, argv[i], sizeof(buffer));
 		args.push_back(std::string(buffer));
 	}
-	CppUnit::TestRunner runner;	
+	CppUnit::TestRunner runner;
 	runner.addTest("SQLiteTestSuite", SQLiteTestSuite::suite());
 	return runner.run(args) ? 0 : 1;
 }

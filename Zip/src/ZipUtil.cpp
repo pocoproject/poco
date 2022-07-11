@@ -38,7 +38,7 @@ Poco::DateTime ZipUtil::parseDateTime(const char* pVal, const Poco::UInt32 timeP
 	int day  = (date & 0x001fu);             // 0000 0000 0001 1111
 	int mon  = ((date & 0x01e0u) >> 5);      // 0000 0001 1110 0000
 	int year = 1980+((date & 0xfe00u) >> 9); // 1111 1110 0000 0000
-	
+
 	if (Poco::DateTime::isValid(year, mon, day, hour, min, sec))
 		return Poco::DateTime(year, mon, day, hour, min, sec);
 	else
@@ -94,7 +94,7 @@ void ZipUtil::sync(std::istream& in)
 {
 	enum
 	{
-		PREFIX = 2, 
+		PREFIX = 2,
 		BUFFER_SIZE = 1024
 	};
 	char temp[BUFFER_SIZE];
@@ -102,7 +102,7 @@ void ZipUtil::sync(std::istream& in)
 	std::size_t tempPos = PREFIX;
 
 	while (in.good() && !in.eof())
-	{ 
+	{
 		// all zip headers start withe same 2byte prefix
 		if (std::memcmp(ZipLocalFileHeader::HEADER, &temp[tempPos - PREFIX], PREFIX) == 0)
 		{
@@ -110,8 +110,8 @@ void ZipUtil::sync(std::istream& in)
 			// read the next 2 bytes
 			in.read(temp+tempPos, PREFIX);
 			tempPos += PREFIX;
-			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 || 
-				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 || 
+			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
+				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipFileInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipDataInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 			{

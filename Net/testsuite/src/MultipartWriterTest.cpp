@@ -40,7 +40,7 @@ void MultipartWriterTest::testWriteOnePart()
 	w.nextPart(h);
 	ostr << "this is part 1";
 	w.close();
-	std::string s = ostr.str();	
+	std::string s = ostr.str();
 	assertTrue (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 }
 
@@ -57,7 +57,7 @@ void MultipartWriterTest::testWriteTwoParts()
 	w.nextPart(h);
 	ostr << "this is part 2";
 	w.close();
-	std::string s = ostr.str();	
+	std::string s = ostr.str();
 	assertTrue (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
 }
 

@@ -52,7 +52,7 @@ struct Foundation_API UTF8
 	static std::string& toUpperInPlace(std::string& str);
 	static std::string toLower(const std::string& str);
 	static std::string& toLowerInPlace(std::string& str);
-	
+
 	static void removeBOM(std::string& str);
 		/// Remove the UTF-8 Byte Order Mark sequence (0xEF, 0xBB, 0xBF)
 		/// from the beginning of the string, if it's there.

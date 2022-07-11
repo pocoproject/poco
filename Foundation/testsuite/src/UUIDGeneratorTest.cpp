@@ -34,7 +34,7 @@ UUIDGeneratorTest::~UUIDGeneratorTest()
 void UUIDGeneratorTest::testTimeBased()
 {
 	UUIDGenerator& gen = UUIDGenerator::defaultGenerator();
-	
+
 	std::set<UUID> uuids;
 	for (int i = 0; i < 1000; ++i)
 	{

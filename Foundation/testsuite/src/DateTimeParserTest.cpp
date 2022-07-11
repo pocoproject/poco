@@ -392,7 +392,7 @@ void DateTimeParserTest::testRFC850()
 	assertTrue (dt.minute() == 30);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == -3600);
-	
+
 	dt = DateTimeParser::parse(DateTimeFormat::RFC850_FORMAT, "Wed, 12-Sep-73 02:01:12 CEST", tzd);
 	assertTrue (dt.year() == 1973);
 	assertTrue (dt.month() == 9);
@@ -484,7 +484,7 @@ void DateTimeParserTest::testCustom()
 	assertTrue (dt.minute() == 0);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 0);
-	
+
 	dt = DateTimeParser::parse("%m/%d/%y", "01/18/05", tzd);
 	assertTrue (dt.year() == 2005);
 	assertTrue (dt.month() == 1);
@@ -493,7 +493,7 @@ void DateTimeParserTest::testCustom()
 	assertTrue (dt.minute() == 0);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 0);
-	
+
 	dt = DateTimeParser::parse("%h:%M %a", "12:30 am", tzd);
 	assertTrue (dt.hour() == 0);
 	assertTrue (dt.minute() == 30);
@@ -557,7 +557,7 @@ void DateTimeParserTest::testGuess()
 	assertTrue (dt.minute() == 30);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 0);
-	
+
 	dt = DateTimeParser::parse("2005-01-08T12:30:00+01:00", tzd);
 	assertTrue (dt.year() == 2005);
 	assertTrue (dt.month() == 1);
@@ -640,7 +640,7 @@ void DateTimeParserTest::testGuess()
 	assertTrue (dt.minute() == 30);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 3600);
-	
+
 	dt = DateTimeParser::parse("Sat Jan  8 12:30:00 2005", tzd);
 	assertTrue (dt.year() == 2005);
 	assertTrue (dt.month() == 1);

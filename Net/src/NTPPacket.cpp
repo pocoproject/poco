@@ -27,7 +27,7 @@ namespace Net {
 #else
 #pragma pack(1)
 #endif
-struct NTPPacketData 
+struct NTPPacketData
 {
 	Poco::Int8 mode:3;
 	Poco::Int8 vn:3;

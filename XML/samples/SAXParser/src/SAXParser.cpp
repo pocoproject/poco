@@ -36,23 +36,23 @@ public:
 		_pLocator(0)
 	{
 	}
-	
+
 	// ContentHandler
 	void setDocumentLocator(const Locator* loc)
 	{
 		_pLocator = loc;
 	}
-	
+
 	void startDocument()
 	{
 		where("startDocument");
 	}
-	
+
 	void endDocument()
 	{
 		where("endDocument");
 	}
-	
+
 	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 	{
 		where("startElement");
@@ -65,83 +65,83 @@ public:
 			std::cout << attributes.getLocalName(i) << "=" << attributes.getValue(i) << std::endl;
 		}
 	}
-	
+
 	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
 	{
 		where("endElement");
 	}
-	
+
 	void characters(const XMLChar ch[], int start, int length)
 	{
 		where("characters");
 		std::cout << std::string(ch + start, length) << std::endl;
 	}
-	
+
 	void ignorableWhitespace(const XMLChar ch[], int start, int length)
 	{
 		where("ignorableWhitespace");
 	}
-	
+
 	void processingInstruction(const XMLString& target, const XMLString& data)
 	{
 		where("processingInstruction");
 		std::cout << "target=" << target << ", data=" << data << std::endl;
 	}
-	
+
 	void startPrefixMapping(const XMLString& prefix, const XMLString& uri)
 	{
 		where("startPrefixMapping");
 		std::cout << "prefix=" << prefix << " uri=" << uri << std::endl;
 	}
-	
+
 	void endPrefixMapping(const XMLString& prefix)
 	{
 		where("endPrefixMapping");
 		std::cout << "prefix=" << prefix << std::endl;
 	}
-	
+
 	void skippedEntity(const XMLString& name)
 	{
 		where("skippedEntity");
 		std::cout << "name=" << name << std::endl;
 	}
-	
+
 	// LexicalHandler
 	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId)
 	{
 		where("startDTD");
 	}
-	
+
 	void endDTD()
 	{
 		where("endDTD");
 	}
-	
+
 	void startEntity(const XMLString& name)
 	{
 		where("startEntity");
 	}
-	
+
 	void endEntity(const XMLString& name)
 	{
 		where("endEntity");
 	}
-	
+
 	void startCDATA()
 	{
 		where("startCDATA");
 	}
-	
+
 	void endCDATA()
 	{
 		where("endCDATA");
 	}
-	
+
 	void comment(const XMLChar ch[], int start, int length)
 	{
 		where("comment");
 	}
-	
+
 protected:
 	void where(const std::string& meth)
 	{
@@ -150,12 +150,12 @@ protected:
 		{
 			std::cout << " in "
 			          << _pLocator->getSystemId()
-			          << ", line " << _pLocator->getLineNumber() 
-			          << ", col " << _pLocator->getColumnNumber() 
+			          << ", line " << _pLocator->getLineNumber()
+			          << ", col " << _pLocator->getColumnNumber()
 			          << std::endl;
 		}
 	}
-	
+
 private:
 	const Locator* _pLocator;
 };
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
 		std::cout << "usage: " << argv[0] << ": <xmlfile>" << std::endl;
 		return 1;
 	}
-	
+
 	MyHandler handler;
 
 	SAXParser parser;
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 	parser.setContentHandler(&handler);
 	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(&handler));
-	
+
 	try
 	{
 		parser.parse(argv[1]);
@@ -188,6 +188,6 @@ int main(int argc, char** argv)
 		std::cerr << e.displayText() << std::endl;
 		return 2;
 	}
-	
+
 	return 0;
 }

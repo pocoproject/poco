@@ -26,12 +26,12 @@ namespace ODBC {
 
 EnvironmentHandle::EnvironmentHandle(): _henv(SQL_NULL_HENV)
 {
-	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_ENV, 
-			SQL_NULL_HANDLE, 
+	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_ENV,
+			SQL_NULL_HANDLE,
 			&_henv)) ||
-		Utility::isError(SQLSetEnvAttr(_henv, 
-			SQL_ATTR_ODBC_VERSION, 
-			(SQLPOINTER) SQL_OV_ODBC3, 
+		Utility::isError(SQLSetEnvAttr(_henv,
+			SQL_ATTR_ODBC_VERSION,
+			(SQLPOINTER) SQL_OV_ODBC3,
 			0)))
 	{
 		throw ODBCException("Could not initialize environment.");

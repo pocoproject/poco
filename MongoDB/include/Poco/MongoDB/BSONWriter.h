@@ -30,7 +30,7 @@ class MongoDB_API BSONWriter
 	/// Class for writing BSON using a Poco::BinaryWriter.
 {
 public:
-	BSONWriter(const Poco::BinaryWriter& writer): 
+	BSONWriter(const Poco::BinaryWriter& writer):
 		_writer(writer)
 		/// Creates the BSONWriter.
 	{

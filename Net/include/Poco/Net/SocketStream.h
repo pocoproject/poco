@@ -44,16 +44,16 @@ public:
 
 	~SocketStreamBuf();
 		/// Destroys the SocketStreamBuf.
-		
+
 	StreamSocketImpl* socketImpl() const;
 		/// Returns the internal SocketImpl.
-	
+
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -75,18 +75,18 @@ public:
 		///
 		/// The socket's SocketImpl must be a StreamSocketImpl,
 		/// otherwise an InvalidArgumentException is thrown.
-		
+
 	~SocketIOS();
 		/// Destroys the SocketIOS.
 		///
 		/// Flushes the buffer, but does not close the socket.
-		
+
 	SocketStreamBuf* rdbuf();
 		/// Returns a pointer to the internal SocketStreamBuf.
-		
+
 	void close();
 		/// Flushes the stream and closes the socket.
-		
+
 	StreamSocket socket() const;
 		/// Returns the underlying socket.
 

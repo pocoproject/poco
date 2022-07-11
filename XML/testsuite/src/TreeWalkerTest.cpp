@@ -73,29 +73,29 @@ void TreeWalkerTest::testShowAll()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
+
 	TreeWalker it(pRoot, NodeFilter::SHOW_ALL);
-	
+
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.nextNode() == pElem1);
 	assertTrue (it.nextNode() == pText1);
 	assertTrue (it.nextNode() == pElem2);
 	assertTrue (it.nextNode() == pText2);
 	assertTrue (it.nextNode() == 0);
-	
+
 	assertTrue (it.currentNode() == pText2);
 	assertTrue (it.previousNode() == pElem2);
 	assertTrue (it.previousNode() == pText1);
 	assertTrue (it.previousNode() == pElem1);
 	assertTrue (it.previousNode() == pRoot);
 	assertTrue (it.previousNode() == 0);
-	
+
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.parentNode() == 0);
 	assertTrue (it.currentNode() == pRoot);
@@ -124,25 +124,25 @@ void TreeWalkerTest::testShowElements()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
+
 	TreeWalker it(pRoot, NodeFilter::SHOW_ELEMENT);
-	
+
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.nextNode() == pElem1);
 	assertTrue (it.nextNode() == pElem2);
 	assertTrue (it.nextNode() == 0);
-	
+
 	assertTrue (it.currentNode() == pElem2);
 	assertTrue (it.previousNode() == pElem1);
 	assertTrue (it.previousNode() == pRoot);
 	assertTrue (it.previousNode() == 0);
-	
+
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.parentNode() == 0);
 	assertTrue (it.currentNode() == pRoot);
@@ -168,22 +168,22 @@ void TreeWalkerTest::testFilter()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
+
 	SkipNodeFilter skipFilter;
 	TreeWalker it1(pRoot, NodeFilter::SHOW_ELEMENT, &skipFilter);
-	
+
 	assertTrue (it1.nextNode() == pElem1);
 	assertTrue (it1.nextNode() == 0);
-	
+
 	assertTrue (it1.currentNode() == pElem1);
 	assertTrue (it1.previousNode() == 0);
-	
+
 	assertTrue (it1.parentNode() == 0);
 	assertTrue (it1.firstChild() == 0);
 	assertTrue (it1.lastChild() == 0);
@@ -191,17 +191,17 @@ void TreeWalkerTest::testFilter()
 	assertTrue (it1.previousSibling() == 0);
 
 	TreeWalker it2(pRoot, NodeFilter::SHOW_ALL, &skipFilter);
-	
+
 	assertTrue (it2.nextNode() == pElem1);
 	assertTrue (it2.nextNode() == pText1);
 	assertTrue (it2.nextNode() == pText2);
 	assertTrue (it2.nextNode() == 0);
-	
+
 	assertTrue (it2.currentNode() == pText2);
 	assertTrue (it2.previousNode() == pText1);
 	assertTrue (it2.previousNode() == pElem1);
 	assertTrue (it2.previousNode() == 0);
-	
+
 	assertTrue (it2.currentNode() == pElem1);
 	assertTrue (it2.parentNode() == 0);
 	assertTrue (it2.nextSibling() == 0);
@@ -213,14 +213,14 @@ void TreeWalkerTest::testFilter()
 
 	RejectNodeFilter rejectFilter;
 	TreeWalker it3(pRoot, NodeFilter::SHOW_ELEMENT, &rejectFilter);
-	
+
 	assertTrue (it3.nextNode() == pElem1);
 	assertTrue (it3.nextNode() == 0);
-	
+
 	assertTrue (it3.currentNode() == pElem1);
 	assertTrue (it3.previousNode() == pRoot);
 	assertTrue (it3.previousNode() == 0);
-	
+
 	assertTrue (it3.currentNode() == pRoot);
 	assertTrue (it3.parentNode() == 0);
 	assertTrue (it3.firstChild() == pElem1);
@@ -230,16 +230,16 @@ void TreeWalkerTest::testFilter()
 	assertTrue (it3.lastChild() == pElem1);
 
 	TreeWalker it4(pRoot, NodeFilter::SHOW_ALL, &rejectFilter);
-	
+
 	assertTrue (it4.nextNode() == pElem1);
 	assertTrue (it4.nextNode() == pText1);
 	assertTrue (it4.nextNode() == 0);
-	
+
 	assertTrue (it4.currentNode() == pText1);
 	assertTrue (it4.previousNode() == pElem1);
 	assertTrue (it4.previousNode() == pRoot);
 	assertTrue (it4.previousNode() == 0);
-	
+
 	assertTrue (it4.currentNode() == pRoot);
 	assertTrue (it4.parentNode() == 0);
 	assertTrue (it4.firstChild() == pElem1);
@@ -263,19 +263,19 @@ void TreeWalkerTest::testShowNothing()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
+
 	TreeWalker it(pRoot, 0);
-	
+
 	assertTrue (it.nextNode() == 0);
-	
+
 	assertTrue (it.previousNode() == 0);
-	
+
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.firstChild() == 0);
 	assertTrue (it.lastChild() == 0);

@@ -49,7 +49,7 @@ RemoteSyslogChannel::RemoteSyslogChannel():
 {
 }
 
-		
+
 RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::string& name, int facility, bool bsdFormat):
 	_logHost(address),
 	_name(name),
@@ -107,7 +107,7 @@ void RemoteSyslogChannel::open()
 	_open = true;
 }
 
-	
+
 void RemoteSyslogChannel::close()
 {
 	if (_open)
@@ -117,7 +117,7 @@ void RemoteSyslogChannel::close()
 	}
 }
 
-	
+
 void RemoteSyslogChannel::log(const Message& msg)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
@@ -163,7 +163,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 	_socket.sendTo(m.data(), static_cast<int>(m.size()), _socketAddress);
 }
 
-	
+
 void RemoteSyslogChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_NAME)
@@ -180,7 +180,7 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 			facility = Poco::toUpper(value.substr(7));
 		else
 			facility = Poco::toUpper(value);
-		
+
 		if (facility == "KERN")
 			_facility = SYSLOG_KERN;
 		else if (facility == "USER")
@@ -252,7 +252,7 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	}
 }
 
-	
+
 std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 {
 	if (name == PROP_NAME)

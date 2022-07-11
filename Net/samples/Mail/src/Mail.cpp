@@ -43,11 +43,11 @@ int main(int argc, char** argv)
 		std::cerr << "       using the SMTP server at <mailhost>." << std::endl;
 		return 1;
 	}
-	
+
 	std::string mailhost(argv[1]);
 	std::string sender(argv[2]);
 	std::string recipient(argv[3]);
-	
+
 	try
 	{
 		MailMessage message;
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 		std::string logo(reinterpret_cast<const char*>(PocoLogo), sizeof(PocoLogo));
 		message.addContent(new StringPartSource(content));
 		message.addAttachment("logo", new StringPartSource(logo, "image/gif"));
-		
+
 		SMTPClientSession session(mailhost);
 		session.login();
 		session.sendMessage(message);

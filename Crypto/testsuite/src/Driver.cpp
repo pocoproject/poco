@@ -23,7 +23,7 @@ public:
 	{
 		Poco::Crypto::initializeCrypto();
 	}
-	
+
 	~CryptoInitializer()
 	{
 		Poco::Crypto::uninitializeCrypto();
@@ -34,7 +34,7 @@ public:
 int main(int ac, char **av)
 {
 	CryptoInitializer ci;
-	
+
 	std::vector<std::string> args;
 	for (int i = 0; i < ac; ++i)
 		args.push_back(std::string(av[i]));

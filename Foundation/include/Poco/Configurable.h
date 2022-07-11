@@ -48,15 +48,15 @@ class Foundation_API Configurable
 public:
 	Configurable();
 		/// Creates the Configurable.
-		
+
 	virtual ~Configurable();
 		/// Destroys the Configurable.
-		
+
 	virtual void setProperty(const std::string& name, const std::string& value) = 0;
 		/// Sets the property with the given name to the given value.
 		/// If a property with the given name is not supported, a
 		/// PropertyNotSupportedException is thrown.
-		
+
 	virtual std::string getProperty(const std::string& name) const = 0;
 		/// Returns the value of the property with the given name.
 		/// If a property with the given name is not supported, a

@@ -34,14 +34,14 @@ class Foundation_API TextConverter
 public:
 	typedef int (*Transform)(int);
 		/// Transform function for convert.
-		
+
 	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 		/// Creates the TextConverter. The encoding objects must not be deleted while the
 		/// TextConverter is in use.
 
 	~TextConverter();
 		/// Destroys the TextConverter.
-		
+
 	int convert(const std::string& source, std::string& destination, Transform trans);
 		/// Converts the source string from inEncoding to outEncoding
 		/// and appends the result to destination. Every character is

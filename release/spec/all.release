@@ -13,3 +13,4 @@ MongoDB
 Redis
 ActiveRecord
 ActiveRecord/Compiler
+Prometheus

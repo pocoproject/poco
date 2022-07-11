@@ -66,7 +66,7 @@ public:
 
 	std::streamsize getColumnWidth() const;
 		/// Returns the column width.
-		
+
 	std::streamsize getSpacing() const;
 		/// Returns the spacing.
 

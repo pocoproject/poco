@@ -51,12 +51,12 @@ ArchiveEntry::ArchiveEntry(const ArchiveEntry& entry):
 {
 }
 
-	
+
 ArchiveEntry::~ArchiveEntry()
 {
 }
 
-	
+
 ArchiveEntry& ArchiveEntry::operator = (const ArchiveEntry& entry)
 {
 	ArchiveEntry temp(entry);

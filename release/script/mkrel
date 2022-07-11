@@ -43,7 +43,7 @@ do
 	elif [ "$1" = "-c" ] ; then
 		shift
 		lineEndConv=$1
-		shift	
+		shift
 	else
 		spec=$1
 		shift

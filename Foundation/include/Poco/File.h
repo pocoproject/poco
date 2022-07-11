@@ -23,7 +23,7 @@
 #include <vector>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) 
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "File_WINCE.h"
 #else

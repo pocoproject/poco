@@ -110,7 +110,7 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 				char literalSuffix[stringSize] = { 0 };
 				char createParams[stringSize] = { 0 };
 				char localTypeName[stringSize] = { 0 };
-				
+
 				TypeInfoTup ti("TYPE_NAME", "",
 					"DATA_TYPE", 0,
 					"COLUMN_SIZE", 0,
@@ -142,10 +142,10 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 				ti.set<4>(literalSuffix);
 				rc = SQLGetData(hstmt, 6, SQL_C_CHAR, createParams, sizeof(createParams), &ind);
 				ti.set<5>(createParams);
-				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), &ind); 
-				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), &ind); 
-				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), &ind); 
-				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), &ind); 
+				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), &ind);
 				rc = SQLGetData(hstmt, 11, SQL_C_SSHORT, &ti.get<10>(), sizeof(SQLSMALLINT), &ind);
 				rc = SQLGetData(hstmt, 12, SQL_C_SSHORT, &ti.get<11>(), sizeof(SQLSMALLINT), &ind);
 				rc = SQLGetData(hstmt, 13, SQL_C_CHAR, localTypeName, sizeof(localTypeName), &ind);
@@ -192,7 +192,7 @@ bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -239,24 +239,24 @@ void TypeInfo::print(std::ostream& ostr)
 
 	for (; it != end; ++it)
 	{
-		ostr << it->get<0>() << "\t" 
-			<< it->get<1>() << "\t" 
-			<< it->get<2>() << "\t" 
-			<< it->get<3>() << "\t" 
-			<< it->get<4>() << "\t" 
-			<< it->get<5>() << "\t" 
-			<< it->get<6>() << "\t" 
-			<< it->get<7>() << "\t" 
-			<< it->get<8>() << "\t" 
-			<< it->get<9>() << "\t" 
-			<< it->get<10>() << "\t" 
-			<< it->get<11>() << "\t" 
-			<< it->get<12>() << "\t" 
-			<< it->get<13>() << "\t" 
+		ostr << it->get<0>() << "\t"
+			<< it->get<1>() << "\t"
+			<< it->get<2>() << "\t"
+			<< it->get<3>() << "\t"
+			<< it->get<4>() << "\t"
+			<< it->get<5>() << "\t"
+			<< it->get<6>() << "\t"
+			<< it->get<7>() << "\t"
+			<< it->get<8>() << "\t"
+			<< it->get<9>() << "\t"
+			<< it->get<10>() << "\t"
+			<< it->get<11>() << "\t"
+			<< it->get<12>() << "\t"
+			<< it->get<13>() << "\t"
 			<< it->get<14>() << "\t"
-			<< it->get<15>() << "\t" 
-			<< it->get<16>() << "\t" 
-			<< it->get<17>() << "\t" 
+			<< it->get<15>() << "\t"
+			<< it->get<16>() << "\t"
+			<< it->get<17>() << "\t"
 			<< it->get<18>() << std::endl;
 	}
 }

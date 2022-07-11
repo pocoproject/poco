@@ -61,7 +61,7 @@ public:
 
 	MD4Engine();
 	~MD4Engine();
-		
+
 	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();

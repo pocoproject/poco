@@ -37,9 +37,9 @@ public:
 	public:
 		std::string beginNameSpaceDecl;      // contains either $(NS)_BEGIN or the namespace x { decl
 		std::string endNameSpaceDecl;        // contains either $(NS)_END or the closing brackets }
-		std::vector<std::string> classDecls; // contains strings of the form "class X;" 
+		std::vector<std::string> classDecls; // contains strings of the form "class X;"
 	};
-	
+
 	static void parse(const std::string& file, NameSpace::SymbolTable& st, const std::string& exec, const std::string& options, const std::string& path);
 		/// Preprocesses and parses the file. The resulting symboltable has base class references already fixed,
 
