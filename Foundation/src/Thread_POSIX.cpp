@@ -121,7 +121,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 		realName = truncName;
 	}
 
-	ScopedLock<FastMutex> lock (_pData->mutex);
+	ScopedLock<FastMutex> lock(_pData->mutex);
 	if (realName != _pData->name) {
 		_pData->name = realName;
 	}
@@ -130,7 +130,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 
 std::string ThreadImpl::getNameImpl() const
 {
-	ScopedLock<FastMutex> lock (_pData->mutex);
+	ScopedLock<FastMutex> lock(_pData->mutex);
 	return _pData->name;
 }
 
@@ -390,13 +390,14 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
-	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-	ScopedLock<FastMutex> lock (pThreadImpl->_pData->mutex);
+	auto* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+
 	{
-		setThreadName(pThreadImpl->_pData->name);
+		FastMutex::ScopedLock lock(pData->mutex);
+		setThreadName(pData->name);
 	}
 
-	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
 		pData->pRunnableTarget->run();
