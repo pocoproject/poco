@@ -40,7 +40,8 @@ public:
 	void run()
 	{
 		Thread* pThread = Thread::current();
-		if (pThread) {
+		if (pThread)
+		{
 			_threadName = pThread->name();
 			auto *pThreadImpl = reinterpret_cast<Poco::ThreadImpl *>(pThread);
 			_osThreadName = pThreadImpl->getOSThreadNameImpl();
