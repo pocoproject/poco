@@ -108,7 +108,8 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 {
     std::string realName = threadName;
 #if (POCO_OS == POCO_OS_MAC_OS_X)
-	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN) {
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+    {
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 #else
 	if (threadName.size() > std::min(POCO_MAX_THREAD_NAME_LEN, 15))
@@ -122,7 +123,8 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 	}
 
 	ScopedLock<FastMutex> lock(_pData->mutex);
-	if (realName != _pData->name) {
+	if (realName != _pData->name)
+    {
 		_pData->name = realName;
 	}
 }

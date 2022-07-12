@@ -16,47 +16,6 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 
-namespace
-{
-	/// See <http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx>
-	/// and <http://blogs.msdn.com/b/stevejs/archive/2005/12/19/505815.aspx> for
-	/// more information on the code below.
-
-	const DWORD MS_VC_EXCEPTION = 0x406D1388;
-
-#pragma pack(push,8)
-	typedef struct tagTHREADNAME_INFO
-	{
-		DWORD dwType;     // Must be 0x1000.
-		LPCSTR szName;    // Pointer to name (in user addr space).
-		DWORD dwThreadID; // Thread ID (-1=caller thread).
-		DWORD dwFlags;    // Reserved for future use, must be zero.
-	} THREADNAME_INFO;
-#pragma pack(pop)
-
-	void setThreadName(DWORD dwThreadID, const std::string& threadName)
-	{
-		THREADNAME_INFO info;
-		info.dwType     = 0x1000;
-		info.szName     = threadName.c_str();
-		info.dwThreadID = dwThreadID;
-		info.dwFlags    = 0;
-
-		__try
-		{
-			RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-		}
-		__except (EXCEPTION_CONTINUE_EXECUTION)
-		{
-		}
-	}
-
-	std::string getThreadName()
-	{
-		/// TODO
-	}
-}
-
 namespace Poco {
 
 
@@ -81,7 +40,8 @@ ThreadImpl::~ThreadImpl()
 void ThreadImpl::setNameImpl(const std::string& threadName)
 {
 	std::string realName = threadName;
-	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN) {
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+    {
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");
@@ -89,7 +49,8 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 		realName = truncName;
 	}
 
-	if (realName != _name) {
+	if (realName != _name)
+    {
 		_name = realName;
 	}
 }
@@ -102,7 +63,7 @@ std::string ThreadImpl::getNameImpl() const
 
 std::string ThreadImpl::getOSThreadNameImpl()
 {
-	// TODO
+    // return fake thread name;
 	return isRunningImpl() ? _name : "";
 }
 
@@ -216,13 +177,11 @@ long ThreadImpl::currentOsTidImpl()
 
 DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 {
-	auto * pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-	_currentThreadHolder.set(pThreadImpl);
-	setThreadName(-1, pThreadImpl->_name);
-	try
-	{
-		pThreadImpl->_pRunnableTarget->run();
-	}
+    _currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
+    try
+    {
+        reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
+    }
 	catch (Exception& exc)
 	{
 		ErrorHandler::handle(exc);

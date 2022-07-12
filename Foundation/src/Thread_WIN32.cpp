@@ -52,11 +52,6 @@ namespace
         {
         }
 	}
-
-	std::string getThreadName()
-	{
-		/// TODO
-	}
 }
 
 
@@ -84,7 +79,8 @@ ThreadImpl::~ThreadImpl()
 void ThreadImpl::setNameImpl(const std::string& threadName)
 {
 	std::string realName = threadName;
-	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN) {
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+    {
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");
@@ -92,7 +88,8 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 		realName = truncName;
 	}
 
-	if (realName != _name) {
+	if (realName != _name)
+    {
 		_name = realName;
 	}
 }
@@ -105,7 +102,7 @@ std::string ThreadImpl::getNameImpl() const
 
 std::string ThreadImpl::getOSThreadNameImpl()
 {
-	// TODO
+	// return fake thread name
 	return isRunningImpl() ? _name : "";
 }
 
