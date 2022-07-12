@@ -38,19 +38,19 @@ namespace
 	
 	void setThreadName(DWORD dwThreadID, const std::string& threadName)
 	{
-        THREADNAME_INFO info;
-        info.dwType     = 0x1000;
-        info.szName     = threadName.c_str();
-        info.dwThreadID = dwThreadID;
-        info.dwFlags    = 0;
+		THREADNAME_INFO info;
+		info.dwType     = 0x1000;
+		info.szName     = threadName.c_str();
+		info.dwThreadID = dwThreadID;
+		info.dwFlags    = 0;
 
-        __try
-        {
-            RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-        }
-        __except (EXCEPTION_CONTINUE_EXECUTION)
-        {
-        }
+		__try
+		{
+			RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+		}
+		__except (EXCEPTION_CONTINUE_EXECUTION)
+		{
+		}
 	}
 }
 
@@ -80,7 +80,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 {
 	std::string realName = threadName;
 	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
-    {
+	{
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");
@@ -89,7 +89,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 	}
 
 	if (realName != _name)
-    {
+	{
 		_name = realName;
 	}
 }

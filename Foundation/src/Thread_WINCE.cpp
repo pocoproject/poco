@@ -41,7 +41,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 {
 	std::string realName = threadName;
 	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
-    {
+	{
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");
@@ -50,7 +50,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 	}
 
 	if (realName != _name)
-    {
+	{
 		_name = realName;
 	}
 }
@@ -63,7 +63,7 @@ std::string ThreadImpl::getNameImpl() const
 
 std::string ThreadImpl::getOSThreadNameImpl()
 {
-    // return fake thread name;
+	// return fake thread name;
 	return isRunningImpl() ? _name : "";
 }
 
@@ -177,11 +177,11 @@ long ThreadImpl::currentOsTidImpl()
 
 DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 {
-    _currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
-    try
-    {
-        reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
-    }
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
+	try
+	{
+		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
+	}
 	catch (Exception& exc)
 	{
 		ErrorHandler::handle(exc);

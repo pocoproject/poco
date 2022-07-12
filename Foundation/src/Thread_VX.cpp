@@ -41,7 +41,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 {
 	std::string realName = threadName;
 	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
-    {
+	{
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");
@@ -50,7 +50,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 	}
 
 	if (realName != _pData->name)
-    {
+	{
 		_pData->name = realName;
 	}
 }
@@ -64,7 +64,7 @@ std::string ThreadImpl::getNameImpl() const
 
 std::string ThreadImpl::getOSThreadNameImpl()
 {
-    // return fake thread name;
+	// return fake thread name;
 	return isRunningImpl() ? _pData->name : "";
 }
 
@@ -173,7 +173,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
-    return taskIdSelf();
+	return taskIdSelf();
 }
 
 long ThreadImpl::currentOsTidImpl()
