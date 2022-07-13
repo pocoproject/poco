@@ -64,6 +64,13 @@ void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::Abstrac
 		_events.erase(it);
 }
 
+void SocketNotifier::clearObservers(SocketReactor* pReactor)
+{
+	_nc.clearObservers();
+	ScopedLock l(_mutex);
+	_events.clear();
+}
+
 
 namespace
 {

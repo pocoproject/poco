@@ -96,6 +96,9 @@ public:
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.
 
+	void clearObservers();
+		/// Unregisters all observers with the NotificationCenter.
+
 	bool hasObserver(const AbstractObserver& observer) const;
 		/// Returns true if the observer is registered with this NotificationCenter.
 

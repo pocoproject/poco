@@ -49,6 +49,9 @@ public:
 	void removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
 		/// Removes the given observer.
 
+	void clearObservers(SocketReactor* pReactor);
+		/// Removes all observers.
+
 	bool hasObserver(const Poco::AbstractObserver& observer) const;
 		/// Returns true if the given observer is registered.
 
@@ -63,6 +66,9 @@ public:
 
 	std::size_t countObservers() const;
 		/// Returns the number of subscribers;
+
+	Socket socket() const;
+		/// Returns the socket attached to the notifier.
 
 protected:
 	~SocketNotifier();
@@ -105,6 +111,12 @@ inline bool SocketNotifier::hasObservers() const
 inline std::size_t SocketNotifier::countObservers() const
 {
 	return _nc.countObservers();
+}
+
+
+inline Socket SocketNotifier::socket() const
+{
+	return _socket;
 }
 
 

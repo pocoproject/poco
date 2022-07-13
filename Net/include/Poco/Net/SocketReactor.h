@@ -167,6 +167,9 @@ public:
 		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.removeEventHandler(obs);
 
+	void closeSocket(const Socket& socket);
+		/// Close socket and unregisters all event handlers with the SocketReactor.
+
 	bool has(const Socket& socket) const;
 		/// Returns true if socket is registered with this rector.
 

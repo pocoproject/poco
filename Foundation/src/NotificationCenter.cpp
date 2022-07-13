@@ -54,6 +54,17 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 }
 
 
+void NotificationCenter::clearObservers()
+{
+	Mutex::ScopedLock lock(_mutex);
+	for (auto it = _observers.begin(); it != _observers.end(); ++it)
+	{
+		(*it)->disable();
+	}
+	_observers.clear();
+}
+
+
 bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 {
 	Mutex::ScopedLock lock(_mutex);

@@ -15,7 +15,7 @@
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/NObserver.h"
+#include "Poco/Net/SocketObserver.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include "Poco/FIFOBuffer.h"
@@ -34,7 +34,7 @@ using Poco::Net::WritableNotification;
 using Poco::Net::ShutdownNotification;
 using Poco::Net::ServerSocket;
 using Poco::Net::StreamSocket;
-using Poco::NObserver;
+using Poco::Net::SocketObserver;
 using Poco::AutoPtr;
 using Poco::Thread;
 using Poco::FIFOBuffer;
@@ -66,8 +66,8 @@ public:
 		Application& app = Application::instance();
 		app.logger().information("Connection from " + socket.peerAddress().toString());
 
-		_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
-		_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onSocketShutdown));
+		_reactor.addEventHandler(_socket, SocketObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
+		_reactor.addEventHandler(_socket, SocketObserver<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onSocketShutdown));
 
 		_fifoOut.readable += delegate(this, &EchoServiceHandler::onFIFOOutReadable);
 		_fifoIn.writable += delegate(this, &EchoServiceHandler::onFIFOInWritable);
@@ -78,33 +78,27 @@ public:
 		Application& app = Application::instance();
 		try
 		{
-			app.logger().information("Disconnecting " + _socket.peerAddress().toString());
+			app.logger().information("Disconnecting");
 		}
 		catch (...)
 		{
 		}
-		_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
-		_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, WritableNotification>(*this, &EchoServiceHandler::onSocketWritable));
-		_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onSocketShutdown));
-
-		_fifoOut.readable -= delegate(this, &EchoServiceHandler::onFIFOOutReadable);
-		_fifoIn.writable -= delegate(this, &EchoServiceHandler::onFIFOInWritable);
 	}
 
 	void onFIFOOutReadable(bool& b)
 	{
 		if (b)
-			_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, WritableNotification>(*this, &EchoServiceHandler::onSocketWritable));
+			_reactor.addEventHandler(_socket, SocketObserver<EchoServiceHandler, WritableNotification>(*this, &EchoServiceHandler::onSocketWritable));
 		else
-			_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, WritableNotification>(*this, &EchoServiceHandler::onSocketWritable));
+			_reactor.removeEventHandler(_socket, SocketObserver<EchoServiceHandler, WritableNotification>(*this, &EchoServiceHandler::onSocketWritable));
 	}
 
 	void onFIFOInWritable(bool& b)
 	{
 		if (b)
-			_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
+			_reactor.addEventHandler(_socket, SocketObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
 		else
-			_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
+			_reactor.removeEventHandler(_socket, SocketObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
 	}
 
 	void onSocketReadable(const AutoPtr<ReadableNotification>& pNf)
@@ -112,20 +106,30 @@ public:
 		try
 		{
 			int len = _socket.receiveBytes(_fifoIn);
-			if (len > 0)
+			if (len == 0)
+			{
+				// maybe remote close the socket, we should close _socket
+				_reactor.closeSocket(_socket);
+			}
+			else if (len < 3)
 			{
 				_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), _fifoIn.used()));
 			}
 			else
 			{
-				delete this;
+				throw Poco::IOException();
 			}
+		}
+		catch (Poco::IOException& exc)
+		{
+			// IO exception reactor will close socket and destroy me
+			throw;
 		}
 		catch (Poco::Exception& exc)
 		{
+			// Logic exception, user should handle it.
 			Application& app = Application::instance();
 			app.logger().log(exc);
-			delete this;
 		}
 	}
 
@@ -135,17 +139,23 @@ public:
 		{
 			_socket.sendBytes(_fifoOut);
 		}
+		catch (Poco::IOException& exc)
+		{
+			// IO exception reactor will close socket and destroy me
+			throw;
+		}
 		catch (Poco::Exception& exc)
 		{
+			// Logic exception, user should handle it.
 			Application& app = Application::instance();
 			app.logger().log(exc);
-			delete this;
 		}
 	}
 
 	void onSocketShutdown(const AutoPtr<ShutdownNotification>& pNf)
 	{
-		delete this;
+		Application& app = Application::instance();
+		app.logger().information("onSocketShutdown");
 	}
 
 private:

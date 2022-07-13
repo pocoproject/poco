@@ -15,6 +15,8 @@
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/SocketNotifier.h"
+#include "Poco/Net/SocketObserver.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
@@ -27,6 +29,7 @@ using Poco::ErrorHandler;
 namespace Poco {
 namespace Net {
 
+std::unordered_map<void*, AtomicCounter> _counter;
 
 SocketReactor::SocketReactor():
 	_stop(false),
@@ -224,6 +227,22 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 	}
 }
 
+void SocketReactor::closeSocket(const Socket& socket)
+{
+	const SocketImpl* pImpl = socket.impl();
+	if (pImpl == nullptr) return;
+	NotifierPtr pNotifier = getNotifier(socket);
+	if (pNotifier)
+	{
+		{
+			ScopedLock lock(_mutex);
+			_handlers.erase(pImpl->sockfd());
+		}
+		_pollSet.remove(socket);
+		pNotifier->clearObservers(this);
+	}
+}
+
 
 bool SocketReactor::has(const Socket& socket) const
 {
@@ -280,9 +299,11 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 
 void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
 {
+	bool success = false;
 	try
 	{
 		pNotifier->dispatch(pNotification);
+		success = true;
 	}
 	catch (Exception& exc)
 	{
@@ -295,6 +316,11 @@ void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotifi
 	catch (...)
 	{
 		ErrorHandler::handle();
+	}
+
+	if (!success || pNotification == _pShutdownNotification)
+	{
+		closeSocket(pNotifier->socket());
 	}
 }
 
