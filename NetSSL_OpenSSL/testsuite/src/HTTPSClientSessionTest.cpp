@@ -33,8 +33,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
 #include "HTTPSTestServer.h"
-#include <istream>
-#include <ostream>
+#include <iostream>
 #include <sstream>
 
 
@@ -298,7 +297,7 @@ void HTTPSClientSessionTest::testInterop()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assertTrue (str == "This is a test file for NetSSL.\n");
-	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assertTrue (cert.commonName().find(".appinf.com") != std::string::npos);
 }
 
 
@@ -319,7 +318,7 @@ void HTTPSClientSessionTest::testProxy()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assertTrue (str == "This is a test file for NetSSL.\n");
-	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assertTrue (cert.commonName().find(".appinf.com") != std::string::npos);
 }
 
 

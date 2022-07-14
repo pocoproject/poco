@@ -89,10 +89,10 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 	return *this;
 }
 
-void Statement::swap(Statement& other)
+void Statement::swap(Statement& other) noexcept
 {
 	using std::swap;
-	
+
 	swap(_pImpl, other._pImpl);
 	swap(_async, other._async);
 	swap(_pAsyncExec, other._pAsyncExec);
@@ -116,7 +116,7 @@ std::size_t Statement::execute(bool reset)
 	bool isDone = done();
 	if (initialized() || paused() || isDone)
 	{
-		if (_arguments.size()) 
+		if (_arguments.size())
 		{
 			_pImpl->formatSQL(_arguments);
 			_arguments.clear();
@@ -132,7 +132,7 @@ std::size_t Statement::execute(bool reset)
 			doAsyncExec();
 			return 0;
 		}
-	} 
+	}
 	else throw InvalidAccessException("Statement still executing.");
 }
 
@@ -275,7 +275,7 @@ Statement& Statement::operator , (const Bulk& bulk)
 	if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-	if (0 == _pImpl->extractions().size() && 
+	if (0 == _pImpl->extractions().size() &&
 		0 == _pImpl->bindings().size() &&
 		_pImpl->bulkExtractionAllowed() &&
 		_pImpl->bulkBindingAllowed())
@@ -293,8 +293,8 @@ Statement& Statement::operator , (const Bulk& bulk)
 Statement& Statement::operator , (BulkFnType)
 {
 	const Limit& limit(_pImpl->extractionLimit());
-	if (limit.isHardLimit() || 
-		limit.isLowerLimit() || 
+	if (limit.isHardLimit() ||
+		limit.isLowerLimit() ||
 		Limit::LIMIT_UNLIMITED == limit.value())
 	{
 		throw InvalidAccessException("Bulk is only allowed with limited extraction,"
@@ -311,7 +311,7 @@ Statement& Statement::operator , (BulkFnType)
 
 Session Statement::session()
 {
-	Poco::AutoPtr<SessionImpl> ps(&impl()->session(), true); 
+	Poco::AutoPtr<SessionImpl> ps(&impl()->session(), true);
 	return Session(ps);
 }
 

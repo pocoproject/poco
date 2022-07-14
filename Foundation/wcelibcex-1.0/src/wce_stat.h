@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -56,14 +56,14 @@ struct stat
 	/*
      * Number of the information node (the inode) for the file (UNIX-specific).
      * On UNIX file systems, the inode describes the file date and time stamps, permissions, and content.
-     * When files are hard-linked to one another, they share the same inode. 
+     * When files are hard-linked to one another, they share the same inode.
      * The inode, and therefore st_ino, has no meaning in the FAT, HPFS, or NTFS file systems.
      */
 	unsigned short st_ino;
 
 	/*
      * Bit mask for file-mode information. The _S_IFDIR bit is set if path specifies a directory;
-	 * the _S_IFREG bit is set if path specifies an ordinary file or a device. 
+	 * the _S_IFREG bit is set if path specifies an ordinary file or a device.
 	 * User read/write bits are set according to the file's permission mode;
      * user execute bits are set according to the filename extension.
      */
@@ -78,7 +78,7 @@ struct stat
 	 * A redirected file is classified as a Windows NT file.
      */
 	short st_uid;
-	
+
     /*
      * Numeric identifier of group that owns file (UNIX-specific).
      * This field will always be zero on Windows NT systems.
@@ -108,7 +108,7 @@ struct stat
 
 /* Permission bits */
 #define	S_ISUID	         04000	       /* Set user ID on execution.  */
-#define	S_ISGID	         02000	       /* Set group ID on execution.  */ 
+#define	S_ISGID	         02000	       /* Set group ID on execution.  */
 #define S_IREAD        0000400         /* Read permission, owner */
 #define S_IWRITE       0000200         /* Write permission, owner */
 #define S_IEXEC        0000100         /* Execute/search permission, owner */

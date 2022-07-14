@@ -39,7 +39,7 @@ ThreadLocalStorage::~ThreadLocalStorage()
 {
 	for (auto& p: _map)
 	{
-		delete p.second;	
+		delete p.second;
 	}
 }
 

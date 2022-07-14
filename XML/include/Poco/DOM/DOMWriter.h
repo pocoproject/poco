@@ -40,7 +40,7 @@ class XML_API DOMWriter
 public:
 	DOMWriter();
 		/// Creates a DOMWriter.
-		
+
 	~DOMWriter();
 		/// Destroys a DOMWriter.
 
@@ -61,7 +61,7 @@ public:
 	void setNewLine(const std::string& newLine);
 		/// Sets the line ending characters for the internal
 		/// XMLWriter. See XMLWriter::setNewLine() for a list
-		/// of supported values. 
+		/// of supported values.
 
 	const std::string& getNewLine() const;
 		/// Returns the line ending characters used by the
@@ -74,7 +74,7 @@ public:
 		/// The given string should only contain TAB or SPACE
 		/// characters (e.g., a single TAB character, or
 		/// two to four SPACE characters).
-		
+
 	const std::string& getIndent() const;
 		/// Returns the string used for one indentation step.
 

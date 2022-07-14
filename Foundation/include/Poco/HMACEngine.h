@@ -31,7 +31,7 @@ class HMACEngine: public DigestEngine
 	/// This class implements the HMAC message
 	/// authentication code algorithm, as specified
 	/// in RFC 2104. The underlying DigestEngine
-	/// (MD5Engine, SHA1Engine, etc.) must be given as 
+	/// (MD5Engine, SHA1Engine, etc.) must be given as
 	/// template argument.
 	/// Since the HMACEngine is a DigestEngine, it can
 	/// be used with the DigestStream class to create
@@ -43,19 +43,19 @@ public:
 		BLOCK_SIZE  = Engine::BLOCK_SIZE,
 		DIGEST_SIZE = Engine::DIGEST_SIZE
 	};
-	
+
 	HMACEngine(const std::string& passphrase)
 	{
 		init(passphrase.data(), passphrase.length());
 	}
-	
+
 	HMACEngine(const char* passphrase, std::size_t length)
 	{
 		poco_check_ptr (passphrase);
 
 		init(passphrase, length);
 	}
-	
+
 	~HMACEngine()
 	{
 		std::memset(_ipad, 0, BLOCK_SIZE);
@@ -63,21 +63,22 @@ public:
 		delete [] _ipad;
 		delete [] _opad;
 	}
-		
+
 	std::size_t digestLength() const
 	{
 		return DIGEST_SIZE;
 	}
-	
+
 	void reset()
 	{
 		_engine.reset();
 		_engine.update(_ipad, BLOCK_SIZE);
 	}
-	
+
 	const DigestEngine::Digest& digest()
 	{
 		const DigestEngine::Digest& d = _engine.digest();
+		poco_assert (d.size() == DIGEST_SIZE);
 		char db[DIGEST_SIZE];
 		char* pdb = db;
 		for (auto v: d) *pdb++ = v;
@@ -122,7 +123,7 @@ protected:
 		}
 		reset();
 	}
-	
+
 	void updateImpl(const void* data, std::size_t length)
 	{
 		_engine.update(data, length);

@@ -150,6 +150,23 @@ If you cannot or do not want to build with CMake, there are other options,
 described in the following.
 
 
+BUILDING - USING VCPKG
+===================
+
+You can download and install poco using the vcpkg(https://github.com/Microsoft/vcpkg)
+dependency manager:
+
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh
+$ ./vcpkg integrate install
+$ ./vcpkg install poco
+
+The poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
+If the version is out of date, please create an issue or pull request(https://github.com/Microsoft/vcpkg)
+on the vcpkg repository.
+
+
 BUILDING ON WINDOWS
 ===================
 
@@ -186,8 +203,8 @@ BUILDING ON UNIX/LINUX/macOS
 ============================
 
 For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 3.80 (or newer), with the help
-from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on
+build system. The build system is based on GNU Make 5.0 (or newer), with the help
+from a few shell scripts. If you do not have GNU Make 5.0 (or later) installed on
 your machine, you will need to download it from
 http://directory.fsf.org/devel/build/make.html>,
 build and install it prior to building the POCO C++ Libraries.

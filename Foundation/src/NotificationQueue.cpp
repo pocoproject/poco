@@ -53,7 +53,7 @@ void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
 		pWI->nfAvailable.set();
-	}	
+	}
 }
 
 
@@ -71,7 +71,7 @@ void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotificatio
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
 		pWI->nfAvailable.set();
-	}	
+	}
 }
 
 
@@ -162,7 +162,7 @@ bool NotificationQueue::empty() const
 	return _nfQueue.empty();
 }
 
-	
+
 int NotificationQueue::size() const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -173,7 +173,7 @@ int NotificationQueue::size() const
 void NotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	_nfQueue.clear();	
+	_nfQueue.clear();
 }
 
 

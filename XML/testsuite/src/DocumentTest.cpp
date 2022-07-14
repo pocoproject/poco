@@ -47,11 +47,11 @@ void DocumentTest::testDocumentElement()
 	assertTrue (pDoc->documentElement() == 0);
 	pDoc->appendChild(pRoot);
 	assertTrue (pDoc->documentElement() == pRoot);
-	
+
 	AutoPtr<Text> pText = pDoc->createTextNode("   ");
 	pDoc->insertBefore(pText, pRoot);
 	assertTrue (pDoc->documentElement() == pRoot);
-	
+
 }
 
 
@@ -61,7 +61,7 @@ void DocumentTest::testImport()
 	AutoPtr<Element> pRoot1 = pDoc1->createElement("root");
 
 	AutoPtr<Document> pDoc2 = new Document;
-	
+
 	try
 	{
 		pDoc2->appendChild(pRoot1);
@@ -70,11 +70,11 @@ void DocumentTest::testImport()
 	catch (DOMException&)
 	{
 	}
-	
+
 	AutoPtr<Element> pRoot2 = static_cast<Element*>(pDoc2->importNode(pRoot1, false));
 	assertTrue (pRoot2->ownerDocument() == pDoc2);
 	assertTrue (pRoot1->ownerDocument() == pDoc1);
-	
+
 	pDoc2->appendChild(pRoot2);
 }
 
@@ -93,7 +93,7 @@ void DocumentTest::testImportDeep()
 	pRoot1->setAttribute("a2", "v2");
 
 	AutoPtr<Document> pDoc2 = new Document;
-	
+
 	try
 	{
 		pDoc2->appendChild(pRoot1);
@@ -102,7 +102,7 @@ void DocumentTest::testImportDeep()
 	catch (DOMException&)
 	{
 	}
-	
+
 	AutoPtr<Element> pRoot2 = static_cast<Element*>(pDoc2->importNode(pRoot1, true));
 	assertTrue (pRoot2->ownerDocument() == pDoc2);
 	assertTrue (pRoot2->firstChild()->ownerDocument() == pDoc2);
@@ -110,7 +110,7 @@ void DocumentTest::testImportDeep()
 	assertTrue (pRoot1->ownerDocument() == pDoc1);
 	assertTrue (pRoot1->firstChild()->ownerDocument() == pDoc1);
 	assertTrue (pRoot1->firstChild()->firstChild()->ownerDocument() == pDoc1);
-	
+
 	pDoc2->appendChild(pRoot2);
 }
 
@@ -122,14 +122,14 @@ void DocumentTest::testElementsByTagName()
 	pDoc->appendChild(pRoot);
 	AutoPtr<NodeList> pNL1 = pDoc->getElementsByTagName("*");
 	AutoPtr<NodeList> pNL2 = pDoc->getElementsByTagName("elem");
-	
+
 	assertTrue (pNL1->length() == 1);
 	assertTrue (pNL1->item(0) == pRoot);
 	assertTrue (pNL2->length() == 0);
-	
+
 	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
 	pRoot->appendChild(pElem1);
-	
+
 	assertTrue (pNL1->length() == 2);
 	assertTrue (pNL2->length() == 1);
 	assertTrue (pNL1->item(0) == pRoot);
@@ -155,14 +155,14 @@ void DocumentTest::testElementsByTagNameNS()
 	pDoc->appendChild(pRoot);
 	AutoPtr<NodeList> pNL1 = pDoc->getElementsByTagNameNS("*", "*");
 	AutoPtr<NodeList> pNL2 = pDoc->getElementsByTagNameNS("*", "elem");
-	
+
 	assertTrue (pNL1->length() == 1);
 	assertTrue (pNL1->item(0) == pRoot);
 	assertTrue (pNL2->length() == 0);
-	
+
 	AutoPtr<Element> pElem1 = pDoc->createElementNS("urn:ns1", "elem");
 	pRoot->appendChild(pElem1);
-	
+
 	assertTrue (pNL1->length() == 2);
 	assertTrue (pNL2->length() == 1);
 	assertTrue (pNL1->item(0) == pRoot);
@@ -199,13 +199,13 @@ void DocumentTest::testElementById()
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem3);
 	pDoc->appendChild(pRoot);
-	
+
 	Element* pFound = pDoc->getElementById("0", "id");
 	assertTrue (pFound == pRoot);
-	
+
 	pFound = pDoc->getElementById("1", "id");
 	assertTrue (pFound == pElem1);
-	
+
 	pFound = pDoc->getElementById("2", "id");
 	assertTrue (pFound == pElem2);
 
@@ -214,7 +214,7 @@ void DocumentTest::testElementById()
 
 	pFound = pDoc->getElementById("4", "id");
 	assertTrue (pFound == 0);
-	
+
 	pFound = pDoc->getElementById("0", "ID");
 	assertTrue (pFound == 0);
 }
@@ -241,10 +241,10 @@ void DocumentTest::testElementByIdNS()
 
 	Element* pFound = pDoc->getElementByIdNS("0", "urn:ns1", "id");
 	assertTrue (pFound == pRoot);
-	
+
 	pFound = pDoc->getElementByIdNS("1", "urn:ns1", "id");
 	assertTrue (pFound == pElem1);
-	
+
 	pFound = pDoc->getElementByIdNS("2", "urn:ns1", "id");
 	assertTrue (pFound == pElem2);
 
@@ -253,7 +253,7 @@ void DocumentTest::testElementByIdNS()
 
 	pFound = pDoc->getElementByIdNS("4", "urn:ns1", "id");
 	assertTrue (pFound == 0);
-	
+
 	pFound = pDoc->getElementByIdNS("0", "urn:ns1", "ID");
 	assertTrue (pFound == 0);
 

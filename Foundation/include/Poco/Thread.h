@@ -224,8 +224,11 @@ public:
 		/// Returns the Thread object for the currently active thread.
 		/// If the current thread is the main thread, 0 is returned.
 
- 	static TID currentTid();
- 		/// Returns the native thread ID for the current thread.
+	static TID currentTid();
+		/// Returns the native thread ID for the current thread.
+
+	static long currentOsTid();
+		/// Returns the operating system specific thread ID for the current thread.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -378,6 +381,10 @@ inline Thread::TID Thread::currentTid()
 	return currentTidImpl();
 }
 
+inline long Thread::currentOsTid()
+{
+	return currentOsTidImpl();
+}
 
 } // namespace Poco
 

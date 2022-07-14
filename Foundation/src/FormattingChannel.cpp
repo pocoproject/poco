@@ -20,22 +20,22 @@
 namespace Poco {
 
 
-FormattingChannel::FormattingChannel(): 
-	_pFormatter(0), 
+FormattingChannel::FormattingChannel():
+	_pFormatter(0),
 	_pChannel(0)
 {
 }
 
 
 FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter):
-	_pFormatter(pFormatter), 
+	_pFormatter(pFormatter),
 	_pChannel(0)
 {
 }
 
 
-FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel): 
-	_pFormatter(pFormatter), 
+FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel):
+	_pFormatter(pFormatter),
 	_pChannel(pChannel)
 {
 }
@@ -105,7 +105,7 @@ void FormattingChannel::open()
 		_pChannel->open();
 }
 
-	
+
 void FormattingChannel::close()
 {
 	if (_pChannel)

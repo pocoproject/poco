@@ -98,7 +98,8 @@ void ODBCStatementImpl::compileImpl()
 
 	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT);
+	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, TextEncoding::find("UTF-8"),
+		TextEncoding::find(Poco::RefAnyCast<std::string>(session().getProperty("dbEncoding"))));
 
 	makeInternalExtractors();
 	doPrepare();
@@ -146,7 +147,8 @@ void ODBCStatementImpl::addPreparator()
 		_preparations.push_back(new Preparator(*_preparations[0]));
 
 	_extractors.push_back(new Extractor(_stmt, _preparations.back(),
-		TextEncoding::find(Poco::RefAnyCast<std::string>(session().getProperty("dbEncoding")))));
+		TextEncoding::find(Poco::RefAnyCast<std::string>(session().getProperty("dbEncoding"))),
+		TextEncoding::find("UTF-8")));
 }
 
 

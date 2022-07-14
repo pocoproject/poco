@@ -41,7 +41,7 @@ class XML_API NamedNodeMap: public DOMObject
 	///
 	/// NamedNodeMap objects in the DOM are live.
 	///
-	/// A NamedNodeMap returned from a method must be released with a call to 
+	/// A NamedNodeMap returned from a method must be released with a call to
 	/// release() when no longer needed.
 {
 public:
@@ -69,19 +69,19 @@ public:
 	virtual unsigned long length() const = 0;
 		/// Returns the number of nodes in the map. The range of valid
 		/// child node indices is 0 to length - 1 inclusive.
-	
+
 	// DOM Level 2
 	virtual Node* getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const = 0;
 		/// Retrieves a node specified by name.
 
 	virtual Node* setNamedItemNS(Node* arg) = 0;
 		/// Adds a node using its nodeName attribute.
-		/// If a node with that namespace URI and that local name is already 
+		/// If a node with that namespace URI and that local name is already
 		/// present in this map, it is replaced by the new one.
 
 	virtual Node* removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) = 0;
 		/// Removes a node specified by name.
-	
+
 protected:
 	virtual ~NamedNodeMap();
 };

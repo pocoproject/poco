@@ -78,7 +78,7 @@ bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 	return found;
 }
 
-	
+
 const Option& OptionSet::getOption(const std::string& name, bool matchShort) const
 {
 	const Option* pOption = 0;

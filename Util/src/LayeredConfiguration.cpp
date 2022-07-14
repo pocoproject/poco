@@ -78,7 +78,7 @@ void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::st
 	item.priority  = priority;
 	item.writeable = writeable;
 	item.label     = label;
-	
+
 	ConfigList::iterator it = _configs.begin();
 	while (it != _configs.end() && it->priority < priority) ++it;
 	_configs.insert(it, item);
@@ -124,7 +124,7 @@ void LayeredConfiguration::setRaw(const std::string& key, const std::string& val
 	{
 		if (conf.writeable)
 		{
-			conf.pConfig->setRaw(key, value); 
+			conf.pConfig->setRaw(key, value);
 			return;
 		}
 	}

@@ -233,7 +233,7 @@ void AbstractNode::addEventListener(const XMLString& type, EventListener* listen
 		_pEventDispatcher->removeEventListener(type, listener, useCapture);
 	else
 		_pEventDispatcher = new EventDispatcher;
-	
+
 	_pEventDispatcher->addEventListener(type, listener, useCapture);
 }
 
@@ -276,7 +276,7 @@ void AbstractNode::captureEvent(Event* evt)
 {
 	if (_pParent)
 		_pParent->captureEvent(evt);
-	
+
 	if (_pEventDispatcher && !evt->isStopped())
 	{
 		evt->setCurrentTarget(this);

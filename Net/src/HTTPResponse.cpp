@@ -81,6 +81,7 @@ const std::string HTTPResponse::HTTP_REASON_MISDIRECTED_REQUEST             = "M
 const std::string HTTPResponse::HTTP_REASON_UNPROCESSABLE_ENTITY            = "Unprocessable Entity";
 const std::string HTTPResponse::HTTP_REASON_LOCKED                          = "Locked";
 const std::string HTTPResponse::HTTP_REASON_FAILED_DEPENDENCY               = "Failed Dependency";
+const std::string HTTPResponse::HTTP_REASON_TOO_EARLY                       = "Too Early";
 const std::string HTTPResponse::HTTP_REASON_UPGRADE_REQUIRED                = "Upgrade Required";
 const std::string HTTPResponse::HTTP_REASON_PRECONDITION_REQUIRED           = "Precondition Required";
 const std::string HTTPResponse::HTTP_REASON_TOO_MANY_REQUESTS               = "Too Many Requests";
@@ -363,6 +364,8 @@ const std::string& HTTPResponse::getReasonForStatus(HTTPStatus status)
 		return HTTP_REASON_LOCKED;
 	case HTTP_FAILED_DEPENDENCY:
 		return HTTP_REASON_FAILED_DEPENDENCY;
+	case HTTP_TOO_EARLY:
+		return HTTP_REASON_TOO_EARLY;
 	case HTTP_UPGRADE_REQUIRED:
 		return HTTP_REASON_UPGRADE_REQUIRED;
 	case HTTP_PRECONDITION_REQUIRED:

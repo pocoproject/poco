@@ -30,6 +30,7 @@
 #include "Poco/StringTokenizer.h"
 #include <deque>
 #include <cstring>
+#include <atomic>
 
 
 namespace Poco {
@@ -42,13 +43,14 @@ typedef int UDPMsgSizeT;
 
 template <std::size_t S = POCO_UDP_BUF_SIZE>
 class UDPHandlerImpl: public Runnable, public RefCountedObject
-	/// UDP handler handles the data that arives to the UDP server.
+	/// UDP handler handles the data that arrives to the UDP server.
 	/// The class is thread-safe and runs in its own thread, so many handlers
-	/// can be used in parallel.Handler manages and provides the storage
+	/// can be used in parallel. Handler manages and provides the storage
 	/// (fixed-size memory blocks of S size) to the reader, which signals back
 	/// to the handler when there is data or error ready for processing.
 	/// Typically, user will inherit from this class and override processData()
-	/// and processError() members to do the actual work.
+	/// and processError() members to do the actual work. To auto-start the handler,
+	/// the inheriting class can call start() in the constructor.
 {
 public:
 	typedef UDPMsgSizeT             MsgSizeT;
@@ -76,7 +78,6 @@ public:
 		_pErr(pErr)
 		/// Creates the UDPHandlerImpl.
 	{
-		_thread.start(*this);
 	}
 
 	~UDPHandlerImpl()
@@ -143,9 +144,9 @@ public:
 	}
 
 	void notify()
-		/// Sets the ready event.
+		/// Sets the data ready event.
 	{
-		_ready.set();
+		_dataReady.set();
 	}
 
 	void run()
@@ -153,28 +154,31 @@ public:
 	{
 		while (!_stop)
 		{
-			_ready.wait();
+			_dataReady.wait();
 			if (_stop) break;
 			if (_mutex.tryLock(10))
 			{
-				BufMap::iterator it = _buffers.begin();
-				BufMap::iterator end = _buffers.end();
-				for (; it != end; ++it)
+				if (!_stop)
 				{
-					BufList::iterator lIt = it->second.begin();
-					BufList::iterator lEnd = it->second.end();
-					for (; lIt != lEnd; ++lIt)
+					BufMap::iterator it = _buffers.begin();
+					BufMap::iterator end = _buffers.end();
+					for (; it != end; ++it)
 					{
-						if (hasData(*lIt))
+						BufList::iterator lIt = it->second.begin();
+						BufList::iterator lEnd = it->second.end();
+						for (; lIt != lEnd; ++lIt)
 						{
-							processData(*lIt);
-							--_dataBacklog;
-							setIdle(*lIt);
-						}
-						else if (isError(*lIt))
-						{
-							processError(*lIt);
-							++_errorBacklog;
+							if (hasData(*lIt))
+							{
+								processData(*lIt);
+								--_dataBacklog;
+								setIdle(*lIt);
+							}
+							else if (isError(*lIt))
+							{
+								processError(*lIt);
+								++_errorBacklog;
+							}
 						}
 					}
 				}
@@ -188,7 +192,7 @@ public:
 		/// Signals the handler to stop.
 	{
 		_stop = true;
-		_ready.set();
+		_dataReady.set();
 	}
 
 	bool stopped() const
@@ -329,6 +333,12 @@ public:
 		setIdle(buf);
 	}
 
+	void start()
+		/// Stars the handler run in thread.
+	{
+		_thread.start(*this);
+	}
+
 private:
 	typedef std::deque<char*>                BufList;
 	typedef std::map<poco_socket_t, BufList> BufMap;
@@ -355,10 +365,10 @@ private:
 		*ret = _buffers[sock].back();
 	}
 
-	Poco::Event       _ready;
+	Poco::Event       _dataReady;
 	Poco::Thread      _thread;
-	bool              _stop;
-	bool              _done;
+	std::atomic<bool> _stop;
+	std::atomic<bool> _done;
 	BufMap            _buffers;
 	BufIt             _bufIt;
 	std::size_t       _bufListSize;

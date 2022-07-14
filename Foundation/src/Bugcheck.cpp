@@ -90,7 +90,7 @@ void Bugcheck::unexpected(const char* file, int line)
 	catch (...)
 	{
 	}
-#endif	
+#endif
 }
 
 

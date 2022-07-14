@@ -38,7 +38,7 @@ public:
 	{
 		return new char_type[static_cast<std::size_t>(size)];
 	}
-	
+
 	static void deallocate(char_type* ptr, std::streamsize /*size*/) noexcept
 	{
 		delete [] ptr;

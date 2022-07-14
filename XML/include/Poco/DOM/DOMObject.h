@@ -62,7 +62,7 @@ public:
 		/// Decreases the object's reference count.
 		/// If the reference count reaches zero,
 		/// the object is deleted.
-		
+
 	virtual void autoRelease() = 0;
 		/// Adds the object to an appropriate
 		/// AutoReleasePool, which is usually the
@@ -76,7 +76,7 @@ protected:
 private:
 	DOMObject(const DOMObject&);
 	DOMObject& operator = (const DOMObject&);
-	
+
 	mutable int _rc;
 };
 

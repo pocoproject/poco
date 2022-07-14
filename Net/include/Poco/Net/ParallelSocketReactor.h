@@ -48,17 +48,21 @@ class ParallelSocketReactor: public SR
 public:
 	using Ptr = Poco::SharedPtr<ParallelSocketReactor>;
 
-	ParallelSocketReactor()
+	ParallelSocketReactor(const std::string& threadName = "")
 	{
 		_thread.start(*this);
+		if (!threadName.empty())
+			_thread.setName(threadName);
 	}
-	
-	ParallelSocketReactor(const Poco::Timespan& timeout):
+
+	ParallelSocketReactor(const Poco::Timespan& timeout, const std::string& threadName = ""):
 		SR(timeout)
 	{
 		_thread.start(*this);
+		if (!threadName.empty())
+			_thread.setName(threadName);
 	}
-	
+
 	~ParallelSocketReactor()
 	{
 		try
@@ -71,14 +75,14 @@ public:
 			poco_unexpected();
 		}
 	}
-	
+
 protected:
 	void onIdle()
 	{
 		SR::onIdle();
 		Poco::Thread::yield();
 	}
-	
+
 private:
 	Poco::Thread _thread;
 };

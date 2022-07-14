@@ -35,15 +35,15 @@ namespace SQLite {
 
 class SQLite_API Notifier
 	/// Notifier is a wrapper for SQLite callback calls. It supports event callbacks
-	/// for insert, update, delete, commit and rollback events. While (un)registering 
-	/// callbacks is thread-safe, execution of the callbacks themselves are not; 
-	/// it is the user's responsibility to ensure the thread-safey of the functions 
+	/// for insert, update, delete, commit and rollback events. While (un)registering
+	/// callbacks is thread-safe, execution of the callbacks themselves are not;
+	/// it is the user's responsibility to ensure the thread-safey of the functions
 	/// they provide as callback target. Additionally, commit callbacks may prevent
 	/// database transactions from succeeding (see sqliteCommitCallbackFn documentation
-	/// for details). 
-	/// 
+	/// for details).
+	///
 	/// There can be only one set of callbacks per session (i.e. registering a new
-	/// callback automatically unregisters the previous one). All callbacks are 
+	/// callback automatically unregisters the previous one). All callbacks are
 	/// registered and enabled at Notifier contruction time and can be disabled
 	/// at a later point time.
 {
@@ -53,9 +53,9 @@ public:
 
 	typedef Poco::BasicEvent<void> Event;
 
-	// 
+	//
 	// Events
-	// 
+	//
 	Event update;
 	Event insert;
 	Event erase;
@@ -113,7 +113,7 @@ public:
 		/// Disables all callbacks.
 
 	static void sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row);
-		/// Update callback event dispatcher. Determines the type of the event, updates the row number 
+		/// Update callback event dispatcher. Determines the type of the event, updates the row number
 		/// and triggers the event.
 
 	static int sqliteCommitCallbackFn(void* pVal);
@@ -165,9 +165,9 @@ private:
 };
 
 
-// 
+//
 // inlines
-// 
+//
 
 inline bool Notifier::operator == (const Notifier& other) const
 {

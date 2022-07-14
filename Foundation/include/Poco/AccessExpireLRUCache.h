@@ -27,10 +27,10 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue,
-	class TMutex = FastMutex, 
+	class TMutex = FastMutex,
 	class TEventMutex = FastMutex
 >
 class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>

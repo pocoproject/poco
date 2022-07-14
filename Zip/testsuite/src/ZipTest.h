@@ -51,7 +51,7 @@ public:
 
 private:
 	void onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
-	
+
 	int _errCnt;
 };
 

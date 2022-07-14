@@ -213,8 +213,7 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 {
-	std::string str = val.toString();
-	bind(pos, str, dir);
+	bind(pos, toString(val), dir);
 }
 
 

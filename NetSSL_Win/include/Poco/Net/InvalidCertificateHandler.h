@@ -30,9 +30,9 @@ class NetSSL_Win_API InvalidCertificateHandler
 	/// A InvalidCertificateHandler is invoked whenever an error occurs verifying the certificate. It allows the user
 	/// to inspect and accept/reject the certificate.
 	/// One can install one's own InvalidCertificateHandler by implementing this interface. Note that
-	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API 
+	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API
 	/// and the name of your handler class is MyGuiHandler):
-	///    
+	///
 	///    #include "Poco/Net/CertificateHandlerFactory.h"
 	///    ...
 	///    POCO_REGISTER_CHFACTORY(My_API, MyGuiHandler)
@@ -43,7 +43,7 @@ class NetSSL_Win_API InvalidCertificateHandler
 	///
 	/// or in case one uses Poco::Util::Application one can rely on an XML configuration and put the following entry
 	/// under the path openSSL.invalidCertificateHandler:
-	///    
+	///
 	///    <invalidCertificateHandler>
 	///        <name>MyGuiHandler<name>
 	///        <options>
@@ -56,7 +56,7 @@ class NetSSL_Win_API InvalidCertificateHandler
 public:
 	InvalidCertificateHandler(bool handleErrorsOnServerSide);
 		/// Creates the InvalidCertificateHandler.
-		/// 
+		///
 		/// Set handleErrorsOnServerSide to true if the certificate handler is used on the server side.
 		/// Automatically registers at one of the SSLManager::VerificationError events.
 

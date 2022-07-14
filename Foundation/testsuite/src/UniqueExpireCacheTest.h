@@ -32,7 +32,7 @@ public:
 	void testExpireN();
 	void testExpirationDecorator();
 	void testAccessUpdate();
-	
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();

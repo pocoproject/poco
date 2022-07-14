@@ -34,7 +34,7 @@ class CppParser_API Attributes
 public:
 	typedef std::map<std::string, std::string> AttrMap;
 	typedef AttrMap::const_iterator Iterator;
-	
+
 	Attributes();
 		/// Creates the Attributes object.
 
@@ -46,15 +46,15 @@ public:
 
 	Attributes& operator = (const Attributes& attrs);
 		/// Assignment operator.
-		
+
 	bool has(const std::string& name) const;
 		/// Returns true if an attribute with the given name exists.
-	
+
 	std::string getString(const std::string& name) const;
 		/// Returns the attribute's value as a string.
 		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
-		
+
 	std::string getString(const std::string& name, const std::string& defaultValue) const;
 		/// Returns the attribute's value as a string, if it exists.
 		/// Returns the defaultValue if the attribute does not exist.
@@ -64,7 +64,7 @@ public:
 		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
 		/// Throws a Poco::SyntaxException if the stored value is not an integer.
-		
+
 	int getInt(const std::string& name, int defaultValue) const;
 		/// Returns the attribute's value as an integer, if it exists.
 		/// Returns the defaultValue if the attribute does not exist.
@@ -74,7 +74,7 @@ public:
 	bool getBool(const std::string& name) const;
 		/// Returns the attribute's value as a boolean.
 		/// The returned value is 'true', iff the stored value is not "false".
-		/// 
+		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
 
 	bool getBool(const std::string& name, bool defaultValue) const;
@@ -83,17 +83,17 @@ public:
 
 	void set(const std::string& name, const std::string& value);
 		/// Sets the value of an attribute.
-	
+
 	void remove(const std::string& name);
 		/// Removes the attribute with the given name.
 		/// Does nothing if the attribute does not exist.
-		
+
 	const std::string& operator [] (const std::string& name) const;
-	std::string& operator [] (const std::string& name);		
-		
+	std::string& operator [] (const std::string& name);
+
 	Iterator begin() const;
 	Iterator end() const;
-	
+
 	void clear();
 		/// Clears all attributes.
 

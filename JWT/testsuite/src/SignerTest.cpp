@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/JWT/Signer.h"
 #include "Poco/JWT/JWTException.h"
+#include <iostream>
 
 
 using namespace Poco::JWT;
@@ -111,7 +112,7 @@ void SignerTest::testSignHS256()
 	Signer signer("0123456789ABCDEF0123456789ABCDEF");
 	std::string jwt = signer.sign(token, Signer::ALGO_HS256);
 
-	assert (jwt == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.qn9G7NwFEOjIh-7hfCUDZA1aJeQmf7I7YvzCBcdenGw");
+	assertTrue(jwt == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.qn9G7NwFEOjIh-7hfCUDZA1aJeQmf7I7YvzCBcdenGw");
 }
 
 
@@ -126,7 +127,7 @@ void SignerTest::testSignHS384()
 	Signer signer("0123456789ABCDEF0123456789ABCDEF");
 	std::string jwt = signer.sign(token, Signer::ALGO_HS384);
 
-	assert (jwt == "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.9NsI7ahPhCd3itTewXb0GNZi08fuUHXLx0qeBscteMXJiug1PyQ_teA9v7zLgg1W");
+	assertTrue(jwt == "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.9NsI7ahPhCd3itTewXb0GNZi08fuUHXLx0qeBscteMXJiug1PyQ_teA9v7zLgg1W");
 }
 
 
@@ -141,7 +142,7 @@ void SignerTest::testSignHS512()
 	Signer signer("0123456789ABCDEF0123456789ABCDEF");
 	std::string jwt = signer.sign(token, Signer::ALGO_HS512);
 
-	assert (jwt == "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.WG4y8U_bDN4T3Vu3L5Q5C4pqssrH4wqBtdrFLVuS8k-BLycCq8_bjYGgo7BCzVt4DFXs3BFUIJQdWBzuJwXHtg");
+	assertTrue(jwt == "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.WG4y8U_bDN4T3Vu3L5Q5C4pqssrH4wqBtdrFLVuS8k-BLycCq8_bjYGgo7BCzVt4DFXs3BFUIJQdWBzuJwXHtg");
 }
 
 
@@ -153,12 +154,12 @@ void SignerTest::testVerifyHS256()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "HS256");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "qn9G7NwFEOjIh-7hfCUDZA1aJeQmf7I7YvzCBcdenGw");
+		assertTrue(token.getAlgorithm() == "HS256");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "qn9G7NwFEOjIh-7hfCUDZA1aJeQmf7I7YvzCBcdenGw");
 	}
 	catch (JWTException&)
 	{
@@ -176,12 +177,12 @@ void SignerTest::testVerifyHS384()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "HS384");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "9NsI7ahPhCd3itTewXb0GNZi08fuUHXLx0qeBscteMXJiug1PyQ_teA9v7zLgg1W");
+		assertTrue(token.getAlgorithm() == "HS384");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "9NsI7ahPhCd3itTewXb0GNZi08fuUHXLx0qeBscteMXJiug1PyQ_teA9v7zLgg1W");
 	}
 	catch (JWTException&)
 	{
@@ -199,12 +200,12 @@ void SignerTest::testVerifyHS512()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "HS512");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "WG4y8U_bDN4T3Vu3L5Q5C4pqssrH4wqBtdrFLVuS8k-BLycCq8_bjYGgo7BCzVt4DFXs3BFUIJQdWBzuJwXHtg");
+		assertTrue(token.getAlgorithm() == "HS512");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "WG4y8U_bDN4T3Vu3L5Q5C4pqssrH4wqBtdrFLVuS8k-BLycCq8_bjYGgo7BCzVt4DFXs3BFUIJQdWBzuJwXHtg");
 	}
 	catch (JWTException&)
 	{
@@ -259,7 +260,7 @@ void SignerTest::testSignRS256()
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_RS256);
 
-	assert (jwt == "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.a27BSSEBTaQZFA1tVX4IZHgyG5HIXcJVZpbpB5LQ_rPTalJjvhDDuWC1dM0G0tUACrzPtUN4BhSd-dygJsX4b35DnWm_gPUNDI3HMm7Ck52mM_2Y6445B6aa_pPPuFk6AWql8WWLzQqo9kjQh8AmbMw2A9bciA1smEEsHVw4-VX1tEtupbhJsXO2FnwkQNhJF_Pp4nuX282UV_4DtZ9LW3jLoEYFytKrM4fhkNKVMY52Cn0DJA89fQYe7098gduCjzqoGtaoKKDngbADn2h_1P8VLZrZEd4UROEHviVLm_qxHrWY8-tB0L7i_JMXxw1qMKAavWA-WbnNDdXpOn_o2Q");
+	assertTrue(jwt == "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.a27BSSEBTaQZFA1tVX4IZHgyG5HIXcJVZpbpB5LQ_rPTalJjvhDDuWC1dM0G0tUACrzPtUN4BhSd-dygJsX4b35DnWm_gPUNDI3HMm7Ck52mM_2Y6445B6aa_pPPuFk6AWql8WWLzQqo9kjQh8AmbMw2A9bciA1smEEsHVw4-VX1tEtupbhJsXO2FnwkQNhJF_Pp4nuX282UV_4DtZ9LW3jLoEYFytKrM4fhkNKVMY52Cn0DJA89fQYe7098gduCjzqoGtaoKKDngbADn2h_1P8VLZrZEd4UROEHviVLm_qxHrWY8-tB0L7i_JMXxw1qMKAavWA-WbnNDdXpOn_o2Q");
 }
 
 
@@ -277,7 +278,7 @@ void SignerTest::testSignRS384()
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_RS384);
 
-	assert (jwt == "eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.L-34N4v5kLa94Llz-XakGIwL9M00ERciAzZSqxgGIJ2dw9VrIodfK-U00wZZwSA2UEZWIm-LJ7wQBiuUw8oMl_fYsufT8W6dWiGZQ2c24AjGKwpXmypPKjh5yRnylkK-8ZRC1AJuZDsY8DJE7vse1w2eAE_Jw0XRJ-u_lq9Hgxz58ZonV1YzUdyVPtD3gWdhyjnlzPCH7lQM4copVUFN6mFTZzt4WQ2i1O1qW1cD_F4Jul9_5z5BYe7-bK3DoV79AgfbEewdnc4yatLQWMIAkrc2LM_tFe83ABhFYhM0qIH8nOuk3WKyKwtjh15f3h3Fn-JnriSfcC79v-M5UpEsZg");
+	assertTrue(jwt == "eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.L-34N4v5kLa94Llz-XakGIwL9M00ERciAzZSqxgGIJ2dw9VrIodfK-U00wZZwSA2UEZWIm-LJ7wQBiuUw8oMl_fYsufT8W6dWiGZQ2c24AjGKwpXmypPKjh5yRnylkK-8ZRC1AJuZDsY8DJE7vse1w2eAE_Jw0XRJ-u_lq9Hgxz58ZonV1YzUdyVPtD3gWdhyjnlzPCH7lQM4copVUFN6mFTZzt4WQ2i1O1qW1cD_F4Jul9_5z5BYe7-bK3DoV79AgfbEewdnc4yatLQWMIAkrc2LM_tFe83ABhFYhM0qIH8nOuk3WKyKwtjh15f3h3Fn-JnriSfcC79v-M5UpEsZg");
 }
 
 
@@ -295,7 +296,7 @@ void SignerTest::testSignRS512()
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_RS512);
 
-	assert (jwt == "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.XQTBYo2zqxcyUGs0H-74tfBY6l8PxBQK7-IAJ1NgEVIeoMDX3zQJu5BQX2_VhjOESOPqGNN-FtiNLD1G-LCvSV1fxJwIVEilT7CTBs5iNii6Jrpha5YPnzETqBiz1zdnyNh_QVbtdRIv2ORlp_OIYNZJrxiRfOGvm2_Z3htDoqgv_Lm8SZqelOntox96GrV6GaXhpKBbLjBSU-XPkSOcm5VuXDCz8tltJ_d5cKxbFDUtS6FBYNMaLEqIL4-_aJU_Ld5TcPQT7MqWlHHZZufA5zzmfKEEgddco6uzCBLOz3B6E4Z5VZDoweCM5R7hnLiZOlK0kYsFoaDCVcK_TZhDNw");
+	assertTrue(jwt == "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.XQTBYo2zqxcyUGs0H-74tfBY6l8PxBQK7-IAJ1NgEVIeoMDX3zQJu5BQX2_VhjOESOPqGNN-FtiNLD1G-LCvSV1fxJwIVEilT7CTBs5iNii6Jrpha5YPnzETqBiz1zdnyNh_QVbtdRIv2ORlp_OIYNZJrxiRfOGvm2_Z3htDoqgv_Lm8SZqelOntox96GrV6GaXhpKBbLjBSU-XPkSOcm5VuXDCz8tltJ_d5cKxbFDUtS6FBYNMaLEqIL4-_aJU_Ld5TcPQT7MqWlHHZZufA5zzmfKEEgddco6uzCBLOz3B6E4Z5VZDoweCM5R7hnLiZOlK0kYsFoaDCVcK_TZhDNw");
 }
 
 
@@ -311,12 +312,12 @@ void SignerTest::testVerifyRS256()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "RS256");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "a27BSSEBTaQZFA1tVX4IZHgyG5HIXcJVZpbpB5LQ_rPTalJjvhDDuWC1dM0G0tUACrzPtUN4BhSd-dygJsX4b35DnWm_gPUNDI3HMm7Ck52mM_2Y6445B6aa_pPPuFk6AWql8WWLzQqo9kjQh8AmbMw2A9bciA1smEEsHVw4-VX1tEtupbhJsXO2FnwkQNhJF_Pp4nuX282UV_4DtZ9LW3jLoEYFytKrM4fhkNKVMY52Cn0DJA89fQYe7098gduCjzqoGtaoKKDngbADn2h_1P8VLZrZEd4UROEHviVLm_qxHrWY8-tB0L7i_JMXxw1qMKAavWA-WbnNDdXpOn_o2Q");
+		assertTrue(token.getAlgorithm() == "RS256");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "a27BSSEBTaQZFA1tVX4IZHgyG5HIXcJVZpbpB5LQ_rPTalJjvhDDuWC1dM0G0tUACrzPtUN4BhSd-dygJsX4b35DnWm_gPUNDI3HMm7Ck52mM_2Y6445B6aa_pPPuFk6AWql8WWLzQqo9kjQh8AmbMw2A9bciA1smEEsHVw4-VX1tEtupbhJsXO2FnwkQNhJF_Pp4nuX282UV_4DtZ9LW3jLoEYFytKrM4fhkNKVMY52Cn0DJA89fQYe7098gduCjzqoGtaoKKDngbADn2h_1P8VLZrZEd4UROEHviVLm_qxHrWY8-tB0L7i_JMXxw1qMKAavWA-WbnNDdXpOn_o2Q");
 	}
 	catch (JWTException&)
 	{
@@ -337,12 +338,12 @@ void SignerTest::testVerifyRS384()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "RS384");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "L-34N4v5kLa94Llz-XakGIwL9M00ERciAzZSqxgGIJ2dw9VrIodfK-U00wZZwSA2UEZWIm-LJ7wQBiuUw8oMl_fYsufT8W6dWiGZQ2c24AjGKwpXmypPKjh5yRnylkK-8ZRC1AJuZDsY8DJE7vse1w2eAE_Jw0XRJ-u_lq9Hgxz58ZonV1YzUdyVPtD3gWdhyjnlzPCH7lQM4copVUFN6mFTZzt4WQ2i1O1qW1cD_F4Jul9_5z5BYe7-bK3DoV79AgfbEewdnc4yatLQWMIAkrc2LM_tFe83ABhFYhM0qIH8nOuk3WKyKwtjh15f3h3Fn-JnriSfcC79v-M5UpEsZg");
+		assertTrue(token.getAlgorithm() == "RS384");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "L-34N4v5kLa94Llz-XakGIwL9M00ERciAzZSqxgGIJ2dw9VrIodfK-U00wZZwSA2UEZWIm-LJ7wQBiuUw8oMl_fYsufT8W6dWiGZQ2c24AjGKwpXmypPKjh5yRnylkK-8ZRC1AJuZDsY8DJE7vse1w2eAE_Jw0XRJ-u_lq9Hgxz58ZonV1YzUdyVPtD3gWdhyjnlzPCH7lQM4copVUFN6mFTZzt4WQ2i1O1qW1cD_F4Jul9_5z5BYe7-bK3DoV79AgfbEewdnc4yatLQWMIAkrc2LM_tFe83ABhFYhM0qIH8nOuk3WKyKwtjh15f3h3Fn-JnriSfcC79v-M5UpEsZg");
 	}
 	catch (JWTException&)
 	{
@@ -363,12 +364,12 @@ void SignerTest::testVerifyRS512()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "RS512");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "XQTBYo2zqxcyUGs0H-74tfBY6l8PxBQK7-IAJ1NgEVIeoMDX3zQJu5BQX2_VhjOESOPqGNN-FtiNLD1G-LCvSV1fxJwIVEilT7CTBs5iNii6Jrpha5YPnzETqBiz1zdnyNh_QVbtdRIv2ORlp_OIYNZJrxiRfOGvm2_Z3htDoqgv_Lm8SZqelOntox96GrV6GaXhpKBbLjBSU-XPkSOcm5VuXDCz8tltJ_d5cKxbFDUtS6FBYNMaLEqIL4-_aJU_Ld5TcPQT7MqWlHHZZufA5zzmfKEEgddco6uzCBLOz3B6E4Z5VZDoweCM5R7hnLiZOlK0kYsFoaDCVcK_TZhDNw");
+		assertTrue(token.getAlgorithm() == "RS512");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "XQTBYo2zqxcyUGs0H-74tfBY6l8PxBQK7-IAJ1NgEVIeoMDX3zQJu5BQX2_VhjOESOPqGNN-FtiNLD1G-LCvSV1fxJwIVEilT7CTBs5iNii6Jrpha5YPnzETqBiz1zdnyNh_QVbtdRIv2ORlp_OIYNZJrxiRfOGvm2_Z3htDoqgv_Lm8SZqelOntox96GrV6GaXhpKBbLjBSU-XPkSOcm5VuXDCz8tltJ_d5cKxbFDUtS6FBYNMaLEqIL4-_aJU_Ld5TcPQT7MqWlHHZZufA5zzmfKEEgddco6uzCBLOz3B6E4Z5VZDoweCM5R7hnLiZOlK0kYsFoaDCVcK_TZhDNw");
 	}
 	catch (JWTException&)
 	{
@@ -402,11 +403,11 @@ void SignerTest::testSignVerifyES256()
 	try
 	{
 		Token token2 = verifier.verify(jwt);
-		assert (token2.getAlgorithm() == "ES256");
-		assert (token2.getType() == "JWT");
-		assert (token2.getSubject() == "1234567890");
-		assert (token2.getIssuedAt().epochTime() == 1516239022);
-		assert (token2.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token2.getAlgorithm() == "ES256");
+		assertTrue(token2.getType() == "JWT");
+		assertTrue(token2.getSubject() == "1234567890");
+		assertTrue(token2.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token2.payload().getValue<std::string>("name") == "John Doe");
 	}
 	catch (JWTException&)
 	{
@@ -427,12 +428,12 @@ void SignerTest::testVerifyES256()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "ES256");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+		assertTrue(token.getAlgorithm() == "ES256");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
 	}
 	catch (JWTException&)
 	{
@@ -466,11 +467,11 @@ void SignerTest::testSignVerifyES384()
 	try
 	{
 		Token token2 = verifier.verify(jwt);
-		assert (token2.getAlgorithm() == "ES384");
-		assert (token2.getType() == "JWT");
-		assert (token2.getSubject() == "1234567890");
-		assert (token2.getIssuedAt().epochTime() == 1516239022);
-		assert (token2.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token2.getAlgorithm() == "ES384");
+		assertTrue(token2.getType() == "JWT");
+		assertTrue(token2.getSubject() == "1234567890");
+		assertTrue(token2.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token2.payload().getValue<std::string>("name") == "John Doe");
 	}
 	catch (JWTException&)
 	{
@@ -491,12 +492,12 @@ void SignerTest::testVerifyES384()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "ES384");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+		assertTrue(token.getAlgorithm() == "ES384");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "ROGmzbopY2GfjSUKih4MmgZ5_1jLQdEc2db3ITYCDOZSHzeGM_14KtY-61qvx4BXxmeUiXfoInPZWlA75VL6dA");
 	}
 	catch (JWTException&)
 	{
@@ -530,11 +531,11 @@ void SignerTest::testSignVerifyES512()
 	try
 	{
 		Token token2 = verifier.verify(jwt);
-		assert (token2.getAlgorithm() == "ES512");
-		assert (token2.getType() == "JWT");
-		assert (token2.getSubject() == "1234567890");
-		assert (token2.getIssuedAt().epochTime() == 1516239022);
-		assert (token2.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token2.getAlgorithm() == "ES512");
+		assertTrue(token2.getType() == "JWT");
+		assertTrue(token2.getSubject() == "1234567890");
+		assertTrue(token2.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token2.payload().getValue<std::string>("name") == "John Doe");
 	}
 	catch (JWTException&)
 	{
@@ -555,12 +556,12 @@ void SignerTest::testVerifyES512()
 	try
 	{
 		Token token = signer.verify(jwt);
-		assert (token.getAlgorithm() == "ES512");
-		assert (token.getType() == "JWT");
-		assert (token.getSubject() == "1234567890");
-		assert (token.getIssuedAt().epochTime() == 1516239022);
-		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+		assertTrue(token.getAlgorithm() == "ES512");
+		assertTrue(token.getType() == "JWT");
+		assertTrue(token.getSubject() == "1234567890");
+		assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+		assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+		assertTrue(token.signature() == "8AYb9WDk3x2U-69Hi2DHou06L8VavXJlMqyH8dF-uiekm926CNM7D3pkgnWD6e_OfV_p2XIkdfIV018PjZtfuA");
 	}
 	catch (JWTException&)
 	{

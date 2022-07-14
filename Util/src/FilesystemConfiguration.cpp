@@ -119,7 +119,7 @@ Path FilesystemConfiguration::keyToPath(const std::string& key) const
 	for (const auto& tok: tokenizer)
 	{
 		result.pushDirectory(tok);
-	}	
+	}
 	return result;
 }
 

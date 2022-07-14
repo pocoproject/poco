@@ -59,7 +59,7 @@ public:
 	void setLineLength(int lineLength);
 		/// Specify the line length.
 		///
-		/// After the given number of characters have been written, 
+		/// After the given number of characters have been written,
 		/// a newline character will be written.
 		///
 		/// Specify 0 for an unlimited line length.

@@ -21,7 +21,7 @@
 class ODBCOracleTest: public ODBCTest
 	/// Oracle ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB							| OS
 	/// ------------+-------------------------------+------------------------------------------
 	///	10.02.00.01	| Oracle9i Release 9.2.0.4.0	| MS Windows XP Professional x64 v.2003/SP1
@@ -51,7 +51,7 @@ public:
 
 private:
 	static void testBarebone();
-	
+
 	void dropObject(const std::string& type, const std::string& name);
 	void recreateNullableTable();
 	void recreatePersonTable();
@@ -72,7 +72,7 @@ private:
 
 	static ODBCTest::SessionPtr _pSession;
 	static ODBCTest::ExecPtr    _pExecutor;
-	
+
 	static std::string _driver;
 	static std::string _dsn;
 	static std::string _uid;

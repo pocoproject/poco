@@ -570,7 +570,7 @@ public:
 	void convert(std::string& s) const
 	{
 		std::ostringstream oss;
-		_val->stringify(oss, 2);
+		_val->stringify(oss);
 		s = oss.str();
 	}
 
@@ -712,7 +712,7 @@ public:
 	void convert(std::string& s) const
 	{
 		std::ostringstream oss;
-		_val.stringify(oss, 2);
+		_val.stringify(oss);
 		s = oss.str();
 	}
 

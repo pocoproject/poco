@@ -35,7 +35,7 @@ class ListMap
 	/// ordering of elements is not desirable. Naturally, this container will
 	/// have inferior data retrieval performance and it is not recommended for
 	/// use with large datasets. The main purpose within POCO is for Internet
-	/// messages (email message, http headers etc), to prevent automatic 
+	/// messages (email message, http headers etc), to prevent automatic
 	/// header entry reordering.
 {
 public:
@@ -45,17 +45,17 @@ public:
 	using ConstReference = const Mapped&;
 	using Pointer = Mapped*;
 	using ConstPointer = const Mapped*;
-	
+
 	using ValueType = typename Container::value_type;
 	using SizeType = typename Container::size_type;
 	using Iterator = typename Container::iterator;
 	using ConstIterator = typename Container::const_iterator;
-	
+
 	ListMap()
 		/// Creates an empty ListMap.
 	{
 	}
-	
+
 	explicit ListMap(std::size_t initialReserve):
 		_container(initialReserve)
 		/// Creates the ListMap with room for initialReserve entries.
@@ -71,7 +71,7 @@ public:
 		_container(std::move(other._container))
 	{
 	}
-	
+
 	ListMap& operator = (const ListMap& map)
 		/// Assigns another ListMap.
 	{
@@ -79,44 +79,44 @@ public:
 		swap(tmp);
 		return *this;
 	}
-	
+
 	ListMap& operator = (ListMap&& map) noexcept
 		/// Assigns another ListMap.
 	{
 		_container = std::move(map._container);
 		return *this;
 	}
-	
-	void swap(ListMap& map)
+
+	void swap(ListMap& map) noexcept
 		/// Swaps the ListMap with another one.
 	{
 		_container.swap(map._container);
 	}
-	
+
 	ConstIterator begin() const
 		/// Returns the beginning of the map.
 	{
 		return _container.begin();
 	}
-	
+
 	ConstIterator end() const
 		/// Returns the end of the map.
 	{
 		return _container.end();
 	}
-	
+
 	Iterator begin()
 		/// Returns the beginning of the map.
 	{
 		return _container.begin();
 	}
-	
+
 	Iterator end()
 		/// Returns the end of the map.
 	{
 		return _container.end();
 	}
-	
+
 	ConstIterator find(const KeyType& key) const
 		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
@@ -148,22 +148,22 @@ public:
 	}
 
 	Iterator insert(const ValueType& val)
-		/// Inserts the value into the map. If one or more values 
-		/// already exist, new value is inserted at the end of the 
+		/// Inserts the value into the map. If one or more values
+		/// already exist, new value is inserted at the end of the
 		/// block. Thus, all the equal value entries are located
 		/// sequentially at all times.
-		/// Returns iterator pointing to the newly inserted value 
+		/// Returns iterator pointing to the newly inserted value
 	{
 		Iterator it = find(val.first);
 		while (it != _container.end() && isEqual(it->first, val.first)) ++it;
 		return _container.insert(it, val);
 	}
-	
+
 	void erase(Iterator it)
 	{
 		_container.erase(it);
 	}
-	
+
 	SizeType erase(const KeyType& key)
 	{
 		SizeType count = 0;
@@ -185,7 +185,7 @@ public:
 		}
 		return count;
 	}
-	
+
 	void clear()
 	{
 		_container.clear();

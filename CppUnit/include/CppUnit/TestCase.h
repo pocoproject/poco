@@ -90,7 +90,7 @@ public:
 	TestCase(const std::string& Name, Test::Type testType = Test::Normal);
 	~TestCase();
 
-	virtual void run(TestResult* result);
+	virtual void run(TestResult* result, const Test::Callback& callback = nullptr);
 	virtual TestResult* run();
 	virtual int countTestCases() const;
 	virtual std::string toString() const;
@@ -124,10 +124,17 @@ protected:
                                    long data2LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	void assertEquals(long expected,
-	                  long actual,
+	template <typename T1, typename T2,
+		typename = typename std::enable_if<std::is_arithmetic<T1>::value, T1>::type,
+		typename = typename std::enable_if<std::is_arithmetic<T2>::value, T2>::type>
+	void assertEquals(T1 expected,
+	                  T2 actual,
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME)
+	{
+		if (expected != actual)
+			assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
+	}
 
 	void assertEquals(double expected,
 	                  double actual,
@@ -140,13 +147,24 @@ protected:
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
+	void assertEquals(const char* expected,
+	                  const std::string& actual,
+	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
 	void assertEquals(const void* expected,
 	                  const void* actual,
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	std::string notEqualsMessage(long expected, long actual);
-	std::string notEqualsMessage(double expected, double actual);
+	template <typename T1, typename T2,
+		typename = typename std::enable_if<std::is_arithmetic<T1>::value, T1>::type,
+		typename = typename std::enable_if<std::is_arithmetic<T2>::value, T2>::type>
+	std::string notEqualsMessage(T1 expected, T2 actual)
+	{
+		return "expected: " + std::to_string(expected) + " but was: " + std::to_string(actual);
+	}
+
 	std::string notEqualsMessage(const void* expected, const void* actual);
 	std::string notEqualsMessage(const std::string& expected, const std::string& actual);
 

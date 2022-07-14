@@ -40,9 +40,11 @@ public:
 	void testColumnList();
 	void testRow();
 	void testRowSort();
-	void testRowFormat();
+	void testSimpleRowFormatter();;
+	void testJSONRowFormatter();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
+	void testTranscode();
 
 	void setUp();
 	void tearDown();
@@ -50,13 +52,13 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	void testRowStrictWeak(const Poco::Data::Row& row1, 
-		const Poco::Data::Row& row2, 
+	void testRowStrictWeak(const Poco::Data::Row& row1,
+		const Poco::Data::Row& row2,
 		const Poco::Data::Row& row3);
 		/// Strict weak ordering requirement for sorted containers
 		/// as described in Josuttis "The Standard C++ Library"
 		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed: 
+		/// For this to pass, the following condition must be satisifed:
 		/// row1 < row2 < row3
 
 	void writeToCLOB(Poco::BinaryWriter& writer);

@@ -51,7 +51,7 @@ class Foundation_API TaskStartedNotification: public TaskNotification
 {
 public:
 	TaskStartedNotification(Task* pTask);
-	
+
 protected:
 	~TaskStartedNotification();
 };
@@ -92,7 +92,7 @@ public:
 
 protected:
 	~TaskFailedNotification();
-	
+
 private:
 	Exception* _pException;
 };
@@ -109,7 +109,7 @@ public:
 
 protected:
 	~TaskProgressNotification();
-	
+
 private:
 	float _progress;
 };
@@ -137,7 +137,7 @@ public:
 
 protected:
 	~TaskCustomNotification(){};
-	
+
 private:
 	C _custom;
 };

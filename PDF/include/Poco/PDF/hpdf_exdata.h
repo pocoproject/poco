@@ -31,7 +31,7 @@ HPDF_ExData
 HPDF_3DAnnotExData_New(HPDF_MMgr mmgr,
 					   HPDF_Xref xref );
 
-         
+
 
 #ifdef __cplusplus
 }

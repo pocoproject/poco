@@ -134,7 +134,7 @@ public:
 	~ZipArchiveInfo64();
 		/// Destroys the ZipArchiveInfo64.
 
-	void getVersionMadeBy(int& major, int& minor);	
+	void getVersionMadeBy(int& major, int& minor);
 		/// The ZIP version used to create the file
 
 	void getRequiredVersion(int& major, int& minor);
@@ -157,7 +157,7 @@ public:
 
 	std::streamoff getCentralDirectoryOffset() const;
 		/// Returns the offset of the central directory from beginning of first disk
-	
+
 	std::streamoff getHeaderOffset() const;
 		/// Returns the offset of the header in relation to the begin of this disk
 
@@ -175,7 +175,7 @@ public:
 
 	void setHeaderOffset(std::streamoff val);
 		/// Sets the offset of the header in relation to the begin of this disk
-	
+
 	void setTotalNumberOfDisks(Poco::UInt32 val);
 		/// Sets the offset of the central directory from beginning of first disk
 
@@ -217,7 +217,7 @@ private:
 		ENDOFCENTRALDIROFFSET_SIZE = 8,
 		TOTALNUMBEROFENDDISKS_POS = ENDOFCENTRALDIROFFSET_POS + ENDOFCENTRALDIROFFSET_SIZE,
 		TOTALNUMBEROFENDDISKS_SIZE = 4,
-			
+
 		FULL_LOCATOR_SIZE = 20
 	};
 

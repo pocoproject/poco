@@ -40,7 +40,7 @@ const char* LoggingSubsystem::name() const
 	return "Logging Subsystem";
 }
 
-	
+
 void LoggingSubsystem::initialize(Application& app)
 {
 	LoggingConfigurator configurator;

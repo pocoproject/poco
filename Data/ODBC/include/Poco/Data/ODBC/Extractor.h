@@ -33,7 +33,6 @@
 #include "Poco/Nullable.h"
 #include "Poco/UTFString.h"
 #include "Poco/TextEncoding.h"
-#include "Poco/TextConverter.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -56,7 +55,8 @@ public:
 
 	Extractor(const StatementHandle& rStmt,
 		Preparator::Ptr pPreparator,
-		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr,
+		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -592,11 +592,10 @@ private:
 		val.clear();
 		if (ret)
 		{
-			Poco::TextConverter conv(*_pDBEncoding, *_pToEncoding);
 			val.resize(res.size());
 			typename C::iterator vIt = val.begin();
 			typename C::iterator it = res.begin();
-			for (; it != res.end(); ++it, ++vIt) conv.convert(*it, *vIt);
+			for (; it != res.end(); ++it, ++vIt) transcode(*it, *vIt);
 		}
 		return ret;
 	}
@@ -607,7 +606,7 @@ private:
 		bool ret = false;
 		if (Preparator::DE_BOUND == _dataExtraction)
 		{
-			if (!_transcode)
+			if (!transcodeRequired())
 				ret = extractBoundImplContainer(pos, val);
 			else
 				ret = stringContainerExtractConvert(pos, val);
@@ -628,9 +627,6 @@ private:
 	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
 	std::vector<SQLLEN>        _lengths;
-	Poco::TextEncoding::Ptr    _pDBEncoding;
-	bool                       _transcode;
-	Poco::TextEncoding::Ptr    _pToEncoding;
 };
 
 

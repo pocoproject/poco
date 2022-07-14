@@ -46,7 +46,7 @@ public:
 	};
 
 	SharedMemory();
-		/// Default constructor creates an unmapped SharedMemory object. 
+		/// Default constructor creates an unmapped SharedMemory object.
 		/// No clients can connect to an unmapped SharedMemory object.
 
 	SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint = 0, bool server = true);
@@ -81,7 +81,7 @@ public:
 	SharedMemory& operator = (const SharedMemory& other);
 		/// Assigns another SharedMemory object.
 
-	void swap(SharedMemory& other);
+	void swap(SharedMemory& other) noexcept;
 		/// Swaps the SharedMemory object with another one.
 
 	char* begin() const;
@@ -89,7 +89,7 @@ public:
 		/// Will be NULL for illegal segments.
 
 	char* end() const;
-		/// Returns the one-past-end end address of the shared memory segment. 
+		/// Returns the one-past-end end address of the shared memory segment.
 		/// Will be NULL for illegal segments.
 
 private:
@@ -100,7 +100,7 @@ private:
 //
 // inlines
 //
-inline void SharedMemory::swap(SharedMemory& other)
+inline void SharedMemory::swap(SharedMemory& other) noexcept
 {
 	using std::swap;
 	swap(_pImpl, other._pImpl);

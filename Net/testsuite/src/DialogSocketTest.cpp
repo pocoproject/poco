@@ -45,11 +45,11 @@ void DialogSocketTest::testDialogSocket()
 	ds.sendString("Hello, World!\n");
 	ds.receiveMessage(str);
 	assertTrue (str == "Hello, World!");
-	
+
 	ds.sendMessage("EHLO", "appinf.com");
 	ds.receiveMessage(str);
 	assertTrue (str == "EHLO appinf.com");
-	
+
 	ds.sendMessage("PUT", "local.txt", "remote.txt");
 	ds.receiveMessage(str);
 	assertTrue (str == "PUT local.txt remote.txt");
@@ -58,12 +58,12 @@ void DialogSocketTest::testDialogSocket()
 	int status = ds.receiveStatusMessage(str);
 	assertTrue (status == 220);
 	assertTrue (str == "220 Hello, world!");
-	
+
 	ds.sendString("220-line1\r\n220 line2\r\n");
 	status = ds.receiveStatusMessage(str);
 	assertTrue (status == 220);
 	assertTrue (str == "220-line1\n220 line2");
-	
+
 	ds.sendString("220-line1\r\nline2\r\n220 line3\r\n");
 	status = ds.receiveStatusMessage(str);
 	assertTrue (status == 220);
@@ -73,7 +73,7 @@ void DialogSocketTest::testDialogSocket()
 	status = ds.receiveStatusMessage(str);
 	assertTrue (status == 0);
 	assertTrue (str == "Hello, world!");
-	
+
 	ds.sendString("Header\nMore Bytes");
 	status = ds.receiveStatusMessage(str);
 	assertTrue (status == 0);

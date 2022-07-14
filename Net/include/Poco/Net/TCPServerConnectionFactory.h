@@ -44,7 +44,7 @@ class Net_API TCPServerConnectionFactory
 {
 public:
 	using Ptr = Poco::SharedPtr<TCPServerConnectionFactory>;
-	
+
 	virtual ~TCPServerConnectionFactory();
 		/// Destroys the TCPServerConnectionFactory.
 
@@ -71,11 +71,11 @@ public:
 	TCPServerConnectionFactoryImpl()
 	{
 	}
-	
+
 	~TCPServerConnectionFactoryImpl()
 	{
 	}
-	
+
 	TCPServerConnection* createConnection(const StreamSocket& socket)
 	{
 		return new S(socket);

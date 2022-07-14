@@ -61,9 +61,9 @@ void ManifestTest::testManifest()
 	assertTrue (manifest.find("MfTestObject2") != manifest.end());
 	assertTrue (manifest.find("MfTestObject3") != manifest.end());
 	assertTrue (manifest.find("MfTestObject4") == manifest.end());
-	
+
 	std::set<std::string> classes;
-	
+
 	Manifest<MfTestBase>::Iterator it = manifest.begin();
 	assertTrue (it != manifest.end());
 	classes.insert(it->name());
@@ -75,11 +75,11 @@ void ManifestTest::testManifest()
 	classes.insert(it->name());
 	it++;
 	assertTrue (it == manifest.end());
-	
+
 	assertTrue (classes.find("MfTestObject1") != classes.end());
 	assertTrue (classes.find("MfTestObject2") != classes.end());
 	assertTrue (classes.find("MfTestObject3") != classes.end());
-	
+
 	manifest.clear();
 	assertTrue (manifest.empty());
 	assertTrue (manifest.size() == 0);

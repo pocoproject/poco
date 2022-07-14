@@ -68,7 +68,7 @@ public:
 		_entries.reserve(ht._capacity);
 		for (auto p: ht._entries.end())
 		{
-			if (p) 
+			if (p)
 				_entries.push_back(new HashEntry(p));
 			else
 				_entries.push_back(0);
@@ -90,8 +90,8 @@ public:
 		}
 		return *this;
 	}
-	
-	void swap(SimpleHashTable& ht)
+
+	void swap(SimpleHashTable& ht) noexcept
 	{
 		using std::swap;
 		swap(_entries, ht._entries);
@@ -216,12 +216,12 @@ public:
 		UInt32 hsh = hash(key);
 		return const_cast<Value&>(getRaw(key, hsh));
 	}
-	
+
 	const Value& operator [] (const Key& key) const
 	{
 		return get(key);
 	}
-	
+
 	Value& operator [] (const Key& key)
 	{
 		UInt32 hsh = hash(key);
@@ -326,7 +326,7 @@ public:
 	{
 		return _size;
 	}
-	
+
 	UInt32 capacity() const
 	{
 		return _capacity;

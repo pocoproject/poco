@@ -59,7 +59,7 @@ public:
 		_length(0)
 	{
 	}
-	
+
 	void handlePart(const MessageHeader& header, std::istream& stream)
 	{
 		_type = header.get("Content-Type", "(unspecified)");
@@ -71,18 +71,18 @@ public:
 			_name = params.get("name", "(unnamed)");
 			_fileName = params.get("filename", "(unnamed)");
 		}
-		
+
 		CountingInputStream istr(stream);
 		NullOutputStream ostr;
 		StreamCopier::copyStream(istr, ostr);
 		_length = istr.chars();
 	}
-	
+
 	int length() const
 	{
 		return _length;
 	}
-	
+
 	const std::string& name() const
 	{
 		return _name;
@@ -92,12 +92,12 @@ public:
 	{
 		return _fileName;
 	}
-	
+
 	const std::string& contentType() const
 	{
 		return _type;
 	}
-	
+
 private:
 	int _length;
 	std::string _type;
@@ -110,10 +110,10 @@ class FormRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	FormRequestHandler() 
+	FormRequestHandler()
 	{
 	}
-	
+
 	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 	{
 		Application& app = Application::instance();
@@ -126,7 +126,7 @@ public:
 		response.setContentType("text/html");
 
 		std::ostream& ostr = response.send();
-		
+
 		ostr <<
 			"<html>\n"
 			"<head>\n"
@@ -149,7 +149,7 @@ public:
 			"<input type=\"file\" name=\"file\" size=\"31\"> \n"
 			"<input type=\"submit\" value=\"Upload\">\n"
 			"</form>\n";
-			
+
 		ostr << "<h2>Request</h2><p>\n";
 		ostr << "Method: " << request.getMethod() << "<br>\n";
 		ostr << "URI: " << request.getURI() << "<br>\n";
@@ -172,7 +172,7 @@ public:
 			}
 			ostr << "</p>";
 		}
-		
+
 		if (!partHandler.name().empty())
 		{
 			ostr << "<h2>Upload</h2><p>\n";
@@ -224,7 +224,7 @@ public:
 	HTTPFormServer(): _helpRequested(false)
 	{
 	}
-	
+
 	~HTTPFormServer()
 	{
 	}
@@ -235,7 +235,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		ServerApplication::initialize(self);
 	}
-		
+
 	void uninitialize()
 	{
 		ServerApplication::uninitialize();
@@ -244,7 +244,7 @@ protected:
 	void defineOptions(OptionSet& options)
 	{
 		ServerApplication::defineOptions(options);
-		
+
 		options.addOption(
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
@@ -277,7 +277,7 @@ protected:
 		else
 		{
 			unsigned short port = (unsigned short) config().getInt("HTTPFormServer.port", 9980);
-			
+
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a HTTPServer instance
@@ -291,7 +291,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 };

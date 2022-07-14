@@ -169,7 +169,7 @@ Path& Path::operator = (const char* path)
 }
 
 
-void Path::swap(Path& path)
+void Path::swap(Path& path) noexcept
 {
 	std::swap(_node, path._node);
 	std::swap(_device, path._device);

@@ -50,8 +50,8 @@ class Data_API RowFormatter
 	/// it with rows through RecordSet.
 	///
 	/// To accomodate for various formatting needs, a formatter can operate in two modes:
-	/// 
-	///	  - progressive: formatted individual row strings are gemerated and returned from each 
+	///
+	///	  - progressive: formatted individual row strings are gemerated and returned from each
 	///     call to formatValues;
 	///     std::string& formatNames(const NameVecPtr, std::string&) and
 	///     std::string& formatValues(const ValueVec&, std::string&) member calls should be
@@ -106,7 +106,7 @@ public:
 		/// The default implementation does nothing.
 
 	virtual const std::string& toString();
-		/// Throws NotImplementedException. Formatters operating in bulk mode should 
+		/// Throws NotImplementedException. Formatters operating in bulk mode should
 		/// implement this member function to return valid pointer to the formatted result.
 
 	virtual int rowCount() const;
@@ -139,7 +139,12 @@ public:
 
 protected:
 
-	void setPrefix(const std::string& prefix);
+	virtual void adjustPrefix() const;
+		/// Adjusts the prefix, if needed
+		/// (eg. to contain the total row count);
+		/// default no-op.
+
+	void setPrefix(const std::string& prefix) const;
 		/// Sets the prefix for the formatter.
 
 	void setPostfix(const std::string& postfix);
@@ -175,7 +180,7 @@ inline void RowFormatter::setTotalRowCount(int count)
 }
 
 
-inline void RowFormatter::setPrefix(const std::string& prefix)
+inline void RowFormatter::setPrefix(const std::string& prefix) const
 {
 	_prefix = prefix;
 }
@@ -189,6 +194,7 @@ inline void RowFormatter::setPostfix(const std::string& postfix)
 
 inline const std::string& RowFormatter::prefix() const
 {
+	adjustPrefix();
 	return _prefix;
 }
 

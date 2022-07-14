@@ -37,7 +37,7 @@ void MessageHeaderTest::testWrite()
 	mh.set("name1", "value1");
 	mh.set("name2", "value2");
 	mh.set("name3", "value3");
-	
+
 	std::ostringstream ostr;
 	mh.write(ostr);
 	std::string s = ostr.str();
@@ -217,12 +217,12 @@ void MessageHeaderTest::testSplitElements()
 	std::vector<std::string> v;
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.empty());
-	
+
 	s = "foo";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 1);
 	assertTrue (v[0] == "foo");
-	
+
 	s = "  foo ";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 1);
@@ -233,7 +233,7 @@ void MessageHeaderTest::testSplitElements()
 	assertTrue (v.size() == 2);
 	assertTrue (v[0] == "foo");
 	assertTrue (v[1] == "bar");
-	
+
 	s = "foo,,bar";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 2);
@@ -257,7 +257,7 @@ void MessageHeaderTest::testSplitElements()
 	assertTrue (v.size() == 2);
 	assertTrue (v[0] == "foo; param=\"a,b\"");
 	assertTrue (v[1] == "bar; param=\"c,d\"");
-	
+
 	s = "foo, bar, f00, baz";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 4);
@@ -265,26 +265,26 @@ void MessageHeaderTest::testSplitElements()
 	assertTrue (v[1] == "bar");
 	assertTrue (v[2] == "f00");
 	assertTrue (v[3] == "baz");
-	
+
 	s = "a,b,c";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 3);
 	assertTrue (v[0] == "a");
 	assertTrue (v[1] == "b");
 	assertTrue (v[2] == "c");
-	
+
 	s = "a=\"value=\\\\\\\"foo, bar\\\\\\\"\",b=foo";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 2);
 	assertTrue (v[0] == "a=\"value=\\\"foo, bar\\\"\"");
 	assertTrue (v[1] == "b=foo");
-	
+
 	s = "a=\\\",b=\\\"";
 	MessageHeader::splitElements(s, v);
 	assertTrue (v.size() == 2);
 	assertTrue (v[0] == "a=\"");
 	assertTrue (v[1] == "b=\"");
-	
+
 }
 
 
@@ -293,46 +293,46 @@ void MessageHeaderTest::testSplitParameters()
 	std::string s;
 	std::string v;
 	NameValueCollection p;
-	
+
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v.empty());
 	assertTrue (p.empty());
-	
+
 	s = "multipart/related";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "multipart/related");
 	assertTrue (p.empty());
-	
+
 	s = "multipart/related; boundary=MIME_boundary_01234567";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "multipart/related");
 	assertTrue (p.size() == 1);
 	assertTrue (p["boundary"] == "MIME_boundary_01234567");
-	
+
 	s = "multipart/related; boundary=\"MIME_boundary_76543210\"";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "multipart/related");
 	assertTrue (p.size() == 1);
 	assertTrue (p["boundary"] == "MIME_boundary_76543210");
-	
+
 	s = "text/plain; charset=us-ascii";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "text/plain");
 	assertTrue (p.size() == 1);
 	assertTrue (p["charset"] == "us-ascii");
-	
+
 	s = "value; p1=foo; p2=bar";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "value");
 	assertTrue (p.size() == 2);
 	assertTrue (p["p1"] == "foo");
 	assertTrue (p["p2"] == "bar");
-	
+
 	s = "value; p1=\"foo; bar\"";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "value");
 	assertTrue (p.size() == 1);
-	assertTrue (p["p1"] == "foo; bar");	
+	assertTrue (p["p1"] == "foo; bar");
 
 	s = "value ; p1=foo ; p2=bar ";
 	MessageHeader::splitParameters(s, v, p);
@@ -359,6 +359,38 @@ void MessageHeaderTest::testFieldLimit()
 	}
 }
 
+
+void MessageHeaderTest::testNameLengthLimit()
+{
+	std::string s("name1: value1\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setNameLengthLimit(2);
+	try
+	{
+		mh.read(istr);
+		fail("Name length limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+void MessageHeaderTest::testValueLengthLimit()
+{
+	std::string s("name1: value1\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setValueLengthLimit(2);
+	try
+	{
+		mh.read(istr);
+		fail("Value length limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
 
 void MessageHeaderTest::testDecodeWord()
 {

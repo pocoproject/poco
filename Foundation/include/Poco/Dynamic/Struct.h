@@ -173,7 +173,7 @@ public:
 		_data.clear();
 	}
 
-	inline void swap(Struct& other)
+	inline void swap(Struct& other) noexcept
 		/// Swap content of Struct with another Struct
 	{
 		_data.swap(other._data);

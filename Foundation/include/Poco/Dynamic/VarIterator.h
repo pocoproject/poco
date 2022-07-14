@@ -79,11 +79,11 @@ public:
 		/// Advances by one position and returns current position.
 
 	VarIterator operator ++ (int) const;
-		/// Advances by one position and returns copy of the iterator with 
+		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
 	const VarIterator& operator -- () const;
-		/// Goes back by one position and returns copy of the iterator with 
+		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
 	VarIterator operator -- (int) const;
@@ -103,15 +103,15 @@ private:
 	VarIterator();
 
 	void increment() const;
-		/// Increments the iterator position by one. 
+		/// Increments the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void decrement() const;
-		/// Decrements the iterator position by one. 
+		/// Decrements the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void setPosition(std::size_t pos) const;
-		/// Sets the iterator position. 
+		/// Sets the iterator position.
 		/// Throws RangeException if position is out of range.
 
 	Var*                _pVar;

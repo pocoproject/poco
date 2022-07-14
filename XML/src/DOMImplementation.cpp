@@ -53,7 +53,7 @@ bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& ve
 	       (lcFeature == FEATURE_TRAVERSAL && version == VERSION_2_0);
 }
 
-		
+
 DocumentType* DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
 	return new DocumentType(0, name, publicId, systemId);

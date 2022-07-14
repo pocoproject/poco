@@ -71,24 +71,15 @@
 // cases when value holder fits into POCO_SMALL_OBJECT_SIZE
 // (see below).
 //
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!! NOTE: Any/Dynamic::Var SOO will NOT work reliably   !!!
-// !!! without C++11 (std::aligned_storage in particular). !!!
-// !!! Only comment this out if your compiler has support  !!!
-// !!! for std::aligned_storage.                           !!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//
-#ifndef POCO_ENABLE_SOO
-#define POCO_NO_SOO
-#endif
+// #define POCO_NO_SOO
 
 
 // Small object size in bytes. When assigned to Any or Var,
 // objects larger than this value will be alocated on the heap,
 // while those smaller will be placement new-ed into an
-// internal buffer.
-#if !defined(POCO_SMALL_OBJECT_SIZE) && !defined(POCO_NO_SOO)
-	#define POCO_SMALL_OBJECT_SIZE 32
+// internal stack-auto-allocated buffer.
+#if !defined(POCO_SMALL_OBJECT_SIZE)
+	#define POCO_SMALL_OBJECT_SIZE 64
 #endif
 
 
@@ -96,7 +87,7 @@
 // on platforms with no inotify.
 // #define POCO_NO_INOTIFY
 
-// Define to force the use of PollingDirectoryWatcher 
+// Define to force the use of PollingDirectoryWatcher
 // #define POCO_DW_FORCE_POLLING
 
 
@@ -151,6 +142,20 @@
 // #define POCO_NET_NO_IPv6
 
 
+// No UNIX socket support
+// Define to disable unix sockets
+// #define POCO_NET_NO_UNIX_SOCKET
+
+
+// Define to nonzero to enable move semantics
+// on classes where it introduces a new state.
+// For explanation, see:
+// https://github.com/pocoproject/poco/wiki/Move-Semantics-in-POCO
+#ifndef POCO_NEW_STATE_ON_MOVE
+// #define POCO_NEW_STATE_ON_MOVE 1
+#endif
+
+
 // Windows CE has no locale support
 #if defined(_WIN32_WCE)
 	#define POCO_NO_LOCALE
@@ -185,7 +190,7 @@
 //   empty or other value:
 //     Do not link any OpenSSL libraries automatically. You will have to edit the
 //     Visual C++ project files for Crypto and NetSSL_OpenSSL.
-#ifndef POCO_EXTERNAL_OPENSSL
+#if !defined(POCO_EXTERNAL_OPENSSL) && defined(POCO_EXTERNAL_OPENSSL_SLPRO)
 	#define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
 #endif
 

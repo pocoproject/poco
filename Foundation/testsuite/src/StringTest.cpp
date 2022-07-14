@@ -70,6 +70,7 @@ using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
 using Poco::isIntOverflow;
+using Poco::safeMultiply;
 using Poco::isSafeIntCast;
 using Poco::safeIntCast;
 using Poco::FPEnvironment;
@@ -915,121 +916,6 @@ void StringTest::testNumericLocale()
 }
 
 
-void StringTest::benchmarkStrToInt()
-{
-	Poco::Stopwatch sw;
-	std::string num = "123456789";
-	int res;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) parseStream(num, res);
-	sw.stop();
-	std::cout << "parseStream Number: " << res << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
-
-	char* pC = 0;
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res = std::strtol(num.c_str(), &pC, 10);
-	sw.stop();
-	std::cout << "std::strtol Number: " << res << std::endl;
-	double timeStrtol = sw.elapsed() / 1000.0;
-
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res, 10);
-	sw.stop();
-	std::cout << "strToInt Number: " << res << std::endl;
-	double timeStrToInt = sw.elapsed() / 1000.0;
-
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res);
-	sw.stop();
-	std::cout << "sscanf Number: " << res << std::endl;
-	double timeScanf = sw.elapsed() / 1000.0;
-
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
-
-	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
-	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
-
-	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
-	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
-
-	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
-	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
-	std::cout << std::endl;
-}
-
-
-void StringTest::benchmarkStrToFloat()
-{
-	Poco::Stopwatch sw;
-	std::string num = "1.0372157551632929e-112";
-	std::cout << "The Number: " << num << std::endl;
-	double res;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) parseStream(num, res);
-	sw.stop();
-	std::cout << "parseStream Number: " << std::setprecision(std::numeric_limits<double>::digits10) << res << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
-
-	// standard strtod
-	char* pC = 0;
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res = std::strtod(num.c_str(), &pC);
-	sw.stop();
-	std::cout << "std::strtod Number: " << res << std::endl;
-	double timeStdStrtod = sw.elapsed() / 1000.0;
-
-	// POCO Way
-	sw.restart();
-	char ou = 0;
-	for (int i = 0; i < 1000000; ++i) strToDouble(num, res, ou);
-	sw.stop();
-	std::cout << "strToDouble Number: " << res << std::endl;
-	double timeStrToDouble = sw.elapsed() / 1000.0;
-
-	// standard sscanf
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res);
-	sw.stop();
-	std::cout << "sscanf Number: " << res << std::endl;
-	double timeScanf = sw.elapsed() / 1000.0;
-
-	// double-conversion Strtod
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) strToDouble(num.c_str());
-	sw.stop();
-	std::cout << "Strtod Number: " << res << std::endl;
-	double timeStrtod = sw.elapsed() / 1000.0;
-
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
-
-	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
-	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToDouble) << '\t' ;
-	graph = (int) (timeStream / timeStrToDouble); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
-	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "StrtoD:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtod) << '\t' ;
-	graph = (int) (timeStream / timeStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl;
-}
-
-
 void StringTest::testIntToString()
 {
 	//intToStr(T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
@@ -1325,6 +1211,15 @@ void StringTest::testNumericStringLimit()
 	numericStringLowerLimit<int16_t, int8_t>();
 	numericStringLowerLimit<int32_t, int16_t>();
 	numericStringLowerLimit<int64_t, int32_t>();
+
+	multiplyOverflow<int8_t>();
+	multiplyOverflow<uint8_t>();
+	multiplyOverflow<int16_t>();
+	multiplyOverflow<uint16_t>();
+	multiplyOverflow<int32_t>();
+	multiplyOverflow<uint32_t>();
+	multiplyOverflow<int64_t>();
+	multiplyOverflow<uint64_t>();
 }
 
 
@@ -1345,63 +1240,6 @@ void formatSprintf(double value, std::string& str)
 	char buffer[128];
 	std::sprintf(buffer, "%.*g", 16, value);
 	str = buffer;
-}
-
-
-void StringTest::benchmarkFloatToStr()
-{
-	Poco::Stopwatch sw;
-	double val = 1.0372157551632929e-112;
-	std::cout << "The Number: " << std::setprecision(std::numeric_limits<double>::digits10) << val << std::endl;
-	std::string str;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) formatStream(val, str);
-	sw.stop();
-	std::cout << "formatStream Number: " << str << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
-
-	// standard sprintf
-	str = "";
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) formatSprintf(val, str);
-	sw.stop();
-	std::cout << "std::sprintf Number: " << str << std::endl;
-	double timeSprintf = sw.elapsed() / 1000.0;
-
-	// POCO Way (via double-conversion)
-	// no padding
-	sw.restart();
-	char buffer[POCO_MAX_FLT_STRING_LEN];
-	for (int i = 0; i < 1000000; ++i) doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, val);
-	sw.stop();
-	std::cout << "doubleToStr(char) Number: " << buffer << std::endl;
-	double timeDoubleToStrChar = sw.elapsed() / 1000.0;
-
-	// with padding
-	str = "";
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) doubleToStr(str, val);
-	sw.stop();
-	std::cout << "doubleToStr(std::string) Number: " << str << std::endl;
-	double timeDoubleToStrString = sw.elapsed() / 1000.0;
-
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
-
-	std::cout << std::setw(14) << "sprintf:\t" << std::setw(10) << std::setfill(' ') << timeSprintf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeSprintf) << '\t' ;
-	graph = (int) (timeStream / timeSprintf); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "doubleToChar:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrChar << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrChar) << '\t' ;
-	graph = (int) (timeStream / timeDoubleToStrChar); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "doubleToString:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrString << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrString) << '\t' ;
-	graph = (int) (timeStream / timeDoubleToStrString); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl;
 }
 
 
@@ -1471,6 +1309,201 @@ void StringTest::testJSONString()
 }
 
 
+
+void StringTest::conversionBenchmarks()
+{
+	std::cout << std::endl << "===================" << std::endl;
+	benchmarkFloatToStr();
+	std::cout << "===================" << std::endl << std::endl;
+	std::cout << "===================" << std::endl;
+	benchmarkStrToFloat();
+	std::cout << "===================" << std::endl << std::endl;
+	std::cout << "===================" << std::endl;
+	benchmarkStrToInt();
+	std::cout << "===================" << std::endl << std::endl;
+}
+
+
+void StringTest::benchmarkFloatToStr()
+{
+	Poco::Stopwatch sw;
+	double val = 1.0372157551632929e-112;
+	std::cout << "The Number: " << std::setprecision(std::numeric_limits<double>::digits10) << val << std::endl;
+	std::string str;
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) formatStream(val, str);
+	sw.stop();
+	std::cout << "formatStream Number: " << str << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
+
+	// standard sprintf
+	str = "";
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) formatSprintf(val, str);
+	sw.stop();
+	std::cout << "std::sprintf Number: " << str << std::endl;
+	double timeSprintf = sw.elapsed() / 1000.0;
+
+	// POCO Way (via double-conversion)
+	// no padding
+	sw.restart();
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	for (int i = 0; i < 1000000; ++i) doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, val);
+	sw.stop();
+	std::cout << "doubleToStr(char) Number: " << buffer << std::endl;
+	double timeDoubleToStrChar = sw.elapsed() / 1000.0;
+
+	// with padding
+	str = "";
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) doubleToStr(str, val);
+	sw.stop();
+	std::cout << "doubleToStr(std::string) Number: " << str << std::endl;
+	double timeDoubleToStrString = sw.elapsed() / 1000.0;
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
+
+	std::cout << std::setw(14) << "sprintf:\t" << std::setw(10) << std::setfill(' ') << timeSprintf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeSprintf) << '\t' ;
+	graph = (int) (timeStream / timeSprintf); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "doubleToChar:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrChar << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrChar) << '\t' ;
+	graph = (int) (timeStream / timeDoubleToStrChar); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "doubleToString:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrString << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrString) << '\t' ;
+	graph = (int) (timeStream / timeDoubleToStrString); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl;
+}
+
+
+void StringTest::benchmarkStrToInt()
+{
+	Poco::Stopwatch sw;
+	std::string num = "123456789";
+	int res[4] = {};
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) parseStream(num, res[0]);
+	sw.stop();
+	std::cout << "parseStream Number: " << res[0] << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
+
+	char* pC = 0;
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res[1] = std::strtol(num.c_str(), &pC, 10);
+	sw.stop();
+	std::cout << "std::strtol Number: " << res[1] << std::endl;
+	double timeStrtol = sw.elapsed() / 1000.0;
+
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res[2], 10);
+	sw.stop();
+	std::cout << "strToInt Number: " << res[2] << std::endl;
+	double timeStrToInt = sw.elapsed() / 1000.0;
+
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res[3]);
+	sw.stop();
+	std::cout << "sscanf Number: " << res[3] << std::endl;
+	double timeScanf = sw.elapsed() / 1000.0;
+
+	assertEqual (res[0], res[1]);
+	assertEqual (res[1], res[2]);
+	assertEqual (res[2], res[3]);
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
+
+	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
+	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
+
+	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
+	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
+
+	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
+	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
+	std::cout << std::endl;
+}
+
+
+void StringTest::benchmarkStrToFloat()
+{
+	double res[5] = {};
+	Poco::Stopwatch sw;
+	std::string num = "1.0372157551632929e-112";
+	std::cout << "The Number: " << num << std::endl;
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) parseStream(num, res[0]);
+	sw.stop();
+	std::cout << "parseStream Number: " << std::setprecision(std::numeric_limits<double>::digits10) << res[0] << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
+
+	// standard strtod
+	char* pC = 0;
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res[1] = std::strtod(num.c_str(), &pC);
+	sw.stop();
+	std::cout << "std::strtod Number: " << res[1] << std::endl;
+	double timeStdStrtod = sw.elapsed() / 1000.0;
+
+	// POCO Way
+	sw.restart();
+	char ou = 0;
+	for (int i = 0; i < 1000000; ++i) strToDouble(num, res[2], ou);
+	sw.stop();
+	std::cout << "Poco::strToDouble(const string&, double&) Number: " << res[2] << std::endl;
+	double timeStrToDouble = sw.elapsed() / 1000.0;
+
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res[3] = strToDouble(num.c_str());
+	sw.stop();
+	std::cout << "Poco::strToDouble(const char*) Number: " << res[3] << std::endl;
+	double timeStrtoD = sw.elapsed() / 1000.0;
+
+	// standard sscanf
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res[4]);
+	sw.stop();
+	std::cout << "sscanf Number: " << res[4] << std::endl;
+	double timeScanf = sw.elapsed() / 1000.0;
+
+	assertEqual (res[0], res[1]);
+	assertEqual (res[1], res[2]);
+	assertEqual (res[2], res[3]);
+	assertEqual (res[3], res[4]);
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
+
+	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
+	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToDouble) << '\t' ;
+	graph = (int) (timeStream / timeStrToDouble); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtoD) << '\t' ;
+	graph = (int) (timeStream / timeStrtoD); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
+	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl;
+}
+
+
 void StringTest::setUp()
 {
 }
@@ -1510,12 +1543,10 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testNumericStringLimit);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToInt);
 	CppUnit_addTest(pSuite, StringTest, testIntToString);
 	CppUnit_addTest(pSuite, StringTest, testFloatToString);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkFloatToStr);
 	CppUnit_addTest(pSuite, StringTest, testJSONString);
+	CppUnit_addTest(pSuite, StringTest, conversionBenchmarks);
 
 	return pSuite;
 }

@@ -555,7 +555,7 @@ read_number(json_stream *json, int c)
             json_error(json, "unexpected byte '%c' in number", c);
             return JSON_ERROR;
         }
-    } else if (strchr("123456789", c) != NULL) {
+    } else if (c >= '1' && c <= '9') {
         c = json->source.peek(&json->source);
         if (is_digit(c)) {
             if (read_digits(json) != 0)

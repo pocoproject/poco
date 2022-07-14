@@ -607,6 +607,7 @@
     <ClInclude Include="src\IniFileConfigurationTest.h"/>
     <ClInclude Include="src\JSONConfigurationTest.h"/>
     <ClInclude Include="src\LayeredConfigurationTest.h"/>
+    <ClInclude Include="src\LocalConfigurationViewTest.h"/>
     <ClInclude Include="src\LoggingConfiguratorTest.h"/>
     <ClInclude Include="src\MapConfigurationTest.h"/>
     <ClInclude Include="src\OptionProcessorTest.h"/>
@@ -654,6 +655,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\LayeredConfigurationTest.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\LocalConfigurationViewTest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\LoggingConfiguratorTest.cpp">

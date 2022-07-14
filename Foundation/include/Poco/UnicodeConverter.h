@@ -46,10 +46,10 @@ public:
 	static void convert(const std::string& utf8String, UTF16String& utf16String);
 		/// Converts the given UTF-8 encoded string into an UTF-16 encoded wide string.
 
-	static void convert(const char* utf8String,  std::size_t length, UTF16String& utf16String);	
+	static void convert(const char* utf8String,  std::size_t length, UTF16String& utf16String);
 		/// Converts the given UTF-8 encoded character sequence into an UTF-16 encoded wide string.
 
-	static void convert(const char* utf8String, UTF16String& utf16String);	
+	static void convert(const char* utf8String, UTF16String& utf16String);
 		/// Converts the given zero-terminated UTF-8 encoded character sequence into an UTF-16 encoded wide string.
 
 	static void convert(const UTF16String& utf16String, std::string& utf8String);

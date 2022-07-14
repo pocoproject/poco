@@ -42,10 +42,10 @@ public:
 	static bool isLegal(const unsigned char *bytes, int length);
 		/// Utility routine to tell whether a sequence of bytes is legal UTF-8.
 		/// This must be called with the length pre-determined by the first byte.
-		/// The sequence is illegal right away if there aren't enough bytes 
+		/// The sequence is illegal right away if there aren't enough bytes
 		/// available. If presented with a length > 4, this function returns false.
 		/// The Unicode definition of UTF-8 goes up to 4-byte sequences.
-		/// 
+		///
 		/// Adapted from ftp://ftp.unicode.org/Public/PROGRAMS/CVTUTF/ConvertUTF.c
 		/// Copyright 2001-2004 Unicode, Inc.
 

@@ -32,6 +32,7 @@ class X509Certificate;
 class PKCS12Container;
 
 
+//@ deprecated
 class Crypto_API ECKey: public KeyPair
 	/// This class stores an EC key pair, consisting
 	/// of private and public key. Storage of the private

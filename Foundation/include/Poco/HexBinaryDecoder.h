@@ -29,13 +29,13 @@ namespace Poco {
 class Foundation_API HexBinaryDecoderBuf: public UnbufferedStreamBuf
 	/// This streambuf decodes all hexBinary-encoded data read
 	/// from the istream connected to it.
-	/// In hexBinary encoding, each binary octet is encoded as a character tuple,  
+	/// In hexBinary encoding, each binary octet is encoded as a character tuple,
 	/// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
 	/// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
 	/// section 3.2.15.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
@@ -43,7 +43,7 @@ class Foundation_API HexBinaryDecoderBuf: public UnbufferedStreamBuf
 public:
 	HexBinaryDecoderBuf(std::istream& istr);
 	~HexBinaryDecoderBuf();
-	
+
 private:
 	int readFromDevice();
 	int readOne();
@@ -71,13 +71,13 @@ protected:
 class Foundation_API HexBinaryDecoder: public HexBinaryDecoderIOS, public std::istream
 	/// This istream decodes all hexBinary-encoded data read
 	/// from the istream connected to it.
-	/// In hexBinary encoding, each binary octet is encoded as a character tuple,  
+	/// In hexBinary encoding, each binary octet is encoded as a character tuple,
 	/// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
 	/// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
 	/// section 3.2.15.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.

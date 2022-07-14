@@ -66,7 +66,7 @@ public:
 
 	const std::string& getZipComment() const;
 		/// Returns the Zip file comment.
-		
+
 	ZipArchive close();
 		/// Finalizes the ZipArchive, closes it.
 
@@ -82,7 +82,7 @@ public:
 		///   - jpg
 		///   - jpeg
 		///   - png
-		
+
 	const std::set<std::string>& getStoreExtensions() const;
 		/// Returns the file extensions for which the CM_STORE compression method
 		/// is used if CM_AUTO is specified in addFile() or addRecursive().

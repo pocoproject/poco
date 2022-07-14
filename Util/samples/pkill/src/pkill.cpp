@@ -29,13 +29,13 @@ using Poco::Util::OptionCallback;
 class ProcessKillerApp: public Application
 {
 public:
-	ProcessKillerApp(): 
+	ProcessKillerApp():
 		_helpRequested(false),
 		_friendly(false)
 	{
 	}
 
-protected:		
+protected:
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -52,18 +52,18 @@ protected:
 				.repeatable(false)
 				.callback(OptionCallback<ProcessKillerApp>(this, &ProcessKillerApp::handleFriendly)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		stopOptionsProcessing();
 	}
-	
+
 	void handleFriendly(const std::string& name, const std::string& value)
 	{
 		_friendly = true;
 	}
-			
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -73,7 +73,7 @@ protected:
 		helpFormatter.setFooter("Note that the friendly option only works with applications using Poco::Util::ServerApplication::waitForTerminationRequest().");
 		helpFormatter.format(std::cout);
 	}
-	
+
 	int main(const std::vector<std::string>& args)
 	{
 		if (_helpRequested || args.empty())
@@ -93,7 +93,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-		
+
 private:
 	bool _helpRequested;
 	bool _friendly;

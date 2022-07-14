@@ -19,6 +19,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
@@ -47,19 +48,37 @@ public:
 		///
 		/// If the keep-alive flag is enabled, persistent
 		/// HTTP/1.1 connections are supported.
-		
+
 	bool getKeepAlive() const;
 		/// Returns the value of the keep-alive flag for
 		/// this session.
 
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for the HTTP session.
-		
+
 	void setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout);
 		/// Sets different timeouts for the HTTP session.
 
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for the HTTP session.
+
+	void setConnectTimeout(const Poco::Timespan& timeout);
+		/// Sets the connect timeout.
+
+	Poco::Timespan getConnectTimeout() const;
+		/// Gets the connect timeout.
+
+	void setSendTimeout(const Poco::Timespan& timeout);
+		/// Sets the send timeout.
+
+	Poco::Timespan getSendTimeout() const;
+		/// Gets the send timeout.
+
+	void setReceiveTimeout(const Poco::Timespan& timeout);
+		/// Sets the receive timeout.
+
+	Poco::Timespan getReceiveTimeout() const;
+		/// Gets the receive timeout.
 
 	bool connected() const;
 		/// Returns true if the underlying socket is connected.
@@ -67,23 +86,23 @@ public:
 	virtual void abort();
 		/// Aborts a session in progress by shutting down
 		/// and closing the underlying socket.
-		
+
 	const Poco::Exception* networkException() const;
 		/// If sending or receiving data over the underlying
 		/// socket connection resulted in an exception, a
 		/// pointer to this exception is returned.
-		/// 
+		///
 		/// Otherwise, NULL is returned.
 
 	void attachSessionData(const Poco::Any& data);
-		/// Allows to attach an application-specific data 
+		/// Allows to attach an application-specific data
 		/// item to the session.
 		///
 		/// On the server side, this can be used to manage
 		/// data that must be maintained over the entire
 		/// lifetime of a persistent connection (that is,
 		/// multiple requests sent over the same connection).
-	
+
 	const Poco::Any& sessionData() const;
 		/// Returns the data attached with attachSessionData(),
 		/// or an empty Poco::Any if no user data has been
@@ -93,7 +112,7 @@ public:
 	{
 		HTTP_PORT = 80
 	};
-	
+
 	StreamSocket detachSocket();
 		/// Detaches the socket from the session.
 		///
@@ -102,7 +121,7 @@ public:
 
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
-		
+
 	void drainBuffer(Poco::Buffer<char>& buffer);
 		/// Copies all bytes remaining in the internal buffer to the
 		/// given Poco::Buffer, resizing it as necessary.
@@ -110,6 +129,26 @@ public:
 		/// This is usually used together with detachSocket() to
 		/// obtain any data already read from the socket, but not
 		/// yet processed.
+
+	const MessageHeader& requestTrailer() const;
+		/// Returns the trailer for a request sent using chunked
+		/// transfer encoding. This method must be called after
+		/// the entire content of the message has been read.
+
+	MessageHeader& requestTrailer();
+		/// Returns the trailer for a request sent using chunked
+		/// transfer encoding. The trailer fields to be sent must be set
+		/// before the request body has been fully written.
+
+	const MessageHeader& responseTrailer() const;
+		/// Returns the trailer for a response sent using chunked
+		/// transfer encoding. This method must be called after
+		/// the entire content of the message has been read.
+
+	MessageHeader& responseTrailer();
+		/// Returns the trailer for a response sent using chunked
+		/// transfer encoding. The trailer fields to be sent must be set
+		/// before the response body has been fully written.
 
 protected:
 	HTTPSession();
@@ -136,42 +175,46 @@ protected:
 		/// Returns the next byte in the buffer.
 		/// Reads more data from the socket if there are
 		/// no bytes left in the buffer.
-		
+
 	int peek();
 		/// Peeks at the next character in the buffer.
 		/// Reads more data from the socket if there are
 		/// no bytes left in the buffer.
-		
+
 	virtual int read(char* buffer, std::streamsize length);
 		/// Reads up to length bytes.
 		///
 		/// If there is data in the buffer, this data
 		/// is returned. Otherwise, data is read from
 		/// the socket to avoid unnecessary buffering.
-	
+
 	virtual int write(const char* buffer, std::streamsize length);
 		/// Writes data to the socket.
 
 	int receive(char* buffer, int length);
 		/// Reads up to length bytes.
-		
+
 	int buffered() const;
 		/// Returns the number of bytes in the buffer.
 
 	void refill();
 		/// Refills the internal buffer.
-		
+
 	virtual void connect(const SocketAddress& address);
 		/// Connects the underlying socket to the given address
-		/// and sets the socket's receive timeout.	
-		
+		/// and sets the socket's receive timeout.
+
+	void connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress);
+		/// Binds the underlying socket to the source address
+		/// and connects to the targetAddress.
+
 	void attachSocket(const StreamSocket& socket);
 		/// Attaches a socket to the session, replacing the
 		/// previously attached socket.
 
 	void close();
 		/// Closes the underlying socket.
-		
+
 	void setException(const Poco::Exception& exc);
 		/// Stores a clone of the exception.
 
@@ -184,10 +227,10 @@ private:
 		HTTP_DEFAULT_TIMEOUT = 60000000,
 		HTTP_DEFAULT_CONNECTION_TIMEOUT = 30000000
 	};
-	
+
 	HTTPSession(const HTTPSession&);
 	HTTPSession& operator = (const HTTPSession&);
-	
+
 	StreamSocket     _socket;
 	char*            _pBuffer;
 	char*            _pCurrent;
@@ -197,8 +240,10 @@ private:
 	Poco::Timespan   _receiveTimeout;
 	Poco::Timespan   _sendTimeout;
 	Poco::Exception* _pException;
+	MessageHeader    _requestTrailer;
+	MessageHeader    _responseTrailer;
 	Poco::Any        _data;
-	
+
 	friend class HTTPStreamBuf;
 	friend class HTTPHeaderStreamBuf;
 	friend class HTTPFixedLengthStreamBuf;
@@ -216,6 +261,42 @@ inline bool HTTPSession::getKeepAlive() const
 
 
 inline Poco::Timespan HTTPSession::getTimeout() const
+{
+	return _receiveTimeout;
+}
+
+
+inline void HTTPSession::setConnectTimeout(const Poco::Timespan& timeout)
+{
+	_connectionTimeout = timeout;
+}
+
+
+inline Poco::Timespan HTTPSession::getConnectTimeout() const
+{
+	return _connectionTimeout;
+}
+
+
+inline void HTTPSession::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_sendTimeout = timeout;
+}
+
+
+inline Poco::Timespan HTTPSession::getSendTimeout() const
+{
+	return _sendTimeout;
+}
+
+
+inline void HTTPSession::setReceiveTimeout(const Poco::Timespan& timeout)
+{
+	_receiveTimeout = timeout;
+}
+
+
+inline Poco::Timespan HTTPSession::getReceiveTimeout() const
 {
 	return _receiveTimeout;
 }
@@ -242,6 +323,30 @@ inline int HTTPSession::buffered() const
 inline const Poco::Any& HTTPSession::sessionData() const
 {
 	return _data;
+}
+
+
+inline const MessageHeader& HTTPSession::requestTrailer() const
+{
+	return _requestTrailer;
+}
+
+
+inline MessageHeader& HTTPSession::requestTrailer()
+{
+	return _requestTrailer;
+}
+
+
+inline const MessageHeader& HTTPSession::responseTrailer() const
+{
+	return _responseTrailer;
+}
+
+
+inline MessageHeader& HTTPSession::responseTrailer()
+{
+	return _responseTrailer;
 }
 
 

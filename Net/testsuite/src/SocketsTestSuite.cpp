@@ -16,6 +16,7 @@
 #include "DialogSocketTest.h"
 #include "RawSocketTest.h"
 #include "PollSetTest.h"
+#include "SocketProactorTest.h"
 
 
 CppUnit::Test* SocketsTestSuite::suite()
@@ -31,5 +32,6 @@ CppUnit::Test* SocketsTestSuite::suite()
 	pSuite->addTest(MulticastSocketTest::suite());
 #endif
 	pSuite->addTest(PollSetTest::suite());
+	pSuite->addTest(SocketProactorTest::suite());
 	return pSuite;
 }
