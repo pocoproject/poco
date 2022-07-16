@@ -2,6 +2,14 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
+!!!Release 1.12.1
+
+!!Summary of Changes
+
+  - GH #3677 PocoFoundationConfig.cmake should now check for PCRE2
+  - GH #3686 SIGSEGV in OSSL_PROVIDER_unload with static OpenSSL3
+
+
 !!!Release 1.12.0
 
 !!Summary of Changes
