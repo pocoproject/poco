@@ -39,7 +39,7 @@ HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt1
 }
 
 
-HTTPSessionFactory::HTTPSessionFactory(const HTTPClientSession::ProxyConfig& proxyConfig):
+HTTPSessionFactory::HTTPSessionFactory(const ProxyConfig& proxyConfig):
 	_proxyConfig(proxyConfig)
 {
 }
@@ -129,7 +129,7 @@ void HTTPSessionFactory::setProxyCredentials(const std::string& username, const 
 }
 
 
-void HTTPSessionFactory::setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig)
+void HTTPSessionFactory::setProxyConfig(const ProxyConfig& proxyConfig)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
