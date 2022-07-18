@@ -22,6 +22,7 @@
 
 
 using Poco::Net::HTTPClientSession;
+using Poco::Net::ProxyConfig;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
