@@ -150,13 +150,13 @@ inline std::string Envelope::openAsString(const EVPPKey& privKey, const ByteVec&
 }
 
 
-const Envelope::ByteVec& Envelope::getContent() const
+inline const Envelope::ByteVec& Envelope::getContent() const
 {
 	return _encContent;
 }
 	
 
-void Envelope::setContent(const ByteVec& enc)
+inline void Envelope::setContent(const ByteVec& enc)
 {
 	_encContent = enc;
 }
