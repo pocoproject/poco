@@ -144,7 +144,7 @@ public:
 		/// Sets the port number of the proxy server.
 
 	void setProxyProtocol(const std::string& protocol);
-	    /// Sets the proxy protocol (http or https).
+	        /// Sets the proxy protocol (http or https).
 
 	void setProxyTunnel(bool tunnel);
 		/// If 'true' proxy will be used as tunnel.
@@ -156,7 +156,7 @@ public:
 		/// Returns the proxy port number.
 
 	const std::string& getProxyProtocol() const;
-	    /// Returns the proxy protocol.
+	        /// Returns the proxy protocol.
 
 	bool isProxyTunnel() const;
 		/// Returns 'true' if proxy is configured as tunnel.
