@@ -136,15 +136,15 @@ X509Certificate HTTPSClientSession::serverCertificate()
 
 std::string HTTPSClientSession::proxyRequestPrefix() const
 {
-    std::string result("https://");
-    result.append(getHost());
-    /// Do not append default by default, since this may break some servers.
-	/// One example of such server is GCS (Google Cloud Storage).
-	if (getPort() != HTTPS_PORT) {
-        result.append(":");
-        NumberFormatter::append(result, getPort());
-    }
-    return result;
+        std::string result("https://");
+        result.append(getHost());
+        /// Do not append default by default, since this may break some servers.
+        /// One example of such server is GCS (Google Cloud Storage).
+        if (getPort() != HTTPS_PORT) {
+                result.append(":");
+                NumberFormatter::append(result, getPort());
+        }
+        return result;
 }
 
 
@@ -155,34 +155,34 @@ void HTTPSClientSession::proxyAuthenticate(HTTPRequest& request)
 
 void HTTPSClientSession::connect(const SocketAddress& address)
 {
-    bool useProxy = !getProxyHost().empty() && !bypassProxy();
+        bool useProxy = !getProxyHost().empty() && !bypassProxy();
 
-	if (useProxy && isProxyTunnel())
-    {
-        StreamSocket proxySocket(proxyConnect());
-        SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
-        attachSocket(secureSocket);
-        if (_pContext->sessionCacheEnabled())
+        if (useProxy && isProxyTunnel())
         {
-            _pSession = secureSocket.currentSession();
+                StreamSocket proxySocket(proxyConnect());
+                SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
+                attachSocket(secureSocket);
+                if (_pContext->sessionCacheEnabled())
+                {
+                        _pSession = secureSocket.currentSession();
+                }
         }
-    }
-    else
-    {
-        SecureStreamSocket sss(socket());
-        if (sss.getPeerHostName().empty())
+        else
         {
-            sss.setPeerHostName(useProxy ? getProxyHost() : getHost());
-        }
-        if (_pContext->sessionCacheEnabled())
-        {
-            sss.useSession(_pSession);
-        }
-        HTTPSession::connect(address);
-        if (_pContext->sessionCacheEnabled())
-        {
-            _pSession = sss.currentSession();
-        }
+                SecureStreamSocket sss(socket());
+                if (sss.getPeerHostName().empty())
+                {
+                        sss.setPeerHostName(useProxy ? getProxyHost() : getHost());
+                }
+                if (_pContext->sessionCacheEnabled())
+                {
+                        sss.useSession(_pSession);
+                }
+                HTTPSession::connect(address);
+                if (_pContext->sessionCacheEnabled())
+                {
+                        _pSession = sss.currentSession();
+                }
     }
 }
 
