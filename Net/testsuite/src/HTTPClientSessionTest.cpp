@@ -298,7 +298,7 @@ void HTTPClientSessionTest::testProxyAuth()
 
 void HTTPClientSessionTest::testBypassProxy()
 {
-	HTTPClientSession::ProxyConfig proxyConfig;
+	ProxyConfig proxyConfig;
 	proxyConfig.host = "proxy.domain.com";
 	proxyConfig.port = 80;
 	proxyConfig.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
