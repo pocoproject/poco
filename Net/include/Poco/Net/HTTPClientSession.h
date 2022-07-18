@@ -383,8 +383,8 @@ protected:
 		/// Calls proxyConnect() and attaches the resulting StreamSocket
 		/// to the HTTPClientSession.
 
-    HTTPSessionFactory _proxySessionFactory;
-        /// Factory to create HTTPClientSession to proxy.
+        HTTPSessionFactory _proxySessionFactory;
+                /// Factory to create HTTPClientSession to proxy.
 private:
 	using OStreamPtr = Poco::SharedPtr<std::ostream>;
 	using IStreamPtr = Poco::SharedPtr<std::istream>;
@@ -446,13 +446,13 @@ inline Poco::UInt16 HTTPClientSession::getProxyPort() const
 
 inline const std::string& HTTPClientSession::getProxyProtocol() const
 {
-    return _proxyConfig.protocol;
+        return _proxyConfig.protocol;
 }
 
 
 inline bool HTTPClientSession::isProxyTunnel() const
 {
-	return _proxyConfig.tunnel;
+        return _proxyConfig.tunnel;
 }
 
 
