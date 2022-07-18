@@ -627,9 +627,9 @@ StreamSocket HTTPClientSession::proxyConnect()
         proxyUri.setHost(getProxyHost());
         proxyUri.setPort(getProxyPort());
 
-	SharedPtr<HTTPClientSession> proxySession (_proxySessionFactory.createClientSession(proxyUri));
+	HTTPClientSession proxySession (_proxySessionFactory.createClientSession(proxyUri));
 
-	proxySession->setTimeout(getTimeout());
+	proxySession.setTimeout(getTimeout());
 	std::string targetAddress(_host);
 	targetAddress.append(":");
 	NumberFormatter::append(targetAddress, _port);
@@ -637,15 +637,15 @@ StreamSocket HTTPClientSession::proxyConnect()
 	HTTPResponse proxyResponse;
 	proxyRequest.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
 	proxyRequest.set(HTTPRequest::HOST, targetAddress);
-	proxySession->proxyAuthenticateImpl(proxyRequest, _proxyConfig);
-	proxySession->setKeepAlive(true);
-	proxySession->setSourceAddress(_sourceAddress4);
-	proxySession->setSourceAddress(_sourceAddress6);
-	proxySession->sendRequest(proxyRequest);
-	proxySession->receiveResponse(proxyResponse);
+	proxySession.proxyAuthenticateImpl(proxyRequest, _proxyConfig);
+	proxySession.setKeepAlive(true);
+	proxySession.setSourceAddress(_sourceAddress4);
+	proxySession.setSourceAddress(_sourceAddress6);
+	proxySession.sendRequest(proxyRequest);
+	proxySession.receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
 		throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
-	return proxySession->detachSocket();
+	return proxySession.detachSocket();
 }
 
 
