@@ -18,7 +18,6 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
-#include <string>
 
 namespace Poco {
 namespace Net {
@@ -40,25 +39,25 @@ namespace Net {
             }
 
             std::string host;
-            /// Proxy server host name or IP address.
+                /// Proxy server host name or IP address.
             Poco::UInt16 port;
-            /// Proxy server TCP port.
+                /// Proxy server TCP port.
             std::string protocol;
-            /// Protocol to use (http or https).
+                /// Protocol to use (http or https).
             bool tunnel;
-            /// Use proxy as tunnel (establish 2-way communication through CONNECT request).
-            /// If tunnel option is 'false' request will be send directly to proxy without CONNECT request.
+            	/// Use proxy as tunnel (establish 2-way communication through CONNECT request).
+                /// If tunnel option is 'false' request will be send directly to proxy without CONNECT request.
             std::string username;
-            /// Proxy server username.
+                /// Proxy server username.
             std::string password;
-            /// Proxy server password.
+                /// Proxy server password.
             std::string nonProxyHosts;
-            /// A regular expression defining hosts for which the proxy should be bypassed,
-            /// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
-            /// string to disable proxy bypassing.
+                /// A regular expression defining hosts for which the proxy should be bypassed,
+                /// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
+                /// string to disable proxy bypassing.
 
             ProxyAuthentication authMethod;
-            /// The authentication method to use - HTTP Basic or NTLM.
+                /// The authentication method to use - HTTP Basic or NTLM.
         };
 
 } } // namespace Poco::Net
