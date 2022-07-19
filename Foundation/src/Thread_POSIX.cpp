@@ -62,28 +62,26 @@ namespace
 #endif
 
 
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-
-
-namespace {
-void setThreadName(pthread_t thread, const std::string& threadName)
+namespace
 {
-#if (POCO_OS == POCO_OS_MAC_OS_X)
-	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
-#else
-	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
+	void setThreadName(const std::string& threadName)
 	{
-		std::string truncName(threadName, 0, 7);
-		truncName.append("~");
-		truncName.append(threadName, threadName.size() - 7, 7);
-		pthread_setname_np(thread, truncName.c_str());
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+		if (pthread_setname_np(threadName.c_str()))
+#else
+		if (pthread_setname_np(pthread_self(), threadName.c_str()))
+#endif
+			throw Poco::SystemException("cannot get thread name");
 	}
-#endif
-}
-}
 
-
-#endif
+	std::string getThreadName()
+	{
+		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
+		if (pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1))
+			throw Poco::SystemException("cannot get thread name");
+		return name;
+	}
+}
 
 
 namespace Poco {
@@ -104,6 +102,44 @@ ThreadImpl::~ThreadImpl()
 	{
 		pthread_detach(_pData->thread);
 	}
+}
+
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+	{
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+#else
+	if (threadName.size() > std::min(POCO_MAX_THREAD_NAME_LEN, 15))
+	{
+		int half = (std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
+#endif
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	ScopedLock<FastMutex> lock(_pData->mutex);
+	if (realName != _pData->name)
+	{
+		_pData->name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	ScopedLock<FastMutex> lock(_pData->mutex);
+	return _pData->name;
+}
+
+
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	return isRunningImpl() ? getThreadName() : "";
 }
 
 
@@ -356,11 +392,14 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
-	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
-#endif
+	auto* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+
+	{
+		FastMutex::ScopedLock lock(pData->mutex);
+		setThreadName(pData->name);
+	}
+
 	try
 	{
 		pData->pRunnableTarget->run();

@@ -118,7 +118,7 @@
 	}
 
 	function setMargin(){
-		//If called via V1 script, convert bodyMargin from int to str 
+		//If called via V1 script, convert bodyMargin from int to str
 		if (undefined === bodyMarginStr){
 			bodyMarginStr = bodyMargin+'px';
 		}

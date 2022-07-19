@@ -34,7 +34,7 @@ void QuotedPrintableTest::testEncode()
 {
 	std::ostringstream ostr;
 	QuotedPrintableEncoder encoder(ostr);
-	
+
 	encoder <<
 		"Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
 		"Proin id odio sit amet metus dignissim porttitor. \r\n"

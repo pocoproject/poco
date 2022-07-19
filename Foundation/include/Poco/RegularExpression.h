@@ -31,12 +31,12 @@ namespace Poco {
 
 class Foundation_API RegularExpression
 	/// A class for working with regular expressions.
-	/// Implemented using PCRE, the Perl Compatible
+	/// Implemented using PCRE2, the Perl Compatible
 	/// Regular Expressions library by Philip Hazel
 	/// (see http://www.pcre.org).
 {
 public:
-	enum Options // These must match the corresponding options in pcre.h!
+	enum Options
 		/// Some of the following options can only be passed to the constructor;
 		/// some can be passed only to matching functions, and some can be used
 		/// everywhere.
@@ -64,7 +64,7 @@ public:
 		RE_FIRSTLINE       = 0x00040000, /// an  unanchored  pattern  is  required  to  match
 		                                 /// before  or  at  the  first  newline  in  the subject string,
 		                                 /// though the matched text may continue over the newline [ctor]
-		RE_DUPNAMES        = 0x00080000, /// names used to identify capturing  subpatterns  need not be unique [ctor]
+		RE_DUPNAMES        = 0x00080000, /// names used to identify capturing  subpatterns need not be unique [ctor]
 		RE_NEWLINE_CR      = 0x00100000, /// assume newline is CR ('\r'), the default [ctor]
 		RE_NEWLINE_LF      = 0x00200000, /// assume newline is LF ('\n') [ctor]
 		RE_NEWLINE_CRLF    = 0x00300000, /// assume newline is CRLF ("\r\n") [ctor]
@@ -85,8 +85,8 @@ public:
 
 	RegularExpression(const std::string& pattern, int options = 0, bool study = true);
 		/// Creates a regular expression and parses the given pattern.
-		/// If study is true, the pattern is analyzed and optimized. This
-		/// is mainly useful if the pattern is used more than once.
+		/// Note: the study argument is only provided for backwards compatibility
+		/// and is ignored since POCO release 1.12, which uses PCRE2.
 		/// For a description of the options, please see the PCRE documentation.
 		/// Throws a RegularExpressionException if the patter cannot be compiled.
 
@@ -196,16 +196,15 @@ public:
 
 protected:
 	std::string::size_type substOne(std::string& subject, std::string::size_type offset, const std::string& replacement, int options) const;
+	static int compileOptions(int options);
+	static int matchOptions(int options);
 
 private:
-	// Note: to avoid a dependency on the pcre.h header the following are
+	// Note: to avoid a dependency on the pcre2.h header the following are
 	// declared as void* and casted to the correct type in the implementation file.
-	void* _pcre;  // Actual type is pcre*
-	void* _extra; // Actual type is struct pcre_extra*
+	void* _pcre;  // Actual type is pcre2_code_8*
 
 	GroupMap _groups;
-
-	static const int OVEC_SIZE;
 
 	RegularExpression();
 	RegularExpression(const RegularExpression&);

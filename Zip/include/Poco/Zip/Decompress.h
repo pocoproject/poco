@@ -49,7 +49,7 @@ public:
 		/// Creates the Decompress. Note that istream must be good and at the very beginning of the file!
 		/// Calling decompressAllFiles will cause the stream to be in state failed once the zip file is processed.
 		/// outputDir must be a directory. If it doesn't exist yet, it will be automatically created.
-		/// If flattenDirs is set to true, the directory structure of the zip file is not recreated. 
+		/// If flattenDirs is set to true, the directory structure of the zip file is not recreated.
 		/// Instead, all files are extracted into one single directory.
 
 	~Decompress();

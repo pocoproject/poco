@@ -36,7 +36,7 @@ public:
 
 	~DataURIStreamFactory();
 		/// Destroys the DataURIStreamFactory.
-		
+
 	std::istream* open(const URI& uri);
 		/// Creates an input stream returning decoded data from the given data URI.
 		///

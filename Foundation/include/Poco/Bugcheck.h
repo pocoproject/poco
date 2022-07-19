@@ -32,26 +32,26 @@ namespace Poco {
 class Foundation_API Bugcheck
 	/// This class provides some static methods that are
 	/// used by the
-	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(), 
-	/// poco_bugcheck() and poco_unexpected() macros. 
+	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(),
+	/// poco_bugcheck() and poco_unexpected() macros.
 	/// You should not invoke these methods
 	/// directly. Use the macros instead, as they
 	/// automatically provide useful context information.
 {
 public:
-	static void assertion(const char* cond, const char* file, int line, const char* text = 0);
+	[[noreturn]] static void assertion(const char* cond, const char* file, int line, const char* text = 0);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	static void nullPointer(const char* ptr, const char* file, int line);
+	[[noreturn]] static void nullPointer(const char* ptr, const char* file, int line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	static void bugcheck(const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void bugcheck(const char* msg, const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* msg, const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
@@ -186,7 +186,7 @@ struct POCO_STATIC_ASSERTION_FAILURE<true>
 };
 
 
-template <int x> 
+template <int x>
 struct poco_static_assert_test
 {
 };

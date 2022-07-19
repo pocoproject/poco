@@ -46,7 +46,7 @@ SAXParseException::SAXParseException(const std::string& msg, const Locator& loc,
 {
 }
 
-	
+
 SAXParseException::SAXParseException(const std::string& msg, const XMLString& publicId, const XMLString& systemId, int lineNumber, int columnNumber):
 	SAXException(buildMessage(msg, publicId, systemId, lineNumber, columnNumber)),
 	_publicId(publicId),
@@ -95,7 +95,7 @@ SAXParseException& SAXParseException::operator = (const SAXParseException& exc)
 	return *this;
 }
 
-	
+
 const char* SAXParseException::name() const noexcept
 {
 	return "SAXParseException";

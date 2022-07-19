@@ -82,6 +82,7 @@ if(MSVC)
 	if(POCO_SANITIZE_ASAN)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address")
 	endif()
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
 
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
@@ -205,9 +206,9 @@ else()
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre, expat, ...")
+	message(STATUS "Using external sqlite, zlib, pcre2, expat, ...")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre, expat, ...")
+	message(STATUS "Using internal sqlite, zlib, pcre2, expat, ...")
 endif()
 
 # Disable fork exec
@@ -383,6 +384,18 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
 	list(APPEND Poco_COMPONENTS "Data")
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/SQLite AND ENABLE_DATA_SQLITE)
+	list(APPEND Poco_COMPONENTS "Data/SQLite")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/MySQL AND ENABLE_DATA_MYSQL)
+	list(APPEND Poco_COMPONENTS "Data/MySQL")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgresSQL AND ENABLE_DATA_POSTGRESQL)
+	list(APPEND Poco_COMPONENTS "Data/PostgresSQL")
+endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord AND ENABLE_ACTIVERECORD)
 	add_subdirectory(ActiveRecord)
 	list(APPEND Poco_COMPONENTS "ActiveRecord")
@@ -492,7 +505,7 @@ install(
 )
 
 if(POCO_UNBUNDLED)
-	install(FILES cmake/FindPCRE.cmake
+	install(FILES cmake/FindPCRE2.cmake
 			DESTINATION "${PocoConfigPackageLocation}")
 	install(FILES cmake/V39/FindEXPAT.cmake
 			DESTINATION "${PocoConfigPackageLocation}/V39")

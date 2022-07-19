@@ -64,7 +64,7 @@ void ZipManipulator::renameFile(const std::string& zipPath, const std::string& n
 {
 	const ZipLocalFileHeader& entry = getForChange(zipPath);
 	// checked later in Compress too but the earlier one gets the error the better
-	std::string fn = ZipUtil::validZipEntryFileName(newZipPath); 
+	std::string fn = ZipUtil::validZipEntryFileName(newZipPath);
 	addOperation(zipPath, new Rename(entry, fn));
 }
 
@@ -139,7 +139,7 @@ ZipArchive ZipManipulator::compress(const std::string& outFile)
 	Poco::FileOutputStream out(outFile);
 	Compress c(out, true);
 	c.EDone += Poco::Delegate<ZipManipulator, const ZipLocalFileHeader>(this, &ZipManipulator::onEDone);
-	
+
 	ZipArchive::FileHeaders::const_iterator it = _in->headerBegin();
 	for (; it != _in->headerEnd(); ++it)
 	{

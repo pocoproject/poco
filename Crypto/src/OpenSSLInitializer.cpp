@@ -66,8 +66,8 @@ Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-std::atomic<OSSL_PROVIDER*> OpenSSLInitializer::_defaultProvider(0);
-std::atomic<OSSL_PROVIDER*> OpenSSLInitializer::_legacyProvider(0);
+OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(0);
+OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
 #endif
 
 
@@ -156,17 +156,6 @@ void OpenSSLInitializer::uninitialize()
 		CRYPTO_set_id_callback(0);
 #endif
 		delete [] _mutexes;
-#endif
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-		OSSL_PROVIDER* provider = nullptr;
-		if ((provider = _defaultProvider.exchange(nullptr)))
-		{
-			OSSL_PROVIDER_unload(provider);
-		}
-		if ((provider = _legacyProvider.exchange(nullptr)))
-		{
-			OSSL_PROVIDER_unload(provider);
-		}
 #endif
 	}
 }

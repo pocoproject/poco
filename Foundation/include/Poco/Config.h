@@ -52,6 +52,11 @@
 	#define POCO_THREAD_STACK_SIZE 0
 #endif
 
+// Defined to desired max thread name length
+#ifndef POCO_MAX_THREAD_NAME_LEN
+#define POCO_MAX_THREAD_NAME_LEN 15
+#endif
+
 
 // Define to override system-provided
 // minimum thread priority value on POSIX
@@ -79,7 +84,7 @@
 // while those smaller will be placement new-ed into an
 // internal stack-auto-allocated buffer.
 #if !defined(POCO_SMALL_OBJECT_SIZE)
-	#define POCO_SMALL_OBJECT_SIZE 32
+	#define POCO_SMALL_OBJECT_SIZE 64
 #endif
 
 
@@ -87,7 +92,7 @@
 // on platforms with no inotify.
 // #define POCO_NO_INOTIFY
 
-// Define to force the use of PollingDirectoryWatcher 
+// Define to force the use of PollingDirectoryWatcher
 // #define POCO_DW_FORCE_POLLING
 
 

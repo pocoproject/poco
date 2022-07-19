@@ -51,10 +51,10 @@ namespace Poco {
 
 
 class Foundation_API Mutex: private MutexImpl
-	/// A Mutex (mutual exclusion) is a synchronization 
+	/// A Mutex (mutual exclusion) is a synchronization
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multithreaded) scenario.
-	/// Mutexes are recursive, that is, the same mutex can be 
+	/// Mutexes are recursive, that is, the same mutex can be
 	/// locked multiple times by the same thread (but, of course,
 	/// not by other threads).
 	/// Using the ScopedLock class is the preferred way to automatically
@@ -62,23 +62,23 @@ class Foundation_API Mutex: private MutexImpl
 {
 public:
 	using ScopedLock = Poco::ScopedLock<Mutex>;
-	
+
 	Mutex();
 		/// creates the Mutex.
-		
+
 	~Mutex();
 		/// destroys the Mutex.
 
 	void lock();
 		/// Locks the mutex. Blocks if the mutex
 		/// is held by another thread.
-		
+
 	void lock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -92,14 +92,14 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
 		/// other threads.
-	
+
 private:
 	Mutex(const Mutex&);
 	Mutex& operator = (const Mutex&);
@@ -120,7 +120,7 @@ public:
 
 	FastMutex();
 		/// creates the Mutex.
-		
+
 	~FastMutex();
 		/// destroys the Mutex.
 
@@ -133,7 +133,7 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -147,14 +147,14 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
 		/// other threads.
-	
+
 private:
 	FastMutex(const FastMutex&);
 	FastMutex& operator = (const FastMutex&);
@@ -222,12 +222,12 @@ class Foundation_API NullMutex
 {
 public:
 	using ScopedLock = Poco::ScopedLock<NullMutex>;
-	
+
 	NullMutex()
 		/// Creates the NullMutex.
 	{
 	}
-		
+
 	~NullMutex()
 		/// Destroys the NullMutex.
 	{
@@ -237,7 +237,7 @@ public:
 		/// Does nothing.
 	{
 	}
-		
+
 	void lock(long)
 		/// Does nothing.
 	{

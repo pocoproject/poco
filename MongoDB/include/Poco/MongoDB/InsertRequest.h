@@ -36,21 +36,21 @@ public:
 	{
 		INSERT_DEFAULT = 0,
 			/// If specified, perform a normal insert operation.
-		
+
 		INSERT_CONTINUE_ON_ERROR = 1
-			/// If set, the database will not stop processing a bulk insert if one 
-			/// fails (e.g. due to duplicate IDs). This makes bulk insert behave similarly 
-			/// to a series of single inserts, except lastError will be set if any insert 
-			/// fails, not just the last one. If multiple errors occur, only the most 
+			/// If set, the database will not stop processing a bulk insert if one
+			/// fails (e.g. due to duplicate IDs). This makes bulk insert behave similarly
+			/// to a series of single inserts, except lastError will be set if any insert
+			/// fails, not just the last one. If multiple errors occur, only the most
 			/// recent will be reported.
 	};
 
 	InsertRequest(const std::string& collectionName, Flags flags = INSERT_DEFAULT);
 		/// Creates an InsertRequest.
 		///
-		/// The full collection name is the concatenation of the database 
-		/// name with the collection name, using a "." for the concatenation. For example, 
-		/// for the database "foo" and the collection "bar", the full collection name is 
+		/// The full collection name is the concatenation of the database
+		/// name with the collection name, using a "." for the concatenation. For example,
+		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
 	virtual ~InsertRequest();

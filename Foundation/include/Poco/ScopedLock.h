@@ -37,12 +37,12 @@ public:
 	{
 		_mutex.lock();
 	}
-	
+
 	ScopedLock(M& mutex, long milliseconds): _mutex(mutex)
 	{
 		_mutex.lock(milliseconds);
 	}
-	
+
 	~ScopedLock()
 	{
 		try
@@ -79,12 +79,12 @@ public:
 	{
 		_pMutex->lock();
 	}
-	
+
 	ScopedLockWithUnlock(M& mutex, long milliseconds): _pMutex(&mutex)
 	{
 		_pMutex->lock(milliseconds);
 	}
-	
+
 	~ScopedLockWithUnlock()
 	{
 		try
@@ -96,7 +96,7 @@ public:
 			poco_unexpected();
 		}
 	}
-	
+
 	void unlock()
 	{
 		if (_pMutex)

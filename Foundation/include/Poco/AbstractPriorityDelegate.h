@@ -25,7 +25,7 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs>
 class AbstractPriorityDelegate: public AbstractDelegate<TArgs>
 	/// Base class for PriorityDelegate and PriorityExpire.
 	///
@@ -43,7 +43,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractPriorityDelegate() 
+	virtual ~AbstractPriorityDelegate()
 	{
 	}
 

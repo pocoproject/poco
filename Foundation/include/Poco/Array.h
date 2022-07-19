@@ -159,7 +159,7 @@ public:
 
 	enum { static_size = N };
 
-	void swap (Array<T,N>& y)
+	void swap (Array<T,N>& y) noexcept
 	{
 		std::swap_ranges(begin(),end(),y.begin());
 	}
@@ -246,7 +246,7 @@ bool operator>= (const Array<T,N>& x, const Array<T,N>& y)
 
 
 template<class T, std::size_t N>
-inline void swap (Array<T,N>& x, Array<T,N>& y)
+inline void swap (Array<T,N>& x, Array<T,N>& y) noexcept
 	/// global swap()
 {
 	x.swap(y);

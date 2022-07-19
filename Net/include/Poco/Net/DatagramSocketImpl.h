@@ -41,10 +41,10 @@ public:
 
 	DatagramSocketImpl(poco_socket_t sockfd);
 		/// Creates a StreamSocketImpl using the given native socket.
-		
+
 protected:
 	void init(int af);
-	
+
 	~DatagramSocketImpl();
 };
 

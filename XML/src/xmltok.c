@@ -49,7 +49,7 @@
 
 #ifdef EXPAT_WIN32
 #  include "winconfig.h"
-#endif 
+#endif
 
 #include "expat_config.h"
 

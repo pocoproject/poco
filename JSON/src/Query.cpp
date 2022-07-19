@@ -65,7 +65,7 @@ Object& Query::findObject(const std::string& path, Object& obj) const
 		obj = *result.extract<Object::Ptr>();
 	else if (result.type() == typeid(Object))
 		obj = result.extract<Object>();
-	
+
 	return obj;
 }
 
@@ -93,7 +93,7 @@ Array& Query::findArray(const std::string& path, Array& arr) const
 		arr = *result.extract<Array::Ptr>();
 	else if (result.type() == typeid(Array))
 		arr = result.extract<Array>();
-	
+
 	return arr;
 }
 
@@ -101,6 +101,8 @@ Array& Query::findArray(const std::string& path, Array& arr) const
 Var Query::find(const std::string& path) const
 {
 	Var result = _source;
+	if (path.empty()) return result;
+	bool found = false;
 	StringTokenizer tokenizer(path, ".");
 	for (const auto& token: tokenizer)
 	{
@@ -134,14 +136,15 @@ Var Query::find(const std::string& path) const
 				{
 					Object::Ptr o = result.extract<Object::Ptr>();
 					result = o->get(name);
+					found = true;
 				}
 				else if (result.type() == typeid(Object))
 				{
 					Object o = result.extract<Object>();
 					result = o.get(name);
+					found = true;
 				}
-				else
-					result.empty();
+				else result.empty();
 
 			}
 
@@ -165,6 +168,7 @@ Var Query::find(const std::string& path) const
 			}
 		}
 	}
+	if (!found) result.empty();
 	return result;
 }
 

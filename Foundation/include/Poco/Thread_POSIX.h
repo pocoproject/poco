@@ -36,9 +36,7 @@
 #include <cstring>
 #endif
 
-
 namespace Poco {
-
 
 class Foundation_API ThreadImpl
 {
@@ -59,11 +57,17 @@ public:
 	{
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
 	};
-	
+
 	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
@@ -141,12 +145,13 @@ private:
 		std::size_t   stackSize;
 		bool          started;
 		bool          joined;
+		std::string   name;
 		mutable FastMutex mutex;
 	};
 
 	AutoPtr<ThreadData> _pData;
 	static CurrentThreadHolder _currentThreadHolder;
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;

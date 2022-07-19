@@ -50,8 +50,8 @@ class Data_API RowFormatter
 	/// it with rows through RecordSet.
 	///
 	/// To accomodate for various formatting needs, a formatter can operate in two modes:
-	/// 
-	///	  - progressive: formatted individual row strings are gemerated and returned from each 
+	///
+	///	  - progressive: formatted individual row strings are gemerated and returned from each
 	///     call to formatValues;
 	///     std::string& formatNames(const NameVecPtr, std::string&) and
 	///     std::string& formatValues(const ValueVec&, std::string&) member calls should be
@@ -106,7 +106,7 @@ public:
 		/// The default implementation does nothing.
 
 	virtual const std::string& toString();
-		/// Throws NotImplementedException. Formatters operating in bulk mode should 
+		/// Throws NotImplementedException. Formatters operating in bulk mode should
 		/// implement this member function to return valid pointer to the formatted result.
 
 	virtual int rowCount() const;

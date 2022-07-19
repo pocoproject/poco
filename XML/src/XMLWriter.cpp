@@ -193,7 +193,7 @@ void XMLWriter::startDocument()
 
 	if (_options & WRITE_XML_DECLARATION)
 		writeXMLDeclaration();
-	
+
 	_contentWritten = true;
 	_namespaces.reset();
 	_namespaces.pushContext();
@@ -234,7 +234,7 @@ void XMLWriter::endFragment()
 {
 	if (_depth > 1)
 		throw XMLException("Not well-formed (at least one tag has no matching end tag)");
-	
+
 	_inFragment   = false;
 	_elementCount = 0;
 	_depth        = -1;
@@ -250,14 +250,14 @@ void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& loc
 
 void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
-	if (_depth == 0 && !_inFragment && _elementCount > 1) 
+	if (_depth == 0 && !_inFragment && _elementCount > 1)
 		throw XMLException("Not well-formed. Second root element found", nameToString(localName, qname));
-	
+
 	if (_unclosedStartTag) closeStartTag();
 	prettyPrint();
 	if (_options & CANONICAL_XML)
 		writeCanonicalStartElement(namespaceURI, localName, qname, attributes);
-	else		
+	else
 		writeStartElement(namespaceURI, localName, qname, attributes);
 	_elementStack.emplace_back(qname, namespaceURI, localName);
 	_contentWritten = false;
@@ -595,7 +595,7 @@ void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString
 		_namespaces.pushContext();
 	_nsContextPushed = false;
 	++_elementCount;
-	
+
 	declareAttributeNamespaces(attributes);
 
 	writeMarkup(MARKUP_LT);
@@ -643,7 +643,7 @@ void XMLWriter::writeCanonicalStartElement(const XMLString& namespaceURI, const 
 		_namespaces.pushContext();
 	_nsContextPushed = false;
 	++_elementCount;
-	
+
 	declareNamespaces(namespaceURI, localName, qname, attributes);
 
 	writeMarkup(MARKUP_LT);
@@ -726,7 +726,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		XMLString attributeNamespaceURI = attributes.getURI(i);
 		XMLString attributeLocalName    = attributes.getLocalName(i);
 		XMLString attributeQName        = attributes.getQName(i);
-	
+
 		XMLString attributePrefix;
 		XMLString attributeLocal;
 		Name::split(attributeQName, attributePrefix, attributeLocal);
@@ -744,7 +744,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		for (const auto& nsURI: namespaceURIs)
 		{
 			XMLString prefix = p.first;
-			if (prefix.empty()) 
+			if (prefix.empty())
 				prefix = _namespaces.getPrefix(nsURI);
 			if (prefix.empty() && !_namespaces.isMapped(nsURI))
 			{
@@ -761,7 +761,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 
 			}
 			const XMLString& uri = _namespaces.getURI(prefix);
-			if ((uri.empty() || uri != nsURI) && !nsURI.empty()) 
+			if ((uri.empty() || uri != nsURI) && !nsURI.empty())
 			{
 				_namespaces.declarePrefix(prefix, nsURI);
 			}
@@ -807,7 +807,7 @@ void XMLWriter::addNamespaceAttributes(AttributeMap& attributeMap)
 	{
 		XMLString uri   = _namespaces.getURI(prefix);
 		XMLString qname = NamespaceSupport::XMLNS_NAMESPACE_PREFIX;
-		
+
 		if (!prefix.empty())
 		{
 			qname.append(toXMLString(MARKUP_COLON));
@@ -826,7 +826,7 @@ void XMLWriter::addNamespaceAttributes(CanonicalAttributeMap& attributeMap)
 	{
 		XMLString uri   = _namespaces.getURI(prefix);
 		XMLString qname = NamespaceSupport::XMLNS_NAMESPACE_PREFIX;
-		
+
 		if (!prefix.empty())
 		{
 			qname.append(toXMLString(MARKUP_COLON));
@@ -923,7 +923,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -961,7 +961,7 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -1001,8 +1001,8 @@ void XMLWriter::writeName(const XMLString& prefix, const XMLString& localName)
 	}
 	else
 	{
-		writeXML(prefix); 
-		writeMarkup(MARKUP_COLON); 
+		writeXML(prefix);
+		writeMarkup(MARKUP_COLON);
 		writeXML(localName);
 	}
 }

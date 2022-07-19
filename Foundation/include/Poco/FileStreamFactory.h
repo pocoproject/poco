@@ -38,7 +38,7 @@ public:
 
 	~FileStreamFactory();
 		/// Destroys the FileStreamFactory.
-		
+
 	std::istream* open(const URI& uri);
 		/// Creates and opens a file stream in binary mode for the given URI.
 		/// The URI must be either a file URI or a relative URI reference
@@ -46,7 +46,7 @@ public:
 		///
 		/// Throws an FileNotFound exception if the file cannot
 		/// be opened.
-		
+
 	std::istream* open(const Path& path);
 		/// Creates and opens a file stream in binary mode for the given path.
 		///

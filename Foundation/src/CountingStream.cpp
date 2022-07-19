@@ -18,31 +18,31 @@
 namespace Poco {
 
 
-CountingStreamBuf::CountingStreamBuf(): 
-	_pIstr(0), 
-	_pOstr(0), 
-	_chars(0), 
-	_lines(0), 
+CountingStreamBuf::CountingStreamBuf():
+	_pIstr(0),
+	_pOstr(0),
+	_chars(0),
+	_lines(0),
 	_pos(0)
 {
 }
 
 
-CountingStreamBuf::CountingStreamBuf(std::istream& istr): 
-	_pIstr(&istr), 
-	_pOstr(0), 
-	_chars(0), 
-	_lines(0), 
+CountingStreamBuf::CountingStreamBuf(std::istream& istr):
+	_pIstr(&istr),
+	_pOstr(0),
+	_chars(0),
+	_lines(0),
 	_pos(0)
 {
 }
 
 
-CountingStreamBuf::CountingStreamBuf(std::ostream& ostr): 
-	_pIstr(0), 
-	_pOstr(&ostr), 
-	_chars(0), 
-	_lines(0), 
+CountingStreamBuf::CountingStreamBuf(std::ostream& ostr):
+	_pIstr(0),
+	_pOstr(&ostr),
+	_chars(0),
+	_lines(0),
 	_pos(0)
 {
 }
@@ -99,13 +99,13 @@ void CountingStreamBuf::addChars(std::streamsize charsToAdd)
 	_chars += charsToAdd;
 }
 
-		
+
 void CountingStreamBuf::addLines(std::streamsize linesToAdd)
 {
 	_lines += linesToAdd;
 }
 
-		
+
 void CountingStreamBuf::addPos(std::streamsize posToAdd)
 {
 	_pos += posToAdd;
@@ -152,13 +152,13 @@ void CountingIOS::addChars(std::streamsize charsToAdd)
 	_buf.addChars(charsToAdd);
 }
 
-		
+
 void CountingIOS::addLines(std::streamsize linesToAdd)
 {
 	_buf.addLines(linesToAdd);
 }
 
-		
+
 void CountingIOS::addPos(std::streamsize posToAdd)
 {
 	_buf.addPos(posToAdd);

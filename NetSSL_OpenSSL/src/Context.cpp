@@ -23,6 +23,8 @@
 #include "Poco/Format.h"
 #include "Poco/Error.h"
 #include <openssl/bio.h>
+#include <openssl/bn.h>
+#include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>

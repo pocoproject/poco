@@ -45,26 +45,26 @@ public:
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		// add your own initialization code here
 	}
-	
+
 	void uninitialize()
 	{
 		// add your own uninitialization code here
 		Application::uninitialize();
 	}
-	
+
 	void reinitialize(Application& self)
 	{
 		Application::reinitialize(self);
 		// add your own reinitialization code here
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -82,7 +82,7 @@ protected:
 				.argument("filename")
 				.callback(OptionCallback<ZipApp>(this, &ZipApp::handleFile)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
@@ -94,7 +94,7 @@ protected:
 	{
 		_outFile = value;
 	}
-	
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -103,7 +103,7 @@ protected:
 		helpFormatter.setHeader("A application that demonstrates usage of Poco::Zip::Compress class.");
 		helpFormatter.format(std::cout);
 	}
-	
+
 	void onDone(const void*, const Poco::Zip::ZipLocalFileHeader& hdr)
 	{
 		logger().information("DONE: " + hdr.getFileName());
@@ -151,7 +151,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 	std::string _outFile;

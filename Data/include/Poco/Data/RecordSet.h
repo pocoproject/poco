@@ -44,7 +44,7 @@ class RowFilter;
 class Data_API RecordSet: private Statement
 	/// RecordSet provides access to data returned from a query.
 	/// Data access indices (row and column) are 0-based, as usual in C++.
-	/// 
+	///
 	/// Recordset provides navigation methods to iterate through the
 	/// recordset, retrieval methods to extract data, and methods
 	/// to get metadata (type, etc.) about columns.
@@ -64,7 +64,7 @@ class Data_API RecordSet: private Statement
 	/// The third (optional) argument passed to the Recordset constructor is a RowFormatter
 	/// implementation. The formatter is used in conjunction with << operator for recordset
 	/// data formating.
-	/// 
+	///
 	/// The number of rows in the RecordSet can be limited by specifying
 	/// a limit for the Statement.
 {
@@ -82,18 +82,18 @@ public:
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		const RowFormatter& rowFormatter);
 		/// Creates the RecordSet.
 
 	template <class RF>
-	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter): 
+	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter):
 		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -145,7 +145,7 @@ public:
 	std::size_t getTotalRowCount() const;
 		/// Returns the total number of rows in the RecordSet.
 		/// The number of rows reported is independent of filtering.
-		/// If the total row count has not been set externally 
+		/// If the total row count has not been set externally
 		/// (either explicitly or implicitly through SQL), the value
 		/// returned shall only be accurate if the statement limit
 		/// is less or equal to the total row count.
@@ -274,7 +274,7 @@ public:
 		else
 			return value(name, _currentRow);
 	}
-	
+
 	template <typename T>
 	Poco::Dynamic::Var nvl(std::size_t index, const T& deflt = T()) const
 		/// Returns the value in the given column of the current row
@@ -378,11 +378,11 @@ public:
 	void formatNames() const;
 		/// Formats names using the current RowFormatter.
 
-	std::ostream& copyValues(std::ostream& os, 
-		std::size_t offset = 0, 
+	std::ostream& copyValues(std::ostream& os,
+		std::size_t offset = 0,
 		std::size_t length = RowIterator::POSITION_END) const;
 		/// Copies the data values to the supplied output stream.
-		/// The data set to be copied is starting at the specified offset 
+		/// The data set to be copied is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -391,7 +391,7 @@ public:
 
 	void formatValues(std::size_t offset, std::size_t length) const;
 		/// Formats values using the current RowFormatter.
-		/// The data set to be formatted is starting at the specified offset 
+		/// The data set to be formatted is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -421,7 +421,7 @@ private:
 		const AbstractExtractionVec& rExtractions = extractions();
 		AbstractExtractionVec::const_iterator it = rExtractions.begin();
 		AbstractExtractionVec::const_iterator end = rExtractions.end();
-		
+
 		for (; it != end; ++it)
 		{
 			ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(it->get());
@@ -467,9 +467,9 @@ private:
 		{
 			return pExtraction->column();
 		}
-		else 
+		else
 		{
-			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",
 				pos,
 				std::string(typeid(T).name())));
 		}

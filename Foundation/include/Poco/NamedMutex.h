@@ -22,7 +22,7 @@
 #include "Poco/ScopedLock.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) 
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/NamedMutex_WIN32U.h"
 #elif POCO_OS == POCO_OS_ANDROID
 #include "Poco/NamedMutex_Android.h"

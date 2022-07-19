@@ -64,7 +64,7 @@ inline void Test::run(TestResult *result, const Callback& callback)
 // Counts the number of test cases that will be run by this test.
 inline int Test::countTestCases() const
 {
-	return 0; 
+	return 0;
 }
 
 

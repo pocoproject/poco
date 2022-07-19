@@ -67,7 +67,7 @@ Poco::Path SharedMemoryTest::findDataFile(const std::string& afile)
 	Poco::File aFile(result.toString());
 	if (!aFile.exists() || (aFile.exists() && !aFile.isFile()))
 		throw Poco::FileNotFoundException("Didn't find file " + afile);
-	
+
 	return result;
 }
 

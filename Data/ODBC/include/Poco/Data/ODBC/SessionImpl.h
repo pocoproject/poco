@@ -54,15 +54,15 @@ public:
 
 	SessionImpl(const std::string& connect,
 		std::size_t loginTimeout,
-		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
 		/// Throws NotConnectedException if connection was not succesful.
 
 	//@ deprecated
-	SessionImpl(const std::string& connect, 
-		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+	SessionImpl(const std::string& connect,
+		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
 		bool autoExtract = true);
@@ -144,7 +144,7 @@ public:
 
 	void setMaxFieldSize(const std::string& rName, const Poco::Any& rValue);
 		/// Sets the max field size (the default used when column size is unknown).
-		
+
 	Poco::Any getMaxFieldSize(const std::string& rName="") const;
 		/// Returns the max field size (the default used when column size is unknown).
 
@@ -154,11 +154,11 @@ public:
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
 		/// Value must be of type int.
-		
+
 	Poco::Any getQueryTimeout(const std::string&) const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
-		
+
 	int queryTimeout() const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
@@ -230,7 +230,7 @@ inline void SessionImpl::setMaxFieldSize(const std::string& rName, const Poco::A
 	_maxFieldSize = rValue;
 }
 
-		
+
 inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName) const
 {
 	return _maxFieldSize;
@@ -242,7 +242,7 @@ inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::A
 	throw InvalidAccessException();
 }
 
-		
+
 inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName) const
 {
 	return &_dataTypes;

@@ -43,7 +43,7 @@ namespace
 	std::map<std::string, std::string> parseKeyValueList(const std::string& str)
 	{
 		std::map<std::string, std::string> kvm;
-		std::string::const_iterator it = str.begin(); 
+		std::string::const_iterator it = str.begin();
 		std::string::const_iterator end = str.end();
 		while (it != end)
 		{
@@ -66,7 +66,7 @@ namespace
 		Poco::StreamCopier::copyToString(decoder, result);
 		return result;
 	}
-	
+
 	std::string encodeBase64(const std::string& data)
 	{
 		std::ostringstream ostr;
@@ -133,8 +133,8 @@ bool Database::authenticate(Connection& connection, const std::string& username,
 {
 	if (username.empty()) throw Poco::InvalidArgumentException("empty username");
 	if (password.empty()) throw Poco::InvalidArgumentException("empty password");
-	
-	if (method == AUTH_MONGODB_CR) 
+
+	if (method == AUTH_MONGODB_CR)
 		return authCR(connection, username, password);
 	else if (method == AUTH_SCRAM_SHA1)
 		return authSCRAM(connection, username, password);
@@ -167,13 +167,13 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 	md5.update(username);
 	md5.update(credsDigest);
 	std::string key = digestToHexString(md5);
-	
+
 	pCommand = createCommand();
 	pCommand->selector()
 		.add<Poco::Int32>("authenticate", 1)
 		.add<std::string>("user", username)
 		.add<std::string>("nonce", nonce)
-		.add<std::string>("key", key); 
+		.add<std::string>("key", key);
 
 	connection.sendRequest(*pCommand, response);
 	if (response.documents().size() > 0)
@@ -189,20 +189,20 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 {
 	std::string clientNonce(createNonce());
 	std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);
-	
+
 	Poco::SharedPtr<QueryRequest> pCommand = createCommand();
 	pCommand->selector()
 		.add<Poco::Int32>("saslStart", 1)
 		.add<std::string>("mechanism", AUTH_SCRAM_SHA1)
 		.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
-		.add<bool>("authAuthorize", true); 
-		
+		.add<bool>("authAuthorize", true);
+
 	ResponseMessage response;
 	connection.sendRequest(*pCommand, response);
-	
+
 	Int32 conversationId = 0;
 	std::string serverFirstMsg;
-	
+
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
@@ -215,7 +215,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 		else return false;
 	}
 	else throw Poco::ProtocolException("empty response for saslStart");
-	
+
 	std::map<std::string, std::string> kvm = parseKeyValueList(serverFirstMsg);
 	const std::string serverNonce = kvm["r"];
 	const std::string salt = decodeBase64(kvm["s"]);
@@ -223,40 +223,40 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	const Poco::UInt32 dkLen = 20;
 
 	std::string hashedPassword = hashCredentials(username, password);
-		
+
 	Poco::PBKDF2Engine<Poco::HMACEngine<Poco::SHA1Engine> > pbkdf2(salt, iterations, dkLen);
 	pbkdf2.update(hashedPassword);
 	std::string saltedPassword = digestToBinaryString(pbkdf2);
-	
+
 	std::string clientFinalNoProof = Poco::format("c=biws,r=%s", serverNonce);
 	std::string authMessage = Poco::format("%s,%s,%s", clientFirstMsg, serverFirstMsg, clientFinalNoProof);
-	
+
 	Poco::HMACEngine<Poco::SHA1Engine> hmacKey(saltedPassword);
 	hmacKey.update(std::string("Client Key"));
 	std::string clientKey = digestToBinaryString(hmacKey);
-	
+
 	Poco::SHA1Engine sha1;
 	sha1.update(clientKey);
 	std::string storedKey = digestToBinaryString(sha1);
-	
+
 	Poco::HMACEngine<Poco::SHA1Engine> hmacSig(storedKey);
 	hmacSig.update(authMessage);
 	std::string clientSignature = digestToBinaryString(hmacSig);
-	
+
 	std::string clientProof(clientKey);
 	for (std::size_t i = 0; i < clientProof.size(); i++)
 	{
 		clientProof[i] ^= clientSignature[i];
 	}
-	
+
 	std::string clientFinal = Poco::format("%s,p=%s", clientFinalNoProof, encodeBase64(clientProof));
-	
+
 	pCommand = createCommand();
 	pCommand->selector()
 		.add<Poco::Int32>("saslContinue", 1)
 		.add<Poco::Int32>("conversationId", conversationId)
 		.add<Binary::Ptr>("payload", new Binary(clientFinal));
-	
+
 	std::string serverSecondMsg;
 	connection.sendRequest(*pCommand, response);
 	if (response.documents().size() > 0)
@@ -274,17 +274,17 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	Poco::HMACEngine<Poco::SHA1Engine> hmacSKey(saltedPassword);
 	hmacSKey.update(std::string("Server Key"));
 	std::string serverKey = digestToBinaryString(hmacSKey);
-	
+
 	Poco::HMACEngine<Poco::SHA1Engine> hmacSSig(serverKey);
 	hmacSSig.update(authMessage);
 	std::string serverSignature = digestToBase64(hmacSSig);
-	
+
 	kvm = parseKeyValueList(serverSecondMsg);
 	std::string serverSignatureReceived = kvm["v"];
-	
-	if (serverSignature != serverSignatureReceived) 	
+
+	if (serverSignature != serverSignatureReceived)
 		throw Poco::ProtocolException("server signature verification failed");
-	
+
 	pCommand = createCommand();
 	pCommand->selector()
 		.add<Poco::Int32>("saslContinue", 1)

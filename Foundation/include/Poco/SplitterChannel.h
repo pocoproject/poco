@@ -40,13 +40,13 @@ public:
 
 	void addChannel(Channel::Ptr pChannel);
 		/// Attaches a channel, which may not be null.
-		
+
 	void removeChannel(Channel::Ptr pChannel);
 		/// Removes a channel.
 
 	void log(const Message& msg);
 		/// Sends the given Message to all
-		/// attaches channels. 
+		/// attaches channels.
 
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.
@@ -59,7 +59,7 @@ public:
 
 	void close();
 		/// Removes all channels.
-		
+
 	int count() const;
 		/// Returns the number of channels in the SplitterChannel.
 
@@ -68,7 +68,7 @@ protected:
 
 private:
 	typedef std::vector<Channel::Ptr> ChannelVec;
-	
+
 	ChannelVec        _channels;
 	mutable FastMutex _mutex;
 };

@@ -33,7 +33,7 @@ class Foundation_API FileStreamBuf: public BufferedBidirectionalStreamBuf
 public:
 	FileStreamBuf();
 		/// Creates a FileStreamBuf.
-		
+
 	~FileStreamBuf();
 		/// Destroys the FileStream.
 

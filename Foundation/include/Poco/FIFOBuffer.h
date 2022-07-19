@@ -41,7 +41,7 @@ class BasicFIFOBuffer
 	/// However, to achieve thread-safety in cases where multiple
 	/// member function calls are involved and have to be atomic,
 	/// the mutex must be locked externally.
-	/// 
+	///
 	/// Buffer size, as well as amount of unread data and
 	/// available space introspections are supported as well.
 	///
@@ -55,12 +55,12 @@ public:
 		/// Event indicating "writability" of the buffer,
 		/// triggered as follows:
 		///
-		///	* when buffer transitions from non-full to full, 
-		///	  Writable event observers are notified, with 
+		///	* when buffer transitions from non-full to full,
+		///	  Writable event observers are notified, with
 		///	  false value as the argument
 		///
 		///	* when buffer transitions from full to non-full,
-		///	  Writable event observers are notified, with 
+		///	  Writable event observers are notified, with
 		///	  true value as the argument
 
 	mutable Poco::BasicEvent<bool> readable;
@@ -68,7 +68,7 @@ public:
 		/// triggered as follows:
 		///
 		///	* when buffer transitions from non-empty to empty,
-		///	  Readable event observers are notified, with false  
+		///	  Readable event observers are notified, with false
 		///	  value as the argument
 		///
 		///	* when FIFOBuffer transitions from empty to non-empty,
@@ -112,7 +112,7 @@ public:
 		/// Destroys the FIFOBuffer.
 	{
 	}
-	
+
 	void resize(std::size_t newSize, bool preserveContent = true)
 		/// Resizes the buffer. If preserveContent is true,
 		/// the content of the old buffer is preserved.
@@ -126,22 +126,22 @@ public:
 
 		if (preserveContent && (newSize < _used))
 			throw InvalidAccessException("Can not resize FIFO without data loss.");
-		
+
 		std::size_t usedBefore = _used;
 		_buffer.resize(newSize, preserveContent);
 		if (!preserveContent) _used = 0;
 		if (_notify) notify(usedBefore);
 	}
-	
+
 	std::size_t peek(T* pBuffer, std::size_t length) const
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
 		/// If length is zero, the return is immediate.
 		/// If length is greater than used length,
-		/// it is substituted with the the current FIFO 
+		/// it is substituted with the the current FIFO
 		/// used length.
-		/// 
-		/// Returns the number of elements copied in the 
+		///
+		/// Returns the number of elements copied in the
 		/// supplied buffer.
 	{
 		if (0 == length) return 0;
@@ -151,17 +151,17 @@ public:
 		std::memcpy(pBuffer, _buffer.begin() + _begin, length * sizeof(T));
 		return length;
 	}
-	
+
 	std::size_t peek(Poco::Buffer<T>& buffer, std::size_t length = 0) const
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
 		/// Resizes the supplied buffer to the size of
 		/// data written to it. If length is not
-		/// supplied by the caller or is greater than length 
-		/// of currently used data, the current FIFO used 
+		/// supplied by the caller or is greater than length
+		/// of currently used data, the current FIFO used
 		/// data length is substituted for it.
-		/// 
-		/// Returns the number of elements copied in the 
+		///
+		/// Returns the number of elements copied in the
 		/// supplied buffer.
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -170,13 +170,13 @@ public:
 		buffer.resize(length);
 		return peek(buffer.begin(), length);
 	}
-	
+
 	std::size_t read(T* pBuffer, std::size_t length)
 		/// Copies the data currently in the FIFO
 		/// into the supplied buffer, which must be
 		/// preallocated to at least the length size
 		/// before calling this function.
-		/// 
+		///
 		/// Returns the size of the copied data.
 	{
 		if (0 == length) return 0;
@@ -193,13 +193,13 @@ public:
 
 		return readLen;
 	}
-	
+
 	std::size_t read(Poco::Buffer<T>& buffer, std::size_t length = 0)
 		/// Copies the data currently in the FIFO
 		/// into the supplied buffer.
 		/// Resizes the supplied buffer to the size of
 		/// data written to it.
-		/// 
+		///
 		/// Returns the size of the copied data.
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -219,20 +219,20 @@ public:
 	std::size_t write(const T* pBuffer, std::size_t length)
 		/// Writes data from supplied buffer to the FIFO buffer.
 		/// If there is no sufficient space for the whole
-		/// buffer to be written, data up to available 
+		/// buffer to be written, data up to available
 		/// length is written.
 		/// The length of data to be written is determined from the
 		/// length argument. Function does nothing and returns zero
 		/// if length argument is equal to zero.
-		/// 
+		///
 		/// Returns the length of data written.
 	{
 		if (0 == length) return 0;
 
 		Mutex::ScopedLock lock(_mutex);
-		
+
 		if (!isWritable()) return 0;
-		
+
 		if (_buffer.size() - (_begin + _used) < length)
 		{
 			std::memmove(_buffer.begin(), begin(), _used * sizeof(T));
@@ -253,12 +253,12 @@ public:
 	std::size_t write(const Buffer<T>& buffer, std::size_t length = 0)
 		/// Writes data from supplied buffer to the FIFO buffer.
 		/// If there is no sufficient space for the whole
-		/// buffer to be written, data up to available 
+		/// buffer to be written, data up to available
 		/// length is written.
 		/// The length of data to be written is determined from the
 		/// length argument or buffer size (when length argument is
 		/// default zero or greater than buffer size).
-		/// 
+		///
 		/// Returns the length of data written.
 	{
 		if (length == 0 || length > buffer.size())
@@ -272,13 +272,13 @@ public:
 	{
 		return _buffer.size();
 	}
-	
+
 	std::size_t used() const
 		/// Returns the size of the used portion of the buffer.
 	{
 		return _used;
 	}
-	
+
 	std::size_t available() const
 		/// Returns the size of the available portion of the buffer.
 	{
@@ -316,10 +316,10 @@ public:
 		if (0 == length) return;
 
 		Mutex::ScopedLock lock(_mutex);
-		
+
 		if (length > available())
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
-		
+
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
 
@@ -331,14 +331,15 @@ public:
 
 	void advance(std::size_t length)
 		/// Advances buffer by length elements.
-		/// Should be called AFTER the data 
+		/// Should be called AFTER the data
 		/// was copied into the buffer.
 	{
+		if (0 == length) return;
 		Mutex::ScopedLock lock(_mutex);
 
 		if (length > available())
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
-		
+
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
 
@@ -377,7 +378,7 @@ public:
 
 	T& operator [] (std::size_t index)
 		/// Returns value at index position.
-		/// Throws InvalidAccessException if index is larger than 
+		/// Throws InvalidAccessException if index is larger than
 		/// the last valid (used) buffer position.
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -389,7 +390,7 @@ public:
 
 	const T& operator [] (std::size_t index) const
 		/// Returns value at index position.
-		/// Throws InvalidAccessException if index is larger than 
+		/// Throws InvalidAccessException if index is larger than
 		/// the last valid (used) buffer position.
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -404,12 +405,12 @@ public:
 	{
 		return _buffer;
 	}
-	
+
 	void setError(bool error = true)
 		/// Sets the error flag on the buffer and empties it.
-		/// If notifications are enabled, they will be triggered 
+		/// If notifications are enabled, they will be triggered
 		/// if appropriate.
-		/// 
+		///
 		/// Setting error flag to true prevents reading and writing
 		/// to the buffer; to re-enable FIFOBuffer for reading/writing,
 		/// the error flag must be set to false.
@@ -418,8 +419,8 @@ public:
 		{
 			bool f = false;
 			Mutex::ScopedLock lock(_mutex);
-			if (error && isReadable() && _notify) readable.notify(this, f);
-			if (error && isWritable() && _notify) writable.notify(this, f);
+			if (isReadable() && _notify) readable.notify(this, f);
+			if (isWritable() && _notify) writable.notify(this, f);
 			_error = error;
 			_used = 0;
 		}
@@ -441,14 +442,14 @@ public:
 
 	void setEOF(bool eof = true)
 		/// Sets end-of-file flag on the buffer.
-		/// 
+		///
 		/// Setting EOF flag to true prevents writing to the
 		/// buffer; reading from the buffer will still be
-		/// allowed until all data present in the buffer at the 
-		/// EOF set time is drained. After that, to re-enable 
+		/// allowed until all data present in the buffer at the
+		/// EOF set time is drained. After that, to re-enable
 		/// FIFOBuffer for reading/writing, EOF must be
 		/// set to false.
-		/// 
+		///
 		/// Setting EOF flag to false clears EOF state if it
 		/// was previously set. If EOF was not set, it has no
 		/// effect.
@@ -523,7 +524,7 @@ private:
 			readable.notify(this, t);
 		else if (usedBefore > 0 && 0 == _used)
 			readable.notify(this, f);
-		
+
 		if (usedBefore == _buffer.size() && _used < _buffer.size())
 			writable.notify(this, t);
 		else if (usedBefore < _buffer.size() && _used == _buffer.size())

@@ -51,7 +51,7 @@ class EchoServiceHandler
 	/// data availability. To ensure non-blocking behavior and alleviate spurious
 	/// socket writability callback triggering when no data to be sent is available,
 	/// FIFO buffers are used. I/O FIFOBuffer sends notifications on transitions
-	/// from [1] non-readable (i.e. empty) to readable, [2] writable to non-writable 
+	/// from [1] non-readable (i.e. empty) to readable, [2] writable to non-writable
 	/// (i.e. full) and [3] non-writable (i.e. full) to writable.
 	/// Based on these notifications, the handler member functions react by
 	/// enabling/disabling respective reactor framework notifications.
@@ -72,7 +72,7 @@ public:
 		_fifoOut.readable += delegate(this, &EchoServiceHandler::onFIFOOutReadable);
 		_fifoIn.writable += delegate(this, &EchoServiceHandler::onFIFOInWritable);
 	}
-	
+
 	~EchoServiceHandler()
 	{
 		Application& app = Application::instance();
@@ -90,7 +90,7 @@ public:
 		_fifoOut.readable -= delegate(this, &EchoServiceHandler::onFIFOOutReadable);
 		_fifoIn.writable -= delegate(this, &EchoServiceHandler::onFIFOInWritable);
 	}
-	
+
 	void onFIFOOutReadable(bool& b)
 	{
 		if (b)
@@ -98,7 +98,7 @@ public:
 		else
 			_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, WritableNotification>(*this, &EchoServiceHandler::onSocketWritable));
 	}
-	
+
 	void onFIFOInWritable(bool& b)
 	{
 		if (b)
@@ -106,7 +106,7 @@ public:
 		else
 			_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onSocketReadable));
 	}
-	
+
 	void onSocketReadable(const AutoPtr<ReadableNotification>& pNf)
 	{
 		try
@@ -128,7 +128,7 @@ public:
 			delete this;
 		}
 	}
-	
+
 	void onSocketWritable(const AutoPtr<WritableNotification>& pNf)
 	{
 		try
@@ -147,13 +147,13 @@ public:
 	{
 		delete this;
 	}
-	
+
 private:
 	enum
 	{
 		BUFFER_SIZE = 1024
 	};
-	
+
 	StreamSocket   _socket;
 	SocketReactor& _reactor;
 	FIFOBuffer     _fifoIn;
@@ -184,7 +184,7 @@ public:
 	EchoServer(): _helpRequested(false)
 	{
 	}
-	
+
 	~EchoServer()
 	{
 	}
@@ -195,7 +195,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		ServerApplication::initialize(self);
 	}
-		
+
 	void uninitialize()
 	{
 		ServerApplication::uninitialize();
@@ -204,7 +204,7 @@ protected:
 	void defineOptions(OptionSet& options)
 	{
 		ServerApplication::defineOptions(options);
-		
+
 		options.addOption(
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
@@ -238,14 +238,14 @@ protected:
 		{
 			// get parameters from configuration file
 			unsigned short port = (unsigned short) config().getInt("EchoServer.port", 9977);
-			
+
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a SocketReactor...
 			SocketReactor reactor;
 			// ... and a SocketAcceptor
 			SocketAcceptor<EchoServiceHandler> acceptor(svs, reactor);
-			// run the reactor in its own thread so that we can wait for 
+			// run the reactor in its own thread so that we can wait for
 			// a termination request
 			Thread thread;
 			thread.start(reactor);
@@ -257,7 +257,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 };

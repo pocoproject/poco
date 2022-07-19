@@ -50,13 +50,13 @@ public:
 		INVALID_TOKEN,
 		USER_TOKEN
 	};
-	
+
 	Token();
 		/// Creates the Token.
 
 	virtual ~Token();
 		/// Destroys the Token.
-		
+
 	virtual bool start(char c, std::istream& istr);
 		/// Checks if the given character (and, optionally,
 		/// the next character in the input stream) start
@@ -71,18 +71,18 @@ public:
 		/// be set as the token's value.
 
 	virtual void finish(std::istream& istr);
-		/// Builds the token by reading and appending 
+		/// Builds the token by reading and appending
 		/// the remaining characters from istr.
-		
+
 	virtual Class tokenClass() const;
 		/// Returns the kind of the token.
-	
+
 	const std::string& tokenString() const;
 		/// Returns the token's raw string.
-	
+
 	virtual std::string asString() const;
 		/// Returns a string representation of the token.
-	
+
 #if defined(POCO_HAVE_INT64)
 	virtual Int64 asInteger64() const;
         /// Returns a 64-bit integer representation of the token.
@@ -108,7 +108,7 @@ public:
 
 protected:
 	std::string _value;
-	
+
 private:
 	Token(const Token&);
 	Token& operator = (const Token&);

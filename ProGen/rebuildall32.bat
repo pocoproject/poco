@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableDelayedExpansion EnableExtensions        
+setlocal EnableDelayedExpansion EnableExtensions
 if "%POCO_BASE%"=="" (
 	echo POCO_BASE not set
 	goto :exit

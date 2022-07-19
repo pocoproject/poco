@@ -66,7 +66,7 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
 	}
-		
+
 	// read the rest of the header
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	Poco::UInt16 len = getZipCommentSize();

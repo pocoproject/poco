@@ -1,7 +1,6 @@
 ![alt text][logo]
 
-[![poco-ci](https://github.com/pocoproject/poco/actions/workflows/ci.yml/badge.svg?branch=poco-1.11.2)](https://github.com/pocoproject/poco/actions/workflows/ci.yml)
-
+[![poco-ci](https://github.com/pocoproject/poco/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/pocoproject/poco/actions/workflows/ci.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
 
@@ -123,6 +122,22 @@ $ sudo cmake --build . --target install
 The default install location is `/usr/local/` on Linux and macOS and
 `C:\Program Files (x64)\` on Windows and can be overridden by setting
 the `CMAKE_INSTALL_PREFIX` CMake variable.
+
+
+#### Building and Installing - Using vcpkg
+
+You can download and install poco using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+```
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh
+$ ./vcpkg integrate install
+$ ./vcpkg install poco
+```
+The poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
+If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg)
+on the vcpkg repository.
 
 
 ### Building Without CMake

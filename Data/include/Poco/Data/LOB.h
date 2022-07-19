@@ -109,7 +109,7 @@ public:
 		return *_pContent != *other._pContent;
 	}
 
-	void swap(LOB& other)
+	void swap(LOB& other) noexcept
 		/// Swaps the LOB with another one.
 	{
 		using std::swap;
@@ -228,7 +228,7 @@ using JSON = std::string;
 //
 
 template <typename T>
-inline void swap(LOB<T>& b1, LOB<T>& b2)
+inline void swap(LOB<T>& b1, LOB<T>& b2) noexcept
 {
 	b1.swap(b2);
 }

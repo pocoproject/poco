@@ -29,13 +29,13 @@ Twitter::Twitter():
 {
 }
 
-	
+
 Twitter::Twitter(const std::string& twitterURI):
 	_uri(twitterURI)
 {
 }
 
-	
+
 Twitter::~Twitter()
 {
 }
@@ -49,7 +49,7 @@ void Twitter::login(const std::string& consumerKey, const std::string& consumerS
 	_tokenSecret    = tokenSecret;
 }
 
-	
+
 Poco::Int64 Twitter::update(const std::string& status)
 {
 	Poco::Net::HTMLForm form;
@@ -64,23 +64,23 @@ Poco::AutoPtr<Poco::Util::AbstractConfiguration> Twitter::invoke(const std::stri
 	// Create the request URI.
 	// We use the JSON version of the Twitter API.
 	Poco::URI uri(_uri + twitterMethod + ".json");
-	
+
 	Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
 	Poco::Net::HTTPRequest req(httpMethod, uri.getPath(), Poco::Net::HTTPMessage::HTTP_1_1);
-	
+
 	// Sign request
 	Poco::Net::OAuth10Credentials creds(_consumerKey, _consumerSecret, _token, _tokenSecret);
 	creds.authenticate(req, uri, form);
-	
+
 	// Send the request.
 	form.prepareSubmit(req);
 	std::ostream& ostr = session.sendRequest(req);
 	form.write(ostr);
-	
+
 	// Receive the response.
 	Poco::Net::HTTPResponse res;
 	std::istream& rs = session.receiveResponse(res);
-	
+
 	Poco::AutoPtr<Poco::Util::JSONConfiguration> pResult = new Poco::Util::JSONConfiguration(rs);
 
 	// If everything went fine, return the JSON document.

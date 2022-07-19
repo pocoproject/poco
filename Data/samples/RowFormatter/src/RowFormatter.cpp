@@ -39,7 +39,7 @@ public:
 		std::ostringstream os;
 		os << "<TABLE border=\"1\" cellspacing=\"0\">" << std::endl;
 		setPrefix(os.str());
-		
+
 		os.str("");
 		os << "</TABLE>" << std::endl;
 		setPostfix(os.str());
@@ -67,9 +67,9 @@ public:
 		ValueVec::const_iterator end = vals.end();
 		for (; it != end; ++it)
 		{
-			if (it->isNumeric()) 
+			if (it->isNumeric())
 				str << "\t\t<TD align=\"right\">";
-			else 
+			else
 				str << "\t\t<TD align=\"left\">";
 
 			str << it->convert<std::string>() << "</TD>" << std::endl;
@@ -85,16 +85,16 @@ int main(int argc, char** argv)
 {
 	// register SQLite connector
 	Poco::Data::SQLite::Connector::registerConnector();
-	
+
 	// create a session
 	Session session("SQLite", "sample.db");
 
 	// drop sample table, if it exists
 	session << "DROP TABLE IF EXISTS Simpsons", now;
-	
+
 	// (re)create table
 	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
-	
+
 	// insert some rows
 	DateTime hd(1956, 3, 1);
 	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(hd), now;
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(hd), now;
 	hd.assign(1982, 5, 9);
 	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(hd), now;
-		
+
 	// create a statement and print the column names and data as HTML table
 	HTMLTableFormatter tf;
 	Statement stmt = (session << "SELECT * FROM Simpsons", format(tf), now);

@@ -33,7 +33,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
 	typedef int TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -63,13 +63,19 @@ public:
 		}
 
 		Callable  callback;
-		void*     pData; 
+		void*     pData;
 	};
 
 	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
@@ -111,11 +117,12 @@ protected:
 
 		Runnable* pRunnableTarget;
 		AutoPtr<CallbackData> pCallbackTarget;
-		int       task;
-		int       prio;
-		int       osPrio;
-		Event     done;
-		int       stackSize;
+		int               task;
+		int               prio;
+		int               osPrio;
+		Event             done;
+		int               stackSize;
+		std::string       name;
 	};
 
 private:

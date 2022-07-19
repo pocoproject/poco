@@ -62,11 +62,11 @@ class HTTPClient : public Runnable
 {
 public:
 	HTTPClient(const URI& uri, int repetitions, bool cookies=false, bool verbose=false):
-	  _uri(uri), 
-	  _verbose(verbose), 
-	  _cookies(cookies), 
-	  _repetitions(repetitions), 
-	  _usec(0), 
+	  _uri(uri),
+	  _verbose(verbose),
+	  _cookies(cookies),
+	  _repetitions(repetitions),
+	  _usec(0),
 	  _success(0)
 	{
 		_gRepetitions += _repetitions;
@@ -91,7 +91,7 @@ public:
 
 				HTTPClientSession session(_uri.getHost(), _uri.getPort());
 				HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
-				
+
 				if (_cookies)
 				{
 					NameValueCollection nvc;
@@ -116,8 +116,8 @@ public:
 				if (_verbose)
 				{
 					FastMutex::ScopedLock lock(_mutex);
-					std::cout 
-					<< _uri.toString() << ' ' << res.getStatus() << ' ' << res.getReason() 
+					std::cout
+					<< _uri.toString() << ' ' << res.getStatus() << ' ' << res.getReason()
 					<< ' ' << usec/1000.0 << "ms" << std::endl;
 				}
 
@@ -129,7 +129,7 @@ public:
 				std::cerr << exc.displayText() << std::endl;
 			}
 		}
-		
+
 		{
 			FastMutex::ScopedLock lock(_mutex);
 			_gSuccess += _success;
@@ -183,10 +183,10 @@ void HTTPClient::printStats(std::string uri, int repetitions, int success, Poco:
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	std::cout << std::endl << "--------------" << std::endl 
-		<< "Statistics for " << uri << std::endl << "--------------" 
+	std::cout << std::endl << "--------------" << std::endl
+		<< "Statistics for " << uri << std::endl << "--------------"
 		<< std::endl
-		<< repetitions << " attempts, " << success << " succesful (" 
+		<< repetitions << " attempts, " << success << " succesful ("
 		<<  ((float) success / (float) repetitions) * 100.0 << "%)" << std::endl
 		<< "Avg response time: " << ((float) usec / (float) repetitions) / 1000.0 << "ms, " << std::endl
 		<< "Avg requests/second handled: " << ((float) success  /((float) usec / 1000000.0)) << std::endl
@@ -201,35 +201,35 @@ class HTTPLoadTest: public Application
 	/// more information.
 {
 public:
-	HTTPLoadTest(): 
-		_helpRequested(false), 
-		_verbose(false), 
+	HTTPLoadTest():
+		_helpRequested(false),
+		_verbose(false),
 		_cookies(false),
-		_repetitions(1), 
+		_repetitions(1),
 		_threads(1)
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		// add your own initialization code here
 	}
-	
+
 	void uninitialize()
 	{
 		// add your own uninitialization code here
 		Application::uninitialize();
 	}
-	
+
 	void reinitialize(Application& self)
 	{
 		Application::reinitialize(self);
 		// add your own reinitialization code here
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -254,7 +254,7 @@ protected:
 				.required(true)
 				.repeatable(false)
 				.argument("uri"));
-				
+
 		options.addOption(
 			Option("repetitions", "r", "fetch repetitions")
 				.required(false)
@@ -267,7 +267,7 @@ protected:
 				.repeatable(false)
 				.argument("threads"));
 	}
-	
+
 	void handleOption(const std::string& name, const std::string& value)
 	{
 		Application::handleOption(name, value);
@@ -285,7 +285,7 @@ protected:
 		else if (name == "threads")
 			_threads = NumberParser::parse(value);
 	}
-	
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -294,7 +294,7 @@ protected:
 		helpFormatter.setHeader("A sample application that demonstrates some of the features of the Poco::Util::Application class.");
 		helpFormatter.format(std::cout);
 	}
-	
+
 	void defineProperty(const std::string& def)
 	{
 		std::string name;
@@ -342,10 +342,10 @@ protected:
 
 			HTTPClient::printStats(_uri, HTTPClient::totalAttempts(), HTTPClient::totalSuccessCount(), sw.elapsed());
 		}
-		
+
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 	bool _verbose;

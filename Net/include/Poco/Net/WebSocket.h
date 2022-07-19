@@ -278,6 +278,9 @@ public:
 		/// after any previous content in buffer.
 		/// The buffer will be grown as necessary.
 		///
+		/// See the note below if you want the received data
+		/// to be stored at the beginning of the buffer.
+		///
 		/// The frame's payload size must not exceed the
 		/// maximum payload size set with setMaxPayloadSize().
 		/// If it does, a WebSocketException (WS_ERR_PAYLOAD_TOO_BIG)
@@ -304,6 +307,13 @@ public:
 		///
 		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
 		/// is stored in flags.
+		///
+		/// Note: Since the data received from the WebSocket is appended
+		/// to the given Poco::Buffer, the buffer passed to this method
+		/// should be created with a size of 0, or resize(0) should be
+		/// called on the buffer beforehand, if the expectation is that
+		/// the received data is stored starting at the beginning of the
+		/// buffer.
 
 	Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side

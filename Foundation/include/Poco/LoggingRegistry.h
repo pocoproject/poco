@@ -58,7 +58,7 @@ public:
 		/// Registers a channel under a given name.
 		/// It is okay to re-register a different channel under an
 		/// already existing name.
-		
+
 	void registerFormatter(const std::string& name, Formatter::Ptr pFormatter);
 		/// Registers a formatter under a given name.
 		/// It is okay to re-register a different formatter under an
@@ -86,7 +86,7 @@ private:
 	typedef AutoPtr<Formatter> FormatterPtr;
 	typedef std::map<std::string, ChannelPtr> ChannelMap;
 	typedef std::map<std::string, FormatterPtr> FormatterMap;
-	
+
 	ChannelMap   _channelMap;
 	FormatterMap _formatterMap;
 	mutable FastMutex _mutex;

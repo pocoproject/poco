@@ -95,6 +95,7 @@ public:
 
 	void setName(const std::string& name);
 		/// Sets the name of the thread.
+		/// Note that it only take effect before start method invoked.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.
@@ -275,10 +276,8 @@ private:
 	Thread& operator = (const Thread&);
 
 	int                 _id;
-	std::string         _name;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
-	mutable FastMutex   _mutex;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -302,17 +301,13 @@ inline int Thread::id() const
 
 inline std::string Thread::name() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	return _name;
+	return getNameImpl();
 }
 
 
 inline std::string Thread::getName() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	return _name;
+	return getNameImpl();
 }
 
 

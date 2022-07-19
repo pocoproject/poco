@@ -33,13 +33,13 @@ namespace Poco {
 class Foundation_API TimedNotificationQueue
 	/// A TimedNotificationQueue object provides a way to implement timed, asynchronous
 	/// notifications. This is especially useful for sending notifications
-	/// from one thread to another, for example from a background thread to 
-	/// the main (user interface) thread. 
+	/// from one thread to another, for example from a background thread to
+	/// the main (user interface) thread.
 	///
 	/// The TimedNotificationQueue is quite similar to the NotificationQueue class.
 	/// The only difference to NotificationQueue is that each Notification is tagged
 	/// with a Timestamp. When inserting a Notification into the queue, the
-	/// Notification is inserted according to the given Timestamp, with 
+	/// Notification is inserted according to the given Timestamp, with
 	/// lower Timestamp values being inserted before higher ones.
 	///
 	/// Notifications are dequeued in order of their timestamps.
@@ -88,11 +88,11 @@ public:
 		/// It is highly recommended that the result is immediately
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
-		
+
 	Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
-		/// to be enqueued. 
+		/// to be enqueued.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
 		///
@@ -114,7 +114,7 @@ public:
 
 	bool empty() const;
 		/// Returns true iff the queue is empty.
-		
+
 	int size() const;
 		/// Returns the number of notifications in the queue.
 
@@ -129,7 +129,7 @@ protected:
 	typedef std::multimap<Clock, Notification::Ptr> NfQueue;
 	Notification::Ptr dequeueOne(NfQueue::iterator& it);
 	bool wait(Clock::ClockDiff interval);
-	
+
 private:
 	NfQueue _nfQueue;
 	Event   _nfAvailable;

@@ -34,7 +34,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
     typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
 	typedef DWORD (WINAPI *Entry)(LPVOID);
@@ -53,10 +53,16 @@ public:
 		POLICY_DEFAULT_IMPL = 0
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
@@ -102,7 +108,7 @@ private:
 		{
 			TlsSetValue(_slot, pThread);
 		}
-	
+
 	private:
 		DWORD _slot;
 	};
@@ -112,6 +118,7 @@ private:
 	DWORD        _threadId;
 	int          _prio;
 	int          _stackSize;
+	std::string  _name;
 
 	static CurrentThreadHolder _currentThreadHolder;
 };

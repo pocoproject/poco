@@ -35,7 +35,7 @@
 //      Ax: alpha releases
 //      Bx: beta releases
 //
-#define POCO_VERSION 0x010C0000
 
+#define POCO_VERSION 0x010C0000
 
 #endif // Foundation_Version_INCLUDED

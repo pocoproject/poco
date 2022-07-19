@@ -68,31 +68,31 @@ namespace Poco {
 			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
 #else
 			setMessage(strerror(err));
-#endif		
+#endif
 		}
-		
+
 		~StrErrorHelper()
 		{
 		}
-		
+
 		const std::string& message() const
 		{
 			return _message;
 		}
-		
+
 	protected:
 		void setMessage(int rc)
 			/// Handles POSIX variant
 		{
 			_message = _buffer;
 		}
-		
+
 		void setMessage(const char* msg)
 			/// Handles GLIBC variant
 		{
 			_message = msg;
 		}
-		
+
 	private:
 		char _buffer[256];
 		std::string _message;

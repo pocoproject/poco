@@ -25,7 +25,7 @@ VSXMLWriter::~VSXMLWriter()
 {
 }
 
-	
+
 void VSXMLWriter::setDocumentLocator(const Poco::XML::Locator* loc)
 {
 }
@@ -87,7 +87,7 @@ void VSXMLWriter::startElement(const Poco::XML::XMLString& namespaceURI, const P
 				if (attributes.getQName(i) != "Name")
 				{
 					std::string value = attributes.getValue(i);
-					if (_convertBool && (value == "true" || value == "false"))	
+					if (_convertBool && (value == "true" || value == "false"))
 						value = Poco::toUpper(value);
 					sortedAttributes.addAttribute(attributes.getURI(i), attributes.getLocalName(i), attributes.getQName(i), attributes.getType(i), value);
 				}

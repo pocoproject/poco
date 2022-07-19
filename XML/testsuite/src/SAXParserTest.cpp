@@ -53,7 +53,7 @@ public:
 		}
 		return 0;
 	}
-	
+
 	void releaseInputSource(InputSource* pSource)
 	{
 		delete pSource->getByteStream();
@@ -253,7 +253,7 @@ void SAXParserTest::testRSS()
 	filter.setEntityResolver(&resolver);
 	parser.setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
 	parser.setFeature(XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES, true);
-	
+
 	std::istringstream istr(RSS);
 	Poco::FileOutputStream ostr("rss.xml");
 	XMLWriter writer(ostr, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
@@ -269,8 +269,8 @@ void SAXParserTest::testEncoding()
 {
 	SAXParser parser;
 	Poco::Latin9Encoding encoding;
-	parser.addEncoding("ISO-8859-15", &encoding); 
-	
+	parser.addEncoding("ISO-8859-15", &encoding);
+
 	std::istringstream istr(ENCODING);
 	std::ostringstream ostr;
 	XMLWriter writer(ostr, XMLWriter::WRITE_XML_DECLARATION, "ISO-8859-15", encoding);
@@ -279,7 +279,7 @@ void SAXParserTest::testEncoding()
 	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 	InputSource source(istr);
 	parser.parse(&source);
-	
+
 	std::string xml = ostr.str();
 	assertTrue (xml == ENCODING);
 }
@@ -398,7 +398,7 @@ const std::string SAXParserTest::ATTRIBUTES =
 	"</root>";
 
 
-const std::string SAXParserTest::CDATA = 
+const std::string SAXParserTest::CDATA =
 	"<data>\n"
 	"<![CDATA[\n"
 	"\tThe following <tag attr=\"value\">is inside a CDATA section</tag>.\n"
@@ -426,11 +426,11 @@ const std::string SAXParserTest::PROCESSING_INSTRUCTION =
 	"</html>";
 
 
-const std::string SAXParserTest::DTD = 
+const std::string SAXParserTest::DTD =
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	"<!DOCTYPE test SYSTEM \"test.dtd\">\n"
 	"<foo/>";
-	
+
 
 const std::string SAXParserTest::INTERNAL_ENTITY =
     "<!DOCTYPE sample [\n"
@@ -459,7 +459,7 @@ const std::string SAXParserTest::EXTERNAL_UNPARSED =
 	"<sample/>";
 
 
-const std::string SAXParserTest::EXTERNAL_PARSED = 
+const std::string SAXParserTest::EXTERNAL_PARSED =
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	"<!DOCTYPE test [\n"
 	"\t<!ENTITY include SYSTEM \"include.xml\">\n"
@@ -469,7 +469,7 @@ const std::string SAXParserTest::EXTERNAL_PARSED =
 	"</sample>\n";
 
 
-const std::string SAXParserTest::INCLUDE = 
+const std::string SAXParserTest::INCLUDE =
 	"<elem>\n"
 	"\tAn external entity.\n"
 	"</elem>\n";

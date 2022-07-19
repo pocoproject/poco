@@ -29,7 +29,7 @@ namespace MongoDB {
 
 class UpdateRequest: public RequestMessage
 	/// This request is used to update a document in a database
-	/// using the OP_UPDATE client request. 
+	/// using the OP_UPDATE client request.
 {
 public:
 	enum Flags
@@ -37,7 +37,7 @@ public:
 		UPDATE_DEFAULT = 0,
 			/// If set, the database will insert the supplied object into the
 			/// collection if no matching document is found.
-			
+
 		UPDATE_UPSERT = 1,
 			/// If set, the database will update all matching objects in the collection.
 			/// Otherwise only updates first matching doc.
@@ -50,9 +50,9 @@ public:
 	UpdateRequest(const std::string& collectionName, Flags flags = UPDATE_DEFAULT);
 		/// Creates the UpdateRequest.
 		///
-		/// The full collection name is the concatenation of the database 
-		/// name with the collection name, using a "." for the concatenation. For example, 
-		/// for the database "foo" and the collection "bar", the full collection name is 
+		/// The full collection name is the concatenation of the database
+		/// name with the collection name, using a "." for the concatenation. For example,
+		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
 	virtual ~UpdateRequest();

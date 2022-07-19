@@ -23,7 +23,7 @@
 #include <vector>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) 
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "File_WINCE.h"
 #else
@@ -103,7 +103,7 @@ public:
 	File& operator = (const Path& path);
 		/// Assignment operator.
 
-	void swap(File& file);
+	void swap(File& file) noexcept;
 		/// Swaps the file with another one.
 
 	const std::string& path() const;
@@ -312,7 +312,7 @@ inline bool File::operator >= (const File& file) const
 }
 
 
-inline void swap(File& f1, File& f2)
+inline void swap(File& f1, File& f2) noexcept
 {
 	f1.swap(f2);
 }

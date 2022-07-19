@@ -85,7 +85,7 @@ Clock& Clock::operator = (ClockVal tv)
 }
 
 
-void Clock::swap(Clock& timestamp)
+void Clock::swap(Clock& timestamp) noexcept
 {
 	std::swap(_clock, timestamp._clock);
 }
@@ -112,7 +112,7 @@ void Clock::update()
 	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cs);
 	clock_get_time(cs, &ts);
 	mach_port_deallocate(mach_task_self(), cs);
-	
+
 	_clock = ClockVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
 
 #elif defined(POCO_VXWORKS)
@@ -138,7 +138,7 @@ void Clock::update()
 
 	Poco::Timestamp now;
 	_clock = now.epochMicroseconds();
-	
+
 #endif
 }
 
@@ -164,7 +164,7 @@ Clock::ClockDiff Clock::accuracy()
 	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cs);
 	clock_get_attributes(cs, CLOCK_GET_TIME_RES, (clock_attr_t)&nanosecs, &n);
 	mach_port_deallocate(mach_task_self(), cs);
-	
+
 	ClockVal acc = nanosecs/1000;
 	return acc > 0 ? acc : 1;
 
@@ -186,18 +186,18 @@ Clock::ClockDiff Clock::accuracy()
 	struct timespec ts;
 	if (clock_getres(CLOCK_MONOTONIC, &ts))
 		throw SystemException("cannot get system clock");
-	
+
 	ClockVal acc = ClockVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
 	return acc > 0 ? acc : 1;
 
 #else
 
 	return 1000;
-	
+
 #endif
 }
 
-	
+
 bool Clock::monotonic()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -223,7 +223,7 @@ bool Clock::monotonic()
 #else
 
 	return false;
-	
+
 #endif
 }
 
