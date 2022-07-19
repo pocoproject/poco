@@ -26,6 +26,7 @@ public:
 	~SharedMemoryTest();
 
 	void testCreate();
+	void testCreateLarge();
 	void testCreateFromFile();
 
 	void setUp();

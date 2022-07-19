@@ -28,7 +28,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	_name(name),
 	_memHandle(INVALID_HANDLE_VALUE),
 	_fileHandle(INVALID_HANDLE_VALUE),
-	_size(static_cast<DWORD>(size)),
+	_size(size),
 	_mode(PAGE_READONLY),
 	_address(0)
 {
@@ -37,7 +37,15 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 
 	std::wstring utf16name;
 	UnicodeConverter::toUTF16(_name, utf16name);
-	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, 0, _size, utf16name.c_str());
+
+#ifdef _WIN64
+	const DWORD dwMaxSizeLow = static_cast<DWORD>(_size & 0xFFFFFFFFUL);
+	const DWORD dwMaxSizeHigh = static_cast<DWORD>((_size >> 32) & 0xFFFFFFFFUL);
+#else
+	const DWORD dwMaxSizeLow = static_cast<DWORD>(_size);
+	const DWORD dwMaxSizeHigh = 0UL;
+#endif
+	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
 
 	if (!_memHandle)
 	{
@@ -71,7 +79,7 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 	if (!file.exists() || !file.isFile())
 		throw FileNotFoundException(_name);
 
-	_size = static_cast<DWORD>(file.getSize());
+	_size = static_cast<size_t>(file.getSize());
 
 	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	DWORD fileMode  = GENERIC_READ;

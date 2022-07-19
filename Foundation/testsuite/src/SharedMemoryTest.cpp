@@ -37,6 +37,19 @@ void SharedMemoryTest::testCreate()
 	mem.end()[-1] = 'Z';
 }
 
+void SharedMemoryTest::testCreateLarge()
+{
+#ifdef _WIN64
+	const size_t size = 0x03FFFFFFFFULL;
+#else
+	const size_t size = 0xDFFFFFFFUL;
+#endif
+	SharedMemory mem("hiLarge", size, SharedMemory::AM_WRITE);
+	assertTrue(mem.end() - mem.begin() == size);
+	mem.begin()[0] = 'A';
+	mem.end()[-1] = 'Z';
+}
+
 
 void SharedMemoryTest::testCreateFromFile()
 {
@@ -88,6 +101,7 @@ CppUnit::Test* SharedMemoryTest::suite()
 
 #if !defined(POCO_NO_SHAREDMEMORY)
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreate);
+	CppUnit_addTest(pSuite, SharedMemoryTest, testCreateLarge);
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreateFromFile);
 #endif
 	return pSuite;

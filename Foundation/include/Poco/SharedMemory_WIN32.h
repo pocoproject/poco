@@ -74,11 +74,11 @@ private:
 	SharedMemoryImpl& operator = (const SharedMemoryImpl&);
 
 	std::string _name;
-	HANDLE  _memHandle;
-	HANDLE  _fileHandle;
-	DWORD   _size;
-	DWORD   _mode;
-	char*   _address;
+	HANDLE      _memHandle;
+	HANDLE      _fileHandle;
+	size_t      _size;
+	DWORD       _mode;
+	char*       _address;
 };
 
 
