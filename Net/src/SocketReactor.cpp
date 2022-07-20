@@ -94,14 +94,17 @@ void SocketReactor::run()
 		}
 		catch (Exception& exc)
 		{
+			onError(exc.code(), exc.displayText());
 			ErrorHandler::handle(exc);
 		}
 		catch (std::exception& exc)
 		{
+			onError(0, exc.what());
 			ErrorHandler::handle(exc);
 		}
 		catch (...)
 		{
+			onError(0, "unknown exception");
 			ErrorHandler::handle();
 		}
 	}
@@ -241,6 +244,12 @@ void SocketReactor::onShutdown()
 
 void SocketReactor::onBusy()
 {
+}
+
+
+void SocketReactor::onError(int code, const std::string& description)
+{
+	dispatch(new ErrorNotification(this, code, description));
 }
 
 

@@ -36,6 +36,7 @@ using Poco::Net::SocketNotification;
 using Poco::Net::ReadableNotification;
 using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
+using Poco::Net::ErrorNotification;
 using Poco::Net::ShutdownNotification;
 using Poco::Observer;
 using Poco::IllegalStateException;
@@ -294,12 +295,6 @@ namespace
 			reactor()->stop();
 		}
 
-		void onError(int error)
-		{
-			_failed = true;
-			reactor()->stop();
-		}
-
 		bool failed() const
 		{
 			return _failed;
@@ -479,7 +474,7 @@ void SocketReactorTest::testSocketConnectorFail()
 	assertTrue (!connector.failed());
 	assertTrue (!connector.shutdown());
 	reactor.run();
-	//assertTrue (connector.failed());
+	assertTrue (connector.failed());
 	assertTrue (connector.shutdown());
 }
 

@@ -123,9 +123,10 @@ public:
 	virtual ~SocketReactor();
 		/// Destroys the SocketReactor.
 
-	void run();
+	virtual void run();
 		/// Runs the SocketReactor. The reactor will run
 		/// until stop() is called (in a separate thread).
+		/// Can be overriden by inheriting classes.
 
 	void stop();
 		/// Stops the SocketReactor.
@@ -186,11 +187,11 @@ protected:
 		/// implementations.
 
 	virtual void onBusy();
-		/// Called when the SocketReactor is busy and at least one notification
-		/// has been dispatched.
-		///
-		/// Can be overridden by subclasses to perform additional
-		/// periodic tasks. The default implementation does nothing.
+		/// Must be overridden by subclasses (alongside the run() override) to perform
+		/// additional periodic tasks. The default implementation does nothing.
+
+	void onError(int code, const std::string& description);
+		/// Notifies all subscribers when the reactor loop throws an exception.
 
 	void dispatch(const Socket& socket, SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers
