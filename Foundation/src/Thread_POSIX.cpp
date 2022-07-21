@@ -15,9 +15,11 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Format.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
@@ -35,6 +37,8 @@
 	#include <unistd.h>
 	#include <sys/syscall.h>   /* For SYS_xxx definitions */
 #endif
+#include <iostream>
+
 
 //
 // Block SIGPIPE in main thread.
@@ -332,27 +336,30 @@ void ThreadImpl::sleepImpl(long milliseconds)
 		interval.tv_nsec = (milliseconds % 1000)*1000000;
 		pthread_delay_np(&interval);
 #elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
+	struct timespec expiration;
+	int rc = clock_gettime(CLOCK_MONOTONIC, &expiration);
+	if (rc == 0)
 	{
-		struct timespec ts;
-		ts.tv_sec  = (long) remainingTime.totalSeconds();
-		ts.tv_nsec = (long) remainingTime.useconds()*1000;
-		Poco::Timestamp start;
-		rc = ::nanosleep(&ts, 0);
-		if (rc < 0 && errno == EINTR)
+		Poco::UInt64 add = expiration.tv_nsec + (milliseconds * 1000000);
+		expiration.tv_nsec = add % 1000000000;
+		expiration.tv_sec += add / 1000000000;
+
+		do
 		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
+			rc = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &expiration, NULL);
+		} while (rc != 0 && errno == EINTR);
+
+		if (rc != 0)
+		{
+			throw Poco::SystemException(Poco::format("Thread::sleep(): clock_nanosleep() '%s' (%d) ms=%ld, tv_sec=%ld, tv_nsec=%ld",
+				Poco::Error::getMessage(rc), rc, milliseconds, expiration.tv_sec, expiration.tv_nsec));
 		}
 	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
+	else
+	{
+		throw Poco::SystemException(Poco::format("Thread::sleep(): clock_gettime(): '%s' (%d) ms=%ld, tv_sec=%ld, tv_nsec=%ld",
+				Poco::Error::getMessage(rc), rc, milliseconds, expiration.tv_sec, expiration.tv_nsec));
+	}
 #else
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
 	int rc;
