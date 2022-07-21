@@ -21,6 +21,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
+#include <thread>
+#include <chrono>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -317,15 +319,15 @@ inline bool Thread::isRunning() const
 }
 
 
-inline void Thread::sleep(long milliseconds)
-{
-	sleepImpl(milliseconds);
-}
-
-
 inline void Thread::yield()
 {
 	yieldImpl();
+}
+
+
+inline void Thread::sleep(long milliseconds)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 

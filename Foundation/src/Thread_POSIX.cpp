@@ -327,64 +327,6 @@ long ThreadImpl::currentOsTidImpl()
 #endif
 }
 
-void ThreadImpl::sleepImpl(long milliseconds)
-{
-#if defined(__digital__)
-		// This is specific to DECThreads
-		struct timespec interval;
-		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000;
-		pthread_delay_np(&interval);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
-	struct timespec expiration;
-	int rc = clock_gettime(CLOCK_MONOTONIC, &expiration);
-	if (rc == 0)
-	{
-		Poco::UInt64 add = expiration.tv_nsec + (milliseconds * 1000000);
-		expiration.tv_nsec = add % 1000000000;
-		expiration.tv_sec += add / 1000000000;
-
-		do
-		{
-			rc = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &expiration, NULL);
-		} while (rc != 0 && errno == EINTR);
-
-		if (rc != 0)
-		{
-			throw Poco::SystemException(Poco::format("Thread::sleep(): clock_nanosleep() '%s' (%d) ms=%ld, tv_sec=%ld, tv_nsec=%ld",
-				Poco::Error::getMessage(rc), rc, milliseconds, expiration.tv_sec, expiration.tv_nsec));
-		}
-	}
-	else
-	{
-		throw Poco::SystemException(Poco::format("Thread::sleep(): clock_gettime(): '%s' (%d) ms=%ld, tv_sec=%ld, tv_nsec=%ld",
-				Poco::Error::getMessage(rc), rc, milliseconds, expiration.tv_sec, expiration.tv_nsec));
-	}
-#else
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(0, NULL, NULL, NULL, &tv);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): select() failed");
-#endif
-}
-
 
 void* ThreadImpl::runnableEntry(void* pThread)
 {

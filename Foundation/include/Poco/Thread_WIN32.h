@@ -75,7 +75,6 @@ public:
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
@@ -152,12 +151,6 @@ inline int ThreadImpl::getMinOSPriorityImpl(int /* policy */)
 inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 {
 	return PRIO_HIGHEST_IMPL;
-}
-
-
-inline void ThreadImpl::sleepImpl(long milliseconds)
-{
-	Sleep(DWORD(milliseconds));
 }
 
 
