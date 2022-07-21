@@ -551,6 +551,7 @@
     <ClInclude Include="include\Poco\Util\IntValidator.h"/>
     <ClInclude Include="include\Poco\Util\JSONConfiguration.h"/>
     <ClInclude Include="include\Poco\Util\LayeredConfiguration.h"/>
+    <ClInclude Include="include\Poco\Util\LocalConfigurationView.h"/>
     <ClInclude Include="include\Poco\Util\LoggingConfigurator.h"/>
     <ClInclude Include="include\Poco\Util\LoggingSubsystem.h"/>
     <ClInclude Include="include\Poco\Util\MapConfiguration.h"/>
@@ -603,6 +604,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\LayeredConfiguration.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\LocalConfigurationView.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\LoggingConfigurator.cpp">

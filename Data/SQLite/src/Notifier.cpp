@@ -57,10 +57,10 @@ Notifier::~Notifier()
 bool Notifier::enableUpdate()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
-	
+
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), &sqliteUpdateCallbackFn, this))
 		_enabledEvents |= SQLITE_NOTIFY_UPDATE;
-	
+
 	return updateEnabled();
 }
 
@@ -68,10 +68,10 @@ bool Notifier::enableUpdate()
 bool Notifier::disableUpdate()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
-	
+
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::UpdateCallbackType) 0, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_UPDATE;
-	
+
 	return !updateEnabled();
 }
 
@@ -85,10 +85,10 @@ bool Notifier::updateEnabled() const
 bool Notifier::enableCommit()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
-	
+
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), &sqliteCommitCallbackFn, this))
 		_enabledEvents |= SQLITE_NOTIFY_COMMIT;
-	
+
 	return commitEnabled();
 }
 
@@ -96,10 +96,10 @@ bool Notifier::enableCommit()
 bool Notifier::disableCommit()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
-	
+
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::CommitCallbackType) 0, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_COMMIT;
-	
+
 	return !commitEnabled();
 }
 
@@ -113,10 +113,10 @@ bool Notifier::commitEnabled() const
 bool Notifier::enableRollback()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
-	
+
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), &sqliteRollbackCallbackFn, this))
 		_enabledEvents |= SQLITE_NOTIFY_ROLLBACK;
-	
+
 	return rollbackEnabled();
 }
 
@@ -127,7 +127,7 @@ bool Notifier::disableRollback()
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::RollbackCallbackType) 0, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_ROLLBACK;
-	
+
 	return !rollbackEnabled();
 }
 
@@ -154,7 +154,7 @@ void Notifier::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, c
 {
 	poco_check_ptr(pVal);
 	Notifier* pV = reinterpret_cast<Notifier*>(pVal);
-	
+
 	if (opCode == Utility::OPERATION_INSERT)
 	{
 		pV->_table = pTable;

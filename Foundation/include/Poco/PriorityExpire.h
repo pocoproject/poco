@@ -28,17 +28,17 @@ namespace Poco {
 
 template <class TArgs>
 class PriorityExpire: public AbstractPriorityDelegate<TArgs>
-	/// Decorator for AbstractPriorityDelegate adding automatic 
+	/// Decorator for AbstractPriorityDelegate adding automatic
 	/// expiring of registrations to AbstractPriorityDelegate.
 {
 public:
 	PriorityExpire(const AbstractPriorityDelegate<TArgs>& p, Timestamp::TimeDiff expireMilliSec):
 		AbstractPriorityDelegate<TArgs>(p),
-		_pDelegate(static_cast<AbstractPriorityDelegate<TArgs>*>(p.clone())), 
+		_pDelegate(static_cast<AbstractPriorityDelegate<TArgs>*>(p.clone())),
 		_expire(expireMilliSec*1000)
 	{
 	}
-	
+
 	PriorityExpire(const PriorityExpire& expire):
 		AbstractPriorityDelegate<TArgs>(expire),
 		_pDelegate(static_cast<AbstractPriorityDelegate<TArgs>*>(expire._pDelegate->clone())),
@@ -51,7 +51,7 @@ public:
 	{
 		delete _pDelegate;
 	}
-	
+
 	PriorityExpire& operator = (const PriorityExpire& expire)
 	{
 		if (&expire != this)
@@ -62,7 +62,7 @@ public:
 			this->_expire       = expire._expire;
 			this->_creationTime = expire._creationTime;
 		}
-		return *this; 
+		return *this;
 	}
 
 	bool notify(const void* sender, TArgs& arguments)

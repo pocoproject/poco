@@ -67,6 +67,14 @@
 #endif // POCO_NET_NO_IPv6, POCO_HAVE_IPv6
 
 
+// Default to enabled local socket support if not explicitly disabled
+#if !defined(POCO_NET_NO_UNIX_SOCKET) && !defined (POCO_HAVE_UNIX_SOCKET)
+	#define POCO_HAVE_UNIX_SOCKET
+#elif defined(POCO_NET_NO_UNIX_SOCKET) && defined (POCO_HAVE_UNIX_SOCKET)
+	#undef POCO_HAVE_UNIX_SOCKET
+#endif // POCO_NET_NO_UNIX_SOCKET, POCO_HAVE_UNIX_SOCKET
+
+
 namespace Poco {
 namespace Net {
 
@@ -121,6 +129,18 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 //
 #if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 	#define POCO_NET_HAS_INTERFACE
+#endif
+
+
+#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_WINDOWS_NT)
+	#define POCO_HAVE_FD_EPOLL 1
+#endif
+
+
+#if defined(POCO_OS_FAMILY_BSD)
+	#ifndef POCO_HAVE_FD_POLL
+		#define POCO_HAVE_FD_POLL 1
+	#endif
 #endif
 
 

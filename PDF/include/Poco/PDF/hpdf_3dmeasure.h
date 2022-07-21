@@ -34,7 +34,7 @@ HPDF_3DC3DMeasure_New(HPDF_MMgr mmgr,
 		              HPDF_Point3D    firstanchorpoint,
 		              HPDF_Point3D    textanchorpoint
 		);
-             
+
 HPDF_3DMeasure
 HPDF_PD33DMeasure_New(HPDF_MMgr mmgr,
 					  HPDF_Xref xref,

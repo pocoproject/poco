@@ -99,6 +99,6 @@ CppUnit::Test* DigestStreamTest::suite()
 	CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream1);
 	CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream2);
 	CppUnit_addTest(pSuite, DigestStreamTest, testToFromHex);
-	
+
 	return pSuite;
 }

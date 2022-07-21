@@ -45,20 +45,20 @@ public:
 	};
 
 	DeleteRequest(const std::string& collectionName, Flags flags = DELETE_DEFAULT);
-		/// Creates a DeleteRequest for the given collection using the given flags. 
+		/// Creates a DeleteRequest for the given collection using the given flags.
 		///
-		/// The full collection name is the concatenation of the database 
-		/// name with the collection name, using a "." for the concatenation. For example, 
-		/// for the database "foo" and the collection "bar", the full collection name is 
+		/// The full collection name is the concatenation of the database
+		/// name with the collection name, using a "." for the concatenation. For example,
+		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
 	DeleteRequest(const std::string& collectionName, bool justOne);
 		/// Creates a DeleteRequest for the given collection.
-		/// 
+		///
 		/// The full collection name is the concatenation of the database
 		/// name with the collection name, using a "." for the concatenation. For example,
 		/// for the database "foo" and the collection "bar", the full collection name is
-		/// "foo.bar". 
+		/// "foo.bar".
 		///
 		/// If justOne is true, only the first matching document will
 		/// be removed (the same as using flag DELETE_SINGLE_REMOVE).

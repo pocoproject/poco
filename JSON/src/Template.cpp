@@ -303,8 +303,8 @@ class IncludePart: public Part
 {
 public:
 
-	IncludePart(const Path& parentPath, const Path& path): 
-		Part(), 
+	IncludePart(const Path& parentPath, const Path& path):
+		Part(),
 		_path(path)
 	{
 		// When the path is relative, try to make it absolute based
@@ -347,16 +347,16 @@ private:
 };
 
 
-Template::Template(const Path& templatePath): 
-	_parts(0), 
-	_currentPart(0), 
+Template::Template(const Path& templatePath):
+	_parts(0),
+	_currentPart(0),
 	_templatePath(templatePath)
 {
 }
 
 
 Template::Template():
-	_parts(0), 
+	_parts(0),
 	_currentPart(0)
 {
 }

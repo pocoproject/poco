@@ -35,7 +35,7 @@ using Poco::AutoPtr;
 Poco::FastMutex ICMPClientTest::_mutex;
 
 
-ICMPClientTest::ICMPClientTest(const std::string& name): 
+ICMPClientTest::ICMPClientTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
 }
@@ -59,7 +59,7 @@ void ICMPClientTest::testPing()
 	assertTrue (icmpClient.ping("10.0.2.15", 4) > 0);
 	assertTrue (icmpClient.ping("10.0.2.2", 4) > 0);
 #else
-	assertTrue (icmpClient.ping("www.appinf.com", 4) > 0);
+	assertTrue (icmpClient.ping("github.com", 4) > 0);
 
 	// warning: may fail depending on the existence of the addresses at test site
 	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
@@ -86,7 +86,7 @@ void ICMPClientTest::testBigPing()
 	assertTrue (icmpClient.ping("10.0.2.15", 4) > 0);
 	assertTrue (icmpClient.ping("10.0.2.2", 4) > 0);
 #else
-	assertTrue (icmpClient.ping("www.appinf.com", 4) > 0);
+	assertTrue (icmpClient.ping("github.com", 4) > 0);
 
 	// warning: may fail depending on the existence of the addresses at test site
 	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
@@ -132,8 +132,8 @@ void ICMPClientTest::onBegin(const void* pSender, ICMPEventArgs& args)
 {
 	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
-	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " 
-		<< args.dataSize() << " bytes of data:" 
+	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with "
+		<< args.dataSize() << " bytes of data:"
 		<< std::endl << "-------------------------------------------------------" << std::endl;
 	std::cout << os.str() << std::endl;
 }
@@ -144,7 +144,7 @@ void ICMPClientTest::onReply(const void* pSender, ICMPEventArgs& args)
 	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << "Reply from " << args.hostAddress()
-		<< " bytes=" << args.dataSize() 
+		<< " bytes=" << args.dataSize()
 		<< " time=" << args.replyTime() << "ms"
 		<< " TTL=" << args.ttl();
 	std::cout << os.str() << std::endl;
@@ -169,8 +169,8 @@ void ICMPClientTest::onEnd(const void* pSender, ICMPEventArgs& args)
 		<< std::endl << "Packets: Sent=" << args.sent() << ", Received=" << received
 		<< " Lost=" << args.repetitions() - received << " (" << 100.0 - args.percent() << "% loss),"
 		<< std::endl << "Approximate round trip times in milliseconds: " << std::endl
-		<< "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()  
-		<< "ms, Average=" << args.avgRTT() << "ms" 
+		<< "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()
+		<< "ms, Average=" << args.avgRTT() << "ms"
 		<< std::endl << "-----------------------------------------------" << std::endl;
 	std::cout << os.str() << std::endl;
 }

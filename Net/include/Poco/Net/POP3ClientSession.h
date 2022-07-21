@@ -44,14 +44,14 @@ public:
 	{
 		POP3_PORT = 110
 	};
-	
+
 	struct MessageInfo
 		/// Information returned by listMessages().
 	{
 		int id;
 		int size;
 	};
-	
+
 	using MessageInfoVec = std::vector<MessageInfo>;
 
 	explicit POP3ClientSession(const StreamSocket& socket);
@@ -68,7 +68,7 @@ public:
 
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket read operations.
-		
+
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket read operations.
 
@@ -80,7 +80,7 @@ public:
 		/// NetException in case of a general network communication failure.
 
 	void close();
-		/// Sends a QUIT command and closes the connection to the server.	
+		/// Sends a QUIT command and closes the connection to the server.
 		///
 		/// Throws a POP3Exception in case of a POP3-specific error, or a
 		/// NetException in case of a general network communication failure.
@@ -172,7 +172,7 @@ public:
 
 protected:
 	static bool isPositive(const std::string& response);
-	
+
 private:
 	DialogSocket _socket;
 	bool         _isOpen;

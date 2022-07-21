@@ -43,18 +43,18 @@ class Foundation_API Timestamp
 	/// based and thus independent of the timezone
 	/// in effect on the system.
 	///
-	/// The internal reference time is the Unix epoch, 
+	/// The internal reference time is the Unix epoch,
 	/// midnight, January 1, 1970.
 {
 public:
-	using TimeVal = Int64; 
+	using TimeVal = Int64;
 		/// Monotonic UTC time value in microsecond resolution,
 		/// with base time midnight, January 1, 1970.
-		
-	using UtcTimeVal = Int64; 
+
+	using UtcTimeVal = Int64;
 		/// Monotonic UTC time value in 100 nanosecond resolution,
 		/// with base time midnight, October 15, 1582.
-		
+
 	using TimeDiff = Int64;
 		/// Difference between two TimeVal values in microseconds.
 
@@ -63,23 +63,23 @@ public:
 
 	Timestamp();
 		/// Creates a timestamp with the current time.
-		
+
 	Timestamp(TimeVal tv);
 		/// Creates a timestamp from the given time value
 		/// (microseconds since midnight, January 1, 1970).
-		
+
 	Timestamp(const Timestamp& other);
 		/// Copy constructor.
-		
+
 	~Timestamp();
 		/// Destroys the timestamp
-		
+
 	Timestamp& operator = (const Timestamp& other);
 	Timestamp& operator = (TimeVal tv);
-	
-	void swap(Timestamp& timestamp);
+
+	void swap(Timestamp& timestamp) noexcept;
 		/// Swaps the Timestamp with another one.
-	
+
 	void update();
 		/// Updates the Timestamp with the current time.
 
@@ -89,7 +89,7 @@ public:
 	bool operator >= (const Timestamp& ts) const;
 	bool operator <  (const Timestamp& ts) const;
 	bool operator <= (const Timestamp& ts) const;
-	
+
 	Timestamp  operator +  (TimeDiff d) const;
 	Timestamp  operator +  (const Timespan& span) const;
 	Timestamp  operator -  (TimeDiff d) const;
@@ -99,25 +99,25 @@ public:
 	Timestamp& operator += (const Timespan& span);
 	Timestamp& operator -= (TimeDiff d);
 	Timestamp& operator -= (const Timespan& span);
-	
+
 	std::time_t epochTime() const;
 		/// Returns the timestamp expressed in time_t.
 		/// time_t base time is midnight, January 1, 1970.
 		/// Resolution is one second.
-		
+
 	UtcTimeVal utcTime() const;
 		/// Returns the timestamp expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
-	
+
 	TimeVal epochMicroseconds() const;
 		/// Returns the timestamp expressed in microseconds
 		/// since the Unix epoch, midnight, January 1, 1970.
-	
+
 	TimeDiff elapsed() const;
 		/// Returns the time elapsed since the time denoted by
 		/// the timestamp. Equivalent to Timestamp() - *this.
-	
+
 	bool isElapsed(TimeDiff interval) const;
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the timestamp.
@@ -126,15 +126,15 @@ public:
 		/// Returns the raw time value.
 		///
 		/// Same as epochMicroseconds().
-	
+
 	static Timestamp fromEpochTime(std::time_t t);
 		/// Creates a timestamp from a std::time_t.
-		
+
 	static Timestamp fromUtcTime(UtcTimeVal val);
 		/// Creates a timestamp from a UTC time value
 		/// (100 nanosecond intervals since midnight,
 		/// October 15, 1582).
-		
+
 	static TimeDiff resolution();
 		/// Returns the resolution in units per second.
 		/// Since the timestamp has microsecond resolution,
@@ -260,7 +260,7 @@ inline Timestamp::TimeDiff Timestamp::resolution()
 }
 
 
-inline void swap(Timestamp& s1, Timestamp& s2)
+inline void swap(Timestamp& s1, Timestamp& s2) noexcept
 {
 	s1.swap(s2);
 }

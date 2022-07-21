@@ -42,24 +42,24 @@ class Activity: public Runnable
 	/// be stopped at any time. However, to make stopping
 	/// an activity work, the method implementing the
 	/// activity has to check periodically whether it
-	/// has been requested to stop, and if so, return. 
+	/// has been requested to stop, and if so, return.
 	/// Activities are stopped before the object they belong to is
 	/// destroyed. Methods implementing activities cannot have arguments
-	/// or return values. 
+	/// or return values.
 	///
 	/// Activity objects are used as follows:
 	///
 	///     class ActiveObject
 	///     {
 	///     public:
-	///         ActiveObject(): 
+	///         ActiveObject():
 	///             _activity(this, &ActiveObject::runActivity)
 	///         {
 	///             ...
 	///         }
-	///   
+	///
 	///         ...
-	///  
+	///
 	///     protected:
 	///         void runActivity()
 	///         {
@@ -88,7 +88,7 @@ public:
 	{
 		poco_check_ptr (pOwner);
 	}
-	
+
 	~Activity()
 		/// Stops and destroys the activity.
 	{
@@ -102,7 +102,7 @@ public:
 			poco_unexpected();
 		}
 	}
-	
+
 	void start()
 		/// Starts the activity by acquiring a
 		/// thread for it from the default thread pool.
@@ -113,7 +113,7 @@ public:
 	void start(ThreadPool& pool)
 	{
 		FastMutex::ScopedLock lock(_mutex);
-		
+
 		if (!_running)
 		{
 			_done.reset();
@@ -130,19 +130,20 @@ public:
 			}
 		}
 	}
-	
+
 	void stop()
 		/// Requests to stop the activity.
 	{
 		_stopped = true;
 	}
-	
+
 	void wait()
 		/// Waits for the activity to complete.
 	{
 		if (_running)
 		{
 			_done.wait();
+			_running = false;
 		}
 	}
 
@@ -154,15 +155,16 @@ public:
 		if (_running)
 		{
 			_done.wait(milliseconds);
+			_running = false;
 		}
 	}
-	
+
 	bool isStopped() const
 		/// Returns true if the activity has been requested to stop.
 	{
 		return _stopped;
 	}
-	
+
 	bool isRunning() const
 		/// Returns true if the activity is running.
 	{
@@ -178,14 +180,12 @@ protected:
 		}
 		catch (...)
 		{
-			_running = false;
 			_done.set();
 			throw;
 		}
-		_running = false;
 		_done.set();
 	}
-	
+
 private:
 	Activity();
 	Activity(const Activity&);

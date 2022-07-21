@@ -287,7 +287,7 @@ void RedisTest::testDECR()
 
 	try
 	{
-		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
+		_redis.execute<Poco::Int64>(decr);
 		fail("This must fail");
 	}
 	catch (RedisException& e)

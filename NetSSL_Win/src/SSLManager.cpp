@@ -129,7 +129,7 @@ Context::Ptr SSLManager::defaultClientContext()
 		try
 		{
 			initDefaultContext(false);
-		} 
+		}
 		catch (Poco::IllegalStateException&)
 		{
 			_ptrClientCertificateHandler = new RejectCertificateHandler(false);
@@ -221,7 +221,7 @@ void SSLManager::initDefaultContext(bool server)
 	if (trustRoots) options |= Context::OPT_TRUST_ROOTS_WIN_CERT_STORE;
 	if (useMachineStore) options |= Context::OPT_USE_MACHINE_STORE;
 	if (useStrongCrypto) options |= Context::OPT_USE_STRONG_CRYPTO;
-	if (!certPath.empty()) 
+	if (!certPath.empty())
 	{
 		options |= Context::OPT_LOAD_CERT_FROM_FILE;
 		certName = certPath;
@@ -270,7 +270,7 @@ void SSLManager::initPassphraseHandler(bool server)
 {
 	if (server && _ptrServerPassphraseHandler) return;
 	if (!server && _ptrClientPassphraseHandler) return;
-	
+
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 	Poco::Util::AbstractConfiguration& config = appConfig();
 
@@ -352,7 +352,7 @@ void SSLManager::loadSecurityLibrary()
 #if defined(_WIN32_WCE)
 	dllPath = L"Secur32.dll";
 #else
-	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT 
+	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT
 		&& VerInfo.dwMajorVersion == 4)
 	{
 		dllPath = L"Security.dll";
@@ -432,7 +432,7 @@ Poco::Util::AbstractConfiguration& SSLManager::appConfig()
 void initializeSSL()
 {
 }
-	
+
 
 void uninitializeSSL()
 {

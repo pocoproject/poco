@@ -30,8 +30,8 @@ namespace Poco {
 
 
 class Foundation_API Condition
-	/// A Condition is a synchronization object used to block a thread 
-	/// until a particular condition is met. 
+	/// A Condition is a synchronization object used to block a thread
+	/// until a particular condition is met.
 	/// A Condition object is always used in conjunction with
 	/// a Mutex (or FastMutex) object.
 	///
@@ -43,16 +43,16 @@ class Foundation_API Condition
 public:
 	Condition();
 		/// Creates the Condition.
-	
+
 	~Condition();
 		/// Destroys the Condition.
-	
+
 	template <class Mtx>
 	void wait(Mtx& mutex)
 		/// Unlocks the mutex (which must be locked upon calling
 		/// wait()) and waits until the Condition is signalled.
 		///
-		/// The given mutex will be locked again upon 
+		/// The given mutex will be locked again upon
 		/// leaving the function, even in case of an exception.
 	{
 		ScopedUnlock<Mtx> unlock(mutex, false);
@@ -64,13 +64,13 @@ public:
 		}
 		event.wait();
 	}
-	
+
 	template <class Mtx>
 	void wait(Mtx& mutex, long milliseconds)
 		/// Unlocks the mutex (which must be locked upon calling
 		/// wait()) and waits for the given time until the Condition is signalled.
 		///
-		/// The given mutex will be locked again upon successfully leaving the 
+		/// The given mutex will be locked again upon successfully leaving the
 		/// function, even in case of an exception.
 		///
 		/// Throws a TimeoutException if the Condition is not signalled
@@ -79,13 +79,13 @@ public:
 		if (!tryWait(mutex, milliseconds))
 			throw TimeoutException();
 	}
-	
+
 	template <class Mtx>
 	bool tryWait(Mtx& mutex, long milliseconds)
 		/// Unlocks the mutex (which must be locked upon calling
 		/// tryWait()) and waits for the given time until the Condition is signalled.
 		///
-		/// The given mutex will be locked again upon leaving the 
+		/// The given mutex will be locked again upon leaving the
 		/// function, even in case of an exception.
 		///
 		/// Returns true if the Condition has been signalled
@@ -106,7 +106,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	void signal();
 		/// Signals the Condition and allows one waiting thread
 		/// to continue execution.
@@ -119,13 +119,13 @@ protected:
 	void enqueue(Event& event);
 	void dequeue();
 	void dequeue(Event& event);
-	
+
 private:
 	Condition(const Condition&);
 	Condition& operator = (const Condition&);
-	
+
 	typedef std::deque<Event*> WaitQueue;
-	
+
 	FastMutex _mutex;
 	WaitQueue _waitQueue;
 };

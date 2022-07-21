@@ -49,7 +49,7 @@ public:
 	~SimpleRowFormatter();
 		/// Destroys the SimpleRowFormatter.
 
-	void swap(SimpleRowFormatter& other);
+	void swap(SimpleRowFormatter& other) noexcept;
 		/// Swaps the row formatter with another one.
 
 	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames);
@@ -66,7 +66,7 @@ public:
 
 	std::streamsize getColumnWidth() const;
 		/// Returns the column width.
-		
+
 	std::streamsize getSpacing() const;
 		/// Returns the spacing.
 
@@ -109,9 +109,13 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
 
 namespace std
 {
+	// Note: for an unknown reason, clang refuses to compile this function as noexcept
 	template<>
-	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1, 
+	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1,
 		Poco::Data::SimpleRowFormatter& s2)
+#ifndef POCO_COMPILER_CLANG
+		noexcept
+#endif
 		/// Full template specalization of std:::swap for SimpleRowFormatter
 	{
 		s1.swap(s2);

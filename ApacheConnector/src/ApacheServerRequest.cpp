@@ -16,10 +16,10 @@
 
 
 ApacheServerRequest::ApacheServerRequest(
-	ApacheRequestRec* pApacheRequest, 
-	const char* serverName, 
-	int serverPort, 
-	const char* clientName, 
+	ApacheRequestRec* pApacheRequest,
+	const char* serverName,
+	int serverPort,
+	const char* clientName,
 	int clientPort):
 	_pApacheRequest(pApacheRequest),
     _pResponse(0),

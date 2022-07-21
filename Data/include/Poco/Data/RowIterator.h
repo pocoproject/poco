@@ -98,7 +98,7 @@ public:
 		/// Returns a copy the RowIterator backed by diff positions.
 		/// Throws RangeException if diff is larger than current position.
 
-	void swap(RowIterator& other);
+	void swap(RowIterator& other) noexcept;
 		/// Swaps the RowIterator with another one.
 
 private:

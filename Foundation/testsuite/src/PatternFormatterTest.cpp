@@ -44,12 +44,12 @@ void PatternFormatterTest::testPatternFormatter()
 	msg.setTime(DateTime(2005, 1, 1, 14, 30, 15, 500).timestamp());
 	msg.setSourceFile(__FILE__);
 	msg["testParam"] = "Test Parameter";
-	
+
 	std::string result;
 	fmt.setProperty("pattern", "%Y-%m-%dT%H:%M:%S [%s] %p: %t");
 	fmt.format(msg, result);
 	assertTrue (result == "2005-01-01T14:30:15 [TestSource] Error: Test message text");
-	
+
 	result.clear();
 	fmt.setProperty("pattern", "%w, %e %b %y %H:%M:%S.%i [%s:%I:%T] %q: %t");
 	fmt.format(msg, result);
@@ -60,14 +60,14 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.format(msg, result);
 	assertTrue (result.find("2005-01-01 14:30:15 [") == 0);
 	assertTrue (result.find(":TestSource]3-Test message text") != std::string::npos);
-	
+
 	result.clear();
 	assertTrue (fmt.getProperty("times") == "UTC");
 	fmt.setProperty("times", "local");
 	fmt.format(msg, result);
 	assertTrue (result.find("2005-01-01 ") == 0);
 	assertTrue (result.find(":TestSource]3-Test message text") != std::string::npos);
-	
+
 	result.clear();
 	fmt.setProperty("pattern", "%[testParam]");
 	fmt.format(msg, result);

@@ -21,8 +21,8 @@
 class ODBCMySQLTest: public ODBCTest
 	/// MySQL ODBC test class
 	/// Tested:
-	/// 
-	/// Driver          | DB                        | OS                                        | Driver Manager 
+	///
+	/// Driver          | DB                        | OS                                        | Driver Manager
 	/// ----------------+---------------------------+-------------------------------------------+---------------------
 	/// 03.51.12.00     | MySQL 5.0.27-community-nt | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0
 	///  3.51.11.-6     | MySQL 5.0.27-community-nt | Ubuntu 7.04 (2.6.20-15-generic #2 SMP)    | unixODBC 2.2.11.-13
@@ -41,7 +41,7 @@ public:
 	void testStoredFunction();
 
 	void testNull();
-	
+
 	void testMultipleResults();
 	void testFilter();
 

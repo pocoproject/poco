@@ -46,13 +46,13 @@ var CollapsibleLists =
             }
 
           }
-          
+
           var id = getParameterByName('expand');
           if (id){
-          
+
              var node = document.getElementById(id);
              if (node){
-             
+
                 expand(node);
              }
           }
@@ -101,9 +101,9 @@ var CollapsibleLists =
         }
 
       };
-      
+
       /* Expands a node.
-       * 
+       *
        * node - the node containing the unordered list elements
        */
       function expand(node){
@@ -186,13 +186,13 @@ var CollapsibleLists =
           node.className += ' collapsibleList' + (open ? 'Open' : 'Closed');
         }
       }
-      
+
       /* Get a URL query string parameter.
        *
        * name - the parameter name
        */
       function getParameterByName(name){
-      
+
          name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
          var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
              results = regex.exec(location.search);

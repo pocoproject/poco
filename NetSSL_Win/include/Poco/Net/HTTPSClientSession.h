@@ -74,7 +74,7 @@ public:
 	{
 		HTTPS_PORT = 443
 	};
-	
+
 	HTTPSClientSession();
 		/// Creates an unconnected HTTPSClientSession.
 
@@ -122,25 +122,25 @@ public:
 	~HTTPSClientSession();
 		/// Destroys the HTTPSClientSession and closes
 		/// the underlying socket.
-	
+
 	bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
-		
+
 	X509Certificate serverCertificate();
 		/// Returns the server's certificate.
 		///
 		/// The certificate is available after the first request has been sent.
-		
+
 	Session::Ptr sslSession();
-		/// Returns the SSL Session object for the current 
+		/// Returns the SSL Session object for the current
 		/// connection, if session caching has been enabled for
-		/// the HTTPSClientSession's Context. A null pointer is 
+		/// the HTTPSClientSession's Context. A null pointer is
 		/// returned otherwise.
 		///
 		/// The Session object can be obtained after the first request has
 		/// been sent.
-		
+
 	// HTTPSession
 	void abort();
 
@@ -153,7 +153,7 @@ protected:
 private:
 	HTTPSClientSession(const HTTPSClientSession&);
 	HTTPSClientSession& operator = (const HTTPSClientSession&);
-	
+
 	Context::Ptr _pContext;
 	Session::Ptr _pSession;
 };

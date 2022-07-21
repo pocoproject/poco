@@ -25,10 +25,10 @@ class ApacheServerRequest: public Poco::Net::HTTPServerRequest
 {
 public:
 	ApacheServerRequest(
-		ApacheRequestRec* pApacheRequest, 
-		const char* serverName, 
-		int serverPort, 
-		const char* clientName, 
+		ApacheRequestRec* pApacheRequest,
+		const char* serverName,
+		int serverPort,
+		const char* clientName,
 		int clientPort);
 		/// Creates a new ApacheServerRequest.
 
@@ -73,7 +73,7 @@ private:
 	ApacheInputStream*       _pStream;
 	Poco::Net::SocketAddress _serverAddress;
 	Poco::Net::SocketAddress _clientAddress;
-	
+
 	friend class ApacheServerResponse;
 };
 
@@ -84,7 +84,7 @@ private:
 inline std::istream& ApacheServerRequest::stream()
 {
 	poco_check_ptr (_pStream);
-	
+
 	return *_pStream;
 }
 

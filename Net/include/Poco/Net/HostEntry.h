@@ -36,10 +36,10 @@ class Net_API HostEntry
 public:
 	using AliasList = std::vector<std::string>;
 	using AddressList = std::vector<IPAddress>;
-	
+
 	HostEntry();
 		/// Creates an empty HostEntry.
-		
+
 	HostEntry(struct hostent* entry);
 		/// Creates the HostEntry from the data in a hostent structure.
 
@@ -58,8 +58,8 @@ public:
 	HostEntry& operator = (const HostEntry& entry);
 		/// Assigns another HostEntry.
 
-	void swap(HostEntry& hostEntry);
-		/// Swaps the HostEntry with another one.	
+	void swap(HostEntry& hostEntry) noexcept;
+		/// Swaps the HostEntry with another one.
 
 	~HostEntry();
 		/// Destroys the HostEntry.
@@ -111,7 +111,7 @@ inline const HostEntry::AddressList& HostEntry::addresses() const
 }
 
 
-inline void swap(HostEntry& h1, HostEntry& h2)
+inline void swap(HostEntry& h1, HostEntry& h2) noexcept
 {
 	h1.swap(h2);
 }

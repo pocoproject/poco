@@ -37,7 +37,7 @@ class Foundation_API DateTime
 	/// UTC, Julian day and Gregorian calendar dates.
 	///
 	/// The date and time stored in a DateTime is always in UTC
-	/// (Coordinated Universal Time) and thus independent of the 
+	/// (Coordinated Universal Time) and thus independent of the
 	/// timezone in effect on the system.
 	///
 	/// Conversion calculations are based on algorithms
@@ -45,7 +45,7 @@ class Foundation_API DateTime
 	/// http://vsg.cape.com/~pbaum/date/date0.htm
 	///
 	/// Internally, this class stores a date/time in two
-	/// forms (UTC and broken down) for performance reasons. Only use 
+	/// forms (UTC and broken down) for performance reasons. Only use
 	/// this class for conversions between date/time representations.
 	/// Use the Timestamp class for everything else.
 	///
@@ -77,7 +77,7 @@ public:
 		NOVEMBER,
 		DECEMBER
 	};
-	
+
 	enum DaysOfWeek
 		/// Symbolic names for week day numbers (0 to 6).
 	{
@@ -99,7 +99,7 @@ public:
 	DateTime(const Timestamp& timestamp);
 		/// Creates a DateTime for the date and time given in
 		/// a Timestamp.
-		
+
 	DateTime(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Creates a DateTime for the given Gregorian date and time.
 		///   * year is from 0 to 9999.
@@ -129,7 +129,7 @@ public:
 
 	DateTime& operator = (const DateTime& dateTime);
 		/// Assigns another DateTime.
-		
+
 	DateTime& operator = (const Timestamp& timestamp);
 		/// Assigns a Timestamp.
 
@@ -149,66 +149,66 @@ public:
 		///
 		/// Throws an InvalidArgumentException if an argument date is out of range.
 
-	void swap(DateTime& dateTime);
+	void swap(DateTime& dateTime) noexcept;
 		/// Swaps the DateTime with another one.
 
 	int year() const;
 		/// Returns the year.
-		
+
 	int month() const;
 		/// Returns the month (1 to 12).
-	
+
 	int week(int firstDayOfWeek = MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
-		/// The returned week number will be from 0 to 53. Week number 1 is the week 
+		/// The returned week number will be from 0 to 53. Week number 1 is the week
 		/// containing January 4. This is in accordance to ISO 8601.
-		/// 
+		///
 		/// The following example assumes that firstDayOfWeek is MONDAY. For 2005, which started
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
 		///
 		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
-	
+
 	int day() const;
 		/// Returns the day within the month (1 to 31).
-		
+
 	int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
 		/// 0 = Sunday, 1 = Monday, ..., 6 = Saturday).
-	
+
 	int dayOfYear() const;
 		/// Returns the number of the day in the year.
 		/// January 1 is 1, February 1 is 32, etc.
-	
+
 	int hour() const;
 		/// Returns the hour (0 to 23).
-		
+
 	int hourAMPM() const;
 		/// Returns the hour (0 to 12).
-	
+
 	bool isAM() const;
 		/// Returns true if hour < 12;
 
 	bool isPM() const;
 		/// Returns true if hour >= 12.
-		
+
 	int minute() const;
 		/// Returns the minute (0 to 59).
-		
+
 	int second() const;
 		/// Returns the second (0 to 59).
-		
+
 	int millisecond() const;
 		/// Returns the millisecond (0 to 999)
-	
+
 	int microsecond() const;
 		/// Returns the microsecond (0 to 999)
-	
+
 	double julianDay() const;
 		/// Returns the julian day for the date and time.
-		
+
 	Timestamp timestamp() const;
 		/// Returns the date and time expressed as a Timestamp.
 
@@ -217,12 +217,12 @@ public:
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
 
-	bool operator == (const DateTime& dateTime) const;	
-	bool operator != (const DateTime& dateTime) const;	
-	bool operator <  (const DateTime& dateTime) const;	
-	bool operator <= (const DateTime& dateTime) const;	
-	bool operator >  (const DateTime& dateTime) const;	
-	bool operator >= (const DateTime& dateTime) const;	
+	bool operator == (const DateTime& dateTime) const;
+	bool operator != (const DateTime& dateTime) const;
+	bool operator <  (const DateTime& dateTime) const;
+	bool operator <= (const DateTime& dateTime) const;
+	bool operator >  (const DateTime& dateTime) const;
+	bool operator >= (const DateTime& dateTime) const;
 
 	DateTime  operator +  (const Timespan& span) const;
 	DateTime  operator -  (const Timespan& span) const;
@@ -256,14 +256,14 @@ public:
 protected:
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
-	
+
 	static double toJulianDay(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Computes the Julian day for a Gregorian calendar date and time.
 		/// See <http://vsg.cape.com/~pbaum/date/jdimp.htm>, section 2.3.1 for the algorithm.
-	
+
 	static Timestamp::UtcTimeVal toUtcTime(double julianDay);
 		/// Computes the UTC time for a Julian day.
-		
+
 	void computeGregorian(double julianDay);
 		/// Computes the Gregorian date for the given Julian day.
 		/// See <http://vsg.cape.com/~pbaum/date/injdimp.htm>, section 3.3.1 for the algorithm.
@@ -323,19 +323,19 @@ inline int DateTime::year() const
 	return _year;
 }
 
-	
+
 inline int DateTime::month() const
 {
 	return _month;
 }
 
-	
+
 inline int DateTime::day() const
 {
 	return _day;
 }
 
-	
+
 inline int DateTime::hour() const
 {
 	return _hour;
@@ -364,19 +364,19 @@ inline bool DateTime::isPM() const
 	return _hour >= 12;
 }
 
-	
+
 inline int DateTime::minute() const
 {
 	return _minute;
 }
 
-	
+
 inline int DateTime::second() const
 {
 	return _second;
 }
 
-	
+
 inline int DateTime::millisecond() const
 {
 	return _millisecond;
@@ -395,13 +395,13 @@ inline bool DateTime::operator == (const DateTime& dateTime) const
 }
 
 
-inline bool DateTime::operator != (const DateTime& dateTime) const	
+inline bool DateTime::operator != (const DateTime& dateTime) const
 {
 	return _utcTime != dateTime._utcTime;
 }
 
 
-inline bool DateTime::operator <  (const DateTime& dateTime) const	
+inline bool DateTime::operator <  (const DateTime& dateTime) const
 {
 	return _utcTime < dateTime._utcTime;
 }
@@ -419,7 +419,7 @@ inline bool DateTime::operator >  (const DateTime& dateTime) const
 }
 
 
-inline bool DateTime::operator >= (const DateTime& dateTime) const	
+inline bool DateTime::operator >= (const DateTime& dateTime) const
 {
 	return _utcTime >= dateTime._utcTime;
 }
@@ -431,7 +431,7 @@ inline bool DateTime::isLeapYear(int year)
 }
 
 
-inline void swap(DateTime& d1, DateTime& d2)
+inline void swap(DateTime& d1, DateTime& d2) noexcept
 {
 	d1.swap(d2);
 }

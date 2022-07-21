@@ -22,6 +22,11 @@
 #include "Poco/Net/SocketImpl.h"
 #include <vector>
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+	#define POCO_CHECK_NEW_STATE_ON_MOVE poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+#else
+	#define POCO_CHECK_NEW_STATE_ON_MOVE
+#endif
 
 namespace Poco {
 namespace Net {
@@ -36,6 +41,8 @@ class Net_API Socket
 {
 public:
 	using BufVec = SocketBufVec;
+	using Type = SocketImpl::Type;
+	using SocketList = std::vector<Socket>;
 
 	enum SelectMode
 		/// The mode argument to poll() and select().
@@ -44,8 +51,6 @@ public:
 		SELECT_WRITE = 2,
 		SELECT_ERROR = 4
 	};
-	
-	using SocketList = std::vector<Socket>;
 
 	Socket();
 		/// Creates an uninitialized socket.
@@ -55,18 +60,35 @@ public:
 		///
 		/// Attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
-		
+
 	Socket& operator = (const Socket& socket);
 		/// Assignment operator.
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
-		
+
+#if POCO_NEW_STATE_ON_MOVE
+
+	Socket(Socket&& socket);
+		/// Move constructor.
+		///
+		/// Attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+	Socket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl,
+		/// attaches the SocketImpl from the other socket,
+		/// and zeroes the other socket's SocketImpl.
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
 	virtual ~Socket();
 		/// Destroys the Socket and releases the
 		/// SocketImpl.
-		
+
 	bool operator == (const Socket& socket) const;
 		/// Returns true if both sockets share the same
 		/// SocketImpl, false otherwise.
@@ -77,7 +99,7 @@ public:
 
 	bool operator <  (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
-	
+
 	bool operator <= (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
 
@@ -86,12 +108,31 @@ public:
 
 	bool operator >= (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
-		
+
+	bool isNull() const;
+		/// Returns true if pointer to implementation is null.
+
+	Type type() const;
+		/// Returns the socket type.
+
+	bool isStream() const;
+		/// Returns true if socket is a stream socket,
+		/// false otherwise.
+
+	bool isDatagram() const;
+		/// Returns true if socket is a datagram socket,
+		/// false otherwise.
+
+	bool isRaw() const;
+		/// Returns true if socket is a raw socket,
+		/// false otherwise.
+
 	void close();
 		/// Closes the socket.
 
+	//@deprecated
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
-		/// Determines the status of one or more sockets, 
+		/// Determines the status of one or more sockets,
 		/// using a call to select().
 		///
 		/// ReadList contains the list of sockets which should be
@@ -105,7 +146,7 @@ public:
 		///
 		/// Returns the number of sockets ready.
 		///
-		/// After return, 
+		/// After return,
 		///   * readList contains those sockets ready for reading,
 		///   * writeList contains those sockets ready for writing,
 		///   * exceptList contains those sockets with a pending error.
@@ -119,11 +160,14 @@ public:
 		/// the closed socket will not be included in any list.
 		/// In this case, the return value may be greater than the sum
 		/// of all sockets in all list.
+		///
+		/// This function is deprecated and may be removed in the future releases,
+		/// please use PollSet class instead.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
-		/// Determines the status of the socket, using a 
+		/// Determines the status of the socket, using a
 		/// call to poll() or select().
-		/// 
+		///
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
 		///
@@ -134,9 +178,12 @@ public:
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 
+	int getError() const;
+		/// Returns the socket error.
+
 	void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
-		
+
 	int getSendBufferSize() const;
 		/// Returns the size of the send buffer.
 		///
@@ -146,7 +193,7 @@ public:
 
 	void setReceiveBufferSize(int size);
 		/// Sets the size of the receive buffer.
-		
+
 	int getReceiveBufferSize() const;
 		/// Returns the size of the receive buffer.
 		///
@@ -156,7 +203,7 @@ public:
 
 	void setSendTimeout(const Poco::Timespan& timeout);
 		/// Sets the send timeout for the socket.
-	
+
 	Poco::Timespan getSendTimeout() const;
 		/// Returns the send timeout for the socket.
 		///
@@ -169,7 +216,7 @@ public:
 		///
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.
-	
+
 	Poco::Timespan getReceiveTimeout() const;
 		/// Returns the receive timeout for the socket.
 		///
@@ -188,56 +235,56 @@ public:
 	void setOption(int level, int option, unsigned char value);
 		/// Sets the socket option specified by level and option
 		/// to the given integer value.
-		
+
 	void setOption(int level, int option, const Poco::Timespan& value);
 		/// Sets the socket option specified by level and option
 		/// to the given time value.
-		
+
 	void setOption(int level, int option, const IPAddress& value);
 		/// Sets the socket option specified by level and option
 		/// to the given time value.
 
 	void getOption(int level, int option, int& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, unsigned& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, unsigned char& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, Poco::Timespan& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
-	
+
 	void getOption(int level, int option, IPAddress& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void setLinger(bool on, int seconds);
 		/// Sets the value of the SO_LINGER socket option.
-		
+
 	void getLinger(bool& on, int& seconds) const;
 		/// Returns the value of the SO_LINGER socket option.
-	
+
 	void setNoDelay(bool flag);
 		/// Sets the value of the TCP_NODELAY socket option.
-		
+
 	bool getNoDelay() const;
 		/// Returns the value of the TCP_NODELAY socket option.
-	
+
 	void setKeepAlive(bool flag);
 		/// Sets the value of the SO_KEEPALIVE socket option.
-		
+
 	bool getKeepAlive() const;
 		/// Returns the value of the SO_KEEPALIVE socket option.
-	
+
 	void setReuseAddress(bool flag);
 		/// Sets the value of the SO_REUSEADDR socket option.
-	
+
 	bool getReuseAddress() const;
 		/// Returns the value of the SO_REUSEADDR socket option.
 
@@ -245,16 +292,16 @@ public:
 		/// Sets the value of the SO_REUSEPORT socket option.
 		/// Does nothing if the socket implementation does not
 		/// support SO_REUSEPORT.
-	
+
 	bool getReusePort() const;
 		/// Returns the value of the SO_REUSEPORT socket option.
 		///
 		/// Returns false if the socket implementation does not
 		/// support SO_REUSEPORT.
-		
+
 	void setOOBInline(bool flag);
 		/// Sets the value of the SO_OOBINLINE socket option.
-	
+
 	bool getOOBInline() const;
 		/// Returns the value of the SO_OOBINLINE socket option.
 
@@ -264,25 +311,25 @@ public:
 
 	bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of 
+		/// This method will only work if the blocking modes of
 		/// the socket are changed via the setBlocking method!
 
 	SocketAddress address() const;
 		/// Returns the IP address and port number of the socket.
-		
+
 	SocketAddress peerAddress() const;
 		/// Returns the IP address and port number of the peer socket.
 
 	SocketImpl* impl() const;
 		/// Returns the SocketImpl for this socket.
-		
+
 	bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
-		
+
 	static bool supportsIPv4();
 		/// Returns true if the system supports IPv4.
-		
+
 	static bool supportsIPv6();
 		/// Returns true if the system supports IPv6.
 
@@ -333,6 +380,15 @@ public:
 		/// Note:: this function is not suitable for creation
 		/// of buffers used for writing (ie. reading from socket
 		/// into buffers).
+
+	static int lastError();
+		/// Returns the last error code.
+
+	static std::string lastErrorDesc();
+		/// Returns the last error description.
+
+	static void error();
+		/// Throws an appropriate exception for the last error.
 
 protected:
 	Socket(SocketImpl* pImpl);
@@ -403,212 +459,318 @@ inline bool Socket::operator >= (const Socket& socket) const
 }
 
 
+inline Socket::Type Socket::type() const
+{
+	return _pImpl->type();
+}
+
+
+inline bool Socket::isStream() const
+{
+	return type() == Type::SOCKET_TYPE_STREAM;
+}
+
+
+inline bool Socket::isDatagram() const
+{
+	return type() == Type::SOCKET_TYPE_DATAGRAM;
+}
+
+
+inline bool Socket::isRaw() const
+{
+	return type() == Type::SOCKET_TYPE_RAW;
+}
+
+
+inline bool Socket::isNull() const
+{
+	return _pImpl == nullptr;
+}
+
+
 inline void Socket::close()
 {
-	_pImpl->close();
+	if (_pImpl) _pImpl->close();
 }
 
 
 inline bool Socket::poll(const Poco::Timespan& timeout, int mode) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->poll(timeout, mode);
 }
 
 
 inline int Socket::available() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->available();
+}
+
+
+inline int Socket::getError() const
+{
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
+	return _pImpl->getError();
 }
 
 
 inline void Socket::setSendBufferSize(int size)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setSendBufferSize(size);
 }
 
-	
+
 inline int Socket::getSendBufferSize() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getSendBufferSize();
 }
 
 
 inline void Socket::setReceiveBufferSize(int size)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setReceiveBufferSize(size);
 }
 
-	
+
 inline int Socket::getReceiveBufferSize() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getReceiveBufferSize();
 }
 
 
 inline void Socket::setSendTimeout(const Poco::Timespan& timeout)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setSendTimeout(timeout);
 }
 
 
 inline Poco::Timespan Socket::getSendTimeout() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getSendTimeout();
 }
 
 
 inline void Socket::setReceiveTimeout(const Poco::Timespan& timeout)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setReceiveTimeout(timeout);
 }
 
 
 inline Poco::Timespan Socket::getReceiveTimeout() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getReceiveTimeout();
 }
 
 
 inline void Socket::setOption(int level, int option, int value)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::setOption(int level, int option, unsigned value)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::setOption(int level, int option, unsigned char value)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::setOption(int level, int option, const Poco::Timespan& value)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setOption(level, option, value);
 }
 
-	
+
 inline void Socket::setOption(int level, int option, const IPAddress& value)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, int& value) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, unsigned& value) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, unsigned char& value) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, Poco::Timespan& value) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, IPAddress& value) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::setLinger(bool on, int seconds)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setLinger(on, seconds);
 }
 
-	
+
 inline void Socket::getLinger(bool& on, int& seconds) const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->getLinger(on, seconds);
 }
 
 
 inline void Socket::setNoDelay(bool flag)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setNoDelay(flag);
 }
 
-	
+
 inline bool Socket::getNoDelay() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getNoDelay();
 }
 
 
 inline void Socket::setKeepAlive(bool flag)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setKeepAlive(flag);
 }
 
-	
+
 inline bool Socket::getKeepAlive() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getKeepAlive();
 }
 
 
 inline void Socket::setReuseAddress(bool flag)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setReuseAddress(flag);
 }
 
 
 inline bool Socket::getReuseAddress() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getReuseAddress();
 }
 
 
 inline void Socket::setReusePort(bool flag)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setReusePort(flag);
 }
 
 
 inline bool Socket::getReusePort() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getReusePort();
 }
 
-	
+
 inline void Socket::setOOBInline(bool flag)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setOOBInline(flag);
 }
 
 
 inline bool Socket::getOOBInline() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getOOBInline();
 }
 
 
 inline void Socket::setBlocking(bool flag)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->setBlocking(flag);
 }
 
 
 inline bool Socket::getBlocking() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->getBlocking();
 }
 
@@ -621,24 +783,32 @@ inline SocketImpl* Socket::impl() const
 
 inline poco_socket_t Socket::sockfd() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->sockfd();
 }
 
 
 inline SocketAddress Socket::address() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->address();
 }
 
-	
+
 inline SocketAddress Socket::peerAddress() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->peerAddress();
 }
 
 
 inline bool Socket::secure() const
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	return _pImpl->secure();
 }
 
@@ -661,6 +831,8 @@ inline bool Socket::supportsIPv6()
 
 inline void Socket::init(int af)
 {
+	POCO_CHECK_NEW_STATE_ON_MOVE;
+
 	_pImpl->init(af);
 }
 

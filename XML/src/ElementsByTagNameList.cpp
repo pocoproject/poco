@@ -28,7 +28,7 @@ ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLStrin
 	_count(0)
 {
 	poco_check_ptr (pParent);
-	
+
 	_pParent->duplicate();
 }
 
@@ -94,7 +94,7 @@ ElementsByTagNameListNS::ElementsByTagNameListNS(const Node* pParent, const XMLS
 	_count(0)
 {
 	poco_check_ptr (pParent);
-	
+
 	_pParent->duplicate();
 }
 

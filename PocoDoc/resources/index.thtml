@@ -16,7 +16,7 @@ ${PocoDoc.customHeadHTML}
 </div>
 <div class="body">
 <div id="navigation">
-<iframe src="navigation.html" onload="iFrameResize(this);" scrolling="no"></iframe>
+<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation allow-same-origin" src="navigation.html" onload="iFrameResize(this);" scrolling="no"></iframe>
 </div>
 <div id="content">
 <h2>User Guides And Tutorials</h2>

@@ -61,19 +61,19 @@ public:
 	PropertyFileConfiguration(std::istream& istr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given stream, which must be in properties file format.
-		
+
 	PropertyFileConfiguration(const std::string& path);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given file, which must be in properties file format.
-		
+
 	void load(std::istream& istr);
-		/// Loads the configuration data from the given stream, which 
+		/// Loads the configuration data from the given stream, which
 		/// must be in properties file format.
-		
+
 	void load(const std::string& path);
-		/// Loads the configuration data from the given file, which 
+		/// Loads the configuration data from the given file, which
 		/// must be in properties file format.
-		
+
 	void save(std::ostream& ostr) const;
 		/// Writes the configuration data to the given stream.
 		///
@@ -86,7 +86,7 @@ public:
 
 protected:
 	~PropertyFileConfiguration();
-	
+
 private:
 	void parseLine(std::istream& istr);
 	static int readChar(std::istream& istr);

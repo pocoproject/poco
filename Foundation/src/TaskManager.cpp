@@ -43,10 +43,10 @@ TaskManager::~TaskManager()
 void TaskManager::start(Task* pTask)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
-	FastMutex::ScopedLock lock(_mutex);
-
 	pAutoTask->setOwner(this);
 	pAutoTask->setState(Task::TASK_STARTING);
+
+	FastMutex::ScopedLock lock(_mutex);
 	_taskList.push_back(pAutoTask);
 	try
 	{
@@ -83,7 +83,7 @@ void TaskManager::joinAll()
 TaskManager::TaskList TaskManager::taskList() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _taskList;
 }
 
@@ -134,7 +134,7 @@ void TaskManager::taskCancelled(Task* pTask)
 void TaskManager::taskFinished(Task* pTask)
 {
 	_nc.postNotification(new TaskFinishedNotification(pTask));
-	
+
 	FastMutex::ScopedLock lock(_mutex);
 	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
 	{

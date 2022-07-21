@@ -37,7 +37,7 @@ protected:
 	void lockImpl();
 	bool tryLockImpl();
 	void unlockImpl();
-	
+
 private:
 	std::string getFileName();
 

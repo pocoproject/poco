@@ -47,7 +47,7 @@ protected:
 
 private:
 	static const XMLString NODE_NAME;
-	
+
 	friend class Document;
 };
 

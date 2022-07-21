@@ -26,36 +26,21 @@ namespace Dynamic {
 
 
 Var::Var()
-#ifdef POCO_NO_SOO
-	: _pHolder(0)
-#endif
 {
 }
 
 
 Var::Var(const char* pVal)
-#ifdef POCO_NO_SOO
-	: _pHolder(new VarHolderImpl<std::string>(pVal))
-{
-}
-#else
 {
 	construct(std::string(pVal));
 }
-#endif
 
 
 Var::Var(const Var& other)
-#ifdef POCO_NO_SOO
-	: _pHolder(other._pHolder ? other._pHolder->clone() : 0)
-{
-}
-#else
 {
 	if ((this != &other) && !other.isEmpty())
 			construct(other);
 }
-#endif
 
 
 Var::~Var()
@@ -66,15 +51,9 @@ Var::~Var()
 
 Var& Var::operator = (const Var& rhs)
 {
-#ifdef POCO_NO_SOO
-	Var tmp(rhs);
-	swap(tmp);
-#else
-	if ((this != &rhs) && !rhs.isEmpty())
-		construct(rhs);
-	else if ((this != &rhs) && rhs.isEmpty())
-		_placeholder.erase();
-#endif
+	if (this == &rhs) return *this;
+	clear();
+	if (!rhs.isEmpty()) construct(rhs);
 	return *this;
 }
 
@@ -326,27 +305,13 @@ bool Var::operator && (const Var& other) const
 
 void Var::empty()
 {
-#ifdef POCO_NO_SOO
-	delete _pHolder;
-	_pHolder = 0;
-#else
-	if (_placeholder.isLocal()) this->~Var();
-	else delete content();
 	_placeholder.erase();
-#endif
 }
 
 
 void Var::clear()
 {
-#ifdef POCO_NO_SOO
-	delete _pHolder;
-	_pHolder = 0;
-#else
-	if (_placeholder.isLocal()) this->~Var();
-	else delete content();
 	_placeholder.erase();
-#endif
 }
 
 

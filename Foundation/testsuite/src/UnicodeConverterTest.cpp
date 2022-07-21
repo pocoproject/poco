@@ -37,7 +37,7 @@ UnicodeConverterTest::~UnicodeConverterTest()
 
 void UnicodeConverterTest::testUTF16()
 {
-	
+
 	runTests<UTF16String>();
 }
 

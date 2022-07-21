@@ -127,14 +127,14 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 							_eofDetected = true;
 							_length += offset;
-						
+
 							if (offset == 0 && !_postfix.empty())
 							{
 								offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
 								std::memcpy(buffer, _postfix.data(), offset);
 								_postfix.erase(0, offset);
 							}
-						
+
 							return static_cast<int>(offset);
 						}
 					}
@@ -151,14 +151,14 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 							_eofDetected = true;
 							_length += offset;
-						
+
 							if (offset == 0 && !_postfix.empty())
 							{
 								offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
 								std::memcpy(buffer, _postfix.data(), offset);
 								_postfix.erase(0, offset);
 							}
-						
+
 							return static_cast<int>(offset);
 						}
 					}

@@ -30,7 +30,7 @@ class HTMLForm;
 
 
 class Net_API AbstractHTTPRequestHandler: public HTTPRequestHandler
-	/// The abstract base class for AbstractHTTPRequestHandlers 
+	/// The abstract base class for AbstractHTTPRequestHandlers
 	/// created by HTTPServer.
 	///
 	/// Derived classes must override the run() method.
@@ -41,7 +41,7 @@ class Net_API AbstractHTTPRequestHandler: public HTTPRequestHandler
 	/// HTMLForm object is created for use by subclasses.
 	///
 	/// The run() method must perform the complete handling
-	/// of the HTTP request connection. As soon as the run() 
+	/// of the HTTP request connection. As soon as the run()
 	/// method returns, the request handler object is destroyed.
 	///
 	/// A new AbstractHTTPRequestHandler object will be created for
@@ -89,7 +89,7 @@ public:
 		///            <P>message</P>
 		///         </BODY>
 		///     </HTML>
-	
+
 protected:
 	virtual void run() = 0;
 		/// Must be overridden by subclasses.
@@ -117,7 +117,7 @@ private:
 inline HTTPServerRequest& AbstractHTTPRequestHandler::request()
 {
 	poco_check_ptr (_pRequest);
-	
+
 	return *_pRequest;
 }
 

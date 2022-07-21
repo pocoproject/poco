@@ -40,13 +40,13 @@ class AbstractSessionImpl: public SessionImpl
 public:
 	typedef void (C::*FeatureSetter)(const std::string&, bool);
 		/// The setter method for a feature.
-		
+
 	typedef bool (C::*FeatureGetter)(const std::string&) const;
 		/// The getter method for a feature.
-		
+
 	typedef void (C::*PropertySetter)(const std::string&, const Poco::Any&);
 		/// The setter method for a property.
-		
+
 	typedef Poco::Any (C::*PropertyGetter)(const std::string&) const;
 		/// The getter method for a property.
 
@@ -57,28 +57,28 @@ public:
 			_emptyStringIsNull(false),
 			_forceEmptyString(false)
 		/// Creates the AbstractSessionImpl.
-		/// 
-		/// Adds "storage" property and sets the default internal storage container 
+		///
+		/// Adds "storage" property and sets the default internal storage container
 		/// type to std::deque.
-		/// The storage is created by statements automatically whenever a query 
+		/// The storage is created by statements automatically whenever a query
 		/// returning results is executed but external storage is provided by the user.
 		/// Storage type can be reconfigured at runtime both globally (for the
-		/// duration of the session) and locally (for a single statement execution only). 
+		/// duration of the session) and locally (for a single statement execution only).
 		/// See StatementImpl for details on how this property is used at runtime.
-		/// 
+		///
 		/// Adds "handle" property which, if set by the back end, returns native handle
 		/// for the back end DB.
-		/// 
+		///
 		/// Adds "bulk" feature and sets it to false.
 		/// Bulk feature determines whether the session is capable of bulk operations.
-		/// Connectors that are capable of it must set this feature prior to attempting 
+		/// Connectors that are capable of it must set this feature prior to attempting
 		/// bulk operations.
 		///
 		/// Adds "emptyStringIsNull" feature and sets it to false. This feature should be
 		/// set to true in order to modify the behavior of the databases that distinguish
-		/// between zero-length character strings as nulls. Setting this feature to true 
+		/// between zero-length character strings as nulls. Setting this feature to true
 		/// shall disregard any difference between empty character strings and nulls,
-		/// causing the framework to treat them the same (i.e. behave like Oracle).		
+		/// causing the framework to treat them the same (i.e. behave like Oracle).
 		///
 		/// Adds "forceEmptyString" feature and sets it to false. This feature should be set
 		/// to true in order to force the databases that do not distinguish empty strings from
@@ -89,23 +89,23 @@ public:
 		/// resulting in default underlying database behavior.
 		///
 	{
-		addProperty("storage", 
-			&AbstractSessionImpl<C>::setStorage, 
+		addProperty("storage",
+			&AbstractSessionImpl<C>::setStorage,
 			&AbstractSessionImpl<C>::getStorage);
 
-		addProperty("handle", 
+		addProperty("handle",
 			&AbstractSessionImpl<C>::setHandle,
 			&AbstractSessionImpl<C>::getHandle);
 
-		addFeature("bulk", 
-			&AbstractSessionImpl<C>::setBulk, 
+		addFeature("bulk",
+			&AbstractSessionImpl<C>::setBulk,
 			&AbstractSessionImpl<C>::getBulk);
 
-		addFeature("emptyStringIsNull", 
+		addFeature("emptyStringIsNull",
 			&AbstractSessionImpl<C>::setEmptyStringIsNull,
 			&AbstractSessionImpl<C>::getEmptyStringIsNull);
 
-		addFeature("forceEmptyString", 
+		addFeature("forceEmptyString",
 			&AbstractSessionImpl<C>::setForceEmptyString,
 			&AbstractSessionImpl<C>::getForceEmptyString);
 	}
@@ -129,7 +129,7 @@ public:
 		}
 		else throw NotSupportedException(name);
 	}
-	
+
 	bool getFeature(const std::string& name)
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
@@ -144,7 +144,7 @@ public:
 		}
 		else throw NotSupportedException(name);
 	}
-	
+
 	void setProperty(const std::string& name, const Poco::Any& value)
 		/// Looks a property up in the properties map
 		/// and calls the property's setter, if there is one.
@@ -174,7 +174,7 @@ public:
 		}
 		else throw NotSupportedException(name);
 	}
-	
+
 	void setStorage(const std::string& value)
 		/// Sets the storage type.
 	{
@@ -186,7 +186,7 @@ public:
 	{
 		_storage = Poco::RefAnyCast<std::string>(value);
 	}
-		
+
 	Poco::Any getStorage(const std::string& name="") const
 		/// Returns the storage type
 	{
@@ -194,13 +194,13 @@ public:
 	}
 
 	void setHandle(const std::string& name, const Poco::Any& handle)
-		/// Sets the native session handle. 
+		/// Sets the native session handle.
 	{
 		_handle = handle;
 	}
-		
+
 	Poco::Any getHandle(const std::string& name="") const
-		/// Returns the native session handle. 
+		/// Returns the native session handle.
 	{
 		return _handle;
 	}
@@ -210,7 +210,7 @@ public:
 	{
 		_bulk = bulk;
 	}
-		
+
 	bool getBulk(const std::string& name="") const
 		/// Returns the execution type
 	{
@@ -228,7 +228,7 @@ public:
 
 		_emptyStringIsNull = emptyStringIsNull;
 	}
-		
+
 	bool getEmptyStringIsNull(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
@@ -249,7 +249,7 @@ public:
 
 		_forceEmptyString = forceEmptyString;
 	}
-		
+
 	bool getForceEmptyString(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setForceEmptyString(const std::string&, bool)
@@ -270,7 +270,7 @@ protected:
 		feature.getter = getter;
 		_features[name] = feature;
 	}
-		
+
 	void addProperty(const std::string& name, PropertySetter setter, PropertyGetter getter)
 		/// Adds a property to the map of supported properties.
 		///
@@ -289,16 +289,16 @@ private:
 		FeatureSetter setter;
 		FeatureGetter getter;
 	};
-	
+
 	struct Property
 	{
 		PropertySetter setter;
 		PropertyGetter getter;
 	};
-	
+
 	using FeatureMap = std::map<std::string, Feature>;
 	using PropertyMap = std::map<std::string, Property>;
-	
+
 	FeatureMap  _features;
 	PropertyMap _properties;
 	std::string _storage;

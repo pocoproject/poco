@@ -24,11 +24,11 @@ using Poco::Exception;
 int main(int argc, char** argv)
 {
 	UUID uuid;
-	
+
 	std::string arg;
 	if (argc > 1)
 		arg = argv[1];
-	
+
 	try
 	{
 		if (arg == "-random")
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 			uuid = UUIDGenerator::defaultGenerator().create();
 		else
 			uuid = UUIDGenerator::defaultGenerator().createFromName(UUID::uri(), arg);
-		
+
 		std::cout << uuid.toString() << std::endl;
 	}
 	catch (Exception& exc)
@@ -45,6 +45,6 @@ int main(int argc, char** argv)
 		std::cerr << exc.displayText() << std::endl;
 		return 1;
 	}
-	
+
 	return 0;
 }

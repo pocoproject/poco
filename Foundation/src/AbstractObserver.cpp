@@ -32,7 +32,7 @@ AbstractObserver::~AbstractObserver()
 {
 }
 
-	
+
 AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/)
 {
 	return *this;

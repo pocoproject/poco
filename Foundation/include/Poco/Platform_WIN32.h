@@ -23,19 +23,14 @@
 
 
 
-// Verify that we're built with the multithreaded 
+// Verify that we're built with the multithreaded
 // versions of the runtime libraries
 #if defined(_MSC_VER) && !defined(_MT)
 	#error Must compile with /MD, /MDd, /MT or /MTd
 #endif
 
 
-// Check debug/release settings consistency
-#if defined(NDEBUG) && defined(_DEBUG)
-	#error Inconsistent build settings (check for /MD[d])
-#endif
-
-
+// https://en.wikipedia.org/wiki/Microsoft_Visual_C++
 #if (_MSC_VER >= 1300) && (_MSC_VER < 1400)   // Visual Studio 2003, MSVC++ 7.1
 	#define POCO_MSVS_VERSION 2003
 	#define POCO_MSVC_VERSION 71
@@ -57,9 +52,15 @@
 #elif (_MSC_VER >= 1900) && (_MSC_VER < 1910) // Visual Studio 2015, MSVC++ 14.0
 	#define POCO_MSVS_VERSION 2015
 	#define POCO_MSVC_VERSION 140
-#elif (_MSC_VER >= 1910) && (_MSC_VER < 2000) // Visual Studio 2017, MSVC++ 14.1
+#elif (_MSC_VER >= 1910) && (_MSC_VER < 1920) // Visual Studio 2017, MSVC++ 14.1
 	#define POCO_MSVS_VERSION 2017
 	#define POCO_MSVC_VERSION 141
+#elif (_MSC_VER >= 1920) && (_MSC_VER < 1930) // Visual Studio 2019, MSVC++ 14.2
+	#define POCO_MSVS_VERSION 2019
+	#define POCO_MSVC_VERSION 142
+#elif (_MSC_VER >= 1930) // Visual Studio 2022, MSVC++ 14.3
+	#define POCO_MSVS_VERSION 2022
+	#define POCO_MSVC_VERSION 143
 #endif
 
 

@@ -48,7 +48,7 @@ void SharedLibraryTest::testSharedLibrary1()
 	assertTrue (sl.hasSymbol("pocoUninitializeLibrary"));
 	assertTrue (sl.hasSymbol("gimmeFive"));
 	assertTrue (!sl.hasSymbol("fooBar123"));
-	
+
 	void* p1 = sl.getSymbol("pocoBuildManifest");
 	assertNotNullPtr(p1);
 	try
@@ -78,7 +78,7 @@ void SharedLibraryTest::testSharedLibrary2()
 
 	GimmeFiveFunc gimmeFive = (GimmeFiveFunc) sl.getSymbol("gimmeFive");
 	assertTrue (gimmeFive() == 5);
-	
+
 	sl.unload();
 	assertTrue (!sl.isLoaded());
 }
@@ -107,7 +107,7 @@ void SharedLibraryTest::testSharedLibrary3()
 	path.append(SharedLibrary::suffix());
 	sl.load(path);
 	assertTrue (sl.isLoaded());
-	
+
 	try
 	{
 		sl.load(path);

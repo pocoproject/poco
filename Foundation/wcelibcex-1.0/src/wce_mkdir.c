@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -42,8 +42,8 @@
 *
 * Description:
 *
-*   The mkdir() function shall create a new directory with name path. 
-*   Internally, mkdir() function wraps CreateDirectory call from 
+*   The mkdir() function shall create a new directory with name path.
+*   Internally, mkdir() function wraps CreateDirectory call from
 *   Windows CE API.
 *
 * Return:
@@ -57,7 +57,7 @@
 *******************************************************************************/
 int wceex_mkdir(const char *filename)
 {
-    int res;    
+    int res;
     size_t len;
     wchar_t *widestr;
 
@@ -66,10 +66,10 @@ int wceex_mkdir(const char *filename)
 	widestr  = (wchar_t*)malloc(sizeof(wchar_t) * len);
 
     MultiByteToWideChar( CP_ACP, 0, filename, -1, widestr, len);
-	
+
     /* Delete file using Win32 CE API call */
     res = CreateDirectory(widestr, NULL);
-	
+
     /* Free wide-char string */
     free(widestr);
 
@@ -87,8 +87,8 @@ int wceex_mkdir(const char *filename)
 *
 * Description:
 *
-*   The wmkdir() function shall create a new directory with name path. 
-*   Internally, wmkdir() function wraps CreateDirectory call from 
+*   The wmkdir() function shall create a new directory with name path.
+*   Internally, wmkdir() function wraps CreateDirectory call from
 *   Windows CE API.
 *
 * Return:

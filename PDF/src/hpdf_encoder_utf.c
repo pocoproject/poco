@@ -242,7 +242,7 @@ UTF8_Init  (HPDF_Encoder  encoder)
                 HPDF_LIMIT_MAX_NAME_LEN);
     attr->suppliment = 0;
     attr->writing_mode = HPDF_WMODE_HORIZONTAL;
-    
+
     /* Not sure about this
     attr->uid_offset = 0;
     attr->xuid[0] = 0;

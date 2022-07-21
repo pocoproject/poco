@@ -98,7 +98,7 @@ void LogFileImpl::createFile()
 {
 	std::wstring upath;
 	FileImpl::convertPath(_path, upath);
-	
+
 	_hFile = CreateFileW(upath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (_hFile == INVALID_HANDLE_VALUE) throw OpenFileException(_path);
 	SetFilePointer(_hFile, 0, 0, FILE_END);

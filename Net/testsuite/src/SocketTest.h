@@ -25,6 +25,7 @@ public:
 	~SocketTest();
 
 	void testEcho();
+	void testMoveStreamSocket();
 	void testPoll();
 	void testAvailable();
 	void testFIFOBuffer();

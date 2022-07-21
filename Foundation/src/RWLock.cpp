@@ -37,7 +37,7 @@ RWLock::RWLock()
 {
 }
 
-	
+
 RWLock::~RWLock()
 {
 }

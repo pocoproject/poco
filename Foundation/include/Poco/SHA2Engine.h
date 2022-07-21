@@ -38,14 +38,16 @@ class Foundation_API SHA2Engine: public DigestEngine
 public:
 	enum ALGORITHM
 	{
-		SHA_224 = 224,
-		SHA_256 = 256,
-		SHA_384 = 384,
-		SHA_512 = 512
+		SHA_224 = 1,
+		SHA_256,
+		SHA_384,
+		SHA_512,
+		SHA_512_224,
+		SHA_512_256
 	};
 
 	SHA2Engine(ALGORITHM algorithm = SHA_256);
-	~SHA2Engine();
+	virtual ~SHA2Engine();
 
 	std::size_t digestLength() const;
 	void reset();
@@ -63,6 +65,82 @@ private:
 
 	SHA2Engine(const SHA2Engine&);
 	SHA2Engine& operator = (const SHA2Engine&);
+};
+
+
+class Foundation_API SHA2Engine224 : public SHA2Engine
+{
+public:
+	enum
+	{
+		BLOCK_SIZE = 64,
+		DIGEST_SIZE = 28
+	};
+
+	SHA2Engine224(): Poco::SHA2Engine(Poco::SHA2Engine::ALGORITHM::SHA_224)
+	{
+	}
+
+	virtual ~SHA2Engine224()
+	{
+	}
+};
+
+
+class Foundation_API SHA2Engine256 : public SHA2Engine
+{
+public:
+	enum
+	{
+		BLOCK_SIZE = 64,
+		DIGEST_SIZE = 32
+	};
+
+	SHA2Engine256(): Poco::SHA2Engine(Poco::SHA2Engine::ALGORITHM::SHA_256)
+	{
+	}
+
+	virtual ~SHA2Engine256()
+	{
+	}
+};
+
+
+class Foundation_API SHA2Engine384 : public SHA2Engine
+{
+public:
+	enum
+	{
+		BLOCK_SIZE = 128,
+		DIGEST_SIZE = 48
+	};
+
+	SHA2Engine384(): Poco::SHA2Engine(Poco::SHA2Engine::ALGORITHM::SHA_384)
+	{
+	}
+
+	virtual ~SHA2Engine384()
+	{
+	}
+};
+
+
+class Foundation_API SHA2Engine512 : public SHA2Engine
+{
+public:
+	enum
+	{
+		BLOCK_SIZE = 128,
+		DIGEST_SIZE = 64
+	};
+
+	SHA2Engine512(): Poco::SHA2Engine(Poco::SHA2Engine::ALGORITHM::SHA_512)
+	{
+	}
+
+	virtual ~SHA2Engine512()
+	{
+	}
 };
 
 

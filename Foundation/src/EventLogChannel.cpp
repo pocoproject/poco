@@ -28,7 +28,7 @@ const std::string EventLogChannel::PROP_LOGHOST = "loghost";
 const std::string EventLogChannel::PROP_LOGFILE = "logfile";
 
 
-EventLogChannel::EventLogChannel(): 
+EventLogChannel::EventLogChannel():
 	_logFile("Application"),
 	_h(0)
 {
@@ -46,16 +46,16 @@ EventLogChannel::EventLogChannel():
 }
 
 
-EventLogChannel::EventLogChannel(const std::string& name): 
-	_name(name), 
+EventLogChannel::EventLogChannel(const std::string& name):
+	_name(name),
 	_logFile("Application"),
 	_h(0)
 {
 }
 
 
-EventLogChannel::EventLogChannel(const std::string& name, const std::string& host): 
-	_name(name), 
+EventLogChannel::EventLogChannel(const std::string& name, const std::string& host):
+	_name(name),
 	_host(host),
 	_logFile("Application"),
 	_h(0)
@@ -101,7 +101,7 @@ void EventLogChannel::log(const Message& msg)
 	std::wstring utext;
 	UnicodeConverter::toUTF16(msg.getText(), utext);
 	const wchar_t* pMsg = utext.c_str();
-	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL); 
+	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL);
 }
 
 
@@ -190,7 +190,7 @@ void EventLogChannel::setUpRegistry() const
 	UnicodeConverter::toUTF16(key, ukey);
 	DWORD rc = RegCreateKeyExW(HKEY_LOCAL_MACHINE, ukey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp);
 	if (rc != ERROR_SUCCESS) return;
-	
+
 	if (disp == REG_CREATED_NEW_KEY)
 	{
 		std::wstring path;
@@ -209,10 +209,10 @@ void EventLogChannel::setUpRegistry() const
 				#endif
 			#endif
 		#endif
-		
+
 		if (path.empty())
 			path = findLibrary(L"PocoMsg.dll");
-		
+
 		if (!path.empty())
 		{
 			DWORD count = 8;

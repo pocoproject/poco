@@ -1,0 +1,25 @@
+# Suppressed thread sanitizer tests
+#
+# https://github.com/google/sanitizers/wiki/ThreadSanitizerSuppressions
+#
+# To apply:
+# export TSAN_OPTIONS="suppressions=$POCO_BASE/tsan.supress,second_deadlock_stack=1"
+
+##############
+# Suppressions:
+##############
+
+#
+# Foundation
+#
+
+# ActiveDispatcher false positives
+# strictly speaking, yes - ActiveDispatcher::run() is started
+# in a thread before the inheriting object is fully constructed;
+# however, nothing can happen there before some events are
+# enqueued, which can't happen until after the inheriting object
+# is fully constructed
+race:ActiveDispatcherTest
+race:ArchiveStrategy::moveFile
+
+race:ThreadTest::testNotJoin

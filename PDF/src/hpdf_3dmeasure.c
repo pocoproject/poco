@@ -81,7 +81,7 @@ HPDF_3DC3DMeasure_New(HPDF_MMgr mmgr,
 
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DMeasure_SetColor(HPDF_3DMeasure measure, 
+HPDF_3DMeasure_SetColor(HPDF_3DMeasure measure,
 						   HPDF_RGBColor color)
 {
 	HPDF_Array array;
@@ -105,7 +105,7 @@ HPDF_3DMeasure_SetColor(HPDF_3DMeasure measure,
 
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DMeasure_SetTextSize(HPDF_3DMeasure measure, 
+HPDF_3DMeasure_SetTextSize(HPDF_3DMeasure measure,
 						   HPDF_REAL textsize)
 {
 	HPDF_STATUS ret = HPDF_OK;
@@ -117,7 +117,7 @@ HPDF_3DMeasure_SetTextSize(HPDF_3DMeasure measure,
 
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DMeasure_SetName(HPDF_3DMeasure measure, 
+HPDF_3DMeasure_SetName(HPDF_3DMeasure measure,
 					   const char* name)
 {
 	HPDF_STATUS ret = HPDF_OK;
@@ -133,7 +133,7 @@ HPDF_3DMeasure_SetName(HPDF_3DMeasure measure,
 }
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DC3DMeasure_SetTextBoxSize(HPDF_3DMeasure measure, 
+HPDF_3DC3DMeasure_SetTextBoxSize(HPDF_3DMeasure measure,
 							 HPDF_INT32 x,
 							 HPDF_INT32 y)
 {
@@ -155,7 +155,7 @@ HPDF_3DC3DMeasure_SetTextBoxSize(HPDF_3DMeasure measure,
 }
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DC3DMeasure_SetText(HPDF_3DMeasure measure, 
+HPDF_3DC3DMeasure_SetText(HPDF_3DMeasure measure,
 						  const char* text,
 						  HPDF_Encoder encoder)
 {
@@ -172,7 +172,7 @@ HPDF_3DC3DMeasure_SetText(HPDF_3DMeasure measure,
 }
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DC3DMeasure_SetProjectionAnotation(HPDF_3DMeasure measure, 
+HPDF_3DC3DMeasure_SetProjectionAnotation(HPDF_3DMeasure measure,
 						                 HPDF_Annotation projectionanotation)
 {
 	HPDF_STATUS ret = HPDF_OK;

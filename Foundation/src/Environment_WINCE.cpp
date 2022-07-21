@@ -121,7 +121,7 @@ std::string EnvironmentImpl::nodeNameImpl()
 {
     HKEY hKey;
 	DWORD dwDisposition;
-    if (RegCreateKeyExW(HKEY_LOCAL_MACHINE, L"\\Ident", 0, 0, 0, 0, 0, &hKey, &dwDisposition) != ERROR_SUCCESS) 
+    if (RegCreateKeyExW(HKEY_LOCAL_MACHINE, L"\\Ident", 0, 0, 0, 0, 0, &hKey, &dwDisposition) != ERROR_SUCCESS)
 		throw SystemException("Cannot get node name", "registry key not found");
 
 	std::string value;
@@ -130,7 +130,7 @@ std::string EnvironmentImpl::nodeNameImpl()
     DWORD dwData = sizeof(bData);
 	if (RegQueryValueExW(hKey, L"Name", 0, &dwType, bData, &dwData) == ERROR_SUCCESS)
 	{
-		switch (dwType) 
+		switch (dwType)
 		{
 		case REG_SZ:
 			UnicodeConverter::toUTF8(reinterpret_cast<wchar_t*>(bData), value);
@@ -160,7 +160,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	// Make an initial call to GetAdaptersInfo to get
 	// the necessary size into len
 	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
-	if (rc == ERROR_BUFFER_OVERFLOW) 
+	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
 		delete [] reinterpret_cast<char*>(pAdapterInfo);
 		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
@@ -172,10 +172,10 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	try
 	{
 		bool found = false;
-		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
 		{
 			pAdapter = pAdapterInfo;
-			while (pAdapter && !found) 
+			while (pAdapter && !found)
 			{
 				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 				{

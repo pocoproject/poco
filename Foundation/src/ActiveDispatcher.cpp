@@ -29,16 +29,16 @@ namespace
 			_pRunnable(pRunnable)
 		{
 		}
-		
+
 		ActiveRunnableBase::Ptr runnable() const
 		{
 			return _pRunnable;
 		}
-		
+
 	private:
 		ActiveRunnableBase::Ptr _pRunnable;
 	};
-	
+
 	class StopNotification: public Notification
 	{
 	};

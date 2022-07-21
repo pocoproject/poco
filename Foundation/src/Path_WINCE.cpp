@@ -134,7 +134,7 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 					roots.push_back(root);
 				}
 			}
-		} 
+		}
 		while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}

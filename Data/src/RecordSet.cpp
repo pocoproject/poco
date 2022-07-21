@@ -160,6 +160,7 @@ Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFi
 	case MetaColumn::FDT_TIME:      return value<Time>(col, row, useFilter);
 	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, row);
 	case MetaColumn::FDT_UUID:      return value<UUID>(col, row);
+	case MetaColumn::FDT_JSON:      return value<std::string>(col, row, useFilter);
 	default:
 		throw UnknownTypeException("Data type not supported.");
 	}

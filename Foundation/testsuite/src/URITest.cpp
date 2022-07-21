@@ -743,6 +743,7 @@ void URITest::testOther()
 	assertTrue (uri.getQuery() == "q=hello%world");
 	assertTrue (uri.getRawQuery() == "q=hello%25world");
 	assertTrue (uri.getFragment() == "frag ment");
+	assertTrue (uri.getRawFragment() == "frag%20ment");
 	assertTrue (uri.toString() == "http://google.com/search?q=hello%25world#frag%20ment");
 	assertTrue (uri.getPathEtc() == "/search?q=hello%25world#frag%20ment");
 
@@ -783,8 +784,20 @@ void URITest::testOther()
 	assertTrue (uri.getQuery() == "q=hello+world");
 	assertTrue (uri.getRawQuery() == "q=hello+world");
 	assertTrue (uri.getFragment() == "frag ment");
+	assertTrue (uri.getRawFragment() == "frag%20ment");
 	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#frag%20ment");
 	assertTrue (uri.getPathEtc() == "/search?q=hello+world#frag%20ment");
+
+	uri.setFragment("foo/bar");
+	assertTrue (uri.getFragment() == "foo/bar");
+	assertTrue (uri.getRawFragment() == "foo/bar");
+	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#foo/bar");
+	assertTrue (uri.getPathEtc() == "/search?q=hello+world#foo/bar");
+	uri.setRawFragment("foo%2Fbar");
+	assertTrue (uri.getFragment() == "foo/bar");
+	assertTrue (uri.getRawFragment() == "foo%2Fbar");
+	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#foo%2Fbar");
+	assertTrue (uri.getPathEtc() == "/search?q=hello+world#foo%2Fbar");
 }
 
 
@@ -858,6 +871,40 @@ void URITest::testQueryParameters()
 }
 
 
+void URITest::testQueryParametersPlus()
+{
+	Poco::URI uri("http://google.com/search?q=hello+world&client=safari");
+	URI::QueryParameters params = uri.getQueryParameters(false);
+	assertTrue (params.size() == 2);
+	assertTrue (params[0].first == "q");
+	assertTrue (params[0].second == "hello+world");
+	assertTrue (params[1].first == "client");
+	assertTrue (params[1].second == "safari");
+
+	uri.setQueryParameters(params);
+	assertTrue (uri.toString() == "http://google.com/search?q=hello%2Bworld&client=safari");
+
+	uri = "http://google.com/search?q=&client&";
+	params = uri.getQueryParameters();
+	assertTrue (params.size() == 2);
+	assertTrue (params[0].first == "q");
+	assertTrue (params[0].second == "");
+	assertTrue (params[1].first == "client");
+	assertTrue (params[1].second == "");
+
+	uri.setQueryParameters(params);
+	assertTrue (uri.toString() == "http://google.com/search?q=&client=");
+
+	params[0].second = "foo/bar?";
+	uri.setQueryParameters(params);
+	assertTrue (uri.toString() == "http://google.com/search?q=foo%2Fbar%3F&client=");
+
+	params[0].second = "foo&bar";
+	uri.setQueryParameters(params);
+	assertTrue (uri.toString() == "http://google.com/search?q=foo%26bar&client=");
+}
+
+
 void URITest::setUp()
 {
 }
@@ -883,6 +930,7 @@ CppUnit::Test* URITest::suite()
 	CppUnit_addTest(pSuite, URITest, testOther);
 	CppUnit_addTest(pSuite, URITest, testFromPath);
 	CppUnit_addTest(pSuite, URITest, testQueryParameters);
+	CppUnit_addTest(pSuite, URITest, testQueryParametersPlus);
 
 	return pSuite;
 }

@@ -89,7 +89,7 @@ void SignalHandler::handleSignal(int sig)
 	JumpBufferVec& jb = jumpBufferVec();
 	if (!jb.empty())
 		siglongjmp(jb.back().buf, sig);
-		
+
 	// Abort if no jump buffer registered
 	std::abort();
 }

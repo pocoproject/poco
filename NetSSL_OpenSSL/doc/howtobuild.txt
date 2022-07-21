@@ -26,7 +26,7 @@ use a binary (prebuild) release, for example the
 one from Shining Light Productions that comes with
 a Windows installer.
 
-1. Download OpenSSL (at least v0.98a) from: 
+1. Download OpenSSL (at least v0.98a) from:
    http://www.slproweb.com/products/Win32OpenSSL.html
 2. Install OpenSSL (we assume you install to c:\OpenSSL)
 3. Start Visual Studio, go to Tools->Options, under Projects->VC++ Directories

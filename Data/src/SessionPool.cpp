@@ -22,12 +22,13 @@ namespace Poco {
 namespace Data {
 
 
-SessionPool::SessionPool(const std::string& connector, const std::string& connectionString, int minSessions, int maxSessions, int idleTime):
+SessionPool::SessionPool(const std::string& connector, const std::string& connectionString, int minSessions, int maxSessions, int idleTime, int connTimeout):
 	_connector(connector),
 	_connectionString(connectionString),
 	_minSessions(minSessions),
 	_maxSessions(maxSessions),
 	_idleTime(idleTime),
+	_connTimeout(connTimeout),
 	_nSessions(0),
 	_janitorTimer(1000*idleTime, 1000*idleTime/4),
 	_shutdown(false)
@@ -72,7 +73,7 @@ Session SessionPool::get()
 	{
 		if (_nSessions < _maxSessions)
 		{
-			Session newSession(SessionFactory::instance().create(_connector, _connectionString));
+			Session newSession(SessionFactory::instance().create(_connector, _connectionString, static_cast<std::size_t>(_connTimeout)));
 			applySettings(newSession.impl());
 			customizeSession(newSession);
 
@@ -127,6 +128,12 @@ int SessionPool::idle() const
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
 	return (int) _idleSessions.size();
+}
+
+
+int SessionPool::connTimeout() const
+{
+	return _connTimeout;
 }
 
 

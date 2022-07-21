@@ -16,7 +16,7 @@
 // MD5 (RFC 1321) algorithm:
 // Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 // rights reserved.
-// 
+//
 // License to copy and use this software is granted provided that it
 // is identified as the "RSA Data Security, Inc. MD5 Message-Digest
 // Algorithm" in all material mentioning or referencing this software
@@ -61,7 +61,7 @@ public:
 
 	MD5Engine();
 	~MD5Engine();
-		
+
 	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();

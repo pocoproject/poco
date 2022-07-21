@@ -49,7 +49,7 @@ class Util_API AbstractConfiguration: public Poco::RefCountedObject
 public:
 	using Keys = std::vector<std::string>;
 	using Ptr = AutoPtr<AbstractConfiguration>;
-	
+
 	class KeyValue
 		/// A key-value pair, used as event argument.
 	{
@@ -59,27 +59,27 @@ public:
 			_value(value)
 		{
 		}
-		
+
 		const std::string& key() const
 		{
 			return _key;
 		}
-		
+
 		const std::string& value() const
 		{
 			return _value;
 		}
-		
+
 		std::string& value()
 		{
 			return _value;
 		}
-	
+
 	private:
 		const std::string& _key;
 		std::string& _value;
 	};
-	
+
 	Poco::BasicEvent<KeyValue> propertyChanging;
 		/// Fired before a property value is changed or
 		/// a new property is created.
@@ -101,7 +101,7 @@ public:
 		/// Note: This will even be fired if the key
 		/// does not exist and the remove operation will
 		/// fail with an exception.
-		
+
 	Poco::BasicEvent<const std::string> propertyRemoved;
 		/// Fired after a property has been removed by
 		/// a call to remove().
@@ -121,13 +121,13 @@ public:
 		/// Returns true iff the property with the given key exists.
 		///
 		/// Same as hasProperty().
-		
+
 	std::string getString(const std::string& key) const;
 		/// Returns the string value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	std::string getString(const std::string& key, const std::string& defaultValue) const;
 		/// If a property with the given key exists, returns the property's string value,
 		/// otherwise returns the given default value.
@@ -138,12 +138,12 @@ public:
 		/// Returns the raw string value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// References to other properties are not expanded.
-		
+
 	std::string getRawString(const std::string& key, const std::string& defaultValue) const;
 		/// If a property with the given key exists, returns the property's raw string value,
 		/// otherwise returns the given default value.
 		/// References to other properties are not expanded.
-		
+
 	int getInt(const std::string& key) const;
 		/// Returns the int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
@@ -152,7 +152,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	unsigned int getUInt(const std::string& key) const;
 		/// Returns the unsigned int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
@@ -161,7 +161,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	int getInt(const std::string& key, int defaultValue) const;
 		/// If a property with the given key exists, returns the property's int value,
 		/// otherwise returns the given default value.
@@ -170,7 +170,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	unsigned int getUInt(const std::string& key, unsigned int defaultValue) const;
 		/// If a property with the given key exists, returns the property's unsigned int
 		/// value, otherwise returns the given default value.
@@ -227,7 +227,7 @@ public:
 		/// to a double.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	double getDouble(const std::string& key, double defaultValue) const;
 		/// If a property with the given key exists, returns the property's double value,
 		/// otherwise returns the given default value.
@@ -243,7 +243,7 @@ public:
 		/// to a boolean.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	bool getBool(const std::string& key, bool defaultValue) const;
 		/// If a property with the given key exists, returns the property's boolean value,
 		/// otherwise returns the given default value.
@@ -255,15 +255,15 @@ public:
 		/// Case does not matter.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
-		
+
 	virtual void setString(const std::string& key, const std::string& value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
-		
+
 	virtual void setInt(const std::string& key, int value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
-		
+
 	virtual void setUInt(const std::string& key, unsigned int value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
@@ -287,19 +287,25 @@ public:
 	virtual void setBool(const std::string& key, bool value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
-		
+
 	void keys(Keys& range) const;
 		/// Returns in range the names of all keys at root level.
 
 	void keys(const std::string& key, Keys& range) const;
 		/// Returns in range the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
-	
+
 	const Ptr createView(const std::string& prefix) const;
 		/// Creates a non-mutable view (see ConfigurationView) into the configuration.
 
 	Ptr createView(const std::string& prefix);
 		/// Creates a view (see ConfigurationView) into the configuration.
+
+	const Ptr createLocalView(const std::string& prefix) const;
+		/// Creates a non-mutable view (see LocalConfigurationView) into the configuration.
+
+	Ptr createLocalView(const std::string& prefix);
+		/// Creates a view (see LocalConfigurationView) into the configuration.
 	
 	std::string expand(const std::string& value) const;
 		/// Replaces all occurrences of ${<property>} in value with the
@@ -313,13 +319,13 @@ public:
 		/// Removes the property with the given key.
 		///
 		/// Does nothing if the key does not exist.
-		
+
 	void enableEvents(bool enable = true);
 		/// Enables (or disables) events.
-		
+
 	bool eventsEnabled() const;
 		/// Returns true iff events are enabled.
-	
+
 protected:
 	virtual bool getRaw(const std::string& key, std::string& value) const = 0;
 		/// If the property with the given key exists, stores the property's value
@@ -332,11 +338,11 @@ protected:
 		/// An already existing value for the key is overwritten.
 		///
 		/// Must be overridden by subclasses.
-		
+
 	virtual void enumerate(const std::string& key, Keys& range) const = 0;
 		/// Returns in range the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
-		
+
 	virtual void removeRaw(const std::string& key);
 		/// Removes the property with the given key.
 		///
@@ -367,7 +373,7 @@ protected:
 
 	static bool parseBool(const std::string& value);
 	void setRawWithEvent(const std::string& key, std::string value);
-	
+
 	virtual ~AbstractConfiguration();
 
 private:
@@ -380,9 +386,10 @@ private:
 	mutable int _depth;
 	bool        _eventsEnabled;
 	mutable Poco::Mutex _mutex;
-	
+
 	friend class LayeredConfiguration;
 	friend class ConfigurationView;
+	friend class LocalConfigurationView;
 	friend class ConfigurationMapper;
 };
 

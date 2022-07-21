@@ -32,17 +32,17 @@ class Util_API LoggingConfigurator
 	/// This utility class uses a configuration object to configure the
 	/// logging subsystem of an application.
 	///
-	/// The LoggingConfigurator sets up and connects formatters, channels 
+	/// The LoggingConfigurator sets up and connects formatters, channels
 	/// and loggers. To accomplish its work, the LoggingConfigurator relies on the
 	/// functionality provided by the LoggingFactory and LoggingRegistry classes.
 	///
 	/// The LoggingConfigurator expects all configuration data to be under a root
 	/// property named "logging".
-	/// 
+	///
 	/// Configuring Formatters
 	///
-	/// A formatter is configured using the "logging.formatters" property. Every 
-	/// formatter has an internal name, which is only used for referring to it 
+	/// A formatter is configured using the "logging.formatters" property. Every
+	/// formatter has an internal name, which is only used for referring to it
 	/// during configuration time. This name becomes part of the property name.
 	/// Every formatter has a mandatory "class" property, which specifies the actual
 	/// class implementing the formatter. Any other properties are passed on to
@@ -68,11 +68,11 @@ class Util_API LoggingConfigurator
 	/// formatter definition. In either case, when a "formatter" property is
 	/// present, the channel is automatically "wrapped" in a FormattingChannel
 	/// object.
-	/// 
+	///
 	/// Similarly, a channel supports also a "pattern" property, which results
 	/// in the automatic instantiation of a FormattingChannel object with a
 	/// connected PatternFormatter.
-	/// 
+	///
 	/// Examples:
 	///     logging.channels.c1.class = ConsoleChannel
 	///     logging.channels.c1.formatter = f1
@@ -109,7 +109,7 @@ public:
 
 	~LoggingConfigurator();
 		/// Destroys the LoggingConfigurator.
-		
+
 	void configure(AbstractConfiguration::Ptr pConfig);
 		/// Configures the logging subsystem based on
 		/// the given configuration.
@@ -125,7 +125,7 @@ private:
 	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
-	
+
 	LoggingConfigurator(const LoggingConfigurator&);
 	LoggingConfigurator& operator = (const LoggingConfigurator&);
 };

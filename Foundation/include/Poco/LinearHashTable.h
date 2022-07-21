@@ -73,7 +73,7 @@ public:
 		ConstIterator(): _initialized(false)
 		{
 		}
-		
+
 		ConstIterator(const BucketVecIterator& vecIt, const BucketVecIterator& endIt, const BucketIterator& buckIt):
 			_vecIt(vecIt),
 			_endIt(endIt),
@@ -90,15 +90,15 @@ public:
 
 		{
 		}
-		
+
 		ConstIterator& operator = (const ConstIterator& it)
 		{
 			ConstIterator tmp(it);
 			swap(tmp);
 			return *this;
 		}
-		
-		void swap(ConstIterator& it)
+
+		void swap(ConstIterator& it) noexcept
 		{
 			using std::swap;
 			// uninitialized iterators crash when swapped
@@ -109,7 +109,7 @@ public:
 				swap(_buckIt, it._buckIt);
 				swap(_initialized, it._initialized);
 			}
-			else 
+			else
 			{
 				_vecIt = it._vecIt;
 				_endIt = it._endIt;
@@ -117,7 +117,7 @@ public:
 				_initialized = it._initialized;
 			}
 		}
-		
+
 		bool operator == (const ConstIterator& it) const
 		{
 			return _vecIt == it._vecIt && (_vecIt == _endIt || _buckIt == it._buckIt);
@@ -127,7 +127,7 @@ public:
 		{
 			return _vecIt != it._vecIt || (_vecIt != _endIt && _buckIt != it._buckIt);
 		}
-		
+
 		const typename Bucket::value_type& operator * () const
 		{
 			return *_buckIt;
@@ -137,7 +137,7 @@ public:
 		{
 			return &*_buckIt;
 		}
-		
+
 		ConstIterator& operator ++ () // prefix
 		{
 			if (_vecIt != _endIt)
@@ -151,30 +151,30 @@ public:
 			}
 			return *this;
 		}
-		
+
 		ConstIterator operator ++ (int) // postfix
 		{
 			ConstIterator tmp(*this);
 			++*this;
 			return tmp;
 		}
-		
+
 	protected:
 		BucketVecIterator _vecIt;
 		BucketVecIterator _endIt;
 		BucketIterator    _buckIt;
 		bool              _initialized;
-		
+
 		friend class LinearHashTable;
 	};
-	
+
 	class Iterator: public ConstIterator
 	{
 	public:
 		Iterator()
 		{
 		}
-		
+
 		Iterator(const BucketVecIterator& vecIt, const BucketVecIterator& endIt, const BucketIterator& buckIt):
 			ConstIterator(vecIt, endIt, buckIt)
 		{
@@ -184,19 +184,19 @@ public:
 			ConstIterator(it)
 		{
 		}
-		
+
 		Iterator& operator = (const Iterator& it)
 		{
 			Iterator tmp(it);
 			ConstIterator::swap(tmp);
 			return *this;
 		}
-		
-		void swap(Iterator& it)
+
+		void swap(Iterator& it) noexcept
 		{
 			ConstIterator::swap(it);
 		}
-				
+
 		typename Bucket::value_type& operator * ()
 		{
 			return *this->_buckIt;
@@ -216,13 +216,13 @@ public:
 		{
 			return &*this->_buckIt;
 		}
-		
+
 		Iterator& operator ++ () // prefix
 		{
 			ConstIterator::operator ++ ();
 			return *this;
 		}
-		
+
 		Iterator operator ++ (int) // postfix
 		{
 			Iterator tmp(*this);
@@ -232,8 +232,8 @@ public:
 
 		friend class LinearHashTable;
 	};
-	
-	LinearHashTable(std::size_t initialReserve = 64): 
+
+	LinearHashTable(std::size_t initialReserve = 64):
 		_split(0),
 		_front(1),
 		_size(0)
@@ -242,7 +242,7 @@ public:
 		_buckets.reserve(calcSize(initialReserve));
 		_buckets.push_back(Bucket());
 	}
-	
+
 	LinearHashTable(const LinearHashTable& table):
 		_buckets(table._buckets),
 		_split(table._split),
@@ -251,12 +251,12 @@ public:
 		/// Creates the LinearHashTable by copying another one.
 	{
 	}
-	
+
 	~LinearHashTable()
 		/// Destroys the LinearHashTable.
 	{
 	}
-	
+
 	LinearHashTable& operator = (const LinearHashTable& table)
 		/// Assigns another LinearHashTable.
 	{
@@ -264,8 +264,8 @@ public:
 		swap(tmp);
 		return *this;
 	}
-	
-	void swap(LinearHashTable& table)
+
+	void swap(LinearHashTable& table) noexcept
 		/// Swaps the LinearHashTable with another one.
 	{
 		using std::swap;
@@ -274,7 +274,7 @@ public:
 		swap(_front, table._front);
 		swap(_size, table._size);
 	}
-	
+
 	ConstIterator begin() const
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
@@ -289,13 +289,13 @@ public:
 		else
 			return ConstIterator(it, itEnd, it->begin());
 	}
-	
+
 	ConstIterator end() const
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return ConstIterator(_buckets.end(), _buckets.end(), _buckets.front().end());
 	}
-	
+
 	Iterator begin()
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
@@ -310,13 +310,13 @@ public:
 		else
 			return Iterator(it, itEnd, it->begin());
 	}
-	
+
 	Iterator end()
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return Iterator(_buckets.end(), _buckets.end(), _buckets.front().end());
 	}
-		
+
 	ConstIterator find(const Value& value) const
 		/// Finds an entry in the table.
 	{
@@ -340,21 +340,21 @@ public:
 		else
 			return end();
 	}
-	
+
 	std::size_t count(const Value& value) const
 		/// Returns the number of elements with the given
 		/// value, with is either 1 or 0.
 	{
 		return find(value) != end() ? 1 : 0;
 	}
-	
+
 	std::pair<Iterator, bool> insert(const Value& value)
 		/// Inserts an element into the table.
 		///
 		/// If the element already exists in the table,
-		/// a pair(iterator, false) with iterator pointing to the 
+		/// a pair(iterator, false) with iterator pointing to the
 		/// existing element is returned.
-		/// Otherwise, the element is inserted an a 
+		/// Otherwise, the element is inserted an a
 		/// pair(iterator, true) with iterator
 		/// pointing to the new element is returned.
 	{
@@ -376,7 +376,7 @@ public:
 			return std::make_pair(Iterator(it, _buckets.end(), buckIt), false);
 		}
 	}
-	
+
 	void erase(Iterator it)
 		/// Erases the element pointed to by it.
 	{
@@ -387,39 +387,39 @@ public:
 			merge();
 		}
 	}
-	
+
 	void erase(const Value& value)
 		/// Erases the element with the given value, if it exists.
 	{
 		Iterator it = find(value);
 		erase(it);
 	}
-	
+
 	void clear()
 		/// Erases all elements.
 	{
 		LinearHashTable emptyTable;
 		swap(emptyTable);
 	}
-	
+
 	std::size_t size() const
 		/// Returns the number of elements in the table.
 	{
 		return _size;
 	}
-	
+
 	bool empty() const
 		/// Returns true iff the table is empty.
 	{
 		return _size == 0;
 	}
-	
+
 	std::size_t buckets() const
 		/// Returns the number of allocated buckets.
 	{
 		return _buckets.size();
 	}
-	
+
 protected:
 	std::size_t bucketAddress(const Value& value) const
 	{
@@ -429,7 +429,7 @@ protected:
 		else
 			return n % (2*_front);
 	}
-	
+
 	std::size_t bucketAddressForHash(std::size_t hash)
 	{
 		if (hash % _front >= _split)
@@ -437,7 +437,7 @@ protected:
 		else
 			return hash % (2*_front);
 	}
-	
+
 	void split()
 	{
 		if (_split == _front)
@@ -458,7 +458,7 @@ protected:
 			swap(*it, _buckets[addr].back());
 		}
 	}
-	
+
 	void merge()
 	{
 		if (_split == 0)
@@ -478,16 +478,16 @@ protected:
 			swap(*it, _buckets[addr].back());
 		}
 	}
-	
+
 	static std::size_t calcSize(std::size_t initialSize)
 	{
 		std::size_t size = 32;
 		while (size < initialSize) size *= 2;
 		return size;
 	}
-	
+
 private:
-	// Evil hack: _buckets must be mutable because both ConstIterator and Iterator hold 
+	// Evil hack: _buckets must be mutable because both ConstIterator and Iterator hold
 	// ordinary iterator's (not const_iterator's).
 	mutable BucketVec _buckets;
 	std::size_t _split;

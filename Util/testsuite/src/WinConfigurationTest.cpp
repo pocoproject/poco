@@ -55,7 +55,7 @@ void WinConfigurationTest::testConfiguration()
 #if defined(POCO_HAVE_INT64)
 	pReg->setUInt64("name2", std::numeric_limits<UInt64>::max()); // overwrite should also change type
 	assertTrue (pReg->getUInt64("name2") == std::numeric_limits<UInt64>::max());
-	pReg->setInt64("name2", std::numeric_limits<Int64>::min()); 
+	pReg->setInt64("name2", std::numeric_limits<Int64>::min());
 	assertTrue (pReg->getInt64("name2") == std::numeric_limits<Int64>::min());
 
 	/// write real int64 value type
@@ -75,14 +75,14 @@ void WinConfigurationTest::testConfiguration()
 
 	assertTrue (pReg->hasProperty("name1"));
 	assertTrue (pReg->hasProperty("name2"));
-	
+
 	std::string dfl = pReg->getString("nonexistent", "default");
 	assertTrue (dfl == "default");
-	
+
 	AutoPtr<Poco::Util::AbstractConfiguration> pView = pReg->createView("config");
 	dfl = pView->getString("sub.foo", "default");
 	assertTrue (dfl == "default");
-	
+
 	pView->setString("sub.foo", "bar");
 	assertTrue (pView->getString("sub.foo", "default") == "bar");
 

@@ -63,12 +63,12 @@ NameValueCollection& NameValueCollection::operator = (NameValueCollection&& nvc)
 }
 
 
-void NameValueCollection::swap(NameValueCollection& nvc)
+void NameValueCollection::swap(NameValueCollection& nvc) noexcept
 {
 	std::swap(_map, nvc._map);
 }
 
-	
+
 const std::string& NameValueCollection::operator [] (const std::string& name) const
 {
 	ConstIterator it = _map.find(name);
@@ -78,8 +78,8 @@ const std::string& NameValueCollection::operator [] (const std::string& name) co
 		throw NotFoundException(name);
 }
 
-	
-void NameValueCollection::set(const std::string& name, const std::string& value)	
+
+void NameValueCollection::set(const std::string& name, const std::string& value)
 {
 	Iterator it = _map.find(name);
 	if (it != _map.end())
@@ -88,13 +88,13 @@ void NameValueCollection::set(const std::string& name, const std::string& value)
 		_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 void NameValueCollection::add(const std::string& name, const std::string& value)
 {
 	_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 const std::string& NameValueCollection::get(const std::string& name) const
 {
 	ConstIterator it = _map.find(name);
@@ -126,19 +126,19 @@ NameValueCollection::ConstIterator NameValueCollection::find(const std::string& 
 	return _map.find(name);
 }
 
-	
+
 NameValueCollection::ConstIterator NameValueCollection::begin() const
 {
 	return _map.begin();
 }
 
-	
+
 NameValueCollection::ConstIterator NameValueCollection::end() const
 {
 	return _map.end();
 }
 
-	
+
 bool NameValueCollection::empty() const
 {
 	return _map.empty();

@@ -39,13 +39,13 @@ void NumberFormatterTest::testFormat()
 	assertTrue (NumberFormatter::format((unsigned) 123) == "123");
 	assertTrue (NumberFormatter::format((unsigned) 123, 5) == "  123");
 	assertTrue (NumberFormatter::format0((unsigned) 123, 5) == "00123");
-	
+
 	assertTrue (NumberFormatter::format((long) 123) == "123");
 	assertTrue (NumberFormatter::format((long) -123) == "-123");
 	assertTrue (NumberFormatter::format((long) -123, 5) == " -123");
 
 	assertTrue (NumberFormatter::format((unsigned long) 123) == "123");
-	assertTrue (NumberFormatter::format((unsigned long) 123, 5) == "  123");	
+	assertTrue (NumberFormatter::format((unsigned long) 123, 5) == "  123");
 
 	assertTrue (NumberFormatter::format(123) == "123");
 	assertTrue (NumberFormatter::format(-123) == "-123");
@@ -57,7 +57,7 @@ void NumberFormatterTest::testFormat()
 	assertTrue (NumberFormatter::format((Int64) -123, 5) == " -123");
 
 	assertTrue (NumberFormatter::format((UInt64) 123) == "123");
-	assertTrue (NumberFormatter::format((UInt64) 123, 5) == "  123");	
+	assertTrue (NumberFormatter::format((UInt64) 123, 5) == "  123");
 #if defined(POCO_LONG_IS_64_BIT)
 	assertTrue (NumberFormatter::format((long long) 123) == "123");
 	assertTrue (NumberFormatter::format((long long) -123) == "-123");
@@ -263,6 +263,20 @@ void NumberFormatterTest::testFormatFloat()
 	assertTrue (NumberFormatter::format(50.546, 0) == "51");
 	assertTrue (NumberFormatter::format(50.546f, 0) == "51");
 	assertTrue (NumberFormatter::format(50.546f, 2) == "50.55");
+
+	try
+	{
+		Poco::NumberFormatter::format(0.1, -1);
+		fail ("NumberFormatter::format() must throw on negative precision");
+	}
+	catch(Poco::InvalidArgumentException&){}
+
+	try
+	{
+		Poco::NumberFormatter::format(0.1, 2, -1);
+		fail ("NumberFormatter::format() must throw on negative precision");
+	}
+	catch(Poco::InvalidArgumentException&){}
 }
 
 
@@ -293,7 +307,7 @@ void NumberFormatterTest::testAppend()
 	NumberFormatter::append0(s, 123u, 5);
 	assertTrue (s == "00123");
 
-	
+
 	s.erase();
 	NumberFormatter::append(s, 123.4);
 	assertTrue (s == "123.4");

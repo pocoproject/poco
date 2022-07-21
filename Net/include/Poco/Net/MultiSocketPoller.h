@@ -30,7 +30,7 @@ namespace Net {
 template <std::size_t S = POCO_UDP_BUF_SIZE>
 class MultiSocketPoller
 	/// MultiSocketPoller, as its name indicates, repeatedly polls a set of
-	/// sockets for readability and/or eror. If socket is readable or in error
+	/// sockets for readability and/or error. If socket is readable or in error
 	/// state, the reading/error handling actions are delegated to the reader.
 {
 public:

@@ -25,7 +25,7 @@
 class ODBCSQLServerTest: public ODBCTest
 	/// SQLServer ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver				|	DB								| OS
 	/// --------------------+-----------------------------------+------------------------------------------
 	/// 2000.86.1830.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
@@ -48,7 +48,7 @@ public:
 	void testCursorStoredProcedure();
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
-	
+
 	void testStoredFunction();
 
 	static CppUnit::Test* suite();
@@ -74,8 +74,10 @@ private:
 	void recreateMiscTable();
 	void recreateLogTable();
 	void recreateUnicodeTable();
+	void recreateEncodingTables();
 
 	static SessionPtr  _pSession;
+	static SessionPtr  _pEncSession;
 	static ExecPtr     _pExecutor;
 	static std::string _driver;
 	static std::string _dsn;

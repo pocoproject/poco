@@ -31,6 +31,7 @@ namespace Net {
 
 
 class HTTPSession;
+class MessageHeader;
 
 
 class Net_API HTTPChunkedStreamBuf: public HTTPBasicStreamBuf
@@ -40,7 +41,7 @@ class Net_API HTTPChunkedStreamBuf: public HTTPBasicStreamBuf
 public:
 	using openmode = HTTPBasicStreamBuf::openmode;
 
-	HTTPChunkedStreamBuf(HTTPSession& session, openmode mode);
+	HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedStreamBuf();
 	void close();
 
@@ -53,6 +54,7 @@ private:
 	openmode        _mode;
 	std::streamsize _chunk;
 	std::string     _chunkBuffer;
+	MessageHeader*  _pTrailer;
 };
 
 
@@ -60,7 +62,7 @@ class Net_API HTTPChunkedIOS: public virtual std::ios
 	/// The base class for HTTPInputStream.
 {
 public:
-	HTTPChunkedIOS(HTTPSession& session, HTTPChunkedStreamBuf::openmode mode);
+	HTTPChunkedIOS(HTTPSession& session, HTTPChunkedStreamBuf::openmode mode, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedIOS();
 	HTTPChunkedStreamBuf* rdbuf();
 
@@ -73,12 +75,12 @@ class Net_API HTTPChunkedInputStream: public HTTPChunkedIOS, public std::istream
 	/// This class is for internal use by HTTPSession only.
 {
 public:
-	HTTPChunkedInputStream(HTTPSession& session);
+	HTTPChunkedInputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedInputStream();
-	
+
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };
@@ -88,12 +90,12 @@ class Net_API HTTPChunkedOutputStream: public HTTPChunkedIOS, public std::ostrea
 	/// This class is for internal use by HTTPSession only.
 {
 public:
-	HTTPChunkedOutputStream(HTTPSession& session);
+	HTTPChunkedOutputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedOutputStream();
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };

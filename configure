@@ -74,6 +74,10 @@ Options:
     Compile with -DPOCO_NET_NO_IPv6.
     For systems that don't support IPv6.
 
+  --no-soo
+    Compile with -DPOCO_NO_SOO.
+    Disables small object optimization.
+
   --sqlite-fts=<path>
     Compile with -DPOCO_DATA_SQLITE_FTS.
     Compile SQLite with Full Text Search support.
@@ -118,6 +122,10 @@ Options:
     Pass additional flags to compiler.
     Example: --cflags=-wall
 
+  --ldflags=<flags>
+    Pass additional flags to linker.
+    Example: --ldflags=-latomic
+
   --poquito
     Omit a few features for smaller codesize when linking
     statically for embedded targets.
@@ -150,6 +158,7 @@ tests=1
 samples=1
 noprefix=0
 flags=""
+ldflags=""
 includepath=""
 librarypath=""
 odbclib=""
@@ -205,6 +214,9 @@ while [ $# -ge 1 ]; do
 	--cflags=*)
 		flags="$flags `echo ${1} | awk '{print substr($0,10)}'`" ;;
 
+	--ldflags=*)
+		ldflags="$ldflags `echo ${1} | awk '{print substr($0,11)}'`" ;;
+
 	--no-samples)
 		samples="" ;;
 
@@ -225,6 +237,9 @@ while [ $# -ge 1 ]; do
 
 	--no-ipv6)
 		flags="$flags -DPOCO_NET_NO_IPv6" ;;
+
+	--no-soo)
+		flags="$flags -DPOCO_NO_SOO" ;;
 
 	--sqlite-thread-safe=*)
 		flags="$flags -DSQLITE_THREADSAFE=`echo ${1} | awk '{print substr($0,22)}'`" ;;
@@ -320,6 +335,7 @@ echo "POCO_CONFIG = $config" >>$build/config.make
 echo "POCO_BASE = $base" >>$build/config.make
 echo "POCO_BUILD = $build" >>$build/config.make
 echo "POCO_FLAGS = $flags" >>$build/config.make
+echo "POCO_LDFLAGS = $ldflags" >>$build/config.make
 if [ -n "$prefix" ] ; then
 	echo "POCO_PREFIX = $prefix" >>$build/config.make
 fi
@@ -363,6 +379,7 @@ export POCO_CONFIG
 export POCO_BASE
 export POCO_BUILD
 export POCO_FLAGS
+export POCO_LDFLAGS
 __EOF__
 
 if [ -n "$prefix" ] ; then

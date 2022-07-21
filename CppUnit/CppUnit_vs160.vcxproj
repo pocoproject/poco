@@ -55,7 +55,6 @@
     <ProjectGuid>{138BB448-808A-4FE5-A66D-78D1F8770F59}</ProjectGuid>
     <RootNamespace>CppUnit</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">

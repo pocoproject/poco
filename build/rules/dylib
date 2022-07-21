@@ -20,6 +20,10 @@ DYLIB      = $(SHLIB)
 DYLIBFLAGS = $(SHLIBFLAGS)
 endif
 
+target := $(strip $(target))
+target_version := $(strip $(target_version))
+target_libs := $(strip $(target_libs))
+
 DYLIB_DEBUG        = $(BINPATH)/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
 DYLIB_RELEASE      = $(BINPATH)/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
 DYLIB_S_DEBUG      = $(BINPATH)/static/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)

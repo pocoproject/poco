@@ -28,6 +28,14 @@
 #	include <time.h>
 #endif
 
+#if POCO_OS == POCO_OS_LINUX
+	#ifndef _GNU_SOURCE
+		#define _GNU_SOURCE         /* See feature_test_macros(7) */
+	#endif
+	#include <unistd.h>
+	#include <sys/syscall.h>   /* For SYS_xxx definitions */
+#endif
+
 //
 // Block SIGPIPE in main thread.
 //
@@ -54,9 +62,6 @@ namespace
 #endif
 
 
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-
-
 namespace {
 void setThreadName(pthread_t thread, const std::string& threadName)
 {
@@ -73,9 +78,6 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 #endif
 }
 }
-
-
-#endif
 
 
 namespace Poco {
@@ -180,8 +182,11 @@ void ThreadImpl::setStackSizeImpl(int size)
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
-	if (_pData->pRunnableTarget)
-		throw SystemException("thread already running");
+	{
+		FastMutex::ScopedLock l(_pData->mutex);
+		if (_pData->pRunnableTarget)
+			throw SystemException("thread already running");
+	}
 
 	pthread_attr_t attributes;
 	pthread_attr_init(&attributes);
@@ -195,12 +200,15 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		}
 	}
 
-	_pData->pRunnableTarget = pTarget;
-	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
-		_pData->pRunnableTarget = 0;
-		pthread_attr_destroy(&attributes);
-		throw SystemException("cannot start thread");
+		FastMutex::ScopedLock l(_pData->mutex);
+		_pData->pRunnableTarget = pTarget;
+		if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
+		{
+			_pData->pRunnableTarget = 0;
+			pthread_attr_destroy(&attributes);
+			throw SystemException("cannot start thread");
+		}
 	}
 	_pData->started = true;
 	pthread_attr_destroy(&attributes);
@@ -262,6 +270,16 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 	return pthread_self();
 }
 
+long ThreadImpl::currentOsTidImpl()
+{
+#if POCO_OS == POCO_OS_LINUX
+    return ::syscall(SYS_gettid);
+#elif POCO_OS == POCO_OS_MAC_OS_X
+    return ::pthread_mach_thread_np(::pthread_self());
+#else
+    return ::pthread_self();
+#endif
+}
 
 void ThreadImpl::sleepImpl(long milliseconds)
 {
@@ -333,9 +351,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
-#endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
@@ -354,6 +370,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 		ErrorHandler::handle();
 	}
 
+	FastMutex::ScopedLock l(pData->mutex);
 	pData->pRunnableTarget = 0;
 	pData->done.set();
 	return 0;

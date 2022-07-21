@@ -57,7 +57,7 @@ void Task::run()
 {
 	TaskManager* pOwner = getOwner();
 	if (pOwner)
-		pOwner->taskStarted(this);		
+		pOwner->taskStarted(this);
 	try
 	{
 		_state = TASK_RUNNING;
@@ -129,11 +129,11 @@ void Task::postNotification(Notification* pNf)
 	poco_check_ptr (pNf);
 
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (_pOwner)
-	{
 		_pOwner->postNotification(pNf);
-	}
+	else if (pNf)
+		pNf->release();
 }
 
 
