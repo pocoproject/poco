@@ -36,6 +36,7 @@ using Poco::Net::SocketNotification;
 using Poco::Net::ReadableNotification;
 using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
+using Poco::Net::ErrorNotification;
 using Poco::Net::ShutdownNotification;
 using Poco::Observer;
 using Poco::IllegalStateException;
@@ -290,12 +291,6 @@ namespace
 		void onTimeout(TimeoutNotification* pNf)
 		{
 			pNf->release();
-			_failed = true;
-			reactor()->stop();
-		}
-
-		void onError(int error)
-		{
 			_failed = true;
 			reactor()->stop();
 		}

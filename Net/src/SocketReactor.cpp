@@ -35,7 +35,6 @@ SocketReactor::SocketReactor():
 	_pWritableNotification(new WritableNotification(this)),
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
-	_pIdleNotification(new IdleNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this)),
 	_pThread(0)
 {
@@ -49,7 +48,6 @@ SocketReactor::SocketReactor(const Poco::Timespan& timeout):
 	_pWritableNotification(new WritableNotification(this)),
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
-	_pIdleNotification(new IdleNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this)),
 	_pThread(0)
 {
@@ -70,7 +68,6 @@ void SocketReactor::run()
 		{
 			if (!hasSocketHandlers())
 			{
-				onIdle();
 				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
 			}
 			else
@@ -79,7 +76,6 @@ void SocketReactor::run()
 				PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
 				if (sm.size() > 0)
 				{
-					onBusy();
 					PollSet::SocketModeMap::iterator it = sm.begin();
 					PollSet::SocketModeMap::iterator end = sm.end();
 					for (; it != end; ++it)
@@ -98,14 +94,17 @@ void SocketReactor::run()
 		}
 		catch (Exception& exc)
 		{
+			onError(exc.code(), exc.displayText());
 			ErrorHandler::handle(exc);
 		}
 		catch (std::exception& exc)
 		{
+			onError(0, exc.what());
 			ErrorHandler::handle(exc);
 		}
 		catch (...)
 		{
+			onError(0, "unknown exception");
 			ErrorHandler::handle();
 		}
 	}
@@ -237,12 +236,6 @@ void SocketReactor::onTimeout()
 }
 
 
-void SocketReactor::onIdle()
-{
-	dispatch(_pIdleNotification);
-}
-
-
 void SocketReactor::onShutdown()
 {
 	dispatch(_pShutdownNotification);
@@ -251,6 +244,12 @@ void SocketReactor::onShutdown()
 
 void SocketReactor::onBusy()
 {
+}
+
+
+void SocketReactor::onError(int code, const std::string& description)
+{
+	dispatch(new ErrorNotification(this, code, description));
 }
 
 

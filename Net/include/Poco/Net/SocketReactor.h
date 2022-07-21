@@ -123,9 +123,10 @@ public:
 	virtual ~SocketReactor();
 		/// Destroys the SocketReactor.
 
-	void run();
+	virtual void run();
 		/// Runs the SocketReactor. The reactor will run
 		/// until stop() is called (in a separate thread).
+		/// Can be overriden by inheriting classes.
 
 	void stop();
 		/// Stops the SocketReactor.
@@ -178,13 +179,6 @@ protected:
 		/// dispatches the TimeoutNotification and thus should be called by overriding
 		/// implementations.
 
-	virtual void onIdle();
-		/// Called if no sockets are available to call select() on.
-		///
-		/// Can be overridden by subclasses. The default implementation
-		/// dispatches the IdleNotification and thus should be called by overriding
-		/// implementations.
-
 	virtual void onShutdown();
 		/// Called when the SocketReactor is about to terminate.
 		///
@@ -193,11 +187,11 @@ protected:
 		/// implementations.
 
 	virtual void onBusy();
-		/// Called when the SocketReactor is busy and at least one notification
-		/// has been dispatched.
-		///
-		/// Can be overridden by subclasses to perform additional
-		/// periodic tasks. The default implementation does nothing.
+		/// Must be overridden by subclasses (alongside the run() override) to perform
+		/// additional periodic tasks. The default implementation does nothing.
+
+	void onError(int code, const std::string& description);
+		/// Notifies all subscribers when the reactor loop throws an exception.
 
 	void dispatch(const Socket& socket, SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers
@@ -207,11 +201,11 @@ protected:
 		/// Dispatches the given notification to all observers.
 
 private:
-	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
-	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
-	typedef std::map<poco_socket_t, NotifierPtr>     EventHandlerMap;
-	typedef Poco::FastMutex                   MutexType;
-	typedef MutexType::ScopedLock             ScopedLock;
+	typedef Poco::AutoPtr<SocketNotifier>        NotifierPtr;
+	typedef Poco::AutoPtr<SocketNotification>    NotificationPtr;
+	typedef std::map<poco_socket_t, NotifierPtr> EventHandlerMap;
+	typedef Poco::FastMutex                      MutexType;
+	typedef MutexType::ScopedLock                ScopedLock;
 
 	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
@@ -230,7 +224,6 @@ private:
 	NotificationPtr   _pWritableNotification;
 	NotificationPtr   _pErrorNotification;
 	NotificationPtr   _pTimeoutNotification;
-	NotificationPtr   _pIdleNotification;
 	NotificationPtr   _pShutdownNotification;
 	MutexType         _mutex;
 	Poco::Thread*     _pThread;

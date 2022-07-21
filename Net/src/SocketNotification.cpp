@@ -58,8 +58,10 @@ WritableNotification::~WritableNotification()
 }
 
 
-ErrorNotification::ErrorNotification(SocketReactor* pReactor):
-	SocketNotification(pReactor)
+ErrorNotification::ErrorNotification(SocketReactor* pReactor, int code, const std::string& description):
+	SocketNotification(pReactor),
+	_code(code),
+	_description(description)
 {
 }
 
