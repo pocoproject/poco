@@ -69,6 +69,7 @@ public:
 	using SocketMap = std::map<void*, SocketMode>;
 
 	PollSetImpl(): _events(1024),
+		_port(0),
 		_eventfd(eventfd(_port, 0)),
 		_epollfd(epoll_create(1))
 	{
@@ -176,12 +177,13 @@ public:
 				Poco::Timespan waited = end - start;
 				if (waited < remainingTime)
 					remainingTime -= waited;
-				else
-					remainingTime = 0;
+				else break;
 			}
 		}
 		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
-		if (rc < 0) SocketImpl::error();
+
+		if (rc < 0 && SocketImpl::lastError() != POCO_EINTR)
+			SocketImpl::error();
 
 		for (int i = 0; i < rc; i++)
 		{
@@ -198,8 +200,14 @@ public:
 						result[it->second.first] |= PollSet::POLL_ERROR;
 				}
 			}
+#ifndef WEPOLL_H_
+			else if (_events[i].events & EPOLLIN) // eventfd signaled
+			{
+				uint64_t val;
+				read(_eventfd, &val, sizeof(val));
+			}
+#endif
 		}
-
 		return result;
 	}
 
@@ -294,7 +302,7 @@ private:
 	mutable Mutex _mutex;
 	SocketMap _socketMap;
 	std::vector<struct epoll_event> _events;
-	int _port = 0;
+	int _port;
 	std::atomic<int> _eventfd;
 #ifdef WEPOLL_H_
 	std::atomic <HANDLE> _epollfd;
