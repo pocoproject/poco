@@ -89,6 +89,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
+    auto * StreamSocket() { return _pStreamSocketImpl; }
 protected:
 	enum
 	{
