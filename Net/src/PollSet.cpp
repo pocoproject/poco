@@ -171,19 +171,23 @@ public:
 			// calls would round-robin through the remaining ready sockets, but it's better to give
 			// the call enough room once we start hitting the boundary
 			if (rc >= _events.size()) _events.resize(_events.size()*2);
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			else if (rc < 0)
 			{
-				Poco::Timestamp end;
-				Poco::Timespan waited = end - start;
-				if (waited < remainingTime)
-					remainingTime -= waited;
-				else break;
+				// if interrupted and there's still time left, keep waiting
+				if (SocketImpl::lastError() == POCO_EINTR)
+				{
+					Poco::Timestamp end;
+					Poco::Timespan waited = end - start;
+					if (waited < remainingTime)
+					{
+						remainingTime -= waited;
+						continue;
+					}
+				}
+				else SocketImpl::error();
 			}
 		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
-
-		if (rc < 0 && SocketImpl::lastError() != POCO_EINTR)
-			SocketImpl::error();
+		while (false);
 
 		for (int i = 0; i < rc; i++)
 		{
@@ -200,13 +204,15 @@ public:
 						result[it->second.first] |= PollSet::POLL_ERROR;
 				}
 			}
-#ifndef WEPOLL_H_
 			else if (_events[i].events & EPOLLIN) // eventfd signaled
 			{
 				uint64_t val;
+#ifdef WEPOLL_H_
+				if (_pSocket) _pSocket->receiveBytes(&val, sizeof(val));
+#else
 				read(_eventfd, &val, sizeof(val));
-			}
 #endif
+			}
 		}
 		return result;
 	}
@@ -285,6 +291,7 @@ private:
 		if (rmFD == 0)
 		{
 			_pSocket = new ServerSocket(SocketAddress("127.0.0.1", 0));
+			_pSocket->setBlocking(false);
 			port = _pSocket->address().port();
 			return static_cast<int>(_pSocket->impl()->sockfd());
 		}
