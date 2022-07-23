@@ -209,6 +209,9 @@ public:
 		/// wakeUp() before calling trySleep() will prevent the next
 		/// trySleep() call to actually suspend the thread (which, in
 		/// some scenarios, may be desirable behavior).
+		///
+		/// Note that, unlike Thread::sleep(), this function can only
+		/// be succesfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
