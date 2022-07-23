@@ -419,4 +419,39 @@ int ThreadImpl::reverseMapPrio(int prio, int policy)
 }
 
 
+bool ThreadImpl::setAffinityImpl(int coreID)
+{
+#if POCO_OS == POCO_OS_LINUX
+	int numCores = sysconf(_SC_NPROCESSORS_ONLN);
+	if (coreID < 0 || coreID >= numCores)
+		return false;
+
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(coreID, &cpuset);
+
+	return 0 == pthread_setaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset);
+#else
+	return false;
+#endif
+}
+
+
+int ThreadImpl::getAffinityImpl() const
+{
+#if POCO_OS == POCO_OS_LINUX
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	if (0 == pthread_getaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset))
+	{
+		for (int i = 0; i < CPU_SETSIZE; ++i)
+		{
+			if (CPU_ISSET(i, &cpuset)) return i;
+		}
+	}
+#endif
+	return -1;
+}
+
+
 } // namespace Poco

@@ -79,6 +79,8 @@ public:
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	bool setAffinityImpl(int);
+	int getAffinityImpl() const;
 
 protected:
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
@@ -171,6 +173,18 @@ inline int ThreadImpl::getStackSizeImpl() const
 inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
 {
 	return _threadId;
+}
+
+
+inline bool ThreadImpl::setAffinityImpl(int)
+{
+	return false;
+}
+
+
+inline int ThreadImpl::getAffinityImpl() const
+{
+	return -1;
 }
 
 

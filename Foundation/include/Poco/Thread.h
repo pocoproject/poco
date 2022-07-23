@@ -233,6 +233,17 @@ public:
 	static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
 
+	bool setAffinity(int coreId);
+		/// Sets the thread affinity to the coreID.
+		/// Returns true if succesful.
+		/// Returns false if not succesful or not
+		/// implemented.
+
+	int getAffinity() const;
+		/// Returns the thread affinity.
+		/// Negative value means the thread has
+		/// no CPU core affinity.
+
 protected:
 	ThreadLocalStorage& tls();
 		/// Returns a reference to the thread's local storage.
@@ -382,6 +393,18 @@ inline long Thread::currentOsTid()
 {
 	return currentOsTidImpl();
 }
+
+inline bool Thread::setAffinity(int coreId)
+{
+	return setAffinityImpl(coreId);
+}
+
+
+inline int Thread::getAffinity() const
+{
+	return getAffinityImpl();
+}
+
 
 } // namespace Poco
 
