@@ -103,7 +103,7 @@ void TCPServerDispatcher::run()
 
 #ifdef __linux__
     Poco::Thread::current()->setName(_pParams->getName());
-		pthread_setname_np(pthread_self(), _pParams->getName());
+		pthread_setname_np(pthread_self(), _pParams->getName().c_str());
 #endif
 #ifdef __APPLE__
     Poco::Thread::current()->setName(_pParams->getName());
