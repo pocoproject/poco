@@ -101,6 +101,15 @@ void TCPServerDispatcher::run()
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
+#ifdef __linux__
+    Poco::Thread::current()->setName(_pParams->getName());
+		pthread_setname_np(pthread_self(), _pParams->getName());
+#endif
+#ifdef __APPLE__
+    Poco::Thread::current()->setName(_pParams->getName());
+    pthread_setname_np(_pParams->getName().c_str());
+#endif
+
 	for (;;)
 	{
 		{
