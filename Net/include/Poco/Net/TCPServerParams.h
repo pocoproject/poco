@@ -92,6 +92,9 @@ public:
 		/// Returns the priority of TCP server threads
 		/// created by TCPServer.
 
+    inline void setName(const std::string &name) { _name = name; }
+    inline std::string getName() const { return _name; }
+
 protected:
 	virtual ~TCPServerParams();
 		/// Destroys the TCPServerParams.
@@ -101,6 +104,7 @@ private:
 	int _maxThreads;
 	int _maxQueued;
 	Poco::Thread::Priority _threadPriority;
+    std::string _name;
 };
 
 
