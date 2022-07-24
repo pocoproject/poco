@@ -18,6 +18,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/ErrorHandler.h"
 #include <memory>
+#include <iostream>
 
 
 using Poco::Notification;
@@ -93,8 +94,6 @@ void TCPServerDispatcher::release()
 {
 	if (--_rc == 0) delete this;
 }
-
-#include <iostream>
 
 void TCPServerDispatcher::run()
 {
