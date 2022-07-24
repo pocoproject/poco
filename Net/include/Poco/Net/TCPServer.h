@@ -216,7 +216,7 @@ protected:
 		/// object is destroyed, which implicitly calls
 		/// the stop() method.
 
-	static std::string threadName(const ServerSocket& socket);
+	std::string threadName(const ServerSocket& socket);
 		/// Returns a thread name for the server thread.
 
 private:

@@ -126,15 +126,6 @@ void TCPServer::stop()
 void TCPServer::run()
 {
 
-#ifdef __linux__
-    Poco::Thread::current()->setName(_pDispatcher->params().getName());
-		pthread_setname_np(pthread_self(), _pDispatcher->params().getName().c_str());
-#endif
-#ifdef __APPLE__
-    Poco::Thread::current()->setName(_pDispatcher->params().getName());
-    pthread_setname_np(_pDispatcher->params().getName().c_str());
-#endif
-
 	while (!_stopped)
 	{
 		Poco::Timespan timeout(250000);
@@ -241,12 +232,16 @@ std::string TCPServer::threadName(const ServerSocket& socket)
 	// socket.address(), which calls getsockname(), here.
 	std::string name("TCPServer");
 	#pragma message("Using WEC2013 getsockname() workaround in TCPServer::threadName(). Remove when no longer needed.")
-#else
-	std::string name("TCPServer: ");
-	name.append(socket.address().toString());
-#endif
 	return name;
-
+#else
+    if(_pDispatcher->params().getName().empty()) {
+        std::string name("TCPServer: ");
+        name.append(socket.address().toString());
+        return name;
+    } else {
+        return _pDispatcher->params().getName();
+    }
+#endif
 }
 
 

@@ -92,8 +92,12 @@ public:
 		/// Returns the priority of TCP server threads
 		/// created by TCPServer.
 
-    inline void setName(const std::string &name) { _name = name; }
-    inline std::string getName() const { return _name; }
+    void setName(const std::string &name);
+        /// Set the name of the underlying thread
+        //  created vy TCPserver
+
+    std::string getName() const;
+        /// Get the name of the underlying thread
 
 protected:
 	virtual ~TCPServerParams();
