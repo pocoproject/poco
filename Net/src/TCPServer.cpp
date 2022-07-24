@@ -234,7 +234,7 @@ std::string TCPServer::threadName(const ServerSocket& socket)
 	#pragma message("Using WEC2013 getsockname() workaround in TCPServer::threadName(). Remove when no longer needed.")
 	return name;
 #else
-    if(_pDispatcher->params().getName().empty()) {
+    if(_pDispatcher==nullptr || _pDispatcher->params().getName().empty()) {
         std::string name("TCPServer: ");
         name.append(socket.address().toString());
         return name;
