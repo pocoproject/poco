@@ -101,6 +101,11 @@ void TCPServerDispatcher::run()
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
+    if(!_pParams->getName().empty()) {
+        Poco::Thread::current()->setName(_pParams->getName());
+    }
+
+
 	for (;;)
 	{
 		{
