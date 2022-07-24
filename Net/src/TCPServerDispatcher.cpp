@@ -18,8 +18,6 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/ErrorHandler.h"
 #include <memory>
-#include <iostream>
-
 
 using Poco::Notification;
 using Poco::FastMutex;
@@ -102,7 +100,6 @@ void TCPServerDispatcher::run()
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
     if(!_pParams->getName().empty()) {
-        std::cout << "Setting thread name: " << _pParams->getName() << std::endl;
         Poco::Thread::current()->setName(_pParams->getName());
 #ifdef __linux__
         Poco::Thread::current()->setName(_pParams->getName());

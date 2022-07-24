@@ -20,8 +20,6 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 
-#include <iostream>
-
 using Poco::ErrorHandler;
 
 
@@ -128,7 +126,6 @@ void TCPServer::run()
 {
 
     if(!_pDispatcher->params().getName().empty()) {
-        std::cout << "Setting thread name: " << _pDispatcher->params().getName() << std::endl;
         Poco::Thread::current()->setName(_pDispatcher->params().getName());
 #ifdef __linux__
         Poco::Thread::current()->setName(_pDispatcher->params().getName());

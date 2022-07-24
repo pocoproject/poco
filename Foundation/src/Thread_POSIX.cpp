@@ -19,7 +19,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
 #include <signal.h>
-#include <iostream>
+
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
@@ -71,7 +71,6 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 #else
 	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
 	{
-        std::cout << "Calling OS thread name: " << threadName << std::endl;
 		std::string truncName(threadName, 0, 7);
 		truncName.append("~");
 		truncName.append(threadName, threadName.size() - 7, 7);
