@@ -94,6 +94,7 @@ void TCPServerDispatcher::release()
 	if (--_rc == 0) delete this;
 }
 
+#include <iostream>
 
 void TCPServerDispatcher::run()
 {
