@@ -102,9 +102,9 @@ void TCPServerDispatcher::run()
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
     if(!_pParams->getName().empty()) {
+        std::cout << "Setting thread name: " << _pParams->getName() << std::endl;
         Poco::Thread::current()->setName(_pParams->getName());
     }
-
 
 	for (;;)
 	{
