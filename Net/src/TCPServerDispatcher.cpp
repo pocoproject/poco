@@ -104,6 +104,14 @@ void TCPServerDispatcher::run()
     if(!_pParams->getName().empty()) {
         std::cout << "Setting thread name: " << _pParams->getName() << std::endl;
         Poco::Thread::current()->setName(_pParams->getName());
+#ifdef __linux__
+        Poco::Thread::current()->setName_pParams->getName());
+		pthread_setname_np(pthread_self(), _pParams->getName().c_str());
+#endif
+#ifdef __APPLE__
+        Poco::Thread::current()->setName(_pParams->getName());
+        pthread_setname_np(_pParams->getName().c_str());
+#endif
     }
 
 	for (;;)
