@@ -208,7 +208,8 @@ public:
 			{
 				uint64_t val;
 #ifdef WEPOLL_H_
-				if (_pSocket) _pSocket->receiveBytes(&val, sizeof(val));
+				if (_pSocket && _pSocket->available())
+					_pSocket->impl()->receiveBytes(&val, sizeof(val));
 #else
 				read(_eventfd, &val, sizeof(val));
 #endif
