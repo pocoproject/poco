@@ -13,8 +13,6 @@
 
 
 #include "Poco/Net/SocketReactor.h"
-#include "Poco/Net/SocketNotification.h"
-#include "Poco/Net/SocketNotifier.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
@@ -156,18 +154,6 @@ void SocketReactor::wakeUp()
 }
 
 
-void SocketReactor::setTimeout(const Poco::Timespan& timeout)
-{
-	_params.pollTimeout = timeout;
-}
-
-
-const Poco::Timespan& SocketReactor::getTimeout() const
-{
-	return _params.pollTimeout;
-}
-
-
 bool SocketReactor::hasSocketHandlers()
 {
 	if (!_pollSet.empty())
@@ -252,12 +238,6 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 }
 
 
-bool SocketReactor::has(const Socket& socket) const
-{
-	return _pollSet.has(socket);
-}
-
-
 void SocketReactor::onTimeout()
 {
 	dispatch(_pTimeoutNotification);
@@ -267,17 +247,6 @@ void SocketReactor::onTimeout()
 void SocketReactor::onShutdown()
 {
 	dispatch(_pShutdownNotification);
-}
-
-
-void SocketReactor::onBusy()
-{
-}
-
-
-void SocketReactor::onError(int code, const std::string& description)
-{
-	dispatch(new ErrorNotification(this, code, description));
 }
 
 
@@ -301,27 +270,6 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 	for (std::vector<NotifierPtr>::iterator it = delegates.begin(); it != delegates.end(); ++it)
 	{
 		dispatch(*it, pNotification);
-	}
-}
-
-
-void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
-{
-	try
-	{
-		pNotifier->dispatch(pNotification);
-	}
-	catch (Exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (std::exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (...)
-	{
-		ErrorHandler::handle();
 	}
 }
 

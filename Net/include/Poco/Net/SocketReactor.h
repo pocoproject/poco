@@ -20,6 +20,8 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/SocketNotifier.h"
 #include "Poco/Net/PollSet.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timespan.h"
@@ -40,8 +42,6 @@ namespace Net {
 
 
 class Socket;
-class SocketNotification;
-class SocketNotifier;
 
 
 class Net_API SocketReactor: public Poco::Runnable
@@ -235,10 +235,6 @@ protected:
 		/// dispatches the ShutdownNotification and thus should be called by overriding
 		/// implementations.
 
-	virtual void onBusy();
-		/// Must be overridden by subclasses (alongside the run() override) to perform
-		/// additional periodic tasks. The default implementation does nothing.
-
 	void onError(int code, const std::string& description);
 		/// Notifies all subscribers when the reactor loop throws an exception.
 
@@ -285,6 +281,40 @@ private:
 
 	friend class SocketNotifier;
 };
+
+//
+// inlines
+//
+
+
+inline void SocketReactor::setTimeout(const Poco::Timespan& timeout)
+{
+	_params.pollTimeout = timeout;
+}
+
+
+inline const Poco::Timespan& SocketReactor::getTimeout() const
+{
+	return _params.pollTimeout;
+}
+
+
+inline bool SocketReactor::has(const Socket& socket) const
+{
+	return _pollSet.has(socket);
+}
+
+
+inline void SocketReactor::onError(int code, const std::string& description)
+{
+	dispatch(new ErrorNotification(this, code, description));
+}
+
+
+inline void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
+{
+	pNotifier->dispatch(pNotification);
+}
 
 
 } } // namespace Poco::Net
