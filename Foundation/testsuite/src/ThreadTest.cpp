@@ -22,6 +22,7 @@
 #define __EXTENSIONS__
 #endif
 #include <climits>
+#include <iostream>
 
 
 using Poco::Thread;
