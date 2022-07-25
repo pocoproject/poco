@@ -180,18 +180,6 @@ inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
 }
 
 
-inline bool ThreadImpl::setAffinityImpl(int)
-{
-	return false;
-}
-
-
-inline int ThreadImpl::getAffinityImpl() const
-{
-	return -1;
-}
-
-
 } // namespace Poco
 
 

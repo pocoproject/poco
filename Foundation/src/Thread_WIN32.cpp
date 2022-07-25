@@ -16,6 +16,7 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 #include <process.h>
+#include <limits>
 
 
 namespace
@@ -218,6 +219,56 @@ long ThreadImpl::currentOsTidImpl()
 {
 	return GetCurrentThreadId();
 }
+
+
+bool ThreadImpl::setAffinityImpl(int affinity)
+{
+	HANDLE hProcess = GetCurrentProcess();
+	DWORD_PTR procMask = 0, sysMask = 0;
+	if (GetProcessAffinityMask(hProcess, &procMask, &sysMask))
+	{
+		HANDLE hThread = GetCurrentThread();
+		DWORD_PTR threadMask = 0;
+		threadMask |= 1ULL << affinity;
+
+		// thread and process affinities must match
+		if (!(threadMask & procMask)) return false;
+
+		if (SetThreadAffinityMask(hThread, threadMask))
+			return true;
+	}
+	return false;
+}
+
+
+int ThreadImpl::getAffinityImpl() const
+{
+	// bit ugly, but there's no explicit API for this
+	// https://stackoverflow.com/a/6601917/205386
+	HANDLE hThread = GetCurrentThread();
+	DWORD_PTR mask = 1;
+	DWORD_PTR old = 0;
+
+	// try every CPU one by one until one works or none are left
+	while (mask)
+	{
+		old = SetThreadAffinityMask(hThread, mask);
+		if (old)
+		{	// this one worked
+			SetThreadAffinityMask(hThread, old); // restore original
+			if (old > std::numeric_limits<int>::max()) return -1;
+			return static_cast<int>(old);
+		}
+		else
+		{
+			if (GetLastError() != ERROR_INVALID_PARAMETER)
+				return -1;
+		}
+		mask <<= 1;
+	}
+	return -1;
+}
+
 
 #if defined(_DLL)
 DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
