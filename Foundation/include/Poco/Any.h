@@ -66,7 +66,7 @@ union Placeholder
 public:
 	struct Size
 	{
-		static const unsigned int value = SizeV;
+		enum { value = SizeV };
 	};
 
 	Placeholder(const Placeholder&) = delete;
