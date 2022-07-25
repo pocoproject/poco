@@ -116,6 +116,14 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// It is safe to call addEventHandler() and removeEventHandler() from another
 	/// thread while the SocketReactor is running. Also, it is safe to call
 	/// addEventHandler() and removeEventHandler() from event handlers.
+	///
+	/// SocketReactor uses NotificationCenter to notify observers. When a handler
+	/// throws an exception, the NotificationCenter stops notifying the rest of
+	/// the observers about that particular event instance and propagates the
+	/// exception, which is eventually caught in the SocketReactor::run() method.
+	/// This sequence of events is obviously not desirable and it is highly
+	/// recommended that handlers wrap the code in try/catch and deal with all
+	/// the exceptions internally, lest they disrupt the notification of the peers.
 {
 public:
 	struct Params
@@ -235,6 +243,9 @@ protected:
 		/// dispatches the ShutdownNotification and thus should be called by overriding
 		/// implementations.
 
+	void onError(const Socket& socket, int code, const std::string& description);
+		/// Notifies all subscribers when the reactor loop throws an exception.
+
 	void onError(int code, const std::string& description);
 		/// Notifies all subscribers when the reactor loop throws an exception.
 
@@ -302,6 +313,12 @@ inline const Poco::Timespan& SocketReactor::getTimeout() const
 inline bool SocketReactor::has(const Socket& socket) const
 {
 	return _pollSet.has(socket);
+}
+
+
+inline void SocketReactor::onError(const Socket& socket, int code, const std::string& description)
+{
+	dispatch(new ErrorNotification(this, socket, code, description));
 }
 
 

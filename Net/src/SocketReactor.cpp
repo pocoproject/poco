@@ -88,17 +88,35 @@ void SocketReactor::run()
 				sm = _pollSet.poll(_params.pollTimeout);
 				for (const auto& s : sm)
 				{
-					if (s.second & PollSet::POLL_READ)
+					try
 					{
-						dispatch(s.first, _pReadableNotification);
+						if (s.second & PollSet::POLL_READ)
+						{
+							dispatch(s.first, _pReadableNotification);
+						}
+						if (s.second & PollSet::POLL_WRITE)
+						{
+							dispatch(s.first, _pWritableNotification);
+						}
+						if (s.second & PollSet::POLL_ERROR)
+						{
+							dispatch(s.first, _pErrorNotification);
+						}
 					}
-					if (s.second & PollSet::POLL_WRITE)
+					catch (Exception& exc)
 					{
-						dispatch(s.first, _pWritableNotification);
+						onError(s.first, exc.code(), exc.displayText());
+						ErrorHandler::handle(exc);
 					}
-					if (s.second & PollSet::POLL_ERROR)
+					catch (std::exception& exc)
 					{
-						dispatch(s.first, _pErrorNotification);
+						onError(s.first, 0, exc.what());
+						ErrorHandler::handle(exc);
+					}
+					catch (...)
+					{
+						onError(s.first, 0, "unknown exception");
+						ErrorHandler::handle();
 					}
 				}
 				if (0 == sm.size())

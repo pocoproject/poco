@@ -66,6 +66,16 @@ ErrorNotification::ErrorNotification(SocketReactor* pReactor, int code, const st
 }
 
 
+ErrorNotification::ErrorNotification(SocketReactor* pReactor, const Socket& socket,
+	int code, const std::string& description):
+	SocketNotification(pReactor),
+	_code(code),
+	_description(description)
+{
+	setSocket(socket);
+}
+
+
 ErrorNotification::~ErrorNotification()
 {
 }
