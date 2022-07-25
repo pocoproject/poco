@@ -17,6 +17,7 @@
 #include "Poco/Net/SocketNotifier.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 
 
@@ -30,27 +31,38 @@ namespace Net {
 
 SocketReactor::SocketReactor():
 	_stop(false),
-	_timeout(DEFAULT_TIMEOUT),
 	_pReadableNotification(new ReadableNotification(this)),
 	_pWritableNotification(new WritableNotification(this)),
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
-	_pShutdownNotification(new ShutdownNotification(this)),
-	_pThread(0)
+	_pShutdownNotification(new ShutdownNotification(this))
 {
 }
 
 
-SocketReactor::SocketReactor(const Poco::Timespan& timeout):
+SocketReactor::SocketReactor(const Poco::Timespan& pollTimeout, int threadAffinity):
+	_threadAffinity(threadAffinity),
 	_stop(false),
-	_timeout(timeout),
 	_pReadableNotification(new ReadableNotification(this)),
 	_pWritableNotification(new WritableNotification(this)),
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
-	_pShutdownNotification(new ShutdownNotification(this)),
-	_pThread(0)
+	_pShutdownNotification(new ShutdownNotification(this))
 {
+	_params.pollTimeout = pollTimeout.totalMilliseconds();
+}
+
+SocketReactor::SocketReactor(const Params& params, int threadAffinity):
+	_params(params),
+	_threadAffinity(threadAffinity),
+	_stop(false),
+	_pReadableNotification(new ReadableNotification(this)),
+	_pWritableNotification(new WritableNotification(this)),
+	_pErrorNotification(new ErrorNotification(this)),
+	_pTimeoutNotification(new TimeoutNotification(this)),
+	_pShutdownNotification(new ShutdownNotification(this))
+{
+
 }
 
 
@@ -61,36 +73,47 @@ SocketReactor::~SocketReactor()
 
 void SocketReactor::run()
 {
-	_pThread = Thread::current();
+	if (_threadAffinity >= 0)
+	{
+		Poco::Thread* pThread = Thread::current();
+		if (pThread) pThread->setAffinity(_threadAffinity);
+	}
+	Poco::Stopwatch sw;
+	if (_params.throttle) sw.start();
+	PollSet::SocketModeMap sm;
 	while (!_stop)
 	{
 		try
 		{
-			if (!hasSocketHandlers())
+			if (hasSocketHandlers())
 			{
-				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
-			}
-			else
-			{
-				bool readable = false;
-				PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
-				if (sm.size() > 0)
+				sm = _pollSet.poll(_params.pollTimeout);
+				for (const auto& s : sm)
 				{
-					PollSet::SocketModeMap::iterator it = sm.begin();
-					PollSet::SocketModeMap::iterator end = sm.end();
-					for (; it != end; ++it)
+					if (s.second & PollSet::POLL_READ)
 					{
-						if (it->second & PollSet::POLL_READ)
-						{
-							dispatch(it->first, _pReadableNotification);
-							readable = true;
-						}
-						if (it->second & PollSet::POLL_WRITE) dispatch(it->first, _pWritableNotification);
-						if (it->second & PollSet::POLL_ERROR) dispatch(it->first, _pErrorNotification);
+						dispatch(s.first, _pReadableNotification);
+					}
+					if (s.second & PollSet::POLL_WRITE)
+					{
+						dispatch(s.first, _pWritableNotification);
+					}
+					if (s.second & PollSet::POLL_ERROR)
+					{
+						dispatch(s.first, _pErrorNotification);
 					}
 				}
-				if (!readable) onTimeout();
+				if (0 == sm.size())
+				{
+					onTimeout();
+					if (_params.throttle && _params.pollTimeout == 0)
+					{
+						if ((sw.elapsed()/1000) > _params.sleepLimit) sleep();
+					}
+				}
+				else if (_params.throttle) sw.restart();
 			}
+			else sleep();
 		}
 		catch (Exception& exc)
 		{
@@ -112,6 +135,39 @@ void SocketReactor::run()
 }
 
 
+void SocketReactor::sleep()
+{
+	if (_params.sleep < _params.sleepLimit) ++_params.sleep;
+	_event.tryWait(_params.sleep);
+}
+
+
+void SocketReactor::stop()
+{
+	_stop = true;
+	wakeUp();
+}
+
+
+void SocketReactor::wakeUp()
+{
+	_pollSet.wakeUp();
+	_event.set();
+}
+
+
+void SocketReactor::setTimeout(const Poco::Timespan& timeout)
+{
+	_params.pollTimeout = timeout;
+}
+
+
+const Poco::Timespan& SocketReactor::getTimeout() const
+{
+	return _params.pollTimeout;
+}
+
+
 bool SocketReactor::hasSocketHandlers()
 {
 	if (!_pollSet.empty())
@@ -126,34 +182,6 @@ bool SocketReactor::hasSocketHandlers()
 	}
 
 	return false;
-}
-
-
-void SocketReactor::stop()
-{
-	_stop = true;
-}
-
-
-void SocketReactor::wakeUp()
-{
-	if (_pThread && _pThread != Thread::current())
-	{
-		_pThread->wakeUp();
-		_pollSet.wakeUp();
-	}
-}
-
-
-void SocketReactor::setTimeout(const Poco::Timespan& timeout)
-{
-	_timeout = timeout;
-}
-
-
-const Poco::Timespan& SocketReactor::getTimeout() const
-{
-	return _timeout;
 }
 
 
