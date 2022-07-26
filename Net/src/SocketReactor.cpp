@@ -47,7 +47,7 @@ SocketReactor::SocketReactor(const Poco::Timespan& pollTimeout, int threadAffini
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this))
 {
-	_params.pollTimeout = pollTimeout.totalMilliseconds();
+	_params.pollTimeout = pollTimeout;
 }
 
 SocketReactor::SocketReactor(const Params& params, int threadAffinity):

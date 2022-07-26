@@ -74,16 +74,21 @@ namespace
 			_socket(socket),
 			_reactor(reactor),
 			_or(*this, &ClientServiceHandler::onReadable),
-			_ow(*this, &ClientServiceHandler::onWritable)
+			_ow(*this, &ClientServiceHandler::onWritable),
+			_os(*this, &ClientServiceHandler::onShutdown)
 		{
 			_reactor.addEventHandler(_socket, _or);
 			_reactor.addEventHandler(_socket, _ow);
+			_reactor.addEventHandler(_socket, _os);
 
 			doSomething();
 		}
 		
 		~ClientServiceHandler()
 		{
+			_reactor.removeEventHandler(_socket, _os);
+			_reactor.removeEventHandler(_socket, _ow);
+			_reactor.removeEventHandler(_socket, _or);
 		}
 
 		void doSomething()
@@ -91,21 +96,24 @@ namespace
 			Thread::sleep(100);
 		}
 
+		void onShutdown(ShutdownNotification* pNf)
+		{
+			if (pNf) pNf->release();
+			_reactor.removeEventHandler(_socket, _os);
+			delete this;
+		}
+
 		void onReadable(ReadableNotification* pNf)
 		{
-			pNf->release();
+			if (pNf) pNf->release();
 			char buffer[32];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
-			if (n <= 0)
-			{
-				_reactor.removeEventHandler(_socket, _or);
-				delete this;
-			}
+			if (n <= 0) onShutdown(0);
 		}
 		
 		void onWritable(WritableNotification* pNf)
 		{
-			pNf->release();
+			if (pNf) pNf->release();
 			_reactor.removeEventHandler(_socket, _ow);
 			std::string data(5, 'x');
 			_socket.sendBytes(data.data(), (int) data.length());
@@ -116,6 +124,7 @@ namespace
 		SocketReactor&                                       _reactor;
 		Observer<ClientServiceHandler, ReadableNotification> _or;
 		Observer<ClientServiceHandler, WritableNotification> _ow;
+		Observer<ClientServiceHandler, ShutdownNotification> _os;
 	};
 }
 
