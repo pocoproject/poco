@@ -47,9 +47,10 @@ public:
 	Socket socket() const;
 		/// Returns the socket that caused the notification.
 
-private:
+protected:
 	void setSocket(const Socket& socket);
 
+private:
 	SocketReactor* _pReactor;
 	Socket         _socket;
 
@@ -86,6 +87,10 @@ class Net_API ErrorNotification: public SocketNotification
 {
 public:
 	ErrorNotification(SocketReactor* pReactor, int code = 0, const std::string& description = "");
+		/// Creates the ErrorNotification for the given SocketReactor.
+
+	ErrorNotification(SocketReactor* pReactor, const Socket& socket,
+		int code = 0, const std::string& description = "");
 		/// Creates the ErrorNotification for the given SocketReactor.
 
 	~ErrorNotification();

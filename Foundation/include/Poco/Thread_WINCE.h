@@ -75,11 +75,12 @@ public:
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	bool setAffinityImpl(int);
+	int getAffinityImpl() const;
 
 protected:
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
@@ -151,12 +152,6 @@ inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 }
 
 
-inline void ThreadImpl::sleepImpl(long milliseconds)
-{
-	Sleep(DWORD(milliseconds));
-}
-
-
 inline void ThreadImpl::yieldImpl()
 {
 	Sleep(0);
@@ -178,6 +173,18 @@ inline int ThreadImpl::getStackSizeImpl() const
 inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
 {
 	return _threadId;
+}
+
+
+inline bool ThreadImpl::setAffinityImpl(int)
+{
+	return false;
+}
+
+
+inline int ThreadImpl::getAffinityImpl() const
+{
+	return -1;
 }
 
 

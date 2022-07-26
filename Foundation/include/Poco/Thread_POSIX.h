@@ -80,11 +80,12 @@ public:
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	bool setAffinityImpl(int coreID);
+	int getAffinityImpl() const;
 
 protected:
 	static void* runnableEntry(void* pThread);
@@ -146,6 +147,7 @@ private:
 		bool          started;
 		bool          joined;
 		std::string   name;
+		int           affinity;
 		mutable FastMutex mutex;
 	};
 

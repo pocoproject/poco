@@ -22,6 +22,7 @@
 #define __EXTENSIONS__
 #endif
 #include <climits>
+#include <iostream>
 
 
 using Poco::Thread;
@@ -471,6 +472,22 @@ void ThreadTest::testSleep()
 }
 
 
+void ThreadTest::testAffinity()
+{
+#if POCO_OS == POCO_OS_LINUX
+	MyRunnable mr;
+	Thread t;
+	t.start(mr);
+	assertTrue (t.setAffinity(0));
+	assertEqual (t.getAffinity(), 0);
+	mr.notify();
+	t.join();
+#else
+	std::cout << "not implemented";
+#endif
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -499,6 +516,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunctor);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
+	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
 
 	return pSuite;
 }

@@ -15,9 +15,11 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Format.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
@@ -35,6 +37,8 @@
 	#include <unistd.h>
 	#include <sys/syscall.h>   /* For SYS_xxx definitions */
 #endif
+#include <iostream>
+
 
 //
 // Block SIGPIPE in main thread.
@@ -323,61 +327,6 @@ long ThreadImpl::currentOsTidImpl()
 #endif
 }
 
-void ThreadImpl::sleepImpl(long milliseconds)
-{
-#if defined(__digital__)
-		// This is specific to DECThreads
-		struct timespec interval;
-		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000;
-		pthread_delay_np(&interval);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timespec ts;
-		ts.tv_sec  = (long) remainingTime.totalSeconds();
-		ts.tv_nsec = (long) remainingTime.useconds()*1000;
-		Poco::Timestamp start;
-		rc = ::nanosleep(&ts, 0);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
-#else
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(0, NULL, NULL, NULL, &tv);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): select() failed");
-#endif
-}
-
 
 void* ThreadImpl::runnableEntry(void* pThread)
 {
@@ -467,6 +416,41 @@ int ThreadImpl::reverseMapPrio(int prio, int policy)
 			return PRIO_LOWEST_IMPL;
 	}
 	else return PRIO_HIGHEST_IMPL;
+}
+
+
+bool ThreadImpl::setAffinityImpl(int coreID)
+{
+#if POCO_OS == POCO_OS_LINUX
+	int numCores = sysconf(_SC_NPROCESSORS_ONLN);
+	if (coreID < 0 || coreID >= numCores)
+		return false;
+
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(coreID, &cpuset);
+
+	return 0 == pthread_setaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset);
+#else
+	return false;
+#endif
+}
+
+
+int ThreadImpl::getAffinityImpl() const
+{
+#if POCO_OS == POCO_OS_LINUX
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	if (0 == pthread_getaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset))
+	{
+		for (int i = 0; i < CPU_SETSIZE; ++i)
+		{
+			if (CPU_ISSET(i, &cpuset)) return i;
+		}
+	}
+#endif
+	return -1;
 }
 
 

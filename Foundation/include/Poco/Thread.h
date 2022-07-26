@@ -21,6 +21,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
+#include <thread>
+#include <chrono>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -207,6 +209,9 @@ public:
 		/// wakeUp() before calling trySleep() will prevent the next
 		/// trySleep() call to actually suspend the thread (which, in
 		/// some scenarios, may be desirable behavior).
+		///
+		/// Note that, unlike Thread::sleep(), this function can only
+		/// be succesfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
@@ -230,6 +235,17 @@ public:
 
 	static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
+
+	bool setAffinity(int coreId);
+		/// Sets the thread affinity to the coreID.
+		/// Returns true if succesful.
+		/// Returns false if not succesful or not
+		/// implemented.
+
+	int getAffinity() const;
+		/// Returns the thread affinity.
+		/// Negative value means the thread has
+		/// no CPU core affinity.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -317,15 +333,15 @@ inline bool Thread::isRunning() const
 }
 
 
-inline void Thread::sleep(long milliseconds)
-{
-	sleepImpl(milliseconds);
-}
-
-
 inline void Thread::yield()
 {
 	yieldImpl();
+}
+
+
+inline void Thread::sleep(long milliseconds)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 
@@ -380,6 +396,18 @@ inline long Thread::currentOsTid()
 {
 	return currentOsTidImpl();
 }
+
+inline bool Thread::setAffinity(int coreId)
+{
+	return setAffinityImpl(coreId);
+}
+
+
+inline int Thread::getAffinity() const
+{
+	return getAffinityImpl();
+}
+
 
 } // namespace Poco
 

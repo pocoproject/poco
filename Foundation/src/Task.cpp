@@ -79,8 +79,7 @@ void Task::run()
 			pOwner->taskFailed(this, SystemException("unknown exception"));
 	}
 	_state = TASK_FINISHED;
-	if (pOwner)
-		pOwner->taskFinished(this);
+	if (pOwner) pOwner->taskFinished(this);
 }
 
 

@@ -31,6 +31,7 @@ public:
 	void testSocketConnectorTimeout();
 	void testDataCollection();
 	void testSocketConnectorDeadlock();
+	void testSocketReactorWakeup();
 
 	void setUp();
 	void tearDown();

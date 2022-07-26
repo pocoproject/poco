@@ -90,11 +90,12 @@ public:
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	bool setAffinityImpl(int coreID);
+	int getAffinityImpl() const;
 
 protected:
 	static void runnableEntry(void* pThread, int, int, int, int, int, int, int, int, int);
@@ -168,6 +169,18 @@ inline int ThreadImpl::getStackSizeImpl() const
 inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
 {
 	return _pData->task;
+}
+
+
+inline bool ThreadImpl::setAffinityImpl(int)
+{
+	return false;
+}
+
+
+inline int ThreadImpl::getAffinityImpl() const
+{
+	return -1;
 }
 
 
