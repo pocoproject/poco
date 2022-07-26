@@ -66,11 +66,11 @@
 // Detect support for JSON data type
 //
 #if defined(MARIADB_VERSION_ID)
-	#if MARIADB_VERSION_ID > 100207
+	#if MARIADB_VERSION_ID >= 100207
 		#define POCO_MYSQL_JSON
 	#endif
 #else
-	#if MYSQL_VERSION_ID > 50708
+	#if MYSQL_VERSION_ID >= 50708
 		#define POCO_MYSQL_JSON
 	#endif
 #endif
