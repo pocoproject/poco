@@ -81,7 +81,9 @@ public:
 	void testBLOBStmt();
 	void testLongBLOB();
 	void testLongTEXT();
+#ifdef POCO_MYSQL_JSON
 	void testJSON();
+#endif
 
 	void testUnsignedInts();
 	void testFloat();
@@ -122,7 +124,9 @@ private:
 	void recreatePersonTimeTable();
 	void recreatePersonTimestampTable();
 	void recreatePersonLongBLOBTable();
+#ifdef POCO_MYSQL_JSON
 	void recreatePersonJSONTable();
+#endif
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();
