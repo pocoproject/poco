@@ -74,7 +74,11 @@ public:
 		_epollfd(epoll_create(1))
 	{
 		int err = addFD(_eventfd, PollSet::POLL_READ, EPOLL_CTL_ADD);
+#ifdef WEPOLL_H_
+		if ((err) || !_epollfd)
+#else
 		if ((err) || (_epollfd < 0))
+#endif
 		{
 			SocketImpl::error();
 		}
