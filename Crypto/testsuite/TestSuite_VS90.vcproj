@@ -583,6 +583,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\EnvelopeTest.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RSATest.h"
 					>
 				</File>
@@ -608,6 +612,10 @@
 				</File>
 				<File
 					RelativePath=".\src\PKCS12ContainerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EnvelopeTest.cpp"
 					>
 				</File>
 				<File
