@@ -559,6 +559,8 @@
     <ClInclude Include="include\Poco\Crypto\ECDSADigestEngine.h"/>
     <ClInclude Include="include\Poco\Crypto\ECKey.h"/>
     <ClInclude Include="include\Poco\Crypto\ECKeyImpl.h"/>
+    <ClInclude Include="include\Poco\Crypto\Envelope.h"/>
+    <ClInclude Include="include\Poco\Crypto\EVPCipherImpl.h"/>
     <ClInclude Include="include\Poco\Crypto\EVPPKey.h"/>
     <ClInclude Include="include\Poco\Crypto\KeyPair.h"/>
     <ClInclude Include="include\Poco\Crypto\KeyPairImpl.h"/>
@@ -605,6 +607,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\ECKeyImpl.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\Envelope.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\EVPCipherImpl.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\EVPPKey.cpp">
