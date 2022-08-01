@@ -50,13 +50,17 @@ public:
 	using TaskPtr = AutoPtr<Task>;
 	using TaskList = std::list<TaskPtr>;
 
-	TaskManager();
-		/// Creates the TaskManager, using the
-		/// default ThreadPool.
+	TaskManager(const std::string& name = "",
+		int minCapacity = 2,
+		int maxCapacity = 16,
+		int idleTime = 60,
+		int stackSize = POCO_THREAD_STACK_SIZE);
+		/// Creates the TaskManager.
 
 	TaskManager(ThreadPool& pool);
 		/// Creates the TaskManager, using the
-		/// given ThreadPool.
+		/// given ThreadPool (should be used
+		/// by this TaskManager exclusively).
 
 	~TaskManager();
 		/// Destroys the TaskManager.
@@ -110,11 +114,15 @@ protected:
 	void taskFailed(Task* pTask, const Exception& exc);
 
 private:
+	using MutexT = FastMutex;
+	using ScopedLockT = MutexT::ScopedLock;
+
 	ThreadPool&        _threadPool;
+	bool               _ownPool;
 	TaskList           _taskList;
 	Timestamp          _lastProgressNotification;
 	NotificationCenter _nc;
-	mutable FastMutex  _mutex;
+	mutable MutexT  _mutex;
 
 	friend class Task;
 };
@@ -125,7 +133,7 @@ private:
 //
 inline int TaskManager::count() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	ScopedLockT lock(_mutex);
 
 	return (int) _taskList.size();
 }

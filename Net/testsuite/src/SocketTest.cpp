@@ -450,9 +450,8 @@ void SocketTest::testSelect()
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
 
-	ss.sendBytes("hello", 5);
-
-	ss.poll(timeout, Socket::SELECT_READ);
+	assertTrue (5 == ss.sendBytes("hello", 5));
+	assertTrue (ss.poll(timeout, Socket::SELECT_READ));
 
 	readList.push_back(ss);
 	writeList.push_back(ss);

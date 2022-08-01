@@ -57,6 +57,12 @@ public:
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
@@ -69,11 +75,12 @@ public:
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	bool setAffinityImpl(int);
+	int getAffinityImpl() const;
 
 protected:
 #if defined(_DLL)
@@ -116,6 +123,7 @@ private:
 	DWORD _threadId;
 	int _prio;
 	int _stackSize;
+	std::string _name;
 
 	static CurrentThreadHolder _currentThreadHolder;
 };
@@ -145,12 +153,6 @@ inline int ThreadImpl::getMinOSPriorityImpl(int /* policy */)
 inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 {
 	return PRIO_HIGHEST_IMPL;
-}
-
-
-inline void ThreadImpl::sleepImpl(long milliseconds)
-{
-	Sleep(DWORD(milliseconds));
 }
 
 

@@ -171,13 +171,13 @@ BUILDING ON WINDOWS
 ===================
 
 Microsoft Visual Studio 2015 or newer is required to build the POCO C++ Libraries on
-Windows platforms. Solution and project files for all versions from 2015 to 2019 are included.
+Windows platforms. Solution and project files for all versions from 2015 to 2022 are included.
 64-bit (x64) builds are supported as well.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
 Visual Studio Command Prompt and cd to the directory where you
 have extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
-and pass as argument the version of visual studio (140, 150, 160, etc.). You can customize
+and pass as argument the version of visual studio (140, 150, 160, 170, etc.). You can customize
 what is being built by buildwin.cmd by passing appropriate command line arguments to
 it. Call buildwin.cmd without arguments to see what is available.
 

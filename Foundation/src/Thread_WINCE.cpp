@@ -16,7 +16,6 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 
-
 namespace Poco {
 
 
@@ -38,6 +37,35 @@ ThreadImpl::~ThreadImpl()
 	if (_thread) CloseHandle(_thread);
 }
 
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+	{
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	if (realName != _name)
+	{
+		_name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	return _name;
+}
+
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	// return fake thread name;
+	return isRunningImpl() ? _name : "";
+}
 
 void ThreadImpl::setPriorityImpl(int prio)
 {

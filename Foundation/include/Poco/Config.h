@@ -52,6 +52,11 @@
 	#define POCO_THREAD_STACK_SIZE 0
 #endif
 
+// Defined to desired max thread name length
+#ifndef POCO_MAX_THREAD_NAME_LEN
+#define POCO_MAX_THREAD_NAME_LEN 15
+#endif
+
 
 // Define to override system-provided
 // minimum thread priority value on POSIX

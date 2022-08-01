@@ -86,7 +86,9 @@ public:
 	void timestamp();
 	void longBlob();
 	void longText();
+#ifdef POCO_MYSQL_JSON
 	void json();
+#endif	
 	void unsignedInts();
 	void floats();
 	void doubles();

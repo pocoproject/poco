@@ -72,7 +72,9 @@ namespace
 		case MYSQL_TYPE_MEDIUM_BLOB:
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
+#ifdef POCO_MYSQL_JSON
 		case MYSQL_TYPE_JSON:
+#endif		
 			return field.length;
 
 		default:

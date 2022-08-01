@@ -602,6 +602,7 @@
     <ClInclude Include="src\CryptoTestSuite.h"/>
     <ClInclude Include="src\DigestEngineTest.h"/>
     <ClInclude Include="src\ECTest.h"/>
+    <ClInclude Include="src\EnvelopeTest.h"/>
     <ClInclude Include="src\EVPTest.h"/>
     <ClInclude Include="src\PKCS12ContainerTest.h"/>
     <ClInclude Include="src\RSATest.h"/>
@@ -620,6 +621,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\ECTest.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\EnvelopeTest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\EVPTest.cpp">
