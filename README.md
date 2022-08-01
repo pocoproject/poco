@@ -139,7 +139,7 @@ The poco port in vcpkg is kept up to date by Microsoft team members and communit
 If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg)
 on the vcpkg repository.
 
-#### Building and Installing - USING Conan
+#### Building and Installing - Using Conan
 
 You can download and install poco using the Conan(https://github.com/conan-io/conan)
 package manager.
