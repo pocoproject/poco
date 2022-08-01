@@ -139,6 +139,29 @@ The poco port in vcpkg is kept up to date by Microsoft team members and communit
 If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg)
 on the vcpkg repository.
 
+#### Building and Installing - USING Conan
+
+You can download and install poco using the Conan(https://github.com/conan-io/conan)
+package manager.
+
+First, you need to install Conan client:
+
+    $ pip install conan
+
+There other ways to install besides pip: https://conan.io/downloads.html
+
+Then, you can download Poco recipe and build locally:
+
+    $ conan install -r conancenter poco/1.12.0@ --build=poco
+
+Or, you can install a pre-built Poco package available on Conan Center:
+
+    $ conan install -r conancenter poco/1.12.0@
+
+The Poco recipe and packages in Conan Center are kept up to date by Conan team members and community contributors.
+If the version is out of date, or you detect any wrong behavior, please create an issue or pull request(https://github.com/conan-io/conan-center-index)
+on the Conan Center Index repository.
+
 
 ### Building Without CMake
 
