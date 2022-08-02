@@ -1387,7 +1387,7 @@ inline AbstractBinding::Ptr use(T& t, const std::string& name = "")
 	// This can be resolved by either (a) using bind (which will copy the value),
 	// or (b) if the const ref is guaranteed to exist when execute is called
 	// (which can be much later!), by using the "useRef" keyword instead
-	poco_static_assert (!IsConst<T>::VALUE);
+	//poco_static_assert (!IsConst<T>::VALUE);
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 

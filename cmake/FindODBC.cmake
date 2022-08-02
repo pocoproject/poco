@@ -22,10 +22,9 @@ include(FindPackageHandleStandardArgs)
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_ODBC QUIET odbc)
 
-if(WIN32 AND NOT MINGW)
+if(WIN32)
 	get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
 	get_filename_component(kit81_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot81]" REALPATH)
-	set(_odbc_kit_include_dirs "${kit_dir}/Include/um" "${kit81_dir}/Include/um")
 endif()
 
 find_path(ODBC_INCLUDE_DIR
@@ -36,17 +35,19 @@ find_path(ODBC_INCLUDE_DIR
 	PATHS
 		${PC_ODBC_INCLUDE_DIRS}
 		/usr/include
+		/usr/local/unixODBC/include
 		/usr/local/include
-		/usr/local/odbc/include
+#		/usr/local/odbc/include
 		/usr/local/iodbc/include
 		"C:/Program Files/ODBC/include"
 		"C:/Program Files/Microsoft SDKs/Windows/v7.0/include"
 		"C:/Program Files/Microsoft SDKs/Windows/v6.0a/include"
 		"C:/ODBC/include"
-		${_odbc_kit_include_dirs}
+		"${kit_dir}/Include/um"
+		"${kit81_dir}/Include/um"
 	PATH_SUFFIXES
 		odbc
-		iodbc
+#		iodbc
 	DOC "Specify the directory containing sql.h."
 )
 
@@ -70,9 +71,10 @@ find_library(ODBC_LIBRARY
 	PATHS
 		${PC_ODBC_LIBRARY_DIRS}
 		/usr/lib
+		/usr/local/unixODBC/lib
 		/usr/local/lib
-		/usr/local/odbc/lib
-		/usr/local/iodbc/lib
+#		/usr/local/odbc/lib
+#		/usr/local/iodbc/lib
 		"C:/Program Files/ODBC/lib"
 		"C:/ODBC/lib/debug"
 		"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"
@@ -102,9 +104,10 @@ foreach(_lib_name IN LISTS _odbc_required_libs_names)
 		PATHS
 			${PC_ODBC_LIBRARY_DIRS}
 			/usr/lib
+			/usr/local/unixODBC/lib
 			/usr/local/lib
-			/usr/local/odbc/lib
-			/usr/local/iodbc/lib
+#			/usr/local/odbc/lib
+#			/usr/local/iodbc/lib
 			"C:/Program Files/ODBC/lib"
 			"C:/ODBC/lib/debug"
 			"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"

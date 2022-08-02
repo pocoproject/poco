@@ -5674,6 +5674,7 @@ class TypeHandler<Poco::AutoPtr<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for Poco::AutoPtr
 {
 public:
+        typedef AutoPtr<T> TPtr; // new code here
 	static void bind(std::size_t pos, const Poco::AutoPtr<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		// *obj will trigger a nullpointer exception if empty: this is on purpose
