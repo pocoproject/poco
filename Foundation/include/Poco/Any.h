@@ -28,6 +28,8 @@
 
 namespace Poco {
 
+#define POCO_SMALL_OBJECT_SIZE 64
+
 class Any;
 
 namespace Dynamic {
