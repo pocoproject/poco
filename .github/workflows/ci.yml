@@ -22,6 +22,17 @@ jobs:
           EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
+  linux-gcc-make-cxx20:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: >-
+          sudo -s
+          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
+          ./ci/runtests.sh
+
   linux-gcc-make-asan:
     runs-on: ubuntu-20.04
     services:
