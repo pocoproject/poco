@@ -143,7 +143,14 @@ const DigestEngine::Digest& SHA1Engine::digest()
 	for (count = 0; count < DIGEST_SIZE; count++)
 		hash[count] = (BYTE) ((_context.digest[count>>2]) >> (8*(3-(count & 0x3)))) & 0xff;
 	_digest.clear();
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 	_digest.insert(_digest.begin(), hash, hash + DIGEST_SIZE);
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic pop
+#endif
 	reset();
 	return _digest;
 }
