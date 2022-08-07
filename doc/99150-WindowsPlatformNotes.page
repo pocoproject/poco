@@ -51,22 +51,10 @@ and PocoLIB64d.dll for debug, respectively.
 
 !!!C++ standard version not properly defined
 
-In oreder to work around that, `/Zc:__cplusplus` compiler flag is necesary.
+In order to work around that, `/Zc:__cplusplus` compiler flag is necesary.
 
 See following issues for details and explanations:
 
   * https://github.com/pocoproject/poco/issues/3665
   * https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
 
-
-!!!Compiler bug when `/Zc:twoPhase` is specified
-
-There is a bug in the MSVC compiler that prevents `Poco::Any` compilation when the
-small object optimization is enabled and `/Zc:permissive-` flag is specified (more
-specifically, it is the `/Zc:twoPhase` flag, implicitly set by `/Zc:permissive-`).
-
-Details:
-
-  * https://github.com/pocoproject/poco/issues/3682
-  * https://github.com/pocoproject/poco/issues/3683
-  * https://developercommunity.visualstudio.com/t/fatal-error-C1001:-Internal-compiler-err/10095155?space=62&q=djc3ho&entry=problem&sort=newest
