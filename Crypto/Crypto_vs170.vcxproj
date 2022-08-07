@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|ARM64">
       <Configuration>debug_shared</Configuration>
@@ -75,7 +75,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectName>Crypto</ProjectName>
     <ProjectGuid>{EEEE7259-32E9-4D56-B023-C733940AB2A0}</ProjectGuid>
     <RootNamespace>Crypto</RootNamespace>
@@ -230,7 +229,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>17.0.32505.173</_ProjectFileVersion>
+    <_ProjectFileVersion>16.0.32629.160</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|ARM64'">PocoCryptoA64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|ARM64'">PocoCryptomdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|ARM64'">PocoCryptomtd</TargetName>
@@ -824,6 +823,8 @@
     <ClInclude Include="include\Poco\Crypto\ECDSADigestEngine.h"/>
     <ClInclude Include="include\Poco\Crypto\ECKey.h"/>
     <ClInclude Include="include\Poco\Crypto\ECKeyImpl.h"/>
+    <ClInclude Include="include\Poco\Crypto\Envelope.h"/>
+    <ClInclude Include="include\Poco\Crypto\EVPCipherImpl.h"/>
     <ClInclude Include="include\Poco\Crypto\EVPPKey.h"/>
     <ClInclude Include="include\Poco\Crypto\KeyPair.h"/>
     <ClInclude Include="include\Poco\Crypto\KeyPairImpl.h"/>
@@ -870,6 +871,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\ECKeyImpl.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\Envelope.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\EVPCipherImpl.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\EVPPKey.cpp">

@@ -2,6 +2,31 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
+
+!!!Release 1.12.2
+
+!!Summary of Changes
+
+  - GH #3460 fix(Platform): LoongArch support
+  - GH #3688 Linking Crypto-testrunner fails
+  - GH #3693 VS2022 compilation issues
+  - GH #3698 SIGABRT in OSSL_PROVIDER_unload with static OpenSSL3
+  - GH #3699 POSIX Event state need not be atomic
+  - GH #3700 Release script must include build_vs170.cmd
+  - GH #3708 wakeup fd is never read
+  - GH #3711 lowercase winsock2 and iphlpapi to allow cross compile
+  - GH #3716 Compiling with clang_cl_x64_x64 on Visual Studio 2022 failed
+  - GH #3717 Only support extracting JSON fields when the SDK supports it
+  - GH #3719 PocoNet Project File does not support Visual Studio 2022
+  - GH #3720 Update max MSVC version information
+  - GH #3721 fails to build with Visual Studio projects
+  - GH #3722 Added missing Crypto Header to ProGen source
+  - GH #3724 Crypto: Progen again to add new files and bring back ARM64 configuration
+  - GH #3727 Add how to install using Conan section on README
+  - GH #3733 Poco::format and C++20
+  - GH #3734 g++ C++20 warnings
+
+
 !!!Release 1.12.1
 
 !!Summary of Changes

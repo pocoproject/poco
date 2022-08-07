@@ -77,7 +77,9 @@ private:
 	{
 		T result = 0;
 		if (123 <= std::numeric_limits<T>::max())
+		{
 			assertTrue (Poco::strToInt("123", result, 10)); assertTrue (result == 123);
+		}
 
 		assertTrue (Poco::strToInt("0", result, 10)); assertTrue (result == 0);
 		assertTrue (Poco::strToInt("000", result, 10)); assertTrue (result == 0);

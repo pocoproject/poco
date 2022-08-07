@@ -1513,6 +1513,7 @@ void SQLExecutor::longText()
 	poco_assert (longTextRes == biography);
 }
 
+#ifdef POCO_MYSQL_JSON
 void SQLExecutor::json()
 {
 	std::string funct = "json()";
@@ -1537,7 +1538,7 @@ void SQLExecutor::json()
 	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail(funct); }
 	poco_assert(res == biography);
 }
-
+#endif
 
 void SQLExecutor::tuples()
 {

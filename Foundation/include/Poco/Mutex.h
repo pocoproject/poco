@@ -22,16 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
 #include "Poco/Timestamp.h"
-
-#if __cplusplus >= 201103L
-	#ifndef POCO_HAVE_STD_ATOMICS
-		#define POCO_HAVE_STD_ATOMICS
-	#endif
-#endif
-
-#ifdef POCO_HAVE_STD_ATOMICS
-	#include <atomic>
-#endif
+#include <atomic>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -161,8 +152,6 @@ private:
 };
 
 
-#ifdef POCO_HAVE_STD_ATOMICS
-
 class Foundation_API SpinlockMutex
 	/// A SpinlockMutex, implemented in terms of std::atomic_flag, as
 	/// busy-wait mutual exclusion.
@@ -209,8 +198,6 @@ public:
 private:
 	std::atomic_flag _flag = ATOMIC_FLAG_INIT;
 };
-
-#endif // POCO_HAVE_STD_ATOMICS
 
 
 class Foundation_API NullMutex
@@ -336,8 +323,6 @@ inline void FastMutex::unlock()
 }
 
 
-#ifdef POCO_HAVE_STD_ATOMICS
-
 //
 // SpinlockMutex
 //
@@ -381,8 +366,6 @@ inline void SpinlockMutex::unlock()
 {
 	_flag.clear(std::memory_order_release);
 }
-
-#endif // POCO_HAVE_STD_ATOMICS
 
 
 } // namespace Poco
