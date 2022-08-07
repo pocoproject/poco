@@ -147,6 +147,7 @@ public:
 	{
 		pNotification->release();
 		StreamSocket sock = _socket.acceptConnection();
+		sock.setBlocking(false);
 		_pReactor->wakeUp();
 		createServiceHandler(sock);
 	}
