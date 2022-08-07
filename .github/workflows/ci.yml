@@ -30,7 +30,7 @@ jobs:
       - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j4 && sudo make install
       - run: >-
           sudo -s
-          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
+          EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
   linux-gcc-make-asan:
