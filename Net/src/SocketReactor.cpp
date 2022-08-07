@@ -312,33 +312,4 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 	}
 }
 
-
-void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
-{
-	bool success = false;
-	try
-	{
-		pNotifier->dispatch(pNotification);
-		success = true;
-	}
-	catch (Exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (std::exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (...)
-	{
-		ErrorHandler::handle();
-	}
-
-	if (!success || pNotification == _pShutdownNotification)
-	{
-		closeSocket(pNotifier->socket());
-	}
-}
-
-
 } } // namespace Poco::Net

@@ -108,7 +108,7 @@ public:
 			int len = _socket.receiveBytes(_fifoIn);
 			if (len == 0)
 			{
-				// maybe remote close the socket, we should close _socket
+				// maybe remote close the socket, we should close socket
 				_reactor.closeSocket(_socket);
 			}
 			else if (len < 3)
@@ -120,16 +120,13 @@ public:
 				throw Poco::IOException();
 			}
 		}
-		catch (Poco::IOException& exc)
-		{
-			// IO exception reactor will close socket and destroy me
-			throw;
-		}
 		catch (Poco::Exception& exc)
 		{
 			// Logic exception, user should handle it.
 			Application& app = Application::instance();
 			app.logger().log(exc);
+			// Just close socket
+			_reactor.closeSocket(_socket);
 		}
 	}
 
@@ -139,16 +136,13 @@ public:
 		{
 			_socket.sendBytes(_fifoOut);
 		}
-		catch (Poco::IOException& exc)
-		{
-			// IO exception reactor will close socket and destroy me
-			throw;
-		}
 		catch (Poco::Exception& exc)
 		{
 			// Logic exception, user should handle it.
 			Application& app = Application::instance();
 			app.logger().log(exc);
+			// Just close socket
+			_reactor.closeSocket(_socket);
 		}
 	}
 
