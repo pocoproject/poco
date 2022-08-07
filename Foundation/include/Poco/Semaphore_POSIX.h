@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include <pthread.h>
 #include <errno.h>
+#include <atomic>
 
 
 namespace Poco {
@@ -37,10 +38,10 @@ protected:
 	bool waitImpl(long milliseconds);
 
 private:
-	volatile int    _n;
-	int             _max;
-	pthread_mutex_t _mutex;
-	pthread_cond_t  _cond;
+	std::atomic<int>  _n;
+	int               _max;
+	pthread_mutex_t   _mutex;
+	pthread_cond_t    _cond;
 };
 
 
