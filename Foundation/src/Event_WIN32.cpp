@@ -46,7 +46,8 @@ void EventImpl::waitImpl()
 
 bool EventImpl::waitImpl(long milliseconds)
 {
-	switch (WaitForSingleObject(_event, milliseconds + 1))
+	poco_assert(milliseconds != INFINITE);
+	switch (WaitForSingleObject(_event, milliseconds ? milliseconds : 1))
 	{
 	case WAIT_TIMEOUT:
 		return false;
