@@ -79,8 +79,8 @@ public:
 		unsigned threads = Poco::Environment::processorCount(), const std::string& threadName = ""):
 		_threadName(threadName),
 		_socket(socket),
-		_parameters(std::forward_as_tuple(parameters...)),
 		_pReactor(&reactor),
+		_parameters(std::forward_as_tuple(parameters...)),
 		_threads(threads),
 		_next(0)
 		/// Creates a ParallelSocketAcceptor using the given ServerSocket, sets the
