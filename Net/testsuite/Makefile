@@ -19,8 +19,8 @@ objects = \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
 	FTPStreamFactoryTest DialogServer \
-	SocketReactorTest SocketConnectorTest SocketAcceptor ReactorTestSuite \
-	SocketProactorTest \
+	SocketReactorTest SocketConnectorTest ReactorTestSuite \
+	SocketProactorTest SocketAcceptorTest \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
