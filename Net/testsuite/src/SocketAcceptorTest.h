@@ -25,7 +25,9 @@ public:
 	~SocketAcceptorTest();
 
 	void testSocketAcceptor();
+	void testSocketAcceptorWithParameters();
 	void testParallelSocketAcceptor();
+	void testParallelSocketAcceptorWithParameters();
 
 	static CppUnit::Test* suite();
 

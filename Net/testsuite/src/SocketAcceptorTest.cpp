@@ -70,8 +70,8 @@ namespace
 			char buffer[8];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			_data = std::string(buffer, n);
-			if (n > 0) _socket.sendBytes(buffer, n);
-			else delete this;
+			_socket.sendBytes(buffer, sizeof(buffer));
+			delete this;
 		}
 
 		static std::string _data;
@@ -118,6 +118,7 @@ namespace
 		{
 			if (pNf) pNf->release();
 			_reactor.removeEventHandler(_socket, _os);
+			_reactor.stop();
 			delete this;
 		}
 
@@ -126,8 +127,7 @@ namespace
 			if (pNf) pNf->release();
 			char buffer[8];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
-			if (n <= 0) onShutdown(0);
-			_reactor.stop();
+			onShutdown(0);
 		}
 
 		void onWritable(WritableNotification* pNf)
@@ -168,13 +168,17 @@ void SocketAcceptorTest::testSocketAcceptor()
 	EchoServiceHandler::_data.clear();
 	reactor.run();
 	assertTrue (EchoServiceHandler::_data == "xxxxxxxx");
+}
 
-	// Test accept handler with additional parameters
-	SocketAddress ssa2;
-	ServerSocket ss2(ssa);
-	SocketAcceptor<EchoServiceHandler, bool> acceptor2(ss2, reactor, false);
-	SocketAddress sa2("127.0.0.1", ss2.address().port());
-	SocketConnector<ClientServiceHandler> connector2(sa2, reactor);
+
+void SocketAcceptorTest::testSocketAcceptorWithParameters()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	SocketAcceptor<EchoServiceHandler, bool> acceptor(ss, reactor, false);
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	EchoServiceHandler::_isBlocking = true;
 	reactor.run();
 	assertTrue (EchoServiceHandler::_isBlocking == false);
@@ -193,13 +197,17 @@ void SocketAcceptorTest::testParallelSocketAcceptor()
 	EchoServiceHandler::_data.clear();
 	reactor.run();
 	assertTrue (EchoServiceHandler::_data == "xxxxxxxx");
+}
 
-	// Test accept handler with additional parameters
-	SocketAddress ssa2;
-	ServerSocket ss2(ssa);
-	ParallelSocketAcceptor<EchoServiceHandler, SocketReactor, bool> acceptor2(ss, reactor, REACTORS_COUNT, false);
-	SocketAddress sa2("127.0.0.1", ss2.address().port());
-	SocketConnector<ClientServiceHandler> connector2(sa2, reactor);
+
+void SocketAcceptorTest::testParallelSocketAcceptorWithParameters()
+{
+	SocketAddress ssa("127.0.0.1:22087");
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	ParallelSocketAcceptor<EchoServiceHandler, SocketReactor, bool> acceptor(ss, reactor, false, REACTORS_COUNT);
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	EchoServiceHandler::_isBlocking = true;
 	reactor.run();
 	assertTrue (EchoServiceHandler::_isBlocking == false);
@@ -212,7 +220,9 @@ CppUnit::Test* SocketAcceptorTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SocketAcceptorTest");
 
 	CppUnit_addTest(pSuite, SocketAcceptorTest, testSocketAcceptor);
+	CppUnit_addTest(pSuite, SocketAcceptorTest, testSocketAcceptorWithParameters);
 	CppUnit_addTest(pSuite, SocketAcceptorTest, testParallelSocketAcceptor);
+	CppUnit_addTest(pSuite, SocketAcceptorTest, testParallelSocketAcceptorWithParameters);
 
 	return pSuite;
 }
