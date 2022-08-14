@@ -36,7 +36,7 @@ class AccessExpireCache: public AbstractCache<TKey, TValue, AccessExpireStrategy
 	/// Entries expire when they are not accessed with get() during this time period. Each access resets
 	/// the start time for expiration.
 	/// Be careful when using an AccessExpireCache. A cache is often used
-	/// like cache.has(x) followed by cache.get x). Note that it could happen
+	/// like cache.has(x) followed by cache.get(x). Note that it could happen
 	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
 	/// the entry gets invalid, thus leading to an empty SharedPtr being returned
 	/// when "get" is invoked.
