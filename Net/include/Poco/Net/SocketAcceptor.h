@@ -30,7 +30,7 @@ namespace Poco {
 namespace Net {
 
 
-template <class ServiceHandler>
+template <class ServiceHandler, class... Parameters>
 class SocketAcceptor
 	/// This class implements the Acceptor part of the
 	/// Acceptor-Connector design pattern.
@@ -62,6 +62,12 @@ class SocketAcceptor
 	/// e.g.:
 	///     MyServiceHandler(const StreamSocket& socket, ServiceReactor& reactor)
 	///
+	/// Also ServiceHandler can have additional parameters, in which case
+	/// additional parameters should be added to SocketAcceptor,
+	///  e.g.:
+	///     SocketAcceptor sa(socket, reactor, options)
+	///     MyServiceHandler(const StreamSocket& socket, ServiceReactor& reactor, Options options)
+	///
 	/// When the ServiceHandler is done, it must destroy itself.
 	///
 	/// Subclasses can override the createServiceHandler() factory method
@@ -70,21 +76,53 @@ class SocketAcceptor
 public:
 	using Observer = Poco::Observer<SocketAcceptor, ReadableNotification>;
 
-	explicit SocketAcceptor(ServerSocket& socket):
+	struct ServiceHandlerFactory
+		/// Create a ServiceHandler by parameters in a tuple.
+	{
+		template<int ...> struct Seq {};
+
+		template<int N, int ...S>
+		struct Gens : Gens<N - 1, N - 1, S...> {};
+
+		template<int ...S>
+		struct Gens<0, S...>
+		{
+			typedef Seq<S...> type;
+		};
+
+		static ServiceHandler *
+		create(StreamSocket& socket, SocketReactor& reactor, const std::tuple<Parameters...> &params)
+		/// create a ServiceHandler with socket, reactor and additional parameters(params)
+		{
+			return createInternal(socket, reactor, typename Gens<sizeof...(Parameters)>::type(), params);
+		}
+
+	private:
+		template<int ...S>
+		inline static ServiceHandler *createInternal(StreamSocket &socket, SocketReactor &reactor, Seq<S...>,
+													 const std::tuple<Parameters...> &params) {
+			return new ServiceHandler(socket, reactor, std::get<S>(params)...);
+		}
+	};
+
+	explicit SocketAcceptor(ServerSocket& socket, Parameters&&... parameters):
 		_socket(socket),
-		_pReactor(0)
+		_pReactor(0),
+		_parameters(std::forward_as_tuple(parameters...))
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 	{
 	}
 
-	SocketAcceptor(ServerSocket& socket, SocketReactor& reactor):
+	SocketAcceptor(ServerSocket& socket, SocketReactor& reactor, Parameters&&... parameters):
 		_socket(socket),
-		_pReactor(&reactor)
+		_pReactor(&reactor),
+		_parameters(std::forward_as_tuple(parameters...))
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 		/// The SocketAcceptor registers itself with the given SocketReactor.
 	{
 		_pReactor->addEventHandler(_socket, Observer(*this, &SocketAcceptor::onAccept));
 	}
+
 
 	virtual ~SocketAcceptor()
 		/// Destroys the SocketAcceptor.
@@ -146,18 +184,20 @@ public:
 		/// Accepts connection and creates event handler.
 	{
 		pNotification->release();
+		poco_assert(_pReactor != nullptr);
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
 		createServiceHandler(sock);
 	}
 
 protected:
+
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
 		/// Subclasses can override this method.
 	{
-		return new ServiceHandler(socket, *_pReactor);
+		return ServiceHandlerFactory::create(socket, *_pReactor, _parameters);
 	}
 
 	SocketReactor* reactor()
@@ -182,6 +222,9 @@ private:
 
 	ServerSocket   _socket;
 	SocketReactor* _pReactor;
+
+	std::tuple<Parameters...> _parameters;
+		/// parameters used to construct ServiceHandler
 };
 
 

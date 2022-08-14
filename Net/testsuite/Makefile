@@ -20,7 +20,7 @@ objects = \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
 	FTPStreamFactoryTest DialogServer \
 	SocketReactorTest SocketConnectorTest ReactorTestSuite \
-	SocketProactorTest \
+	SocketProactorTest SocketAcceptorTest \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \

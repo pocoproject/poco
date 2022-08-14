@@ -1055,6 +1055,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\SocketAcceptorTest.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\SocketReactorTest.h"
 					>
 				</File>
@@ -1072,6 +1076,10 @@
 				</File>
 				<File
 					RelativePath=".\src\SocketConnectorTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SocketAcceptorTest.cpp"
 					>
 				</File>
 				<File

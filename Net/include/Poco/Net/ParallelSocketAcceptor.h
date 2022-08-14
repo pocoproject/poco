@@ -21,6 +21,7 @@
 #include "Poco/Net/ParallelSocketReactor.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAcceptor.h"
 #include "Poco/Environment.h"
 #include "Poco/NObserver.h"
 #include "Poco/SharedPtr.h"
@@ -39,7 +40,7 @@ namespace Poco {
 namespace Net {
 
 
-template <class ServiceHandler, class SR>
+template <class ServiceHandler, class SR, class... Parameters>
 class ParallelSocketAcceptor
 	/// This class implements the Acceptor part of the Acceptor-Connector design pattern.
 	/// Only the difference from single-threaded version is documented here, For full
@@ -57,11 +58,13 @@ public:
 	using Observer = Poco::Observer<ParallelSocketAcceptor, ReadableNotification>;
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
+	    Parameters&&... parameters,
 		unsigned threads = Poco::Environment::processorCount(),
 		const std::string& threadName = ""):
 		_threadName(threadName),
 		_socket(socket),
 		_pReactor(0),
+		_parameters(std::forward_as_tuple(parameters...)),
 		_threads(threads),
 		_next(0)
 		/// Creates a ParallelSocketAcceptor using the given ServerSocket,
@@ -72,10 +75,12 @@ public:
 
 	ParallelSocketAcceptor(ServerSocket& socket,
 		SocketReactor& reactor,
+		Parameters&&... parameters,
 		unsigned threads = Poco::Environment::processorCount(), const std::string& threadName = ""):
 		_threadName(threadName),
 		_socket(socket),
 		_pReactor(&reactor),
+		_parameters(std::forward_as_tuple(parameters...)),
 		_threads(threads),
 		_next(0)
 		/// Creates a ParallelSocketAcceptor using the given ServerSocket, sets the
@@ -168,7 +173,8 @@ protected:
 			pReactor = _reactors[next];
 		}
 		pReactor->wakeUp();
-		return new ServiceHandler(socket, *pReactor);
+		using Factory = typename SocketAcceptor<ServiceHandler, Parameters...>::ServiceHandlerFactory;
+		return Factory::create(socket, *pReactor, _parameters);
 	}
 
 	SocketReactor* reactor(const Socket& socket)
@@ -235,6 +241,8 @@ private:
 		/// Name prefix of sub SocketReactor threads
 	ServerSocket   _socket;
 	SocketReactor* _pReactor;
+	std::tuple<Parameters...> _parameters;
+		/// parameters used to construct ServiceHandler
 	unsigned       _threads;
 	ReactorVec     _reactors;
 	std::size_t    _next;
