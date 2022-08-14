@@ -94,7 +94,7 @@ function Add-VSCOMNTOOLS([int] $vsver)
 			$range='[17.0,18.0)'
 		}
 		
-		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
+		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
 		$vscomntools = $installationPath.psobject.properties.Value;
 		if ($vsver -eq 150)
 		{
@@ -505,8 +505,6 @@ function Build
 	else										 { $extension = 'vcxproj' }
 
 	$platformName = ''
-	if ($platform -eq 'x64')			 { $platformName = '_x64' }
-	elseif ($platform -eq 'WinCE') { $platformName = '_CE' }
 
 	Build-Components $extension $platformName "lib"
 	Build-Components $extension $platformName "test"
