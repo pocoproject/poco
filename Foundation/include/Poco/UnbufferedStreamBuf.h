@@ -1,5 +1,5 @@
 //
-// UnufferedStreamBuf.h
+// UnbufferedStreamBuf.h
 //
 // Library: Foundation
 // Package: Streams
