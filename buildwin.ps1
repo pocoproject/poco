@@ -408,7 +408,7 @@ function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
 }
 
 
-function Build-Components([string] $extension, [string] $platformName, [string] $type)
+function Build-Components([string] $extension, [string] $type)
 {
 
 	Get-Content "$poco_base\components" | Foreach-Object {
@@ -426,11 +426,11 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
 		if ($omitArray -NotContains $component)
 		{
-			$vsProject = "$poco_base\$componentDir\$componentName$($platformName)$($suffix).$($extension)"
+			$vsProject = "$poco_base\$componentDir\$componentName$($suffix).$($extension)"
 
 			if (!(Test-Path -Path $vsProject)) # when VS project name is not same as directory name
 			{
-				$vsProject = "$poco_base\$componentDir$($platformName)$($suffix).$($extension)"
+				$vsProject = "$poco_base\$componentDir$($suffix).$($extension)"
 				if (!(Test-Path -Path $vsProject)) # not found
 				{
 					Write-Host "+------------------------------------------------------------------"
@@ -450,7 +450,7 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 			}
 			ElseIf ($tests -and ($type -eq "test"))
 			{
-				$vsTestProject = "$poco_base\$componentDir\testsuite\TestSuite$($platformName)$($suffix).$($extension)"
+				$vsTestProject = "$poco_base\$componentDir\testsuite\TestSuite$($suffix).$($extension)"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 				Write-Host "| Building $vsTestProject"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -458,13 +458,13 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
 				if ($component -eq "Foundation") # special case for Foundation, which needs test app and dll
 				{
-					$vsTestProject = "$poco_base\$componentDir\testsuite\TestApp$($platformName)$($suffix).$($extension)"
+					$vsTestProject = "$poco_base\$componentDir\testsuite\TestApp$($suffix).$($extension)"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					Write-Host "| Building $vsTestProject"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					Build-Exec $tool $vsTestProject
 
-					$vsTestProject = "$poco_base\$componentDir\testsuite\TestLibrary$($platformName)$($suffix).$($extension)"
+					$vsTestProject = "$poco_base\$componentDir\testsuite\TestLibrary$($suffix).$($extension)"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					Write-Host "| Building $vsTestProject"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -476,7 +476,7 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 				if ($platform -eq 'x64')
 				{
 					Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
-						Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$platformName$($suffix)" } `
+						Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$($suffix)" } `
 						| Build-samples "$_"
 				}
 				else
@@ -504,11 +504,11 @@ function Build
 	if ($vs -lt 100) { $extension = 'vcproj'	}
 	else										 { $extension = 'vcxproj' }
 
-	$platformName = ''
+	
 
-	Build-Components $extension $platformName "lib"
-	Build-Components $extension $platformName "test"
-	Build-Components $extension $platformName "sample"
+	Build-Components $extension "lib"
+	Build-Components $extension "test"
+	Build-Components $extension "sample"
 }
 
 
