@@ -165,7 +165,7 @@ jobs:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
       - uses: actions/checkout@v2
-      - run: .\buildwin.ps1 -poco_base . -vs160 -action build -linkmode all -config release -platform x64 -samples -tests -omit 'NetSSL_OpenSSL;Crypto;JWT;Data/MySQL;Data/PostgreSQL'
+      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit 'NetSSL_OpenSSL;Crypto;JWT;Data/MySQL;Data/PostgreSQL'
 
   windows-2022-msvc-cmake-2022:
     runs-on: windows-2022
