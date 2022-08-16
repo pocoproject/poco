@@ -21,7 +21,7 @@ namespace Poco {
 namespace Redis {
 
 
-AsyncReader::AsyncReader(Client& client): 
+AsyncReader::AsyncReader(Client& client):
 	_client(client),
 	_activity(this, &AsyncReader::runActivity)
 {

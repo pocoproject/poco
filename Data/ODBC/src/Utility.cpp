@@ -41,7 +41,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	if (!Utility::isError(rc = SQLDrivers(henv, 
+	if (!Utility::isError(rc = SQLDrivers(henv,
 		SQL_FETCH_FIRST,
 		desc,
 		length,
@@ -52,12 +52,12 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	{
 		do
 		{
-			driverMap.insert(DSNMap::value_type(std::string((char *) desc), 
+			driverMap.insert(DSNMap::value_type(std::string((char *) desc),
 				std::string((char *) attr)));
 			std::memset(desc, 0, length);
 			std::memset(attr, 0, length);
 			len2 = length;
-		}while (!Utility::isError(rc = SQLDrivers(henv, 
+		}while (!Utility::isError(rc = SQLDrivers(henv,
 			SQL_FETCH_NEXT,
 			desc,
 			length,
@@ -67,7 +67,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 			&len2)));
 	}
 
-	if (SQL_NO_DATA != rc) 
+	if (SQL_NO_DATA != rc)
 		throw EnvironmentException(henv);
 
 	return driverMap;
@@ -88,7 +88,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	while (!Utility::isError(rc = Poco::Data::ODBC::SQLDataSources(henv, 
+	while (!Utility::isError(rc = Poco::Data::ODBC::SQLDataSources(henv,
 		SQL_FETCH_NEXT,
 		dsn,
 		SQL_MAX_DSN_LENGTH,
@@ -103,7 +103,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 		len2 = length;
 	}
 
-	if (SQL_NO_DATA != rc) 
+	if (SQL_NO_DATA != rc)
 		throw EnvironmentException(henv);
 
 	return dsnMap;

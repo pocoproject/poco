@@ -42,25 +42,25 @@ DocumentTypeTest::~DocumentTypeTest()
 void DocumentTypeTest::testDocumentType()
 {
 	AutoPtr<DocumentType> pDoctype = DOMImplementation::instance().createDocumentType("test", "public", "system");
-	
+
 	assertTrue (pDoctype->ownerDocument() == 0);
 	assertTrue (pDoctype->name() == "test");
 	assertTrue (pDoctype->publicId() == "public");
 	assertTrue (pDoctype->systemId() == "system");
-	
+
 	AutoPtr<Document> pDoc = new Document(pDoctype);
 	assertTrue (pDoc->doctype() == pDoctype);
 	assertTrue (pDoctype->ownerDocument() == pDoc);
 
 	AutoPtr<NamedNodeMap> pEntities = pDoctype->entities();
 	AutoPtr<NamedNodeMap> pNotations = pDoctype->notations();
-	
+
 	assertTrue (pEntities->length() == 0);
 	assertTrue (pNotations->length() == 0);
-	
+
 	AutoPtr<Entity> pEntity1 = pDoc->createEntity("entity1", "public1", "system1", "");
 	pDoctype->appendChild(pEntity1);
-	
+
 	assertTrue (pEntities->length() == 1);
 	assertTrue (pNotations->length() == 0);
 	assertTrue (pEntities->item(0) == pEntity1);
@@ -74,7 +74,7 @@ void DocumentTypeTest::testDocumentType()
 	assertTrue (pEntities->item(1) == pEntity2);
 	assertTrue (pEntities->getNamedItem("entity1") == pEntity1);
 	assertTrue (pEntities->getNamedItem("entity2") == pEntity2);
-	
+
 	AutoPtr<Notation> pNotation = pDoc->createNotation("notation", "public", "system");
 	pDoctype->appendChild(pNotation);
 	assertTrue (pEntities->length() == 2);

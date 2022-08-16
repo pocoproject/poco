@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -72,9 +72,9 @@ void* wceex_lfind(const void *key, const void *base, size_t *nmemb, size_t size,
 
 /* File Management Functions */
 
-void wceex_splitpath( const char *path, 
+void wceex_splitpath( const char *path,
                       char *drive, char *dir, char *name, char *ext );
-void wceex_wsplitpath( const wchar_t *path, 
+void wceex_wsplitpath( const wchar_t *path,
                        wchar_t *drive, wchar_t *dir, wchar_t *name, wchar_t *ext );
 
 void wceex_makepath( char *path,
@@ -87,12 +87,12 @@ void wceex_wmakepath( wchar_t *path,
 char*    wceex_fullpath( char *absPath, const char *relPath, size_t maxLength );
 wchar_t* wceex_wfullpath( wchar_t *absPath, const wchar_t *relPath, size_t maxLength );
 
-DWORD wceex_GetFullPathNameW( LPCWSTR lpFileName, DWORD nBufferLength, 
+DWORD wceex_GetFullPathNameW( LPCWSTR lpFileName, DWORD nBufferLength,
                               LPWSTR lpBuffer, LPWSTR *lpFilePart );
 
 /* Dummy compilation enablers - functions that do not provide any implementation. */
 
-char* wceex_getenv(const char* varname); 
+char* wceex_getenv(const char* varname);
 
 #ifdef __cplusplus
 }

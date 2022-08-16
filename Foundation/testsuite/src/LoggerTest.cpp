@@ -48,14 +48,14 @@ void LoggerTest::testLogger()
 	assertTrue (root.information());
 	assertTrue (!root.debug());
 	assertTrue (!root.trace());
-	
+
 	root.information("Informational message");
 	assertTrue (pChannel->list().size() == 1);
 	root.warning("Warning message");
 	assertTrue (pChannel->list().size() == 2);
 	root.debug("Debug message");
 	assertTrue (pChannel->list().size() == 2);
-	
+
 	Logger& logger1 = Logger::get("Logger1");
 	Logger& logger2 = Logger::get("Logger2");
 	Logger& logger11 = Logger::get("Logger1.Logger1");
@@ -85,7 +85,7 @@ void LoggerTest::testLogger()
 	assertTrue (logger12.is(Message::PRIO_INFORMATION));
 	assertTrue (logger21.is(Message::PRIO_INFORMATION));
 	assertTrue (logger22.is(Message::PRIO_INFORMATION));
-	
+
 	Logger::setLevel("Logger2.Logger1", Message::PRIO_ERROR);
 	assertTrue (logger1.is(Message::PRIO_DEBUG));
 	assertTrue (logger11.is(Message::PRIO_DEBUG));
@@ -96,7 +96,7 @@ void LoggerTest::testLogger()
 	assertTrue (logger12.is(Message::PRIO_INFORMATION));
 	assertTrue (logger21.is(Message::PRIO_ERROR));
 	assertTrue (logger22.is(Message::PRIO_INFORMATION));
-	
+
 	Logger::setLevel("", Message::PRIO_WARNING);
 	assertTrue (root.getLevel() == Message::PRIO_WARNING);
 	assertTrue (logger1.getLevel() == Message::PRIO_WARNING);
@@ -105,7 +105,7 @@ void LoggerTest::testLogger()
 	assertTrue (logger1.getLevel() == Message::PRIO_WARNING);
 	assertTrue (logger21.getLevel() == Message::PRIO_WARNING);
 	assertTrue (logger22.getLevel() == Message::PRIO_WARNING);
-	
+
 	AutoPtr<TestChannel> pChannel2 = new TestChannel;
 	Logger::setChannel("Logger2", pChannel2);
 	assertTrue (pChannel.get()  == root.getChannel().get());
@@ -115,7 +115,7 @@ void LoggerTest::testLogger()
 	assertTrue (pChannel2.get() == logger2.getChannel().get());
 	assertTrue (pChannel2.get() == logger21.getChannel().get());
 	assertTrue (pChannel2.get() == logger22.getChannel().get());
-	
+
 	root.setLevel(Message::PRIO_TRACE);
 	pChannel->list().clear();
 	root.trace("trace");
@@ -141,7 +141,7 @@ void LoggerTest::testLogger()
 	pChannel->list().clear();
 	root.fatal("fatal");
 	assertTrue (pChannel->list().begin()->getPriority() == Message::PRIO_FATAL);
-	
+
 	root.setLevel("1");
 	assertTrue (root.getLevel() == Message::PRIO_FATAL);
 	root.setLevel("8");
@@ -256,18 +256,18 @@ void LoggerTest::testDump()
 	Logger& root = Logger::root();
 	root.setChannel(pChannel);
 	root.setLevel(Message::PRIO_INFORMATION);
-	
+
 	char buffer1[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 	root.dump("test", buffer1, sizeof(buffer1));
 	assertTrue (pChannel->list().empty());
-	
+
 	root.setLevel(Message::PRIO_DEBUG);
 	root.dump("test", buffer1, sizeof(buffer1));
-	
+
 	std::string msg = pChannel->list().begin()->getText();
 	assertTrue (msg == "test\n0000  00 01 02 03 04 05                                 ......");
 	pChannel->clear();
-	
+
 	char buffer2[] = {
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
@@ -276,7 +276,7 @@ void LoggerTest::testDump()
 	msg = pChannel->list().begin()->getText();
 	assertTrue (msg == "0000  00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ................");
 	pChannel->clear();
-	
+
 	char buffer3[] = {
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,

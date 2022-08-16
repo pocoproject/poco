@@ -81,12 +81,23 @@
 		"unordered_set": "cpp",
 		"utility": "cpp",
 		"vector": "cpp",
-		"__bits": "cpp"
+		"*.tcc": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"memory_resource": "cpp",
+		"random": "cpp",
+		"ranges": "cpp",
+		"cfenv": "cpp",
+		"__bits": "cpp",
+		"variant": "cpp",
+		"condition_variable": "cpp",
+		"valarray": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
         "**/bin": true,
         "**/obj": true
 	},
-	"git.ignoreLimitWarning": true
+	"git.ignoreLimitWarning": true,
+	"cmake.configureOnOpen": false
 }

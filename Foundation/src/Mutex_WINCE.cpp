@@ -52,7 +52,7 @@ bool MutexImpl::tryLockImpl()
 	case WAIT_OBJECT_0:
 		return true;
 	default:
-		throw SystemException("cannot lock mutex");		
+		throw SystemException("cannot lock mutex");
 	}
 }
 
@@ -66,7 +66,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 	case WAIT_OBJECT_0:
 		return true;
 	default:
-		throw SystemException("cannot lock mutex");		
+		throw SystemException("cannot lock mutex");
 	}
 }
 

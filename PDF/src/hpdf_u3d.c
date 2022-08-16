@@ -246,7 +246,7 @@ HPDF_EXPORT(HPDF_Dict) HPDF_Create3DView(HPDF_MMgr mmgr, const char *name)
 
 	HPDF_PTRACE ((" HPDF_Create3DView\n"));
 
-	if (name == NULL || name[0] == '\0') { 
+	if (name == NULL || name[0] == '\0') {
 		return NULL;
 	}
 
@@ -260,7 +260,7 @@ HPDF_EXPORT(HPDF_Dict) HPDF_Create3DView(HPDF_MMgr mmgr, const char *name)
 		HPDF_Dict_Free (view);
 		return NULL;
 	}
-	
+
 	ret = HPDF_Dict_Add (view, "XN", HPDF_String_New (mmgr, name, NULL));
 	if (ret != HPDF_OK) {
 		HPDF_Dict_Free (view);
@@ -344,7 +344,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_U3D_SetDefault3DView(HPDF_U3D u3d, const char *nam
 HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_AddNode(HPDF_Dict view, const char *name, HPDF_REAL opacity, HPDF_BOOL visible)
 {
 	HPDF_Array nodes = NULL;
-	HPDF_Dict  node; 
+	HPDF_Dict  node;
 	HPDF_STATUS ret = HPDF_OK;
 
 	HPDF_PTRACE ((" HPDF_3DView_AddNode\n"));
@@ -461,7 +461,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetLighting(HPDF_Dict view, const char *sch
 
 HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetBackgroundColor(HPDF_Dict view, HPDF_REAL r, HPDF_REAL g, HPDF_REAL b)
 {
-	HPDF_Array  color; 
+	HPDF_Array  color;
 	HPDF_STATUS ret = HPDF_OK;
 	HPDF_Dict background;
 
@@ -630,7 +630,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
 	HPDF_REAL upx, upy, upz;
 	HPDF_REAL transx, transy, transz;
 
-	HPDF_Array  matrix; 
+	HPDF_Array  matrix;
 	HPDF_STATUS ret = HPDF_OK;
 
 	HPDF_PTRACE ((" HPDF_3DView_SetCamera\n"));
@@ -643,7 +643,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
 	viewx = -c2cx;
 	viewy = -c2cy;
 	viewz = -c2cz;
-	
+
 	/* c2c = (0, -1, 0) by default */
 	if (viewx == 0.0 && viewy == 0.0 && viewz == 0.0) {
 		viewy = 1.0;
@@ -671,7 +671,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
 		upy =-1.0f;
 		upz = 0.0f;
 	}
-	
+
 	if ( fabs(viewx) + fabs(viewy) != 0.0f) /* other views than top and bottom*/
 	{
 		/* up-vector = up_world - (up_world dot view) view*/
@@ -708,7 +708,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
 		upy = upyprime;
 		upz = upzprime;
 	}
-	
+
 	/* translation vector*/
 	roo = (HPDF_REAL)fabs(roo);
 	if (roo == 0.0) {
@@ -783,7 +783,7 @@ HPDF_Dict HPDF_3DView_New( HPDF_MMgr  mmgr, HPDF_Xref  xref, HPDF_U3D u3d, const
 
 	HPDF_PTRACE ((" HPDF_3DView_New\n"));
 
-	if (name == NULL || name[0] == '\0') { 
+	if (name == NULL || name[0] == '\0') {
 		return NULL;
 	}
 
@@ -800,7 +800,7 @@ HPDF_Dict HPDF_3DView_New( HPDF_MMgr  mmgr, HPDF_Xref  xref, HPDF_U3D u3d, const
 		HPDF_Dict_Free (view);
 		return NULL;
 	}
-	
+
 	ret = HPDF_Dict_Add (view, "XN", HPDF_String_New (mmgr, name, NULL));
 	if (ret != HPDF_OK) {
 		HPDF_Dict_Free (view);

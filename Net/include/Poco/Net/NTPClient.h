@@ -43,13 +43,13 @@ public:
 	int request(SocketAddress& address) const;
 		/// Request the time from the server at address.
 		/// Notifications are posted for events.
-		/// 
+		///
 		/// Returns the number of valid replies.
 
 	int request(const std::string& address) const;
 		/// Request the time from the server at address.
 		/// Notifications are posted for events.
-		/// 
+		///
 		/// Returns the number of valid replies.
 
 private:

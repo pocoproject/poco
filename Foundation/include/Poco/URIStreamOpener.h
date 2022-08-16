@@ -44,7 +44,7 @@ public:
 	{
 		MAX_REDIRECTS = 10
 	};
-	
+
 	URIStreamOpener();
 		/// Creates the URIStreamOpener and registers a FileStreamFactory
 		/// for file URIs.
@@ -93,7 +93,7 @@ public:
 		///
 		/// Whoever calls the method is responsible for deleting
 		/// the returned stream.
-		
+
 	void registerStreamFactory(const std::string& scheme, URIStreamFactory* pFactory);
 		/// Registers a URIStreamFactory for the given scheme. If another factory
 		/// has already been registered for the scheme, an ExistsException is thrown.
@@ -106,7 +106,7 @@ public:
 		///
 		/// Throws a NotFoundException if no URIStreamFactory has been registered
 		/// for the given scheme.
-		
+
 	bool supportsScheme(const std::string& scheme);
 		/// Returns true iff a URIStreamFactory for the given scheme
 		/// has been registered.
@@ -123,7 +123,7 @@ private:
 	URIStreamOpener& operator = (const URIStreamOpener&);
 
 	typedef std::map<std::string, URIStreamFactory*> FactoryMap;
-	
+
 	FactoryMap        _map;
 	mutable FastMutex _mutex;
 };

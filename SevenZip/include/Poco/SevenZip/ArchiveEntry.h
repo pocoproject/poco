@@ -40,7 +40,7 @@ public:
 		ENTRY_FILE      = 0,   /// The entry represents an ordinary file.
 		ENTRY_DIRECTORY = 1    /// The entry represents a directory.
 	};
-	
+
 	enum EntryAttributes
 	{
 		ATTR_READONLY  = 0x01, /// The file or directory is read-only.
@@ -55,25 +55,25 @@ public:
 
 	ArchiveEntry(const ArchiveEntry& entry);
 		/// Creates an ArchiveEntry by copying another one.
-		
+
 	~ArchiveEntry();
 		/// Destroys the ArchiveEntry.
-		
+
 	ArchiveEntry& operator = (const ArchiveEntry& entry);
 		/// Assignment operator.
-	
-	void swap(ArchiveEntry& entry);
+
+	void swap(ArchiveEntry& entry) noexcept;
 		/// Swaps the entry with another one.
-	
+
 	EntryType type() const;
-		/// Returns the type of the entry.	
-		
+		/// Returns the type of the entry.
+
 	const std::string& path() const;
 		/// Return the UTF-8 encoded path.
-		
+
 	Poco::UInt64 size() const;
 		/// Returns the original size of the file.
-		
+
 	Poco::Timestamp lastModified() const;
 		/// Returns the date and time of last modification.
 
@@ -81,10 +81,10 @@ public:
 		/// Returns the entry attributes as a bitmask.
 		///
 		/// See the EntryAttributes enumeration for valid values.
-		
+
 	bool isFile() const;
 		/// Returns true iff the entry represents a file.
-		
+
 	bool isDirectory() const;
 		/// Returns true iff the entry represents a directory.
 
@@ -102,7 +102,7 @@ private:
 	Poco::Timestamp _lastModified;
 	Poco::UInt32 _attributes;
 	Poco::UInt32 _index;
-	
+
 	friend class ArchiveImpl;
 };
 
@@ -121,13 +121,13 @@ inline const std::string& ArchiveEntry::path() const
 	return _path;
 }
 
-	
+
 inline Poco::UInt64 ArchiveEntry::size() const
 {
 	return _size;
 }
 
-	
+
 inline Poco::Timestamp ArchiveEntry::lastModified() const
 {
 	return _lastModified;

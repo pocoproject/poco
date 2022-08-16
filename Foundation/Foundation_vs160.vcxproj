@@ -55,7 +55,6 @@
     <ProjectGuid>{B01196CC-B693-4548-8464-2FF60499E73F}</ProjectGuid>
     <RootNamespace>Foundation</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
@@ -273,6 +272,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -341,6 +341,7 @@
       </DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -398,6 +399,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoFoundationmtd.lib</OutputFile>
@@ -451,6 +453,7 @@
       </DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoFoundationmt.lib</OutputFile>
@@ -500,6 +503,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoFoundationmdd.lib</OutputFile>
@@ -557,6 +561,7 @@
       </DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>
@@ -1025,27 +1030,75 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\PatternFormatter.cpp" />
-    <ClCompile Include="src\pcre_byte_order.c" />
-    <ClCompile Include="src\pcre_chartables.c" />
-    <ClCompile Include="src\pcre_compile.c" />
-    <ClCompile Include="src\pcre_config.c" />
-    <ClCompile Include="src\pcre_dfa_exec.c" />
-    <ClCompile Include="src\pcre_exec.c" />
-    <ClCompile Include="src\pcre_fullinfo.c" />
-    <ClCompile Include="src\pcre_get.c" />
-    <ClCompile Include="src\pcre_globals.c" />
-    <ClCompile Include="src\pcre_jit_compile.c" />
-    <ClCompile Include="src\pcre_maketables.c" />
-    <ClCompile Include="src\pcre_newline.c" />
-    <ClCompile Include="src\pcre_ord2utf8.c" />
-    <ClCompile Include="src\pcre_refcount.c" />
-    <ClCompile Include="src\pcre_string_utils.c" />
-    <ClCompile Include="src\pcre_study.c" />
-    <ClCompile Include="src\pcre_tables.c" />
-    <ClCompile Include="src\pcre_ucd.c" />
-    <ClCompile Include="src\pcre_valid_utf8.c" />
-    <ClCompile Include="src\pcre_version.c" />
-    <ClCompile Include="src\pcre_xclass.c" />
+    <ClCompile Include="src\pcre2_auto_possess.c" />
+    <ClCompile Include="src\pcre2_chartables.c" />
+    <ClCompile Include="src\pcre2_compile.c" />
+    <ClCompile Include="src\pcre2_config.c" />
+    <ClCompile Include="src\pcre2_context.c" />
+    <ClCompile Include="src\pcre2_convert.c" />
+    <ClCompile Include="src\pcre2_dfa_match.c" />
+    <ClCompile Include="src\pcre2_error.c" />
+    <ClCompile Include="src\pcre2_extuni.c" />
+    <ClCompile Include="src\pcre2_find_bracket.c" />
+    <ClCompile Include="src\pcre2_jit_compile.c" />
+    <ClCompile Include="src\pcre2_jit_match.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_jit_misc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_maketables.c" />
+    <ClCompile Include="src\pcre2_match.c" />
+    <ClCompile Include="src\pcre2_match_data.c" />
+    <ClCompile Include="src\pcre2_newline.c" />
+    <ClCompile Include="src\pcre2_ord2utf.c" />
+    <ClCompile Include="src\pcre2_pattern_info.c" />
+    <ClCompile Include="src\pcre2_script_run.c" />
+    <ClCompile Include="src\pcre2_serialize.c" />
+    <ClCompile Include="src\pcre2_string_utils.c" />
+    <ClCompile Include="src\pcre2_study.c" />
+    <ClCompile Include="src\pcre2_substitute.c" />
+    <ClCompile Include="src\pcre2_substring.c" />
+    <ClCompile Include="src\pcre2_tables.c" />
+    <ClCompile Include="src\pcre2_ucd.c" />
+    <ClCompile Include="src\pcre2_ucptables.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pcre2_valid_utf.c" />
+    <ClCompile Include="src\pcre2_xclass.c" />
     <ClCompile Include="src\Pipe.cpp" />
     <ClCompile Include="src\PipeImpl.cpp" />
     <ClCompile Include="src\PipeImpl_DUMMY.cpp">
@@ -1726,12 +1779,13 @@
     <ClInclude Include="src\inffixed.h" />
     <ClInclude Include="src\inflate.h" />
     <ClInclude Include="src\inftrees.h" />
-    <ClInclude Include="src\pcre.h" />
-    <ClInclude Include="src\pcre_config.h" />
-    <ClInclude Include="src\pcre_internal.h" />
+    <ClInclude Include="src\pcre2.h" />
+    <ClInclude Include="src\pcre2_config.h" />
+    <ClInclude Include="src\pcre2_internal.h" />
+    <ClInclude Include="src\pcre2_intmodedep.h" />
+    <ClInclude Include="src\pcre2_ucp.h" />
     <ClInclude Include="src\pocomsg.h" />
     <ClInclude Include="src\trees.h" />
-    <ClInclude Include="src\ucp.h" />
     <ClInclude Include="src\zconf.h" />
     <ClInclude Include="src\zlib.h" />
     <ClInclude Include="src\zutil.h" />

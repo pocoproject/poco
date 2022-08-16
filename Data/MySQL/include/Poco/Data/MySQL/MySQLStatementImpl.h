@@ -40,10 +40,10 @@ class MySQL_API MySQLStatementImpl: public Poco::Data::StatementImpl
 public:
 	MySQLStatementImpl(SessionImpl& s);
 		/// Creates the MySQLStatementImpl.
-		
+
 	~MySQLStatementImpl();
 		/// Destroys the MySQLStatementImpl.
-		
+
 protected:
 	virtual std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
@@ -51,32 +51,32 @@ protected:
 	virtual int affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
-	
+
 	virtual const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns column meta data.
-		
+
 	virtual bool hasNext();
 		/// Returns true if a call to next() will return data.
-		
+
 	virtual std::size_t next();
 		/// Retrieves the next row from the resultset.
 		/// Will throw, if the resultset is empty.
-	
+
 	virtual bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
 	virtual bool canCompile() const;
 		/// Returns true if another compile is possible.
-		
+
 	virtual void compileImpl();
 		/// Compiles the statement, doesn't bind yet
-		
+
 	virtual void bindImpl();
 		/// Binds parameters
-		
+
 	virtual Poco::Data::AbstractExtractor::Ptr extractor();
 		/// Returns the concrete extractor used by the statement.
-		
+
 	virtual Poco::Data::AbstractBinder::Ptr binder();
 		/// Returns the concrete binder used by the statement.
 

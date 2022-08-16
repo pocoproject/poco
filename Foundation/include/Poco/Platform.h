@@ -118,24 +118,25 @@
 //
 // Hardware Architecture and Byte Order
 //
-#define POCO_ARCH_ALPHA   0x01
-#define POCO_ARCH_IA32    0x02
-#define POCO_ARCH_IA64    0x03
-#define POCO_ARCH_MIPS    0x04
-#define POCO_ARCH_HPPA    0x05
-#define POCO_ARCH_PPC     0x06
-#define POCO_ARCH_POWER   0x07
-#define POCO_ARCH_SPARC   0x08
-#define POCO_ARCH_AMD64   0x09
-#define POCO_ARCH_ARM     0x0a
-#define POCO_ARCH_M68K    0x0b
-#define POCO_ARCH_S390    0x0c
-#define POCO_ARCH_SH      0x0d
-#define POCO_ARCH_NIOS2   0x0e
-#define POCO_ARCH_AARCH64 0x0f
-#define POCO_ARCH_ARM64   0x0f // same as POCO_ARCH_AARCH64
-#define POCO_ARCH_RISCV64 0x10
-#define POCO_ARCH_RISCV32 0x11
+#define POCO_ARCH_ALPHA       0x01
+#define POCO_ARCH_IA32        0x02
+#define POCO_ARCH_IA64        0x03
+#define POCO_ARCH_MIPS        0x04
+#define POCO_ARCH_HPPA        0x05
+#define POCO_ARCH_PPC         0x06
+#define POCO_ARCH_POWER       0x07
+#define POCO_ARCH_SPARC       0x08
+#define POCO_ARCH_AMD64       0x09
+#define POCO_ARCH_ARM         0x0a
+#define POCO_ARCH_M68K        0x0b
+#define POCO_ARCH_S390        0x0c
+#define POCO_ARCH_SH          0x0d
+#define POCO_ARCH_NIOS2       0x0e
+#define POCO_ARCH_AARCH64     0x0f
+#define POCO_ARCH_ARM64       0x0f // same as POCO_ARCH_AARCH64
+#define POCO_ARCH_RISCV64     0x10
+#define POCO_ARCH_RISCV32     0x11
+#define POCO_ARCH_LOONGARCH64 0x12
 
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
@@ -234,6 +235,9 @@
 		#define POCO_ARCH POCO_ARCH_RISCV32
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
+#elif defined(__loongarch64)
+	#define POCO_ARCH POCO_ARCH_LOONGARCH64
+	#define POCO_ARCH_LITTLE_ENDIAN 1
 #endif
 
 
@@ -243,6 +247,9 @@
 	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
+	#if defined (__MINGW32__) || defined (__MINGW64__)
+		#define POCO_COMPILER_MINGW
+	#endif
 #elif defined (__MINGW32__) || defined (__MINGW64__)
 	#define POCO_COMPILER_MINGW
 #elif defined (__INTEL_COMPILER) || defined(__ICC) || defined(__ECC) || defined(__ICL)

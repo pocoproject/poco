@@ -28,13 +28,13 @@ namespace Zip {
 
 
 class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
-	/// AutoDetectStreamBuf automatically detects the end of a stream using the 
+	/// AutoDetectStreamBuf automatically detects the end of a stream using the
 	/// Data Descriptor signature.
 {
 public:
 	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
-		/// Creates the AutoDetectStream. 
-		
+		/// Creates the AutoDetectStream.
+
 	~AutoDetectStreamBuf();
 		/// Destroys the AutoDetectStream.
 
@@ -43,7 +43,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE  = 1024
 	};
@@ -83,7 +83,7 @@ protected:
 
 
 class Zip_API AutoDetectInputStream: public AutoDetectIOS, public std::istream
-	/// AutoDetectInputStream automatically detects the end of a stream using the 
+	/// AutoDetectInputStream automatically detects the end of a stream using the
 	/// Data Descriptor signature.
 {
 public:

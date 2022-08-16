@@ -1364,6 +1364,34 @@ void SQLExecutor::time()
 }
 
 
+void SQLExecutor::timestamp()
+{
+	std::string funct = "timestamp()";
+	std::string lastName("Bart");
+	std::string firstName("Simpson");
+	std::string address("Springfield");
+	DateTime birthday(1980, 4, 1, 5, 45, 12, 354, 879);
+	
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+	
+	DateTime bd;
+	assertTrue (bd != birthday);
+	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (bd == birthday);
+	
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+}
+
+
 void SQLExecutor::blob(unsigned int bigSize)
 {
 	std::string funct = "blob()";
@@ -1434,6 +1462,83 @@ void SQLExecutor::blobStmt()
 	poco_assert (res == blob);
 }
 
+
+void SQLExecutor::longBlob()
+{
+	std::string funct = "longBlob()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	Poco::Data::CLOB biography("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 123);
+
+	int count = 0;
+	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(biography));
+	ins.execute();
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+
+	Poco::Data::CLOB res;
+	poco_assert (res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Biography FROM Person", into(res));
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (res == biography);
+}
+
+void SQLExecutor::longText()
+{
+	std::string funct = "longText()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string biography("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 123);
+
+	int count = 0;
+	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(biography));
+	ins.execute();
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+
+	std::string longTextRes;
+	poco_assert (longTextRes.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Biography FROM Person", into(longTextRes));
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (longTextRes == biography);
+}
+
+#ifdef POCO_MYSQL_JSON
+void SQLExecutor::json()
+{
+	std::string funct = "json()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string biography(R"({"biography": {"count": 42, "title": "Lorem Ipsum", "released": true}})");
+
+	int count = 0;
+	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(biography));
+	ins.execute();
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail(funct); }
+	assertTrue(count == 1);
+
+	Poco::Data::JSON res;
+	poco_assert(res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Biography FROM Person", into(res));
+	try { stmt.execute(); }
+	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail(funct); }
+	poco_assert(res == biography);
+}
+#endif
 
 void SQLExecutor::tuples()
 {

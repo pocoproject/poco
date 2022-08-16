@@ -31,8 +31,8 @@ class Foundation_API EnvironmentImpl
 public:
 	typedef UInt8 NodeId[6]; /// Ethernet address.
 
-	static std::string getImpl(const std::string& name);	
-	static bool hasImpl(const std::string& name);	
+	static std::string getImpl(const std::string& name);
+	static bool hasImpl(const std::string& name);
 	static void setImpl(const std::string& name, const std::string& value);
 	static std::string osNameImpl();
 	static std::string osDisplayNameImpl();
@@ -44,7 +44,7 @@ public:
 
 private:
 	typedef std::map<std::string, std::string> StringMap;
-	
+
 	static StringMap _map;
 	static FastMutex _mutex;
 };

@@ -41,14 +41,14 @@ public:
 	TestSuite(const std::string& name = "");
 	~TestSuite();
 
-	void run(TestResult* result);
+	void run(TestResult* result, const Test::Callback& callback = nullptr);
 	int countTestCases() const;
 	void addTest(Test* test);
 	std::string toString() const;
 	Test::Type getType() const;
 
 	virtual void deleteContents();
-	
+
 	const std::vector<Test*> tests() const;
 
 private:
@@ -80,7 +80,7 @@ inline void TestSuite::addTest(Test* test)
 // Returns a std::string representation of the test suite.
 inline std::string TestSuite::toString() const
 {
-	return "suite " + _name; 
+	return "suite " + _name;
 }
 
 // Returns the type of the test, see Test::Type

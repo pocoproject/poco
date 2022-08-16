@@ -49,7 +49,7 @@ public:
 
 	HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode);
 	~HTTPFixedLengthStreamBuf();
-	
+
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
@@ -80,10 +80,10 @@ class Net_API HTTPFixedLengthInputStream: public HTTPFixedLengthIOS, public std:
 public:
 	HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthInputStream();
-	
+
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };
@@ -98,7 +98,7 @@ public:
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };

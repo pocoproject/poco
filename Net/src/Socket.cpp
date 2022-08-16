@@ -14,14 +14,18 @@
 
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
-#if defined(POCO_HAVE_FD_EPOLL)
-#include <sys/epoll.h>
-#elif defined(POCO_HAVE_FD_POLL)
-#include "Poco/SharedPtr.h"
-#include <poll.h>
+
+
+#if defined(POCO_HAVE_FD_POLL)
+	#include "Poco/SharedPtr.h"
+	#ifndef _WIN32
+		#include <poll.h>
+	#endif
 #endif
 
 
@@ -50,6 +54,30 @@ Socket::Socket(const Socket& socket):
 	_pImpl->duplicate();
 }
 
+#if POCO_NEW_STATE_ON_MOVE
+
+Socket::Socket(Socket&& socket):
+	_pImpl(socket._pImpl)
+{
+	poco_check_ptr (_pImpl);
+
+	socket._pImpl = nullptr;
+}
+
+
+Socket& Socket::operator = (Socket&& socket)
+{
+	if (&socket != this)
+	{
+		if (_pImpl) _pImpl->release();
+		_pImpl = socket._pImpl;
+		socket._pImpl = nullptr;
+	}
+	return *this;
+}
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
 
 Socket& Socket::operator = (const Socket& socket)
 {
@@ -62,10 +90,9 @@ Socket& Socket::operator = (const Socket& socket)
 	return *this;
 }
 
-
 Socket::~Socket()
 {
-	_pImpl->release();
+	if (_pImpl) _pImpl->release();
 }
 
 
@@ -76,139 +103,31 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	int epollSize = readList.size() + writeList.size() + exceptList.size();
 	if (epollSize == 0) return 0;
 
-	int epollfd = -1;
+	PollSet ps;
+	for (const auto& s : readList) ps.add(s, PollSet::POLL_READ);
+	for (const auto& s : writeList) ps.add(s, PollSet::POLL_WRITE);
+
+	readList.clear();
+	writeList.clear();
+	exceptList.clear();
+
+	PollSet::SocketModeMap sm = ps.poll(timeout);
+	for (const auto& s : sm)
 	{
-		struct epoll_event eventsIn[epollSize];
-		memset(eventsIn, 0, sizeof(eventsIn));
-		struct epoll_event* eventLast = eventsIn;
-		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
-		{
-			poco_socket_t sockfd = it->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				struct epoll_event* e = eventsIn;
-				for (; e != eventLast; ++e)
-				{
-					if (reinterpret_cast<Socket*>(e->data.ptr)->sockfd() == sockfd)
-						break;
-				}
-				if (e == eventLast)
-				{
-					e->data.ptr = &(*it);
-					++eventLast;
-				}
-				e->events |= EPOLLIN;
-			}
-		}
-
-		for (SocketList::iterator it = writeList.begin(); it != writeList.end(); ++it)
-		{
-			poco_socket_t sockfd = it->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				struct epoll_event* e = eventsIn;
-				for (; e != eventLast; ++e)
-				{
-					if (reinterpret_cast<Socket*>(e->data.ptr)->sockfd() == sockfd)
-						break;
-				}
-				if (e == eventLast)
-				{
-					e->data.ptr = &(*it);
-					++eventLast;
-				}
-				e->events |= EPOLLOUT;
-			}
-		}
-
-		for (SocketList::iterator it = exceptList.begin(); it != exceptList.end(); ++it)
-		{
-			poco_socket_t sockfd = it->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				struct epoll_event* e = eventsIn;
-				for (; e != eventLast; ++e)
-				{
-					if (reinterpret_cast<Socket*>(e->data.ptr)->sockfd() == sockfd)
-						break;
-				}
-				if (e == eventLast)
-				{
-					e->data.ptr = &(*it);
-					++eventLast;
-				}
-				e->events |= EPOLLERR;
-			}
-		}
-
-		epollSize = eventLast - eventsIn;
-		if (epollSize == 0) return 0;
-
-		epollfd = epoll_create(1);
-		if (epollfd < 0)
-		{
-			SocketImpl::error("Can't create epoll queue");
-		}
-
-		for (struct epoll_event* e = eventsIn; e != eventLast; ++e)
-		{
-			poco_socket_t sockfd = reinterpret_cast<Socket*>(e->data.ptr)->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
-				{
-					::close(epollfd);
-					SocketImpl::error("Can't insert socket to epoll queue");
-				}
-			}
-		}
+		if (s.second & PollSet::POLL_READ) readList.push_back(s.first);
+		if (s.second & PollSet::POLL_WRITE) writeList.push_back(s.first);
+		if (s.second & PollSet::POLL_ERROR) exceptList.push_back(s.first);
 	}
 
-	struct epoll_event eventsOut[epollSize];
-	memset(eventsOut, 0, sizeof(eventsOut));
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		Poco::Timestamp start;
-		rc = epoll_wait(epollfd, eventsOut, epollSize, remainingTime.totalMilliseconds());
-		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
-		{
- 			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
-
-	::close(epollfd);
-	if (rc < 0) SocketImpl::error();
-
- 	SocketList readyReadList;
-	SocketList readyWriteList;
-	SocketList readyExceptList;
-	for (int n = 0; n < rc; ++n)
-	{
-		if (eventsOut[n].events & EPOLLERR)
-			readyExceptList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
-		if (eventsOut[n].events & EPOLLIN)
-			readyReadList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
-		if (eventsOut[n].events & EPOLLOUT)
-			readyWriteList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
-	}
-	std::swap(readList, readyReadList);
-	std::swap(writeList, readyWriteList);
-	std::swap(exceptList, readyExceptList);
 	return readList.size() + writeList.size() + exceptList.size();
 
 #elif defined(POCO_HAVE_FD_POLL)
 	typedef Poco::SharedPtr<pollfd, Poco::ReferenceCounter, Poco::ReleaseArrayPolicy<pollfd>> SharedPollArray;
+#ifdef _WIN32
+	typedef ULONG nfds_t;
+#endif
+	nfds_t nfd = static_cast<nfds_t>(readList.size() + writeList.size() + exceptList.size());
 
-	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
 	if (0 == nfd) return 0;
 
 	SharedPollArray pPollArr = new pollfd[nfd]();
@@ -256,7 +175,11 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	do
 	{
 		Poco::Timestamp start;
+#ifdef _WIN32
+		rc = WSAPoll(pPollArr, nfd, static_cast<INT>(remainingTime.totalMilliseconds()));
+#else
 		rc = ::poll(pPollArr, nfd, remainingTime.totalMilliseconds());
+#endif
 		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;
@@ -276,17 +199,17 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	SocketList::iterator endE = exceptList.end();
 	for (int idx = 0; idx < nfd; ++idx)
 	{
-		SocketList::iterator slIt = std::find_if(begR, endR, Socket::FDCompare(pPollArr[idx].fd));
+		SocketList::iterator slIt = std::find_if(begR, endR, Socket::FDCompare(static_cast<int>(pPollArr[idx].fd)));
 		if (POLLIN & pPollArr[idx].revents && slIt != endR) readyReadList.push_back(*slIt);
-		slIt = std::find_if(begW, endW, Socket::FDCompare(pPollArr[idx].fd));
+		slIt = std::find_if(begW, endW, Socket::FDCompare(static_cast<int>(pPollArr[idx].fd)));
 		if (POLLOUT & pPollArr[idx].revents && slIt != endW) readyWriteList.push_back(*slIt);
-		slIt = std::find_if(begE, endE, Socket::FDCompare(pPollArr[idx].fd));
+		slIt = std::find_if(begE, endE, Socket::FDCompare(static_cast<int>(pPollArr[idx].fd)));
 		if (POLLERR & pPollArr[idx].revents && slIt != endE) readyExceptList.push_back(*slIt);
 	}
 	std::swap(readList, readyReadList);
 	std::swap(writeList, readyWriteList);
 	std::swap(exceptList, readyExceptList);
-	return readList.size() + writeList.size() + exceptList.size();
+	return static_cast<int>(readList.size() + writeList.size() + exceptList.size());
 
 #else
 
@@ -461,6 +384,24 @@ SocketBufVec Socket::makeBufVec(const std::vector<std::string>& vec)
 		*it = makeBuffer(reinterpret_cast<void*>(c), vIt->size());
 	}
 	return buf;
+}
+
+
+int Socket::lastError()
+{
+	return SocketImpl::lastError();
+}
+
+
+std::string Socket::lastErrorDesc()
+{
+	return Error::getMessage(SocketImpl::lastError());
+}
+
+
+void Socket::error()
+{
+	SocketImpl::error();
 }
 
 

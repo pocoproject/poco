@@ -735,4 +735,22 @@ Command Command::discard()
 }
 
 
+Command Command::auth(const std::string& password)
+{
+	Command cmd("AUTH");
+	cmd << password;
+
+	return cmd;
+}
+
+
+Command Command::auth(const std::string& username, const std::string& password)
+{
+	Command cmd("AUTH");
+	cmd << username << password;
+
+	return cmd;
+}
+
+
 } } // namespace Poco::Redis

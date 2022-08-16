@@ -20,7 +20,7 @@ namespace Net {
 
 
 MailStreamBuf::MailStreamBuf(std::istream& istr):
-	_pIstr(&istr), 
+	_pIstr(&istr),
 	_pOstr(0),
 	_state(ST_CR_LF)
 {
@@ -28,7 +28,7 @@ MailStreamBuf::MailStreamBuf(std::istream& istr):
 
 
 MailStreamBuf::MailStreamBuf(std::ostream& ostr):
-	_pIstr(0), 
+	_pIstr(0),
 	_pOstr(&ostr),
 	_state(ST_CR_LF)
 {
@@ -53,7 +53,7 @@ void MailStreamBuf::close()
 	}
 }
 
-		
+
 int MailStreamBuf::readFromDevice()
 {
 	int c = std::char_traits<char>::eof();
@@ -194,8 +194,8 @@ MailStreamBuf* MailIOS::rdbuf()
 }
 
 
-MailInputStream::MailInputStream(std::istream& istr): 
-	MailIOS(istr), 
+MailInputStream::MailInputStream(std::istream& istr):
+	MailIOS(istr),
 	std::istream(&_buf)
 {
 }
@@ -206,8 +206,8 @@ MailInputStream::~MailInputStream()
 }
 
 
-MailOutputStream::MailOutputStream(std::ostream& ostr): 
-	MailIOS(ostr), 
+MailOutputStream::MailOutputStream(std::ostream& ostr):
+	MailIOS(ostr),
 	std::ostream(&_buf)
 {
 }

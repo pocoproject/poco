@@ -34,7 +34,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
     typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
 	typedef DWORD (WINAPI *Entry)(LPVOID);
@@ -53,7 +53,7 @@ public:
 		POLICY_DEFAULT_IMPL = 0
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
@@ -73,6 +73,7 @@ public:
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
+	static long currentOsTidImpl();
 
 protected:
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
@@ -101,7 +102,7 @@ private:
 		{
 			TlsSetValue(_slot, pThread);
 		}
-	
+
 	private:
 		DWORD _slot;
 	};

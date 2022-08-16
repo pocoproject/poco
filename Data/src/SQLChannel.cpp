@@ -53,7 +53,7 @@ SQLChannel::SQLChannel():
 }
 
 
-SQLChannel::SQLChannel(const std::string& connector, 
+SQLChannel::SQLChannel(const std::string& connector,
 	const std::string& connect,
 	const std::string& name):
 	_connector(connector),
@@ -93,7 +93,7 @@ void SQLChannel::open()
 	initLogStatement();
 }
 
-	
+
 void SQLChannel::close()
 {
 	wait();
@@ -110,9 +110,9 @@ void SQLChannel::log(const Message& msg)
 void SQLChannel::logAsync(const Message& msg)
 {
 	poco_check_ptr (_pLogStatement);
-	if (0 == wait() && !_pLogStatement->done() && !_pLogStatement->initialized()) 
+	if (0 == wait() && !_pLogStatement->done() && !_pLogStatement->initialized())
 	{
-		if (_throw) 
+		if (_throw)
 			throw TimeoutException("Timed out waiting for previous statement completion");
 		else return;
 	}
@@ -145,7 +145,7 @@ void SQLChannel::logSync(const Message& msg)
 	}
 }
 
-	
+
 void SQLChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_NAME)
@@ -222,7 +222,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	}
 }
 
-	
+
 std::string SQLChannel::getProperty(const std::string& name) const
 {
 	if (name == PROP_NAME)
@@ -288,7 +288,7 @@ void SQLChannel::initLogStatement()
 
 void SQLChannel::registerChannel()
 {
-	Poco::LoggingFactory::defaultFactory().registerChannelClass("SQLChannel", 
+	Poco::LoggingFactory::defaultFactory().registerChannelClass("SQLChannel",
 		new Poco::Instantiator<SQLChannel, Poco::Channel>);
 }
 

@@ -48,19 +48,14 @@ public:
 		/// The socket will be created for the
 		/// given address family.
 
-	DatagramSocket(const SocketAddress& address, bool reuseAddress = false);
+	DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort = false, bool ipV6Only = false);
 		/// Creates a datagram socket and binds it
 		/// to the given address.
 		///
 		/// Depending on the address family, the socket
 		/// will be either an IPv4 or an IPv6 socket.
-
-	DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort);
-		/// Creates a datagram socket and binds it
-		/// to the given address.
-		///
-		/// Depending on the address family, the socket
-		/// will be either an IPv4 or an IPv6 socket.
+		/// If ipV6Only is true, socket will be bound
+		/// to the IPv6 address only.
 
 	DatagramSocket(const Socket& socket);
 		/// Creates the DatagramSocket with the SocketImpl
@@ -68,10 +63,51 @@ public:
 		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
+	DatagramSocket(const DatagramSocket& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket.
+
 	~DatagramSocket();
 		/// Destroys the DatagramSocket.
 
 	DatagramSocket& operator = (const Socket& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
+
+#if POCO_NEW_STATE_ON_MOVE
+
+	DatagramSocket(Socket&& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.The SocketImpl must be
+		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	DatagramSocket(DatagramSocket&& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.
+
+	DatagramSocket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+	DatagramSocket& operator = (DatagramSocket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+	DatagramSocket& operator = (const DatagramSocket& socket);
 		/// Assignment operator.
 		///
 		/// Releases the socket's SocketImpl and
@@ -106,6 +142,23 @@ public:
 		///
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
+		///
+		/// Calls to connect cannot() come before calls to bind().
+
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only = false);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
+		/// socket option.
+		///
+		/// Sets the IPV6_V6ONLY socket option in accordance with
+		/// the supplied ipV6Only value.
 		///
 		/// Calls to connect cannot() come before calls to bind().
 
@@ -231,7 +284,7 @@ protected:
 		/// Creates the Socket and attaches the given SocketImpl.
 		/// The socket takes ownership of the SocketImpl.
 		///
-		/// The SocketImpl must be a StreamSocketImpl, otherwise
+		/// The SocketImpl must be a DatagramSocketImpl, otherwise
 		/// an InvalidArgumentException will be thrown.
 };
 

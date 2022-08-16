@@ -96,7 +96,7 @@ public:
 private:
 	Poco::NotificationQueue& _queue;
 	DatagramSocket           _socket;
-	bool                     _stopped;
+	std::atomic<bool>        _stopped;
 };
 
 
@@ -190,7 +190,7 @@ private:
 
 private:
 	Poco::NotificationQueue& _queue;
-	bool                     _stopped;
+	std::atomic<bool>        _stopped;
 	RemoteSyslogListener*    _pListener;
 };
 
@@ -312,6 +312,7 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 	int tzd = 0;
 	bool hasDate = Poco::DateTimeParser::tryParse(RemoteSyslogChannel::SYSLOG_TIMEFORMAT, timeStr, date, tzd);
 	Poco::Message logEntry(msgId, messageText, prio);
+	logEntry[RemoteSyslogListener::LOG_PROP_FACILITY] = RemoteSyslogChannel::facilityToString(fac);
 	logEntry[RemoteSyslogListener::LOG_PROP_HOST] = hostName;
 	logEntry[RemoteSyslogListener::LOG_PROP_APP] = appName;
 	logEntry[RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA] = sd;
@@ -390,6 +391,7 @@ void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severi
 	pos = line.size();
 	Poco::Message logEntry(hostName, messageText, prio);
 	logEntry.setTime(date.timestamp());
+	logEntry[RemoteSyslogListener::LOG_PROP_FACILITY] = RemoteSyslogChannel::facilityToString(fac);
 	message.swap(logEntry);
 }
 
@@ -501,6 +503,7 @@ const std::string RemoteSyslogListener::PROP_REUSE_PORT("reusePort");
 const std::string RemoteSyslogListener::PROP_THREADS("threads");
 const std::string RemoteSyslogListener::PROP_BUFFER("buffer");
 
+const std::string RemoteSyslogListener::LOG_PROP_FACILITY("facility");
 const std::string RemoteSyslogListener::LOG_PROP_APP("app");
 const std::string RemoteSyslogListener::LOG_PROP_HOST("host");
 const std::string RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA("structured-data");

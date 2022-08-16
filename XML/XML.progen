@@ -12,5 +12,6 @@ vc.project.compiler.defines = XML_STATIC;XML_NS;XML_DTD;HAVE_EXPAT_CONFIG_H
 vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
+vc.project.compiler.additionalOptions = /Zc:__cplusplus
 vc.solution.create = true
 vc.solution.include = testsuite\\TestSuite

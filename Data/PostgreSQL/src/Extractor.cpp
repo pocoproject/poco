@@ -28,7 +28,7 @@ namespace PostgreSQL {
 
 
 Extractor::Extractor(StatementExecutor& st /*, ResultMetadata& md */):
-	_statementExecutor (st)
+	_statementExecutor(st)
 {
 }
 
@@ -40,8 +40,7 @@ Extractor::~Extractor()
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
-
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	int tempVal = 0;
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse(outputParameter.pData(), tempVal))
@@ -56,7 +55,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	unsigned int tempVal = 0;
 	if (isColumnNull(outputParameter)|| !Poco::NumberParser::tryParseUnsigned(outputParameter.pData(), tempVal))
@@ -71,7 +70,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	int tempVal = 0;
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse(outputParameter.pData(), tempVal))
@@ -86,7 +85,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	unsigned int tempVal = 0;
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParseUnsigned(outputParameter.pData(), tempVal))
@@ -101,7 +100,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse(outputParameter.pData(), val))
 	{
@@ -114,7 +113,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParseUnsigned(outputParameter.pData(), val))
 	{
@@ -127,7 +126,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse64(outputParameter.pData(), val))
 	{
@@ -140,7 +139,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParseUnsigned64(outputParameter.pData(), val))
 	{
@@ -154,7 +153,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 #ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	Poco::Int64 tempVal = 0;
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse64(outputParameter.pData(), tempVal))
@@ -169,7 +168,7 @@ bool Extractor::extract(std::size_t pos, long& val)
 
 bool Extractor::extract(std::size_t pos, unsigned long& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	Poco::UInt64 tempVal = 0;
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParseUnsigned64(outputParameter.pData(), tempVal))
@@ -185,7 +184,7 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 
 bool Extractor::extract(std::size_t pos, bool& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if	(isColumnNull(outputParameter))
 	{
@@ -200,7 +199,7 @@ bool Extractor::extract(std::size_t pos, bool& val)
 
 bool Extractor::extract(std::size_t pos, float& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	double tempVal = 0.0;
 	if	(isColumnNull(outputParameter) || !Poco::NumberParser::tryParseFloat(outputParameter.pData(), tempVal))
@@ -215,7 +214,7 @@ bool Extractor::extract(std::size_t pos, float& val)
 
 bool Extractor::extract(std::size_t pos, double& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParseFloat(outputParameter.pData(), val))
 	{
@@ -228,7 +227,7 @@ bool Extractor::extract(std::size_t pos, double& val)
 
 bool Extractor::extract(std::size_t pos, char& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -242,7 +241,7 @@ bool Extractor::extract(std::size_t pos, char& val)
 
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -256,7 +255,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -291,7 +290,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -305,7 +304,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 
 bool Extractor::extract(std::size_t pos, DateTime& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -314,7 +313,7 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 
 	int tzd = -1;
 	DateTime dateTime;
-	if (!DateTimeParser::tryParse("%Y-%m-%d %H:%M:%s", outputParameter.pData(), dateTime, tzd))
+	if (!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
 	{
 		return false;
 	}
@@ -327,7 +326,7 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 
 bool Extractor::extract(std::size_t pos, Date& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -348,7 +347,7 @@ bool Extractor::extract(std::size_t pos, Date& val)
 
 bool Extractor::extract(std::size_t pos, Time& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -372,7 +371,7 @@ bool Extractor::extract(std::size_t pos, Time& val)
 
 bool Extractor::extract(std::size_t pos, UUID& val)
 {
-	OutputParameter outputParameter = extractPreamble(pos);
+	const OutputParameter& outputParameter = extractPreamble(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -397,7 +396,7 @@ bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 
 bool Extractor::isNull(std::size_t col, std::size_t /*row*/)
 {
-	OutputParameter outputParameter = extractPreamble(col);
+	const OutputParameter& outputParameter = extractPreamble(col);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -425,15 +424,9 @@ const OutputParameter& Extractor::extractPreamble(std::size_t aPosition) const
 }
 
 
-bool Extractor::isColumnNull(const OutputParameter& anOutputParameter) const
-{
-	return anOutputParameter.isNull() || 0 == anOutputParameter.pData();
-}
-
-
 bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 {
-	OutputParameter outputParameter = _statementExecutor.resultColumn(pos);
+	const OutputParameter& outputParameter = _statementExecutor.resultColumn(pos);
 
 	if (isColumnNull(outputParameter))
 	{
@@ -525,7 +518,7 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 		}
 	//timestamp
 	case TIMESTAMPOID:
-	case TIMESTAMPZOID:
+	case TIMESTAMPTZOID:
 		{
 			DateTime dt;
 			success = extract(pos, dt);

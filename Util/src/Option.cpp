@@ -113,7 +113,7 @@ Option& Option::operator = (const Option& option)
 }
 
 
-void Option::swap(Option& option)
+void Option::swap(Option& option) noexcept
 {
 	std::swap(_shortName, option._shortName);
 	std::swap(_fullName, option._fullName);

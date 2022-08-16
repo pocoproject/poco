@@ -351,6 +351,15 @@ private:
 };
 
 
+//
+// inlines
+//
+inline bool Extractor::isColumnNull(const OutputParameter& anOutputParameter) const
+{
+	return anOutputParameter.isNull() || 0 == anOutputParameter.pData();
+}
+
+
 } } } // namespace Poco::Data::PostgreSQL
 
 

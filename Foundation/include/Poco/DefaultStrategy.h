@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// Default notification strategy.
 	///
@@ -81,7 +81,7 @@ public:
 			}
 		}
 	}
-	
+
 	void remove(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)

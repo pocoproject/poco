@@ -34,7 +34,7 @@ class NotificationCenter;
 
 
 class Foundation_API Task: public Runnable, public RefCountedObject
-	/// A Task is a subclass of Runnable that has a name 
+	/// A Task is a subclass of Runnable that has a name
 	/// and supports progress reporting and cancellation.
 	///
 	/// A TaskManager object can be used to take care of the
@@ -49,13 +49,13 @@ public:
 		TASK_CANCELLING,
 		TASK_FINISHED
 	};
-	
+
 	Task(const std::string& name);
 		/// Creates the Task.
 
 	const std::string& name() const;
-		/// Returns the task's name.	
-		
+		/// Returns the task's name.
+
 	float progress() const;
 		/// Returns the task's progress.
 		/// The value will be between 0.0 (just started)
@@ -72,7 +72,7 @@ public:
 
 	bool isCancelled() const;
 		/// Returns true if cancellation of the task has been
-		/// requested. 
+		/// requested.
 		///
 		/// A Task's runTask() method should periodically
 		/// call this method and stop whatever it is doing in an
@@ -84,11 +84,11 @@ public:
 	void reset();
 		/// Sets the task's progress to zero and clears the
 		/// cancel flag.
-		
+
 	virtual void runTask() = 0;
 		/// Do whatever the task needs to do. Must
 		/// be overridden by subclasses.
-		
+
 	void run();
 		/// Calls the task's runTask() method and notifies the owner
 		/// of the task's start and completion.
@@ -130,7 +130,7 @@ protected:
 
 	void setOwner(TaskManager* pOwner);
 		/// Sets the (optional) owner of the task.
-		
+
 	TaskManager* getOwner() const;
 		/// Returns the owner of the task, which may be NULL.
 
@@ -139,19 +139,19 @@ protected:
 
 	virtual ~Task();
 		/// Destroys the Task.
-		
+
 private:
 	Task();
 	Task(const Task&);
 	Task& operator = (const Task&);
-	
+
 	std::string       _name;
 	TaskManager*      _pOwner;
 	float             _progress;
-	TaskState         _state;
+	std::atomic<TaskState> _state;
 	Event             _cancelEvent;
 	mutable FastMutex _mutex;
-	
+
 	friend class TaskManager;
 };
 

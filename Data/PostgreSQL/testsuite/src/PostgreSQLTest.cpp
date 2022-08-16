@@ -647,6 +647,7 @@ void PostgreSQLTest::testBLOB()
 	catch (DataException&) { }
 }
 
+
 void PostgreSQLTest::testCLOBStmt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -655,6 +656,7 @@ void PostgreSQLTest::testCLOBStmt()
 	_pExecutor->clobStmt();
 }
 
+
 void PostgreSQLTest::testBLOBStmt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -662,6 +664,7 @@ void PostgreSQLTest::testBLOBStmt()
 	recreatePersonBLOBTable();
 	_pExecutor->blobStmt();
 }
+
 
 void PostgreSQLTest::testUnsignedInts()
 {
@@ -697,6 +700,7 @@ void PostgreSQLTest::testUUID()
 	recreateUUIDsTable();
 	_pExecutor->uuids();
 }
+
 
 void PostgreSQLTest::testTuple()
 {
@@ -888,9 +892,132 @@ void PostgreSQLTest::testTupleWithNullable()
 
 	assertTrue (result[5].get<1>() == std::string("B"));
 	assertTrue (result[5].get<2>() == null);
-
 }
 
+
+void PostgreSQLTest::testBinarySimpleAccess()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->simpleAccess();
+}
+
+
+void PostgreSQLTest::testBinaryComplexType()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->complexType();
+}
+
+
+void PostgreSQLTest::testBinarySimpleAccessVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->simpleAccessVector();
+}
+
+
+void PostgreSQLTest::testBinaryComplexTypeVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->complexTypeVector();
+}
+
+
+void PostgreSQLTest::testBinaryInts()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateUnsignedIntsTable();
+	_pExecutor->unsignedInts();
+}
+
+
+void PostgreSQLTest::testBinaryFloat()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateFloatsTable();
+	_pExecutor->floats();
+}
+
+
+void PostgreSQLTest::testBinaryDouble()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateFloatsTable();
+	_pExecutor->doubles();
+}
+
+
+void PostgreSQLTest::testBinaryUUID()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateUUIDsTable();
+	_pExecutor->uuids();
+}
+
+
+void PostgreSQLTest::testBinaryDateTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonDateTimeTable();
+	_pExecutor->dateTime();
+	recreatePersonDateTable();
+	_pExecutor->date();
+	recreatePersonTimeTable();
+	_pExecutor->time();
+}
+
+
+void PostgreSQLTest::testBinaryCLOBStmt()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonCLOBTable();
+	_pExecutor->clobStmt();
+}
+
+
+void PostgreSQLTest::testBinaryBLOBStmt()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonBLOBTable();
+	_pExecutor->blobStmt();
+}
 
 void PostgreSQLTest::dropTable(const std::string& tableName)
 {
@@ -994,6 +1121,14 @@ void PostgreSQLTest::recreateFloatsTable()
 }
 
 
+void PostgreSQLTest::recreateDoublesTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str DOUBLE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateDoublesTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateDoublesTable()"); }
+}
+
 void PostgreSQLTest::recreateUUIDsTable()
 {
 	dropTable("Strings");
@@ -1055,6 +1190,7 @@ void PostgreSQLTest::tearDown()
 {
 	dropTable("Person");
 	dropTable("Strings");
+	_pSession->setFeature("binaryExtraction", false);
 }
 
 
@@ -1135,6 +1271,19 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableInt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableString);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTupleWithNullable);
+
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccess);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexType);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccessVector);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexTypeVector);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryInts);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryFloat);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryDouble);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryUUID);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryDateTime);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryCLOBStmt);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryBLOBStmt);
+
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testReconnect);

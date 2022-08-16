@@ -35,7 +35,7 @@ public:
 	void testSORTABLE();
 	void testCustom();
 	void testTimespan();
-	
+
 	void setUp();
 	void tearDown();
 

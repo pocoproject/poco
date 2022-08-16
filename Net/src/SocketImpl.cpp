@@ -20,23 +20,17 @@
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
-#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
-#ifndef POCO_HAVE_FD_POLL
-#define POCO_HAVE_FD_POLL 1
-#endif
-#elif defined(POCO_OS_FAMILY_BSD)
-#ifndef POCO_HAVE_FD_POLL
-#define POCO_HAVE_FD_POLL 1
-#endif
-#endif
-
-
 #if defined(POCO_HAVE_FD_EPOLL)
-#include <sys/epoll.h>
+	#ifdef POCO_OS_FAMILY_WINDOWS
+		#include "wepoll.h"
+	#else
+		#include <sys/epoll.h>
+		#include <sys/eventfd.h>
+	#endif
 #elif defined(POCO_HAVE_FD_POLL)
-#ifndef _WIN32
-#include <poll.h>
-#endif
+	#ifndef _WIN32
+		#include <poll.h>
+	#endif
 #endif
 
 
@@ -61,6 +55,20 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::NumberFormatter;
 using Poco::Timespan;
+
+
+#ifdef WEPOLL_H_
+
+namespace {
+
+	int close(HANDLE h)
+	{
+		return epoll_close(h);
+	}
+
+}
+
+#endif // WEPOLL_H_
 
 
 namespace Poco {
@@ -219,10 +227,8 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reus
 	{
 		init(address.af());
 	}
-	if (reuseAddress)
-		setReuseAddress(true);
-	if (reusePort)
-		setReusePort(true);
+	setReuseAddress(reuseAddress);
+	setReusePort(reusePort);
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else
@@ -253,10 +259,8 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reu
 #else
 	if (ipV6Only) throw Poco::NotImplementedException("IPV6_V6ONLY not defined.");
 #endif
-	if (reuseAddress)
-		setReuseAddress(true);
-	if (reusePort)
-		setReusePort(true);
+	setReuseAddress(reuseAddress);
+	setReusePort(reusePort);
 	int rc = ::bind(_sockfd, address.addr(), address.length());
 	if (rc != 0) error(address.toString());
 #else
@@ -614,6 +618,13 @@ int SocketImpl::available()
 {
 	int result = 0;
 	ioctl(FIONREAD, result);
+#if (POCO_OS != POCO_OS_LINUX)
+	if (type() == SOCKET_TYPE_DATAGRAM)
+	{
+		std::vector<char> buf(result);
+		result = recvfrom(sockfd(), &buf[0], result, MSG_PEEK, NULL, NULL);
+	}
+#endif
 	return result;
 }
 
@@ -630,8 +641,11 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	if (sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 #if defined(POCO_HAVE_FD_EPOLL)
-
+#ifdef WEPOLL_H_
+	HANDLE epollfd = epoll_create(1);
+#else
 	int epollfd = epoll_create(1);
+#endif
 	if (epollfd < 0)
 	{
 		error("Can't create epoll queue");
@@ -756,6 +770,14 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	return rc > 0;
 
 #endif // POCO_HAVE_FD_EPOLL
+}
+
+
+int SocketImpl::getError()
+{
+	int result;
+	getOption(SOL_SOCKET, SO_ERROR, result);
+	return result;
 }
 
 
@@ -1027,14 +1049,25 @@ void SocketImpl::setReuseAddress(bool flag)
 {
 	int value = flag ? 1 : 0;
 	setOption(SOL_SOCKET, SO_REUSEADDR, value);
+#ifdef POCO_OS_FAMILY_WINDOWS
+	value = flag ? 0 : 1;
+	setOption(SOL_SOCKET, SO_EXCLUSIVEADDRUSE, value);
+#endif
 }
 
 
 bool SocketImpl::getReuseAddress()
 {
+	bool ret = false;
 	int value(0);
 	getOption(SOL_SOCKET, SO_REUSEADDR, value);
-	return value != 0;
+	ret = (value != 0);
+#ifdef POCO_OS_FAMILY_WINDOWS
+	value = 0;
+	getOption(SOL_SOCKET, SO_EXCLUSIVEADDRUSE, value);
+	ret = ret && (value == 0);
+#endif
+	return ret;
 }
 
 

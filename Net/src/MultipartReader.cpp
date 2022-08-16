@@ -88,7 +88,7 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 					{
 						buf.sbumpc(); // '\n'
 					}
-					return 0;					
+					return 0;
 				}
 				else if (ch == '-' && buf.sgetc() == '-')
 				{
@@ -105,6 +105,7 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		*buffer++ = (char) buf.sbumpc(); ++n;
 		ch = buf.sgetc();
 	}
+	if (ch == eof) _lastPart = true;
 	return n;
 }
 
@@ -218,11 +219,11 @@ bool MultipartReader::hasNextPart()
 	return (!_pMPI || !_pMPI->lastPart()) && _istr.good();
 }
 
-	
+
 std::istream& MultipartReader::stream() const
 {
 	poco_check_ptr (_pMPI);
-	
+
 	return *_pMPI;
 }
 

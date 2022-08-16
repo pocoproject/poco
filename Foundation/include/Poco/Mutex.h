@@ -22,16 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
 #include "Poco/Timestamp.h"
-
-#if __cplusplus >= 201103L
-	#ifndef POCO_HAVE_STD_ATOMICS
-		#define POCO_HAVE_STD_ATOMICS
-	#endif
-#endif
-
-#ifdef POCO_HAVE_STD_ATOMICS
-	#include <atomic>
-#endif
+#include <atomic>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -51,10 +42,10 @@ namespace Poco {
 
 
 class Foundation_API Mutex: private MutexImpl
-	/// A Mutex (mutual exclusion) is a synchronization 
+	/// A Mutex (mutual exclusion) is a synchronization
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multithreaded) scenario.
-	/// Mutexes are recursive, that is, the same mutex can be 
+	/// Mutexes are recursive, that is, the same mutex can be
 	/// locked multiple times by the same thread (but, of course,
 	/// not by other threads).
 	/// Using the ScopedLock class is the preferred way to automatically
@@ -62,23 +53,23 @@ class Foundation_API Mutex: private MutexImpl
 {
 public:
 	using ScopedLock = Poco::ScopedLock<Mutex>;
-	
+
 	Mutex();
 		/// creates the Mutex.
-		
+
 	~Mutex();
 		/// destroys the Mutex.
 
 	void lock();
 		/// Locks the mutex. Blocks if the mutex
 		/// is held by another thread.
-		
+
 	void lock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -92,14 +83,14 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
 		/// other threads.
-	
+
 private:
 	Mutex(const Mutex&);
 	Mutex& operator = (const Mutex&);
@@ -120,7 +111,7 @@ public:
 
 	FastMutex();
 		/// creates the Mutex.
-		
+
 	~FastMutex();
 		/// destroys the Mutex.
 
@@ -133,7 +124,7 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -147,21 +138,19 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
 		/// other threads.
-	
+
 private:
 	FastMutex(const FastMutex&);
 	FastMutex& operator = (const FastMutex&);
 };
 
-
-#ifdef POCO_HAVE_STD_ATOMICS
 
 class Foundation_API SpinlockMutex
 	/// A SpinlockMutex, implemented in terms of std::atomic_flag, as
@@ -210,8 +199,6 @@ private:
 	std::atomic_flag _flag = ATOMIC_FLAG_INIT;
 };
 
-#endif // POCO_HAVE_STD_ATOMICS
-
 
 class Foundation_API NullMutex
 	/// A NullMutex is an empty mutex implementation
@@ -222,12 +209,12 @@ class Foundation_API NullMutex
 {
 public:
 	using ScopedLock = Poco::ScopedLock<NullMutex>;
-	
+
 	NullMutex()
 		/// Creates the NullMutex.
 	{
 	}
-		
+
 	~NullMutex()
 		/// Destroys the NullMutex.
 	{
@@ -237,7 +224,7 @@ public:
 		/// Does nothing.
 	{
 	}
-		
+
 	void lock(long)
 		/// Does nothing.
 	{
@@ -336,8 +323,6 @@ inline void FastMutex::unlock()
 }
 
 
-#ifdef POCO_HAVE_STD_ATOMICS
-
 //
 // SpinlockMutex
 //
@@ -381,8 +366,6 @@ inline void SpinlockMutex::unlock()
 {
 	_flag.clear(std::memory_order_release);
 }
-
-#endif // POCO_HAVE_STD_ATOMICS
 
 
 } // namespace Poco

@@ -432,7 +432,7 @@ private:
 
 	using CountVec = std::vector<std::size_t>;
 
-	State                    _state;
+	std::atomic<State>       _state;
 	Limit                    _extrLimit;
 	std::size_t              _lowerLimit;
 	std::vector<int>         _columnsExtracted;

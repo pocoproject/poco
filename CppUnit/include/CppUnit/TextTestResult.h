@@ -31,7 +31,7 @@ public:
 	virtual void printErrors(std::ostream& stream);
 	virtual void printFailures(std::ostream& stream);
 	virtual void printHeader(std::ostream& stream);
-	
+
 protected:
 	std::string shortName(const std::string& testName);
 	void setup();

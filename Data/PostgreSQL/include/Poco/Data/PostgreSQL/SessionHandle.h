@@ -155,6 +155,9 @@ public:
 	std::string clientEncoding() const;
 		/// returns the client encoding
 
+	std::string parameterStatus(const std::string& param) const;
+		/// Returns the value configured on the server for the given parameter.
+
 	int libpqVersion() const;
 		/// returns the version of libpq
 

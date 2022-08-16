@@ -90,6 +90,9 @@
     <ClInclude Include="include\Poco\Util\LayeredConfiguration.h">
       <Filter>Configuration\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Util\LocalConfigurationView.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Util\LoggingConfigurator.h">
       <Filter>Configuration\Header Files</Filter>
     </ClInclude>
@@ -186,6 +189,9 @@
       <Filter>Configuration\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LayeredConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LocalConfigurationView.cpp">
       <Filter>Configuration\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LoggingConfigurator.cpp">

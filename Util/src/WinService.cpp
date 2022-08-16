@@ -102,7 +102,7 @@ void WinService::registerService(const std::string& path, const std::string& dis
 	_svcHandle = CreateServiceW(
 		_scmHandle,
 		uname.c_str(),
-		udisplayName.c_str(), 
+		udisplayName.c_str(),
 		SERVICE_ALL_ACCESS,
 		SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START,
@@ -113,7 +113,7 @@ void WinService::registerService(const std::string& path, const std::string& dis
 		throw SystemException("cannot register service", _name);
 }
 
-	
+
 void WinService::registerService(const std::string& path)
 {
 	registerService(path, _name);
@@ -144,7 +144,7 @@ bool WinService::isRunning() const
 	return ss.dwCurrentState == SERVICE_RUNNING;
 }
 
-bool WinService::isStopped() const 
+bool WinService::isStopped() const
 {
 	open();
 	SERVICE_STATUS ss;
@@ -153,7 +153,7 @@ bool WinService::isStopped() const
 	return ss.dwCurrentState == SERVICE_STOPPED;
 }
 
-	
+
 void WinService::start()
 {
 	open();
@@ -209,7 +209,7 @@ void WinService::setStartup(WinService::Startup startup)
 	}
 }
 
-	
+
 WinService::Startup WinService::getStartup() const
 {
 	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
@@ -252,15 +252,15 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 	Poco::UnicodeConverter::toUTF16(rebootMessage, urebootMessage);
 	std::vector<wchar_t> rebootMessageVector{ urebootMessage.begin(), urebootMessage.end() };
 	rebootMessageVector.push_back('\0');
-	
+
 	std::wstring uComamnd;
 	Poco::UnicodeConverter::toUTF16(command, uComamnd);
 	std::vector<wchar_t> commandVector{ uComamnd.begin(), uComamnd.end() };
 	commandVector.push_back('\0');
 
-	for (auto i = 0; i < failureActions.size(); i++) 		
+	for (auto i = 0; i < failureActions.size(); i++)
 	{
-		switch (failureActions[i].type) 
+		switch (failureActions[i].type)
 		{
 		case SVC_REBOOT:
 			actions[i].Type = SC_ACTION_REBOOT;
@@ -311,15 +311,15 @@ WinService::FailureActionTypeVector WinService::getFailureActions() const {
 			} else throw SystemException("cannot query service configuration", _name);
 		}
 	}
-	catch (...) 
+	catch (...)
 	{
 		LocalFree(pSvcFailureAction);
 		throw;
 	}
 	FailureActionTypeVector result(3, SVC_NONE);
-	for (auto i = 0; i < pSvcFailureAction->cActions; i++) 
+	for (auto i = 0; i < pSvcFailureAction->cActions; i++)
 	{
-		switch (pSvcFailureAction->lpsaActions->Type) 
+		switch (pSvcFailureAction->lpsaActions->Type)
 		{
 		case SC_ACTION_NONE:
 			result[i] = SVC_NONE;

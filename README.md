@@ -1,6 +1,5 @@
 ![alt text][logo]
 
-
 [![poco-ci](https://github.com/pocoproject/poco/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/pocoproject/poco/actions/workflows/ci.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
@@ -123,6 +122,39 @@ $ sudo cmake --build . --target install
 The default install location is `/usr/local/` on Linux and macOS and
 `C:\Program Files (x64)\` on Windows and can be overridden by setting
 the `CMAKE_INSTALL_PREFIX` CMake variable.
+
+
+#### Building and Installing - Using vcpkg
+
+You can download and install poco using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+```
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh
+$ ./vcpkg integrate install
+$ ./vcpkg install poco
+```
+The poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
+If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg)
+on the vcpkg repository.
+
+#### Building and Installing - Using Conan
+
+You can download and install poco using the Conan(https://github.com/conan-io/conan)
+package manager. It needed to be installed first(https://conan.io/downloads.html):
+
+You can install Poco libraries from Conan Center(https://conan.io/center.html):
+
+    $ conan install -r conancenter poco/1.12.0@
+
+Or, you can download Poco recipe and build locally:
+
+    $ conan install -r conancenter poco/1.12.0@ --build=poco
+
+The Poco recipe and packages in Conan Center are kept up to date by Conan team members and community contributors.
+If the version is out of date, or you detect any wrong behavior, please create an issue or pull request(https://github.com/conan-io/conan-center-index)
+on the Conan Center Index repository.
 
 
 ### Building Without CMake

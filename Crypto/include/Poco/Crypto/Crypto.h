@@ -35,6 +35,7 @@
 
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
+#include <openssl/err.h>
 
 
 #ifndef OPENSSL_VERSION_PREREQ
@@ -176,6 +177,20 @@ enum RSAPaddingMode
 
 namespace Poco {
 namespace Crypto {
+
+
+inline std::string& getError(std::string& msg)
+	/// Appends OpenSSL error(s) to msg and
+	/// returns the augmented error description.
+{
+	unsigned long err;
+	while ((err = ERR_get_error()))
+	{
+		if (!msg.empty()) msg.append(1, '\n');
+		msg.append(ERR_error_string(err, 0));
+	}
+	return msg;
+}
 
 
 void Crypto_API initializeCrypto();

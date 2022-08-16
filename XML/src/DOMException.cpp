@@ -47,19 +47,19 @@ DOMException::DOMException(unsigned short code):
 {
 }
 
-	
+
 DOMException::DOMException(const DOMException& exc):
 	XMLException(exc),
 	_code(exc._code)
 {
 }
 
-	
+
 DOMException::~DOMException() noexcept
 {
 }
 
-	
+
 DOMException& DOMException::operator = (const DOMException& exc)
 {
 	if (&exc != this)

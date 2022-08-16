@@ -37,7 +37,7 @@ protected:
 	bool tryLockImpl();
 	bool tryLockImpl(long milliseconds);
 	void unlockImpl();
-	
+
 private:
 	pthread_mutex_t _mutex;
 };
@@ -56,7 +56,7 @@ protected:
 //
 inline void MutexImpl::lockImpl()
 {
-	if (pthread_mutex_lock(&_mutex)) 
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot lock mutex");
 }
 

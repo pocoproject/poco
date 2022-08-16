@@ -49,12 +49,12 @@ namespace
 	class TestTask: public Task
 	{
 	public:
-		TestTask(): 
+		TestTask():
 			Task("TestTask"),
 			_fail(false)
 		{
 		}
-		
+
 		void runTask()
 		{
 			_event.wait();
@@ -67,12 +67,12 @@ namespace
 			setProgress(1.0);
 			_event.wait();
 		}
-		
+
 		void fail()
 		{
 			_fail = true;
 		}
-		
+
 		void cont()
 		{
 			_event.set();
@@ -82,20 +82,20 @@ namespace
 		Event _event;
 		bool  _fail;
 	};
-	
+
 	class SimpleTask: public Task
 	{
 	public:
 		SimpleTask(): Task("SimpleTask")
 		{
 		}
-		
+
 		void runTask()
 		{
 			sleep(10000);
 		}
 	};
-	
+
 	class TaskObserver
 	{
 	public:
@@ -107,73 +107,73 @@ namespace
 			_progress(0.0)
 		{
 		}
-		
+
 		~TaskObserver()
 		{
 			delete _pException;
 		}
-		
+
 		void taskStarted(TaskStartedNotification* pNf)
 		{
 			_started = true;
 			pNf->release();
 		}
-		
+
 		void taskCancelled(TaskCancelledNotification* pNf)
 		{
 			_cancelled = true;
 			pNf->release();
 		}
-		
+
 		void taskFinished(TaskFinishedNotification* pNf)
 		{
 			_finished = true;
 			pNf->release();
 		}
-		
+
 		void taskFailed(TaskFailedNotification* pNf)
 		{
 			_pException = pNf->reason().clone();
 			pNf->release();
 		}
-		
+
 		void taskProgress(TaskProgressNotification* pNf)
 		{
 			_progress = pNf->progress();
 			pNf->release();
 		}
-		
+
 		bool started() const
 		{
 			return _started;
 		}
-		
+
 		bool cancelled() const
 		{
 			return _cancelled;
 		}
-		
+
 		bool finished() const
 		{
 			return _finished;
 		}
-		
+
 		float progress() const
 		{
 			return _progress;
 		}
-		
+
 		Exception* error() const
 		{
 			return _pException;
 		}
-		
+
 	private:
-		bool       _started;
-		bool       _cancelled;
-		bool       _finished;
-		Exception* _pException;
-		float      _progress;
+		std::atomic<bool> _started;
+		std::atomic<bool> _cancelled;
+		std::atomic<bool> _finished;
+		Exception*        _pException;
+		float             _progress;
 	};
 
 
@@ -181,27 +181,27 @@ namespace
 	class CustomNotificationTask: public Task
 	{
 	public:
-		CustomNotificationTask(const T& t): 
+		CustomNotificationTask(const T& t):
 			Task("CustomNotificationTask"),
 			_custom(t)
 		{
 		}
-		
+
 		void runTask()
 		{
 			sleep(10000);
 		}
-		
+
 		void setCustom(const T& custom)
 		{
 			_custom = custom;
 			postNotification(new TaskCustomNotification<T>(this, _custom));
 		}
-		
+
 	private:
 		T _custom;
 	};
-	
+
 
 	template <class C>
 	class CustomTaskObserver
@@ -210,11 +210,11 @@ namespace
 		CustomTaskObserver(const C& custom): _custom(custom)
 		{
 		}
-		
+
 		~CustomTaskObserver()
 		{
 		}
-		
+
 		void taskCustom(TaskCustomNotification<C>* pNf)
 		{
 			_custom = pNf->custom();
@@ -347,16 +347,16 @@ void TaskManagerTest::testError()
 void TaskManagerTest::testCustom()
 {
 	TaskManager tm;
-	
+
 	CustomTaskObserver<int> ti(0);
 	tm.addObserver(
 		Observer<CustomTaskObserver<int>, TaskCustomNotification<int> >
 			(ti, &CustomTaskObserver<int>::taskCustom));
-	
+
 	AutoPtr<CustomNotificationTask<int> > pCNT1 = new CustomNotificationTask<int>(0);
 	tm.start(pCNT1.duplicate());
 	assertTrue (ti.custom() == 0);
-	
+
 	for (int i = 1; i < 10; ++i)
 	{
 		pCNT1->setCustom(i);
@@ -367,7 +367,7 @@ void TaskManagerTest::testCustom()
 	tm.addObserver(
 		Observer<CustomTaskObserver<std::string>, TaskCustomNotification<std::string> >
 			(ts, &CustomTaskObserver<std::string>::taskCustom));
-	
+
 	AutoPtr<CustomNotificationTask<std::string> > pCNT2 = new CustomNotificationTask<std::string>("");
 	tm.start(pCNT2.duplicate());
 	assertTrue (tm.taskList().size() == 2);
@@ -375,17 +375,17 @@ void TaskManagerTest::testCustom()
 	std::string str("notify me");
 	pCNT2->setCustom(str);
 	assertTrue (ts.custom() == str);
-	
+
 	S s;
 	s.i = 0;
 	s.str = "";
 
 	CustomTaskObserver<S*> ptst(&s);
-	
+
 	tm.addObserver(
 		Observer<CustomTaskObserver<S*>, TaskCustomNotification<S*> >
 			(ptst, &CustomTaskObserver<S*>::taskCustom));
-	
+
 	AutoPtr<CustomNotificationTask<S*> > pCNT3 = new CustomNotificationTask<S*>(&s);
 	tm.start(pCNT3.duplicate());
 	assertTrue (tm.taskList().size() == 3);
@@ -401,11 +401,11 @@ void TaskManagerTest::testCustom()
 	s.str = "";
 
 	CustomTaskObserver<S> tst(s);
-	
+
 	tm.addObserver(
 		Observer<CustomTaskObserver<S>, TaskCustomNotification<S> >
 			(tst, &CustomTaskObserver<S>::taskCustom));
-	
+
 	AutoPtr<CustomNotificationTask<S> > pCNT4 = new CustomNotificationTask<S>(s);
 	tm.start(pCNT4.duplicate());
 	assertTrue (tm.taskList().size() == 4);
@@ -416,7 +416,7 @@ void TaskManagerTest::testCustom()
 	pCNT4->setCustom(s);
 	assertTrue (tst.custom().i == 123);
 	assertTrue (tst.custom().str == "123");
-	
+
 	AutoPtr<SimpleTask> pST = new SimpleTask;
 	tm.start(pST.duplicate());
 	assertTrue (tm.taskList().size() == 5);
@@ -433,10 +433,10 @@ void TaskManagerTest::testMultiTasks()
 	tm.start(new SimpleTask);
 	tm.start(new SimpleTask);
 	tm.start(new SimpleTask);
-	
+
 	TaskManager::TaskList list = tm.taskList();
 	assertTrue (list.size() == 3);
-	
+
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(100);
 	assertTrue (tm.count() == 0);
@@ -471,7 +471,7 @@ void TaskManagerTest::testCustomThreadPool()
 	}
 
 	assertTrue (tm.count() == tp.allocated());
-	
+
 	tp.joinAll();
 }
 

@@ -39,14 +39,14 @@ class Foundation_API Timer: protected Runnable
 	/// Once that interval expires, the timer callback is called repeatedly
 	/// in the given periodic interval. If the interval is 0, the timer is only
 	/// called once.
-	/// The timer callback method can stop the timer by setting the 
+	/// The timer callback method can stop the timer by setting the
 	/// timer's periodic interval to 0.
 	///
 	/// The timer callback runs in its own thread, so multithreading
-	/// issues (proper synchronization) have to be considered when writing 
+	/// issues (proper synchronization) have to be considered when writing
 	/// the callback method.
 	///
-	/// The exact interval at which the callback is called depends on many 
+	/// The exact interval at which the callback is called depends on many
 	/// factors like operating system, CPU performance and system load and
 	/// may differ from the specified interval.
 	///
@@ -66,7 +66,7 @@ class Foundation_API Timer: protected Runnable
 public:
 	Timer(long startInterval = 0, long periodicInterval = 0);
 		/// Creates a new timer object. StartInterval and periodicInterval
-		/// are given in milliseconds. If a periodicInterval of zero is 
+		/// are given in milliseconds. If a periodicInterval of zero is
 		/// specified, the callback will only be called once, after the
 		/// startInterval expires.
 		/// To start the timer, call the Start() method.
@@ -101,7 +101,7 @@ public:
 		/// Create the TimerCallback as follows:
 		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
 		///     timer.start(callback);
-		
+
 	void stop();
 		/// Stops the timer. If the callback method is currently running
 		/// it will be allowed to finish first.
@@ -121,7 +121,7 @@ public:
 		/// Returns the start interval.
 
 	void setStartInterval(long milliseconds);
-		/// Sets the start interval. Will only be 
+		/// Sets the start interval. Will only be
 		/// effective before start() is called.
 
 	long getPeriodicInterval() const;
@@ -131,7 +131,7 @@ public:
 		/// Sets the periodic interval. If the timer is already running
 		/// the new interval will be effective when the current interval
 		/// expires.
-		
+
 	long skipped() const;
 		/// Returns the number of skipped invocations since the last invocation.
 		/// Skipped invocations happen if the timer callback function takes
@@ -149,7 +149,7 @@ private:
 	AbstractTimerCallback* _pCallback;
 	Clock                  _nextInvocation;
 	mutable FastMutex      _mutex;
-	
+
 	Timer(const Timer&);
 	Timer& operator = (const Timer&);
 };
@@ -163,7 +163,7 @@ public:
 	AbstractTimerCallback();
 	AbstractTimerCallback(const AbstractTimerCallback& callback);
 	virtual ~AbstractTimerCallback();
-	
+
 	AbstractTimerCallback& operator = (const AbstractTimerCallback& callback);
 
 	virtual void invoke(Timer& timer) const = 0;
@@ -171,11 +171,11 @@ public:
 };
 
 
-template <class C> 
+template <class C>
 class TimerCallback: public AbstractTimerCallback
 	/// This template class implements an adapter that sits between
 	/// a Timer and an object's method invoked by the timer.
-	/// It is quite similar in concept to the RunnableAdapter, but provides 
+	/// It is quite similar in concept to the RunnableAdapter, but provides
 	/// some Timer specific additional methods.
 	/// See the Timer class for information on how
 	/// to use this template class.

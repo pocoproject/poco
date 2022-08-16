@@ -87,6 +87,7 @@ using Poco::DateTime;
 
 
 ODBCTest::SessionPtr ODBCSQLServerTest::_pSession;
+ODBCTest::SessionPtr ODBCSQLServerTest::_pEncSession;
 ODBCTest::ExecPtr    ODBCSQLServerTest::_pExecutor;
 std::string          ODBCSQLServerTest::_driver = MS_SQL_SERVER_ODBC_DRIVER;
 std::string          ODBCSQLServerTest::_dsn = MS_SQL_SERVER_DSN;
@@ -106,7 +107,7 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	;
 
 
-ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
+ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -127,13 +128,13 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
 
 	tableCreateString = "CREATE TABLE Test "
@@ -254,7 +255,7 @@ void ODBCSQLServerTest::testStoredProcedure()
 			"SET @outParam = -1; "
 			"END;"
 		, now;
-		
+
 		int i = 0;
 		session() << "{call storedProcedure(?)}", out(i), now;
 		assertTrue (-1 == i);
@@ -297,8 +298,8 @@ void ODBCSQLServerTest::testStoredProcedure()
 	}
 /*TODO - currently fails with following error:
 
-[Microsoft][ODBC SQL Server Driver][SQL Server]Invalid parameter 
-2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.  
+[Microsoft][ODBC SQL Server Driver][SQL Server]Invalid parameter
+2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.
 Deprecated types are not supported as output parameters.  Use current large object types instead.
 
 	session().setFeature("autoBind", true);
@@ -339,16 +340,16 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 			"BEGIN "
 			" SELECT * "
 			" FROM Person "
-			" WHERE Age < @ageLimit " 
+			" WHERE Age < @ageLimit "
 			" ORDER BY Age DESC; "
 			"END;"
 		, now;
 
 		people.clear();
 		int age = 13;
-		
+
 		session() << "{call storedCursorProcedure(?)}", in(age), into(people), now;
-		
+
 		assertTrue (2 == people.size());
 		assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
 		assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
@@ -409,7 +410,7 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
-		
+
 		DynamicAny i = 2;
 		DynamicAny j = 0;
 
@@ -506,7 +507,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
 		assertTrue (1 == j);
 		assertTrue (2 == i);
-		assertTrue (3 == result); 
+		assertTrue (3 == result);
 
 		Tuple<int, int> params(1, 2);
 		assertTrue (1 == params.get<0>());
@@ -515,7 +516,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
 		assertTrue (1 == params.get<1>());
 		assertTrue (2 == params.get<0>());
-		assertTrue (3 == result); 
+		assertTrue (3 == result);
 
 		dropObject("PROCEDURE", "storedFunction");
 
@@ -683,15 +684,15 @@ void ODBCSQLServerTest::recreateBoolTable()
 void ODBCSQLServerTest::recreateMiscTable()
 {
 	dropObject("TABLE", "MiscTest");
-	try 
-	{ 
+	try
+	{
 		session() << "CREATE TABLE MiscTest "
 			"(First VARCHAR(30),"
 			"Second VARBINARY(30),"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
 			"Fifth DATETIME,"
-			"Sixth BIT)", now; 
+			"Sixth BIT)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -702,20 +703,20 @@ void ODBCSQLServerTest::recreateLogTable()
 	dropObject("TABLE", "T_POCO_LOG");
 	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(max),"
 			"Name VARCHAR(max),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(max), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(max),"
 			"DateTime DATETIME)";
 
-		session() << sql, "T_POCO_LOG", now; 
-		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+		session() << sql, "T_POCO_LOG", now;
+		session() << sql, "T_POCO_LOG_ARCHIVE", now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -733,13 +734,28 @@ void ODBCSQLServerTest::recreateUnicodeTable()
 }
 
 
+void ODBCSQLServerTest::recreateEncodingTables()
+{
+#if defined (POCO_ODBC_UNICODE)
+	dropObject("TABLE", "Latin1Table");
+	try { session() << "CREATE TABLE Latin1Table (str NVARCHAR(30))", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreateEncodingTables()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreateEncodingTables()"); }
+#endif
+}
+
+
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
+		std::string enc = "Latin1";
+		if ((_pEncSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db, enc)))
+			std::cout << "*** Connected to [" << _driver << "] test database, encoding: [" << enc << "]." << std::endl;
+		// ...
 
-		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession, _pEncSession);
 
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 
@@ -822,6 +838,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEncoding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
 
 		return pSuite;

@@ -19,6 +19,7 @@
 #include "Poco/NumericString.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/NumberFormatter.h"
+#include <limits>
 
 
 class StringTest: public CppUnit::TestCase
@@ -53,12 +54,14 @@ public:
 	void testNumericStringLimit();
 	void testStringToFloatError();
 	void testNumericLocale();
-	void benchmarkStrToFloat();
-	void benchmarkStrToInt();
 
 	void testIntToString();
 	void testFloatToString();
+
+	void conversionBenchmarks();
 	void benchmarkFloatToStr();
+	void benchmarkStrToFloat();
+	void benchmarkStrToInt();
 
 	void testJSONString();
 
@@ -74,7 +77,9 @@ private:
 	{
 		T result = 0;
 		if (123 <= std::numeric_limits<T>::max())
+		{
 			assertTrue (Poco::strToInt("123", result, 10)); assertTrue (result == 123);
+		}
 
 		assertTrue (Poco::strToInt("0", result, 10)); assertTrue (result == 0);
 		assertTrue (Poco::strToInt("000", result, 10)); assertTrue (result == 0);
@@ -128,7 +133,6 @@ private:
 		assertFalse(s == std::numeric_limits<Smaller>::min());
 		assertTrue(Poco::strToInt<Smaller>(val, s, 10));
 		assertTrue (s == std::numeric_limits<Smaller>::min());
-		assertTrue(s == std::numeric_limits<Smaller>::min());
 		--l; val = Poco::NumberFormatter::format(l);
 		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
 		--l; val = Poco::NumberFormatter::format(l);
@@ -141,6 +145,21 @@ private:
 		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
 		--l; val = Poco::NumberFormatter::format(l);
 		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
+	}
+
+	template <typename T>
+	void multiplyOverflow()
+	{
+		T m = static_cast<T>(10);
+		T t = 0;
+		T f = std::numeric_limits<T>::max()/m;
+		assertTrue (Poco::safeMultiply(t, f, m));
+		f += 1;
+		assertFalse (Poco::safeMultiply(t, f, m));
+		f = std::numeric_limits<T>::min()/m;
+		assertTrue (Poco::safeMultiply(t, f, m));
+		f -= 1;
+		assertFalse (Poco::safeMultiply(t, f, m));
 	}
 
 	template <typename T>

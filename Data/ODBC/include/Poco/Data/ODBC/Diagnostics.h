@@ -36,7 +36,7 @@ template <typename H, SQLSMALLINT handleType>
 class Diagnostics
 	/// Utility class providing functionality for retrieving ODBC diagnostic
 	/// records. Diagnostics object must be created with corresponding handle
-	/// as constructor argument. During construction, diagnostic records fields 
+	/// as constructor argument. During construction, diagnostic records fields
 	/// are populated and the object is ready for querying.
 {
 public:
@@ -92,7 +92,7 @@ public:
 	}
 
 	std::string connectionName() const
-		/// Returns the connection name. 
+		/// Returns the connection name.
 		/// If there is no active connection, connection name defaults to NONE.
 		/// If connection name is not applicable for query context (such as when querying environment handle),
 		/// connection name defaults to NOT_APPLICABLE.
@@ -146,54 +146,54 @@ public:
 
 		reset();
 
-		while (!Utility::isError(SQLGetDiagRec(handleType, 
-			_handle, 
-			count, 
-			df._sqlState, 
-			&df._nativeError, 
-			df._message, 
-			SQL_MESSAGE_LENGTH, 
-			&messageLength))) 
+		while (!Utility::isError(SQLGetDiagRec(handleType,
+			_handle,
+			count,
+			df._sqlState,
+			&df._nativeError,
+			df._message,
+			SQL_MESSAGE_LENGTH,
+			&messageLength)))
 		{
 			if (1 == count)
 			{
 				// success of the following two calls is optional
 				// (they fail if connection has not been established yet
 				//  or return empty string if not applicable for the context)
-				if (Utility::isError(SQLGetDiagField(handleType, 
-					_handle, 
-					count, 
-					SQL_DIAG_CONNECTION_NAME, 
-					_connectionName, 
-					sizeof(_connectionName), 
+				if (Utility::isError(SQLGetDiagField(handleType,
+					_handle,
+					count,
+					SQL_DIAG_CONNECTION_NAME,
+					_connectionName,
+					sizeof(_connectionName),
 					&messageLength)))
 				{
-					std::size_t len = sizeof(_connectionName) > none.length() ? 
+					std::size_t len = sizeof(_connectionName) > none.length() ?
 						none.length() : sizeof(_connectionName) - 1;
 					std::memcpy(_connectionName, none.c_str(), len);
 				}
-				else if (0 == _connectionName[0]) 
+				else if (0 == _connectionName[0])
 				{
-					std::size_t len = sizeof(_connectionName) > na.length() ? 
+					std::size_t len = sizeof(_connectionName) > na.length() ?
 						na.length() : sizeof(_connectionName) - 1;
 					std::memcpy(_connectionName, na.c_str(), len);
 				}
-				
-				if (Utility::isError(SQLGetDiagField(handleType, 
-					_handle, 
-					count, 
-					SQL_DIAG_SERVER_NAME, 
-					_serverName, 
-					sizeof(_serverName), 
+
+				if (Utility::isError(SQLGetDiagField(handleType,
+					_handle,
+					count,
+					SQL_DIAG_SERVER_NAME,
+					_serverName,
+					sizeof(_serverName),
 					&messageLength)))
 				{
-					std::size_t len = sizeof(_serverName) > none.length() ? 
+					std::size_t len = sizeof(_serverName) > none.length() ?
 						none.length() : sizeof(_serverName) - 1;
 					std::memcpy(_serverName, none.c_str(), len);
 				}
-				else if (0 == _serverName[0]) 
+				else if (0 == _serverName[0])
 				{
-					std::size_t len = sizeof(_serverName) > na.length() ? 
+					std::size_t len = sizeof(_serverName) > na.length() ?
 						na.length() : sizeof(_serverName) - 1;
 					std::memcpy(_serverName, na.c_str(), len);
 				}

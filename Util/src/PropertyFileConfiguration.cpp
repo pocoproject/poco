@@ -39,7 +39,7 @@ PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr)
 	load(istr);
 }
 
-	
+
 PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path)
 {
 	load(path);
@@ -50,7 +50,7 @@ PropertyFileConfiguration::~PropertyFileConfiguration()
 {
 }
 
-	
+
 void PropertyFileConfiguration::load(std::istream& istr)
 {
 	clear();
@@ -60,7 +60,7 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	}
 }
 
-	
+
 void PropertyFileConfiguration::load(const std::string& path)
 {
 	Poco::FileInputStream istr(path);
@@ -125,7 +125,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 
 void PropertyFileConfiguration::parseLine(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof(); 
+	static const int eof = std::char_traits<char>::eof();
 
 	int c = istr.get();
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();

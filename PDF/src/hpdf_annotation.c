@@ -378,7 +378,7 @@ HPDF_3DAnnot_New    (HPDF_MMgr        mmgr,
     if (!annot) {
         return NULL;
     }
-    
+
     HPDF_Dict_Add(annot, "Contents", HPDF_String_New (mmgr, "3D Model", NULL));
 
     action = HPDF_Dict_New (mmgr);
@@ -533,7 +533,7 @@ HPDF_Annot_SetGrayColor (HPDF_Annotation annot, HPDF_REAL color)
 
     if (ret != HPDF_OK)
         return HPDF_Error_GetCode ( annot->error);
-    
+
     return HPDF_OK;
 }
 
@@ -550,7 +550,7 @@ HPDF_Annot_SetNoColor (HPDF_Annotation annot)
         return HPDF_Error_GetCode ( annot->error);
 
     ret = HPDF_Dict_Add (annot, "C", cArray);
-    
+
     return ret;
 }
 
@@ -788,7 +788,7 @@ CheckSubType (HPDF_Annotation  annot,
 }
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_Annot_Set3DView ( HPDF_MMgr mmgr, 
+HPDF_Annot_Set3DView ( HPDF_MMgr mmgr,
                      HPDF_Annotation    annot,
                      HPDF_Annotation    annot3d,
                      HPDF_Dict            view3d)
@@ -796,11 +796,11 @@ HPDF_Annot_Set3DView ( HPDF_MMgr mmgr,
     HPDF_Proxy proxyView3d;
     HPDF_Dict exData = HPDF_Dict_New( mmgr);
     HPDF_STATUS retS = HPDF_OK;
-    
+
     retS += HPDF_Dict_AddName( exData, "Type", "ExData");
     retS += HPDF_Dict_AddName( exData, "Subtype", "Markup3D");
     retS += HPDF_Dict_Add( exData, "3DA", annot3d);
-    
+
     proxyView3d = HPDF_Proxy_New( mmgr, view3d);
 
     retS += HPDF_Dict_Add( exData, "3DV", proxyView3d);
@@ -833,7 +833,7 @@ HPDF_Annotation
 HPDF_StampAnnot_New (HPDF_MMgr         mmgr,
                      HPDF_Xref         xref,
                      HPDF_Rect         rect,
-                     HPDF_StampAnnotName name,                     
+                     HPDF_StampAnnotName name,
                      const char*       text,
                      HPDF_Encoder       encoder)
 {
@@ -847,7 +847,7 @@ HPDF_StampAnnot_New (HPDF_MMgr         mmgr,
 
     if (HPDF_Dict_AddName ( annot, "Name", HPDF_STAMP_ANNOT_NAME_NAMES[name]) != HPDF_OK)
         return NULL;
-    
+
     s = HPDF_String_New (mmgr, text, encoder);
     if (!s)
         return NULL;
@@ -891,7 +891,7 @@ HPDF_TextMarkupAnnot_SetQuadPoints ( HPDF_Annotation annot, HPDF_Point lb, HPDF_
     HPDF_STATUS ret = HPDF_OK;
 
     HPDF_PTRACE((" HPDF_TextMarkupAnnot_SetQuadPoints\n"));
-    
+
     quadPoints = HPDF_Array_New ( annot->mmgr);
     if ( !quadPoints)
         return HPDF_Error_GetCode ( annot->error);
@@ -946,7 +946,7 @@ HPDF_MarkupAnnot_SetRectDiff (HPDF_Annotation  annot, HPDF_Rect  rect) /* RD ent
     HPDF_REAL tmp;
 
     HPDF_PTRACE((" HPDF_MarkupAnnot_SetRectDiff\n"));
-    
+
     array = HPDF_Array_New ( annot->mmgr);
     if ( !array)
         return HPDF_Error_GetCode ( annot->error);
@@ -977,9 +977,9 @@ HPDF_FreeTextAnnot_SetDefaultStyle (HPDF_Annotation  annot,
 {
     HPDF_String s;
     HPDF_STATUS ret = HPDF_OK;
-    
+
     HPDF_PTRACE((" HPDF_FreeTextAnnot_SetDefaultStyle\n"));
-    
+
     s = HPDF_String_New ( annot->mmgr, style, NULL);
     if ( !s)
         return HPDF_Error_GetCode ( annot->error);
@@ -996,7 +996,7 @@ HPDF_FreeTextAnnot_Set3PointCalloutLine ( HPDF_Annotation annot, HPDF_Point star
     HPDF_STATUS ret = HPDF_OK;
 
     HPDF_PTRACE((" HPDF_FreeTextAnnot_Set3PointCalloutLine\n"));
-    
+
     clPoints = HPDF_Array_New ( annot->mmgr);
     if ( !clPoints)
         return HPDF_Error_GetCode ( annot->error);
@@ -1024,7 +1024,7 @@ HPDF_FreeTextAnnot_Set2PointCalloutLine ( HPDF_Annotation annot, HPDF_Point star
     HPDF_STATUS ret = HPDF_OK;
 
     HPDF_PTRACE((" HPDF_FreeTextAnnot_Set3PointCalloutLine\n"));
-    
+
     clPoints = HPDF_Array_New ( annot->mmgr);
     if ( !clPoints)
         return HPDF_Error_GetCode ( annot->error);
@@ -1050,15 +1050,15 @@ HPDF_MarkupAnnot_SetCloudEffect (HPDF_Annotation  annot, HPDF_INT cloudIntensity
     HPDF_STATUS ret = HPDF_OK;
 
     HPDF_PTRACE((" HPDF_MarkupAnnot_SetCloudEffect\n"));
-    
+
     borderEffect = HPDF_Dict_New ( annot->mmgr);
     if (!borderEffect)
         return HPDF_Error_GetCode ( annot->error);
-    
+
     ret += HPDF_Dict_Add ( annot, "BE", borderEffect);
     ret += HPDF_Dict_AddName ( borderEffect, "S", "C");
     ret += HPDF_Dict_AddNumber ( borderEffect, "I", cloudIntensity);
-    
+
     if (ret != HPDF_OK)
         return HPDF_Error_GetCode (annot->error);
 
@@ -1066,8 +1066,8 @@ HPDF_MarkupAnnot_SetCloudEffect (HPDF_Annotation  annot, HPDF_INT cloudIntensity
 }
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_LineAnnot_SetPosition (HPDF_Annotation annot, 
-                            HPDF_Point startPoint, HPDF_LineAnnotEndingStyle startStyle, 
+HPDF_LineAnnot_SetPosition (HPDF_Annotation annot,
+                            HPDF_Point startPoint, HPDF_LineAnnotEndingStyle startStyle,
                             HPDF_Point endPoint, HPDF_LineAnnotEndingStyle endStyle)
 {
     HPDF_Array lineEndPoints;
@@ -1113,7 +1113,7 @@ HPDF_LineAnnot_SetLeader (HPDF_Annotation annot, HPDF_INT leaderLen, HPDF_INT le
     HPDF_STATUS ret = HPDF_OK;
 
     HPDF_PTRACE((" HPDF_LineAnnot_SetLeader\n"));
-    
+
     ret += HPDF_Dict_AddNumber ( annot, "LL", leaderLen);
     ret += HPDF_Dict_AddNumber ( annot, "LLE", leaderExtLen);
     ret += HPDF_Dict_AddNumber ( annot, "LLO", leaderOffsetLen);
@@ -1130,7 +1130,7 @@ HPDF_LineAnnot_SetCaption (HPDF_Annotation annot, HPDF_BOOL showCaption, HPDF_Li
     HPDF_STATUS ret = HPDF_OK;
     HPDF_Array capOffset;
     HPDF_PTRACE((" HPDF_LineAnnot_SetCaption\n"));
-    
+
     ret += HPDF_Dict_AddBoolean ( annot, "Cap", showCaption);
     ret += HPDF_Dict_AddName( annot, "CP", HPDF_LINE_ANNOT_CAP_POSITION_NAMES[(HPDF_INT)position]);
 

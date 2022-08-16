@@ -46,13 +46,13 @@ void ConfigurationViewTest::testView()
 	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
-	
+
 	assertTrue (pView->getString("prop1") == "foo");
 	assertTrue (pView->getString("prop3.string1") == "foo");
-	
+
 	pView->setString("prop6", "foobar");
 	assertTrue (pConf->getString("prop6") == "foobar");
-	
+
 	pView = pConf->createView("prop1");
 	pView->keys(keys);
 	assertTrue (keys.empty());
@@ -66,7 +66,7 @@ void ConfigurationViewTest::testView()
 	assertTrue (keys.size() == 2);
 	assertTrue (std::find(keys.begin(), keys.end(), "string1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "string2") != keys.end());
-	
+
 	assertTrue (pView->getString("string1") == "foo");
 	assertTrue (pView->getString("string2") == "bar");
 
@@ -80,7 +80,7 @@ void ConfigurationViewTest::testView()
 	assertTrue (std::find(keys.begin(), keys.end(), "string1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
-	
+
 	assertTrue (pView->getString("sub1.string1") == "FOO");
 	assertTrue (pView->getString("sub2.string2") == "Bar");
 
@@ -89,10 +89,10 @@ void ConfigurationViewTest::testView()
 	assertTrue (keys.size() == 2);
 	assertTrue (std::find(keys.begin(), keys.end(), "string1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "string2") != keys.end());
-	
+
 	assertTrue (pView->getString("string1") == "FOO");
 	assertTrue (pView->getString("string2") == "BAR");
-	
+
 	pView->setString("string3", "foobar");
 	assertTrue (pConf->getString("prop5.sub1.string3") == "foobar");
 

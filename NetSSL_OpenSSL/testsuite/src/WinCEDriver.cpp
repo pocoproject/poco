@@ -39,14 +39,14 @@ public:
 		runner.addTest("NetSSLTestSuite", NetSSLTestSuite::suite());
 		return runner.run(_targs) ? 0 : 1;
 	}
-	
+
 	void setup(const std::vector<std::string>& args)
 	{
 		char* argv[] =
 		{
 			const_cast<char*>(args[0].c_str())
 		};
-		
+
 		init(1, argv);
 		for (std::size_t i = 0; i < args.size(); ++i)
 			_targs.push_back(args[i]);
@@ -58,7 +58,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		Poco::Util::Application::initialize(self);
 	}
-	
+
 private:
 	std::vector<std::string> _targs;
 };

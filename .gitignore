@@ -144,3 +144,10 @@ cmake-build/
 *.bak
 stage/
 releases/
+
+# vim #
+#######
+*.orig
+*.swp
+*.vim
+tags

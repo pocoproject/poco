@@ -26,8 +26,8 @@ WhitespaceFilter::WhitespaceFilter():
 {
 }
 
-	
-WhitespaceFilter::WhitespaceFilter(XMLReader* pReader): 
+
+WhitespaceFilter::WhitespaceFilter(XMLReader* pReader):
 	XMLFilterImpl(pReader),
 	_pLexicalHandler(0),
 	_filter(true)
@@ -121,7 +121,7 @@ void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 		{
 			XMLFilterImpl::characters(_data.data(), 0, (int) _data.length());
 			_filter = false;
-			_data.clear();	
+			_data.clear();
 		}
 	}
 	else XMLFilterImpl::characters(ch, start, length);

@@ -572,6 +572,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Util\LocalConfigurationView.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Util\LoggingConfigurator.h"
 					>
 				</File>
@@ -621,6 +625,10 @@
 				</File>
 				<File
 					RelativePath=".\src\LayeredConfiguration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LocalConfigurationView.cpp"
 					>
 				</File>
 				<File

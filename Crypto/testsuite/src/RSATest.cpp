@@ -15,7 +15,10 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
 #include <sstream>
+#include <fstream>
 
 
 using namespace Poco::Crypto;
@@ -203,6 +206,33 @@ void RSATest::testRSACipher()
 		std::string dec = pCipher->decryptString(enc);
 		assertTrue (dec == val);
 	}
+
+	RSAKey key(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	std::string pubKeyFile = Poco::Path::temp() + "poco.key.pub";
+	std::string privKeyFile = Poco::Path::temp() + "poco.key.priv";
+
+	if (Poco::File(pubKeyFile).exists()) Poco::File(pubKeyFile).remove();
+	if (Poco::File(privKeyFile).exists()) Poco::File(privKeyFile).remove();
+	std::ofstream strPub(pubKeyFile);
+	std::ofstream strPriv(privKeyFile);
+	key.save(&strPub, &strPriv);
+	strPub.close();
+	strPriv.close();
+
+    Poco::Crypto::RSAKey encryptKey(pubKeyFile);
+	Poco::Crypto::RSAKey decryptKey(pubKeyFile, privKeyFile);
+
+    Poco::Crypto::CipherFactory factory;
+    auto iengine = factory.createCipher(encryptKey);
+    auto oengine = factory.createCipher(decryptKey);
+
+    std::string ss = "test_str";
+    auto enc = iengine->encryptString(ss);
+    auto dec = oengine->decryptString(enc);
+    assertEqual (ss, dec);
+
+	delete iengine;
+	delete oengine;
 }
 
 
@@ -221,7 +251,7 @@ void RSATest::testRSACipherLarge()
 	sizes.push_back (16383);
 	sizes.push_back (16384);
 	sizes.push_back (16385);
-	
+
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
 	for (std::vector<std::size_t>::const_iterator it = sizes.begin(); it != sizes.end(); ++it)
 	{
@@ -243,7 +273,7 @@ void RSATest::testCertificate()
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(publicKey);
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(privateKey);
 	std::string val("lets do some encryption");
-	
+
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
 	assertTrue (dec == val);

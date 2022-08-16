@@ -41,7 +41,6 @@ typedef struct
 		Poco::UInt64 state64[8];
 	} state;
 
-	SHA2Engine::ALGORITHM size;
 	unsigned char buffer[128];
 } HASHCONTEXT;
 
@@ -274,7 +273,7 @@ void SHA2Engine::updateImpl(const void* buffer_, std::size_t count)
 	Poco::UInt32 left = 0;
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
 	unsigned char* data = (unsigned char*)buffer_;
-	if (pContext->size > SHA_256)
+	if (_algorithm > SHA_256)
 	{
 		left = (Poco::UInt32)(pContext->total.total64[0] & 0x7F);
 		size_t fill = 128 - left;
@@ -323,7 +322,31 @@ void SHA2Engine::updateImpl(const void* buffer_, std::size_t count)
 
 std::size_t SHA2Engine::digestLength() const
 {
-	return (size_t)((int)_algorithm / 8);
+	size_t result = 0;
+
+	switch (_algorithm)
+	{
+	case SHA_224:
+		result = 224;
+		break;
+	case SHA_256:
+		result = 256;
+		break;
+	case SHA_384:
+		result = 384;
+		break;
+	case SHA_512:
+		result = 512;
+		break;
+	case SHA_512_224:
+		result = 224;
+		break;
+	case SHA_512_256:
+		result = 256;
+		break;
+	}
+
+	return result / 8;
 }
 
 
@@ -332,7 +355,6 @@ void SHA2Engine::reset()
 	if (_context != NULL) free(_context);
 	_context = calloc(1, sizeof(HASHCONTEXT));
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
-	pContext->size = _algorithm;
 	if (_algorithm == SHA_224)
 	{
 		pContext->state.state32[0] = 0xC1059ED8;
@@ -366,7 +388,7 @@ void SHA2Engine::reset()
 		pContext->state.state64[6] = UL64(0xDB0C2E0D64F98FA7);
 		pContext->state.state64[7] = UL64(0x47B5481DBEFA4FA4);
 	}
-	else
+	else if (_algorithm == SHA_512)
 	{
 		pContext->state.state64[0] = UL64(0x6A09E667F3BCC908);
 		pContext->state.state64[1] = UL64(0xBB67AE8584CAA73B);
@@ -376,6 +398,27 @@ void SHA2Engine::reset()
 		pContext->state.state64[5] = UL64(0x9B05688C2B3E6C1F);
 		pContext->state.state64[6] = UL64(0x1F83D9ABFB41BD6B);
 		pContext->state.state64[7] = UL64(0x5BE0CD19137E2179);
+	}
+	else if (_algorithm == SHA_512_224)
+	{
+		pContext->state.state64[0] = UL64(0x8C3D37C819544DA2);
+		pContext->state.state64[1] = UL64(0x73E1996689DCD4D6);
+		pContext->state.state64[2] = UL64(0x1DFAB7AE32FF9C82);
+		pContext->state.state64[3] = UL64(0x679DD514582F9FCF);
+		pContext->state.state64[4] = UL64(0x0F6D2B697BD44DA8);
+		pContext->state.state64[5] = UL64(0x77E36F7304C48942);
+		pContext->state.state64[6] = UL64(0x3F9D85A86A1D36C8);
+		pContext->state.state64[7] = UL64(0x1112E6AD91D692A1);
+	} else
+	{
+		pContext->state.state64[0] = UL64(0x22312194FC2BF72C);
+		pContext->state.state64[1] = UL64(0x9F555FA3C84C64C2);
+		pContext->state.state64[2] = UL64(0x2393B86B6F53B151);
+		pContext->state.state64[3] = UL64(0x963877195940EABD);
+		pContext->state.state64[4] = UL64(0x96283EE2A88EFFE3);
+		pContext->state.state64[5] = UL64(0xBE5E1E2553863992);
+		pContext->state.state64[6] = UL64(0x2B0199FC2C85B8AA);
+		pContext->state.state64[7] = UL64(0x0EB72DDC81C52CA2);
 	}
 }
 
@@ -388,7 +431,8 @@ const DigestEngine::Digest& SHA2Engine::digest()
 	size_t last, padn;
 	unsigned char hash[64];
 	memset(hash, 0, 64);
-	if (pContext->size > SHA_256)
+
+	if (_algorithm > SHA_256)
 	{
 		unsigned char msglen[16];
 		Poco::UInt64 high = (pContext->total.total64[0] >> 61) | (pContext->total.total64[1] << 3);
@@ -405,7 +449,7 @@ const DigestEngine::Digest& SHA2Engine::digest()
 		PUT_UINT64(pContext->state.state64[3], hash, 24);
 		PUT_UINT64(pContext->state.state64[4], hash, 32);
 		PUT_UINT64(pContext->state.state64[5], hash, 40);
-		if (pContext->size > SHA_384)
+		if (_algorithm > SHA_384)
 		{
 			PUT_UINT64(pContext->state.state64[6], hash, 48);
 			PUT_UINT64(pContext->state.state64[7], hash, 56);
@@ -429,7 +473,7 @@ const DigestEngine::Digest& SHA2Engine::digest()
 		PUT_UINT32(pContext->state.state32[4], hash, 16);
 		PUT_UINT32(pContext->state.state32[5], hash, 20);
 		PUT_UINT32(pContext->state.state32[6], hash, 24);
-		if (pContext->size > SHA_224) PUT_UINT32(pContext->state.state32[7], hash, 28);
+		if (_algorithm > SHA_224) PUT_UINT32(pContext->state.state32[7], hash, 28);
 	}
 	_digest.insert(_digest.begin(), hash, hash + digestLength());
 	reset();

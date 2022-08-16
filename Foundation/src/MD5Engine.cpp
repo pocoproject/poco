@@ -14,7 +14,7 @@
 // MD5 (RFC 1321) algorithm:
 // Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 // rights reserved.
-// 
+//
 // License to copy and use this software is granted provided that it
 // is identified as the "RSA Data Security, Inc. MD5 Message-Digest
 // Algorithm" in all material mentioning or referencing this software
@@ -54,7 +54,7 @@ MD5Engine::~MD5Engine()
 	reset();
 }
 
-	
+
 void MD5Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
 	const unsigned char* input = (const unsigned char*) input_;
@@ -71,7 +71,7 @@ void MD5Engine::updateImpl(const void* input_, std::size_t inputLen)
 	partLen = 64 - index;
 
 	/* Transform as many times as possible. */
-	if (inputLen >= partLen) 
+	if (inputLen >= partLen)
 	{
 		std::memcpy(&_context.buffer[index], input, partLen);
 		transform(_context.state, _context.buffer);
@@ -107,7 +107,7 @@ void MD5Engine::reset()
 
 const DigestEngine::Digest& MD5Engine::digest()
 {
-	static const unsigned char PADDING[64] = 
+	static const unsigned char PADDING[64] =
 	{
 		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -129,10 +129,16 @@ const DigestEngine::Digest& MD5Engine::digest()
 
 	/* Store state in digest */
 	unsigned char digest[16];
-	encode(digest, _context.state, 16);
+	encode(digest, _context.state, sizeof(digest));
 	_digest.clear();
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
-
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic pop
+#endif
 	/* Zeroize sensitive information. */
 	std::memset(&_context, 0, sizeof (_context));
 	reset();
@@ -286,7 +292,7 @@ void MD5Engine::encode(unsigned char* output, const UInt32* input, std::size_t l
 {
 	unsigned int i, j;
 
-	for (i = 0, j = 0; j < len; i++, j += 4) 
+	for (i = 0, j = 0; j < len; i++, j += 4)
 	{
 		output[j]   = (unsigned char)(input[i] & 0xff);
 		output[j+1] = (unsigned char)((input[i] >> 8) & 0xff);

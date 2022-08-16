@@ -150,17 +150,53 @@ If you cannot or do not want to build with CMake, there are other options,
 described in the following.
 
 
+BUILDING - USING VCPKG
+===================
+
+You can download and install poco using the vcpkg(https://github.com/Microsoft/vcpkg)
+dependency manager:
+
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh
+$ ./vcpkg integrate install
+$ ./vcpkg install poco
+
+The poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
+If the version is out of date, please create an issue or pull request(https://github.com/Microsoft/vcpkg)
+on the vcpkg repository.
+
+
+BUILDING - USING CONAN
+======================
+
+You can download and install poco using the Conan(https://github.com/conan-io/conan)
+package manager. It needed to be installed first(https://conan.io/downloads.html):
+
+You can install Poco libraries from Conan Center(https://conan.io/center.html):
+
+$ conan install -r conancenter poco/1.12.0@
+
+Or, you can download Poco recipe and build locally:
+
+$ conan install -r conancenter poco/1.12.0@ --build=poco
+
+The Poco recipe and packages in Conan Center are kept up to date by Conan team members and community contributors.
+If the version is out of date, or you detect any wrong behavior, please create an issue or pull request(https://github.com/conan-io/conan-center-index)
+on the Conan Center Index repository.
+
+
 BUILDING ON WINDOWS
 ===================
 
 Microsoft Visual Studio 2015 or newer is required to build the POCO C++ Libraries on
-Windows platforms. Solution and project files for all versions from 2015 to 2019 are included.
+Windows platforms. Solution and project files for all versions from 2015 to 2022 are included.
 64-bit (x64) builds are supported as well.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
 Visual Studio Command Prompt and cd to the directory where you
 have extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
-and pass as argument the version of visual studio (140, 150, 160, etc.). You can customize
+and pass as argument the version of visual studio (140, 150, 160, 170, etc.). You can customize
 what is being built by buildwin.cmd by passing appropriate command line arguments to
 it. Call buildwin.cmd without arguments to see what is available.
 
@@ -186,8 +222,8 @@ BUILDING ON UNIX/LINUX/macOS
 ============================
 
 For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 3.80 (or newer), with the help
-from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on
+build system. The build system is based on GNU Make 5.0 (or newer), with the help
+from a few shell scripts. If you do not have GNU Make 5.0 (or later) installed on
 your machine, you will need to download it from
 http://directory.fsf.org/devel/build/make.html>,
 build and install it prior to building the POCO C++ Libraries.

@@ -21,6 +21,7 @@ PDF
 CppParser
 MongoDB
 Redis
+Prometheus
 ActiveRecord
 ActiveRecord/Compiler
 PocoDoc

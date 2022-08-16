@@ -59,7 +59,7 @@ public:
 	{
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
 	};
-	
+
 	ThreadImpl();
 	~ThreadImpl();
 
@@ -80,6 +80,7 @@ public:
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
+	static long currentOsTidImpl();
 
 protected:
 	static void* runnableEntry(void* pThread);
@@ -140,12 +141,12 @@ private:
 		std::size_t   stackSize;
 		bool          started;
 		bool          joined;
+		mutable FastMutex mutex;
 	};
 
 	AutoPtr<ThreadData> _pData;
-
 	static CurrentThreadHolder _currentThreadHolder;
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;
@@ -170,6 +171,7 @@ inline int ThreadImpl::getOSPriorityImpl() const
 
 inline bool ThreadImpl::isRunningImpl() const
 {
+	FastMutex::ScopedLock l(_pData->mutex);
 	return !_pData->pRunnableTarget.isNull();
 }
 

@@ -54,7 +54,7 @@ void PriorityNotificationQueue::enqueueNotification(Notification::Ptr pNotificat
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
 		pWI->nfAvailable.set();
-	}	
+	}
 }
 
 
@@ -145,7 +145,7 @@ bool PriorityNotificationQueue::empty() const
 	return _nfQueue.empty();
 }
 
-	
+
 int PriorityNotificationQueue::size() const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -156,7 +156,7 @@ int PriorityNotificationQueue::size() const
 void PriorityNotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	_nfQueue.clear();	
+	_nfQueue.clear();
 }
 
 

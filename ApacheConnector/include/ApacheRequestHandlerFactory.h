@@ -45,7 +45,7 @@ public:
 
 private:
 	typedef std::map<std::string, Poco::Net::HTTPRequestHandlerFactory*> RequestHandlerFactories;
-	
+
 	RequestHandlerFactories _requestHandlers;
 	Poco::ClassLoader<Poco::Net::HTTPRequestHandlerFactory> _loader;
 	Poco::FastMutex _mutex;

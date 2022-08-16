@@ -1141,6 +1141,10 @@ void JSONTest::testQuery()
 
 	std::string firstChild = query.findValue("children[0]", "");
 	assertTrue (firstChild.compare("Jonas") == 0);
+	std::string secondChild = query.findValue("children[1]", "");
+	assertTrue (secondChild.compare("Ellen") == 0);
+	std::string thirdChild = query.findValue("children[2]", "");
+	assertTrue (thirdChild.empty());
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
 	assertTrue (ds["name"] == "Franky");
@@ -1195,6 +1199,22 @@ void JSONTest::testQuery()
 		fail ("must throw");
 	}
 	catch (Poco::InvalidArgumentException&) { }
+
+	json = R"json({"foo":["bar"]})json";
+	try { result = parser.parse(json); }
+	catch(JSONException& jsone)
+	{
+		fail (jsone.message());
+	}
+	Query queryFoo(result);
+	result = queryFoo.find("foo[0]");
+	assertTrue (!result.isEmpty());
+	result = queryFoo.find("foo[1]");
+	assertTrue (result.isEmpty());
+	result = queryFoo.find("[1]");
+	assertTrue (result.isEmpty());
+	result = queryFoo.find("");
+	assertTrue (result.convert<std::string>() == json);
 }
 
 
@@ -1351,6 +1371,44 @@ void JSONTest::testPrintHandler()
 	parser.parse(json);
 	assertTrue (json == ostr.str());
 
+	json=
+		"{"
+			"\"a\":100,"
+			"\"b\":234.456,"
+			"\"child\":"
+			"["
+				"{"
+					"\"id\":0,"
+					"\"name\":\"lucy_0\""
+				"},"
+				"{"
+					"\"id\":1,"
+					"\"name\":\"lucy_1\""
+				"},"
+				"{"
+					"\"id\":2,"
+					"\"name\":\"lucy_4\""
+				"},"
+				"{"
+					"\"id\":3,"
+					"\"name\":\"lucy_9\""
+				"},"
+				"{"
+					"\"id\":4,"
+					"\"name\":\"lucy_16\""
+				"}"
+			"],"
+			"\"pair\":{"
+				"\"a\":123213,"
+				"\"b\":\"weoifweifj\""
+			"},"
+			"\"str\":\"sdfsdf\""
+		"}";
+	ostr.str("");
+	pHandler->setIndent(0);
+	parser.reset();
+	parser.parse(json);
+	assertTrue (json == ostr.str());
 }
 
 
@@ -1528,6 +1586,17 @@ void JSONTest::testStringify()
 }
 
 
+void JSONTest::testStringifyNaN()
+{
+	Object::Ptr o = new Object;
+	o->set("NaN", NAN);
+	o->set("Infinity", INFINITY);
+	std::ostringstream stream;
+	o->stringify(stream, 0);
+	assertEqual (stream.str(), std::string(R"({"Infinity":null,"NaN":null})"));
+}
+
+
 void JSONTest::testStringifyPreserveOrder()
 {
 	Object presObj(Poco::JSON_PRESERVE_KEY_ORDER);
@@ -1698,6 +1767,43 @@ void JSONTest::testStringifyPreserveOrder()
 		"\"children\": [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 		"\"address\": { \"number\": 742, \"street\": \"Evergreen Terrace\", "
 		"\"town\": \"Springfield\" } } }");
+}
+
+
+void JSONTest::testVarConvert()
+{
+	std::string json = "{ \"foo\" : { \"bar\" : \"baz\", \"arr\": [1, 2, 3]} }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		result = parser.parse(json);
+	}
+	catch (JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assertTrue(false);
+	}
+
+	assertTrue(result.type() == typeid(Object::Ptr));
+
+	std::string cvt;
+	result.convert(cvt);
+	assertTrue(cvt == "{\"foo\":{\"arr\":[1,2,3],\"bar\":\"baz\"}}");
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Object::Ptr f = object->getObject("foo");
+
+	Var o = f;
+	cvt.clear();
+	o.convert(cvt);
+	assertTrue(cvt == "{\"arr\":[1,2,3],\"bar\":\"baz\"}");
+
+	Var a = f->get("arr");
+	cvt.clear();
+	a.convert(cvt);
+	assertTrue(cvt == "[1,2,3]");
 }
 
 
@@ -1990,6 +2096,24 @@ void JSONTest::testNonEscapeUnicode()
 	Var longEscape = object->get("longEscape");
 	assertTrue (shortEscape.convert<std::string>() == shortEscapeStr);
 	assertTrue (longEscape.convert<std::string>() == longEscapeStr);
+
+	Poco::JSON::Object::Ptr json = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
+	Poco::JSON::Object::Ptr json2 = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
+
+	json->set("value", 15);
+	json->set("unit", "°C");
+
+	assertFalse (json->getEscapeUnicode());
+	assertFalse (json2->getEscapeUnicode());
+	json2->set("Temperature", json);
+	std::ostringstream buffer {};
+	json->stringify(buffer);
+	std::string str = buffer.str();
+	assertEqual (str, R"({"value":15,"unit":"°C"})");
+	std::ostringstream buffer2 {};
+	json2->stringify(buffer2);
+	std::string str2 = buffer2.str();
+	assertEqual (str2, R"({"Temperature":{"value":15,"unit":"°C"}})");
 }
 
 
@@ -2248,7 +2372,9 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testComment);
 	CppUnit_addTest(pSuite, JSONTest, testPrintHandler);
 	CppUnit_addTest(pSuite, JSONTest, testStringify);
+	CppUnit_addTest(pSuite, JSONTest, testStringifyNaN);
 	CppUnit_addTest(pSuite, JSONTest, testStringifyPreserveOrder);
+	CppUnit_addTest(pSuite, JSONTest, testVarConvert);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);

@@ -180,9 +180,9 @@ template <>
 class TypeHandler<Person>
 {
 public:
-	static void bind(std::size_t pos, 
-		const Person& obj, 
-		AbstractBinder::Ptr pBinder, 
+	static void bind(std::size_t pos,
+		const Person& obj,
+		AbstractBinder::Ptr pBinder,
 		AbstractBinder::Direction dir = AbstractBinder::PD_IN)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
@@ -231,9 +231,9 @@ template <>
 class TypeHandler<RefCountedPerson>
 {
 public:
-	static void bind(std::size_t pos, 
-		const RefCountedPerson& obj, 
-		AbstractBinder::Ptr pBinder, 
+	static void bind(std::size_t pos,
+		const RefCountedPerson& obj,
+		AbstractBinder::Ptr pBinder,
 		AbstractBinder::Direction dir = AbstractBinder::PD_IN)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
@@ -281,7 +281,7 @@ private:
 } } // namespace Poco::Data
 
 
-const std::string SQLExecutor::MULTI_INSERT = 
+const std::string SQLExecutor::MULTI_INSERT =
 	"INSERT INTO Test VALUES ('1', 2, 3.5);"
 	"INSERT INTO Test VALUES ('2', 3, 4.5);"
 	"INSERT INTO Test VALUES ('3', 4, 5.5);"
@@ -296,9 +296,10 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
-SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession): 
+SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_pEncSession(pEncSession)
 {
 }
 
@@ -308,9 +309,9 @@ SQLExecutor::~SQLExecutor()
 }
 
 
-void SQLExecutor::bareboneODBCTest(const std::string& dbConnString, 
-	const std::string& tableCreateString, 
-	SQLExecutor::DataBinding bindMode, 
+void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
+	const std::string& tableCreateString,
+	SQLExecutor::DataBinding bindMode,
 	SQLExecutor::DataExtraction extractMode,
 	bool doTime,
 	const std::string& blobPlaceholder)
@@ -348,7 +349,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 		rc = SQLGetTypeInfo(hstmt, SQL_TYPE_TIMESTAMP);
 		poco_odbc_check_stmt (rc, hstmt);
-		
+
 		rc = SQLFetch(hstmt);
 		assertTrue (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
 
@@ -413,15 +414,15 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			if (SQLExecutor::PB_AT_EXEC == bindMode)
 				li[0] = SQL_LEN_DATA_AT_EXEC(size);
 
-			rc = SQLBindParameter(hstmt, 
-				(SQLUSMALLINT) 1, 
-				SQL_PARAM_INPUT, 
-				SQL_C_CHAR, 
-				SQL_LONGVARCHAR, 
+			rc = SQLBindParameter(hstmt,
+				(SQLUSMALLINT) 1,
+				SQL_PARAM_INPUT,
+				SQL_C_CHAR,
+				SQL_LONGVARCHAR,
 				(SQLUINTEGER) size,
 				0,
-				(SQLPOINTER) str[0].c_str(), 
-				size, 
+				(SQLPOINTER) str[0].c_str(),
+				size,
 				&li[0]);
 			poco_odbc_check_stmt (rc, hstmt);
 
@@ -430,15 +431,15 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				li[1] = SQL_LEN_DATA_AT_EXEC(size);
 			else li[1] = SQL_NTS;
 
-			rc = SQLBindParameter(hstmt, 
-				(SQLUSMALLINT) 2, 
-				SQL_PARAM_INPUT, 
-				SQL_C_CHAR, 
-				SQL_LONGVARCHAR, 
+			rc = SQLBindParameter(hstmt,
+				(SQLUSMALLINT) 2,
+				SQL_PARAM_INPUT,
+				SQL_C_CHAR,
+				SQL_LONGVARCHAR,
 				(SQLUINTEGER) size,
 				0,
-				(SQLPOINTER) str[1].c_str(), 
-				size, 
+				(SQLPOINTER) str[1].c_str(),
+				size,
 				&li[1]);
 			poco_odbc_check_stmt (rc, hstmt);
 
@@ -447,39 +448,39 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				li[2] = SQL_LEN_DATA_AT_EXEC(size);
 			else li[2] = size;
 
-			rc = SQLBindParameter(hstmt, 
-				(SQLUSMALLINT) 3, 
-				SQL_PARAM_INPUT, 
-				SQL_C_BINARY, 
-				SQL_LONGVARBINARY, 
+			rc = SQLBindParameter(hstmt,
+				(SQLUSMALLINT) 3,
+				SQL_PARAM_INPUT,
+				SQL_C_BINARY,
+				SQL_LONGVARBINARY,
 				(SQLUINTEGER) size,
 				0,
-				(SQLPOINTER) str[2].data(), 
-				size, 
+				(SQLPOINTER) str[2].data(),
+				size,
 				&li[2]);
 			poco_odbc_check_stmt (rc, hstmt);
 
-			rc = SQLBindParameter(hstmt, 
-				(SQLUSMALLINT) 4, 
-				SQL_PARAM_INPUT, 
-				SQL_C_SLONG, 
-				SQL_INTEGER, 
+			rc = SQLBindParameter(hstmt,
+				(SQLUSMALLINT) 4,
+				SQL_PARAM_INPUT,
+				SQL_C_SLONG,
+				SQL_INTEGER,
 				0,
 				0,
-				(SQLPOINTER) &fourth, 
-				0, 
+				(SQLPOINTER) &fourth,
+				0,
 				0);
 			poco_odbc_check_stmt (rc, hstmt);
 
-			rc = SQLBindParameter(hstmt, 
-				(SQLUSMALLINT) 5, 
-				SQL_PARAM_INPUT, 
-				SQL_C_FLOAT, 
-				SQL_REAL, 
+			rc = SQLBindParameter(hstmt,
+				(SQLUSMALLINT) 5,
+				SQL_PARAM_INPUT,
+				SQL_C_FLOAT,
+				SQL_REAL,
 				0,
 				1,
-				(SQLPOINTER) &fifth, 
-				0, 
+				(SQLPOINTER) &fifth,
+				0,
 				0);
 			poco_odbc_check_stmt (rc, hstmt);
 
@@ -498,14 +499,14 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			else
 				std::cerr << '[' << name() << ']' << " Warning: could not get SQL_TYPE_TIMESTAMP parameter description." << std::endl;
 
-			rc = SQLBindParameter(hstmt, 
-				(SQLUSMALLINT) 6, 
-				SQL_PARAM_INPUT, 
-				SQL_C_TYPE_TIMESTAMP, 
-				SQL_TYPE_TIMESTAMP, 
+			rc = SQLBindParameter(hstmt,
+				(SQLUSMALLINT) 6,
+				SQL_PARAM_INPUT,
+				SQL_C_TYPE_TIMESTAMP,
+				SQL_TYPE_TIMESTAMP,
 				dateTimeColSize,
 				dateTimeDecDigits,
-				(SQLPOINTER) &sixth, 
+				(SQLPOINTER) &sixth,
 				0,
 				0);
 			poco_odbc_check_stmt (rc, hstmt);
@@ -519,9 +520,9 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)))
 				{
 					SQLINTEGER dataSize = 0;
-					// Data size should be ignored for non-null, 
-					// non-variable length fields, but SQLite ODBC 
-					// driver insists on it always being the actual 
+					// Data size should be ignored for non-null,
+					// non-variable length fields, but SQLite ODBC
+					// driver insists on it always being the actual
 					// data length
 
 					if (pParam == (SQLPOINTER) str[0].c_str())
@@ -557,55 +558,55 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 			if (SQLExecutor::DE_BOUND == extractMode)
 			{
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 1, 
-					SQL_C_CHAR, 
-					(SQLPOINTER) chr[0], 
-					(SQLINTEGER) sizeof(chr[0]), 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 1,
+					SQL_C_CHAR,
+					(SQLPOINTER) chr[0],
+					(SQLINTEGER) sizeof(chr[0]),
 					&lengths[0]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 2, 
-					SQL_C_CHAR, 
-					(SQLPOINTER) chr[1], 
-					(SQLINTEGER) sizeof(chr[1]), 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 2,
+					SQL_C_CHAR,
+					(SQLPOINTER) chr[1],
+					(SQLINTEGER) sizeof(chr[1]),
 					&lengths[1]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 3, 
-					SQL_C_BINARY, 
-					(SQLPOINTER) chr[2], 
-					(SQLINTEGER) sizeof(chr[2]), 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 3,
+					SQL_C_BINARY,
+					(SQLPOINTER) chr[2],
+					(SQLINTEGER) sizeof(chr[2]),
 					&lengths[2]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 4, 
-					SQL_C_SLONG, 
-					(SQLPOINTER) &fourth, 
-					(SQLINTEGER) 0, 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 4,
+					SQL_C_SLONG,
+					(SQLPOINTER) &fourth,
+					(SQLINTEGER) 0,
 					&lengths[3]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 5, 
-					SQL_C_FLOAT, 
-					(SQLPOINTER) &fifth, 
-					(SQLINTEGER) 0, 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 5,
+					SQL_C_FLOAT,
+					(SQLPOINTER) &fifth,
+					(SQLINTEGER) 0,
 					&lengths[4]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 6, 
-					SQL_C_TYPE_TIMESTAMP, 
-					(SQLPOINTER) &sixth, 
-					(SQLINTEGER) 0, 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 6,
+					SQL_C_TYPE_TIMESTAMP,
+					(SQLPOINTER) &sixth,
+					(SQLINTEGER) 0,
 					&lengths[5]);
 				poco_odbc_check_stmt (rc, hstmt);
 			}
-			
+
 			rc = SQLExecute(hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
 			rc = SQLFetch(hstmt);
@@ -614,67 +615,67 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			if (SQLExecutor::DE_MANUAL == extractMode)
 			{
 				SQLLEN len = lengths[0] = 0;
-				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 1, 
-					SQL_C_CHAR, 
-					chr[0] + len, 
+				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 1,
+					SQL_C_CHAR,
+					chr[0] + len,
 					sizeof(chr[0]) - len,
 					&lengths[0])))
 				{
 					len += lengths[0];
-					if (!lengths[0] || len >= sizeof(chr[1])) 
+					if (!lengths[0] || len >= sizeof(chr[1]))
 						break;
 				}
 				poco_odbc_check_stmt (rc, hstmt);
 
 				len = lengths[1] = 0;
-				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 2, 
-					SQL_C_CHAR, 
-					chr[1] + len, 
+				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 2,
+					SQL_C_CHAR,
+					chr[1] + len,
 					sizeof(chr[1]) - len,
 					&lengths[1])))
 				{
 					len += lengths[1];
-					if (!lengths[1] || len >= sizeof(chr[1])) 
+					if (!lengths[1] || len >= sizeof(chr[1]))
 						break;
 				}
 				poco_odbc_check_stmt (rc, hstmt);
 
 				len = lengths[2] = 0;
-				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 3, 
-					SQL_C_BINARY, 
-					chr[2] + len, 
+				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 3,
+					SQL_C_BINARY,
+					chr[2] + len,
 					sizeof(chr[2]) - len,
 					&lengths[2])))
 				{
 					len += lengths[1];
-					if (!lengths[2] || len >= sizeof(chr[2])) 
+					if (!lengths[2] || len >= sizeof(chr[2]))
 						break;
 				}
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 4, 
-					SQL_C_SLONG, 
-					&fourth, 
+				rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 4,
+					SQL_C_SLONG,
+					&fourth,
 					0,
 					&lengths[3]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 5, 
-					SQL_C_FLOAT, 
-					&fifth, 
+				rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 5,
+					SQL_C_FLOAT,
+					&fifth,
 					0,
 					&lengths[4]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 6, 
-					SQL_C_TYPE_TIMESTAMP, 
-					&sixth, 
+				rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 6,
+					SQL_C_TYPE_TIMESTAMP,
+					&sixth,
 					0,
 					&lengths[5]);
 				poco_odbc_check_stmt (rc, hstmt);
@@ -727,9 +728,9 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 }
 
 
-void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString, 
-	const std::string& tableCreateString, 
-	SQLExecutor::DataBinding bindMode, 
+void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
+	const std::string& tableCreateString,
+	SQLExecutor::DataBinding bindMode,
 	SQLExecutor::DataExtraction extractMode,
 	const std::string& insert,
 	const std::string& select)
@@ -801,11 +802,11 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 			poco_odbc_check_stmt (rc, hstmt);
 			if (SQLExecutor::DE_BOUND == extractMode)
 			{
-				rc = SQLBindCol(hstmt, 
-						(SQLUSMALLINT) 1, 
-						SQL_C_SLONG, 
-						(SQLPOINTER) &count, 
-						(SQLINTEGER) 0, 
+				rc = SQLBindCol(hstmt,
+						(SQLUSMALLINT) 1,
+						SQL_C_SLONG,
+						(SQLPOINTER) &count,
+						(SQLINTEGER) 0,
 						&length);
 				poco_odbc_check_stmt (rc, hstmt);
 			}
@@ -818,10 +819,10 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 			if (SQLExecutor::DE_MANUAL == extractMode)
 			{
-				rc = SQLGetData(hstmt, 
-					(SQLUSMALLINT) 1, 
-					SQL_C_SLONG, 
-					&count, 
+				rc = SQLGetData(hstmt,
+					(SQLUSMALLINT) 1,
+					SQL_C_SLONG,
+					&count,
 					0,
 					&length);
 				poco_odbc_check_stmt (rc, hstmt);
@@ -840,34 +841,34 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 			SQLLEN lengths[3] = { 0 };
 			int second = 0;
 			float third = 0.0f;
-			
+
 			if (SQLExecutor::DE_BOUND == extractMode)
 			{
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 1, 
-					SQL_C_CHAR, 
-					(SQLPOINTER) chr, 
-					(SQLINTEGER) 4, 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 1,
+					SQL_C_CHAR,
+					(SQLPOINTER) chr,
+					(SQLINTEGER) 4,
 					&lengths[0]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 2, 
-					SQL_C_SLONG, 
-					(SQLPOINTER) &second, 
-					(SQLINTEGER) 0, 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 2,
+					SQL_C_SLONG,
+					(SQLPOINTER) &second,
+					(SQLINTEGER) 0,
 					&lengths[1]);
 				poco_odbc_check_stmt (rc, hstmt);
 
-				rc = SQLBindCol(hstmt, 
-					(SQLUSMALLINT) 3, 
-					SQL_C_FLOAT, 
-					(SQLPOINTER) &third, 
-					(SQLINTEGER) 0, 
+				rc = SQLBindCol(hstmt,
+					(SQLUSMALLINT) 3,
+					SQL_C_FLOAT,
+					(SQLPOINTER) &third,
+					(SQLINTEGER) 0,
 					&lengths[2]);
 				poco_odbc_check_stmt (rc, hstmt);
 			}
-			
+
 			rc = SQLExecute(hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
 
@@ -883,26 +884,26 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 				if (SQLExecutor::DE_MANUAL == extractMode)
 				{
-					rc = SQLGetData(hstmt, 
-						(SQLUSMALLINT) 1, 
-						SQL_C_CHAR, 
-						chr, 
+					rc = SQLGetData(hstmt,
+						(SQLUSMALLINT) 1,
+						SQL_C_CHAR,
+						chr,
 						4,
 						&lengths[0]);
 					poco_odbc_check_stmt (rc, hstmt);
 
-					rc = SQLGetData(hstmt, 
-						(SQLUSMALLINT) 2, 
-						SQL_C_SLONG, 
-						&second, 
+					rc = SQLGetData(hstmt,
+						(SQLUSMALLINT) 2,
+						SQL_C_SLONG,
+						&second,
 						0,
 						&lengths[1]);
 					poco_odbc_check_stmt (rc, hstmt);
 
-					rc = SQLGetData(hstmt, 
-						(SQLUSMALLINT) 3, 
-						SQL_C_FLOAT, 
-						&third, 
+					rc = SQLGetData(hstmt,
+						(SQLUSMALLINT) 3,
+						SQL_C_FLOAT,
+						&third,
 						0,
 						&lengths[2]);
 					poco_odbc_check_stmt (rc, hstmt);
@@ -1567,7 +1568,7 @@ void SQLExecutor::insertSingleBulkVec()
 {
 	std::string funct = "insertSingleBulkVec()";
 	std::vector<int> data;
-	
+
 	for (int x = 0; x < 100; ++x)
 		data.push_back(x);
 
@@ -1673,9 +1674,9 @@ void SQLExecutor::limitPrepare()
 		data.push_back(x);
 	}
 
-	try 
-	{ 
-		Statement stmt = (session() << "INSERT INTO Strings VALUES (?)", use(data)); 
+	try
+	{
+		Statement stmt = (session() << "INSERT INTO Strings VALUES (?)", use(data));
 		assertTrue (100 == stmt.execute());
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -1737,13 +1738,13 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	std::vector<std::string> strings(size, "abc");
 	std::vector<double> floats(size, .5);
 	std::vector<DateTime> dateTimes(size);
-	
+
 	Stopwatch sw;
-	try 
+	try
 	{
 		sw.start();
-		session() << "INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)", 
-			use(strings), 
+		session() << "INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)",
+			use(strings),
 			use(ints),
 			use(floats),
 			use(dateTimes), now;
@@ -1757,18 +1758,18 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try 
+	try
 	{
 		sw.restart();
-		session() << "INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)", 
-			use(strings, bulk), 
+		session() << "INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)",
+			use(strings, bulk),
 			use(ints, bulk),
 			use(floats, bulk),
 			use(dateTimes, bulk), now;
 		sw.stop();
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
+
 	double bulkTime = sw.elapsed() / 1000.0;
 
 	double speedup;
@@ -1780,10 +1781,10 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	else
 		speedup = time / bulkTime;
 
-	std::cout << "INSERT => Size:" << size 
-		<< ", Time: " << time 
-		<< ", Bulk Time: " << bulkTime 
-		<< " [ms], Speedup: " << speedup 
+	std::cout << "INSERT => Size:" << size
+		<< ", Time: " << time
+		<< ", Bulk Time: " << bulkTime
+		<< " [ms], Speedup: " << speedup
 		<< 'x' << std::endl;
 
 	ints.clear();
@@ -1791,19 +1792,19 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	floats.clear();
 	dateTimes.clear();
 
-	try 
-	{ 
+	try
+	{
 		sw.restart();
-		session() << "SELECT First, Third, Fourth, Fifth FROM MiscTest", 
-			into(strings), 
-			into(ints), 
+		session() << "SELECT First, Third, Fourth, Fifth FROM MiscTest",
+			into(strings),
+			into(ints),
 			into(floats),
 			into(dateTimes),
-			now; 
+			now;
 		sw.stop();
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
+
 	time = sw.elapsed() / 1000.0;
 
 	assertTrue (ints.size() == size);
@@ -1812,20 +1813,20 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	strings.clear();
 	floats.clear();
 	dateTimes.clear();
-	
-	try 
-	{ 
+
+	try
+	{
 		sw.restart();
-		session() << "SELECT First, Third, Fourth, Fifth FROM MiscTest", 
+		session() << "SELECT First, Third, Fourth, Fifth FROM MiscTest",
 			into(strings, bulk(size)),
 			into(ints, bulk(size)),
 			into(floats, bulk(size)),
 			into(dateTimes, bulk(size)),
-			now; 
+			now;
 		sw.stop();
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
+
 	bulkTime = sw.elapsed() / 1000.0;
 
 	assertTrue (ints.size() == size);
@@ -1838,10 +1839,10 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	else
 		speedup = time / bulkTime;
 
-	std::cout << "SELECT => Size:" << size 
-		<< ", Time: " << time 
-		<< ", Bulk Time: " << bulkTime 
-		<< " [ms], Speedup: " << speedup 
+	std::cout << "SELECT => Size:" << size
+		<< ", Time: " << time
+		<< ", Bulk Time: " << bulkTime
+		<< " [ms], Speedup: " << speedup
 		<< 'x' << std::endl;
 }
 
@@ -2077,7 +2078,7 @@ void SQLExecutor::multiMapComplex()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
-	
+
 	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2139,7 +2140,7 @@ void SQLExecutor::selectIntoSingleStep()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assertTrue (count == 2);
 	Person result;
-	Statement stmt = (session() << "SELECT * FROM Person", into(result), limit(1)); 
+	Statement stmt = (session() << "SELECT * FROM Person", into(result), limit(1));
 	stmt.execute();
 	assertTrue (result == p1);
 	assertTrue (!stmt.done());
@@ -2405,7 +2406,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 
 	CLOB img("0123456789", 10);
 	int count = 0;
-	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), 
+	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder),
 		use(lastName), use(firstName), use(address), use(img), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2431,7 +2432,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), 
+	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder),
 		use(lastName), use(firstName), use(address), use(big), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2509,11 +2510,11 @@ void SQLExecutor::date()
 
 	Date bornDate(1965, 6, 18);
 	int count = 0;
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", 
-		use(lastName), 
-		use(firstName), 
-		use(address), 
-		use(bornDate), 
+	try { session() << "INSERT INTO Person VALUES (?,?,?,?)",
+		use(lastName),
+		use(firstName),
+		use(address),
+		use(bornDate),
 		now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2548,11 +2549,11 @@ void SQLExecutor::time()
 
 	Time bornTime (5, 35, 1);
 	int count = 0;
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", 
-		use(lastName), 
-		use(firstName), 
-		use(address), 
-		use(bornTime), 
+	try { session() << "INSERT INTO Person VALUES (?,?,?,?)",
+		use(lastName),
+		use(firstName),
+		use(address),
+		use(bornTime),
 		now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2600,7 +2601,7 @@ void SQLExecutor::tupleVector()
 	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
 	std::string funct = "tupleVector()";
 	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
-	Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> 
+	Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int>
 		t10(10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29);
 	TupleType t100(100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119);
 	std::vector<TupleType> v;
@@ -2639,8 +2640,8 @@ void SQLExecutor::internalExtraction()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try 
-	{ 
+	try
+	{
 		Statement stmt = (session() << "SELECT * FROM Vectors", now);
 		RecordSet rset(stmt);
 
@@ -2696,7 +2697,7 @@ void SQLExecutor::internalExtraction()
 
 		i = rset.value("str0", 2);
 		assertTrue (5 == i);
-		
+
 		const Column<std::deque<int> >& col = rset.column<std::deque<int> >(0);
 		Column<std::deque<int> >::Iterator it = col.begin();
 		Column<std::deque<int> >::Iterator end = col.end();
@@ -2736,7 +2737,7 @@ void SQLExecutor::internalExtraction()
 
 		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
 		catch (BadCastException&) {	}
-		
+
 		stmt = (session() << "DELETE FROM Vectors", now);
 		rset = stmt;
 
@@ -2761,8 +2762,8 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try 
-	{ 
+	try
+	{
 		Statement stmt = (session() << query, now);
 		RecordSet rset(stmt);
 		assertTrue (rset.totalRowCount() == 4);
@@ -2772,11 +2773,11 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 		assertTrue (!pRF->isEmpty());
 
 		Var da;
-		try 
+		try
 		{
 			da = rset.value(0, 1);
 			fail ("must fail");
-		} catch (InvalidAccessException&) 
+		} catch (InvalidAccessException&)
 		{
 			da = rset.value(0, 1, false);
 			assertTrue (2 == da);
@@ -2845,22 +2846,22 @@ void SQLExecutor::internalBulkExtraction()
 		age[i] = i;
 	}
 
-	try 
-	{ 
-		session() << "INSERT INTO Person VALUES (?,?,?,?)", 
-			use(lastName, bulk), 
-			use(firstName, bulk), 
-			use(address, bulk), 
-			use(age, bulk), 
-			now; 
+	try
+	{
+		session() << "INSERT INTO Person VALUES (?,?,?,?)",
+			use(lastName, bulk),
+			use(firstName, bulk),
+			use(address, bulk),
+			use(age, bulk),
+			now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try 
-	{ 
+	try
+	{
 		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
-		RecordSet rset(stmt); 
+		RecordSet rset(stmt);
 		assertTrue (size == rset.rowCount());
 		assertTrue ("LN0" == rset["LastName"]);
 		assertTrue (0 == rset["Age"]);
@@ -2874,10 +2875,10 @@ void SQLExecutor::internalBulkExtraction()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try 
-	{ 
+	try
+	{
 		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
-		RecordSet rset(stmt); 
+		RecordSet rset(stmt);
 		assertTrue (size == rset.rowCount());
 		assertTrue ("LN0" == rset["LastName"]);
 		assertTrue (0 == rset["Age"]);
@@ -2970,8 +2971,8 @@ void SQLExecutor::internalStorageType()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try 
-	{ 
+	try
+	{
 		std::vector<Statement::Manipulator>::iterator it = manips.begin();
 		std::vector<Statement::Manipulator>::iterator end = manips.end();
 
@@ -3028,15 +3029,15 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 	{
 		session() << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now;
 		fail ("must fail");
-	}catch (StatementException& se) 
-	{ 
+	}catch (StatementException& se)
+	{
 		//double check if we're failing for the right reason
 		//default sqlState value is "23502"; some drivers report "HY???" codes
 		if (se.diagnostics().fields().size())
 		{
 			std::string st = se.diagnostics().sqlState(0);
 			if (sqlState != st)
-				std::cerr << '[' << name() << ']' << " Warning: expected SQL state [" << sqlState << 
+				std::cerr << '[' << name() << ']' << " Warning: expected SQL state [" << sqlState <<
 					"], received [" << se.diagnostics().sqlState(0) << "] instead." << std::endl;
 		}
 	}
@@ -3184,7 +3185,7 @@ void SQLExecutor::rowIterator()
 	std::ostringstream osLoop;
 	RecordSet::Iterator it = rset.begin();
 	RecordSet::Iterator end = rset.end();
-	for (int i = 1; it != end; ++it, ++i) 
+	for (int i = 1; it != end; ++it, ++i)
 	{
 		assertTrue (it->get(0) == i);
 		osLoop << *it;
@@ -3201,7 +3202,7 @@ void SQLExecutor::rowIterator()
 	assertTrue (!pRF->isEmpty());
 	it = rset.begin();
 	end = rset.end();
-	for (int i = 1; it != end; ++it, ++i) 
+	for (int i = 1; it != end; ++it, ++i)
 	{
 		assertTrue (it->get(0) == i);
 		assertTrue (1 == i);
@@ -3278,7 +3279,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	Statement::Result result = stmt.executeAsync();
 	assertTrue (!stmt.isAsync());
 	result.wait();
-	
+
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
@@ -3301,7 +3302,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	assertTrue (stmt.isAsync());
 	stmt.wait();
 	assertTrue (stmt.execute() == 0);
-	
+
 	// +++ if this part of the test case fails, increase the rowCount until achieved
 	//  that first execute is still executing when the second one is called
 	try {
@@ -3337,7 +3338,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
-	
+
 	for (int i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
@@ -3503,8 +3504,8 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 		rs2.moveNext();
 		assertTrue ("WarningSource" == rs2["Source"]);
 		assertTrue ("f Warning sync message" == rs2["Text"]);
-		
-	} 
+
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlChannel()"); }
 }
@@ -3517,7 +3518,7 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 		Logger& root = Logger::root();
 		root.setChannel(new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel"));
 		root.setLevel(Message::PRIO_INFORMATION);
-		
+
 		root.information("a Informational message");
 		root.warning("b Warning message");
 		root.debug("Debug message");
@@ -3530,26 +3531,27 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 		rs.moveNext();
 		assertTrue ("TestSQLChannel" == rs["Source"]);
 		assertTrue ("b Warning message" == rs["Text"]);
-	} 
+		root.setChannel(nullptr);
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlLogger()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlLogger()"); }
 }
 
 
 void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
-{ 
+{
 	if (session.hasTransactionIsolation(ti))
 	{
 		std::string funct = "setTransactionIsolation()";
 
-		try 
+		try
 		{
 			Transaction t(session, false);
 			t.setIsolation(ti);
-			
+
 			assertTrue (ti == t.getIsolation());
 			assertTrue (t.isIsolation(ti));
-			
+
 			assertTrue (ti == session.getTransactionIsolation());
 			assertTrue (session.isTransactionIsolation(ti));
 		}
@@ -3712,11 +3714,11 @@ void SQLExecutor::transaction(const std::string& connect)
 		Transaction trans(session());
 		assertTrue (trans.isActive());
 		assertTrue (session().isTransaction());
-		
+
 		try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		
+
 		assertTrue (session().isTransaction());
 		assertTrue (trans.isActive());
 
@@ -3768,7 +3770,7 @@ void SQLExecutor::transaction(const std::string& connect)
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assertTrue (0 == count);
-	try 
+	try
 	{
 		stmt1.wait(5000);
 		if (local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
@@ -3816,7 +3818,7 @@ void SQLExecutor::transaction(const std::string& connect)
 	assertTrue (0 == count);
 
 	trans.execute(sql);
-	
+
 	Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
 	assertTrue (2 == locCount);
 
@@ -3868,7 +3870,7 @@ void SQLExecutor::transactor()
 	try { session() << "DELETE FROM Person", now; session().commit();}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
+
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -3959,7 +3961,7 @@ void SQLExecutor::nullable()
 	assertTrue (rs.isNull("EmptyInteger"));
 	assertTrue (rs.isNull("EmptyFloat"));
 	assertTrue (rs.isNull("EmptyDateTime"));
-	
+
 	Var di = 1;
 	Var df = 1.5;
 	Var ds = "abc";
@@ -3969,7 +3971,7 @@ void SQLExecutor::nullable()
 	assertTrue (!df.isEmpty());
 	assertTrue (!ds.isEmpty());
 	assertTrue (!dd.isEmpty());
-	
+
 	Statement stmt = (session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(ds), into(di), into(df), into(dd), now);
 
 	assertTrue (di.isEmpty());
@@ -4002,9 +4004,9 @@ void SQLExecutor::reconnect()
 	assertTrue (session().isConnected());
 	session().close();
 	assertTrue (!session().isConnected());
-	try 
+	try
 	{
-		session() << "SELECT LastName FROM Person", into(result), now;  
+		session() << "SELECT LastName FROM Person", into(result), now;
 		fail ("must fail");
 	}
 	catch(NotConnectedException&){ }
@@ -4033,4 +4035,55 @@ void SQLExecutor::unicode(const std::string& dbConnString)
 	session() << "SELECT str FROM UnicodeTable", into(wtext), now;
 	Poco::UnicodeConverter::convert(wtext, text);
 	assertTrue (text == std::string((const char*)supp));
+}
+
+
+void SQLExecutor::encoding(const std::string& dbConnString)
+{
+	try
+	{
+		const unsigned char latinChars[] = { 'g', 252, 'n', 't', 'e', 'r', 0 };
+		const unsigned char utf8Chars[] = { 'g', 195, 188, 'n', 't', 'e', 'r', 0 };
+		std::string latinText((const char*)latinChars);
+		std::string utf8TextIn((const char*)utf8Chars);
+
+		session(true) << "INSERT INTO Latin1Table VALUES (?)", use(utf8TextIn), now;
+
+		std::string latinTextOut;
+		session() << "SELECT str FROM Latin1Table", into(latinTextOut), now;
+		assertTrue(latinText == latinTextOut);
+
+		std::string utf8TextOut;
+		session(true) << "SELECT str FROM Latin1Table", into(utf8TextOut), now;
+		assertTrue(utf8TextIn == utf8TextOut);
+
+		const unsigned char latinChars2[] = { 'G', 220, 'N', 'T', 'E', 'R', 0 };
+		const unsigned char utf8Chars2[] = { 'G', 195, 156, 'N', 'T', 'E', 'R', 0 };
+		std::string latinText2 = (const char*)latinChars2;
+		std::string utf8TextIn2 = (const char*)utf8Chars2;
+
+		session(true) << "INSERT INTO Latin1Table VALUES (?)", use(utf8TextIn2), now;
+
+		std::vector<std::string> textOutVec;
+		session() << "SELECT str FROM Latin1Table", into(textOutVec), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == latinText);
+		assertTrue(textOutVec[1] == latinText2);
+
+		textOutVec.clear();
+		session(true) << "SELECT str FROM Latin1Table", into(textOutVec), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == utf8TextIn);
+		assertTrue(textOutVec[1] == utf8TextIn2);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+		throw;
+	}
+	catch (std::exception& ex)
+	{
+		std::cout << ex.what() << std::endl;
+		throw;
+	}
 }

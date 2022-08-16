@@ -82,7 +82,7 @@ protected:
 	const Poco::Token* parseClassMembers(const Poco::Token* pNext, Struct* pClass);
 	const Poco::Token* parseAccess(const Poco::Token* pNext);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
-	
+
 	void addSymbol(Symbol* pSymbol, int lineNumber, bool addGST = true);
 	void pushNameSpace(NameSpace* pNameSpace, int lineNumber, bool addGST = true);
 	void popNameSpace();

@@ -64,9 +64,9 @@ private:
 	TCPServerConnection();
 	TCPServerConnection(const TCPServerConnection&);
 	TCPServerConnection& operator = (const TCPServerConnection&);
-	
+
 	StreamSocket _socket;
-	
+
 	friend class TCPServerDispatcher;
 };
 

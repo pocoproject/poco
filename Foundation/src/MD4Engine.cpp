@@ -54,7 +54,7 @@ MD4Engine::~MD4Engine()
 	reset();
 }
 
-	
+
 void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
 	const unsigned char* input = (const unsigned char*) input_;
@@ -71,7 +71,7 @@ void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 	partLen = 64 - index;
 
 	/* Transform as many times as possible. */
-	if (inputLen >= partLen) 
+	if (inputLen >= partLen)
 	{
 		std::memcpy(&_context.buffer[index], input, partLen);
 		transform(_context.state, _context.buffer);
@@ -107,7 +107,7 @@ void MD4Engine::reset()
 
 const DigestEngine::Digest& MD4Engine::digest()
 {
-	static const unsigned char PADDING[64] = 
+	static const unsigned char PADDING[64] =
 	{
 		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -129,10 +129,16 @@ const DigestEngine::Digest& MD4Engine::digest()
 
 	/* Store state in digest */
 	unsigned char digest[16];
-	encode(digest, _context.state, 16);
+	encode(digest, _context.state, sizeof(digest));
 	_digest.clear();
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
-
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic pop
+#endif
 	/* Zeroize sensitive information. */
 	std::memset(&_context, 0, sizeof (_context));
 	reset();

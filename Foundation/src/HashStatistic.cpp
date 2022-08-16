@@ -19,10 +19,10 @@ namespace Poco {
 
 
 HashStatistic::HashStatistic(
-	UInt32 tableSize, 
-	UInt32 numEntries, 
-	UInt32 numZeroEntries, 
-	UInt32 maxEntry, 
+	UInt32 tableSize,
+	UInt32 numEntries,
+	UInt32 numZeroEntries,
+	UInt32 maxEntry,
 	std::vector<UInt32> details):
 	_sizeOfTable(tableSize),
 	_numberOfEntries(numEntries),

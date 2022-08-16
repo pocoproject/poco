@@ -176,14 +176,50 @@ public:
 		/// Creates a WebSocket from another Socket, which must be a WebSocket,
 		/// otherwise a Poco::InvalidArgumentException will be thrown.
 
+	WebSocket(const WebSocket& socket);
+		/// Creates a WebSocket from another WebSocket.
+
 	virtual ~WebSocket();
-		/// Destroys the StreamSocket.
+		/// Destroys the WebSocket.
 
 	WebSocket& operator = (const Socket& socket);
 		/// Assignment operator.
 		///
 		/// The other socket must be a WebSocket, otherwise a Poco::InvalidArgumentException
 		/// will be thrown.
+
+	WebSocket& operator = (const WebSocket& socket);
+		/// Assignment operator.
+
+#if POCO_NEW_STATE_ON_MOVE
+
+	WebSocket(Socket&& socket);
+		/// Creates the WebSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.The SocketImpl must be
+		/// a WebSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	WebSocket(WebSocket&& socket);
+		/// Creates the WebSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.
+
+	WebSocket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+	WebSocket& operator = (WebSocket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+#endif //POCO_NEW_STATE_ON_MOVE
 
 	void shutdown();
 		/// Sends a Close control frame to the server end of
@@ -242,6 +278,9 @@ public:
 		/// after any previous content in buffer.
 		/// The buffer will be grown as necessary.
 		///
+		/// See the note below if you want the received data
+		/// to be stored at the beginning of the buffer.
+		///
 		/// The frame's payload size must not exceed the
 		/// maximum payload size set with setMaxPayloadSize().
 		/// If it does, a WebSocketException (WS_ERR_PAYLOAD_TOO_BIG)
@@ -268,6 +307,13 @@ public:
 		///
 		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
 		/// is stored in flags.
+		///
+		/// Note: Since the data received from the WebSocket is appended
+		/// to the given Poco::Buffer, the buffer passed to this method
+		/// should be created with a size of 0, or resize(0) should be
+		/// called on the buffer beforehand, if the expectation is that
+		/// the received data is stored starting at the beginning of the
+		/// buffer.
 
 	Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side

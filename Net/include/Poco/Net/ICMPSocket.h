@@ -51,7 +51,7 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
 
 	int sendTo(const SocketAddress& address, int flags = 0);
 		/// Sends an ICMP request through
@@ -63,7 +63,7 @@ public:
 		/// Receives data from the socket.
 		/// Stores the address of the sender in address.
 		///
-		/// Returns the time elapsed since the originating 
+		/// Returns the time elapsed since the originating
 		/// request was sent.
 
 	int dataSize() const;

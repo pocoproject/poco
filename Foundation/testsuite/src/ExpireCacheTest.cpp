@@ -95,7 +95,7 @@ void ExpireCacheTest::testExpireN()
 	assertTrue (aCache.has(3));
 	tmp = aCache.get(1);
 	SharedPtr<int> tmp2 = aCache.get(3);
-	assertTrue (*tmp == 2); 
+	assertTrue (*tmp == 2);
 	assertTrue (*tmp2 == 4);
 
 	Thread::sleep(DURHALFSLEEP+25); //3|1

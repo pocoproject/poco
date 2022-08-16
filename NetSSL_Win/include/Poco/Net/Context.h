@@ -68,37 +68,37 @@ public:
 		TLSV1_3_SERVER_USE  /// DEPRECATED. Context is used by a server requiring TLSv1.3. Not supported on Windows Embedded Compact.
 	};
 
-	enum VerificationMode 
+	enum VerificationMode
 	{
-		VERIFY_NONE    = 0, 
-			/// Server: The server will not send a client certificate 
-			/// request to the client, so the client will not send a certificate. 
+		VERIFY_NONE    = 0,
+			/// Server: The server will not send a client certificate
+			/// request to the client, so the client will not send a certificate.
 			///
-			/// Client: If not using an anonymous cipher (by default disabled), 
+			/// Client: If not using an anonymous cipher (by default disabled),
 			/// the server will send a certificate which will be checked, but
 			/// the result of the check will be ignored.
 
-		VERIFY_RELAXED = 1, 
-			/// Server: The server sends a client certificate request to the 
-			/// client. The certificate returned (if any) is checked. 
-			/// If the verification process fails, the TLS/SSL handshake is 
-			/// immediately terminated with an alert message containing the 
-			/// reason for the verification failure. 
-			///
-			/// Client: The server certificate is verified, if one is provided. 
+		VERIFY_RELAXED = 1,
+			/// Server: The server sends a client certificate request to the
+			/// client. The certificate returned (if any) is checked.
 			/// If the verification process fails, the TLS/SSL handshake is
-			/// immediately terminated with an alert message containing the 
-			/// reason for the verification failure. 
+			/// immediately terminated with an alert message containing the
+			/// reason for the verification failure.
+			///
+			/// Client: The server certificate is verified, if one is provided.
+			/// If the verification process fails, the TLS/SSL handshake is
+			/// immediately terminated with an alert message containing the
+			/// reason for the verification failure.
 
 		VERIFY_STRICT  = 2,
-			/// Server: If the client did not return a certificate, the TLS/SSL 
+			/// Server: If the client did not return a certificate, the TLS/SSL
 			/// handshake is immediately terminated with a handshake failure
-			/// alert. 
+			/// alert.
 			///
-			/// Client: Same as VERIFY_RELAXED. 
+			/// Client: Same as VERIFY_RELAXED.
 
 		VERIFY_ONCE    = 1
-			/// Same as VERIFY_RELAXED (provided for interface compatibility with 
+			/// Same as VERIFY_RELAXED (provided for interface compatibility with
 			/// the OpenSSL implementation.
 	};
 
@@ -122,26 +122,26 @@ public:
 			/// If specified, the windows machine certificate store is used (server only).
 			/// Otherwise, the user's certificate store is used.
 		OPT_USE_STRONG_CRYPTO           = 0x08,
-			/// Disable known weak cryptographic algorithms, cipher suites, and 
-			/// SSL/TLS protocol versions that may be otherwise enabled for better interoperability. 
+			/// Disable known weak cryptographic algorithms, cipher suites, and
+			/// SSL/TLS protocol versions that may be otherwise enabled for better interoperability.
 		OPT_LOAD_CERT_FROM_FILE         = 0x10,
-			/// Load certificate and private key from a PKCS #12 (.pfx) file, 
+			/// Load certificate and private key from a PKCS #12 (.pfx) file,
 			/// and not from the certificate store.
 		OPT_DEFAULTS                    = OPT_PERFORM_REVOCATION_CHECK | OPT_TRUST_ROOTS_WIN_CERT_STORE | OPT_USE_STRONG_CRYPTO
 	};
 
 	Context(Usage usage,
-		const std::string& certificateNameOrPath, 
+		const std::string& certificateNameOrPath,
 		VerificationMode verMode = VERIFY_RELAXED,
 		int options = OPT_DEFAULTS,
 		const std::string& certificateStoreName = CERT_STORE_MY);
 			/// Creates a Context.
-			/// 
+			///
 			///   * usage specifies whether the context is used by a client or server,
 			///     as well as which protocol to use.
 			///   * certificateNameOrPath specifies either the subject name of the certificate to use,
 			///     or the path of a PKCS #12 file containing the certificate and corresponding private key.
-			///     If a subject name is specified, the certificate must be located in the certificate 
+			///     If a subject name is specified, the certificate must be located in the certificate
 			///     store specified by certificateStoreName. If a path is given, the OPT_LOAD_CERT_FROM_FILE
 			///     option must be set.
 			///   * verificationMode specifies whether and how peer certificates are validated.
@@ -153,7 +153,7 @@ public:
 			/// Note: you can use OpenSSL to convert a certificate and private key in PEM format
 			/// into PKCS #12 format required to import into the Context:
 			///
-			///     openssl pkcs12 -export -inkey cert.key -in cert.crt -out cert.pfx 
+			///     openssl pkcs12 -export -inkey cert.key -in cert.crt -out cert.pfx
 
 	~Context();
 		/// Destroys the Context.
@@ -176,9 +176,9 @@ public:
 		/// extended certificate verification.
 		///
 		/// See X509Certificate::verify() for more information.
-		
+
 	bool extendedCertificateVerificationEnabled() const;
-		/// Returns true iff automatic extended certificate 
+		/// Returns true iff automatic extended certificate
 		/// verification is enabled.
 
 	int options() const;

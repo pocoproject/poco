@@ -239,7 +239,7 @@ public:
 		return assign<Other>(ptr);
 	}
 
-	void swap(SharedPtr& ptr)
+	void swap(SharedPtr& ptr) noexcept
 	{
 		std::swap(_ptr, ptr._ptr);
 		std::swap(_pCounter, ptr._pCounter);

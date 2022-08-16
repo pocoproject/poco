@@ -41,13 +41,13 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, H
 
 	HTTPHeaderInputStream hs(session);
 	read(hs);
-	
+
 	// Now that we know socket is still connected, obtain addresses
 	_clientAddress = session.clientAddress();
 	_serverAddress = session.serverAddress();
-	
+
 	if (getChunkedTransferEncoding())
-		_pStream = new HTTPChunkedInputStream(session);
+		_pStream = new HTTPChunkedInputStream(session, &session.requestTrailer());
 	else if (hasContentLength())
 #if defined(POCO_HAVE_INT64)
 		_pStream = new HTTPFixedLengthInputStream(session, getContentLength64());

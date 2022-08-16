@@ -78,12 +78,12 @@ QName& QName::operator = (QName&& qname) noexcept
 	_ns = std::move(qname._ns);
 	_name = std::move(qname._name);
 	_prefix = std::move(qname._prefix);
-	
+
 	return *this;
 }
 
 
-void QName::swap(QName& qname)
+void QName::swap(QName& qname) noexcept
 {
 	std::swap(_ns, qname._ns);
 	std::swap(_name, qname._name);

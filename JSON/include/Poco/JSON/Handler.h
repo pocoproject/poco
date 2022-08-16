@@ -40,7 +40,7 @@ public:
 
 	Handler();
 		/// Creates an empty Handler.
-	
+
 	virtual ~Handler();
 		/// Destroys the Handler.
 

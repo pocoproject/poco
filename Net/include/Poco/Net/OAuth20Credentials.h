@@ -30,7 +30,7 @@ class HTTPRequest;
 
 class Net_API OAuth20Credentials
 	/// This class implements OAuth 2.0 authentication for HTTP requests,
-	/// via Bearer tokens in the Authorization header, 
+	/// via Bearer tokens in the Authorization header,
 	/// according to RFC 6749 and RFC 6750.
 	///
 	/// To add an Authorization header containing a bearer token
@@ -42,7 +42,7 @@ class Net_API OAuth20Credentials
 	/// object containing a "Bearer" Authorization header and
 	/// calling getBearerToken().
 	///
-	/// The authorization header scheme can be changed from 
+	/// The authorization header scheme can be changed from
 	/// "Bearer" to a custom value. For example, GitHub uses
 	/// the "token" scheme.
 {
@@ -82,16 +82,16 @@ public:
 
 	void setBearerToken(const std::string& bearerToken);
 		/// Sets the bearer token.
-		
+
 	const std::string& getBearerToken() const;
 		/// Returns the bearer token.
 
 	void setScheme(const std::string& scheme);
 		/// Sets the Authorization header scheme.
-		
+
 	const std::string& getScheme() const;
 		/// Returns the Authorization header scheme.
-		
+
 	void authenticate(HTTPRequest& request);
 		/// Adds an Authorization header containing the bearer token to
 		/// the HTTPRequest.
@@ -101,11 +101,11 @@ public:
 protected:
 	void extractBearerToken(const HTTPRequest& request);
 		/// Extracts the bearer token from the HTTPRequest.
-		
+
 private:
 	OAuth20Credentials(const OAuth20Credentials&);
 	OAuth20Credentials& operator = (const OAuth20Credentials&);
-	
+
 	std::string _bearerToken;
 	std::string _scheme;
 };

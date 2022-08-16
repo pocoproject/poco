@@ -51,9 +51,9 @@ public:
 	typedef typename HashEntryMap::const_iterator ConstIterator;
 	typedef typename HashEntryMap::iterator Iterator;
 
-	HashTable(UInt32 initialSize = 251): 
-		_entries(0), 
-		_size(0), 
+	HashTable(UInt32 initialSize = 251):
+		_entries(0),
+		_size(0),
 		_maxCapacity(initialSize)
 		/// Creates the HashTable.
 	{
@@ -211,21 +211,21 @@ public:
 	{
 		return get(key);
 	}
-	
+
 	Value& operator [] (const Key& key)
 	{
 		UInt32 hsh = hash(key);
 
 		if (!_entries[hsh])
 			return insertRaw(key, hsh, Value());
-			
+
 		ConstIterator it = _entries[hsh]->find(key);
 		if (it == _entries[hsh]->end())
 			return insertRaw(key, hsh, Value());
 
 		return it->second;
 	}
-	
+
 	const Key& getKeyRaw(const Key& key, UInt32 hsh)
 		/// Throws an exception if the key does not exist. returns a reference to the internally
 		/// stored key. Useful when someone does an insert and wants for performance reason only to store
@@ -276,7 +276,7 @@ public:
 	{
 		return _size;
 	}
-	
+
 	UInt32 maxCapacity() const
 	{
 		return _maxCapacity;
