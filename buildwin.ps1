@@ -423,6 +423,9 @@ function Build-Components([string] $extension, [string] $type)
 		$omit.Split(',;') | ForEach {
 				$omitArray += $_.Trim()
 		}
+		
+		Write-Host "Omit Array: $omitArray"
+		Write-Host "Component: $component"
 
 		if ($omitArray -NotContains $component)
 		{
