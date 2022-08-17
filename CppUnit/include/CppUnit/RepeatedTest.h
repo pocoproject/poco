@@ -35,39 +35,11 @@ public:
 
 	int countTestCases();
 	std::string toString();
-	void run(TestResult *result);
+	void run(TestResult* result, const Test::Callback& callback = nullptr);
 
 private:
 	const int _timesRepeat;
 };
-
-
-// Counts the number of test cases that will be run by this test.
-inline RepeatedTest::countTestCases ()
-{
-	return TestDecorator::countTestCases() * _timesRepeat;
-}
-
-
-// Returns the name of the test instance.
-inline std::string RepeatedTest::toString()
-{
-	return TestDecorator::toString() + " (repeated)";
-}
-
-
-// Runs a repeated test
-inline void RepeatedTest::run(TestResult *result)
-{
-	for (int n = 0; n < _timesRepeat; n++)
-	{
-		if (result->shouldStop())
-			break;
-
-		TestDecorator::run(result);
-	}
-}
-
 
 } // namespace CppUnit
 
