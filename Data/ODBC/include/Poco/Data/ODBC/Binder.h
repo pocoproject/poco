@@ -424,6 +424,7 @@ private:
 
 		SQLLEN* pLenIn = new SQLLEN;
 		*pLenIn  = size;
+		SQLULEN ColumnSize = size ? size: 1;//zero column size will rise: SQLSTATE = HY104 "Invalid precision value"
 
 		if (PB_AT_EXEC == _paramBinding)
 			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
@@ -435,7 +436,7 @@ private:
 			SQL_PARAM_INPUT,
 			SQL_C_BINARY,
 			SQL_LONGVARBINARY,
-			(SQLUINTEGER) size,
+			ColumnSize,
 			0,
 			pVal,
 			(SQLINTEGER) size,
