@@ -976,7 +976,9 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, MySQLTest, testLongBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testLongTEXT);
+#ifdef POCO_MYSQL_JSON
 	CppUnit_addTest(pSuite, MySQLTest, testJSON);
+#endif
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
