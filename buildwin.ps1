@@ -410,7 +410,9 @@ function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
 
 function Build-Components([string] $extension, [string] $type)
 {
-
+	$dummy = Get-Content "$poco_base\components"
+	Write-Host "$dummy"
+	
 	Get-Content "$poco_base\components" | Foreach-Object {
 
 		$component = $_
