@@ -422,7 +422,7 @@ function Build-Components([string] $extension, [string] $type)
 		$suffix = "_vs$vs"
 
 		$omitArray = @()
-		$omit.Split(',;') | ForEach {
+		$omit.Split(',') | ForEach {
 				$omitArray += $_.Trim()
 		}
 		
