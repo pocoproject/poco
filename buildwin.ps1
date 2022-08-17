@@ -409,10 +409,7 @@ function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
 
 
 function Build-Components([string] $extension, [string] $type)
-{
-	$dummy = Get-Content "$poco_base\components"
-	Write-Host "$dummy"
-	
+{	
 	Get-Content "$poco_base\components" | Foreach-Object {
 
 		$component = $_
@@ -422,22 +419,10 @@ function Build-Components([string] $extension, [string] $type)
 		$suffix = "_vs$vs"
 
 		$omitArray = @()
-		$omit.Split(',') | ForEach {
+		$omit.Split(';') | ForEach {
 				$omitArray += $_.Trim()
 		}
 		
-		Write-Host "Omit Array: $omitArray"
-		Write-Host "Component: $component"
-		
-		if ($omitArray -NotContains $component) 
-		{
-			Write-Host "Not in Omit Array"
-		} 
-		else 
-		{
-			Write-Host "In Omit Array"
-		}			
-
 		if ($omitArray -NotContains $component)
 		{
 			$vsProject = "$poco_base\$componentDir\$componentName$($suffix).$($extension)"
