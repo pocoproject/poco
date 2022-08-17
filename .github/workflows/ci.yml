@@ -175,21 +175,21 @@ jobs:
 #      - uses: actions/checkout@v2
 #      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 #
-  windows-2022-msvc-buildwin-x64:
-    runs-on: windows-2022
-    env:
-      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
-    steps:
-      - uses: actions/checkout@v2
-      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
-#
-#  windows-2022-msvc-buildwin-win32:
+#  windows-2022-msvc-buildwin-x64:
 #    runs-on: windows-2022
 #    env:
 #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
 #      - uses: actions/checkout@v2
-#      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+#      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+
+  windows-2022-msvc-buildwin-win32:
+    runs-on: windows-2022
+    env:
+      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+    steps:
+      - uses: actions/checkout@v2
+      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 #
 #  windows-2022-msvc-cmake-2022:
 #    runs-on: windows-2022
