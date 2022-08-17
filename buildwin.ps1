@@ -11,7 +11,7 @@
 #              [-platform     Win32 | x64 | WinCE | WEC2013]
 #              [-samples]
 #              [-tests]
-#              [-omit         "Lib1X;LibY;LibZ;..."]
+#              [-omit         "Lib1X,LibY,LibZ,..."]
 #              [-tool         msbuild | devenv]
 #              [-useenv       env | noenv]
 #              [-verbosity    m[inimal] | q[uiet] | n[ormal] | d[etailed] | diag[nostic]]
@@ -216,7 +216,7 @@ function Process-Input
 		Write-Host '						 [-platform		 Win32 | x64 | WinCE | WEC2013]'
 		Write-Host '						 [-samples]'
 		Write-Host '						 [-tests]'
-		Write-Host '						 [-omit				 "Lib1X;LibY;LibZ;..."]'
+		Write-Host '						 [-omit				 "Lib1X,LibY,LibZ,..."]'
 		Write-Host '						 [-tool				 msbuild | devenv]'
 		Write-Host '						 [-useenv			 env | noenv]'
 		Write-Host '						 [-verbosity		minimal | quiet | normal | detailed | diagnostic'
@@ -419,7 +419,7 @@ function Build-Components([string] $extension, [string] $type)
 		$suffix = "_vs$vs"
 
 		$omitArray = @()
-		$omit.Split(';') | ForEach {
+		$omit.Split(',') | ForEach {
 				$omitArray += $_.Trim()
 		}
 		
