@@ -428,6 +428,15 @@ function Build-Components([string] $extension, [string] $type)
 		
 		Write-Host "Omit Array: $omitArray"
 		Write-Host "Component: $component"
+		
+		if ($omitArray -NotContains $component) 
+		{
+			Write-Host "Not in Omit Array"
+		} 
+		else 
+		{
+			Write-Host "Not in Omit Array"
+		}			
 
 		if ($omitArray -NotContains $component)
 		{
