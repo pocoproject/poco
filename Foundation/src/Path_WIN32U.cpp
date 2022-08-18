@@ -19,6 +19,9 @@
 #include "Poco/Exception.h"
 #include "Poco/UnWindows.h"
 
+#ifndef PATH_MAX
+#define PATH_MAX 1024 // fallback
+#endif
 
 namespace Poco {
 
