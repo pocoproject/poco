@@ -10,14 +10,13 @@
 #include "CppUnit/CppUnit.h"
 #include "CppUnit/Guards.h"
 #include "CppUnit/TestDecorator.h"
+#include "CppUnit/TestResult.h"
 
 
 namespace CppUnit {
 
 
 class Test;
-class TestResult;
-
 
 /*
  * A decorator that runs a test repeatedly.
@@ -40,6 +39,34 @@ public:
 private:
 	const int _timesRepeat;
 };
+
+
+// Counts the number of test cases that will be run by this test.
+inline int RepeatedTest::countTestCases()
+{
+	return TestDecorator::countTestCases() * _timesRepeat;
+}
+
+
+// Returns the name of the test instance.
+inline std::string RepeatedTest::toString()
+{
+	return TestDecorator::toString() + " (repeated)";
+}
+
+
+// Runs a repeated test
+inline void RepeatedTest::run(TestResult *result, const Test::Callback& callback)
+{
+	for (int n = 0; n < _timesRepeat; n++)
+	{
+		if (result->shouldStop())
+			break;
+
+		TestDecorator::run(result);
+	}
+}
+
 
 } // namespace CppUnit
 
