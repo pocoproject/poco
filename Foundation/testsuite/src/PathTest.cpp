@@ -1623,17 +1623,17 @@ void PathTest::testSelf()
 {
 	std::string self = Path::self();
 #if (defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)) \
-	|| defined(POCO_OS_MAC_OS_X)                              \
-	|| defined(POCO_OS_FREE_BSD)                              \
-	|| defined(POCO_OS_SOLARIS)                               \
-	|| defined(POCO_OS_LINUX)                                 \
-	|| defined(POCO_OS_ANDROID)
+	|| POCO_OS == POCO_OS_MAC_OS_X                            \
+	|| POCO_OS == POCO_OS_FREE_BSD                            \
+	|| POCO_OS == POCO_OS_SOLARIS                             \
+	|| POCO_OS == POCO_OS_LINUX                               \
+	|| POCO_OS == POCO_OS_ANDROID
 
 	assertTrue(!self.empty());
 	Path p(self);
 	assertTrue(p.isAbsolute());
 	assertTrue(p.isFile());
-	assertEquals(p.getFileName(), "Foundation-testrunner");
+	assertTrue(p.getFileName().find("testrunner") != std::string::npos);
 #else
 	assertTrue(self.empty());
 #endif

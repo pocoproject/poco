@@ -25,11 +25,11 @@
 #include <pwd.h>
 #endif
 
-#ifdef POCO_OS_MAC_OS_X
+#if POCO_OS == POCO_OS_MAC_OS_X
 #include <mach-o/dyld.h>
-#elif defined(POCO_OS_FREE_BSD)
+#elif POCO_OS == POCO_OS_FREE_BSD
 #include <sys/sysctl.h>
-#elif defined(POCO_OS_LINUX)
+#elif POCO_OS == POCO_OS_LINUX
 #include <fcntl.h>
 #endif
 
@@ -44,12 +44,12 @@ namespace Poco {
 std::string PathImpl::selfImpl()
 {
 	std::string path;
-#ifdef POCO_OS_MAC_OS_X
+#if POCO_OS == POCO_OS_MAC_OS_X
 	char buf[PATH_MAX];
 	uint32_t size = sizeof(buf);
 	if (_NSGetExecutablePath(buf, &size) == 0)
 		path = buf;
-#elif defined(POCO_OS_FREE_BSD)
+#elif POCO_OS == POCO_OS_FREE_BSD
 	int mib[4];
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
@@ -59,17 +59,17 @@ std::string PathImpl::selfImpl()
 	size_t size = sizeof(buf);
 	if (sysctl(mib, 4, buf, &size, NULL, 0) == 0)
 		path = buf;
-#elif defined(POCO_OS_NET_BSD)
+#elif POCO_OS == POCO_OS_NET_BSD
 	char buf[PATH_MAX];
 	size_t size = sizeof(buf);
 	int n = readlink("/proc/curproc/exe", buf, size);
 	if (n > 0 && n < PATH_MAX)
 		path = buf;
-#elif defined(POCO_OS_SOLARIS)
+#elif POCO_OS == POCO_OS_SOLARIS
 	char * execName = getexecname();
 	if (execName)
 		path = execName;
-#elif defined(POCO_OS_LINUX) || defined(POCO_OS_ANDROID)
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	char buf[PATH_MAX];
 	size_t size = sizeof(buf);
 	int n = readlink("/proc/self/exe", buf, size);
