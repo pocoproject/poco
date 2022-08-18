@@ -1619,6 +1619,27 @@ void PathTest::testWindowsSystem()
 #endif
 }
 
+void PathTest::testSelf()
+{
+	std::string self = Path::self();
+#if (defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)) \
+	|| defined(POCO_OS_MAC_OS_X)                              \
+	|| defined(POCO_OS_FREE_BSD)                              \
+	|| defined(POCO_OS_SOLARIS)                               \
+	|| defined(POCO_OS_LINUX)                                 \
+	|| defined(POCO_OS_ANDROID)
+
+	assertTrue(!self.empty());
+	Path p(self);
+	assertTrue(p.isAbsolute());
+	assertTrue(p.isFile());
+	assertEquals(p.getFileName(), "Foundation-testrunner");
+#else
+	assertTrue(self.empty());
+#endif
+
+}
+
 
 void PathTest::setUp()
 {
@@ -1662,6 +1683,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testResolve);
 	CppUnit_addTest(pSuite, PathTest, testPushPop);
 	CppUnit_addTest(pSuite, PathTest, testWindowsSystem);
+	CppUnit_addTest(pSuite, PathTest, testSelf);
 
 	return pSuite;
 }
