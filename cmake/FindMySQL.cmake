@@ -26,7 +26,7 @@ pkg_check_modules(PC_MARIADB QUIET mariadb)
 SET(BINDIR32_ENV_NAME "ProgramFiles(x86)")
 SET(BINDIR32 $ENV{${BINDIR32_ENV_NAME}})
 
-find_path(MYSQL_INCLUDE_DIR mysql/mysql.h
+find_path(MYSQL_INCLUDE_DIR mysql.h
 	HINTS
 		${MYSQL_ROOT_DIR}/include
 		${MYSQL_ROOT_INCLUDE_DIRS}
@@ -35,6 +35,8 @@ find_path(MYSQL_INCLUDE_DIR mysql/mysql.h
 		${PC_MARIADB_INCLUDE_DIRS}
 		/usr/include
 		/usr/local/include
+		/usr/include
+		/usr/mysql/include
 		/opt/mysql/mysql/include
 		/usr/local/mysql/include
 		$ENV{MYSQL_INCLUDE_DIR}
@@ -68,6 +70,12 @@ if (MSVC)
 				 PATHS
 					 ${PC_MYSQL_LIBRARY_DIRS}
 					 ${PC_MARIADB_LIBRARY_DIRS}
+					 -L/usr/local/lib
+					 /usr/local/lib$(LIB64SUFFIX)/mysql
+					 /usr/lib$(LIB64SUFFIX)/mysql
+					 /usr/mysql/lib$(LIB64SUFFIX)
+					 /usr/mysql/lib$(LIB64SUFFIX)/mysql
+					 /usr/local/mysql/lib$(LIB64SUFFIX)
 					 $ENV{MYSQL_DIR}/lib
 					 $ENV{MYSQL_DIR}/libmysql
 					 $ENV{MYSQL_DIR}/client
