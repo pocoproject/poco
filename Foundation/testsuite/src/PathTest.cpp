@@ -1634,7 +1634,11 @@ void PathTest::testSelf()
 	Path p(self);
 	assertTrue(p.isAbsolute());
 	assertTrue(p.isFile());
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
 	assertTrue(self.find("testrunner") != std::string::npos);
+#endif
+
 #else
 	assertTrue(self.empty());
 #endif
