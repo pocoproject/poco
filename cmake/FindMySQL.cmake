@@ -37,7 +37,7 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		/usr/local/include
 		/usr/mysql/include
  		/usr/local/mysql/include
-		/opt/include
+		/usr/local/opt/mysql-client/include
 		/opt/local/include
 		/opt/mysql/include
 		$ENV{MYSQL_INCLUDE_DIR}
@@ -71,12 +71,13 @@ if (MSVC)
 				 PATHS
 					 ${PC_MYSQL_LIBRARY_DIRS}
 					 ${PC_MARIADB_LIBRARY_DIRS}
-					 -L/usr/local/lib
+					 /usr/local/lib
 					 /usr/local/lib$(LIB64SUFFIX)/mysql
 					 /usr/lib$(LIB64SUFFIX)/mysql
 					 /usr/mysql/lib$(LIB64SUFFIX)
 					 /usr/mysql/lib$(LIB64SUFFIX)/mysql
 					 /usr/local/mysql/lib$(LIB64SUFFIX)
+					 /usr/local/opt/mysql-client/lib
 					 $ENV{MYSQL_DIR}/lib
 					 $ENV{MYSQL_DIR}/libmysql
 					 $ENV{MYSQL_DIR}/client
