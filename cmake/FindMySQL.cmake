@@ -35,10 +35,11 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		${PC_MARIADB_INCLUDE_DIRS}
 		/usr/include
 		/usr/local/include
-		/usr/include
 		/usr/mysql/include
-		/opt/mysql/mysql/include
-		/usr/local/mysql/include
+ 		/usr/local/mysql/include
+		/opt/include
+		/opt/local/include
+		/opt/mysql/include
 		$ENV{MYSQL_INCLUDE_DIR}
 		$ENV{MYSQL_DIR}/include
 		$ENV{ProgramFiles}/MySQL/*/include
