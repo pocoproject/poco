@@ -130,7 +130,7 @@ namespace
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt(NULL)")));
 					if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
-					rc += outLen;
+					rc += static_cast<int>(outLen);
 					output += outLen;
 					outputLength -= outLen;
 					_pos = 0;
@@ -241,7 +241,7 @@ namespace
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
 					if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt")));
-					rc += outLen;
+					rc += static_cast<int>(outLen);
 					output += outLen;
 					outputLength -= outLen;
 					_pos = 0;
