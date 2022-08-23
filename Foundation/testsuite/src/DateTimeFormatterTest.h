@@ -26,6 +26,7 @@ public:
 
 	void testISO8601();
 	void testISO8601Frac();
+	void testISO8601Timestamp();
 	void testRFC822();
 	void testRFC1123();
 	void testHTTP();
