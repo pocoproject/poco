@@ -129,7 +129,7 @@ std::string PKCS12Container::extractFriendlyName(X509* pCert)
 	if(pCert)
 	{
 		int length = 0;
-		char* pBuffer = reinterpret_cast<char *>(X509_alias_get0(pCert, &length));
+		char* pBuffer = reinterpret_cast<char*>(X509_alias_get0(pCert, &length));
 		if (pBuffer) {
 			friendlyName.append(pBuffer, length);
 		}
