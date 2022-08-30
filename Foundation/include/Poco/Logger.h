@@ -156,7 +156,8 @@ public:
 	template <typename T, typename... Args>
 	void fatal(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
+		if (fatal())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
 	}
 
 	void critical(const std::string& msg);
@@ -178,7 +179,8 @@ public:
 	template <typename T, typename... Args>
 	void critical(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
+		if (critical())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
 	}
 
 	void error(const std::string& msg);
@@ -200,7 +202,8 @@ public:
 	template <typename T, typename... Args>
 	void error(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
+		if (error())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
 	}
 
 	void warning(const std::string& msg);
@@ -222,7 +225,8 @@ public:
 	template <typename T, typename... Args>
 	void warning(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
+		if (warning())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
 	}
 
 	void notice(const std::string& msg);
@@ -244,7 +248,8 @@ public:
 	template <typename T, typename... Args>
 	void notice(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
+		if (notice())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
 	}
 
 	void information(const std::string& msg);
@@ -266,7 +271,8 @@ public:
 	template <typename T, typename... Args>
 	void information(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
+		if (information())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
 	}
 
 	void debug(const std::string& msg);
@@ -288,7 +294,8 @@ public:
 	template <typename T, typename... Args>
 	void debug(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
+		if (debug())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
 	}
 
 	void trace(const std::string& msg);
@@ -310,7 +317,8 @@ public:
 	template <typename T, typename... Args>
 	void trace(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
+		if (trace())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
 	}
 
 	void dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio = Message::PRIO_DEBUG);
@@ -467,6 +475,8 @@ private:
 	Logger();
 	Logger(const Logger&);
 	Logger& operator = (const Logger&);
+
+	void logAlways(const std::string& text, Message::Priority prio);
 
 	std::string _name;
 	Channel::Ptr _pChannel;
@@ -670,6 +680,15 @@ inline void Logger::log(const std::string& text, Message::Priority prio, const c
 	if (_level >= prio && _pChannel)
 	{
 		_pChannel->log(Message(_name, text, prio, file, line));
+	}
+}
+
+
+inline void Logger::logAlways(const std::string& text, Message::Priority prio)
+{
+	if (_pChannel)
+	{
+		_pChannel->log(Message(_name, text, prio));
 	}
 }
 
