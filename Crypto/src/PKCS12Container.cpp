@@ -128,10 +128,10 @@ std::string PKCS12Container::extractFriendlyName(X509* pCert)
 	std::string friendlyName;
 	if(pCert)
 	{
-		int len = 0;
-		char* pBuffer = reinterpret_cast<char *>(X509_alias_get0(pCert, &len));
+		int length = 0;
+		char* pBuffer = reinterpret_cast<char *>(X509_alias_get0(pCert, &length));
 		if (pBuffer) {
-			friendlyName.append(pBuffer, len);
+			friendlyName.append(pBuffer, length);
 		}
 	}
 	else throw NullPointerException("PKCS12Container::extractFriendlyName()");
