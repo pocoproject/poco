@@ -175,7 +175,10 @@ void TCPServerDispatcher::stop()
 	FastMutex::ScopedLock lock(_mutex);
 	_stopped = true;
 	_queue.clear();
-	_queue.enqueueNotification(new StopNotification);
+	for (int i = 0; i < _threadPool.allocated(); i++)
+	{
+		_queue.enqueueNotification(new StopNotification);
+	}
 }
 
 
