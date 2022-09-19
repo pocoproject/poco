@@ -211,6 +211,18 @@ public:
 		/// See setProperty() for a description of the supported
 		/// properties.
 
+	void setRotationStrategy(RotateStrategy* strategy);
+		/// Set a rotation strategy. 
+		/// FileChannel will take ownership of the pointer
+	
+	void setArchiveStrategy(ArchiveStrategy* strategy);
+		/// Set an archive strategy. 
+		/// FileChannel will take ownership of the pointer
+		
+	void setPurgeStrategy(PurgeStrategy* strategy);
+		/// Set a purge strategy. 
+		/// FileChannel will take ownership of the pointer
+		
 	Timestamp creationDate() const;
 		/// Returns the log file's creation date.
 
@@ -232,6 +244,7 @@ public:
 
 protected:
 	~FileChannel();
+
 	void setRotation(const std::string& rotation);
 	void setArchive(const std::string& archive);
 	void setCompress(const std::string& compress);
@@ -244,8 +257,10 @@ protected:
 private:
 	bool setNoPurge(const std::string& value);
 	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = NULL) const;
-	void setPurgeStrategy(PurgeStrategy* strategy);
 	Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
+
+	RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
+	ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
 
 	std::string      _path;
 	std::string      _times;

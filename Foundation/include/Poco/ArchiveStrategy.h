@@ -42,6 +42,9 @@ public:
 	ArchiveStrategy();
 	virtual ~ArchiveStrategy();
 
+	virtual LogFile* open(LogFile* pFile) = 0;
+		/// Open a new log file and return it.
+	
 	virtual LogFile* archive(LogFile* pFile) = 0;
 		/// Renames the given log file for archiving
 		/// and creates and returns a new log file.
@@ -71,6 +74,8 @@ class Foundation_API ArchiveByNumberStrategy: public ArchiveStrategy
 public:
 	ArchiveByNumberStrategy();
 	~ArchiveByNumberStrategy();
+
+	LogFile* open(LogFile* pFile);
 	LogFile* archive(LogFile* pFile);
 };
 
@@ -87,6 +92,11 @@ public:
 
 	~ArchiveByTimestampStrategy()
 	{
+	}
+
+	LogFile* open(LogFile* pFile)
+	{
+		return pFile;
 	}
 
 	LogFile* archive(LogFile* pFile)
