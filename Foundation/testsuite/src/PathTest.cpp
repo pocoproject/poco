@@ -1623,8 +1623,8 @@ void PathTest::testSelf()
 {
 	std::string self = Path::self();
 	std::cout << self << std::endl;
-#if (defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)) \
-	|| POCO_OS == POCO_OS_MAC_OS_X                            \
+
+#if POCO_OS == POCO_OS_MAC_OS_X                               \
 	|| POCO_OS == POCO_OS_FREE_BSD                            \
 	|| POCO_OS == POCO_OS_SOLARIS                             \
 	|| POCO_OS == POCO_OS_LINUX                               \
@@ -1632,17 +1632,11 @@ void PathTest::testSelf()
 
 	assertTrue(!self.empty());
 	Path p(self);
+
 	assertTrue(p.isAbsolute());
 	assertTrue(p.isFile());
-
-#if !defined(POCO_OS_FAMILY_WINDOWS)
 	assertTrue(self.find("testrunner") != std::string::npos);
 #endif
-
-#else
-	assertTrue(self.empty());
-#endif
-
 }
 
 
