@@ -536,12 +536,13 @@ int SecureSocketImpl::handleError(int rc)
 	// On an unexpected EOF, versions before OpenSSL 3.0 returned
 	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
 	// errno was 0.  Since OpenSSL 3.0 the returned error is
-	// SSL_ERROR_SSL with a meaningful error on the error stack.
+	// SSL_ERROR_SSL with a meaningful error on the error stack
+	// on Linux. While the behavior did not change on Windows.
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	case SSL_ERROR_SSL:
-#else
-	case SSL_ERROR_SYSCALL:
+	  // fallthrough
 #endif
+	case SSL_ERROR_SYSCALL:
 		if (socketError)
 		{
 			SocketImpl::error(socketError);
