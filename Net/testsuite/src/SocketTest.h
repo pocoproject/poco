@@ -30,6 +30,7 @@ public:
 	void testAvailable();
 	void testFIFOBuffer();
 	void testConnect();
+	void testConnected();
 	void testConnectRefused();
 	void testConnectRefusedNB();
 	void testNonBlocking();

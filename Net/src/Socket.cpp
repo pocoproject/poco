@@ -95,6 +95,13 @@ Socket::~Socket()
 	if (_pImpl) _pImpl->release();
 }
 
+bool Socket::isConnected() const
+{
+	if (_pImpl->sockfd() == POCO_INVALID_SOCKET)
+		return false;
+	return (!poll(Timespan(1,0), SELECT_READ) && poll(Timespan(1,0), SELECT_WRITE));
+}
+
 
 int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {

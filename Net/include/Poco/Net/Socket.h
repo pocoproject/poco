@@ -127,6 +127,9 @@ public:
 		/// Returns true if socket is a raw socket,
 		/// false otherwise.
 
+	bool isConnected() const;
+		/// Returns true if socket connected.
+
 	void close();
 		/// Closes the socket.
 

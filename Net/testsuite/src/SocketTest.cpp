@@ -208,6 +208,19 @@ void SocketTest::testConnect()
 	ss.connect(SocketAddress("127.0.0.1", serv.address().port()), timeout);
 }
 
+void SocketTest::testConnected()
+{
+	ServerSocket serv;
+	serv.bind(SocketAddress());
+	serv.listen();
+	StreamSocket ss;
+	Timespan timeout(250000);
+	assertTrue (!ss.isConnected());
+	ss.connect(SocketAddress("127.0.0.1", serv.address().port()), timeout);
+	assertTrue (ss.isConnected());
+	ss.close();
+	assertTrue (!ss.isConnected());
+}
 
 void SocketTest::testConnectRefused()
 {
@@ -598,6 +611,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
 	CppUnit_addTest(pSuite, SocketTest, testFIFOBuffer);
 	CppUnit_addTest(pSuite, SocketTest, testConnect);
+	CppUnit_addTest(pSuite, SocketTest, testConnected);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefused);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefusedNB);
 	CppUnit_addTest(pSuite, SocketTest, testNonBlocking);
