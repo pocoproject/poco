@@ -2286,6 +2286,15 @@ void VarTest::testOrderedDynamicStructBasics()
 }
 
 
+void VarTest::testDynamicStructEmptyString()
+{
+	DynamicStruct aStruct;
+	aStruct["Empty"] = "";
+	aStruct["Space"] = " ";
+	assertEqual(aStruct.toString(false), "{ \"Empty\": \"\", \"Space\": \" \" }");
+}
+
+
 void VarTest::testDynamicStructNoEscapeString()
 {
 	DynamicStruct aStruct;
@@ -3139,6 +3148,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testDynamicPair);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructBasics);
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructBasics);
+	CppUnit_addTest(pSuite, VarTest, testDynamicStructEmptyString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructNoEscapeString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructString);

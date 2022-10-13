@@ -72,6 +72,10 @@ void appendJSONValue(std::string& val, const Var& any, bool wrap)
 	{
 		val.append("null");
 	}
+	else if (any.isString() && any.extract<std::string>().empty())
+	{
+		val.append("\"\"");
+	}
 	else
 	{
 		bool isStr = wrap && isJSONString(any);
