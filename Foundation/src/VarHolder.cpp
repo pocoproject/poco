@@ -66,7 +66,7 @@ void appendJSONKey(std::string& val, const Var& any)
 }
 
 
-void appendJSONValue(std::string& val, const Var& any)
+void appendJSONValue(std::string& val, const Var& any, bool wrap)
 {
 	if (any.isEmpty())
 	{
@@ -74,7 +74,7 @@ void appendJSONValue(std::string& val, const Var& any)
 	}
 	else
 	{
-		bool isStr = isJSONString(any);
+		bool isStr = wrap && isJSONString(any);
 		if (isStr)
 		{
 			appendJSONString(val, any.convert<std::string>());
