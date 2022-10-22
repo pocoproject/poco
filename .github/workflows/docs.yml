@@ -1,0 +1,25 @@
+name: poco-docs
+on:
+  workflow-dispatch:
+    inputs:
+      relspec:
+        description: 'Release Specification'
+        required: true
+        default: 'all'
+        type: choice
+          options:
+            - basic
+            - all
+
+jobs:
+  mkdoc:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/lib/Linux/x86_64
+          mkdoc ${{ inputs.relspec }}
+
