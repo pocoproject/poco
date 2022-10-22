@@ -1,4 +1,4 @@
-name: poco-docs
+name: Generate reference documentation
 on:
   workflow-dispatch:
     inputs:
@@ -22,4 +22,3 @@ jobs:
           export PATH=$POCO_BASE/release/script:$PATH
           export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/lib/Linux/x86_64
           mkdoc ${{ inputs.relspec }}
-
