@@ -1,6 +1,6 @@
 name: Generate reference documentation
 on:
-  workflow-dispatch:
+  workflow_dispatch:
     inputs:
       relspec:
         description: 'Release Specification'
