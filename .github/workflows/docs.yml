@@ -7,9 +7,9 @@ on:
         required: true
         default: 'all'
         type: choice
-          options:
-            - basic
-            - all
+        options:
+          - basic
+          - all
 
 jobs:
   mkdoc:
