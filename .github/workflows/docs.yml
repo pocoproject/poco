@@ -8,8 +8,8 @@ on:
         default: 'all'
         type: choice
         options:
-          - basic
-          - all
+          - ''
+          - 'all'
 
 jobs:
   mkdoc:
