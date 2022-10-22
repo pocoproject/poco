@@ -47,6 +47,7 @@ jobs:
           mkdir -p ~/.ssh
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
       - run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
@@ -64,6 +65,7 @@ jobs:
           mkdir -p ~/.ssh
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
       - run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
@@ -74,9 +76,11 @@ jobs:
 
   sign_and_publish:
     runs-on: ubuntu-latest
+    needs: ["mkdoc", "mkrelease_win", "mkrelease"]
     steps:
       - run: |
           mkdir -p ~/.ssh
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
       - run: ssh poco@pocoproject.org ./sign_and_publish.sh
