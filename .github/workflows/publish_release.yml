@@ -2,14 +2,6 @@ name: Publish Release
 on:
   workflow_dispatch:
     inputs:
-      relspec:
-        description: 'Release Specification'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - ''
-          - 'all'
       channel:
         description: 'Release Channel'
         required: true
@@ -35,13 +27,14 @@ jobs:
           mkdir -p ~/.ssh
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
       -
         name: Build documentation
         run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
           export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/lib/Linux/x86_64
-          mkdoc ${{ inputs.relspec }}
+          mkdoc all
       -
         name: Copy to web server
         run: |
@@ -70,7 +63,8 @@ jobs:
         run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
-          mkrel -c unix2dos ${{ inputs.relspec }}
+          mkrel -c unix2dos
+          mkrel -C unix2dos all
       -
         name: Copy to web server
         run: |
@@ -85,9 +79,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Install packages
-        run: sudo apt-get update && sudo apt-get -y install dos2unix
-      -
         name: Install SSH key
         run: |
           mkdir -p ~/.ssh
@@ -99,7 +90,8 @@ jobs:
         run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
-          mkrel ${{ inputs.relspec }}
+          mkrel
+          mkrel all
       -
         name: Copy to web server
         run: |
@@ -112,6 +104,9 @@ jobs:
     needs: ["mkdoc", "mkrelease_win", "mkrelease"]
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
         name: Install SSH key
         run: |
           mkdir -p ~/.ssh
@@ -120,4 +115,6 @@ jobs:
           chmod go-rwx ~/.ssh/id_rsa
       -
         name: Sign and publish
-        run: ssh poco@pocoproject.org ./sign_and_publish.sh
+        run: |
+          read VERSION <VERSION
+          ssh poco@pocoproject.org ./sign_and_publish.sh $VERSION ${{ inputs.channel }}
