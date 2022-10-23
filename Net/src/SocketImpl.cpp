@@ -619,7 +619,7 @@ int SocketImpl::available()
 	int result = 0;
 	ioctl(FIONREAD, result);
 #if (POCO_OS != POCO_OS_LINUX)
-	if (type() == SOCKET_TYPE_DATAGRAM)
+	if (result && (type() == SOCKET_TYPE_DATAGRAM))
 	{
 		std::vector<char> buf(result);
 		result = recvfrom(sockfd(), &buf[0], result, MSG_PEEK, NULL, NULL);
