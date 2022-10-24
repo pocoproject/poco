@@ -19,7 +19,7 @@
    Copyright (c) 2016      Gustavo Grieco <gustavo.grieco@imag.fr>
    Copyright (c) 2016      Pascal Cuoq <cuoq@trust-in-soft.com>
    Copyright (c) 2016      Ed Schouten <ed@nuxi.nl>
-   Copyright (c) 2017-2018 Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Václav Slavík <vaclav@slavik.io>
    Copyright (c) 2017      Viktor Szakats <commit@vsz.me>
    Copyright (c) 2017      Chanho Park <chanho61.park@samsung.com>
@@ -4291,7 +4291,7 @@ processXmlDecl(XML_Parser parser, int isGeneralTextEntity, const char *s,
   const XML_Char *storedEncName = NULL;
   const ENCODING *newEncoding = NULL;
   const char *version = NULL;
-  const char *versionend;
+  const char *versionend = NULL;
   const XML_Char *storedversion = NULL;
   int standalone = -1;
 
@@ -5846,10 +5846,15 @@ internalEntityProcessor(XML_Parser parser, const char *s, const char *end,
   {
     parser->m_processor = contentProcessor;
     /* see externalEntityContentProcessor vs contentProcessor */
-    return doContent(parser, parser->m_parentParser ? 1 : 0, parser->m_encoding,
-                     s, end, nextPtr,
-                     (XML_Bool)! parser->m_parsingStatus.finalBuffer,
-                     XML_ACCOUNT_DIRECT);
+    result = doContent(parser, parser->m_parentParser ? 1 : 0,
+                       parser->m_encoding, s, end, nextPtr,
+                       (XML_Bool)! parser->m_parsingStatus.finalBuffer,
+                       XML_ACCOUNT_DIRECT);
+    if (result == XML_ERROR_NONE) {
+      if (! storeRawNames(parser))
+        return XML_ERROR_NO_MEMORY;
+    }
+    return result;
   }
 }
 

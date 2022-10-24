@@ -26,7 +26,7 @@ int TestDecorator::countTestCases() const
 }
 
 
-void TestDecorator::run(TestResult* result, const Test::Callback& callback = nullptr)
+void TestDecorator::run(TestResult* result, const Test::Callback& callback)
 {
 	_test->run(result);
 }
