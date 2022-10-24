@@ -3,7 +3,9 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.11.4 (2022-10-24)
 ===========================
 
-- TODO
+- GH #3805: Upgrade expat to 2.4.9
+- GH #3846: Upgrade bundled zlib to 1.2.13 [fixes CVE]
+- GH #3847: Upgrade bundled SQLite to 3.39.4
 
 
 Release 1.11.3 (2022-06-12)
