@@ -1,0 +1,120 @@
+name: Publish Release
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Release Channel'
+        required: true
+        default: 'releases'
+        type: choice
+        options:
+          - releases
+          - releases-staging
+
+jobs:
+  mkdoc:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Install packages
+        run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev libpq-dev
+      -
+        name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
+          echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
+      -
+        name: Build documentation
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/lib/Linux/x86_64
+          mkdoc all
+      -
+        name: Copy to web server
+        run: |
+          read VERSION <VERSION
+          ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION
+          scp releases/poco-*-doc.tar.gz releases/poco-*-doc.zip poco@pocoproject.org:staging/releases/poco-$VERSION
+
+  mkrelease_win:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Install packages
+        run: sudo apt-get update && sudo apt-get -y install dos2unix
+      -
+        name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
+          echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
+      -
+        name: Build release package
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          mkrel -c unix2dos
+          mkrel -c unix2dos all
+      -
+        name: Copy to web server
+        run: |
+          read VERSION <VERSION
+          ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION
+          scp releases/poco-*.zip poco@pocoproject.org:staging/releases/poco-$VERSION
+
+  mkrelease:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
+          echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
+      -
+        name: Build release package
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          mkrel
+          mkrel all
+      -
+        name: Copy to web server
+        run: |
+          read VERSION <VERSION
+          ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION
+          scp releases/poco-*.tar.gz releases/poco-*.tar.bz2 poco@pocoproject.org:staging/releases/poco-$VERSION
+
+  sign_and_publish:
+    runs-on: ubuntu-latest
+    needs: ["mkdoc", "mkrelease_win", "mkrelease"]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
+          echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
+          chmod go-rwx ~/.ssh/id_rsa
+      -
+        name: Sign and publish
+        run: |
+          read VERSION <VERSION
+          ssh poco@pocoproject.org ./sign_and_publish.sh $VERSION ${{ inputs.channel }}
