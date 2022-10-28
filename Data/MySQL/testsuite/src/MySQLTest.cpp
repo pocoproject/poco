@@ -487,6 +487,7 @@ void MySQLTest::testLongTEXT()
 	_pExecutor->longText();
 }
 
+#ifdef POCO_MYSQL_JSON
 void MySQLTest::testJSON()
 {
 	if (!_pSession) fail("Test not available.");
@@ -494,7 +495,7 @@ void MySQLTest::testJSON()
 	recreatePersonJSONTable();
 	_pExecutor->json();
 }
-
+#endif
 
 void MySQLTest::testUnsignedInts()
 {
@@ -796,7 +797,7 @@ void MySQLTest::recreatePersonLongBLOBTable()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonLongBLOBTable()"); }
 }
 
-
+#ifdef POCO_MYSQL_JSON
 void MySQLTest::recreatePersonJSONTable()
 {
 	dropTable("Person");
@@ -804,7 +805,7 @@ void MySQLTest::recreatePersonJSONTable()
 	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail("recreatePersonJSONTable()"); }
 	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail("recreatePersonJSONTable()"); }
 }
-
+#endif
 
 void MySQLTest::recreateIntsTable()
 {
@@ -975,7 +976,9 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, MySQLTest, testLongBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testLongTEXT);
+#ifdef POCO_MYSQL_JSON
 	CppUnit_addTest(pSuite, MySQLTest, testJSON);
+#endif
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);

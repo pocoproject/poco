@@ -19,7 +19,7 @@
 
 
 #include "Poco/Data/MetaColumn.h"
-#include <mysql/mysql.h>
+#include <mysql.h>
 #include <vector>
 
 

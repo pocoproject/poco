@@ -424,12 +424,22 @@ ENDOFSCRIPT
 
 
 #
+# Create Visual Studio 17 build script
+#
+cat >${target}/build_vs170.cmd <<'ENDOFSCRIPT'
+@echo off
+buildwin 170 build shared both Win32 samples
+ENDOFSCRIPT
+
+
+#
 # Fix line endings
 #
 if [ "$lineEndConv" != "" ] ; then
 	$lineEndConv ${target}/build_vs140.cmd
 	$lineEndConv ${target}/build_vs150.cmd
 	$lineEndConv ${target}/build_vs160.cmd
+	$lineEndConv ${target}/build_vs170.cmd
 	$lineEndConv ${target}/Makefile
 	$lineEndConv ${target}/components
 fi

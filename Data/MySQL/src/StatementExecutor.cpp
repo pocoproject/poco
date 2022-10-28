@@ -14,7 +14,7 @@
 
 #include "Poco/Data/MySQL/StatementExecutor.h"
 #include "Poco/Format.h"
-#include <mysql/mysql.h>
+#include <mysql.h>
 
 
 namespace Poco {

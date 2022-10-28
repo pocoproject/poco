@@ -420,7 +420,14 @@ void DateTime::computeGregorian(double julianDay)
 
 void DateTime::computeDaytime()
 {
-	Timespan span(_utcTime/10);
+	Timestamp::UtcTimeVal ut(_utcTime);
+	if (ut < 0) {
+		// GH3723: UtcTimeVal is negative for pre-gregorian dates
+		// move it 1600 years to the future
+		// keeping hour, minute, second,... for corrections
+		ut += Int64(86400)*1000*1000*10*1600*365;
+	}
+	Timespan span(ut/10);
 	int hour = span.hours();
 	// Due to double rounding issues, the previous call to computeGregorian()
 	// may have crossed into the next or previous day. We need to correct that.

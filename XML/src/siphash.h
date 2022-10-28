@@ -99,14 +99,14 @@
 #define SIPHASH_H
 
 #include <stddef.h> /* size_t */
-#  include <stdint.h> /* uint64_t uint32_t uint8_t */
+#include <stdint.h> /* uint64_t uint32_t uint8_t */
 
 /*
  * Workaround to not require a C++11 compiler for using ULL suffix
  * if this code is included and compiled as C++; related GCC warning is:
  * warning: use of C++11 long long integer constant [-Wlong-long]
  */
-#define _SIP_ULL(high, low) (((uint64_t)high << 32) | low)
+#define _SIP_ULL(high, low) ((((uint64_t)high) << 32) | (low))
 
 #define SIP_ROTL(x, b) (uint64_t)(((x) << (b)) | ((x) >> (64 - (b))))
 

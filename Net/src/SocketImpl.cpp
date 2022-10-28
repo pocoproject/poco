@@ -619,7 +619,7 @@ int SocketImpl::available()
 	int result = 0;
 	ioctl(FIONREAD, result);
 #if (POCO_OS != POCO_OS_LINUX)
-	if (type() == SOCKET_TYPE_DATAGRAM)
+	if (result && (type() == SOCKET_TYPE_DATAGRAM))
 	{
 		std::vector<char> buf(result);
 		result = recvfrom(sockfd(), &buf[0], result, MSG_PEEK, NULL, NULL);
@@ -675,7 +675,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		memset(&evout, 0, sizeof(evout));
 
 		Poco::Timestamp start;
-		rc = epoll_wait(epollfd, &evout, 1, remainingTime.totalMilliseconds());
+		rc = epoll_wait(epollfd, &evout, 1, static_cast<int>(remainingTime.totalMilliseconds()));
 		if (rc < 0 && lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;

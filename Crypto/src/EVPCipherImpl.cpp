@@ -84,7 +84,7 @@ namespace
 			if (EVP_PKEY_encrypt_init(_pCtx) <= 0)
         		throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt_init")));
 
-			_blockSize = EVP_PKEY_size(_pEVP);
+			_blockSize = EVP_PKEY_size(const_cast<EVP_PKEY*>(_pEVP));
 			if (!_blockSize)
 				throwError(Poco::format(fmt, std::string("EVP_PKEY_size")));
 			_pBuf = new unsigned char[_blockSize];
@@ -130,7 +130,7 @@ namespace
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt(NULL)")));
 					if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
-					rc += outLen;
+					rc += static_cast<int>(outLen);
 					output += outLen;
 					outputLength -= outLen;
 					_pos = 0;
@@ -197,7 +197,7 @@ namespace
 			if (EVP_PKEY_decrypt_init(_pCtx) <= 0)
         		throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt_init")));
 
-			_blockSize = EVP_PKEY_size(_pEVP);
+			_blockSize = EVP_PKEY_size(const_cast<EVP_PKEY*>(_pEVP));
 			if (!_blockSize)
 				throwError(Poco::format(fmt, std::string("EVP_PKEY_size")));
 			_pBuf = new unsigned char[_blockSize];
@@ -241,7 +241,7 @@ namespace
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
 					if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt")));
-					rc += outLen;
+					rc += static_cast<int>(outLen);
 					output += outLen;
 					outputLength -= outLen;
 					_pos = 0;

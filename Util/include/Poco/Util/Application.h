@@ -520,7 +520,7 @@ inline Poco::Timespan Application::uptime() const
 		}									\
 		return pApp->run();					\
 	}
-#elif defined(POCO_VXWORKS)
+#elif defined(POCO_VXWORKS) && !defined(POCO_VXWORKS_RTP)
 	#define POCO_APP_MAIN(App) \
 	int pocoAppMain(const char* appName, ...) \
 	{ \

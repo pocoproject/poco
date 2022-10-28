@@ -20,6 +20,7 @@ using Poco::format;
 using Poco::BadCastException;
 using Poco::Int64;
 using Poco::UInt64;
+using Poco::Any;
 
 
 FormatTest::FormatTest(const std::string& name): CppUnit::TestCase(name)
@@ -453,6 +454,27 @@ void FormatTest::testIndex()
 }
 
 
+void FormatTest::testAny()
+{
+	Any a = 42;
+	std::string s(format("%d", a));
+	assertTrue (s == "42");
+
+	a = std::string("42");
+	s = format("%s", a);
+	assertTrue (s == "42");
+
+	a = 42.;
+	s = format("%f", a);
+	assertTrue (s.find("42.0") == 0);
+
+	s.clear();
+	std::vector<Any> av{ 42, std::string("42"), 42. };
+	format(s, "%d '%s' %f", av);
+	assertTrue (s.find("42 '42' 42.0") == 0);
+}
+
+
 void FormatTest::setUp()
 {
 }
@@ -476,6 +498,7 @@ CppUnit::Test* FormatTest::suite()
 	CppUnit_addTest(pSuite, FormatTest, testString);
 	CppUnit_addTest(pSuite, FormatTest, testMultiple);
 	CppUnit_addTest(pSuite, FormatTest, testIndex);
+	CppUnit_addTest(pSuite, FormatTest, testAny);
 
 	return pSuite;
 }
