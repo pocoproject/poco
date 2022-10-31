@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.11.5
+
+!!Summary of Changes
+
+  - GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+
+
 !!!Release 1.11.4
 
 !!Summary of Changes

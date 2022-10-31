@@ -1,5 +1,11 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.11.5 (2022-10-31)
+===========================
+
+- GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+
+
 Release 1.11.4 (2022-10-24)
 ===========================
 
