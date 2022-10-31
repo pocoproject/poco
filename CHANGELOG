@@ -3,7 +3,8 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.12.3 (2022-10-31)
 ===========================
 
-- TODO
+- GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+- GH #3852: SocketReactor - 100 % CPU usage on single-core system
 
 
 Release 1.12.3 (2022-10-24)
