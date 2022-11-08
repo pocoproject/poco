@@ -89,6 +89,9 @@ public:
 	Poco::Net::SocketAddress address() const;
 		/// Returns the address of the MongoDB server.
 
+    std::string uri() const;
+        /// Returns the uri on which the connection was made.
+
 	void connect(const std::string& hostAndPort);
 		/// Connects to the given MongoDB server.
 		///
@@ -146,6 +149,7 @@ protected:
 private:
 	Poco::Net::SocketAddress _address;
 	Poco::Net::StreamSocket _socket;
+    std::string _uri;
 };
 
 
@@ -156,6 +160,11 @@ inline Net::SocketAddress Connection::address() const
 {
 	return _address;
 }
+inline std::string Connection::uri() const
+{
+    return _uri;
+}
+
 
 
 } } // namespace Poco::MongoDB
