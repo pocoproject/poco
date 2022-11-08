@@ -143,142 +143,143 @@ void Connection::connect(const Poco::Net::StreamSocket& socket)
 }
 
 
-    void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
+void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
+{
+    std::vector<std::string> str_addresses;
+    std::string new_uri;
+
+    if (uri.find(',') != std::string::npos) {
+        size_t pos;
+        size_t head = 0;
+        if ((pos = uri.find("@")) != std::string::npos){
+            head = pos + 1;
+        } else if ((pos = uri.find("://")) != std::string::npos){
+            head = pos + 3;
+        }
+
+        std::string tempstr;
+        std::string::const_iterator it = uri.begin();
+        it += head;
+        size_t tail = head;
+        for (;it != uri.end() && *it != '?' && *it != '/'; ++it) {
+            tempstr += *it;
+            tail++;
+        }
+
+        it = tempstr.begin();
+        std::string token;
+        for (;it != tempstr.end(); ++it) {
+            if (*it == ','){
+                new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
+                str_addresses.push_back(new_uri);
+                token = "";
+            }else {
+                token += *it;
+            }
+        }
+        new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
+        str_addresses.push_back(new_uri);
+    }else{
+        str_addresses.push_back(uri);
+    }
+
+    new_uri = str_addresses.front();
+    Poco::URI theURI(new_uri);
+    if (theURI.getScheme() != "mongodb") throw Poco::UnknownURISchemeException(uri);
+
+    std::string userInfo = theURI.getUserInfo();
+
+    std::string databaseName = theURI.getPath();
+    if (!databaseName.empty() && databaseName[0] == '/') databaseName.erase(0, 1);
+    if (databaseName.empty()) databaseName = "admin";
+
+    bool ssl = false;
+    Poco::Timespan connectTimeout;
+    Poco::Timespan socketTimeout;
+    std::string authMechanism = Database::AUTH_SCRAM_SHA1;
+    std::string readPreference="primary";
+
+    Poco::URI::QueryParameters params = theURI.getQueryParameters();
+    for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
     {
-        std::vector<std::string> str_addresses;
-        std::string new_uri;
-
-        if (uri.find(',') != std::string::npos) {
-            size_t pos;
-            size_t head = 0;
-            if ((pos = uri.find("@")) != std::string::npos){
-                head = pos + 1;
-            } else if ((pos = uri.find("://")) != std::string::npos){
-                head = pos + 3;
-            }
-
-            std::string tempstr;
-            std::string::const_iterator it = uri.begin();
-            it += head;
-            size_t tail = head;
-            for (;it != uri.end() && *it != '?' && *it != '/'; ++it) {
-                tempstr += *it;
-                tail++;
-            }
-
-            it = tempstr.begin();
-            std::string token;
-            for (;it != tempstr.end(); ++it) {
-                if (*it == ','){
-                    new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
-                    str_addresses.push_back(new_uri);
-                    token = "";
-                }else {
-                    token += *it;
-                }
-            }
-            new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
-            str_addresses.push_back(new_uri);
-        }else{
-            str_addresses.push_back(uri);
-        }
-
-        new_uri = str_addresses.front();
-        Poco::URI theURI(new_uri);
-        if (theURI.getScheme() != "mongodb") throw Poco::UnknownURISchemeException(uri);
-
-        std::string userInfo = theURI.getUserInfo();
-
-        std::string databaseName = theURI.getPath();
-        if (!databaseName.empty() && databaseName[0] == '/') databaseName.erase(0, 1);
-        if (databaseName.empty()) databaseName = "admin";
-
-        bool ssl = false;
-        Poco::Timespan connectTimeout;
-        Poco::Timespan socketTimeout;
-        std::string authMechanism = Database::AUTH_SCRAM_SHA1;
-        std::string readPreference="primary";
-
-        Poco::URI::QueryParameters params = theURI.getQueryParameters();
-        for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
+        if (it->first == "ssl")
         {
-            if (it->first == "ssl")
-            {
-                ssl = (it->second == "true");
-            }
-            else if (it->first == "connectTimeoutMS")
-            {
-                connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
-            }
-            else if (it->first == "socketTimeoutMS")
-            {
-                socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
-            }
-            else if (it->first == "authMechanism")
-            {
-                authMechanism = it->second;
-            }
-            else if (it->first == "readPreference")
-            {
-                readPreference= it->second;
-                if (readPreference != "primary" or readPreference != "secondary"){
-                    throw Poco::InvalidArgumentException("read preference", readPreference);
-                }
-            }
+            ssl = (it->second == "true");
         }
-
-        for (std::vector<std::string>::const_iterator it = str_addresses.cbegin();it != str_addresses.cend(); ++it){
-            new_uri = *it;
-            Poco::URI theURI(new_uri);
-
-            std::string host = theURI.getHost();
-            Poco::UInt16 port = theURI.getPort();
-            if (port == 0) port = 27017;
-
-            connect(socketFactory.createSocket(host, port, connectTimeout, ssl));
-            _uri = new_uri;
-            if (socketTimeout > 0)
-            {
-                _socket.setSendTimeout(socketTimeout);
-                _socket.setReceiveTimeout(socketTimeout);
-            }
-            if (str_addresses.size() > 1) {
-                Poco::MongoDB::QueryRequest request("admin.$cmd");
-                request.setNumberToReturn(1);
-                request.selector().add("isMaster", 1);
-                Poco::MongoDB::ResponseMessage response;
-
-                sendRequest(request, response);
-                _uri = new_uri;
-                if (!response.documents().empty()) {
-                    Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-                    if (doc->get<bool>("ismaster") && readPreference == "primary") {
-                        break;
-                    } else if (readPreference == "secondary") {
-                        break;
-                    } else if (it + 1 == str_addresses.cend()) {
-                        throw Poco::URISyntaxException(uri);
-                    }
-                }
-            }
+        else if (it->first == "connectTimeoutMS")
+        {
+            connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
         }
-        if (!userInfo.empty()) {
-            std::string username;
-            std::string password;
-            std::string::size_type pos = userInfo.find(':');
-            if (pos != std::string::npos)
-            {
-                username.assign(userInfo, 0, pos++);
-                password.assign(userInfo, pos, userInfo.size() - pos);
+        else if (it->first == "socketTimeoutMS")
+        {
+            socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
+        }
+        else if (it->first == "authMechanism")
+        {
+            authMechanism = it->second;
+        }
+        else if (it->first == "readPreference")
+        {
+            readPreference= it->second;
+            if (readPreference != "primary" or readPreference != "secondary"){
+                throw Poco::InvalidArgumentException("read preference", readPreference);
             }
-            else username = userInfo;
-
-            Database database(databaseName);
-
-            if (!database.authenticate(*this, username, password, authMechanism))
-                throw Poco::NoPermissionException(Poco::format("Access to MongoDB database %s denied for user %s", databaseName, username));
         }
     }
+
+    for (std::vector<std::string>::const_iterator it = str_addresses.cbegin();it != str_addresses.cend(); ++it){
+        new_uri = *it;
+        Poco::URI theURI(new_uri);
+
+        std::string host = theURI.getHost();
+        Poco::UInt16 port = theURI.getPort();
+        if (port == 0) port = 27017;
+
+        connect(socketFactory.createSocket(host, port, connectTimeout, ssl));
+        _uri = new_uri;
+        if (socketTimeout > 0)
+        {
+            _socket.setSendTimeout(socketTimeout);
+            _socket.setReceiveTimeout(socketTimeout);
+        }
+        if (str_addresses.size() > 1) {
+            Poco::MongoDB::QueryRequest request("admin.$cmd");
+            request.setNumberToReturn(1);
+            request.selector().add("isMaster", 1);
+            Poco::MongoDB::ResponseMessage response;
+
+            sendRequest(request, response);
+            _uri = new_uri;
+            if (!response.documents().empty()) {
+                Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+                if (doc->get<bool>("ismaster") && readPreference == "primary") {
+                    break;
+                } else if (readPreference == "secondary") {
+                    break;
+                } else if (it + 1 == str_addresses.cend()) {
+                    throw Poco::URISyntaxException(uri);
+                }
+            }
+        }
+    }
+    if (!userInfo.empty()) {
+        std::string username;
+        std::string password;
+        std::string::size_type pos = userInfo.find(':');
+        if (pos != std::string::npos)
+        {
+            username.assign(userInfo, 0, pos++);
+            password.assign(userInfo, pos, userInfo.size() - pos);
+        }
+        else username = userInfo;
+
+        Database database(databaseName);
+
+        if (!database.authenticate(*this, username, password, authMechanism))
+            throw Poco::NoPermissionException(Poco::format("Access to MongoDB database %s denied for user %s", databaseName, username));
+    }
+}
+
 
 void Connection::disconnect()
 {
