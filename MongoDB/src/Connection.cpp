@@ -221,7 +221,7 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
         else if (it->first == "readPreference")
         {
             readPreference= it->second;
-            if (readPreference != "primary" or readPreference != "secondary"){
+            if (readPreference != "primary" and readPreference != "secondary"){
                 throw Poco::InvalidArgumentException("read preference", readPreference);
             }
         }
