@@ -5,7 +5,8 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  - TODO
+  - GH #3147: Reading from request stream hangs when "Transfer-Encoding: chunked" is used
+  - GH #3859: zlib headers not updated
 
 
 !!!Release 1.11.5

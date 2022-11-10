@@ -3,7 +3,8 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.11.6 (2022-11-??)
 ===========================
 
-- TODO
+- GH #3147: Reading from request stream hangs when "Transfer-Encoding: chunked" is used
+- GH #3859: zlib headers not updated
 
 
 Release 1.11.5 (2022-10-31)
