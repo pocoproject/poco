@@ -70,9 +70,14 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		while (ch != eof && ch != '\n') ch = _session.get();
 		unsigned chunk;
 		if (NumberParser::tryParseHex(chunkLen, chunk))
+		{
 			_chunk = (std::streamsize) chunk;
+		}
 		else
+		{
+			_chunk = -1;
 			return eof;
+		}
 	}
 	if (_chunk > 0)
 	{
@@ -81,12 +86,14 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (n > 0) _chunk -= n;
 		return n;
 	}
-	else 
+	else if (_chunk == 0)
 	{
 		int ch = _session.get();
 		while (ch != eof && ch != '\n') ch = _session.get();
+		_chunk = -1;
 		return 0;
 	}
+	else return eof;
 }
 
 
