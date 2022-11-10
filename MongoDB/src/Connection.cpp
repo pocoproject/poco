@@ -148,12 +148,16 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
     std::vector<std::string> str_addresses;
     std::string new_uri;
 
-    if (uri.find(',') != std::string::npos) {
+    if (uri.find(',') != std::string::npos)
+    {
         size_t pos;
         size_t head = 0;
-        if ((pos = uri.find("@")) != std::string::npos){
+        if ((pos = uri.find("@")) != std::string::npos)
+        {
             head = pos + 1;
-        } else if ((pos = uri.find("://")) != std::string::npos){
+        }
+        else if ((pos = uri.find("://")) != std::string::npos)
+        {
             head = pos + 3;
         }
 
@@ -161,25 +165,32 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
         std::string::const_iterator it = uri.begin();
         it += head;
         size_t tail = head;
-        for (;it != uri.end() && *it != '?' && *it != '/'; ++it) {
+        for (;it != uri.end() && *it != '?' && *it != '/'; ++it)
+        {
             tempstr += *it;
             tail++;
         }
 
         it = tempstr.begin();
         std::string token;
-        for (;it != tempstr.end(); ++it) {
-            if (*it == ','){
+        for (;it != tempstr.end(); ++it)
+        {
+            if (*it == ',')
+            {
                 new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
                 str_addresses.push_back(new_uri);
                 token = "";
-            }else {
+            }
+            else
+            {
                 token += *it;
             }
         }
         new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
         str_addresses.push_back(new_uri);
-    }else{
+    }
+    else
+    {
         str_addresses.push_back(uri);
     }
 
@@ -221,7 +232,8 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
         else if (it->first == "readPreference")
         {
             readPreference= it->second;
-            if (readPreference != "primary" and readPreference != "secondary"){
+            if (readPreference != "primary" && readPreference != "secondary")
+            {
                 throw Poco::InvalidArgumentException("read preference", readPreference);
             }
         }
@@ -242,7 +254,8 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
             _socket.setSendTimeout(socketTimeout);
             _socket.setReceiveTimeout(socketTimeout);
         }
-        if (str_addresses.size() > 1) {
+        if (str_addresses.size() > 1)
+        {
             Poco::MongoDB::QueryRequest request("admin.$cmd");
             request.setNumberToReturn(1);
             request.selector().add("isMaster", 1);
@@ -250,19 +263,26 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 
             sendRequest(request, response);
             _uri = new_uri;
-            if (!response.documents().empty()) {
+            if (!response.documents().empty())
+            {
                 Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-                if (doc->get<bool>("ismaster") && readPreference == "primary") {
+                if (doc->get<bool>("ismaster") && readPreference == "primary")
+                {
                     break;
-                } else if (readPreference == "secondary") {
+                }
+                else if (readPreference == "secondary")
+                {
                     break;
-                } else if (it + 1 == str_addresses.cend()) {
+                }
+                else if (it + 1 == str_addresses.cend())
+                {
                     throw Poco::URISyntaxException(uri);
                 }
             }
         }
     }
-    if (!userInfo.empty()) {
+    if (!userInfo.empty())
+    {
         std::string username;
         std::string password;
         std::string::size_type pos = userInfo.find(':');
