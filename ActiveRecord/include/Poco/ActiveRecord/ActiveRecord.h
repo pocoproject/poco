@@ -125,12 +125,14 @@ protected:
 
 	ID& mutableID();
 
-	void updateID(Poco::Data::Session& session);
+	void updateID(Poco::Data::Session& session, const std::string &table = {}, const std::string &idColumn = {});
 		/// Updates the ID using lastInsertID().
+	    /// Name of the table and the ID column is required for PostgreSQL.
 
-	static ID lastInsertID(Poco::Data::Session& session);
+	static ID lastInsertID(Poco::Data::Session &session, const std::string &table = {}, const std::string &idColumn = {});
 		/// Returns the last inserted ID from the database session.
 		/// Used for automatically incrementing keys.
+		/// Name of the table and the ID column is required for PostgreSQL.
 
 	template <typename T>
 	static Poco::AutoPtr<T> withContext(Poco::AutoPtr<T> pObj, Context::Ptr pContext)
@@ -230,14 +232,14 @@ inline std::string ActiveRecord<IDType>::toString() const
 
 
 template <typename IDType>
-void ActiveRecord<IDType>::updateID(Poco::Data::Session& session)
+void ActiveRecord<IDType>::updateID(Poco::Data::Session& session, const std::string &table, const std::string &idColumn)
 {
-	_id = lastInsertID(session);
+	_id = lastInsertID(session, table, idColumn);
 }
 
 
 template <typename IDType>
-IDType ActiveRecord<IDType>::lastInsertID(Poco::Data::Session& session)
+IDType ActiveRecord<IDType>::lastInsertID(Poco::Data::Session& session, const std::string& table, const std::string& idColumn)
 {
 	using namespace Poco::Data::Keywords;
 
@@ -249,14 +251,14 @@ IDType ActiveRecord<IDType>::lastInsertID(Poco::Data::Session& session)
 			into(id),
 			now;
 	}
-	else if (session.connector() == "PostgreSQL")
+	else if (session.connector() == "postgresql")
 	{
 		session
-			<< "SELECT currval('id_seq')",
+			<< "SELECT currval(pg_get_serial_sequence('" << table << "','" << idColumn << "'))",
 			into(id),
 			now;
 	}
-	else if (session.connector() == "MySQL")
+	else if (session.connector() == "mysql")
 	{
 		session
 			<< "SELECT LAST_INSERT_ID()",

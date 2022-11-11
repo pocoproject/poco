@@ -68,13 +68,13 @@ void CodeGenerator::writeHeaderComment(const std::string& fileName) const
 
 void CodeGenerator::writeInclude(const std::string& nameSpace, const std::string& name) const
 {
-	_stream << "#include \"";
+	_stream << "#include <";
 	auto ns = splitNameSpace(nameSpace);
 	for (const auto& s: ns)
 	{
 		_stream << s << '/';
 	}
-	_stream << name << ".h\"\n";
+	_stream << name << ".h>\n";
 }
 
 

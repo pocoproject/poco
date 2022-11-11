@@ -103,6 +103,7 @@ void Parser::endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLStr
 void Parser::handleProject(const Poco::XML::Attributes& attributes)
 {
 	_nameSpace = attributes.getValue("namespace"s);
+	_dllExport = attributes.getValue("dllexport"s);
 	_convertCamelCase = parseBool("convertCamelCase"s, attributes.getValue("convertCamelCase"s));
 }
 
@@ -111,6 +112,7 @@ void Parser::handleClass(const Poco::XML::Attributes& attributes)
 {
 	_class.name = attributes.getValue("name"s);
 	_class.nameSpace = _nameSpace;
+	_class.dllExport = _dllExport;
 	_class.table = attributes.getValue("table"s);
 	if (_class.table.empty()) _class.table = toDatabaseName(_class.name);
 	_class.key = attributes.getValue("key"s);
@@ -231,14 +233,14 @@ char Parser::parseCardinality(const std::string& cardinality) const
 }
 
 
-bool Parser::parseBool(const std::string& name, const std::string& value, bool deflt) const
+bool Parser::parseBool(const std::string& name, const std::string& value, bool defaultValue) const
 {
 	if (value == "true")
 		return true;
 	else if (value == "false")
 		return false;
 	else if (value.empty())
-		return deflt;
+		return defaultValue;
 	else throw Poco::InvalidArgumentException(Poco::format("%s: %s value must be 'true' or 'false'", name, where()));
 }
 

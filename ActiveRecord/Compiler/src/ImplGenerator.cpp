@@ -30,6 +30,7 @@ ImplGenerator::ImplGenerator(const std::string& source, std::ostream& stream, co
 
 void ImplGenerator::generate() const
 {
+	stream() << "#include \"pch.h\"\n\n";
 	writeHeaderComment(_class.name + ".cpp");
 	writeInclude(_class.nameSpace, _class.name);
 
@@ -37,7 +38,7 @@ void ImplGenerator::generate() const
 	{
 		if (keyType(_class) == "Poco::UUID")
 		{
-			stream() << "#include \"Poco/UUIDGenerator.h\"\n";
+			stream() << "#include <Poco/UUIDGenerator.h>\n";
 		}
 	}
 
@@ -224,7 +225,7 @@ void ImplGenerator::writeInsert() const
 		<< "\t\t<< \"INSERT INTO " << _class.table << " (";
 
 	bool needComma = false;
-	if (!_class.key.empty())
+	if (!_class.key.empty() && !_class.autoIncrementID)
 	{
 		stream() << keyProperty(_class).column;
 		needComma = true;
@@ -245,12 +246,9 @@ void ImplGenerator::writeInsert() const
 		<< "\t\t<< \"  VALUES (";
 
 	needComma = false;
-	if (!_class.key.empty())
+	if (!_class.key.empty() && !_class.autoIncrementID)
 	{
-		if (_class.autoIncrementID)
-			stream() << "NULL";
-		else
-			stream() << "\" << pSPP->next() << \"";
+		stream() << "\" << pSPP->next() << \"";
 		needComma = true;
 	}
 
@@ -276,7 +274,7 @@ void ImplGenerator::writeInsert() const
 
 	if (_class.autoIncrementID)
 	{
-		stream() << "\tupdateID(context()->session());\n";
+		stream() << "\tupdateID(context()->session(), \"" << _class.table << "\", \"" << keyProperty(_class).column << "\"); \n";
 	}
 
 	stream() << "}\n";

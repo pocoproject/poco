@@ -51,6 +51,7 @@ private:
 	const Poco::XML::Locator* _pLocator = nullptr;
 	bool _convertCamelCase = false;
 	std::string _nameSpace;
+	std::string _dllExport;
 	Class _class;
 	ClassMap _classes;
 	std::vector<std::string> _elemStack;
