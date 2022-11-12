@@ -63,7 +63,7 @@ int close(HANDLE h)
 class PollSetImpl
 {
 public:
-	using Mutex = Poco::SpinlockMutex;
+	using Mutex = Poco::FastMutex;
 	using ScopedLock = Mutex::ScopedLock;
 	using SocketMode = std::pair<Socket, int>;
 	using SocketMap = std::map<void*, SocketMode>;
@@ -163,6 +163,7 @@ public:
 		PollSet::SocketModeMap result;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+
 		ScopedLock lock(_mutex);
 		do
 		{

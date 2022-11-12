@@ -133,8 +133,10 @@ namespace
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
 			return Poco::Data::MetaColumn::FDT_BLOB;
+#ifdef POCO_MYSQL_JSON
 		case MYSQL_TYPE_JSON:
 			return Poco::Data::MetaColumn::FDT_JSON;
+#endif
 		default:
 			return Poco::Data::MetaColumn::FDT_UNKNOWN;
 		}

@@ -2,6 +2,36 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
+!!!Release 1.12.4
+
+!!Summary of Changes
+
+  - GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+  - GH #3852: SocketReactor - 100 % CPU usage on single-core system
+
+
+!!!Release 1.12.3
+
+!!Summary of Changes
+
+  - GH #3682: Including Any.h causes Compiler error on Visual Studio
+  - GH #3683: Poco::format receives empty Vector<Any>
+  - GH #3692: v1.12.0 and v1.12.1 Poco::Any compile problem
+  - GH #3723: DateTimeFormatter creates invalid ISO8601 string
+  - GH #3737: Poco EventImpl for Win32 breaks INFINITE wait
+  - GH #3744: bindImplLOB zero size (or NULL) HY104 "Invalid precision value"
+  - GH #3748: Poco 1.12.2 - Building DataMySQL still fails (issue #3689)
+  - GH #3753: Fix optional JSON support for MySQL
+  - GH #3763: Poco::Util::Application VxWorks main is incorrect
+  - GH #3769: Fixed converting/correcting pre-gregorian dates (#3723).
+  - GH #3795: aix system NumberFormatter.cpp build error
+  - GH #3805: Upgrade expat to 2.4.9
+  - GH #3814: Security Vulnerability identified in POCO version 1.12.2
+  - GH #3825: VS 2022 Net project missing ARM64 config
+  - GH #3834: SocketImpl::available()
+  - GH #3846: Upgrade bundled zlib to 1.2.13 [fixes CVE]
+  - GH #3847: Upgrade bundled SQLite to 3.39.4
+
 
 !!!Release 1.12.2
 
