@@ -145,8 +145,8 @@ void Connection::connect(const Poco::Net::StreamSocket& socket)
 
 void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 {
-    std::vector<std::string> str_addresses;
-    std::string new_uri;
+    std::vector<std::string> strAddresses;
+    std::string newURI;
 
     if (uri.find(',') != std::string::npos)
     {
@@ -177,8 +177,8 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
         {
             if (*it == ',')
             {
-                new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
-                str_addresses.push_back(new_uri);
+                newURI = uri.substr(0, head) + token + uri.substr(tail, uri.length());
+                strAddresses.push_back(newURI);
                 token = "";
             }
             else
@@ -186,16 +186,16 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
                 token += *it;
             }
         }
-        new_uri = uri.substr(0, head) + token + uri.substr(tail, uri.length());
-        str_addresses.push_back(new_uri);
+        newURI = uri.substr(0, head) + token + uri.substr(tail, uri.length());
+        strAddresses.push_back(newURI);
     }
     else
     {
-        str_addresses.push_back(uri);
+        strAddresses.push_back(uri);
     }
 
-    new_uri = str_addresses.front();
-    Poco::URI theURI(new_uri);
+    newURI = strAddresses.front();
+    Poco::URI theURI(newURI);
     if (theURI.getScheme() != "mongodb") throw Poco::UnknownURISchemeException(uri);
 
     std::string userInfo = theURI.getUserInfo();
@@ -239,22 +239,22 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
         }
     }
 
-    for (std::vector<std::string>::const_iterator it = str_addresses.cbegin();it != str_addresses.cend(); ++it){
-        new_uri = *it;
-        Poco::URI theURI(new_uri);
+    for (std::vector<std::string>::const_iterator it = strAddresses.cbegin();it != strAddresses.cend(); ++it){
+        newURI = *it;
+        Poco::URI theURI(newURI);
 
         std::string host = theURI.getHost();
         Poco::UInt16 port = theURI.getPort();
         if (port == 0) port = 27017;
 
         connect(socketFactory.createSocket(host, port, connectTimeout, ssl));
-        _uri = new_uri;
+        _uri = newURI;
         if (socketTimeout > 0)
         {
             _socket.setSendTimeout(socketTimeout);
             _socket.setReceiveTimeout(socketTimeout);
         }
-        if (str_addresses.size() > 1)
+        if (strAddresses.size() > 1)
         {
             Poco::MongoDB::QueryRequest request("admin.$cmd");
             request.setNumberToReturn(1);
@@ -262,7 +262,7 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
             Poco::MongoDB::ResponseMessage response;
 
             sendRequest(request, response);
-            _uri = new_uri;
+            _uri = newURI;
             if (!response.documents().empty())
             {
                 Poco::MongoDB::Document::Ptr doc = response.documents()[0];
@@ -274,7 +274,7 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
                 {
                     break;
                 }
-                else if (it + 1 == str_addresses.cend())
+                else if (it + 1 == strAddresses.cend())
                 {
                     throw Poco::URISyntaxException(uri);
                 }
