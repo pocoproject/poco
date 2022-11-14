@@ -30,7 +30,9 @@ ImplGenerator::ImplGenerator(const std::string& source, std::ostream& stream, co
 
 void ImplGenerator::generate() const
 {
-	stream() << "#include \"pch.h\"\n\n";
+	if (!_class.precompiledHeader.empty())
+		stream() << "#include \"" << _class.precompiledHeader <<"\"\n\n";
+
 	writeHeaderComment(_class.name + ".cpp");
 	writeInclude(_class.nameSpace, _class.name);
 
@@ -274,7 +276,7 @@ void ImplGenerator::writeInsert() const
 
 	if (_class.autoIncrementID)
 	{
-		stream() << "\tupdateID(context()->session(), \"" << _class.table << "\", \"" << keyProperty(_class).column << "\"); \n";
+		stream() << "\tupdateID(context()->session(), \"" << _class.table << "\"s, \"" << keyProperty(_class).column << "\"s); \n";
 	}
 
 	stream() << "}\n";

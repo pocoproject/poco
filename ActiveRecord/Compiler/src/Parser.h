@@ -52,6 +52,7 @@ private:
 	bool _convertCamelCase = false;
 	std::string _nameSpace;
 	std::string _dllExport;
+	std::string _precompiledHeader;
 	Class _class;
 	ClassMap _classes;
 	std::vector<std::string> _elemStack;

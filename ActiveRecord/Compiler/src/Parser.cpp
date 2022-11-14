@@ -104,6 +104,7 @@ void Parser::handleProject(const Poco::XML::Attributes& attributes)
 {
 	_nameSpace = attributes.getValue("namespace"s);
 	_dllExport = attributes.getValue("dllexport"s);
+	_precompiledHeader = attributes.getValue("precompiledHeader"s);
 	_convertCamelCase = parseBool("convertCamelCase"s, attributes.getValue("convertCamelCase"s));
 }
 
@@ -113,6 +114,7 @@ void Parser::handleClass(const Poco::XML::Attributes& attributes)
 	_class.name = attributes.getValue("name"s);
 	_class.nameSpace = _nameSpace;
 	_class.dllExport = _dllExport;
+	_class.precompiledHeader = _precompiledHeader;
 	_class.table = attributes.getValue("table"s);
 	if (_class.table.empty()) _class.table = toDatabaseName(_class.name);
 	_class.key = attributes.getValue("key"s);
