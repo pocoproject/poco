@@ -90,6 +90,9 @@ public:
 		/// Creates an UpdateRequest.
 		/// The collectionname must not contain the database name.
 
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
+		/// Creates OpMsgMessage.
+
 	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
 		const std::string& collection,
 		const std::string& indexName,
@@ -180,6 +183,13 @@ inline Poco::SharedPtr<Poco::MongoDB::UpdateRequest>
 Database::createUpdateRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
+}
+
+
+inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
+Database::createOpMsgMessage(const std::string& collectionName) const
+{
+	return new Poco::MongoDB::OpMsgMessage(_dbname, collectionName);
 }
 
 

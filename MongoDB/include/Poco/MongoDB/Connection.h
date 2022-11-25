@@ -23,6 +23,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/ResponseMessage.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
 
 
 namespace Poco {
@@ -139,6 +140,10 @@ public:
 		///
 		/// Use this when a response is expected: only a "query" or "getmore"
 		/// request will return a response.
+
+	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
+		/// Sends a request to the MongoDB server and receives the response
+		/// using newer wire protocol with OP_MSG which always returns response.
 
 protected:
 	void connect();

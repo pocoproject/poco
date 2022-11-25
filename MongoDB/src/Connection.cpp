@@ -232,4 +232,14 @@ void Connection::sendRequest(RequestMessage& request, ResponseMessage& response)
 }
 
 
+void Connection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
+{
+	Poco::Net::SocketOutputStream sos(_socket);
+	request.send(sos);
+
+	Poco::Net::SocketInputStream sis(_socket);
+	response.read(sis);
+}
+
+
 } } // Poco::MongoDB
