@@ -17,6 +17,7 @@
 #include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Binary.h"
@@ -294,33 +295,135 @@ void MongoDBTest::testCursorRequest()
 	_mongo->sendRequest(drop, responseDrop);
 }
 
-
 void MongoDBTest::testBuildInfo()
 {
-	Poco::MongoDB::QueryRequest request("team.$cmd");
-	request.setNumberToReturn(1);
-	request.selector().add("buildInfo", 1);
+	// build info can be issued on "config" system database
 
-	Poco::MongoDB::ResponseMessage response;
-
+	Poco::MongoDB::Database db("config");
 	try
 	{
-		_mongo->sendRequest(request, response);
+		Poco::MongoDB::Document::Ptr doc = db.queryBuildInfo(*_mongo);
+		std::cout << doc->toString(2);
 	}
 	catch(Poco::NotImplementedException& nie)
 	{
 		std::cout << nie.message() << std::endl;
-		return;
 	}
+}
 
-	if ( response.documents().size() > 0 )
+void MongoDBTest::testHello()
+{
+	Poco::MongoDB::Database db("config");
+	try
 	{
-		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		Poco::MongoDB::Document::Ptr doc = db.queryServerHello(*_mongo);
 		std::cout << doc->toString(2);
 	}
-	else
+	catch(Poco::NotImplementedException& nie)
 	{
-		fail("Didn't get a response from the buildinfo command");
+		std::cout << nie.message() << std::endl;
+	}
+}
+
+
+void MongoDBTest::testOpCmdWriteRead()
+{
+	Poco::MongoDB::Database db("abc");
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("col");
+	request->setCommandName(Poco::MongoDB::OpMsgMessage::CMD_INSERT);
+
+	Poco::MongoDB::Document::Ptr doc = new Poco::MongoDB::Document();
+	doc->add("name", "John").add("number", -2);
+	request->documents().push_back(doc);
+
+	doc = new Poco::MongoDB::Document();
+	doc->add("name", "Franz").add("number", -2.8);
+	request->documents().push_back(doc);
+
+	try
+	{
+		Poco::MongoDB::OpMsgMessage response;
+
+		std::stringstream ss;
+		request->send(ss);
+
+		ss.seekg(0, std::ios_base::beg);
+		response.read(ss);
+
+		std::cout << response.body().toString(2);
+		for (const auto& doc: response.documents())
+		{
+			std::cout << doc->toString(2);
+		}
+	}
+	catch(Poco::NotImplementedException& nie)
+	{
+		std::cout << nie.message() << std::endl;
+	}
+}
+
+
+void MongoDBTest::testOpCmdHello()
+{
+	Poco::MongoDB::Database db("config");
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> helloRequest = db.createOpMsgMessage("1");
+	helloRequest->setCommandName(Poco::MongoDB::OpMsgMessage::CMD_HELLO);
+
+	try
+	{
+		Poco::MongoDB::OpMsgMessage response;
+		_mongo->sendRequest(*helloRequest, response);
+		std::cout << response.body().toString(2);
+	}
+	catch(Poco::NotImplementedException& nie)
+	{
+		std::cout << nie.message() << std::endl;
+	}
+}
+
+
+void MongoDBTest::testOpCmdInsert()
+{
+	Poco::MongoDB::Database db("abc");
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> insertRequest = db.createOpMsgMessage("col");
+	insertRequest->setCommandName(Poco::MongoDB::OpMsgMessage::CMD_INSERT);
+
+	Poco::MongoDB::Document::Ptr doc = new Poco::MongoDB::Document();
+	doc->add("name", "John").add("number", -2);
+	insertRequest->documents().push_back(doc);
+
+	doc = new Poco::MongoDB::Document();
+	doc->add("name", "Franz").add("number", -2.8);
+	insertRequest->documents().push_back(doc);
+
+	try
+	{
+		Poco::MongoDB::OpMsgMessage response;
+		_mongo->sendRequest(*insertRequest, response);
+		std::cout << response.body().toString(2);
+	}
+	catch(Poco::NotImplementedException& nie)
+	{
+		std::cout << nie.message() << std::endl;
+	}
+}
+
+
+void MongoDBTest::testOpCmdFind()
+{
+	Poco::MongoDB::Database db("abc");
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> findRequest = db.createOpMsgMessage("col");
+	findRequest->setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
+
+	try
+	{
+		Poco::MongoDB::OpMsgMessage response;
+		_mongo->sendRequest(*findRequest, response);
+		std::cout << response.body().toString(2);
+	}
+	catch(Poco::NotImplementedException& nie)
+	{
+		std::cout << nie.message() << std::endl;
 	}
 }
 
@@ -507,6 +610,14 @@ CppUnit::Test* MongoDBTest::suite()
 	}
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
+	CppUnit_addTest(pSuite, MongoDBTest, testHello);
+
+	CppUnit_addTest(pSuite, MongoDBTest, testOpCmdWriteRead);
+	CppUnit_addTest(pSuite, MongoDBTest, testOpCmdHello);
+	CppUnit_addTest(pSuite, MongoDBTest, testOpCmdInsert);
+	CppUnit_addTest(pSuite, MongoDBTest, testOpCmdFind);
+
+#if false
 	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testArray);
 	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
@@ -521,5 +632,6 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testUUID);
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectURI);
+#endif
 	return pSuite;
 }

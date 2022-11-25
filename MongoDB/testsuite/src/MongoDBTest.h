@@ -35,6 +35,13 @@ public:
 	void testDBCount2Command();
 	void testDeleteRequest();
 	void testBuildInfo();
+	void testHello();
+
+	void testOpCmdWriteRead();
+	void testOpCmdHello();
+	void testOpCmdInsert();
+	void testOpCmdFind();
+
 	void testConnectionPool();
 	void testCursorRequest();
 	void testObjectID();
