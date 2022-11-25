@@ -56,6 +56,12 @@ public:
 		/// May throw a Poco::ProtocolException if authentication fails for a reason other than
 		/// invalid credentials.
 
+	Document::Ptr queryBuildInfo(Connection& connection) const;
+			/// Queries server build info
+
+	Document::Ptr queryServerHello(Connection& connection) const;
+			/// Queries hello response from server
+
 	Int64 count(Connection& connection, const std::string& collectionName) const;
 		/// Sends a count request for the given collection to MongoDB.
 		///
@@ -107,6 +113,27 @@ public:
 
 	static const std::string AUTH_SCRAM_SHA1;
 		/// Default authentication mechanism for MongoDB 3.0.
+	
+	enum WireVersion
+		/// Wire version as reported by the command hello.
+		/// See details in MongoDB github, repository specifications.
+		/// @see queryServerHello
+	{
+		VER_26		= 1,
+		VER_26_2	= 2,
+		VER_30		= 3,
+		VER_32		= 4,
+		VER_34		= 5,
+		VER_36		= 6, ///< First wire version that supports OP_MSG
+		VER_40		= 7,
+		VER_42		= 8,
+		VER_44		= 9,
+		VER_50		= 13,
+		VER_51		= 14, ///< First wire version that supports only OP_MSG
+		VER_52		= 15,
+		VER_53		= 16,
+		VER_60		= 17
+	};
 
 protected:
 	bool authCR(Connection& connection, const std::string& username, const std::string& password);
