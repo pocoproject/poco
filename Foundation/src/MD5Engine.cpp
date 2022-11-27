@@ -129,10 +129,16 @@ const DigestEngine::Digest& MD5Engine::digest()
 
 	/* Store state in digest */
 	unsigned char digest[16];
-	encode(digest, _context.state, 16);
+	encode(digest, _context.state, sizeof(digest));
 	_digest.clear();
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
-
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic pop
+#endif
 	/* Zeroize sensitive information. */
 	std::memset(&_context, 0, sizeof (_context));
 	reset();

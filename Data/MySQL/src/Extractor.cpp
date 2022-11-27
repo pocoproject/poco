@@ -128,12 +128,16 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 	//mysql reports TEXT types as FDT_BLOB when being extracted
 	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
+#ifdef POCO_MYSQL_JSON
 	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB && columnType != Poco::Data::MetaColumn::FDT_JSON)
+#else
+	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB)
+#endif
 		throw MySQLException("Extractor: not a string");
-
+#ifdef POCO_MYSQL_JSON
 	if (columnType == Poco::Data::MetaColumn::FDT_JSON && !extractJSON(pos))
 		return false;
-
+#endif
 	if (columnType == Poco::Data::MetaColumn::FDT_BLOB && !extractLongLOB(pos))
 		return false;
 
@@ -291,6 +295,7 @@ bool Extractor::extractLongLOB(std::size_t pos)
 	return true;
 }
 
+#ifdef POCO_MYSQL_JSON
 bool Extractor::extractJSON(std::size_t pos)
 {
 	// JSON columns are fetched with a zero-length
@@ -306,6 +311,7 @@ bool Extractor::extractJSON(std::size_t pos)
 
 	return true;
 }
+#endif
 
 //////////////
 // Not implemented

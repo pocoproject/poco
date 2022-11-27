@@ -45,3 +45,16 @@ The following naming conventions are used:
 are placed in the <*lib64*> directory. DLLs are placed in <*bin*> (32-bit)
 or <*bin64*> (64-bit). 64-bit DLLs are named PocoLIB64.dll for release
 and PocoLIB64d.dll for debug, respectively.
+
+
+!!MSVC Compiler Notes
+
+!!!C++ standard version not properly defined
+
+In order to work around that, `/Zc:__cplusplus` compiler flag is necesary.
+
+See the following issues for details and explanations:
+
+  * https://github.com/pocoproject/poco/issues/3665
+  * https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
+

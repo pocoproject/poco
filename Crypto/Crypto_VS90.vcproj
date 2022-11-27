@@ -654,6 +654,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Crypto\EVPCipherImpl.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Crypto\EVPPKey.h"
 					>
 				</File>
@@ -675,6 +679,10 @@
 				>
 				<File
 					RelativePath=".\src\CryptoException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EVPCipherImpl.cpp"
 					>
 				</File>
 				<File
@@ -733,6 +741,10 @@
 					RelativePath=".\include\Poco\Crypto\ECKeyImpl.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\Poco\Crypto\Envelope.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -747,6 +759,10 @@
 				</File>
 				<File
 					RelativePath=".\src\ECKeyImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Envelope.cpp"
 					>
 				</File>
 			</Filter>

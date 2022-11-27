@@ -184,9 +184,14 @@ void PollSetTest::testTimeout()
 	sw.stop();
 	assertTrue(ps.poll(timeout).size() == 1);
 
-	// just here to prevent server exception on connection reset
 	char buffer[5];
 	ss.receiveBytes(buffer, sizeof(buffer));
+
+	sw.restart();
+	sm = ps.poll(timeout);
+	sw.stop();
+	assertTrue(sm.empty());
+	assertTrue(sw.elapsed() >= 900000);
 }
 
 

@@ -22,6 +22,17 @@ jobs:
           EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
           ./ci/runtests.sh
 
+  linux-gcc-make-cxx20:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: >-
+          sudo -s
+          EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
+          ./ci/runtests.sh
+
   linux-gcc-make-asan:
     runs-on: ubuntu-20.04
     services:
@@ -99,7 +110,7 @@ jobs:
           make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
   macos-clang-make:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -111,7 +122,7 @@ jobs:
           ./ci/runtests.sh
 
   macos-clang-cmake:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -124,7 +135,7 @@ jobs:
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -147,6 +158,38 @@ jobs:
       - run: >-
           cd cmake-build;
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+          
+  windows-2019-msvc-buildwin-x64:
+    runs-on: windows-2019
+    env:
+      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+    steps:
+      - uses: actions/checkout@v2
+      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+      
+#  windows-2019-msvc-buildwin-win32:
+#    runs-on: windows-2019
+#    env:
+#      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+#    steps:
+#      - uses: actions/checkout@v2
+#      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+
+  windows-2022-msvc-buildwin-x64:
+    runs-on: windows-2022
+    env:
+      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+    steps:
+      - uses: actions/checkout@v2
+      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+
+#  windows-2022-msvc-buildwin-win32:
+#    runs-on: windows-2022
+#    env:
+#      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+#    steps:
+#      - uses: actions/checkout@v2
+#      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
   windows-2022-msvc-cmake-2022:
     runs-on: windows-2022
