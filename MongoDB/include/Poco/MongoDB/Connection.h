@@ -143,7 +143,18 @@ public:
 
 	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
 		/// Sends a request to the MongoDB server and receives the response
-		/// using newer wire protocol with OP_MSG which always returns response.
+		/// using newer wire protocol with OP_MSG.
+
+	void sendRequest(OpMsgMessage& request);
+		/// Sends an unacknowledged request to the MongoDB server using newer
+		/// wire protocol with OP_MSG.
+		/// No response is sent by the server.
+
+	void readResponse(OpMsgMessage& response);
+		/// Reads additional response data when previous message's flag moreToCome
+		/// indicates that server will send more data.
+		/// NOTE: See comments in OpMsgCursor code.
+
 
 protected:
 	void connect();

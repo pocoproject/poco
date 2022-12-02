@@ -81,28 +81,50 @@ public:
 			/// Client is prepared for multiple replies (using the moreToCome bit) to this request
 	};
 
-    OpMsgMessage();
-        /// Creates an OpMsgMessage for response.
+	OpMsgMessage();
+		/// Creates an OpMsgMessage for response.
 
-	OpMsgMessage(const std::string& databaseName, const std::string& collectionName);
+	OpMsgMessage(const std::string& databaseName, const std::string& collectionName, UInt32 flags = MSG_FLAGS_DEFAULT);
 		/// Creates an OpMsgMessage for requests.
 
-#if false
-    OpMsgMessage(const Int64& cursorID);
-        /// Creates an OpMsgMessage for existing cursor ID.
-#endif
+	virtual ~OpMsgMessage();
 
-    virtual ~OpMsgMessage();
+	const std::string& databaseName() const;
 
-    void setCommandName(const std::string& command);
-    	/// Sets the command name and clears the command document
+	const std::string& collectionName() const;	
 
-    Document& body();
-    	/// Access to body document.
-    	/// Additional query arguments shall be added after setting the command name.
+	void setCommandName(const std::string& command);
+		/// Sets the command name and clears the command document
 
-    Document::Vector& documents();
-    	/// Documents prepared for request or retrieved in response.
+	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
+		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
+
+	const std::string& commandName() const;
+		/// Current command name.
+
+	void setAcknowledgedRequest(bool ack);
+		/// Set false to create request that does not return response. 
+		/// It has effect only for commands that write or delete documents.
+		/// Default is true (request returns acknowledge response).
+
+	bool acknowledgedRequest() const;
+
+	UInt32 flags() const;
+
+	Document& body();
+		/// Access to body document.
+		/// Additional query arguments shall be added after setting the command name.
+
+	const Document& body() const;
+
+	Document::Vector& documents();
+		/// Documents prepared for request or retrieved in response.
+
+	const Document::Vector& documents() const;
+		/// Documents prepared for request or retrieved in response.
+
+	bool responseOk() const;
+		/// Reads "ok" status from the response message.
 
 	void clear();
 		/// Clears the message.
@@ -121,13 +143,14 @@ private:
 		PAYLOAD_TYPE_1	= 1
 	};
 
-	const std::string	_databaseName;
-	const std::string	_collectionName;
-	std::string 		_commandName;
-	Flags       		_flags { MSG_FLAGS_DEFAULT };
+	std::string			_databaseName;
+	std::string			_collectionName;
+	UInt32				_flags { MSG_FLAGS_DEFAULT };
+	std::string			_commandName;
+	bool				_acknowledged {true};
 
-	Document    		_body;
-	Document::Vector    _documents;
+	Document			_body;
+	Document::Vector	_documents;
 
 };
 

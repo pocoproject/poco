@@ -237,9 +237,25 @@ void Connection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
 	Poco::Net::SocketOutputStream sos(_socket);
 	request.send(sos);
 
+	response.clear();
+	readResponse(response);
+}
+
+
+void Connection::sendRequest(OpMsgMessage& request)
+{
+	request.setAcknowledgedRequest(false);
+	Poco::Net::SocketOutputStream sos(_socket);
+	request.send(sos);
+}
+
+
+void Connection::readResponse(OpMsgMessage& response)
+{
 	Poco::Net::SocketInputStream sis(_socket);
 	response.read(sis);
 }
+
 
 
 } } // Poco::MongoDB
