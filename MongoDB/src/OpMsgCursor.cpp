@@ -108,21 +108,22 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 	}
 	else
 	{
-		_response.clear();
-		_query.setCursor(_cursorID, _batchSize);
-		connection.sendRequest(_query, _response);
-	}
-
 #if _MONGODB_EXHAUST_ALLOWED_WORKS
-	std::cout << "Response flags: " << _response.flags() << std::endl;
-
-	while (_response.flags() & OpMsgMessage::MSG_MORE_TO_COME)
-	{
-		std::cout << "More to come. Reading more response: " << std::endl;
-		_response.body().clear();
-		connection.readResponse(_response);
+		std::cout << "Response flags: " << _response.flags() << std::endl;
+		if (_response.flags() & OpMsgMessage::MSG_MORE_TO_COME)
+		{
+			std::cout << "More to come. Reading more response: " << std::endl;
+			_response.clear();
+			connection.readResponse(_response);
+		}
+		else
+#endif		
+		{
+			_response.clear();
+			_query.setCursor(_cursorID, _batchSize);
+			connection.sendRequest(_query, _response);
+		}
 	}
-#endif
 
 	const auto& rdoc = _response.body();
 	_cursorID = cursorIdFromResponse(rdoc);
