@@ -338,7 +338,8 @@ void BinaryWriter::writeCString(const char* cString, std::streamsize maxLength)
 {
 	const std::size_t len = ::strnlen(cString, maxLength);
 	writeRaw(cString, len);
-	_ostr << '\0';
+	static const char zero = '\0';
+	_ostr.write(&zero, sizeof(zero));
 }
 
 
