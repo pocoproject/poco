@@ -132,6 +132,9 @@ public:
 	static Command incr(const std::string& key, Int64 by = 0);
 		/// Creates and returns an INCR or INCRBY command. Calls INCR when by is omitted or zero.
 
+	static Command keys(const std::string& pattern);
+		/// Creates and returns a KEYS command.
+
 	static Command lindex(const std::string& list, Int64 index = 0);
 		/// Creates and returns a LINDEX command.
 

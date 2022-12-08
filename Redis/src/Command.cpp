@@ -269,6 +269,16 @@ Command Command::hvals(const std::string& hash)
 }
 
 
+Command Command::keys(const std::string& pattern)
+{
+	Command cmd("KEYS");
+
+	cmd << pattern;
+
+	return cmd;
+}
+
+
 Command Command::incr(const std::string& key, Int64 by)
 {
 	Command cmd(by == 0 ? "INCR" : "INCRBY");
