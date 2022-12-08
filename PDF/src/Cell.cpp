@@ -104,13 +104,13 @@ void Cell::draw(Page& page, float x, float y, float width, float height)
 				else if (_trueType) page.setTTFont((*_pFontMap)[AttributedString::STYLE_PLAIN], fontSize, _encoding);
 				else                page.setFont((*_pFontMap)[AttributedString::STYLE_PLAIN], fontSize, _encoding);
 			}
-			else if (fontStyle | AttributedString::STYLE_BOLD)
+			else if (fontStyle & AttributedString::STYLE_BOLD)
 			{
 				if (!_pFontMap)     page.setFont("Helvetica-Bold", fontSize);
 				else if (_trueType) page.setTTFont((*_pFontMap)[AttributedString::STYLE_BOLD], fontSize, _encoding);
 				else                page.setFont((*_pFontMap)[AttributedString::STYLE_BOLD], fontSize, _encoding);
 			}
-			else if (fontStyle | AttributedString::STYLE_ITALIC)
+			else if (fontStyle & AttributedString::STYLE_ITALIC)
 			{
 				if (!_pFontMap)     page.setFont("Helvetica-Oblique", fontSize);
 				else if (_trueType) page.setTTFont((*_pFontMap)[AttributedString::STYLE_ITALIC], fontSize, _encoding);
