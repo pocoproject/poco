@@ -1,10 +1,13 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.11.6 (2022-11-??)
+Release 1.11.6 (2022-12-08)
 ===========================
 
 - GH #3147: Reading from request stream hangs when "Transfer-Encoding: chunked" is used
 - GH #3859: zlib headers not updated
+- GH #3876: Replace sprintf with snprintf in Environment and NumberFormatter to avoid deprecation warnings
+- Build system improvements for Xcode on Apple Silicon.
+- Upgrade bundled SQLite to 3.40.0
 
 
 Release 1.11.5 (2022-10-31)
