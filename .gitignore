@@ -30,6 +30,7 @@ coverage/
 # NuGet #
 #########
 *.nupkg
+*.snupkg
 
 # WiX #
 #######
