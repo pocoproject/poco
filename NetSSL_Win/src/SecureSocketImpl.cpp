@@ -1223,7 +1223,7 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 							NULL,
 							_pPeerCertificate,
 							NULL,
-							NULL,
+							pServerCert->hCertStore,
 							&chainPara,
 							0,
 							NULL,
