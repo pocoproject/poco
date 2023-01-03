@@ -24,8 +24,7 @@ Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
 {
 	poco_check_ptr(_pCipher);
 	poco_check_ptr(_pCtx);
-	if (1 != EVP_CIPHER_CTX_init(_pCtx))
-		handleErrors(std::string("Envelope():EVP_CIPHER_CTX_init()"));
+	EVP_CIPHER_CTX_init(_pCtx);
 	_iv.resize(ivSize(), 0);
 }
 
