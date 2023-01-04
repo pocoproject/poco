@@ -26,7 +26,9 @@
 #endif
 
 // disable min/max macros
-#define NOMINMAX
+#if !defined(NOMINMAX)
+    #define NOMINMAX
+#endif
 
 #if !defined(POCO_NO_WINDOWS_H)
     #include <windows.h>
