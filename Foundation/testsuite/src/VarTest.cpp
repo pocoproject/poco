@@ -2291,7 +2291,7 @@ void VarTest::testDynamicStructEmptyString()
 	DynamicStruct aStruct;
 	aStruct["Empty"] = "";
 	aStruct["Space"] = " ";
-	assertEqual(aStruct.toString(false), "{ \"Empty\": \"\", \"Space\": \" \" }");
+	assertEqual(aStruct.toString(true), "{ \"Empty\": \"\", \"Space\": \" \" }");
 }
 
 
