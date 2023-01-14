@@ -51,6 +51,43 @@ code contained in the source file to the client, as well as the C++ code fragmen
 in between the Scriptlet tags.
 
 
+!!!Rendering to a Stream
+
+Set <[stringify]> to <[true]> to generate a public <[stringify()]> member
+function. It renders the page content to any output stream, allowing a template
+to generate HTML for e-mail, for example.
+The HTTP handler also calls this function to render its response body.
+
+    <%@ page class="MailHandler" stringify="true" form="false" %>
+    <p>Hello!</p>
+----
+
+The generated class can then be used with <[std::ostringstream]> (include <[<sstream>]>):
+
+    MailHandler handler;
+    std::ostringstream stream;
+    handler.stringify(stream);
+    std::string html = stream.str();
+----
+
+With <[form=false]>, the signature is <[void stringify(std::ostream& responseStream)]>.
+With <[form=true]> (the default), it is
+<[void stringify(std::ostream& responseStream, Poco::Net::HTMLForm& form)]>.
+Body scriptlets can use the supplied <[form]>. For standalone rendering, include
+<[Poco/Net/HTMLForm.h]>, construct and populate a <[Poco::Net::HTMLForm]> yourself,
+and call <[handler.stringify(stream, form)]>. The HTTP handler passes its existing form.
+
+<[stringify]> defaults to <[false]> so existing pages retain their scriptlet scope.
+When enabled, body scriptlets and expressions must not depend on the implicit
+<[request]>, <[response]> or OSP <[session]> objects, or on local variables
+from pre-response scriptlets. Setting <[form=false]> alone does not enable
+stream rendering or establish that the body is independent of HTTP.
+
+Pre-response scriptlets, form and session setup, headers and other HTTP processing
+remain in <[handleRequest()]> and are not executed by <[stringify()]>.
+The <[escape]> option applies to stream rendering as usual.
+
+
 !!!C++ Server Page Syntax
 
 The following special tags are supported in a C++ server page (CPSP) file.
