@@ -260,6 +260,35 @@ void TimerTest::testCancelAllWaitStop()
 }
 
 
+void TimerTest::testMultiCancelAllWaitStop()
+{
+	Timer timer;
+
+	// We will schedule a task and wait for it to start.
+	// After that we will schedule 2 cancel Notifications, one async and the other sync.
+	// But we want to make sure that both are scheduled and present in internal queue, thus we need to wait for this
+	// first task to start.
+	Poco::Event startEvent;
+	Poco::Event canceledScheduledEvent;
+	timer.schedule(Timer::func([&startEvent, &canceledScheduledEvent]()
+	{
+		startEvent.set();
+		canceledScheduledEvent.wait();
+		Poco::Thread::sleep(100);
+	}), Poco::Clock());
+	// We wait for simple task to start.
+	startEvent.wait();
+	// Schedule async cancel notification.
+	timer.cancel();
+	// Now allow simple task to proceed to sleep, in other words give time for next cancel to block.
+	canceledScheduledEvent.set();
+	// Schedule sync cancel, now we should have 2 cancel notifications in internal queue.
+	timer.cancel(true);
+
+	assertTrue (true); // don't hang
+}
+
+
 void TimerTest::testFunc()
 {
 	Timer timer;
@@ -305,6 +334,7 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testCancel);
 	CppUnit_addTest(pSuite, TimerTest, testCancelAllStop);
 	CppUnit_addTest(pSuite, TimerTest, testCancelAllWaitStop);
+	CppUnit_addTest(pSuite, TimerTest, testMultiCancelAllWaitStop);
 	CppUnit_addTest(pSuite, TimerTest, testFunc);
 
 	return pSuite;
