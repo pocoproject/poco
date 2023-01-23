@@ -119,50 +119,50 @@ int ProcessHandle::tryWait() const
 //
 // Process
 //
-ProcessHandle Process::launch(const std::string& command, const Args& args)
+ProcessHandle Process::launch(const std::string& command, const Args& args, int options)
 {
 	std::string initialDirectory;
 	Env env;
-	return ProcessHandle(launchImpl(command, args, initialDirectory, 0, 0, 0, env));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, 0, 0, 0, env, options));
 }
 
 
-ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory)
+ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, int options)
 {
 	Env env;
-	return ProcessHandle(launchImpl(command, args, initialDirectory, 0, 0, 0, env));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, 0, 0, 0, env, options));
 }
 
 
-ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, int options)
 {
 	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
 	std::string initialDirectory;
 	Env env;
-	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options));
 }
 
 
-ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, int options)
 {
 	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
 	Env env;
-	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options));
 }
 
 
-ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const Env& env)
+ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const Env& env, int options)
 {
 	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
 	std::string initialDirectory;
-	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options));
 }
 
 
-ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const Env& env)
+ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const Env& env, int options)
 {
 	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
-	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options));
 }
 
 
