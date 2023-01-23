@@ -13,6 +13,10 @@ POCO_MYSQL_INCLUDE = /usr/local/opt/mysql-client/include
 else
 ifeq (0, $(shell test -d /opt/homebrew/opt/mysql-client/include; echo $$?))
 POCO_MYSQL_INCLUDE = /opt/homebrew/opt/mysql-client/include
+else
+ifeq (0, $(shell test -d /usr/include/mariadb; echo $$?))
+POCO_MYSQL_INCLUDE = /usr/include/mariadb
+endif
 endif
 endif
 endif
