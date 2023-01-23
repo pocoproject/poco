@@ -14,7 +14,7 @@
 
 #include "Poco/Timezone.h"
 #include "Poco/Exception.h"
-#include "Poco/Mutex.h"
+#include <mutex>
 #include <ctime>
 
 
@@ -31,7 +31,7 @@ public:
 
 	int timeZone()
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID // no timezone global var
 		std::time_t now = std::time(NULL);
@@ -50,14 +50,14 @@ public:
 
 	const char* name(bool dst)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		tzset();
 		return tzname[dst ? 1 : 0];
 	}
 
 private:
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 };
 
 
