@@ -19,7 +19,6 @@
 
 #include "Poco/Data/MySQL/MySQLException.h"
 #include "Poco/NumberFormatter.h"
-#include <mysql/mysql.h>
 
 
 namespace Poco {
