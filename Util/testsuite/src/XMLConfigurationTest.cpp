@@ -300,6 +300,27 @@ void XMLConfigurationTest::testLoadEmpty()
 }
 
 
+void XMLConfigurationTest::testManyKeys()
+{
+	std::ostringstream ostr;
+	ostr << "<config>\n";
+	const size_t count = 200000;
+	for (size_t i = 0; i < count; ++i)
+	{
+		ostr << "<element>" << i << "</element>\n";
+	}
+	ostr << "</config>\n";
+
+	std::istringstream istr(ostr.str());
+	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration(istr);
+
+	AbstractConfiguration::Keys all_elements;
+	pConf->keys("", all_elements);
+
+	assertTrue(all_elements.size() == count);
+}
+
+
 void XMLConfigurationTest::setUp()
 {
 }
@@ -322,6 +343,7 @@ CppUnit::Test* XMLConfigurationTest::suite()
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testSaveEmpty);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testFromScratch);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadEmpty);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testManyKeys);
 
 	return pSuite;
 }
