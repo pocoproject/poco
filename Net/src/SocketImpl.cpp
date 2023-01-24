@@ -646,7 +646,12 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 #else
 	int epollfd = epoll_create(1);
 #endif
+
+#ifdef WEPOLL_H_
+	if (!epollfd)
+#else
 	if (epollfd < 0)
+#endif
 	{
 		error("Can't create epoll queue");
 	}
