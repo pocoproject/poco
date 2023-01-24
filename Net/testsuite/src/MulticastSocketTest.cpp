@@ -51,6 +51,8 @@ void MulticastSocketTest::testMulticast()
 	{
 		MulticastEchoServer echoServer;
 		MulticastSocket ms(SocketAddress::IPv4);
+		SocketAddress multicastAddress("234.2.2.2", 4040);
+		ms.joinGroup(multicastAddress.host());
 		ms.setReceiveTimeout(Poco::Timespan(5, 0));
 		int n = ms.sendTo("hello", 5, echoServer.group());
 		assertTrue (n == 5);
@@ -58,6 +60,7 @@ void MulticastSocketTest::testMulticast()
 		n = ms.receiveBytes(buffer, sizeof(buffer));
 		assertTrue (n == 5);
 		assertTrue (std::string(buffer, n) == "hello");
+		ms.leaveGroup(multicastAddress.host());
 		ms.close();
 	}
 	catch (Poco::NotImplementedException&)
