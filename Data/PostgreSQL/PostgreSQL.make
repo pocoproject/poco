@@ -20,6 +20,9 @@ endif
 ifeq (0, $(shell test -e /usr/local/opt/libpq/include; echo $$?))
 INCLUDE += -I/usr/local/opt/libpq/include
 endif
+ifeq (0, $(shell test -e /opt/homebrew/opt/libpq/include; echo $$?))
+INCLUDE += -I/opt/homebrew/opt/libpq/include
+endif
 endif
 
 ifndef POCO_PGSQL_LIB
@@ -40,6 +43,9 @@ SYSLIBS += -L/opt/postgresql/lib$(LIB64SUFFIX)
 endif
 ifeq (0, $(shell test -e /usr/local/opt/libpq/lib; echo $$?))
 SYSLIBS += -L/usr/local/opt/libpq/lib$(LIB64SUFFIX)
+endif
+ifeq (0, $(shell test -e /opt/homebrew/opt/libpq/lib; echo $$?))
+SYSLIBS += -L/opt/homebrew/opt/libpq/lib$(LIB64SUFFIX)
 endif
 endif
 SYSLIBS += -lpq

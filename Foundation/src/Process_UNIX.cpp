@@ -12,6 +12,7 @@
 //
 
 
+#include "Poco/ProcessOptions.h"
 #include "Poco/Process_UNIX.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -112,7 +113,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if defined(__QNX__)
 	if (initialDirectory.empty())
@@ -156,21 +157,24 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
+		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
 		return new ProcessHandleImpl(pid);
 	}
 	else
 	{
-		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options);
 	}
 #else
-	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options);
 #endif
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if !defined(POCO_NO_FORK_EXEC)
 	// On some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number,
@@ -222,11 +226,15 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			dup2(inPipe->readHandle(), STDIN_FILENO);
 			inPipe->close(Pipe::CLOSE_BOTH);
 		}
+		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
+
 		// outPipe and errPipe may be the same, so we dup first and close later
 		if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
 		if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
+		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
+		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
 		// close all open file descriptors other than stdin, stdout, stderr
 		long fdMax = sysconf(_SC_OPEN_MAX);
 		// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number

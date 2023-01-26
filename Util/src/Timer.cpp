@@ -93,6 +93,11 @@ public:
 				_finished.set();
 				return false;
 			}
+			Poco::AutoPtr<CancelNotification> pCnf = pNf.cast<CancelNotification>();
+			if (pCnf)
+			{
+				pCnf->_finished.set();
+			}
 			pNf = static_cast<TimerNotification*>(queue().dequeueNotification());
 		}
 

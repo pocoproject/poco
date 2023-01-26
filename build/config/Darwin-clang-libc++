@@ -11,11 +11,15 @@
 #
 LINKMODE ?= SHARED
 
-ARCHFLAGS          ?= -arch $(OSARCH)
+ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
 SANITIZEFLAGS      ?=
 OSFLAGS            ?= -mmacosx-version-min=10.11 -isysroot $(shell xcrun --show-sdk-path)
 
+ifeq ($(POCO_HOST_OSARCH),arm64)
+OPENSSL_DIR        ?= /opt/homebrew/opt/openssl
+else
 OPENSSL_DIR        ?= /usr/local/opt/openssl
+endif
 
 #
 # Tools

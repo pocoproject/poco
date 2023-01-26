@@ -133,6 +133,7 @@ inline void Parser::append(std::string& decl, const std::string& token)
 	 || token == "static"
 	 || token == "mutable"
 	 || token == "inline"
+	 || token == "virtual"
 	 || token == "volatile"
 	 || token == "register"
 	 || token == "thread_local")
@@ -379,7 +380,7 @@ const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
 
 	pNext = next();
-	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_COMPL))
+	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_COMPL) || isOperator(pNext, OperatorToken::OP_DBL_COLON))
 	{
 		switch (pNext->asInteger())
 		{
