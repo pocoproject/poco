@@ -292,7 +292,6 @@ void OpMsgMessage::read(std::istream& istr)
 	std::istringstream msgss(message);
 	BinaryReader reader(msgss, BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
 
-	Poco::UInt32 flags {0xFFFFFFFF};
 	Poco::UInt8 payloadType {0xFF};
 
 	reader >> _flags;

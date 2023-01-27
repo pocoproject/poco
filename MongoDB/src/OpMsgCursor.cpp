@@ -63,7 +63,7 @@ OpMsgCursor::~OpMsgCursor()
 {
 	try
 	{
-		poco_assert_dbg(_cursorId == 0);
+		poco_assert_dbg(_cursorID == 0);
 	}
 	catch (...)
 	{
