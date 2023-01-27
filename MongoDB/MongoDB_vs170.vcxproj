@@ -867,6 +867,12 @@
     <ClCompile Include="src\UpdateRequest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
+    <ClCompile Include="src\OpMsgMessage.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\OpMsgCursor.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\MongoDB\Array.h"/>
@@ -894,6 +900,8 @@
     <ClInclude Include="include\Poco\MongoDB\RequestMessage.h"/>
     <ClInclude Include="include\Poco\MongoDB\ResponseMessage.h"/>
     <ClInclude Include="include\Poco\MongoDB\UpdateRequest.h"/>
+    <ClInclude Include="include\Poco\MongoDB\OpMsgMessage.h"/>
+    <ClInclude Include="include\Poco\MongoDB\OpMsgCursor.h"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
