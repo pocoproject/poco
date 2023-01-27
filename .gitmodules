@@ -1,3 +1,0 @@
-[submodule "DNSSD"]
-	path = DNSSD
-	url = https://github.com/soroshsabz/poco-dnssd.git
