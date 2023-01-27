@@ -75,7 +75,7 @@ namespace
 #else
 		if (pthread_setname_np(pthread_self(), threadName.c_str()))
 #endif
-			throw Poco::SystemException("cannot get thread name");
+			throw Poco::SystemException("cannot set thread name");
 	}
 
 	std::string getThreadName()
