@@ -217,7 +217,7 @@ public:
 		/// Throws BadCastException. Must be overridden in a type
 		/// specialization in order to support the conversion.
 
-	virtual void convert(std::string::value_type& val) const;
+	virtual void convert(char& val) const;
 		/// Throws BadCastException. Must be overridden in a type
 		/// specialization in order to support the conversion.
 
@@ -589,7 +589,7 @@ inline void VarHolder::convert(double& /*val*/) const
 }
 
 
-inline void VarHolder::convert(std::string::value_type& /*val*/) const
+inline void VarHolder::convert(char& /*val*/) const
 {
 	throw BadCastException("Can not convert to char");
 }
@@ -843,9 +843,9 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
-		val = static_cast<std::string::value_type>(_val);
+		val = static_cast<char>(_val);
 	}
 
 	void convert(std::string& val) const
@@ -999,11 +999,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1152,11 +1152,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1304,11 +1304,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1471,11 +1471,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1623,11 +1623,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1775,11 +1775,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1927,11 +1927,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -2100,9 +2100,9 @@ public:
 		val = (_val ? 1.0 : 0.0);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
-		val = static_cast<std::string::value_type>(_val ? 1 : 0);
+		val = static_cast<char>(_val ? 1 : 0);
 	}
 
 	void convert(std::string& val) const
@@ -2251,11 +2251,11 @@ public:
 		val = _val;
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -2410,11 +2410,11 @@ public:
 		val = _val;
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -2477,7 +2477,7 @@ private:
 
 
 template <>
-class VarHolderImpl<std::string::value_type>: public VarHolder
+class VarHolderImpl<char>: public VarHolder
 {
 public:
 	VarHolderImpl(char val): _val(val)
@@ -2562,7 +2562,7 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		val = _val;
 	}
@@ -2730,7 +2730,7 @@ public:
 		val = NumberParser::parseFloat(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		if (_val.empty())
 			val = '\0';
@@ -2926,7 +2926,7 @@ public:
 		val = NumberParser::parseFloat(toStdString());
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		if (_val.empty())
 			val = '\0';
@@ -3100,11 +3100,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -3238,11 +3238,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -3389,11 +3389,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -3537,11 +3537,11 @@ public:
 		val = static_cast<double>(_val);
 	}
 
-	void convert(std::string::value_type& val) const
+	void convert(char& val) const
 	{
 		UInt8 tmp;
 		convert(tmp);
-		val = static_cast<std::string::value_type>(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
