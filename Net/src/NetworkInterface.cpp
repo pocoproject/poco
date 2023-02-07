@@ -44,7 +44,6 @@
 
 
 using Poco::NumberFormatter;
-using Poco::FastMutex;
 using Poco::format;
 
 
@@ -565,7 +564,7 @@ inline void NetworkInterfaceImpl::setMACAddress(const void *addr, std::size_t le
 //
 
 
-FastMutex NetworkInterface::_mutex;
+std::mutex NetworkInterface::_mutex;
 
 
 NetworkInterface::NetworkInterface(unsigned index):
@@ -1048,7 +1047,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	Map result;
 	ULONG outBufLen = 16384;
 	Poco::Buffer<UCHAR> memory(outBufLen);
@@ -1281,7 +1280,7 @@ namespace Net {
 
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	NetworkInterfaceList result;
 
 	int ifIndex = 1;
@@ -1385,7 +1384,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
 	NetworkInterface intf;
@@ -1603,7 +1602,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
 #if POCO_OS != POCO_OS_ANDROID
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
 	NetworkInterface intf;
@@ -1735,7 +1734,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 /*
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	NetworkInterfaceList result;
 	DatagramSocket socket;
 	// the following code is loosely based

@@ -23,6 +23,7 @@
 #include "Poco/ScopedLock.h"
 #include "Poco/Timestamp.h"
 #include <atomic>
+#include <mutex>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -52,7 +53,7 @@ class Foundation_API Mutex: private MutexImpl
 	/// lock and unlock a mutex.
 {
 public:
-	using ScopedLock = Poco::ScopedLock<Mutex>;
+	using ScopedLock = Poco::ScopedLock<std::recursive_mutex>;
 
 	Mutex();
 		/// creates the Mutex.
@@ -107,7 +108,7 @@ class Foundation_API FastMutex: private FastMutexImpl
 	/// lock and unlock a mutex.
 {
 public:
-	using ScopedLock = Poco::ScopedLock<FastMutex>;
+	using ScopedLock = Poco::ScopedLock<std::mutex>;
 
 	FastMutex();
 		/// creates the Mutex.

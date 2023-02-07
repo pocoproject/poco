@@ -2,7 +2,7 @@
 // NotificationQueue.cpp
 //
 // This sample demonstrates the NotificationQueue, ThreadPool,
-// FastMutex and ScopedLock classes.
+// std::mutex and ScopedLock classes.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -27,7 +27,6 @@ using Poco::NotificationQueue;
 using Poco::ThreadPool;
 using Poco::Thread;
 using Poco::Runnable;
-using Poco::FastMutex;
 using Poco::AutoPtr;
 
 
@@ -75,7 +74,7 @@ public:
 				if (pWorkNf)
 				{
 					{
-						FastMutex::ScopedLock lock(_mutex);
+						std::lock_guard<std::mutex> lock(_mutex);
 						std::cout << _name << " got work notification " << pWorkNf->data() << std::endl;
 					}
 					Thread::sleep(rnd.next(200));
@@ -88,11 +87,11 @@ public:
 private:
 	std::string        _name;
 	NotificationQueue& _queue;
-	static FastMutex   _mutex;
+	static std::mutex  _mutex;
 };
 
 
-FastMutex Worker::_mutex;
+std::mutex Worker::_mutex;
 
 
 int main(int argc, char** argv)

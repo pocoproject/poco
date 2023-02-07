@@ -149,7 +149,7 @@ private:
 
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

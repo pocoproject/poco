@@ -120,7 +120,7 @@ void RemoteSyslogChannel::close()
 
 void RemoteSyslogChannel::log(const Message& msg)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_open) open();
 

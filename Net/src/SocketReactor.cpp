@@ -176,7 +176,7 @@ bool SocketReactor::hasSocketHandlers()
 {
 	if (!_pollSet.empty())
 	{
-		ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		for (auto& p: _handlers)
 		{
 			if (p.second->accepts(_pReadableNotification) ||
@@ -217,7 +217,7 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 	const SocketImpl* pImpl = socket.impl();
 	if (pImpl == nullptr) return 0;
 	poco_socket_t sockfd = pImpl->sockfd();
-	ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	EventHandlerMap::iterator it = _handlers.find(sockfd);
 	if (it != _handlers.end()) return it->second;
@@ -237,7 +237,7 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 		if(pNotifier->countObservers() == 1)
 		{
 			{
-				ScopedLock lock(_mutex);
+				std::lock_guard<std::mutex> lock(_mutex);
 				_handlers.erase(pImpl->sockfd());
 			}
 			_pollSet.remove(socket);
@@ -280,7 +280,7 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 {
 	std::vector<NotifierPtr> delegates;
 	{
-		ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		delegates.reserve(_handlers.size());
 		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
 			delegates.push_back(it->second);

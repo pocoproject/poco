@@ -86,7 +86,7 @@ private:
 	SessionPoolContainer& operator = (const SessionPoolContainer&);
 
 	SessionPoolMap  _sessionPools;
-	Poco::FastMutex _mutex;
+	std::mutex      _mutex;
 };
 
 

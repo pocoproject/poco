@@ -106,8 +106,8 @@ protected:
 private:
 	Channel::Ptr _pChannel;
 	Thread    _thread;
-	FastMutex _threadMutex;
-	FastMutex _channelMutex;
+	std::mutex _threadMutex;
+	std::mutex _channelMutex;
 	NotificationQueue _queue;
 	std::size_t _queueSize = 0;
 	std::size_t _dropCount = 0;

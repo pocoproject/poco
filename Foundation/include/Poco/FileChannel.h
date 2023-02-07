@@ -260,7 +260,7 @@ private:
 	RotateStrategy*  _pRotateStrategy;
 	ArchiveStrategy* _pArchiveStrategy;
 	PurgeStrategy*   _pPurgeStrategy;
-	FastMutex        _mutex;
+	std::mutex        _mutex;
 };
 
 

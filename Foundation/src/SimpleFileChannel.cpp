@@ -63,7 +63,7 @@ SimpleFileChannel::~SimpleFileChannel()
 
 void SimpleFileChannel::open()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_pFile)
 	{
@@ -83,7 +83,7 @@ void SimpleFileChannel::open()
 
 void SimpleFileChannel::close()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	delete _pFile;
 	_pFile = 0;
@@ -94,7 +94,7 @@ void SimpleFileChannel::log(const Message& msg)
 {
 	open();
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_limit > 0 && _pFile->size() >= _limit)
 	{
@@ -106,7 +106,7 @@ void SimpleFileChannel::log(const Message& msg)
 
 void SimpleFileChannel::setProperty(const std::string& name, const std::string& value)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (name == PROP_PATH)
 	{

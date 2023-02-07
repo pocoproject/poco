@@ -150,7 +150,7 @@ protected:
 		FileInStream_CreateVTable(&_archiveStream);
 		LookToRead_CreateVTable(&_lookStream, False);
 
-		Poco::FastMutex::ScopedLock lock(_initMutex);
+		std::lock_guard<std::mutex> lock(_initMutex);
 		if (!_initialized)
 		{
 			CrcGenerateTable();
@@ -287,14 +287,14 @@ private:
 	CSzArEx _db;
 	static ISzAlloc _szAlloc;
 	static ISzAlloc _szAllocTemp;
-	static Poco::FastMutex _initMutex;
+	static std::mutex _initMutex;
 	static bool _initialized;
 };
 
 
 ISzAlloc ArchiveImpl::_szAlloc     = { SzAlloc, SzFree };
 ISzAlloc ArchiveImpl::_szAllocTemp = { SzAlloc, SzFree };
-Poco::FastMutex ArchiveImpl::_initMutex;
+std::mutex ArchiveImpl::_initMutex;
 bool ArchiveImpl::_initialized(false);
 
 

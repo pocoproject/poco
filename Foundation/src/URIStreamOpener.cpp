@@ -38,7 +38,7 @@ URIStreamOpener::~URIStreamOpener()
 
 std::istream* URIStreamOpener::open(const URI& uri) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	std::string scheme;
 	if (uri.isRelative())
@@ -51,7 +51,7 @@ std::istream* URIStreamOpener::open(const URI& uri) const
 
 std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	try
 	{
@@ -85,7 +85,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 
 std::istream* URIStreamOpener::open(const std::string& basePathOrURI, const std::string& pathOrURI) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	try
 	{
@@ -128,7 +128,7 @@ void URIStreamOpener::registerStreamFactory(const std::string& scheme, URIStream
 {
 	poco_check_ptr (pFactory);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_map.find(scheme) == _map.end())
 	{
 		_map[scheme] = pFactory;
@@ -139,7 +139,7 @@ void URIStreamOpener::registerStreamFactory(const std::string& scheme, URIStream
 
 void URIStreamOpener::unregisterStreamFactory(const std::string& scheme)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	FactoryMap::iterator it = _map.find(scheme);
 	if (it != _map.end())
@@ -154,7 +154,7 @@ void URIStreamOpener::unregisterStreamFactory(const std::string& scheme)
 
 bool URIStreamOpener::supportsScheme(const std::string& scheme)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _map.find(scheme) != _map.end();
 }
 

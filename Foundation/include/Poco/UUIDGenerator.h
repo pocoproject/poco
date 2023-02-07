@@ -93,7 +93,7 @@ protected:
 	void getNode();
 
 private:
-	FastMutex           _mutex;
+	std::mutex          _mutex;
 	Random              _random;
 	Timestamp           _lastTime;
 	int                 _ticks;

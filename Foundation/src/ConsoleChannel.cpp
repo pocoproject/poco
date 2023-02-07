@@ -22,7 +22,7 @@
 namespace Poco {
 
 
-FastMutex ConsoleChannel::_mutex;
+std::mutex ConsoleChannel::_mutex;
 
 
 ConsoleChannel::ConsoleChannel(): _str(std::clog)
@@ -42,13 +42,13 @@ ConsoleChannel::~ConsoleChannel()
 
 void ConsoleChannel::log(const Message& msg)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_str << msg.getText() << std::endl;
 }
 
 
-FastMutex ColorConsoleChannel::_mutex;
+std::mutex ColorConsoleChannel::_mutex;
 const std::string ColorConsoleChannel::CSI("\033[");
 
 
@@ -75,7 +75,7 @@ ColorConsoleChannel::~ColorConsoleChannel()
 
 void ColorConsoleChannel::log(const Message& msg)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_enableColors)
 	{

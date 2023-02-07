@@ -62,7 +62,7 @@ public:
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_function)
 		{
 			(*_function)(sender, arguments);
@@ -84,13 +84,13 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_function = 0;
 	}
 
 protected:
 	NotifyFunction _function;
-	Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	FunctionPriorityDelegate();
@@ -131,7 +131,7 @@ public:
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_function)
 		{
 			(*_function)(const_cast<void*>(sender), arguments);
@@ -153,13 +153,13 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_function = 0;
 	}
 
 protected:
 	NotifyFunction _function;
-	Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	FunctionPriorityDelegate();
@@ -200,7 +200,7 @@ public:
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_function)
 		{
 			(*_function)(arguments);
@@ -222,13 +222,13 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_function = 0;
 	}
 
 protected:
 	NotifyFunction _function;
-	Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	FunctionPriorityDelegate();
@@ -271,7 +271,7 @@ public:
 
 	bool notify(const void* sender)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_function)
 		{
 			(*_function)(sender);
@@ -293,13 +293,13 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_function = 0;
 	}
 
 protected:
 	NotifyFunction _function;
-	Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	FunctionPriorityDelegate();
@@ -340,7 +340,7 @@ public:
 
 	bool notify(const void* sender)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_function)
 		{
 			(*_function)(const_cast<void*>(sender));
@@ -362,13 +362,13 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_function = 0;
 	}
 
 protected:
 	NotifyFunction _function;
-	Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	FunctionPriorityDelegate();
@@ -409,7 +409,7 @@ public:
 
 	bool notify(const void* sender)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_function)
 		{
 			(*_function)();
@@ -431,13 +431,13 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_function = 0;
 	}
 
 protected:
 	NotifyFunction _function;
-	Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	FunctionPriorityDelegate();

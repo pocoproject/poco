@@ -56,7 +56,7 @@ Notifier::~Notifier()
 
 bool Notifier::enableUpdate()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), &sqliteUpdateCallbackFn, this))
 		_enabledEvents |= SQLITE_NOTIFY_UPDATE;
@@ -67,7 +67,7 @@ bool Notifier::enableUpdate()
 
 bool Notifier::disableUpdate()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::UpdateCallbackType) 0, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_UPDATE;
@@ -84,7 +84,7 @@ bool Notifier::updateEnabled() const
 
 bool Notifier::enableCommit()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), &sqliteCommitCallbackFn, this))
 		_enabledEvents |= SQLITE_NOTIFY_COMMIT;
@@ -95,7 +95,7 @@ bool Notifier::enableCommit()
 
 bool Notifier::disableCommit()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::CommitCallbackType) 0, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_COMMIT;
@@ -112,7 +112,7 @@ bool Notifier::commitEnabled() const
 
 bool Notifier::enableRollback()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), &sqliteRollbackCallbackFn, this))
 		_enabledEvents |= SQLITE_NOTIFY_ROLLBACK;
@@ -123,7 +123,7 @@ bool Notifier::enableRollback()
 
 bool Notifier::disableRollback()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 
 	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::RollbackCallbackType) 0, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_ROLLBACK;

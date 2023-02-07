@@ -52,7 +52,7 @@ public:
 		/// hold by the SingletonHolder. The first call
 		/// to get will create the singleton.
 	{
-		FastMutex::ScopedLock lock(_m);
+		std::lock_guard<std::mutex> lock(_m);
 		if (!_pS) _pS = new S;
 		return _pS;
 	}
@@ -60,14 +60,14 @@ public:
 	void reset()
 		/// Deletes the singleton object.
 	{
-		FastMutex::ScopedLock lock(_m);
+		std::lock_guard<std::mutex> lock(_m);
 		delete _pS;
 		_pS = 0;
 	}
 
 private:
 	S* _pS;
-	FastMutex _m;
+	std::mutex _m;
 };
 
 

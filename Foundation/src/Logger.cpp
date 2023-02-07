@@ -25,7 +25,7 @@ namespace Poco {
 
 
 Logger::LoggerMapPtr Logger::_pLoggerMap;
-Mutex                Logger::_mapMtx;
+std::recursive_mutex Logger::_mapMtx;
 const std::string    Logger::ROOT;
 
 
@@ -108,7 +108,7 @@ void Logger::dump(const std::string& msg, const void* buffer, std::size_t length
 
 void Logger::setLevel(const std::string& name, int level)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	if (_pLoggerMap)
 	{
@@ -126,7 +126,7 @@ void Logger::setLevel(const std::string& name, int level)
 
 void Logger::setChannel(const std::string& name, Channel::Ptr pChannel)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	if (_pLoggerMap)
 	{
@@ -144,7 +144,7 @@ void Logger::setChannel(const std::string& name, Channel::Ptr pChannel)
 
 void Logger::setProperty(const std::string& loggerName, const std::string& propertyName, const std::string& value)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	if (_pLoggerMap)
 	{
@@ -275,7 +275,7 @@ void Logger::formatDump(std::string& message, const void* buffer, std::size_t le
 
 Logger& Logger::get(const std::string& name)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	return unsafeGet(name);
 }
@@ -303,7 +303,7 @@ Logger& Logger::unsafeGet(const std::string& name)
 
 Logger& Logger::create(const std::string& name, Channel::Ptr pChannel, int level)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	if (find(name)) throw ExistsException();
 	Ptr pLogger = new Logger(name, pChannel, level);
@@ -314,7 +314,7 @@ Logger& Logger::create(const std::string& name, Channel::Ptr pChannel, int level
 
 Logger& Logger::root()
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	return unsafeGet(ROOT);
 }
@@ -322,7 +322,7 @@ Logger& Logger::root()
 
 Logger::Ptr Logger::has(const std::string& name)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	return find(name);
 }
@@ -330,7 +330,7 @@ Logger::Ptr Logger::has(const std::string& name)
 
 void Logger::shutdown()
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	_pLoggerMap.reset();
 }
@@ -349,7 +349,7 @@ Logger::Ptr Logger::find(const std::string& name)
 
 void Logger::destroy(const std::string& name)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	if (_pLoggerMap)
 	{
@@ -361,7 +361,7 @@ void Logger::destroy(const std::string& name)
 
 void Logger::names(std::vector<std::string>& names)
 {
-	Mutex::ScopedLock lock(_mapMtx);
+	std::lock_guard<std::recursive_mutex> lock(_mapMtx);
 
 	names.clear();
 	if (_pLoggerMap)

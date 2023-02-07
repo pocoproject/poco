@@ -70,8 +70,8 @@ protected:
 
 private:
 	typedef std::multiset<SocketNotification*> EventSet;
-	typedef Poco::FastMutex                    MutexType;
-	typedef MutexType::ScopedLock              ScopedLock;
+	typedef std::mutex                         MutexType;
+	typedef std::lock_guard<std::mutex>        ScopedLock;
 
 	EventSet                 _events;
 	Poco::NotificationCenter _nc;

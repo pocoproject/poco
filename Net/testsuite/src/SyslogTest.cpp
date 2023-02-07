@@ -51,7 +51,7 @@ private:
 	Messages   _cache;
 	std::size_t _size;
 	std::size_t _maxSize;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 
@@ -63,7 +63,7 @@ std::size_t CachingChannel::getMaxSize() const
 
 std::size_t CachingChannel::getCurrentSize() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _size;
 }
 
@@ -84,7 +84,7 @@ CachingChannel::~CachingChannel()
 
 void CachingChannel::log(const Poco::Message& msg)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_cache.push_front(msg);
 	if (_size == _maxSize)
 	{

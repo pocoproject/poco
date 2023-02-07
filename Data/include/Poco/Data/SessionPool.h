@@ -207,7 +207,7 @@ private:
 	AddPropertyMap _addPropertyMap;
 	AddFeatureMap  _addFeatureMap;
 	mutable
-	Poco::Mutex _mutex;
+	std::recursive_mutex _mutex;
 
 	friend class PooledSessionImpl;
 };

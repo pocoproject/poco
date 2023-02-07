@@ -21,7 +21,6 @@
 
 
 using Poco::Notification;
-using Poco::FastMutex;
 using Poco::AutoPtr;
 
 
@@ -138,7 +137,7 @@ namespace
 
 void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_queue.size() < _pParams->getMaxQueued())
 	{
@@ -187,7 +186,7 @@ int TCPServerDispatcher::currentThreads() const
 
 int TCPServerDispatcher::maxThreads() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return _threadPool.capacity();
 }
@@ -225,7 +224,7 @@ int TCPServerDispatcher::refusedConnections() const
 
 void TCPServerDispatcher::beginConnection()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	++_totalConnections;
 	++_currentConnections;

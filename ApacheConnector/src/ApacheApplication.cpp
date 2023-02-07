@@ -16,7 +16,6 @@
 
 
 using Poco::Logger;
-using Poco::FastMutex;
 
 
 ApacheApplication::ApacheApplication():
@@ -34,7 +33,7 @@ ApacheApplication::~ApacheApplication()
 
 void ApacheApplication::setup()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ready)
 	{

@@ -166,7 +166,7 @@ void  FTPClientSession::receiveServerReadyReply()
 		throw FTPException("Cannot receive status message", response, status);
 
 	{
-		Poco::FastMutex::ScopedLock lock(_wmMutex);
+		std::lock_guard<std::mutex> lock(_wmMutex);
 		_welcomeMessage = response;
 	}
 	_serverReady = true;

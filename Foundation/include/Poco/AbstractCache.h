@@ -34,7 +34,7 @@
 namespace Poco {
 
 
-template <class TKey, class TValue, class TStrategy, class TMutex = FastMutex, class TEventMutex = FastMutex>
+template <class TKey, class TValue, class TStrategy, class TMutex = std::mutex, class TEventMutex = std::mutex>
 class AbstractCache
 	/// An AbstractCache is the interface of all caches.
 {
@@ -76,7 +76,7 @@ public:
 		/// Adds the key value pair to the cache.
 		/// If for the key already an entry exists, it will be overwritten.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doAdd(key, val);
 	}
 
@@ -87,7 +87,7 @@ public:
 		/// just a simply silent update is performed
 		/// If the key does not exist the behavior is equal to add, ie. an add event is thrown
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doUpdate(key, val);
 	}
 
@@ -96,7 +96,7 @@ public:
 		/// If for the key already an entry exists, it will be overwritten, ie. first a remove event
 		/// is thrown, then a add event
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doAdd(key, val);
 	}
 
@@ -107,7 +107,7 @@ public:
 		/// just an Update is thrown
 		/// If the key does not exist the behavior is equal to add, ie. an add event is thrown
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doUpdate(key, val);
 	}
 
@@ -115,7 +115,7 @@ public:
 		/// Removes an entry from the cache. If the entry is not found,
 		/// the remove is ignored.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		Iterator it = _data.find(key);
 		doRemove(it);
 	}
@@ -123,7 +123,7 @@ public:
 	bool has(const TKey& key) const
 		/// Returns true if the cache contains a value for the key.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return doHas(key);
 	}
 
@@ -132,21 +132,21 @@ public:
 		/// even when cache replacement removes the element.
 		/// If for the key no value exists, an empty SharedPtr is returned.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return doGet (key);
 	}
 
 	void clear()
 		/// Removes all elements from the cache.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doClear();
 	}
 
 	std::size_t size()
 		/// Returns the number of cached elements
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doReplace();
 		return _data.size();
 	}
@@ -158,14 +158,14 @@ public:
 		/// In some cases, i.e. expire based caching where for a long time no access to the cache happens,
 		/// it might be desirable to be able to trigger cache replacement manually.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doReplace();
 	}
 
 	std::set<TKey> getAllKeys()
 		/// Returns a copy of all keys stored in the cache
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		doReplace();
 		ConstIterator it = _data.begin();
 		ConstIterator itEnd = _data.end();
@@ -186,7 +186,7 @@ public:
 		/// as the actual value (or reference),
 		/// not a Poco::SharedPtr.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		for (const auto& p: _data)
 		{
 			fn(p.first, *p.second);

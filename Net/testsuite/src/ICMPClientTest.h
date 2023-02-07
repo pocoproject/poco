@@ -43,7 +43,7 @@ public:
 private:
 	void registerDelegates(const Poco::Net::ICMPClient& icmpClient);
 	void unregisterDelegates(const Poco::Net::ICMPClient& icmpClient);
-	static Poco::FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
 

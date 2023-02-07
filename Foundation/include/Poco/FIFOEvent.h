@@ -27,7 +27,7 @@ namespace Poco {
 
 
 //@ deprecated
-template <class TArgs, class TMutex = FastMutex>
+template <class TArgs, class TMutex = std::mutex>
 class FIFOEvent: public AbstractEvent <
 	TArgs,
 	FIFOStrategy<TArgs, AbstractDelegate<TArgs>>,

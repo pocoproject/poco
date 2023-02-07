@@ -173,7 +173,7 @@ public:
 	operator PGconn* ();
 		/// Get the PostgreSQL connection pointer
 
-	Poco::FastMutex& mutex();
+	std::mutex& mutex();
 		/// Get the sessionHandle mutex to protect the connection pointer
 
 private:
@@ -189,7 +189,7 @@ private:
 	SessionHandle& operator= (const SessionHandle&);
 
 private:
-	mutable Poco::FastMutex   _sessionMutex;
+	mutable std::mutex        _sessionMutex;
 	PGconn*                   _pConnection;
 	std::string               _connectionString;
 	bool                      _inTransaction;
@@ -288,7 +288,7 @@ inline SessionHandle::operator PGconn * ()
 }
 
 
-inline Poco::FastMutex&SessionHandle::mutex()
+inline std::mutex&SessionHandle::mutex()
 {
 	return _sessionMutex;
 }

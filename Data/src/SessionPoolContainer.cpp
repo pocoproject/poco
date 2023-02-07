@@ -21,7 +21,6 @@
 #include <algorithm>
 
 
-using Poco::FastMutex;
 
 
 namespace Poco {
@@ -42,7 +41,7 @@ void SessionPoolContainer::add(SessionPool* pPool)
 {
 	poco_check_ptr (pPool);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
 		throw SessionPoolExistsException("Session pool already exists: " + pPool->name());
 
@@ -59,7 +58,7 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 {
 	std::string name = SessionPool::name(sessionKey, connectionString);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	SessionPoolMap::iterator it = _sessionPools.find(name);
 
 	// pool already exists, silently return a session from it
@@ -104,7 +103,7 @@ SessionPool& SessionPoolContainer::getPool(const std::string& name)
 	poco_assert (!path.empty());
 	std::string n = Session::uri(uri.getScheme(), path.substr(1));
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	SessionPoolMap::iterator it = _sessionPools.find(n);
 	if (_sessionPools.end() == it) throw NotFoundException(n);
 	return *it->second;

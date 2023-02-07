@@ -40,7 +40,7 @@ public:
 
 private:
 	static std::map<long, const std::string> initSSPIErr();
-	static Poco::FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
 

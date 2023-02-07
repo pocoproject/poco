@@ -320,7 +320,7 @@ private:
 	PrivateKeyPassphraseHandlerPtr   _ptrClientPassphraseHandler;
 	InvalidCertificateHandlerPtr     _ptrClientCertificateHandler;
 	int                              _contextIndex;
-	Poco::FastMutex                  _mutex;
+	std::mutex                       _mutex;
 
 	static const std::string CFG_PRIV_KEY_FILE;
 	static const std::string CFG_CERTIFICATE_FILE;

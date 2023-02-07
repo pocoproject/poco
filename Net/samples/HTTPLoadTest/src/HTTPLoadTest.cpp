@@ -47,7 +47,6 @@ using Poco::Util::HelpFormatter;
 using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
 using Poco::Thread;
-using Poco::FastMutex;
 using Poco::Runnable;
 using Poco::Stopwatch;
 using Poco::NumberParser;
@@ -115,7 +114,7 @@ public:
 
 				if (_verbose)
 				{
-					FastMutex::ScopedLock lock(_mutex);
+					std::lock_guard<std::mutex> lock(_mutex);
 					std::cout
 					<< _uri.toString() << ' ' << res.getStatus() << ' ' << res.getReason()
 					<< ' ' << usec/1000.0 << "ms" << std::endl;
@@ -125,13 +124,13 @@ public:
 			}
 			catch (Exception& exc)
 			{
-				FastMutex::ScopedLock lock(_mutex);
+				std::lock_guard<std::mutex> lock(_mutex);
 				std::cerr << exc.displayText() << std::endl;
 			}
 		}
 
 		{
-			FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_gSuccess += _success;
 			_gUsec += _usec;
 		}
@@ -156,10 +155,10 @@ private:
 	static int _gRepetitions;
 	static Poco::UInt64 _gUsec;
 	static int _gSuccess;
-	static FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
-FastMutex HTTPClient::_mutex;
+std::mutex HTTPClient::_mutex;
 int HTTPClient::_gRepetitions;
 Poco::UInt64 HTTPClient::_gUsec;
 int HTTPClient::_gSuccess;
@@ -181,7 +180,7 @@ int HTTPClient::totalSuccessCount()
 
 void HTTPClient::printStats(std::string uri, int repetitions, int success, Poco::UInt64 usec)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	std::cout << std::endl << "--------------" << std::endl
 		<< "Statistics for " << uri << std::endl << "--------------"

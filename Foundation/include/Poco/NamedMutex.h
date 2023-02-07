@@ -41,7 +41,7 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 	/// Using the ScopedLock class is the preferred way to automatically
 	/// lock and unlock a mutex.
 	///
-	/// Unlike a Mutex or a FastMutex, which itself is the unit of synchronization,
+	/// Unlike a std::recursive_mutex or a std::mutex, which itself is the unit of synchronization,
 	/// a NamedMutex refers to a named operating system resource being the
 	/// unit of synchronization.
 	/// In other words, there can be multiple instances of NamedMutex referring

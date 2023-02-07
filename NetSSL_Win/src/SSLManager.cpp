@@ -111,7 +111,7 @@ void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr pPassphraseHand
 
 Context::Ptr SSLManager::defaultServerContext()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ptrDefaultServerContext)
 		initDefaultContext(true);
@@ -122,7 +122,7 @@ Context::Ptr SSLManager::defaultServerContext()
 
 Context::Ptr SSLManager::defaultClientContext()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ptrDefaultClientContext)
 	{
@@ -143,7 +143,7 @@ Context::Ptr SSLManager::defaultClientContext()
 
 SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::serverPassphraseHandler()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ptrServerPassphraseHandler)
 		initPassphraseHandler(true);
@@ -154,7 +154,7 @@ SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::serverPassphraseHandler()
 
 SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::clientPassphraseHandler()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ptrClientPassphraseHandler)
 		initPassphraseHandler(false);
@@ -165,7 +165,7 @@ SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::clientPassphraseHandler()
 
 SSLManager::InvalidCertificateHandlerPtr SSLManager::serverCertificateHandler()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ptrServerCertificateHandler)
 		initCertificateHandler(true);
@@ -176,7 +176,7 @@ SSLManager::InvalidCertificateHandlerPtr SSLManager::serverCertificateHandler()
 
 SSLManager::InvalidCertificateHandlerPtr SSLManager::clientCertificateHandler()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_ptrClientCertificateHandler)
 		initCertificateHandler(false);

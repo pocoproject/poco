@@ -33,7 +33,7 @@ class Foundation_API Condition
 	/// A Condition is a synchronization object used to block a thread
 	/// until a particular condition is met.
 	/// A Condition object is always used in conjunction with
-	/// a Mutex (or FastMutex) object.
+	/// a std::recursive_mutex (or std::mutex) object.
 	///
 	/// Condition objects are similar to POSIX condition variables, which the
 	/// difference that Condition is not subject to spurious wakeups.
@@ -58,7 +58,7 @@ public:
 		ScopedUnlock<Mtx> unlock(mutex, false);
 		Event event;
 		{
-			FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			mutex.unlock();
 			enqueue(event);
 		}
@@ -94,13 +94,13 @@ public:
 		ScopedUnlock<Mtx> unlock(mutex, false);
 		Event event;
 		{
-			FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			mutex.unlock();
 			enqueue(event);
 		}
 		if (!event.tryWait(milliseconds))
 		{
-			FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			dequeue(event);
 			return false;
 		}
@@ -126,7 +126,7 @@ private:
 
 	typedef std::deque<Event*> WaitQueue;
 
-	FastMutex _mutex;
+	std::mutex _mutex;
 	WaitQueue _waitQueue;
 };
 

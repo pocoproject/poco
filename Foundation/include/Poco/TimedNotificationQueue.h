@@ -133,7 +133,7 @@ protected:
 private:
 	NfQueue _nfQueue;
 	Event   _nfAvailable;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

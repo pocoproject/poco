@@ -29,7 +29,7 @@ void Registry::registerCollector(Collector* pCollector)
 {
 	poco_check_ptr (pCollector);
 
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	const auto it = _collectors.find(pCollector->name());
 	if (it == _collectors.end())
@@ -53,7 +53,7 @@ void Registry::unregisterCollector(Collector* pCollector)
 
 void Registry::unregisterCollector(const std::string& collectorName)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_collectors.erase(collectorName);
 }
@@ -61,7 +61,7 @@ void Registry::unregisterCollector(const std::string& collectorName)
 
 Collector* Registry::findCollector(const std::string& collectorName) const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	const auto it = _collectors.find(collectorName);
 	if (it != _collectors.end())
@@ -73,7 +73,7 @@ Collector* Registry::findCollector(const std::string& collectorName) const
 
 void Registry::clear()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_collectors.clear();
 }
@@ -81,7 +81,7 @@ void Registry::clear()
 
 void Registry::exportTo(Exporter& exporter) const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	for (const auto& p: _collectors)
 	{

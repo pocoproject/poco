@@ -373,7 +373,7 @@ void SessionImpl::begin()
 		throw InvalidAccessException("Session in auto commit mode.");
 
 	{
-		Poco::FastMutex::ScopedLock l(_mutex);
+		std::lock_guard<std::mutex> l(_mutex);
 
 		if (_inTransaction)
 			throw InvalidAccessException("Transaction in progress.");

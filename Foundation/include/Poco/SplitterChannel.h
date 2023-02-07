@@ -70,7 +70,7 @@ private:
 	typedef std::vector<Channel::Ptr> ChannelVec;
 
 	ChannelVec        _channels;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

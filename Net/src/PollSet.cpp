@@ -63,8 +63,8 @@ int close(HANDLE h)
 class PollSetImpl
 {
 public:
-	using Mutex = Poco::FastMutex;
-	using ScopedLock = Mutex::ScopedLock;
+	using Mutex = std::mutex;
+	using ScopedLock = std::lock_guard<Mutex>;
 	using SocketMode = std::pair<Socket, int>;
 	using SocketMap = std::map<void*, SocketMode>;
 
@@ -353,7 +353,7 @@ public:
 
 	void add(const Socket& socket, int mode)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
 		_addMap[fd] |= mode;
 		_removeSet.erase(fd);
@@ -362,7 +362,7 @@ public:
 
 	void remove(const Socket& socket)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
 		_removeSet.insert(fd);
 		_addMap.erase(fd);
@@ -371,7 +371,7 @@ public:
 
 	bool has(const Socket& socket) const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		SocketImpl* sockImpl = socket.impl();
 		return sockImpl &&
 			(_socketMap.find(sockImpl->sockfd()) != _socketMap.end());
@@ -379,13 +379,13 @@ public:
 
 	bool empty() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		return _socketMap.empty();
 	}
 
 	void update(const Socket& socket, int mode)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
 		for (auto it = _pollfds.begin(); it != _pollfds.end(); ++it)
 		{
@@ -400,7 +400,7 @@ public:
 
 	void clear()
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		_socketMap.clear();
 		_addMap.clear();
@@ -412,7 +412,7 @@ public:
 	{
 		PollSet::SocketModeMap result;
 		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 
 			if (!_removeSet.empty())
 			{
@@ -468,7 +468,7 @@ public:
 				_pipe.readBytes(&c, 1);
 			}
 
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 
 			if (!_socketMap.empty())
 			{
@@ -500,7 +500,7 @@ public:
 
 	int count() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		return static_cast<int>(_socketMap.size());
 	}
 
@@ -515,7 +515,7 @@ private:
 			target |= POLLOUT;
 	}
 
-	mutable Poco::FastMutex         _mutex;
+	mutable std::mutex              _mutex;
 	std::map<poco_socket_t, Socket> _socketMap;
 	std::map<poco_socket_t, int>    _addMap;
 	std::set<poco_socket_t>         _removeSet;
@@ -535,37 +535,37 @@ class PollSetImpl
 public:
 	void add(const Socket& socket, int mode)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_map[socket] = mode;
 	}
 
 	void remove(const Socket& socket)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_map.erase(socket);
 	}
 
 	bool has(const Socket& socket) const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		return _map.find(socket) != _map.end();
 	}
 
 	bool empty() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		return _map.empty();
 	}
 
 	void update(const Socket& socket, int mode)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_map[socket] = mode;
 	}
 
 	void clear()
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_map.clear();
 	}
 
@@ -581,7 +581,7 @@ public:
 		FD_ZERO(&fdExcept);
 
 		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 
 			for (auto it = _map.begin(); it != _map.end(); ++it)
 			{
@@ -632,7 +632,7 @@ public:
 		if (rc < 0) SocketImpl::error();
 
 		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 
 			for (auto it = _map.begin(); it != _map.end(); ++it)
 			{
@@ -665,12 +665,12 @@ public:
 
 	int count() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		return static_cast<int>(_map.size());
 	}
 
 private:
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 	PollSet::SocketModeMap  _map;
 };
 

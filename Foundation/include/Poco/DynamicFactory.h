@@ -56,7 +56,7 @@ public:
 		/// The class must have been registered with registerClass.
 		/// If the class name is unknown, a NotFoundException is thrown.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		typename FactoryMap::const_iterator it = _map.find(className);
 		if (it != _map.end())
@@ -85,7 +85,7 @@ public:
 	{
 		poco_check_ptr (pAbstractFactory);
 
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		std::unique_ptr<AbstractFactory> ptr(pAbstractFactory);
 
@@ -101,7 +101,7 @@ public:
 		/// for the class.
 		/// Throws a NotFoundException if the class has not been registered.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		typename FactoryMap::iterator it = _map.find(className);
 		if (it != _map.end())
@@ -115,7 +115,7 @@ public:
 	bool isClass(const std::string& className) const
 		/// Returns true iff the given class has been registered.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		return _map.find(className) != _map.end();
 	}
@@ -127,7 +127,7 @@ private:
 	typedef std::map<std::string, AbstractFactory*> FactoryMap;
 
 	FactoryMap _map;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

@@ -106,7 +106,7 @@ const std::string HTTPDigestCredentials::AUTH_PARAM("auth");
 const std::string HTTPDigestCredentials::CNONCE_PARAM("cnonce");
 const std::string HTTPDigestCredentials::NC_PARAM("nc");
 int HTTPDigestCredentials::_nonceCounter(0);
-Poco::FastMutex HTTPDigestCredentials::_nonceMutex;
+std::mutex HTTPDigestCredentials::_nonceMutex;
 
 class HTTPDigestCredentials::DigestEngineProvider {
 public:
@@ -232,7 +232,7 @@ void HTTPDigestCredentials::updateProxyAuthInfo(HTTPRequest& request)
 
 std::string HTTPDigestCredentials::createNonce()
 {
-	Poco::FastMutex::ScopedLock lock(_nonceMutex);
+	std::lock_guard<std::mutex> lock(_nonceMutex);
 
 	MD5Engine md5;
 	Timestamp::TimeVal now = Timestamp().epochMicroseconds();

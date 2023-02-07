@@ -29,7 +29,7 @@ bool Base64DecoderBuf::IN_ENCODING_URL_INIT = false;
 
 namespace
 {
-	static FastMutex mutex;
+	static std::mutex mutex;
 }
 
 
@@ -40,7 +40,7 @@ Base64DecoderBuf::Base64DecoderBuf(std::istream& istr, int options):
 	_buf(*istr.rdbuf()),
 	_pInEncoding((options & BASE64_URL_ENCODING) ? IN_ENCODING_URL : IN_ENCODING)
 {
-	FastMutex::ScopedLock lock(mutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	if (options & BASE64_URL_ENCODING)
 	{
 		if (!IN_ENCODING_URL_INIT)

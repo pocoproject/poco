@@ -279,7 +279,7 @@ void SocketProactor::wait()
 
 bool SocketProactor::hasHandlers(SubscriberMap& handlers, int sockfd)
 {
-	Poco::Mutex::ScopedLock l(_writeMutex);
+	std::lock_guard<std::recursive_mutex> l(_writeMutex);
 	if (handlers.end() == handlers.find(sockfd))
 		return false;
 	return true;
@@ -337,7 +337,7 @@ void SocketProactor::addReceiveFrom(Socket sock, Buffer& buf, Poco::Net::SocketA
 	pHandler->_pBuf = std::addressof(buf);
 	pHandler->_onCompletion = std::move(onCompletion);
 
-	Poco::Mutex::ScopedLock l(_readMutex);
+	std::lock_guard<std::recursive_mutex> l(_readMutex);
 	_readHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
 }
 
@@ -393,7 +393,7 @@ void SocketProactor::addReceive(Socket sock, Buffer& buf, Callback&& onCompletio
 	pHandler->_pBuf = std::addressof(buf);
 	pHandler->_onCompletion = std::move(onCompletion);
 
-	Poco::Mutex::ScopedLock l(_readMutex);
+	std::lock_guard<std::recursive_mutex> l(_readMutex);
 	_readHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
 	if (!has(sock)) addSocket(sock, PollSet::POLL_READ);
 }
@@ -443,7 +443,7 @@ void SocketProactor::addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr
 	pHandler->_onCompletion = std::move(onCompletion);
 	pHandler->_owner = own;
 
-	Poco::Mutex::ScopedLock l(_writeMutex);
+	std::lock_guard<std::recursive_mutex> l(_writeMutex);
 	_writeHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
 	if (!has(sock)) addSocket(sock, PollSet::POLL_WRITE);
 }
@@ -459,7 +459,7 @@ int SocketProactor::error(Socket& sock)
 
 int SocketProactor::send(Socket& sock)
 {
-	Poco::Mutex::ScopedLock l(_writeMutex);
+	std::lock_guard<std::recursive_mutex> l(_writeMutex);
 	auto hIt = _writeHandlers.find(sock.impl()->sockfd());
 	if (hIt == _writeHandlers.end()) return 0;
 	IOHandlerList& handlers = hIt->second;
@@ -548,7 +548,7 @@ void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 
 int SocketProactor::receive(Socket& sock)
 {
-	Poco::Mutex::ScopedLock l(_readMutex);
+	std::lock_guard<std::recursive_mutex> l(_readMutex);
 	auto hIt = _readHandlers.find(sock.impl()->sockfd());
 	if (hIt == _readHandlers.end()) return 0;
 	IOHandlerList& handlers = hIt->second;

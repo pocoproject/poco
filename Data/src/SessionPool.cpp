@@ -64,7 +64,7 @@ Session SessionPool::get(const std::string& name, bool value)
 
 Session SessionPool::get()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
     if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	purgeDeadSessions();
@@ -95,7 +95,7 @@ Session SessionPool::get()
 
 void SessionPool::purgeDeadSessions()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (_shutdown) return;
 
 	SessionList::iterator it = _idleSessions.begin();
@@ -119,14 +119,14 @@ int SessionPool::capacity() const
 
 int SessionPool::used() const
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	return (int) _activeSessions.size();
 }
 
 
 int SessionPool::idle() const
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	return (int) _idleSessions.size();
 }
 
@@ -139,7 +139,7 @@ int SessionPool::connTimeout() const
 
 int SessionPool::dead()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	int count = 0;
 
 	SessionList::iterator it = _activeSessions.begin();
@@ -156,7 +156,7 @@ int SessionPool::dead()
 
 int SessionPool::allocated() const
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	return _nSessions;
 }
 
@@ -170,7 +170,7 @@ int SessionPool::available() const
 
 void SessionPool::setFeature(const std::string& name, bool state)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_nSessions > 0)
@@ -194,7 +194,7 @@ bool SessionPool::getFeature(const std::string& name)
 
 void SessionPool::setProperty(const std::string& name, const Poco::Any& value)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_nSessions > 0)
@@ -234,7 +234,7 @@ void SessionPool::customizeSession(Session&)
 
 void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (_shutdown) return;
 
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
@@ -287,7 +287,7 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 
 void SessionPool::onJanitorTimer(Poco::Timer&)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (_shutdown) return;
 
 	SessionList::iterator it = _idleSessions.begin();
@@ -312,7 +312,7 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 
 void SessionPool::shutdown()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (_shutdown) return;
 	_shutdown = true;
 	_janitorTimer.stop();

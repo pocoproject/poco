@@ -60,7 +60,7 @@ public:
 #ifdef POCO_HAVE_STD_ATOMICS
 	typedef Poco::SpinlockMutex     DFMutex;
 #else
-	typedef Poco::FastMutex         DFMutex;
+	typedef std::mutex              DFMutex;
 #endif
 
 	static const MsgSizeT BUF_STATUS_IDLE  = 0;
@@ -99,7 +99,7 @@ public:
 		/// If mutex lock times out, returns null pointer.
 	{
 		char* ret = 0;
-		if (_mutex.tryLock(10))
+		if (_mutex.try_lock_for(std::chrono::milliseconds(10)))
 		{
 			if (_buffers[sock].size() < _bufListSize) // building buffer list
 			{
@@ -156,7 +156,7 @@ public:
 		{
 			_dataReady.wait();
 			if (_stop) break;
-			if (_mutex.tryLock(10))
+			if (_mutex.try_lock_for(std::chrono::milliseconds(10)))
 			{
 				if (!_stop)
 				{
@@ -248,14 +248,14 @@ public:
 	bool hasData(char*& pBuf)
 		/// Returns true if buffer contains data.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		std::lock_guard<DFMutex> l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
 	}
 
 	bool isError(char*& pBuf)
 		/// Returns true if buffer contains error.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		std::lock_guard<DFMutex> l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
@@ -353,7 +353,7 @@ private:
 
 	void setStatus(char*& pBuf, MsgSizeT status)
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		std::lock_guard<DFMutex> l(_dfMutex);
 		setStatusImpl(pBuf, status);
 	}
 
@@ -376,7 +376,7 @@ private:
 	MemPool           _memPool;
 	AtomicCounter     _dataBacklog;
 	AtomicCounter     _errorBacklog;
-	Poco::FastMutex   _mutex;
+	std::timed_mutex  _mutex;
 	DFMutex           _dfMutex;
 	std::ostream*     _pErr;
 };

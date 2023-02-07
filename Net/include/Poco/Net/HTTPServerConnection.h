@@ -55,7 +55,7 @@ private:
 	HTTPServerParams::Ptr          _pParams;
 	HTTPRequestHandlerFactory::Ptr _pFactory;
 	bool _stopped;
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 };
 
 

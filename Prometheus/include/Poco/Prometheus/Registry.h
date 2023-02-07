@@ -86,7 +86,7 @@ public:
 
 private:
 	std::map<std::string, Collector*> _collectors;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 
 	Registry(const Registry&) = delete;
 	Registry(Registry&&) = delete;

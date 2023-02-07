@@ -43,7 +43,7 @@ protected:
 private:
 	Poco::PriorityNotificationQueue    _queue;
 	std::multiset<std::string> _handled;
-	Poco::FastMutex            _mutex;
+	std::mutex                 _mutex;
 };
 
 

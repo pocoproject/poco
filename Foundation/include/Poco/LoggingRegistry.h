@@ -89,7 +89,7 @@ private:
 
 	ChannelMap   _channelMap;
 	FormatterMap _formatterMap;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

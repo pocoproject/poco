@@ -40,7 +40,7 @@ SessionFactory& SessionFactory::instance()
 
 void SessionFactory::add(Connector* pIn)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	SessionInfo info(pIn);
 	std::pair<Connectors::iterator, bool> res =
 		_connectors.insert(std::make_pair(pIn->name(), info));
@@ -50,7 +50,7 @@ void SessionFactory::add(Connector* pIn)
 
 void SessionFactory::remove(const std::string& key)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	Connectors::iterator it = _connectors.find(key);
 	poco_assert (_connectors.end() != it);
 
@@ -65,7 +65,7 @@ Session SessionFactory::create(const std::string& key,
 {
 	Poco::SharedPtr<Connector> ptrSI;
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		Connectors::iterator it = _connectors.find(key);
 		if (_connectors.end() == it) throw Poco::NotFoundException(key);
 		ptrSI = it->second.ptrSI;

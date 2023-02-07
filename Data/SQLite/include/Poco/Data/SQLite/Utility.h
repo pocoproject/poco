@@ -216,7 +216,7 @@ private:
 	static void* eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam);
 
 	static TypeMap     _types;
-	static Poco::Mutex _mutex;
+	static std::recursive_mutex _mutex;
 	static int         _threadMode;
 };
 

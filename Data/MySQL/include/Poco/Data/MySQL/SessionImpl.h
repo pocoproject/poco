@@ -202,7 +202,7 @@ private:
 	bool                  _failIfInnoReadOnly;
 	std::size_t           _timeout;
 	mutable int           _lastError;
-	Poco::FastMutex       _mutex;
+	std::mutex            _mutex;
 };
 
 

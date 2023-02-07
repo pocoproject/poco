@@ -20,7 +20,6 @@
 
 
 using Poco::InvalidArgumentException;
-using Poco::Mutex;
 using Poco::ScopedLock;
 
 
@@ -172,7 +171,7 @@ int StreamSocket::sendBytes(const SocketBufVec& buffers, int flags)
 
 int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
 {
-	ScopedLock<Mutex> l(fifoBuf.mutex());
+	ScopedLock<std::recursive_mutex> l(fifoBuf.mutex());
 
 	int ret = impl()->sendBytes(fifoBuf.begin(), (int) fifoBuf.used());
 	if (ret > 0) fifoBuf.drain(ret);
@@ -200,7 +199,7 @@ int StreamSocket::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco
 
 int StreamSocket::receiveBytes(FIFOBuffer& fifoBuf)
 {
-	ScopedLock<Mutex> l(fifoBuf.mutex());
+	ScopedLock<std::recursive_mutex> l(fifoBuf.mutex());
 
 	int ret = impl()->receiveBytes(fifoBuf.next(), (int)fifoBuf.available());
 	if (ret > 0) fifoBuf.advance(ret);

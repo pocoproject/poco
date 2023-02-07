@@ -28,8 +28,8 @@ namespace Poco {
 template <
 	class TKey,
 	class TValue,
-	class TMutex = FastMutex,
-	class TEventMutex = FastMutex
+	class TMutex = std::mutex,
+	class TEventMutex = std::mutex
 >
 class UniqueAccessExpireCache: public AbstractCache<TKey, TValue, UniqueAccessExpireStrategy<TKey, TValue>, TMutex, TEventMutex>
 	/// An UniqueAccessExpireCache caches entries for a given time span. In contrast

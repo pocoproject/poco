@@ -141,7 +141,7 @@ private:
 	TransactionType _transactionType;
 	int         _timeout;
 	mutable
-	Poco::Mutex _mutex;
+	std::recursive_mutex _mutex;
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
 	static const std::string EXCLUSIVE_BEGIN_TRANSACTION;
 	static const std::string IMMEDIATE_BEGIN_TRANSACTION; 

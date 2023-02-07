@@ -18,7 +18,6 @@
 
 
 using Poco::SingletonHolder;
-using Poco::FastMutex;
 using Poco::NotFoundException;
 using Poco::ExistsException;
 
@@ -58,7 +57,7 @@ void HTTPSessionFactory::registerProtocol(const std::string& protocol, HTTPSessi
 {
 	poco_assert_dbg(pSessionInstantiator);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	std::pair<Instantiators::iterator, bool> tmp = _instantiators.insert(make_pair(protocol, InstantiatorInfo(pSessionInstantiator)));
 	if (!tmp.second)
 	{
@@ -70,7 +69,7 @@ void HTTPSessionFactory::registerProtocol(const std::string& protocol, HTTPSessi
 
 void HTTPSessionFactory::unregisterProtocol(const std::string& protocol)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	Instantiators::iterator it = _instantiators.find(protocol);
 	if (it != _instantiators.end())
@@ -88,7 +87,7 @@ void HTTPSessionFactory::unregisterProtocol(const std::string& protocol)
 
 bool HTTPSessionFactory::supportsProtocol(const std::string& protocol)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	Instantiators::iterator it = _instantiators.find(protocol);
 	return it != _instantiators.end();
@@ -97,7 +96,7 @@ bool HTTPSessionFactory::supportsProtocol(const std::string& protocol)
 
 HTTPClientSession* HTTPSessionFactory::createClientSession(const Poco::URI& uri)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (uri.isRelative()) throw Poco::UnknownURISchemeException("Relative URIs are not supported by HTTPSessionFactory.");
 
@@ -113,7 +112,7 @@ HTTPClientSession* HTTPSessionFactory::createClientSession(const Poco::URI& uri)
 
 void HTTPSessionFactory::setProxy(const std::string& host, Poco::UInt16 port)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_proxyConfig.host = host;
 	_proxyConfig.port = port;
@@ -122,7 +121,7 @@ void HTTPSessionFactory::setProxy(const std::string& host, Poco::UInt16 port)
 
 void HTTPSessionFactory::setProxyCredentials(const std::string& username, const std::string& password)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_proxyConfig.username = username;
 	_proxyConfig.password = password;
@@ -131,7 +130,7 @@ void HTTPSessionFactory::setProxyCredentials(const std::string& username, const 
 
 void HTTPSessionFactory::setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_proxyConfig = proxyConfig;
 }

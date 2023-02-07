@@ -122,7 +122,7 @@ public:
 		/// than currently used length and preserveContent
 		/// is true, InvalidAccessException is thrown.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		if (preserveContent && (newSize < _used))
 			throw InvalidAccessException("Can not resize FIFO without data loss.");
@@ -145,7 +145,7 @@ public:
 		/// supplied buffer.
 	{
 		if (0 == length) return 0;
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (!isReadable()) return 0;
 		if (length > _used) length = _used;
 		std::memcpy(pBuffer, _buffer.begin() + _begin, length * sizeof(T));
@@ -164,7 +164,7 @@ public:
 		/// Returns the number of elements copied in the
 		/// supplied buffer.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (!isReadable()) return 0;
 		if (0 == length || length > _used) length = _used;
 		buffer.resize(length);
@@ -180,7 +180,7 @@ public:
 		/// Returns the size of the copied data.
 	{
 		if (0 == length) return 0;
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (!isReadable()) return 0;
 		std::size_t usedBefore = _used;
 		std::size_t readLen = peek(pBuffer, length);
@@ -202,7 +202,7 @@ public:
 		///
 		/// Returns the size of the copied data.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (!isReadable()) return 0;
 		std::size_t usedBefore = _used;
 		std::size_t readLen = peek(buffer, length);
@@ -229,7 +229,7 @@ public:
 	{
 		if (0 == length) return 0;
 
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		if (!isWritable()) return 0;
 
@@ -290,7 +290,7 @@ public:
 		/// If length is zero or greater than buffer current
 		/// content length, buffer is emptied.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		std::size_t usedBefore = _used;
 
@@ -315,7 +315,7 @@ public:
 		poco_check_ptr(ptr);
 		if (0 == length) return;
 
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		if (length > available())
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
@@ -335,7 +335,7 @@ public:
 		/// was copied into the buffer.
 	{
 		if (0 == length) return;
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		if (length > available())
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
@@ -357,7 +357,7 @@ public:
 	T* begin()
 		/// Returns the pointer to the beginning of the buffer.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_begin != 0)
 		{
 			// Move the data to the start of the buffer so begin() and next()
@@ -372,7 +372,7 @@ public:
 	T* next()
 		/// Returns the pointer to the next available position in the buffer.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		return begin() + _used;
 	}
 
@@ -381,7 +381,7 @@ public:
 		/// Throws InvalidAccessException if index is larger than
 		/// the last valid (used) buffer position.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (index >= _used)
 			throw InvalidAccessException(format("Index out of bounds: %z (max index allowed: %z)", index, _used - 1));
 
@@ -393,7 +393,7 @@ public:
 		/// Throws InvalidAccessException if index is larger than
 		/// the last valid (used) buffer position.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (index >= _used)
 			throw InvalidAccessException(format("Index out of bounds: %z (max index allowed: %z)", index, _used - 1));
 
@@ -418,7 +418,7 @@ public:
 		if (error)
 		{
 			bool f = false;
-			Mutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::recursive_mutex> lock(_mutex);
 			if (isReadable() && _notify) readable.notify(this, f);
 			if (isWritable() && _notify) writable.notify(this, f);
 			_error = error;
@@ -427,7 +427,7 @@ public:
 		else
 		{
 			bool t = true;
-			Mutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::recursive_mutex> lock(_mutex);
 			_error = false;
 			if (_notify && !_eof) writable.notify(this, t);
 		}
@@ -454,7 +454,7 @@ public:
 		/// was previously set. If EOF was not set, it has no
 		/// effect.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		bool flag = !eof;
 		if (_notify) writable.notify(this, flag);
 		_eof = eof;
@@ -510,7 +510,7 @@ public:
 		return _notify;
 	}
 
-	Mutex& mutex()
+	std::recursive_mutex& mutex()
 		/// Returns reference to mutex.
 	{
 		return _mutex;
@@ -539,7 +539,7 @@ private:
 	std::size_t   _begin;
 	std::size_t   _used;
 	bool          _notify;
-	mutable Mutex _mutex;
+	mutable std::recursive_mutex _mutex;
 	bool          _eof;
 	bool          _error;
 };

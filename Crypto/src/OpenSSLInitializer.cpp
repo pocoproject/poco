@@ -62,7 +62,7 @@ namespace Crypto {
 Poco::AtomicCounter OpenSSLInitializer::_rc;
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
-Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
+std::mutex* OpenSSLInitializer::_mutexes(0);
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
@@ -106,7 +106,7 @@ void OpenSSLInitializer::initialize()
 		OpenSSL_add_all_algorithms();
 
 		int nMutexes = CRYPTO_num_locks();
-		_mutexes = new Poco::FastMutex[nMutexes];
+		_mutexes = new std::mutex[nMutexes];
 		CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
 #ifndef POCO_OS_FAMILY_WINDOWS
 // Not needed on Windows (see SF #110: random unhandled exceptions when linking with ssl).

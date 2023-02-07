@@ -42,14 +42,14 @@ void SplitterChannel::addChannel(Channel::Ptr pChannel)
 {
 	poco_check_ptr (pChannel);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_channels.push_back(pChannel);
 }
 
 
 void SplitterChannel::removeChannel(Channel::Ptr pChannel)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	for (ChannelVec::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
@@ -78,7 +78,7 @@ void SplitterChannel::setProperty(const std::string& name, const std::string& va
 
 void SplitterChannel::log(const Message& msg)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	for (auto& p: _channels)
 	{
@@ -89,14 +89,14 @@ void SplitterChannel::log(const Message& msg)
 
 void SplitterChannel::close()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_channels.clear();
 }
 
 
 int SplitterChannel::count() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return (int) _channels.size();
 }

@@ -18,7 +18,6 @@
 
 
 using Poco::StringTokenizer;
-using Poco::FastMutex;
 
 
 ApacheRequestHandlerFactory::ApacheRequestHandlerFactory()
@@ -33,7 +32,7 @@ ApacheRequestHandlerFactory::~ApacheRequestHandlerFactory()
 
 Poco::Net::HTTPRequestHandler* ApacheRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	// only if the given uri is found in _uris we are
 	// handling this request.
@@ -57,7 +56,7 @@ Poco::Net::HTTPRequestHandler* ApacheRequestHandlerFactory::createRequestHandler
 
 void ApacheRequestHandlerFactory::handleURIs(const std::string& uris)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	StringTokenizer st(uris, " ", StringTokenizer::TOK_TRIM);
 	StringTokenizer::Iterator it = st.begin();
@@ -91,7 +90,7 @@ void ApacheRequestHandlerFactory::addRequestHandlerFactory(const std::string& dl
 
 bool ApacheRequestHandlerFactory::mustHandle(const std::string& uri)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	// only if the given uri is found in _uris we are
 	// handling this request.

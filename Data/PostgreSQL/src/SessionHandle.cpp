@@ -57,7 +57,7 @@ SessionHandle::~SessionHandle()
 
 bool SessionHandle::isConnected() const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	return isConnectedNoLock();
 }
@@ -77,7 +77,7 @@ bool SessionHandle::isConnectedNoLock() const
 
 void SessionHandle::connect(const std::string& aConnectionString)
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (isConnectedNoLock())
 	{
@@ -135,7 +135,7 @@ void SessionHandle::connect(const char* aHost, const char* aUser, const char* aP
 
 void SessionHandle::disconnect()
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (isConnectedNoLock())
 	{
@@ -155,7 +155,7 @@ void SessionHandle::disconnect()
 // TODO: Figure out what happens if a connection is reset with a pending transaction
 bool SessionHandle::reset()
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (_pConnection)
 	{
@@ -173,7 +173,7 @@ bool SessionHandle::reset()
 
 std::string SessionHandle::lastError() const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -195,7 +195,7 @@ std::string SessionHandle::lastErrorNoLock() const
 
 void SessionHandle::startTransaction()
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -222,7 +222,7 @@ void SessionHandle::startTransaction()
 
 void SessionHandle::commit()
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -246,7 +246,7 @@ void SessionHandle::commit()
 
 void SessionHandle::rollback()
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -290,7 +290,7 @@ void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
 
 void SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -317,7 +317,7 @@ void SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
 
 void SessionHandle::cancel()
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -334,7 +334,7 @@ void SessionHandle::cancel()
 
 void SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -392,7 +392,7 @@ bool SessionHandle::hasTransactionIsolation(Poco::UInt32 aTI)
 
 void SessionHandle::deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate)
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -443,7 +443,7 @@ void SessionHandle::deallocateStoredPreparedStatements()
 
 int SessionHandle::serverVersion() const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -456,7 +456,7 @@ int SessionHandle::serverVersion() const
 
 int SessionHandle::serverProcessID() const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -469,7 +469,7 @@ int SessionHandle::serverProcessID() const
 
 int SessionHandle::protocoVersion() const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -482,7 +482,7 @@ int SessionHandle::protocoVersion() const
 
 std::string SessionHandle::clientEncoding() const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -495,7 +495,7 @@ std::string SessionHandle::clientEncoding() const
 
 std::string SessionHandle::parameterStatus(const std::string& param) const
 {
-	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+	std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 	if (!isConnectedNoLock())
 	{
@@ -567,7 +567,7 @@ SessionParametersMap SessionHandle::connectionParameters() const
 
 	PQconninfoOption* ptrConnInfoOptions = 0;
 	{
-		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+		std::lock_guard<std::mutex> mutexLocker(_sessionMutex);
 
 		ptrConnInfoOptions = PQconninfo(_pConnection);
 	}

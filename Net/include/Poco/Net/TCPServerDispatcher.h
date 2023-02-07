@@ -110,7 +110,7 @@ private:
 
 		~ThreadCountWatcher()
 		{
-			FastMutex::ScopedLock lock(_pDisp->_mutex);
+			std::lock_guard<std::mutex> lock(_pDisp->_mutex);
 			if (_pDisp->_currentThreads > 1 && _pDisp->_queue.empty())
 			{
 				--_pDisp->_currentThreads;
@@ -136,7 +136,7 @@ private:
 	Poco::NotificationQueue         _queue;
 	TCPServerConnectionFactory::Ptr _pConnectionFactory;
 	Poco::ThreadPool&               _threadPool;
-	mutable Poco::FastMutex         _mutex;
+	mutable std::mutex              _mutex;
 };
 
 

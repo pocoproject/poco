@@ -33,7 +33,7 @@ HistogramSample::HistogramSample(const std::vector<double>& bucketBounds):
 
 void HistogramSample::observe(double value)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	const std::size_t n = _bucketBounds.size();
 	for (std::size_t i = 0; i < n; i++)
@@ -117,7 +117,7 @@ std::unique_ptr<HistogramSample> Histogram::createSample() const
 
 void Histogram::exportTo(Exporter& exporter) const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	Gauge bucket(name() + "_bucket"s, nullptr);
 	Gauge sum(name() + "_sum"s, nullptr);

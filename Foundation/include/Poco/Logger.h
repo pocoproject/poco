@@ -484,7 +484,7 @@ private:
 
 	// definitions in Foundation.cpp
 	static LoggerMapPtr _pLoggerMap;
-	static Mutex      _mapMtx;
+	static std::recursive_mutex _mapMtx;
 };
 
 

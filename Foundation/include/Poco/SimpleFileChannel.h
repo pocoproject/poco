@@ -142,7 +142,7 @@ private:
 	UInt64           _limit;
 	bool             _flush;
 	LogFile*         _pFile;
-	FastMutex        _mutex;
+	std::mutex       _mutex;
 };
 
 

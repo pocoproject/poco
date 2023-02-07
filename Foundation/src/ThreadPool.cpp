@@ -53,7 +53,7 @@ private:
 	Event                _targetReady;
 	Event                _targetCompleted;
 	Event                _started;
-	FastMutex            _mutex;
+	std::mutex           _mutex;
 };
 
 
@@ -89,7 +89,7 @@ void PooledThread::start()
 
 void PooledThread::start(Thread::Priority priority, Runnable& target)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	poco_assert (_pTarget == 0);
 
@@ -101,7 +101,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target)
 
 void PooledThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	std::string fullName(name);
 	if (name.empty())
@@ -126,14 +126,14 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 
 inline bool PooledThread::idle()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _idle;
 }
 
 
 int PooledThread::idleTime()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 	return (int) (wceex_time(NULL) - _idleTime);
@@ -155,7 +155,7 @@ void PooledThread::join()
 
 void PooledThread::activate()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	poco_assert (_idle);
 	_idle = false;
@@ -210,7 +210,7 @@ void PooledThread::run()
 			{
 				ErrorHandler::handle();
 			}
-			FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_pTarget  = 0;
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 			_idleTime = wceex_time(NULL);
@@ -293,7 +293,7 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::addCapacity(int n)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	poco_assert (_maxCapacity + n >= _minCapacity);
 	_maxCapacity += n;
@@ -303,14 +303,14 @@ void ThreadPool::addCapacity(int n)
 
 int ThreadPool::capacity() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _maxCapacity;
 }
 
 
 int ThreadPool::available() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	int count = 0;
 	for (auto pThread: _threads)
@@ -323,7 +323,7 @@ int ThreadPool::available() const
 
 int ThreadPool::used() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	int count = 0;
 	for (auto pThread: _threads)
@@ -336,7 +336,7 @@ int ThreadPool::used() const
 
 int ThreadPool::allocated() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return int(_threads.size());
 }
@@ -368,7 +368,7 @@ void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, 
 
 void ThreadPool::stopAll()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	for (auto pThread: _threads)
 	{
@@ -380,7 +380,7 @@ void ThreadPool::stopAll()
 
 void ThreadPool::joinAll()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	for (auto pThread: _threads)
 	{
@@ -392,7 +392,7 @@ void ThreadPool::joinAll()
 
 void ThreadPool::collect()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	housekeep();
 }
 
@@ -440,7 +440,7 @@ void ThreadPool::housekeep()
 
 PooledThread* ThreadPool::getThread()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (++_age == 32)
 		housekeep();
@@ -495,7 +495,7 @@ public:
 	}
 	ThreadPool* pool()
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		if (!_pPool)
 		{
@@ -508,7 +508,7 @@ public:
 
 private:
 	ThreadPool* _pPool;
-	FastMutex   _mutex;
+	std::mutex  _mutex;
 };
 
 

@@ -48,7 +48,7 @@ private:
 
 	RequestHandlerFactories _requestHandlers;
 	Poco::ClassLoader<Poco::Net::HTTPRequestHandlerFactory> _loader;
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 };
 
 

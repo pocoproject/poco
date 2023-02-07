@@ -46,7 +46,7 @@ extern "C" bool lookupFunc(char* name, int val, SYM_TYPE type, int arg, UINT16 g
 namespace Poco {
 
 
-FastMutex SharedLibraryImpl::_mutex;
+std::mutex SharedLibraryImpl::_mutex;
 
 
 SharedLibraryImpl::SharedLibraryImpl():
@@ -62,7 +62,7 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_moduleId) throw LibraryAlreadyLoadedException(path);
 	int fd = open(const_cast<char*>(path.c_str()), O_RDONLY, 0);
@@ -87,7 +87,7 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 
 void SharedLibraryImpl::unloadImpl()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_moduleId)
 	{
@@ -99,7 +99,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _moduleId != 0;
 }
 
@@ -108,7 +108,7 @@ void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 {
 	poco_assert (_moduleId != 0);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	MODULE_INFO mi;
 	if (!moduleInfoGet(_moduleId, &mi)) return 0;

@@ -112,7 +112,7 @@ public:
 
 	void start(ThreadPool& pool)
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		if (!_running)
 		{
@@ -196,7 +196,7 @@ private:
 	std::atomic<bool>   _stopped;
 	std::atomic<bool>   _running;
 	Event               _done;
-	FastMutex           _mutex;
+	std::mutex          _mutex;
 };
 
 

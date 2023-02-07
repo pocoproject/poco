@@ -125,7 +125,7 @@ private:
 	typedef std::map<std::string, URIStreamFactory*> FactoryMap;
 
 	FactoryMap        _map;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

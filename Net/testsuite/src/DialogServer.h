@@ -69,7 +69,7 @@ private:
 	Poco::Net::ServerSocket  _socket;
 	Poco::Thread             _thread;
 	Poco::Event              _ready;
-	mutable Poco::FastMutex  _mutex;
+	mutable std::mutex       _mutex;
 	std::atomic<bool>        _stop;
 	std::vector<std::string> _nextResponses;
 	std::vector<std::string> _lastCommands;

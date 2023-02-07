@@ -63,7 +63,7 @@ public:
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_receiverObject)
 		{
 			(_receiverObject->*_receiverMethod)(sender, arguments);
@@ -85,14 +85,14 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_receiverObject = 0;
 	}
 
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
-	Mutex        _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	Delegate();
@@ -134,7 +134,7 @@ public:
 
 	bool notify(const void*, TArgs& arguments)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_receiverObject)
 		{
 			(_receiverObject->*_receiverMethod)(arguments);
@@ -156,14 +156,14 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_receiverObject = 0;
 	}
 
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
-	Mutex        _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	Delegate();
@@ -275,7 +275,7 @@ public:
 
 	bool notify(const void* sender)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_receiverObject)
 		{
 			(_receiverObject->*_receiverMethod)(sender);
@@ -297,14 +297,14 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_receiverObject = 0;
 	}
 
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
-	Mutex        _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	Delegate();
@@ -346,7 +346,7 @@ public:
 
 	bool notify(const void*)
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		if (_receiverObject)
 		{
 			(_receiverObject->*_receiverMethod)();
@@ -368,14 +368,14 @@ public:
 
 	void disable()
 	{
-		Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_receiverObject = 0;
 	}
 
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
-	Mutex        _mutex;
+	std::recursive_mutex _mutex;
 
 private:
 	Delegate();

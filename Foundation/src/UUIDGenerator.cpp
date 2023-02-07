@@ -37,7 +37,7 @@ UUIDGenerator::~UUIDGenerator()
 
 UUID UUIDGenerator::create()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_haveNode)
 	{
@@ -138,7 +138,7 @@ UUID UUIDGenerator::createOne()
 
 void UUIDGenerator::seed()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_random.seed();
 }
@@ -146,7 +146,7 @@ void UUIDGenerator::seed()
 
 void UUIDGenerator::seed(UInt32 n)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_random.seed(n);
 }

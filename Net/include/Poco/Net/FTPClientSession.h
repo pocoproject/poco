@@ -361,7 +361,7 @@ private:
 	bool _isLoggedIn = false;
 	Poco::Timespan _timeout = DEFAULT_TIMEOUT;
 	std::string _welcomeMessage;
-	Poco::FastMutex _wmMutex;
+	std::mutex _wmMutex;
 };
 
 
@@ -418,7 +418,7 @@ inline bool FTPClientSession::isSecure() const
 
 inline const std::string& FTPClientSession::welcomeMessage()
 {
-	Poco::FastMutex::ScopedLock lock(_wmMutex);
+	std::lock_guard<std::mutex> lock(_wmMutex);
 	return _welcomeMessage;
 }
 

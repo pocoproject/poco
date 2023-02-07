@@ -56,7 +56,7 @@ void DirectoryWatcherTest::testAdded()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemAdded");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -88,7 +88,7 @@ void DirectoryWatcherTest::testRemoved()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemRemoved");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -121,7 +121,7 @@ void DirectoryWatcherTest::testModified()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemModified");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -155,7 +155,7 @@ void DirectoryWatcherTest::testMoved()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	if (dw.supportsMoveEvents())
 	{
 		assertTrue (_events.size() >= 2);
@@ -218,7 +218,7 @@ void DirectoryWatcherTest::testSuspend()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	assertTrue (_events.size() == 0);
 	assertTrue (!_error);
 }
@@ -249,7 +249,7 @@ void DirectoryWatcherTest::testResume()
 	fos2.close();
 
 	{
-		Poco::Mutex::ScopedLock l(_mutex);
+		std::lock_guard<std::recursive_mutex> l(_mutex);
 		assertTrue (_events.size() == 0);
 		assertTrue (!_error);
 	}
@@ -262,7 +262,7 @@ void DirectoryWatcherTest::testResume()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemModified");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -311,7 +311,7 @@ void DirectoryWatcherTest::testSuspendMultipleTimes()
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
 	{
-		Poco::Mutex::ScopedLock l(_mutex);
+		std::lock_guard<std::recursive_mutex> l(_mutex);
 		assertTrue (_events.size() == 0);
 		assertTrue (!_error);
 	}
@@ -325,7 +325,7 @@ void DirectoryWatcherTest::testSuspendMultipleTimes()
 
 	Poco::Thread::sleep(2000*dw.scanInterval());
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	assertTrue (_events.size() >= 1);
 	assertTrue (_events[0].callback == "onItemModified");
 	assertTrue (Poco::Path(_events[0].path).getFileName() == "test.txt");
@@ -373,7 +373,7 @@ void DirectoryWatcherTest::onItemAdded(const Poco::DirectoryWatcher::DirectoryEv
 	de.path = ev.item.path();
 	de.type = ev.event;
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	_events.push_back(de);
 }
 
@@ -385,7 +385,7 @@ void DirectoryWatcherTest::onItemRemoved(const Poco::DirectoryWatcher::Directory
 	de.path = ev.item.path();
 	de.type = ev.event;
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	_events.push_back(de);
 }
 
@@ -397,7 +397,7 @@ void DirectoryWatcherTest::onItemModified(const Poco::DirectoryWatcher::Director
 	de.path = ev.item.path();
 	de.type = ev.event;
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	_events.push_back(de);
 }
 
@@ -409,7 +409,7 @@ void DirectoryWatcherTest::onItemMovedFrom(const Poco::DirectoryWatcher::Directo
 	de.path = ev.item.path();
 	de.type = ev.event;
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	_events.push_back(de);
 }
 
@@ -421,7 +421,7 @@ void DirectoryWatcherTest::onItemMovedTo(const Poco::DirectoryWatcher::Directory
 	de.path = ev.item.path();
 	de.type = ev.event;
 
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	_events.push_back(de);
 }
 

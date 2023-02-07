@@ -98,7 +98,7 @@ bool Task::yield()
 
 void Task::setProgress(float progress)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_progress != progress)
 	{
@@ -111,7 +111,7 @@ void Task::setProgress(float progress)
 
 void Task::setOwner(TaskManager* pOwner)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_pOwner = pOwner;
 }
@@ -127,7 +127,7 @@ void Task::postNotification(Notification* pNf)
 {
 	poco_check_ptr (pNf);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_pOwner)
 		_pOwner->postNotification(pNf);

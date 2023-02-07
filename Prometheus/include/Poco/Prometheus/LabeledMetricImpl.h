@@ -71,7 +71,7 @@ public:
 				throw Poco::InvalidArgumentException(Poco::format("Metric %s requires label values for %s"s, name(), Poco::cat(", "s, labelNames().begin(), labelNames().end())));
 		}
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		const auto it = _samples.find(labelValues);
 		if (it != _samples.end())
@@ -97,7 +97,7 @@ public:
 		if (labelValues.size() != labelNames().size())
 			throw Poco::InvalidArgumentException(Poco::format("Metric %s requires label values for %s"s, name(), Poco::cat(", "s, labelNames().begin(), labelNames().end())));
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		const auto it = _samples.find(labelValues);
 		if (it != _samples.end())
@@ -119,7 +119,7 @@ public:
 		if (labelNames().empty())
 			throw Poco::InvalidAccessException("Metric has no labels"s);
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		_samples.erase(labelValues);
 	}
@@ -127,7 +127,7 @@ public:
 	void clear()
 		/// Removes all samples.
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		_samples.clear();
 	}
@@ -135,7 +135,7 @@ public:
 	std::size_t sampleCount() const
 		/// Returns the number of samples.
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		return _samples.size();
 	}
@@ -144,7 +144,7 @@ public:
 	void forEach(ProcessingFunction func) const
 		/// Calls the given function for each Sample.
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		for (const auto& p: _samples)
 		{
@@ -155,7 +155,7 @@ public:
 	// Collector
 	void exportTo(Exporter& exporter) const override
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		exporter.writeHeader(*this);
 		for (const auto& p: _samples)
@@ -183,7 +183,7 @@ protected:
 
 private:
 	std::map<std::vector<std::string>, std::unique_ptr<Sample>> _samples;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

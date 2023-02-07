@@ -170,7 +170,7 @@ private:
 	NonceCounterMap _nc;
 
 	static int _nonceCounter;
-	static Poco::FastMutex _nonceMutex;
+	static std::mutex _nonceMutex;
 };
 
 

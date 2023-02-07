@@ -20,7 +20,7 @@ namespace Poco {
 
 
 ErrorHandler* ErrorHandler::_pHandler = ErrorHandler::defaultHandler();
-FastMutex ErrorHandler::_mutex;
+std::mutex ErrorHandler::_mutex;
 
 
 ErrorHandler::ErrorHandler()
@@ -53,7 +53,7 @@ void ErrorHandler::exception()
 
 void ErrorHandler::handle(const Exception& exc)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	try
 	{
 		_pHandler->exception(exc);
@@ -66,7 +66,7 @@ void ErrorHandler::handle(const Exception& exc)
 
 void ErrorHandler::handle(const std::exception& exc)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	try
 	{
 		_pHandler->exception(exc);
@@ -79,7 +79,7 @@ void ErrorHandler::handle(const std::exception& exc)
 
 void ErrorHandler::handle()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	try
 	{
 		_pHandler->exception();
@@ -94,7 +94,7 @@ ErrorHandler* ErrorHandler::set(ErrorHandler* pHandler)
 {
 	poco_check_ptr(pHandler);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	ErrorHandler* pOld = _pHandler;
 	_pHandler = pHandler;
 	return pOld;

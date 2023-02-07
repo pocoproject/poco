@@ -134,7 +134,7 @@ void Context::enableExtendedCertificateVerification(bool flag)
 
 void Context::addTrustedCert(const Poco::Net::X509Certificate& cert)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (!CertAddCertificateContextToStore(_hMemCertStore, cert.system(), CERT_STORE_ADD_REPLACE_EXISTING, 0))
 		throw CertificateException("Failed to add certificate to store", GetLastError());
 }
@@ -251,7 +251,7 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 
 CredHandle& Context::credentials()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_hCreds.dwLower == 0 && _hCreds.dwUpper == 0)
 	{

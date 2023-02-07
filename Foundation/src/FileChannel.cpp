@@ -84,7 +84,7 @@ FileChannel::~FileChannel()
 
 void FileChannel::open()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_pFile)
 	{
@@ -107,7 +107,7 @@ void FileChannel::open()
 
 void FileChannel::close()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	delete _pFile;
 	_pFile = 0;
@@ -118,7 +118,7 @@ void FileChannel::log(const Message& msg)
 {
 	open();
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_pRotateStrategy && _pArchiveStrategy && _pRotateStrategy->mustRotate(_pFile))
 	{
@@ -142,7 +142,7 @@ void FileChannel::log(const Message& msg)
 
 void FileChannel::setProperty(const std::string& name, const std::string& value)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (name == PROP_TIMES)
 	{

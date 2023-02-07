@@ -319,7 +319,7 @@ protected:
 private:
 	NetworkInterfaceImpl* _pImpl;
 
-	static Poco::FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
 

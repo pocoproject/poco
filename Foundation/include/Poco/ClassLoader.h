@@ -150,7 +150,7 @@ public:
 		/// the number of calls to unloadLibrary() must be the same
 		/// for the library to become unloaded.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		typename LibraryMap::iterator it = _map.find(path);
 		if (it == _map.end())
@@ -220,7 +220,7 @@ public:
 		/// library, the number of calls to unloadLibrary() must be the same
 		/// for the library to become unloaded.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		typename LibraryMap::iterator it = _map.find(path);
 		if (it != _map.end())
@@ -245,7 +245,7 @@ public:
 		/// Returns a pointer to the MetaObject for the given
 		/// class, or a null pointer if the class is not known.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		for (const auto& p: _map)
 		{
@@ -312,7 +312,7 @@ public:
 		/// Returns a pointer to the Manifest for the given
 		/// library, or a null pointer if the library has not been loaded.
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		typename LibraryMap::const_iterator it = _map.find(path);
 		if (it != _map.end())
@@ -341,21 +341,21 @@ public:
 
 	Iterator begin() const
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		return Iterator(_map.begin());
 	}
 
 	Iterator end() const
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		return Iterator(_map.end());
 	}
 
 private:
 	LibraryMap _map;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

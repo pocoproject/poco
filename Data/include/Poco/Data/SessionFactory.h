@@ -89,7 +89,7 @@ private:
 
 	typedef std::map<std::string, SessionInfo, Poco::CILess> Connectors;
 	Connectors      _connectors;
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 };
 
 

@@ -40,7 +40,7 @@ public:
 private:
 	bool _ready;
 	ApacheRequestHandlerFactory _factory;
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 };
 
 

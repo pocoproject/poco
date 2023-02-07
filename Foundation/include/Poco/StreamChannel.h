@@ -51,7 +51,7 @@ protected:
 
 private:
 	std::ostream& _str;
-	FastMutex     _mutex;
+	std::mutex    _mutex;
 };
 
 

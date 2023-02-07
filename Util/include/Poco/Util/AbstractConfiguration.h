@@ -385,7 +385,7 @@ private:
 
 	mutable int _depth;
 	bool        _eventsEnabled;
-	mutable Poco::Mutex _mutex;
+	mutable std::recursive_mutex _mutex;
 
 	friend class LayeredConfiguration;
 	friend class ConfigurationView;

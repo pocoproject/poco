@@ -101,7 +101,7 @@ protected:
 
 private:
 	static ErrorHandler* _pHandler;
-	static FastMutex     _mutex;
+	static std::mutex    _mutex;
 };
 
 

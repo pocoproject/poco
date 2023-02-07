@@ -58,7 +58,7 @@ const int Utility::OPERATION_UPDATE = SQLITE_UPDATE;
 const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
 Utility::TypeMap Utility::_types;
-Poco::Mutex Utility::_mutex;
+std::recursive_mutex Utility::_mutex;
 
 
 Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex((pDB) ? sqlite3_db_mutex(pDB) : 0)
@@ -158,7 +158,7 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 
 	// Ensure statics are initialized
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		static Utility u;
 	}
 

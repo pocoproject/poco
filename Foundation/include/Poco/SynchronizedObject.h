@@ -27,7 +27,7 @@ namespace Poco {
 
 
 class Foundation_API SynchronizedObject
-	/// This class aggregates a Mutex and an Event
+	/// This class aggregates a std::timed_mutex and an Event
 	/// and can act as a base class for all objects
 	/// requiring synchronization in a multithreaded
 	/// scenario.
@@ -75,7 +75,7 @@ public:
 		/// time interval, false otherwise.
 
 private:
-	mutable Mutex _mutex;
+	mutable std::timed_mutex _mutex;
 	mutable Event _event;
 };
 
@@ -91,7 +91,7 @@ inline void SynchronizedObject::lock() const
 
 inline bool SynchronizedObject::tryLock() const
 {
-	return _mutex.tryLock();
+	return _mutex.try_lock();
 }
 
 

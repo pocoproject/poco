@@ -67,7 +67,7 @@ void MemoryPool::clear()
 
 void* MemoryPool::get()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_blocks.empty())
 	{
@@ -89,7 +89,7 @@ void* MemoryPool::get()
 
 void MemoryPool::release(void* ptr)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	try
 	{

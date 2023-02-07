@@ -161,7 +161,7 @@ private:
 	Poco::Int64        _row;
 	Poco::Dynamic::Var _value;
 	EnabledEventType   _enabledEvents;
-	Poco::Mutex        _mutex;
+	std::recursive_mutex _mutex;
 };
 
 

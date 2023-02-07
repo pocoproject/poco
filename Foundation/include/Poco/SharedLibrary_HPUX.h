@@ -42,7 +42,7 @@ protected:
 private:
 	std::string _path;
 	shl_t _handle;
-	static FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
 

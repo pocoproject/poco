@@ -41,7 +41,7 @@ protected:
 private:
 	std::string _path;
 	void* _handle;
-	static FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
 

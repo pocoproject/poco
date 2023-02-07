@@ -177,7 +177,7 @@ private:
 	int _age;
 	int _stackSize;
 	ThreadVec _threads;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

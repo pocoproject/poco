@@ -129,7 +129,7 @@ private:
 	typedef std::vector<AbstractObserverPtr> ObserverList;
 
 	ObserverList  _observers;
-	mutable Mutex _mutex;
+	mutable std::recursive_mutex _mutex;
 };
 
 

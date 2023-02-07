@@ -205,7 +205,7 @@ private:
 	bool                   _inTransaction;
 	int                    _queryTimeout;
 	std::string            _dbEncoding;
-	Poco::FastMutex        _mutex;
+	std::mutex             _mutex;
 };
 
 

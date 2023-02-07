@@ -148,7 +148,7 @@ private:
 	long          _skipped;
 	AbstractTimerCallback* _pCallback;
 	Clock                  _nextInvocation;
-	mutable FastMutex      _mutex;
+	mutable std::mutex     _mutex;
 
 	Timer(const Timer&);
 	Timer& operator = (const Timer&);

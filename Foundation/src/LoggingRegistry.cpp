@@ -31,7 +31,7 @@ LoggingRegistry::~LoggingRegistry()
 
 Channel::Ptr LoggingRegistry::channelForName(const std::string& name) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	ChannelMap::const_iterator it = _channelMap.find(name);
 	if (it != _channelMap.end())
@@ -43,7 +43,7 @@ Channel::Ptr LoggingRegistry::channelForName(const std::string& name) const
 
 Formatter::Ptr LoggingRegistry::formatterForName(const std::string& name) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	FormatterMap::const_iterator it = _formatterMap.find(name);
 	if (it != _formatterMap.end())
@@ -55,7 +55,7 @@ Formatter::Ptr LoggingRegistry::formatterForName(const std::string& name) const
 
 void LoggingRegistry::registerChannel(const std::string& name, Channel::Ptr pChannel)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_channelMap[name] = ChannelPtr(pChannel, true);
 }
@@ -63,7 +63,7 @@ void LoggingRegistry::registerChannel(const std::string& name, Channel::Ptr pCha
 
 void LoggingRegistry::registerFormatter(const std::string& name, Formatter::Ptr pFormatter)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_formatterMap[name] = FormatterPtr(pFormatter, true);
 }
@@ -71,7 +71,7 @@ void LoggingRegistry::registerFormatter(const std::string& name, Formatter::Ptr 
 
 void LoggingRegistry::unregisterChannel(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	ChannelMap::iterator it = _channelMap.find(name);
 	if (it != _channelMap.end())
@@ -83,7 +83,7 @@ void LoggingRegistry::unregisterChannel(const std::string& name)
 
 void LoggingRegistry::unregisterFormatter(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	FormatterMap::iterator it = _formatterMap.find(name);
 	if (it != _formatterMap.end())
@@ -95,7 +95,7 @@ void LoggingRegistry::unregisterFormatter(const std::string& name)
 
 void LoggingRegistry::clear()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_channelMap.clear();
 	_formatterMap.clear();

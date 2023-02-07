@@ -215,7 +215,7 @@ public:
 		/// If activating the object fails, the object is destroyed and
 		/// the exception is passed on to the caller.
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		if (_size >= _peakCapacity && _pool.empty())
 		{
@@ -252,7 +252,7 @@ public:
 	void returnObject(P pObject)
 		/// Returns an object to the pool.
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		if (_factory.validateObject(pObject))
 		{
@@ -287,14 +287,14 @@ public:
 
 	std::size_t size() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		return _size;
 	}
 
 	std::size_t available() const
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		return _pool.size() + _peakCapacity - _size;
 	}
@@ -324,7 +324,7 @@ private:
 	std::size_t _peakCapacity;
 	std::size_t _size;
 	std::vector<P> _pool;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 	Poco::Condition _availableCondition;
 };
 

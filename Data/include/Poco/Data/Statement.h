@@ -432,7 +432,7 @@ private:
 	// asynchronous execution related members
 	bool                _async;
 	mutable ResultPtr   _pResult;
-	Mutex               _mutex;
+	std::recursive_mutex _mutex;
 	AsyncExecMethodPtr  _pAsyncExec;
 	std::vector<Any>    _arguments;
 	RowFormatter::Ptr   _pRowFormatter;

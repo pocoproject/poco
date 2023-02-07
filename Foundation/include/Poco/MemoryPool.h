@@ -85,7 +85,7 @@ private:
 	int         _maxAlloc;
 	int         _allocated;
 	BlockVec    _blocks;
-	FastMutex   _mutex;
+	std::mutex  _mutex;
 };
 
 
@@ -99,7 +99,7 @@ private:
 #define POCO_FAST_MEMORY_POOL_PREALLOC 1000
 
 
-template <typename T, typename M = FastMutex>
+template <typename T, typename M = std::mutex>
 class FastMemoryPool
 	/// FastMemoryPool is a class for pooling fixed-size blocks of memory.
 	///
@@ -178,7 +178,7 @@ class FastMemoryPool
 	/// pool destruction, any memory that was taken, but not returned to
 	/// it becomes invalid.
 	///
-	/// FastMemoryPool is thread safe; it uses Poco::FastMutex by
+	/// FastMemoryPool is thread safe; it uses std::mutex by
 	/// default, but other mutexes can be specified through the template
 	/// parameter, if needed. Poco::NullMutex can be specified as template
 	/// parameter to avoid locking and improve speed in single-threaded
@@ -250,7 +250,7 @@ private:
 
 public:
 	typedef M MutexType;
-	typedef typename M::ScopedLock ScopedLock;
+	typedef std::lock_guard<M> ScopedLock;
 
 	typedef Block* Bucket;
 	typedef std::vector<Bucket> BucketVec;

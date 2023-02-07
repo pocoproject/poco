@@ -55,10 +55,10 @@ TaskManager::~TaskManager()
 void TaskManager::start(Task* pTask)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
-	pAutoTask->setOwner(this);
-	pAutoTask->setState(Task::TASK_STARTING);
+  pAutoTask->setOwner(this);
+  pAutoTask->setState(Task::TASK_STARTING);
 
-	ScopedLockT lock(_mutex);
+  std::lock_guard<std::mutex> lock(_mutex);
 	_taskList.push_back(pAutoTask);
 	try
 	{
@@ -77,7 +77,7 @@ void TaskManager::start(Task* pTask)
 
 void TaskManager::cancelAll()
 {
-	ScopedLockT lock(_mutex);
+  std::lock_guard<std::mutex> lock(_mutex);
 
 	for (auto& pTask: _taskList)
 	{
@@ -94,9 +94,9 @@ void TaskManager::joinAll()
 
 TaskManager::TaskList TaskManager::taskList() const
 {
-	ScopedLockT lock(_mutex);
+  std::lock_guard<std::mutex> lock(_mutex);
 
-	return _taskList;
+  return _taskList;
 }
 
 
@@ -126,7 +126,7 @@ void TaskManager::taskStarted(Task* pTask)
 
 void TaskManager::taskProgress(Task* pTask, float progress)
 {
-	ScopedLockWithUnlock<MutexT> lock(_mutex);
+  ScopedLockWithUnlock<std::mutex> lock(_mutex);
 
 	if (_lastProgressNotification.isElapsed(MIN_PROGRESS_NOTIFICATION_INTERVAL))
 	{
@@ -147,7 +147,7 @@ void TaskManager::taskFinished(Task* pTask)
 {
 	_nc.postNotification(new TaskFinishedNotification(pTask));
 
-	ScopedLockT lock(_mutex);
+  std::lock_guard<std::mutex> lock(_mutex);
 	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
 	{
 		if (*it == pTask)

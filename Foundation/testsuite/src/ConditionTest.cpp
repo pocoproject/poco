@@ -21,7 +21,6 @@
 using Poco::Thread;
 using Poco::Runnable;
 using Poco::Condition;
-using Poco::Mutex;
 using Poco::TimeoutException;
 
 
@@ -30,7 +29,7 @@ namespace
 	class WaitRunnable: public Runnable
 	{
 	public:
-		WaitRunnable(Condition& cond, Mutex& mutex):
+		WaitRunnable(Condition& cond, std::recursive_mutex& mutex):
 			_ran(false),
 			_cond(cond),
 			_mutex(mutex)
@@ -53,13 +52,13 @@ namespace
 	private:
 		bool _ran;
 		Condition& _cond;
-		Mutex& _mutex;
+		std::recursive_mutex& _mutex;
 	};
 
 	class TryWaitRunnable: public Runnable
 	{
 	public:
-		TryWaitRunnable(Condition& cond, Mutex& mutex):
+		TryWaitRunnable(Condition& cond, std::recursive_mutex& mutex):
 			_ran(false),
 			_cond(cond),
 			_mutex(mutex)
@@ -84,7 +83,7 @@ namespace
 	private:
 		bool _ran;
 		Condition& _cond;
-		Mutex& _mutex;
+		std::recursive_mutex& _mutex;
 	};
 
 }
@@ -103,7 +102,7 @@ ConditionTest::~ConditionTest()
 void ConditionTest::testSignal()
 {
 	Condition cond;
-	Mutex mtx;
+	std::recursive_mutex mtx;
 	WaitRunnable r1(cond, mtx);
 	WaitRunnable r2(cond, mtx);
 
@@ -135,7 +134,7 @@ void ConditionTest::testSignal()
 void ConditionTest::testBroadcast()
 {
 	Condition cond;
-	Mutex mtx;
+	std::recursive_mutex mtx;
 	WaitRunnable r1(cond, mtx);
 	WaitRunnable r2(cond, mtx);
 	TryWaitRunnable r3(cond, mtx);

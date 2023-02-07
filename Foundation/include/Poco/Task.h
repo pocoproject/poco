@@ -150,7 +150,7 @@ private:
 	float             _progress;
 	std::atomic<TaskState> _state;
 	Event             _cancelEvent;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 
 	friend class TaskManager;
 };
@@ -167,7 +167,7 @@ inline const std::string& Task::name() const
 
 inline float Task::progress() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return _progress;
 }
@@ -187,7 +187,7 @@ inline Task::TaskState Task::state() const
 
 inline TaskManager* Task::getOwner() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return _pOwner;
 }

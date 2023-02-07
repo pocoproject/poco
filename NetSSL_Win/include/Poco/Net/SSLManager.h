@@ -265,7 +265,7 @@ private:
 	Context::Ptr                   _ptrDefaultClientContext;
 	PrivateKeyPassphraseHandlerPtr _ptrClientPassphraseHandler;
 	InvalidCertificateHandlerPtr   _ptrClientCertificateHandler;
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 
 	static const std::string CFG_CERT_NAME;
 	static const std::string VAL_CERT_NAME;

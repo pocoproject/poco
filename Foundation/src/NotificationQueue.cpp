@@ -42,7 +42,7 @@ NotificationQueue::~NotificationQueue()
 void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_waitQueue.empty())
 	{
 		_nfQueue.push_back(pNotification);
@@ -60,7 +60,7 @@ void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_waitQueue.empty())
 	{
 		_nfQueue.push_front(pNotification);
@@ -77,7 +77,7 @@ void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotificatio
 
 Notification* NotificationQueue::dequeueNotification()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return dequeueOne().duplicate();
 }
 
@@ -87,7 +87,7 @@ Notification* NotificationQueue::waitDequeueNotification()
 	Notification::Ptr pNf;
 	WaitInfo* pWI = 0;
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
 		pWI = new WaitInfo;
@@ -105,7 +105,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 	Notification::Ptr pNf;
 	WaitInfo* pWI = 0;
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
 		pWI = new WaitInfo;
@@ -117,7 +117,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 	}
 	else
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		pNf = pWI->pNf;
 		for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
 		{
@@ -135,7 +135,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 
 void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	Notification::Ptr pNf = dequeueOne();
 	while (pNf)
 	{
@@ -147,7 +147,7 @@ void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
 
 void NotificationQueue::wakeUpAll()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	for (auto p: _waitQueue)
 	{
 		p->nfAvailable.set();
@@ -158,28 +158,28 @@ void NotificationQueue::wakeUpAll()
 
 bool NotificationQueue::empty() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _nfQueue.empty();
 }
 
 
 int NotificationQueue::size() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return static_cast<int>(_nfQueue.size());
 }
 
 
 void NotificationQueue::clear()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_nfQueue.clear();
 }
 
 
 bool NotificationQueue::remove(Notification::Ptr pNotification)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	NfQueue::iterator it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
 	if (it == _nfQueue.end())
 	{
@@ -192,7 +192,7 @@ bool NotificationQueue::remove(Notification::Ptr pNotification)
 
 bool NotificationQueue::hasIdleThreads() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return !_waitQueue.empty();
 }
 

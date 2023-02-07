@@ -249,7 +249,7 @@ private:
 	PCCERT_CONTEXT             _pCert;
 	CredHandle                 _hCreds;
 	SecurityFunctionTableW&    _securityFunctions;
-	mutable Poco::FastMutex    _mutex;
+	mutable std::mutex         _mutex;
 };
 
 

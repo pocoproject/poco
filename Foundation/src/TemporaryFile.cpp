@@ -58,7 +58,7 @@ public:
 
 	void registerFile(const std::string& path)
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		Path p(path);
 		_files.insert(p.absolute().toString());
@@ -66,7 +66,7 @@ public:
 
 private:
 	std::set<std::string> _files;
-	FastMutex _mutex;
+	std::mutex _mutex;
 };
 
 
@@ -134,7 +134,7 @@ void TemporaryFile::registerForDeletion(const std::string& path)
 
 namespace
 {
-	static FastMutex mutex;
+	static std::mutex mutex;
 }
 
 

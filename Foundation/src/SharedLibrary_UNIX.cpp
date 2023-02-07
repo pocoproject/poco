@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-FastMutex SharedLibraryImpl::_mutex;
+std::mutex SharedLibraryImpl::_mutex;
 
 
 SharedLibraryImpl::SharedLibraryImpl()
@@ -42,7 +42,7 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path, int flags)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(path);
 	int realFlags = RTLD_LAZY;
@@ -62,7 +62,7 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int flags)
 
 void SharedLibraryImpl::unloadImpl()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_handle)
 	{
@@ -74,14 +74,14 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _handle != 0;
 }
 
 
 void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	void* result = 0;
 	if (_handle)

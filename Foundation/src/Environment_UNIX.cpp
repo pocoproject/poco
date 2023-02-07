@@ -31,12 +31,12 @@ namespace Poco {
 
 
 EnvironmentImpl::StringMap EnvironmentImpl::_map;
-FastMutex EnvironmentImpl::_mutex;
+std::mutex EnvironmentImpl::_mutex;
 
 
 std::string EnvironmentImpl::getImpl(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	const char* val = getenv(name.c_str());
 	if (val)
@@ -48,7 +48,7 @@ std::string EnvironmentImpl::getImpl(const std::string& name)
 
 bool EnvironmentImpl::hasImpl(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return getenv(name.c_str()) != 0;
 }
@@ -56,7 +56,7 @@ bool EnvironmentImpl::hasImpl(const std::string& name)
 
 void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	std::string var = name;
 	var.append("=");

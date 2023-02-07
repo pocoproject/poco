@@ -87,7 +87,7 @@ Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 
 void SessionImpl::begin()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	SQLiteStatementImpl tmp(*this, _pDB);
 	switch (_transactionType)
 	{
@@ -108,7 +108,7 @@ void SessionImpl::begin()
 
 void SessionImpl::commit()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(COMMIT_TRANSACTION);
 	tmp.execute();
@@ -118,7 +118,7 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
@@ -267,7 +267,7 @@ void SessionImpl::autoCommit(const std::string&, bool)
 
 bool SessionImpl::isAutoCommit(const std::string&) const
 {
-	Poco::Mutex::ScopedLock l(_mutex);
+	std::lock_guard<std::recursive_mutex> l(_mutex);
 	return (0 != sqlite3_get_autocommit(_pDB));
 }
 

@@ -64,7 +64,7 @@ private:
 	};
 	std::vector<DirEvent> _events;
 	bool _error;
-	Poco::Mutex _mutex;
+	std::recursive_mutex _mutex;
 };
 
 

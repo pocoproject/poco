@@ -58,39 +58,39 @@ public:
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
 	};
 
-	ThreadImpl();
-	~ThreadImpl();
+  ThreadImpl();
+  ~ThreadImpl();
 
-	TIDImpl tidImpl() const;
-	void setNameImpl(const std::string& threadName);
-	std::string getNameImpl() const;
-	std::string getOSThreadNameImpl();
-		/// Returns the thread's name, expressed as an operating system
-		/// specific name value. Return empty string if thread is not running.
-		/// For test used only.
-	void setPriorityImpl(int prio);
-	int getPriorityImpl() const;
-	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
-	int getOSPriorityImpl() const;
-	static int getMinOSPriorityImpl(int policy);
-	static int getMaxOSPriorityImpl(int policy);
-	void setStackSizeImpl(int size);
-	int getStackSizeImpl() const;
-	void startImpl(SharedPtr<Runnable> pTarget);
-	void joinImpl();
-	bool joinImpl(long milliseconds);
-	bool isRunningImpl() const;
-	static void yieldImpl();
-	static ThreadImpl* currentImpl();
-	static TIDImpl currentTidImpl();
-	static long currentOsTidImpl();
-	bool setAffinityImpl(int coreID);
-	int getAffinityImpl() const;
+  TIDImpl tidImpl() const;
+  void setNameImpl(const std::string& threadName);
+  std::string getNameImpl() const;
+  std::string getOSThreadNameImpl();
+  /// Returns the thread's name, expressed as an operating system
+  /// specific name value. Return empty string if thread is not running.
+  /// For test used only.
+  void setPriorityImpl(int prio);
+  int getPriorityImpl() const;
+  void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
+  int getOSPriorityImpl() const;
+  static int getMinOSPriorityImpl(int policy);
+  static int getMaxOSPriorityImpl(int policy);
+  void setStackSizeImpl(int size);
+  int getStackSizeImpl() const;
+  void startImpl(SharedPtr<Runnable> pTarget);
+  void joinImpl();
+  bool joinImpl(long milliseconds);
+  bool isRunningImpl() const;
+  static void yieldImpl();
+  static ThreadImpl* currentImpl();
+  static TIDImpl currentTidImpl();
+  static long currentOsTidImpl();
+  bool setAffinityImpl(int coreID);
+  int getAffinityImpl() const;
 
-protected:
-	static void* runnableEntry(void* pThread);
-	static int mapPrio(int prio, int policy = SCHED_OTHER);
-	static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
+ protected:
+  static void* runnableEntry(void* pThread);
+  static int mapPrio(int prio, int policy = SCHED_OTHER);
+  static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
 
 private:
 	class CurrentThreadHolder
@@ -148,15 +148,15 @@ private:
 		bool          joined;
 		std::string   name;
 		int           affinity;
-		mutable FastMutex mutex;
-	};
+		mutable std::mutex mutex;
+  };
 
-	AutoPtr<ThreadData> _pData;
-	static CurrentThreadHolder _currentThreadHolder;
+  AutoPtr<ThreadData> _pData;
+  static CurrentThreadHolder _currentThreadHolder;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
-	SignalHandler::JumpBufferVec _jumpBufferVec;
-	friend class SignalHandler;
+  SignalHandler::JumpBufferVec _jumpBufferVec;
+  friend class SignalHandler;
 #endif
 };
 
@@ -178,8 +178,8 @@ inline int ThreadImpl::getOSPriorityImpl() const
 
 inline bool ThreadImpl::isRunningImpl() const
 {
-	FastMutex::ScopedLock l(_pData->mutex);
-	return !_pData->pRunnableTarget.isNull();
+  std::lock_guard<std::mutex> l(_pData->mutex);
+  return !_pData->pRunnableTarget.isNull();
 }
 
 

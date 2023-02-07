@@ -29,7 +29,7 @@ Condition::~Condition()
 
 void Condition::signal()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (!_waitQueue.empty())
 	{
@@ -41,7 +41,7 @@ void Condition::signal()
 
 void Condition::broadcast()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	for (auto p: _waitQueue)
 	{

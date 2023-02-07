@@ -24,7 +24,7 @@ namespace Poco {
 namespace Net {
 
 
-Poco::FastMutex Utility::_mutex;
+std::mutex Utility::_mutex;
 
 
 Context::VerificationMode Utility::convertVerificationMode(const std::string& vMode)
@@ -187,7 +187,7 @@ std::map<long, const std::string> Utility::initSSPIErr()
 
 const std::string& Utility::formatError(long errCode)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	static const std::string def("Internal SSPI error");
 	static const std::map<long, const std::string> errs(initSSPIErr());

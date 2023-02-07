@@ -58,7 +58,7 @@ private:
 	SessionPool& _owner;
 	Poco::AutoPtr<SessionImpl> _pImpl;
 	Poco::Timestamp _lastUsed;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 
@@ -79,7 +79,7 @@ inline SessionPool& PooledSessionHolder::owner()
 
 inline void PooledSessionHolder::access()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_lastUsed.update();
 }
@@ -87,7 +87,7 @@ inline void PooledSessionHolder::access()
 
 inline int PooledSessionHolder::idle() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return (int) (_lastUsed.elapsed()/Poco::Timestamp::resolution());
 }

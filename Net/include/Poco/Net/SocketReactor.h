@@ -260,8 +260,6 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>        NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification>    NotificationPtr;
 	typedef std::map<poco_socket_t, NotifierPtr> EventHandlerMap;
-	typedef Poco::FastMutex                      MutexType;
-	typedef MutexType::ScopedLock                ScopedLock;
 
 	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
@@ -287,7 +285,7 @@ private:
 	NotificationPtr   _pErrorNotification;
 	NotificationPtr   _pTimeoutNotification;
 	NotificationPtr   _pShutdownNotification;
-	MutexType         _mutex;
+	std::mutex        _mutex;
 	Poco::Event       _event;
 
 	friend class SocketNotifier;

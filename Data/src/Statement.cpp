@@ -112,7 +112,7 @@ Statement& Statement::reset(Session& session)
 
 std::size_t Statement::execute(bool reset)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	bool isDone = done();
 	if (initialized() || paused() || isDone)
 	{
@@ -139,7 +139,7 @@ std::size_t Statement::execute(bool reset)
 
 const Statement::Result& Statement::executeAsync(bool reset)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	if (initialized() || paused() || done())
 		return doAsyncExec(reset);
 	else

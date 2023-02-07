@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TMutex = FastMutex>
+template <class TArgs, class TMutex = std::mutex>
 class PriorityEvent: public AbstractEvent <
 	TArgs,
 	PriorityStrategy<TArgs, AbstractPriorityDelegate<TArgs> >,

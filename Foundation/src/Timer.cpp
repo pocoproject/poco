@@ -67,7 +67,7 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 	Clock nextInvocation;
 	nextInvocation += static_cast<Clock::ClockVal>(_startInterval)*1000;
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_pCallback)
 	{
@@ -92,7 +92,7 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 
 void Timer::stop()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_pCallback)
 	{
 		_periodicInterval = 0;
@@ -108,7 +108,7 @@ void Timer::stop()
 
 void Timer::restart()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_pCallback)
 	{
 		_wakeUp.set();
@@ -119,7 +119,7 @@ void Timer::restart()
 void Timer::restart(long milliseconds)
 {
 	poco_assert (milliseconds >= 0);
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if (_pCallback)
 	{
 		_periodicInterval = milliseconds;
@@ -130,7 +130,7 @@ void Timer::restart(long milliseconds)
 
 long Timer::getStartInterval() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _startInterval;
 }
 
@@ -138,14 +138,14 @@ long Timer::getStartInterval() const
 void Timer::setStartInterval(long milliseconds)
 {
 	poco_assert (milliseconds >= 0);
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_startInterval = milliseconds;
 }
 
 
 long Timer::getPeriodicInterval() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _periodicInterval;
 }
 
@@ -153,7 +153,7 @@ long Timer::getPeriodicInterval() const
 void Timer::setPeriodicInterval(long milliseconds)
 {
 	poco_assert (milliseconds >= 0);
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_periodicInterval = milliseconds;
 }
 
@@ -184,7 +184,7 @@ void Timer::run()
 
 		if (_wakeUp.tryWait(sleep))
 		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_nextInvocation.update();
 			interval = _periodicInterval;
 		}
@@ -206,7 +206,7 @@ void Timer::run()
 			{
 				Poco::ErrorHandler::handle();
 			}
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			interval = _periodicInterval;
 		}
 		_nextInvocation += static_cast<Clock::ClockVal>(interval)*1000;

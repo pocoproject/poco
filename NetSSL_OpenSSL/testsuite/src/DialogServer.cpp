@@ -22,7 +22,6 @@
 using Poco::Net::Socket;
 using Poco::Net::DialogSocket;
 using Poco::Net::SocketAddress;
-using Poco::FastMutex;
 using Poco::Thread;
 using Poco::Net::SecureStreamSocket;
 using Poco::Net::SSLManager;
@@ -127,7 +126,7 @@ void DialogServer::run()
 				handleDataSSLrequest(ds, _ssl, _SSLsession);
 			}
 			{
-				FastMutex::ScopedLock lock(_mutex);
+				std::lock_guard<std::mutex> lock(_mutex);
 				if (!_nextResponses.empty())
 				{
 					ds.sendMessage(_nextResponses.front());
@@ -155,7 +154,7 @@ void DialogServer::run()
 
 						if (_log) std::cout << ">> " << command << std::endl;
 						{
-							FastMutex::ScopedLock lock(_mutex);
+							std::lock_guard<std::mutex> lock(_mutex);
 							_lastCommands.push_back(command);
 							if (!_nextResponses.empty())
 							{
@@ -178,7 +177,7 @@ void DialogServer::run()
 
 const std::string& DialogServer::lastCommand() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	static const std::string EMPTY;
 	if (_lastCommands.empty())
@@ -196,7 +195,7 @@ const std::vector<std::string>& DialogServer::lastCommands() const
 
 std::string DialogServer::popCommand()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	std::string command;
 	if (!_lastCommands.empty())
@@ -222,7 +221,7 @@ std::string DialogServer::popCommandWait()
 
 void DialogServer::addResponse(const std::string& response)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_nextResponses.push_back(response);
 }
@@ -230,7 +229,7 @@ void DialogServer::addResponse(const std::string& response)
 
 void DialogServer::clearCommands()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_lastCommands.clear();
 }
@@ -238,7 +237,7 @@ void DialogServer::clearCommands()
 
 void DialogServer::clearResponses()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_nextResponses.clear();
 }

@@ -126,7 +126,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 		realName = truncName;
 	}
 
-	ScopedLock<FastMutex> lock(_pData->mutex);
+	std::lock_guard<std::mutex> lock(_pData->mutex);
 	if (realName != _pData->name)
 	{
 		_pData->name = realName;
@@ -136,7 +136,7 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 
 std::string ThreadImpl::getNameImpl() const
 {
-	ScopedLock<FastMutex> lock(_pData->mutex);
+	std::lock_guard<std::mutex> lock(_pData->mutex);
 	return _pData->name;
 }
 
@@ -229,7 +229,7 @@ void ThreadImpl::setStackSizeImpl(int size)
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
 	{
-		FastMutex::ScopedLock l(_pData->mutex);
+		std::lock_guard<std::mutex> l(_pData->mutex);
 		if (_pData->pRunnableTarget)
 			throw SystemException("thread already running");
 	}
@@ -247,7 +247,7 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 	}
 
 	{
-		FastMutex::ScopedLock l(_pData->mutex);
+		std::lock_guard<std::mutex> l(_pData->mutex);
 		_pData->pRunnableTarget = pTarget;
 		if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 		{
@@ -345,7 +345,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 
 	{
-		FastMutex::ScopedLock lock(pData->mutex);
+		std::lock_guard<std::mutex> lock(pData->mutex);
 		setThreadName(pData->name);
 	}
 
@@ -366,7 +366,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 		ErrorHandler::handle();
 	}
 
-	FastMutex::ScopedLock l(pData->mutex);
+	std::lock_guard<std::mutex> l(pData->mutex);
 	pData->pRunnableTarget = 0;
 	pData->done.set();
 	return 0;

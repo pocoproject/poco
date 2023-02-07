@@ -27,7 +27,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TMutex = FastMutex>
+template <class TArgs, class TMutex = std::mutex>
 class BasicEvent: public AbstractEvent <
 	TArgs, DefaultStrategy<TArgs, AbstractDelegate<TArgs>>,
 	AbstractDelegate<TArgs>,

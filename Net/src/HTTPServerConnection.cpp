@@ -62,7 +62,7 @@ void HTTPServerConnection::run()
 	{
 		try
 		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!_stopped)
 			{
 				HTTPServerResponseImpl response(session);
@@ -158,7 +158,7 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 	}
 	else
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		try
 		{

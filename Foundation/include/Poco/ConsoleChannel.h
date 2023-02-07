@@ -59,7 +59,7 @@ protected:
 
 private:
 	std::ostream& _str;
-	static FastMutex _mutex;
+	static std::mutex _mutex;
 };
 
 
@@ -178,7 +178,7 @@ private:
 	std::ostream& _str;
 	bool _enableColors;
 	Color _colors[9];
-	static FastMutex _mutex;
+	static std::mutex _mutex;
 	static const std::string CSI;
 };
 

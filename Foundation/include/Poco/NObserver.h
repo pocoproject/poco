@@ -75,7 +75,7 @@ public:
 
 	void notify(Notification* pNf) const
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		if (_pObject)
 		{
@@ -106,7 +106,7 @@ public:
 
 	void disable()
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 		_pObject = 0;
 	}
@@ -116,7 +116,7 @@ private:
 
 	C*       _pObject;
 	Callback _method;
-	mutable Poco::Mutex _mutex;
+	mutable std::recursive_mutex _mutex;
 };
 
 

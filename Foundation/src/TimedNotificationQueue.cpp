@@ -47,7 +47,7 @@ void TimedNotificationQueue::enqueueNotification(Notification::Ptr pNotification
 	Timestamp::TimeDiff diff = timestamp - tsNow;
 	clock += diff;
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_nfQueue.insert(NfQueue::value_type(clock, pNotification));
 	_nfAvailable.set();
 }
@@ -57,7 +57,7 @@ void TimedNotificationQueue::enqueueNotification(Notification::Ptr pNotification
 {
 	poco_check_ptr (pNotification);
 
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_nfQueue.insert(NfQueue::value_type(clock, pNotification));
 	_nfAvailable.set();
 }
@@ -65,7 +65,7 @@ void TimedNotificationQueue::enqueueNotification(Notification::Ptr pNotification
 
 Notification* TimedNotificationQueue::dequeueNotification()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	NfQueue::iterator it = _nfQueue.begin();
 	if (it != _nfQueue.end())
@@ -172,28 +172,28 @@ bool TimedNotificationQueue::wait(Clock::ClockDiff interval)
 
 bool TimedNotificationQueue::empty() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _nfQueue.empty();
 }
 
 
 int TimedNotificationQueue::size() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return static_cast<int>(_nfQueue.size());
 }
 
 
 void TimedNotificationQueue::clear()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_nfQueue.clear();
 }
 
 
 Notification::Ptr TimedNotificationQueue::dequeueOne(NfQueue::iterator& it)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	Notification::Ptr pNf = it->second;
 	_nfQueue.erase(it);
 	return pNf;

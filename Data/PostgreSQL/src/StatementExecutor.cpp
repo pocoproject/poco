@@ -136,7 +136,7 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	PGresult* ptrPGResult = 0;
 
 	{
-		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
+		std::lock_guard<std::mutex> mutexLocker(_sessionHandle.mutex());
 
 		// prepare the statement - temporary PGresult returned
 		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, (int)countPlaceholdersInSQLStatement, 0);
@@ -154,7 +154,7 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 
 	// Determine what the structure of a statement result will look like
 	{
-		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
+		std::lock_guard<std::mutex> mutexLocker(_sessionHandle.mutex());
 		ptrPGResult = PQdescribePrepared(_sessionHandle, pStatementName);
 	}
 
@@ -247,7 +247,7 @@ void StatementExecutor::execute()
 
 	PGresult* ptrPGResult = 0;
 	{
-		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
+		std::lock_guard<std::mutex> mutexLocker(_sessionHandle.mutex());
 
 		ptrPGResult = PQexecPrepared(_sessionHandle,
 			_preparedStatementName.c_str(), (int)_countPlaceholdersInSQLStatement,

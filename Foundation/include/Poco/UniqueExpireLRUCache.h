@@ -30,8 +30,8 @@ namespace Poco {
 template <
 	class TKey,
 	class TValue,
-	class TMutex = FastMutex,
-	class TEventMutex = FastMutex
+	class TMutex = std::mutex,
+	class TEventMutex = std::mutex
 >
 class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
 	/// A UniqueExpireLRUCache combines LRU caching and time based per entry expire caching.

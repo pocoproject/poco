@@ -44,7 +44,7 @@ protected:
 private:
 	Poco::NotificationQueue    _queue;
 	std::multiset<std::string> _handled;
-	Poco::FastMutex            _mutex;
+	std::mutex                 _mutex;
 };
 
 

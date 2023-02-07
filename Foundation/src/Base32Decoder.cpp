@@ -28,7 +28,7 @@ bool Base32DecoderBuf::IN_ENCODING_INIT = false;
 
 namespace
 {
-	static FastMutex mutex;
+	static std::mutex mutex;
 }
 
 
@@ -37,7 +37,7 @@ Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
 	_groupIndex(0),
 	_buf(*istr.rdbuf())
 {
-	FastMutex::ScopedLock lock(mutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	if (!IN_ENCODING_INIT)
 	{
 		for (unsigned i = 0; i < sizeof(IN_ENCODING); i++)

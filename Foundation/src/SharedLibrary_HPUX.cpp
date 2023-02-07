@@ -19,7 +19,7 @@
 namespace Poco {
 
 
-FastMutex SharedLibraryImpl::_mutex;
+std::mutex SharedLibraryImpl::_mutex;
 
 
 SharedLibraryImpl::SharedLibraryImpl()
@@ -35,7 +35,7 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(path);
 	_handle = shl_load(path.c_str(), BIND_DEFERRED, 0);
@@ -46,7 +46,7 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 
 void SharedLibraryImpl::unloadImpl()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_handle)
 	{
@@ -59,14 +59,14 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _handle != 0;
 }
 
 
 void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	void* result = 0;
 	if (_handle && shl_findsym(&_handle, name.c_str(), TYPE_UNDEFINED, &result) !=  -1)

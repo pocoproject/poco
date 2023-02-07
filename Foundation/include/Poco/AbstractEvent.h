@@ -29,7 +29,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TStrategy, class TDelegate, class TMutex = FastMutex>
+template <class TArgs, class TStrategy, class TDelegate, class TMutex = std::mutex>
 class AbstractEvent
 	/// An AbstractEvent is the base class of all events.
 	/// It works similar to the way C# handles notifications (aka events in C#).
@@ -174,7 +174,7 @@ public:
 		///
 		/// Exact behavior is determined by the TStrategy.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.add(aDelegate);
 	}
 
@@ -183,7 +183,7 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.remove(aDelegate);
 	}
 
@@ -195,7 +195,7 @@ public:
 		/// Returns a DelegateHandle which can be used in call to
 		/// remove() to remove the delegate.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return _strategy.add(aDelegate);
 	}
 
@@ -205,7 +205,7 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.remove(delegateHandle);
 	}
 
@@ -264,7 +264,7 @@ public:
 	{
 		NotifyAsyncParams params(pSender, args);
 		{
-			typename TMutex::ScopedLock lock(_mutex);
+			std::lock_guard<TMutex> lock(_mutex);
 
 			// thread-safeness:
 			// copy should be faster and safer than blocking until
@@ -282,7 +282,7 @@ public:
 	void enable()
 		/// Enables the event.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_enabled = true;
 	}
 
@@ -290,28 +290,28 @@ public:
 		/// Disables the event. notify and notifyAsnyc will be ignored,
 		/// but adding/removing delegates is still allowed.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_enabled = false;
 	}
 
 	bool isEnabled() const
 		/// Returns true if event is enabled.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return _enabled;
 	}
 
 	void clear()
 		/// Removes all delegates.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.clear();
 	}
 
 	bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return _strategy.empty();
 	}
 
@@ -383,7 +383,7 @@ public:
 		///
 		/// Exact behavior is determined by the TStrategy.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.add(aDelegate);
 	}
 
@@ -392,7 +392,7 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.remove(aDelegate);
 	}
 
@@ -404,7 +404,7 @@ public:
 		/// Returns a DelegateHandle which can be used in call to
 		/// remove() to remove the delegate.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return _strategy.add(aDelegate);
 	}
 
@@ -414,7 +414,7 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.remove(delegateHandle);
 	}
 
@@ -467,7 +467,7 @@ public:
 	{
 		NotifyAsyncParams params(pSender);
 		{
-			typename TMutex::ScopedLock lock(_mutex);
+			std::lock_guard<TMutex> lock(_mutex);
 
 			// thread-safeness:
 			// copy should be faster and safer than blocking until
@@ -485,7 +485,7 @@ public:
 	void enable()
 		/// Enables the event.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_enabled = true;
 	}
 
@@ -493,27 +493,27 @@ public:
 		/// Disables the event. notify and notifyAsnyc will be ignored,
 		/// but adding/removing delegates is still allowed.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_enabled = false;
 	}
 
 	bool isEnabled() const
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return _enabled;
 	}
 
 	void clear()
 		/// Removes all delegates.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		_strategy.clear();
 	}
 
 	bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
+		std::lock_guard<TMutex> lock(_mutex);
 		return _strategy.empty();
 	}
 

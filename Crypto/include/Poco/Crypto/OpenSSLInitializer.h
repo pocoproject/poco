@@ -35,7 +35,7 @@ extern "C"
 {
 	struct CRYPTO_dynlock_value
 	{
-		Poco::FastMutex _mutex;
+		std::mutex _mutex;
 	};
 }
 
@@ -88,7 +88,7 @@ private:
 	static Poco::AtomicCounter _rc;
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
-	static Poco::FastMutex* _mutexes;
+	static std::mutex* _mutexes;
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L

@@ -211,8 +211,8 @@ private:
 		/// If expiredOnly is true, only expired temporary functions
 		/// are called.
 
-	typedef Poco::Mutex MutexType;
-	typedef MutexType::ScopedLock ScopedLock;
+	typedef std::recursive_mutex MutexType;
+	typedef std::lock_guard<std::recursive_mutex> ScopedLock;
 
 	static const long DEFAULT_MAX_TIMEOUT_MS = 250;
 
@@ -381,9 +381,9 @@ private:
 	void deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it);
 
 	template <typename T>
-	int errorImpl(Socket& sock, T& handlerMap, Poco::Mutex& mutex)
+	int errorImpl(Socket& sock, T& handlerMap, std::recursive_mutex& mutex)
 	{
-		Poco::Mutex::ScopedLock l(mutex);
+		std::lock_guard<std::recursive_mutex> l(mutex);
 		auto hIt = handlerMap.find(sock.impl()->sockfd());
 		if (hIt == handlerMap.end()) return 0;
 		unsigned err = 0;
@@ -450,8 +450,8 @@ private:
 	SubscriberMap _readHandlers;
 	SubscriberMap _writeHandlers;
 	IOCompletion  _ioCompletion;
-	Poco::Mutex   _writeMutex;
-	Poco::Mutex   _readMutex;
+	MutexType     _writeMutex;
+	MutexType     _readMutex;
 
 	std::unique_ptr<Worker> _pWorker;
 	friend class Worker;

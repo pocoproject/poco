@@ -124,7 +124,7 @@ private:
 	Instantiators _instantiators;
 	HTTPClientSession::ProxyConfig _proxyConfig;
 
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 

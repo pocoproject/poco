@@ -76,7 +76,7 @@ private:
 
 	Poco::Timestamp _lastExecution;
 	std::atomic<bool> _isCancelled;
-	mutable FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 
@@ -117,14 +117,14 @@ inline bool TimerTask::isCancelled() const
 
 inline Poco::Timestamp TimerTask::lastExecution() const
 {
-	FastMutex::ScopedLock l(_mutex);
+	std::lock_guard<std::mutex> l(_mutex);
 	return _lastExecution;
 }
 
 
 inline void TimerTask::updateLastExecution()
 {
-	FastMutex::ScopedLock l(_mutex);
+	std::lock_guard<std::mutex> l(_mutex);
 	_lastExecution.update();
 }
 

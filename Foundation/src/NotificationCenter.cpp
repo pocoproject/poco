@@ -34,14 +34,14 @@ NotificationCenter::~NotificationCenter()
 
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	_observers.push_back(observer.clone());
 }
 
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
 	{
 		if (observer.equals(**it))
@@ -56,7 +56,7 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 
 bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 	for (const auto& p: _observers)
 		if (observer.equals(*p)) return true;
 
@@ -68,7 +68,7 @@ void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 
-	ScopedLockWithUnlock<Mutex> lock(_mutex);
+	ScopedLockWithUnlock<std::recursive_mutex> lock(_mutex);
 	ObserverList observersToNotify(_observers);
 	lock.unlock();
 	for (auto& p: observersToNotify)
@@ -80,7 +80,7 @@ void NotificationCenter::postNotification(Notification::Ptr pNotification)
 
 bool NotificationCenter::hasObservers() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 	return !_observers.empty();
 }
@@ -88,7 +88,7 @@ bool NotificationCenter::hasObservers() const
 
 std::size_t NotificationCenter::countObservers() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 	return _observers.size();
 }

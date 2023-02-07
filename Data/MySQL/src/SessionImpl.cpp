@@ -191,7 +191,7 @@ Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 
 void SessionImpl::begin()
 {
-	Poco::FastMutex::ScopedLock l(_mutex);
+	std::lock_guard<std::mutex> l(_mutex);
 
 	if (_inTransaction)
 		throw Poco::InvalidAccessException("Already in transaction.");

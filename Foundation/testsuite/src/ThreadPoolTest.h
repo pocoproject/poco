@@ -37,7 +37,7 @@ protected:
 	void count();
 
 private:
-	Poco::FastMutex _mutex;
+	std::mutex _mutex;
 	Poco::Event _event;
 	int   _count;
 };

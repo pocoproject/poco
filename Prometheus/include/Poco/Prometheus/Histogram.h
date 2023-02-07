@@ -72,7 +72,7 @@ private:
 	std::vector<Poco::UInt64> _bucketCounts;
 	Poco::UInt64 _count = 0;
 	double _sum = 0.0;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 
 	HistogramSample() = delete;
 	HistogramSample(const HistogramSample&) = delete;
@@ -182,7 +182,7 @@ public:
 
 private:
 	std::vector<double> _bucketBounds;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 };
 
 
@@ -199,7 +199,7 @@ inline const std::vector<double>& HistogramSample::bucketBounds() const
 
 inline HistogramData HistogramSample::data() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	HistogramData data;
 	data.bucketCounts = _bucketCounts;
