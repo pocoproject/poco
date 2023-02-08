@@ -58,39 +58,39 @@ public:
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
 	};
 
-  ThreadImpl();
-  ~ThreadImpl();
+	ThreadImpl();
+	~ThreadImpl();
 
-  TIDImpl tidImpl() const;
-  void setNameImpl(const std::string& threadName);
-  std::string getNameImpl() const;
-  std::string getOSThreadNameImpl();
-  /// Returns the thread's name, expressed as an operating system
-  /// specific name value. Return empty string if thread is not running.
-  /// For test used only.
-  void setPriorityImpl(int prio);
-  int getPriorityImpl() const;
-  void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
-  int getOSPriorityImpl() const;
-  static int getMinOSPriorityImpl(int policy);
-  static int getMaxOSPriorityImpl(int policy);
-  void setStackSizeImpl(int size);
-  int getStackSizeImpl() const;
-  void startImpl(SharedPtr<Runnable> pTarget);
-  void joinImpl();
-  bool joinImpl(long milliseconds);
-  bool isRunningImpl() const;
-  static void yieldImpl();
-  static ThreadImpl* currentImpl();
-  static TIDImpl currentTidImpl();
-  static long currentOsTidImpl();
-  bool setAffinityImpl(int coreID);
-  int getAffinityImpl() const;
+	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
+	void setPriorityImpl(int prio);
+	int getPriorityImpl() const;
+	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
+	int getOSPriorityImpl() const;
+	static int getMinOSPriorityImpl(int policy);
+	static int getMaxOSPriorityImpl(int policy);
+	void setStackSizeImpl(int size);
+	int getStackSizeImpl() const;
+	void startImpl(SharedPtr<Runnable> pTarget);
+	void joinImpl();
+	bool joinImpl(long milliseconds);
+	bool isRunningImpl() const;
+	static void yieldImpl();
+	static ThreadImpl* currentImpl();
+	static TIDImpl currentTidImpl();
+	static long currentOsTidImpl();
+	bool setAffinityImpl(int coreID);
+	int getAffinityImpl() const;
 
- protected:
-  static void* runnableEntry(void* pThread);
-  static int mapPrio(int prio, int policy = SCHED_OTHER);
-  static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
+protected:
+	static void* runnableEntry(void* pThread);
+	static int mapPrio(int prio, int policy = SCHED_OTHER);
+	static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
 
 private:
 	class CurrentThreadHolder
