@@ -13,77 +13,28 @@
 
 
 #include "Poco/Crypto/Envelope.h"
-#include <type_traits>
-#include <functional>
-typedef int(*EVP_CIPHER_CTX_init_INT_TYPE)(EVP_CIPHER_CTX *);
-typedef void(*EVP_CIPHER_CTX_init_VOID_TYPE)(EVP_CIPHER_CTX *);
+
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 	#if !defined(EVP_CIPHER_CTX_init)
 		#define EVP_CIPHER_CTX_init(a)
-		#define EVP_CIPHER_CTX_init_REAL_TYPE EVP_CIPHER_CTX_init_VOID_TYPE
-	#else
-		#define EVP_CIPHER_CTX_init_REAL_TYPE EVP_CIPHER_CTX_init_INT_TYPE
-	#endif
-#else
-	#if defined(EVP_CIPHER_CTX_init)
-		#define EVP_CIPHER_CTX_init_REAL_TYPE EVP_CIPHER_CTX_init_INT_TYPE
-	#else
-		#define EVP_CIPHER_CTX_init_REAL_TYPE decltype(EVP_CIPHER_CTX_init)
 	#endif
 #endif
 
 namespace Poco {
 namespace Crypto {
 
-class EnvelopInitializer
-{
-	EVP_CIPHER_CTX *_pCtx;
-	int _result;
-	bool _hasResult = false;
-public:
-
-	EnvelopInitializer(EVP_CIPHER_CTX *ctx) : _pCtx(ctx), _result(0)
-	{
-	}
-
-	template<class T>
-	typename std::enable_if<std::is_same<T, EVP_CIPHER_CTX_init_INT_TYPE>::value, void>::type
-	initEnvelop()
-	{
-		_hasResult = true;
-		_result = EVP_CIPHER_CTX_init(_pCtx);
-	}
-
-	template<class T>
-	typename std::enable_if<!std::is_same<T, EVP_CIPHER_CTX_init_INT_TYPE>::value, void>::type
-	initEnvelop()
-	{
-		EVP_CIPHER_CTX_init(_pCtx);
-	}
-
-	bool hasResult() const
-	{
-		return _hasResult;
-	}
-
-	int result() const
-	{
-		return _result;
-	}
-};
 
 Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
 	_pCtx(EVP_CIPHER_CTX_new())
 {
 	poco_check_ptr(_pCipher);
 	poco_check_ptr(_pCtx);
-	EnvelopInitializer envelopInitializer(_pCtx);
-        envelopInitializer.initEnvelop<EVP_CIPHER_CTX_init_REAL_TYPE>();
-	if (envelopInitializer.hasResult())
-	{
-		if (1 != envelopInitializer.result())
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	if (1 != EVP_CIPHER_CTX_init(_pCtx))
 			handleErrors(std::string("Envelope():EVP_CIPHER_CTX_init()"));
-	}
+#else
+	EVP_CIPHER_CTX_init(_pCtx);
+#endif
 	_iv.resize(ivSize(), 0);
 }
 
