@@ -168,8 +168,11 @@ void ResultMetadata::reset()
 
 void ResultMetadata::freeMemory()
 {
-	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
+	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it) 
+	{
+		if ((*it) == nullptr) continue;
 		std::free(*it);
+	}
 }
 
 
@@ -213,7 +216,15 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	{
 		std::memset(&_row[i], 0, sizeof(MYSQL_BIND));
 		unsigned int len = static_cast<unsigned int>(_columns[i].length());
-		_buffer[i] = (char*) std::calloc(len, sizeof(char));
+		if (len > 0) 
+		{
+			_buffer[i] = (char*)std::calloc(len, sizeof(char));
+			if (_buffer[i] == nullptr) len = 0;
+		}
+		else 
+		{
+			_buffer[i] = nullptr;
+		}
 		_row[i].buffer_type   = fields[i].type;
 		_row[i].buffer_length = len;
 		_row[i].buffer        = _buffer[i];
@@ -266,8 +277,10 @@ bool ResultMetadata::isNull(std::size_t pos) const
 
 void ResultMetadata::adjustColumnSizeToFit(std::size_t pos)
 {
-	std::free(_buffer[pos]);
+	if (_row[pos].buffer_length > 0) return;
+	if (_buffer[pos] != nullptr) std::free(_buffer[pos]);
 	_buffer[pos] = (char*) std::calloc(_lengths[pos], sizeof(char));
+	if (_buffer[pos] == nullptr) _lengths[pos] = 0;
 	_row[pos].buffer = _buffer[pos];
 	_row[pos].buffer_length = _lengths[pos];
 }
