@@ -26,6 +26,7 @@
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Exception.h"
 #include <vector>
 #include <deque>
