@@ -424,7 +424,8 @@ private:
 
 		SQLLEN* pLenIn = new SQLLEN;
 		*pLenIn  = size;
-		SQLULEN columnSize = size ? size : 1; // prevent SQLSTATE = HY104 "Invalid precision value"
+		// prevent SQLSTATE = HY104 "Invalid precision value"
+		SQLULEN columnSize = size ? size : 1;
 
 		if (PB_AT_EXEC == _paramBinding)
 			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
@@ -550,76 +551,88 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		const C* pVal = 0;
-		if (!transcodeRequired()) pVal = &valC;
+		const C* pValContainer = 0;
+		if (!transcodeRequired()) 
+			pValContainer = &valC;
 		else
 		{
-			pVal = new C(valC.size());
+			pValContainer = new C(valC.size());
 			typename C::const_iterator valIt = valC.begin();
 			typename C::const_iterator valEnd = valC.end();
-			typename C::iterator tcIt = const_cast<C*>(pVal)->begin();
+			typename C::iterator tcIt = const_cast<C*>(pValContainer)->begin();
 			for (; valIt != valEnd; ++valIt, ++tcIt)
 				transcode(*valIt, *tcIt);
 		}
 
-		std::size_t length = pVal->size();
-
-		if (0 == length)
+		std::size_t lenContainer = pValContainer->size();
+		if (0 == lenContainer)
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(length);
+		setParamSetSize(lenContainer);
 
-		SQLINTEGER size = 0;
-		getColumnOrParameterSize(pos, size);
-		poco_assert (size > 0);
+		SQLINTEGER colMaxParamSize = 0;
+		getColumnOrParameterSize(pos, colMaxParamSize);
+		poco_assert(colMaxParamSize > 0);
 
-		if (size == _maxFieldSize)
+		if (colMaxParamSize == _maxFieldSize)
 		{
-			getMinValueSize(*pVal, size);
-			// accomodate for terminating zero
-			if (size != _maxFieldSize) ++size;
+			getMinValueSize(*pValContainer, colMaxParamSize);
+			// accommodate for terminating zero
+			if (colMaxParamSize != _maxFieldSize)
+				++colMaxParamSize;
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
+			//lenght for all items in container will be calc through NTS - null ternamted string
+			//in other cases buffer must contain a valid input value lenghts
+			_vecLengthIndicator[pos] = new LengthVec(lenContainer ? lenContainer : 1, SQL_NTS);
 		}
 
+		// increase for yet one portion of lines/strings
 		if (_charPtrs.size() <= pos)
 			_charPtrs.resize(pos + 1, 0);
 
-		_charPtrs[pos] = (char*) std::calloc(pVal->size() * size, sizeof(char));
+		//alloc(inited by zeros) for all strings using maximum possible value length plus terminate (because we are using SQL_NTS above)
+		_charPtrs[pos] = (char*)std::calloc(pValContainer->size() * colMaxParamSize+1, sizeof(char));
+		
 
-		std::string typeID = typeid(*pVal).name();
+
+		// collect all items from conatiner into one big buffer
 		std::size_t strSize;
 		std::size_t offset = 0;
-		typename C::const_iterator it = pVal->begin();
-		typename C::const_iterator end = pVal->end();
+		char *pStringsBuff = _charPtrs[pos];
+		typename C::const_iterator it = pValContainer->begin();
+		typename C::const_iterator end = pValContainer->end();
 		for (; it != end; ++it)
 		{
 			strSize = it->size();
-			if (strSize > size)
+			if (strSize > colMaxParamSize)
 			{
-				if (transcodeRequired()) delete pVal;
+				if (transcodeRequired()) 
+					delete pValContainer;
+				std::string typeID = typeid(*pValContainer).name();
 				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
 			}
-			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
-			offset += size;
+			std::memcpy(pStringsBuff + offset, it->c_str(), strSize);
+			offset += colMaxParamSize+1;//zero terminate each for case when in container string have a lenght as colMaxParamSize.
 		}
-		if (transcodeRequired()) delete pVal;
+		if (transcodeRequired()) 
+			delete pValContainer;
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
+			(SQLUSMALLINT)pos + 1,
 			toODBCDirection(dir),
 			SQL_C_CHAR,
-			SQL_LONGVARCHAR,
-			(SQLUINTEGER) size - 1,
+			Connector::stringBoundToLongVarChar() ? SQL_LONGVARCHAR : SQL_VARCHAR,
+			(SQLUINTEGER)colMaxParamSize,//ColumnSize
 			0,
-			_charPtrs[pos],
-			(SQLINTEGER) size,
+			pStringsBuff,
+			(SQLINTEGER)colMaxParamSize+1,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
+			std::string typeID = typeid(*pValContainer).name();
 			throw StatementException(_rStmt, Poco::format("SQLBindParameter(%s)", typeID));
 		}
 	}
