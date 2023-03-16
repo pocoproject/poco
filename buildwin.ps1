@@ -14,7 +14,7 @@
 #              [-omit         "Lib1X,LibY,LibZ,..."]
 #              [-tool         msbuild | devenv]
 #              [-useenv       env | noenv]
-#              [-verbosity    m[inimal] | q[uiet] | n[ormal] | d[etailed] | diag[nostic]]
+#              [-verbosity    minimal | quiet | normal | detailed | diagnostic]
 #              [-openssl_base dir]
 #              [-mysql_base   dir]
 
@@ -57,7 +57,7 @@ Param
 	[string] $useenv = 'env',
 
 	[Parameter()]
-	[ValidateSet('quiet', 'm[inimal]', 'n[ormal]', 'd[etailed]', 'diag[nostic]')]
+	[ValidateSet('quiet', 'minimal', 'normal', 'detailed', 'diagnostic')]
 	[string] $verbosity = 'minimal',
 
 	[Parameter()]
