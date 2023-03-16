@@ -19,6 +19,12 @@
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
 #include <signal.h>
+
+#if POCO_OS == POCO_OS_FREE_BSD
+#    include <pthread_np.h>
+#    include <osreldate.h>
+#endif
+
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
@@ -67,6 +73,8 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 {
 #if (POCO_OS == POCO_OS_MAC_OS_X)
 	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+#elif POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version <  1300000
+    pthread_set_name_np(thread, threadName.c_str());
 #else
 	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
 	{
@@ -276,7 +284,10 @@ long ThreadImpl::currentOsTidImpl()
     return ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
     return ::pthread_mach_thread_np(::pthread_self());
+#elif POCO_OS == POCO_OS_FREE_BSD
+    return ::pthread_getthreadid_np();
 #else
+    pthread_t type;
     return ::pthread_self();
 #endif
 }
