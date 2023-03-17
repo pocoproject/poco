@@ -57,6 +57,8 @@ public:
 	void testDynamicStructBasics();
 	void testOrderedDynamicStructBasics();
 	void testDynamicStructString();
+	void testDynamicStructEmptyString();
+	void testDynamicStructNoEscapeString();
 	void testOrderedDynamicStructString();
 	void testDynamicStructInt();
 	void testOrderedDynamicStructInt();

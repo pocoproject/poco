@@ -216,7 +216,8 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
-		return;
+		delete[] reinterpret_cast<char*>(pAdapterInfo);
+		throw SystemException("cannot get network adapter list");
 	}
 	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
 	{

@@ -32,6 +32,37 @@ namespace Poco {
 namespace Dynamic {
 
 
+template <typename S, typename I = typename S::ConstIterator>
+std::string structToString(const S& data, bool wrap = true)
+	/// Utility function for converting DynamicStruct to std::string.
+	/// Set wrap to false in order to prevent string values wrapping
+	/// (useful to prevent JSON fragments from being treated as strings).
+{
+	std::string val;
+	val.append("{ ");
+	I it = data.begin();
+	I itEnd = data.end();
+	if (!data.empty())
+	{
+		Var key(it->first);
+		Impl::appendJSONKey(val, key);
+		val.append(": ");
+		Impl::appendJSONValue(val, it->second, wrap);
+		++it;
+	}
+	for (; it != itEnd; ++it)
+	{
+		val.append(", ");
+		Var key(it->first);
+		Impl::appendJSONKey(val, key);
+		val.append(": ");
+		Impl::appendJSONValue(val, it->second, wrap);
+	}
+	val.append(" }");
+	return val;
+}
+
+
 template <typename K, typename M = std::map<K, Var>, typename S = std::set<K>>
 class Struct
 	/// Struct allows to define a named collection of Var objects.
@@ -226,11 +257,20 @@ public:
 		return it->second;
 	}
 
-	std::string toString() const
+	std::string toString(bool wrap = true) const
+		/// Returns the DynamicStruct as string.
+		///
+		/// To prevent unwanted string wrapping
+		/// (eg. when a value is JSON string),
+		/// `wrap` should be false. Note, however,
+		/// that wrap argument is of a limited utility
+		/// because it applies to the entire Struct,
+		/// so it should not be relied on when mixed content
+		/// (ie. plain string, which should be wrapped,
+		/// and JSON-as-string entries, which shouldn't)
+		/// is held.
 	{
-		std::string str;
-		Var(*this).template convert<std::string>(str);
-		return str;
+		return structToString<Data, ConstIterator>(_data, wrap);
 	}
 
 private:
@@ -332,26 +372,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
 	void convert(Poco::DateTime&) const
@@ -518,26 +539,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
 	void convert(Poco::DateTime&) const
@@ -704,26 +706,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
 	void convert(Poco::DateTime&) const
@@ -890,26 +873,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
 	void convert(Poco::DateTime&) const

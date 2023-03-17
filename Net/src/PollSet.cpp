@@ -63,7 +63,7 @@ int close(HANDLE h)
 class PollSetImpl
 {
 public:
-	using Mutex = Poco::SpinlockMutex;
+	using Mutex = Poco::FastMutex;
 	using ScopedLock = Mutex::ScopedLock;
 	using SocketMode = std::pair<Socket, int>;
 	using SocketMap = std::map<void*, SocketMode>;
@@ -88,10 +88,11 @@ public:
 	{
 #ifdef WEPOLL_H_
 		if (_eventfd >= 0) eventfd(_port, _eventfd);
+		if (_epollfd) close(_epollfd);
 #else
 		if (_eventfd > 0) close(_eventfd.exchange(0));
-#endif
 		if (_epollfd >= 0) close(_epollfd);
+#endif
 	}
 
 	void add(const Socket& socket, int mode)
@@ -146,7 +147,11 @@ public:
 			close(_epollfd);
 			_socketMap.clear();
 			_epollfd = epoll_create(1);
+#ifdef WEPOLL_H_
+			if (!_epollfd) SocketImpl::error();
+#else
 			if (_epollfd < 0) SocketImpl::error();
+#endif
 		}
 #ifdef WEPOLL_H_
 		eventfd(_port, _eventfd);
@@ -163,6 +168,7 @@ public:
 		PollSet::SocketModeMap result;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+
 		ScopedLock lock(_mutex);
 		do
 		{
