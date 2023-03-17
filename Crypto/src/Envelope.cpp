@@ -24,8 +24,12 @@ Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
 {
 	poco_check_ptr(_pCipher);
 	poco_check_ptr(_pCtx);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 	if (1 != EVP_CIPHER_CTX_init(_pCtx))
 		handleErrors(std::string("Envelope():EVP_CIPHER_CTX_init()"));
+#else
+	EVP_CIPHER_CTX_init(_pCtx);
+#endif
 	_iv.resize(ivSize(), 0);
 }
 
