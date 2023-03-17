@@ -271,7 +271,7 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
 		return
 	}
 
-	$cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$useenv /v:$verbosity"
+	$cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$($useenv -eq 'env') /v:$verbosity"
 	Write-Host $cmd
 	Invoke-Expression $cmd
 	if ($LastExitCode -ne 0) { Exit $LastExitCode }
