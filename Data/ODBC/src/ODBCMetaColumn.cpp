@@ -160,6 +160,7 @@ void ODBCMetaColumn::init()
 		setType(MetaColumn::FDT_DATE); break;
 
 	case SQL_TYPE_TIME:
+	case -154: //MS SQL Server custom type SQL_SS_TIME2
 		setType(MetaColumn::FDT_TIME); break;
 
 	case SQL_TYPE_TIMESTAMP:
