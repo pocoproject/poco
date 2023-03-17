@@ -44,7 +44,7 @@ namespace
 	class CryptoTransformImpl: public CryptoTransform
 	{
 	public:
-		typedef Cipher::ByteVec ByteVec;
+		using ByteVec = Cipher::ByteVec;
 
 		enum Direction
 		{
@@ -98,20 +98,22 @@ namespace
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		_pContext = EVP_CIPHER_CTX_new();
-		EVP_CipherInit(
+		if (!_pContext) throwError();
+		int rc = EVP_CipherInit(
 			_pContext,
 			_pCipher,
 			&_key[0],
 			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #else
-		EVP_CipherInit(
+		int rc = EVP_CipherInit(
 			&_context,
 			_pCipher,
 			&_key[0],
 			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #endif
+		if (rc == 0) throwError();
 
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
@@ -151,7 +153,7 @@ namespace
 	int CryptoTransformImpl::setPadding(int padding)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		return EVP_CIPHER_CTX_block_size(_pContext);
+		return EVP_CIPHER_CTX_set_padding(_pContext, padding);
 #else
 		return EVP_CIPHER_CTX_set_padding(&_context, padding);
 #endif
@@ -255,14 +257,14 @@ CipherImpl::~CipherImpl()
 }
 
 
-CryptoTransform* CipherImpl::createEncryptor()
+CryptoTransform::Ptr CipherImpl::createEncryptor()
 {
 	CipherKeyImpl::Ptr p = _key.impl();
 	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(), CryptoTransformImpl::DIR_ENCRYPT);
 }
 
 
-CryptoTransform* CipherImpl::createDecryptor()
+CryptoTransform::Ptr CipherImpl::createDecryptor()
 {
 	CipherKeyImpl::Ptr p = _key.impl();
 	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(), CryptoTransformImpl::DIR_DECRYPT);

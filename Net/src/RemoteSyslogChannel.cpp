@@ -16,6 +16,7 @@
 #include "Poco/Message.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/LoggingFactory.h"
@@ -34,6 +35,7 @@ const std::string RemoteSyslogChannel::PROP_FACILITY("facility");
 const std::string RemoteSyslogChannel::PROP_FORMAT("format");
 const std::string RemoteSyslogChannel::PROP_LOGHOST("loghost");
 const std::string RemoteSyslogChannel::PROP_HOST("host");
+const std::string RemoteSyslogChannel::PROP_BUFFER("buffer");
 const std::string RemoteSyslogChannel::STRUCTURED_DATA("structured-data");
 
 
@@ -42,16 +44,18 @@ RemoteSyslogChannel::RemoteSyslogChannel():
 	_name("-"),
 	_facility(SYSLOG_USER),
 	_bsdFormat(false),
+	_buffer(0),
 	_open(false)
 {
 }
 
-		
+
 RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::string& name, int facility, bool bsdFormat):
 	_logHost(address),
 	_name(name),
 	_facility(facility),
 	_bsdFormat(bsdFormat),
+	_buffer(0),
 	_open(false)
 {
 	if (_name.empty()) _name = "-";
@@ -95,10 +99,15 @@ void RemoteSyslogChannel::open()
 		}
 	}
 
+	if (_buffer)
+	{
+		_socket.setSendBufferSize(_buffer);
+	}
+
 	_open = true;
 }
 
-	
+
 void RemoteSyslogChannel::close()
 {
 	if (_open)
@@ -108,7 +117,7 @@ void RemoteSyslogChannel::close()
 	}
 }
 
-	
+
 void RemoteSyslogChannel::log(const Message& msg)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
@@ -154,7 +163,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 	_socket.sendTo(m.data(), static_cast<int>(m.size()), _socketAddress);
 }
 
-	
+
 void RemoteSyslogChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_NAME)
@@ -171,7 +180,7 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 			facility = Poco::toUpper(value.substr(7));
 		else
 			facility = Poco::toUpper(value);
-		
+
 		if (facility == "KERN")
 			_facility = SYSLOG_KERN;
 		else if (facility == "USER")
@@ -233,13 +242,17 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	{
 		_bsdFormat = (value == "bsd" || value == "rfc3164");
 	}
+	else if (name == PROP_BUFFER)
+	{
+		_buffer = Poco::NumberParser::parse(value);
+	}
 	else
 	{
 		Channel::setProperty(name, value);
 	}
 }
 
-	
+
 std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 {
 	if (name == PROP_NAME)
@@ -314,6 +327,10 @@ std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 	{
 		return _bsdFormat ? "rfc3164" : "rfc5424";
 	}
+	else if (name == PROP_BUFFER)
+	{
+		return Poco::NumberFormatter::format(_buffer);
+	}
 	else
 	{
 		return Channel::getProperty(name);
@@ -342,6 +359,63 @@ int RemoteSyslogChannel::getPrio(const Message& msg)
 		return SYSLOG_ALERT;
 	default:
 		return 0;
+	}
+}
+
+const char* RemoteSyslogChannel::facilityToString(const Facility facility)
+{
+	switch(facility)
+	{
+	case RemoteSyslogChannel::SYSLOG_KERN:
+		return "KERN";
+	case RemoteSyslogChannel::SYSLOG_USER:
+		return "USER";
+	case RemoteSyslogChannel::SYSLOG_MAIL:
+		return "MAIL";
+	case RemoteSyslogChannel::SYSLOG_DAEMON:
+		return "DAEMON";
+	case RemoteSyslogChannel::SYSLOG_AUTH:
+		return "AUTH";
+	case RemoteSyslogChannel::SYSLOG_SYSLOG:
+		return "SYSLOG";
+	case RemoteSyslogChannel::SYSLOG_LPR:
+		return "LPR";
+	case RemoteSyslogChannel::SYSLOG_NEWS:
+		return "NEWS";
+	case RemoteSyslogChannel::SYSLOG_UUCP:
+		return "UUCP";
+	case RemoteSyslogChannel::SYSLOG_CRON:
+		return "CRON";
+	case RemoteSyslogChannel::SYSLOG_AUTHPRIV:
+		return "AUTHPRIV";
+	case RemoteSyslogChannel::SYSLOG_FTP:
+		return "FTP";
+	case RemoteSyslogChannel::SYSLOG_NTP:
+		return "NTP";
+	case RemoteSyslogChannel::SYSLOG_LOGAUDIT:
+		return "LOGAUDIT";
+	case RemoteSyslogChannel::SYSLOG_LOGALERT:
+		return "LOGALERT";
+	case RemoteSyslogChannel::SYSLOG_CLOCK:
+		return "CLOCK";
+	case RemoteSyslogChannel::SYSLOG_LOCAL0:
+		return "LOCAL0";
+	case RemoteSyslogChannel::SYSLOG_LOCAL1:
+		return "LOCAL1";
+	case RemoteSyslogChannel::SYSLOG_LOCAL2:
+		return "LOCAL2";
+	case RemoteSyslogChannel::SYSLOG_LOCAL3:
+		return "LOCAL3";
+	case RemoteSyslogChannel::SYSLOG_LOCAL4:
+		return "LOCAL4";
+	case RemoteSyslogChannel::SYSLOG_LOCAL5:
+		return "LOCAL5";
+	case RemoteSyslogChannel::SYSLOG_LOCAL6:
+		return "LOCAL6";
+	case RemoteSyslogChannel::SYSLOG_LOCAL7:
+		return "LOCAL7";
+	default:
+		return "";
 	}
 }
 

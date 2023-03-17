@@ -33,16 +33,16 @@ MapConfigurationTest::~MapConfigurationTest()
 void MapConfigurationTest::testClear()
 {
 	AutoPtr<MapConfiguration> pConf = new MapConfiguration;
-	
+
 	pConf->setString("foo", "bar");
-	assert (pConf->hasProperty("foo"));
-	
+	assertTrue (pConf->hasProperty("foo"));
+
 	pConf->clear();
-	assert (!pConf->hasProperty("foo"));
+	assertTrue (!pConf->hasProperty("foo"));
 }
 
 
-AbstractConfiguration* MapConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr MapConfigurationTest::allocConfiguration() const
 {
 	return new MapConfiguration;
 }

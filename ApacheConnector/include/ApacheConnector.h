@@ -25,7 +25,7 @@ class ApacheRequestRec
 public:
 	ApacheRequestRec(request_rec* _pRec);
 		/// Creates the ApacheRequestRec;
-	
+
 	bool haveRequestBody();
 		/// Returns true if the request contains a body.
 
@@ -48,14 +48,23 @@ public:
 
 	void sendErrorResponse(int status);
 		/// Sends an error response with the given HTTP status code.
-		
+
 	int sendFile(const std::string& path, unsigned int fileSize, const std::string& mediaType);
 		/// Sends the file given by fileName as response.
 
 	void copyHeaders(ApacheServerRequest& request);
 		/// Copies the request uri and header fields from the Apache request
 		/// to the ApacheServerRequest.
-		
+
+	bool secure();
+		/// Returns true if the request is using a secure
+		/// connection. Returns false if no secure connection
+		/// is used, or if it is not known whether a secure
+		/// connection is used.
+
+	void setStatus(int status);
+		/// Set specific HTTP status code for the request.
+
 private:
 	request_rec* _pRec;
 };

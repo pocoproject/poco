@@ -32,8 +32,7 @@ URIStreamOpener::URIStreamOpener()
 
 URIStreamOpener::~URIStreamOpener()
 {
-	for (FactoryMap::iterator it = _map.begin(); it != _map.end(); ++it)
-		delete it->second;
+	for (auto& p: _map) delete p.second;
 }
 
 
@@ -78,7 +77,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		Path path;
 		if (path.tryParse(pathOrURI, Path::PATH_GUESS))
 			return openFile(path);
-		else 
+		else
 			throw;
 	}
 }
@@ -124,7 +123,7 @@ std::istream* URIStreamOpener::open(const std::string& basePathOrURI, const std:
 	}
 }
 
-	
+
 void URIStreamOpener::registerStreamFactory(const std::string& scheme, URIStreamFactory* pFactory)
 {
 	poco_check_ptr (pFactory);
@@ -141,7 +140,7 @@ void URIStreamOpener::registerStreamFactory(const std::string& scheme, URIStream
 void URIStreamOpener::unregisterStreamFactory(const std::string& scheme)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	FactoryMap::iterator it = _map.find(scheme);
 	if (it != _map.end())
 	{
@@ -184,7 +183,7 @@ std::istream* URIStreamOpener::openURI(const std::string& scheme, const URI& uri
 	std::string actualScheme(scheme);
 	URI actualURI(uri);
 	int redirects = 0;
-	
+
 	while (redirects < MAX_REDIRECTS)
 	{
 		try

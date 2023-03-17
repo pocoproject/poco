@@ -39,14 +39,14 @@ void HexBinaryTest::testEncoder()
 		HexBinaryEncoder encoder(str);
 		encoder << std::string("\00\01\02\03\04\05", 6);
 		encoder.close();
-		assert (str.str() == "000102030405");
+		assertTrue (str.str() == "000102030405");
 	}
 	{
 		std::ostringstream str;
 		HexBinaryEncoder encoder(str);
 		encoder << std::string("\00\01\02\03", 4);
 		encoder.close();
-		assert (str.str() == "00010203");
+		assertTrue (str.str() == "00010203");
 	}
 	{
 		std::ostringstream str;
@@ -54,7 +54,7 @@ void HexBinaryTest::testEncoder()
 		encoder << "ABCDEF";
 		encoder << char(0xaa) << char(0xbb);
 		encoder.close();
-		assert (str.str() == "414243444546aabb");
+		assertTrue (str.str() == "414243444546aabb");
 	}
 	{
 		std::ostringstream str;
@@ -63,7 +63,7 @@ void HexBinaryTest::testEncoder()
 		encoder << "ABCDEF";
 		encoder << char(0xaa) << char(0xbb);
 		encoder.close();
-		assert (str.str() == "414243444546AABB");
+		assertTrue (str.str() == "414243444546AABB");
 	}
 }
 
@@ -73,68 +73,68 @@ void HexBinaryTest::testDecoder()
 	{
 		std::istringstream istr("000102030405");
 		HexBinaryDecoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0);
-		assert (decoder.good() && decoder.get() == 1);
-		assert (decoder.good() && decoder.get() == 2);
-		assert (decoder.good() && decoder.get() == 3);
-		assert (decoder.good() && decoder.get() == 4);
-		assert (decoder.good() && decoder.get() == 5);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0);
+		assertTrue (decoder.good() && decoder.get() == 1);
+		assertTrue (decoder.good() && decoder.get() == 2);
+		assertTrue (decoder.good() && decoder.get() == 3);
+		assertTrue (decoder.good() && decoder.get() == 4);
+		assertTrue (decoder.good() && decoder.get() == 5);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("0001020304");
 		HexBinaryDecoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0);
-		assert (decoder.good() && decoder.get() == 1);
-		assert (decoder.good() && decoder.get() == 2);
-		assert (decoder.good() && decoder.get() == 3);
-		assert (decoder.good() && decoder.get() == 4);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0);
+		assertTrue (decoder.good() && decoder.get() == 1);
+		assertTrue (decoder.good() && decoder.get() == 2);
+		assertTrue (decoder.good() && decoder.get() == 3);
+		assertTrue (decoder.good() && decoder.get() == 4);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("0a0bcdef");
 		HexBinaryDecoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0x0a);
-		assert (decoder.good() && decoder.get() == 0x0b);
-		assert (decoder.good() && decoder.get() == 0xcd);
-		assert (decoder.good() && decoder.get() == 0xef);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0x0a);
+		assertTrue (decoder.good() && decoder.get() == 0x0b);
+		assertTrue (decoder.good() && decoder.get() == 0xcd);
+		assertTrue (decoder.good() && decoder.get() == 0xef);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("0A0BCDEF");
 		HexBinaryDecoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0x0a);
-		assert (decoder.good() && decoder.get() == 0x0b);
-		assert (decoder.good() && decoder.get() == 0xcd);
-		assert (decoder.good() && decoder.get() == 0xef);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0x0a);
+		assertTrue (decoder.good() && decoder.get() == 0x0b);
+		assertTrue (decoder.good() && decoder.get() == 0xcd);
+		assertTrue (decoder.good() && decoder.get() == 0xef);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("00 01 02 03");
 		HexBinaryDecoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0);
-		assert (decoder.good() && decoder.get() == 1);
-		assert (decoder.good() && decoder.get() == 2);
-		assert (decoder.good() && decoder.get() == 3);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0);
+		assertTrue (decoder.good() && decoder.get() == 1);
+		assertTrue (decoder.good() && decoder.get() == 2);
+		assertTrue (decoder.good() && decoder.get() == 3);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("414243444546");
 		HexBinaryDecoder decoder(istr);
 		std::string s;
 		decoder >> s;
-		assert (s == "ABCDEF");
-		assert (decoder.eof());
-		assert (!decoder.fail());
+		assertTrue (s == "ABCDEF");
+		assertTrue (decoder.eof());
+		assertTrue (!decoder.fail());
 	}
 	{
 		std::istringstream istr("4041\r\n4243\r\n4445");
 		HexBinaryDecoder decoder(istr);
 		std::string s;
 		decoder >> s;
-		assert (s == "@ABCDE");
-		assert (decoder.eof());
-		assert (!decoder.fail());
+		assertTrue (s == "@ABCDE");
+		assertTrue (decoder.eof());
+		assertTrue (!decoder.fail());
 	}
 	{
 		std::istringstream istr("AABB#CCDD");
@@ -143,12 +143,12 @@ void HexBinaryTest::testDecoder()
 		try
 		{
 			decoder >> s;
-			assert (decoder.bad());
+			assertTrue (decoder.bad());
 		}
 		catch (DataFormatException&)
 		{
 		}
-		assert (!decoder.eof());
+		assertTrue (!decoder.eof());
 	}
 }
 
@@ -165,7 +165,7 @@ void HexBinaryTest::testEncodeDecode()
 		std::string s;
 		int c = decoder.get();
 		while (c != -1) { s += char(c); c = decoder.get(); }
-		assert (s == "The quick brown fox jumped over the lazy dog.");
+		assertTrue (s == "The quick brown fox jumped over the lazy dog.");
 	}
 	{
 		std::string src;
@@ -178,7 +178,7 @@ void HexBinaryTest::testEncodeDecode()
 		std::string s;
 		int c = decoder.get();
 		while (c != -1) { s += char(c); c = decoder.get(); }
-		assert (s == src);
+		assertTrue (s == src);
 	}
 }
 

@@ -2,20 +2,27 @@ set(POCO_EXENAME "PageCompiler")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-POCO_SOURCES_AUTO( SRCS ${SRCS_G})
+POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
-add_executable( "${POCO_EXENAME}" ${SRCS} )
-set_target_properties( "${POCO_EXENAME}"
-    PROPERTIES
-    OUTPUT_NAME cpspc
-    )
+# Version Resource
+if(MSVC)
+	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+endif()
 
-target_link_libraries( "${POCO_EXENAME}" Net Util XML JSON Foundation)
+add_executable(PageCompiler ${SRCS})
+set_target_properties(PageCompiler
+	PROPERTIES
+	OUTPUT_NAME cpspc
+)
+
+target_link_libraries(PageCompiler PUBLIC Poco::Net Poco::Util)
 
 install(
-    TARGETS "${POCO_EXENAME}" EXPORT "${POCO_EXENAME}Targets"
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-    )
+	TARGETS PageCompiler EXPORT PageCompilerTargets
+	LIBRARY DESTINATION lib${LIB_SUFFIX}
+	ARCHIVE DESTINATION lib${LIB_SUFFIX}
+	RUNTIME DESTINATION bin
+	BUNDLE DESTINATION bin
+	INCLUDES DESTINATION include
+)

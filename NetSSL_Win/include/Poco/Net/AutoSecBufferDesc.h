@@ -19,19 +19,21 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #include <wincrypt.h>
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
-#endif
 #include <sspi.h>
+#endif
+#endif
 
 
 namespace Poco {
 namespace Net {
 
 
-template <int numBufs> 
+template <int numBufs>
 class AutoSecBufferDesc: public SecBufferDesc
 	/// AutoSecBufferDesc is a helper class for automatic initialization and release of SecBuffer objects.
 {
@@ -43,7 +45,7 @@ public:
 	{
 		poco_check_ptr (_pSec);
 		poco_static_assert (numBufs > 0);
-		
+
 		initBuffers();
 		cBuffers = numBufs;
 		pBuffers = _buffers;

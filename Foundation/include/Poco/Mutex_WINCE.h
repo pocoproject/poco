@@ -35,7 +35,7 @@ protected:
 	bool tryLockImpl();
 	bool tryLockImpl(long milliseconds);
 	void unlockImpl();
-	
+
 private:
 	HANDLE _mutex;
 };

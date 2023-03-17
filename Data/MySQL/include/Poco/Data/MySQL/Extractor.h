@@ -50,29 +50,29 @@ public:
 
 	virtual bool extract(std::size_t pos, Poco::Int8& val);
 		/// Extracts an Int8.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt8& val);
 		/// Extracts an UInt8.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int16& val);
 		/// Extracts an Int16.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt16& val);
 		/// Extracts an UInt16.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int32& val);
 		/// Extracts an Int32.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt32& val);
 		/// Extracts an UInt32.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int64& val);
 		/// Extracts an Int64.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
-		
-#ifndef POCO_LONG_IS_64_BIT
+
+#ifndef POCO_INT64_IS_LONG
 	virtual bool extract(std::size_t pos, long& val);
 		/// Extracts a long. Returns false if null was received.
 
@@ -82,10 +82,10 @@ public:
 
 	virtual bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
-		
+
 	virtual bool extract(std::size_t pos, float& val);
 		/// Extracts a float.
-		
+
 	virtual bool extract(std::size_t pos, double& val);
 		/// Extracts a double.
 
@@ -110,6 +110,9 @@ public:
 	virtual bool extract(std::size_t pos, Time& val);
 		/// Extracts a Time. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, UUID& val);
+		/// Extracts a UUID. Returns false if null was received.
+
 	virtual bool extract(std::size_t pos, Any& val);
 		/// Extracts an Any. Returns false if null was received.
 
@@ -125,7 +128,7 @@ public:
 	////////////
 	// Not implemented extract functions
 	////////////
-	
+
 	virtual bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
 		/// Extracts an Int8 vector.
 
@@ -198,7 +201,7 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
 		/// Extracts an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	virtual bool extract(std::size_t pos, std::vector<long>& val);
 		/// Extracts a long vector.
 
@@ -316,19 +319,22 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<Dynamic::Var>& val);
 		/// Extracts a Dynamic::Var list.
-	
-private:
 
+private:
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);
 
+	bool extractLongLOB(std::size_t pos);
+#ifdef POCO_MYSQL_JSON
+	bool extractJSON(std::size_t pos);
+#endif
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
 
 private:
-
 	StatementExecutor& _stmt;
 	ResultMetadata& _metadata;
 };
+
 
 } } } // namespace Poco::Data::MySQL
 

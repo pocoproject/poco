@@ -151,7 +151,7 @@ int DeflatingStreamBuf::close()
 			int rc = deflate(&_zstr, Z_FINISH);
 			if (rc != Z_OK && rc != Z_STREAM_END) throw IOException(zError(rc));
 			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
-			if (!_pOstr->good()) throw IOException(zError(rc));
+			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 			while (rc != Z_STREAM_END)
@@ -159,7 +159,7 @@ int DeflatingStreamBuf::close()
 				rc = deflate(&_zstr, Z_FINISH);
 				if (rc != Z_OK && rc != Z_STREAM_END) throw IOException(zError(rc));
 				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
-				if (!_pOstr->good()) throw IOException(zError(rc));
+				if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 				_zstr.next_out  = (unsigned char*) _buffer;
 				_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 			}
@@ -183,7 +183,7 @@ int DeflatingStreamBuf::sync()
 			int rc = deflate(&_zstr, Z_SYNC_FLUSH);
 			if (rc != Z_OK) throw IOException(zError(rc));
 			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
-			if (!_pOstr->good()) throw IOException(zError(rc));
+			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 			while (_zstr.avail_out == 0)
 			{
 				_zstr.next_out  = (unsigned char*) _buffer;
@@ -191,7 +191,7 @@ int DeflatingStreamBuf::sync()
 				rc = deflate(&_zstr, Z_SYNC_FLUSH);
 				if (rc != Z_OK) throw IOException(zError(rc));
 				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
-				if (!_pOstr->good()) throw IOException(zError(rc));
+				if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 			};
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
@@ -281,14 +281,14 @@ int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 		if (_zstr.avail_out == 0)
 		{
 			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE);
-			if (!_pOstr->good()) throw IOException(zError(rc));
+			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 		}
 		if (_zstr.avail_in == 0)
 		{
 			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
-			if (!_pOstr->good()) throw IOException(zError(rc));
+			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 			break;

@@ -27,6 +27,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/SharedPtr.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <wincrypt.h>
 #include <schannel.h>
 #ifndef SECURITY_WIN32
@@ -34,6 +35,7 @@
 #endif
 #include <security.h>
 #include <sspi.h>
+#endif
 
 
 namespace Poco {
@@ -44,7 +46,7 @@ class Context;
 
 
 class NetSSL_Win_API SSLManager
-	/// SSLManager is a singleton for holding the default server/client 
+	/// SSLManager is a singleton for holding the default server/client
 	/// Context and handling callbacks for certificate verification errors
 	/// and private key passphrases.
 	///
@@ -64,7 +66,7 @@ class NetSSL_Win_API SSLManager
 	/// ClientVerificationError and PrivateKeyPassphraseRequired events
 	/// must be registered.
 	///
-	/// An exemplary documentation which sets either the server or client default context and creates 
+	/// An exemplary documentation which sets either the server or client default context and creates
 	/// a PrivateKeyPassphraseHandler that reads the password from the XML file looks like this:
 	///
 	///    <AppConfig>
@@ -98,34 +100,34 @@ class NetSSL_Win_API SSLManager
 	/// Following is a list of supported configuration properties. Property names must always
 	/// be prefixed with openSSL.server or openSSL.client. Some properties are only supported
 	/// for servers.
-	/// 
+	///
 	///    - certificateName (string): The subject name of the certificate to use. The certificate must
-	///      be available in the Windows user or machine certificate store.  
+	///      be available in the Windows user or machine certificate store.
 	///    - certificatePath (string): The path of a certificate and private key file in PKCS #12 format.
-	///    - certificateStore (string): The certificate store location to use. 
+	///    - certificateStore (string): The certificate store location to use.
 	///      Valid values are "MY", "Root", "Trust" or "CA". Defaults to "MY".
 	///    - verificationMode (string): Specifies whether and how peer certificates are validated (see
 	///      the Context class for details). Valid values are "none", "relaxed", "strict". Defaults to "relaxed".
-	///    - revocationCheck (boolean): Enable or disable checking of certificates against revocation list. 
+	///    - revocationCheck (boolean): Enable or disable checking of certificates against revocation list.
 	///      Defaults to true. Not supported (ignored) on Windows Embedded Compact.
 	///    - trustRoots (boolean): Trust root certificates from Windows root certificate store. Defaults to true.
 	///    - useMachineStore (boolean): Use Windows machine certificate store instead of user store (server only).
 	///      Special user privileges may be required. Defaults to false.
-	///    - useStrongCrypto (boolean): Disable known weak cryptographic algorithms, cipher suites, and 
-	///      SSL/TLS protocol versions that may be otherwise enabled for better interoperability. 
+	///    - useStrongCrypto (boolean): Disable known weak cryptographic algorithms, cipher suites, and
+	///      SSL/TLS protocol versions that may be otherwise enabled for better interoperability.
 	///      Defaults to true.
 	///    - privateKeyPassphraseHandler.name (string): The name of the class (subclass of PrivateKeyPassphraseHandler)
 	///      used for obtaining the passphrase for accessing the private key.
 	///    - privateKeyPassphraseHandler.options.password (string): The password to be used by KeyFileHandler.
 	///    - invalidCertificateHandler.name: The name of the class (subclass of CertificateHandler)
 	///      used for confirming invalid certificates.
-	///    - requireTLSv1 (boolean): Require a TLSv1 connection. 
+	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection. Not supported on Windows Embedded Compact.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection. Not supported on Windows Embedded Compact.
 {
 public:
-	typedef Poco::SharedPtr<PrivateKeyPassphraseHandler> PrivateKeyPassphraseHandlerPtr;
-	typedef Poco::SharedPtr<InvalidCertificateHandler> InvalidCertificateHandlerPtr;
+	using PrivateKeyPassphraseHandlerPtr = Poco::SharedPtr<PrivateKeyPassphraseHandler>;
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Poco::BasicEvent<VerificationErrorArgs>  ServerVerificationError;
 		/// Fired whenever a certificate verification error is detected by the server during a handshake.
@@ -147,7 +149,7 @@ public:
 		/// pCertificateHandler can be 0. However, in this case, event delegates
 		/// must be registered with the ServerVerificationError event.
 		///
-		/// Note: Always create the handlers (or register the corresponding event delegates) before creating 
+		/// Note: Always create the handlers (or register the corresponding event delegates) before creating
 		/// the Context.
 		///
 		/// Valid initialization code would be:
@@ -162,7 +164,7 @@ public:
 		/// pCertificateHandler can be 0. However, in this case, event delegates
 		/// must be registered with the ClientVerificationError event.
 		///
-		/// Note: Always create the handlers (or register the corresponding event delegates) before creating 
+		/// Note: Always create the handlers (or register the corresponding event delegates) before creating
 		/// the Context, as during creation of the Context the passphrase for the private key might be needed.
 		///
 		/// Valid initialization code would be:
@@ -171,13 +173,13 @@ public:
 		///     SSLManager::instance().initializeClient(pInvalidCertHandler, pContext);
 
 	Context::Ptr defaultServerContext();
-		/// Returns the default Context used by the server. 
+		/// Returns the default Context used by the server.
 		///
 		/// Unless initializeServer() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
 	Context::Ptr defaultClientContext();
-		/// Returns the default Context used by the client. 
+		/// Returns the default Context used by the client.
 		///
 		/// Unless initializeClient() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
@@ -199,11 +201,11 @@ public:
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
 	PrivateKeyFactoryMgr& privateKeyFactoryMgr();
-		/// Returns the private key factory manager which stores the 
+		/// Returns the private key factory manager which stores the
 		/// factories for the different registered passphrase handlers for private keys.
 
 	CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
-		/// Returns the CertificateHandlerFactoryMgr which stores the 
+		/// Returns the CertificateHandlerFactoryMgr which stores the
 		/// factories for the different registered certificate handlers.
 
 	void shutdown();
@@ -290,6 +292,7 @@ private:
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;
+	static const std::string CFG_REQUIRE_TLSV1_3;
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class SecureSocketImpl;

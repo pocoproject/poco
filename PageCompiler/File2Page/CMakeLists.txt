@@ -1,21 +1,26 @@
-set(POCO_EXENAME "File2Page")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-POCO_SOURCES_AUTO( SRCS ${SRCS_G})
+POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
-add_executable( "${POCO_EXENAME}" ${SRCS} )
-set_target_properties( "${POCO_EXENAME}"
-    PROPERTIES
-    OUTPUT_NAME f2cpsp
-    )
+# Version Resource
+if(MSVC)
+	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+endif()
 
-target_link_libraries( "${POCO_EXENAME}" Net Util XML JSON Foundation)
+add_executable(File2Page ${SRCS})
+set_target_properties(File2Page
+	PROPERTIES
+	OUTPUT_NAME f2cpsp
+)
+
+target_link_libraries(File2Page PUBLIC Poco::Util)
 
 install(
-    TARGETS "${POCO_EXENAME}" EXPORT "${POCO_EXENAME}Targets"
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-    )
+	TARGETS File2Page EXPORT File2PageTargets
+	LIBRARY DESTINATION lib${LIB_SUFFIX}
+	ARCHIVE DESTINATION lib${LIB_SUFFIX}
+	RUNTIME DESTINATION bin
+	BUNDLE DESTINATION bin
+	INCLUDES DESTINATION include
+)

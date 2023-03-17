@@ -8,6 +8,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|Win32 = debug_shared|Win32
 		release_shared|Win32 = release_shared|Win32
+		debug_shared|x64 = debug_shared|x64
+		release_shared|x64 = release_shared|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
@@ -16,12 +18,24 @@ Global
 		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.release_shared|Win32.ActiveCfg = release_shared|Win32
 		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.release_shared|Win32.Build.0 = release_shared|Win32
 		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.release_shared|Win32.Deploy.0 = release_shared|Win32
+		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.debug_shared|x64.Build.0 = debug_shared|x64
+		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.release_shared|x64.ActiveCfg = release_shared|x64
+		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.release_shared|x64.Build.0 = release_shared|x64
+		{CD77A9BA-6E9B-39EF-801A-1C7E66B19106}.release_shared|x64.Deploy.0 = release_shared|x64
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.debug_shared|Win32.Deploy.0 = debug_shared|Win32
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_shared|Win32.ActiveCfg = release_shared|Win32
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_shared|Win32.Build.0 = release_shared|Win32
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_shared|Win32.Deploy.0 = release_shared|Win32
+		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.debug_shared|x64.Build.0 = debug_shared|x64
+		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_shared|x64.ActiveCfg = release_shared|x64
+		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_shared|x64.Build.0 = release_shared|x64
+		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_shared|x64.Deploy.0 = release_shared|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

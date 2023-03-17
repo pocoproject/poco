@@ -36,15 +36,9 @@ namespace Poco {
 	{
 		std::string errMsg;
 		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		LPWSTR lpMsgBuf = 0;
 		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-	#else
-		LPTSTR lpMsgBuf = 0;
-		if (FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
-			errMsg = lpMsgBuf;
-	#endif
 		LocalFree(lpMsgBuf);
 		return errMsg;
 	}
@@ -74,31 +68,31 @@ namespace Poco {
 			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
 #else
 			setMessage(strerror(err));
-#endif		
+#endif
 		}
-		
+
 		~StrErrorHelper()
 		{
 		}
-		
+
 		const std::string& message() const
 		{
 			return _message;
 		}
-		
+
 	protected:
 		void setMessage(int rc)
 			/// Handles POSIX variant
 		{
 			_message = _buffer;
 		}
-		
+
 		void setMessage(const char* msg)
 			/// Handles GLIBC variant
 		{
 			_message = msg;
 		}
-		
+
 	private:
 		char _buffer[256];
 		std::string _message;

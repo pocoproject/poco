@@ -37,13 +37,13 @@ public:
 	{
 		try
 		{
-			for (std::set<std::string>::iterator it = _files.begin(); it != _files.end(); ++it)
+			for (auto& f: _files)
 			{
 				try
 				{
-					File f(*it);
-					if (f.exists())
-						f.remove(true);
+					File file(f);
+					if (file.exists())
+						file.remove(true);
 				}
 				catch (Exception&)
 				{
@@ -70,15 +70,15 @@ private:
 };
 
 
-TemporaryFile::TemporaryFile(): 
-	File(tempName()), 
+TemporaryFile::TemporaryFile():
+	File(tempName()),
 	_keep(false)
 {
 }
 
 
-TemporaryFile::TemporaryFile(const std::string& tempDir): 
-	File(tempName(tempDir)), 
+TemporaryFile::TemporaryFile(const std::string& tempDir):
+	File(tempName(tempDir)),
 	_keep(false)
 {
 }
@@ -120,7 +120,7 @@ void TemporaryFile::keepUntilExit()
 }
 
 
-namespace 
+namespace
 {
 	static TempFileCollector fc;
 }

@@ -1,37 +1,49 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="MySQL"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="MySQL"
 	ProjectGUID="{73E19FDE-1570-488C-B3DB-72A60FADD408}"
 	RootNamespace="MySQL"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\..\mysql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\mysql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;THREADSAFE;__LCC__;MySQL_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -47,65 +59,84 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmysql.lib"
+				AdditionalOptions=""
+				AdditionalDependencies=""
 				OutputFile="..\..\bin\PocoDataMySQLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\..\bin\PocoDataMySQLd.pdb"
-				AdditionalLibraryDirectories="..\..\lib"
 				SubSystem="1"
 				ImportLibrary="..\..\lib\PocoDataMySQLd.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\..\mysql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\mysql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;THREADSAFE;__LCC__;MySQL_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -119,62 +150,81 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmysql.lib"
+				AdditionalOptions=""
+				AdditionalDependencies=""
 				OutputFile="..\..\bin\PocoDataMySQL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="false"
 				AdditionalLibraryDirectories="..\..\lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\lib\PocoDataMySQL.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\..\mysql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\mysql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -185,57 +235,74 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib\PocoDataMySQLmtd.pdb"
+				ProgramDataBaseFileName="..\..\lib\PocoDataMySQLMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataMySQLmtd.lib"/>
+				OutputFile="..\..\lib\PocoDataMySQLMTd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\..\mysql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\mysql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -249,47 +316,64 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataMySQLmt.lib"/>
+				OutputFile="..\..\lib\PocoDataMySQLMT.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\..\mysql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\mysql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -300,57 +384,74 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib\PocoDataMySQLmdd.pdb"
+				ProgramDataBaseFileName="..\..\lib\PocoDataMySQLMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataMySQLmdd.lib"/>
+				OutputFile="..\..\lib\PocoDataMySQLMDd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\..\mysql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\mysql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -364,119 +465,173 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataMySQLmd.lib"/>
+				OutputFile="..\..\lib\PocoDataMySQLMD.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\src\Binder.cpp"/>
+				RelativePath=".\src\Binder.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Connector.cpp"/>
+				RelativePath=".\src\Connector.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Extractor.cpp"/>
+				RelativePath=".\src\Extractor.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\MySQLException.cpp"/>
+				RelativePath=".\src\MySQLException.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\MySQLStatementImpl.cpp"/>
+				RelativePath=".\src\MySQLStatementImpl.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\ResultMetadata.cpp"/>
+				RelativePath=".\src\ResultMetadata.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\SessionHandle.cpp"/>
+				RelativePath=".\src\SessionHandle.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\SessionImpl.cpp"/>
+				RelativePath=".\src\SessionImpl.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\StatementExecutor.cpp"/>
+				RelativePath=".\src\StatementExecutor.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Utility.cpp"/>
+				RelativePath=".\src\Utility.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Binder.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\Binder.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Connector.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\Connector.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Extractor.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\Extractor.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\MySQL.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\MySQL.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\MySQLException.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\MySQLException.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\MySQLStatementImpl.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\MySQLStatementImpl.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\ResultMetadata.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\ResultMetadata.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\SessionHandle.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\SessionHandle.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\SessionImpl.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\SessionImpl.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\StatementExecutor.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\StatementExecutor.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Utility.h"/>
+				RelativePath=".\include\Poco\Data\MySQL\Utility.h"
+				>
+			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\DLLVersion.rc">
-			<FileConfiguration
-				Name="debug_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
+			RelativePath="..\..\DLLVersion.rc"
+			>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 		</File>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

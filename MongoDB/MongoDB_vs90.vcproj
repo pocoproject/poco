@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="MongoDB"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="MongoDB"
 	ProjectGUID="{4FF2F34B-7F37-3ACD-AFBC-F21D6D426199}"
 	RootNamespace="MongoDB"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MongoDB_EXPORTS"
@@ -47,59 +58,77 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\bin\PocoMongoDBd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoMongoDBd.pdb"
-				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				ImportLibrary="..\lib\PocoMongoDBd.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -119,60 +148,78 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\bin\PocoMongoDB.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="false"
 				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\lib\PocoMongoDB.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -185,51 +232,67 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoMongoDBmtd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoMongoDBMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoMongoDBmtd.lib"/>
+				OutputFile="..\lib\PocoMongoDBMTd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -249,45 +312,61 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoMongoDBmt.lib"/>
+				OutputFile="..\lib\PocoMongoDBMT.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -300,51 +379,67 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoMongoDBmdd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoMongoDBMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoMongoDBmdd.lib"/>
+				OutputFile="..\lib\PocoMongoDBMDd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -364,165 +459,269 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoMongoDBmd.lib"/>
+				OutputFile="..\lib\PocoMongoDBMD.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="Source Files">
+			Name="Source Files"
+			>
 			<File
-				RelativePath=".\src\Array.cpp"/>
+				RelativePath=".\src\Array.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Binary.cpp"/>
+				RelativePath=".\src\Binary.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Connection.cpp"/>
+				RelativePath=".\src\Connection.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Cursor.cpp"/>
+				RelativePath=".\src\Cursor.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Database.cpp"/>
+				RelativePath=".\src\Database.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\DeleteRequest.cpp"/>
+				RelativePath=".\src\DeleteRequest.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Document.cpp"/>
+				RelativePath=".\src\Document.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Element.cpp"/>
+				RelativePath=".\src\Element.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\GetMoreRequest.cpp"/>
+				RelativePath=".\src\GetMoreRequest.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\InsertRequest.cpp"/>
+				RelativePath=".\src\InsertRequest.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\JavaScriptCode.cpp"/>
+				RelativePath=".\src\JavaScriptCode.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\KillCursorsRequest.cpp"/>
+				RelativePath=".\src\KillCursorsRequest.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Message.cpp"/>
+				RelativePath=".\src\Message.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\MessageHeader.cpp"/>
+				RelativePath=".\src\MessageHeader.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\ObjectId.cpp"/>
+				RelativePath=".\src\ObjectId.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\QueryRequest.cpp"/>
+				RelativePath=".\src\QueryRequest.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\RegularExpression.cpp"/>
+				RelativePath=".\src\RegularExpression.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\ReplicaSet.cpp"/>
+				RelativePath=".\src\ReplicaSet.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\RequestMessage.cpp"/>
+				RelativePath=".\src\RequestMessage.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\ResponseMessage.cpp"/>
+				RelativePath=".\src\ResponseMessage.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\UpdateRequest.cpp"/>
+				RelativePath=".\src\UpdateRequest.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="Header Files">
+			Name="Header Files"
+			>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Array.h"/>
+				RelativePath=".\include\Poco\MongoDB\Array.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Binary.h"/>
+				RelativePath=".\include\Poco\MongoDB\Binary.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\BSONReader.h"/>
+				RelativePath=".\include\Poco\MongoDB\BSONReader.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\BSONWriter.h"/>
+				RelativePath=".\include\Poco\MongoDB\BSONWriter.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Connection.h"/>
+				RelativePath=".\include\Poco\MongoDB\Connection.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Cursor.h"/>
+				RelativePath=".\include\Poco\MongoDB\Cursor.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Database.h"/>
+				RelativePath=".\include\Poco\MongoDB\Database.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\DeleteRequest.h"/>
+				RelativePath=".\include\Poco\MongoDB\DeleteRequest.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Document.h"/>
+				RelativePath=".\include\Poco\MongoDB\Document.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Element.h"/>
+				RelativePath=".\include\Poco\MongoDB\Element.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\GetMoreRequest.h"/>
+				RelativePath=".\include\Poco\MongoDB\GetMoreRequest.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\InsertRequest.h"/>
+				RelativePath=".\include\Poco\MongoDB\InsertRequest.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\JavaScriptCode.h"/>
+				RelativePath=".\include\Poco\MongoDB\JavaScriptCode.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\KillCursorsRequest.h"/>
+				RelativePath=".\include\Poco\MongoDB\KillCursorsRequest.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\Message.h"/>
+				RelativePath=".\include\Poco\MongoDB\Message.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\MessageHeader.h"/>
+				RelativePath=".\include\Poco\MongoDB\MessageHeader.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\MongoDB.h"/>
+				RelativePath=".\include\Poco\MongoDB\MongoDB.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\ObjectId.h"/>
+				RelativePath=".\include\Poco\MongoDB\ObjectId.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\PoolableConnectionFactory.h"/>
+				RelativePath=".\include\Poco\MongoDB\PoolableConnectionFactory.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\QueryRequest.h"/>
+				RelativePath=".\include\Poco\MongoDB\QueryRequest.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\RegularExpression.h"/>
+				RelativePath=".\include\Poco\MongoDB\RegularExpression.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\ReplicaSet.h"/>
+				RelativePath=".\include\Poco\MongoDB\ReplicaSet.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\RequestMessage.h"/>
+				RelativePath=".\include\Poco\MongoDB\RequestMessage.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\ResponseMessage.h"/>
+				RelativePath=".\include\Poco\MongoDB\ResponseMessage.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\MongoDB\UpdateRequest.h"/>
+				RelativePath=".\include\Poco\MongoDB\UpdateRequest.h"
+				>
+			</File>
 		</Filter>
 		<File
-			RelativePath="..\DLLVersion.rc">
-			<FileConfiguration
-				Name="debug_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
+			RelativePath="..\DLLVersion.rc"
+			>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 		</File>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

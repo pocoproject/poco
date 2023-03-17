@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/AbstractSessionImpl.h"
@@ -48,34 +49,37 @@ public:
 	~SessionImpl();
 		/// Destroys the SessionImpl.
 
-	Poco::Data::StatementImpl* createStatementImpl();
+	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
 		/// Returns an SQLite StatementImpl.
 
 	void open(const std::string& connect = "");
 		/// Opens a connection to the Database.
-		/// 
-		/// An in-memory system database (sys), with a single table (dual) 
+		///
+		/// An in-memory system database (sys), with a single table (dual)
 		/// containing single field (dummy) is attached to the database.
 		/// The in-memory system database is used to force change count
-		/// to be reset to zero on every new query (or batch of queries) 
+		/// to be reset to zero on every new query (or batch of queries)
 		/// execution. Without this functionality, select statements
 		/// executions that do not return any rows return the count of
 		/// changes effected by the most recent insert, update or delete.
 		/// In-memory system database can be queried and updated but can not
-		/// be dropped. It may be used for other purposes 
+		/// be dropped. It may be used for other purposes
 		/// in the future.
 
 	void close();
 		/// Closes the session.
 
-	bool isConnected();
+	void reset();
+		/// Do nothing
+
+	bool isConnected() const;
 		/// Returns true if connected, false otherwise.
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
 		/// Timeout value is in seconds.
 
-	std::size_t getConnectionTimeout();
+	std::size_t getConnectionTimeout() const;
 		/// Returns the session connection timeout value.
 		/// Timeout value is in seconds.
 
@@ -88,48 +92,59 @@ public:
 	void rollback();
 		/// Aborts a transaction.
 
-	bool canTransact();
+	bool canTransact() const;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction();
+	bool isTransaction() const;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	void setTransactionIsolation(Poco::UInt32 ti);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation();
+	Poco::UInt32 getTransactionIsolation() const;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 ti);
+	bool hasTransactionIsolation(Poco::UInt32 ti) const;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 ti);
+	bool isTransactionIsolation(Poco::UInt32 ti) const;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& name="");
+	bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
+
+	void setTransactionType(TransactionType transactionType);
+		/// Sets begin transaction type for the session.
+
+	TransactionType getTransactionType() const;
+		/// Returns begin transaction type.
 
 	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
 protected:
 	void setConnectionTimeout(const std::string& prop, const Poco::Any& value);
-	Poco::Any getConnectionTimeout(const std::string& prop);
+	Poco::Any getConnectionTimeout(const std::string& prop) const;
 
+	void setTransactionType(const std::string &prop, const Poco::Any& value);
+	Poco::Any getTransactionType(const std::string& prop) const;
 private:
 	std::string _connector;
 	sqlite3*    _pDB;
 	bool        _connected;
 	bool        _isTransaction;
+	TransactionType _transactionType;
 	int         _timeout;
+	mutable
 	Poco::Mutex _mutex;
-
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
+	static const std::string EXCLUSIVE_BEGIN_TRANSACTION;
+	static const std::string IMMEDIATE_BEGIN_TRANSACTION; 
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
 };
@@ -138,13 +153,13 @@ private:
 //
 // inlines
 //
-inline bool SessionImpl::canTransact()
+inline bool SessionImpl::canTransact() const
 {
 	return true;
 }
 
 
-inline 	bool SessionImpl::isTransaction()
+inline bool SessionImpl::isTransaction() const
 {
 	return _isTransaction;
 }
@@ -156,11 +171,15 @@ inline const std::string& SessionImpl::connectorName() const
 }
 
 
-inline std::size_t SessionImpl::getConnectionTimeout()
+inline std::size_t SessionImpl::getConnectionTimeout() const
 {
 	return static_cast<std::size_t>(_timeout/1000);
 }
 
+inline TransactionType SessionImpl::getTransactionType() const
+{
+	return _transactionType;
+}
 
 } } } // namespace Poco::Data::SQLite
 

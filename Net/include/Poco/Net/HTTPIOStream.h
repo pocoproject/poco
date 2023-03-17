@@ -34,12 +34,12 @@ class Net_API HTTPResponseStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
 	HTTPResponseStreamBuf(std::istream& istr);
-	
+
 	~HTTPResponseStreamBuf();
-		
+
 private:
 	int readFromDevice();
-	
+
 	std::istream& _istr;
 };
 
@@ -54,9 +54,9 @@ class Net_API HTTPResponseIOS: public virtual std::ios
 {
 public:
 	HTTPResponseIOS(std::istream& istr);
-	
+
 	~HTTPResponseIOS();
-	
+
 	HTTPResponseStreamBuf* rdbuf();
 
 protected:
@@ -74,9 +74,9 @@ class Net_API HTTPResponseStream: public HTTPResponseIOS, public std::istream
 {
 public:
 	HTTPResponseStream(std::istream& istr, HTTPClientSession* pSession);
-		
+
 	~HTTPResponseStream();
-	
+
 private:
 	HTTPClientSession* _pSession;
 };

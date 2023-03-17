@@ -43,12 +43,12 @@ void POP3ClientSessionTest::testLogin()
 	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	std::string cmd = server.popCommand();
-	assert (cmd == "USER user");
+	assertTrue (cmd == "USER user");
 	cmd = server.popCommand();
-	assert (cmd == "PASS secret");
+	assertTrue (cmd == "PASS secret");
 	session.close();
 	cmd = server.popCommand();
-	assert (cmd == "QUIT");
+	assertTrue (cmd == "QUIT");
 }
 
 
@@ -85,8 +85,8 @@ void POP3ClientSessionTest::testMessageCount()
 	server.clearCommands();
 	int n = session.messageCount();
 	std::string cmd = server.popCommand();
-	assert (cmd == "STAT");
-	assert (n == 42);
+	assertTrue (cmd == "STAT");
+	assertTrue (n == 42);
 	session.close();
 }
 
@@ -111,14 +111,14 @@ void POP3ClientSessionTest::testList()
 	std::vector<POP3ClientSession::MessageInfo> infos;
 	session.listMessages(infos);
 	std::string cmd = server.popCommand();
-	assert (cmd == "LIST");
-	assert (infos.size() == 3);
-	assert (infos[0].id == 1);
-	assert (infos[0].size == 1234);
-	assert (infos[1].id == 2);
-	assert (infos[1].size == 5678);
-	assert (infos[2].id == 3);
-	assert (infos[2].size == 987);
+	assertTrue (cmd == "LIST");
+	assertTrue (infos.size() == 3);
+	assertTrue (infos[0].id == 1);
+	assertTrue (infos[0].size == 1234);
+	assertTrue (infos[1].id == 2);
+	assertTrue (infos[1].size == 5678);
+	assertTrue (infos[2].id == 3);
+	assertTrue (infos[2].size == 987);
 	session.close();
 }
 
@@ -150,9 +150,9 @@ void POP3ClientSessionTest::testRetrieveMessage()
 	MailMessage message;
 	session.retrieveMessage(1, message);
 	std::string cmd = server.popCommand();
-	assert (cmd == "RETR 1");
+	assertTrue (cmd == "RETR 1");
 
-	assert (message.getContent() ==
+	assertTrue (message.getContent() ==
 		"Hello Jane,\r\n"
 		"\r\n"
 		"blah blah blah...\r\n"
@@ -186,10 +186,10 @@ void POP3ClientSessionTest::testRetrieveHeader()
 	MessageHeader header;
 	session.retrieveHeader(1, header);
 	std::string cmd = server.popCommand();
-	assert (cmd == "TOP 1 0");
-	assert (header.get("From") == "john.doe@no.where");
-	assert (header.get("To") == "jane.doe@no.where");
-	assert (header.get("Subject") == "test");
+	assertTrue (cmd == "TOP 1 0");
+	assertTrue (header.get("From") == "john.doe@no.where");
+	assertTrue (header.get("To") == "jane.doe@no.where");
+	assertTrue (header.get("Subject") == "test");
 	session.close();
 }
 
@@ -229,17 +229,17 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	MessageHeader header;
 	session.retrieveHeader(1, header);
 	std::string cmd = server.popCommand();
-	assert (cmd == "TOP 1 0");
-	assert (header.get("From") == "john.doe@no.where");
-	assert (header.get("To") == "jane.doe@no.where");
-	assert (header.get("Subject") == "test");
+	assertTrue (cmd == "TOP 1 0");
+	assertTrue (header.get("From") == "john.doe@no.where");
+	assertTrue (header.get("To") == "jane.doe@no.where");
+	assertTrue (header.get("Subject") == "test");
 
 	MailMessage message;
 	session.retrieveMessage(2, message);
 	cmd = server.popCommand();
-	assert (cmd == "RETR 2");
+	assertTrue (cmd == "RETR 2");
 
-	assert (message.getContent() ==
+	assertTrue (message.getContent() ==
 		"Hello Jane,\r\n"
 		"\r\n"
 		"blah blah blah...\r\n"
@@ -264,7 +264,7 @@ void POP3ClientSessionTest::testDeleteMessage()
 	server.clearCommands();
 	session.deleteMessage(42);
 	std::string cmd = server.popCommand();
-	assert (cmd == "DELE 42");
+	assertTrue (cmd == "DELE 42");
 	session.close();
 }
 

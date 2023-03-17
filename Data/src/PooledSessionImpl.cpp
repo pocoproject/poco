@@ -42,7 +42,7 @@ PooledSessionImpl::~PooledSessionImpl()
 }
 
 
-StatementImpl* PooledSessionImpl::createStatementImpl()
+StatementImpl::Ptr PooledSessionImpl::createStatementImpl()
 {
 	return access()->createStatementImpl();
 }
@@ -60,9 +60,15 @@ void PooledSessionImpl::commit()
 }
 
 
-bool PooledSessionImpl::isConnected()
+bool PooledSessionImpl::isConnected() const
 {
 	return access()->isConnected();
+}
+
+
+bool PooledSessionImpl::isGood() const
+{
+	return access()->isGood();
 }
 
 
@@ -72,19 +78,19 @@ void PooledSessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-std::size_t PooledSessionImpl::getConnectionTimeout()
+std::size_t PooledSessionImpl::getConnectionTimeout() const
 {
 	return access()->getConnectionTimeout();
 }
 
 
-bool PooledSessionImpl::canTransact()
+bool PooledSessionImpl::canTransact() const
 {
 	return access()->canTransact();
 }
 
 
-bool PooledSessionImpl::isTransaction()
+bool PooledSessionImpl::isTransaction() const
 {
 	return access()->isTransaction();
 }
@@ -96,19 +102,19 @@ void PooledSessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-Poco::UInt32 PooledSessionImpl::getTransactionIsolation()
+Poco::UInt32 PooledSessionImpl::getTransactionIsolation() const
 {
 	return access()->getTransactionIsolation();
 }
 
 
-bool PooledSessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+bool PooledSessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	return access()->hasTransactionIsolation(ti);
 }
 
 
-bool PooledSessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+bool PooledSessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	return access()->isTransactionIsolation(ti);
 }
@@ -148,13 +154,19 @@ void PooledSessionImpl::close()
 }
 
 
+void PooledSessionImpl::reset()
+{
+	access()->reset();
+}
+
+
 const std::string& PooledSessionImpl::connectorName() const
 {
 	return access()->connectorName();
 }
 
 
-void PooledSessionImpl::setFeature(const std::string& name, bool state)	
+void PooledSessionImpl::setFeature(const std::string& name, bool state)
 {
 	access()->setFeature(name, state);
 }

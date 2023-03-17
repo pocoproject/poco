@@ -31,8 +31,8 @@ class Util_API OptionSet
 	/// A collection of Option objects.
 {
 public:
-	typedef std::vector<Option> OptionVec;
-	typedef OptionVec::const_iterator Iterator;
+	using OptionVec = std::vector<Option>;
+	using Iterator = OptionVec::const_iterator;
 
 	OptionSet();
 		/// Creates the OptionSet.
@@ -48,7 +48,7 @@ public:
 
 	void addOption(const Option& option);
 		/// Adds an option to the collection.
-	
+
 	bool hasOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a true iff an option with the given name exists.
 		///
@@ -58,7 +58,7 @@ public:
 		/// The name must either match the short or full name of an
 		/// option. Comparison case sensitive for the short name and
 		/// not case sensitive for the full name.
-		
+
 	const Option& getOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a reference to the option with the given name.
 		///
@@ -73,11 +73,11 @@ public:
 
 	Iterator begin() const;
 		/// Supports iterating over all options.
-		
+
 	Iterator end() const;
 		/// Supports iterating over all options.
-	
-private:	
+
+private:
 	OptionVec _options;
 };
 

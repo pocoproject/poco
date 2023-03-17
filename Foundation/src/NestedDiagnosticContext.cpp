@@ -43,7 +43,7 @@ NestedDiagnosticContext& NestedDiagnosticContext::operator = (const NestedDiagno
 	return *this;
 }
 
-	
+
 void NestedDiagnosticContext::push(const std::string& info)
 {
 	Context ctx;
@@ -53,7 +53,7 @@ void NestedDiagnosticContext::push(const std::string& info)
 	_stack.push_back(ctx);
 }
 
-	
+
 void NestedDiagnosticContext::push(const std::string& info, int line, const char* filename)
 {
 	Context ctx;
@@ -70,7 +70,7 @@ void NestedDiagnosticContext::pop()
 		_stack.pop_back();
 }
 
-	
+
 int NestedDiagnosticContext::depth() const
 {
 	return int(_stack.size());
@@ -80,16 +80,16 @@ int NestedDiagnosticContext::depth() const
 std::string NestedDiagnosticContext::toString() const
 {
 	std::string result;
-	for (Stack::const_iterator it = _stack.begin(); it != _stack.end(); ++it)
+	for (const auto& i: _stack)
 	{
 		if (!result.empty())
 			result.append(":");
-		result.append(it->info);
+		result.append(i.info);
 	}
 	return result;
 }
 
-	
+
 void NestedDiagnosticContext::dump(std::ostream& ostr) const
 {
 	dump(ostr, "\n");
@@ -98,11 +98,11 @@ void NestedDiagnosticContext::dump(std::ostream& ostr) const
 
 void NestedDiagnosticContext::dump(std::ostream& ostr, const std::string& delimiter) const
 {
-	for (Stack::const_iterator it = _stack.begin(); it != _stack.end(); ++it)
+	for (const auto& i: _stack)
 	{
-		ostr << it->info;
-		if (it->file)
-			ostr << " (in \"" << it->file << "\", line " << it->line << ")";
+		ostr << i.info;
+		if (i.file)
+			ostr << " (in \"" << i.file << "\", line " << i.line << ")";
 		ostr << delimiter;
 	}
 }

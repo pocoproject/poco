@@ -96,7 +96,7 @@ OperatorToken::OperatorToken()
 	_opMap[":"] = i++;
 	_opMap["::"] = i++;
 	_opMap[";"] = i++;
-	_opMap["?"] = i++;	 
+	_opMap["?"] = i++;
 }
 
 
@@ -330,7 +330,7 @@ Token::Class IdentifierToken::tokenClass() const
 }
 
 
-bool IdentifierToken::start(char c, std::istream& istr)
+bool IdentifierToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return (c >= 'A' && c <= 'Z') ||
@@ -345,7 +345,7 @@ void IdentifierToken::finish(std::istream& istr)
 	while ((next >= 'A' && next <= 'Z') ||
 		   (next >= 'a' && next <= 'z') ||
 		   (next >= '0' && next <= '9') ||
-		   (next == '_' || next == '$')) 
+		   (next == '_' || next == '$'))
 	{
 		_value += (char) istr.get();
 		next = istr.peek();
@@ -379,7 +379,7 @@ Token::Class StringLiteralToken::tokenClass() const
 }
 
 
-bool StringLiteralToken::start(char c, std::istream& istr)
+bool StringLiteralToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return c == '"';
@@ -388,7 +388,7 @@ bool StringLiteralToken::start(char c, std::istream& istr)
 
 void StringLiteralToken::finish(std::istream& istr)
 {
-	int next = istr.peek();	
+	int next = istr.peek();
 	while (next != -1 && next != '"' && next != '\n' && next != '\r')
 	{
 		if (next == '\\') _value += (char) istr.get();
@@ -438,7 +438,7 @@ Token::Class CharLiteralToken::tokenClass() const
 }
 
 
-bool CharLiteralToken::start(char c, std::istream& istr)
+bool CharLiteralToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return c == '\'';
@@ -447,7 +447,7 @@ bool CharLiteralToken::start(char c, std::istream& istr)
 
 void CharLiteralToken::finish(std::istream& istr)
 {
-	int next = istr.peek();	
+	int next = istr.peek();
 	while (next != -1 && next != '\'' && next != '\n' && next != '\r')
 	{
 		if (next == '\\') _value += (char) istr.get();
@@ -513,23 +513,18 @@ void NumberLiteralToken::finish(std::istream& istr)
 	_isFloat = false;
 	if (_value[0] != '.') // starts with digit
 	{
-		if (next == 'x')
+		if (_value[0] == '0')
 		{
-			_value += (char) istr.get();
-			next = istr.peek();
-			while (std::isxdigit(next)) 
-			{ 
-				_value += (char) istr.get(); 
-				next = istr.peek(); 
-			}
-			while (next == 'L' || next == 'l' || next == 'U' || next == 'u')
+			if (next == 'x' || next == 'X')
 			{
-				_value += (char) istr.get(); 
-				next = istr.peek();
+				return finishHex(istr, next);
 			}
-			return;
+			else if (next == 'b' || next == 'B')
+			{
+				return finishBin(istr, next);
+			}
 		}
-		while (next >= '0' && next <= '9')
+		while ((next >= '0' && next <= '9') || next == '\'')
 		{
 			_value += (char) istr.get();
 			next = istr.peek();
@@ -563,37 +558,91 @@ void NumberLiteralToken::finish(std::istream& istr)
 	if (next == 'e' || next == 'E')
 	{
 		_isFloat = true;
+		finishExp(istr, next);
+	}
+	finishSuffix(istr, next);
+}
+
+
+void NumberLiteralToken::finishHex(std::istream& istr, int next)
+{
+	_value += (char) istr.get();
+	next = istr.peek();
+	while (std::isxdigit(next) || next == '\'')
+	{
 		_value += (char) istr.get();
 		next = istr.peek();
-		if (next == '+' || next == '-')
+	}
+	if (next == '.')
+	{
+		_isFloat = true;
+		_value += (char) istr.get();
+		next = istr.peek();
+		while (std::isxdigit(next) || next == '\'')
 		{
 			_value += (char) istr.get();
 			next = istr.peek();
 		}
-		if (next >= '0' && next <= '9')
+	}
+	if (next == 'p' || next == 'P')
+	{
+		finishExp(istr, next);
+	}
+	finishSuffix(istr, next);
+}
+
+
+void NumberLiteralToken::finishBin(std::istream& istr, int next)
+{
+	_value += (char) istr.get();
+	next = istr.peek();
+	while (next == '0' || next == '1' || next == '\'')
+	{
+		_value += (char) istr.get();
+		next = istr.peek();
+	}
+	finishSuffix(istr, next);
+}
+
+
+void NumberLiteralToken::finishExp(std::istream& istr, int next)
+{
+	_isFloat = true;
+	_value += (char) istr.get();
+	next = istr.peek();
+	if (next == '+' || next == '-')
+	{
+		_value += (char) istr.get();
+		next = istr.peek();
+	}
+	if (next >= '0' && next <= '9')
+	{
+		while (next >= '0' && next <= '9')
 		{
-			while (next >= '0' && next <= '9')
-			{
-				_value += (char) istr.get();
-				next = istr.peek();
-			}
-		}
-		else
-		{
-			std::string s(1, (char) next);
-			syntaxError("digit", s);
+			_value += (char) istr.get();
+			next = istr.peek();
 		}
 	}
+	else
+	{
+		std::string s(1, (char) next);
+		syntaxError("digit", s);
+	}
+}
+
+
+void NumberLiteralToken::finishSuffix(std::istream& istr, int next)
+{
 	if (_isFloat)
 	{
 		if (next == 'L' || next == 'l' || next == 'F' || next == 'f')
-			_value += (char) istr.get(); 
+			_value += (char) istr.get();
 	}
 	else
 	{
 		while (next == 'L' || next == 'l' || next == 'U' || next == 'u')
 		{
-			_value += (char) istr.get(); 
+			_value += (char) istr.get();
 			next = istr.peek();
 		}
 	}
@@ -603,7 +652,6 @@ void NumberLiteralToken::finish(std::istream& istr)
 int NumberLiteralToken::asInteger() const
 {
 	return static_cast<int>(std::strtol(_value.c_str(), 0, 0));
-	
 }
 
 
@@ -656,7 +704,7 @@ void CommentToken::finish(std::istream& istr)
 		{
 			next = istr.get();
 			_value += (char) next;
-			if (next == '*' && istr.peek() == '/') 
+			if (next == '*' && istr.peek() == '/')
 			{
 				_value += (char) istr.get();
 				break;
@@ -691,7 +739,7 @@ Token::Class PreprocessorToken::tokenClass() const
 }
 
 
-bool PreprocessorToken::start(char c, std::istream& istr)
+bool PreprocessorToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return c == '#';
@@ -704,7 +752,7 @@ void PreprocessorToken::finish(std::istream& istr)
 	int next = istr.peek();
 	while (next != -1 && next != '\r' && next != '\n')
 	{
-		if (next == '\\') 
+		if (next == '\\')
 		{
 			istr.get();
 			int p = istr.peek();

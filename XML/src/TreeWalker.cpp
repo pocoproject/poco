@@ -29,7 +29,7 @@ TreeWalker::TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter
 {
 }
 
-	
+
 TreeWalker::TreeWalker(const TreeWalker& walker):
 	_pRoot(walker._pRoot),
 	_whatToShow(walker._whatToShow),
@@ -38,7 +38,7 @@ TreeWalker::TreeWalker(const TreeWalker& walker):
 {
 }
 
-	
+
 TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
 {
 	if (&walker != this)
@@ -51,7 +51,7 @@ TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
 	return *this;
 }
 
-	
+
 TreeWalker::~TreeWalker()
 {
 }
@@ -66,7 +66,7 @@ void TreeWalker::setCurrentNode(Node* pNode)
 Node* TreeWalker::parentNode()
 {
 	if (!_pCurrent || _pCurrent == _pRoot) return 0;
-	
+
 	Node* pParent = _pCurrent->parentNode();
 	while (pParent && pParent != _pRoot && accept(pParent) != NodeFilter::FILTER_ACCEPT)
 		pParent = pParent->parentNode();
@@ -133,7 +133,7 @@ Node* TreeWalker::nextSibling()
 Node* TreeWalker::previousNode()
 {
 	if (!_pCurrent) return 0;
-	
+
 	Node* pPrev = previous(_pCurrent);
 	while (pPrev && accept(pPrev) != NodeFilter::FILTER_ACCEPT)
 		pPrev = previous(pPrev);
@@ -161,30 +161,30 @@ int TreeWalker::accept(Node* pNode) const
 	bool accept = false;
 	switch (pNode->nodeType())
 	{
-	case Node::ELEMENT_NODE: 
+	case Node::ELEMENT_NODE:
 		accept = (_whatToShow & NodeFilter::SHOW_ELEMENT) != 0; break;
 	case Node::ATTRIBUTE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break;
 	case Node::TEXT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break;
 	case Node::CDATA_SECTION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break;
 	case Node::ENTITY_REFERENCE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break;
 	case Node::ENTITY_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break;
 	case Node::PROCESSING_INSTRUCTION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break;
 	case Node::COMMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break;
 	case Node::DOCUMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break;
 	case Node::DOCUMENT_TYPE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break;
 	case Node::DOCUMENT_FRAGMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break;
 	case Node::NOTATION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break;
 	}
 	if (accept && _pFilter)
 		return _pFilter->acceptNode(pNode);

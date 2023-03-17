@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
+  <metadata>
+    <id>Poco.$id$.vs$vs$.$mode$</id>
+    <version>$version$</version>
+    <title>Pocoproject Poco Foundation vs$vs$ $mode$</title>
+    <authors>Applied Informatics &amp; Contributors</authors>
+    <owners>Guenter Obiltschnig &amp; Aleksandar Fabijanic</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type='expression'>BSL-1.0</license>
+    <icon>image\poco.png</icon>
+    <projectUrl>https://pocoproject.org/</projectUrl>
+    <description>Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.</description>
+    <releaseNotes>releaseNotes</releaseNotes>
+    <copyright>Copyright 2006-2020</copyright>
+    <language></language>
+    <tags>native string filesystem thread date log event regex uri uuid cache nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml</tags>
+    <repository type='git' url='git@github.com:pocoproject/poco.git' branch='poco-$version$' />
+    <dependencies>
+      <dependency id='Poco.$id$.vs$vs$.noarch' version='$version$' />
+<dependency id='Poco.Foundation.vs$vs$.shared' version='$version$' />
+<dependency id='Poco.Net.vs$vs$.shared' version='$version$' />
+     </dependencies>
+  </metadata>
+  <files>
+    <file src='..\..\poco.png' 					target='image\poco.png' />
+	<file src='..\..\..\bin\Poco$id$.*' 		target='build\native\bin\' />
+	<file src='..\..\..\bin\Poco$id$d.*' 		target='build\native\bin\' />
+    <file src='..\..\..\lib\Poco$id$.*' 		target='build\native\lib\'   exclude= '..\..\..\lib\Poco$id$md*.*;..\..\..\lib\Poco$id$mt*.*' />
+    <file src='..\..\..\lib\Poco$id$d.*' 		target='build\native\lib\'   exclude= '..\..\..\lib\Poco$id$md*.*;..\..\..\lib\Poco$id$mt*.*' />
+    <file src='..\..\..\bin64\Poco$id$64.*' 	target='build\native\bin64\' />
+    <file src='..\..\..\bin64\Poco$id$64d.*' 	target='build\native\bin64\' />
+    <file src='..\..\..\lib64\Poco$id$.*' 		target='build\native\lib64\' exclude= '..\..\..\lib64\Poco$id$md*.*;..\..\..\lib64\Poco$id$mt*.*' />
+    <file src='..\..\..\lib64\Poco$id$d.*' 		target='build\native\lib64\' exclude= '..\..\..\lib64\Poco$id$md*.*;..\..\..\lib64\Poco$id$mt*.*' />
+    <file src='Poco.shared.targets' 			target='build\native\Poco.$id$.vs$vs$.shared.targets' />
+   </files>
+</package>

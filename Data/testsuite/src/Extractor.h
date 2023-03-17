@@ -26,7 +26,7 @@ class Extractor: public Poco::Data::AbstractExtractor
 	/// A no-op implementation of AbstractExtractor for testing.
 {
 public:
-	Extractor();
+	Extractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -62,7 +62,7 @@ public:
 	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
 		/// Extracts a Var.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
 
@@ -100,13 +100,24 @@ public:
 	bool extract(std::size_t pos, Time& val);
 		/// Extracts a Time.
 
-	bool extract(std::size_t pos, Poco::DateTime& val);
+	bool extract(std::size_t pos, DateTime& val);
 		/// Extracts a DateTime.
+
+	bool extract(std::size_t pos, UUID& val);
+		/// Extracts a UUID.
 
 	bool isNull(std::size_t col, std::size_t row = -1);
 		/// Returns true if the current row value at pos column is null.
 
 	void reset();
+
+	void setString(const std::string& str)
+	{
+		_stringValue = str;
+	}
+
+private:
+	std::string _stringValue;
 };
 
 

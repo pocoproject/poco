@@ -12,6 +12,7 @@
 //
 
 
+#include "Poco/ProcessOptions.h"
 #include "Poco/Process_WIN32U.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -21,6 +22,43 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
+#include "Poco/Ascii.h"
+
+
+namespace
+{
+	std::vector<wchar_t> getUnicodeEnvironmentVariablesBuffer(const Poco::Process::Env& env)
+	{
+		std::vector<wchar_t> envbuf;
+		std::size_t pos = 0;
+
+		for (const auto& p: env)
+		{
+			std::size_t envlen = p.first.length() + p.second.length() + 1;
+
+			std::wstring uname;
+			Poco::UnicodeConverter::convert(p.first, uname);
+			std::wstring uvalue;
+			Poco::UnicodeConverter::convert(p.second, uvalue);
+
+			envbuf.resize(pos + envlen + 1);
+			std::copy(uname.begin(), uname.end(), &envbuf[pos]);
+			pos += uname.length();
+			envbuf[pos] = L'=';
+			++pos;
+			std::copy(uvalue.begin(), uvalue.end(), &envbuf[pos]);
+			pos += uvalue.length();
+
+			envbuf[pos] = L'\0';
+			++pos;
+		}
+
+		envbuf.resize(pos + 1);
+		envbuf[pos] = L'\0';
+
+		return envbuf;
+	}
+}
 
 
 namespace Poco {
@@ -78,6 +116,18 @@ int ProcessHandleImpl::wait() const
 }
 
 
+int ProcessHandleImpl::tryWait() const
+{
+	DWORD exitCode;
+	if (GetExitCodeProcess(_hProcess, &exitCode) == 0)
+		throw SystemException("Cannot get exit code for process", NumberFormatter::format(_pid));
+	if (exitCode == STILL_ACTIVE)
+		return -1;
+	else
+		return exitCode;
+}
+
+
 //
 // ProcessImpl
 //
@@ -103,7 +153,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 		time.LowPart = ftUser.dwLowDateTime;
 		time.HighPart = ftUser.dwHighDateTime;
 		userTime = long(time.QuadPart / 10000000L);
-	} 
+	}
 	else
 	{
 		userTime = kernelTime = -1;
@@ -111,21 +161,39 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-static bool argNeedsEscaping(const std::string& arg)
+bool ProcessImpl::mustEscapeArg(const std::string& arg)
 {
-	bool containsQuotableChar = std::string::npos != arg.find_first_of(" \t\n\v\"");
-	// Assume args that start and end with quotes are already quoted and do not require further quoting.
-	// There is probably code out there written before launch() escaped the arguments that does its own
-	// escaping of arguments. This ensures we do not interfere with those arguments.
-	bool isAlreadyQuoted = arg.size() > 1 && '\"' == arg[0] && '\"' == arg[arg.size() - 1];
-	return containsQuotableChar && !isAlreadyQuoted;
+	bool result = false;
+	bool inQuotes = false;
+	bool escaped = false;
+	for (char c: arg)
+	{
+		if (Poco::Ascii::isSpace(c) && !inQuotes && !escaped)
+		{
+			result = true;
+			break;
+		}
+		else if (c == '"' && !escaped)
+		{
+			inQuotes = !inQuotes;
+		}
+		else if (c == '\\' && !escaped)
+		{
+			escaped = true;
+		}
+		else
+		{
+			escaped = false;
+		}
+	}
+	return result || inQuotes;
 }
 
 
 // Based on code from https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
-static std::string escapeArg(const std::string& arg)
+std::string ProcessImpl::escapeArg(const std::string& arg)
 {
-	if (argNeedsEscaping(arg))
+	if (mustEscapeArg(arg))
 	{
 		std::string quotedArg("\"");
 		for (std::string::const_iterator it = arg.begin(); ; ++it)
@@ -141,12 +209,12 @@ static std::string escapeArg(const std::string& arg)
 			{
 				quotedArg.append(2 * backslashCount, '\\');
 				break;
-			} 
+			}
 			else if ('"' == *it)
 			{
 				quotedArg.append(2 * backslashCount + 1, '\\');
 				quotedArg.push_back('"');
-			} 
+			}
 			else
 			{
 				quotedArg.append(backslashCount, '\\');
@@ -155,21 +223,18 @@ static std::string escapeArg(const std::string& arg)
 		}
 		quotedArg.push_back('"');
 		return quotedArg;
-	} 
-	else
-	{
-		return arg;
 	}
+	else return arg;
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 	std::string commandLine = escapeArg(command);
-	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
+	for (const auto& a: args)
 	{
 		commandLine.append(" ");
-		commandLine.append(escapeArg(*it));
+		commandLine.append(escapeArg(a));
 	}
 
 	std::wstring ucommandLine;
@@ -205,27 +270,29 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		DuplicateHandle(hProc, inPipe->readHandle(), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
 		inPipe->close(Pipe::CLOSE_READ);
-	} 
+	}
 	else if (GetStdHandle(STD_INPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_INPUT_HANDLE), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} 
+	}
 	else
 	{
 		startupInfo.hStdInput = 0;
 	}
+	if (options & PROCESS_CLOSE_STDIN) CloseHandle(GetStdHandle(STD_INPUT_HANDLE));
+
 	// outPipe may be the same as errPipe, so we duplicate first and close later.
 	if (outPipe)
 	{
 		DuplicateHandle(hProc, outPipe->writeHandle(), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} 
+	}
 	else if (GetStdHandle(STD_OUTPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_OUTPUT_HANDLE), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} 
+	}
 	else
 	{
 		startupInfo.hStdOutput = 0;
@@ -234,18 +301,20 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		DuplicateHandle(hProc, errPipe->writeHandle(), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} 
+	}
 	else if (GetStdHandle(STD_ERROR_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_ERROR_HANDLE), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} 
+	}
 	else
 	{
 		startupInfo.hStdError = 0;
 	}
 	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+	if (options & PROCESS_CLOSE_STDOUT) CloseHandle(GetStdHandle(STD_OUTPUT_HANDLE));
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+	if (options & PROCESS_CLOSE_STDERR) CloseHandle(GetStdHandle(STD_ERROR_HANDLE));
 
 	if (mustInheritHandles)
 	{
@@ -256,16 +325,17 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	UnicodeConverter::toUTF16(initialDirectory, uinitialDirectory);
 	const wchar_t* workingDirectory = uinitialDirectory.empty() ? 0 : uinitialDirectory.c_str();
 
-	const char* pEnv = 0;
-	std::vector<char> envChars;
+	const wchar_t* pEnv = 0;
+	std::vector<wchar_t> envChars;
 	if (!env.empty())
 	{
-		envChars = getEnvironmentVariablesBuffer(env);
+		envChars = getUnicodeEnvironmentVariablesBuffer(env);
 		pEnv = &envChars[0];
 	}
 
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
+	if (pEnv) creationFlags |= CREATE_UNICODE_ENVIRONMENT;
 	BOOL rc = CreateProcessW(
 		applicationName,
 		const_cast<wchar_t*>(ucommandLine.c_str()),
@@ -285,7 +355,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		CloseHandle(processInfo.hThread);
 		return new ProcessHandleImpl(processInfo.hProcess, processInfo.dwProcessId);
-	} 
+	}
 	else throw SystemException("Cannot launch process", command);
 }
 
@@ -314,14 +384,14 @@ void ProcessImpl::killImpl(PIDImpl pid)
 			throw SystemException("cannot kill process");
 		}
 		CloseHandle(hProc);
-	} 
+	}
 	else
 	{
 		switch (GetLastError())
 		{
 		case ERROR_ACCESS_DENIED:
 			throw NoPermissionException("cannot kill process");
-		case ERROR_NOT_FOUND: 
+		case ERROR_NOT_FOUND:
 			throw NotFoundException("cannot kill process");
 		case ERROR_INVALID_PARAMETER:
 			throw NotFoundException("cannot kill process");
@@ -346,9 +416,17 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	bool result = true;
-	DWORD exitCode;
-	BOOL rc = GetExitCodeProcess(hProc, &exitCode);
-	if (!rc || exitCode != STILL_ACTIVE) result = false;
+	if (hProc)
+	{
+		DWORD exitCode;
+		BOOL rc = GetExitCodeProcess(hProc, &exitCode);
+		if (!rc || exitCode != STILL_ACTIVE) result = false;
+		CloseHandle(hProc);
+	}
+	else
+	{
+		result = false;
+	}
 	return result;
 }
 

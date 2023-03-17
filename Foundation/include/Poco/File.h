@@ -23,14 +23,12 @@
 #include <vector>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "File_WINCE.h"
 #else
 #include "Poco/File_WIN32U.h"
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/File_WIN32.h"
 #elif defined(POCO_VXWORKS)
 #include "Poco/File_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -51,8 +49,7 @@ class Foundation_API File: private FileImpl
 	/// platform-specific limitations regarding maximum length
 	/// of the entire path and its components apply.
 	///
-	/// On Windows, if compiled with UTF-8 support (POCO_WIN32_UTF8)
-	/// the implementation tries to work around the rather low
+	/// On Windows, the implementation tries to work around the rather low
 	/// 260 characters MAX_PATH limit by adding the "\\?\" prefix if
 	/// a path is absolute and exceeds MAX_PATH characters in length.
 	/// Note that various limitations regarding usage of the "\\?\"
@@ -68,6 +65,12 @@ public:
 	{
 		LINK_HARD     = 0, /// hard link
 		LINK_SYMBOLIC = 1  /// symbolic link
+	};
+
+	enum Options
+		/// Options for File Copy/Movement
+	{
+		OPT_FAIL_ON_OVERWRITE = OPT_FAIL_ON_OVERWRITE_IMPL
 	};
 
 	File();
@@ -100,7 +103,7 @@ public:
 	File& operator = (const Path& path);
 		/// Assignment operator.
 
-	void swap(File& file);
+	void swap(File& file) noexcept;
 		/// Swaps the file with another one.
 
 	const std::string& path() const;
@@ -183,18 +186,24 @@ public:
 		///
 		/// Does nothing on Windows.
 
-	void copyTo(const std::string& path) const;
+	void copyTo(const std::string& path, int options = 0) const;
 		/// Copies the file (or directory) to the given path.
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// if the File already exists.
 
-	void moveTo(const std::string& path);
+	void moveTo(const std::string& path, int options = 0);
 		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// if the File already exists.
 
-	void renameTo(const std::string& path);
+	void renameTo(const std::string& path, int options = 0);
 		/// Renames the file to the new name.
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// if the File already exists.
 
 	void linkTo(const std::string& path, LinkType type = LINK_SYMBOLIC) const;
 		/// Creates a link (symbolic or hard, depending on type argument)
@@ -253,7 +262,7 @@ public:
 		/// exception for the last file-related error.
 
 protected:
-	void copyDirectory(const std::string& path) const;
+	void copyDirectory(const std::string& path, int options = 0) const;
 		/// Copies a directory. Used internally by copyTo().
 };
 
@@ -303,7 +312,7 @@ inline bool File::operator >= (const File& file) const
 }
 
 
-inline void swap(File& f1, File& f2)
+inline void swap(File& f1, File& f2) noexcept
 {
 	f1.swap(f2);
 }

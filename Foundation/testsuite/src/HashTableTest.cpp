@@ -33,14 +33,14 @@ void HashTableTest::testInsert()
 	std::string s1("str1");
 	std::string s2("str2");
 	HashTable<std::string, int> hashTable;
-	assert (!hashTable.exists(s1));
+	assertTrue (!hashTable.exists(s1));
 	hashTable.insert(s1, 13);
-	assert (hashTable.exists(s1));
-	assert (hashTable.get(s1) == 13);
+	assertTrue (hashTable.exists(s1));
+	assertTrue (hashTable.get(s1) == 13);
 	int retVal = 0;
 
-	assert (hashTable.get(s1, retVal));
-	assert (retVal == 13);
+	assertTrue (hashTable.get(s1, retVal));
+	assertTrue (retVal == 13);
 	try
 	{
 		hashTable.insert(s1, 22);
@@ -54,9 +54,9 @@ void HashTableTest::testInsert()
 	}
 	catch (Exception&){}
 
-	assert (!hashTable.exists(s2));
+	assertTrue (!hashTable.exists(s2));
 	hashTable.insert(s2, 13);
-	assert (hashTable.exists(s2));
+	assertTrue (hashTable.exists(s2));
 }
 
 
@@ -68,16 +68,16 @@ void HashTableTest::testUpdate()
 	HashTable<std::string, int> hashTable;
 	hashTable.insert(s1, 13);
 	hashTable.update(s1, 14);
-	assert (hashTable.exists(s1));
-	assert (hashTable.get(s1) == 14);
+	assertTrue (hashTable.exists(s1));
+	assertTrue (hashTable.get(s1) == 14);
 	int retVal = 0;
 
-	assert (hashTable.get(s1, retVal));
-	assert (retVal == 14);
+	assertTrue (hashTable.get(s1, retVal));
+	assertTrue (retVal == 14);
 
 	// updating a non existing item must work too
 	hashTable.update(s2, 15);
-	assert (hashTable.get(s2) == 15);
+	assertTrue (hashTable.get(s2) == 15);
 }
 
 
@@ -92,8 +92,8 @@ void HashTableTest::testOverflow()
 	for (int i = 0; i < 1024; ++i)
 	{
 		std::string tmp = Poco::NumberFormatter::format(i);
-		assert (hashTable.exists(tmp));
-		assert (hashTable.get(tmp) == i*i);
+		assertTrue (hashTable.exists(tmp));
+		assertTrue (hashTable.get(tmp) == i*i);
 	}
 }
 
@@ -101,29 +101,29 @@ void HashTableTest::testOverflow()
 void HashTableTest::testSize()
 {
 	HashTable<std::string, int> hashTable(13);
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 	Poco::UInt32 POCO_UNUSED h1 = hashTable.insert("1", 1);
-	assert (hashTable.size() == 1);
+	assertTrue (hashTable.size() == 1);
 	Poco::UInt32 POCO_UNUSED h2 = hashTable.update("2", 2);
-	assert (hashTable.size() == 2);
+	assertTrue (hashTable.size() == 2);
 	hashTable.remove("1");
-	assert (hashTable.size() == 1);
+	assertTrue (hashTable.size() == 1);
 	hashTable.remove("3");
-	assert (hashTable.size() == 1);
+	assertTrue (hashTable.size() == 1);
 	hashTable.removeRaw("2", h2);
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 	hashTable.insert("1", 1);
 	hashTable.insert("2", 2);
-	assert (hashTable.size() == 2);
+	assertTrue (hashTable.size() == 2);
 	hashTable.clear();
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 }
 
 
 void HashTableTest::testResize()
 {
 	HashTable<std::string, int> hashTable(13);
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 	hashTable.resize(19);
 	for (int i = 0; i < 1024; ++i)
 	{
@@ -134,8 +134,8 @@ void HashTableTest::testResize()
 	for (int i = 0; i < 1024; ++i)
 	{
 		std::string tmp = Poco::NumberFormatter::format(i);
-		assert (hashTable.exists(tmp));
-		assert (hashTable.get(tmp) == i*i);
+		assertTrue (hashTable.exists(tmp));
+		assertTrue (hashTable.get(tmp) == i*i);
 	}
 }
 
@@ -144,18 +144,18 @@ void HashTableTest::testStatistic()
 {
 	double relax = 0.001;
 	HashTable<std::string, int> hashTable(13);
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 	HashStatistic stat1(hashTable.currentState());
-	assert (stat1.avgEntriesPerHash() < relax && stat1.avgEntriesPerHash() > -relax);
-	assert (stat1.maxPositionsOfTable() == 13);
-	assert (stat1.maxEntriesPerHash() == 0);
+	assertTrue (stat1.avgEntriesPerHash() < relax && stat1.avgEntriesPerHash() > -relax);
+	assertTrue (stat1.maxPositionsOfTable() == 13);
+	assertTrue (stat1.maxEntriesPerHash() == 0);
 
 	hashTable.resize(19);
 	stat1 = hashTable.currentState(true);
-	assert (stat1.avgEntriesPerHash() < relax && stat1.avgEntriesPerHash() > -relax);
-	assert (stat1.maxPositionsOfTable() == 19);
-	assert (stat1.maxEntriesPerHash() == 0);
-	assert (stat1.detailedEntriesPerHash().size() == 19);
+	assertTrue (stat1.avgEntriesPerHash() < relax && stat1.avgEntriesPerHash() > -relax);
+	assertTrue (stat1.maxPositionsOfTable() == 19);
+	assertTrue (stat1.maxEntriesPerHash() == 0);
+	assertTrue (stat1.detailedEntriesPerHash().size() == 19);
 
 	for (int i = 0; i < 1024; ++i)
 	{
@@ -163,17 +163,17 @@ void HashTableTest::testStatistic()
 	}
 	stat1 = hashTable.currentState(true);
 	double expAvg = 1024.0/ 19;
-	assert (stat1.avgEntriesPerHash() < (expAvg + relax) && stat1.avgEntriesPerHash() > (expAvg - relax));
-	assert (stat1.maxPositionsOfTable() == 19);
-	assert (stat1.maxEntriesPerHash() > expAvg);
+	assertTrue (stat1.avgEntriesPerHash() < (expAvg + relax) && stat1.avgEntriesPerHash() > (expAvg - relax));
+	assertTrue (stat1.maxPositionsOfTable() == 19);
+	assertTrue (stat1.maxEntriesPerHash() > expAvg);
 	hashTable.resize(1009);
 	stat1 = hashTable.currentState(true);
 
 	expAvg = 1024.0/ 1009;
 
-	assert (stat1.avgEntriesPerHash() < (expAvg + relax) && stat1.avgEntriesPerHash() > (expAvg - relax));
-	assert (stat1.maxPositionsOfTable() == 1009);
-	assert (stat1.maxEntriesPerHash() > expAvg);
+	assertTrue (stat1.avgEntriesPerHash() < (expAvg + relax) && stat1.avgEntriesPerHash() > (expAvg - relax));
+	assertTrue (stat1.maxPositionsOfTable() == 1009);
+	assertTrue (stat1.maxEntriesPerHash() > expAvg);
 }
 
 

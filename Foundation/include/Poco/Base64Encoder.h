@@ -59,7 +59,7 @@ public:
 	void setLineLength(int lineLength);
 		/// Specify the line length.
 		///
-		/// After the given number of characters have been written, 
+		/// After the given number of characters have been written,
 		/// a newline character will be written.
 		///
 		/// Specify 0 for an unlimited line length.
@@ -116,6 +116,8 @@ class Foundation_API Base64Encoder: public Base64EncoderIOS, public std::ostream
 	/// Always call close() when done
 	/// writing data, to ensure proper
 	/// completion of the encoding operation.
+	///
+	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
 	///
 	/// Note: The characters are directly written
 	/// to the ostream's streambuf, thus bypassing

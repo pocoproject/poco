@@ -2,55 +2,73 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="HTTPS">
-      <UniqueIdentifier>{dd3dcc8a-873f-4432-ade5-ca48241609fd}</UniqueIdentifier>
+      <UniqueIdentifier>{c6547b89-6860-4137-a672-37e448c436a9}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPS\Header Files">
-      <UniqueIdentifier>{7f235f65-0ed8-4256-8fa6-904d8cc1461f}</UniqueIdentifier>
+      <UniqueIdentifier>{9922b686-f467-4944-916a-110e95983510}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPS\Source Files">
-      <UniqueIdentifier>{da4f8c6a-5ebd-4b93-8121-7b30900fd212}</UniqueIdentifier>
+      <UniqueIdentifier>{8411c793-1723-459c-85a2-5f0bfb0ea6d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{8e57b4cd-c864-4695-a433-c0116f6b7207}</UniqueIdentifier>
+      <UniqueIdentifier>{00b22986-6a4f-492f-bbb9-af93419c11e1}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{b61ad82e-fa17-47c0-aeb5-4848f806e9ce}</UniqueIdentifier>
+      <UniqueIdentifier>{48742a87-7ee8-4cdd-bd1b-190cd49e1bdc}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{a2a4a208-e448-4c35-9044-4b6c86b1bb59}</UniqueIdentifier>
+      <UniqueIdentifier>{8a1d69f1-ebbb-4fb5-b4ee-e146a9409434}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{bf6946f8-5247-4f6e-b7da-32901a99d094}</UniqueIdentifier>
+      <UniqueIdentifier>{96ee466b-e599-47dc-81fa-09af15bd1a11}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{d90eb1b3-9830-45c6-a328-73816496f9e3}</UniqueIdentifier>
+      <UniqueIdentifier>{aa5e42ab-1db8-4ce6-a05b-898ecafcb072}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer">
-      <UniqueIdentifier>{8796511b-6a28-49f4-b943-6857d37759a4}</UniqueIdentifier>
+      <UniqueIdentifier>{3a31ff9a-47ff-4c1d-af72-8585cdffee41}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Header Files">
-      <UniqueIdentifier>{acf2088d-e7ce-4f9d-85e9-4074993d6ee8}</UniqueIdentifier>
+      <UniqueIdentifier>{bd8f9bdf-27d8-41d0-9153-57b60fd78dfb}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Source Files">
-      <UniqueIdentifier>{44d895ee-ee8f-4f9a-b68b-915d247d09cf}</UniqueIdentifier>
+      <UniqueIdentifier>{0e6c338b-237e-4ba4-a4d8-d7ed4c124c09}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer">
-      <UniqueIdentifier>{f8cc33e7-858e-429f-a918-ec72b4ffbfef}</UniqueIdentifier>
+      <UniqueIdentifier>{0edcd961-107d-472d-8c2d-572dcb826bea}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer\Header Files">
-      <UniqueIdentifier>{8ca40651-9628-4742-bd4e-babcbbccd81f}</UniqueIdentifier>
+      <UniqueIdentifier>{ec2d6581-c268-46c0-8d2b-7896cf207f49}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer\Source Files">
-      <UniqueIdentifier>{19ce8fb9-b265-48a2-beb1-2cfb6a39a827}</UniqueIdentifier>
+      <UniqueIdentifier>{77d8ee17-7b43-45ed-86bc-504ba591a85b}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{74cd9ac7-2fc1-47f2-b080-03f4af4a5327}</UniqueIdentifier>
+      <UniqueIdentifier>{7722cdda-5ea6-4cd0-9d27-380adefc9355}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{0d81c1c1-12b5-465e-bdf1-c0e966a0548b}</UniqueIdentifier>
+      <UniqueIdentifier>{d9814a6f-7743-4f28-967d-10b81f33f62c}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{22c0f25f-bd50-4b92-a0bc-35119f431db6}</UniqueIdentifier>
+      <UniqueIdentifier>{e01d1795-a972-4ddb-8a3e-71cd7d4b1a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket">
+      <UniqueIdentifier>{3e4f5f38-34e9-4107-8b3a-c1dcb36efbae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Header Files">
+      <UniqueIdentifier>{cbabee5b-4c50-4a71-844c-56bb47c8c1bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Source Files">
+      <UniqueIdentifier>{d73ed15d-80a5-4323-bb9d-08e98f7594b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPSClient">
+      <UniqueIdentifier>{999c2140-033b-479b-94cd-bec6f46ca093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPSClient\Header Files">
+      <UniqueIdentifier>{8abcb35f-c8da-4c11-adf9-0632d87ecb7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPSClient\Source Files">
+      <UniqueIdentifier>{f704361d-028c-45d4-9e90-fe87a7471b67}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +98,21 @@
     </ClInclude>
     <ClInclude Include="src\HTTPSStreamFactoryTest.h">
       <Filter>HTTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTest.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTestSuite.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DialogServer.h">
+      <Filter>FTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FTPSClientSessionTest.h">
+      <Filter>FTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FTPSClientTestSuite.h">
+      <Filter>FTPSClient\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +145,21 @@
     </ClCompile>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp">
       <Filter>HTTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTest.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTestSuite.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DialogServer.cpp">
+      <Filter>FTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientSessionTest.cpp">
+      <Filter>FTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientTestSuite.cpp">
+      <Filter>FTPSClient\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

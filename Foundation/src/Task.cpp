@@ -14,6 +14,7 @@
 
 #include "Poco/Task.h"
 #include "Poco/TaskManager.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
 
 
@@ -25,7 +26,7 @@ Task::Task(const std::string& name):
 	_pOwner(0),
 	_progress(0),
 	_state(TASK_IDLE),
-	_cancelEvent(false)
+	_cancelEvent(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -56,7 +57,7 @@ void Task::run()
 {
 	TaskManager* pOwner = getOwner();
 	if (pOwner)
-		pOwner->taskStarted(this);		
+		pOwner->taskStarted(this);
 	try
 	{
 		_state = TASK_RUNNING;
@@ -78,14 +79,20 @@ void Task::run()
 			pOwner->taskFailed(this, SystemException("unknown exception"));
 	}
 	_state = TASK_FINISHED;
-	if (pOwner)
-		pOwner->taskFinished(this);
+	if (pOwner) pOwner->taskFinished(this);
 }
 
 
 bool Task::sleep(long milliseconds)
 {
 	return _cancelEvent.tryWait(milliseconds);
+}
+
+
+bool Task::yield()
+{
+	Thread::yield();
+	return isCancelled();
 }
 
 
@@ -121,11 +128,11 @@ void Task::postNotification(Notification* pNf)
 	poco_check_ptr (pNf);
 
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (_pOwner)
-	{
 		_pOwner->postNotification(pNf);
-	}
+	else if (pNf)
+		pNf->release();
 }
 
 

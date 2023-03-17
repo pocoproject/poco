@@ -35,7 +35,7 @@ ApacheApplication::~ApacheApplication()
 void ApacheApplication::setup()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (!_ready)
 	{
 		std::vector<std::string> cmdLine;

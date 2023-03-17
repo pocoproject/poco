@@ -36,9 +36,7 @@
 #include <cstring>
 #endif
 
-
 namespace Poco {
-
 
 class Foundation_API ThreadImpl
 {
@@ -59,11 +57,17 @@ public:
 	{
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
 	};
-	
+
 	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
@@ -76,10 +80,12 @@ public:
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
+	static long currentOsTidImpl();
+	bool setAffinityImpl(int coreID);
+	int getAffinityImpl() const;
 
 protected:
 	static void* runnableEntry(void* pThread);
@@ -140,12 +146,14 @@ private:
 		std::size_t   stackSize;
 		bool          started;
 		bool          joined;
+		std::string   name;
+		int           affinity;
+		mutable FastMutex mutex;
 	};
 
 	AutoPtr<ThreadData> _pData;
-
 	static CurrentThreadHolder _currentThreadHolder;
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;
@@ -170,6 +178,7 @@ inline int ThreadImpl::getOSPriorityImpl() const
 
 inline bool ThreadImpl::isRunningImpl() const
 {
+	FastMutex::ScopedLock l(_pData->mutex);
 	return !_pData->pRunnableTarget.isNull();
 }
 

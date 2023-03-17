@@ -10,24 +10,25 @@ namespace PDF {
 
 
 Cell::Cell(const AttributedString& content, const std::string& name, FontMapPtr pFontMap):
-	_content(content), 
+	_content(content),
 	_name(name),
 	_outline(OUTLINE_NONE),
 	_lineWidth(1.0f),
 	_encoding("UTF-8"),
-	_trueType(true)
-
+	_trueType(true),
+	_widthAsPct(-1)
 {
 	setFonts(pFontMap);
 }
 
 
-Cell::Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding, bool trueType):
-	_content(content), 
+Cell::Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding, bool trueType, int widthAsPct):
+	_content(content),
 	_outline(OUTLINE_NONE),
 	_lineWidth(1.0f),
-	_encoding(encoding), 
-	_trueType(trueType)
+	_encoding(encoding),
+	_trueType(trueType),
+	_widthAsPct(widthAsPct)
 {
 	setFonts(pFontMap);
 }
@@ -41,7 +42,7 @@ Cell::~Cell()
 void Cell::setFonts(FontMapPtr pFontMap)
 {
 	_pFontMap = pFontMap;
-	if (_pFontMap) poco_assert(_pFontMap->size() == 4);
+	poco_assert(!_pFontMap || (_pFontMap->size() == 4));
 }
 
 
@@ -71,15 +72,18 @@ void Cell::borderAll(bool show)
 void Cell::draw(Page& page, float x, float y, float width, float height)
 {
 	// uncomment to force showing of the cell outline regardless of settings
-	// _outline = 15;
+	//_outline = 15;
 
 	if (_outline != OUTLINE_NONE)
 	{
 		page.setLineWidth(_lineWidth);
 		page.moveTo(x, y);
 		if (_outline & OUTLINE_LEFT  ) page.lineTo(x,       y+height);
+		page.moveTo(x, y+height);
 		if (_outline & OUTLINE_TOP   ) page.lineTo(x+width, y+height);
+		page.moveTo(x+width, y+height);
 		if (_outline & OUTLINE_RIGHT ) page.lineTo(x+width, y       );
+		page.moveTo(x+width, y);
 		if (_outline & OUTLINE_BOTTOM) page.lineTo(x,       y       );
 		page.stroke();
 	}
@@ -100,13 +104,13 @@ void Cell::draw(Page& page, float x, float y, float width, float height)
 				else if (_trueType) page.setTTFont((*_pFontMap)[AttributedString::STYLE_PLAIN], fontSize, _encoding);
 				else                page.setFont((*_pFontMap)[AttributedString::STYLE_PLAIN], fontSize, _encoding);
 			}
-			else if (fontStyle | AttributedString::STYLE_BOLD)
+			else if (fontStyle & AttributedString::STYLE_BOLD)
 			{
 				if (!_pFontMap)     page.setFont("Helvetica-Bold", fontSize);
 				else if (_trueType) page.setTTFont((*_pFontMap)[AttributedString::STYLE_BOLD], fontSize, _encoding);
 				else                page.setFont((*_pFontMap)[AttributedString::STYLE_BOLD], fontSize, _encoding);
 			}
-			else if (fontStyle | AttributedString::STYLE_ITALIC)
+			else if (fontStyle & AttributedString::STYLE_ITALIC)
 			{
 				if (!_pFontMap)     page.setFont("Helvetica-Oblique", fontSize);
 				else if (_trueType) page.setTTFont((*_pFontMap)[AttributedString::STYLE_ITALIC], fontSize, _encoding);

@@ -32,8 +32,8 @@ namespace Impl {
 class IPAddressImpl : public Poco::RefCountedObject
 {
 public:
-	typedef AddressFamily::Family Family;
-	
+	using Family = AddressFamily::Family;
+
 	virtual ~IPAddressImpl();
 
 	virtual IPAddressImpl* clone() const = 0;
@@ -112,7 +112,7 @@ public:
 	bool operator == (const IPv4AddressImpl& addr) const;
 	bool operator != (const IPv4AddressImpl& addr) const;
 
-private:	
+private:
 	struct in_addr _addr;
 };
 

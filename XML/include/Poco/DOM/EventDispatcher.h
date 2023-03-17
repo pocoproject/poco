@@ -43,13 +43,13 @@ class XML_API EventDispatcher
 public:
 	EventDispatcher();
 		/// Creates the EventDispatcher.
-		
+
 	~EventDispatcher();
 		/// Destroys the EventDispatcher.
-		
+
 	void addEventListener(const XMLString& type, EventListener* listener, bool useCapture);
 		/// Adds an EventListener to the internal list.
-		
+
 	void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture);
 		/// Removes an EventListener from the internal list.
 		///
@@ -61,19 +61,19 @@ public:
 	void dispatchEvent(Event* evt);
 		/// Dispatches the event.
 		///
-		/// Also removes all EventListeners marked for deletion from the 
+		/// Also removes all EventListeners marked for deletion from the
 		/// event dispatcher list.
-		
+
 	void captureEvent(Event* evt);
 		/// Dispatches the event in its capturing phase.
 		///
-		/// Also removes all EventListeners marked for deletion from the 
+		/// Also removes all EventListeners marked for deletion from the
 		/// event dispatcher list.
-		
+
 	void bubbleEvent(Event* evt);
 		/// Dispatches the event in its bubbling phase.
 		///
-		/// Also removes all EventListeners marked for deletion from the 
+		/// Also removes all EventListeners marked for deletion from the
 		/// event dispatcher list.
 
 private:
@@ -85,7 +85,7 @@ private:
 	};
 
 	typedef std::list<EventListenerItem> EventListenerList;
-	
+
 	int               _inDispatch;
 	EventListenerList _listeners;
 };

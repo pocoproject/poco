@@ -60,8 +60,7 @@ class Util_API ServerApplication: public Application
 	///   }
 	///
 	/// The POCO_SERVER_MAIN macro can be used to implement main(argc, argv).
-	/// If POCO has been built with POCO_WIN32_UTF8, POCO_SERVER_MAIN supports
-	/// Unicode command line arguments.
+	/// POCO_SERVER_MAIN supports Unicode command line arguments.
 	///
 	/// On Windows platforms, an application built on top of the
 	/// ServerApplication class can be run both from the command line
@@ -82,7 +81,7 @@ class Util_API ServerApplication: public Application
 	///
 	/// An application can determine whether it is running as a service by checking
 	/// for the "application.runAsService" configuration property.
-	/// 
+	///
 	///     if (config().getBool("application.runAsService", false))
 	///     {
 	///         // do service specific things
@@ -104,7 +103,7 @@ class Util_API ServerApplication: public Application
 	/// command line option. A daemon, when launched, immediately
 	/// forks off a background process that does the actual work. After launching
 	/// the background process, the foreground process exits.
-	/// 
+	///
 	/// After the initialization is complete, but before entering the main() method,
 	/// the current working directory for the daemon process is changed to the root
 	/// directory ("/"), as it is common practice for daemon processes. Therefore, be
@@ -120,8 +119,8 @@ class Util_API ServerApplication: public Application
 	///     }
 	///
 	/// When running as a daemon, specifying the --pidfile option (e.g.,
-	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of 
-	/// the daemon in a file. The PID file will be removed when the daemon process 
+	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of
+	/// the daemon in a file. The PID file will be removed when the daemon process
 	/// terminates (but not, if it crashes).
 {
 public:
@@ -130,7 +129,7 @@ public:
 
 	~ServerApplication();
 		/// Destroys the ServerApplication.
-		
+
 	bool isInteractive() const;
 		/// Returns true if the application runs from the command line.
 		/// Returns false if the application runs as a Unix daemon
@@ -139,12 +138,12 @@ public:
 	int run(int argc, char** argv);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
-		
+
 	int run(const std::vector<std::string>& args);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if defined(_WIN32)
 	int run(int argc, wchar_t** argv);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
@@ -155,10 +154,10 @@ public:
 
 	static void terminate();
 		/// Sends a friendly termination request to the application.
-		/// If the application's main thread is waiting in 
+		/// If the application's main thread is waiting in
 		/// waitForTerminationRequest(), this method will return
 		/// and the application can shut down.
-		
+
 protected:
 	int run();
 	void waitForTerminationRequest();
@@ -188,11 +187,7 @@ private:
 	};
 	static BOOL __stdcall ConsoleCtrlHandler(DWORD ctrlType);
 	static void __stdcall ServiceControlHandler(DWORD control);
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
-#else
-	static void __stdcall ServiceMain(DWORD argc, LPTSTR* argv);
-#endif
 
 	bool hasConsole();
 	bool isService();
@@ -203,16 +198,16 @@ private:
 	void handleUnregisterService(const std::string& name, const std::string& value);
 	void handleDisplayName(const std::string& name, const std::string& value);
 	void handleDescription(const std::string& name, const std::string& value);
-	void handleStartup(const std::string& name, const std::string& value);	
-	
+	void handleStartup(const std::string& name, const std::string& value);
+
 	Action      _action;
 	std::string _displayName;
 	std::string _description;
 	std::string _startup;
 
 	static Poco::Event           _terminated;
-	static SERVICE_STATUS        _serviceStatus; 
-	static SERVICE_STATUS_HANDLE _serviceStatusHandle; 
+	static SERVICE_STATUS        _serviceStatus;
+	static SERVICE_STATUS_HANDLE _serviceStatusHandle;
 #endif // _WIN32_WCE
 	static Poco::NamedEvent      _terminate;
 #endif
@@ -225,7 +220,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\

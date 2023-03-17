@@ -22,6 +22,8 @@
 #include "Poco/Timezone.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberParser.h"
+#include "Poco/StringTokenizer.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
@@ -29,18 +31,23 @@ namespace Poco {
 
 const std::string PatternFormatter::PROP_PATTERN = "pattern";
 const std::string PatternFormatter::PROP_TIMES   = "times";
-
+const std::string PatternFormatter::PROP_PRIORITY_NAMES = "priorityNames";
+const std::string PatternFormatter::DEFAULT_PRIORITY_NAMES = "Fatal,Critical,Error,Warning,Notice,Information,Debug,Trace";
 
 PatternFormatter::PatternFormatter():
-	_localTime(false)
+	_localTime(false),
+	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
+	parsePriorityNames();
 }
 
 
 PatternFormatter::PatternFormatter(const std::string& format):
 	_localTime(false),
-	_pattern(format)
+	_pattern(format),
+	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
+	parsePriorityNames();
 	parsePattern();
 }
 
@@ -60,10 +67,10 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		timestamp += Timezone::dst()*Timestamp::resolution();
 	}
 	DateTime dateTime = timestamp;
-	for (std::vector<PatternAction>::iterator ip = _patternActions.begin(); ip != _patternActions.end(); ++ip)
+	for (auto& pa:_patternActions)
 	{
-		text.append(ip->prepend);
-		switch (ip->key)
+		text.append(pa.prepend);
+		switch (pa.key)
 		{
 		case 's': text.append(msg.getSource()); break;
 		case 't': text.append(msg.getText()); break;
@@ -73,8 +80,10 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'P': NumberFormatter::append(text, msg.getPid()); break;
 		case 'T': text.append(msg.getThread()); break;
 		case 'I': NumberFormatter::append(text, msg.getTid()); break;
+		case 'J': NumberFormatter::append(text, msg.getOsTid()); break;
 		case 'N': text.append(Environment::nodeName()); break;
 		case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
+		case 'O': text.append(msg.getSourceFile() ? Path(msg.getSourceFile()).getFileName() : ""); break;
 		case 'u': NumberFormatter::append(text, msg.getSourceLine()); break;
 		case 'w': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
 		case 'W': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
@@ -101,17 +110,17 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'Z': text.append(DateTimeFormatter::tzdRFC(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
 		case 'E': NumberFormatter::append(text, msg.getTime().epochTime()); break;
 		case 'v':
-			if (ip->length > msg.getSource().length())	//append spaces
-				text.append(msg.getSource()).append(ip->length - msg.getSource().length(), ' ');
-			else if (ip->length && ip->length < msg.getSource().length()) // crop
-				text.append(msg.getSource(), msg.getSource().length()-ip->length, ip->length);
+			if (pa.length > msg.getSource().length())	//append spaces
+				text.append(msg.getSource()).append(pa.length - msg.getSource().length(), ' ');
+			else if (pa.length && pa.length < msg.getSource().length()) // crop
+				text.append(msg.getSource(), msg.getSource().length()-pa.length, pa.length);
 			else
 				text.append(msg.getSource());
 			break;
 		case 'x':
 			try
 			{
-				text.append(msg[ip->property]);
+				text.append(msg[pa.property]);
 			}
 			catch (...)
 			{
@@ -189,7 +198,7 @@ void PatternFormatter::parsePattern()
 	}
 }
 
-	
+
 void PatternFormatter::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_PATTERN)
@@ -201,7 +210,12 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 	{
 		_localTime = (value == "local");
 	}
-	else 
+	else if (name == PROP_PRIORITY_NAMES)
+	{
+		_priorityNames = value;
+		parsePriorityNames();
+	}
+	else
 	{
 		Formatter::setProperty(name, value);
 	}
@@ -214,32 +228,31 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 		return _pattern;
 	else if (name == PROP_TIMES)
 		return _localTime ? "local" : "UTC";
+	else if (name == PROP_PRIORITY_NAMES)
+		return _priorityNames;
 	else
 		return Formatter::getProperty(name);
 }
 
 
-namespace
+void PatternFormatter::parsePriorityNames()
 {
-	static std::string priorities[] = 
+	StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
+	if (st.count() == 8)
 	{
-		"",
-		"Fatal",
-		"Critical",
-		"Error",
-		"Warning",
-		"Notice",
-		"Information",
-		"Debug",
-		"Trace"
-	};
+		for (int i = 1; i <= 8; i++)
+		{
+			_priorities[i] = st[i - 1];
+		}
+	}
+	else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
 }
 
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {
-	poco_assert (1 <= prio && prio <= 8);	
-	return priorities[prio];
+	poco_assert (1 <= prio && prio <= 8);
+	return _priorities[prio];
 }
 
 

@@ -17,12 +17,15 @@
 #ifndef Data_MySQL_StatementHandle_INCLUDED
 #define Data_MySQL_StatementHandle_INCLUDED
 
-#include <mysql.h>
+
 #include "Poco/Data/MySQL/MySQLException.h"
+#include <mysql.h>
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
+
 
 class StatementExecutor
 	/// MySQL statement executor.
@@ -63,12 +66,11 @@ public:
 		/// Fetches the column.
 
 	int getAffectedRowCount() const;
-		
+
 	operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
 
 private:
-
 	StatementExecutor(const StatementExecutor&);
 	StatementExecutor& operator=(const StatementExecutor&);
 
@@ -76,7 +78,7 @@ private:
 	MYSQL*      _pSessionHandle;
 	MYSQL_STMT* _pHandle;
 	int         _state;
-	int         _affectedRowCount;
+	std::size_t _affectedRowCount;
 	std::string _query;
 };
 
@@ -91,7 +93,7 @@ inline StatementExecutor::operator MYSQL_STMT* ()
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_StatementHandle_INCLUDED

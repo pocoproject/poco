@@ -68,7 +68,7 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
 
 	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
 		/// Binds a local address to the socket.
@@ -97,7 +97,7 @@ public:
 		/// Binds a local port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -106,7 +106,7 @@ public:
 		/// Binds a local port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -155,7 +155,7 @@ public:
 		/// Binds a local IPv6 port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -166,12 +166,12 @@ public:
 		///
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
-		
+
 	virtual void bind6(Poco::UInt16 port, bool reuseAddress, bool reusePort, bool ipV6Only);
 		/// Binds a local IPv6 port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.

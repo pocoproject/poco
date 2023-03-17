@@ -49,7 +49,7 @@ protected:
 	void handle3(Poco::Notification* pNf);
 	void handleTest(TestNotification* pNf);
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
-	
+
 private:
 	std::set<std::string> _set;
 };

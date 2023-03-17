@@ -65,7 +65,7 @@ public:
 	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir);
 		/// Binds an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	void bind(std::size_t pos, const long &val, Direction dir);
 		/// Binds a long
 
@@ -105,6 +105,9 @@ public:
 
 	void bind(std::size_t pos, const DateTime& val, Direction dir);
 		/// Binds a DateTime.
+
+	void bind(std::size_t pos, const UUID& val, Direction dir);
+		/// Binds a UUID.
 
 	void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null.

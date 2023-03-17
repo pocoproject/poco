@@ -6,6 +6,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|Win32 = debug_shared|Win32
 		release_shared|Win32 = release_shared|Win32
+		debug_shared|x64 = debug_shared|x64
+		release_shared|x64 = release_shared|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9866EE28-0612-4746-BD35-3B15B0AF7267}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
@@ -14,6 +16,12 @@ Global
 		{9866EE28-0612-4746-BD35-3B15B0AF7267}.release_shared|Win32.ActiveCfg = release_shared|Win32
 		{9866EE28-0612-4746-BD35-3B15B0AF7267}.release_shared|Win32.Build.0 = release_shared|Win32
 		{9866EE28-0612-4746-BD35-3B15B0AF7267}.release_shared|Win32.Deploy.0 = release_shared|Win32
+		{9866EE28-0612-4746-BD35-3B15B0AF7267}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{9866EE28-0612-4746-BD35-3B15B0AF7267}.debug_shared|x64.Build.0 = debug_shared|x64
+		{9866EE28-0612-4746-BD35-3B15B0AF7267}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{9866EE28-0612-4746-BD35-3B15B0AF7267}.release_shared|x64.ActiveCfg = release_shared|x64
+		{9866EE28-0612-4746-BD35-3B15B0AF7267}.release_shared|x64.Build.0 = release_shared|x64
+		{9866EE28-0612-4746-BD35-3B15B0AF7267}.release_shared|x64.Deploy.0 = release_shared|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

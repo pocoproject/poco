@@ -13,13 +13,13 @@
 //
 
 
-#include "Poco/Exception.h"
 #include "Poco/Net/HTTPAuthenticationParams.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
+#include "Poco/Exception.h"
 
 
 using Poco::icompare;
@@ -66,6 +66,7 @@ namespace Net {
 
 
 const std::string HTTPAuthenticationParams::REALM("realm");
+const std::string HTTPAuthenticationParams::NTLM("NTLM");
 const std::string HTTPAuthenticationParams::WWW_AUTHENTICATE("WWW-Authenticate");
 const std::string HTTPAuthenticationParams::PROXY_AUTHENTICATE("Proxy-Authenticate");
 
@@ -135,20 +136,25 @@ void HTTPAuthenticationParams::fromResponse(const HTTPResponse& response, const 
 	bool found = false;
 	while (!found && it != response.end() && icompare(it->first, header) == 0)
 	{
-		const std::string& header = it->second;
-		if (icompare(header, 0, 6, "Basic ") == 0)
+		const std::string& headerValue = it->second;
+		if (icompare(headerValue, 0, 6, "Basic ") == 0)
 		{
-			parse(header.begin() + 6, header.end());
+			parse(headerValue.begin() + 6, headerValue.end());
 			found = true;
 		}
-		else if (icompare(header, 0, 7, "Digest ") == 0)
+		else if (icompare(headerValue, 0, 7, "Digest ") == 0)
 		{
-			parse(header.begin() + 7, header.end());
+			parse(headerValue.begin() + 7, headerValue.end());
+			found = true;
+		}
+		else if (icompare(headerValue, 0, 5, "NTLM ") == 0)
+		{
+			set(NTLM, headerValue.substr(5));
 			found = true;
 		}
 		++it;
 	}
-	if (!found) throw NotAuthenticatedException("No Basic or Digest authentication header found");
+	if (!found) throw NotAuthenticatedException("No Basic, Digest or NTLM authentication header found");
 }
 
 
@@ -166,21 +172,27 @@ void HTTPAuthenticationParams::setRealm(const std::string& realm)
 
 std::string HTTPAuthenticationParams::toString() const
 {
-	ConstIterator iter = begin();
 	std::string result;
-
-	if (iter != end())
+	if (size() == 1 && find(NTLM) != end())
 	{
-		formatParameter(result, iter->first, iter->second);
-		++iter;
+		result = get(NTLM);
 	}
-
-	for (; iter != end(); ++iter)
+	else
 	{
-		result.append(", ");
-		formatParameter(result, iter->first, iter->second);
-	}
+		ConstIterator iter = begin();
 
+		if (iter != end())
+		{
+			formatParameter(result, iter->first, iter->second);
+			++iter;
+		}
+
+		for (; iter != end(); ++iter)
+		{
+			result.append(", ");
+			formatParameter(result, iter->first, iter->second);
+		}
+	}
 	return result;
 }
 

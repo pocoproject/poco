@@ -18,19 +18,19 @@
 namespace Poco {
 
 
-TeeStreamBuf::TeeStreamBuf(): 
+TeeStreamBuf::TeeStreamBuf():
 	_pIstr(0)
 {
 }
 
 
-TeeStreamBuf::TeeStreamBuf(std::istream& istr): 
+TeeStreamBuf::TeeStreamBuf(std::istream& istr):
 	_pIstr(&istr)
 {
 }
 
 
-TeeStreamBuf::TeeStreamBuf(std::ostream& ostr): 
+TeeStreamBuf::TeeStreamBuf(std::ostream& ostr):
 	_pIstr(0)
 {
 	_streams.push_back(&ostr);
@@ -62,9 +62,9 @@ int TeeStreamBuf::readFromDevice()
 
 int TeeStreamBuf::writeToDevice(char c)
 {
-	for (StreamVec::iterator it = _streams.begin(); it != _streams.end(); ++it)
+	for (auto& pStream: _streams)
 	{
-		(*it)->put(c);
+		pStream->put(c);
 	}
 	return charToInt(c);
 }

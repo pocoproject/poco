@@ -1,9 +1,14 @@
 @echo off
 rem
+rem $Id$
+rem
 rem A script for running the POCO testsuites.
 rem
-rem usage: runtests2 [64]
+rem usage: runtests2 [-64] [-d ] [component [test]]
 rem
+rem component   : the component under test
+rem test        : the test as part of the component
+
 rem If the environment variable EXCLUDE_TESTS is set, containing
 rem a space-separated list of project names (as found in the
 rem components file), these tests will be skipped.
@@ -11,21 +16,39 @@ rem
 
 setlocal EnableDelayedExpansion
 
-set TESTRUNNER=TestSuite.exe
+
 set TESTRUNNERARGS=-all
+set TESTCOMPONENTS='C:\Windows\System32\findstr.exe /R "." components'
 set BINDIR=bin
 
-if "%1"=="64" (
+if "%1"=="-64" (
   set BINDIR=bin64
+  shift
 )
+if "%1" =="-d" (
+  set DEBUG=d
+  shift
+)
+
+set PATH=%POCO_BASE%\%BINDIR%;%PATH%
+set IGNORE=-ignore %POCO_BASE%\cppignore.win
+
+if not "%1" == "" (
+  set TESTCOMPONENTS="%1"
+  if not "%2" == "" (
+    set TESTRUNNERARGS=%2
+  )
+)
+
+set TESTRUNNER=TestSuite%DEBUG%.exe
 
 set runs=0
 set failures=0
 set failedTests=
 set status=0
-set excluded=0
 
-for /f %%C in ('findstr /R "." components') do (
+
+for /f %%C in ( %TESTCOMPONENTS% ) do (
   set excluded=0
   for %%X in (%EXCLUDE_TESTS%) do (
     if "%%X"=="%%C" (
@@ -46,7 +69,8 @@ for /f %%C in ('findstr /R "." components') do (
 		  set /a runs=!runs! + 1
 		  set dir=%CD%
 		  cd %%C\testsuite
-		  %BINDIR%\%TESTRUNNER% %TESTRUNNERARGS%
+		  echo %BINDIR%\%TESTRUNNER% %IGNORE% %TESTRUNNERARGS%
+		  %BINDIR%\%TESTRUNNER% %IGNORE% %TESTRUNNERARGS%
 		  if !ERRORLEVEL! neq 0 (
 		    set /a failures=!failures! + 1
 		    set failedTests=!failedTests! %%C

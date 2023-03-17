@@ -28,7 +28,7 @@ const XMLString MutationEvent::DOMAttrModified             = toXMLString("DOMAtt
 const XMLString MutationEvent::DOMCharacterDataModified    = toXMLString("DOMCharacterDataModified");
 
 
-MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type): 
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type):
 	Event(pOwnerDocument, type, 0, true, false),
 	_change(MODIFICATION),
 	_pRelatedNode(0)
@@ -44,7 +44,7 @@ MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, Ev
 }
 
 
-MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode, 
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode,
 	                         const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change):
 	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
 	_prevValue(prevValue),
@@ -61,7 +61,7 @@ MutationEvent::~MutationEvent()
 }
 
 
-void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node* relatedNode, 
+void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node* relatedNode,
 	                                  const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change)
 {
 	initEvent(type, canBubble, cancelable);
@@ -72,5 +72,5 @@ void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, boo
 	_change       = change;
 }
 
-	 
+
 } } // namespace Poco::XML

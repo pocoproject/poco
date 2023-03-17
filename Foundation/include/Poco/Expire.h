@@ -28,12 +28,12 @@ namespace Poco {
 
 template <class TArgs>
 class Expire: public AbstractDelegate<TArgs>
-	/// Decorator for AbstractDelegate adding automatic 
+	/// Decorator for AbstractDelegate adding automatic
 	/// expiration of registrations to AbstractDelegate's.
 {
 public:
 	Expire(const AbstractDelegate<TArgs>& p, Timestamp::TimeDiff expireMillisecs):
-		_pDelegate(p.clone()), 
+		_pDelegate(p.clone()),
 		_expire(expireMillisecs*1000)
 	{
 	}
@@ -50,7 +50,7 @@ public:
 	{
 		delete _pDelegate;
 	}
-	
+
 	Expire& operator = (const Expire& expire)
 	{
 		if (&expire != this)
@@ -81,7 +81,7 @@ public:
 	{
 		return new Expire(*this);
 	}
-	
+
 	void disable()
 	{
 		_pDelegate->disable();
@@ -109,12 +109,12 @@ private:
 
 template <>
 class Expire<void>: public AbstractDelegate<void>
-	/// Decorator for AbstractDelegate adding automatic 
+	/// Decorator for AbstractDelegate adding automatic
 	/// expiration of registrations to AbstractDelegate's.
 {
 public:
 	Expire(const AbstractDelegate<void>& p, Timestamp::TimeDiff expireMillisecs):
-		_pDelegate(p.clone()), 
+		_pDelegate(p.clone()),
 		_expire(expireMillisecs*1000)
 	{
 	}
@@ -131,7 +131,7 @@ public:
 	{
 		delete _pDelegate;
 	}
-	
+
 	Expire& operator = (const Expire& expire)
 	{
 		if (&expire != this)
@@ -162,7 +162,7 @@ public:
 	{
 		return new Expire(*this);
 	}
-	
+
 	void disable()
 	{
 		_pDelegate->disable();

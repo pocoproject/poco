@@ -26,9 +26,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	#if defined(POCO_WIN32_UTF8)
-		#include "Poco/UnicodeConverter.h"
-	#endif
+	#include "Poco/UnicodeConverter.h"
 	#include "Poco/Error.h"
 	#include <wincrypt.h>
 	#include <iphlpapi.h>
@@ -38,6 +36,11 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+
+
+#if defined(_MSC_VER)
+#pragma warning(disable:4996) // deprecation warnings
+#endif
 
 
 using Poco::NumberFormatter;
@@ -70,9 +73,9 @@ namespace Net {
 class NetworkInterfaceImpl: public Poco::RefCountedObject
 {
 public:
-	typedef NetworkInterface::AddressTuple AddressTuple;
-	typedef NetworkInterface::AddressList  AddressList;
-	typedef NetworkInterface::Type         Type;
+	using AddressTuple = NetworkInterface::AddressTuple;
+	using AddressList = NetworkInterface::AddressList;
+	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
 	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
@@ -240,8 +243,12 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
 void NetworkInterfaceImpl::setPhyParams()
 {
 #if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
-	struct ifreq ifr;
-	std::strncpy(ifr.ifr_name, _name.c_str(), IFNAMSIZ);
+	struct ifreq ifr{};
+	std::size_t szFrom = _name.size();
+	std::size_t szTo = IFNAMSIZ - 1;
+	std::size_t sz = szFrom <= szTo ? szFrom : szTo;
+	std::strncpy(ifr.ifr_name, _name.c_str(), sz);
+
 	DatagramSocket ds(SocketAddress::IPv4);
 
 	ds.impl()->ioctl(SIOCGIFFLAGS, &ifr);
@@ -630,7 +637,7 @@ NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interfc)
 }
 
 
-void NetworkInterface::swap(NetworkInterface& other)
+void NetworkInterface::swap(NetworkInterface& other) noexcept
 {
 	using std::swap;
 	swap(_pImpl, other._pImpl);
@@ -796,9 +803,9 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	if (requireIPv6) 
+	if (requireIPv6)
 		return forName(name, IPv6_ONLY);
-	else 
+	else
 		return forName(name, IPv4_OR_IPv6);
 }
 
@@ -873,7 +880,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		std::string adapterName = it->second.adapterName();
 		NetworkInterface::MACAddress mac = it->second.macAddress();
 
-		typedef NetworkInterface::AddressList List;
+		using List = NetworkInterface::AddressList;
 		const List& ipList = it->second.addressList();
 		if (ipList.size() > 0)
 		{
@@ -1007,7 +1014,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 		subKey += name;
 		std::string netmask;
 		HKEY hKey;
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::wstring usubKey;
 		Poco::UnicodeConverter::toUTF16(subKey, usubKey);
 		if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, usubKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
@@ -1023,21 +1029,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 			}
 		}
 		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
-#else
-		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-			return IPAddress();
-		char unetmask[16];
-		DWORD size = sizeof(unetmask);
-		if (RegQueryValueExA(hKey, "DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
-		{
-			if (RegQueryValueExA(hKey, "SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
-			{
-				RegCloseKey(hKey);
-				return IPAddress();
-			}
-		}
-		netmask = unetmask;
-#endif
 		RegCloseKey(hKey);
 		return IPAddress::parse(netmask);
 #else
@@ -1085,7 +1076,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
-	} 
+	}
 	while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
 
 	poco_assert (NO_ERROR == dwRetVal);
@@ -1151,17 +1142,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		std::string name;
 		std::string displayName;
 		std::string adapterName(pAddress->AdapterName);
-#ifdef POCO_WIN32_UTF8
 		Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, name);
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
-#else
-		char nameBuffer[1024];
-		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, nameBuffer, sizeof(nameBuffer), NULL, NULL);
-		if (rc) name = nameBuffer;
-		char displayNameBuffer[1024];
-		rc = WideCharToMultiByte(CP_ACP, 0, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
-		if (rc) displayName = displayNameBuffer;
-#endif
 
 		bool isUp = (pAddress->OperStatus == IfOperStatusUp);
 		bool isIP = (0 != pAddress->FirstUnicastAddress);
@@ -1267,7 +1249,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					{
 						ifIt->second.addAddress(address);
 					}
-				} 
+				}
 				break;
 #if defined(POCO_HAVE_IPv6)
 				case AF_INET6:
@@ -1384,14 +1366,17 @@ NetworkInterface::Type fromNative(u_char nativeType)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
-	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
 	impl.setName(iface->ifa_name);
 	impl.setDisplayName(iface->ifa_name);
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
-	impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
-	impl.setType(fromNative(sdl->sdl_type));
+	if (iface->ifa_addr->sa_family == AF_LINK)
+	{
+		struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
+		impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
+		impl.setType(fromNative(sdl->sdl_type));
+	}
 }
 
 
@@ -1412,9 +1397,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	try
+	for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
 	{
-		for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
+		try
 		{
 			if (!currIface->ifa_addr) continue;
 
@@ -1486,9 +1471,14 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				}
 			}
 		}
-	}
-	catch (...)
-	{
+		catch (Poco::Exception&)
+		{
+		}
+		catch (...)
+		{
+			if (ifaces) freeifaddrs(ifaces);
+			throw;
+		}
 	}
 	if (ifaces) freeifaddrs(ifaces);
 
@@ -1563,16 +1553,19 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setPhyParams();
 
 #ifndef POCO_NO_LINUX_IF_PACKET_H
-	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
-	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
-	impl.setType(fromNative(sdl->sll_hatype));
+	if (iface->ifa_addr->sa_family == AF_PACKET)
+	{
+		struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
+		impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
+		impl.setType(fromNative(sdl->sll_hatype));
+	}
 #else
 	std::string ifPath("/sys/class/net/");
 	ifPath += iface->ifa_name;
 
 	std::string addrPath(ifPath);
 	addrPath += "/address";
-	
+
 	std::ifstream addrStream(addrPath.c_str());
 	if (addrStream.good())
 	{
@@ -1587,7 +1580,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 		impl.setMACAddress(&mac[0], mac.size());
 		addrStream.close();
 	}
-	
+
 	std::string typePath(ifPath);
 	typePath += "/type";
 	std::ifstream typeStream(typePath.c_str());
@@ -1622,9 +1615,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	try
+	for (iface = ifaces; iface; iface = iface->ifa_next)
 	{
-		for (iface = ifaces; iface; iface = iface->ifa_next)
+		try
 		{
 			if (!iface->ifa_addr) continue;
 
@@ -1699,13 +1692,16 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 				}
 			}
-		} // for interface
-	}
-	catch (...)
-	{
-		if (ifaces) freeifaddrs(ifaces);
-		throw;
-	}
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		catch (...)
+		{
+			if (ifaces) freeifaddrs(ifaces);
+			throw;
+		}
+	} // for interface
 
 	if (ifaces) freeifaddrs(ifaces);
 

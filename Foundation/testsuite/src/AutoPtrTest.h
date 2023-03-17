@@ -26,6 +26,7 @@ public:
 
 	void testAutoPtr();
 	void testOps();
+	void testMakeAuto();
 
 	void setUp();
 	void tearDown();

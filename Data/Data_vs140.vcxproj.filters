@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{869cc8e8-a063-4c2d-8cc7-0380d04f6056}</UniqueIdentifier>
+      <UniqueIdentifier>{a918a581-0b94-4c8e-9fb9-958a05520fb3}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{3013dda6-66e6-4ccb-93b2-f3fc6c57e95e}</UniqueIdentifier>
+      <UniqueIdentifier>{35b035eb-d96e-4f12-ac40-fdfcffbfa511}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{fcae8fe2-adbb-4a0f-80e6-fd376025da35}</UniqueIdentifier>
+      <UniqueIdentifier>{cbe6bea8-a94c-4022-8e34-ade5cf268bda}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{a2054186-aed4-4b13-81ff-1409d608a143}</UniqueIdentifier>
+      <UniqueIdentifier>{10e6a489-5fac-49d4-8ee0-73555f49d15c}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{321eedbb-ddd0-426c-8a21-7f90bbf28ebe}</UniqueIdentifier>
+      <UniqueIdentifier>{c86ed4bd-93ce-466a-932c-1baf6d70fc6b}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{14fce574-e5ac-40ff-a6a7-1b5b39b53a9f}</UniqueIdentifier>
+      <UniqueIdentifier>{749d2b0b-1512-4ce0-81f9-f94fc4d77c1c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{86b73492-0127-49f2-b88a-c17642c5eed2}</UniqueIdentifier>
+      <UniqueIdentifier>{3358309f-c181-457a-a176-572c9c29e54e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{118a47ca-ea24-4509-8eaf-c157559b045e}</UniqueIdentifier>
+      <UniqueIdentifier>{170fbdcf-8f02-4198-b22b-812d62cae3a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{81f9f25c-6c45-49e8-b2f3-d8257ac250ef}</UniqueIdentifier>
+      <UniqueIdentifier>{8f4b30b1-f7dc-451e-b618-23b2587336aa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +156,9 @@
     <ClInclude Include="include\Poco\Data\Transaction.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\Transcoder.h">
+      <Filter>DataCore\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Data\TypeHandler.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
@@ -264,6 +267,9 @@
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Transaction.cpp">
+      <Filter>DataCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Transcoder.cpp">
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PooledSessionHolder.cpp">

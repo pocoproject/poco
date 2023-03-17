@@ -23,6 +23,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -45,6 +46,8 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	///     msg.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
 {
 public:
+	using Ptr = Poco::AutoPtr<RemoteSyslogChannel>;
+
 	static const std::string BSD_TIMEFORMAT;
 	static const std::string SYSLOG_TIMEFORMAT;
 
@@ -121,6 +124,7 @@ public:
 		///                  by a colon) can also be specified.
 		///     * host:      (optional) Host name included in syslog messages. If not specified, the host's real domain name or
 		///                  IP address will be used.
+		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
@@ -128,11 +132,15 @@ public:
 	static void registerChannel();
 		/// Registers the channel with the global LoggingFactory.
 
+	static const char* facilityToString(Facility facility);
+		/// Returns the string describing the SyslogFacility
+
 	static const std::string PROP_NAME;
 	static const std::string PROP_FACILITY;
 	static const std::string PROP_FORMAT;
 	static const std::string PROP_LOGHOST;
 	static const std::string PROP_HOST;
+	static const std::string PROP_BUFFER;
 	static const std::string STRUCTURED_DATA;
 
 protected:
@@ -145,6 +153,7 @@ private:
 	std::string _host;
 	int  _facility;
 	bool _bsdFormat;
+	int _buffer;
 	DatagramSocket _socket;
 	SocketAddress _socketAddress;
 	bool _open;

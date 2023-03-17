@@ -31,7 +31,7 @@ public:
 	IdentifierToken()
 	{
 	}
-	
+
 	~IdentifierToken()
 	{
 	}
@@ -40,7 +40,7 @@ public:
 	{
 		return Token::IDENTIFIER_TOKEN;
 	}
-	
+
 	bool start(char c, std::istream& istr)
 	{
 		if (c != -1 && Ascii::isAlpha(c))
@@ -50,7 +50,7 @@ public:
 		}
 		else return false;
 	}
-	
+
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
@@ -70,7 +70,7 @@ public:
 	IntLiteralToken()
 	{
 	}
-	
+
 	~IntLiteralToken()
 	{
 	}
@@ -79,7 +79,7 @@ public:
 	{
 		return Token::INTEGER_LITERAL_TOKEN;
 	}
-	
+
 	bool start(char c, std::istream& istr)
 	{
 		if (c != -1 && Ascii::isDigit(c))
@@ -89,7 +89,7 @@ public:
 		}
 		else return false;
 	}
-	
+
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
@@ -121,9 +121,9 @@ void StreamTokenizerTest::testTokenizer1()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 
@@ -135,13 +135,13 @@ void StreamTokenizerTest::testTokenizer2()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
-	
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "foo");
+
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 
@@ -153,17 +153,17 @@ void StreamTokenizerTest::testTokenizer3()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "foo");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "bar");
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "bar");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 
@@ -175,17 +175,17 @@ void StreamTokenizerTest::testTokenizer4()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "foo");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
-	assert (next->asInteger() == 123);
+	assertTrue (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assertTrue (next->asInteger() == 123);
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 
@@ -197,21 +197,21 @@ void StreamTokenizerTest::testTokenizer5()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "foo");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INVALID_TOKEN);
-	assert (next->tokenString() == "#");
+	assertTrue (next->tokenClass() == Token::INVALID_TOKEN);
+	assertTrue (next->tokenString() == "#");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
-	assert (next->asInteger() == 123);
+	assertTrue (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assertTrue (next->asInteger() == 123);
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 
@@ -223,21 +223,21 @@ void StreamTokenizerTest::testTokenizer6()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "foo");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
-	assert (next->asInteger() == 123);
+	assertTrue (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assertTrue (next->asInteger() == 123);
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INVALID_TOKEN);
-	assert (next->tokenString() == "#");
+	assertTrue (next->tokenClass() == Token::INVALID_TOKEN);
+	assertTrue (next->tokenString() == "#");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 
@@ -249,17 +249,17 @@ void StreamTokenizerTest::testTokenizer7()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
+	assertTrue (next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assertTrue (next->tokenString() == "foo");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
-	assert (next->asInteger() == 123);
+	assertTrue (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assertTrue (next->asInteger() == 123);
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assertTrue (next->tokenClass() == Token::EOF_TOKEN);
 }
 
 

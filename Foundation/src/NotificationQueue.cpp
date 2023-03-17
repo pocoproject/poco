@@ -53,7 +53,7 @@ void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
 		pWI->nfAvailable.set();
-	}	
+	}
 }
 
 
@@ -71,7 +71,7 @@ void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotificatio
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
 		pWI->nfAvailable.set();
-	}	
+	}
 }
 
 
@@ -148,9 +148,9 @@ void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void NotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	for (auto p: _waitQueue)
 	{
-		(*it)->nfAvailable.set();
+		p->nfAvailable.set();
 	}
 	_waitQueue.clear();
 }
@@ -162,7 +162,7 @@ bool NotificationQueue::empty() const
 	return _nfQueue.empty();
 }
 
-	
+
 int NotificationQueue::size() const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -173,7 +173,20 @@ int NotificationQueue::size() const
 void NotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	_nfQueue.clear();	
+	_nfQueue.clear();
+}
+
+
+bool NotificationQueue::remove(Notification::Ptr pNotification)
+{
+	FastMutex::ScopedLock lock(_mutex);
+	NfQueue::iterator it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
+	if (it == _nfQueue.end())
+	{
+		return false;
+	}
+	_nfQueue.erase(it);
+	return true;
 }
 
 

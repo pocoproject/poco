@@ -1,7 +1,6 @@
 //
 // KeyPair.h
 //
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  KeyPair
@@ -48,6 +47,18 @@ public:
 	explicit KeyPair(KeyPairImpl::Ptr pKeyPairImpl = 0);
 		/// Extracts the RSA public key from the given certificate.
 
+	KeyPair(const KeyPair& other);
+		/// Copy constructor.
+
+	KeyPair(KeyPair&& other) noexcept;
+		/// Move constructor.
+
+	KeyPair& operator = (const KeyPair& other);
+		/// Assignment.
+
+	KeyPair& operator = (KeyPair&& other) noexcept;
+		/// Move assignment.
+
 	virtual ~KeyPair();
 		/// Destroys the KeyPair.
 
@@ -57,7 +68,7 @@ public:
 	virtual void save(const std::string& publicKeyPairFile,
 		const std::string& privateKeyPairFile = "",
 		const std::string& privateKeyPairPassphrase = "") const;
-		/// Exports the public and private keys to the given files. 
+		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
@@ -78,7 +89,7 @@ public:
 
 	Type type() const;
 		/// Returns key pair type
-	
+
 private:
 	KeyPairImpl::Ptr _pImpl;
 };
@@ -87,7 +98,6 @@ private:
 //
 // inlines
 //
-
 inline int KeyPair::size() const
 {
 	return _pImpl->size();
@@ -114,6 +124,7 @@ inline const std::string& KeyPair::name() const
 {
 	return _pImpl->name();
 }
+
 
 inline KeyPairImpl::Ptr KeyPair::impl() const
 {

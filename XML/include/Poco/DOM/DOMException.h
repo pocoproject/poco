@@ -32,7 +32,7 @@ class XML_API DOMException: public XMLException
 	/// because data is lost, or because the implementation has become unstable).
 	/// In general, DOM methods return specific error values in ordinary processing
 	/// situations, such as out-of-bound errors when using NodeList.
-	/// 
+	///
 	/// Implementations should raise other exceptions under other circumstances.
 	/// For example, implementations should raise an implementation-dependent exception
 	/// if a null argument is passed when null was not expected.
@@ -55,30 +55,30 @@ public:
 		INVALID_MODIFICATION_ERR,    /// an attempt is made to modify the type of the underlying object
 		NAMESPACE_ERR,               /// an attempt is made to create or change an object in a way which is incorrect with regard to namespaces
 		INVALID_ACCESS_ERR,          /// an attempt is made to use an object that is not, or is no longer, usable
-		
+
 		_NUMBER_OF_MESSAGES
 	};
 
 	DOMException(unsigned short code);
 		/// Creates a DOMException with the given error code.
-		
+
 	DOMException(const DOMException& exc);
 		/// Creates a DOMException by copying another one.
-		
-	~DOMException() throw();
+
+	~DOMException() noexcept;
 		/// Destroys the DOMException.
-		
+
 	DOMException& operator = (const DOMException& exc);
 
-	const char* name() const throw();
+	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const throw();
+	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
 	Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
-		
+
 	void rethrow() const;
 		/// (Re)Throws the exception.
 
@@ -87,12 +87,12 @@ public:
 
 protected:
 	static const std::string& message(unsigned short code);
-	
+
 private:
 	DOMException();
-	
+
 	unsigned short _code;
-	
+
 	static const std::string MESSAGES[_NUMBER_OF_MESSAGES];
 };
 

@@ -32,7 +32,7 @@ namespace Crypto {
 //
 
 
-CryptoStreamBuf::CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize):
+CryptoStreamBuf::CryptoStreamBuf(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize):
 	Poco::BufferedStreamBuf(bufferSize, std::ios::in),
 	_pTransform(pTransform),
 	_pIstr(&istr),
@@ -45,7 +45,7 @@ CryptoStreamBuf::CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform
 }
 
 
-CryptoStreamBuf::CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize):
+CryptoStreamBuf::CryptoStreamBuf(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize):
 	Poco::BufferedStreamBuf(bufferSize, std::ios::out),
 	_pTransform(pTransform),
 	_pIstr(0),
@@ -67,7 +67,6 @@ CryptoStreamBuf::~CryptoStreamBuf()
 	catch (...)
 	{
 	}
-	delete _pTransform;
 }
 
 
@@ -86,10 +85,10 @@ void CryptoStreamBuf::close()
 		// thrown.
 		std::ostream* pOstr = _pOstr;
 		_pOstr = 0;
-		
+
 		// Finalize transformation.
 		std::streamsize n = _pTransform->finalize(_buffer.begin(), static_cast<std::streamsize>(_buffer.size()));
-		
+
 		if (n > 0)
 		{
 			pOstr->write(reinterpret_cast<char*>(_buffer.begin()), n);
@@ -193,14 +192,14 @@ int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 //
 
 
-CryptoIOS::CryptoIOS(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize):
+CryptoIOS::CryptoIOS(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize):
 	_buf(istr, pTransform, bufferSize)
 {
 	poco_ios_init(&_buf);
 }
 
 
-CryptoIOS::CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize):
+CryptoIOS::CryptoIOS(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize):
 	_buf(ostr, pTransform, bufferSize)
 {
 	poco_ios_init(&_buf);
@@ -223,7 +222,7 @@ CryptoStreamBuf* CryptoIOS::rdbuf()
 //
 
 
-CryptoInputStream::CryptoInputStream(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize):
+CryptoInputStream::CryptoInputStream(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize):
 	CryptoIOS(istr, pTransform, bufferSize),
 	std::istream(&_buf)
 {
@@ -247,7 +246,7 @@ CryptoInputStream::~CryptoInputStream()
 //
 
 
-CryptoOutputStream::CryptoOutputStream(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize):
+CryptoOutputStream::CryptoOutputStream(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize):
 	CryptoIOS(ostr, pTransform, bufferSize),
 	std::ostream(&_buf)
 {

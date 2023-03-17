@@ -25,55 +25,53 @@ namespace Poco {
 namespace JSON {
 
 
-Array::Array(int options): _modified(false),
+Array::Array(int options):
+	_modified(false),
 	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0)
 {
 }
 
 
-Array::Array(const Array& other) : _values(other._values),
+Array::Array(const Array& other) :
+	_values(other._values),
 	_pArray(other._pArray),
-	_modified(other._modified)
+	_modified(other._modified),
+	_escapeUnicode(other._escapeUnicode)
 {
 }
 
 
-Array &Array::operator=(const Array& other)
+Array::Array(Array&& other) noexcept:
+	_values(std::move(other._values)),
+	_pArray(std::move(other._pArray)),
+	_modified(other._modified),
+	_escapeUnicode(other._escapeUnicode)
+{
+}
+
+
+Array& Array::operator = (const Array& other)
 {
 	if (&other != this)
 	{
 		_values = other._values;
 		_pArray = other._pArray;
 		_modified = other._modified;
-	}
-	return *this;
-}
-
-#ifdef POCO_ENABLE_CPP11
-
-
-Array::Array(Array&& other) :
-	_values(std::move(other._values)),
-	_pArray(!other._modified ? other._pArray : 0),
-	_modified(other._modified)
-{
-	_pArray = 0;
-}
-
-Array &Array::operator= (Array&& other)
-{
-	if (&other != this)
-	{
-		_values = std::move(other._values);
-		_pArray = other._pArray;
-		other._pArray = 0;
-		_modified = other._modified;
+		_escapeUnicode = other._escapeUnicode;
 	}
 	return *this;
 }
 
 
-#endif // POCO_ENABLE_CPP11
+Array& Array::operator = (Array&& other) noexcept
+{
+	_values = std::move(other._values);
+	_pArray = std::move(other._pArray);
+	_modified = other._modified;
+	_escapeUnicode = other._escapeUnicode;
+
+	return *this;
+}
 
 
 Array::~Array()

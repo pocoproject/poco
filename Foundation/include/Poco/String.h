@@ -58,7 +58,7 @@ S trimRight(const S& str)
 	/// Returns a copy of str with all trailing
 	/// whitespace removed.
 {
-	int pos = int(str.size()) - 1;
+	std::ptrdiff_t pos = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	return S(str, 0, pos + 1);
@@ -69,7 +69,7 @@ template <class S>
 S& trimRightInPlace(S& str)
 	/// Removes all trailing whitespace in str.
 {
-	int pos = int(str.size()) - 1;
+	std::ptrdiff_t pos = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	str.resize(pos + 1);
@@ -83,8 +83,8 @@ S trim(const S& str)
 	/// Returns a copy of str with all leading and
 	/// trailing whitespace removed.
 {
-	int first = 0;
-	int last  = int(str.size()) - 1;
+	std::ptrdiff_t first = 0;
+	std::ptrdiff_t last  = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
@@ -97,15 +97,17 @@ template <class S>
 S& trimInPlace(S& str)
 	/// Removes all leading and trailing whitespace in str.
 {
-	int first = 0;
-	int last  = int(str.size()) - 1;
+	std::ptrdiff_t first = 0;
+	std::ptrdiff_t last  = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
 
-	str.resize(last + 1);
-	str.erase(0, first);
-
+	if (last >= 0)
+	{
+		str.resize(last + 1);
+		str.erase(0, first);
+	}
 	return str;
 }
 
@@ -627,6 +629,22 @@ S cat(const S& delim, const It& begin, const It& end)
 }
 
 
+template <class S>
+bool startsWith(const S& str, const S& prefix)
+	/// Tests whether the string starts with the given prefix.
+{
+	return str.size() >= prefix.size() && equal(prefix.begin(), prefix.end(), str.begin());
+}
+
+
+template <class S>
+bool endsWith(const S& str, const S& suffix)
+	/// Tests whether the string ends with the given suffix.
+{
+	return str.size() >= suffix.size() && equal(suffix.rbegin(), suffix.rend(), str.rbegin());
+}
+
+
 //
 // case-insensitive string equality
 //
@@ -670,7 +688,7 @@ struct i_char_traits : public std::char_traits<charT>
 };
 
 
-typedef std::basic_string<char, i_char_traits<char> > istring;
+typedef std::basic_string<char, i_char_traits<char>> istring;
 	/// Case-insensitive std::string counterpart.
 
 

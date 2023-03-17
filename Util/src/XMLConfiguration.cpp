@@ -103,7 +103,7 @@ XMLConfiguration::XMLConfiguration(const Poco::XML::Document* pDocument, char de
 	load(pDocument);
 }
 
-	
+
 XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode):
 	_delim('.')
 {
@@ -126,7 +126,7 @@ XMLConfiguration::~XMLConfiguration()
 void XMLConfiguration::load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize)
 {
 	poco_check_ptr (pInputSource);
-	
+
 	Poco::XML::DOMParser parser(namePoolSize);
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
@@ -144,21 +144,21 @@ void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
 void XMLConfiguration::load(std::istream& istr)
 {
 	Poco::XML::InputSource src(istr);
-	load(&src);	
+	load(&src);
 }
 
 
 void XMLConfiguration::load(const std::string& path)
 {
 	Poco::XML::InputSource src(path);
-	load(&src);	
+	load(&src);
 }
 
-	
+
 void XMLConfiguration::load(const Poco::XML::Document* pDocument)
 {
 	poco_check_ptr (pDocument);
-	
+
 	_pDocument = Poco::XML::AutoPtr<Poco::XML::Document>(const_cast<Poco::XML::Document*>(pDocument), true);
 	_pRoot     = Poco::XML::AutoPtr<Poco::XML::Node>(pDocument->documentElement(), true);
 }
@@ -265,8 +265,8 @@ void XMLConfiguration::setRaw(const std::string& key, const std::string& value)
 void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	using Poco::NumberFormatter;
-	
-	std::multiset<std::string> keys;
+
+	std::map<std::string, size_t> keys;
 	const Poco::XML::Node* pNode = findNode(key);
 	if (pNode)
 	{
@@ -276,12 +276,12 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 			if (pChild->nodeType() == Poco::XML::Node::ELEMENT_NODE)
 			{
 				const std::string& nodeName = pChild->nodeName();
-				int n = (int) keys.count(nodeName);
-				if (n)
-					range.push_back(nodeName + "[" + NumberFormatter::format(n) + "]");
+				size_t& count = keys[nodeName];
+				if (count)
+					range.push_back(nodeName + "[" + NumberFormatter::format(count) + "]");
 				else
 					range.push_back(nodeName);
-				keys.insert(nodeName);
+				++count;
 			}
 			pChild = pChild->nextSibling();
 		}

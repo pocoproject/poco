@@ -30,7 +30,7 @@ template <class C, class N>
 class NObserver: public AbstractObserver
 	/// This template class implements an adapter that sits between
 	/// a NotificationCenter and an object receiving notifications
-	/// from it. It is quite similar in concept to the 
+	/// from it. It is quite similar in concept to the
 	/// RunnableAdapter, but provides some NotificationCenter
 	/// specific additional methods.
 	/// See the NotificationCenter class for information on how
@@ -38,7 +38,7 @@ class NObserver: public AbstractObserver
 	///
 	/// This class template is quite similar to the Observer class
 	/// template. The only difference is that the NObserver
-	/// expects the callback function to accept a const AutoPtr& 
+	/// expects the callback function to accept a const AutoPtr&
 	/// instead of a plain pointer as argument, thus simplifying memory
 	/// management.
 {
@@ -46,23 +46,23 @@ public:
 	typedef AutoPtr<N> NotificationPtr;
 	typedef void (C::*Callback)(const NotificationPtr&);
 
-	NObserver(C& object, Callback method): 
-		_pObject(&object), 
+	NObserver(C& object, Callback method):
+		_pObject(&object),
 		_method(method)
 	{
 	}
-	
+
 	NObserver(const NObserver& observer):
 		AbstractObserver(observer),
-		_pObject(observer._pObject), 
+		_pObject(observer._pObject),
 		_method(observer._method)
 	{
 	}
-	
+
 	~NObserver()
 	{
 	}
-	
+
 	NObserver& operator = (const NObserver& observer)
 	{
 		if (&observer != this)
@@ -72,7 +72,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	void notify(Notification* pNf) const
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
@@ -87,27 +87,27 @@ public:
 			}
 		}
 	}
-	
+
 	bool equals(const AbstractObserver& abstractObserver) const
 	{
 		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	bool accepts(Notification* pNf) const
+	bool accepts(Notification* pNf, const char* pName = 0) const
 	{
-		return dynamic_cast<N*>(pNf) != 0;
+		return dynamic_cast<N*>(pNf) && (!pName || pNf->name() == pName);
 	}
-	
+
 	AbstractObserver* clone() const
 	{
 		return new NObserver(*this);
 	}
-	
+
 	void disable()
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
-		
+
 		_pObject = 0;
 	}
 

@@ -36,8 +36,8 @@ void OAuth20CredentialsTest::testAuthorize()
 	OAuth20Credentials creds("s3cr3tt0k3n");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
 	creds.authenticate(request);
-	std::string auth = request.get("Authorization");	
-	assert (auth == "Bearer s3cr3tt0k3n");
+	std::string auth = request.get("Authorization");
+	assertTrue (auth == "Bearer s3cr3tt0k3n");
 }
 
 
@@ -46,8 +46,8 @@ void OAuth20CredentialsTest::testAuthorizeCustomScheme()
 	OAuth20Credentials creds("s3cr3tt0k3n", "token");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
 	creds.authenticate(request);
-	std::string auth = request.get("Authorization");	
-	assert (auth == "token s3cr3tt0k3n");
+	std::string auth = request.get("Authorization");
+	assertTrue (auth == "token s3cr3tt0k3n");
 }
 
 
@@ -56,7 +56,7 @@ void OAuth20CredentialsTest::testExtract()
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
 	request.set("Authorization", "Bearer s3cr3tt0k3n");
 	OAuth20Credentials creds(request);
-	assert (creds.getBearerToken() == "s3cr3tt0k3n");
+	assertTrue (creds.getBearerToken() == "s3cr3tt0k3n");
 }
 
 
@@ -65,7 +65,7 @@ void OAuth20CredentialsTest::testExtractCustomScheme()
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
 	request.set("Authorization", "token s3cr3tt0k3n");
 	OAuth20Credentials creds(request, "token");
-	assert (creds.getBearerToken() == "s3cr3tt0k3n");
+	assertTrue (creds.getBearerToken() == "s3cr3tt0k3n");
 }
 
 

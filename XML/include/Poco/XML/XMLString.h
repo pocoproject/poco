@@ -43,17 +43,17 @@ namespace XML {
 #if defined(XML_UNICODE_WCHAR_T)
 
 	// Unicode - use wchar_t
-	typedef wchar_t      XMLChar;
-	typedef std::wstring XMLString;
+	using XMLChar = wchar_t;
+	using XMLString = std::wstring;
 
 	std::string fromXMLString(const XMLString& str);
 		/// Converts an XMLString into an UTF-8 encoded
 		/// string.
-		
+
 	XMLString toXMLString(const std::string& str);
 		/// Converts an UTF-8 encoded string into an
 		/// XMLString
-		
+
 	#define XML_LIT(lit) L##lit
 
 #elif defined(XML_UNICODE)
@@ -63,8 +63,8 @@ namespace XML {
 #else
 
 	// Characters are UTF-8 encoded
-	typedef char        XMLChar;
-	typedef std::string XMLString;
+	using XMLChar = char;
+	using XMLString = std::string;
 
 	inline const std::string& fromXMLString(const XMLString& str)
 	{
@@ -75,7 +75,7 @@ namespace XML {
 	{
 		return str;
 	}
-	
+
 	#define XML_LIT(lit) lit
 
 #endif

@@ -21,7 +21,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
-	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
+	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest \
 	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
@@ -34,10 +34,11 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	TestPlugin DummyDelegate BasicEventTest FIFOEventTest PriorityEventTest EventTestSuite \
 	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest FormatTest \
 	HashingTestSuite HashTableTest SimpleHashTableTest LinearHashTableTest \
-	HashSetTest HashMapTest SharedMemoryTest \
+	HashSetTest HashMapTest SharedMemoryTest OrderedContainersTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
-	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest
+	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
+	DataURIStreamTest
 
 target         = testrunner
 target_version = 1

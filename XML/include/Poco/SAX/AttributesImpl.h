@@ -28,9 +28,9 @@ namespace XML {
 
 
 class XML_API AttributesImpl: public Attributes
-	/// This class provides a default implementation of the SAX2 Attributes interface, 
+	/// This class provides a default implementation of the SAX2 Attributes interface,
 	/// with the addition of manipulators so that the list can be modified or reused.
-	/// 
+	///
 	/// There are two typical uses of this class:
 	///     1. to take a persistent snapshot of an Attributes object in a startElement event; or
 	///     2. to construct or modify an Attributes object in a SAX2 driver or filter.
@@ -45,22 +45,28 @@ public:
 		XMLString type;
 		bool      specified;
 	};
-	typedef std::vector<Attribute> AttributeVec;
-	typedef AttributeVec::const_iterator iterator;
+	using AttributeVec = std::vector<Attribute>;
+	using iterator = AttributeVec::const_iterator;
 
 	AttributesImpl();
 		/// Creates the AttributesImpl.
-		
+
 	AttributesImpl(const Attributes& attributes);
 		/// Creates the AttributesImpl by copying another one.
 
 	AttributesImpl(const AttributesImpl& attributes);
 		/// Creates the AttributesImpl by copying another one.
 
+	AttributesImpl(AttributesImpl&& attributes) noexcept;
+		/// Creates the AttributesImpl by copying another one.
+
 	~AttributesImpl();
 		/// Destroys the AttributesImpl.
 
 	AttributesImpl& operator = (const AttributesImpl& attributes);
+		/// Assignment operator.
+
+	AttributesImpl& operator = (AttributesImpl&& attributes) noexcept;
 		/// Assignment operator.
 
 	int getIndex(const XMLString& name) const;
@@ -128,7 +134,7 @@ public:
 
 	void clear();
 		/// Removes all attributes.
-		
+
 	void reserve(std::size_t capacity);
 		/// Reserves capacity in the internal vector.
 
@@ -146,17 +152,22 @@ public:
 
 	iterator begin() const;
 		/// Iterator support.
-		
+
 	iterator end() const;
 		/// Iterator support.
 
-protected:	
+protected:
 	Attribute* find(const XMLString& qname) const;
 	Attribute* find(const XMLString& namespaceURI, const XMLString& localName) const;
 
+	struct EmptyAttribute: Attribute
+	{
+		EmptyAttribute();
+	};
+
 private:
 	AttributeVec _attributes;
-	Attribute _empty;
+	static EmptyAttribute _empty;
 };
 
 

@@ -24,7 +24,7 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs>
 class AbstractDelegate
 	/// Base class for Delegate and Expire.
 {
@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractDelegate() 
+	virtual ~AbstractDelegate()
 	{
 	}
 
@@ -54,7 +54,7 @@ public:
 
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
-		
+
 	virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.
@@ -64,7 +64,7 @@ public:
 };
 
 
-template <> 
+template <>
 class AbstractDelegate<void>
 	/// Base class for Delegate and Expire.
 {
@@ -77,7 +77,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractDelegate() 
+	virtual ~AbstractDelegate()
 	{
 	}
 
@@ -94,7 +94,7 @@ public:
 
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
-		
+
 	virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.

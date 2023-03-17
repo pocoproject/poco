@@ -12,10 +12,15 @@
 //
 
 
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+
 #include "Poco/Environment.h"
 #include "Poco/Version.h"
 #include <cstdlib>
-#include <cstdio> // sprintf()
+#include <cstdio> // snprintf()
 
 
 #if defined(POCO_VXWORKS)
@@ -26,7 +31,7 @@
 #if defined(_WIN32_WCE)
 #include "Environment_WINCE.cpp"
 #else
-#include "Environment_WIN32.cpp"
+#include "Environment_WIN32U.cpp"
 #endif
 #endif
 
@@ -96,7 +101,7 @@ std::string Environment::nodeId()
 	NodeId id;
 	nodeId(id);
 	char result[18];
-	std::sprintf(result, "%02x:%02x:%02x:%02x:%02x:%02x",
+	std::snprintf(result, sizeof(result), "%02x:%02x:%02x:%02x:%02x:%02x",
 		id[0],
 		id[1],
 		id[2],

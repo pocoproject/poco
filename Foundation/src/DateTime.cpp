@@ -16,22 +16,10 @@
 #include "Poco/Timespan.h"
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 
 
 namespace Poco {
-
-
-inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
-{
-	double utcDays = double(utcTime)/864000000000.0;
-	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
-}
-
-
-inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
-{
-	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
-}
 
 
 DateTime::DateTime()
@@ -43,6 +31,27 @@ DateTime::DateTime()
 }
 
 
+DateTime::DateTime(const tm& tmStruct):
+	_year(tmStruct.tm_year + 1900),
+	_month(tmStruct.tm_mon + 1),
+	_day(tmStruct.tm_mday),
+	_hour(tmStruct.tm_hour),
+	_minute(tmStruct.tm_min),
+	_second(tmStruct.tm_sec),
+	_millisecond(0),
+	_microsecond(0)
+{
+	poco_assert (_year >= 0 && _year <= 9999);
+	poco_assert (_month >= 1 && _month <= 12);
+	poco_assert (_day >= 1 && _day <= daysOfMonth(_year, _month));
+	poco_assert (_hour >= 0 && _hour <= 23);
+	poco_assert (_minute >= 0 && _minute <= 59);
+	poco_assert (_second >= 0 && _second <= 60);
+
+	_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) + 10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS);
+}
+
+
 DateTime::DateTime(const Timestamp& timestamp):
 	_utcTime(timestamp.utcTime())
 {
@@ -50,7 +59,7 @@ DateTime::DateTime(const Timestamp& timestamp):
 	computeDaytime();
 }
 
-	
+
 DateTime::DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond):
 	_year(year),
 	_month(month),
@@ -69,7 +78,7 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 	poco_assert (second >= 0 && second <= 60); // allow leap seconds
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
-	
+
 	_utcTime = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
 }
 
@@ -125,7 +134,7 @@ DateTime& DateTime::operator = (const DateTime& dateTime)
 	return *this;
 }
 
-	
+
 DateTime& DateTime::operator = (const Timestamp& timestamp)
 {
 	_utcTime = timestamp.utcTime();
@@ -163,12 +172,12 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 	_second      = second;
 	_millisecond = millisecond;
 	_microsecond = microsecond;
-	
+
 	return *this;
 }
 
 
-void DateTime::swap(DateTime& dateTime)
+void DateTime::swap(DateTime& dateTime) noexcept
 {
 	std::swap(_utcTime, dateTime._utcTime);
 	std::swap(_year, dateTime._year);
@@ -203,7 +212,7 @@ int DateTime::daysOfMonth(int year, int month)
 	poco_assert (month >= 1 && month <= 12);
 
 	static int daysOfMonthTable[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	
+
 	if (month == 2 && isLeapYear(year))
 		return 29;
 	else
@@ -234,7 +243,7 @@ int DateTime::week(int firstDayOfWeek) const
 	while (DateTime(_year, 1, baseDay).dayOfWeek() != firstDayOfWeek) ++baseDay;
 
 	int doy  = dayOfYear();
-	int offs = baseDay <= 4 ? 0 : 1; 
+	int offs = baseDay <= 4 ? 0 : 1;
 	if (doy < baseDay)
 		return offs;
 	else
@@ -284,12 +293,34 @@ DateTime& DateTime::operator -= (const Timespan& span)
 }
 
 
+tm DateTime::makeTM() const
+{
+	tm tmStruct;
+
+	tmStruct.tm_sec = _second;
+	tmStruct.tm_min = _minute;
+	tmStruct.tm_hour = _hour;
+	tmStruct.tm_mday = _day;
+	poco_assert (_month > 0);
+	tmStruct.tm_mon = _month - 1;
+	poco_assert (_year >= 1900);
+	tmStruct.tm_year = _year - 1900;
+	tmStruct.tm_wday = dayOfWeek();
+	int doy = dayOfYear();
+	poco_assert (_year >0);
+	tmStruct.tm_yday = doy - 1;
+	tmStruct.tm_isdst = -1;
+
+	return tmStruct;
+}
+
+
 void DateTime::makeUTC(int tzd)
 {
 	operator -= (Timespan(((Timestamp::TimeDiff) tzd)*Timespan::SECONDS));
 }
 
-	
+
 void DateTime::makeLocal(int tzd)
 {
 	operator += (Timespan(((Timestamp::TimeDiff) tzd)*Timespan::SECONDS));
@@ -300,7 +331,7 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 {
 	// lookup table for (153*month - 457)/5 - note that 3 <= month <= 14.
 	static int lookup[] = {-91, -60, -30, 0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337};
- 
+
 	// day to double
 	double dday = double(day) + ((double((hour*60 + minute)*60 + second)*1000 + millisecond)*1000 + microsecond)/86400000000.0;
 	if (month < 3)
@@ -389,7 +420,14 @@ void DateTime::computeGregorian(double julianDay)
 
 void DateTime::computeDaytime()
 {
-	Timespan span(_utcTime/10);
+	Timestamp::UtcTimeVal ut(_utcTime);
+	if (ut < 0) {
+		// GH3723: UtcTimeVal is negative for pre-gregorian dates
+		// move it 1600 years to the future
+		// keeping hour, minute, second,... for corrections
+		ut += Int64(86400)*1000*1000*10*1600*365;
+	}
+	Timespan span(ut/10);
 	int hour = span.hours();
 	// Due to double rounding issues, the previous call to computeGregorian()
 	// may have crossed into the next or previous day. We need to correct that.

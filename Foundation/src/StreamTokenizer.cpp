@@ -32,9 +32,9 @@ StreamTokenizer::StreamTokenizer(std::istream& istr):
 
 StreamTokenizer::~StreamTokenizer()
 {
-	for (TokenVec::iterator it = _tokens.begin(); it != _tokens.end(); ++it)
+	for (auto& t: _tokens)
 	{
-		delete it->pToken;
+		delete t.pToken;
 	}
 }
 
@@ -66,11 +66,11 @@ void StreamTokenizer::addToken(Token* pToken, bool ignore)
 	_tokens.push_back(ti);
 }
 
-	
+
 const Token* StreamTokenizer::next()
 {
 	poco_check_ptr (_pIstr);
-	
+
 	static const int eof = std::char_traits<char>::eof();
 
 	int first = _pIstr->get();
@@ -81,7 +81,7 @@ const Token* StreamTokenizer::next()
 		if (ti.pToken->start((char) first, *_pIstr))
 		{
 			ti.pToken->finish(*_pIstr);
-			if (ti.ignore) 
+			if (ti.ignore)
 			{
 				first = _pIstr->get();
 				it = _tokens.begin();

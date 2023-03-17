@@ -34,7 +34,7 @@ class JSON_API PrintHandler: public Handler
 	/// otherwise, the proper indentation is applied to elements.
 {
 public:
-	typedef SharedPtr<PrintHandler> Ptr;
+	using Ptr = SharedPtr<PrintHandler>;
 
 	static const unsigned JSON_PRINT_FLAT = 0;
 
@@ -78,7 +78,7 @@ public:
 	void value(unsigned v);
 		/// An unsigned value is read. This will only be triggered if the
 		/// value cannot fit into a signed int.
-		
+
 #if defined(POCO_HAVE_INT64)
 	void value(Int64 v);
 		/// A 64-bit integer value is read; it will be written to the output.

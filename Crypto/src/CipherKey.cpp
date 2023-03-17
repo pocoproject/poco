@@ -41,8 +41,37 @@ CipherKey::CipherKey(const std::string& name):
 }
 
 
+CipherKey::CipherKey(const CipherKey& other):
+	_pImpl(other._pImpl)
+{
+}
+
+
+CipherKey::CipherKey(CipherKey&& other) noexcept:
+	_pImpl(std::move(other._pImpl))
+{
+}
+
+
 CipherKey::~CipherKey()
 {
+}
+
+
+CipherKey& CipherKey::operator = (const CipherKey& other)
+{
+	if (&other != this)
+	{
+		_pImpl = other._pImpl;
+	}
+	return *this;
+}
+
+
+CipherKey& CipherKey::operator = (CipherKey&& other) noexcept
+{
+	_pImpl = std::move(other._pImpl);
+	return *this;
 }
 
 

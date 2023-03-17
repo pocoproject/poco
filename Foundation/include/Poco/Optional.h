@@ -32,7 +32,7 @@ class Optional
 	/// that allows to introduce a specified/unspecified state
 	/// to value objects.
 	///
-	/// An Optional can be default constructed. In this case, 
+	/// An Optional can be default constructed. In this case,
 	/// the Optional will have a Null value and isSpecified() will
 	/// return false. Calling value()(without default value) on
 	/// a Null object will throw a NullValueException.
@@ -53,25 +53,40 @@ class Optional
 	/// nillable == true.
 {
 public:
-	Optional(): 
+	Optional():
 		/// Creates an empty Optional.
 		_value(),
 		_isSpecified(false)
 	{
 	}
 
-	Optional(const C& value): 
+	Optional(const C& value):
 		/// Creates a Optional with the given value.
-		_value(value), 
+		_value(value),
 		_isSpecified(true)
 	{
 	}
-	
+
+	Optional(C&& value):
+		/// Creates a Optional by moving the given value.
+		_value(std::forward<C>(value)),
+		_isSpecified(true)
+	{
+	}
+
 	Optional(const Optional& other):
 		/// Creates a Optional by copying another one.
 		_value(other._value),
 		_isSpecified(other._isSpecified)
 	{
+	}
+
+	Optional(Optional&& other) noexcept:
+		/// Creates a Optional by moving another one.
+		_value(std::move(other._value)),
+		_isSpecified(other._isSpecified)
+	{
+		other._isSpecified = false;
 	}
 
 	~Optional()
@@ -82,11 +97,19 @@ public:
 	Optional& assign(const C& value)
 		/// Assigns a value to the Optional.
 	{
-		_value  = value;
+		_value = value;
 		_isSpecified = true;
 		return *this;
 	}
-	
+
+	Optional& assign(C&& value)
+		/// Moves a value into the Optional.
+	{
+		_value = std::move(value);
+		_isSpecified = true;
+		return *this;
+	}
+
 	Optional& assign(const Optional& other)
 		/// Assigns another Optional.
 	{
@@ -94,10 +117,15 @@ public:
 		swap(tmp);
 		return *this;
 	}
-	
+
 	Optional& operator = (const C& value)
 	{
 		return assign(value);
+	}
+
+	Optional& operator = (C&& value)
+	{
+		return assign(std::move(value));
 	}
 
 	Optional& operator = (const Optional& other)
@@ -105,7 +133,15 @@ public:
 		return assign(other);
 	}
 
-	void swap(Optional& other)
+	Optional& operator = (Optional&& other) noexcept
+	{
+		_value = std::move(other._value);
+		_isSpecified = other._isSpecified;
+		other._isSpecified = false;
+		return *this;
+	}
+
+	void swap(Optional& other) noexcept
 	{
 		std::swap(_value, other._value);
 		std::swap(_isSpecified, other._isSpecified);
@@ -124,7 +160,7 @@ public:
 
 	const C& value(const C& deflt) const
 		/// Returns the Optional's value, or the
-		/// given default value if the Optional's 
+		/// given default value if the Optional's
 		/// value has not been specified.
 	{
 		return _isSpecified ? _value : deflt;
@@ -135,7 +171,7 @@ public:
 	{
 		return _isSpecified;
 	}
-	
+
 	void clear()
 		/// Clears the Optional.
 	{
@@ -149,7 +185,7 @@ private:
 
 
 template <typename C>
-inline void swap(Optional<C>& n1, Optional<C>& n2)
+inline void swap(Optional<C>& n1, Optional<C>& n2) noexcept
 {
 	n1.swap(n2);
 }

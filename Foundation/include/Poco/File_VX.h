@@ -27,6 +27,11 @@ namespace Poco {
 class FileImpl
 {
 protected:
+
+	enum Options {
+		OPT_FAIL_ON_OVERWRITE_IMPL = 0x01
+	};
+
 	typedef UInt64 FileSizeImpl;
 
 	FileImpl();
@@ -51,8 +56,8 @@ protected:
 	void setSizeImpl(FileSizeImpl size);
 	void setWriteableImpl(bool flag = true);
 	void setExecutableImpl(bool flag = true);
-	void copyToImpl(const std::string& path) const;
-	void renameToImpl(const std::string& path);
+	void copyToImpl(const std::string& path, int options = 0) const;
+	void renameToImpl(const std::string& path, int options = 0);
 	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
 	bool createFileImpl();

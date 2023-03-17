@@ -32,7 +32,7 @@ namespace Impl {
 class Net_API SocketAddressImpl : public Poco::RefCountedObject
 {
 public:
-	typedef AddressFamily::Family Family;
+	using Family = AddressFamily::Family;
 
 	virtual ~SocketAddressImpl();
 

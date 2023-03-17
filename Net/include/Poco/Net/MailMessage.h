@@ -22,7 +22,9 @@
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/PartStore.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Timestamp.h"
+#include <sstream>
 #include <vector>
 
 
@@ -34,6 +36,7 @@ class MediaType;
 class PartSource;
 class PartHandler;
 class MultipartWriter;
+class MultipartSource;
 
 
 class Net_API MailMessage: public MessageHeader
@@ -49,7 +52,7 @@ class Net_API MailMessage: public MessageHeader
 	/// and base64.
 {
 public:
-	typedef std::vector<MailRecipient> Recipients;
+	using Recipients = std::vector<MailRecipient>;
 
 	enum ContentDisposition
 	{
@@ -73,7 +76,7 @@ public:
 		ContentTransferEncoding encoding;
 	};
 
-	typedef std::vector<Part> PartVec;
+	using PartVec = std::vector<Part>;
 
 	MailMessage(PartStoreFactory* pStoreFactory = 0);
 		/// Creates an empty MailMessage.
@@ -263,8 +266,8 @@ protected:
 	void makeMultipart();
 	void writeHeader(const MessageHeader& header, std::ostream& ostr) const;
 	void writeMultipart(MessageHeader& header, std::ostream& ostr) const;
-	void writePart(MultipartWriter& writer, const Part& part) const;
-	void writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding) const;
+	static void writePart(MultipartWriter& writer, const Part& part);
+	static void writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding);
 	void setRecipientHeaders(MessageHeader& headers) const;
 	void readHeader(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
@@ -284,6 +287,47 @@ private:
 	ContentTransferEncoding _encoding;
 	mutable std::string     _boundary;
 	PartStoreFactory*       _pStoreFactory;
+
+	friend class MultipartSource;
+};
+
+
+class Net_API MultipartSource: public PartSource
+	/// This is a PartSource for constructing complex
+	/// mail messages consisting of multiple nested parts.
+{
+public:
+	explicit MultipartSource(const std::string contentType = "multipart/alternative");
+		/// Creates an empty MultipartSource.
+		///
+		/// At least one part must be added with addPart().
+
+	~MultipartSource();
+		/// Destroys the MultipartSource.
+
+	void addPart(const std::string& name,
+		PartSource* pSource,
+		MailMessage::ContentDisposition disposition,
+		MailMessage::ContentTransferEncoding encoding);
+		/// Adds a part/attachment to the MultipartSource.
+		///
+		/// The MultipartSource takes ownership of the PartSource and deletes it
+		/// when it is no longer needed.
+		///
+		/// The part name, and the filename specified in the part source
+		/// must not contain any non-ASCII characters.
+		/// To include non-ASCII characters in the part name or filename,
+		/// use RFC 2047 word encoding (see encodeWord()).
+
+	// PartSource
+	std::istream& stream();
+
+protected:
+	static std::string contentTypeWithBoundary(const std::string& contentType);
+
+private:
+	std::vector<MailMessage::Part> _parts;
+	std::stringstream _content;
 };
 
 

@@ -30,6 +30,7 @@ public:
 	void testString();
 	void testMultiple();
 	void testIndex();
+	void testAny();
 
 	void setUp();
 	void tearDown();

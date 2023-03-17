@@ -6,7 +6,6 @@
 #ifndef CppUnit_CppUnit_INCLUDED
 #define CppUnit_CppUnit_INCLUDED
 
-
 //
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
 //
@@ -42,6 +41,38 @@
 	#endif
 #endif
 
+//
+// Automatically link Data library.
+//
+#if defined(_MSC_VER)
+	#if defined(POCO_DLL)
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "d.lib"
+		#else
+			#define POCO_LIB_SUFFIX ".lib"
+		#endif
+	#elif defined(_DLL)
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "mdd.lib"
+		#else
+			#define POCO_LIB_SUFFIX "md.lib"
+		#endif
+	#else
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "mtd.lib"
+		#else
+			#define POCO_LIB_SUFFIX "mt.lib"
+		#endif
+	#endif
+#endif
+
+
+#if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
+	#if !defined(CppUnit_EXPORTS)
+		#pragma comment(lib, "CppUnit" POCO_LIB_SUFFIX)
+	#endif
+#endif
+
 
 // Turn off some annoying warnings
 #ifdef _MSC_VER
@@ -49,8 +80,8 @@
 	#pragma warning(disable:4503)  // decorated name length exceeded - mainly a problem with STLPort
 	#pragma warning(disable:4018)  // signed/unsigned comparison
 	#pragma warning(disable:4284)  // return type for operator -> is not UDT
-	#pragma warning(disable:4251)  // ... needs to have dll-interface warning 
-	#pragma warning(disable:4273) 
+	#pragma warning(disable:4251)  // ... needs to have dll-interface warning
+	#pragma warning(disable:4273)
 	#pragma warning(disable:4275)  // ... non dll-interface class used as base for dll-interface class
 #endif
 

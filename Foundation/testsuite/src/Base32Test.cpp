@@ -39,35 +39,35 @@ void Base32Test::testEncoder()
 		Base32Encoder encoder(str);
 		encoder << std::string("\00\01\02\03\04\05", 6);
 		encoder.close();
-		assert (str.str() == "AAAQEAYEAU======");
+		assertTrue (str.str() == "AAAQEAYEAU======");
 	}
 	{
 		std::ostringstream str;
 		Base32Encoder encoder(str);
 		encoder << std::string("\00\01\02\03", 4);
 		encoder.close();
-		assert (str.str() == "AAAQEAY=");
+		assertTrue (str.str() == "AAAQEAY=");
 	}
 	{
 		std::ostringstream str;
 		Base32Encoder encoder(str, false);
 		encoder << "ABCDEF";
 		encoder.close();
-		assert (str.str() == "IFBEGRCFIY");
+		assertTrue (str.str() == "IFBEGRCFIY");
 	}
 	{
 		std::ostringstream str;
 		Base32Encoder encoder(str);
 		encoder << "ABCDEF";
 		encoder.close();
-		assert (str.str() == "IFBEGRCFIY======");
+		assertTrue (str.str() == "IFBEGRCFIY======");
 	}
 	{
 		std::ostringstream str;
 		Base32Encoder encoder(str);
 		encoder << "ABCDE";
 		encoder.close();
-		assert (str.str() == "IFBEGRCF");
+		assertTrue (str.str() == "IFBEGRCF");
 	}
 }
 
@@ -77,41 +77,41 @@ void Base32Test::testDecoder()
 	{
 		std::istringstream istr("AAAQEAYEAU======");
 		Base32Decoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0);
-		assert (decoder.good() && decoder.get() == 1);
-		assert (decoder.good() && decoder.get() == 2);
-		assert (decoder.good() && decoder.get() == 3);
-		assert (decoder.good() && decoder.get() == 4);
-		assert (decoder.good() && decoder.get() == 5);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0);
+		assertTrue (decoder.good() && decoder.get() == 1);
+		assertTrue (decoder.good() && decoder.get() == 2);
+		assertTrue (decoder.good() && decoder.get() == 3);
+		assertTrue (decoder.good() && decoder.get() == 4);
+		assertTrue (decoder.good() && decoder.get() == 5);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("AAAQEAYE");
 		Base32Decoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0);
-		assert (decoder.good() && decoder.get() == 1);
-		assert (decoder.good() && decoder.get() == 2);
-		assert (decoder.good() && decoder.get() == 3);
-		assert (decoder.good() && decoder.get() == 4);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0);
+		assertTrue (decoder.good() && decoder.get() == 1);
+		assertTrue (decoder.good() && decoder.get() == 2);
+		assertTrue (decoder.good() && decoder.get() == 3);
+		assertTrue (decoder.good() && decoder.get() == 4);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("AAAQEAY=");
 		Base32Decoder decoder(istr);
-		assert (decoder.good() && decoder.get() == 0);
-		assert (decoder.good() && decoder.get() == 1);
-		assert (decoder.good() && decoder.get() == 2);
-		assert (decoder.good() && decoder.get() == 3);
-		assert (decoder.good() && decoder.get() == -1);
+		assertTrue (decoder.good() && decoder.get() == 0);
+		assertTrue (decoder.good() && decoder.get() == 1);
+		assertTrue (decoder.good() && decoder.get() == 2);
+		assertTrue (decoder.good() && decoder.get() == 3);
+		assertTrue (decoder.good() && decoder.get() == -1);
 	}
 	{
 		std::istringstream istr("IFBEGRCFIY======");
 		Base32Decoder decoder(istr);
 		std::string s;
 		decoder >> s;
-		assert (s == "ABCDEF");
-		assert (decoder.eof());
-		assert (!decoder.fail());
+		assertTrue (s == "ABCDEF");
+		assertTrue (decoder.eof());
+		assertTrue (!decoder.fail());
 	}
 	{
 		std::istringstream istr("QUJD#REVG");
@@ -120,12 +120,12 @@ void Base32Test::testDecoder()
 		try
 		{
 			decoder >> s;
-			assert (decoder.bad());
+			assertTrue (decoder.bad());
 		}
 		catch (DataFormatException&)
 		{
 		}
-		assert (!decoder.eof());
+		assertTrue (!decoder.eof());
 	}
 }
 
@@ -142,7 +142,7 @@ void Base32Test::testEncodeDecode()
 		std::string s;
 		int c = decoder.get();
 		while (c != -1) { s += char(c); c = decoder.get(); }
-		assert (s == "The quick brown fox jumped over the lazy dog.");
+		assertTrue (s == "The quick brown fox jumped over the lazy dog.");
 	}
 	{
 		std::string src;
@@ -155,7 +155,7 @@ void Base32Test::testEncodeDecode()
 		std::string s;
 		int c = decoder.get();
 		while (c != -1) { s += char(c); c = decoder.get(); }
-		assert (s == src);
+		assertTrue (s == src);
 	}
 }
 

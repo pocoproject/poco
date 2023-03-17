@@ -33,7 +33,7 @@ namespace
 	public:
 		void run()
 		{
-		
+
 			testMutex.lock();
 			_timestamp.update();
 			testMutex.unlock();
@@ -54,7 +54,7 @@ namespace
 		TestTryLock(): _locked(false)
 		{
 		}
-		
+
 		void run()
 		{
 			if (testMutex.tryLock())
@@ -87,7 +87,7 @@ NamedMutexTest::~NamedMutexTest()
 
 void NamedMutexTest::testLock()
 {
-	try 
+	try
 	{
 		testMutex.lock();
 		Thread thr;
@@ -97,9 +97,9 @@ void NamedMutexTest::testLock()
 		Thread::sleep(2000);
 		testMutex.unlock();
 		thr.join();
-		assert (tl.timestamp() > now);
+		assertTrue (tl.timestamp() > now);
 	}
-	catch(Poco::NotImplementedException e)
+	catch(Poco::NotImplementedException& e)
 	{
 #if POCO_OS != POCO_OS_ANDROID
 		throw e;
@@ -115,9 +115,9 @@ void NamedMutexTest::testTryLock()
 	thr1.start(ttl1);
 	thr1.join();
 #if POCO_OS != POCO_OS_ANDROID
-	assert (ttl1.locked());
+	assertTrue (ttl1.locked());
 #endif
-	try 
+	try
 	{
 		testMutex.lock();
 		Thread thr2;
@@ -125,9 +125,9 @@ void NamedMutexTest::testTryLock()
 		thr2.start(ttl2);
 		thr2.join();
 		testMutex.unlock();
-		assert (!ttl2.locked());
+		assertTrue (!ttl2.locked());
 	}
-	catch(Poco::NotImplementedException e)
+	catch(Poco::NotImplementedException& e)
 	{
 #if POCO_OS != POCO_OS_ANDROID
 		throw e;

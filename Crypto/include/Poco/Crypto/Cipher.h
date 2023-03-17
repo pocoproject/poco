@@ -19,6 +19,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <istream>
@@ -28,9 +29,6 @@
 
 namespace Poco {
 namespace Crypto {
-
-
-class CryptoTransform;
 
 
 class Crypto_API Cipher: public Poco::RefCountedObject
@@ -75,17 +73,17 @@ class Crypto_API Cipher: public Poco::RefCountedObject
 	///     // and write pass it to the underlying file stream.
 	///     Poco::FileOutputStream sink("encrypted.dat");
 	///     CryptoOutputStream encryptor(sink, pCipher->createEncryptor());
-	///     
+	///
 	///     Poco::FileInputStream source("source.txt");
 	///     Poco::StreamCopier::copyStream(source, encryptor);
-	///     
+	///
 	///     // Always close output streams to flush all internal buffers
 	///     encryptor.close();
 	///     sink.close();
 {
 public:
-	typedef Poco::AutoPtr<Cipher> Ptr;
-	typedef std::vector<unsigned char> ByteVec;
+	using Ptr = Poco::AutoPtr<Cipher>;
+	using ByteVec = std::vector<unsigned char>;
 
 	enum Encoding
 		/// Transport encoding to use for encryptString() and decryptString().
@@ -95,7 +93,6 @@ public:
 		ENC_BINHEX       = 0x02, /// BinHex-encoded output
 		ENC_BASE64_NO_LF = 0x81, /// Base64-encoded output, no linefeeds
 		ENC_BINHEX_NO_LF = 0x82  /// BinHex-encoded output, no linefeeds
-		
 	};
 
 	virtual ~Cipher();
@@ -104,22 +101,22 @@ public:
 	virtual const std::string& name() const = 0;
 		/// Returns the name of the Cipher.
 
-	virtual CryptoTransform* createEncryptor() = 0;
+	virtual CryptoTransform::Ptr createEncryptor() = 0;
 		/// Creates an encryptor object to be used with a CryptoStream.
 
-	virtual CryptoTransform* createDecryptor() = 0;
+	virtual CryptoTransform::Ptr createDecryptor() = 0;
 		/// Creates a decryptor object to be used with a CryptoStream.
 
-	virtual std::string encryptString(const std::string& str, Encoding encoding = ENC_NONE);
+	virtual std::string encryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly encrypt a string and encode it using the given encoding.
 
-	virtual std::string decryptString(const std::string& str, Encoding encoding = ENC_NONE);
+	virtual std::string decryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly decrypt a string that is encoded with the given encoding.
 
-	virtual void encrypt(std::istream& source, std::ostream& sink, Encoding encoding = ENC_NONE);
+	virtual void encrypt(std::istream& source, std::ostream& sink, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly encrypts an input stream and encodes it using the given encoding.
 
-	virtual void decrypt(std::istream& source, std::ostream& sink, Encoding encoding = ENC_NONE);
+	virtual void decrypt(std::istream& source, std::ostream& sink, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly decrypt an input stream that is encoded with the given encoding.
 
 protected:

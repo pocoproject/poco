@@ -30,9 +30,9 @@ namespace Crypto {
 
 
 class RSACipherImpl: public Cipher
-	/// An implementation of the Cipher class for 
+	/// An implementation of the Cipher class for
 	/// asymmetric (public-private key) encryption
-	/// based on the the RSA algorithm in OpenSSL's 
+	/// based on the the RSA algorithm in OpenSSL's
 	/// crypto library.
 	///
 	/// Encryption is using the public key, decryption
@@ -48,11 +48,11 @@ public:
 
 	const std::string& name() const;
 		/// Returns the name of the Cipher.
-	
-	CryptoTransform* createEncryptor();
+
+	CryptoTransform::Ptr createEncryptor();
 		/// Creates an encryptor object.
 
-	CryptoTransform* createDecryptor();
+	CryptoTransform::Ptr createDecryptor();
 		/// Creates a decryptor object.
 
 private:

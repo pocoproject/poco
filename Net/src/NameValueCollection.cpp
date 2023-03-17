@@ -35,6 +35,12 @@ NameValueCollection::NameValueCollection(const NameValueCollection& nvc):
 }
 
 
+NameValueCollection::NameValueCollection(NameValueCollection&& nvc) noexcept:
+	_map(std::move(nvc._map))
+{
+}
+
+
 NameValueCollection::~NameValueCollection()
 {
 }
@@ -42,20 +48,27 @@ NameValueCollection::~NameValueCollection()
 
 NameValueCollection& NameValueCollection::operator = (const NameValueCollection& nvc)
 {
-	if (&nvc != this)
-	{
-		_map = nvc._map;
-	}
+	NameValueCollection tmp(nvc);
+	swap(tmp);
+
 	return *this;
 }
 
 
-void NameValueCollection::swap(NameValueCollection& nvc)
+NameValueCollection& NameValueCollection::operator = (NameValueCollection&& nvc) noexcept
+{
+	_map = std::move(nvc._map);
+
+	return *this;
+}
+
+
+void NameValueCollection::swap(NameValueCollection& nvc) noexcept
 {
 	std::swap(_map, nvc._map);
 }
 
-	
+
 const std::string& NameValueCollection::operator [] (const std::string& name) const
 {
 	ConstIterator it = _map.find(name);
@@ -65,8 +78,8 @@ const std::string& NameValueCollection::operator [] (const std::string& name) co
 		throw NotFoundException(name);
 }
 
-	
-void NameValueCollection::set(const std::string& name, const std::string& value)	
+
+void NameValueCollection::set(const std::string& name, const std::string& value)
 {
 	Iterator it = _map.find(name);
 	if (it != _map.end())
@@ -75,13 +88,13 @@ void NameValueCollection::set(const std::string& name, const std::string& value)
 		_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 void NameValueCollection::add(const std::string& name, const std::string& value)
 {
 	_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 const std::string& NameValueCollection::get(const std::string& name) const
 {
 	ConstIterator it = _map.find(name);
@@ -113,19 +126,19 @@ NameValueCollection::ConstIterator NameValueCollection::find(const std::string& 
 	return _map.find(name);
 }
 
-	
+
 NameValueCollection::ConstIterator NameValueCollection::begin() const
 {
 	return _map.begin();
 }
 
-	
+
 NameValueCollection::ConstIterator NameValueCollection::end() const
 {
 	return _map.end();
 }
 
-	
+
 bool NameValueCollection::empty() const
 {
 	return _map.empty();

@@ -30,7 +30,7 @@ public:
 	void testConstIterator();
 	void testPerformanceInt();
 	void testPerformanceStr();
-	
+
 	void setUp();
 	void tearDown();
 

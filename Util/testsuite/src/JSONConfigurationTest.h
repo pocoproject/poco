@@ -26,6 +26,7 @@ public:
 
 	void testLoad();
 	void testSetArrayElement();
+	void testConfigurationView();
 
 	void setUp();
 	void tearDown();
@@ -33,7 +34,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
 };
 
 

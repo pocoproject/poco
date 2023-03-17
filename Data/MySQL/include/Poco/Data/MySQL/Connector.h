@@ -31,12 +31,11 @@ class MySQL_API Connector: public Poco::Data::Connector
 	/// Connector instantiates MySQL SessionImpl objects.
 {
 public:
-
 	static std::string KEY;
 
 	Connector();
 		/// Creates the Connector.
-	
+
 	virtual ~Connector();
 		/// Destroys the Connector.
 

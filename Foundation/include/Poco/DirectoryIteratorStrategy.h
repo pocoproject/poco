@@ -31,21 +31,21 @@ namespace Poco {
 class Foundation_API TraverseBase
 {
 public:
-	typedef std::stack<DirectoryIterator> Stack;
-	typedef std::pointer_to_unary_function<const Stack&, UInt16> DepthFunPtr;
+	using Stack = std::stack<DirectoryIterator>;
+	using DepthFun = std::function<UInt16(const Stack&)>;
 
 	enum
 	{
 		D_INFINITE = 0 /// Special value for infinite traverse depth.
 	};
 
-	TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
+	TraverseBase(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
 protected:
 	bool isFiniteDepth();
 	bool isDirectory(Poco::File& file);
 
-	DepthFunPtr _depthDeterminer;
+	DepthFun _depthDeterminer;
 	UInt16 _maxDepth;
 	DirectoryIterator _itEnd;
 
@@ -59,7 +59,7 @@ private:
 class Foundation_API ChildrenFirstTraverse: public TraverseBase
 {
 public:
-	ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
+	ChildrenFirstTraverse(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
 	const std::string next(Stack* itStack, bool* isFinished);
 
@@ -73,7 +73,7 @@ private:
 class Foundation_API SiblingsFirstTraverse: public TraverseBase
 {
 public:
-	SiblingsFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
+	SiblingsFirstTraverse(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
 	const std::string next(Stack* itStack, bool* isFinished);
 
@@ -82,7 +82,7 @@ private:
 	SiblingsFirstTraverse(const SiblingsFirstTraverse&);
 	SiblingsFirstTraverse& operator=(const SiblingsFirstTraverse&);
 
-	std::stack<std::queue<std::string> > _dirsStack;
+	std::stack<std::queue<std::string>> _dirsStack;
 };
 
 

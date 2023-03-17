@@ -56,7 +56,7 @@ void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 void Binder::bind(std::size_t pos, const long &val, Direction dir)
 {
 	long tmp = static_cast<long>(val);
@@ -108,6 +108,13 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 {
 	std::string dt(DateTimeFormatter::format(val, DateTimeFormat::ISO8601_FORMAT));
 	bind(pos, dt, dir);
+}
+
+
+void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
+{
+	std::string str(val.toString());
+	bind(pos, str, dir);
 }
 
 

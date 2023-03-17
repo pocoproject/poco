@@ -51,12 +51,12 @@ Template::Ptr TemplateCache::getTemplate(const Path& path)
 
 	Path templatePath = resolvePath(path);
 	std::string templatePathname = templatePath.toString();
-	
+
 	if (_pLogger)
 	{
 		poco_trace_f1(*_pLogger, "Path resolved to %s", templatePathname);
 	}
-	
+
 	File templateFile(templatePathname);
 
 	Template::Ptr tpl;
@@ -131,9 +131,9 @@ Path TemplateCache::resolvePath(const Path& path) const
 	if (path.isAbsolute())
 		return path;
 
-	for (std::vector<Path>::const_iterator it = _includePaths.begin(); it != _includePaths.end(); ++it)
+	for (const auto& p: _includePaths)
 	{
-		Path templatePath(*it, path);
+		Path templatePath(p, path);
 
 		File templateFile(templatePath);
 		if (templateFile.exists())

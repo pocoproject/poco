@@ -367,10 +367,10 @@ void XMLStreamParser::popElement()
 	{
 		// Find the first unhandled attribute and report it.
 		//
-		for (AttributeMapType::const_iterator i(e.attributeMap.begin()); i != e.attributeMap.end(); ++i)
+		for (const auto& p: e.attributeMap)
 		{
-			if (!i->second.handled)
-				throw XMLStreamParserException(*this, "unexpected attribute '" + i->first.toString() + "'");
+			if (!p.second.handled)
+				throw XMLStreamParserException(*this, "unexpected attribute '" + p.first.toString() + "'");
 		}
 		poco_assert(false);
 	}
@@ -755,7 +755,7 @@ void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, 
 		ElementEntry* pe(0);
 		if (am)
 		{
-			p._elementState.push_back(ElementEntry(p._depth + 1));
+			p._elementState.emplace_back(p._depth + 1);
 			pe = &p._elementState.back();
 		}
 
@@ -774,7 +774,7 @@ void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, 
 				}
 				else
 				{
-					p._attributes.push_back(AttributeType());
+					p._attributes.emplace_back();
 					splitName(*atts, p._attributes.back().qname);
 					p._attributes.back().value = *(atts + 1);
 				}
@@ -912,7 +912,7 @@ void XMLCALL XMLStreamParser::handleStartNamespaceDecl(void* v, const XML_Char* 
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	p._startNamespace.push_back(QName());
+	p._startNamespace.emplace_back();
 	p._startNamespace.back().prefix() = (prefix != 0 ? prefix : "");
 	p._startNamespace.back().namespaceURI() = (ns != 0 ? ns : "");
 }
@@ -931,7 +931,7 @@ void XMLCALL XMLStreamParser::handleEndNamespaceDecl(void* v, const XML_Char* pr
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	p._endNamespace.push_back(QName());
+	p._endNamespace.emplace_back();
 	p._endNamespace.back().prefix() = (prefix != 0 ? prefix : "");
 }
 

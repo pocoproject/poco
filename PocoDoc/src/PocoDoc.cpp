@@ -144,20 +144,27 @@ protected:
 		Application::defineOptions(options);
 
 		options.addOption(
-			Option("help", "h", "display help information on command line arguments")
+			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleHelp)));
 
 		options.addOption(
-			Option("config-file", "f", "load configuration data from a file")
+			Option("config", "f", "Load configuration data from a file.")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleConfig)));
 
 		options.addOption(
-			Option("eclipse", "e", "write Eclipse TOC file")
+			Option("define", "D", "Define a configuration property.")
+				.required(false)
+				.repeatable(true)
+				.argument("name=value")
+				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleDefine)));
+
+		options.addOption(
+			Option("eclipse", "e", "Write Eclipse TOC file.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleEclipse)));
@@ -168,6 +175,25 @@ protected:
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
+	}
+
+	void handleDefine(const std::string& name, const std::string& value)
+	{
+		defineProperty(value);
+	}
+
+	void defineProperty(const std::string& def)
+	{
+		std::string name;
+		std::string value;
+		std::string::size_type pos = def.find('=');
+		if (pos != std::string::npos)
+		{
+			name.assign(def, 0, pos);
+			value.assign(def, pos + 1, def.length() - pos);
+		}
+		else name = def;
+		config().setString(name, value);
 	}
 
 	void handleEclipse(const std::string& name, const std::string& value)
@@ -185,7 +211,7 @@ protected:
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Applied Informatics' super duper documentation builder.");
+		helpFormatter.setHeader("POCO C++ Libraries documentation builder.");
 		helpFormatter.format(std::cout);
 	}
 
@@ -269,11 +295,7 @@ protected:
 	void parse(const std::string& file)
 	{
 		logger().information("Preprocessing " + file);
-#ifndef POCO_ENABLE_CPP11
-		std::auto_ptr<Preprocessor> pPreProc(preprocess(file));
-#else
 		std::unique_ptr<Preprocessor> pPreProc(preprocess(file));
-#endif // POCO_ENABLE_CPP11
 		logger().information("Parsing " + file);
 		if (pPreProc->stream().good())
 		{
@@ -297,6 +319,11 @@ protected:
 			catch (Exception& exc)
 			{
 				logger().log(exc);
+				++errors;
+			}
+			catch (std::exception& exc)
+			{
+				logger().error(std::string(exc.what()));
 				++errors;
 			}
 		}
@@ -435,6 +462,9 @@ protected:
 			config().setString("PocoDoc.date", Poco::DateTimeFormatter::format(now, "%Y-%m-%d"));
 			config().setString("PocoDoc.year", Poco::DateTimeFormatter::format(now, "%Y"));
 			config().setString("PocoDoc.googleAnalyticsCode", generateGoogleAnalyticsCode());
+			config().setString("PocoDoc.hubSpotCode", generateHubSpotCode());
+			if (!config().has("PocoDoc.customHeadHTML")) config().setString("PocoDoc.customHeadHTML", "");
+			if (!config().has("PocoDoc.customBodyHTML")) config().setString("PocoDoc.customBodyHTML", "");
 			Poco::Stopwatch sw;
 			int errors = 0;
 			try
@@ -462,17 +492,27 @@ protected:
 		std::string googleAnalyticsId(config().getString("PocoDoc.googleAnalyticsId", ""));
 		if (!googleAnalyticsId.empty())
 		{
-			ostr << "<!-- Begin Google Analytics -->\n";
-			ostr << "<script type=\"text/javascript\">\n";
-			ostr << "var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");\n";
-			ostr << "document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));\n";
+			ostr << "<script>\n";
+			ostr << "  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n";
+			ostr << "  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n";
+			ostr << "  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n";
+			ostr << "  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n";
+			ostr << "\n";
+			ostr << "  ga('create', '" << googleAnalyticsId << "', 'auto');\n";
+			ostr << "  ga('set', 'anonymizeIp', true);\n";
+			ostr << "  ga('send', 'pageview');\n";
 			ostr << "</script>\n";
-			ostr << "<script type=\"text/javascript\">\n";
-			ostr << "try {\n";
-			ostr << "var pageTracker = _gat._getTracker(\"" << googleAnalyticsId << "\");\n";
-			ostr << "pageTracker._trackPageview();\n";
-			ostr << "} catch(err) {}</script>\n";
-			ostr << "<!-- End Google Analytics -->\n";
+		}
+		return ostr.str();
+	}
+
+	std::string generateHubSpotCode()
+	{
+		std::stringstream ostr;
+		std::string hubSpotId(config().getString("PocoDoc.hubSpotId", ""));
+		if (!hubSpotId.empty())
+		{
+			ostr << "<script type=\"text/javascript\" id=\"hs-script-loader\" async defer src=\"//js.hs-scripts.com/" << hubSpotId << ".js\"></script>\n";
 		}
 		return ostr.str();
 	}

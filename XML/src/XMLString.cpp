@@ -31,11 +31,11 @@ std::string fromXMLString(const XMLString& str)
 {
 	std::string result;
 	result.reserve(str.size());
-	
-	for (XMLString::const_iterator it = str.begin(); it != str.end(); ++it)
+
+	for (auto xc: str)
 	{
 		char c;
-		wctomb(&c, *it);
+		wctomb(&c, xc);
 		result += c;
 	}
 	return result;
@@ -46,7 +46,7 @@ XMLString toXMLString(const std::string& str)
 {
 	XMLString result;
 	result.reserve(str.size());
-	
+
 	for (std::string::const_iterator it = str.begin(); it != str.end();)
 	{
 		wchar_t c;

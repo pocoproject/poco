@@ -20,6 +20,8 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Channel.h"
+#include "Poco/Formatter.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -34,33 +36,35 @@ class Foundation_API FormattingChannel: public Channel
 	/// to the destination channel.
 {
 public:
+	using Ptr = AutoPtr<FormattingChannel>;
+
 	FormattingChannel();
 		/// Creates a FormattingChannel.
-		
-	FormattingChannel(Formatter* pFormatter);
+
+	FormattingChannel(Formatter::Ptr pFormatter);
 		/// Creates a FormattingChannel and attaches a Formatter.
-		
-	FormattingChannel(Formatter* pFormatter, Channel* pChannel);
+
+	FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel);
 		/// Creates a FormattingChannel and attaches a Formatter
 		/// and a Channel.
-		
-	void setFormatter(Formatter* pFormatter);
+
+	void setFormatter(Formatter::Ptr pFormatter);
 		/// Sets the Formatter used to format the messages
 		/// before they are passed on. If null, the message
 		/// is passed on unmodified.
-		
-	Formatter* getFormatter() const;
+
+	Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
 		/// which may be null.
 
-	void setChannel(Channel* pChannel);
-		/// Sets the destination channel to which the formatted 
+	void setChannel(Channel::Ptr pChannel);
+		/// Sets the destination channel to which the formatted
 		/// messages are passed on.
-		
-	Channel* getChannel() const;
+
+	Channel::Ptr getChannel() const;
 		/// Returns the channel to which the formatted
 		/// messages are passed on.
-		
+
 	void log(const Message& msg);
 		/// Formats the given Message using the Formatter and
 		/// passes the formatted message on to the destination
@@ -77,7 +81,7 @@ public:
 
 	void open();
 		/// Opens the attached channel.
-		
+
 	void close();
 		/// Closes the attached channel.
 
@@ -85,8 +89,8 @@ protected:
 	~FormattingChannel();
 
 private:
-	Formatter* _pFormatter;
-	Channel* _pChannel;
+	Formatter::Ptr _pFormatter;
+	Channel::Ptr   _pChannel;
 };
 
 

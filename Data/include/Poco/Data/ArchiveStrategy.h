@@ -36,9 +36,9 @@ class Data_API ArchiveStrategy
 public:
 	static const std::string DEFAULT_ARCHIVE_DESTINATION;
 
-	ArchiveStrategy(const std::string& connector, 
-		const std::string& connect, 
-		const std::string& source, 
+	ArchiveStrategy(const std::string& connector,
+		const std::string& connect,
+		const std::string& source,
 		const std::string& destination = DEFAULT_ARCHIVE_DESTINATION);
 		/// Creates archive strategy.
 
@@ -70,8 +70,8 @@ public:
 		/// Sets the archive threshold.
 
 protected:
-	typedef Poco::SharedPtr<Session>   SessionPtr;
-	typedef Poco::SharedPtr<Statement> StatementPtr;
+	using SessionPtr = Poco::SharedPtr<Session>;
+	using StatementPtr = Poco::SharedPtr<Statement>;
 
 	Session& session();
 
@@ -83,7 +83,7 @@ protected:
 	Statement& getDeleteStatement();
 	Statement& getCountStatement();
 private:
-	
+
 	ArchiveStrategy();
 	ArchiveStrategy(const ArchiveStrategy&);
 	ArchiveStrategy& operator = (const ArchiveStrategy&);
@@ -177,11 +177,11 @@ class Data_API ArchiveByAgeStrategy: public ArchiveStrategy
 	/// Archives rows scheduled for archiving.
 {
 public:
-	ArchiveByAgeStrategy(const std::string& connector, 
-		const std::string& connect, 
-		const std::string& sourceTable, 
+	ArchiveByAgeStrategy(const std::string& connector,
+		const std::string& connect,
+		const std::string& sourceTable,
 		const std::string& destinationTable = DEFAULT_ARCHIVE_DESTINATION);
-	
+
 	~ArchiveByAgeStrategy();
 
 	void archive();

@@ -49,7 +49,7 @@ class Redis_API Command: public Array
 	///
 {
 public:
-	typedef std::vector<std::string> StringVec;
+	using StringVec = std::vector<std::string>;
 
 	Command(const std::string& command);
 		/// Creates a command.
@@ -270,6 +270,12 @@ public:
 
 	static Command discard();
 		/// Creates and returns a DISCARD command.
+
+	static Command auth(const std::string& password);
+		/// Creates and returns an AUTH command with the given password.
+
+	static Command auth(const std::string& username, const std::string& password);
+		/// Creates and returns an AUTH command with the given password.
 };
 
 

@@ -31,7 +31,8 @@ class X509Certificate;
 class PKCS12Container;
 
 
-class Crypto_API RSAKey : public KeyPair
+//@ deprecated
+class Crypto_API RSAKey: public KeyPair
 	/// This class stores an RSA key pair, consisting
 	/// of private and public key. Storage of the private
 	/// key is optional.
@@ -56,7 +57,7 @@ public:
 	};
 
 	RSAKey(const EVPPKey& key);
-		/// Constructs ECKeyImpl by extracting the EC key.
+		/// Constructs RSAKey by extracting the RSA key.
 
 	RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
@@ -90,8 +91,20 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
+	RSAKey(const RSAKey& other);
+		/// Copy constructor.
+
+	RSAKey(RSAKey&& other) noexcept;
+		/// Move constructor.
+
 	~RSAKey();
 		/// Destroys the RSAKey.
+
+	RSAKey& operator = (const RSAKey& other);
+		/// Assignment.
+
+	RSAKey& operator = (RSAKey&& other) noexcept;
+		/// Move assignment.
 
 	RSAKeyImpl::ByteVec modulus() const;
 		/// Returns the RSA modulus.
@@ -104,9 +117,6 @@ public:
 
 	RSAKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
-	
-private:
-	RSAKeyImpl::Ptr _pImpl;
 };
 
 
@@ -115,7 +125,7 @@ private:
 //
 inline RSAKeyImpl::Ptr RSAKey::impl() const
 {
-	return _pImpl;
+	return KeyPair::impl().cast<RSAKeyImpl>();
 }
 
 

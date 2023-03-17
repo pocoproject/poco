@@ -29,23 +29,38 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A buffer class that allocates a buffer of a given type and size 
+	/// A buffer class that allocates a buffer of a given type and size
 	/// in the constructor and deallocates the buffer in the destructor.
 	///
 	/// This class is useful everywhere where a temporary buffer
 	/// is needed.
+	///
+	/// Note: A Buffer has both a size and a capacity, similar to
+	/// std::vector and std::string. However, upon creation of the
+	/// Buffer, the size always equals the capacity (provided via the
+	/// length argument of the constructor), as the Buffer is meant
+	/// to be filled by directly writing to its contents,
+	/// i.e., by passing the pointer to the first element
+	/// of the buffer obtained via begin() to a function expecting
+	/// a pointer to a buffer.
+	///
+	/// Therefore, calling append() on a newly created Buffer will
+	/// always expand the buffer size and capacity.
+	/// If you need to create a Buffer and want to write data to it
+	/// by calling append(), the correct steps are to first create
+	/// the Buffer, then call resize(0), and then call append().
 {
 public:
-	Buffer(std::size_t capacity):
-		_capacity(capacity),
-		_used(capacity),
+	Buffer(std::size_t length):
+		_capacity(length),
+		_used(length),
 		_ptr(0),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
-		if (capacity > 0)
+		if (length > 0)
 		{
-			_ptr = new T[capacity];
+			_ptr = new T[length];
 		}
 	}
 
@@ -57,8 +72,8 @@ public:
 		/// Creates the Buffer. Length argument specifies the length
 		/// of the supplied memory pointed to by pMem in the number
 		/// of elements of type T. Supplied pointer is considered
-		/// blank and not owned by Buffer, so in this case Buffer 
-		/// only acts as a wrapper around externally supplied 
+		/// blank and not owned by Buffer, so in this case Buffer
+		/// only acts as a wrapper around externally supplied
 		/// (and lifetime-managed) memory.
 	{
 	}
@@ -94,6 +109,19 @@ public:
 		}
 	}
 
+	Buffer(Buffer&& other) noexcept:
+		/// Move constructor.
+		_capacity(other._capacity),
+		_used(other._used),
+		_ptr(other._ptr),
+		_ownMem(other._ownMem)
+	{
+		other._capacity = 0;
+		other._used = 0;
+		other._ownMem = false;
+		other._ptr = nullptr;
+	}
+
 	Buffer& operator = (const Buffer& other)
 		/// Assignment operator.
 	{
@@ -106,20 +134,38 @@ public:
 		return *this;
 	}
 
+	Buffer& operator = (Buffer&& other) noexcept
+		/// Move assignment operator.
+	{
+		if (_ownMem) delete [] _ptr;
+
+		_capacity = other._capacity;
+		_used = other._used;
+		_ptr = other._ptr;
+		_ownMem = other._ownMem;
+
+		other._capacity = 0;
+		other._used = 0;
+		other._ownMem = false;
+		other._ptr = nullptr;
+
+		return *this;
+	}
+
 	~Buffer()
 		/// Destroys the Buffer.
 	{
 		if (_ownMem) delete [] _ptr;
 	}
-	
+
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer capacity and size. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
 		/// the current one; if it is smaller, capacity will remain intact.
 		/// Size will always be set to the new capacity.
-		///  
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
@@ -128,7 +174,7 @@ public:
 		if (newCapacity > _capacity)
 		{
 			T* ptr = new T[newCapacity];
-			if (preserveContent)
+			if (preserveContent && _ptr)
 			{
 				std::memcpy(ptr, _ptr, _used * sizeof(T));
 			}
@@ -136,19 +182,19 @@ public:
 			_ptr = ptr;
 			_capacity = newCapacity;
 		}
-		
+
 		_used = newCapacity;
 	}
-	
+
 	void setCapacity(std::size_t newCapacity, bool preserveContent = true)
 		/// Sets the buffer capacity. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
-		/// the current one; size will be set to the new capacity only if 
+		/// the current one; size will be set to the new capacity only if
 		/// new capacity is smaller than the current size, otherwise it will
 		/// remain intact.
-		/// 
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
@@ -160,7 +206,7 @@ public:
 			if (newCapacity > 0)
 			{
 				ptr = new T[newCapacity];
-				if (preserveContent)
+				if (preserveContent && _ptr)
 				{
 					std::size_t newSz = _used < newCapacity ? _used : newCapacity;
 					std::memcpy(ptr, _ptr, newSz * sizeof(T));
@@ -217,7 +263,7 @@ public:
 		return _capacity * sizeof(T);
 	}
 
-	void swap(Buffer& other)
+	void swap(Buffer& other) noexcept
 	/// Swaps the buffer with another one.
 	{
 		using std::swap;
@@ -225,6 +271,7 @@ public:
 		swap(_ptr, other._ptr);
 		swap(_capacity, other._capacity);
 		swap(_used, other._used);
+		swap(_ownMem, other._ownMem);
 	}
 
 	bool operator == (const Buffer& other) const
@@ -234,10 +281,11 @@ public:
 		{
 			if (_used == other._used)
 			{
-				if (std::memcmp(_ptr, other._ptr, _used * sizeof(T)) == 0)
+				if (_ptr && other._ptr && std::memcmp(_ptr, other._ptr, _used * sizeof(T)) == 0)
 				{
 					return true;
 				}
+				else return _used == 0;
 			}
 			return false;
 		}
@@ -268,13 +316,13 @@ public:
 	{
 		return _used * sizeof(T);
 	}
-	
+
 	T* begin()
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
-	
+
 	const T* begin() const
 		/// Returns a pointer to the beginning of the buffer.
 	{
@@ -286,13 +334,13 @@ public:
 	{
 		return _ptr + _used;
 	}
-	
+
 	const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
 		return _ptr + _used;
 	}
-	
+
 	bool empty() const
 		/// Return true if buffer is empty.
 	{
@@ -302,14 +350,14 @@ public:
 	T& operator [] (std::size_t index)
 	{
 		poco_assert (index < _used);
-		
+
 		return _ptr[index];
 	}
 
 	const T& operator [] (std::size_t index) const
 	{
 		poco_assert (index < _used);
-		
+
 		return _ptr[index];
 	}
 

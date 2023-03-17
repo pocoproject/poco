@@ -53,11 +53,11 @@ void BinaryReaderWriterTest::testBigEndian()
 	std::stringstream sstream;
 	BinaryWriter writer(sstream, BinaryWriter::BIG_ENDIAN_BYTE_ORDER);
 	BinaryReader reader(sstream, BinaryReader::UNSPECIFIED_BYTE_ORDER);
-	assert (writer.byteOrder() == BinaryWriter::BIG_ENDIAN_BYTE_ORDER);
+	assertTrue (writer.byteOrder() == BinaryWriter::BIG_ENDIAN_BYTE_ORDER);
 	writer.writeBOM();
 	write(writer);
 	reader.readBOM();
-	assert (reader.byteOrder() == BinaryReader::BIG_ENDIAN_BYTE_ORDER);
+	assertTrue (reader.byteOrder() == BinaryReader::BIG_ENDIAN_BYTE_ORDER);
 	read(reader);
 }
 
@@ -67,11 +67,11 @@ void BinaryReaderWriterTest::testLittleEndian()
 	std::stringstream sstream;
 	BinaryWriter writer(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 	BinaryReader reader(sstream, BinaryReader::UNSPECIFIED_BYTE_ORDER);
-	assert (writer.byteOrder() == BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	assertTrue (writer.byteOrder() == BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 	writer.writeBOM();
 	write(writer);
 	reader.readBOM();
-	assert (reader.byteOrder() == BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	assertTrue (reader.byteOrder() == BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
 	read(reader);
 }
 
@@ -87,7 +87,7 @@ void BinaryReaderWriterTest::write(BinaryWriter& writer)
 	writer << (unsigned) 123456;
 	writer << (long) -1234567890;
 	writer << (unsigned long) 1234567890;
-	
+
 #if defined(POCO_HAVE_INT64)
 	writer << (Int64) -1234567890;
 	writer << (UInt64) 1234567890;
@@ -95,13 +95,13 @@ void BinaryReaderWriterTest::write(BinaryWriter& writer)
 
 	writer << (float) 1.5;
 	writer << (double) -1.5;
-	
+
 	writer << "foo";
 	writer << "";
-	
+
 	writer << std::string("bar");
 	writer << std::string();
-	
+
 	writer.write7BitEncoded((UInt32) 100);
 	writer.write7BitEncoded((UInt32) 1000);
 	writer.write7BitEncoded((UInt32) 10000);
@@ -115,7 +115,7 @@ void BinaryReaderWriterTest::write(BinaryWriter& writer)
 	writer.write7BitEncoded((UInt64) 100000);
 	writer.write7BitEncoded((UInt64) 1000000);
 #endif
-	
+
 	std::vector<int> vec;
 	vec.push_back(1);
 	vec.push_back(2);
@@ -130,100 +130,100 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 {
 	bool b;
 	reader >> b;
-	assert (b);
+	assertTrue (b);
 	reader >> b;
-	assert (!b);
-	
+	assertTrue (!b);
+
 	char c;
 	reader >> c;
-	assert (c == 'a');
+	assertTrue (c == 'a');
 
 	short shortv;
 	reader >> shortv;
-	assert (shortv == -100);
+	assertTrue (shortv == -100);
 
 	unsigned short ushortv;
 	reader >> ushortv;
-	assert (ushortv == 50000);
+	assertTrue (ushortv == 50000);
 
 	int intv;
 	reader >> intv;
-	assert (intv == -123456);
+	assertTrue (intv == -123456);
 
 	unsigned uintv;
 	reader >> uintv;
-	assert (uintv == 123456);
+	assertTrue (uintv == 123456);
 
 	long longv;
 	reader >> longv;
-	assert (longv == -1234567890);
+	assertTrue (longv == -1234567890);
 
 	unsigned long ulongv;
 	reader >> ulongv;
-	assert (ulongv == 1234567890);
+	assertTrue (ulongv == 1234567890);
 
 #if defined(POCO_HAVE_INT64)
 	Int64 int64v;
 	reader >> int64v;
-	assert (int64v == -1234567890);
-	
+	assertTrue (int64v == -1234567890);
+
 	UInt64 uint64v;
 	reader >> uint64v;
-	assert (uint64v == 1234567890);
+	assertTrue (uint64v == 1234567890);
 #endif
 
 	float floatv;
 	reader >> floatv;
-	assert (floatv == 1.5);
-	
+	assertTrue (floatv == 1.5);
+
 	double doublev;
 	reader >> doublev;
-	assert (doublev == -1.5);
-	
+	assertTrue (doublev == -1.5);
+
 	std::string str;
 	reader >> str;
-	assert (str == "foo");
+	assertTrue (str == "foo");
 	reader >> str;
-	assert (str == "");
+	assertTrue (str == "");
 	reader >> str;
-	assert (str == "bar");
+	assertTrue (str == "bar");
 	reader >> str;
-	assert (str == "");
-	
+	assertTrue (str == "");
+
 	UInt32 uint32v;
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 100);
+	assertTrue (uint32v == 100);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 1000);
+	assertTrue (uint32v == 1000);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 10000);
+	assertTrue (uint32v == 10000);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 100000);
+	assertTrue (uint32v == 100000);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 1000000);
+	assertTrue (uint32v == 1000000);
 
 #if defined(POCO_HAVE_INT64)
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 100);
+	assertTrue (uint64v == 100);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 1000);
+	assertTrue (uint64v == 1000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 10000);
+	assertTrue (uint64v == 10000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 100000);
+	assertTrue (uint64v == 100000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 1000000);
+	assertTrue (uint64v == 1000000);
 #endif
 
 	std::vector<int> vec;
 	reader >> vec;
-	assert (vec.size() == 3);
-	assert (vec[0] == 1);
-	assert (vec[1] == 2);
-	assert (vec[2] == 3);
+	assertTrue (vec.size() == 3);
+	assertTrue (vec[0] == 1);
+	assertTrue (vec[1] == 2);
+	assertTrue (vec[2] == 3);
 
 	reader.readRaw(3, str);
-	assert (str == "RAW");
+	assertTrue (str == "RAW");
 }
 
 
@@ -240,14 +240,14 @@ void BinaryReaderWriterTest::testWrappers()
 	writer << -1;
 
 	MemoryBinaryReader reader(writer.data());
-	reader >> b; assert (b);
-	reader >> b; assert (!b);
-	reader >> c; assert ('a' == c);
-	assert(reader.available() == sizeof(i) * 2);
-	reader >> i; assert (1 == i);
-	assert(reader.available() == sizeof(i));
-	reader >> i; assert (-1 == i);
-	assert(reader.available() == 0);
+	reader >> b; assertTrue (b);
+	reader >> b; assertTrue (!b);
+	reader >> c; assertTrue ('a' == c);
+	assertTrue (reader.available() == sizeof(i) * 2);
+	reader >> i; assertTrue (1 == i);
+	assertTrue (reader.available() == sizeof(i));
+	reader >> i; assertTrue (-1 == i);
+	assertTrue (reader.available() == 0);
 
 	reader.setExceptions(std::istream::eofbit);
 	try

@@ -54,7 +54,7 @@ void PriorityNotificationQueue::enqueueNotification(Notification::Ptr pNotificat
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
 		pWI->nfAvailable.set();
-	}	
+	}
 }
 
 
@@ -131,9 +131,9 @@ void PriorityNotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void PriorityNotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	for (auto p: _waitQueue)
 	{
-		(*it)->nfAvailable.set();
+		p->nfAvailable.set();
 	}
 	_waitQueue.clear();
 }
@@ -145,7 +145,7 @@ bool PriorityNotificationQueue::empty() const
 	return _nfQueue.empty();
 }
 
-	
+
 int PriorityNotificationQueue::size() const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -156,7 +156,7 @@ int PriorityNotificationQueue::size() const
 void PriorityNotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	_nfQueue.clear();	
+	_nfQueue.clear();
 }
 
 

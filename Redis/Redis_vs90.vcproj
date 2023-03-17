@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Redis"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="Redis"
 	ProjectGUID="{12E39EE2-7049-312D-B390-7568D727CA25}"
 	RootNamespace="Redis"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Redis_EXPORTS"
@@ -47,59 +58,77 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\bin\PocoRedisd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoRedisd.pdb"
-				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				ImportLibrary="..\lib\PocoRedisd.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -119,60 +148,78 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\bin\PocoRedis.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="false"
 				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\lib\PocoRedis.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -185,51 +232,67 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoRedismtd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoRedisMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoRedismtd.lib"/>
+				OutputFile="..\lib\PocoRedisMTd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -249,45 +312,61 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoRedismt.lib"/>
+				OutputFile="..\lib\PocoRedisMT.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -300,51 +379,67 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoRedismdd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoRedisMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoRedismdd.lib"/>
+				OutputFile="..\lib\PocoRedisMDd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -364,113 +459,165 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoRedismd.lib"/>
+				OutputFile="..\lib\PocoRedisMD.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="Source Files">
+			Name="Source Files"
+			>
 			<File
-				RelativePath=".\src\Array.cpp"/>
+				RelativePath=".\src\Array.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\AsyncReader.cpp"/>
+				RelativePath=".\src\AsyncReader.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Client.cpp"/>
+				RelativePath=".\src\Client.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Command.cpp"/>
+				RelativePath=".\src\Command.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Error.cpp"/>
+				RelativePath=".\src\Error.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Exception.cpp"/>
+				RelativePath=".\src\Exception.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\RedisEventArgs.cpp"/>
+				RelativePath=".\src\RedisEventArgs.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\RedisStream.cpp"/>
+				RelativePath=".\src\RedisStream.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Type.cpp"/>
+				RelativePath=".\src\Type.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="Header Files">
+			Name="Header Files"
+			>
 			<File
-				RelativePath=".\include\Poco\Redis\Array.h"/>
+				RelativePath=".\include\Poco\Redis\Array.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\AsyncReader.h"/>
+				RelativePath=".\include\Poco\Redis\AsyncReader.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\Client.h"/>
+				RelativePath=".\include\Poco\Redis\Client.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\Command.h"/>
+				RelativePath=".\include\Poco\Redis\Command.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\Error.h"/>
+				RelativePath=".\include\Poco\Redis\Error.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\Exception.h"/>
+				RelativePath=".\include\Poco\Redis\Exception.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\PoolableConnectionFactory.h"/>
+				RelativePath=".\include\Poco\Redis\PoolableConnectionFactory.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\Redis.h"/>
+				RelativePath=".\include\Poco\Redis\Redis.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\RedisEventArgs.h"/>
+				RelativePath=".\include\Poco\Redis\RedisEventArgs.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\RedisStream.h"/>
+				RelativePath=".\include\Poco\Redis\RedisStream.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Redis\Type.h"/>
+				RelativePath=".\include\Poco\Redis\Type.h"
+				>
+			</File>
 		</Filter>
 		<File
-			RelativePath="..\DLLVersion.rc">
-			<FileConfiguration
-				Name="debug_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
+			RelativePath="..\DLLVersion.rc"
+			>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 		</File>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

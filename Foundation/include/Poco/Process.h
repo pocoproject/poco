@@ -21,14 +21,12 @@
 #include "Poco/Foundation.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Process_WINCE.h"
 #else
 #include "Poco/Process_WIN32U.h"
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/Process_WIN32.h"
 #elif defined(POCO_VXWORKS)
 #include "Poco/Process_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -68,6 +66,11 @@ public:
 		/// Waits for the process to terminate
 		/// and returns the exit code of the process.
 
+	int tryWait() const;
+ 		/// Checks that process is terminated
+ 		/// and returns the exit code of the process.
+ 		/// If the process is still running, returns -1.
+
 protected:
 	ProcessHandle(ProcessHandleImpl* pImpl);
 
@@ -95,7 +98,7 @@ public:
 		/// Returns the number of seconds spent by the
 		/// current process in user and kernel mode.
 
-	static ProcessHandle launch(const std::string& command, const Args& args);
+	static ProcessHandle launch(const std::string& command, const Args& args, int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -103,7 +106,8 @@ public:
 	static ProcessHandle launch(
 		const std::string& command,
 		const Args& args,
-		const std::string& initialDirectory);
+		const std::string& initialDirectory,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -114,7 +118,8 @@ public:
 		const Args& args,
 		Pipe* inPipe,
 		Pipe* outPipe,
-		Pipe* errPipe);
+		Pipe* errPipe,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -147,7 +152,8 @@ public:
 		const std::string& initialDirectory,
 		Pipe* inPipe,
 		Pipe* outPipe,
-		Pipe* errPipe);
+		Pipe* errPipe,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -181,7 +187,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const Env& env);
+		const Env& env,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -199,7 +206,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const Env& env);
+		const Env& env,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -212,6 +220,10 @@ public:
 	static int wait(const ProcessHandle& handle);
 		/// Waits for the process specified by handle to terminate
 		/// and returns the exit code of the process.
+
+	static int tryWait(const ProcessHandle& handle);
+ 		/// Checks that process is finished and returns the exit code of the
+ 		/// process. If the process is still running, returns -1.
 
 	static bool isRunning(const ProcessHandle& handle);
 		/// check if the process specified by handle is running or not

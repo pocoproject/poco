@@ -44,7 +44,7 @@ class RowFilter;
 class Data_API RecordSet: private Statement
 	/// RecordSet provides access to data returned from a query.
 	/// Data access indices (row and column) are 0-based, as usual in C++.
-	/// 
+	///
 	/// Recordset provides navigation methods to iterate through the
 	/// recordset, retrieval methods to extract data, and methods
 	/// to get metadata (type, etc.) about columns.
@@ -64,14 +64,14 @@ class Data_API RecordSet: private Statement
 	/// The third (optional) argument passed to the Recordset constructor is a RowFormatter
 	/// implementation. The formatter is used in conjunction with << operator for recordset
 	/// data formating.
-	/// 
+	///
 	/// The number of rows in the RecordSet can be limited by specifying
 	/// a limit for the Statement.
 {
 public:
-	typedef std::map<std::size_t, Row*> RowMap;
-	typedef const RowIterator           ConstIterator;
-	typedef RowIterator                 Iterator;
+	using RowMap = std::map<std::size_t, Row*>;
+	using ConstIterator = const RowIterator;
+	using Iterator = RowIterator;
 
 	using Statement::isNull;
 	using Statement::subTotalRowCount;
@@ -82,18 +82,18 @@ public:
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		const RowFormatter& rowFormatter);
 		/// Creates the RecordSet.
 
 	template <class RF>
-	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter): 
+	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter):
 		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -107,14 +107,23 @@ public:
 	RecordSet(const RecordSet& other);
 		/// Copy-creates the recordset.
 
+	RecordSet(RecordSet&& other) noexcept;
+		/// Move-creates the recordset.
+
 	~RecordSet();
 		/// Destroys the RecordSet.
 
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Assigns the row formatter to the statement and all recordset rows.
 
-	Statement& operator = (const Statement& stmt);
+	RecordSet& operator = (const Statement& stmt);
 		/// Assignment operator.
+
+	RecordSet& operator = (const RecordSet& other);
+		/// Assignment operator.
+
+	RecordSet& operator = (RecordSet&& other) noexcept;
+		/// Move assignment.
 
 	std::size_t rowCount() const;
 		/// Returns the number of rows in the RecordSet.
@@ -136,7 +145,7 @@ public:
 	std::size_t getTotalRowCount() const;
 		/// Returns the total number of rows in the RecordSet.
 		/// The number of rows reported is independent of filtering.
-		/// If the total row count has not been set externally 
+		/// If the total row count has not been set externally
 		/// (either explicitly or implicitly through SQL), the value
 		/// returned shall only be accurate if the statement limit
 		/// is less or equal to the total row count.
@@ -159,12 +168,12 @@ public:
 	{
 		if (isBulkExtraction())
 		{
-			typedef InternalBulkExtraction<C> E;
+			using E = InternalBulkExtraction<C>;
 			return columnImpl<C,E>(name);
 		}
 		else
 		{
-			typedef InternalExtraction<C> E;
+			using E = InternalExtraction<C>;
 			return columnImpl<C,E>(name);
 		}
 	}
@@ -175,12 +184,12 @@ public:
 	{
 		if (isBulkExtraction())
 		{
-			typedef InternalBulkExtraction<C> E;
+			using E = InternalBulkExtraction<C>;
 			return columnImpl<C,E>(pos);
 		}
 		else
 		{
-			typedef InternalExtraction<C> E;
+			using E = InternalExtraction<C>;
 			return columnImpl<C,E>(pos);
 		}
 	}
@@ -200,18 +209,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef typename std::vector<T> C;
+				using C = typename std::vector<T>;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef typename std::list<T> C;
+				using C = typename std::list<T>;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef typename std::deque<T> C;
+				using C = typename std::deque<T>;
 				return column<C>(col).value(row);
 			}
 			default:
@@ -230,18 +239,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef typename std::vector<T> C;
+				using C = typename std::vector<T>;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef typename std::list<T> C;
+				using C = typename std::list<T>;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef typename std::deque<T> C;
+				using C = typename std::deque<T>;
 				return column<C>(name).value(row);
 			}
 			default:
@@ -265,7 +274,7 @@ public:
 		else
 			return value(name, _currentRow);
 	}
-	
+
 	template <typename T>
 	Poco::Dynamic::Var nvl(std::size_t index, const T& deflt = T()) const
 		/// Returns the value in the given column of the current row
@@ -369,11 +378,11 @@ public:
 	void formatNames() const;
 		/// Formats names using the current RowFormatter.
 
-	std::ostream& copyValues(std::ostream& os, 
-		std::size_t offset = 0, 
+	std::ostream& copyValues(std::ostream& os,
+		std::size_t offset = 0,
 		std::size_t length = RowIterator::POSITION_END) const;
 		/// Copies the data values to the supplied output stream.
-		/// The data set to be copied is starting at the specified offset 
+		/// The data set to be copied is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -382,7 +391,7 @@ public:
 
 	void formatValues(std::size_t offset, std::size_t length) const;
 		/// Formats values using the current RowFormatter.
-		/// The data set to be formatted is starting at the specified offset 
+		/// The data set to be formatted is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -404,15 +413,15 @@ private:
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
+		using T = typename C::value_type;
+		using ExtractionVecPtr = const E*;
 
 		bool typeFound = false;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 		AbstractExtractionVec::const_iterator it = rExtractions.begin();
 		AbstractExtractionVec::const_iterator end = rExtractions.end();
-		
+
 		for (; it != end; ++it)
 		{
 			ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(it->get());
@@ -443,8 +452,8 @@ private:
 	const Column<C>& columnImpl(std::size_t pos) const
 		/// Returns the reference to column at specified position.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
+		using T = typename C::value_type;
+		using ExtractionVecPtr = const E*;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
@@ -458,9 +467,9 @@ private:
 		{
 			return pExtraction->column();
 		}
-		else 
+		else
 		{
-			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",
 				pos,
 				std::string(typeid(T).name())));
 		}
@@ -532,9 +541,16 @@ inline std::size_t RecordSet::columnCount() const
 }
 
 
-inline Statement& RecordSet::operator = (const Statement& stmt)
+inline RecordSet& RecordSet::operator = (const Statement& stmt)
 {
 	reset(stmt);
+	return *this;
+}
+
+
+inline RecordSet& RecordSet::operator = (const RecordSet& other)
+{
+	reset(other);
 	return *this;
 }
 

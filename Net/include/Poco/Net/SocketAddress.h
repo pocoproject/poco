@@ -44,7 +44,7 @@ public:
 	// The following declarations keep the Family type
 	// backwards compatible with the previously used
 	// enum declaration.
-	typedef AddressFamily::Family Family;
+	using Family = AddressFamily::Family;
 	static const Family IPv4 = AddressFamily::IPv4;
 #if defined(POCO_HAVE_IPv6)
 	static const Family IPv6 = AddressFamily::IPv6;
@@ -138,6 +138,9 @@ public:
 	SocketAddress(const SocketAddress& addr);
 		/// Creates a SocketAddress by copying another one.
 
+	SocketAddress(SocketAddress&& addr);
+		/// Creates a SocketAddress by moving another one.
+
 	SocketAddress(const struct sockaddr* addr, poco_socklen_t length);
 		/// Creates a SocketAddress from a native socket address.
 
@@ -146,6 +149,9 @@ public:
 
 	SocketAddress& operator = (const SocketAddress& socketAddress);
 		/// Assigns another SocketAddress.
+
+	SocketAddress& operator = (SocketAddress&& socketAddress);
+		/// Move-assigns another SocketAddress.
 
 	IPAddress host() const;
 		/// Returns the host IP address.

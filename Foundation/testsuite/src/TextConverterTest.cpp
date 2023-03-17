@@ -39,39 +39,39 @@ void TextConverterTest::testIdentityASCII()
 {
 	ASCIIEncoding encoding;
 	TextConverter converter(encoding, encoding);
-	
+
 	std::string empty;
 	std::string result0;
 	int errors = converter.convert(empty, result0);
-	assert (result0 == empty);
-	assert (errors == 0);
-	
+	assertTrue (result0 == empty);
+	assertTrue (errors == 0);
+
 	std::string fooBar = "foo bar";
 	std::string result1;
 	errors = converter.convert(fooBar, result1);
-	assert (result1 == fooBar);
-	assert (errors == 0);
+	assertTrue (result1 == fooBar);
+	assertTrue (errors == 0);
 
 	std::string result2;
 	errors = converter.convert(fooBar.data(), (int) fooBar.length(), result2);
-	assert (result2 == fooBar);
-	assert (errors == 0);
+	assertTrue (result2 == fooBar);
+	assertTrue (errors == 0);
 
 	std::string result3;
 	errors = converter.convert("", 0, result3);
-	assert (result3.empty());
-	assert (errors == 0);
-	
+	assertTrue (result3.empty());
+	assertTrue (errors == 0);
+
 	std::string x = "x";
 	std::string result4;
 	errors = converter.convert(x, result4);
-	assert (result4 == x);
-	assert (errors == 0);
+	assertTrue (result4 == x);
+	assertTrue (errors == 0);
 
 	std::string result5;
 	errors = converter.convert("x", 1, result5);
-	assert (result5 == x);
-	assert (errors == 0);
+	assertTrue (result5 == x);
+	assertTrue (errors == 0);
 }
 
 
@@ -79,63 +79,63 @@ void TextConverterTest::testIdentityUTF8()
 {
 	UTF8Encoding encoding;
 	TextConverter converter(encoding, encoding);
-	
+
 	std::string empty;
 	std::string result0;
 	int errors = converter.convert(empty, result0);
-	assert (result0 == empty);
-	assert (errors == 0);
-	
+	assertTrue (result0 == empty);
+	assertTrue (errors == 0);
+
 	std::string fooBar = "foo bar";
 	std::string result1;
 	errors = converter.convert(fooBar, result1);
-	assert (result1 == fooBar);
-	assert (errors == 0);
+	assertTrue (result1 == fooBar);
+	assertTrue (errors == 0);
 
 	std::string result2;
 	errors = converter.convert(fooBar.data(), (int) fooBar.length(), result2);
-	assert (result2 == fooBar);
-	assert (errors == 0);
+	assertTrue (result2 == fooBar);
+	assertTrue (errors == 0);
 
 	std::string result3;
 	errors = converter.convert("", 0, result3);
-	assert (result3.empty());
-	assert (errors == 0);
-	
+	assertTrue (result3.empty());
+	assertTrue (errors == 0);
+
 	const unsigned char greek[] = {0x20, 0xce, 0xba, 0xe1, 0xbd, 0xb9, 0xcf, 0x83, 0xce, 0xbc, 0xce, 0xb5, 0x20, 0x00};
 	std::string text((const char*) greek);
-	
+
 	std::string result4;
 	errors = converter.convert(text, result4);
-	assert (result4 == text);
-	assert (errors == 0);
-	
+	assertTrue (result4 == text);
+	assertTrue (errors == 0);
+
 	std::string result5;
 	errors = converter.convert((char*) greek, 13, result5);
-	assert (result5 == text);
-	assert (errors == 0);
-	
+	assertTrue (result5 == text);
+	assertTrue (errors == 0);
+
 	std::string x = "x";
 	std::string result6;
 	errors = converter.convert(x, result6);
-	assert (result6 == x);
-	assert (errors == 0);
+	assertTrue (result6 == x);
+	assertTrue (errors == 0);
 
 	std::string result7;
 	errors = converter.convert("x", 1, result7);
-	assert (result7 == x);
-	assert (errors == 0);
-	
+	assertTrue (result7 == x);
+	assertTrue (errors == 0);
+
 	std::string utfChar((char*) greek + 1, 2);
 	std::string result8;
 	errors = converter.convert(utfChar, result8);
-	assert (result8 == utfChar);
-	assert (errors == 0);
-	
+	assertTrue (result8 == utfChar);
+	assertTrue (errors == 0);
+
 	std::string result9;
 	errors = converter.convert((char*) greek + 1, 2, result9);
-	assert (result9 == utfChar);
-	assert (errors == 0);
+	assertTrue (result9 == utfChar);
+	assertTrue (errors == 0);
 }
 
 
@@ -149,12 +149,12 @@ void TextConverterTest::testUTF8toASCII()
 	std::string text((const char*) greek);
 	std::string result0;
 	int errors = converter.convert(text, result0);
-	assert (result0 == " ????? AB");
-	assert (errors == 0);
-	
+	assertTrue (result0 == " ????? AB");
+	assertTrue (errors == 0);
+
 	std::string result1;
 	errors = converter.convert("abcde", 5, result1);
-	assert (result1 == "abcde");
+	assertTrue (result1 == "abcde");
 }
 
 
@@ -163,22 +163,22 @@ void TextConverterTest::testLatin1toUTF8()
 	Latin1Encoding latin1Encoding;
 	UTF8Encoding utf8Encoding;
 	TextConverter converter(latin1Encoding, utf8Encoding);
-	
+
 	const unsigned char latin1Chars[] = {'g', 252, 'n', 't', 'e', 'r', 0};
 	const unsigned char utf8Chars[]   = {'g', 195, 188, 'n', 't', 'e', 'r', 0};
 	std::string latin1Text((const char*) latin1Chars);
 	std::string utf8Text((const char*) utf8Chars);
-	
+
 	std::string result0;
 	int errors = converter.convert(latin1Text, result0);
-	assert (result0 == utf8Text);
-	assert (errors == 0);
+	assertTrue (result0 == utf8Text);
+	assertTrue (errors == 0);
 	assertEqual((long) result0.size(), 7);
-	
+
 	std::string result1;
 	errors = converter.convert(latin1Chars, 6, result1);
-	assert (result1 == utf8Text);
-	assert (errors == 0);
+	assertTrue (result1 == utf8Text);
+	assertTrue (errors == 0);
 }
 
 
@@ -319,10 +319,10 @@ void TextConverterTest::testErrors()
 
 	const unsigned char badChars[] = {'a', 'b', 255, 'c', 254, 0};
 	std::string badText((const char*) badChars);
-	
+
 	std::string result;
 	int errors = converter.convert(badText, result);
-	assert (errors == 2);
+	assertTrue (errors == 2);
 }
 
 

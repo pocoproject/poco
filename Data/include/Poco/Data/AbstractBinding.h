@@ -37,8 +37,8 @@ class Data_API AbstractBinding
 	/// AbstractBinding connects a value with a placeholder via an AbstractBinder interface.
 {
 public:
-	typedef SharedPtr<AbstractBinding> Ptr;
-	typedef AbstractBinder::Ptr        BinderPtr;
+	using Ptr = SharedPtr<AbstractBinding>;
+	using BinderPtr = AbstractBinder::Ptr;
 
 	enum Direction
 	{
@@ -68,7 +68,7 @@ public:
 	virtual std::size_t numOfRowsHandled() const = 0;
 		/// Returns the number of rows that the binding handles.
 		///
-		/// The trivial case will be one single row but 
+		/// The trivial case will be one single row but
 		/// for collection data types it can be larger.
 
 	virtual bool canBind() const = 0;
@@ -100,9 +100,9 @@ private:
 };
 
 
-typedef std::vector<AbstractBinding::Ptr> AbstractBindingVec;
-typedef std::deque<AbstractBinding::Ptr>  AbstractBindingDeq;
-typedef std::list<AbstractBinding::Ptr>   AbstractBindingLst;
+using AbstractBindingVec = std::vector<AbstractBinding::Ptr>;
+using AbstractBindingDeq = std::deque<AbstractBinding::Ptr>;
+using AbstractBindingLst = std::list<AbstractBinding::Ptr>;
 
 
 //

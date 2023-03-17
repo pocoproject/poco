@@ -79,18 +79,14 @@ void FTPStreamFactoryTest::testDownload()
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	FTPStreamFactory sf;
-#ifndef POCO_ENABLE_CPP11
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
-#else
 	std::unique_ptr<std::istream> pStr(sf.open(uri));
-#endif //  POCO_ENABLE_CPP11
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
-	
+
 	pStr.reset();
-		
+
 	std::string s(dataStr.str());
-	assert (s == "line1\r\nline2\r\n");
+	assertTrue (s == "line1\r\nline2\r\n");
 }
 
 
@@ -120,19 +116,15 @@ void FTPStreamFactoryTest::testList()
 	uri.setPort(server.port());
 	uri.setPath("/usr/guest/data;type=d");
 	FTPStreamFactory sf;
-#ifndef POCO_ENABLE_CPP11
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
-#else
 	std::unique_ptr<std::istream> pStr(sf.open(uri));
-#endif //  POCO_ENABLE_CPP11
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
-	
+
 	pStr.reset();
-		
+
 	std::string s(dataStr.str());
-	assert (s == "file1\r\nfile2\r\n");
+	assertTrue (s == "file1\r\nfile2\r\n");
 }
 
 
@@ -162,19 +154,15 @@ void FTPStreamFactoryTest::testUserInfo()
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user:secret");
 	FTPStreamFactory sf;
-#ifndef POCO_ENABLE_CPP11
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
-#else
 	std::unique_ptr<std::istream> pStr(sf.open(uri));
-#endif //  POCO_ENABLE_CPP11
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
-	
+
 	pStr.reset();
-		
+
 	std::string s(dataStr.str());
-	assert (s == "line1\r\nline2\r\n");
+	assertTrue (s == "line1\r\nline2\r\n");
 }
 
 
@@ -205,19 +193,15 @@ void FTPStreamFactoryTest::testPasswordProvider()
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user");
 	FTPStreamFactory sf;
-#ifndef POCO_ENABLE_CPP11
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
-#else
 	std::unique_ptr<std::istream> pStr(sf.open(uri));
-#endif //  POCO_ENABLE_CPP11
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
-	
+
 	pStr.reset();
-		
+
 	std::string s(dataStr.str());
-	assert (s == "line1\r\nline2\r\n");
+	assertTrue (s == "line1\r\nline2\r\n");
 }
 
 
@@ -239,11 +223,7 @@ void FTPStreamFactoryTest::testMissingPasswordProvider()
 	try
 	{
 		FTPStreamFactory sf;
-#ifndef POCO_ENABLE_CPP11
-		std::auto_ptr<std::istream> pStr(sf.open(uri));
-#else
 		std::unique_ptr<std::istream> pStr(sf.open(uri));
-#endif //  POCO_ENABLE_CPP11
 		fail("no password provider - must throw");
 	}
 	catch (FTPException&)

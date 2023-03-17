@@ -24,21 +24,21 @@ namespace
 	class ActiveObject
 	{
 	public:
-		ActiveObject(): 
+		ActiveObject():
 			_activity(this, &ActiveObject::run),
 			_count(0)
 		{
 		}
-		
+
 		~ActiveObject()
 		{
 		}
-		
+
 		Activity<ActiveObject>& activity()
 		{
 			return _activity;
 		}
-		
+
 		Poco::UInt64 count() const
 		{
 			return _count;
@@ -47,7 +47,7 @@ namespace
 	protected:
 		void run()
 		{
-			while (!_activity.isStopped()) 
+			while (!_activity.isStopped())
 				++_count;
 		}
 
@@ -56,7 +56,7 @@ namespace
 		Poco::UInt64           _count;
 	};
 }
- 
+
 
 ActivityTest::ActivityTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -71,14 +71,14 @@ ActivityTest::~ActivityTest()
 void ActivityTest::testActivity()
 {
 	ActiveObject activeObj;
-	assert (activeObj.activity().isStopped());
+	assertTrue (activeObj.activity().isStopped());
 	activeObj.activity().start();
-	assert (!activeObj.activity().isStopped());
+	assertTrue (!activeObj.activity().isStopped());
 	Thread::sleep(1000);
-	assert (activeObj.activity().isRunning());
+	assertTrue (activeObj.activity().isRunning());
 	activeObj.activity().stop();
 	activeObj.activity().wait();
-	assert (activeObj.count() > 0);
+	assertTrue (activeObj.count() > 0);
 }
 
 

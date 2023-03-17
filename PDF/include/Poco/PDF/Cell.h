@@ -35,7 +35,7 @@ public:
 	};
 
 	Cell(const AttributedString& content = "", const std::string& name = "", FontMapPtr pFontMap = 0);
-	Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding = "UTF-8" , bool trueType = true);
+	Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding = "UTF-8" , bool trueType = true, int widthAsPct=-1);
 	~Cell();
 
 	const std::string& getName() const;
@@ -56,6 +56,9 @@ public:
 	void setFonts(FontMapPtr pFontMap);
 	FontMapPtr getFonts() const { return _pFontMap; }
 	void draw(Page& page, float x, float y, float width, float height);
+	int getWidthAsPct() const;
+	void setWidthAsPct(int width);
+	bool hasWidth() const;
 
 private:
 	AttributedString   _content;
@@ -65,6 +68,7 @@ private:
 	FontMapPtr         _pFontMap;
 	std::string        _encoding;
 	bool               _trueType;
+	int                _widthAsPct;
 };
 
 
@@ -145,6 +149,24 @@ inline float Cell::getLineWidth() const
 inline void Cell::setLineWidth(float width)
 {
 	_lineWidth = width;
+}
+
+
+inline int Cell::getWidthAsPct() const
+{
+	return _widthAsPct;
+}
+
+
+inline void Cell::setWidthAsPct(int width)
+{
+	_widthAsPct = width;
+}
+
+
+inline bool Cell::hasWidth() const
+{
+	return _widthAsPct > 0;
 }
 
 

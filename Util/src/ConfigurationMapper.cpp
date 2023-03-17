@@ -19,7 +19,7 @@ namespace Poco {
 namespace Util {
 
 
-ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration* pConfig):
+ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig):
 	_fromPrefix(fromPrefix),
 	_toPrefix(toPrefix),
 	_pConfig(pConfig)
@@ -28,14 +28,11 @@ ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const st
 
 	if (!_fromPrefix.empty()) _fromPrefix += '.';
 	if (!_toPrefix.empty()) _toPrefix += '.';
-
-	_pConfig->duplicate();
 }
 
 
 ConfigurationMapper::~ConfigurationMapper()
 {
-	_pConfig->release();
 }
 
 
@@ -49,7 +46,7 @@ bool ConfigurationMapper::getRaw(const std::string& key, std::string& value) con
 void ConfigurationMapper::setRaw(const std::string& key, const std::string& value)
 {
 	std::string translatedKey = translateKey(key);
-	_pConfig->setRaw(translatedKey, value); 
+	_pConfig->setRaw(translatedKey, value);
 }
 
 

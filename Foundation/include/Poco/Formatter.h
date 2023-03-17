@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Configurable.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/RefCountedObject.h"
 
 
@@ -40,26 +41,28 @@ class Foundation_API Formatter: public Configurable, public RefCountedObject
 	/// A useful implementation should at least take the Message's
 	/// Time, Priority and Text fields and put them into a string.
 	///
-	/// The Formatter class supports the Configurable
-	/// interface, so the behaviour of certain formatters
-	/// is configurable.
-	/// 
-	/// Trivial implementations of of getProperty() and 
+	/// The Formatter class supports the Configurable interface,
+	/// so the behaviour of certain formatters is configurable.
+	/// It also supports reference counting based garbage collection.
+	///
+	/// Trivial implementations of of getProperty() and
 	/// setProperty() are provided.
 	///
 	/// Subclasses must at least provide a format() method.
 {
 public:
+	using Ptr = AutoPtr<Formatter>;
+
 	Formatter();
 		/// Creates the formatter.
-		
+
 	virtual ~Formatter();
 		/// Destroys the formatter.
 
 	virtual void format(const Message& msg, std::string& text) = 0;
-		/// Formats the message and places the result in text. 
+		/// Formats the message and places the result in text.
 		/// Subclasses must override this method.
-		
+
 	void setProperty(const std::string& name, const std::string& value);
 		/// Throws a PropertyNotSupportedException.
 

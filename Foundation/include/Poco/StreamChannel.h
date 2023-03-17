@@ -34,16 +34,18 @@ class Foundation_API StreamChannel: public Channel
 	/// by a newline.
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is contained 
+	/// appropriate Formatter to control what is contained
 	/// in the text.
 {
 public:
+	using Ptr = AutoPtr<StreamChannel>;
+
 	StreamChannel(std::ostream& str);
 		/// Creates the channel.
 
 	void log(const Message& msg);
 		/// Logs the given message to the channel's stream.
-		
+
 protected:
 	virtual ~StreamChannel();
 

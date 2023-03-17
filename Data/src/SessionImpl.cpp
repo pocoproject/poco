@@ -20,7 +20,7 @@ namespace Poco {
 namespace Data {
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout): 
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout):
 	_connectionString(connectionString),
 	_loginTimeout(timeout)
 {
@@ -46,6 +46,12 @@ void SessionImpl::setConnectionString(const std::string& connectionString)
 			" Close the session first.");
 
 	_connectionString = connectionString;
+}
+
+
+bool SessionImpl::isGood() const
+{
+	return isConnected();
 }
 
 

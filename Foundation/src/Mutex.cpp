@@ -51,4 +51,14 @@ FastMutex::~FastMutex()
 }
 
 
+SpinlockMutex::SpinlockMutex()
+{
+}
+
+
+SpinlockMutex::~SpinlockMutex()
+{
+}
+
+
 } // namespace Poco

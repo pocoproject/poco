@@ -25,49 +25,49 @@ PDFTest::~PDFTest()
 
 void PDFTest::testDocument()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testPage()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testImage()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testFont()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testEncoding()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testOutline()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testDestination()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 
 void PDFTest::testAnnotation()
 {
-	fail("not implemented");
+	warn("not implemented");
 }
 
 

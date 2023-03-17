@@ -75,9 +75,9 @@ public:
 	BinaryReader& operator >> (float& value);
 	BinaryReader& operator >> (double& value);
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-	BinaryReader& operator >> (Int64& value);
-	BinaryReader& operator >> (UInt64& value);
+#if defined(POCO_HAVE_INT64)
+	BinaryReader& operator >> (long long& value);
+	BinaryReader& operator >> (unsigned long long& value);
 #endif
 
 	BinaryReader& operator >> (std::string& value);
@@ -122,22 +122,22 @@ public:
 		/// the reader for the encountered byte order.
 		/// A byte-order mark is a 16-bit integer with a value of 0xFEFF,
 		/// written in host byte order.
-		
+
 	bool good();
 		/// Returns _istr.good();
-		
+
 	bool fail();
 		/// Returns _istr.fail();
 
 	bool bad();
 		/// Returns _istr.bad();
-	
+
 	bool eof();
 		/// Returns _istr.eof();
 
 	std::istream& stream() const;
 		/// Returns the underlying stream.
-		
+
 	StreamByteOrder byteOrder() const;
 		/// Returns the byte-order used by the reader, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
@@ -150,7 +150,7 @@ public:
 
 private:
 	std::istream&  _istr;
-	bool           _flipBytes; 
+	bool           _flipBytes;
 	TextConverter* _pTextConverter;
 };
 
@@ -212,7 +212,7 @@ inline bool BinaryReader::good()
 	return _istr.good();
 }
 
-	
+
 inline bool BinaryReader::fail()
 {
 	return _istr.fail();
@@ -236,7 +236,7 @@ inline std::istream& BinaryReader::stream() const
 	return _istr;
 }
 
-	
+
 inline BinaryReader::StreamByteOrder BinaryReader::byteOrder() const
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)

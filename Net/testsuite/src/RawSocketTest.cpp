@@ -48,7 +48,7 @@ void RawSocketTest::testEchoIPv4()
 	rs.connect(sa);
 
 	int n = rs.sendBytes("hello", 5);
-	assert (5 == n);
+	assertTrue (5 == n);
 
 	char buffer[256] = "";
 	unsigned char* ptr = (unsigned char*) buffer;
@@ -57,19 +57,19 @@ void RawSocketTest::testEchoIPv4()
 	int shift = ((buffer[0] & 0x0F) * 4);
 	ptr += shift;
 
-	assert (5 == (n - shift));
-	assert ("hello" == std::string((char*)ptr, 5));
+	assertTrue (5 == (n - shift));
+	assertTrue ("hello" == std::string((char*)ptr, 5));
 
-	rs.close(); 
+	rs.close();
 }
 
 
 void RawSocketTest::testSendToReceiveFromIPv4()
 {
 	RawSocket rs(IPAddress::IPv4);
-	
+
 	int n = rs.sendTo("hello", 5, SocketAddress("127.0.0.1", 0));
-	assert (n == 5);
+	assertTrue (n == 5);
 
 	char buffer[256] = "";
 	unsigned char* ptr = (unsigned char*) buffer;
@@ -78,8 +78,36 @@ void RawSocketTest::testSendToReceiveFromIPv4()
 	int shift = ((buffer[0] & 0x0F) * 4);
 	ptr += shift;
 
-	assert ((n - shift) == 5);
-	assert ("hello" == std::string((char*)ptr, 5));
+	assertTrue ((n - shift) == 5);
+	assertTrue ("hello" == std::string((char*)ptr, 5));
+	rs.close();
+}
+
+
+void RawSocketTest::testEchoIPv4Move()
+{
+	SocketAddress sa("127.0.0.1", 0);
+	RawSocket rs0 = RawSocket(IPAddress::IPv4);
+	rs0.connect(sa);
+
+	RawSocket rs(std::move(rs0));
+#ifdef POCO_NEW_STATE_ON_MOVE
+	assertTrue (rs0.impl() == nullptr);
+#endif // POCO_NEW_STATE_ON_MOVE
+
+	int n = rs.sendBytes("hello", 5);
+	assertTrue (5 == n);
+
+	char buffer[256] = "";
+	unsigned char* ptr = (unsigned char*) buffer;
+
+	n = rs.receiveBytes(buffer, sizeof(buffer));
+	int shift = ((buffer[0] & 0x0F) * 4);
+	ptr += shift;
+
+	assertTrue (5 == (n - shift));
+	assertTrue ("hello" == std::string((char*)ptr, 5));
+
 	rs.close();
 }
 
@@ -100,6 +128,7 @@ CppUnit::Test* RawSocketTest::suite()
 
 	CppUnit_addTest(pSuite, RawSocketTest, testEchoIPv4);
 	CppUnit_addTest(pSuite, RawSocketTest, testSendToReceiveFromIPv4);
+	CppUnit_addTest(pSuite, RawSocketTest, testEchoIPv4Move);
 
 	return pSuite;
 }

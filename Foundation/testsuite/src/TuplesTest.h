@@ -44,6 +44,26 @@ public:
 	void testTuple18();
 	void testTuple19();
 	void testTuple20();
+	void testTuple21();
+	void testTuple22();
+	void testTuple23();
+	void testTuple24();
+	void testTuple25();
+	void testTuple26();
+	void testTuple27();
+	void testTuple28();
+	void testTuple29();
+	void testTuple30();
+	void testTuple31();
+	void testTuple32();
+	void testTuple33();
+	void testTuple34();
+	void testTuple35();
+	void testTuple36();
+	void testTuple37();
+	void testTuple38();
+	void testTuple39();
+	void testTuple40();
 	void testTupleOrder();
 	void testMemOverhead();
 	void setUp();
@@ -56,9 +76,9 @@ private:
 	template <class T>
 	void testTupleStrictWeak(const T& t1, const T& t2, const T& t3)
 	{
-		assert (t1 < t2 && !(t2 < t1)); // antisymmetric
-		assert (t1 < t2 && t2 < t3 && t1 < t3); // transitive
-		assert (!(t1 < t1)); // irreflexive
+		assertTrue (t1 < t2 && !(t2 < t1)); // antisymmetric
+		assertTrue (t1 < t2 && t2 < t3 && t1 < t3); // transitive
+		assertTrue (!(t1 < t1)); // irreflexive
 	}
 };
 

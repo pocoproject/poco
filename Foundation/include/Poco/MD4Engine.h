@@ -49,7 +49,7 @@ namespace Poco {
 
 
 class Foundation_API MD4Engine: public DigestEngine
-	/// This class implementes the MD4 message digest algorithm,
+	/// This class implements the MD4 message digest algorithm,
 	/// described in RFC 1320.
 {
 public:
@@ -61,7 +61,7 @@ public:
 
 	MD4Engine();
 	~MD4Engine();
-		
+
 	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();

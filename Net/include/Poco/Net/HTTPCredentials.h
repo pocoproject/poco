@@ -20,6 +20,7 @@
 
 
 #include "Poco/Net/HTTPDigestCredentials.h"
+#include "Poco/Net/HTTPNTLMCredentials.h"
 
 
 namespace Poco {
@@ -37,7 +38,7 @@ class HTTPResponse;
 
 class Net_API HTTPCredentials
 	/// This is a utility class for working with HTTP
-	/// authentication (Basic or Digest) in HTTPRequest objects.
+	/// authentication (Basic, Digest or NTLM) in HTTPRequest objects.
 	///
 	/// Usage is as follows:
 	/// First, create a HTTPCredentials object containing
@@ -105,6 +106,14 @@ public:
 	const std::string& getPassword() const;
 		/// Returns the password.
 
+	void setHost(const std::string& host);
+		/// Sets the target host. Only used for SSPI-based NTLM authentication using
+		/// the credentials of the currently logged-in user on Windows.
+
+	const std::string& getHost() const;
+		/// Returns the target host. Only used for SSPI-based NTLM authentication using
+		/// the credentials of the currently logged-in user on Windows.
+
 	bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 
@@ -138,6 +147,9 @@ public:
 	static bool isDigestCredentials(const std::string& header);
 		/// Returns true if authentication header is for Digest authentication.
 
+	static bool isNTLMCredentials(const std::string& header);
+		/// Returns true if authentication header is for NTLM authentication.
+
 	static bool hasBasicCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with Basic credentials is present in the request.
 
@@ -153,6 +165,9 @@ public:
 	static bool hasProxyDigestCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
 
+	static bool hasProxyNTLMCredentials(const HTTPRequest& request);
+		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
+
 	static void extractCredentials(const std::string& userInfo, std::string& username, std::string& password);
 		/// Extracts username and password from user:password information string.
 
@@ -164,6 +179,7 @@ private:
 	HTTPCredentials& operator = (const HTTPCredentials&);
 
 	HTTPDigestCredentials _digest;
+	HTTPNTLMCredentials _ntlm;
 };
 
 
@@ -191,6 +207,18 @@ inline void HTTPCredentials::setPassword(const std::string& password)
 inline const std::string& HTTPCredentials::getPassword() const
 {
 	return _digest.getPassword();
+}
+
+
+inline void HTTPCredentials::setHost(const std::string& host)
+{
+	_ntlm.setHost(host);
+}
+
+
+inline const std::string& HTTPCredentials::getHost() const
+{
+	return _ntlm.getHost();
 }
 
 

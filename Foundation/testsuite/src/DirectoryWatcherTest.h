@@ -22,6 +22,7 @@
 
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Path.h"
+#include "Poco/Mutex.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -35,12 +36,15 @@ public:
 	void testRemoved();
 	void testModified();
 	void testMoved();
-	
+	void testSuspend();
+	void testResume();
+	void testSuspendMultipleTimes();
+
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
-	
+
 protected:
 	void onItemAdded(const Poco::DirectoryWatcher::DirectoryEvent& ev);
 	void onItemRemoved(const Poco::DirectoryWatcher::DirectoryEvent& ev);
@@ -48,7 +52,7 @@ protected:
 	void onItemMovedFrom(const Poco::DirectoryWatcher::DirectoryEvent& ev);
 	void onItemMovedTo(const Poco::DirectoryWatcher::DirectoryEvent& ev);
 	void onError(const Poco::Exception& exc);
-	
+
 	Poco::Path path() const;
 
 private:
@@ -60,6 +64,7 @@ private:
 	};
 	std::vector<DirEvent> _events;
 	bool _error;
+	Poco::Mutex _mutex;
 };
 
 

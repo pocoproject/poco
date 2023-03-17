@@ -19,7 +19,8 @@ objects = \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
 	FTPStreamFactoryTest DialogServer \
-	SocketReactorTest ReactorTestSuite \
+	SocketReactorTest SocketConnectorTest ReactorTestSuite \
+	SocketProactorTest \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
@@ -27,7 +28,8 @@ objects = \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
-	PollSetTest
+	PollSetTest UDPServerTest UDPServerTestSuite \
+	NTLMCredentialsTest
 
 target         = testrunner
 target_version = 1

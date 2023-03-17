@@ -25,6 +25,8 @@
 
 #if defined(_WIN32)
 	#define POCO_LIBRARY_API __declspec(dllexport)
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
+	#define POCO_LIBRARY_API __attribute__ ((visibility ("default")))
 #else
 	#define POCO_LIBRARY_API
 #endif
@@ -38,7 +40,7 @@ extern "C"
 	bool POCO_LIBRARY_API pocoBuildManifest(Poco::ManifestBase* pManifest);
 	void POCO_LIBRARY_API pocoInitializeLibrary();
 	void POCO_LIBRARY_API pocoUninitializeLibrary();
-} 
+}
 
 
 //
@@ -92,6 +94,10 @@ extern "C"	\
 
 #define POCO_EXPORT_CLASS(cls) \
     pManifest->insert(new Poco::MetaObject<cls, _Base>(#cls));
+
+
+#define POCO_EXPORT_INTERFACE(cls, itf) \
+    pManifest->insert(new Poco::MetaObject<cls, _Base>(itf));
 
 
 #define POCO_EXPORT_SINGLETON(cls) \

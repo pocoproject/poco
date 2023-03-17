@@ -150,6 +150,12 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 }
 
 
+SocketAddress::SocketAddress(SocketAddress&& socketAddress):
+	_pImpl(std::move(socketAddress._pImpl))
+{
+}
+
+
 SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
 {
 	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
@@ -199,6 +205,13 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 			newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
 #endif
 	}
+	return *this;
+}
+
+
+SocketAddress& SocketAddress::operator = (SocketAddress&& socketAddress)
+{
+	_pImpl = std::move(socketAddress._pImpl);
 	return *this;
 }
 
@@ -295,11 +308,11 @@ void SocketAddress::init(Family fam, const std::string& hostAddress, Poco::UInt1
 		HostEntry::AddressList addresses = he.addresses();
 		if (addresses.size() > 0)
 		{
-			for (HostEntry::AddressList::const_iterator it = addresses.begin(); it != addresses.end(); ++it)
+			for (const auto& addr: addresses)
 			{
-				if (it->family() == fam)
+				if (addr.family() == fam)
 				{
-					init(*it, portNumber);
+					init(addr, portNumber);
 					return;
 				}
 			}

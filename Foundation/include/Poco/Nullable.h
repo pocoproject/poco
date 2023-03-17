@@ -36,15 +36,15 @@ enum NullType
 template <typename C>
 class Nullable
 	/// Nullable is a simple wrapper class for value types
-	/// that allows objects or native type variables 
+	/// that allows objects or native type variables
 	/// to have "null" value.
 	///
 	/// The class is useful for passing parameters to functions
-	/// when parameters are optional and no default values 
+	/// when parameters are optional and no default values
 	/// should be used or when a non-assigned state is needed,
 	/// such as in e.g. fetching null values from database.
 	///
-	/// A Nullable can be default constructed. In this case, 
+	/// A Nullable can be default constructed. In this case,
 	/// the Nullable will have a Null value and isNull() will
 	/// return true. Calling value() (without default value) on
 	/// a Null object will throw a NullValueException.
@@ -58,7 +58,7 @@ class Nullable
 	/// default construction.
 {
 public:
-	Nullable(): 
+	Nullable():
 		/// Creates an empty Nullable.
 		_value(),
 		_isNull(true),
@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-	Nullable(const NullType&): 
+	Nullable(const NullType&):
 		/// Creates an empty Nullable.
 		_value(),
 		_isNull(true),
@@ -74,20 +74,37 @@ public:
 	{
 	}
 
-	Nullable(const C& value): 
+	Nullable(const C& value):
 		/// Creates a Nullable with the given value.
-		_value(value), 
+		_value(value),
 		_isNull(false),
 		_null()
 	{
 	}
-	
+
+	Nullable(C&& value):
+		/// Creates a Nullable by moving the given value.
+		_value(std::forward<C>(value)),
+		_isNull(false),
+		_null()
+	{
+	}
+
 	Nullable(const Nullable& other):
 		/// Creates a Nullable by copying another one.
 		_value(other._value),
 		_isNull(other._isNull),
 		_null()
 	{
+	}
+
+	Nullable(Nullable&& other) noexcept:
+		/// Creates a Nullable by moving another one.
+		_value(std::move(other._value)),
+		_isNull(other._isNull),
+		_null()
+	{
+		other._isNull = true;
 	}
 
 	~Nullable()
@@ -102,7 +119,15 @@ public:
 		_isNull = false;
 		return *this;
 	}
-	
+
+	Nullable& assign(C&& value)
+		/// Assigns a value to the Nullable.
+	{
+		_value  = std::move(value);
+		_isNull = false;
+		return *this;
+	}
+
 	Nullable& assign(const Nullable& other)
 		/// Assigns another Nullable.
 	{
@@ -110,24 +135,39 @@ public:
 		swap(tmp);
 		return *this;
 	}
-	
+
 	Nullable& assign(NullType)
 		/// Sets value to null.
 	{
 		_isNull = true;
 		return *this;
 	}
-	
+
 	Nullable& operator = (const C& value)
 		/// Assigns a value to the Nullable.
 	{
 		return assign(value);
 	}
 
+	Nullable& operator = (C&& value)
+		/// Move-assigns a value to the Nullable.
+	{
+		return assign(std::move(value));
+	}
+
 	Nullable& operator = (const Nullable& other)
 		/// Assigns another Nullable.
 	{
 		return assign(other);
+	}
+
+	Nullable& operator = (Nullable&& other) noexcept
+		/// Moves another Nullable.
+	{
+		_isNull = other._isNull;
+		_value = std::move(other._value);
+		other._isNull = true;
+		return *this;
 	}
 
 	Nullable& operator = (NullType)
@@ -137,7 +177,7 @@ public:
 		return *this;
 	}
 
-	void swap(Nullable& other)
+	void swap(Nullable& other) noexcept
 		/// Swaps this Nullable with other.
 	{
 		std::swap(_value, other._value);
@@ -247,7 +287,6 @@ public:
 	operator NullType& ()
 		/// Get reference to the value
 	{
-
 		return _null;
 	}
 
@@ -256,7 +295,7 @@ public:
 	{
 		return _isNull;
 	}
-	
+
 	void clear()
 		/// Clears the Nullable.
 	{
@@ -271,14 +310,14 @@ private:
 
 
 template <typename C>
-inline void swap(Nullable<C>& n1, Nullable<C>& n2)
+inline void swap(Nullable<C>& n1, Nullable<C>& n2) noexcept
 {
 	n1.swap(n2);
 }
 
 
 template <typename C>
-std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj) 
+std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj)
 {
 	if (!obj.isNull()) out << obj.value();
 	return out;

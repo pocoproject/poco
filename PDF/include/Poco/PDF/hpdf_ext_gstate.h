@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 HPDF_Dict
-HPDF_ExtGState_New  (HPDF_MMgr   mmgr, 
+HPDF_ExtGState_New  (HPDF_MMgr   mmgr,
                      HPDF_Xref   xref);
 
 

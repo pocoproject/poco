@@ -48,7 +48,7 @@ class Data_API StatementImpl
 	/// StatementImpl's are noncopyable.
 {
 public:
-	typedef Poco::SharedPtr<StatementImpl> Ptr;
+	using Ptr = Poco::SharedPtr<StatementImpl>;
 
 	enum State
 	{
@@ -70,19 +70,19 @@ public:
 
 	enum BulkType
 	{
-		BULK_UNDEFINED,     
+		BULK_UNDEFINED,
 			/// Bulk mode not defined yet.
-		BULK_BINDING,       
+		BULK_BINDING,
 			/// Binding in bulk mode.
-			/// If extraction is present in the same statement, 
+			/// If extraction is present in the same statement,
 			/// it must also be bulk.
-		BULK_EXTRACTION,    
+		BULK_EXTRACTION,
 			/// Extraction in bulk mode.
-			/// If binding is present in the same statement, 
+			/// If binding is present in the same statement,
 			/// it must also be bulk.
-		BULK_FORBIDDEN     
-			/// Bulk forbidden. 
-			/// Happens when the statement has already been 
+		BULK_FORBIDDEN
+			/// Bulk forbidden.
+			/// Happens when the statement has already been
 			/// configured as non-bulk.
 	};
 
@@ -99,7 +99,7 @@ public:
 	virtual ~StatementImpl();
 		/// Destroys the StatementImpl.
 
-	template <typename T> 
+	template <typename T>
 	void add(const T& t)
 		/// Appends SQL statement (fragments).
 	{
@@ -117,15 +117,15 @@ public:
 		/// Registers objects used for extracting data with the StatementImpl.
 
 	void setExtractionLimit(const Limit& extrLimit);
-		/// Changes the extractionLimit to extrLimit. 
+		/// Changes the extractionLimit to extrLimit.
 		/// Per default no limit (EXTRACT_UNLIMITED) is set.
 
 	std::string toString() const;
 		/// Create a string version of the SQL statement.
 
 	std::size_t execute(const bool& reset = true);
-		/// Executes a statement. Returns the number of rows 
-		/// extracted for statements returning data or number of rows 
+		/// Executes a statement. Returns the number of rows
+		/// extracted for statements returning data or number of rows
 		/// affected for all other statements (insert, update, delete).
 		/// If reset is true (default), the underlying bound storage is
 		/// reset and reused. In case of containers, this means they are
@@ -154,15 +154,15 @@ public:
 
 	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
-		
+
 protected:
 	virtual std::size_t columnsReturned() const = 0;
-		/// Returns number of columns returned by query. 
+		/// Returns number of columns returned by query.
 
 	virtual int affectedRowCount() const = 0;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
-		/// 
+		///
 		/// Some back-ends may return a negative number in certain circumstances (e.g.
 		/// some ODBC drivers when this function is called after a select statement
 		/// execution).
@@ -174,10 +174,10 @@ protected:
 		/// Returns column meta data.
 
 	virtual bool hasNext() = 0;
-		/// Returns true if a call to next() will return data. 
+		/// Returns true if a call to next() will return data.
 		///
 		/// Note that the implementation must support
-		/// several consecutive calls to hasNext without data getting lost, 
+		/// several consecutive calls to hasNext without data getting lost,
 		/// ie. hasNext(); hasNext(); next() must be equal to hasNext(); next();
 
 	virtual std::size_t next() = 0;
@@ -232,8 +232,8 @@ protected:
 		/// Determines the type of the internal extraction container and
 		/// calls the extraction creation function (addInternalExtract)
 		/// with appropriate data type and container type arguments.
-		/// 
-		/// This function is only called in cases when there is data 
+		///
+		/// This function is only called in cases when there is data
 		/// returned by query, but no data storage supplied by user.
 		///
 		/// The type of the internal container is determined in the
@@ -273,24 +273,24 @@ protected:
 		/// Used as a help to determine whether to automatically create the
 		/// internal extractions when no outside extraction is supplied.
 		/// The reason for this function is to prevent unnecessary internal
-		/// extraction creation in cases (behavior exhibited by some ODBC drivers) 
-		/// when there is data available from the stored procedure call 
-		/// statement execution but no external extraction is supplied (as is 
+		/// extraction creation in cases (behavior exhibited by some ODBC drivers)
+		/// when there is data available from the stored procedure call
+		/// statement execution but no external extraction is supplied (as is
 		/// usually the case when stored procedures are called). In such cases
 		/// no storage is needed because output parameters serve as storage.
 		/// At the Data framework level, this function always returns false.
-		/// When connector-specific behavior is desired, it should be overriden 
+		/// When connector-specific behavior is desired, it should be overridden
 		/// by the statement implementation.
 
 	std::size_t currentDataSet() const;
 		/// Returns the current data set.
 
 	std::size_t activateNextDataSet();
-		/// Returns the next data set index, or throws NoDataException if the last 
+		/// Returns the next data set index, or throws NoDataException if the last
 		/// data set was reached.
 
 	std::size_t activatePreviousDataSet();
-		/// Returns the previous data set index, or throws NoDataException if the last 
+		/// Returns the previous data set index, or throws NoDataException if the last
 		/// data set was reached.
 
 	bool hasMoreDataSets() const;
@@ -304,20 +304,20 @@ private:
 		/// Binds the statement, if not yet bound.
 
 	std::size_t executeWithLimit();
-		/// Executes with an upper limit set. Returns the number of rows 
-		/// extracted for statements returning data or number of rows 
+		/// Executes with an upper limit set. Returns the number of rows
+		/// extracted for statements returning data or number of rows
 		/// affected for all other statements (insert, update, delete).
 
 	std::size_t executeWithoutLimit();
-		/// Executes without an upper limit set. Returns the number of rows 
-		/// extracted for statements returning data or number of rows 
+		/// Executes without an upper limit set. Returns the number of rows
+		/// extracted for statements returning data or number of rows
 		/// affected for all other statements (insert, update, delete).
 
 	void resetExtraction();
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc)
+	SharedPtr<InternalExtraction<C>> createExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -325,7 +325,7 @@ private:
 	}
 
 	template <class C>
-	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc)
+	SharedPtr<InternalBulkExtraction<C>> createBulkExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -339,27 +339,27 @@ private:
 	void addInternalExtract(const MetaColumn& mc)
 		/// Creates and adds the internal extraction.
 		///
-		/// The decision about internal extraction container is done 
+		/// The decision about internal extraction container is done
 		/// in a following way:
 		///
 		/// If this statement has _storage member set, that setting
 		/// overrides the session setting for storage, otherwise the
 		/// session setting is used.
 		/// If neither this statement nor the session have the storage
-		/// type set, std::deque is the default container type used.
+		/// type set, std::vector is the default container type used.
 	{
 		std::string storage;
-	
+
 		switch (_storage)
 		{
-		case STORAGE_DEQUE_IMPL:  
+		case STORAGE_DEQUE_IMPL:
 			storage = DEQUE; break;
-		case STORAGE_VECTOR_IMPL: 
+		case STORAGE_VECTOR_IMPL:
 			storage = VECTOR; break;
-		case STORAGE_LIST_IMPL:   
+		case STORAGE_LIST_IMPL:
 			storage = LIST; break;
 		case STORAGE_UNKNOWN_IMPL:
-			storage = AnyCast<std::string>(session().getProperty("storage")); 
+			storage = AnyCast<std::string>(session().getProperty("storage"));
 			break;
 		}
 
@@ -368,29 +368,29 @@ private:
 		if (0 == icompare(DEQUE, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::deque<T> >(mc));
+				addExtract(createExtract<std::deque<T>>(mc));
 			else
-				addExtract(createBulkExtract<std::deque<T> >(mc));
+				addExtract(createBulkExtract<std::deque<T>>(mc));
 		}
 		else if (0 == icompare(VECTOR, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::vector<T> >(mc));
+				addExtract(createExtract<std::vector<T>>(mc));
 			else
-				addExtract(createBulkExtract<std::vector<T> >(mc));
+				addExtract(createBulkExtract<std::vector<T>>(mc));
 		}
 		else if (0 == icompare(LIST, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::list<T> >(mc));
+				addExtract(createExtract<std::list<T>>(mc));
 			else
-				addExtract(createBulkExtract<std::list<T> >(mc));
+				addExtract(createBulkExtract<std::list<T>>(mc));
 		}
 	}
 
 	bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the value in [col, row] is null.
-		
+
 	void forbidBulk();
 		/// Forbids bulk operations.
 
@@ -399,7 +399,7 @@ private:
 
 	void setBulkExtraction(const Bulk& l);
 		/// Sets the bulk extraction flag and extraction limit.
-	
+
 	void resetBulk();
 		/// Resets the bulk extraction and binding flag.
 
@@ -430,9 +430,9 @@ private:
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
 
-	typedef std::vector<std::size_t> CountVec;
+	using CountVec = std::vector<std::size_t>;
 
-	State                    _state;
+	std::atomic<State>       _state;
 	Limit                    _extrLimit;
 	std::size_t              _lowerLimit;
 	std::vector<int>         _columnsExtracted;
@@ -446,7 +446,7 @@ private:
 	BulkType                 _bulkExtraction;
 	CountVec                 _subTotalRowCount;
 
-	friend class Statement; 
+	friend class Statement;
 };
 
 
@@ -538,13 +538,13 @@ inline bool StatementImpl::isStoredProcedure() const
 
 inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 {
-	try 
+	try
 	{
 		return extractions().at(col)->isNull(row);
 	}
 	catch (std::out_of_range& ex)
-	{ 
-		throw RangeException(ex.what()); 
+	{
+		throw RangeException(ex.what());
 	}
 }
 
@@ -605,7 +605,7 @@ inline bool StatementImpl::isBulkExtraction() const
 	return BULK_EXTRACTION == _bulkExtraction;
 }
 
-	
+
 inline void StatementImpl::resetBulk()
 {
 	_bulkExtraction = BULK_UNDEFINED;

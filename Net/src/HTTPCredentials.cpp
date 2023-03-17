@@ -47,6 +47,13 @@ HTTPCredentials::~HTTPCredentials()
 }
 
 
+void HTTPCredentials::clear()
+{
+	_digest.clear();
+	_ntlm.clear();
+}
+
+
 void HTTPCredentials::fromUserInfo(const std::string& userInfo)
 {
 	std::string username;
@@ -67,6 +74,7 @@ void HTTPCredentials::fromURI(const URI& uri)
 	extractCredentials(uri, username, password);
 	setUsername(username);
 	setPassword(password);
+	setHost(uri.getHost());
 	_digest.reset();
 }
 
@@ -75,14 +83,25 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 {
 	for (HTTPResponse::ConstIterator iter = response.find(HTTPAuthenticationParams::WWW_AUTHENTICATE); iter != response.end(); ++iter)
 	{
-		if (isBasicCredentials(iter->second)) 
+		if (isBasicCredentials(iter->second))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).authenticate(request);
 			return;
-		} 
-		else if (isDigestCredentials(iter->second)) 
+		}
+		else if (isDigestCredentials(iter->second))
 		{
 			_digest.authenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
+			return;
+		}
+		else if (isNTLMCredentials(iter->second))
+		{
+			_ntlm.setUsername(_digest.getUsername());
+			_ntlm.setPassword(_digest.getPassword());
+			if (_ntlm.getHost().empty())
+			{
+				_ntlm.setHost(request.getHost());
+			}
+			_ntlm.authenticate(request, iter->second.substr(5));
 			return;
 		}
 	}
@@ -91,17 +110,21 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 
 void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 {
-	if (request.has(HTTPRequest::AUTHORIZATION)) 
+	if (request.has(HTTPRequest::AUTHORIZATION))
 	{
 		const std::string& authorization = request.get(HTTPRequest::AUTHORIZATION);
 
-		if (isBasicCredentials(authorization)) 
+		if (isBasicCredentials(authorization))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).authenticate(request);
-		} 
-		else if (isDigestCredentials(authorization)) 
+		}
+		else if (isDigestCredentials(authorization))
 		{
 			_digest.updateAuthInfo(request);
+		}
+		else if (isNTLMCredentials(authorization))
+		{
+			_ntlm.updateAuthInfo(request);
 		}
 	}
 }
@@ -111,14 +134,21 @@ void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse
 {
 	for (HTTPResponse::ConstIterator iter = response.find(HTTPAuthenticationParams::PROXY_AUTHENTICATE); iter != response.end(); ++iter)
 	{
-		if (isBasicCredentials(iter->second)) 
+		if (isBasicCredentials(iter->second))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).proxyAuthenticate(request);
 			return;
-		} 
-		else if (isDigestCredentials(iter->second)) 
+		}
+		else if (isDigestCredentials(iter->second))
 		{
 			_digest.proxyAuthenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
+			return;
+		}
+		else if (isNTLMCredentials(iter->second))
+		{
+			_ntlm.setUsername(_digest.getUsername());
+			_ntlm.setPassword(_digest.getPassword());
+			_ntlm.proxyAuthenticate(request, iter->second.substr(5));
 			return;
 		}
 	}
@@ -127,17 +157,21 @@ void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse
 
 void HTTPCredentials::updateProxyAuthInfo(HTTPRequest& request)
 {
-	if (request.has(HTTPRequest::PROXY_AUTHORIZATION)) 
+	if (request.has(HTTPRequest::PROXY_AUTHORIZATION))
 	{
 		const std::string& authorization = request.get(HTTPRequest::PROXY_AUTHORIZATION);
 
-		if (isBasicCredentials(authorization)) 
+		if (isBasicCredentials(authorization))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).proxyAuthenticate(request);
-		} 
-		else if (isDigestCredentials(authorization)) 
+		}
+		else if (isDigestCredentials(authorization))
 		{
 			_digest.updateProxyAuthInfo(request);
+		}
+		else if (isNTLMCredentials(authorization))
+		{
+			_ntlm.updateProxyAuthInfo(request);
 		}
 	}
 }
@@ -155,6 +189,12 @@ bool HTTPCredentials::isDigestCredentials(const std::string& header)
 }
 
 
+bool HTTPCredentials::isNTLMCredentials(const std::string& header)
+{
+	return icompare(header, 0, 4, "NTLM") == 0 && (header.size() > 5 ? Poco::Ascii::isSpace(header[5]) : true);
+}
+
+
 bool HTTPCredentials::hasBasicCredentials(const HTTPRequest& request)
 {
 	return request.has(HTTPRequest::AUTHORIZATION) && isBasicCredentials(request.get(HTTPRequest::AUTHORIZATION));
@@ -164,6 +204,12 @@ bool HTTPCredentials::hasBasicCredentials(const HTTPRequest& request)
 bool HTTPCredentials::hasDigestCredentials(const HTTPRequest& request)
 {
 	return request.has(HTTPRequest::AUTHORIZATION) && isDigestCredentials(request.get(HTTPRequest::AUTHORIZATION));
+}
+
+
+bool HTTPCredentials::hasNTLMCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::AUTHORIZATION) && isNTLMCredentials(request.get(HTTPRequest::AUTHORIZATION));
 }
 
 
@@ -179,16 +225,22 @@ bool HTTPCredentials::hasProxyDigestCredentials(const HTTPRequest& request)
 }
 
 
+bool HTTPCredentials::hasProxyNTLMCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::PROXY_AUTHORIZATION) && isNTLMCredentials(request.get(HTTPRequest::PROXY_AUTHORIZATION));
+}
+
+
 void HTTPCredentials::extractCredentials(const std::string& userInfo, std::string& username, std::string& password)
 {
 	const std::string::size_type p = userInfo.find(':');
 
-	if (p != std::string::npos) 
+	if (p != std::string::npos)
 	{
 		username.assign(userInfo, 0, p);
 		password.assign(userInfo, p + 1, std::string::npos);
-	} 
-	else 
+	}
+	else
 	{
 		username.assign(userInfo);
 		password.clear();
@@ -198,7 +250,7 @@ void HTTPCredentials::extractCredentials(const std::string& userInfo, std::strin
 
 void HTTPCredentials::extractCredentials(const Poco::URI& uri, std::string& username, std::string& password)
 {
-	if (!uri.getUserInfo().empty()) 
+	if (!uri.getUserInfo().empty())
 	{
 		extractCredentials(uri.getUserInfo(), username, password);
 	}

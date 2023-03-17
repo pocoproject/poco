@@ -15,10 +15,8 @@
 #include "Poco/DirectoryIterator.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "DirectoryIterator_WIN32U.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "DirectoryIterator_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "DirectoryIterator_UNIX.cpp"
 #endif
@@ -74,13 +72,16 @@ DirectoryIterator::~DirectoryIterator()
 
 DirectoryIterator& DirectoryIterator::operator = (const DirectoryIterator& it)
 {
-	if (_pImpl) _pImpl->release();
-	_pImpl = it._pImpl;
-	if (_pImpl)
+	if (&it != this)
 	{
-		_pImpl->duplicate();
-		_path = it._path;
-		_file = _path;
+		if (_pImpl) _pImpl->release();
+		_pImpl = it._pImpl;
+		if (_pImpl)
+		{
+			_pImpl->duplicate();
+			_path = it._path;
+			_file = _path;
+		}
 	}
 	return *this;
 }

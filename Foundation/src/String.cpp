@@ -26,7 +26,7 @@ int icompare(const std::string& str, std::string::size_type pos, std::string::si
 	std::string::size_type sz = str.size();
 	if (pos > sz) pos = sz;
 	if (pos + n > sz) n = sz - pos;
-	std::string::const_iterator it1  = str.begin() + pos; 
+	std::string::const_iterator it1  = str.begin() + pos;
 	std::string::const_iterator end1 = str.begin() + pos + n;
 	while (it1 != end1 && it2 != end2)
 	{
@@ -96,7 +96,7 @@ int icompare(const std::string& str, std::string::size_type pos, std::string::si
 	std::string::size_type sz = str.size();
 	if (pos > sz) pos = sz;
 	if (pos + n > sz) n = sz - pos;
-	std::string::const_iterator it  = str.begin() + pos; 
+	std::string::const_iterator it  = str.begin() + pos;
 	std::string::const_iterator end = str.begin() + pos + n;
 	while (it != end && *ptr)
 	{
@@ -159,11 +159,11 @@ std::string remove(const std::string& str, const std::string::value_type ch, std
 	return result;
 }
 
-	
+
 std::string& replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start)
 {
 	poco_assert (from.size() > 0);
-	
+
 	std::string result;
 	std::string::size_type pos = 0;
 	result.append(str, 0, start);

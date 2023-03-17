@@ -20,13 +20,11 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/UnWindows.h"
+#include <vector>
 
 
-#if defined(POCO_WIN32_UTF8)
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGW
-#else
-#define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGA
-#endif
+#define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSW
 
 
 namespace Poco {
@@ -48,9 +46,32 @@ public:
 		SVC_MANUAL_START,
 		SVC_DISABLED
 	};
-	
+
+	enum FailureActionType
+	{
+		SVC_NONE,
+		SVC_REBOOT,
+		SVC_RESTART,
+		SVC_RUN_COMMAND
+	};
+
+	struct FailureAction
+	{
+		FailureActionType type;
+		int delay;
+	};
+
+	using FailureActionVector = std::vector<FailureAction>;
+	using FailureActionTypeVector = std::vector<FailureActionType>;
+
 	WinService(const std::string& name);
 		/// Creates the WinService, using the given service name.
+
+	WinService(SC_HANDLE scmHandle, const std::string& name);
+		/// Creates the WinService, using the given connection to
+		/// a Windows Service Manager and the given service name.
+		///
+		/// The class will close the given scmHandle on destruction
 
 	~WinService();
 		/// Destroys the WinService.
@@ -62,7 +83,7 @@ public:
 		/// Returns the service's display name.
 
 	std::string path() const;
-		/// Returns the path to the service executable. 
+		/// Returns the path to the service executable.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
@@ -71,7 +92,7 @@ public:
 		/// and the given displayName.
 		///
 		/// Throws a ExistsException if the service has already been registered.
-		
+
 	void registerService(const std::string& path);
 		/// Creates a Windows service with the executable specified by path
 		/// and the given displayName. The service name is used as display name.
@@ -79,7 +100,7 @@ public:
 		/// Throws a ExistsException if the service has already been registered.
 
 	void unregisterService();
-		/// Deletes the Windows service. 
+		/// Deletes the Windows service.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
@@ -88,7 +109,10 @@ public:
 
 	bool isRunning() const;
 		/// Returns true if the service is currently running.
-		
+
+	bool isStopped() const;
+		/// Returns true if the service is currently stopped.
+
 	void start();
 		/// Starts the service.
 		/// Does nothing if the service is already running.
@@ -103,13 +127,21 @@ public:
 
 	void setStartup(Startup startup);
 		/// Sets the startup mode for the service.
-		
+
 	Startup getStartup() const;
 		/// Returns the startup mode for the service.
-		
+
+	void setFailureActions(FailureActionVector failureActions, const std::string& command = "", const std::string& rebootMessage = "");
+		/// Sets the Failure Actions for the service.
+		/// If one of the Actions is SVC_RUN_COMMAND the command Parameter is added.
+		/// If one of the Actions is SVC_REBOOT the Reboot Message is set.
+
+	FailureActionTypeVector getFailureActions() const;
+		/// Returns the Failure Actions for the service.
+
 	void setDescription(const std::string& description);
 		/// Sets the service description in the registry.
-		
+
 	std::string getDescription() const;
 		/// Returns the service description from the registry.
 

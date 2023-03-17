@@ -70,25 +70,25 @@ public:
 	void add(TextEncoding::Ptr pEncoding, const std::string& name)
 	{
 		RWLock::ScopedLock lock(_lock, true);
-	
+
 		_encodings[name] = pEncoding;
 	}
 
 	void remove(const std::string& name)
 	{
 		RWLock::ScopedLock lock(_lock, true);
-	
+
 		_encodings.erase(name);
 	}
-	
+
 	TextEncoding::Ptr find(const std::string& name) const
 	{
 		RWLock::ScopedLock lock(_lock);
-		
+
 		EncodingMap::const_iterator it = _encodings.find(name);
 		if (it != _encodings.end())
 			return it->second;
-		
+
 		for (it = _encodings.begin(); it != _encodings.end(); ++it)
 		{
 			if (it->second->isA(name))
@@ -100,9 +100,9 @@ public:
 private:
 	TextEncodingManager(const TextEncodingManager&);
 	TextEncodingManager& operator = (const TextEncodingManager&);
-	
+
 	typedef std::map<std::string, TextEncoding::Ptr, CILess> EncodingMap;
-	
+
 	EncodingMap    _encodings;
 	mutable RWLock _lock;
 };
@@ -154,7 +154,7 @@ TextEncoding& TextEncoding::byName(const std::string& encodingName)
 		throw NotFoundException(encodingName);
 }
 
-	
+
 TextEncoding::Ptr TextEncoding::find(const std::string& encodingName)
 {
 	return manager().find(encodingName);

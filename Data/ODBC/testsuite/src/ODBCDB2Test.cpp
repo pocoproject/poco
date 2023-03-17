@@ -66,7 +66,7 @@ std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER ";"
 	"Pwd=" DB2_PWD ";";
 
 
-ODBCDB2Test::ODBCDB2Test(const std::string& name): 
+ODBCDB2Test::ODBCDB2Test(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -110,7 +110,7 @@ void ODBCDB2Test::testBareboneODBC()
 void ODBCDB2Test::testBLOB()
 {
 	if (!_pSession) fail ("Test not available.");
-	
+
 	const std::size_t maxFldSize = 1000000;
 	_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
 	recreatePersonBLOBTable();
@@ -120,7 +120,7 @@ void ODBCDB2Test::testBLOB()
 		_pExecutor->blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -176,21 +176,21 @@ void ODBCDB2Test::testStoredProcedure()
 
 		int i = 0;
 		*_pSession << "{call storedProcedure(?)}", out(i), now;
-		assert(-1 == i);
+		assertTrue (-1 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		*_pSession << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = inParam*inParam; "
 			"END" , now;
-		
+
 
 		i = 2;
 		int j = 0;
 		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assert(4 == j);
+		assertTrue (4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
-	
+
 		*_pSession << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
 			"BEGIN "
 			" SET ioParam = ioParam*ioParam; "
@@ -198,7 +198,7 @@ void ODBCDB2Test::testStoredProcedure()
 
 		i = 2;
 		*_pSession << "{call storedProcedure(?)}", io(i), now;
-		assert(4 == i);
+		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		//TIMESTAMP is not supported as stored procedure parameter in DB2
@@ -209,7 +209,7 @@ void ODBCDB2Test::testStoredProcedure()
 			" SET outParam = inParam; "
 			"END" , now;
 
-		std::string inParam = 
+		std::string inParam =
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
@@ -221,7 +221,7 @@ void ODBCDB2Test::testStoredProcedure()
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
 		std::string outParam;
 		*_pSession << "{call storedProcedure(?,?)}", in(inParam), out(outParam), now;
-		assert(inParam == outParam);
+		assertTrue (inParam == outParam);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
@@ -247,7 +247,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 			"END" , now;
 
 		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assert(4 == AnyCast<int>(j));
+		assertTrue (4 == AnyCast<int>(j));
 		*_pSession << "DROP PROCEDURE storedProcedure;", now;
 
 		*_pSession << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
@@ -257,7 +257,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 
 		i = 2;
 		*_pSession << "{call storedProcedure(?)}", io(i), now;
-		assert(4 == AnyCast<int>(i));
+		assertTrue (4 == AnyCast<int>(i));
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
@@ -272,7 +272,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 	for (int k = 0; k < 8;)
 	{
 		_pSession->setFeature("autoBind", bindValue(k));
-		
+
 		DynamicAny i = 2;
 		DynamicAny j = 0;
 
@@ -282,7 +282,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 			"END" , now;
 
 		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assert(4 == j);
+		assertTrue (4 == j);
 		*_pSession << "DROP PROCEDURE storedProcedure;", now;
 
 		*_pSession << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
@@ -292,7 +292,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 
 		i = 2;
 		*_pSession << "{call storedProcedure(?)}", io(i), now;
-		assert(4 == i);
+		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
@@ -317,18 +317,18 @@ void ODBCDB2Test::testStoredFunction()
 
 		int i = 0;
 		*_pSession << "{? = call storedFunction()}", out(i), now;
-		assert(-1 == i);
+		assertTrue (-1 == i);
 		dropObject("PROCEDURE", "storedFunction");
-		
+
 		*_pSession << "CREATE PROCEDURE storedFunction(inParam INTEGER) "
 			"BEGIN "
 			" RETURN inParam*inParam; "
 			"END" , now;
-		
+
 		i = 2;
 		int result = 0;
 		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assert(4 == result);
+		assertTrue (4 == result);
 		dropObject("PROCEDURE", "storedFunction");
 
 		*_pSession << "CREATE PROCEDURE storedFunction(inParam INTEGER, OUT outParam INTEGER) "
@@ -341,8 +341,8 @@ void ODBCDB2Test::testStoredFunction()
 		int j = 0;
 		result = 0;
 		*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
-		assert(4 == j);
-		assert(j == result); 
+		assertTrue (4 == j);
+		assertTrue (j == result);
 		dropObject("PROCEDURE", "storedFunction");
 
 		*_pSession << "CREATE PROCEDURE storedFunction(INOUT param1 INTEGER, INOUT param2 INTEGER) "
@@ -358,18 +358,18 @@ void ODBCDB2Test::testStoredFunction()
 		j = 2;
 		result = 0;
 		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
-		assert(1 == j);
-		assert(2 == i);
-		assert(3 == result); 
+		assertTrue (1 == j);
+		assertTrue (2 == i);
+		assertTrue (3 == result);
 
 		Tuple<int, int> params(1, 2);
-		assert(1 == params.get<0>());
-		assert(2 == params.get<1>());
+		assertTrue (1 == params.get<0>());
+		assertTrue (2 == params.get<1>());
 		result = 0;
 		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
-		assert(1 == params.get<1>());
-		assert(2 == params.get<0>());
-		assert(3 == result); 
+		assertTrue (1 == params.get<1>());
+		assertTrue (2 == params.get<0>());
+		assertTrue (3 == result);
 
 		dropObject("PROCEDURE", "storedFunction");
 
@@ -385,8 +385,8 @@ void ODBCDB2Test::testStoredFunction()
 		std::string outParam;
 		int ret;
 		*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
-		assert(inParam == outParam);
-		assert(ret == inParam.size());
+		assertTrue (inParam == outParam);
+		assertTrue (ret == inParam.size());
 		dropObject("PROCEDURE", "storedFunction");
 
 		k += 2;
@@ -545,14 +545,14 @@ void ODBCDB2Test::recreateNullsTable(const std::string& notNull)
 void ODBCDB2Test::recreateMiscTable()
 {
 	dropObject("TABLE", "MiscTest");
-	try 
-	{ 
+	try
+	{
 		session() << "CREATE TABLE MiscTest "
 			"(First VARCHAR(30),"
 			"Second BLOB,"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
-			"Fifth TIMESTAMP)", now; 
+			"Fifth TIMESTAMP)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -563,19 +563,19 @@ void ODBCDB2Test::recreateLogTable()
 	dropObject("TABLE", "T_POCO_LOG");
 	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(100),"
 			"Name VARCHAR(100),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(100), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(100),"
-			"DateTime TIMESTAMP)"; 
+			"DateTime TIMESTAMP)";
 
-		session() << sql, "T_POCO_LOG", now; 
+		session() << sql, "T_POCO_LOG", now;
 		session() << sql, "T_POCO_LOG_ARCHIVE", now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }

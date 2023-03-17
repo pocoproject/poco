@@ -1,5 +1,5 @@
 //
-// UnufferedStreamBuf.h
+// UnbufferedStreamBuf.h
 //
 // Library: Foundation
 // Package: Streams
@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr> 
+template <typename ch, typename tr>
 class BasicUnbufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of an unbuffered streambuf
 	/// that greatly simplifies the implementation of
@@ -61,7 +61,7 @@ public:
 
 	virtual int_type overflow(int_type c)
 	{
-		if (c != char_traits::eof()) 
+		if (c != char_traits::eof())
 			return writeToDevice(char_traits::to_char_type(c));
 		else
 			return c;
@@ -116,9 +116,9 @@ public:
 			return c;
 		}
 	}
-	
+
 	virtual std::streamsize xsgetn(char_type* p, std::streamsize count)
-		/// Some platforms (for example, Compaq C++) have buggy implementations of 
+		/// Some platforms (for example, Compaq C++) have buggy implementations of
 		/// xsgetn that handle null buffers incorrectly.
 		/// Anyway, it does not hurt to provide an optimized implementation
 		/// of xsgetn for this streambuf implementation.
@@ -146,7 +146,7 @@ private:
 	{
 		return char_traits::eof();
 	}
-	
+
 	virtual int_type writeToDevice(char_type)
 	{
 		return char_traits::eof();
@@ -154,7 +154,7 @@ private:
 
 	int_type _pb;
 	bool     _ispb;
-	
+
 	BasicUnbufferedStreamBuf(const BasicUnbufferedStreamBuf&);
 	BasicUnbufferedStreamBuf& operator = (const BasicUnbufferedStreamBuf&);
 };
@@ -168,9 +168,9 @@ private:
 // instantiations in different libraries.
 //
 #if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
-template class Foundation_API BasicUnbufferedStreamBuf<char, std::char_traits<char> >;
+template class Foundation_API BasicUnbufferedStreamBuf<char, std::char_traits<char>>;
 #endif
-typedef BasicUnbufferedStreamBuf<char, std::char_traits<char> > UnbufferedStreamBuf;
+typedef BasicUnbufferedStreamBuf<char, std::char_traits<char>> UnbufferedStreamBuf;
 
 
 } // namespace Poco

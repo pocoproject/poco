@@ -111,9 +111,9 @@ HTMLForm::HTMLForm(const HTTPRequest& request):
 
 HTMLForm::~HTMLForm()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (auto& part: _parts)
 	{
-		delete it->pSource;
+		delete part.pSource;
 	}
 }
 
@@ -387,7 +387,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 
 void HTMLForm::writeUrl(std::ostream& ostr)
 {
-	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
+	for (auto it = begin(); it != end(); ++it)
 	{
 		if (it != begin()) ostr << "&";
 		std::string name;
@@ -404,7 +404,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	HTMLFormCountingOutputStream* pCountingOutputStream(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
 
 	MultipartWriter writer(ostr, _boundary);
-	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
+	for (auto it = begin(); it != end(); ++it)
 	{
 		MessageHeader header;
 		std::string disp("form-data; name=\"");
@@ -414,13 +414,13 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 		writer.nextPart(header);
 		ostr << it->second;
 	}
-	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
+	for (const auto& part: _parts)
 	{
-		MessageHeader header(ita->pSource->headers());
+		MessageHeader header(part.pSource->headers());
 		std::string disp("form-data; name=\"");
-		disp.append(ita->name);
+		disp.append(part.name);
 		disp.append("\"");
-		std::string filename = ita->pSource->filename();
+		std::string filename = part.pSource->filename();
 		if (!filename.empty())
 		{
 			disp.append("; filename=\"");
@@ -428,20 +428,20 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 			disp.append("\"");
 		}
 		header.set("Content-Disposition", disp);
-		header.set("Content-Type", ita->pSource->mediaType());
+		header.set("Content-Type", part.pSource->mediaType());
 		writer.nextPart(header);
 		if (pCountingOutputStream)
 		{
 			// count only, don't move stream position
-			std::streamsize partlen = ita->pSource->getContentLength();
+			std::streamsize partlen = part.pSource->getContentLength();
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
-				pCountingOutputStream->addChars(static_cast<int>(partlen));
+				pCountingOutputStream->addChars(partlen);
 			else
 				pCountingOutputStream->setValid(false);
 		}
 		else
 		{
-			StreamCopier::copyStream(ita->pSource->stream(), ostr);
+			StreamCopier::copyStream(part.pSource->stream(), ostr);
 		}
 	}
 	writer.close();

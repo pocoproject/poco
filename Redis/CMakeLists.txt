@@ -1,45 +1,39 @@
-set(LIBNAME "Redis")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-POCO_SOURCES_AUTO( SRCS ${SRCS_G})
+POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
 # Headers
-file(GLOB_RECURSE HDRS_G "include/*.h" )
-POCO_HEADERS_AUTO( SRCS ${HDRS_G})
+file(GLOB_RECURSE HDRS_G "include/*.h")
+POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
 # Version Resource
-if(MSVC AND NOT POCO_STATIC)
-    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
-    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+if(MSVC AND BUILD_SHARED_LIBS)
+	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
-    PROPERTIES
-    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
-    DEFINE_SYMBOL Redis_EXPORTS
-    )
+add_library(Redis ${SRCS})
+add_library(Poco::Redis ALIAS Redis)
+set_target_properties(Redis
+	PROPERTIES
+	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+	OUTPUT_NAME PocoRedis
+	DEFINE_SYMBOL Redis_EXPORTS
+)
 
-target_link_libraries( "${LIBNAME}" Net Foundation)
-target_include_directories( "${LIBNAME}"
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-    )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_link_libraries(Redis PUBLIC Poco::Net)
+target_include_directories(Redis
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(Redis)
+POCO_GENERATE_PACKAGE(Redis)
 
-if (ENABLE_TESTS)
-    add_subdirectory(testsuite)
-endif ()
-if (ENABLE_SAMPLES)
-#    add_subdirectory(samples)
-endif ()
+if(ENABLE_TESTS)
+	add_subdirectory(testsuite)
+#	 add_subdirectory(samples)
+endif()
 

@@ -48,11 +48,18 @@ Session::Session(const std::string& connection,
 }
 
 
-Session::Session(const Session& other):	_pImpl(other._pImpl),
-	_statementCreator(other._pImpl)
+Session::Session(const Session& other):
+	_pImpl(other._pImpl),
+	_statementCreator(other._statementCreator)
 {
 }
 
+
+Session::Session(Session&& other) noexcept:
+	_pImpl(std::move(other._pImpl)),
+	_statementCreator(std::move(other._statementCreator))
+{
+}
 
 Session::~Session()
 {
@@ -63,6 +70,14 @@ Session& Session::operator = (const Session& other)
 {
 	Session tmp(other);
 	swap(tmp);
+	return *this;
+}
+
+
+Session& Session::operator = (Session&& other) noexcept
+{
+	_pImpl = std::move(other._pImpl);
+	_statementCreator = std::move(other._statementCreator);
 	return *this;
 }
 

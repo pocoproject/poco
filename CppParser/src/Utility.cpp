@@ -91,7 +91,7 @@ void Utility::detectPrefixAndIncludes(const std::string& origHFile, std::vector<
 			++itTmp;
 			std::string defValue = *itTmp;
 			istr >> x;
-			// now find the corresponsing #define
+			// now find the corresponding #define
 			while (x.find(defValue) == std::string::npos)
 				istr >> x;
 			 //now parse until a class def is found without a ; at the end
@@ -195,14 +195,14 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 		newPath += path;
 		Environment::set("PATH", path);
 	}
-	
-	ProcessHandle proc = Process::launch(exec, args);		
+
+	ProcessHandle proc = Process::launch(exec, args);
 	int rc = Process::wait(proc);
 	if (rc != 0)
 	{
 		throw Poco::RuntimeException("Failed to process file");
 	}
-	
+
 	return pp.getFileName();
 }
 
@@ -293,7 +293,7 @@ std::string replace(const std::string& input, const std::string& oldToken, const
 		start = pos + oldToken.length();
 	}
 	while (pos != std::string::npos);
-	
+
 	return result;
 }
 

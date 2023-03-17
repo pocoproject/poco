@@ -51,10 +51,16 @@ public:
 	VarIterator(const VarIterator& other);
 		/// Creates a copy of other VarIterator.
 
+	VarIterator(VarIterator&& other) noexcept;
+		/// Moves another VarIterator.
+
 	~VarIterator();
 		/// Destroys the VarIterator.
 
 	VarIterator& operator = (const VarIterator& other);
+		/// Assigns the other VarIterator.
+
+	VarIterator& operator = (VarIterator&& other) noexcept;
 		/// Assigns the other VarIterator.
 
 	bool operator == (const VarIterator& other) const;
@@ -73,11 +79,11 @@ public:
 		/// Advances by one position and returns current position.
 
 	VarIterator operator ++ (int) const;
-		/// Advances by one position and returns copy of the iterator with 
+		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
 	const VarIterator& operator -- () const;
-		/// Goes back by one position and returns copy of the iterator with 
+		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
 	VarIterator operator -- (int) const;
@@ -97,15 +103,15 @@ private:
 	VarIterator();
 
 	void increment() const;
-		/// Increments the iterator position by one. 
+		/// Increments the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void decrement() const;
-		/// Decrements the iterator position by one. 
+		/// Decrements the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void setPosition(std::size_t pos) const;
-		/// Sets the iterator position. 
+		/// Sets the iterator position.
 		/// Throws RangeException if position is out of range.
 
 	Var*                _pVar;
@@ -138,8 +144,7 @@ inline bool VarIterator::operator != (const VarIterator& other) const
 namespace std
 {
 	template<>
-	inline void swap<Poco::Dynamic::VarIterator>(Poco::Dynamic::VarIterator& s1, 
-		Poco::Dynamic::VarIterator& s2)
+	inline void swap<Poco::Dynamic::VarIterator>(Poco::Dynamic::VarIterator& s1, Poco::Dynamic::VarIterator& s2) noexcept
 		/// Full template specialization of std:::swap for VarIterator
 	{
 		s1.swap(s2);

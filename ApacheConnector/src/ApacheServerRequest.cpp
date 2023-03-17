@@ -16,10 +16,10 @@
 
 
 ApacheServerRequest::ApacheServerRequest(
-	ApacheRequestRec* pApacheRequest, 
-	const char* serverName, 
-	int serverPort, 
-	const char* clientName, 
+	ApacheRequestRec* pApacheRequest,
+	const char* serverName,
+	int serverPort,
+	const char* clientName,
 	int clientPort):
 	_pApacheRequest(pApacheRequest),
     _pResponse(0),
@@ -35,7 +35,7 @@ ApacheServerRequest::~ApacheServerRequest()
 	delete _pStream;
 }
 
-	
+
 const Poco::Net::HTTPServerParams& ApacheServerRequest::serverParams() const
 {
 	throw Poco::NotImplementedException("No HTTPServerParams available in Apache modules.");
@@ -57,4 +57,10 @@ void ApacheServerRequest::setResponse(ApacheServerResponse* pResponse)
 bool ApacheServerRequest::expectContinue() const
 {
 	return false;
+}
+
+
+bool ApacheServerRequest::secure() const
+{
+	return _pApacheRequest->secure();
 }

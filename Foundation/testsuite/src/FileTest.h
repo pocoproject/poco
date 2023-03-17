@@ -33,12 +33,16 @@ public:
 	void testSize();
 	void testDirectory();
 	void testCopy();
+	void testCopyFailIfDestinationFileExists();
 	void testMove();
+	void testMoveFailIfDestinationFileExists();
 	void testCopyDirectory();
+	void testCopyDirectoryFailIfExists();
 	void testRename();
+	void testRenameFailIfExists();
 	void testRootDir();
 	void testLongPath();
-	
+
 	void setUp();
 	void tearDown();
 

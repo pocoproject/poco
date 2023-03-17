@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Encodings"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="Encodings"
 	ProjectGUID="{D7AAB91A-9AB8-457D-A329-02D1FA47CB7E}"
 	RootNamespace="Encodings"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Encodings_EXPORTS"
@@ -47,59 +58,77 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\bin\PocoEncodingsd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoEncodingsd.pdb"
-				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				ImportLibrary="..\lib\PocoEncodingsd.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -119,60 +148,78 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\bin\PocoEncodings.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="false"
 				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\lib\PocoEncodings.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -185,51 +232,68 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoEncodingsmtd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoEncodingsMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmtd.lib"/>
+				AdditionalDependencies=""
+				OutputFile="..\lib\PocoEncodingsMTd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -249,45 +313,61 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmt.lib"/>
+				OutputFile="..\lib\PocoEncodingsMT.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -300,51 +380,67 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoEncodingsmdd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoEncodingsMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmdd.lib"/>
+				OutputFile="..\lib\PocoEncodingsMDd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -364,176 +460,345 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmd.lib"/>
+				OutputFile="..\lib\PocoEncodingsMD.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="Encodings">
+			Name="Encodings"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\DoubleByteEncoding.h"/>
+					RelativePath=".\include\Poco\DoubleByteEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Encodings.h"/>
+					RelativePath=".\include\Poco\Encodings.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_10Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_10Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_11Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_11Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_13Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_13Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_14Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_14Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_16Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_16Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_3Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_3Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_4Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_4Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_5Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_5Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_6Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_6Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_7Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_7Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_8Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_8Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\ISO8859_9Encoding.h"/>
+					RelativePath=".\include\Poco\ISO8859_9Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows1253Encoding.h"/>
+					RelativePath=".\include\Poco\MacCentralEurRomanEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows1254Encoding.h"/>
+					RelativePath=".\include\Poco\MacChineseSimpEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows1255Encoding.h"/>
+					RelativePath=".\include\Poco\MacChineseTradEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows1256Encoding.h"/>
+					RelativePath=".\include\Poco\MacCyrillicEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows1257Encoding.h"/>
+					RelativePath=".\include\Poco\MacJapaneseEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows1258Encoding.h"/>
+					RelativePath=".\include\Poco\MacKoreanEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows874Encoding.h"/>
+					RelativePath=".\include\Poco\MacRomanEncoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows932Encoding.h"/>
+					RelativePath=".\include\Poco\Windows1253Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows936Encoding.h"/>
+					RelativePath=".\include\Poco\Windows1254Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows949Encoding.h"/>
+					RelativePath=".\include\Poco\Windows1255Encoding.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Windows950Encoding.h"/>
+					RelativePath=".\include\Poco\Windows1256Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows1257Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows1258Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows874Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows932Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows936Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows949Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows950Encoding.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\DoubleByteEncoding.cpp"/>
+					RelativePath=".\src\DoubleByteEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Encodings.cpp"/>
+					RelativePath=".\src\Encodings.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_10Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_10Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_11Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_11Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_13Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_13Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_14Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_14Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_16Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_16Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_3Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_3Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_4Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_4Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_5Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_5Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_6Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_6Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_7Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_7Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_8Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_8Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ISO8859_9Encoding.cpp"/>
+					RelativePath=".\src\ISO8859_9Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows1253Encoding.cpp"/>
+					RelativePath=".\src\MacCentralEurRomanEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows1254Encoding.cpp"/>
+					RelativePath=".\src\MacChineseSimpEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows1255Encoding.cpp"/>
+					RelativePath=".\src\MacChineseTradEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows1256Encoding.cpp"/>
+					RelativePath=".\src\MacCyrillicEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows1257Encoding.cpp"/>
+					RelativePath=".\src\MacJapaneseEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows1258Encoding.cpp"/>
+					RelativePath=".\src\MacKoreanEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows874Encoding.cpp"/>
+					RelativePath=".\src\MacRomanEncoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows932Encoding.cpp"/>
+					RelativePath=".\src\Windows1253Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows936Encoding.cpp"/>
+					RelativePath=".\src\Windows1254Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows949Encoding.cpp"/>
+					RelativePath=".\src\Windows1255Encoding.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Windows950Encoding.cpp"/>
+					RelativePath=".\src\Windows1256Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows1257Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows1258Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows874Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows932Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows936Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows949Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows950Encoding.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\DLLVersion.rc">
-			<FileConfiguration
-				Name="debug_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|Win32">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
+			RelativePath="..\DLLVersion.rc"
+			>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 		</File>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

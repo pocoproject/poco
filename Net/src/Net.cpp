@@ -42,6 +42,26 @@ void Net_API uninitializeNetwork()
 }
 
 
+std::string htmlize(const std::string& str)
+{
+	std::string::const_iterator it(str.begin());
+	std::string::const_iterator end(str.end());
+	std::string html;
+	for (; it != end; ++it)
+	{
+		switch (*it)
+		{
+		case '<': html += "&lt;"; break;
+		case '>': html += "&gt;"; break;
+		case '"': html += "&quot;"; break;
+		case '&': html += "&amp;"; break;
+		default:  html += *it; break;
+		}
+	}
+	return html;
+}
+
+
 } } // namespace Poco::Net
 
 

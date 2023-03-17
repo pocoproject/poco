@@ -43,30 +43,30 @@ ParserWriterTest::~ParserWriterTest()
 void ParserWriterTest::testParseWriteXHTML()
 {
 	std::ostringstream ostr;
-	
+
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
 	AutoPtr<Document> pDoc = parser.parseString(XHTML);
 	writer.writeNode(ostr, pDoc);
-	
+
 	std::string xml = ostr.str();
-	assert (xml == XHTML);
+	assertTrue (xml == XHTML);
 }
 
 
 void ParserWriterTest::testParseWriteXHTML2()
 {
 	std::ostringstream ostr;
-	
+
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 	DOMWriter writer;
 	AutoPtr<Document> pDoc = parser.parseString(XHTML2);
 	writer.writeNode(ostr, pDoc);
-	
+
 	std::string xml = ostr.str();
-	assert (xml == XHTML2);
+	assertTrue (xml == XHTML2);
 }
 
 
@@ -97,10 +97,10 @@ void ParserWriterTest::testParseWriteSimple()
 		numChildren++;
 		child = child->nextSibling();
 	}
-	assert (numChildren == 2);
+	assertTrue (numChildren == 2);
 
 	std::string xml = ostr.str();
-	assert (xml == simple);
+	assertTrue (xml == simple);
 }
 
 

@@ -16,6 +16,7 @@
 #include "Poco/Net/TCPServerConnectionFactory.h"
 #include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/ErrorHandler.h"
 #include <memory>
 
 
@@ -35,11 +36,11 @@ public:
 		_socket(socket)
 	{
 	}
-	
+
 	~TCPConnectionNotification()
 	{
 	}
-	
+
 	const StreamSocket& socket() const
 	{
 		return _socket;
@@ -47,6 +48,11 @@ public:
 
 private:
 	StreamSocket _socket;
+};
+
+
+class StopNotification: public Notification
+{
 };
 
 
@@ -66,7 +72,7 @@ TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactor
 
 	if (!_pParams)
 		_pParams = new TCPServerParams;
-	
+
 	if (_pParams->getMaxThreads() == 0)
 		_pParams->setMaxThreads(threadPool.capacity());
 }
@@ -79,53 +85,47 @@ TCPServerDispatcher::~TCPServerDispatcher()
 
 void TCPServerDispatcher::duplicate()
 {
-	_mutex.lock();
 	++_rc;
-	_mutex.unlock();
 }
 
 
 void TCPServerDispatcher::release()
 {
-	_mutex.lock();
-	int rc = --_rc;
-	_mutex.unlock();
-	if (rc == 0) delete this;
+	if (--_rc == 0) delete this;
 }
 
 
 void TCPServerDispatcher::run()
 {
-	AutoPtr<TCPServerDispatcher> guard(this, true); // ensure object stays alive
+	AutoPtr<TCPServerDispatcher> guard(this); // ensure _rc is decreased when function exits; it was incremented in enqueue()
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
 	for (;;)
 	{
-		AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
-		if (pNf)
 		{
-			TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
-			if (pCNf)
+			ThreadCountWatcher tcw(this);
+			try
 			{
-#ifndef POCO_ENABLE_CPP11
-				std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-#else
-				std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-#endif // POCO_ENABLE_CPP11
-				poco_check_ptr(pConnection.get());
-				beginConnection();
-				pConnection->start();
-				endConnection();
+				AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
+				if (pNf)
+				{
+					TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
+					if (pCNf)
+					{
+						std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+						poco_check_ptr(pConnection.get());
+						beginConnection();
+						pConnection->start();
+						endConnection();
+					}
+				}
 			}
+			catch (Poco::Exception &exc) { ErrorHandler::handle(exc); }
+			catch (std::exception &exc)  { ErrorHandler::handle(exc); }
+			catch (...)                  { ErrorHandler::handle();    }
 		}
-	
-		FastMutex::ScopedLock lock(_mutex);
-		if (_stopped || (_currentThreads > 1 && _queue.empty()))
-		{
-			--_currentThreads;
-			break;
-		}
+		if (_stopped || (_currentThreads > 1 && _queue.empty())) break;
 	}
 }
 
@@ -135,7 +135,7 @@ namespace
 	static const std::string threadName("TCPServerConnection");
 }
 
-	
+
 void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -149,6 +149,10 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 			{
 				_threadPool.startWithPriority(_pParams->getThreadPriority(), *this, threadName);
 				++_currentThreads;
+				// Ensure this object lives at least until run() starts
+				// Small chance of leaking if threadpool is stopped before this
+				// work runs, but better than a dangling pointer and crash!
+				++_rc;
 			}
 			catch (Poco::Exception&)
 			{
@@ -166,47 +170,43 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 
 void TCPServerDispatcher::stop()
 {
+	FastMutex::ScopedLock lock(_mutex);
 	_stopped = true;
 	_queue.clear();
-	_queue.wakeUpAll();
+	for (int i = 0; i < _threadPool.allocated(); i++)
+	{
+		_queue.enqueueNotification(new StopNotification);
+	}
 }
 
 
 int TCPServerDispatcher::currentThreads() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	return _currentThreads;
 }
 
 int TCPServerDispatcher::maxThreads() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _threadPool.capacity();
 }
 
 
 int TCPServerDispatcher::totalConnections() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	return _totalConnections;
 }
 
 
 int TCPServerDispatcher::currentConnections() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	return _currentConnections;
 }
 
 
 int TCPServerDispatcher::maxConcurrentConnections() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	return _maxConcurrentConnections;
 }
 
@@ -219,8 +219,6 @@ int TCPServerDispatcher::queuedConnections() const
 
 int TCPServerDispatcher::refusedConnections() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	return _refusedConnections;
 }
 
@@ -228,18 +226,16 @@ int TCPServerDispatcher::refusedConnections() const
 void TCPServerDispatcher::beginConnection()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	++_totalConnections;
 	++_currentConnections;
 	if (_currentConnections > _maxConcurrentConnections)
-		_maxConcurrentConnections = _currentConnections;
+		_maxConcurrentConnections.store(_currentConnections);
 }
 
 
 void TCPServerDispatcher::endConnection()
 {
-	FastMutex::ScopedLock lock(_mutex);
-
 	--_currentConnections;
 }
 

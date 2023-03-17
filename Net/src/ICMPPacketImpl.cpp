@@ -33,8 +33,9 @@ namespace Poco {
 namespace Net {
 
 
-const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE = 4096;
-const UInt16 ICMPPacketImpl::MAX_SEQ_VALUE   = 65535;
+const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE  = 65535;
+const UInt16 ICMPPacketImpl::MAX_PAYLOAD_SIZE = 65507;
+const UInt16 ICMPPacketImpl::MAX_SEQ_VALUE    = 65535;
 
 
 ICMPPacketImpl::ICMPPacketImpl(int dataSize):
@@ -80,13 +81,13 @@ unsigned short ICMPPacketImpl::checksum(UInt16 *addr, Int32 len)
 	UInt16 answer;
 	Int32 sum = 0;
 
-	while (nleft > 1)  
+	while (nleft > 1)
 	{
 		sum   += *w++;
 		nleft -= sizeof(UInt16);
 	}
 
-	if (nleft == 1) 
+	if (nleft == 1)
 	{
 		UInt16 u = 0;
 		*(UInt8*) (&u) = *(UInt8*) w;

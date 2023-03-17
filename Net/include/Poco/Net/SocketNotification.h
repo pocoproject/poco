@@ -40,19 +40,20 @@ public:
 
 	virtual ~SocketNotification();
 		/// Destroys the SocketNotification.
-		
+
 	SocketReactor& source() const;
-		/// Returns the SocketReactor that generated the notification.	
-		
+		/// Returns the SocketReactor that generated the notification.
+
 	Socket socket() const;
 		/// Returns the socket that caused the notification.
 
-private:
+protected:
 	void setSocket(const Socket& socket);
-	
+
+private:
 	SocketReactor* _pReactor;
 	Socket         _socket;
-	
+
 	friend class SocketNotifier;
 };
 
@@ -85,12 +86,38 @@ class Net_API ErrorNotification: public SocketNotification
 	/// This notification is sent if a socket has signalled an error.
 {
 public:
-	ErrorNotification(SocketReactor* pReactor);
+	ErrorNotification(SocketReactor* pReactor, int code = 0, const std::string& description = "");
+		/// Creates the ErrorNotification for the given SocketReactor.
+
+	ErrorNotification(SocketReactor* pReactor, const Socket& socket,
+		int code = 0, const std::string& description = "");
 		/// Creates the ErrorNotification for the given SocketReactor.
 
 	~ErrorNotification();
 		/// Destroys the ErrorNotification.
+
+	int code() const;
+		/// Returns the error code.
+
+	const std::string& description() const;
+		/// Returns error description.
+
+private:
+	int _code = 0;
+	std::string _description;
 };
+
+
+inline int ErrorNotification::code() const
+{
+	return _code;
+}
+
+
+inline const std::string& ErrorNotification::description() const
+{
+	return _description;
+}
 
 
 class Net_API TimeoutNotification: public SocketNotification
@@ -140,7 +167,7 @@ inline SocketReactor& SocketNotification::source() const
 	return *_pReactor;
 }
 
-	
+
 inline Socket SocketNotification::socket() const
 {
 	return _socket;

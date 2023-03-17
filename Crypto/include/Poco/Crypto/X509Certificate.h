@@ -20,6 +20,7 @@
 
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
+#include "Poco/DigestEngine.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
@@ -36,7 +37,7 @@ class Crypto_API X509Certificate
 	/// This class represents a X509 Certificate.
 {
 public:
-	typedef std::vector<X509Certificate> List;
+	using List = std::vector<X509Certificate>;
 
 	enum NID
 		/// Name identifier for extracting information from
@@ -74,10 +75,16 @@ public:
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
+	X509Certificate(X509Certificate&& cert) noexcept;
+		/// Creates the certificate by moving another one.
+
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
 
-	void swap(X509Certificate& cert);
+	X509Certificate& operator = (X509Certificate&& cert) noexcept;
+		/// Move assignment.
+
+	void swap(X509Certificate& cert) noexcept;
 		/// Exchanges the certificate with another one.
 
 	~X509Certificate();
@@ -119,6 +126,11 @@ public:
 
 	Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
+
+	Poco::DigestEngine::Digest fingerprint(const std::string& algorithm = "SHA1") const;
+		/// Computes and returns the fingerprint of the certificate,
+		/// using the given algorithm. The algorithm must be supported
+		/// by OpenSSL, e.g., "SHA1" or "SHA256".
 
 	void save(std::ostream& stream) const;
 		/// Writes the certificate to the given stream.

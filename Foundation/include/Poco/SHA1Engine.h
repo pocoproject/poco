@@ -32,7 +32,7 @@ namespace Poco {
 
 
 class Foundation_API SHA1Engine: public DigestEngine
-	/// This class implementes the SHA-1 message digest algorithm.
+	/// This class implements the SHA-1 message digest algorithm.
 	/// (FIPS 180-1, see http://www.itl.nist.gov/fipspubs/fip180-1.htm)
 {
 public:
@@ -44,7 +44,7 @@ public:
 
 	SHA1Engine();
 	~SHA1Engine();
-		
+
 	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();

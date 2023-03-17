@@ -46,7 +46,7 @@ Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flatt
 	}
 	if (!tmp.isDirectory())
 		throw Poco::IOException("Failed to create/open directory: " + _outDir.toString());
-	EOk += Poco::Delegate<Decompress, std::pair<const ZipLocalFileHeader, const Poco::Path> >(this, &Decompress::onOk);
+	EOk += Poco::Delegate<Decompress, std::pair<const ZipLocalFileHeader, const Poco::Path>>(this, &Decompress::onOk);
 
 }
 
@@ -55,7 +55,7 @@ Decompress::~Decompress()
 {
 	try
 	{
-		EOk -= Poco::Delegate<Decompress, std::pair<const ZipLocalFileHeader, const Poco::Path> >(this, &Decompress::onOk);
+		EOk -= Poco::Delegate<Decompress, std::pair<const ZipLocalFileHeader, const Poco::Path>>(this, &Decompress::onOk);
 	}
 	catch (...)
 	{

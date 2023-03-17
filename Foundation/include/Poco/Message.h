@@ -43,6 +43,8 @@ class Foundation_API Message
 	/// caused the message.
 {
 public:
+	typedef std::map<std::string, std::string> StringMap;
+
 	enum Priority
 	{
 		PRIO_FATAL = 1,   /// A fatal error. The application will most likely terminate. This is the highest priority.
@@ -54,103 +56,112 @@ public:
 		PRIO_DEBUG,       /// A debugging message.
 		PRIO_TRACE        /// A tracing message. This is the lowest priority.
 	};
-	
+
 	Message();
 		/// Creates an empty Message.
 		/// The thread and process ids are set.
-		
+
 	Message(const std::string& source, const std::string& text, Priority prio);
 		/// Creates a Message with the given source, text and priority.
 		/// The thread and process ids are set.
 
 	Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line);
 		/// Creates a Message with the given source, text, priority,
-		/// source file path and line. 
+		/// source file path and line.
 		///
-		/// The source file path must be a 
+		/// The source file path must be a
 		/// static string with a lifetime that's at least the lifetime
 		/// of the message object (the string is not copied internally).
-		/// Usually, this will be the path string obtained from the 
+		/// Usually, this will be the path string obtained from the
 		/// __FILE__ macro.
 		///
 		/// The thread and process ids are set.
-		
+
 	Message(const Message& msg);
 		/// Creates a Message by copying another one.
-		
+
+	Message(Message&& msg) noexcept;
+		/// Creates a Message by copying another one.
+
 	Message(const Message& msg, const std::string& text);
 		/// Creates a Message by copying all but the text from another message.
-		
+
 	~Message();
 		/// Destroys the Message.
-	
+
 	Message& operator = (const Message& msg);
 		/// Assignment operator.
-		
+
+	Message& operator = (Message&& msg) noexcept;
+		/// Assignment operator.
+
 	void swap(Message& msg);
-		/// Swaps the message with another one.	
-		
+		/// Swaps the message with another one.
+
 	void setSource(const std::string& src);
 		/// Sets the source of the message.
-		
+
 	const std::string& getSource() const;
 		/// Returns the source of the message.
-		
+
 	void setText(const std::string& text);
 		/// Sets the text of the message.
-		
+
 	const std::string& getText() const;
 		/// Returns the text of the message.
-		
+
 	void setPriority(Priority prio);
 		/// Sets the priority of the message.
-		
+
 	Priority getPriority() const;
 		/// Returns the priority of the message.
-	
+
 	void setTime(const Timestamp& time);
 		/// Sets the time of the message.
-		
+
 	const Timestamp& getTime() const;
 		/// Returns the time of the message.
-		
+
 	void setThread(const std::string& thread);
 		/// Sets the thread identifier for the message.
-		
+
 	const std::string& getThread() const;
 		/// Returns the thread identifier for the message.
 
 	void setTid(long pid);
 		/// Sets the numeric thread identifier for the message.
-		
+
 	long getTid() const;
 		/// Returns the numeric thread identifier for the message.
-	
+
+	long getOsTid() const;
+		/// Returns the numeric thread identifier for the message.
+
 	void setPid(long pid);
 		/// Sets the process identifier for the message.
-		
+
 	long getPid() const;
 		/// Returns the process identifier for the message.
-		
+
 	void setSourceFile(const char* file);
 		/// Sets the source file path of the statement
 		/// generating the log message.
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
-		
+		/// internally for performance reasons.
+
 	const char* getSourceFile() const;
 		/// Returns the source file path of the code creating
 		/// the message. May be 0 if not set.
-		
+
 	void setSourceLine(int line);
 		/// Sets the source file line of the statement
 		/// generating the log message.
 		///
 		/// This is usually the result of the __LINE__
 		/// macro.
-		
+
 	int getSourceLine() const;
 		/// Returns the source file line of the statement
 		/// generating the log message. May be 0
@@ -169,6 +180,9 @@ public:
 		/// with the given name. If the parameter with the given name
 		/// does not exist, then defaultValue is returned.
 
+	const StringMap& getAll() const;
+		/// Returns a const reference to all the values
+
 	void set(const std::string& param, const std::string& value);
 		/// Sets the value for a parameter. If the parameter does
 		/// not exist, then it is created.
@@ -177,7 +191,7 @@ public:
 		/// Returns a const reference to the value of the parameter
 		/// with the given name. Throws a NotFoundException if the
 		/// parameter does not exist.
-		
+
 	std::string& operator [] (const std::string& param);
 		/// Returns a reference to the value of the parameter with the
 		/// given name. This can be used to set the parameter's value.
@@ -186,14 +200,14 @@ public:
 
 protected:
 	void init();
-	typedef std::map<std::string, std::string> StringMap;
 
-private:	
+private:
 	std::string _source;
 	std::string _text;
 	Priority    _prio;
 	Timestamp   _time;
 	long        _tid;
+	long        _ostid;
 	std::string _thread;
 	long        _pid;
 	const char* _file;
@@ -240,6 +254,10 @@ inline long Message::getTid() const
 	return _tid;
 }
 
+inline long Message::getOsTid() const
+{
+	return _ostid;
+}
 
 inline long Message::getPid() const
 {
@@ -259,7 +277,7 @@ inline int Message::getSourceLine() const
 }
 
 
-inline void swap(Message& m1, Message& m2)
+inline void swap(Message& m1, Message& m2) noexcept
 {
 	m1.swap(m2);
 }

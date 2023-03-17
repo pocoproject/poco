@@ -17,7 +17,7 @@
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -32,7 +32,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -57,14 +57,14 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib "
+				AdditionalDependencies=""
 				OutputFile="bin\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\TestSuited.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
@@ -87,7 +87,7 @@
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -106,7 +106,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -129,12 +129,12 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnit.lib WinTestRunner.lib "
+				AdditionalDependencies=""
 				OutputFile="bin\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -159,7 +159,7 @@
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -174,7 +174,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -199,15 +199,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res "
+				AdditionalDependencies=""
 				OutputFile="bin\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
+				IgnoreDefaultLibraryNames="nafxcwd.lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\static_mt\TestSuited.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
@@ -230,7 +230,7 @@
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -249,7 +249,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -272,13 +272,13 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res "
+				AdditionalDependencies=""
 				OutputFile="bin\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
-				IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib"
+				IgnoreDefaultLibraryNames="nafxcw.lib"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -303,7 +303,7 @@
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -318,7 +318,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -343,14 +343,14 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res "
+				AdditionalDependencies=""
 				OutputFile="bin\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\static_md\TestSuited.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
@@ -373,7 +373,7 @@
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -392,7 +392,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -415,12 +415,12 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res "
+				AdditionalDependencies=""
 				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -474,7 +474,7 @@
 			<Filter
 				Name="Source Files">
 				<File
-					RelativePath=".\src\WinDriver.cpp"/>
+					RelativePath=".\src\Driver.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter

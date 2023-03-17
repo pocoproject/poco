@@ -18,7 +18,10 @@
 #include "Poco/Formatter.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/LoggingRegistry.h"
+#include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
+#include "Poco/Format.h"
 
 
 namespace Poco {
@@ -31,26 +34,26 @@ public:
 		_msg(msg)
 	{
 	}
-	
+
 	~MessageNotification()
 	{
 	}
-	
+
 	const Message& message() const
 	{
 		return _msg;
 	}
-	
+
 private:
 	Message _msg;
 };
 
 
-AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio): 
-	_pChannel(pChannel), 
-	_thread("AsyncChannel")
+AsyncChannel::AsyncChannel(Channel::Ptr pChannel, Thread::Priority prio):
+	_pChannel(pChannel),
+	_thread("AsyncChannel"),
+	_closed(false)
 {
-	if (_pChannel) _pChannel->duplicate();
 	_thread.setPriority(prio);
 }
 
@@ -60,7 +63,6 @@ AsyncChannel::~AsyncChannel()
 	try
 	{
 		close();
-		if (_pChannel) _pChannel->release();
 	}
 	catch (...)
 	{
@@ -69,17 +71,15 @@ AsyncChannel::~AsyncChannel()
 }
 
 
-void AsyncChannel::setChannel(Channel* pChannel)
+void AsyncChannel::setChannel(Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_channelMutex);
-	
-	if (_pChannel) _pChannel->release();
+
 	_pChannel = pChannel;
-	if (_pChannel) _pChannel->duplicate();
 }
 
 
-Channel* AsyncChannel::getChannel() const
+Channel::Ptr AsyncChannel::getChannel() const
 {
 	return _pChannel;
 }
@@ -89,28 +89,43 @@ void AsyncChannel::open()
 {
 	FastMutex::ScopedLock lock(_threadMutex);
 
-	if (!_thread.isRunning())
-		_thread.start(*this);
+	if (!_thread.isRunning()) _thread.start(*this);
 }
 
 
 void AsyncChannel::close()
 {
-	if (_thread.isRunning())
+	if (!_closed.exchange(true))
 	{
-		while (!_queue.empty()) Thread::sleep(100);
-		
-		do 
+		if (_thread.isRunning())
 		{
-			_queue.wakeUpAll(); 
+			while (!_queue.empty()) Thread::sleep(100);
+
+			do
+			{
+				_queue.wakeUpAll();
+			}
+			while (!_thread.tryJoin(100));
 		}
-		while (!_thread.tryJoin(100));
 	}
 }
 
 
 void AsyncChannel::log(const Message& msg)
 {
+	if (_closed) return;
+	if (_queueSize != 0 && _queue.size() >= _queueSize)
+	{
+		++_dropCount;
+		return;
+	}
+
+	if (_dropCount != 0)
+	{
+		_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", _dropCount))));
+		_dropCount = 0;
+	}
+
 	open();
 
 	_queue.enqueueNotification(new MessageNotification(msg));
@@ -120,11 +135,24 @@ void AsyncChannel::log(const Message& msg)
 void AsyncChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == "channel")
+	{
 		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
+	}
 	else if (name == "priority")
+	{
 		setPriority(value);
+	}
+	else if (name == "queueSize")
+	{
+		if (Poco::icompare(value, "none") == 0 || Poco::icompare(value, "unlimited") == 0 || value.empty())
+			_queueSize = 0;
+		else
+			_queueSize = Poco::NumberParser::parseUnsigned(value);
+	}
 	else
+	{
 		Channel::setProperty(name, value);
+	}
 }
 
 
@@ -142,12 +170,12 @@ void AsyncChannel::run()
 		nf = _queue.waitDequeueNotification();
 	}
 }
-		
-		
+
+
 void AsyncChannel::setPriority(const std::string& value)
 {
 	Thread::Priority prio = Thread::PRIO_NORMAL;
-	
+
 	if (value == "lowest")
 		prio = Thread::PRIO_LOWEST;
 	else if (value == "low")
@@ -160,7 +188,7 @@ void AsyncChannel::setPriority(const std::string& value)
 		prio = Thread::PRIO_HIGHEST;
 	else
 		throw InvalidArgumentException("thread priority", value);
-		
+
 	_thread.setPriority(prio);
 }
 

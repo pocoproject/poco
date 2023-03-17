@@ -52,8 +52,8 @@ Exception::Exception(const Exception& exc):
 	_pNested = exc._pNested ? exc._pNested->clone() : 0;
 }
 
-	
-Exception::~Exception() throw()
+
+Exception::~Exception() noexcept
 {
 	delete _pNested;
 }
@@ -73,24 +73,24 @@ Exception& Exception::operator = (const Exception& exc)
 }
 
 
-const char* Exception::name() const throw()
+const char* Exception::name() const noexcept
 {
 	return "Exception";
 }
 
 
-const char* Exception::className() const throw()
+const char* Exception::className() const noexcept
 {
 	return typeid(*this).name();
 }
 
-	
-const char* Exception::what() const throw()
+
+const char* Exception::what() const noexcept
 {
 	return name();
 }
 
-	
+
 std::string Exception::displayText() const
 {
 	std::string txt = name();

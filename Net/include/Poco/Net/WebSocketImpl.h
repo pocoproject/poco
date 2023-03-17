@@ -46,7 +46,7 @@ public:
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
 
-	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags);
+	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
 		/// Receives a WebSocket protocol frame.
 
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);

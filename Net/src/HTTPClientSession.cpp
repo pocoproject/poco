@@ -19,7 +19,7 @@
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
-#include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
@@ -40,12 +40,15 @@ HTTPClientSession::ProxyConfig HTTPClientSession::_globalProxyConfig;
 
 HTTPClientSession::HTTPClientSession():
 	_port(HTTPSession::HTTP_PORT),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -53,12 +56,15 @@ HTTPClientSession::HTTPClientSession():
 HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -66,12 +72,15 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_host(address.host().toString()),
 	_port(address.port()),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -79,12 +88,15 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port):
 	_host(host),
 	_port(port),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -92,6 +104,22 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig):
 	_host(host),
 	_port(port),
+	_proxyConfig(proxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false),
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
+{
+}
+
+
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig):
+	HTTPSession(socket),
+	_port(HTTPSession::HTTP_PORT),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(proxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -122,6 +150,39 @@ void HTTPClientSession::setPort(Poco::UInt16 port)
 		_port = port;
 	else
 		throw IllegalStateException("Cannot set the port number for an already connected session");
+}
+
+
+void HTTPClientSession::setSourceAddress(const SocketAddress& address)
+{
+	if (!connected())
+	{
+		if (address.family() == IPAddress::IPv4)
+			_sourceAddress4 = address;
+		else
+			_sourceAddress6 = address;
+		_sourceAddress = address;
+	}
+	else
+		throw IllegalStateException("Cannot set the source address for an already connected session");
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress()
+{
+	return _sourceAddress;
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress4()
+{
+	return _sourceAddress4;
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress6()
+{
+	return _sourceAddress6;
 }
 
 
@@ -195,8 +256,6 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
 	_pRequestStream = 0;
 	_pResponseStream = 0;
-	clearException();
-	_responseReceived = false;
 
 	bool keepAlive = getKeepAlive();
 	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
@@ -207,56 +266,76 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	try
 	{
 		if (!connected())
+		{
+			_ntlmProxyAuthenticated = false;
 			reconnect();
+		}
 		if (!keepAlive)
+		{
 			request.setKeepAlive(false);
+		}
 		if (!request.has(HTTPRequest::HOST) && !_host.empty())
+		{
 			request.setHost(_host, _port);
+		}
 		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
-			request.setURI(proxyRequestPrefix() + request.getURI());
+			std::string prefix = proxyRequestPrefix();
+			if (!prefix.empty() && request.getURI().compare(0, 7, "http://") != 0 && request.getURI().compare(0, 8, "https://") != 0)
+				request.setURI(prefix + request.getURI());
+			if (keepAlive) request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
 			proxyAuthenticate(request);
 		}
 		_reconnect = keepAlive;
-		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
-		const std::string& method = request.getMethod();
-		if (request.getChunkedTransferEncoding())
-		{
-			HTTPHeaderOutputStream hos(*this);
-			request.write(hos);
-			_pRequestStream = new HTTPChunkedOutputStream(*this);
-		}
-		else if (request.hasContentLength())
-		{
-			Poco::CountingOutputStream cs;
-			request.write(cs);
-#if POCO_HAVE_INT64
-			_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength64() + cs.chars());
-#else
-			_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
-#endif
-			request.write(*_pRequestStream);
-		}
-		else if ((method != HTTPRequest::HTTP_PUT && method != HTTPRequest::HTTP_POST && method != HTTPRequest::HTTP_PATCH) || request.has(HTTPRequest::UPGRADE))
-		{
-			Poco::CountingOutputStream cs;
-			request.write(cs);
-			_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
-			request.write(*_pRequestStream);
-		}
-		else
-		{
-			_pRequestStream = new HTTPOutputStream(*this);
-			request.write(*_pRequestStream);
-		}
-		_lastRequest.update();
-		return *_pRequestStream;
+		return sendRequestImpl(request);
 	}
 	catch (Exception&)
 	{
 		close();
 		throw;
 	}
+}
+
+
+std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
+{
+	_pRequestStream = 0;
+	_pResponseStream = 0;
+	clearException();
+	_responseReceived = false;
+	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+	const std::string& method = request.getMethod();
+	if (request.getChunkedTransferEncoding())
+	{
+		HTTPHeaderOutputStream hos(*this);
+		request.write(hos);
+		_pRequestStream = new HTTPChunkedOutputStream(*this, &requestTrailer());
+	}
+	else if (request.hasContentLength())
+	{
+		Poco::CountingOutputStream cs;
+		request.write(cs);
+#if POCO_HAVE_INT64
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength64() + cs.chars());
+#else
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
+#endif
+		request.write(*_pRequestStream);
+	}
+	else if ((method != HTTPRequest::HTTP_PUT && method != HTTPRequest::HTTP_POST && method != HTTPRequest::HTTP_PATCH) || request.has(HTTPRequest::UPGRADE))
+	{
+		Poco::CountingOutputStream cs;
+		request.write(cs);
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
+		request.write(*_pRequestStream);
+	}
+	else
+	{
+		_pRequestStream = new HTTPOutputStream(*this);
+		request.write(*_pRequestStream);
+	}
+	_lastRequest.update();
+	return *_pRequestStream;
 }
 
 
@@ -270,6 +349,7 @@ void HTTPClientSession::flushRequest()
 std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 {
 	flushRequest();
+	responseTrailer().clear();
 	if (!_responseReceived)
 	{
 		do
@@ -287,7 +367,6 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 					networkException()->rethrow();
 				else
 					throw;
-				throw;
 			}
 		}
 		while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
@@ -298,7 +377,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 	if (!_expectResponseBody || response.getStatus() < 200 || response.getStatus() == HTTPResponse::HTTP_NO_CONTENT || response.getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, 0);
 	else if (response.getChunkedTransferEncoding())
-		_pResponseStream = new HTTPChunkedInputStream(*this);
+		_pResponseStream = new HTTPChunkedInputStream(*this, &responseTrailer());
 	else if (response.hasContentLength())
 #if defined(POCO_HAVE_INT64)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, response.getContentLength64());
@@ -378,16 +457,18 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
+	SocketAddress addr;
 	if (_proxyConfig.host.empty() || bypassProxy())
-	{
-		SocketAddress addr(_host, _port);
-		connect(addr);
-	}
+		addr = SocketAddress(_host, _port);
 	else
-	{
-		SocketAddress addr(_proxyConfig.host, _proxyConfig.port);
+		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
+
+	if ((!_sourceAddress4.host().isWildcard()) || (_sourceAddress4.port() != 0))
+		connect(addr, _sourceAddress4);
+	else if ((!_sourceAddress6.host().isWildcard()) || (_sourceAddress6.port() != 0))
+		connect(addr, _sourceAddress6);
+	else
 		connect(addr);
-	}
 }
 
 
@@ -414,17 +495,89 @@ bool HTTPClientSession::mustReconnect() const
 
 void HTTPClientSession::proxyAuthenticate(HTTPRequest& request)
 {
-	proxyAuthenticateImpl(request);
+	proxyAuthenticateImpl(request, _proxyConfig);
 }
 
 
-void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
+void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyConfig& proxyConfig)
 {
-	if (!_proxyConfig.username.empty())
+	switch (proxyConfig.authMethod)
 	{
-		HTTPBasicCredentials creds(_proxyConfig.username, _proxyConfig.password);
-		creds.proxyAuthenticate(request);
+	case PROXY_AUTH_NONE:
+		break;
+
+	case PROXY_AUTH_HTTP_BASIC:
+		_proxyBasicCreds.setUsername(proxyConfig.username);
+		_proxyBasicCreds.setPassword(proxyConfig.password);
+		_proxyBasicCreds.proxyAuthenticate(request);
+		break;
+
+	case PROXY_AUTH_HTTP_DIGEST:
+		if (HTTPCredentials::hasDigestCredentials(request))
+		{
+			_proxyDigestCreds.updateProxyAuthInfo(request);
+		}
+		else
+		{
+			_proxyDigestCreds.setUsername(proxyConfig.username);
+			_proxyDigestCreds.setPassword(proxyConfig.password);
+			proxyAuthenticateDigest(request);
+		}
+		break;
+
+	case PROXY_AUTH_NTLM:
+		if (_ntlmProxyAuthenticated)
+		{
+			_proxyNTLMCreds.updateProxyAuthInfo(request);
+		}
+		else
+		{
+			_proxyNTLMCreds.setUsername(proxyConfig.username);
+			_proxyNTLMCreds.setPassword(proxyConfig.password);
+			_proxyNTLMCreds.setHost(proxyConfig.host);
+			proxyAuthenticateNTLM(request);
+			_ntlmProxyAuthenticated = true;
+		}
+		break;
 	}
+}
+
+
+void HTTPClientSession::proxyAuthenticateDigest(HTTPRequest& request)
+{
+	HTTPResponse response;
+	request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
+	sendChallengeRequest(request, response);
+	_proxyDigestCreds.proxyAuthenticate(request, response);
+}
+
+
+void HTTPClientSession::proxyAuthenticateNTLM(HTTPRequest& request)
+{
+	HTTPResponse response;
+	request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
+	_proxyNTLMCreds.proxyAuthenticate(request, std::string());
+	sendChallengeRequest(request, response);
+	_proxyNTLMCreds.proxyAuthenticate(request, response);
+}
+
+
+void HTTPClientSession::sendChallengeRequest(const HTTPRequest& request, HTTPResponse& response)
+{
+	if (!connected())
+	{
+		reconnect();
+	}
+
+	HTTPRequest challengeRequest(request);
+	if (challengeRequest.hasContentLength())
+	{
+		challengeRequest.setContentLength(0);
+	}
+
+	sendRequestImpl(challengeRequest);
+	std::istream& istr = receiveResponse(response);
+	while (istr.good()) istr.get();
 }
 
 
@@ -438,10 +591,12 @@ StreamSocket HTTPClientSession::proxyConnect()
 	NumberFormatter::append(targetAddress, _port);
 	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress, HTTPMessage::HTTP_1_1);
 	HTTPResponse proxyResponse;
-	proxyRequest.set("Proxy-Connection", "keep-alive");
-	proxyRequest.set("Host", getHost());
-	proxyAuthenticateImpl(proxyRequest);
+	proxyRequest.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
+	proxyRequest.set(HTTPRequest::HOST, getHost());
+	proxySession.proxyAuthenticateImpl(proxyRequest, _proxyConfig);
 	proxySession.setKeepAlive(true);
+	proxySession.setSourceAddress(_sourceAddress4);
+	proxySession.setSourceAddress(_sourceAddress6);
 	proxySession.sendRequest(proxyRequest);
 	proxySession.receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)

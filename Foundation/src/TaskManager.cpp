@@ -15,6 +15,7 @@
 #include "Poco/TaskManager.h"
 #include "Poco/TaskNotification.h"
 #include "Poco/ThreadPool.h"
+#include "Poco/Timespan.h"
 
 
 namespace Poco {
@@ -23,30 +24,41 @@ namespace Poco {
 const int TaskManager::MIN_PROGRESS_NOTIFICATION_INTERVAL = 100000; // 100 milliseconds
 
 
-TaskManager::TaskManager():
-	_threadPool(ThreadPool::defaultPool())
+TaskManager::TaskManager(const std::string& name,
+		int minCapacity,
+		int maxCapacity,
+		int idleTime,
+		int stackSize):
+	_threadPool(*new ThreadPool(name, minCapacity, maxCapacity, idleTime, stackSize)),
+	_ownPool(true)
 {
+	// prevent skipping the first progress update
+	_lastProgressNotification -= Timespan(MIN_PROGRESS_NOTIFICATION_INTERVAL*2);
 }
 
 
 TaskManager::TaskManager(ThreadPool& pool):
-	_threadPool(pool)
+	_threadPool(pool),
+	_ownPool(false)
 {
+	// prevent skipping the first progress update
+	_lastProgressNotification -= Timespan(MIN_PROGRESS_NOTIFICATION_INTERVAL*2);
 }
 
 
 TaskManager::~TaskManager()
 {
+	if (_ownPool) delete &_threadPool;
 }
 
 
 void TaskManager::start(Task* pTask)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
-	FastMutex::ScopedLock lock(_mutex);
-
 	pAutoTask->setOwner(this);
 	pAutoTask->setState(Task::TASK_STARTING);
+
+	ScopedLockT lock(_mutex);
 	_taskList.push_back(pAutoTask);
 	try
 	{
@@ -65,11 +77,11 @@ void TaskManager::start(Task* pTask)
 
 void TaskManager::cancelAll()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	ScopedLockT lock(_mutex);
 
-	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
+	for (auto& pTask: _taskList)
 	{
-		(*it)->cancel();
+		pTask->cancel();
 	}
 }
 
@@ -82,8 +94,8 @@ void TaskManager::joinAll()
 
 TaskManager::TaskList TaskManager::taskList() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
+	ScopedLockT lock(_mutex);
+
 	return _taskList;
 }
 
@@ -114,7 +126,7 @@ void TaskManager::taskStarted(Task* pTask)
 
 void TaskManager::taskProgress(Task* pTask, float progress)
 {
-	ScopedLockWithUnlock<FastMutex> lock(_mutex);
+	ScopedLockWithUnlock<MutexT> lock(_mutex);
 
 	if (_lastProgressNotification.isElapsed(MIN_PROGRESS_NOTIFICATION_INTERVAL))
 	{
@@ -134,8 +146,8 @@ void TaskManager::taskCancelled(Task* pTask)
 void TaskManager::taskFinished(Task* pTask)
 {
 	_nc.postNotification(new TaskFinishedNotification(pTask));
-	
-	FastMutex::ScopedLock lock(_mutex);
+
+	ScopedLockT lock(_mutex);
 	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
 	{
 		if (*it == pTask)

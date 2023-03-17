@@ -55,7 +55,7 @@ protected:
 private:
 	URIStreamFactory(const URIStreamFactory&);
 	URIStreamFactory& operator = (const URIStreamFactory&);
-	
+
 	friend class URIStreamOpener;
 };
 
@@ -68,16 +68,16 @@ class Foundation_API URIRedirection
 public:
 	URIRedirection(const std::string& uri);
 	URIRedirection(const URIRedirection& redir);
-	
+
 	URIRedirection& operator = (const URIRedirection& redir);
-	void swap(URIRedirection& redir);
-	
+	void swap(URIRedirection& redir) noexcept;
+
 	const std::string& uri() const;
 		/// Returns the new URI.
-	
+
 private:
 	URIRedirection();
-	
+
 	std::string _uri;
 };
 

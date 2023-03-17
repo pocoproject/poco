@@ -35,23 +35,23 @@ void CountingStreamTest::testInput()
 	std::istringstream istr1("foo");
 	CountingInputStream ci1(istr1);
 	while (ci1.good()) ci1.get(c);
-	assert (ci1.lines() == 1);
-	assert (ci1.chars() == 3);
-	assert (ci1.pos() == 3);
+	assertTrue (ci1.lines() == 1);
+	assertTrue (ci1.chars() == 3);
+	assertTrue (ci1.pos() == 3);
 
 	std::istringstream istr2("foo\nbar");
 	CountingInputStream ci2(istr2);
 	while (ci2.good()) ci2.get(c);
-	assert (ci2.lines() == 2);
-	assert (ci2.chars() == 7);
-	assert (ci2.pos() == 3);
+	assertTrue (ci2.lines() == 2);
+	assertTrue (ci2.chars() == 7);
+	assertTrue (ci2.pos() == 3);
 
 	std::istringstream istr3("foo\nbar\n");
 	CountingInputStream ci3(istr3);
 	while (ci3.good()) ci3.get(c);
-	assert (ci3.lines() == 2);
-	assert (ci3.chars() == 8);
-	assert (ci3.pos() == 0);
+	assertTrue (ci3.lines() == 2);
+	assertTrue (ci3.chars() == 8);
+	assertTrue (ci3.pos() == 0);
 
 	std::istringstream istr4("foo");
 	CountingInputStream ci4(istr4);
@@ -59,9 +59,9 @@ void CountingStreamTest::testInput()
 	ci4.addChars(10);
 	ci4.addLines(2);
 	ci4.addPos(3);
-	assert (ci4.lines() == 1 + 2);
-	assert (ci4.chars() == 3 + 10);
-	assert (ci4.pos() == 3 + 3);
+	assertTrue (ci4.lines() == 1 + 2);
+	assertTrue (ci4.chars() == 3 + 10);
+	assertTrue (ci4.pos() == 3 + 3);
 }
 
 
@@ -70,24 +70,24 @@ void CountingStreamTest::testOutput()
 	std::ostringstream ostr1;
 	CountingOutputStream co1(ostr1);
 	co1 << "foo";
-	assert (ostr1.str() == "foo");
-	assert (co1.lines() == 1);
-	assert (co1.chars() == 3);
-	assert (co1.pos() == 3);
+	assertTrue (ostr1.str() == "foo");
+	assertTrue (co1.lines() == 1);
+	assertTrue (co1.chars() == 3);
+	assertTrue (co1.pos() == 3);
 
 	std::ostringstream ostr2;
 	CountingOutputStream co2(ostr2);
 	co2 << "foo\nbar";
-	assert (ostr2.str() == "foo\nbar");
-	assert (co2.lines() == 2);
-	assert (co2.chars() == 7);
-	assert (co2.pos() == 3);
+	assertTrue (ostr2.str() == "foo\nbar");
+	assertTrue (co2.lines() == 2);
+	assertTrue (co2.chars() == 7);
+	assertTrue (co2.pos() == 3);
 
 	CountingOutputStream co3;
 	co3 << "foo\nbar\n";
-	assert (co3.lines() == 2);
-	assert (co3.chars() == 8);
-	assert (co3.pos() == 0);
+	assertTrue (co3.lines() == 2);
+	assertTrue (co3.chars() == 8);
+	assertTrue (co3.pos() == 0);
 
 	std::ostringstream ostr4;
 	CountingOutputStream co4(ostr4);
@@ -95,9 +95,9 @@ void CountingStreamTest::testOutput()
 	co4.addChars(10);
 	co4.addLines(2);
 	co4.addPos(3);
-	assert (co4.lines() == 1 + 2);
-	assert (co4.chars() == 3 + 10);
-	assert (co4.pos() == 3 + 3);
+	assertTrue (co4.lines() == 1 + 2);
+	assertTrue (co4.chars() == 3 + 10);
+	assertTrue (co4.pos() == 3 + 3);
 }
 
 

@@ -43,13 +43,13 @@ class Data_API AbstractExtraction
 	/// retrieved via an AbstractExtractor.
 {
 public:
-	typedef SharedPtr<AbstractExtraction> Ptr;
-	typedef SharedPtr<AbstractExtractor>  ExtractorPtr;
-	typedef SharedPtr<AbstractPreparator> PreparatorPtr;
+	using Ptr = SharedPtr<AbstractExtraction>;
+	using ExtractorPtr = SharedPtr<AbstractExtractor>;
+	using PreparatorPtr = SharedPtr<AbstractPreparator>;
 
 	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
 		Poco::UInt32 position = 0, bool bulk = false);
-		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu) 
+		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu)
 		/// means that we extract as much data as possible during one execute.
 		/// Otherwise the limit value is used to partition data extracting to a limited amount of rows.
 
@@ -74,7 +74,7 @@ public:
 	virtual std::size_t numOfRowsHandled() const = 0;
 		/// Returns the number of rows that the extraction handles.
 		///
-		/// The trivial case will be one single row but 
+		/// The trivial case will be one single row but
 		/// for collection data types (ie vector) it can be larger.
 
 	virtual std::size_t numOfRowsAllowed() const = 0;
@@ -102,8 +102,8 @@ public:
 		/// Gets the limit.
 
 	virtual bool isNull(std::size_t row) const;
-		/// In implementations, this function returns true if value at row is null, 
-		/// false otherwise. 
+		/// In implementations, this function returns true if value at row is null,
+		/// false otherwise.
 		/// Normal behavior is to replace nulls with default values.
 		/// However, extraction implementations may remember the underlying database
 		/// null values and be able to later provide information about them.
@@ -125,7 +125,7 @@ public:
 		/// Returns the force empty string flag.
 
 	template <typename T>
-	bool isValueNull(const T& str, bool deflt)
+	bool isValueNull(const T& /*str*/, bool deflt)
 		/// Utility function to determine the nullness of the value.
 		/// This generic version always returns default value
 		/// (i.e. does nothing). The std::string overload does
@@ -140,7 +140,7 @@ public:
 		///
 		/// Returns true when folowing conditions are met:
 		///
-		/// - string is empty 
+		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
 
 	bool isValueNull(const Poco::UTF16String& str, bool deflt);
@@ -148,7 +148,7 @@ public:
 		///
 		/// Returns true when folowing conditions are met:
 		///
-		/// - string is empty 
+		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
 
 private:
@@ -172,12 +172,12 @@ private:
 };
 
 
-typedef std::vector<AbstractExtraction::Ptr> AbstractExtractionVec;
-typedef std::vector<AbstractExtractionVec>   AbstractExtractionVecVec;
-typedef std::deque<AbstractExtraction::Ptr>  AbstractExtractionDeq;
-typedef std::vector<AbstractExtractionDeq>   AbstractExtractionDeqVec;
-typedef std::list<AbstractExtraction::Ptr>   AbstractExtractionLst;
-typedef std::vector<AbstractExtractionLst>   AbstractExtractionLstVec;
+using AbstractExtractionVec = std::vector<AbstractExtraction::Ptr>;
+using AbstractExtractionVecVec = std::vector<AbstractExtractionVec>;
+using AbstractExtractionDeq = std::deque<AbstractExtraction::Ptr>;
+using AbstractExtractionDeqVec = std::vector<AbstractExtractionDeq>;
+using AbstractExtractionLst = std::list<AbstractExtraction::Ptr>;
+using AbstractExtractionLstVec = std::vector<AbstractExtractionLst>;
 
 
 //
@@ -207,7 +207,7 @@ inline Poco::UInt32 AbstractExtraction::getLimit() const
 }
 
 
-inline bool AbstractExtraction::isNull(std::size_t row) const
+inline bool AbstractExtraction::isNull(std::size_t /*row*/) const
 {
 	throw NotImplementedException("Check for null values not implemented.");
 }

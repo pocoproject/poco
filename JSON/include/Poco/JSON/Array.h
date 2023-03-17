@@ -46,7 +46,7 @@ class JSON_API Array
 	///    Array::Ptr arr = result.extract<Array::Ptr>();
 	///    Object::Ptr object = arr->getObject(0); // object == {\"test\" : 0}
 	///    int i = object->getElement<int>("test"); // i == 0;
-	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
+	///    Object::Ptr subObject = arr->getObject(1); // subObject == {\"test\" : 0}
 	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
 	///    i = result = subArr->get(0); // i == 1;
 	///
@@ -58,10 +58,10 @@ class JSON_API Array
 	/// ----
 {
 public:
-	typedef std::vector<Dynamic::Var>                 ValueVec;
-	typedef std::vector<Dynamic::Var>::iterator       Iterator;
-	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
-	typedef SharedPtr<Array> Ptr;
+	using ValueVec = std::vector<Dynamic::Var>;
+	using Iterator = std::vector<Dynamic::Var>::iterator;
+	using ConstIterator = std::vector<Dynamic::Var>::const_iterator;
+	using Ptr = SharedPtr<Array>;
 
 	Array(int options = 0);
 		/// Creates an empty Array.
@@ -73,20 +73,16 @@ public:
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
 
-#ifdef POCO_ENABLE_CPP11
-
-	Array(Array&& other);
+	Array(Array&& other) noexcept;
 		/// Move constructor
 
-	Array& operator=(Array&& other);
-		/// Move assignment operator.
-
-#endif // POCO_ENABLE_CPP11
-
-	Array& operator=(const Array& other);
+	Array& operator = (const Array& other);
 		/// Assignment operator.
 
-	virtual ~Array();
+	Array& operator = (Array&& other) noexcept;
+		/// Move assignment operator.
+
+	~Array();
 		/// Destroys the Array.
 
 	void setEscapeUnicode(bool escape = true);
@@ -127,6 +123,9 @@ public:
 
 	std::size_t size() const;
 		/// Returns the size of the array.
+
+	bool empty() const;
+ 		/// Returns true if the array is empty, false otherwise.
 
 	bool isArray(unsigned int index) const;
 		/// Returns true when the element is an array.
@@ -172,10 +171,10 @@ public:
 		return value;
 	}
 
-	void add(const Dynamic::Var& value);
+	Array& add(const Dynamic::Var& value);
 		/// Add the given value to the array
 
-	void set(unsigned int index, const Dynamic::Var& value);
+	Array& set(unsigned int index, const Dynamic::Var& value);
 		/// Update the element on the given index to specified value
 
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
@@ -245,6 +244,12 @@ inline std::size_t Array::size() const
 }
 
 
+inline bool Array::empty() const
+{
+	return _values.empty();
+}
+
+
 inline bool Array::isArray(unsigned int index) const
 {
 	Dynamic::Var value = get(index);
@@ -264,18 +269,20 @@ inline bool Array::isArray(ConstIterator& it) const
 }
 
 
-inline void Array::add(const Dynamic::Var& value)
+inline Array& Array::add(const Dynamic::Var& value)
 {
 	_values.push_back(value);
 	_modified = true;
+	return *this;
 }
 
 
-inline void Array::set(unsigned int index, const Dynamic::Var& value)
+inline Array& Array::set(unsigned int index, const Dynamic::Var& value)
 {
 	if (index >= _values.size()) _values.resize(index + 1);
 	_values[index] = value;
 	_modified = true;
+	return *this;
 }
 
 
@@ -372,7 +379,7 @@ public:
 	void convert(std::string& s) const
 	{
 		std::ostringstream oss;
-		_val->stringify(oss, 2);
+		_val->stringify(oss);
 		s = oss.str();
 	}
 
@@ -506,7 +513,7 @@ public:
 	void convert(std::string& s) const
 	{
 		std::ostringstream oss;
-		_val.stringify(oss, 2);
+		_val.stringify(oss);
 		s = oss.str();
 	}
 

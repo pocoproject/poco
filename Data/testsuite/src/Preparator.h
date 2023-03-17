@@ -57,7 +57,7 @@ public:
 	void prepare(std::size_t pos, const Poco::UInt64&);
 		/// Prepares an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	void prepare(std::size_t pos, const long&);
 		/// Prepares a long.
 
@@ -97,6 +97,9 @@ public:
 
 	void prepare(std::size_t pos, const Poco::DateTime&);
 		/// Prepares a DateTime.
+
+	void prepare(std::size_t pos, const Poco::UUID&);
+		/// Prepares a UUID.
 
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Prepares an Any.

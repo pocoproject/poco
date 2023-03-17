@@ -34,14 +34,14 @@ public:
 		/// Creates the AbstractInstantiator.
 	{
 	}
-	
+
 	virtual ~AbstractInstantiator()
 		/// Destroys the AbstractInstantiator.
 	{
 	}
-	
+
 	virtual Base* createInstance() const = 0;
-		/// Creates an instance of a concrete subclass of Base.	
+		/// Creates an instance of a concrete subclass of Base.
 
 private:
 	AbstractInstantiator(const AbstractInstantiator&);
@@ -51,8 +51,8 @@ private:
 
 template <class C, class Base>
 class Instantiator: public AbstractInstantiator<Base>
-	/// A template class for the easy instantiation of 
-	/// instantiators. 
+	/// A template class for the easy instantiation of
+	/// instantiators.
 	///
 	/// For the Instantiator to work, the class of which
 	/// instances are to be instantiated must have a no-argument
@@ -63,7 +63,7 @@ public:
 		/// Creates the Instantiator.
 	{
 	}
-	
+
 	virtual ~Instantiator()
 		/// Destroys the Instantiator.
 	{

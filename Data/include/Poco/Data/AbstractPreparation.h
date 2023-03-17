@@ -32,8 +32,8 @@ class Data_API AbstractPreparation
 	/// Interface for calling the appropriate AbstractPreparator method
 {
 public:
-	typedef SharedPtr<AbstractPreparation> Ptr;
-	typedef AbstractPreparator::Ptr PreparatorPtr;
+	using Ptr = SharedPtr<AbstractPreparation>;
+	using PreparatorPtr = AbstractPreparator::Ptr;
 
 	AbstractPreparation(PreparatorPtr pPreparator);
 		/// Creates the AbstractPreparation.

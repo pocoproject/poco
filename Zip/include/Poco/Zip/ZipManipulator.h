@@ -61,10 +61,10 @@ public:
 		/// Adds a file to the zip file.
 
 	ZipArchive commit();
-		/// Commits all changes and re-creates the Zip File with the changes applied. 
+		/// Commits all changes and re-creates the Zip File with the changes applied.
 		/// Returns the ZipArchive for the newly created archive
 		///
-		/// Changes will be first written to a temporary file, 
+		/// Changes will be first written to a temporary file,
 		/// then the originalfile will be either deleted or renamed to .bak,
 		/// then, the temp file will be renamed to the original zip file name.
 
@@ -88,7 +88,7 @@ private:
 		/// Compresses the new file to outFile
 
 private:
-	typedef std::map<std::string, ZipOperation::Ptr> Changes;
+	using Changes = std::map<std::string, ZipOperation::Ptr>;
 
 	const std::string _zipFile;
 	bool              _backupOriginalFile;

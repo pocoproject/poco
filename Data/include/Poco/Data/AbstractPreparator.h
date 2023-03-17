@@ -21,6 +21,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/UUID.h"
 #include "Poco/UTFString.h"
 #include <vector>
 #include <deque>
@@ -51,13 +52,13 @@ class Data_API AbstractPreparator
 	/// (and memory output locations) before extracting data, e.g. ODBC.
 	/// Extract works as two-phase extract: first we call prepare once, then extract n-times.
 	/// There are cases (bulk operations using std::vector storage) when extract is called only once.
-	/// The value passed to a prepare() call is not used by the prepare, serving only as an indication 
-	/// of the data type being prepared, thus all values are passed as const references. 
-	/// Implementing this interface is not mandatory for a connector. Connectors that only extract data 
+	/// The value passed to a prepare() call is not used by the prepare, serving only as an indication
+	/// of the data type being prepared, thus all values are passed as const references.
+	/// Implementing this interface is not mandatory for a connector. Connectors that only extract data
 	/// after SQL execution (e.g. SQLite) do not need this functionality at all.
 {
 public:
-	typedef SharedPtr<AbstractPreparator> Ptr;
+	using Ptr = SharedPtr<AbstractPreparator>;
 
 	AbstractPreparator(Poco::UInt32 length = 1u);
 		/// Creates the AbstractPreparator.
@@ -161,7 +162,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::UInt64>& val);
 		/// Prepares an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	virtual void prepare(std::size_t pos, const long&) = 0;
 		/// Prepares a long.
 
@@ -306,9 +307,21 @@ public:
 
 	virtual void prepare(std::size_t pos, const std::deque<Time>& val);
 		/// Prepares a Time deque.
-	
+
 	virtual void prepare(std::size_t pos, const std::list<Time>& val);
 		/// Prepares a Time list.
+
+	virtual void prepare(std::size_t pos, const UUID&) = 0;
+		/// Prepares a UUID.
+
+	virtual void prepare(std::size_t pos, const std::vector<UUID>& val);
+		/// Prepares a UUID vector.
+
+	virtual void prepare(std::size_t pos, const std::deque<UUID>& val);
+		/// Prepares a UUID deque.
+
+	virtual void prepare(std::size_t pos, const std::list<UUID>& val);
+		/// Prepares a UUID list.
 
 	virtual void prepare(std::size_t pos, const Any&) = 0;
 		/// Prepares an Any.

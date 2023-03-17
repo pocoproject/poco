@@ -26,39 +26,39 @@ namespace
 		{
 			++_count;
 		}
-				
+
 		void duplicate()
 		{
 			++_rc;
 		}
-		
+
 		void release()
 		{
 			if (--_rc == 0)
 				delete this;
 		}
-		
+
 		int rc() const
 		{
 			return _rc;
 		}
-		
+
 		static int count()
 		{
 			return _count;
 		}
-		
+
 	protected:
 		~TestObj()
 		{
 			--_count;
 		}
-		
+
 	private:
 		int _rc;
 		static int _count;
 	};
-	
+
 	int TestObj::_count = 0;
 }
 
@@ -78,9 +78,9 @@ void AutoReleasePoolTest::testAutoReleasePool()
 	AutoReleasePool<TestObj> arp;
 	arp.add(new TestObj);
 	arp.add(new TestObj);
-	assert (TestObj::count() == 2);
+	assertTrue (TestObj::count() == 2);
 	arp.release();
-	assert (TestObj::count() == 0);
+	assertTrue (TestObj::count() == 0);
 }
 
 

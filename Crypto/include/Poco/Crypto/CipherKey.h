@@ -38,7 +38,7 @@ class Crypto_API CipherKey
 	/// file.
 	///
 	/// To create a key using a human-readable password
-	/// string, use the following code. We create a AES Cipher and 
+	/// string, use the following code. We create a AES Cipher and
 	/// use a salt value to make the key more robust:
 	///
 	///     std::string password = "secret";
@@ -57,8 +57,8 @@ class Crypto_API CipherKey
 	///
 {
 public:
-	typedef CipherKeyImpl::Mode Mode;
-	typedef CipherKeyImpl::ByteVec ByteVec;
+	using Mode = CipherKeyImpl::Mode;
+	using ByteVec = CipherKeyImpl::ByteVec;
 
 	enum
 	{
@@ -68,16 +68,16 @@ public:
 			/// an iteration count of at least 1000.
 	};
 
-	CipherKey(const std::string& name, 
-		const std::string& passphrase, 
+	CipherKey(const std::string& name,
+		const std::string& passphrase,
 		const std::string& salt = "",
 		int iterationCount = DEFAULT_ITERATION_COUNT,
 		const std::string& digest = "md5");
 		/// Creates a new CipherKeyImpl object using the given
 		/// cipher name, passphrase, salt value, iteration count and digest.
 
-	CipherKey(const std::string& name, 
-		const ByteVec& key, 
+	CipherKey(const std::string& name,
+		const ByteVec& key,
 		const ByteVec& iv);
 		/// Creates a new CipherKeyImpl object using the given cipher
 		/// name, key and initialization vector (IV).
@@ -87,11 +87,23 @@ public:
 		/// a custom IV size.
 
 	CipherKey(const std::string& name);
-		/// Creates a new CipherKeyImpl object. Autoinitializes key and 
+		/// Creates a new CipherKeyImpl object. Autoinitializes key and
 		/// initialization vector.
+
+	CipherKey(const CipherKey& other);
+		/// Copy constructor.
+
+	CipherKey(CipherKey&& other) noexcept;
+		/// Copy constructor.
 
 	~CipherKey();
 		/// Destroys the CipherKeyImpl.
+
+	CipherKey& operator = (const CipherKey& other);
+		/// Assignment.
+
+	CipherKey& operator = (CipherKey&& other) noexcept;
+		/// Move assignment.
 
 	const std::string& name() const;
 		/// Returns the name of the Cipher.
@@ -107,7 +119,7 @@ public:
 
 	Mode mode() const;
 		/// Returns the Cipher's mode of operation.
-	
+
 	const ByteVec& getKey() const;
 		/// Returns the key for the Cipher.
 

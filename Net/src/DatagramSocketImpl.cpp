@@ -43,7 +43,7 @@ DatagramSocketImpl::DatagramSocketImpl(SocketAddress::Family family)
 	else throw InvalidArgumentException("Invalid or unsupported address family passed to DatagramSocketImpl");
 }
 
-	
+
 DatagramSocketImpl::DatagramSocketImpl(poco_socket_t sockfd): SocketImpl(sockfd)
 {
 }

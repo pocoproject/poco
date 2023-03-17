@@ -92,7 +92,10 @@ EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 
 EventImpl::~EventImpl()
 {
-	pthread_cond_destroy(&_cond);
+	if (0 == pthread_mutex_lock(&_mutex))
+		pthread_cond_destroy(&_cond);
+	else poco_unexpected();
+	pthread_mutex_unlock(&_mutex);
 	pthread_mutex_destroy(&_mutex);
 }
 

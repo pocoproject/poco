@@ -17,14 +17,12 @@
 #include "Poco/DirectoryIterator.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "File_WINCE.cpp"
 #else
 #include "File_WIN32U.cpp"
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "File_WIN32.cpp"
 #elif defined(POCO_VXWORKS)
 #include "File_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -95,7 +93,7 @@ File& File::operator = (const Path& path)
 }
 
 
-void File::swap(File& file)
+void File::swap(File& file) noexcept
 {
 	swapImpl(file);
 }
@@ -208,7 +206,7 @@ File& File::setExecutable(bool flag)
 }
 
 
-void File::copyTo(const std::string& path) const
+void File::copyTo(const std::string& path, int options) const
 {
 	Path src(getPathImpl());
 	Path dest(path);
@@ -219,13 +217,13 @@ void File::copyTo(const std::string& path) const
 		dest.setFileName(src.getFileName());
 	}
 	if (isDirectory())
-		copyDirectory(dest.toString());
+		copyDirectory(dest.toString(), options);
 	else
-		copyToImpl(dest.toString());
+		copyToImpl(dest.toString(), options);
 }
 
 
-void File::copyDirectory(const std::string& path) const
+void File::copyDirectory(const std::string& path, int options) const
 {
 	File target(path);
 	target.createDirectories();
@@ -236,22 +234,22 @@ void File::copyDirectory(const std::string& path) const
 	DirectoryIterator end;
 	for (; it != end; ++it)
 	{
-		it->copyTo(path);
+		it->copyTo(path, options);
 	}
 }
 
 
-void File::moveTo(const std::string& path)
+void File::moveTo(const std::string& path, int options)
 {
-	copyTo(path);
+	copyTo(path, options);
 	remove(true);
 	setPathImpl(path);
 }
 
 
-void File::renameTo(const std::string& path)
+void File::renameTo(const std::string& path, int options)
 {
-	renameToImpl(path);
+	renameToImpl(path, options);
 	setPathImpl(path);
 }
 
@@ -268,9 +266,9 @@ void File::remove(bool recursive)
 	{
 		std::vector<File> files;
 		list(files);
-		for (std::vector<File>::iterator it = files.begin(); it != files.end(); ++it)
+		for (auto& f: files)
 		{
-			it->remove(true);
+			f.remove(true);
 		}
 
 		// Note: On Windows, removing a directory may not succeed at first

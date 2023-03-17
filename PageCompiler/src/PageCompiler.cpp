@@ -58,7 +58,8 @@ public:
 		_helpRequested(false),
 		_generateOSPCode(false),
 		_generateApacheCode(false),
-		_emitLineDirectives(true)
+		_emitLineDirectives(true),
+		_escape(false)
 	{
 	}
 
@@ -141,6 +142,12 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
+
+		options.addOption(
+			Option("escape", "e", "Escape special HTML characters (<, >, \", &) in <%= %> expressions.")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleEscape)));
 	}
 
 	void handleHelp(const std::string& name, const std::string& value)
@@ -196,6 +203,11 @@ protected:
 		_emitLineDirectives = false;
 	}
 
+	void handleEscape(const std::string& name, const std::string& value)
+	{
+		_escape = true;
+	}
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -204,7 +216,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2019 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2022 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "
@@ -213,7 +225,7 @@ protected:
 		);
 		helpFormatter.setFooter(
 			"For more information, please see the POCO C++ Libraries "
-			"documentation at <http://pocoproject.org/docs/>."
+			"documentation at <https://pocoproject.org/docs/>."
 		);
 		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);
@@ -283,11 +295,7 @@ protected:
 			p.setBaseName(clazz);
 		}
 
-#ifndef POCO_ENABLE_CPP11
-		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
-#else
 		std::unique_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
-#endif
 
 		if (!_outputDir.empty())
 		{
@@ -329,6 +337,12 @@ protected:
 	void compile(const std::string& path)
 	{
 		Page page;
+
+		if (_escape)
+		{
+			page.set("page.escape", "true");
+		}
+
 		std::string clazz;
 		parse(path, page, clazz);
 		write(path, page, clazz);
@@ -365,6 +379,7 @@ private:
 	bool _generateOSPCode;
 	bool _generateApacheCode;
 	bool _emitLineDirectives;
+	bool _escape;
 	std::string _outputDir;
 	std::string _headerOutputDir;
 	std::string _headerPrefix;

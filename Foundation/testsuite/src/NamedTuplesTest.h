@@ -44,6 +44,16 @@ public:
 	void testNamedTuple18();
 	void testNamedTuple19();
 	void testNamedTuple20();
+	void testNamedTuple21();
+	void testNamedTuple22();
+	void testNamedTuple23();
+	void testNamedTuple24();
+	void testNamedTuple25();
+	void testNamedTuple26();
+	void testNamedTuple27();
+	void testNamedTuple28();
+	void testNamedTuple29();
+	void testNamedTuple30();
 
 	void setUp();
 	void tearDown();

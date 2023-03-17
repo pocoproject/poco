@@ -479,7 +479,7 @@ Command Command::set(const std::string& key, const std::string& value, bool over
 	cmd << key << value;
 	if (! overwrite) cmd << "NX";
 	if (! create) cmd << "XX";
-	if (expireTime.totalMicroseconds() > 0) cmd << "PX" << expireTime.totalMilliseconds();
+	if (expireTime.totalMicroseconds() > 0) cmd << "PX" << NumberFormatter::format(expireTime.totalMilliseconds());
 
 	return cmd;
 }
@@ -730,6 +730,24 @@ Command Command::exec()
 Command Command::discard()
 {
 	Command cmd("DISCARD");
+
+	return cmd;
+}
+
+
+Command Command::auth(const std::string& password)
+{
+	Command cmd("AUTH");
+	cmd << password;
+
+	return cmd;
+}
+
+
+Command Command::auth(const std::string& username, const std::string& password)
+{
+	Command cmd("AUTH");
+	cmd << username << password;
 
 	return cmd;
 }

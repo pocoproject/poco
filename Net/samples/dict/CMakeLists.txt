@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "dict")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoNet PocoUtil PocoJSON PocoXML PocoFoundation )
+add_executable(dict src/dict.cpp)
+target_link_libraries(dict PUBLIC Poco::Net Poco::Util Poco::JSON)

@@ -23,6 +23,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Timespan.h"
+#include "Poco/Buffer.h"
 
 
 namespace Poco {
@@ -38,6 +39,13 @@ class Net_API SocketImpl: public Poco::RefCountedObject
 	/// You should not create any instances of this class.
 {
 public:
+	enum Type
+	{
+		SOCKET_TYPE_STREAM = SOCK_STREAM,
+		SOCKET_TYPE_DATAGRAM = SOCK_DGRAM,
+		SOCKET_TYPE_RAW = SOCK_RAW
+	};
+
 	enum SelectMode
 	{
 		SELECT_READ  = 1,
@@ -84,7 +92,7 @@ public:
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
 
-	virtual void bind(const SocketAddress& address, bool reuseAddress, bool reusePort );
+	virtual void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -114,7 +122,7 @@ public:
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
 
-	virtual void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort,  bool ipV6Only);
+	virtual void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only);
 		/// Bind a local IPv6 address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -167,6 +175,13 @@ public:
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
 
+	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
+		/// Receives data from the socket and stores it in buffers.
+		///
+		/// Returns the number of bytes received.
+		///
+		/// Always returns zero for platforms where not implemented.
+
 	virtual int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
@@ -176,6 +191,22 @@ public:
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
 
+	virtual int receiveBytes(SocketBufVec& buffers, int flags = 0);
+		/// Receives data from the socket and stores it in buffers.
+		///
+		/// Returns the number of bytes received.
+		///
+		/// Always returns zero for platforms where not implemented.
+
+	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000);
+		/// Receives data from the socket and stores it in the buffer.
+		/// If needed, the buffer will be resized to accomodate the
+		/// data. Note that this function may impose additional
+		/// performance penalties due to the check for the available
+		/// amount of data.
+		///
+		/// Returns the number of bytes received.
+
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 		/// Sends the contents of the given buffer through
 		/// the socket to the given address.
@@ -183,10 +214,44 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	virtual int sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags = 0);
+		/// Sends the contents of the buffers through
+		/// the socket to the given address.
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+		///
+		/// Always returns zero for platforms where not implemented.
+
+	int receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags = 0);
+		/// Receives data from the socket and stores it
+		/// in buffer. Up to length bytes are received.
+		/// Stores the native address of the sender in
+		/// ppSA, and the length of native address in ppSALen.
+		///
+		/// Returns the number of bytes received.
+
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		/// Stores the address of the sender in address.
+		///
+		/// Returns the number of bytes received.
+
+	virtual int receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags = 0);
+		/// Receives data from the socket and stores it
+		/// in buffers.
+		/// Stores the address of the sender in address.
+		///
+		/// Returns the number of bytes received.
+		///
+		/// Always returns zero for platforms where not implemented.
+
+	int receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags);
+		/// Receives data from the socket and stores it
+		/// in buffers.
+		/// Stores the native address of the sender in
+		/// ppSA, and the length of native address in ppSALen.
 		///
 		/// Returns the number of bytes received.
 
@@ -212,6 +277,12 @@ public:
 		///
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
+
+	Type type();
+		/// Returns the socket type.
+
+	virtual int getError();
+		/// Returns the socket error.
 
 	virtual void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
@@ -244,7 +315,7 @@ public:
 		/// as the system is free to adjust the value.
 
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
-		/// Sets the send timeout for the socket.
+		/// Sets the receive timeout for the socket.
 		///
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.
@@ -432,6 +503,8 @@ protected:
 	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
 
+	void checkBrokenTimeout(SelectMode mode);
+
 	static int lastError();
 		/// Returns the last error code.
 
@@ -451,11 +524,11 @@ private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
 
-	poco_socket_t _sockfd;
+	poco_socket_t  _sockfd;
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
-	bool          _blocking;
-	bool          _isBrokenTimeout;
+	bool           _blocking;
+	bool           _isBrokenTimeout;
 
 	friend class Socket;
 	friend class SecureSocketImpl;
@@ -466,6 +539,17 @@ private:
 //
 // inlines
 //
+inline SocketImpl::Type SocketImpl::type()
+{
+	int type;
+	getOption(SOL_SOCKET, SO_TYPE, type);
+	poco_assert_dbg(type == SOCK_STREAM ||
+					type == SOCK_DGRAM ||
+					type == SOCK_RAW);
+	return static_cast<Type>(type);
+}
+
+
 inline poco_socket_t SocketImpl::sockfd() const
 {
 	return _sockfd;

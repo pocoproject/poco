@@ -1,8 +1,7 @@
 #
 # FreeBSD
 #
-# Make settings for FreeBSD 6.0/gcc 3.4
-#
+# Make settings for FreeBSD 12.x/clang
 #
 
 #
@@ -13,14 +12,14 @@ LINKMODE ?= SHARED
 #
 # Define Tools
 #
-CC      = gcc
-CXX     = g++
+CC      = clang
+CXX     = clang++
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 STRIP   = strip
 SHELL   = sh
 RM      = rm -rf
@@ -36,7 +35,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        =
@@ -61,9 +60,9 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_REENTRANT -D_THREAD_SAFE 
+SYSFLAGS = -D_REENTRANT -D_THREAD_SAFE
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread 
+SYSLIBS  = -lpthread

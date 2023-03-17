@@ -22,7 +22,7 @@
 #include <openssl/pem.h>
 #ifdef _WIN32
 // fix for WIN32 header conflict
-#undef X509_NAME 
+#undef X509_NAME
 #endif
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
@@ -68,7 +68,7 @@ X509Certificate::X509Certificate(X509* pCert, bool shared):
 	_pCert(pCert)
 {
 	poco_check_ptr(_pCert);
-	
+
 	if (shared)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -92,6 +92,16 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 }
 
 
+X509Certificate::X509Certificate(X509Certificate&& cert) noexcept:
+	_issuerName(std::move(cert._issuerName)),
+	_subjectName(std::move(cert._subjectName)),
+	_serialNumber(std::move(cert._serialNumber)),
+	_pCert(cert._pCert)
+{
+	cert._pCert = nullptr;
+}
+
+
 X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 {
 	X509Certificate tmp(cert);
@@ -100,7 +110,18 @@ X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 }
 
 
-void X509Certificate::swap(X509Certificate& cert)
+X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
+{
+	_issuerName = std::move(cert._issuerName);
+	_subjectName = std::move(cert._subjectName);
+	_serialNumber = std::move(cert._serialNumber);
+	if (_pCert) X509_free(_pCert);
+	_pCert = cert._pCert; cert._pCert = nullptr;
+	return *this;
+}
+
+
+void X509Certificate::swap(X509Certificate& cert) noexcept
 {
 	using std::swap;
 	swap(cert._issuerName, _issuerName);
@@ -112,7 +133,7 @@ void X509Certificate::swap(X509Certificate& cert)
 
 X509Certificate::~X509Certificate()
 {
-	X509_free(_pCert);
+	if (_pCert) X509_free(_pCert);
 }
 
 
@@ -162,7 +183,7 @@ void X509Certificate::save(std::ostream& stream) const
 	if (!pBIO) throw Poco::IOException("Cannot create BIO for writing certificate");
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+		if (!PEM_write_bio_X509(pBIO, _pCert))
 			throw Poco::IOException("Failed to write certificate to stream");
 
 		char *pData;
@@ -190,7 +211,7 @@ void X509Certificate::save(const std::string& path) const
 	}
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+		if (!PEM_write_bio_X509(pBIO, _pCert))
 			throw Poco::WriteFileException("Failed to write certificate to file", path);
 	}
 	catch (...)
@@ -264,7 +285,7 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear(); 
+	domainNames.clear();
 	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
 	{
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
@@ -279,7 +300,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 		}
 		GENERAL_NAMES_free(names);
 	}
- 
+
 	cmnName = commonName();
 	if (!cmnName.empty() && domainNames.empty())
 	{
@@ -307,7 +328,7 @@ Poco::DateTime X509Certificate::validFrom() const
 	}
 }
 
-	
+
 Poco::DateTime X509Certificate::expiresOn() const
 {
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
@@ -324,6 +345,24 @@ Poco::DateTime X509Certificate::expiresOn() const
 	else
 	{
 		throw NotImplementedException("Unsupported date/time format in notBefore");
+	}
+}
+
+
+Poco::DigestEngine::Digest X509Certificate::fingerprint(const std::string& algorithm) const
+{
+	unsigned char buffer[EVP_MAX_MD_SIZE];
+	unsigned int length;
+	const EVP_MD* md = EVP_get_digestbyname(algorithm.c_str());
+	if (!md) throw Poco::InvalidArgumentException(algorithm);
+
+	if (X509_digest(_pCert, md, buffer, &length))
+	{
+		return Poco::DigestEngine::Digest(buffer, buffer + length);
+	}
+	else
+	{
+		throw OpenSSLException("failed to compute fingerprint");
 	}
 }
 
@@ -377,10 +416,14 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 {
 	List caCertList;
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
-	if (pBIO == NULL) throw OpenFileException("X509Certificate::readPEM()");
+	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
 	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
-	if (!x) throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
-	while(x)
+	if (!x)
+	{
+		BIO_free(pBIO);
+		throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
+	}
+	while (x)
 	{
 		caCertList.push_back(X509Certificate(x));
 		x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
@@ -393,14 +436,15 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
 {
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "a");
-	if (pBIO == NULL) throw OpenFileException("X509Certificate::writePEM()");
+	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 	List::const_iterator it = list.begin();
 	List::const_iterator end = list.end();
 	for (; it != end; ++it)
 	{
 		if (!PEM_write_bio_X509(pBIO, const_cast<X509*>(it->certificate())))
 		{
-			throw OpenSSLException("X509Certificate::writePEM()");
+			BIO_free(pBIO);
+			throw OpenSSLException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 		}
 	}
 	BIO_free(pBIO);

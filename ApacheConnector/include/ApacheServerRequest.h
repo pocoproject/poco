@@ -25,10 +25,10 @@ class ApacheServerRequest: public Poco::Net::HTTPServerRequest
 {
 public:
 	ApacheServerRequest(
-		ApacheRequestRec* pApacheRequest, 
-		const char* serverName, 
-		int serverPort, 
-		const char* clientName, 
+		ApacheRequestRec* pApacheRequest,
+		const char* serverName,
+		int serverPort,
+		const char* clientName,
 		int clientPort);
 		/// Creates a new ApacheServerRequest.
 
@@ -58,6 +58,12 @@ public:
 	Poco::Net::HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response
 
+	bool secure() const;
+		/// Returns true if the request is using a secure
+		/// connection. Returns false if no secure connection
+		/// is used, or if it is not known whether a secure
+		/// connection is used.
+
 protected:
 	void setResponse(ApacheServerResponse* pResponse);
 
@@ -67,7 +73,7 @@ private:
 	ApacheInputStream*       _pStream;
 	Poco::Net::SocketAddress _serverAddress;
 	Poco::Net::SocketAddress _clientAddress;
-	
+
 	friend class ApacheServerResponse;
 };
 
@@ -78,7 +84,7 @@ private:
 inline std::istream& ApacheServerRequest::stream()
 {
 	poco_check_ptr (_pStream);
-	
+
 	return *_pStream;
 }
 

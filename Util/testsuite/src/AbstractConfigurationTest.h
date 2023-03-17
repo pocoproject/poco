@@ -44,18 +44,18 @@ public:
 	void testRemove();
 	void testChangeEvents();
 	void testRemoveEvents();
-	
+
 	void setUp();
 	void tearDown();
-	
+
 	void onPropertyChanging(const void*, Poco::Util::AbstractConfiguration::KeyValue& kv);
 	void onPropertyChanged(const void*, const Poco::Util::AbstractConfiguration::KeyValue& kv);
 	void onPropertyRemoving(const void*, const std::string& key);
 	void onPropertyRemoved(const void*, const std::string& key);
 
 protected:
-	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const = 0;
-	virtual Poco::AutoPtr<Poco::Util::AbstractConfiguration> createConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const = 0;
+	virtual Poco::Util::AbstractConfiguration::Ptr createConfiguration() const;
 
 	std::string _changingKey;
 	std::string _changingValue;

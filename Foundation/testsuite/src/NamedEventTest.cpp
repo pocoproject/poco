@@ -33,7 +33,7 @@ namespace
 	public:
 		void run()
 		{
-		
+
 			testEvent.wait();
 			_timestamp.update();
 		}
@@ -66,11 +66,11 @@ void NamedEventTest::testNamedEvent()
 	thr1.start(te);
 	Timestamp now;
 	Thread::sleep(2000);
-	try 
+	try
 	{
 		testEvent.set();
 	}
-	catch(Poco::NotImplementedException e)
+	catch(Poco::NotImplementedException& e)
 	{
 #if POCO_OS != POCO_OS_ANDROID
 		throw e;
@@ -78,17 +78,17 @@ void NamedEventTest::testNamedEvent()
 	}
 	thr1.join();
 #if POCO_OS != POCO_OS_ANDROID
-	assert (te.timestamp() > now);
+	assertTrue (te.timestamp() > now);
 #endif
 	Thread thr2;
 	thr2.start(te);
 	now.update();
 	Thread::sleep(2000);
-	try 
+	try
 	{
 		testEvent.set();
 	}
-	catch(Poco::NotImplementedException e)
+	catch(Poco::NotImplementedException& e)
 	{
 #if POCO_OS != POCO_OS_ANDROID
 		throw e;
@@ -96,7 +96,7 @@ void NamedEventTest::testNamedEvent()
 	}
 	thr2.join();
 #if POCO_OS != POCO_OS_ANDROID
-	assert (te.timestamp() > now);
+	assertTrue (te.timestamp() > now);
 #endif
 }
 

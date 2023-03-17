@@ -117,7 +117,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 
 #if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
-	static char fqname[1024];
+	char fqname[1024];
 	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD);
 	if (rc == 0)
 	{
@@ -217,9 +217,9 @@ std::string DNS::hostName()
 
 bool DNS::isIDN(const std::string& hostname)
 {
-	for (std::string::const_iterator it = hostname.begin(); it != hostname.end(); ++it)
+	for (auto ch: hostname)
 	{
-		if (static_cast<unsigned char>(*it) >= 0x80) return true;
+		if (static_cast<unsigned char>(ch) >= 0x80) return true;
 	}
 	return false;
 }
@@ -316,7 +316,7 @@ std::string DNS::decodeIDNLabel(const std::string& encodedIDN)
 			Poco::UTF32Encoding utf32;
 			Poco::UTF8Encoding utf8;
 			Poco::TextConverter converter(utf32, utf8);
-			converter.convert(buffer, size*sizeof(punycode_uint), decoded);
+			converter.convert(buffer, static_cast<int>(size*sizeof(punycode_uint)), decoded);
 		}
 		else throw DNSException("Failed to decode IDN label: ", encodedIDN);
 	}

@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// Default notification strategy.
 	///
@@ -35,10 +35,10 @@ class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// order in which they have been registered.
 {
 public:
-	typedef TDelegate*                   DelegateHandle;
-	typedef SharedPtr<TDelegate>         DelegatePtr;
-	typedef std::vector<DelegatePtr>     Delegates;
-	typedef typename Delegates::iterator Iterator;
+	using DelegateHandle = TDelegate*;
+	using DelegatePtr = SharedPtr<TDelegate>;
+	using Delegates = std::vector<DelegatePtr>;
+	using Iterator = typename Delegates::iterator;
 
 public:
 	DefaultStrategy()
@@ -81,7 +81,7 @@ public:
 			}
 		}
 	}
-	
+
 	void remove(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
@@ -132,10 +132,10 @@ class DefaultStrategy<void,TDelegate>: public NotificationStrategy<void, TDelega
 	/// order in which they have been registered.
 {
 public:
-	typedef TDelegate*                   DelegateHandle;
-	typedef SharedPtr<TDelegate>         DelegatePtr;
-	typedef std::vector<DelegatePtr>     Delegates;
-	typedef typename Delegates::iterator Iterator;
+	using DelegateHandle = TDelegate*;
+	using DelegatePtr = SharedPtr<TDelegate>;
+	using Delegates = std::vector<DelegatePtr>;
+	using Iterator = typename Delegates::iterator;
 
 public:
 	DefaultStrategy()

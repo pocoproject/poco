@@ -17,11 +17,13 @@
 #ifndef Data_MySQL_Binder_INCLUDED
 #define Data_MySQL_Binder_INCLUDED
 
+
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <mysql.h>
+
 
 namespace Poco {
 namespace Data {
@@ -36,7 +38,7 @@ public:
 
 	Binder();
 		/// Creates the Binder.
-		
+
 	virtual ~Binder();
 		/// Destroys the Binder.
 
@@ -64,15 +66,13 @@ public:
 	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
 		/// Binds an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
-
+#ifndef POCO_INT64_IS_LONG
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN);
 		/// Binds a long.
 
 	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN);
 		/// Binds an unsigned long.
-
-#endif // POCO_LONG_IS_64_BIT
+#endif
 
 	virtual void bind(std::size_t pos, const bool& val, Direction dir);
 		/// Binds a boolean.
@@ -104,11 +104,13 @@ public:
 	virtual void bind(std::size_t pos, const Time& val, Direction dir);
 		/// Binds a Time.
 
+	virtual void bind(std::size_t pos, const UUID& val, Direction dir);
+		/// Binds a UUID.
+
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null.
 
-
-	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir = PD_IN);
 
@@ -136,25 +138,25 @@ public:
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::vector<bool>& val, Direction dir = PD_IN);
 
@@ -228,25 +230,21 @@ public:
 	MYSQL_BIND* getBindArray() const;
 		/// Return array
 
-	//void updateDates();
-		/// Update linked times
-
 private:
 	Binder(const Binder&);
 		/// Don't copy the binder
 
 	virtual void bind(std::size_t, const char* const&, Direction)
-		/// Binds a const char ptr. 
+		/// Binds a const char ptr.
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 	{
 	}
-	
+
 	void realBind(std::size_t pos, enum_field_types type, const void* buffer, int length, bool isUnsigned = false);
 		/// Common bind implementation
 
 private:
-
 	std::vector<MYSQL_BIND> _bindArray;
 	std::vector<MYSQL_TIME*> _dates;
 };

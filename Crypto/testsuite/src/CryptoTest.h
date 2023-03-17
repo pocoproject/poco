@@ -21,11 +21,11 @@
 class CryptoTest: public CppUnit::TestCase
 {
 public:
-	enum 
+	enum
 	{
 		MAX_DATA_SIZE = 10000
 	};
-	
+
 	CryptoTest(const std::string& name);
 	~CryptoTest();
 
@@ -41,7 +41,7 @@ public:
 	void testDecryptInterop();
 	void testCertificate();
 	void testCertificateUTF8();
-	
+
 	void setUp();
 	void tearDown();
 

@@ -54,6 +54,27 @@ static const std::string APPINF_PEM(
 	"-----END CERTIFICATE-----\n"
 );
 
+static const std::string UTF8_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDEzCCArigAwIBAgIQAKegojl/YLNUPqTyCnQ4LzAKBggqhkjOPQQDAjB0MQsw\n"
+	"CQYDVQQGEwJDSDEQMA4GA1UECgwHU2llbWVuczEUMBIGA1UECwwLQlQgRGl2aXNp\n"
+	"b24xPTA7BgNVBAMMNEt1cnpSUzFNUDIyc3ByaW50NTlwcmVWVlMgcHJvamVjdCBp\n"
+	"bnRlcm1lZGlhdGUgQ0EgRUMwHhcNMTkxMTI3MDAwMDAwWhcNMjQxMTI4MTkzMzQw\n"
+	"WjCCAQMxJDAiBgNVBAUTG1BJRDpQWEM1LkUwMDMgU046MTQwMDA0RDhFMjELMAkG\n"
+	"A1UEBhMCQ0gxEDAOBgNVBAoMB1NpZW1lbnMxFzAVBgNVBAsMDlNJIEJQIERpdmlz\n"
+	"aW9uMQwwCgYDVQQIDANadWcxHjAcBgNVBAcMFVrDpGhsZXJ3ZWcgNyBSb29tIDU0\n"
+	"NDEnMCUGCSqGSIb3DQEJARYYcmljaGFyZC5rdXJ6QHNpZW1lbnMuY29tMRgwFgYD\n"
+	"VQQLDA9TU0wgQ2VydGlmaWNhdGUxMjAwBgNVBAMMKUt1cnpSUzFNUDIyc3ByaW50\n"
+	"NTlwcmVWVlMuS3VyUFhDNUJOUjM3NjUyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\n"
+	"QgAEJjy+wx/mN9FbW3/IoOAOXdbfQvF1gF8wNasHUeLdn1UsCABnaAZTytqX7gMD\n"
+	"Y5HS32SIvdULYwsy6Dn3CO5tVKOBmjCBlzAOBgNVHQ8BAf8EBAMCA6gwIAYDVR0l\n"
+	"AQH/BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMAwGA1UdEwEB/wQCMAAwHQYDVR0O\n"
+	"BBYEFIbtuXQJoVh7FlYiWZeWT2ooEQRNMB8GA1UdIwQYMBaAFOtUSuT1OYK7bNS4\n"
+	"Mqz0UGPoGavuMBUGA1UdEQQOMAyHBAqqt7SHBMCo/AEwCgYIKoZIzj0EAwIDSQAw\n"
+	"RgIhANBQnB1HFLHp7t8oZbLYsm8nWI0hshmVQupXV9oFwb4qAiEAg5UqSDnvAax3\n"
+	"LWWgnAZJkUS0AEQXu4Rx9ZiP7wBdFtA=\n"
+	"-----END CERTIFICATE-----\n"
+);
 
 static const std::string UTF8_PEM(
 	"-----BEGIN CERTIFICATE-----\n"
@@ -97,7 +118,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -105,7 +126,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -113,7 +134,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 }
 
@@ -128,7 +149,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_NONE);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -136,7 +157,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -144,7 +165,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BINHEX);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 }
 
@@ -161,7 +182,7 @@ void CryptoTest::testEncryptDecryptWithSaltSha1()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_NONE);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -169,7 +190,7 @@ void CryptoTest::testEncryptDecryptWithSaltSha1()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -177,7 +198,7 @@ void CryptoTest::testEncryptDecryptWithSaltSha1()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BINHEX);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 }
 
@@ -191,7 +212,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -199,7 +220,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -207,7 +228,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
-		assert (in == result);
+		assertTrue (in == result);
 	}
 }
 
@@ -224,22 +245,22 @@ void CryptoTest::testEncryptDecryptGCM()
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
 	{
 		std::stringstream str;
-		CryptoTransform* pEncryptor = pCipher->createEncryptor();
+		CryptoTransform::Ptr pEncryptor = pCipher->createEncryptor();
 		CryptoOutputStream encryptorStream(str, pEncryptor);
 		std::string in(n, 'x');
 		encryptorStream << in;
 		encryptorStream.close();
-		assert (encryptorStream.good());
+		assertTrue (encryptorStream.good());
 
 		std::string tag = pEncryptor->getTag();
 
-		CryptoTransform* pDecryptor = pCipher->createDecryptor();
+		CryptoTransform::Ptr pDecryptor = pCipher->createDecryptor();
 		pDecryptor->setTag(tag);
 		CryptoInputStream decryptorStream(str, pDecryptor);
 		std::string out;
 		decryptorStream >> out;
 
-		assert (in == out);
+		assertTrue (in == out);
 	}
 }
 
@@ -253,7 +274,7 @@ void CryptoTest::testPassword()
 	base64KeyEnc.write(reinterpret_cast<const char*>(&key.getKey()[0]), key.keySize());
 	base64KeyEnc.close();
 	std::string base64Key = keyStream.str();
-	assert (base64Key == "hIzxBt58GDd7/6mRp88bewKk42lM4QwaF78ek0FkVoA=");
+	assertTrue (base64Key == "hIzxBt58GDd7/6mRp88bewKk42lM4QwaF78ek0FkVoA=");
 }
 
 
@@ -279,8 +300,8 @@ void CryptoTest::testPasswordSha1()
 	// openssl enc -e -a -md sha1 -aes256 -k password -S 73616c7473616c74 -P
 	// (where "salt" == 73616c74 in Hex, doubled for an 8 bytes salt, openssl padds the salt with 0
 	// whereas Poco's implementation padds with the existing bytes using a modulo operation)
-	assert (hexIv == "c96049b0edc0b67af61ecc43d3de8898");
-	assert (hexKey == "cab86dd6261710891e8cb56ee3625691a75df344f0bff4c12cf3596fc00b39c7");
+	assertTrue (hexIv == "c96049b0edc0b67af61ecc43d3de8898");
+	assertTrue (hexKey == "cab86dd6261710891e8cb56ee3625691a75df344f0bff4c12cf3596fc00b39c7");
 }
 
 
@@ -291,7 +312,7 @@ void CryptoTest::testEncryptInterop()
 	const std::string plainText  = "This is a secret message.";
 	const std::string expectedCipherText = "9HITTPaU3A/LaZzldbdnRZ109DKlshouKren/n8BsHc=";
 	std::string cipherText = pCipher->encryptString(plainText, Cipher::ENC_BASE64);
-	assert (cipherText == expectedCipherText);
+	assertTrue (cipherText == expectedCipherText);
 }
 
 
@@ -302,7 +323,7 @@ void CryptoTest::testDecryptInterop()
 	const std::string expectedPlainText  = "This is a secret message.";
 	const std::string cipherText = "9HITTPaU3A/LaZzldbdnRZ109DKlshouKren/n8BsHc=";
 	std::string plainText = pCipher->decryptString(cipherText, Cipher::ENC_BASE64);
-	assert (plainText == expectedPlainText);
+	assertTrue (plainText == expectedPlainText);
 }
 
 
@@ -321,18 +342,17 @@ void CryptoTest::testStreams()
 	std::string result;
 	Poco::StreamCopier::copyToString(decryptor, result);
 
-	assert (result == SECRET_MESSAGE);
-	assert (decryptor.eof());
-	assert (!decryptor.bad());
-
+	assertTrue (result == SECRET_MESSAGE);
+	assertTrue (decryptor.eof());
+	assertTrue (!decryptor.bad());
 
 	std::istringstream emptyStream;
 	DecryptingInputStream badDecryptor(emptyStream, *pCipher);
 	Poco::StreamCopier::copyToString(badDecryptor, result);
 
-	assert (badDecryptor.fail());
-	assert (badDecryptor.bad());
-	assert (!badDecryptor.eof());
+	assertTrue (badDecryptor.fail());
+	assertTrue (badDecryptor.bad());
+	assertTrue (!badDecryptor.eof());
 }
 
 
@@ -350,14 +370,17 @@ void CryptoTest::testCertificate()
 	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
 	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
 
-	assert (subjectName == "CN=appinf.com,O=Applied Informatics Software Engineering GmbH,OU=Development,ST=Carinthia,C=AT,L=St. Jakob im Rosental,emailAddress=guenter.obiltschnig@appinf.com");
-	assert (issuerName == subjectName);
-	assert (commonName == "appinf.com");
-	assert (country == "AT");
-	assert (localityName == "St. Jakob im Rosental");
-	assert (stateOrProvince == "Carinthia");
-	assert (organizationName == "Applied Informatics Software Engineering GmbH");
-	assert (organizationUnitName == "Development");
+	assertTrue (subjectName == "CN=appinf.com,O=Applied Informatics Software Engineering GmbH,OU=Development,ST=Carinthia,C=AT,L=St. Jakob im Rosental,emailAddress=guenter.obiltschnig@appinf.com");
+	assertTrue (issuerName == subjectName);
+	assertTrue (commonName == "appinf.com");
+	assertTrue (country == "AT");
+	assertTrue (localityName == "St. Jakob im Rosental");
+	assertTrue (stateOrProvince == "Carinthia");
+	assertTrue (organizationName == "Applied Informatics Software Engineering GmbH");
+	assertTrue (organizationUnitName == "Development");
+
+	const auto fingerprint = cert.fingerprint();
+	assertTrue (Poco::DigestEngine::digestToHex(fingerprint) == "ac84e4eb72c861ccb20f2900f3f17a9ac11f6579");
 
 	// fails with recent OpenSSL versions:
 	// assert (cert.issuedBy(cert));
@@ -365,7 +388,7 @@ void CryptoTest::testCertificate()
 	std::istringstream otherCertStream(APPINF_PEM);
 	X509Certificate otherCert(otherCertStream);
 
-	assert (cert.equals(otherCert));
+	assertTrue (cert.equals(otherCert));
 }
 
 
@@ -383,18 +406,18 @@ void CryptoTest::testCertificateUTF8()
 	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
 	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
 
-	assert (subjectName == "serialNumber=PID:PXC5.E003 SN:140004D8E2,C=CH,O=Siemens,OU=SI BP Division,ST=Zug,L=Zählerweg 7 Room 544,emailAddress=richard.kurz@siemens.com,OU=SSL Certificate,CN=KurzRS1MP22sprint59preVVS.KurPXC5BNR37652");
-	assert (commonName == "KurzRS1MP22sprint59preVVS.KurPXC5BNR37652");
-	assert (country == "CH");
-	assert (localityName == "Zählerweg 7 Room 544");
-	assert (stateOrProvince == "Zug");
-	assert (organizationName == "Siemens");
-	assert (organizationUnitName == "SI BP Division");
+	assertTrue (subjectName == "serialNumber=PID:PXC5.E003 SN:140004D8E2,C=CH,O=Siemens,OU=SI BP Division,ST=Zug,L=Zählerweg 7 Room 544,emailAddress=richard.kurz@siemens.com,OU=SSL Certificate,CN=KurzRS1MP22sprint59preVVS.KurPXC5BNR37652");
+	assertTrue (commonName == "KurzRS1MP22sprint59preVVS.KurPXC5BNR37652");
+	assertTrue (country == "CH");
+	assertTrue (localityName == "Zählerweg 7 Room 544");
+	assertTrue (stateOrProvince == "Zug");
+	assertTrue (organizationName == "Siemens");
+	assertTrue (organizationUnitName == "SI BP Division");
 
 	std::istringstream otherCertStream(UTF8_PEM);
 	X509Certificate otherCert(otherCertStream);
 
-	assert (cert.equals(otherCert));
+	assertTrue (cert.equals(otherCert));
 }
 
 

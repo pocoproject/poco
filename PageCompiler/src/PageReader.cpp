@@ -21,6 +21,8 @@ const std::string PageReader::MARKUP_BEGIN("\tresponseStream << \"");
 const std::string PageReader::MARKUP_END("\";\n");
 const std::string PageReader::EXPR_BEGIN("\tresponseStream << (");
 const std::string PageReader::EXPR_END(");\n");
+const std::string PageReader::ESC_EXPR_BEGIN("\t_escapeStream << (");
+const std::string PageReader::ESC_EXPR_END(");\n");
 
 
 PageReader::PageReader(Page& page, const std::string& path):
@@ -133,6 +135,25 @@ void PageReader::parse(std::istream& pageStream)
 			{
 				_page.handler() << MARKUP_END;
 				generateLineDirective(_page.handler());
+				if (escape())
+				{
+					_page.handler() << ESC_EXPR_BEGIN;
+					state = STATE_ESC_EXPR;
+				}
+				else
+				{
+					_page.handler() << EXPR_BEGIN;
+					state = STATE_EXPR;
+				}
+			}
+			else _page.handler() << token;
+		}
+		else if (token == "<%-")
+		{
+			if (state == STATE_MARKUP)
+			{
+				_page.handler() << MARKUP_END;
+				generateLineDirective(_page.handler());
 				_page.handler() << EXPR_BEGIN;
 				state = STATE_EXPR;
 			}
@@ -143,6 +164,12 @@ void PageReader::parse(std::istream& pageStream)
 			if (state == STATE_EXPR)
 			{
 				_page.handler() << EXPR_END;
+				_page.handler() << MARKUP_BEGIN;
+				state = STATE_MARKUP;
+			}
+			else if (state == STATE_ESC_EXPR)
+			{
+				_page.handler() << ESC_EXPR_END;
 				_page.handler() << MARKUP_BEGIN;
 				state = STATE_MARKUP;
 			}
@@ -201,6 +228,7 @@ void PageReader::parse(std::istream& pageStream)
 				_page.handler() << token;
 				break;
 			case STATE_EXPR:
+			case STATE_ESC_EXPR:
 				_page.handler() << token;
 				break;
 			case STATE_COMMENT:
@@ -386,4 +414,10 @@ void PageReader::generateLineDirective(std::ostream& ostr)
 		}
 		ostr << "\"\n";
 	}
+}
+
+
+bool PageReader::escape() const
+{
+	return _page.getBool("page.escape", false);
 }

@@ -1,31 +1,49 @@
-# -*- cmake -*-
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file Copyright.txt or https://cmake.org/licensing for details.
 
-# - Find Apache Runtime
-# Find the APACHE includes and libraries
-# This module defines
-#  APACHE_INCLUDE_DIR and APACHEUTIL_INCLUDE_DIR, where to find APACHE.h, etc.
-#  APACHE_LIBRARIES and APACHEUTIL_LIBRARIES, the libraries needed to use APACHE.
-#  APACHE_FOUND and APACHEUTIL_FOUND, If false, do not try to use APACHE.
-# also defined, but not for general use are
-#  APACHE_LIBRARY and APACHEUTIL_LIBRARY, where to find the APACHE library.
+#.rst:
+# FindApache2
+# -------
+#
+# Find Apache2 Runtime
+#
+# This will define the following variables::
+#
+#   APACHE2_FOUND           - True if the system has the Apache2 library
+#   APACHE2_INCLUDE_DIRS    - where to find httpd.h, etc.
+#
+# Hints:
+# Set ``APACHE2_ROOT_DIR`` to the root directory of an Apache installation.
+#
+include(FindPackageHandleStandardArgs)
 
-FIND_PATH(APACHE_INCLUDE_DIR httpd.h
-/usr/local/include/apache2
-/usr/include/apache2
+find_package(PkgConfig QUIET)
+pkg_check_modules(PC_APACHE2 QUIET apache2)
+
+find_path(APACHE2_INCLUDE_DIR httpd.h
+	HINTS
+		${APACHE2_ROOT_DIR}/include/apache2
+		${APACHE2_ROOT_INCLUDE_DIRS}
+	PATHS
+		${PC_APACHE2_INCLUDE_DIRS}
+		/usr/local/include/apache2
+		/usr/include/apache2
 )
 
-IF (APACHE_INCLUDE_DIR)
-    SET(APACHE_FOUND "YES")
-ELSE (APACHE_LIBRARY AND APACHE_INCLUDE_DIR)
-  SET(APACHE_FOUND "NO")
-ENDIF (APACHE_INCLUDE_DIR)
+set(APACHE2_VERSION ${PC_APACHE2_VERSION})
 
+find_package_handle_standard_args(Apache2
+	FOUND_VAR APACHE2_FOUND
+	REQUIRED_VARS
+		APACHE2_INCLUDE_DIR
+	VERSION_VAR APACHE2_VERSION
+)
 
-IF (APACHE_FOUND)
-      MESSAGE(STATUS "Found APACHE: ${APACHE_INCLUDE_DIR}")
-ENDIF (APACHE_FOUND)
+if(APACHE2_FOUND)
+	set(APACHE2_INCLUDE_DIRS ${APACHE2_INCLUDE_DIR})
+	set(APACHE2_DEFINITIONS ${PC_APACHE2_CFLAGS_OTHER})
+endif()
 
-MARK_AS_ADVANCED(
-  APACHE_INCLUDE_DIR
-  )
-
+mark_as_advanced(
+	APACHE2_INCLUDE_DIR
+)

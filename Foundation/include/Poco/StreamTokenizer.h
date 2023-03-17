@@ -54,7 +54,7 @@ public:
 		/// and whitespace tokens will be marked as
 		/// ignorable, which means that next() will not
 		/// return them.
-	
+
 	void addToken(Token* pToken, bool ignore);
 		/// Adds a token class to the tokenizer. The
 		/// tokenizer takes ownership of the token and
@@ -62,11 +62,11 @@ public:
 		/// If ignore is true, the token will be marked
 		/// as ignorable, which means that next() will
 		/// not return it.
-		
+
 	const Token* next();
 		/// Extracts the next token from the input stream.
 		/// Returns a pointer to an EOFToken if there are
-		/// no more characters to read. 
+		/// no more characters to read.
 		/// Returns a pointer to an InvalidToken if an
 		/// invalid character is encountered.
 		/// If a token is marked as ignorable, it will not
@@ -81,9 +81,9 @@ private:
 		Token* pToken;
 		bool   ignore;
 	};
-	
+
 	typedef std::vector<TokenInfo> TokenVec;
-	
+
 	TokenVec      _tokens;
 	std::istream* _pIstr;
 	InvalidToken  _invalidToken;

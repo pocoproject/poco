@@ -16,13 +16,13 @@
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <cstring>
 
+
 namespace
 {
 	class ResultMetadataHandle
 		/// Simple exception-safe wrapper
 	{
 	public:
-
 		explicit ResultMetadataHandle(MYSQL_STMT* stmt)
 		{
 			h = mysql_stmt_result_metadata(stmt);
@@ -42,7 +42,6 @@ namespace
 		}
 
 	private:
-
 		MYSQL_RES* h;
 	};
 
@@ -62,6 +61,7 @@ namespace
 		case MYSQL_TYPE_DATE:
 		case MYSQL_TYPE_TIME:
 		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			return sizeof(MYSQL_TIME);
 
 		case MYSQL_TYPE_DECIMAL:
@@ -72,21 +72,24 @@ namespace
 		case MYSQL_TYPE_MEDIUM_BLOB:
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
+#ifdef POCO_MYSQL_JSON
+		case MYSQL_TYPE_JSON:
+#endif		
 			return field.length;
 
 		default:
 			throw Poco::Data::MySQL::StatementException("unknown field type");
 		}
-	}	
+	}
 
 	Poco::Data::MetaColumn::ColumnDataType fieldType(const MYSQL_FIELD& field)
-		/// Convert field MySQL-type to Poco-type	
+		/// Convert field MySQL-type to Poco-type
 	{
 		bool unsig = ((field.flags & UNSIGNED_FLAG) == UNSIGNED_FLAG);
 
 		switch (field.type)
 		{
-		case MYSQL_TYPE_TINY:     
+		case MYSQL_TYPE_TINY:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT8;
 			return Poco::Data::MetaColumn::FDT_INT8;
 
@@ -95,31 +98,32 @@ namespace
 			return Poco::Data::MetaColumn::FDT_INT16;
 
 		case MYSQL_TYPE_INT24:
-		case MYSQL_TYPE_LONG:     
+		case MYSQL_TYPE_LONG:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT32;
 			return Poco::Data::MetaColumn::FDT_INT32;
 
-		case MYSQL_TYPE_FLOAT:    
+		case MYSQL_TYPE_FLOAT:
 			return Poco::Data::MetaColumn::FDT_FLOAT;
 
 		case MYSQL_TYPE_DECIMAL:
 		case MYSQL_TYPE_NEWDECIMAL:
-		case MYSQL_TYPE_DOUBLE:   
+		case MYSQL_TYPE_DOUBLE:
 			return Poco::Data::MetaColumn::FDT_DOUBLE;
 
-		case MYSQL_TYPE_LONGLONG: 
+		case MYSQL_TYPE_LONGLONG:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT64;
 			return Poco::Data::MetaColumn::FDT_INT64;
-			
+
 		case MYSQL_TYPE_DATE:
 			return Poco::Data::MetaColumn::FDT_DATE;
-			
+
 		case MYSQL_TYPE_TIME:
 			return Poco::Data::MetaColumn::FDT_TIME;
-			
+
 		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			return Poco::Data::MetaColumn::FDT_TIMESTAMP;
-			
+
 		case MYSQL_TYPE_STRING:
 		case MYSQL_TYPE_VAR_STRING:
 			return Poco::Data::MetaColumn::FDT_STRING;
@@ -129,6 +133,10 @@ namespace
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
 			return Poco::Data::MetaColumn::FDT_BLOB;
+#ifdef POCO_MYSQL_JSON
+		case MYSQL_TYPE_JSON:
+			return Poco::Data::MetaColumn::FDT_JSON;
+#endif
 		default:
 			return Poco::Data::MetaColumn::FDT_UNKNOWN;
 		}
@@ -140,8 +148,16 @@ namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
+ResultMetadata::~ResultMetadata()
+{
+	freeMemory();
+}
+
+
 void ResultMetadata::reset()
 {
+	freeMemory();
 	_columns.resize(0);
 	_row.resize(0);
 	_buffer.resize(0);
@@ -149,14 +165,21 @@ void ResultMetadata::reset()
 	_isNull.resize(0);
 }
 
+
+void ResultMetadata::freeMemory()
+{
+	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
+		std::free(*it);
+}
+
+
 void ResultMetadata::init(MYSQL_STMT* stmt)
 {
 	ResultMetadataHandle h(stmt);
 
 	if (!h)
 	{
-		// all right, it is normal
-		// querys such an "INSERT INTO" just does not have result at all
+		// some queries (eg. INSERT) don't have result
 		reset();
 		return;
 	}
@@ -164,10 +187,9 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	std::size_t count = mysql_num_fields(h);
 	MYSQL_FIELD* fields = mysql_fetch_fields(h);
 
-	std::size_t commonSize = 0;
 	_columns.reserve(count);
 
-	{for (std::size_t i = 0; i < count; i++)
+	for (std::size_t i = 0; i < count; i++)
 	{
 		std::size_t size = fieldSize(fields[i]);
 		if (size == 0xFFFFFFFF) size = 0;
@@ -180,60 +202,75 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 			0,                               // TODO: precision
 			!IS_NOT_NULL(fields[i].flags)    // nullable
 			));
+	}
 
-		commonSize += _columns[i].length();
-	}}
-
-	_buffer.resize(commonSize);
+	_buffer.resize(count);
 	_row.resize(count);
 	_lengths.resize(count);
 	_isNull.resize(count);
-
-	std::size_t offset = 0;
 
 	for (std::size_t i = 0; i < count; i++)
 	{
 		std::memset(&_row[i], 0, sizeof(MYSQL_BIND));
 		unsigned int len = static_cast<unsigned int>(_columns[i].length());
+		_buffer[i] = (char*) std::calloc(len, sizeof(char));
 		_row[i].buffer_type   = fields[i].type;
 		_row[i].buffer_length = len;
-		_row[i].buffer        = (len > 0) ? (&_buffer[0] + offset) : 0;
+		_row[i].buffer        = _buffer[i];
 		_row[i].length        = &_lengths[i];
-		_row[i].is_null       = &_isNull[i];
+		_row[i].is_null       = reinterpret_cast<my_bool*>(&_isNull[i]); // workaround to make it work with both MySQL 8 and earlier
 		_row[i].is_unsigned   = (fields[i].flags & UNSIGNED_FLAG) > 0;
-		
-		offset += _row[i].buffer_length;
 	}
 }
+
 
 std::size_t ResultMetadata::columnsReturned() const
 {
 	return static_cast<std::size_t>(_columns.size());
 }
 
+
 const MetaColumn& ResultMetadata::metaColumn(std::size_t pos) const
 {
 	return _columns[pos];
 }
+
 
 MYSQL_BIND* ResultMetadata::row()
 {
 	return &_row[0];
 }
 
+
 std::size_t ResultMetadata::length(std::size_t pos) const
 {
 	return _lengths[pos];
 }
 
-const unsigned char* ResultMetadata::rawData(std::size_t pos) const 
+
+const unsigned char* ResultMetadata::rawData(std::size_t pos) const
 {
+	if ((_lengths[pos] == 0) && (_row[pos].buffer == nullptr))
+		return reinterpret_cast<const unsigned char*>("");
+	else
+		poco_check_ptr (_row[pos].buffer);
 	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
 
-bool ResultMetadata::isNull(std::size_t pos) const 
+
+bool ResultMetadata::isNull(std::size_t pos) const
 {
 	return (_isNull[pos] != 0);
 }
 
-}}} // namespace Poco::Data::MySQL
+
+void ResultMetadata::adjustColumnSizeToFit(std::size_t pos)
+{
+	std::free(_buffer[pos]);
+	_buffer[pos] = (char*) std::calloc(_lengths[pos], sizeof(char));
+	_row[pos].buffer = _buffer[pos];
+	_row[pos].buffer_length = _lengths[pos];
+}
+
+
+} } } // namespace Poco::Data::MySQL

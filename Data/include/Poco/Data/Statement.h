@@ -74,10 +74,11 @@ class Data_API Statement
 public:
 	typedef void (*Manipulator)(Statement&);
 
-	typedef ActiveResult<std::size_t>                      Result;
-	typedef SharedPtr<Result>                              ResultPtr;
-	typedef ActiveMethod<std::size_t, bool, StatementImpl> AsyncExecMethod;
-	typedef SharedPtr<AsyncExecMethod>                     AsyncExecMethodPtr;
+	using Result = ActiveResult<std::size_t>;
+	using ResultPtr = SharedPtr<Result>;
+	using AsyncExecMethod = ActiveMethod<std::size_t, bool, StatementImpl>;
+	using AsyncExecMethodPtr = SharedPtr<AsyncExecMethod>;
+	using State = StatementImpl::State;
 
 	static const int WAIT_FOREVER = -1;
 
@@ -115,10 +116,16 @@ public:
 		/// synchronized prior to copy operation (i.e. is copied while executing),
 		/// this constructor shall synchronize it.
 
+	Statement(Statement&& other) noexcept;
+		/// Move constructor.
+
 	Statement& operator = (const Statement& stmt);
 		/// Assignment operator.
 
-	void swap(Statement& other);
+	Statement& operator = (Statement&& stmt) noexcept;
+		/// Move assignment.
+
+	void swap(Statement& other) noexcept;
 		/// Swaps the statement with another one.
 
 	template <typename T>
@@ -252,13 +259,14 @@ public:
 	Statement& operator , (Poco::Int32 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	Statement& operator , (long value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
 	Statement& operator , (unsigned long value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 #endif
+
 	Statement& operator , (Poco::UInt64 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
@@ -378,8 +386,11 @@ public:
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
+	State state() const;
+		/// Returns the statement state.
+
 protected:
-	typedef StatementImpl::Ptr ImplPtr;
+	using ImplPtr = StatementImpl::Ptr;
 
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
@@ -406,7 +417,6 @@ protected:
 		/// Returns the underlying session.
 
 private:
-
 	const Result& doAsyncExec(bool reset = true);
 		/// Asynchronously executes the statement.
 
@@ -568,7 +578,7 @@ inline Statement& Statement::operator , (Poco::Int32 value)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 inline Statement& Statement::operator , (long value)
 {
 	return commaPODImpl(value);
@@ -785,6 +795,12 @@ inline bool Statement::isAsync() const
 }
 
 
+inline Statement::State Statement::state() const
+{
+	return _pImpl->getState();
+}
+
+
 inline void Statement::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 {
 	_pRowFormatter = pRowFormatter;
@@ -798,7 +814,7 @@ inline const RowFormatter::Ptr& Statement::getRowFormatter()
 }
 
 
-inline void swap(Statement& s1, Statement& s2)
+inline void swap(Statement& s1, Statement& s2) noexcept
 {
 	s1.swap(s2);
 }
@@ -810,8 +826,7 @@ inline void swap(Statement& s1, Statement& s2)
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1,
-		Poco::Data::Statement& s2)
+	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, Poco::Data::Statement& s2) noexcept
 		/// Full template specalization of std:::swap for Statement
 	{
 		s1.swap(s2);

@@ -695,7 +695,7 @@ AddAnnotation  (HPDF_Page        page,
         if (ret != HPDF_OK)
             return ret;
     }
-    
+
     if ((ret = HPDF_Array_Add (array, annot)) != HPDF_OK)
        return ret;
 
@@ -1225,7 +1225,7 @@ HPDF_Page_GetCurrentTextPos (HPDF_Page  page)
         if (attr->gmode & HPDF_GMODE_TEXT_OBJECT)
             pos = attr->text_pos;
     }
-    
+
     return pos;
 }
 
@@ -1893,7 +1893,7 @@ HPDF_Page_Create3DC3DMeasure(HPDF_Page page,
 	attr = (HPDF_PageAttr)page->attr;
 
 	measure = HPDF_3DC3DMeasure_New(page->mmgr, attr->xref, firstanchorpoint, textanchorpoint);
-	if ( !measure) 
+	if ( !measure)
 		HPDF_CheckError (page->error);
 
 	return measure;
@@ -1921,9 +1921,9 @@ HPDF_Page_CreatePD33DMeasure(HPDF_Page       page,
 
 	attr = (HPDF_PageAttr)page->attr;
 
-	measure = HPDF_PD33DMeasure_New(page->mmgr, 
-		attr->xref, 
-		annotationPlaneNormal, 
+	measure = HPDF_PD33DMeasure_New(page->mmgr,
+		attr->xref,
+		annotationPlaneNormal,
 		firstAnchorPoint,
 		secondAnchorPoint,
 		leaderLinesDirection,
@@ -1932,7 +1932,7 @@ HPDF_Page_CreatePD33DMeasure(HPDF_Page       page,
 		value,
 		unitsString
 		);
-	if ( !measure) 
+	if ( !measure)
 		HPDF_CheckError (page->error);
 
 	return measure;
@@ -1953,7 +1953,7 @@ HPDF_Page_Create3DAnnotExData(HPDF_Page page)
 	attr = (HPDF_PageAttr)page->attr;
 
 	exData = HPDF_3DAnnotExData_New(page->mmgr, attr->xref);
-	if ( !exData) 
+	if ( !exData)
 		HPDF_CheckError (page->error);
 
 	return exData;

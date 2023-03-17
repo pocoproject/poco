@@ -18,13 +18,18 @@
 #define Net_SocketDefs_INCLUDED
 
 
+#include <vector>
+
+
 #define POCO_ENOERR 0
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"
+	#define FD_SETSIZE 1024 // increase as needed
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
+	#include <ws2def.h>
 	#define POCO_INVALID_SOCKET  INVALID_SOCKET
 	#define poco_socket_t        SOCKET
 	#define poco_socklen_t       int
@@ -133,6 +138,7 @@
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <sys/un.h>
+	#include <sys/uio.h>
 	#include <fcntl.h>
 	#if POCO_OS != POCO_OS_HPUX
 		#include <sys/select.h>
@@ -351,6 +357,27 @@ namespace Poco {
 namespace Net {
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	typedef WSABUF SocketBuf;
+#elif defined(POCO_OS_FAMILY_UNIX) // TODO: may need more refinement
+	typedef iovec SocketBuf;
+#endif
+
+typedef std::vector<SocketBuf> SocketBufVec;
+
+inline int SocketBufVecSize(const SocketBufVec& sbv)
+	/// Returns total length of all SocketBufs in the vector.
+{
+	std::size_t sz = 0;
+	for (const auto& v : sbv)
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		sz += v.len;
+#elif defined(POCO_OS_FAMILY_UNIX)
+		sz += v.iov_len;
+#endif
+	return static_cast<int>(sz);
+}
+
 struct AddressFamily
 	/// AddressFamily::Family replaces the previously used IPAddress::Family
 	/// enumeration and is now used for IPAddress::Family and SocketAddress::Family.
@@ -358,15 +385,17 @@ struct AddressFamily
 	enum Family
 		/// Possible address families for socket addresses.
 	{
-		IPv4,
+		UNKNOWN = AF_UNSPEC,
+			/// Unspecified family
+	#if defined(POCO_OS_FAMILY_UNIX)
+		UNIX_LOCAL = AF_UNIX,
+			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
+	#endif
+		IPv4 = AF_INET,
 			/// IPv4 address family.
 	#if defined(POCO_HAVE_IPv6)
-		IPv6,
+		IPv6 = AF_INET6
 			/// IPv6 address family.
-	#endif
-	#if defined(POCO_OS_FAMILY_UNIX)
-		UNIX_LOCAL
-			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
 	#endif
 	};
 };

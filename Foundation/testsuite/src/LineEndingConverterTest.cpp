@@ -39,7 +39,7 @@ void LineEndingConverterTest::testInputDosToUnix()
 	InputLineEndingConverter conv(input, LineEnding::NEWLINE_LF);
 	StreamCopier::copyStream(conv, output);
 	std::string result = output.str();
-	assert (result == "line1\nline2\nline3\n");
+	assertTrue (result == "line1\nline2\nline3\n");
 }
 
 
@@ -50,7 +50,7 @@ void LineEndingConverterTest::testInputUnixToDos()
 	InputLineEndingConverter conv(input, LineEnding::NEWLINE_CRLF);
 	StreamCopier::copyStream(conv, output);
 	std::string result = output.str();
-	assert (result == "line1\r\nline2\r\nline3\r\n");
+	assertTrue (result == "line1\r\nline2\r\nline3\r\n");
 }
 
 
@@ -61,7 +61,7 @@ void LineEndingConverterTest::testInputMacToUnix()
 	InputLineEndingConverter conv(input, LineEnding::NEWLINE_LF);
 	StreamCopier::copyStream(conv, output);
 	std::string result = output.str();
-	assert (result == "line1\nline2\nline3\n");
+	assertTrue (result == "line1\nline2\nline3\n");
 }
 
 
@@ -72,7 +72,7 @@ void LineEndingConverterTest::testInputRemove()
 	InputLineEndingConverter conv(input, "");
 	StreamCopier::copyStream(conv, output);
 	std::string result = output.str();
-	assert (result == "line1line2line3");
+	assertTrue (result == "line1line2line3");
 }
 
 
@@ -82,7 +82,7 @@ void LineEndingConverterTest::testOutputDosToUnix()
 	OutputLineEndingConverter conv(output, LineEnding::NEWLINE_LF);
 	conv << "line1\r\nline2\r\nline3\r\n" << std::flush;
 	std::string result = output.str();
-	assert (result == "line1\nline2\nline3\n");
+	assertTrue (result == "line1\nline2\nline3\n");
 }
 
 
@@ -92,7 +92,7 @@ void LineEndingConverterTest::testOutputUnixToDos()
 	OutputLineEndingConverter conv(output, LineEnding::NEWLINE_CRLF);
 	conv << "line1\nline2\nline3\n" << std::flush;
 	std::string result = output.str();
-	assert (result == "line1\r\nline2\r\nline3\r\n");
+	assertTrue (result == "line1\r\nline2\r\nline3\r\n");
 }
 
 
@@ -102,7 +102,7 @@ void LineEndingConverterTest::testOutputMacToUnix()
 	OutputLineEndingConverter conv(output, LineEnding::NEWLINE_LF);
 	conv << "line1\rline2\rline3\r" << std::flush;
 	std::string result = output.str();
-	assert (result == "line1\nline2\nline3\n");
+	assertTrue (result == "line1\nline2\nline3\n");
 }
 
 
@@ -112,7 +112,7 @@ void LineEndingConverterTest::testOutputRemove()
 	OutputLineEndingConverter conv(output, "");
 	conv << "line1\r\nline2\rline3\n" << std::flush;
 	std::string result = output.str();
-	assert (result == "line1line2line3");
+	assertTrue (result == "line1line2line3");
 }
 
 

@@ -12,6 +12,11 @@
 //
 
 
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+
 #include "Poco/Util/SystemConfiguration.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
@@ -123,7 +128,6 @@ bool SystemConfiguration::getRaw(const std::string& key, std::string& value) con
 	{
 		value = Path::dataHome();
 	}
-
 	else if (key == TEMPHOMEDIR)
 	{
 		value = Path::tempHome();

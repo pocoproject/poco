@@ -75,6 +75,15 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 }
 
 
+X509Certificate::X509Certificate(X509Certificate&& cert) noexcept:
+	_issuerName(std::move(cert._issuerName)),
+	_subjectName(std::move(cert._subjectName)),
+	_pCert(cert._pCert)
+{
+	cert._pCert = nullptr;
+}
+
+
 X509Certificate::X509Certificate(PCCERT_CONTEXT pCert, bool shared):
 	_pCert(pCert)
 {
@@ -97,7 +106,17 @@ X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 }
 
 
-void X509Certificate::swap(X509Certificate& cert)
+X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
+{
+	_issuerName = std::move(cert._issuerName);
+	_subjectName = std::move(cert._subjectName);
+	_pCert = cert._pCert; cert._pCert = nullptr;
+
+	return *this;
+}
+
+
+void X509Certificate::swap(X509Certificate& cert) noexcept
 {
 	using std::swap;
 	swap(cert._issuerName, _issuerName);
@@ -108,7 +127,7 @@ void X509Certificate::swap(X509Certificate& cert)
 
 X509Certificate::~X509Certificate()
 {
-	CertFreeCertificateContext(_pCert);
+	if (_pCert) CertFreeCertificateContext(_pCert);
 }
 
 
@@ -231,7 +250,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
 #endif
 			Poco::Buffer<char> buffer(256);
-			DWORD bufferSize = buffer.sizeBytes();
+			DWORD bufferSize = static_cast<DWORD>(buffer.sizeBytes());
 			BOOL rc = CryptDecodeObjectEx(
 					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 					pExt->pszObjId,
@@ -259,10 +278,14 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 				PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
 				for (int i = 0; i < pNameInfo->cAltEntry; i++)
 				{
-					std::wstring waltName(pNameInfo->rgAltEntry[i].pwszDNSName);
-					std::string altName;
-					Poco::UnicodeConverter::toUTF8(waltName, altName);
-					domainNames.insert(altName);
+					// Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
+					if (pNameInfo->rgAltEntry[i].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME)
+					{
+						std::wstring waltName(pNameInfo->rgAltEntry[i].pwszDNSName);
+						std::string altName;
+						Poco::UnicodeConverter::toUTF8(waltName, altName);
+						domainNames.insert(altName);
+					}
 				}
 			}
 		}
@@ -362,13 +385,13 @@ void* X509Certificate::nid2oid(NID nid)
 
 void X509Certificate::loadCertificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore)
 {
-	std::wstring wcertStore;
-	Poco::UnicodeConverter::convert(certStoreName, wcertStore);
+	std::wstring wcertStoreName;
+	Poco::UnicodeConverter::convert(certStoreName, wcertStoreName);
 	HCERTSTORE hCertStore;
 	if (useMachineStore)
-		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStoreName.c_str());
+		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStoreName.c_str());
 	else
-		hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
+		hCertStore = CertOpenSystemStoreW(0, wcertStoreName.c_str());
 
 	if (!hCertStore) throw CertificateException("Failed to open certificate store", certStoreName, GetLastError());
 

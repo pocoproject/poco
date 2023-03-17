@@ -9,6 +9,7 @@
 
 
 #include "DataTest.h"
+#include "Extractor.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
@@ -20,6 +21,7 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/SimpleRowFormatter.h"
+#include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/DataException.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
@@ -29,6 +31,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/DynamicLOB.h"
 #include "Poco/Data/DynamicDateTime.h"
+#include "Poco/Latin1Encoding.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
@@ -45,6 +48,7 @@ using Poco::UInt32;
 using Poco::Int64;
 using Poco::UInt64;
 using Poco::DateTime;
+using Poco::Latin1Encoding;
 using Poco::Dynamic::Var;
 using Poco::InvalidAccessException;
 using Poco::IllegalStateException;
@@ -62,9 +66,12 @@ using Poco::Data::CLOBOutputStream;
 using Poco::Data::MetaColumn;
 using Poco::Data::Column;
 using Poco::Data::Row;
+using Poco::Data::RowFormatter;
 using Poco::Data::SimpleRowFormatter;
+using Poco::Data::JSONRowFormatter;
 using Poco::Data::Date;
 using Poco::Data::Time;
+using Poco::Data::AbstractExtractor;
 using Poco::Data::AbstractExtraction;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
@@ -88,56 +95,73 @@ DataTest::~DataTest()
 void DataTest::testSession()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
-	assert ("test" == sess.impl()->connectorName());
-	assert (sess.connector() == sess.impl()->connectorName());
-	assert ("cs" == sess.impl()->connectionString());
-	assert ("test:///cs" == sess.uri());
+	assertTrue ("test" == sess.impl()->connectorName());
+	assertTrue (sess.connector() == sess.impl()->connectorName());
+	assertTrue ("cs" == sess.impl()->connectionString());
+	assertTrue ("test:///cs" == sess.uri());
 
-	assert (sess.getLoginTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
+	assertTrue (sess.getLoginTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
 	sess.setLoginTimeout(123);
-	assert (sess.getLoginTimeout() == 123);
+	assertTrue (sess.getLoginTimeout() == 123);
 
 	Session sess2(SessionFactory::instance().create("TeSt:///Cs"));
-	assert ("test" == sess2.impl()->connectorName());
-	assert ("Cs" == sess2.impl()->connectionString());
-	assert ("test:///Cs" == sess2.uri());
+	assertTrue ("test" == sess2.impl()->connectorName());
+	assertTrue ("Cs" == sess2.impl()->connectionString());
+	assertTrue ("test:///Cs" == sess2.uri());
 
 	sess << "DROP TABLE IF EXISTS Test", now;
 	int count;
 	sess << "SELECT COUNT(*) FROM PERSON", into(count), now;
-	
+
 	std::string str;
 	Statement stmt = (sess << "SELECT * FROM Strings", into(str), limit(50));
 	stmt.execute();
 
 	sess.close();
-	assert (!sess.getFeature("connected"));
-	assert (!sess.isConnected());
+	assertTrue (!sess.getFeature("connected"));
+	assertTrue (!sess.isConnected());
 
 	try
 	{
-		stmt.execute(); 
+		stmt.execute();
 		fail ("must fail");
 	} catch (NotConnectedException&) { }
 
+	assertTrue(stmt.done());
+
 	try
 	{
-		sess << "SELECT * FROM Strings", now; 
+		sess << "SELECT * FROM Strings", now;
 		fail ("must fail");
 	} catch (NotConnectedException&) { }
 
 	sess.open();
-	assert (sess.getFeature("connected"));
-	assert (sess.isConnected());
-	
-	sess << "SELECT * FROM Strings", now; 
+	assertTrue (sess.getFeature("connected"));
+	assertTrue (sess.isConnected());
+
+	// ensure that throwing during execution leaves
+	// statement in valid state (ST_DONE)
+	sess.setFeature("throwOnHasNext", true);
+	Statement stmt1 = (sess << "SELECT * FROM Strings", into(str), limit(50));
+	assertTrue (sess.getFeature("throwOnHasNext"));
+	try
+	{
+		stmt1.execute();
+		fail ("must trow UnknownDataBaseException");
+	}
+	catch(const Poco::Data::UnknownDataBaseException&) {}
+	assertTrue(stmt1.done());
+
+	// reset session back to normal operation
+	sess.setFeature("throwOnHasNext", false);
+	sess << "SELECT * FROM Strings", now;
 	stmt.execute();
 
 	sess.reconnect();
-	assert (sess.getFeature("connected"));
-	assert (sess.isConnected());
-	
-	sess << "SELECT * FROM Strings", now; 
+	assertTrue (sess.getFeature("connected"));
+	assertTrue (sess.isConnected());
+
+	sess << "SELECT * FROM Strings", now;
 	stmt.execute();
 }
 
@@ -146,21 +170,21 @@ void DataTest::testStatementFormatting()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
-	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'", 
+	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'",
 		"'",'a',"'",-1, 1u, 1.5, "42", now);
-	
-	assert ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
+
+	assertTrue ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
 }
 
 
 void DataTest::testFeatures()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
-	
+
 	sess.setFeature("f1", true);
-	assert (sess.getFeature("f1"));
-	assert (sess.getFeature("f2"));
-	
+	assertTrue (sess.getFeature("f1"));
+	assertTrue (sess.getFeature("f2"));
+
 	try
 	{
 		sess.setFeature("f2", false);
@@ -168,10 +192,10 @@ void DataTest::testFeatures()
 	catch (NotImplementedException&)
 	{
 	}
-	
+
 	sess.setFeature("f3", false);
-	assert (!sess.getFeature("f2"));
-	
+	assertTrue (!sess.getFeature("f2"));
+
 	try
 	{
 		sess.setFeature("f3", true);
@@ -179,7 +203,7 @@ void DataTest::testFeatures()
 	catch (NotImplementedException&)
 	{
 	}
-	
+
 	try
 	{
 		sess.setFeature("f4", false);
@@ -193,13 +217,13 @@ void DataTest::testFeatures()
 void DataTest::testProperties()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
-		
+
 	sess.setProperty("p1", 1);
 	Poco::Any v1 = sess.getProperty("p1");
-	assert (Poco::AnyCast<int>(v1) == 1);
+	assertTrue (Poco::AnyCast<int>(v1) == 1);
 	Poco::Any v2 = sess.getProperty("p2");
-	assert (Poco::AnyCast<int>(v2) == 1);
-	
+	assertTrue (Poco::AnyCast<int>(v2) == 1);
+
 	try
 	{
 		sess.setProperty("p2", 2);
@@ -207,11 +231,11 @@ void DataTest::testProperties()
 	catch (NotImplementedException&)
 	{
 	}
-	
+
 	sess.setProperty("p3", 2);
 	v1 = sess.getProperty("p2");
-	assert (Poco::AnyCast<int>(v1) == 2);
-	
+	assertTrue (Poco::AnyCast<int>(v1) == 2);
+
 	try
 	{
 		sess.setProperty("p3", 3);
@@ -219,7 +243,7 @@ void DataTest::testProperties()
 	catch (NotImplementedException&)
 	{
 	}
-	
+
 	try
 	{
 		sess.setProperty("p4", 4);
@@ -245,17 +269,17 @@ void DataTest::testLOB()
 	vec.push_back(9);
 
 	Poco::Data::LOB<int> lobNum1(&vec[0], vec.size());
-	assert (lobNum1.size() == vec.size());
-	assert (0 == std::memcmp(&vec[0], lobNum1.rawContent(), lobNum1.size() * sizeof(int)));
-	assert (*lobNum1.begin() == 0);
+	assertTrue (lobNum1.size() == vec.size());
+	assertTrue (0 == std::memcmp(&vec[0], lobNum1.rawContent(), lobNum1.size() * sizeof(int)));
+	assertTrue (*lobNum1.begin() == 0);
 	Poco::Data::LOB<int>::Iterator it1 = lobNum1.end();
-	assert (*(--it1) == 9);
-	
+	assertTrue (*(--it1) == 9);
+
 	Poco::Data::LOB<int> lobNum2(lobNum1);
-	assert (lobNum2.size() == lobNum1.size());
-	assert (lobNum2 == lobNum1);
+	assertTrue (lobNum2.size() == lobNum1.size());
+	assertTrue (lobNum2 == lobNum1);
 	lobNum1.swap(lobNum2);
-	assert (lobNum2 == lobNum1);
+	assertTrue (lobNum2 == lobNum1);
 }
 
 
@@ -265,65 +289,65 @@ void DataTest::testCLOB()
 	std::string strAlpha = "abcdefghijklmnopqrstuvwxyz";
 	std::vector<char> vecAlpha(strAlpha.begin(), strAlpha.end());
 	std::vector<char> vecDigit(strDigit.begin(), strDigit.end());
-	
+
 	CLOB blobNumStr(strDigit.c_str(), strDigit.size());
-	assert (blobNumStr.size() == strDigit.size());
-	assert (0 == std::strncmp(strDigit.c_str(), blobNumStr.rawContent(), blobNumStr.size()));
-	assert (*blobNumStr.begin() == '1');
+	assertTrue (blobNumStr.size() == strDigit.size());
+	assertTrue (0 == std::strncmp(strDigit.c_str(), blobNumStr.rawContent(), blobNumStr.size()));
+	assertTrue (*blobNumStr.begin() == '1');
 	CLOB::Iterator itNumStr = blobNumStr.end();
-	assert (*(--itNumStr) == '0');
+	assertTrue (*(--itNumStr) == '0');
 	CLOB blobNumVec(vecDigit);
-	assert (blobNumVec.size() == vecDigit.size());
-	assert (blobNumVec == blobNumStr);
+	assertTrue (blobNumVec.size() == vecDigit.size());
+	assertTrue (blobNumVec == blobNumStr);
 	blobNumVec.swap(blobNumStr);
-	assert (blobNumVec.size() == blobNumStr.size());
-	assert (blobNumVec == blobNumStr);
+	assertTrue (blobNumVec.size() == blobNumStr.size());
+	assertTrue (blobNumVec == blobNumStr);
 
 	CLOB blobChrStr(strAlpha.c_str(), strAlpha.size());
 	CLOB blobChrVec(vecAlpha);
-	assert (blobChrStr.size() == strAlpha.size());
-	assert (0 == std::strncmp(strAlpha.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
-	assert (*blobChrStr.begin() == 'a');
+	assertTrue (blobChrStr.size() == strAlpha.size());
+	assertTrue (0 == std::strncmp(strAlpha.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
+	assertTrue (*blobChrStr.begin() == 'a');
 	CLOB::Iterator itChrStr = blobChrStr.end();
-	assert (*(--itChrStr) == 'z');
-	assert (blobChrStr == blobChrVec);
+	assertTrue (*(--itChrStr) == 'z');
+	assertTrue (blobChrStr == blobChrVec);
 
 	blobNumStr.swap(blobChrStr);
-	assert (blobNumStr != blobChrStr);
-	assert (&blobNumStr != &blobChrStr);
-	assert (blobNumStr.content() != blobChrStr.content());
-	assert (&blobNumStr.content() != &blobChrStr.content());
-	assert (blobNumStr == blobChrVec);
+	assertTrue (blobNumStr != blobChrStr);
+	assertTrue (&blobNumStr != &blobChrStr);
+	assertTrue (blobNumStr.content() != blobChrStr.content());
+	assertTrue (&blobNumStr.content() != &blobChrStr.content());
+	assertTrue (blobNumStr == blobChrVec);
 
 	Poco::Data::swap(blobNumStr, blobChrVec);
-	assert (blobNumStr == blobChrVec);
+	assertTrue (blobNumStr == blobChrVec);
 	std::swap(blobNumStr, blobChrVec);
-	assert (blobNumStr == blobChrVec);
+	assertTrue (blobNumStr == blobChrVec);
 
-	assert (blobChrStr != blobNumStr);
+	assertTrue (blobChrStr != blobNumStr);
 	Var vLOB = blobNumStr;
 	std::string sss = vLOB.convert<std::string>();
 	blobChrStr = CLOB(sss);
-	assert (blobChrStr == blobNumStr);
+	assertTrue (blobChrStr == blobNumStr);
 
     std::string xyz = "xyz";
 	vLOB = xyz;
 	blobChrStr = sss = vLOB.convert<std::string>();
-	assert (0 == std::strncmp(xyz.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
+	assertTrue (0 == std::strncmp(xyz.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
 }
 
 
 void DataTest::testCLOBStreams()
 {
 	CLOB blob;
-	assert (0 == blob.size());
+	assertTrue (0 == blob.size());
 
 	CLOBOutputStream bos(blob);
 	BinaryWriter bw(bos);
 
-	assert (0 == blob.size());
+	assertTrue (0 == blob.size());
 	writeToCLOB(bw);
-	assert (blob.size() > 0);
+	assertTrue (blob.size() > 0);
 
 	CLOBInputStream bis(blob);
 	BinaryReader br(bis);
@@ -344,19 +368,19 @@ void DataTest::writeToCLOB(BinaryWriter& writer)
 	writer << (unsigned) 123456;
 	writer << (long) -1234567890;
 	writer << (unsigned long) 1234567890;
-	
+
 	writer << (Int64) -1234567890;
 	writer << (UInt64) 1234567890;
 
 	writer << (float) 1.5;
 	writer << (double) -1.5;
-	
+
 	writer << "foo";
 	writer << "";
 
 	writer << std::string("bar");
 	writer << std::string();
-	
+
 	writer.write7BitEncoded((UInt32) 100);
 	writer.write7BitEncoded((UInt32) 1000);
 	writer.write7BitEncoded((UInt32) 10000);
@@ -377,90 +401,90 @@ void DataTest::readFromCLOB(BinaryReader& reader)
 {
 	bool b = false;
 	reader >> b;
-	assert (b);
+	assertTrue (b);
 	reader >> b;
-	assert (!b);
-	
+	assertTrue (!b);
+
 	char c = ' ';
 	reader >> c;
-	assert (c == 'a');
+	assertTrue (c == 'a');
 
 	short shortv = 0;
 	reader >> shortv;
-	assert (shortv == -100);
+	assertTrue (shortv == -100);
 
 	unsigned short ushortv = 0;
 	reader >> ushortv;
-	assert (ushortv == 50000);
+	assertTrue (ushortv == 50000);
 
 	int intv = 0;
 	reader >> intv;
-	assert (intv == -123456);
+	assertTrue (intv == -123456);
 
 	unsigned uintv = 0;
 	reader >> uintv;
-	assert (uintv == 123456);
+	assertTrue (uintv == 123456);
 
 	long longv = 0;
 	reader >> longv;
-	assert (longv == -1234567890);
+	assertTrue (longv == -1234567890);
 
 	unsigned long ulongv = 0;
 	reader >> ulongv;
-	assert (ulongv == 1234567890);
+	assertTrue (ulongv == 1234567890);
 
 	Int64 int64v = 0;
 	reader >> int64v;
-	assert (int64v == -1234567890);
-	
+	assertTrue (int64v == -1234567890);
+
 	UInt64 uint64v = 0;
 	reader >> uint64v;
-	assert (uint64v == 1234567890);
+	assertTrue (uint64v == 1234567890);
 
 	float floatv = 0.0;
 	reader >> floatv;
-	assert (floatv == 1.5);
-	
+	assertTrue (floatv == 1.5);
+
 	double doublev = 0.0;
 	reader >> doublev;
-	assert (doublev == -1.5);
+	assertTrue (doublev == -1.5);
 
 	std::string str;
 	reader >> str;
-	assert (str == "foo");
+	assertTrue (str == "foo");
 	reader >> str;
-	assert (str == "");
-	
+	assertTrue (str == "");
+
 	reader >> str;
-	assert (str == "bar");
+	assertTrue (str == "bar");
 	reader >> str;
-	assert (str == "");
+	assertTrue (str == "");
 
 	UInt32 uint32v;
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 100);
+	assertTrue (uint32v == 100);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 1000);
+	assertTrue (uint32v == 1000);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 10000);
+	assertTrue (uint32v == 10000);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 100000);
+	assertTrue (uint32v == 100000);
 	reader.read7BitEncoded(uint32v);
-	assert (uint32v == 1000000);
+	assertTrue (uint32v == 1000000);
 
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 100);
+	assertTrue (uint64v == 100);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 1000);
+	assertTrue (uint64v == 1000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 10000);
+	assertTrue (uint64v == 10000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 100000);
+	assertTrue (uint64v == 100000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 1000000);
+	assertTrue (uint64v == 1000000);
 
 	reader.readRaw(3, str);
-	assert (str == "RAW");
+	assertTrue (str == "RAW");
 }
 
 
@@ -468,12 +492,12 @@ void DataTest::testColumnVector()
 {
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
-	assert (mc.name() == "mc");
-	assert (mc.position() == 0);
-	assert (mc.length() == 2);
-	assert (mc.precision() == 3);
-	assert (mc.type() == MetaColumn::FDT_DOUBLE);
-	assert (mc.isNullable());
+	assertTrue (mc.name() == "mc");
+	assertTrue (mc.position() == 0);
+	assertTrue (mc.length() == 2);
+	assertTrue (mc.precision() == 3);
+	assertTrue (mc.type() == MetaColumn::FDT_DOUBLE);
+	assertTrue (mc.isNullable());
 
 	std::vector<int>* pData = new std::vector<int>;
 	pData->push_back(1);
@@ -481,59 +505,59 @@ void DataTest::testColumnVector()
 	pData->push_back(3);
 	pData->push_back(4);
 	pData->push_back(5);
-	
-	Column<std::vector<int> > c(mc, pData);
 
-	assert (c.rowCount() == 5);
-	assert (c[0] == 1);
-	assert (c[1] == 2);
-	assert (c[2] == 3);
-	assert (c[3] == 4);
-	assert (c[4] == 5);
-	assert (c.name() == "mc");
-	assert (c.position() == 0);
-	assert (c.length() == 2);
-	assert (c.precision() == 3);
-	assert (c.type() == MetaColumn::FDT_DOUBLE);
+	Column<std::vector<int>> c(mc, pData);
+
+	assertTrue (c.rowCount() == 5);
+	assertTrue (c[0] == 1);
+	assertTrue (c[1] == 2);
+	assertTrue (c[2] == 3);
+	assertTrue (c[3] == 4);
+	assertTrue (c[4] == 5);
+	assertTrue (c.name() == "mc");
+	assertTrue (c.position() == 0);
+	assertTrue (c.length() == 2);
+	assertTrue (c.precision() == 3);
+	assertTrue (c.type() == MetaColumn::FDT_DOUBLE);
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
 
-	Column<std::vector<int> > c1 = c;
+	Column<std::vector<int>> c1 = c;
 
-	assert (c1.rowCount() == 5);
-	assert (c1[0] == 1);
-	assert (c1[1] == 2);
-	assert (c1[2] == 3);
-	assert (c1[3] == 4);
-	assert (c1[4] == 5);
+	assertTrue (c1.rowCount() == 5);
+	assertTrue (c1[0] == 1);
+	assertTrue (c1[1] == 2);
+	assertTrue (c1[2] == 3);
+	assertTrue (c1[3] == 4);
+	assertTrue (c1[4] == 5);
 
-	Column<std::vector<int> > c2(c1);
+	Column<std::vector<int>> c2(c1);
 
-	assert (c2.rowCount() == 5);
-	assert (c2[0] == 1);
-	assert (c2[1] == 2);
-	assert (c2[2] == 3);
-	assert (c2[3] == 4);
-	assert (c2[4] == 5);
+	assertTrue (c2.rowCount() == 5);
+	assertTrue (c2[0] == 1);
+	assertTrue (c2[1] == 2);
+	assertTrue (c2[2] == 3);
+	assertTrue (c2[3] == 4);
+	assertTrue (c2[4] == 5);
 
 	std::vector<int> vi;
 	vi.assign(c.begin(), c.end());
-	assert (vi.size() == 5);
-	assert (vi[0] == 1);
-	assert (vi[1] == 2);
-	assert (vi[2] == 3);
-	assert (vi[3] == 4);
-	assert (vi[4] == 5);
+	assertTrue (vi.size() == 5);
+	assertTrue (vi[0] == 1);
+	assertTrue (vi[1] == 2);
+	assertTrue (vi[2] == 3);
+	assertTrue (vi[3] == 4);
+	assertTrue (vi[4] == 5);
 
 	c.reset();
-	assert (c.rowCount() == 0);
-	assert (c1.rowCount() == 0);
-	assert (c2.rowCount() == 0);
+	assertTrue (c.rowCount() == 0);
+	assertTrue (c1.rowCount() == 0);
+	assertTrue (c2.rowCount() == 0);
 
 	std::vector<int>* pV1 = new std::vector<int>;
 	pV1->push_back(1);
@@ -547,34 +571,34 @@ void DataTest::testColumnVector()
 	pV2->push_back(3);
 	pV2->push_back(2);
 	pV2->push_back(1);
-	Column<std::vector<int> > c3(mc, pV1);
-	Column<std::vector<int> > c4(mc, pV2);
-	
-	Poco::Data::swap(c3, c4);
-	assert (c3[0] == 5);
-	assert (c3[1] == 4);
-	assert (c3[2] == 3);
-	assert (c3[3] == 2);
-	assert (c3[4] == 1);
+	Column<std::vector<int>> c3(mc, pV1);
+	Column<std::vector<int>> c4(mc, pV2);
 
-	assert (c4[0] == 1);
-	assert (c4[1] == 2);
-	assert (c4[2] == 3);
-	assert (c4[3] == 4);
-	assert (c4[4] == 5);
+	Poco::Data::swap(c3, c4);
+	assertTrue (c3[0] == 5);
+	assertTrue (c3[1] == 4);
+	assertTrue (c3[2] == 3);
+	assertTrue (c3[3] == 2);
+	assertTrue (c3[4] == 1);
+
+	assertTrue (c4[0] == 1);
+	assertTrue (c4[1] == 2);
+	assertTrue (c4[2] == 3);
+	assertTrue (c4[3] == 4);
+	assertTrue (c4[4] == 5);
 
 	std::swap(c3, c4);
-	assert (c3[0] == 1);
-	assert (c3[1] == 2);
-	assert (c3[2] == 3);
-	assert (c3[3] == 4);
-	assert (c3[4] == 5);
+	assertTrue (c3[0] == 1);
+	assertTrue (c3[1] == 2);
+	assertTrue (c3[2] == 3);
+	assertTrue (c3[3] == 4);
+	assertTrue (c3[4] == 5);
 
-	assert (c4[0] == 5);
-	assert (c4[1] == 4);
-	assert (c4[2] == 3);
-	assert (c4[3] == 2);
-	assert (c4[4] == 1);
+	assertTrue (c4[0] == 5);
+	assertTrue (c4[1] == 4);
+	assertTrue (c4[2] == 3);
+	assertTrue (c4[3] == 2);
+	assertTrue (c4[4] == 1);
 }
 
 
@@ -588,71 +612,71 @@ void DataTest::testColumnVectorBool()
 	pData->push_back(true);
 	pData->push_back(false);
 	pData->push_back(true);
-	
-	Column<std::vector<bool> > c(mc, pData);
 
-	assert (c.rowCount() == 5);
-	assert (c[0] == true);
-	assert (c[1] == false);
-	assert (c[2] == true);
-	assert (c[3] == false);
-	assert (c[4] == true);
-	assert (c.type() == MetaColumn::FDT_BOOL);
+	Column<std::vector<bool>> c(mc, pData);
+
+	assertTrue (c.rowCount() == 5);
+	assertTrue (c[0] == true);
+	assertTrue (c[1] == false);
+	assertTrue (c[2] == true);
+	assertTrue (c[3] == false);
+	assertTrue (c[4] == true);
+	assertTrue (c.type() == MetaColumn::FDT_BOOL);
 
 	try
 	{
-		bool b; b = c[100]; // to silence gcc
+		POCO_UNUSED bool b; b = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
 
-	Column<std::vector<bool> > c1 = c;
+	Column<std::vector<bool>> c1 = c;
 
-	assert (c1.rowCount() == 5);
-	assert (c1[0] == true);
-	assert (c1[1] == false);
-	assert (c1[2] == true);
-	assert (c1[3] == false);
-	assert (c1[4] == true);
+	assertTrue (c1.rowCount() == 5);
+	assertTrue (c1[0] == true);
+	assertTrue (c1[1] == false);
+	assertTrue (c1[2] == true);
+	assertTrue (c1[3] == false);
+	assertTrue (c1[4] == true);
 
-	Column<std::vector<bool> > c2(c1);
+	Column<std::vector<bool>> c2(c1);
 
-	assert (c2.rowCount() == 5);
-	assert (c2[0] == true);
-	assert (c2[1] == false);
-	assert (c2[2] == true);
-	assert (c2[3] == false);
-	assert (c2[4] == true);
+	assertTrue (c2.rowCount() == 5);
+	assertTrue (c2[0] == true);
+	assertTrue (c2[1] == false);
+	assertTrue (c2[2] == true);
+	assertTrue (c2[3] == false);
+	assertTrue (c2[4] == true);
 
 	std::vector<bool> vi;
 	vi.assign(c.begin(), c.end());
-	assert (vi.size() == 5);
-	assert (vi[0] == true);
-	assert (vi[1] == false);
-	assert (vi[2] == true);
-	assert (vi[3] == false);
-	assert (vi[4] == true);
+	assertTrue (vi.size() == 5);
+	assertTrue (vi[0] == true);
+	assertTrue (vi[1] == false);
+	assertTrue (vi[2] == true);
+	assertTrue (vi[3] == false);
+	assertTrue (vi[4] == true);
 
 	c.reset();
-	assert (c.rowCount() == 0);
-	assert (c1.rowCount() == 0);
-	assert (c2.rowCount() == 0);
+	assertTrue (c.rowCount() == 0);
+	assertTrue (c1.rowCount() == 0);
+	assertTrue (c2.rowCount() == 0);
 }
 
 
 void DataTest::testColumnDeque()
 {
-	typedef std::deque<int> ContainerType;
-	typedef Column<ContainerType> ColumnType;
+	using ContainerType = std::deque<int>;
+	using ColumnType = Column<ContainerType>;
 
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
-	assert (mc.name() == "mc");
-	assert (mc.position() == 0);
-	assert (mc.length() == 2);
-	assert (mc.precision() == 3);
-	assert (mc.type() == MetaColumn::FDT_DOUBLE);
-	assert (mc.isNullable());
+	assertTrue (mc.name() == "mc");
+	assertTrue (mc.position() == 0);
+	assertTrue (mc.length() == 2);
+	assertTrue (mc.precision() == 3);
+	assertTrue (mc.type() == MetaColumn::FDT_DOUBLE);
+	assertTrue (mc.isNullable());
 
 	ContainerType* pData = new ContainerType;
 	pData->push_back(1);
@@ -660,59 +684,59 @@ void DataTest::testColumnDeque()
 	pData->push_back(3);
 	pData->push_back(4);
 	pData->push_back(5);
-	
+
 	ColumnType c(mc, pData);
 
-	assert (c.rowCount() == 5);
-	assert (c[0] == 1);
-	assert (c[1] == 2);
-	assert (c[2] == 3);
-	assert (c[3] == 4);
-	assert (c[4] == 5);
-	assert (c.name() == "mc");
-	assert (c.position() == 0);
-	assert (c.length() == 2);
-	assert (c.precision() == 3);
-	assert (c.type() == MetaColumn::FDT_DOUBLE);
+	assertTrue (c.rowCount() == 5);
+	assertTrue (c[0] == 1);
+	assertTrue (c[1] == 2);
+	assertTrue (c[2] == 3);
+	assertTrue (c[3] == 4);
+	assertTrue (c[4] == 5);
+	assertTrue (c.name() == "mc");
+	assertTrue (c.position() == 0);
+	assertTrue (c.length() == 2);
+	assertTrue (c.precision() == 3);
+	assertTrue (c.type() == MetaColumn::FDT_DOUBLE);
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
 
 	ColumnType c1 = c;
 
-	assert (c1.rowCount() == 5);
-	assert (c1[0] == 1);
-	assert (c1[1] == 2);
-	assert (c1[2] == 3);
-	assert (c1[3] == 4);
-	assert (c1[4] == 5);
+	assertTrue (c1.rowCount() == 5);
+	assertTrue (c1[0] == 1);
+	assertTrue (c1[1] == 2);
+	assertTrue (c1[2] == 3);
+	assertTrue (c1[3] == 4);
+	assertTrue (c1[4] == 5);
 
 	ColumnType c2(c1);
 
-	assert (c2.rowCount() == 5);
-	assert (c2[0] == 1);
-	assert (c2[1] == 2);
-	assert (c2[2] == 3);
-	assert (c2[3] == 4);
-	assert (c2[4] == 5);
+	assertTrue (c2.rowCount() == 5);
+	assertTrue (c2[0] == 1);
+	assertTrue (c2[1] == 2);
+	assertTrue (c2[2] == 3);
+	assertTrue (c2[3] == 4);
+	assertTrue (c2[4] == 5);
 
 	ContainerType vi;
 	vi.assign(c.begin(), c.end());
-	assert (vi.size() == 5);
-	assert (vi[0] == 1);
-	assert (vi[1] == 2);
-	assert (vi[2] == 3);
-	assert (vi[3] == 4);
-	assert (vi[4] == 5);
+	assertTrue (vi.size() == 5);
+	assertTrue (vi[0] == 1);
+	assertTrue (vi[1] == 2);
+	assertTrue (vi[2] == 3);
+	assertTrue (vi[3] == 4);
+	assertTrue (vi[4] == 5);
 
 	c.reset();
-	assert (c.rowCount() == 0);
-	assert (c1.rowCount() == 0);
-	assert (c2.rowCount() == 0);
+	assertTrue (c.rowCount() == 0);
+	assertTrue (c1.rowCount() == 0);
+	assertTrue (c2.rowCount() == 0);
 
 	ContainerType* pV1 = new ContainerType;
 	pV1->push_back(1);
@@ -728,48 +752,48 @@ void DataTest::testColumnDeque()
 	pV2->push_back(1);
 	Column<ContainerType> c3(mc, pV1);
 	Column<ContainerType> c4(mc, pV2);
-	
-	Poco::Data::swap(c3, c4);
-	assert (c3[0] == 5);
-	assert (c3[1] == 4);
-	assert (c3[2] == 3);
-	assert (c3[3] == 2);
-	assert (c3[4] == 1);
 
-	assert (c4[0] == 1);
-	assert (c4[1] == 2);
-	assert (c4[2] == 3);
-	assert (c4[3] == 4);
-	assert (c4[4] == 5);
+	Poco::Data::swap(c3, c4);
+	assertTrue (c3[0] == 5);
+	assertTrue (c3[1] == 4);
+	assertTrue (c3[2] == 3);
+	assertTrue (c3[3] == 2);
+	assertTrue (c3[4] == 1);
+
+	assertTrue (c4[0] == 1);
+	assertTrue (c4[1] == 2);
+	assertTrue (c4[2] == 3);
+	assertTrue (c4[3] == 4);
+	assertTrue (c4[4] == 5);
 
 	std::swap(c3, c4);
-	assert (c3[0] == 1);
-	assert (c3[1] == 2);
-	assert (c3[2] == 3);
-	assert (c3[3] == 4);
-	assert (c3[4] == 5);
+	assertTrue (c3[0] == 1);
+	assertTrue (c3[1] == 2);
+	assertTrue (c3[2] == 3);
+	assertTrue (c3[3] == 4);
+	assertTrue (c3[4] == 5);
 
-	assert (c4[0] == 5);
-	assert (c4[1] == 4);
-	assert (c4[2] == 3);
-	assert (c4[3] == 2);
-	assert (c4[4] == 1);
+	assertTrue (c4[0] == 5);
+	assertTrue (c4[1] == 4);
+	assertTrue (c4[2] == 3);
+	assertTrue (c4[3] == 2);
+	assertTrue (c4[4] == 1);
 }
 
 
 void DataTest::testColumnList()
 {
-	typedef std::list<int> ContainerType;
-	typedef Column<ContainerType> ColumnType;
+	using ContainerType = std::list<int>;
+	using ColumnType = Column<ContainerType>;
 
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
-	assert (mc.name() == "mc");
-	assert (mc.position() == 0);
-	assert (mc.length() == 2);
-	assert (mc.precision() == 3);
-	assert (mc.type() == MetaColumn::FDT_DOUBLE);
-	assert (mc.isNullable());
+	assertTrue (mc.name() == "mc");
+	assertTrue (mc.position() == 0);
+	assertTrue (mc.length() == 2);
+	assertTrue (mc.precision() == 3);
+	assertTrue (mc.type() == MetaColumn::FDT_DOUBLE);
+	assertTrue (mc.isNullable());
 
 	ContainerType* pData = new ContainerType;
 	pData->push_back(1);
@@ -777,57 +801,57 @@ void DataTest::testColumnList()
 	pData->push_back(3);
 	pData->push_back(4);
 	pData->push_back(5);
-	
+
 	ColumnType c(mc, pData);
 
-	assert (c.rowCount() == 5);
-	assert (c[0] == 1);
-	assert (c[1] == 2);
-	assert (c[2] == 3);
-	assert (c[3] == 4);
-	assert (c[4] == 5);
-	assert (c.name() == "mc");
-	assert (c.position() == 0);
-	assert (c.length() == 2);
-	assert (c.precision() == 3);
-	assert (c.type() == MetaColumn::FDT_DOUBLE);
+	assertTrue (c.rowCount() == 5);
+	assertTrue (c[0] == 1);
+	assertTrue (c[1] == 2);
+	assertTrue (c[2] == 3);
+	assertTrue (c[3] == 4);
+	assertTrue (c[4] == 5);
+	assertTrue (c.name() == "mc");
+	assertTrue (c.position() == 0);
+	assertTrue (c.length() == 2);
+	assertTrue (c.precision() == 3);
+	assertTrue (c.type() == MetaColumn::FDT_DOUBLE);
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
 
 	ColumnType c1 = c;
 
-	assert (c1.rowCount() == 5);
-	assert (c1[0] == 1);
-	assert (c1[1] == 2);
-	assert (c1[2] == 3);
-	assert (c1[3] == 4);
-	assert (c1[4] == 5);
+	assertTrue (c1.rowCount() == 5);
+	assertTrue (c1[0] == 1);
+	assertTrue (c1[1] == 2);
+	assertTrue (c1[2] == 3);
+	assertTrue (c1[3] == 4);
+	assertTrue (c1[4] == 5);
 
 	ColumnType c2(c1);
-	assert (c2.rowCount() == 5);
-	assert (c2[0] == 1);
-	assert (c2[1] == 2);
-	assert (c2[2] == 3);
-	assert (c2[3] == 4);
-	assert (c2[4] == 5);
+	assertTrue (c2.rowCount() == 5);
+	assertTrue (c2[0] == 1);
+	assertTrue (c2[1] == 2);
+	assertTrue (c2[2] == 3);
+	assertTrue (c2[3] == 4);
+	assertTrue (c2[4] == 5);
 
 	ContainerType vi;
 	vi.assign(c.begin(), c.end());
-	assert (vi.size() == 5);
+	assertTrue (vi.size() == 5);
 	ContainerType::const_iterator it = vi.begin();
 	ContainerType::const_iterator end = vi.end();
 	for (int i = 1; it != end; ++it, ++i)
-		assert (*it == i);
+		assertTrue (*it == i);
 
 	c.reset();
-	assert (c.rowCount() == 0);
-	assert (c1.rowCount() == 0);
-	assert (c2.rowCount() == 0);
+	assertTrue (c.rowCount() == 0);
+	assertTrue (c1.rowCount() == 0);
+	assertTrue (c2.rowCount() == 0);
 
 	ContainerType* pV1 = new ContainerType;
 	pV1->push_back(1);
@@ -843,32 +867,32 @@ void DataTest::testColumnList()
 	pV2->push_back(1);
 	Column<ContainerType> c3(mc, pV1);
 	Column<ContainerType> c4(mc, pV2);
-	
-	Poco::Data::swap(c3, c4);
-	assert (c3[0] == 5);
-	assert (c3[1] == 4);
-	assert (c3[2] == 3);
-	assert (c3[3] == 2);
-	assert (c3[4] == 1);
 
-	assert (c4[0] == 1);
-	assert (c4[1] == 2);
-	assert (c4[2] == 3);
-	assert (c4[3] == 4);
-	assert (c4[4] == 5);
+	Poco::Data::swap(c3, c4);
+	assertTrue (c3[0] == 5);
+	assertTrue (c3[1] == 4);
+	assertTrue (c3[2] == 3);
+	assertTrue (c3[3] == 2);
+	assertTrue (c3[4] == 1);
+
+	assertTrue (c4[0] == 1);
+	assertTrue (c4[1] == 2);
+	assertTrue (c4[2] == 3);
+	assertTrue (c4[3] == 4);
+	assertTrue (c4[4] == 5);
 
 	std::swap(c3, c4);
-	assert (c3[0] == 1);
-	assert (c3[1] == 2);
-	assert (c3[2] == 3);
-	assert (c3[3] == 4);
-	assert (c3[4] == 5);
+	assertTrue (c3[0] == 1);
+	assertTrue (c3[1] == 2);
+	assertTrue (c3[2] == 3);
+	assertTrue (c3[3] == 4);
+	assertTrue (c3[4] == 5);
 
-	assert (c4[0] == 5);
-	assert (c4[1] == 4);
-	assert (c4[2] == 3);
-	assert (c4[3] == 2);
-	assert (c4[4] == 1);
+	assertTrue (c4[0] == 5);
+	assertTrue (c4[1] == 4);
+	assertTrue (c4[2] == 3);
+	assertTrue (c4[3] == 2);
+	assertTrue (c4[4] == 1);
 }
 
 
@@ -881,47 +905,47 @@ void DataTest::testRow()
 	row.append("field3", 3);
 	row.append("field4", 4);
 
-	assert (row["field0"] == 0);
-	assert (row["field1"] == 1);
-	assert (row["field2"] == 2);
-	assert (row["field3"] == 3);
-	assert (row["field4"] == 4);
+	assertTrue (row["field0"] == 0);
+	assertTrue (row["field1"] == 1);
+	assertTrue (row["field2"] == 2);
+	assertTrue (row["field3"] == 3);
+	assertTrue (row["field4"] == 4);
 
-	assert (row["FIELD0"] == 0);
-	assert (row["FIELD1"] == 1);
-	assert (row["FIELD2"] == 2);
-	assert (row["FIELD3"] == 3);
-	assert (row["FIELD4"] == 4);
+	assertTrue (row["FIELD0"] == 0);
+	assertTrue (row["FIELD1"] == 1);
+	assertTrue (row["FIELD2"] == 2);
+	assertTrue (row["FIELD3"] == 3);
+	assertTrue (row["FIELD4"] == 4);
 
-	assert (row[0] == 0);
-	assert (row[1] == 1);
-	assert (row[2] == 2);
-	assert (row[3] == 3);
-	assert (row[4] == 4);
+	assertTrue (row[0] == 0);
+	assertTrue (row[1] == 1);
+	assertTrue (row[2] == 2);
+	assertTrue (row[3] == 3);
+	assertTrue (row[4] == 4);
 
 	try
 	{
-		int i; i = row[5].convert<int>(); // to silence gcc
+		POCO_UNUSED int i; i = row[5].convert<int>();
 		fail ("must fail");
 	}catch (RangeException&) {}
 
 	try
 	{
-		int i; i = row["a bad name"].convert<int>(); // to silence gcc
+		POCO_UNUSED int i; i = row["a bad name"].convert<int>();
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
-	assert (5 == row.fieldCount());
-	assert (row[0] == 0);
-	assert (row["field0"] == 0);
-	assert (row[1] == 1);
-	assert (row["field1"] == 1);
-	assert (row[2] == 2);
-	assert (row["field2"] == 2);
-	assert (row[3] == 3);
-	assert (row["field3"] == 3);
-	assert (row[4] == 4);
-	assert (row["field4"] == 4);
+	assertTrue (5 == row.fieldCount());
+	assertTrue (row[0] == 0);
+	assertTrue (row["field0"] == 0);
+	assertTrue (row[1] == 1);
+	assertTrue (row["field1"] == 1);
+	assertTrue (row[2] == 2);
+	assertTrue (row["field2"] == 2);
+	assertTrue (row[3] == 3);
+	assertTrue (row["field3"] == 3);
+	assertTrue (row[4] == 4);
+	assertTrue (row["field4"] == 4);
 
 	Row row2;
 
@@ -931,7 +955,7 @@ void DataTest::testRow()
 	row2.append("field3", 2);
 	row2.append("field4", 1);
 
-	assert (row != row2);
+	assertTrue (row != row2);
 
 	Row row3;
 
@@ -941,8 +965,8 @@ void DataTest::testRow()
 	row3.append("field3", 3);
 	row3.append("field4", 4);
 
-	assert (row3 == row);
-	assert (!(row < row3 || row3 < row));
+	assertTrue (row3 == row);
+	assertTrue (!(row < row3 || row3 < row));
 
 	Row row4(row3.names());
 	try
@@ -956,15 +980,15 @@ void DataTest::testRow()
 	row4.set("field2", 2);
 	row4.set("field3", 3);
 	row4.set("field4", 4);
-	assert (row3 == row4);
+	assertTrue (row3 == row4);
 	try
 	{
 		row4.set(5, 0);
 		fail ("must fail");
 	}catch (RangeException&) {}
 	row4.set("field0", 1);
-	assert (row3 != row4);
-	assert (row3 < row4);
+	assertTrue (row3 != row4);
+	assertTrue (row3 < row4);
 }
 
 
@@ -988,9 +1012,9 @@ void DataTest::testRowSort()
 	rowSet1.insert(row1);
 	rowSet1.insert(row2);
 	std::multiset<Row>::iterator it1 = rowSet1.begin();
-	assert (row1 == *it1);
+	assertTrue (row1 == *it1);
 	++it1;
-	assert (row2 == *it1);
+	assertTrue (row2 == *it1);
 
 	Row row3;
 	row3.append("0", 1);
@@ -1010,9 +1034,9 @@ void DataTest::testRowSort()
 	rowSet2.insert(row4);
 	rowSet2.insert(row3);
 	std::set<Row>::iterator it2 = rowSet2.begin();
-	assert (row4 == *it2);
+	assertTrue (row4 == *it2);
 	++it2;
-	assert (row3 == *it2);
+	assertTrue (row3 == *it2);
 
 	Row row5;
 	row5.append("0", 2);
@@ -1051,11 +1075,11 @@ void DataTest::testRowSort()
 	rowSet3.insert(row7);
 
 	std::set<Row>::iterator it3 = rowSet3.begin();
-	assert (row7 == *it3);
+	assertTrue (row7 == *it3);
 	++it3;
-	assert (row6 == *it3);
+	assertTrue (row6 == *it3);
 	++it3;
-	assert (row5 == *it3);
+	assertTrue (row5 == *it3);
 
 	row5.replaceSortField("0", "2");
 	row6.replaceSortField("0", "2");
@@ -1067,11 +1091,11 @@ void DataTest::testRowSort()
 	rowSet3.insert(row5);
 
 	it3 = rowSet3.begin();
-	assert (row5 == *it3);
+	assertTrue (row5 == *it3);
 	++it3;
-	assert (row6 == *it3);
+	assertTrue (row6 == *it3);
 	++it3;
-	assert (row7 == *it3);
+	assertTrue (row7 == *it3);
 
 	row5.resetSort();
 	row6.resetSort();
@@ -1083,11 +1107,11 @@ void DataTest::testRowSort()
 	rowSet3.insert(row7);
 
 	it3 = rowSet3.begin();
-	assert (row7 == *it3);
+	assertTrue (row7 == *it3);
 	++it3;
-	assert (row6 == *it3);
+	assertTrue (row6 == *it3);
 	++it3;
-	assert (row5 == *it3);
+	assertTrue (row5 == *it3);
 
 	Row row8;
 	row8.append("0", "2");
@@ -1146,13 +1170,13 @@ void DataTest::testRowSort()
 
 void DataTest::testRowStrictWeak(const Row& row1, const Row& row2, const Row& row3)
 {
-	assert (row1 < row2 && !(row2 < row1)); // antisymmetric
-	assert (row1 < row2 && row2 < row3 && row1 < row3); // transitive
-	assert (!(row1 < row1)); // irreflexive
+	assertTrue (row1 < row2 && !(row2 < row1)); // antisymmetric
+	assertTrue (row1 < row2 && row2 < row3 && row1 < row3); // transitive
+	assertTrue (!(row1 < row1)); // irreflexive
 }
 
 
-void DataTest::testRowFormat()
+void DataTest::testSimpleRowFormatter()
 {
 	Row row1;
 	row1.append("field0", 0);
@@ -1168,7 +1192,7 @@ void DataTest::testRowFormat()
 	std::string line(std::string::size_type(sz * 5 + sp * 4), '-');
 	std::string spacer(sp, ' ');
 	std::ostringstream os;
-	os << std::left 
+	os << std::left
 		<< std::setw(sz) << "field0"
 		<< spacer
 		<< std::setw(sz) << "field1"
@@ -1177,12 +1201,12 @@ void DataTest::testRowFormat()
 		<< spacer
 		<< std::setw(sz) << "field3"
 		<< spacer
-		<< std::setw(sz) << "field4" << std::endl 
+		<< std::setw(sz) << "field4" << std::endl
 		<< line << std::endl;
-	assert (row1.namesToString() == os.str());
+	assertTrue (row1.namesToString() == os.str());
 
 	os.str("");
-	os << std::right 
+	os << std::right
 		<< std::setw(sz) << "0"
 		<< spacer
 		<< std::setw(sz) << "1"
@@ -1192,7 +1216,39 @@ void DataTest::testRowFormat()
 		<< std::setw(sz) << "3"
 		<< spacer
 		<< std::setw(sz) << "4" << std::endl;
-	assert (row1.valuesToString() == os.str());
+	assertTrue (row1.valuesToString() == os.str());
+}
+
+
+void DataTest::testJSONRowFormatter()
+{
+	Row row1;
+	row1.append("field0", 0);
+	row1.append("field1", "1");
+	row1.append("field2", DateTime(2007, 3, 13, 8, 12, 15));
+	row1.append("field3", Var());
+	row1.append("field4", 4);
+	row1.setFormatter(new JSONRowFormatter);
+
+	assertTrue(row1.getFormatter().prefix() == "{");
+	assertTrue(row1.getFormatter().postfix() == "]}");
+	assertTrue(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
+	assertTrue(row1.namesToString() == "\"names\":[\"field0\",\"field1\",\"field2\",\"field3\",\"field4\"]");
+	assertTrue(row1.valuesToString() == ",\"values\":[[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
+
+	row1.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_SMALL));
+	assertTrue(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
+	assertTrue(row1.namesToString() == "");
+	assertTrue(row1.valuesToString() == "[[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
+	assertTrue(row1.valuesToString() == ",[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
+
+	row1.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_FULL));
+	assertTrue(row1.getFormatter().prefix() == "{\"count\":0,[");
+	assertTrue(row1.getFormatter().postfix() == "]}");
+	assertTrue(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
+	assertTrue(row1.namesToString() == "");
+	assertTrue(row1.valuesToString() == "{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
+	assertTrue(row1.valuesToString() == ",{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
 }
 
 
@@ -1202,41 +1258,41 @@ void DataTest::testDateAndTime()
 	Date d(dt);
 	Time t(dt);
 
-	assert (dt.year() == d.year());
-	assert (dt.month() == d.month());
-	assert (dt.day() == d.day());
+	assertTrue (dt.year() == d.year());
+	assertTrue (dt.month() == d.month());
+	assertTrue (dt.day() == d.day());
 
-	assert (dt.hour() == t.hour());
-	assert (dt.minute() == t.minute());
-	assert (dt.second() == t.second());
-	
+	assertTrue (dt.hour() == t.hour());
+	assertTrue (dt.minute() == t.minute());
+	assertTrue (dt.second() == t.second());
+
 	Date d1(2007, 6, 15);
 	d1.assign(d.year() - 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
-	assert (d1 < d); assert (d1 != d);
+	assertTrue (d1 < d); assertTrue (d1 != d);
 
 	d1.assign(d.year() - 1, 12, d.day());
-	assert (d1 < d); assert (d1 != d);
+	assertTrue (d1 < d); assertTrue (d1 != d);
 
 	if (d.day() > 1)
 	{
 		d1.assign(d.year(), d.month(), d.day() - 1);
-		assert (d1 < d); assert (d1 != d);
+		assertTrue (d1 < d); assertTrue (d1 != d);
 	}
 
 	d1.assign(d.year() + 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
-	assert (d1 > d); assert (d1 != d);
-	
+	assertTrue (d1 > d); assertTrue (d1 != d);
+
 	d1.assign(d.year() + 1, 1, d.day());
-	assert (d1 > d); assert (d1 != d);
+	assertTrue (d1 > d); assertTrue (d1 != d);
 
 	if (d.day() < dt.daysOfMonth(dt.year(), dt.month()))
 	{
 		d1.assign(d.year(), d.month(), d.day() + 1);
-		assert (d1 > d); assert (d1 != d);
+		assertTrue (d1 > d); assertTrue (d1 != d);
 	}
-	
+
 	d1.assign(d.year(), d.month(), d.day());
-	assert (d1 == d);
+	assertTrue (d1 == d);
 
 	try { d1.assign(-1, 1, 1); fail ("must fail"); }
 	catch (InvalidArgumentException&) { }
@@ -1246,45 +1302,45 @@ void DataTest::testDateAndTime()
 	catch (InvalidArgumentException&) { }
 
 	Time t1(12, 30, 15);
-	
+
 	if (t.hour() > 1)
 	{
 		t1.assign(t.hour() - 1, t.minute(), t.second());
-		assert (t1 < t); assert (t1 != t);
+		assertTrue (t1 < t); assertTrue (t1 != t);
 	}
 
 	if (t.minute() > 1)
 	{
 		t1.assign(t.hour(), t.minute() - 1, t.second());
-		assert (t1 < t); assert (t1 != t);
+		assertTrue (t1 < t); assertTrue (t1 != t);
 	}
-	
+
 	if (t.second() > 1)
 	{
 		t1.assign(t.hour(), t.minute(), t.second() - 1);
-		assert (t1 < t); assert (t1 != t);
+		assertTrue (t1 < t); assertTrue (t1 != t);
 	}
 
-	if (t.hour() < 23) 
+	if (t.hour() < 23)
 	{
 		t1.assign(t.hour() + 1, t.minute(), t.second());
-		assert (t1 > t); assert (t1 != t);
+		assertTrue (t1 > t); assertTrue (t1 != t);
 	}
 
 	if (t.minute() < 59)
 	{
 		t1.assign(t.hour(), t.minute() + 1, t.second());
-		assert (t1 > t); assert (t1 != t);
+		assertTrue (t1 > t); assertTrue (t1 != t);
 	}
 
 	if (t.second() < 59)
 	{
 		t1.assign(t.hour(), t.minute(), t.second() + 1);
-		assert (t1 > t); assert (t1 != t);
+		assertTrue (t1 > t); assertTrue (t1 != t);
 	}
 
 	t1.assign(t.hour(), t.minute(), t.second());
-	assert (t1 == t);
+	assertTrue (t1 == t);
 
 	try { t1.assign(-1, 0, 0); fail ("must fail"); }
 	catch (InvalidArgumentException&) { }
@@ -1294,24 +1350,24 @@ void DataTest::testDateAndTime()
 	catch (InvalidArgumentException&) { }
 
 	d1 = dt;
-	assert (d1 == dt);
+	assertTrue (d1 == dt);
 
 	t1 = dt;
-	assert (t1 == dt);
+	assertTrue (t1 == dt);
 
 	d.assign(2007, 6, 15);
 	d1.assign(2007, 6, 16);
-	assert (d != d1);
+	assertTrue (d != d1);
 	Var vDate = d;
 	d1 = vDate;
-	assert (d == d1);
+	assertTrue (d == d1);
 
 	t.assign(12, 30, 15);
 	t1.assign(12, 30, 16);
-	assert (t != t1);
+	assertTrue (t != t1);
 	Var vTime = t;
 	t1 = vTime;
-	assert (t == t1);
+	assertTrue (t == t1);
 }
 
 
@@ -1322,39 +1378,62 @@ void DataTest::testExternalBindingAndExtraction()
 	int i;
 	AbstractExtraction::Ptr pExt1 = into(i);
 	AbstractExtraction::Ptr pExt2 = into(i);
-	assert (1 == pExt1.referenceCount());
-	assert (1 == pExt2.referenceCount());
+	assertTrue (1 == pExt1.referenceCount());
+	assertTrue (1 == pExt2.referenceCount());
 	{
 		Statement stmt(tmp);
 		stmt.addExtract(pExt1);
-		assert (2 == pExt1.referenceCount());
+		assertTrue (2 == pExt1.referenceCount());
 	}
-	assert (1 == pExt1.referenceCount());
-	assert (1 == pExt2.referenceCount());
+	assertTrue (1 == pExt1.referenceCount());
+	assertTrue (1 == pExt2.referenceCount());
 
 	AbstractBinding::Ptr pBind1 = use(i, "mybind1");
 	AbstractBinding::Ptr pBind2 = use(i, "mybind2");
 	AbstractBinding::Ptr pBind3 = use(i, "mybind3");
-	assert (1 == pBind1.referenceCount());
-	assert (1 == pBind2.referenceCount());
-	assert (1 == pBind3.referenceCount());
+	assertTrue (1 == pBind1.referenceCount());
+	assertTrue (1 == pBind2.referenceCount());
+	assertTrue (1 == pBind3.referenceCount());
 	{
 		Statement stmt(tmp);
 		stmt.addBind(pBind1);
-		assert (2 == pBind1.referenceCount());
+		assertTrue (2 == pBind1.referenceCount());
 		stmt.removeBind(pBind1->name());
-		assert (1 == pBind1.referenceCount());
+		assertTrue (1 == pBind1.referenceCount());
 		stmt.addBind(pBind2);
-		assert (2 == pBind2.referenceCount());
+		assertTrue (2 == pBind2.referenceCount());
 		stmt.addBind(pBind3);
-		assert (2 == pBind3.referenceCount());
+		assertTrue (2 == pBind3.referenceCount());
 
 		try { stmt.removeBind("a bad name"); fail("must fail"); }
 		catch (NotFoundException&) { }
 	}
-	assert (1 == pBind1.referenceCount());
-	assert (1 == pBind2.referenceCount());
-	assert (1 == pBind3.referenceCount());
+	assertTrue (1 == pBind1.referenceCount());
+	assertTrue (1 == pBind2.referenceCount());
+	assertTrue (1 == pBind3.referenceCount());
+}
+
+
+void DataTest::testTranscode()
+{
+	Latin1Encoding::Ptr pL2E = new Latin1Encoding();
+
+	const unsigned char latin1Chars[] = { 'g', 252, 'n', 't', 'e', 'r', 0 };
+	const unsigned char utf8Chars[] = { 'g', 195, 188, 'n', 't', 'e', 'r', 0 };
+	std::string latin1Text((const char*)latin1Chars);
+	std::string utf8Text((const char*)utf8Chars);
+
+	Poco::Data::Test::Extractor ext;
+	ext.setString(latin1Text);
+	std::string latin1Out;
+	assertTrue (ext.extract(0, latin1Out));
+	assertTrue(latin1Out == latin1Text);
+
+	Poco::Data::Test::Extractor ext2(new Latin1Encoding());
+	ext2.setString(latin1Text);
+	std::string utf8Out;
+	assertTrue(ext2.extract(0, utf8Out));
+	assertTrue(utf8Out == utf8Text);
 }
 
 
@@ -1385,9 +1464,11 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testColumnList);
 	CppUnit_addTest(pSuite, DataTest, testRow);
 	CppUnit_addTest(pSuite, DataTest, testRowSort);
-	CppUnit_addTest(pSuite, DataTest, testRowFormat);
+	CppUnit_addTest(pSuite, DataTest, testSimpleRowFormatter);
+	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
+	CppUnit_addTest(pSuite, DataTest, testTranscode);
 
 	return pSuite;
 }

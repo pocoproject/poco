@@ -37,7 +37,7 @@ class Redis_API Client
 	/// bit integer, a simple string, a bulk string, an array or an error. The
 	/// first element of the command array is the Redis command. A simple string
 	/// is a string that cannot contain a CR or LF character. A bulk string is
-	/// implemented as a typedef for Poco::Nullable<std::string>. This is
+	/// implemented as an alias for Poco::Nullable<std::string>. This is
 	/// because a bulk string can represent a Null value.
 	///
 	///     BulkString bs = client.execute<BulkString>(...);
@@ -71,7 +71,7 @@ class Redis_API Client
 	///     command << "list";
 {
 public:
-	typedef SharedPtr<Client> Ptr;
+	using Ptr = SharedPtr<Client>;
 
 	Client();
 		/// Creates an unconnected Client.
@@ -86,6 +86,11 @@ public:
 
 	Client(const Net::SocketAddress& addrs);
 		/// Constructor which connects to the given Redis host/port.
+
+	Client(const Net::StreamSocket& socket);
+		/// Constructor which connects using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
 
 	virtual ~Client();
 		/// Destroys the Client.
@@ -112,6 +117,11 @@ public:
 
 	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
 		/// Connects to the given Redis server.
+
+	void connect(const Net::StreamSocket& socket);
+		/// Connects to the given Redis server using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
 
 	void disconnect();
 		/// Disconnects from the Redis server.

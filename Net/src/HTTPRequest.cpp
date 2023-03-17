@@ -50,7 +50,7 @@ HTTPRequest::HTTPRequest():
 {
 }
 
-	
+
 HTTPRequest::HTTPRequest(const std::string& version):
 	HTTPMessage(version),
 	_method(HTTP_GET),
@@ -58,7 +58,7 @@ HTTPRequest::HTTPRequest(const std::string& version):
 {
 }
 
-	
+
 HTTPRequest::HTTPRequest(const std::string& method, const std::string& uri):
 	_method(method),
 	_uri(uri)
@@ -74,8 +74,28 @@ HTTPRequest::HTTPRequest(const std::string& method, const std::string& uri, cons
 }
 
 
+HTTPRequest::HTTPRequest(const HTTPRequest& other):
+	HTTPMessage(other),
+	_method(other._method),
+	_uri(other._uri)
+{
+}
+
+
 HTTPRequest::~HTTPRequest()
 {
+}
+
+
+HTTPRequest& HTTPRequest::operator = (const HTTPRequest& other)
+{
+	if (this != &other)
+	{
+		HTTPMessage::operator = (other);
+		_method = other._method;
+		_uri = other._uri;
+	}
+	return *this;
 }
 
 
@@ -96,7 +116,7 @@ void HTTPRequest::setHost(const std::string& host)
 	set(HOST, host);
 }
 
-	
+
 void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 {
 	std::string value;
@@ -110,7 +130,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	else
 	{
 		value.append(host);
-	}    
+	}
 
 	if (port != 80 && port != 443)
 	{
@@ -120,7 +140,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	setHost(value);
 }
 
-	
+
 const std::string& HTTPRequest::getHost() const
 {
 	return get(HOST);
@@ -142,7 +162,7 @@ void HTTPRequest::setCookies(const NameValueCollection& cookies)
 	add(COOKIE, cookie);
 }
 
-	
+
 void HTTPRequest::getCookies(NameValueCollection& cookies) const
 {
 	NameValueCollection::ConstIterator it = find(COOKIE);
@@ -159,16 +179,22 @@ bool HTTPRequest::hasCredentials() const
 	return has(AUTHORIZATION);
 }
 
-	
+
 void HTTPRequest::getCredentials(std::string& scheme, std::string& authInfo) const
 {
 	getCredentials(AUTHORIZATION, scheme, authInfo);
 }
 
-	
+
 void HTTPRequest::setCredentials(const std::string& scheme, const std::string& authInfo)
 {
 	setCredentials(AUTHORIZATION, scheme, authInfo);
+}
+
+
+void HTTPRequest::removeCredentials()
+{
+	erase(AUTHORIZATION);
 }
 
 
@@ -177,16 +203,22 @@ bool HTTPRequest::hasProxyCredentials() const
 	return has(PROXY_AUTHORIZATION);
 }
 
-	
+
 void HTTPRequest::getProxyCredentials(std::string& scheme, std::string& authInfo) const
 {
 	getCredentials(PROXY_AUTHORIZATION, scheme, authInfo);
 }
 
-	
+
 void HTTPRequest::setProxyCredentials(const std::string& scheme, const std::string& authInfo)
 {
 	setCredentials(PROXY_AUTHORIZATION, scheme, authInfo);
+}
+
+
+void HTTPRequest::removeProxyCredentials()
+{
+	erase(PROXY_AUTHORIZATION);
 }
 
 
@@ -248,7 +280,7 @@ void HTTPRequest::getCredentials(const std::string& header, std::string& scheme,
 	else throw NotAuthenticatedException();
 }
 
-	
+
 void HTTPRequest::setCredentials(const std::string& header, const std::string& scheme, const std::string& authInfo)
 {
 	std::string auth(scheme);

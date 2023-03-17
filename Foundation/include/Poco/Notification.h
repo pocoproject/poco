@@ -35,8 +35,8 @@ class Foundation_API Notification: public RefCountedObject
 	/// template class.
 {
 public:
-	typedef AutoPtr<Notification> Ptr;
-	
+	using Ptr = AutoPtr<Notification>;
+
 	Notification();
 		/// Creates the notification.
 

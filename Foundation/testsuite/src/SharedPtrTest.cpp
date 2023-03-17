@@ -28,27 +28,27 @@ namespace
 		{
 			++_count;
 		}
-		
+
 		virtual ~TestObject()
 		{
 			--_count;
 		}
-		
+
 		const std::string& data()
 		{
 			return _data;
 		}
-		
+
 		static int count()
 		{
 			return _count;
 		}
-		
+
 	private:
 		std::string _data;
 		static int _count;
 	};
-	
+
 	int TestObject::_count = 0;
 
 	class DerivedObject: public TestObject
@@ -62,7 +62,7 @@ namespace
 		{
 			return _number;
 		}
-		
+
 	private:
 		int _number;
 	};
@@ -83,7 +83,10 @@ void SharedPtrTest::testSharedPtr()
 {
 	SharedPtr<TestObject> ptr1;
 	assertNull(ptr1.get());
+	assertTrue (ptr1 == nullptr);
+
 	TestObject* pTO1 = new TestObject("one");
+
 	TestObject* pTO2 = new TestObject("two");
 	if (pTO2 < pTO1)
 	{
@@ -91,70 +94,72 @@ void SharedPtrTest::testSharedPtr()
 		pTO1 = pTO2;
 		pTO2 = pTmp;
 	}
-	assert (pTO1 < pTO2);
+	assertTrue (pTO1 < pTO2);
 	ptr1 = pTO1;
-	assert (ptr1.referenceCount() == 1);
+	assertTrue (ptr1 != nullptr);
+
+	assertTrue (ptr1.referenceCount() == 1);
 	SharedPtr<TestObject> ptr2 = pTO2;
 	SharedPtr<TestObject> ptr3 = ptr1;
-	assert (ptr1.referenceCount() == 2);
+	assertTrue (ptr1.referenceCount() == 2);
 	SharedPtr<TestObject> ptr4;
-	assert (ptr1.get() == pTO1);
-	assert (ptr1 == pTO1);
-	assert (ptr2.get() == pTO2);
-	assert (ptr2 == pTO2);
-	assert (ptr3.get() == pTO1);
-	assert (ptr3 == pTO1);
-	
-	assert (ptr1 == pTO1);
-	assert (ptr1 != pTO2);
-	assert (ptr1 < pTO2);
-	assert (ptr1 <= pTO2);
-	assert (ptr2 > pTO1);
-	assert (ptr2 >= pTO1);
-	
-	assert (ptr1 == ptr3);
-	assert (ptr1 != ptr2);
-	assert (ptr1 < ptr2);
-	assert (ptr1 <= ptr2);
-	assert (ptr2 > ptr1);
-	assert (ptr2 >= ptr1);
-	
+	assertTrue (ptr1.get() == pTO1);
+	assertTrue (ptr1 == pTO1);
+	assertTrue (ptr2.get() == pTO2);
+	assertTrue (ptr2 == pTO2);
+	assertTrue (ptr3.get() == pTO1);
+	assertTrue (ptr3 == pTO1);
+
+	assertTrue (ptr1 == pTO1);
+	assertTrue (ptr1 != pTO2);
+	assertTrue (ptr1 < pTO2);
+	assertTrue (ptr1 <= pTO2);
+	assertTrue (ptr2 > pTO1);
+	assertTrue (ptr2 >= pTO1);
+
+	assertTrue (ptr1 == ptr3);
+	assertTrue (ptr1 != ptr2);
+	assertTrue (ptr1 < ptr2);
+	assertTrue (ptr1 <= ptr2);
+	assertTrue (ptr2 > ptr1);
+	assertTrue (ptr2 >= ptr1);
+
 	ptr1.swap(ptr2);
-	assert (ptr2 < ptr1);
+	assertTrue (ptr2 < ptr1);
 	ptr2.swap(ptr1);
 
-	assert ((ptr1->data() == "one" && ptr2->data() == "two") || (ptr1->data() == "two" && ptr2->data() == "one"));
-	
+	assertTrue ((ptr1->data() == "one" && ptr2->data() == "two") || (ptr1->data() == "two" && ptr2->data() == "one"));
+
 	try
 	{
-		assert (ptr4->data() == "four");
+		assertTrue (ptr4->data() == "four");
 		fail ("must throw NullPointerException");
 	}
 	catch (NullPointerException&)
 	{
 	}
-	
-	assert (!(ptr4 == ptr1));
-	assert (!(ptr4 == ptr2));
-	assert (ptr4 != ptr1);
-	assert (ptr4 != ptr2);
-	
+
+	assertTrue (!(ptr4 == ptr1));
+	assertTrue (!(ptr4 == ptr2));
+	assertTrue (ptr4 != ptr1);
+	assertTrue (ptr4 != ptr2);
+
 	ptr4 = ptr2;
-	assert (ptr4 == ptr2);
-	assert (!(ptr4 != ptr2));
-	
-	assert (TestObject::count() == 2);
+	assertTrue (ptr4 == ptr2);
+	assertTrue (!(ptr4 != ptr2));
+
+	assertTrue (TestObject::count() == 2);
 	ptr1 = 0;
 	ptr2 = 0;
 	ptr3 = 0;
 	ptr4 = 0;
-	assert (TestObject::count() == 0);
-	
+	assertTrue (TestObject::count() == 0);
+
 	{
 		SharedPtr<TestObject> ptr = new TestObject("");
-		assert (TestObject::count() == 1);
+		assertTrue (TestObject::count() == 1);
 	}
-	assert (TestObject::count() == 0);
+	assertTrue (TestObject::count() == 0);
 }
 
 
@@ -168,15 +173,15 @@ void SharedPtrTest::testImplicitCast()
 	}
 	{
 		SharedPtr<DerivedObject> ptr2(new DerivedObject("test", 666));
-		assert (TestObject::count() == 1);
+		assertTrue (TestObject::count() == 1);
 		SharedPtr<TestObject> ptr1 = ptr2;
-		assert (TestObject::count() == 1);
+		assertTrue (TestObject::count() == 1);
 	}
-	assert (TestObject::count() == 0);
+	assertTrue (TestObject::count() == 0);
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
-	assert (TestObject::count() == 1);
+	assertTrue (TestObject::count() == 1);
 	ptr1 = 0;
-	assert (TestObject::count() == 0);
+	assertTrue (TestObject::count() == 0);
 }
 
 
@@ -184,14 +189,14 @@ void SharedPtrTest::testExplicitCast()
 {
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
 	SharedPtr<DerivedObject> ptr2 = ptr1.cast<DerivedObject>();
-	assert (ptr2.get() != 0);
+	assertTrue (ptr2.get() != 0);
 
 	// cast the other way round must fail
 	ptr1 = new TestObject("test");
-	assert (TestObject::count() == 2);
+	assertTrue (TestObject::count() == 2);
 	ptr2 = ptr1.cast<DerivedObject>();
-	assert (TestObject::count() == 1);
-	assert (ptr2.get() == 0);
+	assertTrue (TestObject::count() == 1);
+	assertTrue (ptr2.get() == 0);
 }
 
 

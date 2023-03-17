@@ -48,20 +48,32 @@ public:
 
 	explicit X509Certificate(X509* pCert);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
+		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate.
 
 	X509Certificate(X509* pCert, bool shared);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
-		/// the certificate. If shared is true, the 
+		/// OpenSSL certificate. Ownership is taken of
+		/// the certificate. If shared is true, the
 		/// certificate's reference count is incremented.
 
 	X509Certificate(const Poco::Crypto::X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
+	X509Certificate(const X509Certificate& cert);
+		/// Creates the certificate by copying another one.
+
+	X509Certificate(X509Certificate&& cert) noexcept;
+		/// Creates the certificate by moving another one.
+
 	X509Certificate& operator = (const Poco::Crypto::X509Certificate& cert);
 		/// Assigns a certificate.
+
+	X509Certificate& operator = (const X509Certificate& cert);
+		/// Assigns a certificate.
+
+	X509Certificate& operator = (X509Certificate&& cert) noexcept;
+		/// Moves a certificate.
 
 	~X509Certificate();
 		/// Destroys the X509Certificate.
@@ -72,9 +84,9 @@ public:
 		/// For this check to be successful, the certificate must contain
 		/// a domain name that matches the domain name
 		/// of the host.
-		/// 
+		///
 		/// Returns true if verification succeeded, or false otherwise.
-		
+
 	static bool verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
 		/// Verifies the validity of the certificate against the host name.
 		///
@@ -83,11 +95,11 @@ public:
 		/// of the host.
 		///
 		/// Returns true if verification succeeded, or false otherwise.
-		
+
 protected:
 	static bool containsWildcards(const std::string& commonName);
 	static bool matchWildcard(const std::string& alias, const std::string& hostName);
-	
+
 private:
 	enum
 	{

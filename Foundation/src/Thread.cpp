@@ -38,6 +38,7 @@ namespace Poco {
 
 namespace {
 
+
 class RunnableHolder: public Runnable
 {
 public:
@@ -87,21 +88,21 @@ private:
 } // namespace
 
 
-Thread::Thread(): 
-	_id(uniqueId()), 
-	_name(makeName()), 
+Thread::Thread():
+	_id(uniqueId()),
 	_pTLS(0),
 	_event(true)
 {
+	setNameImpl(makeName());
 }
 
 
-Thread::Thread(const std::string& name): 
-	_id(uniqueId()), 
-	_name(name), 
+Thread::Thread(const std::string& name):
+	_id(uniqueId()),
 	_pTLS(0),
 	_event(true)
 {
+	setNameImpl(name);
 }
 
 
@@ -126,6 +127,12 @@ Thread::Priority Thread::getPriority() const
 void Thread::start(Runnable& target)
 {
 	startImpl(new RunnableHolder(target));
+}
+
+
+void Thread::start(Poco::SharedPtr<Runnable> pTarget)
+{
+	startImpl(pTarget);
 }
 
 
@@ -203,9 +210,7 @@ int Thread::uniqueId()
 
 void Thread::setName(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	_name = name;
+	setNameImpl(name);
 }
 
 

@@ -39,7 +39,7 @@ void HTTPResponseTest::testWrite1()
 	std::ostringstream ostr;
 	response.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "HTTP/1.0 200 OK\r\n\r\n");
+	assertTrue (s == "HTTP/1.0 200 OK\r\n\r\n");
 }
 
 
@@ -51,7 +51,7 @@ void HTTPResponseTest::testWrite2()
 	std::ostringstream ostr;
 	response.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "HTTP/1.1 301 Moved Permanently\r\nLocation: http://www.appinf.com/index.html\r\nServer: Poco/1.0\r\n\r\n");
+	assertTrue (s == "HTTP/1.1 301 Moved Permanently\r\nLocation: http://www.appinf.com/index.html\r\nServer: Poco/1.0\r\n\r\n");
 }
 
 
@@ -61,11 +61,11 @@ void HTTPResponseTest::testRead1()
 	std::istringstream istr(s);
 	HTTPResponse response;
 	response.read(istr);
-	assert (response.getStatus() == HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-	assert (response.getReason() == "Internal Server Error");
-	assert (response.getVersion() == HTTPMessage::HTTP_1_1);
-	assert (response.empty());
-	assert (istr.get() == -1);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+	assertTrue (response.getReason() == "Internal Server Error");
+	assertTrue (response.getVersion() == HTTPMessage::HTTP_1_1);
+	assertTrue (response.empty());
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -75,13 +75,13 @@ void HTTPResponseTest::testRead2()
 	std::istringstream istr(s);
 	HTTPResponse response;
 	response.read(istr);
-	assert (response.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY);
-	assert (response.getReason() == "Moved Permanently");
-	assert (response.getVersion() == HTTPMessage::HTTP_1_0);
-	assert (response.size() == 2);
-	assert (response["Location"] == "http://www.appinf.com/index.html");
-	assert (response["Server"] == "Poco/1.0");
-	assert (istr.get() == -1);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY);
+	assertTrue (response.getReason() == "Moved Permanently");
+	assertTrue (response.getVersion() == HTTPMessage::HTTP_1_0);
+	assertTrue (response.size() == 2);
+	assertTrue (response["Location"] == "http://www.appinf.com/index.html");
+	assertTrue (response["Server"] == "Poco/1.0");
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -91,12 +91,12 @@ void HTTPResponseTest::testRead3()
 	std::istringstream istr(s);
 	HTTPResponse response;
 	response.read(istr);
-	assert (response.getVersion() == HTTPMessage::HTTP_1_1);
-	assert (response.getStatus() == HTTPResponse::HTTP_OK);
-	assert (response.getReason() == "");
-	assert (response.size() == 1);
-	assert (response.getContentLength() == 0);
-	assert (istr.get() == -1);
+	assertTrue (response.getVersion() == HTTPMessage::HTTP_1_1);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (response.getReason() == "");
+	assertTrue (response.size() == 1);
+	assertTrue (response.getContentLength() == 0);
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -159,15 +159,15 @@ void HTTPResponseTest::testCookies()
 	response.addCookie(cookie1);
 	std::vector<HTTPCookie> cookies;
 	response.getCookies(cookies);
-	assert (cookies.size() == 1);
-	assert (cookie1.getVersion() == cookies[0].getVersion());
-	assert (cookie1.getName() == cookies[0].getName());
-	assert (cookie1.getValue() == cookies[0].getValue());
-	assert (cookie1.getComment() == cookies[0].getComment());
-	assert (cookie1.getDomain() == cookies[0].getDomain());
-	assert (cookie1.getPath() == cookies[0].getPath());
-	assert (cookie1.getSecure() == cookies[0].getSecure());
-	assert (cookie1.getMaxAge() == cookies[0].getMaxAge());
+	assertTrue (cookies.size() == 1);
+	assertTrue (cookie1.getVersion() == cookies[0].getVersion());
+	assertTrue (cookie1.getName() == cookies[0].getName());
+	assertTrue (cookie1.getValue() == cookies[0].getValue());
+	assertTrue (cookie1.getComment() == cookies[0].getComment());
+	assertTrue (cookie1.getDomain() == cookies[0].getDomain());
+	assertTrue (cookie1.getPath() == cookies[0].getPath());
+	assertTrue (cookie1.getSecure() == cookies[0].getSecure());
+	assertTrue (cookie1.getMaxAge() == cookies[0].getMaxAge());
 
 	HTTPCookie cookie2("cookie2", "value2");
 	cookie2.setVersion(1);
@@ -175,29 +175,29 @@ void HTTPResponseTest::testCookies()
 	cookie2.setSecure(true);
 	response.addCookie(cookie2);
 	response.getCookies(cookies);
-	assert (cookies.size() == 2);
+	assertTrue (cookies.size() == 2);
 	HTTPCookie cookie2a;
 	if (cookies[0].getName() == cookie2.getName())
 		cookie2a = cookies[0];
 	else
 		cookie2a = cookies[1];
-	assert (cookie2.getVersion() == cookie2a.getVersion());
-	assert (cookie2.getName() == cookie2a.getName());
-	assert (cookie2.getValue() == cookie2a.getValue());
-	assert (cookie2.getComment() == cookie2a.getComment());
-	assert (cookie2.getDomain() == cookie2a.getDomain());
-	assert (cookie2.getPath() == cookie2a.getPath());
-	assert (cookie2.getSecure() == cookie2a.getSecure());
-	assert (cookie2.getMaxAge() == cookie2a.getMaxAge());
+	assertTrue (cookie2.getVersion() == cookie2a.getVersion());
+	assertTrue (cookie2.getName() == cookie2a.getName());
+	assertTrue (cookie2.getValue() == cookie2a.getValue());
+	assertTrue (cookie2.getComment() == cookie2a.getComment());
+	assertTrue (cookie2.getDomain() == cookie2a.getDomain());
+	assertTrue (cookie2.getPath() == cookie2a.getPath());
+	assertTrue (cookie2.getSecure() == cookie2a.getSecure());
+	assertTrue (cookie2.getMaxAge() == cookie2a.getMaxAge());
 
 	HTTPResponse response2;
 	response2.add("Set-Cookie", "name1=value1");
 	response2.add("Set-cookie", "name2=value2");
 	cookies.clear();
 	response2.getCookies(cookies);
-	assert (cookies.size() == 2);
-	assert (cookies[0].getName() == "name1" && cookies[1].getName() == "name2" 
-	     || cookies[0].getName() == "name2" && cookies[1].getName() == "name1"); 
+	assertTrue (cookies.size() == 2);
+	assertTrue (((cookies[0].getName() == "name1") && (cookies[1].getName() == "name2"))
+	     || ((cookies[0].getName() == "name2") && (cookies[1].getName() == "name1")));
 }
 
 

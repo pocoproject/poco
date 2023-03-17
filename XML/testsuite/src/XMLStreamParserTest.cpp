@@ -41,11 +41,11 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root><nested>X</nasted></root>");
 		XMLStreamParser p(is, "test");
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "X");
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "X");
 		p.next();
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -60,7 +60,7 @@ void XMLStreamParserTest::testParser()
 
 		is.setstate(std::ios_base::badbit);
 		p.next();
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const std::ios_base::failure&)
 	{
@@ -80,7 +80,7 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root/>");
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -92,7 +92,7 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root/>");
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root1");
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -132,7 +132,7 @@ void XMLStreamParserTest::testParser()
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
 		p.nextExpect(XMLStreamParser::EV_CHARACTERS);
-		assert(p.value<int>() == 123);
+		assertTrue (p.value<int>() == 123);
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
 	}
 
@@ -143,12 +143,12 @@ void XMLStreamParserTest::testParser()
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
 
-		assert(p.attribute("a") == "a");
-		assert(p.attribute("b", "B") == "b");
-		assert(p.attribute("c", "C") == "C");
-		assert(p.attribute<int>("d") == 123);
-		assert(p.attribute<bool>("t") == true);
-		assert(p.attribute("f", false) == false);
+		assertTrue (p.attribute("a") == "a");
+		assertTrue (p.attribute("b", "B") == "b");
+		assertTrue (p.attribute("c", "C") == "C");
+		assertTrue (p.attribute<int>("d") == 123);
+		assertTrue (p.attribute<bool>("t") == true);
+		assertTrue (p.attribute("f", false) == false);
 
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
 	}
@@ -157,21 +157,21 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root a='a'><nested a='A'><inner/></nested></root>");
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
-		assert(p.attribute("a") == "a");
-		assert(p.peek() == XMLStreamParser::EV_START_ELEMENT && p.localName() == "nested");
-		assert(p.attribute("a") == "a");
+		assertTrue (p.attribute("a") == "a");
+		assertTrue (p.peek() == XMLStreamParser::EV_START_ELEMENT && p.localName() == "nested");
+		assertTrue (p.attribute("a") == "a");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "nested");
-		assert(p.attribute("a") == "A");
+		assertTrue (p.attribute("a") == "A");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "inner");
-		assert(p.attribute("a", "") == "");
+		assertTrue (p.attribute("a", "") == "");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
-		assert(p.attribute("a") == "A");
-		assert(p.peek() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.attribute("a") == "A"); // Still valid.
+		assertTrue (p.attribute("a") == "A");
+		assertTrue (p.peek() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.attribute("a") == "A"); // Still valid.
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
-		assert(p.attribute("a") == "a");
+		assertTrue (p.attribute("a") == "a");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
-		assert(p.attribute("a", "") == "");
+		assertTrue (p.attribute("a", "") == "");
 	}
 
 	try
@@ -179,9 +179,9 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root a='a' b='b'/>");
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
-		assert(p.attribute("a") == "a");
+		assertTrue (p.attribute("a") == "a");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -194,7 +194,7 @@ void XMLStreamParserTest::testParser()
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
 		p.attribute<int>("a");
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -207,43 +207,43 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root x='x'>x<nested/></root>");
 		XMLStreamParser p(is, "peek", XMLStreamParser::RECEIVE_DEFAULT | XMLStreamParser::RECEIVE_ATTRIBUTES_EVENT);
 
-		assert(p.event() == XMLStreamParser::EV_EOF);
+		assertTrue (p.event() == XMLStreamParser::EV_EOF);
 
-		assert(p.peek() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.event() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.peek() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.event() == XMLStreamParser::EV_START_ELEMENT);
 
-		assert(p.peek() == XMLStreamParser::EV_START_ATTRIBUTE);
-		assert(p.event() == XMLStreamParser::EV_START_ATTRIBUTE);
-		assert(p.next() == XMLStreamParser::EV_START_ATTRIBUTE);
+		assertTrue (p.peek() == XMLStreamParser::EV_START_ATTRIBUTE);
+		assertTrue (p.event() == XMLStreamParser::EV_START_ATTRIBUTE);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ATTRIBUTE);
 
-		assert(p.peek() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
-		assert(p.event() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
+		assertTrue (p.peek() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
+		assertTrue (p.event() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
 
-		assert(p.peek() == XMLStreamParser::EV_END_ATTRIBUTE);
-		assert(p.event() == XMLStreamParser::EV_END_ATTRIBUTE);
-		assert(p.next() == XMLStreamParser::EV_END_ATTRIBUTE);
+		assertTrue (p.peek() == XMLStreamParser::EV_END_ATTRIBUTE);
+		assertTrue (p.event() == XMLStreamParser::EV_END_ATTRIBUTE);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ATTRIBUTE);
 
-		assert(p.peek() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
-		assert(p.event() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
+		assertTrue (p.peek() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
+		assertTrue (p.event() == XMLStreamParser::EV_CHARACTERS && p.value() == "x");
 
-		assert(p.peek() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.event() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.peek() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.event() == XMLStreamParser::EV_START_ELEMENT);
 
-		assert(p.peek() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.event() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.peek() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.event() == XMLStreamParser::EV_END_ELEMENT);
 
-		assert(p.peek() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.event() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.peek() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.event() == XMLStreamParser::EV_END_ELEMENT);
 
-		assert(p.peek() == XMLStreamParser::EV_EOF);
-		assert(p.next() == XMLStreamParser::EV_EOF);
-		assert(p.event() == XMLStreamParser::EV_EOF);
+		assertTrue (p.peek() == XMLStreamParser::EV_EOF);
+		assertTrue (p.next() == XMLStreamParser::EV_EOF);
+		assertTrue (p.event() == XMLStreamParser::EV_EOF);
 	}
 
 	// Test content processing.
@@ -255,13 +255,13 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root x=' x '>  \n\t </root>");
 		XMLStreamParser p(is, "empty", XMLStreamParser::RECEIVE_DEFAULT | XMLStreamParser::RECEIVE_ATTRIBUTES_EVENT);
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.content(Content::Empty);
-		assert(p.next() == XMLStreamParser::EV_START_ATTRIBUTE);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " x ");
-		assert(p.next() == XMLStreamParser::EV_END_ATTRIBUTE);
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_EOF);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ATTRIBUTE);
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " x ");
+		assertTrue (p.next() == XMLStreamParser::EV_END_ATTRIBUTE);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_EOF);
 	}
 
 	try
@@ -269,10 +269,10 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root>  \n &amp; X \t </root>");
 		XMLStreamParser p(is, "empty");
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.content(Content::Empty);
 		p.next();
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -285,11 +285,11 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root> X </root>");
 		XMLStreamParser p(is, "simple");
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.content(Content::Simple);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " X ");
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_EOF);
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " X ");
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_EOF);
 	}
 
 	try
@@ -297,11 +297,11 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root> ? <nested/></root>");
 		XMLStreamParser p(is, "simple");
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.content(Content::Simple);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " ? ");
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " ? ");
 		p.next();
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -314,13 +314,13 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root xmlns:a='a'>1&#x32;3</root>");
 		XMLStreamParser p(is, "simple", XMLStreamParser::RECEIVE_DEFAULT | XMLStreamParser::RECEIVE_NAMESPACE_DECLS);
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.nextExpect(XMLStreamParser::EV_START_NAMESPACE_DECL);
 		p.content(Content::Simple);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "123");
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "123");
 		p.nextExpect(XMLStreamParser::EV_END_NAMESPACE_DECL);
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_EOF);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_EOF);
 	}
 
 	try
@@ -330,11 +330,11 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root xmlns:a='a'>1&#x32;<nested/>3</root>");
 		XMLStreamParser p(is, "simple", XMLStreamParser::RECEIVE_DEFAULT | XMLStreamParser::RECEIVE_NAMESPACE_DECLS);
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.nextExpect(XMLStreamParser::EV_START_NAMESPACE_DECL);
 		p.content(Content::Simple);
 		p.next();
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -352,28 +352,28 @@ void XMLStreamParserTest::testParser()
 				"</root>\n");
 		XMLStreamParser p(is, "complex", XMLStreamParser::RECEIVE_DEFAULT | XMLStreamParser::RECEIVE_ATTRIBUTES_EVENT);
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT); // root
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT); // root
 		p.content(Content::Complex);
 
-		assert(p.next() == XMLStreamParser::EV_START_ATTRIBUTE);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " x ");
-		assert(p.next() == XMLStreamParser::EV_END_ATTRIBUTE);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ATTRIBUTE);
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " x ");
+		assertTrue (p.next() == XMLStreamParser::EV_END_ATTRIBUTE);
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT); // nested
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT); // nested
 		p.content(Content::Complex);
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT); // inner
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT); // inner
 		p.content(Content::Empty);
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);   // inner
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);   // inner
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT); // inner
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT); // inner
 		p.content(Content::Simple);
-		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " X ");
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);   // inner
+		assertTrue (p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " X ");
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);   // inner
 
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);   // nested
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);   // root
-		assert(p.next() == XMLStreamParser::EV_EOF);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);   // nested
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);   // root
+		assertTrue (p.next() == XMLStreamParser::EV_EOF);
 	}
 
 	try
@@ -381,12 +381,12 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root> \n<n/> X <n> X </n>  </root>");
 		XMLStreamParser p(is, "complex");
 
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
 		p.content(Content::Complex);
-		assert(p.next() == XMLStreamParser::EV_START_ELEMENT);
-		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (p.next() == XMLStreamParser::EV_END_ELEMENT);
 		p.next();
-		assert(false);
+		assertTrue (false);
 	}
 	catch (const Poco::Exception&)
 	{
@@ -418,31 +418,31 @@ void XMLStreamParserTest::testParser()
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root", Content::Complex);
 
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "nested");
-		assert(p.element() == "X");
+		assertTrue (p.element() == "X");
 
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "nested");
-		assert(p.element() == "");
+		assertTrue (p.element() == "");
 
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "nested");
-		assert(p.element<unsigned int>() == 123);
+		assertTrue (p.element<unsigned int>() == 123);
 
-		assert(p.element("nested") == "Y");
-		assert(p.element(QName("test", "nested")) == "Z");
+		assertTrue (p.element("nested") == "Y");
+		assertTrue (p.element(QName("test", "nested")) == "Z");
 
-		assert(p.element<unsigned int>("nested") == 234);
-		assert(p.element<unsigned int>(QName("test", "nested")) == 345);
+		assertTrue (p.element<unsigned int>("nested") == 234);
+		assertTrue (p.element<unsigned int>(QName("test", "nested")) == 345);
 
-		assert(p.element("nested", "a") == "A");
-		assert(p.element(QName("test", "nested"), "b") == "B");
+		assertTrue (p.element("nested", "a") == "A");
+		assertTrue (p.element(QName("test", "nested"), "b") == "B");
 
-		assert(p.element("nested", "a") == "a" && p.element("nested1") == "A");
-		assert(p.element(QName("test", "nested"), "b") == "b" && p.element(QName("test", "nested1")) == "B");
+		assertTrue (p.element("nested", "a") == "a" && p.element("nested1") == "A");
+		assertTrue (p.element(QName("test", "nested"), "b") == "b" && p.element(QName("test", "nested1")) == "B");
 
-		assert(p.element<unsigned int>("nested", 10) == 1);
-		assert(p.element<unsigned int>(QName("test", "nested"), 20) == 2);
+		assertTrue (p.element<unsigned int>("nested", 10) == 1);
+		assertTrue (p.element<unsigned int>(QName("test", "nested"), 20) == 2);
 
-		assert(p.element<unsigned int>("nested", 10) == 10 && p.element<unsigned int>("nested1") == 1);
-		assert(p.element<unsigned int>(QName("test", "nested"), 20) == 20 && p.element<unsigned int>(QName("test", "nested1")) == 2);
+		assertTrue (p.element<unsigned int>("nested", 10) == 10 && p.element<unsigned int>("nested1") == 1);
+		assertTrue (p.element<unsigned int>(QName("test", "nested"), 20) == 20 && p.element<unsigned int>(QName("test", "nested1")) == 2);
 
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
 	}
@@ -461,12 +461,12 @@ void XMLStreamParserTest::testParser()
 		//for (XMLStreamParser::EventType e: p)
 		//  v.push_back (e);
 
-		assert(v.size() == 5);
-		assert(v[0] == XMLStreamParser::EV_START_ELEMENT);
-		assert(v[1] == XMLStreamParser::EV_START_ELEMENT);
-		assert(v[2] == XMLStreamParser::EV_CHARACTERS);
-		assert(v[3] == XMLStreamParser::EV_END_ELEMENT);
-		assert(v[4] == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (v.size() == 5);
+		assertTrue (v[0] == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (v[1] == XMLStreamParser::EV_START_ELEMENT);
+		assertTrue (v[2] == XMLStreamParser::EV_CHARACTERS);
+		assertTrue (v[3] == XMLStreamParser::EV_END_ELEMENT);
+		assertTrue (v[4] == XMLStreamParser::EV_END_ELEMENT);
 	}
 
 	// Test space extraction into the std::string value.
@@ -475,9 +475,9 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root a=' a '> b </root>");
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
-		assert(p.attribute<std::string>("a") == " a ");
+		assertTrue (p.attribute<std::string>("a") == " a ");
 		p.nextExpect(XMLStreamParser::EV_CHARACTERS);
-		assert(p.value<std::string>() == " b ");
+		assertTrue (p.value<std::string>() == " b ");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
 	}
 }

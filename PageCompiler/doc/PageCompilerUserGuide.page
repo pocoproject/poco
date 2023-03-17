@@ -2,11 +2,16 @@ POCO C++ Server Page Compiler User Guide
 POCO PageCompiler
 
 !!!Introduction
+
 PageCompiler is a command line tool that translates HTML files (and other kinds of files) into
 C++ code, more precisely, subclasses of Poco::Net::HTTPRequestHandler.
 The source files can contain special directives that allow embedding of C++ code.
 The syntax of these directives is based on the syntax used for
-Java Server Pages (JSP) and Active Server Pages (ASP).
+Java Server Pages (JSP), Active Server Pages (ASP) or Embedded JavaScript (EJS) templating.
+
+This makes PageCompiler a C++-based HTML templating system. Since the translation of
+the HTML template into a C++ class happens at compile time, runtime performance is
+excellent.
 
 The following introductory sample shows the code for a simple page that displays the
 current date and time.
@@ -16,8 +21,8 @@ current date and time.
         #include "Poco/DateTime.h"
         #include "Poco/DateTimeFormatter.h"
         #include "Poco/DateTimeFormat.h"
-        
-        
+
+
         using Poco::DateTime;
         using Poco::DateTimeFormatter;
         using Poco::DateTimeFormat;
@@ -88,10 +93,23 @@ is required.
 
 The result of any valid C++ expression can be directly inserted into the page,
 provided the result can be written to an output stream. Note that the expression
-must not end with a semicolon.
+must not end with a semicolon. If HTML escape mode is enabled (new in POCO C++ Libraries
+release 1.10.0), HTML special characters < > " &
+will be replaced with corresponding character entities.
 
     <%= <expression> %>
 ----
+
+An alternative form of this is:
+
+    <%- <expression> %>
+----
+
+The latter form always copies the result of expression to the page verbatim,
+without escaping special HTML characters.
+
+Note that if escape mode is disabled, both forms are equivalent.
+
 
 !!Scriptlet
 
@@ -213,6 +231,13 @@ The argument is passed on to the constructor of the base class, therefore, one o
 constructors of the base class must also accept a single argument of the specified type.
 
 Cannot be used together with <[context]>.
+
+!escape
+
+Enable (set to <[true]>) or disable (<[false]>, default) HTML escape mode.
+If enabled, the result of any expression enclosed in <%= %> tags will be HTML-escaped,
+which means HTML special characters < > " & will be replaced by corresponding
+character entities.
 
 !export
 
@@ -378,6 +403,10 @@ system (e.g., <[/help]> on Windows, <[--help]> or <[-h]> on Unix).
   * config-file (f): load configuration properties from a file
   * osp (O): add factory class definition/implementation for use with OSP
   * apache (A): add factory class definition/implementation and shared library manifest for use with ApacheConnector
+  * escape (e): make HTML-escape mode default for all pages
+
+Run the PageCompiler with the --help option to see all available options.
+
 
 !!Configuration Properties
 

@@ -36,8 +36,8 @@ class Crypto_API PKCS12Container
 	/// This class implements PKCS#12 container functionality.
 {
 public:
-	typedef X509Certificate::List CAList;
-	typedef std::vector<std::string> CANameList;
+	using CAList = X509Certificate::List;
+	using CANameList = std::vector<std::string>;
 
 	explicit PKCS12Container(std::istream& istr, const std::string& password = "");
 		/// Creates the PKCS12Container object from a stream.
@@ -48,18 +48,14 @@ public:
 	PKCS12Container(const PKCS12Container& cont);
 		/// Copy constructor.
 
+	PKCS12Container(PKCS12Container&& cont) noexcept;
+		/// Move constructor.
+
 	PKCS12Container& operator = (const PKCS12Container& cont);
 		/// Assignment operator.
 
-#ifdef POCO_ENABLE_CPP11
-
-	PKCS12Container(PKCS12Container&& cont);
-		/// Move constructor.
-
-	PKCS12Container& operator = (PKCS12Container&& cont);
+	PKCS12Container& operator = (PKCS12Container&& cont) noexcept;
 		/// Move assignment operator.
-
-#endif // POCO_ENABLE_CPP11
 
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
@@ -90,11 +86,7 @@ private:
 	void load(PKCS12* pPKCS12, const std::string& password = "");
 	std::string extractFriendlyName(X509* pCert);
 
-#ifdef POCO_ENABLE_CPP11
-	typedef std::unique_ptr<X509Certificate> CertPtr;
-#else
-	typedef std::auto_ptr<X509Certificate> CertPtr;
-#endif // #ifdef POCO_ENABLE_CPP11
+	using CertPtr = std::unique_ptr<X509Certificate>;
 
 	OpenSSLInitializer _openSSLInitializer;
 	EVP_PKEY*          _pKey;

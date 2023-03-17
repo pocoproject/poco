@@ -19,24 +19,35 @@ namespace Poco {
 namespace XML {
 
 
+AttributesImpl::EmptyAttribute::EmptyAttribute()
+{
+	specified = false;
+	type = XML_LIT("CDATA");
+}
+
+
+AttributesImpl::EmptyAttribute AttributesImpl::_empty;
+
+
 AttributesImpl::AttributesImpl()
 {
-	_empty.specified = false;
-	_empty.type = XML_LIT("CDATA");
 }
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
 {
-	_empty.specified = false;
-	_empty.type = XML_LIT("CDATA");
 	setAttributes(attributes);
 }
 
 
 AttributesImpl::AttributesImpl(const AttributesImpl& attributes):
-	_attributes(attributes._attributes),
-	_empty(attributes._empty)
+	_attributes(attributes._attributes)
+{
+}
+
+
+AttributesImpl::AttributesImpl(AttributesImpl&& attributes) noexcept:
+	_attributes(std::move(attributes._attributes))
 {
 }
 
@@ -52,6 +63,14 @@ AttributesImpl& AttributesImpl::operator = (const AttributesImpl& attributes)
 	{
 		_attributes = attributes._attributes;
 	}
+	return *this;
+}
+
+
+AttributesImpl& AttributesImpl::operator = (AttributesImpl&& attributes) noexcept
+{
+	_attributes = std::move(attributes._attributes);
+
 	return *this;
 }
 
@@ -259,7 +278,7 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& qname) const
 {
 	for (AttributeVec::const_iterator it = _attributes.begin(); it != _attributes.end(); ++it)
 	{
-		if (it->qname == qname) 
+		if (it->qname == qname)
 			return const_cast<Attribute*>(&(*it));
 	}
 	return 0;
@@ -270,7 +289,7 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& namespaceURI, c
 {
 	for (AttributeVec::const_iterator it = _attributes.begin(); it != _attributes.end(); ++it)
 	{
-		if (it->namespaceURI == namespaceURI && it->localName == localName) 
+		if (it->namespaceURI == namespaceURI && it->localName == localName)
 			return const_cast<Attribute*>(&(*it));
 	}
 	return 0;

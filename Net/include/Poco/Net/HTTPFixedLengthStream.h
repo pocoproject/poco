@@ -39,17 +39,17 @@ class Net_API HTTPFixedLengthStreamBuf: public HTTPBasicStreamBuf
 	/// At most a given number of bytes are read or written.
 {
 public:
-	typedef HTTPBasicStreamBuf::openmode openmode;
+	using openmode = HTTPBasicStreamBuf::openmode;
 
 #if defined(POCO_HAVE_INT64)
-	typedef Poco::Int64 ContentLength;
+	using ContentLength = Poco::Int64;
 #else
-	typedef std::streamsize ContentLength;
+	using ContentLength = std::streamsize;
 #endif
 
 	HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode);
 	~HTTPFixedLengthStreamBuf();
-	
+
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
@@ -80,10 +80,10 @@ class Net_API HTTPFixedLengthInputStream: public HTTPFixedLengthIOS, public std:
 public:
 	HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthInputStream();
-	
+
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };
@@ -98,7 +98,7 @@ public:
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
-	
+
 private:
 	static Poco::MemoryPool _pool;
 };

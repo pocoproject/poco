@@ -34,40 +34,46 @@ class Net_API NameValueCollection
 	///
 	/// The name is case-insensitive.
 	///
-	/// There can be more than one name-value pair with the 
+	/// There can be more than one name-value pair with the
 	/// same name.
 {
 public:
-	typedef Poco::ListMap<std::string, std::string> HeaderMap;
-	typedef HeaderMap::Iterator Iterator;
-	typedef HeaderMap::ConstIterator ConstIterator;
-	
+	using HeaderMap = Poco::ListMap<std::string, std::string>;
+	using Iterator = HeaderMap::Iterator;
+	using ConstIterator = HeaderMap::ConstIterator;
+
 	NameValueCollection();
 		/// Creates an empty NameValueCollection.
 
 	NameValueCollection(const NameValueCollection& nvc);
 		/// Creates a NameValueCollection by copying another one.
 
+	NameValueCollection(NameValueCollection&& nvc) noexcept;
+		/// Creates a NameValueCollection by moving another one.
+
 	virtual ~NameValueCollection();
 		/// Destroys the NameValueCollection.
 
 	NameValueCollection& operator = (const NameValueCollection& nvc);
 		/// Assigns the name-value pairs of another NameValueCollection to this one.
-		
-	void swap(NameValueCollection& nvc);
+
+	NameValueCollection& operator = (NameValueCollection&& nvc) noexcept;
+		/// Moves the name-value pairs of another NameValueCollection to this one.
+
+	void swap(NameValueCollection& nvc) noexcept;
 		/// Swaps the NameValueCollection with another one.
-		
+
 	const std::string& operator [] (const std::string& name) const;
 		/// Returns the value of the (first) name-value pair with the given name.
 		///
 		/// Throws a NotFoundException if the name-value pair does not exist.
-		
-	void set(const std::string& name, const std::string& value);	
+
+	void set(const std::string& name, const std::string& value);
 		/// Sets the value of the (first) name-value pair with the given name.
-		
+
 	void add(const std::string& name, const std::string& value);
 		/// Adds a new name-value pair with the given name and value.
-		
+
 	const std::string& get(const std::string& name) const;
 		/// Returns the value of the first name-value pair with the given name.
 		///
@@ -84,15 +90,15 @@ public:
 	ConstIterator find(const std::string& name) const;
 		/// Returns an iterator pointing to the first name-value pair
 		/// with the given name.
-		
+
 	ConstIterator begin() const;
 		/// Returns an iterator pointing to the begin of
 		/// the name-value pair collection.
-		
+
 	ConstIterator end() const;
-		/// Returns an iterator pointing to the end of 
+		/// Returns an iterator pointing to the end of
 		/// the name-value pair collection.
-		
+
 	bool empty() const;
 		/// Returns true iff the header does not have any content.
 
@@ -114,7 +120,7 @@ private:
 //
 // inlines
 //
-inline void swap(NameValueCollection& nvc1, NameValueCollection& nvc2)
+inline void swap(NameValueCollection& nvc1, NameValueCollection& nvc2) noexcept
 {
 	nvc1.swap(nvc2);
 }

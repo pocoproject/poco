@@ -2,40 +2,49 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="SSLCore">
-      <UniqueIdentifier>{d16911b8-6911-4215-99e6-29b496f7b5ca}</UniqueIdentifier>
+      <UniqueIdentifier>{a907450a-b497-4e1f-a21c-94a99e197c2d}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Header Files">
-      <UniqueIdentifier>{0f09c25b-be19-4c22-b345-f62cf5019704}</UniqueIdentifier>
+      <UniqueIdentifier>{93918e37-d134-42d7-b345-2e60ab41e1f9}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Source Files">
-      <UniqueIdentifier>{bc905c40-5072-43e0-a081-cf3b108533c8}</UniqueIdentifier>
+      <UniqueIdentifier>{0a1bfd58-52a7-4c7d-b55d-4ed2d505056b}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{e5661c9a-8329-4f79-a450-b00401b9fc9e}</UniqueIdentifier>
+      <UniqueIdentifier>{9d771387-7041-4c75-acd4-3ba1a7ee1159}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{756c1bc5-d898-439c-9715-6db781986be1}</UniqueIdentifier>
+      <UniqueIdentifier>{10a12d98-5377-4052-816a-c0b51bedcff2}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{14e262c9-63f9-48aa-9c76-7d7d5e959f14}</UniqueIdentifier>
+      <UniqueIdentifier>{15231b28-83ac-4cf7-9fd5-21e3332f7850}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets">
-      <UniqueIdentifier>{72f72669-3a86-44a0-867a-372466c0153a}</UniqueIdentifier>
+      <UniqueIdentifier>{c9510bba-ee39-4c5b-ab65-f5e007511540}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Header Files">
-      <UniqueIdentifier>{9d55c007-7a09-4d40-bce7-b8c3af8643e7}</UniqueIdentifier>
+      <UniqueIdentifier>{313c058b-29ad-47dd-92ca-549a23920413}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Source Files">
-      <UniqueIdentifier>{c3034828-db54-4b8c-9a18-149c41847028}</UniqueIdentifier>
+      <UniqueIdentifier>{0fa5153c-28be-4dbc-893f-d9d12147e0f4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail">
-      <UniqueIdentifier>{53ab6ae2-95eb-4a01-b8a9-f8b5658be22c}</UniqueIdentifier>
+      <UniqueIdentifier>{1c539a87-3151-4667-a766-db7a0eac4f0d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Header Files">
-      <UniqueIdentifier>{9122ac58-370d-4672-8fac-f7a7d9d29e9a}</UniqueIdentifier>
+      <UniqueIdentifier>{42493a3a-e40e-4ec0-829f-1b79acbe5156}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Source Files">
-      <UniqueIdentifier>{24dfc999-b400-4a9e-80cc-d83d372da324}</UniqueIdentifier>
+      <UniqueIdentifier>{e4e19c42-5e42-4e8e-a19d-bf13dcabdeb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPSClient">
+      <UniqueIdentifier>{ec69f65f-615a-4c71-86b4-9f2a78c07ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPSClient\Header Files">
+      <UniqueIdentifier>{c710847c-203f-4940-901b-942d666967f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FTPSClient\Source Files">
+      <UniqueIdentifier>{24844a06-9949-446f-99cb-bdeed264e2cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +132,12 @@
     <ClInclude Include="include\Poco\Net\SecureSMTPClientSession.h">
       <Filter>Mail\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPSClientSession.h">
+      <Filter>FTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPSStreamFactory.h">
+      <Filter>FTPSClient\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AcceptCertificateHandler.cpp">
@@ -205,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="src\SecureSMTPClientSession.cpp">
       <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientSession.cpp">
+      <Filter>FTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSStreamFactory.cpp">
+      <Filter>FTPSClient\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

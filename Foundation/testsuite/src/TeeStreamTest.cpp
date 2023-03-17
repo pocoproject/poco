@@ -37,7 +37,7 @@ void TeeStreamTest::testTeeInputStream()
 	tis.addStream(ostr);
 	std::string s;
 	tis >> s;
-	assert (ostr.str() == "foo");
+	assertTrue (ostr.str() == "foo");
 }
 
 
@@ -48,8 +48,8 @@ void TeeStreamTest::testTeeOutputStream()
 	TeeOutputStream tos(ostr1);
 	tos.addStream(ostr2);
 	tos << "bar" << std::flush;
-	assert (ostr1.str() == "bar");
-	assert (ostr2.str() == "bar");
+	assertTrue (ostr1.str() == "bar");
+	assertTrue (ostr2.str() == "bar");
 }
 
 

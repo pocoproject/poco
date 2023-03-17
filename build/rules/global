@@ -13,6 +13,10 @@
 # POCO_TARGET_OSARCH: Target system architecture (forr cross builds)
 #
 
+target := $(strip $(target))
+target_version := $(strip $(target_version))
+target_libs := $(strip $(target_libs))
+
 #
 # Check for POCO_BASE
 #
@@ -197,6 +201,7 @@ COMPONENT := $(shell $(POCO_BASE)/build/script/projname "$(PROJECT_BASE)")
 #
 SRCDIR   = src
 INCDIR   = include
+GENDIR   = gen
 LIBDIR   = lib/$(OSNAME)/$(OSARCH)
 BINDIR   = bin/$(OSNAME)/$(OSARCH)
 OBJDIR   = obj/$(OSNAME)/$(OSARCH)
@@ -229,14 +234,22 @@ else
 POCO_LIBRARY = -L$(POCO_BASE)/$(LIBDIR)
 endif
 
+ifeq ($(MACCHINA_BASE),)
+MACCHINA_LIBRARY =
+else ifeq ($(MACCHINA_BASE),$(PROJECT_BASE))
+MACCHINA_LIBRARY =
+else
+MACCHINA_LIBRARY = -L$(MACCHINA_BASE)/$(LIBDIR)
+endif
+
 ifndef LIBPREFIX
 LIBPREFIX = lib
 endif
 
-ifeq ($(LIBPATH),$(POCO_BASE)/$(LIBDIR))
-LD_LIBRARY_PATH = $(LIBPATH)
+ifeq ($(POCO_HOST_LIBPATH),$(POCO_BASE)/$(POCO_HOST_LIBDIR))
+LD_LIBRARY_PATH = $(POCO_HOST_LIBPATH)
 else
-LD_LIBRARY_PATH = $(LIBPATH):$(POCO_BASE)/$(LIBDIR)
+LD_LIBRARY_PATH = $(POCO_HOST_LIBPATH):$(POCO_BASE)/$(POCO_HOST_LIBDIR)
 endif
 ifeq ($(POCO_HOST_OSNAME),Darwin)
 SET_LD_LIBRARY_PATH = DYLD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
@@ -277,7 +290,7 @@ endif
 COMMONFLAGS = -DPOCO_BUILD_HOST='"'$(HOSTNAME)'"' -DPOCO_TARGET_OSNAME='"'$(OSNAME)'"' -DPOCO_TARGET_OSARCH='"'$(OSARCH)'"' $(POCO_FLAGS)
 CFLAGS     += $(COMMONFLAGS) $(SYSFLAGS)
 CXXFLAGS   += $(COMMONFLAGS) $(SYSFLAGS)
-LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)
+LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS) $(POCO_LDFLAGS)
 
 ifeq ($(OSARCH_64BITS),1)
 CFLAGS     += $(CFLAGS64)
@@ -309,13 +322,13 @@ INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(f
 #
 # Build Library Directory List
 #
-LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(foreach p,$(POCO_ADD_LIBRARY),-L$(p))
+LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(MACCHINA_LIBRARY) $(foreach p,$(POCO_ADD_LIBRARY),-L$(p))
 
 #
 # Strip Command definition
 #
 ifeq ($(strip $(STRIP)),)
-STRIPCMD = 
+STRIPCMD =
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
 endif

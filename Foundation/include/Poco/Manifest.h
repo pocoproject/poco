@@ -100,7 +100,7 @@ public:
 		{
 			return _it->second;
 		}
-		
+
 	private:
 		typename MetaMap::const_iterator _it;
 	};
@@ -145,9 +145,9 @@ public:
 	void clear()
 		/// Removes all MetaObjects from the manifest.
 	{
-		for (typename MetaMap::iterator it = _metaMap.begin(); it != _metaMap.end(); ++it)
+		for (auto& p: _metaMap)
 		{
-			delete it->second;
+			delete p.second;
 		}
 		_metaMap.clear();
 	}

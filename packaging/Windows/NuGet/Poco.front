@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
+  <metadata>
+    <id>Poco.$id$.vs$vs$.$mode$</id>
+    <version>$version$</version>
+    <title>Pocoproject Poco $id$ vs$vs$ $mode$</title>
+    <authors>Applied Informatics &amp; Contributors</authors>
+    <owners>Guenter Obiltschnig &amp; Aleksandar Fabijanic</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type='expression'>BSL-1.0</license>
+    <icon>image\poco.png</icon>
+    <projectUrl>https://pocoproject.org/</projectUrl>
+    <description>Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.</description>
+    <releaseNotes>releaseNotes</releaseNotes>
+    <copyright>Copyright 2006-2020</copyright>
+    <language></language>
+    <tags>native string filesystem thread date log event regex uri uuid cache nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml</tags>
+    <repository type='git' url='git@github.com:pocoproject/poco.git' branch='poco-$version$' />
+    <dependencies>
+      <dependency id='Poco.$id$.vs$vs$.noarch' version='$version$' />

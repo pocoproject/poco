@@ -47,19 +47,19 @@ DOMException::DOMException(unsigned short code):
 {
 }
 
-	
+
 DOMException::DOMException(const DOMException& exc):
 	XMLException(exc),
 	_code(exc._code)
 {
 }
 
-	
-DOMException::~DOMException() throw()
+
+DOMException::~DOMException() noexcept
 {
 }
 
-	
+
 DOMException& DOMException::operator = (const DOMException& exc)
 {
 	if (&exc != this)
@@ -71,13 +71,13 @@ DOMException& DOMException::operator = (const DOMException& exc)
 }
 
 
-const char* DOMException::name() const throw()
+const char* DOMException::name() const noexcept
 {
 	return "DOMException";
 }
 
 
-const char* DOMException::className() const throw()
+const char* DOMException::className() const noexcept
 {
 	return typeid(*this).name();
 }

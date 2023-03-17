@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <mysql.h>
 
 
 //
@@ -50,11 +51,28 @@
 //
 // Automatically link Data library.
 //
-#if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MySQL_EXPORTS)
+#if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
+	#if !defined(MySQL_EXPORTS)
 		#pragma comment(lib, "PocoDataMySQL" POCO_LIB_SUFFIX)
+	#endif
+	#if defined(LIBMARIADB)
+		#pragma comment(lib, "libmariadb")
+	#else
+		#pragma comment(lib, "libmysql")
 	#endif
 #endif
 
+//
+// Detect support for JSON data type
+//
+#if defined(MARIADB_VERSION_ID)
+	#if MARIADB_VERSION_ID >= 100207
+		#define POCO_MYSQL_JSON
+	#endif
+#else
+	#if MYSQL_VERSION_ID >= 50708
+		#define POCO_MYSQL_JSON
+	#endif
+#endif
 
 #endif // MySQL_MySQL_INCLUDED

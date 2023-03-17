@@ -15,7 +15,10 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
 #include <sstream>
+#include <fstream>
 
 
 using namespace Poco::Crypto;
@@ -102,7 +105,7 @@ void RSATest::testNewKeys()
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -125,7 +128,7 @@ void RSATest::testNewKeysNoPassphrase()
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -146,7 +149,7 @@ void RSATest::testSign()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub);
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
+	assertTrue (eng2.verify(sig));
 }
 
 
@@ -167,7 +170,7 @@ void RSATest::testSignSha256()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub, "SHA256");
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
+	assertTrue (eng2.verify(sig));
 }
 
 
@@ -189,7 +192,7 @@ void RSATest::testSignManipulated()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub);
 	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
-	assert (!eng2.verify(sig));
+	assertTrue (!eng2.verify(sig));
 }
 
 
@@ -201,8 +204,35 @@ void RSATest::testRSACipher()
 		std::string val(n, 'x');
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
-		assert (dec == val);
+		assertTrue (dec == val);
 	}
+
+	RSAKey key(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	std::string pubKeyFile = Poco::Path::temp() + "poco.key.pub";
+	std::string privKeyFile = Poco::Path::temp() + "poco.key.priv";
+
+	if (Poco::File(pubKeyFile).exists()) Poco::File(pubKeyFile).remove();
+	if (Poco::File(privKeyFile).exists()) Poco::File(privKeyFile).remove();
+	std::ofstream strPub(pubKeyFile);
+	std::ofstream strPriv(privKeyFile);
+	key.save(&strPub, &strPriv);
+	strPub.close();
+	strPriv.close();
+
+    Poco::Crypto::RSAKey encryptKey(pubKeyFile);
+	Poco::Crypto::RSAKey decryptKey(pubKeyFile, privKeyFile);
+
+    Poco::Crypto::CipherFactory factory;
+    auto iengine = factory.createCipher(encryptKey);
+    auto oengine = factory.createCipher(decryptKey);
+
+    std::string ss = "test_str";
+    auto enc = iengine->encryptString(ss);
+    auto dec = oengine->decryptString(enc);
+    assertEqual (ss, dec);
+
+	delete iengine;
+	delete oengine;
 }
 
 
@@ -221,14 +251,14 @@ void RSATest::testRSACipherLarge()
 	sizes.push_back (16383);
 	sizes.push_back (16384);
 	sizes.push_back (16385);
-	
+
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
 	for (std::vector<std::size_t>::const_iterator it = sizes.begin(); it != sizes.end(); ++it)
 	{
 		std::string val(*it, 'x');
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
-		assert (dec == val);
+		assertTrue (dec == val);
 	}
 }
 
@@ -243,10 +273,10 @@ void RSATest::testCertificate()
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(publicKey);
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(privateKey);
 	std::string val("lets do some encryption");
-	
+
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
-	assert (dec == val);
+	assertTrue (dec == val);
 }
 
 

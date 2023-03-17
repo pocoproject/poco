@@ -193,7 +193,7 @@ void XMLWriter::startDocument()
 
 	if (_options & WRITE_XML_DECLARATION)
 		writeXMLDeclaration();
-	
+
 	_contentWritten = true;
 	_namespaces.reset();
 	_namespaces.pushContext();
@@ -234,7 +234,7 @@ void XMLWriter::endFragment()
 {
 	if (_depth > 1)
 		throw XMLException("Not well-formed (at least one tag has no matching end tag)");
-	
+
 	_inFragment   = false;
 	_elementCount = 0;
 	_depth        = -1;
@@ -250,16 +250,16 @@ void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& loc
 
 void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
-	if (_depth == 0 && !_inFragment && _elementCount > 1) 
+	if (_depth == 0 && !_inFragment && _elementCount > 1)
 		throw XMLException("Not well-formed. Second root element found", nameToString(localName, qname));
-	
+
 	if (_unclosedStartTag) closeStartTag();
 	prettyPrint();
 	if (_options & CANONICAL_XML)
 		writeCanonicalStartElement(namespaceURI, localName, qname, attributes);
-	else		
+	else
 		writeStartElement(namespaceURI, localName, qname, attributes);
-	_elementStack.push_back(Name(qname, namespaceURI, localName));
+	_elementStack.emplace_back(qname, namespaceURI, localName);
 	_contentWritten = false;
 	++_depth;
 }
@@ -595,7 +595,7 @@ void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString
 		_namespaces.pushContext();
 	_nsContextPushed = false;
 	++_elementCount;
-	
+
 	declareAttributeNamespaces(attributes);
 
 	writeMarkup(MARKUP_LT);
@@ -643,7 +643,7 @@ void XMLWriter::writeCanonicalStartElement(const XMLString& namespaceURI, const 
 		_namespaces.pushContext();
 	_nsContextPushed = false;
 	++_elementCount;
-	
+
 	declareNamespaces(namespaceURI, localName, qname, attributes);
 
 	writeMarkup(MARKUP_LT);
@@ -706,7 +706,7 @@ void XMLWriter::closeStartTag()
 
 void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
-	std::map<XMLString, std::set<XMLString> > usedNamespaces;
+	std::map<XMLString, std::set<XMLString>> usedNamespaces;
 	bool defaultNameSpaceUsed = false;
 	XMLString defaultNamespaceURI = _namespaces.getURI(XMLString());
 	XMLString local;
@@ -726,7 +726,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		XMLString attributeNamespaceURI = attributes.getURI(i);
 		XMLString attributeLocalName    = attributes.getLocalName(i);
 		XMLString attributeQName        = attributes.getQName(i);
-	
+
 		XMLString attributePrefix;
 		XMLString attributeLocal;
 		Name::split(attributeQName, attributePrefix, attributeLocal);
@@ -738,32 +738,32 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 			defaultNameSpaceUsed = defaultNameSpaceUsed || (!defaultNamespaceURI.empty() &&  attributeNamespaceURI == defaultNamespaceURI);
 		}
 	}
-	for (std::map<XMLString, std::set<XMLString> >::const_iterator it = usedNamespaces.begin(); it != usedNamespaces.end(); ++it)
+	for (const auto& p: usedNamespaces)
 	{
-		const std::set<XMLString> namespaceURIs = it->second;
-		for (std::set<XMLString>::const_iterator itURI = namespaceURIs.begin(); itURI != namespaceURIs.end(); ++itURI)
+		const std::set<XMLString> namespaceURIs = p.second;
+		for (const auto& nsURI: namespaceURIs)
 		{
-			XMLString prefix = it->first;
-			if (prefix.empty()) 
-				prefix = _namespaces.getPrefix(*itURI);
-			if (prefix.empty() && !_namespaces.isMapped(*itURI))
+			XMLString prefix = p.first;
+			if (prefix.empty())
+				prefix = _namespaces.getPrefix(nsURI);
+			if (prefix.empty() && !_namespaces.isMapped(nsURI))
 			{
 				if (defaultNameSpaceUsed)
 				{
-					if (*itURI != defaultNamespaceURI)
+					if (nsURI != defaultNamespaceURI)
 						prefix = uniquePrefix();
 				}
 				else
 				{
-					defaultNamespaceURI = *itURI;
+					defaultNamespaceURI = nsURI;
 					defaultNameSpaceUsed = true;
 				}
 
 			}
 			const XMLString& uri = _namespaces.getURI(prefix);
-			if ((uri.empty() || uri != *itURI) && !itURI->empty()) 
+			if ((uri.empty() || uri != nsURI) && !nsURI.empty())
 			{
-				_namespaces.declarePrefix(prefix, *itURI);
+				_namespaces.declarePrefix(prefix, nsURI);
 			}
 		}
 	}
@@ -803,12 +803,11 @@ void XMLWriter::addNamespaceAttributes(AttributeMap& attributeMap)
 {
 	NamespaceSupport::PrefixSet prefixes;
 	_namespaces.getDeclaredPrefixes(prefixes);
-	for (NamespaceSupport::PrefixSet::const_iterator it = prefixes.begin(); it != prefixes.end(); ++it)
+	for (const auto& prefix: prefixes)
 	{
-		XMLString prefix = *it;
-		XMLString uri    = _namespaces.getURI(prefix);
-		XMLString qname  = NamespaceSupport::XMLNS_NAMESPACE_PREFIX;
-		
+		XMLString uri   = _namespaces.getURI(prefix);
+		XMLString qname = NamespaceSupport::XMLNS_NAMESPACE_PREFIX;
+
 		if (!prefix.empty())
 		{
 			qname.append(toXMLString(MARKUP_COLON));
@@ -823,12 +822,11 @@ void XMLWriter::addNamespaceAttributes(CanonicalAttributeMap& attributeMap)
 {
 	NamespaceSupport::PrefixSet prefixes;
 	_namespaces.getDeclaredPrefixes(prefixes);
-	for (NamespaceSupport::PrefixSet::const_iterator it = prefixes.begin(); it != prefixes.end(); ++it)
+	for (const auto& prefix: prefixes)
 	{
-		XMLString prefix = *it;
-		XMLString uri    = _namespaces.getURI(prefix);
-		XMLString qname  = NamespaceSupport::XMLNS_NAMESPACE_PREFIX;
-		
+		XMLString uri   = _namespaces.getURI(prefix);
+		XMLString qname = NamespaceSupport::XMLNS_NAMESPACE_PREFIX;
+
 		if (!prefix.empty())
 		{
 			qname.append(toXMLString(MARKUP_COLON));
@@ -898,7 +896,7 @@ void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attribu
 
 void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 {
-	for (AttributeMap::const_iterator it = attributeMap.begin(); it != attributeMap.end(); ++it)
+	for (const auto& ap: attributeMap)
 	{
 		if ((_options & PRETTY_PRINT) && (_options & PRETTY_PRINT_ATTRIBUTES))
 		{
@@ -909,11 +907,10 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 		{
 			writeMarkup(MARKUP_SPACE);
 		}
-		writeXML(it->first);
+		writeXML(ap.first);
 		writeMarkup(MARKUP_EQQUOT);
-		for (XMLString::const_iterator itc = it->second.begin(); itc != it->second.end(); ++itc)
+		for (auto c: ap.second)
 		{
-			XMLChar c = *itc;
 			switch (c)
 			{
 			case '"':  writeMarkup(MARKUP_QUOTENC); break;
@@ -926,7 +923,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -937,7 +934,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 
 void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 {
-	for (CanonicalAttributeMap::const_iterator it = attributeMap.begin(); it != attributeMap.end(); ++it)
+	for (const auto& ap: attributeMap)
 	{
 		if ((_options & PRETTY_PRINT) && (_options & PRETTY_PRINT_ATTRIBUTES))
 		{
@@ -948,11 +945,10 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 		{
 			writeMarkup(MARKUP_SPACE);
 		}
-		writeXML(it->second.first);
+		writeXML(ap.second.first);
 		writeMarkup(MARKUP_EQQUOT);
-		for (XMLString::const_iterator itc = it->second.second.begin(); itc != it->second.second.end(); ++itc)
+		for (auto c: ap.second.second)
 		{
-			XMLChar c = *itc;
 			switch (c)
 			{
 			case '"':  writeMarkup(MARKUP_QUOTENC); break;
@@ -965,7 +961,7 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -1005,8 +1001,8 @@ void XMLWriter::writeName(const XMLString& prefix, const XMLString& localName)
 	}
 	else
 	{
-		writeXML(prefix); 
-		writeMarkup(MARKUP_COLON); 
+		writeXML(prefix);
+		writeMarkup(MARKUP_COLON);
 		writeXML(localName);
 	}
 }

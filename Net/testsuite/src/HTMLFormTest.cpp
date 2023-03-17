@@ -37,7 +37,7 @@ namespace
 		StringPartHandler()
 		{
 		}
-		
+
 		void handlePart(const MessageHeader& header, std::istream& stream)
 		{
 			_disp = header["Content-Disposition"];
@@ -49,7 +49,7 @@ namespace
 				ch = stream.get();
 			}
 		}
-		
+
 		const std::string& data() const
 		{
 			return _data;
@@ -64,7 +64,7 @@ namespace
 		{
 			return _type;
 		}
-		
+
 	private:
 		std::string _data;
 		std::string _disp;
@@ -91,11 +91,11 @@ void HTMLFormTest::testWriteUrl()
 	form.set("field3", "value=3");
 	form.set("field4", "value&4");
 	form.set("field5", "value+5");
-	
+
 	std::ostringstream ostr;
 	form.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "field1=value1&field2=value%202&field3=value%3D3&field4=value%264&field5=value%2B5");
+	assertTrue (s == "field1=value1&field2=value%202&field3=value%3D3&field4=value%264&field5=value%2B5");
 }
 
 
@@ -106,16 +106,16 @@ void HTMLFormTest::testWriteMultipart()
 	form.set("field2", "value 2");
 	form.set("field3", "value=3");
 	form.set("field4", "value&4");
-	
+
 	form.addPart("attachment1", new StringPartSource("This is an attachment"));
 	StringPartSource* pSPS = new StringPartSource("This is another attachment", "text/plain", "att2.txt");
 	pSPS->headers().set("Content-ID", "1234abcd");
 	form.addPart("attachment2", pSPS);
-	
+
 	std::ostringstream ostr;
 	form.write(ostr, "MIME_boundary_0123456789");
 	std::string s = ostr.str();
-	assert (s == 
+	assertTrue (s ==
 		"--MIME_boundary_0123456789\r\n"
 		"Content-Disposition: form-data; name=\"field1\"\r\n"
 		"\r\n"
@@ -145,7 +145,7 @@ void HTMLFormTest::testWriteMultipart()
 		"This is another attachment\r\n"
 		"--MIME_boundary_0123456789--\r\n"
 	);
-	assert(s.length() == form.calculateContentLength());
+	assertTrue (s.length() == form.calculateContentLength());
 }
 
 
@@ -153,11 +153,11 @@ void HTMLFormTest::testReadUrlGET()
 {
 	HTTPRequest req("GET", "/form.cgi?field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 	HTMLForm form(req);
-	assert (form.size() == 4);
-	assert (form["field1"] == "value1");
-	assert (form["field2"] == "value 2");
-	assert (form["field3"] == "value=3");
-	assert (form["field4"] == "value&4");
+	assertTrue (form.size() == 4);
+	assertTrue (form["field1"] == "value1");
+	assertTrue (form["field2"] == "value 2");
+	assertTrue (form["field3"] == "value=3");
+	assertTrue (form["field4"] == "value&4");
 }
 
 
@@ -165,22 +165,22 @@ void HTMLFormTest::testReadUrlGETMultiple()
 {
 	HTTPRequest req("GET", "/form.cgi?field1=value1&field1=value%202&field1=value%3D3&field1=value%264");
 	HTMLForm form(req);
-	assert (form.size() == 4);
-	
+	assertTrue (form.size() == 4);
+
 	HTMLForm::ConstIterator it = form.find("field1");
-	assert (it != form.end());
-	assert (it->first == "field1" && it->second == "value1");
+	assertTrue (it != form.end());
+	assertTrue (it->first == "field1" && it->second == "value1");
 	++it;
-	assert (it != form.end());
-	assert (it->first == "field1" && it->second == "value 2");
+	assertTrue (it != form.end());
+	assertTrue (it->first == "field1" && it->second == "value 2");
 	++it;
-	assert (it != form.end());
-	assert (it->first == "field1" && it->second == "value=3");
+	assertTrue (it != form.end());
+	assertTrue (it->first == "field1" && it->second == "value=3");
 	++it;
-	assert (it != form.end());
-	assert (it->first == "field1" && it->second == "value&4");
+	assertTrue (it != form.end());
+	assertTrue (it->first == "field1" && it->second == "value&4");
 	++it;
-	assert (it == form.end());
+	assertTrue (it == form.end());
 }
 
 
@@ -189,12 +189,12 @@ void HTMLFormTest::testReadUrlPOST()
 	HTTPRequest req("POST", "/form.cgi?field0=value0");
 	std::istringstream istr("field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 	HTMLForm form(req, istr);
-	assert (form.size() == 5);
-	assert (form["field0"] == "value0");
-	assert (form["field1"] == "value1");
-	assert (form["field2"] == "value 2");
-	assert (form["field3"] == "value=3");
-	assert (form["field4"] == "value&4");
+	assertTrue (form.size() == 5);
+	assertTrue (form["field0"] == "value0");
+	assertTrue (form["field1"] == "value1");
+	assertTrue (form["field2"] == "value 2");
+	assertTrue (form["field3"] == "value=3");
+	assertTrue (form["field4"] == "value&4");
 }
 
 
@@ -203,12 +203,12 @@ void HTMLFormTest::testReadUrlPUT()
 	HTTPRequest req("PUT", "/form.cgi?field0=value0");
 	std::istringstream istr("field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 	HTMLForm form(req, istr);
-	assert (form.size() == 5);
-	assert (form["field0"] == "value0");
-	assert (form["field1"] == "value1");
-	assert (form["field2"] == "value 2");
-	assert (form["field3"] == "value=3");
-	assert (form["field4"] == "value&4");
+	assertTrue (form.size() == 5);
+	assertTrue (form["field0"] == "value0");
+	assertTrue (form["field1"] == "value1");
+	assertTrue (form["field2"] == "value 2");
+	assertTrue (form["field3"] == "value=3");
+	assertTrue (form["field4"] == "value&4");
 }
 
 
@@ -217,12 +217,12 @@ void HTMLFormTest::testReadUrlBOM()
 	HTTPRequest req("PUT", "/form.cgi?field0=value0");
 	std::istringstream istr("\357\273\277field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 	HTMLForm form(req, istr);
-	assert (form.size() == 5);
-	assert (form["field0"] == "value0");
-	assert (form["field1"] == "value1");
-	assert (form["field2"] == "value 2");
-	assert (form["field3"] == "value=3");
-	assert (form["field4"] == "value&4");
+	assertTrue (form.size() == 5);
+	assertTrue (form["field0"] == "value0");
+	assertTrue (form["field1"] == "value1");
+	assertTrue (form["field2"] == "value 2");
+	assertTrue (form["field3"] == "value=3");
+	assertTrue (form["field4"] == "value&4");
 }
 
 
@@ -256,16 +256,16 @@ void HTMLFormTest::testReadMultipart()
 	HTTPRequest req("POST", "/form.cgi");
 	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=\"MIME_boundary_0123456789\"");
 	StringPartHandler sah;
-	HTMLForm form(req, istr, sah);	
-	assert (form.size() == 4);
-	assert (form["field1"] == "value1");
-	assert (form["field2"] == "value 2");
-	assert (form["field3"] == "value=3");
-	assert (form["field4"] == "value&4");
+	HTMLForm form(req, istr, sah);
+	assertTrue (form.size() == 4);
+	assertTrue (form["field1"] == "value1");
+	assertTrue (form["field2"] == "value 2");
+	assertTrue (form["field3"] == "value=3");
+	assertTrue (form["field4"] == "value&4");
 
-	assert (sah.type() == "text/plain");
-	assert (sah.disp() == "file; name=\"attachment1\"; filename=\"att1.txt\"");
-	assert (sah.data() == "This is an attachment");
+	assertTrue (sah.type() == "text/plain");
+	assertTrue (sah.disp() == "file; name=\"attachment1\"; filename=\"att1.txt\"");
+	assertTrue (sah.data() == "This is an attachment");
 }
 
 
@@ -276,10 +276,10 @@ void HTMLFormTest::testSubmit1()
 	form.set("field2", "value 2");
 	form.set("field3", "value=3");
 	form.set("field4", "value&4");
-	
+
 	HTTPRequest req("GET", "/form.cgi");
 	form.prepareSubmit(req);
-	assert (req.getURI() == "/form.cgi?field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
+	assertTrue (req.getURI() == "/form.cgi?field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 }
 
 
@@ -290,10 +290,11 @@ void HTMLFormTest::testSubmit2()
 	form.set("field2", "value 2");
 	form.set("field3", "value=3");
 	form.set("field4", "value&4");
-	
+
 	HTTPRequest req("POST", "/form.cgi");
 	form.prepareSubmit(req);
-	assert (req.getContentType() == HTMLForm::ENCODING_URL);
+	assertTrue (req.getContentType() == HTMLForm::ENCODING_URL);
+	assertTrue (req.getContentLength() == 64);
 }
 
 
@@ -304,15 +305,15 @@ void HTMLFormTest::testSubmit3()
 	form.set("field2", "value 2");
 	form.set("field3", "value=3");
 	form.set("field4", "value&4");
-	
+
 	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
 	form.prepareSubmit(req);
 	std::string expCT(HTMLForm::ENCODING_MULTIPART);
 	expCT.append("; boundary=\"");
 	expCT.append(form.boundary());
 	expCT.append("\"");
-	assert (req.getContentType() == expCT);
-	assert (req.getChunkedTransferEncoding());
+	assertTrue (req.getContentType() == expCT);
+	assertTrue (req.getChunkedTransferEncoding());
 }
 
 
@@ -323,11 +324,30 @@ void HTMLFormTest::testSubmit4()
 	form.add("field1", "value 2");
 	form.add("field1", "value=3");
 	form.add("field1", "value&4");
-	
+
 	HTTPRequest req("GET", "/form.cgi");
 	form.prepareSubmit(req);
 
-	assert (req.getURI() == "/form.cgi?field1=value1&field1=value%202&field1=value%3D3&field1=value%264");
+	assertTrue (req.getURI() == "/form.cgi?field1=value1&field1=value%202&field1=value%3D3&field1=value%264");
+}
+
+
+void HTMLFormTest::testSubmit5()
+{
+	HTMLForm form(HTMLForm::ENCODING_MULTIPART);
+	form.set("field1", "value1");
+	form.set("field2", "value 2");
+	form.set("field3", "value=3");
+	form.set("field4", "value&4");
+
+	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
+	form.prepareSubmit(req, HTMLForm::OPT_USE_CONTENT_LENGTH);
+	std::string expCT(HTMLForm::ENCODING_MULTIPART);
+	expCT.append("; boundary=\"");
+	expCT.append(form.boundary());
+	expCT.append("\"");
+	assertTrue (req.getContentType() == expCT);
+	assertTrue (req.getContentLength() == 403);
 }
 
 
@@ -381,7 +401,7 @@ void HTMLFormTest::testFieldLimitMultipart()
 	form.setFieldLimit(3);
 	try
 	{
-		form.load(req, istr, sah);	
+		form.load(req, istr, sah);
 		fail("field limit violated - must throw");
 	}
 	catch (Poco::Net::HTMLFormException&)
@@ -416,6 +436,7 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit3);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit4);
+	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit5);
 	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitUrl);
 	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitMultipart);
 

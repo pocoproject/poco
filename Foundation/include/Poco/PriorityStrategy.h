@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class PriorityStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// NotificationStrategy for PriorityEvent.
 	///
@@ -34,10 +34,10 @@ class PriorityStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// by their priority.
 {
 public:
-	typedef TDelegate*                   DelegateHandle;
-	typedef SharedPtr<TDelegate>         DelegatePtr;
-	typedef std::vector<DelegatePtr>     Delegates;
-	typedef typename Delegates::iterator Iterator;
+	using DelegateHandle = TDelegate*;
+	using DelegatePtr = SharedPtr<TDelegate>;
+	using Delegates = std::vector<DelegatePtr>;
+	using Iterator = typename Delegates::iterator;
 
 public:
 	PriorityStrategy()
@@ -139,10 +139,10 @@ class PriorityStrategy<void, TDelegate>
 	/// by their priority.
 {
 public:
-	typedef TDelegate*                   DelegateHandle;
-	typedef SharedPtr<TDelegate>         DelegatePtr;
-	typedef std::vector<DelegatePtr>     Delegates;
-	typedef typename Delegates::iterator Iterator;
+	using DelegateHandle = TDelegate*;
+	using DelegatePtr = SharedPtr<TDelegate>;
+	using Delegates = std::vector<DelegatePtr>;
+	using Iterator = typename Delegates::iterator;
 
 public:
 

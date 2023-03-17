@@ -12,6 +12,7 @@
 //
 
 
+#include "Poco/ProcessOptions.h"
 #include "Poco/Process_UNIX.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -66,7 +67,31 @@ int ProcessHandleImpl::wait() const
 	while (rc < 0 && errno == EINTR);
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	return WEXITSTATUS(status);
+
+	if (WIFEXITED(status)) // normal termination
+		return WEXITSTATUS(status);
+	else // termination by a signal
+		return 256 + WTERMSIG(status);
+}
+
+
+int ProcessHandleImpl::tryWait() const
+{
+	int status;
+	int rc;
+	do
+	{
+		rc = waitpid(_pid, &status, WNOHANG);
+	}
+	while (rc < 0 && errno == EINTR);
+	if (rc == 0)
+		return -1;
+	if (rc != _pid)
+		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+	if (WIFEXITED(status)) // normal termination
+		return WEXITSTATUS(status);
+	else // termination by a signal
+		return 256 + WTERMSIG(status);
 }
 
 
@@ -88,7 +113,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if defined(__QNX__)
 	if (initialDirectory.empty())
@@ -97,8 +122,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		char** argv = new char*[args.size() + 2];
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
-		for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
-			argv[i++] = const_cast<char*>(it->c_str());
+		for (const auto& a: args)
+			argv[i++] = const_cast<char*>(a.c_str());
 		argv[i] = NULL;
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
@@ -107,7 +132,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
 		fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
-	
+
 		char** envPtr = 0;
 		std::vector<char> envChars;
 		std::vector<char*> envPtrs;
@@ -125,48 +150,56 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			envPtrs.push_back(0);
 			envPtr = &envPtrs[0];
 		}
-	
+
 		int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
 		delete [] argv;
-		if (pid == -1) 
+		if (pid == -1)
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
+		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
 		return new ProcessHandleImpl(pid);
 	}
 	else
 	{
-		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options);
 	}
 #else
-	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options);
 #endif
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if !defined(POCO_NO_FORK_EXEC)
+	// On some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number,
+	// which would closing all file descriptors up to that number extremely slow.
+	// We therefore limit the maximum number of file descriptors we close.
+	const long CLOSE_FD_MAX = 100000;
+
 	// We must not allocated memory after fork(),
 	// therefore allocate all required buffers first.
 	std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
 	std::vector<char*> argv(args.size() + 2);
 	int i = 0;
 	argv[i++] = const_cast<char*>(command.c_str());
-	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+	for (const auto& a: args)
 	{
-		argv[i++] = const_cast<char*>(it->c_str());
+		argv[i++] = const_cast<char*>(a.c_str());
 	}
 	argv[i] = NULL;
-	
+
 	const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
 
 	int pid = fork();
 	if (pid < 0)
 	{
-		throw SystemException("Cannot fork process for", command);		
+		throw SystemException("Cannot fork process for", command);
 	}
 	else if (pid == 0)
 	{
@@ -193,13 +226,20 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			dup2(inPipe->readHandle(), STDIN_FILENO);
 			inPipe->close(Pipe::CLOSE_BOTH);
 		}
+		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
+
 		// outPipe and errPipe may be the same, so we dup first and close later
 		if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
 		if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
+		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
+		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
 		// close all open file descriptors other than stdin, stdout, stderr
-		for (int i = 3; i < sysconf(_SC_OPEN_MAX); ++i)
+		long fdMax = sysconf(_SC_OPEN_MAX);
+		// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
+		if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
+		for (long i = 3; i < fdMax; ++i)
 		{
 			close(i);
 		}
@@ -247,19 +287,19 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid)  
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0) 
+	if (kill(pid, 0) == 0)
 	{
 		return true;
-	} 
-	else 
+	}
+	else
 	{
 		return false;
 	}
 }
 
-				
+
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
 	if (kill(pid, SIGINT) != 0)

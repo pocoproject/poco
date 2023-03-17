@@ -40,7 +40,7 @@ void OptionProcessorTest::testUnix()
 			.required(false)
 			.repeatable(true)
 			.argument("path"));
-			
+
 	set.addOption(
 		Option("library-dir", "L", "specify a search path for locating library files")
 			.required(false)
@@ -56,7 +56,7 @@ void OptionProcessorTest::testUnix()
 		.description("enable verbose mode")
 		.required(false)
 		.repeatable(false));
-		
+
 	set.addOption(
 		Option("optimize", "O")
 		.description("enable optimization")
@@ -64,7 +64,7 @@ void OptionProcessorTest::testUnix()
 		.repeatable(false)
 		.argument("level", false)
 		.group("mode"));
-		
+
 	set.addOption(
 		Option("debug", "g")
 		.description("generate debug information")
@@ -81,40 +81,40 @@ void OptionProcessorTest::testUnix()
 	OptionProcessor p1(set);
 	std::string name;
 	std::string value;
-	
-	assert (p1.process("-I/usr/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/include");
 
-	assert (p1.process("--include:/usr/local/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/local/include");
-	
-	assert (p1.process("-I", name, value));
-	assert (name.empty());
-	assert (value.empty());
-	assert (p1.process("/usr/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/include");
+	assertTrue (p1.process("-I/usr/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/include");
 
-	assert (p1.process("-I", name, value));
-	assert (name.empty());
-	assert (value.empty());
-	assert (p1.process("-L", name, value));
-	assert (name == "include-dir");
-	assert (value == "-L");
+	assertTrue (p1.process("--include:/usr/local/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/local/include");
 
-	assert (p1.process("--lib=/usr/local/lib", name, value));
-	assert (name == "library-dir");
-	assert (value == "/usr/local/lib");
-	
-	assert (p1.process("-ofile", name, value));
-	assert (name == "output");
-	assert (value == "file");
-	
-	assert (!p1.process("src/file.cpp", name, value));
-	assert (!p1.process("/src/file.cpp", name, value));
-	
+	assertTrue (p1.process("-I", name, value));
+	assertTrue (name.empty());
+	assertTrue (value.empty());
+	assertTrue (p1.process("/usr/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/include");
+
+	assertTrue (p1.process("-I", name, value));
+	assertTrue (name.empty());
+	assertTrue (value.empty());
+	assertTrue (p1.process("-L", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "-L");
+
+	assertTrue (p1.process("--lib=/usr/local/lib", name, value));
+	assertTrue (name == "library-dir");
+	assertTrue (value == "/usr/local/lib");
+
+	assertTrue (p1.process("-ofile", name, value));
+	assertTrue (name == "output");
+	assertTrue (value == "file");
+
+	assertTrue (!p1.process("src/file.cpp", name, value));
+	assertTrue (!p1.process("/src/file.cpp", name, value));
+
 	try
 	{
 		p1.process("--output:file", name, value);
@@ -123,11 +123,11 @@ void OptionProcessorTest::testUnix()
 	catch (Poco::Util::DuplicateOptionException&)
 	{
 	}
-	
-	assert (p1.process("-g", name, value));
-	assert (name == "debug");
-	assert (value == "");
-	
+
+	assertTrue (p1.process("-g", name, value));
+	assertTrue (name == "debug");
+	assertTrue (value == "");
+
 	try
 	{
 		p1.process("--optimize", name, value);
@@ -136,7 +136,7 @@ void OptionProcessorTest::testUnix()
 	catch (Poco::Util::IncompatibleOptionsException&)
 	{
 	}
-	
+
 	try
 	{
 		p1.process("-x", name, value);
@@ -165,7 +165,7 @@ void OptionProcessorTest::testDefault()
 			.required(false)
 			.repeatable(true)
 			.argument("path"));
-			
+
 	set.addOption(
 		Option("library-dir", "L", "specify a search path for locating library files")
 			.required(false)
@@ -181,7 +181,7 @@ void OptionProcessorTest::testDefault()
 		.description("enable verbose mode")
 		.required(false)
 		.repeatable(false));
-		
+
 	set.addOption(
 		Option("optimize", "O")
 		.description("enable optimization")
@@ -189,7 +189,7 @@ void OptionProcessorTest::testDefault()
 		.repeatable(false)
 		.argument("level", false)
 		.group("mode"));
-		
+
 	set.addOption(
 		Option("debug", "g")
 		.description("generate debug information")
@@ -207,33 +207,33 @@ void OptionProcessorTest::testDefault()
 	p1.setUnixStyle(false);
 	std::string name;
 	std::string value;
-	
-	assert (p1.process("/Inc:/usr/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/include");
 
-	assert (p1.process("/include:/usr/local/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/local/include");
+	assertTrue (p1.process("/Inc:/usr/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/include");
 
-	assert (p1.process("/Inc", name, value));
-	assert (name.empty());
-	assert (value.empty());
-	assert (p1.process("/usr/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/include");
+	assertTrue (p1.process("/include:/usr/local/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/local/include");
 
-	assert (p1.process("/lib=/usr/local/lib", name, value));
-	assert (name == "library-dir");
-	assert (value == "/usr/local/lib");
-	
-	assert (p1.process("/out:file", name, value));
-	assert (name == "output");
-	assert (value == "file");
-	
-	assert (!p1.process("src/file.cpp", name, value));
-	assert (!p1.process("\\src\\file.cpp", name, value));
-	
+	assertTrue (p1.process("/Inc", name, value));
+	assertTrue (name.empty());
+	assertTrue (value.empty());
+	assertTrue (p1.process("/usr/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/include");
+
+	assertTrue (p1.process("/lib=/usr/local/lib", name, value));
+	assertTrue (name == "library-dir");
+	assertTrue (value == "/usr/local/lib");
+
+	assertTrue (p1.process("/out:file", name, value));
+	assertTrue (name == "output");
+	assertTrue (value == "file");
+
+	assertTrue (!p1.process("src/file.cpp", name, value));
+	assertTrue (!p1.process("\\src\\file.cpp", name, value));
+
 	try
 	{
 		p1.process("/output:file", name, value);
@@ -242,11 +242,11 @@ void OptionProcessorTest::testDefault()
 	catch (Poco::Util::DuplicateOptionException&)
 	{
 	}
-	
-	assert (p1.process("/debug", name, value));
-	assert (name == "debug");
-	assert (value == "");
-	
+
+	assertTrue (p1.process("/debug", name, value));
+	assertTrue (name == "debug");
+	assertTrue (value == "");
+
 	try
 	{
 		p1.process("/OPT", name, value);
@@ -255,7 +255,7 @@ void OptionProcessorTest::testDefault()
 	catch (Poco::Util::IncompatibleOptionsException&)
 	{
 	}
-	
+
 	try
 	{
 		p1.process("/x", name, value);
@@ -287,7 +287,7 @@ void OptionProcessorTest::testRequired()
 	OptionProcessor p1(set);
 	std::string name;
 	std::string value;
-	
+
 	try
 	{
 		p1.checkRequired();
@@ -296,8 +296,8 @@ void OptionProcessorTest::testRequired()
 	catch (Poco::Util::MissingOptionException&)
 	{
 	}
-	
-	assert (p1.process("-o", name, value));
+
+	assertTrue (p1.process("-o", name, value));
 	p1.checkRequired();
 }
 
@@ -310,7 +310,7 @@ void OptionProcessorTest::testArgs()
 			.required(false)
 			.repeatable(true)
 			.argument("path"));
-		
+
 	set.addOption(
 		Option("optimize", "O")
 		.description("enable optimization")
@@ -321,36 +321,36 @@ void OptionProcessorTest::testArgs()
 	OptionProcessor p1(set);
 	std::string name;
 	std::string value;
-	
-	assert (p1.process("-I/usr/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/include");
 
-	assert (p1.process("--include:/usr/local/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/local/include");
-	
-	assert (p1.process("-I", name, value));
-	assert (name.empty());
-	assert (value.empty());
-	assert (p1.process("/usr/include", name, value));
-	assert (name == "include-dir");
-	assert (value == "/usr/include");
+	assertTrue (p1.process("-I/usr/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/include");
 
-	assert (p1.process("-I", name, value));
-	assert (name.empty());
-	assert (value.empty());
-	assert (p1.process("-L", name, value));
-	assert (name == "include-dir");
-	assert (value == "-L");
+	assertTrue (p1.process("--include:/usr/local/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/local/include");
 
-	assert (p1.process("-O", name, value));
-	assert (name == "optimize");
-	assert (value.empty());
-	
-	assert (p1.process("-O2", name, value));
-	assert (name == "optimize");
-	assert (value == "2");
+	assertTrue (p1.process("-I", name, value));
+	assertTrue (name.empty());
+	assertTrue (value.empty());
+	assertTrue (p1.process("/usr/include", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "/usr/include");
+
+	assertTrue (p1.process("-I", name, value));
+	assertTrue (name.empty());
+	assertTrue (value.empty());
+	assertTrue (p1.process("-L", name, value));
+	assertTrue (name == "include-dir");
+	assertTrue (value == "-L");
+
+	assertTrue (p1.process("-O", name, value));
+	assertTrue (name == "optimize");
+	assertTrue (value.empty());
+
+	assertTrue (p1.process("-O2", name, value));
+	assertTrue (name == "optimize");
+	assertTrue (value == "2");
 }
 
 

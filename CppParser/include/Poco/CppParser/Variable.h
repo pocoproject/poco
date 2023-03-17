@@ -37,13 +37,13 @@ public:
 		VAR_VOLATILE = 4, /// The variable is volatile.
 		VAR_CONST    = 8  /// The variable is const.
 	};
-	
+
 	Variable(const std::string& decl, NameSpace* pNameSpace);
 		/// Creates the Variable.
 
 	~Variable();
 		/// Destroys the Variable.
-		
+
 	int flags() const;
 		/// Returns the variable's flags.
 
@@ -57,7 +57,7 @@ public:
 		///
 		/// Example: a type const std::string& -> std::string, a type const std::string* returns std::string
 
-		
+
 private:
 	int _flags;
 	bool _isPointer;

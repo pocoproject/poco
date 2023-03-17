@@ -37,12 +37,12 @@ void MultipartReaderTest::testReadOnePart()
 	std::string s("\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.boundary() == "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.boundary() == "MIME_boundary_01234567");
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -51,8 +51,8 @@ void MultipartReaderTest::testReadOnePart()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is part 1");
-	assert (!r.hasNextPart());
+	assertTrue (part == "this is part 1");
+	assertTrue (!r.hasNextPart());
 	try
 	{
 		r.nextPart(h);
@@ -69,11 +69,11 @@ void MultipartReaderTest::testReadTwoParts()
 	std::string s("\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -82,10 +82,10 @@ void MultipartReaderTest::testReadTwoParts()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is part 1");
-	assert (r.hasNextPart());
+	assertTrue (part == "this is part 1");
+	assertTrue (r.hasNextPart());
 	r.nextPart(h);
-	assert (h.empty());
+	assertTrue (h.empty());
 	std::istream& ii = r.stream();
 	part.clear();
 	ch = ii.get();
@@ -94,7 +94,7 @@ void MultipartReaderTest::testReadTwoParts()
 		part += (char) ch;
 		ch = ii.get();
 	}
-	assert (part == "this is part 2\r\n");
+	assertTrue (part == "this is part 2\r\n");
 
 	try
 	{
@@ -112,11 +112,11 @@ void MultipartReaderTest::testReadEmptyLines()
 	std::string s("\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is\r\npart 1\r\n\r\n--MIME_boundary_01234567\r\n\r\nthis\r\n\r\nis part 2\r\n\r\n\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -125,10 +125,10 @@ void MultipartReaderTest::testReadEmptyLines()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is\r\npart 1\r\n");
-	assert (r.hasNextPart());
+	assertTrue (part == "this is\r\npart 1\r\n");
+	assertTrue (r.hasNextPart());
 	r.nextPart(h);
-	assert (h.empty());
+	assertTrue (h.empty());
 	std::istream& ii = r.stream();
 	part.clear();
 	ch = ii.get();
@@ -137,7 +137,7 @@ void MultipartReaderTest::testReadEmptyLines()
 		part += (char) ch;
 		ch = ii.get();
 	}
-	assert (part == "this\r\n\r\nis part 2\r\n\r\n");
+	assertTrue (part == "this\r\n\r\nis part 2\r\n\r\n");
 
 	try
 	{
@@ -158,11 +158,11 @@ void MultipartReaderTest::testReadLongPart()
 	s.append("\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -171,10 +171,10 @@ void MultipartReaderTest::testReadLongPart()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == longPart);
-	assert (r.hasNextPart());
+	assertTrue (part == longPart);
+	assertTrue (r.hasNextPart());
 	r.nextPart(h);
-	assert (h.empty());
+	assertTrue (h.empty());
 	std::istream& ii = r.stream();
 	part.clear();
 	ch = ii.get();
@@ -183,7 +183,7 @@ void MultipartReaderTest::testReadLongPart()
 		part += (char) ch;
 		ch = ii.get();
 	}
-	assert (part == "this is part 2");
+	assertTrue (part == "this is part 2");
 
 	try
 	{
@@ -201,12 +201,12 @@ void MultipartReaderTest::testGuessBoundary()
 	std::string s("\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr);
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (r.boundary() == "MIME_boundary_01234567");
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (r.boundary() == "MIME_boundary_01234567");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -215,8 +215,8 @@ void MultipartReaderTest::testGuessBoundary()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is part 1");
-	assert (!r.hasNextPart());
+	assertTrue (part == "this is part 1");
+	assertTrue (!r.hasNextPart());
 	try
 	{
 		r.nextPart(h);
@@ -233,11 +233,11 @@ void MultipartReaderTest::testPreamble()
 	std::string s("this is the\r\npreamble\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -246,8 +246,8 @@ void MultipartReaderTest::testPreamble()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is part 1");
-	assert (!r.hasNextPart());
+	assertTrue (part == "this is part 1");
+	assertTrue (!r.hasNextPart());
 	try
 	{
 		r.nextPart(h);
@@ -264,7 +264,7 @@ void MultipartReaderTest::testBadBoundary()
 	std::string s("\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_7654321");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	try
 	{
@@ -281,11 +281,11 @@ void MultipartReaderTest::testRobustness()
 	std::string s("--MIME_boundary_01234567\rname1: value1\r\n\nthis is part 1\n--MIME_boundary_01234567--");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -294,8 +294,8 @@ void MultipartReaderTest::testRobustness()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is part 1");
-	assert (!r.hasNextPart());
+	assertTrue (part == "this is part 1");
+	assertTrue (!r.hasNextPart());
 	try
 	{
 		r.nextPart(h);
@@ -312,11 +312,11 @@ void MultipartReaderTest::testUnixLineEnds()
 	std::string s("\n--MIME_boundary_01234567\nname1: value1\n\nthis is part 1\n--MIME_boundary_01234567\n\nthis is part 2\n\n--MIME_boundary_01234567--\n");
 	std::istringstream istr(s);
 	MultipartReader r(istr, "MIME_boundary_01234567");
-	assert (r.hasNextPart());
+	assertTrue (r.hasNextPart());
 	MessageHeader h;
 	r.nextPart(h);
-	assert (h.size() == 1);
-	assert (h["name1"] == "value1");
+	assertTrue (h.size() == 1);
+	assertTrue (h["name1"] == "value1");
 	std::istream& i = r.stream();
 	int ch = i.get();
 	std::string part;
@@ -325,10 +325,10 @@ void MultipartReaderTest::testUnixLineEnds()
 		part += (char) ch;
 		ch = i.get();
 	}
-	assert (part == "this is part 1");
-	assert (r.hasNextPart());
+	assertTrue (part == "this is part 1");
+	assertTrue (r.hasNextPart());
 	r.nextPart(h);
-	assert (h.empty());
+	assertTrue (h.empty());
 	std::istream& ii = r.stream();
 	part.clear();
 	ch = ii.get();
@@ -337,7 +337,7 @@ void MultipartReaderTest::testUnixLineEnds()
 		part += (char) ch;
 		ch = ii.get();
 	}
-	assert (part == "this is part 2\n");
+	assertTrue (part == "this is part 2\n");
 
 	try
 	{

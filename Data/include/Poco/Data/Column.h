@@ -34,19 +34,19 @@ namespace Data {
 template <class C>
 class Column
 	/// Column class is column data container.
-	/// Data (a pointer to underlying STL container) is assigned to the class 
+	/// Data (a pointer to underlying STL container) is assigned to the class
 	/// at construction time. Construction with null pointer is not allowed.
 	/// This class owns the data assigned to it and deletes the storage on destruction.
 {
 public:
-	typedef C                                  Container;
-	typedef Poco::SharedPtr<C>                 ContainerPtr;
-	typedef typename C::const_iterator         Iterator;
-	typedef typename C::const_reverse_iterator RIterator;
-	typedef typename C::size_type              Size;
-	typedef typename C::value_type             Type;
+	using Container = C;
+	using ContainerPtr = Poco::SharedPtr<C>;
+	using Iterator = typename C::const_iterator;
+	using RIterator = typename C::const_reverse_iterator;
+	using Size = typename C::size_type;
+	using Type = typename C::value_type;
 
-	Column(const MetaColumn& metaColumn, Container* pData): 
+	Column(const MetaColumn& metaColumn, Container* pData):
 		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
@@ -55,9 +55,16 @@ public:
 			throw NullPointerException("Container pointer must point to valid storage.");
 	}
 
-	Column(const Column& col): 
-		_metaColumn(col._metaColumn), 
+	Column(const Column& col):
+		_metaColumn(col._metaColumn),
 		_pData(col._pData)
+		/// Creates the Column.
+	{
+	}
+
+	Column(Column&& col) noexcept:
+		_metaColumn(std::move(col._metaColumn)),
+		_pData(std::move(col._pData))
 		/// Creates the Column.
 	{
 	}
@@ -75,7 +82,15 @@ public:
 		return *this;
 	}
 
-	void swap(Column& other)
+	Column& operator = (Column&& col) noexcept
+		/// Assignment operator.
+	{
+		_metaColumn = std::move(col._metaColumn);
+		_pData = std::move(col._pData);
+		return *this;
+	}
+
+	void swap(Column& other) noexcept
 		/// Swaps the column with another one.
 	{
 		using std::swap;
@@ -97,8 +112,8 @@ public:
 			return _pData->at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -172,28 +187,28 @@ private:
 
 
 template <>
-class Column<std::vector<bool> >
+class Column<std::vector<bool>>
 	/// The std::vector<bool> specialization for the Column class.
-	/// 
+	///
 	/// This specialization is necessary due to the nature of std::vector<bool>.
-	/// For details, see the standard library implementation of vector<bool> 
+	/// For details, see the standard library implementation of vector<bool>
 	/// or
 	/// S. Meyers: "Effective STL" (Copyright Addison-Wesley 2001),
 	/// Item 18: "Avoid using vector<bool>."
-	/// 
+	///
 	/// The workaround employed here is using deque<bool> as an
 	/// internal "companion" container kept in sync with the vector<bool>
 	/// column data.
 {
 public:
-	typedef std::vector<bool>                 Container;
-	typedef Poco::SharedPtr<Container>        ContainerPtr;
-	typedef Container::const_iterator         Iterator;
-	typedef Container::const_reverse_iterator RIterator;
-	typedef Container::size_type              Size;
+	using Container = std::vector<bool>;
+	using ContainerPtr = Poco::SharedPtr<Container>;
+	using Iterator = Container::const_iterator;
+	using RIterator = Container::const_reverse_iterator;
+	using Size = Container::size_type;
 
-	Column(const MetaColumn& metaColumn, Container* pData): 
-		_metaColumn(metaColumn), 
+	Column(const MetaColumn& metaColumn, Container* pData):
+		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -201,8 +216,8 @@ public:
 		_deque.assign(_pData->begin(), _pData->end());
 	}
 
-	Column(const Column& col): 
-		_metaColumn(col._metaColumn), 
+	Column(const Column& col):
+		_metaColumn(col._metaColumn),
 		_pData(col._pData)
 		/// Creates the Column.
 	{
@@ -222,7 +237,7 @@ public:
 		return *this;
 	}
 
-	void swap(Column& other)
+	void swap(Column& other) noexcept
 		/// Swaps the column with another one.
 	{
 		using std::swap;
@@ -248,8 +263,8 @@ public:
 			return _deque.at(row) = _pData->at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -325,18 +340,18 @@ private:
 
 
 template <class T>
-class Column<std::list<T> >
+class Column<std::list<T>>
 	/// Column specialization for std::list
 {
 public:
-	typedef std::list<T>                               Container;
-	typedef Poco::SharedPtr<Container>                 ContainerPtr;
-	typedef typename Container::const_iterator         Iterator;
-	typedef typename Container::const_reverse_iterator RIterator;
-	typedef typename Container::size_type              Size;
+	using Container = std::list<T>;
+	using ContainerPtr = Poco::SharedPtr<Container>;
+	using Iterator = typename Container::const_iterator;
+	using RIterator = typename Container::const_reverse_iterator;
+	using Size = typename Container::size_type;
 
-	Column(const MetaColumn& metaColumn, std::list<T>* pData): 
-		_metaColumn(metaColumn), 
+	Column(const MetaColumn& metaColumn, std::list<T>* pData):
+		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -363,7 +378,7 @@ public:
 		return *this;
 	}
 
-	void swap(Column& other)
+	void swap(Column& other) noexcept
 		/// Swaps the column with another one.
 	{
 		using std::swap;
@@ -380,7 +395,7 @@ public:
 	const T& value(std::size_t row) const
 		/// Returns the field value in specified row.
 		/// This is the std::list specialization and std::list
-		/// is not the optimal solution for cases where random 
+		/// is not the optimal solution for cases where random
 		/// access is needed.
 		/// However, to allow for compatibility with other
 		/// containers, this functionality is provided here.
@@ -404,7 +419,7 @@ public:
 				if (i == row) return *it;
 		}
 
-		throw RangeException("Invalid row number."); 
+		throw RangeException("Invalid row number.");
 	}
 
 	const T& operator [] (std::size_t row) const
@@ -477,7 +492,7 @@ private:
 
 
 template <typename C>
-inline void swap(Column<C>& c1, Column<C>& c2)
+inline void swap(Column<C>& c1, Column<C>& c2) noexcept
 {
 	c1.swap(c2);
 }

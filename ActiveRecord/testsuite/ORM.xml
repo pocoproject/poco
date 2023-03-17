@@ -1,0 +1,15 @@
+<project namespace="ORM">
+	<class name="Employee" table="employees">
+		<property name="id" type="uuid"/>
+		<property name="name" type="string"/>
+		<property name="ssn" type="string"/>
+		<property name="role" type="int16" references="Role"/>
+		<property name="manager" type="uuid" references="Employee" cardinality="?"/>
+	</class>
+
+	<class name="Role" table="roles" autoIncrementID="true">
+		<property name="id" type="int16"/>
+		<property name="name" type="string"/>
+		<property name="description" type="string"/>
+	</class>
+</project>

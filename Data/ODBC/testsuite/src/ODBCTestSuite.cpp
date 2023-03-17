@@ -26,15 +26,15 @@ CppUnit::Test* ODBCTestSuite::suite()
 
 	// WARNING!
 	// On Win XP Pro, the PostgreSQL connection fails if attempted after DB2 w/ following error:
-	// 
-	// sqlState="IM003" 
-	// message="Specified driver could not be loaded due to system error  127 (PostgreSQL ANSI)." 
-	// nativeError=160 
+	//
+	// sqlState="IM003"
+	// message="Specified driver could not be loaded due to system error  127 (PostgreSQL ANSI)."
+	// nativeError=160
 	// System error 127 is "The specified procedure could not be found."
 	// This problem does not manifest with Mammoth ODBCng PostgreSQL driver.
 	//
 	// Oracle tests do not exit cleanly if Oracle driver is loaded after DB2.
-	// 
+	//
 	// For the time being, the workaround is to connect to DB2 after connecting to PostgreSQL and Oracle.
 
 	addTest(pSuite, ODBCMySQLTest::suite());

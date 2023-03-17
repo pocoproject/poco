@@ -38,10 +38,10 @@ class Zip_API ZipArchive
 	/// A ZipArchive contains information on the content of a zip file
 {
 public:
-	typedef std::map<std::string, ZipLocalFileHeader> FileHeaders;
-	typedef std::map<std::string, ZipFileInfo> FileInfos;
-	typedef std::map<Poco::UInt16, ZipArchiveInfo> DirectoryInfos;
-	typedef std::map<Poco::UInt32, ZipArchiveInfo64> DirectoryInfos64;
+	using FileHeaders = std::map<std::string, ZipLocalFileHeader>;
+	using FileInfos = std::map<std::string, ZipFileInfo>;
+	using DirectoryInfos = std::map<Poco::UInt16, ZipArchiveInfo>;
+	using DirectoryInfos64 = std::map<Poco::UInt32, ZipArchiveInfo64>;
 
 	ZipArchive(std::istream& in);
 		/// Creates the ZipArchive from a file. Note that the in stream will be in state failed after the constructor is finished
@@ -78,7 +78,7 @@ private:
 		/// Stores directory info for all found disks
 	DirectoryInfos64 _disks64;
 		/// Stores directory info for all found disks
-		
+
 	static const std::string EMPTY_COMMENT;
 
 	friend class Compress;

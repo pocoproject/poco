@@ -14,7 +14,7 @@
 
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/Dynamic/Struct.h"
+//#include "Poco/Dynamic/Struct.h"
 #undef min
 #undef max
 #include <limits>
@@ -27,16 +27,24 @@ namespace Dynamic {
 const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-VarIterator::VarIterator(Var* pVar, bool positionEnd): 
+VarIterator::VarIterator(Var* pVar, bool positionEnd):
 	_pVar(pVar),
 	_position(positionEnd ? POSITION_END : 0)
 {
+    if (!_pVar || _pVar->isEmpty()) throw InvalidAccessException("Cannot create iterator on empty Var");
 }
 
 
 VarIterator::VarIterator(const VarIterator& other):
 	_pVar(other._pVar),
 	_position(other._position)
+{
+}
+
+
+VarIterator::VarIterator(VarIterator&& other) noexcept:
+	_pVar(std::move(other._pVar)),
+	_position(std::move(other._position))
 {
 }
 
@@ -54,10 +62,18 @@ VarIterator& VarIterator::operator = (const VarIterator& other)
 }
 
 
+VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
+{
+	_pVar = std::move(other._pVar);
+	_position = std::move(other._position);
+	return *this;
+}
+
+
 void VarIterator::swap(VarIterator& other)
 {
 	using std::swap;
-	
+
 	swap(_pVar, other._pVar);
 	swap(_position, other._position);
 }

@@ -64,7 +64,7 @@ public:
 	~ExpirationDecorator()
 	{
 	}
-	
+
 	const Poco::Timestamp& getExpiration() const
 	{
 		return _expiresAt;

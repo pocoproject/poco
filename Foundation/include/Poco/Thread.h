@@ -21,6 +21,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
+#include <thread>
+#include <chrono>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -52,7 +54,7 @@ class Foundation_API Thread: private ThreadImpl
 	/// Furthermore, a thread can be assigned a name.
 	/// The name of a thread can be changed at any time.
 {
-public:	
+public:
 	typedef ThreadImpl::TIDImpl TID;
 
 	using ThreadImpl::Callable;
@@ -66,7 +68,7 @@ public:
 		PRIO_HIGH    = PRIO_HIGH_IMPL,   /// A higher than normal thread priority.
 		PRIO_HIGHEST = PRIO_HIGHEST_IMPL /// The highest thread priority.
 	};
-	
+
 	enum Policy
 	{
 		POLICY_DEFAULT = POLICY_DEFAULT_IMPL
@@ -74,10 +76,10 @@ public:
 
 	Thread();
 		/// Creates a thread. Call start() to start it.
-		
+
 	Thread(const std::string& name);
 		/// Creates a named thread. Call start() to start it.
-		
+
 	~Thread();
 		/// Destroys the thread.
 
@@ -95,6 +97,7 @@ public:
 
 	void setName(const std::string& name);
 		/// Sets the name of the thread.
+		/// Note that it only take effect before start method invoked.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.
@@ -112,17 +115,17 @@ public:
 		/// a scheduling policy can be specified. The policy is currently
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
-		
+
 	int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
 		/// specific priority value.
 		///
 		/// May return 0 if the priority has not been explicitly set.
-		
+
 	static int getMinOSPriority(int policy = POLICY_DEFAULT);
 		/// Returns the minimum operating system-specific priority value,
 		/// which can be passed to setOSPriority() for the given policy.
-		
+
 	static int getMaxOSPriority(int policy = POLICY_DEFAULT);
 		/// Returns the maximum operating system-specific priority value,
 		/// which can be passed to setOSPriority() for the given policy.
@@ -144,26 +147,39 @@ public:
 		/// valid during the entire lifetime of the thread, as
 		/// only a reference to it is stored internally.
 
+	void start(Poco::SharedPtr<Runnable> pTarget);
+		/// Starts the thread with the given target.
+		///
+		/// The Thread ensures that the given target stays
+		/// alive while the thread is running.
+
 	void start(Callable target, void* pData = 0);
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>
-	void startFunc(Functor fn)
+	void startFunc(const Functor& fn)
 		/// Starts the thread with the given functor object or lambda.
 	{
 		startImpl(new FunctorRunnable<Functor>(fn));
 	}
 
+	template <class Functor>
+	void startFunc(Functor&& fn)
+		/// Starts the thread with the given functor object or lambda.
+	{
+		startImpl(new FunctorRunnable<Functor>(std::move(fn)));
+	}
+
 	void join();
-		/// Waits until the thread completes execution.	
+		/// Waits until the thread completes execution.
 		/// If multiple threads try to join the same
 		/// thread, the result is undefined.
-		
+
 	void join(long milliseconds);
 		/// Waits for at most the given interval for the thread
 		/// to complete. Throws a TimeoutException if the thread
 		/// does not complete within the specified time interval.
-		
+
 	bool tryJoin(long milliseconds);
 		/// Waits for at most the given interval for the thread
 		/// to complete. Returns true if the thread has finished,
@@ -175,9 +191,9 @@ public:
 	static bool trySleep(long milliseconds);
 		/// Starts an interruptible sleep. When trySleep() is called,
 		/// the thread will remain suspended until:
-		///   - the timeout expires or 
+		///   - the timeout expires or
 		///   - wakeUp() is called
-		/// 
+		///
 		/// Function returns true if sleep attempt was completed, false
 		/// if sleep was interrupted by a wakeUp() call.
 		/// A frequent scenario where trySleep()/wakeUp() pair of functions
@@ -185,14 +201,17 @@ public:
 		/// with periodic activity between the idle times; trying to sleep
 		/// (as opposed to sleeping) allows immediate ending of idle thread
 		/// from the outside.
-		/// 
-		/// The trySleep() and wakeUp() calls should be used with 
-		/// understanding that the suspended state is not a true sleep, 
-		/// but rather a state of waiting for an event, with timeout 
-		/// expiration. This makes order of calls significant; calling 
-		/// wakeUp() before calling trySleep() will prevent the next  
-		/// trySleep() call to actually suspend the thread (which, in 
+		///
+		/// The trySleep() and wakeUp() calls should be used with
+		/// understanding that the suspended state is not a true sleep,
+		/// but rather a state of waiting for an event, with timeout
+		/// expiration. This makes order of calls significant; calling
+		/// wakeUp() before calling trySleep() will prevent the next
+		/// trySleep() call to actually suspend the thread (which, in
 		/// some scenarios, may be desirable behavior).
+		///
+		/// Note that, unlike Thread::sleep(), this function can only
+		/// be succesfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
@@ -211,8 +230,22 @@ public:
 		/// Returns the Thread object for the currently active thread.
 		/// If the current thread is the main thread, 0 is returned.
 
- 	static TID currentTid();
- 		/// Returns the native thread ID for the current thread.    
+	static TID currentTid();
+		/// Returns the native thread ID for the current thread.
+
+	static long currentOsTid();
+		/// Returns the operating system specific thread ID for the current thread.
+
+	bool setAffinity(int coreId);
+		/// Sets the thread affinity to the coreID.
+		/// Returns true if succesful.
+		/// Returns false if not succesful or not
+		/// implemented.
+
+	int getAffinity() const;
+		/// Returns the thread affinity.
+		/// Negative value means the thread has
+		/// no CPU core affinity.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -223,7 +256,7 @@ protected:
 
 	std::string makeName();
 		/// Creates a unique name for a thread.
-		
+
 	static int uniqueId();
 		/// Creates and returns a unique id for a thread.
 
@@ -236,6 +269,11 @@ protected:
 		{
 		}
 
+		FunctorRunnable(Functor&& functor):
+			_functor(std::move(functor))
+		{
+		}
+
 		~FunctorRunnable()
 		{
 		}
@@ -244,7 +282,7 @@ protected:
 		{
 			_functor();
 		}
-	
+
 	private:
 		Functor _functor;
 	};
@@ -254,10 +292,8 @@ private:
 	Thread& operator = (const Thread&);
 
 	int                 _id;
-	std::string         _name;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
-	mutable FastMutex   _mutex;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -281,17 +317,13 @@ inline int Thread::id() const
 
 inline std::string Thread::name() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
-	return _name;
+	return getNameImpl();
 }
 
 
 inline std::string Thread::getName() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
-	return _name;
+	return getNameImpl();
 }
 
 
@@ -301,15 +333,15 @@ inline bool Thread::isRunning() const
 }
 
 
-inline void Thread::sleep(long milliseconds)
-{
-	sleepImpl(milliseconds);
-}
-
-
 inline void Thread::yield()
 {
 	yieldImpl();
+}
+
+
+inline void Thread::sleep(long milliseconds)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 
@@ -321,22 +353,22 @@ inline Thread* Thread::current()
 
 inline void Thread::setOSPriority(int prio, int policy)
 {
-	setOSPriorityImpl(prio, policy);	
+	setOSPriorityImpl(prio, policy);
 }
 
-	
+
 inline int Thread::getOSPriority() const
 {
 	return getOSPriorityImpl();
 }
 
-	
+
 inline int Thread::getMinOSPriority(int policy)
 {
 	return ThreadImpl::getMinOSPriorityImpl(policy);
 }
 
-	
+
 inline int Thread::getMaxOSPriority(int policy)
 {
 	return ThreadImpl::getMaxOSPriorityImpl(policy);
@@ -358,6 +390,22 @@ inline int Thread::getStackSize() const
 inline Thread::TID Thread::currentTid()
 {
 	return currentTidImpl();
+}
+
+inline long Thread::currentOsTid()
+{
+	return currentOsTidImpl();
+}
+
+inline bool Thread::setAffinity(int coreId)
+{
+	return setAffinityImpl(coreId);
+}
+
+
+inline int Thread::getAffinity() const
+{
+	return getAffinityImpl();
 }
 
 

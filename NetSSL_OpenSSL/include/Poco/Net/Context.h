@@ -20,9 +20,12 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SocketDefs.h"
+#include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
 #include <cstdlib>
@@ -41,20 +44,39 @@ class NetSSL_API Context: public Poco::RefCountedObject
 	///
 	/// The Context class is also used to control
 	/// SSL session caching on the server and client side.
+	///
+	/// A Note Regarding TLSv1.3 Support:
+	///
+	/// TLSv1.3 support requires at least OpenSSL version 1.1.1.
+	/// Make sure that the TLSv1.3 cipher suites are enabled:
+	///
+	///   - TLS_AES_256_GCM_SHA384
+	///   - TLS_CHACHA20_POLY1305_SHA256
+	///   - TLS_AES_128_GCM_SHA256
+	///   - TLS_AES_128_CCM_8_SHA256
+	///   - TLS_AES_128_CCM_SHA256
+	///
+	/// The first three of the above cipher suites should be enabled
+	/// by default in OpenSSL if you do not provide an explicit
+	/// cipher configuration (cipherList).
 {
 public:
-	typedef Poco::AutoPtr<Context> Ptr;
+	using Ptr = Poco::AutoPtr<Context>;
 
 	enum Usage
 	{
-		CLIENT_USE, 	    /// Context is used by a client.
-		SERVER_USE,         /// Context is used by a server.
-		TLSV1_CLIENT_USE,   /// Context is used by a client requiring TLSv1.
-		TLSV1_SERVER_USE,   /// Context is used by a server requiring TLSv1.
-		TLSV1_1_CLIENT_USE, /// Context is used by a client requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
-		TLSV1_1_SERVER_USE, /// Context is used by a server requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
-		TLSV1_2_CLIENT_USE, /// Context is used by a client requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
-		TLSV1_2_SERVER_USE  /// Context is used by a server requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
+		TLS_CLIENT_USE,     /// Context is used by a client for TLSv1 or higher. Use requireMinimumProtocol() or disableProtocols() to disable undesired older versions.
+		TLS_SERVER_USE,     /// Context is used by a client for TLSv1 or higher. Use requireMinimumProtocol() or disableProtocols() to disable undesired older versions.
+		CLIENT_USE, 	    /// DEPRECATED. Context is used by a client.
+		SERVER_USE,         /// DEPRECATED. Context is used by a server.
+		TLSV1_CLIENT_USE,   /// DEPRECATED. Context is used by a client requiring TLSv1.
+		TLSV1_SERVER_USE,   /// DEPRECATED. Context is used by a server requiring TLSv1.
+		TLSV1_1_CLIENT_USE, /// DEPRECATED. Context is used by a client requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
+		TLSV1_1_SERVER_USE, /// DEPRECATED. Context is used by a server requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
+		TLSV1_2_CLIENT_USE, /// DEPRECATED. Context is used by a client requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
+		TLSV1_2_SERVER_USE, /// DEPRECATED. Context is used by a server requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
+		TLSV1_3_CLIENT_USE, /// DEPRECATED. Context is used by a client requiring TLSv1.3 (OpenSSL 1.1.1 or newer).
+		TLSV1_3_SERVER_USE  /// DEPRECATED. Context is used by a server requiring TLSv1.3 (OpenSSL 1.1.1 or newer).
 	};
 
 	enum VerificationMode
@@ -100,7 +122,18 @@ public:
 		PROTO_SSLV3   = 0x02,
 		PROTO_TLSV1   = 0x04,
 		PROTO_TLSV1_1 = 0x08,
-		PROTO_TLSV1_2 = 0x10
+		PROTO_TLSV1_2 = 0x10,
+		PROTO_TLSV1_3 = 0x20
+	};
+
+	enum SecurityLevel
+	{
+		SECURITY_LEVEL_NONE     = 0,
+		SECURITY_LEVEL_80_BITS  = 1,
+		SECURITY_LEVEL_112_BITS = 2,
+		SECURITY_LEVEL_128_BITS = 3,
+		SECURITY_LEVEL_192_BITS = 4,
+		SECURITY_LEVEL_256_BITS = 5
 	};
 
 	struct NetSSL_API Params
@@ -114,6 +147,7 @@ public:
 
 		std::string certificateFile;
 			/// Path to the certificate file (in PEM format).
+			///
 			/// If the private key and the certificate are stored in the same file, this
 			/// can be empty if privateKeyFile is given.
 
@@ -135,6 +169,10 @@ public:
 			/// Specifies whether the builtin CA certificates from OpenSSL are used.
 			/// Defaults to false.
 
+		bool ocspStaplingVerification;
+			/// Specifies whether Client should verify OCSP Response
+			/// Defaults to false.
+
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
 			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
@@ -143,11 +181,36 @@ public:
 			/// Specifies a file containing Diffie-Hellman parameters.
 			/// If empty, the default parameters are used.
 
+		bool dhUse2048Bits;
+			/// If set to true, will use 2048-bit MODP Group with 256-bit
+			/// prime order subgroup (RFC5114) instead of 1024-bit for DH.
+
 		std::string ecdhCurve;
-			/// Specifies the name of the curve to use for ECDH, based
-			/// on the curve names specified in RFC 4492.
-			/// Defaults to "prime256v1".
+			/// OpenSSL 1.0.1 and earlier:
+			///   Specifies the name of the curve to use for ECDH, based
+			///   on the curve names specified in RFC 4492.
+			///   Defaults to "prime256v1".
+			/// OpenSSL 1.0.2 to 1.1.0:
+			///   Specifies the colon-separated list of curves
+			///   to be used for ECDH, based on the curve names
+			///   defined by OpenSSL, such as
+			///   "X448:X25519:P-521:P-384:P-256"
+			///   Defaults to the subset supported by the OpenSSL version
+			///   among the above.
+			/// OpenSSL 1.1.1 and above:
+			///   Specifies the colon-separated list of groups
+			///   (some of which can be curves) to be used for ECDH
+			///   and other TLSv1.3 ephemeral key negotiation, based
+			///   on the group names defined by OpenSSL. Defaults to
+			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
+
+		SecurityLevel securityLevel;
+			/// Defines minimal number of security bits allowed.
+			/// Requires OpenSSL >= 1.1 to be effective.
+
 	};
+
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Context(Usage usage, const Params& params);
 		/// Creates a Context using the given parameters.
@@ -226,7 +289,18 @@ public:
 	void addCertificateAuthority(const Poco::Crypto::X509Certificate& certificate);
 		/// Add one trusted certification authority to be used by the Context.
 
+	//@deprecated
 	void usePrivateKey(const Poco::Crypto::RSAKey& key);
+		/// Sets the private key to be used by the Context.
+		///
+		/// Note that useCertificate() must always be called before
+		/// usePrivateKey().
+		///
+		/// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
+		/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
+		/// event must be handled.
+
+	void usePrivateKey(const Poco::Crypto::EVPPKey &pkey);
 		/// Sets the private key to be used by the Context.
 		///
 		/// Note that useCertificate() must always be called before
@@ -336,17 +410,40 @@ public:
 		///
 		///   context.disableProtocols(PROTO_SSLV2 | PROTO_SSLV3);
 
+	void requireMinimumProtocol(Protocols protocol);
+		/// Disables all protocol version lower than the given one.
+		/// To require at least TLS 1.2 or later:
+		///
+		///   context.requireMinimumProtocol(PROTO_TLSV1_2);
+
 	void preferServerCiphers();
 		/// When choosing a cipher, use the server's preferences instead of the client
 		/// preferences. When not called, the SSL server will always follow the clients
 		/// preferences. When called, the SSL/TLS server will choose following its own
 		/// preferences.
 
+	bool ocspStaplingResponseVerificationEnabled() const;
+		/// Returns true if automatic OCSP response
+		/// reception and verification is enabled for client connections
+
+	void setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificageHandler);
+		/// Sets a Context-specific InvalidCertificateHandler.
+		///
+		/// If specified, this InvalidCertificateHandler will be used instead of the
+		/// one globally set in the SSLManager.
+
+	InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
+		/// Returns the InvalidCertificateHandler set for this Context,
+		/// or a null pointer if none has been set.
+
+	void setSecurityLevel(SecurityLevel level);
+		/// Sets the security level.
+
 private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
 
-	void initDH(const std::string& dhFile);
+	void initDH(bool use2048Bits, const std::string& dhFile);
 		/// Initializes the Context with Diffie-Hellman parameters.
 
 	void initECDH(const std::string& curve);
@@ -360,6 +457,8 @@ private:
 	VerificationMode _mode;
 	SSL_CTX* _pSSLContext;
 	bool _extendedCertificateVerification;
+	bool _ocspStaplingResponseVerification;
+	InvalidCertificateHandlerPtr _pInvalidCertificateHandler;
 };
 
 
@@ -375,9 +474,11 @@ inline Context::Usage Context::usage() const
 inline bool Context::isForServerUse() const
 {
 	return _usage == SERVER_USE
+		|| _usage == TLS_SERVER_USE
 		|| _usage == TLSV1_SERVER_USE
 		|| _usage == TLSV1_1_SERVER_USE
-		|| _usage == TLSV1_2_SERVER_USE;
+		|| _usage == TLSV1_2_SERVER_USE
+		|| _usage == TLSV1_3_SERVER_USE;
 }
 
 
@@ -396,6 +497,18 @@ inline SSL_CTX* Context::sslContext() const
 inline bool Context::extendedCertificateVerificationEnabled() const
 {
 	return _extendedCertificateVerification;
+}
+
+
+inline bool Context::ocspStaplingResponseVerificationEnabled() const
+{
+	return _ocspStaplingResponseVerification;
+}
+
+
+inline Context::InvalidCertificateHandlerPtr Context::getInvalidCertificateHandler() const
+{
+	return _pInvalidCertificateHandler;
 }
 
 

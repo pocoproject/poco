@@ -185,7 +185,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoZipmtd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoZipMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -200,7 +200,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoZipmtd.lib"/>
+				OutputFile="..\lib\PocoZipMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -258,7 +258,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoZipmt.lib"/>
+				OutputFile="..\lib\PocoZipMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -300,7 +300,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoZipmdd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoZipMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -315,7 +315,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoZipmdd.lib"/>
+				OutputFile="..\lib\PocoZipMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -373,7 +373,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoZipmd.lib"/>
+				OutputFile="..\lib\PocoZipMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

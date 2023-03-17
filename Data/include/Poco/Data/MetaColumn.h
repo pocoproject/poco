@@ -50,6 +50,8 @@ public:
 		FDT_DATE,
 		FDT_TIME,
 		FDT_TIMESTAMP,
+		FDT_UUID,
+		FDT_JSON,
 		FDT_UNKNOWN
 	};
 
@@ -64,7 +66,22 @@ public:
 		bool nullable = false);
 		/// Creates the MetaColumn.
 
-	virtual ~MetaColumn();
+	MetaColumn(const MetaColumn& other);
+		/// Copy constructor.
+
+	MetaColumn(MetaColumn&& other) noexcept;
+		/// Move constructor.
+
+	MetaColumn& operator = (const MetaColumn& other);
+		/// Assignment operator.
+
+	MetaColumn& operator = (MetaColumn&& other) noexcept;
+		/// Assignment operator.
+
+	void swap(MetaColumn& other) noexcept;
+		/// Swaps the contents with another instance.
+
+	~MetaColumn();
 		/// Destroys the MetaColumn.
 
 	const std::string& name() const;

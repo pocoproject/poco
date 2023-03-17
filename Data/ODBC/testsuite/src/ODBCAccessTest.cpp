@@ -40,7 +40,7 @@ std::string ODBCAccessTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 
 
-ODBCAccessTest::ODBCAccessTest(const std::string& name): 
+ODBCAccessTest::ODBCAccessTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
 }
@@ -70,17 +70,17 @@ void ODBCAccessTest::testSimpleAccess()
 	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	try { *_pSession << "SELECT LastName FROM PERSON", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (lastName == result);
+	assertTrue (lastName == result);
 
 	try { *_pSession << "SELECT Age FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (count == age);
+	assertTrue (count == age);
 }
 
 
@@ -123,13 +123,13 @@ bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& ds
 	{
 		if (((itDrv->first).find(driver) != std::string::npos))
 		{
-			std::cout << "Driver found: " << itDrv->first 
+			std::cout << "Driver found: " << itDrv->first
 				<< " (" << itDrv->second << ')' << std::endl;
 			break;
 		}
 	}
 
-	if (_drivers.end() == itDrv) 
+	if (_drivers.end() == itDrv)
 	{
 		std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
@@ -142,7 +142,7 @@ bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& ds
 	{
 		if (itDSN->first == dsn && itDSN->second == driver)
 		{
-			std::cout << "DSN found: " << itDSN->first 
+			std::cout << "DSN found: " << itDSN->first
 				<< " (" << itDSN->second << ')' << std::endl;
 			format(_dbConnString, "DSN=%s", dsn);
 			return true;

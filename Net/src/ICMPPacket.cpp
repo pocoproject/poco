@@ -95,9 +95,9 @@ bool ICMPPacket::validReplyID(Poco::UInt8* buffer, int length) const
 }
 
 
-std::string ICMPPacket::errorDescription(Poco::UInt8* buffer, int length)
+std::string ICMPPacket::errorDescription(Poco::UInt8* buffer, int length, int& type, int& code)
 {
-	return _pImpl->errorDescription(buffer, length);
+	return _pImpl->errorDescription(buffer, length, type, code);
 }
 
 

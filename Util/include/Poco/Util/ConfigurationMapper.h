@@ -29,7 +29,7 @@ namespace Util {
 class Util_API ConfigurationMapper: public AbstractConfiguration
 	/// This configuration maps a property hierarchy into another
 	/// hierarchy.
-	/// 
+	///
 	/// For example, given a configuration with the following properties:
 	///     config.value1
 	///     config.value2
@@ -64,18 +64,18 @@ class Util_API ConfigurationMapper: public AbstractConfiguration
 	/// LayeredConfiguration.
 {
 public:
-	ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration* pConfig);
-		/// Creates the ConfigurationMapper. The ConfigurationMapper does not take
-		/// ownership of the passed configuration.
+	ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig);
+		/// Creates the ConfigurationMapper. The ConfigurationMapper
+		/// retains (shared) ownership of the passed configuration.
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const;
 	void setRaw(const std::string& key, const std::string& value);
 	void enumerate(const std::string& key, Keys& range) const;
 	void removeRaw(const std::string& key);
-	
+
 	std::string translateKey(const std::string& key) const;
-	
+
 	~ConfigurationMapper();
 
 private:
@@ -84,7 +84,7 @@ private:
 
 	std::string _fromPrefix;
 	std::string _toPrefix;
-	AbstractConfiguration* _pConfig;
+	AbstractConfiguration::Ptr _pConfig;
 };
 
 

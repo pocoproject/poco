@@ -30,7 +30,7 @@ class PDF_API Font: public Resource<HPDF_Font>
 	/// Font class represents font resource.
 {
 public:
-	Font(HPDF_Doc* pPDF, const HPDF_Font& resource);
+	Font(HPDF_Doc* pPDF, HPDF_Font resource);
 		/// Creates the font.
 
 	~Font();
@@ -118,8 +118,8 @@ inline int Font::upperHeight() const
 
 inline TextWidth Font::textWidth(const std::string& text)
 {
-	return HPDF_Font_TextWidth(handle(), 
-		reinterpret_cast<const HPDF_BYTE*>(text.data()), 
+	return HPDF_Font_TextWidth(handle(),
+		reinterpret_cast<const HPDF_BYTE*>(text.data()),
 		static_cast<HPDF_UINT>(text.size()));
 }
 

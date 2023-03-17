@@ -30,12 +30,12 @@ namespace Net {
 //
 
 
-SocketStreamBuf::SocketStreamBuf(const Socket& socket): 
+SocketStreamBuf::SocketStreamBuf(const Socket& socket):
 	BufferedBidirectionalStreamBuf(STREAM_BUFFER_SIZE, std::ios::in | std::ios::out),
 	_pImpl(dynamic_cast<StreamSocketImpl*>(socket.impl()))
 {
 	if (_pImpl)
-		_pImpl->duplicate(); 
+		_pImpl->duplicate();
 	else
 		throw InvalidArgumentException("Invalid or null SocketImpl passed to SocketStreamBuf");
 }

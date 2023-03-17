@@ -35,13 +35,13 @@ namespace Data {
 
 template <class T>
 class BulkBinding: public AbstractBinding
-	/// A BulkBinding maps a value to a column. 
+	/// A BulkBinding maps a value to a column.
 	/// Bulk binding support is provided only for std::vector.
 {
 public:
-	BulkBinding(const T& val, Poco::UInt32 bulkSize, const std::string& name = "", Direction direction = PD_IN): 
-		AbstractBinding(name, direction, bulkSize), 
-		_val(val), 
+	BulkBinding(const T& val, Poco::UInt32 bulkSize, const std::string& name = "", Direction direction = PD_IN):
+		AbstractBinding(name, direction, bulkSize),
+		_val(val),
 		_bound(false)
 		/// Creates the BulkBinding.
 	{
@@ -91,51 +91,51 @@ private:
 namespace Keywords {
 
 
-template <typename T> 
+template <typename T>
 AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
-	return new BulkBinding<std::vector<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+	return new BulkBinding<std::vector<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
-	return new BulkBinding<std::vector<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+	return new BulkBinding<std::vector<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
-	return new BulkBinding<std::deque<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+	return new BulkBinding<std::deque<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
-	return new BulkBinding<std::deque<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+	return new BulkBinding<std::deque<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
-	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+	return new BulkBinding<std::list<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
-	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+	return new BulkBinding<std::list<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 

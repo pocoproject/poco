@@ -10,4 +10,6 @@ add_subdirectory(WebSocketServer)
 add_subdirectory(dict)
 add_subdirectory(download)
 add_subdirectory(httpget)
+add_subdirectory(tcpserver)
+add_subdirectory(ifconfig)
 

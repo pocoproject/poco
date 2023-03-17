@@ -152,7 +152,7 @@ typedef enum _HPDF_InfoType {
 
 /* PDF-A Types */
 
-typedef enum _HPDF_PDFA_TYPE 
+typedef enum _HPDF_PDFA_TYPE
 {
     HPDF_PDFA_1A = 0,
     HPDF_PDFA_1B = 1
@@ -499,7 +499,7 @@ typedef enum _HPDF_TransitionStyle {
     HPDF_TS_GLITTER_TOP_LEFT_TO_BOTTOM_RIGHT,
     HPDF_TS_REPLACE,
     HPDF_TS_EOF
-} HPDF_TransitionStyle; 
+} HPDF_TransitionStyle;
 
 /*----------------------------------------------------------------------------*/
 
