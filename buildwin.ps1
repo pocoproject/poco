@@ -142,7 +142,7 @@ function Set-Environment
 
 	if ($openssl_base -eq '')
 	{
-		$script:openssl_base = '$poco_base\openssl'
+		$script:openssl_base = "$poco_base\openssl"
 	}
 
 	$Env:OPENSSL_DIR		 = "$openssl_base"
