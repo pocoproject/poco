@@ -14,7 +14,7 @@ jobs:
         ports:
           - 3306:3306
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
       - run: >-
@@ -25,7 +25,7 @@ jobs:
   linux-gcc-make-cxx20:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j4 && sudo make install
       - run: >-
@@ -46,7 +46,7 @@ jobs:
         ports:
           - 3306:3306
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - run: >-
@@ -57,7 +57,7 @@ jobs:
   linux-gcc-make-asan-no-soo:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF --no-soo && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - run: >-
@@ -68,7 +68,7 @@ jobs:
   linux-gcc-make-ubsan:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
       - run: >-
@@ -79,7 +79,7 @@ jobs:
   linux-gcc-make-tsan:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
       - run: >-
@@ -89,7 +89,7 @@ jobs:
   linux-gcc-cmake:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
       - run: >-
@@ -101,7 +101,7 @@ jobs:
   linux-gcc-make-cross-armhf:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: >-
           sudo apt-get -y update &&
           sudo apt-get -y install crossbuild-essential-armhf
@@ -112,7 +112,7 @@ jobs:
   macos-clang-make:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
       - run: ./configure --everything --no-prefix --omit=PDF --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib && make all -s -j4
       - run: >-
@@ -124,7 +124,7 @@ jobs:
   macos-clang-cmake:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
       - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - run: >-
@@ -137,7 +137,7 @@ jobs:
   macos-clang-cmake-openssl3:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: brew install openssl@3 mysql-client unixodbc libpq
       - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - run: >-
@@ -152,7 +152,7 @@ jobs:
     env:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release
       - run: >-
@@ -164,7 +164,7 @@ jobs:
     env:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
       
 #  windows-2019-msvc-buildwin-win32:
@@ -172,7 +172,7 @@ jobs:
 #    env:
 #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
-#      - uses: actions/checkout@v2
+#      - uses: actions/checkout@v3
 #      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
   windows-2022-msvc-buildwin-x64:
@@ -180,7 +180,7 @@ jobs:
     env:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
 #  windows-2022-msvc-buildwin-win32:
@@ -188,7 +188,7 @@ jobs:
 #    env:
 #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
-#      - uses: actions/checkout@v2
+#      - uses: actions/checkout@v3
 #      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
   windows-2022-msvc-cmake-2022:
@@ -196,7 +196,7 @@ jobs:
     env:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release
       - run: >-
@@ -209,7 +209,7 @@ jobs:
 #    env:
 #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
-#      - uses: actions/checkout@v2
+#      - uses: actions/checkout@v3
 #      - run: cmake -S. -Bcmake-build -DPOCO_SANITIZE_ASAN=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
 #      - run: cmake --build cmake-build --config Debug
 #      - run: >-
