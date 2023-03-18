@@ -148,11 +148,7 @@ void Statement::executeDirect(const std::string& query)
 			if (isDone) _pImpl->reset();
 			return _pImpl->executeDirect(query);
 		}
-//		else
-//		{
-//          doAsyncExec();
-//          return;
-//		}
+		else throw InvalidAccessException("Cannot be executed async.");
 	}
 	else throw InvalidAccessException("Statement still executing.");
 }
