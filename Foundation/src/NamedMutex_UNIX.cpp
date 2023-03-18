@@ -18,7 +18,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(_AIX) || defined(__GNU__)
 #include <semaphore.h>
 #else
 #include <unistd.h>
@@ -53,7 +53,7 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 	_name(name)
 {
 	std::string fileName = getFileName();
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 1);
 	if ((long) _sem == (long) SEM_FAILED)
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
@@ -85,13 +85,13 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 	}
 
 	throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
-#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 }
 
 
 NamedMutexImpl::~NamedMutexImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	sem_close(_sem);
 #else
 	if (_owned) semctl(_semid, 0, IPC_RMID, 0);
@@ -101,7 +101,7 @@ NamedMutexImpl::~NamedMutexImpl()
 
 void NamedMutexImpl::lockImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	int err;
 	do
 	{
@@ -127,7 +127,7 @@ void NamedMutexImpl::lockImpl()
 
 bool NamedMutexImpl::tryLockImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	return sem_trywait(_sem) == 0;
 #else
 	struct sembuf op;
@@ -141,7 +141,7 @@ bool NamedMutexImpl::tryLockImpl()
 
 void NamedMutexImpl::unlockImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	if (sem_post(_sem) != 0)
 	   	throw SystemException("cannot unlock named mutex", _name);
 #else

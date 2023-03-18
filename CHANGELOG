@@ -180,6 +180,30 @@ Release 1.12.0 (2022-07-08)
 - GH #3665 MSVC does not properly recognize std version
 
 
+Release 1.11.6 (2022-12-08)
+===========================
+
+- GH #3147: Reading from request stream hangs when "Transfer-Encoding: chunked" is used
+- GH #3859: zlib headers not updated
+- GH #3876: Replace sprintf with snprintf in Environment and NumberFormatter to avoid deprecation warnings
+- Build system improvements for Xcode on Apple Silicon.
+- Upgrade bundled SQLite to 3.40.0
+
+
+Release 1.11.5 (2022-10-31)
+===========================
+
+- GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+
+
+Release 1.11.4 (2022-10-24)
+===========================
+
+- GH #3805: Upgrade expat to 2.4.9
+- GH #3846: Upgrade bundled zlib to 1.2.13 [fixes CVE]
+- GH #3847: Upgrade bundled SQLite to 3.39.4
+
+
 Release 1.11.3 (2022-06-12)
 ===========================
 

@@ -39,11 +39,14 @@ public:
 	void testRotateAtTimeHourLocal();
 	void testRotateAtTimeMinUTC();
 	void testRotateAtTimeMinLocal();
+	void testRotateByStrategy();
 	void testArchive();
+	void testArchiveByStrategy();
 	void testCompress();
 	void testPurgeAge();
 	void testPurgeCount();
 	void testWrongPurgeOption();
+	void testPurgeByStrategy();
 
 	void setUp();
 	void tearDown();
