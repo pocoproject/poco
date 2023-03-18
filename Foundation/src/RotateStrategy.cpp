@@ -39,6 +39,17 @@ RotateStrategy::~RotateStrategy()
 
 
 //
+// NullRotateStrategy
+//
+
+
+bool NullRotateStrategy::mustRotate(LogFile* pFile)
+{
+	return false;
+}
+
+
+//
 // RotateByIntervalStrategy
 //
 
