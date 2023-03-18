@@ -14,6 +14,7 @@
 #include "Poco/ClassLoader.h"
 #include "Poco/Manifest.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 #include "TestPlugin.h"
 
 
@@ -39,14 +40,15 @@ void ClassLoaderTest::testClassLoader1()
 {
 	std::string path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
-
+	Poco::Path libraryPath = Poco::Path::current();
+	libraryPath.append(path);
 	ClassLoader<TestPlugin> cl;
 
 	assertTrue (cl.begin() == cl.end());
 	assertNullPtr (cl.findClass("PluginA"));
-	assertNullPtr (cl.findManifest(path));
+	assertNullPtr (cl.findManifest(libraryPath.toString()));
 
-	assertTrue (!cl.isLibraryLoaded(path));
+	assertTrue (!cl.isLibraryLoaded(libraryPath.toString()));
 
 	try
 	{
@@ -63,7 +65,7 @@ void ClassLoaderTest::testClassLoader1()
 
 	try
 	{
-		const ClassLoader<TestPlugin>::Manif& POCO_UNUSED manif = cl.manifestFor(path);
+		const ClassLoader<TestPlugin>::Manif& POCO_UNUSED manif = cl.manifestFor(libraryPath.toString());
 		fail("not found - must throw exception");
 	}
 	catch (NotFoundException&)
@@ -80,22 +82,23 @@ void ClassLoaderTest::testClassLoader2()
 {
 	std::string path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
-
+	Poco::Path libraryPath = Poco::Path::current();
+	libraryPath.append(path);
 	ClassLoader<TestPlugin> cl;
-	cl.loadLibrary(path);
+	cl.loadLibrary(libraryPath.toString());
 
 	assertTrue (cl.begin() != cl.end());
 	assertNotNullPtr (cl.findClass("PluginA"));
 	assertNotNullPtr (cl.findClass("PluginB"));
 	assertNotNullPtr (cl.findClass("PluginC"));
-	assertNotNullPtr (cl.findManifest(path));
+	assertNotNullPtr (cl.findManifest(libraryPath.toString()));
 
-	assertTrue (cl.isLibraryLoaded(path));
-	assertTrue (cl.manifestFor(path).size() == 3);
+	assertTrue (cl.isLibraryLoaded(libraryPath.toString()));
+	assertTrue (cl.manifestFor(libraryPath.toString()).size() == 3);
 
 	ClassLoader<TestPlugin>::Iterator it = cl.begin();
 	assertTrue (it != cl.end());
-	assertTrue (it->first == path);
+	assertTrue (it->first == libraryPath.toString());
 	assertTrue (it->second->size() == 3);
 	++it;
 	assertTrue (it == cl.end());
@@ -162,7 +165,7 @@ void ClassLoaderTest::testClassLoader2()
 	meta2.destroy(pPlugin);
 	assertTrue (!meta2.isAutoDelete(pPlugin));
 
-	cl.unloadLibrary(path);
+	cl.unloadLibrary(libraryPath.toString());
 }
 
 
@@ -170,23 +173,24 @@ void ClassLoaderTest::testClassLoader3()
 {
 	std::string path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
-
+	Poco::Path libraryPath = Poco::Path::current();
+	libraryPath.append(path);
 	ClassLoader<TestPlugin> cl;
-	cl.loadLibrary(path);
-	cl.loadLibrary(path);
-	cl.unloadLibrary(path);
+	cl.loadLibrary(libraryPath.toString());
+	cl.loadLibrary(libraryPath.toString());
+	cl.unloadLibrary(libraryPath.toString());
 
-	assertTrue (cl.manifestFor(path).size() == 3);
+	assertTrue (cl.manifestFor(libraryPath.toString()).size() == 3);
 
 	ClassLoader<TestPlugin>::Iterator it = cl.begin();
 	assertTrue (it != cl.end());
-	assertTrue (it->first == path);
+	assertTrue (it->first == libraryPath.toString());
 	assertTrue (it->second->size() == 3);
 	++it;
 	assertTrue (it == cl.end());
 
-	cl.unloadLibrary(path);
-	assertNullPtr (cl.findManifest(path));
+	cl.unloadLibrary(libraryPath.toString());
+	assertNullPtr (cl.findManifest(libraryPath.toString()));
 }
 
 
