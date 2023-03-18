@@ -119,6 +119,9 @@ public:
 	bool isDeleted() const;
 		/// Returns true iff the method has been deleted.
 
+	bool isStatic() const;
+		/// Returns true iff the method is static.
+
 	int countParameters() const;
 		/// Returns the number of parameters.
 
@@ -175,6 +178,12 @@ inline bool Function::isDefault() const
 inline bool Function::isDeleted() const
 {
 	return (flags() & FN_DELETE) != 0;
+}
+
+
+inline bool Function::isStatic() const
+{
+	return (flags() & FN_STATIC) != 0;
 }
 
 
