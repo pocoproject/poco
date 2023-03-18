@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/SharedLibrary.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 
 
 using Poco::SharedLibrary;
@@ -38,10 +39,12 @@ void SharedLibraryTest::testSharedLibrary1()
 {
 	std::string path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
+	Poco::Path libraryPath = Poco::Path::current();
+	libraryPath.append(path);
 	SharedLibrary sl;
 	assertTrue (!sl.isLoaded());
-	sl.load(path);
-	assertTrue (sl.getPath() == path);
+	sl.load(libraryPath.toString());
+	assertTrue (sl.getPath() == libraryPath.toString());
 	assertTrue (sl.isLoaded());
 	assertTrue (sl.hasSymbol("pocoBuildManifest"));
 	assertTrue (sl.hasSymbol("pocoInitializeLibrary"));
@@ -72,8 +75,10 @@ void SharedLibraryTest::testSharedLibrary2()
 {
 	std::string path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
-	SharedLibrary sl(path);
-	assertTrue (sl.getPath() == path);
+	Poco::Path libraryPath = Poco::Path::current();
+	libraryPath.append(path);
+	SharedLibrary sl(libraryPath.toString());
+	assertTrue (sl.getPath() == libraryPath.toString());
 	assertTrue (sl.isLoaded());
 
 	GimmeFiveFunc gimmeFive = (GimmeFiveFunc) sl.getSymbol("gimmeFive");
@@ -105,12 +110,14 @@ void SharedLibraryTest::testSharedLibrary3()
 
 	path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
-	sl.load(path);
+	Poco::Path libraryPath = Poco::Path::current();
+	libraryPath.append(path);
+	sl.load(libraryPath.toString());
 	assertTrue (sl.isLoaded());
 
 	try
 	{
-		sl.load(path);
+		sl.load(libraryPath.toString());
 		failmsg("library already loaded - must throw exception");
 	}
 	catch (LibraryAlreadyLoadedException&)

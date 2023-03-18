@@ -161,6 +161,12 @@ ArchiveByNumberStrategy::~ArchiveByNumberStrategy()
 }
 
 
+LogFile* ArchiveByNumberStrategy::open(LogFile* pFile)
+{
+	return pFile;
+}
+
+
 LogFile* ArchiveByNumberStrategy::archive(LogFile* pFile)
 {
 	std::string basePath = pFile->path();
