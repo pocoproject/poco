@@ -49,6 +49,13 @@ private:
 };
 
 
+class Foundation_API NullRotateStrategy : public RotateStrategy
+{
+public:
+	bool mustRotate(LogFile* pFile);
+};
+
+
 template <class DT>
 class RotateAtTimeStrategy: public RotateStrategy
 	/// The file is rotated at specified [day,][hour]:minute
