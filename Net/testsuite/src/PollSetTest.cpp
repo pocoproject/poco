@@ -373,14 +373,22 @@ void PollSetTest::testPollClosedServer()
 	echoServer2.stop();
 	ss2.sendBytes("HELLO", 5);
 	while (!echoServer2.done()) Thread::sleep(10);
-	PollSet::SocketModeMap sm;
+	std::size_t signalled = 0;
 	Stopwatch sw; sw.start();
 	do
 	{
-		sm = ps.poll(Timespan(1000000));
-		if (sw.elapsedSeconds() > 10) fail();
-	} while (sm.size() < 2);
-	assertTrue(sm.size() == 2);
+		PollSet::SocketModeMap sm = ps.poll(Timespan(1000000));
+		signalled += sm.size();
+		for (auto s : sm) ps.remove(s.first);
+		if (signalled >= 2) break;
+		int secs = sw.elapsedSeconds();
+		if (secs > 10)
+		{
+			fail(Poco::format("timed out (%d) waiting for poll (%z)",
+				secs, signalled));
+		}
+	} while (true);
+	assertTrue(signalled == 2);
 	assertTrue(0 == ss1.receiveBytes(0, 0));
 	assertTrue(0 == ss2.receiveBytes(0, 0));
 }
