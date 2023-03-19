@@ -82,7 +82,7 @@ void MongoDBTest::testOpCmdUUID()
 void MongoDBTest::testOpCmdHello()
 {
 	Database db("config");
-	Poco::SharedPtr<OpMsgMessage> helloRequest = db.createOpMsgMessage("1");
+	Poco::SharedPtr<OpMsgMessage> helloRequest = db.createOpMsgMessage();
 	helloRequest->setCommandName(OpMsgMessage::CMD_HELLO);
 
 	try
@@ -316,21 +316,21 @@ void MongoDBTest::testOpCmdCursorAggregate()
 	_mongo->sendRequest(*request, response);
 	assertTrue(response.responseOk());
 
-	OpMsgCursor cursor("team", "numbers");
-	cursor.query().setCommandName(OpMsgMessage::CMD_AGGREGATE);
-	cursor.setBatchSize(1000);
+	Poco::SharedPtr<OpMsgCursor> cursor = db.createOpMsgCursor("numbers");
+	cursor->query().setCommandName(OpMsgMessage::CMD_AGGREGATE);
+	cursor->setBatchSize(1000);
 
 	// Empty pipeline: get all documents
-	cursor.query().body().addNewArray("pipeline");
+	cursor->query().body().addNewArray("pipeline");
 
 	int n = 0;
-	auto cresponse = cursor.next(*_mongo);
+	auto cresponse = cursor->next(*_mongo);
 	while(true)
 	{
 		n += static_cast<int>(cresponse.documents().size());
-		if ( cursor.cursorID() == 0 )
+		if ( cursor->cursorID() == 0 )
 			break;
-		cresponse = cursor.next(*_mongo);
+		cresponse = cursor->next(*_mongo);
 	}
 	assertEquals (10000, n);
 

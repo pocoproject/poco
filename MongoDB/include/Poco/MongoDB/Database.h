@@ -26,6 +26,8 @@
 #include "Poco/MongoDB/UpdateRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
 
+#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/OpMsgCursor.h"
 
 namespace Poco {
 namespace MongoDB {
@@ -92,6 +94,12 @@ public:
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
 		/// Creates OpMsgMessage. (new wire protocol)
+
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage() const;
+		/// Creates OpMsgMessage for database commands. (new wire protocol)
+
+	Poco::SharedPtr<Poco::MongoDB::OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
+		/// Creates OpMsgCursor. (new wire protocol)
 
 	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
 		const std::string& collection,
@@ -187,11 +195,25 @@ Database::createUpdateRequest(const std::string& collectionName) const
 	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
 }
 
+// -- New wire protocol commands
 
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
 Database::createOpMsgMessage(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::OpMsgMessage(_dbname, collectionName);
+}
+
+inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
+Database::createOpMsgMessage() const
+{
+	// Collection name for database commands is ignored and any value will do.
+	return createOpMsgMessage("1");
+}
+
+inline Poco::SharedPtr<Poco::MongoDB::OpMsgCursor>
+Database::createOpMsgCursor(const std::string& collectionName) const
+{
+	return new Poco::MongoDB::OpMsgCursor(_dbname, collectionName);
 }
 
 
