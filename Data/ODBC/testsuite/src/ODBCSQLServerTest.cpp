@@ -162,6 +162,10 @@ void ODBCSQLServerTest::testTempTable()
 	session() << ("select * from #test;"), into(testParams), now;
 
 	assertEquals(1, testParams.size());
+
+	assertEquals(1, testParams.front().get<0>());
+	assertEquals(2, testParams.front().get<1>());
+	assertEquals(3, testParams.front().get<2>());
 }
 
 void ODBCSQLServerTest::testBLOB()
