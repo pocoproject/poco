@@ -35,6 +35,14 @@ Document::~Document()
 }
 
 
+Array& Document::addNewArray(const std::string& name)
+{
+	Array::Ptr newArray = new Array();
+	add(name, newArray);
+	return *newArray;
+}
+
+
 Element::Ptr Document::get(const std::string& name) const
 {
 	Element::Ptr element;
