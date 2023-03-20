@@ -896,6 +896,9 @@
     <ClCompile Include="src\MongoDBTest.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
+    <ClCompile Include="src\MongoDBTestOpMsg.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
     <ClCompile Include="src\MongoDBTestSuite.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
