@@ -351,7 +351,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
+	setThreadName(pthread_self(), reinterpret_cast<Thread*>(pThread)->getName());
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
