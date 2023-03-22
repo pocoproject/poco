@@ -145,18 +145,6 @@ inline int ICMPEventArgs::sent() const
 }
 
 
-inline int ICMPEventArgs::minRTT() const
-{
-	return *std::min_element(_rtt.begin(), _rtt.end());
-}
-
-
-inline int ICMPEventArgs::maxRTT() const
-{
-	return *std::max_element(_rtt.begin(), _rtt.end());
-}
-
-
 } } // namespace Poco::Net
 
 

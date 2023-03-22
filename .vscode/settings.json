@@ -94,7 +94,8 @@
 		"valarray": "cpp",
 		"strstream": "cpp",
 		"future": "cpp",
-		"shared_mutex": "cpp"
+		"shared_mutex": "cpp",
+		"stop_token": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
