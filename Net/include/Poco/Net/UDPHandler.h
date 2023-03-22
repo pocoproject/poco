@@ -57,11 +57,7 @@ public:
 	typedef AutoPtr<UDPHandlerImpl> Ptr;
 	typedef std::vector<Ptr>        List;
 	typedef typename List::iterator Iterator;
-#ifdef POCO_HAVE_STD_ATOMICS
-	typedef Poco::SpinlockMutex     DFMutex;
-#else
 	typedef Poco::FastMutex         DFMutex;
-#endif
 
 	static const MsgSizeT BUF_STATUS_IDLE  = 0;
 	static const MsgSizeT BUF_STATUS_BUSY  = -1;
