@@ -304,6 +304,10 @@ public:
 		/// The result of execution (i.e. number of returned or affected rows) can be
 		/// obtained by calling wait() on the statement at a later point in time.
 
+	void executeDirect(const std::string& query);
+		/// Executes the query synchronously and directly.
+		/// If isAsync() returns true, the statement is also executed synchronously.
+
 	const Result& executeAsync(bool reset = true);
 		/// Executes the statement asynchronously.
 		/// Stops when either a limit is hit or the whole statement was executed.

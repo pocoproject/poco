@@ -101,6 +101,7 @@ public:
 	virtual void testIllegalRange();
 	virtual void testSingleSelect();
 	virtual void testEmptyDB();
+	virtual void testTempTable();
 
 	virtual void testBLOB();
 	virtual void testBLOBContainer();
@@ -221,8 +222,13 @@ private:
 // inlines
 //
 
-inline void ODBCTest::testStoredProcedure()
+inline void ODBCTest::testTempTable()
 {
+	throw Poco::NotImplementedException("ODBCTest::testTempTable()");
+}
+
+inline void ODBCTest::testStoredProcedure() 
+{ 
 	throw Poco::NotImplementedException("ODBCTest::testStoredProcedure()");
 }
 
