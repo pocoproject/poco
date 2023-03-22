@@ -221,9 +221,7 @@ endif()
 option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
 
 if (POCO_ENABLE_STD_MUTEX)
-  if ()
-  add_definitions(-DPOCO_ENABLE_STD_MUTEX)
-  endif()
+	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
 include(DefinePlatformSpecifc)
 
