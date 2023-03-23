@@ -147,6 +147,9 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 			// shut down. Therefore we have to call close(), which works better.
 			// On other platforms, we do the more graceful thing.
 #if defined(_WIN32)
+#if defined(POCO_HAVE_FD_EPOLL)
+			StreamSocket ss(SocketAddress("127.0.0.1", socket().address().port()));
+#endif
 			socket().close();
 #else
 			socket().shutdown();
@@ -163,6 +166,9 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 		try
 		{
 #if defined(_WIN32)
+#if defined(POCO_HAVE_FD_EPOLL)
+			StreamSocket ss(SocketAddress("127.0.0.1", socket().address().port()));
+#endif			
 			socket().close();
 #else
 			socket().shutdown();
