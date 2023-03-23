@@ -198,7 +198,7 @@ public:
 		}
 		while (false);
 
-        ScopedLock lock(_mutex);
+		ScopedLock lock(_mutex);
 
 		for (int i = 0; i < rc; i++)
 		{
