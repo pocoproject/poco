@@ -169,7 +169,6 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
-		ScopedLock lock(_mutex);
 		do
 		{
 			Poco::Timestamp start;
@@ -198,6 +197,8 @@ public:
 			}
 		}
 		while (false);
+
+        ScopedLock lock(_mutex);
 
 		for (int i = 0; i < rc; i++)
 		{
