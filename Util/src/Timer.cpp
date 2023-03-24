@@ -101,7 +101,6 @@ public:
 			pNf = static_cast<TimerNotification*>(queue().dequeueNotification());
 		}
 
-		queue().clear();
 		_finished.set();
 		return true;
 	}
