@@ -1,6 +1,6 @@
 include(CMakeFindDependencyMacro)
 find_dependency(PocoFoundation)
-if(@POCO_UNBUNDLED@)
+if(@POCO_UNBUNDLED_ZLIB@)
 	find_dependency(ZLIB REQUIRED)
 endif()
 

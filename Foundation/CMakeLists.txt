@@ -33,10 +33,9 @@ endif()
 # Messages
 POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 
-# If POCO_UNBUNDLED is enabled we try to find the required packages
-# The configuration will fail if the packages are not found
-option(POCO_UNBUNDLED_PCRE
-  "Set to OFF|ON (default is OFF) to control linking pcre as external" ${POCO_UNBUNDLED})
+# If POCO_UNBUNDLED_PCRE or POCO_UNBUNDLED_ZLIB is enabled we try to
+# find the required packages. The configuration will fail if the
+# packages are not found.
 
 if (POCO_UNBUNDLED_PCRE)
 	find_package(PCRE2 REQUIRED)
@@ -79,9 +78,6 @@ else()
 	)
 endif()
 
-option(POCO_UNBUNDLED_ZLIB
-  "Set to OFF|ON (default is OFF) to control linking zlib as external" ${POCO_UNBUNDLED})
-
 if (POCO_UNBUNDLED_ZLIB)
 	find_package(ZLIB REQUIRED)
 else()
@@ -115,10 +111,14 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 )
 
-if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
-endif(POCO_UNBUNDLED)
+if(POCO_UNBUNDLED_PCRE)
+	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2)
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED_PCRE)
+endif()
+if(POCO_UNBUNDLED_ZLIB)
+	target_link_libraries(Foundation PUBLIC ZLIB::ZLIB)
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED_ZLIB)
+endif()
 
 target_include_directories(Foundation
 	PUBLIC

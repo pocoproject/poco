@@ -204,6 +204,14 @@ option(ENABLE_TESTS
 
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
+option(POCO_UNBUNDLED_EXPAT
+	"Set to OFF|ON (defaults to POCO_UNBUNDLED) to control linking expat as external" ${POCO_UNBUNDLED})
+option(POCO_UNBUNDLED_PCRE
+	"Set to OFF|ON (defaults to POCO_UNBUNDLED) to control linking pcre as external" ${POCO_UNBUNDLED})
+option(POCO_UNBUNDLED_SQLITE
+	"Set to OFF|ON (defaults to POCO_UNBUNDLED) to control linking sqlite as external" ${POCO_UNBUNDLED})
+option(POCO_UNBUNDLED_ZLIB
+	"Set to OFF|ON (defaults to POCO_UNBUNDLED) to control linking zlib as external" ${POCO_UNBUNDLED})
 
 if(ENABLE_TESTS)
 	include(CTest)
@@ -213,10 +221,25 @@ else()
 	message(STATUS "Building without tests & samples")
 endif()
 
-if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, ...")
+if(POCO_UNBUNDLED_EXPAT)
+	message(STATUS "Using external expat")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using internal expat")
+endif()
+if(POCO_UNBUNDLED_PCRE)
+	message(STATUS "Using external pcre")
+else()
+	message(STATUS "Using internal pcre")
+endif()
+if(POCO_UNBUNDLED_SQLITE)
+	message(STATUS "Using external sqlite")
+else()
+	message(STATUS "Using internal sqlite")
+endif()
+if(POCO_UNBUNDLED_ZLIB)
+	message(STATUS "Using external zlib")
+else()
+	message(STATUS "Using internal zlib")
 endif()
 
 # Disable fork exec
@@ -512,11 +535,15 @@ install(
 		Devel
 )
 
-if(POCO_UNBUNDLED)
+if(POCO_UNBUNDLED_PCRE)
 	install(FILES cmake/FindPCRE2.cmake
 			DESTINATION "${PocoConfigPackageLocation}")
+endif()
+if(POCO_UNBUNDLED_EXPAT)
 	install(FILES cmake/V39/FindEXPAT.cmake
 			DESTINATION "${PocoConfigPackageLocation}/V39")
+endif()
+if(POCO_UNBUNDLED_SQLITE)
 	install(FILES cmake/V313/FindSQLite3.cmake
 			DESTINATION "${PocoConfigPackageLocation}/V313")
 endif()
