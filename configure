@@ -251,8 +251,8 @@ while [ $# -ge 1 ]; do
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
 
 	--unbundled)
- 		flags="$flags -DPOCO_UNBUNDLED"
- 		unbundled=1
+		flags="$flags -DPOCO_UNBUNDLED_EXPAT -DPOCO_UNBUNDLED_PCRE -DPOCO_UNBUNDLED_SQLITE -DPOCO_UNBUNDLED_ZLIB"
+		unbundled=1
 		;;
 
 	--minimal)
@@ -369,6 +369,10 @@ if [ -n "$pgsqlinclude" ] ; then
 fi
 if [ -n "$unbundled" ] ; then
 	echo "POCO_UNBUNDLED = 1" >>$build/config.make
+	echo "POCO_UNBUNDLED_EXPAT = 1" >>$build/config.make
+	echo "POCO_UNBUNDLED_PCRE = 1" >>$build/config.make
+	echo "POCO_UNBUNDLED_SQLITE = 1" >>$build/config.make
+	echo "POCO_UNBUNDLED_ZLIB = 1" >>$build/config.make
 fi
 if [ -n "$linkmode" ] ; then
 	echo "LINKMODE = $linkmode" >>$build/config.make
@@ -413,7 +417,10 @@ if [ -n "$pgsqlinclude" ] ; then
 	echo "export POCO_PGSQL_INCLUDE" >>$build/config.make
 fi
 if [ -n "$unbundled" ] ; then
-	echo "export POCO_UNBUNDLED" >>$build/config.make
+	echo "export POCO_UNBUNDLED_EXPAT" >>$build/config.make
+	echo "export POCO_UNBUNDLED_PCRE" >>$build/config.make
+	echo "export POCO_UNBUNDLED_SQLITE" >>$build/config.make
+	echo "export POCO_UNBUNDLED_ZLIB" >>$build/config.make
 fi
 if [ -n "$linkmode" ] ; then
 	echo "export LINKMODE" >>$build/config.make

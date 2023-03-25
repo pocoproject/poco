@@ -14,6 +14,6 @@ target_libs    = PocoJWT PocoJSON PocoCrypto PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
+ifdef POCO_UNBUNDLED_PCRE
         SYSLIBS += -lpcre
 endif

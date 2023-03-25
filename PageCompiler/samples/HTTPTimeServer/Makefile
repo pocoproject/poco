@@ -20,8 +20,16 @@ target_libs    = PocoUtil PocoJSON PocoNet PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre -lexpat
+ifdef POCO_UNBUNDLED_ZLIB
+SYSLIBS += -lz
+endif
+
+ifdef POCO_UNBUNDLED_PCRE
+SYSLIBS += -lpcre
+endif
+
+ifdef POCO_UNBUNDLED_EXPAT
+SYSLIBS += -lexpat
 endif
 
 # Rule for runnning PageCompiler

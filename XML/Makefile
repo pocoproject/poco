@@ -24,7 +24,7 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 
 expat_objects = xmlparse xmlrole xmltok
 
-ifdef POCO_UNBUNDLED
+ifdef POCO_UNBUNDLED_EXPAT
 	SYSLIBS += -lexpat
 else
 	objects += $(expat_objects)

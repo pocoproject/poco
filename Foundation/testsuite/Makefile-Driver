@@ -46,6 +46,10 @@ target_libs    = PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre
+ifdef POCO_UNBUNDLED_PCRE
+	SYSLIBS += -lpcre
+endif
+
+ifdef POCO_UNBUNDLED_ZLIB
+	SYSLIBS += -lz
 endif

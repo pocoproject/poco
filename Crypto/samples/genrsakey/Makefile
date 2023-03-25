@@ -28,6 +28,10 @@ target_libs    = PocoCrypto PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lpcre -lexpat
+ifdef POCO_UNBUNDLED_EXPAT
+	SYSLIBS += -lexpat
+endif
+
+ifdef POCO_UNBUNDLED_PCRE
+	SYSLIBS += -lpcre
 endif

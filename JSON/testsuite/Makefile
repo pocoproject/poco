@@ -14,6 +14,10 @@ target_libs    = PocoJSON PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lpcre -lexpat
+ifdef POCO_UNBUNDLED_EXPAT
+	SYSLIBS += -lexpat
+endif
+
+ifdef POCO_UNBUNDLED_PCRE
+	SYSLIBS += -lpcre
 endif

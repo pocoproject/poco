@@ -14,7 +14,7 @@ target_libs    = PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
+ifdef POCO_UNBUNDLED_PCRE
         SYSLIBS += -lpcre
 endif
 
