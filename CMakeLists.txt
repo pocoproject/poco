@@ -12,6 +12,16 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_
 set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
 
+
+## OOKLA CHANGES ##
+include(shared/cmake/macros.cmake)
+configure_ccache()
+message("--+ Toolchain information:")
+message("  +--> C Compiler: ${CMAKE_C_COMPILER}")
+message("  +--> CXX Compiler: ${CMAKE_CXX_COMPILER}")
+message("  +--> Environment CFLAGS: $ENV{CFLAGS}")
+## END OOKLA CHANGES ##
+
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
 # directories. This simplifies manual testing and the use of the build

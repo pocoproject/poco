@@ -10,6 +10,8 @@ JENKINS_PLATFORM=${PLATFORM}
 rm -rf shared
 git clone --depth 1 git@github.com:teamookla/speedtest-sharedsuite.git shared
 
+. ./shared/build/ccache.sh
+
 CONFIGURE_FLAGS=
 CMAKE_FLAGS=(
   -DBUILD_SHARED_LIBS=off
@@ -162,3 +164,5 @@ for build_type in Debug Release; do
    cmake --build . --config "${build_type}" --target install
   )
 done
+
+. ./shared/build/ccache.sh archive

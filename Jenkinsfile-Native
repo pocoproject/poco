@@ -3,9 +3,9 @@ import java.util.regex.Pattern
 def OPENSSL_VERSION = "1.1.1t"
 
 def agents = [
-  deb9_64bit:    [ label: 'native-deb9-64' ],
-  freebsd13_64:  [ label: 'freebsd64-13', injectGHKey: true ], 
-  freebsd12_64:  [ label: 'freebsd64-12', injectGHKey: true, ], 
+  deb9_64bit:    [ label: 'native-deb9-64', ccache: true ],
+  freebsd13_64:  [ label: 'freebsd64-13', injectGHKey: true, ccache: true ], 
+  freebsd12_64:  [ label: 'freebsd64-12', injectGHKey: true, ccache: true ], 
   macos:         [ label: 'macos' ], 
   win32:         [ label: 'windows-build-pool' ], 
   win64:         [ label: 'windows-build-pool' ]
@@ -40,10 +40,17 @@ def createBuildStage(name, definition) {
       node(definition.agent.label) {
         ws("workspace/" + generateWorkspaceName("${env.APPLICATION_NAME}-${env.BRANCH_NAME}-${name}")) {
           checkout scm
+
+          def ccacheFile =  "none"
+          if(definition.agent.ccache ) {
+            ccacheFile = "poco-${name}-${definition.platform ?: definition.agent.label}-${definition.toolchain ?: name}-ccache.tgz"
+          }
+          
           withEnv([
             "PLATFORM=${definition.platform ?: name}",
             "TOOLCHAIN_NAME=${definition.toolchain ?: name}",
             "CFLAGS=${definition.CFLAGS ?:''}",
+            "CCACHE_FILE=${ccacheFile}",
           ]) {
             if (definition.agent.injectGHKey) {
               withCredentials([[
