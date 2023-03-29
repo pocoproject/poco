@@ -21,6 +21,13 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include <signal.h>
+
+#if POCO_OS == POCO_OS_FREE_BSD
+#    include <sys/thr.h>
+#    include <pthread_np.h>
+#    include <osreldate.h>
+#endif
+
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
@@ -70,7 +77,10 @@ namespace
 {
 	void setThreadName(const std::string& threadName)
 	{
-#if (POCO_OS == POCO_OS_MAC_OS_X)
+#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version <  1300000
+		pthread_set_name_np(pthread_self(), threadName.c_str());
+		return;
+#elif (POCO_OS == POCO_OS_MAC_OS_X)
 		if (pthread_setname_np(threadName.c_str()))
 #else
 		if (pthread_setname_np(pthread_self(), threadName.c_str()))
@@ -319,11 +329,17 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 long ThreadImpl::currentOsTidImpl()
 {
 #if POCO_OS == POCO_OS_LINUX
-    return ::syscall(SYS_gettid);
+	return ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
-    return ::pthread_mach_thread_np(::pthread_self());
+	return ::pthread_mach_thread_np(::pthread_self());
+#elif POCO_OS == POCO_OS_FREE_BSD
+	long id;
+	if(thr_self(&id) < 0) {
+		return 0;
+	}
+	return id;
 #else
-    return ::pthread_self();
+	return ::pthread_self();
 #endif
 }
 
