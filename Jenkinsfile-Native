@@ -14,9 +14,12 @@ def agents = [
 
 def builds = [
   'linux64-deb9':               [ agent: agents.deb9_64bit, openssl: 'deb9_64bit', toolchain: "none" ],
-  'linux-x86_64-static-musl':   [ agent: agents.deb9_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl' ],
-  'linux-x86-static-musl':      [ agent: agents.deb9_64bit, openssl: "static-i386-musl", toolchain: 'static-musl-i386-linux-musl' ],
-  'linux-aarch64-static-musl':  [ agent: agents.deb9_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl' ],
+  'linux-x86_64-static-musl':   [ agent: agents.deb9_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl', 
+                                 CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
+  'linux-x86-static-musl':      [ agent: agents.deb9_64bit, openssl: "static-i386-musl", toolchain: 'static-musl-i386-linux-musl', 
+                                 CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
+  'linux-aarch64-static-musl':  [ agent: agents.deb9_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl', 
+                                 CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
   'freebsd12_64':   [ agent: agents.freebsd12_64, openssl: 'freebsd12_64bit', toolchain: "none" ],
   'freebsd13_64':   [ agent: agents.freebsd13_64, openssl: 'freebsd13_64bit', toolchain: "none"],
   'macosx':         [ agent: agents.macos, openssl: 'macos', toolchain: "none" ],
@@ -40,6 +43,7 @@ def createBuildStage(name, definition) {
           withEnv([
             "PLATFORM=${definition.platform ?: name}",
             "TOOLCHAIN_NAME=${definition.toolchain ?: name}",
+            "CFLAGS=${definition.CFLAGS ?:''}",
           ]) {
             if (definition.agent.injectGHKey) {
               withCredentials([[

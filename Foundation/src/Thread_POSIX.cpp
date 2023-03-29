@@ -75,7 +75,7 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
 #elif POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version <  1300000
     pthread_set_name_np(thread, threadName.c_str());
-#else
+#elif !OOKLA_DISABLE_THREAD_NAME
 	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
 	{
 		std::string truncName(threadName, 0, 7);
