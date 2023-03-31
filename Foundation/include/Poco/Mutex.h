@@ -158,8 +158,9 @@ class Foundation_API SpinlockMutex
 	///
 	/// While in some cases (eg. locking small blocks of code)
 	/// busy-waiting may be an optimal solution, in many scenarios
-	/// spinlock may not be the right choice - it is up to the user to
-	/// choose the proper mutex type for their particular case.
+	/// spinlock may not be the right choice (especially on single-core
+	/// systems) - it is up to the user to choose the proper mutex type
+	/// for their particular case.
 	///
 	/// Works with the ScopedLock class.
 {

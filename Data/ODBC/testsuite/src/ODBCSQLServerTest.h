@@ -40,6 +40,8 @@ public:
 
 	void testBareboneODBC();
 
+	void testTempTable();
+
 	void testBLOB();
 	void testNull();
 	void testBulk();

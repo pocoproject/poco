@@ -107,6 +107,18 @@ std::size_t StatementImpl::execute(const bool& reset)
 	return lim;
 }
 
+void StatementImpl::executeDirect(const std::string &query)
+{
+	if (!_rSession.isConnected())
+	{
+		_state = ST_DONE;
+		throw NotConnectedException(_rSession.connectionString());
+	}
+	_ostr.str("");
+	_ostr << query;
+	execDirectImpl(_ostr.str());
+}
+
 
 void StatementImpl::assignSubTotal(bool reset)
 {
@@ -378,6 +390,11 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	}
 
 	throw NotFoundException(format("Invalid column name: %s", name));
+}
+
+void StatementImpl::execDirectImpl(const std::string& query)
+{
+	poco_assert("Not implemented");
 }
 
 
