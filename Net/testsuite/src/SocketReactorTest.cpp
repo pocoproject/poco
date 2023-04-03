@@ -22,7 +22,9 @@
 #include "Poco/Observer.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
+#include "Poco/Stopwatch.h"
 #include <sstream>
+#include <iostream>
 
 
 using Poco::Net::SocketReactor;
@@ -40,6 +42,7 @@ using Poco::Net::ShutdownNotification;
 using Poco::Observer;
 using Poco::IllegalStateException;
 using Poco::Thread;
+using Poco::Stopwatch;
 
 
 namespace
@@ -504,19 +507,13 @@ void SocketReactorTest::testDataCollection()
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
 	SocketAcceptor<DataServiceHandler> acceptor(ss, reactor);
-	Thread thread;
-	thread.start(reactor);
-
-	SocketAddress sa("127.0.0.1", ss.address().port());
-	StreamSocket sock(sa);
-
 	std::string data0("{"
 					  "  \"src\":\"127.0.0.1\","
 					  "  \"id\":\"test0\","
 					  "  \"ts\":\"1524864651000001\","
 					  "  \"data\":123"
 					  "}\n");
-	sock.sendBytes(data0.data(), static_cast<int>(data0.size()));
+
 	std::string data1("{"
 					  "  \"src\":\"127.0.0.1\","
 					  "  \"id\":\"test1\","
@@ -532,7 +529,7 @@ void SocketReactorTest::testDataCollection()
 					  "   }"
 					  "  ]"
 					  "}\n");
-	sock.sendBytes(data1.data(), static_cast<int>(data1.size()));
+
 	std::string data2 = "{"
 						"  \"src\":\"127.0.0.1\","
 						"  \"id\":\"test2\","
@@ -569,8 +566,22 @@ void SocketReactorTest::testDataCollection()
 						"   }"
 						" ]"
 						"}\n";
+
+	Thread thread;
+	thread.start(reactor);
+
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	StreamSocket sock(sa);
+
+	Stopwatch sw;
+	sw.start();
+	sock.sendBytes(data0.data(), static_cast<int>(data0.size()));
+	sock.sendBytes(data1.data(), static_cast<int>(data1.size()));
 	sock.sendBytes(data2.data(), static_cast<int>(data2.size()));
-	Thread::sleep(500);
+	while ((DataServiceHandler::_data.size() < 4)) Thread::sleep(1);
+	sw.stop();
+	std::cout << "Elapsed time: " << sw.elapsed() << std::endl;
+
 	reactor.stop();
 	thread.join();
 
