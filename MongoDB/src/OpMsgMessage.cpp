@@ -114,7 +114,7 @@ void OpMsgMessage::setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize)
 	_body.add(_commandName, cursorID);
 	_body.add("$db", _databaseName);
 	_body.add("collection", _collectionName);
-	if (batchSize >= 0)
+	if (batchSize > 0)
 	{
 		_body.add("batchSize", batchSize);
 	}

@@ -57,6 +57,7 @@ public:
 	void testOpCmdFind();
 	void testOpCmdCursor();
 	void testOpCmdCursorAggregate();
+	void testOpCmdCursorEmptyFirstBatch();
 	void testOpCmdKillCursor();
 	void testOpCmdCount();
 	void testOpCmdDelete();
