@@ -28,6 +28,7 @@ public:
 	~TimedNotificationQueueTest();
 
 	void testDequeue();
+	void testDequeueNext();
 	void testWaitDequeue();
 	void testWaitDequeueTimeout();
 
