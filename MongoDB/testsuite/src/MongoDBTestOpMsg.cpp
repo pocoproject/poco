@@ -493,3 +493,21 @@ void MongoDBTest::testOpCmdConnectionPool()
 	assertEquals (1, doc.getInteger("n"));
 }
 
+
+void MongoDBTest::testOpCmdDropDatabase()
+{
+	Database db("team");
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage();
+	request->setCommandName(OpMsgMessage::CMD_DROP_DATABASE);
+
+	OpMsgMessage response;
+	_mongo->sendRequest(*request, response);
+
+	std::cout << request->body().toString(2) << std::endl;
+	std::cout << response.body().toString(2) << std::endl;
+
+	assertTrue(response.responseOk());
+}
+
+
+

@@ -63,6 +63,7 @@ public:
 	void testOpCmdDelete();
 	void testOpCmdUnaknowledgedInsert();
 	void testOpCmdConnectionPool();
+	void testOpCmdDropDatabase();
 
 	static CppUnit::Test* suite();
 
