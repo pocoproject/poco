@@ -43,7 +43,6 @@ void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 	FastMutex::ScopedLock lock(_mutex);
-	_cannotWait = false;
 	if (_waitQueue.empty())
 	{
 		_nfQueue.push_back(pNotification);
@@ -62,7 +61,6 @@ void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotificatio
 {
 	poco_check_ptr (pNotification);
 	FastMutex::ScopedLock lock(_mutex);
-	_cannotWait = false;
 	if (_waitQueue.empty())
 	{
 		_nfQueue.push_front(pNotification);
