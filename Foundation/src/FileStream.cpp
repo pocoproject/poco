@@ -58,6 +58,16 @@ FileStreamBuf* FileIOS::rdbuf()
 }
 
 
+FileIOS::NativeHandle FileIOS::nativeHandle() const
+{
+	return _buf.nativeHandle();
+}
+
+
+Poco::UInt64 FileIOS::size() const {
+	return _buf.size();
+}
+
 FileInputStream::FileInputStream():
 	FileIOS(std::ios::in),
 	std::istream(&_buf)

@@ -47,6 +47,9 @@ class Foundation_API FileIOS: public virtual std::ios
 	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
+
+	using NativeHandle = FileStreamBuf::NativeHandle;
+
 	FileIOS(std::ios::openmode defaultMode);
 		/// Creates the basic stream.
 
@@ -69,6 +72,12 @@ public:
 
 	FileStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
+
+	NativeHandle nativeHandle() const;
+		/// Returns native file descriptor handle
+
+	Poco::UInt64 size() const;
+		/// Returns file size
 
 protected:
 	FileStreamBuf _buf;
