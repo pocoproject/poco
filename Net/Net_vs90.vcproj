@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib mswsock.lib"
 				OutputFile="..\bin\PocoNetd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

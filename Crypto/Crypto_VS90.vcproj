@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib mswsock.lib"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -163,7 +163,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib mswsock.lib"
 				OutputFile="..\bin\PocoCrypto.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

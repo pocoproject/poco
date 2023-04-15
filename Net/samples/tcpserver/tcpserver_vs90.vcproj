@@ -247,7 +247,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_mt\tcpserverd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -336,7 +336,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_mt\tcpserver.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -423,7 +423,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_md\tcpserverd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -512,7 +512,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_md\tcpserver.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"

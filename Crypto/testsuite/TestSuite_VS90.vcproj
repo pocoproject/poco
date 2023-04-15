@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib mswsock.lib"
 				OutputFile="bin\TestSuited.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -162,7 +162,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib mswsock.lib"
 				OutputFile="bin\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -250,7 +250,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="Crypt32.lib ws2_32.lib Iphlpapi.lib"
+				AdditionalDependencies="Crypt32.lib ws2_32.lib Iphlpapi.lib mswsock.lib"
 				OutputFile="bin\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -341,7 +341,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="Crypt32.lib ws2_32.lib Iphlpapi.lib"
+				AdditionalDependencies="Crypt32.lib ws2_32.lib Iphlpapi.lib mswsock.lib"
 				OutputFile="bin\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -430,7 +430,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib mswsock.lib"
 				OutputFile="bin\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -520,7 +520,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib mswsock.lib"
 				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"

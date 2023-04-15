@@ -56,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib mswsock.lib"
 				OutputFile="..\bin\PocoZipd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -128,7 +128,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib mswsock.lib"
 				OutputFile="..\bin\PocoZip.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

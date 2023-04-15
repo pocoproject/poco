@@ -13,5 +13,5 @@ vc.project.compiler.defines.shared =
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.additionalOptions = /Zc:__cplusplus
-vc.project.linker.dependencies = ws2_32.lib iphlpapi.lib
+vc.project.linker.dependencies = ws2_32.lib iphlpapi.lib mswsock.lib
 vc.solution.create = true

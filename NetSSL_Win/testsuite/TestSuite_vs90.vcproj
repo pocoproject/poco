@@ -57,7 +57,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib mswsock.lib"
 				OutputFile="bin\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -129,7 +129,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib mswsock.lib"
 				OutputFile="bin\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -199,7 +199,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib mswsock.lib"
 				OutputFile="bin\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -272,7 +272,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib mswsock.lib"
 				OutputFile="bin\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -343,7 +343,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib mswsock.lib"
 				OutputFile="bin\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -415,7 +415,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib mswsock.lib"
 				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"

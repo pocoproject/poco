@@ -8,4 +8,4 @@ vc.project.configurations = debug_shared, release_shared, debug_static_mt, relea
 vc.project.prototype = TestSuite_vs90.vcproj
 vc.project.compiler.include = ..\\..\\Foundation\\include
 vc.project.compiler.additionalOptions = /Zc:__cplusplus
-vc.project.linker.dependencies = iphlpapi.lib
+vc.project.linker.dependencies = iphlpapi.lib mswsock.lib

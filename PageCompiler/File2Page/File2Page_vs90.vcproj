@@ -196,7 +196,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_mt\f2cpspd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -267,7 +267,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_mt\f2cpsp.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -336,7 +336,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_md\f2cpspd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -407,7 +407,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib mswsock.lib"
 				OutputFile="bin\static_md\f2cpsp.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
