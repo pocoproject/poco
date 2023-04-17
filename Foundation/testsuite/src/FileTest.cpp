@@ -605,6 +605,20 @@ void FileTest::testLongPath()
 #endif
 }
 
+void FileTest::testUnixFileExtension()
+{
+	std::string filePath1 = "/a/b/c/.notextension";
+	Poco::Path path1(filePath1, Poco::Path::Style::PATH_UNIX);
+
+	assertEqual(".notextension", path1.getBaseName());
+	assertEqual("", path1.getExtension());
+
+	std::string filePath2 = "/a/b/c/emptyextension.";
+	Poco::Path path2(filePath2, Poco::Path::Style::PATH_UNIX);
+
+	assertEqual("emptyextension", path2.getBaseName());
+	assertEqual("", path2.getExtension());
+}
 
 void FileTest::setUp()
 {
@@ -654,6 +668,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
+	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 
 	return pSuite;
 }
