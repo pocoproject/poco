@@ -596,7 +596,7 @@ private:
 			_charPtrs.resize(pos + 1, 0);
 
 		//alloc(inited by zeros) for all strings using maximum possible value length plus terminate (because we are using SQL_NTS above)
-		_charPtrs[pos] = (char*)std::calloc(pValContainer->size() * colMaxParamSize+1, sizeof(char));
+		_charPtrs[pos] = (char*)std::calloc(pValContainer->size() * (colMaxParamSize+1), sizeof(char));
 		
 
 
