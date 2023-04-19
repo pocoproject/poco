@@ -119,7 +119,7 @@ public:
 
 	AutoPtr& assign(const AutoPtr& ptr)
 	{
-		if (&ptr != this)
+		if (ptr.get() != _ptr)
 		{
 			if (_ptr) _ptr->release();
 			_ptr = ptr._ptr;
