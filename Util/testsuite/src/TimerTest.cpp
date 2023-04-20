@@ -231,11 +231,16 @@ void TimerTest::testCancelAllStop()
 
 		TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
 
-		timer.scheduleAtFixedRate(pTask, 5000, 5000);
-
-		Poco::Thread::sleep(100);
+		// We are scheduling a timer event in 100ms
+		Timestamp time;
+		time += 100000;
+		timer.schedule(pTask, time);
 
 		timer.cancel(false);
+		// Timer should fire in 100ms and onTimer has 100ms sleep in it.
+		// So we are waiting 2 times that plus a small buffer that to make sure that event was never executed.
+		bool timerExecuted = _event.tryWait(200 + 50);
+		assertFalse (timerExecuted);
 	}
 
 	assertTrue (true); // don't hang
@@ -249,11 +254,16 @@ void TimerTest::testCancelAllWaitStop()
 
 		TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
 
-		timer.scheduleAtFixedRate(pTask, 5000, 5000);
-
-		Poco::Thread::sleep(100);
+		// We are scheduling a timer event in 100ms
+		Timestamp time;
+		time += 100000;
+		timer.schedule(pTask, time);
 
 		timer.cancel(true);
+		// Timer should fire in 100ms and onTimer has 100ms sleep in it.
+		// So we are waiting 2 times that plus a small buffer that to make sure that event was never executed.
+		bool timerExecuted = _event.tryWait(200 + 50);
+		assertFalse (timerExecuted);
 	}
 
 	assertTrue (true); // don't hang

@@ -84,9 +84,15 @@ public:
 	bool execute()
 	{
 		// Check if there's a StopNotification pending.
-		Poco::AutoPtr<TimerNotification> pNf = static_cast<TimerNotification*>(queue().dequeueNotification());
-		while (pNf)
+		int numberOfPendingTasks = queue().size();
+		while (numberOfPendingTasks > 0)
 		{
+			Poco::AutoPtr<TimerNotification> pNf = static_cast<TimerNotification*>(queue().dequeueNextNotification());
+			numberOfPendingTasks--;
+			if (!pNf)
+			{
+				continue;
+			}
 			if (pNf.cast<StopNotification>())
 			{
 				queue().clear();
@@ -98,10 +104,8 @@ public:
 			{
 				pCnf->_finished.set();
 			}
-			pNf = static_cast<TimerNotification*>(queue().dequeueNotification());
 		}
 
-		queue().clear();
 		_finished.set();
 		return true;
 	}
