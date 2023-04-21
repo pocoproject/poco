@@ -210,8 +210,31 @@ std::string Symbol::extractName(const std::string& decl)
 		pos -= 3;
 		while (pos > 0 && isIdent(decl[pos - 1])) --pos;
 	}
-	if (pos != std::string::npos)
+	if (pos != std::string::npos){
+		// special case if pointer function
+		// bool example(int x, int y, std::function<bool(int, int)> fcn);
+		if (decl[pos-2] == '<')
+		{
+			uint8_t skipArrow = 0;
+			while (pos < decl.size())
+			{
+				if (decl[pos] == '<')
+				{
+					++skipArrow;
+				}else if (decl[pos] == '>')
+				{
+					if (skipArrow == 0)
+					{
+						return decl.substr(pos+2, decl.size()-pos);
+					}
+					--skipArrow;
+				}
+				++pos;
+			}
+		}
+
 		return decl.substr(pos, end - pos + 1);
+	}
 	else
 		return std::string();
 }
