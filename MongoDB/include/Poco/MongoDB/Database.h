@@ -45,6 +45,9 @@ public:
 	virtual ~Database();
 		/// Destroys the Database.
 
+	const std::string& name() const;
+		/// Database name
+
 	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
 		/// Authenticates against the database using the given connection,
 		/// username and password, as well as authentication method.
@@ -160,6 +163,12 @@ private:
 //
 // inlines
 //
+inline const std::string& Database::name() const
+{
+	return _dbname;
+}
+
+
 inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> cmd = createQueryRequest("$cmd");
