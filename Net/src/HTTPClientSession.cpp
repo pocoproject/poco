@@ -41,7 +41,9 @@ HTTPClientSession::ProxyConfig HTTPClientSession::_globalProxyConfig;
 HTTPClientSession::HTTPClientSession():
 	_port(HTTPSession::HTTP_PORT),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+#if defined(POCO_HAVE_IPv6)
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
+#endif // POCO_HAVE_IPv6
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -57,7 +59,9 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+#if defined(POCO_HAVE_IPv6)
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
+#endif // POCO_HAVE_IPv6
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -73,7 +77,9 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_host(address.host().toString()),
 	_port(address.port()),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+#if defined(POCO_HAVE_IPv6)
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
+#endif // POCO_HAVE_IPv6
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -89,7 +95,9 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_host(host),
 	_port(port),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+#if defined(POCO_HAVE_IPv6)
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
+#endif // POCO_HAVE_IPv6
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -119,7 +127,9 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConf
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+#if defined(POCO_HAVE_IPv6)
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
+#endif // POCO_HAVE_IPv6
 	_proxyConfig(proxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -159,8 +169,10 @@ void HTTPClientSession::setSourceAddress(const SocketAddress& address)
 	{
 		if (address.family() == IPAddress::IPv4)
 			_sourceAddress4 = address;
+#if defined(POCO_HAVE_IPv6)
 		else
 			_sourceAddress6 = address;
+#endif // POCO_HAVE_IPv6
 		_sourceAddress = address;
 	}
 	else
@@ -180,11 +192,12 @@ const SocketAddress& HTTPClientSession::getSourceAddress4()
 }
 
 
+#if defined(POCO_HAVE_IPv6)
 const SocketAddress& HTTPClientSession::getSourceAddress6()
 {
 	return _sourceAddress6;
 }
-
+#endif // POCO_HAVE_IPv6
 
 void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
@@ -465,8 +478,10 @@ void HTTPClientSession::reconnect()
 
 	if ((!_sourceAddress4.host().isWildcard()) || (_sourceAddress4.port() != 0))
 		connect(addr, _sourceAddress4);
+#if defined(POCO_HAVE_IPv6)
 	else if ((!_sourceAddress6.host().isWildcard()) || (_sourceAddress6.port() != 0))
 		connect(addr, _sourceAddress6);
+#endif // POCO_HAVE_IPv6
 	else
 		connect(addr);
 }
@@ -596,7 +611,9 @@ StreamSocket HTTPClientSession::proxyConnect()
 	proxySession.proxyAuthenticateImpl(proxyRequest, _proxyConfig);
 	proxySession.setKeepAlive(true);
 	proxySession.setSourceAddress(_sourceAddress4);
+#if defined(POCO_HAVE_IPv6)
 	proxySession.setSourceAddress(_sourceAddress6);
+#endif // POCO_HAVE_IPv6
 	proxySession.sendRequest(proxyRequest);
 	proxySession.receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
