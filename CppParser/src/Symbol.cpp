@@ -235,7 +235,7 @@ std::string Symbol::extractName(const std::string& decl)
 		// 	}
 		// }
 
-		std::cout << decl << std::endl;
+		std::cout << decl << " after" << decl.substr(pos, end - pos + 1) << std::endl;
 
 		return decl.substr(pos, end - pos + 1);
 	}
