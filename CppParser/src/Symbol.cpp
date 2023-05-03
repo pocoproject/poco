@@ -248,6 +248,8 @@ std::string Symbol::extractName(const std::string& decl)
 
 		std::cout << "end " << pos << std::endl;
 
+		std::cout << decl << pos << std::endl;
+		
 		return decl.substr(pos, end - pos + 1);
 	}
 	else
