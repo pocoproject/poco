@@ -168,7 +168,15 @@ std::string Symbol::extractName(const std::string& decl)
 		if ((gtPos == std::string::npos || gtPos > pos || (ltPos != std::string::npos && gtPos > ltPos)) && eqPos < pos && eqPos > 0 && decl[eqPos + 1] != '=')
 			pos = eqPos - 1;
 	}
+
+	std::cout << "before: " << pos << std::endl;
+
+
 	while (pos > 0 && std::isspace(decl[pos])) --pos;
+
+
+	std::cout << "middle: " << pos << std::endl;
+
 	while (pos > 0 && decl[pos] == ']')
 	{
 		--pos;
@@ -176,6 +184,9 @@ std::string Symbol::extractName(const std::string& decl)
 		if (pos > 0) --pos;
 		while (pos > 0 && std::isspace(decl[pos])) --pos;
 	}
+
+	std::cout << "after: " << pos << std::endl;
+
 	// iterate over template (specialization)
 	int nestedTemplateCount = 0;
 	if (pos > 1 && decl[pos] == '>' && decl[pos-1] != '-' && decl[pos-1] != '>') // the operators ->, >>
@@ -235,7 +246,7 @@ std::string Symbol::extractName(const std::string& decl)
 		// 	}
 		// }
 
-		std::cout << decl << " after" << decl.substr(pos, end - pos + 1) << std::endl;
+		std::cout << decl << " after " << decl.substr(pos, end - pos + 1) << std::endl;
 
 		return decl.substr(pos, end - pos + 1);
 	}
