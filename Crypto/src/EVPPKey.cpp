@@ -21,6 +21,9 @@
 #include "Poco/NumberFormatter.h"
 #include <iostream>
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/param_build.h>
+#endif
 
 namespace Poco {
 namespace Crypto {
@@ -66,7 +69,57 @@ EVPPKey::EVPPKey(const PKCS12Container& cont): EVPPKey(cont.getKey())
 	checkType();
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+void PushBuildParamBignum(OSSL_PARAM_BLD* param_bld, const char* key, const std::vector<unsigned char>& bytes) {
+	BIGNUM* bignum = BN_bin2bn(bytes.data(), (int)bytes.size(), nullptr);
+	OSSL_PARAM_BLD_push_BN(param_bld, key, bignum);
+}
+OSSL_PARAM* GetKeyParameters(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key) {
+	auto param_bld = OSSL_PARAM_BLD_new();
 
+	if (public_key != nullptr) {
+		PushBuildParamBignum(param_bld, "n", *public_key);
+	}
+
+	if (private_key != nullptr) {
+		PushBuildParamBignum(param_bld, "d", *private_key);
+	}
+
+	// default rsa exponent
+	OSSL_PARAM_BLD_push_ulong(param_bld, "e", RSA_F4);
+
+	auto parameters = OSSL_PARAM_BLD_to_param(param_bld);
+	OSSL_PARAM_BLD_free(param_bld);
+
+	return parameters;
+}
+void EVPPKey::SetKeyFromParameters(OSSL_PARAM* parameters) {
+	auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
+	if (EVP_PKEY_fromdata_init(ctx) <= 0) {
+		OSSL_PARAM_free(parameters);
+		throw OpenSSLException("EVPPKey cannot init create key");
+	}
+
+	if (_pEVPPKey != 0) EVP_PKEY_free(_pEVPPKey);
+	if (EVP_PKEY_fromdata(ctx, &_pEVPPKey, EVP_PKEY_KEYPAIR, parameters) <= 0) {
+		OSSL_PARAM_free(parameters);
+		throw OpenSSLException("EVPPKey cannot create key");
+	}
+}
+
+EVPPKey::EVPPKey(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key, unsigned long exponent, int type) : _pEVPPKey(0)
+{
+	if ((EVP_PKEY_RSA != type) || (RSA_F4 != exponent)) {
+		std::string msg = Poco::format("EVPPKey(%d):Invalid format\n", type);
+		throw OpenSSLException(getError(msg));
+	}
+
+	OSSL_PARAM* parameters = GetKeyParameters(public_key, private_key);
+	SetKeyFromParameters(parameters);
+	OSSL_PARAM_free(parameters);
+}
+#endif
+	
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 EVPPKey::EVPPKey(int type, int param): _pEVPPKey(0)
