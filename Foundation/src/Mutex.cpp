@@ -14,8 +14,9 @@
 
 #include "Poco/Mutex.h"
 
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_STD_MUTEX)
+#include "Mutex_STD.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Mutex_WINCE.cpp"
 #else

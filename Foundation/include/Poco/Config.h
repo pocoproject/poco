@@ -208,5 +208,9 @@
 // Disarm POCO_DEPRECATED macro.
 // #define POCO_NO_DEPRECATED
 
-
+// Enable usage of Poco::Mutex and Poco::FastMutex
+// as wrappers for std::recursive_mutex and std::mutex
+#ifndef POCO_ENABLE_STD_MUTEX
+// #define POCO_ENABLE_STD_MUTEX
+#endif
 #endif // Foundation_Config_INCLUDED
