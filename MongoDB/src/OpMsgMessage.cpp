@@ -38,6 +38,8 @@ const std::string OpMsgMessage::CMD_MAP_REDUCE { "mapReduce" };
 
 // Replication and administration 
 const std::string OpMsgMessage::CMD_HELLO { "hello" };
+const std::string OpMsgMessage::CMD_REPL_SET_GET_STATUS { "replSetGetStatus" };
+const std::string OpMsgMessage::CMD_REPL_SET_GET_CONFIG { "replSetGetConfig" };
 
 const std::string OpMsgMessage::CMD_CREATE { "create" };
 const std::string OpMsgMessage::CMD_CREATE_INDEXES { "createIndexes" };
@@ -100,7 +102,16 @@ void OpMsgMessage::setCommandName(const std::string& command)
 	_body.clear();
 
 	// IMPORTANT: Command name must be first
-	_body.add(_commandName, _collectionName);
+	if (_collectionName.empty())
+	{
+		// Collection is not specified. It is assumed that this particular command does 
+		// not need it.
+		_body.add(_commandName, Int32(1));
+	}
+	else
+	{
+		_body.add(_commandName, _collectionName);
+	}
 	_body.add("$db", _databaseName);
 }
 
@@ -114,7 +125,7 @@ void OpMsgMessage::setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize)
 	_body.add(_commandName, cursorID);
 	_body.add("$db", _databaseName);
 	_body.add("collection", _collectionName);
-	if (batchSize >= 0)
+	if (batchSize > 0)
 	{
 		_body.add("batchSize", batchSize);
 	}
