@@ -164,9 +164,10 @@ public:
 	const SocketAddress& getSourceAddress4();
 		/// Returns the last IPv4 source address set with setSourceAddress
 
+#if defined(POCO_HAVE_IPv6)
 	const SocketAddress& getSourceAddress6();
 		/// Returns the last IPV6 source address set with setSourceAddress
-
+#endif // POCO_HAVE_IPv6
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Sets the proxy host name and port number.
 
@@ -371,7 +372,9 @@ private:
 	Poco::UInt16          _port;
 	SocketAddress         _sourceAddress;
 	SocketAddress         _sourceAddress4;
+#if defined(POCO_HAVE_IPv6)
 	SocketAddress         _sourceAddress6;
+#endif // POCO_HAVE_IPv6
 	ProxyConfig           _proxyConfig;
 	Poco::Timespan        _keepAliveTimeout;
 	Poco::Timestamp       _lastRequest;
