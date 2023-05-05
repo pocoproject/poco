@@ -99,7 +99,7 @@ public:
 		/// Creates OpMsgMessage. (new wire protocol)
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage() const;
-		/// Creates OpMsgMessage for database commands. (new wire protocol)
+		/// Creates OpMsgMessage for database commands that do not require collection as an argument. (new wire protocol)
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
 		/// Creates OpMsgCursor. (new wire protocol)
@@ -215,8 +215,8 @@ Database::createOpMsgMessage(const std::string& collectionName) const
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
 Database::createOpMsgMessage() const
 {
-	// Collection name for database commands is ignored and any value will do.
-	return createOpMsgMessage("1");
+	// Collection name for database commands is not needed.
+	return createOpMsgMessage("");
 }
 
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgCursor>
