@@ -37,9 +37,16 @@ DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new Datagra
 DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only):
 	Socket(new DatagramSocketImpl(address.family()))
 {
+#if defined(POCO_HAVE_IPv6)
 	if (address.family() == SocketAddress::IPv6)
+	{
 		bind6(address, reuseAddress, reusePort, ipV6Only);
-	else bind(address, reuseAddress, reusePort);
+	}
+	else
+#endif // POCO_HAVE_IPv6
+	{
+		bind(address, reuseAddress, reusePort);
+	}
 }
 
 
