@@ -701,13 +701,13 @@ void EVPTest::testEVPKeyByModulus()
 			std::cerr << "invalid exponent" << std::endl;
 			throw;
 		}
-		std::string sNbinary;
+		std::string nBinary;
 		std::ostringstream ofs;
-		Poco::MemoryInputStream cIn(sN.data(), sN.length());
+		Poco::MemoryInputStream cIn(n.data(), n.length());
 		Poco::Base64Decoder decoder(cIn, Poco::Base64EncodingOptions::BASE64_URL_ENCODING | Poco::Base64EncodingOptions::BASE64_NO_PADDING);
 		Poco::StreamCopier::copyStream(decoder, ofs);
-		sNbinary=ofs.str();
-		std::vector<unsigned char> public_key(sNbinary.begin(), sNbinary.end());
+		nBinary=ofs.str();
+		std::vector<unsigned char> public_key(nBinary.begin(), nBinary.end());
 		Poco::Crypto::EVPPKey cKey(&public_key, nullptr, exponent, EVP_PKEY_RSA);
 		Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(cKey);
 	}
