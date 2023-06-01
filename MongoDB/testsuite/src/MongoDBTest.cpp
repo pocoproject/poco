@@ -556,7 +556,11 @@ CppUnit::Test* MongoDBTest::suite()
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursor);
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorAggregate);
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdKillCursor);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorEmptyFirstBatch);
+		
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdUUID);
+
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdDropDatabase);		
 	}
 
 	return pSuite;

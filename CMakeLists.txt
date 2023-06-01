@@ -226,6 +226,11 @@ if(POCO_NO_FORK_EXEC)
   add_definitions(-DPOCO_NO_FORK_EXEC=1)
 endif()
 
+option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
+
+if (POCO_ENABLE_STD_MUTEX)
+	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
+endif ()
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file

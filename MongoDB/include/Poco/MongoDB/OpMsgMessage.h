@@ -52,6 +52,8 @@ public:
 
 	// Replication and administration 
 	static const std::string CMD_HELLO;
+	static const std::string CMD_REPL_SET_GET_STATUS;
+	static const std::string CMD_REPL_SET_GET_CONFIG;
 
 	static const std::string CMD_CREATE;
 	static const std::string CMD_CREATE_INDEXES;

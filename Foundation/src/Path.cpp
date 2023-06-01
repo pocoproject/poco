@@ -537,7 +537,7 @@ Path& Path::setBaseName(const std::string& name)
 std::string Path::getBaseName() const
 {
 	std::string::size_type pos = _name.rfind('.');
-	if (pos != std::string::npos)
+	if (pos != std::string::npos && pos != 0)
 		return _name.substr(0, pos);
 	else
 		return _name;
@@ -559,7 +559,7 @@ Path& Path::setExtension(const std::string& extension)
 std::string Path::getExtension() const
 {
 	std::string::size_type pos = _name.rfind('.');
-	if (pos != std::string::npos)
+	if (pos != std::string::npos && pos != 0)
 		return _name.substr(pos + 1);
 	else
 		return std::string();

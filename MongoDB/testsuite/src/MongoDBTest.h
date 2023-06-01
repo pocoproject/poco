@@ -57,11 +57,13 @@ public:
 	void testOpCmdFind();
 	void testOpCmdCursor();
 	void testOpCmdCursorAggregate();
+	void testOpCmdCursorEmptyFirstBatch();
 	void testOpCmdKillCursor();
 	void testOpCmdCount();
 	void testOpCmdDelete();
 	void testOpCmdUnaknowledgedInsert();
 	void testOpCmdConnectionPool();
+	void testOpCmdDropDatabase();
 
 	static CppUnit::Test* suite();
 
