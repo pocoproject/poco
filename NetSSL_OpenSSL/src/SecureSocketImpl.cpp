@@ -14,6 +14,7 @@
 
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Net/Utility.h"
@@ -97,6 +98,7 @@ void SecureSocketImpl::acceptSSL()
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
 	SSL_set_accept_state(_pSSL);
+	SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
 	_needHandshake = true;
 }
 
@@ -156,6 +158,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
+	SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
 
 	if (!_peerHostName.empty())
 	{
@@ -169,7 +172,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	}
 #endif
 
-	if (_pSession)
+	if (_pSession && _pSession->isResumable())
 	{
 		SSL_set_session(_pSSL, _pSession->sslSession());
 	}
@@ -609,6 +612,7 @@ void SecureSocketImpl::reset()
 	close();
 	if (_pSSL)
 	{
+		SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		SSL_free(_pSSL);
 		_pSSL = 0;
 	}
@@ -623,20 +627,7 @@ void SecureSocketImpl::abort()
 
 Session::Ptr SecureSocketImpl::currentSession()
 {
-	if (_pSSL)
-	{
-		SSL_SESSION* pSession = SSL_get1_session(_pSSL);
-		if (pSession)
-		{
-			if (_pSession && pSession == _pSession->sslSession())
-			{
-				SSL_SESSION_free(pSession);
-				return _pSession;
-			}
-			else return new Session(pSession);
-		}
-	}
-	return 0;
+	return _pSession;
 }
 
 
@@ -652,6 +643,19 @@ bool SecureSocketImpl::sessionWasReused()
 		return SSL_session_reused(_pSSL) != 0;
 	else
 		return false;
+}
+
+
+int SecureSocketImpl::onSessionCreated(SSL* pSSL, SSL_SESSION* pSession)
+{
+	void* pEx = SSL_get_ex_data(pSSL, SSLManager::instance().socketIndex());
+	if (pEx)
+	{
+		SecureSocketImpl* pThis = reinterpret_cast<SecureSocketImpl*>(pEx);
+		pThis->_pSession = new Session(pSession);
+		return 1;
+	}
+	else return 0;
 }
 
 
