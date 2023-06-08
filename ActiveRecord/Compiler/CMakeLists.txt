@@ -11,7 +11,7 @@ endif()
 add_executable(ActiveRecordCompiler ${SRCS})
 set_target_properties(ActiveRecordCompiler
 	PROPERTIES
-	OUTPUT_NAME arc
+	OUTPUT_NAME poco-arc
 )
 
 target_link_libraries(ActiveRecordCompiler PUBLIC Poco::Foundation Poco::Util)
