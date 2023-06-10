@@ -66,7 +66,7 @@ public:
 		/// does not exist or is not accessible for other reasons and
 		/// a new file cannot be created.
 
-	void open_handle(NativeHandle handle, std::ios::openmode mode);
+	void openHandle(NativeHandle handle, std::ios::openmode mode);
 		/// Takes ownership of the handle.
 
 	void close();

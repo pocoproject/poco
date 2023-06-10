@@ -40,7 +40,7 @@ public:
 	void open(const std::string& path, std::ios::openmode mode);
 		/// Opens the given file in the given mode.
 
-	void open_handle(int fd, std::ios::openmode mode);
+	void openHandle(int fd, std::ios::openmode mode);
 		/// Take ownership of the given file descriptor.
 
 	bool close();

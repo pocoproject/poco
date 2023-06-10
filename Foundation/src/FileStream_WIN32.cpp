@@ -74,7 +74,7 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 }
 
 
-void FileStreamBuf::open_handle(HANDLE handle, std::ios::openmode mode)
+void FileStreamBuf::openHandle(HANDLE handle, std::ios::openmode mode)
 {
 	poco_assert(_handle == INVALID_HANDLE_VALUE);
 	poco_assert(handle != INVALID_HANDLE_VALUE);

@@ -70,7 +70,7 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 }
 
 
-void FileStreamBuf::open_handle(int fd, std::ios::openmode mode)
+void FileStreamBuf::openHandle(int fd, std::ios::openmode mode)
 {
 	poco_assert(_fd == -1);
 	poco_assert(fd != -1);
