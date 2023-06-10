@@ -126,7 +126,8 @@ S toUpper(const S& str)
 #elif defined( _MSC_VER )
 #pragma loop( hint_parallel( 0 ) )
 #endif
-	while (it != end) {
+	while (it != end)
+	{
 		int ch = static_cast<unsigned char>(*it);
 		*it = static_cast<typename S::value_type>(Ascii::toUpper(ch));
 		++it;
@@ -147,7 +148,8 @@ S& toUpperInPlace(S& str)
 #elif defined( _MSC_VER )
 #pragma loop( hint_parallel( 0 ) )
 #endif
-	while (it != end) {
+	while (it != end)
+	{
 		int ch = static_cast<unsigned char>(*it);
 		*it = static_cast<typename S::value_type>(Ascii::toUpper(ch));
 		++it;
