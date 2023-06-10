@@ -89,6 +89,16 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
+	Notification* dequeueNextNotification();
+		/// Dequeues the next notification regardless of timestamp.
+		/// Returns 0 (null) if no notification is available.
+		/// The caller gains ownership of the notification and
+		/// is expected to release it when done with it.
+		///
+		/// It is highly recommended that the result is immediately
+		/// assigned to a Notification::Ptr, to avoid potential
+		/// memory management issues.
+
 	Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
