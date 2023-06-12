@@ -1,6 +1,6 @@
 vc.project.guid = 84DD1CB5-4735-478A-B48E-5E4858F0E831
 vc.project.name = Compiler
-vc.project.target = arc
+vc.project.target = poco-arc
 vc.project.type = executable
 vc.project.pocobase = ..\\..
 vc.project.outdir = ${vc.project.pocobase}
