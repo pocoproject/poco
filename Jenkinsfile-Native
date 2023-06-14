@@ -1,6 +1,6 @@
 import java.util.regex.Pattern
 
-def OPENSSL_VERSION = "1.1.1t"
+def OPENSSL_VERSION = "3.1.1"
 
 def agents = [
   deb9_64bit:    [ label: 'native-deb9-64', ccache: true ],
