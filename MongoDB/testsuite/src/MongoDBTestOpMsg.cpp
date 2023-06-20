@@ -327,7 +327,11 @@ void MongoDBTest::testOpCmdCursorAggregate()
 	auto cresponse = cursor->next(*_mongo);
 	while(true)
 	{
-		n += static_cast<int>(cresponse.documents().size());
+		int batchDocSize = cresponse.documents().size();
+		if (cursor->cursorID() != 0)
+			assertEquals (1000, batchDocSize);
+
+		n += batchDocSize;
 		if ( cursor->cursorID() == 0 )
 			break;
 		cresponse = cursor->next(*_mongo);
@@ -400,6 +404,53 @@ void MongoDBTest::testOpCmdCount()
 }
 
 
+void MongoDBTest::testOpCmdCursorEmptyFirstBatch()
+{
+	Database db("team");
+
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("numbers");
+	OpMsgMessage response;
+
+	request->setCommandName(OpMsgMessage::CMD_DROP);
+	_mongo->sendRequest(*request, response);
+
+	request->setCommandName(OpMsgMessage::CMD_INSERT);
+	for(int i = 0; i < 10000; ++i)
+	{
+		Document::Ptr doc = new Document();
+		doc->add("number", i);
+		request->documents().push_back(doc);
+	}
+	_mongo->sendRequest(*request, response);
+	assertTrue(response.responseOk());
+
+	Poco::SharedPtr<OpMsgCursor> cursor = db.createOpMsgCursor("numbers");
+	cursor->query().setCommandName(OpMsgMessage::CMD_AGGREGATE);
+	cursor->setEmptyFirstBatch(true);
+	cursor->setBatchSize(0); // Will be ignored, default is used
+
+	// Empty pipeline: get all documents
+	cursor->query().body().addNewArray("pipeline");
+
+	auto cresponse = cursor->next(*_mongo);
+	assertEquals (0, cresponse.documents().size()); // First batch is empty
+
+	int n = 0;
+	while(true)
+	{
+		n += static_cast<int>(cresponse.documents().size());
+		if ( cursor->cursorID() == 0 )
+			break;
+		cresponse = cursor->next(*_mongo);
+	}
+	assertEquals (10000, n);
+
+	request->setCommandName(OpMsgMessage::CMD_DROP);
+	_mongo->sendRequest(*request, response);
+	assertTrue(response.responseOk());
+}
+
+
 void MongoDBTest::testOpCmdDelete()
 {
 	Database db("team");
@@ -441,4 +492,22 @@ void MongoDBTest::testOpCmdConnectionPool()
 	const auto& doc = response.body();
 	assertEquals (1, doc.getInteger("n"));
 }
+
+
+void MongoDBTest::testOpCmdDropDatabase()
+{
+	Database db("team");
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage();
+	request->setCommandName(OpMsgMessage::CMD_DROP_DATABASE);
+
+	OpMsgMessage response;
+	_mongo->sendRequest(*request, response);
+
+	std::cout << request->body().toString(2) << std::endl;
+	std::cout << response.body().toString(2) << std::endl;
+
+	assertTrue(response.responseOk());
+}
+
+
 

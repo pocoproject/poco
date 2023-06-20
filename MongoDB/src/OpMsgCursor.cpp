@@ -71,6 +71,18 @@ OpMsgCursor::~OpMsgCursor()
 }
 
 
+void OpMsgCursor::setEmptyFirstBatch(bool empty)
+{
+	_emptyFirstBatch = empty;
+}
+
+
+bool OpMsgCursor::emptyFirstBatch() const
+{
+	return _emptyFirstBatch;
+}
+
+
 void OpMsgCursor::setBatchSize(Int32 batchSize)
 {
 	_batchSize = batchSize;
@@ -89,16 +101,18 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 	{
 		_response.clear();
 
-		if (_query.commandName() == OpMsgMessage::CMD_FIND)
+		if (_emptyFirstBatch || _batchSize > 0)
 		{
-			if (_batchSize >= 0)
-				_query.body().add("batchSize", _batchSize);
-		}
-		else if (_query.commandName() == OpMsgMessage::CMD_AGGREGATE)
-		{
-			auto cursorDoc = _query.body().addNewDocument("cursor");
-			if (_batchSize >= 0)
-				cursorDoc.add("batchSize", _batchSize);
+			Int32 bsize = _emptyFirstBatch ? 0 : _batchSize;
+			if (_query.commandName() == OpMsgMessage::CMD_FIND)
+			{
+				_query.body().add("batchSize", bsize);
+			}
+			else if (_query.commandName() == OpMsgMessage::CMD_AGGREGATE)
+			{
+				auto& cursorDoc = _query.body().addNewDocument("cursor");
+				cursorDoc.add("batchSize", bsize);
+			}
 		}
 
 		connection.sendRequest(_query, _response);

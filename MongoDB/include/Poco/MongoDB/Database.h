@@ -45,6 +45,9 @@ public:
 	virtual ~Database();
 		/// Destroys the Database.
 
+	const std::string& name() const;
+		/// Database name
+
 	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
 		/// Authenticates against the database using the given connection,
 		/// username and password, as well as authentication method.
@@ -96,7 +99,7 @@ public:
 		/// Creates OpMsgMessage. (new wire protocol)
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage() const;
-		/// Creates OpMsgMessage for database commands. (new wire protocol)
+		/// Creates OpMsgMessage for database commands that do not require collection as an argument. (new wire protocol)
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
 		/// Creates OpMsgCursor. (new wire protocol)
@@ -160,6 +163,12 @@ private:
 //
 // inlines
 //
+inline const std::string& Database::name() const
+{
+	return _dbname;
+}
+
+
 inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> cmd = createQueryRequest("$cmd");
@@ -206,8 +215,8 @@ Database::createOpMsgMessage(const std::string& collectionName) const
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
 Database::createOpMsgMessage() const
 {
-	// Collection name for database commands is ignored and any value will do.
-	return createOpMsgMessage("1");
+	// Collection name for database commands is not needed.
+	return createOpMsgMessage("");
 }
 
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgCursor>
