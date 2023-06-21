@@ -17,6 +17,9 @@
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/TemporaryFile.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/MemoryStream.h"
 #include "Poco/StreamCopier.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -682,6 +685,39 @@ void EVPTest::testECEVPKeyByLength()
 	}
 }
 
+void EVPTest::testEVPKeyByModulus()
+{
+	std::string e = "AQAB";
+	std::string n = "ylJgMkU_bDwCLzMlo47igdZ-AC8oUbtGJUOUHnuJdjflpim7FOxw0zXYf9m0tzND0Bt1y7MPyVtf-3rwInvdgi65CZEJ3kt5PE0g6trPbvyW6hJcVeOsQvSErj33mY6RsjndLhNE-RY36G8o603au64lTOYSb9HjzzRFo4F_faEgQ02jpEYkLIWwf7PboExDbd6NGMV0uume8YA6eB3z5BwfMMHyRZA0FcIzj6F0V-hDqBaJkWegpJsukgpfO7JDKaU5rlor7j6CdbfLaWorYTCUH3F-bXZ1ojBe0wHRGEgEZBNa46A3clgNohQuuNzf4K12NFGnEl_TIFRcLm6M0Q";
+        try
+	{
+		unsigned long exponent = 0;
+		if ((e == "AQAB") || (e == "AAEAAQ")) 
+		{
+			exponent = RSA_F4; //Poco::Crypto::RSAKey::Exponent::EXP_LARGE
+		}
+		else
+		{
+			std::cerr << "invalid exponent" << std::endl;
+			throw;
+		}
+		std::string nBinary;
+		std::ostringstream ofs;
+		Poco::MemoryInputStream cIn(n.data(), n.length());
+		Poco::Base64Decoder decoder(cIn, Poco::Base64EncodingOptions::BASE64_URL_ENCODING | Poco::Base64EncodingOptions::BASE64_NO_PADDING);
+		Poco::StreamCopier::copyStream(decoder, ofs);
+		nBinary=ofs.str();
+		std::vector<unsigned char> public_key(nBinary.begin(), nBinary.end());
+		Poco::Crypto::EVPPKey cKey(&public_key, nullptr, exponent, EVP_PKEY_RSA);
+		Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(cKey);
+	}
+	catch(Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}	
+}
+
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000
 #endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
@@ -714,6 +750,7 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyByLength);
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
+	CppUnit_addTest(pSuite, EVPTest, testEVPKeyByModulus);
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000
 #endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
