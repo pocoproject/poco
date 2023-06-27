@@ -36,7 +36,8 @@ CipherFactory::CipherFactory()
 {
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	OSSL_PROVIDER_load(NULL, "default");
-	OSSL_PROVIDER_load(NULL, "legacy");
+    // Ookla change: ignore legacy provider requirement
+	//OSSL_PROVIDER_load(NULL, "legacy");
 #endif
 }
 

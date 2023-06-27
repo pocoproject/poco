@@ -93,7 +93,8 @@ private:
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	static OSSL_PROVIDER* _defaultProvider;
-	static OSSL_PROVIDER* _legacyProvider;
+    // Ookla Change: ignore legacyProvider requirement
+	//static OSSL_PROVIDER* _legacyProvider;
 #endif
 };
 
