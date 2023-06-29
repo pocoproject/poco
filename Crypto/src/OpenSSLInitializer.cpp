@@ -67,7 +67,8 @@ Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(0);
-OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
+// Ookla change: ignore legacy provider requirement
+// OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
 #endif
 
 
@@ -134,11 +135,16 @@ void OpenSSLInitializer::initialize()
 			_defaultProvider = OSSL_PROVIDER_load(NULL, "default");
 			if (!_defaultProvider) throw CryptoException("Failed to load OpenSSL default provider");
 		}
+        /*
+         * Ookla change: ignore legacy provider requirement for compatibility with
+         * openssl 3.1.1 static builds. Legacy provider is not needed for Ookla
+         *
 		if (!_legacyProvider)
 		{
 			_legacyProvider = OSSL_PROVIDER_load(NULL, "legacy");
 			if (!_legacyProvider) throw CryptoException("Failed to load OpenSSL legacy provider");
 		}
+         */
 #endif
 	}
 }
