@@ -169,6 +169,8 @@ public:
 	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
 	        /// Decode RFC2047 string.
 
+            // Set maximum number of bytes allows for all headers (first line excluded). Defaults to 65KiB.
+    static void setTotalHeaderLimit(int max);
 
 private:
 	enum Limits
@@ -176,12 +178,15 @@ private:
 	{
 		DFL_NAME_LENGTH_LIMIT  = 256,
 		DFL_VALUE_LENGTH_LIMIT = 8192,
-		DFL_FIELD_LIMIT = 100
-	};
+		DFL_FIELD_LIMIT = 100,
+        DFL_HEADER_LIMIT = 65536 // OOKLA MODIFICATION
+    };
 
 	int _fieldLimit;
 	int _nameLengthLimit;
 	int _valueLengthLimit;
+
+    static int _totalHeaderLimit; // OOKLA MODIFICATION
 
 };
 
