@@ -20,6 +20,8 @@ message("--+ Toolchain information:")
 message("  +--> C Compiler: ${CMAKE_C_COMPILER}")
 message("  +--> CXX Compiler: ${CMAKE_CXX_COMPILER}")
 message("  +--> Environment CFLAGS: $ENV{CFLAGS}")
+
+enable_hardening_flags()
 ## END OOKLA CHANGES ##
 
 # Put the libaries and binaries that get built into directories at the

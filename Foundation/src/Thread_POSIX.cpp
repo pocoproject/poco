@@ -23,6 +23,7 @@
 #if POCO_OS == POCO_OS_FREE_BSD
 #    include <pthread_np.h>
 #    include <osreldate.h>
+#    include <sys/thr.h>
 #endif
 
 #if defined(__sun) && defined(__SVR4)
@@ -285,7 +286,11 @@ long ThreadImpl::currentOsTidImpl()
 #elif POCO_OS == POCO_OS_MAC_OS_X
     return ::pthread_mach_thread_np(::pthread_self());
 #elif POCO_OS == POCO_OS_FREE_BSD
-    return ::pthread_getthreadid_np();
+    long id;
+    if(thr_self(&id) < 0) {
+        return 0;
+    }
+    return id;
 #else
     pthread_t type;
     return ::pthread_self();
