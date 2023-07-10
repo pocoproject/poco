@@ -87,6 +87,8 @@ class PartStoreFactory
 {
 public:
 	virtual PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "") = 0;
+
+	virtual ~PartStoreFactory() = default;
 };
 
 
