@@ -5,6 +5,7 @@ AAAIntroduction
 
 !!Summary of Changes
 
+  - GH #4031: Classes with virtual functions missing virtual destructors (compilation issues)
   - GH #4014: wrong string offset in HTTPCredentials::isNTLMCredentials
   - GH #4071: PageCompiler: add referrerPolicy to page directive
   - GH #4077: OpenSSL 3: Don't throw if legacy provider is not available
