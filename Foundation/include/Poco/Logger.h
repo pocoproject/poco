@@ -156,7 +156,10 @@ public:
 	template <typename T, typename... Args>
 	void fatal(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
+		if (_level >= Message::PRIO_FATAL)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
+		}
 	}
 
 	void critical(const std::string& msg);
@@ -178,7 +181,10 @@ public:
 	template <typename T, typename... Args>
 	void critical(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
+		if (_level >= Message::PRIO_CRITICAL)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
+		}
 	}
 
 	void error(const std::string& msg);
@@ -200,7 +206,10 @@ public:
 	template <typename T, typename... Args>
 	void error(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
+		if (_level >= Message::PRIO_ERROR)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
+		}
 	}
 
 	void warning(const std::string& msg);
@@ -222,7 +231,10 @@ public:
 	template <typename T, typename... Args>
 	void warning(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
+		if (_level >= Message::PRIO_WARNING)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
+		}
 	}
 
 	void notice(const std::string& msg);
@@ -244,7 +256,10 @@ public:
 	template <typename T, typename... Args>
 	void notice(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
+		if (_level >= Message::PRIO_NOTICE)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
+		}
 	}
 
 	void information(const std::string& msg);
@@ -266,7 +281,10 @@ public:
 	template <typename T, typename... Args>
 	void information(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
+		if (_level >= Message::PRIO_INFORMATION)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
+		}
 	}
 
 	void debug(const std::string& msg);
@@ -288,7 +306,10 @@ public:
 	template <typename T, typename... Args>
 	void debug(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
+		if (_level >= Message::PRIO_DEBUG)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
+		}
 	}
 
 	void trace(const std::string& msg);
@@ -310,7 +331,10 @@ public:
 	template <typename T, typename... Args>
 	void trace(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
+		if (_level >= Message::PRIO_TRACE)
+		{
+			logNPC(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
+		}
 	}
 
 	void dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio = Message::PRIO_DEBUG);
@@ -454,6 +478,7 @@ protected:
 	~Logger();
 
 	void log(const std::string& text, Message::Priority prio);
+	void logNPC(const std::string& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, int line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
@@ -659,6 +684,15 @@ inline int Logger::getLevel() const
 inline void Logger::log(const std::string& text, Message::Priority prio)
 {
 	if (_level >= prio && _pChannel)
+	{
+		_pChannel->log(Message(_name, text, prio));
+	}
+}
+
+
+inline void Logger::logNPC(const std::string& text, Message::Priority prio)
+{
+	if (_pChannel)
 	{
 		_pChannel->log(Message(_name, text, prio));
 	}
