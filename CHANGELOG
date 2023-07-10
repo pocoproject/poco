@@ -9,6 +9,7 @@ Release 1.11.7 (2023-07-10)
 - GH #4077: OpenSSL 3: Don't throw if legacy provider is not available
 - GH #4078: Upgrade bundled SQLite to 3.42
 - GH #4079: SocketConnector: constructor should take SocketAddress by const reference
+- GH #4082: Logger performance improvement with formatting
 
 
 Release 1.11.6 (2022-12-08)
