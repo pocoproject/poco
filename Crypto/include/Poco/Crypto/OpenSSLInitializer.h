@@ -127,7 +127,11 @@ inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
 
 inline bool OpenSSLInitializer::haveLegacyProvider()
 {
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	return _legacyProvider != nullptr;
+#else
+	return false;
+#endif
 }
 
 
