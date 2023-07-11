@@ -99,14 +99,14 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 		return pSymbol;
 
 	if (alreadyVisited.find(this) != alreadyVisited.end())
-			return pSymbol;
+		return pSymbol;
+	
 	std::string head;
 	std::string tail;
 	splitName(name, head, tail);
 
 	alreadyVisited.insert(this);
 	bool currentNSInserted = true;
-
 
 	if (head.empty())
 	{
