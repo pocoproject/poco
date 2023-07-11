@@ -164,9 +164,6 @@ std::string HTTPTestServer::handleRequest() const
 	}
 	else if (_lastRequest.substr(0, 10) == "POST /fail")
 	{
-		std::string::size_type pos = _lastRequest.find("\r\n\r\n");
-		pos += 4;
-		std::string body = _lastRequest.substr(pos);
 		response.append("HTTP/1.1 400 Bad Request\r\n");
 		response.append("Connection: Close\r\n");
 		response.append("\r\n");
@@ -251,7 +248,7 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("\r\n");
 	}
 	else if (_lastRequest.substr(0, 5) == "GET /" ||
-	    _lastRequest.substr(0, 6) == "HEAD /")
+	         _lastRequest.substr(0, 6) == "HEAD /")
 	{
 		std::string body(SMALL_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
