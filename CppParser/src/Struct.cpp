@@ -252,4 +252,28 @@ std::string Struct::toString() const
 }
 
 
+Symbol* Struct::lookup(const std::string& name) const
+{
+	Symbol* pSymbol = NameSpace::lookup(name);
+	if (!pSymbol)
+	{
+		for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
+		{
+			if (it->access != Symbol::ACC_PRIVATE)
+			{
+				if (it->pClass)
+				{
+					pSymbol = it->pClass->lookup(name);
+					if (pSymbol)
+					{
+						return pSymbol;
+					}
+				}
+			}
+		}
+	}
+	return pSymbol;
+}
+
+
 } } // namespace Poco::CppParser

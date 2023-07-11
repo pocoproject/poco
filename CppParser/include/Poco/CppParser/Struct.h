@@ -138,6 +138,9 @@ public:
 
 	Symbol::Kind kind() const;
 	std::string toString() const;
+
+	// Namespace
+	Symbol* lookup(const std::string& name) const;
 	
 private:
 	std::string _decl;
