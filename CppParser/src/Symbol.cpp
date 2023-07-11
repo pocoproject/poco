@@ -121,25 +121,30 @@ std::string Symbol::extractName(const std::string& decl)
 		return "operator []";
 
 	std::string::size_type pos = decl.find('(');
-	if (pos != std::string::npos) {
+	if (pos != std::string::npos)
+	{
 		// special case std::function<void(int)> a
 		//                                ^   ^^
 		// In case the marked patterns are found,
 		// reset pos to npos to make sure "(" is not seen as the beginning of a function
 		int bracket = 1;
 		std::string::size_type i = pos + 1;
-		while (i < decl.size() && bracket != 0){
-			if (decl[i] == '('){
+		while (i < decl.size() && bracket != 0)
+		{
+			if (decl[i] == '(')
+			{
 				bracket++;
-			} else if (decl[i] == ')'){
+			}
+			else if (decl[i] == ')')
+			{
 				bracket--;
 			}
-			
 			i++;
 		}
-		
+
 		while (i < decl.size() && std::isspace(decl[i])) i++;
-		if (i < decl.size() && decl[i] == '>') {
+		if (i < decl.size() && decl[i] == '>')
+		{
 			pos = std::string::npos;
 		}
 	}
