@@ -5,6 +5,7 @@ AAAIntroduction
 
 !!Summary of Changes
 
+  - GH #4023: CPPParser: Losing data if parameter std::function<void(bool)> is used
   - GH #4031: Classes with virtual functions missing virtual destructors (compilation issues)
   - GH #4014: wrong string offset in HTTPCredentials::isNTLMCredentials
   - GH #4071: PageCompiler: add referrerPolicy to page directive
