@@ -16,6 +16,7 @@
 #include "Poco/Expire.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Stopwatch.h"
 
 
 using namespace Poco;
@@ -347,6 +348,27 @@ void FIFOEventTest::testAsyncNotify()
 	assertTrue (_count == LARGEINC);
 }
 
+void FIFOEventTest::testAsyncNotifyBenchmark()
+{
+	Poco::FIFOEvent<int> simple;
+	simple += delegate(this, &FIFOEventTest::onAsyncBench);
+	assertTrue (_count == 0);
+	const int cnt = 1000000;
+	std::vector<Poco::ActiveResult<int>> vresult;
+	Poco::Stopwatch sw;
+	sw.restart();
+	for (int i = 0; i < cnt; ++i) {
+		vresult.push_back(simple.notifyAsync(this, i));
+	}
+
+	for (int i = 0; i < cnt; ++i) {
+		vresult[i].wait();
+		assertTrue (vresult[i].data() == i);
+	}
+	sw.stop();
+	std::cout << "notify and wait time = " << sw.elapsed() / 1000 << std::endl;
+	assertTrue (_count == cnt);
+}
 
 void FIFOEventTest::onVoid(const void* pSender)
 {
@@ -402,6 +424,10 @@ void FIFOEventTest::onAsync(const void* pSender, int& i)
 	_count += LARGEINC ;
 }
 
+void FIFOEventTest::onAsyncBench(const void* pSender, int& i)
+{
+	++_count;
+}
 
 int FIFOEventTest::getCount() const
 {
@@ -446,5 +472,6 @@ CppUnit::Test* FIFOEventTest::suite()
 	CppUnit_addTest(pSuite, FIFOEventTest, testExpireReRegister);
 	CppUnit_addTest(pSuite, FIFOEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotify);
+	CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
 	return pSuite;
 }
