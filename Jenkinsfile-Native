@@ -13,18 +13,18 @@ def agents = [
 ]
 
 def builds = [
-  'linux64-deb9':               [ agent: agents.deb9_64bit, openssl: 'deb9_64bit', toolchain: "none" ],
-  'linux-x86_64-static-musl':   [ agent: agents.deb9_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl', 
-                                 CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
-  'linux-x86-static-musl':      [ agent: agents.deb9_64bit, openssl: "static-i386-musl", toolchain: 'static-musl-i386-linux-musl', 
-                                 CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
-  'linux-aarch64-static-musl':  [ agent: agents.deb9_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl', 
-                                 CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
-  'freebsd12_64':   [ agent: agents.freebsd12_64, openssl: 'freebsd12_64bit', toolchain: "none" ],
-  'freebsd13_64':   [ agent: agents.freebsd13_64, openssl: 'freebsd13_64bit', toolchain: "none"],
+  // 'linux64-deb9':               [ agent: agents.deb9_64bit, openssl: 'deb9_64bit', toolchain: "none" ],
+  // 'linux-x86_64-static-musl':   [ agent: agents.deb9_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl', 
+  //                                CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
+  // 'linux-x86-static-musl':      [ agent: agents.deb9_64bit, openssl: "static-i386-musl", toolchain: 'static-musl-i386-linux-musl', 
+  //                                CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
+  // 'linux-aarch64-static-musl':  [ agent: agents.deb9_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl', 
+  //                                CFLAGS: '-DOOKLA_DISABLE_THREAD_NAME=1' ],
+  // 'freebsd12_64':   [ agent: agents.freebsd12_64, openssl: 'freebsd12_64bit', toolchain: "none" ],
+  // 'freebsd13_64':   [ agent: agents.freebsd13_64, openssl: 'freebsd13_64bit', toolchain: "none"],
   'macosx':         [ agent: agents.macos, openssl: 'macos', toolchain: "none" ],
-  'windows32':      [ agent: agents.win32, winPlatform:'x86', openssl: 'win32', toolchain: "none" ],
-  'windows64':      [ agent: agents.win64, winPlatform:'x64', openssl: 'win64', toolchain: "none" ],
+  // 'windows32':      [ agent: agents.win32, winPlatform:'x86', openssl: 'win32', toolchain: "none" ],
+  // 'windows64':      [ agent: agents.win64, winPlatform:'x64', openssl: 'win64', toolchain: "none" ],
 ]
 
 def createBuildStages(builds) {
@@ -102,10 +102,10 @@ def createBuildStage(name, definition) {
               ['Debug', 'Release'].each { buildType ->
                 sh "rm -f cmake_install_${buildType}.zip"
                 zip zipFile:"cmake_install_${buildType}.zip", dir:"cmake_install_${buildType}"
-                s3Upload(
-                  bucket:'ookla-native-artifacts',
-                  path:"${APPLICATION_NAME}/${env.BRANCH_NAME}/${APPLICATION_NAME}-${version}-${PLATFORM}-${buildType}.zip",
-                  file:"cmake_install_${buildType}.zip")
+                // s3Upload(
+                //   bucket:'ookla-native-artifacts',
+                //   path:"${APPLICATION_NAME}/${env.BRANCH_NAME}/${APPLICATION_NAME}-${version}-${PLATFORM}-${buildType}.zip",
+                //   file:"cmake_install_${buildType}.zip")
               }
             }
           }
