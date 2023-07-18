@@ -32,13 +32,7 @@ Array::Array(int options):
 }
 
 
-Array::Array(const Array& other) :
-	_values(other._values),
-	_pArray(other._pArray),
-	_modified(other._modified),
-	_escapeUnicode(other._escapeUnicode)
-{
-}
+Array::Array(const Array& other) = default;
 
 
 Array::Array(Array&& other) noexcept:
@@ -74,9 +68,7 @@ Array& Array::operator = (Array&& other) noexcept
 }
 
 
-Array::~Array()
-{
-}
+Array::~Array() = default;
 
 
 Var Array::get(unsigned int index) const
@@ -161,7 +153,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 
 	if (indent > 0) out << std::endl;
 
-	for (ValueVec::const_iterator it = _values.begin(); it != _values.end();)
+	for (auto it = _values.begin(); it != _values.end();)
 	{
 		for (int i = 0; i < indent; i++) out << ' ';
 
@@ -195,14 +187,14 @@ void Array::resetDynArray() const
 
 Array::operator const Poco::Dynamic::Array& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynArray();
 	}
 	else if (_modified)
 	{
-		ValueVec::const_iterator it = _values.begin();
-		ValueVec::const_iterator end = _values.end();
+		auto it = _values.begin();
+		auto end = _values.end();
 		resetDynArray();
 		int index = 0;
 		for (; it != end; ++it, ++index)
@@ -231,8 +223,8 @@ Poco::Dynamic::Array Array::makeArray(const JSON::Array::Ptr& arr)
 {
 	Poco::Dynamic::Array vec;
 
-	JSON::Array::ConstIterator it  = arr->begin();
-	JSON::Array::ConstIterator end = arr->end();
+	auto it  = arr->begin();
+	auto end = arr->end();
 	int index = 0;
 	for (; it != end; ++it, ++index)
 	{
@@ -259,7 +251,7 @@ Poco::Dynamic::Array Array::makeArray(const JSON::Array::Ptr& arr)
 void Array::clear()
 {
 	_values.clear();
-	_pArray = 0;
+	_pArray = nullptr;
 }
 
 
