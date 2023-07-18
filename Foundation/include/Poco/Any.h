@@ -57,9 +57,7 @@ union Placeholder
 	///
 	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
 	/// it will be placement-new-allocated into the local buffer
-	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
-	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
-	/// where the object was allocated (0 => heap, 1 => local).
+	/// (i.e. there will be no heap-allocation).
 	///
 	/// Important: for SOO builds, only same-type (or trivial both-empty no-op)
 	/// swap operation is allowed.
@@ -77,10 +75,8 @@ public:
 
 #ifndef POCO_NO_SOO
 
-	Placeholder(): pHolder(0)
-	{
-		std::memset(holder, 0, sizeof(Placeholder));
-	}
+	Placeholder(): pHolder(nullptr)
+	{}
 
 	~Placeholder()
 	{
@@ -90,7 +86,10 @@ public:
 	void swap(Placeholder& other) noexcept
 	{
 		if (!isEmpty() || !other.isEmpty())
+		{
 			std::swap(holder, other.holder);
+			std::swap(pHolder, other.pHolder);
+		}
 	}
 
 	void erase()
@@ -100,13 +99,12 @@ public:
 
 	bool isEmpty() const
 	{
-		static char buf[SizeV+1] = {};
-		return 0 == std::memcmp(holder, buf, SizeV+1);
+		return !pHolder;
 	}
 
 	bool isLocal() const
 	{
-		return holder[SizeV] != 0;
+		return !pHolder || pHolder == reinterpret_cast<PlaceholderT*>(&holder);
 	}
 
 	template<typename T, typename V,
@@ -114,9 +112,9 @@ public:
 	PlaceholderT* assign(const V& value)
 	{
 		erase();
-		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
-		setLocal(true);
-		return reinterpret_cast<PlaceholderT*>(holder);
+		pHolder = reinterpret_cast<PlaceholderT*>(&holder);
+		new (pHolder) T(value);
+		return pHolder;
 	}
 
 	template<typename T, typename V,
@@ -125,26 +123,17 @@ public:
 	{
 		erase();
 		pHolder = new T(value);
-		setLocal(false);
 		return pHolder;
 	}
 
 	PlaceholderT* content() const
 	{
-		if (isLocal())
-			return reinterpret_cast<PlaceholderT*>(holder);
-		else
-			return pHolder;
+		return pHolder;
 	}
 
 private:
 	typedef std::max_align_t AlignerType;
-	static_assert(sizeof(AlignerType) <= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
-
-	void setLocal(bool local) const
-	{
-		holder[SizeV] = local ? 1 : 0;
-	}
+	static_assert(sizeof(AlignerType) <= SizeV, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
 
 	void destruct(bool clear)
 	{
@@ -153,13 +142,13 @@ private:
 			if (!isLocal())
 				delete pHolder;
 			else
-				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
+				reinterpret_cast<PlaceholderT*>(&holder)->~PlaceholderT();
 
-			if (clear) std::memset(holder, 0, sizeof(Placeholder));
+			if (clear) pHolder = nullptr;
 		}
 	}
 
-	mutable unsigned char holder[SizeV+1];
+	mutable unsigned char holder[SizeV];
 	AlignerType           aligner;
 
 #else // POCO_NO_SOO
