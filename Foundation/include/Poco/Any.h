@@ -139,7 +139,7 @@ public:
 
 private:
 	typedef std::max_align_t AlignerType;
-	static_assert(sizeof(AlignerType) >= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
+	static_assert(sizeof(AlignerType) <= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
 
 	void setLocal(bool local) const
 	{
