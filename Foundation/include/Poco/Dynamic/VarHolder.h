@@ -361,7 +361,7 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit<std::make_unsigned<F>,T>(from);
+		checkUpperLimit<std::make_unsigned_t<F>,T>(from);
 		to = static_cast<T>(from);
 	}
 
