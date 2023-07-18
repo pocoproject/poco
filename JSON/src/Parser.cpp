@@ -35,9 +35,7 @@ Parser::Parser(const Handler::Ptr& pHandler):
 }
 
 
-Parser::~Parser()
-{
-}
+Parser::~Parser() = default;
 
 
 void Parser::setHandler(const Handler::Ptr& pHandler)

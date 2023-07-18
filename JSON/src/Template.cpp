@@ -32,17 +32,13 @@ POCO_IMPLEMENT_EXCEPTION(JSONTemplateException, Exception, "Template Exception")
 class Part
 {
 public:
-	Part()
-	{
-	}
+	Part() = default;
 
-	virtual ~Part()
-	{
-	}
+	virtual ~Part() = default;
 
 	virtual void render(const Var& data, std::ostream& out) const = 0;
 
-	typedef std::vector<SharedPtr<Part>> VectorParts;
+	using VectorParts = std::vector<SharedPtr<Part>>;
 };
 
 
@@ -57,11 +53,9 @@ public:
 	{
 	}
 
-	virtual ~StringPart()
-	{
-	}
+	~StringPart() override = default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		out << _content;
 	}
@@ -84,20 +78,16 @@ private:
 class MultiPart: public Part
 {
 public:
-	MultiPart()
-	{
-	}
+	MultiPart() = default;
 
-	virtual ~MultiPart()
-	{
-	}
+	~MultiPart() override = default;
 
 	virtual void addPart(Part* part)
 	{
-		_parts.push_back(part);
+		_parts.emplace_back(part);
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		for (const auto& p: _parts)
 		{
@@ -117,11 +107,9 @@ public:
 	{
 	}
 
-	virtual ~EchoPart()
-	{
-	}
+	~EchoPart() override = default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		Query query(data);
 		Var value = query.find(_query);
@@ -144,9 +132,7 @@ public:
 	{
 	}
 
-	virtual ~LogicQuery()
-	{
-	}
+	virtual ~LogicQuery() = default;
 
 	virtual bool apply(const Var& data) const
 	{
@@ -188,11 +174,9 @@ public:
 	{
 	}
 
-	virtual ~LogicExistQuery()
-	{
-	}
+	~LogicExistQuery() override = default;
 
-	virtual bool apply(const Var& data) const
+	bool apply(const Var& data) const override
 	{
 		Query query(data);
 		Var value = query.find(_queryString);
@@ -209,11 +193,9 @@ public:
 	{
 	}
 
-	virtual ~LogicElseQuery()
-	{
-	}
+	~LogicElseQuery() override = default;
 
-	virtual bool apply(const Var& data) const
+	bool apply(const Var& data) const override
 	{
 		return true;
 	}
@@ -227,23 +209,21 @@ public:
 	{
 	}
 
-	virtual ~LogicPart()
-	{
-	}
+	~LogicPart() override = default;
 
 	void addPart(LogicQuery* query, Part* part)
 	{
 		MultiPart::addPart(part);
-		_queries.push_back(query);
+		_queries.emplace_back(query);
 	}
 
-	void addPart(Part* part)
+	void addPart(Part* part) override
 	{
 		MultiPart::addPart(part);
 		_queries.push_back(new LogicElseQuery());
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		int count = 0;
 		for (auto it = _queries.begin(); it != _queries.end(); ++it, ++count)
@@ -268,11 +248,9 @@ public:
 	{
 	}
 
-	virtual ~LoopPart()
-	{
-	}
+	~LoopPart() override = default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		Query query(data);
 
@@ -322,14 +300,12 @@ public:
 		}
 	}
 
-	virtual ~IncludePart()
-	{
-	}
+	~IncludePart() override = default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		TemplateCache* cache = TemplateCache::instance();
-		if (cache == 0)
+		if (cache == nullptr)
 		{
 			Template tpl(_path);
 			tpl.parse();
@@ -348,16 +324,16 @@ private:
 
 
 Template::Template(const Path& templatePath):
-	_parts(0),
-	_currentPart(0),
+	_parts(nullptr),
+	_currentPart(nullptr),
 	_templatePath(templatePath)
 {
 }
 
 
 Template::Template():
-	_parts(0),
-	_currentPart(0)
+	_parts(nullptr),
+	_currentPart(nullptr)
 {
 }
 
@@ -430,24 +406,24 @@ void Template::parse(std::istream& in)
 			}
 
 			_partStack.push(_currentPart);
-			LoopPart* part = new LoopPart(loopVariable, query);
+			auto part = new LoopPart(loopVariable, query);
 			_partStack.push(part);
 			_currentPart->addPart(part);
 			_currentPart = part;
 		}
 		else if (command.compare("else") == 0)
 		{
-			if (_partStack.size() == 0)
+			if (_partStack.empty())
 			{
 				throw JSONTemplateException("Unexpected <? else ?> found");
 			}
 			_currentPart = _partStack.top();
-			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			auto lp = dynamic_cast<LogicPart*>(_currentPart);
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? else ?>");
 			}
-			MultiPart* part = new MultiPart();
+			auto part = new MultiPart();
 			lp->addPart(part);
 			_currentPart = part;
 		}
@@ -459,18 +435,18 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Missing query in <? " + command + " ?>");
 			}
 
-			if (_partStack.size() == 0)
+			if (_partStack.empty())
 			{
 				throw JSONTemplateException("Unexpected <? elsif / elif ?> found");
 			}
 
 			_currentPart = _partStack.top();
-			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			auto lp = dynamic_cast<LogicPart*>(_currentPart);
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? elsif / elif ?>");
 			}
-			MultiPart* part = new MultiPart();
+			auto part = new MultiPart();
 			lp->addPart(new LogicQuery(query), part);
 			_currentPart = part;
 		}
@@ -481,8 +457,8 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Unexpected <? endfor ?> found");
 			}
 			MultiPart* loopPart = _partStack.top();
-			LoopPart* lp = dynamic_cast<LoopPart*>(loopPart);
-			if (lp == 0)
+			auto lp = dynamic_cast<LoopPart*>(loopPart);
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? for ?> command");
 			}
@@ -498,8 +474,8 @@ void Template::parse(std::istream& in)
 			}
 
 			_currentPart = _partStack.top();
-			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			auto lp = dynamic_cast<LogicPart*>(_currentPart);
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? endif ?>");
 			}
@@ -516,7 +492,7 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Missing query in <? " + command + " ?>");
 			}
 			_partStack.push(_currentPart);
-			LogicPart* lp = new LogicPart();
+			auto lp = new LogicPart();
 			_partStack.push(lp);
 			_currentPart->addPart(lp);
 			_currentPart = new MultiPart();
