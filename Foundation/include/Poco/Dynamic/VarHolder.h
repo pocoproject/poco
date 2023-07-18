@@ -38,6 +38,7 @@
 #include <list>
 #include <deque>
 #include <typeinfo>
+#include <type_traits>
 #undef min
 #undef max
 #include <limits>
@@ -360,7 +361,7 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit<F,T>(from);
+		checkUpperLimit<std::make_unsigned<F>,T>(from);
 		to = static_cast<T>(from);
 	}
 
