@@ -18,6 +18,7 @@
 #              [-verbosity    minimal | quiet | normal | detailed | diagnostic]
 #              [-openssl_base dir]
 #              [-mysql_base   dir]
+#              [-compiler_options Additional compiler options]
 
 [CmdletBinding()]
 Param
@@ -67,6 +68,9 @@ Param
 
 	[Parameter()]
 	[string] $mysql_base,
+
+	[Parameter()]
+	[string] $compiler_options,
 
 	[switch] $help
 )
@@ -248,6 +252,8 @@ function Process-Input
 		Write-Host '    [-verbosity    minimal | quiet | normal | detailed | diagnostic'
 		Write-Host '    [-openssl_base <dir>]'
 		Write-Host '    [-mysql_base   <dir>]'
+		Write-Host '    [-compiler_options  Additional compiler options]'
+
 		Exit
 	}
 	else
@@ -314,7 +320,7 @@ function ExecuteMSBuild([string] $vsProject, [string] $projectConfig)
 		return
 	}
 
-	$cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$($useenv -eq 'env') /v:$verbosity"
+	$cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$($useenv -eq 'env') /v:$verbosity /p:AdditionalCompilerOptions=$compiler_options"
 	Write-Host $cmd
 	Invoke-Expression $cmd
 	if ($LastExitCode -ne 0) { Exit $LastExitCode }

@@ -340,6 +340,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -372,6 +373,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -402,6 +404,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\libA64\PocoMongoDBmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -428,6 +431,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -450,6 +454,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\libA64\PocoMongoDBmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -476,6 +481,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -498,6 +504,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -530,6 +537,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -560,6 +568,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoMongoDBmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -586,6 +595,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -608,6 +618,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoMongoDBmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -634,6 +645,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoMongoDBmd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -657,6 +669,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -689,6 +702,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -719,6 +733,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib64\PocoMongoDBmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -745,6 +760,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -767,6 +783,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib64\PocoMongoDBmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -793,6 +810,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>

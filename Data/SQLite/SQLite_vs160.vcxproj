@@ -236,6 +236,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -269,6 +270,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -300,6 +302,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib\PocoDataSQLitemtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -327,6 +330,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -350,6 +354,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib\PocoDataSQLitemdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -377,6 +382,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib\PocoDataSQLitemd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -401,6 +407,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -434,6 +441,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -465,6 +473,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib64\PocoDataSQLitemtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -492,6 +501,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -515,6 +525,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib64\PocoDataSQLitemdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -542,6 +553,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>

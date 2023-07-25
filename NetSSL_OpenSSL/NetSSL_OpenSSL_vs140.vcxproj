@@ -235,6 +235,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -268,6 +269,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -299,6 +301,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoNetSSLmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -325,6 +328,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -347,6 +351,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoNetSSLmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -373,6 +378,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoNetSSLmd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -397,6 +403,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -430,6 +437,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -461,6 +469,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib64\PocoNetSSLmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -487,6 +496,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
@@ -509,6 +519,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib64\PocoNetSSLmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
@@ -535,6 +546,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>$(AdditionalCompilerOptions)</AdditionalOptions>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
