@@ -65,7 +65,7 @@
 #pragma warning(disable: 4127)  // conditional expression is constant
 #endif
 
-#if (POCO_OS == POCO_OS_MAC_OS_X)
+#if POCO_OS == POCO_OS_MAC_OS_X
 #include "TargetConditionals.h"
 #endif
 
