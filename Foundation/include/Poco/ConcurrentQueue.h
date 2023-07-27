@@ -11,8 +11,6 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
-
 // Provides a C++11 implementation of a multi-producer, multi-consumer lock-free queue.
 // An overview, including benchmark results, is provided here:
 //     http://Poco.com/blog/2014/a-fast-general-purpose-lock-free-queue-for-c++
@@ -46,14 +44,18 @@
 
 #pragma once
 
-#include "Poco/Foundation.h"
-
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
 // Disable -Wconversion warnings (spuriously triggered when Traits::size_t and
 // Traits::index_t are set to < 32 bits, causing integer promotion, causing warnings
 // upon assigning any computed values)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+
+#define POCO_CPP11_THREAD_LOCAL_SUPPORTED
+
+#ifdef MCDBGQ_USE_RELACY
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#endif
 #endif
 
 #if defined(_MSC_VER) && (!defined(_HAS_CXX17) || !_HAS_CXX17)
@@ -79,38 +81,34 @@
 #include <limits>
 #include <climits>		// for CHAR_BIT
 #include <array>
-#include <thread>		// partly for __WINPTHREADS_VERSION if on MinGW-w64 w/ POSIX threading
-#include <mutex>        // used for thread exit synchronization
+
 #include "Poco/Thread.h"
-#include "Poco/Mutex.h"
 #include "Poco/ThreadLocal.h"
+#include "Poco/Mutex.h"
+#include "Poco/Nullable.h"
 
 // Platform-specific definitions of a numeric thread ID type and an invalid value
-namespace Poco {
-namespace Details {
-	template<typename threadIdT> struct thread_id_converter
-	{
-		typedef threadIdT threadIdNumericSizeT;
-		typedef threadIdT threadIdHashT;
-		static threadIdHashT prehash(threadIdT const& x) { return x; }
+namespace Poco { namespace Details {
+	template<typename thread_id_t> struct thread_id_converter {
+		using thread_id_numeric_size_t = thread_id_t;
+		using thread_id_hash_t = thread_id_t;
+		static thread_id_hash_t prehash(thread_id_t const& x) { return x; }
 	};
-} } // Poco::Details
+} }
 
-namespace Poco {
-namespace Details {
-	typedef Poco::Thread::TID threadIdT;
-	static const threadIdT invalidThreadId  = 0;		// Address can't be nullptr
-	static const threadIdT invalidThreadId2 = 1;		// Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
-	inline threadIdT thread_id()
-	{
-		static Poco::ThreadLocal<Poco::AutoPtr<threadIdT>> x;
+namespace Poco { namespace Details {
+	using thread_id_t = long;
+	static const thread_id_t invalid_thread_id  = 0;		// Address can't be nullptr
+	static const thread_id_t invalid_thread_id2 = 1;		// Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
+	inline thread_id_t thread_id() { 
+		static Poco::ThreadLocal<Poco::Nullable<thread_id_t>> x;
 		if ((*x).isNull())
 		{
-			*x = Poco::makeAuto<threadIdT>(Poco::Thread::currentTid());
+			(*x) = Poco::Thread::currentOsTid();
 		}
-		return *(x.get());
+		return x->value(); 
 	}
-} } // Poco::Details
+} }
 
 
 // Constexpr if
@@ -124,8 +122,47 @@ namespace Details {
 #endif
 #endif
 
-namespace Poco {
-namespace Details {
+// Exceptions
+#ifndef POCO_EXCEPTIONS_ENABLED
+#if (defined(_MSC_VER) && defined(_CPPUNWIND)) || (defined(__GNUC__) && defined(__EXCEPTIONS)) || (!defined(_MSC_VER) && !defined(__GNUC__))
+#define POCO_EXCEPTIONS_ENABLED
+#endif
+#endif
+#ifdef POCO_EXCEPTIONS_ENABLED
+#define POCO_TRY try
+#define POCO_CATCH(...) catch(__VA_ARGS__)
+#define POCO_RETHROW throw
+#define POCO_THROW(expr) throw (expr)
+#else
+#define POCO_TRY POCO_CONSTEXPR_IF (true)
+#define POCO_CATCH(...) else POCO_CONSTEXPR_IF (false)
+#define POCO_RETHROW
+#define POCO_THROW(expr)
+#endif
+
+#ifndef POCO_NOEXCEPT
+#if !defined(POCO_EXCEPTIONS_ENABLED)
+#define POCO_NOEXCEPT
+#define POCO_NOEXCEPT_CTOR(type, valueType, expr) true
+#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) true
+#elif defined(_MSC_VER) && defined(_NOEXCEPT) && _MSC_VER < 1800
+// VS2012's std::is_nothrow_[move_]constructible is broken and returns true when it shouldn't :-(
+// We have to assume *all* non-trivial constructors may throw on VS2012!
+#define POCO_NOEXCEPT _NOEXCEPT
+#define POCO_NOEXCEPT_CTOR(type, valueType, expr) (std::is_rvalue_reference<valueType>::value && std::is_move_constructible<type>::value ? std::is_trivially_move_constructible<type>::value : std::is_trivially_copy_constructible<type>::value)
+#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) ((std::is_rvalue_reference<valueType>::value && std::is_move_assignable<type>::value ? std::is_trivially_move_assignable<type>::value || std::is_nothrow_move_assignable<type>::value : std::is_trivially_copy_assignable<type>::value || std::is_nothrow_copy_assignable<type>::value) && POCO_NOEXCEPT_CTOR(type, valueType, expr))
+#elif defined(_MSC_VER) && defined(_NOEXCEPT) && _MSC_VER < 1900
+#define POCO_NOEXCEPT _NOEXCEPT
+#define POCO_NOEXCEPT_CTOR(type, valueType, expr) (std::is_rvalue_reference<valueType>::value && std::is_move_constructible<type>::value ? std::is_trivially_move_constructible<type>::value || std::is_nothrow_move_constructible<type>::value : std::is_trivially_copy_constructible<type>::value || std::is_nothrow_copy_constructible<type>::value)
+#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) ((std::is_rvalue_reference<valueType>::value && std::is_move_assignable<type>::value ? std::is_trivially_move_assignable<type>::value || std::is_nothrow_move_assignable<type>::value : std::is_trivially_copy_assignable<type>::value || std::is_nothrow_copy_assignable<type>::value) && POCO_NOEXCEPT_CTOR(type, valueType, expr))
+#else
+#define POCO_NOEXCEPT noexcept
+#define POCO_NOEXCEPT_CTOR(type, valueType, expr) noexcept(expr)
+#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) noexcept(expr)
+#endif
+#endif
+
+namespace Poco { namespace Details {
 #ifndef POCO_ALIGNAS
 // VS2013 doesn't support alignas or alignof, and align() requires a constant literal
 #if defined(_MSC_VER) && _MSC_VER <= 1800
@@ -143,13 +180,13 @@ namespace Details {
 	template<typename T> struct Vs2013Aligned<128, T> { typedef __declspec(align(128)) T type; };
 	template<typename T> struct Vs2013Aligned<256, T> { typedef __declspec(align(256)) T type; };
 #else
-	template<typename T> struct identity { typedef T type; };
+	template<typename T> struct identity { using type = T; };
 #define POCO_ALIGNAS(alignment) alignas(alignment)
 #define POCO_ALIGNOF(obj) alignof(obj)
 #define POCO_ALIGNED_TYPE_LIKE(T, obj) alignas(alignof(obj)) typename Details::identity<T>::type
 #endif
 #endif
-} } // Poco::Details
+} }
 
 
 // TSAN can false report races in lock-free code.  To enable TSAN to be used from projects that use this one,
@@ -164,8 +201,7 @@ namespace Details {
 #endif // TSAN
 
 // Compiler-specific likely/unlikely hints
-namespace Poco {
-namespace Details {
+namespace Poco { namespace Details {
 #if defined(__GNUC__)
 	static inline bool (likely)(bool x) { return __builtin_expect((x), true); }
 	static inline bool (unlikely)(bool x) { return __builtin_expect((x), false); }
@@ -182,8 +218,7 @@ namespace Details {
 namespace Poco {
 namespace Details {
 	template<typename T>
-	struct const_numeric_max
-	{
+	struct const_numeric_max {
 		static_assert(std::is_integral<T>::value, "const_numeric_max can only be used with integers");
 		static const T value = std::numeric_limits<T>::is_signed
 			? (static_cast<T>(1) << (sizeof(T) * CHAR_BIT - 1)) - static_cast<T>(1)
@@ -193,18 +228,17 @@ namespace Details {
 #if defined(__GLIBCXX__)
 	typedef ::max_align_t std_max_align_t;      // libstdc++ forgot to add it to std:: for a while
 #else
-	typedef std::max_align_t std_max_align_t;   // Others (e.g. MSVC) insist it can *only* be accessed via std::
+	using std_max_align_t = std::max_align_t;   // Others (e.g. MSVC) insist it can *only* be accessed via std::
 #endif
 
 	// Some platforms have incorrectly set max_align_t to a type with <8 bytes alignment even while supporting
 	// 8-byte aligned scalar values (*cough* 32-bit iOS). Work around this with our own union. See issue #64.
-	typedef union
-	{
+	using max_align_t = union {
 		std_max_align_t x;
 		long long y;
 		void* z;
-	} max_align_t;
-} // Details
+	};
+}
 
 // Default traits for the ConcurrentQueue. To change some of the
 // traits without re-implementing all of them, inherit from this
@@ -215,7 +249,7 @@ namespace Details {
 struct ConcurrentQueueDefaultTraits
 {
 	// General-purpose size type. std::size_t is strongly recommended.
-	typedef std::size_t size_t;
+	using size_t = std::size_t;
 	
 	// The type used for the enqueue and dequeue indices. Must be at least as
 	// large as size_t. Should be significantly larger than the number of elements
@@ -226,8 +260,8 @@ struct ConcurrentQueueDefaultTraits
 	// A 64-bit int type is recommended in that case, and in practice will
 	// prevent a race condition no matter the usage of the queue. Note that
 	// whether the queue is lock-free with a 64-int type depends on the whether
-	// std::atomic<Poco::UInt64> is lock-free, which is platform-specific.
-	typedef std::size_t index_t;
+	// std::atomic<std::uint64_t> is lock-free, which is platform-specific.
+	using index_t = std::size_t;
 	
 	// Internally, all elements are enqueued and dequeued from multi-element
 	// blocks; this is the smallest controllable unit. If you expect few elements
@@ -260,7 +294,7 @@ struct ConcurrentQueueDefaultTraits
 	// Controls the number of items that an explicit consumer (i.e. one with a token)
 	// must consume before it causes all consumers to rotate and move on to the next
 	// internal queue.
-	static const Poco::UInt32 EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE = 256;
+	static const std::uint32_t EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE = 256;
 	
 	// The maximum number of elements (inclusive) that can be enqueued to a sub-queue.
 	// Enqueue operations that would cause this limit to be surpassed will fail. Note
@@ -272,7 +306,7 @@ struct ConcurrentQueueDefaultTraits
 	// Recommended values are on the order of 1000-10000 unless the number of
 	// consumer threads exceeds the number of idle cores (in which case try 0-100).
 	// Only affects instances of the BlockingConcurrentQueue.
-	static const Poco::Int32 MAX_SEMA_SPINS = 10000;
+	static const int MAX_SEMA_SPINS = 10000;
 
 	// Whether to recycle dynamically-allocated blocks into an internal free list or
 	// not. If false, only pre-allocated blocks (controlled by the constructor
@@ -282,6 +316,9 @@ struct ConcurrentQueueDefaultTraits
 	static const bool RECYCLE_ALLOCATED_BLOCKS = false;
 
 	
+#ifndef MCDBGQ_USE_RELACY
+	// Memory allocation can be customized if needed.
+	// malloc should return nullptr on failure, and handle alignment like std::malloc.
 #if defined(malloc) || defined(free)
 	// Gah, this is 2015, stop defining macros that break standard code already!
 	// Work around malloc/free being special macros:
@@ -292,6 +329,12 @@ struct ConcurrentQueueDefaultTraits
 #else
 	static inline void* malloc(size_t size) { return std::malloc(size); }
 	static inline void free(void* ptr) { return std::free(ptr); }
+#endif
+#else
+	// Debug versions when running under the Relacy race detector (ignore
+	// these in user code)
+	static inline void* malloc(size_t size) { return rl::rl_malloc(size, $); }
+	static inline void free(void* ptr) { return rl::rl_free(ptr, $); }
 #endif
 };
 
@@ -319,12 +362,15 @@ namespace Details
 		std::atomic<bool> inactive;
 		ProducerToken* token;
 		
-		ConcurrentQueueProducerTypelessBase();
+		ConcurrentQueueProducerTypelessBase()
+			: next(nullptr), inactive(false), token(nullptr)
+		{
+		}
 	};
 	
-	template<bool use32> struct _hash32Or64
-	{
-		static Poco::UInt32 hash(Poco::UInt32 h)
+	struct hash_32_or_64 {
+		template<typename T, typename std::enable_if_t<(sizeof(T) <= 4), bool> = true>
+		static inline std::uint32_t hash(T h)
 		{
 			// MurmurHash3 finalizer -- see https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp
 			// Since the thread ID is already unique, all we really want to do is propagate that
@@ -336,10 +382,8 @@ namespace Details
 			h *= 0xc2b2ae35;
 			return h ^ (h >> 16);
 		}
-	};
-	template<> struct _hash32Or64<1>
-	{
-		static Poco::UInt64 hash(Poco::UInt64 h)
+		template<typename T, typename std::enable_if_t<(sizeof(T) > 4), bool> = true>
+		static inline std::uint32_t hash(T h)
 		{
 			h ^= h >> 33;
 			h *= 0xff51afd7ed558ccd;
@@ -348,12 +392,15 @@ namespace Details
 			return h ^ (h >> 33);
 		}
 	};
-	template<std::size_t size> struct hash32Or64 : public _hash32Or64<(size > 4)> {  };
 	
-	static size_t hashThreadId(threadIdT id);
+	static inline size_t hash_thread_id(thread_id_t id)
+	{
+		static_assert(sizeof(thread_id_t) <= 8, "Expected a platform where thread IDs are at most 64-bit values");
+		return static_cast<size_t>(hash_32_or_64::hash(thread_id_converter<thread_id_t>::prehash(id)));
+	}
 	
 	template<typename T>
-	static inline bool circularLessThan(T a, T b)
+	static inline bool circular_less_than(T a, T b)
 	{
 		static_assert(std::is_integral<T>::value && !std::numeric_limits<T>::is_signed, "circular_less_than is intended to be used only with unsigned integer types");
 		return static_cast<T>(a - b) > static_cast<T>(static_cast<T>(1) << (static_cast<T>(sizeof(T) * CHAR_BIT - 1)));
@@ -362,14 +409,14 @@ namespace Details
 	}
 	
 	template<typename U>
-	static inline char* alignFor(char* ptr)
+	static inline char* align_for(char* ptr)
 	{
 		const std::size_t alignment = std::alignment_of<U>::value;
 		return ptr + (alignment - (reinterpret_cast<std::uintptr_t>(ptr) % alignment)) % alignment;
 	}
 
 	template<typename T>
-	static inline T ceilToPow2(T x)
+	static inline T ceil_to_pow_2(T x)
 	{
 		static_assert(std::is_integral<T>::value && !std::numeric_limits<T>::is_signed, "ceil_to_pow_2 is intended to be used only with unsigned integer types");
 
@@ -413,14 +460,15 @@ namespace Details
 	struct nomove_if<false>
 	{
 		template<typename U>
-		static inline auto eval(U&& x) -> decltype(std::forward<U>(x))
+		static inline auto eval(U&& x)
+			-> decltype(std::forward<U>(x))
 		{
 			return std::forward<U>(x);
 		}
 	};
 	
 	template<typename It>
-	static inline auto deref_noexcept(It& it) noexcept -> decltype(*it)
+	static inline auto deref_noexcept(It& it) POCO_NOEXCEPT -> decltype(*it)
 	{
 		return *it;
 	}
@@ -430,13 +478,11 @@ namespace Details
 #else
 	template<typename T> struct is_trivially_destructible : std::has_trivial_destructor<T> { };
 #endif
-	
-
 	class ThreadExitNotifier;
 
 	struct ThreadExitListener
 	{
-		typedef void (*callback_t)(void*);
+		using callback_t = void (*)(void *);
 		callback_t callback;
 		void* userData;
 		
@@ -447,27 +493,68 @@ namespace Details
 	class ThreadExitNotifier
 	{
 	public:
-		static void subscribe(ThreadExitListener* listener);
+		static void subscribe(ThreadExitListener* listener)
+		{
+			auto& tlsInst = instance();
+			Poco::FastMutex::ScopedLock guard(mutex());
+			listener->next = tlsInst.tail;
+			listener->chain = &tlsInst;
+			tlsInst.tail = listener;
+		}
 		
-		static void unsubscribe(ThreadExitListener* listener);
-
-		ThreadExitNotifier();
-
-		~ThreadExitNotifier();
-
+		static void unsubscribe(ThreadExitListener* listener)
+		{
+			Poco::FastMutex::ScopedLock guard(mutex());
+			if (!listener->chain) {
+				return;  // race with ~ThreadExitNotifier
+			}
+			auto& tlsInst = *listener->chain;
+			listener->chain = nullptr;
+			ThreadExitListener** prev = &tlsInst.tail;
+			for (auto ptr = tlsInst.tail; ptr != nullptr; ptr = ptr->next) {
+				if (ptr == listener) {
+					*prev = ptr->next;
+					break;
+				}
+				prev = &ptr->next;
+			}
+		}
+		
 	private:
+		ThreadExitNotifier() : tail(nullptr) { }
 		ThreadExitNotifier(ThreadExitNotifier const&) = delete;
 		ThreadExitNotifier& operator=(ThreadExitNotifier const&) = delete;
 		
+		~ThreadExitNotifier()
+		{
+			// This thread is about to exit, let everyone know!
+			assert(this == &instance() && "If this assert fails, you likely have a buggy compiler! Change the preprocessor conditions such that POCO_CPP11_THREAD_LOCAL_SUPPORTED is no longer defined.");
+			Poco::FastMutex::ScopedLock guard(mutex());
+			for (auto ptr = tail; ptr != nullptr; ptr = ptr->next) {
+				ptr->chain = nullptr;
+				ptr->callback(ptr->userData);
+			}
+		}
+		
 		// Thread-local
-		static ThreadExitNotifier& instance();
+		static inline ThreadExitNotifier& instance()
+		{
+			static thread_local ThreadExitNotifier notifier;
+			return notifier;
+		}
 
-		static Poco::FastMutex& mutex();
+		static inline Poco::FastMutex& mutex()
+		{
+			// Must be static because the ThreadExitNotifier could be destroyed while unsubscribe is called
+			static Poco::FastMutex mutex;
+			return mutex;
+		}
 		
 	private:
 		ThreadExitListener* tail;
 	};
 
+	
 	template<typename T> struct static_is_lock_free_num { enum { value = 0 }; };
 	template<> struct static_is_lock_free_num<signed char> { enum { value = ATOMIC_CHAR_LOCK_FREE }; };
 	template<> struct static_is_lock_free_num<short> { enum { value = ATOMIC_SHORT_LOCK_FREE }; };
@@ -488,11 +575,31 @@ struct ProducerToken
 	template<typename T, typename Traits>
 	explicit ProducerToken(BlockingConcurrentQueue<T, Traits>& queue);
 	
-	ProducerToken(ProducerToken&& other) noexcept;
+	ProducerToken(ProducerToken&& other) POCO_NOEXCEPT
+		: producer(other.producer)
+	{
+		other.producer = nullptr;
+		if (producer != nullptr) {
+			producer->token = this;
+		}
+	}
 	
-	ProducerToken& operator=(ProducerToken&& other) noexcept;
+	inline ProducerToken& operator=(ProducerToken&& other) POCO_NOEXCEPT
+	{
+		swap(other);
+		return *this;
+	}
 	
-	void swap(ProducerToken& other) noexcept;
+	void swap(ProducerToken& other) POCO_NOEXCEPT
+	{
+		std::swap(producer, other.producer);
+		if (producer != nullptr) {
+			producer->token = this;
+		}
+		if (other.producer != nullptr) {
+			other.producer->token = &other;
+		}
+	}
 	
 	// A token is always valid unless:
 	//     1) Memory allocation failed during construction
@@ -504,7 +611,13 @@ struct ProducerToken
 	// but not which one; that's up to the user to track.
 	inline bool valid() const { return producer != nullptr; }
 	
-	~ProducerToken();
+	~ProducerToken()
+	{
+		if (producer != nullptr) {
+			producer->token = nullptr;
+			producer->inactive.store(true, std::memory_order_release);
+		}
+	}
 	
 	// Disable copying and assignment
 	ProducerToken(ProducerToken const&) = delete;
@@ -527,14 +640,28 @@ struct ConsumerToken
 	template<typename T, typename Traits>
 	explicit ConsumerToken(BlockingConcurrentQueue<T, Traits>& q);
 	
-	ConsumerToken(ConsumerToken&& other) noexcept;
+	ConsumerToken(ConsumerToken&& other) POCO_NOEXCEPT
+		: initialOffset(other.initialOffset), lastKnownGlobalOffset(other.lastKnownGlobalOffset), itemsConsumedFromCurrent(other.itemsConsumedFromCurrent), currentProducer(other.currentProducer), desiredProducer(other.desiredProducer)
+	{
+	}
 	
-	ConsumerToken& operator=(ConsumerToken&& other) noexcept;
+	inline ConsumerToken& operator=(ConsumerToken&& other) POCO_NOEXCEPT
+	{
+		swap(other);
+		return *this;
+	}
 	
-	void swap(ConsumerToken& other) noexcept;
+	void swap(ConsumerToken& other) POCO_NOEXCEPT
+	{
+		std::swap(initialOffset, other.initialOffset);
+		std::swap(lastKnownGlobalOffset, other.lastKnownGlobalOffset);
+		std::swap(itemsConsumedFromCurrent, other.itemsConsumedFromCurrent);
+		std::swap(currentProducer, other.currentProducer);
+		std::swap(desiredProducer, other.desiredProducer);
+	}
 	
 	// Disable copying and assignment
-	ConsumerToken(ConsumerToken const&) = delete;;
+	ConsumerToken(ConsumerToken const&) = delete;
 	ConsumerToken& operator=(ConsumerToken const&) = delete;
 
 private:
@@ -542,9 +669,9 @@ private:
 	friend class ConcurrentQueueTests;
 	
 private: // but shared with ConcurrentQueue
-	Poco::UInt32 initialOffset;
-	Poco::UInt32 lastKnownGlobalOffset;
-	Poco::UInt32 itemsConsumedFromCurrent;
+	std::uint32_t initialOffset;
+	std::uint32_t lastKnownGlobalOffset;
+	std::uint32_t itemsConsumedFromCurrent;
 	Details::ConcurrentQueueProducerTypelessBase* currentProducer;
 	Details::ConcurrentQueueProducerTypelessBase* desiredProducer;
 };
@@ -552,25 +679,25 @@ private: // but shared with ConcurrentQueue
 // Need to forward-declare this swap because it's in a namespace.
 // See http://stackoverflow.com/questions/4492062/why-does-a-c-friend-class-need-a-forward-declaration-only-in-other-namespaces
 template<typename T, typename Traits>
-inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) noexcept;
+inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) POCO_NOEXCEPT;
 
 
 template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
 class ConcurrentQueue
 {
 public:
-	typedef ::Poco::ProducerToken producer_token_t;
-	typedef ::Poco::ConsumerToken consumer_token_t;
+	using producer_token_t = ::Poco::ProducerToken;
+	using consumer_token_t = ::Poco::ConsumerToken;
 	
-	typedef typename Traits::index_t index_t;
-	typedef typename Traits::size_t size_t;
+	using index_t = typename Traits::index_t;
+	using size_t = typename Traits::size_t;
 	
 	static const size_t BLOCK_SIZE = static_cast<size_t>(Traits::BLOCK_SIZE);
 	static const size_t EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD = static_cast<size_t>(Traits::EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD);
 	static const size_t EXPLICIT_INITIAL_INDEX_SIZE = static_cast<size_t>(Traits::EXPLICIT_INITIAL_INDEX_SIZE);
 	static const size_t IMPLICIT_INITIAL_INDEX_SIZE = static_cast<size_t>(Traits::IMPLICIT_INITIAL_INDEX_SIZE);
 	static const size_t INITIAL_IMPLICIT_PRODUCER_HASH_SIZE = static_cast<size_t>(Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE);
-	static const Poco::UInt32 EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE = static_cast<Poco::UInt32>(Traits::EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE);
+	static const std::uint32_t EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE = static_cast<std::uint32_t>(Traits::EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE);
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4307)		// + integral constant overflow (that's what the ternary expression is for!)
@@ -609,17 +736,17 @@ public:
 		nextExplicitConsumerId(0),
 		globalExplicitConsumerOffset(0)
 	{
-			implicitProducerHashResizeInProgress.clear(std::memory_order_relaxed);
-			populate_initial_implicit_producer_hash();
-			populate_initial_block_list(capacity / BLOCK_SIZE + ((capacity & (BLOCK_SIZE - 1)) == 0 ? 0 : 1));
-
+		implicitProducerHashResizeInProgress.clear(std::memory_order_relaxed);
+		populate_initial_implicit_producer_hash();
+		populate_initial_block_list(capacity / BLOCK_SIZE + ((capacity & (BLOCK_SIZE - 1)) == 0 ? 0 : 1));
+		
 #ifdef POCO_QUEUE_INTERNAL_DEBUG
-			// Track all the producers using a fully-resolved typed list for
-			// each kind; this makes it possible to debug them starting from
-			// the root queue object (otherwise wacky casts are needed that
-			// don't compile in the debugger's expression evaluator).
-			explicitProducers.store(nullptr, std::memory_order_relaxed);
-			implicitProducers.store(nullptr, std::memory_order_relaxed);
+		// Track all the producers using a fully-resolved typed list for
+		// each kind; this makes it possible to debug them starting from
+		// the root queue object (otherwise wacky casts are needed that
+		// don't compile in the debugger's expression evaluator).
+		explicitProducers.store(nullptr, std::memory_order_relaxed);
+		implicitProducers.store(nullptr, std::memory_order_relaxed);
 #endif
 	}
 	
@@ -651,11 +778,9 @@ public:
 	{
 		// Destroy producers
 		auto ptr = producerListTail.load(std::memory_order_relaxed);
-		while (ptr != nullptr)
-		{
+		while (ptr != nullptr) {
 			auto next = ptr->next_prod();
-			if (ptr->token != nullptr)
-			{
+			if (ptr->token != nullptr) {
 				ptr->token->producer = nullptr;
 			}
 			destroy(ptr);
@@ -663,16 +788,12 @@ public:
 		}
 		
 		// Destroy implicit producer hash tables
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0)
-		{
+		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0) {
 			auto hash = implicitProducerHash.load(std::memory_order_relaxed);
-			while (hash != nullptr)
-			{
+			while (hash != nullptr) {
 				auto prev = hash->prev;
-				if (prev != nullptr) // The last hash is part of this object and was not allocated dynamically
-				{
-					for (size_t i = 0; i != hash->capacity; ++i)
-					{
+				if (prev != nullptr) {		// The last hash is part of this object and was not allocated dynamically
+					for (size_t i = 0; i != hash->capacity; ++i) {
 						hash->entries[i].~ImplicitProducerKVP();
 					}
 					hash->~ImplicitProducerHash();
@@ -684,11 +805,9 @@ public:
 		
 		// Destroy global free list
 		auto block = freeList.head_unsafe();
-		while (block != nullptr)
-		{
+		while (block != nullptr) {
 			auto next = block->freeListNext.load(std::memory_order_relaxed);
-			if (block->dynamicallyAllocated)
-			{
+			if (block->dynamicallyAllocated) {
 				destroy(block);
 			}
 			block = next;
@@ -708,7 +827,7 @@ public:
 	// Note: When a queue is moved, its tokens are still valid but can only be
 	// used with the destination queue (i.e. semantically they are moved along
 	// with the queue itself).
-	ConcurrentQueue(ConcurrentQueue&& other) noexcept
+	ConcurrentQueue(ConcurrentQueue&& other) POCO_NOEXCEPT
 		: producerListTail(other.producerListTail.load(std::memory_order_relaxed)),
 		producerCount(other.producerCount.load(std::memory_order_relaxed)),
 		initialBlockPoolIndex(other.initialBlockPoolIndex.load(std::memory_order_relaxed)),
@@ -742,7 +861,7 @@ public:
 		reown_producers();
 	}
 	
-	inline ConcurrentQueue& operator=(ConcurrentQueue&& other) noexcept
+	inline ConcurrentQueue& operator=(ConcurrentQueue&& other) POCO_NOEXCEPT
 	{
 		return swap_internal(other);
 	}
@@ -752,7 +871,7 @@ public:
 	// the tokens that were created for one queue must be used with
 	// only the swapped queue (i.e. the tokens are tied to the
 	// queue's movable state, not the object itself).
-	inline void swap(ConcurrentQueue& other) noexcept
+	inline void swap(ConcurrentQueue& other) POCO_NOEXCEPT
 	{
 		swap_internal(other);
 	}
@@ -760,8 +879,7 @@ public:
 private:
 	ConcurrentQueue& swap_internal(ConcurrentQueue& other)
 	{
-		if (this == &other)
-		{
+		if (this == &other) {
 			return *this;
 		}
 		
@@ -1057,12 +1175,12 @@ public:
 		
 		size_t count = static_cast<ProducerBase*>(token.currentProducer)->dequeue_bulk(itemFirst, max);
 		if (count == max) {
-			if ((token.itemsConsumedFromCurrent += static_cast<Poco::UInt32>(max)) >= EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE) {
+			if ((token.itemsConsumedFromCurrent += static_cast<std::uint32_t>(max)) >= EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE) {
 				globalExplicitConsumerOffset.fetch_add(1, std::memory_order_relaxed);
 			}
 			return max;
 		}
-		token.itemsConsumedFromCurrent += static_cast<Poco::UInt32>(count);
+		token.itemsConsumedFromCurrent += static_cast<std::uint32_t>(count);
 		max -= count;
 		
 		auto tail = producerListTail.load(std::memory_order_acquire);
@@ -1075,7 +1193,7 @@ public:
 			count += dequeued;
 			if (dequeued != 0) {
 				token.currentProducer = ptr;
-				token.itemsConsumedFromCurrent = static_cast<Poco::UInt32>(dequeued);
+				token.itemsConsumedFromCurrent = static_cast<std::uint32_t>(dequeued);
 			}
 			if (dequeued == max) {
 				break;
@@ -1141,10 +1259,10 @@ public:
 		return
 			Details::static_is_lock_free<bool>::value == 2 &&
 			Details::static_is_lock_free<size_t>::value == 2 &&
-			Details::static_is_lock_free<Poco::UInt32>::value == 2 &&
+			Details::static_is_lock_free<std::uint32_t>::value == 2 &&
 			Details::static_is_lock_free<index_t>::value == 2 &&
 			Details::static_is_lock_free<void*>::value == 2 &&
-			Details::static_is_lock_free<typename Details::thread_id_converter<Details::threadIdT>::threadIdNumericSizeT>::value == 2;
+			Details::static_is_lock_free<typename Details::thread_id_converter<Details::thread_id_t>::thread_id_numeric_size_t>::value == 2;
 	}
 
 
@@ -1203,9 +1321,9 @@ private:
 			// Aha, first time we're dequeueing anything.
 			// Figure out our local position
 			// Note: offset is from start, not end, but we're traversing from end -- subtract from count first
-			Poco::UInt32 offset = prodCount - 1 - (token.initialOffset % prodCount);
+			std::uint32_t offset = prodCount - 1 - (token.initialOffset % prodCount);
 			token.desiredProducer = tail;
-			for (Poco::UInt32 i = 0; i != offset; ++i) {
+			for (std::uint32_t i = 0; i != offset; ++i) {
 				token.desiredProducer = static_cast<ProducerBase*>(token.desiredProducer)->next_prod();
 				if (token.desiredProducer == nullptr) {
 					token.desiredProducer = tail;
@@ -1213,11 +1331,11 @@ private:
 			}
 		}
 		
-		Poco::UInt32 delta = globalOffset - token.lastKnownGlobalOffset;
+		std::uint32_t delta = globalOffset - token.lastKnownGlobalOffset;
 		if (delta >= prodCount) {
 			delta = delta % prodCount;
 		}
-		for (Poco::UInt32 i = 0; i != delta; ++i) {
+		for (std::uint32_t i = 0; i != delta; ++i) {
 			token.desiredProducer = static_cast<ProducerBase*>(token.desiredProducer)->next_prod();
 			if (token.desiredProducer == nullptr) {
 				token.desiredProducer = tail;
@@ -1240,7 +1358,7 @@ private:
 	{
 		FreeListNode() : freeListRefs(0), freeListNext(nullptr) { }
 		
-		std::atomic<Poco::UInt32> freeListRefs;
+		std::atomic<std::uint32_t> freeListRefs;
 		std::atomic<N*> freeListNext;
 	};
 	
@@ -1259,9 +1377,6 @@ private:
 		
 		inline void add(N* node)
 		{
-#ifdef MCDBGQ_NOLOCKFREE_FREELIST
-			debug::DebugLock lock(mutex);
-#endif		
 			// We know that the should-be-on-freelist bit is 0 at this point, so it's safe to
 			// set it using a fetch_add
 			if (node->freeListRefs.fetch_add(SHOULD_BE_ON_FREELIST, std::memory_order_acq_rel) == 0) {
@@ -1273,9 +1388,6 @@ private:
 		
 		inline N* try_get()
 		{
-#ifdef MCDBGQ_NOLOCKFREE_FREELIST
-			debug::DebugLock lock(mutex);
-#endif		
 			auto head = freeListHead.load(std::memory_order_acquire);
 			while (head != nullptr) {
 				auto prevHead = head;
@@ -1342,12 +1454,8 @@ private:
 		// Implemented like a stack, but where node order doesn't matter (nodes are inserted out of order under contention)
 		std::atomic<N*> freeListHead;
 	
-	static const Poco::UInt32 REFS_MASK = 0x7FFFFFFF;
-	static const Poco::UInt32 SHOULD_BE_ON_FREELIST = 0x80000000;
-		
-#ifdef MCDBGQ_NOLOCKFREE_FREELIST
-		debug::DebugMutex mutex;
-#endif
+	static const std::uint32_t REFS_MASK = 0x7FFFFFFF;
+	static const std::uint32_t SHOULD_BE_ON_FREELIST = 0x80000000;
 	};
 	
 	
@@ -1361,11 +1469,7 @@ private:
 	{
 		Block()
 			: next(nullptr), elementsCompletelyDequeued(0), freeListRefs(0), freeListNext(nullptr), dynamicallyAllocated(true)
-		{
-#ifdef MCDBGQ_TRACKMEM
-			owner = nullptr;
-#endif
-		}
+		{ }
 		
 		template<InnerQueueContext context>
 		inline bool is_empty() const
@@ -1464,8 +1568,8 @@ private:
 			}
 		}
 		
-		inline T* operator[](index_t idx) noexcept { return static_cast<T*>(static_cast<void*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
-		inline T const* operator[](index_t idx) const noexcept { return static_cast<T const*>(static_cast<void const*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
+		inline T* operator[](index_t idx) POCO_NOEXCEPT { return static_cast<T*>(static_cast<void*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
+		inline T const* operator[](index_t idx) const POCO_NOEXCEPT { return static_cast<T const*>(static_cast<void const*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
 		
 	private:
 		static_assert(std::alignment_of<T>::value <= sizeof(T), "The queue does not support types with an alignment greater than their size at this time");
@@ -1473,24 +1577,13 @@ private:
 	public:
 		Block* next;
 		std::atomic<size_t> elementsCompletelyDequeued;
-		std::atomic<bool> emptyFlags[BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD ? BLOCK_SIZE : 1];
+		std::atomic<bool> emptyFlags[BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD ? BLOCK_SIZE : 1]{};
 	public:
-		std::atomic<Poco::UInt32> freeListRefs;
+		std::atomic<std::uint32_t> freeListRefs;
 		std::atomic<Block*> freeListNext;
 		bool dynamicallyAllocated;		// Perhaps a better name for this would be 'isNotPartOfInitialBlockPool'
-		
-#ifdef MCDBGQ_TRACKMEM
-		void* owner;
-#endif
 	};
 	static_assert(std::alignment_of<Block>::value >= std::alignment_of<T>::value, "Internal error: Blocks must be at least as aligned as the type they are wrapping");
-
-
-#ifdef MCDBGQ_TRACKMEM
-public:
-	struct MemStats;
-private:
-#endif
 	
 	///////////////////////////
 	// Producer base
@@ -1539,7 +1632,7 @@ private:
 		{
 			auto tail = tailIndex.load(std::memory_order_relaxed);
 			auto head = headIndex.load(std::memory_order_relaxed);
-			return Details::circularLessThan(head, tail) ? static_cast<size_t>(tail - head) : 0;
+			return Details::circular_less_than(head, tail) ? static_cast<size_t>(tail - head) : 0;
 		}
 		
 		inline index_t getTail() const { return tailIndex.load(std::memory_order_relaxed); }
@@ -1555,11 +1648,6 @@ private:
 	public:
 		bool isExplicit;
 		ConcurrentQueue* parent;
-		
-	protected:
-#ifdef MCDBGQ_TRACKMEM
-		friend struct MemStats;
-#endif
 	};
 	
 	
@@ -1578,7 +1666,7 @@ private:
 			pr_blockIndexEntries(nullptr),
 			pr_blockIndexRaw(nullptr)
 		{
-			size_t poolBasedIndexSize = Details::ceilToPow2(parent_->initialBlockPoolSize) >> 1;
+			size_t poolBasedIndexSize = Details::ceil_to_pow_2(parent_->initialBlockPoolSize) >> 1;
 			if (poolBasedIndexSize > pr_blockIndexSize) {
 				pr_blockIndexSize = poolBasedIndexSize;
 			}
@@ -1598,10 +1686,10 @@ private:
 					// The head's not on a block boundary, meaning a block somewhere is partially dequeued
 					// (or the head block is the tail block and was fully dequeued, but the head/tail are still not on a boundary)
 					size_t i = (pr_blockIndexFront - pr_blockIndexSlotsUsed) & (pr_blockIndexSize - 1);
-					while (Details::circularLessThan<index_t>(pr_blockIndexEntries[i].base + BLOCK_SIZE, this->headIndex.load(std::memory_order_relaxed))) {
+					while (Details::circular_less_than<index_t>(pr_blockIndexEntries[i].base + BLOCK_SIZE, this->headIndex.load(std::memory_order_relaxed))) {
 						i = (i + 1) & (pr_blockIndexSize - 1);
 					}
-					assert(Details::circularLessThan<index_t>(pr_blockIndexEntries[i].base, this->headIndex.load(std::memory_order_relaxed)));
+					assert(Details::circular_less_than<index_t>(pr_blockIndexEntries[i].base, this->headIndex.load(std::memory_order_relaxed)));
 					halfDequeuedBlock = pr_blockIndexEntries[i].block;
 				}
 				
@@ -1671,8 +1759,8 @@ private:
 					// and <= its current value. Since we have the most recent tail, the head must be
 					// <= to it.
 					auto head = this->headIndex.load(std::memory_order_relaxed);
-					assert(!Details::circularLessThan<index_t>(currentTailIndex, head));
-					if (!Details::circularLessThan<index_t>(head, currentTailIndex + BLOCK_SIZE)
+					assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
+					if (!Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE)
 						|| (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head))) {
 						// We can't enqueue in another block because there's not enough leeway -- the
 						// tail could surpass the head by the time the block fills up! (Or we'll exceed
@@ -1698,9 +1786,6 @@ private:
 					if (newBlock == nullptr) {
 						return false;
 					}
-#ifdef MCDBGQ_TRACKMEM
-					newBlock->owner = this;
-#endif
 					newBlock->ConcurrentQueue::Block::template reset_empty<explicit_context>();
 					if (this->tailBlock == nullptr) {
 						newBlock->next = newBlock;
@@ -1713,18 +1798,18 @@ private:
 					++pr_blockIndexSlotsUsed;
 				}
 
-				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
 					// The constructor may throw. We want the element not to appear in the queue in
 					// that case (without corrupting the queue):
-					try {
+					POCO_TRY {
 						new ((*this->tailBlock)[currentTailIndex]) T(std::forward<U>(element));
 					}
-					catch (...) {
+					POCO_CATCH (...) {
 						// Revert change to the current block, but leave the new block available
 						// for next time
 						pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
 						this->tailBlock = startBlock == nullptr ? this->tailBlock : startBlock;
-						throw;
+						POCO_RETHROW;
 					}
 				}
 				else {
@@ -1739,7 +1824,7 @@ private:
 				blockIndex.load(std::memory_order_relaxed)->front.store(pr_blockIndexFront, std::memory_order_release);
 				pr_blockIndexFront = (pr_blockIndexFront + 1) & (pr_blockIndexSize - 1);
 				
-				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
 					this->tailIndex.store(newTailIndex, std::memory_order_release);
 					return true;
 				}
@@ -1757,7 +1842,7 @@ private:
 		{
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
-			if (Details::circularLessThan<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail)) {
+			if (Details::circular_less_than<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail)) {
 				// Might be something to dequeue, let's give it a try
 				
 				// Note that this if is purely for performance purposes in the common case when the queue is
@@ -1790,7 +1875,7 @@ private:
 				// this load is sequenced after (happens after) the earlier load above. This is supported by read-read
 				// coherency (as defined in the standard), explained here: http://en.cppreference.com/w/cpp/atomic/memory_order
 				tail = this->tailIndex.load(std::memory_order_acquire);
-				if ((Details::likely)(Details::circularLessThan<index_t>(myDequeueCount - overcommit, tail))) {
+				if ((Details::likely)(Details::circular_less_than<index_t>(myDequeueCount - overcommit, tail))) {
 					// Guaranteed to be at least one element to dequeue!
 					
 					// Get the index. Note that since there's guaranteed to be at least one element, this
@@ -1819,7 +1904,7 @@ private:
 					
 					// Dequeue
 					auto& el = *((*block)[index]);
-					if (!noexcept(element = std::move(el))) {
+					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el))) {
 						// Make sure the element is still fully dequeued and destroyed even if the assignment
 						// throws
 						struct Guard {
@@ -1889,8 +1974,8 @@ private:
 					currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 					
 					auto head = this->headIndex.load(std::memory_order_relaxed);
-					assert(!Details::circularLessThan<index_t>(currentTailIndex, head));
-					bool full = !Details::circularLessThan<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
+					assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
+					bool full = !Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
 					if (pr_blockIndexRaw == nullptr || pr_blockIndexSlotsUsed == pr_blockIndexSize || full) {
 						POCO_CONSTEXPR_IF (allocMode == CannotAlloc) {
 							// Failed to allocate, undo changes (but keep injected blocks)
@@ -1921,10 +2006,6 @@ private:
 						this->tailBlock = startBlock == nullptr ? firstAllocatedBlock : startBlock;
 						return false;
 					}
-					
-#ifdef MCDBGQ_TRACKMEM
-					newBlock->owner = this;
-#endif
 					newBlock->ConcurrentQueue::Block::template set_all_empty<explicit_context>();
 					if (this->tailBlock == nullptr) {
 						newBlock->next = newBlock;
@@ -1955,7 +2036,7 @@ private:
 					block = block->next;
 				}
 				
-				POCO_CONSTEXPR_IF (noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
 					blockIndex.load(std::memory_order_relaxed)->front.store((pr_blockIndexFront - 1) & (pr_blockIndexSize - 1), std::memory_order_release);
 				}
 			}
@@ -1971,16 +2052,16 @@ private:
 			}
 			while (true) {
 				index_t stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-				if (Details::circularLessThan<index_t>(newTailIndex, stopIndex)) {
+				if (Details::circular_less_than<index_t>(newTailIndex, stopIndex)) {
 					stopIndex = newTailIndex;
 				}
-				POCO_CONSTEXPR_IF (noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
 					while (currentTailIndex != stopIndex) {
 						new ((*this->tailBlock)[currentTailIndex++]) T(*itemFirst++);
 					}
 				}
 				else {
-					try {
+					POCO_TRY {
 						while (currentTailIndex != stopIndex) {
 							// Must use copy constructor even if move constructor is available
 							// because we may have to revert if there's an exception.
@@ -1989,16 +2070,12 @@ private:
 							// may only define a (noexcept) move constructor, and so calls to the
 							// cctor will not compile, even if they are in an if branch that will never
 							// be executed
-							new ((*this->tailBlock)[currentTailIndex]) T(
-								Details::nomove_if<
-									!noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))
-								>::eval(*itemFirst)
-							);
+							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
 							++currentTailIndex;
 							++itemFirst;
 						}
 					}
-					catch (...) {
+					POCO_CATCH (...) {
 						// Oh dear, an exception's been thrown -- destroy the elements that
 						// were enqueued so far and revert the entire bulk operation (we'll keep
 						// any allocated blocks in our linked list for later, though).
@@ -2017,7 +2094,7 @@ private:
 							currentTailIndex = startTailIndex;
 							while (true) {
 								stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-								if (Details::circularLessThan<index_t>(constructedStopIndex, stopIndex)) {
+								if (Details::circular_less_than<index_t>(constructedStopIndex, stopIndex)) {
 									stopIndex = constructedStopIndex;
 								}
 								while (currentTailIndex != stopIndex) {
@@ -2029,7 +2106,7 @@ private:
 								block = block->next;
 							}
 						}
-						throw;
+						POCO_RETHROW;
 					}
 				}
 				
@@ -2040,7 +2117,7 @@ private:
 				this->tailBlock = this->tailBlock->next;
 			}
 			
-			POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+			POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
 				if (firstAllocatedBlock != nullptr)
 					blockIndex.load(std::memory_order_relaxed)->front.store((pr_blockIndexFront - 1) & (pr_blockIndexSize - 1), std::memory_order_release);
 			}
@@ -2055,7 +2132,7 @@ private:
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
 			auto desiredCount = static_cast<size_t>(tail - (this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit));
-			if (Details::circularLessThan<size_t>(0, desiredCount)) {
+			if (Details::circular_less_than<size_t>(0, desiredCount)) {
 				desiredCount = desiredCount < max ? desiredCount : max;
 				std::atomic_thread_fence(std::memory_order_acquire);
 				
@@ -2063,7 +2140,7 @@ private:
 				
 				tail = this->tailIndex.load(std::memory_order_acquire);
 				auto actualCount = static_cast<size_t>(tail - (myDequeueCount - overcommit));
-				if (Details::circularLessThan<size_t>(0, actualCount)) {
+				if (Details::circular_less_than<size_t>(0, actualCount)) {
 					actualCount = desiredCount < actualCount ? desiredCount : actualCount;
 					if (actualCount < desiredCount) {
 						this->dequeueOvercommit.fetch_add(desiredCount - actualCount, std::memory_order_release);
@@ -2087,9 +2164,9 @@ private:
 					do {
 						auto firstIndexInBlock = index;
 						index_t endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-						endIndex = Details::circularLessThan<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
+						endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 						auto block = localBlockIndex->entries[indexIndex].block;
-						if (noexcept(Details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
+						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
 							while (index != endIndex) {
 								auto& el = *((*block)[index]);
 								*itemFirst++ = std::move(el);
@@ -2098,7 +2175,7 @@ private:
 							}
 						}
 						else {
-							try {
+							POCO_TRY {
 								while (index != endIndex) {
 									auto& el = *((*block)[index]);
 									*itemFirst = std::move(el);
@@ -2107,7 +2184,7 @@ private:
 									++index;
 								}
 							}
-							catch (...) {
+							POCO_CATCH (...) {
 								// It's too late to revert the dequeue, but we can make sure that all
 								// the dequeued objects are properly destroyed and the block index
 								// (and empty count) are properly updated before we propagate the exception
@@ -2121,10 +2198,10 @@ private:
 									
 									firstIndexInBlock = index;
 									endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-									endIndex = Details::circularLessThan<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
+									endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 								} while (index != firstIndex + actualCount);
 								
-								throw;
+								POCO_RETHROW;
 							}
 						}
 						block->ConcurrentQueue::Block::template set_many_empty<explicit_context>(firstIndexInBlock, static_cast<size_t>(endIndex - firstIndexInBlock));
@@ -2170,7 +2247,7 @@ private:
 				return false;
 			}
 			
-			auto newBlockIndexEntries = reinterpret_cast<BlockIndexEntry*>(Details::alignFor<BlockIndexEntry>(newRawPtr + sizeof(BlockIndexHeader)));
+			auto newBlockIndexEntries = reinterpret_cast<BlockIndexEntry*>(Details::align_for<BlockIndexEntry>(newRawPtr + sizeof(BlockIndexHeader)));
 			
 			// Copy in all the old indices, if any
 			size_t j = 0;
@@ -2210,11 +2287,6 @@ private:
 #ifdef POCO_QUEUE_INTERNAL_DEBUG
 	public:
 		ExplicitProducer* nextExplicitProducer;
-	private:
-#endif
-		
-#ifdef MCDBGQ_TRACKMEM
-		friend struct MemStats;
 #endif
 	};
 	
@@ -2240,18 +2312,15 @@ private:
 			// contiguous blocks, and that only the first and last remaining blocks can be only partially
 			// empty (all other remaining blocks must be completely full).
 			
-#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 			// Unregister ourselves for thread termination notification
 			if (!this->inactive.load(std::memory_order_relaxed)) {
 				Details::ThreadExitNotifier::unsubscribe(&threadExitListener);
 			}
-#endif
-			
 			// Destroy all remaining elements!
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto index = this->headIndex.load(std::memory_order_relaxed);
 			Block* block = nullptr;
-			assert(index == tail || Details::circularLessThan(index, tail));
+			assert(index == tail || Details::circular_less_than(index, tail));
 			bool forceFreeLastBlock = index != tail;		// If we enter the loop, then the last (tail) block will not be freed
 			while (index != tail) {
 				if ((index & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 || block == nullptr) {
@@ -2296,15 +2365,12 @@ private:
 			if ((currentTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0) {
 				// We reached the end of a block, start a new one
 				auto head = this->headIndex.load(std::memory_order_relaxed);
-				assert(!Details::circularLessThan<index_t>(currentTailIndex, head));
-				if (!Details::circularLessThan<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head))) {
+				assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
+				if (!Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head))) {
 					return false;
 				}
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-				debug::DebugLock lock(mutex);
-#endif
 				// Find out where we'll be inserting this block in the block index
-				BlockIndexEntry* idxEntry;
+				BlockIndexEntry* idxEntry = nullptr;
 				if (!insert_block_index_entry<allocMode>(idxEntry, currentTailIndex)) {
 					return false;
 				}
@@ -2316,21 +2382,18 @@ private:
 					idxEntry->value.store(nullptr, std::memory_order_relaxed);
 					return false;
 				}
-#ifdef MCDBGQ_TRACKMEM
-				newBlock->owner = this;
-#endif
 				newBlock->ConcurrentQueue::Block::template reset_empty<implicit_context>();
 
-				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
 					// May throw, try to insert now before we publish the fact that we have this new block
-					try {
+					POCO_TRY {
 						new ((*newBlock)[currentTailIndex]) T(std::forward<U>(element));
 					}
-					catch (...) {
+					POCO_CATCH (...) {
 						rewind_block_index_tail();
 						idxEntry->value.store(nullptr, std::memory_order_relaxed);
 						this->parent->add_block_to_free_list(newBlock);
-						throw;
+						POCO_RETHROW;
 					}
 				}
 				
@@ -2339,7 +2402,7 @@ private:
 				
 				this->tailBlock = newBlock;
 				
-				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
 					this->tailIndex.store(newTailIndex, std::memory_order_release);
 					return true;
 				}
@@ -2358,12 +2421,12 @@ private:
 			// See ExplicitProducer::dequeue for rationale and explanation
 			index_t tail = this->tailIndex.load(std::memory_order_relaxed);
 			index_t overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
-			if (Details::circularLessThan<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail)) {
+			if (Details::circular_less_than<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail)) {
 				std::atomic_thread_fence(std::memory_order_acquire);
 				
 				index_t myDequeueCount = this->dequeueOptimisticCount.fetch_add(1, std::memory_order_relaxed);
 				tail = this->tailIndex.load(std::memory_order_acquire);
-				if ((Details::likely)(Details::circularLessThan<index_t>(myDequeueCount - overcommit, tail))) {
+				if ((Details::likely)(Details::circular_less_than<index_t>(myDequeueCount - overcommit, tail))) {
 					index_t index = this->headIndex.fetch_add(1, std::memory_order_acq_rel);
 					
 					// Determine which block the element is in
@@ -2373,12 +2436,7 @@ private:
 					auto block = entry->value.load(std::memory_order_relaxed);
 					auto& el = *((*block)[index]);
 					
-					if (!noexcept(element = std::move(el))) {
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-						// Note: Acquiring the mutex with every dequeue instead of only when a block
-						// is released is very sub-optimal, but it is, after all, purely debug code.
-						debug::DebugLock lock(producer->mutex);
-#endif
+					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el))) {
 						struct Guard {
 							Block* block;
 							index_t index;
@@ -2403,9 +2461,6 @@ private:
 
 						if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index)) {
 							{
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-								debug::DebugLock lock(mutex);
-#endif
 								// Add the block back into the global free pool (and remove from block index)
 								entry->value.store(nullptr, std::memory_order_relaxed);
 							}
@@ -2448,20 +2503,17 @@ private:
 			size_t blockBaseDiff = ((startTailIndex + count - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1)) - ((startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1));
 			index_t currentTailIndex = (startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1);
 			if (blockBaseDiff > 0) {
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-				debug::DebugLock lock(mutex);
-#endif
 				do {
 					blockBaseDiff -= static_cast<index_t>(BLOCK_SIZE);
 					currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 					
 					// Find out where we'll be inserting this block in the block index
 					BlockIndexEntry* idxEntry = nullptr;  // initialization here unnecessary but compiler can't always tell
-					Block* newBlock;
+					Block* newBlock = nullptr;
 					bool indexInserted = false;
 					auto head = this->headIndex.load(std::memory_order_relaxed);
-					assert(!Details::circularLessThan<index_t>(currentTailIndex, head));
-					bool full = !Details::circularLessThan<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
+					assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
+					bool full = !Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
 
 					if (full || !(indexInserted = insert_block_index_entry<allocMode>(idxEntry, currentTailIndex)) || (newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>()) == nullptr) {
 						// Index allocation or block allocation failed; revert any other allocations
@@ -2482,10 +2534,6 @@ private:
 						
 						return false;
 					}
-					
-#ifdef MCDBGQ_TRACKMEM
-					newBlock->owner = this;
-#endif
 					newBlock->ConcurrentQueue::Block::template reset_empty<implicit_context>();
 					newBlock->next = nullptr;
 					
@@ -2514,27 +2562,23 @@ private:
 			}
 			while (true) {
 				index_t stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-				if (Details::circularLessThan<index_t>(newTailIndex, stopIndex)) {
+				if (Details::circular_less_than<index_t>(newTailIndex, stopIndex)) {
 					stopIndex = newTailIndex;
 				}
-				POCO_CONSTEXPR_IF (noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
 					while (currentTailIndex != stopIndex) {
 						new ((*this->tailBlock)[currentTailIndex++]) T(*itemFirst++);
 					}
 				}
 				else {
-					try {
+					POCO_TRY {
 						while (currentTailIndex != stopIndex) {
-							new ((*this->tailBlock)[currentTailIndex]) T(
-								Details::nomove_if<
-									!noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))
-								>::eval(*itemFirst)
-							);
+							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
 							++currentTailIndex;
 							++itemFirst;
 						}
 					}
-					catch (...) {
+					POCO_CATCH (...) {
 						auto constructedStopIndex = currentTailIndex;
 						auto lastBlockEnqueued = this->tailBlock;
 						
@@ -2546,7 +2590,7 @@ private:
 							currentTailIndex = startTailIndex;
 							while (true) {
 								stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-								if (Details::circularLessThan<index_t>(constructedStopIndex, stopIndex)) {
+								if (Details::circular_less_than<index_t>(constructedStopIndex, stopIndex)) {
 									stopIndex = constructedStopIndex;
 								}
 								while (currentTailIndex != stopIndex) {
@@ -2568,7 +2612,7 @@ private:
 						}
 						this->parent->add_blocks_to_free_list(firstAllocatedBlock);
 						this->tailBlock = startBlock;
-						throw;
+						POCO_RETHROW;
 					}
 				}
 				
@@ -2591,7 +2635,7 @@ private:
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
 			auto desiredCount = static_cast<size_t>(tail - (this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit));
-			if (Details::circularLessThan<size_t>(0, desiredCount)) {
+			if (Details::circular_less_than<size_t>(0, desiredCount)) {
 				desiredCount = desiredCount < max ? desiredCount : max;
 				std::atomic_thread_fence(std::memory_order_acquire);
 				
@@ -2599,7 +2643,7 @@ private:
 				
 				tail = this->tailIndex.load(std::memory_order_acquire);
 				auto actualCount = static_cast<size_t>(tail - (myDequeueCount - overcommit));
-				if (Details::circularLessThan<size_t>(0, actualCount)) {
+				if (Details::circular_less_than<size_t>(0, actualCount)) {
 					actualCount = desiredCount < actualCount ? desiredCount : actualCount;
 					if (actualCount < desiredCount) {
 						this->dequeueOvercommit.fetch_add(desiredCount - actualCount, std::memory_order_release);
@@ -2611,16 +2655,16 @@ private:
 					
 					// Iterate the blocks and dequeue
 					auto index = firstIndex;
-					BlockIndexHeader* localBlockIndex;
+					BlockIndexHeader* localBlockIndex = nullptr;
 					auto indexIndex = get_block_index_index_for_index(index, localBlockIndex);
 					do {
 						auto blockStartIndex = index;
 						index_t endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-						endIndex = Details::circularLessThan<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
+						endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 						
 						auto entry = localBlockIndex->index[indexIndex];
 						auto block = entry->value.load(std::memory_order_relaxed);
-						if (noexcept(Details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
+						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
 							while (index != endIndex) {
 								auto& el = *((*block)[index]);
 								*itemFirst++ = std::move(el);
@@ -2629,7 +2673,7 @@ private:
 							}
 						}
 						else {
-							try {
+							POCO_TRY {
 								while (index != endIndex) {
 									auto& el = *((*block)[index]);
 									*itemFirst = std::move(el);
@@ -2638,7 +2682,7 @@ private:
 									++index;
 								}
 							}
-							catch (...) {
+							POCO_CATCH (...) {
 								do {
 									entry = localBlockIndex->index[indexIndex];
 									block = entry->value.load(std::memory_order_relaxed);
@@ -2647,9 +2691,6 @@ private:
 									}
 									
 									if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex))) {
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-										debug::DebugLock lock(mutex);
-#endif
 										entry->value.store(nullptr, std::memory_order_relaxed);
 										this->parent->add_block_to_free_list(block);
 									}
@@ -2657,17 +2698,14 @@ private:
 									
 									blockStartIndex = index;
 									endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-									endIndex = Details::circularLessThan<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
+									endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 								} while (index != firstIndex + actualCount);
 								
-								throw;
+								POCO_RETHROW;
 							}
 						}
 						if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex))) {
 							{
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-								debug::DebugLock lock(mutex);
-#endif
 								// Note that the set_many_empty above did a release, meaning that anybody who acquires the block
 								// we're about to free can use it safely since our writes (and reads!) will have happened-before then.
 								entry->value.store(nullptr, std::memory_order_relaxed);
@@ -2749,16 +2787,13 @@ private:
 		
 		inline BlockIndexEntry* get_block_index_entry_for_index(index_t index) const
 		{
-			BlockIndexHeader* localBlockIndex;
+			BlockIndexHeader* localBlockIndex = nullptr;
 			auto idx = get_block_index_index_for_index(index, localBlockIndex);
 			return localBlockIndex->index[idx];
 		}
 		
 		inline size_t get_block_index_index_for_index(index_t index, BlockIndexHeader*& localBlockIndex) const
 		{
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-			debug::DebugLock lock(mutex);
-#endif
 			index &= ~static_cast<index_t>(BLOCK_SIZE - 1);
 			localBlockIndex = blockIndex.load(std::memory_order_acquire);
 			auto tail = localBlockIndex->tail.load(std::memory_order_acquire);
@@ -2786,8 +2821,8 @@ private:
 			}
 			
 			auto header = new (raw) BlockIndexHeader;
-			auto entries = reinterpret_cast<BlockIndexEntry*>(Details::alignFor<BlockIndexEntry>(raw + sizeof(BlockIndexHeader)));
-			auto index = reinterpret_cast<BlockIndexEntry**>(Details::alignFor<BlockIndexEntry*>(reinterpret_cast<char*>(entries) + sizeof(BlockIndexEntry) * entryCount));
+			auto entries = reinterpret_cast<BlockIndexEntry*>(Details::align_for<BlockIndexEntry>(raw + sizeof(BlockIndexHeader)));
+			auto index = reinterpret_cast<BlockIndexEntry**>(Details::align_for<BlockIndexEntry*>(reinterpret_cast<char*>(entries) + sizeof(BlockIndexEntry) * entryCount));
 			if (prev != nullptr) {
 				auto prevTail = prev->tail.load(std::memory_order_relaxed);
 				auto prevPos = prevTail;
@@ -2819,24 +2854,11 @@ private:
 	private:
 		size_t nextBlockIndexCapacity;
 		std::atomic<BlockIndexHeader*> blockIndex;
-
-#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 	public:
 		Details::ThreadExitListener threadExitListener;
-	private:
-#endif
-		
 #ifdef POCO_QUEUE_INTERNAL_DEBUG
 	public:
 		ImplicitProducer* nextImplicitProducer;
-	private:
-#endif
-
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
-		mutable debug::DebugMutex mutex;
-#endif
-#ifdef MCDBGQ_TRACKMEM
-		friend struct MemStats;
 #endif
 	};
 	
@@ -2922,113 +2944,6 @@ private:
 		}
 	}
 	
-
-#ifdef MCDBGQ_TRACKMEM
-	public:
-		struct MemStats {
-			size_t allocatedBlocks;
-			size_t usedBlocks;
-			size_t freeBlocks;
-			size_t ownedBlocksExplicit;
-			size_t ownedBlocksImplicit;
-			size_t implicitProducers;
-			size_t explicitProducers;
-			size_t elementsEnqueued;
-			size_t blockClassBytes;
-			size_t queueClassBytes;
-			size_t implicitBlockIndexBytes;
-			size_t explicitBlockIndexBytes;
-			
-			friend class ConcurrentQueue;
-			
-		private:
-			static MemStats getFor(ConcurrentQueue* q)
-			{
-				MemStats stats = { 0 };
-				
-				stats.elementsEnqueued = q->size_approx();
-			
-				auto block = q->freeList.head_unsafe();
-				while (block != nullptr) {
-					++stats.allocatedBlocks;
-					++stats.freeBlocks;
-					block = block->freeListNext.load(std::memory_order_relaxed);
-				}
-				
-				for (auto ptr = q->producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
-					bool implicit = dynamic_cast<ImplicitProducer*>(ptr) != nullptr;
-					stats.implicitProducers += implicit ? 1 : 0;
-					stats.explicitProducers += implicit ? 0 : 1;
-					
-					if (implicit) {
-						auto prod = static_cast<ImplicitProducer*>(ptr);
-						stats.queueClassBytes += sizeof(ImplicitProducer);
-						auto head = prod->headIndex.load(std::memory_order_relaxed);
-						auto tail = prod->tailIndex.load(std::memory_order_relaxed);
-						auto hash = prod->blockIndex.load(std::memory_order_relaxed);
-						if (hash != nullptr) {
-							for (size_t i = 0; i != hash->capacity; ++i) {
-								if (hash->index[i]->key.load(std::memory_order_relaxed) != ImplicitProducer::INVALID_BLOCK_BASE && hash->index[i]->value.load(std::memory_order_relaxed) != nullptr) {
-									++stats.allocatedBlocks;
-									++stats.ownedBlocksImplicit;
-								}
-							}
-							stats.implicitBlockIndexBytes += hash->capacity * sizeof(typename ImplicitProducer::BlockIndexEntry);
-							for (; hash != nullptr; hash = hash->prev) {
-								stats.implicitBlockIndexBytes += sizeof(typename ImplicitProducer::BlockIndexHeader) + hash->capacity * sizeof(typename ImplicitProducer::BlockIndexEntry*);
-							}
-						}
-						for (; Details::circular_less_than<index_t>(head, tail); head += BLOCK_SIZE) {
-							//auto block = prod->get_block_index_entry_for_index(head);
-							++stats.usedBlocks;
-						}
-					}
-					else {
-						auto prod = static_cast<ExplicitProducer*>(ptr);
-						stats.queueClassBytes += sizeof(ExplicitProducer);
-						auto tailBlock = prod->tailBlock;
-						bool wasNonEmpty = false;
-						if (tailBlock != nullptr) {
-							auto block = tailBlock;
-							do {
-								++stats.allocatedBlocks;
-								if (!block->ConcurrentQueue::Block::template is_empty<explicit_context>() || wasNonEmpty) {
-									++stats.usedBlocks;
-									wasNonEmpty = wasNonEmpty || block != tailBlock;
-								}
-								++stats.ownedBlocksExplicit;
-								block = block->next;
-							} while (block != tailBlock);
-						}
-						auto index = prod->blockIndex.load(std::memory_order_relaxed);
-						while (index != nullptr) {
-							stats.explicitBlockIndexBytes += sizeof(typename ExplicitProducer::BlockIndexHeader) + index->size * sizeof(typename ExplicitProducer::BlockIndexEntry);
-							index = static_cast<typename ExplicitProducer::BlockIndexHeader*>(index->prev);
-						}
-					}
-				}
-				
-				auto freeOnInitialPool = q->initialBlockPoolIndex.load(std::memory_order_relaxed) >= q->initialBlockPoolSize ? 0 : q->initialBlockPoolSize - q->initialBlockPoolIndex.load(std::memory_order_relaxed);
-				stats.allocatedBlocks += freeOnInitialPool;
-				stats.freeBlocks += freeOnInitialPool;
-				
-				stats.blockClassBytes = sizeof(Block) * stats.allocatedBlocks;
-				stats.queueClassBytes += sizeof(ConcurrentQueue);
-				
-				return stats;
-			}
-		};
-		
-		// For debugging only. Not thread-safe.
-		MemStats getMemStats()
-		{
-			return MemStats::getFor(this);
-		}
-	private:
-		friend struct MemStats;
-#endif
-	
-	
 	//////////////////////////////////
 	// Producer list manipulation
 	//////////////////////////////////	
@@ -3102,24 +3017,24 @@ private:
 	
 	struct ImplicitProducerKVP
 	{
-		std::atomic<Details::threadIdT> key;
+		std::atomic<Details::thread_id_t> key;
 		ImplicitProducer* value;		// No need for atomicity since it's only read by the thread that sets it in the first place
 		
 		ImplicitProducerKVP() : value(nullptr) { }
 		
-		ImplicitProducerKVP(ImplicitProducerKVP&& other) noexcept
+		ImplicitProducerKVP(ImplicitProducerKVP&& other) POCO_NOEXCEPT
 		{
 			key.store(other.key.load(std::memory_order_relaxed), std::memory_order_relaxed);
 			value = other.value;
 		}
 		
-		inline ImplicitProducerKVP& operator=(ImplicitProducerKVP&& other) noexcept
+		inline ImplicitProducerKVP& operator=(ImplicitProducerKVP&& other) POCO_NOEXCEPT
 		{
 			swap(other);
 			return *this;
 		}
 		
-		inline void swap(ImplicitProducerKVP& other) noexcept
+		inline void swap(ImplicitProducerKVP& other) POCO_NOEXCEPT
 		{
 			if (this != &other) {
 				Details::swap_relaxed(key, other.key);
@@ -3129,7 +3044,7 @@ private:
 	};
 	
 	template<typename XT, typename XTraits>
-	friend void Poco::swap(typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&, typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&) noexcept;
+	friend void Poco::swap(typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&, typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&) POCO_NOEXCEPT;
 	
 	struct ImplicitProducerHash
 	{
@@ -3149,7 +3064,7 @@ private:
 			hash->capacity = INITIAL_IMPLICIT_PRODUCER_HASH_SIZE;
 			hash->entries = &initialImplicitProducerHashEntries[0];
 			for (size_t i = 0; i != INITIAL_IMPLICIT_PRODUCER_HASH_SIZE; ++i) {
-				initialImplicitProducerHashEntries[i].key.store(Details::invalidThreadId, std::memory_order_relaxed);
+				initialImplicitProducerHashEntries[i].key.store(Details::invalid_thread_id, std::memory_order_relaxed);
 			}
 			hash->prev = nullptr;
 			implicitProducerHash.store(hash, std::memory_order_relaxed);
@@ -3174,7 +3089,7 @@ private:
 				implicitProducerHash.store(&initialImplicitProducerHash, std::memory_order_relaxed);
 			}
 			else {
-				ImplicitProducerHash* hash;
+				ImplicitProducerHash* hash = nullptr;
 				for (hash = implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &other.initialImplicitProducerHash; hash = hash->prev) {
 					continue;
 				}
@@ -3184,7 +3099,7 @@ private:
 				other.implicitProducerHash.store(&other.initialImplicitProducerHash, std::memory_order_relaxed);
 			}
 			else {
-				ImplicitProducerHash* hash;
+				ImplicitProducerHash* hash = nullptr;
 				for (hash = other.implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &initialImplicitProducerHash; hash = hash->prev) {
 					continue;
 				}
@@ -3211,7 +3126,7 @@ private:
 #endif
 		
 		auto id = Details::thread_id();
-		auto hashedId = Details::hashThreadId(id);
+		auto hashedId = Details::hash_thread_id(id);
 		
 		auto mainHash = implicitProducerHash.load(std::memory_order_acquire);
 		assert(mainHash != nullptr);  // silence clang-tidy and MSVC warnings (hash cannot be null)
@@ -3233,12 +3148,14 @@ private:
 						index = hashedId;
 						while (true) {
 							index &= mainHash->capacity - 1u;
-							auto empty = Details::invalidThreadId;
-
-							auto reusable = Details::invalidThreadId2;
+							auto empty = Details::invalid_thread_id;
+#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
+							auto reusable = Details::invalid_thread_id2;
 							if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed) ||
-								mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed))
-							{
+								mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
+#else
+							if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
+#endif
 								mainHash->entries[index].value = value;
 								break;
 							}
@@ -3248,7 +3165,7 @@ private:
 					
 					return value;
 				}
-				if (probedKey == Details::invalidThreadId) {
+				if (probedKey == Details::invalid_thread_id) {
 					break;		// Not in this hash table
 				}
 				++index;
@@ -3280,10 +3197,10 @@ private:
 					
 					auto newHash = new (raw) ImplicitProducerHash;
 					newHash->capacity = static_cast<size_t>(newCapacity);
-					newHash->entries = reinterpret_cast<ImplicitProducerKVP*>(Details::alignFor<ImplicitProducerKVP>(raw + sizeof(ImplicitProducerHash)));
+					newHash->entries = reinterpret_cast<ImplicitProducerKVP*>(Details::align_for<ImplicitProducerKVP>(raw + sizeof(ImplicitProducerHash)));
 					for (size_t i = 0; i != newCapacity; ++i) {
 						new (newHash->entries + i) ImplicitProducerKVP;
-						newHash->entries[i].key.store(Details::invalidThreadId, std::memory_order_relaxed);
+						newHash->entries[i].key.store(Details::invalid_thread_id, std::memory_order_relaxed);
 					}
 					newHash->prev = mainHash;
 					implicitProducerHash.store(newHash, std::memory_order_release);
@@ -3305,24 +3222,24 @@ private:
 					return nullptr;
 				}
 				
-
+#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 				producer->threadExitListener.callback = &ConcurrentQueue::implicit_producer_thread_exited_callback;
 				producer->threadExitListener.userData = producer;
 				Details::ThreadExitNotifier::subscribe(&producer->threadExitListener);
-
+#endif
 				
 				auto index = hashedId;
 				while (true) {
 					index &= mainHash->capacity - 1u;
-					auto empty = Details::invalidThreadId;
-
-					auto reusable = Details::invalidThreadId2;
+					auto empty = Details::invalid_thread_id;
+#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
+					auto reusable = Details::invalid_thread_id2;
 					if (mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
 						implicitProducerHashCount.fetch_sub(1, std::memory_order_relaxed);  // already counted as a used slot
 						mainHash->entries[index].value = producer;
 						break;
 					}
-
+#endif
 					if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
 						mainHash->entries[index].value = producer;
 						break;
@@ -3339,7 +3256,7 @@ private:
 		}
 	}
 	
-
+#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 	void implicit_producer_thread_exited(ImplicitProducer* producer)
 	{
 		// Remove from hash
@@ -3349,8 +3266,8 @@ private:
 		auto hash = implicitProducerHash.load(std::memory_order_acquire);
 		assert(hash != nullptr);		// The thread exit listener is only registered if we were added to a hash in the first place
 		auto id = Details::thread_id();
-		auto hashedId = Details::hashThreadId(id);
-		Details::threadIdT probedKey;
+		auto hashedId = Details::hash_thread_id(id);
+		Details::thread_id_t probedKey;
 		
 		// We need to traverse all the hashes just in case other threads aren't on the current one yet and are
 		// trying to add an entry thinking there's a free slot (because they reused a producer)
@@ -3359,11 +3276,11 @@ private:
 			do {
 				index &= hash->capacity - 1u;
 				probedKey = id;
-				if (hash->entries[index].key.compare_exchange_strong(probedKey, Details::invalidThreadId2, std::memory_order_seq_cst, std::memory_order_relaxed)) {
+				if (hash->entries[index].key.compare_exchange_strong(probedKey, Details::invalid_thread_id2, std::memory_order_seq_cst, std::memory_order_relaxed)) {
 					break;
 				}
 				++index;
-			} while (probedKey != Details::invalidThreadId);		// Can happen if the hash has changed but we weren't put back in it yet, or if we weren't added to this hash in the first place
+			} while (probedKey != Details::invalid_thread_id);		// Can happen if the hash has changed but we weren't put back in it yet, or if we weren't added to this hash in the first place
 		}
 		
 		// Mark the queue as being recyclable
@@ -3376,7 +3293,7 @@ private:
 		auto queue = producer->parent;
 		queue->implicit_producer_thread_exited(producer);
 	}
-
+#endif
 	
 	//////////////////////////////////
 	// Utility functions
@@ -3392,7 +3309,7 @@ private:
 			void* raw = (Traits::malloc)(size + alignment - 1 + sizeof(void*));
 			if (!raw)
 				return nullptr;
-			char* ptr = Details::alignFor<TAlign>(reinterpret_cast<char*>(raw) + sizeof(void*));
+			char* ptr = Details::align_for<TAlign>(reinterpret_cast<char*>(raw) + sizeof(void*));
 			*(reinterpret_cast<void**>(ptr) - 1) = raw;
 			return ptr;
 		}
@@ -3455,7 +3372,7 @@ private:
 
 private:
 	std::atomic<ProducerBase*> producerListTail;
-	std::atomic<Poco::UInt32> producerCount;
+	std::atomic<std::uint32_t> producerCount;
 	
 	std::atomic<size_t> initialBlockPoolIndex;
 	Block* initialBlockPool;
@@ -3471,10 +3388,10 @@ private:
 	std::atomic<size_t> implicitProducerHashCount;		// Number of slots logically used
 	ImplicitProducerHash initialImplicitProducerHash;
 	std::array<ImplicitProducerKVP, INITIAL_IMPLICIT_PRODUCER_HASH_SIZE> initialImplicitProducerHashEntries;
-	std::atomic_flag implicitProducerHashResizeInProgress;
+	std::atomic_flag implicitProducerHashResizeInProgress{};
 	
-	std::atomic<Poco::UInt32> nextExplicitConsumerId;
-	std::atomic<Poco::UInt32> globalExplicitConsumerOffset;
+	std::atomic<std::uint32_t> nextExplicitConsumerId;
+	std::atomic<std::uint32_t> globalExplicitConsumerOffset;
 	
 #ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODHASH
 	debug::DebugMutex implicitProdMutex;
@@ -3510,7 +3427,7 @@ ConsumerToken::ConsumerToken(ConcurrentQueue<T, Traits>& queue)
 	: itemsConsumedFromCurrent(0), currentProducer(nullptr), desiredProducer(nullptr)
 {
 	initialOffset = queue.nextExplicitConsumerId.fetch_add(1, std::memory_order_release);
-	lastKnownGlobalOffset = static_cast<Poco::UInt32>(-1);
+	lastKnownGlobalOffset = static_cast<std::uint32_t>(-1);
 }
 
 template<typename T, typename Traits>
@@ -3518,27 +3435,27 @@ ConsumerToken::ConsumerToken(BlockingConcurrentQueue<T, Traits>& queue)
 	: itemsConsumedFromCurrent(0), currentProducer(nullptr), desiredProducer(nullptr)
 {
 	initialOffset = reinterpret_cast<ConcurrentQueue<T, Traits>*>(&queue)->nextExplicitConsumerId.fetch_add(1, std::memory_order_release);
-	lastKnownGlobalOffset = static_cast<Poco::UInt32>(-1);
+	lastKnownGlobalOffset = static_cast<std::uint32_t>(-1);
 }
 
 template<typename T, typename Traits>
-inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) noexcept
+inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) POCO_NOEXCEPT
 {
 	a.swap(b);
 }
 
-inline void swap(ProducerToken& a, ProducerToken& b) noexcept
+inline void swap(ProducerToken& a, ProducerToken& b) POCO_NOEXCEPT
 {
 	a.swap(b);
 }
 
-inline void swap(ConsumerToken& a, ConsumerToken& b) noexcept
+inline void swap(ConsumerToken& a, ConsumerToken& b) POCO_NOEXCEPT
 {
 	a.swap(b);
 }
 
 template<typename T, typename Traits>
-inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) noexcept
+inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) POCO_NOEXCEPT
 {
 	a.swap(b);
 }
