@@ -65,6 +65,11 @@
 #pragma warning(disable: 4127)  // conditional expression is constant
 #endif
 
+#include "Poco/Thread.h"
+#include "Poco/ThreadLocal.h"
+#include "Poco/Mutex.h"
+#include "Poco/Nullable.h"
+
 #if POCO_OS == POCO_OS_MAC_OS_X
 #include "TargetConditionals.h"
 #endif
@@ -81,11 +86,6 @@
 #include <limits>
 #include <climits>		// for CHAR_BIT
 #include <array>
-
-#include "Poco/Thread.h"
-#include "Poco/ThreadLocal.h"
-#include "Poco/Mutex.h"
-#include "Poco/Nullable.h"
 
 // Platform-specific definitions of a numeric thread ID type and an invalid value
 namespace Poco { namespace Details {
