@@ -17,7 +17,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
 #include "Poco/Stopwatch.h"
-#include <ostream>
+#include <iostream>
 
 
 using namespace Poco;

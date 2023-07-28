@@ -13,9 +13,9 @@
 
 // Provides a C++11 implementation of a multi-producer, multi-consumer lock-free queue.
 // An overview, including benchmark results, is provided here:
-//     http://Poco.com/blog/2014/a-fast-general-purpose-lock-free-queue-for-c++
+//     http://moodycamel.com/blog/2014/a-fast-general-purpose-lock-free-queue-for-c++
 // The full design is also described in excruciating detail at:
-//    http://Poco.com/blog/2014/detailed-design-of-a-lock-free-queue
+//    http://moodycamel.com/blog/2014/detailed-design-of-a-lock-free-queue
 
 // Simplified BSD license:
 // Copyright (c) 2013-2020, Cameron Desrochers.
