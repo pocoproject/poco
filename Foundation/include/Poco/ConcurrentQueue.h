@@ -74,17 +74,17 @@
 #include "TargetConditionals.h"
 #endif
 
-#include <atomic>		// Requires C++11. Sorry VS2010.
+#include <atomic>  // Requires C++11. Sorry VS2010.
 #include <cassert>
 
-#include <cstddef>              // for max_align_t
+#include <cstddef>  // for max_align_t
 #include <cstdint>
 #include <cstdlib>
 #include <type_traits>
 #include <algorithm>
 #include <utility>
 #include <limits>
-#include <climits>		// for CHAR_BIT
+#include <climits>  // for CHAR_BIT
 #include <array>
 
 // Platform-specific definitions of a numeric thread ID type and an invalid value
@@ -110,6 +110,7 @@ namespace Poco { namespace Details {
 	}
 } }
 
+#define POCO_EXCEPTIONS_ENABLED
 
 // Constexpr if
 #ifndef POCO_CONSTEXPR_IF
@@ -123,44 +124,14 @@ namespace Poco { namespace Details {
 #endif
 
 // Exceptions
-#ifndef POCO_EXCEPTIONS_ENABLED
-#if (defined(_MSC_VER) && defined(_CPPUNWIND)) || (defined(__GNUC__) && defined(__EXCEPTIONS)) || (!defined(_MSC_VER) && !defined(__GNUC__))
-#define POCO_EXCEPTIONS_ENABLED
-#endif
-#endif
-#ifdef POCO_EXCEPTIONS_ENABLED
 #define POCO_TRY try
 #define POCO_CATCH(...) catch(__VA_ARGS__)
 #define POCO_RETHROW throw
 #define POCO_THROW(expr) throw (expr)
-#else
-#define POCO_TRY POCO_CONSTEXPR_IF (true)
-#define POCO_CATCH(...) else POCO_CONSTEXPR_IF (false)
-#define POCO_RETHROW
-#define POCO_THROW(expr)
-#endif
 
-#ifndef POCO_NOEXCEPT
-#if !defined(POCO_EXCEPTIONS_ENABLED)
-#define POCO_NOEXCEPT
-#define POCO_NOEXCEPT_CTOR(type, valueType, expr) true
-#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) true
-#elif defined(_MSC_VER) && defined(_NOEXCEPT) && _MSC_VER < 1800
-// VS2012's std::is_nothrow_[move_]constructible is broken and returns true when it shouldn't :-(
-// We have to assume *all* non-trivial constructors may throw on VS2012!
-#define POCO_NOEXCEPT _NOEXCEPT
-#define POCO_NOEXCEPT_CTOR(type, valueType, expr) (std::is_rvalue_reference<valueType>::value && std::is_move_constructible<type>::value ? std::is_trivially_move_constructible<type>::value : std::is_trivially_copy_constructible<type>::value)
-#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) ((std::is_rvalue_reference<valueType>::value && std::is_move_assignable<type>::value ? std::is_trivially_move_assignable<type>::value || std::is_nothrow_move_assignable<type>::value : std::is_trivially_copy_assignable<type>::value || std::is_nothrow_copy_assignable<type>::value) && POCO_NOEXCEPT_CTOR(type, valueType, expr))
-#elif defined(_MSC_VER) && defined(_NOEXCEPT) && _MSC_VER < 1900
-#define POCO_NOEXCEPT _NOEXCEPT
-#define POCO_NOEXCEPT_CTOR(type, valueType, expr) (std::is_rvalue_reference<valueType>::value && std::is_move_constructible<type>::value ? std::is_trivially_move_constructible<type>::value || std::is_nothrow_move_constructible<type>::value : std::is_trivially_copy_constructible<type>::value || std::is_nothrow_copy_constructible<type>::value)
-#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) ((std::is_rvalue_reference<valueType>::value && std::is_move_assignable<type>::value ? std::is_trivially_move_assignable<type>::value || std::is_nothrow_move_assignable<type>::value : std::is_trivially_copy_assignable<type>::value || std::is_nothrow_copy_assignable<type>::value) && POCO_NOEXCEPT_CTOR(type, valueType, expr))
-#else
 #define POCO_NOEXCEPT noexcept
 #define POCO_NOEXCEPT_CTOR(type, valueType, expr) noexcept(expr)
 #define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) noexcept(expr)
-#endif
-#endif
 
 namespace Poco { namespace Details {
 #ifndef POCO_ALIGNAS
@@ -218,7 +189,8 @@ namespace Poco { namespace Details {
 namespace Poco {
 namespace Details {
 	template<typename T>
-	struct const_numeric_max {
+	struct const_numeric_max 
+	{
 		static_assert(std::is_integral<T>::value, "const_numeric_max can only be used with integers");
 		static const T value = std::numeric_limits<T>::is_signed
 			? (static_cast<T>(1) << (sizeof(T) * CHAR_BIT - 1)) - static_cast<T>(1)
@@ -316,9 +288,6 @@ struct ConcurrentQueueDefaultTraits
 	static const bool RECYCLE_ALLOCATED_BLOCKS = false;
 
 	
-#ifndef MCDBGQ_USE_RELACY
-	// Memory allocation can be customized if needed.
-	// malloc should return nullptr on failure, and handle alignment like std::malloc.
 #if defined(malloc) || defined(free)
 	// Gah, this is 2015, stop defining macros that break standard code already!
 	// Work around malloc/free being special macros:
@@ -329,12 +298,6 @@ struct ConcurrentQueueDefaultTraits
 #else
 	static inline void* malloc(size_t size) { return std::malloc(size); }
 	static inline void free(void* ptr) { return std::free(ptr); }
-#endif
-#else
-	// Debug versions when running under the Relacy race detector (ignore
-	// these in user code)
-	static inline void* malloc(size_t size) { return rl::rl_malloc(size, $); }
-	static inline void free(void* ptr) { return rl::rl_free(ptr, $); }
 #endif
 };
 
@@ -354,21 +317,18 @@ template<typename T, typename Traits> class BlockingConcurrentQueue;
 class ConcurrentQueueTests;
 
 
-namespace Details
-{
+namespace Details {
 	struct ConcurrentQueueProducerTypelessBase
 	{
-		ConcurrentQueueProducerTypelessBase* next;
-		std::atomic<bool> inactive;
-		ProducerToken* token;
+		ConcurrentQueueProducerTypelessBase* next{nullptr};
+		std::atomic<bool> inactive{false};
+		ProducerToken* token{nullptr};
 		
-		ConcurrentQueueProducerTypelessBase()
-			: next(nullptr), inactive(false), token(nullptr)
-		{
-		}
+		ConcurrentQueueProducerTypelessBase() = default;
 	};
 	
-	struct hash_32_or_64 {
+	struct hash_32_or_64 
+	{
 		template<typename T, typename std::enable_if_t<(sizeof(T) <= 4), bool> = true>
 		static inline std::uint32_t hash(T h)
 		{
@@ -460,8 +420,7 @@ namespace Details
 	struct nomove_if<false>
 	{
 		template<typename U>
-		static inline auto eval(U&& x)
-			-> decltype(std::forward<U>(x))
+		static inline auto eval(U&& x) -> decltype(std::forward<U>(x))
 		{
 			return std::forward<U>(x);
 		}
@@ -505,14 +464,17 @@ namespace Details
 		static void unsubscribe(ThreadExitListener* listener)
 		{
 			Poco::FastMutex::ScopedLock guard(mutex());
-			if (!listener->chain) {
+			if (!listener->chain)
+			{
 				return;  // race with ~ThreadExitNotifier
 			}
 			auto& tlsInst = *listener->chain;
 			listener->chain = nullptr;
 			ThreadExitListener** prev = &tlsInst.tail;
-			for (auto ptr = tlsInst.tail; ptr != nullptr; ptr = ptr->next) {
-				if (ptr == listener) {
+			for (auto ptr = tlsInst.tail; ptr != nullptr; ptr = ptr->next)
+			{
+				if (ptr == listener)
+				{
 					*prev = ptr->next;
 					break;
 				}
@@ -521,7 +483,7 @@ namespace Details
 		}
 		
 	private:
-		ThreadExitNotifier() : tail(nullptr) { }
+		ThreadExitNotifier() = default;
 		ThreadExitNotifier(ThreadExitNotifier const&) = delete;
 		ThreadExitNotifier& operator=(ThreadExitNotifier const&) = delete;
 		
@@ -530,7 +492,8 @@ namespace Details
 			// This thread is about to exit, let everyone know!
 			assert(this == &instance() && "If this assert fails, you likely have a buggy compiler! Change the preprocessor conditions such that POCO_CPP11_THREAD_LOCAL_SUPPORTED is no longer defined.");
 			Poco::FastMutex::ScopedLock guard(mutex());
-			for (auto ptr = tail; ptr != nullptr; ptr = ptr->next) {
+			for (auto ptr = tail; ptr != nullptr; ptr = ptr->next)
+			{
 				ptr->chain = nullptr;
 				ptr->callback(ptr->userData);
 			}
@@ -551,7 +514,7 @@ namespace Details
 		}
 		
 	private:
-		ThreadExitListener* tail;
+		ThreadExitListener* tail{nullptr};
 	};
 
 	
@@ -566,7 +529,6 @@ namespace Details
 	template<typename U> struct static_is_lock_free<U*> { enum { value = ATOMIC_POINTER_LOCK_FREE }; };
 }
 
-
 struct ProducerToken
 {
 	template<typename T, typename Traits>
@@ -579,7 +541,8 @@ struct ProducerToken
 		: producer(other.producer)
 	{
 		other.producer = nullptr;
-		if (producer != nullptr) {
+		if (producer != nullptr)
+		{
 			producer->token = this;
 		}
 	}
@@ -593,10 +556,12 @@ struct ProducerToken
 	void swap(ProducerToken& other) POCO_NOEXCEPT
 	{
 		std::swap(producer, other.producer);
-		if (producer != nullptr) {
+		if (producer != nullptr)
+		{
 			producer->token = this;
 		}
-		if (other.producer != nullptr) {
+		if (other.producer != nullptr)
+		{
 			other.producer->token = &other;
 		}
 	}
@@ -613,7 +578,8 @@ struct ProducerToken
 	
 	~ProducerToken()
 	{
-		if (producer != nullptr) {
+		if (producer != nullptr)
+		{
 			producer->token = nullptr;
 			producer->inactive.store(true, std::memory_order_release);
 		}
@@ -642,8 +608,7 @@ struct ConsumerToken
 	
 	ConsumerToken(ConsumerToken&& other) POCO_NOEXCEPT
 		: initialOffset(other.initialOffset), lastKnownGlobalOffset(other.lastKnownGlobalOffset), itemsConsumedFromCurrent(other.itemsConsumedFromCurrent), currentProducer(other.currentProducer), desiredProducer(other.desiredProducer)
-	{
-	}
+	{ }
 	
 	inline ConsumerToken& operator=(ConsumerToken&& other) POCO_NOEXCEPT
 	{
@@ -669,11 +634,11 @@ private:
 	friend class ConcurrentQueueTests;
 	
 private: // but shared with ConcurrentQueue
-	std::uint32_t initialOffset;
-	std::uint32_t lastKnownGlobalOffset;
-	std::uint32_t itemsConsumedFromCurrent;
-	Details::ConcurrentQueueProducerTypelessBase* currentProducer;
-	Details::ConcurrentQueueProducerTypelessBase* desiredProducer;
+	std::uint32_t initialOffset{0};
+	std::uint32_t lastKnownGlobalOffset{0};
+	std::uint32_t itemsConsumedFromCurrent{0};
+	Details::ConcurrentQueueProducerTypelessBase* currentProducer{nullptr};
+	Details::ConcurrentQueueProducerTypelessBase* desiredProducer{nullptr};
 };
 
 // Need to forward-declare this swap because it's in a namespace.
@@ -778,9 +743,11 @@ public:
 	{
 		// Destroy producers
 		auto ptr = producerListTail.load(std::memory_order_relaxed);
-		while (ptr != nullptr) {
+		while (ptr != nullptr)
+		{
 			auto next = ptr->next_prod();
-			if (ptr->token != nullptr) {
+			if (ptr->token != nullptr)
+			{
 				ptr->token->producer = nullptr;
 			}
 			destroy(ptr);
@@ -788,12 +755,16 @@ public:
 		}
 		
 		// Destroy implicit producer hash tables
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0) {
+		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0)
+		{
 			auto hash = implicitProducerHash.load(std::memory_order_relaxed);
-			while (hash != nullptr) {
+			while (hash != nullptr)
+			{
 				auto prev = hash->prev;
-				if (prev != nullptr) {		// The last hash is part of this object and was not allocated dynamically
-					for (size_t i = 0; i != hash->capacity; ++i) {
+				if (prev != nullptr)		// The last hash is part of this object and was not allocated dynamically
+				{
+					for (size_t i = 0; i != hash->capacity; ++i)
+					{
 						hash->entries[i].~ImplicitProducerKVP();
 					}
 					hash->~ImplicitProducerHash();
@@ -805,9 +776,11 @@ public:
 		
 		// Destroy global free list
 		auto block = freeList.head_unsafe();
-		while (block != nullptr) {
+		while (block != nullptr)
+		{
 			auto next = block->freeListNext.load(std::memory_order_relaxed);
-			if (block->dynamicallyAllocated) {
+			if (block->dynamicallyAllocated)
+			{
 				destroy(block);
 			}
 			block = next;
@@ -879,7 +852,8 @@ public:
 private:
 	ConcurrentQueue& swap_internal(ConcurrentQueue& other)
 	{
-		if (this == &other) {
+		if (this == &other)
+		{
 			return *this;
 		}
 		
@@ -1048,10 +1022,13 @@ public:
 		size_t nonEmptyCount = 0;
 		ProducerBase* best = nullptr;
 		size_t bestSize = 0;
-		for (auto ptr = producerListTail.load(std::memory_order_acquire); nonEmptyCount < 3 && ptr != nullptr; ptr = ptr->next_prod()) {
+		for (auto ptr = producerListTail.load(std::memory_order_acquire); nonEmptyCount < 3 && ptr != nullptr; ptr = ptr->next_prod())
+		{
 			auto size = ptr->size_approx();
-			if (size > 0) {
-				if (size > bestSize) {
+			if (size > 0)
+			{
+				if (size > bestSize)
+				{
 					bestSize = size;
 					best = ptr;
 				}
@@ -1061,11 +1038,14 @@ public:
 		
 		// If there was at least one non-empty queue but it appears empty at the time
 		// we try to dequeue from it, we need to make sure every queue's been tried
-		if (nonEmptyCount > 0) {
-			if ((Details::likely)(best->dequeue(item))) {
+		if (nonEmptyCount > 0)
+		{
+			if ((Details::likely)(best->dequeue(item)))
+			{
 				return true;
 			}
-			for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
+			for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod())
+			{
 				if (ptr != best && ptr->dequeue(item)) {
 					return true;
 				}
@@ -1086,8 +1066,10 @@ public:
 	template<typename U>
 	bool try_dequeue_non_interleaved(U& item)
 	{
-		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
-			if (ptr->dequeue(item)) {
+		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod())
+		{
+			if (ptr->dequeue(item))
+			{
 				return true;
 			}
 		}
@@ -1107,7 +1089,8 @@ public:
 		// If there's no items where you're supposed to be, keep moving until you find a producer with some items
 		// If the global offset has not changed but you've run out of items to consume, move over from your current position until you find an producer with something in it
 		
-		if (token.desiredProducer == nullptr || token.lastKnownGlobalOffset != globalExplicitConsumerOffset.load(std::memory_order_relaxed)) {
+		if (token.desiredProducer == nullptr || token.lastKnownGlobalOffset != globalExplicitConsumerOffset.load(std::memory_order_relaxed))
+		{
 			if (!update_current_producer_after_rotation(token)) {
 				return false;
 			}
@@ -1115,8 +1098,10 @@ public:
 		
 		// If there was at least one non-empty queue but it appears empty at the time
 		// we try to dequeue from it, we need to make sure every queue's been tried
-		if (static_cast<ProducerBase*>(token.currentProducer)->dequeue(item)) {
-			if (++token.itemsConsumedFromCurrent == EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE) {
+		if (static_cast<ProducerBase*>(token.currentProducer)->dequeue(item))
+		{
+			if (++token.itemsConsumedFromCurrent == EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE)
+			{
 				globalExplicitConsumerOffset.fetch_add(1, std::memory_order_relaxed);
 			}
 			return true;
@@ -1124,17 +1109,21 @@ public:
 		
 		auto tail = producerListTail.load(std::memory_order_acquire);
 		auto ptr = static_cast<ProducerBase*>(token.currentProducer)->next_prod();
-		if (ptr == nullptr) {
+		if (ptr == nullptr)
+		{
 			ptr = tail;
 		}
-		while (ptr != static_cast<ProducerBase*>(token.currentProducer)) {
-			if (ptr->dequeue(item)) {
+		while (ptr != static_cast<ProducerBase*>(token.currentProducer))
+		{
+			if (ptr->dequeue(item))
+			{
 				token.currentProducer = ptr;
 				token.itemsConsumedFromCurrent = 1;
 				return true;
 			}
 			ptr = ptr->next_prod();
-			if (ptr == nullptr) {
+			if (ptr == nullptr)
+			{
 				ptr = tail;
 			}
 		}
@@ -1150,9 +1139,11 @@ public:
 	size_t try_dequeue_bulk(It itemFirst, size_t max)
 	{
 		size_t count = 0;
-		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
+		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod())
+		{
 			count += ptr->dequeue_bulk(itemFirst, max - count);
-			if (count == max) {
+			if (count == max)
+			{
 				break;
 			}
 		}
@@ -1167,15 +1158,19 @@ public:
 	template<typename It>
 	size_t try_dequeue_bulk(consumer_token_t& token, It itemFirst, size_t max)
 	{
-		if (token.desiredProducer == nullptr || token.lastKnownGlobalOffset != globalExplicitConsumerOffset.load(std::memory_order_relaxed)) {
-			if (!update_current_producer_after_rotation(token)) {
+		if (token.desiredProducer == nullptr || token.lastKnownGlobalOffset != globalExplicitConsumerOffset.load(std::memory_order_relaxed))
+		{
+			if (!update_current_producer_after_rotation(token))
+			{
 				return 0;
 			}
 		}
 		
 		size_t count = static_cast<ProducerBase*>(token.currentProducer)->dequeue_bulk(itemFirst, max);
-		if (count == max) {
-			if ((token.itemsConsumedFromCurrent += static_cast<std::uint32_t>(max)) >= EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE) {
+		if (count == max)
+		{
+			if ((token.itemsConsumedFromCurrent += static_cast<std::uint32_t>(max)) >= EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE)
+			{
 				globalExplicitConsumerOffset.fetch_add(1, std::memory_order_relaxed);
 			}
 			return max;
@@ -1185,22 +1180,27 @@ public:
 		
 		auto tail = producerListTail.load(std::memory_order_acquire);
 		auto ptr = static_cast<ProducerBase*>(token.currentProducer)->next_prod();
-		if (ptr == nullptr) {
+		if (ptr == nullptr)
+		{
 			ptr = tail;
 		}
-		while (ptr != static_cast<ProducerBase*>(token.currentProducer)) {
+		while (ptr != static_cast<ProducerBase*>(token.currentProducer))
+		{
 			auto dequeued = ptr->dequeue_bulk(itemFirst, max);
 			count += dequeued;
-			if (dequeued != 0) {
+			if (dequeued != 0)
+			{
 				token.currentProducer = ptr;
 				token.itemsConsumedFromCurrent = static_cast<std::uint32_t>(dequeued);
 			}
-			if (dequeued == max) {
+			if (dequeued == max)
+			{
 				break;
 			}
 			max -= dequeued;
 			ptr = ptr->next_prod();
-			if (ptr == nullptr) {
+			if (ptr == nullptr)
+			{
 				ptr = tail;
 			}
 		}
@@ -1244,7 +1244,8 @@ public:
 	size_t size_approx() const
 	{
 		size_t size = 0;
-		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
+		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod())
+		{
 			size += ptr->size_approx();
 		}
 		return size;
@@ -1312,32 +1313,39 @@ private:
 	{
 		// Ah, there's been a rotation, figure out where we should be!
 		auto tail = producerListTail.load(std::memory_order_acquire);
-		if (token.desiredProducer == nullptr && tail == nullptr) {
+		if (token.desiredProducer == nullptr && tail == nullptr)
+		{
 			return false;
 		}
 		auto prodCount = producerCount.load(std::memory_order_relaxed);
 		auto globalOffset = globalExplicitConsumerOffset.load(std::memory_order_relaxed);
-		if ((Details::unlikely)(token.desiredProducer == nullptr)) {
+		if ((Details::unlikely)(token.desiredProducer == nullptr))
+		{
 			// Aha, first time we're dequeueing anything.
 			// Figure out our local position
 			// Note: offset is from start, not end, but we're traversing from end -- subtract from count first
 			std::uint32_t offset = prodCount - 1 - (token.initialOffset % prodCount);
 			token.desiredProducer = tail;
-			for (std::uint32_t i = 0; i != offset; ++i) {
+			for (std::uint32_t i = 0; i != offset; ++i)
+			{
 				token.desiredProducer = static_cast<ProducerBase*>(token.desiredProducer)->next_prod();
-				if (token.desiredProducer == nullptr) {
+				if (token.desiredProducer == nullptr)
+				{
 					token.desiredProducer = tail;
 				}
 			}
 		}
 		
 		std::uint32_t delta = globalOffset - token.lastKnownGlobalOffset;
-		if (delta >= prodCount) {
+		if (delta >= prodCount)
+		{
 			delta = delta % prodCount;
 		}
-		for (std::uint32_t i = 0; i != delta; ++i) {
+		for (std::uint32_t i = 0; i != delta; ++i)
+		{
 			token.desiredProducer = static_cast<ProducerBase*>(token.desiredProducer)->next_prod();
-			if (token.desiredProducer == nullptr) {
+			if (token.desiredProducer == nullptr)
+			{
 				token.desiredProducer = tail;
 			}
 		}
@@ -1368,7 +1376,7 @@ private:
 	template<typename N>		// N must inherit FreeListNode or have the same fields (and initialization of them)
 	struct FreeList
 	{
-		FreeList() : freeListHead(nullptr) { }
+		FreeList() = default;
 		FreeList(FreeList&& other) : freeListHead(other.freeListHead.load(std::memory_order_relaxed)) { other.freeListHead.store(nullptr, std::memory_order_relaxed); }
 		void swap(FreeList& other) { Details::swap_relaxed(freeListHead, other.freeListHead); }
 		
@@ -1379,7 +1387,8 @@ private:
 		{
 			// We know that the should-be-on-freelist bit is 0 at this point, so it's safe to
 			// set it using a fetch_add
-			if (node->freeListRefs.fetch_add(SHOULD_BE_ON_FREELIST, std::memory_order_acq_rel) == 0) {
+			if (node->freeListRefs.fetch_add(SHOULD_BE_ON_FREELIST, std::memory_order_acq_rel) == 0)
+			{
 				// Oh look! We were the last ones referencing this node, and we know
 				// we want to add it to the free list, so let's do it!
 		 		add_knowing_refcount_is_zero(node);
@@ -1389,10 +1398,12 @@ private:
 		inline N* try_get()
 		{
 			auto head = freeListHead.load(std::memory_order_acquire);
-			while (head != nullptr) {
+			while (head != nullptr)
+			{
 				auto prevHead = head;
 				auto refs = head->freeListRefs.load(std::memory_order_relaxed);
-				if ((refs & REFS_MASK) == 0 || !head->freeListRefs.compare_exchange_strong(refs, refs + 1, std::memory_order_acquire, std::memory_order_relaxed)) {
+				if ((refs & REFS_MASK) == 0 || !head->freeListRefs.compare_exchange_strong(refs, refs + 1, std::memory_order_acquire, std::memory_order_relaxed))
+				{
 					head = freeListHead.load(std::memory_order_acquire);
 					continue;
 				}
@@ -1400,7 +1411,8 @@ private:
 				// Good, reference count has been incremented (it wasn't at zero), which means we can read the
 				// next and not worry about it changing between now and the time we do the CAS
 				auto next = head->freeListNext.load(std::memory_order_relaxed);
-				if (freeListHead.compare_exchange_strong(head, next, std::memory_order_acquire, std::memory_order_relaxed)) {
+				if (freeListHead.compare_exchange_strong(head, next, std::memory_order_acquire, std::memory_order_relaxed))
+				{
 					// Yay, got the node. This means it was on the list, which means shouldBeOnFreeList must be false no
 					// matter the refcount (because nobody else knows it's been taken off yet, it can't have been put back on).
 					assert((head->freeListRefs.load(std::memory_order_relaxed) & SHOULD_BE_ON_FREELIST) == 0);
@@ -1414,7 +1426,8 @@ private:
 				// Note that we don't need to release any memory effects, but we do need to ensure that the reference
 				// count decrement happens-after the CAS on the head.
 				refs = prevHead->freeListRefs.fetch_sub(1, std::memory_order_acq_rel);
-				if (refs == SHOULD_BE_ON_FREELIST + 1) {
+				if (refs == SHOULD_BE_ON_FREELIST + 1)
+				{
 					add_knowing_refcount_is_zero(prevHead);
 				}
 			}
@@ -1437,12 +1450,15 @@ private:
 			// to add the node to the actual list fails, decrease the refcount and leave the add operation to
 			// the next thread who puts the refcount back at zero (which could be us, hence the loop).
 			auto head = freeListHead.load(std::memory_order_relaxed);
-			while (true) {
+			while (true)
+			{
 				node->freeListNext.store(head, std::memory_order_relaxed);
 				node->freeListRefs.store(1, std::memory_order_release);
-				if (!freeListHead.compare_exchange_strong(head, node, std::memory_order_release, std::memory_order_relaxed)) {
+				if (!freeListHead.compare_exchange_strong(head, node, std::memory_order_release, std::memory_order_relaxed))
+				{
 					// Hmm, the add failed, but we can only try again when the refcount goes back to zero
-					if (node->freeListRefs.fetch_add(SHOULD_BE_ON_FREELIST - 1, std::memory_order_release) == 1) {
+					if (node->freeListRefs.fetch_add(SHOULD_BE_ON_FREELIST - 1, std::memory_order_release) == 1)
+					{
 						continue;
 					}
 				}
@@ -1452,7 +1468,7 @@ private:
 		
 	private:
 		// Implemented like a stack, but where node order doesn't matter (nodes are inserted out of order under contention)
-		std::atomic<N*> freeListHead;
+		std::atomic<N*> freeListHead{nullptr};
 	
 	static const std::uint32_t REFS_MASK = 0x7FFFFFFF;
 	static const std::uint32_t SHOULD_BE_ON_FREELIST = 0x80000000;
@@ -1467,17 +1483,18 @@ private:
 	
 	struct Block
 	{
-		Block()
-			: next(nullptr), elementsCompletelyDequeued(0), freeListRefs(0), freeListNext(nullptr), dynamicallyAllocated(true)
-		{ }
+		Block() = default;
 		
 		template<InnerQueueContext context>
 		inline bool is_empty() const
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD) {
+			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			{
 				// Check flags
-				for (size_t i = 0; i < BLOCK_SIZE; ++i) {
-					if (!emptyFlags[i].load(std::memory_order_relaxed)) {
+				for (size_t i = 0; i < BLOCK_SIZE; ++i)
+				{
+					if (!emptyFlags[i].load(std::memory_order_relaxed))
+					{
 						return false;
 					}
 				}
@@ -1486,9 +1503,11 @@ private:
 				std::atomic_thread_fence(std::memory_order_acquire);
 				return true;
 			}
-			else {
+			else
+			{
 				// Check counter
-				if (elementsCompletelyDequeued.load(std::memory_order_relaxed) == BLOCK_SIZE) {
+				if (elementsCompletelyDequeued.load(std::memory_order_relaxed) == BLOCK_SIZE)
+				{
 					std::atomic_thread_fence(std::memory_order_acquire);
 					return true;
 				}
@@ -1501,13 +1520,15 @@ private:
 		template<InnerQueueContext context>
 		inline bool set_empty(POCO_MAYBE_UNUSED index_t i)
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD) {
+			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			{
 				// Set flag
 				assert(!emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].load(std::memory_order_relaxed));
 				emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].store(true, std::memory_order_release);
 				return false;
 			}
-			else {
+			else
+			{
 				// Increment counter
 				auto prevVal = elementsCompletelyDequeued.fetch_add(1, std::memory_order_release);
 				assert(prevVal < BLOCK_SIZE);
@@ -1520,17 +1541,20 @@ private:
 		template<InnerQueueContext context>
 		inline bool set_many_empty(POCO_MAYBE_UNUSED index_t i, size_t count)
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD) {
+			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			{
 				// Set flags
 				std::atomic_thread_fence(std::memory_order_release);
 				i = BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1)) - count + 1;
-				for (size_t j = 0; j != count; ++j) {
+				for (size_t j = 0; j != count; ++j)
+				{
 					assert(!emptyFlags[i + j].load(std::memory_order_relaxed));
 					emptyFlags[i + j].store(true, std::memory_order_relaxed);
 				}
 				return false;
 			}
-			else {
+			else
+			{
 				// Increment counter
 				auto prevVal = elementsCompletelyDequeued.fetch_add(count, std::memory_order_release);
 				assert(prevVal + count <= BLOCK_SIZE);
@@ -1541,13 +1565,16 @@ private:
 		template<InnerQueueContext context>
 		inline void set_all_empty()
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD) {
+			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			{
 				// Set all flags
-				for (size_t i = 0; i != BLOCK_SIZE; ++i) {
+				for (size_t i = 0; i != BLOCK_SIZE; ++i)
+				{
 					emptyFlags[i].store(true, std::memory_order_relaxed);
 				}
 			}
-			else {
+			else
+			{
 				// Reset counter
 				elementsCompletelyDequeued.store(BLOCK_SIZE, std::memory_order_relaxed);
 			}
@@ -1556,32 +1583,41 @@ private:
 		template<InnerQueueContext context>
 		inline void reset_empty()
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD) {
+			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			{
 				// Reset flags
-				for (size_t i = 0; i != BLOCK_SIZE; ++i) {
+				for (size_t i = 0; i != BLOCK_SIZE; ++i)
+				{
 					emptyFlags[i].store(false, std::memory_order_relaxed);
 				}
 			}
-			else {
+			else
+			{
 				// Reset counter
 				elementsCompletelyDequeued.store(0, std::memory_order_relaxed);
 			}
 		}
 		
-		inline T* operator[](index_t idx) POCO_NOEXCEPT { return static_cast<T*>(static_cast<void*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
-		inline T const* operator[](index_t idx) const POCO_NOEXCEPT { return static_cast<T const*>(static_cast<void const*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
+		inline T* operator[](index_t idx) POCO_NOEXCEPT
+		{
+			return static_cast<T*>(static_cast<void*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1));
+		}
+		inline T const* operator[](index_t idx) const POCO_NOEXCEPT
+		{
+			return static_cast<T const*>(static_cast<void const*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1));
+		}
 		
 	private:
 		static_assert(std::alignment_of<T>::value <= sizeof(T), "The queue does not support types with an alignment greater than their size at this time");
 		POCO_ALIGNED_TYPE_LIKE(char[sizeof(T) * BLOCK_SIZE], T) elements;
 	public:
-		Block* next;
-		std::atomic<size_t> elementsCompletelyDequeued;
+		Block* next{nullptr};
+		std::atomic<size_t> elementsCompletelyDequeued{0};
 		std::atomic<bool> emptyFlags[BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD ? BLOCK_SIZE : 1]{};
 	public:
-		std::atomic<std::uint32_t> freeListRefs;
-		std::atomic<Block*> freeListNext;
-		bool dynamicallyAllocated;		// Perhaps a better name for this would be 'isNotPartOfInitialBlockPool'
+		std::atomic<std::uint32_t> freeListRefs{0};
+		std::atomic<Block*> freeListNext{nullptr};
+		bool dynamicallyAllocated{true};		// Perhaps a better name for this would be 'isNotPartOfInitialBlockPool'
 	};
 	static_assert(std::alignment_of<Block>::value >= std::alignment_of<T>::value, "Internal error: Blocks must be at least as aligned as the type they are wrapping");
 	
@@ -1599,18 +1635,19 @@ private:
 			tailBlock(nullptr),
 			isExplicit(isExplicit_),
 			parent(parent_)
-		{
-		}
+		{ }
 		
-		virtual ~ProducerBase() { }
+		virtual ~ProducerBase() = default;
 		
 		template<typename U>
 		inline bool dequeue(U& element)
 		{
-			if (isExplicit) {
+			if (isExplicit)
+			{
 				return static_cast<ExplicitProducer*>(this)->dequeue(element);
 			}
-			else {
+			else
+			{
 				return static_cast<ImplicitProducer*>(this)->dequeue(element);
 			}
 		}
@@ -1618,10 +1655,12 @@ private:
 		template<typename It>
 		inline size_t dequeue_bulk(It& itemFirst, size_t max)
 		{
-			if (isExplicit) {
+			if (isExplicit)
+			{
 				return static_cast<ExplicitProducer*>(this)->dequeue_bulk(itemFirst, max);
 			}
-			else {
+			else
+			{
 				return static_cast<ImplicitProducer*>(this)->dequeue_bulk(itemFirst, max);
 			}
 		}
@@ -1667,7 +1706,8 @@ private:
 			pr_blockIndexRaw(nullptr)
 		{
 			size_t poolBasedIndexSize = Details::ceil_to_pow_2(parent_->initialBlockPoolSize) >> 1;
-			if (poolBasedIndexSize > pr_blockIndexSize) {
+			if (poolBasedIndexSize > pr_blockIndexSize)
+			{
 				pr_blockIndexSize = poolBasedIndexSize;
 			}
 			
@@ -1679,14 +1719,17 @@ private:
 			// Destruct any elements not yet dequeued.
 			// Since we're in the destructor, we can assume all elements
 			// are either completely dequeued or completely not (no halfways).
-			if (this->tailBlock != nullptr) {		// Note this means there must be a block index too
+			if (this->tailBlock != nullptr)		// Note this means there must be a block index too
+			{
 				// First find the block that's partially dequeued, if any
 				Block* halfDequeuedBlock = nullptr;
-				if ((this->headIndex.load(std::memory_order_relaxed) & static_cast<index_t>(BLOCK_SIZE - 1)) != 0) {
+				if ((this->headIndex.load(std::memory_order_relaxed) & static_cast<index_t>(BLOCK_SIZE - 1)) != 0)
+				{
 					// The head's not on a block boundary, meaning a block somewhere is partially dequeued
 					// (or the head block is the tail block and was fully dequeued, but the head/tail are still not on a boundary)
 					size_t i = (pr_blockIndexFront - pr_blockIndexSlotsUsed) & (pr_blockIndexSize - 1);
-					while (Details::circular_less_than<index_t>(pr_blockIndexEntries[i].base + BLOCK_SIZE, this->headIndex.load(std::memory_order_relaxed))) {
+					while (Details::circular_less_than<index_t>(pr_blockIndexEntries[i].base + BLOCK_SIZE, this->headIndex.load(std::memory_order_relaxed)))
+					{
 						i = (i + 1) & (pr_blockIndexSize - 1);
 					}
 					assert(Details::circular_less_than<index_t>(pr_blockIndexEntries[i].base, this->headIndex.load(std::memory_order_relaxed)));
@@ -1695,38 +1738,47 @@ private:
 				
 				// Start at the head block (note the first line in the loop gives us the head from the tail on the first iteration)
 				auto block = this->tailBlock;
-				do {
+				do
+				{
 					block = block->next;
-					if (block->ConcurrentQueue::Block::template is_empty<explicit_context>()) {
+					if (block->ConcurrentQueue::Block::template is_empty<explicit_context>())
+					{
 						continue;
 					}
 					
 					size_t i = 0;	// Offset into block
-					if (block == halfDequeuedBlock) {
+					if (block == halfDequeuedBlock)
+					{
 						i = static_cast<size_t>(this->headIndex.load(std::memory_order_relaxed) & static_cast<index_t>(BLOCK_SIZE - 1));
 					}
 					
 					// Walk through all the items in the block; if this is the tail block, we need to stop when we reach the tail index
 					auto lastValidIndex = (this->tailIndex.load(std::memory_order_relaxed) & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 ? BLOCK_SIZE : static_cast<size_t>(this->tailIndex.load(std::memory_order_relaxed) & static_cast<index_t>(BLOCK_SIZE - 1));
-					while (i != BLOCK_SIZE && (block != this->tailBlock || i != lastValidIndex)) {
+					while (i != BLOCK_SIZE && (block != this->tailBlock || i != lastValidIndex))
+					{
 						(*block)[i++]->~T();
 					}
-				} while (block != this->tailBlock);
+				}
+				while (block != this->tailBlock);
 			}
 			
 			// Destroy all blocks that we own
-			if (this->tailBlock != nullptr) {
+			if (this->tailBlock != nullptr)
+			{
 				auto block = this->tailBlock;
-				do {
+				do
+				{
 					auto nextBlock = block->next;
 					this->parent->add_block_to_free_list(block);
 					block = nextBlock;
-				} while (block != this->tailBlock);
+				}
+				while (block != this->tailBlock);
 			}
 			
 			// Destroy the block indices
 			auto header = static_cast<BlockIndexHeader*>(pr_blockIndexRaw);
-			while (header != nullptr) {
+			while (header != nullptr)
+			{
 				auto prev = static_cast<BlockIndexHeader*>(header->prev);
 				header->~BlockIndexHeader();
 				(Traits::free)(header);
@@ -1739,11 +1791,13 @@ private:
 		{
 			index_t currentTailIndex = this->tailIndex.load(std::memory_order_relaxed);
 			index_t newTailIndex = 1 + currentTailIndex;
-			if ((currentTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0) {
+			if ((currentTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0)
+			{
 				// We reached the end of a block, start a new one
 				auto startBlock = this->tailBlock;
 				auto originalBlockIndexSlotsUsed = pr_blockIndexSlotsUsed;
-				if (this->tailBlock != nullptr && this->tailBlock->next->ConcurrentQueue::Block::template is_empty<explicit_context>()) {
+				if (this->tailBlock != nullptr && this->tailBlock->next->ConcurrentQueue::Block::template is_empty<explicit_context>())
+				{
 					// We can re-use the block ahead of us, it's empty!					
 					this->tailBlock = this->tailBlock->next;
 					this->tailBlock->ConcurrentQueue::Block::template reset_empty<explicit_context>();
@@ -1754,43 +1808,52 @@ private:
 					// it would have been re-attempted when adding the first block to the queue; since there is such
 					// a block, a block index must have been successfully allocated.
 				}
-				else {
+				else
+				{
 					// Whatever head value we see here is >= the last value we saw here (relatively),
 					// and <= its current value. Since we have the most recent tail, the head must be
 					// <= to it.
 					auto head = this->headIndex.load(std::memory_order_relaxed);
 					assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
 					if (!Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE)
-						|| (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head))) {
+						|| (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value
+						&& (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head)))
+					{
 						// We can't enqueue in another block because there's not enough leeway -- the
 						// tail could surpass the head by the time the block fills up! (Or we'll exceed
 						// the size limit, if the second part of the condition was true.)
 						return false;
 					}
 					// We're going to need a new block; check that the block index has room
-					if (pr_blockIndexRaw == nullptr || pr_blockIndexSlotsUsed == pr_blockIndexSize) {
+					if (pr_blockIndexRaw == nullptr || pr_blockIndexSlotsUsed == pr_blockIndexSize)
+					{
 						// Hmm, the circular block index is already full -- we'll need
 						// to allocate a new index. Note pr_blockIndexRaw can only be nullptr if
 						// the initial allocation failed in the constructor.
 						
-						POCO_CONSTEXPR_IF (allocMode == CannotAlloc) {
+						POCO_CONSTEXPR_IF (allocMode == CannotAlloc)
+						{
 							return false;
 						}
-						else if (!new_block_index(pr_blockIndexSlotsUsed)) {
+						else if (!new_block_index(pr_blockIndexSlotsUsed))
+						{
 							return false;
 						}
 					}
 					
 					// Insert a new block in the circular linked list
 					auto newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>();
-					if (newBlock == nullptr) {
+					if (newBlock == nullptr)
+					{
 						return false;
 					}
 					newBlock->ConcurrentQueue::Block::template reset_empty<explicit_context>();
-					if (this->tailBlock == nullptr) {
+					if (this->tailBlock == nullptr)
+					{
 						newBlock->next = newBlock;
 					}
-					else {
+					else
+					{
 						newBlock->next = this->tailBlock->next;
 						this->tailBlock->next = newBlock;
 					}
@@ -1798,13 +1861,16 @@ private:
 					++pr_blockIndexSlotsUsed;
 				}
 
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				{
 					// The constructor may throw. We want the element not to appear in the queue in
 					// that case (without corrupting the queue):
-					POCO_TRY {
+					POCO_TRY
+					{
 						new ((*this->tailBlock)[currentTailIndex]) T(std::forward<U>(element));
 					}
-					POCO_CATCH (...) {
+					POCO_CATCH (...)
+					{
 						// Revert change to the current block, but leave the new block available
 						// for next time
 						pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
@@ -1812,7 +1878,8 @@ private:
 						POCO_RETHROW;
 					}
 				}
-				else {
+				else
+				{
 					(void)startBlock;
 					(void)originalBlockIndexSlotsUsed;
 				}
@@ -1824,7 +1891,8 @@ private:
 				blockIndex.load(std::memory_order_relaxed)->front.store(pr_blockIndexFront, std::memory_order_release);
 				pr_blockIndexFront = (pr_blockIndexFront + 1) & (pr_blockIndexSize - 1);
 				
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				{
 					this->tailIndex.store(newTailIndex, std::memory_order_release);
 					return true;
 				}
@@ -1842,7 +1910,8 @@ private:
 		{
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
-			if (Details::circular_less_than<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail)) {
+			if (Details::circular_less_than<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail))
+			{
 				// Might be something to dequeue, let's give it a try
 				
 				// Note that this if is purely for performance purposes in the common case when the queue is
@@ -1875,7 +1944,8 @@ private:
 				// this load is sequenced after (happens after) the earlier load above. This is supported by read-read
 				// coherency (as defined in the standard), explained here: http://en.cppreference.com/w/cpp/atomic/memory_order
 				tail = this->tailIndex.load(std::memory_order_acquire);
-				if ((Details::likely)(Details::circular_less_than<index_t>(myDequeueCount - overcommit, tail))) {
+				if ((Details::likely)(Details::circular_less_than<index_t>(myDequeueCount - overcommit, tail)))
+				{
 					// Guaranteed to be at least one element to dequeue!
 					
 					// Get the index. Note that since there's guaranteed to be at least one element, this
@@ -1904,10 +1974,12 @@ private:
 					
 					// Dequeue
 					auto& el = *((*block)[index]);
-					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el))) {
+					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el)))
+					{
 						// Make sure the element is still fully dequeued and destroyed even if the assignment
 						// throws
-						struct Guard {
+						struct Guard
+						{
 							Block* block;
 							index_t index;
 							
@@ -1920,7 +1992,8 @@ private:
 
 						element = std::move(el); // NOLINT
 					}
-					else {
+					else
+					{
 						element = std::move(el); // NOLINT
 						el.~T(); // NOLINT
 						block->ConcurrentQueue::Block::template set_empty<explicit_context>(index);
@@ -1928,7 +2001,8 @@ private:
 					
 					return true;
 				}
-				else {
+				else
+				{
 					// Wasn't anything to dequeue after all; make the effective dequeue count eventually consistent
 					this->dequeueOvercommit.fetch_add(1, std::memory_order_release);		// Release so that the fetch_add on dequeueOptimisticCount is guaranteed to happen before this write
 				}
@@ -1953,9 +2027,11 @@ private:
 			// Figure out how many blocks we'll need to allocate, and do so
 			size_t blockBaseDiff = ((startTailIndex + count - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1)) - ((startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1));
 			index_t currentTailIndex = (startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1);
-			if (blockBaseDiff > 0) {
+			if (blockBaseDiff > 0)
+			{
 				// Allocate as many blocks as possible from ahead
-				while (blockBaseDiff > 0 && this->tailBlock != nullptr && this->tailBlock->next != firstAllocatedBlock && this->tailBlock->next->ConcurrentQueue::Block::template is_empty<explicit_context>()) {
+				while (blockBaseDiff > 0 && this->tailBlock != nullptr && this->tailBlock->next != firstAllocatedBlock && this->tailBlock->next->ConcurrentQueue::Block::template is_empty<explicit_context>())
+				{
 					blockBaseDiff -= static_cast<index_t>(BLOCK_SIZE);
 					currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 					
@@ -1969,22 +2045,26 @@ private:
 				}
 				
 				// Now allocate as many blocks as necessary from the block pool
-				while (blockBaseDiff > 0) {
+				while (blockBaseDiff > 0)
+				{
 					blockBaseDiff -= static_cast<index_t>(BLOCK_SIZE);
 					currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 					
 					auto head = this->headIndex.load(std::memory_order_relaxed);
 					assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
 					bool full = !Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
-					if (pr_blockIndexRaw == nullptr || pr_blockIndexSlotsUsed == pr_blockIndexSize || full) {
-						POCO_CONSTEXPR_IF (allocMode == CannotAlloc) {
+					if (pr_blockIndexRaw == nullptr || pr_blockIndexSlotsUsed == pr_blockIndexSize || full)
+					{
+						POCO_CONSTEXPR_IF (allocMode == CannotAlloc)
+						{
 							// Failed to allocate, undo changes (but keep injected blocks)
 							pr_blockIndexFront = originalBlockIndexFront;
 							pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
 							this->tailBlock = startBlock == nullptr ? firstAllocatedBlock : startBlock;
 							return false;
 						}
-						else if (full || !new_block_index(originalBlockIndexSlotsUsed)) {
+						else if (full || !new_block_index(originalBlockIndexSlotsUsed))
+						{
 							// Failed to allocate, undo changes (but keep injected blocks)
 							pr_blockIndexFront = originalBlockIndexFront;
 							pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
@@ -2000,17 +2080,20 @@ private:
 					
 					// Insert a new block in the circular linked list
 					auto newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>();
-					if (newBlock == nullptr) {
+					if (newBlock == nullptr)
+					{
 						pr_blockIndexFront = originalBlockIndexFront;
 						pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
 						this->tailBlock = startBlock == nullptr ? firstAllocatedBlock : startBlock;
 						return false;
 					}
 					newBlock->ConcurrentQueue::Block::template set_all_empty<explicit_context>();
-					if (this->tailBlock == nullptr) {
+					if (this->tailBlock == nullptr)
+					{
 						newBlock->next = newBlock;
 					}
-					else {
+					else
+					{
 						newBlock->next = this->tailBlock->next;
 						this->tailBlock->next = newBlock;
 					}
@@ -2028,7 +2111,8 @@ private:
 				// Excellent, all allocations succeeded. Reset each block's emptiness before we fill them up, and
 				// publish the new block index front
 				auto block = firstAllocatedBlock;
-				while (true) {
+				while (true)
+				{
 					block->ConcurrentQueue::Block::template reset_empty<explicit_context>();
 					if (block == this->tailBlock) {
 						break;
@@ -2036,7 +2120,8 @@ private:
 					block = block->next;
 				}
 				
-				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+				{
 					blockIndex.load(std::memory_order_relaxed)->front.store((pr_blockIndexFront - 1) & (pr_blockIndexSize - 1), std::memory_order_release);
 				}
 			}
@@ -2047,22 +2132,29 @@ private:
 			auto endBlock = this->tailBlock;
 			this->tailBlock = startBlock;
 			assert((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) != 0 || firstAllocatedBlock != nullptr || count == 0);
-			if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 && firstAllocatedBlock != nullptr) {
+			if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 && firstAllocatedBlock != nullptr)
+			{
 				this->tailBlock = firstAllocatedBlock;
 			}
-			while (true) {
+			while (true)
+			{
 				index_t stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-				if (Details::circular_less_than<index_t>(newTailIndex, stopIndex)) {
+				if (Details::circular_less_than<index_t>(newTailIndex, stopIndex))
+				{
 					stopIndex = newTailIndex;
 				}
-				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+				{
 					while (currentTailIndex != stopIndex) {
 						new ((*this->tailBlock)[currentTailIndex++]) T(*itemFirst++);
 					}
 				}
-				else {
-					POCO_TRY {
-						while (currentTailIndex != stopIndex) {
+				else
+				{
+					POCO_TRY
+					{
+						while (currentTailIndex != stopIndex)
+						{
 							// Must use copy constructor even if move constructor is available
 							// because we may have to revert if there's an exception.
 							// Sorry about the horrible templated next line, but it was the only way
@@ -2086,21 +2178,27 @@ private:
 						pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
 						this->tailBlock = startBlock == nullptr ? firstAllocatedBlock : startBlock;
 						
-						if (!Details::is_trivially_destructible<T>::value) {
+						if (!Details::is_trivially_destructible<T>::value)
+						{
 							auto block = startBlock;
-							if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0) {
+							if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0)
+							{
 								block = firstAllocatedBlock;
 							}
 							currentTailIndex = startTailIndex;
-							while (true) {
+							while (true)
+							{
 								stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-								if (Details::circular_less_than<index_t>(constructedStopIndex, stopIndex)) {
+								if (Details::circular_less_than<index_t>(constructedStopIndex, stopIndex))
+								{
 									stopIndex = constructedStopIndex;
 								}
-								while (currentTailIndex != stopIndex) {
+								while (currentTailIndex != stopIndex)
+								{
 									(*block)[currentTailIndex++]->~T();
 								}
-								if (block == lastBlockEnqueued) {
+								if (block == lastBlockEnqueued)
+								{
 									break;
 								}
 								block = block->next;
@@ -2110,14 +2208,16 @@ private:
 					}
 				}
 				
-				if (this->tailBlock == endBlock) {
+				if (this->tailBlock == endBlock)
+				{
 					assert(currentTailIndex == newTailIndex);
 					break;
 				}
 				this->tailBlock = this->tailBlock->next;
 			}
 			
-			POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
+			POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+			{
 				if (firstAllocatedBlock != nullptr)
 					blockIndex.load(std::memory_order_relaxed)->front.store((pr_blockIndexFront - 1) & (pr_blockIndexSize - 1), std::memory_order_release);
 			}
@@ -2132,7 +2232,8 @@ private:
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
 			auto desiredCount = static_cast<size_t>(tail - (this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit));
-			if (Details::circular_less_than<size_t>(0, desiredCount)) {
+			if (Details::circular_less_than<size_t>(0, desiredCount))
+			{
 				desiredCount = desiredCount < max ? desiredCount : max;
 				std::atomic_thread_fence(std::memory_order_acquire);
 				
@@ -2142,7 +2243,8 @@ private:
 				auto actualCount = static_cast<size_t>(tail - (myDequeueCount - overcommit));
 				if (Details::circular_less_than<size_t>(0, actualCount)) {
 					actualCount = desiredCount < actualCount ? desiredCount : actualCount;
-					if (actualCount < desiredCount) {
+					if (actualCount < desiredCount)
+					{
 						this->dequeueOvercommit.fetch_add(desiredCount - actualCount, std::memory_order_release);
 					}
 					
@@ -2161,22 +2263,28 @@ private:
 					
 					// Iterate the blocks and dequeue
 					auto index = firstIndex;
-					do {
+					do
+					{
 						auto firstIndexInBlock = index;
 						index_t endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
 						endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 						auto block = localBlockIndex->entries[indexIndex].block;
-						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
-							while (index != endIndex) {
+						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index]))))
+						{
+							while (index != endIndex)
+							{
 								auto& el = *((*block)[index]);
 								*itemFirst++ = std::move(el);
 								el.~T();
 								++index;
 							}
 						}
-						else {
-							POCO_TRY {
-								while (index != endIndex) {
+						else
+						{
+							POCO_TRY
+							{
+								while (index != endIndex)
+								{
 									auto& el = *((*block)[index]);
 									*itemFirst = std::move(el);
 									++itemFirst;
@@ -2184,13 +2292,16 @@ private:
 									++index;
 								}
 							}
-							POCO_CATCH (...) {
+							POCO_CATCH (...)
+							{
 								// It's too late to revert the dequeue, but we can make sure that all
 								// the dequeued objects are properly destroyed and the block index
 								// (and empty count) are properly updated before we propagate the exception
-								do {
+								do
+								{
 									block = localBlockIndex->entries[indexIndex].block;
-									while (index != endIndex) {
+									while (index != endIndex)
+									{
 										(*block)[index++]->~T();
 									}
 									block->ConcurrentQueue::Block::template set_many_empty<explicit_context>(firstIndexInBlock, static_cast<size_t>(endIndex - firstIndexInBlock));
@@ -2199,18 +2310,21 @@ private:
 									firstIndexInBlock = index;
 									endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
 									endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
-								} while (index != firstIndex + actualCount);
+								}
+								while (index != firstIndex + actualCount);
 								
 								POCO_RETHROW;
 							}
 						}
 						block->ConcurrentQueue::Block::template set_many_empty<explicit_context>(firstIndexInBlock, static_cast<size_t>(endIndex - firstIndexInBlock));
 						indexIndex = (indexIndex + 1) & (localBlockIndex->size - 1);
-					} while (index != firstIndex + actualCount);
+					}
+					while (index != firstIndex + actualCount);
 					
 					return actualCount;
 				}
-				else {
+				else
+				{
 					// Wasn't anything to dequeue after all; make the effective dequeue count eventually consistent
 					this->dequeueOvercommit.fetch_add(desiredCount, std::memory_order_release);
 				}
@@ -2242,7 +2356,8 @@ private:
 			// Create the new block
 			pr_blockIndexSize <<= 1;
 			auto newRawPtr = static_cast<char*>((Traits::malloc)(sizeof(BlockIndexHeader) + std::alignment_of<BlockIndexEntry>::value - 1 + sizeof(BlockIndexEntry) * pr_blockIndexSize));
-			if (newRawPtr == nullptr) {
+			if (newRawPtr == nullptr)
+			{
 				pr_blockIndexSize >>= 1;		// Reset to allow graceful retry
 				return false;
 			}
@@ -2251,12 +2366,15 @@ private:
 			
 			// Copy in all the old indices, if any
 			size_t j = 0;
-			if (pr_blockIndexSlotsUsed != 0) {
+			if (pr_blockIndexSlotsUsed != 0)
+			{
 				auto i = (pr_blockIndexFront - pr_blockIndexSlotsUsed) & prevBlockSizeMask;
-				do {
+				do
+				{
 					newBlockIndexEntries[j++] = pr_blockIndexEntries[i];
 					i = (i + 1) & prevBlockSizeMask;
-				} while (i != pr_blockIndexFront);
+				}
+				while (i != pr_blockIndexFront);
 			}
 			
 			// Update everything
@@ -2313,7 +2431,8 @@ private:
 			// empty (all other remaining blocks must be completely full).
 			
 			// Unregister ourselves for thread termination notification
-			if (!this->inactive.load(std::memory_order_relaxed)) {
+			if (!this->inactive.load(std::memory_order_relaxed))
+			{
 				Details::ThreadExitNotifier::unsubscribe(&threadExitListener);
 			}
 			// Destroy all remaining elements!
@@ -2322,9 +2441,12 @@ private:
 			Block* block = nullptr;
 			assert(index == tail || Details::circular_less_than(index, tail));
 			bool forceFreeLastBlock = index != tail;		// If we enter the loop, then the last (tail) block will not be freed
-			while (index != tail) {
-				if ((index & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 || block == nullptr) {
-					if (block != nullptr) {
+			while (index != tail)
+			{
+				if ((index & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 || block == nullptr)
+				{
+					if (block != nullptr)
+					{
 						// Free the old block
 						this->parent->add_block_to_free_list(block);
 					}
@@ -2338,22 +2460,27 @@ private:
 			// Even if the queue is empty, there's still one block that's not on the free list
 			// (unless the head index reached the end of it, in which case the tail will be poised
 			// to create a new block).
-			if (this->tailBlock != nullptr && (forceFreeLastBlock || (tail & static_cast<index_t>(BLOCK_SIZE - 1)) != 0)) {
+			if (this->tailBlock != nullptr && (forceFreeLastBlock || (tail & static_cast<index_t>(BLOCK_SIZE - 1)) != 0))
+			{
 				this->parent->add_block_to_free_list(this->tailBlock);
 			}
 			
 			// Destroy block index
 			auto localBlockIndex = blockIndex.load(std::memory_order_relaxed);
-			if (localBlockIndex != nullptr) {
-				for (size_t i = 0; i != localBlockIndex->capacity; ++i) {
+			if (localBlockIndex != nullptr)
+			{
+				for (size_t i = 0; i != localBlockIndex->capacity; ++i)
+				{
 					localBlockIndex->index[i]->~BlockIndexEntry();
 				}
-				do {
+				do
+				{
 					auto prev = localBlockIndex->prev;
 					localBlockIndex->~BlockIndexHeader();
 					(Traits::free)(localBlockIndex);
 					localBlockIndex = prev;
-				} while (localBlockIndex != nullptr);
+				}
+				while (localBlockIndex != nullptr);
 			}
 		}
 		
@@ -2362,34 +2489,41 @@ private:
 		{
 			index_t currentTailIndex = this->tailIndex.load(std::memory_order_relaxed);
 			index_t newTailIndex = 1 + currentTailIndex;
-			if ((currentTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0) {
+			if ((currentTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0)
+			{
 				// We reached the end of a block, start a new one
 				auto head = this->headIndex.load(std::memory_order_relaxed);
 				assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
-				if (!Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head))) {
+				if (!Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head)))
+				{
 					return false;
 				}
 				// Find out where we'll be inserting this block in the block index
 				BlockIndexEntry* idxEntry = nullptr;
-				if (!insert_block_index_entry<allocMode>(idxEntry, currentTailIndex)) {
+				if (!insert_block_index_entry<allocMode>(idxEntry, currentTailIndex))
+				{
 					return false;
 				}
 				
 				// Get ahold of a new block
 				auto newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>();
-				if (newBlock == nullptr) {
+				if (newBlock == nullptr)
+				{
 					rewind_block_index_tail();
 					idxEntry->value.store(nullptr, std::memory_order_relaxed);
 					return false;
 				}
 				newBlock->ConcurrentQueue::Block::template reset_empty<implicit_context>();
 
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				{
 					// May throw, try to insert now before we publish the fact that we have this new block
-					POCO_TRY {
+					POCO_TRY
+					{
 						new ((*newBlock)[currentTailIndex]) T(std::forward<U>(element));
 					}
-					POCO_CATCH (...) {
+					POCO_CATCH (...)
+					{
 						rewind_block_index_tail();
 						idxEntry->value.store(nullptr, std::memory_order_relaxed);
 						this->parent->add_block_to_free_list(newBlock);
@@ -2402,7 +2536,8 @@ private:
 				
 				this->tailBlock = newBlock;
 				
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element)))) {
+				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				{
 					this->tailIndex.store(newTailIndex, std::memory_order_release);
 					return true;
 				}
@@ -2421,12 +2556,14 @@ private:
 			// See ExplicitProducer::dequeue for rationale and explanation
 			index_t tail = this->tailIndex.load(std::memory_order_relaxed);
 			index_t overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
-			if (Details::circular_less_than<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail)) {
+			if (Details::circular_less_than<index_t>(this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit, tail))
+			{
 				std::atomic_thread_fence(std::memory_order_acquire);
 				
 				index_t myDequeueCount = this->dequeueOptimisticCount.fetch_add(1, std::memory_order_relaxed);
 				tail = this->tailIndex.load(std::memory_order_acquire);
-				if ((Details::likely)(Details::circular_less_than<index_t>(myDequeueCount - overcommit, tail))) {
+				if ((Details::likely)(Details::circular_less_than<index_t>(myDequeueCount - overcommit, tail)))
+				{
 					index_t index = this->headIndex.fetch_add(1, std::memory_order_acq_rel);
 					
 					// Determine which block the element is in
@@ -2436,8 +2573,10 @@ private:
 					auto block = entry->value.load(std::memory_order_relaxed);
 					auto& el = *((*block)[index]);
 					
-					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el))) {
-						struct Guard {
+					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el)))
+					{
+						struct Guard
+						{
 							Block* block;
 							index_t index;
 							BlockIndexEntry* entry;
@@ -2446,7 +2585,8 @@ private:
 							~Guard()
 							{
 								(*block)[index]->~T();
-								if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index)) {
+								if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index))
+								{
 									entry->value.store(nullptr, std::memory_order_relaxed);
 									parent->add_block_to_free_list(block);
 								}
@@ -2455,11 +2595,13 @@ private:
 
 						element = std::move(el); // NOLINT
 					}
-					else {
+					else
+					{
 						element = std::move(el); // NOLINT
 						el.~T(); // NOLINT
 
-						if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index)) {
+						if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index))
+						{
 							{
 								// Add the block back into the global free pool (and remove from block index)
 								entry->value.store(nullptr, std::memory_order_relaxed);
@@ -2470,7 +2612,8 @@ private:
 					
 					return true;
 				}
-				else {
+				else
+				{
 					this->dequeueOvercommit.fetch_add(1, std::memory_order_release);
 				}
 			}
@@ -2502,8 +2645,10 @@ private:
 			// Figure out how many blocks we'll need to allocate, and do so
 			size_t blockBaseDiff = ((startTailIndex + count - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1)) - ((startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1));
 			index_t currentTailIndex = (startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1);
-			if (blockBaseDiff > 0) {
-				do {
+			if (blockBaseDiff > 0)
+			{
+				do
+				{
 					blockBaseDiff -= static_cast<index_t>(BLOCK_SIZE);
 					currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 					
@@ -2515,15 +2660,18 @@ private:
 					assert(!Details::circular_less_than<index_t>(currentTailIndex, head));
 					bool full = !Details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != Details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
 
-					if (full || !(indexInserted = insert_block_index_entry<allocMode>(idxEntry, currentTailIndex)) || (newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>()) == nullptr) {
+					if (full || !(indexInserted = insert_block_index_entry<allocMode>(idxEntry, currentTailIndex)) || (newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>()) == nullptr)
+					{
 						// Index allocation or block allocation failed; revert any other allocations
 						// and index insertions done so far for this operation
-						if (indexInserted) {
+						if (indexInserted)
+						{
 							rewind_block_index_tail();
 							idxEntry->value.store(nullptr, std::memory_order_relaxed);
 						}
 						currentTailIndex = (startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1);
-						for (auto block = firstAllocatedBlock; block != nullptr; block = block->next) {
+						for (auto block = firstAllocatedBlock; block != nullptr; block = block->next)
+						{
 							currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 							idxEntry = get_block_index_entry_for_index(currentTailIndex);
 							idxEntry->value.store(nullptr, std::memory_order_relaxed);
@@ -2542,7 +2690,8 @@ private:
 					
 					// Store the chain of blocks so that we can undo if later allocations fail,
 					// and so that we can find the blocks when we do the actual enqueueing
-					if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) != 0 || firstAllocatedBlock != nullptr) {
+					if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) != 0 || firstAllocatedBlock != nullptr)
+					{
 						assert(this->tailBlock != nullptr);
 						this->tailBlock->next = newBlock;
 					}
@@ -2557,46 +2706,61 @@ private:
 			currentTailIndex = startTailIndex;
 			this->tailBlock = startBlock;
 			assert((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) != 0 || firstAllocatedBlock != nullptr || count == 0);
-			if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 && firstAllocatedBlock != nullptr) {
+			if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0 && firstAllocatedBlock != nullptr)
+			{
 				this->tailBlock = firstAllocatedBlock;
 			}
-			while (true) {
+			while (true)
+			{
 				index_t stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-				if (Details::circular_less_than<index_t>(newTailIndex, stopIndex)) {
+				if (Details::circular_less_than<index_t>(newTailIndex, stopIndex))
+				{
 					stopIndex = newTailIndex;
 				}
-				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))) {
-					while (currentTailIndex != stopIndex) {
+				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+				{
+					while (currentTailIndex != stopIndex)
+					{
 						new ((*this->tailBlock)[currentTailIndex++]) T(*itemFirst++);
 					}
 				}
-				else {
-					POCO_TRY {
-						while (currentTailIndex != stopIndex) {
+				else
+				{
+					POCO_TRY
+					{
+						while (currentTailIndex != stopIndex)
+						{
 							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
 							++currentTailIndex;
 							++itemFirst;
 						}
 					}
-					POCO_CATCH (...) {
+					POCO_CATCH (...)
+					{
 						auto constructedStopIndex = currentTailIndex;
 						auto lastBlockEnqueued = this->tailBlock;
 						
-						if (!Details::is_trivially_destructible<T>::value) {
+						if (!Details::is_trivially_destructible<T>::value)
+						{
 							auto block = startBlock;
-							if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0) {
+							if ((startTailIndex & static_cast<index_t>(BLOCK_SIZE - 1)) == 0)
+							{
 								block = firstAllocatedBlock;
 							}
 							currentTailIndex = startTailIndex;
-							while (true) {
+							while (true)
+							{
 								stopIndex = (currentTailIndex & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
-								if (Details::circular_less_than<index_t>(constructedStopIndex, stopIndex)) {
+								if (Details::circular_less_than<index_t>(constructedStopIndex, stopIndex))
+								{
 									stopIndex = constructedStopIndex;
 								}
-								while (currentTailIndex != stopIndex) {
+								while (currentTailIndex != stopIndex)
+								{
 									(*block)[currentTailIndex++]->~T();
 								}
-								if (block == lastBlockEnqueued) {
+								if (block == lastBlockEnqueued)
+								{
 									break;
 								}
 								block = block->next;
@@ -2604,7 +2768,8 @@ private:
 						}
 						
 						currentTailIndex = (startTailIndex - 1) & ~static_cast<index_t>(BLOCK_SIZE - 1);
-						for (auto block = firstAllocatedBlock; block != nullptr; block = block->next) {
+						for (auto block = firstAllocatedBlock; block != nullptr; block = block->next)
+						{
 							currentTailIndex += static_cast<index_t>(BLOCK_SIZE);
 							auto idxEntry = get_block_index_entry_for_index(currentTailIndex);
 							idxEntry->value.store(nullptr, std::memory_order_relaxed);
@@ -2616,7 +2781,8 @@ private:
 					}
 				}
 				
-				if (this->tailBlock == endBlock) {
+				if (this->tailBlock == endBlock)
+				{
 					assert(currentTailIndex == newTailIndex);
 					break;
 				}
@@ -2635,7 +2801,8 @@ private:
 			auto tail = this->tailIndex.load(std::memory_order_relaxed);
 			auto overcommit = this->dequeueOvercommit.load(std::memory_order_relaxed);
 			auto desiredCount = static_cast<size_t>(tail - (this->dequeueOptimisticCount.load(std::memory_order_relaxed) - overcommit));
-			if (Details::circular_less_than<size_t>(0, desiredCount)) {
+			if (Details::circular_less_than<size_t>(0, desiredCount))
+			{
 				desiredCount = desiredCount < max ? desiredCount : max;
 				std::atomic_thread_fence(std::memory_order_acquire);
 				
@@ -2643,9 +2810,11 @@ private:
 				
 				tail = this->tailIndex.load(std::memory_order_acquire);
 				auto actualCount = static_cast<size_t>(tail - (myDequeueCount - overcommit));
-				if (Details::circular_less_than<size_t>(0, actualCount)) {
+				if (Details::circular_less_than<size_t>(0, actualCount))
+				{
 					actualCount = desiredCount < actualCount ? desiredCount : actualCount;
-					if (actualCount < desiredCount) {
+					if (actualCount < desiredCount)
+					{
 						this->dequeueOvercommit.fetch_add(desiredCount - actualCount, std::memory_order_release);
 					}
 					
@@ -2657,24 +2826,30 @@ private:
 					auto index = firstIndex;
 					BlockIndexHeader* localBlockIndex = nullptr;
 					auto indexIndex = get_block_index_index_for_index(index, localBlockIndex);
-					do {
+					do
+					{
 						auto blockStartIndex = index;
 						index_t endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
 						endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 						
 						auto entry = localBlockIndex->index[indexIndex];
 						auto block = entry->value.load(std::memory_order_relaxed);
-						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
-							while (index != endIndex) {
+						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index]))))
+						{
+							while (index != endIndex)
+							{
 								auto& el = *((*block)[index]);
 								*itemFirst++ = std::move(el);
 								el.~T();
 								++index;
 							}
 						}
-						else {
-							POCO_TRY {
-								while (index != endIndex) {
+						else
+						{
+							POCO_TRY
+							{
+								while (index != endIndex)
+								{
 									auto& el = *((*block)[index]);
 									*itemFirst = std::move(el);
 									++itemFirst;
@@ -2682,15 +2857,19 @@ private:
 									++index;
 								}
 							}
-							POCO_CATCH (...) {
-								do {
+							POCO_CATCH (...)
+							{
+								do
+								{
 									entry = localBlockIndex->index[indexIndex];
 									block = entry->value.load(std::memory_order_relaxed);
-									while (index != endIndex) {
+									while (index != endIndex)
+									{
 										(*block)[index++]->~T();
 									}
 									
-									if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex))) {
+									if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex)))
+									{
 										entry->value.store(nullptr, std::memory_order_relaxed);
 										this->parent->add_block_to_free_list(block);
 									}
@@ -2699,12 +2878,14 @@ private:
 									blockStartIndex = index;
 									endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
 									endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
-								} while (index != firstIndex + actualCount);
+								}
+								while (index != firstIndex + actualCount);
 								
 								POCO_RETHROW;
 							}
 						}
-						if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex))) {
+						if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex)))
+						{
 							{
 								// Note that the set_many_empty above did a release, meaning that anybody who acquires the block
 								// we're about to free can use it safely since our writes (and reads!) will have happened-before then.
@@ -2713,11 +2894,13 @@ private:
 							this->parent->add_block_to_free_list(block);		// releases the above store
 						}
 						indexIndex = (indexIndex + 1) & (localBlockIndex->capacity - 1);
-					} while (index != firstIndex + actualCount);
+					}
+					while (index != firstIndex + actualCount);
 					
 					return actualCount;
 				}
-				else {
+				else
+				{
 					this->dequeueOvercommit.fetch_add(desiredCount, std::memory_order_release);
 				}
 			}
@@ -2748,13 +2931,15 @@ private:
 		inline bool insert_block_index_entry(BlockIndexEntry*& idxEntry, index_t blockStartIndex)
 		{
 			auto localBlockIndex = blockIndex.load(std::memory_order_relaxed);		// We're the only writer thread, relaxed is OK
-			if (localBlockIndex == nullptr) {
+			if (localBlockIndex == nullptr)
+			{
 				return false;  // this can happen if new_block_index failed in the constructor
 			}
 			size_t newTail = (localBlockIndex->tail.load(std::memory_order_relaxed) + 1) & (localBlockIndex->capacity - 1);
 			idxEntry = localBlockIndex->index[newTail];
 			if (idxEntry->key.load(std::memory_order_relaxed) == INVALID_BLOCK_BASE ||
-				idxEntry->value.load(std::memory_order_relaxed) == nullptr) {
+				idxEntry->value.load(std::memory_order_relaxed) == nullptr)
+			{
 				
 				idxEntry->key.store(blockStartIndex, std::memory_order_relaxed);
 				localBlockIndex->tail.store(newTail, std::memory_order_release);
@@ -2762,13 +2947,16 @@ private:
 			}
 			
 			// No room in the old block index, try to allocate another one!
-			POCO_CONSTEXPR_IF (allocMode == CannotAlloc) {
+			POCO_CONSTEXPR_IF (allocMode == CannotAlloc)
+			{
 				return false;
 			}
-			else if (!new_block_index()) {
+			else if (!new_block_index())
+			{
 				return false;
 			}
-			else {
+			else
+			{
 				localBlockIndex = blockIndex.load(std::memory_order_relaxed);
 				newTail = (localBlockIndex->tail.load(std::memory_order_relaxed) + 1) & (localBlockIndex->capacity - 1);
 				idxEntry = localBlockIndex->index[newTail];
@@ -2816,24 +3004,29 @@ private:
 				sizeof(BlockIndexHeader) +
 				std::alignment_of<BlockIndexEntry>::value - 1 + sizeof(BlockIndexEntry) * entryCount +
 				std::alignment_of<BlockIndexEntry*>::value - 1 + sizeof(BlockIndexEntry*) * nextBlockIndexCapacity));
-			if (raw == nullptr) {
+			if (raw == nullptr)
+			{
 				return false;
 			}
 			
 			auto header = new (raw) BlockIndexHeader;
 			auto entries = reinterpret_cast<BlockIndexEntry*>(Details::align_for<BlockIndexEntry>(raw + sizeof(BlockIndexHeader)));
 			auto index = reinterpret_cast<BlockIndexEntry**>(Details::align_for<BlockIndexEntry*>(reinterpret_cast<char*>(entries) + sizeof(BlockIndexEntry) * entryCount));
-			if (prev != nullptr) {
+			if (prev != nullptr)
+			{
 				auto prevTail = prev->tail.load(std::memory_order_relaxed);
 				auto prevPos = prevTail;
 				size_t i = 0;
-				do {
+				do
+				{
 					prevPos = (prevPos + 1) & (prev->capacity - 1);
 					index[i++] = prev->index[prevPos];
-				} while (prevPos != prevTail);
+				}
+				while (prevPos != prevTail);
 				assert(i == prevCapacity);
 			}
-			for (size_t i = 0; i != entryCount; ++i) {
+			for (size_t i = 0; i != entryCount; ++i)
+			{
 				new (entries + i) BlockIndexEntry;
 				entries[i].key.store(INVALID_BLOCK_BASE, std::memory_order_relaxed);
 				index[prevCapacity + i] = entries + i;
@@ -2870,23 +3063,27 @@ private:
 	void populate_initial_block_list(size_t blockCount)
 	{
 		initialBlockPoolSize = blockCount;
-		if (initialBlockPoolSize == 0) {
+		if (initialBlockPoolSize == 0)
+		{
 			initialBlockPool = nullptr;
 			return;
 		}
 		
 		initialBlockPool = create_array<Block>(blockCount);
-		if (initialBlockPool == nullptr) {
+		if (initialBlockPool == nullptr)
+		{
 			initialBlockPoolSize = 0;
 		}
-		for (size_t i = 0; i < initialBlockPoolSize; ++i) {
+		for (size_t i = 0; i < initialBlockPoolSize; ++i)
+		{
 			initialBlockPool[i].dynamicallyAllocated = false;
 		}
 	}
 	
 	inline Block* try_get_block_from_initial_pool()
 	{
-		if (initialBlockPoolIndex.load(std::memory_order_relaxed) >= initialBlockPoolSize) {
+		if (initialBlockPoolIndex.load(std::memory_order_relaxed) >= initialBlockPoolSize)
+		{
 			return nullptr;
 		}
 		
@@ -2897,20 +3094,20 @@ private:
 	
 	inline void add_block_to_free_list(Block* block)
 	{
-#ifdef MCDBGQ_TRACKMEM
-		block->owner = nullptr;
-#endif
-		if (!Traits::RECYCLE_ALLOCATED_BLOCKS && block->dynamicallyAllocated) {
+		if (!Traits::RECYCLE_ALLOCATED_BLOCKS && block->dynamicallyAllocated)
+		{
 			destroy(block);
 		}
-		else {
+		else
+		{
 			freeList.add(block);
 		}
 	}
 	
 	inline void add_blocks_to_free_list(Block* block)
 	{
-		while (block != nullptr) {
+		while (block != nullptr)
+		{
 			auto next = block->next;
 			add_block_to_free_list(block);
 			block = next;
@@ -2927,19 +3124,23 @@ private:
 	Block* requisition_block()
 	{
 		auto block = try_get_block_from_initial_pool();
-		if (block != nullptr) {
+		if (block != nullptr)
+		{
 			return block;
 		}
 		
 		block = try_get_block_from_free_list();
-		if (block != nullptr) {
+		if (block != nullptr)
+		{
 			return block;
 		}
 		
-		POCO_CONSTEXPR_IF (canAlloc == CanAlloc) {
+		POCO_CONSTEXPR_IF (canAlloc == CanAlloc)
+		{
 			return create<Block>();
 		}
-		else {
+		else
+		{
 			return nullptr;
 		}
 	}
@@ -2954,10 +3155,13 @@ private:
 		debug::DebugLock lock(implicitProdMutex);
 #endif
 		// Try to re-use one first
-		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
-			if (ptr->inactive.load(std::memory_order_relaxed) && ptr->isExplicit == isExplicit) {
+		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod())
+		{
+			if (ptr->inactive.load(std::memory_order_relaxed) && ptr->isExplicit == isExplicit)
+			{
 				bool expected = true;
-				if (ptr->inactive.compare_exchange_strong(expected, /* desired */ false, std::memory_order_acquire, std::memory_order_relaxed)) {
+				if (ptr->inactive.compare_exchange_strong(expected, /* desired */ false, std::memory_order_acquire, std::memory_order_relaxed))
+				{
 					// We caught one! It's been marked as activated, the caller can have it
 					return ptr;
 				}
@@ -3423,20 +3627,16 @@ ProducerToken::ProducerToken(BlockingConcurrentQueue<T, Traits>& queue)
 }
 
 template<typename T, typename Traits>
-ConsumerToken::ConsumerToken(ConcurrentQueue<T, Traits>& queue)
-	: itemsConsumedFromCurrent(0), currentProducer(nullptr), desiredProducer(nullptr)
-{
-	initialOffset = queue.nextExplicitConsumerId.fetch_add(1, std::memory_order_release);
-	lastKnownGlobalOffset = static_cast<std::uint32_t>(-1);
-}
+ConsumerToken::ConsumerToken(ConcurrentQueue<T, Traits>& queue) :
+	initialOffset(queue.nextExplicitConsumerId.fetch_add(1, std::memory_order_release)),
+	lastKnownGlobalOffset(static_cast<std::uint32_t>(-1))
+{ }
 
 template<typename T, typename Traits>
-ConsumerToken::ConsumerToken(BlockingConcurrentQueue<T, Traits>& queue)
-	: itemsConsumedFromCurrent(0), currentProducer(nullptr), desiredProducer(nullptr)
-{
-	initialOffset = reinterpret_cast<ConcurrentQueue<T, Traits>*>(&queue)->nextExplicitConsumerId.fetch_add(1, std::memory_order_release);
-	lastKnownGlobalOffset = static_cast<std::uint32_t>(-1);
-}
+ConsumerToken::ConsumerToken(BlockingConcurrentQueue<T, Traits>& queue) :
+	initialOffset(reinterpret_cast<ConcurrentQueue<T, Traits>*>(&queue)->nextExplicitConsumerId.fetch_add(1, std::memory_order_release)),
+	lastKnownGlobalOffset(static_cast<std::uint32_t>(-1))
+{ }
 
 template<typename T, typename Traits>
 inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) POCO_NOEXCEPT
