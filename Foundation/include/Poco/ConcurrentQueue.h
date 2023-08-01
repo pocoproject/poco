@@ -50,12 +50,6 @@
 // upon assigning any computed values)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-
-#define POCO_CPP11_THREAD_LOCAL_SUPPORTED
-
-#ifdef MCDBGQ_USE_RELACY
-#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-#endif
 #endif
 
 #if defined(_MSC_VER) && (!defined(_HAS_CXX17) || !_HAS_CXX17)
@@ -89,7 +83,8 @@
 
 // Platform-specific definitions of a numeric thread ID type and an invalid value
 namespace Poco { namespace Details {
-	template<typename thread_id_t> struct thread_id_converter {
+	template<typename thread_id_t> struct thread_id_converter
+	{
 		using thread_id_numeric_size_t = thread_id_t;
 		using thread_id_hash_t = thread_id_t;
 		static thread_id_hash_t prehash(thread_id_t const& x) { return x; }
@@ -100,7 +95,8 @@ namespace Poco { namespace Details {
 	using thread_id_t = long;
 	static const thread_id_t invalid_thread_id  = 0;		// Address can't be nullptr
 	static const thread_id_t invalid_thread_id2 = 1;		// Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
-	inline thread_id_t thread_id() { 
+	inline thread_id_t thread_id()
+	{ 
 		static Poco::ThreadLocal<Poco::Nullable<thread_id_t>> x;
 		if ((*x).isNull())
 		{
@@ -442,11 +438,11 @@ namespace Details {
 	struct ThreadExitListener
 	{
 		using callback_t = void (*)(void *);
-		callback_t callback;
-		void* userData;
+		callback_t callback{};
+		void* userData{nullptr};
 		
-		ThreadExitListener* next;		// reserved for use by the ThreadExitNotifier
-		ThreadExitNotifier* chain;		// reserved for use by the ThreadExitNotifier
+		ThreadExitListener* next{nullptr};		// reserved for use by the ThreadExitNotifier
+		ThreadExitNotifier* chain{nullptr};		// reserved for use by the ThreadExitNotifier
 	};
 
 	class ThreadExitNotifier
@@ -490,7 +486,7 @@ namespace Details {
 		~ThreadExitNotifier()
 		{
 			// This thread is about to exit, let everyone know!
-			assert(this == &instance() && "If this assert fails, you likely have a buggy compiler! Change the preprocessor conditions such that POCO_CPP11_THREAD_LOCAL_SUPPORTED is no longer defined.");
+			assert(this == &instance() && "If this assert fails, you likely have a buggy compiler! Thread local support problem.");
 			Poco::FastMutex::ScopedLock guard(mutex());
 			for (auto ptr = tail; ptr != nullptr; ptr = ptr->next)
 			{
@@ -885,10 +881,15 @@ public:
 	// production is disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE is 0,
 	// or Traits::MAX_SUBQUEUE_SIZE has been defined and would be surpassed).
 	// Thread-safe.
-	inline bool enqueue(T const& item)
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, bool>::type enqueue(U const& item)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-		else return inner_enqueue<CanAlloc>(item);
+		return false;
+	}
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, bool>::type enqueue(U const& item)
+	{
+		return inner_enqueue<CanAlloc>(item);
 	}
 	
 	// Enqueues a single item (by moving it, if possible).
@@ -896,10 +897,15 @@ public:
 	// production is disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE is 0,
 	// or Traits::MAX_SUBQUEUE_SIZE has been defined and would be surpassed).
 	// Thread-safe.
-	inline bool enqueue(T&& item)
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, bool>::type enqueue(U&& item)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-		else return inner_enqueue<CanAlloc>(std::move(item));
+		return false;
+	}
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, bool>::type enqueue(U&& item)
+	{
+		return inner_enqueue<CanAlloc>(std::move(item));
 	}
 	
 	// Enqueues a single item (by copying it) using an explicit producer token.
@@ -927,10 +933,14 @@ public:
 	// Note: Use std::make_move_iterator if the elements should be moved instead of copied.
 	// Thread-safe.
 	template<typename It>
-	bool enqueue_bulk(It itemFirst, size_t count)
+	typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, bool>::type enqueue_bulk(It itemFirst, size_t count)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-		else return inner_enqueue_bulk<CanAlloc>(itemFirst, count);
+		return false;
+	}
+	template<typename It>
+	typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, bool>::type enqueue_bulk(It itemFirst, size_t count)
+	{
+		return inner_enqueue_bulk<CanAlloc>(itemFirst, count);
 	}
 	
 	// Enqueues several items using an explicit producer token.
@@ -950,10 +960,15 @@ public:
 	// production is disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE
 	// is 0).
 	// Thread-safe.
-	inline bool try_enqueue(T const& item)
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, bool>::type try_enqueue(U const& item)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-		else return inner_enqueue<CannotAlloc>(item);
+		return false;
+	}
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, bool>::type try_enqueue(U const& item)
+	{
+		return inner_enqueue<CannotAlloc>(item);
 	}
 	
 	// Enqueues a single item (by moving it, if possible).
@@ -961,10 +976,15 @@ public:
 	// Fails if not enough room to enqueue (or implicit production is
 	// disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE is 0).
 	// Thread-safe.
-	inline bool try_enqueue(T&& item)
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, bool>::type try_enqueue(U&& item)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-		else return inner_enqueue<CannotAlloc>(std::move(item));
+		return false;
+	}
+	template <typename U = T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, bool>::type try_enqueue(U&& item)
+	{
+		return inner_enqueue<CannotAlloc>(std::move(item));
 	}
 	
 	// Enqueues a single item (by copying it) using an explicit producer token.
@@ -991,10 +1011,14 @@ public:
 	// instead of copied.
 	// Thread-safe.
 	template<typename It>
-	bool try_enqueue_bulk(It itemFirst, size_t count)
+	typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, bool>::type try_enqueue_bulk(It itemFirst, size_t count)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-		else return inner_enqueue_bulk<CannotAlloc>(itemFirst, count);
+		return false;
+	}
+	template<typename It>
+	typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, bool>::type try_enqueue_bulk(It itemFirst, size_t count)
+	{
+		return inner_enqueue_bulk<CannotAlloc>(itemFirst, count);
 	}
 	
 	// Enqueues several items using an explicit producer token.
@@ -1486,116 +1510,108 @@ private:
 		Block() = default;
 		
 		template<InnerQueueContext context>
-		inline bool is_empty() const
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type is_empty() const
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			
+			// Check flags
+			for (size_t i = 0; i < BLOCK_SIZE; ++i)
 			{
-				// Check flags
-				for (size_t i = 0; i < BLOCK_SIZE; ++i)
+				if (!emptyFlags[i].load(std::memory_order_relaxed))
 				{
-					if (!emptyFlags[i].load(std::memory_order_relaxed))
-					{
-						return false;
-					}
+					return false;
 				}
-				
-				// Aha, empty; make sure we have all other memory effects that happened before the empty flags were set
+			}
+			
+			// Aha, empty; make sure we have all other memory effects that happened before the empty flags were set
+			std::atomic_thread_fence(std::memory_order_acquire);
+			return true;
+		}
+		template<InnerQueueContext context>
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type is_empty() const
+		{
+			// Check counter
+			if (elementsCompletelyDequeued.load(std::memory_order_relaxed) == BLOCK_SIZE)
+			{
 				std::atomic_thread_fence(std::memory_order_acquire);
 				return true;
 			}
-			else
-			{
-				// Check counter
-				if (elementsCompletelyDequeued.load(std::memory_order_relaxed) == BLOCK_SIZE)
-				{
-					std::atomic_thread_fence(std::memory_order_acquire);
-					return true;
-				}
-				assert(elementsCompletelyDequeued.load(std::memory_order_relaxed) <= BLOCK_SIZE);
-				return false;
-			}
+			assert(elementsCompletelyDequeued.load(std::memory_order_relaxed) <= BLOCK_SIZE);
+			return false;
 		}
 		
 		// Returns true if the block is now empty (does not apply in explicit context)
 		template<InnerQueueContext context>
-		inline bool set_empty(POCO_MAYBE_UNUSED index_t i)
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_empty(POCO_MAYBE_UNUSED index_t i)
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
-			{
-				// Set flag
-				assert(!emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].load(std::memory_order_relaxed));
-				emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].store(true, std::memory_order_release);
-				return false;
-			}
-			else
-			{
-				// Increment counter
-				auto prevVal = elementsCompletelyDequeued.fetch_add(1, std::memory_order_release);
-				assert(prevVal < BLOCK_SIZE);
-				return prevVal == BLOCK_SIZE - 1;
-			}
+			// Set flag
+			assert(!emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].load(std::memory_order_relaxed));
+			emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].store(true, std::memory_order_release);
+			return false;
+		}
+		// Returns true if the block is now empty (does not apply in explicit context)
+		template<InnerQueueContext context>
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_empty(POCO_MAYBE_UNUSED index_t i)
+		{
+			// Increment counter
+			auto prevVal = elementsCompletelyDequeued.fetch_add(1, std::memory_order_release);
+			assert(prevVal < BLOCK_SIZE);
+			return prevVal == BLOCK_SIZE - 1;
 		}
 		
 		// Sets multiple contiguous item statuses to 'empty' (assumes no wrapping and count > 0).
 		// Returns true if the block is now empty (does not apply in explicit context).
 		template<InnerQueueContext context>
-		inline bool set_many_empty(POCO_MAYBE_UNUSED index_t i, size_t count)
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_many_empty(POCO_MAYBE_UNUSED index_t i, size_t count)
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			// Set flags
+			std::atomic_thread_fence(std::memory_order_release);
+			i = BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1)) - count + 1;
+			for (size_t j = 0; j != count; ++j)
 			{
-				// Set flags
-				std::atomic_thread_fence(std::memory_order_release);
-				i = BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1)) - count + 1;
-				for (size_t j = 0; j != count; ++j)
-				{
-					assert(!emptyFlags[i + j].load(std::memory_order_relaxed));
-					emptyFlags[i + j].store(true, std::memory_order_relaxed);
-				}
-				return false;
+				assert(!emptyFlags[i + j].load(std::memory_order_relaxed));
+				emptyFlags[i + j].store(true, std::memory_order_relaxed);
 			}
-			else
-			{
-				// Increment counter
-				auto prevVal = elementsCompletelyDequeued.fetch_add(count, std::memory_order_release);
-				assert(prevVal + count <= BLOCK_SIZE);
-				return prevVal + count == BLOCK_SIZE;
-			}
+			return false;
+		}
+		template<InnerQueueContext context>
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_many_empty(POCO_MAYBE_UNUSED index_t i, size_t count)
+		{
+			// Increment counter
+			auto prevVal = elementsCompletelyDequeued.fetch_add(count, std::memory_order_release);
+			assert(prevVal + count <= BLOCK_SIZE);
+			return prevVal + count == BLOCK_SIZE;
 		}
 		
 		template<InnerQueueContext context>
-		inline void set_all_empty()
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), void>::type set_all_empty()
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			// Set all flags
+			for (size_t i = 0; i != BLOCK_SIZE; ++i)
 			{
-				// Set all flags
-				for (size_t i = 0; i != BLOCK_SIZE; ++i)
-				{
-					emptyFlags[i].store(true, std::memory_order_relaxed);
-				}
+				emptyFlags[i].store(true, std::memory_order_relaxed);
 			}
-			else
-			{
-				// Reset counter
-				elementsCompletelyDequeued.store(BLOCK_SIZE, std::memory_order_relaxed);
-			}
+		}
+		template<InnerQueueContext context>
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), void>::type set_all_empty()
+		{
+			// Reset counter
+			elementsCompletelyDequeued.store(BLOCK_SIZE, std::memory_order_relaxed);
 		}
 		
 		template<InnerQueueContext context>
-		inline void reset_empty()
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), void>::type reset_empty()
 		{
-			POCO_CONSTEXPR_IF (context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD)
+			// Reset flags
+			for (size_t i = 0; i != BLOCK_SIZE; ++i)
 			{
-				// Reset flags
-				for (size_t i = 0; i != BLOCK_SIZE; ++i)
-				{
-					emptyFlags[i].store(false, std::memory_order_relaxed);
-				}
+				emptyFlags[i].store(false, std::memory_order_relaxed);
 			}
-			else
-			{
-				// Reset counter
-				elementsCompletelyDequeued.store(0, std::memory_order_relaxed);
-			}
+		}
+		template<InnerQueueContext context>
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), void>::type reset_empty()
+		{
+			// Reset counter
+			elementsCompletelyDequeued.store(0, std::memory_order_relaxed);
 		}
 		
 		inline T* operator[](index_t idx) POCO_NOEXCEPT
@@ -2393,14 +2409,14 @@ private:
 		}
 		
 	private:
-		std::atomic<BlockIndexHeader*> blockIndex;
+		std::atomic<BlockIndexHeader*> blockIndex{nullptr};
 		
 		// To be used by producer only -- consumer must use the ones in referenced by blockIndex
-		size_t pr_blockIndexSlotsUsed;
-		size_t pr_blockIndexSize;
-		size_t pr_blockIndexFront;		// Next slot (not current)
-		BlockIndexEntry* pr_blockIndexEntries;
-		void* pr_blockIndexRaw;
+		size_t pr_blockIndexSlotsUsed{0};
+		size_t pr_blockIndexSize{0};
+		size_t pr_blockIndexFront{0};		// Next slot (not current)
+		BlockIndexEntry* pr_blockIndexEntries{nullptr};
+		void* pr_blockIndexRaw{nullptr};
 		
 #ifdef POCO_QUEUE_INTERNAL_DEBUG
 	public:
@@ -2698,7 +2714,8 @@ private:
 					this->tailBlock = newBlock;
 					endBlock = newBlock;
 					firstAllocatedBlock = firstAllocatedBlock == nullptr ? newBlock : firstAllocatedBlock;
-				} while (blockBaseDiff > 0);
+				}
+				while (blockBaseDiff > 0);
 			}
 			
 			// Enqueue, one block at a time
@@ -3045,8 +3062,8 @@ private:
 		}
 		
 	private:
-		size_t nextBlockIndexCapacity;
-		std::atomic<BlockIndexHeader*> blockIndex;
+		size_t nextBlockIndexCapacity{IMPLICIT_INITIAL_INDEX_SIZE};
+		std::atomic<BlockIndexHeader*> blockIndex{nullptr};
 	public:
 		Details::ThreadExitListener threadExitListener;
 #ifdef POCO_QUEUE_INTERNAL_DEBUG
@@ -3174,7 +3191,8 @@ private:
 	ProducerBase* add_producer(ProducerBase* producer)
 	{
 		// Handle failed memory allocation
-		if (producer == nullptr) {
+		if (producer == nullptr)
+		{
 			return nullptr;
 		}
 		
@@ -3182,9 +3200,11 @@ private:
 		
 		// Add it to the lock-free list
 		auto prevTail = producerListTail.load(std::memory_order_relaxed);
-		do {
+		do
+		{
 			producer->next = prevTail;
-		} while (!producerListTail.compare_exchange_weak(prevTail, producer, std::memory_order_release, std::memory_order_relaxed));
+		}
+		while (!producerListTail.compare_exchange_weak(prevTail, producer, std::memory_order_release, std::memory_order_relaxed));
 		
 #ifdef POCO_QUEUE_INTERNAL_DEBUG
 		if (producer->isExplicit) {
@@ -3209,7 +3229,8 @@ private:
 		// After another instance is moved-into/swapped-with this one, all the
 		// producers we stole still think their parents are the other queue.
 		// So fix them up!
-		for (auto ptr = producerListTail.load(std::memory_order_relaxed); ptr != nullptr; ptr = ptr->next_prod()) {
+		for (auto ptr = producerListTail.load(std::memory_order_relaxed); ptr != nullptr; ptr = ptr->next_prod())
+		{
 			ptr->parent = this;
 		}
 	}
@@ -3221,10 +3242,10 @@ private:
 	
 	struct ImplicitProducerKVP
 	{
-		std::atomic<Details::thread_id_t> key;
-		ImplicitProducer* value;		// No need for atomicity since it's only read by the thread that sets it in the first place
+		std::atomic<Details::thread_id_t> key{0};
+		ImplicitProducer* value{nullptr};		// No need for atomicity since it's only read by the thread that sets it in the first place
 		
-		ImplicitProducerKVP() : value(nullptr) { }
+		ImplicitProducerKVP() = default;
 		
 		ImplicitProducerKVP(ImplicitProducerKVP&& other) POCO_NOEXCEPT
 		{
@@ -3240,7 +3261,8 @@ private:
 		
 		inline void swap(ImplicitProducerKVP& other) POCO_NOEXCEPT
 		{
-			if (this != &other) {
+			if (this != &other)
+			{
 				Details::swap_relaxed(key, other.key);
 				std::swap(value, other.value);
 			}
@@ -3259,10 +3281,12 @@ private:
 	
 	inline void populate_initial_implicit_producer_hash()
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) {
+		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0)
+		{
 			return;
 		}
-		else {
+		else
+		{
 			implicitProducerHashCount.store(0, std::memory_order_relaxed);
 			auto hash = &initialImplicitProducerHash;
 			hash->capacity = INITIAL_IMPLICIT_PRODUCER_HASH_SIZE;
@@ -3277,10 +3301,12 @@ private:
 	
 	void swap_implicit_producer_hashes(ConcurrentQueue& other)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) {
+		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0)
+		{
 			return;
 		}
-		else {
+		else
+		{
 			// Swap (assumes our implicit producer hash is initialized)
 			initialImplicitProducerHashEntries.swap(other.initialImplicitProducerHashEntries);
 			initialImplicitProducerHash.entries = &initialImplicitProducerHashEntries[0];
@@ -3289,22 +3315,27 @@ private:
 			Details::swap_relaxed(implicitProducerHashCount, other.implicitProducerHashCount);
 			
 			Details::swap_relaxed(implicitProducerHash, other.implicitProducerHash);
-			if (implicitProducerHash.load(std::memory_order_relaxed) == &other.initialImplicitProducerHash) {
+			if (implicitProducerHash.load(std::memory_order_relaxed) == &other.initialImplicitProducerHash)
+			{
 				implicitProducerHash.store(&initialImplicitProducerHash, std::memory_order_relaxed);
 			}
-			else {
+			else
+			{
 				ImplicitProducerHash* hash = nullptr;
-				for (hash = implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &other.initialImplicitProducerHash; hash = hash->prev) {
+				for (hash = implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &other.initialImplicitProducerHash; hash = hash->prev)
+				{
 					continue;
 				}
 				hash->prev = &initialImplicitProducerHash;
 			}
-			if (other.implicitProducerHash.load(std::memory_order_relaxed) == &initialImplicitProducerHash) {
+			if (other.implicitProducerHash.load(std::memory_order_relaxed) == &initialImplicitProducerHash)
+			{
 				other.implicitProducerHash.store(&other.initialImplicitProducerHash, std::memory_order_relaxed);
 			}
 			else {
 				ImplicitProducerHash* hash = nullptr;
-				for (hash = other.implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &initialImplicitProducerHash; hash = hash->prev) {
+				for (hash = other.implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &initialImplicitProducerHash; hash = hash->prev)
+				{
 					continue;
 				}
 				hash->prev = &other.initialImplicitProducerHash;
@@ -3334,32 +3365,34 @@ private:
 		
 		auto mainHash = implicitProducerHash.load(std::memory_order_acquire);
 		assert(mainHash != nullptr);  // silence clang-tidy and MSVC warnings (hash cannot be null)
-		for (auto hash = mainHash; hash != nullptr; hash = hash->prev) {
+		for (auto hash = mainHash; hash != nullptr; hash = hash->prev)
+		{
 			// Look for the id in this hash
 			auto index = hashedId;
-			while (true) {		// Not an infinite loop because at least one slot is free in the hash table
+			while (true) // Not an infinite loop because at least one slot is free in the hash table
+			{
 				index &= hash->capacity - 1u;
 				
 				auto probedKey = hash->entries[index].key.load(std::memory_order_relaxed);
-				if (probedKey == id) {
+				if (probedKey == id)
+				{
 					// Found it! If we had to search several hashes deep, though, we should lazily add it
 					// to the current main hash table to avoid the extended search next time.
 					// Note there's guaranteed to be room in the current hash table since every subsequent
 					// table implicitly reserves space for all previous tables (there's only one
 					// implicitProducerHashCount).
 					auto value = hash->entries[index].value;
-					if (hash != mainHash) {
+					if (hash != mainHash)
+					{
 						index = hashedId;
-						while (true) {
+						while (true)
+						{
 							index &= mainHash->capacity - 1u;
 							auto empty = Details::invalid_thread_id;
-#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 							auto reusable = Details::invalid_thread_id2;
 							if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed) ||
-								mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
-#else
-							if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
-#endif
+								mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed))
+							{
 								mainHash->entries[index].value = value;
 								break;
 							}
@@ -3369,7 +3402,8 @@ private:
 					
 					return value;
 				}
-				if (probedKey == Details::invalid_thread_id) {
+				if (probedKey == Details::invalid_thread_id)
+				{
 					break;		// Not in this hash table
 				}
 				++index;
@@ -3378,21 +3412,26 @@ private:
 		
 		// Insert!
 		auto newCount = 1 + implicitProducerHashCount.fetch_add(1, std::memory_order_relaxed);
-		while (true) {
+		while (true)
+		{
 			// NOLINTNEXTLINE(clang-analyzer-core.NullDereference)
-			if (newCount >= (mainHash->capacity >> 1) && !implicitProducerHashResizeInProgress.test_and_set(std::memory_order_acquire)) {
+			if (newCount >= (mainHash->capacity >> 1) && !implicitProducerHashResizeInProgress.test_and_set(std::memory_order_acquire))
+			{
 				// We've acquired the resize lock, try to allocate a bigger hash table.
 				// Note the acquire fence synchronizes with the release fence at the end of this block, and hence when
 				// we reload implicitProducerHash it must be the most recent version (it only gets changed within this
 				// locked block).
 				mainHash = implicitProducerHash.load(std::memory_order_acquire);
-				if (newCount >= (mainHash->capacity >> 1)) {
+				if (newCount >= (mainHash->capacity >> 1))
+				{
 					size_t newCapacity = mainHash->capacity << 1;
-					while (newCount >= (newCapacity >> 1)) {
+					while (newCount >= (newCapacity >> 1))
+					{
 						newCapacity <<= 1;
 					}
 					auto raw = static_cast<char*>((Traits::malloc)(sizeof(ImplicitProducerHash) + std::alignment_of<ImplicitProducerKVP>::value - 1 + sizeof(ImplicitProducerKVP) * newCapacity));
-					if (raw == nullptr) {
+					if (raw == nullptr)
+					{
 						// Allocation failed
 						implicitProducerHashCount.fetch_sub(1, std::memory_order_relaxed);
 						implicitProducerHashResizeInProgress.clear(std::memory_order_relaxed);
@@ -3402,7 +3441,8 @@ private:
 					auto newHash = new (raw) ImplicitProducerHash;
 					newHash->capacity = static_cast<size_t>(newCapacity);
 					newHash->entries = reinterpret_cast<ImplicitProducerKVP*>(Details::align_for<ImplicitProducerKVP>(raw + sizeof(ImplicitProducerHash)));
-					for (size_t i = 0; i != newCapacity; ++i) {
+					for (size_t i = 0; i != newCapacity; ++i)
+					{
 						new (newHash->entries + i) ImplicitProducerKVP;
 						newHash->entries[i].key.store(Details::invalid_thread_id, std::memory_order_relaxed);
 					}
@@ -3411,7 +3451,8 @@ private:
 					implicitProducerHashResizeInProgress.clear(std::memory_order_release);
 					mainHash = newHash;
 				}
-				else {
+				else
+				{
 					implicitProducerHashResizeInProgress.clear(std::memory_order_release);
 				}
 			}
@@ -3421,30 +3462,29 @@ private:
 			// always be true)
 			if (newCount < (mainHash->capacity >> 1) + (mainHash->capacity >> 2)) {
 				auto producer = static_cast<ImplicitProducer*>(recycle_or_create_producer(false));
-				if (producer == nullptr) {
+				if (producer == nullptr)
+				{
 					implicitProducerHashCount.fetch_sub(1, std::memory_order_relaxed);
 					return nullptr;
 				}
 				
-#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 				producer->threadExitListener.callback = &ConcurrentQueue::implicit_producer_thread_exited_callback;
 				producer->threadExitListener.userData = producer;
 				Details::ThreadExitNotifier::subscribe(&producer->threadExitListener);
-#endif
 				
 				auto index = hashedId;
 				while (true) {
 					index &= mainHash->capacity - 1u;
 					auto empty = Details::invalid_thread_id;
-#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
 					auto reusable = Details::invalid_thread_id2;
-					if (mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
+					if (mainHash->entries[index].key.compare_exchange_strong(reusable, id, std::memory_order_seq_cst, std::memory_order_relaxed))
+					{
 						implicitProducerHashCount.fetch_sub(1, std::memory_order_relaxed);  // already counted as a used slot
 						mainHash->entries[index].value = producer;
 						break;
 					}
-#endif
-					if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed)) {
+					if (mainHash->entries[index].key.compare_exchange_strong(empty,    id, std::memory_order_seq_cst, std::memory_order_relaxed))
+					{
 						mainHash->entries[index].value = producer;
 						break;
 					}
@@ -3460,7 +3500,7 @@ private:
 		}
 	}
 	
-#ifdef POCO_CPP11_THREAD_LOCAL_SUPPORTED
+
 	void implicit_producer_thread_exited(ImplicitProducer* producer)
 	{
 		// Remove from hash
@@ -3497,7 +3537,6 @@ private:
 		auto queue = producer->parent;
 		queue->implicit_producer_thread_exited(producer);
 	}
-#endif
 	
 	//////////////////////////////////
 	// Utility functions
@@ -3507,12 +3546,17 @@ private:
 	static inline void* aligned_malloc(size_t size)
 	{
 		POCO_CONSTEXPR_IF (std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value)
+		{
 			return (Traits::malloc)(size);
-		else {
+		}
+		else
+		{
 			size_t alignment = std::alignment_of<TAlign>::value;
 			void* raw = (Traits::malloc)(size + alignment - 1 + sizeof(void*));
 			if (!raw)
+			{
 				return nullptr;
+			}
 			char* ptr = Details::align_for<TAlign>(reinterpret_cast<char*>(raw) + sizeof(void*));
 			*(reinterpret_cast<void**>(ptr) - 1) = raw;
 			return ptr;
@@ -3523,9 +3567,13 @@ private:
 	static inline void aligned_free(void* ptr)
 	{
 		POCO_CONSTEXPR_IF (std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value)
+		{
 			return (Traits::free)(ptr);
+		}
 		else
+		{
 			(Traits::free)(ptr ? *(reinterpret_cast<void**>(ptr) - 1) : nullptr);
+		}
 	}
 
 	template<typename U>
@@ -3533,21 +3581,25 @@ private:
 	{
 		assert(count > 0);
 		U* p = static_cast<U*>(aligned_malloc<U>(sizeof(U) * count));
-		if (p == nullptr)
-			return nullptr;
-
+		if (p == nullptr) return nullptr;
+		
 		for (size_t i = 0; i != count; ++i)
+		{
 			new (p + i) U();
+		}
 		return p;
 	}
 
 	template<typename U>
 	static inline void destroy_array(U* p, size_t count)
 	{
-		if (p != nullptr) {
+		if (p != nullptr)
+		{
 			assert(count > 0);
 			for (size_t i = count; i != 0; )
+			{
 				(p + --i)->~U();
+			}
 		}
 		aligned_free<U>(p);
 	}
@@ -3569,18 +3621,17 @@ private:
 	template<typename U>
 	static inline void destroy(U* p)
 	{
-		if (p != nullptr)
-			p->~U();
+		if (p != nullptr) p->~U();
 		aligned_free<U>(p);
 	}
 
 private:
-	std::atomic<ProducerBase*> producerListTail;
-	std::atomic<std::uint32_t> producerCount;
+	std::atomic<ProducerBase*> producerListTail{nullptr};
+	std::atomic<std::uint32_t> producerCount{0};
 	
-	std::atomic<size_t> initialBlockPoolIndex;
-	Block* initialBlockPool;
-	size_t initialBlockPoolSize;
+	std::atomic<size_t> initialBlockPoolIndex{0};
+	Block* initialBlockPool{nullptr};
+	size_t initialBlockPoolSize{0};
 	
 #ifndef MCDBGQ_USEDEBUGFREELIST
 	FreeList<Block> freeList;
@@ -3588,14 +3639,14 @@ private:
 	debug::DebugFreeList<Block> freeList;
 #endif
 	
-	std::atomic<ImplicitProducerHash*> implicitProducerHash;
-	std::atomic<size_t> implicitProducerHashCount;		// Number of slots logically used
+	std::atomic<ImplicitProducerHash*> implicitProducerHash{nullptr};
+	std::atomic<size_t> implicitProducerHashCount{0};		// Number of slots logically used
 	ImplicitProducerHash initialImplicitProducerHash;
 	std::array<ImplicitProducerKVP, INITIAL_IMPLICIT_PRODUCER_HASH_SIZE> initialImplicitProducerHashEntries;
 	std::atomic_flag implicitProducerHashResizeInProgress{};
 	
-	std::atomic<std::uint32_t> nextExplicitConsumerId;
-	std::atomic<std::uint32_t> globalExplicitConsumerOffset;
+	std::atomic<std::uint32_t> nextExplicitConsumerId{0};
+	std::atomic<std::uint32_t> globalExplicitConsumerOffset{0};
 	
 #ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODHASH
 	debug::DebugMutex implicitProdMutex;
@@ -3612,7 +3663,8 @@ template<typename T, typename Traits>
 ProducerToken::ProducerToken(ConcurrentQueue<T, Traits>& queue)
 	: producer(queue.recycle_or_create_producer(true))
 {
-	if (producer != nullptr) {
+	if (producer != nullptr)
+	{
 		producer->token = this;
 	}
 }
@@ -3621,7 +3673,8 @@ template<typename T, typename Traits>
 ProducerToken::ProducerToken(BlockingConcurrentQueue<T, Traits>& queue)
 	: producer(reinterpret_cast<ConcurrentQueue<T, Traits>*>(&queue)->recycle_or_create_producer(true))
 {
-	if (producer != nullptr) {
+	if (producer != nullptr)
+	{
 		producer->token = this;
 	}
 }
