@@ -439,6 +439,21 @@ public:
 	void setSecurityLevel(SecurityLevel level);
 		/// Sets the security level.
 
+	void ignoreUnexpectedEof(bool flag = true);
+		/// Enable or disable SSL/TLS SSL_OP_IGNORE_UNEXPECTED_EOF
+		/// 
+		/// Some TLS implementations do not send the mandatory close_notify alert on shutdown.
+		/// If the application tries to wait for the close_notify alert
+		/// but the peer closes the connection without sending it, an error is generated.
+		/// When this option is enabled the peer does not need to send the close_notify alert
+		/// and a closed connection will be treated as if the close_notify alert was received.
+
+	void setQuietShutdown(bool flag = true);
+		/// Normally, when an SSL connection is finished, the parties must send out close_notify alert messages for a clean shutdown.
+		/// When setting the "quiet shutdown" flag to true, the SecureSocketImpl::shutdown() will set the SSL shutdown flags,
+		/// but no close_notify alert is sent to the peer. This behaviour violates the TLS standard.
+		/// The default is a normal shutdown behaviour as described by the TLS standard.
+
 private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
