@@ -3,7 +3,7 @@
 //
 // Library: Foundation
 // Package: Core
-// Module:	CincurrentQueue
+// Module:	ConcurrentQueue
 //
 // Copyright Copyright (c) 2013-2020, Cameron Desrochers. All rights reserved.
 // Extracted from https://github.com/cameron314/concurrentqueue lib and adapted for poco: Bychuk Alexander 2023
@@ -12,7 +12,7 @@
 //
 
 // Provides a C++11 implementation of a multi-producer, multi-consumer lock-free queue.
-// An overview, including benchmark results, is provided here:
+// based on
 //     http://moodycamel.com/blog/2014/a-fast-general-purpose-lock-free-queue-for-c++
 // The full design is also described in excruciating detail at:
 //    http://moodycamel.com/blog/2014/detailed-design-of-a-lock-free-queue
@@ -87,7 +87,7 @@ namespace Poco { namespace Details {
 	{
 		using thread_id_numeric_size_t = thread_id_t;
 		using thread_id_hash_t = thread_id_t;
-		static thread_id_hash_t prehash(thread_id_t const& x) { return x; }
+		static inline thread_id_hash_t prehash(thread_id_t const& x) { return x; }
 	};
 } }
 
@@ -106,28 +106,14 @@ namespace Poco { namespace Details {
 	}
 } }
 
-#define POCO_EXCEPTIONS_ENABLED
-
 // Constexpr if
 #ifndef POCO_CONSTEXPR_IF
 #if (defined(_MSC_VER) && defined(_HAS_CXX17) && _HAS_CXX17) || __cplusplus > 201402L
 #define POCO_CONSTEXPR_IF if constexpr
-#define POCO_MAYBE_UNUSED [[maybe_unused]]
 #else
 #define POCO_CONSTEXPR_IF if
-#define POCO_MAYBE_UNUSED
 #endif
 #endif
-
-// Exceptions
-#define POCO_TRY try
-#define POCO_CATCH(...) catch(__VA_ARGS__)
-#define POCO_RETHROW throw
-#define POCO_THROW(expr) throw (expr)
-
-#define POCO_NOEXCEPT noexcept
-#define POCO_NOEXCEPT_CTOR(type, valueType, expr) noexcept(expr)
-#define POCO_NOEXCEPT_ASSIGN(type, valueType, expr) noexcept(expr)
 
 namespace Poco { namespace Details {
 #ifndef POCO_ALIGNAS
@@ -162,8 +148,8 @@ namespace Poco { namespace Details {
 #define POCO_NO_TSAN
 #if defined(__has_feature)
  #if __has_feature(thread_sanitizer)
-  #undef POCO_NO_TSAN
-  #define POCO_NO_TSAN __attribute__((no_sanitize("thread")))
+	#undef POCO_NO_TSAN
+	#define POCO_NO_TSAN __attribute__((no_sanitize("thread")))
  #endif // TSAN
 #endif // TSAN
 
@@ -177,10 +163,6 @@ namespace Poco { namespace Details {
 	static inline bool (unlikely)(bool x) { return x; }
 #endif
 } }
-
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-#include "internal/concurrentqueue_internal_debug.h"
-#endif
 
 namespace Poco {
 namespace Details {
@@ -423,7 +405,7 @@ namespace Details {
 	};
 	
 	template<typename It>
-	static inline auto deref_noexcept(It& it) POCO_NOEXCEPT -> decltype(*it)
+	static inline auto deref_noexcept(It& it) noexcept -> decltype(*it)
 	{
 		return *it;
 	}
@@ -533,7 +515,7 @@ struct ProducerToken
 	template<typename T, typename Traits>
 	explicit ProducerToken(BlockingConcurrentQueue<T, Traits>& queue);
 	
-	ProducerToken(ProducerToken&& other) POCO_NOEXCEPT
+	ProducerToken(ProducerToken&& other) noexcept
 		: producer(other.producer)
 	{
 		other.producer = nullptr;
@@ -543,13 +525,13 @@ struct ProducerToken
 		}
 	}
 	
-	inline ProducerToken& operator=(ProducerToken&& other) POCO_NOEXCEPT
+	inline ProducerToken& operator=(ProducerToken&& other) noexcept
 	{
 		swap(other);
 		return *this;
 	}
 	
-	void swap(ProducerToken& other) POCO_NOEXCEPT
+	void swap(ProducerToken& other) noexcept
 	{
 		std::swap(producer, other.producer);
 		if (producer != nullptr)
@@ -602,17 +584,17 @@ struct ConsumerToken
 	template<typename T, typename Traits>
 	explicit ConsumerToken(BlockingConcurrentQueue<T, Traits>& q);
 	
-	ConsumerToken(ConsumerToken&& other) POCO_NOEXCEPT
+	ConsumerToken(ConsumerToken&& other) noexcept
 		: initialOffset(other.initialOffset), lastKnownGlobalOffset(other.lastKnownGlobalOffset), itemsConsumedFromCurrent(other.itemsConsumedFromCurrent), currentProducer(other.currentProducer), desiredProducer(other.desiredProducer)
 	{ }
 	
-	inline ConsumerToken& operator=(ConsumerToken&& other) POCO_NOEXCEPT
+	inline ConsumerToken& operator=(ConsumerToken&& other) noexcept
 	{
 		swap(other);
 		return *this;
 	}
 	
-	void swap(ConsumerToken& other) POCO_NOEXCEPT
+	void swap(ConsumerToken& other) noexcept
 	{
 		std::swap(initialOffset, other.initialOffset);
 		std::swap(lastKnownGlobalOffset, other.lastKnownGlobalOffset);
@@ -640,7 +622,7 @@ private: // but shared with ConcurrentQueue
 // Need to forward-declare this swap because it's in a namespace.
 // See http://stackoverflow.com/questions/4492062/why-does-a-c-friend-class-need-a-forward-declaration-only-in-other-namespaces
 template<typename T, typename Traits>
-inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) POCO_NOEXCEPT;
+inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) noexcept;
 
 
 template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
@@ -700,15 +682,6 @@ public:
 		implicitProducerHashResizeInProgress.clear(std::memory_order_relaxed);
 		populate_initial_implicit_producer_hash();
 		populate_initial_block_list(capacity / BLOCK_SIZE + ((capacity & (BLOCK_SIZE - 1)) == 0 ? 0 : 1));
-		
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-		// Track all the producers using a fully-resolved typed list for
-		// each kind; this makes it possible to debug them starting from
-		// the root queue object (otherwise wacky casts are needed that
-		// don't compile in the debugger's expression evaluator).
-		explicitProducers.store(nullptr, std::memory_order_relaxed);
-		implicitProducers.store(nullptr, std::memory_order_relaxed);
-#endif
 	}
 	
 	// Computes the correct amount of pre-allocated blocks for you based
@@ -725,11 +698,6 @@ public:
 		populate_initial_implicit_producer_hash();
 		size_t blocks = (((minCapacity + BLOCK_SIZE - 1) / BLOCK_SIZE) - 1) * (maxExplicitProducers + 1) + 2 * (maxExplicitProducers + maxImplicitProducers);
 		populate_initial_block_list(blocks);
-		
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-		explicitProducers.store(nullptr, std::memory_order_relaxed);
-		implicitProducers.store(nullptr, std::memory_order_relaxed);
-#endif
 	}
 	
 	// Note: The queue should not be accessed concurrently while it's
@@ -796,7 +764,7 @@ public:
 	// Note: When a queue is moved, its tokens are still valid but can only be
 	// used with the destination queue (i.e. semantically they are moved along
 	// with the queue itself).
-	ConcurrentQueue(ConcurrentQueue&& other) POCO_NOEXCEPT
+	ConcurrentQueue(ConcurrentQueue&& other) noexcept
 		: producerListTail(other.producerListTail.load(std::memory_order_relaxed)),
 		producerCount(other.producerCount.load(std::memory_order_relaxed)),
 		initialBlockPoolIndex(other.initialBlockPoolIndex.load(std::memory_order_relaxed)),
@@ -816,13 +784,6 @@ public:
 		other.nextExplicitConsumerId.store(0, std::memory_order_relaxed);
 		other.globalExplicitConsumerOffset.store(0, std::memory_order_relaxed);
 		
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-		explicitProducers.store(other.explicitProducers.load(std::memory_order_relaxed), std::memory_order_relaxed);
-		other.explicitProducers.store(nullptr, std::memory_order_relaxed);
-		implicitProducers.store(other.implicitProducers.load(std::memory_order_relaxed), std::memory_order_relaxed);
-		other.implicitProducers.store(nullptr, std::memory_order_relaxed);
-#endif
-		
 		other.initialBlockPoolIndex.store(0, std::memory_order_relaxed);
 		other.initialBlockPoolSize = 0;
 		other.initialBlockPool = nullptr;
@@ -830,7 +791,7 @@ public:
 		reown_producers();
 	}
 	
-	inline ConcurrentQueue& operator=(ConcurrentQueue&& other) POCO_NOEXCEPT
+	inline ConcurrentQueue& operator=(ConcurrentQueue&& other) noexcept
 	{
 		return swap_internal(other);
 	}
@@ -840,7 +801,7 @@ public:
 	// the tokens that were created for one queue must be used with
 	// only the swapped queue (i.e. the tokens are tied to the
 	// queue's movable state, not the object itself).
-	inline void swap(ConcurrentQueue& other) POCO_NOEXCEPT
+	inline void swap(ConcurrentQueue& other) noexcept
 	{
 		swap_internal(other);
 	}
@@ -866,11 +827,6 @@ private:
 		
 		reown_producers();
 		other.reown_producers();
-		
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-		Details::swap_relaxed(explicitProducers, other.explicitProducers);
-		Details::swap_relaxed(implicitProducers, other.implicitProducers);
-#endif
 		
 		return *this;
 	}
@@ -1541,7 +1497,7 @@ private:
 		
 		// Returns true if the block is now empty (does not apply in explicit context)
 		template<InnerQueueContext context>
-		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_empty(POCO_MAYBE_UNUSED index_t i)
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_empty(index_t i)
 		{
 			// Set flag
 			assert(!emptyFlags[BLOCK_SIZE - 1 - static_cast<size_t>(i & static_cast<index_t>(BLOCK_SIZE - 1))].load(std::memory_order_relaxed));
@@ -1550,7 +1506,7 @@ private:
 		}
 		// Returns true if the block is now empty (does not apply in explicit context)
 		template<InnerQueueContext context>
-		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_empty(POCO_MAYBE_UNUSED index_t i)
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_empty(POCO_UNUSED index_t i)
 		{
 			// Increment counter
 			auto prevVal = elementsCompletelyDequeued.fetch_add(1, std::memory_order_release);
@@ -1561,7 +1517,7 @@ private:
 		// Sets multiple contiguous item statuses to 'empty' (assumes no wrapping and count > 0).
 		// Returns true if the block is now empty (does not apply in explicit context).
 		template<InnerQueueContext context>
-		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_many_empty(POCO_MAYBE_UNUSED index_t i, size_t count)
+		inline typename std::enable_if<(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_many_empty(index_t i, size_t count)
 		{
 			// Set flags
 			std::atomic_thread_fence(std::memory_order_release);
@@ -1574,7 +1530,7 @@ private:
 			return false;
 		}
 		template<InnerQueueContext context>
-		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_many_empty(POCO_MAYBE_UNUSED index_t i, size_t count)
+		inline typename std::enable_if<!(context == explicit_context && BLOCK_SIZE <= EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD), bool>::type set_many_empty(POCO_UNUSED index_t i, size_t count)
 		{
 			// Increment counter
 			auto prevVal = elementsCompletelyDequeued.fetch_add(count, std::memory_order_release);
@@ -1614,11 +1570,11 @@ private:
 			elementsCompletelyDequeued.store(0, std::memory_order_relaxed);
 		}
 		
-		inline T* operator[](index_t idx) POCO_NOEXCEPT
+		inline T* operator[](index_t idx) noexcept
 		{
 			return static_cast<T*>(static_cast<void*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1));
 		}
-		inline T const* operator[](index_t idx) const POCO_NOEXCEPT
+		inline T const* operator[](index_t idx) const noexcept
 		{
 			return static_cast<T const*>(static_cast<void const*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1));
 		}
@@ -1877,21 +1833,21 @@ private:
 					++pr_blockIndexSlotsUsed;
 				}
 
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
 				{
 					// The constructor may throw. We want the element not to appear in the queue in
 					// that case (without corrupting the queue):
-					POCO_TRY
+					try
 					{
 						new ((*this->tailBlock)[currentTailIndex]) T(std::forward<U>(element));
 					}
-					POCO_CATCH (...)
+					catch (...)
 					{
 						// Revert change to the current block, but leave the new block available
 						// for next time
 						pr_blockIndexSlotsUsed = originalBlockIndexSlotsUsed;
 						this->tailBlock = startBlock == nullptr ? this->tailBlock : startBlock;
-						POCO_RETHROW;
+						throw;
 					}
 				}
 				else
@@ -1907,7 +1863,7 @@ private:
 				blockIndex.load(std::memory_order_relaxed)->front.store(pr_blockIndexFront, std::memory_order_release);
 				pr_blockIndexFront = (pr_blockIndexFront + 1) & (pr_blockIndexSize - 1);
 				
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
 				{
 					this->tailIndex.store(newTailIndex, std::memory_order_release);
 					return true;
@@ -1990,7 +1946,7 @@ private:
 					
 					// Dequeue
 					auto& el = *((*block)[index]);
-					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el)))
+					if (!noexcept(element = std::move(el)))
 					{
 						// Make sure the element is still fully dequeued and destroyed even if the assignment
 						// throws
@@ -2136,7 +2092,7 @@ private:
 					block = block->next;
 				}
 				
-				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+				POCO_CONSTEXPR_IF (noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
 				{
 					blockIndex.load(std::memory_order_relaxed)->front.store((pr_blockIndexFront - 1) & (pr_blockIndexSize - 1), std::memory_order_release);
 				}
@@ -2159,7 +2115,7 @@ private:
 				{
 					stopIndex = newTailIndex;
 				}
-				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+				POCO_CONSTEXPR_IF (noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
 				{
 					while (currentTailIndex != stopIndex) {
 						new ((*this->tailBlock)[currentTailIndex++]) T(*itemFirst++);
@@ -2167,7 +2123,7 @@ private:
 				}
 				else
 				{
-					POCO_TRY
+					try
 					{
 						while (currentTailIndex != stopIndex)
 						{
@@ -2178,12 +2134,12 @@ private:
 							// may only define a (noexcept) move constructor, and so calls to the
 							// cctor will not compile, even if they are in an if branch that will never
 							// be executed
-							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
+							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
 							++currentTailIndex;
 							++itemFirst;
 						}
 					}
-					POCO_CATCH (...) {
+					catch (...) {
 						// Oh dear, an exception's been thrown -- destroy the elements that
 						// were enqueued so far and revert the entire bulk operation (we'll keep
 						// any allocated blocks in our linked list for later, though).
@@ -2220,7 +2176,7 @@ private:
 								block = block->next;
 							}
 						}
-						POCO_RETHROW;
+						throw;
 					}
 				}
 				
@@ -2232,7 +2188,7 @@ private:
 				this->tailBlock = this->tailBlock->next;
 			}
 			
-			POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+			POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
 			{
 				if (firstAllocatedBlock != nullptr)
 					blockIndex.load(std::memory_order_relaxed)->front.store((pr_blockIndexFront - 1) & (pr_blockIndexSize - 1), std::memory_order_release);
@@ -2285,7 +2241,7 @@ private:
 						index_t endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
 						endIndex = Details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
 						auto block = localBlockIndex->entries[indexIndex].block;
-						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index]))))
+						if (noexcept(Details::deref_noexcept(itemFirst) = std::move((*(*block)[index]))))
 						{
 							while (index != endIndex)
 							{
@@ -2297,7 +2253,7 @@ private:
 						}
 						else
 						{
-							POCO_TRY
+							try
 							{
 								while (index != endIndex)
 								{
@@ -2308,7 +2264,7 @@ private:
 									++index;
 								}
 							}
-							POCO_CATCH (...)
+							catch (...)
 							{
 								// It's too late to revert the dequeue, but we can make sure that all
 								// the dequeued objects are properly destroyed and the block index
@@ -2329,7 +2285,7 @@ private:
 								}
 								while (index != firstIndex + actualCount);
 								
-								POCO_RETHROW;
+								throw;
 							}
 						}
 						block->ConcurrentQueue::Block::template set_many_empty<explicit_context>(firstIndexInBlock, static_cast<size_t>(endIndex - firstIndexInBlock));
@@ -2417,11 +2373,6 @@ private:
 		size_t pr_blockIndexFront{0};		// Next slot (not current)
 		BlockIndexEntry* pr_blockIndexEntries{nullptr};
 		void* pr_blockIndexRaw{nullptr};
-		
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-	public:
-		ExplicitProducer* nextExplicitProducer;
-#endif
 	};
 	
 	
@@ -2531,19 +2482,19 @@ private:
 				}
 				newBlock->ConcurrentQueue::Block::template reset_empty<implicit_context>();
 
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
 				{
 					// May throw, try to insert now before we publish the fact that we have this new block
-					POCO_TRY
+					try
 					{
 						new ((*newBlock)[currentTailIndex]) T(std::forward<U>(element));
 					}
-					POCO_CATCH (...)
+					catch (...)
 					{
 						rewind_block_index_tail();
 						idxEntry->value.store(nullptr, std::memory_order_relaxed);
 						this->parent->add_block_to_free_list(newBlock);
-						POCO_RETHROW;
+						throw;
 					}
 				}
 				
@@ -2552,7 +2503,7 @@ private:
 				
 				this->tailBlock = newBlock;
 				
-				POCO_CONSTEXPR_IF (!POCO_NOEXCEPT_CTOR(T, U, new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
+				POCO_CONSTEXPR_IF (!noexcept(new (static_cast<T*>(nullptr)) T(std::forward<U>(element))))
 				{
 					this->tailIndex.store(newTailIndex, std::memory_order_release);
 					return true;
@@ -2589,7 +2540,7 @@ private:
 					auto block = entry->value.load(std::memory_order_relaxed);
 					auto& el = *((*block)[index]);
 					
-					if (!POCO_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el)))
+					if (!noexcept(element = std::move(el)))
 					{
 						struct Guard
 						{
@@ -2734,7 +2685,7 @@ private:
 				{
 					stopIndex = newTailIndex;
 				}
-				POCO_CONSTEXPR_IF (POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
+				POCO_CONSTEXPR_IF (noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst))))
 				{
 					while (currentTailIndex != stopIndex)
 					{
@@ -2743,16 +2694,16 @@ private:
 				}
 				else
 				{
-					POCO_TRY
+					try
 					{
 						while (currentTailIndex != stopIndex)
 						{
-							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!POCO_NOEXCEPT_CTOR(T, decltype(*itemFirst), new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
+							new ((*this->tailBlock)[currentTailIndex]) T(Details::nomove_if<!noexcept(new (static_cast<T*>(nullptr)) T(Details::deref_noexcept(itemFirst)))>::eval(*itemFirst));
 							++currentTailIndex;
 							++itemFirst;
 						}
 					}
-					POCO_CATCH (...)
+					catch (...)
 					{
 						auto constructedStopIndex = currentTailIndex;
 						auto lastBlockEnqueued = this->tailBlock;
@@ -2794,7 +2745,7 @@ private:
 						}
 						this->parent->add_blocks_to_free_list(firstAllocatedBlock);
 						this->tailBlock = startBlock;
-						POCO_RETHROW;
+						throw;
 					}
 				}
 				
@@ -2851,7 +2802,7 @@ private:
 						
 						auto entry = localBlockIndex->index[indexIndex];
 						auto block = entry->value.load(std::memory_order_relaxed);
-						if (POCO_NOEXCEPT_ASSIGN(T, T&&, Details::deref_noexcept(itemFirst) = std::move((*(*block)[index]))))
+						if (noexcept(Details::deref_noexcept(itemFirst) = std::move((*(*block)[index]))))
 						{
 							while (index != endIndex)
 							{
@@ -2863,7 +2814,7 @@ private:
 						}
 						else
 						{
-							POCO_TRY
+							try
 							{
 								while (index != endIndex)
 								{
@@ -2874,7 +2825,7 @@ private:
 									++index;
 								}
 							}
-							POCO_CATCH (...)
+							catch (...)
 							{
 								do
 								{
@@ -2898,7 +2849,7 @@ private:
 								}
 								while (index != firstIndex + actualCount);
 								
-								POCO_RETHROW;
+								throw;
 							}
 						}
 						if (block->ConcurrentQueue::Block::template set_many_empty<implicit_context>(blockStartIndex, static_cast<size_t>(endIndex - blockStartIndex)))
@@ -3066,10 +3017,6 @@ private:
 		std::atomic<BlockIndexHeader*> blockIndex{nullptr};
 	public:
 		Details::ThreadExitListener threadExitListener;
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-	public:
-		ImplicitProducer* nextImplicitProducer;
-#endif
 	};
 	
 	
@@ -3168,9 +3115,6 @@ private:
 	
 	ProducerBase* recycle_or_create_producer(bool isExplicit)
 	{
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODHASH
-		debug::DebugLock lock(implicitProdMutex);
-#endif
 		// Try to re-use one first
 		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod())
 		{
@@ -3206,21 +3150,6 @@ private:
 		}
 		while (!producerListTail.compare_exchange_weak(prevTail, producer, std::memory_order_release, std::memory_order_relaxed));
 		
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-		if (producer->isExplicit) {
-			auto prevTailExplicit = explicitProducers.load(std::memory_order_relaxed);
-			do {
-				static_cast<ExplicitProducer*>(producer)->nextExplicitProducer = prevTailExplicit;
-			} while (!explicitProducers.compare_exchange_weak(prevTailExplicit, static_cast<ExplicitProducer*>(producer), std::memory_order_release, std::memory_order_relaxed));
-		}
-		else {
-			auto prevTailImplicit = implicitProducers.load(std::memory_order_relaxed);
-			do {
-				static_cast<ImplicitProducer*>(producer)->nextImplicitProducer = prevTailImplicit;
-			} while (!implicitProducers.compare_exchange_weak(prevTailImplicit, static_cast<ImplicitProducer*>(producer), std::memory_order_release, std::memory_order_relaxed));
-		}
-#endif
-		
 		return producer;
 	}
 	
@@ -3247,19 +3176,19 @@ private:
 		
 		ImplicitProducerKVP() = default;
 		
-		ImplicitProducerKVP(ImplicitProducerKVP&& other) POCO_NOEXCEPT
+		ImplicitProducerKVP(ImplicitProducerKVP&& other) noexcept
 		{
 			key.store(other.key.load(std::memory_order_relaxed), std::memory_order_relaxed);
 			value = other.value;
 		}
 		
-		inline ImplicitProducerKVP& operator=(ImplicitProducerKVP&& other) POCO_NOEXCEPT
+		inline ImplicitProducerKVP& operator=(ImplicitProducerKVP&& other) noexcept
 		{
 			swap(other);
 			return *this;
 		}
 		
-		inline void swap(ImplicitProducerKVP& other) POCO_NOEXCEPT
+		inline void swap(ImplicitProducerKVP& other) noexcept
 		{
 			if (this != &other)
 			{
@@ -3270,7 +3199,7 @@ private:
 	};
 	
 	template<typename XT, typename XTraits>
-	friend void Poco::swap(typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&, typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&) POCO_NOEXCEPT;
+	friend void Poco::swap(typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&, typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&) noexcept;
 	
 	struct ImplicitProducerHash
 	{
@@ -3279,67 +3208,67 @@ private:
 		ImplicitProducerHash* prev;
 	};
 	
-	inline void populate_initial_implicit_producer_hash()
+	template <typename U=T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, void>::type populate_initial_implicit_producer_hash()
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0)
+		return;
+	}
+	template <typename U=T>
+	inline typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, void>::type populate_initial_implicit_producer_hash()
+	{
+		implicitProducerHashCount.store(0, std::memory_order_relaxed);
+		auto hash = &initialImplicitProducerHash;
+		hash->capacity = INITIAL_IMPLICIT_PRODUCER_HASH_SIZE;
+		hash->entries = &initialImplicitProducerHashEntries[0];
+		for (size_t i = 0; i != INITIAL_IMPLICIT_PRODUCER_HASH_SIZE; ++i)
 		{
-			return;
+			initialImplicitProducerHashEntries[i].key.store(Details::invalid_thread_id, std::memory_order_relaxed);
 		}
-		else
-		{
-			implicitProducerHashCount.store(0, std::memory_order_relaxed);
-			auto hash = &initialImplicitProducerHash;
-			hash->capacity = INITIAL_IMPLICIT_PRODUCER_HASH_SIZE;
-			hash->entries = &initialImplicitProducerHashEntries[0];
-			for (size_t i = 0; i != INITIAL_IMPLICIT_PRODUCER_HASH_SIZE; ++i) {
-				initialImplicitProducerHashEntries[i].key.store(Details::invalid_thread_id, std::memory_order_relaxed);
-			}
-			hash->prev = nullptr;
-			implicitProducerHash.store(hash, std::memory_order_relaxed);
-		}
+		hash->prev = nullptr;
+		implicitProducerHash.store(hash, std::memory_order_relaxed);
 	}
 	
-	void swap_implicit_producer_hashes(ConcurrentQueue& other)
+	template <typename U=T>
+	typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0, void>::type swap_implicit_producer_hashes(ConcurrentQueue& other)
 	{
-		POCO_CONSTEXPR_IF (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0)
+		return;
+	}
+	template <typename U=T>
+	typename std::enable_if<INITIAL_IMPLICIT_PRODUCER_HASH_SIZE != 0, void>::type swap_implicit_producer_hashes(ConcurrentQueue& other)
+	{
+		// Swap (assumes our implicit producer hash is initialized)
+		initialImplicitProducerHashEntries.swap(other.initialImplicitProducerHashEntries);
+		initialImplicitProducerHash.entries = &initialImplicitProducerHashEntries[0];
+		other.initialImplicitProducerHash.entries = &other.initialImplicitProducerHashEntries[0];
+		
+		Details::swap_relaxed(implicitProducerHashCount, other.implicitProducerHashCount);
+		
+		Details::swap_relaxed(implicitProducerHash, other.implicitProducerHash);
+		if (implicitProducerHash.load(std::memory_order_relaxed) == &other.initialImplicitProducerHash)
 		{
-			return;
+			implicitProducerHash.store(&initialImplicitProducerHash, std::memory_order_relaxed);
 		}
 		else
 		{
-			// Swap (assumes our implicit producer hash is initialized)
-			initialImplicitProducerHashEntries.swap(other.initialImplicitProducerHashEntries);
-			initialImplicitProducerHash.entries = &initialImplicitProducerHashEntries[0];
-			other.initialImplicitProducerHash.entries = &other.initialImplicitProducerHashEntries[0];
-			
-			Details::swap_relaxed(implicitProducerHashCount, other.implicitProducerHashCount);
-			
-			Details::swap_relaxed(implicitProducerHash, other.implicitProducerHash);
-			if (implicitProducerHash.load(std::memory_order_relaxed) == &other.initialImplicitProducerHash)
+			ImplicitProducerHash* hash = nullptr;
+			for (hash = implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &other.initialImplicitProducerHash; hash = hash->prev)
 			{
-				implicitProducerHash.store(&initialImplicitProducerHash, std::memory_order_relaxed);
+				continue;
 			}
-			else
+			hash->prev = &initialImplicitProducerHash;
+		}
+		if (other.implicitProducerHash.load(std::memory_order_relaxed) == &initialImplicitProducerHash)
+		{
+			other.implicitProducerHash.store(&other.initialImplicitProducerHash, std::memory_order_relaxed);
+		}
+		else 
+		{
+			ImplicitProducerHash* hash = nullptr;
+			for (hash = other.implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &initialImplicitProducerHash; hash = hash->prev)
 			{
-				ImplicitProducerHash* hash = nullptr;
-				for (hash = implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &other.initialImplicitProducerHash; hash = hash->prev)
-				{
-					continue;
-				}
-				hash->prev = &initialImplicitProducerHash;
+				continue;
 			}
-			if (other.implicitProducerHash.load(std::memory_order_relaxed) == &initialImplicitProducerHash)
-			{
-				other.implicitProducerHash.store(&other.initialImplicitProducerHash, std::memory_order_relaxed);
-			}
-			else {
-				ImplicitProducerHash* hash = nullptr;
-				for (hash = other.implicitProducerHash.load(std::memory_order_relaxed); hash->prev != &initialImplicitProducerHash; hash = hash->prev)
-				{
-					continue;
-				}
-				hash->prev = &other.initialImplicitProducerHash;
-			}
+			hash->prev = &other.initialImplicitProducerHash;
 		}
 	}
 	
@@ -3355,10 +3284,6 @@ private:
 		// have added it previously to one of the tables that we traversed.
 		
 		// Code and algorithm adapted from http://preshing.com/20130605/the-worlds-simplest-lock-free-hash-table
-		
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODHASH
-		debug::DebugLock lock(implicitProdMutex);
-#endif
 		
 		auto id = Details::thread_id();
 		auto hashedId = Details::hash_thread_id(id);
@@ -3460,7 +3385,8 @@ private:
 			// If it's < three-quarters full, add to the old one anyway so that we don't have to wait for the next table
 			// to finish being allocated by another thread (and if we just finished allocating above, the condition will
 			// always be true)
-			if (newCount < (mainHash->capacity >> 1) + (mainHash->capacity >> 2)) {
+			if (newCount < (mainHash->capacity >> 1) + (mainHash->capacity >> 2)) 
+			{
 				auto producer = static_cast<ImplicitProducer*>(recycle_or_create_producer(false));
 				if (producer == nullptr)
 				{
@@ -3473,7 +3399,8 @@ private:
 				Details::ThreadExitNotifier::subscribe(&producer->threadExitListener);
 				
 				auto index = hashedId;
-				while (true) {
+				while (true) 
+				{
 					index &= mainHash->capacity - 1u;
 					auto empty = Details::invalid_thread_id;
 					auto reusable = Details::invalid_thread_id2;
@@ -3504,27 +3431,28 @@ private:
 	void implicit_producer_thread_exited(ImplicitProducer* producer)
 	{
 		// Remove from hash
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODHASH
-		debug::DebugLock lock(implicitProdMutex);
-#endif
 		auto hash = implicitProducerHash.load(std::memory_order_acquire);
 		assert(hash != nullptr);		// The thread exit listener is only registered if we were added to a hash in the first place
 		auto id = Details::thread_id();
 		auto hashedId = Details::hash_thread_id(id);
-		Details::thread_id_t probedKey;
+		Details::thread_id_t probedKey{0};
 		
 		// We need to traverse all the hashes just in case other threads aren't on the current one yet and are
 		// trying to add an entry thinking there's a free slot (because they reused a producer)
-		for (; hash != nullptr; hash = hash->prev) {
+		for (; hash != nullptr; hash = hash->prev) 
+		{
 			auto index = hashedId;
-			do {
+			do
+			{
 				index &= hash->capacity - 1u;
 				probedKey = id;
-				if (hash->entries[index].key.compare_exchange_strong(probedKey, Details::invalid_thread_id2, std::memory_order_seq_cst, std::memory_order_relaxed)) {
+				if (hash->entries[index].key.compare_exchange_strong(probedKey, Details::invalid_thread_id2, std::memory_order_seq_cst, std::memory_order_relaxed))
+				{
 					break;
 				}
 				++index;
-			} while (probedKey != Details::invalid_thread_id);		// Can happen if the hash has changed but we weren't put back in it yet, or if we weren't added to this hash in the first place
+			}
+			while (probedKey != Details::invalid_thread_id);		// Can happen if the hash has changed but we weren't put back in it yet, or if we weren't added to this hash in the first place
 		}
 		
 		// Mark the queue as being recyclable
@@ -3543,37 +3471,33 @@ private:
 	//////////////////////////////////
 
 	template<typename TAlign>
-	static inline void* aligned_malloc(size_t size)
+	static inline typename std::enable_if<(std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value), void*>::type aligned_malloc(size_t size)
 	{
-		POCO_CONSTEXPR_IF (std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value)
+		return (Traits::malloc)(size);
+	}
+	template<typename TAlign>
+	static inline typename std::enable_if<!(std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value), void*>::type aligned_malloc(size_t size)
+	{
+		size_t alignment = std::alignment_of<TAlign>::value;
+		void* raw = (Traits::malloc)(size + alignment - 1 + sizeof(void*));
+		if (!raw)
 		{
-			return (Traits::malloc)(size);
+			return nullptr;
 		}
-		else
-		{
-			size_t alignment = std::alignment_of<TAlign>::value;
-			void* raw = (Traits::malloc)(size + alignment - 1 + sizeof(void*));
-			if (!raw)
-			{
-				return nullptr;
-			}
-			char* ptr = Details::align_for<TAlign>(reinterpret_cast<char*>(raw) + sizeof(void*));
-			*(reinterpret_cast<void**>(ptr) - 1) = raw;
-			return ptr;
-		}
+		char* ptr = Details::align_for<TAlign>(reinterpret_cast<char*>(raw) + sizeof(void*));
+		*(reinterpret_cast<void**>(ptr) - 1) = raw;
+		return ptr;
 	}
 
 	template<typename TAlign>
-	static inline void aligned_free(void* ptr)
+	static inline typename std::enable_if<(std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value), void>::type aligned_free(void* ptr)
 	{
-		POCO_CONSTEXPR_IF (std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value)
-		{
-			return (Traits::free)(ptr);
-		}
-		else
-		{
-			(Traits::free)(ptr ? *(reinterpret_cast<void**>(ptr) - 1) : nullptr);
-		}
+		return (Traits::free)(ptr);
+	}
+	template<typename TAlign>
+	static inline typename std::enable_if<!(std::alignment_of<TAlign>::value <= std::alignment_of<Details::max_align_t>::value), void>::type aligned_free(void* ptr)
+	{
+		(Traits::free)(ptr ? *(reinterpret_cast<void**>(ptr) - 1) : nullptr);
 	}
 
 	template<typename U>
@@ -3633,11 +3557,7 @@ private:
 	Block* initialBlockPool{nullptr};
 	size_t initialBlockPoolSize{0};
 	
-#ifndef MCDBGQ_USEDEBUGFREELIST
 	FreeList<Block> freeList;
-#else
-	debug::DebugFreeList<Block> freeList;
-#endif
 	
 	std::atomic<ImplicitProducerHash*> implicitProducerHash{nullptr};
 	std::atomic<size_t> implicitProducerHashCount{0};		// Number of slots logically used
@@ -3647,15 +3567,6 @@ private:
 	
 	std::atomic<std::uint32_t> nextExplicitConsumerId{0};
 	std::atomic<std::uint32_t> globalExplicitConsumerOffset{0};
-	
-#ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODHASH
-	debug::DebugMutex implicitProdMutex;
-#endif
-	
-#ifdef POCO_QUEUE_INTERNAL_DEBUG
-	std::atomic<ExplicitProducer*> explicitProducers;
-	std::atomic<ImplicitProducer*> implicitProducers;
-#endif
 };
 
 
@@ -3692,23 +3603,23 @@ ConsumerToken::ConsumerToken(BlockingConcurrentQueue<T, Traits>& queue) :
 { }
 
 template<typename T, typename Traits>
-inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) POCO_NOEXCEPT
+inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) noexcept
 {
 	a.swap(b);
 }
 
-inline void swap(ProducerToken& a, ProducerToken& b) POCO_NOEXCEPT
+inline void swap(ProducerToken& a, ProducerToken& b) noexcept
 {
 	a.swap(b);
 }
 
-inline void swap(ConsumerToken& a, ConsumerToken& b) POCO_NOEXCEPT
+inline void swap(ConsumerToken& a, ConsumerToken& b) noexcept
 {
 	a.swap(b);
 }
 
 template<typename T, typename Traits>
-inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) POCO_NOEXCEPT
+inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) noexcept
 {
 	a.swap(b);
 }

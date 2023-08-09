@@ -1,4 +1,17 @@
-// Provides an efficient blocking version of moodycamel::ConcurrentQueue.
+//
+// BlockingConcurrentQueue.h
+//
+// Library: Foundation
+// Package: Core
+// Module:	BlockingConcurrentQueue
+//
+// Copyright Copyright (c) 2013-2020, Cameron Desrochers. All rights reserved.
+// Extracted from https://github.com/cameron314/concurrentqueue lib and adapted for poco: Bychuk Alexander 2023
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+// Provides an efficient blocking version of Poco::ConcurrentQueue.
 // ©2015-2020 Cameron Desrochers. Distributed under the terms of the simplified
 // BSD license, available at the top of concurrentqueue.h.
 // Also dual-licensed under the Boost Software License (see LICENSE.md)
@@ -7,8 +20,8 @@
 
 #pragma once
 
-#include "concurrentqueue.h"
-#include "lightweightsemaphore.h"
+#include "ConcurrentQueue.h"
+#include "Poco/LightWeightSemaphore.h"
 
 #include <type_traits>
 #include <cerrno>
@@ -16,7 +29,7 @@
 #include <chrono>
 #include <ctime>
 
-namespace moodycamel
+namespace Poco
 {
 // This is a blocking version of the queue. It has an almost identical interface to
 // the normal non-blocking version, with the addition of various wait_dequeue() methods
@@ -25,16 +38,16 @@ template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
 class BlockingConcurrentQueue
 {
 private:
-	typedef ::moodycamel::ConcurrentQueue<T, Traits> ConcurrentQueue;
-	typedef ::moodycamel::LightweightSemaphore LightweightSemaphore;
+	using ConcurrentQueue = ::Poco::ConcurrentQueue<T, Traits>;
+	using LightweightSemaphore = ::Poco::LightweightSemaphore;
 
 public:
-	typedef typename ConcurrentQueue::producer_token_t producer_token_t;
-	typedef typename ConcurrentQueue::consumer_token_t consumer_token_t;
+	using producer_token_t = typename ConcurrentQueue::producer_token_t;
+	using consumer_token_t = typename ConcurrentQueue::consumer_token_t;
 	
-	typedef typename ConcurrentQueue::index_t index_t;
-	typedef typename ConcurrentQueue::size_t size_t;
-	typedef typename std::make_signed<size_t>::type ssize_t;
+	using index_t = typename ConcurrentQueue::index_t;
+	using size_t = typename ConcurrentQueue::size_t;
+	using ssize_t = typename std::make_signed<size_t>::type;
 	
 	static const size_t BLOCK_SIZE = ConcurrentQueue::BLOCK_SIZE;
 	static const size_t EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD = ConcurrentQueue::EXPLICIT_BLOCK_EMPTY_COUNTER_THRESHOLD;
@@ -59,23 +72,17 @@ public:
 		: inner(capacity), sema(create<LightweightSemaphore, ssize_t, int>(0, (int)Traits::MAX_SEMA_SPINS), &BlockingConcurrentQueue::template destroy<LightweightSemaphore>)
 	{
 		assert(reinterpret_cast<ConcurrentQueue*>((BlockingConcurrentQueue*)1) == &((BlockingConcurrentQueue*)1)->inner && "BlockingConcurrentQueue must have ConcurrentQueue as its first member");
-		if (!sema) {
-			MOODYCAMEL_THROW(std::bad_alloc());
-		}
 	}
 	
 	BlockingConcurrentQueue(size_t minCapacity, size_t maxExplicitProducers, size_t maxImplicitProducers)
 		: inner(minCapacity, maxExplicitProducers, maxImplicitProducers), sema(create<LightweightSemaphore, ssize_t, int>(0, (int)Traits::MAX_SEMA_SPINS), &BlockingConcurrentQueue::template destroy<LightweightSemaphore>)
 	{
 		assert(reinterpret_cast<ConcurrentQueue*>((BlockingConcurrentQueue*)1) == &((BlockingConcurrentQueue*)1)->inner && "BlockingConcurrentQueue must have ConcurrentQueue as its first member");
-		if (!sema) {
-			MOODYCAMEL_THROW(std::bad_alloc());
-		}
 	}
 	
 	// Disable copying and copy assignment
-	BlockingConcurrentQueue(BlockingConcurrentQueue const&) MOODYCAMEL_DELETE_FUNCTION;
-	BlockingConcurrentQueue& operator=(BlockingConcurrentQueue const&) MOODYCAMEL_DELETE_FUNCTION;
+	BlockingConcurrentQueue(BlockingConcurrentQueue const&) = delete;
+	BlockingConcurrentQueue& operator=(BlockingConcurrentQueue const&) = delete;
 	
 	// Moving is supported, but note that it is *not* a thread-safe operation.
 	// Nobody can use the queue while it's being moved, and the memory effects
@@ -83,11 +90,11 @@ public:
 	// Note: When a queue is moved, its tokens are still valid but can only be
 	// used with the destination queue (i.e. semantically they are moved along
 	// with the queue itself).
-	BlockingConcurrentQueue(BlockingConcurrentQueue&& other) MOODYCAMEL_NOEXCEPT
+	BlockingConcurrentQueue(BlockingConcurrentQueue&& other) noexcept
 		: inner(std::move(other.inner)), sema(std::move(other.sema))
 	{ }
 	
-	inline BlockingConcurrentQueue& operator=(BlockingConcurrentQueue&& other) MOODYCAMEL_NOEXCEPT
+	inline BlockingConcurrentQueue& operator=(BlockingConcurrentQueue&& other) noexcept
 	{
 		return swap_internal(other);
 	}
@@ -97,7 +104,7 @@ public:
 	// the tokens that were created for one queue must be used with
 	// only the swapped queue (i.e. the tokens are tied to the
 	// queue's movable state, not the object itself).
-	inline void swap(BlockingConcurrentQueue& other) MOODYCAMEL_NOEXCEPT
+	inline void swap(BlockingConcurrentQueue& other) noexcept
 	{
 		swap_internal(other);
 	}
@@ -105,7 +112,8 @@ public:
 private:
 	BlockingConcurrentQueue& swap_internal(BlockingConcurrentQueue& other)
 	{
-		if (this == &other) {
+		if (this == &other)
+		{
 			return *this;
 		}
 		
@@ -122,7 +130,8 @@ public:
 	// Thread-safe.
 	inline bool enqueue(T const& item)
 	{
-		if ((details::likely)(inner.enqueue(item))) {
+		if ((Details::likely)(inner.enqueue(item)))
+		{
 			sema->signal();
 			return true;
 		}
@@ -136,7 +145,8 @@ public:
 	// Thread-safe.
 	inline bool enqueue(T&& item)
 	{
-		if ((details::likely)(inner.enqueue(std::move(item)))) {
+		if ((Details::likely)(inner.enqueue(std::move(item))))
+		{
 			sema->signal();
 			return true;
 		}
@@ -149,7 +159,8 @@ public:
 	// Thread-safe.
 	inline bool enqueue(producer_token_t const& token, T const& item)
 	{
-		if ((details::likely)(inner.enqueue(token, item))) {
+		if ((Details::likely)(inner.enqueue(token, item)))
+		{
 			sema->signal();
 			return true;
 		}
@@ -162,7 +173,8 @@ public:
 	// Thread-safe.
 	inline bool enqueue(producer_token_t const& token, T&& item)
 	{
-		if ((details::likely)(inner.enqueue(token, std::move(item)))) {
+		if ((Details::likely)(inner.enqueue(token, std::move(item))))
+		{
 			sema->signal();
 			return true;
 		}
@@ -178,7 +190,8 @@ public:
 	template<typename It>
 	inline bool enqueue_bulk(It itemFirst, size_t count)
 	{
-		if ((details::likely)(inner.enqueue_bulk(std::forward<It>(itemFirst), count))) {
+		if ((Details::likely)(inner.enqueue_bulk(std::forward<It>(itemFirst), count)))
+		{
 			sema->signal((LightweightSemaphore::ssize_t)(ssize_t)count);
 			return true;
 		}
@@ -194,7 +207,8 @@ public:
 	template<typename It>
 	inline bool enqueue_bulk(producer_token_t const& token, It itemFirst, size_t count)
 	{
-		if ((details::likely)(inner.enqueue_bulk(token, std::forward<It>(itemFirst), count))) {
+		if ((Details::likely)(inner.enqueue_bulk(token, std::forward<It>(itemFirst), count)))
+		{
 			sema->signal((LightweightSemaphore::ssize_t)(ssize_t)count);
 			return true;
 		}
@@ -208,7 +222,8 @@ public:
 	// Thread-safe.
 	inline bool try_enqueue(T const& item)
 	{
-		if (inner.try_enqueue(item)) {
+		if (inner.try_enqueue(item))
+		{
 			sema->signal();
 			return true;
 		}
@@ -222,7 +237,8 @@ public:
 	// Thread-safe.
 	inline bool try_enqueue(T&& item)
 	{
-		if (inner.try_enqueue(std::move(item))) {
+		if (inner.try_enqueue(std::move(item)))
+		{
 			sema->signal();
 			return true;
 		}
@@ -234,7 +250,8 @@ public:
 	// Thread-safe.
 	inline bool try_enqueue(producer_token_t const& token, T const& item)
 	{
-		if (inner.try_enqueue(token, item)) {
+		if (inner.try_enqueue(token, item))
+		{
 			sema->signal();
 			return true;
 		}
@@ -246,7 +263,8 @@ public:
 	// Thread-safe.
 	inline bool try_enqueue(producer_token_t const& token, T&& item)
 	{
-		if (inner.try_enqueue(token, std::move(item))) {
+		if (inner.try_enqueue(token, std::move(item)))
+		{
 			sema->signal();
 			return true;
 		}
@@ -263,7 +281,8 @@ public:
 	template<typename It>
 	inline bool try_enqueue_bulk(It itemFirst, size_t count)
 	{
-		if (inner.try_enqueue_bulk(std::forward<It>(itemFirst), count)) {
+		if (inner.try_enqueue_bulk(std::forward<It>(itemFirst), count))
+		{
 			sema->signal((LightweightSemaphore::ssize_t)(ssize_t)count);
 			return true;
 		}
@@ -278,7 +297,8 @@ public:
 	template<typename It>
 	inline bool try_enqueue_bulk(producer_token_t const& token, It itemFirst, size_t count)
 	{
-		if (inner.try_enqueue_bulk(token, std::forward<It>(itemFirst), count)) {
+		if (inner.try_enqueue_bulk(token, std::forward<It>(itemFirst), count))
+		{
 			sema->signal((LightweightSemaphore::ssize_t)(ssize_t)count);
 			return true;
 		}
@@ -293,8 +313,10 @@ public:
 	template<typename U>
 	inline bool try_dequeue(U& item)
 	{
-		if (sema->tryWait()) {
-			while (!inner.try_dequeue(item)) {
+		if (sema->tryWait())
+		{
+			while (!inner.try_dequeue(item))
+			{
 				continue;
 			}
 			return true;
@@ -309,8 +331,10 @@ public:
 	template<typename U>
 	inline bool try_dequeue(consumer_token_t& token, U& item)
 	{
-		if (sema->tryWait()) {
-			while (!inner.try_dequeue(token, item)) {
+		if (sema->tryWait())
+		{
+			while (!inner.try_dequeue(token, item))
+			{
 				continue;
 			}
 			return true;
@@ -328,7 +352,8 @@ public:
 	{
 		size_t count = 0;
 		max = (size_t)sema->tryWaitMany((LightweightSemaphore::ssize_t)(ssize_t)max);
-		while (count != max) {
+		while (count != max)
+		{
 			count += inner.template try_dequeue_bulk<It&>(itemFirst, max - count);
 		}
 		return count;
@@ -344,7 +369,8 @@ public:
 	{
 		size_t count = 0;
 		max = (size_t)sema->tryWaitMany((LightweightSemaphore::ssize_t)(ssize_t)max);
-		while (count != max) {
+		while (count != max)
+		{
 			count += inner.template try_dequeue_bulk<It&>(token, itemFirst, max - count);
 		}
 		return count;
@@ -358,10 +384,12 @@ public:
 	template<typename U>
 	inline void wait_dequeue(U& item)
 	{
-		while (!sema->wait()) {
+		while (!sema->wait())
+		{
 			continue;
 		}
-		while (!inner.try_dequeue(item)) {
+		while (!inner.try_dequeue(item))
+		{
 			continue;
 		}
 	}
@@ -376,10 +404,12 @@ public:
 	template<typename U>
 	inline bool wait_dequeue_timed(U& item, std::int64_t timeout_usecs)
 	{
-		if (!sema->wait(timeout_usecs)) {
+		if (!sema->wait(timeout_usecs))
+		{
 			return false;
 		}
-		while (!inner.try_dequeue(item)) {
+		while (!inner.try_dequeue(item))
+		{
 			continue;
 		}
 		return true;
@@ -401,10 +431,12 @@ public:
 	template<typename U>
 	inline void wait_dequeue(consumer_token_t& token, U& item)
 	{
-		while (!sema->wait()) {
+		while (!sema->wait())
+		{
 			continue;
 		}
-		while (!inner.try_dequeue(token, item)) {
+		while (!inner.try_dequeue(token, item))
+		{
 			continue;
 		}
 	}
@@ -419,10 +451,12 @@ public:
 	template<typename U>
 	inline bool wait_dequeue_timed(consumer_token_t& token, U& item, std::int64_t timeout_usecs)
 	{
-		if (!sema->wait(timeout_usecs)) {
+		if (!sema->wait(timeout_usecs))
+		{
 			return false;
 		}
-		while (!inner.try_dequeue(token, item)) {
+		while (!inner.try_dequeue(token, item))
+		{
 			continue;
 		}
 		return true;
@@ -448,7 +482,8 @@ public:
 	{
 		size_t count = 0;
 		max = (size_t)sema->waitMany((LightweightSemaphore::ssize_t)(ssize_t)max);
-		while (count != max) {
+		while (count != max)
+		{
 			count += inner.template try_dequeue_bulk<It&>(itemFirst, max - count);
 		}
 		return count;
@@ -466,7 +501,8 @@ public:
 	{
 		size_t count = 0;
 		max = (size_t)sema->waitMany((LightweightSemaphore::ssize_t)(ssize_t)max, timeout_usecs);
-		while (count != max) {
+		while (count != max)
+		{
 			count += inner.template try_dequeue_bulk<It&>(itemFirst, max - count);
 		}
 		return count;
@@ -493,7 +529,8 @@ public:
 	{
 		size_t count = 0;
 		max = (size_t)sema->waitMany((LightweightSemaphore::ssize_t)(ssize_t)max);
-		while (count != max) {
+		while (count != max)
+		{
 			count += inner.template try_dequeue_bulk<It&>(token, itemFirst, max - count);
 		}
 		return count;
@@ -511,7 +548,8 @@ public:
 	{
 		size_t count = 0;
 		max = (size_t)sema->waitMany((LightweightSemaphore::ssize_t)(ssize_t)max, timeout_usecs);
-		while (count != max) {
+		while (count != max)
+		{
 			count += inner.template try_dequeue_bulk<It&>(token, itemFirst, max - count);
 		}
 		return count;
@@ -561,7 +599,8 @@ private:
 	template<typename U>
 	static inline void destroy(U* p)
 	{
-		if (p != nullptr) {
+		if (p != nullptr)
+		{
 			p->~U();
 		}
 		(Traits::free)(p);
@@ -569,14 +608,14 @@ private:
 	
 private:
 	ConcurrentQueue inner;
-	std::unique_ptr<LightweightSemaphore, void (*)(LightweightSemaphore*)> sema;
+	std::unique_ptr<LightweightSemaphore> sema;
 };
 
 
 template<typename T, typename Traits>
-inline void swap(BlockingConcurrentQueue<T, Traits>& a, BlockingConcurrentQueue<T, Traits>& b) MOODYCAMEL_NOEXCEPT
+inline void swap(BlockingConcurrentQueue<T, Traits>& a, BlockingConcurrentQueue<T, Traits>& b) noexcept
 {
 	a.swap(b);
 }
 
-}	// end namespace moodycamel
+}	// end namespace Poco

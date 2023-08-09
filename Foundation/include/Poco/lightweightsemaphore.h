@@ -1,3 +1,16 @@
+//
+// LightWeightSemaphore.h
+//
+// Library: Foundation
+// Package: Core
+// Module:	LightWeightSemaphore
+//
+// Copyright Copyright (c) 2013-2020, Cameron Desrochers. All rights reserved.
+// Extracted from https://github.com/cameron314/concurrentqueue lib and adapted for poco: Bychuk Alexander 2023
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
 // Provides an efficient implementation of a semaphore (LightweightSemaphore).
 // This is an extension of Jeff Preshing's sempahore implementation (licensed 
 // under the terms of its separate zlib license) that has been adapted and
@@ -8,38 +21,10 @@
 #include <cstddef> // For std::size_t
 #include <atomic>
 #include <type_traits> // For std::make_signed<T>
+#include <cassert>
+#include "Poco/Semaphore.h"
 
-#if defined(_WIN32)
-// Avoid including windows.h in a header; we only need a handful of
-// items, so we'll redeclare them here (this is relatively safe since
-// the API generally has to remain stable between Windows versions).
-// I know this is an ugly hack but it still beats polluting the global
-// namespace with thousands of generic names or adding a .cpp for nothing.
-extern "C" {
-	struct _SECURITY_ATTRIBUTES;
-	__declspec(dllimport) void* __stdcall CreateSemaphoreW(_SECURITY_ATTRIBUTES* lpSemaphoreAttributes, long lInitialCount, long lMaximumCount, const wchar_t* lpName);
-	__declspec(dllimport) int __stdcall CloseHandle(void* hObject);
-	__declspec(dllimport) unsigned long __stdcall WaitForSingleObject(void* hHandle, unsigned long dwMilliseconds);
-	__declspec(dllimport) int __stdcall ReleaseSemaphore(void* hSemaphore, long lReleaseCount, long* lpPreviousCount);
-}
-#elif defined(__MACH__)
-#include <mach/mach.h>
-#elif defined(__MVS__)
-#include <zos-semaphore.h>
-#elif defined(__unix__)
-#include <semaphore.h>
-
-#if defined(__GLIBC_PREREQ) && defined(_GNU_SOURCE)
-#if __GLIBC_PREREQ(2,30)
-#define MOODYCAMEL_LIGHTWEIGHTSEMAPHORE_MONOTONIC
-#endif
-#endif
-#endif
-
-namespace moodycamel
-{
-namespace details
-{
+namespace Poco {
 
 // Code in the mpmc_sema namespace below is an adaptation of Jeff Preshing's
 // portable + lightweight semaphore implementations, originally from
@@ -62,204 +47,7 @@ namespace details
 // 2. Altered source versions must be plainly marked as such, and must not be
 //	misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
-#if defined(_WIN32)
-class Semaphore
-{
-private:
-	void* m_hSema;
-	
-	Semaphore(const Semaphore& other) MOODYCAMEL_DELETE_FUNCTION;
-	Semaphore& operator=(const Semaphore& other) MOODYCAMEL_DELETE_FUNCTION;
 
-public:
-	Semaphore(int initialCount = 0)
-	{
-		assert(initialCount >= 0);
-		const long maxLong = 0x7fffffff;
-		m_hSema = CreateSemaphoreW(nullptr, initialCount, maxLong, nullptr);
-		assert(m_hSema);
-	}
-
-	~Semaphore()
-	{
-		CloseHandle(m_hSema);
-	}
-
-	bool wait()
-	{
-		const unsigned long infinite = 0xffffffff;
-		return WaitForSingleObject(m_hSema, infinite) == 0;
-	}
-	
-	bool try_wait()
-	{
-		return WaitForSingleObject(m_hSema, 0) == 0;
-	}
-	
-	bool timed_wait(std::uint64_t usecs)
-	{
-		return WaitForSingleObject(m_hSema, (unsigned long)(usecs / 1000)) == 0;
-	}
-
-	void signal(int count = 1)
-	{
-		while (!ReleaseSemaphore(m_hSema, count, nullptr));
-	}
-};
-#elif defined(__MACH__)
-//---------------------------------------------------------
-// Semaphore (Apple iOS and OSX)
-// Can't use POSIX semaphores due to http://lists.apple.com/archives/darwin-kernel/2009/Apr/msg00010.html
-//---------------------------------------------------------
-class Semaphore
-{
-private:
-	semaphore_t m_sema;
-
-	Semaphore(const Semaphore& other) MOODYCAMEL_DELETE_FUNCTION;
-	Semaphore& operator=(const Semaphore& other) MOODYCAMEL_DELETE_FUNCTION;
-
-public:
-	Semaphore(int initialCount = 0)
-	{
-		assert(initialCount >= 0);
-		kern_return_t rc = semaphore_create(mach_task_self(), &m_sema, SYNC_POLICY_FIFO, initialCount);
-		assert(rc == KERN_SUCCESS);
-		(void)rc;
-	}
-
-	~Semaphore()
-	{
-		semaphore_destroy(mach_task_self(), m_sema);
-	}
-
-	bool wait()
-	{
-		return semaphore_wait(m_sema) == KERN_SUCCESS;
-	}
-	
-	bool try_wait()
-	{
-		return timed_wait(0);
-	}
-	
-	bool timed_wait(std::uint64_t timeout_usecs)
-	{
-		mach_timespec_t ts;
-		ts.tv_sec = static_cast<unsigned int>(timeout_usecs / 1000000);
-		ts.tv_nsec = static_cast<int>((timeout_usecs % 1000000) * 1000);
-
-		// added in OSX 10.10: https://developer.apple.com/library/prerelease/mac/documentation/General/Reference/APIDiffsMacOSX10_10SeedDiff/modules/Darwin.html
-		kern_return_t rc = semaphore_timedwait(m_sema, ts);
-		return rc == KERN_SUCCESS;
-	}
-
-	void signal()
-	{
-		while (semaphore_signal(m_sema) != KERN_SUCCESS);
-	}
-
-	void signal(int count)
-	{
-		while (count-- > 0)
-		{
-			while (semaphore_signal(m_sema) != KERN_SUCCESS);
-		}
-	}
-};
-#elif defined(__unix__) || defined(__MVS__)
-//---------------------------------------------------------
-// Semaphore (POSIX, Linux, zOS)
-//---------------------------------------------------------
-class Semaphore
-{
-private:
-	sem_t m_sema;
-
-	Semaphore(const Semaphore& other) MOODYCAMEL_DELETE_FUNCTION;
-	Semaphore& operator=(const Semaphore& other) MOODYCAMEL_DELETE_FUNCTION;
-
-public:
-	Semaphore(int initialCount = 0)
-	{
-		assert(initialCount >= 0);
-		int rc = sem_init(&m_sema, 0, static_cast<unsigned int>(initialCount));
-		assert(rc == 0);
-		(void)rc;
-	}
-
-	~Semaphore()
-	{
-		sem_destroy(&m_sema);
-	}
-
-	bool wait()
-	{
-		// http://stackoverflow.com/questions/2013181/gdb-causes-sem-wait-to-fail-with-eintr-error
-		int rc;
-		do {
-			rc = sem_wait(&m_sema);
-		} while (rc == -1 && errno == EINTR);
-		return rc == 0;
-	}
-
-	bool try_wait()
-	{
-		int rc;
-		do {
-			rc = sem_trywait(&m_sema);
-		} while (rc == -1 && errno == EINTR);
-		return rc == 0;
-	}
-
-	bool timed_wait(std::uint64_t usecs)
-	{
-		struct timespec ts;
-		const int usecs_in_1_sec = 1000000;
-		const int nsecs_in_1_sec = 1000000000;
-#ifdef MOODYCAMEL_LIGHTWEIGHTSEMAPHORE_MONOTONIC
-		clock_gettime(CLOCK_MONOTONIC, &ts);
-#else
-		clock_gettime(CLOCK_REALTIME, &ts);
-#endif
-		ts.tv_sec += (time_t)(usecs / usecs_in_1_sec);
-		ts.tv_nsec += (long)(usecs % usecs_in_1_sec) * 1000;
-		// sem_timedwait bombs if you have more than 1e9 in tv_nsec
-		// so we have to clean things up before passing it in
-		if (ts.tv_nsec >= nsecs_in_1_sec) {
-			ts.tv_nsec -= nsecs_in_1_sec;
-			++ts.tv_sec;
-		}
-
-		int rc;
-		do {
-#ifdef MOODYCAMEL_LIGHTWEIGHTSEMAPHORE_MONOTONIC
-			rc = sem_clockwait(&m_sema, CLOCK_MONOTONIC, &ts);
-#else
-			rc = sem_timedwait(&m_sema, &ts);
-#endif
-		} while (rc == -1 && errno == EINTR);
-		return rc == 0;
-	}
-
-	void signal()
-	{
-		while (sem_post(&m_sema) == -1);
-	}
-
-	void signal(int count)
-	{
-		while (count-- > 0)
-		{
-			while (sem_post(&m_sema) == -1);
-		}
-	}
-};
-#else
-#error Unsupported platform! (No semaphore wrapper available)
-#endif
-
-}	// end namespace details
 
 
 //---------------------------------------------------------
@@ -268,16 +56,16 @@ public:
 class LightweightSemaphore
 {
 public:
-	typedef std::make_signed<std::size_t>::type ssize_t;
+	using ssize_t = std::make_signed<std::size_t>::type;
 
 private:
 	std::atomic<ssize_t> m_count;
-	details::Semaphore m_sema;
+	Poco::Semaphore m_sema;
 	int m_maxSpins;
 
-	bool waitWithPartialSpinning(std::int64_t timeout_usecs = -1)
+	bool waitWithPartialSpinning(std::int64_t timeout_millisecs = -1)
 	{
-		ssize_t oldCount;
+		ssize_t oldCount = 0;
 		int spin = m_maxSpins;
 		while (--spin >= 0)
 		{
@@ -289,13 +77,25 @@ private:
 		oldCount = m_count.fetch_sub(1, std::memory_order_acquire);
 		if (oldCount > 0)
 			return true;
-		if (timeout_usecs < 0)
+		if (timeout_millisecs < 0)
 		{
-			if (m_sema.wait())
+			
+			try
+			{
+				m_sema.wait();
 				return true;
+			}
+			catch(Poco::SystemException &) {}
 		}
-		if (timeout_usecs > 0 && m_sema.timed_wait((std::uint64_t)timeout_usecs))
-			return true;
+		if (timeout_millisecs > 0)
+		{
+			try
+			{
+				m_sema.wait(timeout_millisecs);
+				return true;
+			}
+			catch(Poco::SystemException &) {}
+		}
 		// At this point, we've timed out waiting for the semaphore, but the
 		// count is still decremented indicating we may still be waiting on
 		// it. So we have to re-adjust the count, but only if the semaphore
@@ -304,17 +104,17 @@ private:
 		while (true)
 		{
 			oldCount = m_count.load(std::memory_order_acquire);
-			if (oldCount >= 0 && m_sema.try_wait())
+			if (oldCount >= 0 && m_sema.tryWait(timeout_millisecs))
 				return true;
 			if (oldCount < 0 && m_count.compare_exchange_strong(oldCount, oldCount + 1, std::memory_order_relaxed, std::memory_order_relaxed))
 				return false;
 		}
 	}
 
-	ssize_t waitManyWithPartialSpinning(ssize_t max, std::int64_t timeout_usecs = -1)
+	ssize_t waitManyWithPartialSpinning(ssize_t max, std::int64_t timeout_millisecs = -1)
 	{
 		assert(max > 0);
-		ssize_t oldCount;
+		ssize_t oldCount = 0;
 		int spin = m_maxSpins;
 		while (--spin >= 0)
 		{
@@ -330,15 +130,45 @@ private:
 		oldCount = m_count.fetch_sub(1, std::memory_order_acquire);
 		if (oldCount <= 0)
 		{
-			if ((timeout_usecs == 0) || (timeout_usecs < 0 && !m_sema.wait()) || (timeout_usecs > 0 && !m_sema.timed_wait((std::uint64_t)timeout_usecs)))
-			{
+			auto calculateOldClount = [&timeout_millisecs, this]() -> ssize_t {
+				ssize_t oldCount = 0;
 				while (true)
 				{
 					oldCount = m_count.load(std::memory_order_acquire);
-					if (oldCount >= 0 && m_sema.try_wait())
+					if (oldCount >= 0 && m_sema.tryWait(timeout_millisecs))
 						break;
 					if (oldCount < 0 && m_count.compare_exchange_strong(oldCount, oldCount + 1, std::memory_order_relaxed, std::memory_order_relaxed))
 						return 0;
+				}
+				return oldCount;
+			};
+			if (timeout_millisecs == 0)
+			{
+				oldCount = calculateOldClount();
+				if (oldCount == 0) return oldCount;
+			}
+			else if (timeout_millisecs < 0)
+			{
+				try
+				{
+					m_sema.wait();
+				}
+				catch (Poco::SystemException &)
+				{
+					oldCount = calculateOldClount();
+					if (oldCount == 0) return oldCount;
+				}
+				
+			}
+			else if (timeout_millisecs > 0)
+			{
+				try
+				{
+					m_sema.wait(timeout_millisecs);
+				}
+				catch (...) {
+					oldCount = calculateOldClount();
+					if (oldCount == 0) return oldCount;
 				}
 			}
 		}
@@ -348,7 +178,7 @@ private:
 	}
 
 public:
-	LightweightSemaphore(ssize_t initialCount = 0, int maxSpins = 10000) : m_count(initialCount), m_maxSpins(maxSpins)
+	LightweightSemaphore(ssize_t initialCount = 0, int maxSpins = 10000) : m_count(initialCount), m_sema(initialCount), m_maxSpins(maxSpins)
 	{
 		assert(initialCount >= 0);
 		assert(maxSpins >= 0);
@@ -413,7 +243,21 @@ public:
 		ssize_t toRelease = -oldCount < count ? -oldCount : count;
 		if (toRelease > 0)
 		{
-			m_sema.signal((int)toRelease);
+			while (count-- > 0)
+			{
+				bool setOk = false;
+				do {
+					try
+					{
+						m_sema.set();
+						setOk = true;
+					}
+					catch(Poco::SystemException &ex)
+					{ }
+				}
+				while(!setOk);
+				
+			}
 		}
 	}
 	
@@ -424,4 +268,4 @@ public:
 	}
 };
 
-}   // end namespace moodycamel
+}   // end namespace Poco
