@@ -458,7 +458,7 @@ ActiveThread* ActiveThreadPool::getThread()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	if (++_age == 32)
+	if (++_age == 128)
 		housekeep();
 	
 

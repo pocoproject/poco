@@ -50,6 +50,11 @@ public:
 	{
 	}
 
+	DefaultStrategy(DefaultStrategy&& s):
+		_delegates(std::move(s._delegates))
+	{
+	}
+
 	~DefaultStrategy()
 	{
 	}
@@ -144,6 +149,11 @@ public:
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
+	{
+	}
+
+	DefaultStrategy(DefaultStrategy&& s):
+		_delegates(std::move(s._delegates))
 	{
 	}
 
