@@ -80,7 +80,6 @@ void FIFOEventTest::testNoDelegate()
 	ConstComplex -= delegate(this, &FIFOEventTest::onConstComplex);
 	ConstComplex.notify(this, pCArgs);
 	assertTrue (_count == 0);
-
 	Const2Complex += delegate(this, &FIFOEventTest::onConst2Complex);
 	Const2Complex -= delegate(this, &FIFOEventTest::onConst2Complex);
 	Const2Complex.notify(this, pArgs);

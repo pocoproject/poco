@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/Environment.h"
 #include <vector>
 
 
@@ -47,8 +48,8 @@ class Foundation_API ActiveThreadPool
 	/// from the pool.
 {
 public:
-	ActiveThreadPool(int minCapacity = 2,
-		int maxCapacity = 16,
+    ActiveThreadPool(int minCapacity = 2,
+        int maxCapacity = static_cast<int>(Environment::processorCount()) + 1,
 		int idleTime = 60,
 		int stackSize = POCO_THREAD_STACK_SIZE);
 		/// Creates a thread pool with minCapacity threads.
@@ -59,8 +60,8 @@ public:
 		/// is killed. Threads are created with given stack size.
 
 	ActiveThreadPool(std::string  name,
-		int minCapacity = 2,
-		int maxCapacity = 16,
+        int minCapacity = 2,
+        int maxCapacity = static_cast<int>(Environment::processorCount()) + 1,
 		int idleTime = 60,
 		int stackSize = POCO_THREAD_STACK_SIZE);
 		/// Creates a thread pool with the given name and minCapacity threads.
@@ -74,28 +75,11 @@ public:
 		/// Currently running threads will remain active
 		/// until they complete.
 
-	void addCapacity(int n);
-		/// Increases (or decreases, if n is negative)
-		/// the maximum number of threads.
-
 	int capacity() const;
 		/// Returns the maximum capacity of threads.
 
-	void setStackSize(int stackSize);
-		/// Sets the stack size for threads.
-		/// New stack size applies only for newly created threads.
-
 	int getStackSize() const;
 		/// Returns the stack size used to create new threads.
-
-	int used() const;
-		/// Returns the number of currently used threads.
-
-	int allocated() const;
-		/// Returns the number of currently allocated threads.
-
-	int available() const;
-		/// Returns the number available threads.
 
 	void start(Runnable& target);
 		/// Obtains a thread and starts the target.
@@ -140,14 +124,6 @@ public:
 		/// thread, but rather wait for the thread's runnables
 		/// to finish.
 
-	void collect();
-		/// Stops and removes no longer used threads from the
-		/// thread pool. Can be called at various times in an
-		/// application's life time to help the thread pool
-		/// manage its threads. Calling this method is optional,
-		/// as the thread pool is also implicitly managed in
-		/// calls to start(), addCapacity() and joinAll().
-
 	const std::string& name() const;
 		/// Returns the name of the thread pool,
 		/// or an empty string if no name has been
@@ -172,23 +148,12 @@ private:
 	std::string _name;
 	int _minCapacity;
 	int _maxCapacity;
-	int _idleTime;
 	int _serial;
-	int _age;
 	int _stackSize;
 	ThreadVec _threads;
 	mutable FastMutex _mutex;
-	size_t _lastThreadIndex;
+	std::atomic<size_t> _lastThreadIndex{0};
 };
-
-
-//
-// inlines
-//
-inline void ActiveThreadPool::setStackSize(int stackSize)
-{
-	_stackSize = stackSize;
-}
 
 
 inline int ActiveThreadPool::getStackSize() const

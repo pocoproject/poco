@@ -22,10 +22,6 @@
 #include <sstream>
 #include <ctime>
 #include <utility>
-#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
-#include "wce_time.h"
-#endif
-
 
 namespace Poco {
 
@@ -81,19 +77,14 @@ public:
 	ActiveThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
 	~ActiveThread() override = default;
 
-	void start();
+    void start();
 	void start(Thread::Priority priority, Runnable& target);
 	void start(Thread::Priority priority, Runnable& target, const std::string& name);
-	bool idle();
-	int idleTime();
 	void join();
-	void activate();
 	void release();
 	void run() override;
 
 private:
-	volatile std::atomic<bool> _idle{};
-	volatile std::time_t _idleTime{};
 	NotificationQueue    _pTargetQueue;
 	std::string          _name;
 	Thread               _thread;
@@ -104,24 +95,18 @@ private:
 
 
 ActiveThread::ActiveThread(const std::string& name, int stackSize):
-	_idle(true),
 	_name(name),
 	_thread(name),
 	_targetCompleted(false)
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
-#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
-	_idleTime = wceex_time(nullptr);
-#else
-	_idleTime = std::time(nullptr);
-#endif
 }
 
 void ActiveThread::start()
 {
-	_thread.start(*this);
-	_started.wait();
+    _thread.start(*this);
+    _started.wait();
 }
 
 
@@ -138,37 +123,11 @@ void ActiveThread::start(Thread::Priority priority, Runnable& target, const std:
 	_pTargetQueue.enqueueNotification(notification);
 }
 
-
-inline bool ActiveThread::idle()
-{
-	return _idle;
-}
-
-
-int ActiveThread::idleTime()
-{
-	FastMutex::ScopedLock lock(_mutex);
-
-#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
-	return (int) (wceex_time(nullptr) - _idleTime);
-#else
-	return (int) (time(nullptr) - _idleTime);
-#endif
-}
-
-
 void ActiveThread::join()
 {
 	_pTargetQueue.wakeUpAll();
 	if (!_pTargetQueue.empty())
 		_targetCompleted.wait();
-}
-
-
-void ActiveThread::activate()
-{
-	_idle = true;
-	_targetCompleted.reset();
 }
 
 
@@ -199,9 +158,6 @@ void ActiveThread::run()
 	auto *_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification());
 	while (_pTarget)
 	{
-
-		_idle = false;
-
 		Runnable* pTarget = &_pTarget->runnable();
 		_thread.setPriority(_pTarget->priotity());
 		_thread.setName(_pTarget->name());
@@ -225,21 +181,6 @@ void ActiveThread::run()
 		_thread.setName(_name);
 		_thread.setPriority(Thread::PRIO_NORMAL);
 		ThreadLocalStorage::clear();
-		_idle = true;
-		_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.dequeueNotification());
-		if (_pTarget != nullptr)
-		{
-			continue;
-		}
-		else
-		{
-			FastMutex::ScopedLock lock(_mutex);
-#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
-			_idleTime = wceex_time(nullptr);
-#else
-			_idleTime = time(nullptr);
-#endif
-		}
 		_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification());
 	}
 	_targetCompleted.set();
@@ -252,15 +193,15 @@ ActiveThreadPool::ActiveThreadPool(int minCapacity,
 	int stackSize):
 	_minCapacity(minCapacity),
 	_maxCapacity(maxCapacity),
-	_idleTime(idleTime),
 	_serial(0),
-	_age(0),
 	_stackSize(stackSize),
 	_lastThreadIndex(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
-	for (int i = 0; i < _minCapacity; i++)
+	_threads.reserve(_maxCapacity);
+
+	for (int i = 0; i < _maxCapacity; i++)
 	{
 		ActiveThread* pThread = createThread();
 		_threads.push_back(pThread);
@@ -277,15 +218,15 @@ ActiveThreadPool::ActiveThreadPool(std::string  name,
 	_name(std::move(name)),
 	_minCapacity(minCapacity),
 	_maxCapacity(maxCapacity),
-	_idleTime(idleTime),
 	_serial(0),
-	_age(0),
 	_stackSize(stackSize),
 	_lastThreadIndex(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
-	for (int i = 0; i < _minCapacity; i++)
+	_threads.reserve(_maxCapacity);
+
+	for (int i = 0; i < _maxCapacity; i++)
 	{
 		ActiveThread* pThread = createThread();
 		_threads.push_back(pThread);
@@ -307,54 +248,9 @@ ActiveThreadPool::~ActiveThreadPool()
 }
 
 
-void ActiveThreadPool::addCapacity(int n)
-{
-	FastMutex::ScopedLock lock(_mutex);
-
-	poco_assert (_maxCapacity + n >= _minCapacity);
-	_maxCapacity += n;
-	housekeep();
-}
-
-
 int ActiveThreadPool::capacity() const
 {
-	FastMutex::ScopedLock lock(_mutex);
 	return _maxCapacity;
-}
-
-
-int ActiveThreadPool::available() const
-{
-	FastMutex::ScopedLock lock(_mutex);
-
-	int count = 0;
-	for (auto pThread: _threads)
-	{
-		if (pThread->idle()) ++count;
-	}
-	return (int) (count + _maxCapacity - _threads.size());
-}
-
-
-int ActiveThreadPool::used() const
-{
-	FastMutex::ScopedLock lock(_mutex);
-
-	int count = 0;
-	for (auto pThread: _threads)
-	{
-		if (!pThread->idle()) ++count;
-	}
-	return count;
-}
-
-
-int ActiveThreadPool::allocated() const
-{
-	FastMutex::ScopedLock lock(_mutex);
-
-	return int(_threads.size());
 }
 
 
@@ -402,102 +298,13 @@ void ActiveThreadPool::joinAll()
 	{
 		pThread->join();
 	}
-	housekeep();
 }
-
-
-void ActiveThreadPool::collect()
-{
-	FastMutex::ScopedLock lock(_mutex);
-	housekeep();
-}
-
-
-void ActiveThreadPool::housekeep()
-{
-	_age = 0;
-	if (_threads.size() <= _minCapacity)
-		return;
-
-	ThreadVec idleThreads;
-	ThreadVec expiredThreads;
-	ThreadVec activeThreads;
-	idleThreads.reserve(_threads.size());
-	activeThreads.reserve(_threads.size());
-
-	for (auto pThread: _threads)
-	{
-		if (pThread->idle())
-		{
-			if (pThread->idleTime() < _idleTime)
-				idleThreads.push_back(pThread);
-			else
-				expiredThreads.push_back(pThread);
-		}
-		else activeThreads.push_back(pThread);
-	}
-	int n = (int) activeThreads.size();
-	int limit = (int) idleThreads.size() + n;
-	if (limit < _minCapacity) limit = _minCapacity;
-	idleThreads.insert(idleThreads.end(), expiredThreads.begin(), expiredThreads.end());
-	_threads.clear();
-	for (auto pIdle: idleThreads)
-	{
-		if (n < limit)
-		{
-			_threads.push_back(pIdle);
-			++n;
-		}
-		else pIdle->release();
-	}
-	_threads.insert(_threads.end(), activeThreads.begin(), activeThreads.end());
-}
-
 
 ActiveThread* ActiveThreadPool::getThread()
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	if (++_age == 128)
-		housekeep();
-	
-
-	ActiveThread* pThread = nullptr;
-	auto thrCount = _threads.size();
 	auto thrSize = _threads.size();
-	while (thrCount-- > 0)
-	{
-		auto i = (thrCount + _lastThreadIndex) % thrSize;
-		if (_threads[i]->idle())
-		{
-			pThread = _threads[i];
-			break;
-		}
-	}
-	_lastThreadIndex = (_lastThreadIndex + 1) % _maxCapacity;
-	if (!pThread)
-	{
-		if (_threads.size() < _maxCapacity)
-		{
-			pThread = createThread();
-			try
-			{
-				pThread->start();
-				_threads.push_back(pThread);
-			}
-			catch (...)
-			{
-				delete pThread;
-				throw;
-			}
-		}
-		else
-		{
-			auto i = (thrCount + _lastThreadIndex) % thrSize;
-			pThread = _threads[i];
-		}
-	}
-	pThread->activate();
+	auto i = (_lastThreadIndex++) % thrSize;
+	ActiveThread* pThread = _threads[i];
 	return pThread;
 }
 
@@ -524,9 +331,7 @@ public:
 
 		if (!_pPool)
 		{
-			_pPool = new ActiveThreadPool("default-active");
-			if (POCO_THREAD_STACK_SIZE > 0)
-				_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
+            _pPool = new ActiveThreadPool("default-active");
 		}
 		return _pPool;
 	}
