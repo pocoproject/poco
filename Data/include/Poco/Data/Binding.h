@@ -98,8 +98,7 @@ public:
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
-		poco_assert_dbg (!pBinder.isNull());
-		pBinder->reset();
+		if (pBinder) pBinder->reset();
 	}
 
 private:
@@ -168,12 +167,10 @@ public:
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
-		poco_assert_dbg (!pBinder.isNull());
-		pBinder->reset();
+		if (pBinder) pBinder->reset();
 	}
 
 private:
-	//typedef typename TypeWrapper<T>::TYPE ValueType;
 	ValPtr _pVal;
 	bool   _bound;
 };
@@ -230,8 +227,7 @@ public:
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
-		poco_assert_dbg (!pBinder.isNull());
-		pBinder->reset();
+		if (pBinder) pBinder->reset();
 	}
 
 private:
@@ -292,8 +288,7 @@ public:
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
-		poco_assert_dbg (!pBinder.isNull());
-		pBinder->reset();
+		if (pBinder) pBinder->reset();
 	}
 
 private:
