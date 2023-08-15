@@ -32,6 +32,7 @@ public:
 	SQLiteTest(const std::string& name);
 	~SQLiteTest();
 
+	void testBind();
 	void testBinding();
 	void testZeroRows();
 	void testSimpleAccess();

@@ -254,6 +254,26 @@ SQLiteTest::~SQLiteTest()
 }
 
 
+void SQLiteTest::testBind()
+{
+	int f1 = -1;
+	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS test", now;
+	session << "CREATE TABLE test (f1 INTEGER)", now;
+
+	Statement statement(session);
+	statement << "INSERT INTO test(f1) VALUES(?)";
+	statement.addBind(Poco::Data::Keywords::bind(1, "f1"));
+	statement.execute();
+	session << "SELECT f1 FROM test", into(f1), now;
+	assertTrue (f1 == 1);
+	statement.removeBind("f1");
+	statement.addBind(Poco::Data::Keywords::bind(2, "f1"));
+	statement.execute();
+	assertTrue (f1 == 2);
+}
+
+
 void SQLiteTest::testBinding()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
