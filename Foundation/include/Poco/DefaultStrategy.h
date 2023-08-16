@@ -50,10 +50,6 @@ public:
 	{
 	}
 
-	DefaultStrategy(DefaultStrategy&& s):
-		_delegates(std::move(s._delegates))
-	{
-	}
 
 	~DefaultStrategy()
 	{

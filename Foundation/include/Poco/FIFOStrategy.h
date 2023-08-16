@@ -40,11 +40,6 @@ public:
 		DefaultStrategy<TArgs, TDelegate>(s)
 	{
 	}
-	
-	FIFOStrategy(FIFOStrategy&& s):
-		DefaultStrategy<TArgs, TDelegate>(std::move(s))
-	{
-	}
 
 	~FIFOStrategy()
 	{
