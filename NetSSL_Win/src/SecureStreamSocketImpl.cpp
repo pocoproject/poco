@@ -32,7 +32,6 @@ SecureStreamSocketImpl::SecureStreamSocketImpl(StreamSocketImpl* pStreamSocket, 
 	_impl(pStreamSocket, pContext),
 	_lazyHandshake(false)
 {
-	pStreamSocket->duplicate();
 	reset(_impl.sockfd());
 }
 
