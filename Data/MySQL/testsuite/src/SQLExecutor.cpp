@@ -1371,7 +1371,7 @@ void SQLExecutor::timestamp()
 	std::string firstName("Simpson");
 	std::string address("Springfield");
 	DateTime birthday(1980, 4, 1, 5, 45, 12, 354, 879);
-	
+
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1380,14 +1380,14 @@ void SQLExecutor::timestamp()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (count == 1);
-	
+
 	DateTime bd;
 	assertTrue (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (bd == birthday);
-	
+
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
 
@@ -1811,10 +1811,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	std::string result;
 
 	bool autoCommit = _pSession->getFeature("autoCommit");
-
 	_pSession->setFeature("autoCommit", true);
-	assertTrue (!_pSession->isTransaction());
-	_pSession->setFeature("autoCommit", false);
 	assertTrue (!_pSession->isTransaction());
 
 	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_UNCOMMITTED);
@@ -1824,6 +1821,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_COMMITTED);
 
 	_pSession->begin();
+	assertTrue (_pSession->getFeature("autoCommit")); // did not change
 	assertTrue (_pSession->isTransaction());
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1840,6 +1838,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	assertTrue (_pSession->isTransaction());
 	_pSession->rollback();
 	assertTrue (!_pSession->isTransaction());
+	assertTrue (_pSession->getFeature("autoCommit")); // did not change
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
 	assertTrue (0 == locCount);
@@ -1861,6 +1860,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 
 	_pSession->commit();
 	assertTrue (!_pSession->isTransaction());
+	assertTrue (_pSession->getFeature("autoCommit")); // did not change
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
 	assertTrue (2 == locCount);
@@ -1906,10 +1906,8 @@ void SQLExecutor::transaction(const std::string& connect)
 	std::string result;
 
 	bool autoCommit = _pSession->getFeature("autoCommit");
-
-	_pSession->setFeature("autoCommit", true);
-	assertTrue (!_pSession->isTransaction());
-	_pSession->setFeature("autoCommit", false);
+	if (!autoCommit)
+		_pSession->setFeature("autoCommit", true);
 	assertTrue (!_pSession->isTransaction());
 	_pSession->setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
 
@@ -1917,7 +1915,7 @@ void SQLExecutor::transaction(const std::string& connect)
 		Transaction trans((*_pSession));
 		assertTrue (trans.isActive());
 		assertTrue (_pSession->isTransaction());
-
+		assertTrue (_pSession->getFeature("autoCommit"));
 		try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -1933,13 +1931,14 @@ void SQLExecutor::transaction(const std::string& connect)
 		assertTrue (trans.isActive());
 	}
 	assertTrue (!_pSession->isTransaction());
+	assertTrue (autoCommit == _pSession->getFeature("autoCommit"));
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (0 == count);
 	assertTrue (!_pSession->isTransaction());
-
+	assertTrue (_pSession->getFeature("autoCommit"));
 	{
 		Transaction trans((*_pSession));
 		try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }

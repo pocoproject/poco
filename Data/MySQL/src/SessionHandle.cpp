@@ -153,17 +153,8 @@ void SessionHandle::close()
 
 void SessionHandle::startTransaction()
 {
-	int rc = mysql_autocommit(_pHandle, false);
-	if (rc != 0)
-	{
-		// retry if connection lost
-		int err = mysql_errno(_pHandle);
-		if (err == 2006 /* CR_SERVER_GONE_ERROR */ || err == 2013 /* CR_SERVER_LOST */)
-		{
-			rc = mysql_autocommit(_pHandle, false);
-		}
-	}
-	if (rc != 0) throw TransactionException("Start transaction failed.", _pHandle);
+	if (mysql_query(_pHandle, "START TRANSACTION") != 0)
+		throw TransactionException("Start transaction failed.", _pHandle);
 }
 
 
