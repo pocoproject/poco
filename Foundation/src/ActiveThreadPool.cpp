@@ -28,8 +28,10 @@ namespace Poco {
 class NewActionNotification: public Notification
 {
 public:
-	NewActionNotification(Thread::Priority priority, Runnable &runnable, std::string name)
-	: _priority(priority), _runnable(runnable), _name(std::move(name))
+	NewActionNotification(Thread::Priority priority, Runnable &runnable, std::string name) :
+	_priority(priority),
+	_runnable(runnable),
+	_name(std::move(name))
 	{ }
 
 	~NewActionNotification() override = default;
@@ -77,7 +79,7 @@ public:
 	ActiveThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
 	~ActiveThread() override = default;
 
-    void start();
+	void start();
 	void start(Thread::Priority priority, Runnable& target);
 	void start(Thread::Priority priority, Runnable& target, const std::string& name);
 	void join();
@@ -105,8 +107,8 @@ ActiveThread::ActiveThread(const std::string& name, int stackSize):
 
 void ActiveThread::start()
 {
-    _thread.start(*this);
-    _started.wait();
+	_thread.start(*this);
+	_started.wait();
 }
 
 
@@ -187,21 +189,17 @@ void ActiveThread::run()
 }
 
 
-ActiveThreadPool::ActiveThreadPool(int minCapacity,
-	int maxCapacity,
-	int idleTime,
-	int stackSize):
-	_minCapacity(minCapacity),
-	_maxCapacity(maxCapacity),
+ActiveThreadPool::ActiveThreadPool(int capacity, int stackSize):
+	_capacity(capacity),
 	_serial(0),
 	_stackSize(stackSize),
 	_lastThreadIndex(0)
 {
-	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
+	poco_assert (_capacity >= 1);
 
-	_threads.reserve(_maxCapacity);
+	_threads.reserve(_capacity);
 
-	for (int i = 0; i < _maxCapacity; i++)
+	for (int i = 0; i < _capacity; i++)
 	{
 		ActiveThread* pThread = createThread();
 		_threads.push_back(pThread);
@@ -210,23 +208,18 @@ ActiveThreadPool::ActiveThreadPool(int minCapacity,
 }
 
 
-ActiveThreadPool::ActiveThreadPool(std::string  name,
-	int minCapacity,
-	int maxCapacity,
-	int idleTime,
-	int stackSize):
+ActiveThreadPool::ActiveThreadPool(std::string  name, int capacity, int stackSize):
 	_name(std::move(name)),
-	_minCapacity(minCapacity),
-	_maxCapacity(maxCapacity),
+	_capacity(capacity),
 	_serial(0),
 	_stackSize(stackSize),
 	_lastThreadIndex(0)
 {
-	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
+	poco_assert (_capacity >= 1);
 
-	_threads.reserve(_maxCapacity);
+	_threads.reserve(_capacity);
 
-	for (int i = 0; i < _maxCapacity; i++)
+	for (int i = 0; i < _capacity; i++)
 	{
 		ActiveThread* pThread = createThread();
 		_threads.push_back(pThread);
@@ -250,7 +243,7 @@ ActiveThreadPool::~ActiveThreadPool()
 
 int ActiveThreadPool::capacity() const
 {
-	return _maxCapacity;
+	return _capacity;
 }
 
 
@@ -331,7 +324,7 @@ public:
 
 		if (!_pPool)
 		{
-            _pPool = new ActiveThreadPool("default-active");
+			_pPool = new ActiveThreadPool("default-active");
 		}
 		return _pPool;
 	}

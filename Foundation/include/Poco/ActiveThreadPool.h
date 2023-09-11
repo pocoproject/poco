@@ -48,35 +48,23 @@ class Foundation_API ActiveThreadPool
 	/// from the pool.
 {
 public:
-    ActiveThreadPool(int minCapacity = 2,
-        int maxCapacity = static_cast<int>(Environment::processorCount()) + 1,
-		int idleTime = 60,
+	ActiveThreadPool(int capacity = static_cast<int>(Environment::processorCount()) + 1,
 		int stackSize = POCO_THREAD_STACK_SIZE);
-		/// Creates a thread pool with minCapacity threads.
-		/// If required, up to maxCapacity threads are created
-		/// a NoThreadAvailableException exception is thrown.
-		/// If a thread is running idle for more than idleTime seconds,
-		/// and more than minCapacity threads are running, the thread
-		/// is killed. Threads are created with given stack size.
+		/// Creates a thread pool with fixed capacity threads.
+		/// Threads are created with given stack size.
 
 	ActiveThreadPool(std::string  name,
-        int minCapacity = 2,
-        int maxCapacity = static_cast<int>(Environment::processorCount()) + 1,
-		int idleTime = 60,
+		int maxCapacity = static_cast<int>(Environment::processorCount()) + 1,
 		int stackSize = POCO_THREAD_STACK_SIZE);
-		/// Creates a thread pool with the given name and minCapacity threads.
-		/// If required, up to maxCapacity threads are created
-		/// a NoThreadAvailableException exception is thrown.
-		/// If a thread is running idle for more than idleTime seconds,
-		/// and more than minCapacity threads are running, the thread
-		/// is killed. Threads are created with given stack size.
+		/// Creates a thread pool with the given name and fixed capacity threads.
+		/// Threads are created with given stack size.
 
 	~ActiveThreadPool();
 		/// Currently running threads will remain active
 		/// until they complete.
 
 	int capacity() const;
-		/// Returns the maximum capacity of threads.
+		/// Returns the capacity of threads.
 
 	int getStackSize() const;
 		/// Returns the stack size used to create new threads.
@@ -137,8 +125,6 @@ protected:
 	ActiveThread* getThread();
 	ActiveThread* createThread();
 
-	void housekeep();
-
 private:
 	ActiveThreadPool(const ActiveThreadPool& pool);
 	ActiveThreadPool& operator = (const ActiveThreadPool& pool);
@@ -146,8 +132,7 @@ private:
 	typedef std::vector<ActiveThread*> ThreadVec;
 
 	std::string _name;
-	int _minCapacity;
-	int _maxCapacity;
+	int _capacity;
 	int _serial;
 	int _stackSize;
 	ThreadVec _threads;

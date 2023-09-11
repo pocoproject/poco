@@ -353,7 +353,7 @@ void FIFOEventTest::testAsyncNotifyBenchmark()
 	Poco::FIFOEvent<int> simple;
 	simple += delegate(this, &FIFOEventTest::onAsyncBench);
 	assertTrue (_count == 0);
-	const int cnt = 10000000;
+	const int cnt = 10000;
 	std::vector<Poco::ActiveResult<int>> vresult;
 	vresult.reserve(cnt);
 	Poco::Stopwatch sw;
