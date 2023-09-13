@@ -765,6 +765,20 @@ void PostgreSQLTest::testReconnect()
 }
 
 
+void PostgreSQLTest::testSqlState()
+{
+        if (!_pSession) fail ("Test not available.");
+
+        try
+        {
+	    *_pSession << "syntax error", now;
+        }
+	catch (const Poco::Data::PostgreSQL::PostgreSQLException & Except)
+	{
+        	assertTrue(Except.SqlState() == std::string("42601"));    
+        }
+}
+
 void PostgreSQLTest::testNullableInt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1271,6 +1285,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableInt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableString);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTupleWithNullable);
+        CppUnit_addTest(pSuite, PostgreSQLTest, testSqlState);
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccess);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexType);

@@ -27,8 +27,8 @@ class PostgreSQLTest: public CppUnit::TestCase
 	///
 	/// Driver			|	DB						| OS
 	/// ----------------+---------------------------+------------------------------------------
-	/// 03.51.12.00		| PostgreSQL 9.3.1.0(18)   	| Mac OSX  10.9.1
-	///
+	/// 03.51.12.00		        | PostgreSQL 9.3.1.0(18)   	                        | Mac OSX  10.9.1
+	///                             | PostgreSQL 15.3          	                        | Ubuntu 16.04
 
 {
 public:
@@ -112,6 +112,8 @@ public:
 	void testTransaction();
 
 	void testReconnect();
+
+        void testSqlState();
 
 	void setUp();
 	void tearDown();
