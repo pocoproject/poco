@@ -113,7 +113,7 @@ public:
 
 	void testReconnect();
 
-        void testSqlState();
+	void testSqlState();
 
 	void setUp();
 	void tearDown();

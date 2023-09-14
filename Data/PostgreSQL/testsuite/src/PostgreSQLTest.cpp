@@ -767,16 +767,16 @@ void PostgreSQLTest::testReconnect()
 
 void PostgreSQLTest::testSqlState()
 {
-        if (!_pSession) fail ("Test not available.");
+	if (!_pSession) fail ("Test not available.");
 
-        try
-        {
-	    *_pSession << "syntax error", now;
-        }
-	catch (const Poco::Data::PostgreSQL::PostgreSQLException & Except)
+	try
 	{
-        	assertTrue(Except.SqlState() == std::string("42601"));    
-        }
+		*_pSession << "syntax error", now;
+	}
+	catch (const Poco::Data::PostgreSQL::PostgreSQLException & exception)
+	{
+		assertTrue(exception.sqlState() == std::string("42601"));    
+	}
 }
 
 void PostgreSQLTest::testNullableInt()

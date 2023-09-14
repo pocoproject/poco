@@ -69,12 +69,12 @@ public:
 		/// copy of an exception (see clone()), then
 		/// throwing it again.
 
-        const char* SqlState() const noexcept;
-                /// Returns the SqlState
+	const char* sqlState() const noexcept;
+		/// Returns the SqlState
 
 
 private:
-	char _SqlState[6];
+	char _sqlState[6];
 };
 
 
@@ -145,9 +145,9 @@ inline void PostgreSQLException::rethrow() const
 }
 
 
-inline const char* PostgreSQLException::SqlState() const noexcept
+inline const char* PostgreSQLException::sqlState() const noexcept
 {
-	return _SqlState;
+	return _sqlState;
 }
 
 

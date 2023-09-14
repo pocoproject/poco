@@ -29,9 +29,12 @@ PostgreSQLException::PostgreSQLException(const std::string& aMessage,const char*
 	Poco::Data::DataException(std::string("[PostgreSQL]: ") + aMessage)
 {
         // handle anSqlState
-        if (pAnSqlState == nullptr) _SqlState[0] = '\0';
-	else strncpy(_SqlState,pAnSqlState,5);
-
+        if (pAnSqlState == nullptr) _sqlState[0] = '\0';
+	else
+	{
+		strncpy(_sqlState,pAnSqlState,5);
+                _sqlState[5] = '\0';
+	}
 	
 }
 
