@@ -36,6 +36,7 @@
 #include <utility>
 #include <memory>
 #include <iostream>
+#include <system_error>
 
 
 namespace Poco {

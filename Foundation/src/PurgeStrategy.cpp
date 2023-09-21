@@ -58,6 +58,26 @@ void PurgeStrategy::list(const std::string& path, std::vector<File>& files)
 
 
 //
+// NullPurgeStrategy
+// 
+
+
+NullPurgeStrategy::NullPurgeStrategy()
+{
+}
+
+
+NullPurgeStrategy::~NullPurgeStrategy()
+{
+}
+
+
+void NullPurgeStrategy::purge(const std::string& path)
+{
+}
+
+
+//
 // PurgeByAgeStrategy
 //
 

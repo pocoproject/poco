@@ -57,6 +57,11 @@ public:
 		///
 		/// Example: a type const std::string& -> std::string, a type const std::string* returns std::string
 
+	bool isConst() const;
+		/// Returns true iff the variable is const.
+
+	bool isStatic() const;
+		/// Returns true iff the variable is static.
 
 private:
 	int _flags;
@@ -77,6 +82,18 @@ inline int Variable::flags() const
 inline bool Variable::isPointer() const
 {
 	return _isPointer;
+}
+
+
+inline bool Variable::isConst() const
+{
+	return (flags() & VAR_CONST) != 0;
+}
+
+
+inline bool Variable::isStatic() const
+{
+	return (flags() & VAR_STATIC) != 0;
 }
 
 
