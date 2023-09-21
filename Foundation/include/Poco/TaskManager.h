@@ -70,7 +70,7 @@ public:
 		/// from the thread pool.
 		///
 		/// The TaskManager takes ownership of the Task object
-		/// and deletes it when it it finished.
+		/// and deletes it when it is finished.
 
 	void cancelAll();
 		/// Requests cancellation of all tasks.
