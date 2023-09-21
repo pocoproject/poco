@@ -33,6 +33,10 @@ public:
 	ServerSocketImpl();
 		/// Creates the ServerSocketImpl.
 
+	ServerSocketImpl(poco_socket_t sockfd);
+		/// Creates a StreamSocketImpl using the given native socket.
+		/// Ownership is taken by poco
+
 protected:
 	virtual ~ServerSocketImpl();
 		/// Destroys the ServerSocketImpl.

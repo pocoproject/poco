@@ -29,6 +29,11 @@ ServerSocket::ServerSocket(): Socket(new ServerSocketImpl)
 }
 
 
+ServerSocket::ServerSocket(poco_socket_t fd): Socket(new ServerSocketImpl(fd))
+{
+}
+
+
 ServerSocket::ServerSocket(const Socket& socket): Socket(socket)
 {
 	if (!dynamic_cast<ServerSocketImpl*>(impl()))
