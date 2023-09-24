@@ -199,6 +199,10 @@ if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
   set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
 
+if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
+  set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
