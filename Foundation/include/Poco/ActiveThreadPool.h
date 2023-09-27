@@ -35,17 +35,12 @@ class ActiveThread;
 class Foundation_API ActiveThreadPool
 	/// A thread pool always keeps a number of threads running, ready
 	/// to accept work.
-	/// Creating and starting a threads can impose a significant runtime
-	/// overhead to an application. A thread pool helps to improve
-	/// the performance of an application by reducing the number
-	/// of threads that have to be created (and destroyed again).
-	/// Threads in a thread pool are re-used once they become
-	/// available again.
-	/// The thread pool always keeps a minimum number of threads
-	/// running. If the demand for threads increases, additional
-	/// threads are created. Once the demand for threads sinks
-	/// again, no-longer used threads are stopped and removed
-	/// from the pool.
+	/// Threads in an active thread pool are re-used
+	/// Every thread in the pool has own notification-queue with Runnable
+	/// Every Runnable executes on next thread (round-robin model)
+	/// The thread pool always keeps fixed number of threads running.
+	/// Use case for this pool is running many (more than os-max-thread-count) short live tasks
+	/// Round-robin model allow efficiently utilize cpu cores
 {
 public:
 	ActiveThreadPool(int capacity = static_cast<int>(Environment::processorCount()) + 1,
@@ -54,7 +49,7 @@ public:
 		/// Threads are created with given stack size.
 
 	ActiveThreadPool(std::string  name,
-		int maxCapacity = static_cast<int>(Environment::processorCount()) + 1,
+		int capacity = static_cast<int>(Environment::processorCount()) + 1,
 		int stackSize = POCO_THREAD_STACK_SIZE);
 		/// Creates a thread pool with the given name and fixed capacity threads.
 		/// Threads are created with given stack size.
@@ -71,25 +66,17 @@ public:
 
 	void start(Runnable& target);
 		/// Obtains a thread and starts the target.
-		/// Throws a NoThreadAvailableException if no more
-		/// threads are available.
 
 	void start(Runnable& target, const std::string& name);
 		/// Obtains a thread and starts the target.
 		/// Assigns the given name to the thread.
-		/// Throws a NoThreadAvailableException if no more
-		/// threads are available.
 
 	void startWithPriority(Thread::Priority priority, Runnable& target);
 		/// Obtains a thread, adjusts the thread's priority, and starts the target.
-		/// Throws a NoThreadAvailableException if no more
-		/// threads are available.
 
 	void startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name);
 		/// Obtains a thread, adjusts the thread's priority, and starts the target.
 		/// Assigns the given name to the thread.
-		/// Throws a NoThreadAvailableException if no more
-		/// threads are available.
 
 	void stopAll();
 		/// Stops all running threads and waits for their completion.
@@ -108,9 +95,8 @@ public:
 	void joinAll();
 		/// Waits for all threads to complete.
 		///
-		/// Note that this will not actually join() the underlying
-		/// thread, but rather wait for the thread's runnables
-		/// to finish.
+		/// Note that this will join() underlying
+		/// threads and restart them for next tasks.
 
 	const std::string& name() const;
 		/// Returns the name of the thread pool,

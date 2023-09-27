@@ -91,8 +91,9 @@ private:
 	std::string          _name;
 	Thread               _thread;
 	Event                _targetCompleted;
-	Event                _started;
 	FastMutex            _mutex;
+	const long           JOIN_TIMEOUT = 10000;
+	std::atomic<bool>    _needToStop{false};
 };
 
 
@@ -107,40 +108,41 @@ ActiveThread::ActiveThread(const std::string& name, int stackSize):
 
 void ActiveThread::start()
 {
+	_needToStop = false;
 	_thread.start(*this);
-	_started.wait();
 }
 
 
 void ActiveThread::start(Thread::Priority priority, Runnable& target)
 {
-	auto notification = Poco::makeAuto<NewActionNotification>(priority, target, _name);
-	_pTargetQueue.enqueueNotification(notification);
+	_pTargetQueue.enqueueNotification(Poco::makeAuto<NewActionNotification>(priority, target, _name));
 }
 
 
 void ActiveThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
 {
-	auto notification = Poco::makeAuto<NewActionNotification>(priority, target, name);
-	_pTargetQueue.enqueueNotification(notification);
+	_pTargetQueue.enqueueNotification(Poco::makeAuto<NewActionNotification>(priority, target, name));
 }
 
 void ActiveThread::join()
 {
 	_pTargetQueue.wakeUpAll();
 	if (!_pTargetQueue.empty())
+	{
 		_targetCompleted.wait();
+	}
+
 }
 
 
 void ActiveThread::release()
 {
-	const long JOIN_TIMEOUT = 10000;
 	// In case of a statically allocated thread pool (such
 	// as the default thread pool), Windows may have already
 	// terminated the thread before we got here.
 	if (_thread.isRunning())
 	{
+		_needToStop = true;
 		_pTargetQueue.wakeUpAll();
 		if (!_pTargetQueue.empty())
 			_targetCompleted.wait(JOIN_TIMEOUT);
@@ -155,37 +157,38 @@ void ActiveThread::release()
 
 void ActiveThread::run()
 {
-	_started.set();
-	
-	auto *_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification());
-	while (_pTarget)
-	{
-		Runnable* pTarget = &_pTarget->runnable();
-		_thread.setPriority(_pTarget->priotity());
-		_thread.setName(_pTarget->name());
-		try
+	do {
+		auto *_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification());
+		while (_pTarget)
 		{
-			pTarget->run();
+			Runnable* pTarget = &_pTarget->runnable();
+			_thread.setPriority(_pTarget->priotity());
+			_thread.setName(_pTarget->name());
+			try
+			{
+				pTarget->run();
+			}
+			catch (Exception& exc)
+			{
+				ErrorHandler::handle(exc);
+			}
+			catch (std::exception& exc)
+			{
+				ErrorHandler::handle(exc);
+			}
+			catch (...)
+			{
+				ErrorHandler::handle();
+			}
+			_pTarget->release();
+			_thread.setName(_name);
+			_thread.setPriority(Thread::PRIO_NORMAL);
+			ThreadLocalStorage::clear();
+			_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification(1000));
 		}
-		catch (Exception& exc)
-		{
-			ErrorHandler::handle(exc);
-		}
-		catch (std::exception& exc)
-		{
-			ErrorHandler::handle(exc);
-		}
-		catch (...)
-		{
-			ErrorHandler::handle();
-		}
-		_pTarget->release();
-		_thread.setName(_name);
-		_thread.setPriority(Thread::PRIO_NORMAL);
-		ThreadLocalStorage::clear();
-		_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification());
+		_targetCompleted.set();
 	}
-	_targetCompleted.set();
+	while (_needToStop == false);
 }
 
 
@@ -291,6 +294,16 @@ void ActiveThreadPool::joinAll()
 	{
 		pThread->join();
 	}
+
+	_threads.clear();
+	_threads.reserve(_capacity);
+
+	for (int i = 0; i < _capacity; i++)
+	{
+		ActiveThread* pThread = createThread();
+		_threads.push_back(pThread);
+		pThread->start();
+	}
 }
 
 ActiveThread* ActiveThreadPool::getThread()
@@ -305,7 +318,7 @@ ActiveThread* ActiveThreadPool::getThread()
 ActiveThread* ActiveThreadPool::createThread()
 {
 	std::ostringstream name;
-	name << _name << "[#active" << ++_serial << "]";
+	name << _name << "[#active-thread-" << ++_serial << "]";
 	return new ActiveThread(name.str(), _stackSize);
 }
 

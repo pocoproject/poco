@@ -65,7 +65,7 @@ protected:
 
 	int getCount() const;
 private:
-	std::atomic<int> _count;
+	std::atomic<Poco::Int64> _count;
 };
 
 

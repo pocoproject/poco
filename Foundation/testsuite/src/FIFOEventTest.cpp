@@ -354,23 +354,28 @@ void FIFOEventTest::testAsyncNotifyBenchmark()
 	simple += delegate(this, &FIFOEventTest::onAsyncBench);
 	assertTrue (_count == 0);
 	const int cnt = 10000;
-	std::vector<Poco::ActiveResult<int>> vresult;
-	vresult.reserve(cnt);
+	int runCount = 1000;
+	const Poco::Int64 allCount = cnt * runCount;
 	Poco::Stopwatch sw;
 	sw.restart();
-	for (int i = 0; i < cnt; ++i)
+	while (runCount-- > 0)
 	{
-		vresult.push_back(simple.notifyAsync(this, i));
-	}
+		std::vector<Poco::ActiveResult<int>> vresult;
+		vresult.reserve(cnt);
+		for (int i = 0; i < cnt; ++i)
+		{
+			vresult.push_back(simple.notifyAsync(this, i));
+		}
 
-	for (int i = 0; i < cnt; ++i)
-	{
-		vresult[i].wait();
-		assertTrue (vresult[i].data() == (i*2));
+		for (int i = 0; i < cnt; ++i)
+		{
+			vresult[i].wait();
+			assertTrue (vresult[i].data() == (i*2));
+		}
 	}
 	sw.stop();
 	std::cout << "notify and wait time = " << sw.elapsed() / 1000 << std::endl;
-	assertTrue (_count == cnt);
+	assertTrue (_count == allCount);
 }
 
 void FIFOEventTest::onVoid(const void* pSender)
