@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.12.5
+
+!!Summary of Changes
+
+  - Merge changes from 1.11.5 to 1.11.8.
+  - TODO
+
 
 !!!Release 1.12.4
 
@@ -196,6 +203,58 @@ AAAIntroduction
   - PollSet::add() is mode-cumulative now
   - UDPServer now requires explicit starting
   - Move semantics for sockets and SocketAddress (compile-time option, disabled by default)
+
+
+!!!Release 1.11.8
+
+!!Summary of Changes
+
+  - GH #4170: Poco::FileStream is always opened with std::ios::in | std::ios::out bug
+  - GH #4169: Upgrade bundled zlib to 1.3.
+  - GH #4171: Upgrade bundled sqlite to 3.43.1
+  - GH #4164: [Bug] SharedLibraryImpl::loadImpl uses an incorrect format specifier
+  - GH #4173: AbstractConfiguration: when expanding property references, allow specifying a default value
+  - GH #4174: AbstractConfiguration: support Int16/UInt16 and Int32/UInt32
+
+
+!!!Release 1.11.7
+
+!!Summary of Changes
+
+  - GH #4023: CPPParser: Losing data if parameter std::function<void(bool)> is used
+  - GH #4031: Classes with virtual functions missing virtual destructors (compilation issues)
+  - GH #4014: wrong string offset in HTTPCredentials::isNTLMCredentials
+  - GH #4071: PageCompiler: add referrerPolicy to page directive
+  - GH #4077: OpenSSL 3: Don't throw if legacy provider is not available
+  - GH #4078: Upgrade bundled SQLite to 3.42
+  - GH #4079: SocketConnector: constructor should take SocketAddress by const reference
+  - GH #4082: Logger performance improvement with formatting
+
+
+!!!Release 1.11.6
+
+!!Summary of Changes
+
+  - GH #3147: Reading from request stream hangs when "Transfer-Encoding: chunked" is used
+  - GH #3859: zlib headers not updated
+  - Build system fixes for Xcode on Apple Silicon.
+  - Upgrade bundled SQLite to 3.40.0
+
+
+!!!Release 1.11.5
+
+!!Summary of Changes
+
+  - GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+
+
+!!!Release 1.11.4
+
+!!Summary of Changes
+
+  - GH #3805: Upgrade expat to 2.4.9
+  - GH #3846: Upgrade bundled zlib to 1.2.13 [fixes CVE]
+  - GH #3847: Upgrade bundled SQLite to 3.39.4
 
 
 !!!Release 1.11.3
