@@ -60,6 +60,14 @@ public:
 		/// does not exist or is not accessible for other reasons and
 		/// a new file cannot be created.
 
+	void open(const std::string& path);
+		/// Opens the file specified by path, using the default mode given 
+		/// in the constructor.
+		///
+		/// Throws a FileException (or a similar exception) if the file 
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
+
 	void close();
 		/// Closes the file stream.
 		///
