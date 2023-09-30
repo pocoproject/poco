@@ -125,14 +125,14 @@ public:
 	std::string getString(const std::string& key) const;
 		/// Returns the string value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	std::string getString(const std::string& key, const std::string& defaultValue) const;
 		/// If a property with the given key exists, returns the property's string value,
 		/// otherwise returns the given default value.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	std::string getRawString(const std::string& key) const;
 		/// Returns the raw string value of the property with the given name.
@@ -150,8 +150,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an int.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	unsigned int getUInt(const std::string& key) const;
 		/// Returns the unsigned int value of the property with the given name.
@@ -159,8 +159,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an unsigned int.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	int getInt(const std::string& key, int defaultValue) const;
 		/// If a property with the given key exists, returns the property's int value,
@@ -168,8 +168,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an int.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	unsigned int getUInt(const std::string& key, unsigned int defaultValue) const;
 		/// If a property with the given key exists, returns the property's unsigned int
@@ -177,8 +177,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an unsigned int.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	Poco::Int32 getInt32(const std::string& key) const;
 		/// Returns the 32-bit int value of the property with the given name.
@@ -186,8 +186,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an Int32.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	Poco::UInt32 getUInt32(const std::string& key) const;
 		/// Returns the 32-bit unsigned int value of the property with the given name.
@@ -195,8 +195,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an UInt32.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	Poco::Int32 getInt32(const std::string& key, Poco::Int32 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 32-bit int value,
@@ -204,8 +204,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an Int32.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	Poco::UInt32 getUInt32(const std::string& key, Poco::UInt32 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 32-bit unsigned int
@@ -213,8 +213,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an UInt32.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	Poco::Int16 getInt16(const std::string& key) const;
 		/// Returns the 16-bit int value of the property with the given name.
@@ -222,8 +222,8 @@ public:
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
 		/// to an Int16.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	Poco::UInt16 getUInt16(const std::string& key) const;
 		/// Returns the unsigned 16-bit int value of the property with the given name.
@@ -231,8 +231,8 @@ public:
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
 		/// to an UInt16.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	Poco::Int16 getInt16(const std::string& key, Poco::Int16 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 16-bit int value,
@@ -240,8 +240,8 @@ public:
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
 		/// to an Int16.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	Poco::UInt16 getUInt16(const std::string& key, Poco::UInt16 defaultValue) const;
 		/// If a property with the given key exists, returns the property's unsigned 16-bit int
@@ -249,8 +249,8 @@ public:
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
 		/// to an UInt16.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 #if defined(POCO_HAVE_INT64)
 
@@ -260,8 +260,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an Int64.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	UInt64 getUInt64(const std::string& key) const;
 		/// Returns the UInt64 value of the property with the given name.
@@ -269,8 +269,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an UInt64.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	Int64 getInt64(const std::string& key, Int64 defaultValue) const;
 		/// If a property with the given key exists, returns the property's Int64 value,
@@ -278,8 +278,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an Int64.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	UInt64 getUInt64(const std::string& key, UInt64 defaultValue) const;
 		/// If a property with the given key exists, returns the property's UInt64
@@ -287,8 +287,8 @@ public:
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an UInt64.
 		/// Numbers starting with 0x are treated as hexadecimal.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 #endif // defined(POCO_HAVE_INT64)
 
@@ -297,24 +297,24 @@ public:
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
 		/// to a double.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	double getDouble(const std::string& key, double defaultValue) const;
 		/// If a property with the given key exists, returns the property's double value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
 		/// to an double.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 
 	bool getBool(const std::string& key) const;
 		/// Returns the boolean value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
 		/// to a boolean.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	bool getBool(const std::string& key, bool defaultValue) const;
 		/// If a property with the given key exists, returns the property's boolean value,
@@ -325,8 +325,8 @@ public:
 		///   - numerical values: non zero becomes true, zero becomes false
 		///   - strings: true, yes, on become true, false, no, off become false
 		/// Case does not matter.
-		/// If the value contains references to other properties (${<property>}), these
-		/// are expanded.
+		/// If the value contains references to other properties (${<property>}, or
+		/// ${<property>:-<default>}), these are expanded (see expand()).
 		
 	virtual void setString(const std::string& key, const std::string& value);
 		/// Sets the property with the given key to the given value.
@@ -393,6 +393,12 @@ public:
 		/// Replaces all occurrences of ${<property>} in value with the
 		/// value of the <property>. If <property> does not exist,
 		/// nothing is changed.
+		///
+		/// It is also possible to specify a default value for a referenced
+		/// property that does not exist, using ${<property>:-<default>}.
+		/// Note that currently a default value cannot contain a closing
+		/// curly bracket ("}"). The default value also cannot reference
+		/// another variable.
 		///
 		/// If a circular property reference is detected, a
 		/// CircularReferenceException will be thrown.

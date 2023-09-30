@@ -105,6 +105,49 @@ void AbstractConfigurationTest::testGetInt()
 }
 
 
+void AbstractConfigurationTest::testGetInt16()
+{
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+
+	assertTrue (pConf->getInt16("prop4.int1") == 42);
+	assertTrue (pConf->getInt16("prop4.int2") == -42);
+	assertTrue (pConf->getInt16("prop4.hex") == 0x1f);
+	assertTrue (pConf->getUInt16("prop4.hex") == 0x1f);
+	assertTrue (pConf->getInt16("ref2") == 42);
+	
+	try
+	{
+		pConf->getInt16("prop1");
+		fail("not a number - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		pConf->getInt16("prop4.notint16");
+		fail("too big for UInt16 - must throw");
+	}
+	catch (Poco::RangeException&)
+	{
+	}
+
+	try
+	{
+		pConf->getUInt16("prop4.notuint16");
+		fail("too big for UInt16 - must throw");
+	}
+	catch (Poco::RangeException&)
+	{
+	}
+
+	assertTrue (pConf->getInt16("prop4.int1", 100) == 42);
+	assertTrue (pConf->getInt16("prop4.int2", 100) == -42);
+	assertTrue (pConf->getInt16("prop4.int3", 100) == 100);
+}
+
+
 void AbstractConfigurationTest::testGetInt64()
 {
 #if defined(POCO_HAVE_INT64)
@@ -212,6 +255,11 @@ void AbstractConfigurationTest::testExpand()
 	
 	assertTrue (pConf->getString("dollar.atend") == "foo$");
 	assertTrue (pConf->getString("dollar.middle") == "foo$bar");
+
+	assertTrue (pConf->expand("default=${undefined:-default value}") == "default=default value");
+	assertTrue (pConf->expand("default=${undefined:-}") == "default=");
+	assertTrue (pConf->expand("default=${undefined:value}") == "default=${undefined:value}");
+	assertTrue (pConf->expand("default:${undefined::value}") == "default:${undefined::value}");
 }
 
 
@@ -368,7 +416,7 @@ void AbstractConfigurationTest::testRemove()
 	pConf->keys(keys);
 	assertTrue (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assertTrue (keys.size() == 17);
+	assertTrue (keys.size() == 19);
 
 	pConf->remove("prop4.bool1");
 	assertTrue (!pConf->hasProperty("prop4.bool1"));
@@ -377,7 +425,7 @@ void AbstractConfigurationTest::testRemove()
 	pConf->keys(keys);
 	assertTrue (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assertTrue (keys.size() == 16);
+	assertTrue (keys.size() == 18);
 
 	pConf->remove("prop4");
 	assertTrue (!pConf->hasProperty("prop4.bool1"));
@@ -406,6 +454,8 @@ AbstractConfiguration::Ptr AbstractConfigurationTest::createConfiguration() cons
 	pConfig->setString("prop4.int1", "42");
 	pConfig->setString("prop4.int2", "-42");
 	pConfig->setString("prop4.uint", NumberFormatter::format(std::numeric_limits<unsigned>::max()));
+	pConfig->setString("prop4.notint16", "32768");
+	pConfig->setString("prop4.notuint16", "65536");
 #if defined(POCO_HAVE_INT64)
 	pConfig->setString("prop4.bigint1", NumberFormatter::format(std::numeric_limits<Int64>::max()));
 	pConfig->setString("prop4.bigint2", NumberFormatter::format(std::numeric_limits<Int64>::min()));

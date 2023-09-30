@@ -507,12 +507,32 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 			{
 				++it;
 				std::string prop;
-				while (it != end && *it != '}') prop += *it++;
+				std::string deflt;
+				bool haveDefault = false;
+				while (it != end && *it != '}')
+				{
+					if (*it == ':')
+					{
+						++it;
+						if (it != end && *it == '-')
+						{
+							haveDefault = true;
+							++it;
+							while (it != end && *it != '}') deflt += *it++;
+						}
+						else prop += ':';
+					}
+					else prop += *it++;
+				}
 				if (it != end) ++it;
 				std::string value;
 				if (getRaw(prop, value))
 				{
 					result.append(internalExpand(value));
+				}
+				else if (haveDefault)
+				{
+					result.append(deflt);
 				}
 				else
 				{
