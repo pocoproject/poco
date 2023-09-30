@@ -256,9 +256,9 @@ endif()
 
 if(ENABLE_NETSSL_WIN)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-	if(ENABLE_TESTS)
-		set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-	endif()
+	#if(ENABLE_TESTS)
+	#	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
+	#endif()
 endif()
 
 if(ENABLE_NETSSL)

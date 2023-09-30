@@ -270,7 +270,7 @@ void FileStreamTest::testSeek()
 
 void FileStreamTest::testMultiOpen()
 {
-	Poco::FileStream str("test.txt", std::ios::trunc);
+	Poco::FileStream str("test.txt", std::ios::out | std::ios::trunc);
 	str << "0123456789\n";
 	str << "abcdefghij\n";
 	str << "klmnopqrst\n";
