@@ -1,6 +1,20 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.13.0
+
+!!Summary of Changes
+
+  - TODO
+
+
+!!!Release 1.12.4
+
+!!Summary of Changes
+
+  - GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+  - GH #3852: SocketReactor - 100 % CPU usage on single-core system
+
 
 !!!Release 1.12.3
 
