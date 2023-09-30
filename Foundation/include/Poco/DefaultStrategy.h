@@ -207,6 +207,15 @@ public:
 		return *this;
 	}
 
+	DefaultStrategy& operator = (DefaultStrategy&& s)
+	{
+		if (this != &s)
+		{
+			_delegates = std::move(s._delegates);
+		}
+		return *this;
+	}
+
 	void clear()
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
