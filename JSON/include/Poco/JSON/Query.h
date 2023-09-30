@@ -32,7 +32,7 @@ class JSON_API Query
 {
 public:
 	Query(const Dynamic::Var& source);
-		/// Creates a Query/
+		/// Creates a Query.
 		///
 		/// Source must be JSON Object, Array, Object::Ptr,
 		/// Array::Ptr or empty Var. Any other type will trigger throwing of 
