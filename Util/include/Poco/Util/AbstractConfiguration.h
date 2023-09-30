@@ -180,6 +180,78 @@ public:
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
 
+	Poco::Int32 getInt32(const std::string& key) const;
+		/// Returns the 32-bit int value of the property with the given name.
+		/// Throws a NotFoundException if the key does not exist.
+		/// Throws a SyntaxException if the property can not be converted
+		/// to an Int32.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+		
+	Poco::UInt32 getUInt32(const std::string& key) const;
+		/// Returns the 32-bit unsigned int value of the property with the given name.
+		/// Throws a NotFoundException if the key does not exist.
+		/// Throws a SyntaxException if the property can not be converted
+		/// to an UInt32.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+		
+	Poco::Int32 getInt32(const std::string& key, Poco::Int32 defaultValue) const;
+		/// If a property with the given key exists, returns the property's 32-bit int value,
+		/// otherwise returns the given default value.
+		/// Throws a SyntaxException if the property can not be converted
+		/// to an Int32.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+		
+	Poco::UInt32 getUInt32(const std::string& key, Poco::UInt32 defaultValue) const;
+		/// If a property with the given key exists, returns the property's 32-bit unsigned int
+		/// value, otherwise returns the given default value.
+		/// Throws a SyntaxException if the property can not be converted
+		/// to an UInt32.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+
+	Poco::Int16 getInt16(const std::string& key) const;
+		/// Returns the 16-bit int value of the property with the given name.
+		/// Throws a NotFoundException if the key does not exist.
+		/// Throws a SyntaxException or a RangeException if the property can not be converted
+		/// to an Int16.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+		
+	Poco::UInt16 getUInt16(const std::string& key) const;
+		/// Returns the unsigned 16-bit int value of the property with the given name.
+		/// Throws a NotFoundException if the key does not exist.
+		/// Throws a SyntaxException or a RangeException if the property can not be converted
+		/// to an UInt16.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+		
+	Poco::Int16 getInt16(const std::string& key, Poco::Int16 defaultValue) const;
+		/// If a property with the given key exists, returns the property's 16-bit int value,
+		/// otherwise returns the given default value.
+		/// Throws a SyntaxException or a RangeException if the property can not be converted
+		/// to an Int16.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+		
+	Poco::UInt16 getUInt16(const std::string& key, Poco::UInt16 defaultValue) const;
+		/// If a property with the given key exists, returns the property's unsigned 16-bit int
+		/// value, otherwise returns the given default value.
+		/// Throws a SyntaxException or a RangeException if the property can not be converted
+		/// to an UInt16.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+
 #if defined(POCO_HAVE_INT64)
 
 	Int64 getInt64(const std::string& key) const;
@@ -268,6 +340,22 @@ public:
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 
+	virtual void setInt16(const std::string& key, Poco::Int16 value);
+		/// Sets the property with the given key to the given value.
+		/// An already existing value for the key is overwritten.
+		
+	virtual void setUInt16(const std::string& key, Poco::UInt16 value);
+		/// Sets the property with the given key to the given value.
+		/// An already existing value for the key is overwritten.
+
+	virtual void setInt32(const std::string& key, Poco::Int32 value);
+		/// Sets the property with the given key to the given value.
+		/// An already existing value for the key is overwritten.
+		
+	virtual void setUInt32(const std::string& key, Poco::UInt32 value);
+		/// Sets the property with the given key to the given value.
+		/// An already existing value for the key is overwritten.
+
 #if defined(POCO_HAVE_INT64)
 
 	virtual void setInt64(const std::string& key, Int64 value);
@@ -353,6 +441,14 @@ protected:
 		/// Returns string as unsigned integer.
 		/// Decimal and hexadecimal notation is supported.
 
+	static Poco::Int16 parseInt16(const std::string& value);
+		/// Returns string as signed 16-bit integer.
+		/// Decimal and hexadecimal notation is supported.
+
+	static Poco::UInt16 parseUInt16(const std::string& value);
+		/// Returns string as unsigned 16-bit integer.
+		/// Decimal and hexadecimal notation is supported.
+
 #if defined(POCO_HAVE_INT64)
 
 	static Int64 parseInt64(const std::string& value);
@@ -385,6 +481,35 @@ private:
 	friend class ConfigurationView;
 	friend class ConfigurationMapper;
 };
+
+
+//
+// inlines
+//
+
+
+inline Poco::Int32 AbstractConfiguration::getInt32(const std::string& key) const
+{
+	return getInt(key);
+}
+
+	
+inline Poco::Int32 AbstractConfiguration::getInt32(const std::string& key, Poco::Int32 defaultValue) const
+{
+	return getInt(key, defaultValue);
+}
+
+
+inline Poco::UInt32 AbstractConfiguration::getUInt32(const std::string& key) const
+{
+	return getUInt(key);
+}
+
+
+inline Poco::UInt32 AbstractConfiguration::getUInt32(const std::string& key, Poco::UInt32 defaultValue) const
+{
+	return getUInt(key, defaultValue);
+}
 
 
 } } // namespace Poco::Util

@@ -163,6 +163,54 @@ unsigned AbstractConfiguration::getUInt(const std::string& key, unsigned default
 }
 
 
+Poco::Int16 AbstractConfiguration::getInt16(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return parseInt16(internalExpand(value));
+	else
+		throw NotFoundException(key);
+}
+
+	
+Poco::Int16 AbstractConfiguration::getInt16(const std::string& key, Poco::Int16 defaultValue) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return parseInt16(internalExpand(value));
+	else
+		return defaultValue;
+}
+
+
+Poco::UInt16 AbstractConfiguration::getUInt16(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return parseUInt16(internalExpand(value));
+	else
+		throw NotFoundException(key);
+}
+
+
+Poco::UInt16 AbstractConfiguration::getUInt16(const std::string& key, Poco::UInt16 defaultValue) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return parseUInt16(internalExpand(value));
+	else
+		return defaultValue;
+}
+
+
 #if defined(POCO_HAVE_INT64)
 
 
@@ -278,6 +326,30 @@ void AbstractConfiguration::setInt(const std::string& key, int value)
 
 	
 void AbstractConfiguration::setUInt(const std::string& key, unsigned int value)
+{
+	setRawWithEvent(key, NumberFormatter::format(value));
+}
+
+
+void AbstractConfiguration::setInt16(const std::string& key, Poco::Int16 value)
+{
+	setRawWithEvent(key, NumberFormatter::format(value));
+}
+
+	
+void AbstractConfiguration::setUInt16(const std::string& key, Poco::UInt16 value)
+{
+	setRawWithEvent(key, NumberFormatter::format(value));
+}
+
+
+void AbstractConfiguration::setInt32(const std::string& key, Poco::Int32 value)
+{
+	setRawWithEvent(key, NumberFormatter::format(value));
+}
+
+	
+void AbstractConfiguration::setUInt32(const std::string& key, Poco::UInt32 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
@@ -472,6 +544,34 @@ unsigned AbstractConfiguration::parseUInt(const std::string& value)
 		return NumberParser::parseHex(value);
 	else
 		return NumberParser::parseUnsigned(value);
+}
+
+
+Poco::Int16 AbstractConfiguration::parseInt16(const std::string& value)
+{
+	int intValue = 0;
+	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
+		intValue = static_cast<int>(NumberParser::parseHex(value));
+	else
+		intValue = NumberParser::parse(value);
+	if (intValue >= -32768 && intValue <= 32767)
+		return static_cast<Poco::Int16>(intValue);
+	else
+		throw Poco::RangeException("Not a valid 16-bit integer value", value);
+}
+
+
+Poco::UInt16 AbstractConfiguration::parseUInt16(const std::string& value)
+{
+	unsigned uintValue;
+	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
+		uintValue = NumberParser::parseHex(value);
+	else
+		uintValue = NumberParser::parseUnsigned(value);
+	if (uintValue <= 65535)
+		return static_cast<Poco::UInt16>(uintValue);
+	else
+		throw Poco::RangeException("Not a valid unsigned 16-bit integer value", value);
 }
 
 
