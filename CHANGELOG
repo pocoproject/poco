@@ -1,9 +1,14 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.11.8 (2023-10-XX)
+Release 1.11.8 (2023-10-02)
 ===========================
 
-- TODO
+- GH #4170: Poco::FileStream is always opened with std::ios::in | std::ios::out bug
+- GH #4169: Upgrade bundled zlib to 1.3.
+- GH #4171: Upgrade bundled sqlite to 3.43.1
+- GH #4164: [Bug] SharedLibraryImpl::loadImpl uses an incorrect format specifier
+- GH #4173: AbstractConfiguration: when expanding property references, allow specifying a default value
+- GH #4174: AbstractConfiguration: support Int16/UInt16 and Int32/UInt32
 
 
 Release 1.11.7 (2023-07-11)
