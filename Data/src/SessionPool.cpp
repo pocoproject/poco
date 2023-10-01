@@ -312,10 +312,15 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 
 void SessionPool::shutdown()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
-	if (_shutdown) return;
-	_shutdown = true;
+	{
+		Poco::Mutex::ScopedLock lock(_mutex);
+		if (_shutdown) return;
+		_shutdown = true;
+	}
+
 	_janitorTimer.stop();
+
+	Poco::Mutex::ScopedLock lock(_mutex);
 	closeAll(_idleSessions);
 	closeAll(_activeSessions);
 }
