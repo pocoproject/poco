@@ -122,7 +122,7 @@ void TestCase::run(TestResult *result)
 	}
 	catch (std::exception& e)
 	{
-		std::string msg(typeid(e).name());
+		std::string msg(TestResult::demangle(typeid(e).name()));
 		msg.append(": ");
 		msg.append(e.what());
 		result->addError(this, new CppUnitException(msg));
