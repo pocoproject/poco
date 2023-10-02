@@ -10,6 +10,7 @@
 #include "CppUnit/CppUnit.h"
 #include "CppUnit/Guards.h"
 #include "CppUnit/Test.h"
+#include "CppUnit/TestResult.h"
 #include "CppUnit/CppUnitException.h"
 #include <string>
 #include <vector>
@@ -243,7 +244,7 @@ inline void TestCase::tearDown()
 inline std::string TestCase::toString() const
 {
 	const std::type_info& thisClass = typeid(*this);
-	return std::string(thisClass.name()) + "." + name();
+	return TestResult::demangle(thisClass.name()) + "." + name();
 }
 
 
