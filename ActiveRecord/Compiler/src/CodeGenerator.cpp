@@ -48,6 +48,7 @@ void CodeGenerator::writeEndNameSpace(const std::string& nameSpace) const
 		auto ns = splitNameSpace(nameSpace);
 		for (const auto& s: ns)
 		{
+			(void) s; // avoid unused variable warning
 			_stream << "} ";
 		}
 		_stream << "// namespace " << nameSpace << "\n";
