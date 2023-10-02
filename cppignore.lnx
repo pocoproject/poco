@@ -1,5 +1,6 @@
 CppUnit::TestCaller<ThreadTest>.testSleep
 CppUnit::TestCaller<ExpireCacheTest>.testAccessExpireN
+CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN
 CppUnit::TestCaller<ExpireCacheTest>.testExpireN
 CppUnit::TestCaller<UniqueExpireCacheTest>.testExpireN
 CppUnit::TestCaller<FileChannelTest>.testPurgeAge
