@@ -20,8 +20,8 @@
 #define NetSSL_NetSSL_INCLUDED
 
 
-#include "Poco/Crypto/Crypto.h"
 #include "Poco/Net/Net.h"
+#include "Poco/Crypto/Crypto.h"
 
 
 //
