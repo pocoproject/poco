@@ -42,6 +42,9 @@ public:
 	SSL_SESSION* sslSession() const;
 		/// Returns the stored OpenSSL SSL_SESSION object.
 
+	bool isResumable() const;
+		/// Returns true if the session is resumable.
+
 protected:
 	Session(SSL_SESSION* pSession);
 		/// Creates a new Session object, using the given
