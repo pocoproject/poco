@@ -1,5 +1,9 @@
 name: poco-ci
 on: [push]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   linux-gcc-make:
     runs-on: ubuntu-22.04
