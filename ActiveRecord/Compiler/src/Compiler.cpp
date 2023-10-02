@@ -78,7 +78,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Libraries ActiveRecord ORM Compiler.\n"
-			"Copyright (c) 2020-2022 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2020-2023 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program generates C++ source code from an ActiveRecord "
 			"XML definition. "
