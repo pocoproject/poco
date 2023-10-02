@@ -12,13 +12,8 @@
 //
 
 
-#if defined(__APPLE__)
-// Some OpenSSL functions are deprecated in OS X 10.7
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-
 #include "Poco/Net/Session.h"
+#include <openssl/ssl.h>
 
 
 namespace Poco {
@@ -34,6 +29,16 @@ Session::Session(SSL_SESSION* pSession):
 Session::~Session()
 {
 	SSL_SESSION_free(_pSession);
+}
+
+
+bool Session::isResumable() const
+{
+#if OPENSSL_VERSION_NUMBER >= 0x10101000L
+	return SSL_SESSION_is_resumable(_pSession) == 1;
+#else
+	return false;
+#endif
 }
 
 

@@ -59,10 +59,7 @@ void HTTPChunkedStreamBuf::close()
 			HTTPOutputStream hos(_session);
 			_pTrailer->write(hos);
 		}
-		else
-		{
-			_session.write("\r\n", 2);
-		}
+		_session.write("\r\n", 2);
 	}
 }
 
