@@ -3,8 +3,13 @@
 //
 
 
+#if defined(__clang__) || defined (__GNUC__)
+	#define HAVE_CXXABI_H
+#endif
+
+
 #include "CppUnit/TestResult.h"
-#ifdef POCO_HAVE_CXXABI_H
+#ifdef HAVE_CXXABI_H
 #include <cxxabi.h>
 #include <cstdlib>
 #endif
@@ -31,7 +36,7 @@ TestResult::~TestResult()
 std::string TestResult::demangle(const char* typeName)
 {
 	std::string result;
-#ifdef POCO_HAVE_CXXABI_H
+#ifdef HAVE_CXXABI_H
 	int status;
 	char* demangled = abi::__cxa_demangle(typeName, nullptr, nullptr, &status);
 	if (demangled)
