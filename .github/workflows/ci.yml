@@ -125,7 +125,7 @@ jobs:
           make all -s -j4
       - run: >-
           sudo -s
-          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<Uniqu>.pireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<UniqueExpireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
           EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
           ./ci/runtests.sh
 
@@ -138,7 +138,7 @@ jobs:
       - run: >-
           cd cmake-build &&
           sudo -s
-          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<Uniqu>.pireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<UniqueExpireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -151,7 +151,7 @@ jobs:
       - run: >-
           cd cmake-build &&
           sudo -s
-          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<Uniqu>.pireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<UniqueExpireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
