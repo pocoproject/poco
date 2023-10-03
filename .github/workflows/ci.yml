@@ -199,7 +199,7 @@ jobs:
 #      - uses: actions/checkout@v3
 #      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
-  windows-2022-msvc-cmake-2022:
+  windows-2022-msvc-cmake:
     runs-on: windows-2022
     env:
       CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
@@ -212,7 +212,7 @@ jobs:
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
 
 # missing asan dll path
-#  windows-2022-msvc-cmake-2022-asan:
+#  windows-2022-msvc-cmake-asan:
 #    runs-on: windows-2022
 #    env:
 #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
