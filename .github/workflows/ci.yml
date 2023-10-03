@@ -118,7 +118,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: ./configure --everything --no-prefix --omit=PDF --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib && make all -s -j4
+      - run: >-
+          ./configure --everything --no-prefix --omit=PDF 
+          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
+          --mysql-include=/usr/local/opt/mysql/include --mysql-lib=/usr/local/opt/mysql/lib &&
+          make all -s -j4
       - run: >-
           sudo -s
           CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<Uniqu>.pireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
