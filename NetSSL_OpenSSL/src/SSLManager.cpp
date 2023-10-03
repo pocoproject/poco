@@ -77,7 +77,8 @@ const bool        SSLManager::VAL_FIPS_MODE(false);
 
 
 SSLManager::SSLManager():
-	_contextIndex(SSL_CTX_get_ex_new_index(0, NULL, NULL, NULL, NULL))
+	_contextIndex(SSL_CTX_get_ex_new_index(0, NULL, NULL, NULL, NULL)),
+	_socketIndex(SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL))
 {
 }
 

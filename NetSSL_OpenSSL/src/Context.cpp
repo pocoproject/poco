@@ -33,7 +33,6 @@
 #include <openssl/core_names.h>
 #include <openssl/decoder.h>
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
-#include <iostream>
 
 
 namespace Poco {
