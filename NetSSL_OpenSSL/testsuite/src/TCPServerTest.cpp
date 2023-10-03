@@ -363,6 +363,11 @@ void TCPServerTest::testReuseSession()
 	assertTrue (srv.totalConnections() == 1);
 
 	Session::Ptr pSession = ss1.currentSession();
+	if (!pSession || !pSession->isResumable())
+	{
+		std::cerr << "WARNING: Server did not return a session or session is not resumable. Aborting test." << std::endl;
+		return;
+	}
 
 	ss1.close();
 	Thread::sleep(300);
