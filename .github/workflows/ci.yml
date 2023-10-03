@@ -121,7 +121,7 @@ jobs:
       - run: >-
           ./configure --everything --no-prefix --omit=PDF 
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql/include --mysql-lib=/usr/local/opt/mysql/lib &&
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib &&
           make all -s -j4
       - run: >-
           sudo -s
