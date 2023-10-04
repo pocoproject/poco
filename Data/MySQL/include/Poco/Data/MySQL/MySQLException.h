@@ -20,7 +20,7 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/DataException.h"
-#include <mysql.h>
+#include <mysql/mysql.h>
 #include <typeinfo>
 #include <string>
 
