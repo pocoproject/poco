@@ -119,13 +119,20 @@ jobs:
       - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
       - run: >-
-          ./configure --everything --no-prefix --omit=PDF 
+          ./configure --everything --no-prefix --omit=PDF
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib &&
           make all -s -j4
       - run: >-
           sudo -s
-          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<UniqueExpireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CPPUNIT_IGNORE="
+          CppUnit::TestCaller<ThreadTest>.testTrySleep,
+          CppUnit::TestCaller<TimestampTest>.testTimestamp,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+          CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+          CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
           EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
           ./ci/runtests.sh
 
@@ -138,7 +145,14 @@ jobs:
       - run: >-
           cd cmake-build &&
           sudo -s
-          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<UniqueExpireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CPPUNIT_IGNORE="
+          CppUnit::TestCaller<ThreadTest>.testTrySleep,
+          CppUnit::TestCaller<TimestampTest>.testTimestamp,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+          CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+          CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -151,14 +165,29 @@ jobs:
       - run: >-
           cd cmake-build &&
           sudo -s
-          CPPUNIT_IGNORE="CppUnit::TestCaller<ThreadTest>.testTrySleep,CppUnit::TestCaller<TimestampTest>.testTimestamp,CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<UniqueExpireLRUCacheTestEE.testExpireN,CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CPPUNIT_IGNORE="
+          CppUnit::TestCaller<ThreadTest>.testTrySleep,
+          CppUnit::TestCaller<TimestampTest>.testTimestamp,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+          CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+          CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   windows-2019-msvc-cmake:
     runs-on: windows-2019
     env:
-      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,CppUnit::TestCaller<class PollSetTest>.testPollClosedServer
+      CPPUNIT_IGNORE: >-
+        class CppUnit::TestCaller<class PathTest>.testFind,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
+        class CppUnit::TestCaller<class PollSetTest>.testPollClosedServer
     steps:
       - uses: actions/checkout@v3
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
@@ -166,15 +195,22 @@ jobs:
       - run: >-
           cd cmake-build;
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
-          
+
   windows-2019-msvc-buildwin-x64:
     runs-on: windows-2019
     env:
-      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+      CPPUNIT_IGNORE: >-
+        class CppUnit::TestCaller<class PathTest>.testFind,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
       - uses: actions/checkout@v3
       - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
-      
+
 #  windows-2019-msvc-buildwin-win32:
 #    runs-on: windows-2019
 #    env:
@@ -186,7 +222,14 @@ jobs:
   windows-2022-msvc-buildwin-x64:
     runs-on: windows-2022
     env:
-      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+      CPPUNIT_IGNORE: >-
+        class CppUnit::TestCaller<class PathTest>.testFind,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
       - uses: actions/checkout@v3
       - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
@@ -194,7 +237,14 @@ jobs:
 #  windows-2022-msvc-buildwin-win32:
 #    runs-on: windows-2022
 #    env:
-#      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+#      CPPUNIT_IGNORE: >-
+#        class CppUnit::TestCaller<class PathTest>.testFind,
+#        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+#        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+#        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+#        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+#        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+#        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
 #      - uses: actions/checkout@v3
 #      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
@@ -202,7 +252,14 @@ jobs:
   windows-2022-msvc-cmake:
     runs-on: windows-2022
     env:
-      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+      CPPUNIT_IGNORE: >-
+        class CppUnit::TestCaller<class PathTest>.testFind,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
       - uses: actions/checkout@v3
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
@@ -215,7 +272,14 @@ jobs:
 #  windows-2022-msvc-cmake-asan:
 #    runs-on: windows-2022
 #    env:
-#      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+#      CPPUNIT_IGNORE: >-
+#        class CppUnit::TestCaller<class PathTest>.testFind,
+#        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+#        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+#        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+#        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+#        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+#        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
 #      - uses: actions/checkout@v3
 #      - run: cmake -S. -Bcmake-build -DPOCO_SANITIZE_ASAN=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
