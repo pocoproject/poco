@@ -73,6 +73,8 @@ void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, int priority,
 
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority, bool writeable)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	ConfigItem item;
 	item.pConfig   = pConfig;
 	item.priority  = priority;
@@ -87,6 +89,8 @@ void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::st
 
 void LayeredConfiguration::removeConfiguration(AbstractConfiguration::Ptr pConfig)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
 		if (it->pConfig == pConfig)
@@ -100,6 +104,8 @@ void LayeredConfiguration::removeConfiguration(AbstractConfiguration::Ptr pConfi
 
 AbstractConfiguration::Ptr LayeredConfiguration::find(const std::string& label) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	for (const auto& conf: _configs)
 	{
 		if (conf.label == label) return conf.pConfig;

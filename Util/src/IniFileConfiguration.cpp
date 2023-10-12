@@ -59,6 +59,8 @@ IniFileConfiguration::~IniFileConfiguration()
 
 void IniFileConfiguration::load(std::istream& istr)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	_map.clear();
 	_sectionKey.clear();
 	while (!istr.eof())

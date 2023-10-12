@@ -104,7 +104,6 @@ std::string AbstractConfiguration::getRawString(const std::string& key) const
 	
 std::string AbstractConfiguration::getRawString(const std::string& key, const std::string& defaultValue) const
 {
-	
 	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;

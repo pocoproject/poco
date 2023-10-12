@@ -415,6 +415,37 @@ public:
 		/// Returns true iff events are enabled.
 	
 protected:
+	class ScopedLock
+		/// A helper class allowing to temporarily
+		/// lock an entire AbstractConfiguration,
+		/// for use by subclasses. A typical use 
+		/// case is loading or saving an entire
+		/// configuration in a thread-safe way.
+		///
+		/// Caution: Thoughtless use of this class 
+		/// may easily lead to deadlock situations
+		/// in connection with events if any of the
+		/// mutating methods (set...(), remove())
+		/// are called with the lock held. Therefore
+		/// this class is available to subclasses
+		/// only, not for general use.
+	{
+	public:
+		explicit ScopedLock(const AbstractConfiguration& c):
+			_c(c)
+		{
+			_c._mutex.lock();
+		}
+
+		~ScopedLock()
+		{
+			_c._mutex.unlock();
+		}
+
+	private:
+		const AbstractConfiguration& _c;
+	};
+
 	virtual bool getRaw(const std::string& key, std::string& value) const = 0;
 		/// If the property with the given key exists, stores the property's value
 		/// in value and returns true. Otherwise, returns false.
@@ -486,6 +517,7 @@ private:
 	friend class LayeredConfiguration;
 	friend class ConfigurationView;
 	friend class ConfigurationMapper;
+	friend class ScopedLock;
 };
 
 
