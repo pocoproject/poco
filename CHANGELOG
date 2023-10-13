@@ -212,6 +212,7 @@ Release 1.11.8 (2023-10-16)
 - GH #4173: AbstractConfiguration: when expanding property references, allow specifying a default value
 - GH #4174: AbstractConfiguration: support Int16/UInt16 and Int32/UInt32
 - GH #4182: Util: Make load()/save()/clear() operations on configurations thread-safe
+- GH #4184: Poco::TemporaryFile: make filenames less predictable
 
 
 Release 1.11.7 (2023-07-11)
