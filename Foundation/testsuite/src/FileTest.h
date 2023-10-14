@@ -43,6 +43,7 @@ public:
 	void testRootDir();
 	void testLongPath();
 	void testUnixFileExtension();
+	void testTemporaryFile();
 
 	void setUp();
 	void tearDown();

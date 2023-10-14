@@ -161,7 +161,7 @@ std::string TemporaryFile::tempName(const std::string& tempDir)
 				randomChars.append(alphabet);
 			}
 		}
-		n = (count += random.next(1000));
+		n = (count += random.next(1000) + 1);
 	}
 
 	std::ostringstream name;
