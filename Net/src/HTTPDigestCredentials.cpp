@@ -304,8 +304,8 @@ void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 
 	if (qop.empty())
 	{
-		/// Assume that https://tools.ietf.org/html/rfc7616 does not supported 
-		/// and still using https://tools.ietf.org/html/rfc2069#section-2.4	
+		/// Assume that https://tools.ietf.org/html/rfc7616 is not supported
+		/// and still using https://tools.ietf.org/html/rfc2069#section-2.4
 
 		MD5Engine engine;
 
@@ -407,8 +407,9 @@ int HTTPDigestCredentials::updateNonceCounter(const std::string& nonce)
 bool HTTPDigestCredentials::isAlgorithmSupported(const std::string& algorithm) const
 {
 	bool isAlgorithmSupported = std::find_if(std::begin(SUPPORTED_ALGORITHMS), 
-											std::end(SUPPORTED_ALGORITHMS),
-											[&algorithm](const std::string& supportedAlgorithm) {
+		std::end(SUPPORTED_ALGORITHMS),
+		[&algorithm](const std::string& supportedAlgorithm)
+	{
 		return icompare(algorithm, supportedAlgorithm) == 0;
 	}) != std::end(SUPPORTED_ALGORITHMS);
 

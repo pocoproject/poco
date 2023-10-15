@@ -42,6 +42,10 @@
 #include "Poco/SignalHandler.h"
 #include <stdio.h>
 #include <sys/ioctl.h>
+#if POCO_OS == POCO_OS_SOLARIS
+#include <stropts.h>
+#include <termios.h>
+#endif
 #endif
 #include "Poco/UnicodeConverter.h"
 

@@ -116,12 +116,13 @@ function Add-VSCOMNTOOLS([int] $vsver)
 
 function Add-Env-Var([string] $lib, [string] $var)
 {
-	if ((${Env:$var} -eq $null) -or (-not ${Env:$var}.Contains(${Env:$lib_$var"})))
+	$envvar = if (Test-Path "Env:$var") { Get-Content "Env:$var" } Else { "" }
+
+	$libvar = Get-Content "Env:${lib}_$var"
+	if (-not $envvar.Contains($libvar))
 	{
-		$libvar = "$lib" + "_" + "$var"
-		$envvar = [Environment]::GetEnvironmentVariable($var, "Process")
-		$envvar = $envvar + ';' + [Environment]::GetEnvironmentVariable($libvar, "Process")
-		[Environment]::SetEnvironmentVariable($var, $envvar, "Process")
+        $envvar = $envvar + ";$libvar"
+		Set-Content "Env:${var}" $envvar
 	}
 }
 
@@ -270,7 +271,7 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
 		return
 	}
 
-	$cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$useenv /v:$verbosity"
+	$cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$($useenv -eq 'env') /v:$verbosity"
 	Write-Host $cmd
 	Invoke-Expression $cmd
 	if ($LastExitCode -ne 0) { Exit $LastExitCode }
