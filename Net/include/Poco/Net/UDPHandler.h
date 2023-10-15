@@ -41,7 +41,7 @@ typedef int UDPMsgSizeT;
 #define POCO_UDP_BUF_SIZE 1472 + sizeof(UDPMsgSizeT) + SocketAddress::MAX_ADDRESS_LENGTH
 
 
-template <std::size_t S = POCO_UDP_BUF_SIZE>
+template <std::size_t S = POCO_UDP_BUF_SIZE, class TMutex = Poco::FastMutex>
 class UDPHandlerImpl: public Runnable, public RefCountedObject
 	/// UDP handler handles the data that arrives to the UDP server.
 	/// The class is thread-safe and runs in its own thread, so many handlers
@@ -57,7 +57,7 @@ public:
 	typedef AutoPtr<UDPHandlerImpl> Ptr;
 	typedef std::vector<Ptr>        List;
 	typedef typename List::iterator Iterator;
-	typedef Poco::FastMutex         DFMutex;
+	typedef TMutex                  DFMutex;
 
 	static const MsgSizeT BUF_STATUS_IDLE  = 0;
 	static const MsgSizeT BUF_STATUS_BUSY  = -1;
@@ -244,14 +244,14 @@ public:
 	bool hasData(char*& pBuf)
 		/// Returns true if buffer contains data.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
 	}
 
 	bool isError(char*& pBuf)
 		/// Returns true if buffer contains error.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
@@ -349,7 +349,7 @@ private:
 
 	void setStatus(char*& pBuf, MsgSizeT status)
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		setStatusImpl(pBuf, status);
 	}
 
