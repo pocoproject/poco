@@ -311,7 +311,7 @@ public:
 	}
 
 	virtual void processData(char*)
-		/// Caled when data is received by reader.
+		/// Called when data is received by reader.
 		///
 		/// No-op here, must be overridden by inheriting
 		/// class in order to do useful work.
@@ -319,7 +319,7 @@ public:
 	};
 
 	virtual void processError(char* buf)
-		/// Caled when error is detected by reader.
+		/// Called when error is detected by reader.
 		///
 		/// Only functional if stream pointer is provided
 		/// to the handler, otherwise it must be overridden
@@ -330,7 +330,7 @@ public:
 	}
 
 	void start()
-		/// Stars the handler run in thread.
+		/// Starts the handler run in thread.
 	{
 		_thread.start(*this);
 	}

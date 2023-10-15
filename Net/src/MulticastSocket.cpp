@@ -257,8 +257,7 @@ NetworkInterface MulticastSocket::findFirstInterface(const IPAddress& groupAddre
 
 void MulticastSocket::leaveGroup(const IPAddress& groupAddress)
 {
-	NetworkInterface intf;
-	leaveGroup(groupAddress, intf);
+	leaveGroup(groupAddress, findFirstInterface(groupAddress));
 }
 
 

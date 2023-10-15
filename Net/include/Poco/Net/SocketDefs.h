@@ -365,6 +365,21 @@ namespace Net {
 
 typedef std::vector<SocketBuf> SocketBufVec;
 
+inline int SocketBufVecSize(const SocketBufVec& sbv)
+	/// Returns total length of all SocketBufs in the vector.
+{
+	std::size_t sz = 0;
+	for (const auto& v : sbv)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		sz += v.len;
+#elif defined(POCO_OS_FAMILY_UNIX)
+		sz += v.iov_len;
+#endif
+	}
+	return static_cast<int>(sz);
+}
+
 struct AddressFamily
 	/// AddressFamily::Family replaces the previously used IPAddress::Family
 	/// enumeration and is now used for IPAddress::Family and SocketAddress::Family.

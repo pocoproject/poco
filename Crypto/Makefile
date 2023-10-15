@@ -6,9 +6,12 @@
 
 include $(POCO_BASE)/build/rules/global
 
-# see https://github.com/pocoproject/poco/issues/3073
 GLOBAL_SYSLIBS := $(SYSLIBS)
+ifeq ($(findstring AIX, $(POCO_CONFIG)), AIX)
+SYSLIBS = -lssl_a -lcrypto_a
+else
 SYSLIBS = -lssl -lcrypto
+endif
 SYSLIBS += $(GLOBAL_SYSLIBS)
 
 objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \

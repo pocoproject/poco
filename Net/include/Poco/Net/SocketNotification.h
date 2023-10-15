@@ -47,9 +47,10 @@ public:
 	Socket socket() const;
 		/// Returns the socket that caused the notification.
 
-private:
+protected:
 	void setSocket(const Socket& socket);
 
+private:
 	SocketReactor* _pReactor;
 	Socket         _socket;
 

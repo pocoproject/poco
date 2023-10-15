@@ -61,7 +61,7 @@ public:
 		/// is ready to accept connections.
 
 	virtual ~ServerSocket();
-		/// Destroys the StreamSocket.
+		/// Destroys the ServerSocket.
 
 	ServerSocket& operator = (const Socket& socket);
 		/// Assignment operator.

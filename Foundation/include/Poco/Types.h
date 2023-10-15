@@ -42,14 +42,14 @@ using UIntPtr = std::uintptr_t;
 		#define POCO_PTR_IS_64_BIT 1
 	#endif
 	#define POCO_HAVE_INT64 1
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) || defined(__QNX__)
 	#if defined(_WIN64)
 		#define POCO_PTR_IS_64_BIT 1
 	#else
 		#if defined(__LP64__)
 			#define POCO_PTR_IS_64_BIT 1
 			#define POCO_LONG_IS_64_BIT 1
-			#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_ANDROID
+			#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_AIX || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_SOLARIS
 				#define POCO_INT64_IS_LONG 1
 			#endif
 		#endif
