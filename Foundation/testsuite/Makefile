@@ -5,7 +5,7 @@
 #
 
 .PHONY: projects
-clean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -f Makefile-Driver $(MAKECMDGOALS)
 ifneq ($(LINKMODE),STATIC)
