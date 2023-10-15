@@ -5,6 +5,6 @@
 #
 
 .PHONY: projects
-clean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -C genrsakey $(MAKECMDGOALS)
