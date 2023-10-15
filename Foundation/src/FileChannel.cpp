@@ -351,6 +351,7 @@ void FileChannel::setArchive(const std::string& archive)
 void FileChannel::setCompress(const std::string& compress)
 {
 	_compress = icompare(compress, "true") == 0;
+	if (_pArchiveStrategy)
 	_pArchiveStrategy->compress(_compress);
 }
 
@@ -391,12 +392,15 @@ void FileChannel::setRotateOnOpen(const std::string& rotateOnOpen)
 
 void FileChannel::purge()
 {
+	if (_pPurgeStrategy)
+	{
 	try
 	{
 		_pPurgeStrategy->purge(_path);
 	}
 	catch (...)
 	{
+	}
 	}
 }
 

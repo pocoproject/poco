@@ -188,7 +188,7 @@ double NumberParser::parseFloat(const std::string& s, char decSep, char thSep)
 
 bool NumberParser::tryParseFloat(const std::string& s, double& value, char decSep, char thSep)
 {
-	return strToDouble(s, value, decSep, thSep);
+	return strToDouble(s.c_str(), value, decSep, thSep);
 }
 
 
