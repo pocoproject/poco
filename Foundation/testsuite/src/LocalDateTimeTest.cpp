@@ -479,7 +479,7 @@ void LocalDateTimeTest::testTimezone2()
 			then = *std::localtime(&t);
 #if POCO_OS == POCO_OS_SOLARIS
 			assertTrue((mktime(&then)-t) * 1000 == ldt.tzd());
-#else                        
+#else
 			assertTrue (then.tm_gmtoff == ldt.tzd());
 #endif
 		}
