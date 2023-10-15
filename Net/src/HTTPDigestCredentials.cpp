@@ -305,7 +305,7 @@ void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 	if (qop.empty())
 	{
 		/// Assume that https://tools.ietf.org/html/rfc7616 is not supported 
-		/// and still using https://tools.ietf.org/html/rfc2069#section-2.4	
+		/// and still using https://tools.ietf.org/html/rfc2069#section-2.4
 
 		MD5Engine engine;
 
