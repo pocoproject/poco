@@ -370,11 +370,13 @@ inline int SocketBufVecSize(const SocketBufVec& sbv)
 {
 	std::size_t sz = 0;
 	for (const auto& v : sbv)
+	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		sz += v.len;
 #elif defined(POCO_OS_FAMILY_UNIX)
 		sz += v.iov_len;
 #endif
+	}
 	return static_cast<int>(sz);
 }
 

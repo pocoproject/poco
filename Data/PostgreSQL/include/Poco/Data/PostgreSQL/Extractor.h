@@ -354,9 +354,9 @@ private:
 //
 // inlines
 //
-inline bool Extractor::isColumnNull(const OutputParameter& anOutputParameter) const
+inline bool Extractor::isColumnNull(const OutputParameter& outputParameter) const
 {
-	return anOutputParameter.isNull() || 0 == anOutputParameter.pData();
+	return outputParameter.isNull() || 0 == outputParameter.pData();
 }
 
 
