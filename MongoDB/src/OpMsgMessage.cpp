@@ -247,7 +247,7 @@ void OpMsgMessage::send(std::ostream& ostr)
 		wdoc.flush();
 
 		const std::string& identifier = commandIdentifier(_commandName);
-		const Poco::Int32 size = sizeof(size) + identifier.size() + 1 + ssdoc.tellp();
+		const Poco::Int32 size = static_cast<Poco::Int32>(sizeof(size) + identifier.size() + 1 + ssdoc.tellp());
 		writer << PAYLOAD_TYPE_1;
 		writer << size;
 		writer.writeCString(identifier.c_str());
