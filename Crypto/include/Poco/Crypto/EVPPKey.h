@@ -86,7 +86,7 @@ public:
 #endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-	explicit EVPPKey(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key, unsigned long exponent, int type);
+	explicit EVPPKey(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey, unsigned long exponent, int type);
 #endif
 	
 	explicit EVPPKey(EVP_PKEY* pEVPPKey);
@@ -178,7 +178,7 @@ public:
 private:
 	EVPPKey();
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L	
-	void SetKeyFromParameters(OSSL_PARAM* parameters);
+	void setKeyFromParameters(OSSL_PARAM* parameters);
 #endif
 	static int type(const EVP_PKEY* pEVPPKey);
 	void checkType();
