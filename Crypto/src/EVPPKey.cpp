@@ -73,14 +73,15 @@ EVPPKey::EVPPKey(const PKCS12Container& cont): EVPPKey(cont.getKey())
 
 void pushBuildParamBignum(OSSL_PARAM_BLD* paramBld, const char* key, const std::vector<unsigned char>& bytes)
 {
-	BIGNUM* bignum = nullptr;
-	if (!(bignum = BN_bin2bn(bytes.data(), (int)bytes.size(), nullptr)))
+	BIGNUM* pBigNum = nullptr;
+	if (!(pBigNum = BN_bin2bn(bytes.data(), (int)bytes.size(), nullptr)))
 	{
 		std::string msg = "pushBuildParamBignum(): BN_bin2bn()\n";
 		throw OpenSSLException(getError(msg));
 	}
 
-	OSSL_PARAM_BLD_push_BN(paramBld, key, bignum);
+	OSSL_PARAM_BLD_push_BN(paramBld, key, pBigNum);
+	BN_clear_free(pBigNum);
 }
 
 
