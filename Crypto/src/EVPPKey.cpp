@@ -71,22 +71,23 @@ EVPPKey::EVPPKey(const PKCS12Container& cont): EVPPKey(cont.getKey())
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 
-void pushBuildParamBignum(OSSL_PARAM_BLD* paramBld, const char* key, const std::vector<unsigned char>& bytes)
+void pushBuildParamBignum(OSSL_PARAM_BLD* paramBld, const char* key, const std::vector<unsigned char>& bytes, BIGNUM** pBigNum)
 {
-	BIGNUM* pBigNum = nullptr;
-	if (!(pBigNum = BN_bin2bn(bytes.data(), (int)bytes.size(), nullptr)))
+	poco_check_ptr(pBigNum);
+	if (!(*pBigNum = BN_bin2bn(bytes.data(), (int)bytes.size(), nullptr)))
 	{
 		std::string msg = "pushBuildParamBignum(): BN_bin2bn()\n";
 		throw OpenSSLException(getError(msg));
 	}
 
-	OSSL_PARAM_BLD_push_BN(paramBld, key, pBigNum);
-	BN_clear_free(pBigNum);
+	OSSL_PARAM_BLD_push_BN(paramBld, key, *pBigNum);
 }
 
 
 OSSL_PARAM* getKeyParameters(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey)
 {
+	BIGNUM* pBigNum1 = nullptr;
+	BIGNUM* pBigNum2 = nullptr;
 	OSSL_PARAM* parameters = nullptr;
 	auto paramBld = OSSL_PARAM_BLD_new();
 	if (!paramBld)
@@ -98,10 +99,10 @@ OSSL_PARAM* getKeyParameters(const std::vector<unsigned char>* publicKey, const 
 	try
 	{
 		if (publicKey != nullptr)
-			pushBuildParamBignum(paramBld, "n", *publicKey);
+			pushBuildParamBignum(paramBld, "n", *publicKey, &pBigNum1);
 
 		if (privateKey != nullptr)
-			pushBuildParamBignum(paramBld, "d", *privateKey);
+			pushBuildParamBignum(paramBld, "d", *privateKey, &pBigNum2);
 
 		// default rsa exponent
 		OSSL_PARAM_BLD_push_ulong(paramBld, "e", RSA_F4);
@@ -120,6 +121,8 @@ OSSL_PARAM* getKeyParameters(const std::vector<unsigned char>* publicKey, const 
 	}
 
 	OSSL_PARAM_BLD_free(paramBld);
+	BN_clear_free(pBigNum1);
+	BN_clear_free(pBigNum2);
 
 	return parameters;
 }
