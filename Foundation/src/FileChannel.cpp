@@ -230,7 +230,7 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 {
 	std::string::const_iterator it  = rotation.begin();
 	std::string::const_iterator end = rotation.end();
-	int n = 0;
+	Poco::Int64 n = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
 	while (it != end && Ascii::isSpace(*it)) ++it;
