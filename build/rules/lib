@@ -46,6 +46,7 @@ include $(POCO_BASE)/build/rules/compile
 # Rules for creating a library
 #
 clean:
+	$(RM) $(POCO_BUILD_STDERR_FILE)
 	$(RM) $(OBJPATH)
 	$(RM) $(LIB_RELEASE_STATIC) $(LIB_DEBUG_STATIC) $(LIB_RELEASE_SHARED) $(LIB_DEBUG_SHARED)
 	$(RM) $(LIB_DEBUG_SHARED_LINK) $(LIB_RELEASE_SHARED_LINK)
