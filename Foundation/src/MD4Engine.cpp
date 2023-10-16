@@ -134,8 +134,10 @@ const DigestEngine::Digest& MD4Engine::digest()
 #if defined(POCO_COMPILER_GCC)
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+	#pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
+	poco_assert_dbg (_digest.size() == sizeof(digest));
 #if defined(POCO_COMPILER_GCC)
 	#pragma GCC diagnostic pop
 #endif
