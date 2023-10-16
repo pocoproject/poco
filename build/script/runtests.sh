@@ -86,10 +86,10 @@ do
 				echo "****************************************"
 				echo ""
 
-				runs=`expr $runs + 1`
+				runs=$((runs + 1))
 				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $IGNORE $TESTRUNNERARGS"
 				if [ $? -ne 0 ] ; then
-					failures=`expr $failures + 1`
+					failures=$(("failures" + 1))
 					failedTests="$failedTests $comp"
 					status=1
 				fi
