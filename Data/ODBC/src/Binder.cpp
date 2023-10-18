@@ -82,7 +82,7 @@ void Binder::freeMemory()
 
 	UUIDMap::iterator itUUID = _uuids.begin();
 	UUIDMap::iterator itUUIDEnd = _uuids.end();
-	for(; itUUID != itUUIDEnd; ++itUUID) std::free(itUUID->first);
+	for(; itUUID != itUUIDEnd; ++itUUID) delete [] itUUID->first;
 
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();
