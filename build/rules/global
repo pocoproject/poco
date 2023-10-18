@@ -7,6 +7,7 @@
 # POCO_BASE:   Path to POCO source tree. Must be defined.
 # POCO_BUILD:  Path to directory where build files are put.
 #              Defaults to $(POCO_BASE)
+# POCO_BUILD_STDERR: Redirect command for build errors log file.
 # POCO_CONFIG: Build configuration to use.
 #              Defaults to `uname`.
 # POCO_TARGET_OSNAME: Target system operating system name (for cross builds)
@@ -49,6 +50,15 @@ endif
 export POCO_BUILD
 ifdef POCO_VERBOSE
 $(info POCO_BUILD          = $(POCO_BUILD))
+endif
+
+#
+# Build errors/warnings output
+#
+ifndef POCO_BUILD_STDERR
+POCO_BUILD_STDERR_FILE = "$(POCO_BASE)/build/poco_build_stderr.out"
+$(shell rm -f $(POCO_BUILD_STDERR_FILE))
+POCO_BUILD_STDERR = 2>&1|tee -a $(POCO_BUILD_STDERR_FILE)
 endif
 
 #

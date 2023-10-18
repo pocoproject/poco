@@ -29,6 +29,7 @@ include $(POCO_BASE)/build/rules/compile
 # Rules for creating an executable
 #
 clean:
+	$(RM) $(POCO_BUILD_STDERR_FILE)
 	$(RM) $(OBJPATH)
 	$(RM) $(EXEC_RELEASE_STATIC) $(EXEC_DEBUG_STATIC) $(EXEC_RELEASE_SHARED) $(EXEC_DEBUG_SHARED)
 
