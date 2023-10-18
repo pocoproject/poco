@@ -16,7 +16,6 @@ SANITIZEFLAGS ?=
 #  -fsanitize=undefined
 #  -fsanitize=thread
 
-
 #
 # Define Tools
 #
