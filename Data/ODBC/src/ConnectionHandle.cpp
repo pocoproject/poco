@@ -17,7 +17,6 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Error.h"
 #include "Poco/Debugger.h"
-#include <iostream>
 
 
 namespace Poco {

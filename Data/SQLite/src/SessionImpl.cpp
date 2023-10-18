@@ -257,11 +257,6 @@ Poco::Any SessionImpl::getTransactionType(const std::string& prop) const
 
 void SessionImpl::autoCommit(const std::string&, bool)
 {
-	// The problem here is to decide whether to call commit or rollback
-	// when autocommit is set to true. Hence, it is best not to implement
-	// this explicit call and only implicitly support autocommit setting.
-	throw NotImplementedException(
-		"SQLite autocommit is implicit with begin/commit/rollback.");
 }
 
 
