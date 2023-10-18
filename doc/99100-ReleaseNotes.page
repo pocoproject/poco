@@ -16,6 +16,7 @@ AAAIntroduction
   - GH #4182: Util: Make load()/save()/clear() operations on configurations thread-safe
   - GH #4184: Poco::TemporaryFile: make filenames less predictable
   - GH #4195: Poco::File::created() on macOS should use birthtime
+  - GH #4197: ODBC::Binder UUID new/free mismatch
 
 
 !!!Release 1.11.7
