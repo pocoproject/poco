@@ -7,6 +7,7 @@ CppUnit::TestCaller<FileChannelTest>.testPurgeAge
 CppUnit::TestCaller<FileTest>.testFileAttributes2
 CppUnit::TestCaller<PathTest>.testExpand
 CppUnit::TestCaller<PathTest>.testExpandVariableFromPath
+CppUnit::TestCaller<SyslogTest>.testOldBSD
 CppUnit::TestCaller<ClockTest>.testClock
 CppUnit::TestCaller<TimerTest>.testScheduleAtFixedRate
 CppUnit::TestCaller<TimerTest>.testScheduleInterval
