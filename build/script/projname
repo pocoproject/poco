@@ -10,8 +10,8 @@
 #
 
 PROJECT_BASE=$1
-cdir=`sh -c pwd`
-cd $PROJECT_BASE
-projbase=`sh -c pwd`
-cd "$cdir"
+cdir=$(sh -c pwd)
+cd "$PROJECT_BASE" || exit
+projbase=$(sh -c pwd)
+cd "$cdir" || exit
 sh -c pwd | sed "s:^$projbase::" | sed "s:^/::"
