@@ -53,6 +53,11 @@ public:
 	static const std::size_t CONNECTION_TIMEOUT_DEFAULT = CONNECTION_TIMEOUT_INFINITE;
 		/// Default connection/login timeout in seconds.
 
+	// ODBC only, otherwise no-op
+	static const int CURSOR_USE_ALWAYS = 0;
+	static const int CURSOR_USE_IF_NEEDED = 1;
+	static const int CURSOR_USE_NEVER = 2;
+
 	SessionImpl(const std::string& connectionString,
 		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
@@ -141,6 +146,9 @@ public:
 	std::string uri() const;
 		/// Returns the URI for this session.
 
+	virtual bool hasFeature(const std::string& name) = 0;
+		/// Returns true if session has the named feature.
+
 	virtual void setFeature(const std::string& name, bool state) = 0;
 		/// Set the state of a feature.
 		///
@@ -158,6 +166,9 @@ public:
 		///
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
+
+	virtual bool hasProperty(const std::string& name) = 0;
+		/// Returns true if session has the named feature.
 
 	virtual void setProperty(const std::string& name, const Poco::Any& value) = 0;
 		/// Set the value of a property.

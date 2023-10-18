@@ -107,6 +107,8 @@ public:
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
 
+	virtual void testRecordSet();
+
 	virtual void testDateTime();
 	virtual void testDate();
 	virtual void testTime();

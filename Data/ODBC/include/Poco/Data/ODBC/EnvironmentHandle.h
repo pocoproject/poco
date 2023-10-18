@@ -57,7 +57,6 @@ private:
 	const EnvironmentHandle& operator=(const EnvironmentHandle&);
 
 	SQLHENV _henv;
-	bool    _isOwner;
 };
 
 

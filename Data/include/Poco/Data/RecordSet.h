@@ -133,6 +133,9 @@ public:
 		/// for large recordsets, so it should be used judiciously.
 		/// Use totalRowCount() to obtain the total number of rows.
 
+	std::size_t affectedRowCount() const;
+		/// Returns the number of rows affected by the statement execution.
+
 	std::size_t extractedRowCount() const;
 		/// Returns the number of rows extracted during the last statement
 		/// execution.

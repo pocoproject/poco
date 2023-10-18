@@ -82,7 +82,7 @@ public:
 	int sqlDataType(int cDataType) const;
 		/// Returns SQL data type corresponding to supplied C data type.
 
-	void fillTypeInfo(SQLHDBC pHDBC);
+	void fillTypeInfo(const SQLHDBC* pHDBC);
 		/// Fills the data type info structure for the database.
 
 	DynamicAny getInfo(SQLSMALLINT type, const std::string& param) const;
@@ -107,7 +107,7 @@ private:
 	DataTypeMap _cDataTypes;
 	DataTypeMap _sqlDataTypes;
 	TypeInfoVec _typeInfo;
-	SQLHDBC*    _pHDBC;
+	const SQLHDBC*    _pHDBC;
 };
 
 

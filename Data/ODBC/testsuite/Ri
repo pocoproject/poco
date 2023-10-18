@@ -1,0 +1,8 @@
+[ODBC][195242][1697641086.652825][SQLGetData.c][237]
+		Entry:
+			Statement = 0xffff9e5f3080
+			Column Number = 15
+			Target Type = -15 SQL_C_SSHORT
+			Buffer Length = 2
+			Target Value = 0xffff7fefcc74
+			StrLen Or Ind = 0xffff7fefc3f0

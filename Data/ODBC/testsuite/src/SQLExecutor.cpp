@@ -73,6 +73,7 @@ using Poco::Data::ODBC::Preparator;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::DataTruncatedException;
+using Poco::Data::ODBC::ConnectionError;
 using Poco::Data::ODBC::StatementError;
 using Poco::format;
 using Poco::Tuple;
@@ -354,13 +355,13 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		assertTrue (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
 
 		SQLULEN dateTimeColSize = 0;
-		SQLSMALLINT dateTimeDecDigits = 0;
+		SQLSMALLINT dateTimeDecDigits = -1;
 		if (SQL_SUCCEEDED(rc))
 		{
 			SQLLEN ind = 0;
 			rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &dateTimeColSize, sizeof(SQLINTEGER), &ind);
 			poco_odbc_check_stmt (rc, hstmt);
-			rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), &ind);
+			rc = SQLGetData(hstmt, 15, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), &ind);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			assertTrue (sizeof(SQL_TIMESTAMP_STRUCT) <= dateTimeColSize);
@@ -484,17 +485,25 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				0);
 			poco_odbc_check_stmt (rc, hstmt);
 
-			SQLSMALLINT dataType = 0;
-			SQLULEN parameterSize = 0;
-			SQLSMALLINT decimalDigits = 0;
-			SQLSMALLINT nullable = 0;
-			rc = SQLDescribeParam(hstmt, 6, &dataType, &parameterSize, &decimalDigits, &nullable);
-			if (SQL_SUCCEEDED(rc))
+			if (dateTimeColSize == 0 || dateTimeDecDigits == -1)
 			{
-				if (parameterSize)
-					dateTimeColSize = parameterSize;
-				if (decimalDigits)
-					dateTimeDecDigits = decimalDigits;
+				SQLSMALLINT dataType = 0;
+				SQLULEN parameterSize = 0;
+				SQLSMALLINT decimalDigits = -1;
+				SQLSMALLINT nullable = 0;
+				rc = SQLDescribeParam(hstmt, 6, &dataType, &parameterSize, &decimalDigits, &nullable);
+				if (SQL_SUCCEEDED(rc))
+				{
+					if (parameterSize != 0 && dateTimeColSize == 0)
+						dateTimeColSize = parameterSize;
+					if (decimalDigits != -1 && dateTimeDecDigits == -1)
+						dateTimeDecDigits = decimalDigits;
+				}
+				else
+				{
+					std::cerr << '[' << name() << ']' << " Warning: could not get SQL_TYPE_TIMESTAMP "
+						"parameter description." << std::endl;
+				}
 			}
 			else
 				std::cerr << '[' << name() << ']' << " Warning: could not get SQL_TYPE_TIMESTAMP parameter description." << std::endl;
@@ -939,11 +948,266 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 }
 
 
+void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
+	const std::string& procCreateString,
+	const std::string& procExecuteString,
+	SQLExecutor::DataBinding bindMode,
+	SQLExecutor::DataExtraction extractMode)
+{
+	SQLRETURN rc;
+	SQLHENV henv = SQL_NULL_HENV;
+	SQLHDBC hdbc = SQL_NULL_HDBC;
+	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+
+	// Environment begin
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	poco_odbc_check_env(rc, henv);
+	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+	poco_odbc_check_env(rc, henv);
+
+	// Connection begin
+	rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+	poco_odbc_check_dbc(rc, hdbc);
+
+	SQLCHAR connectOutput[1024] = { 0 };
+	SQLSMALLINT result;
+	rc = SQLDriverConnect(hdbc
+		, NULL
+		, (SQLCHAR*)dbConnString.c_str()
+		, (SQLSMALLINT)SQL_NTS
+		, connectOutput
+		, sizeof(connectOutput)
+		, &result
+		, SQL_DRIVER_NOPROMPT);
+	poco_odbc_check_dbc(rc, hdbc);
+
+	// retrieve datetime type information for this DBMS
+	rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	poco_odbc_check_stmt(rc, hstmt);
+
+	rc = SQLGetTypeInfo(hstmt, SQL_TYPE_TIMESTAMP);
+	poco_odbc_check_stmt(rc, hstmt);
+
+	rc = SQLFetch(hstmt);
+	assertTrue(SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
+
+	SQLULEN dateTimeColSize = 0;
+	SQLSMALLINT dateTimeDecDigits = -1;
+	if (SQL_SUCCEEDED(rc))
+	{
+		SQLLEN ind = 0;
+		rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &dateTimeColSize, sizeof(SQLINTEGER), &ind);
+		poco_odbc_check_stmt(rc, hstmt);
+		rc = SQLGetData(hstmt, 15, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), &ind);
+		poco_odbc_check_stmt(rc, hstmt);
+
+		assertTrue(sizeof(SQL_TIMESTAMP_STRUCT) <= dateTimeColSize);
+	}
+	else if (SQL_NO_DATA == rc)
+		std::cerr << '[' << name() << ']' << " Warning: no SQL_TYPE_TIMESTAMP data type info returned by driver." << std::endl;
+
+	rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+	poco_odbc_check_stmt(rc, hstmt);
+
+		// Statement begin
+		rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+		poco_odbc_check_stmt(rc, hstmt);
+
+		std::string sql = "DROP PROCEDURE TestStoredProcedure";
+		SQLCHAR* pStr = (SQLCHAR*)sql.c_str();
+		SQLExecDirect(hstmt, pStr, (SQLINTEGER)sql.length());
+		//no return code check - ignore drop errors
+
+		// create stored prcedure and go
+		sql = procCreateString;
+		pStr = (SQLCHAR*)sql.c_str();
+		rc = SQLPrepare(hstmt, pStr, (SQLINTEGER)sql.length());
+		poco_odbc_check_stmt(rc, hstmt);
+
+		rc = SQLExecute(hstmt);
+		poco_odbc_check_stmt(rc, hstmt);
+
+		char inParam[10] = "1234";
+		char outParam[10] = "";
+		char retVal[10] = "";
+
+		sql = procExecuteString;
+		pStr = (SQLCHAR*)sql.c_str();
+		rc = SQLPrepare(hstmt, pStr, (SQLINTEGER)sql.length());
+		poco_odbc_check_stmt(rc, hstmt);
+
+		SQLLEN li[3] = { SQL_NTS, SQL_NTS, SQL_NTS };
+		SQLINTEGER size = (SQLINTEGER)strlen(inParam);
+
+		if (SQLExecutor::PB_AT_EXEC == bindMode)
+			li[0] = SQL_LEN_DATA_AT_EXEC(size);
+
+		rc = SQLBindParameter(hstmt,
+			(SQLUSMALLINT)1,
+			SQL_PARAM_OUTPUT,
+			SQL_C_CHAR,
+			SQL_VARCHAR,
+			(SQLUINTEGER)sizeof(retVal),
+			0,
+			(SQLPOINTER)retVal,
+			sizeof(retVal),
+			&li[0]);
+		poco_odbc_check_stmt(rc, hstmt);
+
+		if (SQLExecutor::PB_AT_EXEC == bindMode)
+			li[1] = SQL_LEN_DATA_AT_EXEC(size);
+
+		rc = SQLBindParameter(hstmt,
+			(SQLUSMALLINT)2,
+			SQL_PARAM_INPUT,
+			SQL_C_CHAR,
+			SQL_VARCHAR,
+			(SQLUINTEGER)sizeof(inParam),
+			0,
+			(SQLPOINTER)inParam,
+			sizeof(inParam),
+			&li[1]);
+		poco_odbc_check_stmt(rc, hstmt);
+
+		if (SQLExecutor::PB_AT_EXEC == bindMode)
+			li[2] = SQL_LEN_DATA_AT_EXEC(size);
+
+		rc = SQLBindParameter(hstmt,
+			(SQLUSMALLINT)3,
+			SQL_PARAM_OUTPUT,
+			SQL_C_CHAR,
+			SQL_VARCHAR,
+			(SQLUINTEGER)sizeof(outParam),
+			0,
+			(SQLPOINTER)outParam,
+			sizeof(outParam),
+			&li[2]);
+		poco_odbc_check_stmt(rc, hstmt);
+
+		rc = SQLExecute(hstmt);
+		if (rc && SQL_NEED_DATA != rc)
+		{
+			std::cout << "rc=" << rc << ", SQL_NEED_DATA=" << SQL_NEED_DATA << '\n';
+			poco_odbc_check_stmt(rc, hstmt);
+		}
+		assertTrue(SQL_NEED_DATA == rc || SQL_SUCCEEDED(rc));
+
+		if (SQL_NEED_DATA == rc)
+		{
+			SQLPOINTER pParam = 0;
+			while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)))
+			{
+				if ((pParam != (SQLPOINTER)retVal) &&
+					(pParam != (SQLPOINTER)inParam) &&
+					(pParam != (SQLPOINTER)outParam))
+				{
+					fail("Parameter mismatch.");
+				}
+
+				assertTrue(0 != (SQLINTEGER)size);
+				rc = SQLPutData(hstmt, pParam, (SQLINTEGER)size);
+				poco_odbc_check_stmt(rc, hstmt);
+			}
+		}
+		poco_odbc_check_stmt(rc, hstmt);
+		assertTrue(std::string(outParam) == std::string(inParam));
+		assertTrue(std::string(retVal) == std::string(inParam));
+
+		sql = "DROP PROCEDURE TestStoredProcedure";
+		pStr = (SQLCHAR*)sql.c_str();
+		rc = SQLExecDirect(hstmt, pStr, (SQLINTEGER)sql.length());
+		poco_odbc_check_stmt(rc, hstmt);
+
+		rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+		poco_odbc_check_stmt(rc, hstmt);
+
+	// Connection end
+	rc = SQLDisconnect(hdbc);
+	poco_odbc_check_dbc(rc, hdbc);
+	rc = SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+	poco_odbc_check_dbc(rc, hdbc);
+
+	// Environment end
+	rc = SQLFreeHandle(SQL_HANDLE_ENV, henv);
+	poco_odbc_check_env(rc, henv);
+}
+
+
 void SQLExecutor::execute(const std::string& sql)
 {
 	try { session() << sql, now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (sql); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (sql); }
+}
+
+
+void SQLExecutor::connection(const std::string& connectString)
+{
+	Poco::Data::ODBC::Connection c;
+	assertFalse (c.isConnected());
+	assertTrue (c.connect(connectString, 5));
+	assertTrue (c.isConnected());
+	assertTrue (c.getTimeout() == 5);
+	c.setTimeout(6);
+	assertTrue (c.getTimeout() == 6);
+	assertTrue (c.disconnect());
+	assertFalse (c.isConnected());
+	assertTrue (c.connect(connectString));
+	assertTrue (c.isConnected());
+	try
+	{
+		c.connect();
+		fail ("Connection attempt must fail when already connected");
+	}
+	catch(const Poco::InvalidAccessException&){}
+	assertTrue (c.disconnect());
+	assertFalse (c.isConnected());
+	try
+	{
+		c.connect();
+		fail ("Connection attempt with empty string must fail");
+	}
+	catch(const Poco::InvalidArgumentException&){}
+}
+
+
+void SQLExecutor::session(const std::string& connectString, int timeout)
+{
+	Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, connectString, timeout);
+	assertTrue (s.isConnected());
+	s.close();
+	assertTrue (!s.isConnected());
+	s.open();
+	assertTrue (s.isConnected());
+	s.reconnect();
+	assertTrue (s.isConnected());
+	s.close();
+	assertTrue (!s.isConnected());
+	s.reconnect();
+	assertTrue (s.isConnected());
+
+	Poco::Any any = s.getProperty("handle");
+	assertTrue (typeid(SQLHDBC) == any.type());
+	SQLHDBC hdbc = Poco::AnyCast<SQLHDBC>(any);
+	assertTrue (SQL_NULL_HDBC != hdbc);
+	SQLRETURN rc = SQLDisconnect(hdbc);
+	assertTrue (!Utility::isError(rc));
+	assertTrue (!s.isConnected());
+	s.open();
+	assertTrue (s.isConnected());
+
+	hdbc = Poco::AnyCast<SQLHDBC>(any);
+	rc = SQLDisconnect(hdbc);
+	assertTrue (!Utility::isError(rc));
+	assertTrue (!s.isConnected());
+	s.reconnect();
+	assertTrue (s.isConnected());
+	s.close();
+	assertTrue (!s.isConnected());
+	s.reconnect();
+	assertTrue (s.isConnected());
+	s.reconnect();
+	assertTrue (s.isConnected());
 }
 
 
@@ -2470,6 +2734,106 @@ void SQLExecutor::blobStmt()
 }
 
 
+void SQLExecutor::recordSet()
+{
+	std::string funct = "dateTime()";
+
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	DateTime born(1965, 6, 18, 5, 35, 1);
+	DateTime born2(1991, 6, 18, 14, 35, 1);
+
+	try
+	{
+		{
+			Statement stmt = (session() << "SELECT COUNT(*) AS row_count FROM Person", now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 1);
+			assertTrue (rset["row_count"].convert<int>() == 0);
+		}
+
+		{
+			Statement stmt = (session() <<
+				"INSERT INTO Person VALUES (?,?,?,?)",
+				use(lastName), use(firstName), use(address), use(born), now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 0);
+			assertTrue (rset.affectedRowCount() == 1);
+		}
+
+		{
+			Statement stmt = (session() << "SELECT COUNT(*) AS row_count FROM Person", now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 1);
+			assertTrue (rset["row_count"].convert<int>() == 1);
+		}
+
+		{
+			Statement stmt = (session() << "SELECT Born FROM Person", now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 1);
+			assertTrue (rset["Born"].convert<DateTime>() == born);
+		}
+
+		{
+			Statement stmt = (session() <<
+				"DELETE FROM Person WHERE born = ?", use(born), now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 0);
+			assertTrue (rset.affectedRowCount() == 1);
+		}
+
+		{
+			Statement stmt = (session() <<
+				"INSERT INTO Person VALUES (?,?,?,?)",
+				use(lastName), use(firstName), use(address), use(born), now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 0);
+			assertTrue (rset.affectedRowCount() == 1);
+		}
+
+		{
+			Statement stmt = (session() <<
+				"INSERT INTO Person VALUES (?,?,?,?)",
+				use(lastName), use(firstName), use(address), use(born2), now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 0);
+			assertTrue (rset.affectedRowCount() == 1);
+		}
+
+		{
+			Statement stmt = (session() << "SELECT COUNT(*) AS row_count FROM Person", now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 1);
+			assertTrue (rset["row_count"].convert<int>() == 2);
+		}
+
+		{
+			Statement stmt = (session() << "SELECT Born FROM Person ORDER BY Born DESC", now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 2);
+			assertTrue (rset["Born"].convert<DateTime>() == born2);
+			rset.moveNext();
+			assertTrue (rset["Born"].convert<DateTime>() == born);
+			rset.moveFirst();
+			assertTrue (rset["Born"].convert<DateTime>() == born2);
+			rset.moveLast();
+			assertTrue (rset["Born"].convert<DateTime>() == born);
+		}
+
+		{
+			Statement stmt = (session() << "DELETE FROM Person", now);
+			RecordSet rset(stmt);
+			assertTrue (rset.rowCount() == 0);
+			assertTrue (rset.affectedRowCount() == 2);
+		}
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
+}
+
+
 void SQLExecutor::dateTime()
 {
 	std::string funct = "dateTime()";
@@ -3457,22 +3821,35 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 	try
 	{
 		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel");
+		Stopwatch sw; sw.start();
+		while (!pChannel->isRunning())
+		{
+			Thread::sleep(10);
+			if (sw.elapsedSeconds() > 3)
+				fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
+		}
+
+		pChannel->setProperty("bulk", "true");
 		pChannel->setProperty("keep", "2 seconds");
 
 		Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
 		pChannel->log(msgInf);
+		while (pChannel->logged() != 1) Thread::sleep(10);
+
 		Message msgWarn("WarningSource", "b Warning async message", Message::PRIO_WARNING);
 		pChannel->log(msgWarn);
-		pChannel->wait();
+		while (pChannel->logged() != 2) Thread::sleep(10);
 
-		pChannel->setProperty("async", "false");
 		Message msgInfS("InformationSource", "c Informational sync message", Message::PRIO_INFORMATION);
 		pChannel->log(msgInfS);
+		while (pChannel->logged() != 3) Thread::sleep(10);
 		Message msgWarnS("WarningSource", "d Warning sync message", Message::PRIO_WARNING);
 		pChannel->log(msgWarnS);
+		while (pChannel->logged() != 4) Thread::sleep(10);
 
 		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
-		assertTrue (4 == rs.rowCount());
+		size_t rc = rs.rowCount();
+		assertTrue (4 == rc);
 		assertTrue ("InformationSource" == rs["Source"]);
 		assertTrue ("a Informational async message" == rs["Text"]);
 		rs.moveNext();
@@ -3485,12 +3862,14 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 		assertTrue ("WarningSource" == rs["Source"]);
 		assertTrue ("d Warning sync message" == rs["Text"]);
 
-		Thread::sleep(3000);
+		Thread::sleep(3000); // give it time to archive
 
 		Message msgInfA("InformationSource", "e Informational sync message", Message::PRIO_INFORMATION);
 		pChannel->log(msgInfA);
+		while (pChannel->logged() != 5) Thread::sleep(10);
 		Message msgWarnA("WarningSource", "f Warning sync message", Message::PRIO_WARNING);
 		pChannel->log(msgWarnA);
+		while (pChannel->logged() != 6) Thread::sleep(10);
 
 		RecordSet rs1(session(), "SELECT * FROM T_POCO_LOG_ARCHIVE");
 		assertTrue (4 == rs1.rowCount());
@@ -3504,7 +3883,6 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 		rs2.moveNext();
 		assertTrue ("WarningSource" == rs2["Source"]);
 		assertTrue ("f Warning sync message" == rs2["Text"]);
-
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlChannel()"); }
@@ -3516,14 +3894,23 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 	try
 	{
 		Logger& root = Logger::root();
-		root.setChannel(new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel"));
+		SQLChannel* pSQLChannel = new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel");
+		Stopwatch sw; sw.start();
+		while (!pSQLChannel->isRunning())
+		{
+			Thread::sleep(10);
+			if (sw.elapsedSeconds() > 3)
+				fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
+		}
+
+		root.setChannel(pSQLChannel);
 		root.setLevel(Message::PRIO_INFORMATION);
 
 		root.information("a Informational message");
 		root.warning("b Warning message");
 		root.debug("Debug message");
 
-		Thread::sleep(100);
+		while (pSQLChannel->logged() != 2) Thread::sleep(100);
 		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
 		assertTrue (2 == rs.rowCount());
 		assertTrue ("TestSQLChannel" == rs["Source"]);
@@ -3531,7 +3918,6 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 		rs.moveNext();
 		assertTrue ("TestSQLChannel" == rs["Source"]);
 		assertTrue ("b Warning message" == rs["Text"]);
-		root.setChannel(nullptr);
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlLogger()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlLogger()"); }
@@ -3852,7 +4238,7 @@ struct TestRollbackTransactor
 
 void SQLExecutor::transactor()
 {
-	std::string funct = "transaction()";
+	std::string funct = "transactor()";
 	int count = 0;
 
 	bool autoCommit = session().getFeature("autoCommit");

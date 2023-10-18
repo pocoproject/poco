@@ -43,8 +43,10 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_dbEncoding("UTF-8")
 {
 	setFeature("bulk", true);
+	// this option is obsolete; here only to support older drivers, should be changed to ODBC_CURSOR_USE_NEVER
+	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
+	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
 	open();
-	setProperty("handle", _db.handle());
 }
 
 
@@ -63,8 +65,10 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_dbEncoding("UTF-8")
 {
 	setFeature("bulk", true);
+	// this option is obsolete; here only to support older drivers, should be changed to ODBC_CURSOR_USE_NEVER
+	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
+	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
 	open();
-	setProperty("handle", _db.handle());
 }
 
 
@@ -104,69 +108,51 @@ void SessionImpl::open(const std::string& connect)
 			setConnectionString(connect);
 	}
 
-	poco_assert_dbg (!connectionString().empty());
+	if (connectionString().empty())
+		throw InvalidArgumentException("SessionImpl::open(): Connection string empty");
 
 	SQLULEN tout = static_cast<SQLULEN>(getLoginTimeout());
-	if (Utility::isError(SQLSetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, (SQLPOINTER) tout, 0)))
+
+	if (_db.connect(connectionString(), tout))
 	{
-		if (Utility::isError(SQLGetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, &tout, 0, 0)) ||
-				getLoginTimeout() != tout)
-		{
-			ConnectionError e(_db);
-			throw ConnectionFailedException(e.toString());
-		}
+		setProperty("handle", _db.handle());
+
+		_dataTypes.fillTypeInfo(_db.pHandle());
+			addProperty("dataTypeInfo",
+			&SessionImpl::setDataTypeInfo,
+			&SessionImpl::dataTypeInfo);
+
+		addFeature("autoCommit",
+			&SessionImpl::autoCommit,
+			&SessionImpl::isAutoCommit);
+
+		addFeature("autoBind",
+			&SessionImpl::autoBind,
+			&SessionImpl::isAutoBind);
+
+		addFeature("autoExtract",
+			&SessionImpl::autoExtract,
+			&SessionImpl::isAutoExtract);
+
+		addProperty("maxFieldSize",
+			&SessionImpl::setMaxFieldSize,
+			&SessionImpl::getMaxFieldSize);
+
+		addProperty("queryTimeout",
+			&SessionImpl::setQueryTimeout,
+			&SessionImpl::getQueryTimeout);
+
+		addProperty("dbEncoding",
+			&SessionImpl::setDBEncoding,
+			&SessionImpl::getDBEncoding);
+
+		Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
+
+		if (!canTransact()) autoCommit("", true);
 	}
-
-	SQLCHAR connectOutput[512] = {0};
-	SQLSMALLINT result;
-
-	if (Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_db
-		, NULL
-		,(SQLCHAR*) connectionString().c_str()
-		,(SQLSMALLINT) SQL_NTS
-		, connectOutput
-		, sizeof(connectOutput)
-		, &result
-		, SQL_DRIVER_NOPROMPT)))
-	{
-		ConnectionError err(_db);
-		std::string errStr = err.toString();
-		close();
-		throw ConnectionFailedException(errStr);
-	}
-
-	_dataTypes.fillTypeInfo(_db);
-		addProperty("dataTypeInfo",
-		&SessionImpl::setDataTypeInfo,
-		&SessionImpl::dataTypeInfo);
-
-	addFeature("autoCommit",
-		&SessionImpl::autoCommit,
-		&SessionImpl::isAutoCommit);
-
-	addFeature("autoBind",
-		&SessionImpl::autoBind,
-		&SessionImpl::isAutoBind);
-
-	addFeature("autoExtract",
-		&SessionImpl::autoExtract,
-		&SessionImpl::isAutoExtract);
-
-	addProperty("maxFieldSize",
-		&SessionImpl::setMaxFieldSize,
-		&SessionImpl::getMaxFieldSize);
-
-	addProperty("queryTimeout",
-		&SessionImpl::setQueryTimeout,
-		&SessionImpl::getQueryTimeout);
-
-	addProperty("dbEncoding",
-		&SessionImpl::setDBEncoding,
-		&SessionImpl::getDBEncoding);
-
-	Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
-
-	if (!canTransact()) autoCommit("", true);
+	else
+		throw ConnectionException(SQL_NULL_HDBC,
+			Poco::format("Connection to '%s' failed.", connectionString()));
 }
 
 
@@ -180,15 +166,62 @@ void SessionImpl::setDBEncoding(const std::string&, const Poco::Any& value)
 
 bool SessionImpl::isConnected() const
 {
-	SQLULEN value = 0;
+	return _db.isConnected();
+}
 
-	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
-		SQL_ATTR_CONNECTION_DEAD,
-		&value,
-		0,
-		0))) return false;
 
-	return (SQL_CD_FALSE == value);
+inline void SessionImpl::setCursorUse(const std::string&, const Poco::Any& value)
+{
+#if POCO_OS == POCO_OS_WINDOWS_NT
+#pragma warning (disable : 4995) // ignore marked as deprecated
+#endif
+	int cursorUse = static_cast<int>(Poco::AnyCast<CursorUse>(value));
+	int rc = 0;
+	switch (cursorUse)
+	{
+	case ODBC_CURSOR_USE_ALWAYS:
+		rc = Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, (SQLPOINTER)SQL_CUR_USE_ODBC, SQL_IS_INTEGER);
+		break;
+	case ODBC_CURSOR_USE_IF_NEEDED:
+		rc = Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, (SQLPOINTER)SQL_CUR_USE_IF_NEEDED, SQL_IS_INTEGER);
+		break;
+	case ODBC_CURSOR_USE_NEVER:
+		rc = Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, (SQLPOINTER)SQL_CUR_USE_DRIVER, SQL_IS_INTEGER);
+		break;
+	default:
+		throw Poco::InvalidArgumentException(Poco::format("SessionImpl::setCursorUse(%d)", cursorUse));
+	}
+#if POCO_OS == POCO_OS_WINDOWS_NT
+#pragma warning (default : 4995)
+#endif
+	if (Utility::isError(rc))
+	{
+		throw Poco::Data::ODBC::HandleException<SQLHDBC, SQL_HANDLE_DBC>(_db, Poco::format("SessionImpl::setCursorUse(%d)", cursorUse));
+	}
+}
+
+
+inline Poco::Any SessionImpl::getCursorUse(const std::string&) const
+{
+#if POCO_OS == POCO_OS_WINDOWS_NT
+#pragma warning (disable : 4995) // ignore marked as deprecated
+#endif
+	SQLUINTEGER curUse = 0;
+	Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, &curUse, SQL_IS_UINTEGER, 0);
+	switch (curUse)
+	{
+	case SQL_CUR_USE_ODBC:
+		return ODBC_CURSOR_USE_ALWAYS;
+	case SQL_CUR_USE_IF_NEEDED:
+		return ODBC_CURSOR_USE_IF_NEEDED;
+	case SQL_CUR_USE_DRIVER:
+		return ODBC_CURSOR_USE_NEVER;
+	default: break;
+	}
+	throw Poco::InvalidArgumentException(Poco::format("SessionImpl::getCursorUse(%u)", curUse));
+#if POCO_OS == POCO_OS_WINDOWS_NT
+#pragma warning (default : 4995)
+#endif
 }
 
 
@@ -333,7 +366,7 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 		SQL_ATTR_AUTOCOMMIT,
 		val ? (SQLPOINTER) SQL_AUTOCOMMIT_ON :
 			(SQLPOINTER) SQL_AUTOCOMMIT_OFF,
-		SQL_IS_UINTEGER), "Failed to set automatic commit.");
+		SQL_IS_UINTEGER), "Failed to set autocommit.");
 }
 
 
@@ -419,7 +452,8 @@ void SessionImpl::close()
 	{
 	}
 
-	SQLDisconnect(_db);
+	_db.disconnect();
+	setProperty("handle", SQL_NULL_HDBC);
 }
 
 

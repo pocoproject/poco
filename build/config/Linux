@@ -11,6 +11,11 @@
 LINKMODE ?= SHARED
 
 SANITIZEFLAGS ?=
+# sanitize flags:
+#  -fsanitize=address
+#  -fsanitize=undefined
+#  -fsanitize=thread
+
 
 #
 # Define Tools
