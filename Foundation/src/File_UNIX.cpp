@@ -212,11 +212,7 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
-#if defined(__APPLE__) && defined(st_birthtime) && !defined(POCO_NO_STAT64) // st_birthtime is available only on 10.5
-	struct stat64 st;
-	if (stat64(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_birthtime);
-#elif defined(__FreeBSD__)
+#if defined(__FreeBSD__) || (defined(__APPLE__) && defined(_DARWIN_FEATURE_64_BIT_INODE))
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);
