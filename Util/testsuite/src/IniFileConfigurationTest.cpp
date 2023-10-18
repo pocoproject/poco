@@ -87,6 +87,18 @@ void IniFileConfigurationTest::testLoad()
 	assertTrue (std::find(keys.begin(), keys.end(), "section1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "Prop1") == keys.end());
+
+	std::istringstream istr_err(iniFile);
+	istr_err.putback(std::ios_base::failbit);
+	try
+	{
+		AutoPtr<IniFileConfiguration> pConf_err = new IniFileConfiguration(istr_err);
+	}
+	catch (Poco::IOException& exc)
+	{
+		std::string s(exc.message());
+		assertTrue (s == "Broken input stream");
+	}
 }
 
 
