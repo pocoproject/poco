@@ -65,6 +65,10 @@ void IniFileConfiguration::load(std::istream& istr)
 	_sectionKey.clear();
 	while (!istr.eof())
 	{
+		if(istr.fail())
+		{
+			throw Poco::IOException("Broken input stream");
+		}
 		parseLine(istr);
 	}
 }
