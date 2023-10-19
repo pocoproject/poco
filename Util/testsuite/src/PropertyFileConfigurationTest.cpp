@@ -85,6 +85,18 @@ void PropertyFileConfigurationTest::testLoad()
 	catch (NotFoundException&)
 	{
 	}
+
+	std::istringstream istr_err(propFile);
+	istr_err.putback(std::ios_base::failbit);
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pConf_err = new PropertyFileConfiguration(istr_err);
+	}
+	catch (Poco::IOException& exc)
+	{
+		std::string s(exc.message());
+		assertTrue (s == "Broken input stream");
+	}
 }
 
 
