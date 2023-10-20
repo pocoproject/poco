@@ -57,14 +57,18 @@ public:
 	int getTimeout() const;
 		/// Returns the connection timeout in seconds.
 
-	operator const SQLHDBC& () const;
-		/// Const conversion operator into reference to native type.
-
 	const SQLHDBC& handle() const;
 		/// Returns const reference to handle;
 
 	const SQLHDBC* pHandle() const;
 		/// Returns const pointer to handle;
+
+	operator const SQLHDBC& () const;
+		/// Const conversion operator into reference to native type.
+
+	operator bool();
+		/// Returns true if handles are not null.
+		/// True value is not a guarantee that the connection is valid.
 
 private:
 	operator SQLHDBC& ();
@@ -82,8 +86,8 @@ private:
 	ConnectionHandle(const ConnectionHandle&);
 	const ConnectionHandle& operator=(const ConnectionHandle&);
 
-	const EnvironmentHandle* _pEnvironment;
-	SQLHDBC                  _hdbc;
+	const EnvironmentHandle* _pEnvironment = nullptr;
+	SQLHDBC                  _hdbc = SQL_NULL_HDBC;
 	std::string              _connectString;
 
 	friend class Poco::Data::ODBC::SessionImpl;
@@ -99,6 +103,12 @@ using Connection = ConnectionHandle;
 inline ConnectionHandle::operator const SQLHDBC& () const
 {
 	return handle();
+}
+
+
+inline ConnectionHandle::operator bool()
+{
+	return _pEnvironment != nullptr && _hdbc != SQL_NULL_HDBC;
 }
 
 

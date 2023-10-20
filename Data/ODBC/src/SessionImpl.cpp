@@ -372,6 +372,8 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 
 bool SessionImpl::isAutoCommit(const std::string&) const
 {
+	if (!_db) return false;
+
 	SQLULEN value = 0;
 
 	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
@@ -386,7 +388,7 @@ bool SessionImpl::isAutoCommit(const std::string&) const
 
 bool SessionImpl::isTransaction() const
 {
-	if (!canTransact()) return false;
+	if (!_db || !canTransact()) return false;
 
 	SQLULEN value = 0;
 	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,

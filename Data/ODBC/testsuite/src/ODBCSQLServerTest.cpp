@@ -180,18 +180,6 @@ void ODBCSQLServerTest::testTempTable()
 }
 
 
-void ODBCSQLServerTest::testConnection()
-{
-	executor().connection(_connectString);
-}
-
-
-void ODBCSQLServerTest::testSession()
-{
-	executor().session(_connectString, 5);
-}
-
-
 void ODBCSQLServerTest::testBLOB()
 {
 	const std::size_t maxFldSize = 250000;
@@ -902,6 +890,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testConnection);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSession);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);

@@ -41,9 +41,6 @@ public:
 
 	void testBareboneODBC();
 
-	void testConnection();
-	void testSession();
-
 	void testTempTable();
 
 	void testBLOB();

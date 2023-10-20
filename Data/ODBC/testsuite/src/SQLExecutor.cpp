@@ -29,6 +29,8 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Data/Session.h"
+#include "Poco/Data/SessionPool.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
@@ -54,6 +56,7 @@
 
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
+using Poco::Data::SessionPool;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 using Poco::Data::Column;
@@ -1208,6 +1211,244 @@ void SQLExecutor::session(const std::string& connectString, int timeout)
 	assertTrue (s.isConnected());
 	s.reconnect();
 	assertTrue (s.isConnected());
+}
+
+
+void SQLExecutor::sessionPool(const std::string& connectString, int minSessions, int maxSessions, int idleTime, int timeout)
+{
+	assertTrue (minSessions <= maxSessions);
+
+	SessionPool sp("ODBC", connectString, minSessions, maxSessions, idleTime, timeout);
+	assertEqual (0, sp.allocated());
+	assertEqual (maxSessions, sp.available());
+	Session s1 = sp.get();
+	assertEqual (minSessions, sp.allocated());
+	assertEqual (maxSessions-1, sp.available());
+	s1 = sp.get();
+	assertEqual (2, sp.allocated());
+	assertEqual (maxSessions-1, sp.available());
+	{
+		Session s2 = sp.get();
+		assertEqual (2, sp.allocated());
+		assertEqual (maxSessions-2, sp.available());
+	}
+	assertEqual (2, sp.allocated());
+	assertEqual (maxSessions-1, sp.available());
+
+	Thread::sleep(idleTime + 500);
+	assertEqual (maxSessions-minSessions, sp.available());
+
+	try
+	{
+		sp.setFeature("autoBind", true);
+		fail("SessionPool must throw on setFeature after the first session was created.");
+	}
+	catch(const Poco::InvalidAccessException&) {}
+	try
+	{
+		sp.setProperty("handle", SQL_NULL_HDBC);
+		fail("SessionPool must throw on setProperty after the first session was created.");
+	}
+	catch(const Poco::InvalidAccessException&) {}
+
+	std::vector<Session> sessions;
+	for (int i = 0; i < maxSessions-minSessions; ++i)
+	{
+		sessions.push_back(sp.get());
+	}
+
+	try
+	{
+		Session s = sp.get();
+		fail("SessionPool must throw when no sesions available.");
+	}
+	catch(const Poco::Data::SessionPoolExhaustedException&) {}
+
+	sp.shutdown();
+	try
+	{
+		Session s = sp.get();
+		fail("SessionPool that was shut down must throw on get.");
+	}
+	catch(const Poco::InvalidAccessException&) {}
+
+	{
+		SessionPool pool("ODBC", connectString, 1, 4, 2, 10);
+
+		pool.setFeature("f1", true);
+		assertTrue (pool.getFeature("f1"));
+		try { pool.getFeature("g1"); fail ("must fail"); }
+		catch ( Poco::NotFoundException& ) { }
+
+		pool.setProperty("p1", 1);
+		assertTrue (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
+		try { pool.getProperty("r1"); fail ("must fail"); }
+		catch ( Poco::NotFoundException& ) { }
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 0);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 4);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+		Session s1(pool.get());
+
+		assertTrue (s1.getFeature("f1"));
+		assertTrue (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
+
+		try { pool.setFeature("f1", true); fail ("must fail"); }
+		catch ( Poco::InvalidAccessException& ) { }
+
+		try { pool.setProperty("p1", 1); fail ("must fail"); }
+		catch ( Poco::InvalidAccessException& ) { }
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 1);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 3);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		Session s2(pool.get("f1", false));
+		assertTrue (!s2.getFeature("f1"));
+		assertTrue (1 == Poco::AnyCast<int>(s2.getProperty("p1")));
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 2);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 2);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		{
+			Session s3(pool.get("p1", 2));
+			assertTrue (s3.getFeature("f1"));
+			assertTrue (2 == Poco::AnyCast<int>(s3.getProperty("p1")));
+
+			assertTrue (pool.capacity() == 4);
+			assertTrue (pool.allocated() == 3);
+			assertTrue (pool.idle() == 0);
+			assertTrue (pool.connTimeout() == 10);
+			assertTrue (pool.available() == 1);
+			assertTrue (pool.dead() == 0);
+			assertTrue (pool.allocated() == pool.used() + pool.idle());
+		}
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 3);
+		assertTrue (pool.idle() == 1);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 2);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		Session s4(pool.get());
+		assertTrue (s4.getFeature("f1"));
+		assertTrue (1 == Poco::AnyCast<int>(s4.getProperty("p1")));
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 3);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 1);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		Session s5(pool.get());
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 4);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 0);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		try
+		{
+			Session s6(pool.get());
+			fail("pool exhausted - must throw");
+		}
+		catch (Poco::Data::SessionPoolExhaustedException&) { }
+
+		s5.close();
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 4);
+		assertTrue (pool.idle() == 1);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 1);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		try
+		{
+			s5 << "DROP TABLE IF EXISTS Test", now;
+			fail("session unusable - must throw");
+		}
+		catch (Poco::Data::SessionUnavailableException&) { }
+
+		s4.close();
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 4);
+		assertTrue (pool.idle() == 2);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 2);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		Thread::sleep(5000); // time to clean up idle sessions
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 2);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 2);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		Session s6(pool.get());
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 3);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 1);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		s6.setFeature("connected", false);
+		assertTrue (pool.dead() == 1);
+
+		s6.close();
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 2);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 2);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+
+		assertTrue (pool.isActive());
+		pool.shutdown();
+		assertTrue (!pool.isActive());
+		try
+		{
+			Session s7(pool.get());
+			fail("pool shut down - must throw");
+		}
+		catch (InvalidAccessException&) { }
+
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 0);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.connTimeout() == 10);
+		assertTrue (pool.available() == 0);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
+	}
 }
 
 

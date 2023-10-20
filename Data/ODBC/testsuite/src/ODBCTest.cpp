@@ -77,6 +77,24 @@ ODBCTest::~ODBCTest()
 }
 
 
+void ODBCTest::testConnection()
+{
+	_pExecutor->connection(_rConnectString);
+}
+
+
+void ODBCTest::testSession()
+{
+	_pExecutor->session(_rConnectString, 5);
+}
+
+
+void ODBCTest::testSessionPool()
+{
+	_pExecutor->sessionPool(_rConnectString, 1, 4, 3, 5);
+}
+
+
 void ODBCTest::testZeroRows()
 {
 	if (!_pSession) fail ("Test not available.");

@@ -121,6 +121,8 @@ public:
 
 	void connection(const std::string& connectString);
 	void session(const std::string& connectString, int timeout);
+	void sessionPool(const std::string& connectString,
+		int minSessions, int maxSessions, int idleTime, int timeout);
 
 	void zeroRows();
 	void simpleAccess();

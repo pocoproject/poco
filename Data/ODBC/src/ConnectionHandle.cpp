@@ -144,6 +144,8 @@ int ConnectionHandle::getTimeout() const
 
 bool ConnectionHandle::isConnected() const
 {
+	if (!*this) return false;
+
 	SQLULEN value = 0;
 
 	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_hdbc,
