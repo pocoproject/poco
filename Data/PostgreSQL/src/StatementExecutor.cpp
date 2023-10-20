@@ -143,13 +143,18 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	}
 
 	{
+                // get the sqlState
+                const char* pSQLState	= PQresultErrorField(ptrPGResult, PG_DIAG_SQLSTATE);		
+
 		// setup to clear the result from PQprepare
 		PQResultClear resultClearer(ptrPGResult);
 
-		if	(!ptrPGResult || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK)
+                //
+		if  (!ptrPGResult || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK )
 		{
-			throw StatementException(std::string("postgresql_stmt_prepare error: ") + PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
+			throw StatementException(std::string("postgresql_stmt_prepare error: ") + PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement,pSQLState);
 		}
+
 	}
 
 	// Determine what the structure of a statement result will look like
@@ -159,11 +164,15 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	}
 
 	{
+ 		// get the sqlState
+                const char* pSQLState	= PQresultErrorField(ptrPGResult, PG_DIAG_SQLSTATE);
+	
 		PQResultClear resultClearer(ptrPGResult);
+
 		if (!ptrPGResult || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK)
 		{
 			throw StatementException(std::string("postgresql_stmt_describe error: ") +
-				PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
+				PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement,pSQLState);
 		}
 
 		// remember the structure of the statement result
@@ -270,13 +279,14 @@ void StatementExecutor::execute()
 		const char* pHint		= PQresultErrorField(ptrPGResult, PG_DIAG_MESSAGE_HINT);
 		const char* pConstraint	= PQresultErrorField(ptrPGResult, PG_DIAG_CONSTRAINT_NAME);
 
+                
 		throw StatementException(std::string("postgresql_stmt_execute error: ")
 			+ PQresultErrorMessage (ptrPGResult)
 			+ " Severity: " + (pSeverity   ? pSeverity   : "N/A")
 			+ " State: " + (pSQLState   ? pSQLState   : "N/A")
 			+ " Detail: " + (pDetail ? pDetail : "N/A")
 			+ " Hint: " + (pHint   ? pHint   : "N/A")
-			+ " Constraint: " + (pConstraint ? pConstraint : "N/A"));
+			+ " Constraint: " + (pConstraint ? pConstraint : "N/A"),pSQLState);
 	}
 
 	_pResultHandle = ptrPGResult;
