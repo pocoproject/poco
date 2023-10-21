@@ -146,6 +146,7 @@ const DigestEngine::Digest& SHA1Engine::digest()
 #if defined(POCO_COMPILER_GCC)
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+	#pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 	_digest.insert(_digest.begin(), hash, hash + DIGEST_SIZE);
 #if defined(POCO_COMPILER_GCC)

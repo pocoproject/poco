@@ -230,7 +230,7 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 {
 	std::string::const_iterator it  = rotation.begin();
 	std::string::const_iterator end = rotation.end();
-	int n = 0;
+	Poco::Int64 n = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
 	while (it != end && Ascii::isSpace(*it)) ++it;
@@ -351,6 +351,7 @@ void FileChannel::setArchive(const std::string& archive)
 void FileChannel::setCompress(const std::string& compress)
 {
 	_compress = icompare(compress, "true") == 0;
+	if (_pArchiveStrategy)
 	_pArchiveStrategy->compress(_compress);
 }
 
@@ -391,12 +392,15 @@ void FileChannel::setRotateOnOpen(const std::string& rotateOnOpen)
 
 void FileChannel::purge()
 {
+	if (_pPurgeStrategy)
+	{
 	try
 	{
 		_pPurgeStrategy->purge(_path);
 	}
 	catch (...)
 	{
+	}
 	}
 }
 

@@ -199,6 +199,10 @@ if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
   set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
 
+if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
+  set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
@@ -278,9 +282,6 @@ endif()
 
 if(ENABLE_NETSSL_WIN)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-	if(ENABLE_TESTS)
-		set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-	endif()
 endif()
 
 if(ENABLE_NETSSL)

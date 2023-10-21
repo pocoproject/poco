@@ -30,6 +30,7 @@
 #endif
 
 
+#include <mysql/mysql.h>
 #include <iostream>
 #include <limits>
 

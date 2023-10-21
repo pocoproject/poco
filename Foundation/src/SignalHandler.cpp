@@ -34,7 +34,7 @@ SignalHandler::JumpBufferVec SignalHandler::_jumpBufferVec;
 SignalHandler::SignalHandler()
 {
 	JumpBufferVec& jbv = jumpBufferVec();
-	JumpBuffer buf;
+	JumpBuffer buf = {};
 	jbv.push_back(buf);
 }
 

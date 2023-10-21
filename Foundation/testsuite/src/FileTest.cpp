@@ -380,6 +380,7 @@ void FileTest::testCopy()
 	f1.setWriteable().remove();
 }
 
+
 void FileTest::testCopyFailIfDestinationFileExists()
 {
 	std::ofstream ostr("testfile.dat");
@@ -414,6 +415,7 @@ void FileTest::testMove()
 	assertTrue (f1 == f2);
 }
 
+
 void FileTest::testMoveFailIfDestinationFileExists() {
 	std::ofstream ostr("testfile.dat");
 	ostr << "Hello, world!" << std::endl;
@@ -429,6 +431,7 @@ void FileTest::testMoveFailIfDestinationFileExists() {
 	}
 	f1.setWriteable().remove();
 }
+
 
 void FileTest::testCopyDirectory()
 {
@@ -499,6 +502,7 @@ void FileTest::testCopyDirectory()
 	fd3.remove(true);
 }
 
+
 void FileTest::testCopyDirectoryFailIfExists()
 {
 	Path pd1("testdir");
@@ -538,6 +542,7 @@ void FileTest::testCopyDirectoryFailIfExists()
 	fd2.remove(true);
 }
 
+
 void FileTest::testRename()
 {
 	std::ofstream ostr("testfile.dat");
@@ -554,6 +559,7 @@ void FileTest::testRename()
 
 	f2.remove();
 }
+
 
 void FileTest::testRenameFailIfExists() {
 	std::ofstream ostr("testfile.dat");
@@ -578,8 +584,6 @@ void FileTest::testRenameFailIfExists() {
 
 	f2.remove();
 }
-
-
 
 
 void FileTest::testLongPath()
@@ -619,6 +623,20 @@ void FileTest::testUnixFileExtension()
 	assertEqual("emptyextension", path2.getBaseName());
 	assertEqual("", path2.getExtension());
 }
+
+
+void FileTest::testTemporaryFile()
+{
+	const int COUNT = 10000;
+	std::set<std::string> paths;
+	for (int i = 0; i < COUNT; i++)
+	{
+		Poco::TemporaryFile f;
+		paths.insert(f.path());
+	}
+	assertTrue (paths.size() == COUNT);
+}
+
 
 void FileTest::setUp()
 {
@@ -669,6 +687,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
+	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
 
 	return pSuite;
 }

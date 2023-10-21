@@ -87,6 +87,18 @@ void IniFileConfigurationTest::testLoad()
 	assertTrue (std::find(keys.begin(), keys.end(), "section1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "Prop1") == keys.end());
+
+	std::istringstream istr_err(iniFile);
+	istr_err.putback(std::ios_base::failbit);
+	try
+	{
+		AutoPtr<IniFileConfiguration> pConf_err = new IniFileConfiguration(istr_err);
+	}
+	catch (Poco::IOException& exc)
+	{
+		std::string s(exc.message());
+		assertTrue (s == "Broken input stream");
+	}
 }
 
 
@@ -102,7 +114,7 @@ void IniFileConfigurationTest::testCaseInsensitiveRemove()
 	pConf->keys(keys);
 	assertTrue (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assertTrue (keys.size() == 17);
+	assertTrue (keys.size() == 19);
 
 	pConf->remove("PROP4.Bool1");
 	assertTrue (pConf->hasProperty("Prop1"));
@@ -112,7 +124,7 @@ void IniFileConfigurationTest::testCaseInsensitiveRemove()
 	pConf->keys(keys);
 	assertTrue (keys.size() == 13);
 	pConf->keys("PROP4", keys);
-	assertTrue (keys.size() == 16);
+	assertTrue (keys.size() == 18);
 
 	pConf->remove("Prop4");
 	assertTrue (pConf->hasProperty("Prop1"));

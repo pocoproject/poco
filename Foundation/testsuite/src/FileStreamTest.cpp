@@ -182,7 +182,7 @@ void FileStreamTest::testOpenModeAte()
 	ostr << "0123456789";
 	ostr.close();
 
-	Poco::FileStream str1("test.txt", std::ios::ate);
+	Poco::FileStream str1("test.txt", std::ios::in | std::ios::ate);
 	int c = str1.get();
 	assertTrue (str1.eof());
 
@@ -193,7 +193,7 @@ void FileStreamTest::testOpenModeAte()
 
 	str1.close();
 
-	Poco::FileStream str2("test.txt", std::ios::ate);
+	Poco::FileStream str2("test.txt", std::ios::in | std::ios::out | std::ios::ate);
 	str2 << "abcdef";
 	str2.seekg(0);
 	std::string s;
@@ -209,7 +209,7 @@ void FileStreamTest::testOpenModeApp()
 	ostr << "0123456789";
 	ostr.close();
 
-	Poco::FileStream str1("test.txt", std::ios::app);
+	Poco::FileStream str1("test.txt", std::ios::in | std::ios::out | std::ios::app);
 
 	str1 << "abc";
 
@@ -229,7 +229,7 @@ void FileStreamTest::testOpenModeApp()
 
 void FileStreamTest::testSeek()
 {
-	Poco::FileStream str("test.txt", std::ios::trunc);
+	Poco::FileStream str("test.txt", std::ios::in | std::ios::out | std::ios::trunc);
 	str << "0123456789abcdef";
 
 	str.seekg(0);
@@ -270,7 +270,7 @@ void FileStreamTest::testSeek()
 
 void FileStreamTest::testMultiOpen()
 {
-	Poco::FileStream str("test.txt", std::ios::trunc);
+	Poco::FileStream str("test.txt", std::ios::out | std::ios::trunc);
 	str << "0123456789\n";
 	str << "abcdefghij\n";
 	str << "klmnopqrst\n";
