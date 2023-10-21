@@ -100,7 +100,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 {
 #if defined(POCO_HAVE_FD_EPOLL)
 
-	int epollSize = readList.size() + writeList.size() + exceptList.size();
+	auto epollSize = readList.size() + writeList.size() + exceptList.size();
 	if (epollSize == 0) return 0;
 
 	PollSet ps;
@@ -119,7 +119,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		if (s.second & PollSet::POLL_ERROR) exceptList.push_back(s.first);
 	}
 
-	return readList.size() + writeList.size() + exceptList.size();
+	return static_cast<int>(readList.size() + writeList.size() + exceptList.size());
 
 #elif defined(POCO_HAVE_FD_POLL)
 	typedef Poco::SharedPtr<pollfd, Poco::ReferenceCounter, Poco::ReleaseArrayPolicy<pollfd>> SharedPollArray;
