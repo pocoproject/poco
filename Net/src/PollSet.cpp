@@ -207,9 +207,9 @@ public:
 				SocketMap::iterator it = _socketMap.find(_events[i].data.ptr);
 				if (it != _socketMap.end())
 				{
-					if (_events[i].events & EPOLLIN)
+					if (_events[i].events & (EPOLLIN | EPOLLRDNORM | EPOLLHUP))
 						result[it->second.first] |= PollSet::POLL_READ;
-					if (_events[i].events & EPOLLOUT)
+					if (_events[i].events & (EPOLLOUT | EPOLLWRNORM))
 						result[it->second.first] |= PollSet::POLL_WRITE;
 					if (_events[i].events & EPOLLERR)
 						result[it->second.first] |= PollSet::POLL_ERROR;
