@@ -338,15 +338,19 @@ void PollSetTest::testPollNoServer()
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
 	PollSet::SocketModeMap sm;
+	int signalled = 0;
 	Stopwatch sw; sw.start();
 	do
 	{
 		sm = ps.poll(Timespan(1000000));
+		for (auto s : sm)
+			assertTrue(0 != (s.second & PollSet::POLL_ERROR));
+
+		signalled += static_cast<int>(sm.size());
 		if (sw.elapsedSeconds() > 10) fail();
-	} while (sm.size() < 2);
-	assertTrue(sm.size() == 2);
-	for (auto s : sm)
-		assertTrue(0 != (s.second & PollSet::POLL_ERROR));
+	} while (signalled < 2);
+	assertTrue(signalled == 2);
+	
 }
 
 
@@ -359,6 +363,7 @@ void PollSetTest::testPollClosedServer()
 
 	ss1.connect(SocketAddress("127.0.0.1", echoServer1.port()));
 	ss2.connect(SocketAddress("127.0.0.1", echoServer2.port()));
+
 	PollSet ps;
 	assertTrue(ps.empty());
 	ps.add(ss1, PollSet::POLL_READ);
@@ -367,22 +372,33 @@ void PollSetTest::testPollClosedServer()
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
 
+	std::string str = "HELLO";
+	int len = static_cast<int>(str.length());
+
 	echoServer1.stop();
-	ss1.sendBytes("HELLO", 5);
+	// echoServer is blocked waiting for data, send some
+	assertTrue (len == ss1.sendBytes(str.data(), len));
+	// the stop flag should kick in, wait for it ...
 	while (!echoServer1.done()) Thread::sleep(10);
+
 	echoServer2.stop();
-	ss2.sendBytes("HELLO", 5);
+	assertTrue (len == ss2.sendBytes(str.data(), len));
 	while (!echoServer2.done()) Thread::sleep(10);
-	PollSet::SocketModeMap sm;
+
+	int signalled = 0;
 	Stopwatch sw; sw.start();
 	do
 	{
-		sm = ps.poll(Timespan(1000000));
-		if (sw.elapsedSeconds() > 10) fail();
-	} while (sm.size() < 2);
-	assertTrue(sm.size() == 2);
-	assertTrue(0 == ss1.receiveBytes(0, 0));
-	assertTrue(0 == ss2.receiveBytes(0, 0));
+		signalled += static_cast<int>(ps.poll(Timespan(1000000)).size());
+		int secs = sw.elapsedSeconds();
+		if (secs > 10)
+			fail(Poco::format("timed out after %ds, sockets signalled=%z (expected 2)", secs, signalled), __LINE__);
+	} while (signalled < 2);
+
+	assertTrue(signalled == 2);
+	// socket closed or error
+	assertTrue(0 >= ss1.receiveBytes(0, 0));
+	assertTrue(0 >= ss2.receiveBytes(0, 0));
 }
 
 
