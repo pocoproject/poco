@@ -323,8 +323,8 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 							int c = d - '0';
 							if (c < rc)
 							{
-								int o = ovec[c*2];
-								int l = ovec[c*2 + 1] - o;
+								std::size_t o = ovec[c*2];
+								std::size_t l = ovec[c*2 + 1] - o;
 								result.append(subject, o, l);
 							}
 						}
