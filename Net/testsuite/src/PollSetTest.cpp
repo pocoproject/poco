@@ -347,7 +347,14 @@ void PollSetTest::testPollNoServer()
 			assertTrue(0 != (s.second & PollSet::POLL_ERROR));
 
 		signalled += static_cast<int>(sm.size());
-		if (sw.elapsedSeconds() > 10) fail();
+		sm.clear();
+		int secs = sw.elapsedSeconds();
+		if (secs > 10)
+		{
+			fail(Poco::format("testPollNoServer() timed out after %ds, "
+				"sockets signalled=%d (expected 2)",
+				secs, signalled), __LINE__);
+		}
 	} while (signalled < 2);
 	assertTrue(signalled == 2);
 	
@@ -379,20 +386,34 @@ void PollSetTest::testPollClosedServer()
 	// echoServer is blocked waiting for data, send some
 	assertTrue (len == ss1.sendBytes(str.data(), len));
 	// the stop flag should kick in, wait for it ...
-	while (!echoServer1.done()) Thread::sleep(10);
+	Stopwatch sw; sw.start();
+	while (!echoServer1.done())
+	{
+		Thread::sleep(10);
+		int secs = sw.elapsedSeconds();
+		if (secs > 10)
+		{
+			fail(Poco::format("testPollClosedServer() timed out "
+				"waiting on server after %ds", secs), __LINE__);
+		}
+	}
 
 	echoServer2.stop();
 	assertTrue (len == ss2.sendBytes(str.data(), len));
 	while (!echoServer2.done()) Thread::sleep(10);
 
 	int signalled = 0;
-	Stopwatch sw; sw.start();
+	sw.restart();
 	do
 	{
 		signalled += static_cast<int>(ps.poll(Timespan(1000000)).size());
 		int secs = sw.elapsedSeconds();
 		if (secs > 10)
-			fail(Poco::format("timed out after %ds, sockets signalled=%z (expected 2)", secs, signalled), __LINE__);
+		{
+			fail(Poco::format("testPollClosedServer() timed out waiting on "
+				"signalled sockets after %ds, sockets signalled=%d (expected 2)",
+				secs, signalled), __LINE__);
+		}
 	} while (signalled < 2);
 
 	assertTrue(signalled == 2);
