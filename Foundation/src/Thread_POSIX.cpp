@@ -21,7 +21,6 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include <signal.h>
-#include <sys/prctl.h>
 
 #if POCO_OS == POCO_OS_FREE_BSD
 #    include <sys/thr.h>
@@ -36,6 +35,10 @@
 #endif
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
+#endif
+
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
 #endif
 
 #if POCO_OS == POCO_OS_LINUX
