@@ -17,7 +17,7 @@ objects = Binder Extractor Notifier SessionImpl Connector \
 
 sqlite_objects = sqlite3
 
-ifdef POCO_UNBUNDLED
+ifdef POCO_UNBUNDLED_SQLITE
         SYSLIBS += -lsqlite3
 else
         objects += $(sqlite_objects)

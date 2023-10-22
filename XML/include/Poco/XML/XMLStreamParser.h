@@ -30,7 +30,7 @@
 #include "Poco/XML/QName.h"
 #include "Poco/XML/ValueTraits.h"
 #include "Poco/XML/Content.h"
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_UNBUNDLED_EXPAT)
 #include <expat.h>
 #else
 #include "Poco/XML/expat.h"

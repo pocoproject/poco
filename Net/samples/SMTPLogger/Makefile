@@ -14,6 +14,6 @@ target_libs    = PocoNet PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz
+ifdef POCO_UNBUNDLED_ZLIB
+	SYSLIBS += -lz
 endif

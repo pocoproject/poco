@@ -1,5 +1,6 @@
+
 # Expat CPP sources to be excluded from globbed SRCS_G
-# They are added back on the list if POCO_UNBUNDLED is not set
+# They are added back on the list if POCO_UNBUNDLED_EXPAT is not set
 set(EXPAT_CPP "${CMAKE_CURRENT_SOURCE_DIR}/src/xmlparse.cpp")
 
 # Sources
@@ -17,9 +18,10 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-# If POCO_UNBUNDLED is enabled we try to find the required packages
+# If POCO_UNBUNDLED_EXPAT is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
-if(POCO_UNBUNDLED)
+
+if (POCO_UNBUNDLED_EXPAT)
 	find_package(EXPAT REQUIRED)
 else()
 	POCO_SOURCES(SRCS expat
@@ -29,7 +31,7 @@ else()
 		src/xmltok_impl.c
 		src/xmltok_ns.c
 	)
-endif(POCO_UNBUNDLED)
+endif()
 
 add_library(XML ${SRCS})
 
@@ -49,9 +51,9 @@ target_include_directories(XML
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-if(POCO_UNBUNDLED)
+if(POCO_UNBUNDLED_EXPAT)
 	target_link_libraries(XML PUBLIC EXPAT::EXPAT)
-	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
+	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED_EXPAT)
 else()
 	if(WIN32)
 		#TODO: Is XML_STATIC only required with Windows? What does it do?

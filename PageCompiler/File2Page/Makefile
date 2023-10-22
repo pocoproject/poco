@@ -8,8 +8,16 @@ include $(POCO_BASE)/build/rules/global
 
 objects = File2Page
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre -lexpat
+ifdef POCO_UNBUNDLED_ZLIB
+	SYSLIBS += -lz
+endif
+
+ifdef POCO_UNBUNDLED_PCRE
+	SYSLIBS += -lpcre
+endif
+
+ifdef POCO_UNBUNDLED_EXPAT
+	SYSLIBS += -lexpat
 endif
 
 target         = f2cpsp

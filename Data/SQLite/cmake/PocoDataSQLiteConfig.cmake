@@ -1,7 +1,7 @@
 include(CMakeFindDependencyMacro)
 find_dependency(PocoFoundation)
 find_dependency(PocoData)
-if(@POCO_UNBUNDLED@)
+if(@POCO_UNBUNDLED_SQLITE@)
 	if(CMAKE_VERSION VERSION_LESS "3.14")
 		list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/V313")
 	endif()

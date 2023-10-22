@@ -1,3 +1,4 @@
+
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
@@ -6,9 +7,9 @@ POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
-# If POCO_UNBUNDLED is enabled we try to find the required packages
+# If POCO_UNBUNDLED_ZLIB is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
-if(POCO_UNBUNDLED)
+if (POCO_UNBUNDLED_ZLIB)
 	find_package(ZLIB REQUIRED)
 else()
 	# zlib
@@ -25,7 +26,7 @@ else()
 		src/trees.c
 		src/zutil.c
 	)
-endif(POCO_UNBUNDLED)
+endif()
 
 # TODO: Currently only bundled is supported, in future this should also be possible
 # with an unbundled version of hpdf
@@ -131,10 +132,10 @@ set_target_properties(PDF
 	DEFINE_SYMBOL PDF_EXPORTS
 )
 
-if(POCO_UNBUNDLED)
+if(POCO_UNBUNDLED_ZLIB)
 	target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
-	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
-endif(POCO_UNBUNDLED)
+	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED_ZLIB)
+endif()
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF
 	PUBLIC

@@ -44,11 +44,16 @@ pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_compile pcre2_config \
 
 pcre_utf8_objects = pcre2_ucd pcre2_tables
 
-ifdef POCO_UNBUNDLED
-	SYSLIBS += -lpcre2-8 -lz
+ifdef POCO_UNBUNDLED_PCRE
+	SYSLIBS += -lpcre2-8
 	objects += $(pcre_utf8_objects)
 else
-	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
+	objects += $(pcre_objects) $(pcre_utf8_objects)
+endif
+ifdef POCO_UNBUNDLED_ZLIB
+	SYSLIBS += -lz
+else
+	objects += $(zlib_objects)
 endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)

@@ -15,7 +15,7 @@
 #include "Poco/RegularExpression.h"
 #include "Poco/Exception.h"
 #include <sstream>
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_UNBUNDLED_PCRE)
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #else

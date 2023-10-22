@@ -14,7 +14,7 @@ target_libs    = PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lexpat
+ifdef POCO_UNBUNDLED_EXPAT
+	SYSLIBS += -lexpat
 endif
 

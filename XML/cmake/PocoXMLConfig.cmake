@@ -1,6 +1,6 @@
 include(CMakeFindDependencyMacro)
 find_dependency(PocoFoundation)
-if(@POCO_UNBUNDLED@)
+if(@POCO_UNBUNDLED_EXPAT@)
 	if(CMAKE_VERSION VERSION_LESS "3.10")
 		list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/V39")
 	endif()
