@@ -21,6 +21,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include <signal.h>
+#include <sys/prctl.h>
 
 #if POCO_OS == POCO_OS_FREE_BSD
 #    include <sys/thr.h>
@@ -83,7 +84,7 @@ namespace
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 		if (pthread_setname_np(threadName.c_str()))
 #else
-		if (pthread_setname_np(pthread_self(), threadName.c_str()))
+		if (prctl(PR_SET_NAME, threadName.c_str()))
 #endif
 			throw Poco::SystemException("cannot set thread name");
 	}
@@ -91,7 +92,7 @@ namespace
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
-		if (pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1))
+		if (prctl(PR_GET_NAME, name))
 			throw Poco::SystemException("cannot get thread name");
 		return name;
 	}
