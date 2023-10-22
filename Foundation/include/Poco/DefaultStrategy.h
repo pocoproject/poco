@@ -147,6 +147,11 @@ public:
 	{
 	}
 
+	DefaultStrategy(DefaultStrategy&& s):
+		_delegates(std::move(s._delegates))
+	{
+	}
+
 	~DefaultStrategy()
 	{
 	}
@@ -197,6 +202,15 @@ public:
 		if (this != &s)
 		{
 			_delegates = s._delegates;
+		}
+		return *this;
+	}
+
+	DefaultStrategy& operator = (DefaultStrategy&& s)
+	{
+		if (this != &s)
+		{
+			_delegates = std::move(s._delegates);
 		}
 		return *this;
 	}

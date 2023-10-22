@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
+objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel ActiveThreadPool\
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
 	Condition CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \

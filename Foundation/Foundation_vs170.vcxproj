@@ -1921,6 +1921,7 @@
     <ClCompile Include="src\Thread.cpp" />
     <ClCompile Include="src\ThreadLocal.cpp" />
     <ClCompile Include="src\ThreadPool.cpp" />
+    <ClCompile Include="src\ActiveThreadPool.cpp" />
     <ClCompile Include="src\ThreadTarget.cpp" />
     <ClCompile Include="src\Thread_POSIX.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
