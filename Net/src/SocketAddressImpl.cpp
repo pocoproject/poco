@@ -127,7 +127,7 @@ std::string IPv6SocketAddressImpl::toString() const
 #endif // POCO_HAVE_IPv6
 
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 
 
 //
@@ -178,7 +178,7 @@ std::string LocalSocketAddressImpl::toString() const
 }
 
 
-#endif // POCO_OS_FAMILY_UNIX
+#endif // POCO_HAS_UNIX_SOCKET
 
 
 } } } // namespace Poco::Net::Impl

@@ -49,7 +49,7 @@ public:
 #if defined(POCO_HAVE_IPv6)
 	static const Family IPv6 = AddressFamily::IPv6;
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	static const Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
 #endif
 
@@ -181,7 +181,7 @@ public:
 	enum
 	{
 		MAX_ADDRESS_LENGTH =
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 			sizeof(struct sockaddr_un)
 #elif defined(POCO_HAVE_IPv6)
 			sizeof(struct sockaddr_in6)
@@ -214,7 +214,7 @@ private:
 	void newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 #endif
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	void newLocal(const sockaddr_un* sockAddr);
 	void newLocal(const std::string& path);
 #endif
@@ -265,7 +265,7 @@ inline void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 po
 #endif // POCO_HAVE_IPv6
 
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 inline void SocketAddress::newLocal(const sockaddr_un* sockAddr)
 {
 	_pImpl = new Poco::Net::Impl::LocalSocketAddressImpl(sockAddr);
@@ -276,12 +276,12 @@ inline void SocketAddress::newLocal(const std::string& path)
 {
 	_pImpl = new Poco::Net::Impl::LocalSocketAddressImpl(path.c_str(), path.size());
 }
-#endif // POCO_OS_FAMILY_UNIX
+#endif // POCO_HAS_UNIX_SOCKET
 
 
 inline 	bool SocketAddress::operator == (const SocketAddress& socketAddress) const
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (family() == UNIX_LOCAL)
 		return toString() == socketAddress.toString();
 	else

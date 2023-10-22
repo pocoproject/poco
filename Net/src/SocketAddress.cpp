@@ -20,12 +20,14 @@
 #include "Poco/NumberParser.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/RegularExpression.h"
 #include <algorithm>
 #include <cstring>
 
 
 using Poco::RefCountedObject;
 using Poco::NumberParser;
+using Poco::RegularExpression;
 using Poco::UInt16;
 using Poco::InvalidArgumentException;
 using Poco::Net::Impl::SocketAddressImpl;
@@ -33,7 +35,7 @@ using Poco::Net::Impl::IPv4SocketAddressImpl;
 #ifdef POCO_HAVE_IPv6
 using Poco::Net::Impl::IPv6SocketAddressImpl;
 #endif
-#ifdef POCO_OS_FAMILY_UNIX
+#ifdef POCO_HAS_UNIX_SOCKET
 using Poco::Net::Impl::LocalSocketAddressImpl;
 #endif
 
@@ -63,7 +65,7 @@ const SocketAddress::Family SocketAddress::IPv4;
 #if defined(POCO_HAVE_IPv6)
 const SocketAddress::Family SocketAddress::IPv6;
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 const SocketAddress::Family SocketAddress::UNIX_LOCAL;
 #endif
 #endif
@@ -143,7 +145,7 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 	else if (socketAddress.family() == IPv6)
 		newIPv6(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	else if (socketAddress.family() == UNIX_LOCAL)
 		newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
 #endif
@@ -164,7 +166,7 @@ SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t len
 	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
 		newIPv6(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	else if (length > 0 && length <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
 		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr));
 #endif
@@ -181,7 +183,7 @@ bool SocketAddress::operator < (const SocketAddress& socketAddress) const
 {
 	if (family() < socketAddress.family()) return true;
 	if (family() > socketAddress.family()) return false;
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (family() == UNIX_LOCAL) return toString() < socketAddress.toString();
 #endif
 	if (host() < socketAddress.host()) return true;
@@ -200,7 +202,7 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 		else if (socketAddress.family() == IPv6)
 			newIPv6(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 		else if (socketAddress.family() == UNIX_LOCAL)
 			newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
 #endif
@@ -325,7 +327,7 @@ void SocketAddress::init(Family fam, const std::string& hostAddress, Poco::UInt1
 
 void SocketAddress::init(Family fam, const std::string& address)
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (fam == UNIX_LOCAL)
 	{
 		newLocal(address);
@@ -363,6 +365,15 @@ void SocketAddress::init(Family fam, const std::string& address)
 void SocketAddress::init(const std::string& hostAndPort)
 {
 	poco_assert (!hostAndPort.empty());
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_HAS_UNIX_SOCKET)
+	RegularExpression re(R"((?:[a-zA-Z]\:|\\\\[\w\s\.]+\\[\w\s\.$]+)\\(?:[\w\s\.]+\\)*[\w\s\.]*?$)");
+	if (re.match(hostAndPort))
+	{
+		newLocal(hostAndPort);
+		return;
+	}
+#endif
 
 	std::string host;
 	std::string port;

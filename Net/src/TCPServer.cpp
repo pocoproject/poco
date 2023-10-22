@@ -139,7 +139,7 @@ void TCPServer::run()
 					if (!_pConnectionFilter || _pConnectionFilter->accept(ss))
 					{
 						// enable nodelay per default: OSX really needs that
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 						if (ss.address().family() != AddressFamily::UNIX_LOCAL)
 #endif
 						{

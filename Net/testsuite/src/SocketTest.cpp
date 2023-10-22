@@ -22,6 +22,7 @@
 #include "Poco/FIFOBuffer.h"
 #include "Poco/Delegate.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 #include <iostream>
 
 
@@ -36,6 +37,8 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::Buffer;
 using Poco::FIFOBuffer;
+using Poco::Path;
+using Poco::File;
 using Poco::delegate;
 
 
@@ -536,12 +539,12 @@ void SocketTest::testSelect3()
 
 void SocketTest::testEchoUnixLocal()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 #if POCO_OS == POCO_OS_ANDROID
-	Poco::File socketFile("/data/local/tmp/SocketTest.sock");
+	File socketFile("/data/local/tmp/SocketTest.sock");
 #else
-	Poco::File socketFile("/tmp/SocketTest.sock");
-#endif
+	File socketFile(Path::tempHome() + "SocketTest.sock");
+#endif // POCO_OS == POCO_OS_ANDROID
 	if (socketFile.exists()) socketFile.remove();
 	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, socketFile.path());
 	EchoServer echoServer(localAddr);
@@ -554,7 +557,11 @@ void SocketTest::testEchoUnixLocal()
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
-	socketFile.remove();
+	if (socketFile.exists()) socketFile.remove();
+	echoServer.stop();
+#else // POCO_HAS_UNIX_SOCKET
+	#pragma message("[UNIX LOCAL SOCKET DISABLED]")
+	std::cout << "[UNIX LOCAL SOCKET DISABLED]" << std::endl;
 #endif
 }
 
