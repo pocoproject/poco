@@ -234,7 +234,9 @@
 	#define POCO_TRY_AGAIN       TRY_AGAIN
 	#define POCO_NO_RECOVERY     NO_RECOVERY
 	#define POCO_NO_DATA         NO_DATA
-	#define POCO_HAS_UNIX_SOCKET
+	#if !defined (POCO_NET_NO_UNIX_SOCKET)
+		#define POCO_HAS_UNIX_SOCKET
+	#endif
 #endif
 
 
