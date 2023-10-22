@@ -326,10 +326,9 @@ void PollSetTest::testPoll()
 
 void PollSetTest::testPollNoServer()
 {
-	StreamSocket ss1;
-	StreamSocket ss2;
-	ss1.connectNB(SocketAddress("127.0.0.1", 0xFEFE));
-	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
+	StreamSocket ss1(SocketAddress::IPv4);
+	StreamSocket ss2(SocketAddress::IPv4);
+
 	PollSet ps;
 	assertTrue(ps.empty());
 	ps.add(ss1, PollSet::POLL_READ | PollSet::POLL_WRITE | PollSet::POLL_ERROR);
@@ -337,26 +336,34 @@ void PollSetTest::testPollNoServer()
 	assertTrue(!ps.empty());
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
+
+	assertEqual(0, static_cast<int>(ps.poll(Timespan(100)).size()));
+
+	ss1.connectNB(SocketAddress("127.0.0.1", 0xFEFE));
+	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
+
 	PollSet::SocketModeMap sm;
-	int signalled = 0;
+	int signalledErrors = 0;
 	Stopwatch sw; sw.start();
 	do
 	{
 		sm = ps.poll(Timespan(1000000));
 		for (auto s : sm)
+		{
 			assertTrue(0 != (s.second & PollSet::POLL_ERROR));
+			++signalledErrors;
+		}
 
-		signalled += static_cast<int>(sm.size());
 		sm.clear();
 		int secs = sw.elapsedSeconds();
 		if (secs > 10)
 		{
 			fail(Poco::format("testPollNoServer() timed out after %ds, "
 				"sockets signalled=%d (expected 2)",
-				secs, signalled), __LINE__);
+				secs, signalledErrors), __LINE__);
 		}
-	} while (signalled < 2);
-	assertTrue(signalled == 2);
+	} while (signalledErrors < 2);
+	assertEqual(2, signalledErrors);
 	
 }
 
@@ -365,11 +372,8 @@ void PollSetTest::testPollClosedServer()
 {
 	EchoServer echoServer1;
 	EchoServer echoServer2;
-	StreamSocket ss1;
-	StreamSocket ss2;
-
-	ss1.connect(SocketAddress("127.0.0.1", echoServer1.port()));
-	ss2.connect(SocketAddress("127.0.0.1", echoServer2.port()));
+	StreamSocket ss1(SocketAddress::IPv4);
+	StreamSocket ss2(SocketAddress::IPv4);
 
 	PollSet ps;
 	assertTrue(ps.empty());
@@ -378,6 +382,11 @@ void PollSetTest::testPollClosedServer()
 	assertTrue(!ps.empty());
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
+
+	assertEqual(0, static_cast<int>(ps.poll(Timespan(100)).size()));
+
+	ss1.connectNB(SocketAddress("127.0.0.1", echoServer1.port()));
+	ss2.connectNB(SocketAddress("127.0.0.1", echoServer2.port()));
 
 	std::string str = "HELLO";
 	int len = static_cast<int>(str.length());
@@ -393,14 +402,23 @@ void PollSetTest::testPollClosedServer()
 		int secs = sw.elapsedSeconds();
 		if (secs > 10)
 		{
-			fail(Poco::format("testPollClosedServer() timed out "
+			fail(Poco::format("testPollClosedServer(1) timed out "
 				"waiting on server after %ds", secs), __LINE__);
 		}
 	}
 
 	echoServer2.stop();
 	assertTrue (len == ss2.sendBytes(str.data(), len));
-	while (!echoServer2.done()) Thread::sleep(10);
+	while (!echoServer2.done())
+	{
+		Thread::sleep(10);
+		int secs = sw.elapsedSeconds();
+		if (secs > 10)
+		{
+			fail(Poco::format("testPollClosedServer(2) timed out "
+				"waiting on server after %ds", secs), __LINE__);
+		}
+	}
 
 	int signalled = 0;
 	sw.restart();
