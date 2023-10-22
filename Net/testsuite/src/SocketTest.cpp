@@ -568,6 +568,32 @@ void SocketTest::testEchoUnixLocal()
 }
 
 
+void SocketTest::testUnixLocalAbstract()
+{
+// abstract local sockets don't work on windows
+// see https://github.com/microsoft/WSL/issues/4240
+// they are a nonportable Linux extension
+#if (POCO_OS == POCO_OS_LINUX) && defined(POCO_HAS_UNIX_SOCKET)
+	std::string addr("\0look ma - no file!", 20);
+	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, addr);
+	EchoServer echoServer(localAddr);
+	StreamSocket ss(SocketAddress::UNIX_LOCAL);
+	ss.connect(localAddr);
+	int n = ss.sendBytes("hello", 5);
+	assertTrue(n == 5);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue(n == 5);
+	assertTrue(std::string(buffer, n) == "hello");
+	ss.close();
+	echoServer.stop();
+#else // POCO_HAS_UNIX_SOCKET
+#pragma message("[ABSTRACT UNIX LOCAL SOCKET DISABLED]")
+	std::cout << "[ABSTRACT UNIX LOCAL SOCKET DISABLED]" << std::endl;
+#endif
+}
+
+
 
 void SocketTest::onReadable(bool& b)
 {
@@ -619,6 +645,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
+	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 
 	return pSuite;
 }

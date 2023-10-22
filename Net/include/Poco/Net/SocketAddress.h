@@ -37,8 +37,11 @@ class IPAddress;
 class Net_API SocketAddress
 	/// This class represents an internet (IP) endpoint/socket
 	/// address. The address can belong either to the
-	/// IPv4 or the IPv6 address family and consists of a
-	/// host address and a port number.
+	/// IPv4, IPv6 or Unix local family.
+	/// IP addresses consist of a host address and a port number.
+	/// An Unix local socket address consists of a path to socket file.
+	/// Abstract local sockets, which operate without the need for
+	/// interaction with the filesystem, are supported on Linux only.
 {
 public:
 	// The following declarations keep the Family type
@@ -124,16 +127,30 @@ public:
 		///     [::ffff:192.168.1.120]:2040
 		///     www.appinf.com:8080
 		///
-		/// On POSIX platforms supporting UNIX_LOCAL sockets, hostAndPort
-		/// can also be the absolute path of a local socket, starting with a
-		/// slash, e.g. "/tmp/local.socket".
+		/// On platforms supporting UNIX_LOCAL sockets, hostAndPort
+		/// can also be a valid absolute local socket file path.
+		///
+		/// Examples:
+		///     /tmp/local.sock
+		///     C:\Temp\local.sock
+		///
+		/// On Linux, abstract local sockets are supported as well.
+		/// Abstract local sockets operate in a namespace that has
+		/// no need for a filesystem. They are identified by
+		/// a null byte at the beginning of the path.
+		///
+		/// Example:
+		///     \0abstract.sock
+		///
 
 	SocketAddress(Family family, const std::string& addr);
 		/// Creates a SocketAddress of the given family from a
 		/// string representation of the address, which is
-		/// either an IP address and port number, separated by
-		/// a colon for IPv4 or IPv6 addresses, or a path for
+		/// either (1) an IP address and port number, separated by
+		/// a colon for IPv4 or IPv6 addresses, or (2) path for
 		/// UNIX_LOCAL sockets.
+		/// See `SocketAddress(const string&)` documentation
+		/// for more details.
 
 	SocketAddress(const SocketAddress& addr);
 		/// Creates a SocketAddress by copying another one.
