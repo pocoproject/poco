@@ -3114,7 +3114,8 @@ struct ProcessDummy
 {
 	Var &v;
 	ProcessDummy(Var &var) : v(var) {}
-	void operator()(const Dummy &d) {
+	void operator()(const Dummy &d)
+	{
 		v = d;
 	}
 };

@@ -19,14 +19,14 @@ namespace Dynamic {
 
 bool Visitor::visit(const Var &x) const
 {
-	bool wasHendled = false;
+	bool wasHandled = false;
 	auto it = _handlers.find(x.type());
 	if (it != _handlers.end())
 	{
 		it->second(x);
-		wasHendled = true;
+		wasHandled = true;
 	}
-	return wasHendled;
+	return wasHandled;
 }
 
 } } // namespace Poco::Dynamic

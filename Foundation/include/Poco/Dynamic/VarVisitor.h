@@ -56,9 +56,9 @@ class Foundation_API Visitor
 	/// VarVisitor class.
 {
 	std::unordered_map<Details::TypeInfoRef,
-						Details::HandlerCaller,
-						Details::TypeInfoHash,
-						Details::EqualRef> _handlers;
+			Details::HandlerCaller,
+			Details::TypeInfoHash,
+			Details::EqualRef> _handlers;
 	
 public:
 	template <typename T>
@@ -68,10 +68,10 @@ public:
 	/// Returns true if handler was added
 	{
 		auto result = _handlers.emplace(std::ref(typeid(T)),
-										Details::HandlerCaller([handler = f](const Poco::Dynamic::Var& x)
-										{
-											handler(x.extract<T>());
-										}));
+			Details::HandlerCaller([handler = f](const Poco::Dynamic::Var& x)
+			{
+				handler(x.extract<T>());
+			}));
 		return result.second;
 	}
 	
@@ -82,10 +82,10 @@ public:
 	/// Returns true if handler was added
 	{
 		auto result = _handlers.emplace(std::ref(typeid(T)),
-										Details::HandlerCaller([handlerPointer = f](const Poco::Dynamic::Var& x)
-										{
-											handlerPointer(x.extract<T>());
-										}));
+			Details::HandlerCaller([handlerPointer = f](const Poco::Dynamic::Var& x)
+			{
+				handlerPointer(x.extract<T>());
+			}));
 		return result.second;
 	}
 	
