@@ -53,7 +53,7 @@ void ODBCMetaColumn::getDescription()
 		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::getDescription()");
 	}
 }
 
@@ -69,7 +69,7 @@ bool ODBCMetaColumn::isUnsigned() const
 		0,
 		&val)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::isUnsigned()");
 	}
 	return (val == SQL_TRUE);
 }
@@ -87,7 +87,7 @@ void ODBCMetaColumn::init()
 			0,
 			&_dataLength)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::init()");
 	}
 
 	setName(std::string((char*) _columnDesc.name));

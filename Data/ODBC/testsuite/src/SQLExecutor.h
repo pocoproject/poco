@@ -48,7 +48,7 @@
 	if (!SQL_SUCCEEDED(r))	\
 	{ \
 		Poco::Data::ODBC::StatementException se(h); \
-		std::cout << se.toString() << std::endl; \
+		std::cout << se.displayText() << std::endl; \
 	} \
 	assert (SQL_SUCCEEDED(r))
 
@@ -57,7 +57,7 @@
 	if (!SQL_SUCCEEDED(r))	\
 	{ \
 		Poco::Data::ODBC::DescriptorException de(h); \
-		std::cout << de.toString() << std::endl; \
+		std::cout << de.displayText() << std::endl; \
 	} \
 	assert (SQL_SUCCEEDED(r))
 
@@ -106,12 +106,23 @@ public:
 		SQLExecutor::DataExtraction extractMode,
 		const std::string& insert = MULTI_INSERT,
 		const std::string& select = MULTI_SELECT);
-		/// The above two functions use "bare bone" ODBC API calls
+
+	void bareboneODBCStoredFuncTest(const std::string& dbConnString,
+		const std::string& tableCreateString,
+		const std::string& procExecuteString,
+		SQLExecutor::DataBinding bindMode,
+		SQLExecutor::DataExtraction extractMode);
+		/// The above three functions use "bare bone" ODBC API calls
 		/// (i.e. calls are not "wrapped" in PocoData framework structures).
 		/// The purpose of the functions is to verify that a driver behaves
 		/// correctly as well as to determine its capabilities
 		/// (e.g. SQLGetData() restrictions relaxation policy, if any).
 		/// If these test pass, subsequent tests failures are likely ours.
+
+	void connection(const std::string& connectString);
+	void session(const std::string& connectString, int timeout);
+	void sessionPool(const std::string& connectString,
+		int minSessions, int maxSessions, int idleTime, int timeout);
 
 	void zeroRows();
 	void simpleAccess();
@@ -463,6 +474,7 @@ public:
 	}
 
 	void blobStmt();
+	void recordSet();
 
 	void dateTime();
 	void date();

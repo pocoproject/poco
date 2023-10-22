@@ -583,7 +583,7 @@ private:
 			(SQLINTEGER) dataSize,
 			&_lengths[pos])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareFixedSize():SQLBindCol()");
 		}
 	}
 
@@ -612,7 +612,7 @@ private:
 			(SQLINTEGER) dataSize,
 			&_lenLengths[pos][0])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareFixedSize():SQLBindCol()");
 		}
 	}
 
@@ -637,7 +637,7 @@ private:
 			(SQLINTEGER) size*sizeof(T),
 			&_lengths[pos])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareVariableLen():SQLBindCol()");
 		}
 	}
 
@@ -664,7 +664,7 @@ private:
 			(SQLINTEGER) size,
 			&_lenLengths[pos][0])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareCharArray():SQLBindCol()");
 		}
 	}
 

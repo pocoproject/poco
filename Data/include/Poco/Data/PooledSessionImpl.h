@@ -62,8 +62,10 @@ public:
 	bool hasTransactionIsolation(Poco::UInt32) const;
 	bool isTransactionIsolation(Poco::UInt32) const;
 	const std::string& connectorName() const;
+	bool hasFeature(const std::string& name);
 	void setFeature(const std::string& name, bool state);
 	bool getFeature(const std::string& name);
+	bool hasProperty(const std::string& name);
 	void setProperty(const std::string& name, const Poco::Any& value);
 	Poco::Any getProperty(const std::string& name);
 

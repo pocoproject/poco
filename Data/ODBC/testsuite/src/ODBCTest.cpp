@@ -77,6 +77,24 @@ ODBCTest::~ODBCTest()
 }
 
 
+void ODBCTest::testConnection()
+{
+	_pExecutor->connection(_rConnectString);
+}
+
+
+void ODBCTest::testSession()
+{
+	_pExecutor->session(_rConnectString, 5);
+}
+
+
+void ODBCTest::testSessionPool()
+{
+	_pExecutor->sessionPool(_rConnectString, 1, 4, 3, 5);
+}
+
+
 void ODBCTest::testZeroRows()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -842,6 +860,21 @@ void ODBCTest::testBLOBStmt()
 }
 
 
+void ODBCTest::testRecordSet()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTimeTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->recordSet();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testDateTime()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1368,7 +1401,7 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 
 	try
 	{
-		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
+		std::cout << "Connecting to [" << dbConnString << ']' << std::endl;
 		SessionPtr ptr = new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
 		if (!dbEncoding.empty())
 			ptr->setProperty("dbEncoding", dbEncoding);

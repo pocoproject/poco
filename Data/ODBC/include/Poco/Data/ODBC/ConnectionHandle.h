@@ -36,17 +36,39 @@ class ODBC_API ConnectionHandle
 /// ODBC connection handle class
 {
 public:
-	ConnectionHandle(EnvironmentHandle* pEnvironment = 0);
+	ConnectionHandle(const std::string& connectString = "", SQLULEN timeout = 5);
 		/// Creates the ConnectionHandle.
 
 	~ConnectionHandle();
 		/// Creates the ConnectionHandle.
 
-	operator const SQLHDBC& () const;
-		/// Const conversion operator into reference to native type.
+	bool connect(const std::string& connectString = "", SQLULEN timeout = 5);
+		/// Connects the handle to the database.
+
+	bool disconnect();
+		/// Disconnects the handle from database.
+
+	bool isConnected() const;
+		/// Returns true if connected.
+
+	void setTimeout(SQLULEN timeout);
+		/// Sets the connection timeout in seconds.
+
+	int getTimeout() const;
+		/// Returns the connection timeout in seconds.
 
 	const SQLHDBC& handle() const;
 		/// Returns const reference to handle;
+
+	const SQLHDBC* pHandle() const;
+		/// Returns const pointer to handle;
+
+	operator const SQLHDBC& () const;
+		/// Const conversion operator into reference to native type.
+
+	operator bool();
+		/// Returns true if handles are not null.
+		/// True value is not a guarantee that the connection is valid.
 
 private:
 	operator SQLHDBC& ();
@@ -55,15 +77,24 @@ private:
 	SQLHDBC& handle();
 		/// Returns reference to handle;
 
+	void alloc();
+		/// Allocates the connection handle.
+
+	void free();
+		/// Frees the connection handle.
+
 	ConnectionHandle(const ConnectionHandle&);
 	const ConnectionHandle& operator=(const ConnectionHandle&);
 
-	const EnvironmentHandle* _pEnvironment;
-	SQLHDBC                  _hdbc;
-	bool                     _ownsEnvironment;
+	const EnvironmentHandle* _pEnvironment = nullptr;
+	SQLHDBC                  _hdbc = SQL_NULL_HDBC;
+	std::string              _connectString;
 
 	friend class Poco::Data::ODBC::SessionImpl;
 };
+
+
+using Connection = ConnectionHandle;
 
 
 //
@@ -75,9 +106,21 @@ inline ConnectionHandle::operator const SQLHDBC& () const
 }
 
 
+inline ConnectionHandle::operator bool()
+{
+	return _pEnvironment != nullptr && _hdbc != SQL_NULL_HDBC;
+}
+
+
 inline const SQLHDBC& ConnectionHandle::handle() const
 {
 	return _hdbc;
+}
+
+
+inline const SQLHDBC* ConnectionHandle::pHandle() const
+{
+	return &_hdbc;
 }
 
 

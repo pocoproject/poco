@@ -39,6 +39,9 @@ class Data_API Transaction
 public:
 	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = 0);
 		/// Creates the Transaction and starts it, using the given database session and logger.
+		/// If `session` is in autocommit mode, it is switched to manual commit mode
+		/// for the duration of the transaction and reverted back to the original mode
+		/// after transaction completes.
 
 	Transaction(Poco::Data::Session& session, bool start);
 		/// Creates the Transaction, using the given database session.
@@ -107,10 +110,18 @@ public:
 		/// Passing true value for commit disables rollback during destruction
 		/// of this Transaction object.
 
-	void execute(const std::vector<std::string>& sql);
+	bool execute(const std::vector<std::string>& sql);
 		/// Executes all the SQL statements supplied in the vector and, after the last
-		/// one is sucesfully executed, commits the transaction.
-		/// If an error occurs during execution, transaction is rolled back.
+		/// one is sucesfully executed, commits the transaction and returns true.
+		/// If an error occurs during execution, transaction is rolled back and false is returned.
+		/// Passing true value for commit disables rollback during destruction
+		/// of this Transaction object.
+
+	bool execute(const std::vector<std::string>& sql, std::string* info);
+		/// Executes all the SQL statements supplied in the vector and, after the last
+		/// one is sucesfully executed, commits the transaction and returns true.
+		/// If an error occurs during execution, transaction is rolled back false is returned
+		/// and info pointer is assigned to a std::string containing the error message.
 		/// Passing true value for commit disables rollback during destruction
 		/// of this Transaction object.
 
@@ -148,7 +159,8 @@ private:
 		/// Otherwise does nothing.
 
 	Session _rSession;
-	Logger* _pLogger;
+	bool _autoCommit = false;
+	Logger* _pLogger = nullptr;
 };
 
 

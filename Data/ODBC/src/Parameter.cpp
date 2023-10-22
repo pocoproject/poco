@@ -45,7 +45,7 @@ void Parameter::init()
 		&_decimalDigits,
 		&_isNullable)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBC::Parameter::init():SQLDescribeParam()");
 	}
 }
 
