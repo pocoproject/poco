@@ -80,6 +80,7 @@ public:
 	void testEmpty();
 	void testIterator();
 	void testSharedPtr();
+	void testVarVisitor();
 
 	void setUp();
 	void tearDown();
