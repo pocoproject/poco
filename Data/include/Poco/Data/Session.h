@@ -273,6 +273,9 @@ public:
 		/// Utility function that teturns the URI formatted from supplied
 		/// arguments as "connector:///connectionString".
 
+	bool hasFeature(const std::string& name);
+		/// Returns true if session has the named feature.
+
 	void setFeature(const std::string& name, bool state);
 		/// Set the state of a feature.
 		///
@@ -290,6 +293,9 @@ public:
 		///
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
+
+	bool hasProperty(const std::string& name);
+		/// Returns true if session has the named property.
 
 	void setProperty(const std::string& name, const Poco::Any& value);
 		/// Set the value of a property.
@@ -456,6 +462,12 @@ inline std::string Session::uri() const
 }
 
 
+inline bool Session::hasFeature(const std::string& name)
+{
+	return _pImpl->hasFeature(name);
+}
+
+
 inline void Session::setFeature(const std::string& name, bool state)
 {
 	_pImpl->setFeature(name, state);
@@ -467,6 +479,11 @@ inline bool Session::getFeature(const std::string& name) const
 	return const_cast<SessionImpl*>(_pImpl.get())->getFeature(name);
 }
 
+
+inline bool Session::hasProperty(const std::string& name)
+{
+	return _pImpl->hasProperty(name);
+}
 
 inline void Session::setProperty(const std::string& name, const Poco::Any& value)
 {

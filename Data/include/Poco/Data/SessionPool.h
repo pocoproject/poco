@@ -191,21 +191,21 @@ private:
 
 	void closeAll(SessionList& sessionList);
 
-	std::string    _connector;
-	std::string    _connectionString;
-	int            _minSessions;
-	int            _maxSessions;
-	int            _idleTime;
-	int            _connTimeout;
-	int            _nSessions;
-	SessionList    _idleSessions;
-	SessionList    _activeSessions;
-	Poco::Timer    _janitorTimer;
-	FeatureMap     _featureMap;
-	PropertyMap    _propertyMap;
-	bool           _shutdown;
-	AddPropertyMap _addPropertyMap;
-	AddFeatureMap  _addFeatureMap;
+	std::string       _connector;
+	std::string       _connectionString;
+	std::atomic<int>  _minSessions;
+	std::atomic<int>  _maxSessions;
+	std::atomic<int>  _idleTime;
+	std::atomic<int>  _connTimeout;
+	std::atomic<int>  _nSessions;
+	SessionList       _idleSessions;
+	SessionList       _activeSessions;
+	Poco::Timer       _janitorTimer;
+	FeatureMap        _featureMap;
+	PropertyMap       _propertyMap;
+	std::atomic<bool> _shutdown;
+	AddPropertyMap    _addPropertyMap;
+	AddFeatureMap     _addFeatureMap;
 	mutable
 	Poco::Mutex _mutex;
 

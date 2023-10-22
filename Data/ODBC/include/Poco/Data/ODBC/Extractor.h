@@ -410,6 +410,7 @@ private:
 
 		CharType** pc = AnyCast<CharType*>(&(_pPreparator->at(pos)));
 		poco_assert_dbg (pc);
+		poco_assert_dbg(*pc);
 		poco_assert_dbg (_pPreparator->bulkSize() == values.size());
 		std::size_t colWidth = columnSize(pos);
 		ItType it = values.begin();
@@ -441,6 +442,7 @@ private:
 
 		CharType** pc = AnyCast<CharType*>(&(_pPreparator->at(pos)));
 		poco_assert_dbg (pc);
+		poco_assert_dbg(*pc);
 		poco_assert_dbg (_pPreparator->bulkSize() == values.size());
 		std::size_t colWidth = _pPreparator->maxDataSize(pos);
 		ItType it = values.begin();
@@ -480,7 +482,7 @@ private:
 			&_lengths[pos]);  //length indicator
 
 		if (Utility::isError(rc))
-			throw StatementException(_rStmt, "SQLGetData()");
+			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl():SQLGetData()");
 
 		if (isNullLengthIndicator(_lengths[pos]))
 			return false;
