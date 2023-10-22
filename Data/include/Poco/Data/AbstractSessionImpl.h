@@ -115,6 +115,16 @@ public:
 	{
 	}
 
+	bool hasFeature(const std::string& name)
+		/// Looks a feature up in the features map
+		/// and returns true if there is one.
+	{
+		auto it = _features.find(name);
+		return it != _features.end() &&
+			it->second.getter &&
+			it->second.setter;
+	}
+
 	void setFeature(const std::string& name, bool state)
 		/// Looks a feature up in the features map
 		/// and calls the feature's setter, if there is one.
@@ -143,6 +153,16 @@ public:
 				throw NotImplementedException("get", name);
 		}
 		else throw NotSupportedException(name);
+	}
+
+	bool hasProperty(const std::string& name)
+		/// Looks a property up in the properties map
+		/// and returns true if there is one.
+	{
+		auto it = _properties.find(name);
+		return it != _properties.end() &&
+			it->second.getter &&
+			it->second.setter;
 	}
 
 	void setProperty(const std::string& name, const Poco::Any& value)

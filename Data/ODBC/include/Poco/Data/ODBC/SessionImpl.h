@@ -52,6 +52,13 @@ public:
 		ODBC_TXN_CAPABILITY_TRUE = 1
 	};
 
+	enum CursorUse
+	{
+		ODBC_CURSOR_USE_ALWAYS = Poco::Data::SessionImpl::CURSOR_USE_ALWAYS,
+		ODBC_CURSOR_USE_IF_NEEDED = Poco::Data::SessionImpl::CURSOR_USE_IF_NEEDED,
+		ODBC_CURSOR_USE_NEVER = Poco::Data::SessionImpl::CURSOR_USE_NEVER
+	};
+
 	SessionImpl(const std::string& connect,
 		std::size_t loginTimeout,
 		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
@@ -159,6 +166,15 @@ public:
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
 
+	void setCursorUse(const std::string&, const Poco::Any& value);
+		/// Sets the use of cursors:
+		///   - SQL_CUR_USE_ODBC - always
+		///   - SQL_CUR_USE_IF_NEEDED - if needed
+		///   - SQL_CUR_USE_DRIVER - never
+
+	Poco::Any getCursorUse(const std::string&) const;
+		/// Returns the use of cursors.
+
 	int queryTimeout() const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
@@ -195,17 +211,17 @@ private:
 		/// Sets the transaction isolation level.
 		/// Called internally from getTransactionIsolation()
 
-	std::string            _connector;
-	mutable ConnectionHandle _db;
-	Poco::Any              _maxFieldSize;
-	bool                   _autoBind;
-	bool                   _autoExtract;
-	TypeInfo               _dataTypes;
-	mutable char           _canTransact;
-	bool                   _inTransaction;
-	int                    _queryTimeout;
-	std::string            _dbEncoding;
-	Poco::FastMutex        _mutex;
+	std::string                   _connector;
+	mutable ConnectionHandle      _db;
+	Poco::Any                     _maxFieldSize;
+	bool                          _autoBind;
+	bool                          _autoExtract;
+	TypeInfo                      _dataTypes;
+	mutable TransactionCapability _canTransact;
+	std::atomic<bool>             _inTransaction;
+	int                           _queryTimeout;
+	std::string                   _dbEncoding;
+	Poco::FastMutex               _mutex;
 };
 
 
