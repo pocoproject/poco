@@ -95,8 +95,13 @@ namespace
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
 		if (prctl(PR_GET_NAME, name))
 			throw Poco::SystemException("cannot get thread name");
+#else
+		if (pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1))
+			throw Poco::SystemException("cannot get thread name");
+#endif
 		return name;
 	}
 }
