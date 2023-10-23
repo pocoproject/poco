@@ -51,6 +51,10 @@
 #include <iostream>
 
 
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
+#endif
+
 //
 // Block SIGPIPE in main thread.
 //
@@ -76,31 +80,39 @@ namespace
 }
 #endif
 
-
 namespace
 {
-	void setThreadName(const std::string& threadName)
+	std::string truncName(const std::string& name)
 	{
-#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version <  1300000
-		pthread_set_name_np(pthread_self(), threadName.c_str());
-		return;
+		if (name.size() > POCO_MAX_THREAD_NAME_LEN)
+			return name.substr(0, POCO_MAX_THREAD_NAME_LEN).append("~");
+		return name;
+	}
+
+	void setThreadName(const std::string& threadName)
+		/// Sets thread name. Support for this feature varies
+		/// on platforms. Any errors are ignored.
+	{
+#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version < 1300000
+		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
-		if (pthread_setname_np(threadName.c_str()))
+	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+			pthread_setname_np(truncName(threadName).c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+		#endif
+	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
 #else
-		if (prctl(PR_SET_NAME, threadName.c_str()))
+		prctl(PR_SET_NAME, truncName(threadName).c_str());
 #endif
-			throw Poco::SystemException("cannot set thread name");
 	}
 
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
-		if (prctl(PR_GET_NAME, name))
-			throw Poco::SystemException("cannot get thread name");
+		prctl(PR_GET_NAME, name);
 #else
-		if (pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1))
-			throw Poco::SystemException("cannot get thread name");
+		pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
 #endif
 		return name;
 	}
@@ -366,7 +378,8 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
-	auto* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 
 	{
