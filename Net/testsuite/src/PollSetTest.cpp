@@ -372,6 +372,7 @@ void PollSetTest::testPollClosedServer()
 {
 	EchoServer echoServer1;
 	EchoServer echoServer2;
+
 	StreamSocket ss1(SocketAddress::IPv4);
 	StreamSocket ss2(SocketAddress::IPv4);
 
@@ -385,8 +386,8 @@ void PollSetTest::testPollClosedServer()
 
 	assertEqual(0, static_cast<int>(ps.poll(Timespan(100)).size()));
 
-	ss1.connectNB(SocketAddress("127.0.0.1", echoServer1.port()));
-	ss2.connectNB(SocketAddress("127.0.0.1", echoServer2.port()));
+	ss1.connect(SocketAddress("127.0.0.1", echoServer1.port()));
+	ss2.connect(SocketAddress("127.0.0.1", echoServer2.port()));
 
 	std::string str = "HELLO";
 	int len = static_cast<int>(str.length());
