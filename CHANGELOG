@@ -10,7 +10,39 @@ Release 1.12.5 (2023-10-??)
 ===========================
 
 - Merge changes from 1.11.5 to 1.11.8.
-- TODO
+- GH #4215 Remove SocketReactor dependency on Poco::Thread for sleeping
+- GH #4197 ODBC::Binder UUID new/free mismatch
+- GH #4194 PollSet filters out some events
+- GH #4189 Use after free warnings
+- GH #4180 receiveResponse() may not return response body stream
+- GH #4177 Upgrade bundled pcre2 to 10.42
+- GH #4147 missing \r\n when setting trailer header in chunked response
+- GH #4134 Initialisation of _socketIndex in SSLManager (OpenSSL)
+- GH #3867 Add options to disable STDIO in child process
+- GH #3832 pthread_getname_np' was not declared in this scope
+- GH #3786 FileChannel::setRotation overflow
+- GH #2776 Shutdown TLS1.3 connection
+- GH #4176 PCRE2 10.40 version has security vulnerabilities（CVE-2022-41409）, when is the plan to fix it third-party
+- GH #4150 Use Poco format instead of sprintf in Util
+- GH #4116 Logging should evaluate only if the logging level is active
+- GH #4071 PageCompiler: add referrerPolicy to page directive feature
+- GH #4057 ODBC: SQL Anywhere Support
+- GH #4031 Classes with virtual functions missing virtual destructors (compilation issues)
+- GH #4023 CPPParser: Losing data if parameter std::function<void(bool)> is used
+- GH #4014 wrong string offset in HTTPCredentials::isNTLMCredentials
+- GH #4005 On UNIX platform, Poco::Path::getExtension() returns name of the hidden file if no extension is present
+- GH #3986 Fix dead lock on Timer destructor
+- GH #3968 Poco::Net::SocketConnector constructor should take SocketAddress by const reference
+- GH #3935 The extractor in postgresql drops milliseconds
+- GH #3926 CppParser throws exception when return value is specified to be in global namespace
+- GH #3921 Deadlock in Timer when one sync and one async cancel requests are issued
+- GH #3918 Static FastMutex fails to lock when issued from another thread on linux
+- GH #3880 NetSSL_OpenSSL: Support session resumption with TLSv1.3
+- GH #3876 Replace sprintf with snprintf in Environment and NumberFormatter to avoid deprecation warnings
+- GH #3859 zlib headers not updated
+- GH #3806 HTTPClientSession::receiveResponse() gives NoMessage instead of Timeout exception for SSL connection on Windows when using OpenSSL 3.0.x
+- GH #3723 DateTimeFormatter creates invalid ISO8601 string
+- GH #3147 Reading from request stream hangs when "Transfer-Encoding: chunked" is used
 
 
 Release 1.12.4 (2022-10-31)
