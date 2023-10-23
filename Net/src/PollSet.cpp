@@ -230,10 +230,11 @@ public:
 
 	void wakeUp()
 	{
+		uint64_t val = 1;
 #ifdef WEPOLL_H_
 		StreamSocket ss(SocketAddress("127.0.0.1", _port));
+		ss.impl()->sendBytes(&val, sizeof(val));
 #else
-		uint64_t val = 1;
 		// This is guaranteed to write into a valid fd,
 		// or 0 (meaning PollSet is being destroyed).
 		// Errors are ignored.
