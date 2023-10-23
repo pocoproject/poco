@@ -37,6 +37,10 @@
 #	include <time.h>
 #endif
 
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
+#endif
+
 #if POCO_OS == POCO_OS_LINUX
 	#ifndef _GNU_SOURCE
 		#define _GNU_SOURCE         /* See feature_test_macros(7) */
@@ -83,7 +87,7 @@ namespace
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 		if (pthread_setname_np(threadName.c_str()))
 #else
-		if (pthread_setname_np(pthread_self(), threadName.c_str()))
+		if (prctl(PR_SET_NAME, threadName.c_str()))
 #endif
 			throw Poco::SystemException("cannot set thread name");
 	}
@@ -91,8 +95,13 @@ namespace
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+		if (prctl(PR_GET_NAME, name))
+			throw Poco::SystemException("cannot get thread name");
+#else
 		if (pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1))
 			throw Poco::SystemException("cannot get thread name");
+#endif
 		return name;
 	}
 }
