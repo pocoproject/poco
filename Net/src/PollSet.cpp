@@ -69,7 +69,9 @@ public:
 	using SocketMode = std::pair<Socket, int>;
 	using SocketMap = std::map<void*, SocketMode>;
 
-	PollSetImpl(): _events(FD_SETSIZE),
+	static const epoll_event EPOLL_NULL_EVENT;
+
+	PollSetImpl(): _events(FD_SETSIZE, EPOLL_NULL_EVENT),
 #if defined(WEPOLL_H_)
 		_eventfd(eventfd()),
 #else
@@ -341,6 +343,7 @@ private:
 	EPollHandle      _epollfd;
 };
 
+const epoll_event PollSetImpl::EPOLL_NULL_EVENT = {0, {0}};
 
 #elif defined(POCO_HAVE_FD_POLL)
 
