@@ -149,6 +149,10 @@
 
 // No UNIX socket support
 // Define to disable unix sockets
+// UNIX local sockets are default-enabled on
+// all UNIX systems, on Windows if available
+// See Net/SocketDefs.h
+// See https://devblogs.microsoft.com/commandline/af_unix-comes-to-windows/
 // #define POCO_NET_NO_UNIX_SOCKET
 
 
