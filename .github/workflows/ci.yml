@@ -1,4 +1,7 @@
-name: poco-ci
+# To enable retrying a job on failure or a specific timeout, instead of the run step, use uses: nick-fields/retry@v2.9.0(see the linux-gcc-make-tsan jsob)
+# To retry only on timeout set retry_on: timeout
+# To retry only on error set retry_on: error
+# For more information on the retry action see https://github.com/nick-fields/retry
 on: 
   pull_request:
     types: [opened]
@@ -93,6 +96,7 @@ jobs:
         with:
           timeout_minutes: 90
           max_attempts: 3
+          retry_on: any
           command: >-
             sudo -s
             ./ci/runtests.sh TSAN
