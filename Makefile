@@ -196,7 +196,7 @@ Util-samples: Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Util/samples
 
 Util-clean:
-	$(MAKE)  -C $(POCO_BASE)/Util clean
+	$(MAKE) -C $(POCO_BASE)/Util clean
 	$(MAKE) -C $(POCO_BASE)/Util/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Util/samples clean
 
