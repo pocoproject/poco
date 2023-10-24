@@ -3,7 +3,7 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.12.5 (2023-10-25)
 ===========================
 
-- Merge changes from 1.11.5 to 1.11.8.
+- GH #4219 Make POSIX event thread safe
 - GH #4215 Remove SocketReactor dependency on Poco::Thread for sleeping
 - GH #4197 ODBC::Binder UUID new/free mismatch
 - GH #4194 PollSet filters out some events
