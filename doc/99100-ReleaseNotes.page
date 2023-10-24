@@ -16,6 +16,7 @@ AAAIntroduction
   - Upgrade double-conversion to 3.3.0
   - Upgrade bundled pcre2 to 10.42
 
+- GH #4219 Make POSIX event thread safe
 - GH #4215 Remove SocketReactor dependency on Poco::Thread for sleeping
 - GH #4197 ODBC::Binder UUID new/free mismatch
 - GH #4194 PollSet filters out some events
