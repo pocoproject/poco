@@ -5,7 +5,7 @@
 #
 
 .PHONY: projects
-clea distclean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -C SampleApp $(MAKECMDGOALS)
 	$(MAKE) -C SampleServer $(MAKECMDGOALS)
