@@ -343,28 +343,7 @@ void PollSetTest::testPollNoServer()
 	ss1.connectNB(SocketAddress("127.0.0.1", 0xFEFE));
 	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
 
-	PollSet::SocketModeMap sm;
-	int signalledErrors = 0;
-	Stopwatch sw; sw.start();
-	do
-	{
-		sm = ps.poll(Timespan(1000000));
-		for (auto s : sm)
-		{
-			assertTrue(0 != (s.second & PollSet::POLL_ERROR));
-			++signalledErrors;
-		}
-
-		sm.clear();
-		int secs = sw.elapsedSeconds();
-		if (secs > 10)
-		{
-			fail(Poco::format("testPollNoServer() timed out after %ds, "
-				"sockets signalled=%d (expected 2)",
-				secs, signalledErrors), __LINE__);
-		}
-	} while (signalledErrors < 2);
-	assertEqual(2, signalledErrors);
+	assertEqual(2, ps.poll(Timespan(1000000)).size());
 	
 }
 
@@ -422,21 +401,8 @@ void PollSetTest::testPollClosedServer()
 		}
 	}
 
-	int signalled = 0;
-	sw.restart();
-	do
-	{
-		signalled += static_cast<int>(ps.poll(Timespan(1000000)).size());
-		int secs = sw.elapsedSeconds();
-		if (secs > 10)
-		{
-			fail(Poco::format("testPollClosedServer() timed out waiting on "
-				"signalled sockets after %ds, sockets signalled=%d (expected 2)",
-				secs, signalled), __LINE__);
-		}
-	} while (signalled < 2);
+	assertEqual(2, ps.poll(Timespan(1000000)).size());
 
-	assertTrue(signalled == 2);
 	// socket closed or error
 	assertTrue(0 >= ss1.receiveBytes(0, 0));
 	assertTrue(0 >= ss2.receiveBytes(0, 0));
