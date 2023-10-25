@@ -62,6 +62,22 @@ void OptionSet::addOption(const Option& option)
 }
 
 
+void OptionSet::removeOption(const std::string& option)
+{
+	if (option.empty()) return;
+	OptionVec::const_iterator it = _options.begin();
+	OptionVec::const_iterator itEnd = _options.end();
+	for (; it != itEnd; ++it)
+	{
+		if (it->fullName() == option)
+		{
+			_options.erase(it);
+			return;
+		}
+	}
+}
+
+
 bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 {
 	bool found = false;
