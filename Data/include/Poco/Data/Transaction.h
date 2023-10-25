@@ -39,9 +39,6 @@ class Data_API Transaction
 public:
 	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = 0);
 		/// Creates the Transaction and starts it, using the given database session and logger.
-		/// If `session` is in autocommit mode, it is switched to manual commit mode
-		/// for the duration of the transaction and reverted back to the original mode
-		/// after transaction completes.
 
 	Transaction(Poco::Data::Session& session, bool start);
 		/// Creates the Transaction, using the given database session.
@@ -159,7 +156,6 @@ private:
 		/// Otherwise does nothing.
 
 	Session _rSession;
-	bool _autoCommit = false;
 	Logger* _pLogger = nullptr;
 };
 

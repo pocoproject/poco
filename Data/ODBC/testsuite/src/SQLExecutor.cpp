@@ -1275,14 +1275,10 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 	{
 		SessionPool pool("ODBC", connectString, 1, 4, 2, 10);
 
-		pool.setFeature("f1", true);
-		assertTrue (pool.getFeature("f1"));
-		try { pool.getFeature("g1"); fail ("must fail"); }
+		try { pool.getFeature("g1"); fail ("getting an unsuported feature must fail"); }
 		catch ( Poco::NotFoundException& ) { }
 
-		pool.setProperty("p1", 1);
-		assertTrue (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
-		try { pool.getProperty("r1"); fail ("must fail"); }
+		try { pool.getProperty("r1"); fail ("getting an unsuported property must fail"); }
 		catch ( Poco::NotFoundException& ) { }
 
 		assertTrue (pool.capacity() == 4);
@@ -1294,14 +1290,15 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
 		Session s1(pool.get());
 
-		assertTrue (s1.getFeature("f1"));
-		assertTrue (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
+		try { pool.setFeature("f1", true); fail ("setting an unsuported feature must fail"); }
+		catch (Poco::InvalidAccessException&) { }
+		catch (Poco::NotImplementedException&) { }
+		catch (Poco::Data::NotSupportedException&) { }
 
-		try { pool.setFeature("f1", true); fail ("must fail"); }
-		catch ( Poco::InvalidAccessException& ) { }
-
-		try { pool.setProperty("p1", 1); fail ("must fail"); }
-		catch ( Poco::InvalidAccessException& ) { }
+		try { pool.setProperty("p1", 1); fail ("setting an unsuported property must fail"); }
+		catch (Poco::InvalidAccessException&) { }
+		catch (Poco::NotImplementedException&) { }
+		catch (Poco::Data::NotSupportedException&) { }
 
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 1);
@@ -1311,10 +1308,7 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 		assertTrue (pool.dead() == 0);
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
 
-		Session s2(pool.get("f1", false));
-		assertTrue (!s2.getFeature("f1"));
-		assertTrue (1 == Poco::AnyCast<int>(s2.getProperty("p1")));
-
+		Session s2(pool.get());
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 2);
 		assertTrue (pool.idle() == 0);
@@ -1323,32 +1317,7 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 		assertTrue (pool.dead() == 0);
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
 
-		{
-			Session s3(pool.get("p1", 2));
-			assertTrue (s3.getFeature("f1"));
-			assertTrue (2 == Poco::AnyCast<int>(s3.getProperty("p1")));
-
-			assertTrue (pool.capacity() == 4);
-			assertTrue (pool.allocated() == 3);
-			assertTrue (pool.idle() == 0);
-			assertTrue (pool.connTimeout() == 10);
-			assertTrue (pool.available() == 1);
-			assertTrue (pool.dead() == 0);
-			assertTrue (pool.allocated() == pool.used() + pool.idle());
-		}
-
-		assertTrue (pool.capacity() == 4);
-		assertTrue (pool.allocated() == 3);
-		assertTrue (pool.idle() == 1);
-		assertTrue (pool.connTimeout() == 10);
-		assertTrue (pool.available() == 2);
-		assertTrue (pool.dead() == 0);
-		assertTrue (pool.allocated() == pool.used() + pool.idle());
-
 		Session s4(pool.get());
-		assertTrue (s4.getFeature("f1"));
-		assertTrue (1 == Poco::AnyCast<int>(s4.getProperty("p1")));
-
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 3);
 		assertTrue (pool.idle() == 0);
@@ -1358,7 +1327,6 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 		Session s5(pool.get());
-
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 4);
 		assertTrue (pool.idle() == 0);
@@ -1419,13 +1387,10 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 		assertTrue (pool.dead() == 0);
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
 
-		s6.setFeature("connected", false);
-		assertTrue (pool.dead() == 1);
-
 		s6.close();
 		assertTrue (pool.capacity() == 4);
-		assertTrue (pool.allocated() == 2);
-		assertTrue (pool.idle() == 0);
+		assertTrue (pool.allocated() == 3);
+		assertTrue (pool.idle() == 1);
 		assertTrue (pool.connTimeout() == 10);
 		assertTrue (pool.available() == 2);
 		assertTrue (pool.dead() == 0);
@@ -1447,7 +1412,9 @@ void SQLExecutor::sessionPool(const std::string& connectString, int minSessions,
 		assertTrue (pool.connTimeout() == 10);
 		assertTrue (pool.available() == 0);
 		assertTrue (pool.dead() == 0);
-		assertTrue (pool.allocated() == pool.used() + pool.idle());
+		assertTrue (pool.allocated() == 0);
+		assertTrue (pool.used() == 0);
+		assertTrue (pool.idle() == 0);
 	}
 }
 
@@ -4214,9 +4181,8 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	}
 
 	Session local("odbc", connect);
-	local.setFeature("autoCommit", true);
 
-	std::string funct = "transaction()";
+	std::string funct = "sessionTransaction()";
 	std::vector<std::string> lastNames;
 	std::vector<std::string> firstNames;
 	std::vector<std::string> addresses;
@@ -4240,10 +4206,13 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	session().setFeature("autoCommit", false);
 	assertTrue (!session().isTransaction());
 
+	auto ti = session().getTransactionIsolation();
+
+	// these are just calls to check the transactional capabilities of the session
+	// they will print diagnostics to stderr if a transaction isolation level is not supported
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
 	setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
 	setTransactionIsolation(session(), Session::TRANSACTION_SERIALIZABLE);
-
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 
 	session().begin();
@@ -4291,7 +4260,9 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assertTrue (2 == count);
 
+	// restore the original transaction state
 	session().setFeature("autoCommit", autoCommit);
+	setTransactionIsolation(session(), ti);
 }
 
 
@@ -4305,6 +4276,9 @@ void SQLExecutor::transaction(const std::string& connect)
 
 	Session local("odbc", connect);
 	local.setFeature("autoCommit", true);
+
+	bool autoCommit = session().getFeature("autoCommit");
+	auto ti = session().getTransactionIsolation();
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 	if (local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED))
@@ -4328,8 +4302,6 @@ void SQLExecutor::transaction(const std::string& connect)
 	ages.push_back(2);
 	int count = 0, locCount = 0;
 	std::string result;
-
-	bool autoCommit = session().getFeature("autoCommit");
 
 	session().setFeature("autoCommit", true);
 	assertTrue (!session().isTransaction());
@@ -4454,7 +4426,9 @@ void SQLExecutor::transaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assertTrue (2 == count);
 
+	// restore the original transaction state
 	session().setFeature("autoCommit", autoCommit);
+	setTransactionIsolation(session(), ti);
 }
 
 

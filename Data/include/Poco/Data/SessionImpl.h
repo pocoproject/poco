@@ -146,7 +146,7 @@ public:
 	std::string uri() const;
 		/// Returns the URI for this session.
 
-	virtual bool hasFeature(const std::string& name) = 0;
+	virtual bool hasFeature(const std::string& name) const = 0;
 		/// Returns true if session has the named feature.
 
 	virtual void setFeature(const std::string& name, bool state) = 0;
@@ -158,7 +158,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
-	virtual bool getFeature(const std::string& name) = 0;
+	virtual bool getFeature(const std::string& name) const = 0;
 		/// Look up the state of a feature.
 		///
 		/// Features are a generic extension mechanism for session implementations.
@@ -167,7 +167,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
-	virtual bool hasProperty(const std::string& name) = 0;
+	virtual bool hasProperty(const std::string& name) const = 0;
 		/// Returns true if session has the named feature.
 
 	virtual void setProperty(const std::string& name, const Poco::Any& value) = 0;
@@ -179,7 +179,7 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
-	virtual Poco::Any getProperty(const std::string& name) = 0;
+	virtual Poco::Any getProperty(const std::string& name) const = 0;
 		/// Look up the value of a property.
 		///
 		/// Properties are a generic extension mechanism for session implementations.
