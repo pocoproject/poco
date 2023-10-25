@@ -166,7 +166,7 @@ const std::string& PooledSessionImpl::connectorName() const
 }
 
 
-bool PooledSessionImpl::hasFeature(const std::string& name)
+bool PooledSessionImpl::hasFeature(const std::string& name) const
 {
 	return access()->hasFeature(name);
 }
@@ -178,13 +178,13 @@ void PooledSessionImpl::setFeature(const std::string& name, bool state)
 }
 
 
-bool PooledSessionImpl::getFeature(const std::string& name)
+bool PooledSessionImpl::getFeature(const std::string& name) const
 {
 	return access()->getFeature(name);
 }
 
 
-bool PooledSessionImpl::hasProperty(const std::string& name)
+bool PooledSessionImpl::hasProperty(const std::string& name) const
 {
 	return access()->hasProperty(name);
 }
@@ -196,7 +196,7 @@ void PooledSessionImpl::setProperty(const std::string& name, const Poco::Any& va
 }
 
 
-Poco::Any PooledSessionImpl::getProperty(const std::string& name)
+Poco::Any PooledSessionImpl::getProperty(const std::string& name) const
 {
 	return access()->getProperty(name);
 }
