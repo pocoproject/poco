@@ -333,3 +333,15 @@ jobs:
           sudo -s
           EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus SevenZip Util XML Zip"
           ./ci/runtests.sh
+
+  linux-test-mongodb:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: supercharge/mongodb-github-action@1.10.0
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: >-
+          sudo -s
+          EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+          ./ci/runtests.sh
