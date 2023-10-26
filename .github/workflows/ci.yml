@@ -283,7 +283,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       mysql:
-        image: mysql:latest
+        image: mysql:8.1.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: pocotest
@@ -314,7 +314,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:16.0
         env:
           POSTGRES_PASSWORD: postgres
         ports:
