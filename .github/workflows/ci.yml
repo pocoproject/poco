@@ -279,7 +279,7 @@ jobs:
 #          cd cmake-build;
 #          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Debug
 
-  linux-test-mysql:
+  linux-gcc-make-mysql:
     runs-on: ubuntu-22.04
     services:
       mysql:
@@ -310,7 +310,7 @@ jobs:
       #     EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
       #     ./ci/runtests.sh
 
-  linux-test-postgres:
+  linux-gcc-make-postgres:
     runs-on: ubuntu-22.04
     services:
       postgres:
@@ -328,7 +328,7 @@ jobs:
           EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
           ./ci/runtests.sh
 
-  linux-test-redis:
+  linux-gcc-make-redis:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -344,7 +344,7 @@ jobs:
           EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus SevenZip Util XML Zip"
           ./ci/runtests.sh
 
-  linux-test-mongodb:
+  linux-gcc-make-mongodb:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
