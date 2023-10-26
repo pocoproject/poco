@@ -19,7 +19,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
-	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
+	Path PatternFormatter PIDFile Process ProcessRunner PurgeStrategy RWLock Random RandomStream \
 	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
 	SHA1Engine SHA2Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \

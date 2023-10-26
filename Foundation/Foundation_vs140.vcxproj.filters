@@ -642,6 +642,9 @@
     <ClCompile Include="src\NamedMutex_WIN32U.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PIDFile.cpp">
+      <Filter>Processes\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Pipe.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
@@ -667,6 +670,9 @@
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Process_WIN32U.cpp">
+      <Filter>Processes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessRunner.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SharedMemory.cpp">
@@ -1514,6 +1520,9 @@
     <ClInclude Include="include\Poco\NamedMutex_WIN32U.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PIDFile.h">
+      <Filter>Processes\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Pipe.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
@@ -1539,6 +1548,9 @@
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Process_WIN32U.h">
+      <Filter>Processes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ProcessRunner.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\SharedMemory.h">
