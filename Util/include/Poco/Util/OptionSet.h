@@ -33,8 +33,6 @@ class Util_API OptionSet
 public:
 	using OptionVec = std::vector<Option>;
 	using Iterator = OptionVec::const_iterator;
-	template <typename T>
-	using Callback = void (T::*)(const std::string&, const std::string&);
 
 	OptionSet();
 		/// Creates the OptionSet.
@@ -50,16 +48,6 @@ public:
 
 	void addOption(const Option& option);
 		/// Adds an option to the collection.
-
-	void removeOption(const std::string& option);
-		/// Removes an option from the collection.
-		/// No-op if option is empty or not found.
-
-	template <typename T>
-	void replaceOption(const std::string& opt, const std::string& shortOpt, const std::string& desc,
-		bool req, bool rep, const std::string& arg,
-		T* pObj, Callback<T> func);
-		/// Replaces an option.
 
 	bool hasOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a true iff an option with the given name exists.
@@ -92,24 +80,6 @@ public:
 private:
 	OptionVec _options;
 };
-
-
-//
-// inlines
-//
-
-template <typename T>
-void OptionSet::replaceOption(const std::string& opt, const std::string& shortOpt, const std::string& desc,
-	bool req, bool rep, const std::string& arg,
-	T* pObj, Callback<T> func)
-{
-	removeOption(opt);
-	addOption(Option(opt, shortOpt, desc)
-		.required(req)
-		.repeatable(rep)
-		.argument(arg)
-		.callback(OptionCallback<T>(pObj, func)));
-}
 
 
 } } // namespace Poco::Util
