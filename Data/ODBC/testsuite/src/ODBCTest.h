@@ -152,7 +152,10 @@ public:
 	virtual void testSQLChannel();
 	virtual void testSQLLogger();
 
+	virtual void testAutoCommit();
+	virtual void testTransactionIsolation();
 	virtual void testSessionTransaction();
+	virtual void testSessionTransactionNoAutoCommit();
 	virtual void testTransaction();
 	virtual void testTransactor();
 	virtual void testNullable();
