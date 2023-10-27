@@ -50,6 +50,13 @@ void FileIOS::open(const std::string& path)
 }
 
 
+void FileIOS::openHandle(NativeHandle handle, std::ios::openmode mode)
+{
+	clear();
+	_buf.openHandle(handle, mode | _defaultMode);
+}
+
+
 void FileIOS::close()
 {
 	if (!_buf.close())
