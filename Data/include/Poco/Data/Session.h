@@ -201,7 +201,10 @@ public:
 	Statement operator << (const T& t)
 		/// Creates a Statement with the given data as SQLContent
 	{
-		return _statementCreator << t;
+		Statement stmt = (_statementCreator << t);
+		if (!_pImpl->isTransaction() && !isAutocommit())
+			_pImpl->begin();
+		return stmt;
 	}
 
 	SharedPtr<StatementImpl> createStatementImpl();

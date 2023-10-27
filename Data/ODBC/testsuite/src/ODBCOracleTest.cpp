@@ -931,6 +931,9 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransaction);

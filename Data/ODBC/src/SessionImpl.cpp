@@ -376,7 +376,7 @@ Poco::UInt32 SessionImpl::getDefaultTransactionIsolation() const
 Poco::UInt32 SessionImpl::transactionIsolation(SQLULEN isolation)
 {
 	if (0 == isolation)
-		throw InvalidArgumentException("transactionIsolation(SQLUINTEGER)");
+		throw InvalidArgumentException("transactionIsolation(0): invalid isolation 0");
 
 	Poco::UInt32 ret = 0;
 
@@ -393,7 +393,7 @@ Poco::UInt32 SessionImpl::transactionIsolation(SQLULEN isolation)
 		ret |= Session::TRANSACTION_SERIALIZABLE;
 
 	if (0 == ret)
-		throw InvalidArgumentException("transactionIsolation(SQLUINTEGER)");
+		throw InvalidArgumentException(Poco::format("transactionIsolation(%u)", isolation));
 
 	return ret;
 }
@@ -401,6 +401,13 @@ Poco::UInt32 SessionImpl::transactionIsolation(SQLULEN isolation)
 
 void SessionImpl::autoCommit(const std::string&, bool val)
 {
+	if (val == isAutoCommit()) return;
+	if (val && isTransaction())
+	{
+		throw InvalidAccessException("autoCommit not "
+			"allowed for session in transaction");
+	}
+
 	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db,
 		SQL_ATTR_AUTOCOMMIT,
 		val ? (SQLPOINTER) SQL_AUTOCOMMIT_ON :

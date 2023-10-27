@@ -511,7 +511,11 @@ public:
 	void sqlChannel(const std::string& connect);
 	void sqlLogger(const std::string& connect);
 
+	void autoCommit(const std::string& connect);
+	void transactionIsolation(const std::string& connect);
+
 	void sessionTransaction(const std::string& connect);
+	void sessionTransactionNoAutoCommit(const std::string& connect);
 	void transaction(const std::string& connect);
 	void transactor();
 	void nullable();
