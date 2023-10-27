@@ -494,6 +494,9 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransactor);

@@ -1206,6 +1206,36 @@ void ODBCTest::testSQLLogger()
 }
 
 
+void ODBCTest::testAutoCommit()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->autoCommit(_rConnectString);
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testTransactionIsolation()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->transactionIsolation(_rConnectString);
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testSessionTransaction()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1216,6 +1246,21 @@ void ODBCTest::testSessionTransaction()
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->sessionTransaction(_rConnectString);
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testSessionTransactionNoAutoCommit()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->sessionTransactionNoAutoCommit(_rConnectString);
 		i += 2;
 	}
 }
