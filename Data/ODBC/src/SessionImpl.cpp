@@ -42,10 +42,14 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_queryTimeout(-1),
 		_dbEncoding("UTF-8")
 {
+	addFeatures();
 	setFeature("bulk", true);
+	setFeature("multiActiveResultset", true);
+
 	// this option is obsolete; here only to support older drivers, should be changed to ODBC_CURSOR_USE_NEVER
 	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
 	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
+
 	open();
 }
 
@@ -64,10 +68,14 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_queryTimeout(-1),
 		_dbEncoding("UTF-8")
 {
+	addFeatures();
 	setFeature("bulk", true);
+	setFeature("multiActiveResultset", true);
+
 	// this option is obsolete; here only to support older drivers, should be changed to ODBC_CURSOR_USE_NEVER
 	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
 	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
+
 	open();
 }
 
@@ -97,6 +105,40 @@ Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 }
 
 
+void SessionImpl::addFeatures()
+{
+	addFeature("autoCommit",
+		&SessionImpl::autoCommit,
+		&SessionImpl::isAutoCommit);
+
+	addFeature("autoBind",
+		&SessionImpl::autoBind,
+		&SessionImpl::isAutoBind);
+
+	addFeature("autoExtract",
+		&SessionImpl::autoExtract,
+		&SessionImpl::isAutoExtract);
+
+	addProperty("maxFieldSize",
+		&SessionImpl::setMaxFieldSize,
+		&SessionImpl::getMaxFieldSize);
+
+	addProperty("queryTimeout",
+		&SessionImpl::setQueryTimeout,
+		&SessionImpl::getQueryTimeout);
+
+	addProperty("dbEncoding",
+		&SessionImpl::setDBEncoding,
+		&SessionImpl::getDBEncoding);
+
+	// SQL Server supports multiple active resultsets
+	// currently has no effect on other back ends
+	addFeature("multiActiveResultset",
+		&SessionImpl::setMultiActiveResultset,
+		&SessionImpl::getMultiActiveResultset);
+}
+
+
 void SessionImpl::open(const std::string& connect)
 {
 	if (connect != connectionString())
@@ -121,30 +163,6 @@ void SessionImpl::open(const std::string& connect)
 			addProperty("dataTypeInfo",
 			&SessionImpl::setDataTypeInfo,
 			&SessionImpl::dataTypeInfo);
-
-		addFeature("autoCommit",
-			&SessionImpl::autoCommit,
-			&SessionImpl::isAutoCommit);
-
-		addFeature("autoBind",
-			&SessionImpl::autoBind,
-			&SessionImpl::isAutoBind);
-
-		addFeature("autoExtract",
-			&SessionImpl::autoExtract,
-			&SessionImpl::isAutoExtract);
-
-		addProperty("maxFieldSize",
-			&SessionImpl::setMaxFieldSize,
-			&SessionImpl::getMaxFieldSize);
-
-		addProperty("queryTimeout",
-			&SessionImpl::setQueryTimeout,
-			&SessionImpl::getQueryTimeout);
-
-		addProperty("dbEncoding",
-			&SessionImpl::setDBEncoding,
-			&SessionImpl::getDBEncoding);
 
 		Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
 
@@ -294,6 +312,27 @@ void SessionImpl::setTransactionIsolationImpl(Poco::UInt32 ti) const
 		isolation |= SQL_TXN_SERIALIZABLE;
 
 	checkError(SQLSetConnectAttr(_db, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER) isolation, 0));
+}
+
+
+void SessionImpl::setMultiActiveResultset(const std::string&, bool val)
+{
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+	int enabled = val ? SQL_MARS_ENABLED_YES : SQL_MARS_ENABLED_NO;
+	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &enabled, SQL_IS_INTEGER));
+#endif
+}
+
+
+bool SessionImpl::getMultiActiveResultset(const std::string&) const
+{
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+	SQLINTEGER mars;
+	Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &mars, SQL_IS_INTEGER, 0);
+	return mars == SQL_MARS_ENABLED_YES;
+#else
+	return false;
+#endif
 }
 
 
