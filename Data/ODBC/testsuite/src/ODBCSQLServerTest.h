@@ -34,6 +34,9 @@ class ODBCSQLServerTest: public ODBCTest
 	///  SQL Server                         | 10.00.22621.1992  | 16.0.1000.6 (64-bit)  | Windows 11
 	///  ODBC Driver 17 for SQL Server      | 2017.1710.03.01   | 16.0.1000.6 (64-bit)  | Windows 11
 	///  ODBC Driver 18 for SQL Server      | 2018.183.01.01    | 16.0.1000.6 (64-bit)  | Windows 11
+	///
+	/// Drivers download (x86, x64, ARM64):
+	/// https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
 {
 public:
 	ODBCSQLServerTest(const std::string& name);
