@@ -88,7 +88,13 @@ void SessionHandle::connect(const std::string& aConnectionString)
 
 	if (!isConnectedNoLock())
 	{
-		throw ConnectionFailedException(std::string("Connection Error: ") + lastErrorNoLock());
+		std::string msg = std::string("Connection Error: ") + lastErrorNoLock();
+		if (_pConnection)
+		{
+			PQfinish(_pConnection);
+			_pConnection = 0;
+		}
+		throw ConnectionFailedException(msg);
 	}
 
 	_connectionString = aConnectionString;
