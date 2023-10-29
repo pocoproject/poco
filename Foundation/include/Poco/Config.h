@@ -215,6 +215,16 @@
 // Enable usage of Poco::Mutex and Poco::FastMutex
 // as wrappers for std::recursive_mutex and std::mutex
 #ifndef POCO_ENABLE_STD_MUTEX
-// #define POCO_ENABLE_STD_MUTEX
+//	#define POCO_ENABLE_STD_MUTEX
 #endif
+
+#define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+
+// Enable usage of SQL parser in Poco::Data
+#ifndef POCO_DATA_ENABLE_SQL_PARSER
+	#ifdef POCO_HAVE_CPP17_COMPILER
+		#define POCO_DATA_ENABLE_SQL_PARSER
+	#endif
+#endif
+
 #endif // Foundation_Config_INCLUDED

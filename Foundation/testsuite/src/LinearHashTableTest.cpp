@@ -245,7 +245,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			s.find(i);
+			auto it = s.find(i);
 		}
 		sw.stop();
 		std::cout << "Find set: " << sw.elapsedSeconds() << std::endl;
@@ -322,7 +322,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			s.find(values[i]);
+			auto it = s.find(values[i]);
 		}
 		sw.stop();
 		std::cout << "Find set: " << sw.elapsedSeconds() << std::endl;
