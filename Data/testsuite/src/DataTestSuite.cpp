@@ -11,6 +11,9 @@
 #include "DataTestSuite.h"
 #include "DataTest.h"
 #include "SessionPoolTest.h"
+#ifdef POCO_DATA_ENABLE_SQL_PARSER
+#include "SQLParserTest.h"
+#endif // POCO_DATA_ENABLE_SQL_PARSER
 
 
 CppUnit::Test* DataTestSuite::suite()
@@ -19,6 +22,9 @@ CppUnit::Test* DataTestSuite::suite()
 
 	pSuite->addTest(DataTest::suite());
 	pSuite->addTest(SessionPoolTest::suite());
+#ifdef POCO_DATA_ENABLE_SQL_PARSER
+	pSuite->addTest(SQLParserTest::suite());
+#endif // POCO_DATA_ENABLE_SQL_PARSER
 
 	return pSuite;
 }
