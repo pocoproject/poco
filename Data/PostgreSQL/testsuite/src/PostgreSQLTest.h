@@ -40,7 +40,6 @@ public:
 	void testPostgreSQLOIDs();
 	void testBarebonePostgreSQL();
 
-
 	void testSimpleAccess();
 	void testComplexType();
 	void testSimpleAccessVector();

@@ -149,7 +149,6 @@ void PostgreSQLTest::testFailedConnect()
 	dbConnString +=	" password=invalid";
 	dbConnString += " port=" + getPort();
 
-	Poco::SharedPtr<Poco::Data::Session> pInvalidSession;
 	try
 	{
 		std::cout << "Attempting to Connect to [" << dbConnString << "] with invalid credentials: " << std::endl;
