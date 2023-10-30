@@ -74,7 +74,7 @@ jobs:
       - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
       - uses: nick-fields/retry@v2.9.0
         with:
-          timeout_minutes: 90
+          timeout_minutes: 20
           max_attempts: 3
           retry_on: any
           command: >-
