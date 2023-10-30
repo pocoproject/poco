@@ -143,7 +143,7 @@ void SessionHandle::disconnect()
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
-	if (isConnectedNoLock())
+	if (_pConnection)
 	{
 		PQfinish(_pConnection);
 
