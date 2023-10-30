@@ -71,7 +71,7 @@ using Poco::DateTime;
 	#endif
 	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver")
 #else
-	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
+	#define MS_SQL_SERVER_ODBC_DRIVER "ODBC Driver 18 for SQL Server"
 	#define FREE_TDS_VERSION "8.0"
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
@@ -79,11 +79,11 @@ using Poco::DateTime;
 #endif
 
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
-#define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER "\\SQLEXPRESS"
+#define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER ""
 #define MS_SQL_SERVER_PORT "1433"
-#define MS_SQL_SERVER_DB "poco"
-#define MS_SQL_SERVER_UID "poco"
-#define MS_SQL_SERVER_PWD "poco"
+#define MS_SQL_SERVER_DB "model"
+#define MS_SQL_SERVER_UID "sa"
+#define MS_SQL_SERVER_PWD "Pocopoco1"
 
 
 ODBCTest::SessionPtr ODBCSQLServerTest::_pSession;
@@ -101,6 +101,7 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	"DATABASE=" MS_SQL_SERVER_DB ";"
 	"SERVER=" MS_SQL_SERVER_SERVER ";"
 	"PORT=" MS_SQL_SERVER_PORT ";"
+	"TrustServerCertificate=yes;"
 #ifdef FREE_TDS_VERSION
 	"TDS_Version=" FREE_TDS_VERSION ";"
 #endif
