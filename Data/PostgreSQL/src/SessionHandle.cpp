@@ -47,7 +47,11 @@ SessionHandle::~SessionHandle()
 {
 	try
 	{
-		disconnect();
+		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+		if (_pConnection)
+		{
+			PQfinish(_pConnection);
+		}
 	}
 	catch (...)
 	{
@@ -83,12 +87,25 @@ void SessionHandle::connect(const std::string& aConnectionString)
 	{
 		throw ConnectionFailedException("Already Connected");
 	}
+	else if (_pConnection)
+	{
+		PQfinish(_pConnection);
+		_pConnection = 0;
+	}
 
 	_pConnection = PQconnectdb(aConnectionString.c_str());
 
 	if (!isConnectedNoLock())
 	{
-		throw ConnectionFailedException(std::string("Connection Error: ") + lastErrorNoLock());
+		// Retrieve error message from the connection and then free PGconn
+
+		const std::string errorMessage = std::string("Connection Error: ") + lastErrorNoLock();
+		if (_pConnection)
+		{
+			PQfinish(_pConnection);
+			_pConnection = 0;
+		}
+		throw ConnectionFailedException(errorMessage);
 	}
 
 	_connectionString = aConnectionString;
