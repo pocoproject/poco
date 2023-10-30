@@ -24,7 +24,7 @@
 #include "Poco/ProcessOptions.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
-#include "Poco/Logger.h"
+#include "Poco/Format.h"
 #include "Poco/Stopwatch.h"
 #include <atomic>
 #include <vector>
@@ -36,7 +36,7 @@ namespace Poco {
 class Foundation_API ProcessRunner: public Poco::Runnable
 	/// ProcessRunner is a wrapper class for `Poco::ProcessHandle.
 	/// It starts and terminates a process with enabled or disabled (default)
-	/// `stdio` pipes, and waits for process PID to be created before
+	/// `stdio` pipes, and optionally waits for process PID to be created before
 	/// returning control to the caller. The process is spawned from an
 	/// internal thread. Starting/stopping the process may block up to
 	/// a certain (configurable) period of time.
@@ -114,9 +114,17 @@ public:
 
 	std::string cmdLine() const;
 		/// Returns process full command line.
+	
+	int result() const;
+		/// Returns process return code.
+	
+	bool done() const;
+		/// Returns true if the process was completely executed, otherwise false.
+
 
 private:
 	static const Poco::ProcessHandle::PID INVALID_PID = -1;
+	static const int RESULT_UNKNOWN = -1;
 
 	void run();
 		/// Starts the process and waits for it to be fully initialized.
@@ -136,7 +144,7 @@ private:
 	int _timeout;
 	std::atomic<Poco::ProcessHandle*> _pPH;
 	std::atomic<bool> _started;
-	Poco::Logger& _logger;
+	std::atomic<int> _rc;
 };
 
 
@@ -159,6 +167,18 @@ inline bool ProcessRunner::running() const
 inline ProcessRunner::PID ProcessRunner::pid() const
 {
 	return _pid;
+}
+
+
+inline int ProcessRunner::result() const
+{
+	return _rc;
+}
+
+
+inline bool ProcessRunner::done() const
+{
+	return _rc != RESULT_UNKNOWN;
 }
 
 

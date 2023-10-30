@@ -50,7 +50,7 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 			_timeout(timeout),
 			_pPH(nullptr),
 			_started(false),
-			_logger(Poco::Logger::get("ProcessRunner"))
+			_rc(RESULT_UNKNOWN)
 {
 	if (!File(_cmd).exists())
 		throw Poco::NotFoundException(_cmd);
@@ -105,35 +105,22 @@ std::string ProcessRunner::cmdLine() const
 void ProcessRunner::run()
 {
 	ProcessHandle* pPH = nullptr;
-	int rc = 0;
 
 	try
 	{
-		_logger.information("Starting '%s', options=%d)", cmdLine(), _options);
 		_pPH.store(new ProcessHandle(Process::launch(_cmd, _args, _options)));
 		pPH = _pPH;
 		_pid = pPH->id();
-		rc = pPH->wait();
+		_rc = pPH->wait();
 	}
-	catch(const Poco::Exception& e)
+	catch (...)
 	{
-		_logger.error(Poco::format("run(): %s", e.displayText()));
-	}
-	catch(const std::exception& e)
-	{
-		_logger.error(Poco::format("run(): %s", std::string(e.what())));
-	}
-	catch(...)
-	{
-		_logger.error("run(): unknown error");
 	}
 
 	_pid = INVALID_PID;
 	_pPH.store(nullptr);
 
 	delete pPH;
-
-	if (rc) _logger.warning("process returned %d (0 expected)", rc);
 }
 
 
@@ -152,7 +139,7 @@ void ProcessRunner::stop()
 		if ((pPH = _pPH.exchange(nullptr)))
 			Process::requestTermination(pPH->id());
 
-		std::string msg = "Waiting for process shutdown";
+		std::string msg = "Waiting for PID file";
 		if (!_pidFile.empty())
 		{
 			Poco::format(msg, "%s (pidFile: '%s')", msg, _pidFile);
@@ -163,12 +150,12 @@ void ProcessRunner::stop()
 				_pidFile.clear();
 				Stopwatch sw; sw.start();
 				while (pidFile.exists())
-					checkTimeout(sw, "waiting for PID file");
+					checkTimeout(sw, msg);
 			}
 		}
 
 		Stopwatch sw; sw.start();
-		while (_pPH) checkTimeout(sw, msg);
+		while (_pPH) checkTimeout(sw, "Waiting for process shutdown");
 	}
 	_started.store(false);
 }
