@@ -64,10 +64,12 @@ void ArchiveStrategy::open()
 ArchiveByAgeStrategy::ArchiveByAgeStrategy(const std::string& connector,
 	const std::string& connect,
 	const std::string& sourceTable,
-	const std::string& destinationTable):
+	const std::string& destinationTable,
+	const std::string& age):
 	ArchiveStrategy(connector, connect, sourceTable, destinationTable)
 {
 	initStatements();
+	if (!age.empty()) setThreshold(age);
 }
 
 

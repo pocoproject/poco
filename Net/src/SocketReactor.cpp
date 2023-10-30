@@ -160,13 +160,14 @@ void SocketReactor::sleep()
 
 void SocketReactor::stop()
 {
-	_stop = true;
+	if (_stop.exchange(true)) return;
 	wakeUp();
 }
 
 
 void SocketReactor::wakeUp()
 {
+	if (_stop) return;
 	_pollSet.wakeUp();
 	_event.set();
 }

@@ -115,6 +115,16 @@ public:
 	{
 	}
 
+	bool hasFeature(const std::string& name) const
+		/// Looks a feature up in the features map
+		/// and returns true if there is one.
+	{
+		auto it = _features.find(name);
+		return it != _features.end() &&
+			it->second.getter &&
+			it->second.setter;
+	}
+
 	void setFeature(const std::string& name, bool state)
 		/// Looks a feature up in the features map
 		/// and calls the feature's setter, if there is one.
@@ -130,7 +140,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool getFeature(const std::string& name)
+	bool getFeature(const std::string& name) const
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
 	{
@@ -138,11 +148,21 @@ public:
 		if (it != _features.end())
 		{
 			if (it->second.getter)
-				return (static_cast<C*>(this)->*it->second.getter)(name);
+				return (static_cast<const C*>(this)->*it->second.getter)(name);
 			else
 				throw NotImplementedException("get", name);
 		}
 		else throw NotSupportedException(name);
+	}
+
+	bool hasProperty(const std::string& name) const
+		/// Looks a property up in the properties map
+		/// and returns true if there is one.
+	{
+		auto it = _properties.find(name);
+		return it != _properties.end() &&
+			it->second.getter &&
+			it->second.setter;
 	}
 
 	void setProperty(const std::string& name, const Poco::Any& value)
@@ -160,7 +180,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	Poco::Any getProperty(const std::string& name)
+	Poco::Any getProperty(const std::string& name) const
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
 	{
@@ -168,7 +188,7 @@ public:
 		if (it != _properties.end())
 		{
 			if (it->second.getter)
-				return (static_cast<C*>(this)->*it->second.getter)(name);
+				return (static_cast<const C*>(this)->*it->second.getter)(name);
 			else
 				throw NotImplementedException("set", name);
 		}

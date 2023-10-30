@@ -583,6 +583,9 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSession);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexType);

@@ -369,6 +369,10 @@ public:
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
 
+	std::size_t affectedRowCount() const;
+		/// Returns the number of affected rows.
+		/// Used to find out the number of rows affected by insert, delete or update.
+
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the current data set.
@@ -706,6 +710,12 @@ inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 inline void Statement::setStorage(const std::string& storage)
 {
 	_pImpl->setStorage(storage);
+}
+
+
+inline std::size_t Statement::affectedRowCount() const
+{
+	return static_cast<std::size_t>(_pImpl->affectedRowCount());
 }
 
 

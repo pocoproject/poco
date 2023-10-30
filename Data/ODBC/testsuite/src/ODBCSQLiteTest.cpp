@@ -323,6 +323,9 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSession);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexType);
