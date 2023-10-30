@@ -12,11 +12,14 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
 
+#include "Poco/PIDFile.h"
 
 #include <string>
 #include <iostream>
 #include <cstdlib>
 #include <signal.h>
+
+using namespace Poco;
 
 
 int main(int argc, char** argv)
@@ -55,6 +58,32 @@ int main(int argc, char** argv)
 			for (int i = 2; i < argc; ++i)
 			{
 				std::cout << argv[i] << std::endl;
+			}
+		}
+		else if (arg.find("--pidfile") != std::string::npos || arg.find("-p") != std::string::npos)
+		{
+			std::unique_ptr<PIDFile> _pPIDFile;
+			size_t equals_pos = arg.find('=');
+
+			if (equals_pos != std::string::npos)
+			{
+				std::string pidPath = arg.substr(equals_pos + 1);
+				_pPIDFile.reset(new PIDFile(pidPath, true, false));
+				_pPIDFile->create(false);
+
+				sigset_t sset;
+				sigemptyset(&sset);
+				if (!std::getenv("POCO_ENABLE_DEBUGGER"))
+				{
+					sigaddset(&sset, SIGINT);
+				}
+				sigaddset(&sset, SIGQUIT);
+				sigaddset(&sset, SIGTERM);
+				sigprocmask(SIG_BLOCK, &sset, NULL);
+				int sig;
+				sigwait(&sset, &sig);
+
+				return 0;
 			}
 		}
 	}
