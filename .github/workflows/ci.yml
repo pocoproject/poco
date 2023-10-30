@@ -123,7 +123,7 @@ jobs:
           CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
           CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
           CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+          CppUnit::TestCaller<SyslogTest>.testOldBSD"
           EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
           ./ci/runtests.sh
 

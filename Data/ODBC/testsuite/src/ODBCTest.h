@@ -23,7 +23,7 @@
 #include "SQLExecutor.h"
 
 
-#define POCO_ODBC_TEST_DATABASE_SERVER "localhost"
+#define POCO_ODBC_TEST_DATABASE_SERVER "10.211.55.5"//"localhost"
 
 
 class ODBCTest: public CppUnit::TestCase
@@ -46,6 +46,10 @@ public:
 	virtual void tearDown();
 
 	virtual void testBareboneODBC() = 0;
+
+	virtual void testConnection();
+	virtual void testSession();
+	virtual void testSessionPool();
 
 	virtual void testZeroRows();
 	virtual void testSimpleAccess();
@@ -106,6 +110,8 @@ public:
 	virtual void testBLOB();
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
+
+	virtual void testRecordSet();
 
 	virtual void testDateTime();
 	virtual void testDate();

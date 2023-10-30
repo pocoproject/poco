@@ -127,7 +127,7 @@ std::string IPv6SocketAddressImpl::toString() const
 #endif // POCO_HAVE_IPv6
 
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 
 
 //
@@ -146,22 +146,36 @@ LocalSocketAddressImpl::LocalSocketAddressImpl(const char* path)
 {
 	poco_assert (std::strlen(path) < sizeof(_pAddr->sun_path));
 
+#if POCO_OS != POCO_OS_LINUX
+	if (path[0] == 0)
+		throw Poco::InvalidArgumentException("LocalSocketAddressImpl(): "
+			"abstract sockets are only supported on Linux");
+#endif
+
 	_pAddr = new sockaddr_un;
-	poco_set_sun_len(_pAddr, std::strlen(path) + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
+	std::memset(_pAddr, 0, sizeof(sockaddr_un));
+	std::size_t length = strlen(path);
+	poco_set_sun_len(_pAddr, length + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
 	_pAddr->sun_family = AF_UNIX;
-	std::strcpy(_pAddr->sun_path, path);
+	std::memcpy(&_pAddr->sun_path, path, length);
 }
 
 
 LocalSocketAddressImpl::LocalSocketAddressImpl(const char* path, std::size_t length)
 {
-	poco_assert (length < sizeof(_pAddr->sun_path));
+	poco_assert (length && length < sizeof(_pAddr->sun_path));
+
+#if POCO_OS != POCO_OS_LINUX
+	if (path[0] == 0)
+		throw Poco::InvalidArgumentException("LocalSocketAddressImpl(): "
+			"abstract sockets are only supported on Linux");
+#endif
 
 	_pAddr = new sockaddr_un;
+	std::memset(_pAddr, 0, sizeof(sockaddr_un));
 	poco_set_sun_len(_pAddr, length + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
 	_pAddr->sun_family = AF_UNIX;
-	std::memcpy(_pAddr->sun_path, path, length);
-	_pAddr->sun_path[length] = 0;
+	std::memcpy(&_pAddr->sun_path, path, length);
 }
 
 
@@ -178,7 +192,7 @@ std::string LocalSocketAddressImpl::toString() const
 }
 
 
-#endif // POCO_OS_FAMILY_UNIX
+#endif // POCO_HAS_UNIX_SOCKET
 
 
 } } } // namespace Poco::Net::Impl

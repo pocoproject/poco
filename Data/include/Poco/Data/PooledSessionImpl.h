@@ -62,10 +62,12 @@ public:
 	bool hasTransactionIsolation(Poco::UInt32) const;
 	bool isTransactionIsolation(Poco::UInt32) const;
 	const std::string& connectorName() const;
+	bool hasFeature(const std::string& name) const;
 	void setFeature(const std::string& name, bool state);
-	bool getFeature(const std::string& name);
+	bool getFeature(const std::string& name) const;
+	bool hasProperty(const std::string& name) const;
 	void setProperty(const std::string& name, const Poco::Any& value);
-	Poco::Any getProperty(const std::string& name);
+	Poco::Any getProperty(const std::string& name) const;
 
 protected:
 	SessionImpl* access() const;

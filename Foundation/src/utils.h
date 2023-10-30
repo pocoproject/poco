@@ -34,6 +34,13 @@
 #include <cstdlib>
 #include <cstring>
 
+// For pre-C++11 compatibility
+#if __cplusplus >= 201103L
+#define DOUBLE_CONVERSION_NULLPTR nullptr
+#else
+#define DOUBLE_CONVERSION_NULLPTR NULL
+#endif
+
 #include <cassert>
 #ifndef DOUBLE_CONVERSION_ASSERT
 #define DOUBLE_CONVERSION_ASSERT(condition)         \
@@ -133,14 +140,14 @@ int main(int argc, char** argv) {
     defined(__hppa__) || defined(__ia64__) || \
     defined(__mips__) || \
     defined(__loongarch__) || \
-    defined(nios2) || defined(__nios2) || defined(__nios2__) || defined(__ghs) || \
+    defined(__nios2__) || defined(__ghs) || \
     defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
     defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \
     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
     defined(__SH4__) || defined(__alpha__) || \
     defined(_MIPS_ARCH_MIPS32R2) || defined(__ARMEB__) ||\
     defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
-    (defined(__riscv) && defined(__riscv_float_abi_double)) || defined(__e2k__) || \
+    defined(__riscv) || defined(__e2k__) || \
     defined(__or1k__) || defined(__arc__) || defined(__ARC64__) || \
     defined(__microblaze__) || defined(__XTENSA__) || \
     defined(__EMSCRIPTEN__) || defined(__wasm32__)
@@ -241,9 +248,9 @@ inline int StrLength(const char* string) {
 template <typename T>
 class Vector {
  public:
-  Vector() : start_(NULL), length_(0) {}
+  Vector() : start_(DOUBLE_CONVERSION_NULLPTR), length_(0) {}
   Vector(T* data, int len) : start_(data), length_(len) {
-    DOUBLE_CONVERSION_ASSERT(len == 0 || (len > 0 && data != NULL));
+    DOUBLE_CONVERSION_ASSERT(len == 0 || (len > 0 && data != DOUBLE_CONVERSION_NULLPTR));
   }
 
   // Returns a vector using the same backing storage as this one,
@@ -326,7 +333,7 @@ class StringBuilder {
   void AddSubstring(const char* s, int n) {
     DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ + n < buffer_.length());
     DOUBLE_CONVERSION_ASSERT(static_cast<size_t>(n) <= strlen(s));
-    memmove(&buffer_[position_], s, n);
+    memmove(&buffer_[position_], s, static_cast<size_t>(n));
     position_ += n;
   }
 
