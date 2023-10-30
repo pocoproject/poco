@@ -83,6 +83,12 @@ void SessionHandle::connect(const std::string& aConnectionString)
 	{
 		throw ConnectionFailedException("Already Connected");
 	}
+	else if (_pConnection)
+	{
+		// free bad connection
+		PQfinish(_pConnection);
+		_pConnection = 0;
+	}
 
 	_pConnection = PQconnectdb(aConnectionString.c_str());
 
