@@ -1,7 +1,6 @@
 import { error, warning, info, debug, setOutput } from '@actions/core';
 import { execSync, spawn } from 'child_process';
 import ms from 'milliseconds';
-import kill from 'tree-kill';
 
 import { getInputs, getTimeout, Inputs, validateInputs } from './inputs';
 import { retryWait, wait } from './util';
@@ -116,7 +115,7 @@ async function runCmd(attempt: number, inputs: Inputs) {
   if (!done && child.pid) {
     timeout = true;
     try {
-      kill(child.pid, 'SIGKILL');
+      child.kill("SIGKILL");
     }
     catch(e) {
       //ignore if process can't be killed
