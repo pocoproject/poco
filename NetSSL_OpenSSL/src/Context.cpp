@@ -797,6 +797,7 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 	}
 	else
 	{
+		freeEVPPKey = false;
 		pKeyCtx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
 		if (!pKeyCtx)
 		{
