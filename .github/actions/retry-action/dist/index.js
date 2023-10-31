@@ -25946,7 +25946,12 @@ function runCmd(attempt, inputs) {
                 case 4:
                     if (!(!done && child.pid)) return [3 /*break*/, 6];
                     timeout = true;
-                    (0, tree_kill_1.default)(child.pid);
+                    try {
+                        (0, tree_kill_1.default)(child.pid);
+                    }
+                    catch (e) {
+                        //ignore if process can't be killed
+                    }
                     return [4 /*yield*/, (0, util_1.retryWait)(milliseconds_1.default.seconds(inputs.retry_wait_seconds))];
                 case 5:
                     _c.sent();

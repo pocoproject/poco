@@ -115,7 +115,12 @@ async function runCmd(attempt: number, inputs: Inputs) {
 
   if (!done && child.pid) {
     timeout = true;
-    kill(child.pid);
+    try {
+      kill(child.pid);
+    }
+    catch(e) {
+      //ignore if process can't be killed
+    }
     await retryWait(ms.seconds(inputs.retry_wait_seconds));
     throw new Error(`Timeout of ${getTimeout(inputs)}ms hit`);
   } else if (exit > 0) {
