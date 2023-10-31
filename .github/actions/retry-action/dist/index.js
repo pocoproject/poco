@@ -25820,7 +25820,7 @@ function runCmd(attempt, inputs) {
                     if (!(!done && child.pid)) return [3 /*break*/, 6];
                     timeout = true;
                     try {
-                        child.kill("SIGKILL");
+                        child.kill();
                     }
                     catch (e) {
                         //ignore if process can't be killed

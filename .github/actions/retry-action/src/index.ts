@@ -115,7 +115,7 @@ async function runCmd(attempt: number, inputs: Inputs) {
   if (!done && child.pid) {
     timeout = true;
     try {
-      child.kill("SIGKILL");
+      child.kill();
     }
     catch(e) {
       //ignore if process can't be killed
