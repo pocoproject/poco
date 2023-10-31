@@ -12,6 +12,12 @@
 	#else
 		#define SQLParser_API __declspec(dllimport)
 	#endif
+#else
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define SQLParser_API __attribute__ ((visibility ("default")))
+	#else
+		#define SQLParser_API
+	#endif
 #endif
 
 

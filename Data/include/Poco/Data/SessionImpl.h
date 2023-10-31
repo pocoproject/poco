@@ -146,6 +146,9 @@ public:
 	std::string uri() const;
 		/// Returns the URI for this session.
 
+	bool isAutocommit() const;
+		/// Returns true if autocommit is on, false otherwise.
+
 	virtual bool hasFeature(const std::string& name) const = 0;
 		/// Returns true if session has the named feature.
 
@@ -235,6 +238,12 @@ inline std::string SessionImpl::uri(const std::string& connector,
 inline std::string SessionImpl::uri() const
 {
 	return uri(connectorName(), connectionString());
+}
+
+
+inline bool SessionImpl::isAutocommit() const
+{
+	return hasFeature("autoCommit") && getFeature("autoCommit");
 }
 
 

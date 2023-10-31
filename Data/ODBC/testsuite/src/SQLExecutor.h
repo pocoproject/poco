@@ -512,7 +512,7 @@ public:
 	void sqlLogger(const std::string& connect);
 
 	void autoCommit(const std::string& connect);
-	void transactionIsolation(const std::string& connect);
+	void transactionIsolation();
 
 	void sessionTransaction(const std::string& connect);
 	void sessionTransactionNoAutoCommit(const std::string& connect);
