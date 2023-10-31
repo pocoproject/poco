@@ -74,7 +74,7 @@ jobs:
       - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
       - uses: ./.github/actions/retry-action
         with:
-          timeout_minutes: 1
+          timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
