@@ -1230,7 +1230,7 @@ void ODBCTest::testTransactionIsolation()
 		recreatePersonTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->transactionIsolation(_rConnectString);
+		_pExecutor->transactionIsolation();
 		i += 2;
 	}
 }

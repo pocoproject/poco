@@ -199,12 +199,9 @@ public:
 
 	template <typename T>
 	Statement operator << (const T& t)
-		/// Creates a Statement with the given data as SQLContent
+		/// Creates a Statement with the given string as SQLContent.
 	{
-		Statement stmt = (_statementCreator << t);
-		if (!_pImpl->isTransaction() && !isAutocommit())
-			_pImpl->begin();
-		return stmt;
+		return (_statementCreator << t);
 	}
 
 	SharedPtr<StatementImpl> createStatementImpl();
@@ -356,7 +353,7 @@ private:
 
 inline bool Session::isAutocommit() const
 {
-	return hasFeature("autoCommit") && getFeature("autoCommit");
+	return _pImpl->isAutocommit();
 }
 
 

@@ -20,7 +20,7 @@
 #include "Poco/Config.h"
 
 
-#ifdef POCO_DATA_ENABLE_SQL_PARSER
+#ifndef POCO_DATA_NO_SQL_PARSER
 
 
 #include "sql-parser/src/SQLParser.h"
@@ -29,13 +29,14 @@
 
 
 namespace Poco {
+namespace Data {
 
-namespace Data = hsql;
+	namespace Parser = hsql; // namespace Poco::Data::Parser
 
-} // namespace Poco
+} } // namespace Poco::Data
 
 
-#endif // POCO_DATA_ENABLE_SQL_PARSER
+#endif //  POCO_DATA_NO_SQL_PARSER
 
 
 #endif // Data_SQLParser_INCLUDED

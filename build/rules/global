@@ -29,6 +29,7 @@ endif
 # Include some optional make configuration
 #
 sinclude $(POCO_BASE)/config.build
+sinclude $(POCO_BASE)/config.make
 
 #
 # Check for PROJECT_BASE

@@ -6,6 +6,7 @@
 
 sinclude config.make
 sinclude config.build
+POCO_CONFIG_INCLUDED = 1
 
 ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)

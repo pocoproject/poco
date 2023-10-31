@@ -968,9 +968,9 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoCommit);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);

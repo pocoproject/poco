@@ -40,6 +40,7 @@ StatementCreator::StatementCreator(const StatementCreator& other):
 StatementCreator::StatementCreator(StatementCreator&& other) noexcept:
 	_ptrImpl(std::move(other._ptrImpl))
 {
+	other._ptrImpl = nullptr;
 }
 
 
@@ -54,13 +55,8 @@ StatementCreator& StatementCreator::operator = (const StatementCreator& other)
 StatementCreator& StatementCreator::operator = (StatementCreator&& other) noexcept
 {
 	_ptrImpl = std::move(other._ptrImpl);
+	other._ptrImpl = nullptr;
 	return *this;
-}
-
-void StatementCreator::swap(StatementCreator& other) noexcept
-{
-	using std::swap;
-	swap(_ptrImpl, other._ptrImpl);
 }
 
 
