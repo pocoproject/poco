@@ -25947,7 +25947,7 @@ function runCmd(attempt, inputs) {
                     if (!(!done && child.pid)) return [3 /*break*/, 6];
                     timeout = true;
                     try {
-                        (0, tree_kill_1.default)(child.pid);
+                        (0, tree_kill_1.default)(child.pid, 'SIGKILL');
                     }
                     catch (e) {
                         //ignore if process can't be killed
