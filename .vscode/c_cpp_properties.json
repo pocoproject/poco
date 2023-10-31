@@ -23,7 +23,7 @@
             "${POCO_BASE}/Redis/include",
             "${POCO_BASE}/MongoDB/include",
             "${POCO_BASE}/ApacheConnector/include",
-            "/usr/include"
+            "${POCO_BASE}/Data/src"
         ]
     },
     "configurations": [

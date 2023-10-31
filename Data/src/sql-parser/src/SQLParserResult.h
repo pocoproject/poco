@@ -63,7 +63,7 @@ class SQLParser_API SQLParserResult {
   std::vector<SQLStatement*> releaseStatements();
 
   // Deletes all statements and other data within the result.
-  void reset();
+  void reset(bool mv = false);
 
   // Does NOT take ownership.
   void addParameter(Expr* parameter);
@@ -72,7 +72,7 @@ class SQLParser_API SQLParserResult {
 
  private:
   // List of statements within the result.
-  std::vector<SQLStatement*>* statements_;
+  mutable std::vector<SQLStatement*>* statements_;
 
   // Flag indicating the parsing was successful.
   bool isValid_;

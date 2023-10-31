@@ -4187,7 +4187,7 @@ void SQLExecutor::autoCommit(const std::string& connect)
 }
 
 
-void SQLExecutor::transactionIsolation(const std::string& connect)
+void SQLExecutor::transactionIsolation()
 {
 	auto ti = session().getTransactionIsolation();
 
@@ -4225,18 +4225,25 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	std::string result;
 
 	session().setFeature("autoCommit", true);
+	assertTrue (session().getFeature("autoCommit"));
+	assertTrue (!session().isTransaction());
+
 	session().begin();
 	assertTrue (session().isTransaction());
+	assertTrue (!session().getFeature("autoCommit"));
 
-	// autocommit is invalid for session in transaction ...
+	// changing autocommit is invalid for session in transaction ...
 	try
 	{
 		 session().setFeature("autoCommit", true);
 		 fail ("must fail on autocommit setting during transaction");
 	}
 	catch(const Poco::InvalidAccessException& e) { }
+	// make sure nothing was changed ...
+	assertTrue (!session().getFeature("autoCommit"));
 	// but setting it to its current state is allowed (no-op)
 	session().setFeature("autoCommit", false);
+	assertTrue (!session().getFeature("autoCommit"));
 
 	session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session().isTransaction());
@@ -4293,6 +4300,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
 	}
 
 	std::string funct = "sessionTransactionNoAutoCommit()";
+
 	std::vector<std::string> lastNames = {"LN1", "LN2"};
 	std::vector<std::string> firstNames = {"FN1", "FN2"};
 	std::vector<std::string> addresses = {"ADDR1", "ADDR2"};
@@ -4311,20 +4319,24 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
 	assertTrue (0 == count);
 	assertTrue (2 == locCount);
+#ifndef POCO_DATA_NO_SQL_PARSER
 	assertTrue (local.isTransaction());
 
 	// autocommit is invalid for session in transaction ...
 	try
 	{
 		 local.setFeature("autoCommit", true);
-		 fail ("must fail on autocommit setting during transaction");
+		 fail ("must fail on autocommit setting during transaction", __LINE__);
 	}
 	catch(const Poco::InvalidAccessException& e) { }
+
 	// but setting it to its current state is allowed (no-op)
 	local.setFeature("autoCommit", false);
 
 	assertTrue (!session().isTransaction());
-
+#else
+	session().commit();
+#endif // POCO_DATA_NO_SQL_PARSER
 	local.commit();
 	assertTrue (!local.isTransaction());
 
@@ -4341,8 +4353,12 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
 	assertTrue (0 == count);
 	assertTrue (4 == locCount);
+#ifndef POCO_DATA_NO_SQL_PARSER
 	assertTrue (local.isTransaction());
 	assertTrue (!session().isTransaction());
+#else
+	session().commit();
+#endif
 
 	local.rollback();
 	assertTrue (!local.isTransaction());
@@ -4354,7 +4370,10 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
 	assertTrue (2 == count);
 	assertTrue (2 == locCount);
-
+#ifndef POCO_DATA_NO_SQL_PARSER
+	session().commit();
+	local.commit();
+#endif
 	session().setFeature("autoCommit", autoCommit);
 }
 
@@ -4399,34 +4418,26 @@ void SQLExecutor::transaction(const std::string& connect)
 		assertTrue (trans.isActive());
 		assertTrue (session().isTransaction());
 
-		try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
 
 		assertTrue (session().isTransaction());
 		assertTrue (trans.isActive());
 
-		try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
-		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		session() << "SELECT COUNT(*) FROM Person", into(count), now;
 		assertTrue (2 == count);
 		assertTrue (session().isTransaction());
 		assertTrue (trans.isActive());
 	}
 	assertTrue (!session().isTransaction());
 
-	try { session() << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
-	assertTrue (session().isTransaction());
+	assertTrue (!session().isTransaction());
 	session().commit();
 
 	{
 		Transaction trans(session());
-		try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
 
 		Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 
@@ -4440,20 +4451,14 @@ void SQLExecutor::transaction(const std::string& connect)
 		assertTrue (2 == locCount);
 	}
 
-	try { session() << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
 
-	try { session() << "DELETE FROM Person", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	session() << "DELETE FROM Person", now;
 
 	Statement stmt1 = (local << "SELECT count(*) FROM Person", into(locCount), async, now);
 
-	try { session() << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 	try
 	{
@@ -4493,9 +4498,7 @@ void SQLExecutor::transaction(const std::string& connect)
 	stmt2.wait();
 	assertTrue (0 == locCount);
 
-	try { session() << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 
 	trans.execute(sql);
@@ -4503,9 +4506,7 @@ void SQLExecutor::transaction(const std::string& connect)
 	Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
 	assertTrue (2 == locCount);
 
-	try { session() << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
 	session().commit();
 
