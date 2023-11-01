@@ -1460,8 +1460,7 @@ void DataTest::testSQLParse()
 	assertTrue (!stmt.isDelete().value());
 	assertTrue (!stmt.hasDelete().value());
 
-	Session sess2(SessionFactory::instance().create("test", "cs"));
-	stmt.reset(sess2);
+	stmt.reset();
 	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
 		"SELECT * FROM Test WHERE First = ?;"
 		"UPDATE Test SET value=1 WHERE First = '1';"
@@ -1479,6 +1478,29 @@ void DataTest::testSQLParse()
 	assertTrue (stmt.hasInsert().value());
 	assertTrue (!stmt.isDelete().value());
 	assertTrue (stmt.hasDelete().value());
+
+	sess.setFeature("sqlParse", false);
+	assertTrue (!sess.getFeature("sqlParse"));
+
+	stmt.reset();
+	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
+		"SELECT * FROM Test WHERE First = ?;"
+		"UPDATE Test SET value=1 WHERE First = '1';"
+		"DELETE FROM Test WHERE First = ?;"
+		"DROP TABLE table_name;"
+		"ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn;"
+		"PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';"
+		"EXECUTE prep_inst(1, 2, 3);");
+
+	stmt.execute();
+	assertTrue (!stmt.isSelect().isSpecified());
+	assertTrue (!stmt.hasSelect().isSpecified());
+	assertTrue (!stmt.isUpdate().isSpecified());
+	assertTrue (!stmt.hasUpdate().isSpecified());
+	assertTrue (!stmt.isInsert().isSpecified());
+	assertTrue (!stmt.hasInsert().isSpecified());
+	assertTrue (!stmt.isDelete().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
 
 #endif //  POCO_DATA_NO_SQL_PARSER
 }

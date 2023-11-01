@@ -578,7 +578,9 @@ inline const std::string& Statement::parseError()
 inline Optional<bool> Statement::isSelect() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return isType(Parser::StatementType::kStmtSelect);
+	if (_pImpl->session().shouldParse())
+		return isType(Parser::StatementType::kStmtSelect);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -588,7 +590,9 @@ inline Optional<bool> Statement::isSelect() const
 inline Optional<bool> Statement::isInsert() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return isType(Parser::StatementType::kStmtInsert);
+	if (_pImpl->session().shouldParse())
+		return isType(Parser::StatementType::kStmtInsert);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -598,7 +602,9 @@ inline Optional<bool> Statement::isInsert() const
 inline Optional<bool> Statement::isUpdate() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return isType(Parser::StatementType::kStmtUpdate);
+	if (_pImpl->session().shouldParse())
+		return isType(Parser::StatementType::kStmtUpdate);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -608,7 +614,9 @@ inline Optional<bool> Statement::isUpdate() const
 inline Optional<bool> Statement::isDelete() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return isType(Parser::StatementType::kStmtDelete);
+	if (_pImpl->session().shouldParse())
+		return isType(Parser::StatementType::kStmtDelete);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -618,7 +626,9 @@ inline Optional<bool> Statement::isDelete() const
 inline Optional<bool> Statement::hasSelect() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return hasType(Parser::StatementType::kStmtSelect);
+	if (_pImpl->session().shouldParse())
+		return hasType(Parser::StatementType::kStmtSelect);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -628,7 +638,9 @@ inline Optional<bool> Statement::hasSelect() const
 inline Optional<bool> Statement::hasInsert() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return hasType(Parser::StatementType::kStmtInsert);
+	if (_pImpl->session().shouldParse())
+		return hasType(Parser::StatementType::kStmtInsert);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -638,7 +650,9 @@ inline Optional<bool> Statement::hasInsert() const
 inline Optional<bool> Statement::hasUpdate() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return hasType(Parser::StatementType::kStmtUpdate);
+	if (_pImpl->session().shouldParse())
+		return hasType(Parser::StatementType::kStmtUpdate);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
@@ -648,7 +662,9 @@ inline Optional<bool> Statement::hasUpdate() const
 inline Optional<bool> Statement::hasDelete() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return hasType(Parser::StatementType::kStmtDelete);
+	if (_pImpl->session().shouldParse())
+		return hasType(Parser::StatementType::kStmtDelete);
+	else return Optional<bool>();
 #else
 	return Optional<bool>();
 #endif
