@@ -110,7 +110,7 @@ SQLChannel::~SQLChannel()
 	try
 	{
 		stop();
-		close(_timeout);
+		close();
 		wait();
 		if (_pFileChannel)
 			_pFileChannel->close();
@@ -170,9 +170,9 @@ void SQLChannel::open()
 }
 
 
-void SQLChannel::close(int ms)
+void SQLChannel::close()
 {
-	wait(ms);
+	wait(_timeout);
 	_pSession = nullptr;
 }
 
@@ -237,7 +237,7 @@ void SQLChannel::run()
 		{
 			if (_reconnect)
 			{
-				close(_timeout);
+				close();
 				open();
 				_reconnect = _pSession.isNull();
 				if (_reconnect && sleepTime < 12800)
@@ -591,7 +591,7 @@ size_t SQLChannel::execSQL()
 			_logger.error(ex.displayText());
 			if (!_file.empty())
 				n = logTofile(_pFileChannel, _file);
-			close(_timeout);
+			close();
 			_reconnect = true;
 		}
 		catch (std::exception& ex)
@@ -599,7 +599,7 @@ size_t SQLChannel::execSQL()
 			_logger.error(ex.what());
 			if (!_file.empty())
 				n = logTofile(_pFileChannel, _file);
-			close(_timeout);
+			close();
 			_reconnect = true;
 		}
 	}
