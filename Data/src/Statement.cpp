@@ -155,13 +155,14 @@ Statement& Statement::reset()
 	return *this;
 }
 
-std::size_t Statement::statementsCount() const
+Optional<std::size_t> Statement::statementsCount() const
 {
+	Optional<std::size_t> ret;
 #ifndef POCO_DATA_NO_SQL_PARSER
-	return _pParseResult->size();
-#else
-	return 0u;
+	if (_pImpl->session().shouldParse())
+		ret = _pParseResult->size();
 #endif
+	return ret;
 }
 
 

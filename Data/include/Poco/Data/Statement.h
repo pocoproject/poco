@@ -305,7 +305,7 @@ public:
 	const std::string& toString() const;
 		/// Creates a string from the accumulated SQL statement.
 
-	std::size_t statementsCount() const;
+	Optional<std::size_t> statementsCount() const;
 		/// Returns the total number of SQL statements held in the accummulated SQL statement.
 
 	Optional<bool> parse();
