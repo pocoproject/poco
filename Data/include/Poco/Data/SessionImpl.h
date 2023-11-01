@@ -118,7 +118,7 @@ public:
 		/// Returns true if session has transaction capabilities.
 
 	virtual bool isTransaction() const = 0;
-		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+		/// Returns true iff a transaction is in progress, false otherwise.
 
 	virtual void setTransactionIsolation(Poco::UInt32) = 0;
 		/// Sets the transaction isolation level.
@@ -148,6 +148,9 @@ public:
 
 	bool isAutocommit() const;
 		/// Returns true if autocommit is on, false otherwise.
+
+	bool shouldParse() const;
+		/// Returns true if SQL parser is enabled, false otherwise.
 
 	virtual bool hasFeature(const std::string& name) const = 0;
 		/// Returns true if session has the named feature.
@@ -244,6 +247,12 @@ inline std::string SessionImpl::uri() const
 inline bool SessionImpl::isAutocommit() const
 {
 	return hasFeature("autoCommit") && getFeature("autoCommit");
+}
+
+
+inline bool SessionImpl::shouldParse() const
+{
+	return hasFeature("sqlParse") && getFeature("sqlParse");
 }
 
 
