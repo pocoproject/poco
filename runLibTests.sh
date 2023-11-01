@@ -52,5 +52,5 @@ else
 fi
 
 cd "$basedir"/"$library"/testsuite/bin/"$OSNAME"/"$OSARCH"/ || exit
-testrunner -all
-testrunnerd -all
+./testrunner -all
+./testrunnerd -all
