@@ -1451,6 +1451,7 @@ void DataTest::testSQLParse()
 		"'",'a',"'",-1, 1u, 1.5, "42", now);
 
 	assertTrue ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
+	assertEqual (1u, stmt.statementsCount().value());
 	assertTrue (stmt.isSelect().value());
 	assertTrue (stmt.hasSelect().value());
 	assertTrue (!stmt.isUpdate().value());
@@ -1470,6 +1471,7 @@ void DataTest::testSQLParse()
 		"PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';"
 		"EXECUTE prep_inst(1, 2, 3);");
 	stmt.execute();
+	assertEqual (8u, stmt.statementsCount().value());
 	assertTrue (!stmt.isSelect().value());
 	assertTrue (stmt.hasSelect().value());
 	assertTrue (!stmt.isUpdate().value());
