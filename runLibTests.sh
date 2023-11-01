@@ -30,19 +30,27 @@ flag=$2
 
 make distclean -C CppUnit
 make distclean -C Foundation
-make distclean -C "$library"
+if [[ "$library" != "Foundation" ]]; then
+	make distclean -C "$library"
+fi
 make distclean -C "$library"/testsuite
 
 if [ -n "${flag}" ]; then
 	make -s -j4 -C "$POCO_BASE"/CppUnit SANITIZEFLAGS+=-fsanitize="$flag"
 	make -s -j4 -C "$POCO_BASE"/Foundation SANITIZEFLAGS+=-fsanitize="$flag"
-	make -s -j4 -C "$POCO_BASE"/"$library" SANITIZEFLAGS+=-fsanitize="$flag"
+	if [[ "$library" != "Foundation" ]]; then
+		make -s -j4 -C "$POCO_BASE"/"$library" SANITIZEFLAGS+=-fsanitize="$flag"
+	fi
 	make -s -j4 -C "$POCO_BASE"/"$library"/testsuite SANITIZEFLAGS+=-fsanitize="$flag"
 else
 	make -s -j4 -C "$POCO_BASE"/CppUnit
 	make -s -j4 -C "$POCO_BASE"/Foundation
-	make -s -j4 -C "$POCO_BASE"/"$library"
+	if [[ "$library" != "Foundation" ]]; then
+		make -s -j4 -C "$POCO_BASE"/"$library"
+	fi
 	make -s -j4 -C "$POCO_BASE"/"$library"/testsuite
 fi
-"$library"/testsuite/bin/"$OSNAME"/"$OSARCH"/testrunner -all
-"$library"/testsuite/bin/"$OSNAME"/"$OSARCH"/testrunnerd -all
+
+cd "$basedir"/"$library"/testsuite/bin/"$OSNAME"/"$OSARCH"/ || exit
+testrunner -all
+testrunnerd -all
