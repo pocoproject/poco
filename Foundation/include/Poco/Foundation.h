@@ -91,6 +91,14 @@
 	#endif
 #endif
 
+#include <string>
+
+namespace Poco {
+
+using namespace std::literals;
+
+} // Poco
+
 
 //
 // Include platform-specific definitions
