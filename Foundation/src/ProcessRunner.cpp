@@ -128,13 +128,6 @@ void ProcessRunner::stop()
 {
 	if (_started)
 	{
-		// TODO:
-		// on Windows, this only works cleanly for Poco::Util::ServerApplication:
-		// https://github.com/pocoproject/poco/blob/ed43543113c5307e216615d8c004f5ffd8a8b37f/Foundation/include/Poco/Process.h#L252
-		// the solution is either to implement Windows SIGTERM handling in Poco:
-		// https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/signal?view=msvc-170
-		// or resort to brute force TerminateProcess Win API for non-Poco processes:
-		// https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminateprocess
 		ProcessHandle* pPH = nullptr;
 		if ((pPH = _pPH.exchange(nullptr)))
 			Process::requestTermination(pPH->id());
