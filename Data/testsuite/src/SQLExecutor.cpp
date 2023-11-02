@@ -41,7 +41,6 @@
 #include "Poco/Data/Transaction.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UTFString.h"
-#include <sqltypes.h>
 #include <iostream>
 #include <sstream>
 #include <iterator>
