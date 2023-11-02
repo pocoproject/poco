@@ -38,28 +38,23 @@ public:
 	PIDFile();
 		/// Creates the PIDFile.
 
-	PIDFile(const std::string& fileName, bool append = true, bool write = true);
+	PIDFile(const std::string& fileName, bool write = true);
 		/// Creates the PIDFile.
-		/// If pidFileName is not empty, creates the PID file.
-		/// For debug builds, if `append` is true, appends 'd'
-		/// to the end of filename.
+		/// If `fileName` is not empty, creates the PID file.
 		/// If `write` is true, the file is written.
 
 	~PIDFile();
 		/// Destroys the PIDFile.
-		/// If pidFileName is not empty, deletes the PID file.
+		/// If fileName is not empty, deletes the PID file.
 
 	const std::string& getName() const;
 		/// Returns the file name.
 
-	void setName(const std::string& fileName, bool append = true);
-		/// Sets the file name; if `append` is true, appends
-		/// 'd' to the file name.
+	void setName(const std::string& fileName);
+		/// Sets the file name;
 
-	void create(bool append = true);
-		/// Creates the file and writes PID into it; if `append`
-		/// is true, 'd' is appended to the file name for debug
-		/// build.
+	void create();
+		/// Creates the file and writes PID into it;
 
 	void destroy();
 		/// Deletes the PID file and invalidates the held PID.
@@ -74,9 +69,8 @@ public:
 	static bool contains(const std::string& fileName, int pid);
 		/// Returns true if the `fileName` contains the given `pid`.
 
-	static std::string& getFileName(std::string& pidFile, bool append = true);
-		/// Returns the file name, with appended 'd'
-		/// for debug build if `append` is true.
+	static std::string& getFileName(std::string& pidFile);
+		/// Returns the file name.
 
 private:
 

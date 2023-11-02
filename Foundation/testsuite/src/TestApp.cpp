@@ -68,8 +68,7 @@ int main(int argc, char** argv)
 			if (equals_pos != std::string::npos)
 			{
 				std::string pidPath = arg.substr(equals_pos + 1);
-				_pPIDFile.reset(new PIDFile(pidPath, true, false));
-				_pPIDFile->create(false);
+				_pPIDFile.reset(new PIDFile(pidPath, true));
 
 				sigset_t sset;
 				sigemptyset(&sset);

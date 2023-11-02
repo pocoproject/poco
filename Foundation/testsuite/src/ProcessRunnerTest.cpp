@@ -13,27 +13,18 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/PIDFile.h"
-#include <sstream>
-#include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/Format.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
-#include "Poco/Environment.h"
-#include <fstream>
-#include <iostream>
 
 
-//using namespace IoT::Devs::Util;
 using namespace Poco;
-using namespace Poco::Util;
-//using IoT::Devs::Util::enableLogging;
 
 
 ProcessRunnerTest::ProcessRunnerTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	//enableLogging("debug", "%Y-%m-%d %H:%M:%S.%i [%s]: %t");
 }
 
 
@@ -45,39 +36,23 @@ ProcessRunnerTest::~ProcessRunnerTest()
 void ProcessRunnerTest::testPIDFile()
 {
 	std::string pidFile = Path::tempHome() + "test.pid";
-	std::string pidFiled = Path::tempHome() + "testd.pid";
 
 	{
 		PIDFile f;
 		assertTrue (f.getName().empty());
 		assertTrue (f.getPID() == PIDFile::INVALID_PID);
 		assertFalse (File(pidFile).exists());
-		assertFalse (File(pidFiled).exists());
 
-		f.setName(pidFile, false);
+		f.setName(pidFile);
 		assertTrue (f.getName() == pidFile);
 		assertTrue (f.getPID() != PIDFile::INVALID_PID);
 		assertTrue (File(pidFile).exists());
-		assertTrue (!File(pidFiled).exists());
-
-#ifdef _DEBUG
-		f.setName(pidFile, true);
-		assertTrue (f.getName() == pidFiled);
-		assertTrue (f.getPID() != PIDFile::INVALID_PID);
-		assertTrue (!File(pidFile).exists());
-		assertTrue (File(pidFiled).exists());
-#endif
 	}
 	assertFalse (File(pidFile).exists());
-	assertFalse (File(pidFiled).exists());
 
 	{
 		PIDFile f(pidFile);
-#ifdef _DEBUG
-		std::string pf = pidFiled;
-#else
 		std::string pf = pidFile;
-#endif
 
 		assertTrue (f.getName() == pf);
 		assertTrue (File(pf).exists());
@@ -86,10 +61,9 @@ void ProcessRunnerTest::testPIDFile()
 		assertTrue (f.exists());
 	}
 	assertFalse (File(pidFile).exists());
-	assertFalse (File(pidFiled).exists());
 
 	{
-		PIDFile f(pidFile, false);
+		PIDFile f(pidFile);
 		assertTrue (f.getName() == pidFile);
 		assertTrue (File(pidFile).exists());
 		assertTrue (f.getPID() != PIDFile::INVALID_PID);
@@ -97,25 +71,19 @@ void ProcessRunnerTest::testPIDFile()
 		assertTrue (f.exists());
 	}
 	assertFalse (File(pidFile).exists());
-	assertFalse (File(pidFiled).exists());
 
 	{
-		PIDFile f(pidFile, true, false);
-#ifdef _DEBUG
-		std::string pf = pidFiled;
-#else
+		PIDFile f(pidFile, false);
 		std::string pf = pidFile;
-#endif
 
 		assertTrue (f.getName() == pf);
 		assertTrue (!File(pf).exists());
 		assertTrue (f.getPID() == PIDFile::INVALID_PID);
 
-		f.create(false);
+		f.create();
 		assertTrue (f.exists());
 	}
 	assertFalse (File(pidFile).exists());
-	assertFalse (File(pidFiled).exists());
 }
 
 

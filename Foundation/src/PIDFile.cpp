@@ -36,11 +36,10 @@ PIDFile::PIDFile()
 }
 
 
-PIDFile::PIDFile(const std::string& fileName, bool append, bool write):
+PIDFile::PIDFile(const std::string& fileName, bool write):
 	_fileName(fileName)
 {
-	if (write) create(append);
-	else if (append) getFileName(_fileName, append);
+	if (write) create();
 }
 
 
@@ -50,19 +49,19 @@ PIDFile::~PIDFile()
 }
 
 
-void PIDFile::setName(const std::string& fileName, bool append)
+void PIDFile::setName(const std::string& fileName)
 {
 	destroy();
 	_fileName = fileName;
-	create(append);
+	create();
 }
 
 
-void PIDFile::create(bool append)
+void PIDFile::create()
 {
 	if (!_fileName.empty())
 	{
-		Path p(getFileName(_fileName, append));
+		Path p(getFileName(_fileName));
 		if (!File(p.makeParent()).exists())
 			File(p).createDirectories();
 		_pid = static_cast<int>(Process::id());
@@ -112,13 +111,9 @@ bool PIDFile::contains(const std::string& fileName, int pid)
 }
 
 
-std::string& PIDFile::getFileName(std::string& pidFile, bool append)
+std::string& PIDFile::getFileName(std::string& pidFile)
 {
 	Path p(pidFile);
-#ifdef _DEBUG
-	if (append)
-		p.setBaseName(p.getBaseName() + 'd');
-#endif
 	pidFile = p.makeAbsolute().toString();
 	return pidFile;
 }
