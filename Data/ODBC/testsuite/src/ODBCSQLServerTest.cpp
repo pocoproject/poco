@@ -59,7 +59,7 @@ using Poco::DateTime;
 	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver")
 #else
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
-	#define FREE_TDS_VERSION "8.0"
+	#define FREE_TDS_VERSION "7.4"
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
 	#endif
