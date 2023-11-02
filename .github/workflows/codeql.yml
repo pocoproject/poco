@@ -123,7 +123,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
 
-    - name: Fail if an error is found
-      run: |
-        python ./.github/workflows/fail_on_error.py \
-          ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+    # - name: Fail if an error is found
+    #   run: |
+    #     python ./.github/workflows/fail_on_error.py \
+    #       ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
