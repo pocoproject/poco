@@ -1,5 +1,11 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.12.5p1 (2023-11-02)
+=============================
+
+- GH #4241: Poco::FileInputStream broken in 1.12.5 and 1.11.8
+
+
 Release 1.12.5 (2023-10-25)
 ===========================
 

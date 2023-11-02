@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.12.5p1
+
+!! Summary of Changes
+
+  - GH #4241: Poco::FileInputStream broken in 1.12.5 and 1.11.8
+
+
 !!!Release 1.12.5
 
 !!Summary of Changes
