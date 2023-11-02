@@ -189,7 +189,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&)
 	{
@@ -209,7 +209,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&) { }
 }

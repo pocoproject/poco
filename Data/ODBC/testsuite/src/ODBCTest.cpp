@@ -55,7 +55,7 @@ const bool        ODBCTest::_bindValues[8] =
 
 ODBCTest::ODBCTest(const std::string& name,
 	SessionPtr pSession,
-	ExecPtr    pExecutor,
+	ExecPtr pExecutor,
 	std::string& rDSN,
 	std::string& rUID,
 	std::string& rPwd,
