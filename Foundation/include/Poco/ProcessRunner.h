@@ -145,6 +145,7 @@ private:
 	std::atomic<Poco::ProcessHandle*> _pPH;
 	std::atomic<bool> _started;
 	std::atomic<int> _rc;
+	std::atomic<bool> _done;
 };
 
 
@@ -178,7 +179,7 @@ inline int ProcessRunner::result() const
 
 inline bool ProcessRunner::done() const
 {
-	return _rc != RESULT_UNKNOWN;
+	return _done;
 }
 
 
