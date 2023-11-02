@@ -22,7 +22,9 @@ ifneq ($(OSNAME),Darwin)
 SYSLIBS += -lltdl
 endif
 ifneq ($(OSNAME),FreeBSD)
+ifneq ($(OSNAME),Darwin)
 SYSLIBS += -ldl
+endif
 endif
 
 objects = ODBCTestSuite Driver \
