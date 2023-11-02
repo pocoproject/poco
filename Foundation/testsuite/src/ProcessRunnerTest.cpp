@@ -107,7 +107,7 @@ void ProcessRunnerTest::testProcessRunner()
 		pr.start();
 		Stopwatch sw; sw.start();
 		while (!pr.running())
-			checkTimeout(sw, "Waiting for process to start", 1000);
+			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
 		assertTrue (pr.running());
 		try
 		{
@@ -118,11 +118,11 @@ void ProcessRunnerTest::testProcessRunner()
 		pr.stop();
 		sw.restart();
 		while (pr.running())
-			checkTimeout(sw, "Waiting for process to stop", 1000);
+			checkTimeout(sw, "Waiting for process to stop", 1000, __LINE__);
 		assertFalse (pr.running());
 		pr.start();
 		while (!pr.running())
-			checkTimeout(sw, "Waiting for process to start", 1000);
+			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
 		assertTrue (pr.running());
 		pr.stop();
 		pr.stop(); // second stop() should be silent no-op
@@ -139,7 +139,7 @@ void ProcessRunnerTest::testProcessRunner()
 		pr.start();
 		Stopwatch sw; sw.start();
 		while (!pr.running())
-			checkTimeout(sw, "Waiting for process to start", 1000);
+			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
 		assertTrue (pr.running());
 		try
 		{
@@ -150,11 +150,11 @@ void ProcessRunnerTest::testProcessRunner()
 		pr.stop();
 		sw.restart();
 		while (pr.running())
-			checkTimeout(sw, "Waiting for process to stop", 1000);
+			checkTimeout(sw, "Waiting for process to stop", 1000, __LINE__);
 		assertFalse (pr.running());
 		pr.start();
 		while (!pr.running())
-			checkTimeout(sw, "Waiting for process to start", 1000);
+			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
 		assertTrue (pr.running());
 		pr.stop();
 		pr.stop(); // second stop() should be silent no-op
@@ -204,7 +204,7 @@ void ProcessRunnerTest::testProcessRunner()
 			PIDFile::getFileName(pidFile);
 			Stopwatch sw; sw.start();
 			while (!File(pidFile).exists())
-				checkTimeout(sw, "Waiting for PID file", 1000);
+				checkTimeout(sw, "Waiting for PID file", 1000, __LINE__);
 
 			// PID file exists and is valid
 			assertTrue (File(pidFile).exists());
@@ -225,7 +225,7 @@ void ProcessRunnerTest::testProcessRunner()
 			PIDFile::getFileName(pidFile);
 			Stopwatch sw; sw.start();
 			while (!File(pidFile).exists())
-				checkTimeout(sw, "Waiting for PID file", 1000);
+				checkTimeout(sw, "Waiting for PID file", 1000, __LINE__);
 
 			// PID file exists and is valid
 			assertTrue (File(pidFile).exists());
@@ -268,12 +268,12 @@ std::string ProcessRunnerTest::cmdLine(const std::string& cmd, const ProcessRunn
 }
 
 
-void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg, int timeoutMS)
+void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg, int timeoutMS, int line)
 {
 	if (sw.elapsedSeconds()*1000 > timeoutMS)
 	{
 		throw Poco::TimeoutException(
-			Poco::format("ProcessRunner::checkTimeout(): %s", msg));
+			Poco::format("ProcessRunner::checkTimeout(): %s, line: %d", msg, line));
 	}
 	Thread::sleep(10);
 }
