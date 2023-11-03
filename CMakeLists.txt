@@ -42,16 +42,16 @@ endif()
 # Setup C/C++ compiler options
 #################################################################################
 
-# C++11/14 compiler flags
+# C++11/17 compiler flags
 include(CXX1x)
-check_for_cxx14_compiler(CXX14_COMPILER)
+check_for_cxx17_compiler(CXX17_COMPILER)
 
-# If a C++14 compiler is available, then set the appropriate flags
-if(CXX14_COMPILER)
-	set(CMAKE_CXX_STANDARD 14)
+# If a C++17 compiler is available, then set the appropriate flags
+if(CXX17_COMPILER)
+	set(CMAKE_CXX_STANDARD 17)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else()
-	message(FATAL_ERROR "Compiler does not support C++14.")
+	message(FATAL_ERROR "Compiler does not support C++17.")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
