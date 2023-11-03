@@ -1897,11 +1897,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 
 	bool autoCommit = _pSession->getFeature("autoCommit");
 
-	// Next four lines inverted as autoCommit set to true is the normal mode
-// autocommit set to false is the same as issuing a "begin" statement
-_pSession->setFeature("autoCommit", false);
-	assertTrue (_pSession->isTransaction());
-
+	// autoCommit set to true is the normal mode
 	_pSession->setFeature("autoCommit", true);
 	assertTrue (!_pSession->isTransaction());
 
@@ -1995,11 +1991,11 @@ void SQLExecutor::transaction(const std::string& connect)
 
 	bool autoCommit = _pSession->getFeature("autoCommit");
 
-	_pSession->setFeature("autoCommit", false);
+/*	_pSession->setFeature("autoCommit", false);
 	assertTrue (_pSession->isTransaction());
 	_pSession->setFeature("autoCommit", true);
 	assertTrue (!_pSession->isTransaction());
-
+*/
 	_pSession->setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
 
 	{

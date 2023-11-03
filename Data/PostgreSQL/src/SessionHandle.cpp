@@ -277,11 +277,9 @@ void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
 
 	if (aShouldAutoCommit)
 	{
-		commit();  // end any in process transaction
-	}
-	else
-	{
-		startTransaction();  // start a new transaction
+		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+		if (_inTransaction)
+			commit();  // end any in process transaction
 	}
 
 	_isAutoCommit = aShouldAutoCommit;
