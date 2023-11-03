@@ -38,13 +38,13 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.3 Unicode Driver"
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 8.2 Unicode Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
-#define MYSQL_DB "test"
-#define MYSQL_UID "root"
-#define MYSQL_PWD "poco"
-#define MYSQL_DB "test"
+#define MYSQL_DB "pocotest"
+#define MYSQL_UID "pocotest"
+#define MYSQL_PWD "pocotest"
+#define MYSQL_DB "pocotest"
 
 
 ODBCTest::SessionPtr ODBCMySQLTest::_pSession;
