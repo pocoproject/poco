@@ -58,10 +58,6 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 
 	if (_pidFile.empty() && !_args.empty() && !pidArgFmt.empty())
 	{
-		// try to detect PID file name from arguments;
-		// we follow Poco convention
-		// (-pfile or --pidfile=file)
-		// TODO: windows
 		for (const auto& fmt : pidArgFmt)
 		{
 			for (const auto& arg : _args)
