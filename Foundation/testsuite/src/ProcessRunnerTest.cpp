@@ -101,6 +101,8 @@ void ProcessRunnerTest::testProcessRunner()
 	// non-auto start, no PID
 	{
 		std::vector<std::string> args;
+		std::string pidFile = Poco::format("run/%s.pid", name);
+		args.push_back(std::string("--pidfile=").append(pidFile));
 		ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT, 10, false);
 		assertTrue (pr.cmdLine() == cmdLine(cmd, args));
 		assertFalse (pr.running());
