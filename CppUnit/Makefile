@@ -11,6 +11,6 @@ objects = CppUnitException TestDecorator TestResult TestSuite \
 
 target         = CppUnit
 target_version = 1
-target_libs    =
+target_libs    = PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

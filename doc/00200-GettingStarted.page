@@ -389,6 +389,7 @@ Here an overview of POCO build options:
     * ENABLE_PAGECOMPILER_FILE2PAGE    Set to OFF|ON (default is ON) to build File2Page
     * ENABLE_POCODOC                   Set to OFF|ON (default is OFF) to build Poco Documentation Generator
     * ENABLE_TESTS                     Set to OFF|ON (default is OFF) to build Unit tests
+    * ENABLE_SAMPLES                   Set to OFF|ON (default is OFF) to build samples
     * ENABLE_LONG_RUNNING_TESTS	       Set to OFF|ON (default is ON) to use long running test
     * POCO_UNBUNDLED                   Set to OFF|ON (default is OFF) to control linking dependencies as external
 

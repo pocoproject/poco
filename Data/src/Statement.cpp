@@ -48,6 +48,7 @@ Statement::Statement(Session& session):
 Statement::Statement(const Statement& stmt):
 #ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(stmt._pParseResult),
+	_parseError(stmt._parseError),
 #endif
 	_pImpl(stmt._pImpl),
 	_async(stmt._async),
@@ -55,8 +56,7 @@ Statement::Statement(const Statement& stmt):
 	_pAsyncExec(stmt._pAsyncExec),
 	_arguments(stmt._arguments),
 	_pRowFormatter(stmt._pRowFormatter),
-	_stmtString(stmt._stmtString),
-	_parseError(stmt._parseError)
+	_stmtString(stmt._stmtString)
 {
 }
 
@@ -64,6 +64,7 @@ Statement::Statement(const Statement& stmt):
 Statement::Statement(Statement&& stmt) noexcept:
 #ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(std::move(stmt._pParseResult)),
+	_parseError(std::move(stmt._parseError)),
 #endif
 	_pImpl(std::move(stmt._pImpl)),
 	_async(std::move(stmt._async)),
@@ -71,8 +72,7 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
 	_pRowFormatter(std::move(stmt._pRowFormatter)),
-	_stmtString(std::move(stmt._stmtString)),
-	_parseError(std::move(stmt._parseError))
+	_stmtString(std::move(stmt._stmtString))
 {
 	stmt._pImpl = nullptr;
 	stmt._async = false;
@@ -81,7 +81,9 @@ Statement::Statement(Statement&& stmt) noexcept:
 	stmt._arguments.clear();
 	stmt._pRowFormatter = nullptr;
 	_stmtString.clear();
+#ifndef POCO_DATA_NO_SQL_PARSER
 	_parseError.clear();
+#endif
 }
 
 
@@ -102,6 +104,8 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult = std::move(stmt._pParseResult);
+	_parseError = std::move(stmt._parseError);
+	_parseError.clear();
 #endif
 	_pImpl = std::move(stmt._pImpl);
 	stmt._pImpl = nullptr;
@@ -117,8 +121,6 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 	stmt._pRowFormatter = nullptr;
 	_stmtString = std::move(stmt._stmtString);
 	_stmtString.clear();
-	_parseError = std::move(stmt._parseError);
-	_parseError.clear();
 
 	return *this;
 }
@@ -128,6 +130,7 @@ void Statement::swap(Statement& other) noexcept
 	using std::swap;
 #ifndef POCO_DATA_NO_SQL_PARSER
 	swap(_pParseResult, other._pParseResult);
+	swap(_parseError, other._parseError);
 #endif
 	swap(_pImpl, other._pImpl);
 	swap(_async, other._async);
@@ -136,7 +139,6 @@ void Statement::swap(Statement& other) noexcept
 	_arguments.swap(other._arguments);
 	swap(_pRowFormatter, other._pRowFormatter);
 	swap(_stmtString, other._stmtString);
-	swap(_parseError, other._parseError);
 }
 
 

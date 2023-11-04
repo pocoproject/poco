@@ -75,7 +75,5 @@ POCO_GENERATE_PACKAGE(SevenZip)
 
 if(ENABLE_TESTS)
 	add_subdirectory(samples)
-	# TODO: Add tests
-	#add_subdirectory(testsuite)
 endif()
 

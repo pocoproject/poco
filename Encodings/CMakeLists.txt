@@ -32,7 +32,10 @@ target_include_directories(Encodings
 POCO_INSTALL(Encodings)
 POCO_GENERATE_PACKAGE(Encodings)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
