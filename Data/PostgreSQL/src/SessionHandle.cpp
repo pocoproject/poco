@@ -282,6 +282,7 @@ void SessionHandle::rollback()
 
 void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
 {
+	// There is no PostgreSQL API call to switch autocommit (unchained) mode off.
 	if (aShouldAutoCommit == _isAutoCommit)
 	{
 		return;
@@ -289,8 +290,7 @@ void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
 
 	if (aShouldAutoCommit)
 	{
-		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
-		if (_inTransaction)
+		if (isTransaction())
 			commit();  // end any in process transaction
 	}
 
@@ -386,7 +386,7 @@ void SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
 }
 
 
-Poco::UInt32 SessionHandle::transactionIsolation()
+Poco::UInt32 SessionHandle::transactionIsolation() const
 {
 	return _tranactionIsolationLevel;
 }
