@@ -1504,6 +1504,8 @@ void DataTest::testSQLParse()
 	assertTrue (!stmt.isDelete().isSpecified());
 	assertTrue (!stmt.hasDelete().isSpecified());
 
+#else
+	std::cout << "[NOT ENABLED]";
 #endif //  POCO_DATA_NO_SQL_PARSER
 }
 

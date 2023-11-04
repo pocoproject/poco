@@ -7,7 +7,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
+POCO_SOURCES_AUTO_PLAT(TEST_SRCS WIN
 	src/WinDriver.cpp
 )
 
@@ -31,5 +31,3 @@ else()
 	set_tests_properties(Data PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 endif()
 target_link_libraries(Data-testrunner PUBLIC Poco::Data CppUnit)
-
-add_subdirectory(DataTest)

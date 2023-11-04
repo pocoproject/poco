@@ -49,7 +49,10 @@ target_include_directories(Util
 POCO_INSTALL(Util)
 POCO_GENERATE_PACKAGE(Util)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()

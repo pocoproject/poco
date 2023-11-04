@@ -8,4 +8,4 @@
 clean distclean all: projects
 projects:
 	$(MAKE) -f Makefile-testrunner $(MAKECMDGOALS)
-	$(MAKE) -f Makefile-library $(MAKECMDGOALS)
+	$(MAKE) -C DataTest $(MAKECMDGOALS)
