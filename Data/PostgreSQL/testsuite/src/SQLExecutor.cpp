@@ -1991,11 +1991,10 @@ void SQLExecutor::transaction(const std::string& connect)
 
 	bool autoCommit = _pSession->getFeature("autoCommit");
 
-/*	_pSession->setFeature("autoCommit", false);
-	assertTrue (_pSession->isTransaction());
+	_pSession->setFeature("autoCommit", false);
 	_pSession->setFeature("autoCommit", true);
 	assertTrue (!_pSession->isTransaction());
-*/
+
 	_pSession->setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
 
 	{
