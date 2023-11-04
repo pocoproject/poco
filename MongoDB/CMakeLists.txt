@@ -32,8 +32,11 @@ target_include_directories(MongoDB
 POCO_INSTALL(MongoDB)
 POCO_GENERATE_PACKAGE(MongoDB)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

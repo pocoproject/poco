@@ -544,7 +544,7 @@ private:
 		/// Returns true if the statement is of the argument type.
 
 	Poco::SharedPtr<Parser::SQLParserResult> _pParseResult;
-
+	std::string _parseError;
 #endif //  POCO_DATA_NO_SQL_PARSER
 
 	StatementImpl::Ptr _pImpl;
@@ -557,7 +557,6 @@ private:
 	std::vector<Any>    _arguments;
 	RowFormatter::Ptr   _pRowFormatter;
 	mutable std::string _stmtString;
-	std::string         _parseError;
 };
 
 //
@@ -571,7 +570,12 @@ inline std::size_t Statement::subTotalRowCount(int dataSet) const
 
 inline const std::string& Statement::parseError()
 {
+#ifdef POCO_DATA_NO_SQL_PARSER
+	static std::string empty;
+	return empty;
+#else
 	return _parseError;
+#endif
 }
 
 

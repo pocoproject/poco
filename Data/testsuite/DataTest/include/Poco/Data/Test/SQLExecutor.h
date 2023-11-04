@@ -3,18 +3,18 @@
 //
 // Definition of the SQLExecutor class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
-// and Contributors.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.,
+// Aleph ONE Software Engineering d.o.o., and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
 
-#ifndef Data_SQLExecutor_INCLUDED
-#define Data_SQLExecutor_INCLUDED
+#ifndef DataTest_SQLExecutor_INCLUDED
+#define DataTest_SQLExecutor_INCLUDED
 
 
-#include "Poco/Data/Data.h"
+#include "Poco/Data/Test/DataTest.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
@@ -22,6 +22,11 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
+
+
+namespace Poco {
+namespace Data {
+namespace Test {
 
 
 #define poco_data_using_keywords using Poco::Data::Keywords::now; \
@@ -33,12 +38,7 @@
 		using Poco::Data::CLOB;
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
-
-
-class SQLExecutor: public CppUnit::TestCase
+class DataTest_API SQLExecutor: public CppUnit::TestCase
 {
 public:
 	enum DataBinding
@@ -238,4 +238,4 @@ private:
 } } } // Poco::Data::Test
 
 
-#endif // Data_SQLExecutor_INCLUDED
+#endif // DataTest_SQLExecutor_INCLUDED

@@ -65,8 +65,11 @@ endif()
 POCO_INSTALL(XML)
 POCO_GENERATE_PACKAGE(XML)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 
