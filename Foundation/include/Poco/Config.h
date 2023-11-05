@@ -220,13 +220,13 @@
 
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
 
-// Uncomment to disable usage of SQLParser
+// Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
 
-// Enable usage of SQL parser in Poco::Data
+// Automatically disable SQL parser for < c++17 compile
 #if !defined(POCO_DATA_NO_SQL_PARSER)
-	#ifdef POCO_HAVE_CPP17_COMPILER
-		#define POCO_DATA_ENABLE_SQL_PARSER
+	#ifndef POCO_HAVE_CPP17_COMPILER
+		#define POCO_DATA_NO_SQL_PARSER
 	#endif
 #endif
 

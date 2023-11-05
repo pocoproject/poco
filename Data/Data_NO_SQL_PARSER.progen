@@ -1,5 +1,5 @@
-vc.project.guid = ${vc.project.guidFromName}
-vc.project.name = JSON
+vc.project.guid = 240E83C3-368D-11DB-9FBC-00123FC423B5
+vc.project.name = Data
 vc.project.target = Poco${vc.project.name}
 vc.project.type = library
 vc.project.pocobase = ..
@@ -12,6 +12,6 @@ vc.project.compiler.defines =
 vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
-vc.project.compiler.additionalOptions = /Zc:__cplusplus /std:c++17
+vc.project.compiler.additionalOptions.Win32.x64 = /bigobj
 vc.solution.create = true
 vc.solution.include = testsuite\\TestSuite
