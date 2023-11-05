@@ -37,6 +37,7 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="3"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
@@ -57,7 +58,7 @@
 		AdditionalLibraryDirectories="${project.pocobase}\libA64;${configuration.linker.libraries}"
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
-		ProgramDatabaseFile="binA64\${project.target}d.pdb"
+		ProgramDatabaseFile="$(OutDir)$(TargetName).pdb"
 		SubSystem="1"
 		TargetMachine="18"
 		AdditionalOptions="${configuration.linker.additionalOptions}"
