@@ -584,6 +584,11 @@ protected:
 
 	void fix2022Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
 	{
+		// TODO: handle standards
+		// in template:
+		// LanguageStandard="${vc.project.compiler.std.cpp}"
+		// LanguageStandard_C="${vc.project.compiler.std.c}"
+		// for now, we're getting by through AdditionalOptions for C++
 		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v143");
 		Poco::AutoPtr<Poco::XML::NodeList> pLinkList = pProjectDoc->getElementsByTagName("Link");
 		for (unsigned long i = 0; i < pLinkList->length(); i++)
