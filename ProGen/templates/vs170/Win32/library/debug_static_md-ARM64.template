@@ -38,6 +38,7 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="3"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
