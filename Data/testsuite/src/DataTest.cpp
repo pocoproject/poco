@@ -1439,8 +1439,6 @@ void DataTest::testTranscode()
 
 void DataTest::testSQLParse()
 {
-#ifndef POCO_DATA_NO_SQL_PARSER
-
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
 	assertTrue (sess.getFeature("autoCommit"));
@@ -1451,6 +1449,9 @@ void DataTest::testSQLParse()
 		"'",'a',"'",-1, 1u, 1.5, "42", now);
 
 	assertTrue ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
+
+#ifndef POCO_DATA_NO_SQL_PARSER
+
 	assertEqual (1u, stmt.statementsCount().value());
 	assertTrue (stmt.isSelect().value());
 	assertTrue (stmt.hasSelect().value());
@@ -1484,6 +1485,12 @@ void DataTest::testSQLParse()
 	sess.setFeature("sqlParse", false);
 	assertTrue (!sess.getFeature("sqlParse"));
 
+#else
+
+	std::cout << "partial test (parser not available)";
+
+#endif // POCO_DATA_NO_SQL_PARSER
+
 	stmt.reset();
 	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
 		"SELECT * FROM Test WHERE First = ?;"
@@ -1503,10 +1510,6 @@ void DataTest::testSQLParse()
 	assertTrue (!stmt.hasInsert().isSpecified());
 	assertTrue (!stmt.isDelete().isSpecified());
 	assertTrue (!stmt.hasDelete().isSpecified());
-
-#else
-	std::cout << "[NOT ENABLED]";
-#endif //  POCO_DATA_NO_SQL_PARSER
 }
 
 
