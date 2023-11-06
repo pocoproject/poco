@@ -71,7 +71,7 @@ Param
 
 function Add-VSCOMNTOOLS([int] $vsver)
 {
-  if ($vsver -ge 150)
+	if ($vsver -ge 150)
 	{
 		$vssetup= $([Environment]::GetFolderPath("MyDocuments"))
 		$vssetup= Join-Path $vssetup "WindowsPowerShell"
@@ -94,7 +94,20 @@ function Add-VSCOMNTOOLS([int] $vsver)
 			$range='[17.0,18.0)'
 		}
 
-		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | Select-Object InstallationPath
+		$installationPath = ""
+		if ($platform -eq 'x64')
+		{
+			$installationPath = Get-VSSetupInstance | `
+				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | `
+				Select-Object InstallationPath
+		}
+		elseif ($platform -eq 'ARM64')
+		{
+			$installationPath = Get-VSSetupInstance | `
+				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.ARM64 | `
+				Select-Object InstallationPath
+		}
+
 		$vscomntools = $installationPath.psobject.properties.Value;
 		if ($vsver -eq 150)
 		{
@@ -166,6 +179,7 @@ function Set-Environment
 	$Command = ''
 	$CommandArg = ''
 	if ($platform -eq 'x64') { $CommandArg = "amd64" }
+	if ($platform -eq 'ARM64') { $CommandArg = "ARM64" }
 	else { $CommandArg = "x86" }
 	if ($vs -eq 150)
 	{
@@ -244,17 +258,17 @@ function Process-Input
 
 		if ($omit -ne '')
 		{
-			Write-Host "Omit:      $omit"
+			Write-Host "Omit:          $omit"
 		}
 
 		if ($openssl_base -ne '')
 		{
-			Write-Host "OpenSSL:   $openssl_base"
+			Write-Host "OpenSSL:       $openssl_base"
 		}
 
 		if ($mysql_base -ne '')
 		{
-			Write-Host "MySQL:     $mysql_base"
+			Write-Host "MySQL:         $mysql_base"
 		}
 
 		# NB: this won't work in PowerShell ISE
