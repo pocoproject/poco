@@ -55,7 +55,7 @@
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalDependencies="${configuration.linker.dependencies}"
-		OutputFile="${project.outdir}\binA64\${project.target}d.dll"
+		OutputFile="$(OutDir)$(TargetName).dll"
 		LinkIncremental="2"
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
