@@ -41,7 +41,7 @@ Param
 	[string] $config = 'release',
 
 	[Parameter()]
-	[ValidateSet('Win32', 'x64', 'WinCE', 'WEC2013')]
+	[ValidateSet('Win32', 'x64', 'ARM64', 'WinCE', 'WEC2013')]
 	[string] $platform = 'x64',
 
 	[switch] $tests = $false,
@@ -93,8 +93,8 @@ function Add-VSCOMNTOOLS([int] $vsver)
 		{
 			$range='[17.0,18.0)'
 		}
-		
-		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
+
+		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | Select-Object InstallationPath
 		$vscomntools = $installationPath.psobject.properties.Value;
 		if ($vsver -eq 150)
 		{
@@ -145,17 +145,17 @@ function Set-Environment
 		$script:openssl_base = "$poco_base\openssl"
 	}
 
-	$Env:OPENSSL_DIR		 = "$openssl_base"
+	$Env:OPENSSL_DIR     = "$openssl_base"
 	$Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
-	$Env:OPENSSL_LIB		 = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
+	$Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
 	Add-Env-Var "OPENSSL" "INCLUDE"
 	Add-Env-Var "OPENSSL" "LIB"
 
 	if ($mysql_base -ne '')
 	{
-		$Env:MYSQL_DIR		 = "$mysql_base"
+		$Env:MYSQL_DIR     = "$mysql_base"
 		$Env:MYSQL_INCLUDE = "$Env:MYSQL_DIR\include"
-		$Env:MYSQL_LIB		 = "$Env:MYSQL_DIR\lib"
+		$Env:MYSQL_LIB     = "$Env:MYSQL_DIR\lib"
 		Add-Env-Var "MYSQL" "INCLUDE"
 		Add-Env-Var "MYSQL" "LIB"
 	}
@@ -166,7 +166,7 @@ function Set-Environment
 	$Command = ''
 	$CommandArg = ''
 	if ($platform -eq 'x64') { $CommandArg = "amd64" }
-	else										 { $CommandArg = "x86" }
+	else { $CommandArg = "x86" }
 	if ($vs -eq 150)
 	{
 		$Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
@@ -209,20 +209,20 @@ function Process-Input
 	{
 		Write-Host 'Usage:'
 		Write-Host '------'
-		Write-Host 'buildwin.ps1 [-poco_base		<dir>]'
-		Write-Host '						 [-vs					 140 | 150 | 160 | 170]'
-		Write-Host '						 [-action			 build | rebuild | clean]'
-		Write-Host '						 [-linkmode		 shared | static_mt | static_md | all]'
-		Write-Host '						 [-config			 release | debug | both]'
-		Write-Host '						 [-platform		 Win32 | x64 | WinCE | WEC2013]'
-		Write-Host '						 [-samples]'
-		Write-Host '						 [-tests]'
-		Write-Host '						 [-omit				 "Lib1X,LibY,LibZ,..."]'
-		Write-Host '						 [-tool				 msbuild | devenv]'
-		Write-Host '						 [-useenv			 env | noenv]'
-		Write-Host '						 [-verbosity		minimal | quiet | normal | detailed | diagnostic'
-		Write-Host '						 [-openssl_base <dir>]'
-		Write-Host '						 [-mysql_base	 <dir>]'
+		Write-Host 'buildwin.ps1 [-poco_base <dir>]'
+		Write-Host '    [-vs           140 | 150 | 160 | 170]'
+		Write-Host '    [-action       build | rebuild | clean]'
+		Write-Host '    [-linkmode     shared | static_mt | static_md | all]'
+		Write-Host '    [-config       release | debug | both]'
+		Write-Host '    [-platform     Win32 | x64 | WinCE | WEC2013]'
+		Write-Host '    [-samples]'
+		Write-Host '    [-tests]'
+		Write-Host '    [-omit         "Lib1X,LibY,LibZ,..."]'
+		Write-Host '    [-tool         msbuild | devenv]'
+		Write-Host '    [-useenv       env | noenv]'
+		Write-Host '    [-verbosity    minimal | quiet | normal | detailed | diagnostic'
+		Write-Host '    [-openssl_base <dir>]'
+		Write-Host '    [-mysql_base   <dir>]'
 
 		Exit
 	}
@@ -232,29 +232,29 @@ function Process-Input
 
 		Write-Host "Build configuration:"
 		Write-Host "--------------------"
-		Write-Host "Poco Base:		 $poco_base"
-		Write-Host "Version:			 $vs"
-		Write-Host "Action:				$action"
-		Write-Host "Link Mode:		 $linkmode"
+		Write-Host "Poco Base:     $poco_base"
+		Write-Host "Version:       $vs"
+		Write-Host "Action:        $action"
+		Write-Host "Link Mode:     $linkmode"
 		Write-Host "Configuration: $config"
-		Write-Host "Platform:			$platform"
-		Write-Host "Tests:				 $tests"
-		Write-Host "Samples:			 $samples"
-		Write-Host "Build Tool:		$tool"
+		Write-Host "Platform:      $platform"
+		Write-Host "Tests:         $tests"
+		Write-Host "Samples:       $samples"
+		Write-Host "Build Tool:    $tool"
 
 		if ($omit -ne '')
 		{
-			Write-Host "Omit:					$omit"
+			Write-Host "Omit:      $omit"
 		}
 
 		if ($openssl_base -ne '')
 		{
-			Write-Host "OpenSSL:			 $openssl_base"
+			Write-Host "OpenSSL:   $openssl_base"
 		}
 
 		if ($mysql_base -ne '')
 		{
-			Write-Host "MySQL:				 $mysql_base"
+			Write-Host "MySQL:     $mysql_base"
 		}
 
 		# NB: this won't work in PowerShell ISE
@@ -410,7 +410,7 @@ function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
 
 
 function Build-Components([string] $extension, [string] $type)
-{	
+{
 	Get-Content "$poco_base\components" | Foreach-Object {
 
 		$component = $_
@@ -420,10 +420,10 @@ function Build-Components([string] $extension, [string] $type)
 		$suffix = "_vs$vs"
 
 		$omitArray = @()
-		$omit.Split(',') | ForEach {
+		$omit.Split(',') | ForEach-Object {
 				$omitArray += $_.Trim()
 		}
-		
+
 		if ($omitArray -NotContains $component)
 		{
 			$vsProject = "$poco_base\$componentDir\$componentName$($suffix).$($extension)"
@@ -476,13 +476,13 @@ function Build-Components([string] $extension, [string] $type)
 				if ($platform -eq 'x64')
 				{
 					Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
-						Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$($suffix)" } `
+						Where-Object {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$($suffix)" } `
 						| Build-samples "$_"
 				}
 				else
 				{
 					Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
-						Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$($suffix)" -And $_.BaseName -NotLike "*_x64_*" } `
+						Where-Object {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$($suffix)" -And $_.BaseName -NotLike "*_x64_*" } `
 						| Build-samples "$_"
 				}
 			}
@@ -501,10 +501,8 @@ function Build
 {
 	Process-Input
 
-	if ($vs -lt 100) { $extension = 'vcproj'	}
-	else										 { $extension = 'vcxproj' }
-
-	
+	if ($vs -lt 100) { $extension = 'vcproj' }
+	else { $extension = 'vcxproj' }
 
 	Build-Components $extension "lib"
 	Build-Components $extension "test"
