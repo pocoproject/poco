@@ -340,8 +340,25 @@ void PollSetTest::testPollNoServer()
 	// should be like this, but Linux epoll disagrees ...
 	//assertEqual(0, static_cast<int>(ps.poll(Timespan(100)).size()));
 
-	ss1.connectNB(SocketAddress("127.0.0.1", 0xFEFE));
-	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
+	ss1.setBlocking(true);
+	ss2.setBlocking(true);
+	try
+	{
+		ss1.connect(SocketAddress("127.0.0.1", 0xFFFF));
+		fail("connection must fail", __LINE__, __FILE__);
+	}
+	catch (Poco::Net::ConnectionRefusedException&) {}
+	catch (Poco::Net::NetException&) {}
+	catch (Poco::Exception&) {}
+
+	try
+	{
+		ss2.connect(SocketAddress("127.0.0.1", 0xFFFF));
+		fail("connection must fail", __LINE__, __FILE__);
+	}
+	catch (Poco::Net::ConnectionRefusedException&) {}
+	catch (Poco::Net::NetException&) {}
+	catch (Poco::Exception&) {}
 
 	assertEqual(2, ps.poll(Timespan(1000000)).size());
 	
