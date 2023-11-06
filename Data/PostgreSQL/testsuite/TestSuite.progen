@@ -7,7 +7,8 @@ vc.project.platforms = Win32
 vc.project.configurations = debug_shared, release_shared, debug_static_mt, release_static_mt, debug_static_md, release_static_md
 vc.project.prototype = TestSuite_vs90.vcproj
 postgresql = ${vc.project.pocobase}\\postgresql
-vc.project.compiler.include = ${postgresql}\\include;${vc.project.pocobase}\\Foundation\\include;${vc.project.pocobase}\\Data\\include
+vc.project.compiler.include = ${postgresql}\\include;${vc.project.pocobase}\\Foundation\\include; \
+	${vc.project.pocobase}\\Data\\include;${vc.project.pocobase}\\Data\\src
 vc.project.compiler.defines = _CRT_SECURE_NO_WARNINGS
 vc.project.linker.dependencies = iphlpapi.lib
 vc.project.linker.dependencies.debug_shared =
