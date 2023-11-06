@@ -94,16 +94,15 @@ function Add-VSCOMNTOOLS([int] $vsver)
 			$range='[17.0,18.0)'
 		}
 
-		$installationPath = ""
 		if ($platform -eq 'x64')
 		{
-			$installationPath = Get-VSSetupInstance | `
+			$global:installationPath = Get-VSSetupInstance | `
 				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | `
 				Select-Object InstallationPath
 		}
 		elseif ($platform -eq 'ARM64')
 		{
-			$installationPath = Get-VSSetupInstance | `
+			$global:installationPath = Get-VSSetupInstance | `
 				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.ARM64 | `
 				Select-Object InstallationPath
 		}
@@ -112,17 +111,26 @@ function Add-VSCOMNTOOLS([int] $vsver)
 		if ($vsver -eq 150)
 		{
 			set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
-			Write-Host "`nVS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
+			Write-Host "`n----------------------------------------" -ForegroundColor Yellow
+			Write-Host "VS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
+			Write-Host "----------------------------------------" -ForegroundColor Yellow
+			Write-Host ""
 		}
 		if ($vsver -eq 160)
 		{
 			set-item -force -path "ENV:VS160COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
-			Write-Host "`nVS160COMNTOOLS=$env:VS160COMNTOOLS" -ForegroundColor Yellow
+			Write-Host "`n----------------------------------------" -ForegroundColor Yellow
+			Write-Host "VS160COMNTOOLS=$env:VS160COMNTOOLS" -ForegroundColor Yellow
+			Write-Host "----------------------------------------" -ForegroundColor Yellow
+			Write-Host ""
 		}
 		if ($vsver -eq 170)
 		{
 			set-item -force -path "ENV:VS170COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
-			Write-Host "`nVS170COMNTOOLS=$env:VS170COMNTOOLS" -ForegroundColor Yellow
+			Write-Host "`n----------------------------------------" -ForegroundColor Yellow
+			Write-Host "VS170COMNTOOLS=$env:VS170COMNTOOLS" -ForegroundColor Yellow
+			Write-Host "----------------------------------------" -ForegroundColor Yellow
+			Write-Host ""
 		}
 	}
 }
@@ -228,7 +236,7 @@ function Process-Input
 		Write-Host '    [-action       build | rebuild | clean]'
 		Write-Host '    [-linkmode     shared | static_mt | static_md | all]'
 		Write-Host '    [-config       release | debug | both]'
-		Write-Host '    [-platform     Win32 | x64 | WinCE | WEC2013]'
+		Write-Host '    [-platform     Win32 | x64 | WinCE | WEC2013 | ARM64]'
 		Write-Host '    [-samples]'
 		Write-Host '    [-tests]'
 		Write-Host '    [-omit         "Lib1X,LibY,LibZ,..."]'
@@ -237,13 +245,19 @@ function Process-Input
 		Write-Host '    [-verbosity    minimal | quiet | normal | detailed | diagnostic'
 		Write-Host '    [-openssl_base <dir>]'
 		Write-Host '    [-mysql_base   <dir>]'
-
 		Exit
 	}
 	else
 	{
 		Set-Environment
 
+		Write-Host ""
+		Write-Host "--------------------"
+		Write-Host "PS Version: " $PSVersionTable.PSVersion
+		Write-Host "--------------------"
+
+		Write-Host ""
+		Write-Host "--------------------"
 		Write-Host "Build configuration:"
 		Write-Host "--------------------"
 		Write-Host "Poco Base:     $poco_base"
@@ -270,6 +284,9 @@ function Process-Input
 		{
 			Write-Host "MySQL:         $mysql_base"
 		}
+
+		Write-Host "----------------------------------------"
+		Write-Host ""
 
 		# NB: this won't work in PowerShell ISE
 		#Write-Host "Press Ctrl-C to exit or any other key to continue ..."
