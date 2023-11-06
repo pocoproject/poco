@@ -51,7 +51,7 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 			_pPH(nullptr),
 			_started(false),
 			_rc(RESULT_UNKNOWN),
-			_done(false)
+			_runCount(0)
 {
 	if (!File(_cmd).exists())
 		throw Poco::NotFoundException(_cmd);
@@ -102,8 +102,7 @@ std::string ProcessRunner::cmdLine() const
 void ProcessRunner::run()
 {
 	ProcessHandle* pPH = nullptr;
-	_done = false;
-
+	
 	try
 	{
 		_pPH.store(new ProcessHandle(Process::launch(_cmd, _args, _options)));
@@ -117,7 +116,7 @@ void ProcessRunner::run()
 
 	_pid = INVALID_PID;
 	_pPH.store(nullptr);
-	_done = true;
+	_runCount++;
 
 	delete pPH;
 }
@@ -168,12 +167,16 @@ void ProcessRunner::start()
 {
 	if (!_started.exchange(true))
 	{
+		int prevRunCnt = runCount();
+
 		_t.start(*this);
 
 		std::string msg;
 		Poco::format(msg, "Waiting for process to start (pidFile: '%s')", _pidFile);
 		Stopwatch sw; sw.start();
-		while (!running() || done()) checkTimeout(sw, msg);
+
+		// wait for the process to be either running or completed by monitoring run counts.
+		while (!running() && prevRunCnt >= runCount()) checkTimeout(sw, msg);
 
 		// we could wait for the process handle != INVALID_PID,
 		// but if pidFile name was given, we should wait for

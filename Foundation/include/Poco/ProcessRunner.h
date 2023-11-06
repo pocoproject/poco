@@ -118,8 +118,8 @@ public:
 	int result() const;
 		/// Returns process return code.
 	
-	bool done() const;
-		/// Returns true if the process was completely executed, otherwise false.
+	int runCount() const;
+		/// Returns the number of times the process has been executed.
 
 
 private:
@@ -145,7 +145,7 @@ private:
 	std::atomic<Poco::ProcessHandle*> _pPH;
 	std::atomic<bool> _started;
 	std::atomic<int> _rc;
-	std::atomic<bool> _done;
+	std::atomic<int> _runCount;
 };
 
 
@@ -177,9 +177,9 @@ inline int ProcessRunner::result() const
 }
 
 
-inline bool ProcessRunner::done() const
+inline int ProcessRunner::runCount() const
 {
-	return _done;
+	return _runCount;
 }
 
 
