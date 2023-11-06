@@ -31,6 +31,9 @@ set_target_properties(Data
 	DEFINE_SYMBOL Data_EXPORTS
 )
 
+if (NOT POCO_DATA_NO_SQL_PARSER)
+	target_compile_definitions(Data PUBLIC -DSQLParser_EXPORTS)
+endif()
 target_link_libraries(Data PUBLIC Poco::Foundation)
 target_include_directories(Data
 	PUBLIC
