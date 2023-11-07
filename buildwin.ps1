@@ -8,7 +8,7 @@
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
-#              [-platform     Win32 | x64 | WinCE | WEC2013]
+#              [-platform     Win32 | x64 | ARM64 | WinCE | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
