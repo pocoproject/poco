@@ -538,11 +538,11 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client odbc-postgresql alien libaio1 gnupg2 curl
       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
-      - name: Setup MySQL ODBC connector
-        run: |
-          wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
-          wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
-          sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
+      # - name: Setup MySQL ODBC connector
+      #   run: |
+      #     wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
+      #     wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
+      #     sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
       - name: Setup Oracle ODBC connector
         run: |
           wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
