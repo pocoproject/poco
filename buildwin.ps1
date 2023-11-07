@@ -94,16 +94,16 @@ function Add-VSCOMNTOOLS([int] $vsver)
 			$range='[17.0,18.0)'
 		}
 
-		if ($platform -eq 'x64')
-		{
-			$global:installationPath = Get-VSSetupInstance | `
-				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | `
-				Select-Object InstallationPath
-		}
-		elseif ($platform -eq 'ARM64')
+		if ($platform -eq 'ARM64')
 		{
 			$global:installationPath = Get-VSSetupInstance | `
 				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.ARM64 | `
+				Select-Object InstallationPath
+		}
+		else
+		{
+			$global:installationPath = Get-VSSetupInstance | `
+				Select-VSSetupInstance -Version $range -product * -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | `
 				Select-Object InstallationPath
 		}
 
@@ -187,7 +187,7 @@ function Set-Environment
 	$Command = ''
 	$CommandArg = ''
 	if ($platform -eq 'x64') { $CommandArg = "amd64" }
-	if ($platform -eq 'ARM64') { $CommandArg = "ARM64" }
+	elseif ($platform -eq 'ARM64') { $CommandArg = "ARM64" }
 	else { $CommandArg = "x86" }
 	if ($vs -eq 150)
 	{
