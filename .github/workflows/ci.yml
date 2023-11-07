@@ -493,18 +493,18 @@ jobs:
       #     wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
       #     wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
       #     sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
-      - name: Setup Oracle ODBC connector
-        run: |
-          wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
-          wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
-          wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
-          sudo alien --scripts ./oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm 
-          sudo alien --scripts ./oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
-          sudo alien --scripts ./oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
-          sudo apt install ./oracle-instantclient-basic_21.12.0.0.0-2_amd64.deb
-          sudo apt install ./oracle-instantclient-sqlplus_21.12.0.0.0-2_amd64.deb
-          sudo apt install ./oracle-instantclient-odbc_21.12.0.0.0-2_amd64.deb
-          sudo /usr/lib/oracle/21/client64/bin/odbc_update_ini.sh / "/usr/lib/oracle/21/client64/lib" "" ""  "/etc/odbc.ini"
+      # - name: Setup Oracle ODBC connector
+      #   run: |
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm 
+      #     sudo alien --scripts ./oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
+      #     sudo apt install ./oracle-instantclient-basic_21.12.0.0.0-2_amd64.deb
+      #     sudo apt install ./oracle-instantclient-sqlplus_21.12.0.0.0-2_amd64.deb
+      #     sudo apt install ./oracle-instantclient-odbc_21.12.0.0.0-2_amd64.deb
+      #     sudo /usr/lib/oracle/21/client64/bin/odbc_update_ini.sh / "/usr/lib/oracle/21/client64/lib" "" ""  "/etc/odbc.ini"
       - name: Setup SQL Server ODBC connector
         run: |
            curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
