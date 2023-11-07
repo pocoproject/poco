@@ -451,56 +451,6 @@ jobs:
             sudo -s
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
-
-# TODO Tests keep failing at testCursorStoredProcedure
-#   linux-gcc-make-oracle:
-#     runs-on: ubuntu-22.04
-#     services:
-#       oracle:
-#         image: container-registry.oracle.com/database/express:21.3.0-xe
-#         env:
-#           ORACLE_PWD: poco
-#         ports:
-#           - 1521:1521
-#     steps:
-#       - uses: actions/checkout@v3
-#       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
-#       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
-#       - uses: ./.github/actions/retry-action
-#         with:
-#           timeout_minutes: 90
-#           max_attempts: 3
-#           retry_on: any
-#           command: >-
-#            sudo -s
-#            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/ODBC Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-#            ./ci/runtests.sh
-
-# TODO multiple tests are failling(testStoredProcedure, testBulkPerformance, testBulk,testBareboneODBC)
-#   linux-gcc-make-sqlserver:
-#     runs-on: ubuntu-22.04
-#     services:
-#       sqlserver:
-#         image: mcr.microsoft.com/mssql/server:2022-latest
-#         env:
-#           MSSQL_PID: Express
-#           ACCEPT_EULA: Y
-#           MSSQL_SA_PASSWORD: Pocopoco1
-#         ports:
-#           - 1433:1433
-#     steps:
-#       - uses: actions/checkout@v3
-#       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
-#       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
-#       - uses: ./.github/actions/retry-action
-#         with:
-#           timeout_minutes: 90
-#           max_attempts: 3
-#           retry_on: any
-#           command: >-
-#             sudo -s
-#             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/ODBC Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-#             ./ci/runtests.sh
   
   linux-gcc-make-odbc:
     runs-on: ubuntu-22.04
