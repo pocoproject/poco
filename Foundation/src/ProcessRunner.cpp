@@ -79,8 +79,14 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 
 ProcessRunner::~ProcessRunner()
 {
-	stop();
-	_t.join();
+	try
+	{
+		stop();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -102,11 +108,9 @@ std::string ProcessRunner::cmdLine() const
 void ProcessRunner::run()
 {
 	ProcessHandle* pPH = nullptr;
-	
 	try
 	{
-		_pPH.store(new ProcessHandle(Process::launch(_cmd, _args, _options)));
-		pPH = _pPH;
+		_pPH = pPH = new ProcessHandle(Process::launch(_cmd, _args, _options));
 		_pid = pPH->id();
 		_rc = pPH->wait();
 	}
@@ -115,9 +119,8 @@ void ProcessRunner::run()
 	}
 
 	_pid = INVALID_PID;
-	_pPH.store(nullptr);
-	_runCount++;
-
+	_pPH = nullptr;
+	++_runCount;
 	delete pPH;
 }
 
@@ -126,27 +129,35 @@ void ProcessRunner::stop()
 {
 	if (_started)
 	{
-		ProcessHandle* pPH = nullptr;
-		if ((pPH = _pPH.exchange(nullptr)))
-			Process::requestTermination(pPH->id());
+		PID pid;
+		Stopwatch sw; sw.start();
+		if (_pPH.exchange(nullptr) && ((pid = _pid.exchange(INVALID_PID))) != INVALID_PID)
+		{
+			while (Process::isRunning(pid))
+			{
+				if (pid > 0)
+				{
+					Process::requestTermination(pid);
+					checkTimeout(sw, "Waiting for process termination");
+				}
+				else throw Poco::IllegalStateException("Invalid PID, can;t terminate process");
+			}
+			_t.join();
+		}
 
-		std::string msg = "Waiting for PID file";
 		if (!_pidFile.empty())
 		{
-			Poco::format(msg, "%s (pidFile: '%s')", msg, _pidFile);
-
 			if (!_pidFile.empty())
 			{
 				File pidFile(_pidFile);
 				_pidFile.clear();
+				std::string msg;
+				Poco::format(msg, "Waiting for PID file (pidFile: '%s')", _pidFile);
 				Stopwatch sw; sw.start();
 				while (pidFile.exists())
 					checkTimeout(sw, msg);
 			}
 		}
-
-		Stopwatch sw; sw.start();
-		while (_pPH) checkTimeout(sw, "Waiting for process shutdown");
 	}
 	_started.store(false);
 }

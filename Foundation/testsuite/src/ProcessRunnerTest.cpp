@@ -22,7 +22,7 @@
 using namespace Poco;
 
 
-ProcessRunnerTest::ProcessRunnerTest(const std::string& name): 
+ProcessRunnerTest::ProcessRunnerTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
 }
@@ -89,9 +89,16 @@ void ProcessRunnerTest::testPIDFile()
 
 void ProcessRunnerTest::testProcessRunner()
 {
-	std::string name("TestApp");
+	std::string name = Path::expand("$POCO_BASE");
+	char c = Path::separator();
+	std::string OSNAME = Path::expand("$OSNAME");
+	std::string OSARCH = Path::expand("$OSARCH");
+	name.append(1, c)
+		.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
+		.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
+		.append("TestApp");
 	std::string cmd;
-	
+
 #ifdef _DEBUG
 	name += 'd';
 #endif

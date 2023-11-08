@@ -14,12 +14,15 @@
 #include "Poco/Process.h"
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
+#include "Poco/Path.h"
+#include "Poco/Format.h"
 
 
 using namespace std::string_literals;
 using Poco::Process;
 using Poco::ProcessHandle;
 using Poco::Pipe;
+using Poco::Path;
 using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
 
@@ -54,7 +57,7 @@ void ProcessTest::testEscapeArgs()
 
 void ProcessTest::testLaunch()
 {
-	std::string name("TestApp");
+	std::string name(getFullName("TestApp"));
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
@@ -83,7 +86,7 @@ void ProcessTest::testLaunch()
 void ProcessTest::testLaunchRedirectIn()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string name(getFullName("TestApp"));
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
@@ -111,7 +114,7 @@ void ProcessTest::testLaunchRedirectIn()
 void ProcessTest::testLaunchRedirectOut()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string name(getFullName("TestApp"));
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
@@ -141,7 +144,7 @@ void ProcessTest::testLaunchRedirectOut()
 void ProcessTest::testLaunchEnv()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string name(getFullName("TestApp"));
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
@@ -173,7 +176,7 @@ void ProcessTest::testLaunchEnv()
 void ProcessTest::testLaunchArgs()
 {
 #if defined (_WIN32) && !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string name(getFullName("TestApp"));
 #if defined(_DEBUG)
 	name += 'd';
 #endif
@@ -229,7 +232,7 @@ void ProcessTest::testLaunchArgs()
 void ProcessTest::testIsRunning()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string name(getFullName("TestApp"));
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
@@ -255,6 +258,20 @@ void ProcessTest::testIsRunning()
 	assertTrue (!Process::isRunning(ph));
 	assertTrue (!Process::isRunning(id));
 #endif // !defined(_WIN32_WCE)
+}
+
+
+std::string ProcessTest::getFullName(const std::string& appName)
+{
+	std::string name = Path::expand("$POCO_BASE");
+	char c = Path::separator();
+	std::string OSNAME = Path::expand("$OSNAME");
+	std::string OSARCH = Path::expand("$OSARCH");
+	name.append(1, c)
+		.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
+		.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
+		.append(appName);
+	return name;
 }
 
 

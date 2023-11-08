@@ -114,10 +114,10 @@ public:
 
 	std::string cmdLine() const;
 		/// Returns process full command line.
-	
+
 	int result() const;
 		/// Returns process return code.
-	
+
 	int runCount() const;
 		/// Returns the number of times the process has been executed.
 
