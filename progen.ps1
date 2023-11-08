@@ -11,11 +11,11 @@
 Param
 (
 	[Parameter()]
-	[string] $poco_base = ".",
+	[string] $poco_base,
 
 	[Parameter()]
 	[ValidateSet(140, 150, 160, 170)]
-	[int] $vs = 170,
+	[int] $vs = 140,
 
 	[string] $omit,
 
