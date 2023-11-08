@@ -15,7 +15,7 @@ Param
 
 	[Parameter()]
 	[ValidateSet(140, 150, 160, 170)]
-	[int] $vs = 140,
+	[int] $vs = 170,
 
 	[string] $omit,
 
@@ -58,7 +58,15 @@ function Process-Input
 
 function Run-Progen-Components
 {
-	$progenPath = Resolve-Path "$poco_base\ProGen\bin64\static_mt\progen.exe"
+	if(Test-Path "$poco_base\ProGen\bin64\static_mt\progen.exe") {
+		$progenPath = Resolve-Path "$poco_base\ProGen\bin64\static_mt\progen.exe"
+	}
+	elseif(Test-Path "$poco_base\ProGen\bin64\static_md\progen.exe") {
+		$progenPath = Resolve-Path "$poco_base\ProGen\bin64\static_md\progen.exe"
+	}
+	else {
+		$progenPath = Resolve-Path "$poco_base\ProGen\bin64\progen.exe"
+	}
 	Get-Content "$poco_base\components" | Foreach-Object {
 
 		$component = $_
