@@ -51,10 +51,10 @@ public:
 		/// Returns the file name.
 
 	void setName(const std::string& fileName);
-		/// Sets the file name;
+		/// Sets the file name.
 
 	void create();
-		/// Creates the file and writes PID into it;
+		/// Creates the file and writes PID into it.
 
 	void destroy();
 		/// Deletes the PID file and invalidates the held PID.
