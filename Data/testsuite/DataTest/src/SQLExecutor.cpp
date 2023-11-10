@@ -3849,7 +3849,7 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	{
 		 session().setFeature("autoCommit", true);
 		 fail ("must fail on autocommit setting during transaction");
-	}	catch(const Poco::InvalidAccessException& e) { }
+	}	catch(const Poco::InvalidAccessException&) { }
 	// make sure nothing was changed ...
 	assertTrue (!session().getFeature("autoCommit"));
 	// but setting it to its current state is allowed (no-op)
@@ -3936,7 +3936,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	{
 		 local.setFeature("autoCommit", true);
 		 fail ("must fail on autocommit setting during transaction", __LINE__);
-	}	catch(const Poco::InvalidAccessException& e) { }
+	}	catch(const Poco::InvalidAccessException&) { }
 
 	// but setting it to its current state is allowed (no-op)
 	local.setFeature("autoCommit", false);
