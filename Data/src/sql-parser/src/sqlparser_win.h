@@ -2,16 +2,29 @@
 #define SQLPARSER_SQLPARSER_WIN_H
 
 
-#if defined(_WIN32)
-	#define strncasecmp _strnicmp
-	#define strcasecmp _stricmp
-	#if defined(_USRDLL)
+#if (__cplusplus >= 201703L)
+	#if __has_include("Poco/Data/Data.h")
+		#include "Poco/Data/Data.h"
+	#endif
+#endif
+
+
+#ifdef Data_API
+	#define SQLParser_API Data_API
+#else
+	#if defined(_DLL) || defined(_USRDLL)
 		#if defined(SQLParser_EXPORTS)
 			#define SQLParser_API __declspec(dllexport)
 		#else
 			#define SQLParser_API __declspec(dllimport)
 		#endif
 	#endif
+#endif
+
+
+#if defined(_WIN32)
+	#define strncasecmp _strnicmp
+	#define strcasecmp _stricmp
 #endif
 
 
