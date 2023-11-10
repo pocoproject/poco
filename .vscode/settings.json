@@ -95,7 +95,11 @@
 		"strstream": "cpp",
 		"future": "cpp",
 		"shared_mutex": "cpp",
-		"stop_token": "cpp"
+		"stop_token": "cpp",
+		"codecvt": "cpp",
+		"numbers": "cpp",
+		"span": "cpp",
+		"semaphore": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,

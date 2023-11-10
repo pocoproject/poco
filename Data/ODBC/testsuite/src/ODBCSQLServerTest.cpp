@@ -190,7 +190,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&)
 	{
@@ -210,7 +210,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&) { }
 }
@@ -967,8 +967,11 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransactionNoAutoCommit);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactionIsolation);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);

@@ -373,7 +373,7 @@ void ODBCStatementImpl::makeStep()
 	_extractors[currentDataSet()]->reset();
 	_nextResponse = SQLFetch(_stmt);
 	// workaround for SQL Server drivers 17, 18, ...
-	// stored procedure calls produce additional data,
+	// stored procedure calls may produce additional data,
 	// causing SQLFetch error 24000 (invalid cursor state);
 	// when it happens, SQLMoreResults() is called to
 	// force SQL_NO_DATA response

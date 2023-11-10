@@ -5,7 +5,11 @@
 #
 
 ifndef POCO_ODBC_INCLUDE
+ifeq (0, $(shell test -e /usr/include/sql.h; echo $$?))
 POCO_ODBC_INCLUDE = /usr/include
+else ifeq (0, $(shell test -e /opt/homebrew/include; echo $$?))
+POCO_ODBC_INCLUDE = /opt/homebrew/include
+endif
 endif
 
 ifndef POCO_ODBC_LIB
@@ -13,6 +17,8 @@ ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
 POCO_ODBC_LIB = /usr/lib/$(OSARCH)-linux-gnu
 else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
 POCO_ODBC_LIB = /usr/lib64
+else ifeq (0, $(shell test -d /opt/homebrew/lib; echo $$?))
+POCO_ODBC_LIB = /opt/homebrew/lib
 else
 POCO_ODBC_LIB = /usr/lib
 endif

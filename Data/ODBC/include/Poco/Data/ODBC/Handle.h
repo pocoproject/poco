@@ -61,8 +61,6 @@ public:
 			SQLRETURN rc =
 #endif
 			SQLFreeHandle(handleType, _handle);
-			// N.B. Destructors should not throw, but neither do we want to
-			// leak resources. So, we throw here in debug mode if things go bad.
 			poco_assert_dbg (!Utility::isError(rc));
 		}
 		catch (...)

@@ -28,6 +28,10 @@
 #include "Poco/SharedPtr.h"
 #include <cstddef>
 
+#if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif
 
 namespace Poco {
 namespace Data {
@@ -5750,5 +5754,8 @@ private:
 
 } } // namespace Poco::Data
 
+#if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
+	#pragma GCC diagnostic pop
+#endif
 
 #endif // Data_TypeHandler_INCLUDED

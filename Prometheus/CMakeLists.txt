@@ -32,8 +32,11 @@ target_include_directories(Prometheus
 POCO_INSTALL(Prometheus)
 POCO_GENERATE_PACKAGE(Prometheus)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

@@ -145,7 +145,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
       - run: >-
-          ./configure --everything --no-prefix --omit=PDF 
+          ./configure --everything --no-prefix --omit=PDF
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib &&
           make all -s -j4
@@ -261,7 +261,7 @@ jobs:
 #           max_attempts: 3
 #           retry_on: any
 #           command: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
-      
+
 #  windows-2019-msvc-buildwin-win32:
 #    runs-on: windows-2019
 #    env:
@@ -379,7 +379,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev  mysql-client
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/SQLite,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -389,21 +389,6 @@ jobs:
             sudo -s
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/ODBC Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
-# TODO ODBC tests connect to database and hang 
-#         - run: |
-#             wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
-#             wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
-#             sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
-#         - run: mysql -h 127.0.0.1 -u pocotest --password=pocotest -e "DROP DATABASE pocotest; CREATE DATABASE pocotest"
-#        - uses: ./.github/actions/retry-action
-#          with:
-#            timeout_minutes: 90
-#            max_attempts: 3
-#            retry_on: any
-#            command: >- 
-#             sudo -s
-#             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-#             ./ci/runtests.sh
 
 # TODO tests sometimes failling on testTransaction and testReconnect
 #   linux-gcc-make-postgres:
@@ -418,7 +403,7 @@ jobs:
 #     steps:
 #       - uses: actions/checkout@v3
 #       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
-#       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+#       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
 #       - uses: ./.github/actions/retry-action
 #         with:
 #           timeout_minutes: 90
@@ -427,21 +412,6 @@ jobs:
 #           command: >-
 #             sudo -s
 #             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-#             ./ci/runtests.sh
-#       - run: |
-#           sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-#           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-#           sudo apt -y update
-#           sudo apt -y install postgresql-client-12
-#       - run: PGPASSWORD=postgres psql -h localhost --username=postgres -d template1 -c 'DROP DATABASE postgres' -c 'CREATE DATABASE postgres'
-#       - uses: ./.github/actions/retry-action
-#         with:
-#           timeout_minutes: 90
-#           max_attempts: 3
-#           retry_on: any
-#           command: >-
-#             sudo -s
-#             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
 #             ./ci/runtests.sh
 
   linux-gcc-make-redis:
@@ -481,69 +451,72 @@ jobs:
             sudo -s
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
-
-# TODO Tests keep failing at testCursorStoredProcedure
-#   linux-gcc-make-oracle:
-#     runs-on: ubuntu-22.04
-#     services:
-#       oracle:
-#         image: container-registry.oracle.com/database/express:21.3.0-xe
-#         env:
-#           ORACLE_PWD: poco
-#         ports:
-#           - 1521:1521
-#     steps:
-#       - uses: actions/checkout@v3
-#       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev alien libaio1
-#       - run: |
-#           wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
-#           wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
-#           wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
-#           sudo alien --scripts ./oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm 
-#           sudo alien --scripts ./oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
-#           sudo alien --scripts ./oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
-#           sudo apt install ./oracle-instantclient-basic_21.12.0.0.0-2_amd64.deb
-#           sudo apt install ./oracle-instantclient-sqlplus_21.12.0.0.0-2_amd64.deb
-#           sudo apt install ./oracle-instantclient-odbc_21.12.0.0.0-2_amd64.deb
-#           sudo /usr/lib/oracle/21/client64/bin/odbc_update_ini.sh / "/usr/lib/oracle/21/client64/lib" "" ""  "/etc/odbc.ini"
-#       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
-#       - uses: ./.github/actions/retry-action
-#         with:
-#           timeout_minutes: 90
-#           max_attempts: 3
-#           retry_on: any
-#           command: >-
-#            sudo -s
-#            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-#            ./ci/runtests.sh
-# TODO multiple tests are failling(testStoredProcedure, testBulkPerformance, testBulk,testBareboneODBC)
-#   linux-gcc-make-sqlserver:
-#     runs-on: ubuntu-22.04
-#     services:
-#       sqlserver:
-#         image: mcr.microsoft.com/mssql/server:2022-latest
-#         env:
-#           MSSQL_PID: Express
-#           ACCEPT_EULA: Y
-#           MSSQL_SA_PASSWORD: Pocopoco1
-#         ports:
-#           - 1433:1433
-#     steps:
-#       - uses: actions/checkout@v3
-#       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev gnupg2 curl
-#       - run: |
-#           curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
-#           curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
-#           sudo apt-get update
-#           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
-#       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
-#       - uses: ./.github/actions/retry-action
-#         with:
-#           timeout_minutes: 90
-#           max_attempts: 3
-#           retry_on: any
-#           command: >-
-#             sudo -s
-#             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-#             ./ci/runtests.sh
   
+  linux-gcc-make-odbc:
+    runs-on: ubuntu-22.04
+    services:
+      mysql:
+        image: mysql:8.1.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: pocotest
+          MYSQL_PASSWORD: pocotest
+          MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:16.0
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+      oracle:
+        image: container-registry.oracle.com/database/express:21.3.0-xe
+        env:
+          ORACLE_PWD: poco
+        ports:
+          - 1521:1521
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          MSSQL_PID: Express
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: Pocopoco1
+        ports:
+          - 1433:1433
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client alien libaio1 gnupg2 curl #odbc-postgresql
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      # - name: Setup MySQL ODBC connector
+      #   run: |
+      #     wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
+      #     wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
+      #     sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
+      # - name: Setup Oracle ODBC connector
+      #   run: |
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm 
+      #     sudo alien --scripts ./oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
+      #     sudo apt install ./oracle-instantclient-basic_21.12.0.0.0-2_amd64.deb
+      #     sudo apt install ./oracle-instantclient-sqlplus_21.12.0.0.0-2_amd64.deb
+      #     sudo apt install ./oracle-instantclient-odbc_21.12.0.0.0-2_amd64.deb
+      #     sudo /usr/lib/oracle/21/client64/bin/odbc_update_ini.sh / "/usr/lib/oracle/21/client64/lib" "" ""  "/etc/odbc.ini"
+      - name: Setup SQL Server ODBC connector
+        run: |
+           curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+           curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+           sudo apt-get update
+           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/PostgreSQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+            ./ci/runtests.sh

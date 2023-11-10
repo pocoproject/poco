@@ -96,6 +96,10 @@ public:
 		/// This is normally done by implementation
 		/// when a database connection loss is detected.
 
+	void setAutoCommit(const std::string& name, bool value);
+	bool getAutoCommit(const std::string& name) const;
+		/// Sets/gets the autoCommit property.
+
 	void setF(const std::string& name, bool value);
 	bool getF(const std::string& name) const;
 	void setThrowOnHasNext(const std::string& name, bool value);
@@ -108,6 +112,7 @@ private:
 	bool         _throwOnHasNext = false;
 	Poco::Any    _p;
 	bool         _connected;
+	bool         _autoCommit  = true;
 	std::string  _connectionString;
 };
 

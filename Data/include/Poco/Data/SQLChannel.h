@@ -106,7 +106,7 @@ public:
 		/// Opens the SQLChannel.
 		/// Returns true if succesful.
 
-	void close(int ms = 0);
+	void close();
 		/// Closes the SQLChannel.
 
 	void run();

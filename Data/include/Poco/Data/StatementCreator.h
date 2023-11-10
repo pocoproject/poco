@@ -68,9 +68,29 @@ public:
 		return stmt;
 	}
 
+	void reset();
+		/// Resets the StatementCreator.
+
 private:
 	Poco::AutoPtr<SessionImpl> _ptrImpl;
 };
+
+//
+// inlines
+//
+
+
+inline void StatementCreator::swap(StatementCreator& other) noexcept
+{
+	using std::swap;
+	swap(_ptrImpl, other._ptrImpl);
+}
+
+
+inline void StatementCreator::reset()
+{
+	_ptrImpl = nullptr;
+}
 
 
 } } // namespace Poco::Data

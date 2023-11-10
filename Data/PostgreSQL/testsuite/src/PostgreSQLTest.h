@@ -36,6 +36,7 @@ public:
 	~PostgreSQLTest();
 
 	void testConnectNoDB();
+	void testFailedConnect();
 	void testPostgreSQLOIDs();
 	void testBarebonePostgreSQL();
 

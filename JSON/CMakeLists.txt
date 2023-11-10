@@ -41,7 +41,10 @@ endif()
 POCO_INSTALL(JSON)
 POCO_GENERATE_PACKAGE(JSON)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
