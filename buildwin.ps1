@@ -312,6 +312,11 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
 function Build-MSBuild([string] $vsProject, [switch] $skipStatic)
 {
 	if ($linkmode -contains "static" -and $skipStatic) { Return }
+	if ($linkmode.Contains("static") -and $vsProject.Contains("TestLibrary"))
+	{
+		Write-Host "Skipping static build of DLL-only $vsProject"
+		return
+	}
 
 	if ($linkmode -eq 'all')
 	{
@@ -500,6 +505,14 @@ function Build-Components([string] $extension, [string] $type)
 					Write-Host "| Building $vsTestProject"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					Build-Exec $tool $vsTestProject -skipStatic
+				}
+				elseif ($component -eq "Data") # special case for Data, which needs DataTest lib
+				{
+					$vsTestProject = "$poco_base\$componentDir\testsuite\DataTest\DataTest$($suffix).$($extension)"
+					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+					Write-Host "| Building $vsTestProject"
+					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+					Build-Exec $tool $vsTestProject
 				}
 			}
 			ElseIf ($samples -and ($type -eq "sample"))
