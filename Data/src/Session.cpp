@@ -60,6 +60,9 @@ Session::Session(Session&& other) noexcept:
 	_statementCreator(std::move(other._statementCreator)),
 	_wasAutoCommit(other._wasAutoCommit)
 {
+	other._pImpl = nullptr;
+	other._statementCreator.reset();
+	other._wasAutoCommit = false;
 }
 
 Session::~Session()

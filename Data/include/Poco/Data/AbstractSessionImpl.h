@@ -55,7 +55,8 @@ public:
 			_storage(std::string("deque")),
 			_bulk(false),
 			_emptyStringIsNull(false),
-			_forceEmptyString(false)
+			_forceEmptyString(false),
+			_sqlParse(true)
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -108,6 +109,10 @@ public:
 		addFeature("forceEmptyString",
 			&AbstractSessionImpl<C>::setForceEmptyString,
 			&AbstractSessionImpl<C>::getForceEmptyString);
+
+		addFeature("sqlParse",
+			&AbstractSessionImpl<C>::setSQLParse,
+			&AbstractSessionImpl<C>::getSQLParse);
 	}
 
 	~AbstractSessionImpl()
@@ -257,7 +262,7 @@ public:
 		return _emptyStringIsNull;
 	}
 
-	void setForceEmptyString(const std::string& name, bool forceEmptyString)
+	void setForceEmptyString(const std::string&, bool forceEmptyString)
 		/// Sets the behavior regarding empty variable length strings.
 		/// Those are treated as NULL by Oracle and as empty string by
 		/// most other databases.
@@ -276,6 +281,25 @@ public:
 		/// and this class documentation for feature rationale and details.
 	{
 		return _forceEmptyString;
+	}
+
+	void setSQLParse(const std::string&, bool doParse)
+		/// Enables the SQL parsing. Value must be of type bool.
+		/// When SQL parsing is enabled (default), the Statement attempts
+		/// to parse the SQL prior to executing it. The parsing is done
+		/// in non-autocommit mode only, with purpose to determine the
+		/// type of query and whether to start the transaction automatically.
+		///
+		/// See Statement documentation for more information.
+	{
+		_sqlParse = doParse;
+	}
+
+
+	bool getSQLParse(const std::string& name = "") const
+		/// Returns the value of the SQL parsing flag.
+	{
+		return _sqlParse;
 	}
 
 protected:
@@ -325,6 +349,7 @@ private:
 	bool        _bulk;
 	bool        _emptyStringIsNull;
 	bool        _forceEmptyString;
+	bool        _sqlParse;
 	Poco::Any   _handle;
 };
 

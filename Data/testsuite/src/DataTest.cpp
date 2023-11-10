@@ -1437,6 +1437,82 @@ void DataTest::testTranscode()
 }
 
 
+void DataTest::testSQLParse()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	assertTrue (sess.getFeature("autoCommit"));
+	sess.setFeature("autoCommit", false);
+	assertTrue (!sess.getFeature("autoCommit"));
+
+	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'",
+		"'",'a',"'",-1, 1u, 1.5, "42", now);
+
+	assertTrue ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
+
+#ifndef POCO_DATA_NO_SQL_PARSER
+
+	assertEqual (1u, stmt.statementsCount().value());
+	assertTrue (stmt.isSelect().value());
+	assertTrue (stmt.hasSelect().value());
+	assertTrue (!stmt.isUpdate().value());
+	assertTrue (!stmt.hasUpdate().value());
+	assertTrue (!stmt.isInsert().value());
+	assertTrue (!stmt.hasInsert().value());
+	assertTrue (!stmt.isDelete().value());
+	assertTrue (!stmt.hasDelete().value());
+
+	stmt.reset();
+	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
+		"SELECT * FROM Test WHERE First = ?;"
+		"UPDATE Test SET value=1 WHERE First = '1';"
+		"DELETE FROM Test WHERE First = ?;"
+		"DROP TABLE table_name;"
+		"ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn;"
+		"PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';"
+		"EXECUTE prep_inst(1, 2, 3);");
+	stmt.execute();
+	assertEqual (8u, stmt.statementsCount().value());
+	assertTrue (!stmt.isSelect().value());
+	assertTrue (stmt.hasSelect().value());
+	assertTrue (!stmt.isUpdate().value());
+	assertTrue (stmt.hasUpdate().value());
+	assertTrue (!stmt.isInsert().value());
+	assertTrue (stmt.hasInsert().value());
+	assertTrue (!stmt.isDelete().value());
+	assertTrue (stmt.hasDelete().value());
+
+	sess.setFeature("sqlParse", false);
+	assertTrue (!sess.getFeature("sqlParse"));
+
+#else
+
+	std::cout << "partial test (parser not available)";
+
+#endif // POCO_DATA_NO_SQL_PARSER
+
+	stmt.reset();
+	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
+		"SELECT * FROM Test WHERE First = ?;"
+		"UPDATE Test SET value=1 WHERE First = '1';"
+		"DELETE FROM Test WHERE First = ?;"
+		"DROP TABLE table_name;"
+		"ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn;"
+		"PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';"
+		"EXECUTE prep_inst(1, 2, 3);");
+
+	stmt.execute();
+	assertTrue (!stmt.isSelect().isSpecified());
+	assertTrue (!stmt.hasSelect().isSpecified());
+	assertTrue (!stmt.isUpdate().isSpecified());
+	assertTrue (!stmt.hasUpdate().isSpecified());
+	assertTrue (!stmt.isInsert().isSpecified());
+	assertTrue (!stmt.hasInsert().isSpecified());
+	assertTrue (!stmt.isDelete().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1469,6 +1545,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
+	CppUnit_addTest(pSuite, DataTest, testSQLParse);
 
 	return pSuite;
 }

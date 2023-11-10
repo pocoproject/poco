@@ -23,7 +23,6 @@
 #include <functional>
 #include <algorithm>
 #include <vector>
-#include <utility>
 #include <cstddef>
 
 
@@ -67,9 +66,15 @@ public:
 	typedef typename Bucket::iterator    BucketIterator;
 	typedef typename BucketVec::iterator BucketVecIterator;
 
-	class ConstIterator: public std::iterator<std::forward_iterator_tag, Value>
+	class ConstIterator
 	{
 	public:
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = Value;
+		using difference_type = ptrdiff_t;
+		using pointer = Value*;
+		using reference = Value&;
+
 		ConstIterator(): _initialized(false)
 		{
 		}

@@ -45,6 +45,7 @@ public:
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
 	void testTranscode();
+	void testSQLParse();
 
 	void setUp();
 	void tearDown();

@@ -15,6 +15,10 @@ objects = Binder Extractor SessionImpl Connector \
 	MySQLStatementImpl ResultMetadata MySQLException \
 	SessionHandle StatementExecutor Utility
 
+ifndef POCO_DATA_NO_SQL_PARSER
+	target_includes = $(POCO_BASE)/Data/src
+endif
+
 target         = PocoDataMySQL
 target_version = $(LIBVERSION)
 target_libs    = PocoData PocoFoundation

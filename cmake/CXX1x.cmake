@@ -20,7 +20,7 @@
 
 # Determines whether the compiler supports C++11
 macro(check_for_cxx11_compiler _VAR)
-    message(STATUS "Checking for C++11 compiler")
+    message(STATUS "Checking for C++11 compiler ...")
     set(${_VAR})
     try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/test_compiler.cpp CMAKE_FLAGS -DCMAKE_CXX_STANDARD=11 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
     if(NOT _COMPILER_TEST_RESULT AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -43,17 +43,17 @@ macro(check_for_cxx11_compiler _VAR)
     endif()
 endmacro()
 
-# Determines whether the compiler supports C++14
-macro(check_for_cxx14_compiler _VAR)
-    message(STATUS "Checking for C++14 compiler")
+# Determines whether the compiler supports C++17
+macro(check_for_cxx17_compiler _VAR)
+    message(STATUS "Checking for C++17 compiler")
     set(${_VAR})
-    try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/test_compiler.cpp CMAKE_FLAGS -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
+    try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/test_compiler.cpp CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
     if(NOT _COMPILER_TEST_RESULT AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/test_compiler.cpp CMAKE_FLAGS -DCMAKE_CXX_FLAGS="-stdlib=libc++" -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
+      try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/test_compiler.cpp CMAKE_FLAGS -DCMAKE_CXX_FLAGS="-stdlib=libc++" -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
       if(_COMPILER_TEST_RESULT)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
       else()
-	message(STATUS "To enable C++14 install libc++ standard library from https://libcxx.llvm.org/")
+	message(STATUS "To enable C++17 install libc++ standard library from https://libcxx.llvm.org/")
       endif()
     endif()
     if(_COMPILER_TEST_RESULT AND ((MSVC AND (MSVC14)) OR
@@ -62,8 +62,8 @@ macro(check_for_cxx14_compiler _VAR)
     (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.4) OR
     (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")))
         set(${_VAR} 1)
-        message(STATUS "Checking for C++14 compiler - available")
+        message(STATUS "Checking for C++17 compiler - available")
     else()
-        message(STATUS "Checking for C++14 compiler - unavailable")
+        message(STATUS "Checking for C++17 compiler - unavailable")
     endif()
 endmacro()
