@@ -140,6 +140,32 @@ void PostgreSQLTest::testConnectNoDB()
 	}
 }
 
+
+void PostgreSQLTest::testFailedConnect()
+{
+	std::string dbConnString;
+	dbConnString +=  "host=" + getHost();
+	dbConnString += " user=invalid";
+	dbConnString +=	" password=invalid";
+	dbConnString += " port=" + getPort();
+
+	try
+	{
+		std::cout << "Attempting to Connect to [" << dbConnString << "] with invalid credentials: " << std::endl;
+		Session session(PostgreSQL::Connector::KEY, dbConnString);
+		fail ("must fail");
+	}
+	catch (ConnectionFailedException& ex)
+	{
+		std::cout  << ex.displayText() << std::endl;
+	}
+	catch (ConnectionException& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+	}
+}
+
+
 void PostgreSQLTest::testPostgreSQLOIDs()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -307,6 +333,7 @@ void PostgreSQLTest::testBarebonePostgreSQL()
 	_pExecutor->barebonePostgreSQLTest(POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_PWD, POSTGRESQL_DB, POSTGRESQL_PORT, tableCreateString.c_str());
 */
 }
+
 
 
 void PostgreSQLTest::testSimpleAccess()
@@ -775,7 +802,7 @@ void PostgreSQLTest::testSqlState()
 	}
 	catch (const Poco::Data::PostgreSQL::PostgreSQLException & exception)
 	{
-		assertTrue(exception.sqlState() == std::string("42601"));    
+		assertTrue(exception.sqlState() == std::string("42601"));
 	}
 }
 
@@ -1236,6 +1263,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PostgreSQLTest");
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testConnectNoDB);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedConnect);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testPostgreSQLOIDs);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBarebonePostgreSQL);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccess);
