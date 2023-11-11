@@ -1463,6 +1463,7 @@
     <ClCompile Include="src\Var.cpp" />
     <ClCompile Include="src\VarHolder.cpp" />
     <ClCompile Include="src\VarIterator.cpp" />
+    <ClCompile Include="src\VarVisitor.cpp" />
     <ClCompile Include="src\Void.cpp" />
     <ClCompile Include="src\Windows1250Encoding.cpp" />
     <ClCompile Include="src\Windows1251Encoding.cpp" />
