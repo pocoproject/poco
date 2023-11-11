@@ -12,7 +12,7 @@
 #ifdef Data_API
 	#define SQLParser_API Data_API
 	#ifdef Data_EXPORTS
-		#define SQLParserEXPORTS
+		#define SQLParser_EXPORTS
 	#endif
 #else
 	#if defined(_DLL) || defined(_USRDLL)
