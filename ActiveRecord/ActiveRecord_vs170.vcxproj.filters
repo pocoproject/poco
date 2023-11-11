@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ActiveRecord">
-      <UniqueIdentifier>{c01cecef-6df2-46a3-ab05-46ed396f6038}</UniqueIdentifier>
+      <UniqueIdentifier>{73c14701-9a05-4ff0-ad45-6a014639a69e}</UniqueIdentifier>
     </Filter>
     <Filter Include="ActiveRecord\Header Files">
-      <UniqueIdentifier>{f809bd11-fc6a-401f-82bd-e20950f1d1b0}</UniqueIdentifier>
+      <UniqueIdentifier>{163f196a-9202-45e4-80aa-20307db240a7}</UniqueIdentifier>
     </Filter>
     <Filter Include="ActiveRecord\Source Files">
-      <UniqueIdentifier>{114f7d6f-450f-4730-afc3-93c52413d20f}</UniqueIdentifier>
+      <UniqueIdentifier>{15a3b1af-8e8c-4aff-bb0f-04c75fcc1610}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

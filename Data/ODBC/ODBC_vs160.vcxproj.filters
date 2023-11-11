@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ODBC">
-      <UniqueIdentifier>{e2a5414c-2ea8-4332-8e66-e425df38839d}</UniqueIdentifier>
+      <UniqueIdentifier>{85a70ddf-ffdf-43ff-9d15-7314f24f8119}</UniqueIdentifier>
     </Filter>
     <Filter Include="ODBC\Header Files">
-      <UniqueIdentifier>{ea8d6d0f-1dcc-4992-bb60-7a201b6e70de}</UniqueIdentifier>
+      <UniqueIdentifier>{84609c69-4c6b-454f-8d3f-6e76ffe07259}</UniqueIdentifier>
     </Filter>
     <Filter Include="ODBC\Source Files">
-      <UniqueIdentifier>{fc6df9a9-e096-4f48-93ea-83e59cadce4c}</UniqueIdentifier>
+      <UniqueIdentifier>{c0f252a5-5fdd-4d18-82d2-c1bf39392bac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
