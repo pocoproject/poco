@@ -19,6 +19,12 @@
 #include <iostream>
 
 
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4834) // divide by zero
+#endif // POCO_COMPILER_MSVC
+
+
 using Poco::LinearHashTable;
 using Poco::Hash;
 using Poco::HashTable;
@@ -354,3 +360,7 @@ CppUnit::Test* LinearHashTableTest::suite()
 
 	return pSuite;
 }
+
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#endif // POCO_COMPILER_MSVC

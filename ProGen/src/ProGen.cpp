@@ -694,11 +694,11 @@ protected:
 						setProperty(*pProps, "configuration.compiler.includes", projectConfig, "vc.project.compiler.include", platform, arch, config);
 						setProperty(*pProps, "configuration.compiler.defines", projectConfig, "vc.project.compiler.defines", platform, arch, config);
 						setProperty(*pProps, "configuration.compiler.disableWarnings", projectConfig, "vc.project.compiler.disableWarnings", platform, arch, config);
-						setProperty(*pProps, "configuration.compiler.additionalOptions", projectConfig, "vc.project.compiler.additionalOptions", platform, arch, config);
+						setProperty(*pProps, "configuration.compiler.additionalOptions", projectConfig, "vc.project.compiler.additionalOptions", platform, arch, config, " ");
 						setProperty(*pProps, "configuration.linker.dependencies", projectConfig, "vc.project.linker.dependencies", platform, arch, config, " ");
 						setProperty(*pProps, "configuration.linker.libraries", projectConfig, "vc.project.linker.libraries", platform, arch, config);
 						setProperty(*pProps, "configuration.linker.entry", projectConfig, "vc.project.linker.entry", platform, arch, config);
-						setProperty(*pProps, "configuration.linker.additionalOptions", projectConfig, "vc.project.linker.additionalOptions", platform, arch, config);
+						setProperty(*pProps, "configuration.linker.additionalOptions", projectConfig, "vc.project.linker.additionalOptions", platform, arch, config, " ");
 						setProperty(*pProps, "configuration.prebuild", projectConfig, "vc.project.prebuild", platform, arch, config);
 						setProperty(*pProps, "configuration.postbuild", projectConfig, "vc.project.postbuild", platform, arch, config);
 						std::string libSuffix = this->config().getString("progen.libsuffix." + config, "");

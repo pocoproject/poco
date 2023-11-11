@@ -30,6 +30,6 @@ else()
 	)
 	set_tests_properties(Data PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 endif()
-target_link_libraries(Data-testrunner PUBLIC Poco::Data CppUnit)
+target_link_libraries(Data-testrunner PUBLIC Poco::DataTest Poco::Data CppUnit)
 
 add_subdirectory(DataTest)
