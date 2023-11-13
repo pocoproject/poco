@@ -166,7 +166,7 @@ function Exec-Buildwin {
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	Write-Host "| Building Foundation,XML,JSON,Util,Progen"
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-	Invoke-Expression "$poco_base/buildwin.ps1 -poco_base $poco_base -vs $vs -action build -components `"Foundation,XML,JSON,Util,Progen`" "
+	Invoke-Expression "$poco_base/buildwin.ps1 -poco_base $poco_base -linkmode static_mt -vs $vs -action build -components `"Foundation,XML,JSON,Util,Progen`" "
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	Write-Host "| Build finished."
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
