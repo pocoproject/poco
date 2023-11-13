@@ -164,7 +164,7 @@ function Run-Progen-Components([string] $type)
 
 function Exec-Buildwin {
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-	Write-Host "| Building $components"
+	Write-Host "| Building Foundation,XML,JSON,Util,Progen"
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	Invoke-Expression "$poco_base/buildwin.ps1 -poco_base $poco_base -vs $vs -action build -components `"Foundation,XML,JSON,Util,Progen`" "
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
