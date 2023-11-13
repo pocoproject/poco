@@ -173,6 +173,9 @@ void SessionImpl::open(const std::string& connect)
 		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
+	// autocommit is initially on when a session is opened
+	AbstractSessionImpl::setAutoCommit("", true);
+
 	_connected = true;
 }
 
@@ -217,10 +220,10 @@ void SessionImpl::rollback()
 
 void SessionImpl::autoCommit(const std::string& s, bool val)
 {
-	if (val == getAutoCommit(s))
-		return;
-	_handle.autoCommit(val);
-	AbstractSessionImpl::setAutoCommit(s, val);
+	if (val != getAutoCommit(s)) {
+		_handle.autoCommit(val);
+		AbstractSessionImpl::setAutoCommit(s, val);
+	}
 }
 
 
@@ -306,6 +309,7 @@ void SessionImpl::reset()
 	if (_connected && _reset)
 	{
 		_handle.reset();
+		AbstractSessionImpl::setAutoCommit("", true);
 	}
 }
 
