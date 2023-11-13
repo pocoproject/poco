@@ -242,6 +242,7 @@ function Process-Input
 		Write-Host '    [-samples]'
 		Write-Host '    [-tests]'
 		Write-Host '    [-omit         "Lib1X,LibY,LibZ,..."]'
+		Write-Host '    [-compoennts   "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-tool         msbuild | devenv]'
 		Write-Host '    [-useenv       env | noenv]'
 		Write-Host '    [-verbosity    minimal | quiet | normal | detailed | diagnostic'
@@ -283,7 +284,7 @@ function Process-Input
 
 		if ($components -ne '')
 		{
-			Write-Host "Components:          $components"
+			Write-Host "Components:    $components"
 		}
 
 		if ($openssl_base -ne '')
