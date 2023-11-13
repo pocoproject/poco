@@ -7,6 +7,7 @@
 #              [-vs           140 | 150 | 160| 170]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
 #              [-components   "Lib1X,LibY,LibZ,..."]
+#              [-platform     Win32 | x64 | ARM64 | WinCE | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-nobuild]
@@ -23,6 +24,11 @@ Param
 
 	[string] $omit,
 	[string] $components,
+
+	[Parameter()]
+	[ValidateSet('Win32', 'x64', 'ARM64', 'WinCE', 'WEC2013')]
+	[string] $platform = 'x64',
+
 	[switch] $samples = $false,
 	[switch] $tests = $false,
 	[switch] $nobuild = $false,
@@ -31,7 +37,7 @@ Param
 	[switch] $help
 )
 
-function Process-Input
+function ProcessInput
 {
 	if ($help -eq $true)
 	{
@@ -81,7 +87,7 @@ function Process-Input
 	}
 }
 
-function Invoke-Process([string] $exe, [string] $arguments)
+function InvokeProcess([string] $exe, [string] $arguments)
 {
 	$proc = Start-Process -NoNewWindow  -FilePath $exe -ArgumentList $arguments -PassThru
 	$handle = $proc.Handle # cache proc.Handle, necessary to get exit code
@@ -91,7 +97,7 @@ function Invoke-Process([string] $exe, [string] $arguments)
 	}
 }
 
-function Invoke-Progen-Samples
+function InvokeProgenSamples
 {
 	process {
 		$sampleName = $_.BaseName.split(".")[0]
@@ -107,11 +113,11 @@ function Invoke-Progen-Samples
 			Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 			$sampleProgenPath = "$($poco_base)\$($componentDir)\samples\$($sampleName)\$($_)"
 		}
-		Invoke-Process $progenPath "/tool=vs$vs $sampleProgenPath"
+		InvokeProcess $progenPath "/tool=vs$vs $sampleProgenPath"
 	}
 }
 
-function Invoke-Progen-Components([string] $type)
+function InvokeProgenComponents([string] $type)
 {
 	if(Test-Path "$poco_base\ProGen\bin64\static_mt\progen.exe") {
 		$progenPath = Resolve-Path "$poco_base\ProGen\bin64\static_mt\progen.exe"
@@ -122,6 +128,12 @@ function Invoke-Progen-Components([string] $type)
 	else {
 		$progenPath = Resolve-Path "$poco_base\ProGen\bin64\progen.exe"
 	}
+	$exists = Test-Path "$poco_base\ProGen\bin64\static_mt\progen.exe"
+	if (-not $exists) {
+		Write-Error "Progen not found, exiting..."
+		Exit -1
+	}
+
 	Get-Content "$poco_base\components" | Foreach-Object {
 
 		$component = $_
@@ -146,14 +158,14 @@ function Invoke-Progen-Components([string] $type)
 				Write-Host "| Running ProGen for $componentDir"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 				$componentProgenPath = "$poco_base\$componentDir\$componentName.progen"
-				Invoke-Process $progenPath "/tool=vs$vs $componentProgenPath"
+				InvokeProcess $progenPath "/tool=vs$vs $componentProgenPath"
 			}
 			ElseIf ($tests -and ($type -eq "test")) {
 				$componentTestProgenPath = "$poco_base\$componentDir\testsuite\TestSuite.Progen"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 				Write-Host "| Running Progen for $componentDir\testsuite"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-				Invoke-Process $progenPath "/tool=vs$vs $componentTestProgenPath"
+				InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
 
 				if ($component -eq "Data") # special case for Data
 				{
@@ -161,13 +173,13 @@ function Invoke-Progen-Components([string] $type)
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					Write-Host "| Running Progen for $componentDir\testsuite\DataTest"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					Invoke-Process $progenPath "/tool=vs$vs $componentTestProgenPath"
+					InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
 				}
 			}
 			ElseIf ($samples -and ($type -eq "sample")) {
 				Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
 				Where-Object {$_.Extension -Match ".progen" -And $_.DirectoryName -Like "*samples*" } `
-				| Invoke-Progen-Samples "$_"
+				| InvokeProgenSamples "$_"
 			}
 		}
 		else
@@ -179,11 +191,11 @@ function Invoke-Progen-Components([string] $type)
 	}
 }
 
-function Invoke-Buildwin {
+function InvokeBuildWin {
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	Write-Host "| Building Foundation,XML,JSON,Util,Progen"
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-	Invoke-Expression "$poco_base\buildwin.ps1 -poco_base $poco_base -linkmode static_mt -vs $vs -action build -components `"Foundation,XML,JSON,Util,Progen`" "
+	Invoke-Expression "$poco_base\buildwin.ps1 -poco_base $poco_base -platform $platform -linkmode static_mt -vs $vs -action build -components `"Foundation,XML,JSON,Util,Progen`" "
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	Write-Host "| Build finished."
 	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -191,15 +203,15 @@ function Invoke-Buildwin {
 
 function Run
 {
-	Process-Input
+	ProcessInput
 
 	if($nobuild -eq $false) {
-		Invoke-Buildwin
+		InvokeBuildWin
 	}
 
-	Invoke-Progen-Components "lib"
-	Invoke-Progen-Components "test"
-	Invoke-Progen-Components "sample"
+	InvokeProgenComponents "lib"
+	InvokeProgenComponents "test"
+	InvokeProgenComponents "sample"
 }
 
 
