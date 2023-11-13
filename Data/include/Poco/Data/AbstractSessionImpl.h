@@ -307,23 +307,6 @@ public:
 		return _sqlParse;
 	}
 
-	void setAutoCommit(const std::string&, bool autoCommit)
-		/// Enables automatic commit. When this feature is true,
-		/// every query is automatically commited. When false,
-		/// every query starts a transaction, except SELECT queries
-		/// (if properly detected by parser, see set/getSQLParse() and
-		/// Statement::checkBeginTransaction() documentation).
-	{
-		_autoCommit = autoCommit;
-	}
-
-	bool getAutoCommit(const std::string& name = "") const
-		/// Returns the value of the automatic commit flag.
-		/// See setAutoCommit() documentation for more details.
-	{
-		return _autoCommit;
-	}
-
 protected:
 	void addFeature(const std::string& name, FeatureSetter setter, FeatureGetter getter)
 		/// Adds a feature to the map of supported features.
@@ -347,6 +330,32 @@ protected:
 		property.setter = setter;
 		property.getter = getter;
 		_properties[name] = property;
+	}
+
+	// most, if not all, back ends support the autocommit feature
+	// these handlers are added in this class by default,
+	// but an implementation can easily replace them by registering
+	// early its own handlers with:
+	//    addFeature("autoCommit", setter, getter)");
+	//
+	// these are here to be used by any back end DBMS client that
+	// does not provide its own autocommit get/set capabilities
+
+	void setAutoCommit(const std::string&, bool autoCommit)
+		/// Enables automatic commit. When this feature is true,
+		/// every query is automatically commited. When false,
+		/// every query starts a transaction, except SELECT queries
+		/// (if properly detected by parser, see set/getSQLParse() and
+		/// Statement::checkBeginTransaction() documentation).
+	{
+		_autoCommit = autoCommit;
+	}
+
+	bool getAutoCommit(const std::string& name = "") const
+		/// Returns the value of the automatic commit flag.
+		/// See setAutoCommit() documentation for more details.
+	{
+		return _autoCommit;
 	}
 
 private:
