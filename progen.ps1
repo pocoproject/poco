@@ -9,6 +9,7 @@
 #              [-components   "Lib1X,LibY,LibZ,..."]
 #              [-samples]
 #              [-tests]
+#              [-nobuild]
 
 [CmdletBinding()]
 Param
@@ -24,6 +25,8 @@ Param
 	[string] $components,
 	[switch] $samples = $false,
 	[switch] $tests = $false,
+	[switch] $nobuild = $false,
+
 
 	[switch] $help
 )
@@ -40,6 +43,7 @@ function Process-Input
 		Write-Host '    [-components   "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-samples]'
 		Write-Host '    [-tests]'
+		Write-Host '    [-nobuild]'
 		Exit
 	}
 	else
@@ -56,6 +60,7 @@ function Process-Input
 		Write-Host "Version:       $vs"
 		Write-Host "Samples:       $samples"
 		Write-Host "Tests:         $tests"
+		Write-Host "No Build:      $nobuild"
 
 		if ($omit -ne '')
 		{
@@ -124,7 +129,7 @@ function Run-Progen-Components([string] $type)
 				$componentsArray += $_.Trim()
 		}
 
-		if ($omitArray -NotContains $component -and (($components -Contains $component) -or ($components -eq '')))
+		if ($omitArray -NotContains $component -and (($componentsArray -Contains $component) -or ($components -eq '')))
 		{
 
 			Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -140,7 +145,7 @@ function Run-Progen-Components([string] $type)
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 				Write-Host "| Running Progen for $componentDir\testsuite"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-				Invoke-Expression "$progenPath /tool=vs$vs $componentTestProgenPath" 
+				Invoke-Expression "$progenPath /tool=vs$vs $componentTestProgenPath"
 			}
 			ElseIf ($samples -and ($type -eq "sample")) {
 				Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
@@ -157,9 +162,23 @@ function Run-Progen-Components([string] $type)
 	}
 }
 
+function Exec-Buildwin {
+	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	Write-Host "| Building $components"
+	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	Invoke-Expression "$poco_base/buildwin.ps1 -poco_base $poco_base -vs $vs -action build -components `"Foundation,XML,JSON,Util,Progen`" "
+	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	Write-Host "| Build finished."
+	Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+}
+
 function Run
 {
 	Process-Input
+
+	if($nobuild -eq $false) {
+		Exec-Buildwin
+	}
 
 	Run-Progen-Components "lib"
 	Run-Progen-Components "test"
