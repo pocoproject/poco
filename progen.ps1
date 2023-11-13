@@ -6,6 +6,7 @@
 # progen.ps1   [-poco_base    dir]
 #              [-vs           140 | 150 | 160| 170]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
+#              [-components   "Lib1X,LibY,LibZ,..."]
 #              [-samples]
 #              [-tests]
 
@@ -20,6 +21,7 @@ Param
 	[int] $vs = 140,
 
 	[string] $omit,
+	[string] $components,
 	[switch] $samples = $false,
 	[switch] $tests = $false,
 
@@ -35,12 +37,17 @@ function Process-Input
 		Write-Host 'progen.ps1 [-poco_base <dir>]'
 		Write-Host '    [-vs           140 | 150 | 160 | 170]'
 		Write-Host '    [-omit         "Lib1X,LibY,LibZ,..."]'
+		Write-Host '    [-components   "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-samples]'
 		Write-Host '    [-tests]'
 		Exit
 	}
 	else
 	{
+		if($components -ne '' -and $omit -ne '') {
+			Write-Host "-components and -omit cannot be used simultaneously, exiting..."
+			Exit
+		}
 		Write-Host ""
 		Write-Host "--------------------"
 		Write-Host "Progen configuration:"
@@ -53,6 +60,11 @@ function Process-Input
 		if ($omit -ne '')
 		{
 			Write-Host "Omit:          $omit"
+		}
+
+		if ($components -ne '')
+		{
+			Write-Host "Components:          $components"
 		}
 
 		Write-Host "----------------------------------------"
@@ -107,7 +119,12 @@ function Run-Progen-Components([string] $type)
 				$omitArray += $_.Trim()
 		}
 
-		if ($omitArray -NotContains $component)
+		$componentsArray = @()
+		$components.Split(',') | ForEach-Object {
+				$componentsArray += $_.Trim()
+		}
+
+		if ($omitArray -NotContains $component -and (($components -Contains $component) -or ($components -eq '')))
 		{
 
 			Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
