@@ -19,6 +19,12 @@
 
 namespace Poco {
 
+// NOTE: Must be in sync with DateTimeParser::parseTZD
+// TODO: Validate timezone strings separately and simplify regex?
+#define TIMEZONES_REGEX_PART \
+	"(UT)|(GMT)|(BST)|(IST)|(WET)|(WEST)|(CET)|(CEST)|(EET)|(EEST)|(EST)|(MSK)|" \
+	"(MSD)|(NST)|(NDT)|(AST)|(ADT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|" \
+	"(PDT)|(AKST)|(AKDT)|(HST)|(AEST)|(AEDT)|(ACST)|(ACDT)|(AWST)|(AWDT)"
 
 const std::string DateTimeFormat::ISO8601_FORMAT("%Y-%m-%dT%H:%M:%S%z");
 const std::string DateTimeFormat::ISO8601_FRAC_FORMAT("%Y-%m-%dT%H:%M:%s%z");
@@ -31,12 +37,14 @@ const std::string DateTimeFormat::ISO8601_REGEX("([\\+-]?\\d{4}(?!\\d{2}\\b))"
 	"(\\17[0-5]\\d([\\.,]\\d+)?)?([A-I]|[K-Z]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?");
 
 const std::string DateTimeFormat::RFC822_FORMAT("%w, %e %b %y %H:%M:%S %Z");
+
+// TODO: Is this regex correct? RFC 822 spec does not mention timezone codes, just GMT.
 const std::string DateTimeFormat::RFC822_REGEX("(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), *)?"
 	"\\d\\d? +"
 	"((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) +"
 	"\\d\\d(\\d\\d)? +"
 	"\\d\\d:\\d\\d(:\\d\\d)? +"
-	"(([+\\-]?\\d\\d\\d\\d)|(UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|\\w)");
+	"(([+\\-]?\\d\\d\\d\\d)|" TIMEZONES_REGEX_PART "|\\w)");
 
 const std::string DateTimeFormat::RFC1123_FORMAT("%w, %e %b %Y %H:%M:%S %Z");
 const std::string DateTimeFormat::RFC1123_REGEX(DateTimeFormat::RFC822_REGEX);
@@ -46,8 +54,8 @@ const std::string DateTimeFormat::HTTP_REGEX("(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(S
 	"\\d\\d? +"
 	"((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) +"
 	"\\d\\d(\\d\\d)? +\\d\\d:\\d\\d(:\\d\\d)? "
-	"((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|)?+"
-	"(([+\\-]?\\d\\d\\d\\d)?|(UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|\\w)");
+	"(" TIMEZONES_REGEX_PART "|)?+"
+	"(([+\\-]?\\d\\d\\d\\d)?|" TIMEZONES_REGEX_PART "|\\w)");
 
 const std::string DateTimeFormat::RFC850_FORMAT("%W, %e-%b-%y %H:%M:%S %Z");
 const std::string DateTimeFormat::RFC850_REGEX(
@@ -55,8 +63,8 @@ const std::string DateTimeFormat::RFC850_REGEX(
 	"(Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), *)?"
 	"\\d\\d?-((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec))-"
 	"\\d\\d(\\d\\d)? +\\d\\d:\\d\\d(:\\d\\d)? "
-	"((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|)?+"
-	"(([+\\-]?\\d\\d\\d\\d)?|(UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|\\w)");
+	"(" TIMEZONES_REGEX_PART "|)?+"
+	"(([+\\-]?\\d\\d\\d\\d)?|" TIMEZONES_REGEX_PART "|\\w)");
 
 const std::string DateTimeFormat::RFC1036_FORMAT("%W, %e %b %y %H:%M:%S %Z");
 const std::string DateTimeFormat::RFC1036_REGEX(
@@ -64,8 +72,8 @@ const std::string DateTimeFormat::RFC1036_REGEX(
 	"\\d\\d? +"
 	"((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) +"
 	"\\d\\d(\\d\\d)? +\\d\\d:\\d\\d(:\\d\\d)? "
-	"((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|)?+"
-	"(([+\\-]?\\d\\d\\d\\d)?|(UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|\\w)");
+	"(" TIMEZONES_REGEX_PART "|)?+"
+	"(([+\\-]?\\d\\d\\d\\d)?|" TIMEZONES_REGEX_PART "|\\w)");
 
 const std::string DateTimeFormat::ASCTIME_FORMAT("%w %b %f %H:%M:%S %Y");
 const std::string DateTimeFormat::ASCTIME_REGEX("((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)) +"

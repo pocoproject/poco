@@ -351,6 +351,7 @@ void DateTimeParserTest::testRFC1123()
 	assertTrue (tzd == -14400);
 	testBad(DateTimeFormat::RFC1123_FORMAT, "Hue, 18 Jan 2005 12:30:00 EDT", tzd);
 
+	// Parsing fails? If this format supported at all by the spec?
 	dt = DateTimeParser::parse(DateTimeFormat::RFC1123_FORMAT, "Sun, 20 Jul 1969 16:17:30 GMT+01:00", tzd);
 	assertTrue (dt.year() == 1969);
 	assertTrue (dt.month() == 7);
