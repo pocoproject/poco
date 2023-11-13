@@ -472,7 +472,12 @@ function Build-Components([string] $extension, [string] $type)
 				$omitArray += $_.Trim()
 		}
 
-		if ($omitArray -NotContains $component -and (($components -Contains $component) -or ($components -eq '')))
+		$componentsArray = @()
+		$components.Split(',') | ForEach-Object {
+				$componentsArray += $_.Trim()
+		}
+
+		if ($omitArray -NotContains $component -and (($componentsArray -Contains $component) -or ($components -eq '')))
 		{
 			$vsProject = "$poco_base\$componentDir\$componentName$($suffix).$($extension)"
 
