@@ -146,6 +146,15 @@ function Run-Progen-Components([string] $type)
 				Write-Host "| Running Progen for $componentDir\testsuite"
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 				Invoke-Expression "$progenPath /tool=vs$vs $componentTestProgenPath"
+
+				if ($component -eq "Data") # special case for Data
+				{
+					$componentTestProgenPath = "$poco_base\$componentDir\testsuite\DataTest\DataTest.progen"
+					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+					Write-Host "| Running Progen for $componentDir\testsuite\DataTest"
+					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+					Invoke-Expression "$progenPath /tool=vs$vs $componentTestProgenPath"
+				}
 			}
 			ElseIf ($samples -and ($type -eq "sample")) {
 				Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
