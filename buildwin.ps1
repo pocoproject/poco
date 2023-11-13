@@ -12,6 +12,7 @@
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
+#              [-components   "Lib1X,LibY,LibZ,..."]
 #              [-tool         msbuild | devenv]
 #              [-useenv       env | noenv]
 #              [-verbosity    minimal | quiet | normal | detailed | diagnostic]
@@ -47,6 +48,7 @@ Param
 	[switch] $tests = $false,
 	[switch] $samples = $false,
 	[string] $omit,
+	[string] $components,
 
 	[Parameter()]
 	[ValidateSet('msbuild', 'devenv')]
@@ -249,6 +251,10 @@ function Process-Input
 	}
 	else
 	{
+		if($components -ne '' -and $omit -ne '') {
+			Write-Host "-components and -omit cannot be used simultaneously, exiting..."
+			Exit 1
+		}
 		Set-Environment
 
 		Write-Host ""
@@ -273,6 +279,11 @@ function Process-Input
 		if ($omit -ne '')
 		{
 			Write-Host "Omit:          $omit"
+		}
+
+		if ($components -ne '')
+		{
+			Write-Host "Components:          $components"
 		}
 
 		if ($openssl_base -ne '')
@@ -460,7 +471,7 @@ function Build-Components([string] $extension, [string] $type)
 				$omitArray += $_.Trim()
 		}
 
-		if ($omitArray -NotContains $component)
+		if ($omitArray -NotContains $component -and (($components -Contains $component) -or ($components -eq '')))
 		{
 			$vsProject = "$poco_base\$componentDir\$componentName$($suffix).$($extension)"
 
