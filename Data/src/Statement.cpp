@@ -235,7 +235,7 @@ void Statement::formatQuery()
 void Statement::checkBeginTransaction()
 {
 	SessionImpl& session = _pImpl->session();
-	if (!session.isAutocommit() && !session.isTransaction() && session.shouldParse())
+	if (session.shouldParse() && !session.isTransaction() && !session.isAutocommit())
 	{
 		auto result = parse();
 		if (result.isSpecified() && result.value() && !isSelect().value())
