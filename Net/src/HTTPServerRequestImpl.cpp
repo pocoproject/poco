@@ -40,6 +40,7 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, H
 	response.attachRequest(this);
 
 	HTTPHeaderInputStream hs(session);
+	setAutoDecode(_pParams->getAutoDecodeHeaders());
 	read(hs);
 
 	// Now that we know socket is still connected, obtain addresses
