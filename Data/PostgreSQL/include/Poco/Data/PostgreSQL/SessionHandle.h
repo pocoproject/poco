@@ -118,7 +118,7 @@ public:
 	bool isAutoCommit() const;
 		/// is the connection in auto commit mode?
 
-	void setAutoCommit(bool aShouldAutoCommit = true);
+	void autoCommit(bool val);
 		/// is the connection in auto commit mode?
 
 	bool isAsynchronousCommit() const;
@@ -193,7 +193,6 @@ private:
 	PGconn*                   _pConnection;
 	std::string               _connectionString;
 	bool                      _inTransaction;
-	bool                      _isAutoCommit;
 	bool                      _isAsynchronousCommit;
 	Poco::UInt32              _tranactionIsolationLevel;
 	std::vector <std::string> _preparedStatementsToBeDeallocated;
@@ -303,12 +302,6 @@ inline std::string SessionHandle::connectionString() const
 inline bool SessionHandle::isTransaction() const
 {
 	return _inTransaction;
-}
-
-
-inline bool SessionHandle::isAutoCommit() const
-{
-	return _isAutoCommit;
 }
 
 

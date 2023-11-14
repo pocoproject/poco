@@ -36,7 +36,6 @@ const std::string SessionHandle::POSTGRESQL_SERIALIZABLE	= "SERIALIZABLE";
 SessionHandle::SessionHandle():
 	_pConnection(0),
 	_inTransaction(false),
-	_isAutoCommit(true),
 	_isAsynchronousCommit(false),
 	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
@@ -157,7 +156,6 @@ void SessionHandle::disconnect()
 
 		_connectionString = std::string();
 		_inTransaction= false;
-		_isAutoCommit = true;
 		_isAsynchronousCommit = false;
 		_tranactionIsolationLevel = Session::TRANSACTION_READ_COMMITTED;
 	}
@@ -280,21 +278,13 @@ void SessionHandle::rollback()
 }
 
 
-void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
+void SessionHandle::autoCommit(bool val)
 {
 	// There is no PostgreSQL API call to switch autocommit (unchained) mode off.
-	if (aShouldAutoCommit == _isAutoCommit)
+	if (val && isTransaction())
 	{
-		return;
+		commit();  // end any in process transaction
 	}
-
-	if (aShouldAutoCommit)
-	{
-		if (isTransaction())
-			commit();  // end any in process transaction
-	}
-
-	_isAutoCommit = aShouldAutoCommit;
 }
 
 

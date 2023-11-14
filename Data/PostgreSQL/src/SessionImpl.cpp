@@ -134,7 +134,7 @@ void SessionImpl::open(const std::string& aConnectionString)
 	_sessionHandle.connect(createConnectionStringFromOptionsMap(optionsMap));
 
 	addFeature("autoCommit",
-		&SessionImpl::setAutoCommit,
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
 	addFeature("asynchronousCommit",
@@ -206,15 +206,18 @@ void SessionImpl::rollback()
 }
 
 
-void SessionImpl::setAutoCommit(const std::string&, bool aValue)
+void SessionImpl::autoCommit(const std::string& s, bool val)
 {
-	_sessionHandle.setAutoCommit(aValue);
+	if (val != getAutoCommit(s)) {
+		_sessionHandle.autoCommit(val);
+		AbstractSessionImpl::setAutoCommit(s, val);
+	}
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&) const
+bool SessionImpl::isAutoCommit(const std::string& s) const
 {
-	return _sessionHandle.isAutoCommit();
+	return AbstractSessionImpl::getAutoCommit(s);
 }
 
 
