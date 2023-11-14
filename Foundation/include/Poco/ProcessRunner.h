@@ -57,7 +57,7 @@ public:
 		int options = NO_OUT,
 		int timeout = 10, /*seconds*/
 		bool startProcess = true,
-		const Args& pidArgFmt = {"-p", "--pidfile="});
+		const Args& pidArgFmt = pidArgFormat());
 		/// Creates the ProcessRunner.
 		///
 		/// If `pidFile` is not empty, the starting of the process waits
@@ -125,6 +125,16 @@ public:
 private:
 	static const Poco::ProcessHandle::PID INVALID_PID = -1;
 	static const int RESULT_UNKNOWN = -1;
+
+	static Args pidArgFormat()
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		return Args{"-p", "--pidfile=", "/p", "/pidfile="};
+#else
+		return Args{"-p", "--pidfile="};
+#endif
+	}
+
 
 	void run();
 		/// Starts the process and waits for it to be fully initialized.
