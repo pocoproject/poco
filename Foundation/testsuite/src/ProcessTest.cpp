@@ -226,6 +226,34 @@ void ProcessTest::testLaunchArgs()
 }
 
 
+void ProcessTest::testLaunchInvalidCommand()
+{
+	std::string name("InvalidCmd");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#elif defined(_WIN32_WCE)
+	cmd = "\\";
+	cmd += name;
+	cmd += ".EXE";
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	args.push_back("arg1");
+	args.push_back("arg2");
+	args.push_back("arg3");
+	ProcessHandle ph = Process::launch(cmd, args);
+	int rc = ph.wait();
+	assertTrue (rc == 72);
+}
+
+
 void ProcessTest::testIsRunning()
 {
 #if !defined(_WIN32_WCE)
@@ -278,6 +306,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnv);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchArgs);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchInvalidCommand);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
 
 	return pSuite;
