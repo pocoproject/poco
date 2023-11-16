@@ -184,7 +184,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 
 	do
 	{
-		// We must not allocated memory after fork(),
+		// We must not allocate memory after fork(),
 		// therefore allocate all required buffers first.
 
 		std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
@@ -242,9 +242,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			long fdMax = sysconf(_SC_OPEN_MAX);
 			// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
 			if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
-			for (long i = 3; i < fdMax; ++i)
+			for (long j = 3; j < fdMax; ++j)
 			{
-				close(i);
+				close(j);
 			}
 
 			execvp(argv[0], &argv[0]);
