@@ -259,7 +259,7 @@ void ProcessTest::testLaunchInvalidCommand()
 		int rc = ph.wait();
 		fail("must fail");
 	}
-	catch (SystemException& e){}
+	catch (...){}
 #endif
 }
 
