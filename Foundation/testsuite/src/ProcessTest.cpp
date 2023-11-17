@@ -248,9 +248,19 @@ void ProcessTest::testLaunchInvalidCommand()
 	args.push_back("arg1");
 	args.push_back("arg2");
 	args.push_back("arg3");
+#if defined(POCO_OS_FAMILY_UNIX)
 	ProcessHandle ph = Process::launch(cmd, args);
 	int rc = ph.wait();
 	assertTrue (rc == 72);
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	try
+	{
+		ProcessHandle ph = Process::launch(cmd, args);
+		int rc = ph.wait();
+		fail("must fail");
+	}
+	catch (SystemException& e){}
+#endif
 }
 
 
