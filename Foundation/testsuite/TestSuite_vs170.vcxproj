@@ -969,6 +969,7 @@
     <ClCompile Include="src\PBKDF2EngineTest.cpp" />
     <ClCompile Include="src\PriorityEventTest.cpp" />
     <ClCompile Include="src\PriorityNotificationQueueTest.cpp" />
+    <ClCompile Include="src\ProcessRunnerTest.cpp" />
     <ClCompile Include="src\ProcessesTestSuite.cpp" />
     <ClCompile Include="src\ProcessTest.cpp" />
     <ClCompile Include="src\RandomStreamTest.cpp" />
@@ -1110,6 +1111,7 @@
     <ClInclude Include="src\PBKDF2EngineTest.h" />
     <ClInclude Include="src\PriorityEventTest.h" />
     <ClInclude Include="src\PriorityNotificationQueueTest.h" />
+    <ClCompile Include="src\ProcessRunnerTest.h" />
     <ClInclude Include="src\ProcessesTestSuite.h" />
     <ClInclude Include="src\ProcessTest.h" />
     <ClInclude Include="src\RandomStreamTest.h" />
