@@ -53,9 +53,6 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 			_rc(RESULT_UNKNOWN),
 			_runCount(0)
 {
-	if (!File(_cmd).exists())
-		throw Poco::NotFoundException(_cmd);
-
 	if (_pidFile.empty() && !_args.empty() && !pidArgFmt.empty())
 	{
 		for (const auto& fmt : pidArgFmt)

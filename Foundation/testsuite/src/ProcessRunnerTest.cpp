@@ -89,27 +89,37 @@ void ProcessRunnerTest::testPIDFile()
 
 void ProcessRunnerTest::testProcessRunner()
 {
-	std::string name = "TestApp";
+	std::string name("TestApp");
 	std::string cmd;
-
-#ifdef _DEBUG
-	name += 'd';
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
 #endif
 
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#elif defined(_WIN32_WCE)
+	cmd = "\\";
+	cmd += name;
+	cmd += ".EXE";
+#else
 	cmd = name;
+#endif
 
 	// non-auto start, no PID
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		args.push_back(std::string("--pidfile=").append(pidFile));
 		ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT, 10, false);
 		assertTrue (pr.cmdLine() == cmdLine(cmd, args));
 		assertFalse (pr.running());
 		pr.start();
+		
 		Stopwatch sw; sw.start();
 		while (!pr.running())
 			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
+		
 		assertTrue (pr.running());
 		try
 		{
@@ -133,7 +143,8 @@ void ProcessRunnerTest::testProcessRunner()
 	// non-auto start with PID
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		args.push_back(std::string("--pidfile=").append(pidFile));
 		ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT, 10, false);
 		assertTrue (pr.cmdLine() == cmdLine(cmd, args));
@@ -165,7 +176,8 @@ void ProcessRunnerTest::testProcessRunner()
 	// autodetect PID file from the long command line argument
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		args.push_back(std::string("--pidfile=").append(pidFile));
 		{
 			ProcessRunner pr(cmd, args);
@@ -180,7 +192,8 @@ void ProcessRunnerTest::testProcessRunner()
 	// autodetect PID file from the short command line argument
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		args.push_back(std::string("-p=").append(pidFile));
 		{
 			ProcessRunner pr(cmd, args, PIDFile::getFileName(pidFile));
@@ -196,7 +209,8 @@ void ProcessRunnerTest::testProcessRunner()
 	// if argument formats list is empty
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		args.push_back(std::string("--pidfile=").append(pidFile));
 		{
 			ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT, 10, true, {});
@@ -217,7 +231,8 @@ void ProcessRunnerTest::testProcessRunner()
 
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		args.push_back(std::string("-p=").append(pidFile));
 		{
 			ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT, 10, true, {});
@@ -239,7 +254,8 @@ void ProcessRunnerTest::testProcessRunner()
 	// no PID file created at all
 	{
 		std::vector<std::string> args;
-		std::string pidFile = Poco::format("run/%s.pid", name);
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
 		{
 			ProcessRunner pr(cmd, args);
 			assertTrue (pr.cmdLine() == cmdLine(cmd, args));
