@@ -21,13 +21,15 @@ namespace Test {
 SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
 	Poco::Data::AbstractSessionImpl<SessionImpl>(init, timeout),
 	_f(false),
-	_connected(true)
+	_connected(true),
+	_autoCommit(true)
 {
 	addFeature("f1", &SessionImpl::setF, &SessionImpl::getF);
 	addFeature("f2", 0, &SessionImpl::getF);
 	addFeature("f3", &SessionImpl::setF, 0);
 	addFeature("throwOnHasNext", &SessionImpl::setThrowOnHasNext, &SessionImpl::getThrowOnHasNext);
 	addFeature("connected", &SessionImpl::setConnected, &SessionImpl::getConnected);
+	addFeature("autoCommit", &SessionImpl::setAutoCommit, &SessionImpl::getAutoCommit);
 	addProperty("p1", &SessionImpl::setP, &SessionImpl::getP);
 	addProperty("p2", 0, &SessionImpl::getP);
 	addProperty("p3", &SessionImpl::setP, &SessionImpl::getP);
@@ -143,6 +145,18 @@ bool SessionImpl::getConnected(const std::string& name) const
 void SessionImpl::setConnected(const std::string&, bool value)
 {
 	_connected = value;
+}
+
+
+bool SessionImpl::getAutoCommit(const std::string& name) const
+{
+	return _autoCommit;
+}
+
+
+void SessionImpl::setAutoCommit(const std::string&, bool value)
+{
+	_autoCommit = value;
 }
 
 

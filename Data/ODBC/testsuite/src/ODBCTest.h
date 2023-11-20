@@ -23,14 +23,14 @@
 #include "SQLExecutor.h"
 
 
-#define POCO_ODBC_TEST_DATABASE_SERVER "10.211.55.5"//"localhost"
+#define POCO_ODBC_TEST_DATABASE_SERVER "localhost"
 
 
 class ODBCTest: public CppUnit::TestCase
 {
 public:
-	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
-	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
+	using SessionPtr = Poco::SharedPtr<Poco::Data::Session>;
+	using ExecPtr = Poco::SharedPtr<SQLExecutor>;
 
 	ODBCTest(const std::string& name,
 		SessionPtr pSession,
@@ -152,7 +152,10 @@ public:
 	virtual void testSQLChannel();
 	virtual void testSQLLogger();
 
+	virtual void testAutoCommit();
+	virtual void testTransactionIsolation();
 	virtual void testSessionTransaction();
+	virtual void testSessionTransactionNoAutoCommit();
 	virtual void testTransaction();
 	virtual void testTransactor();
 	virtual void testNullable();
@@ -233,8 +236,8 @@ inline void ODBCTest::testTempTable()
 	throw Poco::NotImplementedException("ODBCTest::testTempTable()");
 }
 
-inline void ODBCTest::testStoredProcedure() 
-{ 
+inline void ODBCTest::testStoredProcedure()
+{
 	throw Poco::NotImplementedException("ODBCTest::testStoredProcedure()");
 }
 

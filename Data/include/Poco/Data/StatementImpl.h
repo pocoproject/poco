@@ -259,6 +259,9 @@ protected:
 	SessionImpl& session();
 		/// Rteurns session associated with this statement.
 
+	const SessionImpl& session() const;
+		/// Rteurns session associated with this statement.
+
 	virtual AbstractBinding::BinderPtr binder() = 0;
 		/// Returns the concrete binder used by the statement.
 
@@ -507,6 +510,12 @@ inline StatementImpl::State StatementImpl::getState() const
 
 
 inline SessionImpl& StatementImpl::session()
+{
+	return _rSession;
+}
+
+
+inline const SessionImpl& StatementImpl::session() const
 {
 	return _rSession;
 }

@@ -42,16 +42,16 @@ endif()
 # Setup C/C++ compiler options
 #################################################################################
 
-# C++11/14 compiler flags
+# C++11/17 compiler flags
 include(CXX1x)
-check_for_cxx14_compiler(CXX14_COMPILER)
+check_for_cxx17_compiler(CXX17_COMPILER)
 
-# If a C++14 compiler is available, then set the appropriate flags
-if(CXX14_COMPILER)
-	set(CMAKE_CXX_STANDARD 14)
+# If a C++17 compiler is available, then set the appropriate flags
+if(CXX17_COMPILER)
+	set(CMAKE_CXX_STANDARD 17)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else()
-	message(FATAL_ERROR "Compiler does not support C++14.")
+	message(FATAL_ERROR "Compiler does not support C++17.")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -204,7 +204,10 @@ if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
 endif()
 
 option(ENABLE_TESTS
-	"Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
+	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
+
+option(ENABLE_SAMPLES
+	"Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
@@ -393,7 +396,13 @@ if(OPENSSL_FOUND)
 	endif()
 endif(OPENSSL_FOUND)
 
+
+option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
+	if(POCO_DATA_NO_SQL_PARSER)
+		add_definitions(-DPOCO_DATA_NO_SQL_PARSER=1)
+	endif()
 	add_subdirectory(Data)
 	list(APPEND Poco_COMPONENTS "Data")
 endif()

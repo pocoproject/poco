@@ -34,6 +34,5 @@ POCO_GENERATE_PACKAGE(Redis)
 
 if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
-#	 add_subdirectory(samples)
 endif()
 

@@ -81,6 +81,9 @@ public:
 	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
 		/// Returns an ODBC StatementImpl
 
+	void addFeatures();
+		/// Adds the ODBC session features and properties.
+
 	void open(const std::string& connect = "");
 		/// Opens a connection to the Database
 
@@ -188,6 +191,14 @@ public:
 
 	const std::string& dbEncoding() const;
 		/// Returns the database encoding.
+
+	void setMultiActiveResultset(const std::string&, bool value);
+		/// Sets the multiple active resultset capability, if available.
+		/// Does nothing, if feature is not available.
+
+	bool getMultiActiveResultset(const std::string&) const;
+		/// Returns the multiple active resultset capability, if available.
+		/// Returns false, if feature is not available.
 
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.

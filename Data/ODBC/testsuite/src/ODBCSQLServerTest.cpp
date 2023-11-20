@@ -68,9 +68,9 @@ using Poco::DateTime;
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
 #define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MS_SQL_SERVER_PORT "1433"
-#define MS_SQL_SERVER_DB "poco"
-#define MS_SQL_SERVER_UID "poco"
-#define MS_SQL_SERVER_PWD "poco"
+#define MS_SQL_SERVER_DB "model"
+#define MS_SQL_SERVER_UID "sa"
+#define MS_SQL_SERVER_PWD "Pocopoco1"
 
 
 ODBCTest::SessionPtr ODBCSQLServerTest::_pSession;
@@ -88,6 +88,7 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	"DATABASE=" MS_SQL_SERVER_DB ";"
 	"SERVER=" MS_SQL_SERVER_SERVER ";"
 	"PORT=" MS_SQL_SERVER_PORT ";"
+	"TrustServerCertificate=yes;"
 	"Encrypt=no"
 #ifdef FREE_TDS_VERSION
 	"TDS_Version=" FREE_TDS_VERSION ";"
@@ -189,7 +190,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&)
 	{
@@ -209,7 +210,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&) { }
 }
@@ -966,8 +967,11 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransactionNoAutoCommit);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactionIsolation);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);

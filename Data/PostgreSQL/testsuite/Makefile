@@ -13,6 +13,10 @@ SYSLIBS += -lpq -lz -lpthread -ldl
 
 objects = PostgreSQLTestSuite Driver PostgreSQLTest SQLExecutor
 
+ifndef POCO_DATA_NO_SQL_PARSER
+	target_includes = $(POCO_BASE)/Data/src
+endif
+
 target         = testrunner
 target_version = 1
 target_libs    = PocoDataPostgreSQL PocoData PocoFoundation CppUnit

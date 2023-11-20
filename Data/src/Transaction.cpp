@@ -22,7 +22,6 @@ namespace Data {
 
 Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
 	_rSession(rSession),
-	_autoCommit(_rSession.hasFeature("autoCommit") ? _rSession.getFeature("autoCommit") : false),
 	_pLogger(pLogger)
 {
 	begin();
@@ -31,7 +30,6 @@ Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
 
 Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 	_rSession(rSession),
-	_autoCommit(_rSession.hasFeature("autoCommit") ? _rSession.getFeature("autoCommit") : false),
 	_pLogger(0)
 {
 	if (start) begin();
@@ -73,11 +71,7 @@ Transaction::~Transaction()
 void Transaction::begin()
 {
 	if (!_rSession.isTransaction())
-	{
-		if (_autoCommit)
-			_rSession.setFeature("autoCommit", false);
 		_rSession.begin();
-	}
 	else
 		throw InvalidAccessException("Transaction in progress.");
 }
@@ -122,8 +116,6 @@ void Transaction::commit()
 		_pLogger->debug("Committing transaction.");
 
 	_rSession.commit();
-	if (_autoCommit)
-		_rSession.setFeature("autoCommit", true);
 }
 
 
@@ -133,8 +125,6 @@ void Transaction::rollback()
 		_pLogger->debug("Rolling back transaction.");
 
 	_rSession.rollback();
-	if (_autoCommit)
-		_rSession.setFeature("autoCommit", true);
 }
 
 

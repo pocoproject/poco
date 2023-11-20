@@ -78,7 +78,7 @@ Session SessionPool::get()
 			customizeSession(newSession);
 
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
-			_idleSessions.push_front(pHolder);
+			_idleSessions.push_back(pHolder);
 			++_nSessions;
 		}
 		else throw SessionPoolExhaustedException(_connector);
@@ -178,7 +178,7 @@ void SessionPool::setFeature(const std::string& name, bool state)
 }
 
 
-bool SessionPool::getFeature(const std::string& name)
+bool SessionPool::getFeature(const std::string& name) const
 {
 
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
@@ -205,7 +205,7 @@ void SessionPool::setProperty(const std::string& name, const Poco::Any& value)
 }
 
 
-Poco::Any SessionPool::getProperty(const std::string& name)
+Poco::Any SessionPool::getProperty(const std::string& name) const
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
 	PropertyMap::ConstIterator it = _propertyMap.find(name);
@@ -261,7 +261,7 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 				applySettings(pHolder->session());
 
 				pHolder->access();
-				_idleSessions.push_front(pHolder);
+				_idleSessions.push_back(pHolder);
 			}
 			else --_nSessions;
 

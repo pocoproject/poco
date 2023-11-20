@@ -152,3 +152,8 @@ poco_build_stderr.out
 *.swp
 *.vim
 tags
+
+# Javascript #
+##############
+package-lock.json
+node_modules

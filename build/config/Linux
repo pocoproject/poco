@@ -45,7 +45,7 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = $(SANITIZEFLAGS) -std=c11
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(SANITIZEFLAGS) -std=c++14 -Wall -Wno-sign-compare
+CXXFLAGS        = $(SANITIZEFLAGS) -std=c++17 -Wall -Wno-sign-compare
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       = $(SANITIZEFLAGS)

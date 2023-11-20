@@ -6,6 +6,7 @@
 
 sinclude config.make
 sinclude config.build
+POCO_CONFIG_INCLUDED = 1
 
 ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
@@ -80,7 +81,7 @@ all: libexecs tests samples
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis Prometheus
 
-cppunit:
+cppunit: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/CppUnit
 
 CppUnit-clean:

@@ -146,13 +146,13 @@ public:
 	void setFeature(const std::string& name, bool state);
 		/// Sets feature for all the sessions.
 
-	bool getFeature(const std::string& name);
+	bool getFeature(const std::string& name) const;
 		/// Returns the requested feature.
 
 	void setProperty(const std::string& name, const Poco::Any& value);
 		/// Sets property for all sessions.
 
-	Poco::Any getProperty(const std::string& name);
+	Poco::Any getProperty(const std::string& name) const;
 		/// Returns the requested property.
 
 	void shutdown();
