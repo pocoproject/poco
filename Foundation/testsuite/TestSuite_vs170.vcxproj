@@ -1127,7 +1127,7 @@
     <ClInclude Include="src\PBKDF2EngineTest.h" />
     <ClInclude Include="src\PriorityEventTest.h" />
     <ClInclude Include="src\PriorityNotificationQueueTest.h" />
-    <ClCompile Include="src\ProcessRunnerTest.h" />
+    <ClInclude Include="src\ProcessRunnerTest.h" />
     <ClInclude Include="src\ProcessesTestSuite.h" />
     <ClInclude Include="src\ProcessTest.h" />
     <ClInclude Include="src\RandomStreamTest.h" />
