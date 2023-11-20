@@ -150,7 +150,7 @@ void ProcessRunner::stop()
 				_pidFile.clear();
 				std::string msg;
 				Poco::format(msg, "Waiting for PID file (pidFile: '%s')", _pidFile);
-				Stopwatch sw; sw.start();
+				sw.restart();
 				while (pidFile.exists())
 					checkTimeout(sw, msg);
 			}
