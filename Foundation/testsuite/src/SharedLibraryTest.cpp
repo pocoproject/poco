@@ -14,6 +14,7 @@
 #include "Poco/SharedLibrary.h"
 #include "Poco/Exception.h"
 #include "Poco/Path.h"
+#include "Poco/File.h"
 #include "Poco/Format.h"
 
 
@@ -22,6 +23,7 @@ using Poco::NotFoundException;
 using Poco::LibraryLoadException;
 using Poco::LibraryAlreadyLoadedException;
 using Poco::Path;
+using Poco::File;
 
 
 typedef int (*GimmeFiveFunc)();
@@ -129,6 +131,7 @@ void SharedLibraryTest::testSharedLibrary3()
 
 std::string SharedLibraryTest::getFullName(const std::string& libName)
 {
+	// make
 	std::string name = Path::expand("$POCO_BASE");
 	char c = Path::separator();
 	std::string OSNAME = Path::expand("$OSNAME");
@@ -137,6 +140,18 @@ std::string SharedLibraryTest::getFullName(const std::string& libName)
 		.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
 		.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
 		.append(libName).append(SharedLibrary::suffix());
+
+	// CMake
+	if (!File(name).exists())
+	{
+		name = Path::expand("$POCO_BASE");
+		name.append(Poco::format("%ccmake-build%cbin%c", c, c, c))
+			.append(libName).append(SharedLibrary::suffix());
+	}
+
+	if (!File(name).exists())
+		name = libName + SharedLibrary::suffix();
+
 	return name;
 }
 

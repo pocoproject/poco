@@ -15,7 +15,7 @@
 #include "Poco/Manifest.h"
 #include "Poco/Exception.h"
 #include "Poco/Path.h"
-#include "Poco/Path.h"
+#include "Poco/File.h"
 #include "Poco/Format.h"
 #include "TestPlugin.h"
 
@@ -27,6 +27,7 @@ using Poco::AbstractMetaObject;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::Path;
+using Poco::File;
 
 
 ClassLoaderTest::ClassLoaderTest(const std::string& name): CppUnit::TestCase(name)
@@ -198,6 +199,18 @@ std::string ClassLoaderTest::getFullName(const std::string& libName)
 		.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
 		.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
 		.append(libName).append(SharedLibrary::suffix());
+
+	// CMake
+	if (!File(name).exists())
+	{
+		name = Path::expand("$POCO_BASE");
+		name.append(Poco::format("%ccmake-build%cbin%c", c, c, c))
+			.append(libName).append(SharedLibrary::suffix());
+	}
+
+	if (!File(name).exists())
+		name = libName + SharedLibrary::suffix();
+
 	return name;
 }
 
