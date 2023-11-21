@@ -40,10 +40,15 @@ SplitterChannel::~SplitterChannel()
 
 void SplitterChannel::addChannel(Channel::Ptr pChannel)
 {
-	poco_check_ptr (pChannel);
+	poco_check_ptr(pChannel);
 
 	FastMutex::ScopedLock lock(_mutex);
-	_channels.push_back(pChannel);
+
+	// ensure that the channel is only added once
+	if (std::find(_channels.begin(), _channels.end(), pChannel) == _channels.end())
+	{
+		_channels.push_back(pChannel);
+	}
 }
 
 
@@ -51,13 +56,11 @@ void SplitterChannel::removeChannel(Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	for (ChannelVec::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	const auto it = std::find(_channels.begin(), _channels.end(), pChannel);
+
+	if (it != _channels.end())
 	{
-		if (*it == pChannel)
-		{
-			_channels.erase(it);
-			break;
-		}
+		_channels.erase(it);
 	}
 }
 
