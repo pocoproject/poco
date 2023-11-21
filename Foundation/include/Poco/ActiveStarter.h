@@ -19,7 +19,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "Poco/ThreadPool.h"
+#include "Poco/ActiveThreadPool.h"
 #include "Poco/ActiveRunnable.h"
 
 
@@ -36,7 +36,7 @@ class ActiveStarter
 public:
 	static void start(OwnerType* /*pOwner*/, ActiveRunnableBase::Ptr pRunnable)
 	{
-		ThreadPool::defaultPool().start(*pRunnable);
+		ActiveThreadPool::defaultPool().start(*pRunnable);
 		pRunnable->duplicate(); // The runnable will release itself.
 	}
 };
