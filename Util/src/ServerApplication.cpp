@@ -436,17 +436,6 @@ void ServerApplication::handleStartup(const std::string& name, const std::string
 }
 
 
-void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
-{
-	Poco::FileOutputStream ostr(value);
-	if (ostr.good())
-		ostr << Poco::Process::id() << std::endl;
-	else
-		throw Poco::CreateFileException("Cannot write PID to file", value);
-	Poco::TemporaryFile::registerForDeletion(value);
-}
-
-
 #else // _WIN32_WCE
 void ServerApplication::waitForTerminationRequest()
 {
@@ -718,6 +707,17 @@ void ServerApplication::handleUMask(const std::string& name, const std::string& 
 
 
 #endif
+
+
+void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
+{
+	Poco::FileOutputStream ostr(value);
+	if (ostr.good())
+		ostr << Poco::Process::id() << std::endl;
+	else
+		throw Poco::CreateFileException("Cannot write PID to file", value);
+	Poco::TemporaryFile::registerForDeletion(value);
+}
 
 
 } } // namespace Poco::Util
