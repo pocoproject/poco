@@ -30,6 +30,7 @@ public:
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
 	void testLaunchArgs();
+	void testLaunchInvalidCommand();
 	void testIsRunning();
 
 	void setUp();
