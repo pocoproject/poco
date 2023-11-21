@@ -16,6 +16,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/OptionException.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
@@ -26,7 +27,6 @@
 #include "Poco/Logger.h"
 #include "Poco/String.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
-#include "Poco/TemporaryFile.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -436,6 +436,17 @@ void ServerApplication::handleStartup(const std::string& name, const std::string
 }
 
 
+void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
+{
+	Poco::FileOutputStream ostr(value);
+	if (ostr.good())
+		ostr << Poco::Process::id() << std::endl;
+	else
+		throw Poco::CreateFileException("Cannot write PID to file", value);
+	Poco::TemporaryFile::registerForDeletion(value);
+}
+
+
 #else // _WIN32_WCE
 void ServerApplication::waitForTerminationRequest()
 {
@@ -703,17 +714,6 @@ void ServerApplication::handleUMask(const std::string& name, const std::string& 
 			throw Poco::InvalidArgumentException("umask contains non-octal characters", value);
 	}
 	umask(mask);
-}
-
-
-void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
-{
-	Poco::FileOutputStream ostr(value);
-	if (ostr.good())
-		ostr << Poco::Process::id() << std::endl;
-	else
-		throw Poco::CreateFileException("Cannot write PID to file", value);
-	Poco::TemporaryFile::registerForDeletion(value);
 }
 
 
