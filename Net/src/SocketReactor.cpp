@@ -37,7 +37,7 @@ SocketReactor::SocketReactor():
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pIdleNotification(new IdleNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this)),
-	_pThread(0)
+	_event(true)
 {
 }
 
@@ -51,19 +51,19 @@ SocketReactor::SocketReactor(const Poco::Timespan& timeout):
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pIdleNotification(new IdleNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this)),
-	_pThread(0)
+	_event(true)
 {
 }
 
 
 SocketReactor::~SocketReactor()
 {
+	stop();
 }
 
 
 void SocketReactor::run()
 {
-	_pThread = Thread::current();
 	while (!_stop)
 	{
 		try
@@ -71,7 +71,7 @@ void SocketReactor::run()
 			if (!hasSocketHandlers())
 			{
 				onIdle();
-				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
+				_event.tryWait(static_cast<long>(_timeout.totalMilliseconds()));
 			}
 			else
 			{
@@ -132,17 +132,16 @@ bool SocketReactor::hasSocketHandlers()
 
 void SocketReactor::stop()
 {
-	_stop = true;
+	if (_stop.exchange(true)) return;
+	wakeUp();
 }
 
 
 void SocketReactor::wakeUp()
 {
-	if (_pThread && _pThread != Thread::current())
-	{
-		_pThread->wakeUp();
-		_pollSet.wakeUp();
-	}
+	if (_stop) return;
+	_event.set();
+	_pollSet.wakeUp();
 }
 
 

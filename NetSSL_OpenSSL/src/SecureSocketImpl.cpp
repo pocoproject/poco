@@ -14,6 +14,7 @@
 
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Net/Utility.h"
@@ -95,8 +96,24 @@ void SecureSocketImpl::acceptSSL()
 		BIO_free(pBIO);
 		throw SSLException("Cannot create SSL object");
 	}
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL
+	/* TLS 1.3 server sends session tickets after a handhake as part of
+	* the SSL_accept(). If a client finishes all its job before server
+	* sends the tickets, SSL_accept() fails with EPIPE errno. Since we
+	* are not interested in a session resumption, we can not to send the
+	* tickets. */
+	if (1 != SSL_set_num_tickets(_pSSL, 0))
+	{
+		BIO_free(pBIO);
+		throw SSLException("Cannot create SSL object");
+	}
+	//Otherwise we can perform two-way shutdown. Client must call SSL_read() before the final SSL_shutdown().
+#endif
+
 	SSL_set_bio(_pSSL, pBIO, pBIO);
 	SSL_set_accept_state(_pSSL);
+	SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
 	_needHandshake = true;
 }
 
@@ -156,6 +173,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
+	SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
 
 	if (!_peerHostName.empty())
 	{
@@ -169,7 +187,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	}
 #endif
 
-	if (_pSession)
+	if (_pSession && _pSession->isResumable())
 	{
 		SSL_set_session(_pSSL, _pSession->sslSession());
 	}
@@ -537,11 +555,13 @@ int SecureSocketImpl::handleError(int rc)
 	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
 	// errno was 0.  Since OpenSSL 3.0 the returned error is
 	// SSL_ERROR_SSL with a meaningful error on the error stack.
+	// However, we still need to check for socket errors in both
+	// cases with OpenSSL 3.0 or later.
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	case SSL_ERROR_SSL:
-#else
-	case SSL_ERROR_SYSCALL:
+		// fallthrough to handle socket errors first
 #endif
+	case SSL_ERROR_SYSCALL:
 		if (socketError)
 		{
 			SocketImpl::error(socketError);
@@ -557,6 +577,11 @@ int SecureSocketImpl::handleError(int rc)
 				ERR_error_string_n(lastError, buffer, sizeof(buffer));
 				msg = buffer;
 			}
+			// SSL_GET_ERROR(3ossl):
+			// On an unexpected EOF, versions before OpenSSL 3.0 returned
+			// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
+			// errno was 0.  Since OpenSSL 3.0 the returned error is
+			// SSL_ERROR_SSL with a meaningful error on the error stack.
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 			if (sslError == SSL_ERROR_SSL)
 #else
@@ -602,6 +627,7 @@ void SecureSocketImpl::reset()
 	close();
 	if (_pSSL)
 	{
+		SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		SSL_free(_pSSL);
 		_pSSL = 0;
 	}
@@ -616,20 +642,7 @@ void SecureSocketImpl::abort()
 
 Session::Ptr SecureSocketImpl::currentSession()
 {
-	if (_pSSL)
-	{
-		SSL_SESSION* pSession = SSL_get1_session(_pSSL);
-		if (pSession)
-		{
-			if (_pSession && pSession == _pSession->sslSession())
-			{
-				SSL_SESSION_free(pSession);
-				return _pSession;
-			}
-			else return new Session(pSession);
-		}
-	}
-	return 0;
+	return _pSession;
 }
 
 
@@ -645,6 +658,19 @@ bool SecureSocketImpl::sessionWasReused()
 		return SSL_session_reused(_pSSL) != 0;
 	else
 		return false;
+}
+
+
+int SecureSocketImpl::onSessionCreated(SSL* pSSL, SSL_SESSION* pSession)
+{
+	void* pEx = SSL_get_ex_data(pSSL, SSLManager::instance().socketIndex());
+	if (pEx)
+	{
+		SecureSocketImpl* pThis = reinterpret_cast<SecureSocketImpl*>(pEx);
+		pThis->_pSession = new Session(pSession);
+		return 1;
+	}
+	else return 0;
 }
 
 

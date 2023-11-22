@@ -39,7 +39,18 @@ FileIOS::~FileIOS()
 void FileIOS::open(const std::string& path, std::ios::openmode mode)
 {
 	clear();
-	_buf.open(path, mode | _defaultMode);
+	if (!(mode & std::ios::in) && !(mode & std::ios::out))
+	{
+		mode |= _defaultMode;
+	}
+	_buf.open(path, mode);
+}
+
+
+void FileIOS::open(const std::string& path)
+{
+	clear();
+	_buf.open(path, _defaultMode);
 }
 
 
@@ -69,7 +80,7 @@ FileInputStream::FileInputStream(const std::string& path, std::ios::openmode mod
 	FileIOS(std::ios::in),
 	std::istream(&_buf)
 {
-	open(path, mode);
+	open(path, mode | std::ios::in);
 }
 
 
@@ -89,7 +100,7 @@ FileOutputStream::FileOutputStream(const std::string& path, std::ios::openmode m
 	FileIOS(std::ios::out),
 	std::ostream(&_buf)
 {
-	open(path, mode);
+	open(path, mode | std::ios::out);
 }
 
 

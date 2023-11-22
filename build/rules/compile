@@ -113,25 +113,41 @@ $(OBJPATH_RELEASE_SHARED)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/c
 # Regular sources rules
 
 $(DEPPATH)/%.d: $(SRCDIR)/%.cpp
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),distclean)
 	@echo "** Creating dependency info for" $^
 	$(MKDIR) $(DEPPATH)
 	$(DEP) $(SRCDIR)/$(patsubst %.d,%.cpp,$(notdir $@)) $@ $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_SHARED) $(OBJPATH_RELEASE_SHARED) $(INCLUDE) $(CXXFLAGS)
+endif
+endif
 
 $(DEPPATH)/%.d: $(SRCDIR)/%.c
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),distclean)
 	@echo "** Creating dependency info for" $^
 	$(MKDIR) $(DEPPATH)
 	$(DEP) $(SRCDIR)/$(patsubst %.d,%.c,$(notdir $@)) $@ $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_SHARED) $(OBJPATH_RELEASE_SHARED) $(INCLUDE) $(CFLAGS)
+endif
+endif
 
 # Generated sources rules
 
 $(DEPPATH)/%.d: $(GENDIR)/%.cpp
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),distclean)
 	@echo "** Creating dependency info for" $^
 	$(MKDIR) $(DEPPATH)
 	$(DEP) $(GENDIR)/$(patsubst %.d,%.cpp,$(notdir $@)) $@ $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_SHARED) $(OBJPATH_RELEASE_SHARED) $(INCLUDE) $(CXXFLAGS)
+endif
+endif
 
 $(DEPPATH)/%.d: $(GENDIR)/%.c
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),distclean)
 	@echo "** Creating dependency info for" $^
 	$(MKDIR) $(DEPPATH)
 	$(DEP) $(GENDIR)/$(patsubst %.d,%.c,$(notdir $@)) $@ $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_SHARED) $(OBJPATH_RELEASE_SHARED) $(INCLUDE) $(CFLAGS)
+endif
+endif
 
 depend: $(addprefix $(DEPPATH)/,$(addsuffix .d,$(objects)))

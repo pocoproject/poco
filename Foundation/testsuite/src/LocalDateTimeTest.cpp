@@ -477,7 +477,11 @@ void LocalDateTimeTest::testTimezone2()
 			std::time_t t = ldt.timestamp().epochTime();
 			std::tm then;
 			then = *std::localtime(&t);
+#if POCO_OS == POCO_OS_SOLARIS
+			assertTrue((mktime(&then)-t) * 1000 == ldt.tzd());
+#else
 			assertTrue (then.tm_gmtoff == ldt.tzd());
+#endif
 		}
 		unsetenv("TZ");
 	}

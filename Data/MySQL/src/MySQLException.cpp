@@ -18,8 +18,7 @@
 
 
 #include "Poco/Data/MySQL/MySQLException.h"
-#include <mysql/mysql.h>
-#include <stdio.h>
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
@@ -71,9 +70,7 @@ std::string ConnectionException::compose(const std::string& text, MYSQL* h)
 	str += mysql_error(h);
 
 	str += "\t[mysql_errno]: ";
-	char buff[30];
-	sprintf(buff, "%d", mysql_errno(h));
-	str += buff;
+	Poco::NumberFormatter::append(str, mysql_errno(h));
 
 	str += "\t[mysql_sqlstate]: ";
 	str += mysql_sqlstate(h);
@@ -125,9 +122,7 @@ std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, 
 		str += mysql_stmt_error(h);
 
 		str += "\t[mysql_stmt_errno]: ";
-		char buff[30];
-		sprintf(buff, "%d", mysql_stmt_errno(h));
-		str += buff;
+		Poco::NumberFormatter::append(str, mysql_stmt_errno(h));
 
 		str += "\t[mysql_stmt_sqlstate]: ";
 		str += mysql_stmt_sqlstate(h);

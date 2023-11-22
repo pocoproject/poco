@@ -103,29 +103,31 @@ void TCPServerDispatcher::run()
 
 	for (;;)
 	{
+		try
 		{
-			ThreadCountWatcher tcw(this);
-			try
+			AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
+			if (pNf)
 			{
-				AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
-				if (pNf)
+				TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
+				if (pCNf)
 				{
-					TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
-					if (pCNf)
-					{
-						std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-						poco_check_ptr(pConnection.get());
-						beginConnection();
-						pConnection->start();
-						endConnection();
-					}
+					std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+					poco_check_ptr(pConnection.get());
+					beginConnection();
+					pConnection->start();
+					endConnection();
 				}
 			}
-			catch (Poco::Exception &exc) { ErrorHandler::handle(exc); }
-			catch (std::exception &exc)  { ErrorHandler::handle(exc); }
-			catch (...)                  { ErrorHandler::handle();    }
 		}
-		if (_stopped || (_currentThreads > 1 && _queue.empty())) break;
+		catch (Poco::Exception &exc) { ErrorHandler::handle(exc); }
+		catch (std::exception &exc)  { ErrorHandler::handle(exc); }
+		catch (...)                  { ErrorHandler::handle();    }
+		FastMutex::ScopedLock lock(_mutex);
+		if (_stopped || (_currentThreads > 1 && _queue.empty()))
+		{
+			--_currentThreads;
+			break;
+		}
 	}
 }
 
@@ -173,7 +175,10 @@ void TCPServerDispatcher::stop()
 	FastMutex::ScopedLock lock(_mutex);
 	_stopped = true;
 	_queue.clear();
-	_queue.enqueueNotification(new StopNotification);
+	for (int i = 0; i < _threadPool.allocated(); i++)
+	{
+		_queue.enqueueNotification(new StopNotification);
+	}
 }
 
 

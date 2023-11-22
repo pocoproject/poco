@@ -139,6 +139,25 @@ void TimedNotificationQueueTest::testDequeue()
 }
 
 
+void TimedNotificationQueueTest::testDequeueNext()
+{
+	TimedNotificationQueue queue;
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
+	Notification* pNf = queue.dequeueNextNotification();
+	assertNullPtr(pNf);
+	Timestamp time;
+	time += 100000;
+	queue.enqueueNotification(new Notification, time);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 1);
+	pNf = queue.dequeueNextNotification();
+	assertNotNullPtr(pNf);
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
+	pNf->release();
+}
+
 void TimedNotificationQueueTest::testWaitDequeue()
 {
 	TimedNotificationQueue queue;
@@ -264,6 +283,7 @@ CppUnit::Test* TimedNotificationQueueTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TimedNotificationQueueTest");
 
 	CppUnit_addTest(pSuite, TimedNotificationQueueTest, testDequeue);
+	CppUnit_addTest(pSuite, TimedNotificationQueueTest, testDequeueNext);
 	CppUnit_addTest(pSuite, TimedNotificationQueueTest, testWaitDequeue);
 	CppUnit_addTest(pSuite, TimedNotificationQueueTest, testWaitDequeueTimeout);
 

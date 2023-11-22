@@ -36,6 +36,10 @@
 	#include <sys/syscall.h>   /* For SYS_xxx definitions */
 #endif
 
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
+#endif
+
 //
 // Block SIGPIPE in main thread.
 //
@@ -63,20 +67,30 @@ namespace
 
 
 namespace {
-void setThreadName(pthread_t thread, const std::string& threadName)
-{
-#if (POCO_OS == POCO_OS_MAC_OS_X)
-	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
-#else
-	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
+
+	std::string truncName(const std::string& name)
 	{
-		std::string truncName(threadName, 0, 7);
-		truncName.append("~");
-		truncName.append(threadName, threadName.size() - 7, 7);
-		pthread_setname_np(thread, truncName.c_str());
+		if (name.size() > 15)
+			return name.substr(0, 15).append("~");
+		return name;
 	}
+
+	void setThreadName(const std::string& threadName)
+		/// Sets thread name. Support for this feature varies
+		/// on platforms. Any errors are ignored.
+	{
+#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version < 1300000
+		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
+#elif (POCO_OS == POCO_OS_MAC_OS_X)
+	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+			pthread_setname_np(truncName(threadName).c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+		#endif
+	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
+#else
+		prctl(PR_SET_NAME, truncName(threadName).c_str());
 #endif
-}
+	}
 }
 
 
@@ -351,7 +365,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
+	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{

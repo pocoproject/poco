@@ -88,10 +88,11 @@ public:
 	{
 #ifdef WEPOLL_H_
 		if (_eventfd >= 0) eventfd(_port, _eventfd);
+		if (_epollfd) close(_epollfd);
 #else
 		if (_eventfd > 0) close(_eventfd.exchange(0));
-#endif
 		if (_epollfd >= 0) close(_epollfd);
+#endif
 	}
 
 	void add(const Socket& socket, int mode)
@@ -146,7 +147,11 @@ public:
 			close(_epollfd);
 			_socketMap.clear();
 			_epollfd = epoll_create(1);
+#ifdef WEPOLL_H_
+			if (!_epollfd) SocketImpl::error();
+#else
 			if (_epollfd < 0) SocketImpl::error();
+#endif
 		}
 #ifdef WEPOLL_H_
 		eventfd(_port, _eventfd);
@@ -201,9 +206,9 @@ public:
 				SocketMap::iterator it = _socketMap.find(_events[i].data.ptr);
 				if (it != _socketMap.end())
 				{
-					if (_events[i].events & EPOLLIN)
+					if (_events[i].events & (EPOLLIN | EPOLLRDNORM | EPOLLHUP))
 						result[it->second.first] |= PollSet::POLL_READ;
-					if (_events[i].events & EPOLLOUT)
+					if (_events[i].events & (EPOLLOUT | EPOLLWRNORM))
 						result[it->second.first] |= PollSet::POLL_WRITE;
 					if (_events[i].events & EPOLLERR)
 						result[it->second.first] |= PollSet::POLL_ERROR;
@@ -225,10 +230,11 @@ public:
 
 	void wakeUp()
 	{
+		uint64_t val = 1;
 #ifdef WEPOLL_H_
 		StreamSocket ss(SocketAddress("127.0.0.1", _port));
+		ss.impl()->sendBytes(&val, sizeof(val));
 #else
-		uint64_t val = 1;
 		// This is guaranteed to write into a valid fd,
 		// or 0 (meaning PollSet is being destroyed).
 		// Errors are ignored.

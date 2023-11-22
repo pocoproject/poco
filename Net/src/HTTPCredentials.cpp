@@ -191,7 +191,7 @@ bool HTTPCredentials::isDigestCredentials(const std::string& header)
 
 bool HTTPCredentials::isNTLMCredentials(const std::string& header)
 {
-	return icompare(header, 0, 4, "NTLM") == 0 && (header.size() > 5 ? Poco::Ascii::isSpace(header[5]) : true);
+	return icompare(header, 0, 4, "NTLM") == 0 && (header.size() > 4 ? Poco::Ascii::isSpace(header[4]) : true);
 }
 
 

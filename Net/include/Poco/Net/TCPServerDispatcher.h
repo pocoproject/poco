@@ -101,30 +101,6 @@ private:
 	TCPServerDispatcher(const TCPServerDispatcher&);
 	TCPServerDispatcher& operator = (const TCPServerDispatcher&);
 
-	class ThreadCountWatcher
-	{
-	public:
-		ThreadCountWatcher(TCPServerDispatcher* pDisp) : _pDisp(pDisp)
-		{
-		}
-
-		~ThreadCountWatcher()
-		{
-			FastMutex::ScopedLock lock(_pDisp->_mutex);
-			if (_pDisp->_currentThreads > 1 && _pDisp->_queue.empty())
-			{
-				--_pDisp->_currentThreads;
-			}
-		}
-
-		private:
-			ThreadCountWatcher();
-			ThreadCountWatcher(const ThreadCountWatcher&);
-			ThreadCountWatcher& operator=(const ThreadCountWatcher&);
-
-			TCPServerDispatcher* _pDisp;
-	};
-
 	std::atomic<int> _rc;
 	TCPServerParams::Ptr _pParams;
 	std::atomic<int>  _currentThreads;

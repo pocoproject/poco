@@ -280,6 +280,9 @@ protected:
 		/// Note that simply closing a socket is not sufficient
 		/// to be able to re-use it again.
 
+	static int onSessionCreated(SSL* pSSL, SSL_SESSION* pSession);
+		/// Callback to handle new session data sent by server.
+
 private:
 	SecureSocketImpl(const SecureSocketImpl&);
 	SecureSocketImpl& operator = (const SecureSocketImpl&);
@@ -293,6 +296,7 @@ private:
 	bool _bidirectShutdown = true;
 
 	friend class SecureStreamSocketImpl;
+	friend class Context;
 };
 
 

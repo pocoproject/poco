@@ -13,7 +13,7 @@
 
 
 #include "Poco/Net/HTTPChunkedStream.h"
-#include "Poco/Net/HTTPStream.h"
+#include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
@@ -53,15 +53,16 @@ void HTTPChunkedStreamBuf::close()
 	if (_mode & std::ios::out)
 	{
 		sync();
-		_session.write("0\r\n", 3);
 		if (_pTrailer && !_pTrailer->empty())
 		{
-			HTTPOutputStream hos(_session);
+			HTTPHeaderOutputStream hos(_session);
+			hos.write("0\r\n", 3);
 			_pTrailer->write(hos);
+			hos.write("\r\n", 2);
 		}
 		else
 		{
-			_session.write("\r\n", 2);
+			_session.write("0\r\n\r\n", 5); // If possible, send in one write
 		}
 	}
 }
@@ -81,9 +82,14 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		while (ch != eof && ch != '\n') ch = _session.get();
 		unsigned chunk;
 		if (NumberParser::tryParseHex(chunkLen, chunk))
-			_chunk = (std::streamsize) chunk;
+		{
+			_chunk = static_cast<std::streamsize>(chunk);
+		}
 		else
+		{
+			_chunk = -1;
 			return eof;
+		}
 	}
 	if (_chunk > 0)
 	{
@@ -92,12 +98,12 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (n > 0) _chunk -= n;
 		return n;
 	}
-	else
+	else if (_chunk == 0)
 	{
 		int ch = _session.peek();
 		if (ch != eof && ch != '\r' && ch != '\n')
 		{
-			HTTPInputStream his(_session);
+			HTTPHeaderInputStream his(_session);
 			if (_pTrailer)
 			{
 				_pTrailer->read(his);
@@ -113,8 +119,10 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			ch = _session.get();
 			while (ch != eof && ch != '\n') ch = _session.get();
 		}
+		_chunk = -1;
 		return 0;
 	}
+	else return eof;
 }
 
 

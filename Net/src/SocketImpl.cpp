@@ -646,7 +646,12 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 #else
 	int epollfd = epoll_create(1);
 #endif
+
+#ifdef WEPOLL_H_
+	if (!epollfd)
+#else
 	if (epollfd < 0)
+#endif
 	{
 		error("Can't create epoll queue");
 	}
@@ -675,7 +680,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		memset(&evout, 0, sizeof(evout));
 
 		Poco::Timestamp start;
-		rc = epoll_wait(epollfd, &evout, 1, remainingTime.totalMilliseconds());
+		rc = epoll_wait(epollfd, &evout, 1, static_cast<int>(remainingTime.totalMilliseconds()));
 		if (rc < 0 && lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;

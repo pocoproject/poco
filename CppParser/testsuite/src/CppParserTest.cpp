@@ -78,6 +78,22 @@ void CppParserTest::testExtractName()
 	name = Symbol::extractName(decl);
 	assertTrue (name == "func");
 
+	decl = "std::function<bool> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<void(bool)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<std::vector<int>(std::vector<bool>)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<void*(std::function<const int*(void)>)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
 	decl = "const std::vector<NS::MyType>* var";
 	name = Symbol::extractName(decl);
 	assertTrue (name == "var");

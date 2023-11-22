@@ -477,9 +477,9 @@ void NumberFormatter::append(std::string& str, const void* ptr)
 {
 	char buffer[24];
 #if defined(POCO_PTR_IS_64_BIT)
-	std::sprintf(buffer, "%016" PRIXPTR, (UIntPtr) ptr);
+	std::snprintf(buffer, sizeof(buffer), "%016" PRIXPTR, (UIntPtr) ptr);
 #else
-	std::sprintf(buffer, "%08" PRIXPTR, (UIntPtr) ptr);
+	std::snprintf(buffer, sizeof(buffer), "%08" PRIXPTR, (UIntPtr) ptr);
 #endif
 	str.append(buffer);
 }

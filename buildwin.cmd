@@ -39,8 +39,10 @@ if "%1"=="" goto usage
 rem -version ^^[16.0^^,17.0^^)
 set VS_VERSION=vs%1
 rem  should be set "VSWHERE='%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe  -property installationPath -version ^[16.0^,17.0^)'"
+
+set VS_VERSION=vs%1
 if %VS_VERSION%==vs170 (
-  set "VSWHERE='C:\PROGRA~2\"Microsoft Visual Studio"\Installer\vswhere.exe  -latest -property installationPath -version ^[16.0^,17.0^)'"
+  set "VSWHERE='C:\PROGRA~2\"Microsoft Visual Studio"\Installer\vswhere.exe  -latest -property installationPath -version ^[17.0^,18.0^)'"
 ) else (
 if %VS_VERSION%==vs160 (
   set "VSWHERE='C:\PROGRA~2\"Microsoft Visual Studio"\Installer\vswhere.exe  -latest -property installationPath -version ^[16.0^,17.0^)'"

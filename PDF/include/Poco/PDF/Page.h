@@ -49,21 +49,21 @@ public:
 	enum Size
 	{
 		PAGE_SIZE_LETTER = HPDF_PAGE_SIZE_LETTER, 
-			/// 8� x 11 (Inches), 612 x 792 px
+			/// 8½ x 11 (Inches), 612 x 792 px
 		PAGE_SIZE_LEGAL = HPDF_PAGE_SIZE_LEGAL,
-			/// 8� x 14 (Inches), 612 x 1008 px
+			/// 8½ x 14 (Inches), 612 x 1008 px
 		PAGE_SIZE_A3 = HPDF_PAGE_SIZE_A3,
-			/// 297 � 420 (mm), 841.89 x 1199.551 px
+			/// 297 × 420 (mm), 841.89 x 1199.551 px
 		PAGE_SIZE_A4 = HPDF_PAGE_SIZE_A4,
-			/// 210 � 297 (mm), 595.276 x 841.89 px
+			/// 210 × 297 (mm), 595.276 x 841.89 px
 		PAGE_SIZE_A5 = HPDF_PAGE_SIZE_A5,
-			/// 148 � 210 (mm), 419.528 x 595.276 px
+			/// 148 × 210 (mm), 419.528 x 595.276 px
 		PAGE_SIZE_B4 = HPDF_PAGE_SIZE_B4,
-			/// 250 � 353 (mm), 708.661 x 1000.63 px
+			/// 250 × 353 (mm), 708.661 x 1000.63 px
 		PAGE_SIZE_B5 = HPDF_PAGE_SIZE_B5,
-			/// 176 � 250 (mm), 498.898 x 708.661 px
+			/// 176 × 250 (mm), 498.898 x 708.661 px
 		PAGE_SIZE_EXECUTIVE = HPDF_PAGE_SIZE_EXECUTIVE,
-			/// 7� x 10� (Inches), 522 x 756 px
+			/// 7½ x 10½ (Inches), 522 x 756 px
 		PAGE_SIZE_US4x6 = HPDF_PAGE_SIZE_US4x6,
 			/// 4 x 6 (Inches), 288 x 432 px
 		PAGE_SIZE_US4x8 = HPDF_PAGE_SIZE_US4x8,
@@ -301,19 +301,19 @@ public:
 		/// Appends a path from the current point to the specified point..
 
 	void curveTo(const std::vector<float>& values);
-		/// Appends a B�zier curve to the current path using two specified points.
+		/// Appends a Bézier curve to the current path using two specified points.
 		/// The point (x1, y1) and the point (x2, y2) are used as the control points 
-		/// for a B�zier curve and current point is moved to the point (x3, y3)
+		/// for a Bézier curve and current point is moved to the point (x3, y3)
 
 	void curveToRight(float x2, float y2, float x3, float y3);
-		/// Appends a B�zier curve to the right of the current point using two specified points.
+		/// Appends a Bézier curve to the right of the current point using two specified points.
 		/// The current point and the point (x2, y2) are used as the control points 
-		/// for a B�zier curve and current point is moved to the point (x3, y3)
+		/// for a Bézier curve and current point is moved to the point (x3, y3)
 
 	void curveToLeft(float x2, float y2, float x3, float y3);
-		/// Appends a B�zier curve to the left of the current point using two specified points.
+		/// Appends a Bézier curve to the left of the current point using two specified points.
 		/// The current point and the point (x2, y2) are used as the control points 
-		/// for a B�zier curve and current point is moved to the point (x3, y3)
+		/// for a Bézier curve and current point is moved to the point (x3, y3)
 
 	void closePath();
 		/// Appends a straight line from the current point to the start point of sub path.

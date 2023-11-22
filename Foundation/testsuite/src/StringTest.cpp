@@ -1238,7 +1238,7 @@ void formatStream(double value, std::string& str)
 void formatSprintf(double value, std::string& str)
 {
 	char buffer[128];
-	std::sprintf(buffer, "%.*g", 16, value);
+	std::snprintf(buffer, sizeof(buffer), "%.*g", 16, value);
 	str = buffer;
 }
 

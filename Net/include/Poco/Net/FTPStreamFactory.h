@@ -66,7 +66,7 @@ public:
 		/// Destroys the FTPStreamFactory.
 
 	std::istream* open(const Poco::URI& uri);
-		/// Creates and opens a HTTP stream for the given URI.
+		/// Creates and opens a FTP stream for the given URI.
 		/// The URI must be a ftp://... URI.
 		///
 		/// Throws a NetException if anything goes wrong.

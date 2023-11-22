@@ -85,7 +85,7 @@ void Binder::freeMemory()
 
 	UUIDMap::iterator itUUID = _uuids.begin();
 	UUIDMap::iterator itUUIDEnd = _uuids.end();
-	for(; itUUID != itUUIDEnd; ++itUUID) std::free(itUUID->first);
+	for(; itUUID != itUUIDEnd; ++itUUID) delete [] itUUID->first;
 
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();
@@ -518,7 +518,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	{
 		found = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
 		if (found) colSize = tmp;
-		if (actualSize > colSize)
+		if (found && actualSize > colSize)
 		{
 			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
 					pos, actualSize, static_cast<long>(colSize)));
