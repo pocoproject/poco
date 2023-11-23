@@ -132,6 +132,15 @@ void SecureSocketImpl::initCommon()
 	{
 		_contextFlags |= ISC_REQ_MANUAL_CRED_VALIDATION;
 	}
+
+	if (_mode == MODE_CLIENT)
+	{
+		// If we do not set this, in some cases the InitializeSecurityContext() will return SEC_I_INCOMPLETE_CREDENTIALS. 
+		// That case is not handled in the handshake, it will try to continue reading, thus blocking until timeout.
+		// The handling of this case would be to repeat the InitializeSecurityContext once again, or as we do here,
+		// inform to use a client cert if available. 
+		_contextFlags |= ISC_REQ_USE_SUPPLIED_CREDS;
+	}
 }
 
 
