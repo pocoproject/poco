@@ -268,6 +268,36 @@ void ProcessRunnerTest::testProcessRunner()
 		}
 		assertTrue (!File(pidFile).exists());
 	}
+#if defined(POCO_OS_FAMILY_UNIX)
+	// start process launching multiple threads
+	{
+		std::vector<std::string> args;
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
+		args.push_back(std::string("--pidfile=").append(pidFile));
+		args.push_back(std::string("--launch-thread"));
+		ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT, 10, false);
+		assertTrue (pr.cmdLine() == cmdLine(cmd, args));
+		assertFalse (pr.running());
+		pr.start();
+		Stopwatch sw; sw.start();
+		while (!pr.running())
+			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
+		assertTrue (pr.running());
+		try
+		{
+			pr.start();
+			fail("It should not be possible to start a started process.");
+		}
+		catch(const Poco::InvalidAccessException&) {}
+		pr.stop();
+		sw.restart();
+		while (pr.running())
+			checkTimeout(sw, "Waiting for process to stop", 1000, __LINE__);
+		assertFalse (pr.running());
+		assertEqual (pr.result(), 0);
+	}
+#endif
 }
 
 

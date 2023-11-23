@@ -19,7 +19,10 @@
 #include <cstdlib>
 #include <signal.h>
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_UNIX)
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Process.h"
 #include "Poco/Event.h"
 #include "Poco/NamedEvent.h"
@@ -27,12 +30,41 @@
 
 using namespace Poco;
 
-#if POCO_OS != POCO_OS_ANDROID
-class App
+#if defined(POCO_OS_FAMILY_UNIX)
+class MyRunnable: public Runnable
 {
 public:
-	App() {}
-	~App() {}
+	MyRunnable(): _ran(false)
+	{
+	}
+
+	void run()
+	{
+		Thread* pThread = Thread::current();
+		if (pThread)
+		{
+			_threadName = pThread->name();
+		}
+		_ran = true;
+	}
+
+	bool ran() const
+	{
+		return _ran;
+	}
+
+private:
+	bool _ran;
+	std::string _threadName;
+};
+#endif
+
+#if POCO_OS != POCO_OS_ANDROID
+class MyApp
+{
+public:
+	MyApp() {}
+	~MyApp() {}
 
 	std::unique_ptr<PIDFile> _pPIDFile;
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -81,6 +113,36 @@ public:
 		int sig;
 		sigwait(&sset, &sig);
 	}
+
+	int runThreads(std::string pidPath)
+	{
+		_pPIDFile.reset(new PIDFile(pidPath, true));
+
+		uint32_t sigMask = 4; // Block SIGINT
+
+		Thread thread1(sigMask);
+		Thread thread2(sigMask);
+		Thread thread3(sigMask);
+		Thread thread4(sigMask);
+
+		MyRunnable r1;
+		MyRunnable r2;
+		MyRunnable r3;
+		MyRunnable r4;
+
+		thread1.start(r1);
+		thread2.start(r2);
+		thread3.start(r3);
+		thread4.start(r4);
+
+		waitForTerminationRequest();
+
+		thread1.join();
+		thread2.join();
+		thread3.join();
+		thread4.join();
+		return 0;
+	}
 #endif
 
 	int run(std::string pidPath)
@@ -92,8 +154,8 @@ public:
 };
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
-Poco::Event App::_terminated;
-Poco::NamedEvent      App::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
+Poco::Event MyApp::_terminated;
+Poco::NamedEvent      MyApp::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
 #endif
 
 int main(int argc, char** argv)
@@ -134,6 +196,19 @@ int main(int argc, char** argv)
 				std::cout << argv[i] << std::endl;
 			}
 		}
+#if defined(POCO_OS_FAMILY_UNIX)
+		else if (argc > 2 && arg.find("--pidfile") != std::string::npos && std::string(argv[2]) == "--launch-thread") 
+		{
+			size_t equals_pos = arg.find('=');
+			if (equals_pos != std::string::npos)
+			{
+				std::string pidPath = arg.substr(equals_pos + 1);
+				MyApp myApp;
+				int result = myApp.runThreads(pidPath);
+				return result;
+			}
+		}
+#endif
 #if POCO_OS != POCO_OS_ANDROID
 		else if (arg.find("--pidfile") != std::string::npos || arg.find("-p") != std::string::npos)
 		{
@@ -141,7 +216,7 @@ int main(int argc, char** argv)
 			if (equals_pos != std::string::npos)
 			{
 				std::string pidPath = arg.substr(equals_pos + 1);
-				App myApp;
+				MyApp myApp;
 				int result = myApp.run(pidPath);
 				return result;
 			}
