@@ -88,21 +88,27 @@ private:
 } // namespace
 
 
-Thread::Thread():
+Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
 	_pTLS(0),
 	_event(true)
 {
 	setNameImpl(makeName());
+#if defined(POCO_OS_FAMILY_UNIX)
+	setSignalMaskImpl(sigMask);
+#endif
 }
 
 
-Thread::Thread(const std::string& name):
+Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
 	_pTLS(0),
 	_event(true)
 {
 	setNameImpl(name);
+#if defined(POCO_OS_FAMILY_UNIX)
+	setSignalMaskImpl(sigMask);
+#endif
 }
 
 
