@@ -3,7 +3,7 @@
 # https://github.com/google/sanitizers/wiki/ThreadSanitizerSuppressions
 #
 # To apply:
-# export TSAN_OPTIONS="suppressions=$POCO_BASE/tsan.supress,second_deadlock_stack=1"
+# export TSAN_OPTIONS="suppressions=$POCO_BASE/tsan.suppress,second_deadlock_stack=1"
 
 ##############
 # Suppressions:

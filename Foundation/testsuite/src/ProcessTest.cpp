@@ -14,12 +14,15 @@
 #include "Poco/Process.h"
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
+#include "Poco/Path.h"
+#include "Poco/Format.h"
 
 
 using namespace std::string_literals;
 using Poco::Process;
 using Poco::ProcessHandle;
 using Poco::Pipe;
+using Poco::Path;
 using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
 
