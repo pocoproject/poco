@@ -37,6 +37,17 @@ HTTPTestServer::HTTPTestServer():
 }
 
 
+HTTPTestServer::HTTPTestServer(const std::string& addr) :
+	_socket(SocketAddress(addr)),
+	_thread("HTTPTestServer"),
+	_stop(false)
+{
+	_thread.start(*this);
+	_ready.wait();
+	_lastRequest.reserve(4000);
+}
+
+
 HTTPTestServer::~HTTPTestServer()
 {
 	_stop = true;
@@ -74,13 +85,15 @@ void HTTPTestServer::run()
 				{
 					_lastRequest.append(buffer, n);
 					if (!requestComplete())
+					{
 						n = ss.receiveBytes(buffer, sizeof(buffer));
+					}
 					else
 						n = 0;
 				}
 				std::string response = handleRequest();
-				ss.sendBytes(response.data(), (int) response.size());
-				Poco::Thread::sleep(1000);
+				n = ss.sendBytes(response.data(), (int) response.size());
+				if (n) Poco::Thread::sleep(1000);
 				try
 				{
 					ss.shutdown();
