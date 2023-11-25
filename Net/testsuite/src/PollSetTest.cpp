@@ -404,9 +404,19 @@ void PollSetTest::testPollClosedServer()
 				"waiting on server after %ds", secs), __LINE__);
 		}
 	}
-
+	char buffer[5];
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue(n == 0);
+	auto smm = ps.poll(Timespan(1000000));
+	assertEqual(1, smm.size());
+	assertTrue(ss1 == smm.begin()->first);
+	ps.remove(ss1);
+	assertTrue(!ps.empty());
+	assertTrue(!ps.has(ss1));
+	assertTrue(ps.has(ss2));
 	echoServer2.stop();
 	assertTrue (len == ss2.sendBytes(str.data(), len));
+	sw.restart();
 	while (!echoServer2.done())
 	{
 		Thread::sleep(10);
@@ -417,8 +427,11 @@ void PollSetTest::testPollClosedServer()
 				"waiting on server after %ds", secs), __LINE__);
 		}
 	}
-
-	assertEqual(2, ps.poll(Timespan(1000000)).size());
+	n = ss2.receiveBytes(buffer, sizeof(buffer));
+	assertTrue(n == 0);
+	smm = ps.poll(Timespan(1000000));
+	assertEqual(1, smm.size());
+	assertTrue(ss2 == smm.begin()->first);
 
 	// socket closed or error
 	assertTrue(0 >= ss1.receiveBytes(0, 0));
