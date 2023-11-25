@@ -34,6 +34,7 @@ using Poco::Net::HTTPServerResponse;
 using Poco::Net::SocketStream;
 using Poco::Net::WebSocket;
 using Poco::Net::WebSocketException;
+using Poco::Net::ConnectionAbortedException;
 
 
 namespace
@@ -75,6 +76,9 @@ namespace
 					response.send();
 					break;
 				}
+			}
+			catch (ConnectionAbortedException&)
+			{
 			}
 		}
 
