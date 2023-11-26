@@ -122,7 +122,7 @@ private:
 	TaskList           _taskList;
 	Timestamp          _lastProgressNotification;
 	NotificationCenter _nc;
-	mutable MutexT  _mutex;
+	mutable MutexT     _mutex;
 
 	friend class Task;
 };

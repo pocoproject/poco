@@ -171,12 +171,16 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
-		do
+		while (true)
 		{
 			Poco::Timestamp start;
 			rc = epoll_wait(_epollfd, &_events[0],
 				static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
-			if (rc == 0) return result;
+			if (rc == 0)
+			{
+				if (keepWaiting(start, remainingTime)) continue;
+				return result;
+			}
 
 			// if we are hitting the events limit, resize it; even without resizing, the subseqent
 			// calls would round-robin through the remaining ready sockets, but it's better to give
@@ -187,18 +191,12 @@ public:
 				// if interrupted and there's still time left, keep waiting
 				if (SocketImpl::lastError() == POCO_EINTR)
 				{
-					Poco::Timestamp end;
-					Poco::Timespan waited = end - start;
-					if (waited < remainingTime)
-					{
-						remainingTime -= waited;
-						continue;
-					}
+					if (keepWaiting(start, remainingTime)) continue;
 				}
 				else SocketImpl::error();
 			}
+			break;
 		}
-		while (false);
 
 		ScopedLock lock(_mutex);
 
@@ -302,6 +300,18 @@ private:
 			ev.events |= EPOLLERR;
 		ev.data.ptr = ptr;
 		return epoll_ctl(_epollfd, op, fd, &ev);
+	}
+
+	static bool keepWaiting(const Poco::Timestamp& start, Poco::Timespan& remainingTime)
+	{
+		Poco::Timestamp end;
+		Poco::Timespan waited = end - start;
+		if (waited < remainingTime)
+		{
+			remainingTime -= waited;
+			return true;
+		}
+		return false;
 	}
 
 #ifndef WEPOLL_H_

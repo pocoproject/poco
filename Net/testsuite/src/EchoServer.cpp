@@ -83,8 +83,10 @@ void EchoServer::run()
 			{
 				std::cerr << "EchoServer: " << exc.displayText() << std::endl;
 			}
+			ss.close();
 		}
 	}
+	_socket.close();
 	_done = true;
 }
 
@@ -99,4 +101,3 @@ bool EchoServer::done()
 {
 	return _done;
 }
-

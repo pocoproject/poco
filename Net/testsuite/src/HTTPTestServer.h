@@ -27,6 +27,9 @@ public:
 	HTTPTestServer();
 		/// Creates the HTTPTestServer.
 
+	HTTPTestServer(const std::string& addr);
+	/// Creates the HTTPTestServer on the specified address.
+
 	~HTTPTestServer();
 		/// Destroys the HTTPTestServer.
 

@@ -562,8 +562,10 @@ void SocketTest::testEchoUnixLocal()
 	if (socketFile.exists()) socketFile.remove();
 	echoServer.stop();
 #else // POCO_HAS_UNIX_SOCKET
-	#pragma message("[UNIX LOCAL SOCKET DISABLED]")
-	std::cout << "[UNIX LOCAL SOCKET DISABLED]" << std::endl;
+	#if POCO_OS == POCO_OS_WINDOWS_NT
+		#pragma message("[UNIX LOCAL SOCKET DISABLED]")
+	#endif
+	std::cout << "[UNIX LOCAL SOCKET DISABLED]";
 #endif
 }
 
@@ -588,8 +590,10 @@ void SocketTest::testUnixLocalAbstract()
 	ss.close();
 	echoServer.stop();
 #else // POCO_HAS_UNIX_SOCKET
-#pragma message("[ABSTRACT UNIX LOCAL SOCKET DISABLED]")
-	std::cout << "[ABSTRACT UNIX LOCAL SOCKET DISABLED]" << std::endl;
+	#if POCO_OS == POCO_OS_WINDOWS_NT
+		#pragma message("[ABSTRACT UNIX LOCAL SOCKET DISABLED]")
+	#endif
+	std::cout << "[ABSTRACT UNIX LOCAL SOCKET DISABLED]";
 #endif
 }
 
