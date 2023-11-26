@@ -229,6 +229,26 @@ void Context::setSecurityLevel(SecurityLevel level)
 #endif
 }
 
+void Context::ignoreUnexpectedEof(bool flag)
+{
+	if (flag)
+	{
+#if defined(SSL_OP_IGNORE_UNEXPECTED_EOF)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_IGNORE_UNEXPECTED_EOF);
+#endif
+	}
+	else
+	{
+#if defined(SSL_OP_IGNORE_UNEXPECTED_EOF)
+		SSL_CTX_clear_options(_pSSLContext, SSL_OP_IGNORE_UNEXPECTED_EOF);
+#endif
+	}
+}
+
+void Context::setQuietShutdown(bool flag)
+{
+	SSL_CTX_set_quiet_shutdown(_pSSLContext, flag ? 1 : 0);
+}
 
 void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 {

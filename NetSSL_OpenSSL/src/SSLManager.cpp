@@ -103,6 +103,7 @@ void SSLManager::shutdown()
 	ServerVerificationError.clear();
 	_ptrDefaultServerContext = 0;
 	_ptrDefaultClientContext = 0;
+	_socketIndex = _contextIndex = -1;
 }
 
 
