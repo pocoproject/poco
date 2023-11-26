@@ -53,10 +53,10 @@ private:
 	void onReadable(bool& b);
 	void onWritable(bool& b);
 
-	int _readableToNot;
-	int _notToReadable;
-	int _writableToNot;
-	int _notToWritable;
+	int _readableToNot = 0;
+	int _notToReadable = 0;
+	int _writableToNot = 0;
+	int _notToWritable = 0;
 };
 
 
