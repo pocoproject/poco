@@ -171,7 +171,7 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
-		do
+		while (true)
 		{
 			Poco::Timestamp start;
 			rc = epoll_wait(_epollfd, &_events[0],
@@ -195,8 +195,8 @@ public:
 				}
 				else SocketImpl::error();
 			}
+			break;
 		}
-		while (false);
 
 		ScopedLock lock(_mutex);
 

@@ -35,6 +35,7 @@ using Poco::Net::SocketStream;
 using Poco::Net::WebSocket;
 using Poco::Net::WebSocketException;
 using Poco::Net::ConnectionAbortedException;
+using Poco::IOException;
 
 
 namespace
@@ -78,6 +79,9 @@ namespace
 				}
 			}
 			catch (ConnectionAbortedException&)
+			{
+			}
+			catch (IOException&)
 			{
 			}
 		}
