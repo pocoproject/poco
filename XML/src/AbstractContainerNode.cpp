@@ -151,6 +151,80 @@ Node* AbstractContainerNode::insertBefore(Node* newChild, Node* refChild)
 }
 
 
+
+Node* AbstractContainerNode::insertAfterNP(Node* newChild, Node* refChild)
+{
+    poco_check_ptr (newChild);
+
+    if (static_cast<AbstractNode*>(newChild)->_pOwner != _pOwner && static_cast<AbstractNode*>(newChild)->_pOwner != this)
+        throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
+    if (refChild && static_cast<AbstractNode*>(refChild)->_pParent != this)
+        throw DOMException(DOMException::NOT_FOUND_ERR);
+    if (newChild == refChild)
+        return nullptr;
+    if (this == newChild)
+        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
+
+    AbstractNode* pFirst = 0;
+    AbstractNode* pLast  = 0;
+    if (newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
+    {
+        AbstractContainerNode* pFrag = static_cast<AbstractContainerNode*>(newChild);
+        pFirst = pFrag->_pFirstChild;
+        pLast  = pFirst;
+        if (pFirst)
+        {
+            while (pLast->_pNext)
+            {
+                pLast->_pParent = this;
+                pLast = pLast->_pNext;
+            }
+            pLast->_pParent = this;
+        }
+        pFrag->_pFirstChild = 0;
+    }
+    else
+    {
+        newChild->duplicate();
+        AbstractContainerNode* pParent = static_cast<AbstractNode*>(newChild)->_pParent;
+        if (pParent) pParent->removeChild(newChild);
+        pFirst = static_cast<AbstractNode*>(newChild);
+        pLast  = pFirst;
+        pFirst->_pParent = this;
+    }
+    if (_pFirstChild && pFirst)
+    {
+        AbstractNode* pCur = _pFirstChild;
+        while (pCur && pCur != refChild)
+        {
+            pCur = pCur->_pNext;
+        }
+        if (pCur)
+        {
+            pLast->_pNext = pCur->_pNext;
+            pCur->_pNext = pFirst;
+        }
+        else throw DOMException(DOMException::NOT_FOUND_ERR);
+    }
+    else
+    {
+        _pFirstChild = pFirst;
+    }
+
+    if (events())
+    {
+        while (pFirst && pFirst != pLast->_pNext)
+        {
+            pFirst->dispatchNodeInserted();
+            pFirst->dispatchNodeInsertedIntoDocument();
+            pFirst = pFirst->_pNext;
+        }
+        dispatchSubtreeModified();
+    }
+    return newChild;
+}
+
+
 Node* AbstractContainerNode::replaceChild(Node* newChild, Node* oldChild)
 {
 	poco_check_ptr (newChild);
