@@ -68,23 +68,6 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 namespace Poco {
 
 
-void toJSON(const std::string& value, std::ostream& out, bool wrap)
-{
-	int options = (wrap ? Poco::JSON_WRAP_STRINGS : 0);
-	writeString<std::ostream, std::streamsize>(value, out, &std::ostream::write, options);
-}
-
-
-std::string toJSON(const std::string& value, bool wrap)
-{
-	int options = (wrap ? Poco::JSON_WRAP_STRINGS : 0);
-	std::string ret;
-	writeString<std::string,
-				std::string::size_type>(value, ret, &std::string::append, options);
-	return ret;
-}
-
-
 void toJSON(const std::string& value, std::ostream& out, int options)
 {
 	writeString<std::ostream, std::streamsize>(value, out, &std::ostream::write, options);
