@@ -1,0 +1,5 @@
+include(CMakeFindDependencyMacro)
+find_dependency(PocoFoundation)
+find_dependency(PocoData)
+find_dependency(CppUnit)
+include("${CMAKE_CURRENT_LIST_DIR}/PocoDataTestTargets.cmake")

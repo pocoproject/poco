@@ -119,6 +119,11 @@ public:
 	bool isDeleted() const;
 		/// Returns true iff the method has been deleted.
 
+	bool isVirtual() const;
+		/// Returns true if the method is virtual. Also examines base
+		/// classes to check for a virtual function with the same
+		/// signature.
+
 	bool isStatic() const;
 		/// Returns true iff the method is static.
 
@@ -127,11 +132,6 @@ public:
 
 	std::string signature() const;
 		/// Returns the signature of the function.
-
-	bool isVirtual() const;
-		/// Returns true if the method is virtual. Also examines base
-		/// classes to check for a virtual function with the same
-		/// signature.
 
 	Function* getOverridden() const;
 		/// If the function is virtual and overrides a function in a

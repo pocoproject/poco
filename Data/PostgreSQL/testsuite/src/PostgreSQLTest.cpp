@@ -140,6 +140,32 @@ void PostgreSQLTest::testConnectNoDB()
 	}
 }
 
+
+void PostgreSQLTest::testFailedConnect()
+{
+	std::string dbConnString;
+	dbConnString +=  "host=" + getHost();
+	dbConnString += " user=invalid";
+	dbConnString +=	" password=invalid";
+	dbConnString += " port=" + getPort();
+
+	try
+	{
+		std::cout << "Attempting to Connect to [" << dbConnString << "] with invalid credentials: " << std::endl;
+		Session session(PostgreSQL::Connector::KEY, dbConnString);
+		fail ("must fail");
+	}
+	catch (ConnectionFailedException& ex)
+	{
+		std::cout  << ex.displayText() << std::endl;
+	}
+	catch (ConnectionException& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+	}
+}
+
+
 void PostgreSQLTest::testPostgreSQLOIDs()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -307,6 +333,7 @@ void PostgreSQLTest::testBarebonePostgreSQL()
 	_pExecutor->barebonePostgreSQLTest(POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_PWD, POSTGRESQL_DB, POSTGRESQL_PORT, tableCreateString.c_str());
 */
 }
+
 
 
 void PostgreSQLTest::testSimpleAccess()
@@ -765,6 +792,20 @@ void PostgreSQLTest::testReconnect()
 }
 
 
+void PostgreSQLTest::testSqlState()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	try
+	{
+		*_pSession << "syntax error", now;
+	}
+	catch (const Poco::Data::PostgreSQL::PostgreSQLException & exception)
+	{
+		assertTrue(exception.sqlState() == std::string("42601"));
+	}
+}
+
 void PostgreSQLTest::testNullableInt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1222,6 +1263,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PostgreSQLTest");
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testConnectNoDB);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedConnect);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testPostgreSQLOIDs);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBarebonePostgreSQL);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccess);
@@ -1271,6 +1313,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableInt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableString);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTupleWithNullable);
+        CppUnit_addTest(pSuite, PostgreSQLTest, testSqlState);
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccess);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexType);

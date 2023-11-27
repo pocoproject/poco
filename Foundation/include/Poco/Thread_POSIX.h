@@ -76,6 +76,7 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setSignalMaskImpl(uint32_t sigMask);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);

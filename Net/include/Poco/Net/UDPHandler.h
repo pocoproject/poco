@@ -41,7 +41,7 @@ typedef int UDPMsgSizeT;
 #define POCO_UDP_BUF_SIZE 1472 + sizeof(UDPMsgSizeT) + SocketAddress::MAX_ADDRESS_LENGTH
 
 
-template <std::size_t S = POCO_UDP_BUF_SIZE>
+template <std::size_t S = POCO_UDP_BUF_SIZE, class TMutex = Poco::FastMutex>
 class UDPHandlerImpl: public Runnable, public RefCountedObject
 	/// UDP handler handles the data that arrives to the UDP server.
 	/// The class is thread-safe and runs in its own thread, so many handlers
@@ -57,11 +57,7 @@ public:
 	typedef AutoPtr<UDPHandlerImpl> Ptr;
 	typedef std::vector<Ptr>        List;
 	typedef typename List::iterator Iterator;
-#ifdef POCO_HAVE_STD_ATOMICS
-	typedef Poco::SpinlockMutex     DFMutex;
-#else
-	typedef Poco::FastMutex         DFMutex;
-#endif
+	typedef TMutex                  DFMutex;
 
 	static const MsgSizeT BUF_STATUS_IDLE  = 0;
 	static const MsgSizeT BUF_STATUS_BUSY  = -1;
@@ -248,14 +244,14 @@ public:
 	bool hasData(char*& pBuf)
 		/// Returns true if buffer contains data.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
 	}
 
 	bool isError(char*& pBuf)
 		/// Returns true if buffer contains error.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
@@ -315,7 +311,7 @@ public:
 	}
 
 	virtual void processData(char*)
-		/// Caled when data is received by reader.
+		/// Called when data is received by reader.
 		///
 		/// No-op here, must be overridden by inheriting
 		/// class in order to do useful work.
@@ -323,7 +319,7 @@ public:
 	};
 
 	virtual void processError(char* buf)
-		/// Caled when error is detected by reader.
+		/// Called when error is detected by reader.
 		///
 		/// Only functional if stream pointer is provided
 		/// to the handler, otherwise it must be overridden
@@ -334,7 +330,7 @@ public:
 	}
 
 	void start()
-		/// Stars the handler run in thread.
+		/// Starts the handler run in thread.
 	{
 		_thread.start(*this);
 	}
@@ -353,7 +349,7 @@ private:
 
 	void setStatus(char*& pBuf, MsgSizeT status)
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		setStatusImpl(pBuf, status);
 	}
 

@@ -21,6 +21,9 @@
 #include "Poco/NumberFormatter.h"
 #include <iostream>
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/param_build.h>
+#endif
 
 namespace Poco {
 namespace Crypto {
@@ -66,7 +69,110 @@ EVPPKey::EVPPKey(const PKCS12Container& cont): EVPPKey(cont.getKey())
 	checkType();
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 
+void pushBuildParamBignum(OSSL_PARAM_BLD* paramBld, const char* key, const std::vector<unsigned char>& bytes, BIGNUM** pBigNum)
+{
+	poco_check_ptr(pBigNum);
+	if (!(*pBigNum = BN_bin2bn(bytes.data(), (int)bytes.size(), nullptr)))
+	{
+		std::string msg = "pushBuildParamBignum(): BN_bin2bn()\n";
+		throw OpenSSLException(getError(msg));
+	}
+
+	OSSL_PARAM_BLD_push_BN(paramBld, key, *pBigNum);
+}
+
+
+OSSL_PARAM* getKeyParameters(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey)
+{
+	BIGNUM* pBigNum1 = nullptr;
+	BIGNUM* pBigNum2 = nullptr;
+	OSSL_PARAM* parameters = nullptr;
+	auto paramBld = OSSL_PARAM_BLD_new();
+	if (!paramBld)
+	{
+		std::string msg = "getKeyParameters(): OSSL_PARAM_BLD_new()\n";
+		throw OpenSSLException(getError(msg));
+	}
+
+	try
+	{
+		if (publicKey != nullptr)
+			pushBuildParamBignum(paramBld, "n", *publicKey, &pBigNum1);
+
+		if (privateKey != nullptr)
+			pushBuildParamBignum(paramBld, "d", *privateKey, &pBigNum2);
+
+		// default rsa exponent
+		OSSL_PARAM_BLD_push_ulong(paramBld, "e", RSA_F4);
+
+		parameters = OSSL_PARAM_BLD_to_param(paramBld);
+		if (!parameters)
+		{
+			std::string msg = "getKeyParameters(): OSSL_PARAM_BLD_to_param()\n";
+			throw OpenSSLException(getError(msg));
+		}
+	}
+	catch(OpenSSLException&)
+	{
+		OSSL_PARAM_BLD_free(paramBld);
+		throw;
+	}
+
+	OSSL_PARAM_BLD_free(paramBld);
+	BN_clear_free(pBigNum1);
+	BN_clear_free(pBigNum2);
+
+	return parameters;
+}
+
+
+void EVPPKey::setKeyFromParameters(OSSL_PARAM* parameters)
+{
+	auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
+	if (EVP_PKEY_fromdata_init(ctx) <= 0)
+	{
+		OSSL_PARAM_free(parameters);
+		EVP_PKEY_CTX_free(ctx);
+		throw OpenSSLException("EVPPKey cannot init create key");
+	}
+
+	if (_pEVPPKey != 0) EVP_PKEY_free(_pEVPPKey);
+	if (EVP_PKEY_fromdata(ctx, &_pEVPPKey, EVP_PKEY_KEYPAIR, parameters) <= 0)
+	{
+		OSSL_PARAM_free(parameters);
+		EVP_PKEY_CTX_free(ctx);
+		throw OpenSSLException("EVPPKey cannot create key");
+	}
+
+	EVP_PKEY_CTX_free(ctx);
+}
+
+
+EVPPKey::EVPPKey(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key, unsigned long exponent, int type) : _pEVPPKey(0)
+{
+	if ((EVP_PKEY_RSA != type) || (RSA_F4 != exponent))
+	{
+		std::string msg = Poco::format("EVPPKey(%d):Invalid format\n", type);
+		throw OpenSSLException(getError(msg));
+	}
+
+	OSSL_PARAM* parameters = getKeyParameters(public_key, private_key);
+	if (parameters)
+	{
+		setKeyFromParameters(parameters);
+		OSSL_PARAM_free(parameters);
+	}
+	else
+	{
+		std::string msg = "EVPPKey(): getKeyParameters()\n";
+		throw OpenSSLException(getError(msg));
+	}
+}
+
+#endif
+	
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 EVPPKey::EVPPKey(int type, int param): _pEVPPKey(0)

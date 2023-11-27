@@ -19,6 +19,9 @@
 #include "Poco/Process.h"
 #endif
 #include "Poco/Mutex.h"
+#include "Poco/Random.h"
+#include <algorithm>
+#include <random>
 #include <set>
 #include <sstream>
 
@@ -132,19 +135,36 @@ void TemporaryFile::registerForDeletion(const std::string& path)
 }
 
 
-namespace
-{
-	static FastMutex mutex;
-}
-
-
 std::string TemporaryFile::tempName(const std::string& tempDir)
 {
-	std::ostringstream name;
+	static constexpr int UNIQUE_LENGTH = 8;
+	static FastMutex mutex;
 	static unsigned long count = 0;
-	mutex.lock();
-	unsigned long n = count++;
-	mutex.unlock();
+	static Poco::Random random;
+	static std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
+	static std::string randomChars;
+
+	unsigned long n;
+	{
+		Poco::FastMutex::ScopedLock lock(mutex);
+
+		if (count == 0) 
+		{
+			random.seed();
+			
+			std::random_device rd;
+			std::mt19937 mt(rd());
+			randomChars.reserve(alphabet.size() * UNIQUE_LENGTH);
+			for (int i = 0; i < UNIQUE_LENGTH; i++)
+			{
+				std::shuffle(alphabet.begin(), alphabet.end(), mt);
+				randomChars.append(alphabet);
+			}
+		}
+		n = (count += random.next(1000) + 1);
+	}
+
+	std::ostringstream name;
 	name << (tempDir.empty() ? Path::temp() : tempDir);
 	if (name.str().at(name.str().size() - 1) != Path::separator())
 	{
@@ -155,9 +175,9 @@ std::string TemporaryFile::tempName(const std::string& tempDir)
 #else
 	name << "tmp" << Process::id();
 #endif
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < UNIQUE_LENGTH; i++)
 	{
-		name << char('a' + (n % 26));
+		name << randomChars[alphabet.size()*i + (n % 26)];
 		n /= 26;
 	}
 	return name.str();

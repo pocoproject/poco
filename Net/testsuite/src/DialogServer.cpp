@@ -108,6 +108,7 @@ const std::string& DialogServer::lastCommand() const
 
 const std::vector<std::string>& DialogServer::lastCommands() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _lastCommands;
 }
 

@@ -5,7 +5,7 @@
 #
 
 IPHONE_SDK         = iPhoneSimulator
-POCO_TARGET_OSARCH = i686
-OSFLAGS            = -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
+POCO_TARGET_OSARCH = x86_64
+OSFLAGS            = -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -miphonesimulator-version-min=$(IPHONE_SDK_VERSION_MIN)
 
 include $(POCO_BASE)/build/config/iPhone-clang

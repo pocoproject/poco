@@ -26,19 +26,25 @@ class ODBCSQLServerTest: public ODBCTest
 	/// SQLServer ODBC test class
 	/// Tested:
 	///
-	/// Driver				|	DB								| OS
-	/// --------------------+-----------------------------------+------------------------------------------
-	/// 2000.86.1830.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
-	/// 2005.90.2047.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
-	/// 2009.100.1600.01	| SQL Server Express 10.50.1600.1	| MS Windows XP Professional x64 v.2003/SP1
+	///  Driver name                        | Driver version    | DB version            | OS
+	/// ------------------------------------+-------------------+-----------------------+------------------------------------------
+	///  SQL Server Express 9.0.2047        | 2000.86.1830.00   |                       | MS Windows XP Professional x64 v.2003/SP1
+	///  SQL Server Express 9.0.2047        | 2005.90.2047.00   |                       | MS Windows XP Professional x64 v.2003/SP1
+	///  SQL Server Express 10.50.1600.1    | 2009.100.1600.01  |                       | MS Windows XP Professional x64 v.2003/SP1
+	///  SQL Server                         | 10.00.22621.1992  | 16.0.1000.6 (64-bit)  | Windows 11
+	///  ODBC Driver 17 for SQL Server      | 2017.1710.03.01   | 16.0.1000.6 (64-bit)  | Windows 11
+	///  ODBC Driver 18 for SQL Server      | 2018.183.01.01    | 16.0.1000.6 (64-bit)  | Windows 11
 	///
-
+	/// Drivers download (x86, x64, ARM64):
+	/// https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
 {
 public:
 	ODBCSQLServerTest(const std::string& name);
 	~ODBCSQLServerTest();
 
 	void testBareboneODBC();
+
+	void testTempTable();
 
 	void testBLOB();
 	void testNull();
@@ -49,6 +55,7 @@ public:
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
 
+	void testStoredProcedureReturn();
 	void testStoredFunction();
 
 	static CppUnit::Test* suite();

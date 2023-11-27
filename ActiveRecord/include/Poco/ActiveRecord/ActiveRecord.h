@@ -162,7 +162,7 @@ template <typename IDType>
 const IDType ActiveRecord<IDType>::INVALID_ID = IDTraits<IDType>::INVALID_ID;
 
 
-class KeylessActiveRecord: public ActiveRecordBase
+class ActiveRecordLib_API KeylessActiveRecord: public ActiveRecordBase
 	/// The base class for all database objects that
 	/// implement the ActiveRecord pattern, without
 	/// a key column.

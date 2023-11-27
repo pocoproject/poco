@@ -71,12 +71,12 @@ void Task::run()
 	catch (std::exception& exc)
 	{
 		if (pOwner)
-			pOwner->taskFailed(this, SystemException(exc.what()));
+			pOwner->taskFailed(this, SystemException("Task::run()", exc.what()));
 	}
 	catch (...)
 	{
 		if (pOwner)
-			pOwner->taskFailed(this, SystemException("unknown exception"));
+			pOwner->taskFailed(this, SystemException("Task::run(): unknown exception"));
 	}
 	_state = TASK_FINISHED;
 	if (pOwner) pOwner->taskFinished(this);
@@ -98,11 +98,9 @@ bool Task::yield()
 
 void Task::setProgress(float progress)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	if (_progress != progress)
+	if (_progress.exchange(progress) != progress)
 	{
-		_progress = progress;
+		FastMutex::ScopedLock lock(_mutex);
 		if (_pOwner)
 			_pOwner->taskProgress(this, _progress);
 	}
@@ -112,7 +110,6 @@ void Task::setProgress(float progress)
 void Task::setOwner(TaskManager* pOwner)
 {
 	FastMutex::ScopedLock lock(_mutex);
-
 	_pOwner = pOwner;
 }
 

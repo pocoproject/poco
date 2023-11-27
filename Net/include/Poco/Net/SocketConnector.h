@@ -73,14 +73,14 @@ class SocketConnector
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	explicit SocketConnector(SocketAddress& address):
+	explicit SocketConnector(const SocketAddress& address):
 		_pReactor(0)
 		/// Creates a SocketConnector, using the given Socket.
 	{
 		_socket.connectNB(address);
 	}
 
-	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
+	SocketConnector(const SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
 		_pReactor(0)
 		/// Creates an connector, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.

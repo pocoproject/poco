@@ -24,7 +24,9 @@
 #include "Poco/Timestamp.h"
 #include <atomic>
 
-
+#ifdef POCO_ENABLE_STD_MUTEX
+#include "Poco/Mutex_STD.h"
+#else
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Poco/Mutex_WINCE.h"
@@ -35,6 +37,7 @@
 #include "Poco/Mutex_VX.h"
 #else
 #include "Poco/Mutex_POSIX.h"
+#endif
 #endif
 
 
@@ -158,8 +161,9 @@ class Foundation_API SpinlockMutex
 	///
 	/// While in some cases (eg. locking small blocks of code)
 	/// busy-waiting may be an optimal solution, in many scenarios
-	/// spinlock may not be the right choice - it is up to the user to
-	/// choose the proper mutex type for their particular case.
+	/// spinlock may not be the right choice (especially on single-core
+	/// systems) - it is up to the user to choose the proper mutex type
+	/// for their particular case.
 	///
 	/// Works with the ScopedLock class.
 {

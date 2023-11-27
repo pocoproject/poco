@@ -15,6 +15,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
 #include "Poco/AutoPtr.h"
+#include <iostream>
 
 
 using Poco::Task;
@@ -34,20 +35,42 @@ namespace
 
 		void runTask()
 		{
-			_event.wait();
-			if (sleep(10))
-				return;
-			setProgress(0.5);
-			_event.wait();
-			if (isCancelled())
-				return;
-			setProgress(1.0);
-			_event.wait();
+			try
+			{
+				_event.wait();
+				if (sleep(100))
+					return;
+				setProgress(0.5);
+				_event.wait();
+				if (isCancelled())
+					return;
+				setProgress(1.0);
+				_event.wait();
+			}
+			catch(const Poco::Exception& e)
+			{
+				std::cerr << "TestTask::run(): " << e.displayText() << '\n';
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << "TestTask::run(): " << e.what() << '\n';
+			}
+			catch(...)
+			{
+				std::cerr << "TestTask::run(): unknown exception." << '\n';
+			}
 		}
 
 		void cont()
 		{
-			_event.set();
+			try
+			{
+				_event.set();
+			}
+			catch(const Poco::SystemException& e)
+			{
+				std::cerr << "TestTask::cont(): " << e.displayText() << '\n';
+			}
 		}
 
 	private:
@@ -108,6 +131,8 @@ void TaskTest::testCancel2()
 	assertTrue (pTT->state() == Task::TASK_IDLE);
 	Thread thr;
 	thr.start(*pTT);
+	while (pTT->state() != Task::TASK_RUNNING)
+		Thread::sleep(50);
 	assertTrue (pTT->progress() == 0);
 	pTT->cancel();
 	assertTrue (pTT->state() == Task::TASK_CANCELLING);

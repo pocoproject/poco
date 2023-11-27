@@ -1,0 +1,356 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+  {
+    "name": "Linux GDB Foundation Test",
+    "variables": {
+      "libName": "Foundation"
+    },
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/${libName}/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "environment": [ { "name": "PATH", "value": "${env:PATH}:${workspaceFolder}/${libName}/testsuite/bin/${env:OSNAME}/${env:OSARCH}" } ],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB XML Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/XML/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB JSON Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/JSON/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Util Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Util/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Net Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Net/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Crypto Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Crypto/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Net SSL Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/NetSSL_OpenSSL/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Data Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Data/SQLite Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/SQLite/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Data/ODBC Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/ODBC/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Data/MySQL Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/MySQL/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Data/PostgreSQL Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/PostgreSQL/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB MongoDB Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/MongoDB/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  {
+    "name": "Linux GDB Redis Test",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/Redis/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "setupCommands": [
+      {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+      }
+      ]
+  },
+  /********************************************************************************************************************************
+   *  Following configurations are multiplatform; lldb and CodeLLDB required:                                                     *
+   *  https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb                                                     *
+   *                                                                                                                              *
+   *  OSX SIP notes:                                                                                                              *
+   *    1. DYLD_LIBRARY_PATH is not passed to VSCode (even when launched from terminal having it properly set)                    *
+   *    2. the consequence is that the POCO libraries can only be found if they (or links to them) are in the system library path *
+   *    3. binaries or symbolic links can not be placed in `/usr/lib`, only in `/usr/local/lib`                                   *
+   *    4. SIP can be disabled (not recommended)                                                                                  *
+   *      https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection                   *
+   ********************************************************************************************************************************/
+  {
+    "name": "CodeLLDB Foundation Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Foundation/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Net Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Net/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB JSON Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/JSON/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB XML Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/XML/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Util Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Util/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Data Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Data/SQLite Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/SQLite/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Data/ODBC Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/ODBC/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Data/MySQL Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/MySQL/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Data/PostgreSQL Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Data/PostgreSQL/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB MongoDB Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/MongoDB/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  },
+  {
+    "name": "CodeLLDB Redis Test",
+    "type": "lldb",
+    "request": "launch",
+    "program": "${workspaceFolder}/Redis/testsuite/bin/${env:OSNAME}/${env:OSARCH}/testrunnerd",
+    "args": ["-all"]
+  }
+  ]
+}

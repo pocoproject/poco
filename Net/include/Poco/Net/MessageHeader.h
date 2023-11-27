@@ -87,6 +87,23 @@ public:
 		/// Throws a MessageException if the input stream is
 		/// malformed.
 
+	void setAutoDecode(bool convert);
+		/// Enables or disables automatic conversion of HTTP header values
+		/// when reading HTTP header.
+
+	bool getAutoDecode() const;
+		/// Returns true if automatic conversion of HTTP header values
+		/// when reading HTTP header.
+
+	std::string getDecoded(const std::string& name) const;
+		/// Get decoded header value. It does conversion if it was not
+		/// automatically converted when reading.
+
+	std::string getDecoded(const std::string& name, const std::string& defaultValue) const;
+		/// Get decoded header value. It does conversion if it was not
+		/// automatically converted when reading.
+		/// Default value is returned if the name does not exist.
+
 	int getFieldLimit() const;
 		/// Returns the maximum number of header fields
 		/// allowed.
@@ -122,7 +139,7 @@ public:
 		/// The default limit is 8192.
 
 	bool hasToken(const std::string& fieldName, const std::string& token) const;
-		/// Returns true iff the field with the given fieldName contains
+		/// Returns true if the field with the given fieldName contains
 		/// the given token. Tokens in a header field are expected to be
 		/// comma-separated and are case insensitive.
 
@@ -182,6 +199,8 @@ private:
 	int _fieldLimit;
 	int _nameLengthLimit;
 	int _valueLengthLimit;
+	bool _autoDecode;
+	bool _decodedOnRead;
 
 };
 

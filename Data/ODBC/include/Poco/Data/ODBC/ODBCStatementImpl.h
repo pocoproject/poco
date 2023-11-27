@@ -88,8 +88,14 @@ protected:
 	AbstractBinding::BinderPtr binder();
 		/// Returns the concrete binder used by the statement.
 
+	void execDirectImpl(const std::string& query);
+		/// Execute query directly impl
+
 	std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
+
+	void printErrors(std::ostream& os) const;
+		/// Print errors, if any.
 
 private:
 	typedef Poco::Data::AbstractBindingVec    Bindings;
@@ -140,17 +146,26 @@ private:
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
-	const SQLHDBC&        _rConnection;
-	const StatementHandle _stmt;
-	PreparatorVec         _preparations;
-	BinderPtr             _pBinder;
-	ExtractorVec          _extractors;
-	bool                  _stepCalled;
-	int                   _nextResponse;
-	ColumnPtrVecVec       _columnPtrs;
-	bool                  _prepared;
-	mutable std::size_t   _affectedRowCount;
-	bool                  _canCompile;
+	struct ERROR_INFO
+	{
+		SQLCHAR state[8];
+		SQLINTEGER native;
+		SQLCHAR text[256];
+	};
+	void addErrors();
+
+	const SQLHDBC&          _rConnection;
+	const StatementHandle   _stmt;
+	PreparatorVec           _preparations;
+	BinderPtr               _pBinder;
+	ExtractorVec            _extractors;
+	bool                    _stepCalled;
+	int                     _nextResponse;
+	ColumnPtrVecVec         _columnPtrs;
+	bool                    _prepared;
+	mutable std::size_t     _affectedRowCount;
+	bool                    _canCompile;
+	std::vector<ERROR_INFO> _errorInfo;
 };
 
 

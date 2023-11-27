@@ -176,7 +176,8 @@ public:
 		/// value denoting a certain condition.
 
 	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
-		/// Receives data from the socket and stores it in buffers.
+		/// Sends the contents of the given buffers through
+		/// the socket.
 		///
 		/// Returns the number of bytes received.
 		///

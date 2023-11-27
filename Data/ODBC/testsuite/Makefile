@@ -22,7 +22,9 @@ ifneq ($(OSNAME),Darwin)
 SYSLIBS += -lltdl
 endif
 ifneq ($(OSNAME),FreeBSD)
+ifneq ($(OSNAME),Darwin)
 SYSLIBS += -ldl
+endif
 endif
 
 objects = ODBCTestSuite Driver \
@@ -33,8 +35,13 @@ ifeq ($(POCO_CONFIG),MinGW)
 	objects += ODBCAccessTest
 endif
 
-target         = testrunner
-target_version = 1
-target_libs    = PocoDataODBC PocoData PocoFoundation CppUnit
+ifndef POCO_DATA_NO_SQL_PARSER
+	target_includes += $(POCO_BASE)/Data/src
+endif
+
+target           = testrunner
+target_version   = 1
+target_libs      = PocoDataODBC PocoDataTest PocoData PocoFoundation CppUnit
+target_includes += $(POCO_BASE)/Data/testsuite/DataTest/include
 
 include $(POCO_BASE)/build/rules/exec

@@ -21,6 +21,13 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include <signal.h>
+
+#if POCO_OS == POCO_OS_FREE_BSD
+#    include <sys/thr.h>
+#    include <pthread_np.h>
+#    include <osreldate.h>
+#endif
+
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
@@ -28,6 +35,10 @@
 #endif
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
+#endif
+
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
 #endif
 
 #if POCO_OS == POCO_OS_LINUX
@@ -39,6 +50,10 @@
 #endif
 #include <iostream>
 
+
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
+#endif
 
 //
 // Block SIGPIPE in main thread.
@@ -65,24 +80,40 @@ namespace
 }
 #endif
 
-
 namespace
 {
-	void setThreadName(const std::string& threadName)
+	std::string truncName(const std::string& name)
 	{
-#if (POCO_OS == POCO_OS_MAC_OS_X)
-		if (pthread_setname_np(threadName.c_str()))
+		if (name.size() > POCO_MAX_THREAD_NAME_LEN)
+			return name.substr(0, POCO_MAX_THREAD_NAME_LEN).append("~");
+		return name;
+	}
+
+	void setThreadName(const std::string& threadName)
+		/// Sets thread name. Support for this feature varies
+		/// on platforms. Any errors are ignored.
+	{
+#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version < 1300000
+		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
+#elif (POCO_OS == POCO_OS_MAC_OS_X)
+	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+			pthread_setname_np(truncName(threadName).c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+		#endif
+	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
 #else
-		if (pthread_setname_np(pthread_self(), threadName.c_str()))
+		prctl(PR_SET_NAME, truncName(threadName).c_str());
 #endif
-			throw Poco::SystemException("cannot set thread name");
 	}
 
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
-		if (pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1))
-			throw Poco::SystemException("cannot get thread name");
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+		prctl(PR_GET_NAME, name);
+#else
+		pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
+#endif
 		return name;
 	}
 }
@@ -226,6 +257,21 @@ void ThreadImpl::setStackSizeImpl(int size)
 }
 
 
+void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
+{
+	sigset_t sset;
+	sigemptyset(&sset);
+
+	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig) 
+	{
+		if ((sigMask & (1 << sig)) != 0)
+			sigaddset(&sset, sig);
+	}
+	
+	pthread_sigmask(SIG_BLOCK, &sset, 0);
+}
+
+
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
 	{
@@ -319,11 +365,17 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 long ThreadImpl::currentOsTidImpl()
 {
 #if POCO_OS == POCO_OS_LINUX
-    return ::syscall(SYS_gettid);
+	return ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
-    return ::pthread_mach_thread_np(::pthread_self());
+	return ::pthread_mach_thread_np(::pthread_self());
+#elif POCO_OS == POCO_OS_FREE_BSD
+	long id;
+	if(thr_self(&id) < 0) {
+		return 0;
+	}
+	return id;
 #else
-    return ::pthread_self();
+	return ::pthread_self();
 #endif
 }
 
@@ -341,7 +393,8 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
-	auto* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 
 	{

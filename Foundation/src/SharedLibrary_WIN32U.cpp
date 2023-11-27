@@ -55,7 +55,7 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 	{
 		DWORD errn = Error::last();
 		std::string err;
-		Poco::format(err, "Error %ul while loading [%s]: [%s]", errn, path, Poco::trim(Error::getMessage(errn)));
+		Poco::format(err, "Error %lu while loading [%s]: [%s]", errn, path, Poco::trim(Error::getMessage(errn)));
 		throw LibraryLoadException(err);
 	}
 	_path = path;

@@ -42,16 +42,16 @@ endif()
 # Setup C/C++ compiler options
 #################################################################################
 
-# C++11/14 compiler flags
+# C++11/17 compiler flags
 include(CXX1x)
-check_for_cxx14_compiler(CXX14_COMPILER)
+check_for_cxx17_compiler(CXX17_COMPILER)
 
-# If a C++14 compiler is available, then set the appropriate flags
-if(CXX14_COMPILER)
-	set(CMAKE_CXX_STANDARD 14)
+# If a C++17 compiler is available, then set the appropriate flags
+if(CXX17_COMPILER)
+	set(CMAKE_CXX_STANDARD 17)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else()
-	message(FATAL_ERROR "Compiler does not support C++14.")
+	message(FATAL_ERROR "Compiler does not support C++17.")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -205,8 +205,15 @@ if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
   set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
 
+if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
+  set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
 option(ENABLE_TESTS
-	"Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
+	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
+
+option(ENABLE_SAMPLES
+	"Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
@@ -232,6 +239,11 @@ if(POCO_NO_FORK_EXEC)
   add_definitions(-DPOCO_NO_FORK_EXEC=1)
 endif()
 
+option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
+
+if (POCO_ENABLE_STD_MUTEX)
+	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
+endif ()
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
@@ -279,9 +291,6 @@ endif()
 
 if(ENABLE_NETSSL_WIN)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-	if(ENABLE_TESTS)
-		set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-	endif()
 endif()
 
 if(ENABLE_NETSSL)
@@ -398,7 +407,13 @@ if(OPENSSL_FOUND)
 	endif()
 endif(OPENSSL_FOUND)
 
+
+option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
+	if(POCO_DATA_NO_SQL_PARSER)
+		add_definitions(-DPOCO_DATA_NO_SQL_PARSER=1)
+	endif()
 	add_subdirectory(Data)
 	list(APPEND Poco_COMPONENTS "Data")
 endif()

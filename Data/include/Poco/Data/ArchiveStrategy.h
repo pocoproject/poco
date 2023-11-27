@@ -180,7 +180,8 @@ public:
 	ArchiveByAgeStrategy(const std::string& connector,
 		const std::string& connect,
 		const std::string& sourceTable,
-		const std::string& destinationTable = DEFAULT_ARCHIVE_DESTINATION);
+		const std::string& destinationTable = DEFAULT_ARCHIVE_DESTINATION,
+		const std::string& age = "");
 
 	~ArchiveByAgeStrategy();
 

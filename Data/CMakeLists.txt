@@ -1,6 +1,11 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
+if (NOT POCO_DATA_NO_SQL_PARSER)
+	file(GLOB_RECURSE SRCS_PARSER "src/sql-parser/src/*.cpp")
+	LIST(REMOVE_ITEM SRCS_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/sql-parser/src/parser/conflict_test.cpp")
+	POCO_SOURCES_AUTO(SRCS ${SRCS_PARSER})
+endif()
 
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
@@ -26,16 +31,24 @@ set_target_properties(Data
 	DEFINE_SYMBOL Data_EXPORTS
 )
 
+if (NOT POCO_DATA_NO_SQL_PARSER)
+	target_compile_definitions(Data PUBLIC -DSQLParser_EXPORTS)
+endif()
 target_link_libraries(Data PUBLIC Poco::Foundation)
 target_include_directories(Data
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 POCO_INSTALL(Data)
 POCO_GENERATE_PACKAGE(Data)
+
+if(ENABLE_TESTS)
+	add_subdirectory(testsuite)
+endif()
 
 if(ENABLE_DATA_SQLITE)
 	# SQlite3 is built in any case
@@ -66,7 +79,6 @@ else()
 	message(STATUS "ODBC Support Disabled")
 endif()
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
-	add_subdirectory(testsuite)
 endif()

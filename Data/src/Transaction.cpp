@@ -85,21 +85,28 @@ void Transaction::execute(const std::string& sql, bool doCommit)
 }
 
 
-void Transaction::execute(const std::vector<std::string>& sql)
+bool Transaction::execute(const std::vector<std::string>& sql)
+{
+	return execute(sql, nullptr);
+}
+
+bool Transaction::execute(const std::vector<std::string>& sql, std::string* info)
 {
 	try
 	{
 		std::vector<std::string>::const_iterator it = sql.begin();
 		std::vector<std::string>::const_iterator end = sql.end();
 		for (; it != end; ++it)	execute(*it, it + 1 == end ? true : false);
-		return;
+		return true;
 	}
 	catch (Exception& ex)
 	{
 		if (_pLogger) _pLogger->log(ex);
+		if(info) *info = ex.displayText();
 	}
 
 	rollback();
+	return false;
 }
 
 

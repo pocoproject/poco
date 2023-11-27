@@ -108,7 +108,7 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// shutdown processing.
 	///
 	/// The SocketReactor is implemented so that it can run in its own thread.
-	/// Moreover, the thread affinity to a CPU core can optionally  be set for the
+	/// Moreover, the thread affinity to a CPU core can optionally be set for the
 	/// thread on platforms where that functionality is supported and implemented.
 	/// It is also possible to run multiple SocketReactors in parallel, as long
 	/// as they work on different sockets.

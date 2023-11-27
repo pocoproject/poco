@@ -133,6 +133,14 @@ public:
 		/// If newChild is a DocumentFragment object, all of its children are
 		/// inserted in the same order, before refChild. If the newChild is already
 		/// in the tree, it is first removed.
+	
+	virtual Node* insertAfterNP(Node* newChild, Node* refChild) = 0;
+		/// Inserts the node newChild after the existing child node refChild.
+		///
+		/// If refChild is null, insert newChild at the beginning of the list of children.
+		/// If newChild is a DocumentFragment object, all of its children are
+		/// inserted in the same order, after refChild. If the newChild is already
+		/// in the tree, it is first removed.
 
 	virtual Node* replaceChild(Node* newChild, Node* oldChild) = 0;
 		/// Replaces the child node oldChild with newChild in the list of children,

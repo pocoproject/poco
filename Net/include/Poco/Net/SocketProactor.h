@@ -199,7 +199,7 @@ public:
 		/// Returns true if this proactor is running
 
 	bool ioCompletionInProgress() const;
-		/// Returns true if there are not executed handlers from last IO..
+		/// Returns true if there are not executed handlers from last IO.
 
 private:
 	void onShutdown();

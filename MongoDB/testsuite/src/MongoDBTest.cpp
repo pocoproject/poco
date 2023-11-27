@@ -17,6 +17,7 @@
 #include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Binary.h"
@@ -32,6 +33,7 @@ using namespace Poco::MongoDB;
 
 
 Poco::MongoDB::Connection::Ptr MongoDBTest::_mongo;
+Poco::Int64 MongoDBTest::_wireVersion {0};
 
 
 MongoDBTest::MongoDBTest(const std::string& name):
@@ -92,24 +94,25 @@ void MongoDBTest::testArray()
 	arr->add(false);
 
 	// Document-style interface
-	arr->add("4", "12.4");
+	arr->add("4", "12.4E");
 
 	assertEqual(arr->size(), 5);
 	assertTrue(arr->exists("0"));
 	assertTrue(arr->exists("1"));
 	assertTrue(arr->exists("2"));
 	assertTrue(arr->exists("3"));
-	assertFalse(arr->exists("4"));
+	assertTrue(arr->exists("4"));
+	assertFalse(arr->exists("5"));
 
 	assertEqual(arr->get<std::string>(0), "First");
 	assertEqual(arr->get<Poco::Timestamp>(1).raw(), birthdate.timestamp().raw());
 	assertEqual(arr->get<Poco::Int32>(2), 1993);
 	assertEqual(arr->get<bool>(3), false);
-	assertEqual(arr->get<std::string>(4), "12.4");
+	assertEqual(arr->get<std::string>(4), "12.4E");
 
 	// Document-style interface
 	assertEqual(arr->get<Poco::Int32>("2"), 1993);
-	assertEqual(arr->get<std::string>("4"), "12.4");
+	assertEqual(arr->get<std::string>("4"), "12.4E");
 
 }
 
@@ -294,33 +297,33 @@ void MongoDBTest::testCursorRequest()
 	_mongo->sendRequest(drop, responseDrop);
 }
 
-
 void MongoDBTest::testBuildInfo()
 {
-	Poco::MongoDB::QueryRequest request("team.$cmd");
-	request.setNumberToReturn(1);
-	request.selector().add("buildInfo", 1);
+	// build info can be issued on "config" system database
 
-	Poco::MongoDB::ResponseMessage response;
-
+	Poco::MongoDB::Database db("config");
 	try
 	{
-		_mongo->sendRequest(request, response);
+		Poco::MongoDB::Document::Ptr doc = db.queryBuildInfo(*_mongo);
+		std::cout << doc->toString(2);
 	}
 	catch(Poco::NotImplementedException& nie)
 	{
 		std::cout << nie.message() << std::endl;
-		return;
 	}
+}
 
-	if ( response.documents().size() > 0 )
+void MongoDBTest::testHello()
+{
+	Poco::MongoDB::Database db("config");
+	try
 	{
-		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		Poco::MongoDB::Document::Ptr doc = db.queryServerHello(*_mongo);
 		std::cout << doc->toString(2);
 	}
-	else
+	catch(Poco::NotImplementedException& nie)
 	{
-		fail("Didn't get a response from the buildinfo command");
+		std::cout << nie.message() << std::endl;
 	}
 }
 
@@ -497,8 +500,14 @@ CppUnit::Test* MongoDBTest::suite()
 #endif
 	try
 	{
+		_wireVersion = 0;
 		_mongo = new Poco::MongoDB::Connection(host, 27017);
 		std::cout << "Connected to [" << host << ":27017]" << std::endl;
+
+		Poco::MongoDB::Database db("config");
+		Poco::MongoDB::Document::Ptr doc = db.queryServerHello(*_mongo);
+		_wireVersion = doc->getInteger("maxWireVersion");
+		std::cout << "MongoDB wire version: " << _wireVersion << std::endl;
 	}
 	catch (Poco::Net::ConnectionRefusedException& e)
 	{
@@ -506,20 +515,53 @@ CppUnit::Test* MongoDBTest::suite()
 		return 0;
 	}
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
-	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
-	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
-	CppUnit_addTest(pSuite, MongoDBTest, testArray);
-	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
-	CppUnit_addTest(pSuite, MongoDBTest, testDBQueryRequest);
-	CppUnit_addTest(pSuite, MongoDBTest, testCountCommand);
-	CppUnit_addTest(pSuite, MongoDBTest, testDBCountCommand);
-	CppUnit_addTest(pSuite, MongoDBTest, testDBCount2Command);
-	CppUnit_addTest(pSuite, MongoDBTest, testConnectionPool);
-	CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
-	CppUnit_addTest(pSuite, MongoDBTest, testCursorRequest);
+
 	CppUnit_addTest(pSuite, MongoDBTest, testObjectID);
-	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
-	CppUnit_addTest(pSuite, MongoDBTest, testUUID);
+	CppUnit_addTest(pSuite, MongoDBTest, testArray);
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectURI);
+	CppUnit_addTest(pSuite, MongoDBTest, testHello);
+	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
+
+	if (_wireVersion < Poco::MongoDB::Database::VER_51)		
+	{
+		// Database supports old wire protocol
+		CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
+		CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
+		CppUnit_addTest(pSuite, MongoDBTest, testDBQueryRequest);
+		CppUnit_addTest(pSuite, MongoDBTest, testCountCommand);
+		CppUnit_addTest(pSuite, MongoDBTest, testDBCountCommand);
+		CppUnit_addTest(pSuite, MongoDBTest, testDBCount2Command);
+		CppUnit_addTest(pSuite, MongoDBTest, testConnectionPool);
+		CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
+
+		CppUnit_addTest(pSuite, MongoDBTest, testCursorRequest);
+		CppUnit_addTest(pSuite, MongoDBTest, testCommand);
+		CppUnit_addTest(pSuite, MongoDBTest, testUUID);
+	}
+
+	if (_wireVersion >= Poco::MongoDB::Database::VER_36)
+	{
+		// Database supports OP_MSG wire protocol
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdWriteRead);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdHello);
+
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdInsert);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdFind);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCount);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdConnectionPool);
+
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdDelete);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdUnaknowledgedInsert);
+		
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursor);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorAggregate);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdKillCursor);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorEmptyFirstBatch);
+		
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdUUID);
+
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdDropDatabase);		
+	}
+
 	return pSuite;
 }

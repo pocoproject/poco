@@ -41,6 +41,7 @@ public:
 	void testRSAEVPKeyByLength();
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	void testECEVPKeyByLength();
+	void testEVPKeyByModulus();
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
 #endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 

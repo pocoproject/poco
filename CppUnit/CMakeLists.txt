@@ -38,3 +38,6 @@ elseif(MINGW)
 		PUBLIC
 			_DLL)
 endif()
+
+POCO_INSTALL(CppUnit)
+POCO_GENERATE_PACKAGE(CppUnit)
