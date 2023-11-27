@@ -32,6 +32,7 @@ class Net_API ServerSocketImpl: public SocketImpl
 public:
 	ServerSocketImpl();
 		/// Creates the ServerSocketImpl.
+
 protected:
 	virtual ~ServerSocketImpl();
 		/// Destroys the ServerSocketImpl.
