@@ -32,6 +32,7 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 {
 	bool wrap = ((options & Poco::JSON_WRAP_STRINGS) != 0);
 	bool escapeAllUnicode = ((options & Poco::JSON_ESCAPE_UNICODE) != 0);
+	bool lowerCaseHex = ((options & Poco::JSON_LOWERCASE_HEX) != 0);
 
 	if (value.size() == 0)
 	{
@@ -42,7 +43,7 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 	if(wrap) (obj.*write)("\"", 1);
 	if(escapeAllUnicode)
 	{
-		std::string str = Poco::UTF8::escape(value.begin(), value.end(), true);
+		std::string str = Poco::UTF8::escape(value.begin(), value.end(), true, lowerCaseHex);
 		(obj.*write)(str.c_str(), str.size());
 	}
 	else
@@ -51,7 +52,7 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 		{
 			if ((*it >= 0 && *it <= 31) || (*it == '"') || (*it == '\\'))
 			{
-				std::string str = Poco::UTF8::escape(it, it + 1, true);
+				std::string str = Poco::UTF8::escape(it, it + 1, true, lowerCaseHex);
 				(obj.*write)(str.c_str(), str.size());
 			}
 			else (obj.*write)(&(*it), 1);
@@ -65,23 +66,6 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 
 
 namespace Poco {
-
-
-void toJSON(const std::string& value, std::ostream& out, bool wrap)
-{
-	int options = (wrap ? Poco::JSON_WRAP_STRINGS : 0);
-	writeString<std::ostream, std::streamsize>(value, out, &std::ostream::write, options);
-}
-
-
-std::string toJSON(const std::string& value, bool wrap)
-{
-	int options = (wrap ? Poco::JSON_WRAP_STRINGS : 0);
-	std::string ret;
-	writeString<std::string,
-				std::string::size_type>(value, ret, &std::string::append, options);
-	return ret;
-}
 
 
 void toJSON(const std::string& value, std::ostream& out, int options)

@@ -28,6 +28,7 @@ namespace JSON {
 void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, int options)
 {
 	bool escapeUnicode = ((options & Poco::JSON_ESCAPE_UNICODE) != 0);
+	bool lowercaseHex = ((options & Poco::JSON_LOWERCASE_HEX) != 0);
 
 	if (step == -1) step = indent;
 
@@ -35,24 +36,28 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	{
 		Object& o = const_cast<Object&>(any.extract<Object>());
 		o.setEscapeUnicode(escapeUnicode);
+		o.setLowercaseHex(lowercaseHex);
 		o.stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if (any.type() == typeid(Array))
 	{
 		Array& a = const_cast<Array&>(any.extract<Array>());
 		a.setEscapeUnicode(escapeUnicode);
+		a.setLowercaseHex(lowercaseHex);
 		a.stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if (any.type() == typeid(Object::Ptr))
 	{
 		Object::Ptr& o = const_cast<Object::Ptr&>(any.extract<Object::Ptr>());
 		o->setEscapeUnicode(escapeUnicode);
+		o->setLowercaseHex(lowercaseHex);
 		o->stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if (any.type() == typeid(Array::Ptr))
 	{
 		Array::Ptr& a = const_cast<Array::Ptr&>(any.extract<Array::Ptr>());
 		a->setEscapeUnicode(escapeUnicode);
+		a->setLowercaseHex(lowercaseHex);
 		a->stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if (any.isEmpty())
