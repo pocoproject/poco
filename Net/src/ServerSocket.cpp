@@ -29,11 +29,6 @@ ServerSocket::ServerSocket(): Socket(new ServerSocketImpl)
 }
 
 
-ServerSocket::ServerSocket(poco_socket_t fd): Socket(new ServerSocketImpl(fd))
-{
-}
-
-
 ServerSocket::ServerSocket(const Socket& socket): Socket(socket)
 {
 	if (!dynamic_cast<ServerSocketImpl*>(impl()))
@@ -59,6 +54,14 @@ ServerSocket::ServerSocket(Poco::UInt16 port, int backlog): Socket(new ServerSoc
 
 ServerSocket::ServerSocket(SocketImpl* pImpl, bool ignore): Socket(pImpl)
 {
+}
+
+
+ServerSocket ServerSocket::fromFileDescriptor(poco_socket_t fd)
+{
+	ServerSocket s;
+	s.impl()->useFileDescriptor(fd);
+	return s;
 }
 
 

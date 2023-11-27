@@ -38,10 +38,6 @@ public:
 		/// The server socket must be bound to
 		/// an address and put into listening state.
 
-	ServerSocket(poco_socket_t fd);
-		// Creates a socket from an existing file descriptor.
-		// Ownership is taken by poco
-
 	ServerSocket(const Socket& socket);
 		/// Creates the ServerSocket with the SocketImpl
 		/// from another socket. The SocketImpl must be
@@ -63,6 +59,10 @@ public:
 		///
 		/// After successful construction, the server socket
 		/// is ready to accept connections.
+
+	static ServerSocket fromFileDescriptor(poco_socket_t fd);
+		// Creates a socket from an existing file descriptor.
+		// Ownership is taken by poco
 
 	virtual ~ServerSocket();
 		/// Destroys the ServerSocket.

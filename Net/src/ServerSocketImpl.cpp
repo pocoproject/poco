@@ -24,11 +24,6 @@ ServerSocketImpl::ServerSocketImpl()
 }
 
 
-ServerSocketImpl::ServerSocketImpl(poco_socket_t sockfd) : SocketImpl(sockfd)
-{
-}
-
-
 ServerSocketImpl::~ServerSocketImpl()
 {
 }
