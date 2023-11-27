@@ -208,7 +208,7 @@ inline bool Ascii::isPrintable(int ch)
 inline int Ascii::toLower(int ch)
 {
 	if (isUpper(ch))
-		return ch + 32;
+		return ch | 0x20;
 	else
 		return ch;
 }
@@ -217,7 +217,7 @@ inline int Ascii::toLower(int ch)
 inline int Ascii::toUpper(int ch)
 {
 	if (isLower(ch))
-		return ch - 32;
+		return ch & ~0x20;
 	else
 		return ch;
 }
