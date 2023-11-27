@@ -99,7 +99,9 @@
 		"codecvt": "cpp",
 		"numbers": "cpp",
 		"span": "cpp",
-		"semaphore": "cpp"
+		"semaphore": "cpp",
+		"__verbose_abort": "cpp",
+		"charconv": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
