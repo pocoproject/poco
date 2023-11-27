@@ -302,11 +302,11 @@ public:
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
-	static void appendHex(std::string& str, int value);
+	static void appendHex(std::string& str, int value, bool lowercase = false);
 		/// Formats an int value in hexadecimal notation.
 		/// The value is treated as unsigned.
 
-	static void appendHex(std::string& str, int value, int width);
+	static void appendHex(std::string& str, int value, int width, bool lowercase = false);
 		/// Formats a int value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
