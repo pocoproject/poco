@@ -29,6 +29,14 @@ NotificationCenter::NotificationCenter()
 
 NotificationCenter::~NotificationCenter()
 {
+	try
+	{
+		Mutex::ScopedLock lock(_mutex);
+	}
+	catch(...)
+	{
+		poco_unexpected();
+	}
 }
 
 
