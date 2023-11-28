@@ -56,27 +56,29 @@ void Task::reset()
 void Task::run()
 {
 	TaskManager* pOwner = getOwner();
-	if (pOwner)
-		pOwner->taskStarted(this);
-	try
-	{
-		_state = TASK_RUNNING;
-		runTask();
-	}
-	catch (Exception& exc)
+	if (_state.exchange(TASK_RUNNING) < TASK_RUNNING)
 	{
 		if (pOwner)
-			pOwner->taskFailed(this, exc);
-	}
-	catch (std::exception& exc)
-	{
-		if (pOwner)
-			pOwner->taskFailed(this, SystemException("Task::run()", exc.what()));
-	}
-	catch (...)
-	{
-		if (pOwner)
-			pOwner->taskFailed(this, SystemException("Task::run(): unknown exception"));
+			pOwner->taskStarted(this);
+		try
+		{
+			runTask();
+		}
+		catch (Exception& exc)
+		{
+			if (pOwner)
+				pOwner->taskFailed(this, exc);
+		}
+		catch (std::exception& exc)
+		{
+			if (pOwner)
+				pOwner->taskFailed(this, SystemException("Task::run()", exc.what()));
+		}
+		catch (...)
+		{
+			if (pOwner)
+				pOwner->taskFailed(this, SystemException("Task::run(): unknown exception"));
+		}
 	}
 	_state = TASK_FINISHED;
 	if (pOwner) pOwner->taskFinished(this);
@@ -114,9 +116,9 @@ void Task::setOwner(TaskManager* pOwner)
 }
 
 
-void Task::setState(TaskState state)
+Task::TaskState Task::setState(TaskState state)
 {
-	_state = state;
+	return _state.exchange(state);
 }
 
 

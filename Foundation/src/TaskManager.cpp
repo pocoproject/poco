@@ -52,26 +52,32 @@ TaskManager::~TaskManager()
 }
 
 
-void TaskManager::start(Task* pTask)
+bool TaskManager::start(Task* pTask)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
-	pAutoTask->setOwner(this);
-	pAutoTask->setState(Task::TASK_STARTING);
+	pTask->setOwner(this);
+	Task::TaskState prevState = pTask->setState(Task::TASK_STARTING);
 
 	ScopedLockT lock(_mutex);
-	_taskList.push_back(pAutoTask);
 	try
 	{
-		_threadPool.start(*pAutoTask, pAutoTask->name());
+		// do not start cancelled or running tasks
+		if ((prevState <= Task::TASK_STARTING) || (prevState > Task::TASK_RUNNING))
+		{
+			_threadPool.start(*pTask, pTask->name());
+			_taskList.push_back(pAutoTask);
+			return true;
+		}
 	}
 	catch (...)
 	{
-		// Make sure that we don't act like we own the task since
-		// we never started it.  If we leave the task on our task
-		// list, the size of the list is incorrect.
-		_taskList.pop_back();
+		pTask->setOwner(nullptr);
 		throw;
 	}
+
+	pTask->setState(Task::TASK_FINISHED);
+	pTask->setOwner(nullptr);
+	return false;
 }
 
 

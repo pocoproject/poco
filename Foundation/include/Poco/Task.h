@@ -77,6 +77,8 @@ public:
 		/// A Task's runTask() method should periodically
 		/// call this method and stop whatever it is doing in an
 		/// orderly way when this method returns true.
+		/// If task is cancelled before it had a chance to run,
+		/// runTask() will never be called.
 
 	TaskState state() const;
 		/// Returns the task's current state.
@@ -90,8 +92,11 @@ public:
 		/// be overridden by subclasses.
 
 	void run();
-		/// Calls the task's runTask() method and notifies the owner
-		/// of the task's start and completion.
+		/// If task has not been cancelled prior to this call, it
+		/// calls the task's runTask() method and notifies the owner of
+		/// the task's start and completion.
+		/// If task has been cancelled prior to this call, it only sets
+		/// the state to TASK_FINISHED and notifies the owner.
 
 protected:
 	bool sleep(long milliseconds);
@@ -134,7 +139,7 @@ protected:
 	TaskManager* getOwner() const;
 		/// Returns the owner of the task, which may be NULL.
 
-	void setState(TaskState state);
+	TaskState setState(TaskState state);
 		/// Sets the task's state.
 
 	virtual ~Task();

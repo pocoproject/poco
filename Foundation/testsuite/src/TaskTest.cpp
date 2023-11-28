@@ -29,12 +29,14 @@ namespace
 	class TestTask: public Task
 	{
 	public:
-		TestTask(): Task("TestTask")
+		TestTask(): Task("TestTask"),
+			_started(false)
 		{
 		}
 
 		void runTask()
 		{
+			_started = true;
 			try
 			{
 				_event.wait();
@@ -73,8 +75,14 @@ namespace
 			}
 		}
 
+		bool started() const
+		{
+			return _started;
+		}
+
 	private:
 		Event _event;
+		std::atomic<bool> _started;
 	};
 }
 
@@ -142,6 +150,21 @@ void TaskTest::testCancel2()
 }
 
 
+void TaskTest::testCancelNoStart()
+{
+	AutoPtr<TestTask> pTT = new TestTask;
+	assertTrue (pTT->state() == Task::TASK_IDLE);
+	pTT->cancel();
+	assertTrue (pTT->state() == Task::TASK_CANCELLING);
+	Thread thr;
+	thr.start(*pTT);
+	while (pTT->state() != Task::TASK_FINISHED)
+		Thread::sleep(50);
+	assertTrue (pTT->state() == Task::TASK_FINISHED);
+	assertFalse (pTT->started());
+}
+
+
 void TaskTest::setUp()
 {
 }
@@ -159,6 +182,7 @@ CppUnit::Test* TaskTest::suite()
 	CppUnit_addTest(pSuite, TaskTest, testFinish);
 	CppUnit_addTest(pSuite, TaskTest, testCancel1);
 	CppUnit_addTest(pSuite, TaskTest, testCancel2);
+	CppUnit_addTest(pSuite, TaskTest, testCancelNoStart);
 
 	return pSuite;
 }

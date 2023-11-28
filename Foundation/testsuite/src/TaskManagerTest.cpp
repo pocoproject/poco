@@ -22,6 +22,7 @@
 #include "Poco/Observer.h"
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
+#include <iostream>
 
 
 using Poco::TaskManager;
@@ -51,12 +52,14 @@ namespace
 	public:
 		TestTask():
 			Task("TestTask"),
-			_fail(false)
+			_fail(false),
+			_started(false)
 		{
 		}
 
 		void runTask()
 		{
+			_started = true;
 			_event.wait();
 			setProgress(0.5);
 			_event.wait();
@@ -78,9 +81,15 @@ namespace
 			_event.set();
 		}
 
+		bool started() const
+		{
+			return _started;
+		}
+
 	private:
 		Event _event;
-		bool  _fail;
+		std::atomic<bool> _fail;
+		std::atomic<bool> _started;
 	};
 
 	class SimpleTask: public Task
@@ -277,6 +286,11 @@ void TaskManagerTest::testFinish()
 	assertTrue (!to.error());
 	tm.cancelAll();
 	tm.joinAll();
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
@@ -317,6 +331,11 @@ void TaskManagerTest::testCancel()
 	assertTrue (!to.error());
 	tm.cancelAll();
 	tm.joinAll();
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
@@ -330,7 +349,7 @@ void TaskManagerTest::testError()
 	tm.addObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
-	tm.start(pTT.duplicate());
+	assertTrue (tm.start(pTT.duplicate()));
 	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
@@ -356,6 +375,11 @@ void TaskManagerTest::testError()
 	assertTrue (list.empty());
 	tm.cancelAll();
 	tm.joinAll();
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
@@ -443,6 +467,30 @@ void TaskManagerTest::testCustom()
 }
 
 
+void TaskManagerTest::testCancelNoStart()
+{
+	std::cout << "TODO";
+	/*
+	TaskManager tm;
+	TaskObserver to;
+	tm.addObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.addObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.addObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.addObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
+	AutoPtr<TestTask> pTT = new TestTask;
+	pTT->cancel();
+	assertFalse(tm.start(pTT.duplicate()));
+	while (pTT->state() < Task::TASK_FINISHED) Thread::sleep(50);
+	assertTrue (pTT->progress() == 0);
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
+*/}
+
+
 void TaskManagerTest::testMultiTasks()
 {
 	TaskManager tm;
@@ -510,6 +558,7 @@ CppUnit::Test* TaskManagerTest::suite()
 	CppUnit_addTest(pSuite, TaskManagerTest, testFinish);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCancel);
 	CppUnit_addTest(pSuite, TaskManagerTest, testError);
+	CppUnit_addTest(pSuite, TaskManagerTest, testCancelNoStart);
 	CppUnit_addTest(pSuite, TaskManagerTest, testMultiTasks);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCustom);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCustomThreadPool);
