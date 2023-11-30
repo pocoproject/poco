@@ -115,14 +115,14 @@ inline void formatAny(std::string& result, const std::string& fmt, const std::ve
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 {
-	format(result, fmt, values);
+	Poco::format(result, fmt, values);
 }
 
 inline void formatAny(std::string& result, const char *fmt, const std::vector<Any>& values)
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 {
-	format(result, fmt, values);
+	Poco::format(result, fmt, values);
 }
 
 template <typename T, typename... Args>
