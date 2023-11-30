@@ -71,6 +71,8 @@ public:
 	void testStringifyPreserveOrder();
 	void testVarConvert();
 
+	void testBasicJson();
+
 	void testValidJanssonFiles();
 	void testInvalidJanssonFiles();
 	void testTemplate();
