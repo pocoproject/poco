@@ -3900,7 +3900,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 {
 	bool autoCommit = session().getFeature("autoCommit");
 
-	Session local("odbc", connect);
+	Session local(connector, connect);
 	local.setFeature("autoCommit", false);
 	assertTrue (!local.getFeature("autoCommit"));
 
@@ -3994,7 +3994,7 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 		return;
 	}
 
-	Session local("odbc", connect);
+	Session local(connector, connect);
 	local.setFeature("autoCommit", true);
 
 	bool autoCommit = session().getFeature("autoCommit");
