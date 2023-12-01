@@ -609,7 +609,7 @@ void SocketTest::testUseFd()
 	struct addrinfo* addr_result;
 	getaddrinfo(nullptr, "0", &addr_hint, &addr_result);
 	poco_socket_t listenfd = socket(addr_result->ai_family, addr_result->ai_socktype, addr_result->ai_protocol);
-	bind(listenfd, result->ai_addr, (int)result->ai_addrlen);
+	bind(listenfd, addr_result->ai_addr, (int)addr_result->ai_addrlen);
 	freeaddrinfo(addr_result);
 	listen(listenfd, SOMAXCONN);
 	SOCKADDR_IN serv_addr;
