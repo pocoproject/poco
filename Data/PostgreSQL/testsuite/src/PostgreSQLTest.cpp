@@ -774,6 +774,15 @@ void PostgreSQLTest::testSessionTransaction()
 }
 
 
+void PostgreSQLTest::testSessionTransactionNoAutoCommit()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonTable();
+	_pExecutor->sessionTransactionNoAutoCommit(_dbConnString);
+}
+
+
 void PostgreSQLTest::testTransaction()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1328,6 +1337,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryBLOBStmt);
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransaction);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransactionNoAutoCommit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testReconnect);
 

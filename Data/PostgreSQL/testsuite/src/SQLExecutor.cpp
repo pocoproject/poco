@@ -141,7 +141,8 @@ private:
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_dataExecutor("Poco::Data SQL Executor", pSession, 0)
 {
 }
 
@@ -1955,6 +1956,103 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	assertTrue (2 == count);
 
 	_pSession->setFeature("autoCommit", autoCommit); // redundant but ok
+}
+
+
+
+void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
+{
+	bool autoCommit = _pSession->getFeature("autoCommit");
+
+	Session local("postgresql", connect);
+	local.setFeature("autoCommit", false);
+	assertTrue (!local.getFeature("autoCommit"));
+
+	if (!local.canTransact())
+	{
+		std::cout << "Session not capable of transactions." << std::endl;
+		return;
+	}
+
+	std::vector<std::string> lastNames = {"LN1", "LN2"};
+	std::vector<std::string> firstNames = {"FN1", "FN2"};
+	std::vector<std::string> addresses = {"ADDR1", "ADDR2"};
+	std::vector<int> ages = {1, 2};
+	std::string tableName("Person");
+	int count = 0, locCount = 0;
+	std::string result;
+
+	// no autoCommit session becomes transaction without explicit begin()
+	assertTrue (!local.isTransaction());
+	assertTrue (!_pSession->isTransaction());
+	local << "INSERT INTO Person VALUES ($1,$2,$3,$4)",
+		use(lastNames), use(firstNames), use(addresses), use(ages), now;
+	Statement stmt = ((*_pSession) << "SELECT COUNT(*) FROM Person",
+		into(count), async, now);
+	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
+	assertTrue (0 == count);
+	assertTrue (2 == locCount);
+
+#ifndef POCO_DATA_NO_SQL_PARSER
+	assertTrue (local.isTransaction());
+
+	// autocommit is invalid for session in transaction ...
+	try
+	{
+		 local.setFeature("autoCommit", true);
+		 fail ("must fail on autocommit setting during transaction", __LINE__);
+	}	catch(const Poco::InvalidAccessException&) { }
+
+	// but setting it to its current state is allowed (no-op)
+	local.setFeature("autoCommit", false);
+
+	assertTrue (!_pSession->isTransaction());
+#else
+	_pSession->commit();
+#endif // POCO_DATA_NO_SQL_PARSER
+	local.commit();
+	assertTrue (!local.isTransaction());
+	assertTrue (!local.getFeature("autoCommit"));
+
+	stmt.wait();
+	assertTrue (2 == count);
+
+	stmt.reset((*_pSession));
+
+	assertTrue (!local.isTransaction());
+	assertTrue (!_pSession->isTransaction());
+	local.begin();
+	local << "INSERT INTO Person VALUES ($1,$2,$3,$4)",
+		use(lastNames), use(firstNames), use(addresses), use(ages), now;
+	assertTrue (local.isTransaction());
+	assertTrue (!local.getFeature("autoCommit"));
+	stmt = ((*_pSession) << "SELECT COUNT(*) FROM Person", into(count), async, now);
+	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
+	assertTrue (2 == count);
+	assertTrue (4 == locCount);
+
+#ifndef POCO_DATA_NO_SQL_PARSER
+	assertTrue (local.isTransaction());
+	assertTrue (!_pSession->isTransaction());
+#else
+	_pSession->commit();
+#endif
+
+	local.rollback();
+	assertTrue (!local.isTransaction());
+	stmt.wait();
+	assertTrue (2 == count);
+
+	locCount = 0;
+	(*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now;
+	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
+	assertTrue (2 == count);
+	assertTrue (2 == locCount);
+#ifndef POCO_DATA_NO_SQL_PARSER
+	_pSession->commit();
+	local.commit();
+#endif
+	_pSession->setFeature("autoCommit", autoCommit);
 }
 
 
