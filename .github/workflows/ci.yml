@@ -11,6 +11,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  android-ndk-latest-cmake:
+   runs-on: ubuntu-22.04
+   steps:
+       - uses: actions/checkout@v3
+       - uses: nttld/setup-ndk@v1
+         with:
+            ndk-version: r25c
+            add-to-path: true
+       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
   android-ndk-cmake:
    runs-on: ubuntu-22.04
    steps:
@@ -19,7 +29,7 @@ jobs:
          with:
             ndk-version: r25c
             add-to-path: true
-       - run: cmake -S$GITHUB_WORKSPACE -Bandroid-build -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake
+       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
 
   linux-gcc-make:
     runs-on: ubuntu-22.04
