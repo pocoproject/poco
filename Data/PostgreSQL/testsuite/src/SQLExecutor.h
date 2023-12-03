@@ -14,7 +14,6 @@
 
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/Session.h"
-#include "Poco/Data/Test/SQLExecutor.h"
 
 #include <libpq-fe.h>
 
@@ -108,7 +107,6 @@ private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
 
 	Poco::Data::Session* _pSession;
-	Poco::Data::Test::SQLExecutor _dataExecutor;
 };
 
 
