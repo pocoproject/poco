@@ -1989,6 +1989,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
 	Statement stmt = ((*_pSession) << "SELECT COUNT(*) FROM Person",
 		into(count), async, now);
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
+	stmt.wait();
 	assertTrue (0 == count);
 	assertTrue (2 == locCount);
 
@@ -2013,6 +2014,9 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
 	assertTrue (!local.isTransaction());
 	assertTrue (!local.getFeature("autoCommit"));
 
+	stmt.reset((*_pSession));
+	stmt = ((*_pSession) << "SELECT COUNT(*) FROM Person",
+		into(count), async, now);
 	stmt.wait();
 	assertTrue (2 == count);
 
