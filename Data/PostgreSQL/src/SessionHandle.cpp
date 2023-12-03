@@ -281,9 +281,9 @@ void SessionHandle::rollback()
 void SessionHandle::autoCommit(bool val)
 {
 	// There is no PostgreSQL API call to switch autocommit (unchained) mode off.
-	if (val && isTransaction())
+	if (isTransaction())
 	{
-		commit();  // end any in process transaction
+		throw Poco::InvalidAccessException();
 	}
 }
 

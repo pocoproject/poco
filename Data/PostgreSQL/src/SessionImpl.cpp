@@ -60,6 +60,7 @@ SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLogi
 	Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout),
 	_connectorName("postgresql")
 {
+	setFeature("sqlParse", false); // the parse currently cannot handle the PostgreSQL placeholders $1, $2, etc.
 	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	open();
