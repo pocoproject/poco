@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  android-ndk-latest-cmake:
+  android-arm64-v8a-ndk-latest-cmake:
    runs-on: ubuntu-22.04
    steps:
        - uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
             add-to-path: true
        - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
 
-  android-ndk-cmake:
+  android-arm64-v8a-ndk-cmake:
    runs-on: ubuntu-22.04
    steps:
        - uses: actions/checkout@v3
@@ -30,6 +30,16 @@ jobs:
             ndk-version: r25c
             add-to-path: true
        - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
+  android-armeabi-v7a-ndk-cmake:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
 
   linux-gcc-make:
     runs-on: ubuntu-22.04
