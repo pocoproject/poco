@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.12.5p2
+
+!! Summary of Changes
+
+  - GH #4320: Integer overflow in Poco::UTF32Encoding
+
+
 !!!Release 1.12.5p1
 
 !! Summary of Changes
