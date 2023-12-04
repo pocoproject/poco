@@ -43,6 +43,7 @@ public:
 	void testSelect3();
 	void testEchoUnixLocal();
 	void testUnixLocalAbstract();
+	void testUseFd();
 
 	void setUp();
 	void tearDown();

@@ -54,6 +54,15 @@ Socket::Socket(const Socket& socket):
 	_pImpl->duplicate();
 }
 
+
+Socket Socket::fromFileDescriptor(poco_socket_t fd)
+{
+	Socket s;
+	s.impl()->useFileDescriptor(fd);
+	return s;
+}
+
+
 #if POCO_NEW_STATE_ON_MOVE
 
 Socket::Socket(Socket&& socket):
