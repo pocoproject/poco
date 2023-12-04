@@ -72,6 +72,8 @@ std::string PathImpl::selfImpl()
 	int n = readlink("/proc/self/exe", buf, size);
 	if (n > 0 && n < PATH_MAX)
 		path = buf;
+#else
+	throw Poco::NotImplementedException("File path of the current program not implemented on this platform.");
 #endif
 
 	return path;

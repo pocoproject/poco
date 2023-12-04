@@ -1624,11 +1624,13 @@ void PathTest::testSelf()
 	std::string self = Path::self();
 	std::cout << self << std::endl;
 
-#if POCO_OS == POCO_OS_MAC_OS_X                               \
-    || POCO_OS == POCO_OS_FREE_BSD                            \
-	|| POCO_OS == POCO_OS_SOLARIS                             \
-	|| POCO_OS == POCO_OS_LINUX                               \
-	|| POCO_OS == POCO_OS_ANDROID
+#if POCO_OS == POCO_OS_MAC_OS_X      \
+    || POCO_OS == POCO_OS_FREE_BSD   \
+    || POCO_OS == POCO_OS_NET_BSD	 \
+	|| POCO_OS == POCO_OS_SOLARIS    \
+	|| POCO_OS == POCO_OS_LINUX      \
+	|| POCO_OS == POCO_OS_ANDROID    \
+    || POCO_OS == POCO_OS_WINDOWS_NT
 
 	assertTrue(!self.empty());
 	Path p(self);
@@ -1636,7 +1638,8 @@ void PathTest::testSelf()
 	assertTrue(p.isAbsolute());
 	assertTrue(p.isFile());
 	assertTrue(self.find("testrunner") != std::string::npos);
-
+#else
+	std::cout << "Path::self() not implemented for this platform."
 #endif
 }
 
