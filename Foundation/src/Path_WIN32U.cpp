@@ -19,19 +19,15 @@
 #include "Poco/Exception.h"
 #include "Poco/UnWindows.h"
 
-#ifndef PATH_MAX
-#define PATH_MAX 1024 // fallback
-#endif
-
 namespace Poco {
 
 std::string PathImpl::selfImpl()
 {
 	std::string path;
-	Buffer<wchar_t> buf(PATH_MAX);
-	DWORD n = GetModuleFileNameW(NULL, buf.begin(), PATH_MAX);
+	Buffer<wchar_t> buf(MAX_PATH_LEN);
+	DWORD n = GetModuleFileNameW(NULL, buf.begin(), MAX_PATH_LEN);
 
-	if (n > 0  && n < PATH_MAX)
+	if (n > 0  && n < MAX_PATH_LEN)
 		UnicodeConverter::toUTF8(buf.begin(), path);
 	return path;
 }

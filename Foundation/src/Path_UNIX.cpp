@@ -35,9 +35,8 @@
 
 
 #ifndef PATH_MAX
-#define PATH_MAX 1024 // fallback
+#define PATH_MAX 4096 // fallback
 #endif
-
 
 namespace Poco {
 
@@ -45,8 +44,9 @@ std::string PathImpl::selfImpl()
 {
 	std::string path;
 	char buf[PATH_MAX + 1] {0};
+
 #if POCO_OS == POCO_OS_MAC_OS_X
-	uint32_t size = sizeof(buf);
+	std::uint32_t size = sizeof(buf);
 	if (_NSGetExecutablePath(buf, &size) == 0)
 		path = buf;
 #elif POCO_OS == POCO_OS_FREE_BSD
@@ -55,11 +55,11 @@ std::string PathImpl::selfImpl()
 	mib[1] = KERN_PROC;
 	mib[2] = KERN_PROC_PATHNAME;
 	mib[3] = -1;
-	size_t size = sizeof(buf);
+	std::size_t size = sizeof(buf);
 	if (sysctl(mib, 4, buf, &size, NULL, 0) == 0)
 		path = buf;
 #elif POCO_OS == POCO_OS_NET_BSD
-	size_t size = sizeof(buf);
+	std::size_t size = sizeof(buf);
 	int n = readlink("/proc/curproc/exe", buf, size);
 	if (n > 0 && n < PATH_MAX)
 		path = buf;
@@ -68,7 +68,7 @@ std::string PathImpl::selfImpl()
 	if (execName)
 		path = execName;
 #elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
-	size_t size = sizeof(buf);
+	const std::size_t size = sizeof(buf);
 	int n = readlink("/proc/self/exe", buf, size);
 	if (n > 0 && n < PATH_MAX)
 		path = buf;
