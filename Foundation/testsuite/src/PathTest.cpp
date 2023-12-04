@@ -1619,6 +1619,27 @@ void PathTest::testWindowsSystem()
 #endif
 }
 
+void PathTest::testSelf()
+{
+	std::string self = Path::self();
+	std::cout << self << std::endl;
+
+#if POCO_OS == POCO_OS_MAC_OS_X                               \
+    || POCO_OS == POCO_OS_FREE_BSD                            \
+	|| POCO_OS == POCO_OS_SOLARIS                             \
+	|| POCO_OS == POCO_OS_LINUX                               \
+	|| POCO_OS == POCO_OS_ANDROID
+
+	assertTrue(!self.empty());
+	Path p(self);
+
+	assertTrue(p.isAbsolute());
+	assertTrue(p.isFile());
+	assertTrue(self.find("testrunner") != std::string::npos);
+
+#endif
+}
+
 
 void PathTest::setUp()
 {
@@ -1662,6 +1683,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testResolve);
 	CppUnit_addTest(pSuite, PathTest, testPushPop);
 	CppUnit_addTest(pSuite, PathTest, testWindowsSystem);
+	CppUnit_addTest(pSuite, PathTest, testSelf);
 
 	return pSuite;
 }
