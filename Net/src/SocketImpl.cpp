@@ -276,6 +276,14 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reu
 }
 
 
+void SocketImpl::useFileDescriptor(poco_socket_t fd)
+{
+	poco_assert (_sockfd == POCO_INVALID_SOCKET);
+
+	_sockfd = fd;
+}
+
+
 void SocketImpl::listen(int backlog)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
