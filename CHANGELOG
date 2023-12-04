@@ -1,5 +1,12 @@
 This is the changelog file for the POCO C++ Libraries.
 
+
+Release 1.11.8p2 (2023-12-04)
+=============================
+
+- GH #4320: Integer overflow in Poco::UTF32Encoding
+
+
 Release 1.11.8p1 (2023-11-02)
 =============================
 
