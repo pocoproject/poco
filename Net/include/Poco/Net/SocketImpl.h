@@ -144,7 +144,7 @@ public:
 
 	void useFileDescriptor(poco_socket_t fd);
 		/// Use a external file descriptor for the socket. Required to be careful
-		/// about what kind of file descriptor you're passing to make sure it's compatable
+		/// about what kind of file descriptor you're passing to make sure it's compatible
 		/// with how you plan on using it. These specifics are platform-specific.
 		/// Not valid to call this if the internal socket is already initialized.
 		/// Poco takes ownership of the file descriptor, closing it when this socket is closed.
