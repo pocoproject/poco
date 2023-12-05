@@ -27,6 +27,7 @@ namespace JSON {
 Object::Object(int options):
 	_preserveInsOrder((options & Poco::JSON_PRESERVE_KEY_ORDER) != 0),
 	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),
+	_lowercaseHex((options & Poco::JSON_LOWERCASE_HEX) != 0),
 	_modified(false)
 {
 }
@@ -35,6 +36,7 @@ Object::Object(int options):
 Object::Object(const Object& other) : _values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex),
 	_pStruct(!other._modified ? other._pStruct : 0),
 	_modified(other._modified)
 {
@@ -47,6 +49,7 @@ Object::Object(Object&& other) noexcept:
 	_keys(std::move(other._keys)),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex),
 	_pStruct(std::move(other._pStruct)),
 	_pOrdStruct(std::move(other._pOrdStruct)),
 	_modified(other._modified)
@@ -67,6 +70,7 @@ Object &Object::operator = (const Object &other)
 		_keys = other._keys;
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
+		_lowercaseHex = other._lowercaseHex;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
 	}
@@ -80,6 +84,7 @@ Object& Object::operator = (Object&& other) noexcept
 	_keys = std::move(other._keys);
 	_preserveInsOrder = other._preserveInsOrder;
 	_escapeUnicode = other._escapeUnicode;
+	_lowercaseHex = other._lowercaseHex;
 	_pStruct = std::move(other._pStruct);
 	_pOrdStruct = std::move(other._pOrdStruct);
 	_modified = other._modified;

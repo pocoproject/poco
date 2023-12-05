@@ -89,11 +89,13 @@ namespace MongoDB {
 
 class PooledConnection
 	/// Helper class for borrowing and returning a connection automatically from a pool.
+	/// Note that the connection pool is not expected to be deleted during the lifetime
+	/// of an instance of PooledConnection.
 {
 public:
-	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(pool)
+	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(&pool)
 	{
-		_connection = _pool.borrowObject();
+		_connection = _pool->borrowObject();
 	}
 
 	virtual ~PooledConnection()
@@ -102,7 +104,7 @@ public:
 		{
 			if (_connection)
 			{
-				_pool.returnObject(_connection);
+				_pool->returnObject(_connection);
 			}
 		}
 		catch (...)
@@ -125,7 +127,7 @@ public:
 	PooledConnection& operator=(PooledConnection&&) = default;
 
 private:
-	Poco::ObjectPool<Connection, Connection::Ptr>& _pool;
+	Poco::ObjectPool<Connection, Connection::Ptr>* _pool;
 	Connection::Ptr _connection;
 };
 

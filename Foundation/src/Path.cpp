@@ -578,6 +578,12 @@ Path& Path::clear()
 }
 
 
+std::string Path::self()
+{
+	return PathImpl::selfImpl();
+}
+
+
 std::string Path::current()
 {
 	return PathImpl::currentImpl();

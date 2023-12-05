@@ -212,6 +212,9 @@ endif()
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
+option(ENABLE_COMPILER_WARNINGS
+	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
+
 option(ENABLE_SAMPLES
 	"Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
