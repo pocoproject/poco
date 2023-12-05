@@ -28,6 +28,7 @@ namespace Poco {
 class Foundation_API PathImpl
 {
 public:
+	static std::string selfImpl();
 	static std::string currentImpl();
 	static std::string homeImpl();
 	static std::string configHomeImpl();

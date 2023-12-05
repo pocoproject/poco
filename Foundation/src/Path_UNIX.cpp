@@ -19,18 +19,73 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <climits>
+
 #if !defined(POCO_VXWORKS)
 #include <pwd.h>
 #endif
-#include <climits>
 
-
-#ifndef PATH_MAX
-#define PATH_MAX 1024 // fallback
+#if POCO_OS == POCO_OS_MAC_OS_X
+#include <mach-o/dyld.h>
+#elif POCO_OS == POCO_OS_FREE_BSD
+#include <sys/sysctl.h>
+#elif POCO_OS == POCO_OS_LINUX
+#include <fcntl.h>
 #endif
 
 
+#ifndef PATH_MAX
+#define PATH_MAX 4096 // fallback
+#endif
+
 namespace Poco {
+
+std::string PathImpl::selfImpl()
+{
+	std::string path;
+	char buf[PATH_MAX + 1] {0};
+
+#if POCO_OS == POCO_OS_MAC_OS_X
+	std::uint32_t size = sizeof(buf);
+	if (_NSGetExecutablePath(buf, &size) == 0)
+		path = buf;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
+#elif POCO_OS == POCO_OS_FREE_BSD
+	int mib[4];
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_PROC;
+	mib[2] = KERN_PROC_PATHNAME;
+	mib[3] = -1;
+	std::size_t size = sizeof(buf);
+	if (sysctl(mib, 4, buf, &size, NULL, 0) == 0)
+		path = buf;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
+#elif POCO_OS == POCO_OS_NET_BSD
+	std::size_t size = sizeof(buf);
+	int n = readlink("/proc/curproc/exe", buf, size);
+	if (n > 0 && n < PATH_MAX)
+		path = buf;
+#elif POCO_OS == POCO_OS_SOLARIS
+	char * execName = getexecname();
+	if (execName)
+		path = execName;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	const std::size_t size = sizeof(buf);
+	int n = readlink("/proc/self/exe", buf, size);
+	if (n > 0 && n < PATH_MAX)
+		path = buf;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
+#else
+	throw Poco::NotImplementedException("File path of the current process not implemented on this platform.");
+#endif
+
+	return path;
+}
 
 
 std::string PathImpl::currentImpl()
