@@ -98,6 +98,8 @@ public:
 		/// If task has been cancelled prior to this call, it only sets
 		/// the state to TASK_FINISHED and notifies the owner.
 
+	bool hasOwner() const;
+		/// Returns true iff the task has an owner.
 protected:
 	bool sleep(long milliseconds);
 		/// Suspends the current thread for the specified
@@ -150,12 +152,12 @@ private:
 	Task(const Task&);
 	Task& operator = (const Task&);
 
-	std::string            _name;
-	TaskManager*           _pOwner;
-	std::atomic<float>     _progress;
-	std::atomic<TaskState> _state;
-	Event                  _cancelEvent;
-	mutable FastMutex      _mutex;
+	std::string               _name;
+	std::atomic<TaskManager*> _pOwner;
+	std::atomic<float>        _progress;
+	std::atomic<TaskState>    _state;
+	Event                     _cancelEvent;
+	mutable FastMutex         _mutex;
 
 	friend class TaskManager;
 };
@@ -190,9 +192,13 @@ inline Task::TaskState Task::state() const
 
 inline TaskManager* Task::getOwner() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
 	return _pOwner;
+}
+
+
+inline bool Task::hasOwner() const
+{
+	return _pOwner != nullptr;
 }
 
 

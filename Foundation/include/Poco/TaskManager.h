@@ -74,7 +74,7 @@ public:
 		/// in any case, a false return means refusal of ownership
 		/// and indicates that the task pointer may not be valid
 		/// anymore (it will only be valid if it was duplicated
-		/// prior to this call.
+		/// prior to this call).
 		///
 		/// The TaskManager takes ownership of the Task object
 		/// and deletes it when it is finished.

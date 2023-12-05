@@ -41,7 +41,7 @@ void Task::cancel()
 	_state = TASK_CANCELLING;
 	_cancelEvent.set();
 	if (_pOwner)
-		_pOwner->taskCancelled(this);
+		_pOwner.load()->taskCancelled(this);
 }
 
 
@@ -104,7 +104,7 @@ void Task::setProgress(float progress)
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		if (_pOwner)
-			_pOwner->taskProgress(this, _progress);
+			_pOwner.load()->taskProgress(this, _progress);
 	}
 }
 
@@ -129,7 +129,7 @@ void Task::postNotification(Notification* pNf)
 	FastMutex::ScopedLock lock(_mutex);
 
 	if (_pOwner)
-		_pOwner->postNotification(pNf);
+		_pOwner.load()->postNotification(pNf);
 	else if (pNf)
 		pNf->release();
 }

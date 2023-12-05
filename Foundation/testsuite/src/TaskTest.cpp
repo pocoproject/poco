@@ -112,6 +112,20 @@ void TaskTest::testFinish()
 	pTT->cont();
 	thr.join();
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
+
+	pTT->reset();
+	assertTrue (pTT->progress() == 0);
+	assertTrue (pTT->state() == Task::TASK_IDLE);
+	thr.start(*pTT);
+	assertTrue (pTT->progress() == 0);
+	pTT->cont();
+	while (pTT->progress() != 0.5) Thread::sleep(50);
+	assertTrue (pTT->state() == Task::TASK_RUNNING);
+	pTT->cont();
+	while (pTT->progress() != 1.0) Thread::sleep(50);
+	pTT->cont();
+	thr.join();
+	assertTrue (pTT->state() == Task::TASK_FINISHED);
 }
 
 

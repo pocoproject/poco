@@ -469,8 +469,6 @@ void TaskManagerTest::testCustom()
 
 void TaskManagerTest::testCancelNoStart()
 {
-	std::cout << "TODO";
-	/*
 	TaskManager tm;
 	TaskObserver to;
 	tm.addObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
@@ -480,23 +478,34 @@ void TaskManagerTest::testCancelNoStart()
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	pTT->cancel();
+	assertTrue (pTT->isCancelled());
 	assertFalse(tm.start(pTT.duplicate()));
-	while (pTT->state() < Task::TASK_FINISHED) Thread::sleep(50);
 	assertTrue (pTT->progress() == 0);
+	assertTrue (pTT->isCancelled());
+	assertFalse (pTT->hasOwner());
 	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
 	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
 	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
 	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
-*/}
+}
 
 
 void TaskManagerTest::testMultiTasks()
 {
 	TaskManager tm;
-	tm.start(new SimpleTask);
-	tm.start(new SimpleTask);
-	tm.start(new SimpleTask);
+
+	AutoPtr<SimpleTask> pTT1 = new SimpleTask;
+	AutoPtr<SimpleTask> pTT2 = new SimpleTask;
+	AutoPtr<SimpleTask> pTT3 = new SimpleTask;
+
+	tm.start(pTT1.duplicate());
+	tm.start(pTT2.duplicate());
+	tm.start(pTT3.duplicate());
+
+	assertTrue (pTT1->hasOwner());
+	assertTrue (pTT2->hasOwner());
+	assertTrue (pTT3->hasOwner());
 
 	TaskManager::TaskList list = tm.taskList();
 	assertTrue (list.size() == 3);
@@ -505,6 +514,13 @@ void TaskManagerTest::testMultiTasks()
 	while (tm.count() > 0) Thread::sleep(100);
 	assertTrue (tm.count() == 0);
 	tm.joinAll();
+
+	while (pTT1->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertFalse (pTT1->hasOwner());
+	while (pTT2->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertFalse (pTT2->hasOwner());
+	while (pTT3->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertFalse (pTT3->hasOwner());
 }
 
 
