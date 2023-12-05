@@ -111,7 +111,6 @@ void Task::setProgress(float progress)
 
 void Task::setOwner(TaskManager* pOwner)
 {
-	FastMutex::ScopedLock lock(_mutex);
 	_pOwner = pOwner;
 }
 
