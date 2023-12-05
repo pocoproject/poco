@@ -28,8 +28,12 @@ std::string PathImpl::selfImpl()
 	DWORD n = GetModuleFileNameW(NULL, buf.begin(), MAX_PATH_LEN);
 
 	if (n > 0  && n < MAX_PATH_LEN)
+	{
 		UnicodeConverter::toUTF8(buf.begin(), path);
-	return path;
+		return path;
+	}
+
+	throw SystemException("Cannot get path of the current process.");
 }
 
 std::string PathImpl::currentImpl()

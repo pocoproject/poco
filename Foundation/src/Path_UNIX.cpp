@@ -49,6 +49,8 @@ std::string PathImpl::selfImpl()
 	std::uint32_t size = sizeof(buf);
 	if (_NSGetExecutablePath(buf, &size) == 0)
 		path = buf;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
 #elif POCO_OS == POCO_OS_FREE_BSD
 	int mib[4];
 	mib[0] = CTL_KERN;
@@ -58,6 +60,8 @@ std::string PathImpl::selfImpl()
 	std::size_t size = sizeof(buf);
 	if (sysctl(mib, 4, buf, &size, NULL, 0) == 0)
 		path = buf;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
 #elif POCO_OS == POCO_OS_NET_BSD
 	std::size_t size = sizeof(buf);
 	int n = readlink("/proc/curproc/exe", buf, size);
@@ -67,13 +71,17 @@ std::string PathImpl::selfImpl()
 	char * execName = getexecname();
 	if (execName)
 		path = execName;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
 #elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	const std::size_t size = sizeof(buf);
 	int n = readlink("/proc/self/exe", buf, size);
 	if (n > 0 && n < PATH_MAX)
 		path = buf;
+	else
+		throw Poco::SystemException("Cannot get path of the current process.");
 #else
-	throw Poco::NotImplementedException("File path of the current program not implemented on this platform.");
+	throw Poco::NotImplementedException("File path of the current process not implemented on this platform.");
 #endif
 
 	return path;
