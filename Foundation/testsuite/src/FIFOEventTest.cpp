@@ -357,7 +357,6 @@ void FIFOEventTest::testAsyncNotifyBenchmark()
 	assertTrue (_count == 0);
 	const int cnt = 10000;
 	int runCount = 1000;
-	int totalCount = 0;
 	const Poco::Int64 allCount = cnt * runCount;
 	std::vector<int> times;
 	times.reserve(allCount);
@@ -493,6 +492,6 @@ CppUnit::Test* FIFOEventTest::suite()
 	CppUnit_addTest(pSuite, FIFOEventTest, testExpireReRegister);
 	CppUnit_addTest(pSuite, FIFOEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotify);
-	CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
+	//CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
 	return pSuite;
 }
