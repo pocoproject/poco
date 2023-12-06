@@ -216,7 +216,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer",
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
             CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
