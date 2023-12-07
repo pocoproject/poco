@@ -34,7 +34,7 @@ class MongoDB_API MessageHeader
 	/// MongoDB request or response message.
 {
 public:
-	static const unsigned int MSG_HEADER_SIZE = 16;
+	static constexpr Int32 MSG_HEADER_SIZE = 16;
 
 	enum OpCode
 	{
