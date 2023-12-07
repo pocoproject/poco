@@ -23,6 +23,10 @@
 
 namespace Poco {
 
+std::string PathImpl::selfImpl()
+{
+	return("");
+}
 
 std::string PathImpl::currentImpl()
 {

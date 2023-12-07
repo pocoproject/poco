@@ -290,6 +290,10 @@ public:
 		/// this is the semicolon ';'. On OpenVMS systems, this is the
 		/// comma ','.
 
+	static std::string self();
+		/// Return path to the executable file, empty string if failed.
+		/// The path is absolute one.
+
 	static std::string current();
 		/// Returns the current working directory.
 

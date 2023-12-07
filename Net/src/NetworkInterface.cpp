@@ -1512,7 +1512,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
-#ifndef POCO_NO_LINUX_IF_PACKET_H
+#if !defined(POCO_NO_LINUX_IF_PACKET_H) && !defined(POCO_EMSCRIPTEN)
 #include <linux/if_packet.h>
 #endif
 #include <net/if_arp.h>
@@ -1543,7 +1543,7 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
-#if POCO_OS != POCO_OS_ANDROID
+#if (POCO_OS != POCO_OS_ANDROID) && !defined(POCO_EMSCRIPTEN)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
@@ -1552,7 +1552,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
-#ifndef POCO_NO_LINUX_IF_PACKET_H
+#if !defined(POCO_NO_LINUX_IF_PACKET_H)
 	if (iface->ifa_addr->sa_family == AF_PACKET)
 	{
 		struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
@@ -1602,7 +1602,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
-#if POCO_OS != POCO_OS_ANDROID
+#if (POCO_OS != POCO_OS_ANDROID) && !defined(POCO_EMSCRIPTEN)
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;

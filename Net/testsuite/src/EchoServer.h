@@ -31,6 +31,9 @@ public:
 	EchoServer(const Poco::Net::SocketAddress& address);
 		/// Creates the EchoServer using the given address.
 
+	EchoServer(const Poco::Net::ServerSocket& sock);
+		/// Creates the EchoServer using the already created socket
+
 	~EchoServer();
 		/// Destroys the EchoServer.
 
