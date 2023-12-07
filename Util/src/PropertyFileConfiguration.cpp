@@ -53,9 +53,15 @@ PropertyFileConfiguration::~PropertyFileConfiguration()
 
 void PropertyFileConfiguration::load(std::istream& istr)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	clear();
 	while (!istr.eof())
 	{
+		if(istr.fail())
+		{
+			throw Poco::IOException("Broken input stream");
+		}
 		parseLine(istr);
 	}
 }
@@ -73,6 +79,8 @@ void PropertyFileConfiguration::load(const std::string& path)
 
 void PropertyFileConfiguration::save(std::ostream& ostr) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	MapConfiguration::iterator it = begin();
 	MapConfiguration::iterator ed = end();
 	while (it != ed)

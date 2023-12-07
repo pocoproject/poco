@@ -594,6 +594,9 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCDB2Test");
 
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testConnection);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testSession);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexType);
@@ -666,6 +669,9 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransaction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactor);

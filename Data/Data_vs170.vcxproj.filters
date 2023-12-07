@@ -2,31 +2,67 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{25181de0-3e99-4db9-a218-4580b16cbb0a}</UniqueIdentifier>
+      <UniqueIdentifier>{17dee3c5-eff8-4413-8538-35cde2b4b148}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{bf1fcd58-d750-4f91-8eea-0dc1e09013b6}</UniqueIdentifier>
+      <UniqueIdentifier>{b47de74d-a006-494a-92ca-14bb740b6a8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{9ccb9717-2829-450a-b3ea-715077fc770f}</UniqueIdentifier>
+      <UniqueIdentifier>{2fae20d2-553e-4d22-a054-7bdcaf5cfa18}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{fa110a23-abc0-4838-8c37-2cf0a512d556}</UniqueIdentifier>
+      <UniqueIdentifier>{8e430176-5758-4f18-a0a1-a2e47cd5d20a}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{6dd4ce47-c8de-48c7-891f-6fc47fff19e9}</UniqueIdentifier>
+      <UniqueIdentifier>{f46d9d0c-aaad-4c18-b335-aa902649086a}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{5011cbf7-2ae9-4b14-9a03-bb9f9c754dc4}</UniqueIdentifier>
+      <UniqueIdentifier>{a2f2316a-c2ec-45b6-bfb5-9c7ea4bf8406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser">
+      <UniqueIdentifier>{396b1821-ed93-4c83-884c-d60497a66f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\Header Files">
+      <UniqueIdentifier>{77bc6a77-c249-4be3-80b3-86841c7b6297}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\Source Files">
+      <UniqueIdentifier>{c74693c2-b89b-4615-ba48-44ef418f9ab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\parser">
+      <UniqueIdentifier>{6fadb32c-ee06-4f9e-937e-28203e2504d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\parser\Header Files">
+      <UniqueIdentifier>{3c5d1163-2067-4363-abf6-dc040e3613cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\parser\Source Files">
+      <UniqueIdentifier>{15321502-9c36-49f6-a094-90a9de888c41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\sql">
+      <UniqueIdentifier>{4f383c22-b278-40e9-bb9a-b25fd0db10a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\sql\Header Files">
+      <UniqueIdentifier>{f037c038-fa66-4ea9-ab1e-187aac6f52ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\sql\Source Files">
+      <UniqueIdentifier>{fda6c009-20d7-4eb4-a9be-fbb1d578d166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\util">
+      <UniqueIdentifier>{5e4a847f-8c8d-40f0-aa79-03b211bd5ac9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\util\Header Files">
+      <UniqueIdentifier>{dd5133dc-82db-4f2a-92f6-91dba81a222b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLParser\util\Source Files">
+      <UniqueIdentifier>{8d7c5808-50f5-4790-b35c-77350ea2b16c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{39e78f99-76eb-4ca6-a6e5-69380ba1e19f}</UniqueIdentifier>
+      <UniqueIdentifier>{6fe708ec-ec55-4aeb-9be3-2b1aa30f3cb1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{c2cbcb61-3c9c-4208-aebc-bf1e7ec77703}</UniqueIdentifier>
+      <UniqueIdentifier>{c8f1ad0b-aede-43b8-9b01-ad4cbf24f45b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{f59283d4-ff32-4856-903b-81bd84ebb146}</UniqueIdentifier>
+      <UniqueIdentifier>{6845af31-0048-47ba-96f7-48baed099606}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +129,9 @@
     <ClInclude Include="include\Poco\Data\Extraction.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\JSONRowFormatter.h">
+      <Filter>DataCore\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Data\Limit.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
@@ -141,6 +180,12 @@
     <ClInclude Include="include\Poco\Data\SimpleRowFormatter.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\SQLChannel.h">
+      <Filter>DataCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Data\SQLParser.h">
+      <Filter>DataCore\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Data\Statement.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
@@ -174,10 +219,82 @@
     <ClInclude Include="include\Poco\Data\SessionPoolContainer.h">
       <Filter>SessionPooling\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\Data\ArchiveStrategy.h">
-      <Filter>Logging\Header Files</Filter>
+    <ClInclude Include="src\sql-parser\src\SQLParser.h">
+      <Filter>SQLParser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\Data\SQLChannel.h">
+    <ClInclude Include="src\sql-parser\src\SQLParserResult.h">
+      <Filter>SQLParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sqlparser_win.h">
+      <Filter>SQLParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\parser\bison_parser.h">
+      <Filter>SQLParser\parser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\parser\flex_lexer.h">
+      <Filter>SQLParser\parser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\parser\parser_typedef.h">
+      <Filter>SQLParser\parser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\AlterStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\ColumnType.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\CreateStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\DeleteStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\DropStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\ExecuteStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\ExportStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\Expr.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\ImportStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\InsertStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\PrepareStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\SelectStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\ShowStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\SQLStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\statements.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\Table.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\TransactionStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\sql\UpdateStatement.h">
+      <Filter>SQLParser\sql\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sql-parser\src\util\sqlhelper.h">
+      <Filter>SQLParser\util\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Data\ArchiveStrategy.h">
       <Filter>Logging\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -213,6 +330,9 @@
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DynamicLOB.cpp">
+      <Filter>DataCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONRowFormatter.cpp">
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Limit.cpp">
@@ -254,6 +374,9 @@
     <ClCompile Include="src\SimpleRowFormatter.cpp">
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SQLChannel.cpp">
+      <Filter>DataCore\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Statement.cpp">
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
@@ -284,10 +407,37 @@
     <ClCompile Include="src\SessionPoolContainer.cpp">
       <Filter>SessionPooling\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ArchiveStrategy.cpp">
-      <Filter>Logging\Source Files</Filter>
+    <ClCompile Include="src\sql-parser\src\SQLParser.cpp">
+      <Filter>SQLParser\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SQLChannel.cpp">
+    <ClCompile Include="src\sql-parser\src\SQLParserResult.cpp">
+      <Filter>SQLParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\parser\bison_parser.cpp">
+      <Filter>SQLParser\parser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\parser\flex_lexer.cpp">
+      <Filter>SQLParser\parser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\sql\CreateStatement.cpp">
+      <Filter>SQLParser\sql\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\sql\Expr.cpp">
+      <Filter>SQLParser\sql\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\sql\PrepareStatement.cpp">
+      <Filter>SQLParser\sql\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\sql\SQLStatement.cpp">
+      <Filter>SQLParser\sql\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\sql\statements.cpp">
+      <Filter>SQLParser\sql\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql-parser\src\util\sqlhelper.cpp">
+      <Filter>SQLParser\util\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchiveStrategy.cpp">
       <Filter>Logging\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

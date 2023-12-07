@@ -22,6 +22,7 @@
 #include "Poco/FIFOBuffer.h"
 #include "Poco/Delegate.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 #include <iostream>
 
 
@@ -36,6 +37,8 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::Buffer;
 using Poco::FIFOBuffer;
+using Poco::Path;
+using Poco::File;
 using Poco::delegate;
 
 
@@ -536,12 +539,14 @@ void SocketTest::testSelect3()
 
 void SocketTest::testEchoUnixLocal()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 #if POCO_OS == POCO_OS_ANDROID
-	Poco::File socketFile("/data/local/tmp/SocketTest.sock");
+	File socketFile("/data/local/tmp/SocketTest.sock");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	File socketFile(Path::tempHome() + "SocketTest.sock");
 #else
-	Poco::File socketFile("/tmp/SocketTest.sock");
-#endif
+	File socketFile("/tmp/SocketTest.sock");
+#endif // POCO_OS == POCO_OS_ANDROID
 	if (socketFile.exists()) socketFile.remove();
 	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, socketFile.path());
 	EchoServer echoServer(localAddr);
@@ -554,7 +559,41 @@ void SocketTest::testEchoUnixLocal()
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
-	socketFile.remove();
+	if (socketFile.exists()) socketFile.remove();
+	echoServer.stop();
+#else // POCO_HAS_UNIX_SOCKET
+	#if POCO_OS == POCO_OS_WINDOWS_NT
+		#pragma message("[UNIX LOCAL SOCKET DISABLED]")
+	#endif
+	std::cout << "[UNIX LOCAL SOCKET DISABLED]";
+#endif
+}
+
+
+void SocketTest::testUnixLocalAbstract()
+{
+// abstract local sockets don't work on windows
+// see https://github.com/microsoft/WSL/issues/4240
+// they are a nonportable Linux extension
+#if (POCO_OS == POCO_OS_LINUX) && defined(POCO_HAS_UNIX_SOCKET)
+	std::string addr("\0look ma - no file!", 20);
+	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, addr);
+	EchoServer echoServer(localAddr);
+	StreamSocket ss(SocketAddress::UNIX_LOCAL);
+	ss.connect(localAddr);
+	int n = ss.sendBytes("hello", 5);
+	assertTrue(n == 5);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue(n == 5);
+	assertTrue(std::string(buffer, n) == "hello");
+	ss.close();
+	echoServer.stop();
+#else // POCO_HAS_UNIX_SOCKET
+	#if POCO_OS == POCO_OS_WINDOWS_NT
+		#pragma message("[ABSTRACT UNIX LOCAL SOCKET DISABLED]")
+	#endif
+	std::cout << "[ABSTRACT UNIX LOCAL SOCKET DISABLED]";
 #endif
 }
 
@@ -610,6 +649,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
+	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 
 	return pSuite;
 }

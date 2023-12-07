@@ -730,6 +730,7 @@
     <ClCompile Include="src\ThreadingTestSuite.cpp" />
     <ClCompile Include="src\ThreadLocalTest.cpp" />
     <ClCompile Include="src\ThreadPoolTest.cpp" />
+    <ClCompile Include="src\ActiveThreadPoolTest.cpp" />
     <ClCompile Include="src\ThreadTest.cpp" />
     <ClCompile Include="src\TimedNotificationQueueTest.cpp" />
     <ClCompile Include="src\TimerTest.cpp" />
@@ -871,6 +872,7 @@
     <ClInclude Include="src\ThreadingTestSuite.h" />
     <ClInclude Include="src\ThreadLocalTest.h" />
     <ClInclude Include="src\ThreadPoolTest.h" />
+    <ClInclude Include="src\ActiveThreadPoolTest.h" />
     <ClInclude Include="src\ThreadTest.h" />
     <ClInclude Include="src\TimedNotificationQueueTest.h" />
     <ClInclude Include="src\TimerTest.h" />

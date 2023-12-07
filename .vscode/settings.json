@@ -95,7 +95,13 @@
 		"strstream": "cpp",
 		"future": "cpp",
 		"shared_mutex": "cpp",
-		"stop_token": "cpp"
+		"stop_token": "cpp",
+		"codecvt": "cpp",
+		"numbers": "cpp",
+		"span": "cpp",
+		"semaphore": "cpp",
+		"__verbose_abort": "cpp",
+		"charconv": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
@@ -103,5 +109,9 @@
         "**/obj": true
 	},
 	"git.ignoreLimitWarning": true,
-	"cmake.configureOnOpen": false
+	"cmake.configureOnOpen": false,
+	"cmake.buildDirectory": "${workspaceFolder}/cmake-build-vs",
+	"cmake.configureArgs": [
+		"-DENABLE_TESTS=ON"
+	]
 }

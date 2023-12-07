@@ -96,6 +96,21 @@ void SecureSocketImpl::acceptSSL()
 		BIO_free(pBIO);
 		throw SSLException("Cannot create SSL object");
 	}
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL
+	/* TLS 1.3 server sends session tickets after a handhake as part of
+	* the SSL_accept(). If a client finishes all its job before server
+	* sends the tickets, SSL_accept() fails with EPIPE errno. Since we
+	* are not interested in a session resumption, we can not to send the
+	* tickets. */
+	if (1 != SSL_set_num_tickets(_pSSL, 0))
+	{
+		BIO_free(pBIO);
+		throw SSLException("Cannot create SSL object");
+	}
+	//Otherwise we can perform two-way shutdown. Client must call SSL_read() before the final SSL_shutdown().
+#endif
+
 	SSL_set_bio(_pSSL, pBIO, pBIO);
 	SSL_set_accept_state(_pSSL);
 	SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);

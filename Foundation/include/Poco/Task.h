@@ -107,7 +107,7 @@ protected:
 		/// A Task should use this method in favor of Thread::sleep().
 
 	bool yield();
-	    /// Yields cpu to other threads
+		/// Yields cpu to other threads
 		///
 		/// If the task is cancelled while it is suspended,
 		/// yield() will return true. If the tasks resumes
@@ -145,12 +145,12 @@ private:
 	Task(const Task&);
 	Task& operator = (const Task&);
 
-	std::string       _name;
-	TaskManager*      _pOwner;
-	float             _progress;
+	std::string            _name;
+	TaskManager*           _pOwner;
+	std::atomic<float>     _progress;
 	std::atomic<TaskState> _state;
-	Event             _cancelEvent;
-	mutable FastMutex _mutex;
+	Event                  _cancelEvent;
+	mutable FastMutex      _mutex;
 
 	friend class TaskManager;
 };
@@ -167,8 +167,6 @@ inline const std::string& Task::name() const
 
 inline float Task::progress() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
 	return _progress;
 }
 

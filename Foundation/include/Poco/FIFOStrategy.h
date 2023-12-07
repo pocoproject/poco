@@ -41,11 +41,22 @@ public:
 	{
 	}
 
+	FIFOStrategy(FIFOStrategy&& s):
+		DefaultStrategy<TArgs, TDelegate>(std::move(s))
+	{
+	}
+
 	~FIFOStrategy()
 	{
 	}
 
 	FIFOStrategy& operator = (const FIFOStrategy& s)
+	{
+		DefaultStrategy<TArgs, TDelegate>::operator = (s);
+		return *this;
+	}
+	
+	FIFOStrategy& operator = (FIFOStrategy&& s)
 	{
 		DefaultStrategy<TArgs, TDelegate>::operator = (s);
 		return *this;

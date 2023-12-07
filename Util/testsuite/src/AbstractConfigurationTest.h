@@ -29,6 +29,7 @@ public:
 	void testHasProperty();
 	void testGetString();
 	void testGetInt();
+	void testGetInt16();
 	void testGetInt64();
 	void testGetDouble();
 	void testGetBool();

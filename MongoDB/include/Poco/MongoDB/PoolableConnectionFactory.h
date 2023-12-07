@@ -89,11 +89,13 @@ namespace MongoDB {
 
 class PooledConnection
 	/// Helper class for borrowing and returning a connection automatically from a pool.
+	/// Note that the connection pool is not expected to be deleted during the lifetime
+	/// of an instance of PooledConnection.
 {
 public:
-	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(pool)
+	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(&pool)
 	{
-		_connection = _pool.borrowObject();
+		_connection = _pool->borrowObject();
 	}
 
 	virtual ~PooledConnection()
@@ -102,7 +104,7 @@ public:
 		{
 			if (_connection)
 			{
-				_pool.returnObject(_connection);
+				_pool->returnObject(_connection);
 			}
 		}
 		catch (...)
@@ -116,25 +118,16 @@ public:
 		return _connection;
 	}
 
-#if defined(POCO_ENABLE_CPP11)
 	// Disable copy to prevent unwanted release of resources: C++11 way
-    PooledConnection(const PooledConnection&) = delete;
-    PooledConnection& operator=(const PooledConnection&) = delete;
+	PooledConnection(const PooledConnection&) = delete;
+	PooledConnection& operator=(const PooledConnection&) = delete;
 
-    // Enable move semantics
-    PooledConnection(PooledConnection&& other) = default;
-    PooledConnection& operator=(PooledConnection&&) = default;
-#endif
+	// Enable move semantics
+	PooledConnection(PooledConnection&& other) = default;
+	PooledConnection& operator=(PooledConnection&&) = default;
 
 private:
-
-#if ! defined(POCO_ENABLE_CPP11)
-	// Disable copy to prevent unwanted release of resources: pre C++11 way
-    PooledConnection(const PooledConnection&);
-    PooledConnection& operator=(const PooledConnection&);
-#endif
-
-	Poco::ObjectPool<Connection, Connection::Ptr>& _pool;
+	Poco::ObjectPool<Connection, Connection::Ptr>* _pool;
 	Connection::Ptr _connection;
 };
 

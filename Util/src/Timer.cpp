@@ -106,6 +106,7 @@ public:
 			}
 		}
 
+		queue().clear();
 		_finished.set();
 		return true;
 	}

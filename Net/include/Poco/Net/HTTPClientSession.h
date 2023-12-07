@@ -384,7 +384,7 @@ private:
 	HTTPBasicCredentials  _proxyBasicCreds;
 	HTTPDigestCredentials _proxyDigestCreds;
 	HTTPNTLMCredentials   _proxyNTLMCreds;
-	bool                  _ntlmProxyAuthenticated;
+	bool                  _ntlmProxyAuthenticated = false;
 
 	static ProxyConfig _globalProxyConfig;
 

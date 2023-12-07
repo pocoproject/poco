@@ -302,6 +302,10 @@ public:
 protected:
 	P activateObject(P pObject)
 	{
+#if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif
 		try
 		{
 			_factory.activateObject(pObject);
@@ -312,6 +316,9 @@ protected:
 			throw;
 		}
 		return pObject;
+#if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
+	#pragma GCC diagnostic pop
+#endif
 	}
 
 private:

@@ -116,12 +116,22 @@ template <class S>
 S toUpper(const S& str)
 	/// Returns a copy of str containing all upper-case characters.
 {
-	typename S::const_iterator it  = str.begin();
-	typename S::const_iterator end = str.end();
+	S result(str);
 
-	S result;
-	result.reserve(str.size());
-	while (it != end) result += static_cast<typename S::value_type>(Ascii::toUpper(*it++));
+	typename S::iterator it  = result.begin();
+	typename S::iterator end = result.end();
+
+#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#	pragma clang loop unroll(enable)
+#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#	pragma loop(hint_parallel(0))
+#endif
+	while (it != end)
+	{
+		int ch = static_cast<unsigned char>(*it);
+		*it = static_cast<typename S::value_type>(Ascii::toUpper(ch));
+		++it;
+	}
 	return result;
 }
 
@@ -133,7 +143,17 @@ S& toUpperInPlace(S& str)
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 
-	while (it != end) { *it = static_cast<typename S::value_type>(Ascii::toUpper(*it)); ++it; }
+#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#	pragma clang loop unroll(enable)
+#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#	pragma loop(hint_parallel(0))
+#endif
+	while (it != end)
+	{
+		int ch = static_cast<unsigned char>(*it);
+		*it = static_cast<typename S::value_type>(Ascii::toUpper(ch));
+		++it;
+	}
 	return str;
 }
 
@@ -142,12 +162,22 @@ template <class S>
 S toLower(const S& str)
 	/// Returns a copy of str containing all lower-case characters.
 {
-	typename S::const_iterator it  = str.begin();
-	typename S::const_iterator end = str.end();
+	S result(str);
 
-	S result;
-	result.reserve(str.size());
-	while (it != end) result += static_cast<typename S::value_type>(Ascii::toLower(*it++));
+	typename S::iterator it  = result.begin();
+	typename S::iterator end = result.end();
+
+#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#	pragma clang loop unroll(enable)
+#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#	pragma loop(hint_parallel(0))
+#endif
+	while (it != end)
+	{
+		int ch = static_cast<unsigned char>(*it);
+		*it = static_cast<typename S::value_type>(Ascii::toLower(ch));
+		++it;
+	}
 	return result;
 }
 
@@ -159,7 +189,17 @@ S& toLowerInPlace(S& str)
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 
-	while (it != end) { *it = static_cast<typename S::value_type>(Ascii::toLower(*it)); ++it; }
+#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#	pragma clang loop unroll(enable)
+#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#	pragma loop(hint_parallel(0))
+#endif
+	while (it != end)
+	{
+		int ch = static_cast<unsigned char>(*it);
+		*it = static_cast<typename S::value_type>(Ascii::toLower(ch));
+		++it;
+	}
 	return str;
 }
 

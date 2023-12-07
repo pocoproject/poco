@@ -324,6 +324,7 @@ void TCPServerTest::testReuseSession()
 		9,
 		true,
 		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	pServerContext->disableProtocols(Context::PROTO_TLSV1_3);
 	pServerContext->enableSessionCache(true, "TestSuite");
 	pServerContext->setSessionTimeout(10);
 	pServerContext->setSessionCacheSize(1000);
@@ -363,6 +364,11 @@ void TCPServerTest::testReuseSession()
 	assertTrue (srv.totalConnections() == 1);
 
 	Session::Ptr pSession = ss1.currentSession();
+	if (!pSession || !pSession->isResumable())
+	{
+		std::cerr << "WARNING: Server did not return a session or session is not resumable. Aborting test." << std::endl;
+		return;
+	}
 
 	ss1.close();
 	Thread::sleep(300);

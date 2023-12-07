@@ -22,7 +22,9 @@
             "${POCO_BASE}/JWT/include",
             "${POCO_BASE}/Redis/include",
             "${POCO_BASE}/MongoDB/include",
-            "${POCO_BASE}/ApacheConnector/include"
+            "${POCO_BASE}/ApacheConnector/include",
+            "${POCO_BASE}/Data/src",
+            "${POCO_BASE}/Data/testsuite/DataTest/include"
         ]
     },
     "configurations": [

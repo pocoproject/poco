@@ -29,8 +29,8 @@
 class ODBCTest: public CppUnit::TestCase
 {
 public:
-	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
-	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
+	using SessionPtr = Poco::SharedPtr<Poco::Data::Session>;
+	using ExecPtr = Poco::SharedPtr<SQLExecutor>;
 
 	ODBCTest(const std::string& name,
 		SessionPtr pSession,
@@ -46,6 +46,10 @@ public:
 	virtual void tearDown();
 
 	virtual void testBareboneODBC() = 0;
+
+	virtual void testConnection();
+	virtual void testSession();
+	virtual void testSessionPool();
 
 	virtual void testZeroRows();
 	virtual void testSimpleAccess();
@@ -107,6 +111,8 @@ public:
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
 
+	virtual void testRecordSet();
+
 	virtual void testDateTime();
 	virtual void testDate();
 	virtual void testTime();
@@ -146,7 +152,10 @@ public:
 	virtual void testSQLChannel();
 	virtual void testSQLLogger();
 
+	virtual void testAutoCommit();
+	virtual void testTransactionIsolation();
 	virtual void testSessionTransaction();
+	virtual void testSessionTransactionNoAutoCommit();
 	virtual void testTransaction();
 	virtual void testTransactor();
 	virtual void testNullable();
@@ -227,8 +236,8 @@ inline void ODBCTest::testTempTable()
 	throw Poco::NotImplementedException("ODBCTest::testTempTable()");
 }
 
-inline void ODBCTest::testStoredProcedure() 
-{ 
+inline void ODBCTest::testStoredProcedure()
+{
 	throw Poco::NotImplementedException("ODBCTest::testStoredProcedure()");
 }
 

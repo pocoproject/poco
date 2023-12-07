@@ -53,7 +53,7 @@ and PocoLIB64d.dll for debug, respectively.
 
 In order to work around that, `/Zc:__cplusplus` compiler flag is necesary.
 
-See following issues for details and explanations:
+See the following issues for details and explanations:
 
   * https://github.com/pocoproject/poco/issues/3665
   * https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/

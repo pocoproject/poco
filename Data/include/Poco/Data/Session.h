@@ -151,6 +151,12 @@ class Data_API Session
 	/// If the formatting will occur and the percent sign is part of the query itself, it can be passed to the query by entering it twice (%%).
 	/// However, if no formatting is used, one percent sign is sufficient as the string will be passed unaltered.
 	/// For complete list of supported data types with their respective specifications, see the documentation for format in Foundation.
+	///
+	/// Transactions are supported via the begin(), commit() and rollback() methods.
+	/// If the session is in autocommit mode, begin() will temporarily disable autocommit mode for the duration of the transaction.
+	/// Calls to either commit() or rollback() will re-enable it.
+	/// Poco::Data::Transaction, a convenient session wrapper class, automates this process and provides RAII-based transactional behavior.
+	/// For more information, see Transation class documentation.
 {
 public:
 	static const std::size_t LOGIN_TIMEOUT_DEFAULT = SessionImpl::LOGIN_TIMEOUT_DEFAULT;
@@ -160,7 +166,7 @@ public:
 	static const Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
 
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
-		/// Creates the Session.
+		/// Creates the Session from SessionImpl.
 
 	Session(const std::string& connector,
 		const std::string& connectionString,
@@ -193,9 +199,9 @@ public:
 
 	template <typename T>
 	Statement operator << (const T& t)
-		/// Creates a Statement with the given data as SQLContent
+		/// Creates a Statement with the given string as SQLContent.
 	{
-		return _statementCreator << t;
+		return (_statementCreator << t);
 	}
 
 	SharedPtr<StatementImpl> createStatementImpl();
@@ -221,6 +227,13 @@ public:
 	bool isGood();
 		/// Returns true iff the session is good and can be used, false otherwise.
 
+	bool isAutocommit() const;
+		/// Returns true iff the session is in autocommit mode, false otherwise.
+		/// If the session does not support autocommit, it is assumed not to
+		/// be in auto commit mode.
+		/// This function looks for the "autoCommit" feature and returns its value.
+		/// It is recommended for all back-end implementations to support this feature.
+
 	void setLoginTimeout(std::size_t timeout);
 		/// Sets the session login timeout value.
 
@@ -235,12 +248,19 @@ public:
 
 	void begin();
 		/// Starts a transaction.
+		/// If `session` is in autocommit mode, it is switched to manual commit mode
+		/// for the duration of the transaction and reverted back to the original mode
+		/// after transaction completes (on rollback or commit() call).
 
 	void commit();
 		/// Commits and ends a transaction.
+		/// If `session` was in autocommit mode when the transaction started (begin() call),
+		/// it is switched back to autocommit mode.
 
 	void rollback();
 		/// Rolls back and ends a transaction.
+		/// If `session` was in autocommit mode when the transaction started (begin() call),
+		/// it is switched back to autocommit mode.
 
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.
@@ -273,6 +293,9 @@ public:
 		/// Utility function that teturns the URI formatted from supplied
 		/// arguments as "connector:///connectionString".
 
+	bool hasFeature(const std::string& name) const;
+		/// Returns true if session has the named feature.
+
 	void setFeature(const std::string& name, bool state);
 		/// Set the state of a feature.
 		///
@@ -290,6 +313,9 @@ public:
 		///
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
+
+	bool hasProperty(const std::string& name) const;
+		/// Returns true if session has the named property.
 
 	void setProperty(const std::string& name, const Poco::Any& value);
 		/// Set the value of a property.
@@ -316,13 +342,21 @@ private:
 	Session();
 
 	Poco::AutoPtr<SessionImpl> _pImpl;
-	StatementCreator           _statementCreator;
+	StatementCreator _statementCreator;
+	bool _wasAutoCommit = false;
 };
 
 
 //
 // inlines
 //
+
+inline bool Session::isAutocommit() const
+{
+	return _pImpl->isAutocommit();
+}
+
+
 inline SharedPtr<StatementImpl> Session::createStatementImpl()
 {
 	return _pImpl->createStatementImpl();
@@ -383,24 +417,6 @@ inline std::size_t Session::getConnectionTimeout()
 }
 
 
-inline void Session::begin()
-{
-	return _pImpl->begin();
-}
-
-
-inline void Session::commit()
-{
-	return _pImpl->commit();
-}
-
-
-inline void Session::rollback()
-{
-	return _pImpl->rollback();
-}
-
-
 inline bool Session::canTransact()
 {
 	return _pImpl->canTransact();
@@ -456,6 +472,12 @@ inline std::string Session::uri() const
 }
 
 
+inline bool Session::hasFeature(const std::string& name) const
+{
+	return _pImpl->hasFeature(name);
+}
+
+
 inline void Session::setFeature(const std::string& name, bool state)
 {
 	_pImpl->setFeature(name, state);
@@ -467,6 +489,11 @@ inline bool Session::getFeature(const std::string& name) const
 	return const_cast<SessionImpl*>(_pImpl.get())->getFeature(name);
 }
 
+
+inline bool Session::hasProperty(const std::string& name) const
+{
+	return _pImpl->hasProperty(name);
+}
 
 inline void Session::setProperty(const std::string& name, const Poco::Any& value)
 {

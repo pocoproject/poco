@@ -25,6 +25,7 @@ public:
 	~HTTPClientSessionTest();
 
 	void testGetSmall();
+	void testGetSmallUnix();
 	void testGetLarge();
 	void testHead();
 	void testPostSmallIdentity();

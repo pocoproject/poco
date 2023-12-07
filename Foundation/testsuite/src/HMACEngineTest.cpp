@@ -94,7 +94,7 @@ void HMACEngineTest::testHMAC_SHA2_224()
 		0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19
 	};
 	key  = std::string(str.begin(), str.end()); // 25 bytes
-	data = std::string(50, 0xcd);
+	data = std::string(50, (char)0xcd);
 	HMACEngine<SHA2Engine224> hmac4(key);
 	hmac4.update(data);
 	digest = DigestEngine::digestToHex(hmac4.digest());
@@ -131,7 +131,7 @@ void HMACEngineTest::testHMAC_SHA2_224()
 		digest = DigestEngine::digestToHex(d, d.size()+1);
 		fail("Invalid digest length, must throw.");
 	}
-	catch(const Poco::InvalidArgumentException& e) {}
+	catch(const Poco::InvalidArgumentException&) {}
 }
 
 
@@ -166,7 +166,7 @@ void HMACEngineTest::testHMAC_SHA2_256()
 		0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19
 	};
 	key  = std::string(str.begin(), str.end()); // 25 bytes
-	data = std::string(50, 0xcd);
+	data = std::string(50, (char)0xcd);
 	HMACEngine<SHA2Engine256> hmac4(key);
 	hmac4.update(data);
 	digest = DigestEngine::digestToHex(hmac4.digest());
@@ -203,7 +203,7 @@ void HMACEngineTest::testHMAC_SHA2_256()
 		digest = DigestEngine::digestToHex(d, d.size()+1);
 		fail("Invalid digest length, must throw.");
 	}
-	catch(const Poco::InvalidArgumentException& e) {}
+	catch(const Poco::InvalidArgumentException&) {}
 }
 
 
@@ -244,7 +244,7 @@ void HMACEngineTest::testHMAC_SHA2_384()
 		0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19
 	};
 	key  = std::string(str.begin(), str.end()); // 25 bytes
-	data = std::string(50, 0xcd);
+	data = std::string(50, (char)0xcd);
 	HMACEngine<SHA2Engine384> hmac4(key);
 	hmac4.update(data);
 	digest = DigestEngine::digestToHex(hmac4.digest());
@@ -287,7 +287,7 @@ void HMACEngineTest::testHMAC_SHA2_384()
 		digest = DigestEngine::digestToHex(d, d.size()+1);
 		fail("Invalid digest length, must throw.");
 	}
-	catch(const Poco::InvalidArgumentException& e) {}
+	catch(const Poco::InvalidArgumentException&) {}
 }
 
 
@@ -331,7 +331,7 @@ void HMACEngineTest::testHMAC_SHA2_512()
 		0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19
 	};
 	key  = std::string(str.begin(), str.end()); // 25 bytes
-	data = std::string(50, 0xcd);
+	data = std::string(50, (char)0xcd);
 	HMACEngine<SHA2Engine512> hmac4(key);
 	hmac4.update(data);
 	digest = DigestEngine::digestToHex(hmac4.digest());
@@ -377,7 +377,7 @@ void HMACEngineTest::testHMAC_SHA2_512()
 		digest = DigestEngine::digestToHex(d, d.size()+1);
 		fail("Invalid digest length, must throw.");
 	}
-	catch(const Poco::InvalidArgumentException& e) {}
+	catch(const Poco::InvalidArgumentException&) {}
 }
 
 

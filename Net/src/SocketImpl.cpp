@@ -242,8 +242,15 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reus
 	{
 		init(address.af());
 	}
-	setReuseAddress(reuseAddress);
-	setReusePort(reusePort);
+
+#ifdef POCO_HAS_UNIX_SOCKET
+	if (address.family() != SocketAddress::Family::UNIX_LOCAL)
+#endif
+	{
+		setReuseAddress(reuseAddress);
+		setReusePort(reusePort);
+	}
+
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else

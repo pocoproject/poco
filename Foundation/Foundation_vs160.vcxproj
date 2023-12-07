@@ -1099,6 +1099,7 @@
     </ClCompile>
     <ClCompile Include="src\pcre2_valid_utf.c" />
     <ClCompile Include="src\pcre2_xclass.c" />
+    <ClCompile Include="src\PIDFile.cpp" />
     <ClCompile Include="src\Pipe.cpp" />
     <ClCompile Include="src\PipeImpl.cpp" />
     <ClCompile Include="src\PipeImpl_DUMMY.cpp">
@@ -1174,6 +1175,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\ProcessRunner.cpp" />
     <ClCompile Include="src\PurgeStrategy.cpp" />
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\RandomStream.cpp" />
@@ -1391,6 +1393,7 @@
     <ClCompile Include="src\Thread.cpp" />
     <ClCompile Include="src\ThreadLocal.cpp" />
     <ClCompile Include="src\ThreadPool.cpp" />
+    <ClCompile Include="src\ActiveThreadPool.cpp" />
     <ClCompile Include="src\ThreadTarget.cpp" />
     <ClCompile Include="src\Thread_POSIX.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
@@ -1469,6 +1472,7 @@
     <ClCompile Include="src\Var.cpp" />
     <ClCompile Include="src\VarHolder.cpp" />
     <ClCompile Include="src\VarIterator.cpp" />
+    <ClCompile Include="src\VarVisitor.cpp" />
     <ClCompile Include="src\Void.cpp" />
     <ClCompile Include="src\Windows1250Encoding.cpp" />
     <ClCompile Include="src\Windows1251Encoding.cpp" />
@@ -1659,6 +1663,7 @@
     <ClInclude Include="include\Poco\Path_WIN32U.h" />
     <ClInclude Include="include\Poco\PatternFormatter.h" />
     <ClInclude Include="include\Poco\PBKDF2Engine.h" />
+    <ClInclude Include="include\Poco\PIDFile.h" />
     <ClInclude Include="include\Poco\Pipe.h" />
     <ClInclude Include="include\Poco\PipeImpl.h" />
     <ClInclude Include="include\Poco\PipeImpl_DUMMY.h" />
@@ -1677,6 +1682,7 @@
     <ClInclude Include="include\Poco\Process.h" />
     <ClInclude Include="include\Poco\Process_UNIX.h" />
     <ClInclude Include="include\Poco\Process_WIN32U.h" />
+    <ClInclude Include="include\Poco\ProcessRunner.h" />
     <ClInclude Include="include\Poco\PurgeStrategy.h" />
     <ClInclude Include="include\Poco\Random.h" />
     <ClInclude Include="include\Poco\RandomStream.h" />

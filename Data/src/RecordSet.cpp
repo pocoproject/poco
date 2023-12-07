@@ -244,7 +244,8 @@ Row& RecordSet::row(std::size_t pos)
 
 std::size_t RecordSet::rowCount() const
 {
-	poco_assert (extractions().size());
+	if (extractions().size() == 0) return 0;
+
 	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;
 
@@ -255,6 +256,12 @@ std::size_t RecordSet::rowCount() const
 	}
 
 	return counter;
+}
+
+
+std::size_t RecordSet::affectedRowCount() const
+{
+	return Statement::affectedRowCount();
 }
 
 

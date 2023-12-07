@@ -59,10 +59,16 @@ IniFileConfiguration::~IniFileConfiguration()
 
 void IniFileConfiguration::load(std::istream& istr)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	_map.clear();
 	_sectionKey.clear();
 	while (!istr.eof())
 	{
+		if(istr.fail())
+		{
+			throw Poco::IOException("Broken input stream");
+		}
 		parseLine(istr);
 	}
 }

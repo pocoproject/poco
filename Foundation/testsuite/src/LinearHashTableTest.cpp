@@ -19,6 +19,12 @@
 #include <iostream>
 
 
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4834) // divide by zero
+#endif // POCO_COMPILER_MSVC
+
+
 using Poco::LinearHashTable;
 using Poco::Hash;
 using Poco::HashTable;
@@ -245,7 +251,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			s.find(i);
+			auto it = s.find(i);
 		}
 		sw.stop();
 		std::cout << "Find set: " << sw.elapsedSeconds() << std::endl;
@@ -322,7 +328,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			s.find(values[i]);
+			auto it = s.find(values[i]);
 		}
 		sw.stop();
 		std::cout << "Find set: " << sw.elapsedSeconds() << std::endl;
@@ -354,3 +360,7 @@ CppUnit::Test* LinearHashTableTest::suite()
 
 	return pSuite;
 }
+
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#endif // POCO_COMPILER_MSVC

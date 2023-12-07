@@ -42,6 +42,7 @@ include $(POCO_BASE)/build/rules/compile
 # Rules for creating a dynamically loadable shared library
 #
 clean:
+	$(RM) $(POCO_BUILD_STDERR_FILE)
 	$(RM) $(OBJPATH)
 	$(RM) $(DYLIB_DEBUG) $(DYLIB_RELEASE) $(DYLIB_S_DEBUG) $(DYLIB_S_RELEASE)
 

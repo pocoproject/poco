@@ -149,6 +149,10 @@
 
 // No UNIX socket support
 // Define to disable unix sockets
+// UNIX local sockets are default-enabled on
+// all UNIX systems, on Windows if available
+// See Net/SocketDefs.h
+// See https://devblogs.microsoft.com/commandline/af_unix-comes-to-windows/
 // #define POCO_NET_NO_UNIX_SOCKET
 
 
@@ -211,6 +215,19 @@
 // Enable usage of Poco::Mutex and Poco::FastMutex
 // as wrappers for std::recursive_mutex and std::mutex
 #ifndef POCO_ENABLE_STD_MUTEX
-// #define POCO_ENABLE_STD_MUTEX
+//	#define POCO_ENABLE_STD_MUTEX
 #endif
+
+#define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+
+// Uncomment to explicitly disable SQLParser
+// #define POCO_DATA_NO_SQL_PARSER
+
+// Automatically disable SQL parser for < c++17 compile
+#if !defined(POCO_DATA_NO_SQL_PARSER)
+	#ifndef POCO_HAVE_CPP17_COMPILER
+		#define POCO_DATA_NO_SQL_PARSER
+	#endif
+#endif
+
 #endif // Foundation_Config_INCLUDED

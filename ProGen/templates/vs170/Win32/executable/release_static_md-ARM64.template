@@ -40,6 +40,9 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="0"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
+		LanguageStandard="${vc.project.compiler.std.cpp}"
+		LanguageStandard_C="${vc.project.compiler.std.c}"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
@@ -54,8 +57,8 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="iphlpapi.lib winmm.lib mswsock.lib ${configuration.linker.dependencies}"
-		OutputFile="binA64\static_md\${project.target}.exe"
+		AdditionalDependencies="iphlpapi.lib winmm.lib ${configuration.linker.dependencies}"
+		OutputFile="$(OutDir)$(TargetName).exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\libA64;${configuration.linker.libraries}"
 		GenerateDebugInformation="false"

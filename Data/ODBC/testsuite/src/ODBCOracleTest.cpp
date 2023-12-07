@@ -41,12 +41,12 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in XE"
+#define ORACLE_ODBC_DRIVER "Oracle 21 ODBC driver"
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
 #define ORACLE_SID "XE"
-#define ORACLE_UID "poco"
+#define ORACLE_UID "SYSTEM"
 #define ORACLE_PWD "poco"
 
 
@@ -854,6 +854,9 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
 
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSession);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
@@ -928,6 +931,9 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransaction);
