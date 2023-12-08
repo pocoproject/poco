@@ -56,7 +56,7 @@
 using sighandler_t = sig_t;
 #endif
 
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
 #include <sys/sendfile.h>
 #endif
 
@@ -1422,6 +1422,8 @@ Poco::Int64 _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, Poco::UInt64 o
 	{
 		sent = sentSize;
 	}
+#else
+	throw Poco::NotImplementedException("sendfile not implemented for this platform");
 #endif
 #endif
 	if (errno == EAGAIN || errno == EWOULDBLOCK) 
@@ -1438,7 +1440,8 @@ Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 
 	std::streamoff sentSize = fileSize - offset;
 	Poco::Int64 sent = 0;
 	sighandler_t sigPrev = signal(SIGPIPE, SIG_IGN);
-	while (sent == 0) {
+	while (sent == 0)
+	{
 		errno = 0;
 		sent = _sendfile(_sockfd, fd, offset, sentSize);
 	}

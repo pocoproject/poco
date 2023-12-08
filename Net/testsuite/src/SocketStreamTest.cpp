@@ -21,6 +21,7 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 
 
 using Poco::Net::Socket;
@@ -127,7 +128,8 @@ void SocketStreamTest::testSendFile()
 {
 	const int fileSize = 64000;
 	std::string payload(fileSize, 'x');
-	const std::string fileName = "test.sendfile.txt";
+	Poco::Path testFilePath = Poco::Path::temp().append("test.sendfile.txt");
+	const std::string fileName = testFilePath.toString();
 	{
 		File f(fileName);
 		if (f.exists())
@@ -147,7 +149,15 @@ void SocketStreamTest::testSendFile()
 
 	Poco::UInt64 offset = 0;
 	Poco::Int64 sent = 0;
+	try
+	{
 	sent = ss.sendFile(fin);
+	}
+	catch (Poco::NotImplementedException &)
+	{
+		std::cout << "[NOT IMPLEMENTED]\n";
+		return;
+	}
 	assertTrue(sent >= 0);
 	while (sent < fileSize)
 	{
