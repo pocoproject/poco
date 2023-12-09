@@ -23,6 +23,11 @@
 #include <cstring>
 #include <algorithm>
 
+// ignore loop unrolling warnings in this file
+#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wpass-failed"
+#endif
 
 namespace Poco {
 
@@ -760,5 +765,8 @@ struct CILess
 
 } // namespace Poco
 
+#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#	pragma clang diagnostic pop
+#endif
 
 #endif // Foundation_String_INCLUDED

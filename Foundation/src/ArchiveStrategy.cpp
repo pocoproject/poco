@@ -123,7 +123,7 @@ void ArchiveStrategy::moveFile(const std::string& oldPath, const std::string& ne
 	{
 		f.renameTo(newPath);
 		if (!_pCompressor) _pCompressor = new ArchiveCompressor;
-		_pCompressor->compress(newPath);
+		_pCompressor.load()->compress(newPath);
 	}
 }
 

@@ -48,30 +48,39 @@ TaskManager::TaskManager(ThreadPool& pool):
 
 TaskManager::~TaskManager()
 {
+	for (auto& pTask: _taskList)
+		pTask->setOwner(nullptr);
+
 	if (_ownPool) delete &_threadPool;
 }
 
 
-void TaskManager::start(Task* pTask)
+bool TaskManager::start(Task* pTask)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
-	pAutoTask->setOwner(this);
-	pAutoTask->setState(Task::TASK_STARTING);
+	if (pTask->getOwner())
+		throw IllegalStateException("Task already owned by another TaskManager");
 
-	ScopedLockT lock(_mutex);
-	_taskList.push_back(pAutoTask);
-	try
+	if (pTask->state() == Task::TASK_IDLE)
 	{
-		_threadPool.start(*pAutoTask, pAutoTask->name());
+		pTask->setOwner(this);
+		pTask->setState(Task::TASK_STARTING);
+		try
+		{
+			_threadPool.start(*pTask, pTask->name());
+			ScopedLockT lock(_mutex);
+			_taskList.push_back(pAutoTask);
+			return true;
+		}
+		catch (...)
+		{
+			pTask->setOwner(nullptr);
+			throw;
+		}
 	}
-	catch (...)
-	{
-		// Make sure that we don't act like we own the task since
-		// we never started it.  If we leave the task on our task
-		// list, the size of the list is incorrect.
-		_taskList.pop_back();
-		throw;
-	}
+
+	pTask->setOwner(nullptr);
+	return false;
 }
 
 
@@ -152,6 +161,7 @@ void TaskManager::taskFinished(Task* pTask)
 	{
 		if (*it == pTask)
 		{
+			pTask->setOwner(nullptr);
 			_taskList.erase(it);
 			break;
 		}

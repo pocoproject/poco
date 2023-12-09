@@ -18,6 +18,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Stopwatch.h"
 #include <iostream>
+#include <numeric>
 
 
 using namespace Poco;
@@ -357,12 +358,14 @@ void FIFOEventTest::testAsyncNotifyBenchmark()
 	const int cnt = 10000;
 	int runCount = 1000;
 	const Poco::Int64 allCount = cnt * runCount;
+	std::vector<int> times;
+	times.reserve(allCount);
+	std::vector<Poco::ActiveResult<int>> vresult;
+	vresult.reserve(cnt);
 	Poco::Stopwatch sw;
-	sw.restart();
 	while (runCount-- > 0)
 	{
-		std::vector<Poco::ActiveResult<int>> vresult;
-		vresult.reserve(cnt);
+		sw.restart();
 		for (int i = 0; i < cnt; ++i)
 		{
 			vresult.push_back(simple.notifyAsync(this, i));
@@ -373,11 +376,18 @@ void FIFOEventTest::testAsyncNotifyBenchmark()
 			vresult[i].wait();
 			assertTrue (vresult[i].data() == (i*2));
 		}
+		sw.stop();
+		times.push_back(sw.elapsed()/1000);
+		vresult.clear();
 	}
-	sw.stop();
-	std::cout << "notify and wait time = " << sw.elapsed() / 1000 << std::endl;
+
+	Poco::UInt64 totTime = std::accumulate(times.begin(), times.end(), 0);
+	double avgTime = static_cast<double>(totTime)/times.size();
+	std::cout << "Total notify/wait time for " << allCount << " runs of "
+		<< cnt << " tasks = " << totTime << "ms (avg/run=" << avgTime << "ms)";
 	assertTrue (_count == allCount);
 }
+
 
 void FIFOEventTest::onVoid(const void* pSender)
 {
@@ -482,6 +492,6 @@ CppUnit::Test* FIFOEventTest::suite()
 	CppUnit_addTest(pSuite, FIFOEventTest, testExpireReRegister);
 	CppUnit_addTest(pSuite, FIFOEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotify);
-	CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
+	//CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
 	return pSuite;
 }

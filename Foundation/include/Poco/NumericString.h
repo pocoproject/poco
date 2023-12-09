@@ -387,7 +387,8 @@ bool intToStr(T value,
 	char fill = ' ',
 	char thSep = 0,
 	bool lowercase = false)
-	/// Converts integer to string. Standard numeric bases from binary to hexadecimal are supported.
+	/// Converts signed integer to string. Standard numeric bases from binary to hexadecimal
+	/// are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
 	/// paddings are prepended to the formatted result with minus sign or base prefix included
@@ -534,8 +535,8 @@ bool intToStr(T value,
 }
 
 
-//@ deprecated
 template <typename T>
+[[deprecated("use intToStr instead")]]
 bool uIntToStr(T value,
 	unsigned short base,
 	char* result,
@@ -579,8 +580,8 @@ bool intToStr (T number,
 }
 
 
-//@ deprecated
 template <typename T>
+[[deprecated("use intToStr instead")]]
 bool uIntToStr (T number,
 	unsigned short base,
 	std::string& result,

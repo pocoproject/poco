@@ -28,11 +28,14 @@ namespace Poco {
 class NewActionNotification: public Notification
 {
 public:
-	NewActionNotification(Thread::Priority priority, Runnable &runnable, std::string name) :
-	_priority(priority),
-	_runnable(runnable),
-	_name(std::move(name))
-	{ }
+	using Ptr = AutoPtr<NewActionNotification>;
+
+	NewActionNotification(Thread::Priority priority, Runnable& runnable, const std::string& name) :
+		_priority(priority),
+		_runnable(runnable),
+		_name(name)
+	{
+	}
 
 	~NewActionNotification() override = default;
 
@@ -41,16 +44,16 @@ public:
 		return _runnable;
 	}
 
-	Thread::Priority priotity() const
+	Thread::Priority priority() const
 	{
 		return _priority;
 	}
-	
+
 	const std::string &threadName() const
 	{
 		return _name;
 	}
-	
+
 	std::string threadFullName() const
 	{
 		std::string fullName(_name);
@@ -68,8 +71,8 @@ public:
 	}
 
 private:
-	Thread::Priority _priority;
-	Runnable &_runnable;
+	std::atomic<Thread::Priority> _priority;
+	Runnable& _runnable;
 	std::string _name;
 };
 
@@ -87,13 +90,13 @@ public:
 	void run() override;
 
 private:
-	NotificationQueue    _pTargetQueue;
-	std::string          _name;
-	Thread               _thread;
-	Event                _targetCompleted;
-	FastMutex            _mutex;
-	const long           JOIN_TIMEOUT = 10000;
-	std::atomic<bool>    _needToStop{false};
+	NotificationQueue _pTargetQueue;
+	std::string       _name;
+	Thread            _thread;
+	Event             _targetCompleted;
+	FastMutex         _mutex;
+	const long        JOIN_TIMEOUT = 10000;
+	std::atomic<bool> _needToStop{false};
 };
 
 
@@ -157,16 +160,18 @@ void ActiveThread::release()
 
 void ActiveThread::run()
 {
-	do {
-		auto *_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification());
-		while (_pTarget)
+	do
+	{
+		AutoPtr<Notification> pN = _pTargetQueue.waitDequeueNotification();
+		while (pN)
 		{
-			Runnable* pTarget = &_pTarget->runnable();
-			_thread.setPriority(_pTarget->priotity());
-			_thread.setName(_pTarget->name());
+			NewActionNotification::Ptr pNAN = pN.cast<NewActionNotification>();
+			Runnable& target = pNAN->runnable();
+			_thread.setPriority(pNAN->priority());
+			_thread.setName(pNAN->name());
 			try
 			{
-				pTarget->run();
+				target.run();
 			}
 			catch (Exception& exc)
 			{
@@ -180,11 +185,10 @@ void ActiveThread::run()
 			{
 				ErrorHandler::handle();
 			}
-			_pTarget->release();
 			_thread.setName(_name);
 			_thread.setPriority(Thread::PRIO_NORMAL);
 			ThreadLocalStorage::clear();
-			_pTarget = dynamic_cast<NewActionNotification*>(_pTargetQueue.waitDequeueNotification(1000));
+			pN = _pTargetQueue.waitDequeueNotification(1000);
 		}
 		_targetCompleted.set();
 	}

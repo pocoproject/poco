@@ -2,6 +2,9 @@
 # To retry only on timeout set retry_on: timeout
 # To retry only on error set retry_on: error
 # For more information on the retry action see https://github.com/nick-fields/retry
+
+name: Compile and Testrun
+
 on:
   pull_request:
     types: [opened]
@@ -231,7 +234,8 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 

@@ -23,6 +23,7 @@
 #include "Poco/File.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberFormatter.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -44,7 +45,7 @@ public:
 
 	virtual LogFile* open(LogFile* pFile) = 0;
 		/// Open a new log file and return it.
-	
+
 	virtual LogFile* archive(LogFile* pFile) = 0;
 		/// Renames the given log file for archiving
 		/// and creates and returns a new log file.
@@ -61,8 +62,8 @@ private:
 	ArchiveStrategy(const ArchiveStrategy&);
 	ArchiveStrategy& operator = (const ArchiveStrategy&);
 
-	bool _compress;
-	ArchiveCompressor* _pCompressor;
+	std::atomic<bool> _compress;
+	std::atomic<ArchiveCompressor*> _pCompressor;
 };
 
 
