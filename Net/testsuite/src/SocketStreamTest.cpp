@@ -22,7 +22,7 @@
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
-
+#include <iostream>
 
 using Poco::Net::Socket;
 using Poco::Net::SocketStream;
