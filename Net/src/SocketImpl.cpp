@@ -1410,7 +1410,7 @@ Poco::Int64 _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, Poco::UInt64 o
 #ifdef __USE_LARGEFILE64
 	sent = sendfile64(sd, fd, (off64_t *)&offset, sentSize);
 #else
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
 	sent = sendfile(sd, fd, (off_t *)&offset, sentSize);
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	int result = sendfile(fd, sd, offset, &sentSize, nullptr, 0);
