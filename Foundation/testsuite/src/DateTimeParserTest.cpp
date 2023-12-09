@@ -24,6 +24,7 @@ using Poco::DateTimeParser;
 using Poco::Timestamp;
 using Poco::SyntaxException;
 
+using namespace std::string_literals;
 
 DateTimeParserTest::DateTimeParserTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -47,6 +48,16 @@ void DateTimeParserTest::testISO8601()
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 0);
 	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12.30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-00-08T12:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T33:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:80:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-0012:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00X12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "200501-00T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-0100T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005_01+00T12:30:90Z", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:30:00+01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -57,6 +68,8 @@ void DateTimeParserTest::testISO8601()
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 3600);
 	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-8T12:30:00+01:00", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00+41:00", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00+01:70", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:30:00-01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -351,15 +364,7 @@ void DateTimeParserTest::testRFC1123()
 	assertTrue (tzd == -14400);
 	testBad(DateTimeFormat::RFC1123_FORMAT, "Hue, 18 Jan 2005 12:30:00 EDT", tzd);
 
-	// Parsing fails? If this format supported at all by the spec?
-	dt = DateTimeParser::parse(DateTimeFormat::RFC1123_FORMAT, "Sun, 20 Jul 1969 16:17:30 GMT+01:00", tzd);
-	assertTrue (dt.year() == 1969);
-	assertTrue (dt.month() == 7);
-	assertTrue (dt.day() == 20);
-	assertTrue (dt.hour() == 16);
-	assertTrue (dt.minute() == 17);
-	assertTrue (dt.second() == 30);
-	assertTrue (tzd == 3600);
+	testBad(DateTimeFormat::RFC1123_FORMAT, "Sun, 20 Jul 1969 16:17:30 GMT+01:00", tzd);
 	testBad(DateTimeFormat::RFC1123_FORMAT, "Sun, 20 Jul 1969 16:17:30 GMT+01?00", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::RFC1123_FORMAT, "Tue, 18 Jan 2005 12:30:00 CDT", tzd);
@@ -391,6 +396,7 @@ void DateTimeParserTest::testRFC1123()
 	assertTrue (dt.second() == 12);
 	assertTrue (tzd == -18000);
 	testBad(DateTimeFormat::RFC1123_FORMAT, "12 Sep 193 02:01:12 EST", tzd);
+	testBad(DateTimeFormat::RFC1123_FORMAT, "12 Sep 1973 02:01:12 ABC", tzd);
 }
 
 
@@ -840,7 +846,7 @@ void DateTimeParserTest::testBad(const std::string& fmt, const std::string& date
 	{
 		DateTime dt;
 		DateTimeParser::parse(fmt, dateStr, dt, tzd);
-		fail ("must fail");
+		fail ("must fail: "s + fmt + ", " + dateStr);
 	}
 	catch(const Poco::Exception) { }
 }

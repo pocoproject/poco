@@ -38,7 +38,6 @@ const std::string DateTimeFormat::ISO8601_REGEX("([\\+-]?\\d{4}(?!\\d{2}\\b))"
 
 const std::string DateTimeFormat::RFC822_FORMAT("%w, %e %b %y %H:%M:%S %Z");
 
-// TODO: Is this regex correct? RFC 822 spec does not mention timezone codes, just GMT.
 const std::string DateTimeFormat::RFC822_REGEX("(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), *)?"
 	"\\d\\d? +"
 	"((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) +"
@@ -74,6 +73,9 @@ const std::string DateTimeFormat::RFC1036_REGEX(
 	"\\d\\d(\\d\\d)? +\\d\\d:\\d\\d(:\\d\\d)? "
 	"(" TIMEZONES_REGEX_PART "|)?+"
 	"(([+\\-]?\\d\\d\\d\\d)?|" TIMEZONES_REGEX_PART "|\\w)");
+
+// It would perhaps be useful to add RFC 2822 (successor of 822)
+// https://www.rfc-editor.org/rfc/rfc2822#section-3.3
 
 const std::string DateTimeFormat::ASCTIME_FORMAT("%w %b %f %H:%M:%S %Y");
 const std::string DateTimeFormat::ASCTIME_REGEX("((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)) +"
