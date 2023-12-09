@@ -32,6 +32,10 @@ NotificationCenter::~NotificationCenter()
 	try
 	{
 		Mutex::ScopedLock lock(_mutex);
+		for (auto& o: _observers)
+			o->disable();
+
+		_observers.clear();
 	}
 	catch(...)
 	{
