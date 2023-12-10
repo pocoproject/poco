@@ -42,7 +42,7 @@ endif()
 # Setup C/C++ compiler options
 #################################################################################
 
-# C++11/17 compiler flags
+# C++17 compiler flags
 include(CXX1x)
 check_for_cxx17_compiler(CXX17_COMPILER)
 

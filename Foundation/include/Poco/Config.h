@@ -223,11 +223,4 @@
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
 
-// Automatically disable SQL parser for < c++17 compile
-#if !defined(POCO_DATA_NO_SQL_PARSER)
-	#ifndef POCO_HAVE_CPP17_COMPILER
-		#define POCO_DATA_NO_SQL_PARSER
-	#endif
-#endif
-
 #endif // Foundation_Config_INCLUDED
