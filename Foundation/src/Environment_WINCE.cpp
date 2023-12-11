@@ -153,6 +153,8 @@ std::string EnvironmentImpl::nodeNameImpl()
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
+	std::memset(&id, 0, sizeof(id));
+
 	PIP_ADAPTER_INFO pAdapterInfo;
 	PIP_ADAPTER_INFO pAdapter = 0;
 	ULONG len    = sizeof(IP_ADAPTER_INFO);
@@ -160,38 +162,62 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	// Make an initial call to GetAdaptersInfo to get
 	// the necessary size into len
 	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
-	if (rc == ERROR_BUFFER_OVERFLOW)
-	{
-		delete [] reinterpret_cast<char*>(pAdapterInfo);
-		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
-	}
-	else if (rc != ERROR_SUCCESS)
-	{
-		delete[] reinterpret_cast<char*>(pAdapterInfo);
-		throw SystemException("cannot get network adapter list");
-	}
+
 	try
 	{
+		if (rc == ERROR_BUFFER_OVERFLOW)
+		{
+			delete[] reinterpret_cast<char*>(pAdapterInfo);
+			pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+		}
+		else if (rc != ERROR_SUCCESS)
+		{
+			throw SystemException("cannot get network adapter list");
+		}
+
 		bool found = false;
+
 		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
 		{
 			pAdapter = pAdapterInfo;
+
 			while (pAdapter && !found)
 			{
 				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 				{
-					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
 					found = true;
+					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+				}
+				pAdapter = pAdapter->Next;
+			}
+
+			// if an ethernet adapter was not found, search for a wifi adapter
+			pAdapter = pAdapterInfo;
+
+			while (pAdapter && !found)
+			{
+				if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
+				{
+					found = true;
+					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
 				}
 				pAdapter = pAdapter->Next;
 			}
 		}
-		else throw SystemException("cannot get network adapter list");
-		if (!found) throw SystemException("no Ethernet adapter found");
+		else
+		{
+			throw SystemException("cannot get network adapter list");
+		}
+
+		// ethernet and wifi adapters not found, fail the search
+		if (!found)
+		{
+			throw SystemException("No ethernet or wifi adapter found");
+		}
 	}
-	catch (Exception&)
+	catch (SystemException&)
 	{
-		delete [] reinterpret_cast<char*>(pAdapterInfo);
+		delete[] reinterpret_cast<char*>(pAdapterInfo);
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterInfo);

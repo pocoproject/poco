@@ -352,15 +352,16 @@ namespace Poco {
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
+
 	char name[MAXHOSTNAMELEN];
 	if (gethostname(name, sizeof(name)))
-		return;
+		throw SystemException("Unable to get hostname");
 
 	struct hostent* pHost = gethostbyname(name);
-	if (!pHost) return;
+	if (!pHost) throw SystemException("Unable to get host");
 
 	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s == -1) return;
+	if (s == -1) throw SystemException("Unable to open socket");
 
 	struct arpreq ar;
 	std::memset(&ar, 0, sizeof(ar));
@@ -369,7 +370,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
 	int rc = ioctl(s, SIOCGARP, &ar);
 	close(s);
-	if (rc < 0) return;
+	if (rc < 0) throw SystemException("Unable to get socket data");
 	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
 }
 
