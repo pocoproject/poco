@@ -36,7 +36,7 @@ const std::string OpMsgMessage::CMD_COUNT { "count" };
 const std::string OpMsgMessage::CMD_DISTINCT { "distinct" };
 const std::string OpMsgMessage::CMD_MAP_REDUCE { "mapReduce" };
 
-// Replication and administration 
+// Replication and administration
 const std::string OpMsgMessage::CMD_HELLO { "hello" };
 const std::string OpMsgMessage::CMD_REPL_SET_GET_STATUS { "replSetGetStatus" };
 const std::string OpMsgMessage::CMD_REPL_SET_GET_CONFIG { "replSetGetConfig" };
@@ -104,7 +104,7 @@ void OpMsgMessage::setCommandName(const std::string& command)
 	// IMPORTANT: Command name must be first
 	if (_collectionName.empty())
 	{
-		// Collection is not specified. It is assumed that this particular command does 
+		// Collection is not specified. It is assumed that this particular command does
 		// not need it.
 		_body.add(_commandName, Int32(1));
 	}
@@ -280,7 +280,7 @@ void OpMsgMessage::read(std::istream& istr)
 
 		poco_assert_dbg(_header.opCode() == _header.OP_MSG);
 
-		const std::streamsize remainingSize {_header.getMessageLength() - _header.MSG_HEADER_SIZE };
+		const std::streamsize remainingSize { static_cast<std::streamsize>(_header.getMessageLength() - _header.MSG_HEADER_SIZE) };
 		message.reserve(remainingSize);
 
 #if POCO_MONGODB_DUMP
@@ -289,7 +289,7 @@ void OpMsgMessage::read(std::istream& istr)
 			<< _header.opCode() << " " << _header.getRequestID() << " " << _header.responseTo()
 			<< std::endl;
 #endif
-		
+
 		reader.readRaw(remainingSize, message);
 
 #if POCO_MONGODB_DUMP
