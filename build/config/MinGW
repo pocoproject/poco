@@ -70,4 +70,4 @@ SYSFLAGS = -D_WIN32 -DMINGW32 -DWINVER=0x501 -DPOCO_NO_FPENVIRONMENT -DPCRE_STAT
 #
 # System Specific Libraries
 #
-SYSLIBS  = -L/usr/local/lib -L/usr/lib -liphlpapi -lssl -lcrypto -lws2_32
+SYSLIBS  = -L/usr/local/lib -L/usr/lib -liphlpapi -lmswsock -lssl -lcrypto -lws2_32

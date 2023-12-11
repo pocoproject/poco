@@ -10,7 +10,7 @@ postgresql = ${vc.project.pocobase}\\postgresql
 vc.project.compiler.include = ${postgresql}\\include;${vc.project.pocobase}\\Foundation\\include; \
 	${vc.project.pocobase}\\Data\\include;${vc.project.pocobase}\\Data\\src
 vc.project.compiler.defines = _CRT_SECURE_NO_WARNINGS
-vc.project.linker.dependencies = iphlpapi.lib
+vc.project.linker.dependencies = iphlpapi.lib mswsock.lib
 vc.project.linker.dependencies.debug_shared =
 vc.project.linker.dependencies.release_shared =
 vc.project.linker.dependencies.debug_static_md =

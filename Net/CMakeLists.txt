@@ -28,7 +28,7 @@ set_target_properties(Net
 target_link_libraries(Net PUBLIC Poco::Foundation)
 # Windows and WindowsCE need additional libraries
 if(WIN32)
-	target_link_libraries(Net PUBLIC "iphlpapi.lib")
+	target_link_libraries(Net PUBLIC "iphlpapi.lib" "mswsock.lib")
 	if(WINCE)
 		target_link_libraries(Net PUBLIC "ws2.lib")
 	else()
