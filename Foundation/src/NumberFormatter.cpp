@@ -128,20 +128,20 @@ void NumberFormatter::append0(std::string& str, unsigned int value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, unsigned value)
+void NumberFormatter::appendHex(std::string& str, unsigned value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz);
+	intToStr(value, 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, unsigned value, int width)
+void NumberFormatter::appendHex(std::string& str, unsigned value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz, false, width, '0');
+	intToStr(value, 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
@@ -173,20 +173,20 @@ void NumberFormatter::append0(std::string& str, long value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, long value)
+void NumberFormatter::appendHex(std::string& str, long value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(static_cast<unsigned long>(value), 0x10, result, sz);
+	intToStr(static_cast<unsigned long>(value), 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, long value, int width)
+void NumberFormatter::appendHex(std::string& str, long value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(static_cast<unsigned long>(value), 0x10, result, sz, false, width, '0');
+	intToStr(static_cast<unsigned long>(value), 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
@@ -218,20 +218,20 @@ void NumberFormatter::append0(std::string& str, unsigned long value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, unsigned long value)
+void NumberFormatter::appendHex(std::string& str, unsigned long value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz);
+	intToStr(value, 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, unsigned long value, int width)
+void NumberFormatter::appendHex(std::string& str, unsigned long value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz, false, width, '0');
+	intToStr(value, 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
@@ -267,20 +267,20 @@ void NumberFormatter::append0(std::string& str, long long value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, long long value)
+void NumberFormatter::appendHex(std::string& str, long long value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(static_cast<unsigned long long>(value), 0x10, result, sz);
+	intToStr(static_cast<unsigned long long>(value), 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, long long value, int width)
+void NumberFormatter::appendHex(std::string& str, long long value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(static_cast<unsigned long long>(value), 0x10, result, sz, false, width, '0');
+	intToStr(static_cast<unsigned long long>(value), 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
@@ -312,20 +312,20 @@ void NumberFormatter::append0(std::string& str, unsigned long long value, int wi
 }
 
 
-void NumberFormatter::appendHex(std::string& str, unsigned long long value)
+void NumberFormatter::appendHex(std::string& str, unsigned long long value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz);
+	intToStr(value, 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, unsigned long long value, int width)
+void NumberFormatter::appendHex(std::string& str, unsigned long long value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz, false, width, '0');
+	intToStr(value, 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
@@ -360,20 +360,20 @@ void NumberFormatter::append0(std::string& str, Int64 value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, Int64 value)
+void NumberFormatter::appendHex(std::string& str, Int64 value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(static_cast<UInt64>(value), 0x10, result, sz);
+	intToStr(static_cast<UInt64>(value), 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, Int64 value, int width)
+void NumberFormatter::appendHex(std::string& str, Int64 value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(static_cast<UInt64>(value), 0x10, result, sz, false, width, '0');
+	intToStr(static_cast<UInt64>(value), 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
@@ -405,20 +405,20 @@ void NumberFormatter::append0(std::string& str, UInt64 value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, UInt64 value)
+void NumberFormatter::appendHex(std::string& str, UInt64 value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz);
+	intToStr(value, 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
+void NumberFormatter::appendHex(std::string& str, UInt64 value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 0x10, result, sz, false, width, '0');
+	intToStr(value, 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
