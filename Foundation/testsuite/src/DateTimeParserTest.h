@@ -44,6 +44,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void testBad(const std::string& fmt, const std::string& dateStr, int tzd);
 };
 
 

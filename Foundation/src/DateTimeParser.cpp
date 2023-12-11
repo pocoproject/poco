@@ -44,8 +44,8 @@ namespace Poco {
 
 void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
 {
-	if (fmt.empty() || str.empty())
-		throw SyntaxException("Empty string.");
+	if (fmt.empty() || str.empty() || (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str)))
+		throw SyntaxException("Invalid DateTimeString:" + str);
 
 	int year   = 0;
 	int month  = 0;
@@ -56,6 +56,9 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	int millis = 0;
 	int micros = 0;
 	int tzd    = 0;
+
+	bool dayParsed = false;
+	bool monthParsed = false;
 
 	std::string::const_iterator it   = str.begin();
 	std::string::const_iterator end  = str.end();
@@ -78,18 +81,21 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 				case 'b':
 				case 'B':
 					month = parseMonth(it, end);
+					monthParsed = true;
 					break;
 				case 'd':
 				case 'e':
 				case 'f':
 					SKIP_JUNK();
 					PARSE_NUMBER_N(day, 2);
+					dayParsed = true;
 					break;
 				case 'm':
 				case 'n':
 				case 'o':
 					SKIP_JUNK();
 					PARSE_NUMBER_N(month, 2);
+					monthParsed = true;
 					break;
 				case 'y':
 					SKIP_JUNK();
@@ -167,12 +173,13 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 		}
 		else ++itf;
 	}
-	if (month == 0) month = 1;
-	if (day == 0) day = 1;
+	if (!monthParsed) month = 1;
+	if (!dayParsed) day = 1;
 	if (DateTime::isValid(year, month, day, hour, minute, second, millis, micros))
 		dateTime.assign(year, month, day, hour, minute, second, millis, micros);
 	else
 		throw SyntaxException("date/time component out of range");
+
 	timeZoneDifferential = tzd;
 }
 
@@ -191,7 +198,7 @@ bool DateTimeParser::tryParse(const std::string& fmt, const std::string& str, Da
 	{
 		parse(fmt, str, dateTime, timeZoneDifferential);
 	}
-	catch (Exception&)
+	catch (const Exception&)
 	{
 		return false;
 	}
@@ -245,53 +252,55 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 	{
 		const char* designator;
 		int         timeZoneDifferential;
+		bool        allowsDifference;
 	};
 
-	static Zone zones[] =
+	static const Zone zones[] =
 	{
-		{"Z",           0},
-		{"UT",          0},
-		{"GMT",         0},
-		{"BST",    1*3600},
-		{"IST",    1*3600},
-		{"WET",         0},
-		{"WEST",   1*3600},
-		{"CET",    1*3600},
-		{"CEST",   2*3600},
-		{"EET",    2*3600},
-		{"EEST",   3*3600},
-		{"MSK",    3*3600},
-		{"MSD",    4*3600},
-		{"NST",   -3*3600-1800},
-		{"NDT",   -2*3600-1800},
-		{"AST",   -4*3600},
-		{"ADT",   -3*3600},
-		{"EST",   -5*3600},
-		{"EDT",   -4*3600},
-		{"CST",   -6*3600},
-		{"CDT",   -5*3600},
-		{"MST",   -7*3600},
-		{"MDT",   -6*3600},
-		{"PST",   -8*3600},
-		{"PDT",   -7*3600},
-		{"AKST",  -9*3600},
-		{"AKDT",  -8*3600},
-		{"HST",  -10*3600},
-		{"AEST",  10*3600},
-		{"AEDT",  11*3600},
-		{"ACST",   9*3600+1800},
-		{"ACDT",  10*3600+1800},
-		{"AWST",   8*3600},
-		{"AWDT",   9*3600}
+		{"Z",           0, true},
+		{"UT",          0, true},
+		{"GMT",         0, true},
+		{"BST",    1*3600, false},
+		{"IST",    1*3600, false},
+		{"WET",         0, false},
+		{"WEST",   1*3600, false},
+		{"CET",    1*3600, false},
+		{"CEST",   2*3600, false},
+		{"EET",    2*3600, false},
+		{"EEST",   3*3600, false},
+		{"MSK",    3*3600, false},
+		{"MSD",    4*3600, false},
+		{"NST",   -3*3600-1800, false},
+		{"NDT",   -2*3600-1800, false},
+		{"AST",   -4*3600, false},
+		{"ADT",   -3*3600, false},
+		{"EST",   -5*3600, false},
+		{"EDT",   -4*3600, false},
+		{"CST",   -6*3600, false},
+		{"CDT",   -5*3600, false},
+		{"MST",   -7*3600, false},
+		{"MDT",   -6*3600, false},
+		{"PST",   -8*3600, false},
+		{"PDT",   -7*3600, false},
+		{"AKST",  -9*3600, false},
+		{"AKDT",  -8*3600, false},
+		{"HST",  -10*3600, false},
+		{"AEST",  10*3600, false},
+		{"AEDT",  11*3600, false},
+		{"ACST",   9*3600+1800, false},
+		{"ACDT",  10*3600+1800, false},
+		{"AWST",   8*3600, false},
+		{"AWDT",   9*3600, false}
 	};
 
 	int tzd = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
+	const Zone* zone = nullptr;
+	std::string designator;
 	if (it != end)
 	{
 		if (Ascii::isAlpha(*it))
 		{
-			std::string designator;
 			designator += *it++;
 			if (it != end && Ascii::isAlpha(*it)) designator += *it++;
 			if (it != end && Ascii::isAlpha(*it)) designator += *it++;
@@ -300,20 +309,33 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			{
 				if (designator == zones[i].designator)
 				{
-					tzd = zones[i].timeZoneDifferential;
+					zone = &(zones[i]);
+					tzd = zone->timeZoneDifferential;
 					break;
 				}
 			}
 		}
+		if (!designator.empty() && !zone)
+			throw SyntaxException("Unknown timezone designator "s + designator);
+
 		if (it != end && (*it == '+' || *it == '-'))
 		{
+			// Time difference is allowed only for some timezone designators in general
+			// Some formats prevent even that with regular expression
+			if (zone && !zone->allowsDifference)
+				throw SyntaxException("Timezone does not allow difference "s + zone->designator);
+
 			int sign = *it == '+' ? 1 : -1;
 			++it;
 			int hours = 0;
 			PARSE_NUMBER_N(hours, 2);
+			if (hours < 0 || hours > 23)
+				throw SyntaxException("Timezone difference hours out of range");
 			if (it != end && *it == ':') ++it;
 			int minutes = 0;
 			PARSE_NUMBER_N(minutes, 2);
+			if (minutes < 0 || minutes > 59)
+				throw SyntaxException("Timezone difference minutes out of range");
 			tzd += sign*(hours*3600 + minutes*60);
 		}
 	}
