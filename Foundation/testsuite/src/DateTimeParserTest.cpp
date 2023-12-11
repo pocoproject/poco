@@ -848,7 +848,7 @@ void DateTimeParserTest::testBad(const std::string& fmt, const std::string& date
 		DateTimeParser::parse(fmt, dateStr, dt, tzd);
 		fail ("must fail: "s + fmt + ", " + dateStr);
 	}
-	catch(const Poco::Exception) { }
+	catch(const Poco::Exception&) { }
 }
 
 
