@@ -100,7 +100,6 @@ bool FileImpl::existsImpl() const
 		{
 		case ERROR_FILE_NOT_FOUND:
 		case ERROR_PATH_NOT_FOUND:
-		case ERROR_NOT_READY:
 		case ERROR_INVALID_DRIVE:
 			return false;
 		default:
@@ -439,6 +438,8 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ERROR_CANT_RESOLVE_FILENAME:
 	case ERROR_INVALID_DRIVE:
 		throw PathNotFoundException(path, err);
+	case ERROR_NOT_READY:
+		throw FileNotReadyException(path, err);
 	case ERROR_ACCESS_DENIED:
 		throw FileAccessDeniedException(path, err);
 	case ERROR_ALREADY_EXISTS:
