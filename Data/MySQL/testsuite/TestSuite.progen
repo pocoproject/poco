@@ -9,4 +9,4 @@ vc.project.prototype = TestSuite_vs90.vcproj
 mysql = ${vc.project.pocobase}\\mysql
 vc.project.compiler.include = ${mysql}\\include;${vc.project.pocobase}\\Foundation\\include; \
 	${vc.project.pocobase}\\Data\\include;${vc.project.pocobase}\\Data\\src
-vc.project.linker.dependencies.Win32 = iphlpapi.lib mswsock.lib
+vc.project.linker.dependencies.Win32 = iphlpapi.lib
