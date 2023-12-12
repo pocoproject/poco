@@ -599,4 +599,8 @@ inline bool SocketImpl::getBlocking() const
 } } // namespace Poco::Net
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#pragma comment(lib, "mswsock.lib") 
+#endif 
+
 #endif // Net_SocketImpl_INCLUDED
