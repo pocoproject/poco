@@ -355,13 +355,13 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 
 	char name[MAXHOSTNAMELEN];
 	if (gethostname(name, sizeof(name)))
-		throw SystemException("Unable to get hostname");
+		throw SystemException("unable to get hostname");
 
 	struct hostent* pHost = gethostbyname(name);
-	if (!pHost) throw SystemException("Unable to get host");
+	if (!pHost) throw SystemException("unable to get host");
 
 	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s == -1) throw SystemException("Unable to open socket");
+	if (s == -1) throw SystemException("unable to open socket");
 
 	struct arpreq ar;
 	std::memset(&ar, 0, sizeof(ar));
@@ -370,7 +370,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
 	int rc = ioctl(s, SIOCGARP, &ar);
 	close(s);
-	if (rc < 0) throw SystemException("Unable to get socket data");
+	if (rc < 0) throw SystemException("unable to get socket data");
 	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
 }
 

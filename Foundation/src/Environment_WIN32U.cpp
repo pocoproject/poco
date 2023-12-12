@@ -202,72 +202,65 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
 
-	PIP_ADAPTER_INFO pAdapterInfo;
-	PIP_ADAPTER_INFO pAdapter = 0;
+	auto pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(1);
 	ULONG len    = sizeof(IP_ADAPTER_INFO);
-	pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+
 	// Make an initial call to GetAdaptersInfo to get
 	// the necessary size into len
-	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
+	const DWORD rc = GetAdaptersInfo(pAdapterInfo.get(), &len);
 
-	try
+	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
-		if (rc == ERROR_BUFFER_OVERFLOW)
-		{
-			delete[] reinterpret_cast<char*>(pAdapterInfo);
-			pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
-		}
-		else if (rc != ERROR_SUCCESS)
-		{
-			throw SystemException("cannot get network adapter list");
-		}
+		pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(len / sizeof(IP_ADAPTER_INFO));
+	}
+	else if (rc != ERROR_SUCCESS)
+	{
+		throw SystemException("cannot get network adapter list");
+	}
 
-		bool found = false;
+	bool found = false;
 
-		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
+	if (GetAdaptersInfo(pAdapterInfo.get(), &len) == NO_ERROR)
+	{
+		IP_ADAPTER_INFO* pAdapter = pAdapterInfo.get();
+
+		while (pAdapter && !found)
 		{
-			pAdapter = pAdapterInfo;
-
-			while (pAdapter && !found)
+			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 			{
-				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
-				{
-					found = true;
-					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
-				}
-				pAdapter = pAdapter->Next;
+				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+
+				// found an ethernet adapter, we can return now
+				return;
 			}
+			pAdapter = pAdapter->Next;
+		}
 
-			// if an ethernet adapter was not found, search for a wifi adapter
-			pAdapter = pAdapterInfo;
+		// if an ethernet adapter was not found, search for a wifi adapter
+		pAdapter = pAdapterInfo.get();
 
-			while (pAdapter && !found)
+		while (pAdapter && !found)
+		{
+			if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
 			{
-				if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
-				{
-					found = true;
-					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
-				}
-				pAdapter = pAdapter->Next;
-			}
-		}
-		else
-		{
-			throw SystemException("cannot get network adapter list");
-		}
+				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
 
-		// ethernet and wifi adapters not found, fail the search
-		if (!found)
-		{
-			throw SystemException("No ethernet or wifi adapter found");
+				// found a wifi adapter, we can return now
+				return;
+			}
+			pAdapter = pAdapter->Next;
 		}
 	}
-	catch (SystemException&)
+	else
 	{
-		delete[] reinterpret_cast<char*>(pAdapterInfo);
-		throw;
+		throw SystemException("cannot get network adapter list");
 	}
-	delete[] reinterpret_cast<char*>(pAdapterInfo);
+
+	// ethernet and wifi adapters not found, fail the search
+	if (!found)
+	{
+		throw SystemException("no ethernet or wifi adapter found");
+	}
 }
 
 
