@@ -97,10 +97,6 @@ void ProcessRunnerTest::testProcessRunner()
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd += name;
-#elif defined(_WIN32_WCE)
-	cmd = "\\";
-	cmd += name;
-	cmd += ".EXE";
 #else
 	cmd = name;
 #endif

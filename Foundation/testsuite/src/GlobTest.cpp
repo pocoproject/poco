@@ -456,13 +456,11 @@ void GlobTest::testGlob()
 	assertTrue (files.find("globtest/testsuite/src/test.c") != files.end());
 	assertTrue (files.find("globtest/testsuite/src/main.c") != files.end());
 
-#if !defined(_WIN32_WCE)
 	// won't work if current directory is root dir
 	files.clear();
 	Glob::glob("globtest/../*/testsuite/*/", files);
 	translatePaths(files);
 	assertTrue (files.size() == 1);
-#endif
 
 	File dir("globtest");
 	dir.remove(true);

@@ -181,11 +181,11 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
-#if !defined(_WIN32_WCE)
+
 	Environment::set("FOO", "BAR");
 	assertTrue (Environment::has("FOO"));
 	assertTrue (Environment::get("FOO") == "BAR");
-#endif
+
 	try
 	{
 		std::string v = Environment::get("THISONEDOESNOTEXIST123");

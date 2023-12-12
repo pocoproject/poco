@@ -12,7 +12,7 @@
 #include "ConfigurationTestSuite.h"
 #include "OptionsTestSuite.h"
 #include "TimerTestSuite.h"
-#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+#if defined(_MSC_VER)
 #include "WindowsTestSuite.h"
 #endif
 
@@ -24,7 +24,7 @@ CppUnit::Test* UtilTestSuite::suite()
 	pSuite->addTest(ConfigurationTestSuite::suite());
 	pSuite->addTest(OptionsTestSuite::suite());
 	pSuite->addTest(TimerTestSuite::suite());
-#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+#if defined(_MSC_VER)
 	pSuite->addTest(WindowsTestSuite::suite());
 #endif
 
