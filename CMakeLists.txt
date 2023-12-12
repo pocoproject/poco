@@ -195,6 +195,8 @@ option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
+option(ENABLE_PROGEN "Enable VS Project file generator (development tool)" OFF)
+
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
   set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
@@ -325,6 +327,12 @@ endif()
 if(ENABLE_JWT)
 	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+endif()
+
+if(ENABLE_PROGEN)
+	add_subdirectory(ProGen)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
 if(ENABLE_FOUNDATION)
