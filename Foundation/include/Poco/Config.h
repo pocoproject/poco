@@ -42,7 +42,7 @@
 // #define POCO_NO_SHAREDMEMORY
 
 
-// Define if no <locale> header is available (such as on WinCE)
+// Define if no <locale> header is available
 // #define POCO_NO_LOCALE
 
 
