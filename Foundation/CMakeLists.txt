@@ -10,18 +10,10 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 POCO_SOURCES_AUTO_PLAT(SRCS UNIX src/SyslogChannel.cpp)
 POCO_HEADERS_AUTO(SRCS include/Poco/SyslogChannel.h)
 
-# For Windows CE we need to disable these
-if(WINCE)
-POCO_SOURCES_AUTO_PLAT(SRCS OFF
-	src/WindowsConsoleChannel.cpp
-	src/EventLogChannel.cpp
-	)
-else()
 POCO_SOURCES_AUTO_PLAT(SRCS WIN32
 	src/WindowsConsoleChannel.cpp
 	src/EventLogChannel.cpp
 	)
-endif()
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)

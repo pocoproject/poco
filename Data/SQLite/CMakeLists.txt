@@ -49,9 +49,6 @@ if(POCO_UNBUNDLED)
 		SQLITE_THREADSAFE=1
 )
 else()
-	if(WINCE)
-		target_compile_definitions(DataSQLite PRIVATE SQLITE_MSVC_LOCALTIME_API)
-	endif(WINCE)
 	target_compile_definitions(DataSQLite PRIVATE
 		SQLITE_THREADSAFE=1
 		SQLITE_DISABLE_LFS

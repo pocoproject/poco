@@ -7,7 +7,7 @@
 #              [-vs           140 | 150 | 160| 170]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
 #              [-components   "Lib1X,LibY,LibZ,..."]
-#              [-platform     Win32 | x64 | ARM64 | WinCE | WEC2013]
+#              [-platform     Win32 | x64 | ARM64 | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-nobuild]
@@ -26,7 +26,7 @@ Param
 	[string] $components,
 
 	[Parameter()]
-	[ValidateSet('Win32', 'x64', 'ARM64', 'WinCE', 'WEC2013')]
+	[ValidateSet('Win32', 'x64', 'ARM64', 'WEC2013')]
 	[string] $platform = 'x64',
 
 	[switch] $samples = $false,
