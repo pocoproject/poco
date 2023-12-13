@@ -42,7 +42,7 @@
 // #define POCO_NO_SHAREDMEMORY
 
 
-// Define if no <locale> header is available (such as on WinCE)
+// Define if no <locale> header is available
 // #define POCO_NO_LOCALE
 
 
@@ -162,12 +162,6 @@
 // https://github.com/pocoproject/poco/wiki/Move-Semantics-in-POCO
 #ifndef POCO_NEW_STATE_ON_MOVE
 // #define POCO_NEW_STATE_ON_MOVE 1
-#endif
-
-
-// Windows CE has no locale support
-#if defined(_WIN32_WCE)
-	#define POCO_NO_LOCALE
 #endif
 
 

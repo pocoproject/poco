@@ -104,15 +104,12 @@ void TextTestResult::ignoring(const std::string ignore)
 
 void TextTestResult::setup()
 {
-#if !defined(_WIN32_WCE)
 	const char* env = std::getenv("CPPUNIT_IGNORE");
 	if (env)
 	{
 		std::string ignored = env;
 		ignoring(ignored);
 	}
-
-#endif
 }
 
 

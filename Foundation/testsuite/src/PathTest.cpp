@@ -19,11 +19,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Path_WINCE.h"
-#else
 #include "Poco/Path_WIN32U.h"
-#endif
 #endif
 
 
@@ -1549,9 +1545,6 @@ void PathTest::testFind()
 	bool found = Path::find(Environment::get("PATH"), "ls", p);
 	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123", p);
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-	return;
-#endif
 	bool found = Path::find(Environment::get("PATH"), "cmd.exe", p);
 	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123.zzz", p);
 #else

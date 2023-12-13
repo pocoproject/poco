@@ -1308,7 +1308,6 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 		}
 		CertFreeCertificateContext(pResult);
 
-#if !defined(_WIN32_WCE)
 		// check if cert is revoked
 		if (_pContext->options() & Context::OPT_PERFORM_REVOCATION_CHECK)
 		{
@@ -1338,7 +1337,6 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 			}
 			else break;
 		}
-#endif
 	}
 	CertFreeCertificateChain(pChainContext);
 }
@@ -1409,7 +1407,6 @@ void SecureSocketImpl::serverVerifyCertificate()
 			return;
 	}
 
-#if !defined(_WIN32_WCE)
 	// perform revocation checking
 	for (DWORD i = 0; i < pChainContext->cChain; i++)
 	{
@@ -1444,7 +1441,7 @@ void SecureSocketImpl::serverVerifyCertificate()
 			}
 		}
 	}
-#endif
+
 	if (pChainContext)
 	{
 		CertFreeCertificateChain(pChainContext);

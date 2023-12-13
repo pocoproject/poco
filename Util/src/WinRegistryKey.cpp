@@ -148,17 +148,14 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		Poco::Buffer<wchar_t> buffer(len + 1);
 		RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, (BYTE*) buffer.begin(), &size);
 		buffer[len] = 0;
-#if !defined(_WIN32_WCE)
+
 		wchar_t temp;
 		DWORD expSize = ExpandEnvironmentStringsW(buffer.begin(), &temp, 1);
 		Poco::Buffer<wchar_t> expBuffer(expSize);
 		ExpandEnvironmentStringsW(buffer.begin(), expBuffer.begin(), expSize);
 		std::string result;
 		UnicodeConverter::toUTF8(expBuffer.begin(), result);
-#else
-		std::string result;
-		UnicodeConverter::toUTF8(buffer.begin(), result);
-#endif
+
 		return result;
 	}
 	return std::string();
@@ -281,7 +278,6 @@ void WinRegistryKey::deleteKey()
 	std::wstring usubKey;
 	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
 
-#if !defined(_WIN32_WCE)
 	typedef LONG (WINAPI *RegDeleteKeyExWFunc)(HKEY hKey, const wchar_t* lpSubKey, REGSAM samDesired, DWORD Reserved);
 	if (_extraSam != 0)
 	{
@@ -297,7 +293,7 @@ void WinRegistryKey::deleteKey()
 			}
 		}
 	}
-#endif
+
 	if (RegDeleteKeyW(_hRootKey, usubKey.c_str()) != ERROR_SUCCESS)
 		throw NotFoundException(key());
 }

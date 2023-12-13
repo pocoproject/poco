@@ -72,7 +72,7 @@ else()
 	message(STATUS "PostgreSQL Support Disabled")
 endif()
 
-if(ODBC_FOUND AND ENABLE_DATA_ODBC AND NOT WINCE)
+if(ODBC_FOUND AND ENABLE_DATA_ODBC)
 	message(STATUS "ODBC Support Enabled")
 	add_subdirectory(ODBC)
 else()

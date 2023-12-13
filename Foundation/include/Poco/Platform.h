@@ -41,7 +41,6 @@
 #define POCO_OS_ANDROID       0x000f
 #define POCO_OS_UNKNOWN_UNIX  0x00ff
 #define POCO_OS_WINDOWS_NT    0x1001
-#define POCO_OS_WINDOWS_CE    0x1011
 #define POCO_OS_VMS           0x2001
 
 
@@ -101,9 +100,6 @@
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_UNKNOWN_UNIX
-#elif defined(_WIN32_WCE)
-	#define POCO_OS_FAMILY_WINDOWS 1
-	#define POCO_OS POCO_OS_WINDOWS_CE
 #elif defined(_WIN32) || defined(_WIN64)
 	#define POCO_OS_FAMILY_WINDOWS 1
 	#define POCO_OS POCO_OS_WINDOWS_NT
@@ -212,7 +208,7 @@
 	#define POCO_ARCH_BIG_ENDIAN 1
 #elif defined(__sh__) || defined(__sh) || defined(SHx) || defined(_SHX_)
 	#define POCO_ARCH POCO_ARCH_SH
-	#if defined(__LITTLE_ENDIAN__) || (POCO_OS == POCO_OS_WINDOWS_CE)
+	#if defined(__LITTLE_ENDIAN__)
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#else
 		#define POCO_ARCH_BIG_ENDIAN 1

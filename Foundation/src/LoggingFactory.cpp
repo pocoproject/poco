@@ -25,7 +25,7 @@
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOGCHANNEL)
 #include "Poco/SyslogChannel.h"
 #endif
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/EventLogChannel.h"
 #include "Poco/WindowsConsoleChannel.h"
 #endif
@@ -85,7 +85,7 @@ LoggingFactory& LoggingFactory::defaultFactory()
 void LoggingFactory::registerBuiltins()
 {
 	_channelFactory.registerClass("AsyncChannel", new Instantiator<AsyncChannel, Channel>);
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<WindowsConsoleChannel, Channel>);
 	_channelFactory.registerClass("ColorConsoleChannel", new Instantiator<WindowsColorConsoleChannel, Channel>);
 #else
@@ -110,7 +110,7 @@ void LoggingFactory::registerBuiltins()
 #endif
 #endif
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	_channelFactory.registerClass("EventLogChannel", new Instantiator<EventLogChannel, Channel>);
 #endif
 

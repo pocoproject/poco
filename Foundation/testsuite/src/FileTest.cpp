@@ -231,15 +231,13 @@ void FileTest::testFileAttributes3()
 #else
  	File f("/dev/console");
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 	File f("CON");
 #endif
 
-#if !defined(_WIN32_WCE)
 	assertTrue (f.isDevice());
 	assertTrue (!f.isFile());
 	assertTrue (!f.isDirectory());
-#endif
 }
 
 
@@ -271,12 +269,6 @@ void FileTest::testCompare()
 void FileTest::testRootDir()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-	File f1("\\");
-	File f2("/");
-	assertTrue (f1.exists());
-	assertTrue (f2.exists());
-#else
 	File f1("/");
 	File f2("c:/");
 	File f3("c:\\");
@@ -285,7 +277,6 @@ void FileTest::testRootDir()
 	assertTrue (f2.exists());
 	assertTrue (f3.exists());
 	assertTrue (f4.exists());
-#endif
 #else
 	File f1("/");
 	assertTrue (f1.exists());
@@ -588,7 +579,7 @@ void FileTest::testRenameFailIfExists() {
 
 void FileTest::testLongPath()
 {
-#if defined(_WIN32) && !defined(_WIN32_WCE)
+#if defined(_WIN32)
 	Poco::Path p("longpathtest");
 	p.makeAbsolute();
 	std::string longpath(p.toString());
