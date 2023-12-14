@@ -292,10 +292,11 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
-SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession):
+SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
-	_pEncSession(pEncSession)
+	_pEncSession(pEncSession),
+	_numberedPlaceHolders(numberedPlaceHolders)
 {
 }
 
@@ -565,7 +566,7 @@ void SQLExecutor::simpleAccess()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;  }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -608,7 +609,7 @@ void SQLExecutor::complexType()
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(p1), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(p1), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -616,7 +617,7 @@ void SQLExecutor::complexType()
 	}
 
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(p2), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(p2), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -652,7 +653,7 @@ void SQLExecutor::complexTypeTuple()
 	Person p2("LN2", "FN2", "ADDR2", 2);
 
 	Tuple<Person,Person> t(p1,p2);
-	try { *_pSession << "INSERT INTO Person VALUES(?,?,?,?,?,?,?,?)", use(t), now; }
+	try { *_pSession << formatSQL("INSERT INTO Person VALUES(?,?,?,?,?,?,?,?)"), use(t), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -691,7 +692,7 @@ void SQLExecutor::simpleAccessVector()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -732,7 +733,7 @@ void SQLExecutor::complexTypeVector()
 	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
 	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -768,7 +769,7 @@ void SQLExecutor::sharedPtrComplexTypeVector()
 	people.push_back(new Person("LN1", "FN1", "ADDR1", 1));
 	people.push_back(new Person("LN2", "FN2", "ADDR2", 2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -806,7 +807,7 @@ void SQLExecutor::autoPtrComplexTypeVector()
 	people.push_back(new RefCountedPerson("LN1", "FN1", "ADDR1", 1));
 	people.push_back(new RefCountedPerson("LN2", "FN2", "ADDR2", 2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -854,7 +855,7 @@ void SQLExecutor::insertVector()
 	int count = 100;
 
 	{
-		Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(str)));
+		Statement stmt((session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(str)));
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(DataException& ce)
 	{
@@ -899,7 +900,7 @@ void SQLExecutor::insertEmptyVector()
 
 	try
 	{
-		session() << "INSERT INTO Strings VALUES (?)", use(str), now;
+		session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(str), now;
 		fail("empty collections should not work", __LINE__, __FILE__);
 	}	catch (Poco::Exception&)
 	{
@@ -925,7 +926,7 @@ void SQLExecutor::simpleAccessList()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -966,7 +967,7 @@ void SQLExecutor::complexTypeList()
 	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
 	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1006,7 +1007,7 @@ void SQLExecutor::insertList()
 	int count = 100;
 
 	{
-		Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(str)));
+		Statement stmt((session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(str)));
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(DataException& ce)
 	{
@@ -1050,7 +1051,7 @@ void SQLExecutor::insertEmptyList()
 
 	try
 	{
-		session() << "INSERT INTO Strings VALUES (?)", use(str), now;
+		session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(str), now;
 		fail("empty collections should not work");
 	}	catch (Poco::Exception&)
 	{
@@ -1076,7 +1077,7 @@ void SQLExecutor::simpleAccessDeque()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1116,7 +1117,7 @@ void SQLExecutor::complexTypeDeque()
 	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
 	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1156,7 +1157,7 @@ void SQLExecutor::insertDeque()
 	int count = 100;
 
 	{
-		Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(str)));
+		Statement stmt((session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(str)));
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(DataException& ce)
 	{
@@ -1217,7 +1218,7 @@ void SQLExecutor::affectedRows(const std::string& whereClause)
 	str.push_back("s3");
 	int count = 100;
 
-	Statement stmt1((session() << "INSERT INTO Strings VALUES(?)", use(str)));
+	Statement stmt1((session() << formatSQL("INSERT INTO Strings VALUES(?)"), use(str)));
 	session() << "SELECT COUNT(*) FROM Strings", into(count), now;
 	assertTrue (count == 0);
 	assertTrue (4 == stmt1.execute());
@@ -1232,7 +1233,7 @@ void SQLExecutor::affectedRows(const std::string& whereClause)
 
 	std::string sql;
 	format(sql, "DELETE FROM Strings %s", whereClause);
-	Statement stmt4(session() << sql);
+	Statement stmt4(session() << formatSQL(sql));
 	assertTrue (3 == stmt4.execute());
 }
 
@@ -1240,7 +1241,7 @@ void SQLExecutor::affectedRows(const std::string& whereClause)
 void SQLExecutor::insertSingleBulk()
 {
 	int x = 0;
-	Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(x)));
+	Statement stmt((session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(x)));
 
 	for (x = 0; x < 100; ++x)
 	{
@@ -1273,7 +1274,7 @@ void SQLExecutor::floats()
 	float data = 1.5f;
 	float ret = 0.0f;
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1307,7 +1308,7 @@ void SQLExecutor::doubles()
 	double data = 1.5;
 	double ret = 0.0;
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1341,7 +1342,7 @@ void SQLExecutor::uuids()
 	Poco::UUID data("49cf6461-9b62-4163-9659-5472ef73153d");
 	Poco::UUID ret;
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1377,7 +1378,7 @@ void SQLExecutor::insertSingleBulkVec()
 	for (int x = 0; x < 100; ++x)
 		data.push_back(x);
 
-	Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(data)));
+	Statement stmt((session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data)));
 	stmt.execute();
 
 	int count = 0;
@@ -1409,7 +1410,7 @@ void SQLExecutor::limits()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1440,7 +1441,7 @@ void SQLExecutor::limitZero()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1467,7 +1468,7 @@ void SQLExecutor::limitOnce()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1502,7 +1503,7 @@ void SQLExecutor::limitPrepare()
 
 	try
 	{
-		Statement stmt = (session() << "INSERT INTO Strings VALUES (?)", use(data));
+		Statement stmt = (session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data));
 		assertTrue (100 == stmt.execute());
 	}
 	catch(DataException& ce)
@@ -1561,7 +1562,7 @@ void SQLExecutor::prepare()
 	}
 
 	{
-		Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(data)));
+		Statement stmt((session() << formatSQL("INSERT INTO Strings VALUES (?)"), use(data)));
 	}
 
 	// stmt should not have been executed when destroyed
@@ -1588,7 +1589,7 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	try
 	{
 		sw.start();
-		session() << "INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)",
+		session() << formatSQL("INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)"),
 			use(strings),
 			use(ints),
 			use(floats),
@@ -1611,7 +1612,7 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	try
 	{
 		sw.restart();
-		session() << "INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)",
+		session() << formatSQL("INSERT INTO MiscTest (First, Third, Fourth, Fifth) VALUES (?,?,?,?)"),
 			use(strings, bulk),
 			use(ints, bulk),
 			use(floats, bulk),
@@ -1724,7 +1725,7 @@ void SQLExecutor::setSimple()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }	catch(DataException& ce)
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now; }	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		fail (__func__, __LINE__, __FILE__);
@@ -1761,7 +1762,7 @@ void SQLExecutor::setComplex()
 	people.insert(Person("LN1", "FN1", "ADDR1", 1));
 	people.insert(Person("LN2", "FN2", "ADDR2", 2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }	catch(DataException& ce)
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		fail (__func__, __LINE__, __FILE__);
@@ -1798,7 +1799,7 @@ void SQLExecutor::setComplexUnique()
 	Person p2("LN2", "FN2", "ADDR2", 2);
 	people.push_back(p2);
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }	catch(DataException& ce)
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		fail (__func__, __LINE__, __FILE__);
@@ -1845,7 +1846,7 @@ void SQLExecutor::multiSetSimple()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1890,7 +1891,7 @@ void SQLExecutor::multiSetComplex()
 	Person p2("LN2", "FN2", "ADDR2", 2);
 	people.insert(p2);
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1927,7 +1928,7 @@ void SQLExecutor::mapComplex()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -1967,7 +1968,7 @@ void SQLExecutor::mapComplexUnique()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2007,7 +2008,7 @@ void SQLExecutor::multiMapComplex()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2044,7 +2045,7 @@ void SQLExecutor::selectIntoSingle()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2080,7 +2081,7 @@ void SQLExecutor::selectIntoSingleStep()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2116,7 +2117,7 @@ void SQLExecutor::selectIntoSingleFail()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN2", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2151,7 +2152,7 @@ void SQLExecutor::lowerLimitOk()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2186,7 +2187,7 @@ void SQLExecutor::singleSelect()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2221,7 +2222,7 @@ void SQLExecutor::lowerLimitFail()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2256,7 +2257,7 @@ void SQLExecutor::combinedLimits()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2295,7 +2296,7 @@ void SQLExecutor::ranges()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2333,7 +2334,7 @@ void SQLExecutor::combinedIllegalLimits()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2368,7 +2369,7 @@ void SQLExecutor::illegalRange()
 	people.insert(std::make_pair("LN1", p1));
 	people.insert(std::make_pair("LN1", p2));
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(people), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2423,7 +2424,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 
 	CLOB img("0123456789", 10);
 	int count = 0;
-	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder),
+	try { session() << formatSQL(format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder)),
 		use(lastName), use(firstName), use(address), use(img), now; }
 	catch(DataException& ce)
 	{
@@ -2466,7 +2467,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 
 	try
 	{
-		session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder),
+		session() << formatSQL(format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder)),
 			use(lastName), use(firstName), use(address), use(big), now;
 	}
 	catch(DataException& ce)
@@ -2490,7 +2491,7 @@ void SQLExecutor::blobStmt()
 	CLOB blob("0123456789", 10);
 
 	int count = 0;
-	Statement ins = (session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(blob));
+	Statement ins = (session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(blob));
 	ins.execute();
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(DataException& ce)
@@ -2534,7 +2535,7 @@ void SQLExecutor::recordSet()
 
 		{
 			Statement stmt = (session() <<
-				"INSERT INTO Person VALUES (?,?,?,?)",
+				formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 				use(lastName), use(firstName), use(address), use(born), now);
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 0);
@@ -2557,7 +2558,7 @@ void SQLExecutor::recordSet()
 
 		{
 			Statement stmt = (session() <<
-				"DELETE FROM Person WHERE born = ?", use(born), now);
+				formatSQL("DELETE FROM Person WHERE born = ?"), use(born), now);
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 0);
 			assertTrue (rset.affectedRowCount() == 1);
@@ -2565,7 +2566,7 @@ void SQLExecutor::recordSet()
 
 		{
 			Statement stmt = (session() <<
-				"INSERT INTO Person VALUES (?,?,?,?)",
+				formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 				use(lastName), use(firstName), use(address), use(born), now);
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 0);
@@ -2574,7 +2575,7 @@ void SQLExecutor::recordSet()
 
 		{
 			Statement stmt = (session() <<
-				"INSERT INTO Person VALUES (?,?,?,?)",
+				formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 				use(lastName), use(firstName), use(address), use(born2), now);
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 0);
@@ -2620,7 +2621,7 @@ void SQLExecutor::dateTime()
 
 	DateTime born(1965, 6, 18, 5, 35, 1);
 	int count = 0;
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(born), now; }	catch (ConnectionFailedException& ce){ std::cout << ce.displayText() << std::endl; fail (__func__, __LINE__, __FILE__); }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(born), now; }	catch (ConnectionFailedException& ce){ std::cout << ce.displayText() << std::endl; fail (__func__, __LINE__, __FILE__); }
 
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }	catch (ConnectionFailedException& ce){ std::cout << ce.displayText() << std::endl; fail (__func__, __LINE__, __FILE__); }
 
@@ -2647,7 +2648,7 @@ void SQLExecutor::date()
 
 	Date bornDate(1965, 6, 18);
 	int count = 0;
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)",
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 		use(lastName),
 		use(firstName),
 		use(address),
@@ -2697,7 +2698,7 @@ void SQLExecutor::time()
 
 	Time bornTime (5, 35, 1);
 	int count = 0;
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)",
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 		use(lastName),
 		use(firstName),
 		use(address),
@@ -2743,7 +2744,7 @@ void SQLExecutor::tuples()
 	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
 	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
 
-	try { session() << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(t), now; }
+	try { session() << formatSQL("INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"), use(t), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2775,7 +2776,7 @@ void SQLExecutor::tupleVector()
 	v.push_back(t10);
 	v.push_back(t100);
 
-	try { session() << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(v), now; }
+	try { session() << formatSQL("INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"), use(v), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2812,7 +2813,7 @@ void SQLExecutor::internalExtraction()
 	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
 	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
 
-	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	try { session() << formatSQL("INSERT INTO Vectors VALUES (?,?,?)"), use(v), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -2940,7 +2941,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
 	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
 
-	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	try { session() << formatSQL("INSERT INTO Vectors VALUES (?,?,?)"), use(v), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3036,7 +3037,7 @@ void SQLExecutor::internalBulkExtraction()
 
 	try
 	{
-		session() << "INSERT INTO Person VALUES (?,?,?,?)",
+		session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 			use(lastName, bulk),
 			use(firstName, bulk),
 			use(address, bulk),
@@ -3106,7 +3107,7 @@ void SQLExecutor::internalBulkExtractionUTF16()
 
 	try
 	{
-		session() << "INSERT INTO Person VALUES (?,?,?,?)",
+		session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 			use(lastName, bulk),
 			use(firstName, bulk),
 			use(address, bulk),
@@ -3157,7 +3158,7 @@ void SQLExecutor::internalStorageType()
 	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
 	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
 
-	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	try { session() << formatSQL("INSERT INTO Vectors VALUES (?,?,?)"), use(v), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3222,7 +3223,7 @@ void SQLExecutor::internalStorageType()
 
 void SQLExecutor::nulls()
 {
-	try { session() << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now; }
+	try { session() << formatSQL("INSERT INTO NullTest (i,r,v) VALUES (?,?,?)"), use(null), use(null), use(null), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3254,7 +3255,7 @@ void SQLExecutor::nulls()
 	double f = 1.5;
 	std::string s = "123";
 
-	try { session() << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(f), use(s), now; }
+	try { session() << formatSQL("INSERT INTO NullTest (i, r, v) VALUES (?,?,?)"), use(i), use(f), use(s), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3284,7 +3285,7 @@ void SQLExecutor::nulls()
 
 	i = 2;
 	f = 3.4;
-	try { session() << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(null), use(null), now; }
+	try { session() << formatSQL("INSERT INTO NullTest (i, r, v) VALUES (?,?,?)"), use(i), use(null), use(null), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3314,7 +3315,7 @@ void SQLExecutor::nulls()
 		fail (__func__, __LINE__, __FILE__);
 	}
 
-	try { session() << "INSERT INTO NullTest (v) VALUES (?)", bind(""), now; }
+	try { session() << formatSQL("INSERT INTO NullTest (v) VALUES (?)"), bind(""), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3376,7 +3377,7 @@ void SQLExecutor::rowIterator()
 	RecordSet rset0(session(), "SELECT * FROM Vectors");
 	assertTrue (rset0.begin() == rset0.end());
 
-	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	try { session() << formatSQL("INSERT INTO Vectors VALUES (?,?,?)"), use(v), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3416,7 +3417,7 @@ void SQLExecutor::rowIterator()
 void SQLExecutor::stdVectorBool()
 {
 	bool b = false;
-	try { session() << "INSERT INTO BoolTest VALUES (?)", use(b), now; }
+	try { session() << formatSQL("INSERT INTO BoolTest VALUES (?)"), use(b), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3429,7 +3430,7 @@ void SQLExecutor::stdVectorBool()
 	session() << "DELETE FROM BoolTest", now;
 
 	b = true;
-	try { session() << "INSERT INTO BoolTest VALUES (?)", use(b), now; }
+	try { session() << formatSQL("INSERT INTO BoolTest VALUES (?)"), use(b), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3447,7 +3448,7 @@ void SQLExecutor::stdVectorBool()
 	v.push_back(false);
 	v.push_back(true);
 
-	try { session() << "INSERT INTO BoolTest VALUES (?)", use(v), now; }
+	try { session() << formatSQL("INSERT INTO BoolTest VALUES (?)"), use(v), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -3465,9 +3466,9 @@ void SQLExecutor::stdVectorBool()
 		t += *it ? 1 : 0;
 	assertTrue (2 == t);
 
-	try { session() << "SELECT * FROM BoolTest WHERE b = ?", out(v), now; fail("must fail"); }	catch (BindingException&) { }
+	try { session() << formatSQL("SELECT * FROM BoolTest WHERE b = ?"), out(v), now; fail("must fail"); }	catch (BindingException&) { }
 
-	try { session() << "SELECT * FROM BoolTest WHERE b = ?", io(v), now; fail("must fail"); }	catch (BindingException&) { }
+	try { session() << formatSQL("SELECT * FROM BoolTest WHERE b = ?"), io(v), now; fail("must fail"); }	catch (BindingException&) { }
 
 	RecordSet rset(session(), "SELECT * FROM BoolTest");
 
@@ -3483,7 +3484,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	Session tmp = session();
 
 	std::vector<int> data(rowCount);
-	Statement stmt = (tmp << "INSERT INTO Strings VALUES(?)", use(data));
+	Statement stmt = (tmp << formatSQL("INSERT INTO Strings VALUES(?)"), use(data));
 	Statement::Result result = stmt.executeAsync();
 	assertTrue (!stmt.isAsync());
 	result.wait();
@@ -3573,7 +3574,7 @@ void SQLExecutor::any()
 
 	Session tmp = session();
 
-	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+	tmp << formatSQL("INSERT INTO Anys VALUES (?, ?, ?)"), use(i), use(f), use(s), now;
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
@@ -3596,7 +3597,7 @@ void SQLExecutor::dynamicAny()
 	Var s = "42";
 
 	Session tmp = session();
-	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+	tmp << formatSQL("INSERT INTO Anys VALUES (?, ?, ?)"), use(i), use(f), use(s), now;
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
@@ -3621,7 +3622,7 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	people.push_back(Person("Simpson", "Bart", "Springfield", 10));
 	people.push_back(Person("Simpson", "Lisa", "Springfield", 8));
 	people.push_back(Person("Simpson", "Maggie", "Springfield", 3));
-	session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+	session() << formatSQL("INSERT INTO Person VALUES (?, ?, ?, ?)"), use(people), now;
 
 	Person pHomer;
 	int aHomer = 42, aLisa = 8;
@@ -3856,7 +3857,7 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	session().setFeature("autoCommit", false);
 	assertTrue (!session().getFeature("autoCommit"));
 
-	session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+	session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session().isTransaction());
 
 	Statement stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
@@ -3876,7 +3877,7 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	assertTrue (!session().isTransaction());
 
 	session().begin();
-	session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+	session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session().isTransaction());
 
 	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
@@ -3921,7 +3922,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	// no autoCommit session becomes transaction without explicit begin()
 	assertTrue (!local.isTransaction());
 	assertTrue (!session().isTransaction());
-	local << "INSERT INTO Person VALUES (?,?,?,?)",
+	local << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 		use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	Statement stmt = (session() << "SELECT COUNT(*) FROM Person",
 		into(count), async, now);
@@ -3955,7 +3956,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 
 	assertTrue (!local.isTransaction());
 	assertTrue (!session().isTransaction());
-	local << "INSERT INTO Person VALUES (?,?,?,?)",
+	local << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
 		use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	stmt = (session() << "SELECT COUNT(*) FROM Person", into(count), async, now);
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
@@ -4025,7 +4026,7 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 		assertTrue (trans.isActive());
 		assertTrue (session().isTransaction());
 
-		session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+		session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
 
 		assertTrue (session().isTransaction());
 		assertTrue (trans.isActive());
@@ -4044,7 +4045,7 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 
 	{
 		Transaction trans(session());
-		session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+		session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
 
 		Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 
@@ -4270,7 +4271,7 @@ void SQLExecutor::reconnect()
 	int count = 0;
 	std::string result;
 
-	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;  }
+	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
@@ -4337,7 +4338,7 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		std::string latinText((const char*)latinChars);
 		std::string utf8TextIn((const char*)utf8Chars);
 
-		session(true) << "INSERT INTO Latin1Table VALUES (?)", use(utf8TextIn), now;
+		session(true) << formatSQL("INSERT INTO Latin1Table VALUES (?)"), use(utf8TextIn), now;
 
 		std::string latinTextOut;
 		session() << "SELECT str FROM Latin1Table", into(latinTextOut), now;
@@ -4352,7 +4353,7 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		std::string latinText2 = (const char*)latinChars2;
 		std::string utf8TextIn2 = (const char*)utf8Chars2;
 
-		session(true) << "INSERT INTO Latin1Table VALUES (?)", use(utf8TextIn2), now;
+		session(true) << formatSQL("INSERT INTO Latin1Table VALUES (?)"), use(utf8TextIn2), now;
 
 		std::vector<std::string> textOutVec;
 		session() << "SELECT str FROM Latin1Table", into(textOutVec), now;
@@ -4377,5 +4378,28 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		throw;
 	}
 }
+
+
+std::string SQLExecutor::formatSQL(std::string_view s) const
+{
+	if (!_numberedPlaceHolders)
+		return std::string(s);
+
+	std::string r;
+	r.reserve(s.size());
+	int idx = 0;
+	for (char c: s)
+	{
+		if (c == '?')
+		{
+			r += '$';
+			r += std::to_string(++idx);
+		}
+		else
+			r += c;
+	}
+	return r;
+}
+
 
 } } } // Poco::Data::Test

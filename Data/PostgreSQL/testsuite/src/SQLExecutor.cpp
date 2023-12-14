@@ -141,7 +141,8 @@ private:
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_dataExecutor("Poco::Data SQL Executor", pSession, nullptr, true)
 {
 }
 
