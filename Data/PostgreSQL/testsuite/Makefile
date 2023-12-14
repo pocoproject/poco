@@ -20,5 +20,6 @@ endif
 target         = testrunner
 target_version = 1
 target_libs    = PocoDataPostgreSQL PocoData PocoFoundation CppUnit
+target_includes += $(POCO_BASE)/Data/testsuite/DataTest/include
 
 include $(POCO_BASE)/build/rules/exec
