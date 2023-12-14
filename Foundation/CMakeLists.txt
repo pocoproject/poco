@@ -181,7 +181,7 @@ if(CMAKE_SYSTEM MATCHES "SunOS")
 	target_link_libraries(Foundation PUBLIC pthread socket xnet nsl resolv rt ${CMAKE_DL_LIBS})
 endif()
 
-if(CMAKE_COMPILER_IS_MINGW)
+if(MINGW)
 	target_compile_definitions(Foundation
 		PUBLIC
 			WC_NO_BEST_FIT_CHARS=0x400
