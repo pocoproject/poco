@@ -218,13 +218,11 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 		throw SystemException("cannot get network adapter list");
 	}
 
-	bool found = false;
-
 	if (GetAdaptersInfo(pAdapterInfo.get(), &len) == NO_ERROR)
 	{
 		IP_ADAPTER_INFO* pAdapter = pAdapterInfo.get();
 
-		while (pAdapter && !found)
+		while (pAdapter)
 		{
 			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 			{
@@ -239,7 +237,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 		// if an ethernet adapter was not found, search for a wifi adapter
 		pAdapter = pAdapterInfo.get();
 
-		while (pAdapter && !found)
+		while (pAdapter)
 		{
 			if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
 			{
@@ -257,10 +255,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	}
 
 	// ethernet and wifi adapters not found, fail the search
-	if (!found)
-	{
-		throw SystemException("no ethernet or wifi adapter found");
-	}
+	throw SystemException("no ethernet or wifi adapter found");
 }
 
 
