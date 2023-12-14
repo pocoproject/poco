@@ -235,7 +235,7 @@ private:
 	Poco::Data::Session* _pEncSession;
 	bool _numberedPlaceHolders = false;
 
-	std::string formatSQL(std::string_view s) const;
+	std::string formatSQL(const std::string& s) const;
 };
 
 

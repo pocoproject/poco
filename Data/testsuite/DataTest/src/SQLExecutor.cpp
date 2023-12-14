@@ -4380,7 +4380,7 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 }
 
 
-std::string SQLExecutor::formatSQL(std::string_view s) const
+std::string SQLExecutor::formatSQL(const std::string& s) const
 {
 	if (!_numberedPlaceHolders)
 		return std::string(s);
