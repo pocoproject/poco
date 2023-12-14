@@ -30,6 +30,9 @@ target_link_libraries(Net PUBLIC Poco::Foundation)
 if(WIN32)
 	target_link_libraries(Net PUBLIC "iphlpapi.lib")
 	target_link_libraries(Net PUBLIC "ws2_32.lib")
+	if (MINGW)
+		target_link_libraries(Net PUBLIC "mswsock.lib")
+	endif()
 endif(WIN32)
 
 target_include_directories(Net

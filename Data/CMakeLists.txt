@@ -14,6 +14,9 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 if(MSVC AND NOT(MSVC_VERSION LESS 1400))
 	set_source_files_properties(src/StatementImpl.cpp
 		PROPERTIES COMPILE_FLAGS "/bigobj")
+elseif(MINGW)
+	set_source_files_properties(src/StatementImpl.cpp
+		PROPERTIES COMPILE_FLAGS "-Wa,-mbig-obj")
 endif()
 
 # Version Resource
