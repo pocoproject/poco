@@ -3880,12 +3880,13 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session().isTransaction());
 
-	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
+	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+	assertTrue (0 == locCount);
 
 	session().commit();
 	assertTrue (!session().isTransaction());
 
-	stmt.wait();
+	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
 	assertTrue (2 == locCount);
 
 	session() << "SELECT count(*) FROM Person", into(count), now;
@@ -3951,7 +3952,6 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 
 	stmt.wait();
 	assertTrue (2 == count);
-	count = 0;
 	stmt.reset(session());
 
 	assertTrue (!local.isTransaction());
@@ -3960,7 +3960,8 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 		use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	stmt = (session() << "SELECT COUNT(*) FROM Person", into(count), async, now);
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == count);
+	// no guarantee if stmt is executed or not:
+	assertTrue (2 == count);
 	assertTrue (4 == locCount);
 #ifndef POCO_DATA_NO_SQL_PARSER
 	assertTrue (local.isTransaction());
@@ -4040,7 +4041,7 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 
 	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
-	assertTrue (!session().isTransaction());
+	assertTrue (!(session().impl()->shouldParse() && session().isTransaction()));
 	session().commit();
 
 	{
@@ -4320,7 +4321,7 @@ void SQLExecutor::unicode(const std::string& dbConnString)
 
 	UTF16String wtext;
 	Poco::UnicodeConverter::convert(text, wtext);
-	session() << "INSERT INTO UnicodeTable VALUES (?)", use(wtext), now;
+	session() << formatSQL("INSERT INTO UnicodeTable VALUES (?)"), use(wtext), now;
 	wtext.clear();
 	text.clear();
 	session() << "SELECT str FROM UnicodeTable", into(wtext), now;
