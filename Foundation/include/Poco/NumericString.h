@@ -46,8 +46,8 @@ typedef Poco::Int64 intmax_t;
 #pragma warning(disable : 4146)
 #endif // POCO_COMPILER_MSVC
 
-// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
-#define POCO_MAX_INT_STRING_LEN 65
+// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero) + 2 (hex prefix)
+#define POCO_MAX_INT_STRING_LEN (67)
 // value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
 #define POCO_MAX_FLT_STRING_LEN 780
 
