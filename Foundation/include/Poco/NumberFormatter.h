@@ -44,12 +44,14 @@ public:
 	};
 
 	enum class Options
+		/// Option to control the format of the generated string.
 	{
-		OPT_NONE = 0,
+		OPT_DEFAULT = 0,
+			/// formatHex defaults: No 0x prefix, uppercase hexadecimal values
 		OPT_PREFIX = 1 << 0,
-			/// Prepend prefix 0x
+			/// formatHex: Prepend prefix 0x
 		OPT_LOWERCASE = 1 << 1
-			/// Use uppercase letters for hexadecimal values
+			/// formatHex: Use lowercase letters for hexadecimal values
 	};
 
 	static const unsigned NF_MAX_INT_STRING_LEN = 32; // increase for 64-bit binary formatting support
@@ -68,30 +70,14 @@ public:
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(int value, bool prefix);
-		/// Formats an int value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-		/// The value is treated as unsigned.
-
-	static std::string formatHex(int value, Options options = Options::OPT_NONE);
+	static std::string formatHex(int value, Options options = Options::OPT_DEFAULT);
 		/// Formats an int value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(int value, int width, bool prefix);
-		/// Formats a int value in hexadecimal notation,
-		/// right justified and zero-padded in
-		/// a field having at least the specified width.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-		/// The value is treated as unsigned.
-
-	static std::string formatHex(int value, int width, Options options = Options::OPT_NONE);
-		/// Formats a int value in hexadecimal notation,
+	static std::string formatHex(int value, int width, Options options = Options::OPT_DEFAULT);
+		/// Formats an int value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
 		/// Options (see NumberFormatter::Options) define the format of the
@@ -111,27 +97,13 @@ public:
 		/// right justified and zero-padded in a field having at
 		/// least the specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(unsigned value, bool prefix);
-		/// Formats an unsigned int value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-
-	static std::string formatHex(unsigned value, Options options = Options::OPT_NONE);
+	static std::string formatHex(unsigned value, Options options = Options::OPT_DEFAULT);
 		/// Formats an unsigned int value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(unsigned value, int width, bool prefix);
-		/// Formats a unsigned value in hexadecimal notation,
-		/// right justified and zero-padded in
-		/// a field having at least the specified width.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-
-	static std::string formatHex(unsigned value, int width, Options options = Options::OPT_NONE);
-		/// Formats a unsigned value in hexadecimal notation,
+	static std::string formatHex(unsigned value, int width, Options options = Options::OPT_DEFAULT);
+		/// Formats an unsigned value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
 		/// Options (see NumberFormatter::Options) define the format of the
@@ -150,28 +122,12 @@ public:
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(long value, bool prefix);
-		/// Formats an long value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-		/// The value is treated as unsigned.
-
-	static std::string formatHex(long value, Options options = Options::OPT_NONE);
+	static std::string formatHex(long value, Options options = Options::OPT_DEFAULT);
 		/// Formats a long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(long value, int width, bool prefix);
-		/// Formats a long value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least the
-		/// specified width.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-		/// The value is treated as unsigned.
-
-	static std::string formatHex(long value, int width, Options options = Options::OPT_NONE);
+	static std::string formatHex(long value, int width, Options options = Options::OPT_DEFAULT);
 		/// Formats a long value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
@@ -191,26 +147,12 @@ public:
 		/// right justified and zero-padded
 		/// in a field having at least the specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(unsigned long value, bool prefix);
-		/// Formats an unsigned long value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-
-	static std::string formatHex(unsigned long value, Options options = Options::OPT_NONE);
+	static std::string formatHex(unsigned long value, Options options = Options::OPT_DEFAULT);
 		/// Formats an unsigned long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(unsigned long value, int width, bool prefix);
-		/// Formats an unsigned long value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least the
-		/// specified width.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-
-	static std::string formatHex(unsigned long value, int width, Options options = Options::OPT_NONE);
+	static std::string formatHex(unsigned long value, int width, Options options = Options::OPT_DEFAULT);
 		/// Formats an unsigned long value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
@@ -232,27 +174,12 @@ public:
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(long long value, bool prefix);
+	static std::string formatHex(long long value, Options options = Options::OPT_DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-		/// The value is treated as unsigned.
-
-	static std::string formatHex(long long value, Options options = Options::OPT_NONE);
-		/// Formats a long long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(long long value, int width, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least
-		/// the specified width.
-		/// The value is treated as unsigned.
-		/// If prefix is true, "0x" prefix is prepended to the resulting string.
-
-	static std::string formatHex(long long value, int width, Options options = Options::OPT_NONE);
+	static std::string formatHex(long long value, int width, Options options = Options::OPT_DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
@@ -272,26 +199,13 @@ public:
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(unsigned long long value, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-
-	static std::string formatHex(unsigned long long value, Options options = Options::OPT_NONE);
-		/// Formats a unsigned long long value in hexadecimal notation.
+	static std::string formatHex(unsigned long long value, Options options = Options::OPT_DEFAULT);
+		/// Formats an unsigned 64-bit value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(unsigned long long value, int width, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least
-		/// the specified width. If prefix is true, "0x" prefix is
-		/// prepended to the resulting string.
-
-	static std::string formatHex(unsigned long long value, int width, Options options = Options::OPT_NONE);
-		/// Formats a 64-bit integer value in hexadecimal notation,
+	static std::string formatHex(unsigned long long value, int width, Options options = Options::OPT_DEFAULT);
+		/// Formats an unsigned 64-bit value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 		/// The value is treated as unsigned.
@@ -312,27 +226,12 @@ public:
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(Int64 value, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-		/// The value is treated as unsigned.
-
-	static std::string formatHex(Int64 value, Options options = Options::OPT_NONE);
+	static std::string formatHex(Int64 value, Options options = Options::OPT_DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(Int64 value, int width, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least
-		/// the specified width.
-		/// The value is treated as unsigned.
-		/// If prefix is true, "0x" prefix is prepended to the resulting string.
-
-	static std::string formatHex(Int64 value, int width, Options options = Options::OPT_NONE);
+	static std::string formatHex(Int64 value, int width, Options options = Options::OPT_DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
@@ -352,26 +251,13 @@ public:
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(UInt64 value, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the
-		/// resulting string.
-
-	static std::string formatHex(UInt64 value, Options options = Options::OPT_NONE);
-		/// Formats a 64-bit integer value in hexadecimal notation.
+	static std::string formatHex(UInt64 value, Options options = Options::OPT_DEFAULT);
+		/// Formats an unsigned 64-bit integer in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	[[deprecated("use formatHex with options instead")]]
-	static std::string formatHex(UInt64 value, int width, bool prefix);
-		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least
-		/// the specified width. If prefix is true, "0x" prefix is
-		/// prepended to the resulting string.
-
-	static std::string formatHex(UInt64 value, int width, Options options = Options::OPT_NONE);
-		/// Formats a 64-bit integer value in hexadecimal notation,
+	static std::string formatHex(UInt64 value, int width, Options options = Options::OPT_DEFAULT);
+		/// Formats an unsigned 64-bit integer in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 		/// The value is treated as unsigned.
@@ -627,7 +513,137 @@ public:
 		/// sixteen (64-bit architectures) characters wide
 		/// field in hexadecimal notation.
 
+//
+// Deprecated functions
+//
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(int value, bool prefix);
+		/// Formats an int value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+		/// The value is treated as unsigned.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(int value, int width, bool prefix);
+		/// Formats an int value in hexadecimal notation,
+		/// right justified and zero-padded in
+		/// a field having at least the specified width.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+		/// The value is treated as unsigned.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(unsigned value, bool prefix);
+		/// Formats an unsigned int value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(unsigned value, int width, bool prefix);
+		/// Formats an unsigned value in hexadecimal notation,
+		/// right justified and zero-padded in
+		/// a field having at least the specified width.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(long value, bool prefix);
+		/// Formats a long value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+		/// The value is treated as unsigned.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(long value, int width, bool prefix);
+		/// Formats a long value in hexadecimal notation,
+		/// right justified and zero-padded in a field having at least the
+		/// specified width.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+		/// The value is treated as unsigned.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(unsigned long value, bool prefix);
+		/// Formats an unsigned long value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(unsigned long value, int width, bool prefix);
+		/// Formats an unsigned long value in hexadecimal notation,
+		/// right justified and zero-padded in a field having at least the
+		/// specified width.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+
+#ifdef POCO_HAVE_INT64
+#ifdef POCO_INT64_IS_LONG
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(long long value, bool prefix);
+		/// Formats a 64-bit integer value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+		/// The value is treated as unsigned.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(long long value, int width, bool prefix);
+		/// Formats a 64-bit integer value in hexadecimal notation,
+		/// right justified and zero-padded in a field having at least
+		/// the specified width.
+		/// The value is treated as unsigned.
+		/// If prefix is true, "0x" prefix is prepended to the resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(unsigned long long value, bool prefix);
+		/// Formats an unsigned 64-bit integer value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(unsigned long long value, int width, bool prefix);
+		/// Formats an unsigned 64-bit integer value in hexadecimal notation,
+		/// right justified and zero-padded in a field having at least
+		/// the specified width. If prefix is true, "0x" prefix is
+		/// prepended to the resulting string.
+
+#else // ifndef POCO_INT64_IS_LONG
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(Int64 value, bool prefix);
+		/// Formats a 64-bit integer value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+		/// The value is treated as unsigned.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(Int64 value, int width, bool prefix);
+		/// Formats a 64-bit integer value in hexadecimal notation,
+		/// right justified and zero-padded in a field having at least
+		/// the specified width.
+		/// The value is treated as unsigned.
+		/// If prefix is true, "0x" prefix is prepended to the resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(UInt64 value, bool prefix);
+		/// Formats an unsigned 64-bit integer value in hexadecimal notation.
+		/// If prefix is true, "0x" prefix is prepended to the
+		/// resulting string.
+
+	[[deprecated("use formatHex with options instead")]]
+	static std::string formatHex(UInt64 value, int width, bool prefix);
+		/// Formats an unsigned 64-bit integer value in hexadecimal notation,
+		/// right justified and zero-padded in a field having at least
+		/// the specified width. If prefix is true, "0x" prefix is
+		/// prepended to the resulting string.
+
+#endif // ifdef POCO_INT64_IS_LONG
+#endif // ifdef POCO_HAVE_INT64
+
 private:
+
+	static bool isEnabled(NumberFormatter::Options options, NumberFormatter::Options opt);
 };
 
 
@@ -638,7 +654,7 @@ private:
 
 inline NumberFormatter::Options operator | (NumberFormatter::Options lhs, NumberFormatter::Options rhs)
 {
-    using T = std::underlying_type_t <NumberFormatter::Options>;
+    using T = std::underlying_type_t<NumberFormatter::Options>;
     return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) | static_cast<T>(rhs));
 }
 
@@ -652,7 +668,7 @@ inline NumberFormatter::Options& operator |= (NumberFormatter::Options& lhs, Num
 
 inline NumberFormatter::Options operator & (NumberFormatter::Options lhs, NumberFormatter::Options rhs)
 {
-    using T = std::underlying_type_t <NumberFormatter::Options>;
+    using T = std::underlying_type_t<NumberFormatter::Options>;
     return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) & static_cast<T>(rhs));
 }
 
@@ -661,6 +677,13 @@ inline NumberFormatter::Options& operator &= (NumberFormatter::Options& lhs, Num
 {
     lhs = lhs & rhs;
     return lhs;
+}
+
+
+inline bool NumberFormatter::isEnabled(Options options, Options opt)
+{
+	using T = std::underlying_type_t<Options>;
+    return static_cast<T>(options & opt) != 0;
 }
 
 
@@ -688,21 +711,9 @@ inline std::string NumberFormatter::format0(int value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(int value, bool prefix)
-{
-	return formatHex(static_cast<unsigned int>(value), prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(int value, Options options)
 {
 	return formatHex(static_cast<unsigned int>(value), options);
-}
-
-
-inline std::string NumberFormatter::formatHex(int value, int width, bool prefix)
-{
-	return formatHex(static_cast<unsigned int>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
@@ -736,34 +747,18 @@ inline std::string NumberFormatter::format0(unsigned int value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(unsigned value, bool prefix)
-{
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(unsigned value, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, -1, ' ', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX),-1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
-}
-
-
-inline std::string NumberFormatter::formatHex(unsigned value, int width, bool prefix)
-{
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
 inline std::string NumberFormatter::formatHex(unsigned value, int width, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, width, '0', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
 }
 
@@ -792,21 +787,9 @@ inline std::string NumberFormatter::format0(long value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(long value, bool prefix)
-{
-	return formatHex(static_cast<unsigned long>(value), prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(long value, Options options)
 {
 	return formatHex(static_cast<unsigned long>(value), options);
-}
-
-
-inline std::string NumberFormatter::formatHex(long value, int width, bool prefix)
-{
-	return formatHex(static_cast<unsigned long>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
@@ -840,34 +823,18 @@ inline std::string NumberFormatter::format0(unsigned long value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(unsigned long value, bool prefix)
-{
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(unsigned long value, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, -1, ' ', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), -1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
-}
-
-
-inline std::string NumberFormatter::formatHex(unsigned long value, int width, bool prefix)
-{
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
 inline std::string NumberFormatter::formatHex(unsigned long value, int width, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, width, '0', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
 }
 
@@ -899,21 +866,9 @@ inline std::string NumberFormatter::format0(long long value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(long long value, bool prefix)
-{
-	return formatHex(static_cast<unsigned long long>(value), prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(long long value, Options options)
 {
 	return formatHex(static_cast<unsigned long long>(value), options);
-}
-
-
-inline std::string NumberFormatter::formatHex(long long value, int width, bool prefix)
-{
-	return formatHex(static_cast<unsigned long long>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
@@ -947,34 +902,18 @@ inline std::string NumberFormatter::format0(unsigned long long value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(unsigned long long value, bool prefix)
-{
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(unsigned long long value, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, -1, ' ', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), -1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
-}
-
-
-inline std::string NumberFormatter::formatHex(unsigned long long value, int width, bool prefix)
-{
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
 inline std::string NumberFormatter::formatHex(unsigned long long value, int width, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, width, '0', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
 }
 
@@ -1006,21 +945,9 @@ inline std::string NumberFormatter::format0(Int64 value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(Int64 value, bool prefix)
-{
-	return formatHex(static_cast<UInt64>(value), prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(Int64 value, Options options)
 {
 	return formatHex(static_cast<UInt64>(value), options);
-}
-
-
-inline std::string NumberFormatter::formatHex(Int64 value, int width, bool prefix)
-{
-	return formatHex(static_cast<UInt64>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
@@ -1054,34 +981,18 @@ inline std::string NumberFormatter::format0(UInt64 value, int width)
 }
 
 
-inline std::string NumberFormatter::formatHex(UInt64 value, bool prefix)
-{
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
-}
-
-
 inline std::string NumberFormatter::formatHex(UInt64 value, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, -1, ' ', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), -1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
-}
-
-
-inline std::string NumberFormatter::formatHex(UInt64 value, int width, bool prefix)
-{
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_NONE);
 }
 
 
 inline std::string NumberFormatter::formatHex(UInt64 value, int width, Options options)
 {
 	std::string result;
-	const bool prefix { (options & Options::OPT_PREFIX) != Options::OPT_NONE};
-	const bool lowercase { (options & Options::OPT_LOWERCASE) != Options::OPT_NONE};
-	intToStr(value, 0x10, result, prefix, width, '0', 0, lowercase);
+	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
 	return result;
 }
 

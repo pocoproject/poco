@@ -485,4 +485,116 @@ void NumberFormatter::append(std::string& str, const void* ptr)
 }
 
 
+//
+// Deprecated functions
+//
+
+
+std::string NumberFormatter::formatHex(int value, bool prefix)
+{
+	return formatHex(static_cast<unsigned int>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(int value, int width, bool prefix)
+{
+	return formatHex(static_cast<unsigned int>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(unsigned value, bool prefix)
+{
+	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(unsigned value, int width, bool prefix)
+{
+	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(long value, bool prefix)
+{
+	return formatHex(static_cast<unsigned long>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(long value, int width, bool prefix)
+{
+	return formatHex(static_cast<unsigned long>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(unsigned long value, bool prefix)
+{
+	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(unsigned long value, int width, bool prefix)
+{
+	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+#ifdef POCO_HAVE_INT64
+#ifdef POCO_INT64_IS_LONG
+
+
+std::string NumberFormatter::formatHex(long long value, bool prefix)
+{
+	return formatHex(static_cast<unsigned long long>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(long long value, int width, bool prefix)
+{
+	return formatHex(static_cast<unsigned long long>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(unsigned long long value, bool prefix)
+{
+	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(unsigned long long value, int width, bool prefix)
+{
+	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+#else // ifndef POCO_LONG_IS_64_BIT
+
+
+std::string NumberFormatter::formatHex(Int64 value, bool prefix)
+{
+	return formatHex(static_cast<UInt64>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(Int64 value, int width, bool prefix)
+{
+	return formatHex(static_cast<UInt64>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(UInt64 value, bool prefix)
+{
+	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+std::string NumberFormatter::formatHex(UInt64 value, int width, bool prefix)
+{
+	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+}
+
+
+#endif // ifdef POCO_INT64_IS_LONG
+#endif // ifdef POCO_HAVE_INT64
+
+
 } // namespace Poco
