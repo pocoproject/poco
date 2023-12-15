@@ -3951,9 +3951,11 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	assertTrue (!local.isTransaction());
 
 	stmt.wait();
-	assertTrue (2 == count);
+	// in general, there is no guarantee if stmt was exeuted before or after the commit
+	assertTrue (2 == count || 0 == count);
 	stmt.reset(session());
-
+	session() << "SELECT COUNT(*) FROM Person", into(count), now;
+	assertTrue (2 == count);
 	assertTrue (!local.isTransaction());
 	assertTrue (!session().isTransaction());
 	local << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
