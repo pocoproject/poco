@@ -492,49 +492,49 @@ void NumberFormatter::append(std::string& str, const void* ptr)
 
 std::string NumberFormatter::formatHex(int value, bool prefix)
 {
-	return formatHex(static_cast<unsigned int>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<unsigned int>(value), prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(int value, int width, bool prefix)
 {
-	return formatHex(static_cast<unsigned int>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<unsigned int>(value), width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(unsigned value, bool prefix)
 {
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(unsigned value, int width, bool prefix)
 {
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(long value, bool prefix)
 {
-	return formatHex(static_cast<unsigned long>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<unsigned long>(value), prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(long value, int width, bool prefix)
 {
-	return formatHex(static_cast<unsigned long>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<unsigned long>(value), width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(unsigned long value, bool prefix)
 {
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(unsigned long value, int width, bool prefix)
 {
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
@@ -544,25 +544,25 @@ std::string NumberFormatter::formatHex(unsigned long value, int width, bool pref
 
 std::string NumberFormatter::formatHex(long long value, bool prefix)
 {
-	return formatHex(static_cast<unsigned long long>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<unsigned long long>(value), prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(long long value, int width, bool prefix)
 {
-	return formatHex(static_cast<unsigned long long>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<unsigned long long>(value), width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(unsigned long long value, bool prefix)
 {
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(unsigned long long value, int width, bool prefix)
 {
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
@@ -571,25 +571,25 @@ std::string NumberFormatter::formatHex(unsigned long long value, int width, bool
 
 std::string NumberFormatter::formatHex(Int64 value, bool prefix)
 {
-	return formatHex(static_cast<UInt64>(value), prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<UInt64>(value), prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(Int64 value, int width, bool prefix)
 {
-	return formatHex(static_cast<UInt64>(value), width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(static_cast<UInt64>(value), width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(UInt64 value, bool prefix)
 {
-	return formatHex(value, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 
 std::string NumberFormatter::formatHex(UInt64 value, int width, bool prefix)
 {
-	return formatHex(value, width, prefix ? Options::OPT_PREFIX : Options::OPT_DEFAULT);
+	return formatHex(value, width, prefix ? Options::PREFIX : Options::DEFAULT);
 }
 
 

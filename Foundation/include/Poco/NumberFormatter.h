@@ -44,13 +44,13 @@ public:
 	};
 
 	enum class Options
-		/// Option to control the format of the generated string.
+		/// Options to control the format of the generated string.
 	{
-		OPT_DEFAULT = 0,
+		DEFAULT = 0,
 			/// formatHex defaults: No 0x prefix, uppercase hexadecimal values
-		OPT_PREFIX = 1 << 0,
+		PREFIX = 1 << 0,
 			/// formatHex: Prepend prefix 0x
-		OPT_LOWERCASE = 1 << 1
+		LOWERCASE = 1 << 1
 			/// formatHex: Use lowercase letters for hexadecimal values
 	};
 
@@ -70,13 +70,13 @@ public:
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
-	static std::string formatHex(int value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(int value, Options options = Options::DEFAULT);
 		/// Formats an int value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 		/// The value is treated as unsigned.
 
-	static std::string formatHex(int value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(int value, int width, Options options = Options::DEFAULT);
 		/// Formats an int value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
@@ -97,12 +97,12 @@ public:
 		/// right justified and zero-padded in a field having at
 		/// least the specified width.
 
-	static std::string formatHex(unsigned value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(unsigned value, Options options = Options::DEFAULT);
 		/// Formats an unsigned int value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(unsigned value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(unsigned value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
@@ -122,12 +122,12 @@ public:
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
-	static std::string formatHex(long value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(long value, Options options = Options::DEFAULT);
 		/// Formats a long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(long value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(long value, int width, Options options = Options::DEFAULT);
 		/// Formats a long value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
@@ -147,12 +147,12 @@ public:
 		/// right justified and zero-padded
 		/// in a field having at least the specified width.
 
-	static std::string formatHex(unsigned long value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(unsigned long value, Options options = Options::DEFAULT);
 		/// Formats an unsigned long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(unsigned long value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(unsigned long value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned long value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
@@ -174,12 +174,12 @@ public:
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
-	static std::string formatHex(long long value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(long long value, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(long long value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(long long value, int width, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
@@ -199,12 +199,12 @@ public:
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
-	static std::string formatHex(unsigned long long value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(unsigned long long value, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(unsigned long long value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(unsigned long long value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
@@ -226,12 +226,12 @@ public:
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
-	static std::string formatHex(Int64 value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(Int64 value, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(Int64 value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(Int64 value, int width, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
@@ -251,12 +251,12 @@ public:
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
-	static std::string formatHex(UInt64 value, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(UInt64 value, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit integer in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
-	static std::string formatHex(UInt64 value, int width, Options options = Options::OPT_DEFAULT);
+	static std::string formatHex(UInt64 value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit integer in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
@@ -750,7 +750,7 @@ inline std::string NumberFormatter::format0(unsigned int value, int width)
 inline std::string NumberFormatter::formatHex(unsigned value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX),-1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX),-1, ' ', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -758,7 +758,7 @@ inline std::string NumberFormatter::formatHex(unsigned value, Options options)
 inline std::string NumberFormatter::formatHex(unsigned value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -826,7 +826,7 @@ inline std::string NumberFormatter::format0(unsigned long value, int width)
 inline std::string NumberFormatter::formatHex(unsigned long value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), -1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), -1, ' ', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -834,7 +834,7 @@ inline std::string NumberFormatter::formatHex(unsigned long value, Options optio
 inline std::string NumberFormatter::formatHex(unsigned long value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -905,7 +905,7 @@ inline std::string NumberFormatter::format0(unsigned long long value, int width)
 inline std::string NumberFormatter::formatHex(unsigned long long value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), -1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), -1, ' ', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -913,7 +913,7 @@ inline std::string NumberFormatter::formatHex(unsigned long long value, Options 
 inline std::string NumberFormatter::formatHex(unsigned long long value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -984,7 +984,7 @@ inline std::string NumberFormatter::format0(UInt64 value, int width)
 inline std::string NumberFormatter::formatHex(UInt64 value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), -1, ' ', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), -1, ' ', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
@@ -992,7 +992,7 @@ inline std::string NumberFormatter::formatHex(UInt64 value, Options options)
 inline std::string NumberFormatter::formatHex(UInt64 value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::OPT_PREFIX), width, '0', 0, isEnabled(options, Options::OPT_LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
 	return result;
 }
 
