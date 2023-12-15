@@ -198,7 +198,8 @@ jobs:
       - run: >-
           ./configure --everything --no-prefix --omit=PDF
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib &&
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@1.1/include" --library-path="/usr/local/opt/openssl@1.1/lib" &&
           make all -s -j4
       - uses: ./.github/actions/retry-action
         with:
