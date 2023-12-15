@@ -702,30 +702,6 @@ void SQLExecutor::lowerLimitFail()
 void SQLExecutor::combinedLimits()
 {
 	_dataExecutor.combinedLimits();
-	/*
-	std::string funct = "combinedLimits()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	std::vector <Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), lowerLimit(2), upperLimit(2), now; }// will return 2 objects
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == 2);
-	assertTrue (result[0] == p1);
-	assertTrue (result[1] == p2);
-	*/
 }
 
 
@@ -733,114 +709,24 @@ void SQLExecutor::combinedLimits()
 void SQLExecutor::ranges()
 {
 	_dataExecutor.ranges();
-	/*
-	std::string funct = "range()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	std::vector <Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), range(2, 2), now; }// will return 2 objects
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == 2);
-	assertTrue (result[0] == p1);
-	assertTrue (result[1] == p2);
-	*/
 }
 
 
 void SQLExecutor::combinedIllegalLimits()
 {
 	_dataExecutor.combinedIllegalLimits();
-	/*
-	std::string funct = "combinedIllegalLimits()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), lowerLimit(3), upperLimit(2), now;
-		fail("lower > upper is not allowed");
-	}
-	catch(LimitException&)
-	{
-	}
-	*/
 }
 
 
 void SQLExecutor::illegalRange()
 {
 	_dataExecutor.illegalRange();
-	/*
-	std::string funct = "illegalRange()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), range(3, 2), now;
-		fail("lower > upper is not allowed");
-	}
-	catch(LimitException&)
-	{
-	}
-	*/
 }
 
 
 void SQLExecutor::emptyDB()
 {
 	_dataExecutor.emptyDB();
-	/*
-	std::string funct = "emptyDB()";
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 0);
-
-	Person result;
-	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
-	stmt.execute();
-	assertTrue (result.firstName.empty());
-	assertTrue (stmt.done());
-	*/
 }
 
 
@@ -1041,56 +927,12 @@ void SQLExecutor::blobStmt()
 void SQLExecutor::tuples()
 {
 	_dataExecutor.tuples();
-	/*
-	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
-	std::string funct = "tuples()";
-	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
-
-	try { *_pSession << "INSERT INTO Tuples VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)", use(t), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	TupleType ret(-10,-11,-12,-13,-14,-15,-16,-17,-18,-19);
-	assertTrue (ret != t);
-	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == t);
-	*/
 }
 
 
 void SQLExecutor::tupleVector()
 {
 	_dataExecutor.tupleVector();
-	/*
-	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
-	std::string funct = "tupleVector()";
-	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
-	Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int>
-		t10(10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29);
-	TupleType t100(100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119);
-	std::vector<TupleType> v;
-	v.push_back(t);
-	v.push_back(t10);
-	v.push_back(t100);
-
-	try { *_pSession << "INSERT INTO Tuples VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)", use(v), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Tuples", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (v.size() == (std::size_t) count);
-
-	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> > ret;
-	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == v);
-	*/
 }
 
 

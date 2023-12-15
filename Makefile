@@ -260,7 +260,7 @@ Data-clean:
 Data/SQLite-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite
 
-Data/SQLite-tests: Data/SQLite-libexec cppunit
+Data/SQLite-tests: Data/SQLite-libexec Data-tests
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
 
 Data/SQLite-clean:
@@ -270,7 +270,7 @@ Data/SQLite-clean:
 Data/ODBC-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC
 
-Data/ODBC-tests: Data/ODBC-libexec cppunit
+Data/ODBC-tests: Data/ODBC-libexec Data-tests
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
 
 Data/ODBC-clean:
@@ -280,7 +280,7 @@ Data/ODBC-clean:
 Data/MySQL-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL
 
-Data/MySQL-tests: Data/MySQL-libexec cppunit
+Data/MySQL-tests: Data/MySQL-libexec Data-tests
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
 
 Data/MySQL-clean:
@@ -290,7 +290,7 @@ Data/MySQL-clean:
 Data/PostgreSQL-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL
 
-Data/PostgreSQL-tests: Data/PostgreSQL-libexec cppunit
+Data/PostgreSQL-tests: Data/PostgreSQL-libexec Data-tests
 	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite
 
 Data/PostgreSQL-clean:
