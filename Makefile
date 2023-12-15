@@ -407,7 +407,7 @@ Prometheus-libexec: Foundation-libexec Net-libexec
 Prometheus-tests: Prometheus-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Prometheus/testsuite
 
-Prometheus-samples: Prometheus-libexec
+Prometheus-samples: Prometheus-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Prometheus/samples
 
 Prometheus-clean:
