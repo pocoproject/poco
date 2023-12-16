@@ -117,7 +117,7 @@ URI::URI(URI&& uri) noexcept:
 	_scheme(std::move(uri._scheme)),
 	_userInfo(std::move(uri._userInfo)),
 	_host(std::move(uri._host)),
-	_port(std::move(uri._port)),
+	_port(uri._port),
 	_path(std::move(uri._path)),
 	_query(std::move(uri._query)),
 	_fragment(std::move(uri._fragment))
@@ -174,7 +174,7 @@ URI& URI::operator = (URI&& uri) noexcept
 	_scheme   = std::move(uri._scheme);
 	_userInfo = std::move(uri._userInfo);
 	_host     = std::move(uri._host);
-	_port     = std::move(uri._port);
+	_port     = uri._port;
 	_path     = std::move(uri._path);
 	_query    = std::move(uri._query);
 	_fragment = std::move(uri._fragment);

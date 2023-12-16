@@ -71,11 +71,11 @@ RecordSet::RecordSet(const RecordSet& other):
 
 RecordSet::RecordSet(RecordSet&& other) noexcept:
 	Statement(std::move(other)),
-	_currentRow(std::move(other._currentRow)),
-	_pBegin(std::move(other._pBegin)),
-	_pEnd(std::move(other._pEnd)),
+	_currentRow(other._currentRow),
+	_pBegin(other._pBegin),
+	_pEnd(other._pEnd),
 	_pFilter(std::move(other._pFilter)),
-	_totalRowCount(std::move(other._totalRowCount))
+	_totalRowCount(other._totalRowCount)
 {
 }
 
@@ -101,11 +101,11 @@ RecordSet::~RecordSet()
 RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 {
 	Statement::operator = (std::move(other));
-	_currentRow = std::move(other._currentRow);
-	_pBegin = std::move(other._pBegin);
-	_pEnd = std::move(other._pEnd);
+	_currentRow = other._currentRow;
+	_pBegin = other._pBegin;
+	_pEnd = other._pEnd;
 	_pFilter = std::move(other._pFilter);
-	_totalRowCount = std::move(other._totalRowCount);
+	_totalRowCount = other._totalRowCount;
 
 	return *this;
 }

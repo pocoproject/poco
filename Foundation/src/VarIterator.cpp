@@ -43,8 +43,8 @@ VarIterator::VarIterator(const VarIterator& other):
 
 
 VarIterator::VarIterator(VarIterator&& other) noexcept:
-	_pVar(std::move(other._pVar)),
-	_position(std::move(other._position))
+	_pVar(other._pVar),
+	_position(other._position)
 {
 }
 
@@ -64,8 +64,8 @@ VarIterator& VarIterator::operator = (const VarIterator& other)
 
 VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
 {
-	_pVar = std::move(other._pVar);
-	_position = std::move(other._position);
+	_pVar = other._pVar;
+	_position = other._position;
 	return *this;
 }
 

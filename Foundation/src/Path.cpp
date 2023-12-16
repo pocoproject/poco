@@ -86,7 +86,7 @@ Path::Path(Path&& path) noexcept:
 	_name(std::move(path._name)),
 	_version(std::move(path._version)),
 	_dirs(std::move(path._dirs)),
-	_absolute(std::move(path._absolute))
+	_absolute(path._absolute)
 {
 }
 
@@ -147,7 +147,7 @@ Path& Path::operator = (Path&& path) noexcept
 	_name     = std::move(path._name);
 	_version  = std::move(path._version);
 	_dirs     = std::move(path._dirs);
-	_absolute = std::move(path._absolute);
+	_absolute = path._absolute;
 	return *this;
 }
 

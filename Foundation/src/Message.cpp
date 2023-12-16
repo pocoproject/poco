@@ -90,14 +90,14 @@ Message::Message(const Message& msg):
 Message::Message(Message&& msg) noexcept:
 	_source(std::move(msg._source)),
 	_text(std::move(msg._text)),
-	_prio(std::move(msg._prio)),
-	_time(std::move(msg._time)),
-	_tid(std::move(msg._tid)),
-	_ostid(std::move(msg._ostid)),
+	_prio(msg._prio),
+	_time(msg._time),
+	_tid(msg._tid),
+	_ostid(msg._ostid),
 	_thread(std::move(msg._thread)),
-	_pid(std::move(msg._pid)),
-	_file(std::move(msg._file)),
-	_line(std::move(msg._line))
+	_pid(msg._pid),
+	_file(msg._file),
+	_line(msg._line)
 {
 	_pMap = msg._pMap;
 	msg._pMap = nullptr;
@@ -159,14 +159,14 @@ Message& Message::operator = (Message&& msg) noexcept
 {
 	_source = std::move(msg._source);
 	_text = std::move(msg._text);
-	_prio = std::move(msg._prio);
-	_time = std::move(msg._time);
-	_tid = std::move(msg._tid);
-	_ostid = std::move(msg._ostid);
+	_prio = msg._prio;
+	_time = msg._time;
+	_tid = msg._tid;
+	_ostid = msg._ostid;
 	_thread = std::move(msg._thread);
-	_pid = std::move(msg._pid);
-	_file = std::move(msg._file);
-	_line = std::move(msg._line);
+	_pid = msg._pid;
+	_file = msg._file;
+	_line = msg._line;
 	delete _pMap;
 	_pMap = msg._pMap;
 	msg._pMap = nullptr;

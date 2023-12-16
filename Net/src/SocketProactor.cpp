@@ -373,7 +373,7 @@ void SocketProactor::addSendTo(Socket sock, Buffer&& message, const SocketAddres
 	try
 	{
 		pMessage = new Buffer(std::move(message));
-		pAddr = new SocketAddress(std::move(addr));
+		pAddr = new SocketAddress(addr);
 	}
 	catch(...)
 	{

@@ -67,7 +67,7 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_parseError(std::move(stmt._parseError)),
 #endif
 	_pImpl(std::move(stmt._pImpl)),
-	_async(std::move(stmt._async)),
+	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
 	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
@@ -109,7 +109,7 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 #endif
 	_pImpl = std::move(stmt._pImpl);
 	stmt._pImpl = nullptr;
-	_async = std::move(stmt._async);
+	_async = stmt._async;
 	stmt._async = false;
 	_pResult = std::move(stmt._pResult);
 	stmt._pResult = nullptr;
