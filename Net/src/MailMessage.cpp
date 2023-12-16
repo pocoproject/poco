@@ -692,7 +692,7 @@ PartSource* MailMessage::createPartStore(const std::string& content, const std::
 }
 
 
-MultipartSource::MultipartSource(const std::string contentType):
+MultipartSource::MultipartSource(const std::string& contentType):
 	PartSource(contentTypeWithBoundary(contentType))
 {
 }
