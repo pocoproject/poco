@@ -12,6 +12,7 @@
 //
 
 
+#include <memory>
 #include <utility>
 
 #include "Poco/Logger.h"
@@ -429,7 +430,7 @@ int Logger::parseLevel(const std::string& level)
 
 void Logger::add(Ptr pLogger)
 {
-	if (!_pLoggerMap) _pLoggerMap.reset(new LoggerMap);
+	if (!_pLoggerMap) _pLoggerMap = std::make_unique<LoggerMap>();
 	_pLoggerMap->insert(LoggerMap::value_type(pLogger->name(), pLogger));
 }
 

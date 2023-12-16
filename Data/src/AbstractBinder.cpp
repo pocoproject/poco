@@ -12,6 +12,8 @@
 //
 
 
+#include <memory>
+
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
@@ -60,7 +62,7 @@ void AbstractBinder::reverseTranscode(const std::string& from, std::string& to)
 
 const std::string& AbstractBinder::toString(const UUID& uuid)
 {
-	if (!_pStrings) _pStrings.reset(new StringList);
+	if (!_pStrings) _pStrings = std::make_unique<StringList>();
 	_pStrings->push_back(new std::string(uuid.toString()));
 	return *_pStrings->back();
 }

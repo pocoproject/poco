@@ -61,7 +61,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::unique_ptr<std::string> eStr;
 	if (ePos != std::string::npos)
 	{
-		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));
+		eStr = std::make_unique<std::string>(str.substr(ePos, std::string::npos));
 		frac -= eStr->length();
 		str = str.substr(0, str.length() - eStr->length());
 	}

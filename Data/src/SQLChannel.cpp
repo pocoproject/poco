@@ -26,6 +26,7 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Stopwatch.h"
 #include <fstream>
+#include <memory>
 #include <utility>
 
 
@@ -283,7 +284,7 @@ void SQLChannel::reconnect()
 {
 	if (!_pDBThread)
 	{
-		_pDBThread.reset(new Thread);
+		_pDBThread = std::make_unique<Thread>();
 		_pDBThread->start(*this);
 	}
 	_reconnect = true;

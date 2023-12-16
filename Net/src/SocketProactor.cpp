@@ -23,6 +23,7 @@
 #endif // max
 #endif // POCO_OS_FAMILY_WINDOWS
 #include <limits>
+#include <memory>
 
 
 using Poco::Exception;
@@ -141,12 +142,12 @@ public:
 					bool isExpired = !alwaysRun && (Timestamp() >= it->second);
 					if (isExpired)
 					{
-						pCH.reset(new Work(std::move(it->first)));
+						pCH = std::make_unique<Work>(std::move(it->first));
 						it = _funcList.erase(it);
 					}
 					else if (alwaysRun)
 					{
-						pCH.reset(new Work(it->first));
+						pCH = std::make_unique<Work>(it->first);
 						++it;
 					}
 					else ++it;

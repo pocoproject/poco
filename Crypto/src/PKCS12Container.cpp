@@ -21,8 +21,9 @@
 #include "Poco/Crypto/PKCS12Container.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
-#include <sstream>
+#include <memory>
 #include <openssl/err.h>
+#include <sstream>
 
 
 namespace Poco {
@@ -95,7 +96,7 @@ PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 	{
 		if (_pKey) EVP_PKEY_free(_pKey);
 		_pKey = EVPPKey::duplicate(other._pKey, &_pKey);
-		_pX509Cert.reset(new X509Certificate(*other._pX509Cert));
+		_pX509Cert = std::make_unique<X509Certificate>(*other._pX509Cert);
 		_caCertList = other._caCertList;
 		_caCertNames = other._caCertNames;
 		_pkcsFriendlyName = other._pkcsFriendlyName;
@@ -151,7 +152,7 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 		{
 			if (pCert)
 			{
-				_pX509Cert.reset(new X509Certificate(pCert, true));
+				_pX509Cert = std::make_unique<X509Certificate>(pCert, true);
 				_pkcsFriendlyName = extractFriendlyName(pCert);
 				X509_free(pCert);
 			}
