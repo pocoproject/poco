@@ -58,7 +58,7 @@ Var& Var::operator = (const Var& rhs)
 }
 
 
-const Var Var::operator + (const Var& other) const
+Var Var::operator + (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -94,7 +94,7 @@ Var& Var::operator += (const Var& other)
 }
 
 
-const Var Var::operator - (const Var& other) const
+Var Var::operator - (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -126,7 +126,7 @@ Var& Var::operator -= (const Var& other)
 }
 
 
-const Var Var::operator * (const Var& other) const
+Var Var::operator * (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -158,7 +158,7 @@ Var& Var::operator *= (const Var& other)
 }
 
 
-const Var Var::operator / (const Var& other) const
+Var Var::operator / (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -199,7 +199,7 @@ Var& Var::operator ++ ()
 }
 
 
-const Var Var::operator ++ (int)
+Var Var::operator ++ (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -219,7 +219,7 @@ Var& Var::operator -- ()
 }
 
 
-const Var Var::operator -- (int)
+Var Var::operator -- (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");

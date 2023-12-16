@@ -194,7 +194,7 @@ public:
 	bool operator < (const Row& other) const;
 		/// Less-than operator.
 
-	const NameVecPtr names() const;
+	NameVecPtr names() const;
 		/// Returns the shared pointer to names vector.
 
 	const ValueVec& values() const;
@@ -252,7 +252,7 @@ inline void Row::reset()
 }
 
 
-inline const Row::NameVecPtr Row::names() const
+inline Row::NameVecPtr Row::names() const
 {
 	return _pNames;
 }

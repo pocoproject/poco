@@ -57,7 +57,7 @@ ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFun depthDeterminer, UInt16 ma
 }
 
 
-const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
+std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 {
 	// pointer mustn't point to NULL and iteration mustn't be finished
 	poco_check_ptr(isFinished);
@@ -111,7 +111,7 @@ SiblingsFirstTraverse::SiblingsFirstTraverse(DepthFun depthDeterminer, UInt16 ma
 }
 
 
-const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
+std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 {
 	// pointer mustn't point to NULL and iteration mustn't be finished
 	poco_check_ptr(isFinished);

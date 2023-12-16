@@ -383,13 +383,13 @@ public:
 		/// Returns in range the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
 
-	const Ptr createView(const std::string& prefix) const;
+	Ptr createView(const std::string& prefix) const;
 		/// Creates a non-mutable view (see ConfigurationView) into the configuration.
 
 	Ptr createView(const std::string& prefix);
 		/// Creates a view (see ConfigurationView) into the configuration.
 
-	const Ptr createLocalView(const std::string& prefix) const;
+	Ptr createLocalView(const std::string& prefix) const;
 		/// Creates a non-mutable view (see LocalConfigurationView) into the configuration.
 
 	Ptr createLocalView(const std::string& prefix);

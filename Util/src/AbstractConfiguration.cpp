@@ -408,7 +408,7 @@ void AbstractConfiguration::keys(const std::string& key, Keys& range) const
 }
 
 
-const AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& prefix) const
+AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& prefix) const
 {
 	return new ConfigurationView(prefix, AbstractConfiguration::Ptr(const_cast<AbstractConfiguration*>(this), true));
 }
@@ -420,7 +420,7 @@ AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& 
 }
 
 
-const AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::string& prefix) const
+AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::string& prefix) const
 {
 	return new LocalConfigurationView(prefix, AbstractConfiguration::Ptr(const_cast<AbstractConfiguration*>(this), true));
 }

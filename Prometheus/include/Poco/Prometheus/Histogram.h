@@ -157,7 +157,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the Histogram.
 
-	const std::vector<double> buckets() const;
+	std::vector<double> buckets() const;
 		/// Returns the configured bucket upper bounds.
 
 	void observe(double value);
@@ -224,7 +224,7 @@ inline Histogram& Histogram::labelNames(const std::vector<std::string>& labelNam
 }
 
 
-inline const std::vector<double> Histogram::buckets() const
+inline std::vector<double> Histogram::buckets() const
 {
 	return _bucketBounds;
 }

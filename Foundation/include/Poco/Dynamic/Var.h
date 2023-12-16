@@ -237,28 +237,28 @@ public:
 		/// Assignment operator specialization for Var
 
 	template <typename T>
-	const Var operator + (const T& other) const
+	Var operator + (const T& other) const
 		/// Addition operator for adding POD to Var
 	{
 		return convert<T>() + other;
 	}
 
-	const Var operator + (const Var& other) const;
+	Var operator + (const Var& other) const;
 		/// Addition operator specialization for Var
 
-	const Var operator + (const char* other) const;
+	Var operator + (const char* other) const;
 		/// Addition operator specialization for adding const char* to Var
 
 	Var& operator ++ ();
 		/// Pre-increment operator
 
-	const Var operator ++ (int);
+	Var operator ++ (int);
 		/// Post-increment operator
 
 	Var& operator -- ();
 		/// Pre-decrement operator
 
-	const Var operator -- (int);
+	Var operator -- (int);
 		/// Post-decrement operator
 
 	template <typename T>
@@ -275,13 +275,13 @@ public:
 		/// Addition assignment operator overload for const char*
 
 	template <typename T>
-	const Var operator - (const T& other) const
+	Var operator - (const T& other) const
 		/// Subtraction operator for subtracting POD from Var
 	{
 		return convert<T>() - other;
 	}
 
-	const Var operator - (const Var& other) const;
+	Var operator - (const Var& other) const;
 		/// Subtraction operator overload for Var
 
 	template <typename T>
@@ -295,13 +295,13 @@ public:
 		/// Subtraction assignment operator overload for Var
 
 	template <typename T>
-	const Var operator * (const T& other) const
+	Var operator * (const T& other) const
 		/// Multiplication operator for multiplying Var with POD
 	{
 		return convert<T>() * other;
 	}
 
-	const Var operator * (const Var& other) const;
+	Var operator * (const Var& other) const;
 		/// Multiplication operator overload for Var
 
 	template <typename T>
@@ -315,13 +315,13 @@ public:
 		/// Multiplication assignment operator overload for Var
 
 	template <typename T>
-	const Var operator / (const T& other) const
+	Var operator / (const T& other) const
 		/// Division operator for dividing Var with POD
 	{
 		return convert<T>() / other;
 	}
 
-	const Var operator / (const Var& other) const;
+	Var operator / (const Var& other) const;
 		/// Division operator overload for Var
 
 	template <typename T>
@@ -711,7 +711,7 @@ inline const Var& Var::operator [] (const std::string& name) const
 }
 
 
-inline const Var Var::operator + (const char* other) const
+inline Var Var::operator + (const char* other) const
 {
 	return convert<std::string>() + other;
 }
@@ -853,7 +853,7 @@ inline std::size_t Var::size() const
 /// Var non-member functions
 ///
 
-inline const Var operator + (const char* other, const Var& da)
+inline Var operator + (const char* other, const Var& da)
 	/// Addition operator for adding Var to const char*
 {
 	std::string tmp = other;
