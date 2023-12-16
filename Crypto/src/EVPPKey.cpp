@@ -39,7 +39,7 @@ const std::map<int, std::string> EVPPKey::KNOWN_TYPES =
 	};
 
 
-EVPPKey::EVPPKey(const std::string& ecCurveName): _pEVPPKey(0)
+EVPPKey::EVPPKey(const std::string& ecCurveName): _pEVPPKey(nullptr)
 {
 	newECKey(ecCurveName.c_str());
 	poco_check_ptr(_pEVPPKey);
@@ -47,7 +47,7 @@ EVPPKey::EVPPKey(const std::string& ecCurveName): _pEVPPKey(0)
 }
 
 
-EVPPKey::EVPPKey(const char* ecCurveName): _pEVPPKey(0)
+EVPPKey::EVPPKey(const char* ecCurveName): _pEVPPKey(nullptr)
 {
 	newECKey(ecCurveName);
 	poco_check_ptr(_pEVPPKey);
@@ -138,7 +138,7 @@ void EVPPKey::setKeyFromParameters(OSSL_PARAM* parameters)
 		throw OpenSSLException("EVPPKey cannot init create key");
 	}
 
-	if (_pEVPPKey != 0) EVP_PKEY_free(_pEVPPKey);
+	if (_pEVPPKey != nullptr) EVP_PKEY_free(_pEVPPKey);
 	if (EVP_PKEY_fromdata(ctx, &_pEVPPKey, EVP_PKEY_KEYPAIR, parameters) <= 0)
 	{
 		OSSL_PARAM_free(parameters);
@@ -150,7 +150,7 @@ void EVPPKey::setKeyFromParameters(OSSL_PARAM* parameters)
 }
 
 
-EVPPKey::EVPPKey(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key, unsigned long exponent, int type) : _pEVPPKey(0)
+EVPPKey::EVPPKey(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key, unsigned long exponent, int type) : _pEVPPKey(nullptr)
 {
 	if ((EVP_PKEY_RSA != type) || (RSA_F4 != exponent))
 	{
@@ -175,10 +175,10 @@ EVPPKey::EVPPKey(const std::vector<unsigned char>* public_key, const std::vector
 	
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
 
-EVPPKey::EVPPKey(int type, int param): _pEVPPKey(0)
+EVPPKey::EVPPKey(int type, int param): _pEVPPKey(nullptr)
 {
-	EVP_PKEY_CTX *pCtx = EVP_PKEY_CTX_new_id(type, NULL);
-	if (NULL == pCtx)
+	EVP_PKEY_CTX *pCtx = EVP_PKEY_CTX_new_id(type, nullptr);
+	if (nullptr == pCtx)
 	{
 		std::string msg = Poco::format(
 			"EVPPKey(%d, %d):EVP_PKEY_CTX_new_id()\n", type, param);
@@ -236,7 +236,7 @@ EVPPKey::EVPPKey(int type, int param): _pEVPPKey(0)
 #endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 
-EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey): _pEVPPKey(0)
+EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey): _pEVPPKey(nullptr)
 {
 	duplicate(pEVPPKey, &_pEVPPKey);
 	poco_check_ptr(_pEVPPKey);
@@ -246,16 +246,16 @@ EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey): _pEVPPKey(0)
 
 EVPPKey::EVPPKey(const std::string& publicKeyFile,
 	const std::string& privateKeyFile,
-	const std::string& privateKeyPassphrase): _pEVPPKey(0)
+	const std::string& privateKeyPassphrase): _pEVPPKey(nullptr)
 {
-	if (loadKey(&_pEVPPKey, PEM_read_PrivateKey, (EVP_PKEY_get_Key_fn)0, privateKeyFile, privateKeyPassphrase))
+	if (loadKey(&_pEVPPKey, PEM_read_PrivateKey, (EVP_PKEY_get_Key_fn)nullptr, privateKeyFile, privateKeyPassphrase))
 	{
 		poco_check_ptr(_pEVPPKey);
 		return; // private key is enough
 	}
 
 	// no private key, this must be public key only, otherwise throw
-	if (!loadKey(&_pEVPPKey, PEM_read_PUBKEY, (EVP_PKEY_get_Key_fn)0, publicKeyFile))
+	if (!loadKey(&_pEVPPKey, PEM_read_PUBKEY, (EVP_PKEY_get_Key_fn)nullptr, publicKeyFile))
 	{
 		std::string msg = "EVPPKey(const string&, const string&, const string&)\n";
 		throw OpenSSLException(getError(msg));
@@ -267,16 +267,16 @@ EVPPKey::EVPPKey(const std::string& publicKeyFile,
 
 EVPPKey::EVPPKey(std::istream* pPublicKeyStream,
 	std::istream* pPrivateKeyStream,
-	const std::string& privateKeyPassphrase): _pEVPPKey(0)
+	const std::string& privateKeyPassphrase): _pEVPPKey(nullptr)
 {
-	if (loadKey(&_pEVPPKey, PEM_read_bio_PrivateKey, (EVP_PKEY_get_Key_fn)0, pPrivateKeyStream, privateKeyPassphrase))
+	if (loadKey(&_pEVPPKey, PEM_read_bio_PrivateKey, (EVP_PKEY_get_Key_fn)nullptr, pPrivateKeyStream, privateKeyPassphrase))
 	{
 		poco_check_ptr(_pEVPPKey);
 		return; // private key is enough
 	}
 
 	// no private key, this must be public key only, otherwise throw
-	if (!loadKey(&_pEVPPKey, PEM_read_bio_PUBKEY, (EVP_PKEY_get_Key_fn)0, pPublicKeyStream))
+	if (!loadKey(&_pEVPPKey, PEM_read_bio_PUBKEY, (EVP_PKEY_get_Key_fn)nullptr, pPublicKeyStream))
 	{
 		std::string msg = "EVPPKey(istream* ,istream* const string&)\n";
 		throw OpenSSLException(getError(msg));
@@ -416,13 +416,13 @@ void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateK
 				int rc = 0;
 				if (privateKeyPassphrase.empty())
 				{
-					rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, 0, 0, 0, 0, 0);
+					rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, nullptr, nullptr, 0, nullptr, nullptr);
 				}
 				else
 				{
 					rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, EVP_des_ede3_cbc(),
 						reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())),
-						static_cast<int>(privateKeyPassphrase.length()), 0, 0);
+						static_cast<int>(privateKeyPassphrase.length()), nullptr, nullptr);
 				}
 				if (!rc)
 				{
@@ -483,11 +483,11 @@ void EVPPKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStre
 		}
 		int rc = 0;
 		if (privateKeyPassphrase.empty())
-			rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, 0, 0, 0, 0, 0);
+			rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, nullptr, nullptr, 0, nullptr, nullptr);
 		else
 			rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, EVP_des_ede3_cbc(),
 				reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())),
-				static_cast<int>(privateKeyPassphrase.length()), 0, 0);
+				static_cast<int>(privateKeyPassphrase.length()), nullptr, nullptr);
 		if (!rc)
 		{
 			std::string msg = "EVPPKey::save(ostream*, ostream*, const string&)\n";

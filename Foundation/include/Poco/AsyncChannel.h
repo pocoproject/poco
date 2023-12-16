@@ -44,7 +44,7 @@ class Foundation_API AsyncChannel: public Channel, public Runnable
 public:
 	using Ptr = AutoPtr<AsyncChannel>;
 
-	AsyncChannel(Channel::Ptr pChannel = 0, Thread::Priority prio = Thread::PRIO_NORMAL);
+	AsyncChannel(Channel::Ptr pChannel = nullptr, Thread::Priority prio = Thread::PRIO_NORMAL);
 		/// Creates the AsyncChannel and connects it to
 		/// the given channel.
 

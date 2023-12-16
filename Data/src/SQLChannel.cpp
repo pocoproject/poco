@@ -319,7 +319,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		if (value.empty())
 		{
-			_pArchiveStrategy = 0;
+			_pArchiveStrategy = nullptr;
 		}
 		else if (_pArchiveStrategy)
 		{
@@ -336,7 +336,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		if (value.empty() || "forever" == value)
 		{
-			_pArchiveStrategy = 0;
+			_pArchiveStrategy = nullptr;
 		}
 		else if (_pArchiveStrategy)
 		{

@@ -21,21 +21,21 @@ namespace XML {
 
 
 XMLFilterImpl::XMLFilterImpl():
-	_pParent(0),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pContentHandler(0),
-	_pErrorHandler(0)
+	_pParent(nullptr),
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pErrorHandler(nullptr)
 {
 }
 
 
 XMLFilterImpl::XMLFilterImpl(XMLReader* pParent):
 	_pParent(pParent),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pContentHandler(0),
-	_pErrorHandler(0)
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pErrorHandler(nullptr)
 {
 }
 
@@ -176,7 +176,7 @@ InputSource* XMLFilterImpl::resolveEntity(const XMLString* publicId, const XMLSt
 	if (_pEntityResolver)
 		return _pEntityResolver->resolveEntity(publicId, systemId);
 	else
-		return 0;
+		return nullptr;
 }
 
 

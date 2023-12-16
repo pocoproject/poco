@@ -131,7 +131,7 @@ public:
 	{
 		using value_type = EventType;
 
-		Iterator(XMLStreamParser* p = 0, EventType e = EV_EOF):
+		Iterator(XMLStreamParser* p = nullptr, EventType e = EV_EOF):
 			_parser(p),
 			_e(e)
 		{
@@ -589,7 +589,7 @@ inline Content XMLStreamParser::content() const
 
 inline const XMLStreamParser::ElementEntry* XMLStreamParser::getElement() const
 {
-	return _elementState.empty() ? 0 : getElementImpl();
+	return _elementState.empty() ? nullptr : getElementImpl();
 }
 
 

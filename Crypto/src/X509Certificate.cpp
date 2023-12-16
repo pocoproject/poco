@@ -42,14 +42,14 @@ namespace Crypto {
 
 
 X509Certificate::X509Certificate(std::istream& istr):
-	_pCert(0)
+	_pCert(nullptr)
 {
 	load(istr);
 }
 
 
 X509Certificate::X509Certificate(const std::string& path):
-	_pCert(0)
+	_pCert(nullptr)
 {
 	load(path);
 }
@@ -147,7 +147,7 @@ void X509Certificate::load(std::istream& istr)
 
 	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cert.data()), static_cast<int>(cert.size()));
 	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate");
-	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
+	_pCert = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 	BIO_free(pBIO);
 
 	if (!_pCert) throw Poco::IOException("Failed to load certificate from stream");
@@ -168,7 +168,7 @@ void X509Certificate::load(const std::string& path)
 		throw Poco::OpenFileException("Cannot open certificate file for reading", path);
 	}
 
-	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
+	_pCert = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 	BIO_free(pBIO);
 
 	if (!_pCert) throw Poco::ReadFileException("Faild to load certificate from", path);
@@ -239,7 +239,7 @@ void X509Certificate::init()
 {
 	_issuerName = _X509_NAME_oneline_utf8(X509_get_issuer_name(_pCert));
 	_subjectName = _X509_NAME_oneline_utf8(X509_get_subject_name(_pCert));
-	BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509*>(_pCert)), 0);
+	BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509*>(_pCert)), nullptr);
 	if (pBN)
 	{
 		char* pSN = BN_bn2hex(pBN);
@@ -286,7 +286,7 @@ std::string X509Certificate::subjectName(NID nid) const
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
 	domainNames.clear();
-	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
+	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, nullptr, nullptr)))
 	{
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
 		{
@@ -416,8 +416,8 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 {
 	List caCertList;
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
-	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
-	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+	if (pBIO == nullptr) throw OpenFileException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
+	X509* x = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 	if (!x)
 	{
 		BIO_free(pBIO);
@@ -426,7 +426,7 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 	while (x)
 	{
 		caCertList.push_back(X509Certificate(x));
-		x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+		x = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 	}
 	BIO_free(pBIO);
 	return caCertList;
@@ -436,7 +436,7 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
 {
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "a");
-	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
+	if (pBIO == nullptr) throw OpenFileException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 	List::const_iterator it = list.begin();
 	List::const_iterator end = list.end();
 	for (; it != end; ++it)

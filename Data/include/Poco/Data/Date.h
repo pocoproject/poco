@@ -203,7 +203,7 @@ public:
 		val = DateTimeFormatter::format(dt, "%Y/%m/%d");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

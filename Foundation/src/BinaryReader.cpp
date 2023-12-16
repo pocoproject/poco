@@ -24,7 +24,7 @@ namespace Poco {
 
 BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
 	_istr(istr),
-	_pTextConverter(0)
+	_pTextConverter(nullptr)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);

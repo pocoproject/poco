@@ -92,7 +92,7 @@ public:
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	bool accepts(Notification* pNf, const char* pName = 0) const
+	bool accepts(Notification* pNf, const char* pName = nullptr) const
 	{
 		return dynamic_cast<N*>(pNf) && (!pName || pNf->name() == pName);
 	}

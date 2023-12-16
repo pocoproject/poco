@@ -79,10 +79,10 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 	}
 	catch (...)
 	{
-		conn = 0;
+		conn = nullptr;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 

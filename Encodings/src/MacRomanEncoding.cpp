@@ -21,7 +21,7 @@ namespace Poco {
 const char* MacRomanEncoding::_names[] =
 {
 	"MacRoman",
-	NULL
+	nullptr
 };
 
 

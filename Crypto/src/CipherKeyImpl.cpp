@@ -32,7 +32,7 @@ namespace
 		{
 			if (!msg.empty())
 				msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -49,8 +49,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	const std::string& salt,
 	int iterationCount,
 	const std::string& digest):
-	_pCipher(0),
-	_pDigest(0),
+	_pCipher(nullptr),
+	_pDigest(nullptr),
 	_name(name),
 	_key(),
 	_iv()
@@ -76,8 +76,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	const ByteVec& key,
 	const ByteVec& iv):
-	_pCipher(0),
-	_pDigest(0),
+	_pCipher(nullptr),
+	_pDigest(nullptr),
 	_name(name),
 	_key(key),
 	_iv(iv)
@@ -92,8 +92,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name):
-	_pCipher(0),
-	_pDigest(0),
+	_pCipher(nullptr),
+	_pDigest(nullptr),
 	_name(name),
 	_key(),
 	_iv()
@@ -198,7 +198,7 @@ void CipherKeyImpl::generateKey(
 	int keySize = EVP_BytesToKey(
 		_pCipher,
 		_pDigest ? _pDigest : EVP_md5(),
-		(salt.empty() ? 0 : saltBytes),
+		(salt.empty() ? nullptr : saltBytes),
 		reinterpret_cast<const unsigned char*>(password.data()),
 		static_cast<int>(password.size()),
 		iterationCount,

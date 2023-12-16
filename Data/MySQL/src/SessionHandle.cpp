@@ -69,7 +69,7 @@ Poco::SingletonHolder<ThreadCleanupHelper> ThreadCleanupHelper::_sh;
 #endif
 
 
-SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(0)
+SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(nullptr)
 {
 	init(mysql);
 #ifdef POCO_OS_FAMILY_UNIX
@@ -97,7 +97,7 @@ SessionHandle::~SessionHandle()
 
 void SessionHandle::options(mysql_option opt)
 {
-	if (mysql_options(_pHandle, opt, 0) != 0)
+	if (mysql_options(_pHandle, opt, nullptr) != 0)
 		throw ConnectionException("mysql_options error", _pHandle);
 }
 
@@ -132,7 +132,7 @@ void SessionHandle::options(mysql_option opt, unsigned int i)
 void SessionHandle::connect(const char* host, const char* user, const char* password, const char* db, unsigned int port)
 {
 #ifdef HAVE_MYSQL_REAL_CONNECT
-	if (!mysql_real_connect(_pHandle, host, user, password, db, port, 0, 0))
+	if (!mysql_real_connect(_pHandle, host, user, password, db, port, nullptr, 0))
 		throw ConnectionFailedException(mysql_error(_pHandle));
 #else
 	if (!mysql_connect(_pHandle, host, user, password))
@@ -146,7 +146,7 @@ void SessionHandle::close()
 	if (_pHandle)
 	{
 		mysql_close(_pHandle);
-		_pHandle = 0;
+		_pHandle = nullptr;
 	}
 }
 

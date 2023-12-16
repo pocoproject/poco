@@ -24,7 +24,7 @@ const char* Latin9Encoding::_names[] =
 	"ISO-8859-15",
 	"Latin9",
 	"Latin-9",
-	NULL
+	nullptr
 };
 
 

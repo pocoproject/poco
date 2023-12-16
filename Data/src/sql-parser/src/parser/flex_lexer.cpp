@@ -4609,7 +4609,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 				}
 			else
 				/* Can't grow it, we don't own it. */
-				b->yy_ch_buf = NULL;
+				b->yy_ch_buf = nullptr;
 
 			if ( ! b->yy_ch_buf )
 				YY_FATAL_ERROR(
@@ -4916,7 +4916,7 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
 		return;
 
 	if ( b == YY_CURRENT_BUFFER ) /* Not sure if we should pop here. */
-		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) 0;
+		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) nullptr;
 
 	if ( b->yy_is_our_buffer )
 		yyfree( (void *) b->yy_ch_buf , yyscanner );
@@ -4990,7 +4990,7 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
 void yypush_buffer_state (YY_BUFFER_STATE new_buffer , yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-	if (new_buffer == NULL)
+	if (new_buffer == nullptr)
 		return;
 
 	yyensure_buffer_stack(yyscanner);
@@ -5025,7 +5025,7 @@ void yypop_buffer_state (yyscan_t yyscanner)
 		return;
 
 	yy_delete_buffer(YY_CURRENT_BUFFER , yyscanner);
-	YY_CURRENT_BUFFER_LVALUE = NULL;
+	YY_CURRENT_BUFFER_LVALUE = nullptr;
 	if (yyg->yy_buffer_stack_top > 0)
 		--yyg->yy_buffer_stack_top;
 
@@ -5096,7 +5096,7 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscann
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
 		/* They forgot to leave room for the EOB's. */
-		return NULL;
+		return nullptr;
 
 	b = (YY_BUFFER_STATE) yyalloc( sizeof( struct yy_buffer_state ) , yyscanner );
 	if ( ! b )
@@ -5105,7 +5105,7 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscann
 	b->yy_buf_size = (int) (size - 2);	/* "- 2" to take care of EOB's */
 	b->yy_buf_pos = b->yy_ch_buf = base;
 	b->yy_is_our_buffer = 0;
-	b->yy_input_file = NULL;
+	b->yy_input_file = nullptr;
 	b->yy_n_chars = b->yy_buf_size;
 	b->yy_is_interactive = 0;
 	b->yy_at_bol = 1;
@@ -5375,14 +5375,14 @@ void yyset_lloc (YYLTYPE *  yylloc_param , yyscan_t yyscanner)
  */
 int yylex_init(yyscan_t* ptr_yy_globals)
 {
-    if (ptr_yy_globals == NULL){
+    if (ptr_yy_globals == nullptr){
         errno = EINVAL;
         return 1;
     }
 
-    *ptr_yy_globals = (yyscan_t) yyalloc ( sizeof( struct yyguts_t ), NULL );
+    *ptr_yy_globals = (yyscan_t) yyalloc ( sizeof( struct yyguts_t ), nullptr );
 
-    if (*ptr_yy_globals == NULL){
+    if (*ptr_yy_globals == nullptr){
         errno = ENOMEM;
         return 1;
     }
@@ -5406,14 +5406,14 @@ int yylex_init_extra( YY_EXTRA_TYPE yy_user_defined, yyscan_t* ptr_yy_globals )
 
     yyset_extra (yy_user_defined, &dummy_yyguts);
 
-    if (ptr_yy_globals == NULL){
+    if (ptr_yy_globals == nullptr){
         errno = EINVAL;
         return 1;
     }
 
     *ptr_yy_globals = (yyscan_t) yyalloc ( sizeof( struct yyguts_t ), &dummy_yyguts );
 
-    if (*ptr_yy_globals == NULL){
+    if (*ptr_yy_globals == nullptr){
         errno = ENOMEM;
         return 1;
     }
@@ -5434,24 +5434,24 @@ static int yy_init_globals (yyscan_t yyscanner)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
-    yyg->yy_buffer_stack = NULL;
+    yyg->yy_buffer_stack = nullptr;
     yyg->yy_buffer_stack_top = 0;
     yyg->yy_buffer_stack_max = 0;
-    yyg->yy_c_buf_p = NULL;
+    yyg->yy_c_buf_p = nullptr;
     yyg->yy_init = 0;
     yyg->yy_start = 0;
 
     yyg->yy_start_stack_ptr = 0;
     yyg->yy_start_stack_depth = 0;
-    yyg->yy_start_stack =  NULL;
+    yyg->yy_start_stack =  nullptr;
 
 /* Defined in main.c */
 #ifdef YY_STDINIT
     yyin = stdin;
     yyout = stdout;
 #else
-    yyin = NULL;
-    yyout = NULL;
+    yyin = nullptr;
+    yyout = nullptr;
 #endif
 
     /* For future reference: Set errno on error, since we are called by
@@ -5468,17 +5468,17 @@ int yylex_destroy  (yyscan_t yyscanner)
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		yy_delete_buffer( YY_CURRENT_BUFFER , yyscanner );
-		YY_CURRENT_BUFFER_LVALUE = NULL;
+		YY_CURRENT_BUFFER_LVALUE = nullptr;
 		yypop_buffer_state(yyscanner);
 	}
 
 	/* Destroy the stack itself. */
 	yyfree(yyg->yy_buffer_stack , yyscanner);
-	yyg->yy_buffer_stack = NULL;
+	yyg->yy_buffer_stack = nullptr;
 
     /* Destroy the start condition stack. */
         yyfree( yyg->yy_start_stack , yyscanner );
-        yyg->yy_start_stack = NULL;
+        yyg->yy_start_stack = nullptr;
 
     /* Reset the globals. This is important in a non-reentrant scanner so the next time
      * yylex() is called, initialization will occur. */
@@ -5486,7 +5486,7 @@ int yylex_destroy  (yyscan_t yyscanner)
 
     /* Destroy the main struct (reentrant only). */
     yyfree ( yyscanner , yyscanner );
-    yyscanner = NULL;
+    yyscanner = nullptr;
     return 0;
 }
 

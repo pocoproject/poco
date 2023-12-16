@@ -148,7 +148,7 @@ public:
 		static CBMap retMap;
 		T* pRet = reinterpret_cast<T*>(eventHookRegister(pDB, callbackFn, pParam));
 
-		if (pRet == 0)
+		if (pRet == nullptr)
 		{
 			if (retMap.find(pDB) == retMap.end())
 			{

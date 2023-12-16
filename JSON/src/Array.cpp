@@ -265,7 +265,7 @@ Poco::Dynamic::Array Array::makeArray(const JSON::Array::Ptr& arr)
 void Array::clear()
 {
 	_values.clear();
-	_pArray = 0;
+	_pArray = nullptr;
 }
 
 

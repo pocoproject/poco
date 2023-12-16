@@ -99,7 +99,7 @@ private:
 	public:
 		CurrentThreadHolder()
 		{
-			if (pthread_key_create(&_key, NULL))
+			if (pthread_key_create(&_key, nullptr))
 				throw SystemException("cannot allocate thread context key");
 		}
 		~CurrentThreadHolder()

@@ -329,7 +329,7 @@ public:
 	void render(const Var& data, std::ostream& out) const
 	{
 		TemplateCache* cache = TemplateCache::instance();
-		if (cache == 0)
+		if (cache == nullptr)
 		{
 			Template tpl(_path);
 			tpl.parse();
@@ -348,16 +348,16 @@ private:
 
 
 Template::Template(const Path& templatePath):
-	_parts(0),
-	_currentPart(0),
+	_parts(nullptr),
+	_currentPart(nullptr),
 	_templatePath(templatePath)
 {
 }
 
 
 Template::Template():
-	_parts(0),
-	_currentPart(0)
+	_parts(nullptr),
+	_currentPart(nullptr)
 {
 }
 
@@ -443,7 +443,7 @@ void Template::parse(std::istream& in)
 			}
 			_currentPart = _partStack.top();
 			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? else ?>");
 			}
@@ -466,7 +466,7 @@ void Template::parse(std::istream& in)
 
 			_currentPart = _partStack.top();
 			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? elsif / elif ?>");
 			}
@@ -482,7 +482,7 @@ void Template::parse(std::istream& in)
 			}
 			MultiPart* loopPart = _partStack.top();
 			LoopPart* lp = dynamic_cast<LoopPart*>(loopPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? for ?> command");
 			}
@@ -499,7 +499,7 @@ void Template::parse(std::istream& in)
 
 			_currentPart = _partStack.top();
 			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? endif ?>");
 			}

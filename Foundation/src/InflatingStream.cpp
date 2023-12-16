@@ -23,18 +23,18 @@ namespace Poco {
 InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_eof(false),
 	_check(type != STREAM_ZIP)
 {
-	_zstr.next_in   = 0;
+	_zstr.next_in   = nullptr;
 	_zstr.avail_in  = 0;
 	_zstr.total_in  = 0;
-	_zstr.next_out  = 0;
+	_zstr.next_out  = nullptr;
 	_zstr.avail_out = 0;
 	_zstr.total_out = 0;
-	_zstr.msg       = 0;
-	_zstr.state     = 0;
+	_zstr.msg       = nullptr;
+	_zstr.state     = nullptr;
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
@@ -56,16 +56,16 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_eof(false),
 	_check(false)
 {
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
+	_zstr.next_in   = nullptr;
 	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
+	_zstr.next_out  = nullptr;
 	_zstr.avail_out = 0;
 
 	_buffer = new char[INFLATE_BUFFER_SIZE];
@@ -81,7 +81,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 
 InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_eof(false),
 	_check(type != STREAM_ZIP)
@@ -89,9 +89,9 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
+	_zstr.next_in   = nullptr;
 	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
+	_zstr.next_out  = nullptr;
 	_zstr.avail_out = 0;
 
 	_buffer = new char[INFLATE_BUFFER_SIZE];
@@ -107,7 +107,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 
 InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_eof(false),
 	_check(false)
@@ -115,9 +115,9 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
+	_zstr.next_in   = nullptr;
 	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
+	_zstr.next_out  = nullptr;
 	_zstr.avail_out = 0;
 
 	_buffer = new char[INFLATE_BUFFER_SIZE];
@@ -148,8 +148,8 @@ InflatingStreamBuf::~InflatingStreamBuf()
 int InflatingStreamBuf::close()
 {
 	sync();
-	_pIstr = 0;
-	_pOstr = 0;
+	_pIstr = nullptr;
+	_pOstr = nullptr;
 	return 0;
 }
 

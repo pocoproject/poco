@@ -423,7 +423,7 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 #if defined(POCO_VXWORKS)
 		throw ServiceNotFoundException(service);
 #else
-		struct servent* se = getservbyname(service.c_str(), NULL);
+		struct servent* se = getservbyname(service.c_str(), nullptr);
 		if (se)
 			return ntohs(se->s_port);
 		else

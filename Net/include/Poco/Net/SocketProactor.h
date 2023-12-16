@@ -113,7 +113,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all functions.
 
-	int poll(int* pHandled = 0);
+	int poll(int* pHandled = nullptr);
 		/// Polls all registered sockets and calls their respective handlers.
 		/// If pHandled is not null, after the call it contains the total number
 		/// of read/write/error socket handlers called.

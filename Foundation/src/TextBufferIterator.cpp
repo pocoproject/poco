@@ -22,9 +22,9 @@ namespace Poco {
 
 
 TextBufferIterator::TextBufferIterator():
-	_pEncoding(0),
-	_it(0),
-	_end(0)
+	_pEncoding(nullptr),
+	_it(nullptr),
+	_end(nullptr)
 {
 }
 
@@ -54,7 +54,7 @@ TextBufferIterator::TextBufferIterator(const char* begin, const char* end, const
 
 
 TextBufferIterator::TextBufferIterator(const char* end):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(end),
 	_end(end)
 {

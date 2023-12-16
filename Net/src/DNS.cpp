@@ -76,7 +76,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_flags = hintFlags;
-	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI);
+	int rc = getaddrinfo(hostname.c_str(), nullptr, &hints, &pAI);
 	if (rc == 0)
 	{
 		HostEntry result(pAI);
@@ -118,14 +118,14 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 #if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
 	char fqname[1024];
-	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD);
+	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), nullptr, 0, NI_NAMEREQD);
 	if (rc == 0)
 	{
 		struct addrinfo* pAI;
 		struct addrinfo hints;
 		std::memset(&hints, 0, sizeof(hints));
 		hints.ai_flags = hintFlags;
-		rc = getaddrinfo(fqname, NULL, &hints, &pAI);
+		rc = getaddrinfo(fqname, nullptr, &hints, &pAI);
 		if (rc == 0)
 		{
 			HostEntry result(pAI);

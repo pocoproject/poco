@@ -187,7 +187,7 @@ inline std::string& getError(std::string& msg)
 	while ((err = ERR_get_error()))
 	{
 		if (!msg.empty()) msg.append(1, '\n');
-		msg.append(ERR_error_string(err, 0));
+		msg.append(ERR_error_string(err, nullptr));
 	}
 	return msg;
 }

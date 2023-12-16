@@ -216,7 +216,7 @@ bool SocketReactor::hasEventHandler(const Socket& socket, const Poco::AbstractOb
 SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool makeNew)
 {
 	const SocketImpl* pImpl = socket.impl();
-	if (pImpl == nullptr) return 0;
+	if (pImpl == nullptr) return nullptr;
 	poco_socket_t sockfd = pImpl->sockfd();
 	ScopedLock lock(_mutex);
 
@@ -224,7 +224,7 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 	if (it != _handlers.end()) return it->second;
 	else if (makeNew) return (_handlers[sockfd] = new SocketNotifier(socket));
 
-	return 0;
+	return nullptr;
 }
 
 

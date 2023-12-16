@@ -23,7 +23,7 @@ const char* ISO8859_9Encoding::_names[] =
 	"ISO-8859-9",
 	"Latin5",
 	"Latin-5",
-	NULL
+	nullptr
 };
 
 

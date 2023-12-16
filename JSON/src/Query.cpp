@@ -51,7 +51,7 @@ Object::Ptr Query::findObject(const std::string& path) const
 	else if (result.type() == typeid(Object))
 		return new Object(result.extract<Object>());
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -79,7 +79,7 @@ Array::Ptr Query::findArray(const std::string& path) const
 	else if (result.type() == typeid(Array))
 		return new Array(result.extract<Array>());
 
-	return 0;
+	return nullptr;
 }
 
 

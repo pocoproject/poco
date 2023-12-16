@@ -144,7 +144,7 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length)
-	: _pImpl(0)
+	: _pImpl(nullptr)
 {
 	if (length == sizeof(struct in_addr))
 		newIPv4(addr);
@@ -652,7 +652,7 @@ std::vector<unsigned char> IPAddress::toBytes() const
 {
 	std::size_t sz = 0;
 	std::vector<unsigned char> bytes;
-	const void* ptr = 0;
+	const void* ptr = nullptr;
 	switch (family())
 	{
 		case IPv4:

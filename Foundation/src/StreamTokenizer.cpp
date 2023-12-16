@@ -19,7 +19,7 @@ namespace Poco {
 
 
 StreamTokenizer::StreamTokenizer():
-	_pIstr(0)
+	_pIstr(nullptr)
 {
 }
 

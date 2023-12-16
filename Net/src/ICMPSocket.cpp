@@ -64,13 +64,13 @@ ICMPSocket& ICMPSocket::operator = (const Socket& socket)
 
 int ICMPSocket::sendTo(const SocketAddress& address, int flags)
 {
-	return impl()->sendTo(0, 0, address, flags);
+	return impl()->sendTo(nullptr, 0, address, flags);
 }
 
 
 int ICMPSocket::receiveFrom(SocketAddress& address, int flags)
 {
-	return impl()->receiveFrom(0, 0, address, flags);
+	return impl()->receiveFrom(nullptr, 0, address, flags);
 }
 
 

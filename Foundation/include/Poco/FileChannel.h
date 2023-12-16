@@ -256,7 +256,7 @@ protected:
 
 private:
 	bool setNoPurge(const std::string& value);
-	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = NULL) const;
+	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = nullptr) const;
 	Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
 
 	RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;

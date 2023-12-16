@@ -85,7 +85,7 @@ Notification* NotificationQueue::dequeueNotification()
 Notification* NotificationQueue::waitDequeueNotification()
 {
 	Notification::Ptr pNf;
-	WaitInfo* pWI = 0;
+	WaitInfo* pWI = nullptr;
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
@@ -103,7 +103,7 @@ Notification* NotificationQueue::waitDequeueNotification()
 Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 {
 	Notification::Ptr pNf;
-	WaitInfo* pWI = 0;
+	WaitInfo* pWI = nullptr;
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();

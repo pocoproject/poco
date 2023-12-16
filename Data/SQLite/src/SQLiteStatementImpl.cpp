@@ -36,7 +36,7 @@ const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = -1;
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
 	StatementImpl(rSession),
 	_pDB(pDB),
-	_pStmt(0),
+	_pStmt(nullptr),
 	_stepCalled(false),
 	_nextResponse(0),
 	_affectedRowCount(POCO_SQLITE_INV_ROW_CNT),
@@ -70,14 +70,14 @@ void SQLiteStatementImpl::compileImpl()
 
 	std::string statement(toString());
 
-	sqlite3_stmt* pStmt = 0;
+	sqlite3_stmt* pStmt = nullptr;
 	const char* pSql = _pLeftover ? _pLeftover->c_str() : statement.c_str();
 
 	if (0 == std::strlen(pSql))
 		throw InvalidSQLStatementException("Empty statements are illegal");
 
 	int rc = SQLITE_OK;
-	const char* pLeftover = 0;
+	const char* pLeftover = nullptr;
 	bool queryFound = false;
 
 	do
@@ -86,7 +86,7 @@ void SQLiteStatementImpl::compileImpl()
 		if (rc != SQLITE_OK)
 		{
 			if (pStmt) sqlite3_finalize(pStmt);
-			pStmt = 0;
+			pStmt = nullptr;
 			std::string errMsg = sqlite3_errmsg(_pDB);
 			Utility::throwException(_pDB, rc, errMsg);
 		}
@@ -153,7 +153,7 @@ void SQLiteStatementImpl::bindImpl()
 {
 	_stepCalled = false;
 	_nextResponse = 0;
-	if (_pStmt == 0) return;
+	if (_pStmt == nullptr) return;
 
 	sqlite3_reset(_pStmt);
 
@@ -221,9 +221,9 @@ void SQLiteStatementImpl::clear()
 	if (_pStmt)
 	{
 		sqlite3_finalize(_pStmt);
-		_pStmt=0;
+		_pStmt=nullptr;
 	}
-	_pLeftover = 0;
+	_pLeftover = nullptr;
 }
 
 
@@ -233,7 +233,7 @@ bool SQLiteStatementImpl::hasNext()
 		return (_nextResponse == SQLITE_ROW);
 
 	// _pStmt is allowed to be null for conditional SQL statements
-	if (_pStmt == 0)
+	if (_pStmt == nullptr)
 	{
 		_stepCalled   = true;
 		_nextResponse = SQLITE_DONE;
@@ -309,7 +309,7 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 int SQLiteStatementImpl::affectedRowCount() const
 {
 	if (_affectedRowCount != POCO_SQLITE_INV_ROW_CNT) return _affectedRowCount;
-	return _pStmt == 0 || sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
+	return _pStmt == nullptr || sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
 }
 
 

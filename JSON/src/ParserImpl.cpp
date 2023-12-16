@@ -220,7 +220,7 @@ void ParserImpl::handleObject()
 	while (tok != JSON_OBJECT_END && checkError())
 	{
 		json_next(_pJSON);
-		if (_pHandler) _pHandler->key(std::string(json_get_string(_pJSON, NULL)));
+		if (_pHandler) _pHandler->key(std::string(json_get_string(_pJSON, nullptr)));
 		handle();
 		tok = json_peek(_pJSON);
 	}
@@ -252,7 +252,7 @@ void ParserImpl::handle()
 	case JSON_NUMBER:
 		if (_pHandler)
 		{
-			std::string str(json_get_string(_pJSON, NULL));
+			std::string str(json_get_string(_pJSON, nullptr));
 			if (str.find(_decimalPoint) != str.npos || str.find('e') != str.npos || str.find('E') != str.npos)
 			{
 				_pHandler->value(NumberParser::parseFloat(str));

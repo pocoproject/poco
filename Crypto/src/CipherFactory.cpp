@@ -35,8 +35,8 @@ namespace Crypto {
 CipherFactory::CipherFactory()
 {
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-	OSSL_PROVIDER_load(NULL, "default");
-	OSSL_PROVIDER_load(NULL, "legacy");
+	OSSL_PROVIDER_load(nullptr, "default");
+	OSSL_PROVIDER_load(nullptr, "legacy");
 #endif
 }
 

@@ -97,7 +97,7 @@ public:
 		/// is not exported.
 
 	void save(std::ostream* pPublicKeyStream,
-		std::ostream* pPrivateKeyStream = 0,
+		std::ostream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///

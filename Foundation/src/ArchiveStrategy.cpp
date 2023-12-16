@@ -85,7 +85,7 @@ protected:
 
 ArchiveStrategy::ArchiveStrategy():
 	_compress(false),
-	_pCompressor(0)
+	_pCompressor(nullptr)
 {
 }
 

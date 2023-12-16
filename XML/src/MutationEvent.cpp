@@ -29,9 +29,9 @@ const XMLString MutationEvent::DOMCharacterDataModified    = toXMLString("DOMCha
 
 
 MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type):
-	Event(pOwnerDocument, type, 0, true, false),
+	Event(pOwnerDocument, type, nullptr, true, false),
 	_change(MODIFICATION),
-	_pRelatedNode(0)
+	_pRelatedNode(nullptr)
 {
 }
 

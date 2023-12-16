@@ -77,7 +77,7 @@ public:
 
 #ifndef POCO_NO_SOO
 
-	Placeholder(): pHolder(0)
+	Placeholder(): pHolder(nullptr)
 	{
 		std::memset(holder, 0, sizeof(Placeholder));
 	}
@@ -412,7 +412,7 @@ ValueType* AnyCast(Any* operand)
 {
 	return operand && operand->type() == typeid(ValueType)
 				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
-				: 0;
+				: nullptr;
 }
 
 

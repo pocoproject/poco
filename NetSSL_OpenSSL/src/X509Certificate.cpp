@@ -160,7 +160,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 	}
 	return ok;
 #else
-	if (X509_check_host(const_cast<X509*>(certificate.certificate()), hostName.c_str(), hostName.length(), 0, NULL) == 1)
+	if (X509_check_host(const_cast<X509*>(certificate.certificate()), hostName.c_str(), hostName.length(), 0, nullptr) == 1)
 	{
 		return true;
 	}

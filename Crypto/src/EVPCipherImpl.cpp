@@ -33,7 +33,7 @@ namespace
 		while ((err = ERR_get_error()))
 		{
 			if (!msg.empty()) msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -43,7 +43,7 @@ namespace
 	{
 	public:
 		EVPPKeyContext() = delete;
-		EVPPKeyContext(const EVP_PKEY* pEVP) : _pCtx(EVP_PKEY_CTX_new(const_cast<EVP_PKEY*>(pEVP), NULL))
+		EVPPKeyContext(const EVP_PKEY* pEVP) : _pCtx(EVP_PKEY_CTX_new(const_cast<EVP_PKEY*>(pEVP), nullptr))
 		{
 			if (!_pCtx)
 			{
@@ -73,7 +73,7 @@ namespace
 			_pEVP(pEVP),
 			_pCtx(_pEVP),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 		{
 			std::string fmt = "EVPEncryptImpl():%s()";
 			poco_check_ptr(_pEVP);
@@ -126,7 +126,7 @@ namespace
 				{
 					poco_assert (outputLength >= evpSize);
 					std::size_t outLen;
-					if (EVP_PKEY_encrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
+					if (EVP_PKEY_encrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt(NULL)")));
 					if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
@@ -156,7 +156,7 @@ namespace
 			std::size_t outLen = 0;
 			if (_pos > 0)
 			{
-				if (EVP_PKEY_encrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
+				if (EVP_PKEY_encrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
 				if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
@@ -169,7 +169,7 @@ namespace
 		{
 			std::string fmt = "EVPEncryptImpl::maxDataSize():%s()";
 			std::size_t outLength = 0;
-			if (EVP_PKEY_encrypt(_pCtx, NULL, &outLength, pIO, length) <= 0)
+			if (EVP_PKEY_encrypt(_pCtx, nullptr, &outLength, pIO, length) <= 0)
 				throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
 			return outLength;
 		}
@@ -189,7 +189,7 @@ namespace
 			_pEVP(pEVP),
 			_pCtx(_pEVP),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 		{
 			std::string fmt = "EVPDecryptImpl():%s()";
 			poco_check_ptr(_pEVP);
@@ -237,7 +237,7 @@ namespace
 				if (missing == 0)
 				{
 					std::size_t outLen = 0;
-					if (EVP_PKEY_decrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
+					if (EVP_PKEY_decrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
 					if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt")));
@@ -263,7 +263,7 @@ namespace
 			poco_assert (length >= _blockSize);
 			std::string fmt = "EVPDecryptImpl::finalize():%s()";
 			std::size_t outLen = 0;
-			if (EVP_PKEY_decrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
+			if (EVP_PKEY_decrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
 			poco_assert (length >= outLen);
 			if (_pos > 0)

@@ -403,7 +403,7 @@ inline bool FTPClientSession::isPermanentNegative(int status)
 
 inline bool FTPClientSession::isOpen() const
 {
-	return _pControlSocket != 0;
+	return _pControlSocket != nullptr;
 }
 
 

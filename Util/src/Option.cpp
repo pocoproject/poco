@@ -31,8 +31,8 @@ Option::Option():
 	_required(false),
 	_repeatable(false),
 	_argRequired(false),
-	_pValidator(0),
-	_pCallback(0)
+	_pValidator(nullptr),
+	_pCallback(nullptr)
 {
 }
 
@@ -62,8 +62,8 @@ Option::Option(const std::string& fullName, const std::string& shortName):
 	_required(false),
 	_repeatable(false),
 	_argRequired(false),
-	_pValidator(0),
-	_pCallback(0)
+	_pValidator(nullptr),
+	_pCallback(nullptr)
 {
 }
 
@@ -75,8 +75,8 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 	_required(required),
 	_repeatable(false),
 	_argRequired(false),
-	_pValidator(0),
-	_pCallback(0)
+	_pValidator(nullptr),
+	_pCallback(nullptr)
 {
 }
 
@@ -89,8 +89,8 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 	_repeatable(false),
 	_argName(argName),
 	_argRequired(argRequired),
-	_pValidator(0),
-	_pCallback(0)
+	_pValidator(nullptr),
+	_pCallback(nullptr)
 {
 }
 
@@ -190,7 +190,7 @@ Option& Option::group(const std::string& group)
 
 Option& Option::binding(const std::string& propertyName)
 {
-	return binding(propertyName, 0);
+	return binding(propertyName, nullptr);
 }
 
 

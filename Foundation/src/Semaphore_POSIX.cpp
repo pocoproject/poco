@@ -58,7 +58,7 @@ SemaphoreImpl::SemaphoreImpl(int n, int max): _n(n), _max(max)
 	// if the mutex has never been used.
 	std::memset(&_mutex, 0, sizeof(_mutex));
 #endif
-	if (pthread_mutex_init(&_mutex, NULL))
+	if (pthread_mutex_init(&_mutex, nullptr))
 		throw SystemException("cannot create semaphore (mutex)");
 
 #if defined(POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT)

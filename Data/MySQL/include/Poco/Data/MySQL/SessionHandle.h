@@ -37,7 +37,7 @@ public:
 	~SessionHandle();
 		/// Destroy handle, close connection
 
-	void init(MYSQL* mysql = 0);
+	void init(MYSQL* mysql = nullptr);
 		/// Initializes the handle iff not initialized.
 
 	void options(mysql_option opt);

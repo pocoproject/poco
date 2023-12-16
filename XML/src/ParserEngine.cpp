@@ -84,20 +84,20 @@ const XMLString ParserEngine::EMPTY_STRING;
 
 
 ParserEngine::ParserEngine():
-	_parser(0),
-	_pBuffer(0),
+	_parser(nullptr),
+	_pBuffer(nullptr),
 	_encodingSpecified(false),
 	_expandInternalEntities(true),
 	_externalGeneralEntities(false),
 	_externalParameterEntities(false),
 	_enablePartialReads(false),
 	_pNamespaceStrategy(new NoNamespacesStrategy()),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pDeclHandler(0),
-	_pContentHandler(0),
-	_pLexicalHandler(0),
-	_pErrorHandler(0),
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pDeclHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pLexicalHandler(nullptr),
+	_pErrorHandler(nullptr),
 	_maximumAmplificationFactor(0.0),
 	_activationThresholdBytes(0)
 {
@@ -105,8 +105,8 @@ ParserEngine::ParserEngine():
 
 
 ParserEngine::ParserEngine(const XMLString& encoding):
-	_parser(0),
-	_pBuffer(0),
+	_parser(nullptr),
+	_pBuffer(nullptr),
 	_encodingSpecified(true),
 	_encoding(encoding),
 	_expandInternalEntities(true),
@@ -114,12 +114,12 @@ ParserEngine::ParserEngine(const XMLString& encoding):
 	_externalParameterEntities(false),
 	_enablePartialReads(false),
 	_pNamespaceStrategy(new NoNamespacesStrategy()),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pDeclHandler(0),
-	_pContentHandler(0),
-	_pLexicalHandler(0),
-	_pErrorHandler(0),
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pDeclHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pLexicalHandler(nullptr),
+	_pErrorHandler(nullptr),
 	_maximumAmplificationFactor(0.0),
 	_activationThresholdBytes(0)
 {
@@ -463,7 +463,7 @@ void ParserEngine::init()
 
 	if (dynamic_cast<NoNamespacePrefixesStrategy*>(_pNamespaceStrategy))
 	{
-		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : 0, '\t');
+		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : nullptr, '\t');
 		if (_parser)
 		{
 			XML_SetNamespaceDeclHandler(_parser, handleStartNamespaceDecl, handleEndNamespaceDecl);
@@ -471,7 +471,7 @@ void ParserEngine::init()
 	}
 	else if (dynamic_cast<NamespacePrefixesStrategy*>(_pNamespaceStrategy))
 	{
-		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : 0, '\t');
+		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : nullptr, '\t');
 		if (_parser)
 		{
 			XML_SetReturnNSTriplet(_parser, 1);
@@ -480,7 +480,7 @@ void ParserEngine::init()
 	}
 	else
 	{
-		_parser = XML_ParserCreate(_encodingSpecified ? _encoding.c_str() : 0);
+		_parser = XML_ParserCreate(_encodingSpecified ? _encoding.c_str() : nullptr);
 	}
 
 	if (!_parser) throw XMLException("Cannot create Expat parser");
@@ -724,7 +724,7 @@ void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* enti
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	if (pThis->_pDTDHandler)
-		pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : 0, systemId, notationName);
+		pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : nullptr, systemId, notationName);
 }
 
 
@@ -737,7 +737,7 @@ void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationNa
 	XMLString sysId;
 	if (systemId) sysId.assign(systemId);
 	if (pThis->_pDTDHandler)
-		pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : 0, systemId ? &sysId : 0);
+		pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : nullptr, systemId ? &sysId : nullptr);
 }
 
 
@@ -748,8 +748,8 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 	if (!context && !pThis->_externalParameterEntities) return XML_STATUS_ERROR;
 	if (context && !pThis->_externalGeneralEntities) return XML_STATUS_ERROR;
 
-	InputSource* pInputSource = 0;
-	EntityResolver* pEntityResolver = 0;
+	InputSource* pInputSource = nullptr;
+	EntityResolver* pEntityResolver = nullptr;
 	EntityResolverImpl defaultResolver;
 
 	XMLString sysId(systemId);
@@ -762,17 +762,17 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 	if (pThis->_pEntityResolver)
 	{
 		pEntityResolver = pThis->_pEntityResolver;
-		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
+		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : nullptr, toXMLString(uri.toString()));
 	}
 	if (!pInputSource && pThis->_externalGeneralEntities)
 	{
 		pEntityResolver = &defaultResolver;
-		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
+		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : nullptr, toXMLString(uri.toString()));
 	}
 
 	if (pInputSource)
 	{
-		XML_Parser extParser = XML_ExternalEntityParserCreate(pThis->_parser, context, 0);
+		XML_Parser extParser = XML_ExternalEntityParserCreate(pThis->_parser, context, nullptr);
 		if (!extParser) throw XMLException("Cannot create external entity parser");
 
 		try
@@ -798,7 +798,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(encodingHandlerData);
 
 	XMLString encoding(name);
-	TextEncoding* knownEncoding = 0;
+	TextEncoding* knownEncoding = nullptr;
 
 	EncodingMap::const_iterator it = pThis->_encodings.find(encoding);
 	if (it != pThis->_encodings.end())
@@ -814,7 +814,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 
 		info->data    = knownEncoding;
 		info->convert = &ParserEngine::convert;
-		info->release = 0;
+		info->release = nullptr;
 		return XML_STATUS_OK;
 	}
 	else return XML_STATUS_ERROR;
@@ -910,7 +910,7 @@ void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	if (pThis->_pDeclHandler)
-		pThis->_pDeclHandler->externalEntityDecl(entityName, publicId ? &pubId : 0, systemId);
+		pThis->_pDeclHandler->externalEntityDecl(entityName, publicId ? &pubId : nullptr, systemId);
 }
 
 

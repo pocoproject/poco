@@ -128,7 +128,7 @@ public:
 		/// If the LOB is empty, returns NULL.
 	{
 		if (_pContent->empty())
-			return 0;
+			return nullptr;
 		else
 			return _pContent->data();
 	}
@@ -286,7 +286,7 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -324,7 +324,7 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

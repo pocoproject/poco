@@ -114,9 +114,9 @@ RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 void RecordSet::reset(const Statement& stmt)
 {
 	delete _pBegin;
-	_pBegin = 0;
+	_pBegin = nullptr;
 	delete _pEnd;
-	_pEnd = 0;
+	_pEnd = nullptr;
 	_currentRow = 0;
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 
@@ -208,7 +208,7 @@ Row& RecordSet::row(std::size_t pos)
 		throw RangeException("Invalid recordset row requested.");
 
 	RowMap::const_iterator it = _rowMap.find(pos);
-	Row* pRow = 0;
+	Row* pRow = nullptr;
 	std::size_t columns = columnCount();
 	if (it == _rowMap.end())
 	{

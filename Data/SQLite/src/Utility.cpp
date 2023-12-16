@@ -61,7 +61,7 @@ Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 
 
-Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex((pDB) ? sqlite3_db_mutex(pDB) : 0)
+Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex((pDB) ? sqlite3_db_mutex(pDB) : nullptr)
 {
 	if (_pMutex)
 		sqlite3_mutex_enter(_pMutex);
@@ -255,7 +255,7 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 
 	// Note: SQLITE_OPEN_READWRITE is required to correctly handle an existing hot journal.
 	// See #3135
-	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI, NULL);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI, nullptr);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");
@@ -278,7 +278,7 @@ bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, nullptr);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pFile, "main", pInMemory, "main");

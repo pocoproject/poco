@@ -62,7 +62,7 @@ namespace
 
 Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
 {
-	if (!pParent) return 0;
+	if (!pParent) return nullptr;
 
 	// preorder search
 	Node* pCur = pParent->firstChild();
@@ -123,7 +123,7 @@ unsigned long ElementsByTagNameListNS::length() const
 
 Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) const
 {
-	if (!pParent) return 0;
+	if (!pParent) return nullptr;
 
 	// preorder search
 	Node* pCur = pParent->firstChild();

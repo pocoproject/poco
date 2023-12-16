@@ -44,7 +44,7 @@ FileChannel::FileChannel():
 	_compress(false),
 	_flush(true),
 	_rotateOnOpen(false),
-	_pFile(0),
+	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
 	_pPurgeStrategy(new NullPurgeStrategy())
@@ -58,7 +58,7 @@ FileChannel::FileChannel(const std::string& path):
 	_compress(false),
 	_flush(true),
 	_rotateOnOpen(false),
-	_pFile(0),
+	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
 	_pPurgeStrategy(new NullPurgeStrategy())
@@ -112,7 +112,7 @@ void FileChannel::close()
 	FastMutex::ScopedLock lock(_mutex);
 
 	delete _pFile;
-	_pFile = 0;
+	_pFile = nullptr;
 }
 
 
@@ -237,7 +237,7 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 
-	RotateStrategy* pStrategy = 0;
+	RotateStrategy* pStrategy = nullptr;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
 		if (times == "utc")
@@ -296,7 +296,7 @@ void FileChannel::setRotation(const std::string& rotation)
 
 ArchiveStrategy* FileChannel::createArchiveStrategy(const std::string& archive, const std::string& times) const
 {
-	ArchiveStrategy* pStrategy = 0;
+	ArchiveStrategy* pStrategy = nullptr;
 	if (archive == "number")
 	{
 		pStrategy = new ArchiveByNumberStrategy;
@@ -326,7 +326,7 @@ void FileChannel::setArchiveStrategy(ArchiveStrategy* strategy)
 
 void FileChannel::setArchive(const std::string& archive)
 {
-	ArchiveStrategy* pStrategy = 0;
+	ArchiveStrategy* pStrategy = nullptr;
 	if (archive == "number")
 	{
 		pStrategy = new ArchiveByNumberStrategy;

@@ -46,7 +46,7 @@ class XML_API DOMBuilder: protected DTDHandler, protected ContentHandler, protec
 	/// must be supplied to the DOMBuilder.
 {
 public:
-	DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool = 0);
+	DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool = nullptr);
 		/// Creates a DOMBuilder using the given XMLReader.
 		/// If a NamePool is given, it becomes the Document's NamePool.
 

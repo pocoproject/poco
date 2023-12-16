@@ -28,7 +28,7 @@ namespace XML {
 Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
 	AbstractContainerNode(pOwnerDocument),
 	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName)),
-	_pFirstAttr(0)
+	_pFirstAttr(nullptr)
 {
 }
 
@@ -36,7 +36,7 @@ Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const 
 Element::Element(Document* pOwnerDocument, const Element& element):
 	AbstractContainerNode(pOwnerDocument, element),
 	_name(pOwnerDocument->namePool().insert(element._name)),
-	_pFirstAttr(0)
+	_pFirstAttr(nullptr)
 {
 	Attr* pAttr = element._pFirstAttr;
 	while (pAttr)
@@ -143,8 +143,8 @@ Attr* Element::removeAttributeNode(Attr* oldAttr)
 		else throw DOMException(DOMException::NOT_FOUND_ERR);
 	}
 	else _pFirstAttr = static_cast<Attr*>(_pFirstAttr->_pNext);
-	oldAttr->_pNext   = 0;
-	oldAttr->_pParent = 0;
+	oldAttr->_pNext   = nullptr;
+	oldAttr->_pParent = nullptr;
 	oldAttr->autoRelease();
 
 	return oldAttr;
@@ -298,13 +298,13 @@ Attr* Element::setAttributeNodeNS(Attr* newAttr)
 
 bool Element::hasAttribute(const XMLString& name) const
 {
-	return getAttributeNode(name) != 0;
+	return getAttributeNode(name) != nullptr;
 }
 
 
 bool Element::hasAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return getAttributeNodeNS(namespaceURI, localName) != 0;
+	return getAttributeNodeNS(namespaceURI, localName) != nullptr;
 }
 
 
@@ -328,7 +328,7 @@ const XMLString& Element::localName() const
 
 bool Element::hasAttributes() const
 {
-	return _pFirstAttr != 0;
+	return _pFirstAttr != nullptr;
 }
 
 
@@ -418,7 +418,7 @@ Element* Element::getElementById(const XMLString& elementId, const XMLString& id
 		}
 		pNode = pNode->nextSibling();
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -437,7 +437,7 @@ Element* Element::getElementByIdNS(const XMLString& elementId, const XMLString& 
 		}
 		pNode = pNode->nextSibling();
 	}
-	return 0;
+	return nullptr;
 }
 
 

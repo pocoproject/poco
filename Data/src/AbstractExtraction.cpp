@@ -22,7 +22,7 @@ namespace Data {
 AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
 	Poco::UInt32 position,
 	bool bulk):
-	_pExtractor(0),
+	_pExtractor(nullptr),
 	_limit(limit),
 	_position(position),
 	_bulk(bulk),

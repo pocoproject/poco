@@ -19,17 +19,17 @@
 namespace Poco {
 
 
-Exception::Exception(int code): _pNested(0), _code(code)
+Exception::Exception(int code): _pNested(nullptr), _code(code)
 {
 }
 
 
-Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
 	if (!arg.empty())
 	{
@@ -49,7 +49,7 @@ Exception::Exception(const Exception& exc):
 	_msg(exc._msg),
 	_code(exc._code)
 {
-	_pNested = exc._pNested ? exc._pNested->clone() : 0;
+	_pNested = exc._pNested ? exc._pNested->clone() : nullptr;
 }
 
 
@@ -63,7 +63,7 @@ Exception& Exception::operator = (const Exception& exc)
 {
 	if (&exc != this)
 	{
-		Exception* newPNested = exc._pNested ? exc._pNested->clone() : 0;
+		Exception* newPNested = exc._pNested ? exc._pNested->clone() : nullptr;
 		delete _pNested;
 		_msg     = exc._msg;
 		_pNested = newPNested;

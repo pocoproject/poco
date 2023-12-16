@@ -416,7 +416,7 @@ public:
 		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -550,7 +550,7 @@ public:
 		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

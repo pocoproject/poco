@@ -51,8 +51,8 @@ public:
 		_pb(char_traits::eof()),
 		_ispb(false)
 	{
-		this->setg(0, 0, 0);
-		this->setp(0, 0);
+		this->setg(nullptr, nullptr, nullptr);
+		this->setp(nullptr, nullptr);
 	}
 
 	~BasicUnbufferedStreamBuf()

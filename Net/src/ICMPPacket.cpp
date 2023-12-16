@@ -35,7 +35,7 @@ namespace Poco {
 namespace Net {
 
 
-ICMPPacket::ICMPPacket(IPAddress::Family family, int dataSize):_pImpl(0)
+ICMPPacket::ICMPPacket(IPAddress::Family family, int dataSize):_pImpl(nullptr)
 {
 	if (family == IPAddress::IPv4)
 		_pImpl = new ICMPv4PacketImpl(dataSize);

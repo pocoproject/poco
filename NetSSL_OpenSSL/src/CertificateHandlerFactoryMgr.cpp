@@ -56,7 +56,7 @@ const CertificateHandlerFactory* CertificateHandlerFactoryMgr::getFactory(const 
 	if (it != _factories.end())
 		return it->second;
 	else
-		return 0;
+		return nullptr;
 }
 
 

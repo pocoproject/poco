@@ -102,7 +102,7 @@ public:
 		if (_pMutex)
 		{
 			_pMutex->unlock();
-			_pMutex = 0;
+			_pMutex = nullptr;
 		}
 	}
 

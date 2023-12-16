@@ -492,7 +492,7 @@ void ServerApplication::waitForTerminationRequest()
 	}
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
-	sigprocmask(SIG_BLOCK, &sset, NULL);
+	sigprocmask(SIG_BLOCK, &sset, nullptr);
 	int sig;
 	sigwait(&sset, &sig);
 #else // POCO_OS != POCO_OS_ANDROID

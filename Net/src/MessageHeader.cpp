@@ -373,7 +373,7 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 					hex += c;
 				}
 				hex = toUpper(hex);
-				tempout += (char)(int)strtol(hex.c_str(), 0, 16);
+				tempout += (char)(int)strtol(hex.c_str(), nullptr, 16);
 				continue;
 			}
 			tempout += c;

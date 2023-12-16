@@ -148,7 +148,7 @@ struct timeval ICMPv4PacketImpl::time(Poco::UInt8* buffer, int length) const
 {
 	struct timeval tv;
 
-	if (0 == buffer || 0 == length)
+	if (nullptr == buffer || 0 == length)
 	{
 		Timespan value(Timestamp().epochMicroseconds());
 		tv.tv_sec  = (long) value.totalSeconds();
@@ -169,7 +169,7 @@ ICMPv4PacketImpl::Header* ICMPv4PacketImpl::header(Poco::UInt8* buffer, int leng
 	poco_check_ptr (buffer);
 
 	int offset = (buffer[0] & 0x0F) * 4;
-	if ((offset + sizeof(Header)) > length) return 0;
+	if ((offset + sizeof(Header)) > length) return nullptr;
 
 	buffer += offset;
 	return reinterpret_cast<Header*>(buffer);

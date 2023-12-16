@@ -28,7 +28,7 @@ PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, s
 	_numBytes(end-start),
 	_bytesWritten(0),
 	_pIstr(&in),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_prefix(pre),
 	_postfix(post),
 	_ignoreStart(0),
@@ -44,7 +44,7 @@ PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::si
 	_start(0),
 	_numBytes(0),
 	_bytesWritten(0),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&out),
 	_ignoreStart(start),
 	_buffer(end),
@@ -60,7 +60,7 @@ PartialStreamBuf::~PartialStreamBuf()
 
 int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	if (_pIstr == 0 ||length == 0) return -1;
+	if (_pIstr == nullptr ||length == 0) return -1;
 	if (!_initialized)
 	{
 		_initialized = true;
@@ -106,7 +106,7 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	if (_pOstr == 0 || length == 0) return -1;
+	if (_pOstr == nullptr || length == 0) return -1;
 	if (!_initialized)
 	{
 		_initialized = true;

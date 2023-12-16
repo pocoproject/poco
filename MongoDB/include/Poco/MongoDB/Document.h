@@ -124,7 +124,7 @@ public:
 			if (ElementTraits<T>::TypeId == element->type())
 			{
 				ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-				if (concrete != 0)
+				if (concrete != nullptr)
 				{
 					return concrete->value();
 				}
@@ -148,7 +148,7 @@ public:
 		if (ElementTraits<T>::TypeId == element->type())
 		{
 			ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-			if (concrete != 0)
+			if (concrete != nullptr)
 			{
 				return concrete->value();
 			}

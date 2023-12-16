@@ -195,9 +195,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		{
 			argv[i++] = const_cast<char*>(a.c_str());
 		}
-		argv[i] = NULL;
+		argv[i] = nullptr;
 
-		const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
+		const char* pInitialDirectory = initialDirectory.empty() ? nullptr : initialDirectory.c_str();
 
 		int pid = fork();
 		if (pid < 0)

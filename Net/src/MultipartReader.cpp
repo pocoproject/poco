@@ -176,7 +176,7 @@ MultipartInputStream::~MultipartInputStream()
 
 MultipartReader::MultipartReader(std::istream& istr):
 	_istr(istr),
-	_pMPI(0)
+	_pMPI(nullptr)
 {
 }
 
@@ -184,7 +184,7 @@ MultipartReader::MultipartReader(std::istream& istr):
 MultipartReader::MultipartReader(std::istream& istr, const std::string& boundary):
 	_istr(istr),
 	_boundary(boundary),
-	_pMPI(0)
+	_pMPI(nullptr)
 {
 }
 

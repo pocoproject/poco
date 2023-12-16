@@ -197,7 +197,7 @@ do {                                              \
 
 
 SHA2Engine::SHA2Engine(ALGORITHM algorithm):
-	_context(NULL),
+	_context(nullptr),
 	_algorithm(algorithm)
 {
 	_digest.reserve(digestLength());
@@ -269,7 +269,7 @@ void _sha512_process(HASHCONTEXT* pContext, const unsigned char data[128])
 
 void SHA2Engine::updateImpl(const void* buffer_, std::size_t count)
 {
-	if (_context == NULL || buffer_ == NULL || count == 0) return;
+	if (_context == nullptr || buffer_ == nullptr || count == 0) return;
 	Poco::UInt32 left = 0;
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
 	unsigned char* data = (unsigned char*)buffer_;
@@ -352,7 +352,7 @@ std::size_t SHA2Engine::digestLength() const
 
 void SHA2Engine::reset()
 {
-	if (_context != NULL) free(_context);
+	if (_context != nullptr) free(_context);
 	_context = calloc(1, sizeof(HASHCONTEXT));
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
 	if (_algorithm == SHA_224)
@@ -426,7 +426,7 @@ void SHA2Engine::reset()
 const DigestEngine::Digest& SHA2Engine::digest()
 {
 	_digest.clear();
-	if (_context == NULL) return _digest;
+	if (_context == nullptr) return _digest;
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
 	size_t last, padn;
 	unsigned char hash[64];

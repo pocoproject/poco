@@ -288,7 +288,7 @@ Logger& Logger::unsafeGet(const std::string& name)
 	{
 		if (name == ROOT)
 		{
-			pLogger = new Logger(name, 0, Message::PRIO_INFORMATION);
+			pLogger = new Logger(name, nullptr, Message::PRIO_INFORMATION);
 		}
 		else
 		{
@@ -343,7 +343,7 @@ Logger::Ptr Logger::find(const std::string& name)
 		LoggerMap::iterator it = _pLoggerMap->find(name);
 		if (it != _pLoggerMap->end()) return it->second;
 	}
-	return 0;
+	return nullptr;
 }
 
 

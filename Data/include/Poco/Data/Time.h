@@ -207,7 +207,7 @@ public:
 		val = DateTimeFormatter::format(dt, "%H:%M:%S");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

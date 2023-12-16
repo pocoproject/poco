@@ -66,8 +66,8 @@ Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(0);
-OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
+OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(nullptr);
+OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(nullptr);
 #endif
 
 
@@ -95,7 +95,7 @@ void OpenSSLInitializer::initialize()
 	if (++_rc == 1)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		CONF_modules_load(NULL, NULL, 0);
+		CONF_modules_load(nullptr, nullptr, 0);
 #else
 		OPENSSL_config(NULL);
 #endif
@@ -131,12 +131,12 @@ void OpenSSLInitializer::initialize()
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 		if (!_defaultProvider)
 		{
-			_defaultProvider = OSSL_PROVIDER_load(NULL, "default");
+			_defaultProvider = OSSL_PROVIDER_load(nullptr, "default");
 			if (!_defaultProvider) throw CryptoException("Failed to load OpenSSL default provider");
 		}
 		if (!_legacyProvider)
 		{
-			_legacyProvider = OSSL_PROVIDER_load(NULL, "legacy");
+			_legacyProvider = OSSL_PROVIDER_load(nullptr, "legacy");
 			// Note: use haveLegacyProvider() to check if legacy provider has been loaded
 		}
 #endif

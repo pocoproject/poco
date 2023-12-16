@@ -23,7 +23,7 @@ const char* ASCIIEncoding::_names[] =
 {
 	"US-ASCII",
 	"ASCII",
-	NULL
+	nullptr
 };
 
 

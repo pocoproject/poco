@@ -37,7 +37,7 @@ Object::Object(const Object& other) : _values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._modified ? other._pStruct : 0),
+	_pStruct(!other._modified ? other._pStruct : nullptr),
 	_modified(other._modified)
 {
 	syncKeys(other._keys);
@@ -71,7 +71,7 @@ Object &Object::operator = (const Object &other)
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
 		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._modified ? other._pStruct : 0;
+		_pStruct = !other._modified ? other._pStruct : nullptr;
 		_modified = other._modified;
 	}
 	return *this;
@@ -128,7 +128,7 @@ Array::Ptr Object::getArray(const std::string& key) const
 		return it->second.extract<Array::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -140,7 +140,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 		return it->second.extract<Object::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -339,7 +339,7 @@ void Object::clear()
 {
 	_values.clear();
 	_keys.clear();
-	_pStruct = 0;
+	_pStruct = nullptr;
 	_modified = true;
 }
 

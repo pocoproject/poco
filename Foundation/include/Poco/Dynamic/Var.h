@@ -731,7 +731,7 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == content();
+	return nullptr == content();
 }
 
 

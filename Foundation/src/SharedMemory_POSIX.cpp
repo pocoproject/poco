@@ -28,7 +28,7 @@ namespace Poco {
 SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint, bool server):
 	_size(size),
 	_fd(-1),
-	_address(0),
+	_address(nullptr),
 	_access(mode),
 	_name("/"),
 	_fileMapped(false),
@@ -66,7 +66,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessMode mode, const void* addrHint):
 	_size(0),
 	_fd(-1),
-	_address(0),
+	_address(nullptr),
 	_access(mode),
 	_name(file.path()),
 	_fileMapped(true),

@@ -21,7 +21,7 @@ namespace Poco {
 const char* MacCentralEurRomanEncoding::_names[] =
 {
 	"MacCentralEurRoman",
-	NULL
+	nullptr
 };
 
 

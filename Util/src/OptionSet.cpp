@@ -81,7 +81,7 @@ bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 
 const Option& OptionSet::getOption(const std::string& name, bool matchShort) const
 {
-	const Option* pOption = 0;
+	const Option* pOption = nullptr;
 	for (const auto& opt: _options)
 	{
 		if ((matchShort && opt.matchesShort(name)) || (!matchShort && opt.matchesPartial(name)))

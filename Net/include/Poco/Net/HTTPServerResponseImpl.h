@@ -123,7 +123,7 @@ private:
 //
 inline bool HTTPServerResponseImpl::sent() const
 {
-	return _pStream != 0;
+	return _pStream != nullptr;
 }
 
 

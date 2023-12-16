@@ -281,13 +281,13 @@ public:
 		/// member of the pair.
 
 protected:
-	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name,
@@ -297,7 +297,7 @@ protected:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		MACAddress* pMACAddress = 0);
+		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name,
@@ -305,7 +305,7 @@ protected:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		MACAddress* pMACAddress = 0);
+		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;

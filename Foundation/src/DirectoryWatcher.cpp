@@ -306,7 +306,7 @@ public:
 			tv.tv_sec  = 0;
 			tv.tv_usec = 200000;
 
-			if (select(_fd + 1, &fds, NULL, NULL, &tv) == 1)
+			if (select(_fd + 1, &fds, nullptr, nullptr, &tv) == 1)
 			{
 				int n = read(_fd, buffer.begin(), buffer.size());
 				int i = 0;

@@ -86,7 +86,7 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:
@@ -157,7 +157,7 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:

@@ -35,7 +35,7 @@ namespace
 		{
 			if (!msg.empty())
 				msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -90,7 +90,7 @@ namespace
 			_pRSA(pRSA),
 			_paddingMode(paddingMode),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 	{
 		_pBuf = new unsigned char[blockSize()];
 	}
@@ -227,7 +227,7 @@ namespace
 			_pRSA(pRSA),
 			_paddingMode(paddingMode),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 	{
 		_pBuf = new unsigned char[blockSize()];
 	}

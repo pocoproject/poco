@@ -20,10 +20,10 @@ namespace Poco {
 namespace JSON {
 
 
-TemplateCache* TemplateCache::_pInstance = 0;
+TemplateCache* TemplateCache::_pInstance = nullptr;
 
 
-TemplateCache::TemplateCache(): _pLogger(0)
+TemplateCache::TemplateCache(): _pLogger(nullptr)
 {
 	setup();
 }
@@ -31,13 +31,13 @@ TemplateCache::TemplateCache(): _pLogger(0)
 
 TemplateCache::~TemplateCache()
 {
-	_pInstance = 0;
+	_pInstance = nullptr;
 }
 
 
 void TemplateCache::setup()
 {
-	poco_assert (_pInstance == 0);
+	poco_assert (_pInstance == nullptr);
 	_pInstance = this;
 }
 

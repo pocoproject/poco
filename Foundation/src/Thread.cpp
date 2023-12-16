@@ -86,7 +86,7 @@ private:
 
 Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
-	_pTLS(0),
+	_pTLS(nullptr),
 	_event(true)
 {
 	setNameImpl(makeName());
@@ -98,7 +98,7 @@ Thread::Thread(uint32_t sigMask):
 
 Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
-	_pTLS(0),
+	_pTLS(nullptr),
 	_event(true)
 {
 	setNameImpl(name);
@@ -190,7 +190,7 @@ void Thread::clearTLS()
 	if (_pTLS)
 	{
 		delete _pTLS;
-		_pTLS = 0;
+		_pTLS = nullptr;
 	}
 }
 
