@@ -73,7 +73,6 @@ protected:
 		}
 		File f(path);
 		f.remove();
-		return;
 	}
 };
 

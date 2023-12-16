@@ -300,7 +300,6 @@ void ZLIB_INTERNAL inflate_fast(z_streamp strm, unsigned start) {
                                  257 + (end - out) : 257 - (out - end));
     state->hold = hold;
     state->bits = bits;
-    return;
 }
 
 /*

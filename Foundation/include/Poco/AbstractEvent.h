@@ -540,7 +540,6 @@ protected:
 
 		NotifyAsyncParams params = par;
 		params.ptrStrat->notify(params.pSender);
-		return;
 	}
 
 	TStrategy _strategy; /// The strategy used to notify observers.
