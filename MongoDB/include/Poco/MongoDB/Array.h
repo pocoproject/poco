@@ -36,7 +36,7 @@ public:
 	Array();
 		/// Creates an empty Array.
 
-	virtual ~Array();
+	~Array() override;
 		/// Destroys the Array.
 
 	// Document template functions available for backward compatibility
@@ -93,7 +93,7 @@ public:
 		return Document::isType<T>(Poco::NumberFormatter::format(pos));
 	}
 
-	std::string toString(int indent = 0) const;
+	std::string toString(int indent = 0) const override;
 		/// Returns a string representation of the Array.
 
 private:

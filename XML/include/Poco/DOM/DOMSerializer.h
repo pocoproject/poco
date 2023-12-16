@@ -53,7 +53,7 @@ public:
 	DOMSerializer();
 		/// Creates the DOMSerializer.
 
-	~DOMSerializer();
+	~DOMSerializer() override;
 		/// Destroys the DOMSerializer.
 
 	void serialize(const Node* pNode);
@@ -63,31 +63,31 @@ public:
 		/// handlers.
 
 	// XMLReader
-	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
-	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
-	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
-	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
+	void setEntityResolver(EntityResolver* pResolver) override;
+	EntityResolver* getEntityResolver() const override;
+	void setDTDHandler(DTDHandler* pDTDHandler) override;
+	DTDHandler* getDTDHandler() const override;
+	void setContentHandler(ContentHandler* pContentHandler) override;
+	ContentHandler* getContentHandler() const override;
+	void setErrorHandler(ErrorHandler* pErrorHandler) override;
+	ErrorHandler* getErrorHandler() const override;
 
-	void setFeature(const XMLString& featureId, bool state);
-	bool getFeature(const XMLString& featureId) const;
-	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
+	void setFeature(const XMLString& featureId, bool state) override;
+	bool getFeature(const XMLString& featureId) const override;
+	void setProperty(const XMLString& propertyId, const XMLString& value) override;
+	void setProperty(const XMLString& propertyId, void* value) override;
+	void* getProperty(const XMLString& propertyId) const override;
 
 protected:
-	void parse(InputSource* pSource);
+	void parse(InputSource* pSource) override;
 		/// The DOMSerializer cannot parse an InputSource,
 		/// so this method simply throws an XMLException when invoked.
 
-	void parse(const XMLString& systemId);
+	void parse(const XMLString& systemId) override;
 		/// The DOMSerializer cannot parse from a system identifier,
 		/// so this method simply throws an XMLException when invoked.
 
-	void parseMemoryNP(const char* xml, std::size_t size);
+	void parseMemoryNP(const char* xml, std::size_t size) override;
 		/// The DOMSerializer cannot parse from a system identifier,
 		/// so this method simply throws an XMLException when invoked.
 

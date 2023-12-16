@@ -33,14 +33,14 @@ class Crypto_API DigestEngine: public Poco::DigestEngine
 	/// digest algorithms supported by OpenSSL.
 {
 public:
-	DigestEngine(const std::string& name);
+	DigestEngine(std::string  name);
 		/// Creates a DigestEngine using the digest with the given name
 		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).
 		/// See the OpenSSL documentation for a list of supported digest algorithms.
 		///
 		/// Throws a Poco::NotFoundException if no algorithm with the given name exists.
 
-	~DigestEngine();
+	~DigestEngine() override;
 		/// Destroys the DigestEngine.
 
 	const std::string& algorithm() const;
@@ -50,12 +50,12 @@ public:
 		/// Returns the NID (OpenSSL object identifier) of the digest algorithm.
 
 	// DigestEngine
-	std::size_t digestLength() const;
-	void reset();
-	const Poco::DigestEngine::Digest& digest();
+	std::size_t digestLength() const override;
+	void reset() override;
+	const Poco::DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void* data, std::size_t length) override;
 
 private:
 	std::string _name;

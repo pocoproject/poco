@@ -20,13 +20,11 @@ namespace Util {
 
 
 Validator::Validator()
-{
-}
+= default;
 
 
 Validator::~Validator()
-{
-}
+= default;
 
 
 } } // namespace Poco::Util

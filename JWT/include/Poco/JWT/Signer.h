@@ -55,7 +55,7 @@ public:
 		/// Call setAlgorithms() or addAlgorithm() to allow additional
 		/// algorithms for verification.
 
-	explicit Signer(const std::string& hmacKey);
+	explicit Signer(std::string  hmacKey);
 		/// Creates the Signer using the given secret/key for HMAC-based signing and verification.
 		///
 		/// Sets HS256 as the only allowed algorithm.
@@ -97,7 +97,7 @@ public:
 	Signer& setHMACKey(const std::string& key);
 		/// Sets the key used for HMAC-based signing and verification.
 
-	const std::string getHMACKey() const;
+	std::string getHMACKey() const;
 		/// Returns the key used for HMAC-based signing and verification.
 
 	Signer& setRSAKey(const Poco::SharedPtr<Poco::Crypto::RSAKey>& pKey);
@@ -172,7 +172,7 @@ inline const std::set<std::string>& Signer::getAlgorithms() const
 }
 
 
-inline const std::string Signer::getHMACKey() const
+inline std::string Signer::getHMACKey() const
 {
 	return _hmacKey;
 }

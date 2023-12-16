@@ -20,13 +20,11 @@ namespace Zip {
 
 
 ZipOperation::ZipOperation()
-{
-}
+= default;
 
 
 ZipOperation::~ZipOperation()
-{
-}
+= default;
 
 
 } } // namespace Poco::Zip

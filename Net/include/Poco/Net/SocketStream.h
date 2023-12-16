@@ -42,15 +42,15 @@ public:
 		/// The socket's SocketImpl must be a StreamSocketImpl,
 		/// otherwise an InvalidArgumentException is thrown.
 
-	~SocketStreamBuf();
+	~SocketStreamBuf() override;
 		/// Destroys the SocketStreamBuf.
 
 	StreamSocketImpl* socketImpl() const;
 		/// Returns the internal SocketImpl.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -76,7 +76,7 @@ public:
 		/// The socket's SocketImpl must be a StreamSocketImpl,
 		/// otherwise an InvalidArgumentException is thrown.
 
-	~SocketIOS();
+	~SocketIOS() override;
 		/// Destroys the SocketIOS.
 		///
 		/// Flushes the buffer, but does not close the socket.
@@ -105,7 +105,7 @@ public:
 		/// The socket's SocketImpl must be a StreamSocketImpl,
 		/// otherwise an InvalidArgumentException is thrown.
 
-	~SocketOutputStream();
+	~SocketOutputStream() override;
 		/// Destroys the SocketOutputStream.
 		///
 		/// Flushes the buffer, but does not close the socket.
@@ -131,7 +131,7 @@ public:
 		/// The socket's SocketImpl must be a StreamSocketImpl,
 		/// otherwise an InvalidArgumentException is thrown.
 
-	~SocketInputStream();
+	~SocketInputStream() override;
 		/// Destroys the SocketInputStream.
 };
 
@@ -155,7 +155,7 @@ public:
 		/// The socket's SocketImpl must be a StreamSocketImpl,
 		/// otherwise an InvalidArgumentException is thrown.
 
-	~SocketStream();
+	~SocketStream() override;
 		/// Destroys the SocketStream.
 		///
 		/// Flushes the buffer, but does not close the socket.

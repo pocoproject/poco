@@ -56,14 +56,14 @@ public:
 	HTTPCookie();
 		/// Creates an empty HTTPCookie.
 
-	explicit HTTPCookie(const std::string& name);
+	explicit HTTPCookie(std::string  name);
 		/// Creates a cookie with the given name.
 		/// The cookie never expires.
 
 	explicit HTTPCookie(const NameValueCollection& nvc);
 		/// Creates a cookie from the given NameValueCollection.
 
-	HTTPCookie(const std::string& name, const std::string& value);
+	HTTPCookie(std::string  name, std::string  value);
 		/// Creates a cookie with the given name and value.
 		/// The cookie never expires.
 		///

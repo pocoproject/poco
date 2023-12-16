@@ -18,10 +18,11 @@
 #define Foundation_PBKDF2Engine_INCLUDED
 
 
-#include "Poco/Foundation.h"
-#include "Poco/DigestEngine.h"
 #include "Poco/ByteOrder.h"
+#include "Poco/DigestEngine.h"
+#include "Poco/Foundation.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -66,30 +67,29 @@ public:
 		PRF_DIGEST_SIZE = PRF::DIGEST_SIZE
 	};
 
-	PBKDF2Engine(const std::string& salt, unsigned c = 4096, Poco::UInt32 dkLen = PRF_DIGEST_SIZE):
-		_s(salt),
+	PBKDF2Engine(std::string  salt, unsigned c = 4096, Poco::UInt32 dkLen = PRF_DIGEST_SIZE):
+		_s(std::move(salt)),
 		_c(c),
 		_dkLen(dkLen)
 	{
 		_result.reserve(_dkLen + PRF_DIGEST_SIZE);
 	}
 
-	~PBKDF2Engine()
-	{
-	}
+	~PBKDF2Engine() override
+	= default;
 
-	std::size_t digestLength() const
+	std::size_t digestLength() const override
 	{
 		return _dkLen;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_p.clear();
 		_result.clear();
 	}
 
-	const DigestEngine::Digest& digest()
+	const DigestEngine::Digest& digest() override
 	{
 		Poco::UInt32 i = 1;
 		while (_result.size() < _dkLen)
@@ -101,7 +101,7 @@ public:
 	}
 
 protected:
-	void updateImpl(const void* data, std::size_t length)
+	void updateImpl(const void* data, std::size_t length) override
 	{
 		_p.append(reinterpret_cast<const char*>(data), length);
 	}

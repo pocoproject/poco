@@ -18,6 +18,8 @@
 #define Redis_Type_INCLUDED
 
 
+#include <utility>
+
 #include "Poco/LineEndingConverter.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
@@ -197,7 +199,7 @@ struct RedisTypeTraits<BulkString>
 		}
 		else
 		{
-			std::string s = value.value();
+			const std::string& s = value.value();
 			return marker
 				+ NumberFormatter::format(s.length())
 				+ LineEnding::NEWLINE_CRLF
@@ -234,10 +236,9 @@ class Type: public RedisType
 public:
 	Type()
 		/// Creates the Type.
-	{
-	}
+	= default;
 
-	Type(const T& t) : _value(t)
+	Type(T  t) : _value(std::move(t))
 		/// Creates the Type from another one.
 	{
 	}
@@ -247,24 +248,23 @@ public:
 	{
 	}
 
-	virtual ~Type()
+	~Type() override
 		/// Destroys the Type.
-	{
-	}
+	= default;
 
-	int type() const
+	int type() const override
 		/// Returns the type of the value
 	{
 		return RedisTypeTraits<T>::TypeId;
 	}
 
-	void read(RedisInputStream& socket)
+	void read(RedisInputStream& socket) override
 		/// Reads the value from the stream (RESP).
 	{
 		RedisTypeTraits<T>::read(socket, _value);
 	}
 
-	std::string toString() const
+	std::string toString() const override
 		/// Converts the value to a string based on the RESP protocol.
 	{
 		return RedisTypeTraits<T>::toString(_value);

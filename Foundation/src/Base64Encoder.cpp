@@ -154,8 +154,7 @@ Base64EncoderIOS::Base64EncoderIOS(std::ostream& ostr, int options): _buf(ostr, 
 
 
 Base64EncoderIOS::~Base64EncoderIOS()
-{
-}
+= default;
 
 
 int Base64EncoderIOS::close()
@@ -176,8 +175,7 @@ Base64Encoder::Base64Encoder(std::ostream& ostr, int options): Base64EncoderIOS(
 
 
 Base64Encoder::~Base64Encoder()
-{
-}
+= default;
 
 
 } // namespace Poco

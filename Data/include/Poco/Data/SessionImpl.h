@@ -58,11 +58,11 @@ public:
 	static const int CURSOR_USE_IF_NEEDED = 1;
 	static const int CURSOR_USE_NEVER = 2;
 
-	SessionImpl(const std::string& connectionString,
+	SessionImpl(std::string  connectionString,
 		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
-	virtual ~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
 	virtual Poco::SharedPtr<StatementImpl> createStatementImpl() = 0;

@@ -52,7 +52,7 @@ public:
 	HTTPSessionFactory(const std::string& proxyHost, Poco::UInt16 proxyPort);
 		/// Creates the HTTPSessionFactory and sets the proxy host and port.
 
-	HTTPSessionFactory(const HTTPClientSession::ProxyConfig& proxyConfig);
+	HTTPSessionFactory(HTTPClientSession::ProxyConfig  proxyConfig);
 		/// Creates the HTTPSessionFactory and sets the proxy configuration.
 
 	~HTTPSessionFactory();

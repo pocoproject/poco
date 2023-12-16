@@ -34,8 +34,7 @@ RandomBuf::RandomBuf(): BufferedStreamBuf(256, std::ios::in)
 
 
 RandomBuf::~RandomBuf()
-{
-}
+= default;
 
 
 int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -68,7 +67,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 
 		n = 0;
 		SHA1Engine engine;
-		UInt32 t = (UInt32) std::time(NULL);
+		UInt32 t = (UInt32) std::time(nullptr);
 		engine.update(&t, sizeof(t));
 		void* p = this;
 		engine.update(&p, sizeof(p));
@@ -104,8 +103,7 @@ RandomIOS::RandomIOS()
 
 
 RandomIOS::~RandomIOS()
-{
-}
+= default;
 
 
 RandomBuf* RandomIOS::rdbuf()
@@ -120,8 +118,7 @@ RandomInputStream::RandomInputStream(): std::istream(&_buf)
 
 
 RandomInputStream::~RandomInputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

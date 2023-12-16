@@ -41,10 +41,10 @@ public:
 	HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
 		/// Creates the HTTPServerConnection.
 
-	virtual ~HTTPServerConnection();
+	~HTTPServerConnection() override;
 		/// Destroys the HTTPServerConnection.
 
-	void run();
+	void run() override;
 		/// Handles all HTTP requests coming in.
 
 protected:

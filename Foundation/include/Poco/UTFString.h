@@ -78,7 +78,7 @@ struct UTF16CharTraits
 				return s;
 			++s;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	static char_type* move(char_type* s1, const char_type* s2, std::size_t n)
@@ -195,7 +195,7 @@ struct UTF32CharTraits
 				return s;
 			++s;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	static char_type* move(char_type* s1, const char_type* s2, std::size_t n)

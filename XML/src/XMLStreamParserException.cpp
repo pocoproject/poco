@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/XML/XMLStreamParserException.h"
 #include "Poco/XML/XMLStreamParser.h"
 
@@ -20,26 +22,25 @@ namespace Poco {
 namespace XML {
 
 
-XMLStreamParserException::~XMLStreamParserException() throw ()
-{
-}
+XMLStreamParserException::~XMLStreamParserException() noexcept
+= default;
 
 
-XMLStreamParserException::XMLStreamParserException(const std::string& n, Poco::UInt64 l, Poco::UInt64 c, const std::string& d):
-	_name(n),
+XMLStreamParserException::XMLStreamParserException(std::string  n, Poco::UInt64 l, Poco::UInt64 c, std::string  d):
+	_name(std::move(n)),
 	_line(l),
 	_column(c),
-	_description(d)
+	_description(std::move(d))
 {
 	init();
 }
 
 
-XMLStreamParserException::XMLStreamParserException(const XMLStreamParser& p, const std::string& d):
+XMLStreamParserException::XMLStreamParserException(const XMLStreamParser& p, std::string  d):
 	_name(p.inputName()),
 	_line(p.line()),
 	_column(p.column()),
-	_description(d)
+	_description(std::move(d))
 {
 	init();
 }
@@ -79,7 +80,7 @@ const std::string& XMLStreamParserException::description() const
 }
 
 
-char const* XMLStreamParserException::what() const throw ()
+char const* XMLStreamParserException::what() const noexcept
 {
 	return _what.c_str();
 }

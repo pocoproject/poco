@@ -86,18 +86,18 @@ public:
 		/// The format pattern must be specified with
 		/// a call to setProperty.
 
-	PatternFormatter(const std::string& format);
+	PatternFormatter(std::string  format);
 		/// Creates a PatternFormatter that uses the
 		/// given format pattern.
 
-	~PatternFormatter();
+	~PatternFormatter() override;
 		/// Destroys the PatternFormatter.
 
-	void format(const Message& msg, std::string& text);
+	void format(const Message& msg, std::string& text) override;
 		/// Formats the message according to the specified
 		/// format pattern and places the result in text.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name to the given value.
 		///
 		/// The following properties are supported:
@@ -112,7 +112,7 @@ public:
 		/// If any other property name is given, a PropertyNotSupported
 		/// exception is thrown.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name or
 		/// throws a PropertyNotSupported exception if the given
 		/// name is not recognized.

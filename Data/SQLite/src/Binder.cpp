@@ -38,8 +38,7 @@ Binder::Binder(sqlite3_stmt* pStmt):
 
 
 Binder::~Binder()
-{
-}
+= default;
 
 
 void Binder::bind(std::size_t pos, const Poco::Int32 &val, Direction dir)

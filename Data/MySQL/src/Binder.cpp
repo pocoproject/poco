@@ -21,16 +21,15 @@ namespace MySQL {
 
 
 Binder::Binder()
-{
-}
+= default;
 
 
 Binder::~Binder()
 {
-	for (std::vector<MYSQL_TIME*>::iterator it = _dates.begin(); it != _dates.end(); ++it)
+	for (auto & _date : _dates)
 	{
-		delete *it;
-		*it = 0;
+		delete _date;
+		_date = 0;
 	}
 }
 
@@ -220,7 +219,7 @@ void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 void Binder::bind(std::size_t pos, const NullData&, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_NULL, 0, 0);
+	realBind(pos, MYSQL_TYPE_NULL, nullptr, 0);
 }
 
 
@@ -232,9 +231,9 @@ std::size_t Binder::size() const
 
 MYSQL_BIND* Binder::getBindArray() const
 {
-	if (_bindArray.size() == 0)
+	if (_bindArray.empty())
 	{
-		return 0;
+		return nullptr;
 	}
 
 	return const_cast<MYSQL_BIND*>(&_bindArray[0]);
@@ -286,7 +285,7 @@ void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer
 		std::memset(&_bindArray[s], 0, sizeof(MYSQL_BIND) * (_bindArray.size() - s));
 	}
 
-	MYSQL_BIND b = {0};
+	MYSQL_BIND b = {nullptr};
 
 	b.buffer_type   = type;
 	b.buffer  = const_cast<void*>(buffer);

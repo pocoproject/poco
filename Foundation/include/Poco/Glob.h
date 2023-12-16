@@ -59,7 +59,7 @@ public:
 		GLOB_DIRS_ONLY       = 0x80  /// only glob for directories (for internal use only)
 	};
 
-	Glob(const std::string& pattern, int options = 0);
+	Glob(std::string  pattern, int options = 0);
 		/// Creates the Glob, using the given pattern. The pattern
 		/// must not be an empty string.
 		///
@@ -132,7 +132,7 @@ public:
 protected:
 	bool match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends);
 	bool matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIterator its, const TextIterator& ends);
-	bool matchSet(TextIterator& itp, const TextIterator& endp, int c);
+	bool matchSet(TextIterator& itp, const TextIterator& endp, int c) const;
 	static void collect(const Path& pathPattern, const Path& base, const Path& current, const std::string& pattern, std::set<std::string>& files, int options);
 	static bool isDirectory(const Path& path, bool followSymlink);
 

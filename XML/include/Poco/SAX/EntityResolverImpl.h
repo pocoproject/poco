@@ -48,17 +48,17 @@ public:
 		/// Creates an EntityResolverImpl that uses the given
 		/// URIStreamOpener.
 
-	~EntityResolverImpl();
+	~EntityResolverImpl() override;
 		/// Destroys the EntityResolverImpl.
 
-	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);
+	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId) override;
 		/// Tries to use the URIStreamOpener to create and open an istream
 		/// for the given systemId, which is interpreted as an URI.
 		///
 		/// If the systemId is not a valid URI, it is interpreted as
 		/// a local filesystem path and a Poco::FileInputStream is opened for it.
 
-	void releaseInputSource(InputSource* pSource);
+	void releaseInputSource(InputSource* pSource) override;
 		/// Deletes the InputSource's stream.
 
 protected:

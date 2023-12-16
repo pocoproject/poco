@@ -26,13 +26,11 @@ namespace Util {
 
 
 LayeredConfiguration::LayeredConfiguration()
-{
-}
+= default;
 
 
 LayeredConfiguration::~LayeredConfiguration()
-{
-}
+= default;
 
 
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
@@ -110,7 +108,7 @@ AbstractConfiguration::Ptr LayeredConfiguration::find(const std::string& label) 
 	{
 		if (conf.label == label) return conf.pConfig;
 	}
-	return 0;
+	return nullptr;
 }
 
 

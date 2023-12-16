@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Util/ConfigurationView.h"
 
 
@@ -19,8 +21,8 @@ namespace Poco {
 namespace Util {
 
 
-ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig):
-	_prefix(prefix),
+ConfigurationView::ConfigurationView(std::string  prefix, AbstractConfiguration::Ptr pConfig):
+	_prefix(std::move(prefix)),
 	_pConfig(pConfig)
 {
 	poco_check_ptr (pConfig);
@@ -28,8 +30,7 @@ ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfigur
 
 
 ConfigurationView::~ConfigurationView()
-{
-}
+= default;
 
 
 bool ConfigurationView::getRaw(const std::string& key, std::string& value) const

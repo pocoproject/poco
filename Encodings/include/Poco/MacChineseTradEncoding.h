@@ -32,7 +32,7 @@ class Encodings_API MacChineseTradEncoding: public DoubleByteEncoding
 {
 public:
 	MacChineseTradEncoding();
-	~MacChineseTradEncoding();
+	~MacChineseTradEncoding() override;
 
 private:
 	static const char* _names[];

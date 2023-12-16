@@ -51,7 +51,7 @@ public:
 		/// all pass through this filter.
 
 protected:
-	virtual ~XMLFilter();
+	~XMLFilter() override;
 };
 
 

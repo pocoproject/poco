@@ -14,6 +14,7 @@
 
 #include "Poco/HashStatistic.h"
 #include <sstream>
+#include <utility>
 
 namespace Poco {
 
@@ -28,14 +29,13 @@ HashStatistic::HashStatistic(
 	_numberOfEntries(numEntries),
 	_numZeroEntries(numZeroEntries),
 	_maxEntriesPerHash(maxEntry),
-	_detailedEntriesPerHash(details)
+	_detailedEntriesPerHash(std::move(details))
 {
 }
 
 
 HashStatistic::~HashStatistic()
-{
-}
+= default;
 
 
 std::string HashStatistic::toString() const

@@ -13,20 +13,21 @@
 
 
 #include "Poco/Net/RemoteSyslogListener.h"
-#include "Poco/Net/RemoteSyslogChannel.h"
-#include "Poco/Net/DatagramSocket.h"
-#include "Poco/Net/SocketAddress.h"
-#include "Poco/Runnable.h"
-#include "Poco/Notification.h"
-#include "Poco/AutoPtr.h"
-#include "Poco/NumberParser.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/DateTimeParser.h"
-#include "Poco/Message.h"
-#include "Poco/LoggingFactory.h"
-#include "Poco/Buffer.h"
 #include "Poco/Ascii.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Buffer.h"
+#include "Poco/DateTimeParser.h"
+#include "Poco/LoggingFactory.h"
+#include "Poco/Message.h"
+#include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/RemoteSyslogChannel.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Notification.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Runnable.h"
 #include <cstddef>
+#include <utility>
 
 
 namespace Poco {
@@ -41,21 +42,20 @@ namespace Net {
 class MessageNotification: public Poco::Notification
 {
 public:
-	MessageNotification(const char* buffer, std::size_t length, const Poco::Net::SocketAddress& sourceAddress):
+	MessageNotification(const char* buffer, std::size_t length, Poco::Net::SocketAddress  sourceAddress):
 		_message(buffer, length),
-		_sourceAddress(sourceAddress)
+		_sourceAddress(std::move(sourceAddress))
 	{
 	}
 
-	MessageNotification(const std::string& message, const Poco::Net::SocketAddress& sourceAddress):
-		_message(message),
-		_sourceAddress(sourceAddress)
+	MessageNotification(std::string  message, Poco::Net::SocketAddress  sourceAddress):
+		_message(std::move(message)),
+		_sourceAddress(std::move(sourceAddress))
 	{
 	}
 
-	~MessageNotification()
-	{
-	}
+	~MessageNotification() override
+	= default;
 
 	const std::string& message() const
 	{
@@ -88,9 +88,9 @@ public:
 	};
 
 	RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, bool reusePort, int buffer);
-	~RemoteUDPListener();
+	~RemoteUDPListener() override;
 
-	void run();
+	void run() override;
 	void safeStop();
 
 private:
@@ -113,8 +113,7 @@ RemoteUDPListener::RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt1
 
 
 RemoteUDPListener::~RemoteUDPListener()
-{
-}
+= default;
 
 
 void RemoteUDPListener::run()
@@ -165,10 +164,10 @@ public:
 	};
 
 	SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener* pListener);
-	~SyslogParser();
+	~SyslogParser() override;
 
 	void parse(const std::string& line, Poco::Message& message);
-	void run();
+	void run() override;
 	void safeStop();
 
 	static Poco::Message::Priority convert(RemoteSyslogChannel::Severity severity);
@@ -208,8 +207,7 @@ SyslogParser::SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener*
 
 
 SyslogParser::~SyslogParser()
-{
-}
+= default;
 
 
 void SyslogParser::run()
@@ -510,8 +508,8 @@ const std::string RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA("structured-dat
 
 
 RemoteSyslogListener::RemoteSyslogListener():
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(RemoteSyslogChannel::SYSLOG_PORT),
 	_reusePort(false),
 	_threads(1),
@@ -521,8 +519,8 @@ RemoteSyslogListener::RemoteSyslogListener():
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(port),
 	_reusePort(false),
 	_threads(1),
@@ -532,8 +530,8 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(port),
 	_reusePort(false),
 	_threads(threads),
@@ -543,8 +541,8 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, bool reusePort, int threads):
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(port),
 	_reusePort(reusePort),
 	_threads(threads),
@@ -554,8 +552,7 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, bool reusePort, in
 
 
 RemoteSyslogListener::~RemoteSyslogListener()
-{
-}
+= default;
 
 
 void RemoteSyslogListener::processMessage(const std::string& messageText)
@@ -653,8 +650,8 @@ void RemoteSyslogListener::close()
 	_threadPool.joinAll();
 	delete _pListener;
 	delete _pParser;
-	_pListener = 0;
-	_pParser = 0;
+	_pListener = nullptr;
+	_pParser = nullptr;
 	SplitterChannel::close();
 }
 

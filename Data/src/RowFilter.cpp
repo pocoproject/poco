@@ -14,9 +14,10 @@
 
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <functional>
+#include <utility>
 
 
 namespace Poco {
@@ -32,8 +33,8 @@ RowFilter::RowFilter(RecordSet* pRecordSet): _pRecordSet(pRecordSet), _not(false
 }
 
 
-RowFilter::RowFilter(Ptr pParent, LogicOperator op): _pRecordSet(0),
-	_pParent(pParent),
+RowFilter::RowFilter(Ptr pParent, LogicOperator op): _pRecordSet(nullptr),
+	_pParent(std::move(pParent)),
 	_not(false)
 {
 	poco_check_ptr(_pParent.get());
@@ -61,7 +62,7 @@ RowFilter::~RowFilter()
 {
 	try
 	{
-		if (_pRecordSet) _pRecordSet->filter(0);
+		if (_pRecordSet) _pRecordSet->filter(nullptr);
 		if (_pParent && _pParent->has(this))
 			_pParent->removeFilter(this);
 		release();
@@ -89,7 +90,7 @@ bool RowFilter::isAllowed(std::size_t row) const
 			if (_comparisonMap.find(name) == _comparisonMap.end()) continue;
 
 			Poco::Dynamic::Var ret;
-			CompT compOp = 0;
+			CompT compOp = nullptr;
 			Poco::Dynamic::Var val = rs.value(col, row, false);
 
 			switch (it->second.get<1>())
@@ -180,8 +181,8 @@ void RowFilter::removeFilter(Ptr pFilter)
 
 	_pRecordSet->moveFirst();
 	_filterMap.erase(pFilter);
-	pFilter->_pRecordSet = 0;
-	pFilter->_pParent = 0;
+	pFilter->_pRecordSet = nullptr;
+	pFilter->_pParent = nullptr;
 }
 
 

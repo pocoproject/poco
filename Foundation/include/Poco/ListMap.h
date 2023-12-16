@@ -53,8 +53,7 @@ public:
 
 	ListMap()
 		/// Creates an empty ListMap.
-	{
-	}
+	= default;
 
 	explicit ListMap(std::size_t initialReserve):
 		_container(initialReserve)

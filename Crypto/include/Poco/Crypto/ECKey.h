@@ -49,7 +49,7 @@ public:
 	ECKey(const X509Certificate& cert);
 		/// Extracts the EC public key from the given certificate.
 
-	ECKey(const PKCS12Container& cert);
+	ECKey(const PKCS12Container& cont);
 		/// Extracts the EC private key from the given certificate.
 
 	ECKey(const std::string& eccGroup);
@@ -65,7 +65,7 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
-	ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = nullptr, const std::string& privateKeyPassphrase = "");
 		/// Creates the ECKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.
 		///
@@ -74,13 +74,13 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
-	ECKey(const ECKey& key);
+	ECKey(const ECKey& other);
 		/// Creates the ECKey by copying another one.
 
-	ECKey(ECKey&& key) noexcept;
+	ECKey(ECKey&& other) noexcept;
 		/// Creates the ECKey by moving another one.
 
-	~ECKey();
+	~ECKey() override;
 		/// Destroys the ECKey.
 
 	ECKey& operator = (const ECKey& other);

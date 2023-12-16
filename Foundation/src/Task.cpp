@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Task.h"
 #include "Poco/TaskManager.h"
 #include "Poco/Thread.h"
@@ -21,9 +23,9 @@
 namespace Poco {
 
 
-Task::Task(const std::string& name):
-	_name(name),
-	_pOwner(0),
+Task::Task(std::string  name):
+	_name(std::move(name)),
+	_pOwner(nullptr),
 	_progress(0),
 	_state(TASK_IDLE),
 	_cancelEvent(Event::EVENT_MANUALRESET)
@@ -32,8 +34,7 @@ Task::Task(const std::string& name):
 
 
 Task::~Task()
-{
-}
+= default;
 
 
 void Task::cancel()
@@ -91,7 +92,7 @@ bool Task::sleep(long milliseconds)
 }
 
 
-bool Task::yield()
+bool Task::yield() const
 {
 	Thread::yield();
 	return isCancelled();

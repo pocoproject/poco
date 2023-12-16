@@ -68,7 +68,7 @@ public:
 	Parser(const Handler::Ptr& pHandler = new ParseHandler);
 		/// Creates JSON Parser, using the given Handler and buffer size.
 
-	virtual ~Parser();
+	~Parser() override;
 		/// Destroys JSON Parser.
 
 	void reset();

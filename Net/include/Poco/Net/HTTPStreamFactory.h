@@ -35,22 +35,22 @@ public:
 	HTTPStreamFactory();
 		/// Creates the HTTPStreamFactory.
 
-	HTTPStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
+	HTTPStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
 		/// Creates the HTTPStreamFactory.
 		///
 		/// HTTP connections will use the given proxy.
 
-	HTTPStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword);
+	HTTPStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort, std::string  proxyUsername, std::string  proxyPassword);
 		/// Creates the HTTPStreamFactory.
 		///
 		/// HTTP connections will use the given proxy and
 		/// will be authorized against the proxy using Basic authentication
 		/// with the given proxyUsername and proxyPassword.
 
-	virtual ~HTTPStreamFactory();
+	~HTTPStreamFactory() override;
 		/// Destroys the HTTPStreamFactory.
 
-	virtual std::istream* open(const Poco::URI& uri);
+	std::istream* open(const Poco::URI& uri) override;
 		/// Creates and opens a HTTP stream for the given URI.
 		/// The URI must be a http://... URI.
 		///

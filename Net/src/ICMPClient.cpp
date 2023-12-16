@@ -43,8 +43,7 @@ ICMPClient::ICMPClient(SocketAddress::Family family, int dataSize, int ttl, int 
 
 
 ICMPClient::~ICMPClient()
-{
-}
+= default;
 
 
 int ICMPClient::ping(const std::string& address, int repeat) const

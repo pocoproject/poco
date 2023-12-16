@@ -38,7 +38,7 @@ ECKeyImpl::ECKeyImpl(const EVPPKey& key):
 
 ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
 	KeyPairImpl("ec", KT_EC_IMPL),
-	_pEC(0)
+	_pEC(nullptr)
 {
 	const X509* pCert = cert.certificate();
 	if (pCert)
@@ -78,7 +78,7 @@ ECKeyImpl::ECKeyImpl(int curve):
 
 ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 	const std::string& privateKeyFile,
-	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(0)
+	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(nullptr)
 {
 	if (EVPPKey::loadKey(&_pEC, PEM_read_PrivateKey, EVP_PKEY_get1_EC_KEY, privateKeyFile, privateKeyPassphrase))
 	{
@@ -101,7 +101,7 @@ ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 
 ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 	std::istream* pPrivateKeyStream,
-	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(0)
+	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(nullptr)
 {
 	if (EVPPKey::loadKey(&_pEC, PEM_read_bio_PrivateKey, EVP_PKEY_get1_EC_KEY, pPrivateKeyStream, privateKeyPassphrase))
 	{
@@ -141,7 +141,7 @@ void ECKeyImpl::freeEC()
 	if (_pEC)
 	{
 		EC_KEY_free(_pEC);
-		_pEC = 0;
+		_pEC = nullptr;
 	}
 }
 
@@ -181,7 +181,7 @@ int ECKeyImpl::groupId() const
 std::string ECKeyImpl::getCurveName(int nid)
 {
 	std::string curveName;
-	size_t len = EC_get_builtin_curves(NULL, 0);
+	size_t len = EC_get_builtin_curves(nullptr, 0);
 	EC_builtin_curve* pCurves =
 			(EC_builtin_curve*) OPENSSL_malloc(sizeof(EC_builtin_curve) * len);
 	if (!pCurves) return curveName;
@@ -206,7 +206,7 @@ std::string ECKeyImpl::getCurveName(int nid)
 int ECKeyImpl::getCurveNID(std::string& name)
 {
 	std::string curveName;
-	size_t len = EC_get_builtin_curves(NULL, 0);
+	size_t len = EC_get_builtin_curves(nullptr, 0);
 	EC_builtin_curve* pCurves =
 		(EC_builtin_curve*)OPENSSL_malloc(static_cast<int>(sizeof(EC_builtin_curve) * len));
 	if (!pCurves) return -1;

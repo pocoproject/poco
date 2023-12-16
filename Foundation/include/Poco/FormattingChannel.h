@@ -65,12 +65,12 @@ public:
 		/// Returns the channel to which the formatted
 		/// messages are passed on.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Formats the given Message using the Formatter and
 		/// passes the formatted message on to the destination
 		/// Channel.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets or changes a configuration property.
 		///
 		/// Only the "channel" and "formatter" properties are supported, which allow
@@ -79,14 +79,14 @@ public:
 		///
 		/// Unsupported properties are passed to the attached Channel.
 
-	void open();
+	void open() override;
 		/// Opens the attached channel.
 
-	void close();
+	void close() override;
 		/// Closes the attached channel.
 
 protected:
-	~FormattingChannel();
+	~FormattingChannel() override;
 
 private:
 	Formatter::Ptr _pFormatter;

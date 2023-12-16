@@ -21,7 +21,7 @@ namespace Poco {
 const char* MacRomanEncoding::_names[] =
 {
 	"MacRoman",
-	NULL
+	nullptr
 };
 
 
@@ -90,8 +90,7 @@ MacRomanEncoding::MacRomanEncoding():
 
 
 MacRomanEncoding::~MacRomanEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

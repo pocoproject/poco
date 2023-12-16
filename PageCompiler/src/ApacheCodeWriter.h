@@ -22,15 +22,15 @@ public:
 	ApacheCodeWriter(const Page& page, const std::string& clazz);
 		/// Creates the CodeWriter, using the given Page.
 
-	~ApacheCodeWriter();
+	~ApacheCodeWriter() override;
 		/// Destroys the PageReader.
 
 protected:
-	virtual void writeHeaderIncludes(std::ostream& ostr);
-	virtual void writeFactoryClass(std::ostream& ostr);
-	virtual void writeImplIncludes(std::ostream& ostr);
-	virtual void writeFactory(std::ostream& ostr);
-	virtual void writeManifest(std::ostream& ostr);
+	void writeHeaderIncludes(std::ostream& ostr) override;
+	void writeFactoryClass(std::ostream& ostr) override;
+	void writeImplIncludes(std::ostream& ostr) override;
+	void writeFactory(std::ostream& ostr) override;
+	void writeManifest(std::ostream& ostr) override;
 };
 
 

@@ -31,8 +31,7 @@ namespace Poco {
 
 
 SharedLibrary::SharedLibrary()
-{
-}
+= default;
 
 
 SharedLibrary::SharedLibrary(const std::string& path)
@@ -48,8 +47,7 @@ SharedLibrary::SharedLibrary(const std::string& path, int flags)
 
 
 SharedLibrary::~SharedLibrary()
-{
-}
+= default;
 
 
 void SharedLibrary::load(const std::string& path)
@@ -78,7 +76,7 @@ bool SharedLibrary::isLoaded() const
 
 bool SharedLibrary::hasSymbol(const std::string& name)
 {
-	return findSymbolImpl(name) != 0;
+	return findSymbolImpl(name) != nullptr;
 }
 
 

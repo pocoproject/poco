@@ -31,10 +31,10 @@ class Zip_API Add: public ZipOperation
 	/// Operation Add adds a new file entry to an existing Zip File
 {
 public:
-	Add(const std::string& zipPath, const std::string& localPath, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl);
+	Add(std::string  zipPath, std::string  localPath, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl);
 		/// Creates the Add.
 
-	void execute(Compress& c, std::istream& input);
+	void execute(Compress& c, std::istream& input) override;
 		/// Performs the add operation
 
 private:

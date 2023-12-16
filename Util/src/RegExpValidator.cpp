@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Util/RegExpValidator.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionException.h"
@@ -26,15 +28,14 @@ namespace Poco {
 namespace Util {
 
 
-RegExpValidator::RegExpValidator(const std::string& regexp):
-	_regexp(regexp)
+RegExpValidator::RegExpValidator(std::string  regexp):
+	_regexp(std::move(regexp))
 {
 }
 
 
 RegExpValidator::~RegExpValidator()
-{
-}
+= default;
 
 
 void RegExpValidator::validate(const Option& option, const std::string& value)

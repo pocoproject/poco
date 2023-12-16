@@ -32,7 +32,7 @@ class Encodings_API MacCyrillicEncoding: public DoubleByteEncoding
 {
 public:
 	MacCyrillicEncoding();
-	~MacCyrillicEncoding();
+	~MacCyrillicEncoding() override;
 
 private:
 	static const char* _names[];

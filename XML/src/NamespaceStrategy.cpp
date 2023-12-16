@@ -27,8 +27,7 @@ const XMLString NamespaceStrategy::NOTHING;
 
 
 NamespaceStrategy::~NamespaceStrategy()
-{
-}
+= default;
 
 
 void NamespaceStrategy::splitName(const XMLChar* qname, XMLString& uri, XMLString& localName)
@@ -78,8 +77,7 @@ NoNamespacesStrategy::NoNamespacesStrategy()
 
 
 NoNamespacesStrategy::~NoNamespacesStrategy()
-{
-}
+= default;
 
 
 void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
@@ -115,8 +113,7 @@ NoNamespacePrefixesStrategy::NoNamespacePrefixesStrategy()
 
 
 NoNamespacePrefixesStrategy::~NoNamespacePrefixesStrategy()
-{
-}
+= default;
 
 
 void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
@@ -154,8 +151,7 @@ NamespacePrefixesStrategy::NamespacePrefixesStrategy()
 
 
 NamespacePrefixesStrategy::~NamespacePrefixesStrategy()
-{
-}
+= default;
 
 
 void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)

@@ -270,7 +270,7 @@ public:
 		/// Note that a private key and/or certificate must be specified with
 		/// usePrivateKey()/useCertificate() before the Context can be used.
 
-	~Context();
+	~Context() override;
 		/// Destroys the Context.
 
 	void useCertificate(const Poco::Crypto::X509Certificate& certificate);
@@ -426,7 +426,7 @@ public:
 		/// Returns true if automatic OCSP response
 		/// reception and verification is enabled for client connections
 
-	void setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificageHandler);
+	void setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificateHandler);
 		/// Sets a Context-specific InvalidCertificateHandler.
 		///
 		/// If specified, this InvalidCertificateHandler will be used instead of the
@@ -458,7 +458,7 @@ private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
 
-	void initDH(bool use2048Bits, const std::string& dhFile);
+	void initDH(bool use2048Bits, const std::string& dhParamsFile);
 		/// Initializes the Context with Diffie-Hellman parameters.
 
 	void initECDH(const std::string& curve);

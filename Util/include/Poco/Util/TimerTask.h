@@ -67,7 +67,7 @@ public:
 		/// Updates the last execution of the timer task.
 
 protected:
-	~TimerTask();
+	~TimerTask() override;
 		/// Destroys the TimerTask.
 
 private:
@@ -96,7 +96,7 @@ public:
 	{
 	}
 
-	void run()
+	void run() override
 	{
 		_fn();
 	}

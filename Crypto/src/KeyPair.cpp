@@ -15,21 +15,22 @@
 #include "Poco/Crypto/KeyPair.h"
 #include <openssl/rsa.h>
 
+#include <utility>
+
 
 namespace Poco {
 namespace Crypto {
 
 
 KeyPair::KeyPair(KeyPairImpl::Ptr pKeyPairImpl):
-	_pImpl(pKeyPairImpl)
+	_pImpl(std::move(pKeyPairImpl))
 {
 }
 
 
-KeyPair::KeyPair(const KeyPair& other):
-	_pImpl(other._pImpl)
-{
-}
+KeyPair::KeyPair(const KeyPair& other)
+	
+= default;
 
 
 KeyPair::KeyPair(KeyPair&& other) noexcept:
@@ -39,8 +40,7 @@ KeyPair::KeyPair(KeyPair&& other) noexcept:
 
 
 KeyPair::~KeyPair()
-{
-}
+= default;
 
 
 KeyPair& KeyPair::operator = (const KeyPair& other)

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
@@ -41,8 +43,7 @@ MultipartStreamBuf::MultipartStreamBuf(std::istream& istr, const std::string& bo
 
 
 MultipartStreamBuf::~MultipartStreamBuf()
-{
-}
+= default;
 
 
 int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -165,8 +166,7 @@ MultipartInputStream::MultipartInputStream(std::istream& istr, const std::string
 
 
 MultipartInputStream::~MultipartInputStream()
-{
-}
+= default;
 
 
 //
@@ -176,15 +176,15 @@ MultipartInputStream::~MultipartInputStream()
 
 MultipartReader::MultipartReader(std::istream& istr):
 	_istr(istr),
-	_pMPI(0)
+	_pMPI(nullptr)
 {
 }
 
 
-MultipartReader::MultipartReader(std::istream& istr, const std::string& boundary):
+MultipartReader::MultipartReader(std::istream& istr, std::string  boundary):
 	_istr(istr),
-	_boundary(boundary),
-	_pMPI(0)
+	_boundary(std::move(boundary)),
+	_pMPI(nullptr)
 {
 }
 

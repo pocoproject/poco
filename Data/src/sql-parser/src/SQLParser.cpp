@@ -1,9 +1,9 @@
 
 #include "SQLParser.h"
-#include <stdio.h>
-#include <string>
 #include "parser/bison_parser.h"
 #include "parser/flex_lexer.h"
+#include <cstdio>
+#include <string>
 
 namespace hsql {
 

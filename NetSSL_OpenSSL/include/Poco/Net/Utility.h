@@ -31,7 +31,7 @@ class NetSSL_API Utility
 	/// with the OpenSSL library.
 {
 public:
-	static Context::VerificationMode convertVerificationMode(const std::string& verMode);
+	static Context::VerificationMode convertVerificationMode(const std::string& vMode);
 		/// Non-case sensitive conversion of a string to a VerificationMode enum.
 		/// If verMode is illegal an InvalidArgumentException is thrown.
 

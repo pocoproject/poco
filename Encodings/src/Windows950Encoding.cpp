@@ -25,7 +25,7 @@ const char* Windows950Encoding::_names[] =
 	"cp950",
 	"CP950",
 	"big5",
-	NULL
+	nullptr
 };
 
 
@@ -3456,8 +3456,7 @@ Windows950Encoding::Windows950Encoding():
 
 
 Windows950Encoding::~Windows950Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

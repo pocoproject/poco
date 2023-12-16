@@ -33,10 +33,10 @@ public:
 	SkipCallback();
 		/// Creates the SkipCallback.
 
-	virtual ~SkipCallback();
+	~SkipCallback() override;
 		/// Destroys the SkipCallback.
 
-	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr);
+	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr) override;
 };
 
 

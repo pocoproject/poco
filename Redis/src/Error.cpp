@@ -14,6 +14,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Redis/Error.h"
 
 
@@ -22,18 +24,16 @@ namespace Redis {
 
 
 Error::Error()
-{
-}
+= default;
 
 
-Error::Error(const std::string& message): _message(message)
+Error::Error(std::string  message): _message(std::move(message))
 {
 }
 
 
 Error::~Error()
-{
-}
+= default;
 
 
 } } // namespace Poco::Redis

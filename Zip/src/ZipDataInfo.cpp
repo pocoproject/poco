@@ -58,8 +58,7 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 
 
 ZipDataInfo::~ZipDataInfo()
-{
-}
+= default;
 
 
 const char ZipDataInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
@@ -99,8 +98,7 @@ ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
 
 
 ZipDataInfo64::~ZipDataInfo64()
-{
-}
+= default;
 
 
 } } // namespace Poco::Zip

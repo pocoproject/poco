@@ -161,7 +161,7 @@ public:
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
 
-	void start(Callable target, void* pData = 0);
+	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>
@@ -262,7 +262,7 @@ protected:
 	void clearTLS();
 		/// Clears the thread's local storage.
 
-	std::string makeName();
+	std::string makeName() const;
 		/// Creates a unique name for a thread.
 
 	static int uniqueId();
@@ -282,11 +282,10 @@ protected:
 		{
 		}
 
-		~FunctorRunnable()
-		{
-		}
+		~FunctorRunnable() override
+		= default;
 
-		void run()
+		void run() override
 		{
 			_functor();
 		}

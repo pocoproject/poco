@@ -35,8 +35,7 @@ RedisStreamBuf::RedisStreamBuf(Net::StreamSocket& redis):
 
 
 RedisStreamBuf::~RedisStreamBuf()
-{
-}
+= default;
 
 
 int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
@@ -100,8 +99,7 @@ RedisOutputStream::RedisOutputStream(Net::StreamSocket& redis):
 
 
 RedisOutputStream::~RedisOutputStream()
-{
-}
+= default;
 
 
 RedisInputStream::RedisInputStream(Net::StreamSocket& redis):
@@ -117,15 +115,14 @@ RedisInputStream::RedisInputStream(Net::StreamSocket& redis):
 
 
 RedisInputStream::~RedisInputStream()
-{
-}
+= default;
 
 
 std::string RedisInputStream::getline()
 {
 	std::string line;
 	std::getline(*this, line);
-	if ( line.size() > 0 ) line.erase(line.end() - 1);
+	if ( !line.empty() ) line.erase(line.end() - 1);
 	return line;
 }
 

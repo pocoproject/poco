@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Glob.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
@@ -24,15 +26,14 @@
 namespace Poco {
 
 
-Glob::Glob(const std::string& pattern, int options)
-	: _pattern(pattern), _options(options)
+Glob::Glob(std::string  pattern, int options)
+	: _pattern(std::move(pattern)), _options(options)
 {
 }
 
 
 Glob::~Glob()
-{
-}
+= default;
 
 
 bool Glob::match(const std::string& subject)
@@ -155,7 +156,7 @@ bool Glob::matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIt
 }
 
 
-bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c)
+bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c) const
 {
 	if (_options & GLOB_CASELESS)
 		c = Unicode::toLower(c);

@@ -21,7 +21,7 @@ namespace Poco {
 const char* MacChineseSimpEncoding::_names[] =
 {
 	"MacChineseSimp",
-	NULL
+	nullptr
 };
 
 
@@ -1945,8 +1945,7 @@ MacChineseSimpEncoding::MacChineseSimpEncoding():
 
 
 MacChineseSimpEncoding::~MacChineseSimpEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

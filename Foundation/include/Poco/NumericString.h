@@ -156,8 +156,7 @@ inline T& isSafeIntCast(F from)
 	/// Returns true if it is safe to cast
 	/// integer from F to T.
 {
-	if (!isIntOverflow<T, F>(from)) return true;
-	return false;
+	return static_cast<bool>(!isIntOverflow<T, F>(from));
 }
 
 
@@ -358,7 +357,7 @@ namespace Impl {
 		}
 
 	private:
-		void checkBounds(char* ptr)
+		void checkBounds(const char* ptr)
 		{
 			if (ptr > _end) throw RangeException();
 		}

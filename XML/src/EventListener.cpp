@@ -20,8 +20,7 @@ namespace XML {
 
 
 EventListener::~EventListener()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

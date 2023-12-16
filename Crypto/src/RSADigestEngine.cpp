@@ -15,27 +15,28 @@
 #include "Poco/Crypto/RSADigestEngine.h"
 #include <openssl/rsa.h>
 
+#include <utility>
+
 
 namespace Poco {
 namespace Crypto {
 
 
-RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
-	_key(key),
+RSADigestEngine::RSADigestEngine(RSAKey  key, DigestType digestType):
+	_key(std::move(key)),
 	_engine(digestType == DIGEST_MD5 ? "MD5" : "SHA1")
 {
 }
 
-RSADigestEngine::RSADigestEngine(const RSAKey& key, const std::string &name):
-	_key(key),
+RSADigestEngine::RSADigestEngine(RSAKey  key, const std::string &name):
+	_key(std::move(key)),
 	_engine(name)
 {
 }
 
 
 RSADigestEngine::~RSADigestEngine()
-{
-}
+= default;
 
 
 std::size_t RSADigestEngine::digestLength() const

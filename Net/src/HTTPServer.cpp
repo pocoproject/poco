@@ -42,8 +42,7 @@ HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool
 
 
 HTTPServer::~HTTPServer()
-{
-}
+= default;
 
 
 void HTTPServer::stopAll(bool abortCurrent)

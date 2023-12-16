@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPSSessionInstantiator.h"
 #include "Poco/Net/HTTPSessionFactory.h"
 #include "Poco/Net/HTTPSClientSession.h"
@@ -22,19 +24,17 @@ namespace Net {
 
 
 HTTPSSessionInstantiator::HTTPSSessionInstantiator()
-{
-}
+= default;
 
 
 HTTPSSessionInstantiator::HTTPSSessionInstantiator(Context::Ptr pContext) :
-	_pContext(pContext)
+	_pContext(std::move(pContext))
 {
 }
 
 
 HTTPSSessionInstantiator::~HTTPSSessionInstantiator()
-{
-}
+= default;
 
 
 HTTPClientSession* HTTPSSessionInstantiator::createClientSession(const Poco::URI& uri)

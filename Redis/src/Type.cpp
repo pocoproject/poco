@@ -24,13 +24,11 @@ namespace Redis {
 
 
 RedisType::RedisType()
-{
-}
+= default;
 
 
 RedisType::~RedisType()
-{
-}
+= default;
 
 
 RedisType::Ptr RedisType::createRedisType(char marker)

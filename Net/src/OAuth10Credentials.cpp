@@ -13,21 +13,22 @@
 
 
 #include "Poco/Net/OAuth10Credentials.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTMLForm.h"
-#include "Poco/Net/NetException.h"
-#include "Poco/Net/HTTPAuthenticationParams.h"
-#include "Poco/SHA1Engine.h"
-#include "Poco/HMACEngine.h"
 #include "Poco/Base64Encoder.h"
-#include "Poco/RandomStream.h"
-#include "Poco/Timestamp.h"
-#include "Poco/NumberParser.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/Format.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/HTTPAuthenticationParams.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/RandomStream.h"
+#include "Poco/SHA1Engine.h"
 #include "Poco/String.h"
+#include "Poco/Timestamp.h"
 #include <map>
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -38,22 +39,21 @@ const std::string OAuth10Credentials::SCHEME = "OAuth";
 
 
 OAuth10Credentials::OAuth10Credentials()
+= default;
+
+
+OAuth10Credentials::OAuth10Credentials(std::string  consumerKey, std::string  consumerSecret):
+	_consumerKey(std::move(consumerKey)),
+	_consumerSecret(std::move(consumerSecret))
 {
 }
 
 
-OAuth10Credentials::OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret):
-	_consumerKey(consumerKey),
-	_consumerSecret(consumerSecret)
-{
-}
-
-
-OAuth10Credentials::OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret, const std::string& token, const std::string& tokenSecret):
-	_consumerKey(consumerKey),
-	_consumerSecret(consumerSecret),
-	_token(token),
-	_tokenSecret(tokenSecret)
+OAuth10Credentials::OAuth10Credentials(std::string  consumerKey, std::string  consumerSecret, std::string  token, std::string  tokenSecret):
+	_consumerKey(std::move(consumerKey)),
+	_consumerSecret(std::move(consumerSecret)),
+	_token(std::move(token)),
+	_tokenSecret(std::move(tokenSecret))
 {
 }
 
@@ -82,8 +82,7 @@ OAuth10Credentials::OAuth10Credentials(const Poco::Net::HTTPRequest& request)
 
 
 OAuth10Credentials::~OAuth10Credentials()
-{
-}
+= default;
 
 
 void OAuth10Credentials::setConsumerKey(const std::string& consumerKey)

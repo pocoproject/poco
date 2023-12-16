@@ -13,12 +13,13 @@
 
 
 #include "Poco/XML/XMLWriter.h"
-#include "Poco/XML/XMLString.h"
-#include "Poco/XML/XMLException.h"
 #include "Poco/SAX/AttributesImpl.h"
-#include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
+#include "Poco/UTF8Encoding.h"
+#include "Poco/XML/XMLException.h"
+#include "Poco/XML/XMLString.h"
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -57,7 +58,7 @@ const std::string XMLWriter::MARKUP_END_CDATA   = "]]>";
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(new Poco::UTF8Encoding),
 	_options(options),
@@ -79,12 +80,12 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 }
 
 
-XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding):
-	_pTextConverter(0),
+XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding& textEncoding):
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(0),
+	_pOutEncoding(nullptr),
 	_options(options),
-	_encoding(encodingName),
+	_encoding(std::move(encodingName)),
 	_depth(-1),
 	_elementCount(0),
 	_inFragment(false),
@@ -102,12 +103,12 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 }
 
 
-XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding):
-	_pTextConverter(0),
+XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding* pTextEncoding):
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(0),
+	_pOutEncoding(nullptr),
 	_options(options),
-	_encoding(encodingName),
+	_encoding(std::move(encodingName)),
 	_depth(-1),
 	_elementCount(0),
 	_inFragment(false),
@@ -724,8 +725,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
 		XMLString attributeNamespaceURI = attributes.getURI(i);
-		XMLString attributeLocalName    = attributes.getLocalName(i);
-		XMLString attributeQName        = attributes.getQName(i);
+				const XMLString& attributeQName        = attributes.getQName(i);
 
 		XMLString attributePrefix;
 		XMLString attributeLocal;
@@ -774,9 +774,9 @@ void XMLWriter::declareAttributeNamespaces(const Attributes& attributes)
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
-		XMLString namespaceURI = attributes.getURI(i);
-		XMLString localName    = attributes.getLocalName(i);
-		XMLString qname        = attributes.getQName(i);
+		const XMLString& namespaceURI = attributes.getURI(i);
+		const XMLString& localName    = attributes.getLocalName(i);
+		const XMLString& qname        = attributes.getQName(i);
 		if (!localName.empty())
 		{
 			XMLString prefix;
@@ -841,8 +841,8 @@ void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attr
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
-		XMLString namespaceURI = attributes.getURI(i);
-		XMLString localName    = attributes.getLocalName(i);
+		const XMLString& namespaceURI = attributes.getURI(i);
+		const XMLString& localName    = attributes.getLocalName(i);
 		XMLString qname        = attributes.getQName(i);
 		if (!localName.empty())
 		{
@@ -866,8 +866,8 @@ void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attribu
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
-		XMLString namespaceURI = attributes.getURI(i);
-		XMLString localName    = attributes.getLocalName(i);
+		const XMLString& namespaceURI = attributes.getURI(i);
+		const XMLString& localName    = attributes.getLocalName(i);
 		XMLString qname        = attributes.getQName(i);
 		XMLString fullQName    = qname;
 		if (!localName.empty())

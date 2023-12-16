@@ -40,9 +40,9 @@ Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
 	FastMutex::ScopedLock lock(mutex);
 	if (!IN_ENCODING_INIT)
 	{
-		for (unsigned i = 0; i < sizeof(IN_ENCODING); i++)
+		for (unsigned char & i : IN_ENCODING)
 		{
-			IN_ENCODING[i] = 0xFF;
+			i = 0xFF;
 		}
 		for (unsigned i = 0; i < sizeof(Base32EncoderBuf::OUT_ENCODING); i++)
 		{
@@ -55,8 +55,7 @@ Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
 
 
 Base32DecoderBuf::~Base32DecoderBuf()
-{
-}
+= default;
 
 
 int Base32DecoderBuf::readFromDevice()
@@ -137,8 +136,7 @@ Base32DecoderIOS::Base32DecoderIOS(std::istream& istr): _buf(istr)
 
 
 Base32DecoderIOS::~Base32DecoderIOS()
-{
-}
+= default;
 
 
 Base32DecoderBuf* Base32DecoderIOS::rdbuf()
@@ -153,8 +151,7 @@ Base32Decoder::Base32Decoder(std::istream& istr): Base32DecoderIOS(istr), std::i
 
 
 Base32Decoder::~Base32Decoder()
-{
-}
+= default;
 
 
 } // namespace Poco

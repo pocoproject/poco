@@ -32,13 +32,13 @@ class NetSSL_API ConsoleCertificateHandler: public InvalidCertificateHandler
 	/// The certificate is printed to stdout and the user is asked via console if he wants to accept it.
 {
 public:
-	ConsoleCertificateHandler(bool handleErrorsOnServerSide);
+	ConsoleCertificateHandler(bool server);
 		/// Creates the ConsoleCertificateHandler.
 
-	virtual ~ConsoleCertificateHandler();
+	~ConsoleCertificateHandler() override;
 		/// Destroys the ConsoleCertificateHandler.
 
-	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert);
+	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert) override;
 		/// Prints the certificate to stdout and waits for user input on the console
 		/// to decide if a certificate should be accepted/rejected.
 };

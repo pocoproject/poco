@@ -35,7 +35,7 @@ class Net_API ICMPEventArgs
 	///	passed to the handler function to provide information about the event.
 {
 public:
-	ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl);
+	ICMPEventArgs(SocketAddress  address, int repetitions, int dataSize, int ttl);
 		/// Creates ICMPEventArgs.
 
 	virtual ~ICMPEventArgs();

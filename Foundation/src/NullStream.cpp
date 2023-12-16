@@ -19,13 +19,11 @@ namespace Poco {
 
 
 NullStreamBuf::NullStreamBuf()
-{
-}
+= default;
 
 
 NullStreamBuf::~NullStreamBuf()
-{
-}
+= default;
 
 
 int NullStreamBuf::readFromDevice()
@@ -47,8 +45,7 @@ NullIOS::NullIOS()
 
 
 NullIOS::~NullIOS()
-{
-}
+= default;
 
 
 NullInputStream::NullInputStream(): std::istream(&_buf)
@@ -57,8 +54,7 @@ NullInputStream::NullInputStream(): std::istream(&_buf)
 
 
 NullInputStream::~NullInputStream()
-{
-}
+= default;
 
 
 NullOutputStream::NullOutputStream(): std::ostream(&_buf)
@@ -67,8 +63,7 @@ NullOutputStream::NullOutputStream(): std::ostream(&_buf)
 
 
 NullOutputStream::~NullOutputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

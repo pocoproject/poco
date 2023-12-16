@@ -33,22 +33,19 @@ RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):
 }
 
 
-RowIterator::RowIterator(const RowIterator& other):
+RowIterator::RowIterator(const RowIterator& other)
+	
+= default;
+
+
+RowIterator::RowIterator(RowIterator&& other) noexcept:
 	_pRecordSet(other._pRecordSet),
 	_position(other._position)
 {
 }
 
-
-RowIterator::RowIterator(RowIterator&& other) noexcept:
-	_pRecordSet(std::move(other._pRecordSet)),
-	_position(std::move(other._position))
-{
-}
-
 RowIterator::~RowIterator()
-{
-}
+= default;
 
 
 RowIterator& RowIterator::operator = (const RowIterator& other)
@@ -61,8 +58,8 @@ RowIterator& RowIterator::operator = (const RowIterator& other)
 
 RowIterator& RowIterator::operator = (RowIterator&& other) noexcept
 {
-	_pRecordSet = std::move(other._pRecordSet);
-	_position = std::move(other._position);
+	_pRecordSet = other._pRecordSet;
+	_position = other._position;
 	return *this;
 }
 

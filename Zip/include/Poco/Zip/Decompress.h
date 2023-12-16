@@ -45,21 +45,21 @@ public:
 	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const Poco::Path>> EOk;
 		/// Thrown whenever a file was successfully decompressed
 
-	Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs = false, bool keepIncompleteFiles = false);
+	Decompress(std::istream& in, Poco::Path  outputDir, bool flattenDirs = false, bool keepIncompleteFiles = false);
 		/// Creates the Decompress. Note that istream must be good and at the very beginning of the file!
 		/// Calling decompressAllFiles will cause the stream to be in state failed once the zip file is processed.
 		/// outputDir must be a directory. If it doesn't exist yet, it will be automatically created.
 		/// If flattenDirs is set to true, the directory structure of the zip file is not recreated.
 		/// Instead, all files are extracted into one single directory.
 
-	~Decompress();
+	~Decompress() override;
 		/// Destroys the Decompress.
 
 	ZipArchive decompressAllFiles();
 		/// Decompresses all files stored in the zip File. Can only be called once per Decompress object.
 		/// Use mapping to retrieve the location of the decompressed files
 
-	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr);
+	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr) override;
 
 	const ZipMapping& mapping() const;
 		/// A ZipMapping stores as key the full name of the ZipFileInfo/ZipLocalFileHeader and as value the decompressed file

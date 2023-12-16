@@ -24,8 +24,7 @@ namespace ActiveRecord {
 
 
 StatementPlaceholderProvider::~StatementPlaceholderProvider()
-{
-}
+= default;
 
 
 void DefaultStatementPlaceholderProvider::reset()

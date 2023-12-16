@@ -64,13 +64,13 @@ public:
 	}
 
 protected:
-	void initialize(Application& self)
+	void initialize(Application& self) override
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 	}
 
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& options) override
 	{
 		Application::defineOptions(options);
 
@@ -245,7 +245,7 @@ protected:
 		config().setString(name, value);
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const std::vector<std::string>& args) override
 	{
 		if (_helpRequested || args.empty())
 		{
@@ -253,15 +253,15 @@ protected:
 			return Application::EXIT_OK;
 		}
 
-		for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+		for (const auto & arg : args)
 		{
-			compile(*it);
+			compile(arg);
 		}
 
 		return Application::EXIT_OK;
 	}
 
-	void parse(const std::string& path, Page& page, std::string& clazz)
+	void parse(const std::string& path, Page& page, std::string& clazz) const
 	{
 		FileInputStream srcStream(path);
 		PageReader pageReader(page, path);
@@ -364,7 +364,7 @@ protected:
 		}
 	}
 
-	CodeWriter* createCodeWriter(const Page& page, const std::string& clazz)
+	CodeWriter* createCodeWriter(const Page& page, const std::string& clazz) const
 	{
 		if (_generateOSPCode)
 			return new OSPCodeWriter(page, clazz);

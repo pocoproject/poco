@@ -48,7 +48,7 @@ const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
 	_connector("MySQL"),
-	_handle(0),
+	_handle(nullptr),
 	_reset(false),
 	_connected(false),
 	_inTransaction(false),
@@ -114,7 +114,7 @@ void SessionImpl::open(const std::string& connect)
 	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
 
-	const char * db = NULL;
+	const char * db = nullptr;
 	if (!options["db"].empty())
 		db = options["db"].c_str();
 

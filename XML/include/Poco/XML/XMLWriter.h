@@ -18,18 +18,19 @@
 #define XML_XMLWriter_INCLUDED
 
 
-#include "Poco/XML/XML.h"
 #include "Poco/SAX/ContentHandler.h"
-#include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/DTDHandler.h"
+#include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/NamespaceSupport.h"
-#include "Poco/XML/XMLString.h"
-#include "Poco/XML/XMLStream.h"
-#include "Poco/XML/Name.h"
-#include "Poco/TextEncoding.h"
 #include "Poco/StreamConverter.h"
-#include <vector>
+#include "Poco/TextEncoding.h"
+#include "Poco/XML/Name.h"
+#include "Poco/XML/XML.h"
+#include "Poco/XML/XMLStream.h"
+#include "Poco/XML/XMLString.h"
 #include <map>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -91,14 +92,14 @@ public:
 		///
 		/// The resulting stream will be UTF-8 encoded.
 
-	XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding);
+	XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding& textEncoding);
 		/// Creates the XMLWriter and sets the specified options.
 		///
 		/// The encoding is reflected in the XML declaration.
 		/// The caller is responsible for that the given encodingName matches with
 		/// the given textEncoding.
 
-	XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding);
+	XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding* pTextEncoding);
 		/// Creates the XMLWriter and sets the specified options.
 		///
 		/// The encoding is reflected in the XML declaration.
@@ -107,7 +108,7 @@ public:
 		/// If pTextEncoding is null, the given encodingName is ignored and the
 		/// default UTF-8 encoding is used.
 
-	~XMLWriter();
+	~XMLWriter() override;
 		/// Destroys the XMLWriter.
 
 	void setNewLine(const std::string& newLineCharacters);
@@ -134,15 +135,15 @@ public:
 		/// Returns the string used for one indentation step.
 
 	// ContentHandler
-	void setDocumentLocator(const Locator* loc);
+	void setDocumentLocator(const Locator* loc) override;
 		/// Currently unused.
 
-	void startDocument();
+	void startDocument() override;
 		/// Writes a generic XML declaration to the stream.
 		/// If a document type has been set (see SetDocumentType),
 		/// a DOCTYPE declaration is also written.
 
-	void endDocument();
+	void endDocument() override;
 		/// Checks that all elements are closed and prints a final newline.
 
 	void startFragment();
@@ -153,7 +154,7 @@ public:
 	void endFragment();
 		/// Checks that all elements are closed and prints a final newline.
 
-	void startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
+	void startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes) override;
 		/// Writes an XML start element tag.
 		///
 		/// Namespaces are handled as follows.
@@ -169,7 +170,7 @@ public:
 		/// Writes an XML start element tag with no attributes.
 		/// See the other startElement() method for more information.
 
-	void endElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
+	void endElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname) override;
 		/// Writes an XML end element tag.
 		///
 		/// Throws an exception if the name of doesn't match the
@@ -181,7 +182,7 @@ public:
 	void emptyElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
 		/// Writes an empty XML element tag with the given attributes (<elem attr1="value1"... />).
 
-	void characters(const XMLChar ch[], int start, int length);
+	void characters(const XMLChar ch[], int start, int length) override;
 		/// Writes XML character data. Quotes, ampersand's, less-than and
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
@@ -205,21 +206,21 @@ public:
 		/// The characters must be encoded in UTF-8 (if XMLChar is char) or
 		/// UTF-16 (if XMLChar is wchar_t).
 
-	void ignorableWhitespace(const XMLChar ch[], int start, int length);
+	void ignorableWhitespace(const XMLChar ch[], int start, int length) override;
 		/// Writes whitespace characters by simply passing them to
 		/// characters().
 
-	void processingInstruction(const XMLString& target, const XMLString& data);
+	void processingInstruction(const XMLString& target, const XMLString& data) override;
 		/// Writes a processing instruction.
 
-	void startPrefixMapping(const XMLString& prefix, const XMLString& namespaceURI);
+	void startPrefixMapping(const XMLString& prefix, const XMLString& namespaceURI) override;
 		/// Begin the scope of a prefix-URI Namespace mapping.
 		/// A namespace declaration is written with the next element.
 
-	void endPrefixMapping(const XMLString& prefix);
+	void endPrefixMapping(const XMLString& prefix) override;
 		/// End the scope of a prefix-URI mapping.
 
-	void skippedEntity(const XMLString& name);
+	void skippedEntity(const XMLString& name) override;
 		/// Does nothing.
 
 	void dataElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& data,
@@ -229,31 +230,31 @@ public:
 		/// Writes a data element in the form <name attr1="value1"...>data</name>.
 
 	// LexicalHandler
-	void startCDATA();
+	void startCDATA() override;
 		/// Writes the <![CDATA[ string that begins a CDATA section.
 		/// Use characters() to write the actual character data.
 
-	void endCDATA();
+	void endCDATA() override;
 		/// Writes the ]]> string that ends a CDATA section.
 
-	void comment(const XMLChar ch[], int start, int length);
+	void comment(const XMLChar ch[], int start, int length) override;
 		/// Writes a comment.
 
-	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId);
+	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId) override;
 		/// Writes a DTD declaration.
 
-	void endDTD();
+	void endDTD() override;
 		/// Writes the closing characters of a DTD declaration.
 
-	void startEntity(const XMLString& name);
+	void startEntity(const XMLString& name) override;
 		/// Does nothing.
 
-	void endEntity(const XMLString& name);
+	void endEntity(const XMLString& name) override;
 		/// Does nothing.
 
 	// DTDHandler
-	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId);
-	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
+	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId) override;
+	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName) override;
 
 	static const std::string NEWLINE_DEFAULT;
 	static const std::string NEWLINE_CR;
@@ -290,7 +291,7 @@ protected:
 	void writeXML(XMLChar ch) const;
 	void writeNewLine() const;
 	void writeIndent() const;
-	void writeIndent(int indent) const;
+	void writeIndent(int depth) const;
 	void writeName(const XMLString& prefix, const XMLString& localName);
 	void writeXMLDeclaration();
 	void closeStartTag();
@@ -308,9 +309,9 @@ protected:
 private:
 	struct Namespace
 	{
-		Namespace(const XMLString& thePrefix, const XMLString& theNamespaceURI):
-			prefix(thePrefix),
-			namespaceURI(theNamespaceURI)
+		Namespace(XMLString  thePrefix, XMLString  theNamespaceURI):
+			prefix(std::move(thePrefix)),
+			namespaceURI(std::move(theNamespaceURI))
 		{
 		}
 

@@ -71,7 +71,7 @@ void Envelope::addKey(const EVPPKey& key)
 
 const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 {
-	std::vector<Byte*> pEncKeys(_encKeys.size(), 0);
+	std::vector<Byte*> pEncKeys(_encKeys.size(), nullptr);
 	std::vector<int> encKeysSizes(_encKeys.size(), 0);
 	int i = 0;
 	for (const auto& k : _encKeys)
@@ -123,7 +123,7 @@ const Envelope::ByteVec& Envelope::seal(const std::string& plainText)
 
 Envelope::ByteVec Envelope::open(const EVPPKey& privKey, const ByteVec& encKey, const ByteVec& iv)
 {
-	if (iv.size() > 0) _iv = iv;
+	if (!iv.empty()) _iv = iv;
 	int encContentLen = static_cast<int>(_encContent.size());
 	int blockSz = blockSize();
 	int mod = encContentLen % blockSz;
@@ -159,7 +159,7 @@ void Envelope::handleErrors(std::string&& msg)
 	while ((err = ERR_get_error()))
 	{
 		if (!msg.empty()) msg.append("\n");
-		msg.append(ERR_error_string(err, 0));
+		msg.append(ERR_error_string(err, nullptr));
 	}
 	throw CryptoException(msg);
 }

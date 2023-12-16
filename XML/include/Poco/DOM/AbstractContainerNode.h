@@ -34,25 +34,25 @@ class XML_API AbstractContainerNode: public AbstractNode
 {
 public:
 	// Node
-	Node* firstChild() const;
-	Node* lastChild() const;
-	Node* insertBefore(Node* newChild, Node* refChild);
-	Node* insertAfterNP(Node* newChild, Node* refChild);
-	Node* replaceChild(Node* newChild, Node* oldChild);
-	Node* removeChild(Node* oldChild);
-	Node* appendChild(Node* newChild);
-	bool hasChildNodes() const;
-	bool hasAttributes() const;
-	Node* getNodeByPath(const XMLString& path) const;
-	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
+	Node* firstChild() const override;
+	Node* lastChild() const override;
+	Node* insertBefore(Node* newChild, Node* refChild) override;
+	Node* insertAfterNP(Node* newChild, Node* refChild) override;
+	Node* replaceChild(Node* newChild, Node* oldChild) override;
+	Node* removeChild(Node* oldChild) override;
+	Node* appendChild(Node* newChild) override;
+	bool hasChildNodes() const override;
+	bool hasAttributes() const override;
+	Node* getNodeByPath(const XMLString& path) const override;
+	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const override;
 
 protected:
 	AbstractContainerNode(Document* pOwnerDocument);
 	AbstractContainerNode(Document* pOwnerDocument, const AbstractContainerNode& node);
-	~AbstractContainerNode();
+	~AbstractContainerNode() override;
 
-	void dispatchNodeRemovedFromDocument();
-	void dispatchNodeInsertedIntoDocument();
+	void dispatchNodeRemovedFromDocument() override;
+	void dispatchNodeInsertedIntoDocument() override;
 
 	static const Node* findNode(XMLString::const_iterator& it, const XMLString::const_iterator& end, const Node* pNode, const NSMap* pNSMap, bool& indexBound);
 	static const Node* findElement(const XMLString& name, const Node* pNode, const NSMap* pNSMap);

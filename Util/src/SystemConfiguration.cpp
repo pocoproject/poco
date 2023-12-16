@@ -60,13 +60,11 @@ const std::string SystemConfiguration::ENV            = "system.env.";
 
 
 SystemConfiguration::SystemConfiguration()
-{
-}
+= default;
 
 
 SystemConfiguration::~SystemConfiguration()
-{
-}
+= default;
 
 
 bool SystemConfiguration::getRaw(const std::string& key, std::string& value) const

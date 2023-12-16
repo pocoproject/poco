@@ -40,7 +40,7 @@ class JSON_API ParserImpl
 protected:
 	static const std::size_t JSON_DEFAULT_DEPTH = 128;
 
-	ParserImpl(const Handler::Ptr& pHandler = new ParseHandler);
+	ParserImpl(Handler::Ptr  pHandler = new ParseHandler);
 		/// Creates JSON ParserImpl, using the given Handler and buffer size.
 
 	virtual ~ParserImpl();
@@ -76,7 +76,7 @@ protected:
 	Dynamic::Var parseImpl(const std::string& json);
 		/// Parses JSON from a string.
 
-	Dynamic::Var parseImpl(std::istream& in);
+	Dynamic::Var parseImpl(std::istream& json);
 		/// Parses JSON from an input stream.
 
 	void setHandlerImpl(const Handler::Ptr& pHandler);
@@ -100,7 +100,7 @@ private:
 	void handle();
 	void handle(const std::string& json);
 	void handle(std::istream& json);
-	void stripComments(std::string& json);
+	void stripComments(std::string& json) const;
 	bool checkError();
 
 	struct json_stream* _pJSON;

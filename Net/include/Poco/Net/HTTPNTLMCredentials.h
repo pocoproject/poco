@@ -40,7 +40,7 @@ public:
 	HTTPNTLMCredentials();
 		/// Creates an empty HTTPNTLMCredentials object.
 
-	HTTPNTLMCredentials(const std::string& username, const std::string& password);
+	HTTPNTLMCredentials(std::string  username, std::string  password);
 		/// Creates a HTTPNTLMCredentials object with the given username and password.
 
 	HTTPNTLMCredentials(const std::string& username, const std::string& password, const std::string& host);
@@ -119,7 +119,7 @@ private:
 	HTTPNTLMCredentials(const HTTPNTLMCredentials&);
 	HTTPNTLMCredentials& operator = (const HTTPNTLMCredentials&);
 
-	std::string createNTLMMessage(const std::string& ntlmChallengeBase64);
+	std::string createNTLMMessage(const std::string& responseAuthParams);
 	bool useSSPINTLM() const;
 
 	std::string _username;

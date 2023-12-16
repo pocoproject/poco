@@ -21,7 +21,7 @@ namespace Poco {
 
 StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_inEncoding(inEncoding),
 	_outEncoding(outEncoding),
 	_defaultChar(defaultChar),
@@ -33,7 +33,7 @@ StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& i
 
 
 StreamConverterBuf::StreamConverterBuf(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_inEncoding(inEncoding),
 	_outEncoding(outEncoding),
@@ -46,8 +46,7 @@ StreamConverterBuf::StreamConverterBuf(std::ostream& ostr, const TextEncoding& i
 
 
 StreamConverterBuf::~StreamConverterBuf()
-{
-}
+= default;
 
 
 int StreamConverterBuf::readFromDevice()
@@ -149,8 +148,7 @@ StreamConverterIOS::StreamConverterIOS(std::ostream& ostr, const TextEncoding& i
 
 
 StreamConverterIOS::~StreamConverterIOS()
-{
-}
+= default;
 
 
 StreamConverterBuf* StreamConverterIOS::rdbuf()
@@ -173,8 +171,7 @@ InputStreamConverter::InputStreamConverter(std::istream& istr, const TextEncodin
 
 
 InputStreamConverter::~InputStreamConverter()
-{
-}
+= default;
 
 
 OutputStreamConverter::OutputStreamConverter(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
@@ -185,8 +182,7 @@ OutputStreamConverter::OutputStreamConverter(std::ostream& ostr, const TextEncod
 
 
 OutputStreamConverter::~OutputStreamConverter()
-{
-}
+= default;
 
 
 } // namespace Poco

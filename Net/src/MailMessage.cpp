@@ -66,12 +66,11 @@ namespace
 		{
 		}
 
-		~MultiPartHandler()
+		~MultiPartHandler() override
 			/// Destroys string part handler.
-		{
-		}
+		= default;
 
-		void handlePart(const MessageHeader& header, std::istream& stream)
+		void handlePart(const MessageHeader& header, std::istream& stream) override
 			/// Handles a part. If message pointer was provided at construction time,
 			/// the message pointed to will be properly populated so it could be written
 			/// back out at a later point in time.
@@ -83,7 +82,7 @@ namespace
 				MailMessage::ContentTransferEncoding cte = MailMessage::ENCODING_7BIT;
 				if (header.has(MailMessage::HEADER_CONTENT_TRANSFER_ENCODING))
 				{
-					std::string enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
+					const std::string& enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
 					if (enc == MailMessage::CTE_8BIT)
 						cte = MailMessage::ENCODING_8BIT;
 					else if (enc == MailMessage::CTE_QUOTED_PRINTABLE)
@@ -160,12 +159,11 @@ namespace
 		{
 		}
 
-		~StringPartHandler()
+		~StringPartHandler() override
 			/// Destroys string part handler.
-		{
-		}
+		= default;
 
-		void handlePart(const MessageHeader& header, std::istream& stream)
+		void handlePart(const MessageHeader& header, std::istream& stream) override
 			/// Handles a part.
 		{
 			std::string tmp;

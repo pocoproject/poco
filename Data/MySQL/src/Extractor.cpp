@@ -28,8 +28,7 @@ Extractor::Extractor(StatementExecutor& st, ResultMetadata& md): _stmt(st), _met
 
 
 Extractor::~Extractor()
-{
-}
+= default;
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
@@ -265,8 +264,8 @@ void Extractor::reset()
 
 bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned)
 {
-	MYSQL_BIND bind = {0};
-	my_bool isNull = 0;
+	MYSQL_BIND bind = {nullptr};
+	my_bool isNull = false;
 
 	bind.is_null     = &isNull;
 	bind.buffer_type = type;
@@ -289,10 +288,7 @@ bool Extractor::extractLongLOB(std::size_t pos)
 	_metadata.adjustColumnSizeToFit(pos);
 	
 	MYSQL_BIND* row = _metadata.row();
-	if (!_stmt.fetchColumn(pos, &row[pos]))
-		return false;
-	
-	return true;
+	return _stmt.fetchColumn(pos, &row[pos]);
 }
 
 #ifdef POCO_MYSQL_JSON
@@ -306,10 +302,7 @@ bool Extractor::extractJSON(std::size_t pos)
 
 	MYSQL_BIND* row = _metadata.row();
 	row->buffer_type = MYSQL_TYPE_JSON;
-	if (!_stmt.fetchColumn(pos, &row[pos]))
-		return false;
-
-	return true;
+	return _stmt.fetchColumn(pos, &row[pos]);
 }
 #endif
 

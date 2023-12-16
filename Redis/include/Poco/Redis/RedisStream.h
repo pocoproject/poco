@@ -36,15 +36,15 @@ public:
 	RedisStreamBuf(Net::StreamSocket& redis);
 		/// Constructor
 
-	~RedisStreamBuf();
+	~RedisStreamBuf() override;
 		/// Destructor
 
 	std::string readLine();
 		/// Reads a line from Redis (until \r\n is encountered).
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -62,7 +62,7 @@ public:
 	RedisIOS(Net::StreamSocket& redis);
 		/// Creates the RedisIOS with the given socket.
 
-	~RedisIOS();
+	~RedisIOS() override;
 		/// Destroys the RedisIOS.
 		///
 		/// Flushes the buffer, but does not close the socket.
@@ -85,7 +85,7 @@ public:
 	RedisOutputStream(Net::StreamSocket& redis);
 		/// Creates the RedisOutputStream with the given socket.
 
-	~RedisOutputStream();
+	~RedisOutputStream() override;
 		/// Destroys the RedisOutputStream.
 		///
 		/// Flushes the buffer.
@@ -99,7 +99,7 @@ public:
 	RedisInputStream(Net::StreamSocket& redis);
 		/// Creates the RedisInputStream with the given socket.
 
-	~RedisInputStream();
+	~RedisInputStream() override;
 		/// Destroys the RedisInputStream.
 
 	std::string getline();

@@ -32,7 +32,7 @@ class Encodings_API Windows936Encoding: public DoubleByteEncoding
 {
 public:
 	Windows936Encoding();
-	~Windows936Encoding();
+	~Windows936Encoding() override;
 
 private:
 	static const char* _names[];

@@ -19,11 +19,12 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
-#include <vector>
+#include "Poco/SharedPtr.h"
 #include <algorithm>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -80,8 +81,7 @@ public:
 
 	~LOB()
 		/// Destroys the LOB.
-	{
-	}
+	= default;
 
 	LOB& operator = (const LOB& other)
 		/// Assignment operator.
@@ -128,7 +128,7 @@ public:
 		/// If the LOB is empty, returns NULL.
 	{
 		if (_pContent->empty())
-			return 0;
+			return nullptr;
 		else
 			return _pContent->data();
 	}
@@ -268,25 +268,24 @@ template <>
 class VarHolderImpl<Poco::Data::BLOB>: public VarHolder
 {
 public:
-	VarHolderImpl(const Poco::Data::BLOB& val): _val(val)
+	VarHolderImpl(Poco::Data::BLOB  val): _val(std::move(val))
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override
+	= default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::BLOB);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -306,25 +305,24 @@ template <>
 class VarHolderImpl<Poco::Data::CLOB>: public VarHolder
 {
 public:
-	VarHolderImpl(const Poco::Data::CLOB& val): _val(val)
+	VarHolderImpl(Poco::Data::CLOB  val): _val(std::move(val))
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override
+	= default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::CLOB);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

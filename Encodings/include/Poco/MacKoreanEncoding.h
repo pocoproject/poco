@@ -32,7 +32,7 @@ class Encodings_API MacKoreanEncoding: public DoubleByteEncoding
 {
 public:
 	MacKoreanEncoding();
-	~MacKoreanEncoding();
+	~MacKoreanEncoding() override;
 
 private:
 	static const char* _names[];

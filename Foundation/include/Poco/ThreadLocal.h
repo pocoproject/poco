@@ -48,9 +48,8 @@ public:
 	{
 	}
 
-	~TLSSlot()
-	{
-	}
+	~TLSSlot() override
+	= default;
 
 	C& value()
 	{
@@ -116,12 +115,10 @@ class ThreadLocal
 
 public:
 	ThreadLocal()
-	{
-	}
+	= default;
 
 	~ThreadLocal()
-	{
-	}
+	= default;
 
 	C* operator -> ()
 	{

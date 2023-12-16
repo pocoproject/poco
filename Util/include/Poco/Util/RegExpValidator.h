@@ -31,13 +31,13 @@ class Util_API RegExpValidator: public Validator
 	/// a regular expression.
 {
 public:
-	RegExpValidator(const std::string& regexp);
+	RegExpValidator(std::string  regexp);
 		/// Creates the RegExpValidator, using the given regular expression.
 
-	~RegExpValidator();
+	~RegExpValidator() override;
 		/// Destroys the RegExpValidator.
 
-	void validate(const Option& option, const std::string& value);
+	void validate(const Option& option, const std::string& value) override;
 		/// Validates the value for the given option by
 		/// matching it with the regular expression.
 

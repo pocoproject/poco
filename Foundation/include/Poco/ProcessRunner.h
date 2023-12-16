@@ -51,9 +51,9 @@ public:
 	static const int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
 		/// Constant to prevent std out and err from being received from the process.
 
-	ProcessRunner(const std::string& cmd,
-		const Args& args,
-		const std::string& pidFile = "",
+	ProcessRunner(std::string  cmd,
+		Args  args,
+		std::string  pidFile = "",
 		int options = NO_OUT,
 		int timeout = 10, /*seconds*/
 		bool startProcess = true,
@@ -81,7 +81,7 @@ public:
 		///
 		/// If `startProcess` is true, the process is started on object creation.
 
-	~ProcessRunner();
+	~ProcessRunner() override;
 		/// Destroys the ProcessRunner.
 
 	PID pid() const;
@@ -136,12 +136,12 @@ private:
 	}
 
 
-	void run();
+	void run() override;
 		/// Starts the process and waits for it to be fully initialized.
 		/// Process initialization completion is indicated by new pid in
 		/// the pid file. If pid file is not specified, there is no waiting.
 
-	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg);
+	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg) const;
 		/// If timeout is exceeded, throws TimeoutException with `msg`
 		/// message.
 

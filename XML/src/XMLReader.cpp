@@ -30,8 +30,7 @@ const XMLString XMLReader::PROPERTY_LEXICAL_HANDLER            = toXMLString("ht
 
 
 XMLReader::~XMLReader()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

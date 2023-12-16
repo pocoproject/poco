@@ -21,7 +21,7 @@ namespace Poco {
 const char* ISO8859_11Encoding::_names[] =
 {
 	"ISO-8859-11",
-	NULL
+	nullptr
 };
 
 
@@ -93,8 +93,7 @@ ISO8859_11Encoding::ISO8859_11Encoding():
 
 
 ISO8859_11Encoding::~ISO8859_11Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

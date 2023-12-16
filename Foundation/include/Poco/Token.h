@@ -103,7 +103,7 @@ public:
 	virtual char asChar() const;
 		/// Returns a char representation of the token.
 
-	bool is(Class tokenClass) const;
+	bool is(Class cls) const;
 		/// Returns true iff the token has the given class.
 
 protected:
@@ -122,8 +122,8 @@ class Foundation_API InvalidToken: public Token
 {
 public:
 	InvalidToken();
-	~InvalidToken();
-	Class tokenClass() const;
+	~InvalidToken() override;
+	Class tokenClass() const override;
 };
 
 
@@ -133,8 +133,8 @@ class Foundation_API EOFToken: public Token
 {
 public:
 	EOFToken();
-	~EOFToken();
-	Class tokenClass() const;
+	~EOFToken() override;
+	Class tokenClass() const override;
 };
 
 
@@ -144,10 +144,10 @@ class Foundation_API WhitespaceToken: public Token
 {
 public:
 	WhitespaceToken();
-	~WhitespaceToken();
-	Class tokenClass() const;
-	bool start(char c, std::istream& istr);
-	void finish(std::istream& istr);
+	~WhitespaceToken() override;
+	Class tokenClass() const override;
+	bool start(char c, std::istream& istr) override;
+	void finish(std::istream& istr) override;
 };
 
 

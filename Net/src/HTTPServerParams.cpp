@@ -30,8 +30,7 @@ HTTPServerParams::HTTPServerParams():
 
 
 HTTPServerParams::~HTTPServerParams()
-{
-}
+= default;
 
 
 void HTTPServerParams::setServerName(const std::string& serverName)

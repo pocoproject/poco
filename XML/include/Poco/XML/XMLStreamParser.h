@@ -131,7 +131,7 @@ public:
 	{
 		using value_type = EventType;
 
-		Iterator(XMLStreamParser* p = 0, EventType e = EV_EOF):
+		Iterator(XMLStreamParser* p = nullptr, EventType e = EV_EOF):
 			_parser(p),
 			_e(e)
 		{
@@ -175,7 +175,7 @@ public:
 		return Iterator(this, EV_EOF);
 	}
 
-	XMLStreamParser(std::istream&, const std::string& inputName, FeatureType = RECEIVE_DEFAULT);
+	XMLStreamParser(std::istream&, std::string  inputName, FeatureType = RECEIVE_DEFAULT);
 		/// The parser constructor takes three arguments: the stream to parse,
 		/// input name that is used in diagnostics to identify the document being
 		/// parsed, and the list of events we want the parser to report.
@@ -187,7 +187,7 @@ public:
 		/// exception is used to report io errors (badbit and failbit).
 		/// Otherwise, those are reported as the parsing exception.
 
-	XMLStreamParser(const void* data, std::size_t size, const std::string& inputName, FeatureType = RECEIVE_DEFAULT);
+	XMLStreamParser(const void* data, std::size_t size, std::string  inputName, FeatureType = RECEIVE_DEFAULT);
 		/// Parse memory buffer that contains the whole document. Input name
 		/// is used in diagnostics to identify the document being parsed.
 
@@ -589,7 +589,7 @@ inline Content XMLStreamParser::content() const
 
 inline const XMLStreamParser::ElementEntry* XMLStreamParser::getElement() const
 {
-	return _elementState.empty() ? 0 : getElementImpl();
+	return _elementState.empty() ? nullptr : getElementImpl();
 }
 
 

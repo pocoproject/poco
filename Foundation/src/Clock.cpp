@@ -19,7 +19,7 @@
 #include <mach/mach.h>
 #include <mach/clock.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 #elif defined(POCO_VXWORKS)
 #include <timers.h>
@@ -67,15 +67,11 @@ Clock::Clock(const Clock& other)
 
 
 Clock::~Clock()
-{
-}
+= default;
 
 
 Clock& Clock::operator = (const Clock& other)
-{
-	_clock = other._clock;
-	return *this;
-}
+= default;
 
 
 Clock& Clock::operator = (ClockVal tv)

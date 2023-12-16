@@ -46,8 +46,7 @@ ProcessHandleImpl::ProcessHandleImpl(pid_t pid):
 
 
 ProcessHandleImpl::~ProcessHandleImpl()
-{
-}
+= default;
 
 
 pid_t ProcessHandleImpl::id() const
@@ -195,9 +194,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		{
 			argv[i++] = const_cast<char*>(a.c_str());
 		}
-		argv[i] = NULL;
+		argv[i] = nullptr;
 
-		const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
+		const char* pInitialDirectory = initialDirectory.empty() ? nullptr : initialDirectory.c_str();
 
 		int pid = fork();
 		if (pid < 0)
@@ -296,14 +295,7 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return kill(pid, 0) == 0;
 }
 
 

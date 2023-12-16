@@ -47,8 +47,7 @@ JSONRowFormatter::JSONRowFormatter(int mode) : RowFormatter("{", "]}"),
 
 
 JSONRowFormatter::~JSONRowFormatter()
-{
-}
+= default;
 
 
 void JSONRowFormatter::adjustPrefix() const

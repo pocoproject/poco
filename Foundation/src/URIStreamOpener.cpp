@@ -56,7 +56,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 	try
 	{
 		URI uri(pathOrURI);
-		std::string scheme(uri.getScheme());
+		const std::string& scheme(uri.getScheme());
 		FactoryMap::const_iterator it = _map.find(scheme);
 		if (it != _map.end())
 		{

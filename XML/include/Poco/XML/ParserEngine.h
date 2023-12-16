@@ -58,11 +58,11 @@ public:
 	ParserEngine();
 		/// Creates the parser engine.
 
-	ParserEngine(const XMLString& encoding);
+	ParserEngine(XMLString  encoding);
 		/// Creates the parser engine and passes the encoding
 		/// to the underlying parser.
 
-	~ParserEngine();
+	~ParserEngine() override;
 		/// Destroys the parser.
 
 	void setEncoding(const XMLString& encoding);
@@ -193,16 +193,16 @@ public:
 		/// Parses an XML document from the given buffer.
 
 	// Locator
-	XMLString getPublicId() const;
+	XMLString getPublicId() const override;
 		/// Return the public identifier for the current document event.
 
-	XMLString getSystemId() const;
+	XMLString getSystemId() const override;
 		/// Return the system identifier for the current document event.
 
-	int getLineNumber() const;
+	int getLineNumber() const override;
 		/// Return the line number where the current document event ends.
 
-	int getColumnNumber() const;
+	int getColumnNumber() const override;
 		/// Return the column number where the current document event ends.
 
 protected:
@@ -215,10 +215,10 @@ protected:
 	void parseCharInputStream(XMLCharInputStream& istr);
 		/// Parses an entity from the given stream.
 
-	std::streamsize readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize);
+	std::streamsize readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize) const;
 		/// Reads at most bufferSize bytes from the given stream into the given buffer.
 
-	std::streamsize readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize);
+	std::streamsize readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize) const;
 		/// Reads at most bufferSize chars from the given stream into the given buffer.
 
 	void handleError(int errorNo);

@@ -61,10 +61,10 @@ class XML_API NoNamespacesStrategy: public NamespaceStrategy
 {
 public:
 	NoNamespacesStrategy();
-	~NoNamespacesStrategy();
+	~NoNamespacesStrategy() override;
 
-	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
-	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler) override;
+	void endElement(const XMLChar* name, ContentHandler* pContentHandler) override;
 
 private:
 	XMLString _name;
@@ -78,10 +78,10 @@ class XML_API NoNamespacePrefixesStrategy: public NamespaceStrategy
 {
 public:
 	NoNamespacePrefixesStrategy();
-	~NoNamespacePrefixesStrategy();
+	~NoNamespacePrefixesStrategy() override;
 
-	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
-	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler) override;
+	void endElement(const XMLChar* name, ContentHandler* pContentHandler) override;
 
 private:
 	XMLString _uri;
@@ -96,10 +96,10 @@ class XML_API NamespacePrefixesStrategy: public NamespaceStrategy
 {
 public:
 	NamespacePrefixesStrategy();
-	~NamespacePrefixesStrategy();
+	~NamespacePrefixesStrategy() override;
 
-	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
-	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler) override;
+	void endElement(const XMLChar* name, ContentHandler* pContentHandler) override;
 
 private:
 	XMLString _uri;

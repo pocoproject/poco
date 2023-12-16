@@ -15,11 +15,12 @@
 
 
 #include "Poco/Net/ICMPEventArgs.h"
-#include "Poco/Net/SocketAddress.h"
-#include "Poco/Net/DNS.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/DNS.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/SocketAddress.h"
 #include <numeric>
+#include <utility>
 
 
 using Poco::IOException;
@@ -30,8 +31,8 @@ namespace Poco {
 namespace Net {
 
 
-ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
-	_address(address),
+ICMPEventArgs::ICMPEventArgs(SocketAddress  address, int repetitions, int dataSize, int ttl):
+	_address(std::move(address)),
 	_sent(0),
 	_dataSize(dataSize),
 	_ttl(ttl),
@@ -42,8 +43,7 @@ ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int 
 
 
 ICMPEventArgs::~ICMPEventArgs()
-{
-}
+= default;
 
 
 std::string ICMPEventArgs::hostName() const
@@ -120,7 +120,7 @@ void ICMPEventArgs::setError(int index, const std::string& text)
 
 const std::string& ICMPEventArgs::error(int index) const
 {
-	if (0 == _errors.size())
+	if (_errors.empty())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	if (-1 == index) index = _sent - 1;
@@ -139,7 +139,7 @@ void ICMPEventArgs::setReplyTime(int index, int time)
 
 int ICMPEventArgs::replyTime(int index) const
 {
-	if (0 == _rtt.size())
+	if (_rtt.empty())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 
 	if (-1 == index) index = _sent - 1;
@@ -151,7 +151,7 @@ int ICMPEventArgs::replyTime(int index) const
 
 int ICMPEventArgs::avgRTT() const
 {
-	if (0 == _rtt.size()) return 0;
+	if (_rtt.empty()) return 0;
 
 	int avg = 0, cnt = 0;
 	for (const auto& r : _rtt)
@@ -168,7 +168,7 @@ int ICMPEventArgs::avgRTT() const
 
 float ICMPEventArgs::percent() const
 {
-	if (0 == _rtt.size()) return 0;
+	if (_rtt.empty()) return 0;
 
 	return ((float) received() / (float) _rtt.size()) * (float) 100.0;
 }

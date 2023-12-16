@@ -21,13 +21,11 @@ namespace Util {
 
 
 MapConfiguration::MapConfiguration()
-{
-}
+= default;
 
 
 MapConfiguration::~MapConfiguration()
-{
-}
+= default;
 
 
 void MapConfiguration::copyTo(AbstractConfiguration& config)

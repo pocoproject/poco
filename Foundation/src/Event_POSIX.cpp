@@ -57,7 +57,7 @@ EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 	std::memset(&_mutex, 0, sizeof(_mutex));
 #endif
 
-	if (pthread_mutex_init(&_mutex, NULL))
+	if (pthread_mutex_init(&_mutex, nullptr))
 		throw SystemException("cannot create event (mutex)");
 
 #if defined(POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT)

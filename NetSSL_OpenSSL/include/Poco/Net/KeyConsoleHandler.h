@@ -34,10 +34,10 @@ public:
 	KeyConsoleHandler(bool server);
 		/// Creates the KeyConsoleHandler.
 
-	~KeyConsoleHandler();
+	~KeyConsoleHandler() override;
 		/// Destroys the KeyConsoleHandler.
 
-	void onPrivateKeyRequested(const void* pSender, std::string& privateKey);
+	void onPrivateKeyRequested(const void* pSender, std::string& privateKey) override;
 };
 
 

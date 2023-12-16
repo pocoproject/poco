@@ -41,8 +41,7 @@ ICMPSocketImpl::ICMPSocketImpl(IPAddress::Family family, int dataSize, int ttl, 
 
 
 ICMPSocketImpl::~ICMPSocketImpl()
-{
-}
+= default;
 
 
 int ICMPSocketImpl::sendTo(const void*, int, const SocketAddress& address, int flags)

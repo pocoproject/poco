@@ -31,8 +31,7 @@ ParseHandler::ParseHandler(bool preserveObjectOrder) : Handler(),
 
 
 ParseHandler::~ParseHandler()
-{
-}
+= default;
 
 
 void ParseHandler::reset()
@@ -120,7 +119,7 @@ void ParseHandler::key(const std::string& k)
 
 void ParseHandler::setValue(const Var& value)
 {
-	if (_stack.size())
+	if (!_stack.empty())
 	{
 		Var parent = _stack.top();
 

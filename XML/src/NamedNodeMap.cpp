@@ -20,8 +20,7 @@ namespace XML {
 
 
 NamedNodeMap::~NamedNodeMap()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

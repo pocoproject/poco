@@ -23,7 +23,7 @@ const char* ISO8859_16Encoding::_names[] =
 	"ISO-8859-16",
 	"Latin10",
 	"Latin-10",
-	NULL
+	nullptr
 };
 
 
@@ -96,8 +96,7 @@ ISO8859_16Encoding::ISO8859_16Encoding():
 
 
 ISO8859_16Encoding::~ISO8859_16Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

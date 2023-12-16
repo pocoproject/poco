@@ -81,19 +81,19 @@ public:
 		FORMAT_BULK
 	};
 
-	RowFormatter(const std::string& prefix = "",
-		const std::string& postfix = "",
+	RowFormatter(std::string  prefix = "",
+		std::string  postfix = "",
 		Mode mode = FORMAT_PROGRESSIVE);
 		/// Creates the RowFormatter and sets the prefix and postfix to specified values.
 
 	virtual ~RowFormatter();
 		/// Destroys the RowFormatter.
 
-	virtual std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames);
+	virtual std::string& formatNames(NameVecPtr pNames, std::string& formattedNames);
 		/// Should be implemented to format the row fields names and return the formatted string.
 		/// The default implementation clears the names string and returns it.
 
-	virtual void formatNames(const NameVecPtr pNames);
+	virtual void formatNames(NameVecPtr pNames);
 		/// Should be implemented to format the row fields names.
 		/// The default implementation does nothing.
 

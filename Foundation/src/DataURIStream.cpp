@@ -19,7 +19,8 @@
 #include "Poco/Path.h"
 #include "Poco/StreamUtil.h"
 #include "Poco/URI.h"
-#include <string.h>
+#include <cstring>
+#include <memory>
 
 
 namespace Poco {
@@ -34,12 +35,12 @@ DataURIStreamIOS::DataURIStreamIOS(const URI& uri)
 	if (comma == std::string::npos)
 		throw DataFormatException();
 	_data = path.substr(comma + 1);
-	_memoryStream.reset(new MemoryInputStream(_data.data(), _data.length()));
+	_memoryStream = std::make_unique<MemoryInputStream>(_data.data(), _data.length());
 	constexpr char base64[] = ";base64";
 	const size_t base64Len = strlen(base64);
 	if ((comma >= base64Len) && !path.compare(comma - base64Len, base64Len, base64, base64Len))
 	{
-		_base64Decoder.reset(new Base64Decoder(*_memoryStream, 0));
+		_base64Decoder = std::make_unique<Base64Decoder>(*_memoryStream, 0);
 		_buf = _base64Decoder->rdbuf();
 	}
 	else
@@ -49,8 +50,7 @@ DataURIStreamIOS::DataURIStreamIOS(const URI& uri)
 
 
 DataURIStreamIOS::~DataURIStreamIOS()
-{
-}
+= default;
 
 
 std::streambuf* DataURIStreamIOS::rdbuf()
@@ -65,8 +65,7 @@ DataURIStream::DataURIStream(const URI& uri): DataURIStreamIOS(uri), std::istrea
 
 
 DataURIStream::~DataURIStream()
-{
-}
+= default;
 
 
 } // namespace Poco

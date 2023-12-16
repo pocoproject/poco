@@ -30,8 +30,7 @@ MessageHeader::MessageHeader(OpCode opCode):
 
 
 MessageHeader::~MessageHeader()
-{
-}
+= default;
 
 
 void MessageHeader::read(BinaryReader& reader)

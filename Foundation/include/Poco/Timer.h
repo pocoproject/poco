@@ -71,7 +71,7 @@ public:
 		/// startInterval expires.
 		/// To start the timer, call the Start() method.
 
-	virtual ~Timer();
+	~Timer() override;
 		/// Stops and destroys the timer.
 
 	void start(const AbstractTimerCallback& method);
@@ -138,7 +138,7 @@ public:
 		/// longer to execute than the timer interval.
 
 protected:
-	void run();
+	void run() override;
 
 private:
 	long _startInterval;
@@ -191,9 +191,8 @@ public:
 	{
 	}
 
-	~TimerCallback()
-	{
-	}
+	~TimerCallback() override
+	= default;
 
 	TimerCallback& operator = (const TimerCallback& callback)
 	{
@@ -205,12 +204,12 @@ public:
 		return *this;
 	}
 
-	void invoke(Timer& timer) const
+	void invoke(Timer& timer) const override
 	{
 		(_pObject->*_method)(timer);
 	}
 
-	AbstractTimerCallback* clone() const
+	AbstractTimerCallback* clone() const override
 	{
 		return new TimerCallback(*this);
 	}

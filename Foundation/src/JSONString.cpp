@@ -34,7 +34,7 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 	bool escapeAllUnicode = ((options & Poco::JSON_ESCAPE_UNICODE) != 0);
 	bool lowerCaseHex = ((options & Poco::JSON_LOWERCASE_HEX) != 0);
 
-	if (value.size() == 0)
+	if (value.empty())
 	{
 		if(wrap) (obj.*write)("\"\"", 2);
 		return;

@@ -24,7 +24,7 @@
 namespace Poco {
 
 
-DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(0), _rc(1)
+DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(nullptr), _rc(1)
 {
 	Path p(path);
 	p.makeFile();

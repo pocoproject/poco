@@ -44,8 +44,7 @@ class AutoReleasePool
 public:
 	AutoReleasePool()
 		/// Creates the AutoReleasePool.
-	{
-	}
+	= default;
 
 	~AutoReleasePool()
 		/// Destroys the AutoReleasePool and releases

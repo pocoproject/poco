@@ -81,7 +81,7 @@ protected:
 		/// the option to a configuration property or specify a callback
 		/// to handle the option.
 
-	virtual ~Subsystem();
+	~Subsystem() override;
 		/// Destroys the Subsystem.
 
 	friend class Application;

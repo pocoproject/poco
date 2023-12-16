@@ -173,7 +173,7 @@ public:
 	static SSLManager& instance();
 		/// Returns the instance of the SSLManager singleton.
 
-	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrCertificateHandler, Context::Ptr ptrContext);
+	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext);
 		/// Initializes the server side of the SSLManager with a default passphrase handler, a default invalid certificate handler and a default context. If this method
 		/// is never called the SSLmanager will try to initialize its members from an application configuration.
 		///

@@ -38,7 +38,7 @@ public:
 	PIDFile();
 		/// Creates the PIDFile.
 
-	PIDFile(const std::string& fileName, bool write = true);
+	PIDFile(std::string  fileName, bool write = true);
 		/// Creates the PIDFile.
 		/// If `fileName` is not empty, creates the PID file.
 		/// If `write` is true, the file is written.

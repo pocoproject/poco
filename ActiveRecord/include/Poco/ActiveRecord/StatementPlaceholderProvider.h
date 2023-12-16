@@ -40,16 +40,16 @@ public:
 class ActiveRecordLib_API DefaultStatementPlaceholderProvider: public StatementPlaceholderProvider
 {
 public:
-	void reset();
-	std::string next();
+	void reset() override;
+	std::string next() override;
 };
 
 
 class ActiveRecordLib_API PostgresStatementPlaceholderProvider: public StatementPlaceholderProvider
 {
 public:
-	void reset();
-	std::string next();
+	void reset() override;
+	std::string next() override;
 
 private:
 	int _n = 1;

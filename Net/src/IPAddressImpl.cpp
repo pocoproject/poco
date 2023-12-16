@@ -69,13 +69,11 @@ namespace Impl {
 
 
 IPAddressImpl::IPAddressImpl()
-{
-}
+= default;
 
 
 IPAddressImpl::~IPAddressImpl()
-{
-}
+= default;
 
 
 //

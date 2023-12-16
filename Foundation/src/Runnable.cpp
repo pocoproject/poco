@@ -20,13 +20,11 @@ namespace Poco {
 
 
 Runnable::Runnable()
-{
-}
+= default;
 
 
 Runnable::~Runnable()
-{
-}
+= default;
 
 
 } // namespace Poco

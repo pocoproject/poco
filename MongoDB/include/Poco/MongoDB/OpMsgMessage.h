@@ -86,10 +86,10 @@ public:
 	OpMsgMessage();
 		/// Creates an OpMsgMessage for response.
 
-	OpMsgMessage(const std::string& databaseName, const std::string& collectionName, UInt32 flags = MSG_FLAGS_DEFAULT);
+	OpMsgMessage(std::string  databaseName, std::string  collectionName, UInt32 flags = MSG_FLAGS_DEFAULT);
 		/// Creates an OpMsgMessage for requests.
 
-	virtual ~OpMsgMessage();
+	~OpMsgMessage() override;
 
 	const std::string& databaseName() const;
 

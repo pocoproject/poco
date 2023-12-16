@@ -30,13 +30,9 @@ TreeWalker::TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter
 }
 
 
-TreeWalker::TreeWalker(const TreeWalker& walker):
-	_pRoot(walker._pRoot),
-	_whatToShow(walker._whatToShow),
-	_pFilter(walker._pFilter),
-	_pCurrent(walker._pCurrent)
-{
-}
+TreeWalker::TreeWalker(const TreeWalker& walker)
+	
+= default;
 
 
 TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
@@ -53,8 +49,7 @@ TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
 
 
 TreeWalker::~TreeWalker()
-{
-}
+= default;
 
 
 void TreeWalker::setCurrentNode(Node* pNode)
@@ -65,7 +60,7 @@ void TreeWalker::setCurrentNode(Node* pNode)
 
 Node* TreeWalker::parentNode()
 {
-	if (!_pCurrent || _pCurrent == _pRoot) return 0;
+	if (!_pCurrent || _pCurrent == _pRoot) return nullptr;
 
 	Node* pParent = _pCurrent->parentNode();
 	while (pParent && pParent != _pRoot && accept(pParent) != NodeFilter::FILTER_ACCEPT)
@@ -73,16 +68,16 @@ Node* TreeWalker::parentNode()
 	if (pParent && accept(pParent) == NodeFilter::FILTER_ACCEPT)
 		_pCurrent = pParent;
 	else
-		pParent = 0;
+		pParent = nullptr;
 	return pParent;
 }
 
 
 Node* TreeWalker::firstChild()
 {
-	if (!_pCurrent) return 0;
+	if (!_pCurrent) return nullptr;
 
-	Node* pNode = accept(_pCurrent) != NodeFilter::FILTER_REJECT ? _pCurrent->firstChild() : 0;
+	Node* pNode = accept(_pCurrent) != NodeFilter::FILTER_REJECT ? _pCurrent->firstChild() : nullptr;
 	while (pNode && accept(pNode) != NodeFilter::FILTER_ACCEPT)
 		pNode = pNode->nextSibling();
 	if (pNode)
@@ -93,9 +88,9 @@ Node* TreeWalker::firstChild()
 
 Node* TreeWalker::lastChild()
 {
-	if (!_pCurrent) return 0;
+	if (!_pCurrent) return nullptr;
 
-	Node* pNode = accept(_pCurrent) != NodeFilter::FILTER_REJECT ? _pCurrent->lastChild() : 0;
+	Node* pNode = accept(_pCurrent) != NodeFilter::FILTER_REJECT ? _pCurrent->lastChild() : nullptr;
 	while (pNode && accept(pNode) != NodeFilter::FILTER_ACCEPT)
 		pNode = pNode->previousSibling();
 	if (pNode)
@@ -106,7 +101,7 @@ Node* TreeWalker::lastChild()
 
 Node* TreeWalker::previousSibling()
 {
-	if (!_pCurrent) return 0;
+	if (!_pCurrent) return nullptr;
 
 	Node* pNode = _pCurrent->previousSibling();
 	while (pNode && accept(pNode) != NodeFilter::FILTER_ACCEPT)
@@ -119,7 +114,7 @@ Node* TreeWalker::previousSibling()
 
 Node* TreeWalker::nextSibling()
 {
-	if (!_pCurrent) return 0;
+	if (!_pCurrent) return nullptr;
 
 	Node* pNode = _pCurrent->nextSibling();
 	while (pNode && accept(pNode) != NodeFilter::FILTER_ACCEPT)
@@ -132,7 +127,7 @@ Node* TreeWalker::nextSibling()
 
 Node* TreeWalker::previousNode()
 {
-	if (!_pCurrent) return 0;
+	if (!_pCurrent) return nullptr;
 
 	Node* pPrev = previous(_pCurrent);
 	while (pPrev && accept(pPrev) != NodeFilter::FILTER_ACCEPT)
@@ -145,7 +140,7 @@ Node* TreeWalker::previousNode()
 
 Node* TreeWalker::nextNode()
 {
-	if (!_pCurrent) return 0;
+	if (!_pCurrent) return nullptr;
 
 	Node* pNext = next(_pCurrent);
 	while (pNext && accept(pNext) != NodeFilter::FILTER_ACCEPT)
@@ -195,7 +190,7 @@ int TreeWalker::accept(Node* pNode) const
 
 Node* TreeWalker::next(Node* pNode) const
 {
-	Node* pNext = accept(pNode) != NodeFilter::FILTER_REJECT ? pNode->firstChild() : 0;
+	Node* pNext = accept(pNode) != NodeFilter::FILTER_REJECT ? pNode->firstChild() : nullptr;
 	if (pNext) return pNext;
 	pNext = pNode;
 	while (pNext && pNext != _pRoot)
@@ -204,17 +199,17 @@ Node* TreeWalker::next(Node* pNode) const
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
-	return 0;
+	return nullptr;
 }
 
 
 Node* TreeWalker::previous(Node* pNode) const
 {
-	if (pNode == _pRoot) return 0;
+	if (pNode == _pRoot) return nullptr;
 	Node* pPrev = pNode->previousSibling();
 	while (pPrev)
 	{
-		Node* pLastChild = accept(pPrev) != NodeFilter::FILTER_REJECT ? pPrev->lastChild() : 0;
+		Node* pLastChild = accept(pPrev) != NodeFilter::FILTER_REJECT ? pPrev->lastChild() : nullptr;
 		if (pLastChild)
 			pPrev = pLastChild;
 		else

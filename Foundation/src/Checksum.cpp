@@ -42,8 +42,7 @@ Checksum::Checksum(Type t):
 
 
 Checksum::~Checksum()
-{
-}
+= default;
 
 
 void Checksum::update(const char* data, unsigned length)

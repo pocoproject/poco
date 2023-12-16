@@ -45,7 +45,7 @@ public:
 		/// Executes the operation
 
 protected:
-	virtual ~ZipOperation();
+	~ZipOperation() override;
 		/// Destroys the ZipOperation.
 };
 

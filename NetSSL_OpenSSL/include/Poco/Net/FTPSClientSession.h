@@ -56,7 +56,7 @@ public:
 		///
 		/// Passive mode will be used for data transfers.
 
-	virtual ~FTPSClientSession();
+	~FTPSClientSession() override;
 
 	void enableFTPS(bool enable = true);
 		/// Enable or disable FTPS (FTP over SSL/TLS).
@@ -68,10 +68,10 @@ public:
 		/// Enable or disable session reusing
 
 protected:
-	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
+	StreamSocket establishDataConnection(const std::string& command, const std::string& arg) override;
 		/// Create secure data connection
 
-	virtual void receiveServerReadyReply();
+	void receiveServerReadyReply() override;
 		/// Function that read server welcome message after connetion and set and make secure socket
 
 private:

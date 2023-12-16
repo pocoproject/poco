@@ -45,15 +45,15 @@ public:
 		/// Creates the CountingStreamBuf and connects it
 		/// to the given output stream.
 
-	~TeeStreamBuf();
+	~TeeStreamBuf() override;
 		/// Destroys the CountingStream.
 
 	void addStream(std::ostream& ostr);
 		/// Adds the given output stream.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	typedef std::vector<std::ostream*> StreamVec;
@@ -81,7 +81,7 @@ public:
 		/// Creates the basic stream and connects it
 		/// to the given output stream.
 
-	~TeeIOS();
+	~TeeIOS() override;
 		/// Destroys the stream.
 
 	void addStream(std::ostream& ostr);
@@ -104,7 +104,7 @@ public:
 		/// Creates the TeeInputStream and connects it
 		/// to the given input stream.
 
-	~TeeInputStream();
+	~TeeInputStream() override;
 		/// Destroys the TeeInputStream.
 };
 
@@ -121,7 +121,7 @@ public:
 		/// Creates the TeeOutputStream and connects it
 		/// to the given input stream.
 
-	~TeeOutputStream();
+	~TeeOutputStream() override;
 		/// Destroys the TeeOutputStream.
 };
 

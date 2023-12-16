@@ -14,6 +14,7 @@
 
 #include "Poco/MongoDB/RegularExpression.h"
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -21,28 +22,26 @@ namespace MongoDB {
 
 
 RegularExpression::RegularExpression()
-{
-}
+= default;
 
 
-RegularExpression::RegularExpression(const std::string& pattern, const std::string& options):
-	_pattern(pattern),
-	_options(options)
+RegularExpression::RegularExpression(std::string  pattern, std::string  options):
+	_pattern(std::move(pattern)),
+	_options(std::move(options))
 {
 }
 
 
 RegularExpression::~RegularExpression()
-{
-}
+= default;
 
 
 SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 {
 	int options = 0;
-	for (std::string::const_iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
+	for (char _option : _options)
 	{
-		switch (*optIt)
+		switch (_option)
 		{
 		case 'i': // Case Insensitive
 			options |= Poco::RegularExpression::RE_CASELESS;

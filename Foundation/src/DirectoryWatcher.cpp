@@ -55,8 +55,7 @@ public:
 	}
 
 	virtual ~DirectoryWatcherStrategy()
-	{
-	}
+	= default;
 
 	DirectoryWatcher& owner()
 	{
@@ -75,12 +74,9 @@ protected:
 		{
 		}
 
-		ItemInfo(const ItemInfo& other):
-			path(other.path),
-			size(other.size),
-			lastModified(other.lastModified)
-		{
-		}
+		ItemInfo(const ItemInfo& other)
+			
+		= default;
 
 		explicit ItemInfo(const File& f):
 			path(f.path()),
@@ -264,12 +260,12 @@ public:
 		if (_fd == -1) throw Poco::IOException("cannot initialize inotify", errno);
 	}
 
-	~LinuxDirectoryWatcherStrategy()
+	~LinuxDirectoryWatcherStrategy() override
 	{
 		close(_fd);
 	}
 
-	void run()
+	void run() override
 	{
 		int mask = 0;
 		if (owner().eventMask() & DirectoryWatcher::DW_ITEM_ADDED)
@@ -306,7 +302,7 @@ public:
 			tv.tv_sec  = 0;
 			tv.tv_usec = 200000;
 
-			if (select(_fd + 1, &fds, NULL, NULL, &tv) == 1)
+			if (select(_fd + 1, &fds, nullptr, nullptr, &tv) == 1)
 			{
 				int n = read(_fd, buffer.begin(), buffer.size());
 				int i = 0;
@@ -361,12 +357,12 @@ public:
 		}
 	}
 
-	void stop()
+	void stop() override
 	{
 		_stopped = true;
 	}
 
-	bool supportsMoveEvents() const
+	bool supportsMoveEvents() const override
 	{
 		return true;
 	}

@@ -20,8 +20,7 @@ namespace XML {
 
 
 NodeFilter::~NodeFilter()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

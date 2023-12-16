@@ -22,19 +22,16 @@ namespace Redis {
 
 
 Array::Array()
-{
-}
+= default;
 
 
-Array::Array(const Array& copy):
-	_elements(copy._elements)
-{
-}
+Array::Array(const Array& copy)
+	
+= default;
 
 
 Array::~Array()
-{
-}
+= default;
 
 
 Array& Array::addRedisType(RedisType::Ptr value)

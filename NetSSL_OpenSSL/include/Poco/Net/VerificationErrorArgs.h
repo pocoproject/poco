@@ -31,7 +31,7 @@ class NetSSL_API VerificationErrorArgs
 	/// A utility class for certificate error handling.
 {
 public:
-	VerificationErrorArgs(Poco::Net::Context::Ptr pContext, const X509Certificate& cert, int errDepth, int errNum, const std::string& errMsg);
+	VerificationErrorArgs(Poco::Net::Context::Ptr pContext, X509Certificate  cert, int errDepth, int errNum, std::string  errMsg);
 		/// Creates the VerificationErrorArgs. _ignoreError is per default set to false.
 
 	~VerificationErrorArgs();

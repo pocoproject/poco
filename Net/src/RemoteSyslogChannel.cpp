@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/RemoteSyslogChannel.h"
 #include "Poco/Message.h"
 #include "Poco/DateTimeFormatter.h"
@@ -50,9 +52,9 @@ RemoteSyslogChannel::RemoteSyslogChannel():
 }
 
 
-RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::string& name, int facility, bool bsdFormat):
-	_logHost(address),
-	_name(name),
+RemoteSyslogChannel::RemoteSyslogChannel(std::string  address, std::string  name, int facility, bool bsdFormat):
+	_logHost(std::move(address)),
+	_name(std::move(name)),
 	_facility(facility),
 	_bsdFormat(bsdFormat),
 	_buffer(0),

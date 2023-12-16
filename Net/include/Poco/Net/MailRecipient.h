@@ -47,10 +47,10 @@ public:
 	MailRecipient(const MailRecipient& recipient);
 		/// Creates a MailRecipient by copying another one.
 
-	MailRecipient(RecipientType type, const std::string& address);
+	MailRecipient(RecipientType type, std::string  address);
 		/// Creates a MailRecipient of the given type.
 
-	MailRecipient(RecipientType type, const std::string& address, const std::string& realName);
+	MailRecipient(RecipientType type, std::string  address, std::string  realName);
 		/// Creates a MailRecipient of the given type.
 
 	~MailRecipient();

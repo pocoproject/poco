@@ -38,8 +38,7 @@ HTTPFixedLengthStreamBuf::HTTPFixedLengthStreamBuf(HTTPSession& session, Content
 
 
 HTTPFixedLengthStreamBuf::~HTTPFixedLengthStreamBuf()
-{
-}
+= default;
 
 
 int HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -116,8 +115,7 @@ HTTPFixedLengthInputStream::HTTPFixedLengthInputStream(HTTPSession& session, HTT
 
 
 HTTPFixedLengthInputStream::~HTTPFixedLengthInputStream()
-{
-}
+= default;
 
 
 void* HTTPFixedLengthInputStream::operator new(std::size_t size)
@@ -155,8 +153,7 @@ HTTPFixedLengthOutputStream::HTTPFixedLengthOutputStream(HTTPSession& session, H
 
 
 HTTPFixedLengthOutputStream::~HTTPFixedLengthOutputStream()
-{
-}
+= default;
 
 
 void* HTTPFixedLengthOutputStream::operator new(std::size_t size)

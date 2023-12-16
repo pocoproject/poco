@@ -24,7 +24,7 @@ const char* Windows874Encoding::_names[] =
 	"Windows-874",
 	"cp874",
 	"CP874",
-	NULL
+	nullptr
 };
 
 
@@ -94,8 +94,7 @@ Windows874Encoding::Windows874Encoding():
 
 
 Windows874Encoding::~Windows874Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

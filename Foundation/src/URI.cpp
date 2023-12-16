@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/URI.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
@@ -50,8 +52,8 @@ URI::URI(const char* uri):
 }
 
 
-URI::URI(const std::string& scheme, const std::string& pathEtc):
-	_scheme(scheme),
+URI::URI(std::string  scheme, const std::string& pathEtc):
+	_scheme(std::move(scheme)),
 	_port(0)
 {
 	toLowerInPlace(_scheme);
@@ -61,8 +63,8 @@ URI::URI(const std::string& scheme, const std::string& pathEtc):
 }
 
 
-URI::URI(const std::string& scheme, const std::string& authority, const std::string& pathEtc):
-	_scheme(scheme)
+URI::URI(std::string  scheme, const std::string& authority, const std::string& pathEtc):
+	_scheme(std::move(scheme))
 {
 	toLowerInPlace(_scheme);
 	std::string::const_iterator beg = authority.begin();
@@ -74,10 +76,10 @@ URI::URI(const std::string& scheme, const std::string& authority, const std::str
 }
 
 
-URI::URI(const std::string& scheme, const std::string& authority, const std::string& path, const std::string& query):
-	_scheme(scheme),
-	_path(path),
-	_query(query)
+URI::URI(std::string  scheme, const std::string& authority, std::string  path, std::string  query):
+	_scheme(std::move(scheme)),
+	_path(std::move(path)),
+	_query(std::move(query))
 {
 	toLowerInPlace(_scheme);
 	std::string::const_iterator beg = authority.begin();
@@ -86,11 +88,11 @@ URI::URI(const std::string& scheme, const std::string& authority, const std::str
 }
 
 
-URI::URI(const std::string& scheme, const std::string& authority, const std::string& path, const std::string& query, const std::string& fragment):
-	_scheme(scheme),
-	_path(path),
-	_query(query),
-	_fragment(fragment)
+URI::URI(std::string  scheme, const std::string& authority, std::string  path, std::string  query, std::string  fragment):
+	_scheme(std::move(scheme)),
+	_path(std::move(path)),
+	_query(std::move(query)),
+	_fragment(std::move(fragment))
 {
 	toLowerInPlace(_scheme);
 	std::string::const_iterator beg = authority.begin();
@@ -99,23 +101,16 @@ URI::URI(const std::string& scheme, const std::string& authority, const std::str
 }
 
 
-URI::URI(const URI& uri):
-	_scheme(uri._scheme),
-	_userInfo(uri._userInfo),
-	_host(uri._host),
-	_port(uri._port),
-	_path(uri._path),
-	_query(uri._query),
-	_fragment(uri._fragment)
-{
-}
+URI::URI(const URI& uri)
+	
+= default;
 
 
 URI::URI(URI&& uri) noexcept:
 	_scheme(std::move(uri._scheme)),
 	_userInfo(std::move(uri._userInfo)),
 	_host(std::move(uri._host)),
-	_port(std::move(uri._port)),
+	_port(uri._port),
 	_path(std::move(uri._path)),
 	_query(std::move(uri._query)),
 	_fragment(std::move(uri._fragment))
@@ -147,8 +142,7 @@ URI::URI(const Path& path):
 
 
 URI::~URI()
-{
-}
+= default;
 
 
 URI& URI::operator = (const URI& uri)
@@ -172,7 +166,7 @@ URI& URI::operator = (URI&& uri) noexcept
 	_scheme   = std::move(uri._scheme);
 	_userInfo = std::move(uri._userInfo);
 	_host     = std::move(uri._host);
-	_port     = std::move(uri._port);
+	_port     = uri._port;
 	_path     = std::move(uri._path);
 	_query    = std::move(uri._query);
 	_fragment = std::move(uri._fragment);

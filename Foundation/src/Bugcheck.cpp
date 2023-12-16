@@ -46,7 +46,7 @@ void Bugcheck::nullPointer(const char* ptr, const char* file, int line)
 void Bugcheck::bugcheck(const char* file, int line)
 {
 	Debugger::enter("Bugcheck", file, line);
-	throw BugcheckException(what(0, file, line));
+	throw BugcheckException(what(nullptr, file, line));
 }
 
 
@@ -110,7 +110,7 @@ std::string Bugcheck::what(const char* msg, const char* file, int line, const ch
 {
 	std::ostringstream str;
 	if (msg) str << msg << " ";
-   if (text != NULL) str << "(" << text << ") ";
+   if (text != nullptr) str << "(" << text << ") ";
 	str << "in file \"" << file << "\", line " << line;
 	return str.str();
 }

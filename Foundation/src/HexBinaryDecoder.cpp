@@ -26,8 +26,7 @@ HexBinaryDecoderBuf::HexBinaryDecoderBuf(std::istream& istr):
 
 
 HexBinaryDecoderBuf::~HexBinaryDecoderBuf()
-{
-}
+= default;
 
 
 int HexBinaryDecoderBuf::readFromDevice()
@@ -71,8 +70,7 @@ HexBinaryDecoderIOS::HexBinaryDecoderIOS(std::istream& istr): _buf(istr)
 
 
 HexBinaryDecoderIOS::~HexBinaryDecoderIOS()
-{
-}
+= default;
 
 
 HexBinaryDecoderBuf* HexBinaryDecoderIOS::rdbuf()
@@ -87,8 +85,7 @@ HexBinaryDecoder::HexBinaryDecoder(std::istream& istr): HexBinaryDecoderIOS(istr
 
 
 HexBinaryDecoder::~HexBinaryDecoder()
-{
-}
+= default;
 
 
 } // namespace Poco

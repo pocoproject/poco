@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/MongoDB/Element.h"
 
 
@@ -19,14 +21,13 @@ namespace Poco {
 namespace MongoDB {
 
 
-Element::Element(const std::string& name) : _name(name)
+Element::Element(std::string  name) : _name(std::move(name))
 {
 }
 
 
 Element::~Element()
-{
-}
+= default;
 
 
 } } // namespace Poco::MongoDB

@@ -20,13 +20,11 @@ namespace Net {
 
 
 HTTPServerResponse::HTTPServerResponse()
-{
-}
+= default;
 
 
 HTTPServerResponse::~HTTPServerResponse()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

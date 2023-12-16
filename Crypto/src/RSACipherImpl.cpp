@@ -15,9 +15,10 @@
 #include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/Exception.h"
+#include <cstring>
 #include <openssl/err.h>
 #include <openssl/rsa.h>
-#include <cstring>
+#include <utility>
 
 
 namespace Poco {
@@ -35,7 +36,7 @@ namespace
 		{
 			if (!msg.empty())
 				msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -63,20 +64,20 @@ namespace
 	{
 	public:
 		RSAEncryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
-		~RSAEncryptImpl();
+		~RSAEncryptImpl() override;
 
-		std::size_t blockSize() const;
+		std::size_t blockSize() const override;
 		std::size_t maxDataSize() const;
-		std::string getTag(std::size_t);
-		void setTag(const std::string&);
+		std::string getTag(std::size_t) override;
+		void setTag(const std::string&) override;
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
-			std::streamsize		 outputLength);
+			std::streamsize		 outputLength) override;
 
-		std::streamsize finalize(unsigned char*	output, std::streamsize length);
+		std::streamsize finalize(unsigned char*	output, std::streamsize length) override;
 
 	private:
 		const RSA*      _pRSA;
@@ -90,7 +91,7 @@ namespace
 			_pRSA(pRSA),
 			_paddingMode(paddingMode),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 	{
 		_pBuf = new unsigned char[blockSize()];
 	}
@@ -199,21 +200,21 @@ namespace
 	{
 	public:
 		RSADecryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
-		~RSADecryptImpl();
+		~RSADecryptImpl() override;
 
-		std::size_t blockSize() const;
-		std::string getTag(std::size_t);
-		void setTag(const std::string&);
+		std::size_t blockSize() const override;
+		std::string getTag(std::size_t) override;
+		void setTag(const std::string&) override;
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
-			std::streamsize		 outputLength);
+			std::streamsize		 outputLength) override;
 
 		std::streamsize finalize(
 			unsigned char*	output,
-			std::streamsize length);
+			std::streamsize length) override;
 
 	private:
 		const RSA*      _pRSA;
@@ -227,7 +228,7 @@ namespace
 			_pRSA(pRSA),
 			_paddingMode(paddingMode),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 	{
 		_pBuf = new unsigned char[blockSize()];
 	}
@@ -314,16 +315,15 @@ namespace
 }
 
 
-RSACipherImpl::RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode):
-	_key(key),
+RSACipherImpl::RSACipherImpl(RSAKey  key, RSAPaddingMode paddingMode):
+	_key(std::move(key)),
 	_paddingMode(paddingMode)
 {
 }
 
 
 RSACipherImpl::~RSACipherImpl()
-{
-}
+= default;
 
 
 CryptoTransform::Ptr RSACipherImpl::createEncryptor()

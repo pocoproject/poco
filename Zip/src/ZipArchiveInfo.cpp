@@ -48,8 +48,7 @@ ZipArchiveInfo::ZipArchiveInfo():
 
 
 ZipArchiveInfo::~ZipArchiveInfo()
-{
-}
+= default;
 
 
 void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
@@ -129,8 +128,7 @@ ZipArchiveInfo64::ZipArchiveInfo64():
 
 
 ZipArchiveInfo64::~ZipArchiveInfo64()
-{
-}
+= default;
 
 
 void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)

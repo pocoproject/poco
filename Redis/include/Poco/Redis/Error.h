@@ -32,7 +32,7 @@ public:
 	Error();
 		/// Creates an empty Error.
 
-	Error(const std::string& message);
+	Error(std::string  message);
 		/// Creates an Error with the given message.
 
 	virtual ~Error();

@@ -20,8 +20,7 @@ namespace XML {
 
 
 ErrorHandler::~ErrorHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

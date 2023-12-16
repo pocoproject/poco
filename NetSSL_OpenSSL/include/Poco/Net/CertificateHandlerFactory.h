@@ -67,14 +67,12 @@ class CertificateHandlerFactoryImpl: public Poco::Net::CertificateHandlerFactory
 {
 public:
 	CertificateHandlerFactoryImpl()
-	{
-	}
+	= default;
 
-	~CertificateHandlerFactoryImpl()
-	{
-	}
+	~CertificateHandlerFactoryImpl() override
+	= default;
 
-	InvalidCertificateHandler* create(bool server) const
+	InvalidCertificateHandler* create(bool server) const override
 	{
 		return new T(server);
 	}

@@ -37,8 +37,7 @@ Text::Text(Document* pOwnerDocument, const Text& text):
 
 
 Text::~Text()
-{
-}
+= default;
 
 
 Text* Text::splitText(unsigned long offset)

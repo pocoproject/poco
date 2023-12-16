@@ -38,10 +38,10 @@ class Foundation_API Base64DecoderBuf: public UnbufferedStreamBuf
 {
 public:
 	Base64DecoderBuf(std::istream& istr, int options = 0);
-	~Base64DecoderBuf();
+	~Base64DecoderBuf() override;
 
 private:
-	int readFromDevice();
+	int readFromDevice() override;
 	int readOne();
 
 	int             _options;
@@ -70,7 +70,7 @@ class Foundation_API Base64DecoderIOS: public virtual std::ios
 {
 public:
 	Base64DecoderIOS(std::istream& istr, int options = 0);
-	~Base64DecoderIOS();
+	~Base64DecoderIOS() override;
 	Base64DecoderBuf* rdbuf();
 
 protected:
@@ -96,7 +96,7 @@ class Foundation_API Base64Decoder: public Base64DecoderIOS, public std::istream
 {
 public:
 	Base64Decoder(std::istream& istr, int options = 0);
-	~Base64Decoder();
+	~Base64Decoder() override;
 
 private:
 	Base64Decoder(const Base64Decoder&);

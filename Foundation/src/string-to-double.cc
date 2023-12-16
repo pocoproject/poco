@@ -122,12 +122,12 @@ static const int kWhitespaceTable16Length = DOUBLE_CONVERSION_ARRAY_SIZE(kWhites
 
 static bool isWhitespace(int x) {
   if (x < 128) {
-    for (int i = 0; i < kWhitespaceTable7Length; i++) {
-      if (kWhitespaceTable7[i] == x) return true;
+    for (char i : kWhitespaceTable7) {
+      if (i == x) return true;
     }
   } else {
-    for (int i = 0; i < kWhitespaceTable16Length; i++) {
-      if (kWhitespaceTable16[i] == x) return true;
+    for (unsigned short i : kWhitespaceTable16) {
+      if (i == x) return true;
     }
   }
   return false;
@@ -679,7 +679,7 @@ double StringToDoubleConverter::StringToIeee(
       // Check overflow.
       int digit = *current - '0';
       if (num >= max_exponent / 10
-          && !(num == max_exponent / 10 && digit <= max_exponent % 10)) {
+          && (num != max_exponent / 10 || digit > max_exponent % 10)) {
         num = max_exponent;
       } else {
         num = num * 10 + digit;

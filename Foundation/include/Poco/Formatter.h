@@ -56,17 +56,17 @@ public:
 	Formatter();
 		/// Creates the formatter.
 
-	virtual ~Formatter();
+	~Formatter() override;
 		/// Destroys the formatter.
 
 	virtual void format(const Message& msg, std::string& text) = 0;
 		/// Formats the message and places the result in text.
 		/// Subclasses must override this method.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Throws a PropertyNotSupportedException.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Throws a PropertyNotSupportedException.
 };
 

@@ -36,8 +36,7 @@ ThreadTarget& ThreadTarget::operator = (const ThreadTarget& te)
 
 
 ThreadTarget::~ThreadTarget()
-{
-}
+= default;
 
 
 } // namespace Poco

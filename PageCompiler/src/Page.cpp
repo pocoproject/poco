@@ -14,13 +14,11 @@
 
 
 Page::Page()
-{
-}
+= default;
 
 
 Page::~Page()
-{
-}
+= default;
 
 
 bool Page::getBool(const std::string& property, bool deflt) const

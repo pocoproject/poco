@@ -42,14 +42,14 @@ public:
 	CryptoStreamBuf(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 	CryptoStreamBuf(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 
-	virtual ~CryptoStreamBuf();
+	~CryptoStreamBuf() override;
 
 	void close();
 		/// Flushes all buffers and finishes the encryption.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	CryptoTransform::Ptr _pTransform;
@@ -73,7 +73,7 @@ class Crypto_API CryptoIOS: public virtual std::ios
 public:
 	CryptoIOS(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 	CryptoIOS(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
-	~CryptoIOS();
+	~CryptoIOS() override;
 	CryptoStreamBuf* rdbuf();
 
 protected:
@@ -97,7 +97,7 @@ public:
 	CryptoInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new encrypting CryptoInputStream object using the given cipher.
 
-	~CryptoInputStream();
+	~CryptoInputStream() override;
 		/// Destroys the CryptoInputStream.
 };
 
@@ -121,7 +121,7 @@ public:
 	CryptoOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new decrypting CryptoOutputStream object using the given cipher.
 
-	~CryptoOutputStream();
+	~CryptoOutputStream() override;
 		/// Destroys the CryptoOutputStream.
 
 	void close();
@@ -137,7 +137,7 @@ public:
 	DecryptingInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new DecryptingInputStream object using the given cipher.
 
-	~DecryptingInputStream();
+	~DecryptingInputStream() override;
 		/// Destroys the DecryptingInputStream.
 };
 
@@ -150,7 +150,7 @@ public:
 	DecryptingOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new DecryptingOutputStream object using the given cipher.
 
-	~DecryptingOutputStream();
+	~DecryptingOutputStream() override;
 		/// Destroys the DecryptingOutputStream.
 
 	void close();
@@ -166,7 +166,7 @@ public:
 	EncryptingInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new EncryptingInputStream object using the given cipher.
 
-	~EncryptingInputStream();
+	~EncryptingInputStream() override;
 		/// Destroys the EncryptingInputStream.
 };
 
@@ -179,7 +179,7 @@ public:
 	EncryptingOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new EncryptingOutputStream object using the given cipher.
 
-	~EncryptingOutputStream();
+	~EncryptingOutputStream() override;
 		/// Destroys the EncryptingOutputStream.
 
 	void close();

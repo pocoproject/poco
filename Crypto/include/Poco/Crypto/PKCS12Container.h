@@ -45,16 +45,16 @@ public:
 	explicit PKCS12Container(const std::string& path, const std::string& password = "");
 		/// Creates the PKCS12Container object from a file.
 
-	PKCS12Container(const PKCS12Container& cont);
+	PKCS12Container(const PKCS12Container& other);
 		/// Copy constructor.
 
-	PKCS12Container(PKCS12Container&& cont) noexcept;
+	PKCS12Container(PKCS12Container&& other) noexcept;
 		/// Move constructor.
 
-	PKCS12Container& operator = (const PKCS12Container& cont);
+	PKCS12Container& operator = (const PKCS12Container& other);
 		/// Assignment operator.
 
-	PKCS12Container& operator = (PKCS12Container&& cont) noexcept;
+	PKCS12Container& operator = (PKCS12Container&& other) noexcept;
 		/// Move assignment operator.
 
 	~PKCS12Container();
@@ -103,7 +103,7 @@ private:
 
 inline bool PKCS12Container::hasX509Certificate() const
 {
-	return _pX509Cert.get() != 0;
+	return _pX509Cert.get() != nullptr;
 }
 
 
@@ -135,7 +135,7 @@ inline const PKCS12Container::CANameList& PKCS12Container::getFriendlyNamesCA() 
 
 inline bool PKCS12Container::hasKey() const
 {
-	return _pKey != 0;
+	return _pKey != nullptr;
 }
 
 

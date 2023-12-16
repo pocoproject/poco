@@ -14,6 +14,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Redis/Client.h"
 #include "Poco/Redis/Exception.h"
 
@@ -25,8 +27,8 @@ namespace Redis {
 Client::Client():
 	_address(),
 	_socket(),
-	_input(0),
-	_output(0)
+	_input(nullptr),
+	_output(nullptr)
 {
 }
 
@@ -34,8 +36,8 @@ Client::Client():
 Client::Client(const std::string& hostAndPort):
 	_address(hostAndPort),
 	_socket(),
-	_input(0),
-	_output(0)
+	_input(nullptr),
+	_output(nullptr)
 {
 	connect();
 }
@@ -44,18 +46,18 @@ Client::Client(const std::string& hostAndPort):
 Client::Client(const std::string& host, int port):
 	_address(host, port),
 	_socket(),
-	_input(0),
-	_output(0)
+	_input(nullptr),
+	_output(nullptr)
 {
 	connect();
 }
 
 
-Client::Client(const Net::SocketAddress& addrs):
-	_address(addrs),
+Client::Client(Net::SocketAddress  addrs):
+	_address(std::move(addrs)),
 	_socket(),
-	_input(0),
-	_output(0)
+	_input(nullptr),
+	_output(nullptr)
 {
 	connect();
 }
@@ -64,8 +66,8 @@ Client::Client(const Net::SocketAddress& addrs):
 Client::Client(const Net::StreamSocket& socket):
 	_address(),
 	_socket(),
-	_input(0),
-	_output(0)
+	_input(nullptr),
+	_output(nullptr)
 {
 	connect(socket);
 }
@@ -158,10 +160,10 @@ void Client::connect(const Poco::Net::StreamSocket& socket)
 void Client::disconnect()
 {
 	delete _input;
-	_input = 0;
+	_input = nullptr;
 
 	delete _output;
-	_output = 0;
+	_output = nullptr;
 
 	_socket.close();
 }
@@ -169,7 +171,7 @@ void Client::disconnect()
 
 bool Client::isConnected() const
 {
-	return _input != 0;
+	return _input != nullptr;
 }
 
 
@@ -217,9 +219,9 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 {
 	Array results;
 
-	for (std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
+	for (const auto & command : commands)
 	{
-		writeCommand(*it, false);
+		writeCommand(command, false);
 	}
 	_output->flush();
 

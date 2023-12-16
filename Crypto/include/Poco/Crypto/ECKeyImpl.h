@@ -53,10 +53,10 @@ public:
 	ECKeyImpl(const X509Certificate& cert);
 		/// Constructs ECKeyImpl by extracting the EC public key from the given certificate.
 
-	ECKeyImpl(const PKCS12Container& cert);
+	ECKeyImpl(const PKCS12Container& cont);
 		/// Constructs ECKeyImpl by extracting the EC private key from the given certificate.
 
-	ECKeyImpl(int eccGroup);
+	ECKeyImpl(int curve);
 		/// Creates the ECKey of the specified group. Creates a new public/private keypair using the given parameters.
 		/// Can be used to sign data and verify signatures.
 
@@ -70,7 +70,7 @@ public:
 		/// is not null. If a private key file is specified, you don't need to
 		/// specify a public key file. OpenSSL will auto-create it from the private key.
 
-	~ECKeyImpl();
+	~ECKeyImpl() override;
 		/// Destroys the ECKeyImpl.
 
 	EC_KEY* getECKey();
@@ -79,7 +79,7 @@ public:
 	const EC_KEY* getECKey() const;
 		/// Returns the OpenSSL EC key.
 
-	int size() const;
+	int size() const override;
 		/// Returns the EC key length in bits.
 
 	int groupId() const;
@@ -90,15 +90,15 @@ public:
 
 	void save(const std::string& publicKeyFile,
 		const std::string& privateKeyFile = "",
-		const std::string& privateKeyPassphrase = "") const;
+		const std::string& privateKeyPassphrase = "") const override;
 		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
 	void save(std::ostream* pPublicKeyStream,
-		std::ostream* pPrivateKeyStream = 0,
-		const std::string& privateKeyPassphrase = "") const;
+		std::ostream* pPrivateKeyStream = nullptr,
+		const std::string& privateKeyPassphrase = "") const override;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding

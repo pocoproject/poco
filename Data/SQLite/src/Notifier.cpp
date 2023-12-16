@@ -69,7 +69,7 @@ bool Notifier::disableUpdate()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 
-	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::UpdateCallbackType) 0, this))
+	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::UpdateCallbackType) nullptr, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_UPDATE;
 
 	return !updateEnabled();
@@ -97,7 +97,7 @@ bool Notifier::disableCommit()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 
-	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::CommitCallbackType) 0, this))
+	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::CommitCallbackType) nullptr, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_COMMIT;
 
 	return !commitEnabled();
@@ -125,7 +125,7 @@ bool Notifier::disableRollback()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 
-	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::RollbackCallbackType) 0, this))
+	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::RollbackCallbackType) nullptr, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_ROLLBACK;
 
 	return !rollbackEnabled();

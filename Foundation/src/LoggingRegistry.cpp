@@ -20,13 +20,11 @@ namespace Poco {
 
 
 LoggingRegistry::LoggingRegistry()
-{
-}
+= default;
 
 
 LoggingRegistry::~LoggingRegistry()
-{
-}
+= default;
 
 
 Channel::Ptr LoggingRegistry::channelForName(const std::string& name) const

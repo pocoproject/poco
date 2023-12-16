@@ -52,7 +52,7 @@ protected:
 	void setLabelNames(const std::vector<std::string>& labelNames);
 		/// Sets the metric's label names.
 
-	virtual ~LabeledMetric() = default;
+	~LabeledMetric() override = default;
 		/// Destroys the LabeledMetric.
 
 	static const std::string& validateLabelName(const std::string& name);

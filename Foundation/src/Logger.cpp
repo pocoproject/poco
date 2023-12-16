@@ -12,6 +12,9 @@
 //
 
 
+#include <memory>
+#include <utility>
+
 #include "Poco/Logger.h"
 #include "Poco/Formatter.h"
 #include "Poco/LoggingRegistry.h"
@@ -29,14 +32,13 @@ Mutex                Logger::_mapMtx;
 const std::string    Logger::ROOT;
 
 
-Logger::Logger(const std::string& name, Channel::Ptr pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
+Logger::Logger(std::string  name, Channel::Ptr pChannel, int level): _name(std::move(name)), _pChannel(std::move(pChannel)), _level(level)
 {
 }
 
 
 Logger::~Logger()
-{
-}
+= default;
 
 
 void Logger::setChannel(Channel::Ptr pChannel)
@@ -288,7 +290,7 @@ Logger& Logger::unsafeGet(const std::string& name)
 	{
 		if (name == ROOT)
 		{
-			pLogger = new Logger(name, 0, Message::PRIO_INFORMATION);
+			pLogger = new Logger(name, nullptr, Message::PRIO_INFORMATION);
 		}
 		else
 		{
@@ -343,7 +345,7 @@ Logger::Ptr Logger::find(const std::string& name)
 		LoggerMap::iterator it = _pLoggerMap->find(name);
 		if (it != _pLoggerMap->end()) return it->second;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -428,7 +430,7 @@ int Logger::parseLevel(const std::string& level)
 
 void Logger::add(Ptr pLogger)
 {
-	if (!_pLoggerMap) _pLoggerMap.reset(new LoggerMap);
+	if (!_pLoggerMap) _pLoggerMap = std::make_unique<LoggerMap>();
 	_pLoggerMap->insert(LoggerMap::value_type(pLogger->name(), pLogger));
 }
 

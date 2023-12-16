@@ -39,13 +39,11 @@ namespace Util {
 
 
 LoggingConfigurator::LoggingConfigurator()
-{
-}
+= default;
 
 
 LoggingConfigurator::~LoggingConfigurator()
-{
-}
+= default;
 
 
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
@@ -144,7 +142,7 @@ Channel::Ptr LoggingConfigurator::createChannel(AbstractConfiguration::Ptr pConf
 		}
 		else if (p == "formatter")
 		{
-			AutoPtr<FormattingChannel> pFormattingChannel(new FormattingChannel(0, pChannel));
+			AutoPtr<FormattingChannel> pFormattingChannel(new FormattingChannel(nullptr, pChannel));
 			if (pConfig->hasProperty("formatter.class"))
 			{
 				AutoPtr<AbstractConfiguration> pFormatterConfig(pConfig->createView(p));

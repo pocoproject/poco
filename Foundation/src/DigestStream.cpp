@@ -24,8 +24,8 @@ const int DigestBuf::BUFFER_SIZE = 256;
 DigestBuf::DigestBuf(DigestEngine& eng):
 	BufferedStreamBuf(BUFFER_SIZE, std::ios::out),
 	_eng(eng),
-	_pIstr(0),
-	_pOstr(0)
+	_pIstr(nullptr),
+	_pOstr(nullptr)
 {
 }
 
@@ -34,7 +34,7 @@ DigestBuf::DigestBuf(DigestEngine& eng, std::istream& istr):
 	BufferedStreamBuf(BUFFER_SIZE, std::ios::in),
 	_eng(eng),
 	_pIstr(&istr),
-	_pOstr(0)
+	_pOstr(nullptr)
 {
 }
 
@@ -42,15 +42,14 @@ DigestBuf::DigestBuf(DigestEngine& eng, std::istream& istr):
 DigestBuf::DigestBuf(DigestEngine& eng, std::ostream& ostr):
 	BufferedStreamBuf(BUFFER_SIZE, std::ios::out),
 	_eng(eng),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr)
 {
 }
 
 
 DigestBuf::~DigestBuf()
-{
-}
+= default;
 
 
 int DigestBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -100,8 +99,7 @@ DigestIOS::DigestIOS(DigestEngine& eng, std::ostream& ostr): _buf(eng, ostr)
 
 
 DigestIOS::~DigestIOS()
-{
-}
+= default;
 
 
 DigestBuf* DigestIOS::rdbuf()
@@ -118,8 +116,7 @@ DigestInputStream::DigestInputStream(DigestEngine& eng, std::istream& istr):
 
 
 DigestInputStream::~DigestInputStream()
-{
-}
+= default;
 
 
 DigestOutputStream::DigestOutputStream(DigestEngine& eng):
@@ -137,8 +134,7 @@ DigestOutputStream::DigestOutputStream(DigestEngine& eng, std::ostream& ostr):
 
 
 DigestOutputStream::~DigestOutputStream()
-{
-}
+= default;
 
 
 void DigestOutputStream::close()

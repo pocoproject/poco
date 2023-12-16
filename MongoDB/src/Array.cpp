@@ -27,8 +27,7 @@ Array::Array():
 
 
 Array::~Array()
-{
-}
+= default;
 
 
 Element::Ptr Array::get(std::size_t pos) const

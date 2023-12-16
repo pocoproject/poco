@@ -69,14 +69,12 @@ class TCPServerConnectionFactoryImpl: public TCPServerConnectionFactory
 {
 public:
 	TCPServerConnectionFactoryImpl()
-	{
-	}
+	= default;
 
-	~TCPServerConnectionFactoryImpl()
-	{
-	}
+	~TCPServerConnectionFactoryImpl() override
+	= default;
 
-	TCPServerConnection* createConnection(const StreamSocket& socket)
+	TCPServerConnection* createConnection(const StreamSocket& socket) override
 	{
 		return new S(socket);
 	}

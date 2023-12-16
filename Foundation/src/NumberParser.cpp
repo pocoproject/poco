@@ -14,11 +14,11 @@
 
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
-#include "Poco/String.h"
 #include "Poco/NumericString.h"
-#include <cstdio>
+#include "Poco/String.h"
 #include <cctype>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif

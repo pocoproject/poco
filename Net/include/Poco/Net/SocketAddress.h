@@ -152,10 +152,10 @@ public:
 		/// See `SocketAddress(const string&)` documentation
 		/// for more details.
 
-	SocketAddress(const SocketAddress& addr);
+	SocketAddress(const SocketAddress& socketAddress);
 		/// Creates a SocketAddress by copying another one.
 
-	SocketAddress(SocketAddress&& addr);
+	SocketAddress(SocketAddress&& socketAddress);
 		/// Creates a SocketAddress by moving another one.
 
 	SocketAddress(const struct sockaddr* addr, poco_socklen_t length);

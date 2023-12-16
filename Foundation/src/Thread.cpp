@@ -43,11 +43,10 @@ public:
 	{
 	}
 
-	~RunnableHolder()
-	{
-	}
+	~RunnableHolder() override
+	= default;
 
-	void run()
+	void run() override
 	{
 		_target.run();
 	}
@@ -66,11 +65,10 @@ public:
 	{
 	}
 
-	~CallableHolder()
-	{
-	}
+	~CallableHolder() override
+	= default;
 
-	void run()
+	void run() override
 	{
 		_callable(_pData);
 	}
@@ -86,7 +84,7 @@ private:
 
 Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
-	_pTLS(0),
+	_pTLS(nullptr),
 	_event(true)
 {
 	setNameImpl(makeName());
@@ -98,7 +96,7 @@ Thread::Thread(uint32_t sigMask):
 
 Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
-	_pTLS(0),
+	_pTLS(nullptr),
 	_event(true)
 {
 	setNameImpl(name);
@@ -190,12 +188,12 @@ void Thread::clearTLS()
 	if (_pTLS)
 	{
 		delete _pTLS;
-		_pTLS = 0;
+		_pTLS = nullptr;
 	}
 }
 
 
-std::string Thread::makeName()
+std::string Thread::makeName() const
 {
 	std::ostringstream name;
 	name << '#' << _id;

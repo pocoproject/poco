@@ -25,13 +25,11 @@ namespace Net {
 
 
 HTTPSessionInstantiator::HTTPSessionInstantiator()
-{
-}
+= default;
 
 
 HTTPSessionInstantiator::~HTTPSessionInstantiator()
-{
-}
+= default;
 
 
 HTTPClientSession* HTTPSessionInstantiator::createClientSession(const Poco::URI& uri)

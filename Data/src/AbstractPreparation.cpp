@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/AbstractPreparation.h"
 
 
@@ -20,15 +22,14 @@ namespace Data {
 
 
 AbstractPreparation::AbstractPreparation(PreparatorPtr pPreparator):
-	_pPreparator(pPreparator)
+	_pPreparator(std::move(pPreparator))
 {
 	poco_assert_dbg (_pPreparator);
 }
 
 
 AbstractPreparation::~AbstractPreparation()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

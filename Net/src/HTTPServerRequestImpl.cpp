@@ -34,7 +34,7 @@ namespace Net {
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams):
 	_response(response),
 	_session(session),
-	_pStream(0),
+	_pStream(nullptr),
 	_pParams(pParams, true)
 {
 	response.attachRequest(this);

@@ -18,11 +18,11 @@
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 
 
-#include "Poco/Thread.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Thread.h"
+#include <csignal>
 #include <cstdlib>
-#include <signal.h>
 
 
 namespace Poco {
@@ -76,10 +76,10 @@ void SignalHandler::install()
 	sa.sa_handler = handleSignal;
 	sa.sa_flags   = 0;
 	sigemptyset(&sa.sa_mask);
-	sigaction(SIGILL,  &sa, 0);
-	sigaction(SIGBUS,  &sa, 0);
-	sigaction(SIGSEGV, &sa, 0);
-	sigaction(SIGSYS,  &sa, 0);
+	sigaction(SIGILL,  &sa, nullptr);
+	sigaction(SIGBUS,  &sa, nullptr);
+	sigaction(SIGSEGV, &sa, nullptr);
+	sigaction(SIGSYS,  &sa, nullptr);
 #endif
 }
 

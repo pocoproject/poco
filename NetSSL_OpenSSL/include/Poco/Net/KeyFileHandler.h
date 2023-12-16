@@ -35,10 +35,10 @@ public:
 	KeyFileHandler(bool server);
 		/// Creates the KeyFileHandler.
 
-	virtual ~KeyFileHandler();
+	~KeyFileHandler() override;
 		/// Destroys the KeyFileHandler.
 
-	void onPrivateKeyRequested(const void* pSender, std::string& privateKey);
+	void onPrivateKeyRequested(const void* pSender, std::string& privateKey) override;
 
 private:
 	static const std::string CFG_PRIV_KEY_FILE;

@@ -22,18 +22,18 @@ public:
 	OSPCodeWriter(const Page& page, const std::string& clazz);
 		/// Creates the CodeWriter, using the given Page.
 
-	~OSPCodeWriter();
+	~OSPCodeWriter() override;
 		/// Destroys the PageReader.
 
 protected:
-	virtual void writeHeaderIncludes(std::ostream& ostr);
-	virtual void writeHandlerClass(std::ostream& ostr);
-	virtual void writeHandlerMembers(std::ostream& ostr);
-	virtual void writeFactoryClass(std::ostream& ostr);
-	virtual void writeImplIncludes(std::ostream& ostr);
-	virtual void writeConstructor(std::ostream& ostr);
-	virtual void writeFactory(std::ostream& ostr);
-	virtual void writeSession(std::ostream& ostr);
+	void writeHeaderIncludes(std::ostream& ostr) override;
+	void writeHandlerClass(std::ostream& ostr) override;
+	void writeHandlerMembers(std::ostream& ostr) override;
+	void writeFactoryClass(std::ostream& ostr) override;
+	void writeImplIncludes(std::ostream& ostr) override;
+	void writeConstructor(std::ostream& ostr) override;
+	void writeFactory(std::ostream& ostr) override;
+	void writeSession(std::ostream& ostr) override;
 };
 
 

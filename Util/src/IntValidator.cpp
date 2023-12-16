@@ -35,8 +35,7 @@ IntValidator::IntValidator(int min, int max):
 
 
 IntValidator::~IntValidator()
-{
-}
+= default;
 
 
 void IntValidator::validate(const Option& option, const std::string& value)

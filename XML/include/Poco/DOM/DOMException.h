@@ -65,21 +65,21 @@ public:
 	DOMException(const DOMException& exc);
 		/// Creates a DOMException by copying another one.
 
-	~DOMException() noexcept;
+	~DOMException() noexcept override;
 		/// Destroys the DOMException.
 
 	DOMException& operator = (const DOMException& exc);
 
-	const char* name() const noexcept;
+	const char* name() const noexcept override;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	const char* className() const noexcept override;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	Poco::Exception* clone() const override;
 		/// Creates an exact copy of the exception.
 
-	void rethrow() const;
+	void rethrow() const override;
 		/// (Re)Throws the exception.
 
 	unsigned short code() const;

@@ -19,24 +19,19 @@ namespace Poco {
 
 
 AbstractObserver::AbstractObserver()
-{
-}
+= default;
 
 
 AbstractObserver::AbstractObserver(const AbstractObserver& /*observer*/)
-{
-}
+= default;
 
 
 AbstractObserver::~AbstractObserver()
-{
-}
+= default;
 
 
 AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/)
-{
-	return *this;
-}
+= default;
 
 
 } // namespace Poco

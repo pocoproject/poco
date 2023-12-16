@@ -34,13 +34,11 @@ const XMLString DOMImplementation::VERSION_2_0            = toXMLString("2.0");
 
 
 DOMImplementation::DOMImplementation()
-{
-}
+= default;
 
 
 DOMImplementation::~DOMImplementation()
-{
-}
+= default;
 
 
 bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& version) const
@@ -56,7 +54,7 @@ bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& ve
 
 DocumentType* DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
-	return new DocumentType(0, name, publicId, systemId);
+	return new DocumentType(nullptr, name, publicId, systemId);
 }
 
 

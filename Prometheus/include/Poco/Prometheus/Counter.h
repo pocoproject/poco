@@ -100,7 +100,7 @@ public:
 		/// Creates a Counter with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Counter() = default;
+	~Counter() override = default;
 		/// Destroys the Counter.
 
 	using LabeledMetric::help;

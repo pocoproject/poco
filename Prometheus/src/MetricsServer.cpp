@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Prometheus/MetricsServer.h"
 #include "Poco/Prometheus/MetricsRequestHandler.h"
 #include "Poco/Prometheus/Registry.h"
@@ -30,7 +32,7 @@ namespace Prometheus {
 class NotFoundRequestHandler: public Poco::Net::HTTPRequestHandler
 {
 public:
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
 	{
 		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 		response.setChunkedTransferEncoding(true);
@@ -47,13 +49,13 @@ public:
 class MetricsRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
-	MetricsRequestHandlerFactory(const Registry& registry, const std::string& path):
+	MetricsRequestHandlerFactory(const Registry& registry, std::string  path):
 		_registry(registry),
-		_path(path)
+		_path(std::move(path))
 	{
 	}
 
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override
 	{
 		if (request.getURI() == _path)
 		{

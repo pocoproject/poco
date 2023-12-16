@@ -70,10 +70,9 @@ public:
 	{
 	}
 
-	~OptionCallback()
+	~OptionCallback() override
 		/// Destroys the OptionCallback.
-	{
-	}
+	= default;
 
 	OptionCallback& operator = (const OptionCallback& cb)
 	{
@@ -85,12 +84,12 @@ public:
 		return *this;
 	}
 
-	void invoke(const std::string& name, const std::string& value) const
+	void invoke(const std::string& name, const std::string& value) const override
 	{
 		(_pObject->*_method)(name, value);
 	}
 
-	AbstractOptionCallback* clone() const
+	AbstractOptionCallback* clone() const override
 	{
 		return new OptionCallback(_pObject, _method);
 	}

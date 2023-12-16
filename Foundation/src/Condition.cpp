@@ -19,12 +19,10 @@ namespace Poco {
 
 
 Condition::Condition()
-{
-}
+= default;
 
 Condition::~Condition()
-{
-}
+= default;
 
 
 void Condition::signal()

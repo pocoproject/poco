@@ -67,7 +67,7 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_parseError(std::move(stmt._parseError)),
 #endif
 	_pImpl(std::move(stmt._pImpl)),
-	_async(std::move(stmt._async)),
+	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
 	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
@@ -88,8 +88,7 @@ Statement::Statement(Statement&& stmt) noexcept:
 
 
 Statement::~Statement()
-{
-}
+= default;
 
 
 Statement& Statement::operator = (const Statement& stmt)
@@ -109,7 +108,7 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 #endif
 	_pImpl = std::move(stmt._pImpl);
 	stmt._pImpl = nullptr;
-	_async = std::move(stmt._async);
+	_async = stmt._async;
 	stmt._async = false;
 	_pResult = std::move(stmt._pResult);
 	stmt._pResult = nullptr;
@@ -224,7 +223,7 @@ bool Statement::hasType(Parser::StatementType type) const
 
 void Statement::formatQuery()
 {
-	if (_arguments.size())
+	if (!_arguments.empty())
 	{
 		_pImpl->formatSQL(_arguments);
 		_arguments.clear();
@@ -426,8 +425,8 @@ Statement& Statement::operator , (const Bulk& bulk)
 	if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-	if (0 == _pImpl->extractions().size() &&
-		0 == _pImpl->bindings().size() &&
+	if (_pImpl->extractions().empty() &&
+		_pImpl->bindings().empty() &&
 		_pImpl->bulkExtractionAllowed() &&
 		_pImpl->bulkBindingAllowed())
 	{

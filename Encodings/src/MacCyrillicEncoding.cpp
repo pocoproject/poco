@@ -21,7 +21,7 @@ namespace Poco {
 const char* MacCyrillicEncoding::_names[] =
 {
 	"MacCyrillic",
-	NULL
+	nullptr
 };
 
 
@@ -90,8 +90,7 @@ MacCyrillicEncoding::MacCyrillicEncoding():
 
 
 MacCyrillicEncoding::~MacCyrillicEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

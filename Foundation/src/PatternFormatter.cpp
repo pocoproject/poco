@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/PatternFormatter.h"
 #include "Poco/Message.h"
 #include "Poco/NumberFormatter.h"
@@ -42,9 +44,9 @@ PatternFormatter::PatternFormatter():
 }
 
 
-PatternFormatter::PatternFormatter(const std::string& format):
+PatternFormatter::PatternFormatter(std::string  format):
 	_localTime(false),
-	_pattern(format),
+	_pattern(std::move(format)),
 	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
 	parsePriorityNames();
@@ -53,8 +55,7 @@ PatternFormatter::PatternFormatter(const std::string& format):
 
 
 PatternFormatter::~PatternFormatter()
-{
-}
+= default;
 
 
 void PatternFormatter::format(const Message& msg, std::string& text)
@@ -192,7 +193,7 @@ void PatternFormatter::parsePattern()
 			endAct.prepend += *it++;
 		}
 	}
-	if (endAct.prepend.size())
+	if (!endAct.prepend.empty())
 	{
 		_patternActions.push_back(endAct);
 	}

@@ -51,7 +51,7 @@ public:
 		/// node indices is 0 to length - 1 inclusive.
 
 protected:
-	virtual ~NodeList();
+	~NodeList() override;
 };
 
 

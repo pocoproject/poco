@@ -115,11 +115,11 @@ public:
 	HTTPResponse();
 		/// Creates the HTTPResponse with OK status.
 
-	HTTPResponse(HTTPStatus status, const std::string& reason);
+	HTTPResponse(HTTPStatus status, std::string  reason);
 		/// Creates the HTTPResponse with the given status
 		/// and reason phrase.
 
-	HTTPResponse(const std::string& version, HTTPStatus status, const std::string& reason);
+	HTTPResponse(const std::string& version, HTTPStatus status, std::string  reason);
 		/// Creates the HTTPResponse with the given version, status
 		/// and reason phrase.
 
@@ -134,7 +134,7 @@ public:
 	HTTPResponse(const HTTPResponse& other);
 		/// Creates the HTTPResponse by copying another one.
 
-	virtual ~HTTPResponse();
+	~HTTPResponse() override;
 		/// Destroys the HTTPResponse.
 
 	HTTPResponse& operator = (const HTTPResponse& other);
@@ -185,11 +185,11 @@ public:
 		/// May throw an exception in case of a malformed
 		/// Set-Cookie header.
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP response to the given
 		/// output stream.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP response from the
 		/// given input stream.
 		///

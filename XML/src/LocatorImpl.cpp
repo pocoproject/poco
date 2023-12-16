@@ -36,8 +36,7 @@ LocatorImpl::LocatorImpl(const Locator& loc)
 
 
 LocatorImpl::~LocatorImpl()
-{
-}
+= default;
 
 
 LocatorImpl& LocatorImpl::operator = (const Locator& loc)

@@ -34,8 +34,7 @@ HTTPHeaderStreamBuf::HTTPHeaderStreamBuf(HTTPSession& session, openmode mode):
 
 
 HTTPHeaderStreamBuf::~HTTPHeaderStreamBuf()
-{
-}
+= default;
 
 
 int HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -113,8 +112,7 @@ HTTPHeaderInputStream::HTTPHeaderInputStream(HTTPSession& session):
 
 
 HTTPHeaderInputStream::~HTTPHeaderInputStream()
-{
-}
+= default;
 
 
 void* HTTPHeaderInputStream::operator new(std::size_t size)
@@ -152,8 +150,7 @@ HTTPHeaderOutputStream::HTTPHeaderOutputStream(HTTPSession& session):
 
 
 HTTPHeaderOutputStream::~HTTPHeaderOutputStream()
-{
-}
+= default;
 
 
 void* HTTPHeaderOutputStream::operator new(std::size_t size)

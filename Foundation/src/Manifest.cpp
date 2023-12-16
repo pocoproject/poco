@@ -19,13 +19,11 @@ namespace Poco {
 
 
 ManifestBase::ManifestBase()
-{
-}
+= default;
 
 
 ManifestBase::~ManifestBase()
-{
-}
+= default;
 
 
 } // namespace Poco

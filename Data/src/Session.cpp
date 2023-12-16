@@ -47,12 +47,9 @@ Session::Session(const std::string& connection, std::size_t timeout)
 }
 
 
-Session::Session(const Session& other):
-	_pImpl(other._pImpl),
-	_statementCreator(other._statementCreator),
-	_wasAutoCommit(other._wasAutoCommit)
-{
-}
+Session::Session(const Session& other)
+	
+= default;
 
 
 Session::Session(Session&& other) noexcept:
@@ -66,8 +63,7 @@ Session::Session(Session&& other) noexcept:
 }
 
 Session::~Session()
-{
-}
+= default;
 
 
 Session& Session::operator = (const Session& other)

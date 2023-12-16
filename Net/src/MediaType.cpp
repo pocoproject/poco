@@ -13,10 +13,11 @@
 
 
 #include "Poco/Net/MediaType.h"
+#include "Poco/Ascii.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/String.h"
-#include "Poco/Ascii.h"
 #include <algorithm>
+#include <utility>
 
 
 using Poco::icompare;
@@ -32,19 +33,16 @@ MediaType::MediaType(const std::string& mediaType)
 }
 
 
-MediaType::MediaType(const std::string& type, const std::string& subType):
-	_type(type),
-	_subType(subType)
+MediaType::MediaType(std::string  type, std::string  subType):
+	_type(std::move(type)),
+	_subType(std::move(subType))
 {
 }
 
 
-MediaType::MediaType(const MediaType& mediaType):
-	_type(mediaType._type),
-	_subType(mediaType._subType),
-	_parameters(mediaType._parameters)
-{
-}
+MediaType::MediaType(const MediaType& mediaType)
+	
+= default;
 
 
 MediaType::MediaType(MediaType&& mediaType) noexcept:
@@ -56,8 +54,7 @@ MediaType::MediaType(MediaType&& mediaType) noexcept:
 
 
 MediaType::~MediaType()
-{
-}
+= default;
 
 
 MediaType& MediaType::operator = (const MediaType& mediaType)
@@ -139,12 +136,12 @@ std::string MediaType::toString() const
 	result.append(_type);
 	result.append("/");
 	result.append(_subType);
-	for (NameValueCollection::ConstIterator it = _parameters.begin(); it != _parameters.end(); ++it)
+	for (const auto & _parameter : _parameters)
 	{
 		result.append("; ");
-		result.append(it->first);
+		result.append(_parameter.first);
 		result.append("=");
-		MessageHeader::quote(it->second, result);
+		MessageHeader::quote(_parameter.second, result);
 	}
 	return result;
 }

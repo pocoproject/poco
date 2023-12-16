@@ -37,12 +37,12 @@ public:
 		///
 		/// The socket will be created for the given address family.
 
-	int sendTo(const void*, int, const SocketAddress& address, int flags = 0);
+	int sendTo(const void*, int, const SocketAddress& address, int flags = 0) override;
 		/// Sends an ICMP request through the socket to the given address.
 		///
 		/// Returns the number of bytes sent.
 
-	int receiveFrom(void*, int, SocketAddress& address, int flags = 0);
+	int receiveFrom(void*, int, SocketAddress& address, int flags = 0) override;
 		/// Receives data from the socket.
 		/// Stores the address of the sender in address.
 		///
@@ -61,7 +61,7 @@ public:
 		/// Returns the socket timeout value.
 
 protected:
-	~ICMPSocketImpl();
+	~ICMPSocketImpl() override;
 
 private:
 	void checkFragmentation(const std::string& err, int type, int code);

@@ -76,8 +76,7 @@ ZipFileInfo::ZipFileInfo(std::istream& in, bool assumeHeaderRead):
 
 
 ZipFileInfo::~ZipFileInfo()
-{
-}
+= default;
 
 
 void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)

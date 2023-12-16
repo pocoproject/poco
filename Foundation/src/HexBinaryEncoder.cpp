@@ -88,8 +88,7 @@ HexBinaryEncoderIOS::HexBinaryEncoderIOS(std::ostream& ostr): _buf(ostr)
 
 
 HexBinaryEncoderIOS::~HexBinaryEncoderIOS()
-{
-}
+= default;
 
 
 int HexBinaryEncoderIOS::close()
@@ -110,8 +109,7 @@ HexBinaryEncoder::HexBinaryEncoder(std::ostream& ostr): HexBinaryEncoderIOS(ostr
 
 
 HexBinaryEncoder::~HexBinaryEncoder()
-{
-}
+= default;
 
 
 } // namespace Poco

@@ -40,14 +40,14 @@ struct HashMapEntry
 	{
 	}
 
-	HashMapEntry(const Key& key):
-		first(key),
+	HashMapEntry(Key  key):
+		first(std::move(key)),
 		second()
 	{
 	}
 
-	HashMapEntry(const Key& key, const Value& value):
-		first(key),
+	HashMapEntry(Key  key, const Value& value):
+		first(std::move(key)),
 		second(value)
 	{
 	}
@@ -103,8 +103,7 @@ public:
 
 	HashMap()
 		/// Creates an empty HashMap.
-	{
-	}
+	= default;
 
 	HashMap(std::size_t initialReserve):
 		_table(initialReserve)

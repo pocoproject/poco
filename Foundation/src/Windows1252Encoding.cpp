@@ -26,7 +26,7 @@ const char* Windows1252Encoding::_names[] =
 	"Windows-1252",
 	"cp1252",
 	"CP1252",
-	NULL
+	nullptr
 };
 
 
@@ -53,13 +53,11 @@ const TextEncoding::CharacterMap Windows1252Encoding::_charMap =
 
 
 Windows1252Encoding::Windows1252Encoding()
-{
-}
+= default;
 
 
 Windows1252Encoding::~Windows1252Encoding()
-{
-}
+= default;
 
 
 const char* Windows1252Encoding::canonicalName() const

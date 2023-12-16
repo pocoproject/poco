@@ -34,7 +34,7 @@ ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFi
 	_zipFile(zipFile),
 	_backupOriginalFile(backupOriginalFile),
 	_changes(),
-	_in(0)
+	_in(nullptr)
 {
 	Poco::FileInputStream in(zipFile);
 	_in = new ZipArchive(in);
@@ -42,8 +42,7 @@ ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFi
 
 
 ZipManipulator::~ZipManipulator()
-{
-}
+= default;
 
 
 void ZipManipulator::deleteFile(const std::string& zipPath)

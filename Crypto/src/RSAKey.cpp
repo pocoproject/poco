@@ -56,10 +56,9 @@ RSAKey::RSAKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, 
 }
 
 
-RSAKey::RSAKey(const RSAKey& other):
-	KeyPair(other)
-{
-}
+RSAKey::RSAKey(const RSAKey& other)
+	
+= default;
 
 
 RSAKey::RSAKey(RSAKey&& other) noexcept:
@@ -69,15 +68,11 @@ RSAKey::RSAKey(RSAKey&& other) noexcept:
 
 
 RSAKey::~RSAKey()
-{
-}
+= default;
 
 
 RSAKey& RSAKey::operator = (const RSAKey& other)
-{
-	KeyPair::operator = (other);
-	return *this;
-}
+= default;
 
 
 RSAKey& RSAKey::operator = (RSAKey&& other) noexcept

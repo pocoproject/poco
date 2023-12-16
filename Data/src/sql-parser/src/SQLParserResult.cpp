@@ -1,7 +1,7 @@
 
 #include "SQLParserResult.h"
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 namespace hsql {
 

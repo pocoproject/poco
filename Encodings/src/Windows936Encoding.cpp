@@ -25,7 +25,7 @@ const char* Windows936Encoding::_names[] =
 	"cp936",
 	"CP936",
 	"gb2312",
-	NULL
+	nullptr
 };
 
 
@@ -5529,8 +5529,7 @@ Windows936Encoding::Windows936Encoding():
 
 
 Windows936Encoding::~Windows936Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

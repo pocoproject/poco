@@ -110,16 +110,16 @@ public:
 	explicit HTTPClientSession(const SocketAddress& address);
 		/// Creates a HTTPClientSession using the given address.
 
-	HTTPClientSession(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
+	HTTPClientSession(std::string  host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Creates a HTTPClientSession using the given host and port.
 
-	HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig);
+	HTTPClientSession(std::string  host, Poco::UInt16 port, ProxyConfig  proxyConfig);
 		/// Creates a HTTPClientSession using the given host, port and proxy configuration.
 
-	HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig);
+	HTTPClientSession(const StreamSocket& socket, ProxyConfig  proxyConfig);
 		/// Creates a HTTPClientSession using the given socket and proxy configuration.
 
-	virtual ~HTTPClientSession();
+	~HTTPClientSession() override;
 		/// Destroys the HTTPClientSession and closes
 		/// the underlying socket.
 
@@ -324,7 +324,7 @@ protected:
 	void reconnect();
 		/// Connects the underlying socket to the HTTP server.
 
-	int write(const char* buffer, std::streamsize length);
+	int write(const char* buffer, std::streamsize length) override;
 		/// Tries to re-connect if keep-alive is on.
 
 	std::ostream& sendRequestImpl(const HTTPRequest& request);

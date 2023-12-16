@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
@@ -110,18 +112,18 @@ HTTPResponse::HTTPResponse():
 }
 
 
-HTTPResponse::HTTPResponse(HTTPStatus status, const std::string& reason):
+HTTPResponse::HTTPResponse(HTTPStatus status, std::string  reason):
 	_status(status),
-	_reason(reason)
+	_reason(std::move(reason))
 {
 }
 
 
 
-HTTPResponse::HTTPResponse(const std::string& version, HTTPStatus status, const std::string& reason):
+HTTPResponse::HTTPResponse(const std::string& version, HTTPStatus status, std::string  reason):
 	HTTPMessage(version),
 	_status(status),
-	_reason(reason)
+	_reason(std::move(reason))
 {
 }
 
@@ -141,17 +143,13 @@ HTTPResponse::HTTPResponse(const std::string& version, HTTPStatus status):
 }
 
 
-HTTPResponse::HTTPResponse(const HTTPResponse& other):
-	HTTPMessage(other),
-	_status(other._status),
-	_reason(other._reason)
-{
-}
+HTTPResponse::HTTPResponse(const HTTPResponse& other)
+	
+= default;
 
 
 HTTPResponse::~HTTPResponse()
-{
-}
+= default;
 
 
 HTTPResponse& HTTPResponse::operator = (const HTTPResponse& other)

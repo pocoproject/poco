@@ -40,9 +40,9 @@ const XMLString DOMBuilder::EMPTY_STRING;
 DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
 	_xmlReader(xmlReader),
 	_pNamePool(pNamePool),
-	_pDocument(0),
-	_pParent(0),
-	_pPrevious(0),
+	_pDocument(nullptr),
+	_pParent(nullptr),
+	_pPrevious(nullptr),
 	_inCDATA(false),
 	_namespaces(true)
 {
@@ -71,9 +71,9 @@ Document* DOMBuilder::parse(const XMLString& uri)
 	catch (...)
 	{
 		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
+		_pDocument = nullptr;
+		_pParent   = nullptr;
+		_pPrevious = nullptr;
 		throw;
 	}
 	_pDocument->resumeEvents();
@@ -93,9 +93,9 @@ Document* DOMBuilder::parse(InputSource* pInputSource)
 	catch (...)
 	{
 		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
+		_pDocument = nullptr;
+		_pParent   = nullptr;
+		_pPrevious = nullptr;
 		throw;
 	}
 	_pDocument->resumeEvents();
@@ -115,9 +115,9 @@ Document* DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
 	catch (...)
 	{
 		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
+		_pDocument = nullptr;
+		_pParent   = nullptr;
+		_pPrevious = nullptr;
 		throw;
 	}
 	_pDocument->resumeEvents();
@@ -130,7 +130,7 @@ void DOMBuilder::setupParse()
 {
 	_pDocument  = new Document(_pNamePool);
 	_pParent    = _pDocument;
-	_pPrevious  = 0;
+	_pPrevious  = nullptr;
 	_inCDATA    = false;
 	_namespaces = _xmlReader.getFeature(XMLReader::FEATURE_NAMESPACES);
 }
@@ -191,10 +191,10 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
 	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
-	Attr* pPrevAttr = 0;
+	Attr* pPrevAttr = nullptr;
 	for (const auto& attr: attrs)
 	{
-		AutoPtr<Attr> pAttr = new Attr(_pDocument, 0, attr.namespaceURI, attr.localName, attr.qname, attr.value, attr.specified);
+		AutoPtr<Attr> pAttr = new Attr(_pDocument, nullptr, attr.namespaceURI, attr.localName, attr.qname, attr.value, attr.specified);
 		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, pAttr);
 	}
 	appendNode(pElem);

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPSStreamFactory.h"
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPIOStream.h"
@@ -44,25 +46,24 @@ HTTPSStreamFactory::HTTPSStreamFactory():
 }
 
 
-HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort):
-	_proxyHost(proxyHost),
+HTTPSStreamFactory::HTTPSStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort):
+	_proxyHost(std::move(proxyHost)),
 	_proxyPort(proxyPort)
 {
 }
 
 
-HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword):
-	_proxyHost(proxyHost),
+HTTPSStreamFactory::HTTPSStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort, std::string  proxyUsername, std::string  proxyPassword):
+	_proxyHost(std::move(proxyHost)),
 	_proxyPort(proxyPort),
-	_proxyUsername(proxyUsername),
-	_proxyPassword(proxyPassword)
+	_proxyUsername(std::move(proxyUsername)),
+	_proxyPassword(std::move(proxyPassword))
 {
 }
 
 
 HTTPSStreamFactory::~HTTPSStreamFactory()
-{
-}
+= default;
 
 
 std::istream* HTTPSStreamFactory::open(const URI& uri)
@@ -71,7 +72,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 	URI resolvedURI(uri);
 	URI proxyUri;
-	HTTPClientSession* pSession = 0;
+	HTTPClientSession* pSession = nullptr;
 	HTTPResponse res;
 	try
 	{
@@ -139,7 +140,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 					authorize = false;
 				}
 				delete pSession;
-				pSession = 0;
+				pSession = nullptr;
 				++redirects;
 				retry = true;
 			}
@@ -156,7 +157,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				// only use for one single request!
 				proxyUri.resolve(res.get("Location"));
 				delete pSession;
-				pSession = 0;
+				pSession = nullptr;
 				retry = true; // only allow useproxy once
 			}
 			else if (res.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED && !authorize)

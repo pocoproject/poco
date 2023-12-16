@@ -26,18 +26,14 @@ NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFi
 	_pRoot(root),
 	_whatToShow(whatToShow),
 	_pFilter(pFilter),
-	_pCurrent(0)
+	_pCurrent(nullptr)
 {
 }
 
 
-NodeIterator::NodeIterator(const NodeIterator& iterator):
-	_pRoot(iterator._pRoot),
-	_whatToShow(iterator._whatToShow),
-	_pFilter(iterator._pFilter),
-	_pCurrent(iterator._pCurrent)
-{
-}
+NodeIterator::NodeIterator(const NodeIterator& iterator)
+	
+= default;
 
 
 NodeIterator& NodeIterator::operator = (const NodeIterator& iterator)
@@ -54,8 +50,7 @@ NodeIterator& NodeIterator::operator = (const NodeIterator& iterator)
 
 
 NodeIterator::~NodeIterator()
-{
-}
+= default;
 
 
 Node* NodeIterator::nextNode()
@@ -88,8 +83,8 @@ Node* NodeIterator::previousNode()
 
 void NodeIterator::detach()
 {
-	_pRoot    = 0;
-	_pCurrent = 0;
+	_pRoot    = nullptr;
+	_pCurrent = nullptr;
 }
 
 
@@ -140,13 +135,13 @@ Node* NodeIterator::next() const
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
-	return 0;
+	return nullptr;
 }
 
 
 Node* NodeIterator::previous() const
 {
-	if (_pCurrent == _pRoot) return 0;
+	if (_pCurrent == _pRoot) return nullptr;
 	Node* pPrev = _pCurrent->previousSibling();
 	while (pPrev)
 	{
@@ -163,7 +158,7 @@ Node* NodeIterator::previous() const
 Node* NodeIterator::last()
 {
 	_pCurrent = _pRoot;
-	Node* pLast = 0;
+	Node* pLast = nullptr;
 	while (_pCurrent)
 	{
 		pLast = _pCurrent;

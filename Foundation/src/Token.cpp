@@ -21,13 +21,11 @@ namespace Poco {
 
 
 Token::Token()
-{
-}
+= default;
 
 
 Token::~Token()
-{
-}
+= default;
 
 
 bool Token::start(char c, std::istream& istr)
@@ -93,13 +91,11 @@ char Token::asChar() const
 
 
 InvalidToken::InvalidToken()
-{
-}
+= default;
 
 
 InvalidToken::~InvalidToken()
-{
-}
+= default;
 
 
 Token::Class InvalidToken::tokenClass() const
@@ -109,13 +105,11 @@ Token::Class InvalidToken::tokenClass() const
 
 
 EOFToken::EOFToken()
-{
-}
+= default;
 
 
 EOFToken::~EOFToken()
-{
-}
+= default;
 
 
 Token::Class EOFToken::tokenClass() const
@@ -125,13 +119,11 @@ Token::Class EOFToken::tokenClass() const
 
 
 WhitespaceToken::WhitespaceToken()
-{
-}
+= default;
 
 
 WhitespaceToken::~WhitespaceToken()
-{
-}
+= default;
 
 
 Token::Class WhitespaceToken::tokenClass() const

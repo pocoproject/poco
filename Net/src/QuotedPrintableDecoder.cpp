@@ -34,8 +34,7 @@ QuotedPrintableDecoderBuf::QuotedPrintableDecoderBuf(std::istream& istr):
 
 
 QuotedPrintableDecoderBuf::~QuotedPrintableDecoderBuf()
-{
-}
+= default;
 
 
 int QuotedPrintableDecoderBuf::readFromDevice()
@@ -77,8 +76,7 @@ QuotedPrintableDecoderIOS::QuotedPrintableDecoderIOS(std::istream& istr): _buf(i
 
 
 QuotedPrintableDecoderIOS::~QuotedPrintableDecoderIOS()
-{
-}
+= default;
 
 
 QuotedPrintableDecoderBuf* QuotedPrintableDecoderIOS::rdbuf()
@@ -95,8 +93,7 @@ QuotedPrintableDecoder::QuotedPrintableDecoder(std::istream& istr):
 
 
 QuotedPrintableDecoder::~QuotedPrintableDecoder()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

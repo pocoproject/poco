@@ -9,7 +9,9 @@
 
 
 #include "ImplGenerator.h"
+
 #include "Poco/Exception.h"
+#include <utility>
 
 
 using namespace std::string_literals;
@@ -20,9 +22,9 @@ namespace ActiveRecord {
 namespace Compiler {
 
 
-ImplGenerator::ImplGenerator(const std::string& source, std::ostream& stream, const Class& clazz, const ClassMap& classes):
+ImplGenerator::ImplGenerator(const std::string& source, std::ostream& stream, Class  clazz, const ClassMap& classes):
 	CodeGenerator(source, stream),
-	_class(clazz),
+	_class(std::move(clazz)),
 	_classes(classes)
 {
 }

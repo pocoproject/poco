@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/ArchiveStrategy.h"
 #include "Poco/Ascii.h"
 
@@ -29,22 +31,21 @@ using namespace Keywords;
 const std::string ArchiveStrategy::DEFAULT_ARCHIVE_DESTINATION = "T_POCO_LOG_ARCHIVE";
 
 
-ArchiveStrategy::ArchiveStrategy(const std::string& connector,
-	const std::string& connect,
-	const std::string& source,
-	const std::string& destination):
-	_connector(connector),
-	_connect(connect),
-	_source(source),
-	_destination(destination)
+ArchiveStrategy::ArchiveStrategy(std::string  connector,
+	std::string  connect,
+	std::string  source,
+	std::string  destination):
+	_connector(std::move(connector)),
+	_connect(std::move(connect)),
+	_source(std::move(source)),
+	_destination(std::move(destination))
 {
 	open();
 }
 
 
 ArchiveStrategy::~ArchiveStrategy()
-{
-}
+= default;
 
 
 void ArchiveStrategy::open()
@@ -74,8 +75,7 @@ ArchiveByAgeStrategy::ArchiveByAgeStrategy(const std::string& connector,
 
 
 ArchiveByAgeStrategy::~ArchiveByAgeStrategy()
-{
-}
+= default;
 
 
 void ArchiveByAgeStrategy::archive()

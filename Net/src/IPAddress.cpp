@@ -144,7 +144,7 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length)
-	: _pImpl(0)
+	: _pImpl(nullptr)
 {
 	if (length == sizeof(struct in_addr))
 		newIPv4(addr);
@@ -222,8 +222,7 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 
 
 IPAddress::~IPAddress()
-{
-}
+= default;
 
 
 IPAddress& IPAddress::operator = (const IPAddress& addr)
@@ -535,7 +534,7 @@ unsigned IPAddress::prefixLength() const
 std::string& IPAddress::compressV6(std::string& v6addr)
 {
 	// get rid of leading zeros at the beginning
-	while (v6addr.size() && v6addr[0] == '0') v6addr.erase(v6addr.begin());
+	while (!v6addr.empty() && v6addr[0] == '0') v6addr.erase(v6addr.begin());
 
 	// get rid of leading zeros in the middle
 	while (v6addr.find(":0") != std::string::npos)
@@ -652,7 +651,7 @@ std::vector<unsigned char> IPAddress::toBytes() const
 {
 	std::size_t sz = 0;
 	std::vector<unsigned char> bytes;
-	const void* ptr = 0;
+	const void* ptr = nullptr;
 	switch (family())
 	{
 		case IPv4:

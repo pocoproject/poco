@@ -31,7 +31,7 @@ class MongoDB_API GetMoreRequest: public RequestMessage
 	/// after a query request is send (OP_GETMORE).
 {
 public:
-	GetMoreRequest(const std::string& collectionName, Int64 cursorID);
+	GetMoreRequest(std::string  collectionName, Int64 cursorID);
 		/// Creates a GetMoreRequest for the give collection and cursor.
 		///
 		/// The full collection name is the concatenation of the database
@@ -40,7 +40,7 @@ public:
 		/// "foo.bar". The cursorID has been returned by the response on the query request.
 		/// By default the numberToReturn is set to 100.
 
-	virtual ~GetMoreRequest();
+	~GetMoreRequest() override;
 		/// Destroys the GetMoreRequest.
 
 	Int32 getNumberToReturn() const;
@@ -53,7 +53,7 @@ public:
 		/// Returns the cursor ID.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 
 private:
 	std::string _fullCollectionName;

@@ -20,11 +20,12 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/MetaColumn.h"
-#include "Poco/SharedPtr.h"
 #include "Poco/RefCountedObject.h"
-#include <vector>
-#include <list>
+#include "Poco/SharedPtr.h"
 #include <deque>
+#include <list>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -46,8 +47,8 @@ public:
 	using Size = typename C::size_type;
 	using Type = typename C::value_type;
 
-	Column(const MetaColumn& metaColumn, Container* pData):
-		_metaColumn(metaColumn),
+	Column(MetaColumn  metaColumn, Container* pData):
+		_metaColumn(std::move(metaColumn)),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -71,8 +72,7 @@ public:
 
 	~Column()
 		/// Destroys the Column.
-	{
-	}
+	= default;
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -207,8 +207,8 @@ public:
 	using RIterator = Container::const_reverse_iterator;
 	using Size = Container::size_type;
 
-	Column(const MetaColumn& metaColumn, Container* pData):
-		_metaColumn(metaColumn),
+	Column(MetaColumn  metaColumn, Container* pData):
+		_metaColumn(std::move(metaColumn)),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -226,8 +226,7 @@ public:
 
 	~Column()
 		/// Destroys the Column.
-	{
-	}
+	= default;
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -350,8 +349,8 @@ public:
 	using RIterator = typename Container::const_reverse_iterator;
 	using Size = typename Container::size_type;
 
-	Column(const MetaColumn& metaColumn, std::list<T>* pData):
-		_metaColumn(metaColumn),
+	Column(MetaColumn  metaColumn, std::list<T>* pData):
+		_metaColumn(std::move(metaColumn)),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -367,8 +366,7 @@ public:
 
 	~Column()
 		/// Destroys the Column.
-	{
-	}
+	= default;
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.

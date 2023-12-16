@@ -19,13 +19,11 @@ namespace Poco {
 
 
 Configurable::Configurable()
-{
-}
+= default;
 
 
 Configurable::~Configurable()
-{
-}
+= default;
 
 
 } // namespace Poco

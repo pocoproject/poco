@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/SAX/InputSource.h"
 
 
@@ -20,30 +22,29 @@ namespace XML {
 
 
 InputSource::InputSource():
-	_bistr(0),
-	_cistr(0)
+	_bistr(nullptr),
+	_cistr(nullptr)
 {
 }
 
 
-InputSource::InputSource(const XMLString& systemId):
-	_systemId(systemId),
-	_bistr(0),
-	_cistr(0)
+InputSource::InputSource(XMLString  systemId):
+	_systemId(std::move(systemId)),
+	_bistr(nullptr),
+	_cistr(nullptr)
 {
 }
 
 
 InputSource::InputSource(XMLByteInputStream& bistr):
 	_bistr(&bistr),
-	_cistr(0)
+	_cistr(nullptr)
 {
 }
 
 
 InputSource::~InputSource()
-{
-}
+= default;
 
 
 void InputSource::setPublicId(const XMLString& publicId)

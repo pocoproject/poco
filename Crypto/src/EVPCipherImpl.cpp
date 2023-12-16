@@ -16,9 +16,10 @@
 #include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/Exception.h"
 #include "Poco/Logger.h"
+#include <cstring>
 #include <openssl/err.h>
 #include <openssl/evp.h>
-#include <cstring>
+#include <utility>
 
 
 namespace Poco {
@@ -33,7 +34,7 @@ namespace
 		while ((err = ERR_get_error()))
 		{
 			if (!msg.empty()) msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -43,7 +44,7 @@ namespace
 	{
 	public:
 		EVPPKeyContext() = delete;
-		EVPPKeyContext(const EVP_PKEY* pEVP) : _pCtx(EVP_PKEY_CTX_new(const_cast<EVP_PKEY*>(pEVP), NULL))
+		EVPPKeyContext(const EVP_PKEY* pEVP) : _pCtx(EVP_PKEY_CTX_new(const_cast<EVP_PKEY*>(pEVP), nullptr))
 		{
 			if (!_pCtx)
 			{
@@ -73,7 +74,7 @@ namespace
 			_pEVP(pEVP),
 			_pCtx(_pEVP),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 		{
 			std::string fmt = "EVPEncryptImpl():%s()";
 			poco_check_ptr(_pEVP);
@@ -90,27 +91,27 @@ namespace
 			_pBuf = new unsigned char[_blockSize];
 		}
 
-		~EVPEncryptImpl()
+		~EVPEncryptImpl() override
 		{
 			delete [] _pBuf;
 		}
 
-		std::size_t blockSize() const
+		std::size_t blockSize() const override
 		{
 			return _blockSize;
 		}
 
-		std::string getTag(std::size_t)
+		std::string getTag(std::size_t) override
 		{
 			return "";
 		}
 
-		void setTag(const std::string&)
+		void setTag(const std::string&) override
 		{
 		}
 
 		std::streamsize transform(const unsigned char* input, std::streamsize inputLength,
-			unsigned char* output, std::streamsize outputLength)
+			unsigned char* output, std::streamsize outputLength) override
 		{
 			std::string fmt = "EVPEncryptImpl::transform():%s()";
 			std::streamsize maxSize = static_cast<std::streamsize>(maxDataSize(input, inputLength));
@@ -126,7 +127,7 @@ namespace
 				{
 					poco_assert (outputLength >= evpSize);
 					std::size_t outLen;
-					if (EVP_PKEY_encrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
+					if (EVP_PKEY_encrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt(NULL)")));
 					if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(maxSize)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
@@ -148,7 +149,7 @@ namespace
 			return rc;
 		}
 
-		std::streamsize finalize(unsigned char*	output, std::streamsize length)
+		std::streamsize finalize(unsigned char*	output, std::streamsize length) override
 		{
 			poco_assert (length >= blockSize());
 			poco_assert (_pos <= maxDataSize(output, length));
@@ -156,7 +157,7 @@ namespace
 			std::size_t outLen = 0;
 			if (_pos > 0)
 			{
-				if (EVP_PKEY_encrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
+				if (EVP_PKEY_encrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
 				if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
@@ -169,7 +170,7 @@ namespace
 		{
 			std::string fmt = "EVPEncryptImpl::maxDataSize():%s()";
 			std::size_t outLength = 0;
-			if (EVP_PKEY_encrypt(_pCtx, NULL, &outLength, pIO, length) <= 0)
+			if (EVP_PKEY_encrypt(_pCtx, nullptr, &outLength, pIO, length) <= 0)
 				throwError(Poco::format(fmt, std::string("EVP_PKEY_encrypt")));
 			return outLength;
 		}
@@ -189,7 +190,7 @@ namespace
 			_pEVP(pEVP),
 			_pCtx(_pEVP),
 			_pos(0),
-			_pBuf(0)
+			_pBuf(nullptr)
 		{
 			std::string fmt = "EVPDecryptImpl():%s()";
 			poco_check_ptr(_pEVP);
@@ -203,27 +204,27 @@ namespace
 			_pBuf = new unsigned char[_blockSize];
 		}
 
-		~EVPDecryptImpl()
+		~EVPDecryptImpl() override
 		{
 			delete [] _pBuf;
 		}
 
-		std::size_t blockSize() const
+		std::size_t blockSize() const override
 		{
 			return _blockSize;
 		}
 
-		std::string getTag(std::size_t)
+		std::string getTag(std::size_t) override
 		{
 			return "";
 		}
 
-		void setTag(const std::string&)
+		void setTag(const std::string&) override
 		{
 		}
 
 		std::streamsize transform(const unsigned char* input, std::streamsize inputLength,
-			unsigned char* output, std::streamsize outputLength)
+			unsigned char* output, std::streamsize outputLength) override
 		{
 			std::string fmt = "EVPDecryptImpl::transform():%s()";
 			std::streamsize evpSize = static_cast<std::streamsize>(_blockSize);
@@ -237,7 +238,7 @@ namespace
 				if (missing == 0)
 				{
 					std::size_t outLen = 0;
-					if (EVP_PKEY_decrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
+					if (EVP_PKEY_decrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
 					if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 						throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt")));
@@ -258,12 +259,12 @@ namespace
 			return rc;
 		}
 
-		std::streamsize finalize(unsigned char* output, std::streamsize length)
+		std::streamsize finalize(unsigned char* output, std::streamsize length) override
 		{
 			poco_assert (length >= _blockSize);
 			std::string fmt = "EVPDecryptImpl::finalize():%s()";
 			std::size_t outLen = 0;
-			if (EVP_PKEY_decrypt(_pCtx, NULL, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
+			if (EVP_PKEY_decrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
 			poco_assert (length >= outLen);
 			if (_pos > 0)
@@ -284,15 +285,14 @@ namespace
 }
 
 
-EVPCipherImpl::EVPCipherImpl(const EVPPKey& key):
-	_key(key)
+EVPCipherImpl::EVPCipherImpl(EVPPKey  key):
+	_key(std::move(key))
 {
 }
 
 
 EVPCipherImpl::~EVPCipherImpl()
-{
-}
+= default;
 
 
 CryptoTransform::Ptr EVPCipherImpl::createEncryptor()

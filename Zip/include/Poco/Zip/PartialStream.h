@@ -33,7 +33,7 @@ class Zip_API PartialStreamBuf: public Poco::BufferedStreamBuf
 	/// A PartialStreamBuf is a class that limits one view on an inputstream to a selected view range
 {
 public:
-	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& prefix, const std::string& postfix, bool initStream);
+	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, std::string  prefix, std::string  postfix, bool initStream);
 		/// Creates the PartialStream.
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
 		/// to position start
@@ -48,7 +48,7 @@ public:
 		///     start = 3; end = 1
 		///     write("hello", 5) -> "l"
 
-	~PartialStreamBuf();
+	~PartialStreamBuf() override;
 		/// Destroys the PartialStream.
 
 	void close();
@@ -57,9 +57,9 @@ public:
 	Poco::UInt64 bytesWritten() const;
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
 
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -111,7 +111,7 @@ public:
 		///     start = 3; end = 1
 		///     write("hello", 5) -> "l"
 
-	~PartialIOS();
+	~PartialIOS() override;
 		/// Destroys the stream.
 
 	PartialStreamBuf* rdbuf();
@@ -133,7 +133,7 @@ public:
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
 		/// to position start
 
-	~PartialInputStream();
+	~PartialInputStream() override;
 		/// Destroys the PartialInputStream.
 };
 
@@ -157,7 +157,7 @@ public:
 		///     start = 3; end = 0
 		///     write("hello", 5) -> "lo"
 
-	~PartialOutputStream();
+	~PartialOutputStream() override;
 		/// Destroys the PartialOutputStream.
 
 	void close();

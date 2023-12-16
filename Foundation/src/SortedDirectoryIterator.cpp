@@ -57,8 +57,7 @@ SortedDirectoryIterator::SortedDirectoryIterator(const Path& path)
 
 
 SortedDirectoryIterator::~SortedDirectoryIterator()
-{
-}
+= default;
 
 
 SortedDirectoryIterator& SortedDirectoryIterator::operator ++()

@@ -31,8 +31,7 @@ MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
 
 
 MySQLStatementImpl::~MySQLStatementImpl()
-{
-}
+= default;
 
 
 std::size_t MySQLStatementImpl::columnsReturned() const

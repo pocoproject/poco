@@ -21,7 +21,7 @@ namespace XML {
 
 
 WhitespaceFilter::WhitespaceFilter():
-	_pLexicalHandler(0),
+	_pLexicalHandler(nullptr),
 	_filter(true)
 {
 }
@@ -29,15 +29,14 @@ WhitespaceFilter::WhitespaceFilter():
 
 WhitespaceFilter::WhitespaceFilter(XMLReader* pReader):
 	XMLFilterImpl(pReader),
-	_pLexicalHandler(0),
+	_pLexicalHandler(nullptr),
 	_filter(true)
 {
 }
 
 
 WhitespaceFilter::~WhitespaceFilter()
-{
-}
+= default;
 
 
 void WhitespaceFilter::setProperty(const XMLString& propertyId, const XMLString& value)

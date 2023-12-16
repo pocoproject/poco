@@ -119,8 +119,7 @@ QuotedPrintableEncoderIOS::QuotedPrintableEncoderIOS(std::ostream& ostr): _buf(o
 
 
 QuotedPrintableEncoderIOS::~QuotedPrintableEncoderIOS()
-{
-}
+= default;
 
 
 int QuotedPrintableEncoderIOS::close()
@@ -143,8 +142,7 @@ QuotedPrintableEncoder::QuotedPrintableEncoder(std::ostream& ostr):
 
 
 QuotedPrintableEncoder::~QuotedPrintableEncoder()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

@@ -51,9 +51,8 @@ StreamSocket::StreamSocket(const Socket& socket): Socket(socket)
 }
 
 
-StreamSocket::StreamSocket(const StreamSocket& socket): Socket(socket)
-{
-}
+StreamSocket::StreamSocket(const StreamSocket& socket) 
+= default;
 
 
 StreamSocket::StreamSocket(SocketImpl* pImpl): Socket(pImpl)
@@ -64,8 +63,7 @@ StreamSocket::StreamSocket(SocketImpl* pImpl): Socket(pImpl)
 
 
 StreamSocket::~StreamSocket()
-{
-}
+= default;
 
 
 StreamSocket& StreamSocket::operator = (const Socket& socket)

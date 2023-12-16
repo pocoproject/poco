@@ -27,6 +27,7 @@
 #include "Poco/StringTokenizer.h"
 
 #include <iostream>
+#include <utility>
 
 namespace
 {
@@ -110,7 +111,7 @@ Poco::FastMutex HTTPDigestCredentials::_nonceMutex;
 
 class HTTPDigestCredentials::DigestEngineProvider {
 public:
-	DigestEngineProvider(std::string algorithm): _algorithm(algorithm) {
+	DigestEngineProvider(std::string algorithm): _algorithm(std::move(algorithm)) {
 		_isSessionAlgorithm = _algorithm.find("sess") != std::string::npos;
 	}
 
@@ -134,7 +135,7 @@ public:
 		}
 	}
 
-	bool isSessionAlgorithm() {
+	bool isSessionAlgorithm() const {
 		return _isSessionAlgorithm;
 	}
 private:
@@ -148,20 +149,18 @@ private:
 };
 
 HTTPDigestCredentials::HTTPDigestCredentials()
-{
-}
+= default;
 
 
-HTTPDigestCredentials::HTTPDigestCredentials(const std::string& username, const std::string& password):
-	_username(username),
-	_password(password)
+HTTPDigestCredentials::HTTPDigestCredentials(std::string  username, std::string  password):
+	_username(std::move(username)),
+	_password(std::move(password))
 {
 }
 
 
 HTTPDigestCredentials::~HTTPDigestCredentials()
-{
-}
+= default;
 
 
 void HTTPDigestCredentials::reset()
@@ -278,13 +277,13 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 	{
 		Poco::StringTokenizer tok(qop, ",", Poco::StringTokenizer::TOK_TRIM);
 		bool qopSupported = false;
-		for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+		for (const auto & it : tok)
 		{
-			if (icompare(*it, AUTH_PARAM) == 0)
+			if (icompare(it, AUTH_PARAM) == 0)
 			{
 				qopSupported = true;
 				_requestAuthParams.set(CNONCE_PARAM, createNonce());
-				_requestAuthParams.set(QOP_PARAM, *it);
+				_requestAuthParams.set(QOP_PARAM, it);
 				updateAuthParams(request);
 				break;
 			}

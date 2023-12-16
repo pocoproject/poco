@@ -274,7 +274,7 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 protected:
-	virtual ~Node();
+	~Node() override;
 };
 
 

@@ -21,8 +21,7 @@ namespace Poco {
 
 
 TimedNotificationQueue::TimedNotificationQueue()
-{
-}
+= default;
 
 
 TimedNotificationQueue::~TimedNotificationQueue()
@@ -78,7 +77,7 @@ Notification* TimedNotificationQueue::dequeueNotification()
 			return pNf.duplicate();
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -93,7 +92,7 @@ Notification* TimedNotificationQueue::dequeueNextNotification()
 		_nfQueue.erase(it);
 		return pNf.duplicate();
 	}
-	return 0;
+	return nullptr;
 }
 
 Notification* TimedNotificationQueue::waitDequeueNotification()
@@ -163,9 +162,9 @@ Notification* TimedNotificationQueue::waitDequeueNotification(long milliseconds)
 			_nfAvailable.tryWait(milliseconds);
 			milliseconds -= static_cast<long>((now.elapsed() + 999)/1000);
 		}
-		else return 0;
+		else return nullptr;
 	}
-	return 0;
+	return nullptr;
 }
 
 

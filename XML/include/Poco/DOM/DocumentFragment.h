@@ -61,15 +61,15 @@ class XML_API DocumentFragment: public AbstractContainerNode
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 protected:
 	DocumentFragment(Document* pOwnerDocument);
 	DocumentFragment(Document* pOwnerDocument, const DocumentFragment& fragment);
-	~DocumentFragment();
+	~DocumentFragment() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	static const XMLString NODE_NAME;

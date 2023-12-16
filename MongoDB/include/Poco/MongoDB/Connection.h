@@ -77,7 +77,7 @@ public:
 	Connection(const std::string& host, int port);
 		/// Creates a Connection connected to the given MongoDB instance at host and port.
 
-	Connection(const Poco::Net::SocketAddress& addrs);
+	Connection(Poco::Net::SocketAddress  addrs);
 		/// Creates a Connection connected to the given MongoDB instance at the given address.
 
 	Connection(const Poco::Net::StreamSocket& socket);

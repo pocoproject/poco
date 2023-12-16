@@ -29,13 +29,11 @@ namespace Data {
 
 
 SessionPoolContainer::SessionPoolContainer()
-{
-}
+= default;
 
 
 SessionPoolContainer::~SessionPoolContainer()
-{
-}
+= default;
 
 
 void SessionPoolContainer::add(SessionPool* pPool)
@@ -82,12 +80,7 @@ bool SessionPoolContainer::isActive(const std::string& sessionKey,
 		sessionKey : SessionPool::name(sessionKey, connectionString);
 
 	SessionPoolMap::const_iterator it = _sessionPools.find(name);
-	if (it != _sessionPools.end() && it->second->isActive())
-	{
-		return true;
-	}
-
-	return false;
+	return it != _sessionPools.end() && it->second->isActive();
 }
 
 
@@ -100,7 +93,7 @@ Session SessionPoolContainer::get(const std::string& name)
 SessionPool& SessionPoolContainer::getPool(const std::string& name)
 {
 	URI uri(name);
-	std::string path = uri.getPath();
+	const std::string& path = uri.getPath();
 	poco_assert (!path.empty());
 	std::string n = Session::uri(uri.getScheme(), path.substr(1));
 

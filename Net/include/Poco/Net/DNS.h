@@ -180,7 +180,7 @@ protected:
 	static void aierror(int code, const std::string& arg);
 		/// Throws an exception according to the getaddrinfo() error code.
 
-	static std::string encodeIDNLabel(const std::string& idn);
+	static std::string encodeIDNLabel(const std::string& label);
 		/// Encodes the given IDN (internationalized domain name) label, which must
 		/// be in UTF-8 encoding.
 		///

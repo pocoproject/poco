@@ -461,24 +461,24 @@ public:
 		/// Returns the socket descriptor for the
 		/// underlying native socket.
 
-	void ioctl(poco_ioctl_request_t request, int& arg);
+	void ioctl(poco_ioctl_request_t request, int& arg) const;
 		/// A wrapper for the ioctl system call.
 
-	void ioctl(poco_ioctl_request_t request, void* arg);
+	void ioctl(poco_ioctl_request_t request, void* arg) const;
 		/// A wrapper for the ioctl system call.
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	int fcntl(poco_fcntl_request_t request);
+	int fcntl(poco_fcntl_request_t request) const;
 		/// A wrapper for the fcntl system call.
 
-	int fcntl(poco_fcntl_request_t request, long arg);
+	int fcntl(poco_fcntl_request_t request, long arg) const;
 		/// A wrapper for the fcntl system call.
 #endif
 
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 
-	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0);
+	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0) const;
 		/// Sends file using system function
 		/// for posix systems - with sendfile[64](...)
 		/// for windows - with TransmitFile(...)
@@ -490,7 +490,7 @@ protected:
 	SocketImpl(poco_socket_t sockfd);
 		/// Creates a SocketImpl using the given native socket.
 
-	virtual ~SocketImpl();
+	~SocketImpl() override;
 		/// Destroys the SocketImpl.
 		/// Closes the socket if it is still open.
 
@@ -518,7 +518,7 @@ protected:
 		/// The third argument, proto, is normally set to 0,
 		/// except for raw sockets.
 
-	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
+	void reset(poco_socket_t aSocket = POCO_INVALID_SOCKET);
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
 
 	void checkBrokenTimeout(SelectMode mode);

@@ -190,7 +190,7 @@ protected:
 	const std::string& host() const;
 
 private:
-	void sendCommands(const MailMessage& message, const Recipients* pRecipients = 0);
+	void sendCommands(const MailMessage& message, const Recipients* pRecipients = nullptr);
 	void transportMessage(const MailMessage& message);
 
 	std::string  _host;

@@ -51,10 +51,10 @@ public:
 	AbstractHTTPRequestHandler();
 		/// Creates the AbstractHTTPRequestHandler.
 
-	virtual ~AbstractHTTPRequestHandler();
+	~AbstractHTTPRequestHandler() override;
 		/// Destroys the AbstractHTTPRequestHandler.
 
-	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response);
+	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override;
 		/// This class implements some common behavior,
 		/// before calling run() to actually handle the request:
 		///   - save request and response objects;

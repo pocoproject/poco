@@ -59,11 +59,11 @@ public:
 
 	ThreadTarget(const ThreadTarget& te);
 
-	~ThreadTarget();
+	~ThreadTarget() override;
 
 	ThreadTarget& operator = (const ThreadTarget& te);
 
-	void run();
+	void run() override;
 
 private:
 	ThreadTarget();

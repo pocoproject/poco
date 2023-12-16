@@ -41,9 +41,8 @@ public:
 	{
 	}
 
-	~ArchiveCompressor()
-	{
-	}
+	~ArchiveCompressor() override
+	= default;
 
 	ActiveMethod<void, std::string, ArchiveCompressor, ActiveStarter<ActiveDispatcher>> compress;
 
@@ -73,7 +72,6 @@ protected:
 		}
 		File f(path);
 		f.remove();
-		return;
 	}
 };
 
@@ -85,7 +83,7 @@ protected:
 
 ArchiveStrategy::ArchiveStrategy():
 	_compress(false),
-	_pCompressor(0)
+	_pCompressor(nullptr)
 {
 }
 
@@ -152,13 +150,11 @@ bool ArchiveStrategy::exists(const std::string& name)
 
 
 ArchiveByNumberStrategy::ArchiveByNumberStrategy()
-{
-}
+= default;
 
 
 ArchiveByNumberStrategy::~ArchiveByNumberStrategy()
-{
-}
+= default;
 
 
 LogFile* ArchiveByNumberStrategy::open(LogFile* pFile)

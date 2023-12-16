@@ -58,7 +58,7 @@ public:
 		/// and more than minCapacity threads are running, the thread
 		/// is killed. Threads are created with given stack size.
 
-	ThreadPool(const std::string& name,
+	ThreadPool(std::string  name,
 		int minCapacity = 2,
 		int maxCapacity = 16,
 		int idleTime = 60,

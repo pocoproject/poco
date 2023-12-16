@@ -33,8 +33,7 @@ NTPClient::NTPClient(IPAddress::Family family, int timeout):
 
 
 NTPClient::~NTPClient()
-{
-}
+= default;
 
 
 int NTPClient::request(const std::string& address) const

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/AbstractBinding.h"
 
 
@@ -19,11 +21,11 @@ namespace Poco {
 namespace Data {
 
 
-AbstractBinding::AbstractBinding(const std::string& name,
+AbstractBinding::AbstractBinding(std::string  name,
 	Direction direction,
 	Poco::UInt32 bulkSize):
-	_pBinder(0),
-	_name(name),
+	_pBinder(nullptr),
+	_name(std::move(name)),
 	_direction(direction),
 	_bulkSize(bulkSize)
 {
@@ -31,8 +33,7 @@ AbstractBinding::AbstractBinding(const std::string& name,
 
 
 AbstractBinding::~AbstractBinding()
-{
-}
+= default;
 
 
 void AbstractBinding::setBinder(BinderPtr pBinder)

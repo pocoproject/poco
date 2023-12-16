@@ -38,13 +38,13 @@ class Foundation_API Base32EncoderBuf: public UnbufferedStreamBuf
 {
 public:
 	Base32EncoderBuf(std::ostream& ostr, bool padding = true);
-	~Base32EncoderBuf();
+	~Base32EncoderBuf() override;
 
 	int close();
 		/// Closes the stream buffer.
 
 private:
-	int writeToDevice(char c);
+	int writeToDevice(char c) override;
 
 	unsigned char   _group[5];
 	int             _groupLength;
@@ -68,7 +68,7 @@ class Foundation_API Base32EncoderIOS: public virtual std::ios
 {
 public:
 	Base32EncoderIOS(std::ostream& ostr, bool padding = true);
-	~Base32EncoderIOS();
+	~Base32EncoderIOS() override;
 	int close();
 	Base32EncoderBuf* rdbuf();
 
@@ -98,7 +98,7 @@ class Foundation_API Base32Encoder: public Base32EncoderIOS, public std::ostream
 {
 public:
 	Base32Encoder(std::ostream& ostr, bool padding = true);
-	~Base32Encoder();
+	~Base32Encoder() override;
 
 private:
 	Base32Encoder(const Base32Encoder&);

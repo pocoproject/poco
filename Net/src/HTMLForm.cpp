@@ -13,21 +13,21 @@
 
 
 #include "Poco/Net/HTMLForm.h"
+#include "Poco/CountingStream.h"
 #include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/PartSource.h"
-#include "Poco/Net/PartHandler.h"
-#include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
-#include "Poco/Net/NullPartHandler.h"
+#include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/NullPartHandler.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Net/PartSource.h"
 #include "Poco/NullStream.h"
-#include "Poco/CountingStream.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
 #include "Poco/String.h"
-#include "Poco/CountingStream.h"
+#include "Poco/URI.h"
 #include "Poco/UTF8String.h"
 #include <sstream>
+#include <utility>
 
 
 using Poco::NullInputStream;
@@ -77,10 +77,10 @@ HTMLForm::HTMLForm():
 }
 
 
-HTMLForm::HTMLForm(const std::string& encoding):
+HTMLForm::HTMLForm(std::string  encoding):
 	_fieldLimit(DFL_FIELD_LIMIT),
 	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
-	_encoding(encoding)
+	_encoding(std::move(encoding))
 {
 }
 
@@ -404,15 +404,15 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	HTMLFormCountingOutputStream* pCountingOutputStream(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
 
 	MultipartWriter writer(ostr, _boundary);
-	for (auto it = begin(); it != end(); ++it)
+	for (const auto & it : *this)
 	{
 		MessageHeader header;
 		std::string disp("form-data; name=\"");
-		disp.append(it->first);
+		disp.append(it.first);
 		disp.append("\"");
 		header.set("Content-Disposition", disp);
 		writer.nextPart(header);
-		ostr << it->second;
+		ostr << it.second;
 	}
 	for (const auto& part: _parts)
 	{

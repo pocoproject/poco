@@ -20,10 +20,11 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
+#include "Poco/MongoDB/MongoDB.h"
 #include <algorithm>
 #include <cstdlib>
+#include <utility>
 
 
 namespace Poco {
@@ -34,8 +35,8 @@ class Array;
 class ElementFindByName
 {
 public:
-	ElementFindByName(const std::string& name):
-		_name(name)
+	ElementFindByName(std::string  name):
+		_name(std::move(name))
 	{
 	}
 
@@ -124,7 +125,7 @@ public:
 			if (ElementTraits<T>::TypeId == element->type())
 			{
 				ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-				if (concrete != 0)
+				if (concrete != nullptr)
 				{
 					return concrete->value();
 				}
@@ -148,7 +149,7 @@ public:
 		if (ElementTraits<T>::TypeId == element->type())
 		{
 			ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-			if (concrete != 0)
+			if (concrete != nullptr)
 			{
 				return concrete->value();
 			}
@@ -232,9 +233,9 @@ inline bool Document::empty() const
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	for (const auto & _element : _elements)
 	{
-		keys.push_back((*it)->name());
+		keys.push_back(_element->name());
 	}
 }
 

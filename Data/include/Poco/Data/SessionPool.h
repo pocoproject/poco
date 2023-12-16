@@ -67,8 +67,8 @@ class Data_API SessionPool: public RefCountedObject
 	///     ...
 {
 public:
-	SessionPool(const std::string& connector,
-		const std::string& connectionString,
+	SessionPool(std::string  connector,
+		std::string  connectionString,
 		int minSessions = 1,
 		int maxSessions = 32,
 		int idleTime = 60,
@@ -80,7 +80,7 @@ public:
 		/// If a session has been idle for more than idleTime seconds, and more than
 		/// minSessions sessions are in the pool, the session is automatically destroyed.
 
-	~SessionPool();
+	~SessionPool() override;
 		/// Destroys the SessionPool.
 
 	Session get();

@@ -21,14 +21,14 @@ namespace Net {
 
 MailStreamBuf::MailStreamBuf(std::istream& istr):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_state(ST_CR_LF)
 {
 }
 
 
 MailStreamBuf::MailStreamBuf(std::ostream& ostr):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_state(ST_CR_LF)
 {
@@ -36,8 +36,7 @@ MailStreamBuf::MailStreamBuf(std::ostream& ostr):
 
 
 MailStreamBuf::~MailStreamBuf()
-{
-}
+= default;
 
 
 void MailStreamBuf::close()
@@ -178,8 +177,7 @@ MailIOS::MailIOS(std::ostream& ostr): _buf(ostr)
 
 
 MailIOS::~MailIOS()
-{
-}
+= default;
 
 
 void MailIOS::close()
@@ -202,8 +200,7 @@ MailInputStream::MailInputStream(std::istream& istr):
 
 
 MailInputStream::~MailInputStream()
-{
-}
+= default;
 
 
 MailOutputStream::MailOutputStream(std::ostream& ostr):
@@ -214,8 +211,7 @@ MailOutputStream::MailOutputStream(std::ostream& ostr):
 
 
 MailOutputStream::~MailOutputStream()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

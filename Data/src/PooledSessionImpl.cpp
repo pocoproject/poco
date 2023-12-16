@@ -149,7 +149,7 @@ void PooledSessionImpl::close()
 			}
 		}
 		_pHolder->owner().putBack(_pHolder);
-		_pHolder = 0;
+		_pHolder = nullptr;
 	}
 }
 

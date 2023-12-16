@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Util/Timer.h"
 #include "Poco/Notification.h"
 #include "Poco/ErrorHandler.h"
@@ -33,9 +35,8 @@ public:
 	{
 	}
 
-	~TimerNotification()
-	{
-	}
+	~TimerNotification() override
+	= default;
 
 	virtual bool execute() = 0;
 
@@ -57,11 +58,10 @@ public:
 	{
 	}
 
-	~StopNotification()
-	{
-	}
+	~StopNotification() override
+	= default;
 
-	bool execute()
+	bool execute() override
 	{
 		queue().clear();
 		return false;
@@ -77,11 +77,10 @@ public:
 	{
 	}
 
-	~CancelNotification()
-	{
-	}
+	~CancelNotification() override
+	= default;
 
-	bool execute()
+	bool execute() override
 	{
 		// Check if there's a StopNotification pending.
 		int numberOfPendingTasks = queue().size();
@@ -125,20 +124,19 @@ class TaskNotification: public TimerNotification
 public:
 	TaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask):
 		TimerNotification(queue),
-		_pTask(pTask)
+		_pTask(std::move(pTask))
 	{
 	}
 
-	~TaskNotification()
-	{
-	}
+	~TaskNotification() override
+	= default;
 
 	TimerTask::Ptr task()
 	{
 		return _pTask;
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		if (!_pTask->isCancelled())
 		{
@@ -177,11 +175,10 @@ public:
 	{
 	}
 
-	~PeriodicTaskNotification()
-	{
-	}
+	~PeriodicTaskNotification() override
+	= default;
 
-	bool execute()
+	bool execute() override
 	{
 		TaskNotification::execute();
 
@@ -212,11 +209,10 @@ public:
 	{
 	}
 
-	~FixedRateTaskNotification()
-	{
-	}
+	~FixedRateTaskNotification() override
+	= default;
 
-	bool execute()
+	bool execute() override
 	{
 		TaskNotification::execute();
 

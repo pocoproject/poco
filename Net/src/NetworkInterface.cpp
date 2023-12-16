@@ -34,8 +34,9 @@
 #endif
 #include <cstring>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <utility>
 
 
 #if defined(_MSC_VER)
@@ -50,7 +51,7 @@ using Poco::format;
 
 std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
 {
-	std::ios state(0);
+	std::ios state(nullptr);
 	state.copyfmt(os);
 	for (unsigned i = 0; i < mac.size(); ++i)
 	{
@@ -78,16 +79,16 @@ public:
 	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = 0);
-	NetworkInterfaceImpl(const std::string& name,
-		const std::string& displayName,
-		const std::string& adapterName,
+	NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(std::string  name,
+		std::string  displayName,
+		std::string  adapterName,
 		const IPAddress& address,
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		NetworkInterface::MACAddress* pMACAddress = 0);
+		NetworkInterface::MACAddress* pMACAddress = nullptr);
 
 	unsigned index() const;
 	const std::string& name() const;
@@ -137,7 +138,7 @@ public:
 	void setPhyParams();
 
 protected:
-	~NetworkInterfaceImpl();
+	~NetworkInterfaceImpl() override;
 
 private:
 	std::string _name;
@@ -174,10 +175,10 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
+NetworkInterfaceImpl::NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress):
+	_name(std::move(name)),
+	_displayName(std::move(displayName)),
+	_adapterName(std::move(adapterName)),
 	_index(index),
 	_broadcast(false),
 	_loopback(false),
@@ -194,10 +195,10 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
+NetworkInterfaceImpl::NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, unsigned index, NetworkInterface::MACAddress* pMACAddress):
+	_name(std::move(name)),
+	_displayName(std::move(displayName)),
+	_adapterName(std::move(adapterName)),
 	_index(index),
 	_broadcast(false),
 	_loopback(false),
@@ -213,17 +214,17 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
-	const std::string& displayName,
-	const std::string& adapterName,
+NetworkInterfaceImpl::NetworkInterfaceImpl(std::string  name,
+	std::string  displayName,
+	std::string  adapterName,
 	const IPAddress& address,
 	const IPAddress& subnetMask,
 	const IPAddress& broadcastAddress,
 	unsigned index,
 	NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
+	_name(std::move(name)),
+	_displayName(std::move(displayName)),
+	_adapterName(std::move(adapterName)),
 	_index(index),
 	_broadcast(false),
 	_loopback(false),
@@ -261,8 +262,7 @@ void NetworkInterfaceImpl::setPhyParams()
 
 
 NetworkInterfaceImpl::~NetworkInterfaceImpl()
-{
-}
+= default;
 
 
 bool NetworkInterfaceImpl::supportsIPv4() const
@@ -882,7 +882,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 
 		using List = NetworkInterface::AddressList;
 		const List& ipList = it->second.addressList();
-		if (ipList.size() > 0)
+		if (!ipList.empty())
 		{
 			List::const_iterator ipIt = ipList.begin();
 			List::const_iterator ipEnd = ipList.end();
@@ -1587,8 +1587,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* iface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* iface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");

@@ -84,7 +84,7 @@ public:
 	File(const File& file);
 		/// Copy constructor.
 
-	virtual ~File();
+	~File() override;
 		/// Destroys the file.
 
 	File& operator = (const File& file);

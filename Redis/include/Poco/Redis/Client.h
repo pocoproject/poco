@@ -84,7 +84,7 @@ public:
 	Client(const std::string& host, int port);
 		/// Constructor which connects to the given Redis host/port.
 
-	Client(const Net::SocketAddress& addrs);
+	Client(Net::SocketAddress  addrs);
 		/// Constructor which connects to the given Redis host/port.
 
 	Client(const Net::StreamSocket& socket);

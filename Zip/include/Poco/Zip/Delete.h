@@ -34,7 +34,7 @@ public:
 	Delete(const ZipLocalFileHeader& hdr);
 		/// Creates the Delete.
 
-	void execute(Compress& c, std::istream& input);
+	void execute(Compress& c, std::istream& input) override;
 		/// Throws away the ZipEntry
 
 private:

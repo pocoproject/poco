@@ -40,7 +40,7 @@ public:
 	LogStreamBuf(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
 		/// Creates the LogStream.
 
-	~LogStreamBuf();
+	~LogStreamBuf() override;
 		/// Destroys the LogStream.
 
 	void setPriority(Message::Priority priority);
@@ -59,7 +59,7 @@ public:
 		/// Sets the capacity of the internal message buffer to the given size.
 
 private:
-	int writeToDevice(char c);
+	int writeToDevice(char c) override;
 
 private:
 	Logger&           _logger;
@@ -76,7 +76,7 @@ class Foundation_API LogIOS: public virtual std::ios
 {
 public:
 	LogIOS(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
-	~LogIOS();
+	~LogIOS() override;
 	LogStreamBuf* rdbuf();
 
 protected:
@@ -108,7 +108,7 @@ public:
 		/// Creates the LogStream, using the logger identified
 		/// by loggerName, and sets the priority.
 
-	~LogStream();
+	~LogStream() override;
 		/// Destroys the LogStream.
 
 	LogStream& fatal();

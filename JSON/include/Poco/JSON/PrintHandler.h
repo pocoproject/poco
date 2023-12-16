@@ -44,56 +44,56 @@ public:
 	PrintHandler(std::ostream& out, unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.
 
-	~PrintHandler();
+	~PrintHandler() override;
 		/// Destroys the PrintHandler.
 
-	void reset();
+	void reset() override;
 		/// Resets the handler state.
 
-	void startObject();
+	void startObject() override;
 		/// The parser has read a '{'; a new object is started.
 		/// If indent is greater than zero, a newline will be appended.
 
-	void endObject();
+	void endObject() override;
 		/// The parser has read a '}'; the object is closed.
 
-	void startArray();
+	void startArray() override;
 		/// The parser has read a [; a new array will be started.
 		/// If indent is greater than zero, a newline will be appended.
 
-	void endArray();
+	void endArray() override;
 		/// The parser has read a ]; the array is closed.
 
-	void key(const std::string& k);
+	void key(const std::string& k) override;
 		/// A key of an object is read; it will be written to the output,
 		/// followed by a ':'. If indent is greater than zero, the colon
 		/// is padded by a space before and after.
 
-	void null();
+	void null() override;
 		/// A null value is read; "null" will be written to the output.
 
-	void value(int v);
+	void value(int v) override;
 		/// An integer value is read.
 
-	void value(unsigned v);
+	void value(unsigned v) override;
 		/// An unsigned value is read. This will only be triggered if the
 		/// value cannot fit into a signed int.
 
 #if defined(POCO_HAVE_INT64)
-	void value(Int64 v);
+	void value(Int64 v) override;
 		/// A 64-bit integer value is read; it will be written to the output.
 
-	void value(UInt64 v);
+	void value(UInt64 v) override;
 		/// An unsigned 64-bit integer value is read; it will be written to the output.
 #endif
 
-	void value(const std::string& value);
+	void value(const std::string& value) override;
 		/// A string value is read; it will be formatted and written to the output.
 
-	void value(double d);
+	void value(double d) override;
 		/// A double value is read; it will be written to the output.
 
-	void value(bool b);
+	void value(bool b) override;
 		/// A boolean value is read; it will be written to the output.
 
 	void comma();

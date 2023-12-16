@@ -20,8 +20,7 @@ namespace XML {
 
 
 ContentHandler::~ContentHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

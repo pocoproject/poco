@@ -57,7 +57,7 @@ public:
 	Command(const Command& copy);
 		/// Creates a command by copying another one.
 
-	virtual ~Command();
+	~Command() override;
 		/// Destroys the command.
 
 	static Command append(const std::string& key, const std::string& value);

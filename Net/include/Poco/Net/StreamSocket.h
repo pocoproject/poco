@@ -69,7 +69,7 @@ public:
 		/// Creates the StreamSocket with the SocketImpl
 		/// from another socket.
 
-	virtual ~StreamSocket();
+	~StreamSocket() override;
 		/// Destroys the StreamSocket.
 
 	StreamSocket& operator = (const Socket& socket);
@@ -187,7 +187,7 @@ public:
 		/// The flags parameter can be used to pass system-defined flags
 		/// for send() like MSG_OOB.
 
-	int sendBytes(Poco::FIFOBuffer& buffer);
+	int sendBytes(Poco::FIFOBuffer& fifoBuf);
 		/// Sends the contents of the given buffer through
 		/// the socket. FIFOBuffer has writable/readable transition
 		/// notifications which may be enabled to notify the caller when
@@ -234,7 +234,7 @@ public:
 		/// The flags parameter can be used to pass system-defined flags
 		/// for recv() like MSG_OOB, MSG_PEEK or MSG_WAITALL.
 
-	int receiveBytes(Poco::FIFOBuffer& buffer);
+	int receiveBytes(Poco::FIFOBuffer& fifoBuf);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received. FIFOBuffer has
 		/// writable/readable transition notifications which may be enabled

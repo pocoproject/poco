@@ -24,8 +24,7 @@ Stopwatch::Stopwatch(): _elapsed(0), _running(false)
 
 
 Stopwatch::~Stopwatch()
-{
-}
+= default;
 
 
 Clock::ClockDiff Stopwatch::elapsed() const

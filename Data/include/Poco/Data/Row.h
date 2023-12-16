@@ -82,12 +82,12 @@ public:
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
-		const RowFormatter::Ptr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = nullptr);
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
 		const SortMapPtr& pSortMap,
-		const RowFormatter::Ptr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = nullptr);
 		/// Creates the Row.
 
 	~Row();
@@ -194,20 +194,20 @@ public:
 	bool operator < (const Row& other) const;
 		/// Less-than operator.
 
-	const NameVecPtr names() const;
+	NameVecPtr names() const;
 		/// Returns the shared pointer to names vector.
 
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
-	void setFormatter(const RowFormatter::Ptr& pFormatter = 0);
+	void setFormatter(const RowFormatter::Ptr& pFormatter = nullptr);
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
 	const RowFormatter& getFormatter() const;
 		/// Returns the reference to the formatter.
 
-	void setSortMap(const SortMapPtr& pSortMap = 0);
+	void setSortMap(const SortMapPtr& pSortMap = nullptr);
 		/// Adds the sorting fields entry and takes the
 		/// shared ownership of it.
 
@@ -252,7 +252,7 @@ inline void Row::reset()
 }
 
 
-inline const Row::NameVecPtr Row::names() const
+inline Row::NameVecPtr Row::names() const
 {
 	return _pNames;
 }

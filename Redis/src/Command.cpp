@@ -28,14 +28,12 @@ Command::Command(const std::string& command): Array()
 }
 
 
-Command::Command(const Command& copy): Array(copy)
-{
-}
+Command::Command(const Command& copy) 
+= default;
 
 
 Command::~Command()
-{
-}
+= default;
 
 
 Command Command::append(const std::string& key, const std::string& value)
@@ -403,9 +401,9 @@ Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool 
 {
 	Command cmd(create ? "MSET" : "MSETNX");
 
-	for(std::map<std::string, std::string>::const_iterator it = keyvalues.begin(); it != keyvalues.end(); ++it)
+	for(const auto & keyvalue : keyvalues)
 	{
-		cmd << it->first << it->second;
+		cmd << keyvalue.first << keyvalue.second;
 	}
 
 	return cmd;

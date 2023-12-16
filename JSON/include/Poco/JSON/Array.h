@@ -18,11 +18,12 @@
 #define JSON_Array_INCLUDED
 
 
+#include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/JSON.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/Dynamic/Var.h"
-#include <vector>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -70,7 +71,7 @@ public:
 		/// stringified, all unicode characters will be escaped in the
 		/// resulting string.
 
-	Array(const Array& copy);
+	Array(const Array& other);
 		/// Creates an Array by copying another one.
 
 	Array(Array&& other) noexcept;
@@ -139,7 +140,7 @@ public:
 	bool isArray(const Dynamic::Var& value) const;
 		/// Returns true when the element is an array.
 
-	bool isArray(ConstIterator& value) const;
+	bool isArray(ConstIterator& it) const;
 		/// Returns true when the element is an array.
 
 	bool isNull(unsigned int index) const;
@@ -152,7 +153,7 @@ public:
 	bool isObject(const Dynamic::Var& value) const;
 		/// Returns true when the element is an object.
 
-	bool isObject(ConstIterator& value) const;
+	bool isObject(ConstIterator& it) const;
 		/// Returns true when the element is an object.
 
 	template<typename T>
@@ -321,102 +322,101 @@ template <>
 class VarHolderImpl<JSON::Array::Ptr>: public VarHolder
 {
 public:
-	VarHolderImpl(const JSON::Array::Ptr& val): _val(val)
+	VarHolderImpl(JSON::Array::Ptr  val): _val(std::move(val))
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override
+	= default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Array::Ptr);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
-		value = !_val.isNull() && _val->size() > 0;
+		value = !_val.isNull() && !_val->empty();
 	}
 
-	void convert(float&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(double&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(char&) const override
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
 		_val->stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		throw BadCastException("Cannot convert Array to DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		throw BadCastException("Cannot convert Array to LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -426,22 +426,22 @@ public:
 		return _val;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
@@ -455,102 +455,101 @@ template <>
 class VarHolderImpl<JSON::Array>: public VarHolder
 {
 public:
-	VarHolderImpl(const JSON::Array& val): _val(val)
+	VarHolderImpl(JSON::Array  val): _val(std::move(val))
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override
+	= default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Array);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
-		value = _val.size() > 0;
+		value = !_val.empty();
 	}
 
-	void convert(float&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(double&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(char&) const override
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
 		_val.stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		throw BadCastException("Cannot convert Array to DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		throw BadCastException("Cannot convert Array to LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -560,22 +559,22 @@ public:
 		return _val;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}

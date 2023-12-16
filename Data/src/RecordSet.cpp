@@ -71,11 +71,11 @@ RecordSet::RecordSet(const RecordSet& other):
 
 RecordSet::RecordSet(RecordSet&& other) noexcept:
 	Statement(std::move(other)),
-	_currentRow(std::move(other._currentRow)),
-	_pBegin(std::move(other._pBegin)),
-	_pEnd(std::move(other._pEnd)),
+	_currentRow(other._currentRow),
+	_pBegin(other._pBegin),
+	_pEnd(other._pEnd),
 	_pFilter(std::move(other._pFilter)),
-	_totalRowCount(std::move(other._totalRowCount))
+	_totalRowCount(other._totalRowCount)
 {
 }
 
@@ -101,11 +101,11 @@ RecordSet::~RecordSet()
 RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 {
 	Statement::operator = (std::move(other));
-	_currentRow = std::move(other._currentRow);
-	_pBegin = std::move(other._pBegin);
-	_pEnd = std::move(other._pEnd);
+	_currentRow = other._currentRow;
+	_pBegin = other._pBegin;
+	_pEnd = other._pEnd;
 	_pFilter = std::move(other._pFilter);
-	_totalRowCount = std::move(other._totalRowCount);
+	_totalRowCount = other._totalRowCount;
 
 	return *this;
 }
@@ -114,9 +114,9 @@ RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 void RecordSet::reset(const Statement& stmt)
 {
 	delete _pBegin;
-	_pBegin = 0;
+	_pBegin = nullptr;
 	delete _pEnd;
-	_pEnd = 0;
+	_pEnd = nullptr;
 	_currentRow = 0;
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 
@@ -208,11 +208,11 @@ Row& RecordSet::row(std::size_t pos)
 		throw RangeException("Invalid recordset row requested.");
 
 	RowMap::const_iterator it = _rowMap.find(pos);
-	Row* pRow = 0;
+	Row* pRow = nullptr;
 	std::size_t columns = columnCount();
 	if (it == _rowMap.end())
 	{
-		if (_rowMap.size())
+		if (!_rowMap.empty())
 		{
 			//reuse first row column names and sorting fields to save some memory
 			pRow = new Row(_rowMap.begin()->second->names(),
@@ -244,7 +244,7 @@ Row& RecordSet::row(std::size_t pos)
 
 std::size_t RecordSet::rowCount() const
 {
-	if (extractions().size() == 0) return 0;
+	if (extractions().empty()) return 0;
 
 	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;

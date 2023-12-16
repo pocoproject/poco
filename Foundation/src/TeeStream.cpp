@@ -19,7 +19,7 @@ namespace Poco {
 
 
 TeeStreamBuf::TeeStreamBuf():
-	_pIstr(0)
+	_pIstr(nullptr)
 {
 }
 
@@ -31,15 +31,14 @@ TeeStreamBuf::TeeStreamBuf(std::istream& istr):
 
 
 TeeStreamBuf::TeeStreamBuf(std::ostream& ostr):
-	_pIstr(0)
+	_pIstr(nullptr)
 {
 	_streams.push_back(&ostr);
 }
 
 
 TeeStreamBuf::~TeeStreamBuf()
-{
-}
+= default;
 
 
 void TeeStreamBuf::addStream(std::ostream& ostr)
@@ -89,8 +88,7 @@ TeeIOS::TeeIOS(std::ostream& ostr): _buf(ostr)
 
 
 TeeIOS::~TeeIOS()
-{
-}
+= default;
 
 
 void TeeIOS::addStream(std::ostream& ostr)
@@ -111,8 +109,7 @@ TeeInputStream::TeeInputStream(std::istream& istr): TeeIOS(istr), std::istream(&
 
 
 TeeInputStream::~TeeInputStream()
-{
-}
+= default;
 
 
 TeeOutputStream::TeeOutputStream(): std::ostream(&_buf)
@@ -126,8 +123,7 @@ TeeOutputStream::TeeOutputStream(std::ostream& ostr): TeeIOS(ostr), std::ostream
 
 
 TeeOutputStream::~TeeOutputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

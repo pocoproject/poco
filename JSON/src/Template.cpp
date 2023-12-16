@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/JSON/Template.h"
 #include "Poco/JSON/TemplateCache.h"
 #include "Poco/JSON/Query.h"
@@ -33,12 +35,10 @@ class Part
 {
 public:
 	Part()
-	{
-	}
+	= default;
 
 	virtual ~Part()
-	{
-	}
+	= default;
 
 	virtual void render(const Var& data, std::ostream& out) const = 0;
 
@@ -53,15 +53,14 @@ public:
 	{
 	}
 
-	StringPart(const std::string& content): Part(), _content(content)
+	StringPart(std::string  content): Part(), _content(std::move(content))
 	{
 	}
 
-	virtual ~StringPart()
-	{
-	}
+	~StringPart() override
+	= default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		out << _content;
 	}
@@ -85,19 +84,17 @@ class MultiPart: public Part
 {
 public:
 	MultiPart()
-	{
-	}
+	= default;
 
-	virtual ~MultiPart()
-	{
-	}
+	~MultiPart() override
+	= default;
 
 	virtual void addPart(Part* part)
 	{
 		_parts.push_back(part);
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		for (const auto& p: _parts)
 		{
@@ -113,15 +110,14 @@ protected:
 class EchoPart: public Part
 {
 public:
-	EchoPart(const std::string& query): Part(), _query(query)
+	EchoPart(std::string  query): Part(), _query(std::move(query))
 	{
 	}
 
-	virtual ~EchoPart()
-	{
-	}
+	~EchoPart() override
+	= default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		Query query(data);
 		Var value = query.find(_query);
@@ -140,13 +136,12 @@ private:
 class LogicQuery
 {
 public:
-	LogicQuery(const std::string& query): _queryString(query)
+	LogicQuery(std::string  query): _queryString(std::move(query))
 	{
 	}
 
 	virtual ~LogicQuery()
-	{
-	}
+	= default;
 
 	virtual bool apply(const Var& data) const
 	{
@@ -188,11 +183,10 @@ public:
 	{
 	}
 
-	virtual ~LogicExistQuery()
-	{
-	}
+	~LogicExistQuery() override
+	= default;
 
-	virtual bool apply(const Var& data) const
+	bool apply(const Var& data) const override
 	{
 		Query query(data);
 		Var value = query.find(_queryString);
@@ -209,11 +203,10 @@ public:
 	{
 	}
 
-	virtual ~LogicElseQuery()
-	{
-	}
+	~LogicElseQuery() override
+	= default;
 
-	virtual bool apply(const Var& data) const
+	bool apply(const Var& data) const override
 	{
 		return true;
 	}
@@ -227,9 +220,8 @@ public:
 	{
 	}
 
-	virtual ~LogicPart()
-	{
-	}
+	~LogicPart() override
+	= default;
 
 	void addPart(LogicQuery* query, Part* part)
 	{
@@ -237,13 +229,13 @@ public:
 		_queries.push_back(query);
 	}
 
-	void addPart(Part* part)
+	void addPart(Part* part) override
 	{
 		MultiPart::addPart(part);
 		_queries.push_back(new LogicElseQuery());
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		int count = 0;
 		for (auto it = _queries.begin(); it != _queries.end(); ++it, ++count)
@@ -264,15 +256,14 @@ private:
 class LoopPart: public MultiPart
 {
 public:
-	LoopPart(const std::string& name, const std::string& query): MultiPart(), _name(name), _query(query)
+	LoopPart(std::string  name, std::string  query): MultiPart(), _name(std::move(name)), _query(std::move(query))
 	{
 	}
 
-	virtual ~LoopPart()
-	{
-	}
+	~LoopPart() override
+	= default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		Query query(data);
 
@@ -303,9 +294,9 @@ class IncludePart: public Part
 {
 public:
 
-	IncludePart(const Path& parentPath, const Path& path):
+	IncludePart(const Path& parentPath, Path  path):
 		Part(),
-		_path(path)
+		_path(std::move(path))
 	{
 		// When the path is relative, try to make it absolute based
 		// on the path of the parent template. When the file doesn't
@@ -322,14 +313,13 @@ public:
 		}
 	}
 
-	virtual ~IncludePart()
-	{
-	}
+	~IncludePart() override
+	= default;
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		TemplateCache* cache = TemplateCache::instance();
-		if (cache == 0)
+		if (cache == nullptr)
 		{
 			Template tpl(_path);
 			tpl.parse();
@@ -347,17 +337,17 @@ private:
 };
 
 
-Template::Template(const Path& templatePath):
-	_parts(0),
-	_currentPart(0),
-	_templatePath(templatePath)
+Template::Template(Path  templatePath):
+	_parts(nullptr),
+	_currentPart(nullptr),
+	_templatePath(std::move(templatePath))
 {
 }
 
 
 Template::Template():
-	_parts(0),
-	_currentPart(0)
+	_parts(nullptr),
+	_currentPart(nullptr)
 {
 }
 
@@ -437,13 +427,13 @@ void Template::parse(std::istream& in)
 		}
 		else if (command.compare("else") == 0)
 		{
-			if (_partStack.size() == 0)
+			if (_partStack.empty())
 			{
 				throw JSONTemplateException("Unexpected <? else ?> found");
 			}
 			_currentPart = _partStack.top();
 			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? else ?>");
 			}
@@ -459,14 +449,14 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Missing query in <? " + command + " ?>");
 			}
 
-			if (_partStack.size() == 0)
+			if (_partStack.empty())
 			{
 				throw JSONTemplateException("Unexpected <? elsif / elif ?> found");
 			}
 
 			_currentPart = _partStack.top();
 			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? elsif / elif ?>");
 			}
@@ -482,7 +472,7 @@ void Template::parse(std::istream& in)
 			}
 			MultiPart* loopPart = _partStack.top();
 			LoopPart* lp = dynamic_cast<LoopPart*>(loopPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? for ?> command");
 			}
@@ -499,7 +489,7 @@ void Template::parse(std::istream& in)
 
 			_currentPart = _partStack.top();
 			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if (lp == 0)
+			if (lp == nullptr)
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? endif ?>");
 			}

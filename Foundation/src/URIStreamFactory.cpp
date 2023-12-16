@@ -14,31 +14,29 @@
 
 #include "Poco/URIStreamFactory.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
 
 
 URIStreamFactory::URIStreamFactory()
-{
-}
+= default;
 
 
 URIStreamFactory::~URIStreamFactory()
+= default;
+
+
+URIRedirection::URIRedirection(std::string  uri):
+	_uri(std::move(uri))
 {
 }
 
 
-URIRedirection::URIRedirection(const std::string& uri):
-	_uri(uri)
-{
-}
-
-
-URIRedirection::URIRedirection(const URIRedirection& redir):
-	_uri(redir._uri)
-{
-}
+URIRedirection::URIRedirection(const URIRedirection& redir)
+	
+= default;
 
 
 URIRedirection& URIRedirection::operator = (const URIRedirection& redir)

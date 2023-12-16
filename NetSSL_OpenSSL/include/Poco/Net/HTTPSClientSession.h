@@ -119,11 +119,11 @@ public:
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
 
-	~HTTPSClientSession();
+	~HTTPSClientSession() override;
 		/// Destroys the HTTPSClientSession and closes
 		/// the underlying socket.
 
-	bool secure() const;
+	bool secure() const override;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
 
@@ -142,13 +142,13 @@ public:
 		/// been sent.
 
 	// HTTPSession
-	void abort();
+	void abort() override;
 
 protected:
-	void connect(const SocketAddress& address);
-	std::string proxyRequestPrefix() const;
-	void proxyAuthenticate(HTTPRequest& request);
-	int read(char* buffer, std::streamsize length);
+	void connect(const SocketAddress& address) override;
+	std::string proxyRequestPrefix() const override;
+	void proxyAuthenticate(HTTPRequest& request) override;
+	int read(char* buffer, std::streamsize length) override;
 
 private:
 	HTTPSClientSession(const HTTPSClientSession&);

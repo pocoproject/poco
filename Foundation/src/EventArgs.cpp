@@ -21,13 +21,11 @@ namespace Poco {
 
 
 EventArgs::EventArgs()
-{
-}
+= default;
 
 
 EventArgs::~EventArgs()
-{
-}
+= default;
 
 
 } // namespace Poco

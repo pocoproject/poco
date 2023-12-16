@@ -36,7 +36,7 @@ public:
 		/// Creates the SecureServerSocketImpl using the
 		/// given SSL context object.
 
-	SocketImpl* acceptConnection(SocketAddress& clientAddr);
+	SocketImpl* acceptConnection(SocketAddress& clientAddr) override;
 		/// Get the next completed connection from the
 		/// socket's completed connection queue.
 		///
@@ -48,22 +48,22 @@ public:
 		///
 		/// The client socket's address is returned in clientAddr.
 
-	void connect(const SocketAddress& address);
+	void connect(const SocketAddress& address) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
+	void connect(const SocketAddress& address, const Poco::Timespan& timeout) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void connectNB(const SocketAddress& address);
+	void connectNB(const SocketAddress& address) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false) override;
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -73,7 +73,7 @@ public:
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
 
-	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort) override;
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -86,7 +86,7 @@ public:
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 
-	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false) override;
 		/// Bind a local IPv6 address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -103,7 +103,7 @@ public:
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
 
-	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only);
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only) override;
 		/// Bind a local IPv6 address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -123,7 +123,7 @@ public:
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
 
-	void listen(int backlog = 64);
+	void listen(int backlog = 64) override;
 		/// Puts the socket into listening state.
 		///
 		/// The socket becomes a passive socket that
@@ -133,35 +133,35 @@ public:
 		/// number of connections that can be queued
 		/// for this socket.
 
-	void close();
+	void close() override;
 		/// Close the socket.
 
-	int sendBytes(const void* buffer, int length, int flags = 0);
+	int sendBytes(const void* buffer, int length, int flags = 0) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	int receiveBytes(void* buffer, int length, int flags = 0);
+	int receiveBytes(void* buffer, int length, int flags = 0) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
+	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
+	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void sendUrgent(unsigned char data);
+	void sendUrgent(unsigned char data) override;
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	bool secure() const;
+	bool secure() const override;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
@@ -169,7 +169,7 @@ public:
 		/// Returns the SSL context used by this socket.
 
 protected:
-	~SecureServerSocketImpl();
+	~SecureServerSocketImpl() override;
 		/// Destroys the SecureServerSocketImpl.
 
 private:

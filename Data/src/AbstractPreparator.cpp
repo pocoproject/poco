@@ -27,8 +27,7 @@ AbstractPreparator::AbstractPreparator(Poco::UInt32 length):
 
 
 AbstractPreparator::~AbstractPreparator()
-{
-}
+= default;
 
 
 void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::Int8>& val)

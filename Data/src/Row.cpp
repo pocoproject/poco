@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/Row.h"
 #include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/String.h"
@@ -30,7 +32,7 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 
 
 Row::Row():
-	_pNames(0),
+	_pNames(nullptr),
 	_pSortMap(new SortMap),
 	_pFormatter(new SimpleRowFormatter)
 {
@@ -38,16 +40,16 @@ Row::Row():
 
 
 Row::Row(NameVecPtr pNames,
-	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
+	const RowFormatter::Ptr& pFormatter): _pNames(std::move(pNames))
 {
 	if (!_pNames) throw NullPointerException();
-	init(0, pFormatter);
+	init(nullptr, pFormatter);
 }
 
 
 Row::Row(NameVecPtr pNames,
 	const SortMapPtr& pSortMap,
-	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
+	const RowFormatter::Ptr& pFormatter): _pNames(std::move(pNames))
 {
 	if (!_pNames) throw NullPointerException();
 	init(pSortMap, pFormatter);
@@ -75,8 +77,7 @@ void Row::init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter)
 
 
 Row::~Row()
-{
-}
+= default;
 
 
 Poco::Dynamic::Var& Row::get(std::size_t col)
@@ -233,7 +234,7 @@ void Row::replaceSortField(const std::string& oldName, const std::string& newNam
 void Row::resetSort()
 {
 	_pSortMap->clear();
-	if (_values.size())	addSortField(0);
+	if (!_values.empty())	addSortField(0);
 }
 
 

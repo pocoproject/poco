@@ -20,13 +20,11 @@ namespace Poco {
 
 
 Formatter::Formatter()
-{
-}
+= default;
 
 
 Formatter::~Formatter()
-{
-}
+= default;
 
 
 void Formatter::setProperty(const std::string& /*name*/, const std::string& /*value*/)

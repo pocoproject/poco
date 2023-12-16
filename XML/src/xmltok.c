@@ -1403,7 +1403,7 @@ unknown_toUtf16(const ENCODING *enc, const char **fromP, const char *fromLim,
 }
 
 ENCODING *
-XmlInitUnknownEncoding(void *mem, int *table, CONVERTER convert,
+XmlInitUnknownEncoding(void *mem, const int *table, CONVERTER convert,
                        void *userData) {
   int i;
   struct unknown_encoding *e = (struct unknown_encoding *)mem;

@@ -35,8 +35,7 @@ SecureSMTPClientSession::SecureSMTPClientSession(const std::string& host, Poco::
 
 
 SecureSMTPClientSession::~SecureSMTPClientSession()
-{
-}
+= default;
 
 
 bool SecureSMTPClientSession::startTLS()

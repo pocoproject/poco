@@ -29,13 +29,11 @@ namespace Impl {
 
 
 SocketAddressImpl::SocketAddressImpl()
-{
-}
+= default;
 
 
 SocketAddressImpl::~SocketAddressImpl()
-{
-}
+= default;
 
 
 //

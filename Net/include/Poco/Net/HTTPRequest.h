@@ -43,16 +43,16 @@ public:
 		/// Creates a GET / HTTP/1.x request with
 		/// the given version (HTTP/1.0 or HTTP/1.1).
 
-	HTTPRequest(const std::string& method, const std::string& uri);
+	HTTPRequest(std::string  method, std::string  uri);
 		/// Creates a HTTP/1.0 request with the given method and URI.
 
-	HTTPRequest(const std::string& method, const std::string& uri, const std::string& version);
+	HTTPRequest(std::string  method, std::string  uri, const std::string& version);
 		/// Creates a HTTP request with the given method, URI and version.
 
 	HTTPRequest(const HTTPRequest& other);
 		/// Creates a HTTP request by copying another one.
 
-	virtual ~HTTPRequest();
+	~HTTPRequest() override;
 		/// Destroys the HTTPRequest.
 
 	HTTPRequest& operator = (const HTTPRequest&);
@@ -138,11 +138,11 @@ public:
 	void removeProxyCredentials();
 		/// Removes any proxy credentials from the request.
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP request to the given
 		/// output stream.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP request from the
 		/// given input stream.
 

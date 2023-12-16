@@ -175,8 +175,7 @@ SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t len
 
 
 SocketAddress::~SocketAddress()
-{
-}
+= default;
 
 
 bool SocketAddress::operator < (const SocketAddress& socketAddress) const
@@ -283,7 +282,7 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 	{
 		HostEntry he = DNS::hostByName(hostAddress);
 		HostEntry::AddressList addresses = he.addresses();
-		if (addresses.size() > 0)
+		if (!addresses.empty())
 		{
 #if defined(POCO_HAVE_IPv6) && defined(POCO_SOCKETADDRESS_PREFER_IPv4)
 			// if we get both IPv4 and IPv6 addresses, prefer IPv4
@@ -308,7 +307,7 @@ void SocketAddress::init(Family fam, const std::string& hostAddress, Poco::UInt1
 	{
 		HostEntry he = DNS::hostByName(hostAddress);
 		HostEntry::AddressList addresses = he.addresses();
-		if (addresses.size() > 0)
+		if (!addresses.empty())
 		{
 			for (const auto& addr: addresses)
 			{
@@ -369,7 +368,7 @@ bool SocketAddress::isUnixLocal(const std::string& hostAndPort)
 		RegularExpression re(R"((?:[a-zA-Z]\:|\\\\[\w\s\.]+\\[\w\s\.$]+)\\(?:[\w\s\.]+\\)*[\w\s\.]*?$)");
 		if (re.match(hostAndPort)) return true;
 	#elif defined(POCO_OS_FAMILY_UNIX)
-		if (hostAndPort.size() && (hostAndPort[0] == '/')) return true;
+		if (!hostAndPort.empty() && (hostAndPort[0] == '/')) return true;
 	#endif
 #endif
 	return false;
@@ -423,7 +422,7 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 #if defined(POCO_VXWORKS)
 		throw ServiceNotFoundException(service);
 #else
-		struct servent* se = getservbyname(service.c_str(), NULL);
+		struct servent* se = getservbyname(service.c_str(), nullptr);
 		if (se)
 			return ntohs(se->s_port);
 		else

@@ -48,16 +48,13 @@ DOMException::DOMException(unsigned short code):
 }
 
 
-DOMException::DOMException(const DOMException& exc):
-	XMLException(exc),
-	_code(exc._code)
-{
-}
+DOMException::DOMException(const DOMException& exc)
+	
+= default;
 
 
 DOMException::~DOMException() noexcept
-{
-}
+= default;
 
 
 DOMException& DOMException::operator = (const DOMException& exc)

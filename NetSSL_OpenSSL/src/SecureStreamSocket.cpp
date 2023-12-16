@@ -109,8 +109,7 @@ SecureStreamSocket::SecureStreamSocket(SocketImpl* pImpl):
 
 
 SecureStreamSocket::~SecureStreamSocket()
-{
-}
+= default;
 
 
 SecureStreamSocket& SecureStreamSocket::operator = (const Socket& socket)

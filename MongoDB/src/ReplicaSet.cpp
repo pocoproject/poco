@@ -28,17 +28,16 @@ ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress> &addresses):
 
 
 ReplicaSet::~ReplicaSet()
-{
-}
+= default;
 
 
 Connection::Ptr ReplicaSet::findMaster()
 {
 	Connection::Ptr master;
 
-	for (std::vector<Net::SocketAddress>::iterator it = _addresses.begin(); it != _addresses.end(); ++it)
+	for (auto & _addresse : _addresses)
 	{
-		master = isMaster(*it);
+		master = isMaster(_addresse);
 		if (!master.isNull())
 		{
 			break;
@@ -64,7 +63,7 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 		ResponseMessage response;
 		conn->sendRequest(request, response);
 
-		if (response.documents().size() > 0)
+		if (!response.documents().empty())
 		{
 			Document::Ptr doc = response.documents()[0];
 			if (doc->get<bool>("ismaster"))
@@ -79,10 +78,10 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 	}
 	catch (...)
 	{
-		conn = 0;
+		conn = nullptr;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 

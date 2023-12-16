@@ -32,13 +32,13 @@ class NetSSL_API RejectCertificateHandler: public InvalidCertificateHandler
 	/// the certificate.
 {
 public:
-	RejectCertificateHandler(bool handleErrorsOnServerSide);
+	RejectCertificateHandler(bool server);
 		/// Creates the RejectCertificateHandler
 
-	virtual ~RejectCertificateHandler();
+	~RejectCertificateHandler() override;
 		/// Destroys the RejectCertificateHandler.
 
-	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert);
+	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert) override;
 };
 
 

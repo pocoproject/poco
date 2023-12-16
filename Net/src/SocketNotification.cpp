@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/SocketNotification.h"
 
 
@@ -26,8 +28,7 @@ SocketNotification::SocketNotification(SocketReactor* pReactor):
 
 
 SocketNotification::~SocketNotification()
-{
-}
+= default;
 
 
 void SocketNotification::setSocket(const Socket& socket)
@@ -43,8 +44,7 @@ ReadableNotification::ReadableNotification(SocketReactor* pReactor):
 
 
 ReadableNotification::~ReadableNotification()
-{
-}
+= default;
 
 
 WritableNotification::WritableNotification(SocketReactor* pReactor):
@@ -54,31 +54,29 @@ WritableNotification::WritableNotification(SocketReactor* pReactor):
 
 
 WritableNotification::~WritableNotification()
-{
-}
+= default;
 
 
-ErrorNotification::ErrorNotification(SocketReactor* pReactor, int code, const std::string& description):
+ErrorNotification::ErrorNotification(SocketReactor* pReactor, int code, std::string  description):
 	SocketNotification(pReactor),
 	_code(code),
-	_description(description)
+	_description(std::move(description))
 {
 }
 
 
 ErrorNotification::ErrorNotification(SocketReactor* pReactor, const Socket& socket,
-	int code, const std::string& description):
+	int code, std::string  description):
 	SocketNotification(pReactor),
 	_code(code),
-	_description(description)
+	_description(std::move(description))
 {
 	setSocket(socket);
 }
 
 
 ErrorNotification::~ErrorNotification()
-{
-}
+= default;
 
 
 TimeoutNotification::TimeoutNotification(SocketReactor* pReactor):
@@ -88,8 +86,7 @@ TimeoutNotification::TimeoutNotification(SocketReactor* pReactor):
 
 
 TimeoutNotification::~TimeoutNotification()
-{
-}
+= default;
 
 
 IdleNotification::IdleNotification(SocketReactor* pReactor):
@@ -99,8 +96,7 @@ IdleNotification::IdleNotification(SocketReactor* pReactor):
 
 
 IdleNotification::~IdleNotification()
-{
-}
+= default;
 
 
 ShutdownNotification::ShutdownNotification(SocketReactor* pReactor):
@@ -110,8 +106,7 @@ ShutdownNotification::ShutdownNotification(SocketReactor* pReactor):
 
 
 ShutdownNotification::~ShutdownNotification()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

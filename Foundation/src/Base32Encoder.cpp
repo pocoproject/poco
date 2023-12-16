@@ -172,8 +172,7 @@ Base32EncoderIOS::Base32EncoderIOS(std::ostream& ostr, bool padding):
 
 
 Base32EncoderIOS::~Base32EncoderIOS()
-{
-}
+= default;
 
 
 int Base32EncoderIOS::close()
@@ -195,8 +194,7 @@ Base32Encoder::Base32Encoder(std::ostream& ostr, bool padding):
 
 
 Base32Encoder::~Base32Encoder()
-{
-}
+= default;
 
 
 } // namespace Poco

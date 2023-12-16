@@ -69,11 +69,10 @@ namespace
 			sigset_t sset;
 			sigemptyset(&sset);
 			sigaddset(&sset, SIGPIPE);
-			pthread_sigmask(SIG_BLOCK, &sset, 0);
+			pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 		}
 		~SignalBlocker()
-		{
-		}
+		= default;
 	};
 
 	static SignalBlocker signalBlocker;
@@ -172,7 +171,7 @@ std::string ThreadImpl::getNameImpl() const
 }
 
 
-std::string ThreadImpl::getOSThreadNameImpl()
+std::string ThreadImpl::getOSThreadNameImpl() const
 {
 	return isRunningImpl() ? getThreadName() : "";
 }
@@ -268,7 +267,7 @@ void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
 			sigaddset(&sset, sig);
 	}
 	
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 }
 
 
@@ -297,7 +296,7 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		_pData->pRunnableTarget = pTarget;
 		if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 		{
-			_pData->pRunnableTarget = 0;
+			_pData->pRunnableTarget = nullptr;
 			pthread_attr_destroy(&attributes);
 			throw SystemException("cannot start thread");
 		}
@@ -392,7 +391,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigaddset(&sset, SIGPIPE);
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
@@ -422,9 +421,9 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	}
 
 	FastMutex::ScopedLock l(pData->mutex);
-	pData->pRunnableTarget = 0;
+	pData->pRunnableTarget = nullptr;
 	pData->done.set();
-	return 0;
+	return nullptr;
 }
 
 

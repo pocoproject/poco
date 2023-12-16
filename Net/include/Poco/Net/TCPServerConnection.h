@@ -49,7 +49,7 @@ public:
 		/// Creates the TCPServerConnection using the given
 		/// stream socket.
 
-	virtual ~TCPServerConnection();
+	~TCPServerConnection() override;
 		/// Destroys the TCPServerConnection.
 
 protected:

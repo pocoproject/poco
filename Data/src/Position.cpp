@@ -25,8 +25,7 @@ Position::Position(Poco::UInt32 value): _value(value)
 
 
 Position::~Position()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

@@ -42,12 +42,11 @@ public:
 		_istr.exceptions(std::ios::badbit);
 	}
 
-	~FTPSStreamBuf()
-	{
-	}
+	~FTPSStreamBuf() override
+	= default;
 
 private:
-	int readFromDevice()
+	int readFromDevice() override
 	{
 		return _istr.get();
 	}
@@ -65,9 +64,8 @@ public:
 		poco_ios_init(&_buf);
 	}
 
-	~FTPSIOS()
-	{
-	}
+	~FTPSIOS() override
+	= default;
 
 	FTPSStreamBuf* rdbuf()
 	{
@@ -89,7 +87,7 @@ public:
 	{
 	}
 
-	~FTPSStream()
+	~FTPSStream() override
 	{
 		delete _pSession;
 	}
@@ -100,13 +98,11 @@ private:
 
 
 FTPSStreamFactory::FTPSStreamFactory()
-{
-}
+= default;
 
 
 FTPSStreamFactory::~FTPSStreamFactory()
-{
-}
+= default;
 
 
 std::istream* FTPSStreamFactory::open(const URI& uri)

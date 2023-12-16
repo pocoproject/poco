@@ -34,8 +34,7 @@ NamedEvent::NamedEvent(const std::string& name):
 
 
 NamedEvent::~NamedEvent()
-{
-}
+= default;
 
 
 } // namespace Poco

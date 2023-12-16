@@ -47,7 +47,7 @@ public:
 		PD_IN_OUT = AbstractBinder::PD_IN_OUT
 	};
 
-	AbstractBinding(const std::string& name = "", Direction direction = PD_IN, Poco::UInt32 bulkSize = 0);
+	AbstractBinding(std::string  name = "", Direction direction = PD_IN, Poco::UInt32 bulkSize = 0);
 		/// Creates the AbstractBinding.
 
 	virtual ~AbstractBinding();

@@ -19,13 +19,11 @@ namespace Poco {
 
 
 EventChannel::EventChannel()
-{
-}
+= default;
 
 
 EventChannel::~EventChannel()
-{
-}
+= default;
 
 
 void EventChannel::log(const Message& msg)

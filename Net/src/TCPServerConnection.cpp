@@ -32,8 +32,7 @@ TCPServerConnection::TCPServerConnection(const StreamSocket& socket):
 
 
 TCPServerConnection::~TCPServerConnection()
-{
-}
+= default;
 
 
 void TCPServerConnection::start()

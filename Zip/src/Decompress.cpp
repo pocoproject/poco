@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Zip/Decompress.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipArchive.h"
@@ -29,9 +31,9 @@ namespace Poco {
 namespace Zip {
 
 
-Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs, bool keepIncompleteFiles):
+Decompress::Decompress(std::istream& in, Poco::Path  outputDir, bool flattenDirs, bool keepIncompleteFiles):
 	_in(in),
-	_outDir(outputDir),
+	_outDir(std::move(outputDir)),
 	_flattenDirs(flattenDirs),
 	_keepIncompleteFiles(keepIncompleteFiles),
 	_mapping()
@@ -79,7 +81,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		// directory have 0 size, nth to read
 		if (!_flattenDirs)
 		{
-			std::string dirName = hdr.getFileName();
+			const std::string& dirName = hdr.getFileName();
 			if (!ZipCommon::isValidPath(dirName))
 				throw ZipException("Illegal entry name", dirName);
 			Poco::Path dir(_outDir, dirName);

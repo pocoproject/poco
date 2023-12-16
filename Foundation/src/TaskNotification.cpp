@@ -38,8 +38,7 @@ TaskStartedNotification::TaskStartedNotification(Task* pTask):
 
 
 TaskStartedNotification::~TaskStartedNotification()
-{
-}
+= default;
 
 
 TaskCancelledNotification::TaskCancelledNotification(Task* pTask):
@@ -49,8 +48,7 @@ TaskCancelledNotification::TaskCancelledNotification(Task* pTask):
 
 
 TaskCancelledNotification::~TaskCancelledNotification()
-{
-}
+= default;
 
 
 TaskFinishedNotification::TaskFinishedNotification(Task* pTask):
@@ -60,8 +58,7 @@ TaskFinishedNotification::TaskFinishedNotification(Task* pTask):
 
 
 TaskFinishedNotification::~TaskFinishedNotification()
-{
-}
+= default;
 
 
 TaskFailedNotification::TaskFailedNotification(Task* pTask, const Exception& exc):
@@ -85,8 +82,7 @@ TaskProgressNotification::TaskProgressNotification(Task* pTask, float progress):
 
 
 TaskProgressNotification::~TaskProgressNotification()
-{
-}
+= default;
 
 
 } // namespace Poco

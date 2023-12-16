@@ -39,12 +39,12 @@ public:
 	SecureStreamSocketImpl(StreamSocketImpl* pStreamSocket, Context::Ptr pContext);
 		/// Creates the SecureStreamSocketImpl.
 
-	SocketImpl* acceptConnection(SocketAddress& clientAddr);
+	SocketImpl* acceptConnection(SocketAddress& clientAddr) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void connect(const SocketAddress& address);
+	void connect(const SocketAddress& address) override;
 		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address.
 		///
@@ -52,57 +52,57 @@ public:
 		/// connection is established. Instead, incoming and outgoing
 		/// packets are restricted to the specified address.
 
-	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
+	void connect(const SocketAddress& address, const Poco::Timespan& timeout) override;
 		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
 
-	void connectNB(const SocketAddress& address);
+	void connectNB(const SocketAddress& address) override;
 		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void listen(int backlog = 64);
+	void listen(int backlog = 64) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void close();
+	void close() override;
 		/// Close the socket.
 
-	int sendBytes(const void* buffer, int length, int flags = 0);
+	int sendBytes(const void* buffer, int length, int flags = 0) override;
 		/// Sends the contents of the given buffer through
 		/// the socket. Any specified flags are ignored.
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
-	int receiveBytes(void* buffer, int length, int flags = 0);
+	int receiveBytes(void* buffer, int length, int flags = 0) override;
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
 		/// Returns the number of bytes received.
 
-	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
+	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
+	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void sendUrgent(unsigned char data);
+	void sendUrgent(unsigned char data) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	int available();
+	int available() override;
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 		///
@@ -110,26 +110,26 @@ public:
 		/// can be read from the currently buffered SSL record,
 		/// before a new record is read from the underlying socket.
 
-	void shutdownReceive();
+	void shutdownReceive() override;
 		/// Shuts down the receiving part of the socket connection.
 		///
 		/// Since SSL does not support a half shutdown, this does
 		/// nothing.
 
-	void shutdownSend();
+	void shutdownSend() override;
 		/// Shuts down the receiving part of the socket connection.
 		///
 		/// Since SSL does not support a half shutdown, this does
 		/// nothing.
 
-	void shutdown();
+	void shutdown() override;
 		/// Shuts down the SSL connection.
 
 	void abort();
 		/// Aborts the connection by closing the underlying
 		/// TCP connection. No orderly SSL shutdown is performed.
 
-	bool secure() const;
+	bool secure() const override;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
@@ -203,7 +203,7 @@ protected:
 	void connectSSL();
 		/// Performs a SSL client-side handshake on an already connected TCP socket.
 
-	~SecureStreamSocketImpl();
+	~SecureStreamSocketImpl() override;
 		/// Destroys the SecureStreamSocketImpl.
 
 	static int lastError();

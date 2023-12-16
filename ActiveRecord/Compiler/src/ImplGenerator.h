@@ -24,7 +24,7 @@ namespace Compiler {
 class ImplGenerator: public CodeGenerator
 {
 public:
-	ImplGenerator(const std::string& source, std::ostream& stream, const Class& clazz, const ClassMap& classes);
+	ImplGenerator(const std::string& source, std::ostream& stream, Class  clazz, const ClassMap& classes);
 
 	void generate() const;
 	void writeClassMembers() const;

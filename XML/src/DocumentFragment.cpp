@@ -35,8 +35,7 @@ DocumentFragment::DocumentFragment( Document* pOwnerDocument, const DocumentFrag
 
 
 DocumentFragment::~DocumentFragment()
-{
-}
+= default;
 
 
 const XMLString& DocumentFragment::nodeName() const

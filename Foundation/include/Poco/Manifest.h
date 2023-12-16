@@ -66,8 +66,7 @@ public:
 			_it = it._it;
 		}
 		~Iterator()
-		{
-		}
+		= default;
 		Iterator& operator = (const Iterator& it)
 		{
 			_it = it._it;
@@ -107,10 +106,9 @@ public:
 
 	Manifest()
 		/// Creates an empty Manifest.
-	{
-	}
+	= default;
 
-	virtual ~Manifest()
+	~Manifest() override
 		/// Destroys the Manifest.
 	{
 		clear();
@@ -164,7 +162,7 @@ public:
 		return _metaMap.empty();
 	}
 
-	const char* className() const
+	const char* className() const override
 	{
 		return typeid(*this).name();
 	}

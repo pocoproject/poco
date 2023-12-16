@@ -42,12 +42,11 @@ public:
 		_istr.exceptions(std::ios::badbit);
 	}
 
-	~FTPStreamBuf()
-	{
-	}
+	~FTPStreamBuf() override
+	= default;
 
 private:
-	int readFromDevice()
+	int readFromDevice() override
 	{
 		return _istr.get();
 	}
@@ -65,9 +64,8 @@ public:
 		poco_ios_init(&_buf);
 	}
 
-	~FTPIOS()
-	{
-	}
+	~FTPIOS() override
+	= default;
 
 	FTPStreamBuf* rdbuf()
 	{
@@ -89,7 +87,7 @@ public:
 	{
 	}
 
-	~FTPStream()
+	~FTPStream() override
 	{
 		delete _pSession;
 	}
@@ -100,27 +98,23 @@ private:
 
 
 FTPPasswordProvider::FTPPasswordProvider()
-{
-}
+= default;
 
 
 FTPPasswordProvider::~FTPPasswordProvider()
-{
-}
+= default;
 
 
 std::string          FTPStreamFactory::_anonymousPassword("poco@localhost");
-FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(0);
+FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(nullptr);
 
 
 FTPStreamFactory::FTPStreamFactory()
-{
-}
+= default;
 
 
 FTPStreamFactory::~FTPStreamFactory()
-{
-}
+= default;
 
 
 std::istream* FTPStreamFactory::open(const URI& uri)

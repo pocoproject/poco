@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/SMTPChannel.h"
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
@@ -53,10 +55,10 @@ SMTPChannel::SMTPChannel():
 }
 
 
-SMTPChannel::SMTPChannel(const std::string& mailhost, const std::string& sender, const std::string& recipient):
-	_mailHost(mailhost),
-	_sender(sender),
-	_recipient(recipient),
+SMTPChannel::SMTPChannel(std::string  mailhost, std::string  sender, std::string  recipient):
+	_mailHost(std::move(mailhost)),
+	_sender(std::move(sender)),
+	_recipient(std::move(recipient)),
 	_local(true),
 	_type("text/plain"),
 	_delete(false),

@@ -76,13 +76,13 @@ public:
 	Option(const Option& option);
 		/// Creates an option from another one.
 
-	Option(const std::string& fullName, const std::string& shortName);
+	Option(std::string  fullName, std::string  shortName);
 		/// Creates an option with the given properties.
 
-	Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required = false);
+	Option(std::string  fullName, std::string  shortName, std::string  description, bool required = false);
 		/// Creates an option with the given properties.
 
-	Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argRequired = false);
+	Option(std::string  fullName, std::string  shortName, std::string  description, bool required, std::string  argName, bool argRequired = false);
 		/// Creates an option with the given properties.
 
 	~Option();

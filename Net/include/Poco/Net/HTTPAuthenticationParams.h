@@ -50,7 +50,7 @@ public:
 	HTTPAuthenticationParams(const HTTPResponse& response, const std::string& header = WWW_AUTHENTICATE);
 		/// See fromResponse() documentation.
 
-	virtual ~HTTPAuthenticationParams();
+	~HTTPAuthenticationParams() override;
 		/// Destroys the HTTPAuthenticationParams.
 
 	HTTPAuthenticationParams& operator = (const HTTPAuthenticationParams& authParams);

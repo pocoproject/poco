@@ -79,7 +79,7 @@ public:
 		///
 		/// New threads are taken from the given thread pool.
 
-	~HTTPServer();
+	~HTTPServer() override;
 		/// Destroys the HTTPServer and its HTTPRequestHandlerFactory.
 
 	void stopAll(bool abortCurrent = false);

@@ -67,34 +67,33 @@ public:
 	{
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return 1u;
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return !_bound;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
 
-	void reset ()
+	void reset () override
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
@@ -136,34 +135,33 @@ public:
 	{
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return 1;
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return !_bound;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, *_pVal, getBinder(), getDirection());
 		_bound = true;
 	}
 
-	void reset ()
+	void reset () override
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
@@ -196,34 +194,33 @@ public:
 	{
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
-	{
-		return 1u;
-	}
-
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	bool canBind() const
+	std::size_t numOfRowsHandled() const override
+	{
+		return 1u;
+	}
+
+	bool canBind() const override
 	{
 		return !_bound;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<std::string>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
 
-	void reset ()
+	void reset () override
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
@@ -257,34 +254,33 @@ public:
 	{
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
-	{
-		return 1u;
-	}
-
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	bool canBind() const
+	std::size_t numOfRowsHandled() const override
+	{
+		return 1u;
+	}
+
+	bool canBind() const override
 	{
 		return !_bound;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<std::string>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
 
-	void reset ()
+	void reset () override
 	{
 		_bound = false;
 		AbstractBinder::Ptr pBinder = getBinder();
@@ -321,27 +317,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -350,7 +345,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -388,27 +383,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -417,7 +411,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();
@@ -469,27 +463,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -497,7 +490,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _deq.begin();
 		_end   = _deq.end();
@@ -550,27 +543,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_deq.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -578,7 +570,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _deq.begin();
 		_end   = _deq.end();
@@ -615,27 +607,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -643,7 +634,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -680,27 +671,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -708,7 +698,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();
@@ -745,27 +735,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -773,7 +762,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -810,27 +799,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -838,7 +826,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();
@@ -875,27 +863,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -903,7 +890,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -940,27 +927,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -968,7 +954,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();
@@ -1005,27 +991,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -1033,7 +1018,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -1070,27 +1055,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -1098,7 +1082,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();
@@ -1135,27 +1119,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -1163,7 +1146,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -1200,27 +1183,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -1228,7 +1210,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();
@@ -1265,27 +1247,26 @@ public:
 		reset();
 	}
 
-	~Binding()
+	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -1293,7 +1274,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _val.begin();
 		_end   = _val.end();
@@ -1330,27 +1311,26 @@ public:
 		reset();
 	}
 
-	~CopyBinding()
+	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return _begin != _end;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
@@ -1358,7 +1338,7 @@ public:
 		++_begin;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_begin = _pVal->begin();
 		_end   = _pVal->end();

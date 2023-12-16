@@ -20,13 +20,11 @@ namespace Net {
 
 
 PartHandler::PartHandler()
-{
-}
+= default;
 
 
 PartHandler::~PartHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

@@ -59,8 +59,7 @@ Binary::Binary(const void* data, Poco::Int32 size, unsigned char subtype):
 
 
 Binary::~Binary()
-{
-}
+= default;
 
 
 std::string Binary::toString(int indent) const

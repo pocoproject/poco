@@ -57,7 +57,7 @@ public:
 	SAXParser(const XMLString& encoding);
 		/// Creates an SAXParser with the given encoding.
 
-	~SAXParser();
+	~SAXParser() override;
 		/// Destroys the SAXParser.
 
 	void setEncoding(const XMLString& encoding);
@@ -73,22 +73,22 @@ public:
 		/// Adds an encoding to the parser. Does not take ownership of the pointer!
 
 	/// XMLReader
-	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
-	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
-	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
-	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
-	void setFeature(const XMLString& featureId, bool state);
-	bool getFeature(const XMLString& featureId) const;
-	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
-	void parse(InputSource* pSource);
-	void parse(const XMLString& systemId);
-	void parseMemoryNP(const char* xml, std::size_t size);
+	void setEntityResolver(EntityResolver* pResolver) override;
+	EntityResolver* getEntityResolver() const override;
+	void setDTDHandler(DTDHandler* pDTDHandler) override;
+	DTDHandler* getDTDHandler() const override;
+	void setContentHandler(ContentHandler* pContentHandler) override;
+	ContentHandler* getContentHandler() const override;
+	void setErrorHandler(ErrorHandler* pErrorHandler) override;
+	ErrorHandler* getErrorHandler() const override;
+	void setFeature(const XMLString& featureId, bool state) override;
+	bool getFeature(const XMLString& featureId) const override;
+	void setProperty(const XMLString& propertyId, const XMLString& value) override;
+	void setProperty(const XMLString& propertyId, void* value) override;
+	void* getProperty(const XMLString& propertyId) const override;
+	void parse(InputSource* pSource) override;
+	void parse(const XMLString& systemId) override;
+	void parseMemoryNP(const char* xml, std::size_t size) override;
 
 	/// Extensions
 	void parseString(const std::string& xml);

@@ -50,17 +50,13 @@ Timespan::Timespan(int days, int hours, int minutes, int seconds, int microSecon
 }
 
 
-Timespan::Timespan(const Timespan& timespan):
-	_span(timespan._span)
-{
-}
+Timespan::Timespan(const Timespan& timespan)
+	
+= default;
 
 
 Timespan& Timespan::operator = (const Timespan& timespan)
-{
-	_span = timespan._span;
-	return *this;
-}
+= default;
 
 
 Timespan& Timespan::operator = (TimeDiff microSeconds)

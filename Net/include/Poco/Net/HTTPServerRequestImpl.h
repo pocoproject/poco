@@ -47,29 +47,29 @@ public:
 		/// Creates the HTTPServerRequestImpl, using the
 		/// given HTTPServerSession.
 
-	~HTTPServerRequestImpl();
+	~HTTPServerRequestImpl() override;
 		/// Destroys the HTTPServerRequestImpl.
 
-	std::istream& stream();
+	std::istream& stream() override;
 		/// Returns the input stream for reading
 		/// the request body.
 		///
 		/// The stream is valid until the HTTPServerRequestImpl
 		/// object is destroyed.
 
-	const SocketAddress& clientAddress() const;
+	const SocketAddress& clientAddress() const override;
 		/// Returns the client's address.
 
-	const SocketAddress& serverAddress() const;
+	const SocketAddress& serverAddress() const override;
 		/// Returns the server's address.
 
-	const HTTPServerParams& serverParams() const;
+	const HTTPServerParams& serverParams() const override;
 		/// Returns a reference to the server parameters.
 
-	HTTPServerResponse& response() const;
+	HTTPServerResponse& response() const override;
 		/// Returns a reference to the associated response.
 
-	bool secure() const;
+	bool secure() const override;
 		/// Returns true if the request is using a secure
 		/// connection. Returns false if no secure connection
 		/// is used, or if it is not known whether a secure

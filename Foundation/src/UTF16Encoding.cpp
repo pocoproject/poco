@@ -24,7 +24,7 @@ const char* UTF16Encoding::_names[] =
 {
 	"UTF-16",
 	"UTF16",
-	NULL
+	nullptr
 };
 
 
@@ -62,8 +62,7 @@ UTF16Encoding::UTF16Encoding(int byteOrderMark)
 
 
 UTF16Encoding::~UTF16Encoding()
-{
-}
+= default;
 
 
 UTF16Encoding::ByteOrderType UTF16Encoding::getByteOrder() const

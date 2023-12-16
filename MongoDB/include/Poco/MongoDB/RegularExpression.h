@@ -36,7 +36,7 @@ public:
 	RegularExpression();
 		/// Creates an empty RegularExpression.
 
-	RegularExpression(const std::string& pattern, const std::string& options);
+	RegularExpression(std::string  pattern, std::string  options);
 		/// Creates a RegularExpression using the given pattern and options.
 
 	virtual ~RegularExpression();

@@ -35,23 +35,20 @@ VarIterator::VarIterator(Var* pVar, bool positionEnd):
 }
 
 
-VarIterator::VarIterator(const VarIterator& other):
+VarIterator::VarIterator(const VarIterator& other)
+	
+= default;
+
+
+VarIterator::VarIterator(VarIterator&& other) noexcept:
 	_pVar(other._pVar),
 	_position(other._position)
 {
 }
 
 
-VarIterator::VarIterator(VarIterator&& other) noexcept:
-	_pVar(std::move(other._pVar)),
-	_position(std::move(other._position))
-{
-}
-
-
 VarIterator::~VarIterator()
-{
-}
+= default;
 
 
 VarIterator& VarIterator::operator = (const VarIterator& other)
@@ -64,8 +61,8 @@ VarIterator& VarIterator::operator = (const VarIterator& other)
 
 VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
 {
-	_pVar = std::move(other._pVar);
-	_position = std::move(other._position);
+	_pVar = other._pVar;
+	_position = other._position;
 	return *this;
 }
 

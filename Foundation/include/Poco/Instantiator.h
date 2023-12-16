@@ -32,13 +32,11 @@ class AbstractInstantiator
 public:
 	AbstractInstantiator()
 		/// Creates the AbstractInstantiator.
-	{
-	}
+	= default;
 
 	virtual ~AbstractInstantiator()
 		/// Destroys the AbstractInstantiator.
-	{
-	}
+	= default;
 
 	virtual Base* createInstance() const = 0;
 		/// Creates an instance of a concrete subclass of Base.
@@ -61,15 +59,13 @@ class Instantiator: public AbstractInstantiator<Base>
 public:
 	Instantiator()
 		/// Creates the Instantiator.
-	{
-	}
+	= default;
 
-	virtual ~Instantiator()
+	~Instantiator() override
 		/// Destroys the Instantiator.
-	{
-	}
+	= default;
 
-	Base* createInstance() const
+	Base* createInstance() const override
 	{
 		return new C;
 	}

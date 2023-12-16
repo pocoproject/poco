@@ -32,10 +32,10 @@ namespace Poco {
 class Foundation_API NamedMutexImpl
 {
 protected:
-	NamedMutexImpl(const std::string& name);
+	NamedMutexImpl(std::string  name);
 	~NamedMutexImpl();
 	void lockImpl();
-	bool tryLockImpl();
+	bool tryLockImpl() const;
 	void unlockImpl();
 
 private:

@@ -53,19 +53,19 @@ class Util_API ConfigurationView: public AbstractConfiguration
 	/// still works as expected given a ConfigurationView.
 {
 public:
-	ConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig);
+	ConfigurationView(std::string  prefix, AbstractConfiguration::Ptr pConfig);
 		/// Creates the ConfigurationView. The ConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 
 	std::string translateKey(const std::string& key) const;
 
-	~ConfigurationView();
+	~ConfigurationView() override;
 
 private:
 	ConfigurationView(const ConfigurationView&);

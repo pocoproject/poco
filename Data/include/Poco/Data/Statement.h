@@ -130,7 +130,7 @@ public:
 		/// synchronized prior to copy operation (i.e. is copied while executing),
 		/// this constructor shall synchronize it.
 
-	Statement(Statement&& other) noexcept;
+	Statement(Statement&& stmt) noexcept;
 		/// Move constructor.
 
 	Statement& operator = (const Statement& stmt);

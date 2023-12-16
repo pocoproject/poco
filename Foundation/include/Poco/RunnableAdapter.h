@@ -48,9 +48,8 @@ public:
 	{
 	}
 
-	~RunnableAdapter()
-	{
-	}
+	~RunnableAdapter() override
+	= default;
 
 	RunnableAdapter& operator = (const RunnableAdapter& ra)
 	{
@@ -59,7 +58,7 @@ public:
 		return *this;
 	}
 
-	void run()
+	void run() override
 	{
 		(_pObject->*_method)();
 	}

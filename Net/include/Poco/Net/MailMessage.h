@@ -78,7 +78,7 @@ public:
 
 	using PartVec = std::vector<Part>;
 
-	MailMessage(PartStoreFactory* pStoreFactory = 0);
+	MailMessage(PartStoreFactory* pStoreFactory = nullptr);
 		/// Creates an empty MailMessage.
 		///
 		/// If pStoreFactory is not null, message attachments will be
@@ -87,7 +87,7 @@ public:
 		/// the file system in order to avoid potential memory
 		/// exhaustion when attachment files are very large.
 
-	virtual ~MailMessage();
+	~MailMessage() override;
 		/// Destroys the MailMessage.
 
 	void addRecipient(const MailRecipient& recipient);
@@ -225,13 +225,13 @@ public:
 		/// is not a multi-part message, the content is stored
 		/// in a string available by calling getContent().
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the MailMessage from the given input stream.
 		///
 		/// The raw message (including all MIME parts) is stored
 		/// in a string and available by calling getContent().
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the mail message to the given output stream.
 
 	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
@@ -297,12 +297,12 @@ class Net_API MultipartSource: public PartSource
 	/// mail messages consisting of multiple nested parts.
 {
 public:
-	explicit MultipartSource(const std::string contentType = "multipart/alternative");
+	explicit MultipartSource(std::string contentType = "multipart/alternative");
 		/// Creates an empty MultipartSource.
 		///
 		/// At least one part must be added with addPart().
 
-	~MultipartSource();
+	~MultipartSource() override;
 		/// Destroys the MultipartSource.
 
 	void addPart(const std::string& name,
@@ -320,7 +320,7 @@ public:
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	// PartSource
-	std::istream& stream();
+	std::istream& stream() override;
 
 protected:
 	static std::string contentTypeWithBoundary(const std::string& contentType);

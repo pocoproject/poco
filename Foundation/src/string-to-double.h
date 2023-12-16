@@ -225,7 +225,7 @@ class StringToDoubleConverter {
   const uc16 separator_;
 
   template <class Iterator>
-  double StringToIeee(Iterator start_pointer,
+  double StringToIeee(Iterator input,
                       int length,
                       bool read_as_double,
                       int* processed_characters_count) const;

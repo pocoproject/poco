@@ -18,21 +18,22 @@
 #define Data_SQLChannel_INCLUDED
 
 
-#include "Poco/Data/Data.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Channel.h"
+#include "Poco/Data/ArchiveStrategy.h"
 #include "Poco/Data/Connector.h"
+#include "Poco/Data/Data.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/Statement.h"
-#include "Poco/Logger.h"
-#include "Poco/Data/ArchiveStrategy.h"
-#include "Poco/Channel.h"
 #include "Poco/FileChannel.h"
+#include "Poco/Logger.h"
 #include "Poco/Message.h"
-#include "Poco/AutoPtr.h"
-#include "Poco/String.h"
-#include "Poco/NotificationQueue.h"
-#include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/NotificationQueue.h"
+#include "Poco/String.h"
+#include "Poco/Thread.h"
 #include <atomic>
+#include <utility>
 
 
 namespace Poco {
@@ -72,8 +73,8 @@ public:
 	public:
 		using Ptr = Poco::AutoPtr<LogNotification>;
 
-		LogNotification(const Poco::Message& message) :
-			_message(message)
+		LogNotification(Poco::Message  message) :
+			_message(std::move(message))
 		{
 		}
 
@@ -92,33 +93,33 @@ public:
 	SQLChannel();
 		/// Creates SQLChannel.
 
-	SQLChannel(const std::string& connector,
-		const std::string& connect,
-		const std::string& name = "-",
-		const std::string& table = "T_POCO_LOG",
+	SQLChannel(std::string  connector,
+		std::string  connect,
+		std::string  name = "-",
+		std::string  table = "T_POCO_LOG",
 		int timeout = 1000,
 		int minBatch = DEFAULT_MIN_BATCH_SIZE,
 		int maxBatch = DEFAULT_MAX_BATCH_SIZE);
 		/// Creates an SQLChannel with the given connector, connect string, timeout, table and name.
 		/// The connector must be already registered.
 
-	void open();
+	void open() override;
 		/// Opens the SQLChannel.
 		/// Returns true if succesful.
 
-	void close();
+	void close() override;
 		/// Closes the SQLChannel.
 
-	void run();
+	void run() override;
 		/// Dequeues and sends the logs to the DB.
 
 	bool isRunning() const;
 		/// Returns true if the logging thread is running.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Writes the log message to the database.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
@@ -172,7 +173,7 @@ public:
 		///     * file       Destination file name for the backup FileChannel, used when DB
 		///                  connection is not present to log not executed SQL statements.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
 	void stop();
@@ -203,7 +204,7 @@ public:
 	static const std::string PROP_FILE;
 
 protected:
-	~SQLChannel();
+	~SQLChannel() override;
 
 private:
 	static const std::string SQL_INSERT_STMT;

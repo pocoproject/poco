@@ -43,8 +43,7 @@ Extractor::Extractor(sqlite3_stmt* pStmt):
 
 
 Extractor::~Extractor()
-{
-}
+= default;
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)

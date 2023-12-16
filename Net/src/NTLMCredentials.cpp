@@ -138,7 +138,7 @@ std::vector<unsigned char> NTLMCredentials::createNTLMv2Response(const std::vect
 	writer << timestamp;
 	writer.writeRaw(reinterpret_cast<const char*>(&nonce[0]), nonce.size());
 	writer << Poco::UInt32(0);
-	if (targetInfo.size() > 0)
+	if (!targetInfo.empty())
 	{
 		writer.writeRaw(reinterpret_cast<const char*>(&targetInfo[0]), targetInfo.size());
 	}

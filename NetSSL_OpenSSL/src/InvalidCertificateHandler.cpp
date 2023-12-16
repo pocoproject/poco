@@ -30,8 +30,7 @@ InvalidCertificateHandler::InvalidCertificateHandler(bool handleErrorsOnServerSi
 
 
 InvalidCertificateHandler::~InvalidCertificateHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

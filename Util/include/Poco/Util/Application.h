@@ -309,31 +309,31 @@ public:
 		///
 		/// Returns zero width and height if the window size cannot be determined.
 
-	const char* name() const;
+	const char* name() const override;
 
 protected:
-	void initialize(Application& self);
+	void initialize(Application& self) override;
 		/// Initializes the application and all registered subsystems.
 		/// Subsystems are always initialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void uninitialize();
+	void uninitialize() override;
 		/// Uninitializes the application and all registered subsystems.
 		/// Subsystems are always uninitialized in reverse order in which
 		/// they have been initialized.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void reinitialize(Application& self);
+	void reinitialize(Application& self) override;
 		/// Re-nitializes the application and all registered subsystems.
 		/// Subsystems are always reinitialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	virtual void defineOptions(OptionSet& options);
+	void defineOptions(OptionSet& options) override;
 		/// Called before command line processing begins.
 		/// If a subclass wants to support command line arguments,
 		/// it must override this method.
@@ -379,7 +379,7 @@ protected:
 	void init();
 		/// Common initialization code.
 
-	~Application();
+	~Application() override;
 		/// Destroys the Application and deletes all registered subsystems.
 
 private:

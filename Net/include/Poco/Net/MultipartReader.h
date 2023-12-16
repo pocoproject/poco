@@ -35,11 +35,11 @@ class Net_API MultipartStreamBuf: public Poco::BufferedStreamBuf
 {
 public:
 	MultipartStreamBuf(std::istream& istr, const std::string& boundary);
-	~MultipartStreamBuf();
+	~MultipartStreamBuf() override;
 	bool lastPart() const;
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -58,7 +58,7 @@ class Net_API MultipartIOS: public virtual std::ios
 {
 public:
 	MultipartIOS(std::istream& istr, const std::string& boundary);
-	~MultipartIOS();
+	~MultipartIOS() override;
 	MultipartStreamBuf* rdbuf();
 	bool lastPart() const;
 
@@ -72,7 +72,7 @@ class Net_API MultipartInputStream: public MultipartIOS, public std::istream
 {
 public:
 	MultipartInputStream(std::istream& istr, const std::string& boundary);
-	~MultipartInputStream();
+	~MultipartInputStream() override;
 };
 
 
@@ -104,7 +104,7 @@ public:
 		/// stream. The message must not contain a preamble
 		/// preceding the first encapsulation boundary.
 
-	MultipartReader(std::istream& istr, const std::string& boundary);
+	MultipartReader(std::istream& istr, std::string  boundary);
 		/// Creates the MultipartReader and attaches it to the
 		/// given input stream. The given boundary string is
 		/// used to find message boundaries.

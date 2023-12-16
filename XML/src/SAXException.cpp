@@ -67,19 +67,13 @@ SAXParseException::SAXParseException(const std::string& msg, const XMLString& pu
 }
 
 
-SAXParseException::SAXParseException(const SAXParseException& exc):
-	SAXException(exc),
-	_publicId(exc._publicId),
-	_systemId(exc._systemId),
-	_lineNumber(exc._lineNumber),
-	_columnNumber(exc._columnNumber)
-{
-}
+SAXParseException::SAXParseException(const SAXParseException& exc)
+	
+= default;
 
 
 SAXParseException::~SAXParseException() noexcept
-{
-}
+= default;
 
 
 SAXParseException& SAXParseException::operator = (const SAXParseException& exc)

@@ -34,7 +34,7 @@ class Net_API NTPEventArgs
 	///	passed to the handler function to provide information about the event.
 {
 public:
-	NTPEventArgs(const SocketAddress& address);
+	NTPEventArgs(SocketAddress  address);
 		/// Creates NTPEventArgs.
 
 	virtual ~NTPEventArgs();

@@ -32,7 +32,7 @@ class Encodings_API MacRomanEncoding: public DoubleByteEncoding
 {
 public:
 	MacRomanEncoding();
-	~MacRomanEncoding();
+	~MacRomanEncoding() override;
 
 private:
 	static const char* _names[];

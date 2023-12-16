@@ -39,20 +39,20 @@ class RSACipherImpl: public Cipher
 	/// requires the private key.
 {
 public:
-	RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode);
+	RSACipherImpl(RSAKey  key, RSAPaddingMode paddingMode);
 		/// Creates a new RSACipherImpl object for the given RSAKey
 		/// and using the given padding mode.
 
-	virtual ~RSACipherImpl();
+	~RSACipherImpl() override;
 		/// Destroys the RSACipherImpl.
 
-	const std::string& name() const;
+	const std::string& name() const override;
 		/// Returns the name of the Cipher.
 
-	CryptoTransform::Ptr createEncryptor();
+	CryptoTransform::Ptr createEncryptor() override;
 		/// Creates an encryptor object.
 
-	CryptoTransform::Ptr createDecryptor();
+	CryptoTransform::Ptr createDecryptor() override;
 		/// Creates a decryptor object.
 
 private:

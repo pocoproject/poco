@@ -23,6 +23,7 @@
 #endif // max
 #endif // POCO_OS_FAMILY_WINDOWS
 #include <limits>
+#include <memory>
 
 
 using Poco::Exception;
@@ -141,12 +142,12 @@ public:
 					bool isExpired = !alwaysRun && (Timestamp() >= it->second);
 					if (isExpired)
 					{
-						pCH.reset(new Work(std::move(it->first)));
+						pCH = std::make_unique<Work>(std::move(it->first));
 						it = _funcList.erase(it);
 					}
 					else if (alwaysRun)
 					{
-						pCH.reset(new Work(it->first));
+						pCH = std::make_unique<Work>(it->first);
 						++it;
 					}
 					else ++it;
@@ -280,9 +281,7 @@ void SocketProactor::wait()
 bool SocketProactor::hasHandlers(SubscriberMap& handlers, int sockfd)
 {
 	Poco::Mutex::ScopedLock l(_writeMutex);
-	if (handlers.end() == handlers.find(sockfd))
-		return false;
-	return true;
+	return handlers.end() != handlers.find(sockfd);
 }
 
 
@@ -291,7 +290,7 @@ int SocketProactor::poll(int* pHandled)
 	int handled = 0;
 	int worked = 0;
 	PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
-	if (sm.size() > 0)
+	if (!sm.empty())
 	{
 		auto it = sm.begin();
 		auto end = sm.end();
@@ -373,7 +372,7 @@ void SocketProactor::addSendTo(Socket sock, Buffer&& message, const SocketAddres
 	try
 	{
 		pMessage = new Buffer(std::move(message));
-		pAddr = new SocketAddress(std::move(addr));
+		pAddr = new SocketAddress(addr);
 	}
 	catch(...)
 	{
@@ -493,7 +492,7 @@ int SocketProactor::send(Socket& sock)
 void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 {
 	Buffer* pBuf = (*it)->_pBuf;
-	if (pBuf && pBuf->size())
+	if (pBuf && !pBuf->empty())
 	{
 		SocketAddress *pAddr = (*it)->_pAddr;
 		int n = 0, err = 0;
@@ -522,7 +521,7 @@ void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 {
 	Buffer* pBuf = (*it)->_pBuf;
-	if (pBuf && pBuf->size())
+	if (pBuf && !pBuf->empty())
 	{
 		int n = 0, err = 0;
 		try
@@ -572,7 +571,7 @@ int SocketProactor::receive(Socket& sock)
 			handlers.pop_front();
 			// end iterator is invalidated when the last member
 			// is removed, so make sure we don't check for it
-			if (handlers.size() == 0) break;
+			if (handlers.empty()) break;
 		}
 		else break;
 	}
@@ -682,9 +681,7 @@ void SocketProactor::run()
 
 bool SocketProactor::hasSocketHandlers() const
 {
-	if (_readHandlers.size() || _writeHandlers.size())
-		return true;
-	return false;
+	return !_readHandlers.empty() || !_writeHandlers.empty();
 }
 
 

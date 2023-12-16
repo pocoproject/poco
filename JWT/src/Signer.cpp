@@ -13,19 +13,20 @@
 
 
 #include "Poco/JWT/Signer.h"
-#include "Poco/JWT/Serializer.h"
-#include "Poco/JWT/JWTException.h"
-#include "Poco/HMACEngine.h"
-#include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/DynamicFactory.h"
-#include "Poco/MemoryStream.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
+#include "Poco/Base64Encoder.h"
 #include "Poco/Crypto/DigestEngine.h"
-#include "Poco/Crypto/RSADigestEngine.h"
 #include "Poco/Crypto/ECDSADigestEngine.h"
+#include "Poco/Crypto/RSADigestEngine.h"
+#include "Poco/DynamicFactory.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/JWT/JWTException.h"
+#include "Poco/JWT/Serializer.h"
+#include "Poco/MemoryStream.h"
+#include "Poco/RefCountedObject.h"
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -46,7 +47,7 @@ public:
 	Algorithm();
 		/// Creates the Algorithm.
 
-	virtual ~Algorithm();
+	~Algorithm() override;
 		/// Destroys the Algorithm.
 
 	virtual Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) = 0;
@@ -64,13 +65,11 @@ public:
 
 
 Algorithm::Algorithm()
-{
-}
+= default;
 
 
 Algorithm::~Algorithm()
-{
-}
+= default;
 
 
 const std::string Algorithm::SHA256("SHA256");
@@ -130,7 +129,7 @@ template <typename Engine>
 class HMACAlgorithm: public Algorithm
 {
 public:
-	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
+	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) override
 	{
 		if (signer.getHMACKey().empty()) throw SignatureGenerationException("No HMAC key available");
 
@@ -141,7 +140,7 @@ public:
 		return hmac.digest();
 	}
 
-	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
+	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature) override
 	{
 		return sign(signer, header, payload) == signature;
 	}
@@ -156,12 +155,12 @@ typedef HMACAlgorithm<SHA512Engine> HS512;
 class RSAAlgorithm: public Algorithm
 {
 public:
-	RSAAlgorithm(const std::string& digestType):
-		_digestType(digestType)
+	RSAAlgorithm(std::string  digestType):
+		_digestType(std::move(digestType))
 	{
 	}
 
-	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
+	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) override
 	{
 		if (!signer.getRSAKey()) throw SignatureGenerationException("No RSA key available");
 
@@ -173,7 +172,7 @@ public:
 
 	}
 
-	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
+	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature) override
 	{
 		if (!signer.getRSAKey()) throw SignatureVerificationException("No RSA key available");
 
@@ -227,12 +226,12 @@ public:
 		RS_PADDING = 32
 	};
 
-	ECDSAAlgorithm(const std::string& digestType):
-		_digestType(digestType)
+	ECDSAAlgorithm(std::string  digestType):
+		_digestType(std::move(digestType))
 	{
 	}
 
-	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
+	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) override
 	{
 		if (!signer.getECKey()) throw SignatureGenerationException("No EC key available");
 
@@ -254,7 +253,7 @@ public:
 		return jwtSig;
 	}
 
-	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
+	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature) override
 	{
 		if (!signer.getECKey()) throw SignatureVerificationException("No EC key available");
 
@@ -354,8 +353,8 @@ Signer::Signer()
 }
 
 
-Signer::Signer(const std::string& hmacKey):
-	_hmacKey(hmacKey)
+Signer::Signer(std::string  hmacKey):
+	_hmacKey(std::move(hmacKey))
 {
 	_algorithms.insert(ALGO_HS256);
 }
@@ -376,8 +375,7 @@ Signer::Signer(const Poco::SharedPtr<Poco::Crypto::ECKey>& pECKey):
 
 
 Signer::~Signer()
-{
-}
+= default;
 
 
 Signer& Signer::setAlgorithms(const std::set<std::string>& algorithms)

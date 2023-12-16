@@ -61,7 +61,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::unique_ptr<std::string> eStr;
 	if (ePos != std::string::npos)
 	{
-		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));
+		eStr = std::make_unique<std::string>(str.substr(ePos, std::string::npos));
 		frac -= eStr->length();
 		str = str.substr(0, str.length() - eStr->length());
 	}
@@ -122,7 +122,7 @@ void insertThousandSep(std::string& str, char thSep, char decSep = '.')
 	/// Used only internally.
 {
 	poco_assert (decSep != thSep);
-	if (str.size() == 0) return;
+	if (str.empty()) return;
 
 	std::string::size_type exPos = str.find('e');
 	if (exPos == std::string::npos) exPos = str.find('E');

@@ -42,7 +42,7 @@ PipeImpl::~PipeImpl()
 }
 
 
-int PipeImpl::writeBytes(const void* buffer, int length)
+int PipeImpl::writeBytes(const void* buffer, int length) const
 {
 	poco_assert (_writefd != -1);
 
@@ -59,7 +59,7 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 }
 
 
-int PipeImpl::readBytes(void* buffer, int length)
+int PipeImpl::readBytes(void* buffer, int length) const
 {
 	poco_assert (_readfd != -1);
 

@@ -18,6 +18,8 @@
 #include "Poco/Buffer.h"
 #include <openssl/err.h>
 
+#include <utility>
+
 
 namespace Poco {
 namespace Crypto {
@@ -34,7 +36,7 @@ namespace
 		{
 			if (!msg.empty())
 				msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -54,26 +56,26 @@ namespace
 
 		CryptoTransformImpl(
 			const EVP_CIPHER* pCipher,
-			const ByteVec&    key,
-			const ByteVec&    iv,
+			ByteVec     key,
+			ByteVec     iv,
 			Direction         dir);
 
-		~CryptoTransformImpl();
+		~CryptoTransformImpl() override;
 
-		std::size_t blockSize() const;
-		int setPadding(int padding);
-		std::string getTag(std::size_t tagSize);
-		void setTag(const std::string& tag);
+		std::size_t blockSize() const override;
+		int setPadding(int padding) override;
+		std::string getTag(std::size_t tagSize) override;
+		void setTag(const std::string& tag) override;
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize      inputLength,
 			unsigned char*       output,
-			std::streamsize      outputLength);
+			std::streamsize      outputLength) override;
 
 		std::streamsize finalize(
 			unsigned char*  output,
-			std::streamsize length);
+			std::streamsize length) override;
 
 	private:
 		const EVP_CIPHER* _pCipher;
@@ -89,12 +91,12 @@ namespace
 
 	CryptoTransformImpl::CryptoTransformImpl(
 		const EVP_CIPHER* pCipher,
-		const ByteVec&    key,
-		const ByteVec&    iv,
+		ByteVec     key,
+		ByteVec     iv,
 		Direction         dir):
 		_pCipher(pCipher),
-		_key(key),
-		_iv(iv)
+		_key(std::move(key)),
+		_iv(std::move(iv))
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		_pContext = EVP_CIPHER_CTX_new();
@@ -103,7 +105,7 @@ namespace
 			_pContext,
 			_pCipher,
 			&_key[0],
-			_iv.empty() ? 0 : &_iv[0],
+			_iv.empty() ? nullptr : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #else
 		int rc = EVP_CipherInit(
@@ -119,7 +121,7 @@ namespace
 		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), NULL);
+			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
 #else
 			int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), NULL);
 #endif
@@ -246,15 +248,14 @@ namespace
 }
 
 
-CipherImpl::CipherImpl(const CipherKey& key):
-	_key(key)
+CipherImpl::CipherImpl(CipherKey  key):
+	_key(std::move(key))
 {
 }
 
 
 CipherImpl::~CipherImpl()
-{
-}
+= default;
 
 
 CryptoTransform::Ptr CipherImpl::createEncryptor()

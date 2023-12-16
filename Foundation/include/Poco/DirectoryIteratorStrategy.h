@@ -42,7 +42,7 @@ public:
 	TraverseBase(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
 protected:
-	bool isFiniteDepth();
+	bool isFiniteDepth() const;
 	bool isDirectory(Poco::File& file);
 
 	DepthFun _depthDeterminer;
@@ -61,7 +61,7 @@ class Foundation_API ChildrenFirstTraverse: public TraverseBase
 public:
 	ChildrenFirstTraverse(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
-	const std::string next(Stack* itStack, bool* isFinished);
+	std::string next(Stack* itStack, bool* isFinished);
 
 private:
 	ChildrenFirstTraverse();
@@ -75,7 +75,7 @@ class Foundation_API SiblingsFirstTraverse: public TraverseBase
 public:
 	SiblingsFirstTraverse(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
-	const std::string next(Stack* itStack, bool* isFinished);
+	std::string next(Stack* itStack, bool* isFinished);
 
 private:
 	SiblingsFirstTraverse();

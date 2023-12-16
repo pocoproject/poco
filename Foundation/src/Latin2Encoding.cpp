@@ -24,7 +24,7 @@ const char* Latin2Encoding::_names[] =
 	"ISO-8859-2",
 	"Latin2",
 	"Latin-2",
-	NULL
+	nullptr
 };
 
 
@@ -51,13 +51,11 @@ const TextEncoding::CharacterMap Latin2Encoding::_charMap =
 
 
 Latin2Encoding::Latin2Encoding()
-{
-}
+= default;
 
 
 Latin2Encoding::~Latin2Encoding()
-{
-}
+= default;
 
 
 const char* Latin2Encoding::canonicalName() const

@@ -34,7 +34,7 @@ class Net_API SocketAddressImpl : public Poco::RefCountedObject
 public:
 	using Family = AddressFamily::Family;
 
-	virtual ~SocketAddressImpl();
+	~SocketAddressImpl() override;
 
 	virtual IPAddress host() const = 0;
 	virtual UInt16 port() const = 0;
@@ -59,13 +59,13 @@ public:
 	IPv4SocketAddressImpl();
 	IPv4SocketAddressImpl(const struct sockaddr_in* addr);
 	IPv4SocketAddressImpl(const void* addr, UInt16 port);
-	IPAddress host() const;
-	UInt16 port() const;
-	poco_socklen_t length() const;
-	const struct sockaddr* addr() const;
-	int af() const;
-	Family family() const;
-	std::string toString() const;
+	IPAddress host() const override;
+	UInt16 port() const override;
+	poco_socklen_t length() const override;
+	const struct sockaddr* addr() const override;
+	int af() const override;
+	Family family() const override;
+	std::string toString() const override;
 
 private:
 	struct sockaddr_in _addr;
@@ -121,13 +121,13 @@ public:
 	IPv6SocketAddressImpl(const struct sockaddr_in6* addr);
 	IPv6SocketAddressImpl(const void* addr, UInt16 port);
 	IPv6SocketAddressImpl(const void* addr, UInt16 port, UInt32 scope);
-	IPAddress host() const;
-	UInt16 port() const;
-	poco_socklen_t length() const;
-	const struct sockaddr* addr() const;
-	int af() const;
-	Family family() const;
-	std::string toString() const;
+	IPAddress host() const override;
+	UInt16 port() const override;
+	poco_socklen_t length() const override;
+	const struct sockaddr* addr() const override;
+	int af() const override;
+	Family family() const override;
+	std::string toString() const override;
 
 private:
 	struct sockaddr_in6 _addr;
@@ -186,15 +186,15 @@ public:
 	LocalSocketAddressImpl(const struct sockaddr_un* addr);
 	LocalSocketAddressImpl(const char* path);
 	LocalSocketAddressImpl(const char* path, std::size_t length);
-	~LocalSocketAddressImpl();
-	IPAddress host() const;
-	UInt16 port() const;
-	poco_socklen_t length() const;
-	const struct sockaddr* addr() const;
-	int af() const;
-	Family family() const;
+	~LocalSocketAddressImpl() override;
+	IPAddress host() const override;
+	UInt16 port() const override;
+	poco_socklen_t length() const override;
+	const struct sockaddr* addr() const override;
+	int af() const override;
+	Family family() const override;
 	const char* path() const;
-	std::string toString() const;
+	std::string toString() const override;
 
 private:
 	struct sockaddr_un* _pAddr;

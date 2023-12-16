@@ -98,7 +98,7 @@ public:
 
 protected:
 	static bool containsWildcards(const std::string& commonName);
-	static bool matchWildcard(const std::string& alias, const std::string& hostName);
+	static bool matchWildcard(const std::string& wildcard, const std::string& hostName);
 
 private:
 	enum

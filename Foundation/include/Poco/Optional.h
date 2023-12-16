@@ -91,8 +91,7 @@ public:
 
 	~Optional()
 		/// Destroys the Optional.
-	{
-	}
+	= default;
 
 	Optional& assign(const C& value)
 		/// Assigns a value to the Optional.

@@ -74,8 +74,7 @@ Token::Token(const std::string& header, const std::string& payload, const std::s
 
 
 Token::~Token()
-{
-}
+= default;
 
 
 Token& Token::operator = (const Token& token)
@@ -141,9 +140,9 @@ std::string Token::toString() const
 void Token::setAudience(const std::vector<std::string>& audience)
 {
 	Poco::JSON::Array::Ptr pArray = new Poco::JSON::Array;
-	for (std::vector<std::string>::const_iterator it = audience.begin(); it != audience.end(); ++it)
+	for (const auto & it : audience)
 	{
-		pArray->add(*it);
+		pArray->add(it);
 	}
 	_pPayload->set(CLAIM_AUDIENCE, pArray);
 }

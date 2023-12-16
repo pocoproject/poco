@@ -40,7 +40,7 @@
 #endif
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
-#include <stdio.h>
+#include <cstdio>
 #include <sys/ioctl.h>
 #if POCO_OS == POCO_OS_SOLARIS
 #include <stropts.h>
@@ -65,7 +65,7 @@ namespace Poco {
 namespace Util {
 
 
-Application* Application::_pInstance = 0;
+Application* Application::_pInstance = nullptr;
 
 
 Application::Application():
@@ -93,13 +93,13 @@ Application::Application(int argc, char* argv[]):
 
 Application::~Application()
 {
-	_pInstance = 0;
+	_pInstance = nullptr;
 }
 
 
 void Application::setup()
 {
-	poco_assert (_pInstance == 0);
+	poco_assert (_pInstance == nullptr);
 
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true);

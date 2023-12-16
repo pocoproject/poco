@@ -45,7 +45,7 @@ PDJSON_SYMEXPORT void json_open_user(json_stream *json, json_user_io get, json_u
 PDJSON_SYMEXPORT void json_close(json_stream *json);
 
 PDJSON_SYMEXPORT void json_set_allocator(json_stream *json, json_allocator *a);
-PDJSON_SYMEXPORT void json_set_streaming(json_stream *json, bool mode);
+PDJSON_SYMEXPORT void json_set_streaming(json_stream *json, bool streaming);
 
 PDJSON_SYMEXPORT enum json_type json_next(json_stream *json);
 PDJSON_SYMEXPORT enum json_type json_peek(json_stream *json);

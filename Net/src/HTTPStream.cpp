@@ -34,8 +34,7 @@ HTTPStreamBuf::HTTPStreamBuf(HTTPSession& session, openmode mode):
 
 
 HTTPStreamBuf::~HTTPStreamBuf()
-{
-}
+= default;
 
 
 void HTTPStreamBuf::close()
@@ -107,8 +106,7 @@ HTTPInputStream::HTTPInputStream(HTTPSession& session):
 
 
 HTTPInputStream::~HTTPInputStream()
-{
-}
+= default;
 
 
 void* HTTPInputStream::operator new(std::size_t size)
@@ -146,8 +144,7 @@ HTTPOutputStream::HTTPOutputStream(HTTPSession& session):
 
 
 HTTPOutputStream::~HTTPOutputStream()
-{
-}
+= default;
 
 
 void* HTTPOutputStream::operator new(std::size_t size)

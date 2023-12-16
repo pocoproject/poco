@@ -45,10 +45,10 @@ public:
 		/// If listen is true, a thread is launched where client can receive
 		/// responses rom the server.
 
-	virtual ~UDPClient();
+	~UDPClient() override;
 		/// Destroys UDPClient.
 
-	void run();
+	void run() override;
 		/// Runs listener (typically invoked internally, in separate thread).
 
 	SocketAddress address() const;

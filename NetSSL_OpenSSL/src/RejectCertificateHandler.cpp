@@ -26,8 +26,7 @@ RejectCertificateHandler::RejectCertificateHandler(bool server): InvalidCertific
 
 
 RejectCertificateHandler::~RejectCertificateHandler()
-{
-}
+= default;
 
 
 void RejectCertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)

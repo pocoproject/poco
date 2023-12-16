@@ -39,7 +39,7 @@ public:
 	HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServerSession.
 
-	virtual ~HTTPServerSession();
+	~HTTPServerSession() override;
 		/// Destroys the HTTPServerSession.
 
 	bool hasMoreRequests();

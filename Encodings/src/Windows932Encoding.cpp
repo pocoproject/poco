@@ -25,7 +25,7 @@ const char* Windows932Encoding::_names[] =
 	"cp932",
 	"CP932",
 	"shift_jis",
-	NULL
+	nullptr
 };
 
 
@@ -1971,8 +1971,7 @@ Windows932Encoding::Windows932Encoding():
 
 
 Windows932Encoding::~Windows932Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

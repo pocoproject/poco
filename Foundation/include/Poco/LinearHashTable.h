@@ -177,8 +177,7 @@ public:
 	{
 	public:
 		Iterator()
-		{
-		}
+		= default;
 
 		Iterator(const BucketVecIterator& vecIt, const BucketVecIterator& endIt, const BucketIterator& buckIt):
 			ConstIterator(vecIt, endIt, buckIt)
@@ -259,8 +258,7 @@ public:
 
 	~LinearHashTable()
 		/// Destroys the LinearHashTable.
-	{
-	}
+	= default;
 
 	LinearHashTable& operator = (const LinearHashTable& table)
 		/// Assigns another LinearHashTable.

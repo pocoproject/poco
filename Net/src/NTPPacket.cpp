@@ -78,8 +78,7 @@ NTPPacket::NTPPacket(Poco::UInt8 *packet)
 
 
 NTPPacket::~NTPPacket()
-{
-}
+= default;
 
 
 void NTPPacket::packet(Poco::UInt8 *packet) const

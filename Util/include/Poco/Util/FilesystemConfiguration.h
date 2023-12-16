@@ -75,12 +75,12 @@ public:
 		/// directory and all its subdirectories and files.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 	Poco::Path keyToPath(const std::string& key) const;
-	~FilesystemConfiguration();
+	~FilesystemConfiguration() override;
 
 private:
 	Poco::Path _path;

@@ -41,17 +41,16 @@ class CompilerApp: public Application
 {
 public:
 	CompilerApp()
-	{
-	}
+	= default;
 
 protected:
-	void initialize(Application& self)
+	void initialize(Application& self) override
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 	}
 
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& options) override
 	{
 		Application::defineOptions(options);
 
@@ -197,7 +196,7 @@ protected:
 		}
 	}
 
-	int main(const ArgVec& args)
+	int main(const ArgVec& args) override
 	{
 		if (!_helpRequested)
 		{

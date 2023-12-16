@@ -50,7 +50,7 @@ bool EnvironmentImpl::hasImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	return getenv(name.c_str()) != 0;
+	return getenv(name.c_str()) != nullptr;
 }
 
 
@@ -232,7 +232,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int lastlen = 0;
 	int len = 100*sizeof(struct ifreq);
 	struct ifconf ifc;
-	char* buf = 0;
+	char* buf = nullptr;
 	for (;;)
 	{
 		buf = new char[len];

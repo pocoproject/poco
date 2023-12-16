@@ -20,7 +20,7 @@
 #undef max
 #include <limits>
 #if defined(POCO_OS_FAMILY_UNIX)
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 #if defined(POCO_VXWORKS)
 #include <timers.h>
@@ -68,15 +68,11 @@ Timestamp::Timestamp(const Timestamp& other)
 
 
 Timestamp::~Timestamp()
-{
-}
+= default;
 
 
 Timestamp& Timestamp::operator = (const Timestamp& other)
-{
-	_ts = other._ts;
-	return *this;
-}
+= default;
 
 
 Timestamp& Timestamp::operator = (TimeVal tv)

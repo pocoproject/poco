@@ -32,7 +32,7 @@ class Encodings_API MacJapaneseEncoding: public DoubleByteEncoding
 {
 public:
 	MacJapaneseEncoding();
-	~MacJapaneseEncoding();
+	~MacJapaneseEncoding() override;
 
 private:
 	static const char* _names[];

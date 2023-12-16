@@ -36,14 +36,14 @@ public:
 	Connector();
 		/// Creates the Connector.
 
-	virtual ~Connector();
+	~Connector() override;
 		/// Destroys the Connector.
 
-	virtual const std::string& name() const;
+	const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
-	virtual Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
-		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
+	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
+		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a MySQL SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();

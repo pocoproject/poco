@@ -45,7 +45,7 @@ public:
 		/// instance was found.
 
 protected:
-	Connection::Ptr isMaster(const Net::SocketAddress& host);
+	Connection::Ptr isMaster(const Net::SocketAddress& address);
 
 private:
 	std::vector<Net::SocketAddress> _addresses;

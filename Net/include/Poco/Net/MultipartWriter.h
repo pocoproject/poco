@@ -51,7 +51,7 @@ public:
 		///
 		/// Creates a random boundary string.
 
-	MultipartWriter(std::ostream& ostr, const std::string& boundary);
+	MultipartWriter(std::ostream& ostr, std::string  boundary);
 		/// Creates the MultipartWriter, using the
 		/// given output stream and boundary string.
 

@@ -31,8 +31,7 @@ namespace Poco {
 
 
 File::File()
-{
-}
+= default;
 
 
 File::File(const std::string& path): FileImpl(path)
@@ -56,8 +55,7 @@ File::File(const File& file): FileImpl(file.getPathImpl())
 
 
 File::~File()
-{
-}
+= default;
 
 
 File& File::operator = (const File& file)

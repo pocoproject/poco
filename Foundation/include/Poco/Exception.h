@@ -30,20 +30,20 @@ class Foundation_API Exception: public std::exception
 	/// in the Poco class library.
 {
 public:
-	Exception(const std::string& msg, int code = 0);
+	Exception(std::string  msg, int code = 0);
 		/// Creates an exception.
 
-	Exception(const std::string& msg, const std::string& arg, int code = 0);
+	Exception(std::string  msg, const std::string& arg, int code = 0);
 		/// Creates an exception.
 
-	Exception(const std::string& msg, const Exception& nested, int code = 0);
+	Exception(std::string  msg, const Exception& nested, int code = 0);
 		/// Creates an exception and stores a clone
 		/// of the nested exception.
 
 	Exception(const Exception& exc);
 		/// Copy constructor.
 
-	~Exception() noexcept;
+	~Exception() noexcept override;
 		/// Destroys the exception and deletes the nested exception.
 
 	Exception& operator = (const Exception& exc);
@@ -55,7 +55,7 @@ public:
 	virtual const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	virtual const char* what() const noexcept;
+	const char* what() const noexcept override;
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.

@@ -30,6 +30,8 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 
+#include <utility>
+
 
 using Poco::IOException;
 using Poco::TimeoutException;
@@ -47,9 +49,9 @@ namespace Net {
 
 
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
-	_pSSL(0),
-	_pSocket(pSocketImpl),
-	_pContext(pContext),
+	_pSSL(nullptr),
+	_pSocket(std::move(pSocketImpl)),
+	_pContext(std::move(pContext)),
 	_needHandshake(false)
 {
 	poco_check_ptr (_pSocket);
@@ -209,7 +211,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	catch (...)
 	{
 		SSL_free(_pSSL);
-		_pSSL = 0;
+		_pSSL = nullptr;
 		throw;
 	}
 }
@@ -489,7 +491,7 @@ X509* SecureSocketImpl::peerCertificate() const
 	if (_pSSL)
 		return SSL_get_peer_certificate(_pSSL);
 	else
-		return 0;
+		return nullptr;
 }
 
 
@@ -629,7 +631,7 @@ void SecureSocketImpl::reset()
 	{
 		SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		SSL_free(_pSSL);
-		_pSSL = 0;
+		_pSSL = nullptr;
 	}
 }
 

@@ -80,7 +80,7 @@ public:
 	RowFilter(Ptr pParent, LogicOperator op = OP_OR);
 		/// Creates child RowFilter and associates it with the parent filter.
 
-	~RowFilter();
+	~RowFilter() override;
 		/// Destroys the RowFilter.
 
 	void addFilter(Ptr pFilter, LogicOperator comparison);
@@ -194,7 +194,7 @@ inline bool RowFilter::has(Ptr pFilter) const
 
 inline bool RowFilter::isEmpty() const
 {
-	return _comparisonMap.size() == 0;
+	return _comparisonMap.empty();
 }
 
 

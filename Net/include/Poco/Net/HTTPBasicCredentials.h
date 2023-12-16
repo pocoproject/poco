@@ -37,7 +37,7 @@ public:
 	HTTPBasicCredentials();
 		/// Creates an empty HTTPBasicCredentials object.
 
-	HTTPBasicCredentials(const std::string& username, const std::string& password);
+	HTTPBasicCredentials(std::string  username, std::string  password);
 		/// Creates a HTTPBasicCredentials object with the given username and password.
 
 	explicit HTTPBasicCredentials(const HTTPRequest& request);

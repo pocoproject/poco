@@ -62,10 +62,10 @@ public:
 	FTPStreamFactory();
 		/// Creates the FTPStreamFactory.
 
-	~FTPStreamFactory();
+	~FTPStreamFactory() override;
 		/// Destroys the FTPStreamFactory.
 
-	std::istream* open(const Poco::URI& uri);
+	std::istream* open(const Poco::URI& uri) override;
 		/// Creates and opens a FTP stream for the given URI.
 		/// The URI must be a ftp://... URI.
 		///

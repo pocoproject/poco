@@ -38,20 +38,20 @@ class EVPCipherImpl: public Cipher
 	/// requires the private key.
 {
 public:
-	EVPCipherImpl(const EVPPKey& key);
+	EVPCipherImpl(EVPPKey  key);
 		/// Creates a new EVPCipherImpl object for the given EVPPKey
 		/// and using the given padding mode.
 
-	virtual ~EVPCipherImpl();
+	~EVPCipherImpl() override;
 		/// Destroys the EVPCipherImpl.
 
-	const std::string& name() const;
+	const std::string& name() const override;
 		/// Returns the name of the Cipher.
 
-	CryptoTransform::Ptr createEncryptor();
+	CryptoTransform::Ptr createEncryptor() override;
 		/// Creates an encryptor object.
 
-	CryptoTransform::Ptr createDecryptor();
+	CryptoTransform::Ptr createDecryptor() override;
 		/// Creates a decryptor object.
 
 private:

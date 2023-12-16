@@ -168,8 +168,7 @@ FastMutexImpl::FastMutexImpl(): MutexImpl(true)
 
 
 FastMutexImpl::~FastMutexImpl()
-{
-}
+= default;
 
 
 } // namespace Poco

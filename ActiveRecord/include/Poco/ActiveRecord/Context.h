@@ -33,13 +33,13 @@ class ActiveRecordLib_API Context: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<Context>;
 
-	explicit Context(const Poco::Data::Session& session);
+	explicit Context(Poco::Data::Session  session);
 		/// Creates the Context from an existing Poco::Data::Session.
 
 	Context(const std::string& connector, const std::string& connectionString);
 		/// Creates the Context from a connector name and connection string.
 
-	~Context() = default;
+	~Context() override = default;
 		/// Destroys the Context.
 
 	Poco::Data::Session& session();

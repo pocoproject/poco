@@ -9,26 +9,27 @@
 
 
 #include "CodeWriter.h"
+
 #include "Page.h"
 #include "Poco/Path.h"
-#include "Poco/StringTokenizer.h"
 #include "Poco/String.h"
+#include "Poco/StringTokenizer.h"
+#include <utility>
 
 
 using Poco::Path;
 using Poco::StringTokenizer;
 
 
-CodeWriter::CodeWriter(const Page& page, const std::string& clazz):
+CodeWriter::CodeWriter(const Page& page, std::string  clazz):
 	_page(page),
-	_class(clazz)
+	_class(std::move(clazz))
 {
 }
 
 
 CodeWriter::~CodeWriter()
-{
-}
+= default;
 
 
 void CodeWriter::writeHeader(std::ostream& ostr, const std::string& headerFileName)
@@ -99,9 +100,9 @@ void CodeWriter::beginNamespace(std::ostream& ostr)
 	if (!ns.empty())
 	{
 		StringTokenizer tok(ns, ":", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+		for (const auto & it : tok)
 		{
-			ostr << "namespace " << *it << " {\n";
+			ostr << "namespace " << it << " {\n";
 		}
 		ostr << "\n\n";
 	}

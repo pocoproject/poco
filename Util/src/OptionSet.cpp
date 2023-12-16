@@ -22,19 +22,16 @@ namespace Util {
 
 
 OptionSet::OptionSet()
-{
-}
+= default;
 
 
-OptionSet::OptionSet(const OptionSet& options):
-	_options(options._options)
-{
-}
+OptionSet::OptionSet(const OptionSet& options)
+	
+= default;
 
 
 OptionSet::~OptionSet()
-{
-}
+= default;
 
 
 OptionSet& OptionSet::operator = (const OptionSet& options)
@@ -81,7 +78,7 @@ bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 
 const Option& OptionSet::getOption(const std::string& name, bool matchShort) const
 {
-	const Option* pOption = 0;
+	const Option* pOption = nullptr;
 	for (const auto& opt: _options)
 	{
 		if ((matchShort && opt.matchesShort(name)) || (!matchShort && opt.matchesPartial(name)))

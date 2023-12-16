@@ -39,10 +39,10 @@ class Net_API QuotedPrintableDecoderBuf: public Poco::UnbufferedStreamBuf
 {
 public:
 	QuotedPrintableDecoderBuf(std::istream& istr);
-	~QuotedPrintableDecoderBuf();
+	~QuotedPrintableDecoderBuf() override;
 
 private:
-	int readFromDevice();
+	int readFromDevice() override;
 
 	std::streambuf& _buf;
 };
@@ -56,7 +56,7 @@ class Net_API QuotedPrintableDecoderIOS: public virtual std::ios
 {
 public:
 	QuotedPrintableDecoderIOS(std::istream& istr);
-	~QuotedPrintableDecoderIOS();
+	~QuotedPrintableDecoderIOS() override;
 	QuotedPrintableDecoderBuf* rdbuf();
 
 protected:
@@ -76,7 +76,7 @@ class Net_API QuotedPrintableDecoder: public QuotedPrintableDecoderIOS, public s
 {
 public:
 	QuotedPrintableDecoder(std::istream& istr);
-	~QuotedPrintableDecoder();
+	~QuotedPrintableDecoder() override;
 };
 
 

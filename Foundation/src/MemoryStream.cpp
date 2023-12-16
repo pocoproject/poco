@@ -26,8 +26,7 @@ MemoryIOS::MemoryIOS(char* pBuffer, std::streamsize bufferSize):
 
 
 MemoryIOS::~MemoryIOS()
-{
-}
+= default;
 
 
 MemoryInputStream::MemoryInputStream(const char* pBuffer, std::streamsize bufferSize):
@@ -38,8 +37,7 @@ MemoryInputStream::MemoryInputStream(const char* pBuffer, std::streamsize buffer
 
 
 MemoryInputStream::~MemoryInputStream()
-{
-}
+= default;
 
 
 MemoryOutputStream::MemoryOutputStream(char* pBuffer, std::streamsize bufferSize):
@@ -50,8 +48,7 @@ MemoryOutputStream::MemoryOutputStream(char* pBuffer, std::streamsize bufferSize
 
 
 MemoryOutputStream::~MemoryOutputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

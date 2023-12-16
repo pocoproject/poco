@@ -30,8 +30,7 @@ AttributesImpl::EmptyAttribute AttributesImpl::_empty;
 
 
 AttributesImpl::AttributesImpl()
-{
-}
+= default;
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
@@ -53,8 +52,7 @@ AttributesImpl::AttributesImpl(AttributesImpl&& attributes) noexcept:
 
 
 AttributesImpl::~AttributesImpl()
-{
-}
+= default;
 
 
 AttributesImpl& AttributesImpl::operator = (const AttributesImpl& attributes)
@@ -276,23 +274,23 @@ void AttributesImpl::setURI(int i, const XMLString& namespaceURI)
 
 AttributesImpl::Attribute* AttributesImpl::find(const XMLString& qname) const
 {
-	for (AttributeVec::const_iterator it = _attributes.begin(); it != _attributes.end(); ++it)
+	for (const auto & _attribute : _attributes)
 	{
-		if (it->qname == qname)
-			return const_cast<Attribute*>(&(*it));
+		if (_attribute.qname == qname)
+			return const_cast<Attribute*>(&_attribute);
 	}
-	return 0;
+	return nullptr;
 }
 
 
 AttributesImpl::Attribute* AttributesImpl::find(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	for (AttributeVec::const_iterator it = _attributes.begin(); it != _attributes.end(); ++it)
+	for (const auto & _attribute : _attributes)
 	{
-		if (it->namespaceURI == namespaceURI && it->localName == localName)
-			return const_cast<Attribute*>(&(*it));
+		if (_attribute.namespaceURI == namespaceURI && _attribute.localName == localName)
+			return const_cast<Attribute*>(&_attribute);
 	}
-	return 0;
+	return nullptr;
 }
 
 

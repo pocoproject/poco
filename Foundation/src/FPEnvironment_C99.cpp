@@ -37,10 +37,7 @@ FPEnvironmentImpl::~FPEnvironmentImpl()
 
 
 FPEnvironmentImpl& FPEnvironmentImpl::operator = (const FPEnvironmentImpl& env)
-{
-	_env = env._env;
-	return *this;
-}
+= default;
 
 
 void FPEnvironmentImpl::keepCurrentImpl()

@@ -42,12 +42,11 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		auto pPrep = preparation();
@@ -75,12 +74,11 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		TypeHandler<std::vector<T>>::prepare(_pos, _val, preparation());
@@ -107,12 +105,11 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		TypeHandler<std::deque<T>>::prepare(_pos, _val, preparation());
@@ -139,12 +136,11 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		TypeHandler<std::list<T>>::prepare(_pos, _val, preparation());

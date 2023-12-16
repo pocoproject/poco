@@ -60,7 +60,7 @@ class XML_API Document: public AbstractContainerNode, public DocumentEvent
 public:
 	using AutoReleasePool = Poco::AutoReleasePool<DOMObject>;
 
-	explicit Document(NamePool* pNamePool = 0);
+	explicit Document(NamePool* pNamePool = nullptr);
 		/// Creates a new document. If pNamePool == 0, the document
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances
@@ -70,7 +70,7 @@ public:
 		/// Creates a new document using a name pool with the given size, which
 		/// should be a prime number (e.g., 251, 509, 1021, 4093).
 
-	Document(DocumentType* pDocumentType, NamePool* pNamePool = 0);
+	Document(DocumentType* pDocumentType, NamePool* pNamePool = nullptr);
 		/// Creates a new document. If pNamePool == 0, the document
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances
@@ -95,10 +95,10 @@ public:
 	void resumeEvents();
 		/// Resumes all events suspended with suspendEvent();
 
-	bool eventsSuspended() const;
+	bool eventsSuspended() const override;
 		/// Returns true if events are suspended.
 
-	bool events() const;
+	bool events() const override;
 		/// Returns true if events are not suspended.
 
 	const DocumentType* doctype() const;
@@ -200,14 +200,14 @@ public:
 		/// and getElementByIdNS().
 
 	// DocumentEvent
-	Event* createEvent(const XMLString& eventType) const;
+	Event* createEvent(const XMLString& eventType) const override;
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 	// EventTarget
-	bool dispatchEvent(Event* evt);
+	bool dispatchEvent(Event* evt) override;
 
 	// Extensions
 	Entity* createEntity(const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName) const;
@@ -233,9 +233,9 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 protected:
-	~Document();
+	~Document() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 	DocumentType* getDoctype();
 	void setDoctype(DocumentType* pDoctype);

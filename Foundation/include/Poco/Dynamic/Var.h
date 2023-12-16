@@ -233,32 +233,32 @@ public:
 	bool operator ! () const;
 		/// Logical NOT operator.
 
-	Var& operator = (const Var& other);
+	Var& operator = (const Var& rhs);
 		/// Assignment operator specialization for Var
 
 	template <typename T>
-	const Var operator + (const T& other) const
+	Var operator + (const T& other) const
 		/// Addition operator for adding POD to Var
 	{
 		return convert<T>() + other;
 	}
 
-	const Var operator + (const Var& other) const;
+	Var operator + (const Var& other) const;
 		/// Addition operator specialization for Var
 
-	const Var operator + (const char* other) const;
+	Var operator + (const char* other) const;
 		/// Addition operator specialization for adding const char* to Var
 
 	Var& operator ++ ();
 		/// Pre-increment operator
 
-	const Var operator ++ (int);
+	Var operator ++ (int);
 		/// Post-increment operator
 
 	Var& operator -- ();
 		/// Pre-decrement operator
 
-	const Var operator -- (int);
+	Var operator -- (int);
 		/// Post-decrement operator
 
 	template <typename T>
@@ -275,13 +275,13 @@ public:
 		/// Addition assignment operator overload for const char*
 
 	template <typename T>
-	const Var operator - (const T& other) const
+	Var operator - (const T& other) const
 		/// Subtraction operator for subtracting POD from Var
 	{
 		return convert<T>() - other;
 	}
 
-	const Var operator - (const Var& other) const;
+	Var operator - (const Var& other) const;
 		/// Subtraction operator overload for Var
 
 	template <typename T>
@@ -295,13 +295,13 @@ public:
 		/// Subtraction assignment operator overload for Var
 
 	template <typename T>
-	const Var operator * (const T& other) const
+	Var operator * (const T& other) const
 		/// Multiplication operator for multiplying Var with POD
 	{
 		return convert<T>() * other;
 	}
 
-	const Var operator * (const Var& other) const;
+	Var operator * (const Var& other) const;
 		/// Multiplication operator overload for Var
 
 	template <typename T>
@@ -315,13 +315,13 @@ public:
 		/// Multiplication assignment operator overload for Var
 
 	template <typename T>
-	const Var operator / (const T& other) const
+	Var operator / (const T& other) const
 		/// Division operator for dividing Var with POD
 	{
 		return convert<T>() / other;
 	}
 
-	const Var operator / (const Var& other) const;
+	Var operator / (const Var& other) const;
 		/// Division operator overload for Var
 
 	template <typename T>
@@ -542,7 +542,7 @@ public:
 	static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
 
-	static std::string toString(const Var& var);
+	static std::string toString(const Var& any);
 		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
 		/// a different result than Var::convert<std::string>() and Var::toString()!
 
@@ -550,7 +550,7 @@ private:
 	Var& getAt(std::size_t n);
 	Var& getAt(const std::string& n);
 
-	static Var parse(const std::string& val, std::string::size_type& offset);
+	static Var parse(const std::string& val, std::string::size_type& pos);
 		/// Parses the string which must be in JSON format
 
 	static Var parseObject(const std::string& val, std::string::size_type& pos);
@@ -711,7 +711,7 @@ inline const Var& Var::operator [] (const std::string& name) const
 }
 
 
-inline const Var Var::operator + (const char* other) const
+inline Var Var::operator + (const char* other) const
 {
 	return convert<std::string>() + other;
 }
@@ -731,7 +731,7 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == content();
+	return nullptr == content();
 }
 
 
@@ -853,7 +853,7 @@ inline std::size_t Var::size() const
 /// Var non-member functions
 ///
 
-inline const Var operator + (const char* other, const Var& da)
+inline Var operator + (const char* other, const Var& da)
 	/// Addition operator for adding Var to const char*
 {
 	std::string tmp = other;

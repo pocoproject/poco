@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
@@ -50,8 +52,8 @@ SocketReactor::SocketReactor(const Poco::Timespan& pollTimeout, int threadAffini
 	_params.pollTimeout = pollTimeout;
 }
 
-SocketReactor::SocketReactor(const Params& params, int threadAffinity):
-	_params(params),
+SocketReactor::SocketReactor(Params  params, int threadAffinity):
+	_params(std::move(params)),
 	_threadAffinity(threadAffinity),
 	_stop(false),
 	_pReadableNotification(new ReadableNotification(this)),
@@ -65,8 +67,7 @@ SocketReactor::SocketReactor(const Params& params, int threadAffinity):
 
 
 SocketReactor::~SocketReactor()
-{
-}
+= default;
 
 
 void SocketReactor::run()
@@ -119,7 +120,7 @@ void SocketReactor::run()
 						ErrorHandler::handle();
 					}
 				}
-				if (0 == sm.size())
+				if (sm.empty())
 				{
 					onTimeout();
 					if (_params.throttle && _params.pollTimeout == 0)
@@ -216,7 +217,7 @@ bool SocketReactor::hasEventHandler(const Socket& socket, const Poco::AbstractOb
 SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool makeNew)
 {
 	const SocketImpl* pImpl = socket.impl();
-	if (pImpl == nullptr) return 0;
+	if (pImpl == nullptr) return nullptr;
 	poco_socket_t sockfd = pImpl->sockfd();
 	ScopedLock lock(_mutex);
 
@@ -224,7 +225,7 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 	if (it != _handlers.end()) return it->second;
 	else if (makeNew) return (_handlers[sockfd] = new SocketNotifier(socket));
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -283,12 +284,12 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 	{
 		ScopedLock lock(_mutex);
 		delegates.reserve(_handlers.size());
-		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
-			delegates.push_back(it->second);
+		for (auto & _handler : _handlers)
+			delegates.push_back(_handler.second);
 	}
-	for (std::vector<NotifierPtr>::iterator it = delegates.begin(); it != delegates.end(); ++it)
+	for (auto & delegate : delegates)
 	{
-		dispatch(*it, pNotification);
+		dispatch(delegate, pNotification);
 	}
 }
 

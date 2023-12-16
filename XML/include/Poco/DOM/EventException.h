@@ -44,22 +44,22 @@ public:
 	EventException(const EventException& exc);
 		/// Creates an EventException by copying another one.
 
-	~EventException() noexcept;
+	~EventException() noexcept override;
 		/// Destroys the EventException.
 
 	EventException& operator = (const EventException& exc);
 
-	const char* name() const noexcept;
+	const char* name() const noexcept override;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	const char* className() const noexcept override;
 		/// Returns the name of the exception class.
 
 	unsigned short code() const;
 		/// Returns the Event exception code.
 
 protected:
-	Poco::Exception* clone() const;
+	Poco::Exception* clone() const override;
 
 private:
 	EventException();

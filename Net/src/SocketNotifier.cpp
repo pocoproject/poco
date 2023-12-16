@@ -28,8 +28,7 @@ SocketNotifier::SocketNotifier(const Socket& socket):
 
 
 SocketNotifier::~SocketNotifier()
-{
-}
+= default;
 
 
 void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)

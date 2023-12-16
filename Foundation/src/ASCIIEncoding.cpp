@@ -23,7 +23,7 @@ const char* ASCIIEncoding::_names[] =
 {
 	"US-ASCII",
 	"ASCII",
-	NULL
+	nullptr
 };
 
 
@@ -49,13 +49,11 @@ const TextEncoding::CharacterMap ASCIIEncoding::_charMap =
 
 
 ASCIIEncoding::ASCIIEncoding()
-{
-}
+= default;
 
 
 ASCIIEncoding::~ASCIIEncoding()
-{
-}
+= default;
 
 
 const char* ASCIIEncoding::canonicalName() const

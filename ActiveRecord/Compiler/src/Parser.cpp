@@ -27,8 +27,7 @@ namespace Compiler {
 
 
 Parser::Parser()
-{
-}
+= default;
 
 
 ClassMap Parser::parse(const std::string& systemId, std::istream& stream)
@@ -90,7 +89,7 @@ void Parser::startElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLS
 
 void Parser::endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname)
 {
-	poco_assert (_elemStack.size() > 0);
+	poco_assert (!_elemStack.empty());
 
 	if (qname == "class")
 	{
@@ -250,7 +249,7 @@ std::string Parser::convertCamelCase(const std::string& name)
 	{
 		if (Poco::Ascii::isUpper(c))
 		{
-			if (!(result.empty() || result.back() == '_'))
+			if (!result.empty() && result.back() != '_')
 			{
 				result += '_';
 			}

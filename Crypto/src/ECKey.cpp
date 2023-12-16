@@ -57,10 +57,9 @@ ECKey::ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, co
 }
 
 
-ECKey::ECKey(const ECKey& other):
-	KeyPair(other)
-{
-}
+ECKey::ECKey(const ECKey& other)
+	
+= default;
 
 
 ECKey::ECKey(ECKey&& other) noexcept:
@@ -70,15 +69,11 @@ ECKey::ECKey(ECKey&& other) noexcept:
 
 
 ECKey::~ECKey()
-{
-}
+= default;
 
 
 ECKey& ECKey::operator = (const ECKey& other)
-{
-	KeyPair::operator = (other);
-	return *this;
-}
+= default;
 
 
 ECKey& ECKey::operator = (ECKey&& other) noexcept

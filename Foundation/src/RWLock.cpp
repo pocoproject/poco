@@ -30,13 +30,11 @@ namespace Poco {
 
 
 RWLock::RWLock()
-{
-}
+= default;
 
 
 RWLock::~RWLock()
-{
-}
+= default;
 
 
 } // namespace Poco

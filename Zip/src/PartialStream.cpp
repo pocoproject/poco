@@ -15,22 +15,23 @@
 #include "Poco/Zip/PartialStream.h"
 #include "Poco/Exception.h"
 #include <cstring>
+#include <utility>
 
 
 namespace Poco {
 namespace Zip {
 
 
-PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& pre, const std::string& post, bool initStream):
+PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, std::string  pre, std::string  post, bool initStream):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_initialized(!initStream),
 	_start(start),
 	_numBytes(end-start),
 	_bytesWritten(0),
 	_pIstr(&in),
-	_pOstr(0),
-	_prefix(pre),
-	_postfix(post),
+	_pOstr(nullptr),
+	_prefix(std::move(pre)),
+	_postfix(std::move(post)),
 	_ignoreStart(0),
 	_buffer(0),
 	_bufferOffset(0)
@@ -44,7 +45,7 @@ PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::si
 	_start(0),
 	_numBytes(0),
 	_bytesWritten(0),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&out),
 	_ignoreStart(start),
 	_buffer(end),
@@ -54,13 +55,12 @@ PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::si
 
 
 PartialStreamBuf::~PartialStreamBuf()
-{
-}
+= default;
 
 
 int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	if (_pIstr == 0 ||length == 0) return -1;
+	if (_pIstr == nullptr ||length == 0) return -1;
 	if (!_initialized)
 	{
 		_initialized = true;
@@ -106,7 +106,7 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	if (_pOstr == 0 || length == 0) return -1;
+	if (_pOstr == nullptr || length == 0) return -1;
 	if (!_initialized)
 	{
 		_initialized = true;
@@ -142,7 +142,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 			return static_cast<int>(length);
 		}
 	}
-	if (_buffer.size() > 0)
+	if (!_buffer.empty())
 	{
 		// always treat each write as the potential last one
 		// thus first fill the buffer with the last n bytes of the msg
@@ -210,8 +210,7 @@ PartialIOS::PartialIOS(std::ostream& ostr, std::size_t start, std::size_t end, b
 
 
 PartialIOS::~PartialIOS()
-{
-}
+= default;
 
 
 PartialStreamBuf* PartialIOS::rdbuf()
@@ -228,8 +227,7 @@ PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type st
 
 
 PartialInputStream::~PartialInputStream()
-{
-}
+= default;
 
 
 PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream):

@@ -166,8 +166,7 @@ public:
 	}
 
 	virtual ~AbstractEvent()
-	{
-	}
+	= default;
 
 	void operator += (const TDelegate& aDelegate)
 		/// Adds a delegate to the event.
@@ -374,8 +373,7 @@ public:
 	}
 
 	virtual ~AbstractEvent()
-	{
-	}
+	= default;
 
 	void operator += (const TDelegate& aDelegate)
 		/// Adds a delegate to the event.
@@ -540,7 +538,6 @@ protected:
 
 		NotifyAsyncParams params = par;
 		params.ptrStrat->notify(params.pSender);
-		return;
 	}
 
 	TStrategy _strategy; /// The strategy used to notify observers.

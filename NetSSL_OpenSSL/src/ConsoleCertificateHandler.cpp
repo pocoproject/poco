@@ -27,8 +27,7 @@ ConsoleCertificateHandler::ConsoleCertificateHandler(bool server): InvalidCertif
 
 
 ConsoleCertificateHandler::~ConsoleCertificateHandler()
-{
-}
+= default;
 
 
 void ConsoleCertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)

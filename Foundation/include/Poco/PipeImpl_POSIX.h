@@ -33,9 +33,9 @@ public:
 	typedef int Handle;
 
 	PipeImpl();
-	~PipeImpl();
-	int writeBytes(const void* buffer, int length);
-	int readBytes(void* buffer, int length);
+	~PipeImpl() override;
+	int writeBytes(const void* buffer, int length) const;
+	int readBytes(void* buffer, int length) const;
 	Handle readHandle() const;
 	Handle writeHandle() const;
 	void closeRead();

@@ -69,15 +69,9 @@ Path::Path(const char* path, Style style)
 }
 
 
-Path::Path(const Path& path):
-	_node(path._node),
-	_device(path._device),
-	_name(path._name),
-	_version(path._version),
-	_dirs(path._dirs),
-	_absolute(path._absolute)
-{
-}
+Path::Path(const Path& path)
+	
+= default;
 
 
 Path::Path(Path&& path) noexcept:
@@ -86,7 +80,7 @@ Path::Path(Path&& path) noexcept:
 	_name(std::move(path._name)),
 	_version(std::move(path._version)),
 	_dirs(std::move(path._dirs)),
-	_absolute(std::move(path._absolute))
+	_absolute(path._absolute)
 {
 }
 
@@ -130,8 +124,7 @@ Path::Path(const Path& parent, const Path& relative):
 
 
 Path::~Path()
-{
-}
+= default;
 
 
 Path& Path::operator = (const Path& path)
@@ -147,7 +140,7 @@ Path& Path::operator = (Path&& path) noexcept
 	_name     = std::move(path._name);
 	_version  = std::move(path._version);
 	_dirs     = std::move(path._dirs);
-	_absolute = std::move(path._absolute);
+	_absolute = path._absolute;
 	return *this;
 }
 
@@ -774,7 +767,7 @@ void Path::parseWindows(const std::string& path)
 			char d = *it++;
 			if (it != end && *it == ':') // drive letter
 			{
-				if (_absolute || !((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) throw PathSyntaxException(path);
+				if (_absolute || ((d < 'a' || d > 'z') && (d < 'A' || d > 'Z'))) throw PathSyntaxException(path);
 				_absolute = true;
 				_device += d;
 				++it;

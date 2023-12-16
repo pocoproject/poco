@@ -63,7 +63,7 @@ public:
 	UInt32 maxEntriesPerHash() const;
 		/// Returns the maximum number of entries per hash value found in the current table.
 
-	const std::vector<UInt32> detailedEntriesPerHash() const;
+	std::vector<UInt32> detailedEntriesPerHash() const;
 		/// Will either be an empty vector or will contain for each possible hash value, the number of entries currently stored
 
 	std::string toString() const;
@@ -114,7 +114,7 @@ inline UInt32 HashStatistic::maxEntriesPerHash() const
 }
 
 
-inline const std::vector<UInt32> HashStatistic::detailedEntriesPerHash() const
+inline std::vector<UInt32> HashStatistic::detailedEntriesPerHash() const
 {
 	return _detailedEntriesPerHash;
 }

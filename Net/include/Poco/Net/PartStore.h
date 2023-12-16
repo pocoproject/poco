@@ -34,7 +34,7 @@ public:
 	PartStore(const std::string& mediaType);
 		/// Creates the PartStore for the given MIME type.
 
-	~PartStore();
+	~PartStore() override;
 		/// Destroys the PartFileStore.
 
 private:
@@ -47,7 +47,7 @@ class Net_API FilePartStore: public PartStore
 	/// parts (usually email attachment files) to the file system.
 {
 public:
-	FilePartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "");
+	FilePartStore(const std::string& content, const std::string& mediaType, std::string  filename = "");
 		/// Creates the FilePartStore for the given MIME type.
 		/// For security purposes, attachment filename is NOT used to save file to the file system.
 		/// A unique temporary file name is used to persist the file.
@@ -55,13 +55,13 @@ public:
 		///
 		/// Throws an exception if the file cannot be opened.
 
-	~FilePartStore();
+	~FilePartStore() override;
 		/// Destroys the FilePartStore.
 
-	std::istream& stream();
+	std::istream& stream() override;
 		/// Returns a file input stream for the given file.
 
-	const std::string& filename() const;
+	const std::string& filename() const override;
 		/// Returns the filename portion of the path.
 		/// This is the name under which the file is known
 		/// to the user of this class (typically, MailMessage
@@ -95,7 +95,7 @@ public:
 class FilePartStoreFactory: public PartStoreFactory
 {
 public:
-	PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "")
+	PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "") override
 	{
 		return new FilePartStore(content, mediaType, filename);
 	}

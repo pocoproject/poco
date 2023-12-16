@@ -64,8 +64,8 @@ public:
 		/// and iteration count.
 
 	CipherKeyImpl(const std::string& name,
-		const ByteVec& key,
-		const ByteVec& iv);
+		ByteVec  key,
+		ByteVec  iv);
 		/// Creates a new CipherKeyImpl object, using the
 		/// given cipher name, key and initialization vector.
 
@@ -73,7 +73,7 @@ public:
 		/// Creates a new CipherKeyImpl object. Autoinitializes key
 		/// and initialization vector.
 
-	virtual ~CipherKeyImpl();
+	~CipherKeyImpl() override;
 		/// Destroys the CipherKeyImpl.
 
 	const std::string& name() const;
@@ -107,7 +107,7 @@ public:
 		/// Returns the cipher object
 
 private:
-	void generateKey(const std::string& passphrase,
+	void generateKey(const std::string& password,
 		const std::string& salt,
 		int iterationCount);
 	 	/// Generates key and IV from a password and optional salt string.

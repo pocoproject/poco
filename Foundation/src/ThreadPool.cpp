@@ -13,13 +13,14 @@
 
 
 #include "Poco/ThreadPool.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Event.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
-#include "Poco/Event.h"
 #include "Poco/ThreadLocal.h"
-#include "Poco/ErrorHandler.h"
-#include <sstream>
 #include <ctime>
+#include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -29,7 +30,7 @@ class PooledThread: public Runnable
 {
 public:
 	PooledThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
-	~PooledThread();
+	~PooledThread() override;
 
 	void start();
 	void start(Thread::Priority priority, Runnable& target);
@@ -39,7 +40,7 @@ public:
 	void join();
 	void activate();
 	void release();
-	void run();
+	void run() override;
 
 private:
 	volatile bool        _idle;
@@ -57,20 +58,19 @@ private:
 PooledThread::PooledThread(const std::string& name, int stackSize):
 	_idle(true),
 	_idleTime(0),
-	_pTarget(0),
+	_pTarget(nullptr),
 	_name(name),
 	_thread(name),
 	_targetCompleted(false)
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
-	_idleTime = std::time(NULL);
+	_idleTime = std::time(nullptr);
 }
 
 
 PooledThread::~PooledThread()
-{
-}
+= default;
 
 
 void PooledThread::start()
@@ -84,7 +84,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	poco_assert (_pTarget == 0);
+	poco_assert (_pTarget == nullptr);
 
 	_pTarget = &target;
 	_thread.setPriority(priority);
@@ -110,7 +110,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 	_thread.setName(fullName);
 	_thread.setPriority(priority);
 
-	poco_assert (_pTarget == 0);
+	poco_assert (_pTarget == nullptr);
 
 	_pTarget = &target;
 	_targetReady.set();
@@ -128,7 +128,7 @@ int PooledThread::idleTime()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	return (int) (time(NULL) - _idleTime);
+	return (int) (time(nullptr) - _idleTime);
 }
 
 
@@ -157,7 +157,7 @@ void PooledThread::release()
 	const long JOIN_TIMEOUT = 10000;
 
 	_mutex.lock();
-	_pTarget = 0;
+	_pTarget = nullptr;
 	_mutex.unlock();
 	// In case of a statically allocated thread pool (such
 	// as the default thread pool), Windows may have already
@@ -200,8 +200,8 @@ void PooledThread::run()
 				ErrorHandler::handle();
 			}
 			FastMutex::ScopedLock lock(_mutex);
-			_pTarget  = 0;
-			_idleTime = time(NULL);
+			_pTarget  = nullptr;
+			_idleTime = time(nullptr);
 			_idle     = true;
 			_targetCompleted.set();
 			ThreadLocalStorage::clear();
@@ -239,12 +239,12 @@ ThreadPool::ThreadPool(int minCapacity,
 }
 
 
-ThreadPool::ThreadPool(const std::string& name,
+ThreadPool::ThreadPool(std::string  name,
 	int minCapacity,
 	int maxCapacity,
 	int idleTime,
 	int stackSize):
-	_name(name),
+	_name(std::move(name)),
 	_minCapacity(minCapacity),
 	_maxCapacity(maxCapacity),
 	_idleTime(idleTime),
@@ -430,7 +430,7 @@ PooledThread* ThreadPool::getThread()
 	if (++_age == 32)
 		housekeep();
 
-	PooledThread* pThread = 0;
+	PooledThread* pThread = nullptr;
 	for (ThreadVec::iterator it = _threads.begin(); !pThread && it != _threads.end(); ++it)
 	{
 		if ((*it)->idle())
@@ -472,7 +472,7 @@ class ThreadPoolSingletonHolder
 public:
 	ThreadPoolSingletonHolder()
 	{
-		_pPool = 0;
+		_pPool = nullptr;
 	}
 	~ThreadPoolSingletonHolder()
 	{

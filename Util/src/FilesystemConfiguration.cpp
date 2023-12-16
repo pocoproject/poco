@@ -38,8 +38,7 @@ FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
 
 
 FilesystemConfiguration::~FilesystemConfiguration()
-{
-}
+= default;
 
 
 void FilesystemConfiguration::clear()

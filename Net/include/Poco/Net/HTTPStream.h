@@ -41,12 +41,12 @@ public:
 	using openmode = HTTPBasicStreamBuf::openmode;
 
 	HTTPStreamBuf(HTTPSession& session, openmode mode);
-	~HTTPStreamBuf();
+	~HTTPStreamBuf() override;
 	void close();
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	HTTPSession& _session;
@@ -59,7 +59,7 @@ class Net_API HTTPIOS: public virtual std::ios
 {
 public:
 	HTTPIOS(HTTPSession& session, HTTPStreamBuf::openmode mode);
-	~HTTPIOS();
+	~HTTPIOS() override;
 	HTTPStreamBuf* rdbuf();
 
 protected:
@@ -72,7 +72,7 @@ class Net_API HTTPInputStream: public HTTPIOS, public std::istream
 {
 public:
 	HTTPInputStream(HTTPSession& session);
-	~HTTPInputStream();
+	~HTTPInputStream() override;
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
@@ -87,7 +87,7 @@ class Net_API HTTPOutputStream: public HTTPIOS, public std::ostream
 {
 public:
 	HTTPOutputStream(HTTPSession& session);
-	~HTTPOutputStream();
+	~HTTPOutputStream() override;
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);

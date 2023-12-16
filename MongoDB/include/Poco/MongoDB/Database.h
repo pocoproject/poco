@@ -39,7 +39,7 @@ class MongoDB_API Database
 	/// the database.
 {
 public:
-	explicit Database(const std::string& name);
+	explicit Database(std::string  name);
 		/// Creates a Database for the database with the given name.
 
 	virtual ~Database();
@@ -152,8 +152,8 @@ public:
 	};
 
 protected:
-	bool authCR(Connection& connection, const std::string& username, const std::string& password);
-	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
+	bool authCR(Connection& connection, const std::string& username, const std::string& password) const;
+	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password) const;
 
 private:
 	std::string _dbname;

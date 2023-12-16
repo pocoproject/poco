@@ -33,7 +33,7 @@ FIFOBufferStreamBuf::FIFOBufferStreamBuf():
 
 FIFOBufferStreamBuf::FIFOBufferStreamBuf(FIFOBuffer& fifoBuffer):
 	BufferedBidirectionalStreamBuf(fifoBuffer.size() + 4, std::ios::in | std::ios::out),
-	_pFIFOBuffer(0),
+	_pFIFOBuffer(nullptr),
 	_fifoBuffer(fifoBuffer)
 {
 	fifoBuffer.setNotify(true);
@@ -179,8 +179,7 @@ FIFOBufferStream::FIFOBufferStream(std::size_t length):
 
 
 FIFOBufferStream::~FIFOBufferStream()
-{
-}
+= default;
 
 
 } // namespace Poco

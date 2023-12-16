@@ -44,7 +44,7 @@ public:
 			/// Delete only the first document.
 	};
 
-	DeleteRequest(const std::string& collectionName, Flags flags = DELETE_DEFAULT);
+	DeleteRequest(std::string  collectionName, Flags flags = DELETE_DEFAULT);
 		/// Creates a DeleteRequest for the given collection using the given flags.
 		///
 		/// The full collection name is the concatenation of the database
@@ -52,7 +52,7 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
-	DeleteRequest(const std::string& collectionName, bool justOne);
+	DeleteRequest(std::string  collectionName, bool justOne);
 		/// Creates a DeleteRequest for the given collection.
 		///
 		/// The full collection name is the concatenation of the database
@@ -63,7 +63,7 @@ public:
 		/// If justOne is true, only the first matching document will
 		/// be removed (the same as using flag DELETE_SINGLE_REMOVE).
 
-	virtual ~DeleteRequest();
+	~DeleteRequest() override;
 		/// Destructor
 
 	Flags flags() const;
@@ -76,7 +76,7 @@ public:
 		/// Returns the selector document.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 		/// Writes the OP_DELETE request to the writer.
 
 private:

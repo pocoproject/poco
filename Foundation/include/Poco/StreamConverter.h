@@ -45,15 +45,15 @@ public:
 		/// Creates the StreamConverterBuf and connects it
 		/// to the given output stream.
 
-	~StreamConverterBuf();
+	~StreamConverterBuf() override;
 		/// Destroys the StreamConverterBuf.
 
 	int errors() const;
 		/// Returns the number of encoding errors encountered.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream*       _pIstr;
@@ -77,7 +77,7 @@ class Foundation_API StreamConverterIOS: public virtual std::ios
 public:
 	StreamConverterIOS(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 	StreamConverterIOS(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-	~StreamConverterIOS();
+	~StreamConverterIOS() override;
 	StreamConverterBuf* rdbuf();
 	int errors() const;
 
@@ -99,7 +99,7 @@ public:
 		/// Creates the InputStreamConverter and connects it
 		/// to the given input stream.
 
-	~InputStreamConverter();
+	~InputStreamConverter() override;
 		/// Destroys the stream.
 };
 
@@ -117,7 +117,7 @@ public:
 		/// Creates the OutputStreamConverter and connects it
 		/// to the given input stream.
 
-	~OutputStreamConverter();
+	~OutputStreamConverter() override;
 		/// Destroys the CountingOutputStream.
 };
 

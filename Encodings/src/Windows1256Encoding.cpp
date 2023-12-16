@@ -24,7 +24,7 @@ const char* Windows1256Encoding::_names[] =
 	"Windows-1256",
 	"cp1256",
 	"CP1256",
-	NULL
+	nullptr
 };
 
 
@@ -97,8 +97,7 @@ Windows1256Encoding::Windows1256Encoding():
 
 
 Windows1256Encoding::~Windows1256Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

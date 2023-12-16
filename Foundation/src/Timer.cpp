@@ -25,7 +25,7 @@ Timer::Timer(long startInterval, long periodicInterval):
 	_startInterval(startInterval),
 	_periodicInterval(periodicInterval),
 	_skipped(0),
-	_pCallback(0)
+	_pCallback(nullptr)
 {
 	poco_assert (startInterval >= 0 && periodicInterval >= 0);
 }
@@ -84,7 +84,7 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 	catch (...)
 	{
 		delete _pCallback;
-		_pCallback = 0;
+		_pCallback = nullptr;
 		throw;
 	}
 }
@@ -101,7 +101,7 @@ void Timer::stop()
 		_done.wait(); // warning: deadlock if called from timer callback
 		_mutex.lock();
 		delete _pCallback;
-		_pCallback = 0;
+		_pCallback = nullptr;
 	}
 }
 
@@ -224,24 +224,19 @@ long Timer::skipped() const
 
 
 AbstractTimerCallback::AbstractTimerCallback()
-{
-}
+= default;
 
 
 AbstractTimerCallback::AbstractTimerCallback(const AbstractTimerCallback& callback)
-{
-}
+= default;
 
 
 AbstractTimerCallback::~AbstractTimerCallback()
-{
-}
+= default;
 
 
 AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCallback& callback)
-{
-	return *this;
-}
+= default;
 
 
 } // namespace Poco

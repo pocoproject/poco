@@ -29,8 +29,7 @@ AbstractExtractor::AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding,
 
 
 AbstractExtractor::~AbstractExtractor()
-{
-}
+= default;
 
 
 void AbstractExtractor::transcode(const std::string& from, std::string& to)

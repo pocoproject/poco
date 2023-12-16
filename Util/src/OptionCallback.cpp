@@ -20,18 +20,15 @@ namespace Util {
 
 
 AbstractOptionCallback::AbstractOptionCallback()
-{
-}
+= default;
 
 
 AbstractOptionCallback::AbstractOptionCallback(const AbstractOptionCallback&)
-{
-}
+= default;
 
 
 AbstractOptionCallback::~AbstractOptionCallback()
-{
-}
+= default;
 
 
 } } // namespace Poco::Util

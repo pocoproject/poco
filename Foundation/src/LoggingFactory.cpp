@@ -42,8 +42,7 @@ LoggingFactory::LoggingFactory()
 
 
 LoggingFactory::~LoggingFactory()
-{
-}
+= default;
 
 
 void LoggingFactory::registerChannelClass(const std::string& className, ChannelInstantiator* pFactory)

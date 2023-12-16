@@ -22,8 +22,7 @@ namespace Net {
 
 
 HostEntry::HostEntry()
-{
-}
+= default;
 
 
 HostEntry::HostEntry(struct hostent* entry)
@@ -103,12 +102,9 @@ HostEntry::HostEntry(const std::string& name, const IPAddress& addr):
 #endif // POCO_VXWORKS
 
 
-HostEntry::HostEntry(const HostEntry& entry):
-	_name(entry._name),
-	_aliases(entry._aliases),
-	_addresses(entry._addresses)
-{
-}
+HostEntry::HostEntry(const HostEntry& entry)
+	
+= default;
 
 
 HostEntry& HostEntry::operator = (const HostEntry& entry)
@@ -132,8 +128,7 @@ void HostEntry::swap(HostEntry& hostEntry) noexcept
 
 
 HostEntry::~HostEntry()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

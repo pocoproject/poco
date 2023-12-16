@@ -70,8 +70,7 @@ RawSocket::RawSocket(SocketImpl* pImpl): Socket(pImpl)
 
 
 RawSocket::~RawSocket()
-{
-}
+= default;
 
 
 RawSocket& RawSocket::operator = (const Socket& socket)

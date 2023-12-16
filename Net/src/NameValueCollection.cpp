@@ -25,14 +25,12 @@ namespace Net {
 
 
 NameValueCollection::NameValueCollection()
-{
-}
+= default;
 
 
-NameValueCollection::NameValueCollection(const NameValueCollection& nvc):
-	_map(nvc._map)
-{
-}
+NameValueCollection::NameValueCollection(const NameValueCollection& nvc)
+	
+= default;
 
 
 NameValueCollection::NameValueCollection(NameValueCollection&& nvc) noexcept:
@@ -42,8 +40,7 @@ NameValueCollection::NameValueCollection(NameValueCollection&& nvc) noexcept:
 
 
 NameValueCollection::~NameValueCollection()
-{
-}
+= default;
 
 
 NameValueCollection& NameValueCollection::operator = (const NameValueCollection& nvc)

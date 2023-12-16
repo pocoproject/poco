@@ -50,7 +50,7 @@ public:
 		TASK_FINISHED
 	};
 
-	Task(const std::string& name);
+	Task(std::string  name);
 		/// Creates the Task.
 
 	const std::string& name() const;
@@ -91,7 +91,7 @@ public:
 		/// Do whatever the task needs to do. Must
 		/// be overridden by subclasses.
 
-	void run();
+	void run() override;
 		/// If task has not been cancelled prior to this call, it
 		/// calls the task's runTask() method and notifies the owner of
 		/// the task's start and completion.
@@ -113,7 +113,7 @@ protected:
 		///
 		/// A Task should use this method in favor of Thread::sleep().
 
-	bool yield();
+	bool yield() const;
 		/// Yields cpu to other threads
 		///
 		/// If the task is cancelled while it is suspended,
@@ -144,7 +144,7 @@ protected:
 	TaskState setState(TaskState state);
 		/// Sets the task's state.
 
-	virtual ~Task();
+	~Task() override;
 		/// Destroys the Task.
 
 private:

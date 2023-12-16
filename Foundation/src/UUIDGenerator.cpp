@@ -31,8 +31,7 @@ UUIDGenerator::UUIDGenerator(): _ticks(0), _haveNode(false)
 
 
 UUIDGenerator::~UUIDGenerator()
-{
-}
+= default;
 
 
 UUID UUIDGenerator::create()

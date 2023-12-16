@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/Exception.h"
 
@@ -20,16 +22,15 @@ namespace Poco {
 namespace Data {
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout):
-	_connectionString(connectionString),
+SessionImpl::SessionImpl(std::string  connectionString, std::size_t timeout):
+	_connectionString(std::move(connectionString)),
 	_loginTimeout(timeout)
 {
 }
 
 
 SessionImpl::~SessionImpl()
-{
-}
+= default;
 
 
 void SessionImpl::reconnect()

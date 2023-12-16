@@ -37,7 +37,7 @@ Object::Object(const Object& other) : _values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._modified ? other._pStruct : 0),
+	_pStruct(!other._modified ? other._pStruct : nullptr),
 	_modified(other._modified)
 {
 	syncKeys(other._keys);
@@ -58,8 +58,7 @@ Object::Object(Object&& other) noexcept:
 
 
 Object::~Object()
-{
-}
+= default;
 
 
 Object &Object::operator = (const Object &other)
@@ -71,7 +70,7 @@ Object &Object::operator = (const Object &other)
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
 		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._modified ? other._pStruct : 0;
+		_pStruct = !other._modified ? other._pStruct : nullptr;
 		_modified = other._modified;
 	}
 	return *this;
@@ -98,9 +97,9 @@ void Object::syncKeys(const KeyList& keys)
 	if(_preserveInsOrder)
 	{
 		// update iterators in _keys to point to copied _values
-		for(KeyList::const_iterator it = keys.begin(); it != keys.end(); ++it)
+		for(auto key : keys)
 		{
-			ValueMap::const_iterator itv = _values.find((*it)->first);
+			ValueMap::const_iterator itv = _values.find(key->first);
 			poco_assert (itv != _values.end());
 			_keys.push_back(itv);
 		}
@@ -128,7 +127,7 @@ Array::Ptr Object::getArray(const std::string& key) const
 		return it->second.extract<Array::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -140,7 +139,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 		return it->second.extract<Object::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -149,16 +148,16 @@ void Object::getNames(NameList& names) const
 	names.clear();
 	if (_preserveInsOrder)
 	{
-		for(KeyList::const_iterator it = _keys.begin(); it != _keys.end(); ++it)
+		for(auto _key : _keys)
 		{
-			names.push_back((*it)->first);
+			names.push_back(_key->first);
 		}
 	}
 	else
 	{
-		for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+		for(const auto & _value : _values)
 		{
-			names.push_back(it->first);
+			names.push_back(_value.first);
 		}
 	}
 }
@@ -249,7 +248,7 @@ void Object::resetDynStruct() const
 
 Object::operator const Poco::DynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pStruct);
 	}
@@ -281,7 +280,7 @@ Object::operator const Poco::DynamicStruct& () const
 
 Object::operator const Poco::OrderedDynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pOrdStruct);
 	}
@@ -339,7 +338,7 @@ void Object::clear()
 {
 	_values.clear();
 	_keys.clear();
-	_pStruct = 0;
+	_pStruct = nullptr;
 	_modified = true;
 }
 

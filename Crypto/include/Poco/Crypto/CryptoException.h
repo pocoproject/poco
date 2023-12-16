@@ -38,12 +38,12 @@ public:
 	OpenSSLException(const std::string& msg, const std::string& arg, int code = 0);
 	OpenSSLException(const std::string& msg, const Poco::Exception& exc, int code = 0);
 	OpenSSLException(const OpenSSLException& exc);
-	~OpenSSLException() noexcept;
+	~OpenSSLException() noexcept override;
 	OpenSSLException& operator = (const OpenSSLException& exc);
-	const char* name() const noexcept;
-	const char* className() const noexcept;
-	Poco::Exception* clone() const;
-	void rethrow() const;
+	const char* name() const noexcept override;
+	const char* className() const noexcept override;
+	Poco::Exception* clone() const override;
+	void rethrow() const override;
 
 private:
 	void setExtMessage();

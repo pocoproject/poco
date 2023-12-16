@@ -31,8 +31,7 @@ PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode):
 
 
 PipeStreamBuf::~PipeStreamBuf()
-{
-}
+= default;
 
 
 int PipeStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -103,8 +102,7 @@ PipeOutputStream::PipeOutputStream(const Pipe& pipe):
 
 
 PipeOutputStream::~PipeOutputStream()
-{
-}
+= default;
 
 
 //
@@ -120,8 +118,7 @@ PipeInputStream::PipeInputStream(const Pipe& pipe):
 
 
 PipeInputStream::~PipeInputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

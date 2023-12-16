@@ -42,7 +42,7 @@ class Foundation_API HexBinaryEncoderBuf: public UnbufferedStreamBuf
 {
 public:
 	HexBinaryEncoderBuf(std::ostream& ostr);
-	~HexBinaryEncoderBuf();
+	~HexBinaryEncoderBuf() override;
 
 	int close();
 		/// Closes the stream buffer.
@@ -62,7 +62,7 @@ public:
 		/// Specify whether hex digits a-f are written in upper or lower case.
 
 private:
-	int writeToDevice(char c);
+	int writeToDevice(char c) override;
 
 	int _pos;
 	int _lineLength;
@@ -79,7 +79,7 @@ class Foundation_API HexBinaryEncoderIOS: public virtual std::ios
 {
 public:
 	HexBinaryEncoderIOS(std::ostream& ostr);
-	~HexBinaryEncoderIOS();
+	~HexBinaryEncoderIOS() override;
 	int close();
 	HexBinaryEncoderBuf* rdbuf();
 
@@ -107,7 +107,7 @@ class Foundation_API HexBinaryEncoder: public HexBinaryEncoderIOS, public std::o
 {
 public:
 	HexBinaryEncoder(std::ostream& ostr);
-	~HexBinaryEncoder();
+	~HexBinaryEncoder() override;
 };
 
 

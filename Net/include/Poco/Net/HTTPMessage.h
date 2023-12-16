@@ -150,7 +150,7 @@ protected:
 	HTTPMessage();
 		/// Creates the HTTPMessage with version HTTP/1.0.
 
-	HTTPMessage(const std::string& version);
+	HTTPMessage(std::string  version);
 		/// Creates the HTTPMessage and sets
 		/// the version.
 
@@ -160,7 +160,7 @@ protected:
 	HTTPMessage& operator = (const HTTPMessage& other);
 		/// Assignment operator.
 
-	virtual ~HTTPMessage();
+	~HTTPMessage() override;
 		/// Destroys the HTTPMessage.
 
 private:

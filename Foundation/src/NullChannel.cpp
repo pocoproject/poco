@@ -19,13 +19,11 @@ namespace Poco {
 
 
 NullChannel::NullChannel()
-{
-}
+= default;
 
 
 NullChannel::~NullChannel()
-{
-}
+= default;
 
 
 void NullChannel::log(const Message&)

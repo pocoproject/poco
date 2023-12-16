@@ -45,8 +45,7 @@ EntityResolverImpl::EntityResolverImpl(const URIStreamOpener& opener):
 
 
 EntityResolverImpl::~EntityResolverImpl()
-{
-}
+= default;
 
 
 InputSource* EntityResolverImpl::resolveEntity(const XMLString* publicId, const XMLString& systemId)

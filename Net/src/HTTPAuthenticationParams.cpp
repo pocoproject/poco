@@ -72,8 +72,7 @@ const std::string HTTPAuthenticationParams::PROXY_AUTHENTICATE("Proxy-Authentica
 
 
 HTTPAuthenticationParams::HTTPAuthenticationParams()
-{
-}
+= default;
 
 
 HTTPAuthenticationParams::HTTPAuthenticationParams(const std::string& authInfo)
@@ -95,16 +94,11 @@ HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPResponse& response,
 
 
 HTTPAuthenticationParams::~HTTPAuthenticationParams()
-{
-}
+= default;
 
 
 HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams)
-{
-	NameValueCollection::operator = (authParams);
-
-	return *this;
-}
+= default;
 
 
 void HTTPAuthenticationParams::fromAuthInfo(const std::string& authInfo)

@@ -43,7 +43,7 @@ public:
 		/// a ICMPSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	~ICMPSocket();
+	~ICMPSocket() override;
 		/// Destroys the ICMPSocket.
 
 	ICMPSocket& operator = (const Socket& socket);

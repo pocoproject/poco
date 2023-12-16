@@ -52,12 +52,12 @@ public:
 	};
 
 	//@ deprecated
-	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
+	RSADigestEngine(RSAKey  key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the MD5 or SHA-1 hash algorithm.
 		/// Kept for backward compatibility
 
-	RSADigestEngine(const RSAKey& key, const std::string &name);
+	RSADigestEngine(RSAKey  key, const std::string &name);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the hash algorithm with the given name
 		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).
@@ -65,17 +65,17 @@ public:
 		///
 		/// Throws a Poco::NotFoundException if no algorithm with the given name exists.
 
-	~RSADigestEngine();
+	~RSADigestEngine() override;
 		/// Destroys the RSADigestEngine.
 
-	std::size_t digestLength() const;
+	std::size_t digestLength() const override;
 		/// Returns the length of the digest in bytes.
 
-	void reset();
+	void reset() override;
 		/// Resets the engine so that a new
 		/// digest can be computed.
 
-	const DigestEngine::Digest& digest();
+	const DigestEngine::Digest& digest() override;
 		/// Finishes the computation of the digest
 		/// (the first time it's called) and
 		/// returns the message digest.
@@ -95,7 +95,7 @@ public:
 		/// Returns true if the signature can be verified, false otherwise.
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void* data, std::size_t length) override;
 
 private:
 	RSAKey _key;

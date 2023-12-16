@@ -19,9 +19,10 @@
 #include "Poco/Exception.h"
 #include "Poco/MetaProgramming.h"
 #include <algorithm>
-#include <typeinfo>
-#include <cstring>
 #include <cstddef>
+#include <cstring>
+#include <typeinfo>
+#include <utility>
 
 
 #define poco_any_assert(cond) do { if (!(cond)) std::abort(); } while (0)
@@ -77,7 +78,7 @@ public:
 
 #ifndef POCO_NO_SOO
 
-	Placeholder(): pHolder(0)
+	Placeholder(): pHolder(nullptr)
 	{
 		std::memset(holder, 0, sizeof(Placeholder));
 	}
@@ -226,8 +227,7 @@ public:
 
 	Any()
 		/// Creates an empty any type.
-	{
-	}
+	= default;
 
 	template<typename ValueType>
 	Any(const ValueType & value)
@@ -250,8 +250,7 @@ public:
 	~Any()
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
-	{
-	}
+	= default;
 
 	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.
@@ -342,16 +341,16 @@ private:
 	class Holder : public ValueHolder
 	{
 	public:
-		Holder(const ValueType & value) : _held(value)
+		Holder(ValueType  value) : _held(std::move(value))
 		{
 		}
 
-		virtual const std::type_info& type() const
+		const std::type_info& type() const override
 		{
 			return typeid(ValueType);
 		}
 
-		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
+		void clone(Placeholder<ValueHolder>* pPlaceholder) const override
 		{
 			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}
@@ -412,7 +411,7 @@ ValueType* AnyCast(Any* operand)
 {
 	return operand && operand->type() == typeid(ValueType)
 				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
-				: 0;
+				: nullptr;
 }
 
 

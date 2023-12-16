@@ -36,10 +36,10 @@ class Data_API ArchiveStrategy
 public:
 	static const std::string DEFAULT_ARCHIVE_DESTINATION;
 
-	ArchiveStrategy(const std::string& connector,
-		const std::string& connect,
-		const std::string& source,
-		const std::string& destination = DEFAULT_ARCHIVE_DESTINATION);
+	ArchiveStrategy(std::string  connector,
+		std::string  connect,
+		std::string  source,
+		std::string  destination = DEFAULT_ARCHIVE_DESTINATION);
 		/// Creates archive strategy.
 
 	virtual ~ArchiveStrategy();
@@ -183,14 +183,14 @@ public:
 		const std::string& destinationTable = DEFAULT_ARCHIVE_DESTINATION,
 		const std::string& age = "");
 
-	~ArchiveByAgeStrategy();
+	~ArchiveByAgeStrategy() override;
 
-	void archive();
+	void archive() override;
 
-	const std::string& getThreshold() const;
+	const std::string& getThreshold() const override;
 		/// Returns the archive threshold.
 
-	void setThreshold(const std::string& threshold);
+	void setThreshold(const std::string& threshold) override;
 		/// Sets the archive threshold.
 
 private:
