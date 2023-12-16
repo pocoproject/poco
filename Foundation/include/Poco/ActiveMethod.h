@@ -164,7 +164,7 @@ class ActiveMethod <ResultType, void, OwnerType, StarterType>
 	/// For methods that do not require an argument or a return value, simply use void.
 {
 public:
-	typedef ResultType (OwnerType::*Callback)(void);
+	typedef ResultType (OwnerType::*Callback)();
 	typedef ActiveResult<ResultType> ActiveResultType;
 	typedef ActiveRunnable<ResultType, void, OwnerType> ActiveRunnableType;
 
@@ -176,7 +176,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	ActiveResultType operator () (void)
+	ActiveResultType operator () ()
 		/// Invokes the ActiveMethod.
 	{
 		ActiveResultType result(new ActiveResultHolder<ResultType>());
