@@ -280,9 +280,7 @@ void SocketProactor::wait()
 bool SocketProactor::hasHandlers(SubscriberMap& handlers, int sockfd)
 {
 	Poco::Mutex::ScopedLock l(_writeMutex);
-	if (handlers.end() == handlers.find(sockfd))
-		return false;
-	return true;
+	return handlers.end() != handlers.find(sockfd);
 }
 
 
@@ -682,9 +680,7 @@ void SocketProactor::run()
 
 bool SocketProactor::hasSocketHandlers() const
 {
-	if (!_readHandlers.empty() || !_writeHandlers.empty())
-		return true;
-	return false;
+	return !_readHandlers.empty() || !_writeHandlers.empty();
 }
 
 

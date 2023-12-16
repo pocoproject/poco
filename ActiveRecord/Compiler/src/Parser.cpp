@@ -249,7 +249,7 @@ std::string Parser::convertCamelCase(const std::string& name)
 	{
 		if (Poco::Ascii::isUpper(c))
 		{
-			if (!(result.empty() || result.back() == '_'))
+			if (!result.empty() && result.back() != '_')
 			{
 				result += '_';
 			}

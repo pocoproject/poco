@@ -168,8 +168,7 @@ void ParserImpl::stripComments(std::string& json) const
 		std::string::iterator it = json.begin();
 		for (; it != json.end();)
 		{
-			if (*it == '"' && !inString) inString = true;
-			else inString = false;
+			inString = *it == '"' && !inString;
 			if (!inString)
 			{
 				if (*it == '/' && it + 1 != json.end() && *(it + 1) == '*')

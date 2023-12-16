@@ -141,15 +141,13 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 
 bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
-	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
-	return false;
+	return ti == Session::TRANSACTION_READ_COMMITTED;
 }
 
 
 bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
-	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
-	return false;
+	return ti == Session::TRANSACTION_READ_COMMITTED;
 }
 
 

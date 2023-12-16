@@ -2015,8 +2015,8 @@ yysyntax_error (YYPTRDIFF_T *yymsg_alloc, char **yymsg,
   if (*yymsg_alloc < yysize)
     {
       *yymsg_alloc = 2 * yysize;
-      if (! (yysize <= *yymsg_alloc
-             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
+      if (yysize > *yymsg_alloc
+             || *yymsg_alloc > YYSTACK_ALLOC_MAXIMUM)
         *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
       return -1;
     }

@@ -348,7 +348,7 @@ XMLString Element::innerText() const
 Element* Element::getChildElement(const XMLString& name) const
 {
 	Node* pNode = firstChild();
-	while (pNode && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->nodeName() == name))
+	while (pNode && (pNode->nodeType() != Node::ELEMENT_NODE || !pNode->nodeName() == name))
 		pNode = pNode->nextSibling();
 	return static_cast<Element*>(pNode);
 }
@@ -357,7 +357,7 @@ Element* Element::getChildElement(const XMLString& name) const
 Element* Element::getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
 	Node* pNode = firstChild();
-	while (pNode && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->namespaceURI() == namespaceURI && pNode->localName() == localName))
+	while (pNode && (pNode->nodeType() != Node::ELEMENT_NODE || !pNode->namespaceURI() == namespaceURI || !pNode->localName() == localName))
 		pNode = pNode->nextSibling();
 	return static_cast<Element*>(pNode);
 }

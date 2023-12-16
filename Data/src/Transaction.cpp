@@ -96,7 +96,7 @@ bool Transaction::execute(const std::vector<std::string>& sql, std::string* info
 	{
 		std::vector<std::string>::const_iterator it = sql.begin();
 		std::vector<std::string>::const_iterator end = sql.end();
-		for (; it != end; ++it)	execute(*it, it + 1 == end ? true : false);
+		for (; it != end; ++it)	execute(*it, it + 1 == end);
 		return true;
 	}
 	catch (Exception& ex)

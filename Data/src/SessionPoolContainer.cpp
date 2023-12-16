@@ -80,12 +80,7 @@ bool SessionPoolContainer::isActive(const std::string& sessionKey,
 		sessionKey : SessionPool::name(sessionKey, connectionString);
 
 	SessionPoolMap::const_iterator it = _sessionPools.find(name);
-	if (it != _sessionPools.end() && it->second->isActive())
-	{
-		return true;
-	}
-
-	return false;
+	return it != _sessionPools.end() && it->second->isActive();
 }
 
 

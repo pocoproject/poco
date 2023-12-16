@@ -2220,8 +2220,8 @@ public:
 
 	void convert(bool& val) const override
 	{
-		val = !(_val <= std::numeric_limits<float>::min() &&
-			_val >= -1 * std::numeric_limits<float>::min());
+		val = _val > std::numeric_limits<float>::min() ||
+			_val < -1 * std::numeric_limits<float>::min();
 	}
 
 	void convert(float& val) const override
@@ -2372,8 +2372,8 @@ public:
 
 	void convert(bool& val) const override
 	{
-		val = !(_val <= std::numeric_limits<double>::min() &&
-			_val >= -1 * std::numeric_limits<double>::min());
+		val = _val > std::numeric_limits<double>::min() ||
+			_val < -1 * std::numeric_limits<double>::min();
 	}
 
 	void convert(float& val) const override

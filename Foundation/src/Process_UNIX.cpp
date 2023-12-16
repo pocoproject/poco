@@ -295,14 +295,7 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return kill(pid, 0) == 0;
 }
 
 

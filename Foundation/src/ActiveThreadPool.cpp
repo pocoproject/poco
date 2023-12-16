@@ -192,7 +192,7 @@ void ActiveThread::run()
 		}
 		_targetCompleted.set();
 	}
-	while (_needToStop == false);
+	while (!_needToStop);
 }
 
 

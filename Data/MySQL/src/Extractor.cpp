@@ -288,10 +288,7 @@ bool Extractor::extractLongLOB(std::size_t pos)
 	_metadata.adjustColumnSizeToFit(pos);
 	
 	MYSQL_BIND* row = _metadata.row();
-	if (!_stmt.fetchColumn(pos, &row[pos]))
-		return false;
-	
-	return true;
+	return _stmt.fetchColumn(pos, &row[pos]);
 }
 
 #ifdef POCO_MYSQL_JSON
@@ -305,10 +302,7 @@ bool Extractor::extractJSON(std::size_t pos)
 
 	MYSQL_BIND* row = _metadata.row();
 	row->buffer_type = MYSQL_TYPE_JSON;
-	if (!_stmt.fetchColumn(pos, &row[pos]))
-		return false;
-
-	return true;
+	return _stmt.fetchColumn(pos, &row[pos]);
 }
 #endif
 
