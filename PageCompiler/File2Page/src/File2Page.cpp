@@ -272,9 +272,9 @@ protected:
 	{
 		if (!_helpRequested)
 		{
-			for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+			for (const auto & arg : args)
 			{
-				convert(*it);
+				convert(arg);
 			}
 		}
 		return Application::EXIT_OK;

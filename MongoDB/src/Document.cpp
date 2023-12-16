@@ -205,11 +205,11 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for (auto & _element : _elements)
 		{
-			tempWriter << static_cast<unsigned char>((*it)->type());
-			BSONWriter(tempWriter).writeCString((*it)->name());
-			Element::Ptr element = *it;
+			tempWriter << static_cast<unsigned char>(_element->type());
+			BSONWriter(tempWriter).writeCString(_element->name());
+			Element::Ptr element = _element;
 			element->write(tempWriter);
 		}
 		tempWriter.flush();

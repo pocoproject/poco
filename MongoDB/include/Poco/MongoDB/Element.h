@@ -116,9 +116,9 @@ struct ElementTraits<std::string>
 
 		oss << '"';
 
-		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+		for (char it : value)
 		{
-			switch (*it)
+			switch (it)
 			{
 			case '"':
 				oss << "\\\"";
@@ -143,13 +143,13 @@ struct ElementTraits<std::string>
 				break;
 			default:
 				{
-					if ( *it > 0 && *it <= 0x1F )
+					if ( it > 0 && it <= 0x1F )
 					{
-						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
+						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(it);
 					}
 					else
 					{
-						oss << *it;
+						oss << it;
 					}
 					break;
 				}

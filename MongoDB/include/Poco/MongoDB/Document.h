@@ -233,9 +233,9 @@ inline bool Document::empty() const
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	for (const auto & _element : _elements)
 	{
-		keys.push_back((*it)->name());
+		keys.push_back(_element->name());
 	}
 }
 

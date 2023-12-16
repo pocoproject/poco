@@ -173,14 +173,14 @@ bool UUID::tryParse(const std::string& uuid)
 		newUUID._clockSeq = (newUUID._clockSeq << 4) | n;
 	}
 	if (haveHyphens) ++it;
-	for (int i = 0; i < 6; ++i)
+	for (unsigned char & i : newUUID._node)
 	{
 		Int16 n1 = nibble(*it++);
 		if (n1 < 0) return false;
 		Int16 n2 = nibble(*it++);
 		if (n2 < 0) return false;
 
-		newUUID._node[i] = (n1 << 4) | n2;
+		i = (n1 << 4) | n2;
 	}
 	swap(newUUID);
 
@@ -200,8 +200,8 @@ std::string UUID::toString() const
 	result += '-';
 	appendHex(result, _clockSeq);
 	result += '-';
-	for (int i = 0; i < sizeof(_node); ++i)
-		appendHex(result, _node[i]);
+	for (unsigned char i : _node)
+		appendHex(result, i);
 	return result;
 }
 

@@ -168,8 +168,8 @@ void ResultMetadata::reset()
 
 void ResultMetadata::freeMemory()
 {
-	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
-		std::free(*it);
+	for (auto & it : _buffer)
+		std::free(it);
 }
 
 

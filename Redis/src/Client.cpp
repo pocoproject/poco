@@ -219,9 +219,9 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 {
 	Array results;
 
-	for (std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
+	for (const auto & command : commands)
 	{
-		writeCommand(*it, false);
+		writeCommand(command, false);
 	}
 	_output->flush();
 

@@ -404,15 +404,15 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	HTMLFormCountingOutputStream* pCountingOutputStream(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
 
 	MultipartWriter writer(ostr, _boundary);
-	for (auto it = begin(); it != end(); ++it)
+	for (const auto & it : *this)
 	{
 		MessageHeader header;
 		std::string disp("form-data; name=\"");
-		disp.append(it->first);
+		disp.append(it.first);
 		disp.append("\"");
 		header.set("Content-Disposition", disp);
 		writer.nextPart(header);
-		ostr << it->second;
+		ostr << it.second;
 	}
 	for (const auto& part: _parts)
 	{

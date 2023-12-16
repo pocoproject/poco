@@ -163,23 +163,23 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	std::string authMechanism = Database::AUTH_SCRAM_SHA1;
 
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
-	for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
+	for (const auto & param : params)
 	{
-		if (it->first == "ssl")
+		if (param.first == "ssl")
 		{
-			ssl = (it->second == "true");
+			ssl = (param.second == "true");
 		}
-		else if (it->first == "connectTimeoutMS")
+		else if (param.first == "connectTimeoutMS")
 		{
-			connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
+			connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(param.second);
 		}
-		else if (it->first == "socketTimeoutMS")
+		else if (param.first == "socketTimeoutMS")
 		{
-			socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
+			socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(param.second);
 		}
-		else if (it->first == "authMechanism")
+		else if (param.first == "authMechanism")
 		{
-			authMechanism = it->second;
+			authMechanism = param.second;
 		}
 	}
 

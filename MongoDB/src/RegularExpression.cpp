@@ -39,9 +39,9 @@ RegularExpression::~RegularExpression()
 SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 {
 	int options = 0;
-	for (std::string::const_iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
+	for (char _option : _options)
 	{
-		switch (*optIt)
+		switch (_option)
 		{
 		case 'i': // Case Insensitive
 			options |= Poco::RegularExpression::RE_CASELESS;

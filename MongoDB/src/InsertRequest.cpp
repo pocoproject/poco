@@ -40,9 +40,9 @@ void InsertRequest::buildRequest(BinaryWriter& writer)
 	writer << _flags;
 	BSONWriter bsonWriter(writer);
 	bsonWriter.writeCString(_fullCollectionName);
-	for (Document::Vector::iterator it = _documents.begin(); it != _documents.end(); ++it)
+	for (auto & _document : _documents)
 	{
-		bsonWriter.write(*it);
+		bsonWriter.write(_document);
 	}
 }
 

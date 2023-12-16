@@ -284,12 +284,12 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 	{
 		ScopedLock lock(_mutex);
 		delegates.reserve(_handlers.size());
-		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
-			delegates.push_back(it->second);
+		for (auto & _handler : _handlers)
+			delegates.push_back(_handler.second);
 	}
-	for (std::vector<NotifierPtr>::iterator it = delegates.begin(); it != delegates.end(); ++it)
+	for (auto & delegate : delegates)
 	{
-		dispatch(*it, pNotification);
+		dispatch(delegate, pNotification);
 	}
 }
 

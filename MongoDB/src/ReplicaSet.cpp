@@ -35,9 +35,9 @@ Connection::Ptr ReplicaSet::findMaster()
 {
 	Connection::Ptr master;
 
-	for (std::vector<Net::SocketAddress>::iterator it = _addresses.begin(); it != _addresses.end(); ++it)
+	for (auto & _addresse : _addresses)
 	{
-		master = isMaster(*it);
+		master = isMaster(_addresse);
 		if (!master.isNull())
 		{
 			break;

@@ -406,12 +406,12 @@ void PageReader::generateLineDirective(std::ostream& ostr)
 		p.makeAbsolute();
 		std::string absPath = p.toString();
 		ostr << "#line " << _line << " \"";
-		for (std::string::const_iterator it = absPath.begin(); it != absPath.end(); ++it)
+		for (char it : absPath)
 		{
-			if (*it == '\\')
+			if (it == '\\')
 				ostr << "\\\\";
 			else
-				ostr << *it;
+				ostr << it;
 		}
 		ostr << "\"\n";
 	}

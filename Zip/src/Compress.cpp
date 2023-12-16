@@ -384,9 +384,9 @@ ZipArchive Compress::close()
 void Compress::setStoreExtensions(const std::set<std::string>& extensions)
 {
 	_storeExtensions.clear();
-	for (std::set<std::string>::const_iterator it = extensions.begin(); it != extensions.end(); ++it)
+	for (const auto & extension : extensions)
 	{
-		_storeExtensions.insert(Poco::toLower(*it));
+		_storeExtensions.insert(Poco::toLower(extension));
 	}
 }
 

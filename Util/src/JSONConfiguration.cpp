@@ -157,7 +157,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 				JSON::Array::Ptr newArray;
 				JSON::Array::Ptr parentArray;
 				JSON::Array::Ptr topArray;
-				for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it)
+				for(int & indexe : indexes)
 				{
 					newArray = new JSON::Array();
 					if (topArray.isNull())
@@ -170,7 +170,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 						parentArray->add(newArray);
 					}
 
-					for(int i = 0; i <= *it - 1; ++i)
+					for(int i = 0; i <= indexe - 1; ++i)
 					{
 						Poco::DynamicAny nullValue;
 						newArray->add(nullValue);

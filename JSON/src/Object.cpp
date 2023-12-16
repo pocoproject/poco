@@ -97,9 +97,9 @@ void Object::syncKeys(const KeyList& keys)
 	if(_preserveInsOrder)
 	{
 		// update iterators in _keys to point to copied _values
-		for(KeyList::const_iterator it = keys.begin(); it != keys.end(); ++it)
+		for(auto key : keys)
 		{
-			ValueMap::const_iterator itv = _values.find((*it)->first);
+			ValueMap::const_iterator itv = _values.find(key->first);
 			poco_assert (itv != _values.end());
 			_keys.push_back(itv);
 		}
@@ -148,16 +148,16 @@ void Object::getNames(NameList& names) const
 	names.clear();
 	if (_preserveInsOrder)
 	{
-		for(KeyList::const_iterator it = _keys.begin(); it != _keys.end(); ++it)
+		for(auto _key : _keys)
 		{
-			names.push_back((*it)->first);
+			names.push_back(_key->first);
 		}
 	}
 	else
 	{
-		for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+		for(const auto & _value : _values)
 		{
-			names.push_back(it->first);
+			names.push_back(_value.first);
 		}
 	}
 }

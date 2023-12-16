@@ -203,9 +203,9 @@ inline Array& Array::add(const char* s)
 
 inline Array& Array::add(const std::vector<std::string>& strings)
 {
-	for(std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
+	for(const auto & string : strings)
 	{
-		add(*it);
+		add(string);
 	}
 	return *this;
 }
@@ -283,10 +283,9 @@ struct RedisTypeTraits<Array>
 		else
 		{
 			result << value.size() << LineEnding::NEWLINE_CRLF;
-			for(std::vector<RedisType::Ptr>::const_iterator it = value.begin();
-				it != value.end(); ++it)
+			for(const auto & it : value)
 			{
-				result << (*it)->toString();
+				result << it->toString();
 			}
 		}
 		return result.str();

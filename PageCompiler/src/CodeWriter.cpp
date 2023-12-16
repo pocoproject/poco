@@ -100,9 +100,9 @@ void CodeWriter::beginNamespace(std::ostream& ostr)
 	if (!ns.empty())
 	{
 		StringTokenizer tok(ns, ":", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+		for (const auto & it : tok)
 		{
-			ostr << "namespace " << *it << " {\n";
+			ostr << "namespace " << it << " {\n";
 		}
 		ostr << "\n\n";
 	}

@@ -79,10 +79,10 @@ const XMLString& NamespaceSupport::getPrefix(const XMLString& namespaceURI) cons
 {
 	for (ContextVec::const_reverse_iterator rit = _contexts.rbegin(); rit != _contexts.rend(); ++rit)
 	{
-		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
+		for (const auto & it : *rit)
 		{
-			if (it->second == namespaceURI)
-				return it->first;
+			if (it.second == namespaceURI)
+				return it.first;
 		}
 	}
 	return EMPTY_STRING;
@@ -93,9 +93,9 @@ bool NamespaceSupport::isMapped(const XMLString& namespaceURI) const
 {
 	for (ContextVec::const_reverse_iterator rit = _contexts.rbegin(); rit != _contexts.rend(); ++rit)
 	{
-		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
+		for (const auto & it : *rit)
 		{
-			if (it->second == namespaceURI)
+			if (it.second == namespaceURI)
 				return true;
 		}
 	}
@@ -108,11 +108,11 @@ void NamespaceSupport::getPrefixes(PrefixSet& prefixes) const
 	prefixes.clear();
 	for (ContextVec::const_reverse_iterator rit = _contexts.rbegin(); rit != _contexts.rend(); ++rit)
 	{
-		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
+		for (const auto & it : *rit)
 		{
-			const XMLString& prefix = it->first;
+			const XMLString& prefix = it.first;
 			if (!prefix.empty() && prefixes.find(prefix) == prefixes.end())
-				prefixes.insert(it->first);
+				prefixes.insert(it.first);
 		}
 	}
 }
@@ -123,11 +123,11 @@ void NamespaceSupport::getPrefixes(const XMLString& namespaceURI, PrefixSet& pre
 	prefixes.clear();
 	for (ContextVec::const_reverse_iterator rit = _contexts.rbegin(); rit != _contexts.rend(); ++rit)
 	{
-		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
+		for (const auto & it : *rit)
 		{
-			const XMLString& prefix = it->first;
-			if (it->second == namespaceURI && !prefix.empty() && prefixes.find(prefix) == prefixes.end())
-				prefixes.insert(it->first);
+			const XMLString& prefix = it.first;
+			if (it.second == namespaceURI && !prefix.empty() && prefixes.find(prefix) == prefixes.end())
+				prefixes.insert(it.first);
 		}
 	}
 }

@@ -305,11 +305,11 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			if (it != end && Ascii::isAlpha(*it)) designator += *it++;
 			if (it != end && Ascii::isAlpha(*it)) designator += *it++;
 			if (it != end && Ascii::isAlpha(*it)) designator += *it++;
-			for (unsigned i = 0; i < sizeof(zones)/sizeof(Zone); ++i)
+			for (auto i : zones)
 			{
-				if (designator == zones[i].designator)
+				if (designator == i.designator)
 				{
-					zone = &(zones[i]);
+					zone = &i;
 					tzd = zone->timeZoneDifferential;
 					break;
 				}

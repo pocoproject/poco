@@ -129,15 +129,15 @@ void SyslogChannel::setProperty(const std::string& name, const std::string& valu
 	{
 		_options = 0;
 		StringTokenizer tokenizer(value, "|+:;,", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (StringTokenizer::Iterator it = tokenizer.begin(); it != tokenizer.end(); ++it)
+		for (const auto & it : tokenizer)
 		{
-			if (*it == "LOG_CONS")
+			if (it == "LOG_CONS")
 				_options |= SYSLOG_CONS;
-			else if (*it == "LOG_NDELAY")
+			else if (it == "LOG_NDELAY")
 				_options |= SYSLOG_NDELAY;
-			else if (*it == "LOG_PERROR")
+			else if (it == "LOG_PERROR")
 				_options |= SYSLOG_PERROR;
-			else if (*it == "LOG_PID")
+			else if (it == "LOG_PID")
 				_options |= SYSLOG_PID;
 		}
 	}

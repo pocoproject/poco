@@ -33,9 +33,9 @@ void KillCursorsRequest::buildRequest(BinaryWriter& writer)
 {
 	writer << 0; // 0 - reserved for future use
 	writer << static_cast<Poco::UInt64>(_cursors.size());
-	for (std::vector<Int64>::iterator it = _cursors.begin(); it != _cursors.end(); ++it)
+	for (long & _cursor : _cursors)
 	{
-		writer << *it;
+		writer << _cursor;
 	}
 }
 

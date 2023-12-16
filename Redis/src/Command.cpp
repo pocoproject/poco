@@ -401,9 +401,9 @@ Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool 
 {
 	Command cmd(create ? "MSET" : "MSETNX");
 
-	for(std::map<std::string, std::string>::const_iterator it = keyvalues.begin(); it != keyvalues.end(); ++it)
+	for(const auto & keyvalue : keyvalues)
 	{
-		cmd << it->first << it->second;
+		cmd << keyvalue.first << keyvalue.second;
 	}
 
 	return cmd;

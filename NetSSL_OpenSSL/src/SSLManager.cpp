@@ -500,19 +500,19 @@ void SSLManager::initDefaultContext(bool server)
 	std::string disabledProtocolsList = config.getString(prefix + CFG_DISABLE_PROTOCOLS, "");
 	Poco::StringTokenizer dpTok(disabledProtocolsList, ";,", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
 	int disabledProtocols = 0;
-	for (Poco::StringTokenizer::Iterator it = dpTok.begin(); it != dpTok.end(); ++it)
+	for (const auto & it : dpTok)
 	{
-		if (*it == "sslv2")
+		if (it == "sslv2")
 			disabledProtocols |= Context::PROTO_SSLV2;
-		else if (*it == "sslv3")
+		else if (it == "sslv3")
 			disabledProtocols |= Context::PROTO_SSLV3;
-		else if (*it == "tlsv1")
+		else if (it == "tlsv1")
 			disabledProtocols |= Context::PROTO_TLSV1;
-		else if (*it == "tlsv1_1")
+		else if (it == "tlsv1_1")
 			disabledProtocols |= Context::PROTO_TLSV1_1;
-		else if (*it == "tlsv1_2")
+		else if (it == "tlsv1_2")
 			disabledProtocols |= Context::PROTO_TLSV1_2;
-		else if (*it == "tlsv1_3")
+		else if (it == "tlsv1_3")
 			disabledProtocols |= Context::PROTO_TLSV1_3;
 	}
 	if (server)

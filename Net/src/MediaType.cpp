@@ -136,12 +136,12 @@ std::string MediaType::toString() const
 	result.append(_type);
 	result.append("/");
 	result.append(_subType);
-	for (NameValueCollection::ConstIterator it = _parameters.begin(); it != _parameters.end(); ++it)
+	for (const auto & _parameter : _parameters)
 	{
 		result.append("; ");
-		result.append(it->first);
+		result.append(_parameter.first);
 		result.append("=");
-		MessageHeader::quote(it->second, result);
+		MessageHeader::quote(_parameter.second, result);
 	}
 	return result;
 }

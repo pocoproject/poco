@@ -253,9 +253,9 @@ protected:
 			return Application::EXIT_OK;
 		}
 
-		for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+		for (const auto & arg : args)
 		{
-			compile(*it);
+			compile(arg);
 		}
 
 		return Application::EXIT_OK;

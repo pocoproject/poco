@@ -40,9 +40,9 @@ Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
 	FastMutex::ScopedLock lock(mutex);
 	if (!IN_ENCODING_INIT)
 	{
-		for (unsigned i = 0; i < sizeof(IN_ENCODING); i++)
+		for (unsigned char & i : IN_ENCODING)
 		{
-			IN_ENCODING[i] = 0xFF;
+			i = 0xFF;
 		}
 		for (unsigned i = 0; i < sizeof(Base32EncoderBuf::OUT_ENCODING); i++)
 		{

@@ -69,9 +69,9 @@ void SplitterChannel::setProperty(const std::string& name, const std::string& va
 	if (name.compare(0, 7, "channel") == 0)
 	{
 		StringTokenizer tokenizer(value, ",;", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (StringTokenizer::Iterator it = tokenizer.begin(); it != tokenizer.end(); ++it)
+		for (const auto & it : tokenizer)
 		{
-			addChannel(LoggingRegistry::defaultRegistry().channelForName(*it));
+			addChannel(LoggingRegistry::defaultRegistry().channelForName(it));
 		}
 	}
 	else Channel::setProperty(name, value);

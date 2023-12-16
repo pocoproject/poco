@@ -277,13 +277,13 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 	{
 		Poco::StringTokenizer tok(qop, ",", Poco::StringTokenizer::TOK_TRIM);
 		bool qopSupported = false;
-		for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+		for (const auto & it : tok)
 		{
-			if (icompare(*it, AUTH_PARAM) == 0)
+			if (icompare(it, AUTH_PARAM) == 0)
 			{
 				qopSupported = true;
 				_requestAuthParams.set(CNONCE_PARAM, createNonce());
-				_requestAuthParams.set(QOP_PARAM, *it);
+				_requestAuthParams.set(QOP_PARAM, it);
 				updateAuthParams(request);
 				break;
 			}
