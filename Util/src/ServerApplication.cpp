@@ -27,12 +27,12 @@
 #include "Poco/Logger.h"
 #include "Poco/String.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <signal.h>
-#include <sys/stat.h>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
+#include <sys/stat.h>
+#include <unistd.h>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"

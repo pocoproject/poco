@@ -73,14 +73,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <stddef.h>
-#include <string.h> /* memset(), memcpy() */
-#include <assert.h>
-#include <limits.h> /* UINT_MAX */
-#include <stdio.h>  /* fprintf */
-#include <stdlib.h> /* getenv, rand_s */
-#include <stdint.h> /* uintptr_t */
-#include <math.h>   /* isnan */
+#include <cassert>
+#include <climits> /* UINT_MAX */
+#include <cmath>   /* isnan */
+#include <cstddef>
+#include <cstdint> /* uintptr_t */
+#include <cstdio>  /* fprintf */
+#include <cstdlib> /* getenv, rand_s */
+#include <cstring> /* memset(), memcpy() */
 
 #define EXPAT_POCO 1
 

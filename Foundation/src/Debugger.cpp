@@ -20,7 +20,7 @@
 	#include "Poco/UnWindows.h"
 #elif defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	#include <unistd.h>
-	#include <signal.h>
+	#include <csignal>
 #endif
 #include "Poco/UnicodeConverter.h"
 

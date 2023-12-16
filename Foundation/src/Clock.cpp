@@ -19,7 +19,7 @@
 #include <mach/mach.h>
 #include <mach/clock.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 #elif defined(POCO_VXWORKS)
 #include <timers.h>

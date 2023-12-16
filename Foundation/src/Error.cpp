@@ -12,12 +12,12 @@
 //
 
 
+#include "Poco/Error.h"
 #include "Poco/Foundation.h"
 #include "Poco/UnicodeConverter.h"
-#include "Poco/Error.h"
+#include <cerrno>
+#include <cstring>
 #include <string>
-#include <string.h>
-#include <errno.h>
 
 
 namespace Poco {

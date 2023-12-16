@@ -97,8 +97,8 @@
 #include "bison_parser.h"
 #include "flex_lexer.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
   using namespace hsql;
 

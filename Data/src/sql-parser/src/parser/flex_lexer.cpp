@@ -256,10 +256,10 @@
 /* First, we deal with  platform-specific or compiler-specific issues. */
 
 /* begin standard C headers. */
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /* end standard C headers. */
 
@@ -3063,7 +3063,7 @@ static const flex_int16_t yy_chk[8848] =
 #include "../sql/Expr.h"
 #include "bison_parser.h"
 #include <climits>
-#include <stdio.h>
+#include <cstdio>
 #include <sstream>
 
 #define TOKEN(name) { return SQL_##name; }

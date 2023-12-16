@@ -40,7 +40,7 @@
 #endif
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
-#include <stdio.h>
+#include <cstdio>
 #include <sys/ioctl.h>
 #if POCO_OS == POCO_OS_SOLARIS
 #include <stropts.h>

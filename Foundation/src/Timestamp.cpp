@@ -20,7 +20,7 @@
 #undef max
 #include <limits>
 #if defined(POCO_OS_FAMILY_UNIX)
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 #if defined(POCO_VXWORKS)
 #include <timers.h>

@@ -21,7 +21,7 @@
 
 
 #include "Poco/SHA2Engine.h"
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {

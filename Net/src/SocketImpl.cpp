@@ -13,13 +13,13 @@
 
 
 #include "Poco/Net/SocketImpl.h"
+#include "Poco/Error.h"
+#include "Poco/FileStream.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
-#include "Poco/FileStream.h"
-#include "Poco/Error.h"
-#include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
+#include <cstring> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
 #if defined(POCO_HAVE_FD_EPOLL)

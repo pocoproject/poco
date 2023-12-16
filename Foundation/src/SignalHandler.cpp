@@ -18,11 +18,11 @@
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 
 
-#include "Poco/Thread.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Thread.h"
+#include <csignal>
 #include <cstdlib>
-#include <signal.h>
 
 
 namespace Poco {

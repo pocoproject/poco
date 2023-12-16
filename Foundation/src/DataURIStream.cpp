@@ -19,7 +19,7 @@
 #include "Poco/Path.h"
 #include "Poco/StreamUtil.h"
 #include "Poco/URI.h"
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {
