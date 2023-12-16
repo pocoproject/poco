@@ -71,7 +71,7 @@ public:
 		/// stringified, all unicode characters will be escaped in the
 		/// resulting string.
 
-	Array(const Array& copy);
+	Array(const Array& other);
 		/// Creates an Array by copying another one.
 
 	Array(Array&& other) noexcept;
@@ -140,7 +140,7 @@ public:
 	bool isArray(const Dynamic::Var& value) const;
 		/// Returns true when the element is an array.
 
-	bool isArray(ConstIterator& value) const;
+	bool isArray(ConstIterator& it) const;
 		/// Returns true when the element is an array.
 
 	bool isNull(unsigned int index) const;
@@ -153,7 +153,7 @@ public:
 	bool isObject(const Dynamic::Var& value) const;
 		/// Returns true when the element is an object.
 
-	bool isObject(ConstIterator& value) const;
+	bool isObject(ConstIterator& it) const;
 		/// Returns true when the element is an object.
 
 	template<typename T>

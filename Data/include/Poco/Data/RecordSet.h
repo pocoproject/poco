@@ -261,10 +261,10 @@ public:
 		}
 	}
 
-	Poco::Dynamic::Var value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
+	Poco::Dynamic::Var value(std::size_t col, std::size_t row, bool useFilter = true) const;
 		/// Returns the data value at column, row location.
 
-	Poco::Dynamic::Var value(const std::string& name, std::size_t row, bool checkFiltering = true) const;
+	Poco::Dynamic::Var value(const std::string& name, std::size_t row, bool useFilter = true) const;
 		/// Returns the data value at named column, row location.
 
 	template <typename T>

@@ -174,19 +174,19 @@ struct SQLParser_API Expr {
 
   static Expr* caseListAppend(Expr* caseList, Expr* caseListElement);
 
-  static Expr* makeCase(Expr* expr, Expr* when, Expr* elseExpr);
+  static Expr* makeCase(Expr* expr, Expr* caseList, Expr* elseExpr);
 
   static Expr* makeLiteral(int64_t val);
 
   static Expr* makeLiteral(double val);
 
-  static Expr* makeLiteral(char* val);
+  static Expr* makeLiteral(char* string);
 
   static Expr* makeLiteral(bool val);
 
   static Expr* makeNullLiteral();
 
-  static Expr* makeDateLiteral(char* val);
+  static Expr* makeDateLiteral(char* string);
 
   static Expr* makeIntervalLiteral(int64_t duration, DatetimeField unit);
 

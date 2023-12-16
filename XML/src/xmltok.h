@@ -287,7 +287,7 @@ int XmlParseXmlDecl(int isGeneralTextEntity, const ENCODING *enc,
                     const char *ptr, const char *end, const char **badPtr,
                     const char **versionPtr, const char **versionEndPtr,
                     const char **encodingNamePtr,
-                    const ENCODING **namedEncodingPtr, int *standalonePtr);
+                    const ENCODING **encoding, int *standalonePtr);
 
 int XmlInitEncoding(INIT_ENCODING *, const ENCODING **, const char *name);
 const ENCODING *XmlGetUtf8InternalEncoding(void);
@@ -305,7 +305,7 @@ int XmlParseXmlDeclNS(int isGeneralTextEntity, const ENCODING *enc,
                       const char *ptr, const char *end, const char **badPtr,
                       const char **versionPtr, const char **versionEndPtr,
                       const char **encodingNamePtr,
-                      const ENCODING **namedEncodingPtr, int *standalonePtr);
+                      const ENCODING **encoding, int *standalonePtr);
 
 int XmlInitEncodingNS(INIT_ENCODING *, const ENCODING **, const char *name);
 const ENCODING *XmlGetUtf8InternalEncodingNS(void);

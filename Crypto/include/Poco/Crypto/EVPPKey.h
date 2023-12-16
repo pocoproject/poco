@@ -63,7 +63,7 @@ public:
 	EVPPKey(const X509Certificate& cert);
 		/// Constructs EVPPKey from the given certificate.
 
-	EVPPKey(const PKCS12Container& cert);
+	EVPPKey(const PKCS12Container& cont);
 		/// Constructs EVPPKey from the given container.
 
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
@@ -86,7 +86,7 @@ public:
 #endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-	explicit EVPPKey(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey, unsigned long exponent, int type);
+	explicit EVPPKey(const std::vector<unsigned char>* public_key, const std::vector<unsigned char>* private_key, unsigned long exponent, int type);
 #endif
 	
 	explicit EVPPKey(EVP_PKEY* pEVPPKey);
@@ -182,7 +182,7 @@ private:
 #endif
 	static int type(const EVP_PKEY* pEVPPKey);
 	void checkType();
-	void newECKey(const char* group);
+	void newECKey(const char* ecCurveName);
 	void duplicate(EVP_PKEY* pEVPPKey);
 
 	//@ deprecated

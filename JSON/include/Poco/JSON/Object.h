@@ -79,7 +79,7 @@ public:
 		/// stringified, all unicode characters will be escaped in the
 		/// resulting string.
 
-	Object(const Object& copy);
+	Object(const Object& other);
 		/// Creates an Object by copying another one.
 		///
 		/// Struct is not copied to keep the operation as

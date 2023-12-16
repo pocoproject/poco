@@ -53,10 +53,10 @@ public:
 	ECKeyImpl(const X509Certificate& cert);
 		/// Constructs ECKeyImpl by extracting the EC public key from the given certificate.
 
-	ECKeyImpl(const PKCS12Container& cert);
+	ECKeyImpl(const PKCS12Container& cont);
 		/// Constructs ECKeyImpl by extracting the EC private key from the given certificate.
 
-	ECKeyImpl(int eccGroup);
+	ECKeyImpl(int curve);
 		/// Creates the ECKey of the specified group. Creates a new public/private keypair using the given parameters.
 		/// Can be used to sign data and verify signatures.
 

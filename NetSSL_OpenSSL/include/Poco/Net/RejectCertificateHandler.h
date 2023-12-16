@@ -32,7 +32,7 @@ class NetSSL_API RejectCertificateHandler: public InvalidCertificateHandler
 	/// the certificate.
 {
 public:
-	RejectCertificateHandler(bool handleErrorsOnServerSide);
+	RejectCertificateHandler(bool server);
 		/// Creates the RejectCertificateHandler
 
 	~RejectCertificateHandler() override;

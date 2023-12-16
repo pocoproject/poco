@@ -128,7 +128,7 @@ public:
 	const std::string& getThread() const;
 		/// Returns the thread identifier for the message.
 
-	void setTid(long pid);
+	void setTid(long tid);
 		/// Sets the numeric thread identifier for the message.
 
 	long getTid() const;

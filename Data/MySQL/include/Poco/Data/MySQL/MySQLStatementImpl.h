@@ -38,7 +38,7 @@ class MySQL_API MySQLStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for MySQL
 {
 public:
-	MySQLStatementImpl(SessionImpl& s);
+	MySQLStatementImpl(SessionImpl& h);
 		/// Creates the MySQLStatementImpl.
 
 	~MySQLStatementImpl() override;

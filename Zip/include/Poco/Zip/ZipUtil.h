@@ -57,7 +57,7 @@ public:
 	static void syncDataDescriptor(std::istream& in, bool force64);
 		/// Searches the next data descriptor
 
-	static void verifyZipEntryFileName(const std::string& zipPath);
+	static void verifyZipEntryFileName(const std::string& fn);
 		/// Verifies that the name of the ZipEntry is a valid path
 
 	static std::string validZipEntryFileName(const Poco::Path& entry);

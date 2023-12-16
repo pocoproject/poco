@@ -131,7 +131,7 @@ private:
 
 	void parseDateTime();
 
-	void init(const Poco::Path& fileName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl);
+	void init(const Poco::Path& fName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl);
 
 	Poco::UInt16 getFileNameLength() const;
 

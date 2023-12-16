@@ -40,7 +40,7 @@ public:
 	const char* name() const override;
 
 protected:
-	void initialize(Application& self) override;
+	void initialize(Application& app) override;
 	void uninitialize() override;
 	~LoggingSubsystem() override;
 };

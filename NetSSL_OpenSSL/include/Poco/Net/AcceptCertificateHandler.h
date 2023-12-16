@@ -34,7 +34,7 @@ class NetSSL_API AcceptCertificateHandler: public InvalidCertificateHandler
 	/// Should be using for testing purposes only.
 {
 public:
-	AcceptCertificateHandler(bool handleErrorsOnServerSide);
+	AcceptCertificateHandler(bool server);
 		/// Creates the AcceptCertificateHandler
 
 	~AcceptCertificateHandler() override;

@@ -50,7 +50,7 @@ public:
 	const DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length) override;
+	void updateImpl(const void* buffer_, std::size_t count) override;
 
 private:
 	void transform();

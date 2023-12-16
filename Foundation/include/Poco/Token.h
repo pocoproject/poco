@@ -103,7 +103,7 @@ public:
 	virtual char asChar() const;
 		/// Returns a char representation of the token.
 
-	bool is(Class tokenClass) const;
+	bool is(Class cls) const;
 		/// Returns true iff the token has the given class.
 
 protected:

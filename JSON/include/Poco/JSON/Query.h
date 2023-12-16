@@ -71,7 +71,7 @@ public:
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
-	Array& findArray(const std::string& path, Array& obj) const;
+	Array& findArray(const std::string& path, Array& arr) const;
 		/// Search for an array.
 		///
 		/// If array is found, it is assigned to the

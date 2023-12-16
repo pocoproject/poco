@@ -79,7 +79,7 @@ public:
 	~Random();
 		/// Destroys the PRNG.
 
-	void seed(UInt32 seed);
+	void seed(UInt32 x);
 		/// Seeds the pseudo random generator with the given seed.
 
 	void seed();
@@ -105,7 +105,7 @@ public:
 		/// Returns the next double pseudo random number between 0.0 and 1.0.
 
 protected:
-	void initState(UInt32 seed, char* arg_state, Int32 n);
+	void initState(UInt32 seed, char* argState, Int32 n);
 	static UInt32 goodRand(Int32 x);
 
 private:

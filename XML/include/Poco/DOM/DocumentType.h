@@ -82,7 +82,7 @@ public:
 
 protected:
 	DocumentType(Document* pOwner, XMLString  name, XMLString  publicId, XMLString  systemId);
-	DocumentType(Document* pOwner, const DocumentType& dt);
+	DocumentType(Document* pOwner, const DocumentType& doctype);
 	~DocumentType() override;
 
 	Node* copyNode(bool deep, Document* pOwnerDocument) const override;

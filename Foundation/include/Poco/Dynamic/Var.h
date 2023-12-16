@@ -233,7 +233,7 @@ public:
 	bool operator ! () const;
 		/// Logical NOT operator.
 
-	Var& operator = (const Var& other);
+	Var& operator = (const Var& rhs);
 		/// Assignment operator specialization for Var
 
 	template <typename T>
@@ -542,7 +542,7 @@ public:
 	static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
 
-	static std::string toString(const Var& var);
+	static std::string toString(const Var& any);
 		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
 		/// a different result than Var::convert<std::string>() and Var::toString()!
 
@@ -550,7 +550,7 @@ private:
 	Var& getAt(std::size_t n);
 	Var& getAt(const std::string& n);
 
-	static Var parse(const std::string& val, std::string::size_type& offset);
+	static Var parse(const std::string& val, std::string::size_type& pos);
 		/// Parses the string which must be in JSON format
 
 	static Var parseObject(const std::string& val, std::string::size_type& pos);

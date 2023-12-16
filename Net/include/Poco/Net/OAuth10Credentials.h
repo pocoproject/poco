@@ -149,7 +149,7 @@ public:
 	const std::string& getRealm() const;
 		/// Returns the optional realm to be included in the Authorization header.
 
-	void setCallback(const std::string& uri);
+	void setCallback(const std::string& callback);
 		/// Sets the callback URI.
 
 	const std::string& getCallback() const;

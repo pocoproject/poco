@@ -165,7 +165,7 @@ public:
 	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
 	static const Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
 
-	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
+	Session(Poco::AutoPtr<SessionImpl> pImpl);
 		/// Creates the Session from SessionImpl.
 
 	Session(const std::string& connector,

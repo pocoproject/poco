@@ -406,7 +406,7 @@ private:
 	void setBulkBinding();
 		/// Sets the bulk binding flag.
 
-	void setBulkExtraction(const Bulk& l);
+	void setBulkExtraction(const Bulk& b);
 		/// Sets the bulk extraction flag and extraction limit.
 
 	void resetBulk();

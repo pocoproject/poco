@@ -32,7 +32,7 @@ public:
 	RedisEventArgs(RedisType::Ptr message);
 		/// Creates the RedisEventArgs from the given message.
 
-	RedisEventArgs(Exception* e);
+	RedisEventArgs(Exception* pException);
 		/// Creates the RedisEventArgs from the given Redis Exception.
 
 	~RedisEventArgs();

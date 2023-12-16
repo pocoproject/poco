@@ -196,7 +196,7 @@ public:
 	Poco::UInt16 port() const;
 		/// Returns the port the server socket listens on.
 
-	void setConnectionFilter(const TCPServerConnectionFilter::Ptr& pFilter);
+	void setConnectionFilter(const TCPServerConnectionFilter::Ptr& pConnectionFilter);
 		/// Sets a TCPServerConnectionFilter. Can also be used to remove
 		/// a filter by passing a null pointer.
 		///

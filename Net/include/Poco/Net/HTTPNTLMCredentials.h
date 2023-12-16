@@ -119,7 +119,7 @@ private:
 	HTTPNTLMCredentials(const HTTPNTLMCredentials&);
 	HTTPNTLMCredentials& operator = (const HTTPNTLMCredentials&);
 
-	std::string createNTLMMessage(const std::string& ntlmChallengeBase64);
+	std::string createNTLMMessage(const std::string& responseAuthParams);
 	bool useSSPINTLM() const;
 
 	std::string _username;

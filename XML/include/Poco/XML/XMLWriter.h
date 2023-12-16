@@ -291,7 +291,7 @@ protected:
 	void writeXML(XMLChar ch) const;
 	void writeNewLine() const;
 	void writeIndent() const;
-	void writeIndent(int indent) const;
+	void writeIndent(int depth) const;
 	void writeName(const XMLString& prefix, const XMLString& localName);
 	void writeXMLDeclaration();
 	void closeStartTag();

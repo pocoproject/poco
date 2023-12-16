@@ -65,17 +65,17 @@ public:
 	virtual int size() const;
 		/// Returns the RSA modulus size.
 
-	virtual void save(const std::string& publicKeyPairFile,
-		const std::string& privateKeyPairFile = "",
-		const std::string& privateKeyPairPassphrase = "") const;
+	virtual void save(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	virtual void save(std::ostream* pPublicKeyPairStream,
-		std::ostream* pPrivateKeyPairStream = nullptr,
-		const std::string& privateKeyPairPassphrase = "") const;
+	virtual void save(std::ostream* pPublicKeyStream,
+		std::ostream* pPrivateKeyStream = nullptr,
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding

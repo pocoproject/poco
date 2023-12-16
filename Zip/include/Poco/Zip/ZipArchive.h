@@ -46,7 +46,7 @@ public:
 	ZipArchive(std::istream& in);
 		/// Creates the ZipArchive from a file. Note that the in stream will be in state failed after the constructor is finished
 
-	ZipArchive(std::istream& in, ParseCallback& callback);
+	ZipArchive(std::istream& in, ParseCallback& pc);
 		/// Creates the ZipArchive from a file or network stream. Note that the in stream will be in state failed after the constructor is finished
 
 	~ZipArchive();

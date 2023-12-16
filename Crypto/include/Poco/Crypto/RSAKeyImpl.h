@@ -56,7 +56,7 @@ public:
 	RSAKeyImpl(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
 
-	RSAKeyImpl(const PKCS12Container& cert);
+	RSAKeyImpl(const PKCS12Container& cont);
 		/// Extracts the RSA private key from the given certificate.
 
 	RSAKeyImpl(int keyLength, unsigned long exponent);

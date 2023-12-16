@@ -107,7 +107,7 @@ public:
 		/// Returns the cipher object
 
 private:
-	void generateKey(const std::string& passphrase,
+	void generateKey(const std::string& password,
 		const std::string& salt,
 		int iterationCount);
 	 	/// Generates key and IV from a password and optional salt string.

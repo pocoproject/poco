@@ -76,7 +76,7 @@ static const int kFastDtoaMaximalSingleLength = 9;
 //     If there are two values that are equally close, then FastDtoa returns
 //     false.
 // For both modes the buffer must be large enough to hold the result.
-bool FastDtoa(double d,
+bool FastDtoa(double v,
               FastDtoaMode mode,
               int requested_digits,
               Vector<char> buffer,

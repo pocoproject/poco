@@ -67,7 +67,7 @@ public:
 	const DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length) override;
+	void updateImpl(const void* input_, std::size_t inputLen) override;
 
 private:
 	static void transform(UInt32 state[4], const unsigned char block[64]);

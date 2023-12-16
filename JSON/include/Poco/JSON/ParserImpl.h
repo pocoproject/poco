@@ -76,7 +76,7 @@ protected:
 	Dynamic::Var parseImpl(const std::string& json);
 		/// Parses JSON from a string.
 
-	Dynamic::Var parseImpl(std::istream& in);
+	Dynamic::Var parseImpl(std::istream& json);
 		/// Parses JSON from an input stream.
 
 	void setHandlerImpl(const Handler::Ptr& pHandler);
