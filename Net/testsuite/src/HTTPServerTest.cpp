@@ -24,6 +24,9 @@
 #include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Path.h"
+#include "Poco/FileStream.h"
+#include "Poco/File.h"
 #include <sstream>
 
 
@@ -40,10 +43,15 @@ using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
 using Poco::Net::ServerSocket;
 using Poco::StreamCopier;
+using Poco::Path;
+using Poco::File;
+using Poco::FileOutputStream;
 
 
 namespace
 {
+	static const int sendFileSize = 64000;
+
 	class EchoBodyRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -105,7 +113,29 @@ namespace
 			response.sendBuffer(data.data(), data.length());
 		}
 	};
-
+	
+	class FileRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			std::string payload(sendFileSize, 'x');
+			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.txt");
+			const std::string fileName = testFilePath.toString();
+			{
+				File f(fileName);
+				if (f.exists())
+				{
+					f.remove();
+				}
+			}
+			FileOutputStream fout(fileName);
+			fout << payload;
+			fout.close();
+			response.sendFile(fileName, "text/plain");
+		}
+	};
+	
 	class TrailerRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -138,8 +168,10 @@ namespace
 				return new BufferRequestHandler;
 			else if (request.getURI() == "/trailer")
 				return new TrailerRequestHandler;
+			else if (request.getURI() == "/file")
+				return new FileRequestHandler;
 			else
-				return 0;
+				return nullptr;
 		}
 	};
 }
@@ -534,6 +566,26 @@ void HTTPServerTest::testBuffer()
 	assertTrue (rbody == "xxxxxxxxxx");
 }
 
+void HTTPServerTest::testFile()
+{
+	std::string payload(sendFileSize, 'x');
+	
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	HTTPRequest request("GET", "/file");
+	cs.sendRequest(request);
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (rbody == payload);
+}
+
 
 void HTTPServerTest::testChunkedTrailer()
 {
@@ -585,6 +637,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testAuth);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNotImpl);
 	CppUnit_addTest(pSuite, HTTPServerTest, testBuffer);
+	CppUnit_addTest(pSuite, HTTPServerTest, testFile);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedTrailer);
 
 	return pSuite;

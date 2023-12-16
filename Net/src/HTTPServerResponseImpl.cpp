@@ -126,9 +126,22 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	{
 		_pStream = new HTTPHeaderOutputStream(_session);
 		write(*_pStream);
+#ifdef POCO_USE_SENDFILE_FOR_HTTPSERVER
 		if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
 		{
+			delete _pStream; // delete the stream to flush the HTTP headers to the socket, required by HTTP 1.0 and above
+			_pStream = nullptr;
+
+			Poco::Int64 sent = 0;
+			Poco::Int64 offset = 0;
+			while (sent < length)
+			{
+				offset = sent;
+				sent = _session.socket().sendFile(istr, offset);
+			}
+#else
 			StreamCopier::copyStream(istr, *_pStream);
+#endif
 		}
 	}
 	else throw OpenFileException(path);
