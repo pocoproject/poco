@@ -358,7 +358,7 @@ namespace Impl {
 		}
 
 	private:
-		void checkBounds(char* ptr)
+		void checkBounds(const char* ptr)
 		{
 			if (ptr > _end) throw RangeException();
 		}

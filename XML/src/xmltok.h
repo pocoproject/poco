@@ -298,7 +298,7 @@ int XmlSizeOfUnknownEncoding(void);
 
 typedef int(XMLCALL *CONVERTER)(void *userData, const char *p);
 
-ENCODING *XmlInitUnknownEncoding(void *mem, int *table, CONVERTER convert,
+ENCODING *XmlInitUnknownEncoding(void *mem, const int *table, CONVERTER convert,
                                  void *userData);
 
 int XmlParseXmlDeclNS(int isGeneralTextEntity, const ENCODING *enc,

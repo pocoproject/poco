@@ -97,7 +97,7 @@ protected:
 	};
 
 	int receiveHeader(char mask[4], bool& useMask);
-	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
+	int receivePayload(char *buffer, int payloadLength, const char mask[4], bool useMask);
 	int receiveNBytes(void* buffer, int bytes);
 	int receiveSomeBytes(char* buffer, int bytes);
 	~WebSocketImpl() override;
