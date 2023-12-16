@@ -42,12 +42,12 @@ public:
 	using openmode = HTTPBasicStreamBuf::openmode;
 
 	HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, MessageHeader* pTrailer = nullptr);
-	~HTTPChunkedStreamBuf();
+	~HTTPChunkedStreamBuf() override;
 	void close();
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	HTTPSession&    _session;
@@ -63,7 +63,7 @@ class Net_API HTTPChunkedIOS: public virtual std::ios
 {
 public:
 	HTTPChunkedIOS(HTTPSession& session, HTTPChunkedStreamBuf::openmode mode, MessageHeader* pTrailer = nullptr);
-	~HTTPChunkedIOS();
+	~HTTPChunkedIOS() override;
 	HTTPChunkedStreamBuf* rdbuf();
 
 protected:
@@ -76,7 +76,7 @@ class Net_API HTTPChunkedInputStream: public HTTPChunkedIOS, public std::istream
 {
 public:
 	HTTPChunkedInputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
-	~HTTPChunkedInputStream();
+	~HTTPChunkedInputStream() override;
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
@@ -91,7 +91,7 @@ class Net_API HTTPChunkedOutputStream: public HTTPChunkedIOS, public std::ostrea
 {
 public:
 	HTTPChunkedOutputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
-	~HTTPChunkedOutputStream();
+	~HTTPChunkedOutputStream() override;
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);

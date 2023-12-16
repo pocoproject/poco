@@ -62,7 +62,7 @@ public:
 		/// a special way, outside the TCPServer framework.
 
 protected:
-	virtual ~TCPServerConnectionFilter();
+	~TCPServerConnectionFilter() override;
 };
 
 
@@ -146,7 +146,7 @@ public:
 		///
 		/// New threads are taken from the given thread pool.
 
-	virtual ~TCPServer();
+	~TCPServer() override;
 		/// Destroys the TCPServer and its TCPServerConnectionFactory.
 
 	const TCPServerParams& params() const;
@@ -210,7 +210,7 @@ public:
 		/// or null pointer if no filter has been set.
 
 protected:
-	void run();
+	void run() override;
 		/// Runs the server. The server will run until
 		/// the stop() method is called, or the server
 		/// object is destroyed, which implicitly calls

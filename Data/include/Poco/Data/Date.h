@@ -171,39 +171,39 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
+	~VarHolderImpl() override
 	{
 	}
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::Date);
 	}
 
-	void convert(Poco::Timestamp& val) const
+	void convert(Poco::Timestamp& val) const override
 	{
 		DateTime dt;
 		dt.assign(_val.year(), _val.month(), _val.day());
 		val = dt.timestamp();
 	}
 
-	void convert(Poco::DateTime& val) const
+	void convert(Poco::DateTime& val) const override
 	{
 		val.assign(_val.year(), _val.month(), _val.day());
 	}
 
-	void convert(Poco::LocalDateTime& val) const
+	void convert(Poco::LocalDateTime& val) const override
 	{
 		val.assign(_val.year(), _val.month(), _val.day());
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		DateTime dt(_val.year(), _val.month(), _val.day());
 		val = DateTimeFormatter::format(dt, "%Y/%m/%d");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

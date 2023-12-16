@@ -32,7 +32,7 @@ class Encodings_API Windows932Encoding: public DoubleByteEncoding
 {
 public:
 	Windows932Encoding();
-	~Windows932Encoding();
+	~Windows932Encoding() override;
 
 private:
 	static const char* _names[];

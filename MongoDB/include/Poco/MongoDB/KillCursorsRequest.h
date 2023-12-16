@@ -35,14 +35,14 @@ public:
 	KillCursorsRequest();
 		/// Creates a KillCursorsRequest.
 
-	virtual ~KillCursorsRequest();
+	~KillCursorsRequest() override;
 		/// Destroys the KillCursorsRequest.
 
 	std::vector<Int64>& cursors();
 		/// The internal list of cursors.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 	std::vector<Int64> _cursors;
 };
 

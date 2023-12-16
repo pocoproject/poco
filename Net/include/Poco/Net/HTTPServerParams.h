@@ -105,7 +105,7 @@ public:
 		/// when reading HTTP header.
 
 protected:
-	virtual ~HTTPServerParams();
+	~HTTPServerParams() override;
 		/// Destroys the HTTPServerParams.
 
 private:

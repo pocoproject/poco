@@ -35,21 +35,21 @@ class XML_API DTDMap: public NamedNodeMap
 	/// and DocumentType::notations().
 {
 public:
-	Node* getNamedItem(const XMLString& name) const;
-	Node* setNamedItem(Node* arg);
-	Node* removeNamedItem(const XMLString& name);
-	Node* item(unsigned long index) const;
-	unsigned long length() const;
+	Node* getNamedItem(const XMLString& name) const override;
+	Node* setNamedItem(Node* arg) override;
+	Node* removeNamedItem(const XMLString& name) override;
+	Node* item(unsigned long index) const override;
+	unsigned long length() const override;
 
-	Node* getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const;
-	Node* setNamedItemNS(Node* arg);
-	Node* removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName);
+	Node* getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const override;
+	Node* setNamedItemNS(Node* arg) override;
+	Node* removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) override;
 
-	void autoRelease();
+	void autoRelease() override;
 
 protected:
 	DTDMap(const DocumentType* pDocumentType, unsigned short type);
-	~DTDMap();
+	~DTDMap() override;
 
 private:
 	DTDMap();

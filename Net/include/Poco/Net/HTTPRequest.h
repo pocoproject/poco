@@ -52,7 +52,7 @@ public:
 	HTTPRequest(const HTTPRequest& other);
 		/// Creates a HTTP request by copying another one.
 
-	virtual ~HTTPRequest();
+	~HTTPRequest() override;
 		/// Destroys the HTTPRequest.
 
 	HTTPRequest& operator = (const HTTPRequest&);
@@ -138,11 +138,11 @@ public:
 	void removeProxyCredentials();
 		/// Removes any proxy credentials from the request.
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP request to the given
 		/// output stream.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP request from the
 		/// given input stream.
 

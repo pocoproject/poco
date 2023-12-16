@@ -44,7 +44,7 @@ public:
 	HTTPServerRequest();
 		/// Creates the HTTPServerRequest
 
-	~HTTPServerRequest();
+	~HTTPServerRequest() override;
 		/// Destroys the HTTPServerRequest.
 
 	virtual std::istream& stream() = 0;

@@ -36,7 +36,7 @@ class Foundation_API ProcessHandleImpl: public RefCountedObject
 {
 public:
 	ProcessHandleImpl(pid_t pid);
-	~ProcessHandleImpl();
+	~ProcessHandleImpl() override;
 
 	pid_t id() const;
 	int wait() const;

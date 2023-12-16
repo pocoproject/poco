@@ -32,7 +32,7 @@ class Encodings_API ISO8859_4Encoding: public DoubleByteEncoding
 {
 public:
 	ISO8859_4Encoding();
-	~ISO8859_4Encoding();
+	~ISO8859_4Encoding() override;
 
 private:
 	static const char* _names[];

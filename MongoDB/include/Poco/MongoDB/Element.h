@@ -360,7 +360,7 @@ public:
 	{
 	}
 
-	virtual ~ConcreteElement()
+	~ConcreteElement() override
 	{
 	}
 
@@ -371,23 +371,23 @@ public:
 	}
 
 
-	std::string toString(int indent = 0) const
+	std::string toString(int indent = 0) const override
 	{
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
 
-	int type() const
+	int type() const override
 	{
 		return ElementTraits<T>::TypeId;
 	}
 
-	void read(BinaryReader& reader)
+	void read(BinaryReader& reader) override
 	{
 		BSONReader(reader).read(_value);
 	}
 
-	void write(BinaryWriter& writer)
+	void write(BinaryWriter& writer) override
 	{
 		BSONWriter(writer).write(_value);
 	}

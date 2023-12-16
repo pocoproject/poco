@@ -34,10 +34,10 @@ public:
 	DataURIStreamFactory();
 		/// Creates the DataURIStreamFactory.
 
-	~DataURIStreamFactory();
+	~DataURIStreamFactory() override;
 		/// Destroys the DataURIStreamFactory.
 
-	std::istream* open(const URI& uri);
+	std::istream* open(const URI& uri) override;
 		/// Creates an input stream returning decoded data from the given data URI.
 		///
 		/// Throws a DataFormatException exception if the data is incorrect format.

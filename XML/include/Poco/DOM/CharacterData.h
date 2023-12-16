@@ -83,13 +83,13 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 	// Node
-	const XMLString& getNodeValue() const;
-	void setNodeValue(const XMLString& value);
+	const XMLString& getNodeValue() const override;
+	void setNodeValue(const XMLString& value) override;
 
 protected:
 	CharacterData(Document* pOwnerDocument, const XMLString& data);
 	CharacterData(Document* pOwnerDocument, const CharacterData& data);
-	~CharacterData();
+	~CharacterData() override;
 
 private:
 	XMLString _data;

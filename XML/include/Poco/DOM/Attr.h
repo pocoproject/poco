@@ -110,25 +110,25 @@ public:
 		/// if this attribute is not in use.
 
 	// Node
-	Node* parentNode() const;
-	const XMLString& nodeName() const;
-	const XMLString& getNodeValue() const;
-	void setNodeValue(const XMLString& value);
-	unsigned short nodeType() const;
-	Node* previousSibling() const;
-	const XMLString& namespaceURI() const;
-	XMLString prefix() const;
-	const XMLString& localName() const;
+	Node* parentNode() const override;
+	const XMLString& nodeName() const override;
+	const XMLString& getNodeValue() const override;
+	void setNodeValue(const XMLString& value) override;
+	unsigned short nodeType() const override;
+	Node* previousSibling() const override;
+	const XMLString& namespaceURI() const override;
+	XMLString prefix() const override;
+	const XMLString& localName() const override;
 
 	// Non-standard extensions
-	XMLString innerText() const;
+	XMLString innerText() const override;
 
 protected:
 	Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified = true);
 	Attr(Document* pOwnerDocument, const Attr& attr);
-	~Attr();
+	~Attr() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	const Name& _name;

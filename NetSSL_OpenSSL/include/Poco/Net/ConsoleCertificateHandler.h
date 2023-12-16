@@ -35,10 +35,10 @@ public:
 	ConsoleCertificateHandler(bool handleErrorsOnServerSide);
 		/// Creates the ConsoleCertificateHandler.
 
-	virtual ~ConsoleCertificateHandler();
+	~ConsoleCertificateHandler() override;
 		/// Destroys the ConsoleCertificateHandler.
 
-	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert);
+	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert) override;
 		/// Prints the certificate to stdout and waits for user input on the console
 		/// to decide if a certificate should be accepted/rejected.
 };

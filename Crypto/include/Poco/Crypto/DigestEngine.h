@@ -40,7 +40,7 @@ public:
 		///
 		/// Throws a Poco::NotFoundException if no algorithm with the given name exists.
 
-	~DigestEngine();
+	~DigestEngine() override;
 		/// Destroys the DigestEngine.
 
 	const std::string& algorithm() const;
@@ -50,12 +50,12 @@ public:
 		/// Returns the NID (OpenSSL object identifier) of the digest algorithm.
 
 	// DigestEngine
-	std::size_t digestLength() const;
-	void reset();
-	const Poco::DigestEngine::Digest& digest();
+	std::size_t digestLength() const override;
+	void reset() override;
+	const Poco::DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void* data, std::size_t length) override;
 
 private:
 	std::string _name;

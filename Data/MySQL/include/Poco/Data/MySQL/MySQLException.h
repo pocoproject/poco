@@ -47,25 +47,25 @@ public:
 	MySQLException(const std::string& msg, int code);
 		/// Creates MySQLException.
 
-	~MySQLException() noexcept;
+	~MySQLException() noexcept override;
 		/// Destroys MySQLexception.
 
 	MySQLException& operator=(const MySQLException& exc);
 		/// Assignment operator.
 
-	const char* name() const noexcept;
+	const char* name() const noexcept override;
 		/// Returns exception name.
 
-	const char* className() const noexcept;
+	const char* className() const noexcept override;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	Poco::Exception* clone() const override;
 		/// Creates an exact copy of the exception.
 		///
 		/// The copy can later be thrown again by
 		/// invoking rethrow() on it.
 
-	void rethrow() const;
+	void rethrow() const override;
 		/// (Re)Throws the exception.
 		///
 		/// This is useful for temporarily storing a

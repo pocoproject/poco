@@ -53,7 +53,7 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
-	virtual ~InsertRequest();
+	~InsertRequest() override;
 		/// Destroys the InsertRequest.
 
 	Document& addNewDocument();
@@ -65,7 +65,7 @@ public:
 		/// Returns the documents to insert into the database.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 
 private:
 	Int32 _flags;

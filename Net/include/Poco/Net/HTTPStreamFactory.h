@@ -47,10 +47,10 @@ public:
 		/// will be authorized against the proxy using Basic authentication
 		/// with the given proxyUsername and proxyPassword.
 
-	virtual ~HTTPStreamFactory();
+	~HTTPStreamFactory() override;
 		/// Destroys the HTTPStreamFactory.
 
-	virtual std::istream* open(const Poco::URI& uri);
+	std::istream* open(const Poco::URI& uri) override;
 		/// Creates and opens a HTTP stream for the given URI.
 		/// The URI must be a http://... URI.
 		///

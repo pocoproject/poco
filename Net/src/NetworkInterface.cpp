@@ -137,7 +137,7 @@ public:
 	void setPhyParams();
 
 protected:
-	~NetworkInterfaceImpl();
+	~NetworkInterfaceImpl() override;
 
 private:
 	std::string _name;

@@ -115,12 +115,12 @@ public:
 			&AbstractSessionImpl<C>::getSQLParse);
 	}
 
-	~AbstractSessionImpl()
+	~AbstractSessionImpl() override
 		/// Destroys the AbstractSessionImpl.
 	{
 	}
 
-	bool hasFeature(const std::string& name) const
+	bool hasFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and returns true if there is one.
 	{
@@ -130,7 +130,7 @@ public:
 			it->second.setter;
 	}
 
-	void setFeature(const std::string& name, bool state)
+	void setFeature(const std::string& name, bool state) override
 		/// Looks a feature up in the features map
 		/// and calls the feature's setter, if there is one.
 	{
@@ -145,7 +145,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool getFeature(const std::string& name) const
+	bool getFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
 	{
@@ -160,7 +160,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool hasProperty(const std::string& name) const
+	bool hasProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and returns true if there is one.
 	{
@@ -170,7 +170,7 @@ public:
 			it->second.setter;
 	}
 
-	void setProperty(const std::string& name, const Poco::Any& value)
+	void setProperty(const std::string& name, const Poco::Any& value) override
 		/// Looks a property up in the properties map
 		/// and calls the property's setter, if there is one.
 	{
@@ -185,7 +185,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	Poco::Any getProperty(const std::string& name) const
+	Poco::Any getProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
 	{

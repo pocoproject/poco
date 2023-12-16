@@ -47,7 +47,7 @@ public:
 	KeyPairImpl(const std::string& name, Type type);
 		/// Create KeyPairImpl with specified type and name.
 
-	virtual ~KeyPairImpl();
+	~KeyPairImpl() override;
 		/// Destroys the KeyPairImpl.
 
 	virtual int size() const = 0;

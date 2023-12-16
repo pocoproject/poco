@@ -127,7 +127,7 @@ public:
 	}
 
 protected:
-	~ActiveResultHolder()
+	~ActiveResultHolder() override
 	{
 		delete _pData;
 		delete _pExc;
@@ -220,7 +220,7 @@ public:
 	}
 
 protected:
-	~ActiveResultHolder()
+	~ActiveResultHolder() override
 	{
 		delete _pExc;
 	}

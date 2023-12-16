@@ -103,16 +103,16 @@ public:
 		/// Creates a RemoteSyslogChannel with the given target address, name, and facility.
 		/// If bsdFormat is true, messages are formatted according to RFC 3164.
 
-	void open();
+	void open() override;
 		/// Opens the RemoteSyslogChannel.
 
-	void close();
+	void close() override;
 		/// Closes the RemoteSyslogChannel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Sends the message's text to the syslog service.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
@@ -126,7 +126,7 @@ public:
 		///                  IP address will be used.
 		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
 	static void registerChannel();
@@ -144,7 +144,7 @@ public:
 	static const std::string STRUCTURED_DATA;
 
 protected:
-	~RemoteSyslogChannel();
+	~RemoteSyslogChannel() override;
 	static int getPrio(const Message& msg);
 
 private:

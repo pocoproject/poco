@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	~RunnableAdapter()
+	~RunnableAdapter() override
 	{
 	}
 
@@ -59,7 +59,7 @@ public:
 		return *this;
 	}
 
-	void run()
+	void run() override
 	{
 		(_pObject->*_method)();
 	}

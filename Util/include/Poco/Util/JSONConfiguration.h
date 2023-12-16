@@ -78,7 +78,7 @@ public:
 		/// Creates a configuration from the given JSON object
 
 
-	virtual ~JSONConfiguration();
+	~JSONConfiguration() override;
 		/// Destructor
 
 
@@ -98,30 +98,30 @@ public:
 		/// Saves the configuration to the given stream
 
 
-	virtual void setInt(const std::string& key, int value);
+	void setInt(const std::string& key, int value) override;
 
 
-	virtual void setBool(const std::string& key, bool value);
+	void setBool(const std::string& key, bool value) override;
 
 
-	virtual void setDouble(const std::string& key, double value);
+	void setDouble(const std::string& key, double value) override;
 
 
-	virtual void setString(const std::string& key, const std::string& value);
+	void setString(const std::string& key, const std::string& value) override;
 
 
-	virtual void removeRaw(const std::string& key);
+	void removeRaw(const std::string& key) override;
 
 
 protected:
 
-	bool getRaw(const std::string & key, std::string & value) const;
+	bool getRaw(const std::string & key, std::string & value) const override;
 
 
-	void setRaw(const std::string& key, const std::string& value);
+	void setRaw(const std::string& key, const std::string& value) override;
 
 
-	void enumerate(const std::string& key, Keys& range) const;
+	void enumerate(const std::string& key, Keys& range) const override;
 
 
 private:

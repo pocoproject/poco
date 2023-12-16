@@ -81,7 +81,7 @@ public:
 		///
 		/// If `startProcess` is true, the process is started on object creation.
 
-	~ProcessRunner();
+	~ProcessRunner() override;
 		/// Destroys the ProcessRunner.
 
 	PID pid() const;
@@ -136,7 +136,7 @@ private:
 	}
 
 
-	void run();
+	void run() override;
 		/// Starts the process and waits for it to be fully initialized.
 		/// Process initialization completion is indicated by new pid in
 		/// the pid file. If pid file is not specified, there is no waiting.

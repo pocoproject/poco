@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	~FIFOEvent()
+	~FIFOEvent() override
 	{
 	}
 

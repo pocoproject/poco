@@ -33,7 +33,7 @@ public:
 	OpMsgCursor(const std::string& dbname, const std::string& collectionName);
 		/// Creates a OpMsgCursor for the given database and collection.
 
-	virtual ~OpMsgCursor();
+	~OpMsgCursor() override;
 		/// Destroys the OpMsgCursor.
 
 	void setEmptyFirstBatch(bool empty);

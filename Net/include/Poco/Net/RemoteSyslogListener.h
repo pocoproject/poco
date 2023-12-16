@@ -70,7 +70,7 @@ public:
 		/// If reusePort is true, the underlying UDP socket will bind
 		/// with the reusePort flag set.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
@@ -85,13 +85,13 @@ public:
 		///     * buffer: The UDP socket receive buffer size in bytes. If not
 		///       specified, the system default is used.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
-	void open();
+	void open() override;
 		/// Starts the listener.
 
-	void close();
+	void close() override;
 		/// Stops the listener.
 
 	void processMessage(const std::string& messageText);
@@ -116,7 +116,7 @@ public:
 	static const std::string LOG_PROP_STRUCTURED_DATA;
 
 protected:
-	~RemoteSyslogListener();
+	~RemoteSyslogListener() override;
 		/// Destroys the RemoteSyslogListener.
 
 private:

@@ -41,33 +41,33 @@ public:
 	PooledSessionImpl(PooledSessionHolder* pHolder);
 		/// Creates the PooledSessionImpl.
 
-	~PooledSessionImpl();
+	~PooledSessionImpl() override;
 		/// Destroys the PooledSessionImpl.
 
-	StatementImpl::Ptr createStatementImpl();
-	void begin();
-	void commit();
-	void rollback();
-	void open(const std::string& connect = "");
-	void close();
-	void reset();
-	bool isConnected() const;
-	bool isGood() const;
-	void setConnectionTimeout(std::size_t timeout);
-	std::size_t getConnectionTimeout() const;
-	bool canTransact() const;
-	bool isTransaction() const;
-	void setTransactionIsolation(Poco::UInt32);
-	Poco::UInt32 getTransactionIsolation() const;
-	bool hasTransactionIsolation(Poco::UInt32) const;
-	bool isTransactionIsolation(Poco::UInt32) const;
-	const std::string& connectorName() const;
-	bool hasFeature(const std::string& name) const;
-	void setFeature(const std::string& name, bool state);
-	bool getFeature(const std::string& name) const;
-	bool hasProperty(const std::string& name) const;
-	void setProperty(const std::string& name, const Poco::Any& value);
-	Poco::Any getProperty(const std::string& name) const;
+	StatementImpl::Ptr createStatementImpl() override;
+	void begin() override;
+	void commit() override;
+	void rollback() override;
+	void open(const std::string& connect = "") override;
+	void close() override;
+	void reset() override;
+	bool isConnected() const override;
+	bool isGood() const override;
+	void setConnectionTimeout(std::size_t timeout) override;
+	std::size_t getConnectionTimeout() const override;
+	bool canTransact() const override;
+	bool isTransaction() const override;
+	void setTransactionIsolation(Poco::UInt32) override;
+	Poco::UInt32 getTransactionIsolation() const override;
+	bool hasTransactionIsolation(Poco::UInt32) const override;
+	bool isTransactionIsolation(Poco::UInt32) const override;
+	const std::string& connectorName() const override;
+	bool hasFeature(const std::string& name) const override;
+	void setFeature(const std::string& name, bool state) override;
+	bool getFeature(const std::string& name) const override;
+	bool hasProperty(const std::string& name) const override;
+	void setProperty(const std::string& name, const Poco::Any& value) override;
+	Poco::Any getProperty(const std::string& name) const override;
 
 protected:
 	SessionImpl* access() const;

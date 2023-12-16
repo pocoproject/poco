@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	~Delegate()
+	~Delegate() override
 	{
 	}
 
@@ -61,7 +61,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender, TArgs& arguments)
+	bool notify(const void* sender, TArgs& arguments) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -72,18 +72,18 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<TArgs>& other) const
+	bool equals(const AbstractDelegate<TArgs>& other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<TArgs>* clone() const
+	AbstractDelegate<TArgs>* clone() const override
 	{
 		return new Delegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = nullptr;
@@ -118,7 +118,7 @@ public:
 	{
 	}
 
-	~Delegate()
+	~Delegate() override
 	{
 	}
 
@@ -132,7 +132,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void*, TArgs& arguments)
+	bool notify(const void*, TArgs& arguments) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -143,18 +143,18 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<TArgs>& other) const
+	bool equals(const AbstractDelegate<TArgs>& other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<TArgs>* clone() const
+	AbstractDelegate<TArgs>* clone() const override
 	{
 		return new Delegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = nullptr;
@@ -259,7 +259,7 @@ public:
 	{
 	}
 
-	~Delegate()
+	~Delegate() override
 	{
 	}
 
@@ -273,7 +273,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -284,18 +284,18 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new Delegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = 0;
@@ -330,7 +330,7 @@ public:
 	{
 	}
 
-	~Delegate()
+	~Delegate() override
 	{
 	}
 
@@ -344,7 +344,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void*)
+	bool notify(const void*) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -355,18 +355,18 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new Delegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = 0;

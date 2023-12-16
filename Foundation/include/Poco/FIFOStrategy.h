@@ -46,7 +46,7 @@ public:
 	{
 	}
 
-	~FIFOStrategy()
+	~FIFOStrategy() override
 	{
 	}
 

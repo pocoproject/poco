@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	~BasicEvent()
+	~BasicEvent() override
 	{
 	}
 

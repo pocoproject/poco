@@ -35,10 +35,10 @@ public:
 	RejectCertificateHandler(bool handleErrorsOnServerSide);
 		/// Creates the RejectCertificateHandler
 
-	virtual ~RejectCertificateHandler();
+	~RejectCertificateHandler() override;
 		/// Destroys the RejectCertificateHandler.
 
-	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert);
+	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert) override;
 };
 
 

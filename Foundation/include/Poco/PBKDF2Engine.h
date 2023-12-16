@@ -74,22 +74,22 @@ public:
 		_result.reserve(_dkLen + PRF_DIGEST_SIZE);
 	}
 
-	~PBKDF2Engine()
+	~PBKDF2Engine() override
 	{
 	}
 
-	std::size_t digestLength() const
+	std::size_t digestLength() const override
 	{
 		return _dkLen;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_p.clear();
 		_result.clear();
 	}
 
-	const DigestEngine::Digest& digest()
+	const DigestEngine::Digest& digest() override
 	{
 		Poco::UInt32 i = 1;
 		while (_result.size() < _dkLen)
@@ -101,7 +101,7 @@ public:
 	}
 
 protected:
-	void updateImpl(const void* data, std::size_t length)
+	void updateImpl(const void* data, std::size_t length) override
 	{
 		_p.append(reinterpret_cast<const char*>(data), length);
 	}

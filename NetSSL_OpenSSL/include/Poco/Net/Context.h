@@ -270,7 +270,7 @@ public:
 		/// Note that a private key and/or certificate must be specified with
 		/// usePrivateKey()/useCertificate() before the Context can be used.
 
-	~Context();
+	~Context() override;
 		/// Destroys the Context.
 
 	void useCertificate(const Poco::Crypto::X509Certificate& certificate);

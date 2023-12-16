@@ -30,7 +30,7 @@ namespace Prometheus {
 class NotFoundRequestHandler: public Poco::Net::HTTPRequestHandler
 {
 public:
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
 	{
 		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 		response.setChunkedTransferEncoding(true);
@@ -53,7 +53,7 @@ public:
 	{
 	}
 
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override
 	{
 		if (request.getURI() == _path)
 		{

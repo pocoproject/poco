@@ -178,7 +178,7 @@ protected:
 	{
 	}
 
-	~LabeledMetricImpl() = default;
+	~LabeledMetricImpl() override = default;
 		/// Destroys the LabeledMetricImpl.
 
 private:

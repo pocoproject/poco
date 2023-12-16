@@ -53,18 +53,18 @@ public:
 		/// has no data.
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 	// Non-standard extensions
-	XMLString innerText() const;
+	XMLString innerText() const override;
 
 protected:
 	Text(Document* pOwnerDocument, const XMLString& data);
 	Text(Document* pOwnerDocument, const Text& text);
-	~Text();
+	~Text() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	static const XMLString NODE_NAME;

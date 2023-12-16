@@ -67,7 +67,7 @@ public:
 	DialogSocket(const DialogSocket& socket);
 		/// Creates the DialogSocket as copy of another dialog socket.
 
-	~DialogSocket();
+	~DialogSocket() override;
 		/// Destroys the DialogSocket.
 
 	DialogSocket& operator = (const Socket& socket);

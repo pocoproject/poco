@@ -64,12 +64,12 @@ public:
 	{
 	}
 
-	virtual ~Instantiator()
+	~Instantiator() override
 		/// Destroys the Instantiator.
 	{
 	}
 
-	Base* createInstance() const
+	Base* createInstance() const override
 	{
 		return new C;
 	}

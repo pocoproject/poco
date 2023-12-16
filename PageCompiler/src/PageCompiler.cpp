@@ -64,13 +64,13 @@ public:
 	}
 
 protected:
-	void initialize(Application& self)
+	void initialize(Application& self) override
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 	}
 
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& options) override
 	{
 		Application::defineOptions(options);
 
@@ -245,7 +245,7 @@ protected:
 		config().setString(name, value);
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const std::vector<std::string>& args) override
 	{
 		if (_helpRequested || args.empty())
 		{

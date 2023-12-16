@@ -50,7 +50,7 @@ public:
 		/// Creates a DOMBuilder using the given XMLReader.
 		/// If a NamePool is given, it becomes the Document's NamePool.
 
-	virtual ~DOMBuilder();
+	~DOMBuilder() override;
 		/// Destroys the DOMBuilder.
 
 	virtual Document* parse(const XMLString& uri);
@@ -64,30 +64,30 @@ public:
 
 protected:
 	// DTDHandler
-	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId);
-	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
+	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId) override;
+	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName) override;
 
 	// ContentHandler
-	void setDocumentLocator(const Locator* loc);
-	void startDocument();
-	void endDocument();
-	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
-	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname);
-	void characters(const XMLChar ch[], int start, int length);
-	void ignorableWhitespace(const XMLChar ch[], int start, int length);
-	void processingInstruction(const XMLString& target, const XMLString& data);
-	void startPrefixMapping(const XMLString& prefix, const XMLString& uri);
-	void endPrefixMapping(const XMLString& prefix);
-	void skippedEntity(const XMLString& name);
+	void setDocumentLocator(const Locator* loc) override;
+	void startDocument() override;
+	void endDocument() override;
+	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes) override;
+	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname) override;
+	void characters(const XMLChar ch[], int start, int length) override;
+	void ignorableWhitespace(const XMLChar ch[], int start, int length) override;
+	void processingInstruction(const XMLString& target, const XMLString& data) override;
+	void startPrefixMapping(const XMLString& prefix, const XMLString& uri) override;
+	void endPrefixMapping(const XMLString& prefix) override;
+	void skippedEntity(const XMLString& name) override;
 
 	// LexicalHandler
-	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId);
-	void endDTD();
-	void startEntity(const XMLString& name);
-	void endEntity(const XMLString& name);
-	void startCDATA();
-	void endCDATA();
-	void comment(const XMLChar ch[], int start, int length);
+	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId) override;
+	void endDTD() override;
+	void startEntity(const XMLString& name) override;
+	void endEntity(const XMLString& name) override;
+	void startCDATA() override;
+	void endCDATA() override;
+	void comment(const XMLChar ch[], int start, int length) override;
 
 	void appendNode(AbstractNode* pNode);
 

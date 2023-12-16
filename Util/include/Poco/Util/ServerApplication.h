@@ -127,7 +127,7 @@ public:
 	ServerApplication();
 		/// Creates the ServerApplication.
 
-	~ServerApplication();
+	~ServerApplication() override;
 		/// Destroys the ServerApplication.
 
 	bool isInteractive() const;
@@ -159,9 +159,9 @@ public:
 		/// and the application can shut down.
 
 protected:
-	int run();
+	int run() override;
 	void waitForTerminationRequest();
-	void defineOptions(OptionSet& options);
+	void defineOptions(OptionSet& options) override;
 
 private:
 	virtual void handlePidFile(const std::string& name, const std::string& value);

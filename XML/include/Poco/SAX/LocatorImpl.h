@@ -44,22 +44,22 @@ public:
 		/// locator changes, this copy will still keep the original values (and it can be
 		/// used outside the scope of DocumentHandler methods).
 
-	~LocatorImpl();
+	~LocatorImpl() override;
 		/// Destroys the Locator.
 
 	LocatorImpl& operator = (const Locator& loc);
 		/// Assignment operator.
 
-	XMLString getPublicId() const;
+	XMLString getPublicId() const override;
 		/// Return the saved public identifier.
 
-	XMLString getSystemId() const;
+	XMLString getSystemId() const override;
 		/// Return the saved system identifier.
 
-	int getLineNumber() const;
+	int getLineNumber() const override;
 		/// Return the saved line number (1-based).
 
-	int getColumnNumber() const;
+	int getColumnNumber() const override;
 		/// Return the saved column number (1-based).
 
 	void setPublicId(const XMLString& publicId);

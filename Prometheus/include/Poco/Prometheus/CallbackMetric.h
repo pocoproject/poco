@@ -104,7 +104,7 @@ public:
 		setHelp(help);
 	}
 
-	~CallbackMetric() = default;
+	~CallbackMetric() override = default;
 		/// Destroys the CallbackMetric.
 
 	using Metric::help;

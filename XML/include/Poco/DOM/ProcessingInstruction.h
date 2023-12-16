@@ -52,17 +52,17 @@ public:
 		/// Sets the content of this processing instruction.
 
 	// Node
-	const XMLString& nodeName() const;
-	const XMLString& getNodeValue() const;
-	void setNodeValue(const XMLString& data);
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	const XMLString& getNodeValue() const override;
+	void setNodeValue(const XMLString& data) override;
+	unsigned short nodeType() const override;
 
 protected:
 	ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data);
 	ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction);
-	~ProcessingInstruction();
+	~ProcessingInstruction() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	XMLString _target;

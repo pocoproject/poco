@@ -55,11 +55,11 @@ public:
 		this->setp(nullptr, nullptr);
 	}
 
-	~BasicUnbufferedStreamBuf()
+	~BasicUnbufferedStreamBuf() override
 	{
 	}
 
-	virtual int_type overflow(int_type c)
+	int_type overflow(int_type c) override
 	{
 		if (c != char_traits::eof())
 			return writeToDevice(char_traits::to_char_type(c));
@@ -67,7 +67,7 @@ public:
 			return c;
 	}
 
-	virtual int_type underflow()
+	int_type underflow() override
 	{
 		if (_ispb)
 		{
@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	virtual int_type uflow()
+	int_type uflow() override
 	{
 		if (_ispb)
 		{
@@ -103,7 +103,7 @@ public:
 		}
 	}
 
-	virtual int_type pbackfail(int_type c)
+	int_type pbackfail(int_type c) override
 	{
 		if (_ispb)
 		{
@@ -117,7 +117,7 @@ public:
 		}
 	}
 
-	virtual std::streamsize xsgetn(char_type* p, std::streamsize count)
+	std::streamsize xsgetn(char_type* p, std::streamsize count) override
 		/// Some platforms (for example, Compaq C++) have buggy implementations of
 		/// xsgetn that handle null buffers incorrectly.
 		/// Anyway, it does not hurt to provide an optimized implementation

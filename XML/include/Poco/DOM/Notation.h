@@ -53,15 +53,15 @@ public:
 		/// as in the DOM specification).
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 protected:
 	Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
 	Notation(Document* pOwnerDocument, const Notation& notation);
-	~Notation();
+	~Notation() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	XMLString _name;

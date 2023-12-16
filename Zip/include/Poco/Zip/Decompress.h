@@ -52,14 +52,14 @@ public:
 		/// If flattenDirs is set to true, the directory structure of the zip file is not recreated.
 		/// Instead, all files are extracted into one single directory.
 
-	~Decompress();
+	~Decompress() override;
 		/// Destroys the Decompress.
 
 	ZipArchive decompressAllFiles();
 		/// Decompresses all files stored in the zip File. Can only be called once per Decompress object.
 		/// Use mapping to retrieve the location of the decompressed files
 
-	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr);
+	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr) override;
 
 	const ZipMapping& mapping() const;
 		/// A ZipMapping stores as key the full name of the ZipFileInfo/ZipLocalFileHeader and as value the decompressed file

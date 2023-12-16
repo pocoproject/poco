@@ -40,12 +40,12 @@ public:
 	{
 	}
 
-	~DialogStreamBuf()
+	~DialogStreamBuf() override
 	{
 	}
 
 private:
-	int readFromDevice()
+	int readFromDevice() override
 	{
 		return _socket.get();
 	}
@@ -63,7 +63,7 @@ public:
 		poco_ios_init(&_buf);
 	}
 
-	~DialogIOS()
+	~DialogIOS() override
 	{
 	}
 
@@ -86,7 +86,7 @@ public:
 	{
 	}
 
-	~DialogInputStream()
+	~DialogInputStream() override
 	{
 	}
 };

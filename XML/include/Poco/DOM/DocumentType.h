@@ -77,15 +77,15 @@ public:
 		/// returns an empty string.
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 protected:
 	DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
 	DocumentType(Document* pOwner, const DocumentType& dt);
-	~DocumentType();
+	~DocumentType() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	XMLString _name;

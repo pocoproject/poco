@@ -72,11 +72,11 @@ public:
 	{
 	}
 
-	~TCPServerConnectionFactoryImpl()
+	~TCPServerConnectionFactoryImpl() override
 	{
 	}
 
-	TCPServerConnection* createConnection(const StreamSocket& socket)
+	TCPServerConnection* createConnection(const StreamSocket& socket) override
 	{
 		return new S(socket);
 	}

@@ -282,11 +282,11 @@ protected:
 		{
 		}
 
-		~FunctorRunnable()
+		~FunctorRunnable() override
 		{
 		}
 
-		void run()
+		void run() override
 		{
 			_functor();
 		}

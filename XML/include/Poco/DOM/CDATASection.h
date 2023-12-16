@@ -61,15 +61,15 @@ public:
 	Text* splitText(unsigned long offset);
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 protected:
 	CDATASection(Document* pOwnerDocument, const XMLString& data);
 	CDATASection(Document* pOwnerDocument, const CDATASection& sec);
-	~CDATASection();
+	~CDATASection() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	static const XMLString NODE_NAME;

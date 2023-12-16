@@ -183,14 +183,14 @@ public:
 		const std::string& destinationTable = DEFAULT_ARCHIVE_DESTINATION,
 		const std::string& age = "");
 
-	~ArchiveByAgeStrategy();
+	~ArchiveByAgeStrategy() override;
 
-	void archive();
+	void archive() override;
 
-	const std::string& getThreshold() const;
+	const std::string& getThreshold() const override;
 		/// Returns the archive threshold.
 
-	void setThreshold(const std::string& threshold);
+	void setThreshold(const std::string& threshold) override;
 		/// Sets the archive threshold.
 
 private:

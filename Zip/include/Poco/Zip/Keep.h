@@ -35,7 +35,7 @@ public:
 	Keep(const ZipLocalFileHeader& hdr);
 		/// Creates the Keep object.
 
-	void execute(Compress& c, std::istream& input);
+	void execute(Compress& c, std::istream& input) override;
 		///Adds a copy of the compressed input file to the ZipArchive
 
 private:

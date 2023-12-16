@@ -55,7 +55,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
@@ -103,7 +103,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
@@ -150,7 +150,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
@@ -196,7 +196,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try

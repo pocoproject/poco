@@ -63,20 +63,20 @@ namespace
 	{
 	public:
 		RSAEncryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
-		~RSAEncryptImpl();
+		~RSAEncryptImpl() override;
 
-		std::size_t blockSize() const;
+		std::size_t blockSize() const override;
 		std::size_t maxDataSize() const;
-		std::string getTag(std::size_t);
-		void setTag(const std::string&);
+		std::string getTag(std::size_t) override;
+		void setTag(const std::string&) override;
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
-			std::streamsize		 outputLength);
+			std::streamsize		 outputLength) override;
 
-		std::streamsize finalize(unsigned char*	output, std::streamsize length);
+		std::streamsize finalize(unsigned char*	output, std::streamsize length) override;
 
 	private:
 		const RSA*      _pRSA;
@@ -199,21 +199,21 @@ namespace
 	{
 	public:
 		RSADecryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
-		~RSADecryptImpl();
+		~RSADecryptImpl() override;
 
-		std::size_t blockSize() const;
-		std::string getTag(std::size_t);
-		void setTag(const std::string&);
+		std::size_t blockSize() const override;
+		std::string getTag(std::size_t) override;
+		void setTag(const std::string&) override;
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
-			std::streamsize		 outputLength);
+			std::streamsize		 outputLength) override;
 
 		std::streamsize finalize(
 			unsigned char*	output,
-			std::streamsize length);
+			std::streamsize length) override;
 
 	private:
 		const RSA*      _pRSA;

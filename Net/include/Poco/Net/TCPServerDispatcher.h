@@ -53,7 +53,7 @@ public:
 		/// and deletes the object if the count
 		/// reaches zero.
 
-	void run();
+	void run() override;
 		/// Runs the dispatcher.
 
 	void enqueue(const StreamSocket& socket);
@@ -87,7 +87,7 @@ public:
 		/// Returns a const reference to the TCPServerParam object.
 
 protected:
-	~TCPServerDispatcher();
+	~TCPServerDispatcher() override;
 		/// Destroys the TCPServerDispatcher.
 
 	void beginConnection();

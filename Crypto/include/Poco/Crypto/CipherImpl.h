@@ -36,16 +36,16 @@ public:
 	CipherImpl(const CipherKey& key);
 		/// Creates a new CipherImpl object for the given CipherKey.
 
-	virtual ~CipherImpl();
+	~CipherImpl() override;
 		/// Destroys the CipherImpl.
 
-	const std::string& name() const;
+	const std::string& name() const override;
 		/// Returns the name of the cipher.
 
-	CryptoTransform::Ptr createEncryptor();
+	CryptoTransform::Ptr createEncryptor() override;
 		/// Creates an encryptor object.
 
-	CryptoTransform::Ptr createDecryptor();
+	CryptoTransform::Ptr createDecryptor() override;
 		/// Creates a decryptor object.
 
 private:

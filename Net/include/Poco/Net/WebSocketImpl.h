@@ -40,37 +40,37 @@ public:
 		/// Creates a WebSocketImpl.
 
 	// StreamSocketImpl
-	virtual int sendBytes(const void* buffer, int length, int flags);
+	int sendBytes(const void* buffer, int length, int flags) override;
 		/// Sends a WebSocket protocol frame.
 
-	virtual int receiveBytes(void* buffer, int length, int flags);
+	int receiveBytes(void* buffer, int length, int flags) override;
 		/// Receives a WebSocket protocol frame.
 
-	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
+	int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0) override;
 		/// Receives a WebSocket protocol frame.
 
-	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
-	virtual void connect(const SocketAddress& address);
-	virtual void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-	virtual void connectNB(const SocketAddress& address);
-	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
-	virtual void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
-	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
-	virtual void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only);
-	virtual void listen(int backlog = 64);
-	virtual void close();
-	virtual void shutdownReceive();
-	virtual void shutdownSend();
-	virtual void shutdown();
-	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
-	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
-	virtual void sendUrgent(unsigned char data);
-	virtual int available();
-	virtual bool secure() const;
-	virtual void setSendTimeout(const Poco::Timespan& timeout);
-	virtual Poco::Timespan getSendTimeout();
-	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
-	virtual Poco::Timespan getReceiveTimeout();
+	SocketImpl* acceptConnection(SocketAddress& clientAddr) override;
+	void connect(const SocketAddress& address) override;
+	void connect(const SocketAddress& address, const Poco::Timespan& timeout) override;
+	void connectNB(const SocketAddress& address) override;
+	void bind(const SocketAddress& address, bool reuseAddress = false) override;
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort) override;
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false) override;
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only) override;
+	void listen(int backlog = 64) override;
+	void close() override;
+	void shutdownReceive() override;
+	void shutdownSend() override;
+	void shutdown() override;
+	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0) override;
+	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0) override;
+	void sendUrgent(unsigned char data) override;
+	int available() override;
+	bool secure() const override;
+	void setSendTimeout(const Poco::Timespan& timeout) override;
+	Poco::Timespan getSendTimeout() override;
+	void setReceiveTimeout(const Poco::Timespan& timeout) override;
+	Poco::Timespan getReceiveTimeout() override;
 
 	// Internal
 	int frameFlags() const;
@@ -100,7 +100,7 @@ protected:
 	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
 	int receiveNBytes(void* buffer, int bytes);
 	int receiveSomeBytes(char* buffer, int bytes);
-	virtual ~WebSocketImpl();
+	~WebSocketImpl() override;
 
 private:
 	WebSocketImpl();

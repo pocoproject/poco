@@ -85,7 +85,7 @@ public:
 		/// Writes the configuration data to the given file.
 
 protected:
-	~PropertyFileConfiguration();
+	~PropertyFileConfiguration() override;
 
 private:
 	void parseLine(std::istream& istr);

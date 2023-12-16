@@ -48,11 +48,11 @@ public:
 #endif
 
 	HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode);
-	~HTTPFixedLengthStreamBuf();
+	~HTTPFixedLengthStreamBuf() override;
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	HTTPSession&    _session;
@@ -66,7 +66,7 @@ class Net_API HTTPFixedLengthIOS: public virtual std::ios
 {
 public:
 	HTTPFixedLengthIOS(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length, HTTPFixedLengthStreamBuf::openmode mode);
-	~HTTPFixedLengthIOS();
+	~HTTPFixedLengthIOS() override;
 	HTTPFixedLengthStreamBuf* rdbuf();
 
 protected:
@@ -79,7 +79,7 @@ class Net_API HTTPFixedLengthInputStream: public HTTPFixedLengthIOS, public std:
 {
 public:
 	HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
-	~HTTPFixedLengthInputStream();
+	~HTTPFixedLengthInputStream() override;
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
@@ -94,7 +94,7 @@ class Net_API HTTPFixedLengthOutputStream: public HTTPFixedLengthIOS, public std
 {
 public:
 	HTTPFixedLengthOutputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
-	~HTTPFixedLengthOutputStream();
+	~HTTPFixedLengthOutputStream() override;
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);

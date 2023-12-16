@@ -56,7 +56,7 @@ public:
 		init(passphrase, length);
 	}
 
-	~HMACEngine()
+	~HMACEngine() override
 	{
 		std::memset(_ipad, 0, BLOCK_SIZE);
 		std::memset(_opad, 0, BLOCK_SIZE);
@@ -64,18 +64,18 @@ public:
 		delete [] _opad;
 	}
 
-	std::size_t digestLength() const
+	std::size_t digestLength() const override
 	{
 		return DIGEST_SIZE;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_engine.reset();
 		_engine.update(_ipad, BLOCK_SIZE);
 	}
 
-	const DigestEngine::Digest& digest()
+	const DigestEngine::Digest& digest() override
 	{
 		const DigestEngine::Digest& d = _engine.digest();
 		poco_assert (d.size() == DIGEST_SIZE);
@@ -124,7 +124,7 @@ protected:
 		reset();
 	}
 
-	void updateImpl(const void* data, std::size_t length)
+	void updateImpl(const void* data, std::size_t length) override
 	{
 		_engine.update(data, length);
 	}

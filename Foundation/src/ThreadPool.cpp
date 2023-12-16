@@ -29,7 +29,7 @@ class PooledThread: public Runnable
 {
 public:
 	PooledThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
-	~PooledThread();
+	~PooledThread() override;
 
 	void start();
 	void start(Thread::Priority priority, Runnable& target);
@@ -39,7 +39,7 @@ public:
 	void join();
 	void activate();
 	void release();
-	void run();
+	void run() override;
 
 private:
 	volatile bool        _idle;

@@ -39,10 +39,10 @@ public:
 	HTTPSSessionInstantiator(Context::Ptr pContext);
 		/// Creates the HTTPSSessionInstantiator using the given SSL context.
 
-	~HTTPSSessionInstantiator();
+	~HTTPSSessionInstantiator() override;
 		/// Destroys the HTTPSSessionInstantiator.
 
-	HTTPClientSession* createClientSession(const Poco::URI& uri);
+	HTTPClientSession* createClientSession(const Poco::URI& uri) override;
 		/// Creates a HTTPSClientSession for the given URI.
 
 	static void registerInstantiator();

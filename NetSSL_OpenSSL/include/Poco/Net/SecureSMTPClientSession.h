@@ -55,7 +55,7 @@ public:
 		/// Creates the SecureSMTPClientSession using a socket connected
 		/// to the given host and port.
 
-	virtual ~SecureSMTPClientSession();
+	~SecureSMTPClientSession() override;
 		/// Destroys the SMTPClientSession.
 
 	bool startTLS();

@@ -72,11 +72,11 @@ public:
 	{
 	}
 
-	~PrivateKeyFactoryImpl()
+	~PrivateKeyFactoryImpl() override
 	{
 	}
 
-	PrivateKeyPassphraseHandler* create(bool server) const
+	PrivateKeyPassphraseHandler* create(bool server) const override
 	{
 		return new T(server);
 	}

@@ -179,11 +179,11 @@ public:
 		/// This can be used to use a DOMWriter with custom options.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	~XMLConfiguration();
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
+	~XMLConfiguration() override;
 
 private:
 	const Poco::XML::Node* findNode(const std::string& key) const;

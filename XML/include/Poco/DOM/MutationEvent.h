@@ -90,7 +90,7 @@ protected:
 	MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode);
 	MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode,
 				  const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change);
-	~MutationEvent();
+	~MutationEvent() override;
 
 private:
 	XMLString      _prevValue;

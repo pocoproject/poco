@@ -56,7 +56,7 @@ public:
 		/// Creates the LineEndingConverterStreamBuf and connects it
 		/// to the given output stream.
 
-	~LineEndingConverterStreamBuf();
+	~LineEndingConverterStreamBuf() override;
 		/// Destroys the LineEndingConverterStream.
 
 	void setNewLine(const std::string& newLineCharacters);
@@ -75,8 +75,8 @@ public:
 		/// Returns the line ending currently in use.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream*               _pIstr;
@@ -102,7 +102,7 @@ public:
 		/// Creates the LineEndingConverterIOS and connects it
 		/// to the given output stream.
 
-	~LineEndingConverterIOS();
+	~LineEndingConverterIOS() override;
 		/// Destroys the stream.
 
 	void setNewLine(const std::string& newLineCharacters);
@@ -148,7 +148,7 @@ public:
 		/// Creates the LineEndingConverterInputStream and connects it
 		/// to the given input stream.
 
-	~InputLineEndingConverter();
+	~InputLineEndingConverter() override;
 		/// Destroys the stream.
 };
 
@@ -170,7 +170,7 @@ public:
 		/// Creates the LineEndingConverterOutputStream and connects it
 		/// to the given input stream.
 
-	~OutputLineEndingConverter();
+	~OutputLineEndingConverter() override;
 		/// Destroys the LineEndingConverterOutputStream.
 };
 

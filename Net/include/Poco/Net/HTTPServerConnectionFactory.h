@@ -36,10 +36,10 @@ public:
 	HTTPServerConnectionFactory(HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
 		/// Creates the HTTPServerConnectionFactory.
 
-	~HTTPServerConnectionFactory();
+	~HTTPServerConnectionFactory() override;
 		/// Destroys the HTTPServerConnectionFactory.
 
-	TCPServerConnection* createConnection(const StreamSocket& socket);
+	TCPServerConnection* createConnection(const StreamSocket& socket) override;
 		/// Creates an instance of HTTPServerConnection
 		/// using the given StreamSocket.
 

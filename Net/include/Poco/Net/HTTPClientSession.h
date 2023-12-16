@@ -119,7 +119,7 @@ public:
 	HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig);
 		/// Creates a HTTPClientSession using the given socket and proxy configuration.
 
-	virtual ~HTTPClientSession();
+	~HTTPClientSession() override;
 		/// Destroys the HTTPClientSession and closes
 		/// the underlying socket.
 
@@ -324,7 +324,7 @@ protected:
 	void reconnect();
 		/// Connects the underlying socket to the HTTP server.
 
-	int write(const char* buffer, std::streamsize length);
+	int write(const char* buffer, std::streamsize length) override;
 		/// Tries to re-connect if keep-alive is on.
 
 	std::ostream& sendRequestImpl(const HTTPRequest& request);

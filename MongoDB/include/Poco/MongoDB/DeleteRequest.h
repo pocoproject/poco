@@ -63,7 +63,7 @@ public:
 		/// If justOne is true, only the first matching document will
 		/// be removed (the same as using flag DELETE_SINGLE_REMOVE).
 
-	virtual ~DeleteRequest();
+	~DeleteRequest() override;
 		/// Destructor
 
 	Flags flags() const;
@@ -76,7 +76,7 @@ public:
 		/// Returns the selector document.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 		/// Writes the OP_DELETE request to the writer.
 
 private:

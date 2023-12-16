@@ -73,7 +73,7 @@ public:
 		/// is not null. If a private key file is specified, you don't need to
 		/// specify a public key file. OpenSSL will auto-create it from the private key.
 
-	~RSAKeyImpl();
+	~RSAKeyImpl() override;
 		/// Destroys the RSAKeyImpl.
 
 	RSA* getRSA();
@@ -82,7 +82,7 @@ public:
 	const RSA* getRSA() const;
 		/// Returns the OpenSSL RSA object.
 
-	int size() const;
+	int size() const override;
 		/// Returns the RSA modulus size.
 
 	ByteVec modulus() const;
@@ -96,7 +96,7 @@ public:
 
 	void save(const std::string& publicKeyFile,
 		const std::string& privateKeyFile = "",
-		const std::string& privateKeyPassphrase = "") const;
+		const std::string& privateKeyPassphrase = "") const override;
 		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
@@ -104,7 +104,7 @@ public:
 
 	void save(std::ostream* pPublicKeyStream,
 		std::ostream* pPrivateKeyStream = nullptr,
-		const std::string& privateKeyPassphrase = "") const;
+		const std::string& privateKeyPassphrase = "") const override;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding

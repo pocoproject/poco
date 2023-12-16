@@ -56,7 +56,7 @@ public:
 		/// Creates the MessageHeader by copying
 		/// another one.
 
-	virtual ~MessageHeader();
+	~MessageHeader() override;
 		/// Destroys the MessageHeader.
 
 	MessageHeader& operator = (const MessageHeader& messageHeader);

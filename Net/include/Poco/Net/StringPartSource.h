@@ -44,16 +44,16 @@ public:
 		/// Creates the StringPartSource for the given
 		/// string, MIME type and filename.
 
-	~StringPartSource();
+	~StringPartSource() override;
 		/// Destroys the StringPartSource.
 
-	std::istream& stream();
+	std::istream& stream() override;
 		/// Returns a string input stream for the string.
 
-	const std::string& filename() const;
+	const std::string& filename() const override;
 		/// Returns the filename portion of the path.
 
-	std::streamsize getContentLength() const;
+	std::streamsize getContentLength() const override;
 		/// Returns the string size.
 
 private:

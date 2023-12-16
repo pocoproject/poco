@@ -46,7 +46,7 @@ public:
 	Algorithm();
 		/// Creates the Algorithm.
 
-	virtual ~Algorithm();
+	~Algorithm() override;
 		/// Destroys the Algorithm.
 
 	virtual Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) = 0;
@@ -130,7 +130,7 @@ template <typename Engine>
 class HMACAlgorithm: public Algorithm
 {
 public:
-	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
+	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) override
 	{
 		if (signer.getHMACKey().empty()) throw SignatureGenerationException("No HMAC key available");
 
@@ -141,7 +141,7 @@ public:
 		return hmac.digest();
 	}
 
-	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
+	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature) override
 	{
 		return sign(signer, header, payload) == signature;
 	}
@@ -161,7 +161,7 @@ public:
 	{
 	}
 
-	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
+	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) override
 	{
 		if (!signer.getRSAKey()) throw SignatureGenerationException("No RSA key available");
 
@@ -173,7 +173,7 @@ public:
 
 	}
 
-	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
+	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature) override
 	{
 		if (!signer.getRSAKey()) throw SignatureVerificationException("No RSA key available");
 
@@ -232,7 +232,7 @@ public:
 	{
 	}
 
-	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
+	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload) override
 	{
 		if (!signer.getECKey()) throw SignatureGenerationException("No EC key available");
 
@@ -254,7 +254,7 @@ public:
 		return jwtSig;
 	}
 
-	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
+	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature) override
 	{
 		if (!signer.getECKey()) throw SignatureVerificationException("No EC key available");
 

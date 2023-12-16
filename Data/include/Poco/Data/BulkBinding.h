@@ -49,34 +49,34 @@ public:
 			throw BindingException("Zero size containers not allowed.");
 	}
 
-	~BulkBinding()
+	~BulkBinding() override
 		/// Destroys the BulkBinding.
 	{
 	}
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return 1;
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
-	bool canBind() const
+	bool canBind() const override
 	{
 		return !_bound;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
 
-	void reset ()
+	void reset () override
 	{
 		_bound = false;
 		getBinder()->reset();

@@ -39,7 +39,7 @@ public:
     ResponseMessage(const Int64& cursorID);
         /// Creates an ResponseMessage for existing cursor ID.
 
-	virtual ~ResponseMessage();
+	~ResponseMessage() override;
 		/// Destroys the ResponseMessage.
 
 	Int64 cursorID() const;

@@ -31,14 +31,14 @@ class XML_API ChildNodesList: public NodeList
 	// by Node::getChildNodes().
 {
 public:
-	Node* item(unsigned long index) const;
-	unsigned long length() const;
+	Node* item(unsigned long index) const override;
+	unsigned long length() const override;
 
-	void autoRelease();
+	void autoRelease() override;
 
 protected:
 	ChildNodesList(const Node* pParent);
-	~ChildNodesList();
+	~ChildNodesList() override;
 
 private:
 	ChildNodesList();

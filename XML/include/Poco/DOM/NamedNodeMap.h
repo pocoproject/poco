@@ -83,7 +83,7 @@ public:
 		/// Removes a node specified by name.
 
 protected:
-	virtual ~NamedNodeMap();
+	~NamedNodeMap() override;
 };
 
 

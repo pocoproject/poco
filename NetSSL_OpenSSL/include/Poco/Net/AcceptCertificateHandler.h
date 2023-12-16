@@ -37,10 +37,10 @@ public:
 	AcceptCertificateHandler(bool handleErrorsOnServerSide);
 		/// Creates the AcceptCertificateHandler
 
-	virtual ~AcceptCertificateHandler();
+	~AcceptCertificateHandler() override;
 		/// Destroys the AcceptCertificateHandler.
 
-	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert);
+	void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert) override;
 		/// Receives the questionable certificate in parameter errorCert. If one wants to accept the
 		/// certificate, call errorCert.setIgnoreError(true).
 };

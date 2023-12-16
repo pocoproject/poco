@@ -34,11 +34,11 @@ class Net_API QuotedPrintableEncoderBuf: public Poco::UnbufferedStreamBuf
 {
 public:
 	QuotedPrintableEncoderBuf(std::ostream& ostr);
-	~QuotedPrintableEncoderBuf();
+	~QuotedPrintableEncoderBuf() override;
 	int close();
 
 private:
-	int writeToDevice(char c);
+	int writeToDevice(char c) override;
 	void writeEncoded(char c);
 	void writeRaw(char c);
 
@@ -56,7 +56,7 @@ class Net_API QuotedPrintableEncoderIOS: public virtual std::ios
 {
 public:
 	QuotedPrintableEncoderIOS(std::ostream& ostr);
-	~QuotedPrintableEncoderIOS();
+	~QuotedPrintableEncoderIOS() override;
 	int close();
 	QuotedPrintableEncoderBuf* rdbuf();
 
@@ -75,7 +75,7 @@ class Net_API QuotedPrintableEncoder: public QuotedPrintableEncoderIOS, public s
 {
 public:
 	QuotedPrintableEncoder(std::ostream& ostr);
-	~QuotedPrintableEncoder();
+	~QuotedPrintableEncoder() override;
 };
 
 

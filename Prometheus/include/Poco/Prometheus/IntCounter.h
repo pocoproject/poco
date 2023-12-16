@@ -60,7 +60,7 @@ public:
 		/// Creates a IntCounter with the given name and help text (via params), and
 		/// registers it with the given registry (if not nullptr).
 
-	~IntCounter() = default;
+	~IntCounter() override = default;
 		/// Destroys the IntCounter.
 
 	using Metric::help;

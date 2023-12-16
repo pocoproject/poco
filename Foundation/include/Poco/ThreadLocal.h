@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	~TLSSlot()
+	~TLSSlot() override
 	{
 	}
 

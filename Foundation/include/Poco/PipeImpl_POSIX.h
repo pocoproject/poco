@@ -33,7 +33,7 @@ public:
 	typedef int Handle;
 
 	PipeImpl();
-	~PipeImpl();
+	~PipeImpl() override;
 	int writeBytes(const void* buffer, int length);
 	int readBytes(void* buffer, int length);
 	Handle readHandle() const;

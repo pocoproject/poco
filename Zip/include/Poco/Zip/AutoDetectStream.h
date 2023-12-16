@@ -35,12 +35,12 @@ public:
 	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
 		/// Creates the AutoDetectStream.
 
-	~AutoDetectStreamBuf();
+	~AutoDetectStreamBuf() override;
 		/// Destroys the AutoDetectStream.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -71,7 +71,7 @@ public:
 		/// Creates the basic stream and connects it
 		/// to the given input stream.
 
-	~AutoDetectIOS();
+	~AutoDetectIOS() override;
 		/// Destroys the stream.
 
 	AutoDetectStreamBuf* rdbuf();
@@ -90,7 +90,7 @@ public:
 	AutoDetectInputStream(std::istream& istr, const std::string& prefix = std::string(), const std::string& postfix = std::string(), bool reposition = false, Poco::UInt32 start = 0, bool needsZip64 = false);
 		/// Creates the AutoDetectInputStream and connects it to the underlying stream.
 
-	~AutoDetectInputStream();
+	~AutoDetectInputStream() override;
 		/// Destroys the AutoDetectInputStream.
 };
 

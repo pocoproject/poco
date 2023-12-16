@@ -48,26 +48,26 @@ public:
 	{
 	}
 
-	~ContextLocator()
+	~ContextLocator() override
 	{
 	}
 
-	XMLString getPublicId() const
+	XMLString getPublicId() const override
 	{
 		return _publicId;
 	}
 
-	XMLString getSystemId() const
+	XMLString getSystemId() const override
 	{
 		return _systemId;
 	}
 
-	int getLineNumber() const
+	int getLineNumber() const override
 	{
 		return XML_GetCurrentLineNumber(_parser);
 	}
 
-	int getColumnNumber() const
+	int getColumnNumber() const override
 	{
 		return XML_GetCurrentColumnNumber(_parser);
 	}

@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	~Observer()
+	~Observer() override
 	{
 	}
 
@@ -71,7 +71,7 @@ public:
 		return *this;
 	}
 
-	void notify(Notification* pNf) const
+	void notify(Notification* pNf) const override
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 
@@ -86,23 +86,23 @@ public:
 		}
 	}
 
-	bool equals(const AbstractObserver& abstractObserver) const
+	bool equals(const AbstractObserver& abstractObserver) const override
 	{
 		const Observer* pObs = dynamic_cast<const Observer*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	bool accepts(Notification* pNf, const char* pName = nullptr) const
+	bool accepts(Notification* pNf, const char* pName = nullptr) const override
 	{
 		return dynamic_cast<N*>(pNf) && (!pName || pNf->name() == pName);
 	}
 
-	AbstractObserver* clone() const
+	AbstractObserver* clone() const override
 	{
 		return new Observer(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 

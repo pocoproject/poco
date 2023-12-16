@@ -73,7 +73,7 @@ public:
 
 protected:
 	ActiveRecordBase() = default;
-	~ActiveRecordBase() = default;
+	~ActiveRecordBase() override = default;
 
 	template <typename T>
 	static Poco::AutoPtr<T> withContext(Poco::AutoPtr<T> pObj, Context::Ptr pContext)
@@ -110,13 +110,13 @@ public:
 		/// Returns the unique ID of the object.
 
 	// ActiveRecordBase
-	std::string toString() const;
-	bool isValid() const;
+	std::string toString() const override;
+	bool isValid() const override;
 
 protected:
 	ActiveRecord() = default;
 	ActiveRecord(ID id): _id(id) {};
-	~ActiveRecord() = default;
+	~ActiveRecord() override = default;
 
 	ActiveRecord(const ActiveRecord& other):
 		_id(other._id)
@@ -171,7 +171,7 @@ public:
 	using Ptr = Poco::AutoPtr<KeylessActiveRecord>;
 
 	// ActiveRecordBase
-	std::string toString() const;
+	std::string toString() const override;
 
 protected:
 	template <typename AR>

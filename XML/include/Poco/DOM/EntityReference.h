@@ -50,15 +50,15 @@ class XML_API EntityReference: public AbstractNode
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	unsigned short nodeType() const override;
 
 protected:
 	EntityReference(Document* pOwnerDocument, const XMLString& name);
 	EntityReference(Document* pOwnerDocument, const EntityReference& ref);
-	~EntityReference();
+	~EntityReference() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
 private:
 	XMLString _name;

@@ -34,9 +34,9 @@ public:
 
 protected:
 	// ContentHandler
-	void setDocumentLocator(const Poco::XML::Locator* pLocator);
-	void startElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname, const Poco::XML::Attributes& attributes);
-	void endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname);
+	void setDocumentLocator(const Poco::XML::Locator* pLocator) override;
+	void startElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname, const Poco::XML::Attributes& attributes) override;
+	void endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname) override;
 	void handleProject(const Poco::XML::Attributes& attributes);
 	void handleClass(const Poco::XML::Attributes& attributes);
 	void handleProperty(const Poco::XML::Attributes& attributes);

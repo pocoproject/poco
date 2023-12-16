@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	~TCPConnectionNotification()
+	~TCPConnectionNotification() override
 	{
 	}
 

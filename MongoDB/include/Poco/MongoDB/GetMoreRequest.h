@@ -40,7 +40,7 @@ public:
 		/// "foo.bar". The cursorID has been returned by the response on the query request.
 		/// By default the numberToReturn is set to 100.
 
-	virtual ~GetMoreRequest();
+	~GetMoreRequest() override;
 		/// Destroys the GetMoreRequest.
 
 	Int32 getNumberToReturn() const;
@@ -53,7 +53,7 @@ public:
 		/// Returns the cursor ID.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 
 private:
 	std::string _fullCollectionName;

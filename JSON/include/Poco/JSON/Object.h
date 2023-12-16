@@ -517,101 +517,101 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
+	~VarHolderImpl() override
 	{
 	}
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Object::Ptr);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
 		value = !_val.isNull() && _val->size() > 0;
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
 		_val->stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		//TODO: val = _val;
 		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		//TODO: ldt = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		//TODO: ts = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -621,27 +621,27 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
@@ -659,101 +659,101 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
+	~VarHolderImpl() override
 	{
 	}
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Object);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
 		value = _val.size() > 0;
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
 		_val.stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		//TODO: val = _val;
 		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		//TODO: ldt = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		//TODO: ts = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -763,27 +763,27 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}

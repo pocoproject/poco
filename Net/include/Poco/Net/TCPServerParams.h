@@ -93,7 +93,7 @@ public:
 		/// created by TCPServer.
 
 protected:
-	virtual ~TCPServerParams();
+	~TCPServerParams() override;
 		/// Destroys the TCPServerParams.
 
 private:

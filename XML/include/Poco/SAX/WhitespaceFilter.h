@@ -39,34 +39,34 @@ public:
 	WhitespaceFilter(XMLReader* pReader);
 		/// Creates the WhitespaceFilter with the specified parent.
 
-	~WhitespaceFilter();
+	~WhitespaceFilter() override;
 		/// Destroys the WhitespaceFilter.
 
 	// XMLReader
-	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
+	void setProperty(const XMLString& propertyId, const XMLString& value) override;
+	void setProperty(const XMLString& propertyId, void* value) override;
+	void* getProperty(const XMLString& propertyId) const override;
 
 	// ContentHandler
-	void startDocument();
-	void endDocument();
-	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attrList);
-	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname);
-	void characters(const XMLChar ch[], int start, int length);
-	void ignorableWhitespace(const XMLChar ch[], int start, int length);
-	void processingInstruction(const XMLString& target, const XMLString& data);
+	void startDocument() override;
+	void endDocument() override;
+	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attrList) override;
+	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname) override;
+	void characters(const XMLChar ch[], int start, int length) override;
+	void ignorableWhitespace(const XMLChar ch[], int start, int length) override;
+	void processingInstruction(const XMLString& target, const XMLString& data) override;
 
 	// LexicalHandler
-	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId);
-	void endDTD();
-	void startEntity(const XMLString& name);
-	void endEntity(const XMLString& name);
-	void startCDATA();
-	void endCDATA();
-	void comment(const XMLChar ch[], int start, int length);
+	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId) override;
+	void endDTD() override;
+	void startEntity(const XMLString& name) override;
+	void endEntity(const XMLString& name) override;
+	void startCDATA() override;
+	void endCDATA() override;
+	void comment(const XMLChar ch[], int start, int length) override;
 
 protected:
-	void setupParse();
+	void setupParse() override;
 
 private:
 	LexicalHandler* _pLexicalHandler;

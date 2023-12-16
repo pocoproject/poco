@@ -69,14 +69,14 @@ public:
 		/// retains (shared) ownership of the passed configuration.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 
 	std::string translateKey(const std::string& key) const;
 
-	~ConfigurationMapper();
+	~ConfigurationMapper() override;
 
 private:
 	ConfigurationMapper(const ConfigurationMapper&);

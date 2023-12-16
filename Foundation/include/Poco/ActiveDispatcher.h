@@ -79,7 +79,7 @@ public:
 		/// Creates the ActiveDispatcher and sets
 		/// the priority of its thread.
 
-	virtual ~ActiveDispatcher();
+	~ActiveDispatcher() override;
 		/// Destroys the ActiveDispatcher.
 
 	void start(ActiveRunnableBase::Ptr pRunnable);
@@ -89,7 +89,7 @@ public:
 		/// Cancels all queued methods.
 
 protected:
-	void run();
+	void run() override;
 	void stop();
 
 private:

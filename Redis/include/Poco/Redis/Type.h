@@ -247,24 +247,24 @@ public:
 	{
 	}
 
-	virtual ~Type()
+	~Type() override
 		/// Destroys the Type.
 	{
 	}
 
-	int type() const
+	int type() const override
 		/// Returns the type of the value
 	{
 		return RedisTypeTraits<T>::TypeId;
 	}
 
-	void read(RedisInputStream& socket)
+	void read(RedisInputStream& socket) override
 		/// Reads the value from the stream (RESP).
 	{
 		RedisTypeTraits<T>::read(socket, _value);
 	}
 
-	std::string toString() const
+	std::string toString() const override
 		/// Converts the value to a string based on the RESP protocol.
 	{
 		return RedisTypeTraits<T>::toString(_value);

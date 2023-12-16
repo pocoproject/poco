@@ -40,7 +40,7 @@ public:
     Cursor(const Document& aggregationResponse);
         /// Creates a Cursor for the given agregation query response.
 
-	virtual ~Cursor();
+	~Cursor() override;
 		/// Destroys the Cursor.
 
 	ResponseMessage& next(Connection& connection);

@@ -264,12 +264,12 @@ public:
 		if (_fd == -1) throw Poco::IOException("cannot initialize inotify", errno);
 	}
 
-	~LinuxDirectoryWatcherStrategy()
+	~LinuxDirectoryWatcherStrategy() override
 	{
 		close(_fd);
 	}
 
-	void run()
+	void run() override
 	{
 		int mask = 0;
 		if (owner().eventMask() & DirectoryWatcher::DW_ITEM_ADDED)
@@ -361,12 +361,12 @@ public:
 		}
 	}
 
-	void stop()
+	void stop() override
 	{
 		_stopped = true;
 	}
 
-	bool supportsMoveEvents() const
+	bool supportsMoveEvents() const override
 	{
 		return true;
 	}

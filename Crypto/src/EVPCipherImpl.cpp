@@ -90,27 +90,27 @@ namespace
 			_pBuf = new unsigned char[_blockSize];
 		}
 
-		~EVPEncryptImpl()
+		~EVPEncryptImpl() override
 		{
 			delete [] _pBuf;
 		}
 
-		std::size_t blockSize() const
+		std::size_t blockSize() const override
 		{
 			return _blockSize;
 		}
 
-		std::string getTag(std::size_t)
+		std::string getTag(std::size_t) override
 		{
 			return "";
 		}
 
-		void setTag(const std::string&)
+		void setTag(const std::string&) override
 		{
 		}
 
 		std::streamsize transform(const unsigned char* input, std::streamsize inputLength,
-			unsigned char* output, std::streamsize outputLength)
+			unsigned char* output, std::streamsize outputLength) override
 		{
 			std::string fmt = "EVPEncryptImpl::transform():%s()";
 			std::streamsize maxSize = static_cast<std::streamsize>(maxDataSize(input, inputLength));
@@ -148,7 +148,7 @@ namespace
 			return rc;
 		}
 
-		std::streamsize finalize(unsigned char*	output, std::streamsize length)
+		std::streamsize finalize(unsigned char*	output, std::streamsize length) override
 		{
 			poco_assert (length >= blockSize());
 			poco_assert (_pos <= maxDataSize(output, length));
@@ -203,27 +203,27 @@ namespace
 			_pBuf = new unsigned char[_blockSize];
 		}
 
-		~EVPDecryptImpl()
+		~EVPDecryptImpl() override
 		{
 			delete [] _pBuf;
 		}
 
-		std::size_t blockSize() const
+		std::size_t blockSize() const override
 		{
 			return _blockSize;
 		}
 
-		std::string getTag(std::size_t)
+		std::string getTag(std::size_t) override
 		{
 			return "";
 		}
 
-		void setTag(const std::string&)
+		void setTag(const std::string&) override
 		{
 		}
 
 		std::streamsize transform(const unsigned char* input, std::streamsize inputLength,
-			unsigned char* output, std::streamsize outputLength)
+			unsigned char* output, std::streamsize outputLength) override
 		{
 			std::string fmt = "EVPDecryptImpl::transform():%s()";
 			std::streamsize evpSize = static_cast<std::streamsize>(_blockSize);
@@ -258,7 +258,7 @@ namespace
 			return rc;
 		}
 
-		std::streamsize finalize(unsigned char* output, std::streamsize length)
+		std::streamsize finalize(unsigned char* output, std::streamsize length) override
 		{
 			poco_assert (length >= _blockSize);
 			std::string fmt = "EVPDecryptImpl::finalize():%s()";

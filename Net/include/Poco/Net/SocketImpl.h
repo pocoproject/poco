@@ -490,7 +490,7 @@ protected:
 	SocketImpl(poco_socket_t sockfd);
 		/// Creates a SocketImpl using the given native socket.
 
-	virtual ~SocketImpl();
+	~SocketImpl() override;
 		/// Destroys the SocketImpl.
 		/// Closes the socket if it is still open.
 

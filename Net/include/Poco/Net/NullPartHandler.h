@@ -33,10 +33,10 @@ public:
 	NullPartHandler();
 		/// Creates the NullPartHandler.
 
-	~NullPartHandler();
+	~NullPartHandler() override;
 		/// Destroys the NullPartHandler.
 
-	void handlePart(const MessageHeader& header, std::istream& stream);
+	void handlePart(const MessageHeader& header, std::istream& stream) override;
 		/// Reads and discards all data from the stream.
 };
 

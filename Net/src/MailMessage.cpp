@@ -66,12 +66,12 @@ namespace
 		{
 		}
 
-		~MultiPartHandler()
+		~MultiPartHandler() override
 			/// Destroys string part handler.
 		{
 		}
 
-		void handlePart(const MessageHeader& header, std::istream& stream)
+		void handlePart(const MessageHeader& header, std::istream& stream) override
 			/// Handles a part. If message pointer was provided at construction time,
 			/// the message pointed to will be properly populated so it could be written
 			/// back out at a later point in time.
@@ -160,12 +160,12 @@ namespace
 		{
 		}
 
-		~StringPartHandler()
+		~StringPartHandler() override
 			/// Destroys string part handler.
 		{
 		}
 
-		void handlePart(const MessageHeader& header, std::istream& stream)
+		void handlePart(const MessageHeader& header, std::istream& stream) override
 			/// Handles a part.
 		{
 			std::string tmp;

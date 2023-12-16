@@ -34,7 +34,7 @@ public:
 	explicit RequestMessage(MessageHeader::OpCode opcode);
 		/// Creates a RequestMessage using the given opcode.
 
-	virtual ~RequestMessage();
+	~RequestMessage() override;
 		/// Destroys the RequestMessage.
 
 	void send(std::ostream& ostr);

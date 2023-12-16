@@ -81,7 +81,7 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
-	virtual ~QueryRequest();
+	~QueryRequest() override;
 		/// Destroys the QueryRequest.
 
 	Flags getFlags() const;
@@ -112,7 +112,7 @@ public:
 		/// Returns the field selector document.
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 
 private:
 	Flags       _flags;

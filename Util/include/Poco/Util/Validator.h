@@ -46,7 +46,7 @@ protected:
 	Validator();
 		/// Creates the Validator.
 
-	virtual ~Validator();
+	~Validator() override;
 		/// Destroys the Validator.
 };
 

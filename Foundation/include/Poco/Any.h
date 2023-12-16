@@ -346,12 +346,12 @@ private:
 		{
 		}
 
-		virtual const std::type_info& type() const
+		const std::type_info& type() const override
 		{
 			return typeid(ValueType);
 		}
 
-		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
+		void clone(Placeholder<ValueHolder>* pPlaceholder) const override
 		{
 			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}

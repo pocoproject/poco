@@ -34,7 +34,7 @@ public:
 	Add(const std::string& zipPath, const std::string& localPath, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl);
 		/// Creates the Add.
 
-	void execute(Compress& c, std::istream& input);
+	void execute(Compress& c, std::istream& input) override;
 		/// Performs the add operation
 
 private:

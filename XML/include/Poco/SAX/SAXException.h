@@ -98,22 +98,22 @@ public:
 	SAXParseException(const SAXParseException& exc);
 		/// Creates a new SAXParseException from another one.
 
-	~SAXParseException() noexcept;
+	~SAXParseException() noexcept override;
 		/// Destroy the exception.
 
 	SAXParseException& operator = (const SAXParseException& exc);
 		/// Assignment operator.
 
-	const char* name() const noexcept;
+	const char* name() const noexcept override;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	const char* className() const noexcept override;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	Poco::Exception* clone() const override;
 		/// Creates an exact copy of the exception.
 
-	void rethrow() const;
+	void rethrow() const override;
 		/// (Re)Throws the exception.
 
 	const XMLString& getPublicId() const;

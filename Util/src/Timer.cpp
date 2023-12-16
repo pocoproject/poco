@@ -33,7 +33,7 @@ public:
 	{
 	}
 
-	~TimerNotification()
+	~TimerNotification() override
 	{
 	}
 
@@ -57,11 +57,11 @@ public:
 	{
 	}
 
-	~StopNotification()
+	~StopNotification() override
 	{
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		queue().clear();
 		return false;
@@ -77,11 +77,11 @@ public:
 	{
 	}
 
-	~CancelNotification()
+	~CancelNotification() override
 	{
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		// Check if there's a StopNotification pending.
 		int numberOfPendingTasks = queue().size();
@@ -129,7 +129,7 @@ public:
 	{
 	}
 
-	~TaskNotification()
+	~TaskNotification() override
 	{
 	}
 
@@ -138,7 +138,7 @@ public:
 		return _pTask;
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		if (!_pTask->isCancelled())
 		{
@@ -177,11 +177,11 @@ public:
 	{
 	}
 
-	~PeriodicTaskNotification()
+	~PeriodicTaskNotification() override
 	{
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		TaskNotification::execute();
 
@@ -212,11 +212,11 @@ public:
 	{
 	}
 
-	~FixedRateTaskNotification()
+	~FixedRateTaskNotification() override
 	{
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		TaskNotification::execute();
 

@@ -97,7 +97,7 @@ public:
 	RSAKey(RSAKey&& other) noexcept;
 		/// Move constructor.
 
-	~RSAKey();
+	~RSAKey() override;
 		/// Destroys the RSAKey.
 
 	RSAKey& operator = (const RSAKey& other);

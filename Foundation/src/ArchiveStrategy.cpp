@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	~ArchiveCompressor()
+	~ArchiveCompressor() override
 	{
 	}
 

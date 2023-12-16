@@ -61,7 +61,7 @@ public:
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
 
-	~Timer();
+	~Timer() override;
 		/// Destroys the Timer, cancelling all pending tasks.
 
 	void cancel(bool wait = false);
@@ -176,7 +176,7 @@ public:
 	}
 
 protected:
-	void run();
+	void run() override;
 	static void validateTask(const TimerTask::Ptr& pTask);
 
 private:

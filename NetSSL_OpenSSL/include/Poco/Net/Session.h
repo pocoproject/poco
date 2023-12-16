@@ -52,7 +52,7 @@ protected:
 		///
 		/// The SSL_SESSION's reference count is not changed.
 
-	~Session();
+	~Session() override;
 		/// Destroys the Session.
 		///
 		/// Calls SSL_SESSION_free() on the stored

@@ -40,47 +40,47 @@ class XML_API AbstractNode: public Node
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	const XMLString& getNodeValue() const;
-	void setNodeValue(const XMLString& value);
-	Node* parentNode() const;
-	NodeList* childNodes() const;
-	Node* firstChild() const;
-	Node* lastChild() const;
-	Node* previousSibling() const;
-	Node* nextSibling() const;
-	NamedNodeMap* attributes() const;
-	Document* ownerDocument() const;
-	Node* insertBefore(Node* newChild, Node* refChild);
-	Node* insertAfterNP(Node* newChild, Node* refChild);
-	Node* replaceChild(Node* newChild, Node* oldChild);
-	Node* removeChild(Node* oldChild);
-	Node* appendChild(Node* newChild);
-	bool hasChildNodes() const;
-	Node* cloneNode(bool deep) const;
-	void normalize();
-	bool isSupported(const XMLString& feature, const XMLString& version) const;
-	const XMLString& namespaceURI() const;
-	XMLString prefix() const;
-	const XMLString& localName() const;
-	bool hasAttributes() const;
+	const XMLString& nodeName() const override;
+	const XMLString& getNodeValue() const override;
+	void setNodeValue(const XMLString& value) override;
+	Node* parentNode() const override;
+	NodeList* childNodes() const override;
+	Node* firstChild() const override;
+	Node* lastChild() const override;
+	Node* previousSibling() const override;
+	Node* nextSibling() const override;
+	NamedNodeMap* attributes() const override;
+	Document* ownerDocument() const override;
+	Node* insertBefore(Node* newChild, Node* refChild) override;
+	Node* insertAfterNP(Node* newChild, Node* refChild) override;
+	Node* replaceChild(Node* newChild, Node* oldChild) override;
+	Node* removeChild(Node* oldChild) override;
+	Node* appendChild(Node* newChild) override;
+	bool hasChildNodes() const override;
+	Node* cloneNode(bool deep) const override;
+	void normalize() override;
+	bool isSupported(const XMLString& feature, const XMLString& version) const override;
+	const XMLString& namespaceURI() const override;
+	XMLString prefix() const override;
+	const XMLString& localName() const override;
+	bool hasAttributes() const override;
 
 	// EventTarget
-	void addEventListener(const XMLString& type, EventListener* listener, bool useCapture);
-	void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture);
-	bool dispatchEvent(Event* evt);
+	void addEventListener(const XMLString& type, EventListener* listener, bool useCapture) override;
+	void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture) override;
+	bool dispatchEvent(Event* evt) override;
 
 	// Extensions
-	XMLString innerText() const;
-	Node* getNodeByPath(const XMLString& path) const;
-	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
+	XMLString innerText() const override;
+	Node* getNodeByPath(const XMLString& path) const override;
+	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const override;
 
-	virtual void autoRelease();
+	void autoRelease() override;
 
 protected:
 	AbstractNode(Document* pOwnerDocument);
 	AbstractNode(Document* pOwnerDocument, const AbstractNode& node);
-	~AbstractNode();
+	~AbstractNode() override;
 
 	virtual Node* copyNode(bool deep, Document* pOwnerDocument) const = 0;
 

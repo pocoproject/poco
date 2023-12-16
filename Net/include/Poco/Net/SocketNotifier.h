@@ -65,7 +65,7 @@ public:
 		/// Returns the number of subscribers;
 
 protected:
-	~SocketNotifier();
+	~SocketNotifier() override;
 		/// Destroys the SocketNotifier.
 
 private:

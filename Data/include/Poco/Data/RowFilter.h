@@ -80,7 +80,7 @@ public:
 	RowFilter(Ptr pParent, LogicOperator op = OP_OR);
 		/// Creates child RowFilter and associates it with the parent filter.
 
-	~RowFilter();
+	~RowFilter() override;
 		/// Destroys the RowFilter.
 
 	void addFilter(Ptr pFilter, LogicOperator comparison);

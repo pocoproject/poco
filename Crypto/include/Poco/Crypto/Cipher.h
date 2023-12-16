@@ -95,7 +95,7 @@ public:
 		ENC_BINHEX_NO_LF = 0x82  /// BinHex-encoded output, no linefeeds
 	};
 
-	virtual ~Cipher();
+	~Cipher() override;
 		/// Destroys the Cipher.
 
 	virtual const std::string& name() const = 0;

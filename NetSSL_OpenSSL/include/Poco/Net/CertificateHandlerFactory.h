@@ -70,11 +70,11 @@ public:
 	{
 	}
 
-	~CertificateHandlerFactoryImpl()
+	~CertificateHandlerFactoryImpl() override
 	{
 	}
 
-	InvalidCertificateHandler* create(bool server) const
+	InvalidCertificateHandler* create(bool server) const override
 	{
 		return new T(server);
 	}

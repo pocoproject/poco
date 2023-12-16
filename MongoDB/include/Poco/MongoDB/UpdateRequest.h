@@ -55,7 +55,7 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is
 		/// "foo.bar".
 
-	virtual ~UpdateRequest();
+	~UpdateRequest() override;
 		/// Destroys the UpdateRequest.
 
 	Document& selector();
@@ -71,7 +71,7 @@ public:
 		/// Sets the flags
 
 protected:
-	void buildRequest(BinaryWriter& writer);
+	void buildRequest(BinaryWriter& writer) override;
 
 private:
 	Flags       _flags;

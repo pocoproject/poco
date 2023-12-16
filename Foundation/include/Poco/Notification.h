@@ -45,7 +45,7 @@ public:
 		/// The default implementation returns the class name.
 
 protected:
-	virtual ~Notification();
+	~Notification() override;
 };
 
 

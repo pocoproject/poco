@@ -55,19 +55,19 @@ public:
 	Channel::Ptr getChannel() const;
 		/// Returns the target channel.
 
-	void open();
+	void open() override;
 		/// Opens the channel and creates the
 		/// background logging thread.
 
-	void close();
+	void close() override;
 		/// Closes the channel and stops the background
 		/// logging thread.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Queues the message for processing by the
 		/// background thread.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets or changes a configuration property.
 		///
 		/// The "channel" property allows setting the target
@@ -99,8 +99,8 @@ public:
 		/// The "queueSize" property is set-only.
 
 protected:
-	~AsyncChannel();
-	void run();
+	~AsyncChannel() override;
+	void run() override;
 	void setPriority(const std::string& value);
 
 private:

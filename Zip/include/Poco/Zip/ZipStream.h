@@ -45,7 +45,7 @@ public:
 	ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bool reposition);
 		/// Creates the ZipStreamBuf. Set reposition to false, if you do on-the-fly compression.
 
-	virtual ~ZipStreamBuf();
+	~ZipStreamBuf() override;
 		/// Destroys the ZipStreamBuf.
 
 	void close(Poco::UInt64& extraDataSize);
@@ -55,9 +55,9 @@ public:
 		/// Call this method once all bytes were read from the input stream to determine if the CRC is valid
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
 
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -98,7 +98,7 @@ public:
 		/// Creates the basic stream and connects it
 		/// to the given output stream.
 
-	~ZipIOS();
+	~ZipIOS() override;
 		/// Destroys the stream.
 
 	ZipStreamBuf* rdbuf();
@@ -118,7 +118,7 @@ public:
 		/// Creates the ZipInputStream and connects it
 		/// to the given input stream.
 
-	~ZipInputStream();
+	~ZipInputStream() override;
 		/// Destroys the ZipInputStream.
 
 	bool crcValid() const;
@@ -136,7 +136,7 @@ public:
 		/// Creates the ZipOutputStream and connects it
 		/// to the given output stream.
 
-	~ZipOutputStream();
+	~ZipOutputStream() override;
 		/// Destroys the ZipOutputStream.
 
 	void close(Poco::UInt64& extraDataSize);

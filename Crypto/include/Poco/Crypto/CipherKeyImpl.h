@@ -73,7 +73,7 @@ public:
 		/// Creates a new CipherKeyImpl object. Autoinitializes key
 		/// and initialization vector.
 
-	virtual ~CipherKeyImpl();
+	~CipherKeyImpl() override;
 		/// Destroys the CipherKeyImpl.
 
 	const std::string& name() const;

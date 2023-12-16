@@ -99,7 +99,7 @@ public:
 		/// The returned NodeList must be released with a call
 		/// to release() when no longer needed.
 
-	void normalize();
+	void normalize() override;
 		/// Puts all Text nodes in the full depth of the sub-tree underneath this Element,
 		/// including attribute nodes, into a "normal" form where only markup (e.g.,
 		/// tags, comments, processing instructions, CDATA sections, and entity references)
@@ -149,11 +149,11 @@ public:
 		/// The returned NodeList must be released with a call
 		/// to release() when no longer needed.
 
-	const XMLString& namespaceURI() const;
-	XMLString prefix() const;
-	const XMLString& localName() const;
-	bool hasAttributes() const;
-	XMLString innerText() const;
+	const XMLString& namespaceURI() const override;
+	XMLString prefix() const override;
+	const XMLString& localName() const override;
+	bool hasAttributes() const override;
+	XMLString innerText() const override;
 
 	Element* getChildElement(const XMLString& name) const;
 		/// Returns the first child element with the given name, or null
@@ -180,19 +180,19 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 	// Node
-	const XMLString& nodeName() const;
-	NamedNodeMap* attributes() const;
-	unsigned short nodeType() const;
+	const XMLString& nodeName() const override;
+	NamedNodeMap* attributes() const override;
+	unsigned short nodeType() const override;
 
 protected:
 	Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
 	Element(Document* pOwnerDocument, const Element& elem);
-	~Element();
+	~Element() override;
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const override;
 
-	void dispatchNodeRemovedFromDocument();
-	void dispatchNodeInsertedIntoDocument();
+	void dispatchNodeRemovedFromDocument() override;
+	void dispatchNodeInsertedIntoDocument() override;
 
 private:
 	const Name& _name;

@@ -35,7 +35,7 @@ public:
 	Replace(const ZipLocalFileHeader& hdr, const std::string& localPath);
 		/// Creates the Replace.
 
-	void execute(Compress& c, std::istream& input);
+	void execute(Compress& c, std::istream& input) override;
 		/// Performs the replace operation
 
 private:

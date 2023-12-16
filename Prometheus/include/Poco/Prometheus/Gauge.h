@@ -116,7 +116,7 @@ public:
 		/// Creates a Gauge with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Gauge() = default;
+	~Gauge() override = default;
 		/// Destroys the Gauge.
 
 	using LabeledMetric::help;

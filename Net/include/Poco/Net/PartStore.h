@@ -34,7 +34,7 @@ public:
 	PartStore(const std::string& mediaType);
 		/// Creates the PartStore for the given MIME type.
 
-	~PartStore();
+	~PartStore() override;
 		/// Destroys the PartFileStore.
 
 private:
@@ -55,13 +55,13 @@ public:
 		///
 		/// Throws an exception if the file cannot be opened.
 
-	~FilePartStore();
+	~FilePartStore() override;
 		/// Destroys the FilePartStore.
 
-	std::istream& stream();
+	std::istream& stream() override;
 		/// Returns a file input stream for the given file.
 
-	const std::string& filename() const;
+	const std::string& filename() const override;
 		/// Returns the filename portion of the path.
 		/// This is the name under which the file is known
 		/// to the user of this class (typically, MailMessage
@@ -95,7 +95,7 @@ public:
 class FilePartStoreFactory: public PartStoreFactory
 {
 public:
-	PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "")
+	PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "") override
 	{
 		return new FilePartStore(content, mediaType, filename);
 	}

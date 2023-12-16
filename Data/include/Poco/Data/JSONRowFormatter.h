@@ -82,13 +82,13 @@ public:
 	JSONRowFormatter(int mode = (JSON_FMT_MODE_COLUMN_NAMES | JSON_FMT_MODE_SMALL));
 		/// Creates a new JSONRowFormatter.
 
-	~JSONRowFormatter();
+	~JSONRowFormatter() override;
 		/// Destroys the JSONRowFormatter.
 
-	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames);
+	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) override;
 		/// Formats names.
 
-	std::string& formatValues(const ValueVec& vals, std::string& formattedValues);
+	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) override;
 		// Formats values.
 
 	void setJSONMode(int mode);
@@ -116,7 +116,7 @@ public:
 
 
 private:
-	void adjustPrefix() const;
+	void adjustPrefix() const override;
 
 	NameVecPtr _pNames;
 	int        _mode;

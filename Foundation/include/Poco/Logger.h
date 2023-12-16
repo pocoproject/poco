@@ -116,14 +116,14 @@ public:
 		///   - debug
 		///   - trace
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets or changes a configuration property.
 		///
 		/// Only the "channel" and "level" properties are supported, which allow
 		/// setting the target channel and log level, respectively, via the LoggingRegistry.
 		/// The "channel" and "level" properties are set-only.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Logs the given message if its priority is
 		/// greater than or equal to the Logger's log level.
 
@@ -459,7 +459,7 @@ protected:
 	typedef std::map<std::string, Ptr> LoggerMap;
 
 	Logger(const std::string& name, Channel::Ptr pChannel, int level);
-	~Logger();
+	~Logger() override;
 
 	void log(const std::string& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, int line);

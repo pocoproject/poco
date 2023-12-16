@@ -39,7 +39,7 @@ public:
 	PooledSessionHolder(SessionPool& owner, SessionImpl* pSessionImpl);
 		/// Creates the PooledSessionHolder.
 
-	~PooledSessionHolder();
+	~PooledSessionHolder() override;
 		/// Destroys the PooledSessionHolder.
 
 	SessionImpl* session();

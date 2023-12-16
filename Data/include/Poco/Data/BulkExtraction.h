@@ -62,26 +62,26 @@ public:
 			result.resize(limit);
 	}
 
-	virtual ~BulkExtraction()
+	~BulkExtraction() override
 	{
 	}
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<C>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _rResult.size();
 	}
 
-	std::size_t numOfRowsAllowed() const
+	std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	bool isNull(std::size_t row) const
+	bool isNull(std::size_t row) const override
 	{
 		try
 		{
@@ -93,7 +93,7 @@ public:
 		}
 	}
 
-	std::size_t extract(std::size_t col)
+	std::size_t extract(std::size_t col) override
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
 		TypeHandler<C>::extract(col, _rResult, _default, pExt);
@@ -107,11 +107,11 @@ public:
 		return _rResult.size();
 	}
 
-	virtual void reset()
+	void reset() override
 	{
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col) override
 	{
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
@@ -162,13 +162,13 @@ public:
 	{
 	}
 
-	~InternalBulkExtraction()
+	~InternalBulkExtraction() override
 		/// Destroys InternalBulkExtraction.
 	{
 		delete _pColumn;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_pColumn->reset();
 	}
@@ -185,7 +185,7 @@ public:
 		}
 	}
 
-	bool isNull(std::size_t row) const
+	bool isNull(std::size_t row) const override
 	{
 		return BulkExtraction<C>::isNull(row);
 	}

@@ -80,7 +80,7 @@ public:
 		/// If a session has been idle for more than idleTime seconds, and more than
 		/// minSessions sessions are in the pool, the session is automatically destroyed.
 
-	~SessionPool();
+	~SessionPool() override;
 		/// Destroys the SessionPool.
 
 	Session get();

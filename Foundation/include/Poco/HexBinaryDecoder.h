@@ -42,10 +42,10 @@ class Foundation_API HexBinaryDecoderBuf: public UnbufferedStreamBuf
 {
 public:
 	HexBinaryDecoderBuf(std::istream& istr);
-	~HexBinaryDecoderBuf();
+	~HexBinaryDecoderBuf() override;
 
 private:
-	int readFromDevice();
+	int readFromDevice() override;
 	int readOne();
 
 	std::streambuf& _buf;
@@ -60,7 +60,7 @@ class Foundation_API HexBinaryDecoderIOS: public virtual std::ios
 {
 public:
 	HexBinaryDecoderIOS(std::istream& istr);
-	~HexBinaryDecoderIOS();
+	~HexBinaryDecoderIOS() override;
 	HexBinaryDecoderBuf* rdbuf();
 
 protected:
@@ -84,7 +84,7 @@ class Foundation_API HexBinaryDecoder: public HexBinaryDecoderIOS, public std::i
 {
 public:
 	HexBinaryDecoder(std::istream& istr);
-	~HexBinaryDecoder();
+	~HexBinaryDecoder() override;
 };
 
 

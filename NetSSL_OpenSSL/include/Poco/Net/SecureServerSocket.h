@@ -83,7 +83,7 @@ public:
 		/// After successful construction, the server socket
 		/// is ready to accept connections.
 
-	virtual ~SecureServerSocket();
+	~SecureServerSocket() override;
 		/// Destroys the StreamSocket.
 
 	SecureServerSocket& operator = (const Socket& socket);
@@ -93,7 +93,7 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
-	StreamSocket acceptConnection(SocketAddress& clientAddr);
+	StreamSocket acceptConnection(SocketAddress& clientAddr) override;
 		/// Get the next completed connection from the
 		/// socket's completed connection queue.
 		///
@@ -110,7 +110,7 @@ public:
 		/// sendBytes(), receiveBytes() or completeHandshake()
 		/// is called on the returned SecureStreamSocket.
 
-	StreamSocket acceptConnection();
+	StreamSocket acceptConnection() override;
 		/// Get the next completed connection from the
 		/// socket's completed connection queue.
 		///

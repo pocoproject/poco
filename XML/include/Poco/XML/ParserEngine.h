@@ -62,7 +62,7 @@ public:
 		/// Creates the parser engine and passes the encoding
 		/// to the underlying parser.
 
-	~ParserEngine();
+	~ParserEngine() override;
 		/// Destroys the parser.
 
 	void setEncoding(const XMLString& encoding);
@@ -193,16 +193,16 @@ public:
 		/// Parses an XML document from the given buffer.
 
 	// Locator
-	XMLString getPublicId() const;
+	XMLString getPublicId() const override;
 		/// Return the public identifier for the current document event.
 
-	XMLString getSystemId() const;
+	XMLString getSystemId() const override;
 		/// Return the system identifier for the current document event.
 
-	int getLineNumber() const;
+	int getLineNumber() const override;
 		/// Return the line number where the current document event ends.
 
-	int getColumnNumber() const;
+	int getColumnNumber() const override;
 		/// Return the column number where the current document event ends.
 
 protected:

@@ -80,7 +80,7 @@ public:
 	ECKey(ECKey&& key) noexcept;
 		/// Creates the ECKey by moving another one.
 
-	~ECKey();
+	~ECKey() override;
 		/// Destroys the ECKey.
 
 	ECKey& operator = (const ECKey& other);

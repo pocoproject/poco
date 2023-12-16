@@ -43,11 +43,11 @@ public:
 	{
 	}
 
-	~RunnableHolder()
+	~RunnableHolder() override
 	{
 	}
 
-	void run()
+	void run() override
 	{
 		_target.run();
 	}
@@ -66,11 +66,11 @@ public:
 	{
 	}
 
-	~CallableHolder()
+	~CallableHolder() override
 	{
 	}
 
-	void run()
+	void run() override
 	{
 		_callable(_pData);
 	}

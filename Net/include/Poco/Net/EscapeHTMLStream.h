@@ -37,12 +37,12 @@ public:
 		/// Creates the EscapeHTMLStreamBuf and connects it
 		/// to the given output stream.
 
-	~EscapeHTMLStreamBuf();
+	~EscapeHTMLStreamBuf() override;
 		/// Destroys the EscapeHTMLStreamBuf.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::ostream* _pOstr;
@@ -57,7 +57,7 @@ public:
 		/// Creates the MailIOS and connects it
 		/// to the given output stream.
 
-	~EscapeHTMLIOS();
+	~EscapeHTMLIOS() override;
 		/// Destroys the stream.
 
 	EscapeHTMLStreamBuf* rdbuf();
@@ -78,7 +78,7 @@ public:
 		/// Creates the MailOutputStream and connects it
 		/// to the given input stream.
 
-	~EscapeHTMLOutputStream();
+	~EscapeHTMLOutputStream() override;
 		/// Destroys the MailOutputStream.
 };
 

@@ -109,12 +109,12 @@ public:
 		/// a subclass of Event interface only the values specified in the
 		/// initEvent method are modified, all other attributes are left unchanged.
 
-	void autoRelease();
+	void autoRelease() override;
 
 protected:
 	Event(Document* pOwnerDocument, const XMLString& type);
 	Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable);
-	~Event();
+	~Event() override;
 
 	bool isCanceled() const;
 		/// returns true if and only if the event has been cancelled.

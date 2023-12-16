@@ -46,19 +46,19 @@ public:
 	SimpleRowFormatter& operator = (const SimpleRowFormatter& row);
 		/// Assignment operator.
 
-	~SimpleRowFormatter();
+	~SimpleRowFormatter() override;
 		/// Destroys the SimpleRowFormatter.
 
 	void swap(SimpleRowFormatter& other) noexcept;
 		/// Swaps the row formatter with another one.
 
-	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames);
+	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) override;
 		/// Formats the row field names.
 
-	std::string& formatValues(const ValueVec& vals, std::string& formattedValues);
+	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) override;
 		/// Formats the row values.
 
-	int rowCount() const;
+	int rowCount() const override;
 		/// Returns row count.
 
 	void setColumnWidth(std::streamsize width);

@@ -30,14 +30,14 @@ class Foundation_API UTF8Encoding: public TextEncoding
 {
 public:
 	UTF8Encoding();
-	~UTF8Encoding();
-	const char* canonicalName() const;
-	bool isA(const std::string& encodingName) const;
-	const CharacterMap& characterMap() const;
-	int convert(const unsigned char* bytes) const;
-	int convert(int ch, unsigned char* bytes, int length) const;
-	int queryConvert(const unsigned char* bytes, int length) const;
-	int sequenceLength(const unsigned char* bytes, int length) const;
+	~UTF8Encoding() override;
+	const char* canonicalName() const override;
+	bool isA(const std::string& encodingName) const override;
+	const CharacterMap& characterMap() const override;
+	int convert(const unsigned char* bytes) const override;
+	int convert(int ch, unsigned char* bytes, int length) const override;
+	int queryConvert(const unsigned char* bytes, int length) const override;
+	int sequenceLength(const unsigned char* bytes, int length) const override;
 
 	static bool isLegal(const unsigned char *bytes, int length);
 		/// Utility routine to tell whether a sequence of bytes is legal UTF-8.

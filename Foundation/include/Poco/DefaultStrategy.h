@@ -50,11 +50,11 @@ public:
 	{
 	}
 
-	~DefaultStrategy()
+	~DefaultStrategy() override
 	{
 	}
 
-	void notify(const void* sender, TArgs& arguments)
+	void notify(const void* sender, TArgs& arguments) override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -62,14 +62,14 @@ public:
 		}
 	}
 
-	DelegateHandle add(const TDelegate& delegate)
+	DelegateHandle add(const TDelegate& delegate) override
 	{
 		DelegatePtr pDelegate(static_cast<TDelegate*>(delegate.clone()));
 		_delegates.push_back(pDelegate);
 		return pDelegate.get();
 	}
 
-	void remove(const TDelegate& delegate)
+	void remove(const TDelegate& delegate) override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -82,7 +82,7 @@ public:
 		}
 	}
 
-	void remove(DelegateHandle delegateHandle)
+	void remove(DelegateHandle delegateHandle) override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -104,7 +104,7 @@ public:
 		return *this;
 	}
 
-	void clear()
+	void clear() override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -113,7 +113,7 @@ public:
 		_delegates.clear();
 	}
 
-	bool empty() const
+	bool empty() const override
 	{
 		return _delegates.empty();
 	}
@@ -152,11 +152,11 @@ public:
 	{
 	}
 
-	~DefaultStrategy()
+	~DefaultStrategy() override
 	{
 	}
 
-	void notify(const void* sender)
+	void notify(const void* sender) override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -164,14 +164,14 @@ public:
 		}
 	}
 
-	DelegateHandle add(const TDelegate& delegate)
+	DelegateHandle add(const TDelegate& delegate) override
 	{
 		DelegatePtr pDelegate(static_cast<TDelegate*>(delegate.clone()));
 		_delegates.push_back(pDelegate);
 		return pDelegate.get();
 	}
 
-	void remove(const TDelegate& delegate)
+	void remove(const TDelegate& delegate) override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -184,7 +184,7 @@ public:
 		}
 	}
 
-	void remove(DelegateHandle delegateHandle)
+	void remove(DelegateHandle delegateHandle) override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -215,7 +215,7 @@ public:
 		return *this;
 	}
 
-	void clear()
+	void clear() override
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
@@ -224,7 +224,7 @@ public:
 		_delegates.clear();
 	}
 
-	bool empty() const
+	bool empty() const override
 	{
 		return _delegates.empty();
 	}

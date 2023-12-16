@@ -35,7 +35,7 @@ public:
 	{
 	}
 
-	~MessageNotification()
+	~MessageNotification() override
 	{
 	}
 

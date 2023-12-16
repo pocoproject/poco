@@ -52,16 +52,16 @@ public:
 		///
 		/// Throws an OpenFileException if the file cannot be opened.
 
-	~FilePartSource();
+	~FilePartSource() override;
 		/// Destroys the FilePartSource.
 
-	std::istream& stream();
+	std::istream& stream() override;
 		/// Returns a file input stream for the given file.
 
-	const std::string& filename() const;
+	const std::string& filename() const override;
 		/// Returns the filename portion of the path.
 
-	std::streamsize getContentLength() const;
+	std::streamsize getContentLength() const override;
 		/// Returns the file size.
 
 private:

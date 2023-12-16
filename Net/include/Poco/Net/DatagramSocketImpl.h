@@ -43,9 +43,9 @@ public:
 		/// Creates a StreamSocketImpl using the given native socket.
 
 protected:
-	void init(int af);
+	void init(int af) override;
 
-	~DatagramSocketImpl();
+	~DatagramSocketImpl() override;
 };
 
 

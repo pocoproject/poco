@@ -33,13 +33,13 @@ class XML_API XMLStreamParserException: public Poco::XML::XMLException
 public:
 	XMLStreamParserException(const std::string& name, Poco::UInt64 line, Poco::UInt64 column, const std::string& description);
 	XMLStreamParserException(const XMLStreamParser&, const std::string& description);
-	virtual ~XMLStreamParserException() throw ();
+	~XMLStreamParserException() throw () override;
 
-	const char* name() const noexcept;
+	const char* name() const noexcept override;
 	Poco::UInt64 line() const;
 	Poco::UInt64 column() const;
 	const std::string& description() const;
-	virtual const char* what() const throw ();
+	const char* what() const throw () override;
 
 private:
 	void init();

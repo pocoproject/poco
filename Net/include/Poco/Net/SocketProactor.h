@@ -79,7 +79,7 @@ public:
 	SocketProactor& operator=(const SocketProactor&) = delete;
 	SocketProactor& operator=(SocketProactor&&) = delete;
 
-	~SocketProactor();
+	~SocketProactor() override;
 		/// Destroys the SocketProactor.
 
 	void addWork(const Work& ch, Timestamp::TimeDiff ms = PERMANENT_COMPLETION_HANDLER);
@@ -126,7 +126,7 @@ public:
 		/// Returns 1 on successful handler invocation, 0 on
 		/// exception.
 
-	void run();
+	void run() override;
 		/// Runs the SocketProactor. The reactor will run
 		/// until stop() is called (in a separate thread).
 
@@ -245,7 +245,7 @@ private:
 		{
 		}
 
-		~IONotification() = default;
+		~IONotification() override = default;
 
 		void call()
 			/// Calls the completion handler.

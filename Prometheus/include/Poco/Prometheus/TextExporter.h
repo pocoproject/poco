@@ -41,7 +41,7 @@ public:
 	TextExporter(const TextExporter&) = delete;
 	TextExporter& operator = (const TextExporter&) = delete;
 
-	~TextExporter() = default;
+	~TextExporter() override = default;
 
 	// Exporter
 	void writeHeader(const Metric& metric) override;

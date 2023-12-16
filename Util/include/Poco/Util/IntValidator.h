@@ -34,10 +34,10 @@ public:
 	IntValidator(int min, int max);
 		/// Creates the IntValidator.
 
-	~IntValidator();
+	~IntValidator() override;
 		/// Destroys the IntValidator.
 
-	void validate(const Option& option, const std::string& value);
+	void validate(const Option& option, const std::string& value) override;
 		/// Validates the value for the given option by
 		/// testing whether it's an integer that lies within
 		/// a given range.

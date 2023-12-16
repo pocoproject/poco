@@ -33,13 +33,13 @@ class XML_API ElementsByTagNameList: public NodeList
 	// Element::getElementsByTagName().
 {
 public:
-	Node* item(unsigned long index) const;
-	unsigned long length() const;
-	void autoRelease();
+	Node* item(unsigned long index) const override;
+	unsigned long length() const override;
+	void autoRelease() override;
 
 protected:
 	ElementsByTagNameList(const Node* pParent, const XMLString& name);
-	~ElementsByTagNameList();
+	~ElementsByTagNameList() override;
 
 	Node* find(const Node* pParent, unsigned long index) const;
 
@@ -59,13 +59,13 @@ class XML_API ElementsByTagNameListNS: public NodeList
 	// Element::getElementsByTagNameNS().
 {
 public:
-	virtual Node* item(unsigned long index) const;
-	virtual unsigned long length() const;
-	virtual void autoRelease();
+	Node* item(unsigned long index) const override;
+	unsigned long length() const override;
+	void autoRelease() override;
 
 protected:
 	ElementsByTagNameListNS(const Node* pParent, const XMLString& namespaceURI, const XMLString& localName);
-	~ElementsByTagNameListNS();
+	~ElementsByTagNameListNS() override;
 
 	Node* find(const Node* pParent, unsigned long index) const;
 

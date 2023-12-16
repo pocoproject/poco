@@ -49,54 +49,54 @@ public:
 	XMLFilterImpl(XMLReader* pParent);
 		/// Construct an XML filter with the specified parent.
 
-	~XMLFilterImpl();
+	~XMLFilterImpl() override;
 		/// Destroys the XMLFilterImpl.
 
 	// XMLFilter
-	XMLReader* getParent() const;
-	void setParent(XMLReader* pParent);
+	XMLReader* getParent() const override;
+	void setParent(XMLReader* pParent) override;
 
 	// XMLReader
-	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
-	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
-	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
-	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
-	void setFeature(const XMLString& featureId, bool state);
-	bool getFeature(const XMLString& featureId) const;
-	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
-	void parse(InputSource* pSource);
-	void parse(const XMLString& systemId);
-	void parseMemoryNP(const char* xml, std::size_t size);
+	void setEntityResolver(EntityResolver* pResolver) override;
+	EntityResolver* getEntityResolver() const override;
+	void setDTDHandler(DTDHandler* pDTDHandler) override;
+	DTDHandler* getDTDHandler() const override;
+	void setContentHandler(ContentHandler* pContentHandler) override;
+	ContentHandler* getContentHandler() const override;
+	void setErrorHandler(ErrorHandler* pErrorHandler) override;
+	ErrorHandler* getErrorHandler() const override;
+	void setFeature(const XMLString& featureId, bool state) override;
+	bool getFeature(const XMLString& featureId) const override;
+	void setProperty(const XMLString& propertyId, const XMLString& value) override;
+	void setProperty(const XMLString& propertyId, void* value) override;
+	void* getProperty(const XMLString& propertyId) const override;
+	void parse(InputSource* pSource) override;
+	void parse(const XMLString& systemId) override;
+	void parseMemoryNP(const char* xml, std::size_t size) override;
 
 	// EntityResolver
-	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);
-	void releaseInputSource(InputSource* pSource);
+	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId) override;
+	void releaseInputSource(InputSource* pSource) override;
 
 	// DTDHandler
-	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId);
-	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
+	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId) override;
+	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName) override;
 
 	// ContentHandler
-	void setDocumentLocator(const Locator* loc);
-	void startDocument();
-	void endDocument();
-	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attrList);
-	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname);
-	void characters(const XMLChar ch[], int start, int length);
-	void ignorableWhitespace(const XMLChar ch[], int start, int length);
-	void processingInstruction(const XMLString& target, const XMLString& data);
-	void startPrefixMapping(const XMLString& prefix, const XMLString& uri);
-	void endPrefixMapping(const XMLString& prefix);
-	void skippedEntity(const XMLString& prefix);
-	void warning(const SAXException& e);
-	void error(const SAXException& e);
-	void fatalError(const SAXException& e);
+	void setDocumentLocator(const Locator* loc) override;
+	void startDocument() override;
+	void endDocument() override;
+	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attrList) override;
+	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname) override;
+	void characters(const XMLChar ch[], int start, int length) override;
+	void ignorableWhitespace(const XMLChar ch[], int start, int length) override;
+	void processingInstruction(const XMLString& target, const XMLString& data) override;
+	void startPrefixMapping(const XMLString& prefix, const XMLString& uri) override;
+	void endPrefixMapping(const XMLString& prefix) override;
+	void skippedEntity(const XMLString& prefix) override;
+	void warning(const SAXException& e) override;
+	void error(const SAXException& e) override;
+	void fatalError(const SAXException& e) override;
 
 protected:
 	XMLReader* parent() const;

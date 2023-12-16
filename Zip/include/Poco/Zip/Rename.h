@@ -34,7 +34,7 @@ public:
 	Rename(const ZipLocalFileHeader& hdr, const std::string& newZipEntryName);
 		/// Creates the Rename.
 
-	void execute(Compress& c, std::istream& input);
+	void execute(Compress& c, std::istream& input) override;
 		/// Performs the rename operation
 
 private:

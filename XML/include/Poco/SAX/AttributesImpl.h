@@ -60,7 +60,7 @@ public:
 	AttributesImpl(AttributesImpl&& attributes) noexcept;
 		/// Creates the AttributesImpl by copying another one.
 
-	~AttributesImpl();
+	~AttributesImpl() override;
 		/// Destroys the AttributesImpl.
 
 	AttributesImpl& operator = (const AttributesImpl& attributes);
@@ -69,18 +69,18 @@ public:
 	AttributesImpl& operator = (AttributesImpl&& attributes) noexcept;
 		/// Assignment operator.
 
-	int getIndex(const XMLString& name) const;
-	int getIndex(const XMLString& namespaceURI, const XMLString& localName) const;
-	int getLength() const;
-	const XMLString& getLocalName(int i) const;
-	const XMLString& getQName(int i) const;
-	const XMLString& getType(int i) const;
-	const XMLString& getType(const XMLString& qname) const;
-	const XMLString& getType(const XMLString& namespaceURI, const XMLString& localName) const;
-	const XMLString& getValue(int i) const;
-	const XMLString& getValue(const XMLString& qname) const;
-	const XMLString& getValue(const XMLString& namespaceURI, const XMLString& localName) const;
-	const XMLString& getURI(int i) const;
+	int getIndex(const XMLString& name) const override;
+	int getIndex(const XMLString& namespaceURI, const XMLString& localName) const override;
+	int getLength() const override;
+	const XMLString& getLocalName(int i) const override;
+	const XMLString& getQName(int i) const override;
+	const XMLString& getType(int i) const override;
+	const XMLString& getType(const XMLString& qname) const override;
+	const XMLString& getType(const XMLString& namespaceURI, const XMLString& localName) const override;
+	const XMLString& getValue(int i) const override;
+	const XMLString& getValue(const XMLString& qname) const override;
+	const XMLString& getValue(const XMLString& namespaceURI, const XMLString& localName) const override;
+	const XMLString& getURI(int i) const override;
 
 	bool isSpecified(int i) const;
 		/// Returns true unless the attribute value was provided by DTD defaulting.

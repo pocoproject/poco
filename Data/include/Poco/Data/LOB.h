@@ -272,21 +272,21 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
+	~VarHolderImpl() override
 	{
 	}
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::BLOB);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -310,21 +310,21 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
+	~VarHolderImpl() override
 	{
 	}
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::CLOB);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

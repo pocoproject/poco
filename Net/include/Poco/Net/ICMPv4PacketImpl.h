@@ -128,25 +128,25 @@ public:
 	ICMPv4PacketImpl(int dataSize = 48);
 		/// Constructor. Creates an ICMPv4PacketImpl.
 
-	~ICMPv4PacketImpl();
+	~ICMPv4PacketImpl() override;
 		/// Destructor.
 
-	int packetSize() const;
+	int packetSize() const override;
 		/// Returns the total length of packet (header + data);
 
-	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const;
+	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const override;
 		/// Returns current epoch time if either buffer or length are equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
-	bool validReplyID(Poco::UInt8* buffer, int length) const;
+	bool validReplyID(Poco::UInt8* buffer, int length) const override;
 		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
-	virtual std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code);
+	std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code) override;
 		/// Returns error description string.
 		/// If supplied buffer contains ICMPv4 echo reply packet, an
 		/// empty string is returned indicating the absence of error.
@@ -155,7 +155,7 @@ public:
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
-	virtual std::string typeDescription(int typeId);
+	std::string typeDescription(int typeId) override;
 		/// Returns the description of the packet type.
 
 	static const Poco::UInt16 MAX_PACKET_SIZE;
@@ -167,7 +167,7 @@ public:
 	static const Poco::UInt8 PARAMETER_PROBLEM_TYPE;       // 12
 
 private:
-	void initPacket();
+	void initPacket() override;
 	Header* header(Poco::UInt8* buffer, int length) const;
 	Poco::UInt8* data(Poco::UInt8* buffer, int length) const;
 

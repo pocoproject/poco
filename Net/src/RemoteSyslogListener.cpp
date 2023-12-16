@@ -53,7 +53,7 @@ public:
 	{
 	}
 
-	~MessageNotification()
+	~MessageNotification() override
 	{
 	}
 
@@ -88,9 +88,9 @@ public:
 	};
 
 	RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, bool reusePort, int buffer);
-	~RemoteUDPListener();
+	~RemoteUDPListener() override;
 
-	void run();
+	void run() override;
 	void safeStop();
 
 private:
@@ -165,10 +165,10 @@ public:
 	};
 
 	SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener* pListener);
-	~SyslogParser();
+	~SyslogParser() override;
 
 	void parse(const std::string& line, Poco::Message& message);
-	void run();
+	void run() override;
 	void safeStop();
 
 	static Poco::Message::Priority convert(RemoteSyslogChannel::Severity severity);

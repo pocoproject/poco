@@ -160,7 +160,7 @@ protected:
 	HTTPMessage& operator = (const HTTPMessage& other);
 		/// Assignment operator.
 
-	virtual ~HTTPMessage();
+	~HTTPMessage() override;
 		/// Destroys the HTTPMessage.
 
 private:

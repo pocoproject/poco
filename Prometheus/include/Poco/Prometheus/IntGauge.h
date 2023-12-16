@@ -60,7 +60,7 @@ public:
 		/// Creates a IntGauge with the given name and help text (via params), and
 		/// registers it with the given registry (if not nullptr).
 
-	~IntGauge() = default;
+	~IntGauge() override = default;
 		/// Destroys the IntGauge.
 
 	using Metric::help;

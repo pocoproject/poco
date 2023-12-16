@@ -148,7 +148,7 @@ public:
 		/// scanInterval specifies the interval in seconds between scans
 		/// of the directory.
 
-	~DirectoryWatcher();
+	~DirectoryWatcher() override;
 		/// Destroys the DirectoryWatcher.
 
 	void suspendEvents();
@@ -177,7 +177,7 @@ public:
 protected:
 	void init();
 	void stop();
-	void run();
+	void run() override;
 
 private:
 	DirectoryWatcher();

@@ -40,16 +40,16 @@ public:
 	SMTPChannel(const std::string& mailhost, const std::string& sender, const std::string& recipient);
 		/// Creates a SMTPChannel with the given target mailhost, sender, and recipient.
 
-	void open();
+	void open() override;
 		/// Opens the SMTPChannel.
 
-	void close();
+	void close() override;
 		/// Closes the SMTPChannel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Sends the message's text to the recipient.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
@@ -64,7 +64,7 @@ public:
 		///     * throw:      Boolean value indicating whether to throw
 		///                   exception upon failure.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
 	static void registerChannel();
@@ -80,7 +80,7 @@ public:
 	static const std::string PROP_THROW;
 
 protected:
-	~SMTPChannel();
+	~SMTPChannel() override;
 
 private:
 	bool isTrue(const std::string& value) const;

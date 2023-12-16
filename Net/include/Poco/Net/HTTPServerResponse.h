@@ -47,7 +47,7 @@ public:
 	HTTPServerResponse();
 		/// Creates the HTTPServerResponse.
 
-	~HTTPServerResponse();
+	~HTTPServerResponse() override;
 		/// Destroys the HTTPServerResponse.
 
 	virtual void sendContinue() = 0;

@@ -46,7 +46,7 @@ public:
 		/// Creates a custom ProcessCollector with the given name (prefix)
 		/// and registers it with the given Registry.
 
-	~ProcessCollector() = default;
+	~ProcessCollector() override = default;
 		/// Destroys the ProcessCollector.
 
 	static Poco::Timestamp startTime();

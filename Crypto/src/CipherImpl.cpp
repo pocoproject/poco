@@ -58,22 +58,22 @@ namespace
 			const ByteVec&    iv,
 			Direction         dir);
 
-		~CryptoTransformImpl();
+		~CryptoTransformImpl() override;
 
-		std::size_t blockSize() const;
-		int setPadding(int padding);
-		std::string getTag(std::size_t tagSize);
-		void setTag(const std::string& tag);
+		std::size_t blockSize() const override;
+		int setPadding(int padding) override;
+		std::string getTag(std::size_t tagSize) override;
+		void setTag(const std::string& tag) override;
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize      inputLength,
 			unsigned char*       output,
-			std::streamsize      outputLength);
+			std::streamsize      outputLength) override;
 
 		std::streamsize finalize(
 			unsigned char*  output,
-			std::streamsize length);
+			std::streamsize length) override;
 
 	private:
 		const EVP_CIPHER* _pCipher;

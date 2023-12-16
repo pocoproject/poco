@@ -57,11 +57,11 @@ public:
 	{
 	}
 
-	virtual ~StringPart()
+	~StringPart() override
 	{
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		out << _content;
 	}
@@ -88,7 +88,7 @@ public:
 	{
 	}
 
-	virtual ~MultiPart()
+	~MultiPart() override
 	{
 	}
 
@@ -97,7 +97,7 @@ public:
 		_parts.push_back(part);
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		for (const auto& p: _parts)
 		{
@@ -117,11 +117,11 @@ public:
 	{
 	}
 
-	virtual ~EchoPart()
+	~EchoPart() override
 	{
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		Query query(data);
 		Var value = query.find(_query);
@@ -188,11 +188,11 @@ public:
 	{
 	}
 
-	virtual ~LogicExistQuery()
+	~LogicExistQuery() override
 	{
 	}
 
-	virtual bool apply(const Var& data) const
+	bool apply(const Var& data) const override
 	{
 		Query query(data);
 		Var value = query.find(_queryString);
@@ -209,11 +209,11 @@ public:
 	{
 	}
 
-	virtual ~LogicElseQuery()
+	~LogicElseQuery() override
 	{
 	}
 
-	virtual bool apply(const Var& data) const
+	bool apply(const Var& data) const override
 	{
 		return true;
 	}
@@ -227,7 +227,7 @@ public:
 	{
 	}
 
-	virtual ~LogicPart()
+	~LogicPart() override
 	{
 	}
 
@@ -237,13 +237,13 @@ public:
 		_queries.push_back(query);
 	}
 
-	void addPart(Part* part)
+	void addPart(Part* part) override
 	{
 		MultiPart::addPart(part);
 		_queries.push_back(new LogicElseQuery());
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		int count = 0;
 		for (auto it = _queries.begin(); it != _queries.end(); ++it, ++count)
@@ -268,11 +268,11 @@ public:
 	{
 	}
 
-	virtual ~LoopPart()
+	~LoopPart() override
 	{
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		Query query(data);
 
@@ -322,11 +322,11 @@ public:
 		}
 	}
 
-	virtual ~IncludePart()
+	~IncludePart() override
 	{
 	}
 
-	void render(const Var& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const override
 	{
 		TemplateCache* cache = TemplateCache::instance();
 		if (cache == nullptr)

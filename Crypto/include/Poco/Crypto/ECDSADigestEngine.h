@@ -55,17 +55,17 @@ public:
 		///
 		/// Throws a Poco::NotFoundException if no algorithm with the given name exists.
 
-	~ECDSADigestEngine();
+	~ECDSADigestEngine() override;
 		/// Destroys the ECDSADigestEngine.
 
-	std::size_t digestLength() const;
+	std::size_t digestLength() const override;
 		/// Returns the length of the digest in bytes.
 
-	void reset();
+	void reset() override;
 		/// Resets the engine so that a new
 		/// digest can be computed.
 
-	const DigestEngine::Digest& digest();
+	const DigestEngine::Digest& digest() override;
 		/// Finishes the computation of the digest
 		/// (the first time it's called) and
 		/// returns the message digest.
@@ -85,7 +85,7 @@ public:
 		/// Returns true if the signature can be verified, false otherwise.
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void* data, std::size_t length) override;
 
 private:
 	ECKey _key;

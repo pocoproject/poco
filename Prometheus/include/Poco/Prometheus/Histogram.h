@@ -130,7 +130,7 @@ public:
 		/// Creates a Histogram with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Histogram() = default;
+	~Histogram() override = default;
 		/// Destroys the Histogram.
 
 	using Metric::help;

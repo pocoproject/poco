@@ -24,7 +24,7 @@ public:
 	Page();
 		/// Creates a Page.
 
-	~Page();
+	~Page() override;
 		/// Destroys the Page.
 
 	std::stringstream& headerDecls();

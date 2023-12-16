@@ -42,26 +42,26 @@ public:
 	}
 
 protected:
-	void initialize(Application& self)
+	void initialize(Application& self) override
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		// add your own initialization code here
 	}
 
-	void uninitialize()
+	void uninitialize() override
 	{
 		// add your own uninitialization code here
 		Application::uninitialize();
 	}
 
-	void reinitialize(Application& self)
+	void reinitialize(Application& self) override
 	{
 		Application::reinitialize(self);
 		// add your own reinitialization code here
 	}
 
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& options) override
 	{
 		Application::defineOptions(options);
 
@@ -268,7 +268,7 @@ protected:
 			return "application/binary";
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const std::vector<std::string>& args) override
 	{
 		if (!_helpRequested)
 		{

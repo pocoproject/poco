@@ -48,7 +48,7 @@ public:
 		/// Creates the MailStreamBuf and connects it
 		/// to the given output stream.
 
-	~MailStreamBuf();
+	~MailStreamBuf() override;
 		/// Destroys the MailStreamBuf.
 
 	void close();
@@ -56,8 +56,8 @@ public:
 		/// CR-LF.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 	int readOne();
 
 private:
@@ -94,7 +94,7 @@ public:
 		/// Creates the MailIOS and connects it
 		/// to the given output stream.
 
-	~MailIOS();
+	~MailIOS() override;
 		/// Destroys the stream.
 
 	void close();
@@ -120,7 +120,7 @@ public:
 		/// Creates the MailInputStream and connects it
 		/// to the given input stream.
 
-	~MailInputStream();
+	~MailInputStream() override;
 		/// Destroys the MailInputStream.
 };
 
@@ -135,7 +135,7 @@ public:
 		/// Creates the MailOutputStream and connects it
 		/// to the given input stream.
 
-	~MailOutputStream();
+	~MailOutputStream() override;
 		/// Destroys the MailOutputStream.
 };
 

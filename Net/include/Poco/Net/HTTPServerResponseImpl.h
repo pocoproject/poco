@@ -45,14 +45,14 @@ public:
 	HTTPServerResponseImpl(HTTPServerSession& session);
 		/// Creates the HTTPServerResponseImpl.
 
-	~HTTPServerResponseImpl();
+	~HTTPServerResponseImpl() override;
 		/// Destroys the HTTPServerResponseImpl.
 
-	void sendContinue();
+	void sendContinue() override;
 		/// Sends a 100 Continue response to the
 		/// client.
 
-	std::ostream& send();
+	std::ostream& send() override;
 		/// Sends the response header to the client and
 		/// returns an output stream for sending the
 		/// response body.
@@ -63,7 +63,7 @@ public:
 		/// Must not be called after sendFile(), sendBuffer()
 		/// or redirect() has been called.
 
-	void sendFile(const std::string& path, const std::string& mediaType);
+	void sendFile(const std::string& path, const std::string& mediaType) override;
 		/// Sends the response header to the client, followed
 		/// by the content of the given file.
 		///
@@ -74,7 +74,7 @@ public:
 		/// cannot be found, or an OpenFileException if
 		/// the file cannot be opened.
 
-	void sendBuffer(const void* pBuffer, std::size_t length);
+	void sendBuffer(const void* pBuffer, std::size_t length) override;
 		/// Sends the response header to the client, followed
 		/// by the contents of the given buffer.
 		///
@@ -88,7 +88,7 @@ public:
 		/// Must not be called after send(), sendFile()
 		/// or redirect() has been called.
 
-	void redirect(const std::string& uri, HTTPStatus status = HTTP_FOUND);
+	void redirect(const std::string& uri, HTTPStatus status = HTTP_FOUND) override;
 		/// Sets the status code, which must be one of
 		/// HTTP_MOVED_PERMANENTLY (301), HTTP_FOUND (302),
 		/// or HTTP_SEE_OTHER (303),
@@ -98,12 +98,12 @@ public:
 		///
 		/// Must not be called after send() has been called.
 
-	void requireAuthentication(const std::string& realm);
+	void requireAuthentication(const std::string& realm) override;
 		/// Sets the status code to 401 (Unauthorized)
 		/// and sets the "WWW-Authenticate" header field
 		/// according to the given realm.
 
-	bool sent() const;
+	bool sent() const override;
 		/// Returns true if the response (header) has been sent.
 
 protected:

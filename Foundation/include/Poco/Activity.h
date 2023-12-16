@@ -89,7 +89,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	~Activity()
+	~Activity() override
 		/// Stops and destroys the activity.
 	{
 		try
@@ -172,7 +172,7 @@ public:
 	}
 
 protected:
-	void run()
+	void run() override
 	{
 		try
 		{

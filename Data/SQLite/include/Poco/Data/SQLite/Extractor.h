@@ -51,31 +51,31 @@ public:
 	Extractor(sqlite3_stmt* pStmt);
 		/// Creates the Extractor.
 
-	~Extractor();
+	~Extractor() override;
 		/// Destroys the Extractor.
 
-	bool extract(std::size_t pos, Poco::Int8& val);
+	bool extract(std::size_t pos, Poco::Int8& val) override;
 		/// Extracts an Int8.
 
-	bool extract(std::size_t pos, Poco::UInt8& val);
+	bool extract(std::size_t pos, Poco::UInt8& val) override;
 		/// Extracts an UInt8.
 
-	bool extract(std::size_t pos, Poco::Int16& val);
+	bool extract(std::size_t pos, Poco::Int16& val) override;
 		/// Extracts an Int16.
 
-	bool extract(std::size_t pos, Poco::UInt16& val);
+	bool extract(std::size_t pos, Poco::UInt16& val) override;
 		/// Extracts an UInt16.
 
-	bool extract(std::size_t pos, Poco::Int32& val);
+	bool extract(std::size_t pos, Poco::Int32& val) override;
 		/// Extracts an Int32.
 
-	bool extract(std::size_t pos, Poco::UInt32& val);
+	bool extract(std::size_t pos, Poco::UInt32& val) override;
 		/// Extracts an UInt32.
 
-	bool extract(std::size_t pos, Poco::Int64& val);
+	bool extract(std::size_t pos, Poco::Int64& val) override;
 		/// Extracts an Int64.
 
-	bool extract(std::size_t pos, Poco::UInt64& val);
+	bool extract(std::size_t pos, Poco::UInt64& val) override;
 		/// Extracts an UInt64.
 
 #ifndef POCO_INT64_IS_LONG
@@ -86,46 +86,46 @@ public:
 		/// Extracts an unsigned long.
 #endif
 
-	bool extract(std::size_t pos, bool& val);
+	bool extract(std::size_t pos, bool& val) override;
 		/// Extracts a boolean.
 
-	bool extract(std::size_t pos, float& val);
+	bool extract(std::size_t pos, float& val) override;
 		/// Extracts a float.
 
-	bool extract(std::size_t pos, double& val);
+	bool extract(std::size_t pos, double& val) override;
 		/// Extracts a double.
 
-	bool extract(std::size_t pos, char& val);
+	bool extract(std::size_t pos, char& val) override;
 		/// Extracts a single character.
 
-	bool extract(std::size_t pos, std::string& val);
+	bool extract(std::size_t pos, std::string& val) override;
 		/// Extracts a string.
 
-	bool extract(std::size_t pos, Poco::Data::BLOB& val);
+	bool extract(std::size_t pos, Poco::Data::BLOB& val) override;
 		/// Extracts a BLOB.
 
-	bool extract(std::size_t pos, Poco::Data::CLOB& val);
+	bool extract(std::size_t pos, Poco::Data::CLOB& val) override;
 		/// Extracts a CLOB.
 
-	bool extract(std::size_t pos, Poco::Data::Date& val);
+	bool extract(std::size_t pos, Poco::Data::Date& val) override;
 		/// Extracts a Date.
 
-	bool extract(std::size_t pos, Poco::Data::Time& val);
+	bool extract(std::size_t pos, Poco::Data::Time& val) override;
 		/// Extracts a Time.
 
-	bool extract(std::size_t pos, Poco::DateTime& val);
+	bool extract(std::size_t pos, Poco::DateTime& val) override;
 		/// Extracts a DateTime.
 
-	bool extract(std::size_t pos, Poco::UUID& val);
+	bool extract(std::size_t pos, Poco::UUID& val) override;
 		/// Extracts a Time.
 
-	bool extract(std::size_t pos, Poco::Any& val);
+	bool extract(std::size_t pos, Poco::Any& val) override;
 		/// Extracts an Any.
 
-	bool extract(std::size_t pos, Poco::DynamicAny& val);
+	bool extract(std::size_t pos, Poco::DynamicAny& val) override;
 		/// Extracts a DynamicAny.
 
-	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW);
+	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW) override;
 		/// Returns true if the current row value at pos column is null.
 		/// Because of the loss of information about null-ness of the
 		/// underlying database values due to the nature of SQLite engine,
@@ -141,7 +141,7 @@ public:
 		/// The row argument, needed for connectors with bulk capabilities,
 		/// is ignored in this implementation.
 
-	void reset();
+	void reset() override;
 		/// Clears the cached nulls indicator vector.
 
 private:

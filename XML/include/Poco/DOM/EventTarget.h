@@ -66,7 +66,7 @@ public:
 		/// which dispatchEvent is called.
 
 protected:
-	virtual ~EventTarget();
+	~EventTarget() override;
 };
 
 

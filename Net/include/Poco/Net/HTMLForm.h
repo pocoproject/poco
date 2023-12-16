@@ -82,7 +82,7 @@ public:
 		/// For POST requests, you must use one of the constructors
 		/// taking an additional input stream for the request body.
 
-	~HTMLForm();
+	~HTMLForm() override;
 		/// Destroys the HTMLForm.
 
 	void setEncoding(const std::string& encoding);
