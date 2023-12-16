@@ -439,7 +439,7 @@ void Template::parse(std::istream& in)
 		}
 		else if (command.compare("else") == 0)
 		{
-			if (_partStack.size() == 0)
+			if (_partStack.empty())
 			{
 				throw JSONTemplateException("Unexpected <? else ?> found");
 			}
@@ -461,7 +461,7 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Missing query in <? " + command + " ?>");
 			}
 
-			if (_partStack.size() == 0)
+			if (_partStack.empty())
 			{
 				throw JSONTemplateException("Unexpected <? elsif / elif ?> found");
 			}

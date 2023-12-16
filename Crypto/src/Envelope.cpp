@@ -123,7 +123,7 @@ const Envelope::ByteVec& Envelope::seal(const std::string& plainText)
 
 Envelope::ByteVec Envelope::open(const EVPPKey& privKey, const ByteVec& encKey, const ByteVec& iv)
 {
-	if (iv.size() > 0) _iv = iv;
+	if (!iv.empty()) _iv = iv;
 	int encContentLen = static_cast<int>(_encContent.size());
 	int blockSz = blockSize();
 	int mod = encContentLen % blockSz;

@@ -535,7 +535,7 @@ unsigned IPAddress::prefixLength() const
 std::string& IPAddress::compressV6(std::string& v6addr)
 {
 	// get rid of leading zeros at the beginning
-	while (v6addr.size() && v6addr[0] == '0') v6addr.erase(v6addr.begin());
+	while (!v6addr.empty() && v6addr[0] == '0') v6addr.erase(v6addr.begin());
 
 	// get rid of leading zeros in the middle
 	while (v6addr.find(":0") != std::string::npos)

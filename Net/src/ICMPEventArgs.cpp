@@ -121,7 +121,7 @@ void ICMPEventArgs::setError(int index, const std::string& text)
 
 const std::string& ICMPEventArgs::error(int index) const
 {
-	if (0 == _errors.size())
+	if (_errors.empty())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	if (-1 == index) index = _sent - 1;
@@ -140,7 +140,7 @@ void ICMPEventArgs::setReplyTime(int index, int time)
 
 int ICMPEventArgs::replyTime(int index) const
 {
-	if (0 == _rtt.size())
+	if (_rtt.empty())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 
 	if (-1 == index) index = _sent - 1;
@@ -152,7 +152,7 @@ int ICMPEventArgs::replyTime(int index) const
 
 int ICMPEventArgs::avgRTT() const
 {
-	if (0 == _rtt.size()) return 0;
+	if (_rtt.empty()) return 0;
 
 	int avg = 0, cnt = 0;
 	for (const auto& r : _rtt)
@@ -169,7 +169,7 @@ int ICMPEventArgs::avgRTT() const
 
 float ICMPEventArgs::percent() const
 {
-	if (0 == _rtt.size()) return 0;
+	if (_rtt.empty()) return 0;
 
 	return ((float) received() / (float) _rtt.size()) * (float) 100.0;
 }

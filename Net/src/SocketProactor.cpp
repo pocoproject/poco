@@ -291,7 +291,7 @@ int SocketProactor::poll(int* pHandled)
 	int handled = 0;
 	int worked = 0;
 	PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
-	if (sm.size() > 0)
+	if (!sm.empty())
 	{
 		auto it = sm.begin();
 		auto end = sm.end();
@@ -493,7 +493,7 @@ int SocketProactor::send(Socket& sock)
 void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 {
 	Buffer* pBuf = (*it)->_pBuf;
-	if (pBuf && pBuf->size())
+	if (pBuf && !pBuf->empty())
 	{
 		SocketAddress *pAddr = (*it)->_pAddr;
 		int n = 0, err = 0;
@@ -522,7 +522,7 @@ void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 {
 	Buffer* pBuf = (*it)->_pBuf;
-	if (pBuf && pBuf->size())
+	if (pBuf && !pBuf->empty())
 	{
 		int n = 0, err = 0;
 		try
@@ -572,7 +572,7 @@ int SocketProactor::receive(Socket& sock)
 			handlers.pop_front();
 			// end iterator is invalidated when the last member
 			// is removed, so make sure we don't check for it
-			if (handlers.size() == 0) break;
+			if (handlers.empty()) break;
 		}
 		else break;
 	}
@@ -682,7 +682,7 @@ void SocketProactor::run()
 
 bool SocketProactor::hasSocketHandlers() const
 {
-	if (_readHandlers.size() || _writeHandlers.size())
+	if (!_readHandlers.empty() || !_writeHandlers.empty())
 		return true;
 	return false;
 }

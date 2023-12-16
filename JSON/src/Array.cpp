@@ -201,7 +201,7 @@ void Array::resetDynArray() const
 
 Array::operator const Poco::Dynamic::Array& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynArray();
 	}

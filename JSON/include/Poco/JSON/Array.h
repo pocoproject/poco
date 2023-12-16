@@ -377,7 +377,7 @@ public:
 
 	void convert(bool& value) const override
 	{
-		value = !_val.isNull() && _val->size() > 0;
+		value = !_val.isNull() && !_val->empty();
 	}
 
 	void convert(float&) const override
@@ -511,7 +511,7 @@ public:
 
 	void convert(bool& value) const override
 	{
-		value = _val.size() > 0;
+		value = !_val.empty();
 	}
 
 	void convert(float&) const override

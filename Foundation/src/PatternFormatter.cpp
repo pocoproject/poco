@@ -194,7 +194,7 @@ void PatternFormatter::parsePattern()
 			endAct.prepend += *it++;
 		}
 	}
-	if (endAct.prepend.size())
+	if (!endAct.prepend.empty())
 	{
 		_patternActions.push_back(endAct);
 	}

@@ -152,7 +152,7 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 
 	ResponseMessage response;
 	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		Document::Ptr pDoc = response.documents()[0];
 		if (pDoc->getInteger("ok") != 1) return false;
@@ -177,7 +177,7 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 		.add<std::string>("key", key);
 
 	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		Document::Ptr pDoc = response.documents()[0];
 		return pDoc->getInteger("ok") == 1;
@@ -204,7 +204,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	Int32 conversationId = 0;
 	std::string serverFirstMsg;
 
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		Document::Ptr pDoc = response.documents()[0];
 		if (pDoc->getInteger("ok") == 1)
@@ -260,7 +260,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 
 	std::string serverSecondMsg;
 	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		Document::Ptr pDoc = response.documents()[0];
 		if (pDoc->getInteger("ok") == 1)
@@ -293,7 +293,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 		.add<Binary::Ptr>("payload", new Binary);
 
 	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		Document::Ptr pDoc = response.documents()[0];
 		return pDoc->getInteger("ok") == 1;
@@ -312,7 +312,7 @@ Document::Ptr Database::queryBuildInfo(Connection& connection) const
 	connection.sendRequest(*request, response);
 
 	Document::Ptr buildInfo;
-	if ( response.documents().size() > 0 )
+	if ( !response.documents().empty() )
 	{
 		buildInfo = response.documents()[0];
 	}
@@ -334,7 +334,7 @@ Document::Ptr Database::queryServerHello(Connection& connection) const
 	connection.sendRequest(*request, response);
 
 	Document::Ptr hello;
-	if ( response.documents().size() > 0 )
+	if ( !response.documents().empty() )
 	{
 		hello = response.documents()[0];
 	}
@@ -353,7 +353,7 @@ Int64 Database::count(Connection& connection, const std::string& collectionName)
 	Poco::MongoDB::ResponseMessage response;
 	connection.sendRequest(*countRequest, response);
 
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
 		return doc->getInteger("n");
@@ -409,7 +409,7 @@ Document::Ptr Database::getLastErrorDoc(Connection& connection) const
 	Poco::MongoDB::ResponseMessage response;
 	connection.sendRequest(*request, response);
 
-	if (response.documents().size() > 0)
+	if (!response.documents().empty())
 	{
 		errorDoc = response.documents()[0];
 	}

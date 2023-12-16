@@ -212,7 +212,7 @@ Row& RecordSet::row(std::size_t pos)
 	std::size_t columns = columnCount();
 	if (it == _rowMap.end())
 	{
-		if (_rowMap.size())
+		if (!_rowMap.empty())
 		{
 			//reuse first row column names and sorting fields to save some memory
 			pRow = new Row(_rowMap.begin()->second->names(),
@@ -244,7 +244,7 @@ Row& RecordSet::row(std::size_t pos)
 
 std::size_t RecordSet::rowCount() const
 {
-	if (extractions().size() == 0) return 0;
+	if (extractions().empty()) return 0;
 
 	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;

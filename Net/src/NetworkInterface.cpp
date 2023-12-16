@@ -883,7 +883,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 
 		using List = NetworkInterface::AddressList;
 		const List& ipList = it->second.addressList();
-		if (ipList.size() > 0)
+		if (!ipList.empty())
 		{
 			List::const_iterator ipIt = ipList.begin();
 			List::const_iterator ipEnd = ipList.end();

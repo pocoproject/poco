@@ -249,7 +249,7 @@ void Object::resetDynStruct() const
 
 Object::operator const Poco::DynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pStruct);
 	}
@@ -281,7 +281,7 @@ Object::operator const Poco::DynamicStruct& () const
 
 Object::operator const Poco::OrderedDynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pOrdStruct);
 	}

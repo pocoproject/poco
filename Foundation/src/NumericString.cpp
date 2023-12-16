@@ -122,7 +122,7 @@ void insertThousandSep(std::string& str, char thSep, char decSep = '.')
 	/// Used only internally.
 {
 	poco_assert (decSep != thSep);
-	if (str.size() == 0) return;
+	if (str.empty()) return;
 
 	std::string::size_type exPos = str.find('e');
 	if (exPos == std::string::npos) exPos = str.find('E');

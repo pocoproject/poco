@@ -143,7 +143,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 			return static_cast<int>(length);
 		}
 	}
-	if (_buffer.size() > 0)
+	if (!_buffer.empty())
 	{
 		// always treat each write as the potential last one
 		// thus first fill the buffer with the last n bytes of the msg

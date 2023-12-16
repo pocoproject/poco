@@ -83,7 +83,7 @@ inline std::size_t ResponseMessage::count() const
 
 inline bool ResponseMessage::empty() const
 {
-	return _documents.size() == 0;
+	return _documents.empty();
 }
 
 
@@ -101,7 +101,7 @@ inline Document::Vector& ResponseMessage::documents()
 
 inline bool ResponseMessage::hasDocuments() const
 {
-	return _documents.size() > 0;
+	return !_documents.empty();
 }
 
 

@@ -224,7 +224,7 @@ bool Statement::hasType(Parser::StatementType type) const
 
 void Statement::formatQuery()
 {
-	if (_arguments.size())
+	if (!_arguments.empty())
 	{
 		_pImpl->formatSQL(_arguments);
 		_arguments.clear();
@@ -426,8 +426,8 @@ Statement& Statement::operator , (const Bulk& bulk)
 	if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-	if (0 == _pImpl->extractions().size() &&
-		0 == _pImpl->bindings().size() &&
+	if (_pImpl->extractions().empty() &&
+		_pImpl->bindings().empty() &&
 		_pImpl->bulkExtractionAllowed() &&
 		_pImpl->bulkBindingAllowed())
 	{

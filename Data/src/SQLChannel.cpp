@@ -202,7 +202,7 @@ size_t SQLChannel::logSync()
 bool SQLChannel::processOne(int minBatch)
 {
 	bool ret = false;
-	if (_logQueue.size())
+	if (!_logQueue.empty())
 	{
 		Notification::Ptr pN = _logQueue.dequeueNotification();
 		LogNotification::Ptr pLN = pN.cast<LogNotification>();
@@ -273,7 +273,7 @@ void SQLChannel::stop()
 		_reconnect = false;
 		_stop = true;
 		_pDBThread->join();
-		while (_logQueue.size())
+		while (!_logQueue.empty())
 			processOne();
 	}
 }
@@ -629,7 +629,7 @@ std::size_t SQLChannel::wait(int ms)
 	Stopwatch sw;
 	sw.start();
 	int processed = _logQueue.size();
-	while (_logQueue.size())
+	while (!_logQueue.empty())
 	{
 		Thread::sleep(10);
 		if (ms && sw.elapsed() * 1000 > ms)

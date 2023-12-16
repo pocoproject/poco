@@ -90,7 +90,7 @@ void Parser::startElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLS
 
 void Parser::endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname)
 {
-	poco_assert (_elemStack.size() > 0);
+	poco_assert (!_elemStack.empty());
 
 	if (qname == "class")
 	{

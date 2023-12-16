@@ -235,7 +235,7 @@ void Row::replaceSortField(const std::string& oldName, const std::string& newNam
 void Row::resetSort()
 {
 	_pSortMap->clear();
-	if (_values.size())	addSortField(0);
+	if (!_values.empty())	addSortField(0);
 }
 
 

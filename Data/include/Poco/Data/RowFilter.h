@@ -194,7 +194,7 @@ inline bool RowFilter::has(Ptr pFilter) const
 
 inline bool RowFilter::isEmpty() const
 {
-	return _comparisonMap.size() == 0;
+	return _comparisonMap.empty();
 }
 
 

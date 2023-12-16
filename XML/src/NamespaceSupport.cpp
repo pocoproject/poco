@@ -40,7 +40,7 @@ NamespaceSupport::~NamespaceSupport()
 
 bool NamespaceSupport::declarePrefix(const XMLString& prefix, const XMLString& namespaceURI)
 {
-	poco_assert (_contexts.size() > 0);
+	poco_assert (!_contexts.empty());
 
 	Context& ctx = _contexts.back();
 	if (ctx.find(prefix) == ctx.end())

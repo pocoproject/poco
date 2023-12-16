@@ -64,7 +64,7 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 		ResponseMessage response;
 		conn->sendRequest(request, response);
 
-		if (response.documents().size() > 0)
+		if (!response.documents().empty())
 		{
 			Document::Ptr doc = response.documents()[0];
 			if (doc->get<bool>("ismaster"))

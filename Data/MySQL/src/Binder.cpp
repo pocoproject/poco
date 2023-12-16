@@ -232,7 +232,7 @@ std::size_t Binder::size() const
 
 MYSQL_BIND* Binder::getBindArray() const
 {
-	if (_bindArray.size() == 0)
+	if (_bindArray.empty())
 	{
 		return nullptr;
 	}

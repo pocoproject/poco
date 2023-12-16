@@ -125,7 +125,7 @@ std::string RedisInputStream::getline()
 {
 	std::string line;
 	std::getline(*this, line);
-	if ( line.size() > 0 ) line.erase(line.end() - 1);
+	if ( !line.empty() ) line.erase(line.end() - 1);
 	return line;
 }
 

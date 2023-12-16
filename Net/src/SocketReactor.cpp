@@ -121,7 +121,7 @@ void SocketReactor::run()
 						ErrorHandler::handle();
 					}
 				}
-				if (0 == sm.size())
+				if (sm.empty())
 				{
 					onTimeout();
 					if (_params.throttle && _params.pollTimeout == 0)

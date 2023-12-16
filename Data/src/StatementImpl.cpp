@@ -128,7 +128,7 @@ void StatementImpl::assignSubTotal(bool reset)
 		CountVec::iterator end = _subTotalRowCount.end();
 		for (int counter = 0; it != end; ++it, ++counter)
 		{
-			if (_extractors[counter].size())
+			if (!_extractors[counter].empty())
 			{
 				if (reset)
 					*it = CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
@@ -202,7 +202,7 @@ void StatementImpl::compile()
 		compileImpl();
 		_state = ST_COMPILED;
 
-		if (!extractions().size() && !isStoredProcedure())
+		if (extractions().empty() && !isStoredProcedure())
 		{
 			std::size_t cols = columnsReturned();
 			if (cols) makeExtractors(cols);
@@ -456,7 +456,7 @@ void StatementImpl::removeBind(const std::string& name)
 std::size_t StatementImpl::columnsExtracted(int dataSet) const
 {
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
-	if (_columnsExtracted.size() > 0)
+	if (!_columnsExtracted.empty())
 	{
 		poco_assert (dataSet >= 0 && dataSet < _columnsExtracted.size());
 		return _columnsExtracted[dataSet];
@@ -469,10 +469,10 @@ std::size_t StatementImpl::columnsExtracted(int dataSet) const
 std::size_t StatementImpl::rowsExtracted(int dataSet) const
 {
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
-	if (extractions().size() > 0)
+	if (!extractions().empty())
 	{
 		poco_assert (dataSet >= 0 && dataSet < _extractors.size());
-		if (_extractors[dataSet].size() > 0)
+		if (!_extractors[dataSet].empty())
 			return _extractors[dataSet][0]->numOfRowsHandled();
 	}
 
@@ -483,7 +483,7 @@ std::size_t StatementImpl::rowsExtracted(int dataSet) const
 std::size_t StatementImpl::subTotalRowCount(int dataSet) const
 {
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
-	if (_subTotalRowCount.size() > 0)
+	if (!_subTotalRowCount.empty())
 	{
 		poco_assert (dataSet >= 0 && dataSet < _subTotalRowCount.size());
 		return _subTotalRowCount[dataSet];
