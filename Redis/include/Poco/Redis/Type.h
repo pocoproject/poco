@@ -199,7 +199,7 @@ struct RedisTypeTraits<BulkString>
 		}
 		else
 		{
-			std::string s = value.value();
+			const std::string& s = value.value();
 			return marker
 				+ NumberFormatter::format(s.length())
 				+ LineEnding::NEWLINE_CRLF
