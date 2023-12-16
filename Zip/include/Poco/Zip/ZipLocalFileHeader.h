@@ -58,7 +58,7 @@ public:
 
 	int getMinorVersionNumber() const;
 
-	void getRequiredVersion(int& major, int& minor);
+	void getRequiredVersion(int& major, int& minor) const;
 		/// The minimum version required to extract the data
 
 	Poco::UInt32 getHeaderSize() const;
@@ -246,7 +246,7 @@ inline int ZipLocalFileHeader::getMinorVersionNumber() const
 }
 
 
-inline void ZipLocalFileHeader::getRequiredVersion(int& major, int& minor)
+inline void ZipLocalFileHeader::getRequiredVersion(int& major, int& minor) const
 {
 	major = getMajorVersionNumber();
 	minor = getMinorVersionNumber();

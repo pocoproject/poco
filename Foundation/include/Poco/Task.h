@@ -113,7 +113,7 @@ protected:
 		///
 		/// A Task should use this method in favor of Thread::sleep().
 
-	bool yield();
+	bool yield() const;
 		/// Yields cpu to other threads
 		///
 		/// If the task is cancelled while it is suspended,

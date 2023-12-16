@@ -135,7 +135,7 @@ public:
 		}
 	}
 
-	bool isSessionAlgorithm() {
+	bool isSessionAlgorithm() const {
 		return _isSessionAlgorithm;
 	}
 private:

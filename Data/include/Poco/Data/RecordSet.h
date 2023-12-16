@@ -336,16 +336,16 @@ public:
 		///
 		/// Does not remove the associated RowFilter or RowFormatter.
 
-	Poco::Dynamic::Var value(const std::string& name);
+	Poco::Dynamic::Var value(const std::string& name) const;
 		/// Returns the value in the named column of the current row.
 
-	Poco::Dynamic::Var value(std::size_t index);
+	Poco::Dynamic::Var value(std::size_t index) const;
 		/// Returns the value in the given column of the current row.
 
-	Poco::Dynamic::Var operator [] (const std::string& name);
+	Poco::Dynamic::Var operator [] (const std::string& name) const;
 		/// Returns the value in the named column of the current row.
 
-	Poco::Dynamic::Var operator [] (std::size_t index);
+	Poco::Dynamic::Var operator [] (std::size_t index) const;
 		/// Returns the value in the named column of the current row.
 
 	MetaColumn::ColumnDataType columnType(std::size_t pos) const;
@@ -558,25 +558,25 @@ inline RecordSet& RecordSet::operator = (const RecordSet& other)
 }
 
 
-inline Poco::Dynamic::Var RecordSet::value(const std::string& name)
+inline Poco::Dynamic::Var RecordSet::value(const std::string& name) const
 {
 	return value(name, _currentRow);
 }
 
 
-inline Poco::Dynamic::Var RecordSet::value(std::size_t index)
+inline Poco::Dynamic::Var RecordSet::value(std::size_t index) const
 {
 	return value(index, _currentRow);
 }
 
 
-inline Poco::Dynamic::Var RecordSet::operator [] (const std::string& name)
+inline Poco::Dynamic::Var RecordSet::operator [] (const std::string& name) const
 {
 	return value(name, _currentRow);
 }
 
 
-inline Poco::Dynamic::Var RecordSet::operator [] (std::size_t index)
+inline Poco::Dynamic::Var RecordSet::operator [] (std::size_t index) const
 {
 	return value(index, _currentRow);
 }

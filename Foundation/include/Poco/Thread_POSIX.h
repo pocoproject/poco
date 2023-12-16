@@ -64,7 +64,7 @@ public:
 	TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
 	std::string getNameImpl() const;
-	std::string getOSThreadNameImpl();
+	std::string getOSThreadNameImpl() const;
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
@@ -110,7 +110,7 @@ private:
 		{
 			return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_key));
 		}
-		void set(ThreadImpl* pThread)
+		void set(ThreadImpl* pThread) const
 		{
 			pthread_setspecific(_key, pThread);
 		}

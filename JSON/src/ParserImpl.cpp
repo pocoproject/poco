@@ -158,7 +158,7 @@ Dynamic::Var ParserImpl::parseImpl(std::istream& json)
 }
 
 
-void ParserImpl::stripComments(std::string& json)
+void ParserImpl::stripComments(std::string& json) const
 {
 	if (_allowComments)
 	{

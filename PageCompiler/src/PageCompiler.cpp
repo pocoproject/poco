@@ -261,7 +261,7 @@ protected:
 		return Application::EXIT_OK;
 	}
 
-	void parse(const std::string& path, Page& page, std::string& clazz)
+	void parse(const std::string& path, Page& page, std::string& clazz) const
 	{
 		FileInputStream srcStream(path);
 		PageReader pageReader(page, path);
@@ -364,7 +364,7 @@ protected:
 		}
 	}
 
-	CodeWriter* createCodeWriter(const Page& page, const std::string& clazz)
+	CodeWriter* createCodeWriter(const Page& page, const std::string& clazz) const
 	{
 		if (_generateOSPCode)
 			return new OSPCodeWriter(page, clazz);

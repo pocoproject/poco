@@ -132,7 +132,7 @@ public:
 protected:
 	bool match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends);
 	bool matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIterator its, const TextIterator& ends);
-	bool matchSet(TextIterator& itp, const TextIterator& endp, int c);
+	bool matchSet(TextIterator& itp, const TextIterator& endp, int c) const;
 	static void collect(const Path& pathPattern, const Path& base, const Path& current, const std::string& pattern, std::set<std::string>& files, int options);
 	static bool isDirectory(const Path& path, bool followSymlink);
 

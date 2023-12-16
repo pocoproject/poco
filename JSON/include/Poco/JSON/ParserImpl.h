@@ -100,7 +100,7 @@ private:
 	void handle();
 	void handle(const std::string& json);
 	void handle(std::istream& json);
-	void stripComments(std::string& json);
+	void stripComments(std::string& json) const;
 	bool checkError();
 
 	struct json_stream* _pJSON;

@@ -43,7 +43,7 @@ public:
 			throw Poco::SystemException("cannot create TLS key for mysql cleanup");
 	}
 
-	void init()
+	void init() const
 	{
 		if (pthread_setspecific(_key, reinterpret_cast<void*>(1)))
 			throw Poco::SystemException("cannot set TLS key for mysql cleanup");

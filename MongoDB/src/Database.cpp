@@ -144,7 +144,7 @@ bool Database::authenticate(Connection& connection, const std::string& username,
 }
 
 
-bool Database::authCR(Connection& connection, const std::string& username, const std::string& password)
+bool Database::authCR(Connection& connection, const std::string& username, const std::string& password) const
 {
 	std::string nonce;
 	Poco::SharedPtr<QueryRequest> pCommand = createCommand();
@@ -186,7 +186,7 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 }
 
 
-bool Database::authSCRAM(Connection& connection, const std::string& username, const std::string& password)
+bool Database::authSCRAM(Connection& connection, const std::string& username, const std::string& password) const
 {
 	std::string clientNonce(createNonce());
 	std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);

@@ -161,7 +161,7 @@ void ProcessRunner::stop()
 }
 
 
-void ProcessRunner::checkTimeout(const Stopwatch& sw, const std::string& msg)
+void ProcessRunner::checkTimeout(const Stopwatch& sw, const std::string& msg) const
 {
 	if (sw.elapsedSeconds() > _timeout)
 	{

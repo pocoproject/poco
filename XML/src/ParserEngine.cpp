@@ -375,7 +375,7 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 }
 
 
-std::streamsize ParserEngine::readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize)
+std::streamsize ParserEngine::readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize) const
 {
 	if (_enablePartialReads)
 	{
@@ -395,7 +395,7 @@ std::streamsize ParserEngine::readBytes(XMLByteInputStream& istr, char* pBuffer,
 }
 
 
-std::streamsize ParserEngine::readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize)
+std::streamsize ParserEngine::readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize) const
 {
 	if (_enablePartialReads)
 	{

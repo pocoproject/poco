@@ -29,7 +29,7 @@ TraverseBase::TraverseBase(DepthFun depthDeterminer, UInt16 maxDepth):
 }
 
 
-inline bool TraverseBase::isFiniteDepth()
+inline bool TraverseBase::isFiniteDepth() const
 {
 	return _maxDepth != D_INFINITE;
 }

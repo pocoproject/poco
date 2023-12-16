@@ -1214,7 +1214,7 @@ void SocketImpl::initSocket(int af, int type, int proto)
 }
 
 
-void SocketImpl::ioctl(poco_ioctl_request_t request, int& arg)
+void SocketImpl::ioctl(poco_ioctl_request_t request, int& arg) const
 {
 #if defined(_WIN32)
 	int rc = ioctlsocket(_sockfd, request, reinterpret_cast<u_long*>(&arg));
@@ -1227,7 +1227,7 @@ void SocketImpl::ioctl(poco_ioctl_request_t request, int& arg)
 }
 
 
-void SocketImpl::ioctl(poco_ioctl_request_t request, void* arg)
+void SocketImpl::ioctl(poco_ioctl_request_t request, void* arg) const
 {
 #if defined(_WIN32)
 	int rc = ioctlsocket(_sockfd, request, reinterpret_cast<u_long*>(arg));
@@ -1241,7 +1241,7 @@ void SocketImpl::ioctl(poco_ioctl_request_t request, void* arg)
 
 
 #if defined(POCO_OS_FAMILY_UNIX)
-int SocketImpl::fcntl(poco_fcntl_request_t request)
+int SocketImpl::fcntl(poco_fcntl_request_t request) const
 {
 	int rc = ::fcntl(_sockfd, request);
 	if (rc == -1) error();
@@ -1249,7 +1249,7 @@ int SocketImpl::fcntl(poco_fcntl_request_t request)
 }
 
 
-int SocketImpl::fcntl(poco_fcntl_request_t request, long arg)
+int SocketImpl::fcntl(poco_fcntl_request_t request, long arg) const
 {
 	int rc = ::fcntl(_sockfd, request, arg);
 	if (rc == -1) error();
@@ -1433,7 +1433,7 @@ Poco::Int64 _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, Poco::UInt64 o
 	return sent;
 }
 
-Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset)
+Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset) const
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
 	Poco::UInt64 fileSize = fileInputStream.size();

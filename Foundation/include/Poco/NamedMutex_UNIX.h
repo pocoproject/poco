@@ -35,7 +35,7 @@ protected:
 	NamedMutexImpl(std::string  name);
 	~NamedMutexImpl();
 	void lockImpl();
-	bool tryLockImpl();
+	bool tryLockImpl() const;
 	void unlockImpl();
 
 private:

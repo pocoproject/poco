@@ -157,7 +157,7 @@ bool Glob::matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIt
 }
 
 
-bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c)
+bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c) const
 {
 	if (_options & GLOB_CASELESS)
 		c = Unicode::toLower(c);

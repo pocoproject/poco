@@ -152,8 +152,8 @@ public:
 	};
 
 protected:
-	bool authCR(Connection& connection, const std::string& username, const std::string& password);
-	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
+	bool authCR(Connection& connection, const std::string& username, const std::string& password) const;
+	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password) const;
 
 private:
 	std::string _dbname;

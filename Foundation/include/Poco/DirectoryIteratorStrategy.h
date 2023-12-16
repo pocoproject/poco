@@ -42,7 +42,7 @@ public:
 	TraverseBase(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
 protected:
-	bool isFiniteDepth();
+	bool isFiniteDepth() const;
 	bool isDirectory(Poco::File& file);
 
 	DepthFun _depthDeterminer;

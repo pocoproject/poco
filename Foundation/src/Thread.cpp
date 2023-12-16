@@ -195,7 +195,7 @@ void Thread::clearTLS()
 }
 
 
-std::string Thread::makeName()
+std::string Thread::makeName() const
 {
 	std::ostringstream name;
 	name << '#' << _id;

@@ -141,7 +141,7 @@ private:
 		/// Process initialization completion is indicated by new pid in
 		/// the pid file. If pid file is not specified, there is no waiting.
 
-	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg);
+	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg) const;
 		/// If timeout is exceeded, throws TimeoutException with `msg`
 		/// message.
 

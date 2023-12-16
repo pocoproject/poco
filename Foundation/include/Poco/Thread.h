@@ -262,7 +262,7 @@ protected:
 	void clearTLS();
 		/// Clears the thread's local storage.
 
-	std::string makeName();
+	std::string makeName() const;
 		/// Creates a unique name for a thread.
 
 	static int uniqueId();

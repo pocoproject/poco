@@ -127,7 +127,7 @@ void NamedMutexImpl::lockImpl()
 }
 
 
-bool NamedMutexImpl::tryLockImpl()
+bool NamedMutexImpl::tryLockImpl() const
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	return sem_trywait(_sem) == 0;

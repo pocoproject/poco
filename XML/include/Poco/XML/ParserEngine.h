@@ -215,10 +215,10 @@ protected:
 	void parseCharInputStream(XMLCharInputStream& istr);
 		/// Parses an entity from the given stream.
 
-	std::streamsize readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize);
+	std::streamsize readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize) const;
 		/// Reads at most bufferSize bytes from the given stream into the given buffer.
 
-	std::streamsize readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize);
+	std::streamsize readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize) const;
 		/// Reads at most bufferSize chars from the given stream into the given buffer.
 
 	void handleError(int errorNo);

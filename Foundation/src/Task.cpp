@@ -93,7 +93,7 @@ bool Task::sleep(long milliseconds)
 }
 
 
-bool Task::yield()
+bool Task::yield() const
 {
 	Thread::yield();
 	return isCancelled();

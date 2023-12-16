@@ -172,7 +172,7 @@ std::string ThreadImpl::getNameImpl() const
 }
 
 
-std::string ThreadImpl::getOSThreadNameImpl()
+std::string ThreadImpl::getOSThreadNameImpl() const
 {
 	return isRunningImpl() ? getThreadName() : "";
 }
