@@ -52,7 +52,7 @@ public:
 	void swap(SimpleRowFormatter& other) noexcept;
 		/// Swaps the row formatter with another one.
 
-	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) override;
+	std::string& formatNames(NameVecPtr pNames, std::string& formattedNames) override;
 		/// Formats the row field names.
 
 	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) override;

@@ -85,7 +85,7 @@ public:
 	~JSONRowFormatter() override;
 		/// Destroys the JSONRowFormatter.
 
-	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) override;
+	std::string& formatNames(NameVecPtr pNames, std::string& formattedNames) override;
 		/// Formats names.
 
 	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) override;

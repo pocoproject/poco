@@ -33,21 +33,21 @@ class Zip_API ZipUtil
 	/// A utility class used for parsing header information inside of zip files
 {
 public:
-	static Poco::UInt16 get16BitValue(const char* pVal, const Poco::UInt32 pos);
+	static Poco::UInt16 get16BitValue(const char* pVal, Poco::UInt32 pos);
 
-	static Poco::UInt32 get32BitValue(const char* pVal, const Poco::UInt32 pos);
+	static Poco::UInt32 get32BitValue(const char* pVal, Poco::UInt32 pos);
 
-	static Poco::UInt64 get64BitValue(const char* pVal, const Poco::UInt32 pos);
+	static Poco::UInt64 get64BitValue(const char* pVal, Poco::UInt32 pos);
 
-	static void set16BitValue(const Poco::UInt16 val, char* pVal, const Poco::UInt32 pos);
+	static void set16BitValue(Poco::UInt16 val, char* pVal, Poco::UInt32 pos);
 
-	static void set32BitValue(const Poco::UInt32 val, char* pVal, const Poco::UInt32 pos);
+	static void set32BitValue(Poco::UInt32 val, char* pVal, Poco::UInt32 pos);
 
-	static void set64BitValue(const Poco::UInt64 val, char* pVal, const Poco::UInt32 pos);
+	static void set64BitValue(Poco::UInt64 val, char* pVal, Poco::UInt32 pos);
 
-	static Poco::DateTime parseDateTime(const char* pVal, const Poco::UInt32 timePos, const Poco::UInt32 datePos);
+	static Poco::DateTime parseDateTime(const char* pVal, Poco::UInt32 timePos, Poco::UInt32 datePos);
 
-	static void setDateTime(const Poco::DateTime& dt, char* pVal, const Poco::UInt32 timePos, const Poco::UInt32 datePos);
+	static void setDateTime(const Poco::DateTime& dt, char* pVal, Poco::UInt32 timePos, Poco::UInt32 datePos);
 
 	static std::string fakeZLibInitString(ZipCommon::CompressionLevel cl);
 
