@@ -103,8 +103,7 @@ public:
 
 	HashMap()
 		/// Creates an empty HashMap.
-	{
-	}
+	= default;
 
 	HashMap(std::size_t initialReserve):
 		_table(initialReserve)

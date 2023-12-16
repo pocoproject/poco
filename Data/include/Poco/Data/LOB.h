@@ -81,8 +81,7 @@ public:
 
 	~LOB()
 		/// Destroys the LOB.
-	{
-	}
+	= default;
 
 	LOB& operator = (const LOB& other)
 		/// Assignment operator.
@@ -274,8 +273,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{
@@ -312,8 +310,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{

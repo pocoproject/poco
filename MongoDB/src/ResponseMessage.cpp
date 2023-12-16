@@ -41,8 +41,7 @@ ResponseMessage::ResponseMessage(const Int64& cursorID):
 
 
 ResponseMessage::~ResponseMessage()
-{
-}
+= default;
 
 
 void ResponseMessage::clear()

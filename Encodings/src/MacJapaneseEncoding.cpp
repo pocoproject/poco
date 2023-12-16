@@ -1867,8 +1867,7 @@ MacJapaneseEncoding::MacJapaneseEncoding():
 
 
 MacJapaneseEncoding::~MacJapaneseEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

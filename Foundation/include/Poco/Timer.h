@@ -192,8 +192,7 @@ public:
 	}
 
 	~TimerCallback() override
-	{
-	}
+	= default;
 
 	TimerCallback& operator = (const TimerCallback& callback)
 	{

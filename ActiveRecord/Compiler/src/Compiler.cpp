@@ -41,8 +41,7 @@ class CompilerApp: public Application
 {
 public:
 	CompilerApp()
-	{
-	}
+	= default;
 
 protected:
 	void initialize(Application& self) override

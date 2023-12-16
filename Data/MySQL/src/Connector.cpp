@@ -28,13 +28,11 @@ std::string Connector::KEY("mysql");
 
 
 Connector::Connector()
-{
-}
+= default;
 
 
 Connector::~Connector()
-{
-}
+= default;
 
 
 const std::string& Connector::name() const

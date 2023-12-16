@@ -30,8 +30,7 @@ namespace Net {
 
 
 HTTPSessionFactory::HTTPSessionFactory()
-{
-}
+= default;
 
 
 HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt16 proxyPort)

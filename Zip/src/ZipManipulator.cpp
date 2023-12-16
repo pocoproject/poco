@@ -42,8 +42,7 @@ ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFi
 
 
 ZipManipulator::~ZipManipulator()
-{
-}
+= default;
 
 
 void ZipManipulator::deleteFile(const std::string& zipPath)

@@ -20,8 +20,7 @@ OSPCodeWriter::OSPCodeWriter(const Page& page, const std::string& clazz):
 
 
 OSPCodeWriter::~OSPCodeWriter()
-{
-}
+= default;
 
 
 void OSPCodeWriter::writeHeaderIncludes(std::ostream& ostr)

@@ -20,8 +20,7 @@ namespace XML {
 
 
 Attributes::~Attributes()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

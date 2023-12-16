@@ -63,8 +63,7 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 
 
 StatementImpl::~StatementImpl()
-{
-}
+= default;
 
 
 std::size_t StatementImpl::execute(const bool& reset)

@@ -39,8 +39,7 @@ HelpFormatter::HelpFormatter(const OptionSet& options):
 
 
 HelpFormatter::~HelpFormatter()
-{
-}
+= default;
 
 
 void HelpFormatter::setCommand(const std::string& command)

@@ -29,13 +29,11 @@ namespace Poco {
 
 
 RotateStrategy::RotateStrategy()
-{
-}
+= default;
 
 
 RotateStrategy::~RotateStrategy()
-{
-}
+= default;
 
 
 //
@@ -66,8 +64,7 @@ RotateByIntervalStrategy::RotateByIntervalStrategy(const Timespan& span):
 
 
 RotateByIntervalStrategy::~RotateByIntervalStrategy()
-{
-}
+= default;
 
 
 bool RotateByIntervalStrategy::mustRotate(LogFile* pFile)
@@ -113,8 +110,7 @@ RotateBySizeStrategy::RotateBySizeStrategy(UInt64 size): _size(size)
 
 
 RotateBySizeStrategy::~RotateBySizeStrategy()
-{
-}
+= default;
 
 
 bool RotateBySizeStrategy::mustRotate(LogFile* pFile)

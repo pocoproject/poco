@@ -172,8 +172,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{

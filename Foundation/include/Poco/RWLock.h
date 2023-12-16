@@ -179,8 +179,7 @@ inline ScopedReadRWLock::ScopedReadRWLock(RWLock& rwl): ScopedRWLock(rwl, false)
 
 
 inline ScopedReadRWLock::~ScopedReadRWLock()
-{
-}
+= default;
 
 
 inline ScopedWriteRWLock::ScopedWriteRWLock(RWLock& rwl): ScopedRWLock(rwl, true)
@@ -189,8 +188,7 @@ inline ScopedWriteRWLock::ScopedWriteRWLock(RWLock& rwl): ScopedRWLock(rwl, true
 
 
 inline ScopedWriteRWLock::~ScopedWriteRWLock()
-{
-}
+= default;
 
 
 } // namespace Poco

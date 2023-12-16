@@ -31,9 +31,8 @@ MySQLException::MySQLException(const std::string& msg) : Poco::Data::DataExcepti
 }
 
 
-MySQLException::MySQLException(const MySQLException& exc) : Poco::Data::DataException(exc)
-{
-}
+MySQLException::MySQLException(const MySQLException& exc)  
+= default;
 
 
 MySQLException::MySQLException(const std::string& msg, int code) : Poco::Data::DataException(std::string("[MySQL]: ") + msg, code)
@@ -42,8 +41,7 @@ MySQLException::MySQLException(const std::string& msg, int code) : Poco::Data::D
 
 
 MySQLException::~MySQLException() noexcept
-{
-}
+= default;
 
 
 //

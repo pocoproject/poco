@@ -20,8 +20,7 @@ namespace XML {
 
 
 LexicalHandler::~LexicalHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

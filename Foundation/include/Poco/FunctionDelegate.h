@@ -46,8 +46,7 @@ public:
 	}
 
 	~FunctionDelegate()
-	{
-	}
+	= default;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -113,8 +112,7 @@ public:
 	}
 
 	~FunctionDelegate()
-	{
-	}
+	= default;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -180,8 +178,7 @@ public:
 	}
 
 	~FunctionDelegate()
-	{
-	}
+	= default;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -249,8 +246,7 @@ public:
 	}
 
 	~FunctionDelegate() override
-	{
-	}
+	= default;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -316,8 +312,7 @@ public:
 	}
 
 	~FunctionDelegate() override
-	{
-	}
+	= default;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -383,8 +378,7 @@ public:
 	}
 
 	~FunctionDelegate() override
-	{
-	}
+	= default;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{

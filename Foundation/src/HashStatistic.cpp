@@ -35,8 +35,7 @@ HashStatistic::HashStatistic(
 
 
 HashStatistic::~HashStatistic()
-{
-}
+= default;
 
 
 std::string HashStatistic::toString() const

@@ -66,8 +66,7 @@ public:
 			_it = it._it;
 		}
 		~Iterator()
-		{
-		}
+		= default;
 		Iterator& operator = (const Iterator& it)
 		{
 			_it = it._it;
@@ -107,8 +106,7 @@ public:
 
 	Manifest()
 		/// Creates an empty Manifest.
-	{
-	}
+	= default;
 
 	~Manifest() override
 		/// Destroys the Manifest.

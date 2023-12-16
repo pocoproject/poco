@@ -58,8 +58,7 @@ public:
 	}
 
 	~Observer() override
-	{
-	}
+	= default;
 
 	Observer& operator = (const Observer& observer)
 	{

@@ -52,13 +52,11 @@ const TextEncoding::CharacterMap Windows1251Encoding::_charMap =
 
 
 Windows1251Encoding::Windows1251Encoding()
-{
-}
+= default;
 
 
 Windows1251Encoding::~Windows1251Encoding()
-{
-}
+= default;
 
 
 const char* Windows1251Encoding::canonicalName() const

@@ -48,8 +48,7 @@ public:
 	}
 
 	~Delegate() override
-	{
-	}
+	= default;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -119,8 +118,7 @@ public:
 	}
 
 	~Delegate() override
-	{
-	}
+	= default;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -260,8 +258,7 @@ public:
 	}
 
 	~Delegate() override
-	{
-	}
+	= default;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -331,8 +328,7 @@ public:
 	}
 
 	~Delegate() override
-	{
-	}
+	= default;
 
 	Delegate& operator = (const Delegate& delegate)
 	{

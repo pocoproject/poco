@@ -33,8 +33,7 @@ AbstractBinding::AbstractBinding(std::string  name,
 
 
 AbstractBinding::~AbstractBinding()
-{
-}
+= default;
 
 
 void AbstractBinding::setBinder(BinderPtr pBinder)

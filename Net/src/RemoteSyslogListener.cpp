@@ -55,8 +55,7 @@ public:
 	}
 
 	~MessageNotification() override
-	{
-	}
+	= default;
 
 	const std::string& message() const
 	{
@@ -114,8 +113,7 @@ RemoteUDPListener::RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt1
 
 
 RemoteUDPListener::~RemoteUDPListener()
-{
-}
+= default;
 
 
 void RemoteUDPListener::run()
@@ -209,8 +207,7 @@ SyslogParser::SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener*
 
 
 SyslogParser::~SyslogParser()
-{
-}
+= default;
 
 
 void SyslogParser::run()
@@ -555,8 +552,7 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, bool reusePort, in
 
 
 RemoteSyslogListener::~RemoteSyslogListener()
-{
-}
+= default;
 
 
 void RemoteSyslogListener::processMessage(const std::string& messageText)

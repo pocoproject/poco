@@ -44,8 +44,7 @@ public:
 	}
 
 	~RunnableHolder() override
-	{
-	}
+	= default;
 
 	void run() override
 	{
@@ -67,8 +66,7 @@ public:
 	}
 
 	~CallableHolder() override
-	{
-	}
+	= default;
 
 	void run() override
 	{

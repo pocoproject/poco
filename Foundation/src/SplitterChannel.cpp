@@ -21,8 +21,7 @@ namespace Poco {
 
 
 SplitterChannel::SplitterChannel()
-{
-}
+= default;
 
 
 SplitterChannel::~SplitterChannel()

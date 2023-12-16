@@ -42,8 +42,7 @@ AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, std::string  pre, std
 
 
 AutoDetectStreamBuf::~AutoDetectStreamBuf()
-{
-}
+= default;
 
 
 int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -205,8 +204,7 @@ AutoDetectIOS::AutoDetectIOS(std::istream& istr, const std::string& pre, const s
 
 
 AutoDetectIOS::~AutoDetectIOS()
-{
-}
+= default;
 
 
 AutoDetectStreamBuf* AutoDetectIOS::rdbuf()
@@ -223,8 +221,7 @@ AutoDetectInputStream::AutoDetectInputStream(std::istream& istr, const std::stri
 
 
 AutoDetectInputStream::~AutoDetectInputStream()
-{
-}
+= default;
 
 
 } } // namespace Poco::Zip

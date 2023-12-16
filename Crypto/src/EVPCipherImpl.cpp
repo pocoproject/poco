@@ -292,8 +292,7 @@ EVPCipherImpl::EVPCipherImpl(EVPPKey  key):
 
 
 EVPCipherImpl::~EVPCipherImpl()
-{
-}
+= default;
 
 
 CryptoTransform::Ptr EVPCipherImpl::createEncryptor()

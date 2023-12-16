@@ -21,8 +21,7 @@ namespace MySQL {
 
 
 Binder::Binder()
-{
-}
+= default;
 
 
 Binder::~Binder()

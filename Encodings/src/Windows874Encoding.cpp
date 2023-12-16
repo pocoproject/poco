@@ -94,8 +94,7 @@ Windows874Encoding::Windows874Encoding():
 
 
 Windows874Encoding::~Windows874Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

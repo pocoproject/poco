@@ -117,8 +117,7 @@ public:
 
 	~AbstractSessionImpl() override
 		/// Destroys the AbstractSessionImpl.
-	{
-	}
+	= default;
 
 	bool hasFeature(const std::string& name) const override
 		/// Looks a feature up in the features map

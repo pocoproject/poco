@@ -31,8 +31,7 @@ OptionProcessor::OptionProcessor(const OptionSet& options):
 
 
 OptionProcessor::~OptionProcessor()
-{
-}
+= default;
 
 
 void OptionProcessor::setUnixStyle(bool flag)

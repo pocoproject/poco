@@ -62,16 +62,12 @@ TextBufferIterator::TextBufferIterator(const char* end):
 
 
 TextBufferIterator::~TextBufferIterator()
-{
-}
+= default;
 
 
-TextBufferIterator::TextBufferIterator(const TextBufferIterator& it):
-	_pEncoding(it._pEncoding),
-	_it(it._it),
-	_end(it._end)
-{
-}
+TextBufferIterator::TextBufferIterator(const TextBufferIterator& it)
+	
+= default;
 
 
 TextBufferIterator& TextBufferIterator::operator = (const TextBufferIterator& it)

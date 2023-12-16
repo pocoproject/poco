@@ -34,8 +34,7 @@ NamedMutex::NamedMutex(const std::string& name):
 
 
 NamedMutex::~NamedMutex()
-{
-}
+= default;
 
 
 } // namespace Poco

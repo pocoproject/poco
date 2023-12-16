@@ -24,8 +24,7 @@ namespace Net {
 
 
 DatagramSocketImpl::DatagramSocketImpl()
-{
-}
+= default;
 
 
 DatagramSocketImpl::DatagramSocketImpl(SocketAddress::Family family)
@@ -51,8 +50,7 @@ DatagramSocketImpl::DatagramSocketImpl(poco_socket_t sockfd): SocketImpl(sockfd)
 
 
 DatagramSocketImpl::~DatagramSocketImpl()
-{
-}
+= default;
 
 
 void DatagramSocketImpl::init(int af)

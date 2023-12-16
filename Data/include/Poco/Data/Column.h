@@ -72,8 +72,7 @@ public:
 
 	~Column()
 		/// Destroys the Column.
-	{
-	}
+	= default;
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -227,8 +226,7 @@ public:
 
 	~Column()
 		/// Destroys the Column.
-	{
-	}
+	= default;
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -368,8 +366,7 @@ public:
 
 	~Column()
 		/// Destroys the Column.
-	{
-	}
+	= default;
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.

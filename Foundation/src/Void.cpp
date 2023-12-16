@@ -19,24 +19,19 @@ namespace Poco {
 
 
 Void::Void()
-{
-}
+= default;
 
 
 Void::Void(const Void&)
-{
-}
+= default;
 
 
 Void::~Void()
-{
-}
+= default;
 
 
 Void& Void::operator = (const Void&)
-{
-	return *this;
-}
+= default;
 
 
 } // namespace Poco

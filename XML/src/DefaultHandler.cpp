@@ -20,13 +20,11 @@ namespace XML {
 
 
 DefaultHandler::DefaultHandler()
-{
-}
+= default;
 
 
 DefaultHandler::~DefaultHandler()
-{
-}
+= default;
 
 
 InputSource* DefaultHandler::resolveEntity(const XMLString* publicId, const XMLString& systemId)

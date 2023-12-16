@@ -37,8 +37,7 @@ PartSource::PartSource(std::string  mediaType):
 
 
 PartSource::~PartSource()
-{
-}
+= default;
 
 
 namespace

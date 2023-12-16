@@ -113,8 +113,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name):
 
 
 CipherKeyImpl::~CipherKeyImpl()
-{
-}
+= default;
 
 
 CipherKeyImpl::Mode CipherKeyImpl::mode() const

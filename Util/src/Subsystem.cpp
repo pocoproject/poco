@@ -20,13 +20,11 @@ namespace Util {
 
 
 Subsystem::Subsystem()
-{
-}
+= default;
 
 
 Subsystem::~Subsystem()
-{
-}
+= default;
 
 
 void Subsystem::reinitialize(Application& app)

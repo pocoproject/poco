@@ -59,16 +59,12 @@ TextIterator::TextIterator(const std::string::const_iterator& end):
 
 
 TextIterator::~TextIterator()
-{
-}
+= default;
 
 
-TextIterator::TextIterator(const TextIterator& it):
-	_pEncoding(it._pEncoding),
-	_it(it._it),
-	_end(it._end)
-{
-}
+TextIterator::TextIterator(const TextIterator& it)
+	
+= default;
 
 
 TextIterator& TextIterator::operator = (const TextIterator& it)

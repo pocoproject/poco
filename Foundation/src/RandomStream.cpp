@@ -34,8 +34,7 @@ RandomBuf::RandomBuf(): BufferedStreamBuf(256, std::ios::in)
 
 
 RandomBuf::~RandomBuf()
-{
-}
+= default;
 
 
 int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -104,8 +103,7 @@ RandomIOS::RandomIOS()
 
 
 RandomIOS::~RandomIOS()
-{
-}
+= default;
 
 
 RandomBuf* RandomIOS::rdbuf()
@@ -120,8 +118,7 @@ RandomInputStream::RandomInputStream(): std::istream(&_buf)
 
 
 RandomInputStream::~RandomInputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

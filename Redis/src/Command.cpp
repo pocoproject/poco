@@ -28,14 +28,12 @@ Command::Command(const std::string& command): Array()
 }
 
 
-Command::Command(const Command& copy): Array(copy)
-{
-}
+Command::Command(const Command& copy) 
+= default;
 
 
 Command::~Command()
-{
-}
+= default;
 
 
 Command Command::append(const std::string& key, const std::string& value)

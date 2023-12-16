@@ -112,8 +112,7 @@ ICMPv4PacketImpl::ICMPv4PacketImpl(int dataSize)
 
 
 ICMPv4PacketImpl::~ICMPv4PacketImpl()
-{
-}
+= default;
 
 
 int ICMPv4PacketImpl::packetSize() const

@@ -21,13 +21,11 @@ namespace JSON {
 
 
 Handler::Handler()
-{
-}
+= default;
 
 
 Handler::~Handler()
-{
-}
+= default;
 
 
 Dynamic::Var Handler::asVar() const

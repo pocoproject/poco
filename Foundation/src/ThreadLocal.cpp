@@ -21,18 +21,15 @@ namespace Poco {
 
 
 TLSAbstractSlot::TLSAbstractSlot()
-{
-}
+= default;
 
 
 TLSAbstractSlot::~TLSAbstractSlot()
-{
-}
+= default;
 
 
 ThreadLocalStorage::ThreadLocalStorage()
-{
-}
+= default;
 
 
 ThreadLocalStorage::~ThreadLocalStorage()

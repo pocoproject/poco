@@ -46,8 +46,7 @@ ProcessHandleImpl::ProcessHandleImpl(pid_t pid):
 
 
 ProcessHandleImpl::~ProcessHandleImpl()
-{
-}
+= default;
 
 
 pid_t ProcessHandleImpl::id() const

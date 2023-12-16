@@ -34,13 +34,11 @@ const XMLString DOMImplementation::VERSION_2_0            = toXMLString("2.0");
 
 
 DOMImplementation::DOMImplementation()
-{
-}
+= default;
 
 
 DOMImplementation::~DOMImplementation()
-{
-}
+= default;
 
 
 bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& version) const

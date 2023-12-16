@@ -43,8 +43,7 @@ public:
 	}
 
 	~FTPStreamBuf() override
-	{
-	}
+	= default;
 
 private:
 	int readFromDevice() override
@@ -66,8 +65,7 @@ public:
 	}
 
 	~FTPIOS() override
-	{
-	}
+	= default;
 
 	FTPStreamBuf* rdbuf()
 	{
@@ -100,13 +98,11 @@ private:
 
 
 FTPPasswordProvider::FTPPasswordProvider()
-{
-}
+= default;
 
 
 FTPPasswordProvider::~FTPPasswordProvider()
-{
-}
+= default;
 
 
 std::string          FTPStreamFactory::_anonymousPassword("poco@localhost");
@@ -114,13 +110,11 @@ FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(nullptr);
 
 
 FTPStreamFactory::FTPStreamFactory()
-{
-}
+= default;
 
 
 FTPStreamFactory::~FTPStreamFactory()
-{
-}
+= default;
 
 
 std::istream* FTPStreamFactory::open(const URI& uri)

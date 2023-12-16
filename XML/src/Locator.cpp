@@ -20,8 +20,7 @@ namespace XML {
 
 
 Locator::~Locator()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

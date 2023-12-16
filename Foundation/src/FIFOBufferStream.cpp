@@ -179,8 +179,7 @@ FIFOBufferStream::FIFOBufferStream(std::size_t length):
 
 
 FIFOBufferStream::~FIFOBufferStream()
-{
-}
+= default;
 
 
 } // namespace Poco

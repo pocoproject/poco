@@ -61,10 +61,9 @@ X509Certificate::X509Certificate(const Poco::Crypto::X509Certificate& cert):
 }
 
 
-X509Certificate::X509Certificate(const X509Certificate& cert):
-	Poco::Crypto::X509Certificate(cert)
-{
-}
+X509Certificate::X509Certificate(const X509Certificate& cert)
+	
+= default;
 
 
 X509Certificate::X509Certificate(X509Certificate&& cert) noexcept:
@@ -97,8 +96,7 @@ X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
 
 
 X509Certificate::~X509Certificate()
-{
-}
+= default;
 
 
 bool X509Certificate::verify(const std::string& hostName) const

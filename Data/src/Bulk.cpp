@@ -30,8 +30,7 @@ Bulk::Bulk(Poco::UInt32 value): _limit(value, false, false)
 
 
 Bulk::~Bulk()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

@@ -28,8 +28,7 @@ Extractor::Extractor(StatementExecutor& st, ResultMetadata& md): _stmt(st), _met
 
 
 Extractor::~Extractor()
-{
-}
+= default;
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)

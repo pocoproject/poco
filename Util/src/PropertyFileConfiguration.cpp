@@ -30,8 +30,7 @@ namespace Util {
 
 
 PropertyFileConfiguration::PropertyFileConfiguration()
-{
-}
+= default;
 
 
 PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr)
@@ -47,8 +46,7 @@ PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path)
 
 
 PropertyFileConfiguration::~PropertyFileConfiguration()
-{
-}
+= default;
 
 
 void PropertyFileConfiguration::load(std::istream& istr)

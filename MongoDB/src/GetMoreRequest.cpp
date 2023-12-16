@@ -32,8 +32,7 @@ GetMoreRequest::GetMoreRequest(std::string  collectionName, Int64 cursorID):
 
 
 GetMoreRequest::~GetMoreRequest()
-{
-}
+= default;
 
 
 void GetMoreRequest::buildRequest(BinaryWriter& writer)

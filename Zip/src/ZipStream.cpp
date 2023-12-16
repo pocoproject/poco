@@ -287,8 +287,7 @@ ZipIOS::ZipIOS(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bool repositio
 
 
 ZipIOS::~ZipIOS()
-{
-}
+= default;
 
 
 ZipStreamBuf* ZipIOS::rdbuf()
@@ -307,8 +306,7 @@ ZipInputStream::ZipInputStream(std::istream& istr, const ZipLocalFileHeader& fil
 
 
 ZipInputStream::~ZipInputStream()
-{
-}
+= default;
 
 
 bool ZipInputStream::crcValid() const
@@ -323,8 +321,7 @@ ZipOutputStream::ZipOutputStream(std::ostream& ostr, ZipLocalFileHeader& fileEnt
 
 
 ZipOutputStream::~ZipOutputStream()
-{
-}
+= default;
 
 
 void ZipOutputStream::close(Poco::UInt64& extraDataSize)

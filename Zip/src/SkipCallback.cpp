@@ -23,13 +23,11 @@ namespace Zip {
 
 
 SkipCallback::SkipCallback()
-{
-}
+= default;
 
 
 SkipCallback::~SkipCallback()
-{
-}
+= default;
 
 
 bool SkipCallback::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr)

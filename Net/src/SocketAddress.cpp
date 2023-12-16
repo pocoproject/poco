@@ -175,8 +175,7 @@ SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t len
 
 
 SocketAddress::~SocketAddress()
-{
-}
+= default;
 
 
 bool SocketAddress::operator < (const SocketAddress& socketAddress) const

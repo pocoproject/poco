@@ -47,15 +47,9 @@ MetaColumn::MetaColumn(std::size_t position,
 }
 
 
-MetaColumn::MetaColumn(const MetaColumn& other):
-	_name(other._name),
-	_length(other._length),
-	_precision(other._precision),
-	_position(other._position),
-	_type(other._type),
-	_nullable(other._nullable)
-{
-}
+MetaColumn::MetaColumn(const MetaColumn& other)
+	
+= default;
 
 
 MetaColumn::MetaColumn(MetaColumn&& other) noexcept:
@@ -70,8 +64,7 @@ MetaColumn::MetaColumn(MetaColumn&& other) noexcept:
 
 
 MetaColumn::~MetaColumn()
-{
-}
+= default;
 
 
 MetaColumn& MetaColumn::operator = (const MetaColumn& other)

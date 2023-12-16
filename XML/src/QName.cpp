@@ -25,8 +25,7 @@ namespace XML {
 
 
 QName::QName()
-{
-}
+= default;
 
 
 QName::QName(std::string  name) :
@@ -50,12 +49,9 @@ QName::QName(std::string  ns, std::string  name, std::string  prefix) :
 }
 
 
-QName::QName(const QName& qname):
-	_ns(qname._ns),
-	_name(qname._name),
-	_prefix(qname._prefix)
-{
-}
+QName::QName(const QName& qname)
+	
+= default;
 
 
 QName::QName(QName&& qname) noexcept:

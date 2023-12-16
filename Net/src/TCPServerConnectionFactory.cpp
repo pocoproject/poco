@@ -20,13 +20,11 @@ namespace Net {
 
 
 TCPServerConnectionFactory::TCPServerConnectionFactory()
-{
-}
+= default;
 
 
 TCPServerConnectionFactory::~TCPServerConnectionFactory()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

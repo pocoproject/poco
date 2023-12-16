@@ -30,8 +30,7 @@ KeyPairImpl::KeyPairImpl(std::string  name, Type type):
 
 
 KeyPairImpl::~KeyPairImpl()
-{
-}
+= default;
 
 
 } } // namespace Poco::Crypto

@@ -45,8 +45,7 @@ Compress::Compress(std::ostream& out, bool seekableOut, bool forceZip64):
 
 
 Compress::~Compress()
-{
-}
+= default;
 
 
 void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, const Poco::Path& fileName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl)

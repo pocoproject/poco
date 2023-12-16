@@ -51,8 +51,7 @@ Event::Event(Document* pOwnerDocument, XMLString  type, EventTarget* pTarget, bo
 
 
 Event::~Event()
-{
-}
+= default;
 
 
 void Event::stopPropagation()

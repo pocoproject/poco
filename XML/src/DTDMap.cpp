@@ -31,8 +31,7 @@ DTDMap::DTDMap(const DocumentType* pDocumentType, unsigned short type):
 
 
 DTDMap::~DTDMap()
-{
-}
+= default;
 
 
 Node* DTDMap::getNamedItem(const XMLString& name) const

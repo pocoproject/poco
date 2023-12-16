@@ -90,8 +90,7 @@ MacCyrillicEncoding::MacCyrillicEncoding():
 
 
 MacCyrillicEncoding::~MacCyrillicEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

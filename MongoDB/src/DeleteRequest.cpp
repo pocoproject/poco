@@ -40,8 +40,7 @@ DeleteRequest::DeleteRequest(std::string  collectionName, bool justOne):
 
 
 DeleteRequest::~DeleteRequest()
-{
-}
+= default;
 
 
 void DeleteRequest::buildRequest(BinaryWriter& writer)

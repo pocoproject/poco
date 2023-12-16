@@ -42,8 +42,7 @@ DoubleByteEncoding::DoubleByteEncoding(const char* names[], const TextEncoding::
 
 
 DoubleByteEncoding::~DoubleByteEncoding()
-{
-}
+= default;
 
 
 const char* DoubleByteEncoding::canonicalName() const

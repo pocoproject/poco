@@ -40,8 +40,7 @@ Notation::Notation(Document* pOwnerDocument, const Notation& notation):
 
 
 Notation::~Notation()
-{
-}
+= default;
 
 
 const XMLString& Notation::nodeName() const

@@ -42,8 +42,7 @@ Attr::Attr(Document* pOwnerDocument, const Attr& attr):
 
 
 Attr::~Attr()
-{
-}
+= default;
 
 
 void Attr::setValue(const XMLString& value)

@@ -29,8 +29,7 @@ CodeWriter::CodeWriter(const Page& page, std::string  clazz):
 
 
 CodeWriter::~CodeWriter()
-{
-}
+= default;
 
 
 void CodeWriter::writeHeader(std::ostream& ostr, const std::string& headerFileName)

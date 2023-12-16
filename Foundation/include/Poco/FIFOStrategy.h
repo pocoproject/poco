@@ -33,8 +33,7 @@ class FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
 {
 public:
 	FIFOStrategy()
-	{
-	}
+	= default;
 
 	FIFOStrategy(const FIFOStrategy& s):
 		DefaultStrategy<TArgs, TDelegate>(s)
@@ -47,8 +46,7 @@ public:
 	}
 
 	~FIFOStrategy() override
-	{
-	}
+	= default;
 
 	FIFOStrategy& operator = (const FIFOStrategy& s)
 	{

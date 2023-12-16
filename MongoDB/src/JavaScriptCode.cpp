@@ -20,14 +20,11 @@ namespace MongoDB {
 
 
 JavaScriptCode::JavaScriptCode()
-{
-
-}
+= default;
 
 
 JavaScriptCode::~JavaScriptCode()
-{
-}
+= default;
 
 
 } } // namespace Poco::MongoDB

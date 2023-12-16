@@ -44,8 +44,7 @@ InputSource::InputSource(XMLByteInputStream& bistr):
 
 
 InputSource::~InputSource()
-{
-}
+= default;
 
 
 void InputSource::setPublicId(const XMLString& publicId)

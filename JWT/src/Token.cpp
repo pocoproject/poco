@@ -74,8 +74,7 @@ Token::Token(const std::string& header, const std::string& payload, const std::s
 
 
 Token::~Token()
-{
-}
+= default;
 
 
 Token& Token::operator = (const Token& token)

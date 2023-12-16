@@ -45,8 +45,7 @@ ArchiveStrategy::ArchiveStrategy(std::string  connector,
 
 
 ArchiveStrategy::~ArchiveStrategy()
-{
-}
+= default;
 
 
 void ArchiveStrategy::open()
@@ -76,8 +75,7 @@ ArchiveByAgeStrategy::ArchiveByAgeStrategy(const std::string& connector,
 
 
 ArchiveByAgeStrategy::~ArchiveByAgeStrategy()
-{
-}
+= default;
 
 
 void ArchiveByAgeStrategy::archive()

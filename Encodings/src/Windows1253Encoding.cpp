@@ -95,8 +95,7 @@ Windows1253Encoding::Windows1253Encoding():
 
 
 Windows1253Encoding::~Windows1253Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

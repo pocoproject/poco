@@ -107,8 +107,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
 
 
 ZipLocalFileHeader::~ZipLocalFileHeader()
-{
-}
+= default;
 
 
 void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)

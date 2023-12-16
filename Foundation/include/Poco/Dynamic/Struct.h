@@ -101,8 +101,7 @@ public:
 
 	virtual ~Struct()
 		/// Destroys the Struct.
-	{
-	}
+	= default;
 
 	inline Var& operator [] (const K& name)
 		/// Returns the Var with the given name, creates an entry if not found.
@@ -302,8 +301,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{
@@ -469,8 +467,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{
@@ -636,8 +633,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{
@@ -803,8 +799,7 @@ public:
 	}
 
 	~VarHolderImpl() override
-	{
-	}
+	= default;
 
 	const std::type_info& type() const override
 	{

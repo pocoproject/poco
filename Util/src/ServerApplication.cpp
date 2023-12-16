@@ -73,8 +73,7 @@ ServerApplication::ServerApplication()
 
 
 ServerApplication::~ServerApplication()
-{
-}
+= default;
 
 
 bool ServerApplication::isInteractive() const

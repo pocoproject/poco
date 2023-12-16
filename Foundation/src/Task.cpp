@@ -34,8 +34,7 @@ Task::Task(std::string  name):
 
 
 Task::~Task()
-{
-}
+= default;
 
 
 void Task::cancel()

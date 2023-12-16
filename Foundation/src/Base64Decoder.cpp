@@ -77,8 +77,7 @@ Base64DecoderBuf::Base64DecoderBuf(std::istream& istr, int options):
 
 
 Base64DecoderBuf::~Base64DecoderBuf()
-{
-}
+= default;
 
 
 int Base64DecoderBuf::readFromDevice()
@@ -155,8 +154,7 @@ Base64DecoderIOS::Base64DecoderIOS(std::istream& istr, int options): _buf(istr, 
 
 
 Base64DecoderIOS::~Base64DecoderIOS()
-{
-}
+= default;
 
 
 Base64DecoderBuf* Base64DecoderIOS::rdbuf()
@@ -171,8 +169,7 @@ Base64Decoder::Base64Decoder(std::istream& istr, int options): Base64DecoderIOS(
 
 
 Base64Decoder::~Base64Decoder()
-{
-}
+= default;
 
 
 } // namespace Poco

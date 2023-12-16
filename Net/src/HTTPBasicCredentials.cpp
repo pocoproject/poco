@@ -35,8 +35,7 @@ const std::string HTTPBasicCredentials::SCHEME = "Basic";
 
 
 HTTPBasicCredentials::HTTPBasicCredentials()
-{
-}
+= default;
 
 
 HTTPBasicCredentials::HTTPBasicCredentials(std::string  username, std::string  password):
@@ -66,8 +65,7 @@ HTTPBasicCredentials::HTTPBasicCredentials(const std::string& authInfo)
 
 
 HTTPBasicCredentials::~HTTPBasicCredentials()
-{
-}
+= default;
 
 
 void HTTPBasicCredentials::clear()

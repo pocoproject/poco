@@ -30,8 +30,7 @@ ConfigurationView::ConfigurationView(std::string  prefix, AbstractConfiguration:
 
 
 ConfigurationView::~ConfigurationView()
-{
-}
+= default;
 
 
 bool ConfigurationView::getRaw(const std::string& key, std::string& value) const

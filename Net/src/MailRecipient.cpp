@@ -27,12 +27,9 @@ MailRecipient::MailRecipient():
 }
 
 
-MailRecipient::MailRecipient(const MailRecipient& recipient):
-	_address(recipient._address),
-	_realName(recipient._realName),
-	_type(recipient._type)
-{
-}
+MailRecipient::MailRecipient(const MailRecipient& recipient)
+	
+= default;
 
 
 MailRecipient::MailRecipient(RecipientType type, std::string  address):
@@ -51,8 +48,7 @@ MailRecipient::MailRecipient(RecipientType type, std::string  address, std::stri
 
 
 MailRecipient::~MailRecipient()
-{
-}
+= default;
 
 
 MailRecipient& MailRecipient::operator = (const MailRecipient& recipient)

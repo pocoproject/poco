@@ -69,12 +69,10 @@ class PrivateKeyFactoryImpl: public Poco::Net::PrivateKeyFactory
 {
 public:
 	PrivateKeyFactoryImpl()
-	{
-	}
+	= default;
 
 	~PrivateKeyFactoryImpl() override
-	{
-	}
+	= default;
 
 	PrivateKeyPassphraseHandler* create(bool server) const override
 	{

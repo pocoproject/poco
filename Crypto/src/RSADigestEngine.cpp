@@ -36,8 +36,7 @@ RSADigestEngine::RSADigestEngine(RSAKey  key, const std::string &name):
 
 
 RSADigestEngine::~RSADigestEngine()
-{
-}
+= default;
 
 
 std::size_t RSADigestEngine::digestLength() const

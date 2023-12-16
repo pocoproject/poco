@@ -63,8 +63,7 @@ FilePartSource::FilePartSource(const std::string& path, std::string  filename, c
 
 
 FilePartSource::~FilePartSource()
-{
-}
+= default;
 
 
 std::istream& FilePartSource::stream()

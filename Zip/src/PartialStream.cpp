@@ -55,8 +55,7 @@ PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::si
 
 
 PartialStreamBuf::~PartialStreamBuf()
-{
-}
+= default;
 
 
 int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -211,8 +210,7 @@ PartialIOS::PartialIOS(std::ostream& ostr, std::size_t start, std::size_t end, b
 
 
 PartialIOS::~PartialIOS()
-{
-}
+= default;
 
 
 PartialStreamBuf* PartialIOS::rdbuf()
@@ -229,8 +227,7 @@ PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type st
 
 
 PartialInputStream::~PartialInputStream()
-{
-}
+= default;
 
 
 PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream):

@@ -2207,8 +2207,7 @@ MacKoreanEncoding::MacKoreanEncoding():
 
 
 MacKoreanEncoding::~MacKoreanEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

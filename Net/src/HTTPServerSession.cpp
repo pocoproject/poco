@@ -31,8 +31,7 @@ HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParam
 
 
 HTTPServerSession::~HTTPServerSession()
-{
-}
+= default;
 
 
 bool HTTPServerSession::hasMoreRequests()

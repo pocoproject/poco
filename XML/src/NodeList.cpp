@@ -20,8 +20,7 @@ namespace XML {
 
 
 NodeList::~NodeList()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

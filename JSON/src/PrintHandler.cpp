@@ -42,8 +42,7 @@ PrintHandler::PrintHandler(std::ostream& out, unsigned indent, int options):
 
 
 PrintHandler::~PrintHandler()
-{
-}
+= default;
 
 
 void PrintHandler::reset()

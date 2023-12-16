@@ -32,8 +32,7 @@ namespace Net {
 
 
 HTTPCredentials::HTTPCredentials()
-{
-}
+= default;
 
 
 HTTPCredentials::HTTPCredentials(const std::string& username, const std::string& password):
@@ -43,8 +42,7 @@ HTTPCredentials::HTTPCredentials(const std::string& username, const std::string&
 
 
 HTTPCredentials::~HTTPCredentials()
-{
-}
+= default;
 
 
 void HTTPCredentials::clear()

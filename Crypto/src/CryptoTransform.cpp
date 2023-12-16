@@ -20,13 +20,11 @@ namespace Crypto {
 
 
 CryptoTransform::CryptoTransform()
-{
-}
+= default;
 
 
 CryptoTransform::~CryptoTransform()
-{
-}
+= default;
 
 
 int CryptoTransform::setPadding(int padding)

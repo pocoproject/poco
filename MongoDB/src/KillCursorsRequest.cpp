@@ -26,8 +26,7 @@ KillCursorsRequest::KillCursorsRequest():
 
 
 KillCursorsRequest::~KillCursorsRequest()
-{
-}
+= default;
 
 
 void KillCursorsRequest::buildRequest(BinaryWriter& writer)

@@ -56,8 +56,7 @@ public:
 	}
 
 	~BasicUnbufferedStreamBuf() override
-	{
-	}
+	= default;
 
 	int_type overflow(int_type c) override
 	{

@@ -29,8 +29,7 @@ public:
 	}
 
 	~NamePoolItem()
-	{
-	}
+	= default;
 
 	bool set(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName)
 	{

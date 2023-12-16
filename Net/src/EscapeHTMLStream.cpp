@@ -26,8 +26,7 @@ EscapeHTMLStreamBuf::EscapeHTMLStreamBuf(std::ostream& ostr):
 
 
 EscapeHTMLStreamBuf::~EscapeHTMLStreamBuf()
-{
-}
+= default;
 
 
 int EscapeHTMLStreamBuf::readFromDevice()
@@ -67,8 +66,7 @@ EscapeHTMLIOS::EscapeHTMLIOS(std::ostream& ostr): _buf(ostr)
 
 
 EscapeHTMLIOS::~EscapeHTMLIOS()
-{
-}
+= default;
 
 
 EscapeHTMLStreamBuf* EscapeHTMLIOS::rdbuf()
@@ -85,8 +83,7 @@ EscapeHTMLOutputStream::EscapeHTMLOutputStream(std::ostream& ostr):
 
 
 EscapeHTMLOutputStream::~EscapeHTMLOutputStream()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

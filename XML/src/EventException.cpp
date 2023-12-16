@@ -26,22 +26,17 @@ EventException::EventException(int code):
 }
 
 
-EventException::EventException(const EventException& exc):
-	XMLException(exc)
-{
-}
+EventException::EventException(const EventException& exc)
+	
+= default;
 
 
 EventException::~EventException() noexcept
-{
-}
+= default;
 
 
 EventException& EventException::operator = (const EventException& exc)
-{
-	XMLException::operator = (exc);
-	return *this;
-}
+= default;
 
 
 const char* EventException::name() const noexcept

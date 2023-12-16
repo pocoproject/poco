@@ -222,8 +222,7 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 
 
 IPAddress::~IPAddress()
-{
-}
+= default;
 
 
 IPAddress& IPAddress::operator = (const IPAddress& addr)

@@ -42,8 +42,7 @@ public:
 
 public:
 	DefaultStrategy()
-	{
-	}
+	= default;
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
@@ -51,8 +50,7 @@ public:
 	}
 
 	~DefaultStrategy() override
-	{
-	}
+	= default;
 
 	void notify(const void* sender, TArgs& arguments) override
 	{
@@ -139,8 +137,7 @@ public:
 
 public:
 	DefaultStrategy()
-	{
-	}
+	= default;
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
@@ -153,8 +150,7 @@ public:
 	}
 
 	~DefaultStrategy() override
-	{
-	}
+	= default;
 
 	void notify(const void* sender) override
 	{

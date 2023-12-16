@@ -50,9 +50,8 @@ DatagramSocket::DatagramSocket(const Socket& socket): Socket(socket)
 }
 
 
-DatagramSocket::DatagramSocket(const DatagramSocket& socket): Socket(socket)
-{
-}
+DatagramSocket::DatagramSocket(const DatagramSocket& socket) 
+= default;
 
 
 DatagramSocket::DatagramSocket(SocketImpl* pImpl): Socket(pImpl)
@@ -63,8 +62,7 @@ DatagramSocket::DatagramSocket(SocketImpl* pImpl): Socket(pImpl)
 
 
 DatagramSocket::~DatagramSocket()
-{
-}
+= default;
 
 
 DatagramSocket& DatagramSocket::operator = (const Socket& socket)
@@ -109,10 +107,7 @@ DatagramSocket& DatagramSocket::operator = (DatagramSocket&& socket)
 #endif // POCO_NEW_STATE_ON_MOVE
 
 DatagramSocket& DatagramSocket::operator = (const DatagramSocket& socket)
-{
-	Socket::operator = (socket);
-	return *this;
-}
+= default;
 
 
 void DatagramSocket::connect(const SocketAddress& address)

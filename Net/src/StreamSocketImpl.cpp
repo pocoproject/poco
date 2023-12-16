@@ -22,8 +22,7 @@ namespace Net {
 
 
 StreamSocketImpl::StreamSocketImpl()
-{
-}
+= default;
 
 
 StreamSocketImpl::StreamSocketImpl(SocketAddress::Family family)
@@ -48,8 +47,7 @@ StreamSocketImpl::StreamSocketImpl(poco_socket_t sockfd): SocketImpl(sockfd)
 
 
 StreamSocketImpl::~StreamSocketImpl()
-{
-}
+= default;
 
 
 int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)

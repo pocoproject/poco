@@ -101,16 +101,9 @@ URI::URI(std::string  scheme, const std::string& authority, std::string  path, s
 }
 
 
-URI::URI(const URI& uri):
-	_scheme(uri._scheme),
-	_userInfo(uri._userInfo),
-	_host(uri._host),
-	_port(uri._port),
-	_path(uri._path),
-	_query(uri._query),
-	_fragment(uri._fragment)
-{
-}
+URI::URI(const URI& uri)
+	
+= default;
 
 
 URI::URI(URI&& uri) noexcept:
@@ -149,8 +142,7 @@ URI::URI(const Path& path):
 
 
 URI::~URI()
-{
-}
+= default;
 
 
 URI& URI::operator = (const URI& uri)

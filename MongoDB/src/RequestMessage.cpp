@@ -28,8 +28,7 @@ RequestMessage::RequestMessage(MessageHeader::OpCode opcode):
 
 
 RequestMessage::~RequestMessage()
-{
-}
+= default;
 
 
 void RequestMessage::send(std::ostream& ostr)

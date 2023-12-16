@@ -19,13 +19,11 @@ namespace Poco {
 
 
 Channel::Channel()
-{
-}
+= default;
 
 
 Channel::~Channel()
-{
-}
+= default;
 
 
 void Channel::open()

@@ -41,8 +41,7 @@ XMLFilterImpl::XMLFilterImpl(XMLReader* pParent):
 
 
 XMLFilterImpl::~XMLFilterImpl()
-{
-}
+= default;
 
 
 XMLReader* XMLFilterImpl::getParent() const

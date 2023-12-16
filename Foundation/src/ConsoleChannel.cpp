@@ -36,8 +36,7 @@ ConsoleChannel::ConsoleChannel(std::ostream& str): _str(str)
 
 
 ConsoleChannel::~ConsoleChannel()
-{
-}
+= default;
 
 
 void ConsoleChannel::log(const Message& msg)
@@ -69,8 +68,7 @@ ColorConsoleChannel::ColorConsoleChannel(std::ostream& str):
 
 
 ColorConsoleChannel::~ColorConsoleChannel()
-{
-}
+= default;
 
 
 void ColorConsoleChannel::log(const Message& msg)

@@ -68,15 +68,11 @@ Timestamp::Timestamp(const Timestamp& other)
 
 
 Timestamp::~Timestamp()
-{
-}
+= default;
 
 
 Timestamp& Timestamp::operator = (const Timestamp& other)
-{
-	_ts = other._ts;
-	return *this;
-}
+= default;
 
 
 Timestamp& Timestamp::operator = (TimeVal tv)

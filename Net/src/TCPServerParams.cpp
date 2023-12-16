@@ -29,8 +29,7 @@ TCPServerParams::TCPServerParams():
 
 
 TCPServerParams::~TCPServerParams()
-{
-}
+= default;
 
 
 void TCPServerParams::setThreadIdleTime(const Poco::Timespan& milliseconds)

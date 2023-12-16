@@ -55,8 +55,7 @@ PatternFormatter::PatternFormatter(std::string  format):
 
 
 PatternFormatter::~PatternFormatter()
-{
-}
+= default;
 
 
 void PatternFormatter::format(const Message& msg, std::string& text)

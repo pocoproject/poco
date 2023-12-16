@@ -31,13 +31,11 @@ const std::string Connector::KEY("sqlite");
 
 
 Connector::Connector()
-{
-}
+= default;
 
 
 Connector::~Connector()
-{
-}
+= default;
 
 
 Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString,

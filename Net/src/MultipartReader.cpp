@@ -43,8 +43,7 @@ MultipartStreamBuf::MultipartStreamBuf(std::istream& istr, const std::string& bo
 
 
 MultipartStreamBuf::~MultipartStreamBuf()
-{
-}
+= default;
 
 
 int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
@@ -167,8 +166,7 @@ MultipartInputStream::MultipartInputStream(std::istream& istr, const std::string
 
 
 MultipartInputStream::~MultipartInputStream()
-{
-}
+= default;
 
 
 //

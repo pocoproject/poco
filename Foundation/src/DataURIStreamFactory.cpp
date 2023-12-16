@@ -22,13 +22,11 @@ namespace Poco {
 
 
 DataURIStreamFactory::DataURIStreamFactory()
-{
-}
+= default;
 
 
 DataURIStreamFactory::~DataURIStreamFactory()
-{
-}
+= default;
 
 
 std::istream* DataURIStreamFactory::open(const URI& uri)

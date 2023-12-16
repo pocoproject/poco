@@ -262,8 +262,7 @@ public:
         using pointer = value_type*;
 
 
-        ordered_iterator() noexcept {
-        }
+        ordered_iterator() noexcept = default;
 
         ordered_iterator(const ordered_iterator<false>& other) noexcept: m_iterator(other.m_iterator) {
         }

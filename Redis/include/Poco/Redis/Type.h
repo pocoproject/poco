@@ -236,8 +236,7 @@ class Type: public RedisType
 public:
 	Type()
 		/// Creates the Type.
-	{
-	}
+	= default;
 
 	Type(T  t) : _value(std::move(t))
 		/// Creates the Type from another one.
@@ -251,8 +250,7 @@ public:
 
 	~Type() override
 		/// Destroys the Type.
-	{
-	}
+	= default;
 
 	int type() const override
 		/// Returns the type of the value

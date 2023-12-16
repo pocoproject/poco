@@ -37,8 +37,7 @@ CDATASection::CDATASection(Document* pOwnerDocument, const CDATASection& sec):
 
 
 CDATASection::~CDATASection()
-{
-}
+= default;
 
 
 Text* CDATASection::splitText(unsigned long offset)

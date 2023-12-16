@@ -49,8 +49,7 @@ RawSocketImpl::RawSocketImpl(poco_socket_t sockfd):
 
 
 RawSocketImpl::~RawSocketImpl()
-{
-}
+= default;
 
 
 void RawSocketImpl::init(int af)

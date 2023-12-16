@@ -45,8 +45,7 @@ LineEndingConverterStreamBuf::LineEndingConverterStreamBuf(std::ostream& ostr):
 
 
 LineEndingConverterStreamBuf::~LineEndingConverterStreamBuf()
-{
-}
+= default;
 
 
 void LineEndingConverterStreamBuf::setNewLine(const std::string& newLineCharacters)
@@ -110,8 +109,7 @@ LineEndingConverterIOS::LineEndingConverterIOS(std::ostream& ostr): _buf(ostr)
 
 
 LineEndingConverterIOS::~LineEndingConverterIOS()
-{
-}
+= default;
 
 
 void LineEndingConverterIOS::setNewLine(const std::string& newLineCharacters)
@@ -148,8 +146,7 @@ InputLineEndingConverter::InputLineEndingConverter(std::istream& istr, const std
 
 
 InputLineEndingConverter::~InputLineEndingConverter()
-{
-}
+= default;
 
 
 OutputLineEndingConverter::OutputLineEndingConverter(std::ostream& ostr):
@@ -168,8 +165,7 @@ OutputLineEndingConverter::OutputLineEndingConverter(std::ostream& ostr, const s
 
 
 OutputLineEndingConverter::~OutputLineEndingConverter()
-{
-}
+= default;
 
 
 } // namespace Poco

@@ -31,8 +31,7 @@ namespace Poco {
 
 
 SharedLibrary::SharedLibrary()
-{
-}
+= default;
 
 
 SharedLibrary::SharedLibrary(const std::string& path)
@@ -48,8 +47,7 @@ SharedLibrary::SharedLibrary(const std::string& path, int flags)
 
 
 SharedLibrary::~SharedLibrary()
-{
-}
+= default;
 
 
 void SharedLibrary::load(const std::string& path)

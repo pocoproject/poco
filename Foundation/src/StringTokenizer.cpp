@@ -58,8 +58,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 
 
 StringTokenizer::~StringTokenizer()
-{
-}
+= default;
 
 
 void StringTokenizer::trim(std::string& token)

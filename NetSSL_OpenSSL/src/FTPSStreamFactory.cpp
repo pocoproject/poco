@@ -43,8 +43,7 @@ public:
 	}
 
 	~FTPSStreamBuf() override
-	{
-	}
+	= default;
 
 private:
 	int readFromDevice() override
@@ -66,8 +65,7 @@ public:
 	}
 
 	~FTPSIOS() override
-	{
-	}
+	= default;
 
 	FTPSStreamBuf* rdbuf()
 	{
@@ -100,13 +98,11 @@ private:
 
 
 FTPSStreamFactory::FTPSStreamFactory()
-{
-}
+= default;
 
 
 FTPSStreamFactory::~FTPSStreamFactory()
-{
-}
+= default;
 
 
 std::istream* FTPSStreamFactory::open(const URI& uri)

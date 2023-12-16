@@ -41,10 +41,9 @@ CipherKey::CipherKey(const std::string& name):
 }
 
 
-CipherKey::CipherKey(const CipherKey& other):
-	_pImpl(other._pImpl)
-{
-}
+CipherKey::CipherKey(const CipherKey& other)
+	
+= default;
 
 
 CipherKey::CipherKey(CipherKey&& other) noexcept:
@@ -54,8 +53,7 @@ CipherKey::CipherKey(CipherKey&& other) noexcept:
 
 
 CipherKey::~CipherKey()
-{
-}
+= default;
 
 
 CipherKey& CipherKey::operator = (const CipherKey& other)

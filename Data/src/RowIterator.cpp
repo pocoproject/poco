@@ -33,11 +33,9 @@ RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):
 }
 
 
-RowIterator::RowIterator(const RowIterator& other):
-	_pRecordSet(other._pRecordSet),
-	_position(other._position)
-{
-}
+RowIterator::RowIterator(const RowIterator& other)
+	
+= default;
 
 
 RowIterator::RowIterator(RowIterator&& other) noexcept:
@@ -47,8 +45,7 @@ RowIterator::RowIterator(RowIterator&& other) noexcept:
 }
 
 RowIterator::~RowIterator()
-{
-}
+= default;
 
 
 RowIterator& RowIterator::operator = (const RowIterator& other)

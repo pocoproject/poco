@@ -59,8 +59,7 @@ MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, Ev
 
 
 MutationEvent::~MutationEvent()
-{
-}
+= default;
 
 
 void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node* relatedNode,

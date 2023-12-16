@@ -50,8 +50,7 @@ PageReader::PageReader(const PageReader& parent, std::string  path):
 
 
 PageReader::~PageReader()
-{
-}
+= default;
 
 
 void PageReader::emitLineDirectives(bool flag)

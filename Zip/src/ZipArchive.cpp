@@ -59,8 +59,7 @@ ZipArchive::ZipArchive(std::istream& in, ParseCallback& pc):
 
 
 ZipArchive::~ZipArchive()
-{
-}
+= default;
 
 
 void ZipArchive::parse(std::istream& in, ParseCallback& pc)

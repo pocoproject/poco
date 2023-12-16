@@ -67,15 +67,11 @@ Clock::Clock(const Clock& other)
 
 
 Clock::~Clock()
-{
-}
+= default;
 
 
 Clock& Clock::operator = (const Clock& other)
-{
-	_clock = other._clock;
-	return *this;
-}
+= default;
 
 
 Clock& Clock::operator = (ClockVal tv)

@@ -32,8 +32,7 @@ NodeAppender::NodeAppender(Element* parent):
 
 
 NodeAppender::~NodeAppender()
-{
-}
+= default;
 
 
 void NodeAppender::appendChild(Node* newChild)

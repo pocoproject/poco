@@ -27,8 +27,7 @@ PooledSessionHolder::PooledSessionHolder(SessionPool& owner, SessionImpl* pSessi
 
 
 PooledSessionHolder::~PooledSessionHolder()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

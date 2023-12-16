@@ -66,8 +66,7 @@ ServerSocket ServerSocket::fromFileDescriptor(poco_socket_t fd)
 
 
 ServerSocket::~ServerSocket()
-{
-}
+= default;
 
 
 ServerSocket& ServerSocket::operator = (const Socket& socket)

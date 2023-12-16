@@ -83,8 +83,7 @@ OpMsgMessage::OpMsgMessage(std::string  databaseName, std::string  collectionNam
 
 
 OpMsgMessage::~OpMsgMessage()
-{
-}
+= default;
 
 const std::string& OpMsgMessage::databaseName() const
 {

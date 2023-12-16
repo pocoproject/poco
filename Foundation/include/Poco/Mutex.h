@@ -212,13 +212,11 @@ public:
 
 	NullMutex()
 		/// Creates the NullMutex.
-	{
-	}
+	= default;
 
 	~NullMutex()
 		/// Destroys the NullMutex.
-	{
-	}
+	= default;
 
 	void lock()
 		/// Does nothing.

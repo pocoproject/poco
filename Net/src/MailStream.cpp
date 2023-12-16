@@ -36,8 +36,7 @@ MailStreamBuf::MailStreamBuf(std::ostream& ostr):
 
 
 MailStreamBuf::~MailStreamBuf()
-{
-}
+= default;
 
 
 void MailStreamBuf::close()
@@ -178,8 +177,7 @@ MailIOS::MailIOS(std::ostream& ostr): _buf(ostr)
 
 
 MailIOS::~MailIOS()
-{
-}
+= default;
 
 
 void MailIOS::close()
@@ -202,8 +200,7 @@ MailInputStream::MailInputStream(std::istream& istr):
 
 
 MailInputStream::~MailInputStream()
-{
-}
+= default;
 
 
 MailOutputStream::MailOutputStream(std::ostream& ostr):
@@ -214,8 +211,7 @@ MailOutputStream::MailOutputStream(std::ostream& ostr):
 
 
 MailOutputStream::~MailOutputStream()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

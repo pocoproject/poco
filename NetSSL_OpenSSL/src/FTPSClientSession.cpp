@@ -53,8 +53,7 @@ FTPSClientSession::FTPSClientSession(const std::string& host, Poco::UInt16 port,
 
 
 FTPSClientSession::~FTPSClientSession()
-{
-}
+= default;
 
 
 void FTPSClientSession::enableFTPS(bool enable)

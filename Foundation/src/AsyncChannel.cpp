@@ -38,8 +38,7 @@ public:
 	}
 
 	~MessageNotification() override
-	{
-	}
+	= default;
 
 	const Message& message() const
 	{

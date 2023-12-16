@@ -4343,8 +4343,7 @@ Windows949Encoding::Windows949Encoding():
 
 
 Windows949Encoding::~Windows949Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

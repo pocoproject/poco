@@ -47,8 +47,7 @@ MultipartWriter::MultipartWriter(std::ostream& ostr, std::string  boundary):
 
 
 MultipartWriter::~MultipartWriter()
-{
-}
+= default;
 
 
 void MultipartWriter::nextPart(const MessageHeader& header)

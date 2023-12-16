@@ -21,13 +21,11 @@ namespace Poco
 {
 
 DigestEngine::DigestEngine()
-{
-}
+= default;
 
 
 DigestEngine::~DigestEngine()
-{
-}
+= default;
 
 
 std::string DigestEngine::digestToHex(const Digest& bytes, std::size_t length)

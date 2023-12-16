@@ -76,8 +76,7 @@ public:
 	}
 
 	~PBKDF2Engine() override
-	{
-	}
+	= default;
 
 	std::size_t digestLength() const override
 	{

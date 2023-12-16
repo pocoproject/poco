@@ -1945,8 +1945,7 @@ MacChineseSimpEncoding::MacChineseSimpEncoding():
 
 
 MacChineseSimpEncoding::~MacChineseSimpEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

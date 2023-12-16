@@ -40,12 +40,9 @@ MediaType::MediaType(std::string  type, std::string  subType):
 }
 
 
-MediaType::MediaType(const MediaType& mediaType):
-	_type(mediaType._type),
-	_subType(mediaType._subType),
-	_parameters(mediaType._parameters)
-{
-}
+MediaType::MediaType(const MediaType& mediaType)
+	
+= default;
 
 
 MediaType::MediaType(MediaType&& mediaType) noexcept:
@@ -57,8 +54,7 @@ MediaType::MediaType(MediaType&& mediaType) noexcept:
 
 
 MediaType::~MediaType()
-{
-}
+= default;
 
 
 MediaType& MediaType::operator = (const MediaType& mediaType)

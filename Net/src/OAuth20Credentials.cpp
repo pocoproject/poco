@@ -62,8 +62,7 @@ OAuth20Credentials::OAuth20Credentials(const HTTPRequest& request, std::string  
 
 
 OAuth20Credentials::~OAuth20Credentials()
-{
-}
+= default;
 
 
 void OAuth20Credentials::setBearerToken(const std::string& bearerToken)

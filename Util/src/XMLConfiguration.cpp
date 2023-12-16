@@ -119,8 +119,7 @@ XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode, char delim):
 
 
 XMLConfiguration::~XMLConfiguration()
-{
-}
+= default;
 
 
 void XMLConfiguration::load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize)

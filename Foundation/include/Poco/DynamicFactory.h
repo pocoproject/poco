@@ -38,8 +38,7 @@ public:
 
 	DynamicFactory()
 		/// Creates the DynamicFactory.
-	{
-	}
+	= default;
 
 	~DynamicFactory()
 		/// Destroys the DynamicFactory and deletes the instantiators for

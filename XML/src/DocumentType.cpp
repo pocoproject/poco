@@ -43,8 +43,7 @@ DocumentType::DocumentType(Document* pOwner, const DocumentType& doctype):
 
 
 DocumentType::~DocumentType()
-{
-}
+= default;
 
 
 NamedNodeMap* DocumentType::entities() const

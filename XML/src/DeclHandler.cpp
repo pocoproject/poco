@@ -20,8 +20,7 @@ namespace XML {
 
 
 DeclHandler::~DeclHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

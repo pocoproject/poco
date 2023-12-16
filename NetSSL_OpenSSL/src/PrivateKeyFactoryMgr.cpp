@@ -29,8 +29,7 @@ PrivateKeyFactoryMgr::PrivateKeyFactoryMgr()
 
 
 PrivateKeyFactoryMgr::~PrivateKeyFactoryMgr()
-{
-}
+= default;
 
 
 void PrivateKeyFactoryMgr::setFactory(const std::string& name, PrivateKeyFactory* pFactory)

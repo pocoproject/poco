@@ -22,8 +22,7 @@ namespace Data {
 
 
 StatementCreator::StatementCreator()
-{
-}
+= default;
 
 
 StatementCreator::StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl):
@@ -32,10 +31,9 @@ StatementCreator::StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl):
 }
 
 
-StatementCreator::StatementCreator(const StatementCreator& other):
-	_ptrImpl(other._ptrImpl)
-{
-}
+StatementCreator::StatementCreator(const StatementCreator& other)
+	
+= default;
 
 
 StatementCreator::StatementCreator(StatementCreator&& other) noexcept:
@@ -62,8 +60,7 @@ StatementCreator& StatementCreator::operator = (StatementCreator&& other) noexce
 
 
 StatementCreator::~StatementCreator()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

@@ -20,13 +20,11 @@ namespace Data {
 
 
 Connector::Connector()
-{
-}
+= default;
 
 
 Connector::~Connector()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

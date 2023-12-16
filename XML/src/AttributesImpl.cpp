@@ -30,8 +30,7 @@ AttributesImpl::EmptyAttribute AttributesImpl::_empty;
 
 
 AttributesImpl::AttributesImpl()
-{
-}
+= default;
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
@@ -53,8 +52,7 @@ AttributesImpl::AttributesImpl(AttributesImpl&& attributes) noexcept:
 
 
 AttributesImpl::~AttributesImpl()
-{
-}
+= default;
 
 
 AttributesImpl& AttributesImpl::operator = (const AttributesImpl& attributes)

@@ -38,8 +38,7 @@ ECDSADigestEngine::ECDSADigestEngine(ECKey  key, const std::string &name):
 
 
 ECDSADigestEngine::~ECDSADigestEngine()
-{
-}
+= default;
 
 
 std::size_t ECDSADigestEngine::digestLength() const

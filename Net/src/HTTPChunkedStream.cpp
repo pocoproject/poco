@@ -44,8 +44,7 @@ HTTPChunkedStreamBuf::HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, 
 
 
 HTTPChunkedStreamBuf::~HTTPChunkedStreamBuf()
-{
-}
+= default;
 
 
 void HTTPChunkedStreamBuf::close()
@@ -184,8 +183,7 @@ HTTPChunkedInputStream::HTTPChunkedInputStream(HTTPSession& session, MessageHead
 
 
 HTTPChunkedInputStream::~HTTPChunkedInputStream()
-{
-}
+= default;
 
 
 void* HTTPChunkedInputStream::operator new(std::size_t size)
@@ -223,8 +221,7 @@ HTTPChunkedOutputStream::HTTPChunkedOutputStream(HTTPSession& session, MessageHe
 
 
 HTTPChunkedOutputStream::~HTTPChunkedOutputStream()
-{
-}
+= default;
 
 
 void* HTTPChunkedOutputStream::operator new(std::size_t size)

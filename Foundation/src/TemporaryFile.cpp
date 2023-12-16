@@ -33,8 +33,7 @@ class TempFileCollector
 {
 public:
 	TempFileCollector()
-	{
-	}
+	= default;
 
 	~TempFileCollector()
 	{

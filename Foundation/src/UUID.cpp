@@ -91,8 +91,7 @@ UUID::UUID(const char* bytes, Version version)
 
 
 UUID::~UUID()
-{
-}
+= default;
 
 
 UUID& UUID::operator = (const UUID& uuid)

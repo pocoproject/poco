@@ -255,8 +255,7 @@ CipherImpl::CipherImpl(CipherKey  key):
 
 
 CipherImpl::~CipherImpl()
-{
-}
+= default;
 
 
 CryptoTransform::Ptr CipherImpl::createEncryptor()

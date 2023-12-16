@@ -35,12 +35,10 @@ class Part
 {
 public:
 	Part()
-	{
-	}
+	= default;
 
 	virtual ~Part()
-	{
-	}
+	= default;
 
 	virtual void render(const Var& data, std::ostream& out) const = 0;
 
@@ -60,8 +58,7 @@ public:
 	}
 
 	~StringPart() override
-	{
-	}
+	= default;
 
 	void render(const Var& data, std::ostream& out) const override
 	{
@@ -87,12 +84,10 @@ class MultiPart: public Part
 {
 public:
 	MultiPart()
-	{
-	}
+	= default;
 
 	~MultiPart() override
-	{
-	}
+	= default;
 
 	virtual void addPart(Part* part)
 	{
@@ -120,8 +115,7 @@ public:
 	}
 
 	~EchoPart() override
-	{
-	}
+	= default;
 
 	void render(const Var& data, std::ostream& out) const override
 	{
@@ -147,8 +141,7 @@ public:
 	}
 
 	virtual ~LogicQuery()
-	{
-	}
+	= default;
 
 	virtual bool apply(const Var& data) const
 	{
@@ -191,8 +184,7 @@ public:
 	}
 
 	~LogicExistQuery() override
-	{
-	}
+	= default;
 
 	bool apply(const Var& data) const override
 	{
@@ -212,8 +204,7 @@ public:
 	}
 
 	~LogicElseQuery() override
-	{
-	}
+	= default;
 
 	bool apply(const Var& data) const override
 	{
@@ -230,8 +221,7 @@ public:
 	}
 
 	~LogicPart() override
-	{
-	}
+	= default;
 
 	void addPart(LogicQuery* query, Part* part)
 	{
@@ -271,8 +261,7 @@ public:
 	}
 
 	~LoopPart() override
-	{
-	}
+	= default;
 
 	void render(const Var& data, std::ostream& out) const override
 	{
@@ -325,8 +314,7 @@ public:
 	}
 
 	~IncludePart() override
-	{
-	}
+	= default;
 
 	void render(const Var& data, std::ostream& out) const override
 	{

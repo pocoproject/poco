@@ -32,8 +32,7 @@ Transcoder::Transcoder(Poco::TextEncoding::Ptr pFromEncoding,
 
 
 Transcoder::~Transcoder()
-{
-}
+= default;
 
 
 Transcoder::Ptr Transcoder::create(Poco::TextEncoding::Ptr pFromEncoding,

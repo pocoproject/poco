@@ -60,8 +60,7 @@ public:
 	}
 
 	~BasicMemoryStreamBuf() override
-	{
-	}
+	= default;
 
 	int_type overflow(int_type /*c*/) override
 	{

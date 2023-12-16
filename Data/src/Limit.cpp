@@ -28,8 +28,7 @@ Limit::Limit(SizeT value, bool hardLimit, bool isLowerLimit) :
 
 
 Limit::~Limit()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

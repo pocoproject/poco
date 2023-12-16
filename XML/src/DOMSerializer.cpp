@@ -54,8 +54,7 @@ DOMSerializer::DOMSerializer():
 
 
 DOMSerializer::~DOMSerializer()
-{
-}
+= default;
 
 
 void DOMSerializer::setEntityResolver(EntityResolver* pEntityResolver)

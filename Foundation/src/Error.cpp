@@ -72,8 +72,7 @@ namespace Poco {
 		}
 
 		~StrErrorHelper()
-		{
-		}
+		= default;
 
 		const std::string& message() const
 		{

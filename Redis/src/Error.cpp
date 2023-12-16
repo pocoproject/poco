@@ -24,8 +24,7 @@ namespace Redis {
 
 
 Error::Error()
-{
-}
+= default;
 
 
 Error::Error(std::string  message): _message(std::move(message))
@@ -34,8 +33,7 @@ Error::Error(std::string  message): _message(std::move(message))
 
 
 Error::~Error()
-{
-}
+= default;
 
 
 } } // namespace Poco::Redis

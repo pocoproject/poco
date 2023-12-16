@@ -36,8 +36,7 @@ EntityReference::EntityReference(Document* pOwnerDocument, const EntityReference
 
 
 EntityReference::~EntityReference()
-{
-}
+= default;
 
 
 const XMLString& EntityReference::nodeName() const

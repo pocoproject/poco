@@ -23,8 +23,7 @@ namespace Poco {
 
 
 NotificationCenter::NotificationCenter()
-{
-}
+= default;
 
 
 NotificationCenter::~NotificationCenter()

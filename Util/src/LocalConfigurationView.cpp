@@ -28,8 +28,7 @@ LocalConfigurationView::LocalConfigurationView(std::string  prefix, AbstractConf
 
 
 LocalConfigurationView::~LocalConfigurationView()
-{
-}
+= default;
 
 
 bool LocalConfigurationView::getRaw(const std::string& key, std::string& value) const

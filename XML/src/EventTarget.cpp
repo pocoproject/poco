@@ -20,8 +20,7 @@ namespace XML {
 
 
 EventTarget::~EventTarget()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

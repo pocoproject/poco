@@ -130,7 +130,7 @@ AlterStatement::~AlterStatement() {
 TransactionStatement::TransactionStatement(TransactionCommand command)
     : SQLStatement(kStmtTransaction), command(command) {}
 
-TransactionStatement::~TransactionStatement() {}
+TransactionStatement::~TransactionStatement() = default;
 
 // ExecuteStatement
 ExecuteStatement::ExecuteStatement() : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr) {}

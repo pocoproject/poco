@@ -37,8 +37,7 @@ UDPServerParams::UDPServerParams(Poco::Net::SocketAddress  sa,
 
 
 UDPServerParams::~UDPServerParams()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

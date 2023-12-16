@@ -37,8 +37,7 @@ Logger::Logger(std::string  name, Channel::Ptr pChannel, int level): _name(std::
 
 
 Logger::~Logger()
-{
-}
+= default;
 
 
 void Logger::setChannel(Channel::Ptr pChannel)

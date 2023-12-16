@@ -33,8 +33,7 @@ AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
 
 
 AbstractExtraction::~AbstractExtraction()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

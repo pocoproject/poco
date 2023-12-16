@@ -26,8 +26,7 @@ namespace Dynamic {
 
 
 Var::Var()
-{
-}
+= default;
 
 
 Var::Var(const char* pVal)

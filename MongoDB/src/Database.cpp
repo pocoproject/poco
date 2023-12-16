@@ -126,8 +126,7 @@ Database::Database(std::string  db):
 
 
 Database::~Database()
-{
-}
+= default;
 
 
 bool Database::authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method)

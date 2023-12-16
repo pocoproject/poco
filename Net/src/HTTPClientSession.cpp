@@ -132,8 +132,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket, ProxyConfig  pr
 
 
 HTTPClientSession::~HTTPClientSession()
-{
-}
+= default;
 
 
 void HTTPClientSession::setHost(const std::string& host)

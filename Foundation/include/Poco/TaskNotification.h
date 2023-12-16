@@ -136,7 +136,7 @@ public:
 	}
 
 protected:
-	~TaskCustomNotification() override{};
+	~TaskCustomNotification() override= default;
 
 private:
 	C _custom;

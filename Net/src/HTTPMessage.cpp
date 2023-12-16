@@ -58,16 +58,13 @@ HTTPMessage::HTTPMessage(std::string  version):
 }
 
 
-HTTPMessage::HTTPMessage(const HTTPMessage& other):
-	MessageHeader(other),
-	_version(other._version)
-{
-}
+HTTPMessage::HTTPMessage(const HTTPMessage& other)
+	
+= default;
 
 
 HTTPMessage::~HTTPMessage()
-{
-}
+= default;
 
 
 HTTPMessage& HTTPMessage::operator = (const HTTPMessage& other)

@@ -39,8 +39,7 @@ DOMWriter::DOMWriter():
 
 
 DOMWriter::~DOMWriter()
-{
-}
+= default;
 
 
 void DOMWriter::setEncoding(const std::string& encodingName, Poco::TextEncoding& textEncoding)

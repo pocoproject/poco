@@ -327,8 +327,7 @@ DeflatingIOS::DeflatingIOS(std::istream& istr, int windowBits, int level):
 
 
 DeflatingIOS::~DeflatingIOS()
-{
-}
+= default;
 
 
 DeflatingStreamBuf* DeflatingIOS::rdbuf()
@@ -352,8 +351,7 @@ DeflatingOutputStream::DeflatingOutputStream(std::ostream& ostr, int windowBits,
 
 
 DeflatingOutputStream::~DeflatingOutputStream()
-{
-}
+= default;
 
 
 int DeflatingOutputStream::close()
@@ -383,8 +381,7 @@ DeflatingInputStream::DeflatingInputStream(std::istream& istr, int windowBits, i
 
 
 DeflatingInputStream::~DeflatingInputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

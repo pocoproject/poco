@@ -55,8 +55,7 @@ public:
 	}
 
 	virtual ~DirectoryWatcherStrategy()
-	{
-	}
+	= default;
 
 	DirectoryWatcher& owner()
 	{
@@ -75,12 +74,9 @@ protected:
 		{
 		}
 
-		ItemInfo(const ItemInfo& other):
-			path(other.path),
-			size(other.size),
-			lastModified(other.lastModified)
-		{
-		}
+		ItemInfo(const ItemInfo& other)
+			
+		= default;
 
 		explicit ItemInfo(const File& f):
 			path(f.path()),

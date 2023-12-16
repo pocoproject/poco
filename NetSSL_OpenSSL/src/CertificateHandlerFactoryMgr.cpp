@@ -31,8 +31,7 @@ CertificateHandlerFactoryMgr::CertificateHandlerFactoryMgr()
 
 
 CertificateHandlerFactoryMgr::~CertificateHandlerFactoryMgr()
-{
-}
+= default;
 
 
 void CertificateHandlerFactoryMgr::setFactory(const std::string& name, CertificateHandlerFactory* pFactory)

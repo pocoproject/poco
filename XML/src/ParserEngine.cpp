@@ -50,8 +50,7 @@ public:
 	}
 
 	~ContextLocator() override
-	{
-	}
+	= default;
 
 	XMLString getPublicId() const override
 	{

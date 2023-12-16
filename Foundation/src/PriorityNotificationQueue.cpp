@@ -22,8 +22,7 @@ namespace Poco {
 
 
 PriorityNotificationQueue::PriorityNotificationQueue()
-{
-}
+= default;
 
 
 PriorityNotificationQueue::~PriorityNotificationQueue()

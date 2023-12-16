@@ -307,8 +307,7 @@ inline void swap(Timespan& s1, Timespan& s2) noexcept
 
 
 inline Timespan::~Timespan()
-{
-}
+= default;
 
 
 } // namespace Poco

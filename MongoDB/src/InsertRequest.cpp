@@ -30,8 +30,7 @@ InsertRequest::InsertRequest(std::string  collectionName, Flags flags):
 
 
 InsertRequest::~InsertRequest()
-{
-}
+= default;
 
 
 void InsertRequest::buildRequest(BinaryWriter& writer)

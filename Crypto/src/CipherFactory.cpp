@@ -42,8 +42,7 @@ CipherFactory::CipherFactory()
 
 
 CipherFactory::~CipherFactory()
-{
-}
+= default;
 
 
 namespace

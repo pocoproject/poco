@@ -32,8 +32,7 @@ HTTPResponseStreamBuf::HTTPResponseStreamBuf(std::istream& istr):
 
 
 HTTPResponseStreamBuf::~HTTPResponseStreamBuf()
-{
-}
+= default;
 
 
 HTTPResponseIOS::HTTPResponseIOS(std::istream& istr):
@@ -44,8 +43,7 @@ HTTPResponseIOS::HTTPResponseIOS(std::istream& istr):
 
 
 HTTPResponseIOS::~HTTPResponseIOS()
-{
-}
+= default;
 
 
 HTTPResponseStream::HTTPResponseStream(std::istream& istr, HTTPClientSession* pSession):

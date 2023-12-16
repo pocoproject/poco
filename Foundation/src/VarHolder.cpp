@@ -22,13 +22,11 @@ namespace Dynamic {
 
 
 VarHolder::VarHolder()
-{
-}
+= default;
 
 
 VarHolder::~VarHolder()
-{
-}
+= default;
 
 
 namespace Impl {

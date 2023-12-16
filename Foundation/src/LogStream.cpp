@@ -32,8 +32,7 @@ LogStreamBuf::LogStreamBuf(Logger& logger, Message::Priority priority, std::size
 
 
 LogStreamBuf::~LogStreamBuf()
-{
-}
+= default;
 
 
 void LogStreamBuf::setPriority(Message::Priority priority)
@@ -77,8 +76,7 @@ LogIOS::LogIOS(Logger& logger, Message::Priority priority, std::size_t bufferCap
 
 
 LogIOS::~LogIOS()
-{
-}
+= default;
 
 
 LogStreamBuf* LogIOS::rdbuf()
@@ -107,8 +105,7 @@ LogStream::LogStream(const std::string& loggerName, Message::Priority priority, 
 
 
 LogStream::~LogStream()
-{
-}
+= default;
 
 
 LogStream& LogStream::fatal()

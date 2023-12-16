@@ -34,8 +34,7 @@ NamespaceSupport::NamespaceSupport()
 
 
 NamespaceSupport::~NamespaceSupport()
-{
-}
+= default;
 
 
 bool NamespaceSupport::declarePrefix(const XMLString& prefix, const XMLString& namespaceURI)

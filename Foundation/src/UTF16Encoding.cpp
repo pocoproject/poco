@@ -62,8 +62,7 @@ UTF16Encoding::UTF16Encoding(int byteOrderMark)
 
 
 UTF16Encoding::~UTF16Encoding()
-{
-}
+= default;
 
 
 UTF16Encoding::ByteOrderType UTF16Encoding::getByteOrder() const

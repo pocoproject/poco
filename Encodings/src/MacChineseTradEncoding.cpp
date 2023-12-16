@@ -3437,8 +3437,7 @@ MacChineseTradEncoding::MacChineseTradEncoding():
 
 
 MacChineseTradEncoding::~MacChineseTradEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

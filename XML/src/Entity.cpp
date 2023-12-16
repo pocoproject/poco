@@ -45,8 +45,7 @@ Entity::Entity(Document* pOwnerDocument, const Entity& entity):
 
 
 Entity::~Entity()
-{
-}
+= default;
 
 
 const XMLString& Entity::nodeName() const

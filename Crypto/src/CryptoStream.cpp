@@ -207,8 +207,7 @@ CryptoIOS::CryptoIOS(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::s
 
 
 CryptoIOS::~CryptoIOS()
-{
-}
+= default;
 
 
 CryptoStreamBuf* CryptoIOS::rdbuf()
@@ -237,8 +236,7 @@ CryptoInputStream::CryptoInputStream(std::istream& istr, Cipher& cipher, std::st
 
 
 CryptoInputStream::~CryptoInputStream()
-{
-}
+= default;
 
 
 //
@@ -261,8 +259,7 @@ CryptoOutputStream::CryptoOutputStream(std::ostream& ostr, Cipher& cipher, std::
 
 
 CryptoOutputStream::~CryptoOutputStream()
-{
-}
+= default;
 
 
 void CryptoOutputStream::close()
@@ -284,8 +281,7 @@ EncryptingInputStream::EncryptingInputStream(std::istream& istr, Cipher& cipher,
 
 
 EncryptingInputStream::~EncryptingInputStream()
-{
-}
+= default;
 
 
 //
@@ -301,8 +297,7 @@ EncryptingOutputStream::EncryptingOutputStream(std::ostream& ostr, Cipher& ciphe
 
 
 EncryptingOutputStream::~EncryptingOutputStream()
-{
-}
+= default;
 
 
 void EncryptingOutputStream::close()
@@ -324,8 +319,7 @@ DecryptingInputStream::DecryptingInputStream(std::istream& istr, Cipher& cipher,
 
 
 DecryptingInputStream::~DecryptingInputStream()
-{
-}
+= default;
 
 
 //
@@ -341,8 +335,7 @@ DecryptingOutputStream::DecryptingOutputStream(std::ostream& ostr, Cipher& ciphe
 
 
 DecryptingOutputStream::~DecryptingOutputStream()
-{
-}
+= default;
 
 
 void DecryptingOutputStream::close()

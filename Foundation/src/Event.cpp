@@ -38,8 +38,7 @@ Event::Event(bool autoReset): EventImpl(autoReset)
 
 
 Event::~Event()
-{
-}
+= default;
 
 
 } // namespace Poco

@@ -27,13 +27,11 @@ namespace Net {
 
 
 NullPartHandler::NullPartHandler()
-{
-}
+= default;
 
 
 NullPartHandler::~NullPartHandler()
-{
-}
+= default;
 
 
 void NullPartHandler::handlePart(const MessageHeader& header, std::istream& stream)

@@ -34,8 +34,7 @@ QueryRequest::QueryRequest(std::string  collectionName, QueryRequest::Flags flag
 
 
 QueryRequest::~QueryRequest()
-{
-}
+= default;
 
 
 void QueryRequest::buildRequest(BinaryWriter& writer)

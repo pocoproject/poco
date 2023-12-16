@@ -36,12 +36,10 @@ public:
 	using DelegateHandle = TDelegate*;
 
 	NotificationStrategy()
-	{
-	}
+	= default;
 
 	virtual ~NotificationStrategy()
-	{
-	}
+	= default;
 
 	virtual void notify(const void* sender, TArgs& arguments) = 0;
 		/// Sends a notification to all registered delegates.
@@ -77,12 +75,10 @@ public:
 	using DelegateHandle = TDelegate*;
 
 	NotificationStrategy()
-	{
-	}
+	= default;
 
 	virtual ~NotificationStrategy()
-	{
-	}
+	= default;
 
 	virtual void notify(const void* sender) = 0;
 		/// Sends a notification to all registered delegates.

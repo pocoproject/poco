@@ -42,8 +42,7 @@ public:
 	}
 
 	~ArchiveCompressor() override
-	{
-	}
+	= default;
 
 	ActiveMethod<void, std::string, ArchiveCompressor, ActiveStarter<ActiveDispatcher>> compress;
 
@@ -151,13 +150,11 @@ bool ArchiveStrategy::exists(const std::string& name)
 
 
 ArchiveByNumberStrategy::ArchiveByNumberStrategy()
-{
-}
+= default;
 
 
 ArchiveByNumberStrategy::~ArchiveByNumberStrategy()
-{
-}
+= default;
 
 
 LogFile* ArchiveByNumberStrategy::open(LogFile* pFile)

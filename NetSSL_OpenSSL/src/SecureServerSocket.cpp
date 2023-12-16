@@ -82,8 +82,7 @@ SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog, Context::
 
 
 SecureServerSocket::~SecureServerSocket()
-{
-}
+= default;
 
 
 SecureServerSocket& SecureServerSocket::operator = (const Socket& socket)

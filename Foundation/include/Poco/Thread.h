@@ -283,8 +283,7 @@ protected:
 		}
 
 		~FunctorRunnable() override
-		{
-		}
+		= default;
 
 		void run() override
 		{

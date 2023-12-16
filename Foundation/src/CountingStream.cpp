@@ -49,8 +49,7 @@ CountingStreamBuf::CountingStreamBuf(std::ostream& ostr):
 
 
 CountingStreamBuf::~CountingStreamBuf()
-{
-}
+= default;
 
 
 int CountingStreamBuf::readFromDevice()
@@ -131,8 +130,7 @@ CountingIOS::CountingIOS(std::ostream& ostr): _buf(ostr)
 
 
 CountingIOS::~CountingIOS()
-{
-}
+= default;
 
 
 void CountingIOS::reset()
@@ -177,8 +175,7 @@ CountingInputStream::CountingInputStream(std::istream& istr): CountingIOS(istr),
 
 
 CountingInputStream::~CountingInputStream()
-{
-}
+= default;
 
 
 CountingOutputStream::CountingOutputStream(): std::ostream(&_buf)
@@ -192,8 +189,7 @@ CountingOutputStream::CountingOutputStream(std::ostream& ostr): CountingIOS(ostr
 
 
 CountingOutputStream::~CountingOutputStream()
-{
-}
+= default;
 
 
 } // namespace Poco

@@ -42,8 +42,7 @@ AbstractConfiguration::AbstractConfiguration():
 
 
 AbstractConfiguration::~AbstractConfiguration()
-{
-}
+= default;
 
 
 bool AbstractConfiguration::hasProperty(const std::string& key) const

@@ -88,8 +88,7 @@ Statement::Statement(Statement&& stmt) noexcept:
 
 
 Statement::~Statement()
-{
-}
+= default;
 
 
 Statement& Statement::operator = (const Statement& stmt)

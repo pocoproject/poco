@@ -39,13 +39,11 @@ namespace Util {
 
 
 LoggingConfigurator::LoggingConfigurator()
-{
-}
+= default;
 
 
 LoggingConfigurator::~LoggingConfigurator()
-{
-}
+= default;
 
 
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)

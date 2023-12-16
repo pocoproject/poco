@@ -29,13 +29,11 @@ namespace Data {
 
 
 SessionPoolContainer::SessionPoolContainer()
-{
-}
+= default;
 
 
 SessionPoolContainer::~SessionPoolContainer()
-{
-}
+= default;
 
 
 void SessionPoolContainer::add(SessionPool* pPool)

@@ -21,8 +21,7 @@ namespace Poco {
 
 
 NestedDiagnosticContext::NestedDiagnosticContext()
-{
-}
+= default;
 
 
 NestedDiagnosticContext::NestedDiagnosticContext(const NestedDiagnosticContext& ctx)
@@ -32,8 +31,7 @@ NestedDiagnosticContext::NestedDiagnosticContext(const NestedDiagnosticContext& 
 
 
 NestedDiagnosticContext::~NestedDiagnosticContext()
-{
-}
+= default;
 
 
 NestedDiagnosticContext& NestedDiagnosticContext::operator = (const NestedDiagnosticContext& ctx)

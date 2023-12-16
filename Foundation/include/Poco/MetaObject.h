@@ -135,8 +135,7 @@ public:
 	}
 
 	~MetaObject()
-	{
-	}
+	= default;
 
 	B* create() const
 	{
@@ -167,8 +166,7 @@ public:
 	}
 
 	~MetaSingleton()
-	{
-	}
+	= default;
 
 	B* create() const
 	{

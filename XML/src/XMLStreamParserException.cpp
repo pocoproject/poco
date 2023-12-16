@@ -23,8 +23,7 @@ namespace XML {
 
 
 XMLStreamParserException::~XMLStreamParserException() noexcept
-{
-}
+= default;
 
 
 XMLStreamParserException::XMLStreamParserException(std::string  n, Poco::UInt64 l, Poco::UInt64 c, std::string  d):

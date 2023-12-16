@@ -20,8 +20,7 @@ namespace XML {
 
 
 DTDHandler::~DTDHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

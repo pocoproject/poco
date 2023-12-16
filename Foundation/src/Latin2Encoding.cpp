@@ -51,13 +51,11 @@ const TextEncoding::CharacterMap Latin2Encoding::_charMap =
 
 
 Latin2Encoding::Latin2Encoding()
-{
-}
+= default;
 
 
 Latin2Encoding::~Latin2Encoding()
-{
-}
+= default;
 
 
 const char* Latin2Encoding::canonicalName() const

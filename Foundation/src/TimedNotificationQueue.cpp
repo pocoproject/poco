@@ -21,8 +21,7 @@ namespace Poco {
 
 
 TimedNotificationQueue::TimedNotificationQueue()
-{
-}
+= default;
 
 
 TimedNotificationQueue::~TimedNotificationQueue()

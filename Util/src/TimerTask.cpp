@@ -27,8 +27,7 @@ TimerTask::TimerTask():
 
 
 TimerTask::~TimerTask()
-{
-}
+= default;
 
 
 void TimerTask::cancel()

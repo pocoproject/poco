@@ -15,7 +15,7 @@ enum struct ConstraintType { None, NotNull, Null, PrimaryKey, Unique };
 
 // Superclass for both TableConstraint and Column Definition
 struct SQLParser_API TableElement {
-  virtual ~TableElement() {}
+  virtual ~TableElement() = default;
 };
 
 // Represents definition of a table constraint

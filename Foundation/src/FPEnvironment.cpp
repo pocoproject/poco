@@ -43,8 +43,7 @@ namespace Poco {
 
 
 FPEnvironment::FPEnvironment()
-{
-}
+= default;
 
 
 FPEnvironment::FPEnvironment(RoundingMode rm)
@@ -53,14 +52,12 @@ FPEnvironment::FPEnvironment(RoundingMode rm)
 }
 
 
-FPEnvironment::FPEnvironment(const FPEnvironment& env): FPEnvironmentImpl(env)
-{
-}
+FPEnvironment::FPEnvironment(const FPEnvironment& env) 
+= default;
 
 
 FPEnvironment::~FPEnvironment()
-{
-}
+= default;
 
 
 FPEnvironment& FPEnvironment::operator = (const FPEnvironment& env)

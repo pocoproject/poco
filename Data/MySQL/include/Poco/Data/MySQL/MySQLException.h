@@ -122,10 +122,7 @@ private:
 
 
 inline MySQLException& MySQLException::operator=(const MySQLException& exc)
-{
-	Poco::Data::DataException::operator=(exc);
-	return *this;
-}
+= default;
 
 inline const char* MySQLException::name() const noexcept
 {

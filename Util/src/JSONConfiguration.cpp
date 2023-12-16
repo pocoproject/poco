@@ -56,8 +56,7 @@ JSONConfiguration::JSONConfiguration(JSON::Object::Ptr  object) : _object(std::m
 
 
 JSONConfiguration::~JSONConfiguration()
-{
-}
+= default;
 
 
 void JSONConfiguration::load(const std::string& path)

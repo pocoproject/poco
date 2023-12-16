@@ -224,24 +224,19 @@ long Timer::skipped() const
 
 
 AbstractTimerCallback::AbstractTimerCallback()
-{
-}
+= default;
 
 
 AbstractTimerCallback::AbstractTimerCallback(const AbstractTimerCallback& callback)
-{
-}
+= default;
 
 
 AbstractTimerCallback::~AbstractTimerCallback()
-{
-}
+= default;
 
 
 AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCallback& callback)
-{
-	return *this;
-}
+= default;
 
 
 } // namespace Poco

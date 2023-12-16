@@ -38,8 +38,7 @@ CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& data
 
 
 CharacterData::~CharacterData()
-{
-}
+= default;
 
 
 void CharacterData::setData(const XMLString& data)

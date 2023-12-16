@@ -21,13 +21,11 @@ namespace Net {
 
 
 PrivateKeyFactory::PrivateKeyFactory()
-{
-}
+= default;
 
 
 PrivateKeyFactory::~PrivateKeyFactory()
-{
-}
+= default;
 
 
 PrivateKeyFactoryRegistrar::PrivateKeyFactoryRegistrar(const std::string& name, PrivateKeyFactory* pFactory)
@@ -37,8 +35,7 @@ PrivateKeyFactoryRegistrar::PrivateKeyFactoryRegistrar(const std::string& name, 
 
 
 PrivateKeyFactoryRegistrar::~PrivateKeyFactoryRegistrar()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

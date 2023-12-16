@@ -3456,8 +3456,7 @@ Windows950Encoding::Windows950Encoding():
 
 
 Windows950Encoding::~Windows950Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

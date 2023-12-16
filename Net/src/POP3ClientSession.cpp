@@ -41,8 +41,7 @@ public:
 	}
 
 	~DialogStreamBuf() override
-	{
-	}
+	= default;
 
 private:
 	int readFromDevice() override
@@ -64,8 +63,7 @@ public:
 	}
 
 	~DialogIOS() override
-	{
-	}
+	= default;
 
 	DialogStreamBuf* rdbuf()
 	{
@@ -87,8 +85,7 @@ public:
 	}
 
 	~DialogInputStream() override
-	{
-	}
+	= default;
 };
 
 

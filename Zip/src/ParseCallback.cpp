@@ -20,13 +20,11 @@ namespace Zip {
 
 
 ParseCallback::ParseCallback()
-{
-}
+= default;
 
 
 ParseCallback::~ParseCallback()
-{
-}
+= default;
 
 
 } } // namespace Poco::Zip

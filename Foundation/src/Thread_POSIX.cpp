@@ -72,8 +72,7 @@ namespace
 			pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 		}
 		~SignalBlocker()
-		{
-		}
+		= default;
 	};
 
 	static SignalBlocker signalBlocker;

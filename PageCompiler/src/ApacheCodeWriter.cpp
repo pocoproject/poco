@@ -19,8 +19,7 @@ ApacheCodeWriter::ApacheCodeWriter(const Page& page, const std::string& clazz):
 
 
 ApacheCodeWriter::~ApacheCodeWriter()
-{
-}
+= default;
 
 
 void ApacheCodeWriter::writeHeaderIncludes(std::ostream& ostr)

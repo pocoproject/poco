@@ -70,8 +70,7 @@ PooledThread::PooledThread(const std::string& name, int stackSize):
 
 
 PooledThread::~PooledThread()
-{
-}
+= default;
 
 
 void PooledThread::start()

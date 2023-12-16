@@ -29,8 +29,7 @@ AbstractPreparation::AbstractPreparation(PreparatorPtr pPreparator):
 
 
 AbstractPreparation::~AbstractPreparation()
-{
-}
+= default;
 
 
 } } // namespace Poco::Data

@@ -44,8 +44,7 @@ public:
 
 	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
 	void prepare() override
 		/// Prepares data.
@@ -77,8 +76,7 @@ public:
 
 	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
 	void prepare() override
 		/// Prepares data.
@@ -109,8 +107,7 @@ public:
 
 	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
 	void prepare() override
 		/// Prepares data.
@@ -141,8 +138,7 @@ public:
 
 	~Preparation() override
 		/// Destroys the Preparation.
-	{
-	}
+	= default;
 
 	void prepare() override
 		/// Prepares data.

@@ -64,8 +64,7 @@ public:
 	}
 
 	~BulkExtraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{

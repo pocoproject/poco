@@ -26,13 +26,11 @@ namespace Util {
 
 
 LoggingSubsystem::LoggingSubsystem()
-{
-}
+= default;
 
 
 LoggingSubsystem::~LoggingSubsystem()
-{
-}
+= default;
 
 
 const char* LoggingSubsystem::name() const

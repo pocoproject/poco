@@ -47,8 +47,7 @@ MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 
 
 MessageHeader::~MessageHeader()
-{
-}
+= default;
 
 
 MessageHeader& MessageHeader::operator = (const MessageHeader& messageHeader)

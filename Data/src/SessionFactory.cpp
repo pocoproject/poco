@@ -22,13 +22,11 @@ namespace Data {
 
 
 SessionFactory::SessionFactory()
-{
-}
+= default;
 
 
 SessionFactory::~SessionFactory()
-{
-}
+= default;
 
 
 SessionFactory& SessionFactory::instance()

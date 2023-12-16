@@ -31,8 +31,7 @@ LogFile::LogFile(const std::string& path): LogFileImpl(path)
 
 
 LogFile::~LogFile()
-{
-}
+= default;
 
 
 } // namespace Poco

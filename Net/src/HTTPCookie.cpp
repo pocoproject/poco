@@ -142,25 +142,13 @@ HTTPCookie::HTTPCookie(std::string  name, std::string  value):
 }
 
 
-HTTPCookie::HTTPCookie(const HTTPCookie& cookie):
-	_version(cookie._version),
-	_name(cookie._name),
-	_value(cookie._value),
-	_comment(cookie._comment),
-	_domain(cookie._domain),
-	_path(cookie._path),
-	_priority(cookie._priority),
-	_secure(cookie._secure),
-	_maxAge(cookie._maxAge),
-	_httpOnly(cookie._httpOnly),
-	_sameSite(cookie._sameSite)
-{
-}
+HTTPCookie::HTTPCookie(const HTTPCookie& cookie)
+	
+= default;
 
 
 HTTPCookie::~HTTPCookie()
-{
-}
+= default;
 
 
 HTTPCookie& HTTPCookie::operator = (const HTTPCookie& cookie)

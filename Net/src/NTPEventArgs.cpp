@@ -38,8 +38,7 @@ NTPEventArgs::NTPEventArgs(SocketAddress  address):
 
 
 NTPEventArgs::~NTPEventArgs()
-{
-}
+= default;
 
 
 std::string NTPEventArgs::hostName() const

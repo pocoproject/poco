@@ -33,8 +33,7 @@ const std::string HTTPNTLMCredentials::SCHEME = "NTLM";
 
 
 HTTPNTLMCredentials::HTTPNTLMCredentials()
-{
-}
+= default;
 
 
 HTTPNTLMCredentials::HTTPNTLMCredentials(std::string  username, std::string  password):
@@ -45,8 +44,7 @@ HTTPNTLMCredentials::HTTPNTLMCredentials(std::string  username, std::string  pas
 
 
 HTTPNTLMCredentials::~HTTPNTLMCredentials()
-{
-}
+= default;
 
 
 void HTTPNTLMCredentials::reset()

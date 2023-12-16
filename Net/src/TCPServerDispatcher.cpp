@@ -39,8 +39,7 @@ public:
 	}
 
 	~TCPConnectionNotification() override
-	{
-	}
+	= default;
 
 	const StreamSocket& socket() const
 	{
@@ -80,8 +79,7 @@ TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactor
 
 
 TCPServerDispatcher::~TCPServerDispatcher()
-{
-}
+= default;
 
 
 void TCPServerDispatcher::duplicate()

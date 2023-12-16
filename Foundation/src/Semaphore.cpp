@@ -38,8 +38,7 @@ Semaphore::Semaphore(int n, int max): SemaphoreImpl(n, max)
 
 
 Semaphore::~Semaphore()
-{
-}
+= default;
 
 
 } // namespace Poco

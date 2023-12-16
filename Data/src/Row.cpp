@@ -77,8 +77,7 @@ void Row::init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter)
 
 
 Row::~Row()
-{
-}
+= default;
 
 
 Poco::Dynamic::Var& Row::get(std::size_t col)

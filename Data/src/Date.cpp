@@ -48,8 +48,7 @@ Date::Date(const DateTime& dt)
 
 
 Date::~Date()
-{
-}
+= default;
 
 
 void Date::assign(int year, int month, int day)

@@ -22,8 +22,7 @@ namespace Poco {
 
 
 NotificationQueue::NotificationQueue()
-{
-}
+= default;
 
 
 NotificationQueue::~NotificationQueue()

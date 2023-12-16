@@ -296,8 +296,7 @@ InflatingIOS::InflatingIOS(std::istream& istr, int windowBits):
 
 
 InflatingIOS::~InflatingIOS()
-{
-}
+= default;
 
 
 InflatingStreamBuf* InflatingIOS::rdbuf()
@@ -321,8 +320,7 @@ InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, int windowBits)
 
 
 InflatingOutputStream::~InflatingOutputStream()
-{
-}
+= default;
 
 
 int InflatingOutputStream::close()
@@ -346,8 +344,7 @@ InflatingInputStream::InflatingInputStream(std::istream& istr, int windowBits):
 
 
 InflatingInputStream::~InflatingInputStream()
-{
-}
+= default;
 
 
 void InflatingInputStream::reset()

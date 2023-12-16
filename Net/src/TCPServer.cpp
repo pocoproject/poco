@@ -34,8 +34,7 @@ namespace Net {
 
 
 TCPServerConnectionFilter::~TCPServerConnectionFilter()
-{
-}
+= default;
 
 
 //

@@ -30,13 +30,11 @@ namespace Crypto {
 
 
 Cipher::Cipher()
-{
-}
+= default;
 
 
 Cipher::~Cipher()
-{
-}
+= default;
 
 
 std::string Cipher::encryptString(const std::string& str, Encoding encoding, bool padding)

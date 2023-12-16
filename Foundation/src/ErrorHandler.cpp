@@ -24,13 +24,11 @@ FastMutex ErrorHandler::_mutex;
 
 
 ErrorHandler::ErrorHandler()
-{
-}
+= default;
 
 
 ErrorHandler::~ErrorHandler()
-{
-}
+= default;
 
 
 void ErrorHandler::exception(const Exception& exc)

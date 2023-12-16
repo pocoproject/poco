@@ -262,8 +262,7 @@ void NetworkInterfaceImpl::setPhyParams()
 
 
 NetworkInterfaceImpl::~NetworkInterfaceImpl()
-{
-}
+= default;
 
 
 bool NetworkInterfaceImpl::supportsIPv4() const

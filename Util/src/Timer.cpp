@@ -36,8 +36,7 @@ public:
 	}
 
 	~TimerNotification() override
-	{
-	}
+	= default;
 
 	virtual bool execute() = 0;
 
@@ -60,8 +59,7 @@ public:
 	}
 
 	~StopNotification() override
-	{
-	}
+	= default;
 
 	bool execute() override
 	{
@@ -80,8 +78,7 @@ public:
 	}
 
 	~CancelNotification() override
-	{
-	}
+	= default;
 
 	bool execute() override
 	{
@@ -132,8 +129,7 @@ public:
 	}
 
 	~TaskNotification() override
-	{
-	}
+	= default;
 
 	TimerTask::Ptr task()
 	{
@@ -180,8 +176,7 @@ public:
 	}
 
 	~PeriodicTaskNotification() override
-	{
-	}
+	= default;
 
 	bool execute() override
 	{
@@ -215,8 +210,7 @@ public:
 	}
 
 	~FixedRateTaskNotification() override
-	{
-	}
+	= default;
 
 	bool execute() override
 	{

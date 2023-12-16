@@ -27,8 +27,7 @@ namespace Compiler {
 
 
 Parser::Parser()
-{
-}
+= default;
 
 
 ClassMap Parser::parse(const std::string& systemId, std::istream& stream)

@@ -96,8 +96,7 @@ public:
 	}
 
 	~RotateAtTimeStrategy() override
-	{
-	}
+	= default;
 
 	bool mustRotate(LogFile* /*pFile*/) override
 	{

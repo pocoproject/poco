@@ -43,8 +43,7 @@ ICMPEventArgs::ICMPEventArgs(SocketAddress  address, int repetitions, int dataSi
 
 
 ICMPEventArgs::~ICMPEventArgs()
-{
-}
+= default;
 
 
 std::string ICMPEventArgs::hostName() const

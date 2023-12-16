@@ -32,8 +32,7 @@ HTTPServerConnectionFactory::HTTPServerConnectionFactory(HTTPServerParams::Ptr p
 
 
 HTTPServerConnectionFactory::~HTTPServerConnectionFactory()
-{
-}
+= default;
 
 
 TCPServerConnection* HTTPServerConnectionFactory::createConnection(const StreamSocket& socket)

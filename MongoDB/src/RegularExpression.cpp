@@ -22,8 +22,7 @@ namespace MongoDB {
 
 
 RegularExpression::RegularExpression()
-{
-}
+= default;
 
 
 RegularExpression::RegularExpression(std::string  pattern, std::string  options):
@@ -34,8 +33,7 @@ RegularExpression::RegularExpression(std::string  pattern, std::string  options)
 
 
 RegularExpression::~RegularExpression()
-{
-}
+= default;
 
 
 SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const

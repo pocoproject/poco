@@ -39,8 +39,7 @@ const std::string OAuth10Credentials::SCHEME = "OAuth";
 
 
 OAuth10Credentials::OAuth10Credentials()
-{
-}
+= default;
 
 
 OAuth10Credentials::OAuth10Credentials(std::string  consumerKey, std::string  consumerSecret):
@@ -83,8 +82,7 @@ OAuth10Credentials::OAuth10Credentials(const Poco::Net::HTTPRequest& request)
 
 
 OAuth10Credentials::~OAuth10Credentials()
-{
-}
+= default;
 
 
 void OAuth10Credentials::setConsumerKey(const std::string& consumerKey)

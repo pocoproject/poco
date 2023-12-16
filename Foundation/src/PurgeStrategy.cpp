@@ -27,13 +27,11 @@ namespace Poco {
 
 
 PurgeStrategy::PurgeStrategy()
-{
-}
+= default;
 
 
 PurgeStrategy::~PurgeStrategy()
-{
-}
+= default;
 
 
 void PurgeStrategy::list(const std::string& path, std::vector<File>& files)
@@ -63,13 +61,11 @@ void PurgeStrategy::list(const std::string& path, std::vector<File>& files)
 
 
 NullPurgeStrategy::NullPurgeStrategy()
-{
-}
+= default;
 
 
 NullPurgeStrategy::~NullPurgeStrategy()
-{
-}
+= default;
 
 
 void NullPurgeStrategy::purge(const std::string& path)
@@ -88,8 +84,7 @@ PurgeByAgeStrategy::PurgeByAgeStrategy(const Timespan& age): _age(age)
 
 
 PurgeByAgeStrategy::~PurgeByAgeStrategy()
-{
-}
+= default;
 
 
 void PurgeByAgeStrategy::purge(const std::string& path)
@@ -118,8 +113,7 @@ PurgeByCountStrategy::PurgeByCountStrategy(int count): _count(count)
 
 
 PurgeByCountStrategy::~PurgeByCountStrategy()
-{
-}
+= default;
 
 
 void PurgeByCountStrategy::purge(const std::string& path)

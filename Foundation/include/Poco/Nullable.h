@@ -109,8 +109,7 @@ public:
 
 	~Nullable()
 		/// Destroys the Nullable.
-	{
-	}
+	= default;
 
 	Nullable& assign(const C& value)
 		/// Assigns a value to the Nullable.

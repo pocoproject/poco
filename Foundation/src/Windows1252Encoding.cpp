@@ -53,13 +53,11 @@ const TextEncoding::CharacterMap Windows1252Encoding::_charMap =
 
 
 Windows1252Encoding::Windows1252Encoding()
-{
-}
+= default;
 
 
 Windows1252Encoding::~Windows1252Encoding()
-{
-}
+= default;
 
 
 const char* Windows1252Encoding::canonicalName() const

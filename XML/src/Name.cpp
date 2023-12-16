@@ -25,8 +25,7 @@ const XMLString Name::EMPTY_NAME;
 
 
 Name::Name()
-{
-}
+= default;
 
 
 Name::Name(XMLString  qname):
@@ -51,12 +50,9 @@ Name::Name(XMLString  qname, XMLString  namespaceURI, XMLString  localName):
 }
 
 
-Name::Name(const Name& name):
-	_qname(name._qname),
-	_namespaceURI(name._namespaceURI),
-	_localName(name._localName)
-{
-}
+Name::Name(const Name& name)
+	
+= default;
 
 
 Name::Name(Name&& name) noexcept:
@@ -68,8 +64,7 @@ Name::Name(Name&& name) noexcept:
 
 
 Name::~Name()
-{
-}
+= default;
 
 
 Name& Name::operator = (const Name& name)

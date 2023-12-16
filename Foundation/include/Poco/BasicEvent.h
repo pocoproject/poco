@@ -41,12 +41,10 @@ class BasicEvent: public AbstractEvent <
 {
 public:
 	BasicEvent()
-	{
-	}
+	= default;
 
 	~BasicEvent() override
-	{
-	}
+	= default;
 
 private:
 	BasicEvent(const BasicEvent& e);

@@ -46,8 +46,7 @@ SAXParser::SAXParser(const XMLString& encoding):
 
 
 SAXParser::~SAXParser()
-{
-}
+= default;
 
 
 void SAXParser::setEncoding(const XMLString& encoding)

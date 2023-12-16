@@ -58,8 +58,7 @@ Object::Object(Object&& other) noexcept:
 
 
 Object::~Object()
-{
-}
+= default;
 
 
 Object &Object::operator = (const Object &other)

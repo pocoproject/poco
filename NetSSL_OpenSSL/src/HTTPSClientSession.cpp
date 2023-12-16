@@ -102,8 +102,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 
 
 HTTPSClientSession::~HTTPSClientSession()
-{
-}
+= default;
 
 
 bool HTTPSClientSession::secure() const

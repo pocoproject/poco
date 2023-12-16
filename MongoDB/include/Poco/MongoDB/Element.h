@@ -362,8 +362,7 @@ public:
 	}
 
 	~ConcreteElement() override
-	{
-	}
+	= default;
 
 
 	T value() const

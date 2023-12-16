@@ -27,8 +27,7 @@ Element::Element(std::string  name) : _name(std::move(name))
 
 
 Element::~Element()
-{
-}
+= default;
 
 
 } } // namespace Poco::MongoDB

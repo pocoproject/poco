@@ -50,8 +50,7 @@ EventDispatcher::EventDispatcher():
 
 
 EventDispatcher::~EventDispatcher()
-{
-}
+= default;
 
 
 void EventDispatcher::addEventListener(const XMLString& type, EventListener* listener, bool useCapture)

@@ -20,13 +20,11 @@ namespace Net {
 
 
 HTTPRequestHandler::HTTPRequestHandler()
-{
-}
+= default;
 
 
 HTTPRequestHandler::~HTTPRequestHandler()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

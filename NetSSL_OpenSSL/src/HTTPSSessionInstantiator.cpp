@@ -24,8 +24,7 @@ namespace Net {
 
 
 HTTPSSessionInstantiator::HTTPSSessionInstantiator()
-{
-}
+= default;
 
 
 HTTPSSessionInstantiator::HTTPSSessionInstantiator(Context::Ptr pContext) :
@@ -35,8 +34,7 @@ HTTPSSessionInstantiator::HTTPSSessionInstantiator(Context::Ptr pContext) :
 
 
 HTTPSSessionInstantiator::~HTTPSSessionInstantiator()
-{
-}
+= default;
 
 
 HTTPClientSession* HTTPSSessionInstantiator::createClientSession(const Poco::URI& uri)

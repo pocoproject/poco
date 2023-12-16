@@ -20,8 +20,7 @@ namespace XML {
 
 
 EntityResolver::~EntityResolver()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

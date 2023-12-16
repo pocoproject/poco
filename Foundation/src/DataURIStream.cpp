@@ -49,8 +49,7 @@ DataURIStreamIOS::DataURIStreamIOS(const URI& uri)
 
 
 DataURIStreamIOS::~DataURIStreamIOS()
-{
-}
+= default;
 
 
 std::streambuf* DataURIStreamIOS::rdbuf()
@@ -65,8 +64,7 @@ DataURIStream::DataURIStream(const URI& uri): DataURIStreamIOS(uri), std::istrea
 
 
 DataURIStream::~DataURIStream()
-{
-}
+= default;
 
 
 } // namespace Poco

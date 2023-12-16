@@ -36,8 +36,7 @@ namespace Util {
 
 
 IniFileConfiguration::IniFileConfiguration()
-{
-}
+= default;
 
 
 IniFileConfiguration::IniFileConfiguration(std::istream& istr)
@@ -53,8 +52,7 @@ IniFileConfiguration::IniFileConfiguration(const std::string& path)
 
 
 IniFileConfiguration::~IniFileConfiguration()
-{
-}
+= default;
 
 
 void IniFileConfiguration::load(std::istream& istr)

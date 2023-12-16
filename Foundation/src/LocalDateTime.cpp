@@ -90,11 +90,9 @@ LocalDateTime::LocalDateTime(int tzd, const DateTime& dateTime, bool adjust):
 }
 
 
-LocalDateTime::LocalDateTime(const LocalDateTime& dateTime):
-	_dateTime(dateTime._dateTime),
-	_tzd(dateTime._tzd)
-{
-}
+LocalDateTime::LocalDateTime(const LocalDateTime& dateTime)
+	
+= default;
 
 
 LocalDateTime::LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff, int tzd):
@@ -106,8 +104,7 @@ LocalDateTime::LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff 
 
 
 LocalDateTime::~LocalDateTime()
-{
-}
+= default;
 
 
 LocalDateTime& LocalDateTime::operator = (const LocalDateTime& dateTime)

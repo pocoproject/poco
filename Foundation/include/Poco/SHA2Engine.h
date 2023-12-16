@@ -82,8 +82,7 @@ public:
 	}
 
 	~SHA2Engine224() override
-	{
-	}
+	= default;
 };
 
 
@@ -101,8 +100,7 @@ public:
 	}
 
 	~SHA2Engine256() override
-	{
-	}
+	= default;
 };
 
 
@@ -120,8 +118,7 @@ public:
 	}
 
 	~SHA2Engine384() override
-	{
-	}
+	= default;
 };
 
 
@@ -139,8 +136,7 @@ public:
 	}
 
 	~SHA2Engine512() override
-	{
-	}
+	= default;
 };
 
 

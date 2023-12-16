@@ -38,8 +38,7 @@ public:
 
 	virtual ~BSONWriter()
 		/// Destroys the BSONWriter.
-	{
-	}
+	= default;
 
 	template<typename T>
 	void write(T& t)

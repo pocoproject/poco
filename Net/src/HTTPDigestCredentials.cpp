@@ -149,8 +149,7 @@ private:
 };
 
 HTTPDigestCredentials::HTTPDigestCredentials()
-{
-}
+= default;
 
 
 HTTPDigestCredentials::HTTPDigestCredentials(std::string  username, std::string  password):
@@ -161,8 +160,7 @@ HTTPDigestCredentials::HTTPDigestCredentials(std::string  username, std::string 
 
 
 HTTPDigestCredentials::~HTTPDigestCredentials()
-{
-}
+= default;
 
 
 void HTTPDigestCredentials::reset()

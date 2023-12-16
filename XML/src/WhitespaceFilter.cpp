@@ -36,8 +36,7 @@ WhitespaceFilter::WhitespaceFilter(XMLReader* pReader):
 
 
 WhitespaceFilter::~WhitespaceFilter()
-{
-}
+= default;
 
 
 void WhitespaceFilter::setProperty(const XMLString& propertyId, const XMLString& value)

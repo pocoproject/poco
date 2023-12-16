@@ -34,8 +34,7 @@ ConfigurationMapper::ConfigurationMapper(std::string  fromPrefix, std::string  t
 
 
 ConfigurationMapper::~ConfigurationMapper()
-{
-}
+= default;
 
 
 bool ConfigurationMapper::getRaw(const std::string& key, std::string& value) const

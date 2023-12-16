@@ -35,8 +35,7 @@ RegExpValidator::RegExpValidator(std::string  regexp):
 
 
 RegExpValidator::~RegExpValidator()
-{
-}
+= default;
 
 
 void RegExpValidator::validate(const Option& option, const std::string& value)

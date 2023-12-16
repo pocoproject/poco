@@ -95,8 +95,7 @@ Windows1255Encoding::Windows1255Encoding():
 
 
 Windows1255Encoding::~Windows1255Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

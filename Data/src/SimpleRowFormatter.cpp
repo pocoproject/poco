@@ -37,8 +37,7 @@ SimpleRowFormatter::SimpleRowFormatter(const SimpleRowFormatter& other):
 
 
 SimpleRowFormatter::~SimpleRowFormatter()
-{
-}
+= default;
 
 
 SimpleRowFormatter& SimpleRowFormatter::operator = (const SimpleRowFormatter& row)

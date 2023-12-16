@@ -76,17 +76,13 @@ HTTPRequest::HTTPRequest(std::string  method, std::string  uri, const std::strin
 }
 
 
-HTTPRequest::HTTPRequest(const HTTPRequest& other):
-	HTTPMessage(other),
-	_method(other._method),
-	_uri(other._uri)
-{
-}
+HTTPRequest::HTTPRequest(const HTTPRequest& other)
+	
+= default;
 
 
 HTTPRequest::~HTTPRequest()
-{
-}
+= default;
 
 
 HTTPRequest& HTTPRequest::operator = (const HTTPRequest& other)

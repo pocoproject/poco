@@ -47,8 +47,7 @@ namespace Net {
 
 
 MulticastSocket::MulticastSocket()
-{
-}
+= default;
 
 
 MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(family)
@@ -71,8 +70,7 @@ MulticastSocket::MulticastSocket(const Socket& socket): DatagramSocket(socket)
 
 
 MulticastSocket::~MulticastSocket()
-{
-}
+= default;
 
 
 MulticastSocket& MulticastSocket::operator = (const Socket& socket)

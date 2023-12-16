@@ -63,8 +63,7 @@ HTTPSStreamFactory::HTTPSStreamFactory(std::string  proxyHost, Poco::UInt16 prox
 
 
 HTTPSStreamFactory::~HTTPSStreamFactory()
-{
-}
+= default;
 
 
 std::istream* HTTPSStreamFactory::open(const URI& uri)

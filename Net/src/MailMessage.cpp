@@ -68,8 +68,7 @@ namespace
 
 		~MultiPartHandler() override
 			/// Destroys string part handler.
-		{
-		}
+		= default;
 
 		void handlePart(const MessageHeader& header, std::istream& stream) override
 			/// Handles a part. If message pointer was provided at construction time,
@@ -162,8 +161,7 @@ namespace
 
 		~StringPartHandler() override
 			/// Destroys string part handler.
-		{
-		}
+		= default;
 
 		void handlePart(const MessageHeader& header, std::istream& stream) override
 			/// Handles a part.

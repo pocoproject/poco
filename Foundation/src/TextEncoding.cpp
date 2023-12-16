@@ -59,8 +59,7 @@ public:
 	}
 
 	~TextEncodingManager()
-	{
-	}
+	= default;
 
 	void add(TextEncoding::Ptr pEncoding)
 	{
@@ -117,8 +116,7 @@ const std::string TextEncoding::GLOBAL;
 
 
 TextEncoding::~TextEncoding()
-{
-}
+= default;
 
 
 int TextEncoding::convert(const unsigned char* bytes) const

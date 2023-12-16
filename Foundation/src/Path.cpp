@@ -69,15 +69,9 @@ Path::Path(const char* path, Style style)
 }
 
 
-Path::Path(const Path& path):
-	_node(path._node),
-	_device(path._device),
-	_name(path._name),
-	_version(path._version),
-	_dirs(path._dirs),
-	_absolute(path._absolute)
-{
-}
+Path::Path(const Path& path)
+	
+= default;
 
 
 Path::Path(Path&& path) noexcept:
@@ -130,8 +124,7 @@ Path::Path(const Path& parent, const Path& relative):
 
 
 Path::~Path()
-{
-}
+= default;
 
 
 Path& Path::operator = (const Path& path)

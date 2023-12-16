@@ -33,14 +33,9 @@ Array::Array(int options):
 }
 
 
-Array::Array(const Array& other) :
-	_values(other._values),
-	_pArray(other._pArray),
-	_modified(other._modified),
-	_escapeUnicode(other._escapeUnicode),
-	_lowercaseHex(other._lowercaseHex)
-{
-}
+Array::Array(const Array& other) 
+	
+= default;
 
 
 Array::Array(Array&& other) noexcept:
@@ -80,8 +75,7 @@ Array& Array::operator = (Array&& other) noexcept
 
 
 Array::~Array()
-{
-}
+= default;
 
 
 Var Array::get(unsigned int index) const

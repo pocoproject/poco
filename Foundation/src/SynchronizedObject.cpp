@@ -19,13 +19,11 @@ namespace Poco {
 
 
 SynchronizedObject::SynchronizedObject()
-{
-}
+= default;
 
 
 SynchronizedObject::~SynchronizedObject()
-{
-}
+= default;
 
 
 } // namespace Poco

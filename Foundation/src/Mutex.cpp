@@ -29,33 +29,27 @@ namespace Poco {
 
 
 Mutex::Mutex()
-{
-}
+= default;
 
 
 Mutex::~Mutex()
-{
-}
+= default;
 
 
 FastMutex::FastMutex()
-{
-}
+= default;
 
 
 FastMutex::~FastMutex()
-{
-}
+= default;
 
 
 SpinlockMutex::SpinlockMutex()
-{
-}
+= default;
 
 
 SpinlockMutex::~SpinlockMutex()
-{
-}
+= default;
 
 
 } // namespace Poco

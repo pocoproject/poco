@@ -67,8 +67,7 @@ SocketReactor::SocketReactor(Params  params, int threadAffinity):
 
 
 SocketReactor::~SocketReactor()
-{
-}
+= default;
 
 
 void SocketReactor::run()

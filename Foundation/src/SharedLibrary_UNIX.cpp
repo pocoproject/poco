@@ -36,8 +36,7 @@ SharedLibraryImpl::SharedLibraryImpl()
 
 
 SharedLibraryImpl::~SharedLibraryImpl()
-{
-}
+= default;
 
 
 void SharedLibraryImpl::loadImpl(const std::string& path, int flags)

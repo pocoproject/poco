@@ -115,8 +115,7 @@ SocketOutputStream::SocketOutputStream(const Socket& socket):
 
 
 SocketOutputStream::~SocketOutputStream()
-{
-}
+= default;
 
 
 //
@@ -132,8 +131,7 @@ SocketInputStream::SocketInputStream(const Socket& socket):
 
 
 SocketInputStream::~SocketInputStream()
-{
-}
+= default;
 
 
 //
@@ -149,8 +147,7 @@ SocketStream::SocketStream(const Socket& socket):
 
 
 SocketStream::~SocketStream()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

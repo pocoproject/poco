@@ -33,8 +33,7 @@ namespace Poco {
 
 
 PIDFile::PIDFile()
-{
-}
+= default;
 
 
 PIDFile::PIDFile(std::string  fileName, bool write):

@@ -57,15 +57,11 @@ OpenSSLException::OpenSSLException(const OpenSSLException& exc): CryptoException
 
 
 OpenSSLException::~OpenSSLException() noexcept
-{
-}
+= default;
 
 
 OpenSSLException& OpenSSLException::operator = (const OpenSSLException& exc)
-{
-	CryptoException::operator = (exc);
-	return *this;
-}
+= default;
 
 
 const char* OpenSSLException::name() const noexcept

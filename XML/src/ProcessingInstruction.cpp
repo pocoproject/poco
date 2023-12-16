@@ -38,8 +38,7 @@ ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const Pro
 
 
 ProcessingInstruction::~ProcessingInstruction()
-{
-}
+= default;
 
 
 void ProcessingInstruction::setData(const XMLString& data)

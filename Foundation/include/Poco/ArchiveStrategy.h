@@ -88,12 +88,10 @@ class ArchiveByTimestampStrategy: public ArchiveStrategy
 {
 public:
 	ArchiveByTimestampStrategy()
-	{
-	}
+	= default;
 
 	~ArchiveByTimestampStrategy() override
-	{
-	}
+	= default;
 
 	LogFile* open(LogFile* pFile) override
 	{

@@ -30,16 +30,13 @@ class AbstractDelegate
 {
 public:
 	AbstractDelegate()
-	{
-	}
+	= default;
 
 	AbstractDelegate(const AbstractDelegate& /*del*/)
-	{
-	}
+	= default;
 
 	virtual ~AbstractDelegate()
-	{
-	}
+	= default;
 
 	virtual bool notify(const void* sender, TArgs& arguments) = 0;
 		/// Invokes the delegate's callback function.
@@ -70,16 +67,13 @@ class AbstractDelegate<void>
 {
 public:
 	AbstractDelegate()
-	{
-	}
+	= default;
 
 	AbstractDelegate(const AbstractDelegate&)
-	{
-	}
+	= default;
 
 	virtual ~AbstractDelegate()
-	{
-	}
+	= default;
 
 	virtual bool notify(const void* sender) = 0;
 		/// Invokes the delegate's callback function.

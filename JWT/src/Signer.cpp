@@ -65,13 +65,11 @@ public:
 
 
 Algorithm::Algorithm()
-{
-}
+= default;
 
 
 Algorithm::~Algorithm()
-{
-}
+= default;
 
 
 const std::string Algorithm::SHA256("SHA256");
@@ -377,8 +375,7 @@ Signer::Signer(const Poco::SharedPtr<Poco::Crypto::ECKey>& pECKey):
 
 
 Signer::~Signer()
-{
-}
+= default;
 
 
 Signer& Signer::setAlgorithms(const std::set<std::string>& algorithms)

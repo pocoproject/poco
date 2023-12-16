@@ -34,8 +34,7 @@ RowFormatter::RowFormatter(std::string  prefix,
 
 
 RowFormatter::~RowFormatter()
-{
-}
+= default;
 
 
 std::string& RowFormatter::formatNames(const NameVecPtr pNames, std::string& formattedNames)

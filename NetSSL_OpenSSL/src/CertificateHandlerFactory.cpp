@@ -21,13 +21,11 @@ namespace Net {
 
 
 CertificateHandlerFactory::CertificateHandlerFactory()
-{
-}
+= default;
 
 
 CertificateHandlerFactory::~CertificateHandlerFactory()
-{
-}
+= default;
 
 
 CertificateHandlerFactoryRegistrar::CertificateHandlerFactoryRegistrar(const std::string& name, CertificateHandlerFactory* pFactory)
@@ -37,8 +35,7 @@ CertificateHandlerFactoryRegistrar::CertificateHandlerFactoryRegistrar(const std
 
 
 CertificateHandlerFactoryRegistrar::~CertificateHandlerFactoryRegistrar()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

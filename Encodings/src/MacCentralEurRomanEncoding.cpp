@@ -90,8 +90,7 @@ MacCentralEurRomanEncoding::MacCentralEurRomanEncoding():
 
 
 MacCentralEurRomanEncoding::~MacCentralEurRomanEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

@@ -24,13 +24,11 @@ namespace Poco {
 
 
 FileStreamFactory::FileStreamFactory()
-{
-}
+= default;
 
 
 FileStreamFactory::~FileStreamFactory()
-{
-}
+= default;
 
 
 std::istream* FileStreamFactory::open(const URI& uri)

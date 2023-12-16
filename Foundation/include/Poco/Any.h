@@ -227,8 +227,7 @@ public:
 
 	Any()
 		/// Creates an empty any type.
-	{
-	}
+	= default;
 
 	template<typename ValueType>
 	Any(const ValueType & value)
@@ -251,8 +250,7 @@ public:
 	~Any()
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
-	{
-	}
+	= default;
 
 	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.

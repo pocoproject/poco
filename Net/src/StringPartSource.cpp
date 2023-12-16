@@ -44,8 +44,7 @@ StringPartSource::StringPartSource(const std::string& str, const std::string& me
 
 
 StringPartSource::~StringPartSource()
-{
-}
+= default;
 
 
 std::istream& StringPartSource::stream()

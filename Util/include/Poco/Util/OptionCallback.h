@@ -72,8 +72,7 @@ public:
 
 	~OptionCallback() override
 		/// Destroys the OptionCallback.
-	{
-	}
+	= default;
 
 	OptionCallback& operator = (const OptionCallback& cb)
 	{

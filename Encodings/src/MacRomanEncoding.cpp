@@ -90,8 +90,7 @@ MacRomanEncoding::MacRomanEncoding():
 
 
 MacRomanEncoding::~MacRomanEncoding()
-{
-}
+= default;
 
 
 } // namespace Poco

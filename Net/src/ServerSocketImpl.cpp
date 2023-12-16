@@ -20,13 +20,11 @@ namespace Net {
 
 
 ServerSocketImpl::ServerSocketImpl()
-{
-}
+= default;
 
 
 ServerSocketImpl::~ServerSocketImpl()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

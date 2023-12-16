@@ -35,8 +35,7 @@ PartStore::PartStore(const std::string& mediaType): PartSource(mediaType)
 
 
 PartStore::~PartStore()
-{
-}
+= default;
 
 
 //

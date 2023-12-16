@@ -30,13 +30,9 @@ TreeWalker::TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter
 }
 
 
-TreeWalker::TreeWalker(const TreeWalker& walker):
-	_pRoot(walker._pRoot),
-	_whatToShow(walker._whatToShow),
-	_pFilter(walker._pFilter),
-	_pCurrent(walker._pCurrent)
-{
-}
+TreeWalker::TreeWalker(const TreeWalker& walker)
+	
+= default;
 
 
 TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
@@ -53,8 +49,7 @@ TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
 
 
 TreeWalker::~TreeWalker()
-{
-}
+= default;
 
 
 void TreeWalker::setCurrentNode(Node* pNode)

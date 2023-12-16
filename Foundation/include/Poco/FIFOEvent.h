@@ -44,12 +44,10 @@ class FIFOEvent: public AbstractEvent <
 {
 public:
 	FIFOEvent()
-	{
-	}
+	= default;
 
 	~FIFOEvent() override
-	{
-	}
+	= default;
 
 private:
 	FIFOEvent(const FIFOEvent& e);

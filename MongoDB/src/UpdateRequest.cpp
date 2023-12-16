@@ -32,8 +32,7 @@ UpdateRequest::UpdateRequest(std::string  collectionName, UpdateRequest::Flags f
 
 
 UpdateRequest::~UpdateRequest()
-{
-}
+= default;
 
 
 void UpdateRequest::buildRequest(BinaryWriter& writer)

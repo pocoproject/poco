@@ -26,13 +26,11 @@ namespace MongoDB {
 
 
 Document::Document()
-{
-}
+= default;
 
 
 Document::~Document()
-{
-}
+= default;
 
 
 Array& Document::addNewArray(const std::string& name)

@@ -49,13 +49,11 @@ const TextEncoding::CharacterMap UTF8Encoding::_charMap =
 
 
 UTF8Encoding::UTF8Encoding()
-{
-}
+= default;
 
 
 UTF8Encoding::~UTF8Encoding()
-{
-}
+= default;
 
 
 const char* UTF8Encoding::canonicalName() const

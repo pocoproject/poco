@@ -96,8 +96,7 @@ ISO8859_9Encoding::ISO8859_9Encoding():
 
 
 ISO8859_9Encoding::~ISO8859_9Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

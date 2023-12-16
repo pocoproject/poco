@@ -37,8 +37,7 @@ AtomicCounter::AtomicCounter(const AtomicCounter& counter):
 
 
 AtomicCounter::~AtomicCounter()
-{
-}
+= default;
 
 
 AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)

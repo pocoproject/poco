@@ -30,8 +30,7 @@ SessionImpl::SessionImpl(std::string  connectionString, std::size_t timeout):
 
 
 SessionImpl::~SessionImpl()
-{
-}
+= default;
 
 
 void SessionImpl::reconnect()

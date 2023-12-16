@@ -33,8 +33,7 @@ VerificationErrorArgs::VerificationErrorArgs(Poco::Net::Context::Ptr pContext, X
 
 
 VerificationErrorArgs::~VerificationErrorArgs()
-{
-}
+= default;
 
 
 } } // namespace Poco::Net

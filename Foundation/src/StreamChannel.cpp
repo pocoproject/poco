@@ -25,8 +25,7 @@ StreamChannel::StreamChannel(std::ostream& str): _str(str)
 
 
 StreamChannel::~StreamChannel()
-{
-}
+= default;
 
 
 void StreamChannel::log(const Message& msg)

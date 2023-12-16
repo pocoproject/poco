@@ -323,8 +323,7 @@ RSACipherImpl::RSACipherImpl(RSAKey  key, RSAPaddingMode paddingMode):
 
 
 RSACipherImpl::~RSACipherImpl()
-{
-}
+= default;
 
 
 CryptoTransform::Ptr RSACipherImpl::createEncryptor()

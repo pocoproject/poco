@@ -37,8 +37,7 @@ TextConverter::TextConverter(const TextEncoding& inEncoding, const TextEncoding&
 
 
 TextConverter::~TextConverter()
-{
-}
+= default;
 
 
 int TextConverter::convert(const std::string& source, std::string& destination, Transform trans)

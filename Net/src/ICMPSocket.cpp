@@ -48,8 +48,7 @@ ICMPSocket::ICMPSocket(SocketImpl* pImpl):
 
 
 ICMPSocket::~ICMPSocket()
-{
-}
+= default;
 
 
 ICMPSocket& ICMPSocket::operator = (const Socket& socket)

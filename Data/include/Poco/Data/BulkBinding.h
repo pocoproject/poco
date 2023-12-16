@@ -51,8 +51,7 @@ public:
 
 	~BulkBinding() override
 		/// Destroys the BulkBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{

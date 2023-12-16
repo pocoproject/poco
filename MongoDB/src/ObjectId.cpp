@@ -47,8 +47,7 @@ ObjectId::ObjectId(const ObjectId& copy)
 
 
 ObjectId::~ObjectId()
-{
-}
+= default;
 
 
 std::string ObjectId::toString(const std::string& fmt) const

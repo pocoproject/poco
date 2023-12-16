@@ -21,13 +21,11 @@ namespace Poco {
 
 
 URIStreamFactory::URIStreamFactory()
-{
-}
+= default;
 
 
 URIStreamFactory::~URIStreamFactory()
-{
-}
+= default;
 
 
 URIRedirection::URIRedirection(std::string  uri):
@@ -36,10 +34,9 @@ URIRedirection::URIRedirection(std::string  uri):
 }
 
 
-URIRedirection::URIRedirection(const URIRedirection& redir):
-	_uri(redir._uri)
-{
-}
+URIRedirection::URIRedirection(const URIRedirection& redir)
+	
+= default;
 
 
 URIRedirection& URIRedirection::operator = (const URIRedirection& redir)

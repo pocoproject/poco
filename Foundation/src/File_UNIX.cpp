@@ -49,8 +49,7 @@ namespace Poco {
 
 
 FileImpl::FileImpl()
-{
-}
+= default;
 
 
 FileImpl::FileImpl(std::string  path): _path(std::move(path))
@@ -62,8 +61,7 @@ FileImpl::FileImpl(std::string  path): _path(std::move(path))
 
 
 FileImpl::~FileImpl()
-{
-}
+= default;
 
 
 void FileImpl::swapImpl(FileImpl& file)

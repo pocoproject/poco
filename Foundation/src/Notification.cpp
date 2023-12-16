@@ -20,13 +20,11 @@ namespace Poco {
 
 
 Notification::Notification()
-{
-}
+= default;
 
 
 Notification::~Notification()
-{
-}
+= default;
 
 
 std::string Notification::name() const

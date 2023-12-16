@@ -28,8 +28,7 @@ ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress> &addresses):
 
 
 ReplicaSet::~ReplicaSet()
-{
-}
+= default;
 
 
 Connection::Ptr ReplicaSet::findMaster()

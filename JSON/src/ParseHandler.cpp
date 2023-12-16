@@ -31,8 +31,7 @@ ParseHandler::ParseHandler(bool preserveObjectOrder) : Handler(),
 
 
 ParseHandler::~ParseHandler()
-{
-}
+= default;
 
 
 void ParseHandler::reset()

@@ -72,8 +72,7 @@ public:
 
 	~Extraction() override
 		/// Destroys the Extraction object.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -156,8 +155,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -246,8 +244,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -338,8 +335,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -428,8 +424,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -588,8 +583,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -652,8 +646,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -716,8 +709,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -780,8 +772,7 @@ public:
 	}
 
 	~Extraction() override
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{

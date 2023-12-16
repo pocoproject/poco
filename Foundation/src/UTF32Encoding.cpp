@@ -62,8 +62,7 @@ UTF32Encoding::UTF32Encoding(int byteOrderMark)
 
 
 UTF32Encoding::~UTF32Encoding()
-{
-}
+= default;
 
 
 UTF32Encoding::ByteOrderType UTF32Encoding::getByteOrder() const

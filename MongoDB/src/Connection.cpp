@@ -28,13 +28,11 @@ namespace MongoDB {
 
 
 Connection::SocketFactory::SocketFactory()
-{
-}
+= default;
 
 
 Connection::SocketFactory::~SocketFactory()
-{
-}
+= default;
 
 
 Poco::Net::StreamSocket Connection::SocketFactory::createSocket(const std::string& host, int port, Poco::Timespan connectTimeout, bool secure)

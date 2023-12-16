@@ -33,8 +33,7 @@ LogFileImpl::LogFileImpl(const std::string& path):
 
 
 LogFileImpl::~LogFileImpl()
-{
-}
+= default;
 
 
 void LogFileImpl::writeImpl(const std::string& text, bool flush)

@@ -28,10 +28,9 @@ KeyPair::KeyPair(KeyPairImpl::Ptr pKeyPairImpl):
 }
 
 
-KeyPair::KeyPair(const KeyPair& other):
-	_pImpl(other._pImpl)
-{
-}
+KeyPair::KeyPair(const KeyPair& other)
+	
+= default;
 
 
 KeyPair::KeyPair(KeyPair&& other) noexcept:
@@ -41,8 +40,7 @@ KeyPair::KeyPair(KeyPair&& other) noexcept:
 
 
 KeyPair::~KeyPair()
-{
-}
+= default;
 
 
 KeyPair& KeyPair::operator = (const KeyPair& other)

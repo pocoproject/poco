@@ -35,8 +35,7 @@ Comment::Comment(Document* pOwnerDocument, const Comment& comment):
 
 
 Comment::~Comment()
-{
-}
+= default;
 
 
 const XMLString& Comment::nodeName() const

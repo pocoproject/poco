@@ -25,8 +25,7 @@ DOMObject::DOMObject(): _rc(1)
 
 
 DOMObject::~DOMObject()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

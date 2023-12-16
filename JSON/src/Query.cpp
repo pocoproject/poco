@@ -38,8 +38,7 @@ Query::Query(const Var& source): _source(source)
 
 
 Query::~Query()
-{
-}
+= default;
 
 
 Object::Ptr Query::findObject(const std::string& path) const

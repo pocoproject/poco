@@ -31,8 +31,7 @@ FileIOS::FileIOS()
 
 
 FileIOS::~FileIOS()
-{
-}
+= default;
 
 
 void FileIOS::close()
@@ -74,8 +73,7 @@ FileInputStream::FileInputStream(const std::string& path, std::ios::openmode mod
 
 
 FileInputStream::~FileInputStream()
-{
-}
+= default;
 
 
 void FileInputStream::open(const std::string& path, std::ios::openmode mode)
@@ -99,8 +97,7 @@ FileOutputStream::FileOutputStream(const std::string& path, std::ios::openmode m
 
 
 FileOutputStream::~FileOutputStream()
-{
-}
+= default;
 
 
 void FileOutputStream::open(const std::string& path, std::ios::openmode mode)
@@ -124,8 +121,7 @@ FileStream::FileStream(const std::string& path, std::ios::openmode mode):
 
 
 FileStream::~FileStream()
-{
-}
+= default;
 
 
 void FileStream::open(const std::string& path, std::ios::openmode mode)

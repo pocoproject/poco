@@ -5529,8 +5529,7 @@ Windows936Encoding::Windows936Encoding():
 
 
 Windows936Encoding::~Windows936Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

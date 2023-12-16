@@ -20,8 +20,7 @@ namespace XML {
 
 
 DocumentEvent::~DocumentEvent()
-{
-}
+= default;
 
 
 } } // namespace Poco::XML

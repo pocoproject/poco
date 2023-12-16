@@ -31,13 +31,9 @@ NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFi
 }
 
 
-NodeIterator::NodeIterator(const NodeIterator& iterator):
-	_pRoot(iterator._pRoot),
-	_whatToShow(iterator._whatToShow),
-	_pFilter(iterator._pFilter),
-	_pCurrent(iterator._pCurrent)
-{
-}
+NodeIterator::NodeIterator(const NodeIterator& iterator)
+	
+= default;
 
 
 NodeIterator& NodeIterator::operator = (const NodeIterator& iterator)
@@ -54,8 +50,7 @@ NodeIterator& NodeIterator::operator = (const NodeIterator& iterator)
 
 
 NodeIterator::~NodeIterator()
-{
-}
+= default;
 
 
 Node* NodeIterator::nextNode()

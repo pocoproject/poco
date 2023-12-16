@@ -35,11 +35,9 @@ VarIterator::VarIterator(Var* pVar, bool positionEnd):
 }
 
 
-VarIterator::VarIterator(const VarIterator& other):
-	_pVar(other._pVar),
-	_position(other._position)
-{
-}
+VarIterator::VarIterator(const VarIterator& other)
+	
+= default;
 
 
 VarIterator::VarIterator(VarIterator&& other) noexcept:
@@ -50,8 +48,7 @@ VarIterator::VarIterator(VarIterator&& other) noexcept:
 
 
 VarIterator::~VarIterator()
-{
-}
+= default;
 
 
 VarIterator& VarIterator::operator = (const VarIterator& other)

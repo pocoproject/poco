@@ -33,8 +33,7 @@ Glob::Glob(std::string  pattern, int options)
 
 
 Glob::~Glob()
-{
-}
+= default;
 
 
 bool Glob::match(const std::string& subject)

@@ -26,8 +26,7 @@ KeyConsoleHandler::KeyConsoleHandler(bool server):PrivateKeyPassphraseHandler(se
 
 
 KeyConsoleHandler::~KeyConsoleHandler()
-{
-}
+= default;
 
 
 void KeyConsoleHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)

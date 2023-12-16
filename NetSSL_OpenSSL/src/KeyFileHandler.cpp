@@ -33,8 +33,7 @@ KeyFileHandler::KeyFileHandler(bool server):PrivateKeyPassphraseHandler(server)
 
 
 KeyFileHandler::~KeyFileHandler()
-{
-}
+= default;
 
 
 void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)

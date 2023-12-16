@@ -51,13 +51,11 @@ const TextEncoding::CharacterMap Latin9Encoding::_charMap =
 
 
 Latin9Encoding::Latin9Encoding()
-{
-}
+= default;
 
 
 Latin9Encoding::~Latin9Encoding()
-{
-}
+= default;
 
 
 const char* Latin9Encoding::canonicalName() const

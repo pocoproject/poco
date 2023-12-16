@@ -46,8 +46,7 @@ Time::Time(const DateTime& dt)
 
 
 Time::~Time()
-{
-}
+= default;
 
 
 void Time::assign(int hour, int minute, int second)

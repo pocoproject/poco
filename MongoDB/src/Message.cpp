@@ -26,8 +26,7 @@ Message::Message(MessageHeader::OpCode opcode):
 
 
 Message::~Message()
-{
-}
+= default;
 
 
 } } // namespace Poco::MongoDB

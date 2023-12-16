@@ -178,8 +178,7 @@ public:
 	}
 
 	~BasicMemoryBinaryReader()
-	{
-	}
+	= default;
 
 	const Buffer<T>& data() const
 	{

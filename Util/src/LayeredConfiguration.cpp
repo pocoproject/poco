@@ -26,13 +26,11 @@ namespace Util {
 
 
 LayeredConfiguration::LayeredConfiguration()
-{
-}
+= default;
 
 
 LayeredConfiguration::~LayeredConfiguration()
-{
-}
+= default;
 
 
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)

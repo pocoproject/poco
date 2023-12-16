@@ -112,23 +112,13 @@ DateTime::DateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff):
 }
 
 
-DateTime::DateTime(const DateTime& dateTime):
-	_utcTime(dateTime._utcTime),
-	_year(dateTime._year),
-	_month(dateTime._month),
-	_day(dateTime._day),
-	_hour(dateTime._hour),
-	_minute(dateTime._minute),
-	_second(dateTime._second),
-	_millisecond(dateTime._millisecond),
-	_microsecond(dateTime._microsecond)
-{
-}
+DateTime::DateTime(const DateTime& dateTime)
+	
+= default;
 
 
 DateTime::~DateTime()
-{
-}
+= default;
 
 
 DateTime& DateTime::operator = (const DateTime& dateTime)

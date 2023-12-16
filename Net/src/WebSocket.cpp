@@ -83,15 +83,13 @@ WebSocket::WebSocket(WebSocket&& socket):
 #endif // POCO_NEW_STATE_ON_MOVE
 
 
-WebSocket::WebSocket(const WebSocket& socket):
-	StreamSocket(socket)
-{
-}
+WebSocket::WebSocket(const WebSocket& socket)
+	
+= default;
 
 
 WebSocket::~WebSocket()
-{
-}
+= default;
 
 
 WebSocket& WebSocket::operator = (const Socket& socket)

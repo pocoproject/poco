@@ -44,8 +44,7 @@ FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pCh
 
 
 FormattingChannel::~FormattingChannel()
-{
-}
+= default;
 
 
 void FormattingChannel::setFormatter(Formatter::Ptr pFormatter)

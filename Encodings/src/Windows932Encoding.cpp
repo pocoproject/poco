@@ -1971,8 +1971,7 @@ Windows932Encoding::Windows932Encoding():
 
 
 Windows932Encoding::~Windows932Encoding()
-{
-}
+= default;
 
 
 } // namespace Poco

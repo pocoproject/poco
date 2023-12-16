@@ -69,8 +69,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -138,8 +137,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -198,8 +196,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -259,8 +256,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -323,8 +319,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -390,8 +385,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -471,8 +465,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -552,8 +545,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -617,8 +609,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -682,8 +673,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -747,8 +737,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -812,8 +801,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -877,8 +865,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -942,8 +929,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1007,8 +993,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1072,8 +1057,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1137,8 +1121,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1202,8 +1185,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1267,8 +1249,7 @@ public:
 
 	~Binding() override
 		/// Destroys the Binding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1332,8 +1313,7 @@ public:
 
 	~CopyBinding() override
 		/// Destroys the CopyBinding.
-	{
-	}
+	= default;
 
 	std::size_t numOfColumnsHandled() const override
 	{

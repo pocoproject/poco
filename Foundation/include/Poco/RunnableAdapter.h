@@ -49,8 +49,7 @@ public:
 	}
 
 	~RunnableAdapter() override
-	{
-	}
+	= default;
 
 	RunnableAdapter& operator = (const RunnableAdapter& ra)
 	{

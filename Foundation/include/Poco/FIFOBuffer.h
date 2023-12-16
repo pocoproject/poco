@@ -110,8 +110,7 @@ public:
 
 	~BasicFIFOBuffer()
 		/// Destroys the FIFOBuffer.
-	{
-	}
+	= default;
 
 	void resize(std::size_t newSize, bool preserveContent = true)
 		/// Resizes the buffer. If preserveContent is true,
