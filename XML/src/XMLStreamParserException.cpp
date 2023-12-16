@@ -22,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-XMLStreamParserException::~XMLStreamParserException() throw ()
+XMLStreamParserException::~XMLStreamParserException() noexcept
 {
 }
 
@@ -81,7 +81,7 @@ const std::string& XMLStreamParserException::description() const
 }
 
 
-char const* XMLStreamParserException::what() const throw ()
+char const* XMLStreamParserException::what() const noexcept
 {
 	return _what.c_str();
 }
