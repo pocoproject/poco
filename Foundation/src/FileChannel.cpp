@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/FileChannel.h"
 #include "Poco/ArchiveStrategy.h"
 #include "Poco/RotateStrategy.h"
@@ -52,8 +54,8 @@ FileChannel::FileChannel():
 }
 
 
-FileChannel::FileChannel(const std::string& path):
-	_path(path),
+FileChannel::FileChannel(std::string  path):
+	_path(std::move(path)),
 	_times("utc"),
 	_compress(false),
 	_flush(true),

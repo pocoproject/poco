@@ -55,7 +55,7 @@ public:
 		/// Call setAlgorithms() or addAlgorithm() to allow additional
 		/// algorithms for verification.
 
-	explicit Signer(const std::string& hmacKey);
+	explicit Signer(std::string  hmacKey);
 		/// Creates the Signer using the given secret/key for HMAC-based signing and verification.
 		///
 		/// Sets HS256 as the only allowed algorithm.

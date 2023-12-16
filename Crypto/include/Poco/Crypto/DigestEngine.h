@@ -33,7 +33,7 @@ class Crypto_API DigestEngine: public Poco::DigestEngine
 	/// digest algorithms supported by OpenSSL.
 {
 public:
-	DigestEngine(const std::string& name);
+	DigestEngine(std::string  name);
 		/// Creates a DigestEngine using the digest with the given name
 		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).
 		/// See the OpenSSL documentation for a list of supported digest algorithms.

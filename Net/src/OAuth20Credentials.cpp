@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/OAuth20Credentials.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
@@ -31,16 +33,16 @@ OAuth20Credentials::OAuth20Credentials():
 }
 
 
-OAuth20Credentials::OAuth20Credentials(const std::string& bearerToken):
-	_bearerToken(bearerToken),
+OAuth20Credentials::OAuth20Credentials(std::string  bearerToken):
+	_bearerToken(std::move(bearerToken)),
 	_scheme(SCHEME)
 {
 }
 
 
-OAuth20Credentials::OAuth20Credentials(const std::string& bearerToken, const std::string& scheme):
-	_bearerToken(bearerToken),
-	_scheme(scheme)
+OAuth20Credentials::OAuth20Credentials(std::string  bearerToken, std::string  scheme):
+	_bearerToken(std::move(bearerToken)),
+	_scheme(std::move(scheme))
 {
 }
 
@@ -52,8 +54,8 @@ OAuth20Credentials::OAuth20Credentials(const HTTPRequest& request):
 }
 
 
-OAuth20Credentials::OAuth20Credentials(const HTTPRequest& request, const std::string& scheme):
-	_scheme(scheme)
+OAuth20Credentials::OAuth20Credentials(const HTTPRequest& request, std::string  scheme):
+	_scheme(std::move(scheme))
 {
 	extractBearerToken(request);
 }

@@ -30,6 +30,8 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 
+#include <utility>
+
 
 using Poco::IOException;
 using Poco::TimeoutException;
@@ -48,8 +50,8 @@ namespace Net {
 
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
 	_pSSL(nullptr),
-	_pSocket(pSocketImpl),
-	_pContext(pContext),
+	_pSocket(std::move(pSocketImpl)),
+	_pContext(std::move(pContext)),
 	_needHandshake(false)
 {
 	poco_check_ptr (_pSocket);

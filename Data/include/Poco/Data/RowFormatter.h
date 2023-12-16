@@ -81,8 +81,8 @@ public:
 		FORMAT_BULK
 	};
 
-	RowFormatter(const std::string& prefix = "",
-		const std::string& postfix = "",
+	RowFormatter(std::string  prefix = "",
+		std::string  postfix = "",
 		Mode mode = FORMAT_PROGRESSIVE);
 		/// Creates the RowFormatter and sets the prefix and postfix to specified values.
 

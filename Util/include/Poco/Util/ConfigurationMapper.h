@@ -64,7 +64,7 @@ class Util_API ConfigurationMapper: public AbstractConfiguration
 	/// LayeredConfiguration.
 {
 public:
-	ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig);
+	ConfigurationMapper(std::string  fromPrefix, std::string  toPrefix, AbstractConfiguration::Ptr pConfig);
 		/// Creates the ConfigurationMapper. The ConfigurationMapper
 		/// retains (shared) ownership of the passed configuration.
 

@@ -45,7 +45,7 @@ class Util_API LocalConfigurationView : public AbstractConfiguration
 	/// The LocalConfigurationView only searches for the properties in the viewed Space.
 {
 public:
-	LocalConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig);
+	LocalConfigurationView(std::string  prefix, AbstractConfiguration::Ptr pConfig);
 		/// Creates the LocalConfigurationView. The LocalConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 

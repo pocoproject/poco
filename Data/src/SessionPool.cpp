@@ -13,18 +13,19 @@
 
 
 #include "Poco/Data/SessionPool.h"
-#include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/SessionFactory.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
 namespace Data {
 
 
-SessionPool::SessionPool(const std::string& connector, const std::string& connectionString, int minSessions, int maxSessions, int idleTime, int connTimeout):
-	_connector(connector),
-	_connectionString(connectionString),
+SessionPool::SessionPool(std::string  connector, std::string  connectionString, int minSessions, int maxSessions, int idleTime, int connTimeout):
+	_connector(std::move(connector)),
+	_connectionString(std::move(connectionString)),
 	_minSessions(minSessions),
 	_maxSessions(maxSessions),
 	_idleTime(idleTime),

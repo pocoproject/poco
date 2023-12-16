@@ -70,7 +70,7 @@ protected:
 		/// Creates the PartSource, using
 		/// the application/octet-stream MIME type.
 
-	PartSource(const std::string& mediaType);
+	PartSource(std::string  mediaType);
 		/// Creates the PartSource, using the
 		/// given MIME type.
 

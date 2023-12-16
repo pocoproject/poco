@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
@@ -50,8 +52,8 @@ SocketReactor::SocketReactor(const Poco::Timespan& pollTimeout, int threadAffini
 	_params.pollTimeout = pollTimeout;
 }
 
-SocketReactor::SocketReactor(const Params& params, int threadAffinity):
-	_params(params),
+SocketReactor::SocketReactor(Params  params, int threadAffinity):
+	_params(std::move(params)),
 	_threadAffinity(threadAffinity),
 	_stop(false),
 	_pReadableNotification(new ReadableNotification(this)),

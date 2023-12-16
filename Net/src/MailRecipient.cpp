@@ -14,6 +14,7 @@
 
 #include "Poco/Net/MailRecipient.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -34,16 +35,16 @@ MailRecipient::MailRecipient(const MailRecipient& recipient):
 }
 
 
-MailRecipient::MailRecipient(RecipientType type, const std::string& address):
-	_address(address),
+MailRecipient::MailRecipient(RecipientType type, std::string  address):
+	_address(std::move(address)),
 	_type(type)
 {
 }
 
 
-MailRecipient::MailRecipient(RecipientType type, const std::string& address, const std::string& realName):
-	_address(address),
-	_realName(realName),
+MailRecipient::MailRecipient(RecipientType type, std::string  address, std::string  realName):
+	_address(std::move(address)),
+	_realName(std::move(realName)),
 	_type(type)
 {
 }

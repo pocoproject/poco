@@ -44,7 +44,7 @@ public:
 	HTTPDigestCredentials();
 		/// Creates an empty HTTPDigestCredentials object.
 
-	HTTPDigestCredentials(const std::string& username, const std::string& password);
+	HTTPDigestCredentials(std::string  username, std::string  password);
 		/// Creates a HTTPDigestCredentials object with the given username and password.
 
 	~HTTPDigestCredentials();

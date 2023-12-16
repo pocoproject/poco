@@ -30,13 +30,13 @@ class Foundation_API Exception: public std::exception
 	/// in the Poco class library.
 {
 public:
-	Exception(const std::string& msg, int code = 0);
+	Exception(std::string  msg, int code = 0);
 		/// Creates an exception.
 
-	Exception(const std::string& msg, const std::string& arg, int code = 0);
+	Exception(std::string  msg, const std::string& arg, int code = 0);
 		/// Creates an exception.
 
-	Exception(const std::string& msg, const Exception& nested, int code = 0);
+	Exception(std::string  msg, const Exception& nested, int code = 0);
 		/// Creates an exception and stores a clone
 		/// of the nested exception.
 

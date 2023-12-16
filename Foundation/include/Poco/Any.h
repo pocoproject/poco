@@ -19,9 +19,10 @@
 #include "Poco/Exception.h"
 #include "Poco/MetaProgramming.h"
 #include <algorithm>
-#include <typeinfo>
-#include <cstring>
 #include <cstddef>
+#include <cstring>
+#include <typeinfo>
+#include <utility>
 
 
 #define poco_any_assert(cond) do { if (!(cond)) std::abort(); } while (0)
@@ -342,7 +343,7 @@ private:
 	class Holder : public ValueHolder
 	{
 	public:
-		Holder(const ValueType & value) : _held(value)
+		Holder(ValueType  value) : _held(std::move(value))
 		{
 		}
 

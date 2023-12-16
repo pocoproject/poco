@@ -172,7 +172,7 @@ public:
 		/// the run() method run. Nonexisting core or situation when this feature is not implemented
 		/// are silently ignored and this argument has no effect in such scenarios.
 
-	SocketReactor(const Params& params, int threadAffinity = -1);
+	SocketReactor(Params  params, int threadAffinity = -1);
 		/// Creates the SocketReactor, using the given parameters.
 		/// The threadAffinity argument, when non-negative, indicates on which CPU core should
 		/// the run() method run. Nonexisting core or situation when this feature is not implemented

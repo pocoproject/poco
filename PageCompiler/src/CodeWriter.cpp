@@ -9,19 +9,21 @@
 
 
 #include "CodeWriter.h"
+
 #include "Page.h"
 #include "Poco/Path.h"
-#include "Poco/StringTokenizer.h"
 #include "Poco/String.h"
+#include "Poco/StringTokenizer.h"
+#include <utility>
 
 
 using Poco::Path;
 using Poco::StringTokenizer;
 
 
-CodeWriter::CodeWriter(const Page& page, const std::string& clazz):
+CodeWriter::CodeWriter(const Page& page, std::string  clazz):
 	_page(page),
-	_class(clazz)
+	_class(std::move(clazz))
 {
 }
 

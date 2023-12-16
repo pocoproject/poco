@@ -92,7 +92,7 @@ public:
 	Template();
 		/// Creates a Template.
 
-	Template(const Path& templatePath);
+	Template(Path  templatePath);
 		/// Creates a Template from the file with the given templatePath.
 
 	virtual ~Template();

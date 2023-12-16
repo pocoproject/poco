@@ -66,7 +66,7 @@ class Foundation_API URIRedirection
 	/// (such as a MOVED PERMANENTLY in HTTP).
 {
 public:
-	URIRedirection(const std::string& uri);
+	URIRedirection(std::string  uri);
 	URIRedirection(const URIRedirection& redir);
 
 	URIRedirection& operator = (const URIRedirection& redir);

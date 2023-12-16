@@ -59,7 +59,7 @@ public:
 		/// Creates the MetaColumn.
 
 	explicit MetaColumn(std::size_t position,
-		const std::string& name = "",
+		std::string  name = "",
 		ColumnDataType type = FDT_UNKNOWN,
 		std::size_t length = 0,
 		std::size_t precision = 0,

@@ -47,7 +47,7 @@ class Crypto_API ECDSADigestEngine: public Poco::DigestEngine
 {
 public:
 
-	ECDSADigestEngine(const ECKey& key, const std::string &name);
+	ECDSADigestEngine(ECKey  key, const std::string &name);
 		/// Creates the ECDSADigestEngine with the given ECDSA key,
 		/// using the hash algorithm with the given name
 		/// (e.g., "SHA1", "SHA256", "SHA512", etc.).

@@ -54,7 +54,7 @@ public:
 	unsigned short nodeType() const override;
 
 protected:
-	EntityReference(Document* pOwnerDocument, const XMLString& name);
+	EntityReference(Document* pOwnerDocument, XMLString  name);
 	EntityReference(Document* pOwnerDocument, const EntityReference& ref);
 	~EntityReference() override;
 

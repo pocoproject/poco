@@ -86,11 +86,11 @@ class Net_API ErrorNotification: public SocketNotification
 	/// This notification is sent if a socket has signalled an error.
 {
 public:
-	ErrorNotification(SocketReactor* pReactor, int code = 0, const std::string& description = "");
+	ErrorNotification(SocketReactor* pReactor, int code = 0, std::string  description = "");
 		/// Creates the ErrorNotification for the given SocketReactor.
 
 	ErrorNotification(SocketReactor* pReactor, const Socket& socket,
-		int code = 0, const std::string& description = "");
+		int code = 0, std::string  description = "");
 		/// Creates the ErrorNotification for the given SocketReactor.
 
 	~ErrorNotification() override;

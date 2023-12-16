@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Random.h"
@@ -34,9 +36,9 @@ MultipartWriter::MultipartWriter(std::ostream& ostr):
 }
 
 
-MultipartWriter::MultipartWriter(std::ostream& ostr, const std::string& boundary):
+MultipartWriter::MultipartWriter(std::ostream& ostr, std::string  boundary):
 	_ostr(ostr),
-	_boundary(boundary),
+	_boundary(std::move(boundary)),
 	_firstPart(true)
 {
 	if (_boundary.empty())

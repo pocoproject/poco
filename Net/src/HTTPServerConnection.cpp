@@ -13,16 +13,17 @@
 
 
 #include "Poco/Net/HTTPServerConnection.h"
-#include "Poco/Net/HTTPServerSession.h"
-#include "Poco/Net/HTTPServerRequestImpl.h"
-#include "Poco/Net/HTTPServerResponseImpl.h"
+#include "Poco/Delegate.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
+#include "Poco/Net/HTTPServerResponseImpl.h"
+#include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
-#include "Poco/Delegate.h"
 #include <memory>
+#include <utility>
 
 
 namespace Poco {
@@ -31,7 +32,7 @@ namespace Net {
 
 HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
 	TCPServerConnection(socket),
-	_pParams(pParams),
+	_pParams(std::move(pParams)),
 	_pFactory(pFactory),
 	_stopped(false)
 {

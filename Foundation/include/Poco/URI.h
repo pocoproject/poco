@@ -67,16 +67,16 @@ public:
 		/// Parses an URI from the given string. Throws a
 		/// SyntaxException if the uri is not valid.
 
-	URI(const std::string& scheme, const std::string& pathEtc);
+	URI(std::string  scheme, const std::string& pathEtc);
 		/// Creates an URI from its parts.
 
-	URI(const std::string& scheme, const std::string& authority, const std::string& pathEtc);
+	URI(std::string  scheme, const std::string& authority, const std::string& pathEtc);
 		/// Creates an URI from its parts.
 
-	URI(const std::string& scheme, const std::string& authority, const std::string& path, const std::string& query);
+	URI(std::string  scheme, const std::string& authority, std::string  path, std::string  query);
 		/// Creates an URI from its parts.
 
-	URI(const std::string& scheme, const std::string& authority, const std::string& path, const std::string& query, const std::string& fragment);
+	URI(std::string  scheme, const std::string& authority, std::string  path, std::string  query, std::string  fragment);
 		/// Creates an URI from its parts.
 
 	URI(const URI& uri);

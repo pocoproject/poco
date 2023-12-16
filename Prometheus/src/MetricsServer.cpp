@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Prometheus/MetricsServer.h"
 #include "Poco/Prometheus/MetricsRequestHandler.h"
 #include "Poco/Prometheus/Registry.h"
@@ -47,9 +49,9 @@ public:
 class MetricsRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
-	MetricsRequestHandlerFactory(const Registry& registry, const std::string& path):
+	MetricsRequestHandlerFactory(const Registry& registry, std::string  path):
 		_registry(registry),
-		_path(path)
+		_path(std::move(path))
 	{
 	}
 

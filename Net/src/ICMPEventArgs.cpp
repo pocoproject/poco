@@ -15,11 +15,12 @@
 
 
 #include "Poco/Net/ICMPEventArgs.h"
-#include "Poco/Net/SocketAddress.h"
-#include "Poco/Net/DNS.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/DNS.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/SocketAddress.h"
 #include <numeric>
+#include <utility>
 
 
 using Poco::IOException;
@@ -30,8 +31,8 @@ namespace Poco {
 namespace Net {
 
 
-ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
-	_address(address),
+ICMPEventArgs::ICMPEventArgs(SocketAddress  address, int repetitions, int dataSize, int ttl):
+	_address(std::move(address)),
 	_sent(0),
 	_dataSize(dataSize),
 	_ttl(ttl),

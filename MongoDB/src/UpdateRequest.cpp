@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/MongoDB/UpdateRequest.h"
 
 
@@ -19,10 +21,10 @@ namespace Poco {
 namespace MongoDB {
 
 
-UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::Flags flags):
+UpdateRequest::UpdateRequest(std::string  collectionName, UpdateRequest::Flags flags):
 	RequestMessage(MessageHeader::OP_UPDATE),
 	_flags(flags),
-	_fullCollectionName(collectionName),
+	_fullCollectionName(std::move(collectionName)),
 	_selector(),
 	_update()
 {

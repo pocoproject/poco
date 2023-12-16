@@ -47,7 +47,7 @@ class Net_API FilePartStore: public PartStore
 	/// parts (usually email attachment files) to the file system.
 {
 public:
-	FilePartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "");
+	FilePartStore(const std::string& content, const std::string& mediaType, std::string  filename = "");
 		/// Creates the FilePartStore for the given MIME type.
 		/// For security purposes, attachment filename is NOT used to save file to the file system.
 		/// A unique temporary file name is used to persist the file.

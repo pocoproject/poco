@@ -35,7 +35,7 @@ protected:
 	typedef UInt64 FileSizeImpl;
 
 	FileImpl();
-	FileImpl(const std::string& path);
+	FileImpl(std::string  path);
 	virtual ~FileImpl();
 	void swapImpl(FileImpl& file);
 	void setPathImpl(const std::string& path);

@@ -18,19 +18,20 @@
 #define JSON_Object_INCLUDED
 
 
-#include "Poco/JSON/JSON.h"
+#include "Poco/Dynamic/Struct.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSONString.h"
-#include "Poco/SharedPtr.h"
-#include "Poco/Dynamic/Var.h"
-#include "Poco/Dynamic/Struct.h"
 #include "Poco/Nullable.h"
-#include <map>
-#include <vector>
+#include "Poco/SharedPtr.h"
 #include <deque>
 #include <iostream>
+#include <map>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -513,7 +514,7 @@ template <>
 class VarHolderImpl<JSON::Object::Ptr>: public VarHolder
 {
 public:
-	VarHolderImpl(const JSON::Object::Ptr& val): _val(val)
+	VarHolderImpl(JSON::Object::Ptr  val): _val(std::move(val))
 	{
 	}
 
@@ -655,7 +656,7 @@ template <>
 class VarHolderImpl<JSON::Object>: public VarHolder
 {
 public:
-	VarHolderImpl(const JSON::Object& val): _val(val)
+	VarHolderImpl(JSON::Object  val): _val(std::move(val))
 	{
 	}
 

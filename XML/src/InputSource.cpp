@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/SAX/InputSource.h"
 
 
@@ -26,8 +28,8 @@ InputSource::InputSource():
 }
 
 
-InputSource::InputSource(const XMLString& systemId):
-	_systemId(systemId),
+InputSource::InputSource(XMLString  systemId):
+	_systemId(std::move(systemId)),
 	_bistr(nullptr),
 	_cistr(nullptr)
 {

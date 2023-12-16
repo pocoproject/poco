@@ -52,12 +52,12 @@ public:
 	};
 
 	//@ deprecated
-	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
+	RSADigestEngine(RSAKey  key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the MD5 or SHA-1 hash algorithm.
 		/// Kept for backward compatibility
 
-	RSADigestEngine(const RSAKey& key, const std::string &name);
+	RSADigestEngine(RSAKey  key, const std::string &name);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the hash algorithm with the given name
 		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).

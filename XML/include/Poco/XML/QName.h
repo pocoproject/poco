@@ -39,9 +39,9 @@ class XML_API QName
 {
 public:
 	QName();
-	QName(const std::string& name);
-	QName(const std::string& ns, const std::string& name);
-	QName(const std::string& ns, const std::string& name, const std::string& prefix);
+	QName(std::string  name);
+	QName(std::string  ns, std::string  name);
+	QName(std::string  ns, std::string  name, std::string  prefix);
 	QName(const QName& qname);
 	QName(QName&& qname) noexcept;
 

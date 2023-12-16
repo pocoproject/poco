@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/StringPartSource.h"
 
 
@@ -33,10 +35,10 @@ StringPartSource::StringPartSource(const std::string& str, const std::string& me
 }
 
 
-StringPartSource::StringPartSource(const std::string& str, const std::string& mediaType, const std::string& filename):
+StringPartSource::StringPartSource(const std::string& str, const std::string& mediaType, std::string  filename):
 	PartSource(mediaType),
 	_istr(str),
-	_filename(filename)
+	_filename(std::move(filename))
 {
 }
 

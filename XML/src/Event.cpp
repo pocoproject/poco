@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/Event.h"
 #include "Poco/DOM/Document.h"
 
@@ -20,9 +22,9 @@ namespace Poco {
 namespace XML {
 
 
-Event::Event(Document* pOwnerDocument, const XMLString& type):
+Event::Event(Document* pOwnerDocument, XMLString  type):
 	_pOwner(pOwnerDocument),
-	_type(type),
+	_type(std::move(type)),
 	_pTarget(nullptr),
 	_pCurrentTarget(nullptr),
 	_currentPhase(CAPTURING_PHASE),
@@ -34,9 +36,9 @@ Event::Event(Document* pOwnerDocument, const XMLString& type):
 }
 
 
-Event::Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable):
+Event::Event(Document* pOwnerDocument, XMLString  type, EventTarget* pTarget, bool canBubble, bool isCancelable):
 	_pOwner(pOwnerDocument),
-	_type(type),
+	_type(std::move(type)),
 	_pTarget(pTarget),
 	_pCurrentTarget(nullptr),
 	_currentPhase(CAPTURING_PHASE),

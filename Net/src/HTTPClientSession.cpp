@@ -13,18 +13,19 @@
 
 
 #include "Poco/Net/HTTPClientSession.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPHeaderStream.h"
-#include "Poco/Net/HTTPStream.h"
-#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/CountingStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPCredentials.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/CountingStream.h"
 #include "Poco/RegularExpression.h"
 #include <sstream>
+#include <utility>
 
 
 using Poco::NumberFormatter;
@@ -85,8 +86,8 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 }
 
 
-HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port):
-	_host(host),
+HTTPClientSession::HTTPClientSession(std::string  host, Poco::UInt16 port):
+	_host(std::move(host)),
 	_port(port),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
@@ -101,10 +102,10 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 }
 
 
-HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig):
-	_host(host),
+HTTPClientSession::HTTPClientSession(std::string  host, Poco::UInt16 port, ProxyConfig  proxyConfig):
+	_host(std::move(host)),
 	_port(port),
-	_proxyConfig(proxyConfig),
+	_proxyConfig(std::move(proxyConfig)),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
@@ -115,12 +116,12 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 }
 
 
-HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig):
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket, ProxyConfig  proxyConfig):
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
 	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
 	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
-	_proxyConfig(proxyConfig),
+	_proxyConfig(std::move(proxyConfig)),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),

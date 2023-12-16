@@ -18,19 +18,20 @@
 #define Data_Extraction_INCLUDED
 
 
-#include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtraction.h"
+#include "Poco/Data/Column.h"
+#include "Poco/Data/Data.h"
+#include "Poco/Data/DataException.h"
+#include "Poco/Data/Position.h"
 #include "Poco/Data/Preparation.h"
 #include "Poco/Data/TypeHandler.h"
-#include "Poco/Data/Column.h"
-#include "Poco/Data/Position.h"
-#include "Poco/Data/DataException.h"
-#include <set>
-#include <vector>
-#include <list>
-#include <deque>
-#include <map>
 #include <cstddef>
+#include <deque>
+#include <list>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -146,10 +147,10 @@ public:
 		_rResult.clear();
 	}
 
-	Extraction(std::vector<T>& result, const T& def, const Position& pos = Position(0)):
+	Extraction(std::vector<T>& result, T  def, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result),
-		_default(def)
+		_default(std::move(def))
 	{
 		_rResult.clear();
 	}
@@ -328,10 +329,10 @@ public:
 		_rResult.clear();
 	}
 
-	Extraction(std::list<T>& result, const T& def, const Position& pos = Position(0)):
+	Extraction(std::list<T>& result, T  def, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result),
-		_default(def)
+		_default(std::move(def))
 	{
 		_rResult.clear();
 	}
@@ -418,10 +419,10 @@ public:
 		_rResult.clear();
 	}
 
-	Extraction(std::deque<T>& result, const T& def, const Position& pos = Position(0)):
+	Extraction(std::deque<T>& result, T  def, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result),
-		_default(def)
+		_default(std::move(def))
 	{
 		_rResult.clear();
 	}

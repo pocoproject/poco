@@ -17,6 +17,7 @@
 
 #include "Poco/XML/QName.h"
 #include <ostream>
+#include <utility>
 
 
 namespace Poco {
@@ -28,23 +29,23 @@ QName::QName()
 }
 
 
-QName::QName(const std::string& name) :
-	_name(name)
+QName::QName(std::string  name) :
+	_name(std::move(name))
 {
 }
 
 
-QName::QName(const std::string& ns, const std::string& name) :
-	_ns(ns),
-	_name(name)
+QName::QName(std::string  ns, std::string  name) :
+	_ns(std::move(ns)),
+	_name(std::move(name))
 {
 }
 
 
-QName::QName(const std::string& ns, const std::string& name, const std::string& prefix) :
-	_ns(ns),
-	_name(name),
-	_prefix(prefix)
+QName::QName(std::string  ns, std::string  name, std::string  prefix) :
+	_ns(std::move(ns)),
+	_name(std::move(name)),
+	_prefix(std::move(prefix))
 {
 }
 

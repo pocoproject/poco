@@ -9,12 +9,14 @@
 
 
 #include "PageReader.h"
+
 #include "Page.h"
-#include "Poco/FileStream.h"
-#include "Poco/CountingStream.h"
-#include "Poco/Path.h"
-#include "Poco/Exception.h"
 #include "Poco/Ascii.h"
+#include "Poco/CountingStream.h"
+#include "Poco/Exception.h"
+#include "Poco/FileStream.h"
+#include "Poco/Path.h"
+#include <utility>
 
 
 const std::string PageReader::MARKUP_BEGIN("\tresponseStream << \"");
@@ -25,10 +27,10 @@ const std::string PageReader::ESC_EXPR_BEGIN("\t_escapeStream << (");
 const std::string PageReader::ESC_EXPR_END(");\n");
 
 
-PageReader::PageReader(Page& page, const std::string& path):
+PageReader::PageReader(Page& page, std::string  path):
 	_page(page),
 	_pParent(nullptr),
-	_path(path),
+	_path(std::move(path)),
 	_line(0),
 	_emitLineDirectives(false)
 {
@@ -36,10 +38,10 @@ PageReader::PageReader(Page& page, const std::string& path):
 }
 
 
-PageReader::PageReader(const PageReader& parent, const std::string& path):
+PageReader::PageReader(const PageReader& parent, std::string  path):
 	_page(parent._page),
 	_pParent(&parent),
-	_path(path),
+	_path(std::move(path)),
 	_line(0),
 	_emitLineDirectives(false)
 {

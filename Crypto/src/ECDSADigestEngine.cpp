@@ -18,6 +18,8 @@
 #include <openssl/ecdsa.h>
 #include <openssl/bn.h>
 
+#include <utility>
+
 
 namespace Poco {
 namespace Crypto {
@@ -28,8 +30,8 @@ namespace Crypto {
 //
 
 
-ECDSADigestEngine::ECDSADigestEngine(const ECKey& key, const std::string &name):
-	_key(key),
+ECDSADigestEngine::ECDSADigestEngine(ECKey  key, const std::string &name):
+	_key(std::move(key)),
 	_engine(name)
 {
 }

@@ -115,11 +115,11 @@ public:
 	HTTPResponse();
 		/// Creates the HTTPResponse with OK status.
 
-	HTTPResponse(HTTPStatus status, const std::string& reason);
+	HTTPResponse(HTTPStatus status, std::string  reason);
 		/// Creates the HTTPResponse with the given status
 		/// and reason phrase.
 
-	HTTPResponse(const std::string& version, HTTPStatus status, const std::string& reason);
+	HTTPResponse(const std::string& version, HTTPStatus status, std::string  reason);
 		/// Creates the HTTPResponse with the given version, status
 		/// and reason phrase.
 

@@ -55,7 +55,7 @@ public:
 	InputSource();
 		/// Zero-argument default constructor.
 
-	InputSource(const XMLString& systemId);
+	InputSource(XMLString  systemId);
 		/// Creates a new input source with a system identifier.
 		/// Applications may use setPublicId to include a public identifier as well,
 		/// or setEncoding to specify the character encoding, if known.

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/NameValueCollection.h"
@@ -59,17 +61,17 @@ HTTPRequest::HTTPRequest(const std::string& version):
 }
 
 
-HTTPRequest::HTTPRequest(const std::string& method, const std::string& uri):
-	_method(method),
-	_uri(uri)
+HTTPRequest::HTTPRequest(std::string  method, std::string  uri):
+	_method(std::move(method)),
+	_uri(std::move(uri))
 {
 }
 
 
-HTTPRequest::HTTPRequest(const std::string& method, const std::string& uri, const std::string& version):
+HTTPRequest::HTTPRequest(std::string  method, std::string  uri, const std::string& version):
 	HTTPMessage(version),
-	_method(method),
-	_uri(uri)
+	_method(std::move(method)),
+	_uri(std::move(uri))
 {
 }
 

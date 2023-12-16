@@ -18,6 +18,8 @@
 #include "Poco/Buffer.h"
 #include <openssl/err.h>
 
+#include <utility>
+
 
 namespace Poco {
 namespace Crypto {
@@ -54,8 +56,8 @@ namespace
 
 		CryptoTransformImpl(
 			const EVP_CIPHER* pCipher,
-			const ByteVec&    key,
-			const ByteVec&    iv,
+			ByteVec     key,
+			ByteVec     iv,
 			Direction         dir);
 
 		~CryptoTransformImpl() override;
@@ -89,12 +91,12 @@ namespace
 
 	CryptoTransformImpl::CryptoTransformImpl(
 		const EVP_CIPHER* pCipher,
-		const ByteVec&    key,
-		const ByteVec&    iv,
+		ByteVec     key,
+		ByteVec     iv,
 		Direction         dir):
 		_pCipher(pCipher),
-		_key(key),
-		_iv(iv)
+		_key(std::move(key)),
+		_iv(std::move(iv))
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		_pContext = EVP_CIPHER_CTX_new();
@@ -246,8 +248,8 @@ namespace
 }
 
 
-CipherImpl::CipherImpl(const CipherKey& key):
-	_key(key)
+CipherImpl::CipherImpl(CipherKey  key):
+	_key(std::move(key))
 {
 }
 

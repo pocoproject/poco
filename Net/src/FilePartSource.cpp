@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/FilePartSource.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
@@ -48,10 +50,10 @@ FilePartSource::FilePartSource(const std::string& path, const std::string& media
 }
 
 
-FilePartSource::FilePartSource(const std::string& path, const std::string& filename, const std::string& mediaType):
+FilePartSource::FilePartSource(const std::string& path, std::string  filename, const std::string& mediaType):
 	PartSource(mediaType),
 	_path(path),
-	_filename(filename),
+	_filename(std::move(filename)),
 	_istr(path)
 {
 	Path p(path);

@@ -87,7 +87,7 @@ public:
 	void setNodeValue(const XMLString& value) override;
 
 protected:
-	CharacterData(Document* pOwnerDocument, const XMLString& data);
+	CharacterData(Document* pOwnerDocument, XMLString  data);
 	CharacterData(Document* pOwnerDocument, const CharacterData& data);
 	~CharacterData() override;
 

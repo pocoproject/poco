@@ -25,7 +25,7 @@ namespace Compiler {
 class CodeGenerator
 {
 public:
-	CodeGenerator(const std::string& source, std::ostream& stream);
+	CodeGenerator(std::string source, std::ostream& stream);
 
 	static std::vector<std::string> splitNameSpace(const std::string& nameSpace);
 

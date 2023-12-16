@@ -13,13 +13,14 @@
 
 
 #include "Poco/ThreadPool.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Event.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
-#include "Poco/Event.h"
 #include "Poco/ThreadLocal.h"
-#include "Poco/ErrorHandler.h"
-#include <sstream>
 #include <ctime>
+#include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -239,12 +240,12 @@ ThreadPool::ThreadPool(int minCapacity,
 }
 
 
-ThreadPool::ThreadPool(const std::string& name,
+ThreadPool::ThreadPool(std::string  name,
 	int minCapacity,
 	int maxCapacity,
 	int idleTime,
 	int stackSize):
-	_name(name),
+	_name(std::move(name)),
 	_minCapacity(minCapacity),
 	_maxCapacity(maxCapacity),
 	_idleTime(idleTime),

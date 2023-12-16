@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/MetaColumn.h"
 
 
@@ -30,12 +32,12 @@ MetaColumn::MetaColumn():
 
 
 MetaColumn::MetaColumn(std::size_t position,
-	const std::string& name,
+	std::string  name,
 	ColumnDataType type,
 	std::size_t length,
 	std::size_t precision,
 	bool nullable):
-	_name(name),
+	_name(std::move(name)),
 	_length(length),
 	_precision(precision),
 	_position(position),

@@ -21,10 +21,11 @@
 #include "Poco/StreamCopier.h"
 #undef min
 #undef max
-#include <limits>
+#include "pdjson.h"
 #include <clocale>
 #include <istream>
-#include "pdjson.h"
+#include <limits>
+#include <utility>
 
 
 typedef struct json_stream json_stream;
@@ -50,9 +51,9 @@ extern "C"
 }
 
 
-ParserImpl::ParserImpl(const Handler::Ptr& pHandler):
+ParserImpl::ParserImpl(Handler::Ptr  pHandler):
 	_pJSON(new json_stream),
-	_pHandler(pHandler),
+	_pHandler(std::move(pHandler)),
 	_depth(JSON_DEFAULT_DEPTH),
 	_decimalPoint('.'),
 	_allowNullByte(true),

@@ -86,7 +86,7 @@ public:
 		/// The format pattern must be specified with
 		/// a call to setProperty.
 
-	PatternFormatter(const std::string& format);
+	PatternFormatter(std::string  format);
 		/// Creates a PatternFormatter that uses the
 		/// given format pattern.
 

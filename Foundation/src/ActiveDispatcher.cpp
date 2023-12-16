@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/ActiveDispatcher.h"
 #include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
@@ -26,7 +28,7 @@ namespace
 	{
 	public:
 		MethodNotification(ActiveRunnableBase::Ptr pRunnable):
-			_pRunnable(pRunnable)
+			_pRunnable(std::move(pRunnable))
 		{
 		}
 

@@ -13,6 +13,8 @@
 
 
 
+#include <utility>
+
 #include "Poco/Util/JSONConfiguration.h"
 
 
@@ -48,7 +50,7 @@ JSONConfiguration::JSONConfiguration(std::istream& istr)
 }
 
 
-JSONConfiguration::JSONConfiguration(const JSON::Object::Ptr& object) : _object(object)
+JSONConfiguration::JSONConfiguration(JSON::Object::Ptr  object) : _object(std::move(object))
 {
 }
 

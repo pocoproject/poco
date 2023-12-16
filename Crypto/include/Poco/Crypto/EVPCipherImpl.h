@@ -38,7 +38,7 @@ class EVPCipherImpl: public Cipher
 	/// requires the private key.
 {
 public:
-	EVPCipherImpl(const EVPPKey& key);
+	EVPCipherImpl(EVPPKey  key);
 		/// Creates a new EVPCipherImpl object for the given EVPPKey
 		/// and using the given padding mode.
 

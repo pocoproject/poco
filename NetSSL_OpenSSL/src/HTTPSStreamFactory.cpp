@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPSStreamFactory.h"
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPIOStream.h"
@@ -44,18 +46,18 @@ HTTPSStreamFactory::HTTPSStreamFactory():
 }
 
 
-HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort):
-	_proxyHost(proxyHost),
+HTTPSStreamFactory::HTTPSStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort):
+	_proxyHost(std::move(proxyHost)),
 	_proxyPort(proxyPort)
 {
 }
 
 
-HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword):
-	_proxyHost(proxyHost),
+HTTPSStreamFactory::HTTPSStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort, std::string  proxyUsername, std::string  proxyPassword):
+	_proxyHost(std::move(proxyHost)),
 	_proxyPort(proxyPort),
-	_proxyUsername(proxyUsername),
-	_proxyPassword(proxyPassword)
+	_proxyUsername(std::move(proxyUsername)),
+	_proxyPassword(std::move(proxyPassword))
 {
 }
 

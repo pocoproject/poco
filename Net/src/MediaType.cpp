@@ -13,10 +13,11 @@
 
 
 #include "Poco/Net/MediaType.h"
+#include "Poco/Ascii.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/String.h"
-#include "Poco/Ascii.h"
 #include <algorithm>
+#include <utility>
 
 
 using Poco::icompare;
@@ -32,9 +33,9 @@ MediaType::MediaType(const std::string& mediaType)
 }
 
 
-MediaType::MediaType(const std::string& type, const std::string& subType):
-	_type(type),
-	_subType(subType)
+MediaType::MediaType(std::string  type, std::string  subType):
+	_type(std::move(type)),
+	_subType(std::move(subType))
 {
 }
 

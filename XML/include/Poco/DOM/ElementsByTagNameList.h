@@ -38,7 +38,7 @@ public:
 	void autoRelease() override;
 
 protected:
-	ElementsByTagNameList(const Node* pParent, const XMLString& name);
+	ElementsByTagNameList(const Node* pParent, XMLString  name);
 	~ElementsByTagNameList() override;
 
 	Node* find(const Node* pParent, unsigned long index) const;
@@ -64,7 +64,7 @@ public:
 	void autoRelease() override;
 
 protected:
-	ElementsByTagNameListNS(const Node* pParent, const XMLString& namespaceURI, const XMLString& localName);
+	ElementsByTagNameListNS(const Node* pParent, XMLString  namespaceURI, XMLString  localName);
 	~ElementsByTagNameListNS() override;
 
 	Node* find(const Node* pParent, unsigned long index) const;

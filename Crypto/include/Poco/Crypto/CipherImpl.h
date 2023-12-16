@@ -33,7 +33,7 @@ class CipherImpl: public Cipher
 	/// An implementation of the Cipher class for OpenSSL's crypto library.
 {
 public:
-	CipherImpl(const CipherKey& key);
+	CipherImpl(CipherKey  key);
 		/// Creates a new CipherImpl object for the given CipherKey.
 
 	~CipherImpl() override;

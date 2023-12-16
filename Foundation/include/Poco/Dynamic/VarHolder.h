@@ -18,27 +18,28 @@
 #define Foundation_VarHolder_INCLUDED
 
 
-#include "Poco/Foundation.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/NumberParser.h"
+#include "Poco/Any.h"
 #include "Poco/DateTime.h"
-#include "Poco/Timestamp.h"
-#include "Poco/LocalDateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
-#include "Poco/String.h"
-#include "Poco/UnicodeConverter.h"
-#include "Poco/UTFString.h"
-#include "Poco/UTF8String.h"
-#include "Poco/UUID.h"
-#include "Poco/Any.h"
 #include "Poco/Exception.h"
-#include <vector>
-#include <list>
+#include "Poco/Foundation.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/String.h"
+#include "Poco/Timestamp.h"
+#include "Poco/UTF8String.h"
+#include "Poco/UTFString.h"
+#include "Poco/UUID.h"
+#include "Poco/UnicodeConverter.h"
 #include <deque>
-#include <typeinfo>
+#include <list>
 #include <type_traits>
+#include <typeinfo>
+#include <utility>
+#include <vector>
 #undef min
 #undef max
 #include <limits>
@@ -2627,7 +2628,7 @@ public:
 	{
 	}
 
-	VarHolderImpl(const std::string& val) : _val(val)
+	VarHolderImpl(std::string  val) : _val(std::move(val))
 	{
 	}
 
@@ -2824,7 +2825,7 @@ public:
 	{
 	}
 
-	VarHolderImpl(const Poco::UTF16String& val) : _val(val)
+	VarHolderImpl(Poco::UTF16String  val) : _val(std::move(val))
 	{
 	}
 

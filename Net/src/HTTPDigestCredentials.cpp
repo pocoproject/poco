@@ -27,6 +27,7 @@
 #include "Poco/StringTokenizer.h"
 
 #include <iostream>
+#include <utility>
 
 namespace
 {
@@ -110,7 +111,7 @@ Poco::FastMutex HTTPDigestCredentials::_nonceMutex;
 
 class HTTPDigestCredentials::DigestEngineProvider {
 public:
-	DigestEngineProvider(std::string algorithm): _algorithm(algorithm) {
+	DigestEngineProvider(std::string algorithm): _algorithm(std::move(algorithm)) {
 		_isSessionAlgorithm = _algorithm.find("sess") != std::string::npos;
 	}
 
@@ -152,9 +153,9 @@ HTTPDigestCredentials::HTTPDigestCredentials()
 }
 
 
-HTTPDigestCredentials::HTTPDigestCredentials(const std::string& username, const std::string& password):
-	_username(username),
-	_password(password)
+HTTPDigestCredentials::HTTPDigestCredentials(std::string  username, std::string  password):
+	_username(std::move(username)),
+	_password(std::move(password))
 {
 }
 

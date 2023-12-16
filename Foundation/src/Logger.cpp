@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Logger.h"
 #include "Poco/Formatter.h"
 #include "Poco/LoggingRegistry.h"
@@ -29,7 +31,7 @@ Mutex                Logger::_mapMtx;
 const std::string    Logger::ROOT;
 
 
-Logger::Logger(const std::string& name, Channel::Ptr pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
+Logger::Logger(std::string  name, Channel::Ptr pChannel, int level): _name(std::move(name)), _pChannel(std::move(pChannel)), _level(level)
 {
 }
 

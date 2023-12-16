@@ -18,10 +18,11 @@
 #define Foundation_PBKDF2Engine_INCLUDED
 
 
-#include "Poco/Foundation.h"
-#include "Poco/DigestEngine.h"
 #include "Poco/ByteOrder.h"
+#include "Poco/DigestEngine.h"
+#include "Poco/Foundation.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -66,8 +67,8 @@ public:
 		PRF_DIGEST_SIZE = PRF::DIGEST_SIZE
 	};
 
-	PBKDF2Engine(const std::string& salt, unsigned c = 4096, Poco::UInt32 dkLen = PRF_DIGEST_SIZE):
-		_s(salt),
+	PBKDF2Engine(std::string  salt, unsigned c = 4096, Poco::UInt32 dkLen = PRF_DIGEST_SIZE):
+		_s(std::move(salt)),
 		_c(c),
 		_dkLen(dkLen)
 	{

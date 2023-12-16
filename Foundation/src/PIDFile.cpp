@@ -14,11 +14,12 @@
 
 
 #include "Poco/PIDFile.h"
-#include "Poco/Path.h"
 #include "Poco/File.h"
-#include "Poco/Process.h"
 #include "Poco/FileStream.h"
+#include "Poco/Path.h"
+#include "Poco/Process.h"
 #include <fstream>
+#include <utility>
 
 
 using Poco::Path;
@@ -36,8 +37,8 @@ PIDFile::PIDFile()
 }
 
 
-PIDFile::PIDFile(const std::string& fileName, bool write):
-	_fileName(fileName)
+PIDFile::PIDFile(std::string  fileName, bool write):
+	_fileName(std::move(fileName))
 {
 	if (write) create();
 }

@@ -40,7 +40,7 @@ class JSON_API ParserImpl
 protected:
 	static const std::size_t JSON_DEFAULT_DEPTH = 128;
 
-	ParserImpl(const Handler::Ptr& pHandler = new ParseHandler);
+	ParserImpl(Handler::Ptr  pHandler = new ParseHandler);
 		/// Creates JSON ParserImpl, using the given Handler and buffer size.
 
 	virtual ~ParserImpl();

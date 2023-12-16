@@ -34,14 +34,14 @@ public:
 	Name();
 		/// Creates an empty Name.
 
-	Name(const XMLString& qname);
+	Name(XMLString  qname);
 		/// Creates a Name from a qualified name only.
 
-	Name(const XMLString& qname, const XMLString& namespaceURI);
+	Name(const XMLString& qname, XMLString  namespaceURI);
 		/// Creates a Name from a qualified name and a namespace URI.
 		/// The local name is extracted from the qualified name.
 
-	Name(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);
+	Name(XMLString  qname, XMLString  namespaceURI, XMLString  localName);
 		/// Creates a Name from a qualified name, a namespace URI and a local name.
 
 	Name(const Name& name);

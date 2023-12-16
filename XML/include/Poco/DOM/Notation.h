@@ -57,7 +57,7 @@ public:
 	unsigned short nodeType() const override;
 
 protected:
-	Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
+	Notation(Document* pOwnerDocument, XMLString  name, XMLString  publicId, XMLString  systemId);
 	Notation(Document* pOwnerDocument, const Notation& notation);
 	~Notation() override;
 

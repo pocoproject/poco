@@ -28,12 +28,13 @@
 #else
 #include <sys/statfs.h>
 #endif
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <utime.h>
 #include <cstring>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <utility>
+#include <utime.h>
 
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 #define STATFSFN statvfs
@@ -52,7 +53,7 @@ FileImpl::FileImpl()
 }
 
 
-FileImpl::FileImpl(const std::string& path): _path(path)
+FileImpl::FileImpl(std::string  path): _path(std::move(path))
 {
 	std::string::size_type n = _path.size();
 	if (n > 1 && _path[n - 1] == '/')

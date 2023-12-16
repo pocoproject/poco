@@ -15,13 +15,15 @@
 #include "Poco/Crypto/KeyPair.h"
 #include <openssl/rsa.h>
 
+#include <utility>
+
 
 namespace Poco {
 namespace Crypto {
 
 
 KeyPair::KeyPair(KeyPairImpl::Ptr pKeyPairImpl):
-	_pImpl(pKeyPairImpl)
+	_pImpl(std::move(pKeyPairImpl))
 {
 }
 

@@ -14,6 +14,7 @@
 
 #include "Poco/Data/StatementCreator.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -26,7 +27,7 @@ StatementCreator::StatementCreator()
 
 
 StatementCreator::StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl):
-	_ptrImpl(ptrImpl)
+	_ptrImpl(std::move(ptrImpl))
 {
 }
 

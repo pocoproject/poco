@@ -81,7 +81,7 @@ public:
 	unsigned short nodeType() const override;
 
 protected:
-	DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
+	DocumentType(Document* pOwner, XMLString  name, XMLString  publicId, XMLString  systemId);
 	DocumentType(Document* pOwner, const DocumentType& dt);
 	~DocumentType() override;
 

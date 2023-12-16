@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/MongoDB/DeleteRequest.h"
 
 
@@ -19,19 +21,19 @@ namespace Poco {
 namespace MongoDB {
 
 
-DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::Flags flags):
+DeleteRequest::DeleteRequest(std::string  collectionName, DeleteRequest::Flags flags):
 	RequestMessage(MessageHeader::OP_DELETE),
 	_flags(flags),
-	_fullCollectionName(collectionName),
+	_fullCollectionName(std::move(collectionName)),
 	_selector()
 {
 }
 
 
-DeleteRequest::DeleteRequest(const std::string& collectionName, bool justOne):
+DeleteRequest::DeleteRequest(std::string  collectionName, bool justOne):
 	RequestMessage(MessageHeader::OP_DELETE),
 	_flags(justOne ? DELETE_SINGLE_REMOVE : DELETE_DEFAULT),
-	_fullCollectionName(collectionName),
+	_fullCollectionName(std::move(collectionName)),
 	_selector()
 {
 }

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/ActiveRecord/Context.h"
 
 
@@ -19,8 +21,8 @@ namespace Poco {
 namespace ActiveRecord {
 
 
-Context::Context(const Poco::Data::Session& session):
-	_session(session)
+Context::Context(Poco::Data::Session  session):
+	_session(std::move(session))
 {
 }
 

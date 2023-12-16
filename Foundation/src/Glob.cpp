@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Glob.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
@@ -24,8 +26,8 @@
 namespace Poco {
 
 
-Glob::Glob(const std::string& pattern, int options)
-	: _pattern(pattern), _options(options)
+Glob::Glob(std::string  pattern, int options)
+	: _pattern(std::move(pattern)), _options(options)
 {
 }
 

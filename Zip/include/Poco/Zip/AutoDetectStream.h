@@ -32,7 +32,7 @@ class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
 	/// Data Descriptor signature.
 {
 public:
-	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
+	AutoDetectStreamBuf(std::istream& in, std::string  prefix, std::string  postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
 		/// Creates the AutoDetectStream.
 
 	~AutoDetectStreamBuf() override;

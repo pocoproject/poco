@@ -15,17 +15,18 @@
 #include "Poco/Data/RowFormatter.h"
 #include "Poco/Exception.h"
 #include <iomanip>
+#include <utility>
 
 
 namespace Poco {
 namespace Data {
 
 
-RowFormatter::RowFormatter(const std::string& prefix,
-	const std::string& postfix,
+RowFormatter::RowFormatter(std::string  prefix,
+	std::string  postfix,
 	Mode mode):
-	_prefix(prefix),
-	_postfix(postfix),
+	_prefix(std::move(prefix)),
+	_postfix(std::move(postfix)),
 	_mode(mode),
 	_totalRowCount(0)
 {

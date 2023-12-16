@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/Transcoder.h"
 
 
@@ -21,8 +23,8 @@ namespace Data {
 
 Transcoder::Transcoder(Poco::TextEncoding::Ptr pFromEncoding,
 	Poco::TextEncoding::Ptr pToEncoding):
-	_pFromEncoding(pFromEncoding),
-	_pToEncoding(pToEncoding),
+	_pFromEncoding(std::move(pFromEncoding)),
+	_pToEncoding(std::move(pToEncoding)),
 	_pConverter(new Poco::TextConverter(*_pFromEncoding, *_pToEncoding)),
 	_pReverseConverter(new Poco::TextConverter(*_pToEncoding, *_pFromEncoding))
 {

@@ -16,9 +16,10 @@
 #include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/Exception.h"
 #include "Poco/Logger.h"
+#include <cstring>
 #include <openssl/err.h>
 #include <openssl/evp.h>
-#include <cstring>
+#include <utility>
 
 
 namespace Poco {
@@ -284,8 +285,8 @@ namespace
 }
 
 
-EVPCipherImpl::EVPCipherImpl(const EVPPKey& key):
-	_key(key)
+EVPCipherImpl::EVPCipherImpl(EVPPKey  key):
+	_key(std::move(key))
 {
 }
 

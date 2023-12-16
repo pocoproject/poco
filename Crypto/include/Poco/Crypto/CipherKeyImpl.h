@@ -64,8 +64,8 @@ public:
 		/// and iteration count.
 
 	CipherKeyImpl(const std::string& name,
-		const ByteVec& key,
-		const ByteVec& iv);
+		ByteVec  key,
+		ByteVec  iv);
 		/// Creates a new CipherKeyImpl object, using the
 		/// given cipher name, key and initialization vector.
 

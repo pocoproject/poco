@@ -31,7 +31,7 @@ class Util_API RegExpValidator: public Validator
 	/// a regular expression.
 {
 public:
-	RegExpValidator(const std::string& regexp);
+	RegExpValidator(std::string  regexp);
 		/// Creates the RegExpValidator, using the given regular expression.
 
 	~RegExpValidator() override;

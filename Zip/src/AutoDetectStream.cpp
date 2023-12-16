@@ -13,25 +13,26 @@
 
 
 #include "Poco/Zip/AutoDetectStream.h"
-#include "Poco/Zip/ZipLocalFileHeader.h"
+#include "Poco/Exception.h"
 #include "Poco/Zip/ZipArchiveInfo.h"
 #include "Poco/Zip/ZipDataInfo.h"
 #include "Poco/Zip/ZipFileInfo.h"
-#include "Poco/Exception.h"
+#include "Poco/Zip/ZipLocalFileHeader.h"
 #include <cstring>
+#include <utility>
 
 
 namespace Poco {
 namespace Zip {
 
 
-AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
+AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, std::string  pre, std::string  post, bool reposition, Poco::UInt32 start, bool needsZip64):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&in),
 	_eofDetected(false),
 	_matchCnt(0),
-	_prefix(pre),
-	_postfix(post),
+	_prefix(std::move(pre)),
+	_postfix(std::move(post)),
 	_reposition(reposition),
 	_start(start),
 	_needsZip64(needsZip64),

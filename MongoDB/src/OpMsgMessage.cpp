@@ -11,6 +11,8 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#include <utility>
+
 #include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/MongoDB/MessageHeader.h"
 #include "Poco/MongoDB/Array.h"
@@ -71,10 +73,10 @@ OpMsgMessage::OpMsgMessage() :
 }
 
 
-OpMsgMessage::OpMsgMessage(const std::string& databaseName, const std::string& collectionName, UInt32 flags) :
+OpMsgMessage::OpMsgMessage(std::string  databaseName, std::string  collectionName, UInt32 flags) :
 	Message(MessageHeader::OP_MSG),
-	_databaseName(databaseName),
-	_collectionName(collectionName),
+	_databaseName(std::move(databaseName)),
+	_collectionName(std::move(collectionName)),
 	_flags(flags)
 {
 }

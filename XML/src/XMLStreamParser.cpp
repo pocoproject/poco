@@ -16,11 +16,12 @@
 
 
 #include "Poco/XML/XMLStreamParser.h"
-#include <new>
 #include <cstring>
 #include <istream>
+#include <new>
 #include <ostream>
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -85,9 +86,9 @@ std::ostream& operator << (std::ostream& os, XMLStreamParser::EventType e)
 }
 
 
-XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, FeatureType f):
+XMLStreamParser::XMLStreamParser(std::istream& is, std::string  iname, FeatureType f):
 	_size(0),
-	_inputName(iname),
+	_inputName(std::move(iname)),
 	_feature(f)
 {
 	_data.is = &is;
@@ -95,9 +96,9 @@ XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, Fea
 }
 
 
-XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::string& iname, FeatureType f):
+XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, std::string  iname, FeatureType f):
 	_size(size),
-	_inputName(iname),
+	_inputName(std::move(iname)),
 	_feature(f)
 {
 	poco_assert(data != nullptr && size != 0);

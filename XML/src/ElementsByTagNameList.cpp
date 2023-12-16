@@ -13,18 +13,19 @@
 
 
 #include "Poco/DOM/ElementsByTagNameList.h"
-#include "Poco/DOM/Node.h"
 #include "Poco/DOM/Document.h"
+#include "Poco/DOM/Node.h"
 #include <climits>
+#include <utility>
 
 
 namespace Poco {
 namespace XML {
 
 
-ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLString& name):
+ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, XMLString  name):
 	_pParent(pParent),
-	_name(name),
+	_name(std::move(name)),
 	_count(0)
 {
 	poco_check_ptr (pParent);
@@ -87,10 +88,10 @@ void ElementsByTagNameList::autoRelease()
 }
 
 
-ElementsByTagNameListNS::ElementsByTagNameListNS(const Node* pParent, const XMLString& namespaceURI, const XMLString& localName):
+ElementsByTagNameListNS::ElementsByTagNameListNS(const Node* pParent, XMLString  namespaceURI, XMLString  localName):
 	_pParent(pParent),
-	_localName(localName),
-	_namespaceURI(namespaceURI),
+	_localName(std::move(localName)),
+	_namespaceURI(std::move(namespaceURI)),
 	_count(0)
 {
 	poco_check_ptr (pParent);

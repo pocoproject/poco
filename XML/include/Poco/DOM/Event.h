@@ -112,8 +112,8 @@ public:
 	void autoRelease() override;
 
 protected:
-	Event(Document* pOwnerDocument, const XMLString& type);
-	Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable);
+	Event(Document* pOwnerDocument, XMLString  type);
+	Event(Document* pOwnerDocument, XMLString  type, EventTarget* pTarget, bool canBubble, bool isCancelable);
 	~Event() override;
 
 	bool isCanceled() const;

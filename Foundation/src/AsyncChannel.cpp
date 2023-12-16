@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/AsyncChannel.h"
 #include "Poco/Notification.h"
 #include "Poco/Message.h"
@@ -30,8 +32,8 @@ namespace Poco {
 class MessageNotification: public Notification
 {
 public:
-	MessageNotification(const Message& msg):
-		_msg(msg)
+	MessageNotification(Message  msg):
+		_msg(std::move(msg))
 	{
 	}
 
@@ -50,7 +52,7 @@ private:
 
 
 AsyncChannel::AsyncChannel(Channel::Ptr pChannel, Thread::Priority prio):
-	_pChannel(pChannel),
+	_pChannel(std::move(pChannel)),
 	_thread("AsyncChannel"),
 	_closed(false)
 {

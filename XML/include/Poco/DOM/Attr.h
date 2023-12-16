@@ -124,7 +124,7 @@ public:
 	XMLString innerText() const override;
 
 protected:
-	Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified = true);
+	Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, XMLString  value, bool specified = true);
 	Attr(Document* pOwnerDocument, const Attr& attr);
 	~Attr() override;
 

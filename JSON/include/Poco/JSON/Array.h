@@ -18,11 +18,12 @@
 #define JSON_Array_INCLUDED
 
 
+#include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/JSON.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/Dynamic/Var.h"
-#include <vector>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -321,7 +322,7 @@ template <>
 class VarHolderImpl<JSON::Array::Ptr>: public VarHolder
 {
 public:
-	VarHolderImpl(const JSON::Array::Ptr& val): _val(val)
+	VarHolderImpl(JSON::Array::Ptr  val): _val(std::move(val))
 	{
 	}
 
@@ -455,7 +456,7 @@ template <>
 class VarHolderImpl<JSON::Array>: public VarHolder
 {
 public:
-	VarHolderImpl(const JSON::Array& val): _val(val)
+	VarHolderImpl(JSON::Array  val): _val(std::move(val))
 	{
 	}
 

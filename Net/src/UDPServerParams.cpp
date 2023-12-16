@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/UDPServerParams.h"
 
 
@@ -19,12 +21,12 @@ namespace Poco {
 namespace Net {
 
 
-UDPServerParams::UDPServerParams(const Poco::Net::SocketAddress& sa,
+UDPServerParams::UDPServerParams(Poco::Net::SocketAddress  sa,
 	int nSockets,
 	Poco::Timespan timeout,
 	std::size_t handlerBufListSize,
 	bool notifySender,
-	int  backlogThreshold): _sa(sa),
+	int  backlogThreshold): _sa(std::move(sa)),
 		_nSockets(nSockets),
 		_timeout(timeout),
 		_handlerBufListSize(handlerBufListSize),

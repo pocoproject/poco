@@ -17,6 +17,8 @@
 #include "Poco/StringTokenizer.h"
 #include <syslog.h>
 
+#include <utility>
+
 
 namespace Poco {
 
@@ -34,8 +36,8 @@ SyslogChannel::SyslogChannel():
 }
 
 
-SyslogChannel::SyslogChannel(const std::string& name, int options, int facility):
-	_name(name),
+SyslogChannel::SyslogChannel(std::string  name, int options, int facility):
+	_name(std::move(name)),
 	_options(options),
 	_facility(facility),
 	_open(false)

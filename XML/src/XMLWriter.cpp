@@ -13,12 +13,13 @@
 
 
 #include "Poco/XML/XMLWriter.h"
-#include "Poco/XML/XMLString.h"
-#include "Poco/XML/XMLException.h"
 #include "Poco/SAX/AttributesImpl.h"
-#include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
+#include "Poco/UTF8Encoding.h"
+#include "Poco/XML/XMLException.h"
+#include "Poco/XML/XMLString.h"
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -79,12 +80,12 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 }
 
 
-XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding):
+XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding& textEncoding):
 	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(nullptr),
 	_options(options),
-	_encoding(encodingName),
+	_encoding(std::move(encodingName)),
 	_depth(-1),
 	_elementCount(0),
 	_inFragment(false),
@@ -102,12 +103,12 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 }
 
 
-XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding):
+XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding* pTextEncoding):
 	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(nullptr),
 	_options(options),
-	_encoding(encodingName),
+	_encoding(std::move(encodingName)),
 	_depth(-1),
 	_elementCount(0),
 	_inFragment(false),

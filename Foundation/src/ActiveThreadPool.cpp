@@ -30,10 +30,10 @@ class NewActionNotification: public Notification
 public:
 	using Ptr = AutoPtr<NewActionNotification>;
 
-	NewActionNotification(Thread::Priority priority, Runnable& runnable, const std::string& name) :
+	NewActionNotification(Thread::Priority priority, Runnable& runnable, std::string  name) :
 		_priority(priority),
 		_runnable(runnable),
-		_name(name)
+		_name(std::move(name))
 	{
 	}
 

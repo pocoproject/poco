@@ -53,7 +53,7 @@ class Util_API ConfigurationView: public AbstractConfiguration
 	/// still works as expected given a ConfigurationView.
 {
 public:
-	ConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig);
+	ConfigurationView(std::string  prefix, AbstractConfiguration::Ptr pConfig);
 		/// Creates the ConfigurationView. The ConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 

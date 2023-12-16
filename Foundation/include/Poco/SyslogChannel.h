@@ -66,7 +66,7 @@ public:
 	SyslogChannel();
 		/// Creates a SyslogChannel.
 
-	SyslogChannel(const std::string& name, int options = SYSLOG_CONS, int facility = SYSLOG_USER);
+	SyslogChannel(std::string  name, int options = SYSLOG_CONS, int facility = SYSLOG_USER);
 		/// Creates a SyslogChannel with the given name, options and facility.
 
 	void open() override;

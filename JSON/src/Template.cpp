@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/JSON/Template.h"
 #include "Poco/JSON/TemplateCache.h"
 #include "Poco/JSON/Query.h"
@@ -53,7 +55,7 @@ public:
 	{
 	}
 
-	StringPart(const std::string& content): Part(), _content(content)
+	StringPart(std::string  content): Part(), _content(std::move(content))
 	{
 	}
 
@@ -113,7 +115,7 @@ protected:
 class EchoPart: public Part
 {
 public:
-	EchoPart(const std::string& query): Part(), _query(query)
+	EchoPart(std::string  query): Part(), _query(std::move(query))
 	{
 	}
 
@@ -140,7 +142,7 @@ private:
 class LogicQuery
 {
 public:
-	LogicQuery(const std::string& query): _queryString(query)
+	LogicQuery(std::string  query): _queryString(std::move(query))
 	{
 	}
 
@@ -264,7 +266,7 @@ private:
 class LoopPart: public MultiPart
 {
 public:
-	LoopPart(const std::string& name, const std::string& query): MultiPart(), _name(name), _query(query)
+	LoopPart(std::string  name, std::string  query): MultiPart(), _name(std::move(name)), _query(std::move(query))
 	{
 	}
 
@@ -303,9 +305,9 @@ class IncludePart: public Part
 {
 public:
 
-	IncludePart(const Path& parentPath, const Path& path):
+	IncludePart(const Path& parentPath, Path  path):
 		Part(),
-		_path(path)
+		_path(std::move(path))
 	{
 		// When the path is relative, try to make it absolute based
 		// on the path of the parent template. When the file doesn't
@@ -347,10 +349,10 @@ private:
 };
 
 
-Template::Template(const Path& templatePath):
+Template::Template(Path  templatePath):
 	_parts(nullptr),
 	_currentPart(nullptr),
-	_templatePath(templatePath)
+	_templatePath(std::move(templatePath))
 {
 }
 

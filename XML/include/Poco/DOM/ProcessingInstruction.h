@@ -58,7 +58,7 @@ public:
 	unsigned short nodeType() const override;
 
 protected:
-	ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data);
+	ProcessingInstruction(Document* pOwnerDocument, XMLString  target, XMLString  data);
 	ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction);
 	~ProcessingInstruction() override;
 

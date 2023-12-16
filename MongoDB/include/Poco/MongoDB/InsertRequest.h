@@ -45,7 +45,7 @@ public:
 			/// recent will be reported.
 	};
 
-	InsertRequest(const std::string& collectionName, Flags flags = INSERT_DEFAULT);
+	InsertRequest(std::string  collectionName, Flags flags = INSERT_DEFAULT);
 		/// Creates an InsertRequest.
 		///
 		/// The full collection name is the concatenation of the database

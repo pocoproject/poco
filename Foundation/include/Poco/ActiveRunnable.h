@@ -18,6 +18,8 @@
 #define Foundation_ActiveRunnable_INCLUDED
 
 
+#include <utility>
+
 #include "Poco/Foundation.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/Runnable.h"
@@ -94,10 +96,10 @@ public:
 	typedef void (OwnerType::*Callback)(const ArgType&);
 	typedef ActiveResult<void> ActiveResultType;
 
-	ActiveRunnable(OwnerType* pOwner, Callback method, const ArgType& arg, const ActiveResultType& result):
+	ActiveRunnable(OwnerType* pOwner, Callback method, ArgType  arg, const ActiveResultType& result):
 		_pOwner(pOwner),
 		_method(method),
-		_arg(arg),
+		_arg(std::move(arg)),
 		_result(result)
 	{
 		poco_check_ptr (pOwner);

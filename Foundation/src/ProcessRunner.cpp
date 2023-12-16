@@ -14,13 +14,14 @@
 
 
 #include "Poco/ProcessRunner.h"
-#include "Poco/PIDFile.h"
-#include "Poco/FileStream.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/File.h"
+#include "Poco/FileStream.h"
+#include "Poco/PIDFile.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include <fstream>
+#include <utility>
 
 
 using Poco::Thread;
@@ -36,16 +37,16 @@ using Poco::Stopwatch;
 namespace Poco {
 
 
-ProcessRunner::ProcessRunner(const std::string& cmd,
-		const Args& args,
-		const std::string& pidFile,
+ProcessRunner::ProcessRunner(std::string  cmd,
+		Args  args,
+		std::string  pidFile,
 		int options,
 		int timeout,
 		bool startProcess,
-		const Args& pidArgFmt): _cmd(cmd),
-			_args(args),
+		const Args& pidArgFmt): _cmd(std::move(cmd)),
+			_args(std::move(args)),
 			_pid(INVALID_PID),
-			_pidFile(pidFile),
+			_pidFile(std::move(pidFile)),
 			_options(options),
 			_timeout(timeout),
 			_pPH(nullptr),

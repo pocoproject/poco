@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Util/Timer.h"
 #include "Poco/Notification.h"
 #include "Poco/ErrorHandler.h"
@@ -125,7 +127,7 @@ class TaskNotification: public TimerNotification
 public:
 	TaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask):
 		TimerNotification(queue),
-		_pTask(pTask)
+		_pTask(std::move(pTask))
 	{
 	}
 

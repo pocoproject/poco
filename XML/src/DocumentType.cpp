@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/DocumentType.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/DTDMap.h"
@@ -22,11 +24,11 @@ namespace Poco {
 namespace XML {
 
 
-DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
+DocumentType::DocumentType(Document* pOwner, XMLString  name, XMLString  publicId, XMLString  systemId):
 	AbstractContainerNode(pOwner),
-	_name(name),
-	_publicId(publicId),
-	_systemId(systemId)
+	_name(std::move(name)),
+	_publicId(std::move(publicId)),
+	_systemId(std::move(systemId))
 {
 }
 

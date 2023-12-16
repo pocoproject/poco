@@ -22,6 +22,8 @@
 #define Foundation_TypeList_INCLUDED
 
 
+#include <utility>
+
 #include "Poco/Foundation.h"
 #include "Poco/MetaProgramming.h"
 
@@ -74,7 +76,7 @@ struct TypeList
 	{
 	}
 
-	TypeList(ConstHeadType& h, ConstTailType& t):head(h), tail(t)
+	TypeList(ConstHeadType  h, ConstTailType& t):head(std::move(h)), tail(t)
 	{
 	}
 

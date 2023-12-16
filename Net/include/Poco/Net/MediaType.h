@@ -38,7 +38,7 @@ public:
 		/// Creates the MediaType from the given string, which
 		/// must have the format <type>/<subtype>{;<parameter>=<value>}.
 
-	MediaType(const std::string& type, const std::string& subType);
+	MediaType(std::string  type, std::string  subType);
 		/// Creates the MediaType, using the given type and subtype.
 
 	MediaType(const MediaType& mediaType);

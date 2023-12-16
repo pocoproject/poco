@@ -56,7 +56,7 @@ public:
 		/// Creates an empty HTMLForm and sets the
 		/// encoding to "application/x-www-form-urlencoded".
 
-	explicit HTMLForm(const std::string& encoding);
+	explicit HTMLForm(std::string  encoding);
 		/// Creates an empty HTMLForm that uses
 		/// the given encoding.
 		///

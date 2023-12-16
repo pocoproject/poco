@@ -458,7 +458,7 @@ public:
 protected:
 	typedef std::map<std::string, Ptr> LoggerMap;
 
-	Logger(const std::string& name, Channel::Ptr pChannel, int level);
+	Logger(std::string  name, Channel::Ptr pChannel, int level);
 	~Logger() override;
 
 	void log(const std::string& text, Message::Priority prio);

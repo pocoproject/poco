@@ -13,19 +13,20 @@
 
 
 #include "Poco/JWT/Signer.h"
-#include "Poco/JWT/Serializer.h"
-#include "Poco/JWT/JWTException.h"
-#include "Poco/HMACEngine.h"
-#include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/DynamicFactory.h"
-#include "Poco/MemoryStream.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
+#include "Poco/Base64Encoder.h"
 #include "Poco/Crypto/DigestEngine.h"
-#include "Poco/Crypto/RSADigestEngine.h"
 #include "Poco/Crypto/ECDSADigestEngine.h"
+#include "Poco/Crypto/RSADigestEngine.h"
+#include "Poco/DynamicFactory.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/JWT/JWTException.h"
+#include "Poco/JWT/Serializer.h"
+#include "Poco/MemoryStream.h"
+#include "Poco/RefCountedObject.h"
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -156,8 +157,8 @@ typedef HMACAlgorithm<SHA512Engine> HS512;
 class RSAAlgorithm: public Algorithm
 {
 public:
-	RSAAlgorithm(const std::string& digestType):
-		_digestType(digestType)
+	RSAAlgorithm(std::string  digestType):
+		_digestType(std::move(digestType))
 	{
 	}
 
@@ -227,8 +228,8 @@ public:
 		RS_PADDING = 32
 	};
 
-	ECDSAAlgorithm(const std::string& digestType):
-		_digestType(digestType)
+	ECDSAAlgorithm(std::string  digestType):
+		_digestType(std::move(digestType))
 	{
 	}
 
@@ -354,8 +355,8 @@ Signer::Signer()
 }
 
 
-Signer::Signer(const std::string& hmacKey):
-	_hmacKey(hmacKey)
+Signer::Signer(std::string  hmacKey):
+	_hmacKey(std::move(hmacKey))
 {
 	_algorithms.insert(ALGO_HS256);
 }

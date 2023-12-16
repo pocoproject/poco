@@ -13,11 +13,12 @@
 
 
 #include "Poco/Net/TCPServerDispatcher.h"
-#include "Poco/Net/TCPServerConnectionFactory.h"
-#include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/ErrorHandler.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Notification.h"
 #include <memory>
+#include <utility>
 
 
 using Poco::Notification;
@@ -58,7 +59,7 @@ class StopNotification: public Notification
 
 TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, TCPServerParams::Ptr pParams):
 	_rc(1),
-	_pParams(pParams),
+	_pParams(std::move(pParams)),
 	_currentThreads(0),
 	_totalConnections(0),
 	_currentConnections(0),

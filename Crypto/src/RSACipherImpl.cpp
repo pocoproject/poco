@@ -15,9 +15,10 @@
 #include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/Exception.h"
+#include <cstring>
 #include <openssl/err.h>
 #include <openssl/rsa.h>
-#include <cstring>
+#include <utility>
 
 
 namespace Poco {
@@ -314,8 +315,8 @@ namespace
 }
 
 
-RSACipherImpl::RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode):
-	_key(key),
+RSACipherImpl::RSACipherImpl(RSAKey  key, RSAPaddingMode paddingMode):
+	_key(std::move(key)),
 	_paddingMode(paddingMode)
 {
 }

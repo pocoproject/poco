@@ -59,7 +59,7 @@ public:
 		GLOB_DIRS_ONLY       = 0x80  /// only glob for directories (for internal use only)
 	};
 
-	Glob(const std::string& pattern, int options = 0);
+	Glob(std::string  pattern, int options = 0);
 		/// Creates the Glob, using the given pattern. The pattern
 		/// must not be an empty string.
 		///

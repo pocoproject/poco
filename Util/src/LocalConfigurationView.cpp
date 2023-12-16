@@ -11,6 +11,8 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#include <utility>
+
 #include "Poco/Util/LocalConfigurationView.h"
 
 
@@ -18,8 +20,8 @@ namespace Poco {
 namespace Util {
 
 
-LocalConfigurationView::LocalConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig) :
-	_prefix(prefix), _pConfig(pConfig)
+LocalConfigurationView::LocalConfigurationView(std::string  prefix, AbstractConfiguration::Ptr pConfig) :
+	_prefix(std::move(prefix)), _pConfig(pConfig)
 {
 	poco_check_ptr(pConfig);
 }

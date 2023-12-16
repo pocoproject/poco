@@ -13,12 +13,13 @@
 
 
 #include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/Base64Encoder.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Base64Encoder.h"
-#include "Poco/Base64Decoder.h"
 #include "Poco/String.h"
 #include <sstream>
+#include <utility>
 
 
 using Poco::Base64Decoder;
@@ -38,9 +39,9 @@ HTTPBasicCredentials::HTTPBasicCredentials()
 }
 
 
-HTTPBasicCredentials::HTTPBasicCredentials(const std::string& username, const std::string& password):
-	_username(username),
-	_password(password)
+HTTPBasicCredentials::HTTPBasicCredentials(std::string  username, std::string  password):
+	_username(std::move(username)),
+	_password(std::move(password))
 {
 }
 

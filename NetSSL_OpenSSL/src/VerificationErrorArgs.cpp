@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/VerificationErrorArgs.h"
 
 
@@ -19,12 +21,12 @@ namespace Poco {
 namespace Net {
 
 
-VerificationErrorArgs::VerificationErrorArgs(Poco::Net::Context::Ptr pContext, const X509Certificate& cert, int errDepth, int errNum, const std::string& errMsg):
-	_pContext(pContext),
-	_cert(cert),
+VerificationErrorArgs::VerificationErrorArgs(Poco::Net::Context::Ptr pContext, X509Certificate  cert, int errDepth, int errNum, std::string  errMsg):
+	_pContext(std::move(pContext)),
+	_cert(std::move(cert)),
 	_errorDepth(errDepth),
 	_errorNumber(errNum),
-	_errorMessage(errMsg),
+	_errorMessage(std::move(errMsg)),
 	_ignoreError(false)
 {
 }

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPSessionFactory.h"
 #include "Poco/Net/HTTPSessionInstantiator.h"
 #include "Poco/Exception.h"
@@ -39,8 +41,8 @@ HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt1
 }
 
 
-HTTPSessionFactory::HTTPSessionFactory(const HTTPClientSession::ProxyConfig& proxyConfig):
-	_proxyConfig(proxyConfig)
+HTTPSessionFactory::HTTPSessionFactory(HTTPClientSession::ProxyConfig  proxyConfig):
+	_proxyConfig(std::move(proxyConfig))
 {
 }
 

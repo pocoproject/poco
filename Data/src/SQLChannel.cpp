@@ -13,19 +13,20 @@
 
 
 #include "Poco/Data/SQLChannel.h"
-#include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/SessionFactory.h"
 #include "Poco/DateTime.h"
-#include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
-#include "Poco/LoggingFactory.h"
-#include "Poco/Instantiator.h"
-#include "Poco/NumberParser.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/Stopwatch.h"
-#include "Poco/Format.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/File.h"
+#include "Poco/Format.h"
+#include "Poco/Instantiator.h"
+#include "Poco/LoggingFactory.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Stopwatch.h"
 #include <fstream>
+#include <utility>
 
 
 namespace Poco {
@@ -75,17 +76,17 @@ SQLChannel::SQLChannel():
 }
 
 
-SQLChannel::SQLChannel(const std::string& connector,
-	const std::string& connect,
-	const std::string& name,
-	const std::string& table,
+SQLChannel::SQLChannel(std::string  connector,
+	std::string  connect,
+	std::string  name,
+	std::string  table,
 	int timeout,
 	int minBatch,
 	int maxBatch) :
-	_connector(connector),
-	_connect(connect),
-	_name(name),
-	_table(table),
+	_connector(std::move(connector)),
+	_connect(std::move(connect)),
+	_name(std::move(name)),
+	_table(std::move(table)),
 	_tableChanged(true),
 	_timeout(timeout),
 	_minBatch(minBatch),

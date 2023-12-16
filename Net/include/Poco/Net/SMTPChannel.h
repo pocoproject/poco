@@ -37,7 +37,7 @@ public:
 	SMTPChannel();
 		/// Creates a SMTPChannel.
 
-	SMTPChannel(const std::string& mailhost, const std::string& sender, const std::string& recipient);
+	SMTPChannel(std::string  mailhost, std::string  sender, std::string  recipient);
 		/// Creates a SMTPChannel with the given target mailhost, sender, and recipient.
 
 	void open() override;

@@ -24,7 +24,7 @@ namespace Compiler {
 class HeaderGenerator: public CodeGenerator
 {
 public:
-	HeaderGenerator(const std::string& source, std::ostream& stream, const Class& clazz, const ClassMap& classes);
+	HeaderGenerator(std::string source, std::ostream& stream, Class  clazz, const ClassMap& classes);
 
 	void generate() const;
 	void writeClass() const;

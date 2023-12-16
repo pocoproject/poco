@@ -14,6 +14,7 @@
 
 #include "Poco/MongoDB/RegularExpression.h"
 #include <sstream>
+#include <utility>
 
 
 namespace Poco {
@@ -25,9 +26,9 @@ RegularExpression::RegularExpression()
 }
 
 
-RegularExpression::RegularExpression(const std::string& pattern, const std::string& options):
-	_pattern(pattern),
-	_options(options)
+RegularExpression::RegularExpression(std::string  pattern, std::string  options):
+	_pattern(std::move(pattern)),
+	_options(std::move(options))
 {
 }
 

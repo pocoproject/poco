@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/Attr.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/XML/NamePool.h"
@@ -21,10 +23,10 @@ namespace Poco {
 namespace XML {
 
 
-Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified):
+Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, XMLString  value, bool specified):
 	AbstractNode(pOwnerDocument),
 	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName)),
-	_value(value),
+	_value(std::move(value)),
 	_specified(specified)
 {
 }

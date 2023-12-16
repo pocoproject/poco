@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/SocketNotification.h"
 
 
@@ -58,19 +60,19 @@ WritableNotification::~WritableNotification()
 }
 
 
-ErrorNotification::ErrorNotification(SocketReactor* pReactor, int code, const std::string& description):
+ErrorNotification::ErrorNotification(SocketReactor* pReactor, int code, std::string  description):
 	SocketNotification(pReactor),
 	_code(code),
-	_description(description)
+	_description(std::move(description))
 {
 }
 
 
 ErrorNotification::ErrorNotification(SocketReactor* pReactor, const Socket& socket,
-	int code, const std::string& description):
+	int code, std::string  description):
 	SocketNotification(pReactor),
 	_code(code),
-	_description(description)
+	_description(std::move(description))
 {
 	setSocket(socket);
 }

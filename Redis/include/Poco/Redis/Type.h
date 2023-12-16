@@ -18,6 +18,8 @@
 #define Redis_Type_INCLUDED
 
 
+#include <utility>
+
 #include "Poco/LineEndingConverter.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
@@ -237,7 +239,7 @@ public:
 	{
 	}
 
-	Type(const T& t) : _value(t)
+	Type(T  t) : _value(std::move(t))
 		/// Creates the Type from another one.
 	{
 	}

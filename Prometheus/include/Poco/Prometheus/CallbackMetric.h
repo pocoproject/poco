@@ -18,9 +18,10 @@
 #define Prometheus_CallbackMetric_INCLUDED
 
 
-#include "Poco/Prometheus/Metric.h"
 #include "Poco/Prometheus/Exporter.h"
+#include "Poco/Prometheus/Metric.h"
 #include <functional>
+#include <utility>
 #include <vector>
 
 
@@ -97,7 +98,7 @@ public:
 
 	CallbackMetric(const std::string& name, const std::string& help, Registry* pRegistry, Callback callback):
 		Metric(metricType, name, pRegistry),
-		_callback(callback)
+		_callback(std::move(callback))
 		/// Creates a CallbackMetric with the given type, name and help text, and
 		/// registers it with the given registry (if not nullptr).
 	{

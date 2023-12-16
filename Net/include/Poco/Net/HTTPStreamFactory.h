@@ -35,12 +35,12 @@ public:
 	HTTPStreamFactory();
 		/// Creates the HTTPStreamFactory.
 
-	HTTPStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
+	HTTPStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
 		/// Creates the HTTPStreamFactory.
 		///
 		/// HTTP connections will use the given proxy.
 
-	HTTPStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword);
+	HTTPStreamFactory(std::string  proxyHost, Poco::UInt16 proxyPort, std::string  proxyUsername, std::string  proxyPassword);
 		/// Creates the HTTPStreamFactory.
 		///
 		/// HTTP connections will use the given proxy and

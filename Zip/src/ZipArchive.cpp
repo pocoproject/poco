@@ -13,9 +13,10 @@
 
 
 #include "Poco/Zip/ZipArchive.h"
-#include "Poco/Zip/SkipCallback.h"
 #include "Poco/Exception.h"
+#include "Poco/Zip/SkipCallback.h"
 #include <cstring>
+#include <utility>
 
 
 namespace Poco {
@@ -37,11 +38,11 @@ ZipArchive::ZipArchive(std::istream& in):
 }
 
 
-ZipArchive::ZipArchive(const FileHeaders& entries, const FileInfos& infos, const DirectoryInfos& dirs, const DirectoryInfos64& dirs64):
-	_entries(entries),
-	_infos(infos),
-	_disks(dirs),
-	_disks64(dirs64)
+ZipArchive::ZipArchive(FileHeaders  entries, FileInfos  infos, DirectoryInfos  dirs, DirectoryInfos64  dirs64):
+	_entries(std::move(entries)),
+	_infos(std::move(infos)),
+	_disks(std::move(dirs)),
+	_disks64(std::move(dirs64))
 {
 }
 

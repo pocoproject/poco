@@ -14,6 +14,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Redis/Client.h"
 #include "Poco/Redis/Exception.h"
 
@@ -51,8 +53,8 @@ Client::Client(const std::string& host, int port):
 }
 
 
-Client::Client(const Net::SocketAddress& addrs):
-	_address(addrs),
+Client::Client(Net::SocketAddress  addrs):
+	_address(std::move(addrs)),
 	_socket(),
 	_input(nullptr),
 	_output(nullptr)

@@ -14,9 +14,10 @@
 
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <functional>
+#include <utility>
 
 
 namespace Poco {
@@ -33,7 +34,7 @@ RowFilter::RowFilter(RecordSet* pRecordSet): _pRecordSet(pRecordSet), _not(false
 
 
 RowFilter::RowFilter(Ptr pParent, LogicOperator op): _pRecordSet(nullptr),
-	_pParent(pParent),
+	_pParent(std::move(pParent)),
 	_not(false)
 {
 	poco_check_ptr(_pParent.get());

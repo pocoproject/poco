@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Zip/Add.h"
 #include "Poco/Zip/Compress.h"
 
@@ -20,9 +22,9 @@ namespace Poco {
 namespace Zip {
 
 
-Add::Add(const std::string& zipPath, const std::string& localPath, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl):
-	_zipPath(zipPath),
-	_localPath(localPath),
+Add::Add(std::string  zipPath, std::string  localPath, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl):
+	_zipPath(std::move(zipPath)),
+	_localPath(std::move(localPath)),
 	_cm(cm),
 	_cl(cl)
 {

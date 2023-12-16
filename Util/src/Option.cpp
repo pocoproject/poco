@@ -13,11 +13,12 @@
 
 
 #include "Poco/Util/Option.h"
+#include "Poco/String.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/OptionException.h"
 #include "Poco/Util/Validator.h"
-#include "Poco/Util/AbstractConfiguration.h"
-#include "Poco/String.h"
 #include <algorithm>
+#include <utility>
 
 
 using Poco::icompare;
@@ -56,9 +57,9 @@ Option::Option(const Option& option):
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName):
-	_shortName(shortName),
-	_fullName(fullName),
+Option::Option(std::string  fullName, std::string  shortName):
+	_shortName(std::move(shortName)),
+	_fullName(std::move(fullName)),
 	_required(false),
 	_repeatable(false),
 	_argRequired(false),
@@ -68,10 +69,10 @@ Option::Option(const std::string& fullName, const std::string& shortName):
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required):
-	_shortName(shortName),
-	_fullName(fullName),
-	_description(description),
+Option::Option(std::string  fullName, std::string  shortName, std::string  description, bool required):
+	_shortName(std::move(shortName)),
+	_fullName(std::move(fullName)),
+	_description(std::move(description)),
 	_required(required),
 	_repeatable(false),
 	_argRequired(false),
@@ -81,13 +82,13 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argRequired):
-	_shortName(shortName),
-	_fullName(fullName),
-	_description(description),
+Option::Option(std::string  fullName, std::string  shortName, std::string  description, bool required, std::string  argName, bool argRequired):
+	_shortName(std::move(shortName)),
+	_fullName(std::move(fullName)),
+	_description(std::move(description)),
 	_required(required),
 	_repeatable(false),
-	_argName(argName),
+	_argName(std::move(argName)),
 	_argRequired(argRequired),
 	_pValidator(nullptr),
 	_pCallback(nullptr)

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Util/ConfigurationMapper.h"
 
 
@@ -19,9 +21,9 @@ namespace Poco {
 namespace Util {
 
 
-ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig):
-	_fromPrefix(fromPrefix),
-	_toPrefix(toPrefix),
+ConfigurationMapper::ConfigurationMapper(std::string  fromPrefix, std::string  toPrefix, AbstractConfiguration::Ptr pConfig):
+	_fromPrefix(std::move(fromPrefix)),
+	_toPrefix(std::move(toPrefix)),
 	_pConfig(pConfig)
 {
 	poco_check_ptr (pConfig);

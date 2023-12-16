@@ -99,7 +99,7 @@ public:
 	RemoteSyslogChannel();
 		/// Creates a RemoteSyslogChannel.
 
-	RemoteSyslogChannel(const std::string& address, const std::string& name, int facility = SYSLOG_USER, bool bsdFormat = false);
+	RemoteSyslogChannel(std::string  address, std::string  name, int facility = SYSLOG_USER, bool bsdFormat = false);
 		/// Creates a RemoteSyslogChannel with the given target address, name, and facility.
 		/// If bsdFormat is true, messages are formatted according to RFC 3164.
 

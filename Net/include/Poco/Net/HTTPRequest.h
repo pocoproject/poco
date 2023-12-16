@@ -43,10 +43,10 @@ public:
 		/// Creates a GET / HTTP/1.x request with
 		/// the given version (HTTP/1.0 or HTTP/1.1).
 
-	HTTPRequest(const std::string& method, const std::string& uri);
+	HTTPRequest(std::string  method, std::string  uri);
 		/// Creates a HTTP/1.0 request with the given method and URI.
 
-	HTTPRequest(const std::string& method, const std::string& uri, const std::string& version);
+	HTTPRequest(std::string  method, std::string  uri, const std::string& version);
 		/// Creates a HTTP request with the given method, URI and version.
 
 	HTTPRequest(const HTTPRequest& other);

@@ -34,8 +34,9 @@
 #endif
 #include <cstring>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <utility>
 
 
 #if defined(_MSC_VER)
@@ -78,11 +79,11 @@ public:
 	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = nullptr);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = nullptr);
-	NetworkInterfaceImpl(const std::string& name,
-		const std::string& displayName,
-		const std::string& adapterName,
+	NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(std::string  name,
+		std::string  displayName,
+		std::string  adapterName,
 		const IPAddress& address,
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
@@ -174,10 +175,10 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
+NetworkInterfaceImpl::NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress):
+	_name(std::move(name)),
+	_displayName(std::move(displayName)),
+	_adapterName(std::move(adapterName)),
 	_index(index),
 	_broadcast(false),
 	_loopback(false),
@@ -194,10 +195,10 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
+NetworkInterfaceImpl::NetworkInterfaceImpl(std::string  name, std::string  displayName, std::string  adapterName, unsigned index, NetworkInterface::MACAddress* pMACAddress):
+	_name(std::move(name)),
+	_displayName(std::move(displayName)),
+	_adapterName(std::move(adapterName)),
 	_index(index),
 	_broadcast(false),
 	_loopback(false),
@@ -213,17 +214,17 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
-	const std::string& displayName,
-	const std::string& adapterName,
+NetworkInterfaceImpl::NetworkInterfaceImpl(std::string  name,
+	std::string  displayName,
+	std::string  adapterName,
 	const IPAddress& address,
 	const IPAddress& subnetMask,
 	const IPAddress& broadcastAddress,
 	unsigned index,
 	NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
+	_name(std::move(name)),
+	_displayName(std::move(displayName)),
+	_adapterName(std::move(adapterName)),
 	_index(index),
 	_broadcast(false),
 	_loopback(false),

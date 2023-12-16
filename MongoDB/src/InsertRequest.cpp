@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/MongoDB/InsertRequest.h"
 
 
@@ -19,10 +21,10 @@ namespace Poco {
 namespace MongoDB {
 
 
-InsertRequest::InsertRequest(const std::string& collectionName, Flags flags):
+InsertRequest::InsertRequest(std::string  collectionName, Flags flags):
 	RequestMessage(MessageHeader::OP_INSERT),
 	_flags(flags),
-	_fullCollectionName(collectionName)
+	_fullCollectionName(std::move(collectionName))
 {
 }
 

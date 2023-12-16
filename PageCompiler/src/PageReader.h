@@ -26,10 +26,10 @@ class PageReader
 	/// containing JSP-style tags.
 {
 public:
-	PageReader(Page& page, const std::string& path);
+	PageReader(Page& page, std::string  path);
 		/// Creates the PageReader, using the given Page.
 
-	PageReader(const PageReader& parent, const std::string& path);
+	PageReader(const PageReader& parent, std::string  path);
 		/// Creates the PageReader, using the given PageReader as parent.
 
 	~PageReader();

@@ -14,6 +14,7 @@
 
 #include "Poco/Exception.h"
 #include <typeinfo>
+#include <utility>
 
 
 namespace Poco {
@@ -24,12 +25,12 @@ Exception::Exception(int code): _pNested(nullptr), _code(code)
 }
 
 
-Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(nullptr), _code(code)
+Exception::Exception(std::string  msg, int code): _msg(std::move(msg)), _pNested(nullptr), _code(code)
 {
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(nullptr), _code(code)
+Exception::Exception(std::string  msg, const std::string& arg, int code): _msg(std::move(msg)), _pNested(nullptr), _code(code)
 {
 	if (!arg.empty())
 	{
@@ -39,7 +40,7 @@ Exception::Exception(const std::string& msg, const std::string& arg, int code): 
 }
 
 
-Exception::Exception(const std::string& msg, const Exception& nested, int code): _msg(msg), _pNested(nested.clone()), _code(code)
+Exception::Exception(std::string  msg, const Exception& nested, int code): _msg(std::move(msg)), _pNested(nested.clone()), _code(code)
 {
 }
 

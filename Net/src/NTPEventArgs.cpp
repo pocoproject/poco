@@ -14,6 +14,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/NTPEventArgs.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DNS.h"
@@ -29,8 +31,8 @@ namespace Poco {
 namespace Net {
 
 
-NTPEventArgs::NTPEventArgs(const SocketAddress& address):
-	_address(address), _packet()
+NTPEventArgs::NTPEventArgs(SocketAddress  address):
+	_address(std::move(address)), _packet()
 {
 }
 

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/PartSource.h"
 
 
@@ -28,8 +30,8 @@ PartSource::PartSource():
 }
 
 
-PartSource::PartSource(const std::string& mediaType):
-	_mediaType(mediaType)
+PartSource::PartSource(std::string  mediaType):
+	_mediaType(std::move(mediaType))
 {
 }
 

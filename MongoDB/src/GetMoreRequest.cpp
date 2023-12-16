@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/Element.h"
 
@@ -20,9 +22,9 @@ namespace Poco {
 namespace MongoDB {
 
 
-GetMoreRequest::GetMoreRequest(const std::string& collectionName, Int64 cursorID):
+GetMoreRequest::GetMoreRequest(std::string  collectionName, Int64 cursorID):
 	RequestMessage(MessageHeader::OP_GET_MORE),
-	_fullCollectionName(collectionName),
+	_fullCollectionName(std::move(collectionName)),
 	_numberToReturn(100),
 	_cursorID(cursorID)
 {

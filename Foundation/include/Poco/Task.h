@@ -50,7 +50,7 @@ public:
 		TASK_FINISHED
 	};
 
-	Task(const std::string& name);
+	Task(std::string  name);
 		/// Creates the Task.
 
 	const std::string& name() const;

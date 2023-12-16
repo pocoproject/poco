@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/EntityReference.h"
 
 
@@ -19,9 +21,9 @@ namespace Poco {
 namespace XML {
 
 
-EntityReference::EntityReference(Document* pOwnerDocument, const XMLString& name):
+EntityReference::EntityReference(Document* pOwnerDocument, XMLString  name):
 	AbstractNode(pOwnerDocument),
-	_name(name)
+	_name(std::move(name))
 {
 }
 

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Zip/Rename.h"
 #include "Poco/Zip/Compress.h"
 
@@ -20,9 +22,9 @@ namespace Poco {
 namespace Zip {
 
 
-Rename::Rename(const ZipLocalFileHeader& hdr, const std::string& newZipEntryName):
+Rename::Rename(const ZipLocalFileHeader& hdr, std::string  newZipEntryName):
 	_hdr(hdr),
-	_newZipEntryName(newZipEntryName)
+	_newZipEntryName(std::move(newZipEntryName))
 {
 }
 

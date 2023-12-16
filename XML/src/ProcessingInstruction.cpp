@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/ProcessingInstruction.h"
 
 
@@ -19,10 +21,10 @@ namespace Poco {
 namespace XML {
 
 
-ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data):
+ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, XMLString  target, XMLString  data):
 	AbstractNode(pOwnerDocument),
-	_target(target),
-	_data(data)
+	_target(std::move(target)),
+	_data(std::move(data))
 {
 }
 

@@ -14,6 +14,7 @@
 
 #include "Poco/XML/Name.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -28,24 +29,24 @@ Name::Name()
 }
 
 
-Name::Name(const XMLString& qname):
-	_qname(qname)
+Name::Name(XMLString  qname):
+	_qname(std::move(qname))
 {
 }
 
 
-Name::Name(const XMLString& qname, const XMLString& namespaceURI):
+Name::Name(const XMLString& qname, XMLString  namespaceURI):
 	_qname(qname),
-	_namespaceURI(namespaceURI),
+	_namespaceURI(std::move(namespaceURI)),
 	_localName(localName(qname))
 {
 }
 
 
-Name::Name(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName):
-	_qname(qname),
-	_namespaceURI(namespaceURI),
-	_localName(localName)
+Name::Name(XMLString  qname, XMLString  namespaceURI, XMLString  localName):
+	_qname(std::move(qname)),
+	_namespaceURI(std::move(namespaceURI)),
+	_localName(std::move(localName))
 {
 }
 

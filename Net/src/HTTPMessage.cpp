@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/NumberFormatter.h"
@@ -50,8 +52,8 @@ HTTPMessage::HTTPMessage():
 }
 
 
-HTTPMessage::HTTPMessage(const std::string& version):
-	_version(version)
+HTTPMessage::HTTPMessage(std::string  version):
+	_version(std::move(version))
 {
 }
 

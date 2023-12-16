@@ -13,20 +13,21 @@
 
 
 #include "Poco/Net/RemoteSyslogListener.h"
-#include "Poco/Net/RemoteSyslogChannel.h"
-#include "Poco/Net/DatagramSocket.h"
-#include "Poco/Net/SocketAddress.h"
-#include "Poco/Runnable.h"
-#include "Poco/Notification.h"
-#include "Poco/AutoPtr.h"
-#include "Poco/NumberParser.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/DateTimeParser.h"
-#include "Poco/Message.h"
-#include "Poco/LoggingFactory.h"
-#include "Poco/Buffer.h"
 #include "Poco/Ascii.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Buffer.h"
+#include "Poco/DateTimeParser.h"
+#include "Poco/LoggingFactory.h"
+#include "Poco/Message.h"
+#include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/RemoteSyslogChannel.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Notification.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Runnable.h"
 #include <cstddef>
+#include <utility>
 
 
 namespace Poco {
@@ -41,15 +42,15 @@ namespace Net {
 class MessageNotification: public Poco::Notification
 {
 public:
-	MessageNotification(const char* buffer, std::size_t length, const Poco::Net::SocketAddress& sourceAddress):
+	MessageNotification(const char* buffer, std::size_t length, Poco::Net::SocketAddress  sourceAddress):
 		_message(buffer, length),
-		_sourceAddress(sourceAddress)
+		_sourceAddress(std::move(sourceAddress))
 	{
 	}
 
-	MessageNotification(const std::string& message, const Poco::Net::SocketAddress& sourceAddress):
-		_message(message),
-		_sourceAddress(sourceAddress)
+	MessageNotification(std::string  message, Poco::Net::SocketAddress  sourceAddress):
+		_message(std::move(message)),
+		_sourceAddress(std::move(sourceAddress))
 	{
 	}
 

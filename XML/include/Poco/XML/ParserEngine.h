@@ -58,7 +58,7 @@ public:
 	ParserEngine();
 		/// Creates the parser engine.
 
-	ParserEngine(const XMLString& encoding);
+	ParserEngine(XMLString  encoding);
 		/// Creates the parser engine and passes the encoding
 		/// to the underlying parser.
 

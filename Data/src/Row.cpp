@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Data/Row.h"
 #include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/String.h"
@@ -38,7 +40,7 @@ Row::Row():
 
 
 Row::Row(NameVecPtr pNames,
-	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
+	const RowFormatter::Ptr& pFormatter): _pNames(std::move(pNames))
 {
 	if (!_pNames) throw NullPointerException();
 	init(nullptr, pFormatter);
@@ -47,7 +49,7 @@ Row::Row(NameVecPtr pNames,
 
 Row::Row(NameVecPtr pNames,
 	const SortMapPtr& pSortMap,
-	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
+	const RowFormatter::Ptr& pFormatter): _pNames(std::move(pNames))
 {
 	if (!_pNames) throw NullPointerException();
 	init(pSortMap, pFormatter);

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPServerConnectionFactory.h"
 #include "Poco/Net/HTTPServerConnection.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
@@ -22,7 +24,7 @@ namespace Net {
 
 
 HTTPServerConnectionFactory::HTTPServerConnectionFactory(HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
-	_pParams(pParams),
+	_pParams(std::move(pParams)),
 	_pFactory(pFactory)
 {
 	poco_check_ptr (pFactory);

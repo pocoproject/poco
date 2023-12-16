@@ -50,10 +50,10 @@ public:
 	OAuth20Credentials();
 		/// Creates an empty OAuth20Credentials object.
 
-	explicit OAuth20Credentials(const std::string& bearerToken);
+	explicit OAuth20Credentials(std::string  bearerToken);
 		/// Creates an OAuth20Credentials object with the given bearer token.
 
-	OAuth20Credentials(const std::string& bearerToken, const std::string& scheme);
+	OAuth20Credentials(std::string  bearerToken, std::string  scheme);
 		/// Creates an OAuth20Credentials object with the given bearer token
 		/// and authorization scheme, which overrides the default scheme ("Bearer").
 		///
@@ -68,7 +68,7 @@ public:
 		/// Throws a NotAuthenticatedException if the request does
 		/// not contain a bearer token in the Authorization header.
 
-	OAuth20Credentials(const HTTPRequest& request, const std::string& scheme);
+	OAuth20Credentials(const HTTPRequest& request, std::string  scheme);
 		/// Creates an OAuth20Credentials object from a HTTPRequest object.
 		///
 		/// Extracts bearer token from the Authorization header, which must

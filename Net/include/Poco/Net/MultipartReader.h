@@ -104,7 +104,7 @@ public:
 		/// stream. The message must not contain a preamble
 		/// preceding the first encapsulation boundary.
 
-	MultipartReader(std::istream& istr, const std::string& boundary);
+	MultipartReader(std::istream& istr, std::string  boundary);
 		/// Creates the MultipartReader and attaches it to the
 		/// given input stream. The given boundary string is
 		/// used to find message boundaries.

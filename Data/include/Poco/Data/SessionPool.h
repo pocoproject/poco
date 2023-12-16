@@ -67,8 +67,8 @@ class Data_API SessionPool: public RefCountedObject
 	///     ...
 {
 public:
-	SessionPool(const std::string& connector,
-		const std::string& connectionString,
+	SessionPool(std::string  connector,
+		std::string  connectionString,
 		int minSessions = 1,
 		int maxSessions = 32,
 		int idleTime = 60,

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
@@ -50,7 +52,7 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket):
 HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession):
 	HTTPClientSession(socket),
 	_pContext(socket.context()),
-	_pSession(pSession)
+	_pSession(std::move(pSession))
 {
 	setPort(HTTPS_PORT);
 }

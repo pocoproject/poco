@@ -20,9 +20,9 @@ namespace ActiveRecord {
 namespace Compiler {
 
 
-HeaderGenerator::HeaderGenerator(const std::string& source, std::ostream& stream, const Class& clazz, const ClassMap& classes):
-	CodeGenerator(source, stream),
-	_class(clazz),
+HeaderGenerator::HeaderGenerator(std::string source, std::ostream& stream, Class  clazz, const ClassMap& classes):
+	CodeGenerator(std::move(source), stream),
+	_class(std::move(clazz)),
 	_classes(classes)
 {
 }

@@ -14,6 +14,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Redis/RedisEventArgs.h"
 
 
@@ -22,7 +24,7 @@ namespace Redis {
 
 
 RedisEventArgs::RedisEventArgs(RedisType::Ptr pMessage):
-	_message(pMessage),
+	_message(std::move(pMessage)),
 	_exception(nullptr),
 	_stop(false)
 {

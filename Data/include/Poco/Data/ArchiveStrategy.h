@@ -36,10 +36,10 @@ class Data_API ArchiveStrategy
 public:
 	static const std::string DEFAULT_ARCHIVE_DESTINATION;
 
-	ArchiveStrategy(const std::string& connector,
-		const std::string& connect,
-		const std::string& source,
-		const std::string& destination = DEFAULT_ARCHIVE_DESTINATION);
+	ArchiveStrategy(std::string  connector,
+		std::string  connect,
+		std::string  source,
+		std::string  destination = DEFAULT_ARCHIVE_DESTINATION);
 		/// Creates archive strategy.
 
 	virtual ~ArchiveStrategy();

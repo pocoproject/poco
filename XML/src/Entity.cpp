@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/Entity.h"
 
 
@@ -22,12 +24,12 @@ namespace XML {
 const XMLString Entity::NODE_NAME = toXMLString("#entity");
 
 
-Entity::Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName):
+Entity::Entity(Document* pOwnerDocument, XMLString  name, XMLString  publicId, XMLString  systemId, XMLString  notationName):
 	AbstractContainerNode(pOwnerDocument),
-	_name(name),
-	_publicId(publicId),
-	_systemId(systemId),
-	_notationName(notationName)
+	_name(std::move(name)),
+	_publicId(std::move(publicId)),
+	_systemId(std::move(systemId)),
+	_notationName(std::move(notationName))
 {
 }
 

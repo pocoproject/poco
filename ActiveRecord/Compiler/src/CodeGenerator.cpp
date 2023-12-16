@@ -11,6 +11,7 @@
 #include "CodeGenerator.h"
 #include "Poco/StringTokenizer.h"
 #include <set>
+#include <utility>
 
 
 using namespace std::string_literals;
@@ -21,8 +22,8 @@ namespace ActiveRecord {
 namespace Compiler {
 
 
-CodeGenerator::CodeGenerator(const std::string& source, std::ostream& stream):
-	_source(source),
+CodeGenerator::CodeGenerator(std::string source, std::ostream& stream):
+	_source(std::move(source)),
 	_stream(stream)
 {
 }

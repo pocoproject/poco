@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/Notation.h"
 
 
@@ -19,11 +21,11 @@ namespace Poco {
 namespace XML {
 
 
-Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
+Notation::Notation(Document* pOwnerDocument, XMLString  name, XMLString  publicId, XMLString  systemId):
 	AbstractNode(pOwnerDocument),
-	_name(name),
-	_publicId(publicId),
-	_systemId(systemId)
+	_name(std::move(name)),
+	_publicId(std::move(publicId)),
+	_systemId(std::move(systemId))
 {
 }
 

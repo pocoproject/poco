@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Crypto/DigestEngine.h"
 #include "Poco/Exception.h"
 
@@ -20,8 +22,8 @@ namespace Poco {
 namespace Crypto {
 
 
-DigestEngine::DigestEngine(const std::string& name):
-	_name(name),
+DigestEngine::DigestEngine(std::string  name):
+	_name(std::move(name)),
 	_pContext(EVP_MD_CTX_create())
 {
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());

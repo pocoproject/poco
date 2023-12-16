@@ -18,10 +18,11 @@
 #define Data_BulkExtraction_INCLUDED
 
 
-#include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Bulk.h"
+#include "Poco/Data/Data.h"
 #include "Poco/Data/Preparation.h"
+#include <utility>
 #include <vector>
 
 
@@ -53,10 +54,10 @@ public:
 			result.resize(limit);
 	}
 
-	BulkExtraction(C& result, const CValType& def, Poco::UInt32 limit, const Position& pos = Position(0)):
+	BulkExtraction(C& result, CValType  def, Poco::UInt32 limit, const Position& pos = Position(0)):
 		AbstractExtraction(limit, pos.value(), true),
 		_rResult(result),
-		_default(def)
+		_default(std::move(def))
 	{
 		if (static_cast<Poco::UInt32>(result.size()) != limit)
 			result.resize(limit);

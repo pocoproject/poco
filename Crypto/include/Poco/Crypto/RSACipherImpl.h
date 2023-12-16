@@ -39,7 +39,7 @@ class RSACipherImpl: public Cipher
 	/// requires the private key.
 {
 public:
-	RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode);
+	RSACipherImpl(RSAKey  key, RSAPaddingMode paddingMode);
 		/// Creates a new RSACipherImpl object for the given RSAKey
 		/// and using the given padding mode.
 

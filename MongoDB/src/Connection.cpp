@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/SocketStream.h"
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Database.h"
@@ -82,8 +84,8 @@ Connection::Connection(const std::string& host, int port):
 }
 
 
-Connection::Connection(const Poco::Net::SocketAddress& addrs):
-	_address(addrs),
+Connection::Connection(Poco::Net::SocketAddress  addrs):
+	_address(std::move(addrs)),
 	_socket()
 {
 	connect();

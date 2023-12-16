@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Zip/Decompress.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipArchive.h"
@@ -29,9 +31,9 @@ namespace Poco {
 namespace Zip {
 
 
-Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs, bool keepIncompleteFiles):
+Decompress::Decompress(std::istream& in, Poco::Path  outputDir, bool flattenDirs, bool keepIncompleteFiles):
 	_in(in),
-	_outDir(outputDir),
+	_outDir(std::move(outputDir)),
 	_flattenDirs(flattenDirs),
 	_keepIncompleteFiles(keepIncompleteFiles),
 	_mapping()

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/FTPSClientSession.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
@@ -31,21 +33,21 @@ FTPSClientSession::FTPSClientSession():
 
 FTPSClientSession::FTPSClientSession(Context::Ptr pContext):
 	FTPClientSession(),
-	_pContext(pContext)
+	_pContext(std::move(pContext))
 {
 }
 
 FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage, bool enableFTPS, Context::Ptr pContext):
 	FTPClientSession(socket, readWelcomeMessage),
 	_enableFTPS(enableFTPS),
-	_pContext(pContext)
+	_pContext(std::move(pContext))
 {
 }
 
 
 FTPSClientSession::FTPSClientSession(const std::string& host, Poco::UInt16 port, const std::string& username, const std::string& password, Context::Ptr pContext):
 	FTPClientSession(host, port, username, password),
-	_pContext(pContext)
+	_pContext(std::move(pContext))
 {
 }
 

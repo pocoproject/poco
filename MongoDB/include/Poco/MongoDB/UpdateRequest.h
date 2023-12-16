@@ -47,7 +47,7 @@ public:
 			/// Otherwise only updates one document.
 	};
 
-	UpdateRequest(const std::string& collectionName, Flags flags = UPDATE_DEFAULT);
+	UpdateRequest(std::string  collectionName, Flags flags = UPDATE_DEFAULT);
 		/// Creates the UpdateRequest.
 		///
 		/// The full collection name is the concatenation of the database

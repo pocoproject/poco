@@ -45,7 +45,7 @@ public:
 	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const Poco::Path>> EOk;
 		/// Thrown whenever a file was successfully decompressed
 
-	Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs = false, bool keepIncompleteFiles = false);
+	Decompress(std::istream& in, Poco::Path  outputDir, bool flattenDirs = false, bool keepIncompleteFiles = false);
 		/// Creates the Decompress. Note that istream must be good and at the very beginning of the file!
 		/// Calling decompressAllFiles will cause the stream to be in state failed once the zip file is processed.
 		/// outputDir must be a directory. If it doesn't exist yet, it will be automatically created.

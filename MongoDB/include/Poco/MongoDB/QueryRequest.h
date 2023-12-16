@@ -73,7 +73,7 @@ public:
 			/// (instead of throwing an error).
 	};
 
-	QueryRequest(const std::string& collectionName, Flags flags = QUERY_DEFAULT);
+	QueryRequest(std::string  collectionName, Flags flags = QUERY_DEFAULT);
 		/// Creates a QueryRequest.
 		///
 		/// The full collection name is the concatenation of the database

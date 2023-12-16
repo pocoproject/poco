@@ -20,6 +20,8 @@
 #include <openssl/err.h>
 #include <openssl/evp.h>
 
+#include <utility>
+
 
 namespace
 {
@@ -74,13 +76,13 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
-	const ByteVec& key,
-	const ByteVec& iv):
+	ByteVec  key,
+	ByteVec  iv):
 	_pCipher(nullptr),
 	_pDigest(nullptr),
 	_name(name),
-	_key(key),
-	_iv(iv)
+	_key(std::move(key)),
+	_iv(std::move(iv))
 {
 	// dummy access to Cipherfactory so that the EVP lib is initialized
 	CipherFactory::defaultFactory();

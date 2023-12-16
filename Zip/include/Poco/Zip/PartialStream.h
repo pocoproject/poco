@@ -33,7 +33,7 @@ class Zip_API PartialStreamBuf: public Poco::BufferedStreamBuf
 	/// A PartialStreamBuf is a class that limits one view on an inputstream to a selected view range
 {
 public:
-	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& prefix, const std::string& postfix, bool initStream);
+	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, std::string  prefix, std::string  postfix, bool initStream);
 		/// Creates the PartialStream.
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
 		/// to position start

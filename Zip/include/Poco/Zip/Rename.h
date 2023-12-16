@@ -31,7 +31,7 @@ class Zip_API Rename: public ZipOperation
 	/// Renames an existing Zip Entry
 {
 public:
-	Rename(const ZipLocalFileHeader& hdr, const std::string& newZipEntryName);
+	Rename(const ZipLocalFileHeader& hdr, std::string  newZipEntryName);
 		/// Creates the Rename.
 
 	void execute(Compress& c, std::istream& input) override;

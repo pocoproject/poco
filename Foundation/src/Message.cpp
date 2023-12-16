@@ -19,6 +19,7 @@
 #endif
 #include "Poco/Thread.h"
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -37,9 +38,9 @@ Message::Message():
 }
 
 
-Message::Message(const std::string& source, const std::string& text, Priority prio):
-	_source(source),
-	_text(text),
+Message::Message(std::string  source, std::string  text, Priority prio):
+	_source(std::move(source)),
+	_text(std::move(text)),
 	_prio(prio),
 	_tid(0),
 	_ostid(0),
@@ -52,9 +53,9 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 }
 
 
-Message::Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line):
-	_source(source),
-	_text(text),
+Message::Message(std::string  source, std::string  text, Priority prio, const char* file, int line):
+	_source(std::move(source)),
+	_text(std::move(text)),
 	_prio(prio),
 	_tid(0),
 	_ostid(0),
@@ -103,9 +104,9 @@ Message::Message(Message&& msg) noexcept:
 }
 
 
-Message::Message(const Message& msg, const std::string& text):
+Message::Message(const Message& msg, std::string  text):
 	_source(msg._source),
-	_text(text),
+	_text(std::move(text)),
 	_prio(msg._prio),
 	_time(msg._time),
 	_tid(msg._tid),

@@ -51,9 +51,9 @@ public:
 	static const int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
 		/// Constant to prevent std out and err from being received from the process.
 
-	ProcessRunner(const std::string& cmd,
-		const Args& args,
-		const std::string& pidFile = "",
+	ProcessRunner(std::string  cmd,
+		Args  args,
+		std::string  pidFile = "",
 		int options = NO_OUT,
 		int timeout = 10, /*seconds*/
 		bool startProcess = true,

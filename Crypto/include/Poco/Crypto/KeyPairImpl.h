@@ -44,7 +44,7 @@ public:
 	using Ptr = Poco::AutoPtr<KeyPairImpl>;
 	using ByteVec = std::vector<unsigned char>;
 
-	KeyPairImpl(const std::string& name, Type type);
+	KeyPairImpl(std::string  name, Type type);
 		/// Create KeyPairImpl with specified type and name.
 
 	~KeyPairImpl() override;

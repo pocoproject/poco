@@ -67,7 +67,7 @@ public:
 private:
 	void parse(std::istream& in, ParseCallback& pc);
 
-	ZipArchive(const FileHeaders& entries, const FileInfos& infos, const DirectoryInfos& dirs, const DirectoryInfos64& dirs64 );
+	ZipArchive(FileHeaders  entries, FileInfos  infos, DirectoryInfos  dirs, DirectoryInfos64  dirs64 );
 
 private:
 	FileHeaders    _entries;

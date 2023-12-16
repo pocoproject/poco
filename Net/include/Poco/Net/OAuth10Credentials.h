@@ -99,12 +99,12 @@ public:
 	OAuth10Credentials();
 		/// Creates an empty OAuth10Credentials object.
 
-	OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret);
+	OAuth10Credentials(std::string  consumerKey, std::string  consumerSecret);
 		/// Creates an OAuth10Credentials object with the given consumer key and consumer secret.
 		///
 		/// The token and tokenSecret will be left empty.
 
-	OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret, const std::string& token, const std::string& tokenSecret);
+	OAuth10Credentials(std::string  consumerKey, std::string  consumerSecret, std::string  token, std::string  tokenSecret);
 		/// Creates an OAuth10Credentials object with the given consumer key and
 		/// consumer secret, as well as token and token secret.
 

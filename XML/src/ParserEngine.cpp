@@ -13,21 +13,22 @@
 
 
 #include "Poco/XML/ParserEngine.h"
-#include "Poco/XML/NamespaceStrategy.h"
-#include "Poco/XML/XMLException.h"
-#include "Poco/SAX/EntityResolver.h"
-#include "Poco/SAX/EntityResolverImpl.h"
+#include "Poco/SAX/ContentHandler.h"
 #include "Poco/SAX/DTDHandler.h"
 #include "Poco/SAX/DeclHandler.h"
-#include "Poco/SAX/ContentHandler.h"
-#include "Poco/SAX/LexicalHandler.h"
+#include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/EntityResolverImpl.h"
 #include "Poco/SAX/ErrorHandler.h"
 #include "Poco/SAX/InputSource.h"
+#include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/Locator.h"
 #include "Poco/SAX/LocatorImpl.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/URI.h"
+#include "Poco/XML/NamespaceStrategy.h"
+#include "Poco/XML/XMLException.h"
 #include <cstring>
+#include <utility>
 
 
 using Poco::URI;
@@ -41,10 +42,10 @@ namespace XML {
 class ContextLocator: public Locator
 {
 public:
-	ContextLocator(XML_Parser parser, const XMLString& publicId, const XMLString& systemId):
+	ContextLocator(XML_Parser parser, XMLString  publicId, XMLString  systemId):
 		_parser(parser),
-		_publicId(publicId),
-		_systemId(systemId)
+		_publicId(std::move(publicId)),
+		_systemId(std::move(systemId))
 	{
 	}
 
@@ -104,11 +105,11 @@ ParserEngine::ParserEngine():
 }
 
 
-ParserEngine::ParserEngine(const XMLString& encoding):
+ParserEngine::ParserEngine(XMLString  encoding):
 	_parser(nullptr),
 	_pBuffer(nullptr),
 	_encodingSpecified(true),
-	_encoding(encoding),
+	_encoding(std::move(encoding)),
 	_expandInternalEntities(true),
 	_externalGeneralEntities(false),
 	_externalParameterEntities(false),

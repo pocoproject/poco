@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Task.h"
 #include "Poco/TaskManager.h"
 #include "Poco/Thread.h"
@@ -21,8 +23,8 @@
 namespace Poco {
 
 
-Task::Task(const std::string& name):
-	_name(name),
+Task::Task(std::string  name):
+	_name(std::move(name)),
 	_pOwner(nullptr),
 	_progress(0),
 	_state(TASK_IDLE),

@@ -31,7 +31,7 @@ class Net_API UDPServerParams
 	/// A class encapsulating UDP server parameters.
 {
 public:
-	UDPServerParams(const Poco::Net::SocketAddress& sa,
+	UDPServerParams(Poco::Net::SocketAddress  sa,
 		int nSockets = 10,
 		Poco::Timespan timeout = 250000,
 		std::size_t handlerBufListSize = 1000,

@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/PartStore.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/File.h"
@@ -42,9 +44,9 @@ PartStore::~PartStore()
 //
 
 
-FilePartStore::FilePartStore(const std::string& content, const std::string& mediaType, const std::string& filename):
+FilePartStore::FilePartStore(const std::string& content, const std::string& mediaType, std::string  filename):
 	PartStore(mediaType),
-	_filename(filename),
+	_filename(std::move(filename)),
 	_path(TemporaryFile::tempName()),
 	_fstr(_path)
 {

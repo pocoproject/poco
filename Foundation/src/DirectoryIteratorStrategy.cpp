@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DirectoryIteratorStrategy.h"
 
 
@@ -22,7 +24,7 @@ namespace Poco {
 // TraverseBase
 //
 TraverseBase::TraverseBase(DepthFun depthDeterminer, UInt16 maxDepth):
-	_depthDeterminer(depthDeterminer), _maxDepth(maxDepth)
+	_depthDeterminer(std::move(depthDeterminer)), _maxDepth(maxDepth)
 {
 }
 

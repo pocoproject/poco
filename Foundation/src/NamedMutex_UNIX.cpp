@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+
+#include <utility>
 #endif
 
 
@@ -49,8 +51,8 @@ namespace Poco {
 #endif
 
 
-NamedMutexImpl::NamedMutexImpl(const std::string& name):
-	_name(name)
+NamedMutexImpl::NamedMutexImpl(std::string  name):
+	_name(std::move(name))
 {
 	std::string fileName = getFileName();
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)

@@ -20,10 +20,11 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
+#include "Poco/MongoDB/MongoDB.h"
 #include <algorithm>
 #include <cstdlib>
+#include <utility>
 
 
 namespace Poco {
@@ -34,8 +35,8 @@ class Array;
 class ElementFindByName
 {
 public:
-	ElementFindByName(const std::string& name):
-		_name(name)
+	ElementFindByName(std::string  name):
+		_name(std::move(name))
 	{
 	}
 

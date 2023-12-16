@@ -61,11 +61,11 @@ public:
 		/// Creates an empty Message.
 		/// The thread and process ids are set.
 
-	Message(const std::string& source, const std::string& text, Priority prio);
+	Message(std::string  source, std::string  text, Priority prio);
 		/// Creates a Message with the given source, text and priority.
 		/// The thread and process ids are set.
 
-	Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line);
+	Message(std::string  source, std::string  text, Priority prio, const char* file, int line);
 		/// Creates a Message with the given source, text, priority,
 		/// source file path and line.
 		///
@@ -83,7 +83,7 @@ public:
 	Message(Message&& msg) noexcept;
 		/// Creates a Message by copying another one.
 
-	Message(const Message& msg, const std::string& text);
+	Message(const Message& msg, std::string  text);
 		/// Creates a Message by copying all but the text from another message.
 
 	~Message();

@@ -31,7 +31,7 @@ class MongoDB_API GetMoreRequest: public RequestMessage
 	/// after a query request is send (OP_GETMORE).
 {
 public:
-	GetMoreRequest(const std::string& collectionName, Int64 cursorID);
+	GetMoreRequest(std::string  collectionName, Int64 cursorID);
 		/// Creates a GetMoreRequest for the give collection and cursor.
 		///
 		/// The full collection name is the concatenation of the database

@@ -168,7 +168,7 @@ public:
 	FileChannel();
 		/// Creates the FileChannel.
 
-	FileChannel(const std::string& path);
+	FileChannel(std::string  path);
 		/// Creates the FileChannel for a file with the given path.
 
 	void open() override;

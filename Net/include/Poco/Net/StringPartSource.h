@@ -40,7 +40,7 @@ public:
 		/// Creates the StringPartSource for the given
 		/// string and MIME type.
 
-	StringPartSource(const std::string& str, const std::string& mediaType, const std::string& filename);
+	StringPartSource(const std::string& str, const std::string& mediaType, std::string  filename);
 		/// Creates the StringPartSource for the given
 		/// string, MIME type and filename.
 

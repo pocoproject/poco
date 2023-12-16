@@ -25,7 +25,7 @@ class CodeWriter
 	/// from C++ Server Pages.
 {
 public:
-	CodeWriter(const Page& page, const std::string& clazz);
+	CodeWriter(const Page& page, std::string  clazz);
 		/// Creates the CodeWriter, using the given Page.
 
 	virtual ~CodeWriter();

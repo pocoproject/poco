@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/HTTPNTLMCredentials.h"
 #include "Poco/Net/NTLMCredentials.h"
 #include "Poco/Net/HTTPAuthenticationParams.h"
@@ -35,9 +37,9 @@ HTTPNTLMCredentials::HTTPNTLMCredentials()
 }
 
 
-HTTPNTLMCredentials::HTTPNTLMCredentials(const std::string& username, const std::string& password):
-	_username(username),
-	_password(password)
+HTTPNTLMCredentials::HTTPNTLMCredentials(std::string  username, std::string  password):
+	_username(std::move(username)),
+	_password(std::move(password))
 {
 }
 

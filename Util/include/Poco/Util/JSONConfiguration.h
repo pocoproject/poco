@@ -74,7 +74,7 @@ public:
 		/// Creates a configuration and loads the JSON structure from the given stream
 
 
-	JSONConfiguration(const JSON::Object::Ptr& object);
+	JSONConfiguration(JSON::Object::Ptr  object);
 		/// Creates a configuration from the given JSON object
 
 

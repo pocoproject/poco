@@ -18,18 +18,19 @@
 #define XML_XMLWriter_INCLUDED
 
 
-#include "Poco/XML/XML.h"
 #include "Poco/SAX/ContentHandler.h"
-#include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/DTDHandler.h"
+#include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/NamespaceSupport.h"
-#include "Poco/XML/XMLString.h"
-#include "Poco/XML/XMLStream.h"
-#include "Poco/XML/Name.h"
-#include "Poco/TextEncoding.h"
 #include "Poco/StreamConverter.h"
-#include <vector>
+#include "Poco/TextEncoding.h"
+#include "Poco/XML/Name.h"
+#include "Poco/XML/XML.h"
+#include "Poco/XML/XMLStream.h"
+#include "Poco/XML/XMLString.h"
 #include <map>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -91,14 +92,14 @@ public:
 		///
 		/// The resulting stream will be UTF-8 encoded.
 
-	XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding);
+	XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding& textEncoding);
 		/// Creates the XMLWriter and sets the specified options.
 		///
 		/// The encoding is reflected in the XML declaration.
 		/// The caller is responsible for that the given encodingName matches with
 		/// the given textEncoding.
 
-	XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding);
+	XMLWriter(XMLByteOutputStream& str, int options, std::string  encodingName, Poco::TextEncoding* pTextEncoding);
 		/// Creates the XMLWriter and sets the specified options.
 		///
 		/// The encoding is reflected in the XML declaration.
@@ -308,9 +309,9 @@ protected:
 private:
 	struct Namespace
 	{
-		Namespace(const XMLString& thePrefix, const XMLString& theNamespaceURI):
-			prefix(thePrefix),
-			namespaceURI(theNamespaceURI)
+		Namespace(XMLString  thePrefix, XMLString  theNamespaceURI):
+			prefix(std::move(thePrefix)),
+			namespaceURI(std::move(theNamespaceURI))
 		{
 		}
 

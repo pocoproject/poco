@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
@@ -181,9 +183,9 @@ MultipartReader::MultipartReader(std::istream& istr):
 }
 
 
-MultipartReader::MultipartReader(std::istream& istr, const std::string& boundary):
+MultipartReader::MultipartReader(std::istream& istr, std::string  boundary):
 	_istr(istr),
-	_boundary(boundary),
+	_boundary(std::move(boundary)),
 	_pMPI(nullptr)
 {
 }

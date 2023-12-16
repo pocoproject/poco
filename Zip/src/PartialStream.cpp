@@ -15,13 +15,14 @@
 #include "Poco/Zip/PartialStream.h"
 #include "Poco/Exception.h"
 #include <cstring>
+#include <utility>
 
 
 namespace Poco {
 namespace Zip {
 
 
-PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& pre, const std::string& post, bool initStream):
+PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, std::string  pre, std::string  post, bool initStream):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_initialized(!initStream),
 	_start(start),
@@ -29,8 +30,8 @@ PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, s
 	_bytesWritten(0),
 	_pIstr(&in),
 	_pOstr(nullptr),
-	_prefix(pre),
-	_postfix(post),
+	_prefix(std::move(pre)),
+	_postfix(std::move(post)),
 	_ignoreStart(0),
 	_buffer(0),
 	_bufferOffset(0)

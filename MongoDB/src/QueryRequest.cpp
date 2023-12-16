@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/MongoDB/QueryRequest.h"
 
 
@@ -19,10 +21,10 @@ namespace Poco {
 namespace MongoDB {
 
 
-QueryRequest::QueryRequest(const std::string& collectionName, QueryRequest::Flags flags):
+QueryRequest::QueryRequest(std::string  collectionName, QueryRequest::Flags flags):
 	RequestMessage(MessageHeader::OP_QUERY),
 	_flags(flags),
-	_fullCollectionName(collectionName),
+	_fullCollectionName(std::move(collectionName)),
 	_numberToSkip(0),
 	_numberToReturn(100),
 	_selector(),

@@ -81,7 +81,7 @@ public:
 	unsigned short nodeType() const override;
 
 protected:
-	Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName);
+	Entity(Document* pOwnerDocument, XMLString  name, XMLString  publicId, XMLString  systemId, XMLString  notationName);
 	Entity(Document* pOwnerDocument, const Entity& entity);
 	~Entity() override;
 

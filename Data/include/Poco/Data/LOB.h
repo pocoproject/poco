@@ -19,11 +19,12 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
-#include <vector>
+#include "Poco/SharedPtr.h"
 #include <algorithm>
+#include <utility>
+#include <vector>
 
 
 namespace Poco {
@@ -268,7 +269,7 @@ template <>
 class VarHolderImpl<Poco::Data::BLOB>: public VarHolder
 {
 public:
-	VarHolderImpl(const Poco::Data::BLOB& val): _val(val)
+	VarHolderImpl(Poco::Data::BLOB  val): _val(std::move(val))
 	{
 	}
 
@@ -306,7 +307,7 @@ template <>
 class VarHolderImpl<Poco::Data::CLOB>: public VarHolder
 {
 public:
-	VarHolderImpl(const Poco::Data::CLOB& val): _val(val)
+	VarHolderImpl(Poco::Data::CLOB  val): _val(std::move(val))
 	{
 	}
 

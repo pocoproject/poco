@@ -12,6 +12,8 @@
 //
 
 
+#include <utility>
+
 #include "Poco/DOM/MutationEvent.h"
 
 
@@ -45,11 +47,11 @@ MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, Ev
 
 
 MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode,
-	                         const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change):
+	                         XMLString  prevValue, XMLString  newValue, XMLString  attrName, AttrChangeType change):
 	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
-	_prevValue(prevValue),
-	_newValue(newValue),
-	_attrName(attrName),
+	_prevValue(std::move(prevValue)),
+	_newValue(std::move(newValue)),
+	_attrName(std::move(attrName)),
 	_change(change),
 	_pRelatedNode(relatedNode)
 {
