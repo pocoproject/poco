@@ -257,12 +257,17 @@ public:
 		///
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
-
-	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0);
+#ifdef POCO_HAVE_SENDFILE
+	IntPtr sendFile(FileInputStream &FileInputStream, UIntPtr offset = 0);
 		/// Sends file using system function
 		/// for posix systems - with sendfile[64](...)
 		/// for windows - with TransmitFile(...)
-
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+		///
+		/// Throws NetException (or a subclass) in case of any errors.
+#endif
 	StreamSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
 		/// The socket takes ownership of the SocketImpl.

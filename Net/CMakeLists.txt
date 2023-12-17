@@ -10,8 +10,26 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 POCO_SOURCES_AUTO_PLAT(SRCS WIN32 src/wepoll.c)
 POCO_HEADERS_AUTO(SRCS src/wepoll.h)
 
-if (POCO_USE_SENDFILE_FOR_HTTPSERVER)
-	add_definitions(-DPOCO_USE_SENDFILE_FOR_HTTPSERVER)
+if (MSVC)
+	set(HAVE_SENDFILE ON)
+else()
+	include(CheckIncludeFiles)
+	include(CheckSymbolExists)
+	check_include_files(sys/sendfile.h HAVE_SYS_SENDFILE_H)
+	if(HAVE_SYS_SENDFILE_H)
+		check_symbol_exists(sendfile sys/sendfile.h HAVE_SENDFILE)
+		if (NOT DEFINED HAVE_SENDFILE)
+			check_symbol_exists(sendfile64 sys/sendfile.h HAVE_SENDFILE)
+		endif()
+	else()
+		# BSD version
+		check_symbol_exists(sendfile "sys/types.h;sys/socket.h;sys/uio.h" HAVE_SENDFILE)
+	endif()
+endif()
+
+if (DEFINED HAVE_SENDFILE)
+	message(STATUS "OS has native sendfile function")
+	add_definitions(-DPOCO_HAVE_SENDFILE)
 endif()
 
 # Version Resource

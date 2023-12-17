@@ -242,8 +242,6 @@ if (POCO_ENABLE_STD_MUTEX)
 	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
 
-option(POCO_USE_SENDFILE_FOR_HTTPSERVER "Set to OFF|ON using native sendFile function from OS for http server method HTTPServerResponse::sendFile" OFF)
-
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file

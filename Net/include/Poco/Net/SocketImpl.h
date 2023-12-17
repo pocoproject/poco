@@ -477,12 +477,17 @@ public:
 
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
-
-	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0);
+#ifdef POCO_HAVE_SENDFILE
+	IntPtr sendFile(FileInputStream &FileInputStream, UIntPtr offset = 0);
 		/// Sends file using system function
 		/// for posix systems - with sendfile[64](...)
 		/// for windows - with TransmitFile(...)
-
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+		///
+		/// Throws NetException (or a subclass) in case of any errors.
+#endif
 protected:
 	SocketImpl();
 		/// Creates a SocketImpl.
