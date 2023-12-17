@@ -148,8 +148,8 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	Poco::URI theURI(uri);
 	if (theURI.getScheme() != "mongodb") throw Poco::UnknownURISchemeException(uri);
 
-	std::string userInfo = theURI.getUserInfo();
-	std::string host = theURI.getHost();
+	const std::string& userInfo = theURI.getUserInfo();
+	const std::string& host = theURI.getHost();
 	Poco::UInt16 port = theURI.getPort();
 	if (port == 0) port = 27017;
 

@@ -549,7 +549,7 @@ std::string& IPAddress::compressV6(std::string& v6addr)
 }
 
 
-std::string IPAddress::trimIPv6(const std::string v6Addr)
+std::string IPAddress::trimIPv6(const std::string& v6Addr)
 {
 	std::string v6addr(v6Addr);
 	std::string::size_type len = v6addr.length();

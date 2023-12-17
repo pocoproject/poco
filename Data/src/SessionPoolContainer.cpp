@@ -100,7 +100,7 @@ Session SessionPoolContainer::get(const std::string& name)
 SessionPool& SessionPoolContainer::getPool(const std::string& name)
 {
 	URI uri(name);
-	std::string path = uri.getPath();
+	const std::string& path = uri.getPath();
 	poco_assert (!path.empty());
 	std::string n = Session::uri(uri.getScheme(), path.substr(1));
 
