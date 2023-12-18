@@ -56,7 +56,7 @@
 using sighandler_t = sig_t;
 #endif
 
-#if POCO_OS == POCO_OS_LINUX && defined(HAVE_SYS_SENDFILE_H)
+#if POCO_OS == POCO_OS_LINUX && defined(HAVE_SYS_SENDFILE_H) && !defined(POCO_EMSCRIPTEN)
 #include <sys/sendfile.h>
 #endif
 
@@ -1411,7 +1411,7 @@ IntPtr _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, UIntPtr offset, std
 #ifdef __USE_LARGEFILE64
 	sent = sendfile64(sd, fd, (off64_t *)&offset, sentSize);
 #else
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
 	sent = sendfile(sd, fd, (off_t *)&offset, sentSize);
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	int result = sendfile(fd, sd, offset, &sentSize, nullptr, 0);
