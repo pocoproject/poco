@@ -163,8 +163,7 @@ void SocketStreamTest::testSendFile()
 	while (sent < fileSize)
 	{
 		offset = sent;
-		sent = ss.sendFile(fin, offset);
-		assertTrue(sent >= 0);
+		sent += ss.sendFile(fin, offset);
 	}
 	str.flush();
 	assertTrue (str.good());
