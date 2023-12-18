@@ -1168,18 +1168,6 @@
 			Name="Expat"
 			>
 			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\include\Poco\Xml\expat.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Xml\expat_external.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="Source Files"
 				>
 				<File
@@ -1191,7 +1179,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\expat.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\expat_config.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\expat_external.h"
 					>
 				</File>
 				<File

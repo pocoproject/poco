@@ -123,7 +123,7 @@
 #include "expat_config.h"
 
 #include "ascii.h"
-#include "Poco/XML/expat.h"
+#include "expat.h"
 #include "siphash.h"
 
 #if defined(HAVE_GETRANDOM) || defined(HAVE_SYSCALL_GETRANDOM)

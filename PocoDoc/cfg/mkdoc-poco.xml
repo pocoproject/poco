@@ -10,7 +10,6 @@
 			</include>
 			<exclude>
 				*_*.h,
-				expat*.h,
 			</exclude>
 		</files>
 		<pages>
