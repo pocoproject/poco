@@ -200,7 +200,9 @@ CppUnit::Test* SocketStreamTest::suite()
 	CppUnit_addTest(pSuite, SocketStreamTest, testStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testLargeStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testEOF);
+#ifdef POCO_HAVE_SENDFILE
 	CppUnit_addTest(pSuite, SocketStreamTest, testSendFile);
+#endif
 
 	return pSuite;
 }
