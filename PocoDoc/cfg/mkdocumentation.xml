@@ -10,7 +10,6 @@
 			</include>
 			<exclude>
 				*_*.h,
-				expat*.h,
 				${PocoBuild}/Util/include/Poco/Util/Units.h
 			</exclude>
 		</files>
