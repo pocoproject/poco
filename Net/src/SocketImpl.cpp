@@ -56,7 +56,7 @@
 using sighandler_t = sig_t;
 #endif
 
-#if POCO_OS == POCO_OS_LINUX && defined(HAVE_SYS_SENDFILE_H) && !defined(POCO_EMSCRIPTEN)
+#if POCO_OS == POCO_OS_LINUX && defined(POCO_HAVE_SENDFILE) && !defined(POCO_EMSCRIPTEN)
 #include <sys/sendfile.h>
 #endif
 
