@@ -58,6 +58,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	if ((long) _sem == (long) SEM_FAILED)
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
+	_createdId = false;
 	int fd = open(fileName.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd == -1 && errno == ENOENT)
 		fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -71,6 +72,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	_semid = semget(key, 1, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | IPC_CREAT | IPC_EXCL);
 	if (_semid >= 0)
 	{
+		_createdId = true;
 		union semun arg;
 		arg.val = 0;
 		semctl(_semid, 0, SETVAL, arg);
@@ -88,6 +90,11 @@ NamedEventImpl::~NamedEventImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	sem_close(_sem);
+#else
+	if (_createdId)
+	{
+		semctl(_semid, 0, IPC_RMID);
+	}
 #endif
 }
 

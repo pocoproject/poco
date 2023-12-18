@@ -15,7 +15,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timestamp.h"
-
+#include "Poco/Exception.h"
 
 using Poco::NamedEvent;
 using Poco::Thread;
@@ -101,6 +101,27 @@ void NamedEventTest::testNamedEvent()
 }
 
 
+void NamedEventTest::testCreateManyNamedEvents()
+{
+	std::string name;
+	try
+	{
+		int i = 0;
+		for (; i < 40000; i++)
+		{
+			name = std::string("TestEvent ") + std::to_string(i);
+			NamedEvent* ne = new NamedEvent(name);
+			delete ne;
+		}
+		assertEqual(i, 40000);
+	}
+	catch (const Poco::Exception& e)
+	{
+		fail (std::string("Failed creating named event: ").append(name).append(" ").append(e.displayText()));
+	}
+}
+
+
 void NamedEventTest::setUp()
 {
 }
@@ -116,6 +137,7 @@ CppUnit::Test* NamedEventTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NamedEventTest");
 
 	CppUnit_addTest(pSuite, NamedEventTest, testNamedEvent);
+	CppUnit_addTest(pSuite, NamedEventTest, testCreateManyNamedEvents);
 
 	return pSuite;
 }
