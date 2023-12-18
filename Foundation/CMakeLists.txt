@@ -68,12 +68,6 @@ else()
 		src/pcre2_xclass.c
 	)
 
-	# zlib
-	POCO_HEADERS(SRCS zlib
-		include/Poco/zconf.h
-		include/Poco/zlib.h
-		)
-
 	POCO_SOURCES(SRCS zlib
 		src/adler32.c
 		src/compress.c
