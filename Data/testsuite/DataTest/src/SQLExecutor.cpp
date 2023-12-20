@@ -3880,14 +3880,14 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session().isTransaction());
 
-	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 	assertTrue (0 == locCount);
 
 	session().commit();
 	assertTrue (!session().isTransaction());
-
-	stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
-	assertTrue (2 == locCount);
+	stmt.wait();
+	// in general, no guarantee if stmt was executed before or after the commit
+	assertTrue (0 == locCount || 2 == locCount);
 
 	session() << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
@@ -3953,9 +3953,11 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	stmt.wait();
 	// in general, there is no guarantee if stmt was exeuted before or after the commit
 	assertTrue (2 == count || 0 == count);
+	count = 0;
 	stmt.reset(session());
 	session() << "SELECT COUNT(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
+	count = 0;
 	assertTrue (!local.isTransaction());
 	assertTrue (!session().isTransaction());
 	local << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"),
@@ -3963,7 +3965,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	stmt = (session() << "SELECT COUNT(*) FROM Person", into(count), async, now);
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
 	// no guarantee if stmt is executed or not:
-	assertTrue (2 == count);
+	assertTrue (0 == count || 2 == count);
 	assertTrue (4 == locCount);
 #ifndef POCO_DATA_NO_SQL_PARSER
 	assertTrue (local.isTransaction());
