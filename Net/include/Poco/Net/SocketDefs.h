@@ -26,7 +26,9 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"
-	#define FD_SETSIZE 1024 // increase as needed
+	#ifndef FD_SETSIZE
+		#define FD_SETSIZE 1024 // increase as needed
+	#endif
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#include <ws2def.h>
@@ -250,7 +252,7 @@
 #endif
 
 
-#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_WINDOWS_CE) || (POCO_OS == POCO_OS_CYGWIN)
+#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_CYGWIN)
 	#define POCO_BROKEN_TIMEOUTS 1
 #endif
 

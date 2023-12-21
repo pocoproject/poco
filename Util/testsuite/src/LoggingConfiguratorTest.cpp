@@ -89,7 +89,7 @@ void LoggingConfiguratorTest::testConfigurator()
 	assertTrue (root.getLevel() == Message::PRIO_WARNING);
 	FormattingChannel::Ptr pFC = root.getChannel().cast<FormattingChannel>();
 	assertNotNull (pFC);
-#if defined(_WIN32) && !defined(_WIN32_WCE)
+#if defined(_WIN32)
 	assertTrue (!pFC->getChannel().cast<Poco::WindowsConsoleChannel>().isNull());
 #else
 	assertTrue (!pFC->getChannel().cast<Poco::ConsoleChannel>().isNull());

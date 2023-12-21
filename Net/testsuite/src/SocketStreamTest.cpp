@@ -19,7 +19,10 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
-
+#include "Poco/FileStream.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include <iostream>
 
 using Poco::Net::Socket;
 using Poco::Net::SocketStream;
@@ -31,7 +34,9 @@ using Poco::Timespan;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
-
+using Poco::FileInputStream;
+using Poco::FileOutputStream;
+using Poco::File;
 
 SocketStreamTest::SocketStreamTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -119,6 +124,62 @@ void SocketStreamTest::testEOF()
 	ss.close();
 }
 
+void SocketStreamTest::testSendFile()
+{
+	const int fileSize = 64000;
+	std::string payload(fileSize, 'x');
+	Poco::Path testFilePath = Poco::Path::temp().append("test.sendfile.txt");
+	const std::string fileName = testFilePath.toString();
+	{
+		File f(fileName);
+		if (f.exists())
+		{
+			f.remove();
+		}
+	}
+	FileOutputStream fout(fileName);
+	fout << payload;
+	fout.close();
+	FileInputStream fin(fileName);
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	
+	SocketStream str(ss);
+
+	Poco::UInt64 offset = 0;
+	Poco::Int64 sent = 0;
+	try
+	{
+	sent = ss.sendFile(fin);
+	}
+	catch (Poco::NotImplementedException &)
+	{
+		std::cout << "[NOT IMPLEMENTED]\n";
+		return;
+	}
+	assertTrue(sent >= 0);
+	while (sent < fileSize)
+	{
+		offset = sent;
+		sent = ss.sendFile(fin, offset);
+		assertTrue(sent >= 0);
+	}
+	str.flush();
+	assertTrue (str.good());
+	ss.shutdownSend();
+
+	assertTrue (str.gcount() == 0);
+	char buffer[fileSize];
+	str.read(buffer, sizeof(buffer));
+	assertTrue (str.good());
+	assertTrue (str.gcount() == fileSize);
+
+	ss.close();
+	fin.close();
+	File f(fileName);
+	f.remove();
+}
 
 void SocketStreamTest::setUp()
 {
@@ -137,6 +198,7 @@ CppUnit::Test* SocketStreamTest::suite()
 	CppUnit_addTest(pSuite, SocketStreamTest, testStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testLargeStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testEOF);
+	CppUnit_addTest(pSuite, SocketStreamTest, testSendFile);
 
 	return pSuite;
 }

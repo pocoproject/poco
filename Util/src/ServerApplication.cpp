@@ -16,6 +16,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/OptionException.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
@@ -26,7 +27,6 @@
 #include "Poco/Logger.h"
 #include "Poco/String.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
-#include "Poco/TemporaryFile.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -34,10 +34,8 @@
 #include <sys/stat.h>
 #include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if !defined(_WIN32_WCE)
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"
-#endif
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
@@ -56,11 +54,9 @@ namespace Util {
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
-#if !defined(_WIN32_WCE)
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus;
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0;
-#endif
 #endif
 #if defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
 Poco::Event ServerApplication::_terminate;
@@ -70,10 +66,8 @@ Poco::Event ServerApplication::_terminate;
 ServerApplication::ServerApplication()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if !defined(_WIN32_WCE)
 	_action = SRV_RUN;
 	std::memset(&_serviceStatus, 0, sizeof(_serviceStatus));
-#endif
 #endif
 }
 
@@ -109,7 +103,6 @@ void ServerApplication::terminate()
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if !defined(_WIN32_WCE)
 
 
 //
@@ -436,59 +429,6 @@ void ServerApplication::handleStartup(const std::string& name, const std::string
 }
 
 
-#else // _WIN32_WCE
-void ServerApplication::waitForTerminationRequest()
-{
-	_terminate.wait();
-}
-
-
-int ServerApplication::run(int argc, char** argv)
-{
-	try
-	{
-		init(argc, argv);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-int ServerApplication::run(const std::vector<std::string>& args)
-{
-	try
-	{
-		init(args);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-int ServerApplication::run(int argc, wchar_t** argv)
-{
-	try
-	{
-		init(argc, argv);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-#endif // _WIN32_WCE
 #elif defined(POCO_VXWORKS)
 //
 // VxWorks specific code
@@ -706,6 +646,9 @@ void ServerApplication::handleUMask(const std::string& name, const std::string& 
 }
 
 
+#endif
+
+
 void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
 {
 	Poco::FileOutputStream ostr(value);
@@ -715,9 +658,6 @@ void ServerApplication::handlePidFile(const std::string& name, const std::string
 		throw Poco::CreateFileException("Cannot write PID to file", value);
 	Poco::TemporaryFile::registerForDeletion(value);
 }
-
-
-#endif
 
 
 } } // namespace Poco::Util

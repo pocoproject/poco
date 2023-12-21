@@ -212,6 +212,12 @@ void CryptoTest::testEncryptDecryptDESECB()
 
 void CryptoTest::testEncryptDecryptGCM()
 {
+	//
+	// The test sometimes fails when it is running for longer time
+	// This conversation perhaps contains a hint:
+	// https://github.com/openssl/openssl/issues/21119
+	//
+
 	CipherKey key("aes-256-gcm");
 
 	CipherKey::ByteVec iv(20, 213);

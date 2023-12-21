@@ -11,8 +11,8 @@
 
 #ifdef Data_API
 	#define SQLParser_API Data_API
-	#ifdef Data_EXPORTS
-		#define SQLParser_EXPORTS 1
+	#if defined(Data_EXPORTS) && !defined(SQLParser_EXPORTS)
+		#define SQLParser_EXPORTS
 	#endif
 #else
 	#if defined(_DLL) || defined(_USRDLL)

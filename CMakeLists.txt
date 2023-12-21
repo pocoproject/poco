@@ -42,7 +42,7 @@ endif()
 # Setup C/C++ compiler options
 #################################################################################
 
-# C++11/17 compiler flags
+# C++17 compiler flags
 include(CXX1x)
 check_for_cxx17_compiler(CXX17_COMPILER)
 
@@ -205,6 +205,9 @@ endif()
 
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
+
+option(ENABLE_COMPILER_WARNINGS
+	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
 
 option(ENABLE_SAMPLES
 	"Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)

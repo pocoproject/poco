@@ -519,6 +519,9 @@
     <ClCompile Include="src\NamedMutexTest.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProcessRunnerTest.cpp">
+      <Filter>Processes\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\ProcessesTestSuite.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
@@ -936,6 +939,9 @@
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\NamedMutexTest.h">
+      <Filter>Processes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ProcessRunnerTest.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ProcessesTestSuite.h">

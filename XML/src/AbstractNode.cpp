@@ -144,6 +144,12 @@ Node* AbstractNode::insertBefore(Node* newChild, Node* refChild)
 }
 
 
+Node* AbstractNode::insertAfterNP(Node* newChild, Node* refChild)
+{
+	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
+}
+
+
 Node* AbstractNode::replaceChild(Node* newChild, Node* oldChild)
 {
 	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);

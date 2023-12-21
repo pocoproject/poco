@@ -202,38 +202,60 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
 
-	PIP_ADAPTER_INFO pAdapterInfo;
-	PIP_ADAPTER_INFO pAdapter = 0;
+	auto pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(1);
 	ULONG len    = sizeof(IP_ADAPTER_INFO);
-	pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+
 	// Make an initial call to GetAdaptersInfo to get
 	// the necessary size into len
-	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
+	const DWORD rc = GetAdaptersInfo(pAdapterInfo.get(), &len);
+
 	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
-		delete [] reinterpret_cast<char*>(pAdapterInfo);
-		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+		pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(len / sizeof(IP_ADAPTER_INFO));
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
-		delete[] reinterpret_cast<char*>(pAdapterInfo);
 		throw SystemException("cannot get network adapter list");
 	}
-	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
+
+	if (GetAdaptersInfo(pAdapterInfo.get(), &len) == NO_ERROR)
 	{
-		pAdapter = pAdapterInfo;
-		bool found = false;
-		while (pAdapter && !found)
+		IP_ADAPTER_INFO* pAdapter = pAdapterInfo.get();
+
+		while (pAdapter)
 		{
 			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 			{
-				found = true;
 				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+
+				// found an ethernet adapter, we can return now
+				return;
+			}
+			pAdapter = pAdapter->Next;
+		}
+
+		// if an ethernet adapter was not found, search for a wifi adapter
+		pAdapter = pAdapterInfo.get();
+
+		while (pAdapter)
+		{
+			if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
+			{
+				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+
+				// found a wifi adapter, we can return now
+				return;
 			}
 			pAdapter = pAdapter->Next;
 		}
 	}
-	delete [] reinterpret_cast<char*>(pAdapterInfo);
+	else
+	{
+		throw SystemException("cannot get network adapter list");
+	}
+
+	// ethernet and wifi adapters not found, fail the search
+	throw SystemException("no ethernet or wifi adapter found");
 }
 
 

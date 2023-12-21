@@ -19,6 +19,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cstdio>
+#include <cstring>
 
 
 namespace Poco {
@@ -164,6 +166,23 @@ std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mod
 
 	_pos = lseek(_fd, pos, SEEK_SET);
 	return _pos;
+}
+
+
+FileStreamBuf::NativeHandle FileStreamBuf::nativeHandle() const
+{
+	return _fd;
+}
+
+Poco::UInt64 FileStreamBuf::size() const
+{
+	struct stat stat_buf;
+	int rc = fstat(_fd, &stat_buf);
+	if (rc < 0)
+	{
+		Poco::SystemException(strerror(errno), errno);
+	}
+	return stat_buf.st_size;
 }
 
 

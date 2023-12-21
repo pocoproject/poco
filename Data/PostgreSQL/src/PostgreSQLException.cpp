@@ -45,7 +45,7 @@ PostgreSQLException::PostgreSQLException(const PostgreSQLException& anException)
 }
 
 
-PostgreSQLException::~PostgreSQLException() throw()
+PostgreSQLException::~PostgreSQLException() noexcept
 {
 }
 

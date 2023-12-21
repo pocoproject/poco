@@ -199,4 +199,23 @@ std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mod
 }
 
 
+FileStreamBuf::NativeHandle FileStreamBuf::nativeHandle() const
+{
+	return _handle;
+}
+
+Poco::UInt64 FileStreamBuf::size() const
+{
+	LARGE_INTEGER result;
+	result.QuadPart = 0;
+	DWORD high = 0;
+	result.LowPart = ::GetFileSize(_handle, &high);
+	if (high > 0)
+	{
+		result.HighPart = high;
+	}
+	return result.QuadPart;
+}
+
+
 } // namespace Poco

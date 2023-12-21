@@ -79,7 +79,7 @@ SocketAddress::SocketAddress()
 
 SocketAddress::SocketAddress(Family fam)
 {
-		init(IPAddress(fam), 0);
+	init(IPAddress(fam), 0);
 }
 
 
@@ -362,31 +362,34 @@ void SocketAddress::init(Family fam, const std::string& address)
 }
 
 
+bool SocketAddress::isUnixLocal(const std::string& hostAndPort)
+{
+#if defined(POCO_HAS_UNIX_SOCKET)
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		RegularExpression re(R"((?:[a-zA-Z]\:|\\\\[\w\s\.]+\\[\w\s\.$]+)\\(?:[\w\s\.]+\\)*[\w\s\.]*?$)");
+		if (re.match(hostAndPort)) return true;
+	#elif defined(POCO_OS_FAMILY_UNIX)
+		if (hostAndPort.size() && (hostAndPort[0] == '/')) return true;
+	#endif
+#endif
+	return false;
+}
+
+
 void SocketAddress::init(const std::string& hostAndPort)
 {
 	poco_assert (!hostAndPort.empty());
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_HAS_UNIX_SOCKET)
-	RegularExpression re(R"((?:[a-zA-Z]\:|\\\\[\w\s\.]+\\[\w\s\.$]+)\\(?:[\w\s\.]+\\)*[\w\s\.]*?$)");
-	if (re.match(hostAndPort))
+	if (isUnixLocal(hostAndPort))
 	{
 		newLocal(hostAndPort);
 		return;
 	}
-#endif
 
 	std::string host;
 	std::string port;
 	std::string::const_iterator it  = hostAndPort.begin();
 	std::string::const_iterator end = hostAndPort.end();
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	if (*it == '/')
-	{
-		newLocal(hostAndPort);
-		return;
-	}
-#endif
 	if (*it == '[')
 	{
 		++it;

@@ -87,7 +87,7 @@ do
 				echo ""
 
 				runs=$((runs + 1))
-				if ! sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $IGNORE $TESTRUNNERARGS";
+				if ! sh -c "export POCO_BASE='$POCO_BASE'; export OSNAME='$OSNAME'; export OSARCH='$OSARCH'; cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $IGNORE $TESTRUNNERARGS";
 				then
 					failures=$((failures + 1))
 					failedTests="$failedTests $comp"

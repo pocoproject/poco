@@ -25,7 +25,7 @@ and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) do
 ### Prerequisites
 
 - CMake 3.5 or newer
-- A C++14 compiler (Visual C++ 2015, GCC 5.0, Clang 3.4, or newer)
+- A C++17 compiler (Visual C++ 2017, GCC 8.0, Clang 5, or newer)
 - OpenSSL headers and libraries (optional, but recommended)
 - MySQL, PostgreSQL and ODBC client libraries (optional)
 

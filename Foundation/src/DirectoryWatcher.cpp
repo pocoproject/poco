@@ -40,6 +40,7 @@
 #endif
 #include <algorithm>
 #include <map>
+#include <atomic>
 
 
 namespace Poco {
@@ -244,7 +245,7 @@ public:
 	}
 
 private:
-	HANDLE _hStopped;
+	std::atomic<HANDLE> _hStopped;
 };
 
 
@@ -455,7 +456,7 @@ public:
 private:
 	int _queueFD;
 	int _dirFD;
-	bool _stopped;
+	std::atomic<bool> _stopped;
 };
 
 

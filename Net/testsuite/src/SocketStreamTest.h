@@ -27,6 +27,7 @@ public:
 	void testStreamEcho();
 	void testLargeStreamEcho();
 	void testEOF();
+	void testSendFile();
 
 	void setUp();
 	void tearDown();

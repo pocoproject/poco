@@ -161,24 +161,21 @@ public:
 protected:
 	int run();
 	void waitForTerminationRequest();
-#if !defined(_WIN32_WCE)
 	void defineOptions(OptionSet& options);
-#endif
 
 private:
+	virtual void handlePidFile(const std::string& name, const std::string& value);
 #if defined(POCO_VXWORKS)
 	static Poco::Event _terminate;
 #elif defined(POCO_OS_FAMILY_UNIX)
 	void handleDaemon(const std::string& name, const std::string& value);
 	void handleUMask(const std::string& name, const std::string& value);
-	void handlePidFile(const std::string& name, const std::string& value);
 	bool isDaemon(int argc, char** argv);
 	void beDaemon();
 #if POCO_OS == POCO_OS_ANDROID
 	static Poco::Event _terminate;
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if !defined(_WIN32_WCE)
 	enum Action
 	{
 		SRV_RUN,
@@ -208,7 +205,6 @@ private:
 	static Poco::Event           _terminated;
 	static SERVICE_STATUS        _serviceStatus;
 	static SERVICE_STATUS_HANDLE _serviceStatusHandle;
-#endif // _WIN32_WCE
 	static Poco::NamedEvent      _terminate;
 #endif
 };

@@ -93,6 +93,8 @@ esac
 # uncomment for sanitizer builds
 #LSAN_OPTIONS=verbosity=1:log_threads=1
 #export LSAN_OPTIONS
+#TSAN_OPTIONS="suppressions=$POCO_BASE/tsan.suppress,second_deadlock_stack=1"
+#export TSAN_OPTIONS
 
 echo "\$OSNAME    = $OSNAME"
 echo "\$OSARCH    = $OSARCH"

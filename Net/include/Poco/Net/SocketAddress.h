@@ -208,6 +208,9 @@ public:
 			/// Maximum length in bytes of a socket address.
 	};
 
+	static bool isUnixLocal(const std::string& hostAndPort);
+		/// Returns true iff `hostAndPort` is an absolute file path.
+
 protected:
 	void init(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 	void init(const std::string& hostAddress, Poco::UInt16 portNumber);

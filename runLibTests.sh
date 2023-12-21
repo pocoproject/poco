@@ -7,10 +7,14 @@
 # to clean and rebuild a single library, with all of its dependencies,
 # and run the tests.
 #
-# Usage: ./runLibTests.sh library	 [address | undefined | thread ]
+# Usage: ./runLibTests.sh library [address | undefined | thread] [<test> | -all | none]
 #
 # Example: ./runLibTests.sh Data/SQLite address
 # (distcleans, rebuilds and runs tests for Data/SQLite with address sanitizer)
+#
+# Known shortcomings (TODO):
+# - the script does not check if the library is a dependency of another library
+#   workaround: run the script for the dependent libraries first
 #
 
 # g++ does not like empty quoted arguments, but
@@ -20,7 +24,7 @@
 path=$1
 if [ -z "${path}" ]; then
 	echo "Library not specified"
-	echo "Usage: $0 path	 [address | undefined | thread ]"
+	echo "Usage: $0 path [address | undefined | thread] [<test> | -all | none]"
 	exit 1
 fi
 
@@ -52,13 +56,20 @@ make distclean -C "$basedir"/CppUnit
 make -s -j4 -C "$basedir"/Foundation $flags
 make -s -j4 -C "$basedir"/CppUnit $flags
 
+test=$3
+if [ -z "${test}" ]; then
+	test="-all"
+fi
+
 # Foundation requested, build/run tests and exit
 if [[ "$path" == "$basedir"/"Foundation" ]]; then
 	cd "$path/testsuite/" || exit
 	make -s -j4 -C ./ $flags
 	cd "bin/$OSNAME/$OSARCH/" || exit
-	./testrunner -all
-	./testrunnerd -all
+	if [[ "$test" != "none" ]]; then
+		./testrunner "${test}"
+		./testrunnerd "${test}"
+	fi
 	echo "$path $flags done."
 	exit 0
 fi
@@ -72,8 +83,10 @@ do
 	make distclean
 	make -s -j4 -C ./ $flags
 	cd bin/"$OSNAME"/"$OSARCH"/ || exit
-	./testrunner -all
-	./testrunnerd -all
+	if [[ "$test" != "none" ]]; then
+		./testrunner "${test}"
+		./testrunnerd "${test}"
+	fi
 	echo "$1 $flags done."
 	cd ../../../../ || exit
 done

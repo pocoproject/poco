@@ -85,6 +85,10 @@ public:
 
 #endif // POCO_NEW_STATE_ON_MOVE
 
+	static Socket fromFileDescriptor(poco_socket_t fd);
+		// Creates a socket from an existing file descriptor.
+		// Ownership is taken by poco
+
 	virtual ~Socket();
 		/// Destroys the Socket and releases the
 		/// SocketImpl.

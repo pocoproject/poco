@@ -562,8 +562,10 @@ void SocketTest::testEchoUnixLocal()
 	if (socketFile.exists()) socketFile.remove();
 	echoServer.stop();
 #else // POCO_HAS_UNIX_SOCKET
-	#pragma message("[UNIX LOCAL SOCKET DISABLED]")
-	std::cout << "[UNIX LOCAL SOCKET DISABLED]" << std::endl;
+	#if POCO_OS == POCO_OS_WINDOWS_NT
+		#pragma message("[UNIX LOCAL SOCKET DISABLED]")
+	#endif
+	std::cout << "[UNIX LOCAL SOCKET DISABLED]";
 #endif
 }
 
@@ -588,11 +590,58 @@ void SocketTest::testUnixLocalAbstract()
 	ss.close();
 	echoServer.stop();
 #else // POCO_HAS_UNIX_SOCKET
-#pragma message("[ABSTRACT UNIX LOCAL SOCKET DISABLED]")
-	std::cout << "[ABSTRACT UNIX LOCAL SOCKET DISABLED]" << std::endl;
+	#if POCO_OS == POCO_OS_WINDOWS_NT
+		#pragma message("[ABSTRACT UNIX LOCAL SOCKET DISABLED]")
+	#endif
+	std::cout << "[ABSTRACT UNIX LOCAL SOCKET DISABLED]";
 #endif
 }
 
+
+void SocketTest::testUseFd()
+{
+#ifdef POCO_OS_FAMILY_WINDOWS
+	struct addrinfo addr_hint = {};
+	addr_hint.ai_family = AF_INET;
+	addr_hint.ai_socktype = SOCK_STREAM;
+	addr_hint.ai_protocol = IPPROTO_TCP;
+	addr_hint.ai_flags = AI_PASSIVE;
+	struct addrinfo* addr_result;
+	getaddrinfo(nullptr, "0", &addr_hint, &addr_result);
+	poco_socket_t listenfd = socket(addr_result->ai_family, addr_result->ai_socktype, addr_result->ai_protocol);
+	bind(listenfd, addr_result->ai_addr, (int)addr_result->ai_addrlen);
+	freeaddrinfo(addr_result);
+	listen(listenfd, SOMAXCONN);
+	SOCKADDR_IN serv_addr;
+	int addr_len = sizeof(serv_addr);
+	getsockname(listenfd, (SOCKADDR*)&serv_addr, &addr_len);
+	auto server_port = ntohs(serv_addr.sin_port);
+#elif defined(POCO_OS_FAMILY_UNIX)
+	poco_socket_t listenfd = socket(AF_INET, SOCK_STREAM, 0);
+	struct sockaddr_in serv_addr = {};
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr.sin_port = htons(0);
+	bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	listen(listenfd, 1);
+	socklen_t len = sizeof(serv_addr);
+	getsockname(listenfd, (struct sockaddr*)&serv_addr, &len);
+	auto server_port = ntohs(serv_addr.sin_port);
+#else
+	std::cout << "[USE FD TEST DISABLED]";
+	return;
+#endif
+	EchoServer server(ServerSocket::fromFileDescriptor(listenfd));
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server_port));
+	int n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	ss.close();
+}
 
 
 void SocketTest::onReadable(bool& b)
@@ -646,6 +695,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
+	CppUnit_addTest(pSuite, SocketTest, testUseFd);
 
 	return pSuite;
 }

@@ -257,6 +257,21 @@ void ThreadImpl::setStackSizeImpl(int size)
 }
 
 
+void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
+{
+	sigset_t sset;
+	sigemptyset(&sset);
+
+	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig) 
+	{
+		if ((sigMask & (1 << sig)) != 0)
+			sigaddset(&sset, sig);
+	}
+	
+	pthread_sigmask(SIG_BLOCK, &sset, 0);
+}
+
+
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
 	{
@@ -349,7 +364,9 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 long ThreadImpl::currentOsTidImpl()
 {
-#if POCO_OS == POCO_OS_LINUX
+#if defined(POCO_EMSCRIPTEN)
+	return ::pthread_self();
+#elif POCO_OS == POCO_OS_LINUX
 	return ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	return ::pthread_mach_thread_np(::pthread_self());

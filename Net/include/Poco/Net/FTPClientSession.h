@@ -325,6 +325,9 @@ protected:
 		DEFAULT_TIMEOUT = 30000000 // 30 seconds default timeout for socket operations
 	};
 
+	const std::string& getHost() const;
+		/// Returns the host name
+
 	static bool isPositivePreliminary(int status);
 	static bool isPositiveCompletion(int status);
 	static bool isPositiveIntermediate(int status);
@@ -422,6 +425,10 @@ inline const std::string& FTPClientSession::welcomeMessage()
 	return _welcomeMessage;
 }
 
+inline const std::string& FTPClientSession::getHost() const
+{
+	return _host;
+}
 
 } } // namespace Poco::Net
 

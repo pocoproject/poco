@@ -23,7 +23,8 @@ HTTPServerParams::HTTPServerParams():
 	_timeout(60000000),
 	_keepAlive(true),
 	_maxKeepAliveRequests(0),
-	_keepAliveTimeout(15000000)
+	_keepAliveTimeout(15000000),
+	_autoDecodeHeaders(true)
 {
 }
 
@@ -67,6 +68,12 @@ void HTTPServerParams::setMaxKeepAliveRequests(int maxKeepAliveRequests)
 {
 	poco_assert (maxKeepAliveRequests >= 0);
 	_maxKeepAliveRequests = maxKeepAliveRequests;
+}
+
+
+void HTTPServerParams::setAutoDecodeHeaders(bool autoDecode)
+{
+	_autoDecodeHeaders = autoDecode;
 }
 
 

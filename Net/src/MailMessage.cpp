@@ -83,7 +83,7 @@ namespace
 				MailMessage::ContentTransferEncoding cte = MailMessage::ENCODING_7BIT;
 				if (header.has(MailMessage::HEADER_CONTENT_TRANSFER_ENCODING))
 				{
-					std::string enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
+					const std::string& enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
 					if (enc == MailMessage::CTE_8BIT)
 						cte = MailMessage::ENCODING_8BIT;
 					else if (enc == MailMessage::CTE_QUOTED_PRINTABLE)
@@ -692,7 +692,7 @@ PartSource* MailMessage::createPartStore(const std::string& content, const std::
 }
 
 
-MultipartSource::MultipartSource(const std::string contentType):
+MultipartSource::MultipartSource(const std::string& contentType):
 	PartSource(contentTypeWithBoundary(contentType))
 {
 }

@@ -407,6 +407,48 @@ void MessageHeaderTest::testDecodeWord()
 	assertTrue (decoded == "Hello Francis, good bye");
 }
 
+// Sample HTTP reuest header
+static std::string httpRequestHeader{
+R"(GET / HTTP/2
+Host: stackoverflow.com
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/119.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-GB,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+X-Encoded-Header-A: (=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)
+X-Encoded-Header-B: Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye
+
+)"
+};
+
+void MessageHeaderTest::testAutoDecode()
+{
+	{
+		std::istringstream istr(httpRequestHeader);
+		MessageHeader mh;
+		mh.read(istr);
+
+		assertEquals(mh.get("X-Encoded-Header-A"), "(a b)");
+		assertEquals(mh.get("X-Encoded-Header-B"), "Hello Francis, good bye");
+
+		assertEquals(mh.getDecoded("X-Encoded-Header-A"), "(a b)");
+		assertEquals(mh.getDecoded("X-Encoded-Header-B"), "Hello Francis, good bye");
+	}
+	{
+		std::istringstream istr(httpRequestHeader);
+		MessageHeader mh;
+		mh.setAutoDecode(false);
+		mh.read(istr);
+
+		assertEquals(mh.get("X-Encoded-Header-A"), "(=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)");
+		assertEquals(mh.get("X-Encoded-Header-B"), "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye");
+
+		assertEquals(mh.getDecoded("X-Encoded-Header-A"), "(a b)");
+		assertEquals(mh.getDecoded("X-Encoded-Header-B"), "Hello Francis, good bye");
+	}
+}
 
 
 void MessageHeaderTest::setUp()
@@ -440,6 +482,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
 
 	return pSuite;
 }

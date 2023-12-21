@@ -2,6 +2,9 @@
 # To retry only on timeout set retry_on: timeout
 # To retry only on error set retry_on: error
 # For more information on the retry action see https://github.com/nick-fields/retry
+
+name: Compile and Testrun
+
 on:
   pull_request:
     types: [opened]
@@ -11,6 +14,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  android-arm64-v8a-ndk-latest-cmake:
+   runs-on: ubuntu-22.04
+   steps:
+       - uses: actions/checkout@v3
+       - uses: nttld/setup-ndk@v1
+         with:
+            ndk-version: r25c
+            add-to-path: true
+       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
+  android-arm64-v8a-ndk-cmake:
+   runs-on: ubuntu-22.04
+   steps:
+       - uses: actions/checkout@v3
+       - uses: nttld/setup-ndk@v1
+         with:
+            ndk-version: r25c
+            add-to-path: true
+       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
+  android-armeabi-v7a-ndk-cmake:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
   linux-gcc-make:
     runs-on: ubuntu-22.04
     steps:
@@ -111,7 +144,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -122,6 +155,24 @@ jobs:
             sudo -s
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
+  linux-emscripten-cmake:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
+      - run: emcmake cmake -H. -B cmake-build -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off && emmake cmake --build cmake-build --target all -j4
+# TODO: How to run unit tests in emscripten?
+#      - uses: ./.github/actions/retry-action
+#        with:
+#          timeout_minutes: 90
+#          max_attempts: 3
+#          retry_on: any
+#          command: >-
+#            cd cmake-build &&
+#            sudo -s
+#            PWD=`pwd`
+#            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   linux-gcc-make-cross-armhf:
     runs-on: ubuntu-22.04
@@ -147,7 +198,8 @@ jobs:
       - run: >-
           ./configure --everything --no-prefix --omit=PDF
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib &&
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@1.1/include" --library-path="/usr/local/opt/openssl@1.1/lib" &&
           make all -s -j4
       - uses: ./.github/actions/retry-action
         with:
@@ -163,16 +215,18 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<SyslogTest>.testOldBSD"
+            CppUnit::TestCaller<SyslogTest>.testOldBSD,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
-  macos-clang-cmake:
+  macos-clang-cmake-openssl:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -188,7 +242,8 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -197,7 +252,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -213,7 +268,8 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 

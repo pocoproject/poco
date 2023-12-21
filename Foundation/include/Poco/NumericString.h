@@ -33,6 +33,7 @@
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
+#include <type_traits>
 #if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
 typedef Poco::Int64 intmax_t;
@@ -45,8 +46,8 @@ typedef Poco::Int64 intmax_t;
 #pragma warning(disable : 4146)
 #endif // POCO_COMPILER_MSVC
 
-// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
-#define POCO_MAX_INT_STRING_LEN 65
+// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero) + 2 (hex prefix)
+#define POCO_MAX_INT_STRING_LEN (67)
 // value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
 #define POCO_MAX_FLT_STRING_LEN 780
 
@@ -207,7 +208,9 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
 	/// they are silently skipped and not verified for correct positioning.
-	/// It is not allowed to convert a negative number to unsigned integer.
+	/// It is not allowed to convert a negative number to anything except
+	/// 10-base signed integer.
+	/// For hexadecimal numbers, the case of the digits is not relevant.
 	///
 	/// Function returns true if successful. If parsing was unsuccessful,
 	/// the return value is false with the result value undetermined.
@@ -216,7 +219,9 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 
 	if (!pStr) return false;
 	while (std::isspace(*pStr)) ++pStr;
-	if (*pStr == '\0') return false;
+	if ((*pStr == '\0') || ((*pStr == '-') && ((base != 10) || (std::is_unsigned<I>::value))))
+		return false;
+
 	bool negative = false;
 	if ((base == 10) && (*pStr == '-'))
 	{
@@ -363,10 +368,16 @@ namespace Impl {
 		const char* _end;
 };
 
+template <typename T>
+using EnableSigned = typename std::enable_if< std::is_signed<T>::value >::type*;
+
+template <typename T>
+using EnableUnsigned = typename std::enable_if< std::is_unsigned<T>::value >::type*;
+
 } // namespace Impl
 
 
-template <typename T>
+template <typename T, Impl::EnableSigned<T> = nullptr>
 bool intToStr(T value,
 	unsigned short base,
 	char* result,
@@ -374,8 +385,10 @@ bool intToStr(T value,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
-	char thSep = 0)
-	/// Converts integer to string. Numeric bases from binary to hexadecimal are supported.
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts signed integer to string. Standard numeric bases from binary to hexadecimal
+	/// are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
 	/// paddings are prepended to the formatted result with minus sign or base prefix included
@@ -383,6 +396,8 @@ bool intToStr(T value,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
 {
+	poco_assert_dbg (((value < 0) && (base == 10)) || (value >= 0));
+
 	if (base < 2 || base > 0x10)
 	{
 		*result = '\0';
@@ -396,7 +411,7 @@ bool intToStr(T value,
 	{
 		tmpVal = value;
 		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
 		if (thSep && (base == 10) && (++thCount == 3))
 		{
 			*ptr++ = thSep;
@@ -444,15 +459,16 @@ bool intToStr(T value,
 }
 
 
-template <typename T>
-bool uIntToStr(T value,
+template <typename T, Impl::EnableUnsigned<T> = nullptr>
+bool intToStr(T value,
 	unsigned short base,
 	char* result,
 	std::size_t& size,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
-	char thSep = 0)
+	char thSep = 0,
+	bool lowercase = false)
 	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
@@ -474,7 +490,7 @@ bool uIntToStr(T value,
 	{
 		tmpVal = value;
 		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
 		if (thSep && (base == 10) && (++thCount == 3))
 		{
 			*ptr++ = thSep;
@@ -510,7 +526,7 @@ bool uIntToStr(T value,
 	char tmp;
 	while(ptrr < ptr)
 	{
-		tmp    = *ptr;
+		tmp     = *ptr;
 		*ptr--  = *ptrr;
 		*ptrr++ = tmp;
 	}
@@ -520,28 +536,66 @@ bool uIntToStr(T value,
 
 
 template <typename T>
-bool intToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
-	/// Converts integer to string; This is a wrapper function, for details see see the
+[[deprecated("use intToStr instead")]]
+bool uIntToStr(T value,
+	unsigned short base,
+	char* result,
+	std::size_t& size,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
+	/// If width is non-zero, it pads the return value with fill character to the specified width.
+	/// When padding is zero character ('0'), it is prepended to the number itself; all other
+	/// paddings are prepended to the formatted result with minus sign or base prefix included
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
+	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
+	/// Formatted string has at least [width] total length.
+	///
+	/// This function is deprecated; use intToStr instead.
+{
+	return intToStr(value, base, result, size, prefix, width, fill, thSep, lowercase);
+}
+
+
+template <typename T>
+bool intToStr (T number,
+	unsigned short base,
+	std::string& result,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts integer to string; This is a wrapper function, for details see the
 	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
+	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, lowercase);
 	result.assign(res, size);
 	return ret;
 }
 
 
 template <typename T>
-bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
-	/// Converts unsigned integer to string; This is a wrapper function, for details see see the
+[[deprecated("use intToStr instead")]]
+bool uIntToStr (T number,
+	unsigned short base,
+	std::string& result,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts unsigned integer to string; This is a wrapper function, for details see the
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
+	///
+	/// This function is deprecated; use intToStr instead.
 {
-	char res[POCO_MAX_INT_STRING_LEN] = {0};
-	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
-	result.assign(res, size);
-	return ret;
+	return intToStr(number, base, result, prefix, width, fill, thSep, lowercase);
 }
 
 

@@ -43,6 +43,7 @@ public:
 	void testNameLengthLimit();
 	void testValueLengthLimit();
 	void testDecodeWord();
+	void testAutoDecode();
 
 	void setUp();
 	void tearDown();

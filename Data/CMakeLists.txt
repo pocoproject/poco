@@ -14,6 +14,9 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 if(MSVC AND NOT(MSVC_VERSION LESS 1400))
 	set_source_files_properties(src/StatementImpl.cpp
 		PROPERTIES COMPILE_FLAGS "/bigobj")
+elseif(MINGW)
+	set_source_files_properties(src/StatementImpl.cpp
+		PROPERTIES COMPILE_FLAGS "-Wa,-mbig-obj")
 endif()
 
 # Version Resource
@@ -72,7 +75,7 @@ else()
 	message(STATUS "PostgreSQL Support Disabled")
 endif()
 
-if(ODBC_FOUND AND ENABLE_DATA_ODBC AND NOT WINCE)
+if(ODBC_FOUND AND ENABLE_DATA_ODBC)
 	message(STATUS "ODBC Support Enabled")
 	add_subdirectory(ODBC)
 else()

@@ -22,11 +22,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Process_WINCE.h"
-#else
 #include "Poco/Process_WIN32U.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/Process_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
