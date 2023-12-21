@@ -2369,7 +2369,23 @@ void JSONTest::testRemove()
 	assertTrue(nl[1] == "baz");
 
 }
-
+void JSONTest::testEnum()
+{
+	enum SAMPLE_ENUM
+	{
+		SOME_ENUM_VALUE = 42
+	};
+	
+	Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+	
+	obj->set("taskType", SOME_ENUM_VALUE);
+	
+	Poco::Dynamic::Var var(obj);
+	std::string expected = "{\"taskType\":42}";
+	std::string result = var.convert<std::string>();
+	
+	assertEquals(expected, result);
+}
 
 CppUnit::Test* JSONTest::suite()
 {
@@ -2424,6 +2440,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
+	CppUnit_addTest(pSuite, JSONTest, testEnum);
 
 	return pSuite;
 }

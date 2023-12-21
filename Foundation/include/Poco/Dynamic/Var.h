@@ -88,11 +88,18 @@ public:
 	Var();
 		/// Creates an empty Var.
 
-	template <typename T>
+	template <typename T, std::enable_if_t<!std::is_enum<T>::value, bool> = true>
 	Var(const T& val)
 		/// Creates the Var from the given value.
 	{
 		construct(val);
+	}
+	
+	template <typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
+	Var(const T& val)
+		/// Creates the Var from the given enum value trough cast to int
+	{
+		construct(static_cast<int>(val));
 	}
 
 	Var(const char* pVal);
