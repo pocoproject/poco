@@ -6,6 +6,18 @@ Release 1.13.0 (2023-10-XX)
 - TODO
 
 
+Release 1.12.5p2 (2023-12-04)
+=============================
+
+- GH #4320: Integer overflow in Poco::UTF32Encoding
+
+
+Release 1.12.5p1 (2023-11-02)
+=============================
+
+- GH #4241: Poco::FileInputStream broken in 1.12.5 and 1.11.8
+
+
 Release 1.12.5 (2023-10-25)
 ===========================
 
@@ -247,6 +259,18 @@ Release 1.12.0 (2022-07-08)
 - GH #3658 Support for chunked transfer encoding trailer
 - GH #3661 PollSet::add()/update() semantics
 - GH #3665 MSVC does not properly recognize std version
+
+
+Release 1.11.8p2 (2023-12-04)
+=============================
+
+- GH #4320: Integer overflow in Poco::UTF32Encoding
+
+
+Release 1.11.8p1 (2023-11-02)
+=============================
+
+- GH #4241: Poco::FileInputStream broken in 1.12.5 and 1.11.8
 
 
 Release 1.11.8 (2023-10-18)
