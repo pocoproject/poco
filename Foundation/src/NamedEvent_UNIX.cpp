@@ -90,6 +90,7 @@ NamedEventImpl::~NamedEventImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	sem_close(_sem);
+	sem_unlink(_name.c_str());
 #else
 	if (_createdId)
 	{

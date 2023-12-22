@@ -17,6 +17,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 
+#include <iostream>
+
 using Poco::NamedEvent;
 using Poco::Thread;
 using Poco::Runnable;
@@ -103,7 +105,15 @@ void NamedEventTest::testNamedEvent()
 
 void NamedEventTest::testCreateManyNamedEvents()
 {
+
 	std::string name;
+	for (int i = 0; i < 40000; i++)
+	{
+		name = std::string("TestEvent ") + std::to_string(i);
+		if (sem_unlink(name.c_str()))
+			std::cout << "sem_unlink failed: " << errno << std::endl;
+	}
+
 	try
 	{
 		int i = 0;
