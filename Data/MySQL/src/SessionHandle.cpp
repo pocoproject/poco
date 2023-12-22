@@ -181,6 +181,13 @@ void SessionHandle::rollback()
 }
 
 
+void SessionHandle::autoCommit(bool val)
+{
+	if (mysql_autocommit(_pHandle, val) != 0)
+		throw TransactionException("Setting autocommit mode failed.", _pHandle);
+}
+
+
 void SessionHandle::reset()
 {
 #if ((defined (MYSQL_VERSION_ID)) && (MYSQL_VERSION_ID >= 50700)) || ((defined (MARIADB_PACKAGE_VERSION_ID)) && (MARIADB_PACKAGE_VERSION_ID >= 30000))

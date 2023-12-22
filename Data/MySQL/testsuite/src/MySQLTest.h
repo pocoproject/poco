@@ -107,6 +107,7 @@ public:
 	void testTransaction();
 
 	void testReconnect();
+	void testSessionPoolAndUnicode();
 
 	void setUp();
 	void tearDown();

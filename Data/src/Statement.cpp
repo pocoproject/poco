@@ -235,11 +235,16 @@ void Statement::formatQuery()
 void Statement::checkBeginTransaction()
 {
 	SessionImpl& session = _pImpl->session();
-	if (!session.isAutocommit() && !session.isTransaction() && session.shouldParse())
-	{
-		auto result = parse();
-		if (result.isSpecified() && result.value() && !isSelect().value())
+	if (!session.isTransaction() && !session.isAutocommit()) {
+		if (session.shouldParse())
+		{
+			auto result = parse();
+			if (result.isSpecified() && result.value() && !isSelect().value())
+				session.begin();
+		} else
+		{
 			session.begin();
+		}
 	}
 }
 

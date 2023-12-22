@@ -110,8 +110,8 @@ public:
 	void testBinaryCLOBStmt();
 
 	void testSessionTransaction();
+	void testSessionTransactionNoAutoCommit();
 	void testTransaction();
-
 	void testReconnect();
 
 	void testSqlState();

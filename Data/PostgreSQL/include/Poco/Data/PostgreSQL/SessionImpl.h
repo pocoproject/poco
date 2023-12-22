@@ -99,7 +99,7 @@ public:
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	void setAutoCommit(const std::string&, bool aValue);
+	void autoCommit(const std::string&, bool aValue);
 		/// Sets autocommit property for the session.
 
 	bool isAutoCommit(const std::string& aName = std::string()) const;

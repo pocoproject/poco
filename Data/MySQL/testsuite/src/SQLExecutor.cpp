@@ -21,6 +21,7 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/SessionPool.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
@@ -1372,7 +1373,7 @@ void SQLExecutor::timestamp()
 	std::string firstName("Simpson");
 	std::string address("Springfield");
 	DateTime birthday(1980, 4, 1, 5, 45, 12, 354, 879);
-	
+
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1381,14 +1382,14 @@ void SQLExecutor::timestamp()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (count == 1);
-	
+
 	DateTime bd;
 	assertTrue (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (bd == birthday);
-	
+
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
 
@@ -2065,4 +2066,32 @@ void SQLExecutor::reconnect()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (count == age);
 	assertTrue (_pSession->isConnected());
+}
+
+
+void SQLExecutor::sessionPoolAndUnicode(const std::string& connString)
+{
+	std::string funct = "unicode()";
+	std::string text = "ěščřžťďůň";
+	std::string text2;
+
+	// Test uses session from SessionPool instead of _pSession to prove session
+	// obtained and returned into pool is valid.
+
+	// Min/Max 1 session - ensures that when get() is called, same session should be returned
+	Poco::SharedPtr<Poco::Data::SessionPool> sp = new Poco::Data::SessionPool(MySQL::Connector::KEY, connString, 1, 1);
+
+	{
+		Poco::Data::Session session = sp->get();
+		try { session << "INSERT INTO Strings VALUES (?)", use(text), now; }
+		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	} // parentheses to ensure session is returned into pool
+
+	Poco::Data::Session session2 = sp->get();
+	try { session2 << "SELECT str FROM Strings", into(text2), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assertTrue (text == text2);
 }

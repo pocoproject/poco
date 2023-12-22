@@ -22,6 +22,7 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
+#include <string_view>
 
 
 namespace Poco {
@@ -53,7 +54,7 @@ public:
 		DE_BOUND
 	};
 
-	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = 0);
+	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = nullptr, bool numberedPlaceHolders = false);
 	~SQLExecutor();
 
 	template <typename C>
@@ -232,6 +233,9 @@ private:
 
 	Poco::Data::Session* _pSession;
 	Poco::Data::Session* _pEncSession;
+	bool _numberedPlaceHolders = false;
+
+	std::string formatSQL(const std::string& s) const;
 };
 
 
