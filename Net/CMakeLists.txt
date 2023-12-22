@@ -26,13 +26,12 @@ set_target_properties(Net
 )
 
 target_link_libraries(Net PUBLIC Poco::Foundation)
-# Windows and WindowsCE need additional libraries
+# Windows need additional libraries
 if(WIN32)
 	target_link_libraries(Net PUBLIC "iphlpapi.lib")
-	if(WINCE)
-		target_link_libraries(Net PUBLIC "ws2.lib")
-	else()
-		target_link_libraries(Net PUBLIC "ws2_32.lib")
+	target_link_libraries(Net PUBLIC "ws2_32.lib")
+	if (MINGW)
+		target_link_libraries(Net PUBLIC "mswsock.lib")
 	endif()
 endif(WIN32)
 
@@ -46,8 +45,11 @@ target_include_directories(Net
 POCO_INSTALL(Net)
 POCO_GENERATE_PACKAGE(Net)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

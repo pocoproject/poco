@@ -14,6 +14,12 @@
 #include "Poco/FPEnvironment.h"
 
 
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4723) // discarding return value of function with 'nodiscard' attribute
+#endif // POCO_COMPILER_MSVC
+
+
 using Poco::FPE;
 
 
@@ -154,3 +160,8 @@ CppUnit::Test* FPETest::suite()
 
 	return pSuite;
 }
+
+
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#endif // POCO_COMPILER_MSVC

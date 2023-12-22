@@ -14,10 +14,11 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 
-
 using Poco::DateTime;
+using Poco::Timestamp;
 using Poco::Timespan;
 using Poco::DateTimeFormat;
 using Poco::DateTimeFormatter;
@@ -65,6 +66,22 @@ void DateTimeFormatterTest::testISO8601Frac()
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, -3600);
 	assertTrue (str == "2005-01-08T12:30:00.012034-01:00");
+}
+
+
+void DateTimeFormatterTest::testISO8601Timestamp()
+{
+	DateTime dt(1582, 10, 15, 1, 2, 34, 56, 78);
+	Timestamp ts = dt.timestamp();
+
+	std::string str = DateTimeFormatter::format(ts, DateTimeFormat::ISO8601_FRAC_FORMAT);
+	assertTrue (str == "1582-10-15T01:02:34.056078Z");
+
+	DateTime preGregorian(1580, 1, 1, 1, 2, 34, 56, 78);
+	ts = preGregorian.timestamp();
+
+	str = DateTimeFormatter::format(ts, DateTimeFormat::ISO8601_FRAC_FORMAT);
+	assertTrue (str == "1580-01-01T01:02:34.056078Z");
 }
 
 
@@ -214,6 +231,7 @@ CppUnit::Test* DateTimeFormatterTest::suite()
 
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601Frac);
+	CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601Timestamp);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC822);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC1123);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testHTTP);

@@ -30,7 +30,9 @@ namespace Net {
 MessageHeader::MessageHeader():
 	_fieldLimit(DFL_FIELD_LIMIT),
 	_nameLengthLimit(DFL_NAME_LENGTH_LIMIT),
-	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT)
+	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
+	_autoDecode(true),
+	_decodedOnRead(false)
 {
 }
 
@@ -104,12 +106,55 @@ void MessageHeader::read(std::istream& istr)
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
+
+		// TODO: Add to the if below?
 		Poco::trimRightInPlace(value);
-		add(name, decodeWord(value));
+
+		if (_autoDecode)
+			add(name, decodeWord(value));
+		else
+			add(name, value);
+
 		++fields;
 	}
+	// Save the state of the auto decode at the time of reading.
+	_decodedOnRead = _autoDecode;
 	if (istr.good() && ch != eof)
 		istr.putback(ch);
+}
+
+
+void MessageHeader::setAutoDecode(bool decode)
+{
+	_autoDecode = decode;
+}
+
+
+bool MessageHeader::getAutoDecode() const
+{
+	return _autoDecode;
+}
+
+
+std::string MessageHeader::getDecoded(const std::string& name) const
+{
+	const auto& value { get(name) };
+	if (_decodedOnRead)
+	{
+		// Already decoded, just return the value
+		return value;
+	}
+	return decodeWord(value);
+}
+
+
+std::string MessageHeader::getDecoded(const std::string& name, const std::string& defaultValue) const
+{
+	if (!has(name))
+	{
+		return defaultValue;
+	}
+	return getDecoded(name);
 }
 
 

@@ -1,6 +1,7 @@
 <Configuration
 	Name="release_shared|ARM64"
 	OutputDirectory="binA64\"
+	TargetName="${project.name}"
 	IntermediateDirectory="objA64\${project.name}\$(ConfigurationName)"
 	ConfigurationType="1"
 	CharacterSet="2"
@@ -40,6 +41,9 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="0"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
+		LanguageStandard="${vc.project.compiler.std.cpp}"
+		LanguageStandard_C="${vc.project.compiler.std.c}"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
@@ -55,7 +59,7 @@
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalDependencies="CppUnit.lib ${configuration.linker.dependencies}"
-		OutputFile="binA64\${project.target}.exe"
+		OutputFile="$(OutDir)$(TargetName).exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\libA64"
 		GenerateDebugInformation="false"

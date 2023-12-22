@@ -11,6 +11,7 @@
 #include "SocketAddressTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Path.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include <iostream>
@@ -23,6 +24,7 @@ using Poco::Net::HostNotFoundException;
 using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
 using Poco::Net::AddressFamilyMismatchException;
+using Poco::Path;
 using Poco::InvalidArgumentException;
 
 
@@ -55,12 +57,10 @@ void SocketAddressTest::testSocketAddress()
 	assertTrue (sa2.host().toString() == "192.168.1.100");
 	assertTrue (sa2.port() == 100);
 
-#if !defined(_WIN32_WCE)
 	SocketAddress sa03 = SocketAddress("192.168.1.100", "ftp");
 	SocketAddress sa3(std::move(sa03));
 	assertTrue (sa3.host().toString() == "192.168.1.100");
 	assertTrue (sa3.port() == 21);
-#endif
 
 	try
 	{
@@ -184,25 +184,27 @@ void SocketAddressTest::testSocketAddress6()
 
 void SocketAddressTest::testSocketAddressUnixLocal()
 {
-#ifdef POCO_OS_FAMILY_UNIX
-	SocketAddress sa1(SocketAddress::UNIX_LOCAL, "/tmp/sock1");
+#ifdef POCO_HAS_UNIX_SOCKET
+	std::string name1 = Path::tempHome() + "sock1";
+	SocketAddress sa1(SocketAddress::UNIX_LOCAL, name1);
 	assertTrue (sa1.af() == AF_UNIX);
 	assertTrue (sa1.family() == SocketAddress::UNIX_LOCAL);
-	assertTrue (sa1.toString() == "/tmp/sock1");
+	assertTrue (sa1.toString() == name1);
 
-	SocketAddress sa2(SocketAddress::UNIX_LOCAL, "/tmp/sock2");
+	std::string name2 = Path::tempHome() + "sock2";
+	SocketAddress sa2(SocketAddress::UNIX_LOCAL, name2);
 	assertTrue (sa1 != sa2);
 	assertTrue (sa1 < sa2);
 
-	SocketAddress sa3(SocketAddress::UNIX_LOCAL, "/tmp/sock1");
+	SocketAddress sa3(SocketAddress::UNIX_LOCAL, name1);
 	assertTrue (sa1 == sa3);
 	assertTrue (!(sa1 < sa3));
 
-	SocketAddress sa4("/tmp/sock1");
+	SocketAddress sa4(name1);
 	assertTrue (sa1 == sa4);
-	assertTrue (sa4.toString() == "/tmp/sock1");
+	assertTrue (sa4.toString() == name1);
 #else
-	std::cout << "[UNIX LOCAL DISABLED]" << std::endl;
+	std::cout << "[UNIX LOCAL SOCKET DISABLED]" << std::endl;
 #endif
 }
 

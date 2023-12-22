@@ -1,30 +1,64 @@
-name: poco-ci
-on: [push, pull_request]
+# To enable retrying a job on failure or a specific timeout, instead of the run step, use uses: nick-fields/retry@v2.9.0(see the linux-gcc-make-tsan jsob)
+# To retry only on timeout set retry_on: timeout
+# To retry only on error set retry_on: error
+# For more information on the retry action see https://github.com/nick-fields/retry
+
+name: Compile and Testrun
+
+on:
+  pull_request:
+    types: [opened]
+  push:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  android-arm64-v8a-ndk-latest-cmake:
+   runs-on: ubuntu-22.04
+   steps:
+       - uses: actions/checkout@v3
+       - uses: nttld/setup-ndk@v1
+         with:
+            ndk-version: r25c
+            add-to-path: true
+       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
+  android-arm64-v8a-ndk-cmake:
+   runs-on: ubuntu-22.04
+   steps:
+       - uses: actions/checkout@v3
+       - uses: nttld/setup-ndk@v1
+         with:
+            ndk-version: r25c
+            add-to-path: true
+       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
+  android-armeabi-v7a-ndk-cmake:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
+
   linux-gcc-make:
     runs-on: ubuntu-22.04
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: pocotest
-          MYSQL_PASSWORD: pocotest
-          MYSQL_DATABASE: pocotest
-        ports:
-          - 3306:3306
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
-      - run: >-
-          sudo -s
-          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
-          ./ci/runtests.sh
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
+            ./ci/runtests.sh
 
   linux-gcc-make-cxx20:
     runs-on: ubuntu-22.04
@@ -32,31 +66,31 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j4 && sudo make install
-      - run: >-
-          sudo -s
-          EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
-          ./ci/runtests.sh
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
+            ./ci/runtests.sh
 
   linux-gcc-make-asan:
     runs-on: ubuntu-22.04
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: pocotest
-          MYSQL_PASSWORD: pocotest
-          MYSQL_DATABASE: pocotest
-        ports:
-          - 3306:3306
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
-      - run: >-
-          sudo -s
-          EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL MongoDB"
-          ./ci/runtests.sh
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/ODBC Data/PostgreSQL Data/MySQL MongoDB"
+            ./ci/runtests.sh
 
   linux-gcc-make-asan-no-soo:
     runs-on: ubuntu-22.04
@@ -64,10 +98,15 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF --no-soo && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
-      - run: >-
-          sudo -s
-          EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
-          ./ci/runtests.sh
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
+            ./ci/runtests.sh
 
   linux-gcc-make-ubsan:
     runs-on: ubuntu-22.04
@@ -75,10 +114,15 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
-      - run: >-
-          sudo -s
-          EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
-          ./ci/runtests.sh
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/MySQL Data/ODBC Data/PostgreSQL MongoDB"
+            ./ci/runtests.sh
 
   linux-gcc-make-tsan:
     runs-on: ubuntu-22.04
@@ -86,21 +130,49 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
-      - run: >-
-          sudo -s
-          ./ci/runtests.sh TSAN
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            ./ci/runtests.sh TSAN
 
   linux-gcc-cmake:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
-      - run: >-
-          cd cmake-build &&
-          sudo -s
-          PWD=`pwd`
-          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
+  linux-emscripten-cmake:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
+      - run: emcmake cmake -H. -B cmake-build -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off && emmake cmake --build cmake-build --target all -j4
+# TODO: How to run unit tests in emscripten?
+#      - uses: ./.github/actions/retry-action
+#        with:
+#          timeout_minutes: 90
+#          max_attempts: 3
+#          retry_on: any
+#          command: >-
+#            cd cmake-build &&
+#            sudo -s
+#            PWD=`pwd`
+#            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   linux-gcc-make-cross-armhf:
     runs-on: ubuntu-22.04
@@ -109,9 +181,14 @@ jobs:
       - run: >-
           sudo apt-get -y update &&
           sudo apt-get -y install crossbuild-essential-armhf
-      - run: >-
-          ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
-          make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
+            make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
   macos-clang-make:
     runs-on: macos-12
@@ -121,97 +198,125 @@ jobs:
       - run: >-
           ./configure --everything --no-prefix --omit=PDF
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib &&
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@1.1/include" --library-path="/usr/local/opt/openssl@1.1/lib" &&
           make all -s -j4
-      - run: >-
-          sudo -s
-          CPPUNIT_IGNORE="
-          CppUnit::TestCaller<ThreadTest>.testTrySleep,
-          CppUnit::TestCaller<TimestampTest>.testTimestamp,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<SyslogTest>.testOldBSD"
-          EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
-          ./ci/runtests.sh
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<SyslogTest>.testOldBSD,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
+            ./ci/runtests.sh
 
-  macos-clang-cmake:
+  macos-clang-cmake-openssl:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
-      - run: >-
-          cd cmake-build &&
-          sudo -s
-          CPPUNIT_IGNORE="
-          CppUnit::TestCaller<ThreadTest>.testTrySleep,
-          CppUnit::TestCaller<TimestampTest>.testTimestamp,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-          CppUnit::TestCaller<SyslogTest>.testOldBSD"
-          PWD=`pwd`
-          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
       - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
-      - run: >-
-          cd cmake-build &&
-          sudo -s
-          CPPUNIT_IGNORE="
-          CppUnit::TestCaller<ThreadTest>.testTrySleep,
-          CppUnit::TestCaller<TimestampTest>.testTimestamp,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-          CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-          CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-          CppUnit::TestCaller<SyslogTest>.testOldBSD"
-          PWD=`pwd`
-          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
+            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
-  windows-2019-msvc-cmake:
-    runs-on: windows-2019
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-        class CppUnit::TestCaller<class PollSetTest>.testPollClosedServer
-    steps:
-      - uses: actions/checkout@v3
-      - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --config Release
-      - run: >-
-          cd cmake-build;
-          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+#   windows-2019-msvc-cmake:
+#     runs-on: windows-2019
+#     env:
+#       CPPUNIT_IGNORE: >-
+#         class CppUnit::TestCaller<class PathTest>.testFind,
+#         class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+#         class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+#         class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+#         class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+#         class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+#         class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
+#         class CppUnit::TestCaller<class PollSetTest>.testPollClosedServer
+#     steps:
+#       - uses: actions/checkout@v3
+#       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
+#       - run: cmake --build cmake-build --config Release
+#       - uses: ./.github/actions/retry-action
+#          with:
+#             timeout_minutes: 90
+#             max_attempts: 3
+#             retry_on: any
+#             command: >-
+#             cd cmake-build;
+#             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
 
-  windows-2019-msvc-buildwin-x64:
-    runs-on: windows-2019
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
-    steps:
-      - uses: actions/checkout@v3
-      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+#   windows-2019-msvc-buildwin-x64:
+#     runs-on: windows-2019
+#     env:
+#       CPPUNIT_IGNORE: >-
+#         class CppUnit::TestCaller<class PathTest>.testFind,
+#         class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+#         class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+#         class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+#         class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+#         class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+#         class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: ./.github/actions/retry-action
+#         with:
+#           timeout_minutes: 90
+#           max_attempts: 3
+#           retry_on: any
+#           command: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
 #  windows-2019-msvc-buildwin-win32:
 #    runs-on: windows-2019
@@ -219,7 +324,12 @@ jobs:
 #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
 #      - uses: actions/checkout@v3
-#      - run: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+#      - uses: ./.github/actions/retry-action
+#        with:
+#          timeout_minutes: 90
+#          max_attempts: 3
+#          retry_on: any
+#          command: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
   windows-2022-msvc-buildwin-x64:
     runs-on: windows-2022
@@ -234,7 +344,12 @@ jobs:
         class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
       - uses: actions/checkout@v3
-      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
 #  windows-2022-msvc-buildwin-win32:
 #    runs-on: windows-2022
@@ -249,7 +364,12 @@ jobs:
 #        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
 #    steps:
 #      - uses: actions/checkout@v3
-#      - run: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+#      - uses: ./.github/actions/retry-action
+#      with:
+#        timeout_minutes: 90
+#        max_attempts: 3
+#        retry_on: any
+#        command: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
 
   windows-2022-msvc-cmake:
     runs-on: windows-2022
@@ -266,9 +386,14 @@ jobs:
       - uses: actions/checkout@v3
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release
-      - run: >-
-          cd cmake-build;
-          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build;
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
 
 # missing asan dll path
 #  windows-2022-msvc-cmake-asan:
@@ -286,6 +411,168 @@ jobs:
 #      - uses: actions/checkout@v3
 #      - run: cmake -S. -Bcmake-build -DPOCO_SANITIZE_ASAN=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
 #      - run: cmake --build cmake-build --config Debug
-#      - run: >-
+#      - uses: ./.github/actions/retry-action
+#        with:
+#          timeout_minutes: 90
+#          max_attempts: 3
+#          retry_on: any
+#          command: >-
 #          cd cmake-build;
 #          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Debug
+
+  linux-gcc-make-mysql:
+    runs-on: ubuntu-22.04
+    services:
+      mysql:
+        image: mysql:8.1.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: pocotest
+          MYSQL_PASSWORD: pocotest
+          MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev  mysql-client
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/SQLite,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/ODBC Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+            ./ci/runtests.sh
+
+# TODO tests sometimes failing on testTransaction and testReconnect
+  linux-gcc-make-postgres:
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:16.0
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+            ./ci/runtests.sh
+
+  linux-gcc-make-redis:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: |
+          curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+          sudo apt-get -y update
+          sudo apt-get -y install redis
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus SevenZip Util XML Zip"
+            ./ci/runtests.sh
+
+  linux-gcc-make-mongodb:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: supercharge/mongodb-github-action@1.10.0
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+            ./ci/runtests.sh
+
+  linux-gcc-make-odbc:
+    runs-on: ubuntu-22.04
+    services:
+      mysql:
+        image: mysql:8.1.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: pocotest
+          MYSQL_PASSWORD: pocotest
+          MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:16.0
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+      oracle:
+        image: container-registry.oracle.com/database/express:21.3.0-xe
+        env:
+          ORACLE_PWD: poco
+        ports:
+          - 1521:1521
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          MSSQL_PID: Express
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: Pocopoco1
+        ports:
+          - 1433:1433
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client alien libaio1 gnupg2 curl #odbc-postgresql
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      # - name: Setup MySQL ODBC connector
+      #   run: |
+      #     wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
+      #     wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
+      #     sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
+      # - name: Setup Oracle ODBC connector
+      #   run: |
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
+      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
+      #     sudo alien --scripts ./oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
+      #     sudo apt install ./oracle-instantclient-basic_21.12.0.0.0-2_amd64.deb
+      #     sudo apt install ./oracle-instantclient-sqlplus_21.12.0.0.0-2_amd64.deb
+      #     sudo apt install ./oracle-instantclient-odbc_21.12.0.0.0-2_amd64.deb
+      #     sudo /usr/lib/oracle/21/client64/bin/odbc_update_ini.sh / "/usr/lib/oracle/21/client64/lib" "" ""  "/etc/odbc.ini"
+      - name: Setup SQL Server ODBC connector
+        run: |
+           curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+           curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+           sudo apt-get update
+           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/PostgreSQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+            ./ci/runtests.sh

@@ -1806,6 +1806,43 @@ void JSONTest::testVarConvert()
 	assertTrue(cvt == "[1,2,3]");
 }
 
+void JSONTest::testBasicJson()
+{
+	// Tests basic JSON structure and accessibility of members
+
+	const auto json = R"(
+		{
+			"clientConfig" : "Franky",
+			"arrayMember": [1, "A", 3.5],
+			"objectMember": {
+				"a": 1,
+				"b": "B"
+			}
+		}
+	)";
+    Poco::JSON::Parser jsonParser;
+    Poco::Dynamic::Var jsonObject = jsonParser.parse(json);
+
+    Poco::JSON::Object::Ptr jsonPtr = jsonObject.extract<Poco::JSON::Object::Ptr>();
+
+    assertFalse(jsonPtr->get("clientConfig").isEmpty());
+    const auto testStr = jsonPtr->getValue<std::string>("clientConfig");
+    assertEqual(testStr, "Franky");
+
+    const auto testArr = jsonPtr->getArray("arrayMember");
+    assertFalse(testArr.isNull());
+    assertFalse(testArr->empty());
+    assertEqual(testArr->size(), 3);
+    assertEqual(testArr->getElement<int>(0), 1);
+    assertEqual(testArr->getElement<std::string>(1), "A");
+
+    const auto testObj = jsonPtr->getObject("objectMember");
+    assertFalse(testObj.isNull());
+    assertEqual(testObj->size(), 2);
+    assertEqual(testObj->getValue<int>("a"), 1);
+    assertEqual(testObj->getValue<std::string>("b"), "B");
+
+}
 
 void JSONTest::testValidJanssonFiles()
 {
@@ -2375,6 +2412,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testStringifyNaN);
 	CppUnit_addTest(pSuite, JSONTest, testStringifyPreserveOrder);
 	CppUnit_addTest(pSuite, JSONTest, testVarConvert);
+	CppUnit_addTest(pSuite, JSONTest, testBasicJson);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);

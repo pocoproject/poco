@@ -196,7 +196,8 @@ void HTTPSession::connect(const SocketAddress& address)
 	_socket.connect(address, _connectionTimeout);
 	_socket.setReceiveTimeout(_receiveTimeout);
 	_socket.setSendTimeout(_sendTimeout);
-	_socket.setNoDelay(true);
+	if (address.family() != SocketAddress::UNIX_LOCAL)
+		_socket.setNoDelay(true);
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.
 	_pCurrent = _pEnd = _pBuffer;

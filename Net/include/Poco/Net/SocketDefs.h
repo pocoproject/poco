@@ -26,10 +26,20 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"
-	#define FD_SETSIZE 1024 // increase as needed
+	#ifndef FD_SETSIZE
+		#define FD_SETSIZE 1024 // increase as needed
+	#endif
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#include <ws2def.h>
+	#if !defined (POCO_NET_NO_UNIX_SOCKET)
+		#if (__cplusplus >= 201703L)
+			#if __has_include(<afunix.h>)
+				#include <afunix.h>
+				#define POCO_HAS_UNIX_SOCKET
+			#endif
+		#endif
+	#endif
 	#define POCO_INVALID_SOCKET  INVALID_SOCKET
 	#define poco_socket_t        SOCKET
 	#define poco_socklen_t       int
@@ -148,7 +158,6 @@
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
 	#include <netdb.h>
-	#if defined(POCO_OS_FAMILY_UNIX)
 		#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID)
 			// Net/src/NetworkInterface.cpp changed #include <linux/if.h> to #include <net/if.h>
 			// no more conflict, can use #include <net/if.h> here
@@ -161,7 +170,6 @@
 		#else
 			#include <net/if.h>
 		#endif
-	#endif
 	#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_MAC_OS_X)
 		#include <sys/sockio.h>
 		#include <sys/filio.h>
@@ -228,6 +236,9 @@
 	#define POCO_TRY_AGAIN       TRY_AGAIN
 	#define POCO_NO_RECOVERY     NO_RECOVERY
 	#define POCO_NO_DATA         NO_DATA
+	#if !defined (POCO_NET_NO_UNIX_SOCKET)
+		#define POCO_HAS_UNIX_SOCKET
+	#endif
 #endif
 
 
@@ -241,7 +252,7 @@
 #endif
 
 
-#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_WINDOWS_CE) || (POCO_OS == POCO_OS_CYGWIN)
+#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_CYGWIN)
 	#define POCO_BROKEN_TIMEOUTS 1
 #endif
 
@@ -389,7 +400,7 @@ struct AddressFamily
 	{
 		UNKNOWN = AF_UNSPEC,
 			/// Unspecified family
-	#if defined(POCO_OS_FAMILY_UNIX)
+	#if defined(POCO_HAS_UNIX_SOCKET)
 		UNIX_LOCAL = AF_UNIX,
 			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
 	#endif

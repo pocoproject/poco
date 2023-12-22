@@ -26,11 +26,7 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Path_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Path_WINCE.cpp"
-#else
 #include "Path_WIN32U.cpp"
-#endif
 #endif
 
 
@@ -575,6 +571,12 @@ Path& Path::clear()
 	_version.clear();
 	_absolute = false;
 	return *this;
+}
+
+
+std::string Path::self()
+{
+	return PathImpl::selfImpl();
 }
 
 

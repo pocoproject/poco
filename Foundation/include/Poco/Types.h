@@ -20,12 +20,13 @@
 
 #include "Poco/Foundation.h"
 #include <cstdint>
+#include <type_traits>
 
 
 namespace Poco {
 
 
-using Int8    = std::int8_t;
+using Int8    = std::conditional<std::is_same<signed char, std::int8_t>::value, std::int8_t, signed char>::type;
 using UInt8   = std::uint8_t;
 using Int16   = std::int16_t;
 using UInt16  = std::uint16_t;

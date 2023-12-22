@@ -17,12 +17,15 @@
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
+#include "Poco/FileStream.h"
+#include "Poco/Error.h"
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
 	#ifdef POCO_OS_FAMILY_WINDOWS
 		#include "wepoll.h"
+		#include "mswsock.h"
 	#else
 		#include <sys/epoll.h>
 		#include <sys/eventfd.h>
@@ -42,8 +45,20 @@
 
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
+#else
+#include <csignal>
 #endif
 
+
+#if POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FAMILY_BSD
+#include <sys/uio.h>
+#include <sys/types.h>
+using sighandler_t = sig_t;
+#endif
+
+#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
+#include <sys/sendfile.h>
+#endif
 
 #if defined(_MSC_VER)
 #pragma warning(disable:4996) // deprecation warnings
@@ -227,8 +242,15 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reus
 	{
 		init(address.af());
 	}
-	setReuseAddress(reuseAddress);
-	setReusePort(reusePort);
+
+#ifdef POCO_HAS_UNIX_SOCKET
+	if (address.family() != SocketAddress::Family::UNIX_LOCAL)
+#endif
+	{
+		setReuseAddress(reuseAddress);
+		setReusePort(reusePort);
+	}
+
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else
@@ -266,6 +288,14 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reu
 #else
 	throw Poco::NotImplementedException("No IPv6 support available");
 #endif
+}
+
+
+void SocketImpl::useFileDescriptor(poco_socket_t fd)
+{
+	poco_assert (_sockfd == POCO_INVALID_SOCKET);
+
+	_sockfd = fd;
 }
 
 
@@ -1343,5 +1373,81 @@ void SocketImpl::error(int code, const std::string& arg)
 	}
 }
 
+#ifdef POCO_OS_FAMILY_WINDOWS
+Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset)
+{
+	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
+	Poco::UInt64 fileSize = fileInputStream.size();
+	std::streamoff sentSize = fileSize - offset;
+	LARGE_INTEGER offsetHelper;
+	offsetHelper.QuadPart = offset;
+	OVERLAPPED overlapped;
+	memset(&overlapped, 0, sizeof(overlapped));
+	overlapped.Offset = offsetHelper.LowPart;
+	overlapped.OffsetHigh =  offsetHelper.HighPart;
+	overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	if (overlapped.hEvent == nullptr)
+	{
+		return -1;
+	}
+	bool result = TransmitFile(_sockfd, fd, sentSize, 0, &overlapped, nullptr, 0);
+	if (!result)
+	{
+		int err = WSAGetLastError();
+		if ((err != ERROR_IO_PENDING) && (WSAGetLastError() != WSA_IO_PENDING)) {
+			CloseHandle(overlapped.hEvent);
+			error(err, Error::getMessage(err));
+		}
+		WaitForSingleObject(overlapped.hEvent, INFINITE);
+	}
+	CloseHandle(overlapped.hEvent);
+	return sentSize;
+}
+#else
+Poco::Int64 _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, Poco::UInt64 offset,std::streamoff sentSize)
+{
+	Poco::Int64 sent = 0;
+#ifdef __USE_LARGEFILE64
+	sent = sendfile64(sd, fd, (off64_t *)&offset, sentSize);
+#else
+#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
+	sent = sendfile(sd, fd, (off_t *)&offset, sentSize);
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	int result = sendfile(fd, sd, offset, &sentSize, nullptr, 0);
+	if (result < 0)
+	{
+		sent = -1;
+	} 
+	else 
+	{
+		sent = sentSize;
+	}
+#else
+	throw Poco::NotImplementedException("sendfile not implemented for this platform");
+#endif
+#endif
+	if (errno == EAGAIN || errno == EWOULDBLOCK) 
+	{
+		sent = 0;
+	}
+	return sent;
+}
+
+Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset)
+{
+	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
+	Poco::UInt64 fileSize = fileInputStream.size();
+	std::streamoff sentSize = fileSize - offset;
+	Poco::Int64 sent = 0;
+	sighandler_t sigPrev = signal(SIGPIPE, SIG_IGN);
+	while (sent == 0)
+	{
+		errno = 0;
+		sent = _sendfile(_sockfd, fd, offset, sentSize);
+	}
+	signal(SIGPIPE, sigPrev != SIG_ERR ? sigPrev : SIG_DFL);
+	return sent;
+}
+#endif // POCO_OS_FAMILY_WINDOWS
 
 } } // namespace Poco::Net

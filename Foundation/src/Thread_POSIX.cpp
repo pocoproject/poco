@@ -15,10 +15,19 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Format.h"
 #include <signal.h>
+
+#if POCO_OS == POCO_OS_FREE_BSD
+#    include <sys/thr.h>
+#    include <pthread_np.h>
+#    include <osreldate.h>
+#endif
+
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
@@ -28,6 +37,10 @@
 #	include <time.h>
 #endif
 
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#	include <sys/prctl.h>
+#endif
+
 #if POCO_OS == POCO_OS_LINUX
 	#ifndef _GNU_SOURCE
 		#define _GNU_SOURCE         /* See feature_test_macros(7) */
@@ -35,6 +48,8 @@
 	#include <unistd.h>
 	#include <sys/syscall.h>   /* For SYS_xxx definitions */
 #endif
+#include <iostream>
+
 
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
 #	include <sys/prctl.h>
@@ -65,13 +80,12 @@ namespace
 }
 #endif
 
-
-namespace {
-
+namespace
+{
 	std::string truncName(const std::string& name)
 	{
-		if (name.size() > 15)
-			return name.substr(0, 15).append("~");
+		if (name.size() > POCO_MAX_THREAD_NAME_LEN)
+			return name.substr(0, POCO_MAX_THREAD_NAME_LEN).append("~");
 		return name;
 	}
 
@@ -90,6 +104,17 @@ namespace {
 #else
 		prctl(PR_SET_NAME, truncName(threadName).c_str());
 #endif
+	}
+
+	std::string getThreadName()
+	{
+		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+		prctl(PR_GET_NAME, name);
+#else
+		pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
+#endif
+		return name;
 	}
 }
 
@@ -112,6 +137,44 @@ ThreadImpl::~ThreadImpl()
 	{
 		pthread_detach(_pData->thread);
 	}
+}
+
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+	{
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+#else
+	if (threadName.size() > std::min(POCO_MAX_THREAD_NAME_LEN, 15))
+	{
+		int half = (std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
+#endif
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	ScopedLock<FastMutex> lock(_pData->mutex);
+	if (realName != _pData->name)
+	{
+		_pData->name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	ScopedLock<FastMutex> lock(_pData->mutex);
+	return _pData->name;
+}
+
+
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	return isRunningImpl() ? getThreadName() : "";
 }
 
 
@@ -191,6 +254,21 @@ void ThreadImpl::setStackSizeImpl(int size)
 	}
  	_pData->stackSize = size;
 #endif
+}
+
+
+void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
+{
+	sigset_t sset;
+	sigemptyset(&sset);
+
+	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
+	{
+		if ((sigMask & (1 << sig)) != 0)
+			sigaddset(&sset, sig);
+	}
+
+	pthread_sigmask(SIG_BLOCK, &sset, 0);
 }
 
 
@@ -286,67 +364,20 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 long ThreadImpl::currentOsTidImpl()
 {
-#if POCO_OS == POCO_OS_LINUX
-    return ::syscall(SYS_gettid);
+#if defined(POCO_EMSCRIPTEN)
+	return ::pthread_self();
+#elif POCO_OS == POCO_OS_LINUX
+	return ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
-    return ::pthread_mach_thread_np(::pthread_self());
-#else
-    return ::pthread_self();
-#endif
-}
-
-void ThreadImpl::sleepImpl(long milliseconds)
-{
-#if defined(__digital__)
-		// This is specific to DECThreads
-		struct timespec interval;
-		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000;
-		pthread_delay_np(&interval);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timespec ts;
-		ts.tv_sec  = (long) remainingTime.totalSeconds();
-		ts.tv_nsec = (long) remainingTime.useconds()*1000;
-		Poco::Timestamp start;
-		rc = ::nanosleep(&ts, 0);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
+	return ::pthread_mach_thread_np(::pthread_self());
+#elif POCO_OS == POCO_OS_FREE_BSD
+	long id;
+	if(thr_self(&id) < 0) {
+		return 0;
 	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
+	return id;
 #else
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(0, NULL, NULL, NULL, &tv);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): select() failed");
+	return ::pthread_self();
 #endif
 }
 
@@ -367,6 +398,12 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
 	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+
+	{
+		FastMutex::ScopedLock lock(pData->mutex);
+		setThreadName(pData->name);
+	}
+
 	try
 	{
 		pData->pRunnableTarget->run();
@@ -434,6 +471,41 @@ int ThreadImpl::reverseMapPrio(int prio, int policy)
 			return PRIO_LOWEST_IMPL;
 	}
 	else return PRIO_HIGHEST_IMPL;
+}
+
+
+bool ThreadImpl::setAffinityImpl(int coreID)
+{
+#if POCO_OS == POCO_OS_LINUX
+	int numCores = sysconf(_SC_NPROCESSORS_ONLN);
+	if (coreID < 0 || coreID >= numCores)
+		return false;
+
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(coreID, &cpuset);
+
+	return 0 == pthread_setaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset);
+#else
+	return false;
+#endif
+}
+
+
+int ThreadImpl::getAffinityImpl() const
+{
+#if POCO_OS == POCO_OS_LINUX
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	if (0 == pthread_getaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset))
+	{
+		for (int i = 0; i < CPU_SETSIZE; ++i)
+		{
+			if (CPU_ISSET(i, &cpuset)) return i;
+		}
+	}
+#endif
+	return -1;
 }
 
 

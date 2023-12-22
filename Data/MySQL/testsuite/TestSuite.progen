@@ -7,5 +7,6 @@ vc.project.platforms = Win32
 vc.project.configurations = debug_shared, release_shared, debug_static_mt, release_static_mt, debug_static_md, release_static_md
 vc.project.prototype = TestSuite_vs90.vcproj
 mysql = ${vc.project.pocobase}\\mysql
-vc.project.compiler.include = ${mysql}\\include;${vc.project.pocobase}\\Foundation\\include;${vc.project.pocobase}\\Data\\include
+vc.project.compiler.include = ${mysql}\\include;${vc.project.pocobase}\\Foundation\\include; \
+	${vc.project.pocobase}\\Data\\include;${vc.project.pocobase}\\Data\\src
 vc.project.linker.dependencies.Win32 = iphlpapi.lib

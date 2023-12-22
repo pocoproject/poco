@@ -301,6 +301,50 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 }
 
 
+Document::Ptr Database::queryBuildInfo(Connection& connection) const
+{
+	// build info can be issued on "config" system database
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
+	request->selector().add("buildInfo", 1);
+
+	Poco::MongoDB::ResponseMessage response;
+	connection.sendRequest(*request, response);
+
+	Document::Ptr buildInfo;
+	if ( response.documents().size() > 0 )
+	{
+		buildInfo = response.documents()[0];
+	}
+	else
+	{
+		throw Poco::ProtocolException("Didn't get a response from the buildinfo command");
+	}
+	return buildInfo;
+}
+
+
+Document::Ptr Database::queryServerHello(Connection& connection) const
+{
+	// hello can be issued on "config" system database
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
+	request->selector().add("hello", 1);
+
+	Poco::MongoDB::ResponseMessage response;
+	connection.sendRequest(*request, response);
+
+	Document::Ptr hello;
+	if ( response.documents().size() > 0 )
+	{
+		hello = response.documents()[0];
+	}
+	else
+	{
+		throw Poco::ProtocolException("Didn't get a response from the hello command");
+	}
+	return hello;
+}
+
+
 Int64 Database::count(Connection& connection, const std::string& collectionName) const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> countRequest = createCountRequest(collectionName);
@@ -357,7 +401,7 @@ Document::Ptr Database::getLastErrorDoc(Connection& connection) const
 {
 	Document::Ptr errorDoc;
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
 	request->setNumberToReturn(1);
 	request->selector().add("getLastError", 1);
 
@@ -387,7 +431,7 @@ std::string Database::getLastError(Connection& connection) const
 
 Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName) const
 {
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
 	request->setNumberToReturn(1);
 	request->selector().add("count", collectionName);
 	return request;

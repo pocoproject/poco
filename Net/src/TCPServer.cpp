@@ -139,7 +139,7 @@ void TCPServer::run()
 					if (!_pConnectionFilter || _pConnectionFilter->accept(ss))
 					{
 						// enable nodelay per default: OSX really needs that
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 						if (ss.address().family() != AddressFamily::UNIX_LOCAL)
 #endif
 						{
@@ -225,18 +225,10 @@ void TCPServer::setConnectionFilter(const TCPServerConnectionFilter::Ptr& pConne
 
 std::string TCPServer::threadName(const ServerSocket& socket)
 {
-#if _WIN32_WCE == 0x0800
-	// Workaround for WEC2013: only the first call to getsockname()
-	// succeeds. To mitigate the impact of this bug, do not call
-	// socket.address(), which calls getsockname(), here.
-	std::string name("TCPServer");
-	#pragma message("Using WEC2013 getsockname() workaround in TCPServer::threadName(). Remove when no longer needed.")
-#else
 	std::string name("TCPServer: ");
 	name.append(socket.address().toString());
-#endif
-	return name;
 
+	return name;
 }
 
 

@@ -38,7 +38,7 @@ namespace Data {
 
 
 template <class T>
-class Binding: public AbstractBinding
+class Binding final: public AbstractBinding
 	/// Binding maps a value or multiple values (see Binding specializations for STL containers as
 	/// well as type handlers) to database column(s). Values to be bound can be either mapped
 	/// directly (by reference) or a copy can be created, depending on the value of the copy argument.
@@ -109,7 +109,7 @@ private:
 
 
 template <class T>
-class CopyBinding: public AbstractBinding
+class CopyBinding final: public AbstractBinding
 	/// Binding maps a value or multiple values (see Binding specializations for STL containers as
 	/// well as type handlers) to database column(s). Values to be bound can be either mapped
 	/// directly (by reference) or a copy can be created, depending on the value of the copy argument.
@@ -177,7 +177,7 @@ private:
 
 
 template <>
-class Binding<const char*>: public AbstractBinding
+class Binding<const char*> final: public AbstractBinding
 	/// Binding const char* specialization wraps char pointer into string.
 {
 public:
@@ -238,7 +238,7 @@ private:
 
 
 template <>
-class CopyBinding<const char*>: public AbstractBinding
+class CopyBinding<const char*> final: public AbstractBinding
 	/// Binding const char* specialization wraps char pointer into string.
 {
 public:
@@ -298,7 +298,7 @@ private:
 
 
 template <class T>
-class Binding<std::vector<T>>: public AbstractBinding
+class Binding<std::vector<T>> final: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
@@ -364,7 +364,7 @@ private:
 
 
 template <class T>
-class CopyBinding<std::vector<T>>: public AbstractBinding
+class CopyBinding<std::vector<T>> final: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
@@ -431,7 +431,7 @@ private:
 
 
 template <>
-class Binding<std::vector<bool>>: public AbstractBinding
+class Binding<std::vector<bool>> final: public AbstractBinding
 	/// Specialization for std::vector<bool>.
 	/// This specialization is necessary due to the nature of std::vector<bool>.
 	/// For details, see the standard library implementation of std::vector<bool>
@@ -512,7 +512,7 @@ private:
 
 
 template <>
-class CopyBinding<std::vector<bool>>: public AbstractBinding
+class CopyBinding<std::vector<bool>> final: public AbstractBinding
 	/// Specialization for std::vector<bool>.
 	/// This specialization is necessary due to the nature of std::vector<bool>.
 	/// For details, see the standard library implementation of std::vector<bool>
@@ -592,7 +592,7 @@ private:
 
 
 template <class T>
-class Binding<std::list<T>>: public AbstractBinding
+class Binding<std::list<T>> final: public AbstractBinding
 	/// Specialization for std::list.
 {
 public:
@@ -657,7 +657,7 @@ private:
 
 
 template <class T>
-class CopyBinding<std::list<T>>: public AbstractBinding
+class CopyBinding<std::list<T>> final: public AbstractBinding
 	/// Specialization for std::list.
 {
 public:
@@ -722,7 +722,7 @@ private:
 
 
 template <class T>
-class Binding<std::deque<T>>: public AbstractBinding
+class Binding<std::deque<T>> final: public AbstractBinding
 	/// Specialization for std::deque.
 {
 public:
@@ -787,7 +787,7 @@ private:
 
 
 template <class T>
-class CopyBinding<std::deque<T>>: public AbstractBinding
+class CopyBinding<std::deque<T>> final: public AbstractBinding
 	/// Specialization for std::deque.
 {
 public:
@@ -852,7 +852,7 @@ private:
 
 
 template <class T>
-class Binding<std::set<T>>: public AbstractBinding
+class Binding<std::set<T>> final: public AbstractBinding
 	/// Specialization for std::set.
 {
 public:
@@ -917,7 +917,7 @@ private:
 
 
 template <class T>
-class CopyBinding<std::set<T>>: public AbstractBinding
+class CopyBinding<std::set<T>> final: public AbstractBinding
 	/// Specialization for std::set.
 {
 public:
@@ -982,7 +982,7 @@ private:
 
 
 template <class T>
-class Binding<std::multiset<T>>: public AbstractBinding
+class Binding<std::multiset<T>> final: public AbstractBinding
 	/// Specialization for std::multiset.
 {
 public:
@@ -1047,7 +1047,7 @@ private:
 
 
 template <class T>
-class CopyBinding<std::multiset<T>>: public AbstractBinding
+class CopyBinding<std::multiset<T>> final: public AbstractBinding
 	/// Specialization for std::multiset.
 {
 public:
@@ -1112,7 +1112,7 @@ private:
 
 
 template <class K, class V>
-class Binding<std::map<K, V>>: public AbstractBinding
+class Binding<std::map<K, V>> final: public AbstractBinding
 	/// Specialization for std::map.
 {
 public:
@@ -1177,7 +1177,7 @@ private:
 
 
 template <class K, class V>
-class CopyBinding<std::map<K, V>>: public AbstractBinding
+class CopyBinding<std::map<K, V>> final: public AbstractBinding
 	/// Specialization for std::map.
 {
 public:
@@ -1242,7 +1242,7 @@ private:
 
 
 template <class K, class V>
-class Binding<std::multimap<K, V>>: public AbstractBinding
+class Binding<std::multimap<K, V>> final: public AbstractBinding
 	/// Specialization for std::multimap.
 {
 public:
@@ -1307,7 +1307,7 @@ private:
 
 
 template <class K, class V>
-class CopyBinding<std::multimap<K, V>>: public AbstractBinding
+class CopyBinding<std::multimap<K, V>> final: public AbstractBinding
 	/// Specialization for std::multimap.
 {
 public:

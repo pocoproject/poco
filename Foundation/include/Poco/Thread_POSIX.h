@@ -36,9 +36,7 @@
 #include <cstring>
 #endif
 
-
 namespace Poco {
-
 
 class Foundation_API ThreadImpl
 {
@@ -64,6 +62,12 @@ public:
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
+	void setNameImpl(const std::string& threadName);
+	std::string getNameImpl() const;
+	std::string getOSThreadNameImpl();
+		/// Returns the thread's name, expressed as an operating system
+		/// specific name value. Return empty string if thread is not running.
+		/// For test used only.
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
@@ -72,15 +76,17 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setSignalMaskImpl(uint32_t sigMask);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
-	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	bool setAffinityImpl(int coreID);
+	int getAffinityImpl() const;
 
 protected:
 	static void* runnableEntry(void* pThread);
@@ -141,6 +147,8 @@ private:
 		std::size_t   stackSize;
 		bool          started;
 		bool          joined;
+		std::string   name;
+		int           affinity;
 		mutable FastMutex mutex;
 	};
 

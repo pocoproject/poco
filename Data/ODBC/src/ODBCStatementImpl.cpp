@@ -47,13 +47,19 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_canCompile(true)
 {
 	int queryTimeout = rSession.queryTimeout();
+	int rc = 0;
 	if (queryTimeout >= 0)
 	{
 		SQLULEN uqt = static_cast<SQLULEN>(queryTimeout);
-		SQLSetStmtAttr(_stmt,
+		rc = SQLSetStmtAttr(_stmt,
 			SQL_ATTR_QUERY_TIMEOUT,
 			(SQLPOINTER) uqt,
 			0);
+		if (Utility::isError(rc))
+		{
+			throw ODBC::ConnectionException(_stmt,
+				Poco::format("SQLSetStmtAttr(SQL_ATTR_QUERY_TIMEOUT, %d)", queryTimeout));
+		}
 	}
 }
 
@@ -96,7 +102,15 @@ void ODBCStatementImpl::compileImpl()
 	{
 	}
 
-	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+	std::size_t maxFieldSize;
+	try
+	{
+		maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+	}
+	catch (Poco::BadCastException&)
+	{
+		maxFieldSize = AnyCast<int>(session().getProperty("maxFieldSize"));
+	}
 
 	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, TextEncoding::find("UTF-8"),
 		TextEncoding::find(Poco::RefAnyCast<std::string>(session().getProperty("dbEncoding"))));
@@ -139,7 +153,15 @@ void ODBCStatementImpl::addPreparator()
 		Preparator::DataExtraction ext = session().getFeature("autoExtract") ?
 			Preparator::DE_BOUND : Preparator::DE_MANUAL;
 
-		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+		std::size_t maxFieldSize;
+		try
+		{
+			maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+		}
+		catch (Poco::BadCastException&)
+		{
+			maxFieldSize = AnyCast<int>(session().getProperty("maxFieldSize"));
+		}
 
 		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext));
 	}
@@ -216,6 +238,38 @@ void ODBCStatementImpl::doBind()
 }
 
 
+void ODBCStatementImpl::addErrors()
+{
+	SQLSMALLINT i = 0;
+	SQLSMALLINT len;
+	SQLRETURN ret;
+	do
+	{
+		_errorInfo.push_back({});
+		ret = SQLGetDiagRec(SQL_HANDLE_STMT, _stmt, ++i,
+			_errorInfo.back().state, &_errorInfo.back().native, _errorInfo.back().text,
+			sizeof(_errorInfo.back().text), &len);
+		if (!SQL_SUCCEEDED(ret) && _errorInfo.size())
+			_errorInfo.pop_back();
+	} while( ret == SQL_SUCCESS );
+}
+
+
+void ODBCStatementImpl::printErrors(std::ostream& os) const
+{
+	if (_errorInfo.size())
+	{
+		os << "Errors\n==================";
+		for (const auto& e : _errorInfo)
+		{
+			os << "\nstate: " << e.state << "\nnative: "
+				<< e.native << "\ntext: " << e.text << '\n';
+		}
+		os << "==================\n";
+	}
+}
+
+
 void ODBCStatementImpl::bindImpl()
 {
 	doBind();
@@ -223,9 +277,19 @@ void ODBCStatementImpl::bindImpl()
 	SQLRETURN rc = SQLExecute(_stmt);
 
 	if (SQL_NEED_DATA == rc) putData();
-	else checkError(rc, "SQLExecute()");
+	else checkError(rc, "ODBCStatementImpl::bindImpl():SQLExecute()");
 
 	_pBinder->synchronize();
+}
+
+
+void ODBCStatementImpl::execDirectImpl(const std::string& query)
+{
+	SQLCHAR * statementText = (SQLCHAR*) query.c_str();
+	SQLINTEGER textLength = static_cast<SQLINTEGER>(query.size());
+	SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);
+
+	checkError(rc, "SQLExecute()");
 }
 
 
@@ -242,13 +306,13 @@ void ODBCStatementImpl::putData()
 			dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
 
 			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize)))
-				throw StatementException(_stmt, "SQLPutData()");
+				throw StatementException(_stmt, "ODBCStatementImpl::putData():SQLPutData()");
 		}
 		else // if pParam is null pointer, do a dummy call
 		{
 			char dummy = 0;
 			if (Utility::isError(SQLPutData(_stmt, &dummy, 0)))
-				throw StatementException(_stmt, "SQLPutData()");
+				throw StatementException(_stmt, "ODBCStatementImpl::putData():SQLPutData()");
 		}
 	}
 
@@ -258,30 +322,12 @@ void ODBCStatementImpl::putData()
 
 void ODBCStatementImpl::clear()
 {
-	SQLRETURN rc = SQLCloseCursor(_stmt);
 	_stepCalled = false;
 	_affectedRowCount = 0;
-
+	_errorInfo.clear();
+	SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
 	if (Utility::isError(rc))
-	{
-		StatementError err(_stmt);
-		bool ignoreError = false;
-
-		const StatementDiagnostics& diagnostics = err.diagnostics();
-		//ignore "Invalid cursor state" error
-		//(returned by 3.x drivers when cursor is not opened)
-		for (int i = 0; i < diagnostics.count(); ++i)
-		{
-			if ((ignoreError =
-				(INVALID_CURSOR_STATE == std::string(diagnostics.sqlState(i)))))
-			{
-				break;
-			}
-		}
-
-		if (!ignoreError)
-			throw StatementException(_stmt, "SQLCloseCursor()");
-	}
+		throw StatementException(_stmt, "ODBCStatementImpl::putData():SQLFreeStmt(SQL_CLOSE)");
 }
 
 
@@ -326,6 +372,25 @@ void ODBCStatementImpl::makeStep()
 {
 	_extractors[currentDataSet()]->reset();
 	_nextResponse = SQLFetch(_stmt);
+	// workaround for SQL Server drivers 17, 18, ...
+	// stored procedure calls may produce additional data,
+	// causing SQLFetch error 24000 (invalid cursor state);
+	// when it happens, SQLMoreResults() is called to
+	// force SQL_NO_DATA response
+	if (Utility::isError(_nextResponse))
+	{
+		StatementError se(_stmt);
+		const StatementDiagnostics& sd = se.diagnostics();
+
+		for (int i = 0; i < sd.count(); ++i)
+		{
+			if (sd.sqlState(i) == INVALID_CURSOR_STATE)
+			{
+				_nextResponse = SQLMoreResults(_stmt);
+				break;
+			}
+		}
+	}
 	checkError(_nextResponse);
 	_stepCalled = true;
 }
@@ -354,7 +419,7 @@ std::size_t ODBCStatementImpl::next()
 	else
 	{
 		throw StatementException(_stmt,
-			std::string("Next row not available."));
+			"ODBCStatementImpl::next():Next row not available.");
 	}
 
 	return count;
@@ -407,6 +472,7 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 
 		throw StatementException(_stmt, str);
 	}
+	else if (SQL_SUCCESS_WITH_INFO == rc) addErrors();
 }
 
 

@@ -21,6 +21,6 @@ target_include_directories(mod_poco
 )
 target_link_libraries(mod_poco PUBLIC Poco::Util Poco::Net Apache::Apr Apache::Aprutil)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
 endif()

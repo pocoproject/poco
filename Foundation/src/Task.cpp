@@ -41,7 +41,7 @@ void Task::cancel()
 	_state = TASK_CANCELLING;
 	_cancelEvent.set();
 	if (_pOwner)
-		_pOwner->taskCancelled(this);
+		_pOwner.load()->taskCancelled(this);
 }
 
 
@@ -56,31 +56,32 @@ void Task::reset()
 void Task::run()
 {
 	TaskManager* pOwner = getOwner();
-	if (pOwner)
-		pOwner->taskStarted(this);
-	try
-	{
-		_state = TASK_RUNNING;
-		runTask();
-	}
-	catch (Exception& exc)
+	if (_state.exchange(TASK_RUNNING) < TASK_RUNNING)
 	{
 		if (pOwner)
-			pOwner->taskFailed(this, exc);
-	}
-	catch (std::exception& exc)
-	{
-		if (pOwner)
-			pOwner->taskFailed(this, SystemException(exc.what()));
-	}
-	catch (...)
-	{
-		if (pOwner)
-			pOwner->taskFailed(this, SystemException("unknown exception"));
+			pOwner->taskStarted(this);
+		try
+		{
+			runTask();
+		}
+		catch (Exception& exc)
+		{
+			if (pOwner)
+				pOwner->taskFailed(this, exc);
+		}
+		catch (std::exception& exc)
+		{
+			if (pOwner)
+				pOwner->taskFailed(this, SystemException("Task::run()", exc.what()));
+		}
+		catch (...)
+		{
+			if (pOwner)
+				pOwner->taskFailed(this, SystemException("Task::run(): unknown exception"));
+		}
 	}
 	_state = TASK_FINISHED;
-	if (pOwner)
-		pOwner->taskFinished(this);
+	if (pOwner) pOwner->taskFinished(this);
 }
 
 
@@ -99,28 +100,24 @@ bool Task::yield()
 
 void Task::setProgress(float progress)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	if (_progress != progress)
+	if (_progress.exchange(progress) != progress)
 	{
-		_progress = progress;
+		FastMutex::ScopedLock lock(_mutex);
 		if (_pOwner)
-			_pOwner->taskProgress(this, _progress);
+			_pOwner.load()->taskProgress(this, _progress);
 	}
 }
 
 
 void Task::setOwner(TaskManager* pOwner)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
 	_pOwner = pOwner;
 }
 
 
-void Task::setState(TaskState state)
+Task::TaskState Task::setState(TaskState state)
 {
-	_state = state;
+	return _state.exchange(state);
 }
 
 
@@ -131,7 +128,7 @@ void Task::postNotification(Notification* pNf)
 	FastMutex::ScopedLock lock(_mutex);
 
 	if (_pOwner)
-		_pOwner->postNotification(pNf);
+		_pOwner.load()->postNotification(pNf);
 	else if (pNf)
 		pNf->release();
 }

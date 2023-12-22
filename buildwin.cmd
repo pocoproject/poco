@@ -37,7 +37,6 @@ rem VS_VERSION {140 | 150 | 160 | 170}
 if "%1"=="" goto usage
 
 rem -version ^^[16.0^^,17.0^^)
-set VS_VERSION=vs%1
 rem  should be set "VSWHERE='%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe  -property installationPath -version ^[16.0^,17.0^)'"
 
 set VS_VERSION=vs%1
@@ -136,12 +135,12 @@ if not defined VCINSTALLDIR (
       ) else (
         if %VS_VERSION%==vs170 (
           if %PLATFORM%==x64 (
-            call "%VS170COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
+            call "%VS170COMNTOOLS%%VS_VARSALL%" x86_amd64
           ) else (
             if %PLATFORM%==arm64 (
               call "%VS170COMNTOOLS%%VS_VARSALL%" x86_arm64
             ) else (
-              call "%VS170COMNTOOLS%%VS_VARSALL%" x86 8.1
+              call "%VS170COMNTOOLS%%VS_VARSALL%" x86
             )
           )
         )

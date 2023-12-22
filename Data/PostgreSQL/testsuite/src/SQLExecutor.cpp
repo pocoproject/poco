@@ -141,7 +141,8 @@ private:
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_dataExecutor("Poco::Data SQL Executor", pSession, nullptr, true)
 {
 }
 
@@ -460,209 +461,43 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 
 void SQLExecutor::simpleAccess()
 {
-	std::string funct = "simpleAccess()";
-	std::string lastName = "lastName";
-	std::string firstName("firstName");
-	std::string address("Address");
-	int age = 133132;
-	int count = 0;
-	std::string result;
-
-	count = 0;
-	try
-	{
-		Statement stmt(*_pSession);
-		stmt << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastName), use(firstName), use(address), use(age);//, now;
-		stmt.execute();
-	}
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	assertTrue (count == 1);
-
-	try { *_pSession << "SELECT LastName FROM Person", into(result), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (lastName == result);
-
-	try { *_pSession << "SELECT Age FROM Person", into(count), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == age);
+	_dataExecutor.simpleAccess();
 }
 
 
 void SQLExecutor::complexType()
 {
-	std::string funct = "complexType()";
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(p1), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(p2), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	Person c1;
-	Person c2;
-	try { *_pSession << "SELECT * FROM Person WHERE LastName = 'LN1'", into(c1), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (c1 == p1);
+	_dataExecutor.complexType();
 }
 
 
 void SQLExecutor::simpleAccessVector()
 {
-	std::string funct = "simpleAccessVector()";
-	std::vector<std::string> lastNames;
-	std::vector<std::string> firstNames;
-	std::vector<std::string> addresses;
-	std::vector<int> ages;
-	std::string tableName("Person");
-	lastNames.push_back("LN1");
-	lastNames.push_back("LN2");
-	firstNames.push_back("FN1");
-	firstNames.push_back("FN2");
-	addresses.push_back("ADDR1");
-	addresses.push_back("ADDR2");
-	ages.push_back(1);
-	ages.push_back(2);
-	int count = 0;
-	std::string result;
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	std::vector<std::string> lastNamesR;
-	std::vector<std::string> firstNamesR;
-	std::vector<std::string> addressesR;
-	std::vector<int> agesR;
-	try { *_pSession << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ages == agesR);
-	assertTrue (lastNames == lastNamesR);
-	assertTrue (firstNames == firstNamesR);
-	assertTrue (addresses == addressesR);
+	_dataExecutor.simpleAccessVector();
 }
 
 
 void SQLExecutor::complexTypeVector()
 {
-	std::string funct = "complexTypeVector()";
-	std::vector<Person> people;
-	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
-	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	std::vector<Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result == people);
+	_dataExecutor.complexTypeVector();
 }
 
 
 void SQLExecutor::insertVector()
 {
-	std::string funct = "insertVector()";
-	std::vector<std::string> str;
-	str.push_back("s1");
-	str.push_back("s2");
-	str.push_back("s3");
-	str.push_back("s3");
-	int count = 100;
-
-	{
-		Statement stmt((*_pSession << "INSERT INTO Strings VALUES ($1)", use(str)));
-		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-		assertTrue (count == 0);
-
-		try { stmt.execute(); }
-		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-		assertTrue (count == 4);
-	}
-	count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 4);
+	_dataExecutor.insertVector();
 }
 
 
 void SQLExecutor::insertEmptyVector()
 {
-	std::string funct = "insertEmptyVector()";
-	std::vector<std::string> str;
-
-	try
-	{
-		*_pSession << "INSERT INTO Strings VALUES ($1)", use(str), now;
-		fail("empty collections should not work");
-	}
-	catch (Poco::Exception&)
-	{
-	}
+	_dataExecutor.insertEmptyVector();
 }
 
 
 void SQLExecutor::insertSingleBulk()
 {
-	std::string funct = "insertSingleBulk()";
-	int x = 0;
-	Statement stmt((*_pSession << "INSERT INTO Strings VALUES ($1)", use(x)));
-
-	for (x = 0; x < 100; ++x)
-	{
-		std::size_t i = stmt.execute();
-		assertTrue (i == 1);
-	}
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 100);
-
-	try { *_pSession << "SELECT SUM(str) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == ((0+99)*100/2));
+	_dataExecutor.insertSingleBulk();
 }
 
 
@@ -691,176 +526,50 @@ void SQLExecutor::unsignedInts()
 
 void SQLExecutor::floats()
 {
-	std::string funct = "floats()";
-	float data = 1.5f;
-	float ret = 0.0f;
-
-	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 1);
-
-	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == data);
+	_dataExecutor.floats();
 }
 
 
 void SQLExecutor::uuids()
 {
-	std::string funct = "uuids()";
-	Poco::UUID data("264a1c6f-7af5-43a5-a593-377aff3d2d7d");
-	Poco::UUID ret;
-
-	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 1);
-
-	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == data);
+	_dataExecutor.uuids();
 }
 
 
 void SQLExecutor::doubles()
 {
-	std::string funct = "floats()";
-	double data = 1.5;
-	double ret = 0.0;
-
-	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 1);
-
-	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == data);
+	_dataExecutor.doubles();
 }
 
 
 void SQLExecutor::insertSingleBulkVec()
 {
-	std::string funct = "insertSingleBulkVec()";
-	std::vector<int> data;
-
-	for (int x = 0; x < 100; ++x)
-		data.push_back(x);
-
-	Statement stmt((*_pSession << "INSERT INTO Strings VALUES ($1)", use(data)));
-	stmt.execute();
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	assertTrue (count == 100);
-	try { *_pSession << "SELECT SUM(str) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == ((0+99)*100/2));
+	_dataExecutor.insertSingleBulkVec();
 }
 
 
 void SQLExecutor::limits()
 {
-	std::string funct = "limit()";
-	std::vector<int> data;
-	for (int x = 0; x < 100; ++x)
-	{
-		data.push_back(x);
-	}
-
-	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	std::vector<int> retData;
-	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(50), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (retData.size() == 50);
-	for (int x = 0; x < 50; ++x)
-	{
-		assertTrue (data[x] == retData[x]);
-	}
+	_dataExecutor.limits();
 }
 
 
 void SQLExecutor::limitZero()
 {
-	std::string funct = "limitZero()";
-	std::vector<int> data;
-	for (int x = 0; x < 100; ++x)
-	{
-		data.push_back(x);
-	}
-
-	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	std::vector<int> retData;
-	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (retData.size() == 0);
+	_dataExecutor.limitZero();
 }
 
 
 void SQLExecutor::limitOnce()
 {
-	std::string funct = "limitOnce()";
-	std::vector<int> data;
-	for (int x = 0; x < 101; ++x)
-	{
-		data.push_back(x);
-	}
-
-	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	std::vector<int> retData;
-	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50), now);
-	assertTrue (!stmt.done());
-	assertTrue (retData.size() == 50);
-	stmt.execute();
-	assertTrue (!stmt.done());
-	assertTrue (retData.size() == 100);
-	stmt.execute();
-	assertTrue (stmt.done());
-	assertTrue (retData.size() == 101);
-
-	for (int x = 0; x < 101; ++x)
-	{
-		assertTrue (data[x] == retData[x]);
-	}
+	_dataExecutor.limitOnce();
 }
 
 
 void SQLExecutor::limitPrepare()
 {
+	// fails: _dataExecutor.limitPrepare();
+	// failed assert: "100 == stmt.execute()"
 	std::string funct = "limitPrepare()";
 	std::vector<int> data;
 	for (int x = 0; x < 100; ++x)
@@ -895,583 +604,137 @@ void SQLExecutor::limitPrepare()
 	{
 		assertTrue (data[x%100] == retData[x]);
 	}
+
 }
 
 
 
 void SQLExecutor::prepare()
 {
-	std::string funct = "prepare()";
-	std::vector<int> data;
-	for (int x = 0; x < 100; x += 2)
-	{
-		data.push_back(x);
-	}
-
-	{
-		Statement stmt((*_pSession << "INSERT INTO Strings VALUES ($1)", use(data)));
-	}
-	// stmt should not have been executed when destroyed
-	int count = 100;
-	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 0);
+	_dataExecutor.prepare();
 }
 
 
 void SQLExecutor::setSimple()
 {
-	std::string funct = "setSimple()";
-	std::set<std::string> lastNames;
-	std::set<std::string> firstNames;
-	std::set<std::string> addresses;
-	std::set<int> ages;
-	std::string tableName("Person");
-	lastNames.insert("LN1");
-	lastNames.insert("LN2");
-	firstNames.insert("FN1");
-	firstNames.insert("FN2");
-	addresses.insert("ADDR1");
-	addresses.insert("ADDR2");
-	ages.insert(1);
-	ages.insert(2);
-	int count = 0;
-	std::string result;
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	std::set<std::string> lastNamesR;
-	std::set<std::string> firstNamesR;
-	std::set<std::string> addressesR;
-	std::set<int> agesR;
-	try { *_pSession << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ages == agesR);
-	assertTrue (lastNames == lastNamesR);
-	assertTrue (firstNames == firstNamesR);
-	assertTrue (addresses == addressesR);
+	_dataExecutor.setSimple();
 }
 
 
 void SQLExecutor::setComplex()
 {
-	std::string funct = "setComplex()";
-	std::set<Person> people;
-	people.insert(Person("LN1", "FN1", "ADDR1", 1));
-	people.insert(Person("LN2", "FN2", "ADDR2", 2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	std::set<Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result == people);
+	_dataExecutor.setComplex();
 }
 
 
 void SQLExecutor::setComplexUnique()
 {
-	std::string funct = "setComplexUnique()";
-	std::vector<Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	people.push_back(p1);
-	people.push_back(p1);
-	people.push_back(p1);
-	people.push_back(p1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.push_back(p2);
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 5);
-
-	std::set<Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == 2);
-	assertTrue (*result.begin() == p1);
-	assertTrue (*++result.begin() == p2);
+	_dataExecutor.setComplexUnique();
 }
+
 
 void SQLExecutor::multiSetSimple()
 {
-	std::string funct = "multiSetSimple()";
-	std::multiset<std::string> lastNames;
-	std::multiset<std::string> firstNames;
-	std::multiset<std::string> addresses;
-	std::multiset<int> ages;
-	std::string tableName("Person");
-	lastNames.insert("LN1");
-	lastNames.insert("LN2");
-	firstNames.insert("FN1");
-	firstNames.insert("FN2");
-	addresses.insert("ADDR1");
-	addresses.insert("ADDR2");
-	ages.insert(1);
-	ages.insert(2);
-	int count = 0;
-	std::string result;
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	std::multiset<std::string> lastNamesR;
-	std::multiset<std::string> firstNamesR;
-	std::multiset<std::string> addressesR;
-	std::multiset<int> agesR;
-	try { *_pSession << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ages.size() == agesR.size());
-	assertTrue (lastNames.size() == lastNamesR.size());
-	assertTrue (firstNames.size() == firstNamesR.size());
-	assertTrue (addresses.size() == addressesR.size());
+	_dataExecutor.multiSetSimple();
 }
 
 
 void SQLExecutor::multiSetComplex()
 {
-	std::string funct = "multiSetComplex()";
-	std::multiset<Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	people.insert(p1);
-	people.insert(p1);
-	people.insert(p1);
-	people.insert(p1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(p2);
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 5);
-
-	std::multiset<Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == people.size());
+	_dataExecutor.multiSetComplex();
 }
 
 
 void SQLExecutor::mapComplex()
 {
-	std::string funct = "mapComplex()";
-	std::map<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN2", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-
-	std::map<std::string, Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result == people);
+	_dataExecutor.mapComplex();
 }
 
 
 void SQLExecutor::mapComplexUnique()
 {
-	std::string funct = "mapComplexUnique()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN2", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 5);
-
-	std::map<std::string, Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == 2);
+	_dataExecutor.mapComplexUnique();
 }
 
 
 void SQLExecutor::multiMapComplex()
 {
-	std::string funct = "multiMapComplex()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN2", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 5);
-
-	std::multimap<std::string, Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == people.size());
+	_dataExecutor.multiMapComplex();
 }
 
 
 void SQLExecutor::selectIntoSingle()
 {
-	std::string funct = "selectIntoSingle()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try { *_pSession << "SELECT * FROM Person", into(result), limit(1), now; }// will return 1 object into one single result
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result == p1);
+	_dataExecutor.selectIntoSingle();
 }
 
 
 void SQLExecutor::selectIntoSingleStep()
 {
-	std::string funct = "selectIntoSingleStep()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
-	stmt.execute();
-	assertTrue (result == p1);
-	assertTrue (!stmt.done());
-	stmt.execute();
-	assertTrue (result == p2);
-	assertTrue (stmt.done());
+	_dataExecutor.selectIntoSingleStep();
 }
 
 
 void SQLExecutor::selectIntoSingleFail()
 {
-	std::string funct = "selectIntoSingleFail()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), limit(2, true), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), limit(1, true), now; // will fail now
-		fail("hardLimit is set: must fail");
-	}
-	catch(Poco::Data::LimitException&)
-	{
-	}
+	_dataExecutor.selectIntoSingleFail();
 }
 
 
 void SQLExecutor::lowerLimitOk()
 {
-	std::string funct = "lowerLimitOk()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), lowerLimit(2), now; // will return 2 objects into one single result but only room for one!
-		fail("Not enough space for results");
-	}
-	catch(Poco::Exception&)
-	{
-	}
+	_dataExecutor.lowerLimitOk();
 }
 
 
 void SQLExecutor::singleSelect()
 {
-	std::string funct = "singleSelect()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
-	stmt.execute();
-	assertTrue (result == p1);
-	assertTrue (!stmt.done());
-	stmt.execute();
-	assertTrue (result == p2);
-	assertTrue (stmt.done());
+	_dataExecutor.singleSelect();
 }
 
 
 void SQLExecutor::lowerLimitFail()
 {
-	std::string funct = "lowerLimitFail()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), lowerLimit(3), now; // will fail
-		fail("should fail. not enough data");
-	}
-	catch(Poco::Exception&)
-	{
-	}
+	_dataExecutor.lowerLimitFail();
 }
 
 
 void SQLExecutor::combinedLimits()
 {
-	std::string funct = "combinedLimits()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	std::vector <Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), lowerLimit(2), upperLimit(2), now; }// will return 2 objects
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == 2);
-	assertTrue (result[0] == p1);
-	assertTrue (result[1] == p2);
+	_dataExecutor.combinedLimits();
 }
 
 
 
 void SQLExecutor::ranges()
 {
-	std::string funct = "range()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	std::vector <Person> result;
-	try { *_pSession << "SELECT * FROM Person", into(result), range(2, 2), now; }// will return 2 objects
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (result.size() == 2);
-	assertTrue (result[0] == p1);
-	assertTrue (result[1] == p2);
+	_dataExecutor.ranges();
 }
 
 
 void SQLExecutor::combinedIllegalLimits()
 {
-	std::string funct = "combinedIllegalLimits()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), lowerLimit(3), upperLimit(2), now;
-		fail("lower > upper is not allowed");
-	}
-	catch(LimitException&)
-	{
-	}
+	_dataExecutor.combinedIllegalLimits();
 }
 
 
 void SQLExecutor::illegalRange()
 {
-	std::string funct = "illegalRange()";
-	std::multimap<std::string, Person> people;
-	Person p1("LN1", "FN1", "ADDR1", 1);
-	Person p2("LN2", "FN2", "ADDR2", 2);
-	people.insert(std::make_pair("LN1", p1));
-	people.insert(std::make_pair("LN1", p2));
-
-	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(people), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 2);
-	Person result;
-	try
-	{
-		*_pSession << "SELECT * FROM Person", into(result), range(3, 2), now;
-		fail("lower > upper is not allowed");
-	}
-	catch(LimitException&)
-	{
-	}
+	_dataExecutor.illegalRange();
 }
 
 
 void SQLExecutor::emptyDB()
 {
-	std::string funct = "emptyDB()";
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 0);
-
-	Person result;
-	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
-	stmt.execute();
-	assertTrue (result.firstName.empty());
-	assertTrue (stmt.done());
+	_dataExecutor.emptyDB();
 }
 
 
 void SQLExecutor::dateTime()
 {
+	// fails because Person as defined here has a birthday but not a born column
+	//_dataExecutor.dateTime();
+
 	std::string funct = "dateTime()";
 	std::string lastName("Bart");
 	std::string firstName("Simpson");
@@ -1495,11 +758,15 @@ void SQLExecutor::dateTime()
 	assertTrue (bd == birthday);
 
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+
 }
 
 
 void SQLExecutor::date()
 {
+	// fails because Person as defined here has a birthday but not a bornDate column
+	//_dataExecutor.date();
+
 	std::string funct = "date()";
 	std::string lastName("Bart");
 	std::string firstName("Simpson");
@@ -1528,7 +795,9 @@ void SQLExecutor::date()
 
 void SQLExecutor::time()
 {
-	std::string funct = "date()";
+	// fails because Person as defined here has a birthday but not a bornTime column
+	//_dataExecutor.time();
+	std::string funct = "time()";
 	std::string lastName("Bart");
 	std::string firstName("Simpson");
 	std::string address("Springfield");
@@ -1657,51 +926,13 @@ void SQLExecutor::blobStmt()
 
 void SQLExecutor::tuples()
 {
-	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
-	std::string funct = "tuples()";
-	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
-
-	try { *_pSession << "INSERT INTO Tuples VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)", use(t), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	TupleType ret(-10,-11,-12,-13,-14,-15,-16,-17,-18,-19);
-	assertTrue (ret != t);
-	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == t);
+	_dataExecutor.tuples();
 }
 
 
 void SQLExecutor::tupleVector()
 {
-	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
-	std::string funct = "tupleVector()";
-	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
-	Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int>
-		t10(10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29);
-	TupleType t100(100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119);
-	std::vector<TupleType> v;
-	v.push_back(t);
-	v.push_back(t10);
-	v.push_back(t100);
-
-	try { *_pSession << "INSERT INTO Tuples VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)", use(v), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	int count = 0;
-	try { *_pSession << "SELECT COUNT(*) FROM Tuples", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (v.size() == (std::size_t) count);
-
-	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> > ret;
-	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (ret == v);
+	_dataExecutor.tupleVector();
 }
 
 
@@ -1829,328 +1060,30 @@ void SQLExecutor::doNull()
 
 void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 {
-	if (session.hasTransactionIsolation(ti))
-	{
-		std::string funct = "setTransactionIsolation()";
-
-		try
-		{
-			Transaction t(session, false);
-			t.setIsolation(ti);
-
-			assertTrue (ti == t.getIsolation());
-			assertTrue (t.isIsolation(ti));
-
-			assertTrue (ti == session.getTransactionIsolation());
-			assertTrue (session.isTransactionIsolation(ti));
-		}
-		catch(Poco::Exception& e){ std::cout << funct << ':' << e.displayText() << std::endl;}
-	}
-	else
-	{
-		std::cout << "Transaction isolation not supported: ";
-		switch (ti)
-		{
-		case Session::TRANSACTION_READ_COMMITTED:
-			std::cout << "READ COMMITTED"; break;
-		case Session::TRANSACTION_READ_UNCOMMITTED:
-			std::cout << "READ UNCOMMITTED"; break;
-		case Session::TRANSACTION_REPEATABLE_READ:
-			std::cout << "REPEATABLE READ"; break;
-		case Session::TRANSACTION_SERIALIZABLE:
-			std::cout << "SERIALIZABLE"; break;
-		default:
-			std::cout << "UNKNOWN"; break;
-		}
-		std::cout << std::endl;
-	}
+	_dataExecutor.setTransactionIsolation(session, ti);
 }
 
 
 void SQLExecutor::sessionTransaction(const std::string& connect)
 {
-	if (!_pSession->canTransact())
-	{
-		std::cout << "Session not capable of transactions." << std::endl;
-		return;
-	}
+	_dataExecutor.sessionTransaction("postgresql", connect);
+}
 
-	Session local("postgresql", connect);
-	local.setFeature("autoCommit", true);
 
-	std::string funct = "transaction()";
-	std::vector<std::string> lastNames;
-	std::vector<std::string> firstNames;
-	std::vector<std::string> addresses;
-	std::vector<int> ages;
-	std::string tableName("Person");
-	lastNames.push_back("LN1");
-	lastNames.push_back("LN2");
-	firstNames.push_back("FN1");
-	firstNames.push_back("FN2");
-	addresses.push_back("ADDR1");
-	addresses.push_back("ADDR2");
-	ages.push_back(1);
-	ages.push_back(2);
-	int count = 0, locCount = 0;
-	std::string result;
 
-	bool autoCommit = _pSession->getFeature("autoCommit");
-
-	// Next four lines inverted as autoCommit set to true is the normal mode
-// autocommit set to false is the same as issuing a "begin" statement
-_pSession->setFeature("autoCommit", false);
-	assertTrue (_pSession->isTransaction());
-
-	_pSession->setFeature("autoCommit", true);
-	assertTrue (!_pSession->isTransaction());
-
-	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_UNCOMMITTED);
-	setTransactionIsolation((*_pSession), Session::TRANSACTION_REPEATABLE_READ);
-	setTransactionIsolation((*_pSession), Session::TRANSACTION_SERIALIZABLE);
-
-	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_COMMITTED);
-
-	_pSession->begin();
-	assertTrue (_pSession->isTransaction());
-	try { (*_pSession) << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (_pSession->isTransaction());
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == locCount);
-
-	try { (*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (2 == count);
-	assertTrue (_pSession->isTransaction());
-	_pSession->rollback();
-	assertTrue (!_pSession->isTransaction());
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == locCount);
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (0 == count);
-	assertTrue (!_pSession->isTransaction());
-
-	_pSession->begin();
-	try { (*_pSession) << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (_pSession->isTransaction());
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == locCount);
-
-	_pSession->commit();
-	assertTrue (!_pSession->isTransaction());
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (2 == locCount);
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (2 == count);
-
-	_pSession->setFeature("autoCommit", autoCommit); // redundant but ok
+void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
+{
+	_dataExecutor.sessionTransactionNoAutoCommit("postgresql", connect);
 }
 
 
 void SQLExecutor::transaction(const std::string& connect)
 {
-	if (!_pSession->canTransact())
-	{
-		std::cout << "Session not transaction-capable." << std::endl;
-		return;
-	}
-
-	Session local("postgresql", connect);
-	local.setFeature("autoCommit", true);
-
-	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_COMMITTED);
-	setTransactionIsolation(local, Session::TRANSACTION_READ_COMMITTED);
-
-	std::string funct = "transaction()";
-	std::vector<std::string> lastNames;
-	std::vector<std::string> firstNames;
-	std::vector<std::string> addresses;
-	std::vector<int> ages;
-	std::string tableName("Person");
-	lastNames.push_back("LN1");
-	lastNames.push_back("LN2");
-	firstNames.push_back("FN1");
-	firstNames.push_back("FN2");
-	addresses.push_back("ADDR1");
-	addresses.push_back("ADDR2");
-	ages.push_back(1);
-	ages.push_back(2);
-	int count = 0, locCount = 0;
-	std::string result;
-
-	bool autoCommit = _pSession->getFeature("autoCommit");
-
-	_pSession->setFeature("autoCommit", false);
-	assertTrue (_pSession->isTransaction());
-	_pSession->setFeature("autoCommit", true);
-	assertTrue (!_pSession->isTransaction());
-
-	_pSession->setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
-
-	{
-		Transaction trans((*_pSession));
-		assertTrue (trans.isActive());
-		assertTrue (_pSession->isTransaction());
-
-		try { (*_pSession) << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-		assertTrue (_pSession->isTransaction());
-		assertTrue (trans.isActive());
-
-		try { (*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now; }
-		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-		assertTrue (2 == count);
-		assertTrue (_pSession->isTransaction());
-		assertTrue (trans.isActive());
-	}
-	assertTrue (!_pSession->isTransaction());
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (0 == count);
-	assertTrue (!_pSession->isTransaction());
-
-	{
-		Transaction trans((*_pSession));
-		try { (*_pSession) << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
-		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-		local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-		assertTrue (0 == locCount);
-
-		assertTrue (_pSession->isTransaction());
-		assertTrue (trans.isActive());
-		trans.commit();
-		assertTrue (!_pSession->isTransaction());
-		assertTrue (!trans.isActive());
-		local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-		assertTrue (2 == locCount);
-	}
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (2 == count);
-
-	_pSession->begin();
-	try { (*_pSession) << "DELETE FROM Person", now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (2 == locCount);
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (0 == count);
-	_pSession->commit();
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == locCount);
-
-	std::string sql1 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
-	std::string sql2 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[1], firstNames[1], addresses[1], ages[1]);
-	std::vector<std::string> sql;
-	sql.push_back(sql1);
-	sql.push_back(sql2);
-
-	Transaction trans((*_pSession));
-
-	trans.execute(sql1, false);
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (1 == count);
-	trans.execute(sql2, false);
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (2 == count);
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == locCount);
-
-	trans.rollback();
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (0 == locCount);
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (0 == count);
-
-	trans.execute(sql);
-
-	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assertTrue (2 == locCount);
-
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (2 == count);
-
-	_pSession->setFeature("autoCommit", autoCommit);
+	_dataExecutor.transaction("postgresql", connect);
 }
 
 
 void SQLExecutor::reconnect()
 {
-	std::string funct = "reconnect()";
-	std::string lastName = "lastName";
-	std::string firstName("firstName");
-	std::string address("Address");
-	int age = 133132;
-	int count = 0;
-	std::string result;
-
-	try { (*_pSession) << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastName), use(firstName), use(address), use(age), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-
-	count = 0;
-	try { (*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == 1);
-
-	assertTrue (_pSession->isConnected());
-	_pSession->close();
-	assertTrue (!_pSession->isConnected());
-	try
-	{
-		(*_pSession) << "SELECT LastName FROM Person", into(result), now;
-		fail ("must fail");
-	}
-	catch(NotConnectedException&){ }
-	assertTrue (!_pSession->isConnected());
-
-	_pSession->open();
-	assertTrue (_pSession->isConnected());
-	try { (*_pSession) << "SELECT Age FROM Person", into(count), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (count == age);
-	assertTrue (_pSession->isConnected());
+	_dataExecutor.reconnect();
 }

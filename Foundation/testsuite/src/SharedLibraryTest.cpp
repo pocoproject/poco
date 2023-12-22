@@ -13,12 +13,17 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/SharedLibrary.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
+#include "Poco/Format.h"
 
 
 using Poco::SharedLibrary;
 using Poco::NotFoundException;
 using Poco::LibraryLoadException;
 using Poco::LibraryAlreadyLoadedException;
+using Poco::Path;
+using Poco::File;
 
 
 typedef int (*GimmeFiveFunc)();
@@ -36,12 +41,11 @@ SharedLibraryTest::~SharedLibraryTest()
 
 void SharedLibraryTest::testSharedLibrary1()
 {
-	std::string path = "TestLibrary";
-	path.append(SharedLibrary::suffix());
+	std::string libraryPath = getFullName("TestLibrary");
 	SharedLibrary sl;
 	assertTrue (!sl.isLoaded());
-	sl.load(path);
-	assertTrue (sl.getPath() == path);
+	sl.load(libraryPath);
+	assertTrue (sl.getPath() == libraryPath);
 	assertTrue (sl.isLoaded());
 	assertTrue (sl.hasSymbol("pocoBuildManifest"));
 	assertTrue (sl.hasSymbol("pocoInitializeLibrary"));
@@ -70,10 +74,9 @@ void SharedLibraryTest::testSharedLibrary1()
 
 void SharedLibraryTest::testSharedLibrary2()
 {
-	std::string path = "TestLibrary";
-	path.append(SharedLibrary::suffix());
-	SharedLibrary sl(path);
-	assertTrue (sl.getPath() == path);
+	std::string libraryPath = getFullName("TestLibrary");
+	SharedLibrary sl(libraryPath);
+	assertTrue (sl.getPath() == libraryPath);
 	assertTrue (sl.isLoaded());
 
 	GimmeFiveFunc gimmeFive = (GimmeFiveFunc) sl.getSymbol("gimmeFive");
@@ -86,12 +89,12 @@ void SharedLibraryTest::testSharedLibrary2()
 
 void SharedLibraryTest::testSharedLibrary3()
 {
-	std::string path = "NonexistentLibrary";
-	path.append(SharedLibrary::suffix());
+	std::string libraryPath = "NonexistentLibrary";
+	libraryPath.append(libraryPath);
 	SharedLibrary sl;
 	try
 	{
-		sl.load(path);
+		sl.load(libraryPath);
 		failmsg("no such library - must throw exception");
 	}
 	catch (LibraryLoadException&)
@@ -103,14 +106,13 @@ void SharedLibraryTest::testSharedLibrary3()
 	}
 	assertTrue (!sl.isLoaded());
 
-	path = "TestLibrary";
-	path.append(SharedLibrary::suffix());
-	sl.load(path);
+	libraryPath = getFullName("TestLibrary");
+	sl.load(libraryPath);
 	assertTrue (sl.isLoaded());
 
 	try
 	{
-		sl.load(path);
+		sl.load(libraryPath);
 		failmsg("library already loaded - must throw exception");
 	}
 	catch (LibraryAlreadyLoadedException&)
@@ -124,6 +126,33 @@ void SharedLibraryTest::testSharedLibrary3()
 
 	sl.unload();
 	assertTrue (!sl.isLoaded());
+}
+
+
+std::string SharedLibraryTest::getFullName(const std::string& libName)
+{
+	// make
+	std::string name = Path::expand("$POCO_BASE");
+	char c = Path::separator();
+	std::string OSNAME = Path::expand("$OSNAME");
+	std::string OSARCH = Path::expand("$OSARCH");
+	name.append(1, c)
+		.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
+		.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
+		.append(libName).append(SharedLibrary::suffix());
+
+	// CMake
+	if (!File(name).exists())
+	{
+		name = Path::expand("$POCO_BASE");
+		name.append(Poco::format("%ccmake-build%cbin%c", c, c, c))
+			.append(libName).append(SharedLibrary::suffix());
+	}
+
+	if (!File(name).exists())
+		name = libName + SharedLibrary::suffix();
+
+	return name;
 }
 
 

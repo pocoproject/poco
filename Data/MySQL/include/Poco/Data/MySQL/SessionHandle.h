@@ -67,6 +67,9 @@ public:
 	void rollback();
 		/// Rollback transaction
 
+	void autoCommit(bool val);
+		/// Set autocommit mode
+
 	void reset();
 		/// Reset connection with dababase and clears session state, but without disconnecting
 

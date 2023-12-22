@@ -727,6 +727,15 @@ void MySQLTest::testTupleWithNullable()
 }
 
 
+void MySQLTest::testSessionPoolAndUnicode()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateStringsTable();
+	_pExecutor->sessionPoolAndUnicode(_dbConnString);
+}
+
+
 void MySQLTest::dropTable(const std::string& tableName)
 {
 	try { *_pSession << format("DROP TABLE IF EXISTS %s", tableName), now; }
@@ -993,6 +1002,6 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testReconnect);
-
+	CppUnit_addTest(pSuite, MySQLTest, testSessionPoolAndUnicode);
 	return pSuite;
 }

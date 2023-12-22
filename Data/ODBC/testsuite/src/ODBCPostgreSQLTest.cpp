@@ -44,7 +44,7 @@ using Poco::DateTime;
 	#define POSTGRESQL_DSN "PocoDataPgSQLTestW"
 #else
 	#ifdef POCO_PTR_IS_64_BIT
-		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI(x64)"
+		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
 	#else
 		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
 	#endif
@@ -59,8 +59,8 @@ using Poco::DateTime;
 #define POSTGRESQL_PORT    "5432"
 #define POSTGRESQL_DB      "postgres"
 #define POSTGRESQL_UID     "postgres"
-#define POSTGRESQL_PWD     "poco"
-#define POSTGRESQL_VERSION "10"
+#define POSTGRESQL_PWD     "postgres"
+#define POSTGRESQL_VERSION "16"
 
 #ifdef POCO_OS_FAMILY_WINDOWS
 const std::string ODBCPostgreSQLTest::_libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\pg" POSTGRESQL_VERSION "\\\\lib\\\\";
@@ -583,6 +583,9 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSession);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexType);
@@ -668,6 +671,9 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSessionTransaction);
 		// (postgres bug?)
 		// local session claims to be capable of reading uncommitted changes,

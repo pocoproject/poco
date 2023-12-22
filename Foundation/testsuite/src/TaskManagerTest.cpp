@@ -22,6 +22,7 @@
 #include "Poco/Observer.h"
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
+#include <iostream>
 
 
 using Poco::TaskManager;
@@ -51,12 +52,14 @@ namespace
 	public:
 		TestTask():
 			Task("TestTask"),
-			_fail(false)
+			_fail(false),
+			_started(false)
 		{
 		}
 
 		void runTask()
 		{
+			_started = true;
 			_event.wait();
 			setProgress(0.5);
 			_event.wait();
@@ -78,9 +81,15 @@ namespace
 			_event.set();
 		}
 
+		bool started() const
+		{
+			return _started;
+		}
+
 	private:
 		Event _event;
-		bool  _fail;
+		std::atomic<bool> _fail;
+		std::atomic<bool> _started;
 	};
 
 	class SimpleTask: public Task
@@ -169,11 +178,11 @@ namespace
 		}
 
 	private:
-		std::atomic<bool> _started;
-		std::atomic<bool> _cancelled;
-		std::atomic<bool> _finished;
-		Exception*        _pException;
-		float             _progress;
+		std::atomic<bool>       _started;
+		std::atomic<bool>       _cancelled;
+		std::atomic<bool>       _finished;
+		std::atomic<Exception*> _pException;
+		std::atomic<float>      _progress;
 	};
 
 
@@ -253,10 +262,11 @@ void TaskManagerTest::testFinish()
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
+	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
-	while (pTT->progress() != 0.5) Thread::sleep(50);
+	while (to.progress() == 0) Thread::sleep(50);
 	assertTrue (to.progress() == 0.5);
 	assertTrue (to.started());
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
@@ -274,6 +284,13 @@ void TaskManagerTest::testFinish()
 	list = tm.taskList();
 	assertTrue (list.empty());
 	assertTrue (!to.error());
+	tm.cancelAll();
+	tm.joinAll();
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
@@ -288,6 +305,7 @@ void TaskManagerTest::testCancel()
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
+	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
@@ -299,15 +317,25 @@ void TaskManagerTest::testCancel()
 	assertTrue (list.size() == 1);
 	assertTrue (tm.count() == 1);
 	tm.cancelAll();
+	while (pTT->state() != Task::TASK_CANCELLING) Thread::sleep(50);
+	pTT->cont();
 	assertTrue (to.cancelled());
 	pTT->cont();
 	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
+	while (!to.finished()) Thread::sleep(50);
 	assertTrue (to.finished());
 	while (tm.count() == 1) Thread::sleep(50);
 	list = tm.taskList();
 	assertTrue (list.empty());
 	assertTrue (!to.error());
+	tm.cancelAll();
+	tm.joinAll();
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
@@ -321,7 +349,8 @@ void TaskManagerTest::testError()
 	tm.addObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
-	tm.start(pTT.duplicate());
+	assertTrue (tm.start(pTT.duplicate()));
+	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
@@ -335,12 +364,22 @@ void TaskManagerTest::testError()
 	pTT->fail();
 	pTT->cont();
 	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	pTT->cont();
+	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
+	while (!to.finished()) Thread::sleep(50);
 	assertTrue (to.finished());
 	assertTrue (to.error() != 0);
 	while (tm.count() == 1) Thread::sleep(50);
 	list = tm.taskList();
 	assertTrue (list.empty());
+	tm.cancelAll();
+	tm.joinAll();
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
@@ -424,15 +463,49 @@ void TaskManagerTest::testCustom()
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(50);
 	assertTrue (tm.count() == 0);
+	tm.joinAll();
+}
+
+
+void TaskManagerTest::testCancelNoStart()
+{
+	TaskManager tm;
+	TaskObserver to;
+	tm.addObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.addObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.addObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.addObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
+	AutoPtr<TestTask> pTT = new TestTask;
+	pTT->cancel();
+	assertTrue (pTT->isCancelled());
+	assertFalse(tm.start(pTT.duplicate()));
+	assertTrue (pTT->progress() == 0);
+	assertTrue (pTT->isCancelled());
+	assertFalse (pTT->hasOwner());
+	tm.removeObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
+	tm.removeObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
+	tm.removeObserver(Observer<TaskObserver, TaskFailedNotification>(to, &TaskObserver::taskFailed));
+	tm.removeObserver(Observer<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
+	tm.removeObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 }
 
 
 void TaskManagerTest::testMultiTasks()
 {
 	TaskManager tm;
-	tm.start(new SimpleTask);
-	tm.start(new SimpleTask);
-	tm.start(new SimpleTask);
+
+	AutoPtr<SimpleTask> pTT1 = new SimpleTask;
+	AutoPtr<SimpleTask> pTT2 = new SimpleTask;
+	AutoPtr<SimpleTask> pTT3 = new SimpleTask;
+
+	tm.start(pTT1.duplicate());
+	tm.start(pTT2.duplicate());
+	tm.start(pTT3.duplicate());
+
+	assertTrue (pTT1->hasOwner());
+	assertTrue (pTT2->hasOwner());
+	assertTrue (pTT3->hasOwner());
 
 	TaskManager::TaskList list = tm.taskList();
 	assertTrue (list.size() == 3);
@@ -440,6 +513,14 @@ void TaskManagerTest::testMultiTasks()
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(100);
 	assertTrue (tm.count() == 0);
+	tm.joinAll();
+
+	while (pTT1->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertFalse (pTT1->hasOwner());
+	while (pTT2->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertFalse (pTT2->hasOwner());
+	while (pTT3->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertFalse (pTT3->hasOwner());
 }
 
 
@@ -472,7 +553,8 @@ void TaskManagerTest::testCustomThreadPool()
 
 	assertTrue (tm.count() == tp.allocated());
 
-	tp.joinAll();
+	tm.cancelAll();
+	tm.joinAll();
 }
 
 void TaskManagerTest::setUp()
@@ -492,6 +574,7 @@ CppUnit::Test* TaskManagerTest::suite()
 	CppUnit_addTest(pSuite, TaskManagerTest, testFinish);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCancel);
 	CppUnit_addTest(pSuite, TaskManagerTest, testError);
+	CppUnit_addTest(pSuite, TaskManagerTest, testCancelNoStart);
 	CppUnit_addTest(pSuite, TaskManagerTest, testMultiTasks);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCustom);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCustomThreadPool);

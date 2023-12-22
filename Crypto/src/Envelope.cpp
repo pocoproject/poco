@@ -14,6 +14,11 @@
 
 #include "Poco/Crypto/Envelope.h"
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	#if !defined(EVP_CIPHER_CTX_init)
+		#define EVP_CIPHER_CTX_init(a)
+	#endif
+#endif
 
 namespace Poco {
 namespace Crypto {

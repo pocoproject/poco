@@ -339,9 +339,8 @@ protected:
 		}
 
 		NotifyAsyncParams params = par;
-		TArgs retArgs(params.args);
-		params.ptrStrat->notify(params.pSender, retArgs);
-		return retArgs;
+		params.ptrStrat->notify(params.pSender, params.args);
+		return params.args;
 	}
 
 	TStrategy _strategy; /// The strategy used to notify observers.

@@ -16,8 +16,10 @@
 #include "Poco/Bugcheck.h"
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Dynamic/Pair.h"
+#include "Poco/Dynamic/VarVisitor.h"
 #include <map>
 #include <utility>
+#include <iostream>
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
@@ -48,9 +50,14 @@ public:
 		return _val;
 	}
 
-	bool operator == (int i)
+	bool operator == (int i) const
 	{
 		return i == _val;
+	}
+	
+	friend bool operator == (const Dummy &d1, const Dummy &d2)
+	{
+		return d1._val == d2._val;
 	}
 
 private:
@@ -2286,6 +2293,23 @@ void VarTest::testOrderedDynamicStructBasics()
 }
 
 
+void VarTest::testDynamicStructEmptyString()
+{
+	DynamicStruct aStruct;
+	aStruct["Empty"] = "";
+	aStruct["Space"] = " ";
+	assertEqual(aStruct.toString(true), "{ \"Empty\": \"\", \"Space\": \" \" }");
+}
+
+
+void VarTest::testDynamicStructNoEscapeString()
+{
+	DynamicStruct aStruct;
+	aStruct["Birthday"] = "{ \"Day\": 12, \"Month\": \"May\", \"Year\": 2005 }";
+	assertEqual(aStruct.toString(false), "{ \"Birthday\": { \"Day\": 12, \"Month\": \"May\", \"Year\": 2005 } }");
+}
+
+
 void VarTest::testDynamicStructString()
 {
 	DynamicStruct aStruct;
@@ -3086,6 +3110,170 @@ void VarTest::testSharedPtr()
 	assertTrue(p.referenceCount() == 1);
 }
 
+struct ProcessDummy
+{
+	Var &v;
+	ProcessDummy(Var &var) : v(var) {}
+	void operator()(const Dummy &d)
+	{
+		v = d;
+	}
+};
+
+#define ADD_HANDLER_FOR_TYPE_WITH_VALUE(Type, Handler, Value) \
+visitor.addHandler<Type>(Handler); \
+if (accepted) \
+{ \
+	var.emplace_back(Type(Value));\
+} \
+else \
+{ \
+	warn("handler already exists for " #Type "", __LINE__, __FILE__); \
+} void(0)
+
+void VarTest::testVarVisitor()
+{
+	Visitor visitor;
+	Var processedVar;
+	auto processInt8 = [&processedVar](const Poco::Int8 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::Int8 ";
+	};
+	auto processInt16 = [&processedVar](const Poco::Int16 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::Int16 ";
+	};
+	auto processInt32 = [&processedVar](const Poco::Int32 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::Int32 ";
+	};
+	auto processInt64 = [&processedVar](const Poco::Int64 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::Int64 ";
+	};
+	auto processUInt8 = [&processedVar](const Poco::UInt8 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::UInt8 ";
+	};
+	auto processUInt16 = [&processedVar](const Poco::UInt16 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::UInt16 ";
+	};
+	auto processUInt32 = [&processedVar](const Poco::UInt32 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::UInt32 ";
+	};
+	auto processUInt64 = [&processedVar](const Poco::UInt64 &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> Poco::UInt64 ";
+	};
+	auto processBool = [&processedVar](const bool &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> bool ";
+	};
+	auto processChar = [&processedVar](const char &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> char ";
+	};
+	auto processFloat = [&processedVar](const float &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> float ";
+	};
+	auto processDouble = [&processedVar](const double &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> double ";
+	};
+	auto processLong = [&processedVar](const long &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> long ";
+	};
+	auto processLongLong = [&processedVar](const long long &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> long long ";
+	};
+	auto processULong = [&processedVar](const unsigned long &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> unsigned long ";
+	};
+	auto processULongLong = [&processedVar](const unsigned long long &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> unsigned long long ";
+	};
+	auto processString = [&processedVar](const std::string &v) -> void
+	{
+		processedVar = v;
+		std::cout << " -> string ";
+	};
+	
+	std::vector<Var> var;
+	
+	using ulong = unsigned long;
+	using longlong = long long;
+	using ulonglong = unsigned long long;
+	
+	ProcessDummy processDummy(processedVar);
+	
+	bool accepted = false;
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int8,   processInt8,      -8);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int16,  processInt16,     -16);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int32,  processInt32,     -32);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int64,  processInt64,     -64);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::UInt8,  processUInt8,     8);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::UInt16, processUInt16,    16);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::UInt32, processUInt32,    32);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::UInt64, processUInt64,    64);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(bool,         processBool,      true);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(char,         processChar,      'f');
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(float,        processFloat,     1.2f);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(double,       processDouble,    2.4);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(long,         processLong,      123L);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulong,        processULong,     124UL);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(longlong,     processLongLong,  123123LL);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulonglong,    processULongLong, 124124ULL);
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(std::string,  processString,    "hello world");
+	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Dummy,        processDummy,     42);
+	
+	for (const auto &v : var)
+	{
+		std::cout << "handle type : " << v.type().name();
+		if (visitor.visit(v))
+		{
+			if (v.type() != typeid(Dummy))
+			{
+				std::cout  << " [" << v.toString() << "] ... ";
+				assertTrue(v == processedVar);
+			}
+			else
+			{
+				std::cout  << " [" << v.extract<Dummy>() << "] ... ";
+				assertTrue(v.extract<Dummy>() == processedVar.extract<Dummy>());
+			}
+			std::cout << " ok" << '\n';
+		}
+		else
+		{
+			std::cout << " fail" << '\n';
+			fail(Poco::format("failed type handle : %s", v.type().name()), __LINE__, __FILE__);
+		}
+	}
+}
+
 
 void VarTest::setUp()
 {
@@ -3131,6 +3319,8 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testDynamicPair);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructBasics);
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructBasics);
+	CppUnit_addTest(pSuite, VarTest, testDynamicStructEmptyString);
+	CppUnit_addTest(pSuite, VarTest, testDynamicStructNoEscapeString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
@@ -3153,6 +3343,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
+	CppUnit_addTest(pSuite, VarTest, testVarVisitor);
 
 	return pSuite;
 }

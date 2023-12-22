@@ -339,6 +339,7 @@ void SocketProactor::addReceiveFrom(Socket sock, Buffer& buf, Poco::Net::SocketA
 
 	Poco::Mutex::ScopedLock l(_readMutex);
 	_readHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
+	if (!has(sock)) addSocket(sock, PollSet::POLL_READ);
 }
 
 

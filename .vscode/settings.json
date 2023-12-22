@@ -91,7 +91,17 @@
 		"__bits": "cpp",
 		"variant": "cpp",
 		"condition_variable": "cpp",
-		"valarray": "cpp"
+		"valarray": "cpp",
+		"strstream": "cpp",
+		"future": "cpp",
+		"shared_mutex": "cpp",
+		"stop_token": "cpp",
+		"codecvt": "cpp",
+		"numbers": "cpp",
+		"span": "cpp",
+		"semaphore": "cpp",
+		"__verbose_abort": "cpp",
+		"charconv": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,

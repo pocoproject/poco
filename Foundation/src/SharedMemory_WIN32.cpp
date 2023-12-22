@@ -28,7 +28,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	_name(name),
 	_memHandle(INVALID_HANDLE_VALUE),
 	_fileHandle(INVALID_HANDLE_VALUE),
-	_size(static_cast<DWORD>(size)),
+	_size(size),
 	_mode(PAGE_READONLY),
 	_address(0)
 {
@@ -37,24 +37,38 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 
 	std::wstring utf16name;
 	UnicodeConverter::toUTF16(_name, utf16name);
-	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, 0, _size, utf16name.c_str());
+#ifdef _WIN64
+	const DWORD dwMaxSizeLow = static_cast<DWORD>(_size & 0xFFFFFFFFULL);
+	const DWORD dwMaxSizeHigh = static_cast<DWORD>((_size & (0xFFFFFFFFULL << 32)) >> 32);
+#else
+	if (_size > std::numeric_limits<DWORD>::max())
+	{
+		throw Poco::InvalidArgumentException(Poco::format("Requested shared memory size (%z) too large (max %lu)",
+			_size, std::numeric_limits<DWORD>::max()));
+	}
+	const DWORD dwMaxSizeLow = static_cast<DWORD>(_size);
+	const DWORD dwMaxSizeHigh = 0UL;
+#endif
+	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
 
 	if (!_memHandle)
 	{
 		DWORD dwRetVal = GetLastError();
-#if defined (_WIN32_WCE)
-		throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
-#else
+		int retVal = static_cast<int>(dwRetVal);
+
 		if (_mode != PAGE_READONLY || dwRetVal != 5)
-			throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
+		{
+			throw SystemException(Poco::format("Cannot create shared memory object %s [Error %d: %s]",
+				_name, retVal, Error::getMessage(dwRetVal)), retVal);
+		}
 
 		_memHandle = OpenFileMappingW(PAGE_READONLY, FALSE, utf16name.c_str());
 		if (!_memHandle)
 		{
 			dwRetVal = GetLastError();
-			throw SystemException(format("Cannot open shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
+			throw SystemException(Poco::format("Cannot open shared memory object %s [Error %d: %s]",
+				_name, retVal, Error::getMessage(dwRetVal)), retVal);
 		}
-#endif
 	}
 	map();
 }

@@ -37,6 +37,38 @@ ThreadImpl::~ThreadImpl()
 }
 
 
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+	{
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	if (realName != _pData->name)
+	{
+		_pData->name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	return _pData->name;
+}
+
+
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	// return fake thread name;
+	return isRunningImpl() ? _pData->name : "";
+}
+
+
 void ThreadImpl::setPriorityImpl(int prio)
 {
 	if (prio != _pData->prio)
@@ -141,37 +173,12 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
-    return taskIdSelf();
+	return taskIdSelf();
 }
 
 long ThreadImpl::currentOsTidImpl()
 {
 	return taskIdSelf();
-}
-
-void ThreadImpl::sleepImpl(long milliseconds)
-{
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timespec ts;
-		ts.tv_sec  = (long) remainingTime.totalSeconds();
-		ts.tv_nsec = (long) remainingTime.useconds()*1000;
-		Poco::Timestamp start;
-		rc = ::nanosleep(&ts, 0);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
 }
 
 
@@ -181,6 +188,7 @@ void ThreadImpl::runnableEntry(void* pThread, int, int, int, int, int, int, int,
 	_pCurrent = reinterpret_cast<ThreadImpl*>(pThread);
 
 	AutoPtr<ThreadData> pData = _pCurrent->_pData;
+
 	try
 	{
 		pData->pRunnableTarget->run();

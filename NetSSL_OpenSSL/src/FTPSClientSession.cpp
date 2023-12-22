@@ -96,7 +96,7 @@ void FTPSClientSession::afterCreateControlSocket()
 		try
 		{
 			if (!_pContext) _pContext = Poco::Net::SSLManager::instance().defaultClientContext();
-			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(*_pControlSocket, _pContext));
+			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(*_pControlSocket, getHost(), _pContext));
 			*_pControlSocket = sss;
 		}
 		catch (Poco::Exception&)
@@ -125,7 +125,7 @@ StreamSocket FTPSClientSession::establishDataConnection(const std::string& comma
 		Poco::Net::SecureStreamSocketImpl* pSecure = dynamic_cast<Poco::Net::SecureStreamSocketImpl*>(_pControlSocket->impl());
 		if (pSecure != nullptr)
 		{
-			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(ss, pSecure->context(), pSecure->currentSession()));
+			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(ss, getHost(), pSecure->context(), pSecure->currentSession()));
 			ss = sss;
 			if (_forceSessionReuse)
 			{

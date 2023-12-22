@@ -724,8 +724,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
 		XMLString attributeNamespaceURI = attributes.getURI(i);
-		XMLString attributeLocalName    = attributes.getLocalName(i);
-		XMLString attributeQName        = attributes.getQName(i);
+		const XMLString& attributeQName = attributes.getQName(i);
 
 		XMLString attributePrefix;
 		XMLString attributeLocal;
@@ -774,9 +773,9 @@ void XMLWriter::declareAttributeNamespaces(const Attributes& attributes)
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
-		XMLString namespaceURI = attributes.getURI(i);
-		XMLString localName    = attributes.getLocalName(i);
-		XMLString qname        = attributes.getQName(i);
+		const XMLString& namespaceURI = attributes.getURI(i);
+		const XMLString& localName    = attributes.getLocalName(i);
+		const XMLString& qname        = attributes.getQName(i);
 		if (!localName.empty())
 		{
 			XMLString prefix;
@@ -841,8 +840,8 @@ void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attr
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
-		XMLString namespaceURI = attributes.getURI(i);
-		XMLString localName    = attributes.getLocalName(i);
+		const XMLString& namespaceURI = attributes.getURI(i);
+		const XMLString& localName    = attributes.getLocalName(i);
 		XMLString qname        = attributes.getQName(i);
 		if (!localName.empty())
 		{
@@ -866,8 +865,8 @@ void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attribu
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
-		XMLString namespaceURI = attributes.getURI(i);
-		XMLString localName    = attributes.getLocalName(i);
+		const XMLString& namespaceURI = attributes.getURI(i);
+		const XMLString& localName    = attributes.getLocalName(i);
 		XMLString qname        = attributes.getQName(i);
 		XMLString fullQName    = qname;
 		if (!localName.empty())

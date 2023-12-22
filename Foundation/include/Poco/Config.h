@@ -42,7 +42,7 @@
 // #define POCO_NO_SHAREDMEMORY
 
 
-// Define if no <locale> header is available (such as on WinCE)
+// Define if no <locale> header is available
 // #define POCO_NO_LOCALE
 
 
@@ -50,6 +50,11 @@
 // Zero means OS default
 #ifndef POCO_THREAD_STACK_SIZE
 	#define POCO_THREAD_STACK_SIZE 0
+#endif
+
+// Defined to desired max thread name length
+#ifndef POCO_MAX_THREAD_NAME_LEN
+#define POCO_MAX_THREAD_NAME_LEN 15
 #endif
 
 
@@ -144,6 +149,10 @@
 
 // No UNIX socket support
 // Define to disable unix sockets
+// UNIX local sockets are default-enabled on
+// all UNIX systems, on Windows if available
+// See Net/SocketDefs.h
+// See https://devblogs.microsoft.com/commandline/af_unix-comes-to-windows/
 // #define POCO_NET_NO_UNIX_SOCKET
 
 
@@ -153,12 +162,6 @@
 // https://github.com/pocoproject/poco/wiki/Move-Semantics-in-POCO
 #ifndef POCO_NEW_STATE_ON_MOVE
 // #define POCO_NEW_STATE_ON_MOVE 1
-#endif
-
-
-// Windows CE has no locale support
-#if defined(_WIN32_WCE)
-	#define POCO_NO_LOCALE
 #endif
 
 
@@ -203,5 +206,15 @@
 // Disarm POCO_DEPRECATED macro.
 // #define POCO_NO_DEPRECATED
 
+// Enable usage of Poco::Mutex and Poco::FastMutex
+// as wrappers for std::recursive_mutex and std::mutex
+#ifndef POCO_ENABLE_STD_MUTEX
+//	#define POCO_ENABLE_STD_MUTEX
+#endif
+
+#define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+
+// Uncomment to explicitly disable SQLParser
+// #define POCO_DATA_NO_SQL_PARSER
 
 #endif // Foundation_Config_INCLUDED

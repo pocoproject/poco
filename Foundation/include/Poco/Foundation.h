@@ -44,7 +44,7 @@
 // Foundation_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(_WIN32_WCE)) && defined(POCO_DLL)
+#if defined(_WIN32) && defined(POCO_DLL)
 	#if defined(Foundation_EXPORTS)
 		#define Foundation_API __declspec(dllexport)
 	#else
@@ -90,6 +90,14 @@
 		#pragma comment(lib, "PocoFoundation" POCO_LIB_SUFFIX)
 	#endif
 #endif
+
+#include <string>
+
+namespace Poco {
+
+using namespace std::literals;
+
+} // namespace Poco
 
 
 //

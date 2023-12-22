@@ -20,6 +20,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Observer.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include <sstream>
@@ -36,8 +37,10 @@ using Poco::Net::SocketNotification;
 using Poco::Net::ReadableNotification;
 using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
+using Poco::Net::ErrorNotification;
 using Poco::Net::ShutdownNotification;
 using Poco::Observer;
+using Poco::Stopwatch;
 using Poco::IllegalStateException;
 using Poco::Thread;
 
@@ -134,11 +137,17 @@ namespace
 				checkReadableObserverCount(1);
 				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
 				checkReadableObserverCount(0);
-				if (_once || _data.size() == MAX_DATA_SIZE)
+				if (_once)
 				{
 					_reactor.stop();
 					delete this;
+					return;
 				}
+			}
+			if (_data.size() == MAX_DATA_SIZE)
+			{
+				_reactor.stop();
+				delete this;
 			}
 		}
 
@@ -259,7 +268,6 @@ namespace
 		static bool                                          _once;
 	};
 
-
 	std::string ClientServiceHandler::_data;
 	bool ClientServiceHandler::_readableError = false;
 	bool ClientServiceHandler::_writableError = false;
@@ -290,12 +298,6 @@ namespace
 		void onTimeout(TimeoutNotification* pNf)
 		{
 			pNf->release();
-			_failed = true;
-			reactor()->stop();
-		}
-
-		void onError(int error)
-		{
 			_failed = true;
 			reactor()->stop();
 		}
@@ -397,7 +399,7 @@ namespace
 	class DummyServiceHandler
 	{
 	public:
-		DummyServiceHandler(StreamSocket& socket, SocketReactor& reactor): _socket(socket),
+		DummyServiceHandler(StreamSocket& socket, SocketReactor& reactor) : _socket(socket),
 			_reactor(reactor)
 		{
 			_reactor.addEventHandler(_socket, Observer<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
@@ -664,6 +666,23 @@ void SocketReactorTest::testSocketConnectorDeadlock()
 }
 
 
+void SocketReactorTest::testSocketReactorWakeup()
+{
+	SocketReactor::Params params;
+	params.pollTimeout = 1000000000;
+	params.sleepLimit = 1000000000;
+	SocketReactor reactor(params);
+	Thread thread;
+	Stopwatch sw;
+	sw.start();
+	thread.start(reactor);
+	reactor.stop();
+	thread.join();
+	sw.stop();
+	assertTrue (sw.elapsed() < 100000);
+}
+
+
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -686,6 +705,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorTimeout);
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
+	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorWakeup);
 
 	return pSuite;
 }

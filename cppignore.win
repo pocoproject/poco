@@ -2,6 +2,7 @@ class CppUnit::TestCaller<class NTPClientTest>.testTimeSync
 class CppUnit::TestCaller<class GlobTest>.testGlob
 class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4
 class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4
+class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4Move
 class CppUnit::TestCaller<class ICMPClientTest>.testPing
 class CppUnit::TestCaller<class ICMPClientTest>.testBigPing
 class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy
@@ -20,3 +21,4 @@ class CppUnit::TestCaller<class WinServiceTest>.testServiceReturnsTrueIfStopped
 class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom
 class CppUnit::TestCaller<class ICMPSocketTest>.testMTU
 class CppUnit::TestCaller<class HTTPSClientSessionTest>.testCachedSession
+class CppUnit::TestCaller<class PollSetTest>.testPollClosedServer

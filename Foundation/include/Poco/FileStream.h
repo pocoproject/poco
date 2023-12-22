@@ -47,26 +47,14 @@ class Foundation_API FileIOS: public virtual std::ios
 	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
-	FileIOS(std::ios::openmode defaultMode);
+
+	using NativeHandle = FileStreamBuf::NativeHandle;
+
+	FileIOS();
 		/// Creates the basic stream.
 
 	~FileIOS();
 		/// Destroys the stream.
-
-	void open(const std::string& path, std::ios::openmode mode);
-		/// Opens the file specified by path, using the given mode.
-		///
-		/// Throws a FileException (or a similar exception) if the file
-		/// does not exist or is not accessible for other reasons and
-		/// a new file cannot be created.
-
-	void open(const std::string& path);
-		/// Opens the file specified by path, using the default mode given 
-		/// in the constructor.
-		///
-		/// Throws a FileException (or a similar exception) if the file 
-		/// does not exist or is not accessible for other reasons and
-		/// a new file cannot be created.
 
 	void close();
 		/// Closes the file stream.
@@ -78,9 +66,14 @@ public:
 	FileStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
+	NativeHandle nativeHandle() const;
+		/// Returns native file descriptor handle
+
+	Poco::UInt64 size() const;
+		/// Returns file size
+
 protected:
 	FileStreamBuf _buf;
-	std::ios::openmode _defaultMode;
 };
 
 
@@ -111,6 +104,14 @@ public:
 
 	~FileInputStream();
 		/// Destroys the stream.
+
+	void open(const std::string& path, std::ios::openmode mode = std::ios::in);
+		/// Opens the file specified by path, using the given mode, which
+		/// will always include std::ios::in (even if not specified).
+		///
+		/// Throws a FileException (or a similar exception) if the file
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
 };
 
 
@@ -139,9 +140,25 @@ public:
 		/// Throws a FileException (or a similar exception) if the file
 		/// does not exist or is not accessible for other reasons and
 		/// a new file cannot be created.
+		///
+		/// NOTE: The default mode std::ios::out | std::ios::trunc is different from the default
+		/// for std::ofstream, which is std::ios::out only. This is for backwards compatibility
+		/// with earlier POCO versions.
 
 	~FileOutputStream();
 		/// Destroys the FileOutputStream.
+
+	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::trunc);
+		/// Opens the file specified by path, using the given mode, which
+		/// always includes std::ios::out, even if not specified.
+		///
+		/// Throws a FileException (or a similar exception) if the file
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
+		///
+		/// NOTE: The default mode std::ios::out | std::ios::trunc is different from the default
+		/// for std::ostream, which is std::ios::out only. This is for backwards compatibility
+		/// with earlier POCO versions.
 };
 
 
@@ -168,9 +185,20 @@ public:
 	FileStream(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in);
 		/// Creates the FileStream for the file given by path, using
 		/// the given mode.
+		///
+		/// NOTE: The default mode std::ios::in | std::ios::out is different from the default
+		/// for std::fstream, which is std::ios::out only. This is for backwards compatibility
+		/// with earlier POCO versions.
 
 	~FileStream();
 		/// Destroys the FileOutputStream.
+
+	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in);
+		/// Opens the file specified by path, using the given mode.
+		///
+		/// Throws a FileException (or a similar exception) if the file
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
 };
 
 

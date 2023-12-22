@@ -21,14 +21,12 @@
 #include "Poco/Foundation.h"
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
+#include <thread>
+#include <chrono>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Thread_WINCE.h"
-#else
 #include "Poco/Thread_WIN32.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/Thread_VX.h"
 #else
@@ -72,11 +70,23 @@ public:
 		POLICY_DEFAULT = POLICY_DEFAULT_IMPL
 	};
 
-	Thread();
+	Thread(uint32_t sigMask = 0);
 		/// Creates a thread. Call start() to start it.
+		/// 
+		/// The optional sigMask parameter specifies which signals should be blocked.
+		/// To block a specific signal, set the corresponding bit in the sigMask.
+		/// Multiple bits can be set in the mask to block multiple signals if needed.
+		///
+		/// Available on POSIX platforms only
 
-	Thread(const std::string& name);
+	Thread(const std::string& name, uint32_t sigMask = 0);
 		/// Creates a named thread. Call start() to start it.
+		/// 
+		/// The optional sigMask parameter specifies which signals should be blocked.
+		/// To block a specific signal, set the corresponding bit in the sigMask.
+		/// Multiple bits can be set in the mask to block multiple signals if needed.
+		///
+		/// Available on POSIX platforms only
 
 	~Thread();
 		/// Destroys the thread.
@@ -95,6 +105,7 @@ public:
 
 	void setName(const std::string& name);
 		/// Sets the name of the thread.
+		/// Note that it only take effect before start method invoked.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.
@@ -206,6 +217,9 @@ public:
 		/// wakeUp() before calling trySleep() will prevent the next
 		/// trySleep() call to actually suspend the thread (which, in
 		/// some scenarios, may be desirable behavior).
+		///
+		/// Note that, unlike Thread::sleep(), this function can only
+		/// be succesfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
@@ -229,6 +243,17 @@ public:
 
 	static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
+
+	bool setAffinity(int coreId);
+		/// Sets the thread affinity to the coreID.
+		/// Returns true if succesful.
+		/// Returns false if not succesful or not
+		/// implemented.
+
+	int getAffinity() const;
+		/// Returns the thread affinity.
+		/// Negative value means the thread has
+		/// no CPU core affinity.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -275,10 +300,8 @@ private:
 	Thread& operator = (const Thread&);
 
 	int                 _id;
-	std::string         _name;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
-	mutable FastMutex   _mutex;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -302,17 +325,13 @@ inline int Thread::id() const
 
 inline std::string Thread::name() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	return _name;
+	return getNameImpl();
 }
 
 
 inline std::string Thread::getName() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	return _name;
+	return getNameImpl();
 }
 
 
@@ -322,15 +341,15 @@ inline bool Thread::isRunning() const
 }
 
 
-inline void Thread::sleep(long milliseconds)
-{
-	sleepImpl(milliseconds);
-}
-
-
 inline void Thread::yield()
 {
 	yieldImpl();
+}
+
+
+inline void Thread::sleep(long milliseconds)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 
@@ -385,6 +404,18 @@ inline long Thread::currentOsTid()
 {
 	return currentOsTidImpl();
 }
+
+inline bool Thread::setAffinity(int coreId)
+{
+	return setAffinityImpl(coreId);
+}
+
+
+inline int Thread::getAffinity() const
+{
+	return getAffinityImpl();
+}
+
 
 } // namespace Poco
 

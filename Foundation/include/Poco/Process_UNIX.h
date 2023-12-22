@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <vector>
 #include <map>
+#include <atomic>
 
 
 namespace Poco {
@@ -42,7 +43,7 @@ public:
 	int tryWait() const;
 
 private:
-	pid_t _pid;
+	std::atomic<pid_t> _pid;
 };
 
 

@@ -38,6 +38,7 @@
 #include <list>
 #include <deque>
 #include <typeinfo>
+#include <type_traits>
 #undef min
 #undef max
 #include <limits>
@@ -67,10 +68,12 @@ void Foundation_API appendJSONString(std::string& val, const Var& any);
 	/// regardless of the underlying type) and appends it to val.
 
 
-void Foundation_API appendJSONValue(std::string& val, const Var& any);
+void Foundation_API appendJSONValue(std::string& val, const Var& any, bool wrap = true);
 	/// Converts the any to a JSON value (if underlying type qualifies
-	/// as string - see isJSONString() - , it is wrapped into double quotes)
-	/// and appends it to val
+	/// as string - see isJSONString() - it is wrapped into double quotes)
+	/// and appends it to val.
+	/// Wrapping can be prevented (useful for appending JSON fragments) by setting
+	/// the wrap argument to false.
 
 
 template <typename C>
@@ -358,7 +361,7 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit<F,T>(from);
+		checkUpperLimit<std::make_unsigned_t<F>,T>(from);
 		to = static_cast<T>(from);
 	}
 

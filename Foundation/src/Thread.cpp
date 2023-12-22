@@ -21,11 +21,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Thread_WINCE.cpp"
-#else
 #include "Thread_WIN32.cpp"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Thread_VX.cpp"
 #else
@@ -88,21 +84,27 @@ private:
 } // namespace
 
 
-Thread::Thread():
+Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
-	_name(makeName()),
 	_pTLS(0),
 	_event(true)
 {
+	setNameImpl(makeName());
+#if defined(POCO_OS_FAMILY_UNIX)
+	setSignalMaskImpl(sigMask);
+#endif
 }
 
 
-Thread::Thread(const std::string& name):
+Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
-	_name(name),
 	_pTLS(0),
 	_event(true)
 {
+	setNameImpl(name);
+#if defined(POCO_OS_FAMILY_UNIX)
+	setSignalMaskImpl(sigMask);
+#endif
 }
 
 
@@ -210,9 +212,7 @@ int Thread::uniqueId()
 
 void Thread::setName(const std::string& name)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	_name = name;
+	setNameImpl(name);
 }
 
 

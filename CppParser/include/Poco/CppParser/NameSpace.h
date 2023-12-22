@@ -61,7 +61,7 @@ public:
 
 	Iterator end() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
-
+	
 	virtual Symbol* lookup(const std::string& name) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null

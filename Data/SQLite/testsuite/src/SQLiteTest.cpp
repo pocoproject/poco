@@ -89,6 +89,7 @@ using Poco::Int64;
 using Poco::Dynamic::Var;
 using Poco::Data::SQLite::Utility;
 using Poco::delegate;
+using Poco::Stopwatch;
 
 
 class Person
@@ -251,6 +252,31 @@ SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 SQLiteTest::~SQLiteTest()
 {
 	Poco::Data::SQLite::Connector::unregisterConnector();
+}
+
+
+void SQLiteTest::testBind()
+{
+	std::vector<int> vf1;
+	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS test", now;
+	session << "CREATE TABLE test (f1 INTEGER)", now;
+
+	Statement statement(session);
+	statement << "INSERT INTO test(f1) VALUES(?)";
+	statement.addBind(Poco::Data::Keywords::bind(1, "f1"));
+	statement.execute();
+	session << "SELECT f1 FROM test", into(vf1), now;
+	assertTrue (vf1.size() == 1);
+	assertTrue (vf1[0] == 1);
+	statement.removeBind("f1");
+	statement.addBind(Poco::Data::Keywords::bind(2, "f1"));
+	statement.execute();
+	vf1.clear();
+	session << "SELECT f1 FROM test", into(vf1), now;
+	assertTrue (vf1.size() == 2);
+	assertTrue (vf1[0] == 1);
+	assertTrue (vf1[1] == 2);
 }
 
 
@@ -1383,7 +1409,7 @@ void SQLiteTest::testNonexistingDB()
 		Session tmp (Poco::Data::SQLite::Connector::KEY, "foo/bar/nonexisting.db", 1);
 		fail("non-existing DB must throw");
 	}
-	catch(ConnectionFailedException& ex)
+	catch(ConnectionFailedException&)
 	{
 		return;
 	}
@@ -2449,53 +2475,68 @@ void SQLiteTest::testSQLChannel()
 		"DateTime DATE)", now;
 
 	AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
+	Stopwatch sw; sw.start();
+	while (!pChannel->isRunning())
+	{
+		Thread::sleep(10);
+		if (sw.elapsedSeconds() > 3)
+			fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
+	}
+	// bulk binding mode is not suported by SQLite, but SQLChannel should handle it internally
+	pChannel->setProperty("bulk", "true");
 	pChannel->setProperty("keep", "2 seconds");
 
 	Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
 	pChannel->log(msgInf);
+	while (pChannel->logged() != 1) Thread::sleep(100);
+
 	Message msgWarn("WarningSource", "b Warning async message", Message::PRIO_WARNING);
 	pChannel->log(msgWarn);
-	pChannel->wait();
+	while (pChannel->logged() != 2) Thread::sleep(10);
 
-	pChannel->setProperty("async", "false");
 	Message msgInfS("InformationSource", "c Informational sync message", Message::PRIO_INFORMATION);
 	pChannel->log(msgInfS);
+	while (pChannel->logged() != 3) Thread::sleep(10);
 	Message msgWarnS("WarningSource", "d Warning sync message", Message::PRIO_WARNING);
 	pChannel->log(msgWarnS);
+	while (pChannel->logged() != 4) Thread::sleep(10);
 
 	RecordSet rs(tmp, "SELECT * FROM T_POCO_LOG ORDER by Text");
-	assertTrue (4 == rs.rowCount());
-	assertTrue ("InformationSource" == rs["Source"]);
-	assertTrue ("a Informational async message" == rs["Text"]);
+	size_t rc = rs.rowCount();
+	assertTrue(4 == rc);
+	assertTrue("InformationSource" == rs["Source"]);
+	assertTrue("a Informational async message" == rs["Text"]);
 	rs.moveNext();
-	assertTrue ("WarningSource" == rs["Source"]);
-	assertTrue ("b Warning async message" == rs["Text"]);
+	assertTrue("WarningSource" == rs["Source"]);
+	assertTrue("b Warning async message" == rs["Text"]);
 	rs.moveNext();
-	assertTrue ("InformationSource" == rs["Source"]);
-	assertTrue ("c Informational sync message" == rs["Text"]);
+	assertTrue("InformationSource" == rs["Source"]);
+	assertTrue("c Informational sync message" == rs["Text"]);
 	rs.moveNext();
-	assertTrue ("WarningSource" == rs["Source"]);
-	assertTrue ("d Warning sync message" == rs["Text"]);
+	assertTrue("WarningSource" == rs["Source"]);
+	assertTrue("d Warning sync message" == rs["Text"]);
 
-	Thread::sleep(3000);
+	Thread::sleep(3000); // give it time to archive
 
 	Message msgInfA("InformationSource", "e Informational sync message", Message::PRIO_INFORMATION);
 	pChannel->log(msgInfA);
+	while (pChannel->logged() != 5) Thread::sleep(10);
 	Message msgWarnA("WarningSource", "f Warning sync message", Message::PRIO_WARNING);
 	pChannel->log(msgWarnA);
+	while (pChannel->logged() != 6) Thread::sleep(10);
 
 	RecordSet rs1(tmp, "SELECT * FROM T_POCO_LOG_ARCHIVE");
-	assertTrue (4 == rs1.rowCount());
+	assertTrue(4 == rs1.rowCount());
 
 	pChannel->setProperty("keep", "");
-	assertTrue ("forever" == pChannel->getProperty("keep"));
+	assertTrue("forever" == pChannel->getProperty("keep"));
 	RecordSet rs2(tmp, "SELECT * FROM T_POCO_LOG ORDER by Text");
-	assertTrue (2 == rs2.rowCount());
-	assertTrue ("InformationSource" == rs2["Source"]);
-	assertTrue ("e Informational sync message" == rs2["Text"]);
+	assertTrue(2 == rs2.rowCount());
+	assertTrue("InformationSource" == rs2["Source"]);
+	assertTrue("e Informational sync message" == rs2["Text"]);
 	rs2.moveNext();
-	assertTrue ("WarningSource" == rs2["Source"]);
-	assertTrue ("f Warning sync message" == rs2["Text"]);
+	assertTrue("WarningSource" == rs2["Source"]);
+	assertTrue("f Warning sync message" == rs2["Text"]);
 }
 
 
@@ -2512,25 +2553,30 @@ void SQLiteTest::testSQLLogger()
 		"Text VARCHAR,"
 		"DateTime DATE)", now;
 
+	Logger& root = Logger::root();
+	AutoPtr<SQLChannel> pSQLChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
+	Stopwatch sw; sw.start();
+	while (!pSQLChannel->isRunning())
 	{
-		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
-		Logger& root = Logger::root();
-		root.setChannel(pChannel);
-		root.setLevel(Message::PRIO_INFORMATION);
-
-		root.information("Informational message");
-		root.warning("Warning message");
-		root.debug("Debug message");
+		Thread::sleep(10);
+		if (sw.elapsedSeconds() > 3)
+			fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
 	}
+	root.setChannel(pSQLChannel);
+	root.setLevel(Message::PRIO_INFORMATION);
 
-	Thread::sleep(100);
-	RecordSet rs(tmp, "SELECT * FROM T_POCO_LOG ORDER by DateTime");
-	assertTrue (2 == rs.rowCount());
-	assertTrue ("TestSQLChannel" == rs["Source"]);
-	assertTrue ("Informational message" == rs["Text"]);
+	root.information("a Informational message");
+	root.warning("b Warning message");
+	root.debug("Debug message");
+
+	while (pSQLChannel->logged() != 2) Thread::sleep(100);
+	RecordSet rs(tmp, "SELECT * FROM T_POCO_LOG ORDER by Text");
+	assertTrue(2 == rs.rowCount());
+	assertTrue("TestSQLChannel" == rs["Source"]);
+	assertTrue("a Informational message" == rs["Text"]);
 	rs.moveNext();
-	assertTrue ("TestSQLChannel" == rs["Source"]);
-	assertTrue ("Warning message" == rs["Text"]);
+	assertTrue("TestSQLChannel" == rs["Source"]);
+	assertTrue("b Warning message" == rs["Text"]);
 }
 
 
@@ -3105,12 +3151,6 @@ void SQLiteTest::testSessionTransaction()
 	Session local (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assertTrue (local.isConnected());
 
-	try
-	{
-		local.setFeature("autoCommit", true);
-		fail ("Setting SQLite auto-commit explicitly must fail!");
-	}
-	catch (NotImplementedException&) { }
 	assertTrue (local.getFeature("autoCommit"));
 
 	std::string funct = "transaction()";
@@ -3210,12 +3250,16 @@ void SQLiteTest::testTransaction()
 	std::string tableName("Person");
 	lastNames.push_back("LN1");
 	lastNames.push_back("LN2");
+	lastNames.push_back("LN3");
 	firstNames.push_back("FN1");
 	firstNames.push_back("FN2");
+	firstNames.push_back("FN3");
 	addresses.push_back("ADDR1");
 	addresses.push_back("ADDR2");
+	addresses.push_back("ADDR3");
 	ages.push_back(1);
 	ages.push_back(2);
+	ages.push_back(3);
 	int count = 0, locCount = 0;
 	std::string result;
 
@@ -3233,7 +3277,7 @@ void SQLiteTest::testTransaction()
 		assertTrue (trans.isActive());
 
 		session << "SELECT COUNT(*) FROM Person", into(count), now;
-		assertTrue (2 == count);
+		assertTrue (3 == count);
 		assertTrue (session.isTransaction());
 		assertTrue (trans.isActive());
 		// no explicit commit, so transaction RAII must roll back here
@@ -3260,9 +3304,9 @@ void SQLiteTest::testTransaction()
 	}
 
 	session << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (2 == count);
+	assertTrue (3 == count);
 	local << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (2 == count);
+	assertTrue (3 == count);
 
 	session << "DELETE FROM Person", now;
 
@@ -3289,13 +3333,29 @@ void SQLiteTest::testTransaction()
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 
-	trans.execute(sql);
+	bool status = trans.execute(sql);
+	assertTrue (status);
 
 	Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
 	assertTrue (2 == locCount);
 
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
+
+	session << "DELETE FROM Person", now;
+
+	std::string sql3 = format("INSERT INTO Pers VALUES ('%s','%s','%s',%d)", lastNames[2], firstNames[2], addresses[2], ages[2]);
+	// Table name is misspelled, should cause transaction rollback
+	sql.push_back(sql3);
+
+	std::string info;
+	status = trans.execute(sql, &info);
+
+	assertFalse (status);
+	assertEqual (info, "Invalid SQL statement: no such table: Pers: no such table: Pers");
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assertTrue (0 == count);
 
 	session.close();
 	assertTrue (!session.isConnected());
@@ -3481,6 +3541,7 @@ CppUnit::Test* SQLiteTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
 
+	CppUnit_addTest(pSuite, SQLiteTest, testBind);
 	CppUnit_addTest(pSuite, SQLiteTest, testBinding);
 	CppUnit_addTest(pSuite, SQLiteTest, testZeroRows);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);

@@ -324,6 +324,7 @@ void TCPServerTest::testReuseSession()
 		9,
 		true,
 		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	pServerContext->disableProtocols(Context::PROTO_TLSV1_3);
 	pServerContext->enableSessionCache(true, "TestSuite");
 	pServerContext->setSessionTimeout(10);
 	pServerContext->setSessionCacheSize(1000);

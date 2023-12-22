@@ -80,7 +80,7 @@ void LoggingFactoryTest::testBuiltins()
 	LoggingFactory& fact = LoggingFactory::defaultFactory();
 
 	Channel::Ptr pConsoleChannel = fact.createChannel("ConsoleChannel");
-#if defined(_WIN32) && !defined(_WIN32_WCE)
+#if defined(_WIN32)
 	assertTrue (!pConsoleChannel.cast<Poco::WindowsConsoleChannel>().isNull());
 #else
 	assertTrue (!pConsoleChannel.cast<ConsoleChannel>().isNull());

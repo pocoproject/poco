@@ -7,6 +7,7 @@ CppUnit::TestCaller<FileChannelTest>.testPurgeAge
 CppUnit::TestCaller<FileTest>.testFileAttributes2
 CppUnit::TestCaller<PathTest>.testExpand
 CppUnit::TestCaller<PathTest>.testExpandVariableFromPath
+CppUnit::TestCaller<SyslogTest>.testOldBSD
 CppUnit::TestCaller<ClockTest>.testClock
 CppUnit::TestCaller<TimerTest>.testScheduleAtFixedRate
 CppUnit::TestCaller<TimerTest>.testScheduleInterval
@@ -16,6 +17,7 @@ CppUnit::TestCaller<TimerTest>.testTimer
 CppUnit::TestCaller<SocketAddressTest>.testSocketAddress
 CppUnit::TestCaller<RawSocketTest>.testEchoIPv4
 CppUnit::TestCaller<RawSocketTest>.testSendToReceiveFromIPv4
+CppUnit::TestCaller<RawSocketTest>.testEchoIPv4Move
 CppUnit::TestCaller<ICMPClientTest>.testPing
 CppUnit::TestCaller<ICMPClientTest>.testBigPing
 CppUnit::TestCaller<ICMPSocketTest>.testSendToReceiveFrom
