@@ -7,6 +7,7 @@ AAAIntroduction
 
   - Support for MongoDB 5.1 and newer
   - C++17 is the lowest supported standard
+  - Poco::Data SQLParser (experimental, optional at build and runtime)
 
 !!Breaking changes:
 
