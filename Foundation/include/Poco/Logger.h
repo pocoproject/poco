@@ -462,6 +462,7 @@ protected:
 	~Logger();
 
 	void log(const std::string& text, Message::Priority prio);
+	void logNPC(const std::string& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, int line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
@@ -783,6 +784,15 @@ inline int Logger::getLevel() const
 inline void Logger::log(const std::string& text, Message::Priority prio)
 {
 	if (_level >= prio && _pChannel)
+	{
+		_pChannel->log(Message(_name, text, prio));
+	}
+}
+
+
+inline void Logger::logNPC(const std::string& text, Message::Priority prio)
+{
+	if (_pChannel)
 	{
 		_pChannel->log(Message(_name, text, prio));
 	}

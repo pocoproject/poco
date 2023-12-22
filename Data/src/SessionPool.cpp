@@ -317,6 +317,8 @@ void SessionPool::shutdown()
 	if (_shutdown.exchange(true)) return;
 	_shutdown = true;
 	_janitorTimer.stop();
+
+	Poco::Mutex::ScopedLock lock(_mutex);
 	closeAll(_idleSessions);
 	closeAll(_activeSessions);
 }

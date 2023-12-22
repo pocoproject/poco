@@ -262,12 +262,12 @@ void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
 	sigset_t sset;
 	sigemptyset(&sset);
 
-	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig) 
+	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
 	{
 		if ((sigMask & (1 << sig)) != 0)
 			sigaddset(&sset, sig);
 	}
-	
+
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 }
 
