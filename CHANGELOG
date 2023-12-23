@@ -9,7 +9,7 @@ Highlights:
 - C++17 is the lowest supported standard
 - Poco::Data SQLParser (experimental, optional at build and runtime)
 
-Breaking changes:
+Breaking Changes:
 
 - GH #4305 Remove deprecated `toJSON` functions
 - GH #4304 NumericString conversions inconsistencies
@@ -18,7 +18,7 @@ Breaking changes:
 - GH #3701 SocketReactor: Remove not useful handlers calls
 - GH #569 SyntaxException for DateTimeParser::parse not working
 
-Features and enhancements
+Features and Enhancements
 
 - GH #4276 MongoDB default function deleted clang warning
 - GH #4261 Move autoCommit to AbstractSessionImpl
@@ -56,11 +56,9 @@ Features and enhancements
 - GH #2331 Improve implementation of logging macros.
 - GH #2282 Add Path::self()
 - GH #1258 Poco::DateTimeParser::tryParse issue
-
 - GH #3845 Poco::XML::Node `insertAfter` API
 - GH #3659 Add thread name support
 - GH #2291 Visitor Pattern for Dynamic::Var
-
 - PR #4059 Update ICMPv4PacketImpl.h
 - PR #4021 Fix compile with `-DPOCO_NET_NO_IPv6`
 - PR #3885 Use map from key to count instead of multiset
@@ -71,11 +69,10 @@ Features and enhancements
 - PR #3705 Fix/posix sleep
 - PR #3664 set thread name
 - PR #3657 Add lower case format for `NumberFormatter`
-
 - PR #4144 add visitor pattern implementation for Poco::Dynamic::Var
 - PR #3476 add separate accessors and mutators for connect, send and receive tim…
 
-Bug fixes and improvements:
+Bug fixes and Improvements:
 
 - GH #4328 Environment::nodeId Should Throw SystemException When Node ID is 0
 - GH #4311 Canceled `Task` shouldn't start running
@@ -111,7 +108,6 @@ Bug fixes and improvements:
 - GH #2634 Data race in Poco::Net::HTTPServerConnection::onServerStopped
 - GH #2366 Poco::Process::launch (UNIX) - possible memory leak when launching invalid command
 - GH #2332 Optimize multi-arg logger methods to only call format() if log level allows
-
 - PR #4353 Fix some issues found with clang-tidy
 - PR #4345 Build.macos.openssl@1.1
 - PR #4339 Fix RemoteSyslogChannel setProperty value check
