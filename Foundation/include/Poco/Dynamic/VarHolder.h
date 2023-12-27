@@ -399,6 +399,42 @@ protected:
 		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
+	
+	template <typename F, typename T, std::enable_if_t<std::is_signed<F>::value && std::is_signed<T>::value && (sizeof(F) <= sizeof(T))>* = nullptr>
+	void convertToSigned(const F& from, T& to) const
+	{
+		to = static_cast<T>(from);
+	}
+	
+	template <typename F, typename T, std::enable_if_t<std::is_signed<F>::value && std::is_signed<T>::value && (sizeof(F) > sizeof(T))>* = nullptr>
+	void convertToSigned(const F& from, T& to) const
+	{
+		convertToSmaller(from, to);
+	}
+	
+	template <typename F, typename T, std::enable_if_t<!std::is_signed<F>::value && std::is_signed<T>::value>* = nullptr>
+	void convertToSigned(const F& from, T& to) const
+	{
+		convertUnsignedToSigned(from, to);
+	}
+	
+	template <typename F, typename T, std::enable_if_t<!std::is_signed<F>::value && !std::is_signed<T>::value && (sizeof(F) <= sizeof(T))>* = nullptr>
+	void convertToUnsigned(const F& from, T& to) const
+	{
+		to = static_cast<T>(from);
+	}
+	
+	template <typename F, typename T, std::enable_if_t<!std::is_signed<F>::value && !std::is_signed<T>::value && (sizeof(F) > sizeof(T))>* = nullptr>
+	void convertToUnsigned(const F& from, T& to) const
+	{
+		convertToSmallerUnsigned(from, to);
+	}
+	
+	template <typename F, typename T, std::enable_if_t<std::is_signed<F>::value && !std::is_signed<T>::value>* = nullptr>
+	void convertToUnsigned(const F& from, T& to) const
+	{
+		convertSignedToUnsigned(from, to);
+	}
 
 private:
 
@@ -735,7 +771,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<Int8>(_val);
+			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -746,7 +782,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<Int16>(_val);
+			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -757,7 +793,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<Int32>(_val);
+			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -768,7 +804,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<Int64>(_val);
+			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -779,7 +815,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<UInt8>(_val);
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -790,7 +826,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<UInt16>(_val);
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -801,7 +837,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<UInt32>(_val);
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -812,7 +848,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<UInt64>(_val);
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -825,7 +861,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<long long>(_val);
+			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
@@ -836,7 +872,7 @@ public:
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
-			val = static_cast<unsigned long  long>(_val);
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
 		else {
 			VarHolder::convert(val);
