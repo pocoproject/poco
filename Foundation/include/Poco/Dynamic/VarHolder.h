@@ -731,6 +731,264 @@ public:
 		return typeid(T);
 	}
 
+	void convert(Int8& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<Int8>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Int16& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<Int16>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Int32& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<Int32>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Int64& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<Int64>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt8& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<UInt8>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt16& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<UInt16>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt32& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<UInt32>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt64& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<UInt64>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+#ifdef POCO_INT64_IS_LONG
+
+	convert(long long& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<long long>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	convert(unsigned long long& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<unsigned long  long>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+#endif
+
+	void convert(bool& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = (std::underlying_type_t<T>(_val) != 0);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(float& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<float>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(double& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<double>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(char& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = static_cast<char>(_val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(std::string& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			val = NumberFormatter::format(std::underlying_type_t<T>(_val));
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Poco::UTF16String& val) const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			std::string str = NumberFormatter::format(std::underlying_type_t<T>(_val));
+			Poco::UnicodeConverter::convert(str, val);
+		}
+		else {
+			VarHolder::convert(val);
+		}
+	}
+
+	bool isArray() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return false;
+		}
+		else {
+			return VarHolder::isArray();
+		}
+	}
+
+	bool isStruct() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return false;
+		}
+		else {
+			return VarHolder::isStruct();
+		}
+	}
+
+	bool isInteger() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return std::numeric_limits<std::underlying_type_t<T>>::is_integer;
+		}
+		else {
+			return VarHolder::isInteger();
+		}
+	}
+
+	bool isSigned() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return std::numeric_limits<std::underlying_type_t<T>>::is_signed;
+		}
+		else {
+			return VarHolder::isSigned();
+		}
+	}
+
+	bool isNumeric() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return std::numeric_limits<std::underlying_type_t<T>>::is_specialized;
+		}
+		else {
+			return VarHolder::isNumeric();
+		}
+	}
+
+	bool isBoolean() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return false;
+		}
+		else {
+			return VarHolder::isBoolean();
+		}
+	}
+
+	bool isString() const
+	{
+		if constexpr (std::is_enum<T>::value)
+		{
+			return false;
+		}
+		else {
+			return VarHolder::isString();
+		}
+	}
+	
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
 		return cloneHolder(pVarHolder, _val);
