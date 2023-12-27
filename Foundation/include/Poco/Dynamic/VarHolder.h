@@ -857,7 +857,7 @@ public:
 
 #ifdef POCO_INT64_IS_LONG
 
-	convert(long long& val) const
+	void convert(long long& val) const
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
@@ -868,7 +868,7 @@ public:
 		}
 	}
 
-	convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const
 	{
 		if constexpr (std::is_enum<T>::value)
 		{
