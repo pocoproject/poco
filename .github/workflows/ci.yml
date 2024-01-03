@@ -216,8 +216,7 @@ jobs:
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<SyslogTest>.testOldBSD,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
@@ -242,8 +241,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -268,8 +266,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -299,8 +296,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh TSAN
 
@@ -330,8 +326,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
@@ -361,8 +356,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
