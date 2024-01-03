@@ -23,6 +23,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
+#include "Poco/Mutex.h"
 #include <iostream>
 
 
@@ -44,6 +45,8 @@ using Poco::Util::Application;
 
 namespace
 {
+	static Poco::FastMutex cerrMutex;
+
 	class EchoConnection: public TCPServerConnection
 	{
 	public:
@@ -66,6 +69,8 @@ namespace
 			}
 			catch (Poco::Exception& exc)
 			{
+				Poco::FastMutex::ScopedLock l(cerrMutex);
+
 				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
 			}
 		}
