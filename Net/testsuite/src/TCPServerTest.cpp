@@ -18,6 +18,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Thread.h"
+#include "Poco/Mutex.h"
 #include <iostream>
 
 
@@ -35,6 +36,8 @@ using Poco::Thread;
 
 namespace
 {
+	static Poco::FastMutex cerrMutex;
+
 	class EchoConnection: public TCPServerConnection
 	{
 	public:
@@ -55,8 +58,10 @@ namespace
 					n = ss.receiveBytes(buffer, sizeof(buffer));
 				}
 			}
-			catch (Poco::Exception& exc)
+			catch (const Poco::Exception& exc)
 			{
+				Poco::FastMutex::ScopedLock l(cerrMutex);
+
 				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
 			}
 		}
