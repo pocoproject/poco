@@ -229,7 +229,7 @@ void FileTest::testFileAttributes3()
 #if POCO_OS==POCO_OS_CYGWIN
 	File f("/dev/tty");
 #else
- 	File f("/dev/console");
+ 	File f("/dev/null");
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	File f("CON");

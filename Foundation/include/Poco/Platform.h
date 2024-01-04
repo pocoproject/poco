@@ -240,6 +240,11 @@
 #endif
 
 
+#ifdef __SOFTFP__
+#define POCO_NO_FPENVIRONMENT
+#endif
+
+
 #if defined(__clang__)
 	#define POCO_COMPILER_CLANG
 	#define POCO_HAVE_CXXABI_H
