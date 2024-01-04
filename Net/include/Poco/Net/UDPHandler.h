@@ -297,7 +297,7 @@ public:
 	}
 
 	static char* error(char* buf)
-		/// Returns pointer to the erro message payload.
+		/// Returns pointer to the error message payload.
 		///
 		/// Total message size is S.
 		///

@@ -38,7 +38,7 @@ template <std::size_t S = POCO_UDP_BUF_SIZE,
 class UDPServerImpl: public Poco::Runnable
 	/// UDP server, runs in its own thread and owns a poller, to which
 	/// data arrival and discovery is delegated. See SingleSocketPoller and
-	/// MultipleSocketPoller for more information.
+	/// MultiSocketPoller for more information.
 {
 public:
 	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa):

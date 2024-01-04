@@ -154,8 +154,8 @@ public:
 		/// Returns true if all handlers are stopped.
 	{
 		bool stopped = true;
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
+		auto it = _handlers.begin();
+		auto end = _handlers.end();
 		for (; it != end; ++it) stopped = stopped && (*it)->stopped();
 		return stopped;
 	}
@@ -163,8 +163,8 @@ public:
 	void stopHandler()
 		/// Stops all handlers.
 	{
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
+		auto it = _handlers.begin();
+		auto end = _handlers.end();
 		for (; it != end; ++it) (*it)->stop();
 	}
 
@@ -172,8 +172,8 @@ public:
 		/// Returns true if all handlers are done processing data.
 	{
 		bool done = true;
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
+		auto it = _handlers.begin();
+		auto end = _handlers.end();
 		for (; it != end; ++it) done = done && (*it)->done();
 		return done;
 	}
@@ -193,20 +193,19 @@ private:
 		/// Re-points the handler iterator to the next handler in
 		/// round-robin fashion.
 	{
-		poco_assert_dbg (_handler != _handlers.end());
-		if (++_handler == _handlers.end()) _handler = _handlers.begin();
+		if ((_handler == _handlers.end()) || (++_handler == _handlers.end()))
+			_handler = _handlers.begin();
 	}
 
 	UDPHandlerImpl<S>& handler()
 		/// Returns the reference to the current handler.
 	{
-		poco_assert_dbg (_handler != _handlers.end());
 		return **_handler;
 	}
 
-	typedef typename UDPHandlerImpl<S>::List           HandlerList;
-	typedef typename UDPHandlerImpl<S>::List::iterator HandlerIterator;
-	typedef std::map<poco_socket_t, Counter>           CounterMap;
+	using HandlerList = typename UDPHandlerImpl<S>::List;
+	using HandlerIterator = typename UDPHandlerImpl<S>::List::iterator;
+	using CounterMap = std::map<poco_socket_t, Counter>;
 
 	HandlerList&    _handlers;
 	HandlerIterator _handler;
