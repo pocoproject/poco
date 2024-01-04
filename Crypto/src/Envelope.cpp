@@ -14,12 +14,6 @@
 
 #include "Poco/Crypto/Envelope.h"
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
-	#if !defined(EVP_CIPHER_CTX_init)
-		#define EVP_CIPHER_CTX_init(a)
-	#endif
-#endif
-
 namespace Poco {
 namespace Crypto {
 
@@ -30,8 +24,8 @@ Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
 	poco_check_ptr(_pCipher);
 	poco_check_ptr(_pCtx);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-	if (1 != EVP_CIPHER_CTX_init(_pCtx))
-		handleErrors(std::string("Envelope():EVP_CIPHER_CTX_init()"));
+	if (1 != EVP_CIPHER_CTX_reset(_pCtx))
+		handleErrors(std::string("Envelope():EVP_CIPHER_CTX_reset()"));
 #else
 	EVP_CIPHER_CTX_init(_pCtx);
 #endif
