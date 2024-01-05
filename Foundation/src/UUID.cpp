@@ -134,7 +134,7 @@ bool UUID::tryParse(const std::string& uuid)
 	bool haveHyphens = false;
 	if (uuid[8] == '-' && uuid[13] == '-' && uuid[18] == '-' && uuid[23] == '-')
 	{
-		if (uuid.size() >= 36)
+		if (uuid.size() == 36)
 			haveHyphens = true;
 		else
 			return false;
