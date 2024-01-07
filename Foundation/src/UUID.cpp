@@ -129,20 +129,21 @@ void UUID::parse(const std::string& uuid)
 
 bool UUID::tryParse(const std::string& uuid)
 {
-	if (uuid.size() < 32)
+	std::string uuidCopy = Poco::trim(uuid);
+	if (uuidCopy.size() < 32)
 		return false;
 
 	bool haveHyphens = false;
-	if (uuid[8] == '-' && uuid[13] == '-' && uuid[18] == '-' && uuid[23] == '-')
+	if (uuidCopy[8] == '-' && uuidCopy[13] == '-' && uuidCopy[18] == '-' && uuidCopy[23] == '-')
 	{
-		if (Poco::trim(uuid).size() == 36)
+		if (uuidCopy.size() == 36)
 			haveHyphens = true;
 		else
 			return false;
 	}
 
 	UUID newUUID;
-	std::string::const_iterator it = uuid.begin();
+	std::string::const_iterator it = uuidCopy.begin();
 	newUUID._timeLow = 0;
 	for (int i = 0; i < 8; ++i)
 	{

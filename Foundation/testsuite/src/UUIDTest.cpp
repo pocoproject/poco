@@ -204,7 +204,7 @@ void UUIDTest::testTryParse()
 	UUID uuid;
 	assertTrue (uuid.tryParse("6BA7B810-9DAD-11D1-80B4-00C04FD430C8"));
 	assertTrue (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");
-	assertTrue (uuid.tryParse("6BA7B810-9DAD-11D1-80B4-00C04FD430C8   "));
+	assertTrue (uuid.tryParse("  6BA7B810-9DAD-11D1-80B4-00C04FD430C8   "));
 	assertTrue (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 
 	UUID notUuid;
@@ -212,9 +212,9 @@ void UUIDTest::testTryParse()
 	assertTrue (notUuid.isNull());
 
 	UUID wrongUUID;
-	assertFalse (wrongUUID.tryParse("495cff3a-a4b3-11ee-9e54-9cb6d0f68b51AA"));
+	assertFalse (wrongUUID.tryParse("495cff3a-a4b3-11ee-9e54-9cb6d0f68b51AA")); // too long
 	assertTrue (wrongUUID.isNull());
-	assertFalse (wrongUUID.tryParse("495cff3a-a4b3-11ee-9e54-9cb6d0f68b5   "));
+	assertFalse (wrongUUID.tryParse("495cff3a-a4b3-11ee-9e54-9cb6d0f68b5   ")); // too short
 	assertTrue (wrongUUID.isNull());
 }
 
