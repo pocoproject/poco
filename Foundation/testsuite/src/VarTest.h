@@ -42,6 +42,7 @@ public:
 	void testULong();
 	void testLongLong();
 	void testULongLong();
+	void testEnumType();
 	void testString();
 	void testUDT();
 	void testConversionOperator();

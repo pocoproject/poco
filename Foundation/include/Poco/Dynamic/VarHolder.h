@@ -773,7 +773,8 @@ public:
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -784,7 +785,8 @@ public:
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -795,7 +797,8 @@ public:
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -806,7 +809,8 @@ public:
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -817,7 +821,8 @@ public:
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -828,7 +833,8 @@ public:
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -839,7 +845,8 @@ public:
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -850,7 +857,8 @@ public:
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -863,7 +871,8 @@ public:
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -874,7 +883,8 @@ public:
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -887,7 +897,8 @@ public:
 		{
 			val = (std::underlying_type_t<T>(_val) != 0);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -898,7 +909,8 @@ public:
 		{
 			val = static_cast<float>(_val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -909,7 +921,8 @@ public:
 		{
 			val = static_cast<double>(_val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -920,7 +933,8 @@ public:
 		{
 			val = static_cast<char>(_val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -931,7 +945,8 @@ public:
 		{
 			val = NumberFormatter::format(std::underlying_type_t<T>(_val));
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -943,7 +958,8 @@ public:
 			std::string str = NumberFormatter::format(std::underlying_type_t<T>(_val));
 			Poco::UnicodeConverter::convert(str, val);
 		}
-		else {
+		else
+		{
 			VarHolder::convert(val);
 		}
 	}
@@ -954,7 +970,8 @@ public:
 		{
 			return false;
 		}
-		else {
+		else
+		{
 			return VarHolder::isArray();
 		}
 	}
@@ -965,7 +982,8 @@ public:
 		{
 			return false;
 		}
-		else {
+		else
+		{
 			return VarHolder::isStruct();
 		}
 	}
@@ -976,7 +994,8 @@ public:
 		{
 			return std::numeric_limits<std::underlying_type_t<T>>::is_integer;
 		}
-		else {
+		else
+		{
 			return VarHolder::isInteger();
 		}
 	}
@@ -987,7 +1006,8 @@ public:
 		{
 			return std::numeric_limits<std::underlying_type_t<T>>::is_signed;
 		}
-		else {
+		else
+		{
 			return VarHolder::isSigned();
 		}
 	}
@@ -998,7 +1018,8 @@ public:
 		{
 			return std::numeric_limits<std::underlying_type_t<T>>::is_specialized;
 		}
-		else {
+		else
+		{
 			return VarHolder::isNumeric();
 		}
 	}
@@ -1009,7 +1030,8 @@ public:
 		{
 			return false;
 		}
-		else {
+		else
+		{
 			return VarHolder::isBoolean();
 		}
 	}
@@ -1020,7 +1042,8 @@ public:
 		{
 			return false;
 		}
-		else {
+		else
+		{
 			return VarHolder::isString();
 		}
 	}
