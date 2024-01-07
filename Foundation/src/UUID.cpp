@@ -15,6 +15,7 @@
 #include "Poco/UUID.h"
 #include "Poco/ByteOrder.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <algorithm>
 #include <cstring>
 
@@ -134,7 +135,7 @@ bool UUID::tryParse(const std::string& uuid)
 	bool haveHyphens = false;
 	if (uuid[8] == '-' && uuid[13] == '-' && uuid[18] == '-' && uuid[23] == '-')
 	{
-		if (uuid.size() >= 36)
+		if (Poco::trim(uuid).size() == 36)
 			haveHyphens = true;
 		else
 			return false;
