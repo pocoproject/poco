@@ -17,6 +17,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -42,10 +43,17 @@ namespace Poco {
 	{ int i = 0; while (i < n && it != end && Ascii::isDigit(*it)) { var = var*10 + ((*it++) - '0'); i++; } while (i++ < n) var *= 10; }
 
 
-void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
+inline std::string cleanedInputString(const std::string& str)
 {
+	return Poco::trim(str);
+}
+
+void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, DateTime& dateTime, int& timeZoneDifferential)
+{
+	const auto str = cleanedInputString(dtStr);
+
 	if (fmt.empty() || str.empty() || (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str)))
-		throw SyntaxException("Invalid DateTimeString:" + str);
+		throw SyntaxException("Invalid DateTimeString:" + dtStr);
 
 	int year   = 0;
 	int month  = 0;
@@ -223,8 +231,10 @@ DateTime DateTimeParser::parse(const std::string& str, int& timeZoneDifferential
 }
 
 
-bool DateTimeParser::tryParse(const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
+bool DateTimeParser::tryParse(const std::string& dtStr, DateTime& dateTime, int& timeZoneDifferential)
 {
+	const auto str = cleanedInputString(dtStr);
+
 	if (str.length() < 4) return false;
 
 	if (str[3] == ',')

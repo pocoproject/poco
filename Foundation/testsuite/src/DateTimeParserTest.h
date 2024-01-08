@@ -35,6 +35,7 @@ public:
 	void testSORTABLE();
 	void testCustom();
 	void testGuess();
+	void testCleanup();
 	void testParseMonth();
 	void testParseDayOfWeek();
 
