@@ -43,7 +43,7 @@ class X509Certificate;
 class PKCS12Container;
 
 
-class RSAKeyImpl: public KeyPairImpl
+class Crypto_API RSAKeyImpl: public KeyPairImpl
 	/// class RSAKeyImpl
 {
 public:
