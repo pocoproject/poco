@@ -271,29 +271,35 @@ struct UTF32CharTraits
 		typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
 		typedef UInt32                                        UTF32Char;
 		typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
+		#define POCO_USE_STRING16
+		#define POCO_USE_STRING32
 	#else // POCO_NO_WSTRING
 		#if defined(POCO_OS_FAMILY_WINDOWS)
 			typedef wchar_t                                       UTF16Char;
 			typedef std::wstring                                  UTF16String;
 			typedef UInt32                                        UTF32Char;
 			typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
+			#define POCO_USE_STRING32
 		#elif defined(__SIZEOF_WCHAR_T__) //gcc
 			#if (__SIZEOF_WCHAR_T__ == 2)
 				typedef wchar_t                                       UTF16Char;
 				typedef std::wstring                                  UTF16String;
 				typedef UInt32                                        UTF32Char;
 				typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
+				#define POCO_USE_STRING32
 			#elif (__SIZEOF_WCHAR_T__ == 4)
 				typedef Poco::UInt16                                  UTF16Char;
 				typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
 				typedef wchar_t                                       UTF32Char;
 				typedef std::wstring                                  UTF32String;
+				#define POCO_USE_STRING16
 			#endif
 		#else // default to 32-bit wchar_t
 			typedef Poco::UInt16                                  UTF16Char;
 			typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
 			typedef wchar_t                                       UTF32Char;
 			typedef std::wstring                                  UTF32String;
+			#define POCO_USE_STRING16
 		#endif //POCO_OS_FAMILY_WINDOWS
 	#endif //POCO_NO_WSTRING
 //#endif // POCO_ENABLE_CPP11
@@ -301,5 +307,16 @@ struct UTF32CharTraits
 
 } // namespace Poco
 
+namespace std {
+
+#if defined(POCO_USE_STRING16)
+extern template class Foundation_API std::basic_string<Poco::UTF16Char, Poco::UTF16CharTraits>;
+#endif
+
+#if defined(POCO_USE_STRING32)
+extern template class Foundation_API std::basic_string<Poco::UTF32Char, Poco::UTF32CharTraits>;
+#endif
+
+}
 
 #endif // Foundation_UTFString_INCLUDED
