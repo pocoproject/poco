@@ -26,8 +26,17 @@
 
 
 namespace Poco {
+
 namespace JSON {
 
+class JSON_API Array;
+
+}
+
+// Explicitly instantiated shared pointer in JSON library
+extern template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
+
+namespace JSON {
 
 class Object;
 
