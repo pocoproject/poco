@@ -2356,7 +2356,7 @@ void VarTest::testOrderedDynamicStructString()
 	assertTrue(a1["First Name"] == "Senior");
 	testGetIdxMustThrow(a1, 0);
 
-	typedef Struct<std::string, OrderedMap<std::string, Var>, OrderedSet<std::string> > OrderedStruct;
+	using OrderedStruct = OrderedDynamicStruct;
 	OrderedStruct s1;
 	s1["1"] = 1;
 	s1["2"] = 2;

@@ -288,6 +288,13 @@ private:
 };
 
 
+extern template class Foundation_API Struct<std::string>;
+extern template class Foundation_API Struct<int>;
+
+extern template class Foundation_API Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
+extern template class Foundation_API Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+
 template <>
 class VarHolderImpl<Struct<std::string, std::map<std::string, Var>, std::set<std::string>>>: public VarHolder
 {
@@ -959,8 +966,8 @@ private:
 } // namespace Dynamic
 
 
-typedef Dynamic::Struct<std::string> DynamicStruct;
-typedef Dynamic::Struct<std::string, Poco::OrderedMap<std::string, Dynamic::Var>, Poco::OrderedSet<std::string>> OrderedDynamicStruct;
+using DynamicStruct = Dynamic::Struct<std::string>;
+using OrderedDynamicStruct = Dynamic::Struct<std::string, Poco::OrderedMap<std::string, Dynamic::Var>, Poco::OrderedSet<std::string>>;
 
 
 } // namespace Poco

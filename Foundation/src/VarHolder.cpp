@@ -14,11 +14,19 @@
 
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/Dynamic/Struct.h"
 #include "Poco/JSONString.h"
 
 
 namespace Poco {
 namespace Dynamic {
+
+
+template class Struct<std::string>;
+template class Struct<int>;
+
+template class Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
+template class Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
 
 
 VarHolder::VarHolder()
