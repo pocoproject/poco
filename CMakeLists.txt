@@ -46,6 +46,8 @@ endif()
 include(CXX1x)
 check_for_cxx17_compiler(CXX17_COMPILER)
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
 # If a C++17 compiler is available, then set the appropriate flags
 if(CXX17_COMPILER)
 	set(CMAKE_CXX_STANDARD 17)
