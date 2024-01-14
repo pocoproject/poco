@@ -18,6 +18,7 @@
 #include "Poco/Buffer.h"
 #include <sstream>
 #include <cstring>
+#include <memory>
 #include "Poco/UnWindows.h"
 #include <winsock2.h>
 #include <wincrypt.h>
