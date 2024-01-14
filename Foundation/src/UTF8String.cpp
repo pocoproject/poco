@@ -23,7 +23,7 @@
 #include <algorithm>
 
 
-namespace std {
+#if !defined(POCO_OS_FAMILY_WINDOWS)
 
 #if defined(POCO_USE_STRING16)
 template class std::basic_string<Poco::UTF16Char, Poco::UTF16CharTraits>;
@@ -32,8 +32,8 @@ template class std::basic_string<Poco::UTF16Char, Poco::UTF16CharTraits>;
 #if defined(POCO_USE_STRING32)
 template class std::basic_string<Poco::UTF32Char, Poco::UTF32CharTraits>;
 #endif
-	
-}
+
+#endif
 
 namespace Poco {
 

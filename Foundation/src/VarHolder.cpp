@@ -22,11 +22,23 @@ namespace Poco {
 namespace Dynamic {
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+
+template class Foundation_API Struct<std::string>;
+template class Foundation_API Struct<int>;
+
+template class Foundation_API Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
+template class Foundation_API Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+#else
+
 template class Struct<std::string>;
 template class Struct<int>;
 
 template class Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
 template class Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+#endif
 
 
 VarHolder::VarHolder()

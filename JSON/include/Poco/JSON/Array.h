@@ -33,8 +33,14 @@ class JSON_API Array;
 
 }
 
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+// Explicitly instantiated shared pointer in JSON library
+extern template class Poco::SharedPtr<Poco::JSON::Array>;
+#else
 // Explicitly instantiated shared pointer in JSON library
 extern template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
+#endif
 
 namespace JSON {
 

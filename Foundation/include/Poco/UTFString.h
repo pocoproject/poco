@@ -279,7 +279,6 @@ struct UTF32CharTraits
 			typedef std::wstring                                  UTF16String;
 			typedef UInt32                                        UTF32Char;
 			typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
-			#define POCO_USE_STRING32
 		#elif defined(__SIZEOF_WCHAR_T__) //gcc
 			#if (__SIZEOF_WCHAR_T__ == 2)
 				typedef wchar_t                                       UTF16Char;
@@ -307,7 +306,6 @@ struct UTF32CharTraits
 
 } // namespace Poco
 
-namespace std {
 
 #if defined(POCO_USE_STRING16)
 extern template class Foundation_API std::basic_string<Poco::UTF16Char, Poco::UTF16CharTraits>;
@@ -317,6 +315,5 @@ extern template class Foundation_API std::basic_string<Poco::UTF16Char, Poco::UT
 extern template class Foundation_API std::basic_string<Poco::UTF32Char, Poco::UTF32CharTraits>;
 #endif
 
-}
 
 #endif // Foundation_UTFString_INCLUDED
