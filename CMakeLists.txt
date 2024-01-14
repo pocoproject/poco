@@ -46,8 +46,6 @@ endif()
 include(CXX1x)
 check_for_cxx17_compiler(CXX17_COMPILER)
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-
 # If a C++17 compiler is available, then set the appropriate flags
 if(CXX17_COMPILER)
 	set(CMAKE_CXX_STANDARD 17)
@@ -559,6 +557,7 @@ message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
 message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] C++ symbol visibility:  ${CMAKE_CXX_VISIBILITY_PRESET}")
 
 foreach(component ${Poco_COMPONENTS})
 	message(STATUS "Building: ${component}")
