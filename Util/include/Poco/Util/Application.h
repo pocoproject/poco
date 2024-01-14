@@ -504,7 +504,8 @@ inline Poco::Timespan Application::uptime() const
 //
 // Macro to implement main()
 //
-#if defined(_WIN32)
+
+#if defined(_WIN32) && !defined(POCO_COMPILER_MINGW)
 	#define POCO_APP_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)		\
 	{										\
