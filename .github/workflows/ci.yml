@@ -305,7 +305,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_ENCODINGS_COMPILER=ON -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
