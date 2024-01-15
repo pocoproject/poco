@@ -140,13 +140,18 @@ void Context::addTrustedCert(const Poco::Net::X509Certificate& cert)
 }
 
 
-Poco::Net::X509Certificate Context::certificate()
+Poco::Net::X509Certificate Context::certificate(bool mustFindCertificate)
 {
 	if (_pCert)
 		return Poco::Net::X509Certificate(_pCert, true);
 
 	if (_certNameOrPath.empty())
-		throw NoCertificateException("Certificate requested, but no certificate name or path provided");
+	{
+		if (mustFindCertificate)
+			throw NoCertificateException("Certificate requested, but no certificate name or path provided");
+		else
+			throw;
+	}
 
 	if (_options & OPT_LOAD_CERT_FROM_FILE)
 	{

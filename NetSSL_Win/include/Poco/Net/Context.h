@@ -201,11 +201,13 @@ public:
 		///
 		///   context.requireMinimumProtocol(PROTO_TLSV1_2);
 
-	Poco::Net::X509Certificate certificate();
+	Poco::Net::X509Certificate certificate(bool mustFindCertificate);
 		/// Loads or imports and returns the certificate specified in the constructor.
 		///
 		/// Throws a NoCertificateException if the certificate cannot
-		/// be found or no certificate name has been provided in the constructor.
+		/// be found or no certificate name has been provided in the constructor
+		/// and mustFindCertificate is true. When mustFindCertificate is false
+		/// it does an empty throw for this case.
 		///
 		/// May also throw a filesystem-related exception if the certificate file
 		/// cannot be found.

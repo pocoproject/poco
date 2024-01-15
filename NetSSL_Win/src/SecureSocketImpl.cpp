@@ -714,7 +714,7 @@ PCCERT_CONTEXT SecureSocketImpl::loadCertificate(bool mustFindCertificate)
 {
 	try
 	{
-		Poco::Net::X509Certificate cert = _pContext->certificate();
+		Poco::Net::X509Certificate cert = _pContext->certificate(mustFindCertificate);
 		PCCERT_CONTEXT pCert = cert.system();
 		CertDuplicateCertificateContext(pCert);
 		return pCert;
