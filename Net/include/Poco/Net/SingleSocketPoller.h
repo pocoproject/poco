@@ -86,7 +86,7 @@ public:
 	}
 
 	bool done() const
-		/// Returns tru if handler is done.
+		/// Returns true if handler is done.
 	{
 		return _reader.handlerDone();
 	}
