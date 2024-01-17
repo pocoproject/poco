@@ -43,7 +43,7 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = -std=c11 $(ARCHFLAGS)
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -std=c++14 -Wall -Wno-sign-compare -Wno-psabi $(ARCHFLAGS)
+CXXFLAGS        = -std=c++17 -Wall -Wno-sign-compare -Wno-psabi $(ARCHFLAGS)
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =
