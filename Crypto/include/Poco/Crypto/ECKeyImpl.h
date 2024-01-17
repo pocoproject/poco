@@ -40,7 +40,7 @@ class X509Certificate;
 class PKCS12Container;
 
 
-class ECKeyImpl: public KeyPairImpl
+class Crypto_API ECKeyImpl: public KeyPairImpl
 	/// Elliptic Curve key clas implementation.
 {
 public:
