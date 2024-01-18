@@ -11,25 +11,35 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
 #include "Poco/Environment_WIN32U.h"
 #include "Poco/Exception.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
+
 #include <sstream>
 #include <cstring>
 #include <memory>
-#include "Poco/UnWindows.h"
 #include <winsock2.h>
-#include <wincrypt.h>
-#include <ws2ipdef.h>
 #include <iphlpapi.h>
-
 
 #if defined(_MSC_VER)
 #pragma warning(disable:4996) // deprecation warnings
 #endif
 
+#if (POCO_ARCH == POCO_ARCH_IA32)
+// It is expected that _USE_32BIT_TIME_T is defined when compiling on 32-bit Windows
+// to have the structure IP_ADAPTER_INFO defined properly.
+//
+// https://learn.microsoft.com/en-us/windows/win32/api/iptypes/ns-iptypes-ip_adapter_info
+//
+#if !defined(_USE_32BIT_TIME_T)
+	#if defined(POCO_COMPILER_MSVC)
+	#pragma message("WARNING: _USE_32BIT_TIME_T is expected to be defined for compiling " __FILE__ )
+	#endif
+#endif
+static_assert( sizeof(__time32_t) == 4, "Unexpected size of __time32_t.");
+static_assert( sizeof(time_t) == sizeof(__time32_t), "Size of time_t != __time32_t.");
+#endif
 
 namespace Poco {
 
@@ -203,56 +213,60 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
 
-	auto pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(1);
-	ULONG len    = sizeof(IP_ADAPTER_INFO);
+	// Preallocate buffer for some adapters to avoid calling
+	// GetAdaptersInfo multiple times.
+	static constexpr int IP_ADAPTER_BUFFER_SIZE = 10;
 
-	// Make an initial call to GetAdaptersInfo to get
-	// the necessary size into len
+	auto pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(IP_ADAPTER_BUFFER_SIZE);
+	ULONG len    = IP_ADAPTER_BUFFER_SIZE * sizeof(IP_ADAPTER_INFO);
+
 	const DWORD rc = GetAdaptersInfo(pAdapterInfo.get(), &len);
 
 	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
+		// Buffer is not large enough: reallocate and retry.
+
+		// len is expected to be a multiple of IP_ADAPTER_INFO.
+		// If it is not, then this file most probably uses different struct then
+		// the system library.
+		poco_assert_msg( (len % sizeof(IP_ADAPTER_INFO)) == 0, "Unexpected size of IP_ADAPTER_INFO.");
+
 		pAdapterInfo = std::make_unique<IP_ADAPTER_INFO[]>(len / sizeof(IP_ADAPTER_INFO));
+		if (GetAdaptersInfo(pAdapterInfo.get(), &len) != ERROR_SUCCESS)
+		{
+			throw SystemException("cannot get network adapter list");
+		}
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
 		throw SystemException("cannot get network adapter list");
 	}
 
-	if (GetAdaptersInfo(pAdapterInfo.get(), &len) == NO_ERROR)
+	IP_ADAPTER_INFO* pAdapter = pAdapterInfo.get();
+	while (pAdapter)
 	{
-		IP_ADAPTER_INFO* pAdapter = pAdapterInfo.get();
-
-		while (pAdapter)
+		if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 		{
-			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
-			{
-				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+			std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
 
-				// found an ethernet adapter, we can return now
-				return;
-			}
-			pAdapter = pAdapter->Next;
+			// found an ethernet adapter, we can return now
+			return;
 		}
-
-		// if an ethernet adapter was not found, search for a wifi adapter
-		pAdapter = pAdapterInfo.get();
-
-		while (pAdapter)
-		{
-			if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
-			{
-				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
-
-				// found a wifi adapter, we can return now
-				return;
-			}
-			pAdapter = pAdapter->Next;
-		}
+		pAdapter = pAdapter->Next;
 	}
-	else
+
+	// if an ethernet adapter was not found, search for a wifi adapter
+	pAdapter = pAdapterInfo.get();
+	while (pAdapter)
 	{
-		throw SystemException("cannot get network adapter list");
+		if (pAdapter->Type == IF_TYPE_IEEE80211 && pAdapter->AddressLength == sizeof(id))
+		{
+			std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+
+			// found a wifi adapter, we can return now
+			return;
+		}
+		pAdapter = pAdapter->Next;
 	}
 
 	// ethernet and wifi adapters not found, fail the search

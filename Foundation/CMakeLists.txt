@@ -134,6 +134,13 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(WIN32)
+	if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+		# See comments in Environment_WIN32U.cpp.
+		#
+		# NOTE: Property must be applied on non-platform source file, because Environment_WIN32U.cpp is treated as
+		# a header by Poco CMake files.
+		set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/Environment.cpp APPEND PROPERTY COMPILE_DEFINITIONS _USE_32BIT_TIME_T)
+	endif()
 	target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		target_compile_definitions(Foundation PUBLIC POCO_NO_AUTOMATIC_LIBS)
