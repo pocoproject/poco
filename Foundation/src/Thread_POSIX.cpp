@@ -68,10 +68,10 @@ namespace
 
 namespace {
 
-	std::string truncName(const std::string& name)
+	std::string truncName(const std::string& name, int nameSize = 15)
 	{
-		if (name.size() > 15)
-			return name.substr(0, 15).append("~");
+		if (name.size() > nameSize)
+			return name.substr(0, nameSize).append("~");
 		return name;
 	}
 
@@ -79,8 +79,10 @@ namespace {
 		/// Sets thread name. Support for this feature varies
 		/// on platforms. Any errors are ignored.
 	{
-#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version < 1300000
+#if ((POCO_OS == POCO_OS_FREE_BSD) && (__FreeBSD_version < 1300000))
 		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
+#elif (POCO_OS == POCO_OS_QNX)
+		pthread_setname_np(pthread_self(), truncName(threadName, _NTO_THREAD_NAME_MAX).c_str());
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
 		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
