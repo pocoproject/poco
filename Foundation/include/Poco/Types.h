@@ -21,6 +21,16 @@
 #include "Poco/Foundation.h"
 #include <cstdint>
 #include <type_traits>
+#if defined(__clang__) || (defined (__GNUC__) && (__GNUC__ >= 3))
+#	if (__cplusplus >= 201703L)
+#		if __has_include(<cxxabi.h>)
+#			include <typeinfo>
+#			include <cxxabi.h>
+#			include <cstdlib>
+#			define POCO_HAVE_CXXABI_H
+#		endif // __has_include(<cxxabi.h>)
+#	endif // __cplusplus >= 201703L
+#endif // defined(__clang__) || (defined (__GNUC__) && (__GNUC__ >= 3))
 
 
 namespace Poco {
@@ -71,6 +81,29 @@ using UIntPtr = std::uintptr_t;
 #elif defined(_DIAB_TOOL)
 	#define POCO_HAVE_INT64 1
 #endif
+
+
+inline std::string Foundation_API demangle(const char* typeName)
+{
+	std::string result(typeName);
+#ifdef POCO_HAVE_CXXABI_H
+	int status;
+	char* demangled = abi::__cxa_demangle(result.c_str(), nullptr, nullptr, &status);
+	if (demangled)
+	{
+		result = demangled;
+		std::free(demangled);
+	}
+#endif
+	return result;
+}
+
+
+template <typename T>
+std::string Foundation_API demangle(const T&)
+{
+	return demangle(typeid(T).name());
+}
 
 
 } // namespace Poco
