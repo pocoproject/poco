@@ -63,6 +63,7 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * E signed floating-point value in the form [-]d.ddddE[<sign>]dd[d]
 	///   * f signed floating-point value in the form [-]dddd.dddd
 	///   * s std::string
+	///   * v std::string_view
 	///   * z std::size_t
 	///
 	/// The following flags are supported:
