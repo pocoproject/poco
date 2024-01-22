@@ -224,7 +224,7 @@ void ODBCSQLServerTest::testNull()
 		recreateNullsTable("NOT NULL");
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		executor().notNulls("23000");
+		executor().notNulls({"23000"});
 		i += 2;
 	}
 

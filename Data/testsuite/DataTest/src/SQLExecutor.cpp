@@ -573,7 +573,6 @@ void SQLExecutor::simpleAccess()
 		fail (__func__, __LINE__, __FILE__);
 	}
 
-
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(DataException& ce)
@@ -2844,14 +2843,30 @@ void SQLExecutor::internalExtraction()
 		assertTrue (3 == rset2.columnCount());
 		assertTrue (4 == rset2.rowCount());
 
-		int i = rset.value<int>(0,0);
-		assertTrue (1 == i);
+		try
+		{
+			int i = rset.value<int>(0,0);
+			assertTrue (1 == i);
+		}
+		catch(BadCastException&)
+		{
+			long l = rset.value<long>(0,0);
+			assertTrue (1 == l);
+		}
 
 		std::string s = rset.value(0,0).convert<std::string>();
 		assertTrue ("1" == s);
 
-		int a = rset.value<int>(0,2);
-		assertTrue (3 == a);
+		try
+		{
+			int a = rset.value<int>(0,2);
+			assertTrue (3 == a);
+		}
+		catch(BadCastException&)
+		{
+			long l = rset.value<long>(0,2);
+			assertTrue (3 == l);
+		}
 
 		try
 		{
@@ -2875,14 +2890,25 @@ void SQLExecutor::internalExtraction()
 		}
 		assertTrue ("5" == s);
 
-		i = rset.value("str0", 2);
+		int i = rset.value("str0", 2);
 		assertTrue (5 == i);
 
-		const Column<std::deque<int> >& col = rset.column<std::deque<int> >(0);
-		Column<std::deque<int> >::Iterator it = col.begin();
-		Column<std::deque<int> >::Iterator end = col.end();
-		for (int i = 1; it != end; ++it, ++i)
-			assertTrue (*it == i);
+		try
+		{
+			const Column<std::deque<int>>& col = rset.column<std::deque<int> >(0);
+			Column<std::deque<int>>::Iterator it = col.begin();
+			Column<std::deque<int>>::Iterator end = col.end();
+			for (int i = 1; it != end; ++it, ++i)
+				assertTrue (*it == i);
+		}
+		catch(BadCastException&)
+		{
+			const Column<std::deque<long>>& col = rset.column<std::deque<long> >(0);
+			Column<std::deque<long>>::Iterator it = col.begin();
+			Column<std::deque<long>>::Iterator end = col.end();
+			for (long l = 1; it != end; ++it, ++l)
+				assertTrue (*it == l);
+		}
 
 		rset = (session() << "SELECT COUNT(*) AS cnt FROM Vectors", now);
 
@@ -2925,6 +2951,11 @@ void SQLExecutor::internalExtraction()
 		catch (RangeException&) { }
 	}
 	catch(DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		fail (__func__, __LINE__, __FILE__);
+	}
+	catch(Exception& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		fail (__func__, __LINE__, __FILE__);
@@ -3937,7 +3968,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	try
 	{
 		 local.setFeature("autoCommit", true);
-		 fail ("must fail on autocommit setting during transaction", __LINE__);
+		 fail ("must fail on autocommit setting during transaction", __LINE__, __FILE__);
 	}	catch(const Poco::InvalidAccessException&) { }
 
 	// but setting it to its current state is allowed (no-op)
@@ -3992,7 +4023,7 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 }
 
 
-void SQLExecutor::transaction(const std::string& connector, const std::string& connect)
+void SQLExecutor::transaction(const std::string& connector, const std::string& connect, bool readUncommitted)
 {
 	if (!session().canTransact())
 	{
@@ -4076,7 +4107,9 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 	try
 	{
 		stmt1.wait(5000);
-		if (local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
+		if (readUncommitted &&
+			local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED) &&
+			local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
 			assertTrue (0 == locCount);
 	} catch (TimeoutException&)
 	{ std::cerr << '[' << name() << ']' << " Warning: async query timed out." << std::endl; }
@@ -4150,72 +4183,80 @@ struct TestRollbackTransactor
 
 void SQLExecutor::transactor()
 {
-	int count = 0;
-
-	bool autoCommit = session().getFeature("autoCommit");
-	auto ti = session().getTransactionIsolation();
-
-	session().setFeature("autoCommit", false);
-	session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
-
-	TestCommitTransactor ct;
-	Transaction t1(session(), ct);
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (1 == count);
-
-	session() << "DELETE FROM Person", now; session().commit();
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
-
 	try
 	{
-		TestRollbackTransactor rt;
-		Transaction t(session(), rt);
-		fail ("must fail");
-	} catch (Poco::Exception&) { }
+		int count = 0;
 
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
+		bool autoCommit = session().getFeature("autoCommit");
+		auto ti = session().getTransactionIsolation();
 
-	try
+		session().setFeature("autoCommit", false);
+		session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+
+		TestCommitTransactor ct;
+		Transaction t1(session(), ct);
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertTrue (1 == count);
+
+		session() << "DELETE FROM Person", now; session().commit();
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertTrue (0 == count);
+
+		try
+		{
+			TestRollbackTransactor rt;
+			Transaction t(session(), rt);
+			fail ("must fail");
+		} catch (Poco::Exception&) { }
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertTrue (0 == count);
+
+		try
+		{
+			TestRollbackTransactor rt;
+			Transaction t(session());
+			t.transact(rt);
+			fail ("must fail");
+		} catch (Poco::Exception&) { }
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertTrue (0 == count);
+
+		try
+		{
+			TestRollbackTransactor rt;
+			Transaction t(session(), false);
+			t.transact(rt);
+			fail ("must fail");
+		} catch (Poco::Exception&) { }
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertTrue (0 == count);
+
+		try
+		{
+			TestRollbackTransactor rt;
+			Transaction t(session(), true);
+			t.transact(rt);
+			fail ("must fail");
+		} catch (Poco::Exception&) { }
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertTrue (0 == count);
+		session().commit();
+
+		// restore the original transaction state
+		session().setFeature("autoCommit", autoCommit);
+		setTransactionIsolation(session(), ti);
+	}
+	catch (Poco::Exception& ex)
 	{
-		TestRollbackTransactor rt;
-		Transaction t(session());
-		t.transact(rt);
-		fail ("must fail");
-	} catch (Poco::Exception&) { }
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
-
-	try
-	{
-		TestRollbackTransactor rt;
-		Transaction t(session(), false);
-		t.transact(rt);
-		fail ("must fail");
-	} catch (Poco::Exception&) { }
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
-
-	try
-	{
-		TestRollbackTransactor rt;
-		Transaction t(session(), true);
-		t.transact(rt);
-		fail ("must fail");
-	} catch (Poco::Exception&) { }
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
-	session().commit();
-
-	// restore the original transaction state
-	session().setFeature("autoCommit", autoCommit);
-	setTransactionIsolation(session(), ti);
+		std::cerr << __func__ << ':' << ex.displayText() << std::endl;
+		fail (__func__, __LINE__, __FILE__);
+	}
 }
 
 

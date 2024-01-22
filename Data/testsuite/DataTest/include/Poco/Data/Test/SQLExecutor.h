@@ -61,11 +61,63 @@ public:
 	void connection(C& c, const std::string& connectString)
 	{
 		assertFalse (c.isConnected());
-		assertTrue (c.connect(connectString, 5));
+		// some drivers/DBMS do not distinguish, so we only test same values here
+		assertTrue (c.connect(connectString, 10, 10));
 		assertTrue (c.isConnected());
-		assertTrue (c.getTimeout() == 5);
-		c.setTimeout(6);
-		assertTrue (c.getTimeout() == 6);
+		try
+		{
+			assertTrue (c.getTimeout() == 10);
+		}
+		catch(const NotSupportedException&)
+		{
+			std::cout << "Getting session timeout not supported." << '\n';
+		}
+
+		try
+		{
+			assertTrue (c.getLoginTimeout() == 10);
+		}
+		catch(const NotSupportedException&)
+		{
+			std::cout << "Getting login timeout not supported." << '\n';
+		}
+
+		try
+		{
+			c.setTimeout(6);
+		}
+		catch(const NotSupportedException&)
+		{
+			std::cout << "Setting session timeout not supported." << '\n';
+		}
+
+		try
+		{
+			assertTrue (c.getTimeout() == 6);
+		}
+		catch(const NotSupportedException&)
+		{
+			std::cout << "Getting session timeout not supported." << '\n';
+		}
+
+		try
+		{
+			c.setLoginTimeout(11);
+		}
+		catch(const InvalidAccessException&)
+		{
+			std::cout << "Setting login timeout not supported." << '\n';
+		}
+
+		try
+		{
+			assertTrue (c.getLoginTimeout() == 11);
+		}
+		catch(const NotSupportedException&)
+		{
+			std::cout << "Getting login timeout not supported." << '\n';
+		}
+
 		assertTrue (c.disconnect());
 		assertFalse (c.isConnected());
 		assertTrue (c.connect(connectString));
@@ -215,7 +267,7 @@ public:
 
 	void sessionTransaction(const std::string& connector, const std::string& connect);
 	void sessionTransactionNoAutoCommit(const std::string& connector, const std::string& connect);
-	void transaction(const std::string& connector, const std::string& connect);
+	void transaction(const std::string& connector, const std::string& connect, bool readUncommitted = true);
 	void transactor();
 	void nullable();
 

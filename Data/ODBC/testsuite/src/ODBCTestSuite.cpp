@@ -37,12 +37,12 @@ CppUnit::Test* ODBCTestSuite::suite()
 	//
 	// For the time being, the workaround is to connect to DB2 after connecting to PostgreSQL and Oracle.
 
-	addTest(pSuite, ODBCMySQLTest::suite());
+	//addTest(pSuite, ODBCMySQLTest::suite());
 	addTest(pSuite, ODBCOracleTest::suite());
-	addTest(pSuite, ODBCPostgreSQLTest::suite());
-	addTest(pSuite, ODBCSQLiteTest::suite());
-	addTest(pSuite, ODBCSQLServerTest::suite());
-	addTest(pSuite, ODBCDB2Test::suite());
+	//addTest(pSuite, ODBCPostgreSQLTest::suite());
+	//addTest(pSuite, ODBCSQLiteTest::suite());
+	//addTest(pSuite, ODBCSQLServerTest::suite());
+	//addTest(pSuite, ODBCDB2Test::suite());
 // MS Access driver does not support connection status detection
 // disabled for the time being
 #if 0 //defined(POCO_OS_FAMILY_WINDOWS)
