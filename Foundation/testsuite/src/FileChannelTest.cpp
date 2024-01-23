@@ -59,6 +59,33 @@ FileChannelTest::~FileChannelTest()
 }
 
 
+void FileChannelTest::testRotateNever()
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "never");
+		pChannel->open();
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 200; ++i)
+		{
+			pChannel->log(msg);
+		}
+		File f(name);
+		assertTrue (f.exists());
+		f = name + ".0";
+		assertTrue (!f.exists());
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
 void FileChannelTest::testRotateBySize()
 {
 	std::string name = filename();
@@ -804,6 +831,7 @@ CppUnit::Test* FileChannelTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileChannelTest");
 
+	CppUnit_addTest(pSuite, FileChannelTest, testRotateNever);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
