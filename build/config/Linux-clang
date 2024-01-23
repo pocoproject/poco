@@ -10,6 +10,10 @@
 #
 LINKMODE ?= SHARED
 
+ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
+SANITIZEFLAGS      ?=
+OSFLAGS            ?=
+
 #
 # Define Tools
 #
@@ -36,13 +40,13 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -std=c99
-CFLAGS32        =
-CFLAGS64        =
-CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      =
-CXXFLAGS64      =
-LINKFLAGS       =
+CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c11
+CFLAGS32        = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS)
+CFLAGS64        = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS)
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c++17 -Wall -Wno-sign-compare
+CXXFLAGS32      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS)
+CXXFLAGS64      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS)
+LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS)
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =

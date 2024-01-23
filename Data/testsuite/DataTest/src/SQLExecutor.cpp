@@ -2898,8 +2898,8 @@ void SQLExecutor::internalExtraction()
 			const Column<std::deque<int>>& col = rset.column<std::deque<int> >(0);
 			Column<std::deque<int>>::Iterator it = col.begin();
 			Column<std::deque<int>>::Iterator end = col.end();
-			for (int i = 1; it != end; ++it, ++i)
-				assertTrue (*it == i);
+			for (int j = 1; it != end; ++it, ++j)
+				assertTrue (*it == j);
 		}
 		catch(BadCastException&)
 		{

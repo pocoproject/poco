@@ -54,7 +54,7 @@ public:
 	{
 		return i == _val;
 	}
-	
+
 	friend bool operator == (const Dummy &d1, const Dummy &d2)
 	{
 		return d1._val == d2._val;
@@ -3220,15 +3220,15 @@ void VarTest::testVarVisitor()
 		processedVar = v;
 		std::cout << " -> string ";
 	};
-	
+
 	std::vector<Var> var;
-	
+
 	using ulong = unsigned long;
 	using longlong = long long;
 	using ulonglong = unsigned long long;
-	
+
 	ProcessDummy processDummy(processedVar);
-	
+
 	bool accepted = false;
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int8,   processInt8,      -8);
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int16,  processInt16,     -16);
@@ -3244,14 +3244,18 @@ void VarTest::testVarVisitor()
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(double,       processDouble,    2.4);
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(long,         processLong,      123L);
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulong,        processULong,     124UL);
+
+if (typeid(longlong) != typeid(Poco::Int64))
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(longlong,     processLongLong,  123123LL);
+if (typeid(ulonglong) != typeid(Poco::UInt64))
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulonglong,    processULongLong, 124124ULL);
+
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(std::string,  processString,    "hello world");
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Dummy,        processDummy,     42);
-	
+
 	for (const auto &v : var)
 	{
-		std::cout << "handle type : " << v.type().name();
+		std::cout << "handle type : " << v.typeName();
 		if (visitor.visit(v))
 		{
 			if (v.type() != typeid(Dummy))
@@ -3269,7 +3273,7 @@ void VarTest::testVarVisitor()
 		else
 		{
 			std::cout << " fail" << '\n';
-			fail(Poco::format("failed type handle : %s", v.type().name()), __LINE__, __FILE__);
+			fail(Poco::format("failed type handle : %s", v.typeName()), __LINE__, __FILE__);
 		}
 	}
 }

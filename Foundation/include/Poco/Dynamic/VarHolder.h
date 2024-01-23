@@ -405,47 +405,29 @@ private:
 	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
-		if (from > std::numeric_limits<T>::max())
+		if (from > static_cast<F>(std::numeric_limits<T>::max()))
 			throw RangeException("Value too large.");
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
 	void checkLowerLimit(const F& from) const
 	{
-		if (from < std::numeric_limits<T>::min())
+		if (from < static_cast<F>(std::numeric_limits<T>::min()))
 			throw RangeException("Value too small.");
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
-		if (std::is_floating_point<T>::value)
-		{
-			if (from > std::numeric_limits<T>::max())
-				throw RangeException("Value too large.");
-		}
-		else
-		{
-			// Avoid clang -Wimplicit-int-float-conversion warning with an explicit cast.
-			if (from > static_cast<F>(std::numeric_limits<T>::max()))
-				throw RangeException("Value too large.");
-		}
+		if (from > std::numeric_limits<T>::max())
+			throw RangeException("Value too large.");
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	void checkLowerLimit(const F& from) const
 	{
-		if (std::is_floating_point<T>::value)
-		{
-			if (from < -std::numeric_limits<T>::max())
-				throw RangeException("Value too small.");
-		}
-		else
-		{
-			// Avoid clang -Wimplicit-int-float-conversion warning with an explicit cast.
-			if (from < static_cast<F>(std::numeric_limits<T>::min()))
-				throw RangeException("Value too small.");
-		}
+		if (from < -std::numeric_limits<T>::max())
+			throw RangeException("Value too small.");
 	}
 };
 
