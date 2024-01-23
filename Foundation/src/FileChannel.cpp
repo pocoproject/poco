@@ -271,7 +271,9 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 		pStrategy = new RotateBySizeStrategy(n*1024*1024);
 	else if (unit.empty())
 		pStrategy = new RotateBySizeStrategy(n);
-	else if (unit != "never")
+	else if (unit == "never")
+		pStrategy = new NullRotateStrategy();
+	else
 		throw InvalidArgumentException("rotation", rotation);
 
 	return pStrategy;
