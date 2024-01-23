@@ -38,7 +38,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -std=c99 -Isrc
+CFLAGS          = -std=c11 -Isrc
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        =

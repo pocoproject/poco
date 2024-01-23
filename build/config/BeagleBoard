@@ -38,7 +38,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -std=c99 -mfpu=neon -mfloat-abi=softfp -march=armv7-a
+CFLAGS          = -std=c11 -mfpu=neon -mfloat-abi=softfp -march=armv7-a
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -mfpu=neon -mfloat-abi=softfp -march=armv7-a

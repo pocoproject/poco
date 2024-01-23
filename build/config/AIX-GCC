@@ -20,7 +20,7 @@ CXX     = ${CROSS_COMPILE}g++
 LINK    = $(CXX)
 LIB     = $(CROSS_COMPILE)ar -cr -X32_64
 RANLIB  = $(CROSS_COMPILE)ranlib
-## Please note: AIX does NOT have library versioning per se (there is no 'SONAME' capability). 
+## Please note: AIX does NOT have library versioning per se (there is no 'SONAME' capability).
 SHLIB   = $(CXX) $(LDFLAGS) -shared -Wl,-bexpfull -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = $(CROSS_COMPILE)strip -X32_64
@@ -32,7 +32,7 @@ MKDIR   = mkdir -p
 LDFLAGS += -Wl,-bbigtoc
 
 ## http://www.ibm.com/developerworks/aix/library/au-gnu.html:
-## > "/Using -brtl, the AIX linker will look for libraries with both the .a and 
+## > "/Using -brtl, the AIX linker will look for libraries with both the .a and
 ## > .so extensions, such as libfoo.a and libfoo.so.
 ## > Without -brtl, the AIX linker looks only for libfoo.a
 #
@@ -47,7 +47,7 @@ SHAREDLIBLINKEXT = .a
 CFLAGS          = $(SANITIZEFLAGS) -std=c11
 CFLAGS32        = -maix32
 CFLAGS64        = -maix64
-CXXFLAGS        = $(SANITIZEFLAGS) -std=c++14 -Wno-sign-compare
+CXXFLAGS        = $(SANITIZEFLAGS) -std=c++17 -Wno-sign-compare
 CXXFLAGS32      = -maix32
 CXXFLAGS64      = -maix64
 SHLIBFLAGS      = -Wl,-bh:5 -Wl,-bnoipath -Wl,-blibpath:/usr/lib:/lib -Wl,-blibsuff:so -Wl,-bautoexp -Wl,-bnoentry -Wl,-bM:SRE
@@ -58,7 +58,7 @@ LINKFLAGS32     = -maix32
 LINKFLAGS64     = -maix64
 STATICOPT_CC    =
 STATICOPT_CXX   =
-STATICOPT_LINK  = 
+STATICOPT_LINK  =
 SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  =
