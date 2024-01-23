@@ -100,7 +100,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 
 template <typename T>
-std::string Foundation_API demangle(const T&)
+std::string demangle(const T&)
 {
 	return demangle(typeid(T).name());
 }
