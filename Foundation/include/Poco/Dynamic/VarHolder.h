@@ -402,32 +402,75 @@ protected:
 
 private:
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	template <typename T>
+	int numValDigits(T value) const
+	{
+		if (value == 0) return 0;
+
+		int digitCount = 0;
+		do
+		{
+			value /= 10;
+			++digitCount;
+		} while (value);
+
+		return digitCount;
+	}
+
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	int numTypeDigits() const
+	{
+		return std::numeric_limits<T>::digits;
+	}
+
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+	int numTypeDigits() const
+	{
+		return numValDigits(std::numeric_limits<T>::max());
+	}
+
+	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
-		if (from > static_cast<F>(std::numeric_limits<T>::max()))
+		if ((((std::is_same_v<T, float> == true) || (std::is_same_v<T, double> == true)) &&
+				(numValDigits(from) > numTypeDigits<T>())) ||
+			(from > static_cast<F>(std::numeric_limits<T>::max())))
+		{
 			throw RangeException("Value too large.");
+		}
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
 	void checkLowerLimit(const F& from) const
 	{
-		if (from < static_cast<F>(std::numeric_limits<T>::min()))
+		if ((((std::is_same_v<T, float> == true) || (std::is_same_v<T, double> == true)) &&
+				(numValDigits(from) > numTypeDigits<T>())) ||
+			(from < static_cast<F>(std::numeric_limits<T>::min())))
+		{
 			throw RangeException("Value too small.");
+		}
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
 		if (from > std::numeric_limits<T>::max())
 			throw RangeException("Value too large.");
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
 	void checkLowerLimit(const F& from) const
 	{
-		if (from < -std::numeric_limits<T>::max())
-			throw RangeException("Value too small.");
+		if (std::is_floating_point_v<T> == true)
+		{
+			if (from < -std::numeric_limits<T>::max())
+				throw RangeException("Value too small.");
+		}
+		else
+		{
+			if (from < std::numeric_limits<T>::min())
+				throw RangeException("Value too small.");
+		}
 	}
 };
 

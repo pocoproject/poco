@@ -1982,7 +1982,6 @@ void VarTest::testLimitsInt()
 	testLimitsFloatToInt<float, UInt64>();
 	testLimitsFloatToInt<double, UInt64>();
 
-
 	testLimitsUnsigned<UInt16, UInt8>();
 	testLimitsUnsigned<UInt32, UInt8>();
 	testLimitsUnsigned<UInt64, UInt8>();
@@ -2008,6 +2007,22 @@ void VarTest::testLimitsFloat()
 		try { float POCO_UNUSED f; f = da; fail("must fail"); }
 		catch (RangeException&) {}
 	}
+
+	int64_t i = std::numeric_limits<int>::max();
+	++i;
+	Var anyInt = i;
+	anyInt.convert<float>();
+
+	Var anyFloat = 1.0f;
+	anyFloat = i;
+	try
+	{
+		anyFloat.convert<int>();
+		fail("must throw", __LINE__, __FILE__);
+	}
+	catch (Poco::RangeException&) {}
+	assertTrue (anyFloat.convert<int64_t>() == i);
+	float POCO_UNUSED fl = anyFloat;
 }
 
 
@@ -3242,14 +3257,14 @@ void VarTest::testVarVisitor()
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(char,         processChar,      'f');
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(float,        processFloat,     1.2f);
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(double,       processDouble,    2.4);
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(long,         processLong,      123L);
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulong,        processULong,     124UL);
-
-if (typeid(longlong) != typeid(Poco::Int64))
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(longlong,     processLongLong,  123123LL);
-if (typeid(ulonglong) != typeid(Poco::UInt64))
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulonglong,    processULongLong, 124124ULL);
-
+	if (typeid(long) != typeid(Poco::Int64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(long,        processLong,      123L);}
+	if (typeid(ulong) != typeid(Poco::UInt64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulong,       processULong,     124UL);}
+	if (typeid(longlong) != typeid(Poco::Int64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(longlong,    processLongLong,  123123LL);}
+	if (typeid(ulonglong) != typeid(Poco::UInt64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulonglong,   processULongLong, 124124ULL);}
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(std::string,  processString,    "hello world");
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Dummy,        processDummy,     42);
 
