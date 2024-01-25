@@ -44,7 +44,7 @@ FileChannel::FileChannel():
 	_compress(false),
 	_flush(true),
 	_rotateOnOpen(false),
-	_pFile(0),
+	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
 	_pPurgeStrategy(new NullPurgeStrategy())
@@ -58,7 +58,7 @@ FileChannel::FileChannel(const std::string& path):
 	_compress(false),
 	_flush(true),
 	_rotateOnOpen(false),
-	_pFile(0),
+	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
 	_pPurgeStrategy(new NullPurgeStrategy())
@@ -111,8 +111,11 @@ void FileChannel::close()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
+	if (_pFile != nullptr)
+		_pArchiveStrategy->close();
+
 	delete _pFile;
-	_pFile = 0;
+	_pFile = nullptr;
 }
 
 
@@ -298,7 +301,7 @@ void FileChannel::setRotation(const std::string& rotation)
 
 ArchiveStrategy* FileChannel::createArchiveStrategy(const std::string& archive, const std::string& times) const
 {
-	ArchiveStrategy* pStrategy = 0;
+	ArchiveStrategy* pStrategy = nullptr;
 	if (archive == "number")
 	{
 		pStrategy = new ArchiveByNumberStrategy;
@@ -328,7 +331,7 @@ void FileChannel::setArchiveStrategy(ArchiveStrategy* strategy)
 
 void FileChannel::setArchive(const std::string& archive)
 {
-	ArchiveStrategy* pStrategy = 0;
+	ArchiveStrategy* pStrategy = nullptr;
 	if (archive == "number")
 	{
 		pStrategy = new ArchiveByNumberStrategy;

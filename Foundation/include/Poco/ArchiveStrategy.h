@@ -23,6 +23,8 @@
 #include "Poco/File.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Mutex.h"
+#include "Poco/Condition.h"
 #include <atomic>
 
 
@@ -51,6 +53,8 @@ public:
 		/// and creates and returns a new log file.
 		/// The given LogFile object is deleted.
 
+	void close();
+
 	void compress(bool flag = true);
 		/// Enables or disables compression of archived files.
 
@@ -58,9 +62,20 @@ protected:
 	void moveFile(const std::string& oldName, const std::string& newName);
 	bool exists(const std::string& name);
 
+	Poco::FastMutex _rotateMutex;
+
+	// Log rotation must wait until all of the compression tasks complete
+	int _compressingCount;
+	Poco::Condition _compressingComplete;
+
 private:
+
+	friend class ArchiveCompressor;
+
 	ArchiveStrategy(const ArchiveStrategy&);
 	ArchiveStrategy& operator = (const ArchiveStrategy&);
+
+	void compressFile(const std::string& path);
 
 	std::atomic<bool> _compress;
 	std::atomic<ArchiveCompressor*> _pCompressor;

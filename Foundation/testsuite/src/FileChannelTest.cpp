@@ -30,6 +30,7 @@
 #include "Poco/ArchiveStrategy.h"
 #include "Poco/PurgeStrategy.h"
 #include <vector>
+#include <iostream>
 
 
 using Poco::FileChannel;
@@ -559,6 +560,67 @@ void FileChannelTest::testCompress()
 }
 
 
+void FileChannelTest::testCompressedRotation()
+{
+	static const uint32_t MAX_ROLLOVER_TIMES = 8;
+	static const uint32_t LONG_MESSAGE_LENGTH = 1024;
+	static const uint32_t LONG_MAX_FILESIZE = 1024;
+
+	std::vector<uint8_t> longMessage(LONG_MESSAGE_LENGTH, '&');
+	longMessage.push_back(0);
+
+	Poco::Path logsPath(Poco::Path::current(), "logs");
+	Poco::File logsDir(logsPath.toString());
+	if (logsDir.exists())
+		logsDir.remove(true);
+
+	logsDir.createDirectory();
+	logsPath.append("test.log");
+
+	Poco::AutoPtr<Poco::FileChannel> fileChannel = new Poco::FileChannel("ABC");
+	fileChannel->setProperty(Poco::FileChannel::PROP_PATH, logsPath.toString());
+	fileChannel->setProperty(Poco::FileChannel::PROP_FLUSH, "false");
+	fileChannel->setProperty(Poco::FileChannel::PROP_ROTATION, "1 M");
+	fileChannel->setProperty(Poco::FileChannel::PROP_PURGECOUNT, "5");
+	fileChannel->setProperty(Poco::FileChannel::PROP_ARCHIVE, "number");
+	fileChannel->setProperty(Poco::FileChannel::PROP_TIMES, "local");
+	fileChannel->setProperty(Poco::FileChannel::PROP_COMPRESS, "true");
+
+	fileChannel->open();
+
+	std::string text(longMessage.begin(), longMessage.end());
+
+	for (uint32_t i = 1; i <= MAX_ROLLOVER_TIMES; ++i)
+	{
+	    for (uint32_t j = 0; j < LONG_MAX_FILESIZE; ++j)
+	    {
+	        Poco::Message message("ABC", text, Poco::Message::PRIO_INFORMATION);
+	        fileChannel->log(message);
+	    }
+	}
+
+	fileChannel->close();
+
+	std::vector<std::string> files;
+	logsDir.list(files);
+	std::sort(files.begin(), files.end());
+
+	for (const auto& f: files)
+		std::cout << "log file: " << f << std::endl;
+
+	assertEqual(5+1+1, files.size()); // 5+1 rotated files, current file
+	assertEqual("test.log", files[0]);
+	assertEqual("test.log.0.gz", files[1]);
+	assertEqual("test.log.1.gz", files[2]);
+	assertEqual("test.log.2.gz", files[3]);
+	assertEqual("test.log.3.gz", files[4]);
+	assertEqual("test.log.4.gz", files[5]);
+	assertEqual("test.log.5.gz", files[6]);
+
+	logsDir.remove(true);
+}
+
+
 void FileChannelTest::purgeAge(const std::string& pa)
 {
 	std::string name = filename();
@@ -898,6 +960,7 @@ CppUnit::Test* FileChannelTest::suite()
 	CppUnit_addTest(pSuite, FileChannelTest, testArchive);
 	CppUnit_addTest(pSuite, FileChannelTest, testArchiveByStrategy);
 	CppUnit_addTest(pSuite, FileChannelTest, testCompress);
+	CppUnit_addTest(pSuite, FileChannelTest, testCompressedRotation);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testPurgeAge);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeCount);
 	CppUnit_addTest(pSuite, FileChannelTest, testWrongPurgeOption);
