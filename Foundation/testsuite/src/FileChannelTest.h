@@ -45,6 +45,7 @@ public:
 	void testArchive();
 	void testArchiveByStrategy();
 	void testCompress();
+	void testCompressedRotation();
 	void testPurgeAge();
 	void testPurgeCount();
 	void testWrongPurgeOption();
