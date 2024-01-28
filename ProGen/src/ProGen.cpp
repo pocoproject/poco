@@ -601,6 +601,21 @@ protected:
 				appendElement(pLinkElem, "TargetMachine", "MachineARM64");
 			}
 		}
+		Poco::AutoPtr<Poco::XML::NodeList> pClCompileList = pProjectDoc->getElementsByTagName("ClCompile");
+		for (unsigned long i = 0; i < pClCompileList->length(); i++)
+		{
+			Poco::XML::Element* pClCompileElem = static_cast<Poco::XML::Element*>(pClCompileList->item(i));
+			Poco::AutoPtr<Poco::XML::Element> pLanguageStandard = pProjectDoc->createElement("LanguageStandard");
+			Poco::AutoPtr<Poco::XML::Text> pStandardText = pProjectDoc->createTextNode("stdcpp17");
+			pLanguageStandard->appendChild(pStandardText);
+			pClCompileElem->appendChild(pLanguageStandard);
+
+			pClCompileElem = static_cast<Poco::XML::Element*>(pClCompileList->item(i));
+			pLanguageStandard = pProjectDoc->createElement("LanguageStandard_C");
+			pStandardText = pProjectDoc->createTextNode("stdc11");
+			pLanguageStandard->appendChild(pStandardText);
+			pClCompileElem->appendChild(pLanguageStandard);
+		}
 	}
 
 	void appendElement(Poco::XML::Node* pParentNode, const std::string& elemName, const std::string& text)

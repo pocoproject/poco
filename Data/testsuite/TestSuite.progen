@@ -9,6 +9,6 @@ vc.project.prototype = TestSuite_vs90.vcproj
 # TODO, for now we can just send cpp std via AdditionalOptions (see below)
 #vc.project.compiler.std.cpp=stdcpp17
 #vc.project.compiler.std.c=stdc11
-vc.project.compiler.additionalOptions = /Zc:__cplusplus /std:c++17
+vc.project.compiler.additionalOptions = /Zc:__cplusplus
 vc.project.compiler.include = ..\\src;..\\..\\Foundation\\include
 vc.project.linker.dependencies.Win32 = iphlpapi.lib
