@@ -20,6 +20,7 @@
 #include <sstream>
 #include <cstring>
 #include <memory>
+#include "Poco/UnWindows.h"
 
 #include <winsock2.h>
 #include <iphlpapi.h>
