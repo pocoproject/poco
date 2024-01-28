@@ -33,6 +33,8 @@
 #include "Poco/UTF8String.h"
 #include "Poco/UUID.h"
 #include "Poco/Any.h"
+#include "Poco/Format.h"
+#include "Poco/Debugger.h"
 #include "Poco/Exception.h"
 #include <vector>
 #include <list>
@@ -429,47 +431,63 @@ private:
 		return numValDigits(std::numeric_limits<T>::max());
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
-		if ((((std::is_same_v<T, float> == true) || (std::is_same_v<T, double> == true)) &&
-				(numValDigits(from) > numTypeDigits<T>())) ||
-			(from > static_cast<F>(std::numeric_limits<T>::max())))
+		if (((std::is_floating_point<T>::value) && (numValDigits(from) > numTypeDigits<T>())) ||
+			(from > std::numeric_limits<T>::max()))
 		{
-			throw RangeException("Value too large.");
+			throw RangeException(Poco::format("Value too large ((%s/%d) %s > (%s/%d) %s) @ %s.",
+				Poco::demangle(from), numValDigits(from), std::to_string(from),
+				Poco::demangle(T()), numTypeDigits<T>(), std::to_string(std::numeric_limits<T>::max()),
+				poco_src_loc));
 		}
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
 	void checkLowerLimit(const F& from) const
 	{
-		if ((((std::is_same_v<T, float> == true) || (std::is_same_v<T, double> == true)) &&
-				(numValDigits(from) > numTypeDigits<T>())) ||
-			(from < static_cast<F>(std::numeric_limits<T>::min())))
+		if (((std::is_floating_point<T>::value) && (numValDigits(from) > numTypeDigits<T>())) ||
+			(from < std::numeric_limits<T>::min()))
 		{
-			throw RangeException("Value too small.");
+			throw RangeException(Poco::format("Value too small ((%s/%d) %s < (%s/%d) %s) @ %s.",
+				Poco::demangle(from), numValDigits(from), std::to_string(from),
+				Poco::demangle(T()), numTypeDigits<T>(), std::to_string(std::numeric_limits<T>::min()),
+				poco_src_loc));
 		}
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
 		if (from > std::numeric_limits<T>::max())
-			throw RangeException("Value too large.");
+		{
+			throw RangeException(Poco::format("Value too large ((%s) %s > (%s) %s) @ %s.",
+				Poco::demangle(from), std::to_string(from),
+				Poco::demangle(T()), std::to_string(std::numeric_limits<T>::max()),
+				poco_src_loc));
+		}
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	void checkLowerLimit(const F& from) const
 	{
-		if (std::is_floating_point_v<T> == true)
+		if (std::is_floating_point<T>::value)
 		{
 			if (from < -std::numeric_limits<T>::max())
-				throw RangeException("Value too small.");
+			{
+				throw RangeException(Poco::format("Value too small ((%s) %s < (%s) %s @ %s).",
+					Poco::demangle(from), std::to_string(from),
+					Poco::demangle(T()), std::to_string(-std::numeric_limits<T>::max()),
+					poco_src_loc));
+			}
 		}
-		else
+		else if (from < std::numeric_limits<T>::min())
 		{
-			if (from < std::numeric_limits<T>::min())
-				throw RangeException("Value too small.");
+			throw RangeException(Poco::format("Value too small ((%s) %s < (%s) %s @ %s).",
+				Poco::demangle(from), std::to_string(from),
+				Poco::demangle(T()), std::to_string(std::numeric_limits<T>::min()),
+				poco_src_loc));
 		}
 	}
 };
