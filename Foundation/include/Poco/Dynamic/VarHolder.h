@@ -404,29 +404,31 @@ protected:
 
 private:
 
-	template <typename T>
-	int numValDigits(T value) const
+	template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	static constexpr int numValDigits(const T& value)
 	{
+		using U = std::make_unsigned_t<T>;
 		if (value == 0) return 0;
-
 		int digitCount = 0;
-		do
-		{
-			value /= 10;
-			++digitCount;
-		} while (value);
-
+		U locVal = value; // to prevent sign preservation
+		while (locVal >>= 1) ++digitCount;
 		return digitCount;
 	}
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	int numTypeDigits() const
+	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+	static constexpr int numValDigits(T value)
+	{
+		return numValDigits<int64_t>(static_cast<int64_t>(value));
+	}
+
+	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+	static constexpr int numTypeDigits()
 	{
 		return std::numeric_limits<T>::digits;
 	}
 
-	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	int numTypeDigits() const
+	template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	static constexpr int numTypeDigits()
 	{
 		return numValDigits(std::numeric_limits<T>::max());
 	}
@@ -460,7 +462,8 @@ private:
 	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	void checkUpperLimit(const F& from) const
 	{
-		if (from > std::numeric_limits<T>::max())
+		if (((std::is_floating_point<T>::value) && (numValDigits(from) > numTypeDigits<T>())) ||
+			(from > std::numeric_limits<T>::max()))
 		{
 			throw RangeException(Poco::format("Value too large ((%s) %s > (%s) %s) @ %s.",
 				Poco::demangle(from), std::to_string(from),
