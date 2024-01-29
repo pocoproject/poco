@@ -72,6 +72,22 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 }
 
 
+void FileStreamBuf::openHandle(NativeHandle fd, std::ios::openmode mode)
+{
+	poco_assert(_fd == -1);
+	poco_assert(fd != -1);
+
+	_pos = 0;
+	setMode(mode);
+	resetBuffers();
+
+	_fd = fd;
+
+	if ((mode & std::ios::app) || (mode & std::ios::ate))
+		seekoff(0, std::ios::end, mode);
+}
+
+
 int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_fd == -1) return -1;

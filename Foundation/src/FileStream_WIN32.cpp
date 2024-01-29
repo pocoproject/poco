@@ -74,6 +74,22 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 }
 
 
+void FileStreamBuf::openHandle(NativeHandle handle, std::ios::openmode mode)
+{
+	poco_assert(_handle == INVALID_HANDLE_VALUE);
+	poco_assert(handle != INVALID_HANDLE_VALUE);
+
+	_pos = 0;
+	setMode(mode);
+	resetBuffers();
+
+	_handle = handle;
+
+	if ((mode & std::ios::ate) || (mode & std::ios::app))
+		seekoff(0, std::ios::end, mode);
+}
+
+
 int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (INVALID_HANDLE_VALUE == _handle || !(getMode() & std::ios::in))
@@ -85,7 +101,14 @@ int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	DWORD bytesRead(0);
 	BOOL rc = ReadFile(_handle, buffer, static_cast<DWORD>(length), &bytesRead, NULL);
 	if (rc == 0)
+	{
+		if (GetLastError() == ERROR_BROKEN_PIPE)
+		{
+			// Read from closed pipe -> treat as EOF
+			return 0;
+		}
 		File::handleLastError(_path);
+	}
 
 	_pos += bytesRead;
 
