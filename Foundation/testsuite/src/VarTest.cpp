@@ -1999,30 +1999,42 @@ void VarTest::testLimitsFloat()
 	{
 		double iMin = -1 * std::numeric_limits<float>::max();
 		Var da = iMin * 10;
-		try { float POCO_UNUSED f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 
 		double iMax = std::numeric_limits<float>::max();
 		da = iMax * 10;
-		try { float POCO_UNUSED f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 	}
 
 	int64_t i = std::numeric_limits<int>::max();
-	++i;
 	Var anyInt = i;
-	anyInt.convert<float>();
+	try { anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
+	catch (RangeException&) {}
 
 	Var anyFloat = 1.0f;
 	anyFloat = i;
-	try
-	{
-		anyFloat.convert<int>();
-		fail("must throw", __LINE__, __FILE__);
-	}
-	catch (Poco::RangeException&) {}
+	anyFloat.convert<int>();
 	assertTrue (anyFloat.convert<int64_t>() == i);
-	float POCO_UNUSED fl = anyFloat;
+
+	try { float POCO_UNUSED fl = anyFloat; fail("must throw", __LINE__, __FILE__); }
+	catch (Poco::RangeException&) {}
+
+	i = std::numeric_limits<int64_t>::max();
+	anyInt = i;
+
+	float f = 0.f;
+	try { f = anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
+	catch (Poco::RangeException&) {}
+	i = f;
+	assertTrue (0 == i);
+
+	double d = 0.;
+	try { d = anyInt.convert<double>(); fail("must throw", __LINE__, __FILE__); }
+	catch (Poco::RangeException&) {}
+	i = d;
+	assertTrue (0 == i);
 }
 
 

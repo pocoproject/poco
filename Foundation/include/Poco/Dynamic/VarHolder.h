@@ -41,9 +41,17 @@
 #include <deque>
 #include <typeinfo>
 #include <type_traits>
+#include <string_view>
 #undef min
 #undef max
 #include <limits>
+
+
+#define POCO_VAR_RANGE_EXCEPTION(str, from) \
+	throw RangeException(Poco::format("%v ((%s/%d) %s > (%s/%d) %s) @ %s.", \
+		std::string_view(#str), Poco::demangle(from), numValDigits(from), std::to_string(from), \
+		Poco::demangle(T()), numTypeDigits<T>(), std::to_string(static_cast<T>(from)), \
+		poco_src_loc))
 
 
 namespace Poco {
@@ -314,91 +322,83 @@ protected:
 		return pVarHolder->assign<VarHolderImpl<T>, T>(val);
 	}
 
-	template <typename F, typename T>
-	void convertToSmaller(const F& from, T& to) const
+	template <typename F, typename T,
+		typename std::enable_if<std::is_signed<F>::value, F>::type* = nullptr,
+		typename std::enable_if<std::is_signed<T>::value, T>::type* = nullptr>
+	static void convertToSmaller(const F& from, T& to)
 		/// This function is meant to convert signed numeric values from
 		/// larger to smaller type. It checks the upper and lower bound and
 		/// if from value is within limits of type T (i.e. check calls do not throw),
 		/// it is converted.
 	{
-		poco_static_assert (std::numeric_limits<F>::is_specialized);
-		poco_static_assert (std::numeric_limits<T>::is_specialized);
-		poco_static_assert (std::numeric_limits<F>::is_signed);
-		poco_static_assert (std::numeric_limits<T>::is_signed);
-
 		checkUpperLimit<F,T>(from);
 		checkLowerLimit<F,T>(from);
-
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T>
-	void convertToSmallerUnsigned(const F& from, T& to) const
+	template <typename F, typename T,
+		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
+		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value || std::is_floating_point<T>::value, T>::type* = nullptr>
+	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// This function is meant for converting unsigned integral data types,
-		/// from larger to smaller type. Since lower limit is always 0 for unsigned types,
-		/// only the upper limit is checked, thus saving some cycles compared to the signed
-		/// version of the function. If the value to be converted is smaller than
-		/// the maximum value for the target type, the conversion is performed.
+		/// from larger to smaller, as well as floating-point, types. Since lower limit
+		/// is always 0 for unsigned types, only the upper limit is checked, thus
+		/// saving some cycles compared to the signed version of the function. If the
+		/// value to be converted is smaller than the maximum value for the target type,
+		/// the conversion is performed.
 	{
-		poco_static_assert (std::numeric_limits<F>::is_specialized);
-		poco_static_assert (std::numeric_limits<T>::is_specialized);
-		poco_static_assert (!std::numeric_limits<F>::is_signed);
-		poco_static_assert (!std::numeric_limits<T>::is_signed);
-
 		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T>
-	void convertSignedToUnsigned(const F& from, T& to) const
+	template <typename F, typename T,
+		typename std::enable_if<std::is_integral<F>::value && std::is_signed<F>::value, F>::type* = nullptr,
+		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value, T>::type* = nullptr>
+	static void convertSignedToUnsigned(const F& from, T& to)
 		/// This function is meant for converting signed integral data types to
 		/// unsigned data types. Negative values can not be converted and if one
 		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
-		poco_static_assert (std::numeric_limits<F>::is_specialized);
-		poco_static_assert (std::numeric_limits<T>::is_specialized);
-		poco_static_assert (std::numeric_limits<F>::is_signed);
-		poco_static_assert (!std::numeric_limits<T>::is_signed);
-
 		if (from < 0)
-			throw RangeException("Value too small.");
+			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
 		checkUpperLimit<std::make_unsigned_t<F>,T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
-	void convertSignedFloatToUnsigned(const F& from, T& to) const
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true,
+		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value, T>::type* = nullptr>
+	static void convertSignedFloatToUnsigned(const F& from, T& to)
 		/// This function is meant for converting floating point data types to
 		/// unsigned integral data types. Negative values can not be converted and if one
 		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
-		poco_static_assert (std::numeric_limits<F>::is_specialized);
-		poco_static_assert (std::numeric_limits<T>::is_specialized);
-		poco_static_assert (!std::numeric_limits<F>::is_integer);
-		poco_static_assert (std::numeric_limits<T>::is_integer);
-		poco_static_assert (!std::numeric_limits<T>::is_signed);
-
 		if (from < 0)
-			throw RangeException("Value too small.");
+			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
 		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T>
-	void convertUnsignedToSigned(const F& from, T& to) const
+	template <typename F, typename T,
+		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
+		typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type* = nullptr>
+	static void convertUnsignedToSigned(const F& from, T& to)
 		/// This function is meant for converting unsigned integral data types to
-		/// signed integral data types. Negative values can not be converted and if one
-		/// is encountered, RangeException is thrown.
+		/// signed integral data types.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
-		poco_static_assert (std::numeric_limits<F>::is_specialized);
-		poco_static_assert (std::numeric_limits<T>::is_specialized);
-		poco_static_assert (!std::numeric_limits<F>::is_signed);
-		poco_static_assert (std::numeric_limits<T>::is_signed);
-
 		checkUpperLimit<F,T>(from);
+		to = static_cast<T>(from);
+	}
+
+	template <typename F, typename T,
+		std::enable_if_t<std::is_integral<F>::value, bool> = true,
+		std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+	static void convertToFP(F& from, T& to)
+	{
+		if (isPrecisionLost<F, T>(from))
+			POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
 		to = static_cast<T>(from);
 	}
 
@@ -433,65 +433,46 @@ private:
 		return numValDigits(std::numeric_limits<T>::max());
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
-	void checkUpperLimit(const F& from) const
+	template <typename F, typename T,
+		std::enable_if_t<std::is_integral<F>::value, bool> = true,
+		std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+	static bool isPrecisionLost(const F& from)
+		// Checks for loss of precision in integral -> floating point conversion.
 	{
-		if (((std::is_floating_point<T>::value) && (numValDigits(from) > numTypeDigits<T>())) ||
-			(from > std::numeric_limits<T>::max()))
-		{
-			throw RangeException(Poco::format("Value too large ((%s/%d) %s > (%s/%d) %s) @ %s.",
-				Poco::demangle(from), numValDigits(from), std::to_string(from),
-				Poco::demangle(T()), numTypeDigits<T>(), std::to_string(std::numeric_limits<T>::max()),
-				poco_src_loc));
-		}
+		return numValDigits(from) > numTypeDigits<T>();
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
-	void checkLowerLimit(const F& from) const
+	static void checkUpperLimit(const F& from)
 	{
-		if (((std::is_floating_point<T>::value) && (numValDigits(from) > numTypeDigits<T>())) ||
-			(from < std::numeric_limits<T>::min()))
-		{
-			throw RangeException(Poco::format("Value too small ((%s/%d) %s < (%s/%d) %s) @ %s.",
-				Poco::demangle(from), numValDigits(from), std::to_string(from),
-				Poco::demangle(T()), numTypeDigits<T>(), std::to_string(std::numeric_limits<T>::min()),
-				poco_src_loc));
-		}
+		if (from > static_cast<F>(std::numeric_limits<T>::max()))
+			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
+	}
+
+	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	static void checkLowerLimit(const F& from)
+	{
+		if (from < static_cast<F>(std::numeric_limits<T>::min()))
+			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
-	void checkUpperLimit(const F& from) const
+	static void checkUpperLimit(const F& from)
 	{
-		if (((std::is_floating_point<T>::value) && (numValDigits(from) > numTypeDigits<T>())) ||
-			(from > std::numeric_limits<T>::max()))
-		{
-			throw RangeException(Poco::format("Value too large ((%s) %s > (%s) %s) @ %s.",
-				Poco::demangle(from), std::to_string(from),
-				Poco::demangle(T()), std::to_string(std::numeric_limits<T>::max()),
-				poco_src_loc));
-		}
+		if ((from > static_cast<F>(std::numeric_limits<T>::max())))
+			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
-	void checkLowerLimit(const F& from) const
+	static void checkLowerLimit(const F& from)
 	{
 		if (std::is_floating_point<T>::value)
 		{
 			if (-std::numeric_limits<T>::max() > from)
-			{
-				throw RangeException(Poco::format("Value too small ((%s) %s < (%s) %s @ %s).",
-					Poco::demangle(from), std::to_string(from),
-					Poco::demangle(T()), std::to_string(-std::numeric_limits<T>::max()),
-					poco_src_loc));
-			}
+				POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
 		}
 		else if (std::numeric_limits<T>::min() > from)
-		{
-			throw RangeException(Poco::format("Value too small ((%s) %s < (%s) %s @ %s).",
-				Poco::demangle(from), std::to_string(from),
-				Poco::demangle(T()), std::to_string(std::numeric_limits<T>::min()),
-				poco_src_loc));
-		}
+			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
 	}
 };
 
@@ -874,12 +855,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1030,12 +1011,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1183,12 +1164,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1335,12 +1316,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1502,12 +1483,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1654,12 +1635,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1806,12 +1787,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
@@ -1958,12 +1939,12 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(double& val) const
 	{
-		val = static_cast<double>(_val);
+		convertToFP(_val, val);
 	}
 
 	void convert(char& val) const
