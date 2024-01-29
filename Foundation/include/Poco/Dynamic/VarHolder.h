@@ -477,7 +477,7 @@ private:
 	{
 		if (std::is_floating_point<T>::value)
 		{
-			if (from < -std::numeric_limits<T>::max())
+			if (-std::numeric_limits<T>::max() > from)
 			{
 				throw RangeException(Poco::format("Value too small ((%s) %s < (%s) %s @ %s).",
 					Poco::demangle(from), std::to_string(from),
@@ -485,7 +485,7 @@ private:
 					poco_src_loc));
 			}
 		}
-		else if (from < std::numeric_limits<T>::min())
+		else if (std::numeric_limits<T>::min() > from)
 		{
 			throw RangeException(Poco::format("Value too small ((%s) %s < (%s) %s @ %s).",
 				Poco::demangle(from), std::to_string(from),
