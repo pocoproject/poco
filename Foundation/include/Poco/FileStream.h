@@ -69,7 +69,7 @@ public:
 	NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 
-	Poco::UInt64 size() const;
+	UIntPtr size() const;
 		/// Returns file size
 
 protected:

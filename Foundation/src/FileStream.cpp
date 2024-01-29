@@ -56,7 +56,7 @@ FileIOS::NativeHandle FileIOS::nativeHandle() const
 }
 
 
-Poco::UInt64 FileIOS::size() const {
+Poco::UIntPtr FileIOS::size() const {
 	return _buf.size();
 }
 

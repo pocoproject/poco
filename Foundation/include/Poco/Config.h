@@ -212,6 +212,10 @@
 //	#define POCO_ENABLE_STD_MUTEX
 #endif
 
+#ifndef POCO_HAVE_SENDFILE
+//	#define POCO_HAVE_SENDFILE
+#endif
+
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
 
 // Uncomment to explicitly disable SQLParser
