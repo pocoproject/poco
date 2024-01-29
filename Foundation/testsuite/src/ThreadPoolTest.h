@@ -27,6 +27,7 @@ public:
 	~ThreadPoolTest();
 
 	void testThreadPool();
+	void testThreadPoolImmediateShutdown();
 
 	void setUp();
 	void tearDown();
