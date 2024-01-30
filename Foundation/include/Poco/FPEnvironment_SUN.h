@@ -25,7 +25,7 @@
 namespace Poco {
 
 
-class FPEnvironmentImpl
+class Foundation_API FPEnvironmentImpl
 {
 protected:
 	enum RoundingModeImpl

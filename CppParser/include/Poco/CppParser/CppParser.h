@@ -41,7 +41,11 @@
 
 
 #if !defined(CppParser_API)
-	#define CppParser_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define CppParser_API __attribute__ ((visibility ("default")))
+	#else
+		#define CppParser_API
+	#endif
 #endif
 
 

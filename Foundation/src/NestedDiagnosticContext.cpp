@@ -13,7 +13,6 @@
 
 
 #include "Poco/NestedDiagnosticContext.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/ThreadLocal.h"
 
 
@@ -114,15 +113,10 @@ void NestedDiagnosticContext::clear()
 }
 
 
-namespace
-{
-	static ThreadLocal<NestedDiagnosticContext> ndc;
-}
-
-
 NestedDiagnosticContext& NestedDiagnosticContext::current()
 {
-	return ndc.get();
+	static NestedDiagnosticContext ndc;
+	return ndc;
 }
 
 

@@ -15,7 +15,7 @@
 #include "Poco/Clock.h"
 #include "Poco/Exception.h"
 #include "Poco/Timestamp.h"
-#if defined(__MACH__)
+#if defined(__APPLE__)
 #include <mach/mach.h>
 #include <mach/clock.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -104,7 +104,7 @@ void Clock::update()
 	}
 	else throw Poco::SystemException("cannot get system clock");
 
-#elif defined(__MACH__)
+#elif defined(__APPLE__)
 
 	clock_serv_t cs;
 	mach_timespec_t ts;
@@ -155,7 +155,7 @@ Clock::ClockDiff Clock::accuracy()
 	}
 	else throw Poco::SystemException("cannot get system clock accuracy");
 
-#elif defined(__MACH__)
+#elif defined(__APPLE__)
 
 	clock_serv_t cs;
 	int nanosecs;
@@ -204,7 +204,7 @@ bool Clock::monotonic()
 
 	return true;
 
-#elif defined(__MACH__)
+#elif defined(__APPLE__)
 
 	return true;
 

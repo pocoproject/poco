@@ -31,7 +31,7 @@ namespace MongoDB {
 
 class Array;
 
-class ElementFindByName
+class MongoDB_API ElementFindByName
 {
 public:
 	ElementFindByName(const std::string& name):
