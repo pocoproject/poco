@@ -24,6 +24,7 @@ using Poco::Path;
 using Poco::File;
 using Poco::DirectoryIterator;
 using Poco::StringTokenizer;
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -52,7 +53,7 @@ void FilesystemConfiguration::clear()
 bool FilesystemConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	Path p(keyToPath(key));
-	p.setFileName("data");
+	p.setFileName("data"s);
 	File f(p);
 	if (f.exists())
 	{
@@ -75,7 +76,7 @@ void FilesystemConfiguration::setRaw(const std::string& key, const std::string& 
 	Path p(keyToPath(key));
 	File dir(p);
 	dir.createDirectories();
-	p.setFileName("data");
+	p.setFileName("data"s);
 	Poco::FileOutputStream ostr(p.toString());
 	ostr.write(value.data(), (std::streamsize) value.length());
 }

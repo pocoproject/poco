@@ -25,6 +25,9 @@
 #include <memory>
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Net {
 
@@ -73,7 +76,7 @@ void HTTPServerConnection::run()
 				response.setVersion(request.getVersion());
 				response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
 				if (!server.empty())
-					response.set("Server", server);
+					response.set("Server"s, server);
 				try
 				{
 					session.requestTrailer().clear();
