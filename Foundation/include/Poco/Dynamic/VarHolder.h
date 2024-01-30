@@ -323,9 +323,9 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && std::is_signed<F>::value ||
+		typename std::enable_if<(std::is_integral<F>::value && std::is_signed<F>::value) ||
 			std::is_floating_point<F>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value ||
+		typename std::enable_if<(std::is_integral<T>::value && std::is_signed<T>::value) ||
 			std::is_floating_point<F>::value, T>::type* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts signed integral, as well as floating-point, values from
@@ -367,7 +367,7 @@ protected:
 
 	template <typename F, typename T,
 		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value || std::is_floating_point<T>::value, T>::type* = nullptr>
+		typename std::enable_if<(std::is_integral<T>::value && !std::is_signed<T>::value) || std::is_floating_point<T>::value, T>::type* = nullptr>
 	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// Converts unsigned integral data types from larger to smaller, as well as to floating-point, types.
 		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked, thus
