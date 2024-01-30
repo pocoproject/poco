@@ -27,6 +27,9 @@
 #include "Poco/NumberParser.h"
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Util {
 
@@ -109,7 +112,7 @@ void JSONConfiguration::getIndexes(std::string& name, std::vector<int>& indexes)
 	RegularExpression::MatchVec matches;
 	int firstOffset = -1;
 	int offset = 0;
-	RegularExpression regex("\\[([0-9]+)\\]");
+	RegularExpression regex("\\[([0-9]+)\\]"s);
 	while (regex.match(name, offset, matches) > 0)
 	{
 		if (firstOffset == -1)

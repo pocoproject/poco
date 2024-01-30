@@ -19,6 +19,7 @@
 
 
 using Poco::Logger;
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -45,7 +46,7 @@ void LoggingSubsystem::initialize(Application& app)
 {
 	LoggingConfigurator configurator;
 	configurator.configure(app.configPtr());
-	std::string logger = app.config().getString("application.logger", "Application");
+	std::string logger = app.config().getString("application.logger"s, "Application"s);
 	app.setLogger(Logger::get(logger));
 }
 
