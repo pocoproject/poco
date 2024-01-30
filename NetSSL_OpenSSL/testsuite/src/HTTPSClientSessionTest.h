@@ -34,6 +34,7 @@ public:
 	void testPostLargeChunkedKeepAlive();
 	void testKeepAlive();
 	void testInterop();
+	void testMultipleSSLInit();
 	void testProxy();
 	void testCachedSession();
 	void testUnknownContentLength();
