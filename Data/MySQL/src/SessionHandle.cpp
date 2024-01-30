@@ -14,7 +14,6 @@
 
 #include "Poco/Data/MySQL/SessionHandle.h"
 #include "Poco/Data/DataException.h"
-#include "Poco/SingletonHolder.h"
 #ifdef POCO_OS_FAMILY_UNIX
 #include <pthread.h>
 #endif
@@ -51,7 +50,8 @@ public:
 
 	static ThreadCleanupHelper& instance()
 	{
-		return *_sh.get();
+		static ThreadCleanupHelper tch;
+		return tch;
 	}
 
 	static void cleanup(void* data)
@@ -61,11 +61,9 @@ public:
 
 private:
 	pthread_key_t _key;
-	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
 };
 
 
-Poco::SingletonHolder<ThreadCleanupHelper> ThreadCleanupHelper::_sh;
 #endif
 
 

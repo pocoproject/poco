@@ -13,7 +13,6 @@
 
 
 #include "Poco/LoggingFactory.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/AsyncChannel.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/FileChannel.h"
@@ -73,15 +72,10 @@ Formatter::Ptr LoggingFactory::createFormatter(const std::string& className) con
 }
 
 
-namespace
-{
-	static SingletonHolder<LoggingFactory> sh;
-}
-
-
 LoggingFactory& LoggingFactory::defaultFactory()
 {
-	return *sh.get();
+	static LoggingFactory lf;
+	return lf;
 }
 
 

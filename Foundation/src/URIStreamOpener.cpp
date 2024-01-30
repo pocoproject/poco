@@ -17,7 +17,6 @@
 #include "Poco/FileStreamFactory.h"
 #include "Poco/URI.h"
 #include "Poco/Path.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/Exception.h"
 
 
@@ -159,15 +158,10 @@ bool URIStreamOpener::supportsScheme(const std::string& scheme)
 }
 
 
-namespace
-{
-	static SingletonHolder<URIStreamOpener> sh;
-}
-
-
 URIStreamOpener& URIStreamOpener::defaultOpener()
 {
-	return *sh.get();
+	static URIStreamOpener so;
+	return so;
 }
 
 
