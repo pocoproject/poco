@@ -15,7 +15,6 @@
 #include "Poco/PriorityNotificationQueue.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Notification.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -180,15 +179,10 @@ Notification::Ptr PriorityNotificationQueue::dequeueOne()
 }
 
 
-namespace
-{
-	static SingletonHolder<PriorityNotificationQueue> sh;
-}
-
-
 PriorityNotificationQueue& PriorityNotificationQueue::defaultQueue()
 {
-	return *sh.get();
+	static PriorityNotificationQueue pnq;
+	return pnq;
 }
 
 

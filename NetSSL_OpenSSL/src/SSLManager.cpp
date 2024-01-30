@@ -24,7 +24,6 @@
 #include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
@@ -107,15 +106,10 @@ void SSLManager::shutdown()
 }
 
 
-namespace
-{
-	static Poco::SingletonHolder<SSLManager> singleton;
-}
-
-
 SSLManager& SSLManager::instance()
 {
-	return *singleton.get();
+	static SSLManager sm;
+	return sm;
 }
 
 

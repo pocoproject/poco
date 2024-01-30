@@ -352,14 +352,9 @@ private:
 };
 
 
-namespace
-{
-	static ActiveThreadPoolSingletonHolder sh;
-}
-
-
 ActiveThreadPool& ActiveThreadPool::defaultPool()
 {
+	static ActiveThreadPoolSingletonHolder sh;
 	return *sh.pool();
 }
 

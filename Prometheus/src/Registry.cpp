@@ -15,7 +15,6 @@
 #include "Poco/Prometheus/Registry.h"
 #include "Poco/Prometheus/Collector.h"
 #include "Poco/Exception.h"
-#include "Poco/SingletonHolder.h"
 
 
 using namespace std::string_literals;
@@ -90,15 +89,10 @@ void Registry::exportTo(Exporter& exporter) const
 }
 
 
-namespace
-{
-	static SingletonHolder<Registry> sh;
-}
-
-
 Registry& Registry::defaultRegistry()
 {
-	return *sh.get();
+	static Registry r;
+	return r;
 }
 
 
