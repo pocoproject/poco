@@ -206,6 +206,9 @@ endif()
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
+option(ENABLE_TEST_DEPRECATED
+	"Set to OFF|ON (default is OFF) to enable build of tests for deprecated functionality" OFF)
+
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
 
@@ -219,6 +222,9 @@ if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
 	message(STATUS "Building with unittests & samples")
+	if(ENABLE_TEST_DEPRECATED)
+		add_compile_definitions(POCO_TEST_DEPRECATED)
+	endif()
 else()
 	message(STATUS "Building without tests & samples")
 endif()
