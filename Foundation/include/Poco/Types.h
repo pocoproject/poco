@@ -88,10 +88,21 @@ inline std::string Foundation_API demangle(const char* typeName)
 	std::string result(typeName);
 #ifdef POCO_HAVE_CXXABI_H
 	int status;
-	char* demangled = abi::__cxa_demangle(result.c_str(), nullptr, nullptr, &status);
+	char* demangled = abi::__cxa_demangle(typeName, nullptr, nullptr, &status);
 	if (demangled)
 	{
-		result = demangled;
+		if (status == 0) result = demangled;
+		else
+		{
+			switch (status)
+			{
+				case -1: result = "[ERRMEM]";  break;
+				case -2: result = "[ERRNAME]"; break;
+				case -3: result = "[ERRARG]";  break;
+				default: result = "[ERRUNK]";
+			}
+		}
+
 		std::free(demangled);
 	}
 #endif
@@ -100,7 +111,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 
 template <typename T>
-std::string demangle(const T&)
+std::string demangle()
 {
 	return demangle(typeid(T).name());
 }

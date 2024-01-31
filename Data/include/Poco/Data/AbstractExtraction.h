@@ -167,7 +167,7 @@ protected:
 	template<typename T>
 	void setHeldType()
 	{
-		_pHeldType.reset(new std::string(Poco::demangle(T())));
+		_pHeldType.reset(new std::string(Poco::demangle<T>()));
 	}
 
 private:

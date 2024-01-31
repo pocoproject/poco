@@ -49,8 +49,8 @@
 
 #define POCO_VAR_RANGE_EXCEPTION(str, from) \
 	throw RangeException(Poco::format("%v ((%s/%d) %s > (%s/%d) %s) @ %s.", \
-		std::string_view(#str), Poco::demangle(from), numValDigits(from), std::to_string(from), \
-		Poco::demangle(T()), numTypeDigits<T>(), std::to_string(static_cast<T>(from)), \
+		std::string_view(#str), Poco::demangle<F>(), numValDigits(from), std::to_string(from), \
+		Poco::demangle<T>(), numTypeDigits<T>(), std::to_string(static_cast<T>(from)), \
 		poco_src_loc))
 
 
