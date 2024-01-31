@@ -4,7 +4,7 @@
 # Usage:
 # ------
 # progen.ps1   [-poco_base    dir]
-#              [-vs           140 | 150 | 160| 170]
+#              [-vs           160| 170]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
 #              [-components   "Lib1X,LibY,LibZ,..."]
 #              [-platform     Win32 | x64 | ARM64 | WEC2013]
@@ -19,7 +19,7 @@ Param
 	[string] $poco_base = $([System.Environment]::GetEnvironmentVariable('POCO_BASE')),
 
 	[Parameter()]
-	[ValidateSet(140, 150, 160, 170)]
+	[ValidateSet(160, 170)]
 	[int] $vs = 170,
 
 	[string] $omit,
@@ -44,7 +44,7 @@ function ProcessInput
 		Write-Host 'Usage:'
 		Write-Host '------'
 		Write-Host 'progen.ps1 [-poco_base <dir>]'
-		Write-Host '    [-vs           140 | 150 | 160 | 170]'
+		Write-Host '    [-vs           160 | 170]'
 		Write-Host '    [-omit         "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-components   "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-samples]'
