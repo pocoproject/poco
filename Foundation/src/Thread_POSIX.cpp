@@ -20,6 +20,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Format.h"
+#include "Poco/Error.h"
 #include <signal.h>
 
 #if POCO_OS == POCO_OS_FREE_BSD
@@ -194,8 +195,10 @@ void ThreadImpl::setPriorityImpl(int prio)
 		{
 			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
-				throw SystemException("cannot set thread priority");
+			int errorCode;
+			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
+				throw SystemException(Poco::format("cannot set thread priority (%s)",
+					Error::getMessage(errorCode)));
 		}
 	}
 }
@@ -209,8 +212,10 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 		{
 			struct sched_param par;
 			par.sched_priority = prio;
-			if (pthread_setschedparam(_pData->thread, policy, &par))
-				throw SystemException("cannot set thread priority");
+			int errorCode;
+			if ((errorCode = pthread_setschedparam(_pData->thread, policy, &par)))
+				throw SystemException(Poco::format("cannot set thread priority (%s)",
+					Error::getMessage(errorCode)));
 		}
 		_pData->prio   = reverseMapPrio(prio, policy);
 		_pData->osPrio = prio;
@@ -291,24 +296,29 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 
 	if (_pData->stackSize != 0)
 	{
-		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+		int errorCode;
+		if ((errorCode = pthread_attr_setstacksize(&attributes, _pData->stackSize)))
 		{
 			pthread_attr_destroy(&attributes);
-			throw SystemException("cannot set thread stack size");
+			throw SystemException(Poco::format("cannot set thread stack size: (%s)",
+				Error::getMessage(errorCode)));
 		}
 	}
 
 	{
 		FastMutex::ScopedLock l(_pData->mutex);
 		_pData->pRunnableTarget = pTarget;
-		if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
+		int errorCode;
+		if ((errorCode = pthread_create(&_pData->thread, &attributes, runnableEntry, this)))
 		{
 			_pData->pRunnableTarget = 0;
 			pthread_attr_destroy(&attributes);
-			throw SystemException("cannot start thread");
+			throw SystemException(Poco::format("cannot start thread (%s)",
+				Error::getMessage(errorCode)));
 		}
 	}
 	_pData->started = true;
+	_pData->joined = false;
 	pthread_attr_destroy(&attributes);
 
 	if (_pData->policy == SCHED_OTHER)
@@ -317,16 +327,20 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		{
 			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
-				throw SystemException("cannot set thread priority");
+			int errorCode;
+			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
+				throw SystemException(Poco::format("cannot set thread priority (%s)",
+					Error::getMessage(errorCode)));
 		}
 	}
 	else
 	{
 		struct sched_param par;
 		par.sched_priority = _pData->osPrio;
-		if (pthread_setschedparam(_pData->thread, _pData->policy, &par))
-			throw SystemException("cannot set thread priority");
+		int errorCode;
+		if ((errorCode = pthread_setschedparam(_pData->thread, _pData->policy, &par)))
+			throw SystemException(Poco::format("cannot set thread priority (%s)",
+				Error::getMessage(errorCode)));
 	}
 }
 
@@ -335,20 +349,25 @@ void ThreadImpl::joinImpl()
 {
 	if (!_pData->started) return;
 	_pData->done.wait();
-	void* result;
-	if (pthread_join(_pData->thread, &result))
-		throw SystemException("cannot join thread");
-	_pData->joined = true;
+	if (!_pData->joined)
+	{
+		int errorCode;
+		if ((errorCode = pthread_join(_pData->thread, nullptr)))
+			throw SystemException(Poco::format("cannot join thread (%s)",
+				Error::getMessage(errorCode)));
+		_pData->joined = true;
+	}
 }
 
 
 bool ThreadImpl::joinImpl(long milliseconds)
 {
-	if (_pData->started && _pData->done.tryWait(milliseconds))
+	if (_pData->started && _pData->done.tryWait(milliseconds) && !_pData->joined)
 	{
-		void* result;
-		if (pthread_join(_pData->thread, &result))
-			throw SystemException("cannot join thread");
+		int errorCode;
+		if ((errorCode = pthread_join(_pData->thread, nullptr)))
+			throw SystemException(Poco::format("cannot join thread (%s)",
+				Error::getMessage(errorCode)));
 		_pData->joined = true;
 		return true;
 	}
