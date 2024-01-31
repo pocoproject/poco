@@ -228,7 +228,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -262,7 +262,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -292,7 +292,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -320,7 +320,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -342,7 +342,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -370,7 +370,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -393,7 +393,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -427,7 +427,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -457,7 +457,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -485,7 +485,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -507,7 +507,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -535,7 +535,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\Data\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLITE_ENABLE_FTS5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
