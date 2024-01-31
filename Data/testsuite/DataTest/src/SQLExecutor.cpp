@@ -2850,7 +2850,7 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			long l = rset.value<long>(0,0);
+			Poco::Int64 l = rset.value<Poco::Int64>(0,0);
 			assertTrue (1 == l);
 		}
 
@@ -2864,7 +2864,7 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			long l = rset.value<long>(0,2);
+			Poco::Int64 l = rset.value<Poco::Int64>(0,2);
 			assertTrue (3 == l);
 		}
 
@@ -2903,10 +2903,10 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			const Column<std::deque<long>>& col = rset.column<std::deque<long> >(0);
-			Column<std::deque<long>>::Iterator it = col.begin();
-			Column<std::deque<long>>::Iterator end = col.end();
-			for (long l = 1; it != end; ++it, ++l)
+			const Column<std::deque<Poco::Int64>>& col = rset.column<std::deque<Poco::Int64> >(0);
+			Column<std::deque<Poco::Int64>>::Iterator it = col.begin();
+			Column<std::deque<Poco::Int64>>::Iterator end = col.end();
+			for (Poco::Int64 l = 1; it != end; ++it, ++l)
 				assertTrue (*it == l);
 		}
 
