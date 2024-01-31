@@ -721,7 +721,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 		else
 			ret = extractBoundImpl(pos, result);
 		transcode(result, val);
-		
+
 	}
 
 	return ret;

@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Prometheus">
-      <UniqueIdentifier>{da550d87-d4ce-43f1-9de7-95ff18bd3b61}</UniqueIdentifier>
+      <UniqueIdentifier>{a2e895c5-43ef-44fc-8843-8ce5f32490a3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Prometheus\Header Files">
-      <UniqueIdentifier>{b856d548-6ff2-43b8-8ece-28beb7105da2}</UniqueIdentifier>
+      <UniqueIdentifier>{007e1e30-599f-40f1-a03b-73d4ccc2697f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Prometheus\Source Files">
-      <UniqueIdentifier>{00c34b95-ed74-4de6-846c-f93021b9ea5f}</UniqueIdentifier>
+      <UniqueIdentifier>{4b99f8e7-b3ca-42ce-8513-51b68ad0f46a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

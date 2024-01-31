@@ -145,8 +145,8 @@ private:
 		int           policy;
 		Event         done;
 		std::size_t   stackSize;
-		bool          started;
-		bool          joined;
+		std::atomic<bool> started;
+		std::atomic<bool> joined;
 		std::string   name;
 		int           affinity;
 		mutable FastMutex mutex;

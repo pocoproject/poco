@@ -106,7 +106,8 @@ public:
 		SQLExecutor::DataBinding bindMode,
 		SQLExecutor::DataExtraction extractMode,
 		const std::string& insert = MULTI_INSERT,
-		const std::string& select = MULTI_SELECT);
+		const std::string& select = MULTI_SELECT,
+		const std::string& procCreateString = "");
 
 	void bareboneODBCStoredFuncTest(const std::string& dbConnString,
 		const std::string& tableCreateString,
@@ -495,7 +496,7 @@ public:
 	void internalBulkExtractionUTF16();
 	void internalStorageType();
 	void nulls();
-	void notNulls(const std::string& sqlState = "23502");
+	void notNulls(const std::vector<std::string>& sqlStates = {std::string("23502")});
 	void rowIterator();
 	void stdVectorBool();
 
@@ -517,7 +518,7 @@ public:
 
 	void sessionTransaction(const std::string& connect);
 	void sessionTransactionNoAutoCommit(const std::string& connect);
-	void transaction(const std::string& connect);
+	void transaction(const std::string& connect, bool readUncommitted = true);
 	void transactor();
 	void nullable();
 
@@ -994,9 +995,9 @@ inline void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& conne
 }
 
 
-inline void SQLExecutor::transaction(const std::string& connect)
+inline void SQLExecutor::transaction(const std::string& connect, bool readUncommitted)
 {
-	_dataExecutor.transaction("odbc", connect);
+	_dataExecutor.transaction("odbc", connect, readUncommitted);
 }
 
 

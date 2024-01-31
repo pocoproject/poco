@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <string_view>
 
 
 namespace Poco {
@@ -61,10 +62,28 @@ public:
 
 	static void enter(const char* file, int line);
 		/// Writes a debug message to the debugger log and breaks into it.
+
+	static constexpr std::string_view sourceFile(const std::string_view& fileName)
+		/// Utility function for reporting the source file name. The file path is
+		/// truncated and only the source file name (with extension) is returned.
+		///
+		/// For full location reporting (including function name and line number),
+		/// see `poco_src_loc` macro.
+	{
+		std::size_t pos = fileName.find_last_of("/\\");
+		if (pos == std::string_view::npos) pos = 0;
+		else if (fileName.length() > 1) ++pos;
+		return std::string_view(fileName.substr(pos));
+	}
 };
 
 
 } // namespace Poco
+
+
+#define poco_src_loc std::string(Poco::Debugger::sourceFile(__FILE__)) \
+	.append("::").append(__func__) \
+	.append("():").append(std::to_string(__LINE__))
 
 
 #endif // Foundation_Debugger_INCLUDED

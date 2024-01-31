@@ -600,6 +600,7 @@
     <ClCompile Include="src\DataURIStreamTest.cpp">
       <Filter>URI\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActiveThreadPoolTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AnyTest.h">
@@ -1022,5 +1023,6 @@
     <ClInclude Include="src\DataURIStreamTest.h">
       <Filter>URI\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ActiveThreadPoolTest.h" />
   </ItemGroup>
 </Project>

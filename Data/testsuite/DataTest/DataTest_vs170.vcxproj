@@ -230,7 +230,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>17.0.34202.158</_ProjectFileVersion>
+    <_ProjectFileVersion>17.0.34322.80</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|ARM64'">PocoDataTestA64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|ARM64'">PocoDataTestmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|ARM64'">PocoDataTestmtd</TargetName>
@@ -345,8 +345,10 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <OutputFile>..\..\..\binA64\PocoDataTestA64d.dll</OutputFile>
@@ -379,8 +381,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <OutputFile>..\..\..\binA64\PocoDataTestA64.dll</OutputFile>
@@ -411,8 +415,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\libA64\PocoDataTestmtd.lib</OutputFile>
@@ -438,8 +444,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\libA64\PocoDataTestmt.lib</OutputFile>
@@ -462,8 +470,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\libA64\PocoDataTestmdd.lib</OutputFile>
@@ -489,8 +499,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\libA64\PocoDataTestmd.lib</OutputFile>
@@ -513,8 +525,10 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <OutputFile>..\..\..\bin\PocoDataTestd.dll</OutputFile>
@@ -547,8 +561,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <OutputFile>..\..\..\bin\PocoDataTest.dll</OutputFile>
@@ -579,8 +595,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib\PocoDataTestmtd.lib</OutputFile>
@@ -606,8 +624,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib\PocoDataTestmt.lib</OutputFile>
@@ -630,8 +650,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib\PocoDataTestmdd.lib</OutputFile>
@@ -657,8 +679,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib\PocoDataTestmd.lib</OutputFile>
@@ -681,8 +705,10 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <OutputFile>..\..\..\bin64\PocoDataTest64d.dll</OutputFile>
@@ -715,8 +741,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <OutputFile>..\..\..\bin64\PocoDataTest64.dll</OutputFile>
@@ -747,8 +775,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib64\PocoDataTestmtd.lib</OutputFile>
@@ -774,8 +804,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib64\PocoDataTestmt.lib</OutputFile>
@@ -798,8 +830,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib64\PocoDataTestmdd.lib</OutputFile>
@@ -825,8 +859,10 @@
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>/Zc:__cplusplus /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\..\lib64\PocoDataTestmd.lib</OutputFile>
@@ -842,6 +878,8 @@
   <ItemGroup>
     <ClCompile Include="src\SQLExecutor.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

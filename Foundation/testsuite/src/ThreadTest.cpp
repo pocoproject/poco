@@ -17,7 +17,6 @@
 #include "Poco/Event.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-//#include <iostream>
 #if defined(__sun) && defined(__SVR4) && !defined(__EXTENSIONS__)
 #define __EXTENSIONS__
 #endif

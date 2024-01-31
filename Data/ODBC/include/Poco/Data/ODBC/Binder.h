@@ -394,6 +394,7 @@ private:
 	{
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
+
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
 		_lengthIndicator.push_back(0);

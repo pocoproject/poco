@@ -137,6 +137,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/FS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -168,6 +170,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/FS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -198,6 +202,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/FS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -232,6 +238,8 @@
       </DebugInformationFormat>
       <AdditionalOptions>/FS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -270,6 +278,8 @@
       </DebugInformationFormat>
       <AdditionalOptions>/FS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -307,6 +317,8 @@
       </DebugInformationFormat>
       <AdditionalOptions>/FS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>

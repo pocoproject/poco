@@ -475,6 +475,11 @@ public:
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
+	std::string typeName(bool demangle = true) const;
+		/// Returns the type name of the stored content.
+		/// If demangling is available and emangle is true,
+		/// the returnsed string will be demangled.
+
 	//@ deprecated
 	void empty();
 		/// Empties Var.
@@ -521,23 +526,8 @@ public:
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
 		/// for held container.
 
-	std::string toString() const
+	std::string toString() const;
 		/// Returns the stored value as string.
-	{
-		VarHolder* pHolder = content();
-
-		if (!pHolder)
-				throw InvalidAccessException("Can not convert empty value.");
-
-		if (typeid(std::string) == pHolder->type())
-			return extract<std::string>();
-		else
-		{
-			std::string result;
-			pHolder->convert(result);
-			return result;
-		}
-	}
 
 	static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
@@ -617,17 +607,8 @@ private:
 		_placeholder.assign<VarHolderImpl<ValueType>, ValueType>(value);
 	}
 
-	void construct(const char* value)
-	{
-		std::string val(value);
-		_placeholder.assign<VarHolderImpl<std::string>, std::string>(val);
-	}
-
-	void construct(const Var& other)
-	{
-		if (!other.isEmpty())
-			other.content()->clone(&_placeholder);
-	}
+	void construct(const char* value);
+	void construct(const Var& other);
 
 	Placeholder<VarHolder> _placeholder;
 };
@@ -641,6 +622,20 @@ private:
 ///
 /// Var members
 ///
+
+inline void Var::construct(const char* value)
+{
+	std::string val(value);
+	_placeholder.assign<VarHolderImpl<std::string>, std::string>(val);
+}
+
+
+inline void Var::construct(const Var& other)
+{
+	if (!other.isEmpty())
+		other.content()->clone(&_placeholder);
+}
+
 
 inline void Var::swap(Var& other)
 {
@@ -671,6 +666,13 @@ inline const std::type_info& Var::type() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->type() : typeid(void);
+}
+
+
+inline std::string Var::typeName(bool demangle) const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? demangle ? Poco::demangle(pHolder->type().name()) : pHolder->type().name() : std::string();
 }
 
 

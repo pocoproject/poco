@@ -130,7 +130,7 @@ void ODBCSQLiteTest::testNull()
 		recreateNullsTable("NOT NULL");
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HY000");
+		_pExecutor->notNulls({"HY000"});
 		i += 2;
 	}
 }

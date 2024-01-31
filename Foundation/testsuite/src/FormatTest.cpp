@@ -14,6 +14,7 @@
 #include "Poco/Any.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include <string_view>
 
 
 using Poco::format;
@@ -416,6 +417,32 @@ void FormatTest::testString()
 }
 
 
+void FormatTest::testStringView()
+{
+	std::string_view foo("foo");
+	std::string s(format("%v", foo));
+	assertTrue (s == "foo");
+
+	s = format("%5v", foo);
+	assertTrue (s == "  foo");
+
+	s = format("%-5v", foo);
+	assertTrue (s == "foo  ");
+
+	s = format("%*v", 5, foo);
+	assertTrue (s == "  foo");
+
+	s = format("%-*v", 5, foo);
+	assertTrue (s == "foo  ");
+
+	s = format("%v%%a", foo);
+	assertTrue (s == "foo%a");
+
+	s = format("'%v%%''%v%%'", foo, foo);
+	assertTrue (s == "'foo%''foo%'");
+}
+
+
 void FormatTest::testMultiple()
 {
 	std::string s(format("aaa%dbbb%4dccc", 1, 2));
@@ -496,6 +523,7 @@ CppUnit::Test* FormatTest::suite()
 	CppUnit_addTest(pSuite, FormatTest, testFloatFix);
 	CppUnit_addTest(pSuite, FormatTest, testFloatSci);
 	CppUnit_addTest(pSuite, FormatTest, testString);
+	CppUnit_addTest(pSuite, FormatTest, testStringView);
 	CppUnit_addTest(pSuite, FormatTest, testMultiple);
 	CppUnit_addTest(pSuite, FormatTest, testIndex);
 	CppUnit_addTest(pSuite, FormatTest, testAny);
