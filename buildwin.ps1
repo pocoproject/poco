@@ -213,7 +213,7 @@ function Set-Environment
 			$Command = Resolve-Path "$($vsdir)\..\..\VC\vcvarsall.bat"
 			$script:msbuild_exe = "MSBuild.exe"
 		}
-	}}
+	}
 
 	$tempFile = [IO.Path]::GetTempFileName()
 	cmd /c " `"$Command`" $CommandArg && set > `"$tempFile`" "
