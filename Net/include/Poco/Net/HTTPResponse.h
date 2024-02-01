@@ -62,7 +62,7 @@ public:
 		HTTP_SEE_OTHER                       = 303,
 		HTTP_NOT_MODIFIED                    = 304,
 		HTTP_USE_PROXY                       = 305,
-		HTTP_USEPROXY                        = 305, /// @deprecated
+		HTTP_USEPROXY [[deprecated]]         = 305,
 		// UNUSED: 306
 		HTTP_TEMPORARY_REDIRECT              = 307,
 		HTTP_PERMANENT_REDIRECT              = 308,
@@ -80,11 +80,11 @@ public:
 		HTTP_LENGTH_REQUIRED                 = 411,
 		HTTP_PRECONDITION_FAILED             = 412,
 		HTTP_REQUEST_ENTITY_TOO_LARGE        = 413,
-		HTTP_REQUESTENTITYTOOLARGE           = 413, /// @deprecated
+		HTTP_REQUESTENTITYTOOLARGE [[deprecated]] = 413,
 		HTTP_REQUEST_URI_TOO_LONG            = 414,
-		HTTP_REQUESTURITOOLONG               = 414, /// @deprecated
+		HTTP_REQUESTURITOOLONG [[deprecated]] = 414,
 		HTTP_UNSUPPORTED_MEDIA_TYPE          = 415,
-		HTTP_UNSUPPORTEDMEDIATYPE            = 415, /// @deprecated
+		HTTP_UNSUPPORTEDMEDIATYPE [[deprecated]] = 415,
 		HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
 		HTTP_EXPECTATION_FAILED              = 417,
 		HTTP_IM_A_TEAPOT                     = 418,

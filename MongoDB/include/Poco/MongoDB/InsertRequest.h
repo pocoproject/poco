@@ -26,6 +26,7 @@
 namespace Poco {
 namespace MongoDB {
 
+class [[deprecated]] InsertRequest;
 
 class MongoDB_API InsertRequest: public RequestMessage
 	/// A request for inserting one or more documents to the database

@@ -72,25 +72,31 @@ public:
 		///
 		/// If the command fails, -1 is returned.
 
+	[[deprecated]]
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCommand() const;
 		/// Creates a QueryRequest for a command. (old wire protocol)
 
+	[[deprecated]]
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
 		/// Creates a QueryRequest to count the given collection.
 		/// The collectionname must not contain the database name. (old wire protocol)
 
+	[[deprecated]]
 	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
 		/// Creates a DeleteRequest to delete documents in the given collection.
 		/// The collectionname must not contain the database name. (old wire protocol)
 
+	[[deprecated]]
 	Poco::SharedPtr<Poco::MongoDB::InsertRequest> createInsertRequest(const std::string& collectionName) const;
 		/// Creates an InsertRequest to insert new documents in the given collection.
 		/// The collectionname must not contain the database name. (old wire protocol)
 
+	[[deprecated]]
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
 		/// Creates a QueryRequest. (old wire protocol)
 		/// The collectionname must not contain the database name.
 
+	[[deprecated]]
 	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
 		/// Creates an UpdateRequest. (old wire protocol)
 		/// The collectionname must not contain the database name.
@@ -115,10 +121,12 @@ public:
 		/// Creates an index. The document returned is the result of a getLastError call.
 		/// For more info look at the ensureIndex information on the MongoDB website. (old wire protocol)
 
+	[[deprecated]]
 	Document::Ptr getLastErrorDoc(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the error document.
 		/// (old wire protocol)
 
+	[[deprecated]] 
 	std::string getLastError(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the err element
 		/// from the error document. When err is null, an empty string is returned.

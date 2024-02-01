@@ -65,13 +65,6 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-if(POCO_STATIC)
-	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
-	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
-
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
 

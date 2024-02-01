@@ -67,7 +67,7 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
-	//@ deprecated
+	[[deprecated]]
 	LocalDateTime(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond);
 		/// Creates a LocalDateTime for the given Gregorian date and time in the
 		/// time zone denoted by the time zone differential in tzd.
@@ -85,13 +85,13 @@ public:
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the time zone differential of the current time zone.
 
-	//@ deprecated
+	[[deprecated]]
 	LocalDateTime(int tzd, const DateTime& dateTime);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. Adjusts dateTime
 		/// for the given time zone differential.
 
-	//@ deprecated
+	[[deprecated]]
 	LocalDateTime(int tzd, const DateTime& dateTime, bool adjust);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. If adjust is true,
@@ -100,7 +100,7 @@ public:
 	LocalDateTime(double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the local time zone.
 
-	//@ deprecated
+	[[deprecated]]
 	LocalDateTime(int tzd, double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the time zone
 		/// denoted by the time zone differential in tzd.
@@ -131,7 +131,7 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
-	//@ deprecated
+	[[deprecated]]
 	LocalDateTime& assign(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microseconds);
 		/// Assigns a Gregorian local date and time in the time zone denoted by
 		/// the time zone differential in tzd.
@@ -145,7 +145,7 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
-	//@ deprecated
+	[[deprecated]]
 	LocalDateTime& assign(int tzd, double julianDay);
 		/// Assigns a Julian day in the time zone denoted by the
 		/// time zone differential in tzd.
