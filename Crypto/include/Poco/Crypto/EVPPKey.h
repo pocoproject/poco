@@ -35,10 +35,8 @@
 namespace Poco {
 namespace Crypto {
 
-//@deprecated
-class ECKey;
-//@deprecated
-class RSAKey;
+class [[deprecated]] ECKey;
+class [[deprecated]] RSAKey;
 class PKCS12Container;
 class X509Certificate;
 
@@ -93,9 +91,8 @@ public:
 		/// Constructs EVPPKey from EVP_PKEY pointer.
 		/// The content behind the supplied pointer is internally duplicated.
 
-	//@ deprecated
 	template<typename K>
-	explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
+	[[deprecated]] explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
 		/// Constructs EVPPKey from a "native" OpenSSL (RSA or EC_KEY),
 		/// or a Poco wrapper (RSAKey, ECKey) key pointer.
 	{
@@ -185,13 +182,16 @@ private:
 	void newECKey(const char* group);
 	void duplicate(EVP_PKEY* pEVPPKey);
 
-	//@ deprecated
+	[[deprecated]]
 	void setKey(ECKey* pKey);
-	//@ deprecated
+
+	[[deprecated]]
 	void setKey(RSAKey* pKey);
-	//@ deprecated
+
+	[[deprecated]]
 	void setKey(EC_KEY* pKey);
-	//@ deprecated
+
+	[[deprecated]]
 	void setKey(RSA* pKey);
 
 	static int passCB(char* buf, int size, int, void* pass);
@@ -336,9 +336,7 @@ private:
 	EVP_PKEY* _pEVPPKey = 0;
 	static const std::map<int, std::string> KNOWN_TYPES;
 
-	//@deprecated
 	friend class ECKeyImpl;
-	//@deprecated
 	friend class RSAKeyImpl;
 };
 

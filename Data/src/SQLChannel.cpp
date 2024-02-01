@@ -41,7 +41,7 @@ const std::string SQLChannel::PROP_NAME("name");
 const std::string SQLChannel::PROP_TABLE("table");
 const std::string SQLChannel::PROP_ARCHIVE_TABLE("archive");
 const std::string SQLChannel::PROP_MAX_AGE("keep");
-const std::string SQLChannel::PROP_ASYNC("async");
+[[deprecated]] const std::string SQLChannel::PROP_ASYNC("async");
 const std::string SQLChannel::PROP_TIMEOUT("timeout");
 const std::string SQLChannel::PROP_MIN_BATCH("minBatch");
 const std::string SQLChannel::PROP_MAX_BATCH("maxBatch");

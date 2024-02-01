@@ -51,8 +51,7 @@ public:
 		DIGEST_SHA1
 	};
 
-	//@ deprecated
-	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
+	[[deprecated]] RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the MD5 or SHA-1 hash algorithm.
 		/// Kept for backward compatibility

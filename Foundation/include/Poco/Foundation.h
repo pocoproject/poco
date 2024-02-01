@@ -143,25 +143,6 @@ using namespace std::literals;
 
 
 //
-// POCO_DEPRECATED
-//
-// A macro expanding to a compiler-specific clause to
-// mark a class or function as deprecated.
-//
-#if defined(POCO_NO_DEPRECATED)
-#define POCO_DEPRECATED
-#elif defined(_GNUC_)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(__clang__)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define POCO_DEPRECATED __declspec(deprecated)
-#else
-#define POCO_DEPRECATED
-#endif
-
-
-//
 // Pull in basic definitions
 //
 #include "Poco/Bugcheck.h"

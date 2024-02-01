@@ -26,6 +26,7 @@
 namespace Poco {
 namespace MongoDB {
 
+class [[deprecated]] Cursor;
 
 class MongoDB_API Cursor: public Document
 	/// Cursor is an helper class for querying multiple documents.

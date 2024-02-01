@@ -30,8 +30,8 @@ namespace Crypto {
 class X509Certificate;
 class PKCS12Container;
 
+class [[deprecated]] RSAKey;
 
-//@ deprecated
 class Crypto_API RSAKey: public KeyPair
 	/// This class stores an RSA key pair, consisting
 	/// of private and public key. Storage of the private
