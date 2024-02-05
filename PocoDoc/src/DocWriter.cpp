@@ -2359,7 +2359,6 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 {
 	ostr << "<div class=\"toc\">" << std::endl;
 	ostr << "<ul class=\"collapsibleList\"><li>" << tr("TOC") << std::endl;
-	int lastLevel = 0;
 	std::vector<int> levelStack;
 	levelStack.push_back(0);
 	for (TOC::const_iterator it = toc.begin(); it != toc.end(); ++it)
@@ -2384,7 +2383,6 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 			ostr << "</li>" << std::endl;
 		}
 		ostr << "<li class=\"level" << level << "\"><a href=\"#" << it->id << "\">" << htmlize(it->title) << "</a>" << std::endl;
-		lastLevel = level;
 	}
 	while (!levelStack.empty())
 	{

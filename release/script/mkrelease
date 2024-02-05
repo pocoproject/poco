@@ -85,7 +85,6 @@ mkdir -p ${target}/cmake
 #
 echo ${version} "(`date +%Y-%m-%d`)" >${target}/VERSION
 cp ${POCO_BASE}/LICENSE ${target}
-cp ${POCO_BASE}/NEWS ${target}
 cp ${POCO_BASE}/README ${target}
 cp ${POCO_BASE}/CHANGELOG ${target}
 cp ${POCO_BASE}/CONTRIBUTORS ${target}
