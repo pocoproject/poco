@@ -73,7 +73,7 @@ protected:
 	const Poco::Token* parseExtern(const Poco::Token* pNext);
 	const Poco::Token* parseTypeDef(const Poco::Token* pNext);
 	const Poco::Token* parseUsing(const Poco::Token* pNext);
-	const Poco::Token* parseFunc(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseFunc(const Poco::Token* pNext, const std::string& attrs, std::string& decl);
 	const Poco::Token* parseParameters(const Poco::Token* pNext, Function* pFunc);
 	const Poco::Token* parseBlock(const Poco::Token* pNext);
 	const Poco::Token* parseEnum(const Poco::Token* pNext);
@@ -82,6 +82,7 @@ protected:
 	const Poco::Token* parseClassMembers(const Poco::Token* pNext, Struct* pClass);
 	const Poco::Token* parseAccess(const Poco::Token* pNext);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
+	const Poco::Token* parseAttributes(const Poco::Token* pNext, std::string& attrs);
 
 	void addSymbol(Symbol* pSymbol, int lineNumber, bool addGST = true);
 	void pushNameSpace(NameSpace* pNameSpace, int lineNumber, bool addGST = true);
@@ -102,7 +103,7 @@ protected:
 	const Poco::Token* nextToken();
 
 private:
-	typedef std::vector<NameSpace*> NSStack;
+	using NSStack = std::vector<NameSpace*>;
 
 	NameSpace::SymbolTable& _gst;
 	Poco::CountingInputStream _istr;
