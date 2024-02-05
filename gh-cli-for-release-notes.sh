@@ -24,7 +24,7 @@ echo
 echo "${MILESTONE} ($(date "+%Y-%m-%d"))"
 echo ===========================
 echo
-echo "Highlights:"
+echo "Summary of Changes:"
 echo
 echo "Breaking changes:"
 echo
