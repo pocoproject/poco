@@ -6,9 +6,9 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  This is a bugfix release.
+This is a bugfix release.
 
-!!Features and enhancements
+!!Features and Enhancements
 
   - GH #4367 `SQLite` `FTS5` (full text search)
   - GH #4335 Implement patches that Debian/Ubuntu applies when preparing deb packages
@@ -20,7 +20,7 @@ AAAIntroduction
   - PR #4422 enh(File): Linux, macOS: microsecond precision for file times
   - PR #4390 enh(DateTimeParser): option to cleanup input string before parsing (#569)
 
-!!Bug fixes and improvements
+!!Bug Fixes and Improvements
 
   - GH #4425 Unit tests: optional testing of deprecated functionality
   - GH #4421 Multiple calls to initializeSSL/uninitializeSSL cause assert failure during certificate validation
