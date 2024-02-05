@@ -85,6 +85,13 @@ public:
 	Access getAccess() const;
 		/// Returns the symbol's access.
 
+	void setAttributeList(const std::string& attrs);
+		/// Sets the C++11 attribute list, e.g. "[[noreturn]]".
+
+	const std::string& getAttributeList() const;
+		/// Returns the C++11 attribute list, or an empty string
+		/// if the symbol does not have one.
+
 	void setDocumentation(const std::string& text);
 		/// Sets the symbol's documentation.
 
@@ -169,6 +176,7 @@ private:
 	std::string _package;
 	std::string _library;
 	Attributes  _attrs;
+	std::string _attributeList;
 
 	static int  _nextId;
 };
@@ -186,6 +194,12 @@ inline int Symbol::id() const
 inline const std::string& Symbol::name() const
 {
 	return _name;
+}
+
+
+inline const std::string& Symbol::getAttributeList() const
+{
+	return _attributeList;
 }
 
 
