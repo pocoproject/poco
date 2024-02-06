@@ -216,6 +216,18 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		_access = Symbol::ACC_PUBLIC;
 		std::string name = pNext->tokenString();
 		pNext = next();
+
+		if (isOperator(pNext, OperatorToken::OP_ASSIGN))
+		{
+			pNext = next();
+			while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
+			{
+				pNext = next();
+			}
+			if (!isEOF(pNext)) pNext = next();
+			return pNext;
+		}
+
 		expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
 
 		std::string fullName = currentNameSpace()->fullName();
@@ -591,11 +603,18 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 	{
 		append(decl, pNext);
 		pNext = next();
-		bool isOp = false;
-		while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isOperator(pNext, OperatorToken::OP_OPENPARENT) && !isEOF(pNext))
+		bool isOperatorKeyword = false;
+		int tmplDepth = 0;
+		while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !(tmplDepth == 0 && isOperator(pNext, OperatorToken::OP_OPENPARENT)) && !isEOF(pNext))
 		{
+			if (!isOperatorKeyword && isOperator(pNext, OperatorToken::OP_LT)) 
+				tmplDepth++;
+			else if (!isOperatorKeyword && isOperator(pNext, OperatorToken::OP_GT) && tmplDepth > 0)
+				tmplDepth--;
+			else if (!isOperatorKeyword && isOperator(pNext, OperatorToken::OP_SHR) && tmplDepth > 1)
+				tmplDepth -= 2;
 			append(decl, pNext);
-			isOp = isKeyword(pNext, IdentifierToken::KW_OPERATOR);
+			isOperatorKeyword = isKeyword(pNext, IdentifierToken::KW_OPERATOR);
 			pNext = next();
 		}
 		if (isOperator(pNext, OperatorToken::OP_SEMICOLON))
@@ -611,7 +630,7 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 		}
 		else if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
 		{
-			if (isOp)
+			if (isOperatorKeyword)
 			{
 				decl += " (";
 				pNext = next();
