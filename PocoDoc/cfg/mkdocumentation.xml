@@ -34,6 +34,7 @@
 				${Includes},
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
+				-I/usr/include/postgres,
 				-D_DEBUG,
 				-E,
 				-C,
