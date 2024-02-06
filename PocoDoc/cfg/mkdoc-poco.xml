@@ -36,7 +36,7 @@
 				-I/usr/local/ssl/include,
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
-				-I/usr/include/postgres,
+				-I/usr/include/postgresql,
 				-D_DEBUG,
 				-E,
 				-C,
