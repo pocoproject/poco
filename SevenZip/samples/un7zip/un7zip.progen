@@ -7,4 +7,4 @@ vc.project.platforms = Win32
 vc.project.configurations = debug_shared, release_shared, debug_static_mt, release_static_mt, debug_static_md, release_static_md
 vc.project.prototype = ${vc.project.name}_vs90.vcproj
 vc.project.compiler.include = ..\\..\\..\\Foundation\\include;..\\..\\..\\XML\\include;..\\..\\..\\Util\\include;..\\..\\..\\SevenZip\\include
-vc.project.compiler.additionalOptions = /Zc:__cplusplus /std:c++17
+vc.project.compiler.additionalOptions = /Zc:__cplusplus

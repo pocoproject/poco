@@ -27,7 +27,7 @@ namespace Poco {
 namespace Net {
 
 
-SocketReactor::SocketReactor():
+SocketReactor::SocketReactor(): _threadAffinity(-1),
 	_stop(false),
 	_pReadableNotification(new ReadableNotification(this)),
 	_pWritableNotification(new WritableNotification(this)),
@@ -86,6 +86,7 @@ void SocketReactor::run()
 			if (hasSocketHandlers())
 			{
 				sm = _pollSet.poll(_params.pollTimeout);
+				if (_stop) break;
 				for (const auto& s : sm)
 				{
 					try
@@ -167,7 +168,6 @@ void SocketReactor::stop()
 
 void SocketReactor::wakeUp()
 {
-	if (_stop) return;
 	_pollSet.wakeUp();
 	_event.set();
 }

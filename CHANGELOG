@@ -1,5 +1,49 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.13.1 (2024-02-05)
+===========================
+
+Summary of Changes:
+
+This is a bugfix release.
+
+Features and Enhancements:
+
+- GH #4367 `SQLite` `FTS5` (full text search)
+- GH #4335 Implement patches that Debian/Ubuntu applies when preparing deb packages
+- GH #4216 Replace C string literals (const char*) with C++ std::string literals for std::string parameters.
+- GH #3890 Get rid of SingletonHolder
+- GH #2450 Why does it take the ThreadPool 10+ seconds to shutdown when there is nothing running.
+- GH #2443 FileChannel doesn't flush to disk on unix until close
+- GH #4437 Add arm cross-compile config and CI
+- PR #4422 enh(File): Linux, macOS: microsecond precision for file times
+- PR #4390 enh(DateTimeParser): option to cleanup input string before parsing (#569)
+
+Bug Fixes and Improvements:
+
+- GH #4443 Upgrade libexpat to 2.6.0 
+- GH #4425 Unit tests: optional testing of deprecated functionality
+- GH #4421 Multiple calls to initializeSSL/uninitializeSSL cause assert failure during certificate validation
+- GH #4411 NULL pointer: strategy when setting rotation never in FileChannel
+- GH #4404 qnx build error: 'prctl' was not declared in this scope
+- GH #4400 SocketReactor deadlock test intermittently hangs
+- GH #4398 Can not install CppUnit target
+- GH #4393 iOS ARM64 : Invalid access: Can not convert empty value.
+- GH #4392 Environment_WIN32U nodeIdImpl access violation in 1.13.0
+- GH #4375 UUID parser silently ignores too long strings
+- GH #4347 github check job on macOS: testEncryptDecryptGCM occasionally fails
+- GH #4313 Add macos sanitizer CI jobs
+- GH #4019 MSYS2/mingw cmake linking problem
+- GH #4018 cmake MSYS2 compile error for poco/net project
+- GH #3908 JWT token unitest fail with POCO_NO_SOO on vs 2019
+- GH #3650 MailMessage::read() chokes on "Content-disposition"
+- GH #3331 Apple Silicon ARM64 :  Invalid access: Can not convert empty value.
+- GH #3213 NetSSL_Win\src\SecureSocketImpl.cpp CertFreeCertificateContext on nullptr
+- GH #661 Automatic Lib Init (NetworkInitializer) is not working on MinGW
+- PR #4427 enh(tests): Ability to enable/disable testing of deprecated functionality
+- PR #4381 fix(Crypto): Compile error if EVP_CIPHER_CTX_init not defined.
+
+
 Release 1.13.0 (2023-12-22)
 ===========================
 
@@ -9,7 +53,7 @@ Highlights:
 - C++17 is the lowest supported standard
 - Poco::Data SQLParser (experimental, optional at build and runtime)
 
-Breaking changes:
+Breaking Changes:
 
 - GH #4305 Remove deprecated `toJSON` functions
 - GH #4304 NumericString conversions inconsistencies
@@ -18,7 +62,7 @@ Breaking changes:
 - GH #3701 SocketReactor: Remove not useful handlers calls
 - GH #569 SyntaxException for DateTimeParser::parse not working
 
-Features and enhancements
+Features and Enhancements
 
 - GH #4276 MongoDB default function deleted clang warning
 - GH #4261 Move autoCommit to AbstractSessionImpl
@@ -56,11 +100,9 @@ Features and enhancements
 - GH #2331 Improve implementation of logging macros.
 - GH #2282 Add Path::self()
 - GH #1258 Poco::DateTimeParser::tryParse issue
-
 - GH #3845 Poco::XML::Node `insertAfter` API
 - GH #3659 Add thread name support
 - GH #2291 Visitor Pattern for Dynamic::Var
-
 - PR #4059 Update ICMPv4PacketImpl.h
 - PR #4021 Fix compile with `-DPOCO_NET_NO_IPv6`
 - PR #3885 Use map from key to count instead of multiset
@@ -71,11 +113,10 @@ Features and enhancements
 - PR #3705 Fix/posix sleep
 - PR #3664 set thread name
 - PR #3657 Add lower case format for `NumberFormatter`
-
 - PR #4144 add visitor pattern implementation for Poco::Dynamic::Var
 - PR #3476 add separate accessors and mutators for connect, send and receive tim…
 
-Bug fixes and improvements:
+Bug fixes and Improvements:
 
 - GH #4328 Environment::nodeId Should Throw SystemException When Node ID is 0
 - GH #4311 Canceled `Task` shouldn't start running
@@ -111,7 +152,6 @@ Bug fixes and improvements:
 - GH #2634 Data race in Poco::Net::HTTPServerConnection::onServerStopped
 - GH #2366 Poco::Process::launch (UNIX) - possible memory leak when launching invalid command
 - GH #2332 Optimize multi-arg logger methods to only call format() if log level allows
-
 - PR #4353 Fix some issues found with clang-tidy
 - PR #4345 Build.macos.openssl@1.1
 - PR #4339 Fix RemoteSyslogChannel setProperty value check

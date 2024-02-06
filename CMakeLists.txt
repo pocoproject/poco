@@ -23,10 +23,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Reset output dirs for multi-config builds
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
+	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
 endforeach(OUTPUTCONFIG)
 
 # Append our module directory to CMake
@@ -172,7 +172,7 @@ else()
 endif()
 
 # Allow enabling and disabling components
-option(ENABLE_FOUNDATION "Enable Foundation, required by all components except CppUnit" ON)
+option(ENABLE_FOUNDATION "Enable Foundation" ON)
 option(ENABLE_ENCODINGS "Enable Encodings" ON)
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_XML "Enable XML" ON)
@@ -206,6 +206,9 @@ endif()
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
+option(ENABLE_TEST_DEPRECATED
+	"Set to OFF|ON (default is OFF) to enable build of tests for deprecated functionality" OFF)
+
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
 
@@ -219,6 +222,9 @@ if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
 	message(STATUS "Building with unittests & samples")
+	if(ENABLE_TEST_DEPRECATED)
+		add_compile_definitions(POCO_TEST_DEPRECATED)
+	endif()
 else()
 	message(STATUS "Building without tests & samples")
 endif()
@@ -557,6 +563,7 @@ message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
 message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] C++ symbol visibility:  ${CMAKE_CXX_VISIBILITY_PRESET}")
 
 foreach(component ${Poco_COMPONENTS})
 	message(STATUS "Building: ${component}")

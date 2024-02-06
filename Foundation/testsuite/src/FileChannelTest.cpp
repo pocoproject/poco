@@ -59,6 +59,86 @@ FileChannelTest::~FileChannelTest()
 }
 
 
+void FileChannelTest::testRotateNever()
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "never");
+		pChannel->open();
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 200; ++i)
+		{
+			pChannel->log(msg);
+		}
+		File f(name);
+		assertTrue (f.exists());
+		f = name + ".0";
+		assertTrue (!f.exists());
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void FileChannelTest::testFlushing()
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_FLUSH, "false");
+		pChannel->open();
+		Message msg("source", "01234567890123456789", Message::PRIO_INFORMATION);
+		pChannel->log(msg);
+
+		// File shall be there and have content after writing first message.
+		File f(name);
+		assertTrue (f.exists());
+		assertTrue (f.getSize() >= 20);
+
+		Timestamp::TimeDiff noFlushTime;
+		{
+			Timestamp start;
+			for (int i = 0; i < 2000; ++i)
+			{
+				pChannel->log(msg);
+			}
+			pChannel->close();
+			Timestamp end;
+			noFlushTime = end-start;
+		}
+		Timestamp::TimeDiff flushTime;
+		{
+			pChannel->setProperty(FileChannel::PROP_FLUSH, "true");
+			pChannel->open();
+			Timestamp start;
+			for (int i = 0; i < 2000; ++i)
+			{
+				pChannel->log(msg);
+			}
+			pChannel->close();
+			Timestamp end;
+			flushTime = end-start;
+		}
+
+		// Writing to channel with flushing is expected to be slower.
+		assertTrue(flushTime > noFlushTime);
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
 void FileChannelTest::testRotateBySize()
 {
 	std::string name = filename();
@@ -804,6 +884,8 @@ CppUnit::Test* FileChannelTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileChannelTest");
 
+	CppUnit_addTest(pSuite, FileChannelTest, testRotateNever);
+	CppUnit_addTest(pSuite, FileChannelTest, testFlushing);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);

@@ -229,6 +229,7 @@ private:
 			_memory.next = next;
 		}
 
+#ifndef POCO_DOC
 		union
 			/// Memory block storage.
 			///
@@ -242,6 +243,7 @@ private:
 			char buffer[sizeof(T)];
 			Block* next;
 		} _memory;
+#endif
 
 	private:
 		Block(const Block&);

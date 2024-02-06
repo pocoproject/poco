@@ -32,6 +32,7 @@ using Poco::FormattingChannel;
 using Poco::Logger;
 using Poco::LoggingRegistry;
 using Poco::LoggingFactory;
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -52,13 +53,13 @@ void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr (pConfig);
 
-	AbstractConfiguration::Ptr pFormattersConfig(pConfig->createView("logging.formatters"));
+	AbstractConfiguration::Ptr pFormattersConfig(pConfig->createView("logging.formatters"s));
 	configureFormatters(pFormattersConfig);
 
-	AbstractConfiguration::Ptr pChannelsConfig(pConfig->createView("logging.channels"));
+	AbstractConfiguration::Ptr pChannelsConfig(pConfig->createView("logging.channels"s));
 	configureChannels(pChannelsConfig);
 
-	AbstractConfiguration::Ptr pLoggersConfig(pConfig->createView("logging.loggers"));
+	AbstractConfiguration::Ptr pLoggersConfig(pConfig->createView("logging.loggers"s));
 	configureLoggers(pLoggersConfig);
 }
 
@@ -106,7 +107,7 @@ void LoggingConfigurator::configureLoggers(AbstractConfiguration::Ptr pConfig)
 	for (const auto& l: loggers)
 	{
 		AutoPtr<AbstractConfiguration> pLoggerConfig(pConfig->createView(l));
-		loggerMap[pLoggerConfig->getString("name", "")] = pLoggerConfig;
+		loggerMap[pLoggerConfig->getString("name"s, ""s)] = pLoggerConfig;
 	}
 	for (const auto& p: loggerMap)
 	{
@@ -117,12 +118,12 @@ void LoggingConfigurator::configureLoggers(AbstractConfiguration::Ptr pConfig)
 
 Formatter::Ptr LoggingConfigurator::createFormatter(AbstractConfiguration::Ptr pConfig)
 {
-	Formatter::Ptr pFormatter(LoggingFactory::defaultFactory().createFormatter(pConfig->getString("class")));
+	Formatter::Ptr pFormatter(LoggingFactory::defaultFactory().createFormatter(pConfig->getString("class"s)));
 	AbstractConfiguration::Keys props;
 	pConfig->keys(props);
 	for (const auto& p: props)
 	{
-		if (p != "class")
+		if (p != "class"s)
 			pFormatter->setProperty(p, pConfig->getString(p));
 	}
 	return pFormatter;
@@ -131,21 +132,21 @@ Formatter::Ptr LoggingConfigurator::createFormatter(AbstractConfiguration::Ptr p
 
 Channel::Ptr LoggingConfigurator::createChannel(AbstractConfiguration::Ptr pConfig)
 {
-	Channel::Ptr pChannel(LoggingFactory::defaultFactory().createChannel(pConfig->getString("class")));
+	Channel::Ptr pChannel(LoggingFactory::defaultFactory().createChannel(pConfig->getString("class"s)));
 	Channel::Ptr pWrapper(pChannel);
 	AbstractConfiguration::Keys props;
 	pConfig->keys(props);
 	for (const auto& p: props)
 	{
-		if (p == "pattern")
+		if (p == "pattern"s)
 		{
 			AutoPtr<Formatter> pPatternFormatter(new PatternFormatter(pConfig->getString(p)));
 			pWrapper = new FormattingChannel(pPatternFormatter, pChannel);
 		}
-		else if (p == "formatter")
+		else if (p == "formatter"s)
 		{
 			AutoPtr<FormattingChannel> pFormattingChannel(new FormattingChannel(0, pChannel));
-			if (pConfig->hasProperty("formatter.class"))
+			if (pConfig->hasProperty("formatter.class"s))
 			{
 				AutoPtr<AbstractConfiguration> pFormatterConfig(pConfig->createView(p));
 				AutoPtr<Formatter> pFormatter(createFormatter(pFormatterConfig));
@@ -165,7 +166,7 @@ void LoggingConfigurator::configureChannel(Channel::Ptr pChannel, AbstractConfig
 	pConfig->keys(props);
 	for (const auto& p: props)
 	{
-		if (p != "pattern" && p != "formatter" && p != "class")
+		if (p != "pattern"s && p != "formatter"s && p != "class"s)
 		{
 			pChannel->setProperty(p, pConfig->getString(p));
 		}
@@ -175,19 +176,19 @@ void LoggingConfigurator::configureChannel(Channel::Ptr pChannel, AbstractConfig
 
 void LoggingConfigurator::configureLogger(AbstractConfiguration::Ptr pConfig)
 {
-	Logger& logger = Logger::get(pConfig->getString("name", ""));
+	Logger& logger = Logger::get(pConfig->getString("name"s, ""s));
 	AbstractConfiguration::Keys props;
 	pConfig->keys(props);
 	for (const auto& p: props)
 	{
-		if (p == "channel" && pConfig->hasProperty("channel.class"))
+		if (p == "channel"s && pConfig->hasProperty("channel.class"s))
 		{
 			AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(p));
 			AutoPtr<Channel> pChannel(createChannel(pChannelConfig));
 			configureChannel(pChannel, pChannelConfig);
 			Logger::setChannel(logger.name(), pChannel);
 		}
-		else if (p != "name")
+		else if (p != "name"s)
 		{
 			Logger::setProperty(logger.name(), p, pConfig->getString(p));
 		}

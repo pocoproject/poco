@@ -49,8 +49,8 @@ public:
 		FN_DELETE       = 1024 /// The function has been deleted.
 	};
 
-	typedef std::vector<Parameter*> Parameters;
-	typedef Parameters::const_iterator Iterator;
+	using Parameters = std::vector<Parameter*>;
+	using Iterator = Parameters::const_iterator;
 
 	Function(const std::string& decl, NameSpace* pNameSpace);
 		/// Creates the Function.

@@ -48,12 +48,7 @@
 	#include <unistd.h>
 	#include <sys/syscall.h>   /* For SYS_xxx definitions */
 #endif
-#include <iostream>
 
-
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
-#	include <sys/prctl.h>
-#endif
 
 //
 // Block SIGPIPE in main thread.
@@ -82,10 +77,10 @@ namespace
 
 namespace
 {
-	std::string truncName(const std::string& name)
+	std::string truncName(const std::string& name, int nameSize = POCO_MAX_THREAD_NAME_LEN)
 	{
-		if (name.size() > POCO_MAX_THREAD_NAME_LEN)
-			return name.substr(0, POCO_MAX_THREAD_NAME_LEN).append("~");
+		if (name.size() > nameSize)
+			return name.substr(0, nameSize).append("~");
 		return name;
 	}
 
@@ -93,7 +88,7 @@ namespace
 		/// Sets thread name. Support for this feature varies
 		/// on platforms. Any errors are ignored.
 	{
-#if POCO_OS == POCO_OS_FREE_BSD && __FreeBSD_version < 1300000
+#if ((POCO_OS == POCO_OS_FREE_BSD) && (__FreeBSD_version < 1300000))
 		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
@@ -101,6 +96,8 @@ namespace
 			pthread_setname_np(truncName(threadName).c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
 		#endif
 	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
+#elif (POCO_OS == POCO_OS_QNX)
+		pthread_setname_np(pthread_self(), truncName(threadName, _NTO_THREAD_NAME_MAX).c_str());
 #else
 		prctl(PR_SET_NAME, truncName(threadName).c_str());
 #endif
@@ -109,10 +106,19 @@ namespace
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
-		prctl(PR_GET_NAME, name);
-#else
+#if ((POCO_OS == POCO_OS_FREE_BSD) && (__FreeBSD_version < 1300000))
 		pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
+#elif (POCO_OS == POCO_OS_MAC_OS_X)
+	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+			pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
+		#endif
+	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
+#elif (POCO_OS == POCO_OS_QNX)
+		tName[_NTO_THREAD_NAME_MAX] = {'\0'};
+		pthread_getname_np(pthread_self(), tName, _NTO_THREAD_NAME_MAX);
+#else
+		prctl(PR_GET_NAME, name);
 #endif
 		return name;
 	}

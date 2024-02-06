@@ -17,7 +17,6 @@
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/String.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -71,15 +70,10 @@ Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const
 }
 
 
-namespace
-{
-	static Poco::SingletonHolder<DOMImplementation> sh;
-}
-
-
 const DOMImplementation& DOMImplementation::instance()
 {
-	return *sh.get();
+	static DOMImplementation di;
+	return di;
 }
 
 

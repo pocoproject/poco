@@ -1148,8 +1148,9 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 				}
 				begin = it;
 			}
-			if (token == "GH")
+			if (token == "GH" || token == "PR")
 			{
+				bool isPR = token == "PR";
 				std::string uri(GITHUB_POCO_URI);
 				std::string::const_iterator it(begin);
 				std::string spc;
@@ -1171,7 +1172,7 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 						nextToken(begin, end, n);
 						if (!n.empty() && std::isdigit(n[0]))
 						{
-							uri += "/issues/";
+							uri += isPR ? "/pull/" : "/issues/";
 							uri += n;
 							writeTargetLink(ostr, uri, token + " #" + n, "_blank");
 							nextToken(begin, end, token);
@@ -1978,6 +1979,12 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 		writeIcon(ostr, "inline");
 	ostr << "</h3>\n";
 	ostr << "<p class=\"decl\">";
+
+	const std::string& attrs = pFunc->getAttributeList();
+	if (!attrs.empty())
+	{
+		ostr << "<i>" << htmlize(attrs) << "</i><br />";
+	}
 	const std::string& decl = pFunc->declaration();
 	writeDecl(ostr, decl);
 	if (!std::isalnum(decl[decl.length() - 1]))
@@ -2015,7 +2022,7 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 		ostr << " = 0";
 	ostr << ";</p>\n";
 
-	if (pFunc->attrs().has("deprecated"))
+	if (pFunc->attrs().has("deprecated") || pFunc->getAttributeList().compare(0, 12, "[[deprecated") == 0)
 	{
 		writeDeprecated(ostr, "function");
 	}
@@ -2358,7 +2365,6 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 {
 	ostr << "<div class=\"toc\">" << std::endl;
 	ostr << "<ul class=\"collapsibleList\"><li>" << tr("TOC") << std::endl;
-	int lastLevel = 0;
 	std::vector<int> levelStack;
 	levelStack.push_back(0);
 	for (TOC::const_iterator it = toc.begin(); it != toc.end(); ++it)
@@ -2383,7 +2389,6 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 			ostr << "</li>" << std::endl;
 		}
 		ostr << "<li class=\"level" << level << "\"><a href=\"#" << it->id << "\">" << htmlize(it->title) << "</a>" << std::endl;
-		lastLevel = level;
 	}
 	while (!levelStack.empty())
 	{

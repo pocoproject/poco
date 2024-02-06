@@ -7,6 +7,7 @@
 				${PocoBuild}/*/include/Poco/*/*/*.h
 				${PocoBuild}/*/include/Poco/*/*.h
 				${PocoBuild}/*/*/include/Poco/*/*/*.h
+				${PocoBuild}/Data/src/sql-parser/*.h
 			</include>
 			<exclude>
 				*_*.h,
@@ -31,13 +32,17 @@
 			<exec>g++</exec>
 			<options>
 				${Includes},
+				-I${PocoBase}/Data/src,
+				-I/usr/local/ssl/include,
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
+				-I/usr/include/postgresql,
 				-D_DEBUG,
 				-E,
 				-C,
-                -DPOCO_NO_WINDOWS_H,
+				-DPOCO_NO_WINDOWS_H,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
+				-DPOCO_DOC,
 				-xc++
 			</options>
 			<path></path>

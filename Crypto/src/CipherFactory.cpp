@@ -20,7 +20,6 @@
 #include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Crypto/EVPCipherImpl.h"
 #include "Poco/Exception.h"
-#include "Poco/SingletonHolder.h"
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
@@ -46,15 +45,10 @@ CipherFactory::~CipherFactory()
 }
 
 
-namespace
-{
-	static Poco::SingletonHolder<CipherFactory> holder;
-}
-
-
 CipherFactory& CipherFactory::defaultFactory()
 {
-	return *holder.get();
+	static CipherFactory cf;
+	return cf;
 }
 
 

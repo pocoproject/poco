@@ -104,9 +104,13 @@ namespace
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
 				bool added = false;
+
+				static const auto lcContentDisposition = Poco::toLower(MailMessage::HEADER_CONTENT_DISPOSITION);
+
 				for (; it != end; ++it)
 				{
-					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
+					const auto lcHdr = Poco::toLower(it->first);
+					if (!added && lcContentDisposition == lcHdr)
 					{
 						if (it->second == "inline")
 							_pMsg->addContent(pPS, cte);

@@ -59,24 +59,28 @@ class Foundation_API DateTimeParser
 public:
 	static void parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential);
 		/// Parses a date and time in the given format from the given string.
+		/// Performs cleanup of the input string (trims spaces).
 		/// Throws a SyntaxException if the string cannot be successfully parsed.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
 	static DateTime parse(const std::string& fmt, const std::string& str, int& timeZoneDifferential);
 		/// Parses a date and time in the given format from the given string.
+		/// Performs cleanup of the input string (trims spaces).
 		/// Throws a SyntaxException if the string cannot be successfully parsed.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
 	static bool tryParse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential);
 		/// Parses a date and time in the given format from the given string.
+		/// Performs cleanup of the input string (trims spaces).
 		/// Returns true if the string has been successfully parsed, false otherwise.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
 	static void parse(const std::string& str, DateTime& dateTime, int& timeZoneDifferential);
 		/// Parses a date and time from the given dateTime string. Before parsing, the method
+		/// performs cleanup of the input string (trims spaces) when cleanup is true and
 		/// examines the dateTime string for a known date/time format.
 		/// Throws a SyntaxException if the string cannot be successfully parsed.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
@@ -84,12 +88,14 @@ public:
 
 	static DateTime parse(const std::string& str, int& timeZoneDifferential);
 		/// Parses a date and time from the given dateTime string. Before parsing, the method
+		/// performs cleanup of the input string (trims spaces) and
 		/// examines the dateTime string for a known date/time format.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
 	static bool tryParse(const std::string& str, DateTime& dateTime, int& timeZoneDifferential);
 		/// Parses a date and time from the given dateTime string. Before parsing, the method
+		/// performs cleanup of the input string (trims spaces) and
 		/// examines the dateTime string for a known date/time format.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.

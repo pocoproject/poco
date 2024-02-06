@@ -216,8 +216,37 @@ jobs:
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<SyslogTest>.testOldBSD,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
+            ./ci/runtests.sh
+
+  macos-clang-make-visibility-hidden:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - run: brew install openssl@1.1 mysql-client unixodbc libpq
+      - run: >-
+          ./configure --everything --no-prefix --cflags="-fvisibility=hidden" --omit=PDF
+          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@1.1/include" --library-path="/usr/local/opt/openssl@1.1/lib" &&
+          make all -s -j4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<SyslogTest>.testOldBSD,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
@@ -242,8 +271,7 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -268,10 +296,124 @@ jobs:
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
             CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
             CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer,
-            CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM"
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+
+  macos-clang-cmake-openssl3-visibility-hidden:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_ENCODINGS_COMPILER=ON -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+
+  macos-clang-make-openssl3-tsan:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - run: brew install openssl@3
+      - run: >-
+          ./configure --everything --no-prefix --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip
+          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
+          make all -s -j4 SANITIZEFLAGS=-fsanitize=thread
+
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
+            ./ci/runtests.sh TSAN
+
+  macos-clang-make-openssl3-ubsan:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: >-
+          ./configure --everything --no-prefix --no-samples --omit=PDF
+          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
+          make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined
+
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
+            ./ci/runtests.sh
+
+  macos-clang-make-openssl3-asan:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: >-
+          ./configure --everything --no-prefix --no-samples --omit=PDF
+          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
+          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
+          --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
+          make all -s -j4 SANITIZEFLAGS=-fsanitize=address
+
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
+            ./ci/runtests.sh
 
 #   windows-2019-msvc-cmake:
 #     runs-on: windows-2019

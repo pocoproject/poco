@@ -416,12 +416,14 @@ namespace
 		void onReadable(ReadableNotification* pNf)
 		{
 			pNf->release();
-			char buffer[64];
-			do
+			std::vector<char> buffer;
+			int n = 0;
+			while ((n = _socket.available()))
 			{
-				if (0 == _socket.receiveBytes(&buffer[0], sizeof(buffer)))
-					break;
-			} while (true);
+				if (n > buffer.size()) buffer.resize(n);
+				n = _socket.receiveBytes(&buffer[0], buffer.size());
+				if (0 == n) break;
+			}
 		}
 
 		void onShutdown(ShutdownNotification* pNf)

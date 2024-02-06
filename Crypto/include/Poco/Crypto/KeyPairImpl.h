@@ -31,7 +31,7 @@ namespace Poco {
 namespace Crypto {
 
 
-class KeyPairImpl: public Poco::RefCountedObject
+class Crypto_API KeyPairImpl: public Poco::RefCountedObject
 	/// Class KeyPairImpl
 {
 public:

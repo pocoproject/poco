@@ -13,6 +13,7 @@
 
 
 #include "Poco/UTF8String.h"
+#include "Poco/UTFString.h"
 #include "Poco/Unicode.h"
 #include "Poco/TextIterator.h"
 #include "Poco/TextConverter.h"
@@ -21,6 +22,18 @@
 #include "Poco/Ascii.h"
 #include <algorithm>
 
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+
+#if defined(POCO_USE_STRING16)
+template class std::basic_string<Poco::UTF16Char, Poco::UTF16CharTraits>;
+#endif
+
+#if defined(POCO_USE_STRING32)
+template class std::basic_string<Poco::UTF32Char, Poco::UTF32CharTraits>;
+#endif
+
+#endif
 
 namespace Poco {
 

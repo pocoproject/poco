@@ -16,7 +16,6 @@
 #include "Poco/Notification.h"
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -106,15 +105,10 @@ std::size_t NotificationCenter::countObservers() const
 }
 
 
-namespace
-{
-	static SingletonHolder<NotificationCenter> sh;
-}
-
-
 NotificationCenter& NotificationCenter::defaultCenter()
 {
-	return *sh.get();
+	static NotificationCenter nc;
+	return nc;
 }
 
 

@@ -41,7 +41,11 @@
 
 
 #if !defined(ActiveRecordLib_API)
-	#define ActiveRecordLib_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define ActiveRecordLib_API __attribute__ ((visibility ("default")))
+	#else
+		#define ActiveRecordLib_API
+	#endif
 #endif
 
 

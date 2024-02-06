@@ -59,6 +59,12 @@ void Symbol::setAccess(Access access)
 }
 
 
+void Symbol::setAttributeList(const std::string& attrs)
+{
+	_attributeList = attrs;
+}
+
+
 void Symbol::setDocumentation(const std::string& text)
 {
 	_documentation = text;

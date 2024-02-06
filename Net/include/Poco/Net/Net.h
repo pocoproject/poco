@@ -101,11 +101,13 @@ std::string htmlize(const std::string& str);
 // Automate network initialization (only relevant on Windows).
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT) && !defined(__GNUC__)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
 
 extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
 
-#if defined(Net_EXPORTS)
+#if defined(POCO_COMPILER_MINGW)
+	#define POCO_NET_FORCE_SYMBOL(x) static void *__ ## x ## _fp = (void*)&x;
+#elif defined(Net_EXPORTS)
 	#if defined(_WIN64)
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
 	#elif defined(_WIN32)

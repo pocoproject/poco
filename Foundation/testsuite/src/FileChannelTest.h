@@ -31,6 +31,8 @@ public:
 	FileChannelTest(const std::string& name);
 	~FileChannelTest();
 
+	void testRotateNever();
+	void testFlushing();
 	void testRotateBySize();
 	void testRotateByAge();
 	void testRotateAtTimeDayUTC();

@@ -4,7 +4,7 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs           140 | 150 | 160| 170]
+#              [-vs           160| 170]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -26,8 +26,8 @@ Param
 	[string] $poco_base = $([System.Environment]::GetEnvironmentVariable('POCO_BASE')),
 
 	[Parameter()]
-	[ValidateSet(140, 150, 160, 170)]
-	[int] $vs = 140,
+	[ValidateSet(160, 170)]
+	[int] $vs = 170,
 
 	[Parameter()]
 	[ValidateSet('build', 'rebuild', 'clean')]
@@ -73,7 +73,7 @@ Param
 
 function Add-VSCOMNTOOLS([int] $vsver)
 {
-	if ($vsver -ge 150)
+	if ($vsver -ge 160)
 	{
 		$vssetup= $([Environment]::GetFolderPath("MyDocuments"))
 		$vssetup= Join-Path $vssetup "WindowsPowerShell"
@@ -82,10 +82,6 @@ function Add-VSCOMNTOOLS([int] $vsver)
 		if (-not (Test-Path $vssetup))
 		{
 			Install-Module VSSetup -Scope CurrentUser -Force
-		}
-		if ($vsver -eq 150)
-		{
-			$range='[15.0,16.0)'
 		}
 		if ($vsver -eq 160)
 		{
@@ -110,14 +106,6 @@ function Add-VSCOMNTOOLS([int] $vsver)
 		}
 
 		$vscomntools = $installationPath.psobject.properties.Value;
-		if ($vsver -eq 150)
-		{
-			set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
-			Write-Host "`n----------------------------------------" -ForegroundColor Yellow
-			Write-Host "VS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
-			Write-Host "----------------------------------------" -ForegroundColor Yellow
-			Write-Host ""
-		}
 		if ($vsver -eq 160)
 		{
 			set-item -force -path "ENV:VS160COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
@@ -144,7 +132,7 @@ function Add-Env-Var([string] $lib, [string] $var)
 	$libvar = Get-Content "Env:${lib}_$var"
 	if (-not $envvar.Contains($libvar))
 	{
-        $envvar = $envvar + ";$libvar"
+		$envvar = $envvar + ";$libvar"
 		Set-Content "Env:${var}" $envvar
 	}
 }
@@ -154,11 +142,7 @@ function Set-Environment
 {
 	if ($poco_base -eq '') { $script:poco_base = Get-Location }
 
-	switch ( $vs )
-	{
-		140 { }
-	default { Add-VSCOMNTOOLS $vs }
-	}
+	Add-VSCOMNTOOLS $vs
 
 	if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;"))
 	{ $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH" }
@@ -191,11 +175,7 @@ function Set-Environment
 	if ($platform -eq 'x64') { $CommandArg = "amd64" }
 	elseif ($platform -eq 'ARM64') { $CommandArg = "ARM64" }
 	else { $CommandArg = "x86" }
-	if ($vs -eq 150)
-	{
-		$Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
-		$script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\15.0\Bin\MSBuild.exe"
-	} else {
+
 	if ($vs -eq 160)
 	{
 		$Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
@@ -213,7 +193,7 @@ function Set-Environment
 			$Command = Resolve-Path "$($vsdir)\..\..\VC\vcvarsall.bat"
 			$script:msbuild_exe = "MSBuild.exe"
 		}
-	}}
+	}
 
 	$tempFile = [IO.Path]::GetTempFileName()
 	cmd /c " `"$Command`" $CommandArg && set > `"$tempFile`" "
@@ -234,7 +214,7 @@ function Process-Input
 		Write-Host 'Usage:'
 		Write-Host '------'
 		Write-Host 'buildwin.ps1 [-poco_base <dir>]'
-		Write-Host '    [-vs           140 | 150 | 160 | 170]'
+		Write-Host '    [-vs           160 | 170]'
 		Write-Host '    [-action       build | rebuild | clean]'
 		Write-Host '    [-linkmode     shared | static_mt | static_md | all]'
 		Write-Host '    [-config       release | debug | both]'
@@ -562,9 +542,7 @@ function Build
 {
 	Process-Input
 
-	if ($vs -lt 100) { $extension = 'vcproj' }
-	else { $extension = 'vcxproj' }
-
+	$extension = 'vcxproj'
 	BuildComponents $extension "lib"
 	BuildComponents $extension "test"
 	BuildComponents $extension "sample"
