@@ -40,6 +40,7 @@ template <class T> class VarHolderImpl;
 }
 
 
+#ifndef POCO_DOC
 template <class T, std::size_t S>
 struct TypeSizeLE:
 	std::integral_constant<bool, (sizeof(T) <= S)>{};
@@ -48,6 +49,7 @@ struct TypeSizeLE:
 template <class T, std::size_t S>
 struct TypeSizeGT:
 	std::integral_constant<bool, (sizeof(T) > S)>{};
+#endif
 
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>

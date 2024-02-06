@@ -41,6 +41,7 @@
 				-C,
 				-DPOCO_NO_WINDOWS_H,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
+				-DPOCO_DOC,
 				-xc++
 			</options>
 			<path></path>
