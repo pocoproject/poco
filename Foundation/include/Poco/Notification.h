@@ -22,6 +22,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
+#include <memory>
 
 
 namespace Poco {
