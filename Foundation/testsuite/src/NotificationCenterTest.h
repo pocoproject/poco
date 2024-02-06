@@ -18,6 +18,7 @@
 #include "CppUnit/TestCase.h"
 #include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Mutex.h"
 #include <set>
 
 
@@ -30,13 +31,14 @@ public:
 	NotificationCenterTest(const std::string& name);
 	~NotificationCenterTest();
 
-	void test1();
-	void test2();
-	void test3();
-	void test4();
-	void test5();
-	void testAuto();
-	void testDefaultCenter();
+	void testNotificationCenter1();
+	void testNotificationCenter2();
+	void testNotificationCenter3();
+	void testNotificationCenter4();
+	void testNotificationCenter5();
+	void testNotificationCenterAuto();
+	void testNotificationCenterAsync();
+	void testDefaultNotificationCenter();
 
 	void setUp();
 	void tearDown();
@@ -49,9 +51,13 @@ protected:
 	void handle3(Poco::Notification* pNf);
 	void handleTest(TestNotification* pNf);
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
+	void handleAsync1(const Poco::AutoPtr<Poco::Notification>& pNf);
+	void handleAsync2(const Poco::AutoPtr<Poco::Notification>& pNf);
+	bool matchAsync(const std::string& name);
 
 private:
 	std::set<std::string> _set;
+	Poco::Mutex _mutex;
 };
 
 

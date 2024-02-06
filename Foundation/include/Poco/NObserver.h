@@ -3,7 +3,7 @@
 //
 // Library: Foundation
 // Package: Notifications
-// Module:  NotificationCenter
+// Module:  NObserver
 //
 // Definition of the NObserver class template.
 //
@@ -43,8 +43,12 @@ class NObserver: public AbstractObserver
 	/// management.
 {
 public:
-	typedef AutoPtr<N> NotificationPtr;
-	typedef void (C::*Callback)(const NotificationPtr&);
+	using Type = NObserver<C, N>;
+	using NotificationPtr = AutoPtr<N>;
+	using Callback = void (C::*)(const NotificationPtr&);
+	using Handler = Callback;
+
+	NObserver() = delete;
 
 	NObserver(C& object, Callback method):
 		_pObject(&object),
@@ -73,7 +77,7 @@ public:
 		return *this;
 	}
 
-	void notify(Notification* pNf) const
+	virtual void notify(Notification* pNf) const
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 
@@ -88,32 +92,30 @@ public:
 		}
 	}
 
-	bool equals(const AbstractObserver& abstractObserver) const
+	virtual bool equals(const AbstractObserver& abstractObserver) const
 	{
 		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	bool accepts(Notification* pNf, const char* pName = 0) const
+	virtual bool accepts(Notification* pNf, const char* pName = nullptr) const
 	{
 		return dynamic_cast<N*>(pNf) && (!pName || pNf->name() == pName);
 	}
 
-	AbstractObserver* clone() const
+	virtual AbstractObserver* clone() const
 	{
 		return new NObserver(*this);
 	}
 
-	void disable()
+	virtual void disable()
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 
-		_pObject = 0;
+		_pObject = nullptr;
 	}
 
-private:
-	NObserver();
-
+protected:
 	C*       _pObject;
 	Callback _method;
 	mutable Poco::Mutex _mutex;

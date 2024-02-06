@@ -14,12 +14,14 @@
 #include "Poco/NotificationCenter.h"
 #include "Poco/Observer.h"
 #include "Poco/NObserver.h"
+#include "Poco/AsyncObserver.h"
 #include "Poco/AutoPtr.h"
 
 
 using Poco::NotificationCenter;
 using Poco::Observer;
 using Poco::NObserver;
+using Poco::AsyncObserver;
 using Poco::Notification;
 using Poco::AutoPtr;
 
@@ -39,14 +41,14 @@ NotificationCenterTest::~NotificationCenterTest()
 }
 
 
-void NotificationCenterTest::test1()
+void NotificationCenterTest::testNotificationCenter1()
 {
 	NotificationCenter nc;
 	nc.postNotification(new Notification);
 }
 
 
-void NotificationCenterTest::test2()
+void NotificationCenterTest::testNotificationCenter2()
 {
 	NotificationCenter nc;
 	Observer<NotificationCenterTest, Notification> o(*this, &NotificationCenterTest::handle1);
@@ -64,7 +66,7 @@ void NotificationCenterTest::test2()
 }
 
 
-void NotificationCenterTest::test3()
+void NotificationCenterTest::testNotificationCenter3()
 {
 	NotificationCenter nc;
 	Observer<NotificationCenterTest, Notification> o1(*this, &NotificationCenterTest::handle1);
@@ -88,7 +90,7 @@ void NotificationCenterTest::test3()
 }
 
 
-void NotificationCenterTest::test4()
+void NotificationCenterTest::testNotificationCenter4()
 {
 	NotificationCenter nc;
 	Observer<NotificationCenterTest, Notification> o1(*this, &NotificationCenterTest::handle1);
@@ -119,7 +121,7 @@ void NotificationCenterTest::test4()
 }
 
 
-void NotificationCenterTest::test5()
+void NotificationCenterTest::testNotificationCenter5()
 {
 	NotificationCenter nc;
 	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
@@ -137,7 +139,7 @@ void NotificationCenterTest::test5()
 }
 
 
-void NotificationCenterTest::testAuto()
+void NotificationCenterTest::testNotificationCenterAuto()
 {
 	NotificationCenter nc;
 	nc.addObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
@@ -148,7 +150,30 @@ void NotificationCenterTest::testAuto()
 }
 
 
-void NotificationCenterTest::testDefaultCenter()
+void NotificationCenterTest::testNotificationCenterAsync()
+{
+	using ObserverT = AsyncObserver<NotificationCenterTest, Notification>::Type;
+
+	NotificationCenter nc;
+
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	nc.postNotification(new Notification("asyncNotification"));
+	nc.postNotification(new Notification("anotherNotification"));
+
+	while (_set.size() < 2) Poco::Thread::sleep(100);
+
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2));
+
+	assertTrue(_set.size() == 2);
+	assertTrue(_set.find("handleAsync1") != _set.end());
+	assertTrue(_set.find("handleAsync2") != _set.end());
+}
+
+
+void NotificationCenterTest::testDefaultNotificationCenter()
 {
 	NotificationCenter& nc = NotificationCenter::defaultCenter();
 	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
@@ -197,6 +222,26 @@ void NotificationCenterTest::handleAuto(const AutoPtr<Notification>& pNf)
 }
 
 
+void NotificationCenterTest::handleAsync1(const AutoPtr<Notification>& pNf)
+{
+	Poco::Mutex::ScopedLock l(_mutex);
+	_set.insert("handleAsync1");
+}
+
+
+void NotificationCenterTest::handleAsync2(const AutoPtr<Notification>& pNf)
+{
+	Poco::Mutex::ScopedLock l(_mutex);
+	_set.insert("handleAsync2");
+}
+
+
+bool NotificationCenterTest::matchAsync(const std::string& name)
+{
+	return name.find("asyncNotification") == 0;
+}
+
+
 void NotificationCenterTest::setUp()
 {
 	_set.clear();
@@ -212,13 +257,14 @@ CppUnit::Test* NotificationCenterTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NotificationCenterTest");
 
-	CppUnit_addTest(pSuite, NotificationCenterTest, test1);
-	CppUnit_addTest(pSuite, NotificationCenterTest, test2);
-	CppUnit_addTest(pSuite, NotificationCenterTest, test3);
-	CppUnit_addTest(pSuite, NotificationCenterTest, test4);
-	CppUnit_addTest(pSuite, NotificationCenterTest, test5);
-	CppUnit_addTest(pSuite, NotificationCenterTest, testAuto);
-	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultCenter);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter1);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter2);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter3);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter4);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter5);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenterAuto);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenterAsync);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultNotificationCenter);
 
 	return pSuite;
 }

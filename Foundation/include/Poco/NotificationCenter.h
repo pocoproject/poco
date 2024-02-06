@@ -79,6 +79,7 @@ class Foundation_API NotificationCenter
 	///     }
 {
 public:
+
 	NotificationCenter();
 		/// Creates the NotificationCenter.
 
@@ -120,6 +121,12 @@ public:
 	std::size_t countObservers() const;
 		/// Returns the number of registered observers.
 
+	int backlog() const;
+		/// Returns the sum of queued notifications
+		/// for all observers (applies only to active observers,
+		/// regular observers post notifications syncronously and
+		/// never have a backlog).
+
 	static NotificationCenter& defaultCenter();
 		/// Returns a reference to the default
 		/// NotificationCenter.
@@ -127,6 +134,8 @@ public:
 private:
 	typedef SharedPtr<AbstractObserver> AbstractObserverPtr;
 	typedef std::vector<AbstractObserverPtr> ObserverList;
+
+	ObserverList observersToNotify(Notification::Ptr pNotification) const;
 
 	ObserverList  _observers;
 	mutable Mutex _mutex;

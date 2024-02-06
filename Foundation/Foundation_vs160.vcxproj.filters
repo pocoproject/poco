@@ -1448,6 +1448,9 @@
     <ClInclude Include="include\Poco\NObserver.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\AsyncObserver.h">
+      <Filter>Notifications\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Notification.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>

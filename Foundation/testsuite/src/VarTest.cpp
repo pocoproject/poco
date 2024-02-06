@@ -1997,12 +1997,12 @@ void VarTest::testLimitsFloat()
 {
 	if (std::numeric_limits<double>::max() != std::numeric_limits<float>::max())
 	{
-		double iMin = -1 * std::numeric_limits<float>::max();
+		constexpr double iMin = -1 * std::numeric_limits<float>::max();
 		Var da = iMin * 10;
 		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 
-		double iMax = std::numeric_limits<float>::max();
+		constexpr double iMax = std::numeric_limits<float>::max();
 		da = iMax * 10;
 		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
@@ -2027,13 +2027,13 @@ void VarTest::testLimitsFloat()
 	float f = 0.f;
 	try { f = anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
 	catch (Poco::RangeException&) {}
-	i = f;
+	i = static_cast<int64_t>(f);
 	assertTrue (0 == i);
 
 	double d = 0.;
 	try { d = anyInt.convert<double>(); fail("must throw", __LINE__, __FILE__); }
 	catch (Poco::RangeException&) {}
-	i = d;
+	i = static_cast<int64_t>(d);
 	assertTrue (0 == i);
 }
 

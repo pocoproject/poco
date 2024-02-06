@@ -1493,6 +1493,7 @@
     <ClInclude Include="include\Poco\AccessExpireStrategy.h" />
     <ClInclude Include="include\Poco\ActiveDispatcher.h" />
     <ClInclude Include="include\Poco\ActiveMethod.h" />
+    <ClInclude Include="include\Poco\AsyncObserver.h" />
     <ClInclude Include="include\Poco\ActiveResult.h" />
     <ClInclude Include="include\Poco\ActiveRunnable.h" />
     <ClInclude Include="include\Poco\ActiveStarter.h" />
