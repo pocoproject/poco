@@ -76,7 +76,7 @@ bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 }
 
 
-NotificationCenter::ObserverList NotificationCenter::observersToNotify(Notification::Ptr pNotification) const
+NotificationCenter::ObserverList NotificationCenter::observersToNotify(const Notification::Ptr& pNotification) const
 {
 	ObserverList ret;
 	ScopedLock<Mutex> lock(_mutex);

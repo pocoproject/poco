@@ -23,6 +23,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Debugger.h"
+#include "Poco/ErrorHandler.h"
 #include "Poco/Format.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/NotificationQueue.h"
@@ -44,13 +45,14 @@ class AsyncObserver: public NObserver<C, N>
 {
 public:
 	using Type = AsyncObserver<C, N>;
-	using Matcher = bool (C::*)(const std::string&);
+	using Matcher = typename NObserver<C, N>::Matcher;
+	using Handler = typename NObserver<C, N>::Handler;
+	using NotificationPtr = typename NObserver<C, N>::NotificationPtr;
 
 	AsyncObserver() = delete;
 
 	AsyncObserver(C& object, Handler handler, Matcher matcher = nullptr):
-		NObserver(object, handler),
-		_matcher(matcher),
+		NObserver<C, N>(object, handler, matcher),
 		_ra(*this, &AsyncObserver::dequeue),
 		_started(false),
 		_done(false)
@@ -58,8 +60,7 @@ public:
 	}
 
 	AsyncObserver(const AsyncObserver& observer):
-		NObserver(observer),
-		_matcher(observer._matcher),
+		NObserver<C, N>(observer),
 		_ra(*this, &AsyncObserver::dequeue),
 		_started(false),
 		_done(false)
@@ -77,45 +78,18 @@ public:
 		if (&observer != this)
 		{
 			poco_assert(observer._nq.size() == 0);
-			_pObject = observer._pObject;
-			_handler  = observer._handler;
-			_matcher = observer._matcher;
+			setObject(observer._pObject);
+			setHandler(observer._handler);
+			setMatcher(observer._matcher);
 			_started = false;
 			_done =false;
 		}
 		return *this;
 	}
 
-	void notify(Notification* pNf) const
+	virtual void notify(Notification* pNf) const
 	{
-		Poco::ScopedLockWithUnlock l(_mutex);
-		if (_pObject)
-		{
-			if (!_matcher || (_pObject->*_matcher)(pNf->name()))
-			{
-				l.unlock();
-				N* pCastNf = dynamic_cast<N*>(pNf);
-				if (pCastNf)
-				{
-					NotificationPtr ptr(pCastNf, true);
-					_nq.enqueueNotification(ptr);
-				}
-			}
-		}
-	}
-
-	virtual bool equals(const AbstractObserver& abstractObserver) const
-	{
-		const AsyncObserver* pObs = dynamic_cast<const AsyncObserver*>(&abstractObserver);
-		return pObs && pObs->_pObject == _pObject && pObs->_method == _method && pObs->_matcher == _matcher;
-	}
-
-	virtual bool accepts(Notification* pNf, const char* pName = nullptr) const
-	{
-		if (!dynamic_cast<N*>(pNf)) return false;
-
-		Poco::ScopedLock l(_mutex);
-		return _pObject && _matcher && (_pObject->*_matcher)(pNf->name());
+		_nq.enqueueNotification(NotificationPtr(pNf, true));
 	}
 
 	virtual AbstractObserver* clone() const
@@ -125,7 +99,7 @@ public:
 
 	virtual void start()
 	{
-		Poco::ScopedLock l(_mutex);
+		Poco::ScopedLock l(this->mutex());
 		if (_started)
 		{
 			throw Poco::InvalidAccessException(
@@ -149,7 +123,7 @@ public:
 		_nq.wakeUpAll();
 		while (!_done) Thread::sleep(100);
 		_thread.join();
-		NObserver::disable();
+		NObserver<C, N>::disable();
 	}
 
 	virtual int backlog() const
@@ -162,19 +136,25 @@ private:
 	{
 		NotificationPtr pNf;
 		_started = true;
+		_done = false;
 		while (pNf = _nq.waitDequeueNotification())
 		{
 			try
 			{
-				_mutex.lock();
-				try
-				{
-					(_pObject->*_method)(pNf);
-					_mutex.unlock();
-				}
-				catch (Poco::SystemException&) { break; }
-				catch (...) { _mutex.unlock(); }
-			} catch (Poco::SystemException&) {}
+				this->handle(pNf);
+			}
+			catch (Poco::Exception& ex)
+			{
+				Poco::ErrorHandler::handle(ex);
+			}
+			catch (std::exception& ex)
+			{
+				Poco::ErrorHandler::handle(ex);
+			}
+			catch (...)
+			{
+				Poco::ErrorHandler::handle();
+			}
 		}
 		_done = true;
 		_started = false;
@@ -183,7 +163,6 @@ private:
 	using Adapter = RunnableAdapter<AsyncObserver<C, N>>;
 
 	Thread _thread;
-	Matcher _matcher;
 	mutable NotificationQueue _nq;
 	Adapter _ra;
 	std::atomic<bool> _started;

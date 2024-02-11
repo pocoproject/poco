@@ -37,8 +37,14 @@ public:
 	AbstractObserver& operator = (const AbstractObserver& observer);
 
 	virtual void notify(Notification* pNf) const = 0;
+
 	virtual bool equals(const AbstractObserver& observer) const = 0;
-	virtual bool accepts(Notification* pNf, const char* pName = 0) const = 0;
+
+	[[deprecated("use `Poco::Any accepts(Notification*)` instead")]]
+	virtual bool accepts(Notification* pNf, const char* pName) const = 0;
+
+	virtual bool accepts(const Notification::Ptr& pNf) const = 0;
+
 	virtual AbstractObserver* clone() const = 0;
 
 	virtual void start();

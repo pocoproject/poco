@@ -132,10 +132,10 @@ public:
 		/// NotificationCenter.
 
 private:
-	typedef SharedPtr<AbstractObserver> AbstractObserverPtr;
-	typedef std::vector<AbstractObserverPtr> ObserverList;
+	using AbstractObserverPtr = SharedPtr<AbstractObserver>;
+	using ObserverList = std::vector<AbstractObserverPtr>;
 
-	ObserverList observersToNotify(Notification::Ptr pNotification) const;
+	ObserverList observersToNotify(const Notification::Ptr& pNotification) const;
 
 	ObserverList  _observers;
 	mutable Mutex _mutex;

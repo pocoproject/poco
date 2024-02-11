@@ -53,10 +53,12 @@ protected:
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
 	void handleAsync1(const Poco::AutoPtr<Poco::Notification>& pNf);
 	void handleAsync2(const Poco::AutoPtr<Poco::Notification>& pNf);
-	bool matchAsync(const std::string& name);
+	bool matchAsync(const std::string& name) const;
 
 private:
 	std::set<std::string> _set;
+	std::atomic<bool> _handle1Done;
+	std::atomic<bool> _handle2Done;
 	Poco::Mutex _mutex;
 };
 
