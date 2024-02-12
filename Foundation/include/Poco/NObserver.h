@@ -90,12 +90,7 @@ public:
 
 	virtual void notify(Notification* pNf) const
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
-		if (_pObject)
-		{
-			NotificationPtr ptr(pNf, true);
-			(_pObject->*_handler)(ptr);
-		}
+		handle(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
 	virtual bool equals(const AbstractObserver& abstractObserver) const
@@ -112,8 +107,7 @@ public:
 
 	virtual bool accepts(const Notification::Ptr& pNf) const
 	{
-		if(match(pNf)) return pNf.cast<N>() != nullptr;
-		return false;
+		return (match(pNf) && (pNf.template cast<N>() != nullptr));
 	}
 
 	virtual AbstractObserver* clone() const
@@ -130,7 +124,7 @@ public:
 
 protected:
 
-	void handle(const NotificationPtr& ptr)
+	void handle(const NotificationPtr& ptr) const
 	{
 		Mutex::ScopedLock lock(_mutex);
 
@@ -138,7 +132,7 @@ protected:
 			(_pObject->*_handler)(ptr);
 	}
 
-	bool match(const NotificationPtr& ptr) const
+	bool match(const Notification::Ptr& ptr) const
 	{
 		Mutex::ScopedLock l(_mutex);
 

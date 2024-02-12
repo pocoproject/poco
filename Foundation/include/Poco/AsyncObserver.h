@@ -38,7 +38,7 @@ class AsyncObserver: public NObserver<C, N>
 	/// to (N)Observer classes, which notify subscribers synchronously).
 	/// In order to become active and process notifications, the start()
 	/// method must be called.
-	/// 
+	///
 	/// This class is meant to be used with the NotificationCenter only.
 	/// Notification processing thread can be started only once, and copying
 	/// should be done before `start()` is called.
@@ -89,7 +89,7 @@ public:
 
 	virtual void notify(Notification* pNf) const
 	{
-		_nq.enqueueNotification(NotificationPtr(pNf, true));
+		_nq.enqueueNotification(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
 	virtual AbstractObserver* clone() const
@@ -134,14 +134,14 @@ public:
 private:
 	void dequeue()
 	{
-		NotificationPtr pNf;
+		Notification::Ptr pNf;
 		_started = true;
 		_done = false;
 		while ((pNf = _nq.waitDequeueNotification()))
 		{
 			try
 			{
-				this->handle(pNf);
+				this->handle(pNf.unsafeCast<N>());
 			}
 			catch (Poco::Exception& ex)
 			{

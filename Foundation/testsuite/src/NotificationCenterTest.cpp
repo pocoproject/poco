@@ -28,6 +28,13 @@ using Poco::AutoPtr;
 
 class TestNotification: public Notification
 {
+public:
+	TestNotification()
+	{}
+
+	TestNotification(const std::string& name):
+		Notification(name)
+	{}
 };
 
 
@@ -155,15 +162,16 @@ void NotificationCenterTest::testNotificationCenterAuto()
 
 void NotificationCenterTest::testNotificationCenterAsync()
 {
-	using ObserverT = AsyncObserver<NotificationCenterTest, Notification>::Type;
+	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
 
 	NotificationCenter nc;
 
 	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
 	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
 
-	nc.postNotification(new Notification("asyncNotification"));
-	nc.postNotification(new Notification("anotherNotification"));
+	nc.postNotification(new TestNotification("asyncNotification"));
+	nc.postNotification(new TestNotification("anotherNotification"));
+	nc.postNotification(new Notification);
 
 	while (!_handle1Done || !_handle2Done)
 		Poco::Thread::sleep(100);
@@ -227,7 +235,7 @@ void NotificationCenterTest::handleAuto(const AutoPtr<Notification>& pNf)
 }
 
 
-void NotificationCenterTest::handleAsync1(const AutoPtr<Notification>& pNf)
+void NotificationCenterTest::handleAsync1(const AutoPtr<TestNotification>& pNf)
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAsync1");
@@ -235,7 +243,7 @@ void NotificationCenterTest::handleAsync1(const AutoPtr<Notification>& pNf)
 }
 
 
-void NotificationCenterTest::handleAsync2(const AutoPtr<Notification>& pNf)
+void NotificationCenterTest::handleAsync2(const AutoPtr<TestNotification>& pNf)
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAsync2");
