@@ -22,17 +22,8 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Environment.h"
-#include "Poco/NObserver.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
-
-
-using Poco::Net::Socket;
-using Poco::Net::SocketReactor;
-using Poco::Net::ServerSocket;
-using Poco::Net::StreamSocket;
-using Poco::NObserver;
-using Poco::AutoPtr;
 
 
 namespace Poco {
