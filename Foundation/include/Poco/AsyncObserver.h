@@ -8,14 +8,15 @@
 // Definition of the AsyncObserver class template.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Aleph ONE Software Engineering d.o.o.,
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
 
-#ifndef Foundation_ActiveObserver_INCLUDED
-#define Foundation_ActiveObserver_INCLUDED
+#ifndef Foundation_AsyncObserver_INCLUDED
+#define Foundation_AsyncObserver_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -173,4 +174,4 @@ private:
 } // namespace Poco
 
 
-#endif // Foundation_ActiveObserver_INCLUDED
+#endif // Foundation_AsyncObserver_INCLUDED

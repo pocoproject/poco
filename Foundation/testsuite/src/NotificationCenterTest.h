@@ -37,8 +37,10 @@ public:
 	void testNotificationCenter4();
 	void testNotificationCenter5();
 	void testNotificationCenterAuto();
-	void testNotificationCenterAsync();
+	void testAsyncObserver();
+	void testAsyncNotificationCenter();
 	void testDefaultNotificationCenter();
+	void testDefaultAsyncNotificationCenter();
 
 	void setUp();
 	void tearDown();

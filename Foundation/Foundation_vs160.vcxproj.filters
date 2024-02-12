@@ -573,6 +573,9 @@
     <ClCompile Include="src\AbstractObserver.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AsyncNotificationCenter.cpp">
+      <Filter>Notifications\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Notification.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
@@ -1449,6 +1452,9 @@
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\AsyncObserver.h">
+      <Filter>Notifications\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\AsyncNotificationCenter.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Notification.h">

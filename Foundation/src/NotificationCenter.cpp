@@ -93,6 +93,14 @@ void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 
+	notifyObservers(pNotification);
+}
+
+
+void NotificationCenter::notifyObservers(Notification::Ptr& pNotification)
+{
+	poco_check_ptr (pNotification);
+
 	ObserverList observers = observersToNotify(pNotification);
 	for (auto& p: observers)
 		p->notify(pNotification);
