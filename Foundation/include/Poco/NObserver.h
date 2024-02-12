@@ -92,7 +92,10 @@ public:
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 		if (_pObject)
-			(_pObject->*_handler)(NotificationPtr(pNf, true));
+		{
+			NotificationPtr ptr(pNf, true);
+			(_pObject->*_handler)(ptr);
+		}
 	}
 
 	virtual bool equals(const AbstractObserver& abstractObserver) const

@@ -137,7 +137,7 @@ private:
 		NotificationPtr pNf;
 		_started = true;
 		_done = false;
-		while (pNf = _nq.waitDequeueNotification())
+		while ((pNf = _nq.waitDequeueNotification()))
 		{
 			try
 			{
