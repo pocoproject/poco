@@ -580,15 +580,36 @@ protected:
 	void fix2019Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
 	{
 		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v142");
+		Poco::AutoPtr<Poco::XML::NodeList> pLinkList = pProjectDoc->getElementsByTagName("Link");
+		for (unsigned long i = 0; i < pLinkList->length(); i++)
+		{
+			Poco::XML::Element* pLinkElem = static_cast<Poco::XML::Element*>(pLinkList->item(i));
+			Poco::XML::Element* pItemDefinitionGroupElem = static_cast<Poco::XML::Element*>(pLinkElem->parentNode());
+			Poco::XML::XMLString condition = pItemDefinitionGroupElem->getAttribute("Condition");
+			if (Poco::endsWith(condition, Poco::XML::XMLString("ARM64'")))
+			{
+				appendElement(pLinkElem, "TargetMachine", "MachineARM64");
+			}
+		}
+		Poco::AutoPtr<Poco::XML::NodeList> pClCompileList = pProjectDoc->getElementsByTagName("ClCompile");
+		for (unsigned long i = 0; i < pClCompileList->length(); i++)
+		{
+			Poco::XML::Element* pClCompileElem = static_cast<Poco::XML::Element*>(pClCompileList->item(i));
+			Poco::AutoPtr<Poco::XML::Element> pLanguageStandard = pProjectDoc->createElement("LanguageStandard");
+			Poco::AutoPtr<Poco::XML::Text> pStandardText = pProjectDoc->createTextNode("stdcpp17");
+			pLanguageStandard->appendChild(pStandardText);
+			pClCompileElem->appendChild(pLanguageStandard);
+
+			pClCompileElem = static_cast<Poco::XML::Element*>(pClCompileList->item(i));
+			pLanguageStandard = pProjectDoc->createElement("LanguageStandard_C");
+			pStandardText = pProjectDoc->createTextNode("stdc11");
+			pLanguageStandard->appendChild(pStandardText);
+			pClCompileElem->appendChild(pLanguageStandard);
+		}
 	}
 
 	void fix2022Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
 	{
-		// TODO: handle standards
-		// in template:
-		// LanguageStandard="${vc.project.compiler.std.cpp}"
-		// LanguageStandard_C="${vc.project.compiler.std.c}"
-		// for now, we're getting by through AdditionalOptions for C++
 		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v143");
 		Poco::AutoPtr<Poco::XML::NodeList> pLinkList = pProjectDoc->getElementsByTagName("Link");
 		for (unsigned long i = 0; i < pLinkList->length(); i++)
