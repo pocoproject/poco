@@ -2,7 +2,7 @@
 #define SQLPARSER_SQLSTATEMENT_H
 
 #include <vector>
-#include "sql-parser/src/sqlparser_win.h"
+#include "sqlparser_win.h"
 #include "Expr.h"
 
 namespace hsql {

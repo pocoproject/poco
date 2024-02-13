@@ -26,7 +26,8 @@ target_include_directories(ActiveRecord
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/SQLParser
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/SQLParser/src
 )
 
 POCO_INSTALL(ActiveRecord)

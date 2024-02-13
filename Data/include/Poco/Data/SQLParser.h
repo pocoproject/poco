@@ -23,9 +23,9 @@
 #ifndef POCO_DATA_NO_SQL_PARSER
 
 
-#include "sql-parser/src/SQLParser.h"
-#include "sql-parser/src/SQLParserResult.h"
-#include "sql-parser/src/util/sqlhelper.h"
+#include "src/SQLParser.h"
+#include "SQLParserResult.h"
+#include "util/sqlhelper.h"
 
 
 namespace Poco {

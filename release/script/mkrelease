@@ -396,24 +396,6 @@ ENDOFSCRIPT
 
 
 #
-# Create Visual Studio 14 build script
-#
-cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 140 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
-# Create Visual Studio 15 build script
-#
-cat >${target}/build_vs150.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 150 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
 # Create Visual Studio 16 build script
 #
 cat >${target}/build_vs160.cmd <<'ENDOFSCRIPT'
