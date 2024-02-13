@@ -43,7 +43,9 @@ public:
 NotificationCenterTest::NotificationCenterTest(const std::string& name):
 	CppUnit::TestCase(name),
 	_handle1Done(false),
-	_handle2Done(false)
+	_handleAuto1Done(false),
+	_handleAsync1Done(false),
+	_handleAsync2Done(false)
 {
 }
 
@@ -175,7 +177,7 @@ void NotificationCenterTest::testAsyncObserver()
 	nc.postNotification(new TestNotification("anotherNotification"));
 	nc.postNotification(new Notification);
 
-	while (!_handle1Done || !_handle2Done)
+	while (!_handleAsync1Done || !_handleAsync2Done)
 		Poco::Thread::sleep(100);
 
 	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
@@ -201,7 +203,7 @@ void NotificationCenterTest::testAsyncNotificationCenter()
 	nc.postNotification(new TestNotification("anotherNotification"));
 	nc.postNotification(new Notification);
 
-	while (!_handle1Done || !_handle2Done)
+	while (!_handleAsync1Done || !_handleAsync2Done)
 		Poco::Thread::sleep(100);
 
 	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
@@ -230,24 +232,33 @@ void NotificationCenterTest::testDefaultAsyncNotificationCenter()
 	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
 
 	AsyncNotificationCenter& nc = AsyncNotificationCenter::defaultCenter();
+	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
+	nc.addObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
 	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.postNotification(new Notification);
 	nc.postNotification(new TestNotification("asyncNotification"));
 
-	while (!_handle1Done)
+	while (!_handle1Done || !_handleAuto1Done || !_handleAsync1Done)
 		Poco::Thread::sleep(100);
 
 	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
+	nc.removeObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
+	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	Poco::Mutex::ScopedLock l(_mutex);
-	assertTrue (_set.size() == 1);
+	assertTrue (_set.size() == 3);
+	assertTrue (_set.find("handle1") != _set.end());
+	assertTrue (_set.find("handleAuto") != _set.end());
 	assertTrue (_set.find("handleAsync1") != _set.end());
 }
 
 
 void NotificationCenterTest::handle1(Poco::Notification* pNf)
 {
+	Poco::Mutex::ScopedLock l(_mutex);
 	poco_check_ptr (pNf);
 	AutoPtr<Notification> nf = pNf;
 	_set.insert("handle1");
+	_handle1Done = true;
 }
 
 
@@ -277,7 +288,9 @@ void NotificationCenterTest::handleTest(TestNotification* pNf)
 
 void NotificationCenterTest::handleAuto(const AutoPtr<Notification>& pNf)
 {
+	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAuto");
+	_handleAuto1Done = true;
 }
 
 
@@ -285,7 +298,7 @@ void NotificationCenterTest::handleAsync1(const AutoPtr<TestNotification>& pNf)
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAsync1");
-	_handle1Done = true;
+	_handleAsync1Done = true;
 }
 
 
@@ -293,7 +306,7 @@ void NotificationCenterTest::handleAsync2(const AutoPtr<TestNotification>& pNf)
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAsync2");
-	_handle2Done = true;
+	_handleAsync2Done = true;
 }
 
 

@@ -60,7 +60,9 @@ protected:
 private:
 	std::set<std::string> _set;
 	std::atomic<bool> _handle1Done;
-	std::atomic<bool> _handle2Done;
+	std::atomic<bool> _handleAuto1Done;
+	std::atomic<bool> _handleAsync1Done;
+	std::atomic<bool> _handleAsync2Done;
 	Poco::Mutex _mutex;
 };
 
