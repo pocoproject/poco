@@ -24,7 +24,7 @@
 #include "Poco/Data/Range.h"
 #include "Poco/Data/Bulk.h"
 #include "Poco/Data/Row.h"
-#include "Poco/Data/SQLParser.h"
+#include "SQLParser.h"
 #include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"

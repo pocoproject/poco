@@ -14,7 +14,7 @@ objects = Binder ConnectionHandle Connector EnvironmentHandle \
 
 target_includes = $(POCO_BASE)/Data/testsuite/include
 ifndef POCO_DATA_NO_SQL_PARSER
-	target_includes += $(POCO_BASE)/Data/src
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
 endif
 
 target         = PocoDataODBC

@@ -1,7 +1,7 @@
 #ifndef SQLPARSER_COLUMN_TYPE_H
 #define SQLPARSER_COLUMN_TYPE_H
 
-#include"sql-parser/src/sqlparser_win.h"
+#include"sqlparser_win.h"
 #include <ostream>
 
 namespace hsql {

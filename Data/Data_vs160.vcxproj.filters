@@ -219,79 +219,79 @@
     <ClInclude Include="include\Poco\Data\SessionPoolContainer.h">
       <Filter>SessionPooling\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\SQLParser.h">
+    <ClInclude Include="SQLParser\src\SQLParser.h">
       <Filter>SQLParser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\SQLParserResult.h">
+    <ClInclude Include="SQLParser\src\SQLParserResult.h">
       <Filter>SQLParser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sqlparser_win.h">
+    <ClInclude Include="SQLParser\src\sqlparser_win.h">
       <Filter>SQLParser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\parser\bison_parser.h">
+    <ClInclude Include="SQLParser\src\parser\bison_parser.h">
       <Filter>SQLParser\parser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\parser\flex_lexer.h">
+    <ClInclude Include="SQLParser\src\parser\flex_lexer.h">
       <Filter>SQLParser\parser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\parser\parser_typedef.h">
+    <ClInclude Include="SQLParser\src\parser\parser_typedef.h">
       <Filter>SQLParser\parser\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\AlterStatement.h">
+    <ClInclude Include="SQLParser\src\sql\AlterStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\ColumnType.h">
+    <ClInclude Include="SQLParser\src\sql\ColumnType.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\CreateStatement.h">
+    <ClInclude Include="SQLParser\src\sql\CreateStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\DeleteStatement.h">
+    <ClInclude Include="SQLParser\src\sql\DeleteStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\DropStatement.h">
+    <ClInclude Include="SQLParser\src\sql\DropStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\ExecuteStatement.h">
+    <ClInclude Include="SQLParser\src\sql\ExecuteStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\ExportStatement.h">
+    <ClInclude Include="SQLParser\src\sql\ExportStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\Expr.h">
+    <ClInclude Include="SQLParser\src\sql\Expr.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\ImportStatement.h">
+    <ClInclude Include="SQLParser\src\sql\ImportStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\InsertStatement.h">
+    <ClInclude Include="SQLParser\src\sql\InsertStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\PrepareStatement.h">
+    <ClInclude Include="SQLParser\src\sql\PrepareStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\SelectStatement.h">
+    <ClInclude Include="SQLParser\src\sql\SelectStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\ShowStatement.h">
+    <ClInclude Include="SQLParser\src\sql\ShowStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\SQLStatement.h">
+    <ClInclude Include="SQLParser\src\sql\SQLStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\statements.h">
+    <ClInclude Include="SQLParser\src\sql\statements.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\Table.h">
+    <ClInclude Include="SQLParser\src\sql\Table.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\TransactionStatement.h">
+    <ClInclude Include="SQLParser\src\sql\TransactionStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\sql\UpdateStatement.h">
+    <ClInclude Include="SQLParser\src\sql\UpdateStatement.h">
       <Filter>SQLParser\sql\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sql-parser\src\util\sqlhelper.h">
+    <ClInclude Include="SQLParser\src\util\sqlhelper.h">
       <Filter>SQLParser\util\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Data\ArchiveStrategy.h">
@@ -407,34 +407,34 @@
     <ClCompile Include="src\SessionPoolContainer.cpp">
       <Filter>SessionPooling\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\SQLParser.cpp">
+    <ClCompile Include="SQLParser\src\SQLParser.cpp">
       <Filter>SQLParser\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\SQLParserResult.cpp">
+    <ClCompile Include="SQLParser\src\SQLParserResult.cpp">
       <Filter>SQLParser\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\parser\bison_parser.cpp">
+    <ClCompile Include="SQLParser\src\parser\bison_parser.cpp">
       <Filter>SQLParser\parser\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\parser\flex_lexer.cpp">
+    <ClCompile Include="SQLParser\src\parser\flex_lexer.cpp">
       <Filter>SQLParser\parser\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\CreateStatement.cpp">
+    <ClCompile Include="SQLParser\src\sql\CreateStatement.cpp">
       <Filter>SQLParser\sql\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\Expr.cpp">
+    <ClCompile Include="SQLParser\src\sql\Expr.cpp">
       <Filter>SQLParser\sql\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\PrepareStatement.cpp">
+    <ClCompile Include="SQLParser\src\sql\PrepareStatement.cpp">
       <Filter>SQLParser\sql\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\SQLStatement.cpp">
+    <ClCompile Include="SQLParser\src\sql\SQLStatement.cpp">
       <Filter>SQLParser\sql\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\statements.cpp">
+    <ClCompile Include="SQLParser\src\sql\statements.cpp">
       <Filter>SQLParser\sql\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\util\sqlhelper.cpp">
+    <ClCompile Include="SQLParser\src\util\sqlhelper.cpp">
       <Filter>SQLParser\util\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ArchiveStrategy.cpp">

@@ -921,31 +921,31 @@
     <ClInclude Include="include\Poco\Data\Transaction.h"/>
     <ClInclude Include="include\Poco\Data\Transcoder.h"/>
     <ClInclude Include="include\Poco\Data\TypeHandler.h"/>
-    <ClInclude Include="src\sql-parser\src\parser\bison_parser.h"/>
-    <ClInclude Include="src\sql-parser\src\parser\flex_lexer.h"/>
-    <ClInclude Include="src\sql-parser\src\parser\parser_typedef.h"/>
-    <ClInclude Include="src\sql-parser\src\SQLParser.h"/>
-    <ClInclude Include="src\sql-parser\src\SQLParserResult.h"/>
-    <ClInclude Include="src\sql-parser\src\sqlparser_win.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\AlterStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\ColumnType.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\CreateStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\DeleteStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\DropStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\ExecuteStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\ExportStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\Expr.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\ImportStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\InsertStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\PrepareStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\SelectStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\ShowStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\SQLStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\statements.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\Table.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\TransactionStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\sql\UpdateStatement.h"/>
-    <ClInclude Include="src\sql-parser\src\util\sqlhelper.h"/>
+    <ClInclude Include="SQLParser\src\parser\bison_parser.h"/>
+    <ClInclude Include="SQLParser\src\parser\flex_lexer.h"/>
+    <ClInclude Include="SQLParser\src\parser\parser_typedef.h"/>
+    <ClInclude Include="SQLParser\src\SQLParser.h"/>
+    <ClInclude Include="SQLParser\src\SQLParserResult.h"/>
+    <ClInclude Include="SQLParser\src\sqlparser_win.h"/>
+    <ClInclude Include="SQLParser\src\sql\AlterStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\ColumnType.h"/>
+    <ClInclude Include="SQLParser\src\sql\CreateStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\DeleteStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\DropStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\ExecuteStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\ExportStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\Expr.h"/>
+    <ClInclude Include="SQLParser\src\sql\ImportStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\InsertStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\PrepareStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\SelectStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\ShowStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\SQLStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\statements.h"/>
+    <ClInclude Include="SQLParser\src\sql\Table.h"/>
+    <ClInclude Include="SQLParser\src\sql\TransactionStatement.h"/>
+    <ClInclude Include="SQLParser\src\sql\UpdateStatement.h"/>
+    <ClInclude Include="SQLParser\src\util\sqlhelper.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AbstractBinder.cpp">
@@ -1098,52 +1098,52 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\parser\bison_parser.cpp">
+    <ClCompile Include="SQLParser\src\parser\bison_parser.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\parser\flex_lexer.cpp">
+    <ClCompile Include="SQLParser\src\parser\flex_lexer.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\SQLParser.cpp">
+    <ClCompile Include="SQLParser\src\SQLParser.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\SQLParserResult.cpp">
+    <ClCompile Include="SQLParser\src\SQLParserResult.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\CreateStatement.cpp">
+    <ClCompile Include="SQLParser\src\sql\CreateStatement.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\Expr.cpp">
+    <ClCompile Include="SQLParser\src\sql\Expr.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\PrepareStatement.cpp">
+    <ClCompile Include="SQLParser\src\sql\PrepareStatement.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\SQLStatement.cpp">
+    <ClCompile Include="SQLParser\src\sql\SQLStatement.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\sql\statements.cpp">
+    <ClCompile Include="SQLParser\src\sql\statements.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\sql-parser\src\util\sqlhelper.cpp">
+    <ClCompile Include="SQLParser\src\util\sqlhelper.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>

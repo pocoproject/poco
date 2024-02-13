@@ -36,8 +36,7 @@ ifeq ($(POCO_CONFIG),MinGW)
 endif
 
 ifndef POCO_DATA_NO_SQL_PARSER
-	target_includes += $(POCO_BASE)/Data/src
-endif
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
 
 target           = testrunner
 target_version   = 1
