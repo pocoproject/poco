@@ -1453,7 +1453,7 @@
     <ClInclude Include="include\Poco\AsyncObserver.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\AsyncNotificationServer.h">
+    <ClInclude Include="include\Poco\AsyncNotificationCenter.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\NObserver.h">
@@ -1875,9 +1875,6 @@
     </ClInclude>
     <ClInclude Include="src\pcre2_intmodedep.h">
       <Filter>RegularExpression\PCRE2 Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\AsyncObserver.h">
-      <Filter>Notifications\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

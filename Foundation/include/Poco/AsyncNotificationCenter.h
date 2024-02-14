@@ -70,6 +70,9 @@ private:
 	Adapter _ra;
 	std::atomic<bool> _started;
 	std::atomic<bool> _done;
+
+	// TODO: see testDefaultAsyncNotificationCenter for details
+	friend class NotificationCenterTest;
 };
 
 

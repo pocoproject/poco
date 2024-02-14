@@ -180,8 +180,8 @@ void NotificationCenterTest::testAsyncObserver()
 	while (!_handleAsync1Done || !_handleAsync2Done)
 		Poco::Thread::sleep(100);
 
-	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
-	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
 
 	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue(_set.size() == 2);
@@ -206,8 +206,8 @@ void NotificationCenterTest::testAsyncNotificationCenter()
 	while (!_handleAsync1Done || !_handleAsync2Done)
 		Poco::Thread::sleep(100);
 
-	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
-	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
 
 	Poco::Mutex::ScopedLock l(_mutex);
 	assertTrue(_set.size() == 2);
@@ -241,7 +241,7 @@ void NotificationCenterTest::testDefaultAsyncNotificationCenter()
 	while (!_handle1Done || !_handleAuto1Done || !_handleAsync1Done)
 		Poco::Thread::sleep(100);
 
-	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
 	nc.removeObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	Poco::Mutex::ScopedLock l(_mutex);
@@ -249,6 +249,10 @@ void NotificationCenterTest::testDefaultAsyncNotificationCenter()
 	assertTrue (_set.find("handle1") != _set.end());
 	assertTrue (_set.find("handleAuto") != _set.end());
 	assertTrue (_set.find("handleAsync1") != _set.end());
+	// TODO: static object thread hangs without this on windows
+	// for explanation/solution, see
+	// https://stackoverflow.com/questions/10441048/exit-thread-upon-deleting-static-object-during-unload-dll-causes-deadlock
+	nc.stop();
 }
 
 
