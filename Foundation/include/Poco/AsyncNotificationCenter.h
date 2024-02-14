@@ -58,7 +58,8 @@ public:
 
 	static AsyncNotificationCenter& defaultCenter();
 
-private:
+// TODO: see testDefaultAsyncNotificationCenter for details
+//private:
 	void start();
 	void stop();
 	void dequeue();
@@ -70,9 +71,6 @@ private:
 	Adapter _ra;
 	std::atomic<bool> _started;
 	std::atomic<bool> _done;
-
-	// TODO: see testDefaultAsyncNotificationCenter for details
-	friend class NotificationCenterTest;
 };
 
 
