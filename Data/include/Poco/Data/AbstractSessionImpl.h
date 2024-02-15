@@ -56,7 +56,7 @@ public:
 			_bulk(false),
 			_emptyStringIsNull(false),
 			_forceEmptyString(false),
-			_sqlParse(true),
+			_sqlParse(false),
 			_autoCommit(true)
 		/// Creates the AbstractSessionImpl.
 		///
@@ -90,6 +90,18 @@ public:
 		/// While these features can not both be true at the same time, they can both be false,
 		/// resulting in default underlying database behavior.
 		///
+		/// Adds "sqlParse" feature and sets it to false; this property enables parsing of the SQL queries,
+		/// to help the Data framework to determine whether to start a transaction automatically in
+		/// non-autocomit mode (ie. not to start transaction if all the queries in an SQL statement are SELECTs).
+		/// Note that the property is not a bullet-proof way to ensure this behavior, because not all SQL dialects
+		/// are supported by the parser. When enabled, the parsing has performance cost, but it is otherwise
+		/// non-intrusive, ie. on parse failure Statement only internally records parsing errors, but does not throw.
+		/// See Poco::Data::Statement documentation for more information.
+		/// This property has no effect when Poco::Data library is compiled with POCO_DATA_NO_SQL_PARSER.
+		///
+		/// Adds "autoCommit" feature and sets it to true. This property enables automatic commit.
+		/// Setting this feature to  true renders the `sqlParse` property meaningless, because every query
+		/// is automatically commited.
 	{
 		addProperty("storage",
 			&AbstractSessionImpl<C>::setStorage,
