@@ -227,21 +227,21 @@ void NotificationCenterTest::testDefaultNotificationCenter()
 }
 
 
-void NotificationCenterTest::testDefaultAsyncNotificationCenter()
+void NotificationCenterTest::testMixedObservers()
 {
-	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
+	using AObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
 
-	AsyncNotificationCenter& nc = AsyncNotificationCenter::defaultCenter();
+	AsyncNotificationCenter nc;
 	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	nc.addObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
-	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.addObserver(AObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
 	nc.postNotification(new Notification);
 	nc.postNotification(new TestNotification("asyncNotification"));
 
 	while (!_handle1Done || !_handleAuto1Done || !_handleAsync1Done)
 		Poco::Thread::sleep(100);
 
-	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.removeObserver(AObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
 	nc.removeObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	Poco::Mutex::ScopedLock l(_mutex);
@@ -249,10 +249,6 @@ void NotificationCenterTest::testDefaultAsyncNotificationCenter()
 	assertTrue (_set.find("handle1") != _set.end());
 	assertTrue (_set.find("handleAuto") != _set.end());
 	assertTrue (_set.find("handleAsync1") != _set.end());
-	// TODO: static object thread hangs without this on windows
-	// for explanation/solution, see
-	// https://stackoverflow.com/questions/10441048/exit-thread-upon-deleting-static-object-during-unload-dll-causes-deadlock
-	nc.stop();
 }
 
 
@@ -344,7 +340,7 @@ CppUnit::Test* NotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncObserver);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenter);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultNotificationCenter);
-	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultAsyncNotificationCenter);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testMixedObservers);
 
 	return pSuite;
 }

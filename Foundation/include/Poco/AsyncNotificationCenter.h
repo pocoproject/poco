@@ -54,12 +54,9 @@ public:
 		/// Enqueues notification into the notification queue.
 
 	virtual int backlog() const;
-		/// Rteurns the numbner of notifications in the notification queue.
+		/// Returns the numbner of notifications in the notification queue.
 
-	static AsyncNotificationCenter& defaultCenter();
-
-// TODO: see testDefaultAsyncNotificationCenter for details
-//private:
+private:
 	void start();
 	void stop();
 	void dequeue();

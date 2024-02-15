@@ -103,11 +103,4 @@ void AsyncNotificationCenter::dequeue()
 }
 
 
-AsyncNotificationCenter& AsyncNotificationCenter::defaultCenter()
-{
-	static AsyncNotificationCenter nc;
-	return nc;
-}
-
-
 } // namespace Poco

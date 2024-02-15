@@ -40,7 +40,7 @@ public:
 	void testAsyncObserver();
 	void testAsyncNotificationCenter();
 	void testDefaultNotificationCenter();
-	void testDefaultAsyncNotificationCenter();
+	void testMixedObservers();
 
 	void setUp();
 	void tearDown();
