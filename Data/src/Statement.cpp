@@ -12,7 +12,9 @@
 //
 
 
+#ifndef POCO_DATA_NO_SQL_PARSER
 #include "SQLParser.h"
+#endif
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Extraction.h"
