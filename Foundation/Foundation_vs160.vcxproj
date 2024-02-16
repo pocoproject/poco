@@ -577,6 +577,7 @@
     <ClCompile Include="src\Ascii.cpp" />
     <ClCompile Include="src\ASCIIEncoding.cpp" />
     <ClCompile Include="src\AsyncChannel.cpp" />
+    <ClCompile Include="src\AsyncNotificationCenter.cpp" />
     <ClCompile Include="src\AtomicCounter.cpp" />
     <ClCompile Include="src\Base32Decoder.cpp" />
     <ClCompile Include="src\Base32Encoder.cpp" />
@@ -1493,6 +1494,7 @@
     <ClInclude Include="include\Poco\AccessExpireStrategy.h" />
     <ClInclude Include="include\Poco\ActiveDispatcher.h" />
     <ClInclude Include="include\Poco\ActiveMethod.h" />
+    <ClInclude Include="include\Poco\AsyncObserver.h" />
     <ClInclude Include="include\Poco\ActiveResult.h" />
     <ClInclude Include="include\Poco\ActiveRunnable.h" />
     <ClInclude Include="include\Poco\ActiveStarter.h" />
@@ -1502,6 +1504,8 @@
     <ClInclude Include="include\Poco\Ascii.h" />
     <ClInclude Include="include\Poco\ASCIIEncoding.h" />
     <ClInclude Include="include\Poco\AsyncChannel.h" />
+    <ClInclude Include="include\Poco\AsyncObserver.h" />
+    <ClInclude Include="include\Poco\AsyncNotificationCenter.h" />
     <ClInclude Include="include\Poco\AtomicCounter.h" />
     <ClInclude Include="include\Poco\AutoPtr.h" />
     <ClInclude Include="include\Poco\AutoReleasePool.h" />

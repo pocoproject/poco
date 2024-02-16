@@ -47,6 +47,7 @@ void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
 	Mutex::ScopedLock lock(_mutex);
 	_observers.push_back(observer.clone());
+	_observers.back()->start();
 }
 
 
@@ -75,17 +76,34 @@ bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 }
 
 
+NotificationCenter::ObserverList NotificationCenter::observersToNotify(const Notification::Ptr& pNotification) const
+{
+	ObserverList ret;
+	ScopedLock<Mutex> lock(_mutex);
+	for (auto& o : _observers)
+	{
+		if (o->accepts(pNotification))
+			ret.push_back(o);
+	}
+	return ret;
+}
+
+
 void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 
-	ScopedLockWithUnlock<Mutex> lock(_mutex);
-	ObserverList observersToNotify(_observers);
-	lock.unlock();
-	for (auto& p: observersToNotify)
-	{
+	notifyObservers(pNotification);
+}
+
+
+void NotificationCenter::notifyObservers(Notification::Ptr& pNotification)
+{
+	poco_check_ptr (pNotification);
+
+	ObserverList observers = observersToNotify(pNotification);
+	for (auto& p: observers)
 		p->notify(pNotification);
-	}
 }
 
 
@@ -102,6 +120,20 @@ std::size_t NotificationCenter::countObservers() const
 	Mutex::ScopedLock lock(_mutex);
 
 	return _observers.size();
+}
+
+
+int NotificationCenter::backlog() const
+{
+	int cnt = 0;
+
+	ScopedLockWithUnlock<Mutex> lock(_mutex);
+	ObserverList observersToCount(_observers);
+	lock.unlock();
+	for (auto& p : observersToCount)
+		cnt += p->backlog();
+
+	return cnt;
 }
 
 
