@@ -872,15 +872,15 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\src\sql-parser\src\SQLParser.h"
+					RelativePath=".\SQLParser\src\SQLParser.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\sql-parser\src\SQLParserResult.h"
+					RelativePath=".\SQLParser\src\SQLParserResult.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\sql-parser\src\sqlparser_win.h"
+					RelativePath=".\SQLParser\src\sqlparser_win.h"
 					>
 				</File>
 			</Filter>
@@ -888,11 +888,11 @@
 				Name="Source Files"
 				>
 				<File
-					RelativePath=".\src\sql-parser\src\SQLParser.cpp"
+					RelativePath=".\SQLParser\src\SQLParser.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\sql-parser\src\SQLParserResult.cpp"
+					RelativePath=".\SQLParser\src\SQLParserResult.cpp"
 					>
 				</File>
 			</Filter>
@@ -903,15 +903,15 @@
 					Name="Header Files"
 					>
 					<File
-						RelativePath=".\src\sql-parser\src\parser\bison_parser.h"
+						RelativePath=".\SQLParser\src\parser\bison_parser.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\parser\flex_lexer.h"
+						RelativePath=".\SQLParser\src\parser\flex_lexer.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\parser\parser_typedef.h"
+						RelativePath=".\SQLParser\src\parser\parser_typedef.h"
 						>
 					</File>
 				</Filter>
@@ -919,11 +919,11 @@
 					Name="Source Files"
 					>
 					<File
-						RelativePath=".\src\sql-parser\src\parser\bison_parser.cpp"
+						RelativePath=".\SQLParser\src\parser\bison_parser.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\parser\flex_lexer.cpp"
+						RelativePath=".\SQLParser\src\parser\flex_lexer.cpp"
 						>
 					</File>
 				</Filter>
@@ -935,75 +935,75 @@
 					Name="Header Files"
 					>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\AlterStatement.h"
+						RelativePath=".\SQLParser\src\sql\AlterStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\ColumnType.h"
+						RelativePath=".\SQLParser\src\sql\ColumnType.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\CreateStatement.h"
+						RelativePath=".\SQLParser\src\sql\CreateStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\DeleteStatement.h"
+						RelativePath=".\SQLParser\src\sql\DeleteStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\DropStatement.h"
+						RelativePath=".\SQLParser\src\sql\DropStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\ExecuteStatement.h"
+						RelativePath=".\SQLParser\src\sql\ExecuteStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\ExportStatement.h"
+						RelativePath=".\SQLParser\src\sql\ExportStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\Expr.h"
+						RelativePath=".\SQLParser\src\sql\Expr.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\ImportStatement.h"
+						RelativePath=".\SQLParser\src\sql\ImportStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\InsertStatement.h"
+						RelativePath=".\SQLParser\src\sql\InsertStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\PrepareStatement.h"
+						RelativePath=".\SQLParser\src\sql\PrepareStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\SelectStatement.h"
+						RelativePath=".\SQLParser\src\sql\SelectStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\ShowStatement.h"
+						RelativePath=".\SQLParser\src\sql\ShowStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\SQLStatement.h"
+						RelativePath=".\SQLParser\src\sql\SQLStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\statements.h"
+						RelativePath=".\SQLParser\src\sql\statements.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\Table.h"
+						RelativePath=".\SQLParser\src\sql\Table.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\TransactionStatement.h"
+						RelativePath=".\SQLParser\src\sql\TransactionStatement.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\UpdateStatement.h"
+						RelativePath=".\SQLParser\src\sql\UpdateStatement.h"
 						>
 					</File>
 				</Filter>
@@ -1011,23 +1011,23 @@
 					Name="Source Files"
 					>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\CreateStatement.cpp"
+						RelativePath=".\SQLParser\src\sql\CreateStatement.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\Expr.cpp"
+						RelativePath=".\SQLParser\src\sql\Expr.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\PrepareStatement.cpp"
+						RelativePath=".\SQLParser\src\sql\PrepareStatement.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\SQLStatement.cpp"
+						RelativePath=".\SQLParser\src\sql\SQLStatement.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\sql-parser\src\sql\statements.cpp"
+						RelativePath=".\SQLParser\src\sql\statements.cpp"
 						>
 					</File>
 				</Filter>
@@ -1039,7 +1039,7 @@
 					Name="Header Files"
 					>
 					<File
-						RelativePath=".\src\sql-parser\src\util\sqlhelper.h"
+						RelativePath=".\SQLParser\src\util\sqlhelper.h"
 						>
 					</File>
 				</Filter>
@@ -1047,7 +1047,7 @@
 					Name="Source Files"
 					>
 					<File
-						RelativePath=".\src\sql-parser\src\util\sqlhelper.cpp"
+						RelativePath=".\SQLParser\src\util\sqlhelper.cpp"
 						>
 					</File>
 				</Filter>

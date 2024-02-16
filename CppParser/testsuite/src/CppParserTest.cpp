@@ -33,7 +33,7 @@ std::string options("/I \"C:\\Program Files\\Microsoft Visual Studio 8\\VC\\INCL
 				"/D \"_WINDOWS\", "
 				"/D \"_MBCS\", "
 				"/C, /P, /TP");
-std::string path("C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\IDE;C:\\Program Files\\Microsoft Visual Studio 8\\VC\\BIN;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools;;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\bin");
+std::string path("C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\IDE;C:\\Program Files\\Microsoft Visual Studio 8\\VC\\BIN;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\bin");
 
 
 CppParserTest::CppParserTest(const std::string& name): CppUnit::TestCase(name)

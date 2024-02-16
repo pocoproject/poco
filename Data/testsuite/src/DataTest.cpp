@@ -206,11 +206,11 @@ void DataTest::testFeatures()
 	assertTrue (!sess.getFeature("forceEmptyString"));
 
 	assertTrue (sess.hasFeature("sqlParse"));
-	assertTrue (sess.getFeature("sqlParse"));
-	sess.setFeature("sqlParse", false);
-	assertTrue (!sess.getFeature("sqlParse"));
+	assertFalse (sess.getFeature("sqlParse"));
 	sess.setFeature("sqlParse", true);
 	assertTrue (sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", false);
+	assertFalse (sess.getFeature("sqlParse"));
 
 	assertTrue (sess.hasFeature("autoCommit"));
 	assertTrue (sess.getFeature("autoCommit"));
@@ -1497,6 +1497,10 @@ void DataTest::testSQLParse()
 	assertTrue (sess.getFeature("autoCommit"));
 	sess.setFeature("autoCommit", false);
 	assertTrue (!sess.getFeature("autoCommit"));
+
+	assertFalse (sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", true);
+	assertTrue (sess.getFeature("sqlParse"));
 
 	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'",
 		"'",'a',"'",-1, 1u, 1.5, "42", now);

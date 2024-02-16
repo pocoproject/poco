@@ -36,6 +36,7 @@ find_path(ODBC_INCLUDE_DIR
 	PATHS
 		${PC_ODBC_INCLUDE_DIRS}
 		/usr/include
+		/usr/include/libiodbc
 		/usr/local/include
 		/usr/local/odbc/include
 		/usr/local/iodbc/include
