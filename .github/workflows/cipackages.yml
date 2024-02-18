@@ -64,5 +64,5 @@ jobs:
           name: posix-archives
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: rm poco-*-all.tar.gz
-      - run: mkdir poco && cd poco && tar --strip-components 1 xfz ../poco-*.tar.gz
+      - run: mkdir poco && cd poco && tar --strip-components=1 xfz ../poco-*.tar.gz
       - run: cd poco && ./configure --everything && make all -s -j`nproc`
