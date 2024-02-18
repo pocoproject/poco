@@ -1,7 +1,7 @@
-name: Build release packages and perform basic sanity tests
+name: Release Packages QA
 
 on:
-  workflow_dispatch:
+  push:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
