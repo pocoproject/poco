@@ -57,6 +57,7 @@ jobs:
 
   linux-gcc-make-mkrelease:
     runs-on: ubuntu-22.04
+    needs: mkrelease
     steps:
       - uses: actions/download-artifact@v4
         with:
