@@ -1,0 +1,67 @@
+name: Build release packages and perform basic sanity tests
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mkrelease_win:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Install packages
+        run: sudo apt-get update && sudo apt-get -y install dos2unix
+      -
+        name: Build release package
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          mkrel -c unix2dos
+          mkrel -c unix2dos all
+      -
+        name: Copy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-archives
+          path: releases/poco*.zip
+          overwrite: true
+          retention-days: 1
+
+  mkrelease:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Build release package
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          mkrel
+          mkrel all
+      -
+        name: Copy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: posix-archives
+          path: releases/poco*.tar.gz
+          overwrite: true
+          retention-days: 1
+
+  linux-gcc-make-mkrelease:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: rm poco-*-all.tar.gz
+      - run: mkdir poco && cd poco && tar --strip-components 1 xfz ../poco-*.tar.gz
+      - run: cd poco && ./configure --everything && make all -s -j`nproc`
