@@ -1,7 +1,7 @@
 name: Build release packages and perform basic sanity tests
 
 on:
-  push:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -66,3 +66,37 @@ jobs:
       - run: rm poco-*-all.tar.gz
       - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1 
       - run: cd poco && ./configure --everything && make all -s -j`nproc`
+
+  linux-gcc-make-mkrelease-all:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1 
+      - run: cd poco && ./configure --everything && make all -s -j`nproc`
+
+  linux-gcc-cmake-mkrelease:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev 
+      - run: rm poco-*-all.tar.gz
+      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1 
+      - run: cmake -Spoco -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+
+  linux-gcc-cmake-mkrelease-all:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev 
+      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1 
+      - run: cmake -Spoco -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
