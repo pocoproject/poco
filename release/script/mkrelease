@@ -111,6 +111,7 @@ cp ${POCO_BASE}/build/config/* ${target}/build/config
 cp ${POCO_BASE}/build/rules/* ${target}/build/rules
 cp ${POCO_BASE}/build/script/* ${target}/build/script
 cp ${POCO_BASE}/buildwin.cmd ${target}
+cp ${POCO_BASE}/buildwin.ps1 ${target}
 cp ${POCO_BASE}/configure ${target}
 cp ${POCO_BASE}/libversion ${target}
 
