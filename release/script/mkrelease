@@ -164,6 +164,13 @@ chmod -R +w ${target}
 
 
 #
+# Remove VS90 and progen
+#
+find ${target} -name '*.progen' -exec rm {} \;
+find ${target} -iname '*_vs90.sln' -exec rm {} \;
+
+
+#
 # Generate Makefile
 #
 cat >${target}/Makefile <<'ENDOFSCRIPT'
