@@ -109,6 +109,33 @@ jobs:
         with:
           name: windows-archives
       - run: |
-          7z x poco-*.zip
+          7z x poco-*-all.zip
           cd poco-*-all
           .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+
+  windows-2022-msvc-buildwin-x64-mkrelease:
+    runs-on: windows-2022
+    needs: mkrelease_win
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-archives
+      - run: |
+          rm poco-*-all.zip
+          7z x poco-*.zip
+          cd poco-*
+          .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests
+
+  windows-2022-msvc-cmake-mkrelease-all:
+    runs-on: windows-2022
+    needs: mkrelease_win
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-archives
+      - run: |
+          7z x poco-*-all.zip
+          cd poco-*-all
+          cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
+          cmake --build cmake-build --config Release
+
