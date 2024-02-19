@@ -921,6 +921,8 @@
     <ClCompile Include="src\pcre2_xclass.c">
       <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActiveThreadPool.cpp" />
+    <ClCompile Include="src\VarVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">

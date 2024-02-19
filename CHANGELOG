@@ -1,5 +1,22 @@
 This is the changelog file for the POCO C++ Libraries.
 
+
+Release 1.13.2 (2024-02-19)
+===========================
+
+Summary of Changes:
+
+This is a bugfix release.
+
+Breaking Changes:
+
+- GH #4378 [Data] Unconditionally includes of SQLParser.h
+
+Bug fixes and Improvements:
+
+- GH #4462 Disable SQL parsing by default
+
+
 Release 1.13.1 (2024-02-05)
 ===========================
 
