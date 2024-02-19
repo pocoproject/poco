@@ -505,7 +505,7 @@ function BuildComponents([string] $extension, [string] $type)
 				}
 				elseif ($component -eq "Data") # special case for Data, which needs DataTest lib
 				{
-					$vsTestProject = "$poco_base\$componentDir\testsuite\DataTest\DataTest$($suffix).$($extension)"
+					$vsTestProject = "$poco_base\$componentDir\DataTest\DataTest$($suffix).$($extension)"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					Write-Host "| Building $vsTestProject"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"

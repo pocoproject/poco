@@ -25,7 +25,6 @@ target_link_libraries(DataTest PUBLIC Poco::Data CppUnit)
 target_include_directories(DataTest
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Data/include>
-		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Data/src>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
