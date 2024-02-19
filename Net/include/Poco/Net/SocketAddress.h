@@ -316,12 +316,12 @@ inline bool SocketAddress::operator != (const SocketAddress& socketAddress) cons
 }
 
 
-} } // namespace Poco::Net
-
-
 Net_API Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value);
 Net_API Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value);
 Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address);
+
+
+} } // namespace Poco::Net
 
 
 #endif // Net_SocketAddress_INCLUDED

@@ -433,9 +433,6 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 }
 
 
-} } // namespace Poco::Net
-
-
 Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value)
 {
 	writer << value.host();
@@ -460,3 +457,8 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& a
 	ostr << address.toString();
 	return ostr;
 }
+
+
+} } // namespace Poco::Net
+
+
