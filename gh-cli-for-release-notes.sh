@@ -26,14 +26,14 @@ echo ===========================
 echo
 echo "Summary of Changes:"
 echo
-echo "Breaking changes:"
+echo "Breaking Changes:"
 echo
 
 gh issue list -S 'milestone:"'"${MILESTONE}"'" label:breaking' -s all -L 500 --json number,title --jq '.[] | "- GH #\(.number) \(.title)"'
 gh pr    list -S 'milestone:"'"${MILESTONE}"'" label:breaking' -s all -L 500 --json number,title --jq '.[] | "- PR #\(.number) \(.title)"'
 
 echo
-echo "Features and enhancements:"
+echo "Features and Enhancements:"
 echo
 
 gh issue list -S 'milestone:"'"${MILESTONE}"'" -label:breaking label:enhancement' -s all -L 500 --json number,title --jq '.[] | "- GH #\(.number) \(.title)"'
@@ -42,7 +42,7 @@ gh pr    list -S 'milestone:"'"${MILESTONE}"'" -label:breaking label:enhancement
 gh pr    list -S 'milestone:"'"${MILESTONE}"'" -label:breaking -label:enhancement label:feature' -s all -L 500 --json number,title --jq '.[] | "- PR #\(.number) \(.title)"'
 
 echo
-echo "Bug fixes and improvements:"
+echo "Bug Fixes and Improvements:"
 echo
 
 gh issue list -S 'milestone:"'"${MILESTONE}"'" -label:breaking -label:enhancement -label:feature' -s all -L 500 --json number,title --jq '.[] | "- GH #\(.number) \(.title)"'

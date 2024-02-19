@@ -2,6 +2,21 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
+!!!Release 1.13.2
+
+!!Summary of Changes
+
+This is a bugfix release.
+
+!!Breaking Changes
+
+  - GH #4378 [Data] Unconditionally includes of SQLParser.h
+
+!!Bug fixes and Improvements
+
+  - GH #4462 Disable SQL parsing by default
+
+
 !!!Release 1.13.1
 
 !!Summary of Changes
