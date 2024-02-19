@@ -151,10 +151,10 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Libraries Visual Studio Project File Generator.\n"
-			"Copyright (c) 2010-2022 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2010-2024 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program generates project and solution files "
-			"for Visual Studio 2010 - 2022 from global project "
+			"for Visual Studio 2019 - 2022 from global project "
 			"templates and project-specific property files."
 		);
 		helpFormatter.setFooter(
@@ -315,17 +315,7 @@ protected:
 			solutionFile.setWriteable(true);
 		}
 		Poco::FileOutputStream solutionStream(solutionPath.toString());
-		if (tool == "vs140")
-		{
-			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 14\r\n";
-			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
-		}
-		else if (tool == "vs150")
-		{
-			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 15\r\n";
-			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
-		}
-		else if (tool == "vs160")
+		if (tool == "vs160")
 		{
 			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio Version 16\r\n";
 			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
@@ -498,58 +488,6 @@ protected:
 		}
 	}
 
-	void fix2012Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
-	{
-		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
-		Poco::AutoPtr<Poco::XML::NodeList> pConfigurationTypeList = pProjectDoc->getElementsByTagName("ConfigurationType");
-		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
-		{
-			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
-			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
-			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "v110");
-		}
-	}
-
-	void fixWEC2013Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
-	{
-		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
-		Poco::AutoPtr<Poco::XML::NodeList> pConfigurationTypeList = pProjectDoc->getElementsByTagName("ConfigurationType");
-		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
-		{
-			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
-			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
-			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "CE800");
-		}
-		Poco::XML::Node* pGlobals = pProjectDoc->getNodeByPath("//PropertyGroup[@Label='Globals']");
-		if (pGlobals)
-		{
-			removeElement(pGlobals, "RootNamespace");
-			removeElement(pGlobals, "Keyword");
-			appendElement(pGlobals, "DefaultLanguage", "en-US");
-			appendElement(pGlobals, "MinimumVisualStudioVersion", "11.0");
-			appendElement(pGlobals, "EnableRedirectPlatform", "true");
-			appendElement(pGlobals, "RedirectPlatformValue", platform);
-			appendElement(pGlobals, "PlatformToolset", "CE800");
-		}
-		Poco::AutoPtr<Poco::XML::NodeList> pLinkList = pProjectDoc->getElementsByTagName("Link");
-		for (int i = 0; i < pLinkList->length(); i++)
-		{
-			Poco::XML::Element* pLink = static_cast<Poco::XML::Element*>(pLinkList->item(i));
-			removeElement(pLink, "SubSystem");
-			removeElement(pLink, "TargetMachine");
-			removeElement(pLink, "StackReserveSize");
-			removeElement(pLink, "StackCommitSize");
-			removeElement(pLink, "RandomizedBaseAddress");
-			appendElement(pLink, "SubSystem", "WindowsCE");
-			std::string entry = projectProps.getString("configuration.linker.entry", "");
-			if (!entry.empty())
-			{
-				removeElement(pLink, "EntryPointSymbol");
-				appendElement(pLink, "EntryPointSymbol", entry);
-			}
-		}
-	}
-
 	void fix20XXProject(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps, const std::string& platformToolset)
 	{
 		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
@@ -560,21 +498,6 @@ protected:
 			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
 			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", platformToolset);
 		}
-	}
-
-	void fix2013Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
-	{
-		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v120");
-	}
-
-	void fix2015Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
-	{
-		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v140");
-	}
-
-	void fix2017Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
-	{
-		fix20XXProject(pProjectDoc, configSet, platform, projectProps, templateProps, "v141");
 	}
 
 	void fix2019Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
@@ -847,66 +770,7 @@ protected:
 						}
 						Poco::ProcessHandle ph = Poco::Process::launch(tool, args);
 						ph.wait();
-						if (config().getBool("progen.postprocess." + postprocess + ".fix2010ProjectFile", false))
-						{
-							if (projectFile.exists())
-							{
-								logger().information("Fixing Visual Studio 2010 project file: " + vcxprojPath.toString());
-								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
-								fix2010Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								writeProject(pProjectDoc, vcxprojPath.toString());
-							}
-						}
-						if (config().getBool("progen.postprocess." + postprocess + ".fix2012ProjectFile", false))
-						{
-							if (projectFile.exists())
-							{
-								logger().information("Fixing Visual Studio 2012 project file: " + vcxprojPath.toString());
-								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
-								fix2012Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								writeProject(pProjectDoc, vcxprojPath.toString());
-							}
-						}
-						if (config().getBool("progen.postprocess." + postprocess + ".fixWEC2013ProjectFile", false))
-						{
-							if (projectFile.exists())
-							{
-								logger().information("Fixing Visual Studio 2012 (WEC2013) project file: " + vcxprojPath.toString());
-								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
-								fixWEC2013Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								writeProject(pProjectDoc, vcxprojPath.toString());
-							}
-						}
-						if (config().getBool("progen.postprocess." + postprocess + ".fix2013ProjectFile", false))
-						{
-							if (projectFile.exists())
-							{
-								logger().information("Fixing Visual Studio 2013 project file: " + vcxprojPath.toString());
-								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
-								fix2013Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								writeProject(pProjectDoc, vcxprojPath.toString());
-							}
-						}
-						if (config().getBool("progen.postprocess." + postprocess + ".fix2015ProjectFile", false))
-						{
-							if (projectFile.exists())
-							{
-								logger().information("Fixing Visual Studio 2015 project file: " + vcxprojPath.toString());
-								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
-								fix2015Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								writeProject(pProjectDoc, vcxprojPath.toString());
-							}
-						}
-						if (config().getBool("progen.postprocess." + postprocess + ".fix2017ProjectFile", false))
-						{
-							if (projectFile.exists())
-							{
-								logger().information("Fixing Visual Studio 2017 project file: " + vcxprojPath.toString());
-								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
-								fix2017Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								writeProject(pProjectDoc, vcxprojPath.toString());
-							}
-						}
+
 						if (config().getBool("progen.postprocess." + postprocess + ".fix2019ProjectFile", false))
 						{
 							if (projectFile.exists())
