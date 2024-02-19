@@ -38,6 +38,9 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="3"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
+		LanguageStandard="${vc.project.compiler.std.cpp}"
+		LanguageStandard_C="${vc.project.compiler.std.c}"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
