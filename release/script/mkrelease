@@ -348,9 +348,18 @@ ${comp}-libexec: $dependencies
 ENDOFSCRIPT
 
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
+		tdependencies=""
+		if [ -f "${POCO_BASE}/${comp}/testsuite/dependencies" ] ; then
+			for dep in `cat "${POCO_BASE}/${comp}/testsuite/dependencies"` ;
+			do
+				# get rid of surrounding whitespace (trailing \r on Cygwin)
+				read dep <<< ${dep}
+				tdependencies="$tdependencies ${dep}-libexec"
+			done
+		fi
 		cat >>${target}/Makefile <<ENDOFSCRIPT
 
-${comp}-tests: ${comp}-libexec cppunit
+${comp}-tests: ${comp}-libexec $tdependencies cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
 ENDOFSCRIPT
 	fi
