@@ -7,7 +7,6 @@
 				${PocoBuild}/*/include/Poco/*/*/*.h
 				${PocoBuild}/*/include/Poco/*/*.h
 				${PocoBuild}/*/*/include/Poco/*/*/*.h
-				${PocoBuild}/Data/src/sql-parser/*.h
 			</include>
 			<exclude>
 				*_*.h,

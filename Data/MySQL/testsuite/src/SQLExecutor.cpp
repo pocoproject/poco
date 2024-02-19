@@ -1850,9 +1850,11 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (0 == count);
-	assertTrue (!_pSession->isTransaction());
 
-	_pSession->begin();
+	if (_pSession->impl()->shouldParse()) {
+		assertTrue (!_pSession->isTransaction());
+		_pSession->begin();
+	}
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -1936,11 +1938,13 @@ void SQLExecutor::transaction(const std::string& connect)
 	}
 	assertTrue (!_pSession->isTransaction());
 
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (0 == count);
-	assertTrue (!_pSession->isTransaction());
+	if (_pSession->impl()->shouldParse()) {
+		try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+		assertTrue (0 == count);
+		assertTrue (!_pSession->isTransaction());
+	}
 
 	{
 		Transaction trans((*_pSession));
@@ -1965,7 +1969,8 @@ void SQLExecutor::transaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (2 == count);
 
-	_pSession->begin();
+	if (_pSession->impl()->shouldParse())
+		_pSession->begin();
 	try { (*_pSession) << "DELETE FROM Person", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -1987,6 +1992,8 @@ void SQLExecutor::transaction(const std::string& connect)
 	std::vector<std::string> sql;
 	sql.push_back(sql1);
 	sql.push_back(sql2);
+
+	assertTrue (!_pSession->isTransaction());
 
 	Transaction trans((*_pSession));
 
@@ -2037,6 +2044,8 @@ void SQLExecutor::reconnect()
 	int age = 133132;
 	int count = 0;
 	std::string result;
+
+	_pSession->setFeature("autoCommit", true);
 
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }

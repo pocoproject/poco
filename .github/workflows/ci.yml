@@ -718,3 +718,29 @@ jobs:
             sudo -s
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/PostgreSQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
+
+  linux-gcc-make-sqlite-no-sqlparser:
+    runs-on: ubuntu-22.04
+    services:
+      mysql:
+        image: mysql:8.1.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: pocotest
+          MYSQL_PASSWORD: pocotest
+          MYSQL_DATABASE: pocotest
+        ports:
+          - 3306:3306
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt -y update
+      - run: ./configure --everything --no-samples --no-sqlparser --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/MySQL,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/ODBC Data/MySQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
+            ./ci/runtests.sh

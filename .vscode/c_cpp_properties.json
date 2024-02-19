@@ -24,7 +24,7 @@
             "${POCO_BASE}/MongoDB/include",
             "${POCO_BASE}/ApacheConnector/include",
             "${POCO_BASE}/Data/src",
-            "${POCO_BASE}/Data/testsuite/DataTest/include"
+            "${POCO_BASE}/Data/DataTest/include"
         ]
     },
     "configurations": [

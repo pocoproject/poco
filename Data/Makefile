@@ -20,7 +20,7 @@ ifndef POCO_DATA_NO_SQL_PARSER
 		bison_parser flex_lexer \
 		CreateStatement PrepareStatement SQLStatement \
 		Expr statements sqlhelper
-	target_includes = $(POCO_BASE)/Data/src
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
 endif
 
 target          = PocoData

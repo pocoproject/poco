@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\include;..\..\..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;DataTest_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -72,14 +72,14 @@
 				Name="VCLinkerTool"
 				AdditionalOptions=""
 				AdditionalDependencies=""
-				OutputFile="..\..\..\bin\PocoDataTestd.dll"
+				OutputFile="..\..\bin\PocoDataTestd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\..\bin\PocoDataTestd.pdb"
+				ProgramDatabaseFile="..\..\bin\PocoDataTestd.pdb"
 				SubSystem="1"
-				ImportLibrary="..\..\..\lib\PocoDataTestd.lib"
+				ImportLibrary="..\..\lib\PocoDataTestd.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -134,7 +134,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\include;..\..\..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;DataTest_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -162,15 +162,15 @@
 				Name="VCLinkerTool"
 				AdditionalOptions=""
 				AdditionalDependencies=""
-				OutputFile="..\..\..\bin\PocoDataTest.dll"
+				OutputFile="..\..\bin\PocoDataTest.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="..\..\..\lib\PocoDataTest.lib"
+				ImportLibrary="..\..\lib\PocoDataTest.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -221,7 +221,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\include;..\..\..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -232,7 +232,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\..\lib\PocoDataTestMTd.pdb"
+				ProgramDataBaseFileName="..\..\lib\PocoDataTestMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -250,7 +250,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\..\lib\PocoDataTestMTd.lib"
+				OutputFile="..\..\lib\PocoDataTestMTd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -298,7 +298,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\include;..\..\..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -324,7 +324,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\..\lib\PocoDataTestMT.lib"
+				OutputFile="..\..\lib\PocoDataTestMT.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -368,7 +368,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\include;..\..\..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -379,7 +379,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\..\lib\PocoDataTestMDd.pdb"
+				ProgramDataBaseFileName="..\..\lib\PocoDataTestMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -397,7 +397,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\..\lib\PocoDataTestMDd.lib"
+				OutputFile="..\..\lib\PocoDataTestMDd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -445,7 +445,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\include;..\..\..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -471,7 +471,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\..\lib\PocoDataTestMD.lib"
+				OutputFile="..\..\lib\PocoDataTestMD.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -497,11 +497,11 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath=".\include;..\..\include\Poco\DataTest\DataTest.h"
+				RelativePath=".\include\Poco\DataTest\DataTest.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include;..\..\include\Poco\DataTest\SQLExecutor.h"
+				RelativePath=".\include\Poco\DataTest\SQLExecutor.h"
 				>
 			</File>
 		</Filter>
@@ -514,7 +514,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\..\DLLVersion.rc"
+			RelativePath="..\..\DLLVersion.rc"
 			>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"

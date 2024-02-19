@@ -8,14 +8,11 @@ vc.project.outdir = ${vc.project.pocobase}
 vc.project.platforms = Win32
 vc.project.configurations = debug_shared, release_shared, debug_static_mt, release_static_mt, debug_static_md, release_static_md
 vc.project.prototype = ${vc.project.name}_vs90.vcproj
-# TODO, for now we can just send cpp std via AdditionalOptions (see below)
-#vc.project.compiler.std.cpp=stdcpp17
-#vc.project.compiler.std.c=stdc11
-vc.project.compiler.include = .\\src;..\\Foundation\\include
+vc.project.compiler.include = .\\SQLParser;.\\SQLParser\\src;..\\Foundation\\include
 vc.project.compiler.defines =
 vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS;SQLParser_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.additionalOptions = /bigobj /Zc:__cplusplus
 vc.solution.create = true
-vc.solution.include = testsuite\\TestSuite,testsuite\\DataTest\\DataTest
+vc.solution.include = testsuite\\TestSuite,DataTest\\DataTest

@@ -79,9 +79,8 @@ $(ls -C "$base"/build/config/)
     Disables small object optimization.
 
   --no-sqlparser
-    Compile with POCO_DATA_NO_SQL_PARSER
-	SQLParser is not enabled by default for c++14 and below,
-	so this option only has meaning for c++17 and above.
+    Compile with -DPOCO_DATA_NO_SQL_PARSER
+    Disables compilation of the SQLParser.
 
   --sqlite-fts=<path>
     Compile with -DPOCO_DATA_SQLITE_FTS.

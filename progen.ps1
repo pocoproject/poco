@@ -169,9 +169,9 @@ function InvokeProgenComponents([string] $type)
 
 				if ($component -eq "Data") # special case for Data
 				{
-					$componentTestProgenPath = "$poco_base\$componentDir\testsuite\DataTest\DataTest.progen"
+					$componentTestProgenPath = "$poco_base\$componentDir\DataTest\DataTest.progen"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					Write-Host "| Running Progen for $componentDir\testsuite\DataTest"
+					Write-Host "| Running Progen for $componentDir\DataTest"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
 				}
