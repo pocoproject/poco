@@ -61,6 +61,7 @@ POCO_INSTALL(Data)
 POCO_GENERATE_PACKAGE(Data)
 
 if(ENABLE_TESTS)
+	add_subdirectory(DataTest)
 	add_subdirectory(testsuite)
 endif()
 

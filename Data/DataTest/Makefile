@@ -11,6 +11,6 @@ objects = SQLExecutor
 target          = PocoDataTest
 target_version  = 1
 target_libs     = PocoData PocoFoundation CppUnit
-target_includes = $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src $(POCO_BASE)/Data/testsuite/DataTest/include
+target_includes = $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src $(POCO_BASE)/Data/DataTest/include
 
 include $(POCO_BASE)/build/rules/lib

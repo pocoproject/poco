@@ -247,7 +247,7 @@ Data-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
 DataTest-libexec: Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite/DataTest
+	$(MAKE) -C $(POCO_BASE)/Data/DataTest
 
 Data-tests: Data-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite

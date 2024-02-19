@@ -34,5 +34,3 @@ if(NOT POCO_DATA_NO_SQL_PARSER)
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../SQLParser
 	)
 endif()
-
-add_subdirectory(DataTest)
