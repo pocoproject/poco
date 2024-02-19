@@ -360,17 +360,17 @@ void AnyTest::testAnyPointer()
 	assertTrue (*cpyI == *p);
 	std::string* s = AnyCast<std::string>(&a);
 	assertTrue (s == NULL);
-	assertTrue (AnyCast<nullptr_t>(&a) == nullptr);
+	assertTrue (AnyCast<std::nullptr_t>(&a) == nullptr);
 
 	int* POCO_UNUSED tmp = AnyCast<int*>(a);
 	const Any c = a;
 	tmp = AnyCast<int*>(a);
 
 	Any nullPtr(nullptr);
-	assertFalse (AnyHoldsNullPtr<nullptr_t>(nullptr));
+	assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullptr));
 	assertFalse (AnyHoldsNullPtr<void*>(0));
-	assertTrue (AnyHoldsNullPtr<nullptr_t>(nullPtr));
-	assertTrue (AnyHoldsNullPtr<nullptr_t>(&nullPtr));
+	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
+	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(&nullPtr));
 	try
 	{
 		AnyHoldsNullPtr<void*>(nullPtr);
@@ -380,7 +380,7 @@ void AnyTest::testAnyPointer()
 	nullPtr = &i;
 	try
 	{
-		assertFalse (AnyHoldsNullPtr<nullptr_t>(nullPtr));
+		assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}
@@ -391,7 +391,7 @@ void AnyTest::testAnyPointer()
 	assertTrue (AnyHoldsNullPtr<void*>(nullVoidPtr));
 	try
 	{
-		AnyHoldsNullPtr<nullptr_t>(voidPtr);
+		AnyHoldsNullPtr<std::nullptr_t>(voidPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}

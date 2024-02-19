@@ -170,7 +170,7 @@ protected:
 
 #define poco_static_assert_ptr(T) \
 	static_assert(std::is_pointer_v<T> || \
-	std::is_same_v<T, nullptr_t> || \
+	std::is_same_v<T, std::nullptr_t> || \
 	std::is_member_pointer_v<T> || \
 	std::is_member_function_pointer_v<T> || \
 	std::is_member_object_pointer_v<T>, \
