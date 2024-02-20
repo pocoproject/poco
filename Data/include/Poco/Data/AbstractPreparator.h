@@ -60,7 +60,7 @@ class Data_API AbstractPreparator
 public:
 	using Ptr = SharedPtr<AbstractPreparator>;
 
-	AbstractPreparator(Poco::UInt32 length = 1u);
+	explicit AbstractPreparator(Poco::UInt32 length = 1u);
 		/// Creates the AbstractPreparator.
 
 	virtual ~AbstractPreparator();

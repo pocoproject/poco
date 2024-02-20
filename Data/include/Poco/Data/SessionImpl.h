@@ -62,7 +62,7 @@ public:
 		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
-	virtual ~SessionImpl();
+	virtual ~SessionImpl() = default;
 		/// Destroys the SessionImpl.
 
 	virtual Poco::SharedPtr<StatementImpl> createStatementImpl() = 0;

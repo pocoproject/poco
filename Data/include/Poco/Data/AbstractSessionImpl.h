@@ -50,7 +50,7 @@ public:
 	typedef Poco::Any (C::*PropertyGetter)(const std::string&) const;
 		/// The getter method for a property.
 
-	AbstractSessionImpl(const std::string& connectionString,
+	explicit AbstractSessionImpl(const std::string& connectionString,
 		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
 			_storage(std::string("deque")),
 			_bulk(false),
@@ -326,10 +326,7 @@ protected:
 		/// The setter or getter can be null, in case setting or getting a feature
 		/// is not supported.
 	{
-		Feature feature;
-		feature.setter = setter;
-		feature.getter = getter;
-		_features[name] = feature;
+		_features[name] = { setter, getter };
 	}
 
 	void addProperty(const std::string& name, PropertySetter setter, PropertyGetter getter)
@@ -338,10 +335,7 @@ protected:
 		/// The setter or getter can be null, in case setting or getting a property
 		/// is not supported.
 	{
-		Property property;
-		property.setter = setter;
-		property.getter = getter;
-		_properties[name] = property;
+		_properties[name] = { setter, getter };
 	}
 
 	// most, if not all, back ends support the autocommit feature

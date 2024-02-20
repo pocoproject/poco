@@ -19,16 +19,6 @@ namespace Poco {
 namespace Data {
 
 
-MetaColumn::MetaColumn():
-	_length(),
-	_precision(),
-	_position(),
-	_type(),
-	_nullable()
-{
-}
-
-
 MetaColumn::MetaColumn(std::size_t position,
 	const std::string& name,
 	ColumnDataType type,
@@ -42,53 +32,6 @@ MetaColumn::MetaColumn(std::size_t position,
 	_type(type),
 	_nullable(nullable)
 {
-}
-
-
-MetaColumn::MetaColumn(const MetaColumn& other):
-	_name(other._name),
-	_length(other._length),
-	_precision(other._precision),
-	_position(other._position),
-	_type(other._type),
-	_nullable(other._nullable)
-{
-}
-
-
-MetaColumn::MetaColumn(MetaColumn&& other) noexcept:
-	_name(std::move(other._name)),
-	_length(other._length),
-	_precision(other._precision),
-	_position(other._position),
-	_type(other._type),
-	_nullable(other._nullable)
-{
-}
-
-
-MetaColumn::~MetaColumn()
-{
-}
-
-
-MetaColumn& MetaColumn::operator = (const MetaColumn& other)
-{
-	MetaColumn tmp(other);
-	swap(tmp);
-	return *this;
-}
-
-
-MetaColumn& MetaColumn::operator = (MetaColumn&& other) noexcept
-{
-	_name = std::move(other._name);
-	_length = other._length;
-	_precision = other._precision;
-	_position = other._position;
-	_type = other._type;
-	_nullable = other._nullable;
-	return *this;
 }
 
 

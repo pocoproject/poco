@@ -27,11 +27,6 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeou
 }
 
 
-SessionImpl::~SessionImpl()
-{
-}
-
-
 void SessionImpl::reconnect()
 {
 	close();

@@ -21,16 +21,6 @@ namespace Poco {
 namespace Data {
 
 
-SessionFactory::SessionFactory()
-{
-}
-
-
-SessionFactory::~SessionFactory()
-{
-}
-
-
 SessionFactory& SessionFactory::instance()
 {
 	static SessionFactory sf;

@@ -65,7 +65,7 @@ public:
 		PD_IN_OUT
 	};
 
-	AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
+	explicit AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
 		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the AbstractBinder.
 
@@ -368,7 +368,7 @@ protected:
 
 private:
 	using StringList = std::vector<std::string*>;
-  
+
 	std::unique_ptr<Transcoder> _pTranscoder;
 	std::unique_ptr<StringList> _pStrings;
 };

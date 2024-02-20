@@ -75,10 +75,10 @@ public:
 		/// Throws a Poco:Data::UnknownDataBaseException if no Connector is registered for the key.
 
 private:
-	SessionFactory();
-	~SessionFactory();
-	SessionFactory(const SessionFactory&);
-	SessionFactory& operator = (const SessionFactory&);
+	SessionFactory() = default;
+	~SessionFactory() = default;
+	SessionFactory(const SessionFactory&) = delete;
+	SessionFactory& operator = (const SessionFactory&) = delete;
 
 	struct SessionInfo
 	{

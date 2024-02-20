@@ -82,8 +82,8 @@ protected:
 	Statement& getCopyStatement();
 	Statement& getDeleteStatement();
 	Statement& getCountStatement();
-private:
 
+private:
 	ArchiveStrategy();
 	ArchiveStrategy(const ArchiveStrategy&);
 	ArchiveStrategy& operator = (const ArchiveStrategy&);

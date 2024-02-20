@@ -47,7 +47,7 @@ public:
 	using Type = Extraction<ValType>;
 	using Ptr = SharedPtr<Type>;
 
-	Extraction(T& result, const Position& pos = Position(0)):
+	explicit Extraction(T& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result),
 		_default(),

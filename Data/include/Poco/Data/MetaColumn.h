@@ -55,7 +55,7 @@ public:
 		FDT_UNKNOWN
 	};
 
-	MetaColumn();
+	MetaColumn() = default;
 		/// Creates the MetaColumn.
 
 	explicit MetaColumn(std::size_t position,
@@ -66,22 +66,22 @@ public:
 		bool nullable = false);
 		/// Creates the MetaColumn.
 
-	MetaColumn(const MetaColumn& other);
+	MetaColumn(const MetaColumn& other) = default;
 		/// Copy constructor.
 
-	MetaColumn(MetaColumn&& other) noexcept;
+	MetaColumn(MetaColumn&& other) noexcept = default;
 		/// Move constructor.
 
-	MetaColumn& operator = (const MetaColumn& other);
+	MetaColumn& operator = (const MetaColumn& other) = default;
 		/// Assignment operator.
 
-	MetaColumn& operator = (MetaColumn&& other) noexcept;
+	MetaColumn& operator = (MetaColumn&& other) noexcept = default;
 		/// Assignment operator.
 
 	void swap(MetaColumn& other) noexcept;
 		/// Swaps the contents with another instance.
 
-	~MetaColumn();
+	~MetaColumn() = default;
 		/// Destroys the MetaColumn.
 
 	const std::string& name() const;

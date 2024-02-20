@@ -35,7 +35,7 @@ public:
 	using Ptr = SharedPtr<AbstractPreparation>;
 	using PreparatorPtr = AbstractPreparator::Ptr;
 
-	AbstractPreparation(PreparatorPtr pPreparator);
+	explicit AbstractPreparation(PreparatorPtr pPreparator);
 		/// Creates the AbstractPreparation.
 
 	virtual ~AbstractPreparation();
@@ -45,9 +45,9 @@ public:
 		/// Prepares data.
 
 protected:
-	AbstractPreparation();
-	AbstractPreparation(const AbstractPreparation&);
-	AbstractPreparation& operator = (const AbstractPreparation&);
+	AbstractPreparation() = delete;
+	AbstractPreparation(const AbstractPreparation&) = delete;
+	AbstractPreparation& operator = (const AbstractPreparation&) = delete;
 
 	PreparatorPtr preparation();
 		/// Returns the preparation object

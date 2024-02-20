@@ -56,7 +56,7 @@ class Data_API AbstractExtractor
 public:
 	using Ptr = SharedPtr<AbstractExtractor>;
 
-	AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr,
+	explicit AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding = nullptr,
 		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Creates the AbstractExtractor.
 

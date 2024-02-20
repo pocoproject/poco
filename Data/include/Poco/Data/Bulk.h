@@ -29,13 +29,13 @@ namespace Data {
 class Data_API Bulk
 {
 public:
-	Bulk(const Limit& limit);
+	explicit Bulk(const Limit& limit);
 		/// Creates the Bulk.
 
-	Bulk(Poco::UInt32 value);
+	explicit Bulk(Poco::UInt32 value);
 		/// Creates the Bulk.
 
-	~Bulk();
+	~Bulk() = default;
 		/// Destroys the bulk.
 
 	const Limit& limit() const;
