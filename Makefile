@@ -81,7 +81,7 @@ all: libexecs tests samples
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis Prometheus
 
-cppunit: Foundation-libexec
+cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit
 
 CppUnit-clean:
@@ -247,7 +247,7 @@ Data-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
 DataTest-libexec: Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite/DataTest
+	$(MAKE) -C $(POCO_BASE)/Data/DataTest
 
 Data-tests: Data-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite

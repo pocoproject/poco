@@ -38,6 +38,8 @@ public:
 
 	void testMultipleResults();
 
+	virtual void testTransaction();
+
 	void testStoredProcedure();
 	void testCursorStoredProcedure();
 	void testStoredFunction();

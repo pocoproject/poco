@@ -210,6 +210,8 @@ protected:
 	Poco::Data::Session& session();
 	SQLExecutor& executor();
 
+	void setReadUncommitted(bool val);
+
 	const std::string& dsn();
 	const std::string& uid();
 	const std::string& pwd();
@@ -224,6 +226,7 @@ private:
 	std::string&      _rUID;
 	std::string&      _rPwd;
 	std::string&      _rConnectString;
+	bool              _readUncommitted = true;
 };
 
 
@@ -440,6 +443,12 @@ inline const std::string& ODBCTest::pwd()
 inline const std::string& ODBCTest::dbConnString()
 {
 	return _rConnectString;
+}
+
+
+inline void ODBCTest::setReadUncommitted(bool val)
+{
+	_readUncommitted = val;
 }
 
 

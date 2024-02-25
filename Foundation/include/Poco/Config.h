@@ -42,7 +42,7 @@
 // #define POCO_NO_SHAREDMEMORY
 
 
-// Define if no <locale> header is available (such as on WinCE)
+// Define if no <locale> header is available
 // #define POCO_NO_LOCALE
 
 
@@ -165,12 +165,6 @@
 #endif
 
 
-// Windows CE has no locale support
-#if defined(_WIN32_WCE)
-	#define POCO_NO_LOCALE
-#endif
-
-
 // Enable the poco_debug_* and poco_trace_* macros
 // even if the _DEBUG variable is not set.
 // This allows the use of these macros in a release version.
@@ -222,12 +216,5 @@
 
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
-
-// Automatically disable SQL parser for < c++17 compile
-#if !defined(POCO_DATA_NO_SQL_PARSER)
-	#ifndef POCO_HAVE_CPP17_COMPILER
-		#define POCO_DATA_NO_SQL_PARSER
-	#endif
-#endif
 
 #endif // Foundation_Config_INCLUDED

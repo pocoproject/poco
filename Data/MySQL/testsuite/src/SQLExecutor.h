@@ -88,7 +88,7 @@ public:
 	void longText();
 #ifdef POCO_MYSQL_JSON
 	void json();
-#endif	
+#endif
 	void unsignedInts();
 	void floats();
 	void doubles();
@@ -103,6 +103,7 @@ public:
 	void transaction(const std::string& connect);
 
 	void reconnect();
+	void sessionPoolAndUnicode(const std::string& connString);
 
 private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);

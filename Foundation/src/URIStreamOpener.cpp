@@ -17,7 +17,6 @@
 #include "Poco/FileStreamFactory.h"
 #include "Poco/URI.h"
 #include "Poco/Path.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/Exception.h"
 
 
@@ -56,7 +55,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 	try
 	{
 		URI uri(pathOrURI);
-		std::string scheme(uri.getScheme());
+		const std::string& scheme(uri.getScheme());
 		FactoryMap::const_iterator it = _map.find(scheme);
 		if (it != _map.end())
 		{
@@ -159,15 +158,10 @@ bool URIStreamOpener::supportsScheme(const std::string& scheme)
 }
 
 
-namespace
-{
-	static SingletonHolder<URIStreamOpener> sh;
-}
-
-
 URIStreamOpener& URIStreamOpener::defaultOpener()
 {
-	return *sh.get();
+	static URIStreamOpener so;
+	return so;
 }
 
 

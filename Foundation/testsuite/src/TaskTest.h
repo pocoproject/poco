@@ -27,6 +27,7 @@ public:
 	void testFinish();
 	void testCancel1();
 	void testCancel2();
+	void testCancelNoStart();
 
 	void setUp();
 	void tearDown();

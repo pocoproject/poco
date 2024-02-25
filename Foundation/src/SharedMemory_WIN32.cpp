@@ -55,10 +55,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	{
 		DWORD dwRetVal = GetLastError();
 		int retVal = static_cast<int>(dwRetVal);
-#if defined (_WIN32_WCE)
-		throw SystemException(Poco::format("Cannot create shared memory object %s [Error %d: %s]",
-			_name, retVal, Error::getMessage(dwRetVal)));
-#else
+
 		if (_mode != PAGE_READONLY || dwRetVal != 5)
 		{
 			throw SystemException(Poco::format("Cannot create shared memory object %s [Error %d: %s]",
@@ -72,7 +69,6 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 			throw SystemException(Poco::format("Cannot open shared memory object %s [Error %d: %s]",
 				_name, retVal, Error::getMessage(dwRetVal)), retVal);
 		}
-#endif
 	}
 	map();
 }

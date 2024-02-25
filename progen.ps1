@@ -4,10 +4,10 @@
 # Usage:
 # ------
 # progen.ps1   [-poco_base    dir]
-#              [-vs           140 | 150 | 160| 170]
+#              [-vs           160| 170]
 #              [-omit         "Lib1X,LibY,LibZ,..."]
 #              [-components   "Lib1X,LibY,LibZ,..."]
-#              [-platform     Win32 | x64 | ARM64 | WinCE | WEC2013]
+#              [-platform     Win32 | x64 | ARM64 | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-nobuild]
@@ -19,14 +19,14 @@ Param
 	[string] $poco_base = $([System.Environment]::GetEnvironmentVariable('POCO_BASE')),
 
 	[Parameter()]
-	[ValidateSet(140, 150, 160, 170)]
+	[ValidateSet(160, 170)]
 	[int] $vs = 170,
 
 	[string] $omit,
 	[string] $components,
 
 	[Parameter()]
-	[ValidateSet('Win32', 'x64', 'ARM64', 'WinCE', 'WEC2013')]
+	[ValidateSet('Win32', 'x64', 'ARM64', 'WEC2013')]
 	[string] $platform = 'x64',
 
 	[switch] $samples = $false,
@@ -44,7 +44,7 @@ function ProcessInput
 		Write-Host 'Usage:'
 		Write-Host '------'
 		Write-Host 'progen.ps1 [-poco_base <dir>]'
-		Write-Host '    [-vs           140 | 150 | 160 | 170]'
+		Write-Host '    [-vs           160 | 170]'
 		Write-Host '    [-omit         "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-components   "Lib1X,LibY,LibZ,..."]'
 		Write-Host '    [-samples]'
@@ -169,9 +169,9 @@ function InvokeProgenComponents([string] $type)
 
 				if ($component -eq "Data") # special case for Data
 				{
-					$componentTestProgenPath = "$poco_base\$componentDir\testsuite\DataTest\DataTest.progen"
+					$componentTestProgenPath = "$poco_base\$componentDir\DataTest\DataTest.progen"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					Write-Host "| Running Progen for $componentDir\testsuite\DataTest"
+					Write-Host "| Running Progen for $componentDir\DataTest"
 					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 					InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
 				}

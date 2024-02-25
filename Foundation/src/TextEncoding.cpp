@@ -26,7 +26,6 @@
 #include "Poco/Windows1251Encoding.h"
 #include "Poco/Windows1252Encoding.h"
 #include "Poco/RWLock.h"
-#include "Poco/SingletonHolder.h"
 #include <map>
 
 
@@ -193,15 +192,10 @@ TextEncoding& TextEncoding::global()
 }
 
 
-namespace
-{
-	static SingletonHolder<TextEncodingManager> sh;
-}
-
-
 TextEncodingManager& TextEncoding::manager()
 {
-	return *sh.get();
+	static TextEncodingManager tem;
+	return tem;
 }
 
 

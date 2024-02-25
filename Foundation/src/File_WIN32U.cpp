@@ -100,7 +100,6 @@ bool FileImpl::existsImpl() const
 		{
 		case ERROR_FILE_NOT_FOUND:
 		case ERROR_PATH_NOT_FOUND:
-		case ERROR_NOT_READY:
 		case ERROR_INVALID_DRIVE:
 			return false;
 		default:
@@ -309,7 +308,7 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 	std::wstring upath;
 	convertPath(path, upath);
 	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
-		if (MoveFileExW(_upath.c_str(), upath.c_str(), NULL) == 0)
+		if (MoveFileExW(_upath.c_str(), upath.c_str(), 0) == 0)
 			handleLastErrorImpl(_path);
 	} else {
 		if (MoveFileExW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
@@ -439,6 +438,8 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ERROR_CANT_RESOLVE_FILENAME:
 	case ERROR_INVALID_DRIVE:
 		throw PathNotFoundException(path, err);
+	case ERROR_NOT_READY:
+		throw FileNotReadyException(path, err);
 	case ERROR_ACCESS_DENIED:
 		throw FileAccessDeniedException(path, err);
 	case ERROR_ALREADY_EXISTS:

@@ -21,9 +21,11 @@
 #include <sys/types.h>
 #include <climits>
 
+
 #if !defined(POCO_VXWORKS)
 #include <pwd.h>
 #endif
+
 
 #if POCO_OS == POCO_OS_MAC_OS_X
 #include <mach-o/dyld.h>
@@ -38,7 +40,12 @@
 #define PATH_MAX 4096 // fallback
 #endif
 
+
+using namespace std::string_literals;
+
+
 namespace Poco {
+
 
 std::string PathImpl::selfImpl()
 {
@@ -115,9 +122,9 @@ std::string PathImpl::homeImpl()
 	else return "/";
 #else
 	std::string path;
-	if (EnvironmentImpl::hasImpl("HOME"))
+	if (EnvironmentImpl::hasImpl("HOME"s))
 	{
-		path = EnvironmentImpl::getImpl("HOME");
+		path = EnvironmentImpl::getImpl("HOME"s);
 	}
 	else
 	{
@@ -154,8 +161,8 @@ std::string PathImpl::configHomeImpl()
 	return path;
 #else
 	std::string path;
-	if (EnvironmentImpl::hasImpl("XDG_CONFIG_HOME"))
-		path = EnvironmentImpl::getImpl("XDG_CONFIG_HOME");
+	if (EnvironmentImpl::hasImpl("XDG_CONFIG_HOME"s))
+		path = EnvironmentImpl::getImpl("XDG_CONFIG_HOME"s);
 	if (!path.empty())
 		return path;
 
@@ -181,8 +188,8 @@ std::string PathImpl::dataHomeImpl()
 	return path;
 #else
 	std::string path;
-	if (EnvironmentImpl::hasImpl("XDG_DATA_HOME"))
-		path = EnvironmentImpl::getImpl("XDG_DATA_HOME");
+	if (EnvironmentImpl::hasImpl("XDG_DATA_HOME"s))
+		path = EnvironmentImpl::getImpl("XDG_DATA_HOME"s);
 	if (!path.empty())
 		return path;
 
@@ -208,8 +215,8 @@ std::string PathImpl::cacheHomeImpl()
 	return path;
 #else
 	std::string path;
-	if (EnvironmentImpl::hasImpl("XDG_CACHE_HOME"))
-		path = EnvironmentImpl::getImpl("XDG_CACHE_HOME");
+	if (EnvironmentImpl::hasImpl("XDG_CACHE_HOME"s))
+		path = EnvironmentImpl::getImpl("XDG_CACHE_HOME"s);
 	if (!path.empty())
 		return path;
 

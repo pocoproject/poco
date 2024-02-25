@@ -49,9 +49,6 @@ if(POCO_UNBUNDLED)
 		SQLITE_THREADSAFE=1
 )
 else()
-	if(WINCE)
-		target_compile_definitions(DataSQLite PRIVATE SQLITE_MSVC_LOCALTIME_API)
-	endif(WINCE)
 	target_compile_definitions(DataSQLite PRIVATE
 		SQLITE_THREADSAFE=1
 		SQLITE_DISABLE_LFS
@@ -61,6 +58,10 @@ else()
 		SQLITE_OMIT_TCL_VARIABLE
 		SQLITE_OMIT_DEPRECATED
 	)
+	option(ENABLE_DATA_SQLITE_FTS5 "Enable SQLite FTS5 Extension" OFF)
+	if(ENABLE_DATA_SQLITE_FTS5)
+		target_compile_definitions(DataSQLite PRIVATE SQLITE_ENABLE_FTS5)
+	endif()
 endif()
 
 POCO_INSTALL(DataSQLite)

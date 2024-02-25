@@ -158,3 +158,9 @@ tags
 ##############
 package-lock.json
 node_modules
+
+# Old Visual Studio files #
+###########################
+*_vs1[45]0.sln
+*_vs1[45]0.vcxproj
+*_vs1[45]0.vcxproj.filters

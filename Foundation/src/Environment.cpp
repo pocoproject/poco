@@ -28,11 +28,7 @@
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Environment_WINCE.cpp"
-#else
 #include "Environment_WIN32U.cpp"
-#endif
 #endif
 
 

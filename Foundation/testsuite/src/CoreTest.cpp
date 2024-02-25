@@ -23,6 +23,7 @@
 #include "Poco/Ascii.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
+#include "Poco/Debugger.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
@@ -181,11 +182,11 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
-#if !defined(_WIN32_WCE)
+
 	Environment::set("FOO", "BAR");
 	assertTrue (Environment::has("FOO"));
 	assertTrue (Environment::get("FOO") == "BAR");
-#endif
+
 	try
 	{
 		std::string v = Environment::get("THISONEDOESNOTEXIST123");
@@ -1118,6 +1119,13 @@ void CoreTest::testAscii()
 }
 
 
+void CoreTest::testSrcLoc()
+{
+	// must be all on a single line to succeed
+	assertTrue(poco_src_loc == Poco::format("CoreTest.cpp::testSrcLoc():%d", __LINE__));
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1161,6 +1169,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
+	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
 
 	return pSuite;
 }

@@ -57,12 +57,10 @@ void SocketAddressTest::testSocketAddress()
 	assertTrue (sa2.host().toString() == "192.168.1.100");
 	assertTrue (sa2.port() == 100);
 
-#if !defined(_WIN32_WCE)
 	SocketAddress sa03 = SocketAddress("192.168.1.100", "ftp");
 	SocketAddress sa3(std::move(sa03));
 	assertTrue (sa3.host().toString() == "192.168.1.100");
 	assertTrue (sa3.port() == 21);
-#endif
 
 	try
 	{

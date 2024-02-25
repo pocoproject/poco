@@ -17,6 +17,7 @@ CppUnit::TestCaller<TimerTest>.testTimer
 CppUnit::TestCaller<SocketAddressTest>.testSocketAddress
 CppUnit::TestCaller<RawSocketTest>.testEchoIPv4
 CppUnit::TestCaller<RawSocketTest>.testSendToReceiveFromIPv4
+CppUnit::TestCaller<RawSocketTest>.testEchoIPv4Move
 CppUnit::TestCaller<ICMPClientTest>.testPing
 CppUnit::TestCaller<ICMPClientTest>.testBigPing
 CppUnit::TestCaller<ICMPSocketTest>.testSendToReceiveFrom

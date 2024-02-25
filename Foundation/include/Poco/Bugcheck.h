@@ -165,42 +165,16 @@ protected:
 #endif
 
 
-//
-// poco_static_assert
-//
-// The following was ported from <boost/static_assert.hpp>
-//
+#define poco_static_assert(B) static_assert(B)
 
 
-template <bool x>
-struct POCO_STATIC_ASSERTION_FAILURE;
-
-
-template <>
-struct POCO_STATIC_ASSERTION_FAILURE<true>
-{
-	enum
-	{
-		value = 1
-	};
-};
-
-
-template <int x>
-struct poco_static_assert_test
-{
-};
-
-
-#if defined(__GNUC__) && (__GNUC__ == 3) && ((__GNUC_MINOR__ == 3) || (__GNUC_MINOR__ == 4))
-#define poco_static_assert(B) \
-	typedef char POCO_JOIN(poco_static_assert_typedef_, __LINE__) \
-        [POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>::value]
-#else
-#define poco_static_assert(B) \
-	typedef poco_static_assert_test<sizeof(POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>)> \
-		POCO_JOIN(poco_static_assert_typedef_, __LINE__) POCO_UNUSED
-#endif
+#define poco_static_assert_ptr(T) \
+	static_assert(std::is_pointer_v<T> || \
+	std::is_same_v<T, std::nullptr_t> || \
+	std::is_member_pointer_v<T> || \
+	std::is_member_function_pointer_v<T> || \
+	std::is_member_object_pointer_v<T>, \
+	"not a pointer")
 
 
 #endif // Foundation_Bugcheck_INCLUDED

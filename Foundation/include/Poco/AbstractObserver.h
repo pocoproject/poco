@@ -37,11 +37,41 @@ public:
 	AbstractObserver& operator = (const AbstractObserver& observer);
 
 	virtual void notify(Notification* pNf) const = 0;
+
 	virtual bool equals(const AbstractObserver& observer) const = 0;
-	virtual bool accepts(Notification* pNf, const char* pName = 0) const = 0;
+
+	[[deprecated("use `Poco::Any accepts(Notification*)` instead")]]
+	virtual bool accepts(Notification* pNf, const char* pName) const = 0;
+
+	virtual bool accepts(const Notification::Ptr& pNf) const = 0;
+
 	virtual AbstractObserver* clone() const = 0;
+
+	virtual void start();
+		/// No-op.
+		/// This method can be implemented by inheriting classes which require
+		/// explicit start in order to begin processing notifications.
+
 	virtual void disable() = 0;
+
+	virtual int backlog() const;
+		/// Returns number of queued messages that this Observer has.
+		/// For non-active (synchronous) observers, always returns zero.
 };
+
+//
+// inlines
+//
+
+inline void AbstractObserver::start()
+{
+}
+
+
+inline int AbstractObserver::backlog() const
+{
+	return 0;
+}
 
 
 } // namespace Poco

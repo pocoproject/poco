@@ -1275,7 +1275,7 @@ void ODBCTest::testTransaction()
 		recreatePersonTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->transaction(_rConnectString);
+		_pExecutor->transaction(_rConnectString, _readUncommitted);
 		i += 2;
 	}
 }

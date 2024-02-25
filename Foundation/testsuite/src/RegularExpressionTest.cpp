@@ -136,6 +136,15 @@ void RegularExpressionTest::testMatch6()
 }
 
 
+void RegularExpressionTest::testMatchDateTime()
+{
+	RegularExpression re(
+		R"(([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?)"
+	);
+	assert (re.match("2005-01-08T12:30:00Z"));
+}
+
+
 void RegularExpressionTest::testExtract()
 {
 	RegularExpression re("[0-9]+");
@@ -295,6 +304,7 @@ CppUnit::Test* RegularExpressionTest::suite()
 	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch4);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch5);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch6);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testMatchDateTime);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testExtract);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSplit1);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSplit2);

@@ -54,7 +54,7 @@ public:
 	{
 		return i == _val;
 	}
-	
+
 	friend bool operator == (const Dummy &d1, const Dummy &d2)
 	{
 		return d1._val == d2._val;
@@ -1982,7 +1982,6 @@ void VarTest::testLimitsInt()
 	testLimitsFloatToInt<float, UInt64>();
 	testLimitsFloatToInt<double, UInt64>();
 
-
 	testLimitsUnsigned<UInt16, UInt8>();
 	testLimitsUnsigned<UInt32, UInt8>();
 	testLimitsUnsigned<UInt64, UInt8>();
@@ -1998,16 +1997,44 @@ void VarTest::testLimitsFloat()
 {
 	if (std::numeric_limits<double>::max() != std::numeric_limits<float>::max())
 	{
-		double iMin = -1 * std::numeric_limits<float>::max();
+		constexpr double iMin = -1 * std::numeric_limits<float>::max();
 		Var da = iMin * 10;
-		try { float POCO_UNUSED f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 
-		double iMax = std::numeric_limits<float>::max();
+		constexpr double iMax = std::numeric_limits<float>::max();
 		da = iMax * 10;
-		try { float POCO_UNUSED f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 	}
+
+	int64_t i = std::numeric_limits<int>::max();
+	Var anyInt = i;
+	try { anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
+	catch (RangeException&) {}
+
+	Var anyFloat = 1.0f;
+	anyFloat = i;
+	anyFloat.convert<int>();
+	assertTrue (anyFloat.convert<int64_t>() == i);
+
+	try { float POCO_UNUSED fl = anyFloat; fail("must throw", __LINE__, __FILE__); }
+	catch (Poco::RangeException&) {}
+
+	i = std::numeric_limits<int64_t>::max();
+	anyInt = i;
+
+	float f = 0.f;
+	try { f = anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
+	catch (Poco::RangeException&) {}
+	i = static_cast<int64_t>(f);
+	assertTrue (0 == i);
+
+	double d = 0.;
+	try { d = anyInt.convert<double>(); fail("must throw", __LINE__, __FILE__); }
+	catch (Poco::RangeException&) {}
+	i = static_cast<int64_t>(d);
+	assertTrue (0 == i);
 }
 
 
@@ -2356,7 +2383,7 @@ void VarTest::testOrderedDynamicStructString()
 	assertTrue(a1["First Name"] == "Senior");
 	testGetIdxMustThrow(a1, 0);
 
-	typedef Struct<std::string, OrderedMap<std::string, Var>, OrderedSet<std::string> > OrderedStruct;
+	using OrderedStruct = OrderedDynamicStruct;
 	OrderedStruct s1;
 	s1["1"] = 1;
 	s1["2"] = 2;
@@ -3220,15 +3247,15 @@ void VarTest::testVarVisitor()
 		processedVar = v;
 		std::cout << " -> string ";
 	};
-	
+
 	std::vector<Var> var;
-	
+
 	using ulong = unsigned long;
 	using longlong = long long;
 	using ulonglong = unsigned long long;
-	
+
 	ProcessDummy processDummy(processedVar);
-	
+
 	bool accepted = false;
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int8,   processInt8,      -8);
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Poco::Int16,  processInt16,     -16);
@@ -3242,16 +3269,20 @@ void VarTest::testVarVisitor()
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(char,         processChar,      'f');
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(float,        processFloat,     1.2f);
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(double,       processDouble,    2.4);
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(long,         processLong,      123L);
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulong,        processULong,     124UL);
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(longlong,     processLongLong,  123123LL);
-	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulonglong,    processULongLong, 124124ULL);
+	if (typeid(long) != typeid(Poco::Int64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(long,        processLong,      123L);}
+	if (typeid(ulong) != typeid(Poco::UInt64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulong,       processULong,     124UL);}
+	if (typeid(longlong) != typeid(Poco::Int64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(longlong,    processLongLong,  123123LL);}
+	if (typeid(ulonglong) != typeid(Poco::UInt64))
+	{accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(ulonglong,   processULongLong, 124124ULL);}
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(std::string,  processString,    "hello world");
 	accepted = ADD_HANDLER_FOR_TYPE_WITH_VALUE(Dummy,        processDummy,     42);
-	
+
 	for (const auto &v : var)
 	{
-		std::cout << "handle type : " << v.type().name();
+		std::cout << "handle type : " << v.typeName();
 		if (visitor.visit(v))
 		{
 			if (v.type() != typeid(Dummy))
@@ -3269,7 +3300,7 @@ void VarTest::testVarVisitor()
 		else
 		{
 			std::cout << " fail" << '\n';
-			fail(Poco::format("failed type handle : %s", v.type().name()), __LINE__, __FILE__);
+			fail(Poco::format("failed type handle : %s", v.typeName()), __LINE__, __FILE__);
 		}
 	}
 }

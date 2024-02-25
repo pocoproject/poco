@@ -74,15 +74,10 @@ public:
 	void notify(Notification* pNf) const
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
-
 		if (_pObject)
 		{
-			N* pCastNf = dynamic_cast<N*>(pNf);
-			if (pCastNf)
-			{
-				pCastNf->duplicate();
-				(_pObject->*_method)(pCastNf);
-			}
+			pNf->duplicate();
+			(_pObject->*_method)(static_cast<N*>(pNf));
 		}
 	}
 
@@ -92,9 +87,15 @@ public:
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	bool accepts(Notification* pNf, const char* pName = 0) const
+	[[deprecated("use `bool accepts(const Notification::Ptr&)` instead")]]
+	bool accepts(Notification* pNf, const char* pName) const
 	{
-		return dynamic_cast<N*>(pNf) && (!pName || pNf->name() == pName);
+		return (!pName || pNf->name() == pName) && (dynamic_cast<N*>(pNf) != nullptr);
+	}
+
+	bool accepts(const Notification::Ptr& pNf) const
+	{
+		return (pNf.cast<N>() != nullptr);
 	}
 
 	AbstractObserver* clone() const

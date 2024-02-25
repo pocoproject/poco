@@ -32,7 +32,7 @@ class RunnableAdapter: public Runnable
 	/// Usage:
 	///    RunnableAdapter<MyClass> ra(myObject, &MyObject::doSomething));
 	///    Thread thr;
-	///    thr.Start(ra);
+	///    thr.start(ra);
 	///
 	/// For using a freestanding or static member function as a thread
 	/// target, please see the ThreadTarget class.

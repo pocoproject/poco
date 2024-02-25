@@ -2,8 +2,8 @@
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 if (NOT POCO_DATA_NO_SQL_PARSER)
-	file(GLOB_RECURSE SRCS_PARSER "src/sql-parser/src/*.cpp")
-	LIST(REMOVE_ITEM SRCS_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/sql-parser/src/parser/conflict_test.cpp")
+	file(GLOB_RECURSE SRCS_PARSER "SQLParser/src/*.cpp")
+	LIST(REMOVE_ITEM SRCS_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/SQLParser/src/parser/conflict_test.cpp")
 	POCO_SOURCES_AUTO(SRCS ${SRCS_PARSER})
 endif()
 
@@ -14,6 +14,9 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 if(MSVC AND NOT(MSVC_VERSION LESS 1400))
 	set_source_files_properties(src/StatementImpl.cpp
 		PROPERTIES COMPILE_FLAGS "/bigobj")
+elseif(MINGW)
+	set_source_files_properties(src/StatementImpl.cpp
+		PROPERTIES COMPILE_FLAGS "-Wa,-mbig-obj")
 endif()
 
 # Version Resource
@@ -35,18 +38,30 @@ if (NOT POCO_DATA_NO_SQL_PARSER)
 	target_compile_definitions(Data PUBLIC -DSQLParser_EXPORTS)
 endif()
 target_link_libraries(Data PUBLIC Poco::Foundation)
-target_include_directories(Data
+
+if(NOT POCO_DATA_NO_SQL_PARSER)
+	target_include_directories(Data
+		PUBLIC
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SQLParser/src
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SQLParser
+	)
+else()
+	target_include_directories(Data
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+	)
+endif()
 
 POCO_INSTALL(Data)
 POCO_GENERATE_PACKAGE(Data)
 
 if(ENABLE_TESTS)
+	add_subdirectory(DataTest)
 	add_subdirectory(testsuite)
 endif()
 
@@ -72,7 +87,7 @@ else()
 	message(STATUS "PostgreSQL Support Disabled")
 endif()
 
-if(ODBC_FOUND AND ENABLE_DATA_ODBC AND NOT WINCE)
+if(ODBC_FOUND AND ENABLE_DATA_ODBC)
 	message(STATUS "ODBC Support Enabled")
 	add_subdirectory(ODBC)
 else()

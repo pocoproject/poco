@@ -56,7 +56,8 @@ public:
 			_bulk(false),
 			_emptyStringIsNull(false),
 			_forceEmptyString(false),
-			_sqlParse(true)
+			_sqlParse(false),
+			_autoCommit(true)
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -89,6 +90,18 @@ public:
 		/// While these features can not both be true at the same time, they can both be false,
 		/// resulting in default underlying database behavior.
 		///
+		/// Adds "sqlParse" feature and sets it to false; this property enables parsing of the SQL queries,
+		/// to help the Data framework to determine whether to start a transaction automatically in
+		/// non-autocomit mode (ie. not to start transaction if all the queries in an SQL statement are SELECTs).
+		/// Note that the property is not a bullet-proof way to ensure this behavior, because not all SQL dialects
+		/// are supported by the parser. When enabled, the parsing has performance cost, but it is otherwise
+		/// non-intrusive, ie. on parse failure Statement only internally records parsing errors, but does not throw.
+		/// See Poco::Data::Statement documentation for more information.
+		/// This property has no effect when Poco::Data library is compiled with POCO_DATA_NO_SQL_PARSER.
+		///
+		/// Adds "autoCommit" feature and sets it to true. This property enables automatic commit.
+		/// Setting this feature to  true renders the `sqlParse` property meaningless, because every query
+		/// is automatically commited.
 	{
 		addProperty("storage",
 			&AbstractSessionImpl<C>::setStorage,
@@ -113,6 +126,10 @@ public:
 		addFeature("sqlParse",
 			&AbstractSessionImpl<C>::setSQLParse,
 			&AbstractSessionImpl<C>::getSQLParse);
+
+		addFeature("autoCommit",
+			&AbstractSessionImpl<C>::setAutoCommit,
+			&AbstractSessionImpl<C>::getAutoCommit);
 	}
 
 	~AbstractSessionImpl()
@@ -327,6 +344,32 @@ protected:
 		_properties[name] = property;
 	}
 
+	// most, if not all, back ends support the autocommit feature
+	// these handlers are added in this class by default,
+	// but an implementation can easily replace them by registering
+	// early its own handlers with:
+	//    addFeature("autoCommit", setter, getter)");
+	//
+	// these are here to be used by any back end DBMS client that
+	// does not provide its own autocommit get/set capabilities
+
+	void setAutoCommit(const std::string&, bool autoCommit)
+		/// Enables automatic commit. When this feature is true,
+		/// every query is automatically commited. When false,
+		/// every query starts a transaction, except SELECT queries
+		/// (if properly detected by parser, see set/getSQLParse() and
+		/// Statement::checkBeginTransaction() documentation).
+	{
+		_autoCommit = autoCommit;
+	}
+
+	bool getAutoCommit(const std::string& name = "") const
+		/// Returns the value of the automatic commit flag.
+		/// See setAutoCommit() documentation for more details.
+	{
+		return _autoCommit;
+	}
+
 private:
 	struct Feature
 	{
@@ -350,6 +393,7 @@ private:
 	bool        _emptyStringIsNull;
 	bool        _forceEmptyString;
 	bool        _sqlParse;
+	bool        _autoCommit;
 	Poco::Any   _handle;
 };
 

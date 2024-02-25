@@ -214,7 +214,10 @@ void CryptoTest::testEncryptDecryptGCM()
 {
 	CipherKey key("aes-256-gcm");
 
-	CipherKey::ByteVec iv(20, 213);
+	// 96-bit (12 byte) IV is recommended for usage with GCM.
+	// https://crypto.stackexchange.com/questions/41601/aes-gcm-recommended-iv-size-why-12-bytes
+
+	CipherKey::ByteVec iv(12, 213);
 	key.setIV(iv);
 
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(key);

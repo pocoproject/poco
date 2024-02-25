@@ -56,7 +56,7 @@ MutexImpl::MutexImpl()
 #endif
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
-#if defined(PTHREAD_MUTEX_RECURSIVE_NP)
+#if defined(PTHREAD_MUTEX_RECURSIVE_NP) && !defined(__GNU__)
 	pthread_mutexattr_settype_np(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 #elif !defined(POCO_VXWORKS)
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -81,7 +81,7 @@ MutexImpl::MutexImpl(bool fast)
 #endif
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
-#if defined(PTHREAD_MUTEX_RECURSIVE_NP)
+#if defined(PTHREAD_MUTEX_RECURSIVE_NP) && !defined(__GNU__)
 	pthread_mutexattr_settype_np(&attr, fast ? PTHREAD_MUTEX_NORMAL_NP : PTHREAD_MUTEX_RECURSIVE_NP);
 #elif !defined(POCO_VXWORKS)
 	pthread_mutexattr_settype(&attr, fast ? PTHREAD_MUTEX_NORMAL : PTHREAD_MUTEX_RECURSIVE);

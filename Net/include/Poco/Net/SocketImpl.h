@@ -27,6 +27,11 @@
 
 
 namespace Poco {
+
+
+class FileInputStream;
+
+
 namespace Net {
 
 
@@ -473,6 +478,11 @@ public:
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 
+	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0);
+		/// Sends file using system function
+		/// for posix systems - with sendfile[64](...)
+		/// for windows - with TransmitFile(...)
+
 protected:
 	SocketImpl();
 		/// Creates a SocketImpl.
@@ -588,5 +598,9 @@ inline bool SocketImpl::getBlocking() const
 
 } } // namespace Poco::Net
 
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#pragma comment(lib, "mswsock.lib") 
+#endif 
 
 #endif // Net_SocketImpl_INCLUDED

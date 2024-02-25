@@ -45,6 +45,7 @@ namespace
 		info.dwThreadID = dwThreadID;
 		info.dwFlags    = 0;
 
+#if !defined(POCO_COMPILER_MINGW)
 		__try
 		{
 			RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
@@ -52,7 +53,8 @@ namespace
 		__except (EXCEPTION_CONTINUE_EXECUTION)
 		{
 		}
-	}
+#endif
+    }
 }
 
 

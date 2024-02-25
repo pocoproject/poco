@@ -579,7 +579,8 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 	SQLExecutor::DataBinding bindMode,
 	SQLExecutor::DataExtraction extractMode,
 	const std::string& insert,
-	const std::string& select)
+	const std::string& select,
+	const std::string& procCreateString)
 {
 	SQLRETURN rc;
 	SQLHENV henv = SQL_NULL_HENV;
@@ -625,6 +626,18 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 			rc = SQLExecute(hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
+
+			// create stored proc, if provided
+			if (!procCreateString.empty())
+			{
+				sql = procCreateString;
+				pStr = (SQLCHAR*) sql.c_str();
+				rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
+				poco_odbc_check_stmt (rc, hstmt);
+
+				rc = SQLExecute(hstmt);
+				poco_odbc_check_stmt (rc, hstmt);
+			}
 
 			// insert multiple rows
 			pStr = (SQLCHAR*) insert.c_str();
@@ -980,8 +993,12 @@ void SQLExecutor::execute(const std::string& sql)
 
 void SQLExecutor::connection(const std::string& connectString)
 {
+	std::cout << connectString << std::endl;
 	Poco::Data::ODBC::Connection c;
-	_dataExecutor.connection(c, connectString);
+	try { _dataExecutor.connection(c, connectString); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (connectString, __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (connectString, __LINE__, __FILE__); }
+	catch(Poco::Exception& se){ std::cout << se.displayText() << std::endl; fail (connectString, __LINE__, __FILE__); }
 }
 
 
@@ -1025,7 +1042,7 @@ void SQLExecutor::session(const std::string& connectString, int timeout)
 }
 
 
-void SQLExecutor::notNulls(const std::string& sqlState)
+void SQLExecutor::notNulls(const std::vector<std::string>& sqlStates)
 {
 	try
 	{
@@ -1038,9 +1055,14 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 		if (se.diagnostics().fields().size())
 		{
 			std::string st = se.diagnostics().sqlState(0);
-			if (sqlState != st)
-				std::cerr << '[' << name() << ']' << " Warning: expected SQL state [" << sqlState <<
-					"], received [" << se.diagnostics().sqlState(0) << "] instead." << std::endl;
+			for (const auto& sqlState : sqlStates)
+				if (sqlState == st) return;
+
+			std::string strSQLStates;
+			for (const auto& sqlState : sqlStates)
+				strSQLStates.append(sqlState).append(1, ' ');
+			std::cerr << '[' << name() << ']' << " Warning: expected SQL state [" << strSQLStates <<
+				"], received [" << st << "] instead." << std::endl;
 		}
 	}
 }

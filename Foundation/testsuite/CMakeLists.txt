@@ -4,7 +4,6 @@ set(TESTUNIT "Foundation-testrunner")
 file(GLOB SRCS_G "src/*.cpp")
 file(GLOB SRCS_G_REMOVE
 	src/TestApp.cpp
-	src/TestApp_WINCE.cpp
 	src/TestLibrary.cpp
 	src/TestPlugin.cpp
 )
@@ -18,10 +17,6 @@ POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 # WinDriver depends on WinTestRunner which depends on MFC, and we don't want that
 POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 	src/WinDriver.cpp
-)
-
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS WINCE
-	src/WinCEDriver.cpp
 )
 
 add_executable(Foundation-testrunner ${TEST_SRCS})
@@ -53,12 +48,7 @@ if(UNIX AND NOT ANDROID)
 endif(UNIX AND NOT ANDROID)
 
 # TestApp
-if(WINCE)
-add_executable(TestApp src/TestApp_WINCE.cpp)
-	set_target_properties(TestApp PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
-else()
-	add_executable(TestApp src/TestApp.cpp)
-endif()
+add_executable(TestApp src/TestApp.cpp)
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests
 set_target_properties(TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 target_link_libraries(TestApp PUBLIC Poco::Foundation)

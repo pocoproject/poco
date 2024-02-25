@@ -36,12 +36,11 @@ ifeq ($(POCO_CONFIG),MinGW)
 endif
 
 ifndef POCO_DATA_NO_SQL_PARSER
-	target_includes += $(POCO_BASE)/Data/src
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
 endif
 
 target           = testrunner
 target_version   = 1
 target_libs      = PocoDataODBC PocoDataTest PocoData PocoFoundation CppUnit
-target_includes += $(POCO_BASE)/Data/testsuite/DataTest/include
 
 include $(POCO_BASE)/build/rules/exec

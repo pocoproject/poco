@@ -17,6 +17,8 @@
 #include "Poco/Exception.h"
 #include "Poco/UnicodeConverter.h"
 
+// TODO: LogStream shall use FileOutputStream for all implementations (see LogStream_STD)
+// TODO: Implement flushToDisk function in FileOutputStream.
 
 namespace Poco {
 

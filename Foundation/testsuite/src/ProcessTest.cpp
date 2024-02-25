@@ -65,10 +65,6 @@ void ProcessTest::testLaunch()
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd += name;
-#elif defined(_WIN32_WCE)
-	cmd = "\\";
-	cmd += name;
-	cmd += ".EXE";
 #else
 	cmd = name;
 #endif
@@ -85,7 +81,6 @@ void ProcessTest::testLaunch()
 
 void ProcessTest::testLaunchRedirectIn()
 {
-#if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
@@ -107,13 +102,11 @@ void ProcessTest::testLaunchRedirectIn()
 	ostr.close();
 	int rc = ph.wait();
 	assertTrue (rc == 100);
-#endif // !defined(_WIN32_WCE)
 }
 
 
 void ProcessTest::testLaunchRedirectOut()
 {
-#if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
@@ -137,13 +130,11 @@ void ProcessTest::testLaunchRedirectOut()
 	assertTrue (s == "Hello, world!");
 	int rc = ph.wait();
 	assertTrue (rc == 1);
-#endif // !defined(_WIN32_WCE)
 }
 
 
 void ProcessTest::testLaunchEnv()
 {
-#if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
@@ -169,13 +160,12 @@ void ProcessTest::testLaunchEnv()
 	assertTrue (s == "test");
 	int rc = ph.wait();
 	assertTrue (rc == 0);
-#endif // !defined(_WIN32_WCE)
 }
 
 
 void ProcessTest::testLaunchArgs()
 {
-#if defined (_WIN32) && !defined(_WIN32_WCE)
+#if defined (_WIN32)
 	std::string name("TestApp");
 #if defined(_DEBUG)
 	name += 'd';
@@ -225,7 +215,7 @@ void ProcessTest::testLaunchArgs()
 	assertTrue (argNumber == args.size());
 	int rc = ph.wait();
 	assertTrue (rc == args.size());
-#endif // !defined(_WIN32_WCE)
+#endif // defined (_WIN32)
 }
 
 
@@ -239,10 +229,6 @@ void ProcessTest::testLaunchInvalidCommand()
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd += name;
-#elif defined(_WIN32_WCE)
-	cmd = "\\";
-	cmd += name;
-	cmd += ".EXE";
 #else
 	cmd = name;
 #endif
@@ -269,7 +255,6 @@ void ProcessTest::testLaunchInvalidCommand()
 
 void ProcessTest::testIsRunning()
 {
-#if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
 #if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
@@ -295,7 +280,6 @@ void ProcessTest::testIsRunning()
 	int POCO_UNUSED rc = ph.wait();
 	assertTrue (!Process::isRunning(ph));
 	assertTrue (!Process::isRunning(id));
-#endif // !defined(_WIN32_WCE)
 }
 
 

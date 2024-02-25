@@ -1,0 +1,154 @@
+name: Release Packages QA
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mkrelease_win:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Install packages
+        run: sudo apt-get update && sudo apt-get -y install dos2unix
+      -
+        name: Build release package
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          mkrel -c unix2dos
+          mkrel -c unix2dos all
+      -
+        name: Copy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-archives
+          path: releases/poco*.zip
+          overwrite: true
+          retention-days: 1
+
+  mkrelease:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Build release package
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          mkrel
+          mkrel all
+      -
+        name: Copy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: posix-archives
+          path: releases/poco*.tar.gz
+          overwrite: true
+          retention-days: 1
+
+  linux-gcc-make-mkrelease:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: rm poco-*-all.tar.gz
+      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1 
+      - run: cd poco && ./configure --everything && make all -s -j`nproc`
+
+  linux-gcc-make-mkrelease-all:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1 
+      - run: cd poco && ./configure --everything && make all -s -j`nproc`
+
+  linux-gcc-cmake-mkrelease:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev 
+      - run: rm poco-*-all.tar.gz
+      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1 
+      - run: cmake -Spoco -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+
+  linux-gcc-cmake-mkrelease-all:
+    runs-on: ubuntu-22.04
+    needs: mkrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: posix-archives
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev 
+      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1 
+      - run: cmake -Spoco -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+
+  windows-2022-msvc-buildwin-x64-mkrelease-all:
+    runs-on: windows-2022
+    needs: mkrelease_win
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-archives
+      - run: |
+          7z x poco-*-all.zip
+          cd poco-*-all
+          .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+
+  windows-2022-msvc-buildwin-x64-mkrelease:
+    runs-on: windows-2022
+    needs: mkrelease_win
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-archives
+      - run: |
+          rm poco-*-all.zip
+          7z x poco-*.zip
+          cd poco-*
+          .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests
+
+  windows-2022-msvc-cmake-mkrelease-all:
+    runs-on: windows-2022
+    needs: mkrelease_win
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-archives
+      - run: |
+          7z x poco-*-all.zip
+          cd poco-*-all
+          cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
+          cmake --build cmake-build --config Release
+
+  windows-2022-msvc-cmake-mkrelease:
+    runs-on: windows-2022
+    needs: mkrelease_win
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-archives
+      - run: |
+          rm poco-*-all.zip
+          7z x poco-*.zip
+          cd poco-*
+          cmake -S. -Bcmake-build -DENABLE_TESTS=ON
+          cmake --build cmake-build --config Release

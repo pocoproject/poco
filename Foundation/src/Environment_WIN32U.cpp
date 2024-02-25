@@ -16,14 +16,14 @@
 #include "Poco/Exception.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
+
 #include <sstream>
 #include <cstring>
+#include <memory>
 #include "Poco/UnWindows.h"
-#include <winsock2.h>
-#include <wincrypt.h>
-#include <ws2ipdef.h>
-#include <iphlpapi.h>
 
+#include <winsock2.h>
+#include <iphlpapi.h>
 
 #if defined(_MSC_VER)
 #pragma warning(disable:4996) // deprecation warnings
@@ -94,7 +94,7 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 {
 	OSVERSIONINFOEX vi;	// OSVERSIONINFOEX is supported starting at Windows 2000
 	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx((OSVERSIONINFO*) &vi) == 0) throw SystemException("Cannot get OS version information");
+	if (GetVersionEx((OSVERSIONINFO*)&vi) == 0) throw SystemException("Cannot get OS version information");
 	switch (vi.dwMajorVersion)
 	{
 	case 10:
@@ -202,38 +202,60 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
 
-	PIP_ADAPTER_INFO pAdapterInfo;
-	PIP_ADAPTER_INFO pAdapter = 0;
-	ULONG len    = sizeof(IP_ADAPTER_INFO);
-	pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
-	// Make an initial call to GetAdaptersInfo to get
-	// the necessary size into len
-	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
+	// Preallocate buffer for some adapters to avoid calling
+	// GetAdaptersAddresses multiple times.
+	static constexpr int STARTING_BUFFER_SIZE = 20000;
+
+	auto buffer = std::make_unique<unsigned char[]>(STARTING_BUFFER_SIZE);
+	ULONG len = STARTING_BUFFER_SIZE;
+
+	// use GAA_FLAG_SKIP_DNS_SERVER because we're only interested in the physical addresses of the interfaces
+	const DWORD rc = GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_SKIP_DNS_SERVER, nullptr, reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.get()), &len);
+
 	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
-		delete [] reinterpret_cast<char*>(pAdapterInfo);
-		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+		// Buffer is not large enough: reallocate and retry.
+		buffer = std::make_unique<unsigned char[]>(len);
+
+		if (GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_SKIP_DNS_SERVER, nullptr, reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.get()), &len) != ERROR_SUCCESS)
+		{
+			throw SystemException("cannot get network adapter list");
+		}
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
-		delete[] reinterpret_cast<char*>(pAdapterInfo);
 		throw SystemException("cannot get network adapter list");
 	}
-	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
+
+	IP_ADAPTER_ADDRESSES* pAdapter = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.get());
+	while (pAdapter)
 	{
-		pAdapter = pAdapterInfo;
-		bool found = false;
-		while (pAdapter && !found)
+		if (pAdapter->IfType == IF_TYPE_ETHERNET_CSMACD && pAdapter->PhysicalAddressLength == sizeof(id))
 		{
-			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
-			{
-				found = true;
-				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
-			}
-			pAdapter = pAdapter->Next;
+			std::memcpy(&id, pAdapter->PhysicalAddress, pAdapter->PhysicalAddressLength);
+
+			// found an ethernet adapter, we can return now
+			return;
 		}
+		pAdapter = pAdapter->Next;
 	}
-	delete [] reinterpret_cast<char*>(pAdapterInfo);
+
+	// if an ethernet adapter was not found, search for a wifi adapter
+	pAdapter = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.get());
+	while (pAdapter)
+	{
+		if (pAdapter->IfType == IF_TYPE_IEEE80211 && pAdapter->PhysicalAddressLength == sizeof(id))
+		{
+			std::memcpy(&id, pAdapter->PhysicalAddress, pAdapter->PhysicalAddressLength);
+
+			// found a wifi adapter, we can return now
+			return;
+		}
+		pAdapter = pAdapter->Next;
+	}
+
+	// ethernet and wifi adapters not found, fail the search
+	throw SystemException("no ethernet or wifi adapter found");
 }
 
 

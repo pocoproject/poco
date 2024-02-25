@@ -11,10 +11,6 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 	src/WinDriver.cpp
 )
 
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS WINCE
-	src/WinCEDriver.cpp
-)
-
 add_executable(Data-testrunner ${TEST_SRCS})
 if(ANDROID)
 	add_test(
@@ -32,4 +28,9 @@ else()
 endif()
 target_link_libraries(Data-testrunner PUBLIC Poco::DataTest Poco::Data CppUnit)
 
-add_subdirectory(DataTest)
+if(NOT POCO_DATA_NO_SQL_PARSER)
+	target_include_directories(Data-testrunner
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../SQLParser/src
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../SQLParser
+	)
+endif()

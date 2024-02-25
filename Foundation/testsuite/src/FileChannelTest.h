@@ -31,6 +31,8 @@ public:
 	FileChannelTest(const std::string& name);
 	~FileChannelTest();
 
+	void testRotateNever();
+	void testFlushing();
 	void testRotateBySize();
 	void testRotateByAge();
 	void testRotateAtTimeDayUTC();
@@ -43,6 +45,7 @@ public:
 	void testArchive();
 	void testArchiveByStrategy();
 	void testCompress();
+	void testCompressedRotation();
 	void testPurgeAge();
 	void testPurgeCount();
 	void testWrongPurgeOption();

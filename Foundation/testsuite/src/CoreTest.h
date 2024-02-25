@@ -36,6 +36,7 @@ public:
 	void testAtomicCounter();
 	void testNullable();
 	void testAscii();
+	void testSrcLoc();
 
 	void setUp();
 	void tearDown();
