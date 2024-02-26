@@ -19,6 +19,7 @@ set_target_properties(NetSSLWin
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoNetSSLWin
 	DEFINE_SYMBOL NetSSL_Win_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(NetSSLWin PUBLIC Poco::Net Poco::Util Crypt32.lib)

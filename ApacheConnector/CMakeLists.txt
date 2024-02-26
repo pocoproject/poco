@@ -10,7 +10,9 @@ add_library(mod_poco SHARED ${SRCS})
 set_target_properties(mod_poco
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-	DEFINE_SYMBOL ApacheHandlers_EXPORTS)
+	DEFINE_SYMBOL ApacheHandlers_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
+)
 target_include_directories(mod_poco
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

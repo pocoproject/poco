@@ -218,6 +218,9 @@ option(ENABLE_SAMPLES
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
+option(POCO_NO_SONAME
+	"Set to OFF|ON (default is OFF) to control the CMake NO_SONAME target property" OFF)
+
 if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()

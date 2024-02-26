@@ -23,6 +23,7 @@ set_target_properties(Net
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoNet
 	DEFINE_SYMBOL Net_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(Net PUBLIC Poco::Foundation)

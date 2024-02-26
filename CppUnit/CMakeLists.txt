@@ -13,6 +13,7 @@ set_target_properties(CppUnit
 	VERSION "1" SOVERSION "1"
 	OUTPUT_NAME CppUnit
 	DEFINE_SYMBOL CppUnit_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 target_link_libraries(CppUnit PUBLIC Poco::Foundation)
 target_include_directories(CppUnit

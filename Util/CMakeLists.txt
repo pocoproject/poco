@@ -25,6 +25,7 @@ set_target_properties(Util
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoUtil
 	DEFINE_SYMBOL Util_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(Util PUBLIC Poco::Foundation)

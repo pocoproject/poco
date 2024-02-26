@@ -19,6 +19,7 @@ set_target_properties(DataPostgreSQL
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoDataPostgreSQL
 	DEFINE_SYMBOL PostgreSQL_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(DataPostgreSQL PUBLIC Poco::Data PostgreSQL::client)

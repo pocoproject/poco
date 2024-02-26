@@ -33,6 +33,7 @@ set_target_properties(DataSQLite
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoDataSQLite
 	DEFINE_SYMBOL SQLite_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 target_link_libraries(DataSQLite PUBLIC Poco::Data)
 target_include_directories(DataSQLite

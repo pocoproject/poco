@@ -19,6 +19,7 @@ set_target_properties(CppParser
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoCppParser
 	DEFINE_SYMBOL CppParser_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(CppParser PUBLIC Poco::Foundation)

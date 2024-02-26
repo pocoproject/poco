@@ -19,6 +19,7 @@ set_target_properties(Encodings
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoEncodings
 	DEFINE_SYMBOL Encodings_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(Encodings PUBLIC Poco::Foundation)

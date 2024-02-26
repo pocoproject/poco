@@ -19,6 +19,7 @@ set_target_properties(Prometheus
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoPrometheus
 	DEFINE_SYMBOL Prometheus_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(Prometheus PUBLIC Poco::Net)

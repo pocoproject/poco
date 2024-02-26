@@ -19,6 +19,7 @@ set_target_properties(NetSSL
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoNetSSL
 	DEFINE_SYMBOL NetSSL_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(NetSSL PUBLIC Poco::Crypto Poco::Util Poco::Net)

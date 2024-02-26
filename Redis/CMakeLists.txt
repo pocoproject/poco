@@ -19,6 +19,7 @@ set_target_properties(Redis
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoRedis
 	DEFINE_SYMBOL Redis_EXPORTS
+	NO_SONAME ${POCO_NO_SONAME}
 )
 
 target_link_libraries(Redis PUBLIC Poco::Net)
