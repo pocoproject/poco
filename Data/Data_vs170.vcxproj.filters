@@ -2,67 +2,67 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{012b54d8-e14a-4b33-8caf-c2e6d9a3bc74}</UniqueIdentifier>
+      <UniqueIdentifier>{c111f2b8-0fe5-45cf-bcf5-6717f913f4d1}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{d77e45d9-7d80-49e2-8f85-cff3f1c5b5a8}</UniqueIdentifier>
+      <UniqueIdentifier>{a429278e-282a-48ad-a6e9-4673ad994ef6}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{9e770570-2ae7-4b1e-9bb2-7df6f7f88629}</UniqueIdentifier>
+      <UniqueIdentifier>{34cb5ff3-8959-4b44-b06a-6a371e903043}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{490db496-bb56-4fb2-8f0d-8ee99953ffc8}</UniqueIdentifier>
+      <UniqueIdentifier>{56b9dadb-359a-44e8-af9d-67dd5d8cadd2}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{4c786cf3-295a-4896-8172-8e89e15fefd0}</UniqueIdentifier>
+      <UniqueIdentifier>{d775c737-421f-45a3-ba6e-a47034ca0c93}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{bf49d85b-ea57-4395-a050-23d485cc7ed5}</UniqueIdentifier>
+      <UniqueIdentifier>{c282924f-b59d-4fee-b202-c6c567572666}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser">
-      <UniqueIdentifier>{2981742f-433f-489b-a7cd-30f428675b03}</UniqueIdentifier>
+      <UniqueIdentifier>{fcca3d29-3bf5-47f1-be8a-2fe1a0773a9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\Header Files">
-      <UniqueIdentifier>{f82d8e37-5673-4c98-b54b-27e380659404}</UniqueIdentifier>
+      <UniqueIdentifier>{ce5fcae6-0135-4453-9d16-acf8ce133fff}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\Source Files">
-      <UniqueIdentifier>{368e8691-21c8-434d-be1b-8e861e4b9581}</UniqueIdentifier>
+      <UniqueIdentifier>{51152c9c-3e67-47f2-965d-4f8b5528df0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\parser">
-      <UniqueIdentifier>{53af537d-b619-45e2-b265-66e3217de919}</UniqueIdentifier>
+      <UniqueIdentifier>{6886ee17-8a9c-4cf4-820f-cd96ed915c74}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\parser\Header Files">
-      <UniqueIdentifier>{66c6478b-3812-4ebf-a79b-f1c7a8f416af}</UniqueIdentifier>
+      <UniqueIdentifier>{4c76e1c2-dbd6-4090-9c9f-d09fcc8521c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\parser\Source Files">
-      <UniqueIdentifier>{6682953a-faa6-41c8-8c9f-55475f796995}</UniqueIdentifier>
+      <UniqueIdentifier>{85d4c9a3-827b-450b-a4f0-56db8cf5da12}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\sql">
-      <UniqueIdentifier>{ffa1f179-d8a9-4cff-b3b4-aaed32de3a43}</UniqueIdentifier>
+      <UniqueIdentifier>{903ed189-9ddf-44c6-b600-ea212371ea3c}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\sql\Header Files">
-      <UniqueIdentifier>{cfa7b302-bcb6-499a-bcc2-76d04a668f90}</UniqueIdentifier>
+      <UniqueIdentifier>{b2f5f062-3106-4301-8e49-7b242ae66efe}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\sql\Source Files">
-      <UniqueIdentifier>{b5e696d5-58fd-41a6-907d-9071357bcc87}</UniqueIdentifier>
+      <UniqueIdentifier>{2dda7dbb-8a31-4869-87d3-374c7effd007}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\util">
-      <UniqueIdentifier>{6550121a-e318-4d52-8abd-15a87969bdcf}</UniqueIdentifier>
+      <UniqueIdentifier>{574a99ce-a7ea-4221-bdcb-318456d50f0e}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\util\Header Files">
-      <UniqueIdentifier>{a531b96a-2b97-4d3e-acb0-056513bb3dbc}</UniqueIdentifier>
+      <UniqueIdentifier>{e07a89d7-c43c-425f-8bb0-eec2ef4c5763}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\util\Source Files">
-      <UniqueIdentifier>{ae36be03-be16-4e19-9f1f-a6767acf3bb2}</UniqueIdentifier>
+      <UniqueIdentifier>{c9455486-7d6c-4732-a11f-513a24cb954e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{7f65f1e2-5076-4c78-944e-40883b44e43d}</UniqueIdentifier>
+      <UniqueIdentifier>{6d03dc65-89e5-4dac-a6be-0ad2e761adc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{131da4f7-be1d-4f63-9aa2-58004782afed}</UniqueIdentifier>
+      <UniqueIdentifier>{2fc9ede0-fc29-4e59-ba50-a587575c2cc2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{d009673a-dc2d-4bd6-be5f-9b27b177864d}</UniqueIdentifier>
+      <UniqueIdentifier>{b5c53c80-25ce-4a87-8634-2808040e62ab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
