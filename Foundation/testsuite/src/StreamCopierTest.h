@@ -27,10 +27,14 @@ public:
 	void testBufferedCopy();
 	void testUnbufferedCopy();
 	void testCopyToString();
+	void testBufferedCopyRange();
+	void testUnbufferedCopyRange();
 #if defined(POCO_HAVE_INT64)
 	void testBufferedCopy64();
 	void testUnbufferedCopy64();
 	void testCopyToString64();
+	void testBufferedCopyRange64();
+	void testUnbufferedCopyRange64();
 #endif
 
 	void setUp();
