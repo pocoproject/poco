@@ -1,6 +1,10 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.13.3 (2024-03-??)
+===========================
+
+
 Release 1.13.2 (2024-02-19)
 ===========================
 
@@ -38,7 +42,7 @@ Features and Enhancements:
 
 Bug Fixes and Improvements:
 
-- GH #4443 Upgrade libexpat to 2.6.0 
+- GH #4443 Upgrade libexpat to 2.6.0
 - GH #4425 Unit tests: optional testing of deprecated functionality
 - GH #4421 Multiple calls to initializeSSL/uninitializeSSL cause assert failure during certificate validation
 - GH #4411 NULL pointer: strategy when setting rotation never in FileChannel
