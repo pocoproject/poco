@@ -751,3 +751,24 @@ jobs:
             sudo -s
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/ODBC Data/MySQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
+
+  linux-gcc-cmake-verify-no-soname: 
+    runs-on: ubuntu-22.04 
+      steps: 
+        - uses: actions/checkout@v3 
+        - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server 
+        - run: cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DPOCO_NO_SONAME=ON && cmake --build cmake-build --target CppUnit Foundation 
+        -
+        - uses: ./.github/actions/retry-action 
+          with: 
+            timeout_minutes: 90 
+            max_attempts: 3 
+            retry_on: any 
+            command: >- 
+              cd cmake-build && 
+              sudo -s 
+              PWD=`pwd` 
+              if test -f cmake-build/lib/libPocoFoundation.so.*; then
+                exit 1
+              fi
+              ctest --output-on-failure -E "(Foundation)" 
