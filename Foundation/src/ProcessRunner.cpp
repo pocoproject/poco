@@ -20,6 +20,7 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
+#include "Poco/Error.h"
 #include <fstream>
 
 
@@ -104,15 +105,46 @@ std::string ProcessRunner::cmdLine() const
 
 void ProcessRunner::run()
 {
+	int errHandle = 0;
+	int errPID = 0;
+	int errRC = 0;
+
+	_error.clear();
+	_pid = INVALID_PID;
+	_pPH = nullptr;
+
 	ProcessHandle* pPH = nullptr;
 	try
 	{
 		_pPH = pPH = new ProcessHandle(Process::launch(_cmd, _args, _options));
+		errHandle = Error::last();
+
 		_pid = pPH->id();
+		errPID = Error::last();
+
 		_rc = pPH->wait();
+		errRC = Error::last();
+
+		if (errHandle || errPID || errRC || _rc != 0)
+		{
+			Poco::format(_error, "ProcessRunner::run() error; "
+				"handle=%d (%d:%s); pid=%d (%d:%s); return=%d (%d:%s)",
+				(pPH ? pPH->id() : 0), errHandle, Error::getMessage(errHandle),
+				_pid.load(), errPID, Error::getMessage(errPID),
+				_rc.load(), errRC, Error::getMessage(errRC));
+		}
+	}
+	catch (Poco::Exception& ex)
+	{
+		setError(ex.displayText());
+	}
+	catch (std::exception& ex)
+	{
+		setError(ex.what());
 	}
 	catch (...)
 	{
+		setError("Unknown exception"s);
 	}
 
 	_pid = INVALID_PID;
@@ -127,7 +159,7 @@ void ProcessRunner::stop()
 	if (_started)
 	{
 		PID pid;
-		Stopwatch sw; sw.start();
+		_sw.restart();
 		if (_pPH.exchange(nullptr) && ((pid = _pid.exchange(INVALID_PID))) != INVALID_PID)
 		{
 			while (Process::isRunning(pid))
@@ -135,9 +167,9 @@ void ProcessRunner::stop()
 				if (pid > 0)
 				{
 					Process::requestTermination(pid);
-					checkTimeout(sw, "Waiting for process termination");
+					checkStatus("Waiting for process termination");
 				}
-				else throw Poco::IllegalStateException("Invalid PID, can;t terminate process");
+				else throw Poco::IllegalStateException("Invalid PID, can't terminate process");
 			}
 			_t.join();
 		}
@@ -150,9 +182,8 @@ void ProcessRunner::stop()
 				_pidFile.clear();
 				std::string msg;
 				Poco::format(msg, "Waiting for PID file (pidFile: '%s')", _pidFile);
-				sw.restart();
-				while (pidFile.exists())
-					checkTimeout(sw, msg);
+				_sw.restart();
+				while (pidFile.exists()) checkStatus(msg);
 			}
 		}
 	}
@@ -160,14 +191,28 @@ void ProcessRunner::stop()
 }
 
 
-void ProcessRunner::checkTimeout(const Stopwatch& sw, const std::string& msg)
+void ProcessRunner::checkError()
 {
-	if (sw.elapsedSeconds() > _timeout)
+	if (!_error.empty())
+		throw Poco::RuntimeException(_error);
+}
+
+
+void ProcessRunner::checkTimeout(const std::string& msg)
+{
+	if (_sw.elapsedSeconds() > _timeout)
 	{
 		throw Poco::TimeoutException(
 			Poco::format("ProcessRunner::checkTimeout(): %s", msg));
 	}
 	Thread::sleep(10);
+}
+
+
+void ProcessRunner::checkStatus(const std::string& msg, bool tOut)
+{
+	checkError();
+	if (tOut) checkTimeout(msg);
 }
 
 
@@ -181,21 +226,21 @@ void ProcessRunner::start()
 
 		std::string msg;
 		Poco::format(msg, "Waiting for process to start (pidFile: '%s')", _pidFile);
-		Stopwatch sw; sw.start();
+		_sw.restart();
 
 		// wait for the process to be either running or completed by monitoring run counts.
-		while (!running() && prevRunCnt >= runCount()) checkTimeout(sw, msg);
+		while (!running() && prevRunCnt >= runCount()) checkStatus(msg);
 
 		// we could wait for the process handle != INVALID_PID,
 		// but if pidFile name was given, we should wait for
 		// the process to write it
 		if (!_pidFile.empty())
 		{
-			sw.restart();
+			_sw.restart();
 			// wait until process is fully initialized
 			File pidFile(_pidFile);
 			while (!pidFile.exists())
-				checkTimeout(sw, "waiting for PID file");
+				checkStatus(Poco::format("waiting for PID file '%s' creation.", _pidFile));
 
 			// verify that the file content is actually the process PID
 			FileInputStream fis(_pidFile);
@@ -205,12 +250,13 @@ void ProcessRunner::start()
 			while (fPID != pid())
 			{
 				fis.clear(); fis.seekg(0); fis >> fPID;
-				checkTimeout(sw, Poco::format("waiting for new PID (%s)", _pidFile));
+				checkStatus(Poco::format("waiting for new PID (%s)", _pidFile));
 			}
 		}
 	}
 	else
 		throw Poco::InvalidAccessException("start() called on started ProcessRunner");
+	checkStatus("", false);
 }
 
 
