@@ -127,6 +127,8 @@ void ProcessRunner::run()
 
 		if (errHandle || errPID || errRC || _rc != 0)
 		{
+			Poco::FastMutex::ScopedLock l(_mutex);
+
 			Poco::format(_error, "ProcessRunner::run() error; "
 				"handle=%d (%d:%s); pid=%d (%d:%s); return=%d (%d:%s)",
 				(pPH ? pPH->id() : 0), errHandle, Error::getMessage(errHandle),
@@ -193,6 +195,8 @@ void ProcessRunner::stop()
 
 void ProcessRunner::checkError()
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
+
 	if (!_error.empty())
 		throw Poco::RuntimeException(_error);
 }
