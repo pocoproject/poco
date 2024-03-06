@@ -15,6 +15,8 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -95,9 +97,63 @@ void File::swap(File& file) noexcept
 }
 
 
+std::string File::absolutePath() const
+{
+	std::string ret;
+
+	if (Path(path()).isAbsolute())
+		ret = getPathImpl();
+	else
+	{
+		Path curPath(Path::current());
+		curPath.append(path());
+		if (File(curPath).exists()) ret = curPath.toString();
+		else
+		{
+			std::string envPath = Environment::get("PATH", "");
+			std::string pathSeparator(1, Path::pathSeparator());
+			if (!envPath.empty())
+			{
+				StringTokenizer st(envPath, pathSeparator,
+					StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+				for (const auto& p: st)
+				{
+					std::string fileName(p);
+					if (p.size() && p[p.size()-1] != Path::separator())
+						fileName.append(1, Path::separator());
+					fileName.append(path());
+					if (File(fileName).exists())
+					{
+						ret = fileName;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+
 bool File::exists() const
 {
+	if (path().empty()) return false;
 	return existsImpl();
+}
+
+
+bool File::existsAnywhere() const
+{
+	if (path().empty()) return false;
+
+	if (Path(path()).isAbsolute())
+		return existsImpl();
+
+	if (File(absolutePath()).exists())
+		return true;
+
+	return false;
 }
 
 

@@ -18,7 +18,9 @@
 #include "Poco/Thread.h"
 #include <fstream>
 #include <set>
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <Windows.h>
+#endif
 
 using Poco::File;
 using Poco::TemporaryFile;
@@ -189,6 +191,54 @@ void FileTest::testCreateFile()
 	assertTrue (!f.isHidden());
 	created = f.createFile();
 	assertTrue (!created);
+}
+
+
+void FileTest::testExists()
+{
+	assertFalse (File("").exists());
+
+	{
+		File f("testfile.dat");
+		f.createFile();
+		assertTrue (f.exists());
+		assertTrue (f.existsAnywhere());
+		assertFalse (f.canExecute());
+	}
+
+	{
+		File f("/testfile.dat");
+		assertFalse (f.exists());
+		assertFalse (f.existsAnywhere());
+		try
+		{
+			f.canExecute();
+			failmsg("file does not exist - must throw exception");
+		} catch(const Poco::FileNotFoundException&) {}
+	}
+
+	{
+#if defined(POCO_OS_FAMILY_UNIX)
+		File f("echo");
+		File f2("/dev/null");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+		File f("cmd.exe");
+
+		std::string buffer(Path::system());
+		UINT r = GetSystemDirectoryA(buffer.c_str(), buffer.size());
+		Path p(buffer);
+		p.makeDirectory().makeAbsolute().makeParent();
+		buffer = p.toString();
+		buffer.append("win.ini");
+		File f2(buffer);
+#endif
+		assertFalse (f.exists());
+		assertTrue (f.existsAnywhere());
+		assertTrue (File(f.absolutePath()).canExecute());
+		assertTrue (f2.exists());
+		assertTrue (f2.existsAnywhere());
+		assertFalse (f2.canExecute());
+	}
 }
 
 
@@ -660,6 +710,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
 
 	CppUnit_addTest(pSuite, FileTest, testCreateFile);
+	CppUnit_addTest(pSuite, FileTest, testExists);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
