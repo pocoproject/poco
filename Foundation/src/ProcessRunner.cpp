@@ -220,6 +220,18 @@ void ProcessRunner::start()
 {
 	if (!_started.exchange(true))
 	{
+		File exe(_cmd);
+		if (!exe.existsAnywhere())
+		{
+			throw Poco::FileNotFoundException(
+				Poco::format("ProcessRunner::start(%s): command not found", _cmd));
+		}
+		else if (!File(exe.absolutePath()).canExecute())
+		{
+			throw Poco::ExecuteFileException(
+				Poco::format("ProcessRunner::start(%s): cannot execute", _cmd));
+		}
+
 		int prevRunCnt = runCount();
 
 		_t.start(*this);
@@ -256,7 +268,6 @@ void ProcessRunner::start()
 	}
 	else
 		throw Poco::InvalidAccessException("start() called on started ProcessRunner");
-	checkStatus("", false);
 }
 
 

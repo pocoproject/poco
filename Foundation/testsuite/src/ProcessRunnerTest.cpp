@@ -276,8 +276,8 @@ void ProcessRunnerTest::testProcessRunner()
 			try
 			{
 				pr.reset(new ProcessRunner(cmd, args));
-				fail("ProcessRunner should throw an exception.", __LINE__, __FILE__);
-			} catch(const Poco::RuntimeException& e) {}
+				failmsg("ProcessRunner should throw an exception.");
+			} catch(const Poco::FileException& e) {}
 		}
 		assertTrue (!File(pidFile).exists());
 	}
@@ -294,8 +294,8 @@ void ProcessRunnerTest::testProcessRunner()
 			try
 			{
 				pr.reset(new ProcessRunner(cmd, args));
-				fail("ProcessRunner should throw an exception.", __LINE__, __FILE__);
-			} catch(const Poco::RuntimeException& e) {}
+				failmsg("ProcessRunner should throw an exception.");
+			} catch(const Poco::FileException& e) {}
 		}
 		assertTrue (!File(pidFile).exists());
 	}
