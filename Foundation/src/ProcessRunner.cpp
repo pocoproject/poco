@@ -109,7 +109,11 @@ void ProcessRunner::run()
 	int errPID = 0;
 	int errRC = 0;
 
-	_error.clear();
+	{
+		Poco::FastMutex::ScopedLock l(_mutex);
+		_error.clear();
+	}
+
 	_pid = INVALID_PID;
 	_pPH = nullptr;
 

@@ -239,8 +239,8 @@ void FileTest::testExists()
 		assertTrue (f2.exists());
 		assertTrue (f2.existsAnywhere());
 		assertFalse (f2.canExecute());
-	}
 #endif
+	}
 }
 
 
