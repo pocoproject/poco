@@ -173,7 +173,7 @@ private:
 	std::atomic<int> _runCount;
 	Stopwatch _sw;
 	std::string _error;
-	Poco::FastMutex _mutex;
+	mutable Poco::FastMutex _mutex;
 };
 
 
@@ -219,6 +219,8 @@ inline void ProcessRunner::setError(const std::string& msg)
 
 inline const std::string& ProcessRunner::error() const
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
+
 	return _error;
 }
 
