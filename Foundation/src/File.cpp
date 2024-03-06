@@ -118,14 +118,26 @@ std::string File::absolutePath() const
 					StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 				for (const auto& p: st)
 				{
-					std::string fileName(p);
-					if (p.size() && p[p.size()-1] != Path::separator())
-						fileName.append(1, Path::separator());
-					fileName.append(path());
-					if (File(fileName).exists())
+					try
 					{
-						ret = fileName;
-						break;
+						std::string fileName(p);
+						if (p.size() && p[p.size()-1] != Path::separator())
+							fileName.append(1, Path::separator());
+						fileName.append(path());
+						if (File(fileName).exists())
+						{
+							ret = fileName;
+							break;
+						}
+					}
+					catch (const Poco::PathSyntaxException&)
+					{
+						// this try/catch is only here to prevent windows cmake CI from failing
+						// (apparently bad windows path settings in the CI environment):
+						//
+						// class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
+						// "class Poco::PathSyntaxException:
+						// Bad path syntax: D:/a/poco/poco/cmake-build/bin:C:\Program Files\PowerShell\7\TestApp"
 					}
 				}
 			}
