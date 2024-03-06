@@ -209,11 +209,7 @@ void FileTest::testExists()
 		File f("/testfile.dat");
 		assertFalse (f.exists());
 		assertFalse (f.existsAnywhere());
-		try
-		{
-			f.canExecute();
-			failmsg("file does not exist - must throw exception");
-		} catch(const Poco::FileNotFoundException&) {}
+		assertFalse(File(f.absolutePath()).canExecute());
 	}
 
 	{
@@ -222,7 +218,7 @@ void FileTest::testExists()
 		File f2("/dev/null");
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 		std::string buffer(MAX_PATH, 0);
-		UINT r = GetSystemDirectoryA(buffer.c_str(), buffer.size());
+		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
 		if (r)
 		{
 			Path p(buffer);
