@@ -197,7 +197,6 @@ void FileTest::testCreateFile()
 void FileTest::testExists()
 {
 	assertFalse (File("").exists());
-
 	{
 		File f("testfile.dat");
 		f.createFile();
@@ -222,14 +221,20 @@ void FileTest::testExists()
 		File f("echo");
 		File f2("/dev/null");
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-		File f("cmd.exe");
-
-		std::string buffer(Path::system());
+		std::string buffer(MAX_PATH, 0);
 		UINT r = GetSystemDirectoryA(buffer.c_str(), buffer.size());
-		Path p(buffer);
-		p.makeDirectory().makeAbsolute().makeParent();
-		buffer = p.toString();
-		buffer.append("win.ini");
+		if (r)
+		{
+			Path p(buffer);
+			p.makeDirectory().makeAbsolute().makeParent();
+			buffer = p.toString();
+			buffer.append("win.ini");
+		}
+		else
+		{
+			buffer = "c:\\windows\\win.ini";
+		}
+		File f("cmd.exe");
 		File f2(buffer);
 #endif
 		assertFalse (f.exists());

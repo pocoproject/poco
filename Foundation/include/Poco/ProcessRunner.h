@@ -173,6 +173,7 @@ private:
 	std::atomic<int> _runCount;
 	Stopwatch _sw;
 	std::string _error;
+	Poco::FastMutex _mutex;
 };
 
 
