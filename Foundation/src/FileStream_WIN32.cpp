@@ -199,6 +199,11 @@ std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mod
 }
 
 
+void FileStreamBuf::flushToDisk()
+{
+}
+
+
 FileStreamBuf::NativeHandle FileStreamBuf::nativeHandle() const
 {
 	return _handle;
