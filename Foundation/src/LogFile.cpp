@@ -16,8 +16,6 @@
 #include "Poco/File.h"
 #include "Poco/Exception.h"
 
-#include <unistd.h>
-
 namespace Poco {
 
 
@@ -26,6 +24,19 @@ LogFile::LogFile(const std::string& path):
 	_str(_path, std::ios::app),
 	_size(static_cast<UInt64>(_str.tellp()))
 {
+	// There seems to be a strange "optimization" in the Windows NTFS
+	// filesystem that causes it to reuse directory entries of deleted
+	// files. Example:
+	// 1. create a file named "test.dat"
+	//    note the file's creation date
+	// 2. delete the file "test.dat"
+	// 3. wait a few seconds
+	// 4. create a file named "test.dat"
+	//    the new file will have the same creation
+	//    date as the old one.
+	// We work around this bug by taking the file's
+	// modification date as a reference when the
+	// file is empty.
 	if (_size == 0)
 		_creationDate = File(path).getLastModified();
 	else

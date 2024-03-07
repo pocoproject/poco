@@ -201,6 +201,12 @@ std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mod
 
 void FileStreamBuf::flushToDisk()
 {
+	if (getMode() & std::ios::out)
+	{
+		sync();
+		if (FlushFileBuffers(_handle) == 0)
+			File::handleLastError(_path);
+	}
 }
 
 
