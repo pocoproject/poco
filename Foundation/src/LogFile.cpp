@@ -53,7 +53,26 @@ void LogFile::write(const std::string& text, bool flush)
 {
 	std::streampos pos = _str.tellp();
 
-	_str << text << '\n';
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// Replace \n with \r\n
+	std::string logText;
+	logText.reserve(text.size() + 16); // keep some reserve for \n -> \r\n
+	char prevChar = 0;
+	for (char c: text)
+	{
+		if (c == '\n' && prevChar != '\r')
+			logText += POCO_DEFAULT_NEWLINE_CHARS;
+		else
+			logText += c;
+
+		prevChar = c;
+	}
+	_str << logText;
+#else
+	_str << text;
+#endif
+
+	_str << POCO_DEFAULT_NEWLINE_CHARS;
 
 	if (flush)
 		_str.flushToDisk();
