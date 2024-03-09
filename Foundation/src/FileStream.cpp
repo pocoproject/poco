@@ -56,9 +56,17 @@ FileIOS::NativeHandle FileIOS::nativeHandle() const
 }
 
 
-Poco::UInt64 FileIOS::size() const {
+Poco::UInt64 FileIOS::size() const
+{
 	return _buf.size();
 }
+
+
+void FileIOS::flushToDisk()
+{
+	_buf.flushToDisk();
+}
+
 
 FileInputStream::FileInputStream():
 	std::istream(&_buf)

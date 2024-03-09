@@ -42,7 +42,7 @@ const std::string FileChannel::PROP_ROTATEONOPEN = "rotateOnOpen";
 FileChannel::FileChannel():
 	_times("utc"),
 	_compress(false),
-	_flush(true),
+	_flush(false),
 	_rotateOnOpen(false),
 	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
@@ -56,7 +56,7 @@ FileChannel::FileChannel(const std::string& path):
 	_path(path),
 	_times("utc"),
 	_compress(false),
-	_flush(true),
+	_flush(false),
 	_rotateOnOpen(false),
 	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
