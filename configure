@@ -151,6 +151,10 @@ $(ls -C "$base"/build/config/)
 ENDHELP
 }
 
+echo "*********************************************************************"
+echo "WARNING: Make is not officially supported to build Poco, use CMake"
+echo "*********************************************************************"
+
 # save cwd
 build=$(pwd)
 # get directory where we are located
