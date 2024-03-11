@@ -20,7 +20,7 @@
 namespace Poco {
 
 
-NotificationQueue::NotificationQueue()
+NotificationQueue::NotificationQueue() : _cannotWait(false)
 {
 }
 
@@ -89,6 +89,7 @@ Notification* NotificationQueue::waitDequeueNotification()
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
+		if (_cannotWait) return nullptr;
 		pWI = new WaitInfo;
 		_waitQueue.push_back(pWI);
 	}
@@ -107,6 +108,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
+		if (_cannotWait) return nullptr;
 		pWI = new WaitInfo;
 		_waitQueue.push_back(pWI);
 	}
@@ -152,6 +154,7 @@ void NotificationQueue::wakeUpAll()
 		p->nfAvailable.set();
 	}
 	_waitQueue.clear();
+	_cannotWait = true;
 }
 
 

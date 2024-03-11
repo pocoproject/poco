@@ -150,6 +150,7 @@ private:
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;
 	mutable FastMutex _mutex;
+	volatile bool     _cannotWait;
 };
 
 
