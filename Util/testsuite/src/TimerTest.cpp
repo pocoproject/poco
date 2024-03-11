@@ -314,6 +314,28 @@ void TimerTest::testFunc()
 }
 
 
+void TimerTest::testIdle()
+{
+	Timer timer;
+
+	assertTrue (timer.idle());
+
+	Timestamp time;
+	time += 1000000;
+
+	TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
+
+	timer.schedule(pTask, time);
+
+	assertFalse (timer.idle());
+
+	_event.wait();
+	assertTrue (pTask->lastExecution() >= time);
+
+	assertTrue (timer.idle());
+}
+
+
 void TimerTest::setUp()
 {
 }
@@ -346,6 +368,7 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testCancelAllWaitStop);
 	CppUnit_addTest(pSuite, TimerTest, testMultiCancelAllWaitStop);
 	CppUnit_addTest(pSuite, TimerTest, testFunc);
+	CppUnit_addTest(pSuite, TimerTest, testIdle);
 
 	return pSuite;
 }
