@@ -67,7 +67,7 @@ const std::string DateTimeFormat::RFC850_REGEX(
 
 const std::string DateTimeFormat::RFC1036_FORMAT("%W, %e %b %y %H:%M:%S %Z");
 const std::string DateTimeFormat::RFC1036_REGEX(
-	"(((Monday)|(Tuesday)|(Wednesday)|(Thursday)|(Friday)|(Saturday)|(Sun)), *)?"
+	"(((Monday)|(Tuesday)|(Wednesday)|(Thursday)|(Friday)|(Saturday)|(Sunday)), *)?"
 	"\\d\\d? +"
 	"((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) +"
 	"\\d\\d(\\d\\d)? +\\d\\d:\\d\\d(:\\d\\d)? "
