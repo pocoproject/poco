@@ -349,6 +349,9 @@ void PathTest::testParseUnix4()
 	assertTrue (!p.isDirectory());
 	assertTrue (p.isFile());
 	assertTrue (p.toString(Path::PATH_UNIX) == "a/b/c/d");
+
+	p.makeDirectory();
+	assertTrue (p.toString(Path::PATH_UNIX) == "a/b/c/d/");
 }
 
 

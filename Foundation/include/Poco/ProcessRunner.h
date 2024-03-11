@@ -121,6 +121,8 @@ public:
 	int runCount() const;
 		/// Returns the number of times the process has been executed.
 
+	const std::string& error() const;
+		/// Returns the error message.
 
 private:
 	static const Poco::ProcessHandle::PID INVALID_PID = -1;
@@ -141,9 +143,22 @@ private:
 		/// Process initialization completion is indicated by new pid in
 		/// the pid file. If pid file is not specified, there is no waiting.
 
-	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg);
+	void checkError();
 		/// If timeout is exceeded, throws TimeoutException with `msg`
 		/// message.
+
+	void checkTimeout(const std::string& msg);
+		/// If timeout is exceeded, throws TimeoutException with `msg`
+		/// message.
+
+	void checkStatus(const std::string& msg, bool tOut = true);
+		/// If there were andy errors during process start/stop,
+		/// throws RuntimeException with the error message;
+		/// otherwise, if tOut is true and timeout is exceeded, throws
+		/// TimeoutException with `msg` message.
+
+	void setError(const std::string& msg);
+		/// Sets the error message.
 
 	Poco::Thread _t;
 	std::string _cmd;
@@ -156,6 +171,9 @@ private:
 	std::atomic<bool> _started;
 	std::atomic<int> _rc;
 	std::atomic<int> _runCount;
+	Stopwatch _sw;
+	std::string _error;
+	mutable Poco::FastMutex _mutex;
 };
 
 
@@ -190,6 +208,20 @@ inline int ProcessRunner::result() const
 inline int ProcessRunner::runCount() const
 {
 	return _runCount;
+}
+
+
+inline void ProcessRunner::setError(const std::string& msg)
+{
+	_error = Poco::format("ProcessRunner(%s): %s", cmdLine(), msg);
+}
+
+
+inline const std::string& ProcessRunner::error() const
+{
+	Poco::FastMutex::ScopedLock l(_mutex);
+
+	return _error;
 }
 
 

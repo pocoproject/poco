@@ -105,8 +105,23 @@ public:
 	const std::string& path() const;
 		/// Returns the path.
 
+	std::string absolutePath() const;
+		/// Returns absolute path.
+		/// Attempts to find the existing file
+		/// using curent work directory and the PATH
+		/// environment variable.
+		/// If the file doesn't exist, returns empty string.
+
 	bool exists() const;
 		/// Returns true iff the file exists.
+
+	bool existsAnywhere() const;
+		/// If the file path is relative, searches
+		/// for the file in the current working directory
+		/// and the environment paths.
+		/// If the file path is absolute, the
+		/// functionality is identical to the
+		/// exists() call.
 
 	bool canRead() const;
 		/// Returns true iff the file is readable.

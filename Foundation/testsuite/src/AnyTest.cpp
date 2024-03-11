@@ -134,7 +134,7 @@ void AnyTest::testAnyCastToReference()
 
 	int&                ra    = AnyCast<int &>(a);
 	int const&          ra_c  = AnyCast<int const &>(a);
-	// NOTE: The following two AnyCasts will trigger the
+	// NOTE: The volatile AnyCasts will trigger the
 	// undefined behavior sanitizer.
 	int volatile&       ra_v  = AnyCast<int volatile &>(a);
 	int const volatile& ra_cv = AnyCast<int const volatile&>(a);
