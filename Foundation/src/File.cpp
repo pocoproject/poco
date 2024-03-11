@@ -132,12 +132,7 @@ std::string File::absolutePath() const
 					}
 					catch (const Poco::PathSyntaxException&)
 					{
-						// this try/catch is only here to prevent windows cmake CI from failing
-						// (apparently bad windows path settings in the CI environment):
-						//
-						// class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
-						// "class Poco::PathSyntaxException:
-						// Bad path syntax: D:/a/poco/poco/cmake-build/bin:C:\Program Files\PowerShell\7\TestApp"
+						// shield against bad PATH environment entries
 					}
 				}
 			}

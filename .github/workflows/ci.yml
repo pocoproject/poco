@@ -555,7 +555,8 @@ jobs:
         class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
         class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
         class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
+        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner # windows cmake CI has messed up env path
     steps:
       - uses: actions/checkout@v4
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
