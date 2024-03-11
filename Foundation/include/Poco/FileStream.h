@@ -56,6 +56,16 @@ public:
 	~FileIOS();
 		/// Destroys the stream.
 
+	void open(const std::string& path, std::ios::openmode mode);
+		/// Opens the file specified by path, using the given mode.
+		///
+		/// Throws a FileException (or a similar exception) if the file 
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
+
+	void openHandle(NativeHandle handle, std::ios::openmode mode);
+		/// Takes ownership of the handle.
+
 	void close();
 		/// Closes the file stream.
 		///
