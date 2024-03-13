@@ -56,6 +56,9 @@ public:
 
 	void addPage(const std::string& path);
 		/// Adds a page.
+	
+	static const std::string DATABASE_DIR;
+	static const std::string DATABASE_NAME;
 
 protected:
 	enum TextState
@@ -100,6 +103,10 @@ protected:
 	typedef std::map<std::string, std::string> StringMap;
 	typedef std::map<std::string, Page> PageMap;
 
+	void initDatabase();
+	void writeSearchIndex(std::string link, std::string content);
+	static void writeSearchBox(std::ostream& ostr);
+	
 	void writePages();
 	void writePage(Page& page);
 	void scanTOC(const std::string& text, TOC& toc);
@@ -134,7 +141,7 @@ protected:
 	static void endBody(std::ostream& ostr);
 	static void beginContent(std::ostream& ostr);
 	static void endContent(std::ostream& ostr);
-	void writeDescription(std::ostream& ostr, const std::string& text);
+	void writeDescription(std::ostream& ostr, const std::string& text, std::ostream* pSstr = nullptr);
 	void writeDescriptionLine(std::ostream& ostr, const std::string& text, TextState& state);
 	void writeSummary(std::ostream& ostr, const std::string& text, const std::string& uri);
 	static std::string htmlize(const std::string& str);
@@ -155,26 +162,26 @@ protected:
 	void writeInheritance(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeMethodSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeNestedClasses(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
-	void writeNameSpacesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeNameSpaces(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeClassesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
+	void writeNameSpacesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeNameSpaces(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeClassesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeClassSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
-	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType);
-	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum);
+	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType, std::ostream* pSstr = nullptr);
+	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum, std::ostream* pSstr);
 	void writeConstructors(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeDestructor(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeMethods(std::ostream& ostr, const Poco::CppParser::Struct* pNameSpace);
-	void writeFunctionsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeFunctions(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeFunction(std::ostream& ostr, const Poco::CppParser::Function* pFunc);
-	void writeVariables(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeVariable(std::ostream& ostr, const Poco::CppParser::Variable* pVar);
+	void writeFunctionsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeFunctions(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeFunction(std::ostream& ostr, const Poco::CppParser::Function* pFunc, std::ostream* pSstr = nullptr);
+	void writeVariables(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeVariable(std::ostream& ostr, const Poco::CppParser::Variable* pVar, std::ostream* pSstr = nullptr);
 	static void writeNameListItem(std::ostream& ostr, const std::string& name, const Poco::CppParser::Symbol* pSymbol, const Poco::CppParser::NameSpace* pNameSpace, bool& first);
 	static void writeLink(std::ostream& ostr, const std::string& uri, const std::string& text);
 	static void writeLink(std::ostream& ostr, const Poco::CppParser::Symbol* pSymbol, const std::string& text);
