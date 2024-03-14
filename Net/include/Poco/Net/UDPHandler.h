@@ -19,26 +19,27 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
 #include "Poco/MemoryPool.h"
 #include "Poco/Event.h"
-#include "Poco/Error.h"
 #include "Poco/Mutex.h"
 #include "Poco/StringTokenizer.h"
 #include <deque>
 #include <cstring>
 #include <atomic>
-
+#include <map>
 
 namespace Poco {
 namespace Net {
 
 
-typedef int UDPMsgSizeT;
-#define POCO_UDP_BUF_SIZE 1472 + sizeof(UDPMsgSizeT) + SocketAddress::MAX_ADDRESS_LENGTH
+using UDPMsgSizeT = int;
+constexpr std::size_t POCO_UDP_BUF_SIZE = 1472 + sizeof(UDPMsgSizeT) + SocketAddress::MAX_ADDRESS_LENGTH;
 
 
 template <std::size_t S = POCO_UDP_BUF_SIZE, class TMutex = Poco::FastMutex>
@@ -53,15 +54,14 @@ class UDPHandlerImpl: public Runnable, public RefCountedObject
 	/// the inheriting class can call start() in the constructor.
 {
 public:
-	typedef UDPMsgSizeT             MsgSizeT;
-	typedef AutoPtr<UDPHandlerImpl> Ptr;
-	typedef std::vector<Ptr>        List;
-	typedef typename List::iterator Iterator;
-	typedef TMutex                  DFMutex;
+	using MsgSizeT = UDPMsgSizeT;
+	using Ptr = AutoPtr<UDPHandlerImpl>;
+	using List = std::vector<Ptr>;
+	using DFMutex = TMutex;
 
-	static const MsgSizeT BUF_STATUS_IDLE  = 0;
-	static const MsgSizeT BUF_STATUS_BUSY  = -1;
-	static const MsgSizeT BUF_STATUS_ERROR = -2;
+	static constexpr MsgSizeT BUF_STATUS_IDLE  = 0;
+	static constexpr MsgSizeT BUF_STATUS_BUSY  = -1;
+	static constexpr MsgSizeT BUF_STATUS_ERROR = -2;
 
 	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = 0):
 		_thread("UDPHandlerImpl"),
@@ -101,11 +101,11 @@ public:
 			{
 				makeNext(sock, &ret);
 			}
-			else if (*reinterpret_cast<MsgSizeT*>(*_bufIt[sock]) != 0) // busy
+			else if (payloadSize(*_bufIt[sock]) != 0) // busy
 			{
 				makeNext(sock, &ret);
 			}
-			else if (*reinterpret_cast<MsgSizeT*>(*_bufIt[sock]) == 0) // available
+			else if (payloadSize(*_bufIt[sock]) == 0) // available
 			{
 				setBusy(*_bufIt[sock]);
 				ret = *_bufIt[sock];
@@ -116,11 +116,11 @@ public:
 			}
 			else // last resort, full scan
 			{
-				BufList::iterator it = _buffers[sock].begin();
-				BufList::iterator end = _buffers[sock].end();
-				for (; it != end; ++it)
+				auto& buffers { _buffers[sock] };
+				auto it {buffers.begin()};
+				for (; it != buffers.end(); ++it)
 				{
-					if (*reinterpret_cast<MsgSizeT*>(*_bufIt[sock]) == 0) // available
+					if (payloadSize(*_bufIt[sock]) == 0) // available
 					{
 						setBusy(*it);
 						ret = *it;
@@ -132,7 +132,7 @@ public:
 						break;
 					}
 				}
-				if (it == end) makeNext(sock, &ret);
+				if (it == buffers.end()) makeNext(sock, &ret);
 			}
 			_mutex.unlock();
 		}
@@ -156,23 +156,19 @@ public:
 			{
 				if (!_stop)
 				{
-					BufMap::iterator it = _buffers.begin();
-					BufMap::iterator end = _buffers.end();
-					for (; it != end; ++it)
+					for (auto& buf: _buffers)
 					{
-						BufList::iterator lIt = it->second.begin();
-						BufList::iterator lEnd = it->second.end();
-						for (; lIt != lEnd; ++lIt)
+						for (auto* list: buf.second)
 						{
-							if (hasData(*lIt))
+							if (hasData(list))
 							{
-								processData(*lIt);
+								processData(list);
 								--_dataBacklog;
-								setIdle(*lIt);
+								setIdle(list);
 							}
-							else if (isError(*lIt))
+							else if (isError(list))
 							{
-								processError(*lIt);
+								processError(list);
 								++_errorBacklog;
 							}
 						}
@@ -245,7 +241,7 @@ public:
 		/// Returns true if buffer contains data.
 	{
 		typename DFMutex::ScopedLock l(_dfMutex);
-		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
+		return payloadSize(pBuf) > 0;
 	}
 
 	bool isError(char*& pBuf)
@@ -263,7 +259,7 @@ public:
 
 	static MsgSizeT payloadSize(char* buf)
 	{
-		return *((MsgSizeT*) buf);
+		return *reinterpret_cast<MsgSizeT*>(buf);
 	}
 
 	static SocketAddress address(char* buf)
@@ -297,7 +293,7 @@ public:
 	}
 
 	static char* error(char* buf)
-		/// Returns pointer to the erro message payload.
+		/// Returns pointer to the error message payload.
 		///
 		/// Total message size is S.
 		///
@@ -336,11 +332,11 @@ public:
 	}
 
 private:
-	typedef std::deque<char*>                BufList;
-	typedef std::map<poco_socket_t, BufList> BufMap;
-	typedef typename BufList::iterator       BLIt;
-	typedef std::map<poco_socket_t, BLIt>    BufIt;
-	typedef Poco::FastMemoryPool<char[S]>    MemPool;
+	using BufList = std::deque<char*>;
+	using BufMap = std::map<poco_socket_t, BufList>;
+	using BLIt = typename BufList::iterator;
+	using BufIt = std::map<poco_socket_t, BLIt>;
+	using MemPool = Poco::FastMemoryPool<char[S]>;
 
 	void setStatusImpl(char*& pBuf, MsgSizeT status)
 	{
@@ -378,7 +374,7 @@ private:
 };
 
 
-typedef UDPHandlerImpl<POCO_UDP_BUF_SIZE> UDPHandler;
+using UDPHandler = UDPHandlerImpl<>;
 
 
 } } // namespace Poco::Net

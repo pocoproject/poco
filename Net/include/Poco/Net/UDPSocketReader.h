@@ -20,7 +20,9 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/DatagramSocket.h"
-
+#include "Poco/Net/UDPHandler.h"
+#include "Poco/Net/UDPServerParams.h"
+#include "Poco/Error.h"
 
 namespace Poco {
 namespace Net {
@@ -137,7 +139,7 @@ public:
 			}
 			else return;
 		}
-		catch (Poco::Exception& exc)
+		catch (const Poco::Exception& exc)
 		{
 			AtomicCounter::ValueType errors = setError(sock.impl()->sockfd(), p, exc.displayText());
 			if (_backlogThreshold > 0 && errors > _backlogThreshold && errors != _errorBacklog[sockfd] && pSA && pAL)
@@ -154,27 +156,26 @@ public:
 		/// Returns true if all handlers are stopped.
 	{
 		bool stopped = true;
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
-		for (; it != end; ++it) stopped = stopped && (*it)->stopped();
+		for (auto& h: _handlers)
+			stopped = stopped && h->stopped();
+
 		return stopped;
 	}
 
 	void stopHandler()
 		/// Stops all handlers.
 	{
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
-		for (; it != end; ++it) (*it)->stop();
+		for (auto& h: _handlers)
+			h->stop();
 	}
 
 	bool handlerDone() const
 		/// Returns true if all handlers are done processing data.
 	{
 		bool done = true;
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
-		for (; it != end; ++it) done = done && (*it)->done();
+		for (auto& h: _handlers)
+			done = done && h->done();
+
 		return done;
 	}
 
@@ -204,9 +205,9 @@ private:
 		return **_handler;
 	}
 
-	typedef typename UDPHandlerImpl<S>::List           HandlerList;
-	typedef typename UDPHandlerImpl<S>::List::iterator HandlerIterator;
-	typedef std::map<poco_socket_t, Counter>           CounterMap;
+	using HandlerList = typename UDPHandlerImpl<S>::List;
+	using HandlerIterator = typename HandlerList::iterator;
+	using CounterMap = std::map<poco_socket_t, Counter>;
 
 	HandlerList&    _handlers;
 	HandlerIterator _handler;

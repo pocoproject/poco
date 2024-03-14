@@ -19,14 +19,10 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/Net/DatagramSocket.h"
-#include "Poco/Net/PollSet.h"
 #include "Poco/Net/UDPHandler.h"
 #include "Poco/Net/UDPServerParams.h"
-#include "Poco/Net/UDPSocketReader.h"
 #include "Poco/Net/SingleSocketPoller.h"
 #include "Poco/Net/MultiSocketPoller.h"
-#include <map>
 
 
 namespace Poco {

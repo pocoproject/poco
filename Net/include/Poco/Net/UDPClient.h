@@ -21,7 +21,6 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DatagramSocket.h"
-#include "Poco/Timespan.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
 
