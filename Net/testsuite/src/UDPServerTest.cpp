@@ -124,11 +124,9 @@ namespace
 			count = 0;
 			errCount = 0;
 			Poco::Thread::sleep(10);
-			Poco::Net::UDPHandler::Iterator it = handlers.begin();
-			Poco::Net::UDPHandler::Iterator end = handlers.end();
-			for (; it != end; ++it)
+			for (const auto& h: handlers)
 			{
-				count += dynamic_cast<TestUDPHandler &>(*(*it)).counter.value();
+				count += dynamic_cast<const TestUDPHandler &>(*h).counter.value();
 				errCount += count / 10;
 			}
 		} while (count < i);
@@ -138,11 +136,9 @@ namespace
 					<< ", received: " << count << std::endl;
 			return false;
 		}
-		Poco::Net::UDPHandler::Iterator it = handlers.begin();
-		Poco::Net::UDPHandler::Iterator end = handlers.end();
-		for (; it != end; ++it)
+		for (const auto& he: handlers)
 		{
-			TestUDPHandler &h = dynamic_cast<TestUDPHandler &>(*(*it));
+			const auto &h = dynamic_cast<const TestUDPHandler &>(*he);
 			count = h.counter.value();
 			errCount = h.errCounter.value();
 			if (errCount < count / 10)
