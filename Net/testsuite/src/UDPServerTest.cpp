@@ -82,17 +82,17 @@ namespace
 
 	AtomicCounter TestUDPHandler::errors;
 
-	template<typename S>
-	bool server(int handlerCount, int reps, int port = 0)
+	template<typename SRVT, typename CLTT, typename HNDLRT>
+	bool server(int handlerCount, int reps, int port)
 	{
 		Poco::Net::UDPHandler::List handlers;
 		for (int i = 0; i < handlerCount; ++i)
-			handlers.push_back(new TestUDPHandler());
+			handlers.push_back(new HNDLRT());
 
-		S server(handlers, Poco::Net::SocketAddress("127.0.0.1", port));
+		SRVT server(handlers, Poco::Net::SocketAddress("127.0.0.1", port));
 		Poco::Thread::sleep(100);
 
-		Poco::Net::UDPClient client("127.0.0.1", server.port(), true);
+		CLTT client("127.0.0.1", server.port(), true);
 		Poco::Thread::sleep(10);
 
 		std::vector<std::string> data;
@@ -112,7 +112,7 @@ namespace
 						<< ", sent: " << sent << std::endl;
 					return false;
 				}
-				Poco::Thread::sleep(10);
+				Poco::Thread::sleep(5);
 				data.clear();
 			}
 		}
@@ -126,7 +126,7 @@ namespace
 			Poco::Thread::sleep(10);
 			for (const auto& h: handlers)
 			{
-				count += dynamic_cast<const TestUDPHandler &>(*h).counter.value();
+				count += dynamic_cast<const HNDLRT &>(*h).counter.value();
 				errCount += count / 10;
 			}
 		} while (count < i);
@@ -138,7 +138,7 @@ namespace
 		}
 		for (const auto& he: handlers)
 		{
-			const auto &h = dynamic_cast<const TestUDPHandler &>(*he);
+			const auto &h = dynamic_cast<const HNDLRT &>(*he);
 			count = h.counter.value();
 			errCount = h.errCounter.value();
 			if (errCount < count / 10)
@@ -170,11 +170,42 @@ UDPServerTest::~UDPServerTest()
 }
 
 
-void UDPServerTest::testServer()
+void UDPServerTest::testUDPSingleSocket()
 {
+	TestUDPHandler::errors = 0;
 	int msgs = 10000;
-	assertTrue (server<Poco::Net::UDPServer>(1, msgs));
-	assertTrue (server<Poco::Net::UDPMultiServer>(10, msgs, 22080));
+	auto tf = server<Poco::Net::UDPServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(1, msgs, 0) );
+	assertTrue (TestUDPHandler::errors == 0);
+}
+
+
+void UDPServerTest::testUDPMultiSocket()
+{
+	TestUDPHandler::errors = 0;
+	int msgs = 10000;
+	auto tf = server<Poco::Net::UDPMultiServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(1, msgs, 22080) );
+	assertTrue (TestUDPHandler::errors == 0);
+}
+
+
+void UDPServerTest::testUDPSingleSocketMultipleHandlers()
+{
+	TestUDPHandler::errors = 0;
+	int msgs = 10000;
+	auto tf = server<Poco::Net::UDPServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(10, msgs, 0) );
+	assertTrue (TestUDPHandler::errors == 0);
+}
+
+
+void UDPServerTest::testUDPMultiSocketMultipleHandlers()
+{
+	TestUDPHandler::errors = 0;
+	int msgs = 10000;
+	auto tf = server<Poco::Net::UDPMultiServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(10, msgs, 22080) );
 	assertTrue (TestUDPHandler::errors == 0);
 }
 
@@ -193,7 +224,10 @@ CppUnit::Test* UDPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UDPServerTest");
 
-	CppUnit_addTest(pSuite, UDPServerTest, testServer);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPSingleSocket);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocket);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPSingleSocketMultipleHandlers);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocketMultipleHandlers);
 
 	return pSuite;
 }
