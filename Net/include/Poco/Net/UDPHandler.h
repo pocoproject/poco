@@ -225,13 +225,13 @@ public:
 	AtomicCounter::ValueType setError(char* pBuf, const std::string& err)
 		/// Sets the error into the buffer.
 	{
-		std::size_t availLen = S - sizeof(MsgSizeT);
-		std::memset(pBuf + sizeof(MsgSizeT), 0, availLen);
+		std::size_t availLen = S - errorOffset();
+		std::memset(pBuf + errorOffset(), 0, availLen);
 		std::size_t msgLen = err.length();
 		if (msgLen)
 		{
 			if (msgLen >= availLen) msgLen = availLen;
-			std::memcpy(pBuf + sizeof(MsgSizeT), err.data(), msgLen);
+			std::memcpy(pBuf + errorOffset(), err.data(), msgLen);
 		}
 		setStatus(pBuf, BUF_STATUS_ERROR);
 		return --_errorBacklog;
@@ -251,10 +251,28 @@ public:
 		return *reinterpret_cast<const MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
-	static Poco::UInt16 offset()
+	static constexpr Poco::UInt16 errorOffset()
+		/// Returns offset of address length.
+	{
+		return sizeof(MsgSizeT);
+	}
+
+	static constexpr Poco::UInt16 addressLengthOffset()
+		/// Returns offset of address length.
+	{
+		return sizeof(MsgSizeT);
+	}
+
+	static constexpr Poco::UInt16 addressOffset()
+		/// Returns offset of address.
+	{
+		return addressLengthOffset() + sizeof(poco_socklen_t);
+	}
+
+	static constexpr Poco::UInt16 payloadOffset()
 		/// Returns buffer data offset.
 	{
-		return sizeof(MsgSizeT) + sizeof(poco_socklen_t) + SocketAddress::MAX_ADDRESS_LENGTH;
+		return addressOffset() + SocketAddress::MAX_ADDRESS_LENGTH;
 	}
 
 	static MsgSizeT payloadSize(const char* buf)
@@ -264,8 +282,10 @@ public:
 
 	static SocketAddress address(const char* buf)
 	{
-		const auto* len = reinterpret_cast<const poco_socklen_t*>(buf + sizeof(MsgSizeT));
-		const auto* pSA = reinterpret_cast<const struct sockaddr*>(buf + sizeof(MsgSizeT) + sizeof(poco_socklen_t));
+		const auto* len = reinterpret_cast<const poco_socklen_t*>(buf + addressLengthOffset());
+		const auto* pSA = reinterpret_cast<const struct sockaddr*>(buf + addressOffset());
+		poco_assert(*len <= SocketAddress::MAX_ADDRESS_LENGTH);
+
 		return SocketAddress(pSA, *len);
 	}
 
@@ -280,7 +300,7 @@ public:
 		/// | sizeof(MsgSizeT) bytes | sizeof(poco_socklen_t) | SocketAddress::MAX_ADDRESS_LENGTH |    payload    |
 		/// +------------------------+------------------------+-----------------------------------+--------- ~ ---+
 	{
-		return buf + offset();
+		return buf + payloadOffset();
 	}
 
 	static Poco::StringTokenizer payload(const char* buf, char delimiter)
