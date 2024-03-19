@@ -47,7 +47,7 @@ namespace
 		{
 		}
 
-		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
 		{
 			try
 			{
@@ -97,7 +97,7 @@ namespace
 		{
 		}
 
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) override
 		{
 			return new WebSocketRequestHandler(_bufSize);
 		}

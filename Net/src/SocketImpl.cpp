@@ -133,7 +133,7 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 	sockaddr_storage buffer;
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
+	auto* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	poco_socket_t sd;
 	do

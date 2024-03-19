@@ -101,10 +101,10 @@ public:
 		/// for replying to sender and data or error backlog threshold is
 		/// exceeded, sender is notified of the current backlog size.
 	{
-		typedef typename UDPHandlerImpl<S>::MsgSizeT RT;
-		char* p = 0;
-		struct sockaddr* pSA = 0;
-		poco_socklen_t* pAL = 0;
+		using RT = typename UDPHandlerImpl<S>::MsgSizeT;
+		char* p = nullptr;
+		struct sockaddr* pSA = nullptr;
+		poco_socklen_t* pAL = nullptr;
 		poco_socket_t sockfd = sock.impl()->sockfd();
 		nextHandler();
 		try
@@ -179,10 +179,10 @@ public:
 		return done;
 	}
 
-	AtomicCounter::ValueType setError(poco_socket_t sock, char* buf = 0, const std::string& err = "")
+	AtomicCounter::ValueType setError(poco_socket_t sock, char* buf = nullptr, const std::string& err = "")
 		/// Sets error to the provided buffer buf. If the buffer is null, a new buffer is obtained
 		/// from handler.
-		/// If successful, returns the handler's eror backlog size, otherwise returns zero.
+		/// If successful, returns the handler's error backlog size, otherwise returns zero.
 	{
 		if (!buf) buf = handler().next(sock);
 		if (buf) return handler().setError(buf, err.empty() ? Error::getMessage(Error::last()) : err);

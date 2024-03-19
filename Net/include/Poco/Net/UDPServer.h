@@ -57,7 +57,7 @@ public:
 		_thread.start(*this);
 	}
 
-	~UDPServerImpl()
+	~UDPServerImpl() override
 		/// Destroys the UDPServer.
 	{
 		_stop = true;
@@ -79,7 +79,7 @@ public:
 		return _poller.address();
 	}
 
-	void run()
+	void run() override
 		/// Does the work.
 	{
 		while (!_stop) _poller.poll();

@@ -144,7 +144,7 @@
 	#define POCO_NO_DATA         NO_DATA
 #elif defined(POCO_OS_FAMILY_UNIX)
 	#include <unistd.h>
-	#include <errno.h>
+	#include <cerrno>
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <sys/un.h>
@@ -369,12 +369,12 @@ namespace Net {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	typedef WSABUF SocketBuf;
+	using SocketBuf = WSABUF;
 #elif defined(POCO_OS_FAMILY_UNIX) // TODO: may need more refinement
-	typedef iovec SocketBuf;
+	using SocketBuf = iovec;
 #endif
 
-typedef std::vector<SocketBuf> SocketBufVec;
+using SocketBufVec = std::vector<SocketBuf>;
 
 inline int SocketBufVecSize(const SocketBufVec& sbv)
 	/// Returns total length of all SocketBufs in the vector.

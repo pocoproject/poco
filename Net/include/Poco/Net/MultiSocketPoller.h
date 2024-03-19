@@ -38,7 +38,7 @@ class MultiSocketPoller
 	/// state, the reading/error handling actions are delegated to the reader.
 {
 public:
-	MultiSocketPoller(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa, int nSockets = 10, Poco::Timespan timeout = 250000):
+	MultiSocketPoller(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa, int nSockets = 10, const Poco::Timespan& timeout = 250000):
 		_address(sa),
 		_timeout(timeout),
 		_reader(handlers)
