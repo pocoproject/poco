@@ -50,7 +50,7 @@ namespace
 			start();
 		}
 
-		void processData(char *buf)
+		void processData(char *buf) override
 		{
 			if (!addr.empty() && addr != address(buf).toString()) ++errors;
 			addr = address(buf).toString();
@@ -68,7 +68,7 @@ namespace
 			}
 		}
 
-		void processError(char *buf)
+		void processError(char *buf) override
 		{
 			if (std::string(error(buf)) != "error") ++errors;
 			std::memset(buf, 0, blockSize());
@@ -100,7 +100,7 @@ namespace
 		const char *str = "hello\n";
 		for (; i < reps; ++i)
 		{
-			data.push_back(str);
+			data.emplace_back(str);
 			if (data.size() == 230 || i == reps - 1)
 			{
 				data.back().append(1, '\0');

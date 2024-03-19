@@ -63,7 +63,7 @@ public:
 	static constexpr MsgSizeT BUF_STATUS_BUSY  = -1;
 	static constexpr MsgSizeT BUF_STATUS_ERROR = -2;
 
-	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = 0):
+	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = nullptr):
 		_thread("UDPHandlerImpl"),
 		_stop(false),
 		_done(false),
@@ -76,7 +76,7 @@ public:
 	{
 	}
 
-	~UDPHandlerImpl()
+	~UDPHandlerImpl() override
 		/// Destroys the UDPHandlerImpl.
 	{
 		stop();
@@ -94,7 +94,7 @@ public:
 		/// the pointers to the newly created guard/buffer.
 		/// If mutex lock times out, returns null pointer.
 	{
-		char* ret = 0;
+		char* ret = nullptr;
 		if (_mutex.tryLock(10))
 		{
 			if (_buffers[sock].size() < _bufListSize) // building buffer list
@@ -145,7 +145,7 @@ public:
 		_dataReady.set();
 	}
 
-	void run()
+	void run() override
 		/// Does the work.
 	{
 		while (!_stop)
@@ -336,7 +336,8 @@ private:
 	using BufMap = std::map<poco_socket_t, BufList>;
 	using BLIt = typename BufList::iterator;
 	using BufIt = std::map<poco_socket_t, BLIt>;
-	using MemPool = Poco::FastMemoryPool<char[S]>;
+	using BufArray = std::array<char, S>;
+	using MemPool = Poco::FastMemoryPool<BufArray>;
 
 	void setStatusImpl(char*& pBuf, MsgSizeT status)
 	{
