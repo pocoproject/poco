@@ -87,6 +87,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
+      # causes sanitizer to fail.
+      # vm.mmap_rnd_bits needs to be set to 28 to make it work.
+      # (https://github.com/google/sanitizers/issues/1716)
+      - run: sysctl vm.legacy_va_layout
+      - run: sysctl kernel.randomize_va_space
+      - run: sudo sysctl vm.mmap_rnd_bits
+      - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - uses: ./.github/actions/retry-action
@@ -103,6 +111,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
+      # causes sanitizer to fail.
+      # vm.mmap_rnd_bits needs to be set to 28 to make it work.
+      # (https://github.com/google/sanitizers/issues/1716)
+      - run: sysctl vm.legacy_va_layout
+      - run: sysctl kernel.randomize_va_space
+      - run: sudo sysctl vm.mmap_rnd_bits
+      - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=PDF --no-soo && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - uses: ./.github/actions/retry-action
@@ -135,6 +151,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
+      # causes sanitizer to fail.
+      # vm.mmap_rnd_bits needs to be set to 28 to make it work.
+      # (https://github.com/google/sanitizers/issues/1716)
+      - run: sysctl vm.legacy_va_layout
+      - run: sysctl kernel.randomize_va_space
+      - run: sudo sysctl vm.mmap_rnd_bits
+      - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
       - uses: ./.github/actions/retry-action
@@ -143,8 +167,7 @@ jobs:
           max_attempts: 3
           retry_on: any
           command: >-
-            sudo -s
-            ./ci/runtests.sh TSAN
+            sudo -s ./ci/runtests.sh TSAN
 
   linux-gcc-cmake:
     runs-on: ubuntu-22.04
