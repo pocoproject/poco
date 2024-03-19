@@ -22,6 +22,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Runnable.h"
+#include "Poco/RefCountedObject.h"
 #include "Poco/Thread.h"
 
 
@@ -29,7 +30,7 @@ namespace Poco {
 namespace Net {
 
 
-class Net_API UDPClient : public Poco::Runnable
+class Net_API UDPClient : public Poco::Runnable, public RefCountedObject
 	/// UDP client can either send, or send/receive UDP packets.
 	/// The mode of operation is specified at construction time.
 	/// If receiving functionality is enabled, it will run in a
@@ -42,7 +43,7 @@ public:
 	UDPClient(const std::string& address, Poco::UInt16 port, bool listen = false);
 		/// Creates UDP client and connects it to specified address/port.
 		/// If listen is true, a thread is launched where client can receive
-		/// responses rom the server.
+		/// responses from the server.
 
 	~UDPClient() override;
 		/// Destroys UDPClient.

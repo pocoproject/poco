@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/UDPServer.h"
+#include "Poco/Net/UDPServerParams.h"
 #include "Poco/Net/UDPClient.h"
 #include "Poco/Net/UDPHandler.h"
 #include "Poco/Net/DatagramSocket.h"
@@ -83,16 +84,20 @@ namespace
 	AtomicCounter TestUDPHandler::errors;
 
 	template<typename SRVT, typename CLTT, typename HNDLRT>
-	bool server(int handlerCount, int reps, int port)
+	bool server(int handlerCount, int clientCount, int reps, const typename SRVT::ServerParams& params)
 	{
 		Poco::Net::UDPHandler::List handlers;
 		for (int i = 0; i < handlerCount; ++i)
 			handlers.push_back(new HNDLRT());
 
-		SRVT server(handlers, Poco::Net::SocketAddress("127.0.0.1", port));
+		SRVT server(handlers, params);
 		Poco::Thread::sleep(100);
 
-		CLTT client("127.0.0.1", server.port(), true);
+		using ClientPtr = Poco::AutoPtr<CLTT>;
+		std::vector<ClientPtr> clients;
+		for (int i = 0; i < clientCount; i++)
+			clients.push_back( new CLTT("127.0.0.1", server.port(), true) );
+
 		Poco::Thread::sleep(10);
 
 		std::vector<std::string> data;
@@ -105,7 +110,7 @@ namespace
 			{
 				data.back().append(1, '\0');
 				std::size_t sz = (data.size() * strlen(str)) + 1;
-				int sent = client.send(Poco::Net::Socket::makeBufVec(data));
+				int sent = clients[i % clientCount]->send(Poco::Net::Socket::makeBufVec(data));
 				if (sz != sent)
 				{
 					std::cerr << "Send count mismatch, expected: " << sz
@@ -136,6 +141,7 @@ namespace
 					<< ", received: " << count << std::endl;
 			return false;
 		}
+		const auto address = clients[0]->address().toString();
 		for (const auto& he: handlers)
 		{
 			const auto &h = dynamic_cast<const HNDLRT &>(*he);
@@ -148,12 +154,13 @@ namespace
 				return false;
 			}
 
-			if (h.counter && (h.addr.empty() || h.addr != client.address().toString()))
-			{
-				std::cerr << "Address mismatch, expected: " << client.address().toString()
-					<< ", received: " << h.addr << std::endl;
-				return false;
-			}
+			if (clientCount == 1)
+				if (h.counter && (h.addr.empty() || h.addr != address))
+				{
+					std::cerr << "Address mismatch, expected: " << address
+						<< ", received: " << h.addr << std::endl;
+					return false;
+				}
 		}
 		return true;
 	}
@@ -173,9 +180,11 @@ UDPServerTest::~UDPServerTest()
 void UDPServerTest::testUDPSingleSocket()
 {
 	TestUDPHandler::errors = 0;
-	int msgs = 10000;
+	int msgs = 10000;	
+	Poco::Net::UDPServerParams params(Poco::Net::SocketAddress("127.0.0.1", 0));
+
 	auto tf = server<Poco::Net::UDPServer, Poco::Net::UDPClient, TestUDPHandler>;
-	assertTrue( tf(1, msgs, 0) );
+	assertTrue( tf(1, 1, msgs, params) );
 	assertTrue (TestUDPHandler::errors == 0);
 }
 
@@ -184,8 +193,10 @@ void UDPServerTest::testUDPMultiSocket()
 {
 	TestUDPHandler::errors = 0;
 	int msgs = 10000;
+	Poco::Net::UDPServerParams params(Poco::Net::SocketAddress("127.0.0.1", 22080));
+
 	auto tf = server<Poco::Net::UDPMultiServer, Poco::Net::UDPClient, TestUDPHandler>;
-	assertTrue( tf(1, msgs, 22080) );
+	assertTrue( tf(1, 1, msgs, params) );
 	assertTrue (TestUDPHandler::errors == 0);
 }
 
@@ -194,8 +205,10 @@ void UDPServerTest::testUDPSingleSocketMultipleHandlers()
 {
 	TestUDPHandler::errors = 0;
 	int msgs = 10000;
+	Poco::Net::UDPServerParams params(Poco::Net::SocketAddress("127.0.0.1", 0));
+
 	auto tf = server<Poco::Net::UDPServer, Poco::Net::UDPClient, TestUDPHandler>;
-	assertTrue( tf(10, msgs, 0) );
+	assertTrue( tf(10, 1, msgs, params) );
 	assertTrue (TestUDPHandler::errors == 0);
 }
 
@@ -204,8 +217,52 @@ void UDPServerTest::testUDPMultiSocketMultipleHandlers()
 {
 	TestUDPHandler::errors = 0;
 	int msgs = 10000;
+	Poco::Net::UDPServerParams params(Poco::Net::SocketAddress("127.0.0.1", 22080));
+
 	auto tf = server<Poco::Net::UDPMultiServer, Poco::Net::UDPClient, TestUDPHandler>;
-	assertTrue( tf(10, msgs, 22080) );
+	assertTrue( tf(10, 1, msgs, params) );
+	assertTrue (TestUDPHandler::errors == 0);
+}
+
+
+void UDPServerTest::testUDPMultiSocketMultipleHandlersLessSockets()
+{
+	TestUDPHandler::errors = 0;
+	int msgs = 10000;
+	Poco::Net::UDPServerParams params(
+		Poco::Net::SocketAddress("127.0.0.1", 22080),
+		2
+	);
+
+	auto tf = server<Poco::Net::UDPMultiServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(10, 1, msgs, params) );
+	assertTrue (TestUDPHandler::errors == 0);
+}
+
+
+void UDPServerTest::testUDPMultiSocketMultipleHandlersMoreSockets()
+{
+	TestUDPHandler::errors = 0;
+	int msgs = 10000;
+	Poco::Net::UDPServerParams params(
+		Poco::Net::SocketAddress("127.0.0.1", 22080),
+		10
+	);
+
+	auto tf = server<Poco::Net::UDPMultiServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(2, 1, msgs, params) );
+	assertTrue (TestUDPHandler::errors == 0);
+}
+
+
+void UDPServerTest::testUDPMultiSocketMultipleHandlersMultipleClients()
+{
+	TestUDPHandler::errors = 0;
+	int msgs = 50000;
+	Poco::Net::UDPServerParams params(Poco::Net::SocketAddress("127.0.0.1", 0));
+
+	auto tf = server<Poco::Net::UDPServer, Poco::Net::UDPClient, TestUDPHandler>;
+	assertTrue( tf(10, 5, msgs, params) );
 	assertTrue (TestUDPHandler::errors == 0);
 }
 
@@ -228,6 +285,9 @@ CppUnit::Test* UDPServerTest::suite()
 	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocket);
 	CppUnit_addTest(pSuite, UDPServerTest, testUDPSingleSocketMultipleHandlers);
 	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocketMultipleHandlers);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocketMultipleHandlersLessSockets);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocketMultipleHandlersMoreSockets);
+	CppUnit_addTest(pSuite, UDPServerTest, testUDPMultiSocketMultipleHandlersMultipleClients);
 
 	return pSuite;
 }
