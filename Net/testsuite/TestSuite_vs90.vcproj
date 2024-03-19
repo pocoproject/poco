@@ -1295,7 +1295,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\UDPServerTestSuite.cpp"
+					RelativePath=".\src\AsyncServerTestSuite.cpp"
 					>
 				</File>
 			</Filter>
@@ -1307,7 +1307,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\UDPServerTestSuite.h"
+					RelativePath=".\src\AsyncServerTestSuite.h"
 					>
 				</File>
 			</Filter>
