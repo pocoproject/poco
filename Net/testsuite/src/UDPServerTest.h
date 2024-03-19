@@ -27,6 +27,9 @@ public:
 	void testUDPMultiSocket();
 	void testUDPSingleSocketMultipleHandlers();
 	void testUDPMultiSocketMultipleHandlers();
+	void testUDPMultiSocketMultipleHandlersLessSockets();
+	void testUDPMultiSocketMultipleHandlersMoreSockets();
+	void testUDPMultiSocketMultipleHandlersMultipleClients();
 
 	void setUp();
 	void tearDown();

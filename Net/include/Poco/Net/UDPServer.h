@@ -37,6 +37,9 @@ class UDPServerImpl: public Poco::Runnable
 	/// MultipleSocketPoller for more information.
 {
 public:
+
+	using ServerParams = UDPServerParams;
+
 	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa):
 		_poller(handlers, sa),
 		_thread("UDPServer"),
@@ -47,7 +50,7 @@ public:
 		_thread.start(*this);
 	}
 
-	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const UDPServerParams& params):
+	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const ServerParams& params):
 		_poller(handlers, params),
 		_thread("UDPServer"),
 		_stop(false)
