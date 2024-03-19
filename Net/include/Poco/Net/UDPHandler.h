@@ -156,7 +156,7 @@ public:
 			{
 				if (!_stop)
 				{
-					for (auto& buf: _buffers)
+					for (const auto& buf: _buffers)
 					{
 						for (auto* list: buf.second)
 						{
@@ -200,14 +200,14 @@ public:
 		return _done;
 	}
 
-	void setBusy(char*& pBuf)
+	void setBusy(char* pBuf)
 		/// Flags the buffer as busy (usually done before buffer
 		/// is passed to the reader.
 	{
 		setStatus(pBuf, BUF_STATUS_BUSY);
 	}
 
-	void setIdle(char*& pBuf)
+	void setIdle(char* pBuf)
 		/// Flags the buffer as idle, ie. not used by reader or
 		/// waiting to be processed, so ready to be reused for
 		/// reading.
@@ -215,14 +215,14 @@ public:
 		setStatus(pBuf, BUF_STATUS_IDLE);
 	}
 
-	AtomicCounter::ValueType setData(char*& pBuf, MsgSizeT sz)
+	AtomicCounter::ValueType setData(char* pBuf, MsgSizeT sz)
 		/// Flags the buffer as containing data.
 	{
 		setStatus(pBuf, sz);
 		return ++_dataBacklog;
 	}
 
-	AtomicCounter::ValueType setError(char*& pBuf, const std::string& err)
+	AtomicCounter::ValueType setError(char* pBuf, const std::string& err)
 		/// Sets the error into the buffer.
 	{
 		std::size_t availLen = S - sizeof(MsgSizeT);
@@ -237,18 +237,18 @@ public:
 		return --_errorBacklog;
 	}
 
-	bool hasData(char*& pBuf)
+	bool hasData(const char* pBuf)
 		/// Returns true if buffer contains data.
 	{
 		typename DFMutex::ScopedLock l(_dfMutex);
 		return payloadSize(pBuf) > 0;
 	}
 
-	bool isError(char*& pBuf)
+	bool isError(const char* pBuf)
 		/// Returns true if buffer contains error.
 	{
 		typename DFMutex::ScopedLock l(_dfMutex);
-		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
+		return *reinterpret_cast<const MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
 	static Poco::UInt16 offset()
@@ -257,19 +257,19 @@ public:
 		return sizeof(MsgSizeT) + sizeof(poco_socklen_t) + SocketAddress::MAX_ADDRESS_LENGTH;
 	}
 
-	static MsgSizeT payloadSize(char* buf)
+	static MsgSizeT payloadSize(const char* buf)
 	{
-		return *reinterpret_cast<MsgSizeT*>(buf);
+		return *reinterpret_cast<const MsgSizeT*>(buf);
 	}
 
-	static SocketAddress address(char* buf)
+	static SocketAddress address(const char* buf)
 	{
-		poco_socklen_t* len = reinterpret_cast<poco_socklen_t*>(buf + sizeof(MsgSizeT));
-		struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buf + sizeof(MsgSizeT) + sizeof(poco_socklen_t));
+		const auto* len = reinterpret_cast<const poco_socklen_t*>(buf + sizeof(MsgSizeT));
+		const auto* pSA = reinterpret_cast<const struct sockaddr*>(buf + sizeof(MsgSizeT) + sizeof(poco_socklen_t));
 		return SocketAddress(pSA, *len);
 	}
 
-	static char* payload(char* buf)
+	static const char* payload(const char* buf)
 		/// Returns pointer to payload.
 		///
 		/// Total message size is S.
@@ -283,7 +283,7 @@ public:
 		return buf + offset();
 	}
 
-	static Poco::StringTokenizer payload(char* buf, char delimiter)
+	static Poco::StringTokenizer payload(const char* buf, char delimiter)
 		/// Returns tokenized payload.
 		/// Used when multiple logical messages are contained in a
 		/// single physical message. Messages must be ASCII, as well as
@@ -292,7 +292,7 @@ public:
 		return Poco::StringTokenizer(payload(buf), std::string(1, delimiter), StringTokenizer::TOK_IGNORE_EMPTY);
 	}
 
-	static char* error(char* buf)
+	static const char* error(const char* buf)
 		/// Returns pointer to the error message payload.
 		///
 		/// Total message size is S.
@@ -339,12 +339,12 @@ private:
 	using BufArray = std::array<char, S>;
 	using MemPool = Poco::FastMemoryPool<BufArray>;
 
-	void setStatusImpl(char*& pBuf, MsgSizeT status)
+	void setStatusImpl(char* pBuf, MsgSizeT status)
 	{
 		*reinterpret_cast<MsgSizeT*>(pBuf) = status;
 	}
 
-	void setStatus(char*& pBuf, MsgSizeT status)
+	void setStatus(char* pBuf, MsgSizeT status)
 	{
 		typename DFMutex::ScopedLock l(_dfMutex);
 		setStatusImpl(pBuf, status);
