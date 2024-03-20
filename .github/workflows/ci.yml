@@ -228,6 +228,7 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-make-visibility-hidden:
+    # macos-12 runs on Intel CPU
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v4
@@ -258,7 +259,8 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-cmake-openssl:
-    runs-on: macos-12
+    # macos-14 runs on Apple Silicon
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -283,7 +285,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3:
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -308,7 +310,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3-visibility-hidden:
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -333,7 +335,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-make-openssl3-tsan:
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
