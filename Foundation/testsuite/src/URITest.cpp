@@ -798,6 +798,15 @@ void URITest::testOther()
 	assertTrue (uri.getRawFragment() == "foo%2Fbar");
 	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#foo%2Fbar");
 	assertTrue (uri.getPathEtc() == "/search?q=hello+world#foo%2Fbar");
+
+	uri = "http://ServerSocket.com/index.html";
+	assertTrue (uri.toString() == "http://serversocket.com/index.html");
+
+	uri = "http+unix://%2Ftmp%2FServerSocket/index.html";
+	assertTrue (uri.toString() == "http+unix://%2Ftmp%2FServerSocket/index.html");
+	std::string decoded;
+	uri.decode("http+unix://%2Ftmp%2FServerSocket/index.html", decoded);
+	assertTrue (decoded == "http+unix:///tmp/ServerSocket/index.html");
 }
 
 
