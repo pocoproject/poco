@@ -1,4 +1,4 @@
-/* dd2a9703e301882afe16d198a82689ab225277057f5eab9d079d8606eab736b4 (2.6.1+)
+/* 2a14271ad4d35e82bde8ba210b4edb7998794bcbae54deab114046a300f9639a (2.6.2+)
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -6258,7 +6258,7 @@ storeEntityValue(XML_Parser parser, const ENCODING *enc,
           dtd->keepProcessing = dtd->standalone;
           goto endEntityValue;
         }
-        if (entity->open) {
+        if (entity->open || (entity == parser->m_declEntity)) {
           if (enc == parser->m_encoding)
             parser->m_eventPtr = entityTextPtr;
           result = XML_ERROR_RECURSIVE_ENTITY_REF;
@@ -7805,6 +7805,8 @@ copyString(const XML_Char *s, const XML_Memory_Handling_Suite *memsuite) {
 
 static float
 accountingGetCurrentAmplification(XML_Parser rootParser) {
+  //                                          1.........1.........12 => 22
+  const size_t lenOfShortestInclude = sizeof("<!ENTITY a SYSTEM 'b'>") - 1;
   const XmlBigCount countBytesOutput
       = rootParser->m_accounting.countBytesDirect
         + rootParser->m_accounting.countBytesIndirect;
@@ -7812,7 +7814,9 @@ accountingGetCurrentAmplification(XML_Parser rootParser) {
       = rootParser->m_accounting.countBytesDirect
             ? (countBytesOutput
                / (float)(rootParser->m_accounting.countBytesDirect))
-            : 1.0f;
+            : ((lenOfShortestInclude
+                + rootParser->m_accounting.countBytesIndirect)
+               / (float)lenOfShortestInclude);
   assert(! rootParser->m_parentParser);
   return amplificationFactor;
 }
