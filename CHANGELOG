@@ -1,8 +1,28 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.13.3 (2024-03-??)
+Release 1.13.3 (2024-03-25)
 ===========================
+
+Summary of Changes:
+
+This is a bugfix release.
+
+Security Fixes:
+
+- GH #4496 Upgrade bundled libexpat to 2.6.2
+
+Features and Enhancements:
+
+- GH #4488 Add Poco::Util::Timer::idle() method to check if timer has any tasks scheduled
+- GH #3807 DNS.resolve() should not be sorted in HostEntry::removeDuplicates()
+
+Bug Fixes and Improvements:
+
+- GH #4505 ODBC Unicode wrappers do not check for null length pointers
+- GH #4492 Poco::BasicMemoryStreamBuf is missing seekpos()
+- GH #4486 DateTimeFormat RFC1036 Sunday name is short (should be long)
+- GH #4468 Poco::URI: don't lowercase host part if it's a Unix domain socket
 
 
 Release 1.13.2 (2024-02-19)
