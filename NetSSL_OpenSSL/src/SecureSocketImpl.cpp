@@ -252,11 +252,11 @@ void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
-        // Don't shut down the socket more than once.
+		// Don't shut down the socket more than once.
 		int shutdownState = ::SSL_get_shutdown(_pSSL);
-        bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
-        if (!shutdownSent)
-        {
+		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
+		if (!shutdownSent)
+		{
 			// A proper clean shutdown would require us to
 			// retry the shutdown if we get a zero return
 			// value, until SSL_shutdown() returns 1.
