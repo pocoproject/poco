@@ -24,6 +24,7 @@ public:
 	WebSocketTest(const std::string& name);
 	~WebSocketTest();
 
+	void testWebSocketTimeout();
 	void testWebSocket();
 	void testWebSocketLarge();
 
