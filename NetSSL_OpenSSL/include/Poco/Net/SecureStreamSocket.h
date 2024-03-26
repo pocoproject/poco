@@ -132,7 +132,7 @@ public:
 		/// a SecureStreamSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	virtual ~SecureStreamSocket();
+	~SecureStreamSocket() override;
 		/// Destroys the StreamSocket.
 
 	SecureStreamSocket& operator = (const Socket& socket);
