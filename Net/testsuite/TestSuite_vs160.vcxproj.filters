@@ -366,7 +366,7 @@
     <ClInclude Include="src\UDPServerTest.h">
       <Filter>UDP\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\UDPServerTestSuite.h">
+    <ClInclude Include="src\AsyncServerTestSuite.h">
       <Filter>UDP\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -569,7 +569,7 @@
     <ClCompile Include="src\UDPServerTest.cpp">
       <Filter>UDP\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\UDPServerTestSuite.cpp">
+    <ClCompile Include="src\AsyncServerTestSuite.cpp">
       <Filter>UDP\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
