@@ -86,6 +86,8 @@ public:
 	void testMove();
 	void testRemove();
 
+	void testEnum();
+
 	void setUp();
 	void tearDown();
 
