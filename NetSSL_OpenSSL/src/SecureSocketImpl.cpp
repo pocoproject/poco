@@ -40,7 +40,7 @@ namespace Net {
 
 
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
-	_pSSL(0),
+	_pSSL(nullptr),
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
 	_needHandshake(false)
@@ -202,7 +202,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	catch (...)
 	{
 		::SSL_free(_pSSL);
-		_pSSL = 0;
+		_pSSL = nullptr;
 		throw;
 	}
 }
@@ -472,7 +472,7 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 		return X509_V_OK;
 	}
 
-	X509* pCert = ::SSL_get_peer_certificate(_pSSL);
+	::X509* pCert = ::SSL_get_peer_certificate(_pSSL);
 	if (pCert)
 	{
 		X509Certificate cert(pCert);
@@ -489,7 +489,7 @@ bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 		SocketAddress addr(hostName, 0);
 		return addr.host().isLoopback();
 	}
-	catch (Poco::Exception&)
+	catch (const Poco::Exception&)
 	{
 		return false;
 	}
@@ -501,7 +501,7 @@ X509* SecureSocketImpl::peerCertificate() const
 	if (_pSSL)
 		return ::SSL_get_peer_certificate(_pSSL);
 	else
-		return 0;
+		return nullptr;
 }
 
 
@@ -639,7 +639,7 @@ void SecureSocketImpl::reset()
 	{
 		::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		::SSL_free(_pSSL);
-		_pSSL = 0;
+		_pSSL = nullptr;
 	}
 }
 

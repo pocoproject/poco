@@ -97,7 +97,7 @@ namespace
 		{
 		}
 
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) override
 		{
 			return new WebSocketRequestHandler(_bufSize);
 		}
