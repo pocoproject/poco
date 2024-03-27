@@ -484,7 +484,7 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
 	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-	    (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	   (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
 	{
 		return X509_V_OK;
 	}
@@ -517,10 +517,17 @@ X509* SecureSocketImpl::peerCertificate() const
 {
 	LockT l(_mutex);
 
+	X509* pCert = nullptr;
+
 	if (_pSSL)
-		return ::SSL_get_peer_certificate(_pSSL);
-	else
-		return nullptr;
+	{
+		pCert = ::SSL_get_peer_certificate(_pSSL);
+		if (X509_V_OK != SSL_get_verify_result(_pSSL))
+			throw CertificateValidationException("SecureSocketImpl::peerCertificate(): "
+				"Certificate verification error " + Utility::getLastError());
+	}
+
+	return pCert;
 }
 
 
