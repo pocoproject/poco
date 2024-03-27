@@ -26,12 +26,19 @@
 #include "Poco/CppParser/Parameter.h"
 #include "Poco/CppParser/TypeDef.h"
 #include "Poco/CppParser/Variable.h"
+#include "Poco/Data/Session.h"
+#include "Poco/Data/SQLite/Connector.h"
 #include <map>
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <vector>
+#include <iostream>
 
 
+using namespace Poco::Data::Keywords;
+using Poco::Data::Session;
+using Poco::Data::Statement;
 using Poco::NumberFormatter;
 using Poco::Path;
 using Poco::DateTime;
@@ -48,6 +55,8 @@ DocWriter::StringMap DocWriter::_strings;
 Poco::Logger* DocWriter::_pLogger(0);
 const std::string DocWriter::RFC_URI("https://www.ietf.org/rfc/rfc");
 const std::string DocWriter::GITHUB_POCO_URI("https://github.com/pocoproject/poco");
+const std::string DocWriter::DATABASE_DIR("/dist/");
+const std::string DocWriter::DATABASE_NAME("docs.db");
 
 
 DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& path, bool prettifyCode, bool noFrames):
@@ -70,11 +79,41 @@ DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& p
 	logger().information(std::string("Loading translation strings [") + _language + "]");
 
 	loadStrings(_language);
+	initDatabase();
 }
 
 
 DocWriter::~DocWriter()
 {
+}
+
+
+void DocWriter::initDatabase()
+{
+	Poco::Data::SQLite::Connector::registerConnector();
+	std::string dbPath = _path + DATABASE_DIR + DATABASE_NAME;
+	Session session("SQLite", dbPath);
+	session << "DROP TABLE IF EXISTS docs", now;
+	session << "CREATE VIRTUAL TABLE docs USING fts5( link, content )", now;
+}
+
+
+void DocWriter::writeSearchIndex(std::string link, std::string content)
+{
+	try
+	{
+		if (!content.empty()) 
+		{
+			Poco::Data::SQLite::Connector::registerConnector();
+			std::string dbPath = _path + DATABASE_DIR + DATABASE_NAME;
+			Session session("SQLite", dbPath);
+			session << "INSERT INTO docs(link, content) VALUES (?, ?)", use(link), use(content), now;
+		}
+	}
+	catch (Poco::Exception& e)
+	{
+		_pLogger->error(e.displayText());
+	}
 }
 
 
@@ -208,7 +247,7 @@ void DocWriter::writeNavigation()
 	ostr << "<div>&nbsp;</div>\n"; // workaround to avoid cutting off a few pixels from last line
 	endBody(ostr);
 	ostr << "<script>CollapsibleLists.apply(true)</script>" << std::endl;
-	writeFooter(ostr, NO_TRACKING | NO_CUSTOM_HTML);
+	writeFooter(ostr, NO_TRACKING);
 }
 
 
@@ -386,6 +425,7 @@ void DocWriter::writeClass(const Struct* pStruct)
 	_pNameSpace = pStruct;
 	std::string path(pathFor(fileNameFor(pStruct)));
 	std::ofstream ostr(path.c_str());
+	std::ostringstream sstr;
 	if (!ostr.good()) throw Poco::CreateFileException(path);
 	std::string header;
 	if (pStruct->isClass())
@@ -410,7 +450,7 @@ void DocWriter::writeClass(const Struct* pStruct)
 			logger().notice(std::string("TODO in class documentation for ") + pStruct->fullName());
 
 		writeSubTitle(ostr, tr("Description"));
-		writeDescription(ostr, pStruct->getDocumentation());
+		writeDescription(ostr, pStruct->getDocumentation(), &sstr);
 	}
 	else if (pStruct->isPublic() && !pStruct->isDerived())
 	{
@@ -419,23 +459,25 @@ void DocWriter::writeClass(const Struct* pStruct)
 	writeInheritance(ostr, pStruct);
 	writeMethodSummary(ostr, pStruct);
 	writeNestedClasses(ostr, pStruct);
-	writeTypes(ostr, pStruct);
-	writeAliases(ostr, pStruct);
-	writeEnums(ostr, pStruct);
+	writeTypes(ostr, pStruct, &sstr);
+	writeAliases(ostr, pStruct, &sstr);
+	writeEnums(ostr, pStruct, &sstr);
 	writeConstructors(ostr, pStruct);
 	writeDestructor(ostr, pStruct);
 	writeMethods(ostr, pStruct);
-	writeVariables(ostr, pStruct);
+	writeVariables(ostr, pStruct, &sstr);
 	writeCopyright(ostr);
 	endContent(ostr);
 	endBody(ostr);
 	writeFooter(ostr);
+	writeSearchIndex(fileNameFor(pStruct), sstr.str());
 }
 
 
 void DocWriter::writeNameSpace(const NameSpace* pNameSpace)
 {
 	_pNameSpace = pNameSpace;
+	std::ostringstream sstr;
 	std::string path(pathFor(fileNameFor(pNameSpace)));
 	std::ofstream ostr(path.c_str());
 	if (!ostr.good()) throw Poco::CreateFileException(path);
@@ -445,22 +487,23 @@ void DocWriter::writeNameSpace(const NameSpace* pNameSpace)
 	writeNavigationFrame(ostr, "", "");
 	beginContent(ostr);
 	writeSubTitle(ostr, tr("Overview"));
-	writeNameSpacesSummary(ostr, pNameSpace);
-	writeClassesSummary(ostr, pNameSpace);
-	writeTypesSummary(ostr, pNameSpace);
-	writeAliasesSummary(ostr, pNameSpace);
-	writeFunctionsSummary(ostr, pNameSpace);
-	writeNameSpaces(ostr, pNameSpace);
-	writeClasses(ostr, pNameSpace);
-	writeTypes(ostr, pNameSpace);
-	writeAliases(ostr, pNameSpace);
-	writeEnums(ostr, pNameSpace);
-	writeFunctions(ostr, pNameSpace);
-	writeVariables(ostr, pNameSpace);
+	writeNameSpacesSummary(ostr, pNameSpace, &sstr);
+	writeClassesSummary(ostr, pNameSpace, &sstr);
+	writeTypesSummary(ostr, pNameSpace, &sstr);
+	writeAliasesSummary(ostr, pNameSpace, &sstr);
+	writeFunctionsSummary(ostr, pNameSpace, &sstr);
+	writeNameSpaces(ostr, pNameSpace, &sstr);
+	writeClasses(ostr, pNameSpace, &sstr);
+	writeTypes(ostr, pNameSpace, &sstr);
+	writeAliases(ostr, pNameSpace, &sstr);
+	writeEnums(ostr, pNameSpace, &sstr);
+	writeFunctions(ostr, pNameSpace, &sstr);
+	writeVariables(ostr, pNameSpace, &sstr);
 	writeCopyright(ostr);
 	endContent(ostr);
 	endBody(ostr);
 	writeFooter(ostr);
+	writeSearchIndex(fileNameFor(pNameSpace), sstr.str());
 }
 
 
@@ -468,6 +511,7 @@ void DocWriter::writePackage(const std::string& file, const std::string& library
 {
 	std::string path(pathFor(file));
 	std::ofstream ostr(path.c_str());
+	std::ostringstream sstr;
 	if (!ostr.good()) throw Poco::CreateFileException(path);
 	writeHeader(ostr, tr("Package_Index"), "js/iframeResizer.min.js");
 	writeTitle(ostr, tr("Library") + " " + library, tr("Package") + " " + package);
@@ -561,6 +605,7 @@ void DocWriter::writePackage(const std::string& file, const std::string& library
 	endContent(ostr);
 	endBody(ostr);
 	writeFooter(ostr);
+	writeSearchIndex(file, sstr.str());
 }
 
 
@@ -641,6 +686,7 @@ void DocWriter::writeHeader(std::ostream& ostr, const std::string& title, const 
 	ostr << "<meta name=\"author\" content=\"" << htmlize(company) << "\"/>" << std::endl;
 	ostr << "<meta name=\"generator\" content=\"" << app.config().getString("PocoDoc.generator", "PocoDoc") << "\"/>" << std::endl;
 	ostr << "<link rel=\"stylesheet\" href=\"css/styles.css\" type=\"text/css\"/>" << std::endl;
+	ostr << "<link rel=\"stylesheet\" href=\"css/header.css\" type=\"text/css\"/>\n";
 	if (_prettifyCode)
 	{
 		ostr << "<link href=\"css/prettify.css\" type=\"text/css\" rel=\"stylesheet\"/>" << std::endl;
@@ -705,7 +751,73 @@ void DocWriter::writeCopyright(std::ostream& ostr)
 	}
 	ostr << "</p>\n";
 }
+void DocWriter::writeSearchBox(std::ostream& ostr)
+{
+   	ostr << "<div class=\"search-box\" style=\"text-align: center;\">\n";
+    ostr << "<input type=\"text\" id=\"search\" name=\"search\" placeholder=\"Search...\">\n";
+    ostr << "<div id=\"suggestions\"></div>\n";
+    ostr << "</div>\n";
 
+    ostr << "<script type=\"module\">\n";
+    ostr << "import { load } from \"./dist/sql-httpvfs.js\";\n\n";
+    ostr << "let db = null;\n\n";
+    ostr << "async function initDb() {\n";
+    ostr << "    db = await load(\"./docs.db\");\n";
+    ostr << "}\n\n";
+    ostr << "async function searchPages(searchTerm) {\n";
+    ostr << "    if (!db || !searchTerm) return [];\n\n";
+    ostr << "    try {\n";
+    ostr << "        const query = `SELECT link, content, snippet(docs, 1, '<b>', '</b>', '...',10) as snippet FROM docs WHERE docs MATCH \"${searchTerm}\" ORDER BY RANK`;\n";
+    ostr << "        const results = await db.query(query);\n";
+    ostr << "        return results;\n";
+    ostr << "    } catch (error) {\n";
+    ostr << "        console.error(\"Error searching pages:\", error);\n";
+    ostr << "        return [];\n";
+    ostr << "    }\n";
+    ostr << "}\n\n";
+	ostr << "function escapeHTML(text) {\n";
+	ostr << "    const div = document.createElement('div');\n";
+	ostr << "    div.textContent = text;\n";
+	ostr << "    return div.innerHTML.replace(/&lt;(\\/)?b&gt;/g, '<$1b>');\n";
+	ostr << "}\n\n";
+    ostr << "document.addEventListener(\"DOMContentLoaded\", () => {\n";
+    ostr << "    document\n";
+    ostr << "      .getElementById(\"search\")\n";
+    ostr << "      .addEventListener(\"keyup\", async (event) => {\n";
+    ostr << "        const searchTerm = event.target.value.toLowerCase();\n";
+    ostr << "        const suggestionsEl = document.getElementById(\"suggestions\");\n\n";
+    ostr << "        if (searchTerm.length < 3) {\n";
+    ostr << "          suggestionsEl.style.display = \"none\";\n";
+    ostr << "          return;\n";
+    ostr << "        }\n\n";
+    ostr << "        const searchResults = await searchPages(searchTerm);\n";
+	ostr << "        let suggestions = \"\";\n\n";
+	ostr << "        if (searchResults.length === 0) {\n";
+	ostr << "          suggestions = \"<div>No search results found.</div>\";\n";
+	ostr << "        } else {\n";
+	ostr << "          for (const page of searchResults) {\n";
+	ostr << "             suggestions += `<a href=\"${page.link}\">${escapeHTML(page.snippet)}</a>`;\n";
+	ostr << "          }\n";
+	ostr << "        }\n\n";
+	ostr << "        suggestionsEl.innerHTML = suggestions;\n";
+	ostr << "        suggestionsEl.style.display = \"block\";\n";
+	ostr << "      });\n\n";
+    ostr << "    document.getElementById(\"search\").addEventListener(\"blur\", () => {\n";
+    ostr << "      setTimeout(() => {\n";
+    ostr << "        document.getElementById(\"suggestions\").style.display = \"none\";\n";
+    ostr << "      }, 100);\n";
+    ostr << "    });\n\n";
+    ostr << "    document.getElementById(\"search\").addEventListener(\"focus\", () => {\n";
+    ostr << "      if (document.getElementById(\"suggestions\").children.length > 0) {\n";
+    ostr << "        document.getElementById(\"suggestions\").style.display = \"block\";\n";
+    ostr << "      }\n";
+    ostr << "    });\n";
+    ostr << "  });\n\n";
+    ostr << "initDb();\n";
+    ostr << "</script>\n";
+
+    ostr << "\n</div>\n";
+}
 
 void DocWriter::writeTitle(std::ostream& ostr, const std::string& category, const std::string& title)
 {
@@ -716,14 +828,14 @@ void DocWriter::writeTitle(std::ostream& ostr, const std::string& category, cons
 	{
 		ostr << "<img src=\"" << headerImage << "\" alt=\"\">\n";
 	}
-	ostr << "<h1 class=\"category\">";
+
 	if (category.empty())
 		ostr << "&nbsp;";
 	else
-		ostr << htmlize(category);
-	ostr << "</h1>\n";
-	ostr << "<h1 class=\"title\">"  << htmlize(title) << "</h1>";
-	ostr << "\n</div>\n";
+			ostr << "<h1 class=\"category\">" << htmlize(category) << "</h1>";
+
+	ostr << "<h1 class=\"title\">" << htmlize(title) << "</h1>";
+	writeSearchBox(ostr);
 }
 
 
@@ -786,6 +898,7 @@ void DocWriter::writeTitle(std::ostream& ostr, const NameSpace* pNameSpace, cons
 		     << "</h1>";
 	}
 	ostr << "\n</div>\n";
+	writeSearchBox(ostr);
 }
 
 
@@ -808,7 +921,7 @@ void DocWriter::writeNavigationFrame(std::ostream& ostr, const std::string& grou
 		query += item;
 	}
 	ostr << "<div id=\"navigation\">\n";
-	ostr << "<iframe sandbox=\"allow-scripts allow-top-navigation-by-user-activation allow-same-origin\" src=\"navigation.html" << query << "\" onload=\"iFrameResize(this);\" scrolling=\"no\"></iframe>\n";
+	ostr << "<iframe src=\"navigation.html" << query << "\" onload=\"iFrameResize(this);\" scrolling=\"no\"></iframe>\n";
 	ostr << "</div>\n";
 }
 
@@ -837,16 +950,20 @@ void DocWriter::endContent(std::ostream& ostr)
 }
 
 
-void DocWriter::writeDescription(std::ostream& ostr, const std::string& text)
+void DocWriter::writeDescription(std::ostream& ostr, const std::string& text, std::ostream* pSstr)
 {
 	ostr << "<div class=\"description\">\n"
-	     << "<p>";
+		 << "<p>";
 
 	_titleId = 0;
 	_htmlMode = false;
 	TextState state = TEXT_PARAGRAPH;
 	std::string::const_iterator it  = text.begin();
 	std::string::const_iterator end = text.end();
+	if (pSstr)
+	{
+		*pSstr << text;
+	}
 	while (it != end)
 	{
 		std::string line;
@@ -1148,9 +1265,8 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 				}
 				begin = it;
 			}
-			if (token == "GH" || token == "PR")
+			if (token == "GH")
 			{
-				bool isPR = token == "PR";
 				std::string uri(GITHUB_POCO_URI);
 				std::string::const_iterator it(begin);
 				std::string spc;
@@ -1172,7 +1288,7 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 						nextToken(begin, end, n);
 						if (!n.empty() && std::isdigit(n[0]))
 						{
-							uri += isPR ? "/pull/" : "/issues/";
+							uri += "/issues/";
 							uri += n;
 							writeTargetLink(ostr, uri, token + " #" + n, "_blank");
 							nextToken(begin, end, token);
@@ -1300,7 +1416,7 @@ bool DocWriter::writeSpecial(std::ostream& ostr, std::string& token, std::string
 	{
 		_htmlMode = false;
 	}
-	else if (token == "<?" || token == "<?=")
+	else if (token == "<?")
 	{
 		std::string prop;
 		nextToken(begin, end, token);
@@ -1312,19 +1428,6 @@ bool DocWriter::writeSpecial(std::ostream& ostr, std::string& token, std::string
 		Poco::trimInPlace(prop);
 		Application& app = Application::instance();
 		ostr << htmlize(app.config().getString(prop, std::string("NOT FOUND: ") + prop));
-	}
-	else if (token == "<?-")
-	{
-		std::string prop;
-		nextToken(begin, end, token);
-		while (!token.empty() && token != "?>")
-		{
-			prop.append(token);
-			nextToken(begin, end, token);
-		}
-		Poco::trimInPlace(prop);
-		Application& app = Application::instance();
-		ostr << app.config().getString(prop, "");
 	}
 	else if (_htmlMode)
 	{
@@ -1401,10 +1504,7 @@ void DocWriter::nextToken(std::string::const_iterator& it, const std::string::co
 	{
 		token += *it++;
 		if (it != end && std::ispunct(*it)) token += *it++;
-		if (token != "<[" && token != "<*" && token != "<!")
-		{
-			if (it != end && std::ispunct(*it)) token += *it++;
-		}
+		if (it != end && std::ispunct(*it)) token += *it++;
 	}
 	else if (it != end && *it == '[')
 	{
@@ -1656,7 +1756,7 @@ void DocWriter::writeNestedClasses(std::ostream& ostr, const Struct* pStruct)
 }
 
 
-void DocWriter::writeNameSpacesSummary(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeNameSpacesSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable nameSpaces;
 	pNameSpace->nameSpaces(nameSpaces);
@@ -1673,7 +1773,7 @@ void DocWriter::writeNameSpacesSummary(std::ostream& ostr, const NameSpace* pNam
 }
 
 
-void DocWriter::writeNameSpaces(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeNameSpaces(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable nameSpaces;
 	pNameSpace->nameSpaces(nameSpaces);
@@ -1692,7 +1792,7 @@ void DocWriter::writeNameSpaces(std::ostream& ostr, const NameSpace* pNameSpace)
 }
 
 
-void DocWriter::writeClassesSummary(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeClassesSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable classes;
 	pNameSpace->classes(classes);
@@ -1709,7 +1809,7 @@ void DocWriter::writeClassesSummary(std::ostream& ostr, const NameSpace* pNameSp
 }
 
 
-void DocWriter::writeClasses(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeClasses(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable classes;
 	pNameSpace->classes(classes);
@@ -1741,7 +1841,7 @@ void DocWriter::writeClassSummary(std::ostream& ostr, const Struct* pStruct)
 }
 
 
-void DocWriter::writeTypesSummary(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeTypesSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable types;
 	pNameSpace->typeDefs(types);
@@ -1758,7 +1858,7 @@ void DocWriter::writeTypesSummary(std::ostream& ostr, const NameSpace* pNameSpac
 }
 
 
-void DocWriter::writeAliasesSummary(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeAliasesSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable types;
 	pNameSpace->typeAliases(types);
@@ -1775,7 +1875,7 @@ void DocWriter::writeAliasesSummary(std::ostream& ostr, const NameSpace* pNameSp
 }
 
 
-void DocWriter::writeTypes(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeTypes(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable types;
 	pNameSpace->typeDefs(types);
@@ -1791,13 +1891,13 @@ void DocWriter::writeTypes(std::ostream& ostr, const NameSpace* pNameSpace)
 		for (NameSpace::Iterator it = types.begin(); it != types.end(); ++it)
 		{
 			if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-				writeType(ostr, static_cast<const TypeDef*>(it->second));
+				writeType(ostr, static_cast<const TypeDef*>(it->second), pSstr);
 		}
 	}
 }
 
 
-void DocWriter::writeAliases(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeAliases(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable types;
 	pNameSpace->typeAliases(types);
@@ -1813,13 +1913,13 @@ void DocWriter::writeAliases(std::ostream& ostr, const NameSpace* pNameSpace)
 		for (NameSpace::Iterator it = types.begin(); it != types.end(); ++it)
 		{
 			if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-				writeType(ostr, static_cast<const TypeDef*>(it->second));
+				writeType(ostr, static_cast<const TypeDef*>(it->second), pSstr);
 		}
 	}
 }
 
 
-void DocWriter::writeType(std::ostream& ostr, const TypeDef* pType)
+void DocWriter::writeType(std::ostream& ostr, const TypeDef* pType, std::ostream* pSstr)
 {
 	ostr << "<h3>";
 	writeAnchor(ostr, pType->name(), pType);
@@ -1829,11 +1929,11 @@ void DocWriter::writeType(std::ostream& ostr, const TypeDef* pType)
 	ostr << "<p class=\"decl\">";
 	writeDecl(ostr, pType->declaration());
 	ostr << ";</p>\n";
-	writeDescription(ostr, pType->getDocumentation());
+	writeDescription(ostr, pType->getDocumentation(), pSstr);
 }
 
 
-void DocWriter::writeEnums(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeEnums(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable enums;
 	pNameSpace->enums(enums);
@@ -1849,13 +1949,13 @@ void DocWriter::writeEnums(std::ostream& ostr, const NameSpace* pNameSpace)
 		for (NameSpace::Iterator it = enums.begin(); it != enums.end(); ++it)
 		{
 			if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-				writeEnum(ostr, static_cast<const Enum*>(it->second));
+				writeEnum(ostr, static_cast<const Enum*>(it->second), pSstr);
 		}
 	}
 }
 
 
-void DocWriter::writeEnum(std::ostream& ostr, const Enum* pEnum)
+void DocWriter::writeEnum(std::ostream& ostr, const Enum* pEnum, std::ostream* pSstr)
 {
 	ostr << "<h3>";
 	const std::string& name = pEnum->name();
@@ -1866,7 +1966,7 @@ void DocWriter::writeEnum(std::ostream& ostr, const Enum* pEnum)
 	if (pEnum->getAccess() != Symbol::ACC_PUBLIC)
 		writeIcon(ostr, "protected");
 	ostr << "</h3>\n";
-	writeDescription(ostr, pEnum->getDocumentation());
+	writeDescription(ostr, pEnum->getDocumentation(), pSstr);
 	for (Enum::Iterator it = pEnum->begin(); it != pEnum->end(); ++it)
 	{
 		const std::string& name = (*it)->name();
@@ -1876,7 +1976,7 @@ void DocWriter::writeEnum(std::ostream& ostr, const Enum* pEnum)
 		if (!value.empty())
 			ostr << " = " << htmlize(value);
 		ostr << "</p>\n";
-		writeDescription(ostr, (*it)->getDocumentation());
+		writeDescription(ostr, (*it)->getDocumentation(), pSstr);
 	}
 }
 
@@ -1928,7 +2028,7 @@ void DocWriter::writeMethods(std::ostream& ostr, const Struct* pStruct)
 }
 
 
-void DocWriter::writeFunctionsSummary(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeFunctionsSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable funcs;
 	pNameSpace->functions(funcs);
@@ -1950,7 +2050,7 @@ void DocWriter::writeFunctionsSummary(std::ostream& ostr, const NameSpace* pName
 }
 
 
-void DocWriter::writeFunctions(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeFunctions(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable funcs;
 	pNameSpace->functions(funcs);
@@ -1965,7 +2065,7 @@ void DocWriter::writeFunctions(std::ostream& ostr, const NameSpace* pNameSpace)
 }
 
 
-void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
+void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc, std::ostream* pSstr)
 {
 	ostr << "<h3>";
 	writeAnchor(ostr, pFunc->name(), pFunc);
@@ -1979,12 +2079,6 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 		writeIcon(ostr, "inline");
 	ostr << "</h3>\n";
 	ostr << "<p class=\"decl\">";
-
-	const std::string& attrs = pFunc->getAttributeList();
-	if (!attrs.empty())
-	{
-		ostr << "<i>" << htmlize(attrs) << "</i><br />";
-	}
 	const std::string& decl = pFunc->declaration();
 	writeDecl(ostr, decl);
 	if (!std::isalnum(decl[decl.length() - 1]))
@@ -2022,7 +2116,7 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 		ostr << " = 0";
 	ostr << ";</p>\n";
 
-	if (pFunc->attrs().has("deprecated") || pFunc->getAttributeList().compare(0, 12, "[[deprecated") == 0)
+	if (pFunc->attrs().has("deprecated"))
 	{
 		writeDeprecated(ostr, "function");
 	}
@@ -2032,7 +2126,7 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 	if (doc.empty() && pFunc->isPublic() && !pOverridden && !pFunc->isConstructor() && !pFunc->isDestructor())
 		logger().notice(std::string("Undocumented public function: ") + pFunc->fullName());
 
-	writeDescription(ostr, doc);
+	writeDescription(ostr, doc, pSstr);
 	if (pOverridden)
 	{
 		ostr << "<div class=\"description\"><p><b>" << tr("See_also") << ":</b> ";
@@ -2042,7 +2136,7 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 }
 
 
-void DocWriter::writeVariables(std::ostream& ostr, const NameSpace* pNameSpace)
+void DocWriter::writeVariables(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable vars;
 	pNameSpace->variables(vars);
@@ -2059,18 +2153,18 @@ void DocWriter::writeVariables(std::ostream& ostr, const NameSpace* pNameSpace)
 		for (NameSpace::Iterator it = vars.begin(); it != vars.end(); ++it)
 		{
 			if (it->second->getAccess() == Symbol::ACC_PUBLIC)
-				writeVariable(ostr, static_cast<const Variable*>(it->second));
+				writeVariable(ostr, static_cast<const Variable*>(it->second), pSstr);
 		}
 		for (NameSpace::Iterator it = vars.begin(); it != vars.end(); ++it)
 		{
 			if (it->second->getAccess() == Symbol::ACC_PROTECTED)
-				writeVariable(ostr, static_cast<const Variable*>(it->second));
+				writeVariable(ostr, static_cast<const Variable*>(it->second), pSstr);
 		}
 	}
 }
 
 
-void DocWriter::writeVariable(std::ostream& ostr, const Variable* pVar)
+void DocWriter::writeVariable(std::ostream& ostr, const Variable* pVar, std::ostream* pSstr)
 {
 	ostr << "<h3>";
 	writeAnchor(ostr, pVar->name(), pVar);
@@ -2082,7 +2176,7 @@ void DocWriter::writeVariable(std::ostream& ostr, const Variable* pVar)
 	ostr << "<p class=\"decl\">";
 	writeDecl(ostr, pVar->declaration());
 	ostr << ";</p>\n";
-	writeDescription(ostr, pVar->getDocumentation());
+	writeDescription(ostr, pVar->getDocumentation(), pSstr);
 }
 
 
@@ -2311,6 +2405,7 @@ void DocWriter::writePage(Page& page)
 
 	std::string path(pathFor(page.fileName));
 	std::ofstream ostr(path.c_str());
+	std::ostringstream sstr;
 	if (!ostr.good()) throw Poco::CreateFileException(path);
 	writeHeader(ostr, title, "js/iframeResizer.min.js");
 	writeTitle(ostr, tr(category), title);
@@ -2321,12 +2416,13 @@ void DocWriter::writePage(Page& page)
 	{
 		writeTOC(ostr, toc);
 	}
-	writeDescription(ostr, text);
+	writeDescription(ostr, text, &sstr);
 	writeCopyright(ostr);
 	endContent(ostr);
 	endBody(ostr);
 	ostr << "<script>CollapsibleLists.apply(true)</script>" << std::endl;
 	writeFooter(ostr);
+	writeSearchIndex(page.fileName, sstr.str());
 }
 
 
