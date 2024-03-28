@@ -248,7 +248,7 @@ inline Poco::Any SessionImpl::getCursorUse(const std::string&) const
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
 	SQLULEN value = static_cast<SQLUINTEGER>(timeout);
-	_db.setTimeout(value);
+	_db.setTimeout(static_cast<int>(value));
 }
 
 

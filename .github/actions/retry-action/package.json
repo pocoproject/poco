@@ -35,7 +35,7 @@
 		"@types/babel-generator": "^6.25.7",
 		"@types/jest": "^28.1.6",
 		"@types/milliseconds": "0.0.30",
-		"@types/node": "^16.11.7",
+		"@types/node": "^20.11.24",
 		"@typescript-eslint/eslint-plugin": "^5.32.0",
 		"@typescript-eslint/parser": "^5.32.0",
 		"@vercel/ncc": "^0.38.1",

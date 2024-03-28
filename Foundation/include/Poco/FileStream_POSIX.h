@@ -52,6 +52,9 @@ public:
 	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out);
 		/// Change to specified position, according to mode.
 
+	void flushToDisk();
+		/// Forces buffered data to be written to the disk
+
 	NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 	
