@@ -12,8 +12,8 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 
 add_executable(NetSSL-testrunner ${TEST_SRCS})
 
-add_executable(NetSSL-server ping/websocket-server.cpp)
-add_executable(NetSSL-client ping/websocket-client.cpp)
+add_executable(NetSSL-server ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-server.cpp)
+add_executable(NetSSL-client ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-client.cpp)
 
 if(ANDROID)
 	add_test(
