@@ -21,6 +21,8 @@
 #include "Poco/Thread.h"
 #include "Poco/Util/Application.h"
 
+#include <iostream>
+
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPServerResponse;
