@@ -12,9 +12,6 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 
 add_executable(NetSSL-testrunner ${TEST_SRCS})
 
-add_executable(NetSSL-server ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-server.cpp)
-add_executable(NetSSL-client ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-client.cpp)
-
 if(ANDROID)
 	add_test(
 		NAME NetSSL
@@ -36,16 +33,28 @@ else()
 		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/dhparams.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-testrunner.xml
 	)
+endif()
+target_link_libraries(NetSSL-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML CppUnit)
 
-	add_custom_command(
-		TARGET NetSSL-server POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-server.xml
-	)
+
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-server.cpp)
+	add_executable(NetSSL-server ping/websocket-server.cpp)
+	target_link_libraries(NetSSL-server PUBLIC Poco::NetSSL Poco::Util)
+	if (NOT ANDROID)
+		add_custom_command(
+			TARGET NetSSL-server POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-server.xml
+		)
+	endif()
+endif()
+
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-client.cpp)
+	add_executable(NetSSL-client ping/websocket-client.cpp)
+	target_link_libraries(NetSSL-client PUBLIC Poco::NetSSL Poco::Util)
+	if (NOT ANDROID)
 	add_custom_command(
 		TARGET NetSSL-client POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-client.xml
 	)
+	endif()
 endif()
-target_link_libraries(NetSSL-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML CppUnit)
-target_link_libraries(NetSSL-server PUBLIC Poco::NetSSL Poco::Util)
-target_link_libraries(NetSSL-client PUBLIC Poco::NetSSL Poco::Util)
