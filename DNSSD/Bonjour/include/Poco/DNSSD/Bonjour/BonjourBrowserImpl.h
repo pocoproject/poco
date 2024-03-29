@@ -9,8 +9,8 @@
 //
 // Definition of the BonjourBrowserImpl class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -42,10 +42,10 @@ class POCO_DNSSD_Bonjour_API BonjourBrowserImpl: public DNSSDBrowser
 public:
 	BonjourBrowserImpl(EventLoop& eventLoop);
 		/// Creates the BonjourBrowserImpl.
-		
+
 	~BonjourBrowserImpl();
 		/// Destroys the BonjourBrowserImpl.
-		
+
 	// DNSSDBrowser
 	BrowseHandle browse(const std::string& regType, const std::string& domain, int options, Poco::Int32 networkInterface);
 	BrowseHandle resolve(const Service& service, int options);
@@ -54,7 +54,7 @@ public:
 	BrowseHandle queryRecord(const std::string& name, Poco::UInt16 type, Poco::UInt16 clazz, int options, Poco::Int32 networkInterface);
 	BrowseHandle resolveHost(const std::string& host, int options, Poco::Int32 networkInterface);
 	void cancel(BrowseHandle& browseHandle);
-	
+
 	// Implementation
 	void onBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char* serviceName,  const char* regtype, const char* domain);
 	void onResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char* fullName, const char* host, uint16_t port, uint16_t txtLen, const unsigned char* txtRecord);

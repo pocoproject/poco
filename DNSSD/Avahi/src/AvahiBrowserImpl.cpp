@@ -7,8 +7,8 @@
 // Package: Implementation
 // Module:  AvahiBrowserImpl
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -30,13 +30,13 @@ namespace Avahi {
 
 
 extern "C" void onBrowseReply(
-	AvahiServiceBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* name, 
-	const char* type, 
-	const char* domain, 
+	AvahiServiceBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* name,
+	const char* type,
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -52,17 +52,17 @@ extern "C" void onBrowseReply(
 
 
 extern "C" void onResolveReply(
-	AvahiServiceResolver* resolver, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiResolverEvent event, 
-	const char* name, 
-	const char* type, 
-	const char* domain, 
-	const char* host, 
-	const AvahiAddress* a, 
-	uint16_t port, 
-	AvahiStringList* txt, 
+	AvahiServiceResolver* resolver,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiResolverEvent event,
+	const char* name,
+	const char* type,
+	const char* domain,
+	const char* host,
+	const AvahiAddress* a,
+	uint16_t port,
+	AvahiStringList* txt,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -78,11 +78,11 @@ extern "C" void onResolveReply(
 
 
 extern "C" void onEnumerateBrowseDomainsReply(
-	AvahiDomainBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* domain, 
+	AvahiDomainBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -98,11 +98,11 @@ extern "C" void onEnumerateBrowseDomainsReply(
 
 
 extern "C" void onEnumerateDefaultBrowseDomainsReply(
-	AvahiDomainBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* domain, 
+	AvahiDomainBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -122,11 +122,11 @@ extern "C" void onEnumerateDefaultBrowseDomainsReply(
 
 
 extern "C" void onEnumerateRegistrationDomainsReply(
-	AvahiDomainBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* domain, 
+	AvahiDomainBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -142,11 +142,11 @@ extern "C" void onEnumerateRegistrationDomainsReply(
 
 
 extern "C" void onEnumerateDefaultRegistrationDomainsReply(
-	AvahiDomainBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* domain, 
+	AvahiDomainBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -166,15 +166,15 @@ extern "C" void onEnumerateDefaultRegistrationDomainsReply(
 
 
 extern "C" void onQueryRecordReply(
-	AvahiRecordBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* name, 
-	uint16_t clazz, 
-	uint16_t type, 
-	const void* data, 
-	std::size_t size, 
+	AvahiRecordBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* name,
+	uint16_t clazz,
+	uint16_t type,
+	const void* data,
+	std::size_t size,
 	AvahiLookupResultFlags flags,
 	void* context)
 {
@@ -199,14 +199,14 @@ AvahiBrowserImpl::~AvahiBrowserImpl()
 {
 }
 
-	
+
 BrowseHandle AvahiBrowserImpl::browse(const std::string& regType, const std::string& domain, int options, Poco::Int32 networkInterface)
 {
 	AvahiResponderImpl::ScopedLock lock(_responder);
-	
+
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
 	AvahiServiceBrowser* browser = avahi_service_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, regType.c_str(), domain.empty() ? NULL : domain.c_str(), (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onBrowseReply, this);
-	if (!browser) 
+	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to browse for " + regType, AvahiResponderImpl::describeError(error), error);
@@ -221,7 +221,7 @@ BrowseHandle AvahiBrowserImpl::resolve(const Service& service, int options)
 
 	AvahiIfIndex ifIndex = service.networkInterface();
 	AvahiServiceResolver* resolver = avahi_service_resolver_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, service.name().c_str(), service.type().c_str(), service.domain().c_str(), AVAHI_PROTO_UNSPEC, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onResolveReply, this);
-	if (!resolver) 
+	if (!resolver)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to resolve service " + service.name(), AvahiResponderImpl::describeError(error), error);
@@ -236,13 +236,13 @@ BrowseHandle AvahiBrowserImpl::enumerateBrowseDomains(Poco::Int32 networkInterfa
 
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
 	AvahiDomainBrowser* browser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_BROWSE, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateBrowseDomainsReply, this);
-	if (!browser) 
+	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to enumerate browse domains", AvahiResponderImpl::describeError(error), error);
 	}
 	AvahiDomainBrowser* defaultBrowser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_BROWSE_DEFAULT, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateDefaultBrowseDomainsReply, this);
-	if (!defaultBrowser) 
+	if (!defaultBrowser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		avahi_domain_browser_free(browser);
@@ -258,13 +258,13 @@ BrowseHandle AvahiBrowserImpl::enumerateRegistrationDomains(Poco::Int32 networkI
 
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
 	AvahiDomainBrowser* browser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_REGISTER, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateRegistrationDomainsReply, this);
-	if (!browser) 
+	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to enumerate registration domains", AvahiResponderImpl::describeError(error), error);
 	}
 	AvahiDomainBrowser* defaultBrowser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_REGISTER_DEFAULT, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateDefaultRegistrationDomainsReply, this);
-	if (!defaultBrowser) 
+	if (!defaultBrowser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		avahi_domain_browser_free(browser);
@@ -280,7 +280,7 @@ BrowseHandle AvahiBrowserImpl::queryRecord(const std::string& name, Poco::UInt16
 
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
 	AvahiRecordBrowser* browser = avahi_record_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, name.c_str(), clazz, type, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onQueryRecordReply, this);
-	if (!browser) 
+	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to query for record", AvahiResponderImpl::describeError(error), error);
@@ -336,13 +336,13 @@ void AvahiBrowserImpl::cancel(BrowseHandle& browseHandle)
 
 
 void AvahiBrowserImpl::onBrowseReply(
-	AvahiServiceBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* name, 
-	const char* type, 
-	const char* domain, 
+	AvahiServiceBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* name,
+	const char* type,
+	const char* domain,
 	AvahiLookupResultFlags flags)
 {
 	AvahiResponderImpl::ScopedLock lock(_responder);
@@ -372,17 +372,17 @@ void AvahiBrowserImpl::onBrowseReply(
 
 
 void AvahiBrowserImpl::onResolveReply(
-	AvahiServiceResolver* resolver, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiResolverEvent event, 
-	const char* name, 
-	const char* type, 
-	const char* domain, 
-	const char* host, 
-	const AvahiAddress* a, 
-	uint16_t port, 
-	AvahiStringList* txt, 
+	AvahiServiceResolver* resolver,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiResolverEvent event,
+	const char* name,
+	const char* type,
+	const char* domain,
+	const char* host,
+	const AvahiAddress* a,
+	uint16_t port,
+	AvahiStringList* txt,
 	AvahiLookupResultFlags flags)
 {
 	AvahiResponderImpl::ScopedLock lock(_responder);
@@ -426,11 +426,11 @@ void AvahiBrowserImpl::onResolveReply(
 
 
 void AvahiBrowserImpl::onEnumerateBrowseDomainsReply(
-	AvahiDomainBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
+	AvahiDomainBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
 	AvahiBrowserEvent event,
-	const char* domain, 
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	bool isDefault)
 {
@@ -462,11 +462,11 @@ void AvahiBrowserImpl::onEnumerateBrowseDomainsReply(
 
 
 void AvahiBrowserImpl::onEnumerateRegistrationDomainsReply(
-	AvahiDomainBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* domain, 
+	AvahiDomainBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* domain,
 	AvahiLookupResultFlags flags,
 	bool isDefault)
 {
@@ -498,15 +498,15 @@ void AvahiBrowserImpl::onEnumerateRegistrationDomainsReply(
 
 
 void AvahiBrowserImpl::onQueryRecordReply(
-	AvahiRecordBrowser* browser, 
-	AvahiIfIndex interface, 
-	AvahiProtocol protocol, 
-	AvahiBrowserEvent event, 
-	const char* name, 
-	uint16_t clazz, 
-	uint16_t type, 
-	const void* data, 
-	std::size_t size, 
+	AvahiRecordBrowser* browser,
+	AvahiIfIndex interface,
+	AvahiProtocol protocol,
+	AvahiBrowserEvent event,
+	const char* name,
+	uint16_t clazz,
+	uint16_t type,
+	const void* data,
+	std::size_t size,
 	AvahiLookupResultFlags flags)
 {
 	AvahiResponderImpl::ScopedLock lock(_responder);

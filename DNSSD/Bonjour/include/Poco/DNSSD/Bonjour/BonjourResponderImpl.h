@@ -9,8 +9,8 @@
 //
 // Definition of the BonjourResponderImpl class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -39,14 +39,14 @@ class POCO_DNSSD_Bonjour_API BonjourResponderImpl: public Poco::DNSSD::DNSSDResp
 public:
 	BonjourResponderImpl(Poco::DNSSD::DNSSDResponder& owner);
 		/// Creates the BonjourResponder, using the given owner.
-		
+
 	~BonjourResponderImpl();
 		/// Destroys the BonjourResponderImpl.
 
 	// DNSSDResponderImpl
 	DNSSDBrowser& browser();
-	ServiceHandle registerService(const Service& service, int options);	
-	void unregisterService(ServiceHandle& serviceHandle);	
+	ServiceHandle registerService(const Service& service, int options);
+	void unregisterService(ServiceHandle& serviceHandle);
 	RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record);
 	void updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record);
 	void removeRecord(ServiceHandle serviceHandle, RecordHandle& recordHandle);
@@ -56,8 +56,8 @@ public:
 	// Implementation
 	static const char* describeError(int code);
 		/// Returns a human-readable string describing the error.
-		
-	void onRegisterServiceReply(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char* name, const char* regtype, const char* domain);	
+
+	void onRegisterServiceReply(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char* name, const char* regtype, const char* domain);
 
 protected:
 	static std::string createTXTRecord(const Service::Properties& properties);

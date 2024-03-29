@@ -7,8 +7,8 @@
 // Package: Implementation
 // Module:  BonjourResponderImpl
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -95,7 +95,7 @@ ServiceHandle BonjourResponderImpl::registerService(const Service& service, int 
 void BonjourResponderImpl::unregisterService(ServiceHandle& serviceHandle)
 {
 	DNSServiceRef sdRef = serviceHandle.cast<DNSServiceRef>();
-	_eventLoop.remove(sdRef);	
+	_eventLoop.remove(sdRef);
 	serviceHandle.reset();
 }
 
@@ -250,7 +250,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 		if (requiredSize - prevSize > 256)
 			throw Poco::InvalidArgumentException("Property too large: size of key and value together must not exceed 254 bytes");
 	}
-	
+
 	if (requiredSize > 65535)
 		throw Poco::InvalidArgumentException("Too many properties: maximum TXT record size of 65535 bytes exceeded");
 
@@ -259,7 +259,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 
 	TXTRecordRef ref;
 	TXTRecordCreate(&ref, size, buffer.begin());
-	
+
 	// if present, txtvers must be first key in TXT record
 	Service::Properties::ConstIterator itVers = properties.find("txtvers");
 	if (itVers != itEnd)
@@ -267,7 +267,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 		Poco::UInt8 valueSize = static_cast<Poco::UInt8>(itVers->second.size());
 		TXTRecordSetValue(&ref, itVers->first.c_str(), valueSize, valueSize == 0 ? 0 : itVers->second.c_str());
 	}
-	
+
 	it = properties.begin();
 	for (; it != itEnd; ++it)
 	{
@@ -324,7 +324,7 @@ namespace
 
 
 void initializeDNSSD()
-{	
+{
 	Poco::DNSSD::DNSSDResponder::registerImplFactory(implFactory);
 }
 

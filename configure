@@ -171,8 +171,8 @@ unbundled=""
 static=""
 shared=""
 nosqlparser=
-omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF CppParser PageCompiler"
-omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF CppParser"
+omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler"
+omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser"
 omit=$omitTypical
 # parse arguments
 while [ $# -ge 1 ]; do

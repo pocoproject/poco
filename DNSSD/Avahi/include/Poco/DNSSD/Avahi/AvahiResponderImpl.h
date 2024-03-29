@@ -9,8 +9,8 @@
 //
 // Definition of the AvahiResponderImpl class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -47,30 +47,30 @@ class POCO_DNSSD_Avahi_API AvahiResponderImpl: public Poco::DNSSD::DNSSDResponde
 {
 public:
 	typedef Poco::ScopedLock<AvahiResponderImpl> ScopedLock;
-	
+
 	AvahiResponderImpl(Poco::DNSSD::DNSSDResponder& owner);
 		/// Creates the AvahiResponder, using the given owner.
-		
+
 	~AvahiResponderImpl();
 		/// Destroys the AvahiResponderImpl.
 
 	// DNSSDResponderImpl
 	DNSSDBrowser& browser();
-	ServiceHandle registerService(const Service& service, int options);	
-	void unregisterService(ServiceHandle& serviceHandle);	
+	ServiceHandle registerService(const Service& service, int options);
+	void unregisterService(ServiceHandle& serviceHandle);
 	RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record);
 	void updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record);
 	void removeRecord(ServiceHandle serviceHandle, RecordHandle& recordHandle);
 	void start();
 	void stop();
-	
+
 	// Runnable
 	void run();
 
 	// Implementation
 	static const char* describeError(int code);
 		/// Returns a human-readable string describing the error.
-	
+
 	void onClientStateChange(AvahiClientState state);
 	void onGroupStateChange(AvahiEntryGroup* avahiGroup, AvahiEntryGroupState state);
 	void lock();
@@ -81,7 +81,7 @@ protected:
 	{
 		START_TIMEOUT = 5000 // milliseconds
 	};
-		
+
 	struct RecordInfo
 	{
 		Record record;
@@ -96,11 +96,11 @@ protected:
 		int       options;
 	};
 	typedef std::map<ServiceHandle, ServiceInfo> ServiceMap;
-	
+
 	void reregisterServices();
 	void setupEntryGroup(AvahiEntryGroup* avahiGroup, const Service& service, const RecordVec& records, int options, bool rename);
 	static AvahiStringList* createTXTRecord(const Service::Properties& properties);
-	
+
 private:
 	Poco::DNSSD::DNSSDResponder& _owner;
 	AvahiBrowserImpl _browser;
@@ -112,7 +112,7 @@ private:
 	int _nextRecordId;
 	Poco::Mutex _mutex;
 	Poco::Thread _pollThread;
-	
+
 	friend class AvahiBrowserImpl;
 };
 

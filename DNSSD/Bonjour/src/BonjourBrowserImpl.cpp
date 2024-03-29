@@ -7,8 +7,8 @@
 // Package: Implementation
 // Module:  BonjourBrowserImpl
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -28,14 +28,14 @@ namespace Bonjour {
 
 
 extern "C" void DNSSD_API onBrowseReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
-	const char* serviceName, 
-	const char* regtype, 
-	const char* replyDomain, 
-	void* context)	
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* serviceName,
+	const char* regtype,
+	const char* replyDomain,
+	void* context)
 {
 	try
 	{
@@ -49,13 +49,13 @@ extern "C" void DNSSD_API onBrowseReply(
 
 
 extern "C" void DNSSD_API onResolveReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
-	const char* fullName, 
-	const char* host, 
-	uint16_t port, 
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* fullName,
+	const char* host,
+	uint16_t port,
 	uint16_t txtLen,
 #if _DNS_SD_H+0 >= 1070600
 	const unsigned char* txtRecord,
@@ -169,7 +169,7 @@ BonjourBrowserImpl::~BonjourBrowserImpl()
 {
 }
 
-	
+
 BrowseHandle BonjourBrowserImpl::browse(const std::string& regType, const std::string& domain, int options, Poco::Int32 networkInterface)
 {
 	DNSServiceRef sdRef(0);
@@ -251,7 +251,7 @@ BrowseHandle BonjourBrowserImpl::resolveHost(const std::string& host, int option
 	DNSServiceFlags flags(0);
 	if (options & BROWSE_FORCE_MULTICAST) flags |= kDNSServiceFlagsForceMulticast;
 	EventLoop::ScopedLock lock(_eventLoop);
-	DNSServiceErrorType err = DNSServiceGetAddrInfo(&sdRef, flags, networkInterface, 0, host.c_str(), Poco::DNSSD::Bonjour::onResolveHostReply, this);	
+	DNSServiceErrorType err = DNSServiceGetAddrInfo(&sdRef, flags, networkInterface, 0, host.c_str(), Poco::DNSSD::Bonjour::onResolveHostReply, this);
 	if (err == kDNSServiceErr_NoError)
 	{
 		_eventLoop.add(sdRef);
@@ -266,19 +266,19 @@ void BonjourBrowserImpl::cancel(BrowseHandle& browseHandle)
 	DNSServiceRef sdRef = browseHandle.cast<DNSServiceRef>();
 	ServiceMap::iterator it = _serviceMap.find(sdRef);
 	if (it != _serviceMap.end()) _serviceMap.erase(it);
-	_eventLoop.remove(sdRef);	
+	_eventLoop.remove(sdRef);
 	browseHandle.reset();
 }
 
 
 void BonjourBrowserImpl::onBrowseReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
-	const char* serviceName, 
-	const char* regtype, 
-	const char* replyDomain)	
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* serviceName,
+	const char* regtype,
+	const char* replyDomain)
 {
 	if (errorCode == kDNSServiceErr_NoError)
 	{
@@ -304,18 +304,18 @@ void BonjourBrowserImpl::onBrowseReply(
 
 
 void BonjourBrowserImpl::onResolveReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
-	const char* fullName, 
-	const char* host, 
-	uint16_t port, 
-	uint16_t txtLen, 
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* fullName,
+	const char* host,
+	uint16_t port,
+	uint16_t txtLen,
 	const unsigned char* txtRecord)
 {
 	ServiceMap::iterator it = _serviceMap.find(sdRef);
-	_eventLoop.remove(sdRef);	
+	_eventLoop.remove(sdRef);
 	if (errorCode == kDNSServiceErr_NoError)
 	{
 		if (it != _serviceMap.end())
@@ -339,10 +339,10 @@ void BonjourBrowserImpl::onResolveReply(
 
 
 void BonjourBrowserImpl::onEnumerateBrowseDomainsReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
 	const char* replyDomain)
 {
 	if (errorCode == kDNSServiceErr_NoError)
@@ -357,7 +357,7 @@ void BonjourBrowserImpl::onEnumerateBrowseDomainsReply(
 		else
 		{
 			browseDomainRemoved(this, args);
-		}	
+		}
 	}
 	else
 	{
@@ -369,10 +369,10 @@ void BonjourBrowserImpl::onEnumerateBrowseDomainsReply(
 
 
 void BonjourBrowserImpl::onEnumerateRegistrationDomainsReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
 	const char* replyDomain)
 {
 	if (errorCode == kDNSServiceErr_NoError)
@@ -387,7 +387,7 @@ void BonjourBrowserImpl::onEnumerateRegistrationDomainsReply(
 		else
 		{
 			registrationDomainRemoved(this, args);
-		}	
+		}
 	}
 	else
 	{
@@ -399,15 +399,15 @@ void BonjourBrowserImpl::onEnumerateRegistrationDomainsReply(
 
 
 void BonjourBrowserImpl::onQueryRecordReply(
-	DNSServiceRef sdRef, 
-	DNSServiceFlags flags, 
-	uint32_t interfaceIndex, 
-	DNSServiceErrorType errorCode, 
-	const char* fullName, 
-	uint16_t rrtype, 
-	uint16_t rrclass, 
-	uint16_t rdlen, 
-	const void* rdata, 
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* fullName,
+	uint16_t rrtype,
+	uint16_t rrclass,
+	uint16_t rdlen,
+	const void* rdata,
 	uint32_t ttl)
 {
 	if (errorCode == kDNSServiceErr_NoError)
@@ -422,7 +422,7 @@ void BonjourBrowserImpl::onQueryRecordReply(
 		else
 		{
 			recordRemoved(this, args);
-		}	
+		}
 	}
 	else
 	{
@@ -435,10 +435,10 @@ void BonjourBrowserImpl::onQueryRecordReply(
 
 void BonjourBrowserImpl::onResolveHostReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char* hostname, const struct sockaddr* address, uint32_t ttl)
 {
-	_eventLoop.remove(sdRef);	
+	_eventLoop.remove(sdRef);
 	if (errorCode == kDNSServiceErr_NoError)
 	{
-		Poco::Net::IPAddress addr;	
+		Poco::Net::IPAddress addr;
 		switch (address->sa_family)
 		{
 		case AF_INET:
@@ -475,7 +475,7 @@ void BonjourBrowserImpl::parseTXTRecord(Poco::UInt16 length, const void* data, S
 		const void* value;
 		TXTRecordGetItemAtIndex(length, data, i, sizeof(key), key, &valueLength, &value);
 		strKey.assign(key);
-		if (!strKey.empty()) // An empty TXT record will contain one key with an empty name. 
+		if (!strKey.empty()) // An empty TXT record will contain one key with an empty name.
 		{
 			properties.add(strKey, std::string(value ? reinterpret_cast<const char*>(value) : "", valueLength));
 		}

@@ -9,8 +9,8 @@
 //
 // Definition of the DNSSDBrowser class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -43,48 +43,48 @@ class POCO_DNSSD_API DNSSDBrowser
 	/// from the DNSSDResponder by calling the DNSSDResponder::serviceBrowser()
 	/// method.
 	///
-	/// A note on implementing event handlers: An event handler should 
-	/// complete its work and return as quick as possible, otherwise it may 
+	/// A note on implementing event handlers: An event handler should
+	/// complete its work and return as quick as possible, otherwise it may
 	/// interfere with DNS-SD processing. An event handler should never
 	/// wait for other events to happen. Specifically, it must never
 	/// wait for an other DNSSDBrowser event to happen, as this will
 	/// result in a deadlock.
 {
-public:	
+public:
 	enum Options
 		/// Options for browsing, resolving and DNS queries.
 	{
 		RESOLVE_ON_DISCOVERED_INTERFACE = 0x01,
 			/// Attempt to resolve the service on the interface it was discovered on only.
-			
+
 		RESOLVE_ON_ALL_INTERFACES       = 0x02,
 			/// Attempt to resolve the service on all interfaces.
-			
+
 		BROWSE_FORCE_MULTICAST          = 0x04,
-			/// Force query to be performed with a link-local mDNS query, 
-			/// even if the name is an apparently non-local name (i.e. a 
+			/// Force query to be performed with a link-local mDNS query,
+			/// even if the name is an apparently non-local name (i.e. a
 			/// name not ending in ".local.").
-			
+
 		BROWSE_LONG_LIVED_QUERY         = 0x08
-			/// Create a "long-lived" unicast query in a non-local domain. 
+			/// Create a "long-lived" unicast query in a non-local domain.
 			/// Without enabling this option, unicast queries will be one-shot --
 			/// that is, only answers available at the time of the call
-			/// will be returned. By setting this flag, answers that become available 
+			/// will be returned. By setting this flag, answers that become available
 			/// after the initial call is made will generate
 			/// events. This flag has no effect on link-local multicast queries.
 	};
-	
+
 	enum BrowseFlags
 		/// Flags reported in event arguments.
 	{
 		BROWSE_MORE_COMING = 0x01
 			/// This flag signals that more events will follow
 			/// immediately. For the application this means for
-			/// example that updates to the user interface can be 
+			/// example that updates to the user interface can be
 			/// delayed until an event is fired that does not have
 			/// this flag set.
 	};
-	
+
 	struct CommonEventArgs
 	{
 		CommonEventArgs(BrowseHandle h, int f):
@@ -92,11 +92,11 @@ public:
 			flags(f)
 		{
 		}
-		
+
 		BrowseHandle browseHandle;
 		int          flags;
 	};
-	
+
 	struct ServiceEventArgs: public CommonEventArgs
 	{
 		ServiceEventArgs(BrowseHandle h, int f, const Service& s):
@@ -104,10 +104,10 @@ public:
 			service(s)
 		{
 		}
-		
+
 		const Service& service;
 	};
-	
+
 	struct DomainEventArgs: public CommonEventArgs
 	{
 		DomainEventArgs(BrowseHandle h, int f, const Domain& d):
@@ -115,7 +115,7 @@ public:
 			domain(d)
 		{
 		}
-		
+
 		const Domain& domain;
 	};
 
@@ -126,10 +126,10 @@ public:
 			record(r)
 		{
 		}
-		
+
 		const Record& record;
 	};
-	
+
 	struct ResolveHostEventArgs: public CommonEventArgs
 	{
 		ResolveHostEventArgs(BrowseHandle h, int f, const std::string& n, const Poco::Net::IPAddress& a, Poco::Int32 i, Poco::UInt32 t):
@@ -140,13 +140,13 @@ public:
 			ttl(t)
 		{
 		}
-		
+
 		std::string          host;
 		Poco::Net::IPAddress address;
 		Poco::Int32          networkInterface;
 		Poco::UInt32         ttl;
 	};
-	
+
 	struct ErrorEventArgs: public CommonEventArgs
 	{
 		ErrorEventArgs(BrowseHandle h, int f, const Error& e):
@@ -157,14 +157,14 @@ public:
 
 		const Error& error;
 	};
-	
+
 	Poco::BasicEvent<const ErrorEventArgs> browseError;
 		/// Fired when an error occures while browsing for services.
 		///
 		/// The specific error condition can be found by looking at the
 		/// Error object in the argument.
-		
-	Poco::BasicEvent<const ServiceEventArgs> serviceFound;   
+
+	Poco::BasicEvent<const ServiceEventArgs> serviceFound;
 		/// Fired when a service has been found.
 		///
 		/// The Service object given in the argument can be passed to resolve()
@@ -183,13 +183,13 @@ public:
 		///
 		/// The specific error condition can be found by looking at the
 		/// ServiceError object in the argument.
-		 
-	Poco::BasicEvent<const ServiceEventArgs> serviceResolved; 
+
+	Poco::BasicEvent<const ServiceEventArgs> serviceResolved;
 		/// Fired when a service has been successfully resolved.
-	
+
 	Poco::BasicEvent<const DomainEventArgs> browseDomainFound;
 		/// Fired when a browse domain has been found.
-		
+
 	Poco::BasicEvent<const DomainEventArgs> browseDomainRemoved;
 		/// Fired when a browse domain has been removed and is no longer available.
 
@@ -201,7 +201,7 @@ public:
 
 	Poco::BasicEvent<const DomainEventArgs> registrationDomainFound;
 		/// Fired when a registration domain has been found.
-	
+
 	Poco::BasicEvent<const DomainEventArgs> registrationDomainRemoved;
 		/// Fired when a registration domain has been removed and is no longer available.
 
@@ -213,19 +213,19 @@ public:
 
 	Poco::BasicEvent<const RecordEventArgs> recordFound;
 		/// Fired when a record has been found.
-		
+
 	Poco::BasicEvent<const RecordEventArgs> recordRemoved;
 		/// Fired when a record has been removed and is no longer available.
-		
+
 	Poco::BasicEvent<const ErrorEventArgs> recordError;
 		/// Fired when an error occures while browsing for a record type.
 		///
 		/// The specific error condition can be found by looking at the
 		/// Error object in the argument.
-		
+
 	Poco::BasicEvent<const ResolveHostEventArgs> hostResolved;
 		/// Fired when a host name has been resolved.
-		
+
 	Poco::BasicEvent<const ErrorEventArgs> hostResolveError;
 		/// Fired when an error occurs while resolving a host name.
 		///
@@ -273,7 +273,7 @@ public:
 		/// not recommended.
 		/// After either the serviceResolved or resolveError event has been
 		/// fired, the returned BrowseHandle is no longer valid.
-		
+
 	virtual BrowseHandle enumerateBrowseDomains(Poco::Int32 networkInterface = 0) = 0;
 		/// Discovers domains for browse operations on the given interface, given by its index.
 		/// An interface with index 0 can be specified to search on all interfaces.
@@ -324,16 +324,16 @@ public:
 		/// not recommended.
 		/// After either the hostResolved or hostResolveError event has been
 		/// fired, the returned BrowseHandle is no longer valid.
-		
+
 	virtual void cancel(BrowseHandle& browseHandle) = 0;
 		/// Cancels the browse or resolve activity associated with the given BrowseHandle.
 		///
 		/// The BrowseHandle is invalidated.
-	
+
 protected:
 	DNSSDBrowser();
 	virtual ~DNSSDBrowser();
-	
+
 private:
 	DNSSDBrowser(const DNSSDBrowser&);
 	DNSSDBrowser& operator = (const DNSSDBrowser&);

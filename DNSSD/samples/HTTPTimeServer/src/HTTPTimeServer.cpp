@@ -6,8 +6,8 @@
 // This sample demonstrates how a web server can advertise itself
 // on the network using DNS Service Discovery.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -66,11 +66,11 @@ class TimeRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	TimeRequestHandler(const std::string& format): 
+	TimeRequestHandler(const std::string& format):
 		_format(format)
 	{
 	}
-	
+
 	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 	{
 		Application& app = Application::instance();
@@ -89,7 +89,7 @@ public:
 		ostr << dt;
 		ostr << "</p></body></html>";
 	}
-	
+
 private:
 	std::string _format;
 };
@@ -110,7 +110,7 @@ public:
 		else
 			return 0;
 	}
-	
+
 private:
 	std::string _format;
 };
@@ -140,7 +140,7 @@ public:
 	{
 		Poco::DNSSD::initializeDNSSD();
 	}
-	
+
 	~HTTPTimeServer()
 	{
 		Poco::DNSSD::uninitializeDNSSD();
@@ -152,7 +152,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		ServerApplication::initialize(self);
 	}
-		
+
 	void uninitialize()
 	{
 		ServerApplication::uninitialize();
@@ -161,7 +161,7 @@ protected:
 	void defineOptions(OptionSet& options)
 	{
 		ServerApplication::defineOptions(options);
-		
+
 		options.addOption(
 			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
@@ -207,7 +207,7 @@ protected:
 			pHTTPParams->setKeepAliveTimeout(Poco::Timespan(config().getInt("http.keepAliveTimeout", 10), 0));
 
 			ThreadPool::defaultPool().addCapacity(pHTTPParams->getMaxThreads());
-			
+
 			// set-up a server socket
 			SocketAddress httpSA(Poco::Net::IPAddress(), httpPort);
 			ServerSocket httpSocket(httpSA);
@@ -215,27 +215,27 @@ protected:
 			HTTPServer srv(new TimeRequestHandlerFactory(format), httpSocket, pHTTPParams);
 			// start the HTTPServer
 			srv.start();
-			
+
 			// register with DNSSDResponder
 			Poco::DNSSD::DNSSDResponder dnssdResponder;
 			dnssdResponder.start();
-			
+
 			Poco::DNSSD::Service service("_http._tcp", httpPort);
 			Poco::DNSSD::ServiceHandle serviceHandle = dnssdResponder.registerService(service);
 
 			// wait for CTRL-C or kill
 			waitForTerminationRequest();
-			
+
 			// shut down UPnP
 			dnssdResponder.unregisterService(serviceHandle);
 			dnssdResponder.stop();
-		
+
 			// Stop the HTTPServer
 			srv.stop();
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 };

@@ -9,8 +9,8 @@ for someone else to control them. They are full-blown network citizens,
 actively communicating with their peers and often relying on the network
 services provided by other devices to do their job. For this to work,
 all these devices must be configured properly. Configuring the network
-parameters (e.g., IP address, netmask, etc.) of a device is a tedious task, 
-as many devices do not have an appropriate user interface to do this comfortably. 
+parameters (e.g., IP address, netmask, etc.) of a device is a tedious task,
+as many devices do not have an appropriate user interface to do this comfortably.
 This is especially an issue with consumer devices, where the user might not even have the
 necessary technical knowledge to configure such a device. And as the
 number of devices in a network grows, configuring each device separately
@@ -39,8 +39,8 @@ configuration, which is often undesirable, a method called APIPA
 (Automatic Private IP Addressing, or AutoIP for short) is used. In this
 case, a device's TCP/IP stack randomly chooses an IP address in the
 private (link-local) IP address range 169.254.0.0 to 169.254.255.255. To
-prevent two or more devices from accidentally selecting the same address, 
-each device must probe, using the ARP (Address Resolution Protocol), 
+prevent two or more devices from accidentally selecting the same address,
+each device must probe, using the ARP (Address Resolution Protocol),
 whether the chosen address is available.
 
 
@@ -74,17 +74,17 @@ to that specific address.
 
 Service discovery is implemented in the following way:
 
-  - An application or device that needs a certain service sends a request 
-    describing the required properties of the service to a specific multicast 
+  - An application or device that needs a certain service sends a request
+    describing the required properties of the service to a specific multicast
     address (and port number).
-  - Other applications or devices on the same network receive the request, 
-    and if they provide the requested service themselves (or know another device 
-    that implements the service), respond with a message describing where the 
+  - Other applications or devices on the same network receive the request,
+    and if they provide the requested service themselves (or know another device
+    that implements the service), respond with a message describing where the
     service can be found.
-  - The application or device searching for the service collects all responses, 
+  - The application or device searching for the service collects all responses,
     and from the responses chooses the one service provider it is going to use.
-    
-In addition, devices that join or leave a network can send announcements to other 
+
+In addition, devices that join or leave a network can send announcements to other
 devices describing the availability of the services they provide.
 
 
@@ -116,8 +116,8 @@ with service description, the application will access or invoke them.
 This is usually beyond the scope of most service discovery technologies,
 and the domain of specialized technologies and protocols. Examples for
 such technologies are HTTP (HyperText Transfer Protocol), SOAP,
-Java RMI (Remote Method Invocation), CORBA (Common Object Request Broker 
-Architecture), or media streaming protocols such as RTSP 
+Java RMI (Remote Method Invocation), CORBA (Common Object Request Broker
+Architecture), or media streaming protocols such as RTSP
 (Real Time Streaming Protocol).
 
 
@@ -175,16 +175,16 @@ a good choice for resource constrained embedded devices.
 
 Beside heavy use by Apple in many of its applications for Mac OS X and
 Windows (iTunes), Zeroconf is popular among manufacturers of printers
-and network cameras. 
+and network cameras.
 
 
 !!Zeroconf Implementations
 
 Two implementations of Zeroconf are currently in widespread use.
 
-Apple's Bonjour was the first implementation of Zeroconf. The 
+Apple's Bonjour was the first implementation of Zeroconf. The
 implementation is available under an open source license and
-can be used on different platforms like Mac OS X, Windows, Linux or 
+can be used on different platforms like Mac OS X, Windows, Linux or
 VxWorks. Bonjour is an integrated part of Mac OS X and iOS.
 A Windows installer (and SDK) is available as well.
 
@@ -194,15 +194,14 @@ like FreeBSD or Solaris. Avahi has been integrated into many
 Linux distributions such as Debian, Ubuntu, SuSE and others.
 
 
-!!The Applied Informatics DNS-SD Library
+!!The POCO DNS-SD Library
 
-The DNS-SD library from Applied Informatics provides an easy-to-use
+The POCO DNS-SD library provides an easy-to-use
 and unified programming interface for integrating Zeroconf features
-(service discovery and host name resolution) into a C++ application. 
-The Applied Informatics DNS-SD library does not
-implement its own mDNS and DNS-SD protocol stacks, but rather uses
-an existing Zeroconf implementation for that purpose. Apple's Bonjour
-and Avahi can be used as backend for the DNS-SD library.
+(service discovery and host name resolution) into a C++ application.
+The library does not implement its own mDNS and DNS-SD protocol stacks,
+but rather uses an existing Zeroconf implementation for that purpose.
+Apple's Bonjour and Avahi can be used as backend for the DNS-SD library.
 
 A great advantage of the library is that it provides a unified
 programming interface. For the programmer, it's completely

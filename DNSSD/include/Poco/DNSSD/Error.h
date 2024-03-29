@@ -9,8 +9,8 @@
 //
 // Definition of the Error class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -51,7 +51,7 @@ public:
 
 	Poco::Int32 code() const;
 		/// Returns the implementation-specific error code.
-		
+
 	const std::string& message() const;
 		/// Returns the human-readable error message.
 

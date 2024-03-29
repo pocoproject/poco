@@ -9,8 +9,8 @@
 //
 // Definition of the DNSSDResponderImpl class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -40,11 +40,11 @@ class POCO_DNSSD_API DNSSDResponderImpl
 public:
 	virtual ~DNSSDResponderImpl();
 		/// Destroys the DNSSDResponderImpl.
-		
+
 	virtual DNSSDBrowser& browser() = 0;
 		/// Returns the DNSSDBrowser, which is used to
 		/// discover and resolve services and domains.
-		
+
 	virtual ServiceHandle registerService(const Service& service, int options) = 0;
 		/// Registers a service.
 		///
@@ -55,19 +55,19 @@ public:
 		///
 		/// Returns a ServiceHandle that can later be used to unregister
 		/// the service, or to add DNS records to the service.
-	
+
 	virtual void unregisterService(ServiceHandle& serviceHandle) = 0;
 		/// Unregisters the service specified by serviceHandle.
 		///
 		/// The ServiceHandle is invalidated.
-	
+
 	virtual RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record) = 0;
 		/// Add a record to a registered service. The name of the record will be the same as the
 		/// registered service's name.
 		///
 		/// The record can later be updated or deregistered by passing the RecordHandle returned
 		/// by this function to updateRecord() or removeRecord().
-	
+
 	virtual void updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record) = 0;
 		/// Update a registered resource record. The record must either be:
 		///   - the primary txt record of a service registered via registerService()
@@ -79,22 +79,22 @@ public:
 		/// a record added to a registered service via addRecord().
 		///
 		/// The RecordHandle is invalidated.
-	
+
 	virtual void start() = 0;
 		/// Starts the responder.
-		/// 
+		///
 		/// Must be called before services can be registered
 		/// or before browsing for domains and services.
-		
+
 	virtual void stop() = 0;
 		/// Stops the responder.
-		
+
 protected:
 	DNSSDResponderImpl();
 
 private:
 	DNSSDResponderImpl(const DNSSDResponderImpl&);
-	DNSSDResponderImpl& operator = (const DNSSDResponderImpl&); 
+	DNSSDResponderImpl& operator = (const DNSSDResponderImpl&);
 };
 
 
@@ -107,7 +107,7 @@ class POCO_DNSSD_API DNSSDResponderImplFactory
 public:
 	virtual DNSSDResponderImpl* createResponderImpl(DNSSDResponder& owner) = 0;
 		/// Creates a new DNSSDResponderImpl.
-		
+
 protected:
 	virtual ~DNSSDResponderImplFactory();
 };

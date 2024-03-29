@@ -9,8 +9,8 @@
 //
 // Definition of the EventLoop class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -42,7 +42,7 @@ class POCO_DNSSD_Bonjour_API EventLoop: public Poco::Runnable
 {
 public:
 	typedef Poco::ScopedLock<EventLoop> ScopedLock;
-	
+
 	enum
 	{
 		EVENTLOOP_TIMEOUT = 250
@@ -62,15 +62,15 @@ public:
 
 	void stop();
 		/// Requests to stop event loop processing.
-		
+
 	void shutdown();
 		/// Cleans up and frees all DNSServiceRefs.
 		///
 		/// Must be called after the event loop thread has been stopped.
-		
+
 	void lock();
 		/// Locks the internal mutex.
-		
+
 	void unlock();
 		/// Unlocks the internal mutex.
 
@@ -82,7 +82,7 @@ private:
 	typedef std::map<Poco::Net::Socket, DNSServiceRef> SockToRef;
 	typedef std::map<DNSServiceRef, Poco::Net::Socket> RefToSock;
 	typedef std::set<DNSServiceRef>                    RefSet;
-	
+
 	RefToSock   _refs;
 	SockToRef   _sockets;
 	RefSet      _invalidatedRefs;

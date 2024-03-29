@@ -5,8 +5,8 @@
 //
 // This sample demonstrates the DNSSDBrowser and DNSSDResponder classes.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -46,7 +46,7 @@ using Poco::DNSSD::ServiceHandle;
 class DNSSDBrowserApp: public ServerApplication
 {
 public:
-	DNSSDBrowserApp(): 
+	DNSSDBrowserApp():
 		_helpRequested(false),
 		_autoResolve(false),
 		_enumerateDomains(false),
@@ -55,7 +55,7 @@ public:
 	{
 		Poco::DNSSD::initializeDNSSD();
 	}
-	
+
 	~DNSSDBrowserApp()
 	{
 		Poco::DNSSD::uninitializeDNSSD();
@@ -67,7 +67,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		ServerApplication::initialize(self);
 	}
-		
+
 	void uninitialize()
 	{
 		ServerApplication::uninitialize();
@@ -76,7 +76,7 @@ protected:
 	void defineOptions(OptionSet& options)
 	{
 		ServerApplication::defineOptions(options);
-		
+
 		options.addOption(
 			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
@@ -84,7 +84,7 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleHelp)));
 
 		options.addOption(
-			Option("browse", "b", 
+			Option("browse", "b",
 				"Browse for services with the type given in the argument (e.g., _ftp._tcp). "
 				"Can be specified multiple times to browse for different types of services.")
 				.required(false)
@@ -93,14 +93,14 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleBrowse)));
 
 		options.addOption(
-			Option("resolve", "r", 
+			Option("resolve", "r",
 				"Automatically resolve all discovered services.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleResolve)));
 
 		options.addOption(
-			Option("domain", "d", 
+			Option("domain", "d",
 				"Specify the domain to browse, or register a service in. "
 				"If not specified, the default domain will be used.")
 				.required(false)
@@ -115,7 +115,7 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleEnumerate)));
 
 		options.addOption(
-			Option("register", "R", 
+			Option("register", "R",
 				"Register a service with the given type (e.g., _ftp._tcp).")
 				.required(false)
 				.repeatable(false)
@@ -123,7 +123,7 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleRegister)));
 
 		options.addOption(
-			Option("name", "n", 
+			Option("name", "n",
 				"Specify the service name for the service to be registered. "
 				"If not specified, the name of the machine will be used.")
 				.required(false)
@@ -132,7 +132,7 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleName)));
 
 		options.addOption(
-			Option("host", "H", 
+			Option("host", "H",
 				"Specify the host name for the service to be registered. "
 				"If not specified, the machine's host name will be used.")
 				.required(false)
@@ -141,7 +141,7 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleHost)));
 
 		options.addOption(
-			Option("port", "p", 
+			Option("port", "p",
 				"Specify the port number for the service to be registered. "
 				"If not specified, the service will be registered with port 0.")
 				.required(false)
@@ -151,16 +151,16 @@ protected:
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handlePort)));
 
 		options.addOption(
-			Option("txt", "t", 
+			Option("txt", "t",
 				"Specify a key-value pair for a registered service's TXT record. "
 				"Can be given multiple times.")
 				.required(false)
 				.repeatable(true)
 				.argument("<key><[=value]>")
 				.callback(OptionCallback<DNSSDBrowserApp>(this, &DNSSDBrowserApp::handleTXT)));
-				
+
 		options.addOption(
-			Option("interface", "i", 
+			Option("interface", "i",
 				"Specify a specific network interface for browsing and registration, by its "
 				"interface index. Specify 0 to browse/register on all interfaces (default).")
 				.required(false)
@@ -175,17 +175,17 @@ protected:
 		_helpRequested = true;
 		stopOptionsProcessing();
 	}
-	
+
 	void handleBrowse(const std::string& name, const std::string& value)
 	{
 		_browseTypes.insert(value);
 	}
-	
+
 	void handleResolve(const std::string& name, const std::string& value)
 	{
 		_autoResolve = true;
 	}
-	
+
 	void handleDomain(const std::string& name, const std::string& value)
 	{
 		_domain = value;
@@ -195,12 +195,12 @@ protected:
 	{
 		_enumerateDomains = true;
 	}
-	
+
 	void handleRegister(const std::string& name, const std::string& value)
 	{
 		_registeredService = value;
 	}
-	
+
 	void handleName(const std::string& name, const std::string& value)
 	{
 		_name = value;
@@ -228,12 +228,12 @@ protected:
 			_properties.add(value, "");
 		}
 	}
-	
+
 	void handleInterface(const std::string& name, const std::string& value)
 	{
 		_interface = Poco::NumberParser::parse(value);
 	}
-	
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -255,7 +255,7 @@ protected:
 	{
 		std::cout << args.error.message() << " (" << args.error.code() << ")" << std::endl;
 	}
-	
+
 	void onServiceFound(const void* sender, const Poco::DNSSD::DNSSDBrowser::ServiceEventArgs& args)
 	{
 		std::cout << "Service Found: \n"
@@ -263,13 +263,13 @@ protected:
 			<< "  Domain:    " << args.service.domain() << "\n"
 			<< "  Type:      " << args.service.type() << "\n"
 			<< "  Interface: " << args.service.networkInterface() << "\n" << std::endl;
-		
+
 		if (_autoResolve)
 		{
 			reinterpret_cast<Poco::DNSSD::DNSSDBrowser*>(const_cast<void*>(sender))->resolve(args.service);
 		}
 	}
-	
+
 	void onServiceRemoved(const void* sender, const Poco::DNSSD::DNSSDBrowser::ServiceEventArgs& args)
 	{
 		std::cout << "Service Removed: \n"
@@ -290,22 +290,22 @@ protected:
 			<< "  Host:      " << args.service.host() << "\n"
 			<< "  Port:      " << args.service.port() << "\n"
 			<< "  Properties: \n";
-			
+
 		for (Poco::DNSSD::Service::Properties::ConstIterator it = args.service.properties().begin(); it != args.service.properties().end(); ++it)
 		{
 			std::cout << "    " << it->first << ": " << it->second << "\n";
-		}	
+		}
 		std::cout << std::endl;
-		
+
 		reinterpret_cast<Poco::DNSSD::DNSSDBrowser*>(const_cast<void*>(sender))->resolveHost(args.service.host());
 	}
-	
+
 	void onHostResolved(const void* sender, const Poco::DNSSD::DNSSDBrowser::ResolveHostEventArgs& args)
 	{
 		std::cout << "Host Resolved: \n"
 			<< "  Host:      " << args.host << "\n"
-			<< "  Interface: " << args.networkInterface << "\n" 
-			<< "  Address:   " << args.address.toString() << "\n" 
+			<< "  Interface: " << args.networkInterface << "\n"
+			<< "  Address:   " << args.address.toString() << "\n"
 			<< "  TTL:       " << args.ttl << "\n" << std::endl;
 	}
 
@@ -340,7 +340,7 @@ protected:
 			<< "  Interface: " << args.domain.networkInterface() << "\n"
 			<< "  Default:   " << args.domain.isDefault() << "\n" << std::endl;
 	}
-	
+
 	int main(const std::vector<std::string>& args)
 	{
 		if (_helpRequested || (_browseTypes.empty() && _registeredService.empty() && !_enumerateDomains))
@@ -364,26 +364,26 @@ protected:
 			dnssdResponder.browser().registrationDomainRemoved += Poco::delegate(this, &DNSSDBrowserApp::onRegistrationDomainRemoved);
 			dnssdResponder.browser().hostResolveError          += Poco::delegate(this, &DNSSDBrowserApp::onError);
 			dnssdResponder.browser().hostResolved              += Poco::delegate(this, &DNSSDBrowserApp::onHostResolved);
-			
+
 			std::vector<BrowseHandle> browseHandles;
 			for (std::set<std::string>::const_iterator it = _browseTypes.begin(); it != _browseTypes.end(); ++it)
 			{
 				browseHandles.push_back(dnssdResponder.browser().browse(*it, _domain, 0, _interface));
 			}
-			
+
 			if (_enumerateDomains)
 			{
 				browseHandles.push_back(dnssdResponder.browser().enumerateBrowseDomains(_interface));
 				browseHandles.push_back(dnssdResponder.browser().enumerateRegistrationDomains(_interface));
 			}
-			
+
 			ServiceHandle serviceHandle;
 			if (!_registeredService.empty())
 			{
 				Service service(_interface, _name, "", _registeredService, _domain, _host, _port, _properties);
 				serviceHandle = dnssdResponder.registerService(service);
 			}
-			
+
 			dnssdResponder.start();
 			waitForTerminationRequest();
 
@@ -399,7 +399,7 @@ protected:
 			}
 
 			dnssdResponder.stop();
-			
+
 			dnssdResponder.browser().browseError               -= Poco::delegate(this, &DNSSDBrowserApp::onError);
 			dnssdResponder.browser().resolveError              -= Poco::delegate(this, &DNSSDBrowserApp::onError);
 			dnssdResponder.browser().serviceFound              -= Poco::delegate(this, &DNSSDBrowserApp::onServiceFound);
@@ -414,10 +414,10 @@ protected:
 			dnssdResponder.browser().hostResolveError          -= Poco::delegate(this, &DNSSDBrowserApp::onError);
 			dnssdResponder.browser().hostResolved              -= Poco::delegate(this, &DNSSDBrowserApp::onHostResolved);
 		}
-		
+
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 	bool _autoResolve;

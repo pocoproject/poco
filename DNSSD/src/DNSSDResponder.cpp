@@ -7,8 +7,8 @@
 // Package: Core
 // Module:  DNSSDResponder
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -39,19 +39,19 @@ DNSSDResponder::DNSSDResponder():
 	}
 }
 
-	
+
 DNSSDResponder::~DNSSDResponder()
 {
 	delete _pImpl;
 }
 
-	
+
 DNSSDBrowser& DNSSDResponder::browser()
 {
 	return _pImpl->browser();
 }
 
-	
+
 ServiceHandle DNSSDResponder::registerService(const Service& service, int options)
 {
 	return _pImpl->registerService(service, options);
@@ -87,13 +87,13 @@ void DNSSDResponder::start()
 	_pImpl->start();
 }
 
-	
+
 void DNSSDResponder::stop()
 {
 	_pImpl->stop();
 }
 
-	
+
 void DNSSDResponder::registerImplFactory(DNSSDResponderImplFactory& factory)
 {
 	_pImplFactory = &factory;

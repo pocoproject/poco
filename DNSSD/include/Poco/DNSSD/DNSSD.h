@@ -11,8 +11,8 @@
 // This file must be the first file included by every other DNSSD
 // header file.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -97,41 +97,41 @@ public:
 	{
 		TYPE = Type
 	};
-	
+
 	OpaqueHandle():
 		_h(Invalid),
 		_subtype(0)
 	{
 	}
-	
+
 	OpaqueHandle(Base h, int subtype = 0):
 		_h(h),
 		_subtype(subtype)
 	{
 	}
-	
+
 	template <typename T>
 	OpaqueHandle(T h, int subtype = 0):
 		_h(reinterpret_cast<Base>(h)),
 		_subtype(subtype)
 	{
 	}
-	
+
 	~OpaqueHandle()
 	{
 	}
-	
+
 	int subtype() const
 	{
 		return _subtype;
 	}
-	
+
 	template <typename T>
 	T cast() const
 	{
 		return reinterpret_cast<T>(_h);
 	}
-	
+
 	bool operator == (const OpaqueHandle& other) const
 	{
 		return _h == other._h;
@@ -161,22 +161,22 @@ public:
 	{
 		return _h > other._h;
 	}
-	
+
 	void reset()
 	{
 		_h = Invalid;
 	}
-	
+
 	bool isValid() const
 	{
 		return _h != Invalid;
 	}
-	
+
 	bool isNull() const
 	{
 		return _h == Invalid;
 	}
-	
+
 private:
 	Base _h;
 	int  _subtype;

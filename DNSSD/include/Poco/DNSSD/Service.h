@@ -9,8 +9,8 @@
 //
 // Definition of the Service class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -41,14 +41,14 @@ public:
 		/// by a length byte giving the total length
 		/// of the pair. Thus the total length of key
 		/// plus value must not exceed 254 bytes.
-		/// Keys are case insensitive and must consists 
+		/// Keys are case insensitive and must consists
 		/// entirely of printable US-ASCII characters.
 		/// The length of a key should not exceed nine bytes,
 		/// to keep packet sizes small. Values can contain
 		/// arbitrary bytes. A value can also be empty; in
 		/// this case the '=' character can be omitted in
 		/// the record.
-	
+
 	Service();
 		/// Creates an empty Service.
 
@@ -62,14 +62,14 @@ public:
 		///       When registering a service, can be left empty. In this case
 		///       the computer's name is used. Must be 1 - 63 bytes of UTF-8 text.
 		///     - type specifies the registration type of the service, consisting of service type
-		///       and network protocol (delimited by a dot, as in "_ftp._tcp"), 
+		///       and network protocol (delimited by a dot, as in "_ftp._tcp"),
 		///       and an optional subtype (e.g., "_primarytype._tcp,_subtype").
 		///       The protocol is always either "_tcp" or "_udp".
 		///     - domain specifies the name of the domain the service is registered on.
 		///       When registering a service, can be left empty to register in the default domain.
 
 	Service(const std::string& type, Poco::UInt16 port, const Properties& properties = Properties());
-		/// Creates the Service using the given information. This is the easiest way 
+		/// Creates the Service using the given information. This is the easiest way
 		/// to create a Service instance for registration.
 		///
 		/// The service will be registered on all available network interfaces. The computer's name
@@ -77,7 +77,7 @@ public:
 		/// is used as host name for registering.
 		///
 		///     - type specifies the registration type of the service, consisting of service type
-		///       and network protocol (delimited by a dot, as in "_ftp._tcp"), 
+		///       and network protocol (delimited by a dot, as in "_ftp._tcp"),
 		///       and an optional subtype (e.g., "_primarytype._tcp,_subtype").
 		///       The protocol is always either "_tcp" or "_udp".
 		///     - properties contains the contents of the service's TXT record.
@@ -94,7 +94,7 @@ public:
 		///     - fullName specifies the full service name in the form "<servicename>.<protocol>.<domain>.".
 		///       When registering a service, this should be left empty.
 		///     - type specifies the registration type of the service, consisting of service type
-		///       and network protocol (delimited by a dot, as in "_ftp._tcp"), 
+		///       and network protocol (delimited by a dot, as in "_ftp._tcp"),
 		///       and an optional subtype (e.g., "_primarytype._tcp,_subtype").
 		///       The protocol is always either "_tcp" or "_udp".
 		///     - domain specifies the name of the domain the service is registered on.
@@ -115,7 +115,7 @@ public:
 		///     - fullName specifies the full service name in the form "<servicename>.<protocol>.<domain>.".
 		///       When registering a service, this should be left empty.
 		///     - type specifies the registration type of the service, consisting of service type
-		///       and network protocol (delimited by a dot, as in "_ftp._tcp"), 
+		///       and network protocol (delimited by a dot, as in "_ftp._tcp"),
 		///       and an optional subtype (e.g., "_primarytype._tcp,_subtype").
 		///       The protocol is always either "_tcp" or "_udp".
 		///     - domain specifies the name of the domain the service is registered on.
@@ -129,26 +129,26 @@ public:
 		/// Destroys the Service.
 
 	Poco::Int32 networkInterface() const;
-		/// The id of the interface on which the remote service is running, or zero 
+		/// The id of the interface on which the remote service is running, or zero
 		/// if the service is available on all interfaces.
-	
+
 	const std::string& name() const;
 		/// The name of the service.
-		
+
 	const std::string& fullName() const;
 		/// Returns the full name of the service.
 		///
 		/// The format of the full name is "<servicename>.<protocol>.<domain>.".
 		/// This name is escaped following standard DNS rules.
 		/// The full name will be empty for an unresolved service.
-	
-	const std::string& type() const; 
+
+	const std::string& type() const;
 		/// The registration type of the service, consisting of service type
-		/// and network protocol (delimited by a dot, as in "_ftp._tcp"), 
+		/// and network protocol (delimited by a dot, as in "_ftp._tcp"),
 		/// and an optional subtype (e.g., "_primarytype._tcp,_subtype").
 		///
 		/// The protocol is always either "_tcp" or "_udp".
-	
+
 	const std::string& domain() const;
 		/// The domain the service is registered on.
 

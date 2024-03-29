@@ -7,8 +7,8 @@
 // Package: Implementation
 // Module:  AvahiResponderImpl
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -76,7 +76,7 @@ AvahiResponderImpl::AvahiResponderImpl(Poco::DNSSD::DNSSDResponder& owner):
 	avahi_simple_poll_set_func(_avahiPoll, Poco::DNSSD::Avahi::avahiPollFunc, &_mutex);
 	int error;
 	_avahiClient = avahi_client_new(avahi_simple_poll_get(_avahiPoll), AVAHI_CLIENT_NO_FAIL, Poco::DNSSD::Avahi::onClientStateChange, this, &error);
-	if (!_avahiClient) 
+	if (!_avahiClient)
 	{
 		avahi_simple_poll_free(_avahiPoll);
 		throw DNSSDException("Cannot create Avahi client", describeError(error), error);
@@ -108,7 +108,7 @@ DNSSDBrowser& AvahiResponderImpl::browser()
 ServiceHandle AvahiResponderImpl::registerService(const Service& service, int options)
 {
 	ScopedLock lock(*this);
-	
+
 	AvahiEntryGroup* avahiGroup = avahi_entry_group_new(_avahiClient, Poco::DNSSD::Avahi::onGroupStateChange, this);
 	if (!avahiGroup) throw DNSSDException("Cannot create Avahi Entry Group");
 	try
@@ -301,13 +301,13 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 		if (name.empty()) name = avahi_client_get_host_name(_avahiClient);
 		const char* domain = service.domain().empty() ? 0 : service.domain().c_str();
 		const char* host = service.host().empty() ? 0 : service.host().c_str();
-	
+
 		int error = rename ? AVAHI_ERR_COLLISION : avahi_entry_group_add_service_strlst(
-			avahiGroup, 
-			ifIndex, 
-			AVAHI_PROTO_UNSPEC, 
-			(AvahiPublishFlags) 0, 
-			name.c_str(), 
+			avahiGroup,
+			ifIndex,
+			AVAHI_PROTO_UNSPEC,
+			(AvahiPublishFlags) 0,
+			name.c_str(),
 			type.c_str(),
 			domain,
 			host,
@@ -321,11 +321,11 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 			name = newName;
 			avahi_free(const_cast<char*>(newName));
 			error = avahi_entry_group_add_service_strlst(
-				avahiGroup, 
-				ifIndex, 
-				AVAHI_PROTO_UNSPEC, 
-				(AvahiPublishFlags) 0, 
-				name.c_str(), 
+				avahiGroup,
+				ifIndex,
+				AVAHI_PROTO_UNSPEC,
+				(AvahiPublishFlags) 0,
+				name.c_str(),
 				type.c_str(),
 				domain,
 				host,
@@ -334,7 +334,7 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 			);
 		}
 		if (error) throw DNSSDException("Cannot add service to Avahi Entry Group: " + name, describeError(error), error);
-	
+
 		if (!subtypes.empty())
 		{
 			Poco::StringTokenizer tok(subtypes, ",", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
@@ -353,15 +353,15 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 				if (error) throw DNSSDException("Cannot add service subtype to Avahi Entry Group", describeError(error), error);
 			}
 		}
-		
+
 		for (RecordVec::const_iterator it = records.begin(); it != records.end(); ++it)
 		{
 			error = avahi_entry_group_add_record(
-				avahiGroup, 
-				ifIndex, 
-				AVAHI_PROTO_UNSPEC, 
-				(AvahiPublishFlags) 0, 
-				it->record.name().c_str(), 
+				avahiGroup,
+				ifIndex,
+				AVAHI_PROTO_UNSPEC,
+				(AvahiPublishFlags) 0,
+				it->record.name().c_str(),
 				it->record.clazz(),
 				it->record.type(),
 				it->record.ttl(),
@@ -370,11 +370,11 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 			);
 			if (error) throw DNSSDException("Cannot add record to Avahi Entry Group: " + it->record.name(), describeError(error), error);
 		}
-	
+
 		error = avahi_entry_group_commit(avahiGroup);
 		if (error) throw DNSSDException("Cannot commit Avahi Entry Group", describeError(error), error);
-	
-		ServiceHandle serviceHandle(avahiGroup);	
+
+		ServiceHandle serviceHandle(avahiGroup);
 		_services[serviceHandle].service = Service(service.networkInterface(), name, "", service.type(), service.domain(), service.host(), service.port(), service.properties());
 
 		avahi_string_list_free(txtList);
@@ -401,7 +401,7 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 		entry += itVers->second;
 		avahiList = avahi_string_list_new(entry.c_str(), NULL);
 	}
-	
+
 	Service::Properties::ConstIterator it = properties.begin();
 	for (; it != itEnd; ++it)
 	{
@@ -431,7 +431,7 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 void AvahiResponderImpl::onClientStateChange(AvahiClientState state)
 {
 	ScopedLock lock(*this);
-	
+
 	if (state == AVAHI_CLIENT_S_RUNNING)
 	{
 		_avahiClientReady.set();
@@ -499,7 +499,7 @@ namespace
 
 
 void initializeDNSSD()
-{	
+{
 	Poco::DNSSD::DNSSDResponder::registerImplFactory(implFactory);
 }
 

@@ -9,8 +9,8 @@
 //
 // Definition of the DNSSDResponder class.
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -64,7 +64,7 @@ class POCO_DNSSD_API DNSSDResponder
 	/// to unregisterService().
 	///
 	/// Before a DNSSDResponder instance can be created, registerImplFactory() must
-	/// be called to register a DNSSDResponderImplFactory. This is done by 
+	/// be called to register a DNSSDResponderImplFactory. This is done by
 	/// calling the initializeDNSSD() function provided by an implementation library
 	/// (e.g., Bonjour or Avahi).
 {
@@ -84,11 +84,11 @@ public:
 			service(s)
 		{
 		}
-		
+
 		ServiceHandle  serviceHandle;
 		const Service& service;
 	};
-	
+
 	struct ErrorEventArgs
 	{
 		ErrorEventArgs(ServiceHandle h, const Service& s, const Error& e):
@@ -97,31 +97,31 @@ public:
 			error(e)
 		{
 		}
-		
+
 		ServiceHandle  serviceHandle;
 		const Service& service;
 		const Error&   error;
 	};
 
-	Poco::BasicEvent<const ServiceEventArgs> serviceRegistered; 
+	Poco::BasicEvent<const ServiceEventArgs> serviceRegistered;
 		/// Fired after the service has been registered successfully.
 		///
 		/// If auto-rename has been enabled, the service name may be different from the
 		/// name originally specified.
-		
-	Poco::BasicEvent<const ErrorEventArgs> serviceRegistrationFailed; 
-		/// Fired when service registration fails. 
+
+	Poco::BasicEvent<const ErrorEventArgs> serviceRegistrationFailed;
+		/// Fired when service registration fails.
 
 	DNSSDResponder();
 		/// Creates a DNSSDResponder.
-		
+
 	~DNSSDResponder();
 		/// Destroys the DNSSDResponder.
-		
+
 	DNSSDBrowser& browser();
 		/// Returns the DNSServiceBrowser, which is used to
 		/// discover and resolve services and domains.
-		
+
 	ServiceHandle registerService(const Service& service, int options = 0);
 		/// Registers a service, specified by the given Service object.
 		///
@@ -134,19 +134,19 @@ public:
 		///
 		/// Returns a ServiceHandle that can later be used to unregister
 		/// the service, or to add DNS records to the service.
-	
+
 	void unregisterService(ServiceHandle& serviceHandle);
 		/// Unregisters the service specified by serviceHandle.
 		///
 		/// The ServiceHandle is invalidated.
-	
+
 	RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record);
 		/// Add a record to a registered service. The name of the record will be the same as the
 		/// registered service's name.
 		///
 		/// The record can later be updated or deregistered by passing the RecordHandle returned
 		/// by this function to updateRecord() or removeRecord().
-	
+
 	void updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record);
 		/// Update a registered resource record. The record must either be:
 		///   - the primary txt record of a service registered via registerService()
@@ -161,13 +161,13 @@ public:
 
 	void start();
 		/// Starts the responder.
-		/// 
+		///
 		/// Must be called before services can be registered
 		/// or before browsing for domains and services.
-		
+
 	void stop();
 		/// Stops the responder.
-		
+
 	static void registerImplFactory(DNSSDResponderImplFactory& factory);
 		/// Registers the factory for creating DNSSDResponderImpl objects.
 		///
@@ -176,13 +176,13 @@ public:
 
 	static void unregisterImplFactory();
 		/// Unregisters the currently registered DNSSDResponderImplFactory.
-		
+
 private:
 	DNSSDResponder(const DNSSDResponder&);
 	DNSSDResponder& operator = (const DNSSDResponder&);
-	
+
 	DNSSDResponderImpl* _pImpl;
-	
+
 	static DNSSDResponderImplFactory* _pImplFactory;
 };
 

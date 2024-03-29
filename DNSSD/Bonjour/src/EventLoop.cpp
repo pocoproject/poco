@@ -7,8 +7,8 @@
 // Package: Implementation
 // Module:  EventLoop
 //
-// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2006-2024, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
@@ -76,7 +76,7 @@ void EventLoop::add(DNSServiceRef sdRef)
 void EventLoop::remove(DNSServiceRef sdRef)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	
+
 	_invalidatedRefs.insert(sdRef);
 }
 
@@ -105,7 +105,7 @@ void EventLoop::run()
 		if (!_refs.empty() || _refAdded.tryWait(EVENTLOOP_TIMEOUT))
 		{
 			Poco::Mutex::ScopedLock lock(_mutex);
-			
+
 			RefToSock::const_iterator it = _refs.begin();
 			RefToSock::const_iterator itEnd = _refs.end();
 			for (; it != itEnd; ++it)
@@ -113,7 +113,7 @@ void EventLoop::run()
 				readList.push_back(it->second);
 			}
 		}
-		
+
 		if (!readList.empty())
 		{
 			Poco::Timespan timeout(1000*EVENTLOOP_TIMEOUT);
@@ -141,8 +141,8 @@ void EventLoop::run()
 				}
 			}
 		}
-		
-		Poco::Mutex::ScopedLock lock(_mutex);		
+
+		Poco::Mutex::ScopedLock lock(_mutex);
 		RefSet::iterator itSet =_invalidatedRefs.begin();
 		RefSet::iterator itSetEnd = _invalidatedRefs.end();
 		for (; itSet != itSetEnd; ++itSet)
