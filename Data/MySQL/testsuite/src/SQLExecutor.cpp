@@ -205,7 +205,7 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	bind_param[4].buffer		= &fifth;
 	bind_param[4].buffer_type   = MYSQL_TYPE_FLOAT;
 
-	rc = mysql_stmt_bind_param(hstmt, bind_param);
+	rc = mysql_stmt_bind_named_param(hstmt, bind_param, 5, nullptr);
 	assertTrue (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);
