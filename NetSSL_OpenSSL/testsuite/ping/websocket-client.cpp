@@ -14,6 +14,8 @@
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Util/Application.h"
 
+#include <iostream>
+
 using Poco::Net::HTTPSClientSession;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
