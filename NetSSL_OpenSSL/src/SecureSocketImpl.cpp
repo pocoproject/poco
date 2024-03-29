@@ -54,6 +54,7 @@ SecureSocketImpl::~SecureSocketImpl()
 {
 	try
 	{
+		close();
 		reset();
 	}
 	catch (...)
@@ -634,7 +635,6 @@ void SecureSocketImpl::setPeerHostName(const std::string& peerHostName)
 
 void SecureSocketImpl::reset()
 {
-	close();
 	if (_pSSL)
 	{
 		::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
