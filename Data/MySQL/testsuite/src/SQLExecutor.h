@@ -95,6 +95,7 @@ public:
 	void uuids();
 	void tuples();
 	void tupleVector();
+	void stdTuples();
 
 	void internalExtraction();
 	void doNull();

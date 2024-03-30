@@ -93,6 +93,7 @@ public:
 
 	void testTuple();
 	void testTupleVector();
+	void testStdTuple();
 
 	void testInternalExtraction();
 

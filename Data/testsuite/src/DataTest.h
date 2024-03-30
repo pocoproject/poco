@@ -44,6 +44,7 @@ public:
 	void testJSONRowFormatter();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
+	void testStdTuple();
 	void testTranscode();
 	void testSQLParse();
 

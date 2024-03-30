@@ -27,6 +27,9 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/SharedPtr.h"
 #include <cstddef>
+#include <optional>
+#include <tuple>
+
 
 #if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
 	#pragma GCC diagnostic push
@@ -311,6 +314,66 @@ private:
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
+
+
+template <typename T>
+class TypeHandler<std::optional<T>>
+{
+public:
+
+    static void bind(std::size_t pos, const std::optional<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+    {
+        poco_assert_dbg (!pBinder.isNull());
+        if (obj)
+        {
+            pBinder->bind(pos++, *obj, dir);
+        }
+        else
+        {
+            pBinder->bind(pos++, Poco::Data::Keywords::null, dir);
+        }
+
+    }
+
+    static void prepare(std::size_t pos, const std::optional<T>& obj, AbstractPreparator::Ptr pPreparator)
+    {
+        poco_assert_dbg (!pPreparator.isNull());
+        if (obj)
+        {
+            pPreparator->prepare(pos++, *obj);
+        }
+        else
+        {
+           pPreparator->prepare(pos++, Poco::Data::Keywords::null);
+        }
+    }
+
+    static std::size_t size()
+    {
+        return 1u;
+    }
+
+    static void extract(std::size_t pos, std::optional<T>& obj, const std::optional<T>& , AbstractExtractor::Ptr pExt)
+    {
+        poco_assert_dbg (!pExt.isNull());
+        T val;
+        if (pExt->extract(pos++, val))
+        {
+            obj = val;
+        }
+        else
+        {
+            obj.reset();
+        }
+    }
+
+private:
+    TypeHandler();
+    ~TypeHandler();
+    TypeHandler(const TypeHandler&);
+    TypeHandler& operator=(const TypeHandler&);
+};
+
 
 
 /// Poco::Tuple TypeHandler specializations
@@ -5637,15 +5700,103 @@ private:
 };
 
 
+template <typename...T>
+class TypeHandler<std::tuple<T...>>
+{
+
+public:
+    static void bind(std::size_t pos, const std::tuple<T...> & t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+    {
+        poco_assert_dbg (!pBinder.isNull());
+        bindTail<0>(pos, t, pBinder, dir);
+    }
+
+    static void prepare(std::size_t pos, const std::tuple<T...> & t, AbstractPreparator::Ptr pPrepare)
+    {
+        poco_assert_dbg (!pPrepare.isNull());
+        prepareTail<0>(pos, t, pPrepare);
+    }
+
+    static std::size_t size()
+    {
+        std::size_t sz = 0;
+        sizeTail<0>(sz);
+        return sz;
+    }
+
+    static void extract(std::size_t pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
+    {
+        poco_assert_dbg (!pExt.isNull());
+        extractTail<0>(pos, t, defVal, pExt);
+    }
+
+private:
+    TypeHandler();
+    ~TypeHandler();
+    TypeHandler(const TypeHandler&) = delete;
+    TypeHandler& operator=(const TypeHandler&) = delete;
+
+
+    template<size_t N>
+    static void bindTail(std::size_t& pos, const std::tuple<T...>& t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+    {
+        if constexpr (N < sizeof...(T))
+        {
+            using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+            TypeHandler<Type>::bind(pos, std::get<N>(t), pBinder, dir);
+            pos += TypeHandler<Type>::size();
+            bindTail<N+1>(pos, t, pBinder, dir);
+        }
+    }
+
+    template<size_t N>
+    static void prepareTail(std::size_t& pos, const std::tuple<T...>& t, AbstractPreparator::Ptr pPreparator)
+    {
+        if constexpr (N < sizeof...(T))
+        {
+            using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+            TypeHandler<Type>::prepare(pos, std::get<N>(t), pPreparator);
+            pos += TypeHandler<Type>::size();
+            prepareTail<N+1>(pos, t, pPreparator);
+        }
+    }
+
+    template<size_t N>
+    static void sizeTail(std::size_t& sz)
+    {
+        if constexpr (N < sizeof...(T))
+        {
+            using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+            sz += TypeHandler<Type>::size();
+            sizeTail<N+1>(sz);
+        }
+    }
+
+    template<size_t N>
+    static void extractTail(std::size_t& pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
+    {
+        if constexpr (N < sizeof...(T))
+        {
+            using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+            auto dVal = std::get<N>(defVal);
+            TypeHandler<Type>::extract(pos, std::get<N>(t), dVal, pExt);
+            pos += TypeHandler<Type>::size();
+            extractTail<N+1>(pos, t, defVal, pExt);
+        }
+    }
+
+};
+
+
 template <class K, class V>
 class TypeHandler<std::pair<K, V>>: public AbstractTypeHandler
 {
 public:
 	static void bind(std::size_t pos, const std::pair<K, V>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
-			   TypeHandler<K>::bind(pos, obj.first, pBinder, dir);
+		TypeHandler<K>::bind(pos, obj.first, pBinder, dir);
 		pos += TypeHandler<K>::size();
-			   TypeHandler<V>::bind(pos, obj.second, pBinder, dir);
+		TypeHandler<V>::bind(pos, obj.second, pBinder, dir);
 	}
 
 	static std::size_t size()
@@ -5655,16 +5806,16 @@ public:
 
 	static void extract(std::size_t pos, std::pair<K, V>& obj, const std::pair<K, V>& defVal, AbstractExtractor::Ptr pExt)
 	{
-			   TypeHandler<K>::extract(pos, obj.first, defVal.first, pExt);
+		TypeHandler<K>::extract(pos, obj.first, defVal.first, pExt);
 		pos += TypeHandler<K>::size();
-			   TypeHandler<V>::extract(pos, obj.second, defVal.second, pExt);
+		TypeHandler<V>::extract(pos, obj.second, defVal.second, pExt);
 	}
 
 	static void prepare(std::size_t pos, const std::pair<K, V>& obj, AbstractPreparator::Ptr pPreparator)
 	{
-			   TypeHandler<K>::prepare(pos, obj.first, pPreparator);
+		TypeHandler<K>::prepare(pos, obj.first, pPreparator);
 		pos += TypeHandler<K>::size();
-			   TypeHandler<V>::prepare(pos, obj.second, pPreparator);
+		TypeHandler<V>::prepare(pos, obj.second, pPreparator);
 	}
 
 private:

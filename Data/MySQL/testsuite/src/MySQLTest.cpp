@@ -550,6 +550,14 @@ void MySQLTest::testTupleVector()
 	_pExecutor->tupleVector();
 }
 
+void MySQLTest::testStdTuple()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateTuplesTable();
+	_pExecutor->stdTuples();
+}
+
 
 void MySQLTest::testInternalExtraction()
 {
@@ -994,6 +1002,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testUUID);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
+	CppUnit_addTest(pSuite, MySQLTest, testStdTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);

@@ -34,7 +34,7 @@
 #include <mysql/mysql.h>
 #include <iostream>
 #include <limits>
-
+#include <tuple>
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -1589,6 +1589,29 @@ void SQLExecutor::tupleVector()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (ret == v);
+}
+
+
+void SQLExecutor::stdTuples()
+{
+	std::string funct = "stdTuples()";
+
+	auto t = std::make_tuple(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+	using TupleType = decltype(t);
+
+	TupleType ret;
+	std::get<0>(ret) = -1;
+
+	try { *_pSession << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(t), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+
+	assertTrue (ret != t);
+	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (ret == t);
 }
 
 

@@ -171,7 +171,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
 
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
-	return false;
+		return false;
 
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
@@ -223,12 +223,11 @@ bool Extractor::extract(std::size_t pos, Time& val)
 bool Extractor::extract(std::size_t pos, UUID& val)
 {
 	std::string str;
-	if (extract(pos, str))
-	{
-		val.parse(str);
-		return true;
-	}
-	else return false;
+	if (!extract(pos, str))
+		return false;
+
+	val.parse(str);
+	return true;
 }
 
 
@@ -285,13 +284,13 @@ bool Extractor::extractLongLOB(std::size_t pos)
 	// with a zero-length buffer to avoid allocating
 	// huge amounts of memory. Therefore, when extracting
 	// the buffers need to be adjusted.
-	
+
 	_metadata.adjustColumnSizeToFit(pos);
-	
+
 	MYSQL_BIND* row = _metadata.row();
 	if (!_stmt.fetchColumn(pos, &row[pos]))
 		return false;
-	
+
 	return true;
 }
 
