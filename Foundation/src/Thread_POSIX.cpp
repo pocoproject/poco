@@ -392,15 +392,15 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 long ThreadImpl::currentOsTidImpl()
 {
-#if POCO_OS == POCO_OS_LINUX
-	return ::syscall(SYS_gettid);
+	long id = 0;
+#if (POCO_OS == POCO_OS_LINUX) && !defined(POCO_OS_EMSCRIPTEN)
+	id = ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
-	return ::pthread_mach_thread_np(::pthread_self());
+	id = ::pthread_mach_thread_np(::pthread_self());
 #elif POCO_OS == POCO_OS_FREE_BSD
-	long id;
-	if ( 0 == thr_self(&id)) return id;
+	if (0 != thr_self(&id)) id = 0;
 #endif
-	return 0;
+	return id;
 }
 
 
