@@ -80,6 +80,8 @@ void SecureSocketImpl::acceptSSL()
 {
 	poco_assert (!_pSSL);
 
+	LockT l(_mutex);
+
 	BIO* pBIO = ::BIO_new(BIO_s_socket());
 	if (!pBIO) throw SSLException("Cannot create BIO object");
 	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
@@ -155,6 +157,8 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 {
 	poco_assert (!_pSSL);
 	poco_assert (_pSocket->initialized());
+
+	LockT l(_mutex);
 
 	::BIO* pBIO = ::BIO_new(BIO_s_socket());
 	if (!pBIO) throw SSLException("Cannot create SSL BIO object");
@@ -253,6 +257,8 @@ void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
+		UnLockT l(_mutex);
+
 		// Don't shut down the socket more than once.
 		int shutdownState = ::SSL_get_shutdown(_pSSL);
 		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
@@ -301,6 +307,9 @@ void SecureSocketImpl::shutdown()
 			int rc = ::SSL_shutdown(_pSSL);
 #endif
 			if (rc < 0) handleError(rc);
+
+			l.unlock();
+
 			if (_pSocket->getBlocking())
 			{
 				_pSocket->shutdown();
@@ -345,6 +354,9 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	poco_check_ptr (_pSSL);
 
 	int rc;
+
+	LockT l(_mutex);
+
 	if (_needHandshake)
 	{
 		rc = completeHandshake();
@@ -381,6 +393,9 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	poco_check_ptr (_pSSL);
 
 	int rc;
+
+	LockT l(_mutex);
+
 	if (_needHandshake)
 	{
 		rc = completeHandshake();
@@ -413,6 +428,8 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 int SecureSocketImpl::available() const
 {
 	poco_check_ptr (_pSSL);
+
+	LockT l(_mutex);
 
 	return ::SSL_pending(_pSSL);
 }
@@ -468,7 +485,7 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
 	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-	    (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	   (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
 	{
 		return X509_V_OK;
 	}
@@ -499,10 +516,19 @@ bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 
 X509* SecureSocketImpl::peerCertificate() const
 {
+	LockT l(_mutex);
+
+	X509* pCert = nullptr;
+
 	if (_pSSL)
-		return ::SSL_get_peer_certificate(_pSSL);
-	else
-		return nullptr;
+	{
+		pCert = ::SSL_get_peer_certificate(_pSSL);
+		if (X509_V_OK != SSL_get_verify_result(_pSSL))
+			throw CertificateValidationException("SecureSocketImpl::peerCertificate(): "
+				"Certificate verification error " + Utility::getLastError());
+	}
+
+	return pCert;
 }
 
 
@@ -637,6 +663,8 @@ void SecureSocketImpl::reset()
 {
 	if (_pSSL)
 	{
+		LockT l(_mutex);
+
 		::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		::SSL_free(_pSSL);
 		_pSSL = nullptr;
@@ -665,9 +693,12 @@ void SecureSocketImpl::useSession(Session::Ptr pSession)
 bool SecureSocketImpl::sessionWasReused()
 {
 	if (_pSSL)
+	{
+		LockT l(_mutex);
 		return ::SSL_session_reused(_pSSL) != 0;
-	else
-		return false;
+	}
+
+	return false;
 }
 
 
