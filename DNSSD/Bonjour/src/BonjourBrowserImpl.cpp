@@ -172,7 +172,7 @@ BonjourBrowserImpl::~BonjourBrowserImpl()
 
 BrowseHandle BonjourBrowserImpl::browse(const std::string& regType, const std::string& domain, int options, Poco::Int32 networkInterface)
 {
-	DNSServiceRef sdRef(0);
+	DNSServiceRef sdRef(nullptr);
 	EventLoop::ScopedLock lock(_eventLoop);
 	DNSServiceErrorType err = DNSServiceBrowse(&sdRef, 0, networkInterface, regType.c_str(), domain.empty() ? 0 : domain.c_str(), Poco::DNSSD::Bonjour::onBrowseReply, this);
 	if (err == kDNSServiceErr_NoError)
@@ -230,7 +230,7 @@ BrowseHandle BonjourBrowserImpl::enumerateRegistrationDomains(Poco::Int32 networ
 
 BrowseHandle BonjourBrowserImpl::queryRecord(const std::string& name, Poco::UInt16 type, Poco::UInt16 clazz, int options, Poco::Int32 networkInterface)
 {
-	DNSServiceRef sdRef(0);
+	DNSServiceRef sdRef(nullptr);
 	DNSServiceFlags flags(0);
 	if (options & BROWSE_FORCE_MULTICAST) flags |= kDNSServiceFlagsForceMulticast;
 	if (options & BROWSE_LONG_LIVED_QUERY) flags |= kDNSServiceFlagsLongLivedQuery;

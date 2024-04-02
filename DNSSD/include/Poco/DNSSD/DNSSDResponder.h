@@ -74,7 +74,7 @@ public:
 	{
 		REG_LOCAL_ONLY    = 0x01, /// Service is visible on local host only.
 		REG_NO_AUTORENAME = 0x02, /// Do not allow automatic renaming in case another service with the same name exists.
-		REG_NON_BROWSABLE = 0x04  /// Service is not visible when browsing, but can be resolved.
+		REG_NON_BROWSABLE = 0x04  /// Service is not visible when browsing, but can be resolved (only for DNSSD version < 1096.0.2).
 	};
 
 	struct ServiceEventArgs
