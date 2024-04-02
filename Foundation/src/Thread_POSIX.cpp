@@ -21,6 +21,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include <signal.h>
+#include <limits.h>
 
 #if POCO_OS == POCO_OS_FREE_BSD
 #    include <sys/thr.h>
@@ -37,7 +38,7 @@
 #	include <time.h>
 #endif
 
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_FREE_BSD
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 #	include <sys/prctl.h>
 #endif
 
@@ -88,7 +89,7 @@ namespace
 		/// Sets thread name. Support for this feature varies
 		/// on platforms. Any errors are ignored.
 	{
-#if ((POCO_OS == POCO_OS_FREE_BSD) && (__FreeBSD_version < 1300000))
+#if (POCO_OS == POCO_OS_FREE_BSD)
 		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
@@ -106,7 +107,7 @@ namespace
 	std::string getThreadName()
 	{
 		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
-#if ((POCO_OS == POCO_OS_FREE_BSD) && (__FreeBSD_version < 1300000))
+#if (POCO_OS == POCO_OS_FREE_BSD)
 		pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
@@ -335,10 +336,16 @@ void ThreadImpl::joinImpl()
 {
 	if (!_pData->started) return;
 	_pData->done.wait();
-	void* result;
-	if (pthread_join(_pData->thread, &result))
-		throw SystemException("cannot join thread");
-	_pData->joined = true;
+	if (!_pData->joined)
+	{
+		int errorCode;
+		if ((errorCode = pthread_join(_pData->thread, nullptr)))
+		{
+			throw SystemException(Poco::format("cannot join thread (%s)",
+				Error::getMessage(errorCode)));
+		}
+		_pData->joined = true;
+	}
 }
 
 
@@ -370,21 +377,15 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 long ThreadImpl::currentOsTidImpl()
 {
-#if defined(POCO_EMSCRIPTEN)
-	return ::pthread_self();
-#elif POCO_OS == POCO_OS_LINUX
-	return ::syscall(SYS_gettid);
+	long id = 0;
+#if (POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)
+	id = ::syscall(SYS_gettid);
 #elif POCO_OS == POCO_OS_MAC_OS_X
-	return ::pthread_mach_thread_np(::pthread_self());
+	id = ::pthread_mach_thread_np(::pthread_self());
 #elif POCO_OS == POCO_OS_FREE_BSD
-	long id;
-	if(thr_self(&id) < 0) {
-		return 0;
-	}
-	return id;
-#else
-	return ::pthread_self();
+	if (0 != thr_self(&id)) id = 0;
 #endif
+	return id;
 }
 
 
