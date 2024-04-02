@@ -38,6 +38,7 @@ if(NOT APPLE)
 		set(BONJOUR_FOUND TRUE)
 	endif()
 else()
+	find_library(BONJOUR_LIBRARY CoreServices)
 	set(BONJOUR_FOUND TRUE)
 endif()
 
