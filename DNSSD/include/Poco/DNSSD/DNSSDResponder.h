@@ -36,7 +36,7 @@ class DNSSDResponderImpl;
 class DNSSDResponderImplFactory;
 
 
-class POCO_DNSSD_API DNSSDResponder
+class DNSSD_API DNSSDResponder
 	/// DNSSDResponder provides a unified interface to the underlying
 	/// DNS Service Discovery implementation, which can be Apple's Bonjour
 	/// or Avahi.

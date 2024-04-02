@@ -33,7 +33,7 @@ class Service;
 class Record;
 
 
-class POCO_DNSSD_API DNSSDResponderImpl
+class DNSSD_API DNSSDResponderImpl
 	/// DNSSDResponderImpl subclasses implement the actual binding
 	/// to the underlying DNSSD engine (e.g., Bonjour or Avahi).
 {
@@ -98,7 +98,7 @@ private:
 };
 
 
-class POCO_DNSSD_API DNSSDResponderImplFactory
+class DNSSD_API DNSSDResponderImplFactory
 	/// A factory for DNSSDResponderImpl objects.
 	///
 	/// A subclass of this class must be provided by DNSSD

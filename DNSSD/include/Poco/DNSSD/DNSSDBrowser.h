@@ -33,7 +33,7 @@ namespace Poco {
 namespace DNSSD {
 
 
-class POCO_DNSSD_API DNSSDBrowser
+class DNSSD_API DNSSDBrowser
 	/// The DNSSDBrowser class allows browsing for services, domains and records,
 	/// resolving services and error handling. Browse and resolve operations
 	/// are asynchronous. Discovered services, records and domains, as well as

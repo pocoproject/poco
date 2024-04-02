@@ -36,7 +36,7 @@ namespace Bonjour {
 class EventLoop;
 
 
-class POCO_DNSSD_Bonjour_API BonjourBrowserImpl: public DNSSDBrowser
+class DNSSD_Bonjour_API BonjourBrowserImpl: public DNSSDBrowser
 	/// The DNSSDBrowser implementation for Bonjour.
 {
 public:
@@ -47,13 +47,13 @@ public:
 		/// Destroys the BonjourBrowserImpl.
 
 	// DNSSDBrowser
-	BrowseHandle browse(const std::string& regType, const std::string& domain, int options, Poco::Int32 networkInterface);
-	BrowseHandle resolve(const Service& service, int options);
-	BrowseHandle enumerateBrowseDomains(Poco::Int32 networkInterface);
-	BrowseHandle enumerateRegistrationDomains(Poco::Int32 networkInterface);
-	BrowseHandle queryRecord(const std::string& name, Poco::UInt16 type, Poco::UInt16 clazz, int options, Poco::Int32 networkInterface);
-	BrowseHandle resolveHost(const std::string& host, int options, Poco::Int32 networkInterface);
-	void cancel(BrowseHandle& browseHandle);
+	BrowseHandle browse(const std::string& regType, const std::string& domain, int options, Poco::Int32 networkInterface) override;
+	BrowseHandle resolve(const Service& service, int options) override;
+	BrowseHandle enumerateBrowseDomains(Poco::Int32 networkInterface) override;
+	BrowseHandle enumerateRegistrationDomains(Poco::Int32 networkInterface) override;
+	BrowseHandle queryRecord(const std::string& name, Poco::UInt16 type, Poco::UInt16 clazz, int options, Poco::Int32 networkInterface) override;
+	BrowseHandle resolveHost(const std::string& host, int options, Poco::Int32 networkInterface) override;
+	void cancel(BrowseHandle& browseHandle) override;
 
 	// Implementation
 	void onBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char* serviceName,  const char* regtype, const char* domain);
@@ -67,7 +67,7 @@ protected:
 	static void parseTXTRecord(Poco::UInt16 length, const void* data, Service::Properties& properties);
 
 private:
-	typedef std::map<DNSServiceRef, Service> ServiceMap;
+	using ServiceMap = std::map<DNSServiceRef, Service>;
 	EventLoop& _eventLoop;
 	ServiceMap _serviceMap;
 };

@@ -30,20 +30,20 @@
 // from a DLL simpler. All files within this DLL are compiled with the DNSSD_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// POCO_DNSSD_API functions as being imported from a DLL, wheras this DLL sees symbols
+// DNSSD_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
 	#if defined(DNSSD_EXPORTS)
-		#define POCO_DNSSD_API __declspec(dllexport)
+		#define DNSSD_API __declspec(dllexport)
 	#else
-		#define POCO_DNSSD_API __declspec(dllimport)
+		#define DNSSD_API __declspec(dllimport)
 	#endif
 #endif
 
 
-#if !defined(POCO_DNSSD_API)
-	#define POCO_DNSSD_API
+#if !defined(DNSSD_API)
+	#define DNSSD_API
 #endif
 
 

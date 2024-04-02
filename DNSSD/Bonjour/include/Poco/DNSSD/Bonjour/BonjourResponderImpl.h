@@ -33,7 +33,7 @@ namespace DNSSD {
 namespace Bonjour {
 
 
-class POCO_DNSSD_Bonjour_API BonjourResponderImpl: public Poco::DNSSD::DNSSDResponderImpl
+class DNSSD_Bonjour_API BonjourResponderImpl: public Poco::DNSSD::DNSSDResponderImpl
 	/// The DNSSDResponderImpl implementation for Bonjour.
 {
 public:
@@ -44,14 +44,14 @@ public:
 		/// Destroys the BonjourResponderImpl.
 
 	// DNSSDResponderImpl
-	DNSSDBrowser& browser();
-	ServiceHandle registerService(const Service& service, int options);
-	void unregisterService(ServiceHandle& serviceHandle);
-	RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record);
-	void updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record);
-	void removeRecord(ServiceHandle serviceHandle, RecordHandle& recordHandle);
-	void start();
-	void stop();
+	DNSSDBrowser& browser() override;
+	ServiceHandle registerService(const Service& service, int options) override;
+	void unregisterService(ServiceHandle& serviceHandle) override;
+	RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record) override;
+	void updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record) override;
+	void removeRecord(ServiceHandle serviceHandle, RecordHandle& recordHandle) override;
+	void start() override;
+	void stop() override;
 
 	// Implementation
 	static const char* describeError(int code);
@@ -71,7 +71,7 @@ private:
 };
 
 
-class POCO_DNSSD_Bonjour_API BonjourResponderImplFactory: public Poco::DNSSD::DNSSDResponderImplFactory
+class DNSSD_Bonjour_API BonjourResponderImplFactory: public Poco::DNSSD::DNSSDResponderImplFactory
 	/// A factory for BonjourResponderImplFactory objects.
 {
 public:

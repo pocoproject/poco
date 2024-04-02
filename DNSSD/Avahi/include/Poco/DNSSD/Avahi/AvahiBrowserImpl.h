@@ -34,7 +34,7 @@ namespace Avahi {
 class AvahiResponderImpl;
 
 
-class POCO_DNSSD_Avahi_API AvahiBrowserImpl: public DNSSDBrowser
+class DNSSD_Avahi_API AvahiBrowserImpl: public DNSSDBrowser
 	/// The DNSSDBrowser implementation for Avahi.
 {
 public:

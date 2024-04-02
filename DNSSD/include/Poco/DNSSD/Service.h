@@ -28,7 +28,7 @@ namespace Poco {
 namespace DNSSD {
 
 
-class POCO_DNSSD_API Service
+class DNSSD_API Service
 	/// Service holds information for a registered or resolved service.
 {
 public:

@@ -27,7 +27,7 @@ namespace Poco {
 namespace DNSSD {
 
 
-class POCO_DNSSD_API Error
+class DNSSD_API Error
 	/// Error stores information about an error
 	/// that occured during browsing or service
 	/// registration.

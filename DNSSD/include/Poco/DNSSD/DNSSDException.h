@@ -28,7 +28,7 @@ namespace Poco {
 namespace DNSSD {
 
 
-POCO_DECLARE_EXCEPTION(POCO_DNSSD_API, DNSSDException, Poco::RuntimeException)
+POCO_DECLARE_EXCEPTION(DNSSD_API, DNSSDException, Poco::RuntimeException)
 
 
 } } // namespace Poco::DNSSD

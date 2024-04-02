@@ -27,7 +27,7 @@ namespace Poco {
 namespace DNSSD {
 
 
-class POCO_DNSSD_API Domain
+class DNSSD_API Domain
 	/// Domain stores information about a browse domain.
 {
 public:

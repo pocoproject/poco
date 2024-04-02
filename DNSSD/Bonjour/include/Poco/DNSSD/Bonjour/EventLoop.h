@@ -35,7 +35,7 @@ namespace DNSSD {
 namespace Bonjour {
 
 
-class POCO_DNSSD_Bonjour_API EventLoop: public Poco::Runnable
+class DNSSD_Bonjour_API EventLoop: public Poco::Runnable
 	/// The EventLoop class monitors all sockets used by Bonjour (for the connection
 	/// between the client and the daemon) in a thread and drives the
 	/// Bonjour machinery.
@@ -75,13 +75,13 @@ public:
 		/// Unlocks the internal mutex.
 
 protected:
-	void run();
+	void run() override;
 	void removeImpl(DNSServiceRef sdRef);
 
 private:
-	typedef std::map<Poco::Net::Socket, DNSServiceRef> SockToRef;
-	typedef std::map<DNSServiceRef, Poco::Net::Socket> RefToSock;
-	typedef std::set<DNSServiceRef>                    RefSet;
+	using SockToRef = std::map<Poco::Net::Socket, DNSServiceRef>;
+	using RefToSock = std::map<DNSServiceRef, Poco::Net::Socket>;
+	using RefSet = std::set<DNSServiceRef>;
 
 	RefToSock   _refs;
 	SockToRef   _sockets;

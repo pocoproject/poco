@@ -42,7 +42,7 @@ namespace Avahi {
 
 class AvahiBrowserImpl;
 
-class POCO_DNSSD_Avahi_API AvahiResponderImpl: public Poco::DNSSD::DNSSDResponderImpl, public Poco::Runnable
+class DNSSD_Avahi_API AvahiResponderImpl: public Poco::DNSSD::DNSSDResponderImpl, public Poco::Runnable
 	/// The DNSSDResponderImpl implementation for Avahi.
 {
 public:
@@ -117,7 +117,7 @@ private:
 };
 
 
-class POCO_DNSSD_Avahi_API AvahiResponderImplFactory: public Poco::DNSSD::DNSSDResponderImplFactory
+class DNSSD_Avahi_API AvahiResponderImplFactory: public Poco::DNSSD::DNSSDResponderImplFactory
 	/// A factory for AvahiResponderImplFactory objects.
 {
 public:
