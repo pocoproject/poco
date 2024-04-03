@@ -125,6 +125,14 @@ public:
 	const std::string& getLibrary() const;
 		/// Returns the symbol's library.
 
+	void setOrder(std::size_t order);
+		/// Sets the order of the symbol within its container.
+		///
+		/// Currently only used for struct/class members.
+
+	std::size_t getOrder() const;
+		/// Returns the order of the symbol within its container.
+
 	const Attributes& attrs() const;
 		/// Returns the symbol's attributes.
 
@@ -175,6 +183,7 @@ private:
 	int         _line;
 	std::string _package;
 	std::string _library;
+	std::size_t _order;
 	Attributes  _attrs;
 	std::string _attributeList;
 
@@ -242,6 +251,12 @@ inline const std::string& Symbol::getPackage() const
 inline const std::string& Symbol::getLibrary() const
 {
 	return _library;
+}
+
+
+inline std::size_t Symbol::getOrder() const
+{
+	return _order;
 }
 
 

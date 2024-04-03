@@ -66,6 +66,7 @@ OperatorToken::OperatorToken()
 	_opMap[">="] = i++;
 	_opMap[">>"] = i++;
 	_opMap[">>="] = i++;
+	_opMap["<=>"] = i++;
 	_opMap["="] = i++;
 	_opMap["=="] = i++;
 	_opMap["!"] = i++;
@@ -194,8 +195,14 @@ void OperatorToken::finish(std::istream& istr)
 		{
 			_value += (char) istr.get();
 			next = (char) istr.peek();
+			if (next == '=') _value += (char) istr.get();
 		}
-		if (next == '=') _value += (char) istr.get();
+		else if (next == '=')
+		{
+			_value += (char) istr.get();
+			next = (char) istr.peek();
+			if (next == '>') _value += (char) istr.get();
+		}
 		break;
 	case '>':
 		if (next == '>')

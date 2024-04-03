@@ -12,6 +12,7 @@ vc.project.compiler.defines = THREADSAFE
 vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
+vc.project.compiler.additionalOptions = /Zc:__cplusplus
 vc.project.linker.dependencies = odbc32.lib odbccp32.lib
 vc.solution.create = true
 vc.solution.include = testsuite\\TestSuite
