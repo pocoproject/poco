@@ -131,6 +131,8 @@ lib/
 lib64/
 pocomsg.h
 **/UpgradeLog*.XML
+.vs/
+vcpkg_installed/
 
 # Eclipse generated files #
 ###########################

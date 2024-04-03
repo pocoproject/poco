@@ -156,7 +156,7 @@ function InvokeProgenComponents([string] $type)
 				$componentsArray += $_.Trim()
 		}
 
-		if ($omitArray -NotContains $component -and (-not ($component -Contains "Foundation")) -and (($componentsArray -Contains $component) -or ($components -eq '')))
+		if ($omitArray -NotContains $component -and ((-not ($component -Contains "Foundation")) -or ($type -eq "sample")) -and (($componentsArray -Contains $component) -or ($components -eq '')))
 		{
 			if($type -eq "lib") {
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
