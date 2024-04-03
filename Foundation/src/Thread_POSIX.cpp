@@ -24,11 +24,13 @@
 #include <signal.h>
 #include <limits.h>
 
+
 #if POCO_OS == POCO_OS_FREE_BSD
 #    include <sys/thr.h>
 #    include <pthread_np.h>
 #    include <osreldate.h>
 #endif
+
 
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
@@ -38,6 +40,7 @@
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
 #endif
+
 
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 #	include <sys/prctl.h>
@@ -76,6 +79,7 @@ namespace
 	static SignalBlocker signalBlocker;
 }
 #endif
+
 
 namespace
 {
@@ -146,6 +150,7 @@ ThreadImpl::~ThreadImpl()
 		pthread_detach(_pData->thread);
 	}
 }
+
 
 void ThreadImpl::setNameImpl(const std::string& threadName)
 {
@@ -389,6 +394,7 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
 	return pthread_self();
 }
+
 
 long ThreadImpl::currentOsTidImpl()
 {
