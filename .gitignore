@@ -132,6 +132,8 @@ lib64/
 pocomsg.h
 **/UpgradeLog*.XML
 /out/build/x64-Debug
+.vs/
+vcpkg_installed/
 
 # Eclipse generated files #
 ###########################
@@ -164,3 +166,7 @@ node_modules
 *_vs1[45]0.sln
 *_vs1[45]0.vcxproj
 *_vs1[45]0.vcxproj.filters
+
+# Debug files #
+##############
+*.core
