@@ -521,14 +521,9 @@ X509* SecureSocketImpl::peerCertificate() const
 	X509* pCert = nullptr;
 
 	if (_pSSL)
-	{
-		pCert = ::SSL_get_peer_certificate(_pSSL);
-		if (X509_V_OK != SSL_get_verify_result(_pSSL))
-			throw CertificateValidationException("SecureSocketImpl::peerCertificate(): "
-				"Certificate verification error " + Utility::getLastError());
-	}
-
-	return pCert;
+		return ::SSL_get_peer_certificate(_pSSL);
+	else
+		return nullptr;
 }
 
 
