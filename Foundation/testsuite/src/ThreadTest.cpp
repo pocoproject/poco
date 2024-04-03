@@ -450,17 +450,21 @@ void ThreadTest::testThreadStackSize()
 	#endif
 #endif
 
-#if !defined(POCO_OS_FAMILY_BSD) // TODO: temporarily disabled, segfaults on FreeBSD (pthread_join, specifically)
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
-	thread.setStackSize(0);
-	assertTrue (0 == thread.getStackSize());
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+// disabled on FreeBSD; segfaults due to stack overflow,
+// possibly happens on other BSD OSes)
+#if (POCO_OS == POCO_OS_FREE_BSD)
+	{
+		int tmp = MyRunnable::_staticVar;
+		thread.start(freeFunc, &tmp);
+		thread.join();
+		assertTrue (tmp * 2 == MyRunnable::_staticVar);
+		thread.setStackSize(0);
+		assertTrue (0 == thread.getStackSize());
+		tmp = MyRunnable::_staticVar;
+		thread.start(freeFunc, &tmp);
+		thread.join();
+		assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	}
 #endif
 }
 
