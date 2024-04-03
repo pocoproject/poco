@@ -523,7 +523,7 @@ jobs:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
+          command: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT,DNSSD,DNSSD/Avahi,DNSSD/Bonjour"
 
   #  windows-2022-msvc-buildwin-win32:
   #    runs-on: windows-2022
