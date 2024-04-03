@@ -310,6 +310,7 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		}
 	}
 	_pData->started = true;
+	_pData->joined = false;
 	pthread_attr_destroy(&attributes);
 
 	if (_pData->policy == SCHED_OTHER)
