@@ -240,23 +240,24 @@ template <typename IDType>
 IDType ActiveRecord<IDType>::lastInsertID(Poco::Data::Session& session)
 {
 	using namespace Poco::Data::Keywords;
+	using namespace std::string_literals;
 
 	IDType id;
-	if (session.connector() == "sqlite")
+	if (Poco::icompare(session.connector(), "sqlite"s) == 0)
 	{
 		session
 			<< "SELECT last_insert_rowid()",
 			into(id),
 			now;
 	}
-	else if (session.connector() == "PostgreSQL")
+	else if (Poco::icompare(session.connector(), "postgresql"s) == 0)
 	{
 		session
-			<< "SELECT currval('id_seq')",
+			<< "SELECT lastval()",
 			into(id),
 			now;
 	}
-	else if (session.connector() == "MySQL")
+	else if (Poco::icompare(session.connector(), "mysql"s) == 0)
 	{
 		session
 			<< "SELECT LAST_INSERT_ID()",

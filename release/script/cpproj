@@ -51,6 +51,10 @@ if [ -d ${src}/cmake ] ; then
 	cp -R ${src}/cmake/* ${dst}/cmake >/dev/null 2>&1
 fi
 
+if [ -f ${src}/vcpkg.json ] ; then
+	cp ${src}/vcpkg*.json ${dst}
+fi
+
 if [ -d ${src}/testsuite ] ; then
 	mkdir -p ${dst}/testsuite
 	mkdir -p ${dst}/testsuite/src

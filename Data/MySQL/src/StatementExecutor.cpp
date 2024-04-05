@@ -80,8 +80,13 @@ void StatementExecutor::bindParams(MYSQL_BIND* params, std::size_t count)
 
 	if (count == 0) return;
 
+#if LIBMYSQL_VERSION_ID >= 80300
+	if (mysql_stmt_bind_named_param(_pHandle, params, count, nullptr) != 0)
+		throw StatementException("mysql_stmt_bind_named_param() error ", _pHandle, _query);
+#else
 	if (mysql_stmt_bind_param(_pHandle, params) != 0)
 		throw StatementException("mysql_stmt_bind_param() error ", _pHandle, _query);
+#endif
 }
 
 
