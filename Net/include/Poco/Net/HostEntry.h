@@ -76,7 +76,6 @@ public:
 		/// for the host.
 
 private:
-
 	std::string _name;
 	AliasList   _aliases;
 	AddressList _addresses;

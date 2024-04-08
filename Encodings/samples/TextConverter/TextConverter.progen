@@ -7,4 +7,5 @@ vc.project.platforms = Win32
 vc.project.configurations = debug_shared, release_shared, debug_static_mt, release_static_mt, debug_static_md, release_static_md
 vc.project.prototype = ${vc.project.name}_vs90.vcproj
 vc.project.compiler.include = ..\\..\\..\\Foundation\\include;..\\..\\..\\Encodings\\include
+vc.project.compiler.additionalOptions = /Zc:__cplusplus
 vc.project.linker.dependencies.Win32 = ws2_32.lib iphlpapi.lib

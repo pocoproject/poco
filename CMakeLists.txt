@@ -16,10 +16,10 @@ set(RELEASE_NAME "Unstable-trunk")
 # top of the build tree rather than in hard-to-find leaf
 # directories. This simplifies manual testing and the use of the build
 # tree rather than installed Boost libraries.
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "Library output")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "Archive output")
 # Windows DLLs are "runtime" for CMake. Output them to "bin" like the Visual Studio projects do.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE PATH "Runtime output")
 
 # Reset output dirs for multi-config builds
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
@@ -180,6 +180,12 @@ option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
 option(ENABLE_REDIS "Enable Redis" ON)
+option(ENABLE_DNSSD "Enable DNSSD" OFF)
+option(ENABLE_DNSSD_DEFAULT "Enable DNSSD Default" OFF)
+
+option(ENABLE_DNSSD_AVAHI "Enable DNSSD Avahi" OFF)
+option(ENABLE_DNSSD_BONJOUR "Enable DNSSD Bonjour" OFF)
+
 option(ENABLE_PROMETHEUS "Enable Prometheus" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
@@ -372,6 +378,11 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Redis AND ENABLE_REDIS)
 	list(APPEND Poco_COMPONENTS "Redis")
 endif()
 
+if(ENABLE_DNSSD)
+	add_subdirectory(DNSSD)
+	list(APPEND Poco_COMPONENTS "DNSSD")
+endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/Prometheus AND ENABLE_PROMETHEUS)
 	add_subdirectory(Prometheus)
 	list(APPEND Poco_COMPONENTS "Prometheus")
@@ -424,8 +435,8 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Data/MySQL AND ENABLE_DATA_MYSQL)
 	list(APPEND Poco_COMPONENTS "Data/MySQL")
 endif()
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgresSQL AND ENABLE_DATA_POSTGRESQL)
-	list(APPEND Poco_COMPONENTS "Data/PostgresSQL")
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgreSQL AND ENABLE_DATA_POSTGRESQL)
+	list(APPEND Poco_COMPONENTS "Data/PostgreSQL")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord AND ENABLE_ACTIVERECORD)

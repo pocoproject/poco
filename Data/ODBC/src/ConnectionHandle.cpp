@@ -97,7 +97,7 @@ void ConnectionHandle::setTimeouts(SQLULEN loginTimeout, SQLULEN timeout)
 	{
 		try
 		{
-			setTimeout(timeout);
+			setTimeout(static_cast<int>(timeout));
 		}
 		catch(const NotSupportedException&) {}
 	}
@@ -145,7 +145,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 		// for Oracle) flat out refuse to set login timeout and return error - that's why these calls
 		// are wrapped in try/catch and silently ignore errors.
 		if (getTimeout() != timeout)
-			setTimeout(timeout);
+			setTimeout(static_cast<int>(timeout));
 		if (getLoginTimeout() != loginTimeout)
 			setLoginTimeout(loginTimeout);
 	}

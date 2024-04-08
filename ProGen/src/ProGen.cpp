@@ -488,6 +488,45 @@ protected:
 		}
 	}
 
+	void addVcpkgProperties(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
+	{
+		Poco::XML::Node* pInsertAfterNode = nullptr;
+		Poco::AutoPtr<Poco::XML::NodeList> pPropertyGroups = pProjectDoc->getElementsByTagName("PropertyGroup");
+		if (pPropertyGroups->length() > 0)
+		{
+			pInsertAfterNode = pPropertyGroups->item(pPropertyGroups->length() - 1);
+		}
+		Poco::AutoPtr<Poco::XML::Element> pPropertyGroupElem = pProjectDoc->createElement("PropertyGroup");
+		pPropertyGroupElem->setAttribute("Label", "Vcpkg");
+		appendElement(pPropertyGroupElem, "VcpkgEnableManifest", "true");
+		pProjectDoc->documentElement()->insertAfterNP(pPropertyGroupElem, pInsertAfterNode);
+		pInsertAfterNode = pPropertyGroupElem;
+
+		Poco::StringTokenizer archTok(templateProps.getString("project.architectures"), ";,", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+		std::set<std::string> archs(archTok.begin(), archTok.end());
+
+		for (const auto& config: configSet)
+		{
+			for (const auto& arch: archs)
+			{
+				Poco::AutoPtr<Poco::XML::Element> pPropertyGroupElem = pProjectDoc->createElement("PropertyGroup");
+				pPropertyGroupElem->setAttribute("Label", "Vcpkg");
+				pPropertyGroupElem->setAttribute("Condition", Poco::format("'$(Configuration)|$(Platform)'=='%s|%s'", config, arch));
+				appendElement(pPropertyGroupElem, "VcpkgConfiguration", config.find("debug") == 0 ? "Debug" : "Release");
+				if (config.find("_static") != std::string::npos)
+				{
+					appendElement(pPropertyGroupElem, "VcpkgUseStatic", "true");
+				}
+				if (config.find("_static_md") != std::string::npos)
+				{
+					appendElement(pPropertyGroupElem, "VcpkgUseMD", "true");
+				}
+				pProjectDoc->documentElement()->insertAfterNP(pPropertyGroupElem, pInsertAfterNode);
+				pInsertAfterNode = pPropertyGroupElem;
+			}
+		}
+	}
+
 	void fix20XXProject(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps, const std::string& platformToolset)
 	{
 		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
@@ -497,6 +536,10 @@ protected:
 			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
 			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
 			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", platformToolset);
+		}
+		if (projectProps.getBool("project.vcpkg", false))
+		{
+			addVcpkgProperties(pProjectDoc, configSet, platform, projectProps, templateProps);
 		}
 	}
 
@@ -625,6 +668,7 @@ protected:
 				pProps->setString("project.pocobase", projectConfig.getString("vc.project.pocobase", ".."));
 				pProps->setString("project.platform", pTemplateProps->getString("project.platform", platform));
 				pProps->setString("project.targetPlatform", pTemplateProps->getString("project.targetPlatform", "WINDOWS_NT"));
+				pProps->setBool("project.vcpkg", projectConfig.getBool("vc.project.vcpkg", false));
 				expandAttributes(pProjectDoc->documentElement(), *pProps);
 
 				Poco::XML::Node* pFilesElement = pPrototypeDoc->getNodeByPath("//Files");
