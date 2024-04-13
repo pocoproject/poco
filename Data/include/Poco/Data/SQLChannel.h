@@ -232,8 +232,12 @@ private:
 		/// Returns true is value is "true", "t", "yes" or "y".
 		/// Case insensitive.
 
-	size_t logTofile(AutoPtr<FileChannel>& pFileChannel, const std::string& fileName, bool clear = false);
+	size_t logToFile(bool clear = false);
 		/// Logs cached entries to a file. Called in case DB insertions fail.
+
+	size_t logLocal(const std::string, Message::Priority prio = Message::PRIO_ERROR);
+		/// Adds the message to the local SQLChannel log queue, and logs it to the file.
+		/// Typically used to log DB connection/execution erors.
 
 	std::string maskPwd();
 		/// Masks the password in the connection
@@ -243,17 +247,17 @@ private:
 
 	mutable Poco::FastMutex _mutex;
 
-	std::string      _connector;
-	std::string      _connect;
-	SessionPtr       _pSession;
-	std::string      _sql;
-	std::string      _name;
-	std::string      _table;
-	bool             _tableChanged;
-	int              _timeout;
-	std::atomic<int> _minBatch;
-	int              _maxBatch;
-	bool             _bulk;
+	std::string       _connector;
+	std::string       _connect;
+	SessionPtr        _pSession;
+	std::string       _sql;
+	std::string       _name;
+	std::string       _table;
+	bool              _tableChanged;
+	int               _timeout;
+	std::atomic<int>  _minBatch;
+	int               _maxBatch;
+	bool              _bulk;
 	std::atomic<bool> _throw;
 
 	// members for log entry cache
@@ -267,7 +271,6 @@ private:
 	Poco::NotificationQueue       _logQueue;
 	std::unique_ptr<Poco::Thread> _pDBThread;
 	std::atomic<bool>             _reconnect;
-	std::atomic<bool>             _running;
 	std::atomic<bool>             _stop;
 	std::atomic<size_t>           _logged;
 	StrategyPtr                   _pArchiveStrategy;
@@ -293,7 +296,7 @@ inline bool SQLChannel::isTrue(const std::string& value) const
 
 inline bool SQLChannel::isRunning() const
 {
-	return _running;
+	return _pDBThread && _pDBThread->isRunning();
 }
 
 
