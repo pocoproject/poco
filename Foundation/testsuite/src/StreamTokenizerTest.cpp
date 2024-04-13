@@ -43,7 +43,7 @@ public:
 
 	bool start(char c, std::istream& istr)
 	{
-		if (c != -1 && Ascii::isAlpha(c))
+		if ((int)c != -1 && Ascii::isAlpha(c))
 		{
 			_value = c;
 			return true;
@@ -54,7 +54,7 @@ public:
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
-		while (c != -1 && Ascii::isAlphaNumeric(c))
+		while ((int)c != -1 && Ascii::isAlphaNumeric(c))
 		{
 			istr.get();
 			_value += c;
@@ -82,7 +82,7 @@ public:
 
 	bool start(char c, std::istream& istr)
 	{
-		if (c != -1 && Ascii::isDigit(c))
+		if ((int)c != -1 && Ascii::isDigit(c))
 		{
 			_value = c;
 			return true;
@@ -93,7 +93,7 @@ public:
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
-		while (c != -1 && Ascii::isDigit(c))
+		while ((int)c != -1 && Ascii::isDigit(c))
 		{
 			istr.get();
 			_value += c;

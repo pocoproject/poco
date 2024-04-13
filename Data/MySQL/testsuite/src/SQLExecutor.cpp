@@ -205,7 +205,12 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	bind_param[4].buffer		= &fifth;
 	bind_param[4].buffer_type   = MYSQL_TYPE_FLOAT;
 
+#if LIBMYSQL_VERSION_ID >= 80300
+	rc = mysql_stmt_bind_named_param(hstmt, bind_param, 5, nullptr);
+#else
 	rc = mysql_stmt_bind_param(hstmt, bind_param);
+#endif
+
 	assertTrue (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);

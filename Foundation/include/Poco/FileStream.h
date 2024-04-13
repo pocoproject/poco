@@ -72,6 +72,9 @@ public:
 	Poco::UInt64 size() const;
 		/// Returns file size
 
+	void flushToDisk();
+		/// Forces buffered data to be written to the disk
+
 protected:
 	FileStreamBuf _buf;
 };

@@ -143,6 +143,14 @@ void MemoryStreamTest::testInputSeek()
 	assertTrue (istr.good());
 	assertTrue (9 == istr.tellg());
 
+
+	istr.seekg(5);
+	assertTrue (istr.good());
+	assertTrue (5 == istr.tellg());
+	istr >> c;
+	assertTrue (c == '6');
+
+
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(10, std::ios_base::beg);
@@ -336,6 +344,12 @@ void MemoryStreamTest::testOutputSeek()
 	ostr.seekp(9, std::ios_base::beg);
 	assertTrue (ostr.good());
 	assertTrue (9 == ostr.tellp());
+
+
+	ostr.seekp(5);
+	assertTrue (ostr.good());
+	assertTrue (5 == ostr.tellp());
+
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());

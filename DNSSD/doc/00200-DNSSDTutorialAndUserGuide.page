@@ -1,0 +1,406 @@
+DNS-SD Tuturial And User Guide
+DNS-SD
+
+!!!Introduction
+
+The POCO DNS-SD POCO library provides an easy-to-use and
+unified programming interface for integrating Zeroconf features
+(service discovery and host name resolution) into a C++ application.
+The Applied Informatics DNS-SD library does not
+implement its own mDNS and DNS-SD protocol stacks, but rather uses
+an existing Zeroconf implementation for that purpose. Apple's Bonjour
+and Avahi can be used as backend for the DNS-SD library.
+
+A great advantage of the library is that it provides a unified
+programming interface. For the programmer, it's completely
+transparent whether Avahi or Bonjour is used as backend.
+
+
+!!!Programming Basics
+
+The DNS-SD library provides an asynchronous programming interface.
+This means that the application starts a browse or resolve operation
+by calling a member function of the Poco::DNSSD::DNSSDBrowser class,
+and this function returns immediately. The actual browse or resolve
+operation (which involves sending queries over the network and
+receiving responses from other hosts) is carried out in a separate
+thread, and as soon as results become available, these are reported
+to the application via events.
+
+
+!!Event Handlers
+
+The event handlers registered by the application should
+complete their work and return as quick as possible, otherwise they may
+interfere with DNS-SD processing. Event handlers should never
+wait for other events to happen. Specifically, they must never
+wait for an other DNSSDBrowser event to happen, as this will
+result in a deadlock.
+
+
+!!Service Types
+
+Service types (or registration types) are the most important concept when
+handling with DNS Service Discovery. A service type consists of a
+short name (maximum of 15 characters) specifying the protocol implemented
+by the service (prepended by an underscore), followed by a dot, followed
+by a name identifying the primary transport protocol, which is either
+"_tcp" or "_udp". Service types should be registered at <[dns-sd.org]>.
+A list of currently registered service types, as well as information on how
+to register a new service type can be found at the
+[[http://www.dns-sd.org/ServiceTypes.html DNS-SD website]].
+
+Examples for service types are "_daap._tcp" (Digital Audio Access Protocol,
+the protocol used by iTunes music sharing), "_http._tcp" (web server)
+or "_printer._tcp" for a printing service.
+
+Service names are not case sensitive.
+
+
+!!!Programming Tasks
+
+In the following sections, the basic programming Tasks
+that need to be performed when working with the DNS-SD library
+are described.
+
+
+!!Initializing the DNS-SD Library
+
+The DNS-SD core library only defines the classes that are part
+of the programming interfaces, it does not provide an actual
+implementation of these interfaces. So, in addition to the DNS-SD
+core library, a backend library must be linked with the application
+as well. Depending on which backend library is used, either Apple's
+Bonjour or Avahi will be used.
+
+Before the DNS-SD library can be used it must be initialized.
+This is done by calling the Poco::DNSSD::initializeDNSSD() function.
+This function is actually defined implemented in a backend library,
+so the backend libraries's header file must be included.
+
+It is good practice to control which backend header is being
+included via the preprocessor. For a cross-platform application,
+one would use Avahi on Linux platforms and Bonjour on Mac OS X and
+Windows platforms.
+
+Typically, the <[#include]> statements for the DNS-SD library
+would be as follows:
+
+    #include "Poco/DNSSD/DNSSDResponder.h"
+    #include "Poco/DNSSD/DNSSDBrowser.h"
+    #if POCO_OS == POCO_OS_LINUX && !defined(POCO_DNSSD_USE_BONJOUR)
+    #include "Poco/DNSSD/Avahi/Avahi.h"
+    #else
+    #include "Poco/DNSSD/Bonjour/Bonjour.h"
+    #endif
+----
+
+These statements will include the header files for the Poco::DNSSD::DNSSDResponder
+and Poco::DNSSD::DNSSDBrowser classes, as well as the core header
+file for a backend. Note that an application that only registers a service,
+but does not browse for services, does not need to include the
+<*Poco/DNSSD/DNSSDBrowser.h*> header file.
+
+The Poco::DNSSD::initializeDNSSD() function must be called before an
+instance of the Poco::DNSSD::DNSSDResponder class is created. If the
+application uses the Poco::Util::Application class (or its server
+counterpart), this can happen in the constructor of the application
+subclass. It is also good practice to uninitialize the DNS-SD library
+when the application exits by calling Poco::DNSSD::uninitializeDNSSD(),
+which can be done in the application class destructor.
+
+After initializing the DNS-SD library, the application should
+create an instance of the Poco::DNSSD::DNSSDResponder class.
+This class provides the main entry point into the DNS-SD library.
+Although it is possible to create more than one instance of
+the Poco::DNSSD::DNSSDResponder class, application programmers
+should refrain from doing so. The Poco::DNSSD::DNSSDResponder
+object should be kept alive during the entire lifetime of
+the application, or at least as long as DNS-SD services
+are required.
+
+After the responder object has been created, its <[start()]> method
+must be called. This will start a thread that handles all
+DNS-SD related network activity for the application.
+
+Similarly, when the application terminates, or when DNS-SD
+services are no longer required, the <[stop()]> method should
+be called to orderly shut-down the background thread.
+
+
+!!Registering A Service
+
+Registering a service, and thus making it discoverable to other
+DNS-SD capable applications, is a two step process.
+First, an instance of Poco::DNSSD::Service must be created
+and properly initialized. At least the following information
+must be specified:
+
+  - the service type (e.g., "_http._tcp"), and
+  - the port number of the service.
+
+Other information can be specified, but defaults will be
+used if not. This includes:
+
+  - The service name, which defaults to the local hosts's machine name.
+  - The network interface (by its interface index), on which the
+    service shall be announced. The default is to announce the
+    service on all interfaces (interface index is zero).
+  - The domain, on which the service will be announced.
+  - The domain name of the host providing the service.
+  - Service properties, which will be announced in the TXT
+    record of the service.
+
+The service properties (basically, a list of key-value pairs)
+can be used to provide additional information
+necessary for invoking the service. These will be announced along
+with the basic service information (host name, port number, etc.).
+The content of the service properties is specific to the application
+or network protocol the application uses.
+When specifying service properties, a few restrictions must be
+considered:
+
+   - The total length of a key-value pair must not exceed 254 bytes.
+   - The total length of all key-value pairs, including two additional
+     bytes for each pair, must not exceed 65535 bytes.
+   - The length of the key should not exceed nine bytes.
+   - Values can contain text strings or arbitrary binary values, and
+     can also be empty.
+
+
+The following code shows how to register and publish a HTTP server
+(running on port 8080) on a Zeroconf network:
+
+    Poco::DNSSD::DNSSDResponder dnssdResponder;
+    dnssdResponder.start();
+
+    Poco::DNSSD::Service service("_http._tcp", 8080);
+    Poco::DNSSD::ServiceHandle serviceHandle = dnssdResponder.registerService(service);
+----
+
+Another example, the following code shows how to register
+and publish a network postscript-capable printer on a Zeroconf network.
+
+    Poco::DNSSD::DNSSDResponder dnssdResponder;
+    dnssdResponder.start();
+
+    Poco::DNSSD::Service::Properties props;
+    props.add("txtvers", "1");
+    props.add("pdl", "application/postscript");
+    props.add("qtotal", "1");
+    props.add("rp", "ThePrinter");
+    props.add("ty", "A Postscript Printer");
+    Poco::DNSSD::Service service(0, "The Printer", "", "_printer._tcp", "", "", 515, props);
+    Poco::DNSSD::ServiceHandle serviceHandle = dnssdResponder.registerService(service);
+----
+
+!Unregistering A Service
+
+The <[registerService()]> method returns a Poco::DNSSD::ServiceHandle object.
+This object is used to unregister the service when it's no longer available,
+by passing it as argument to the <[unregisterService()]> method.
+
+    dnssdResponder.unregisterService(serviceHandle);
+----
+
+
+!Handling Registration Errors
+
+The above code examples don't do a very good job of error handling.
+Registration on the network may fail for various reasons.
+The Poco::DNSSD::DNSSDResponder class provides two events that can be
+used to check the status of a service registration.
+If the registration was successful, the <[serviceRegistered]> event
+will be fired. If registration failed, the <[serviceRegistrationFailed]>
+event will be fired. Please see the class documentation for a
+description of the available event arguments.
+
+Usually, there's not much an application can do when service registration
+fails. This is especially true for embedded devices, which often don't
+even have a way to communicate this error to the user. However, an application
+should at least log a registration error in a log file, to help with
+error diagnostics.
+
+Handling the <[serviceRegistered]> event is only necessary if the application
+needs to know the actual service name used to announce the service.
+In case of a name conflict (duplicate service names on the network), the
+name specified when registering the service may have been changed by
+the Bonjour or Avahi backend.
+
+The following example shows an event handler (delegate) function for handling
+registration errors.
+
+    void onError(const void* sender, const Poco::DNSSD::DNSSDResponder::ErrorEventArgs& args)
+    {
+        std::cerr
+            << "Service registration failed: "
+            << args.error.message()
+            << " (" << args.error.code() << ")"
+            << std::endl;
+    }
+----
+
+To register this function as delegate for the <[serviceRegistrationFailed]> event:
+
+    dnssdResponder.serviceRegistrationFailed += Poco::delegate(onError);
+----
+
+
+!!Browsing For Services
+
+To discover available services of a specific type on the network, a browse operation
+for a specific service type must be initiated. For this purpose, the
+Poco::DNSSD::DNSSDBrowser class is used. An instance of this class can be obtained
+from the Poco::DNSSD::DNSSDResponder object, by calling the <[browswer()]> method.
+
+After a browse operation for a service type has been started, services becoming
+available or unavailable will be reported via events. A service that has been
+discovered will be reported via the <[serviceFound]> event.
+If a service is no longer available, it will be reported via the <[serviceRemoved]>
+event. The name, type and domain of the discovered service can be obtained from the
+Poco::DNSSD::Service object passed as event argument.
+
+The following sample shows how to write a delegate function for
+the <[serviceFound]> event.
+
+    void onServiceFound(const void* sender, const Poco::DNSSD::DNSSDBrowser::ServiceEventArgs& args)
+    {
+        std::cout << "Service Found: \n"
+            << "  Name:      " << args.service.name() << "\n"
+            << "  Domain:    " << args.service.domain() << "\n"
+            << "  Type:      " << args.service.type() << "\n"
+            << "  Interface: " << args.service.networkInterface() << "\n" << std::endl;
+    }
+----
+
+The next sample shows how to start a browse operation:
+
+    Poco::DNSSD::DNSSDResponder dnssdResponder;
+    dnssdResponder.start();
+
+    dnssdResponder.browser().serviceFound += Poco::delegate(onServiceFound);
+    Poco::DNSSD::BrowseHandle bh = dnssdResponder.browser().browse("_printer._tcp", "");
+----
+
+Poco::DNSSD::DNSSDBrowser::browse() returns a Poco::DNSSD::BrowseHandle object, which can
+later be used to cancel a browse operation, by passing it to the <[cancel()]> method, as
+shown in the following example:
+
+    dnssdResponder.browser().cancel(bh);
+----
+
+After a service has been discovered, the next step is resolving the service, to obtain
+its host name, port number and properties, so that the service can be invoked.
+
+
+!!Resolving A Service
+
+Like browsing for services, resolving a service is an asynchronous operation.
+A resolve operation is started with a call to <[resolve()]>, passing the
+Poco::DNSSD::Service object obtained from the <[serviceFound]> event as
+argument. Once the service has been resolved, the result is reported via
+the <[serviceResolved]> event. The resolve operation can be started
+directly from the <[serviceFound]> event handler, as shown in the
+following sample:
+
+    void onServiceFound(const void* sender, const Poco::DNSSD::DNSSDBrowser::ServiceEventArgs& args)
+    {
+        std::cout << "Service Found: \n"
+            << "  Name:      " << args.service.name() << "\n"
+            << "  Domain:    " << args.service.domain() << "\n"
+            << "  Type:      " << args.service.type() << "\n"
+            << "  Interface: " << args.service.networkInterface() << "\n" << std::endl;
+
+        reinterpret_cast<Poco::DNSSD::DNSSDBrowser*>(const_cast<void*>(sender))->resolve(args.service);
+    }
+----
+
+After a successful resolve, the service host name, port number and properties
+are available through the Poco::DNSSD::Service object passed to the event handler,
+as shown in the sample below:
+
+    void onServiceResolved(const void* sender, const Poco::DNSSD::DNSSDBrowser::ServiceEventArgs& args)
+    {
+        std::cout << "Service Resolved: \n"
+            << "  Name:      " << args.service.name() << "\n"
+            << "  Full Name: " << args.service.fullName() << "\n"
+            << "  Domain:    " << args.service.domain() << "\n"
+            << "  Type:      " << args.service.type() << "\n"
+            << "  Interface: " << args.service.networkInterface() << "\n"
+            << "  Host:      " << args.service.host() << "\n"
+            << "  Port:      " << args.service.port() << "\n"
+            << "  Properties: \n";
+
+        for (Poco::DNSSD::Service::Properties::ConstIterator it = args.service.properties().begin(); it != args.service.properties().end(); ++it)
+        {
+            std::cout << "    " << it->first << ": " << it->second << "\n";
+        }
+        std::cout << std::endl;
+    }
+----
+
+Of course, the event delegate for the <[serviceResolved]> event must be registered:
+
+    dnssdResponder.browser().serviceResolved += Poco::delegate(onServiceResolved);
+----
+
+
+!!Resolving A Service's Host Name
+
+The last step necessary before invoking a service is to resolve the service's host name
+into an IP address. On systems where mDNS is integrated into the DNS resolver (e.g.,
+Mac OS X, Windows with Bonjour or most Linux distributions with Avahi), this
+can simply be done by creating a Poco::Net::SocketAddress instance from the service's
+host name and port number. However if the systems's DNS resolver cannot handle
+Multicast DNS queries, the host name must be resolved through the
+Poco::DNSSD::DNSSDBrowser::resolveHost() method. Like resolving a service, resolving
+a host name is an asynchronous operation, and the result will be reported via
+an event -- the <[hostResolved]> event.
+
+The following sample shows how to implement the delegate function for the
+<[hostResolved]> event:
+
+    void onHostResolved(const void* sender, const Poco::DNSSD::DNSSDBrowser::ResolveHostEventArgs& args)
+    {
+        std::cout << "Host Resolved: \n"
+            << "  Host:      " << args.host << "\n"
+            << "  Interface: " << args.networkInterface << "\n"
+            << "  Address:   " << args.address.toString() << "\n"
+            << "  TTL:       " << args.ttl << "\n" << std::endl;
+    }
+----
+
+Like with resolving a service, it is possible to initiate resolving a host name directly
+from within the event delegate for the <[serviceResolved]> event.
+
+
+!!!Advanced Programming Tasks
+
+!!Enumerating Domains
+
+Available domains for browsing and registration can be enumerated by calling the
+Poco::DNSSD::DNSSDBrowser::enumerateBrowseDomains() and
+Poco::DNSSD::DNSSDBrowser::enumerateRegistrationDomains() methods. As usual,
+results are reported via events.
+
+
+!!Registering And Browsing For Records
+
+Additional DNS records for a specific service can be published on a Zeroconf network
+by invoking the Poco::DNSSD::DNSSDResponder::addRecord() method. It is also possible
+to alter a published record, or remove it. Records can be queried by invoking
+Poco::DNSSD::DNSSDBrowser::queryRecord(). Results are reported via
+events.
+
+
+!!Enumerating Available Service Types
+
+It is possible to enumerate all available services types on a domain by
+browsing for the special service type "_services._dns-sd._udp".
+
+Results will be reported via the <[serviceDiscovered]> event.
+The service type (without the primary transport protocol part,
+as in "_http") can be obtained from the service name stored
+in the Poco::DNSSD::Service object passed as event argument.
+The primary transport protocol and the domain can be obtained
+from the service type.

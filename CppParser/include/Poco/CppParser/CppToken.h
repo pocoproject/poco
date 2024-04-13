@@ -60,6 +60,7 @@ public:
 		OP_GE,              // >=
 		OP_SHR,             // >>
 		OP_SHR_ASSIGN,      // >>=
+		OP_SPACESHIP,       // <=>
 		OP_ASSIGN,          // =
 		OP_EQ,              // ==
 		OP_NOT,             // !
