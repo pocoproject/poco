@@ -2537,6 +2537,19 @@ void SQLiteTest::testSQLChannel()
 	rs2.moveNext();
 	assertTrue("WarningSource" == rs2["Source"]);
 	assertTrue("f Warning sync message" == rs2["Text"]);
+
+	pChannel->setProperty("minBatch", "1024");
+	constexpr int mcount { 20000 };
+	for (int i = 0; i < mcount; i++)
+	{
+		Message msgInfA("InformationSource", "e Informational sync message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInfA);
+	}
+	//pChannel->stop();
+	pChannel.reset();
+	RecordSet rsl(tmp, "SELECT * FROM T_POCO_LOG");
+	assertEquals(2+mcount, rsl.rowCount());
+
 }
 
 
