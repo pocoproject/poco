@@ -26,6 +26,7 @@
 #include "Poco/Format.h"
 #include "Poco/File.h"
 #include <fstream>
+#include <memory>
 
 
 namespace Poco {
@@ -159,7 +160,7 @@ void SQLChannel::open()
 			else logLocal(Poco::format("Connected to %s: %s", _connector, maskPwd()));
 			return;
 		}
-		catch (DataException& ex)
+		catch (const DataException& ex)
 		{
 			logLocal(ex.displayText());
 		}
@@ -180,7 +181,7 @@ void SQLChannel::close()
 }
 
 
-size_t SQLChannel::logLocal(const std::string message, Message::Priority prio)
+size_t SQLChannel::logLocal(const std::string& message, Message::Priority prio)
 {
 	Message msg("SQLChannel"s, message, prio);
 	log(msg);
@@ -229,7 +230,7 @@ bool SQLChannel::processOne(int minBatch)
 			_priority.push_back(msg.getPriority());
 			_text.push_back(msg.getText());
 			Poco::replaceInPlace(_text.back(), "'", "''");
-			_dateTime.push_back(msg.getTime());
+			_dateTime.emplace_back(msg.getTime());
 		}
 		ret = true;
 	}
@@ -254,6 +255,8 @@ void SQLChannel::run()
 				if (_reconnect && sleepTime < 12800)
 					sleepTime *= 2;
 			}
+			if (_stop && _reconnect)
+				std::cout << "Request to stop and reconnect!" << std::endl;
 
 			if (!_reconnect)
 			{
@@ -261,25 +264,35 @@ void SQLChannel::run()
 				sleepTime = 100;
 			}
 		}
-		catch (Poco::Exception& ex)
+		catch (const Poco::Exception& ex)
 		{
-			if (!_stop) _logger.error(ex.displayText());
-			else logLocal(ex.displayText());
+			if (!_stop)
+				_logger.error(ex.displayText());
+			else
+				logLocal(ex.displayText());
 		}
-		catch (std::exception& ex)
+		catch (const std::exception& ex)
 		{
-			if (!_stop) _logger.error(ex.what());
-			else logLocal(ex.what());
+			if (!_stop)
+				_logger.error(ex.what());
+			else
+				logLocal(ex.what());
 		}
 		catch (...)
 		{
-			if (!_stop) _logger.error("SQLChannel::run(): unknown exception"s);
-			else logLocal("SQLChannel::run(): unknown exception"s);
+			if (!_stop)
+				_logger.error("SQLChannel::run(): unknown exception"s);
+			else
+				logLocal("SQLChannel::run(): unknown exception"s);
 		}
-		if (_stop) break;
+		if (_stop)
+		{
+			break;
+		}
 		Thread::sleep(sleepTime);
 	}
-	while (_logQueue.size()) processOne();
+	while (_logQueue.size())
+		processOne();
 }
 
 
@@ -289,7 +302,8 @@ void SQLChannel::stop()
 	{
 		_reconnect = false;
 		_stop = true;
-		while (_pDBThread->isRunning()) Thread::sleep(10);
+		while (_pDBThread->isRunning())
+			Thread::sleep(10);
 		_pDBThread->join();
 	}
 }
@@ -300,7 +314,7 @@ void SQLChannel::reconnect()
 	_reconnect = true;
 	if (!_pDBThread)
 	{
-		_pDBThread.reset(new Thread);
+		_pDBThread = std::make_unique<Thread>();
 		_pDBThread->start(*this);
 	}
 }
@@ -336,7 +350,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		if (value.empty())
 		{
-			_pArchiveStrategy = 0;
+			_pArchiveStrategy = nullptr;
 		}
 		else if (_pArchiveStrategy)
 		{
@@ -353,7 +367,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		if (value.empty() || "forever" == value)
 		{
-			_pArchiveStrategy = 0;
+			_pArchiveStrategy = nullptr;
 		}
 		else if (_pArchiveStrategy)
 		{
@@ -573,7 +587,7 @@ size_t SQLChannel::execSQL()
 						use(_dateTime, bulk), now;
 				}
 				// most likely bulk mode not supported, try again
-				catch (Poco::InvalidAccessException&)
+				catch (const Poco::InvalidAccessException&)
 				{
 					(*_pSession) << _sql,
 						use(_source),
@@ -601,13 +615,13 @@ size_t SQLChannel::execSQL()
 			}
 			n = _source.size();
 		}
-		catch (Poco::Exception& ex)
+		catch (const Poco::Exception& ex)
 		{
 			logLocal(ex.displayText());
 			close();
 			_reconnect = true;
 		}
-		catch (std::exception& ex)
+		catch (const std::exception& ex)
 		{
 			logLocal(ex.what());
 			close();

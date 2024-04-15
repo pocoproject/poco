@@ -102,23 +102,23 @@ public:
 		/// Creates an SQLChannel with the given connector, connect string, timeout, table and name.
 		/// The connector must be already registered.
 
-	void open();
+	void open() override;
 		/// Opens the SQLChannel.
 		/// Returns true if succesful.
 
-	void close();
+	void close() override;
 		/// Closes the SQLChannel.
 
-	void run();
+	void run() override;
 		/// Dequeues and sends the logs to the DB.
 
 	bool isRunning() const;
 		/// Returns true if the logging thread is running.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Writes the log message to the database.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
@@ -172,7 +172,7 @@ public:
 		///     * file       Destination file name for the backup FileChannel, used when DB
 		///                  connection is not present to log not executed SQL statements.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
 	void stop();
@@ -203,15 +203,15 @@ public:
 	static const std::string PROP_FILE;
 
 protected:
-	~SQLChannel();
+	~SQLChannel() override;
 
 private:
 	static const std::string SQL_INSERT_STMT;
 
-	typedef Poco::SharedPtr<Session>         SessionPtr;
-	typedef Poco::SharedPtr<Statement>       StatementPtr;
-	typedef Poco::Message::Priority          Priority;
-	typedef Poco::SharedPtr<ArchiveStrategy> StrategyPtr;
+	using SessionPtr = Poco::SharedPtr<Session>;
+	using StatementPtr = Poco::SharedPtr<Statement>;
+	using Priority = Poco::Message::Priority;
+	using StrategyPtr = Poco::SharedPtr<ArchiveStrategy>;
 
 	void reconnect();
 		/// Closes and opens the DB connection.
@@ -235,7 +235,7 @@ private:
 	size_t logToFile(bool clear = false);
 		/// Logs cached entries to a file. Called in case DB insertions fail.
 
-	size_t logLocal(const std::string, Message::Priority prio = Message::PRIO_ERROR);
+	size_t logLocal(const std::string&, Message::Priority prio = Message::PRIO_ERROR);
 		/// Adds the message to the local SQLChannel log queue, and logs it to the file.
 		/// Typically used to log DB connection/execution erors.
 
