@@ -47,6 +47,8 @@ public:
 	void testTempTable();
 
 	void testBLOB();
+	void testBigString();
+	void testBigBatch();
 	void testNull();
 	void testBulk();
 
@@ -65,6 +67,7 @@ private:
 	void recreateNullableTable();
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonBigStringTable();
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable() { /* no-op */ };
 	void recreatePersonTimeTable() { /* no-op */ };

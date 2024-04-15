@@ -24,6 +24,7 @@
 #include <iostream>
 
 
+using namespace std::string_literals;
 using namespace Poco::Data::Keywords;
 using Poco::Data::DataException;
 using Poco::Data::Statement;
@@ -213,6 +214,76 @@ void ODBCSQLServerTest::testBLOB()
 		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&) { }
+}
+
+
+void ODBCSQLServerTest::testBigString()
+{
+	std::string lastName(8000, 'l');
+	std::string firstName(8000, 'f');
+	std::string address("Address");
+	int age = 42;
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBigStringTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+		try
+		{
+			session() << "INSERT INTO Person VALUES (?,?,?,?)"s,
+				use(lastName), use(firstName), use(address), use(age), now;
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+		i += 2;
+	}
+}
+
+
+void ODBCSQLServerTest::testBigBatch()
+{
+	const std::string query("INSERT INTO Person VALUES('L', 'N', 'A', %d);");
+	std::string bigQuery;
+	// TODO: see what exactly the limits are here
+	int rows = 317, cnt = 0;
+	for (int i = 0; i < rows; ++i)
+	{
+		bigQuery += Poco::format(query, i);
+	}
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBigStringTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+
+		try
+		{
+			session() << bigQuery, now;
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+
+		try
+		{
+			session() << "SELECT COUNT(*) FROM Person", into(cnt), now;
+			assertEqual(rows, cnt);
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+
+		i += 2;
+	}
 }
 
 
@@ -706,6 +777,15 @@ void ODBCSQLServerTest::recreatePersonBLOBTable()
 }
 
 
+void ODBCSQLServerTest::recreatePersonBigStringTable()
+{
+	dropObject("TABLE", "Person");
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(MAX), FirstName VARCHAR(8000), Address VARCHAR(30), Age INTEGER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreatePersonBLOBTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreatePersonBLOBTable()"); }
+}
+
+
 void ODBCSQLServerTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
@@ -939,6 +1019,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigString);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigBatch);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
