@@ -80,7 +80,7 @@ $ brew install cmake openssl mysql-client libpq
 building the POCO C++ Libraries.
 
 ```
-$ git clone -b master https://github.com/pocoproject/poco.git
+$ git clone -b main https://github.com/pocoproject/poco.git
 $ cd poco
 $ mkdir cmake-build
 $ cd cmake-build
