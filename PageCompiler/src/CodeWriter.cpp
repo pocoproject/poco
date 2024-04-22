@@ -160,7 +160,14 @@ void CodeWriter::handlerClass(std::ostream& ostr, const std::string& base, const
 		ostr << "\t" << _class << "(" << ctorArg << ");\n";
 		ostr << "\n";
 	}
-	ostr << "\tvoid handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);\n";
+	ostr << "\tvoid handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;\n";
+
+	if (shouldWriteForm()) {
+		ostr << "\tvoid stringify(std::ostream &responseStream, Poco::Net::HTMLForm &form);\n";
+	} else {
+		ostr << "\tvoid stringify(std::ostream &responseStream);\n";
+	}
+
 	writeHandlerMembers(ostr);
 
 	std::string path = _page.get("page.path", "");
@@ -195,6 +202,11 @@ void CodeWriter::factoryImpl(std::ostream& ostr, const std::string& arg)
 void CodeWriter::writeHeaderIncludes(std::ostream& ostr)
 {
 	ostr << "#include \"Poco/Net/HTTPRequestHandler.h\"\n";
+	ostr << "namespace Poco {\n"
+		"namespace Net {\n"
+		"class HTMLForm;\n"
+		"}\n"
+		"}\n";
 }
 
 
@@ -272,8 +284,18 @@ void CodeWriter::writeHandler(std::ostream& ostr)
 		ostr << "\tif (!(" << _page.get("page.precondition") << ")) return;\n\n";
 	}
 	writeForm(ostr);
-	ostr << _page.preHandler().str();
 	writeContent(ostr);
+	ostr << "}\n\n";
+
+	if (shouldWriteForm()) {
+		ostr << "void " << _class << "::stringify(std::ostream &responseStream, [[maybe_unused]] Poco::Net::HTMLForm &form)\n";
+		ostr << "{\n";
+	} else {
+		ostr << "void " << _class << "::stringify(std::ostream &responseStream)\n";
+		ostr << "{\n";
+	}
+	ostr << _page.preHandler().str();
+	ostr << cleanupHandler(_page.handler().str());
 	ostr << "}\n";
 }
 
@@ -287,6 +309,10 @@ void CodeWriter::writeManifest(std::ostream& ostr)
 {
 }
 
+bool CodeWriter::shouldWriteForm() const
+{
+	return _page.getBool("page.form", true);
+}
 
 void CodeWriter::writeSession(std::ostream& ostr)
 {
@@ -295,7 +321,7 @@ void CodeWriter::writeSession(std::ostream& ostr)
 
 void CodeWriter::writeForm(std::ostream& ostr)
 {
-	if (_page.getBool("page.form", true))
+	if (shouldWriteForm())
 	{
 		std::string partHandler(_page.get("page.formPartHandler", ""));
 		if (!partHandler.empty())
@@ -367,6 +393,8 @@ void CodeWriter::writeContent(std::ostream& ostr)
 	if (buffered) compressed = false;
 	if (compressed) chunked = true;
 
+	std::string stringifyCall = shouldWriteForm() ? "\tstringify(responseStream, form);\n" : "\tstringify(responseStream);\n";
+
 	if (buffered)
 	{
 		ostr << "\tstd::stringstream responseStream;\n";
@@ -374,7 +402,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		{
 			ostr << "\tPoco::Net::EscapeHTMLOutputStream _escapeStream(responseStream);\n";
 		}
-		ostr << cleanupHandler(_page.handler().str());
+		ostr << stringifyCall;
 		if (!chunked)
 		{
 			ostr << "\tresponse.setContentLength(static_cast<int>(responseStream.tellp()));\n";
@@ -390,7 +418,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		{
 			ostr << "\tPoco::Net::EscapeHTMLOutputStream _escapeStream(responseStream);\n";
 		}
-		ostr << cleanupHandler(_page.handler().str());
+		ostr << stringifyCall;
 		ostr << "\tif (_compressResponse) _gzipStream.close();\n";
 	}
 	else
@@ -400,7 +428,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		{
 			ostr << "\tPoco::Net::EscapeHTMLOutputStream _escapeStream(responseStream);\n";
 		}
-		ostr << cleanupHandler(_page.handler().str());
+		ostr << stringifyCall;
 	}
 }
 

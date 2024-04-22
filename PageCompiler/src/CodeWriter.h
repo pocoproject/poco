@@ -58,6 +58,8 @@ protected:
 	virtual void writeContent(std::ostream& ostr);
 	virtual void writeManifest(std::ostream& ostr);
 
+	virtual bool shouldWriteForm() const;
+
 	void beginGuard(std::ostream& ostr, const std::string& headerFileName);
 	void endGuard(std::ostream& ostr, const std::string& headerFileName);
 	void beginNamespace(std::ostream& ostr);
