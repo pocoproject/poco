@@ -653,6 +653,8 @@ int SocketImpl::available()
 	{
 		std::vector<char> buf(result);
 		result = recvfrom(sockfd(), &buf[0], result, MSG_PEEK, nullptr, nullptr);
+
+		if (result < 0) error();
 	}
 #endif
 	return result;
