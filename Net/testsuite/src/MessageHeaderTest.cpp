@@ -402,6 +402,10 @@ void MessageHeaderTest::testDecodeWord()
 	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
 	assertTrue (decoded == "(ab)");
 
+	coded = "(=?ISO-8859-1?Q?a?= <0> =?ISO-8859-1?Q?b?=)";
+	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assertTrue (decoded == "(a <0> b)");
+
 	coded = "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye";
 	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
 	assertTrue (decoded == "Hello Francis, good bye");
