@@ -453,14 +453,21 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 			// not found.
 			outs += tmp;
 			break;
-
 		}
+
 		// At this place, there are a valid rfc2047 chunk, so decode and copy the result.
 		decodeRFC2047(tmp.substr(0, pos3), tmp2, charset);
 		outs += tmp2;
 
 		// Jump at the rest of the string and repeat the whole process.
 		tmp = tmp.substr(pos3 + 2);
+		if (!tmp.empty())
+		{
+			while (*tmp.begin() == ' ')
+			{
+				tmp = tmp.substr(1);
+			}
+		}
 	} while (true);
 
 	return outs;
