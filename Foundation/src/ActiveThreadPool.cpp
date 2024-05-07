@@ -79,31 +79,39 @@ private:
 class ActiveThread: public Runnable
 {
 public:
-	ActiveThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
+	ActiveThread(const std::string& name, std::vector<ActiveThread*> &threads, int stackSize = POCO_THREAD_STACK_SIZE, bool redistributeTasks = false);
 	~ActiveThread() override = default;
 
 	void start();
 	void start(Thread::Priority priority, Runnable& target);
 	void start(Thread::Priority priority, Runnable& target, const std::string& name);
+	void start(Notification::Ptr notification);
 	void join();
+	bool idle() const;
+	int id() const;
 	void release();
 	void run() override;
 
 private:
 	NotificationQueue _pTargetQueue;
 	std::string       _name;
+	std::vector<ActiveThread*> &_threads;
 	Thread            _thread;
 	Event             _targetCompleted;
 	FastMutex         _mutex;
 	const long        JOIN_TIMEOUT = 10000;
 	std::atomic<bool> _needToStop{false};
+	std::atomic<bool> _idle{true};
+	bool              _redistributeTasks;
 };
 
 
-ActiveThread::ActiveThread(const std::string& name, int stackSize):
+ActiveThread::ActiveThread(const std::string& name, std::vector<ActiveThread*> &threads, int stackSize, bool redistributeTasks):
 	_name(name),
+	_threads(threads),
 	_thread(name),
-	_targetCompleted(false)
+	_targetCompleted(false),
+	_redistributeTasks(redistributeTasks)
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
@@ -122,6 +130,13 @@ void ActiveThread::start(Thread::Priority priority, Runnable& target)
 }
 
 
+void ActiveThread::start(Notification::Ptr notification)
+{
+	if (!notification.isNull()){
+		_pTargetQueue.enqueueNotification(std::move(notification));
+	}
+}
+
 void ActiveThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
 {
 	_pTargetQueue.enqueueNotification(Poco::makeAuto<NewActionNotification>(priority, target, name));
@@ -134,9 +149,17 @@ void ActiveThread::join()
 	{
 		_targetCompleted.wait();
 	}
-
 }
 
+inline bool ActiveThread::idle() const
+{
+	return _idle;
+}
+
+inline int ActiveThread::id() const
+{
+	return _thread.id();
+}
 
 void ActiveThread::release()
 {
@@ -165,6 +188,22 @@ void ActiveThread::run()
 		AutoPtr<Notification> pN = _pTargetQueue.waitDequeueNotification();
 		while (pN)
 		{
+			_idle = false;
+			if (_redistributeTasks)
+			{
+				for (const auto &thr : _threads)
+				{
+					if ((thr->id() != _thread.id()) && thr->idle())
+					{
+						thr->start(std::move(pN));
+						pN = _pTargetQueue.waitDequeueNotification(1000);
+					}
+				}
+				if (pN.isNull())
+				{
+					break;
+				}
+			}
 			NewActionNotification::Ptr pNAN = pN.cast<NewActionNotification>();
 			Runnable& target = pNAN->runnable();
 			_thread.setPriority(pNAN->priority());
@@ -191,16 +230,18 @@ void ActiveThread::run()
 			pN = _pTargetQueue.waitDequeueNotification(1000);
 		}
 		_targetCompleted.set();
+		_idle = true;
 	}
 	while (_needToStop == false);
 }
 
 
-ActiveThreadPool::ActiveThreadPool(int capacity, int stackSize):
+ActiveThreadPool::ActiveThreadPool(int capacity, int stackSize, bool redistributeTasks):
 	_capacity(capacity),
 	_serial(0),
 	_stackSize(stackSize),
-	_lastThreadIndex(0)
+	_lastThreadIndex(0),
+	_redistributeTasks(redistributeTasks)
 {
 	poco_assert (_capacity >= 1);
 
@@ -215,12 +256,13 @@ ActiveThreadPool::ActiveThreadPool(int capacity, int stackSize):
 }
 
 
-ActiveThreadPool::ActiveThreadPool(std::string  name, int capacity, int stackSize):
+ActiveThreadPool::ActiveThreadPool(std::string  name, int capacity, int stackSize, bool redistributeTasks):
 	_name(std::move(name)),
 	_capacity(capacity),
 	_serial(0),
 	_stackSize(stackSize),
-	_lastThreadIndex(0)
+	_lastThreadIndex(0),
+	_redistributeTasks(redistributeTasks)
 {
 	poco_assert (_capacity >= 1);
 
@@ -323,7 +365,7 @@ ActiveThread* ActiveThreadPool::createThread()
 {
 	std::ostringstream name;
 	name << _name << "[#active-thread-" << ++_serial << "]";
-	return new ActiveThread(name.str(), _stackSize);
+	return new ActiveThread(name.str(), _threads, _stackSize, _redistributeTasks);
 }
 
 

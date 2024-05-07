@@ -76,6 +76,65 @@ void ActiveThreadPoolTest::testActiveThreadPool()
 }
 
 
+void ActiveThreadPoolTest::testActiveThreadLoadBalancing()
+{
+	Poco::AtomicCounter lttCount;
+	Poco::AtomicCounter lttPerTIDCount;
+	class LongTimeTask : public Poco::Runnable
+	{
+		Poco::AtomicCounter &_counter;
+		Poco::AtomicCounter &_tidCounter;
+	public:
+		LongTimeTask(Poco::AtomicCounter &counter, Poco::AtomicCounter &tidCounter) :
+			_counter(counter),
+			_tidCounter(tidCounter)
+		{}
+		void run() override
+		{
+			_counter++;
+			if (_tidCounter >= 0)
+			{
+				_tidCounter = _tidCounter + (-1 * Poco::Thread::currentOsTid());
+			}
+			else
+			{
+				_tidCounter = _tidCounter + Poco::Thread::currentOsTid();
+			}
+			Poco::Thread::sleep(1 * 110);
+		}
+	};
+	
+	Poco::AtomicCounter sttCount;
+	class ShortTimeTask : public Poco::Runnable
+	{
+		Poco::AtomicCounter &_counter;
+	public:
+		ShortTimeTask(Poco::AtomicCounter &counter) : _counter(counter) {}
+		void run() override
+		{
+			_counter++;
+			Poco::Thread::sleep(1);
+		}
+	};
+	
+	const int capacity = 2;
+	const int taskCount = 100;
+	const bool redistributeTasks = true;
+	Poco::ActiveThreadPool pool(capacity, POCO_THREAD_STACK_SIZE, redistributeTasks);
+	
+	for (int i = 0; i < taskCount; i++) {
+		LongTimeTask ltt(lttCount, lttPerTIDCount);
+		pool.start(ltt);
+		ShortTimeTask stt(sttCount);
+		pool.start(stt);
+	}
+	
+	pool.joinAll();
+	assertEqual(taskCount, lttCount.value());
+	assertEqual(taskCount, sttCount.value());
+	assertTrue(lttPerTIDCount != 0); // without optimization all tasks runs on single thread and this counter equal to 0, othrewise - no
+}
+
 void ActiveThreadPoolTest::setUp()
 {
 	_count = 0;
@@ -98,6 +157,7 @@ CppUnit::Test* ActiveThreadPoolTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ActiveThreadPoolTest");
 
 	CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool);
+	CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadLoadBalancing);
 
 	return pSuite;
 }
