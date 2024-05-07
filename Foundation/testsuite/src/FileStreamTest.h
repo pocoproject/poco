@@ -25,6 +25,7 @@ public:
 	~FileStreamTest();
 
 	void testRead();
+	void testWriteReadNativeHandle();
 	void testWrite();
 	void testReadWrite();
 	void testOpen();

@@ -51,6 +51,45 @@ void FileStreamTest::testRead()
 }
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#else
+#include <fcntl.h>
+#endif
+
+void FileStreamTest::testWriteReadNativeHandle()
+{
+	Poco::FileOutputStream fos;
+	Poco::FileInputStream fis;
+	Poco::FileIOS::NativeHandle outHandle;
+	Poco::FileIOS::NativeHandle inHandle;
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	char tmp[]={'\xc3', '\x84', '\xc3', '\x96', '\xc3', '\x9c', '\xc3', '\xa4', '\xc3', '\xb6', '\xc3', '\xbc', '\0'};
+	std::string file(tmp);
+	file.append(".txt");
+	std::wstring utf16Path;
+	FileImpl::convertPath(file, utf16Path);
+	inHandle = CreateFileW(utf16Path.c_str(), GENERIC_READ, GENERIC_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+#else
+	std::string file("testfile.txt");
+	outHandle = ::open(file.c_str(), O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	inHandle = ::open(file.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+#endif
+
+	Poco::TemporaryFile::registerForDeletion(file);
+
+	fos.openHandle(outHandle, std::ios::binary);
+	fos << "sometestdata";
+	fos.close();
+
+	fis.openHandle(inHandle, std::ios::in);
+	assertTrue (fis.good());
+	std::string read;
+	fis >> read;
+	assertTrue (!read.empty());
+}
+
+
 void FileStreamTest::testWrite()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -304,6 +343,7 @@ CppUnit::Test* FileStreamTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileStreamTest");
 
 	CppUnit_addTest(pSuite, FileStreamTest, testRead);
+	CppUnit_addTest(pSuite, FileStreamTest, testWriteReadNativeHandle);
 	CppUnit_addTest(pSuite, FileStreamTest, testWrite);
 	CppUnit_addTest(pSuite, FileStreamTest, testReadWrite);
 	CppUnit_addTest(pSuite, FileStreamTest, testOpen);
