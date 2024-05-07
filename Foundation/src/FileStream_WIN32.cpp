@@ -15,7 +15,6 @@
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
-#include "Poco/UnicodeConverter.h"
 
 
 namespace Poco {
