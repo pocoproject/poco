@@ -50,13 +50,11 @@ private:
 };
 
 
-inline Test::~Test()
-{
-}
+inline Test::~Test() = default;
 
 
 // Runs a test and collects its result in a TestResult instance.
-inline void Test::run(TestResult* result, const Callback& callback)
+inline void Test::run(TestResult*, const Callback&)
 {
 }
 
