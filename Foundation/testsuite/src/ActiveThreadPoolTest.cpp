@@ -120,12 +120,11 @@ void ActiveThreadPoolTest::testActiveThreadLoadBalancing()
 		void run() override
 		{
 			_counter++;
-			Poco::Thread::sleep(1);
 		}
 	};
 	
 	const int capacity = 2;
-	const int taskCount = 100;
+	const int taskCount = 200;
 	const bool redistributeTasks = true;
 	Poco::ActiveThreadPool pool(capacity, POCO_THREAD_STACK_SIZE, redistributeTasks);
 	std::vector<std::unique_ptr<LongTimeTask>> lttVec(taskCount);

@@ -365,13 +365,16 @@ void ActiveThreadPool::recreateThreads()
 		_threads.push_back(pThread);
 		pThread->start();
 	}
-	for (auto& thr : _threads)
+	if (_redistributeTasks)
 	{
-		while (!thr->isRunning())
+		for (auto& thr : _threads)
 		{
-			Poco::Thread::sleep(100);
+			while (!thr->isRunning())
+			{
+				Poco::Thread::sleep(100);
+			}
+			thr->setRedistributeOption(_redistributeTasks);
 		}
-		thr->setRedistributeOption(_redistributeTasks);
 	}
 }
 
