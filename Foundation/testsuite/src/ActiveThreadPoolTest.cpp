@@ -16,6 +16,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include "Poco/Environment.h"
+#include <vector>
 
 
 using Poco::ActiveThreadPool;
@@ -79,26 +80,32 @@ void ActiveThreadPoolTest::testActiveThreadPool()
 void ActiveThreadPoolTest::testActiveThreadLoadBalancing()
 {
 	Poco::AtomicCounter lttCount;
-	Poco::AtomicCounter lttPerTIDCount;
+	ptrdiff_t lttPerTIDCount = 0;
+	Poco::FastMutex mutex;
 	class LongTimeTask : public Poco::Runnable
 	{
 		Poco::AtomicCounter &_counter;
-		Poco::AtomicCounter &_tidCounter;
+		ptrdiff_t &_tidCounter;
+		Poco::FastMutex &_mutex;
 	public:
-		LongTimeTask(Poco::AtomicCounter &counter, Poco::AtomicCounter &tidCounter) :
+		LongTimeTask(Poco::AtomicCounter &counter, ptrdiff_t &tidCounter, Poco::FastMutex &mutex) :
 			_counter(counter),
-			_tidCounter(tidCounter)
+			_tidCounter(tidCounter),
+			_mutex(mutex)
 		{}
 		void run() override
 		{
 			_counter++;
-			if (_tidCounter >= 0)
 			{
-				_tidCounter = _tidCounter + (-1 * Poco::Thread::currentOsTid());
-			}
-			else
-			{
-				_tidCounter = _tidCounter + Poco::Thread::currentOsTid();
+				Poco::FastMutex::ScopedLock lock(_mutex);
+				if (_tidCounter >= 0)
+				{
+					_tidCounter -= (ptrdiff_t)Poco::Thread::currentTid();
+				}
+				else
+				{
+					_tidCounter += (ptrdiff_t)Poco::Thread::currentTid();
+				}
 			}
 			Poco::Thread::sleep(1 * 110);
 		}
@@ -121,12 +128,13 @@ void ActiveThreadPoolTest::testActiveThreadLoadBalancing()
 	const int taskCount = 100;
 	const bool redistributeTasks = true;
 	Poco::ActiveThreadPool pool(capacity, POCO_THREAD_STACK_SIZE, redistributeTasks);
-	
+	std::vector<std::unique_ptr<LongTimeTask>> lttVec(taskCount);
+	std::vector<std::unique_ptr<ShortTimeTask>> sttVec(taskCount);
 	for (int i = 0; i < taskCount; i++) {
-		LongTimeTask ltt(lttCount, lttPerTIDCount);
-		pool.start(ltt);
-		ShortTimeTask stt(sttCount);
-		pool.start(stt);
+		lttVec[i] = std::make_unique<LongTimeTask>(lttCount, lttPerTIDCount, mutex);
+		pool.start(*(lttVec[i]));
+		sttVec[i] = std::make_unique<ShortTimeTask>(sttCount);
+		pool.start(*(sttVec[i]));
 	}
 	
 	pool.joinAll();

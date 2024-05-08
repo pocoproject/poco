@@ -110,11 +110,11 @@ public:
 		/// Returns a reference to the default
 		/// thread pool.
 
-protected:
+private:
 	ActiveThread* getThread();
 	ActiveThread* createThread();
+	void recreateThreads();
 
-private:
 	ActiveThreadPool(const ActiveThreadPool& pool);
 	ActiveThreadPool& operator = (const ActiveThreadPool& pool);
 
