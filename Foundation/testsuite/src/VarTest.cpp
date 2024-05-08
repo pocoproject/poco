@@ -3002,7 +3002,7 @@ void VarTest::testEmpty()
 	std::string s = da.extract<std::string>();
 	assertTrue ("123" == s);
 	assertTrue (!da.isEmpty());
-	da.empty();
+	da.clear();
 	assertTrue (da.isEmpty());
 	assertTrue (da.type() == typeid(void));
 	assertTrue (!da.isArray());

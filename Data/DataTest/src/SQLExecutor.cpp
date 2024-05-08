@@ -2983,7 +2983,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	{
 		Statement stmt = (session() << query, now);
 		RecordSet rset(stmt);
-		assertTrue (rset.totalRowCount() == 4);
+		assertTrue (rset.getTotalRowCount() == 4);
 		RowFilter::Ptr pRF = new RowFilter(&rset);
 		assertTrue (pRF->isEmpty());
 		pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);

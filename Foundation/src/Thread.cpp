@@ -86,8 +86,8 @@ private:
 
 Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
-	_pTLS(0),
-	_event(true)
+	_pTLS(nullptr),
+	_event(Event::EVENT_AUTORESET)
 {
 	setNameImpl(makeName());
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -98,8 +98,8 @@ Thread::Thread(uint32_t sigMask):
 
 Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
-	_pTLS(0),
-	_event(true)
+	_pTLS(nullptr),
+	_event(Event::EVENT_AUTORESET)
 {
 	setNameImpl(name);
 #if defined(POCO_OS_FAMILY_UNIX)

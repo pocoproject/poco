@@ -126,7 +126,7 @@ private:
 			prio(PRIO_NORMAL_IMPL),
 			osPrio(),
 			policy(SCHED_OTHER),
-			done(false),
+			done(Event::EVENT_MANUALRESET),
 			stackSize(POCO_THREAD_STACK_SIZE),
 			started(false),
 			joined(false)

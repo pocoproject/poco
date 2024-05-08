@@ -103,7 +103,7 @@ private:
 ActiveThread::ActiveThread(const std::string& name, int stackSize):
 	_name(name),
 	_thread(name),
-	_targetCompleted(false)
+	_targetCompleted(Event::EVENT_MANUALRESET)
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);

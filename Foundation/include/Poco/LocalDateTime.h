@@ -85,13 +85,13 @@ public:
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the time zone differential of the current time zone.
 
-	[[deprecated]]
+	[[deprecated ("Really? What is the alternative?")]]
 	LocalDateTime(int tzd, const DateTime& dateTime);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. Adjusts dateTime
 		/// for the given time zone differential.
 
-	[[deprecated]]
+	[[deprecated ("Really? What is the alternative?")]]
 	LocalDateTime(int tzd, const DateTime& dateTime, bool adjust);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. If adjust is true,
