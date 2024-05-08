@@ -14,7 +14,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
@@ -38,7 +38,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::NotFoundException;
 
 
@@ -273,8 +273,8 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 	{
 		_pSession->setFeature("autoBind", bindValue(k));
 
-		DynamicAny i = 2;
-		DynamicAny j = 0;
+		Var i = 2;
+		Var j = 0;
 
 		*_pSession << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "

@@ -15,7 +15,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/AutoTransaction.h"
@@ -37,7 +37,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 
 
@@ -370,14 +370,14 @@ void ODBCOracleTest::testStoredProcedureAny()
 }
 
 
-void ODBCOracleTest::testStoredProcedureDynamicAny()
+void ODBCOracleTest::testStoredProcedureDynamicVar()
 {
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 
-		DynamicAny i = 2;
-		DynamicAny j = 0;
+		Var i = 2;
+		Var j = 0;
 
 		*_pSession << "CREATE OR REPLACE "
 				"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "

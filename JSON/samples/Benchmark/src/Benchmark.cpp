@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 		Poco::JSON::Parser sparser;
 		sw.restart();
 		sparser.parse(jsonStr);
-		Poco::DynamicAny result = sparser.result();
+		Poco::Dynamic::Var result = sparser.result();
 		sw.stop();
 		std::cout << "-----------------------------------------" << std::endl;
 		std::cout << "[std::string] parsed/handled in " << sw.elapsed() << " [us]" << std::endl;
