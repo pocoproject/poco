@@ -210,7 +210,7 @@ public:
 
 		if (pHolder && pHolder->type() == typeid(T))
 		{
-			VarHolderImpl<T>* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
+			auto* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
 			return pHolderImpl->value();
 		}
 		else if (!pHolder)
@@ -733,7 +733,7 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == content();
+	return nullptr == content();
 }
 
 

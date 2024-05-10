@@ -66,11 +66,9 @@ public:
 	{
 	}
 
-	~CallableHolder()
-	{
-	}
+	~CallableHolder() override = default;
 
-	void run()
+	void run() override
 	{
 		_callable(_pData);
 	}
@@ -190,7 +188,7 @@ void Thread::clearTLS()
 	if (_pTLS)
 	{
 		delete _pTLS;
-		_pTLS = 0;
+		_pTLS = nullptr;
 	}
 }
 

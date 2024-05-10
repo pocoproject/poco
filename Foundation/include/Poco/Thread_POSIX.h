@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Mutex.h"
 #include "Poco/Runnable.h"
 #include "Poco/SignalHandler.h"
 #include "Poco/Event.h"
@@ -31,7 +32,6 @@
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
 #endif
-#include <errno.h>
 #if defined(POCO_VXWORKS)
 #include <cstring>
 #endif
@@ -41,8 +41,8 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:
-	typedef pthread_t TIDImpl;
-	typedef void (*Callable)(void*);
+	using TIDImpl = pthread_t;
+	using Callable = void (*)(void *);
 
 	enum Priority
 	{
@@ -99,7 +99,7 @@ private:
 	public:
 		CurrentThreadHolder()
 		{
-			if (pthread_key_create(&_key, NULL))
+			if (pthread_key_create(&_key, nullptr))
 				throw SystemException("cannot allocate thread context key");
 		}
 		~CurrentThreadHolder()

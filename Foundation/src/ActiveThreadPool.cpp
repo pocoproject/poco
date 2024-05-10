@@ -20,7 +20,6 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/NotificationQueue.h"
 #include <sstream>
-#include <ctime>
 #include <utility>
 
 namespace Poco {

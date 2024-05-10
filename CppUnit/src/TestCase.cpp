@@ -81,14 +81,14 @@ void TestCase::assertEquals(const char* expected, const std::string& actual, lon
 
 void TestCase::assertNotNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer == NULL)
+	if (pointer == nullptr)
 		throw CppUnitException(pointerExpression + " must not be NULL", lineNumber, fileName);
 }
 
 
 void TestCase::assertNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer != NULL)
+	if (pointer != nullptr)
 		throw CppUnitException(pointerExpression + " must be NULL", lineNumber, fileName);
 }
 
