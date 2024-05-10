@@ -65,6 +65,8 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
 
