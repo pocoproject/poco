@@ -346,13 +346,23 @@ protected:
 		File file(path);
 		file.createDirectories();
 
-		std::string dbDirectory = path.toString() + DocWriter::DATABASE_DIR;
-		Path dbPath(dbDirectory);
-		dbPath.makeDirectory();
-		File dbFile(dbPath);
-		dbFile.createDirectories();
+		bool searchIndex = false;
 
-		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC);
+		if (config().getBool("PocoDoc.searchIndex", false))
+		{
+#if defined(POCO_ENABLE_SQLITE_FTS5)
+			std::string dbDirectory = path.toString() + DocWriter::DATABASE_DIR;
+			Path dbPath(dbDirectory);
+			dbPath.makeDirectory();
+			File dbFile(dbPath);
+			dbFile.createDirectories();
+			searchIndex = true;
+#else
+		logger().error("FTS5 is not enabled, search is not supported");
+#endif
+		}
+
+		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC, searchIndex);
 
 		if (config().hasProperty("PocoDoc.pages"))
 		{

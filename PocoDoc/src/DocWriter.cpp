@@ -59,7 +59,7 @@ const std::string DocWriter::DATABASE_DIR("/dist/");
 const std::string DocWriter::DATABASE_NAME("docs.db");
 
 
-DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& path, bool prettifyCode, bool noFrames):
+DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& path, bool prettifyCode, bool noFrames, bool searchIndex):
 	_prettifyCode(prettifyCode),
 	_noFrames(noFrames),
 	_htmlMode(false),
@@ -69,7 +69,8 @@ DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& p
 	_pNameSpace(0),
 	_pendingLine(false),
 	_indent(0),
-	_titleId(0)
+	_titleId(0),
+	_searchIndex(searchIndex)
 {
 	_pLogger = &Poco::Logger::get("DocWriter");
 
@@ -79,7 +80,7 @@ DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& p
 	logger().information(std::string("Loading translation strings [") + _language + "]");
 
 	loadStrings(_language);
-	initDatabase();
+	if (_searchIndex) initDatabase();
 }
 
 
@@ -470,7 +471,7 @@ void DocWriter::writeClass(const Struct* pStruct)
 	endContent(ostr);
 	endBody(ostr);
 	writeFooter(ostr);
-	writeSearchIndex(fileNameFor(pStruct), sstr.str());
+	if (_searchIndex) writeSearchIndex(fileNameFor(pStruct), sstr.str());
 }
 
 
@@ -503,7 +504,7 @@ void DocWriter::writeNameSpace(const NameSpace* pNameSpace)
 	endContent(ostr);
 	endBody(ostr);
 	writeFooter(ostr);
-	writeSearchIndex(fileNameFor(pNameSpace), sstr.str());
+	if (_searchIndex) writeSearchIndex(fileNameFor(pNameSpace), sstr.str());
 }
 
 
@@ -605,7 +606,7 @@ void DocWriter::writePackage(const std::string& file, const std::string& library
 	endContent(ostr);
 	endBody(ostr);
 	writeFooter(ostr);
-	writeSearchIndex(file, sstr.str());
+	if (_searchIndex) writeSearchIndex(file, sstr.str());
 }
 
 
@@ -960,15 +961,11 @@ void DocWriter::writeDescription(std::ostream& ostr, const std::string& text, st
 	TextState state = TEXT_PARAGRAPH;
 	std::string::const_iterator it  = text.begin();
 	std::string::const_iterator end = text.end();
-	if (pSstr)
-	{
-		*pSstr << text;
-	}
 	while (it != end)
 	{
 		std::string line;
 		while (it != end && *it != '\n') line += *it++;
-		writeDescriptionLine(ostr, line, state);
+		writeDescriptionLine(ostr, line, state, pSstr);
 		if (it != end) ++it;
 	}
 	switch (state)
@@ -992,7 +989,7 @@ void DocWriter::writeDescription(std::ostream& ostr, const std::string& text, st
 }
 
 
-void DocWriter::writeDescriptionLine(std::ostream& ostr, const std::string& text, TextState& state)
+void DocWriter::writeDescriptionLine(std::ostream& ostr, const std::string& text, TextState& state, std::ostream* pSstr)
 {
 	if (_htmlMode)
 	{
@@ -1012,7 +1009,7 @@ void DocWriter::writeDescriptionLine(std::ostream& ostr, const std::string& text
 			switch (state)
 			{
 			case TEXT_PARAGRAPH:
-				writeText(ostr, text);
+				writeText(ostr, text, pSstr);
 				break;
 			case TEXT_LIST:
 				ostr << "</li>\n</ul>\n<p>";
@@ -1178,7 +1175,7 @@ std::string DocWriter::htmlizeName(const std::string& name)
 }
 
 
-void DocWriter::writeText(std::ostream& ostr, const std::string& text)
+void DocWriter::writeText(std::ostream& ostr, const std::string& text, std::ostream* pSstr)
 {
 	std::string::const_iterator it(text.begin());
 	std::string::const_iterator end(text.end());
@@ -1202,21 +1199,23 @@ void DocWriter::writeText(std::ostream& ostr, const std::string& text)
 			}
 			while (it != end && std::isspace(*it)) ++it;
 			ostr << "</p><" << heading << ">" << format("<a id=\"%d\">", _titleId++) << htmlize(std::string(it, end)) << "</a></" << heading << "><p>" << std::endl;
+			if (pSstr) *pSstr << std::string(it, end) << '\n';
 			return;
 		}
 	}
-	writeText(ostr, it, end);
+	writeText(ostr, it, end, pSstr);
+	if (pSstr) *pSstr << ' ';
 	ostr << ' ';
 }
 
 
-void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin, const std::string::const_iterator& end)
+void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin, const std::string::const_iterator& end, std::ostream* pSstr)
 {
 	std::string token;
 	nextToken(begin, end, token);
 	while (!token.empty())
 	{
-		if (!writeSymbol(ostr, token, begin, end) && !writeSpecial(ostr, token, begin, end))
+		if (!writeSymbol(ostr, token, begin, end, pSstr) && !writeSpecial(ostr, token, begin, end))
 		{
 			if (token == "[[")
 			{
@@ -1238,7 +1237,7 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 					std::string target;
 					if (uri.compare(0, 7, "http://") == 0 || uri.compare(0, 8, "https://") == 0)
 						target = "_blank";
-					writeTargetLink(ostr, uri, text, target);
+					writeTargetLink(ostr, uri, text, target, pSstr);
 				}
 				begin = it;
 				nextToken(begin, end, token);
@@ -1325,6 +1324,7 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 			else
 			{
 				ostr << htmlize(token);
+				if (pSstr) *pSstr << token;
 			}
 			nextToken(begin, end, token);
 		}
@@ -1353,7 +1353,7 @@ void DocWriter::writeDecl(std::ostream& ostr, std::string::const_iterator begin,
 }
 
 
-bool DocWriter::writeSymbol(std::ostream& ostr, std::string& token, std::string::const_iterator& begin, const std::string::const_iterator& end)
+bool DocWriter::writeSymbol(std::ostream& ostr, std::string& token, std::string::const_iterator& begin, const std::string::const_iterator& end, std::ostream* pSstr)
 {
 	if (std::isalnum(token[0]) && _pNameSpace)
 	{
@@ -1378,7 +1378,7 @@ bool DocWriter::writeSymbol(std::ostream& ostr, std::string& token, std::string:
 			Symbol* pSym = _pNameSpace->lookup(id);
 			if (pSym)
 			{
-				writeLink(ostr, pSym, id);
+				writeLink(ostr, pSym, id, pSstr);
 				nextToken(begin, end, token);
 				return true;
 			}
@@ -2200,9 +2200,10 @@ void DocWriter::writeLink(std::ostream& ostr, const std::string& uri, const std:
 }
 
 
-void DocWriter::writeLink(std::ostream& ostr, const Symbol* pSymbol, const std::string& name)
+void DocWriter::writeLink(std::ostream& ostr, const Symbol* pSymbol, const std::string& name, std::ostream* pSstr)
 {
 	ostr << "<a href=\"" << uriFor(pSymbol) << "\" title=\"" << titleFor(pSymbol) << "\">" << htmlizeName(name) << "</a>";
+	if (pSstr) *pSstr << name;
 }
 
 
@@ -2212,7 +2213,7 @@ void DocWriter::writeLink(std::ostream& ostr, const std::string& uri, const std:
 }
 
 
-void DocWriter::writeTargetLink(std::ostream& ostr, const std::string& uri, const std::string& text, const std::string& target)
+void DocWriter::writeTargetLink(std::ostream& ostr, const std::string& uri, const std::string& text, const std::string& target, std::ostream* pSstr)
 {
 	if (_noFrames && target != "_blank")
 		ostr << "<a href=\"" << uri << "\">" << text << "</a>";
@@ -2220,6 +2221,7 @@ void DocWriter::writeTargetLink(std::ostream& ostr, const std::string& uri, cons
 		ostr << "<a href=\"" << uri << "\" target=\"" << target << "\">" << text << "</a>";
 	else
 		ostr << "<a href=\"" << uri << "\">" << htmlize(text) << "</a>";
+	if (pSstr) *pSstr << text;
 }
 
 
@@ -2422,7 +2424,7 @@ void DocWriter::writePage(Page& page)
 	endBody(ostr);
 	ostr << "<script>CollapsibleLists.apply(true)</script>" << std::endl;
 	writeFooter(ostr);
-	writeSearchIndex(page.fileName, sstr.str());
+	if (_searchIndex) writeSearchIndex(page.fileName, sstr.str());
 }
 
 
