@@ -68,7 +68,7 @@ public:
 	void push(const std::string& info);
 		/// Pushes a context (without line number and filename) onto the stack.
 
-	void push(const std::string& info, int line, const char* filename);
+	void push(const std::string& info, LineNumber line, const char* filename);
 		/// Pushes a context (including line number and filename)
 		/// onto the stack. Filename must be a static string, such as the
 		/// one produced by the __FILE__ preprocessor macro.
@@ -104,7 +104,7 @@ private:
 	{
 		std::string info;
 		const char* file;
-		int         line;
+		LineNumber  line;
 	};
 	typedef std::vector<Context> Stack;
 
@@ -124,7 +124,7 @@ public:
 	NDCScope(const std::string& info);
 		/// Pushes a context on the stack.
 
-	NDCScope(const std::string& info, int line, const char* filename);
+	NDCScope(const std::string& info, LineNumber line, const char* filename);
 		/// Pushes a context on the stack.
 
 	~NDCScope();
@@ -141,7 +141,7 @@ inline NDCScope::NDCScope(const std::string& info)
 }
 
 
-inline NDCScope::NDCScope(const std::string& info, int line, const char* filename)
+inline NDCScope::NDCScope(const std::string& info, LineNumber line, const char* filename)
 {
 	NestedDiagnosticContext::current().push(info, line, filename);
 }

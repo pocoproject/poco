@@ -21,7 +21,7 @@
 namespace Poco {
 
 
-void Bugcheck::assertion(const char* cond, const char* file, int line, const char* text)
+void Bugcheck::assertion(const char* cond, const char* file, LineNumber line, const char* text)
 {
 	std::string message("Assertion violation: ");
 	message += cond;
@@ -36,21 +36,21 @@ void Bugcheck::assertion(const char* cond, const char* file, int line, const cha
 }
 
 
-void Bugcheck::nullPointer(const char* ptr, const char* file, int line)
+void Bugcheck::nullPointer(const char* ptr, const char* file, LineNumber line)
 {
 	Debugger::enter(std::string("NULL pointer: ") + ptr, file, line);
 	throw NullPointerException(what(ptr, file, line));
 }
 
 
-void Bugcheck::bugcheck(const char* file, int line)
+void Bugcheck::bugcheck(const char* file, LineNumber line)
 {
 	Debugger::enter("Bugcheck", file, line);
 	throw BugcheckException(what(0, file, line));
 }
 
 
-void Bugcheck::bugcheck(const char* msg, const char* file, int line)
+void Bugcheck::bugcheck(const char* msg, const char* file, LineNumber line)
 {
 	std::string m("Bugcheck");
 	if (msg)
@@ -63,7 +63,7 @@ void Bugcheck::bugcheck(const char* msg, const char* file, int line)
 }
 
 
-void Bugcheck::unexpected(const char* file, int line)
+void Bugcheck::unexpected(const char* file, LineNumber line)
 {
 #ifdef _DEBUG
 	try
@@ -94,19 +94,19 @@ void Bugcheck::unexpected(const char* file, int line)
 }
 
 
-void Bugcheck::debugger(const char* file, int line)
+void Bugcheck::debugger(const char* file, LineNumber line)
 {
 	Debugger::enter(file, line);
 }
 
 
-void Bugcheck::debugger(const char* msg, const char* file, int line)
+void Bugcheck::debugger(const char* msg, const char* file, LineNumber line)
 {
 	Debugger::enter(msg, file, line);
 }
 
 
-std::string Bugcheck::what(const char* msg, const char* file, int line, const char* text)
+std::string Bugcheck::what(const char* msg, const char* file, LineNumber line, const char* text)
 {
 	std::ostringstream str;
 	if (msg) str << msg << " ";

@@ -312,7 +312,7 @@ std::string ProcessRunnerTest::cmdLine(const std::string& cmd, const ProcessRunn
 }
 
 
-void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg, int timeoutMS, int line)
+void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg, int timeoutMS, LineNumber line)
 {
 	if (sw.elapsedSeconds()*1000 > timeoutMS)
 	{

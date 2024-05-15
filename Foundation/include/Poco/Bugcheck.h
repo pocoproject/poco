@@ -39,38 +39,38 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	[[noreturn]] static void assertion(const char* cond, const char* file, int line, const char* text = 0);
+	[[noreturn]] static void assertion(const char* cond, const char* file, LineNumber line, const char* text = 0);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	[[noreturn]] static void nullPointer(const char* ptr, const char* file, int line);
+	[[noreturn]] static void nullPointer(const char* ptr, const char* file, LineNumber line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	[[noreturn]] static void bugcheck(const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	[[noreturn]] static void bugcheck(const char* msg, const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* msg, const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void unexpected(const char* file, int line);
+	static void unexpected(const char* file, LineNumber line);
 		/// An exception was caught in a destructor. Break into debugger,
 		/// if possible and report exception. Must only be called from
 		/// within a catch () block as it rethrows the exception to
 		/// determine its class.
 
-	static void debugger(const char* file, int line);
+	static void debugger(const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible.
 
-	static void debugger(const char* msg, const char* file, int line);
+	static void debugger(const char* msg, const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible.
 
 protected:
-	static std::string what(const char* msg, const char* file, int line, const char* text = 0);
+	static std::string what(const char* msg, const char* file, LineNumber line, const char* text = 0);
 };
 
 
