@@ -32,7 +32,7 @@ protected:
 		OPT_FAIL_ON_OVERWRITE_IMPL = 0x01
 	};
 
-	typedef UInt64 FileSizeImpl;
+	using FileSizeImpl = UInt64;
 
 	FileImpl();
 	FileImpl(const std::string& path);

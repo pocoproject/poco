@@ -54,7 +54,7 @@ class Foundation_API File: private FileImpl
 	/// use the forward slash ("/") as directory separator.
 {
 public:
-	typedef FileSizeImpl FileSize;
+	using FileSize = FileSizeImpl;
 
 	enum LinkType
 		/// Type of link for linkTo().
@@ -84,7 +84,7 @@ public:
 	File(const File& file);
 		/// Copy constructor.
 
-	virtual ~File();
+	~File() override;
 		/// Destroys the file.
 
 	File& operator = (const File& file);
