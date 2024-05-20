@@ -209,7 +209,15 @@ void FileTest::testExists()
 		File f("/testfile.dat");
 		assertFalse (f.exists());
 		assertFalse (f.existsAnywhere());
-		//assertFalse(File(f.absolutePath()).canExecute());
+
+		try
+		{
+			f.canExecute();
+			failmsg("file does not exist - must throw exception");
+		}
+		catch (const Poco::FileNotFoundException&)
+		{
+		}
 	}
 
 	{
@@ -235,7 +243,7 @@ void FileTest::testExists()
 //#endif
 		assertFalse (f.exists());
 		assertTrue (f.existsAnywhere());
-		assertTrue (File(f.absolutePath()).canExecute());
+		assertTrue (f.canExecute());
 		assertTrue (f2.exists());
 		assertTrue (f2.existsAnywhere());
 		assertFalse (f2.canExecute());

@@ -44,7 +44,7 @@ protected:
 	bool existsImpl() const;
 	bool canReadImpl() const;
 	bool canWriteImpl() const;
-	bool canExecuteImpl() const;
+	bool canExecuteImpl(const std::string& absolutePath) const;
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;

@@ -87,7 +87,7 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
 	return false;
 }

@@ -140,9 +140,9 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	Path p(_path);
+	Path p(absolutePath);
 	return icompare(p.getExtension(), "exe") == 0;
 }
 

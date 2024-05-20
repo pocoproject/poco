@@ -102,6 +102,8 @@ std::string File::absolutePath() const
 	std::string ret;
 
 	if (Path(path()).isAbsolute())
+		// TODO: Should this return empty string if file does not exists to be consistent
+		// with the function documentation?
 		ret = getPathImpl();
 	else
 	{
@@ -110,8 +112,8 @@ std::string File::absolutePath() const
 		if (File(curPath).exists()) ret = curPath.toString();
 		else
 		{
-			std::string envPath = Environment::get("PATH", "");
-			std::string pathSeparator(1, Path::pathSeparator());
+			const std::string envPath = Environment::get("PATH", "");
+			const std::string pathSeparator(1, Path::pathSeparator());
 			if (!envPath.empty())
 			{
 				StringTokenizer st(envPath, pathSeparator,
@@ -178,7 +180,13 @@ bool File::canWrite() const
 
 bool File::canExecute() const
 {
-	return canExecuteImpl();
+	// Resolve absolute path from relative and
+	const auto absPath { absolutePath() };
+	if (absPath.empty() || !File(absPath).exists())
+	{
+		throw Poco::FileNotFoundException(getPathImpl());
+	}
+	return canExecuteImpl(absPath);
 }
 
 
