@@ -40,6 +40,7 @@ protected:
 	void swapImpl(FileImpl& file);
 	void setPathImpl(const std::string& path);
 	const std::string& getPathImpl() const;
+	std::string getExecutablePathImpl() const;
 	bool existsImpl() const;
 	bool canReadImpl() const;
 	bool canWriteImpl() const;

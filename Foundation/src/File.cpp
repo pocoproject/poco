@@ -109,21 +109,23 @@ std::string File::absolutePath() const
 	{
 		Path curPath(Path::current());
 		curPath.append(path());
-		if (File(curPath).exists()) ret = curPath.toString();
+		if (File(curPath).exists())
+			ret = curPath.toString();
 		else
 		{
 			const std::string envPath = Environment::get("PATH", "");
 			const std::string pathSeparator(1, Path::pathSeparator());
 			if (!envPath.empty())
 			{
-				StringTokenizer st(envPath, pathSeparator,
+				const StringTokenizer st(envPath, pathSeparator,
 					StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
 				for (const auto& p: st)
 				{
 					try
 					{
 						std::string fileName(p);
-						if (p.size() && p[p.size()-1] != Path::separator())
+						if (p.size() && p.back() != Path::separator())
 							fileName.append(1, Path::separator());
 						fileName.append(path());
 						if (File(fileName).exists())
@@ -180,11 +182,12 @@ bool File::canWrite() const
 
 bool File::canExecute() const
 {
-	// Resolve absolute path from relative and
-	const auto absPath { absolutePath() };
+	// Resolve (platform-specific) executable path and absolute path from relative.
+	const auto execPath { getExecutablePathImpl() };
+	const auto absPath { File(execPath).absolutePath() };
 	if (absPath.empty() || !File(absPath).exists())
 	{
-		throw Poco::FileNotFoundException(getPathImpl());
+		return false;
 	}
 	return canExecuteImpl(absPath);
 }

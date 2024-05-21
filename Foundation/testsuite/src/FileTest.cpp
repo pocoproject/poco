@@ -209,45 +209,42 @@ void FileTest::testExists()
 		File f("/testfile.dat");
 		assertFalse (f.exists());
 		assertFalse (f.existsAnywhere());
-
-		try
-		{
-			f.canExecute();
-			failmsg("file does not exist - must throw exception");
-		}
-		catch (const Poco::FileNotFoundException&)
-		{
-		}
+		assertFalse (f.canExecute());
 	}
 
 	{
 #if defined(POCO_OS_FAMILY_UNIX)
 		File f("echo");
 		File f2("/dev/null");
-//#elif defined(POCO_OS_FAMILY_WINDOWS)
-//		std::string buffer(MAX_PATH, 0);
-//		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
-//		if (r)
-//		{
-//			Path p(buffer);
-//			p.makeDirectory().makeAbsolute().makeParent();
-//			buffer = p.toString();
-//			buffer.append("win.ini");
-//		}
-//		else
-//		{
-//			buffer = "c:\\windows\\win.ini";
-//		}
-//		File f("cmd.exe");
-//		File f2(buffer);
-//#endif
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+		std::string buffer(MAX_PATH, 0);
+		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
+		if (r)
+		{
+			Path p(buffer);
+			p.makeDirectory().makeAbsolute().makeParent();
+			buffer = p.toString();
+			buffer.append("win.ini");
+		}
+		else
+		{
+			buffer = R"(c:\windows\win.ini)";
+		}
+		File f("cmd.exe");
+		File f2(buffer);
+
+		File f3("cmd");
+		assertTrue (f3.canExecute());
+        File f4("cmd-nonexistent");
+        assertFalse (f4.canExecute());
+#endif
 		assertFalse (f.exists());
 		assertTrue (f.existsAnywhere());
 		assertTrue (f.canExecute());
+
 		assertTrue (f2.exists());
 		assertTrue (f2.existsAnywhere());
 		assertFalse (f2.canExecute());
-#endif
 	}
 }
 
