@@ -20,7 +20,6 @@
 
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/Mutex.h"
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/ResponseMessage.h"
 #include "Poco/MongoDB/OpMsgMessage.h"
