@@ -358,7 +358,7 @@ protected:
 			dbFile.createDirectories();
 			searchIndex = true;
 #else
-		logger().error("FTS5 is not enabled, search is not supported");
+			logger().error("FTS5 is disabled, search is not supported");
 #endif
 		}
 
