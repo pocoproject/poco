@@ -13,6 +13,10 @@
 
 
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/MemoryStream.h"
+#include <sstream>
 
 
 namespace Poco {
