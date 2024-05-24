@@ -2811,7 +2811,6 @@ public:
 		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, _val, tmp, tzd))
 			throw BadCastException("string -> LocalDateTime");
 
-		// TODO This LocalDateTime is supposed to be deprecated, however what is the alternative?
 		ldt = LocalDateTime(tzd, tmp, false);
 	}
 
@@ -3012,7 +3011,6 @@ public:
 		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, toStdString(), tmp, tzd))
 			throw BadCastException("string -> LocalDateTime");
 
-		// TODO This LocalDateTime is supposed to be deprecated, however what is the alternative?
 		ldt = LocalDateTime(tzd, tmp, false);
 	}
 
