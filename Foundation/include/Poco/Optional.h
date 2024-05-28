@@ -143,8 +143,9 @@ public:
 
 	void swap(Optional& other) noexcept
 	{
-		std::swap(_value, other._value);
-		std::swap(_isSpecified, other._isSpecified);
+		using std::swap;
+		swap(_value, other._value);
+		swap(_isSpecified, other._isSpecified);
 	}
 
 	const C& value() const
