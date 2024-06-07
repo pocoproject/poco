@@ -100,6 +100,11 @@ public:
 
 	void setTransactionIsolation(Poco::UInt32 ti);
 		/// Sets the transaction isolation level.
+		/// Warning! If you want to use TRANSACTION_READ_UNCOMMITTED isolation level
+		/// than you shouldn't forget that enableSharedCache() and setThreadMode() will affect connection lock behavior
+		/// For ex. Use TRANSACTION_READ_UNCOMMITTED with enableSharedCache() and setThreadMode(THREAD_MODE_MULTI)
+		/// in cases when you have multiple threads, shared connection and custom code for table-lock exceptions
+		/// For ex. Two connections on the same thread with TRANSACTION_READ_UNCOMMITTED for only for one connection will throw exception "databse is locked"
 
 	Poco::UInt32 getTransactionIsolation() const;
 		/// Returns the transaction isolation level.
@@ -147,6 +152,9 @@ private:
 	static const std::string IMMEDIATE_BEGIN_TRANSACTION; 
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
+	static const std::string SQLITE_READ_UNCOMMITTED;
+	static const std::string SQLITE_READ_COMMITTED;
+	Poco::UInt32 _transactionIsolationLevel;
 };
 
 
