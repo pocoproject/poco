@@ -144,7 +144,7 @@ private:
 		T len = 0;
 		if (istr)
 		{
-			istr.seekg(rangeStart);
+			istr.seekg(rangeStart, std::ios_base::beg);
 			istr.read(buffer.begin(), bufferSize);
 			std::streamsize n = istr.gcount();
 			while (n > 0)
@@ -209,7 +209,7 @@ private:
 		char c = 0;
 		if (istr)
 		{
-			istr.seekg(rangeStart);
+			istr.seekg(rangeStart, std::ios_base::beg);
 			istr.get(c);
 			while (istr && ostr && (len < rangeLength))
 			{
