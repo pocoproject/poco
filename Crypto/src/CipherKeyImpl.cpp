@@ -65,7 +65,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_pDigest = EVP_get_digestbyname(digest.c_str());
 
 	if (!_pDigest)
-		throw Poco::NotFoundException("Digest " + name + " was not found");
+		throw Poco::NotFoundException("Digest " + digest + " was not found");
 
 	_key = ByteVec(keySize());
 	_iv = ByteVec(ivSize());
