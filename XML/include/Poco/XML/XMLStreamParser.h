@@ -30,16 +30,15 @@
 #include "Poco/XML/QName.h"
 #include "Poco/XML/ValueTraits.h"
 #include "Poco/XML/Content.h"
-#if defined(POCO_UNBUNDLED)
-#include <expat.h>
-#else
-#include "Poco/XML/expat.h"
-#endif
+#include "Poco/XML/XMLString.h"
 #include <map>
 #include <vector>
 #include <string>
 #include <iosfwd>
 #include <cstddef>
+
+
+struct XML_ParserStruct;
 
 
 namespace Poco {
@@ -269,11 +268,11 @@ private:
 	XMLStreamParser(const XMLStreamParser&);
 	XMLStreamParser& operator = (const XMLStreamParser&);
 
-	static void XMLCALL handleStartElement(void*, const XML_Char*, const XML_Char**);
-	static void XMLCALL handleEndElement(void*, const XML_Char*);
-	static void XMLCALL handleCharacters(void*, const XML_Char*, int);
-	static void XMLCALL handleStartNamespaceDecl(void*, const XML_Char*, const XML_Char*);
-	static void XMLCALL handleEndNamespaceDecl(void*, const XML_Char*);
+	static void handleStartElement(void*, const XMLChar*, const XMLChar**);
+	static void handleEndElement(void*, const XMLChar*);
+	static void handleCharacters(void*, const XMLChar*, int);
+	static void handleStartNamespaceDecl(void*, const XMLChar*, const XMLChar*);
+	static void handleEndNamespaceDecl(void*, const XMLChar*);
 
 	void init();
 	EventType nextImpl(bool peek);
@@ -299,7 +298,7 @@ private:
 	std::size_t _size;
 	const std::string _inputName;
 	FeatureType _feature;
-	XML_Parser _parser;
+	XML_ParserStruct* _parser;
 	std::size_t _depth;
 	bool _accumulateContent; // Whether we are accumulating character content.
 	ParserState _parserState;

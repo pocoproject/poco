@@ -22,11 +22,8 @@
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
 #include <ostream>
-#if defined(POCO_UNBUNDLED)
-#include <zlib.h>
-#else
-#include "Poco/zlib.h"
-#endif
+
+struct z_stream_s;
 
 
 namespace Poco {
@@ -92,12 +89,12 @@ private:
 		INFLATE_BUFFER_SIZE = 32768
 	};
 
-	std::istream*  _pIstr;
-	std::ostream*  _pOstr;
-	char*    _buffer;
-	z_stream _zstr;
-	bool     _eof;
-	bool     _check;
+	std::istream*	_pIstr;
+	std::ostream*	_pOstr;
+	char*			_buffer;
+	z_stream_s*		_pZstr;
+	bool			_eof;
+	bool			_check;
 };
 
 

@@ -25,7 +25,8 @@
 #if defined(POCO_UNBUNDLED)
 #include <zlib.h>
 #else
-#include "Poco/zlib.h"
+// Quirk before we move zlib to external libs.
+#include "../../Foundation/src/zlib.h"
 #endif
 
 

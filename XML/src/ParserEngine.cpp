@@ -12,7 +12,7 @@
 //
 
 
-#include "Poco/XML/ParserEngine.h"
+#include "ParserEngine.h"
 #include "Poco/XML/NamespaceStrategy.h"
 #include "Poco/XML/XMLException.h"
 #include "Poco/SAX/EntityResolver.h"

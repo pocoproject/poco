@@ -14,6 +14,12 @@
 
 #include "Poco/DeflatingStream.h"
 #include "Poco/Exception.h"
+#include <memory>
+#if defined(POCO_UNBUNDLED)
+#include <zlib.h>
+#else
+#include "zlib.h"
+#endif
 
 
 namespace Poco {
@@ -25,29 +31,17 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, StreamType type, int 
 	_pOstr(0),
 	_eof(false)
 {
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.total_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
-	_zstr.total_out = 0;
-	_zstr.msg       = 0;
-	_zstr.state     = 0;
-	_zstr.zalloc    = Z_NULL;
-	_zstr.zfree     = Z_NULL;
-	_zstr.opaque    = Z_NULL;
-	_zstr.data_type = 0;
-	_zstr.adler     = 0;
-	_zstr.reserved  = 0;
+	std::unique_ptr<char[]> buffer(new char[DEFLATE_BUFFER_SIZE]);
 
-	_buffer = new char[DEFLATE_BUFFER_SIZE];
-
-	int rc = deflateInit2(&_zstr, level, Z_DEFLATED, 15 + (type == STREAM_GZIP ? 16 : 0), 8, Z_DEFAULT_STRATEGY);
+	std::unique_ptr<z_stream> pZstr = std::make_unique<z_stream>(z_stream{});
+	int rc = deflateInit2(pZstr.get(), level, Z_DEFLATED, 15 + (type == STREAM_GZIP ? 16 : 0), 8, Z_DEFAULT_STRATEGY);
 	if (rc != Z_OK)
 	{
-		delete [] _buffer;
 		throw IOException(zError(rc));
 	}
+
+	_pZstr = pZstr.release();
+	_buffer = buffer.release();
 }
 
 
@@ -57,22 +51,17 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, int windowBits, int l
 	_pOstr(0),
 	_eof(false)
 {
-	_zstr.zalloc    = Z_NULL;
-	_zstr.zfree     = Z_NULL;
-	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+	std::unique_ptr<char[]> buffer(new char[DEFLATE_BUFFER_SIZE]);
 
-	_buffer = new char[DEFLATE_BUFFER_SIZE];
-
-	int rc = deflateInit2(&_zstr, level, Z_DEFLATED, windowBits, 8, Z_DEFAULT_STRATEGY);
+	std::unique_ptr<z_stream> pZstr = std::make_unique<z_stream>(z_stream{});
+	int rc = deflateInit2(pZstr.get(), level, Z_DEFLATED, windowBits, 8, Z_DEFAULT_STRATEGY);
 	if (rc != Z_OK)
 	{
-		delete [] _buffer;
 		throw IOException(zError(rc));
 	}
+
+	_pZstr = pZstr.release();
+	_buffer = buffer.release();
 }
 
 
@@ -82,22 +71,17 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::ostream& ostr, StreamType type, int 
 	_pOstr(&ostr),
 	_eof(false)
 {
-	_zstr.zalloc    = Z_NULL;
-	_zstr.zfree     = Z_NULL;
-	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+	std::unique_ptr<char[]> buffer(new char[DEFLATE_BUFFER_SIZE]);
 
-	_buffer = new char[DEFLATE_BUFFER_SIZE];
-
-	int rc = deflateInit2(&_zstr, level, Z_DEFLATED, 15 + (type == STREAM_GZIP ? 16 : 0), 8, Z_DEFAULT_STRATEGY);
+	std::unique_ptr<z_stream> pZstr = std::make_unique<z_stream>(z_stream{});
+	int rc = deflateInit2(pZstr.get(), level, Z_DEFLATED, 15 + (type == STREAM_GZIP ? 16 : 0), 8, Z_DEFAULT_STRATEGY);
 	if (rc != Z_OK)
 	{
-		delete [] _buffer;
 		throw IOException(zError(rc));
 	}
+
+	_pZstr = pZstr.release();
+	_buffer = buffer.release();
 }
 
 
@@ -107,22 +91,17 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::ostream& ostr, int windowBits, int l
 	_pOstr(&ostr),
 	_eof(false)
 {
-	_zstr.zalloc    = Z_NULL;
-	_zstr.zfree     = Z_NULL;
-	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+	std::unique_ptr<char[]> buffer(new char[DEFLATE_BUFFER_SIZE]);
 
-	_buffer = new char[DEFLATE_BUFFER_SIZE];
-
-	int rc = deflateInit2(&_zstr, level, Z_DEFLATED, windowBits, 8, Z_DEFAULT_STRATEGY);
+	std::unique_ptr<z_stream> pZstr = std::make_unique<z_stream>(z_stream{});
+	int rc = deflateInit2(pZstr.get(), level, Z_DEFLATED, windowBits, 8, Z_DEFAULT_STRATEGY);
 	if (rc != Z_OK)
 	{
-		delete [] _buffer;
 		throw IOException(zError(rc));
 	}
+
+	_pZstr = pZstr.release();
+	_buffer = buffer.release();
 }
 
 
@@ -136,7 +115,8 @@ DeflatingStreamBuf::~DeflatingStreamBuf()
 	{
 	}
 	delete [] _buffer;
-	deflateEnd(&_zstr);
+	deflateEnd(_pZstr);
+	delete _pZstr;
 }
 
 
@@ -146,22 +126,22 @@ int DeflatingStreamBuf::close()
 	_pIstr = 0;
 	if (_pOstr)
 	{
-		if (_zstr.next_out)
+		if (_pZstr->next_out)
 		{
-			int rc = deflate(&_zstr, Z_FINISH);
+			int rc = deflate(_pZstr, Z_FINISH);
 			if (rc != Z_OK && rc != Z_STREAM_END) throw IOException(zError(rc));
-			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _pZstr->avail_out);
 			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
-			_zstr.next_out  = (unsigned char*) _buffer;
-			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+			_pZstr->next_out  = (unsigned char*) _buffer;
+			_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
 			while (rc != Z_STREAM_END)
 			{
-				rc = deflate(&_zstr, Z_FINISH);
+				rc = deflate(_pZstr, Z_FINISH);
 				if (rc != Z_OK && rc != Z_STREAM_END) throw IOException(zError(rc));
-				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _pZstr->avail_out);
 				if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
-				_zstr.next_out  = (unsigned char*) _buffer;
-				_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+				_pZstr->next_out  = (unsigned char*) _buffer;
+				_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
 			}
 		}
 		_pOstr->flush();
@@ -178,23 +158,23 @@ int DeflatingStreamBuf::sync()
 
 	if (_pOstr)
 	{
-		if (_zstr.next_out)
+		if (_pZstr->next_out)
 		{
-			int rc = deflate(&_zstr, Z_SYNC_FLUSH);
+			int rc = deflate(_pZstr, Z_SYNC_FLUSH);
 			if (rc != Z_OK) throw IOException(zError(rc));
-			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _pZstr->avail_out);
 			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
-			while (_zstr.avail_out == 0)
+			while (_pZstr->avail_out == 0)
 			{
-				_zstr.next_out  = (unsigned char*) _buffer;
-				_zstr.avail_out = DEFLATE_BUFFER_SIZE;
-				rc = deflate(&_zstr, Z_SYNC_FLUSH);
+				_pZstr->next_out  = (unsigned char*) _buffer;
+				_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
+				rc = deflate(_pZstr, Z_SYNC_FLUSH);
 				if (rc != Z_OK) throw IOException(zError(rc));
-				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _pZstr->avail_out);
 				if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
 			};
-			_zstr.next_out  = (unsigned char*) _buffer;
-			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+			_pZstr->next_out  = (unsigned char*) _buffer;
+			_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
 		}
 		// NOTE: This breaks the Zip library and causes corruption in some files.
 		// See GH #1828
@@ -207,7 +187,7 @@ int DeflatingStreamBuf::sync()
 int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_pIstr) return 0;
-	if (_zstr.avail_in == 0 && !_eof)
+	if (_pZstr->avail_in == 0 && !_eof)
 	{
 		int n = 0;
 		if (_pIstr->good())
@@ -217,32 +197,32 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		}
 		if (n > 0)
 		{
-			_zstr.next_in  = (unsigned char*) _buffer;
-			_zstr.avail_in = n;
+			_pZstr->next_in  = (unsigned char*) _buffer;
+			_pZstr->avail_in = n;
 		}
 		else
 		{
-			_zstr.next_in  = 0;
-			_zstr.avail_in = 0;
+			_pZstr->next_in  = 0;
+			_pZstr->avail_in = 0;
 			_eof = true;
 		}
 	}
-	_zstr.next_out  = (unsigned char*) buffer;
-	_zstr.avail_out = static_cast<unsigned>(length);
+	_pZstr->next_out  = (unsigned char*) buffer;
+	_pZstr->avail_out = static_cast<unsigned>(length);
 	for (;;)
 	{
-		int rc = deflate(&_zstr, _eof ? Z_FINISH : Z_NO_FLUSH);
+		int rc = deflate(_pZstr, _eof ? Z_FINISH : Z_NO_FLUSH);
 		if (_eof && rc == Z_STREAM_END)
 		{
 			_pIstr = 0;
-			return static_cast<int>(length) - _zstr.avail_out;
+			return static_cast<int>(length) - _pZstr->avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc));
-		if (_zstr.avail_out == 0)
+		if (_pZstr->avail_out == 0)
 		{
 			return static_cast<int>(length);
 		}
-		if (_zstr.avail_in == 0)
+		if (_pZstr->avail_in == 0)
 		{
 			int n = 0;
 			if (_pIstr->good())
@@ -252,13 +232,13 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			}
 			if (n > 0)
 			{
-				_zstr.next_in  = (unsigned char*) _buffer;
-				_zstr.avail_in = n;
+				_pZstr->next_in  = (unsigned char*) _buffer;
+				_pZstr->avail_in = n;
 			}
 			else
 			{
-				_zstr.next_in  = 0;
-				_zstr.avail_in = 0;
+				_pZstr->next_in  = 0;
+				_pZstr->avail_in = 0;
 				_eof = true;
 			}
 		}
@@ -270,27 +250,27 @@ int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 {
 	if (length == 0 || !_pOstr) return 0;
 
-	_zstr.next_in   = (unsigned char*) buffer;
-	_zstr.avail_in  = static_cast<unsigned>(length);
-	_zstr.next_out  = (unsigned char*) _buffer;
-	_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+	_pZstr->next_in   = (unsigned char*) buffer;
+	_pZstr->avail_in  = static_cast<unsigned>(length);
+	_pZstr->next_out  = (unsigned char*) _buffer;
+	_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
 	for (;;)
 	{
-		int rc = deflate(&_zstr, Z_NO_FLUSH);
+		int rc = deflate(_pZstr, Z_NO_FLUSH);
 		if (rc != Z_OK) throw IOException(zError(rc));
-		if (_zstr.avail_out == 0)
+		if (_pZstr->avail_out == 0)
 		{
 			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE);
 			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
-			_zstr.next_out  = (unsigned char*) _buffer;
-			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+			_pZstr->next_out  = (unsigned char*) _buffer;
+			_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
 		}
-		if (_zstr.avail_in == 0)
+		if (_pZstr->avail_in == 0)
 		{
-			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _pZstr->avail_out);
 			if (!_pOstr->good()) throw IOException("Failed writing deflated data to output stream");
-			_zstr.next_out  = (unsigned char*) _buffer;
-			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+			_pZstr->next_out  = (unsigned char*) _buffer;
+			_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
 			break;
 		}
 	}

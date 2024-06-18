@@ -21,7 +21,7 @@
 #if defined(POCO_UNBUNDLED)
 #include <expat.h>
 #else
-#include "Poco/XML/expat.h"
+#include "expat.h"
 #endif
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/XMLStream.h"

@@ -38,15 +38,15 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "expat_config.h"
+
 #include <stddef.h>
 
 #ifdef EXPAT_WIN32
 #include "winconfig.h"
 #endif
 
-#include "expat_config.h"
-
-#include "Poco/XML/expat_external.h"
+#include "expat_external.h"
 #include "internal.h"
 #include "xmlrole.h"
 #include "ascii.h"

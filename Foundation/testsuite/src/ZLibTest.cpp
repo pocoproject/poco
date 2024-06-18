@@ -17,6 +17,12 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Buffer.h"
 #include <sstream>
+#if defined(POCO_UNBUNDLED)
+#include <zlib.h>
+#else
+// Quirk before we move zlib to external libs.
+#include "../../src/zlib.h"
+#endif
 
 
 using Poco::InflatingInputStream;

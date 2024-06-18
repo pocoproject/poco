@@ -46,6 +46,8 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "expat_config.h"
+
 #include <stddef.h>
 #include <string.h> /* memcpy */
 #include <stdbool.h>
@@ -54,9 +56,7 @@
 #  include "winconfig.h"
 #endif
 
-#include "expat_config.h"
-
-#include "Poco/XML/expat_external.h"
+#include "expat_external.h"
 #include "internal.h"
 #include "xmltok.h"
 #include "nametab.h"
