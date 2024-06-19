@@ -3290,7 +3290,7 @@ void SQLiteTest::testSessionTransactionReadUncommitted()
 	assertTrue (session.getFeature("autoCommit"));
 	
 	stmt.wait();
-	assertTrue (2 == locCount);
+	assertEqual(2, locCount);
 	
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
@@ -3630,6 +3630,7 @@ void SQLiteTest::setUp()
 
 void SQLiteTest::tearDown()
 {
+	Connector::enableSharedCache(false);
 }
 
 
