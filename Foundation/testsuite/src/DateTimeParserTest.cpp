@@ -616,6 +616,12 @@ void DateTimeParserTest::testCustom()
 	catch (SyntaxException&)
 	{
 	}
+
+	// bad year (not a number)
+	testBad("%y", "YY", tzd);
+
+	// bad year (number too big)
+	testBad("%r", "123456789101112131415", tzd);
 }
 
 

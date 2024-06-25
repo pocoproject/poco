@@ -150,11 +150,25 @@ bool DateTimeFormat::hasFormat(const std::string& fmt)
 
 bool DateTimeFormat::isValid(const std::string& dateTime)
 {
-	for (const auto& f : REGEX_LIST)
-	{
-		if (RegularExpression(*f).match(dateTime)) return true;
-	}
-	return false;
+
+        static const RegularExpression regs[] = {
+                RegularExpression(DateTimeFormat::ISO8601_REGEX),
+                RegularExpression(DateTimeFormat::RFC822_REGEX),
+                RegularExpression(DateTimeFormat::RFC1123_REGEX),
+                RegularExpression(DateTimeFormat::HTTP_REGEX),
+                RegularExpression(DateTimeFormat::RFC850_REGEX),
+                RegularExpression(DateTimeFormat::RFC1036_REGEX),
+                RegularExpression(DateTimeFormat::ASCTIME_REGEX),
+                RegularExpression(DateTimeFormat::SORTABLE_REGEX)
+        };
+		// make sure the regex list and the array of regexes are in sync
+		poco_assert((sizeof(regs) / sizeof(regs[0])) == REGEX_LIST.size());
+
+        for (const auto& f : regs)
+        {
+            if (f.match(dateTime)) return true;
+        }
+        return false;
 }
 
 

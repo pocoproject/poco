@@ -18,42 +18,142 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include <iostream>
 
+namespace {
+	using parse_iter = std::string::const_iterator;
+
+	[[nodiscard]] parse_iter skip_non_digits(parse_iter it, parse_iter end)
+	{
+		while (it != end && !Poco::Ascii::isDigit(*it))
+		{
+			++it;
+		}
+		return it;
+	}
+
+
+	[[nodiscard]] parse_iter skip_digits(parse_iter it, parse_iter end)
+	{
+		while (it != end && Poco::Ascii::isDigit(*it))
+		{
+			++it;
+		}
+		return it;
+	}
+
+
+	int parse_number_n(const std::string& dtStr, parse_iter& it, parse_iter end, int n)
+	{
+		parse_iter num_start = end;
+		int i = 0;
+
+		for (; it != end && i < n && Poco::Ascii::isDigit(*it); ++it, ++i)
+		{
+			if (num_start == end)
+			{
+				num_start = it;
+			}
+		}
+
+		if (num_start == end)
+		{
+			throw Poco::SyntaxException("Invalid DateTimeString: " + dtStr + ", No number found to parse");
+		}
+
+		std::string number(num_start, it);
+		int result = 0;
+		try
+		{
+			return std::stoi(number);
+		}
+		catch(const std::exception& e)
+		{
+			throw Poco::SyntaxException("Invalid DateTimeString: " + dtStr + ", invalid number: " + number);
+		}
+	}
+}
 
 namespace Poco {
 
 
-#define SKIP_JUNK() \
-	while (it != end && !Ascii::isDigit(*it)) ++it
-
-
-#define SKIP_DIGITS() \
-	while (it != end && Ascii::isDigit(*it)) ++it
-
-
-#define PARSE_NUMBER(var) \
-	while (it != end && Ascii::isDigit(*it)) var = var*10 + ((*it++) - '0')
-
-
-#define PARSE_NUMBER_N(var, n) \
-	{ int i = 0; while (i++ < n && it != end && Ascii::isDigit(*it)) var = var*10 + ((*it++) - '0'); }
-
-
-#define PARSE_FRACTIONAL_N(var, n) \
-	{ int i = 0; while (i < n && it != end && Ascii::isDigit(*it)) { var = var*10 + ((*it++) - '0'); i++; } while (i++ < n) var *= 10; }
-
-
-inline std::string cleanedInputString(const std::string& str)
-{
-	return Poco::trim(str);
-}
-
 void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, DateTime& dateTime, int& timeZoneDifferential)
 {
-	const auto str = cleanedInputString(dtStr);
+	const auto str = Poco::trim(dtStr);
 
-	if (fmt.empty() || str.empty() || (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str)))
-		throw SyntaxException("Invalid DateTimeString:" + dtStr);
+	if (fmt.empty() || str.empty())
+	{
+		throw SyntaxException("Invalid DateTimeString: " + dtStr);
+	}
+	else if (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str))
+	{
+		throw SyntaxException("Invalid DateTimeString: " + dtStr);
+	}
+	
+	const auto parse_number = [&dtStr](parse_iter& it, parse_iter end)
+	{
+		parse_iter num_start = end;
+
+		for (; it != end && Poco::Ascii::isDigit(*it); ++it)
+		{
+			if (num_start == end)
+			{
+				num_start = it;
+			}
+		}
+
+		if (num_start == end)
+		{
+			throw Poco::SyntaxException("Invalid DateTimeString: " + dtStr + ", No number found to parse");
+		}
+
+		std::string number(num_start, it);
+		int result = 0;
+		try
+		{
+			return std::stoi(number);
+		}
+		catch(const std::exception& e)
+		{
+			throw SyntaxException("Invalid DateTimeString: " + dtStr + ", invalid number: " + number);
+		}
+	};
+
+	
+
+	const auto parse_fractional_n = [dtStr](parse_iter& it, parse_iter end, int n)
+	{
+		parse_iter num_start = end;
+		int i = 0;
+
+		for (; it != end && i < n && Poco::Ascii::isDigit(*it); ++it, ++i)
+		{
+			if (num_start == end)
+			{
+				num_start = it;
+			}
+		}
+
+		if (num_start == end)
+		{
+			return 0;
+		}
+
+		std::string number(num_start, it);
+		int result = 0;
+		try
+		{
+			result = std::stoi(number);
+		}
+		catch(const std::exception& e)
+		{
+			throw SyntaxException("Invalid DateTimeString: " + dtStr + ", invalid number: " + number);
+		}
+		
+		while (i++ < n) result *= 10;
+
+		return result;
+	};
 
 	int year   = 0;
 	int month  = 0;
@@ -81,8 +181,8 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 			{
 				switch (*itf)
 				{
-				case 'w':
-				case 'W':
+				case 'w': // Weekday, abbreviated
+				case 'W': // Weekday
 					while (it != end && Ascii::isSpace(*it)) ++it;
 					while (it != end && Ascii::isAlpha(*it)) ++it;
 					break;
@@ -94,32 +194,33 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 				case 'd':
 				case 'e':
 				case 'f':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(day, 2);
+					it = skip_non_digits(it, end);
+					day = parse_number_n(dtStr, it, end, 2);
 					dayParsed = true;
 					break;
 				case 'm':
 				case 'n':
 				case 'o':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(month, 2);
+					it = skip_non_digits(it, end);
+					month = parse_number_n(dtStr, it, end, 2);
 					monthParsed = true;
 					break;
 				case 'y':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(year, 2);
+					it = skip_non_digits(it, end);
+					year = parse_number_n(dtStr, it, end, 2);
 					if (year >= 69)
 						year += 1900;
 					else
 						year += 2000;
 					break;
 				case 'Y':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(year, 4);
+					it = skip_non_digits(it, end);
+					year = parse_number_n(dtStr, it, end, 4);
 					break;
 				case 'r':
-					SKIP_JUNK();
-					PARSE_NUMBER(year);
+					it = skip_non_digits(it, end);
+					year = parse_number(it, end);
+
 					if (year < 1000)
 					{
 						if (year >= 69)
@@ -130,46 +231,47 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 					break;
 				case 'H':
 				case 'h':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(hour, 2);
+					it = skip_non_digits(it, end);
+					hour = parse_number_n(dtStr, it, end, 2);
 					break;
 				case 'a':
 				case 'A':
 					hour = parseAMPM(it, end, hour);
 					break;
 				case 'M':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(minute, 2);
+					it = skip_non_digits(it, end);
+					minute = parse_number_n(dtStr, it, end, 2);
 					break;
 				case 'S':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(second, 2);
+					it = skip_non_digits(it, end);
+					second = parse_number_n(dtStr, it, end, 2);
 					break;
 				case 's':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(second, 2);
+					it = skip_non_digits(it, end);
+					second = parse_number_n(dtStr, it, end, 2);
+
 					if (it != end && (*it == '.' || *it == ','))
 					{
 						++it;
-						PARSE_FRACTIONAL_N(millis, 3);
-						PARSE_FRACTIONAL_N(micros, 3);
-						SKIP_DIGITS();
+						millis = parse_fractional_n(it, end, 3);
+						micros = parse_fractional_n(it, end, 3);
+						it = skip_digits(it, end);
 					}
 					break;
 				case 'i':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(millis, 3);
+					it = skip_non_digits(it, end);
+					millis = parse_number_n(dtStr, it, end, 3);
 					break;
 				case 'c':
-					SKIP_JUNK();
-					PARSE_NUMBER_N(millis, 1);
+					it = skip_non_digits(it, end);
+					millis = parse_number_n(dtStr, it, end, 1);
 					millis *= 100;
 					break;
 				case 'F':
-					SKIP_JUNK();
-					PARSE_FRACTIONAL_N(millis, 3);
-					PARSE_FRACTIONAL_N(micros, 3);
-					SKIP_DIGITS();
+					it = skip_non_digits(it, end);
+					millis = parse_number_n(dtStr, it, end, 3);
+					micros = parse_number_n(dtStr, it, end, 3);
+					it = skip_digits(it, end);
 					break;
 				case 'z':
 				case 'Z':
@@ -233,7 +335,7 @@ DateTime DateTimeParser::parse(const std::string& str, int& timeZoneDifferential
 
 bool DateTimeParser::tryParse(const std::string& dtStr, DateTime& dateTime, int& timeZoneDifferential)
 {
-	const auto str = cleanedInputString(dtStr);
+	const auto str = Poco::trim(dtStr);
 
 	if (str.length() < 4) return false;
 
@@ -338,12 +440,29 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			int sign = *it == '+' ? 1 : -1;
 			++it;
 			int hours = 0;
-			PARSE_NUMBER_N(hours, 2);
+			try
+			{
+				hours = parse_number_n("", it, end, 2);
+			}
+			catch(const SyntaxException& e)
+			{
+				throw SyntaxException("Timezone invalid number: hours");
+			}
+			
 			if (hours < 0 || hours > 23)
 				throw SyntaxException("Timezone difference hours out of range");
 			if (it != end && *it == ':') ++it;
 			int minutes = 0;
-			PARSE_NUMBER_N(minutes, 2);
+			try
+			{
+				minutes = parse_number_n("", it, end, 2);
+			}
+			catch(const SyntaxException& e)
+			{
+				throw SyntaxException("Timezone invalid number: minutes");
+			}
+			
+			// PARSE_NUMBER_N(minutes, 2);
 			if (minutes < 0 || minutes > 59)
 				throw SyntaxException("Timezone difference minutes out of range");
 			tzd += sign*(hours*3600 + minutes*60);
