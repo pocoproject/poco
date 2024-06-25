@@ -62,7 +62,6 @@ namespace {
 		}
 
 		std::string number(num_start, it);
-		int result = 0;
 		try
 		{
 			return std::stoi(number);
@@ -108,7 +107,6 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 		}
 
 		std::string number(num_start, it);
-		int result = 0;
 		try
 		{
 			return std::stoi(number);
@@ -468,7 +466,6 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 				throw SyntaxException("Timezone invalid number: minutes");
 			}
 			
-			// PARSE_NUMBER_N(minutes, 2);
 			if (minutes < 0 || minutes > 59)
 				throw SyntaxException("Timezone difference minutes out of range");
 			tzd += sign*(hours*3600 + minutes*60);
