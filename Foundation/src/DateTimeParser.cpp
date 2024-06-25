@@ -253,6 +253,12 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 					if (it != end && (*it == '.' || *it == ','))
 					{
 						++it;
+
+						if (it != end && !Ascii::isDigit(*it))
+						{
+							throw SyntaxException("Invalid DateTimeString: " + dtStr + ", missing millisecond");
+						}
+						
 						millis = parse_fractional_n(it, end, 3);
 						micros = parse_fractional_n(it, end, 3);
 						it = skip_digits(it, end);
