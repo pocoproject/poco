@@ -129,19 +129,6 @@ const std::string DateTimeFormat::MONTH_NAMES[] =
 };
 
 
-DateTimeFormat::RegexList DateTimeFormat::REGEX_LIST =
-{
-	&DateTimeFormat::ISO8601_REGEX,
-	&DateTimeFormat::RFC822_REGEX,
-	&DateTimeFormat::RFC1123_REGEX,
-	&DateTimeFormat::HTTP_REGEX,
-	&DateTimeFormat::RFC850_REGEX,
-	&DateTimeFormat::RFC1036_REGEX,
-	&DateTimeFormat::ASCTIME_REGEX,
-	&DateTimeFormat::SORTABLE_REGEX
-};
-
-
 bool DateTimeFormat::hasFormat(const std::string& fmt)
 {
 	return FORMAT_LIST.find(fmt) != FORMAT_LIST.end();
@@ -150,8 +137,7 @@ bool DateTimeFormat::hasFormat(const std::string& fmt)
 
 bool DateTimeFormat::isValid(const std::string& dateTime)
 {
-
-        static const RegularExpression regs[] = {
+        static const RegularExpression regexList[] = {
                 RegularExpression(DateTimeFormat::ISO8601_REGEX),
                 RegularExpression(DateTimeFormat::RFC822_REGEX),
                 RegularExpression(DateTimeFormat::RFC1123_REGEX),
@@ -161,10 +147,8 @@ bool DateTimeFormat::isValid(const std::string& dateTime)
                 RegularExpression(DateTimeFormat::ASCTIME_REGEX),
                 RegularExpression(DateTimeFormat::SORTABLE_REGEX)
         };
-		// make sure the regex list and the array of regexes are in sync
-		poco_assert((sizeof(regs) / sizeof(regs[0])) == REGEX_LIST.size());
-
-        for (const auto& f : regs)
+		
+        for (const auto& f : regexList)
         {
             if (f.match(dateTime)) return true;
         }
