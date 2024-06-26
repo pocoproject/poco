@@ -21,7 +21,7 @@
 
 #if defined(POCO_HAVE_FD_EPOLL)
 	#ifdef POCO_OS_FAMILY_WINDOWS
-		#include "Poco/Net/ServerSocket.h"
+		#include "Poco/Net/DatagramSocket.h"
 		#include "Poco/Net/SocketAddress.h"
 		#include "wepoll.h"
 	#else
@@ -48,16 +48,13 @@ namespace Net {
 
 
 #ifdef WEPOLL_H_
-
-namespace {
-
-int close(HANDLE h)
+namespace 
 {
-	return epoll_close(h);
+	int close(HANDLE h)
+	{
+		return epoll_close(h);
+	}
 }
-
-}
-
 #endif // WEPOLL_H_
 
 
@@ -72,11 +69,7 @@ public:
 	static const epoll_event EPOLL_NULL_EVENT;
 
 	PollSetImpl(): _events(FD_SETSIZE, EPOLL_NULL_EVENT),
-#if defined(WEPOLL_H_)
-		_eventfd(eventfd()),
-#else
 		_eventfd(eventfd(0, 0)),
-#endif // WEPOLL_H_
 		_epollfd(epoll_create(1))
 	{
 		int err = addFD(_eventfd, PollSet::POLL_READ, EPOLL_CTL_ADD);
@@ -174,8 +167,7 @@ public:
 		while (true)
 		{
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, &_events[0],
-				static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+			rc = epoll_wait(_epollfd, &_events[0], static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
 			if (rc == 0)
 			{
 				if (keepWaiting(start, remainingTime)) continue;
@@ -185,7 +177,10 @@ public:
 			// if we are hitting the events limit, resize it; even without resizing, the subseqent
 			// calls would round-robin through the remaining ready sockets, but it's better to give
 			// the call enough room once we start hitting the boundary
-			if (rc >= _events.size()) _events.resize(_events.size()*2);
+			if (rc >= _events.size()) 
+			{
+				_events.resize(_events.size()*2);
+			}
 			else if (rc < 0)
 			{
 				// if interrupted and there's still time left, keep waiting
@@ -217,11 +212,15 @@ public:
 			}
 			else if (_events[i].events & EPOLLIN) // eventfd signaled
 			{
-				uint64_t val;
 #ifdef WEPOLL_H_
-				if (_pSocket && _pSocket->available())
-					_pSocket->impl()->receiveBytes(&val, sizeof(val));
+				if (_pEventSocket)
+				{
+					char val;
+					Poco::Net::SocketAddress sa;
+					_pEventSocket->receiveFrom(&val, sizeof(val), sa);
+				}
 #else
+				std::uint64_t val;
 				read(_eventfd, &val, sizeof(val));
 #endif
 			}
@@ -231,19 +230,14 @@ public:
 
 	void wakeUp()
 	{
-		uint64_t val = 1;
 #ifdef WEPOLL_H_
-	#ifdef POCO_HAS_UNIX_SOCKET
-		poco_check_ptr (_pSockFile);
-		StreamSocket ss(SocketAddress(_pSockFile->path()));
-	#else
-		StreamSocket ss(SocketAddress("127.0.0.1", _port));
-	#endif
-		ss.sendBytes(&val, sizeof(val));
+		char val = 1;
+		_pEventSocket->sendTo(&val, sizeof(val), _pEventSocket->address());
 #else
 		// This is guaranteed to write into a valid fd,
 		// or 0 (meaning PollSet is being destroyed).
 		// Errors are ignored.
+		std::uint64_t val = 1;
 		write(_eventfd, &val, sizeof(val));
 #endif
 	}
@@ -319,31 +313,18 @@ private:
 #else // WEPOLL_H_
 	using EPollHandle = std::atomic<HANDLE>;
 
-	#ifdef POCO_HAS_UNIX_SOCKET
-		int eventfd()
+	int eventfd(int, int)
+	{
+		static const SocketAddress eventSA("127.0.0.238"s, 0);
+		if (!_pEventSocket)
 		{
-			if (!_pSockFile)
-			{
-				_pSockFile.reset(new TemporaryFile);
-				_pSocket.reset(new ServerSocket(SocketAddress(_pSockFile->path())));
-			}
-			_pSocket->setBlocking(false);
-			return static_cast<int>(_pSocket->impl()->sockfd());
+			_pEventSocket.reset(new DatagramSocket(eventSA, true));
+			_pEventSocket->setBlocking(false);
 		}
-		std::unique_ptr<TemporaryFile> _pSockFile;
-	#else // no unix socket, listen on localhost
-		int eventfd()
-		{
-			if (!_pSocket)
-				_pSocket.reset(new ServerSocket(SocketAddress("127.0.0.1", 0)));
-			_port = _pSocket->address().port();
-			_pSocket->setBlocking(false);
-			return static_cast<int>(_pSocket->impl()->sockfd());
-		}
-		int _port = 0;
-	#endif // POCO_HAS_UNIX_SOCKET
+		return static_cast<int>(_pEventSocket->impl()->sockfd());
+	}
 
-	std::unique_ptr<ServerSocket> _pSocket;
+	std::unique_ptr<DatagramSocket> _pEventSocket;
 #endif // WEPOLL_H_
 
 	mutable Mutex _mutex;
@@ -353,7 +334,9 @@ private:
 	EPollHandle      _epollfd;
 };
 
+
 const epoll_event PollSetImpl::EPOLL_NULL_EVENT = {0, {0}};
+
 
 #elif defined(POCO_HAVE_FD_POLL)
 
@@ -529,7 +512,6 @@ public:
 	}
 
 private:
-
 	void setMode(short& target, int mode)
 	{
 		if (mode & PollSet::POLL_READ)
