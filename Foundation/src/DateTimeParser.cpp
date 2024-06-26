@@ -21,9 +21,9 @@
 #include <iostream>
 
 namespace {
-	using parse_iter = std::string::const_iterator;
+	using ParseIter = std::string::const_iterator;
 
-	[[nodiscard]] parse_iter skip_non_digits(parse_iter it, parse_iter end)
+	[[nodiscard]] ParseIter skipNonDigits(ParseIter it, ParseIter end)
 	{
 		while (it != end && !Poco::Ascii::isDigit(*it))
 		{
@@ -33,7 +33,7 @@ namespace {
 	}
 
 
-	[[nodiscard]] parse_iter skip_digits(parse_iter it, parse_iter end)
+	[[nodiscard]] ParseIter skipDigits(ParseIter it, ParseIter end)
 	{
 		while (it != end && Poco::Ascii::isDigit(*it))
 		{
@@ -43,25 +43,25 @@ namespace {
 	}
 
 
-	int parse_number_n(const std::string& dtStr, parse_iter& it, parse_iter end, int n)
+	int parseNumberN(const std::string& dtStr, ParseIter& it, ParseIter end, int n)
 	{
-		parse_iter num_start = end;
+		ParseIter numStart = end;
 		int i = 0;
 
 		for (; it != end && i < n && Poco::Ascii::isDigit(*it); ++it, ++i)
 		{
-			if (num_start == end)
+			if (numStart == end)
 			{
-				num_start = it;
+				numStart = it;
 			}
 		}
 
-		if (num_start == end)
+		if (numStart == end)
 		{
 			throw Poco::SyntaxException("Invalid DateTimeString: " + dtStr + ", No number found to parse");
 		}
 
-		std::string number(num_start, it);
+		std::string number(numStart, it);
 		try
 		{
 			return std::stoi(number);
@@ -89,24 +89,24 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 		throw SyntaxException("Invalid DateTimeString: " + dtStr);
 	}
 	
-	const auto parse_number = [&dtStr](parse_iter& it, parse_iter end)
+	const auto parse_number = [&dtStr](ParseIter& it, ParseIter end)
 	{
-		parse_iter num_start = end;
+		ParseIter numStart = end;
 
 		for (; it != end && Poco::Ascii::isDigit(*it); ++it)
 		{
-			if (num_start == end)
+			if (numStart == end)
 			{
-				num_start = it;
+				numStart = it;
 			}
 		}
 
-		if (num_start == end)
+		if (numStart == end)
 		{
 			throw Poco::SyntaxException("Invalid DateTimeString: " + dtStr + ", No number found to parse");
 		}
 
-		std::string number(num_start, it);
+		std::string number(numStart, it);
 		try
 		{
 			return std::stoi(number);
@@ -119,25 +119,25 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 
 	
 
-	const auto parse_fractional_n = [dtStr](parse_iter& it, parse_iter end, int n)
+	const auto parseFractionalN = [dtStr](ParseIter& it, ParseIter end, int n)
 	{
-		parse_iter num_start = end;
+		ParseIter numStart = end;
 		int i = 0;
 
 		for (; it != end && i < n && Poco::Ascii::isDigit(*it); ++it, ++i)
 		{
-			if (num_start == end)
+			if (numStart == end)
 			{
-				num_start = it;
+				numStart = it;
 			}
 		}
 
-		if (num_start == end)
+		if (numStart == end)
 		{
 			return 0;
 		}
 
-		std::string number(num_start, it);
+		std::string number(numStart, it);
 		int result = 0;
 		try
 		{
@@ -192,31 +192,31 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 				case 'd':
 				case 'e':
 				case 'f':
-					it = skip_non_digits(it, end);
-					day = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					day = parseNumberN(dtStr, it, end, 2);
 					dayParsed = true;
 					break;
 				case 'm':
 				case 'n':
 				case 'o':
-					it = skip_non_digits(it, end);
-					month = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					month = parseNumberN(dtStr, it, end, 2);
 					monthParsed = true;
 					break;
 				case 'y':
-					it = skip_non_digits(it, end);
-					year = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					year = parseNumberN(dtStr, it, end, 2);
 					if (year >= 69)
 						year += 1900;
 					else
 						year += 2000;
 					break;
 				case 'Y':
-					it = skip_non_digits(it, end);
-					year = parse_number_n(dtStr, it, end, 4);
+					it = skipNonDigits(it, end);
+					year = parseNumberN(dtStr, it, end, 4);
 					break;
 				case 'r':
-					it = skip_non_digits(it, end);
+					it = skipNonDigits(it, end);
 					year = parse_number(it, end);
 
 					if (year < 1000)
@@ -229,24 +229,24 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 					break;
 				case 'H':
 				case 'h':
-					it = skip_non_digits(it, end);
-					hour = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					hour = parseNumberN(dtStr, it, end, 2);
 					break;
 				case 'a':
 				case 'A':
 					hour = parseAMPM(it, end, hour);
 					break;
 				case 'M':
-					it = skip_non_digits(it, end);
-					minute = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					minute = parseNumberN(dtStr, it, end, 2);
 					break;
 				case 'S':
-					it = skip_non_digits(it, end);
-					second = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					second = parseNumberN(dtStr, it, end, 2);
 					break;
 				case 's':
-					it = skip_non_digits(it, end);
-					second = parse_number_n(dtStr, it, end, 2);
+					it = skipNonDigits(it, end);
+					second = parseNumberN(dtStr, it, end, 2);
 
 					if (it != end && (*it == '.' || *it == ','))
 					{
@@ -257,25 +257,25 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 							throw SyntaxException("Invalid DateTimeString: " + dtStr + ", missing millisecond");
 						}
 						
-						millis = parse_fractional_n(it, end, 3);
-						micros = parse_fractional_n(it, end, 3);
-						it = skip_digits(it, end);
+						millis = parseFractionalN(it, end, 3);
+						micros = parseFractionalN(it, end, 3);
+						it = skipDigits(it, end);
 					}
 					break;
 				case 'i':
-					it = skip_non_digits(it, end);
-					millis = parse_number_n(dtStr, it, end, 3);
+					it = skipNonDigits(it, end);
+					millis = parseNumberN(dtStr, it, end, 3);
 					break;
 				case 'c':
-					it = skip_non_digits(it, end);
-					millis = parse_number_n(dtStr, it, end, 1);
+					it = skipNonDigits(it, end);
+					millis = parseNumberN(dtStr, it, end, 1);
 					millis *= 100;
 					break;
 				case 'F':
-					it = skip_non_digits(it, end);
-					millis = parse_number_n(dtStr, it, end, 3);
-					micros = parse_number_n(dtStr, it, end, 3);
-					it = skip_digits(it, end);
+					it = skipNonDigits(it, end);
+					millis = parseNumberN(dtStr, it, end, 3);
+					micros = parseNumberN(dtStr, it, end, 3);
+					it = skipDigits(it, end);
 					break;
 				case 'z':
 				case 'Z':
@@ -446,7 +446,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			int hours = 0;
 			try
 			{
-				hours = parse_number_n("", it, end, 2);
+				hours = parseNumberN("", it, end, 2);
 			}
 			catch(const SyntaxException& e)
 			{
@@ -459,7 +459,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			int minutes = 0;
 			try
 			{
-				minutes = parse_number_n("", it, end, 2);
+				minutes = parseNumberN("", it, end, 2);
 			}
 			catch(const SyntaxException& e)
 			{
