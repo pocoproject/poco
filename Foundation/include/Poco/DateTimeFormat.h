@@ -128,9 +128,6 @@ public:
 	static bool isValid(const std::string& dateTime);
 		/// Returns true if dateTime validates against at least one supported format.
 
-	typedef std::unordered_set<const std::string*> RegexList;
-	static RegexList REGEX_LIST;
-
 private:
 	typedef std::unordered_set<std::string> Formatlist;
 	static Formatlist FORMAT_LIST;
