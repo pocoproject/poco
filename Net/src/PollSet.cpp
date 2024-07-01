@@ -24,6 +24,7 @@
 		#include "Poco/Net/DatagramSocket.h"
 		#include "Poco/Net/SocketAddress.h"
 		#include "wepoll.h"
+		#include <memory>
 	#else
 		#include <sys/epoll.h>
 		#include <sys/eventfd.h>
