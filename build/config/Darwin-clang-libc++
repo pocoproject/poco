@@ -11,7 +11,7 @@
 #
 LINKMODE ?= SHARED
 
-ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
+ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
 SANITIZEFLAGS      ?=
 OSFLAGS            ?= -mmacosx-version-min=10.11 -isysroot $(shell xcrun --show-sdk-path)
 
