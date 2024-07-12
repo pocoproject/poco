@@ -28,15 +28,16 @@
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <sstream>
-#include <typeinfo>
 #include <map>
 
 
 namespace Poco {
 namespace Crypto {
 
-class [[deprecated]] ECKey;
-class [[deprecated]] RSAKey;
+//class [[deprecated]] ECKey;
+//class [[deprecated]] RSAKey;
+class ECKey;
+class RSAKey;
 class PKCS12Container;
 class X509Certificate;
 
@@ -92,7 +93,8 @@ public:
 		/// The content behind the supplied pointer is internally duplicated.
 
 	template<typename K>
-	[[deprecated]] explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
+	//[[deprecated]] explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
+	explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
 		/// Constructs EVPPKey from a "native" OpenSSL (RSA or EC_KEY),
 		/// or a Poco wrapper (RSAKey, ECKey) key pointer.
 	{
@@ -182,16 +184,16 @@ private:
 	void newECKey(const char* group);
 	void duplicate(EVP_PKEY* pEVPPKey);
 
-	[[deprecated]]
+	//[[deprecated]]
 	void setKey(ECKey* pKey);
 
-	[[deprecated]]
+	//[[deprecated]]
 	void setKey(RSAKey* pKey);
 
-	[[deprecated]]
+	//[[deprecated]]
 	void setKey(EC_KEY* pKey);
 
-	[[deprecated]]
+	//[[deprecated]]
 	void setKey(RSA* pKey);
 
 	static int passCB(char* buf, int size, int, void* pass);

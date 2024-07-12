@@ -31,7 +31,7 @@ namespace Crypto {
 class X509Certificate;
 class PKCS12Container;
 
-class [[deprecated]] ECKey;
+//class [[deprecated]] ECKey;
 
 class Crypto_API ECKey: public KeyPair
 	/// This class stores an EC key pair, consisting
