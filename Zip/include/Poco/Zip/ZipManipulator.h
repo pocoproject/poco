@@ -22,7 +22,7 @@
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/ZipCommon.h"
 #include "Poco/Zip/ZipOperation.h"
-#include "Poco/FIFOEvent.h"
+#include "Poco/BasicEvent.h"
 #include "Poco/SharedPtr.h"
 #include <map>
 
@@ -38,7 +38,7 @@ class Zip_API ZipManipulator
 	/// ZipManipulator allows to add/remove/update files inside zip files
 {
 public:
-	Poco::FIFOEvent<const ZipLocalFileHeader> EDone;
+	Poco::BasicEvent<const ZipLocalFileHeader> EDone;
 		// Fired for each entry once commit is invoked
 
 	ZipManipulator(const std::string& zipFile, bool backupOriginalFile);

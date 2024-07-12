@@ -62,7 +62,7 @@ public:
 		HTTP_SEE_OTHER                       = 303,
 		HTTP_NOT_MODIFIED                    = 304,
 		HTTP_USE_PROXY                       = 305,
-		HTTP_USEPROXY [[deprecated]]         = 305,
+		HTTP_USEPROXY [[deprecated("use HTTP_USE_PROXY")]] = 305,
 		// UNUSED: 306
 		HTTP_TEMPORARY_REDIRECT              = 307,
 		HTTP_PERMANENT_REDIRECT              = 308,
@@ -134,7 +134,7 @@ public:
 	HTTPResponse(const HTTPResponse& other);
 		/// Creates the HTTPResponse by copying another one.
 
-	virtual ~HTTPResponse();
+	~HTTPResponse() override;
 		/// Destroys the HTTPResponse.
 
 	HTTPResponse& operator = (const HTTPResponse& other);
@@ -185,11 +185,11 @@ public:
 		/// May throw an exception in case of a malformed
 		/// Set-Cookie header.
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP response to the given
 		/// output stream.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP response from the
 		/// given input stream.
 		///

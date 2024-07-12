@@ -13,11 +13,8 @@
 
 
 #include "Poco/Data/SQLChannel.h"
-#include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/BulkBinding.h"
-#include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/DateTimeFormat.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/Instantiator.h"
 #include "Poco/NumberParser.h"
@@ -27,7 +24,7 @@
 #include "Poco/File.h"
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
-#include <fstream>
+
 #include <memory>
 
 
@@ -44,7 +41,7 @@ const std::string SQLChannel::PROP_NAME("name");
 const std::string SQLChannel::PROP_TABLE("table");
 const std::string SQLChannel::PROP_ARCHIVE_TABLE("archive");
 const std::string SQLChannel::PROP_MAX_AGE("keep");
-[[deprecated]] const std::string SQLChannel::PROP_ASYNC("async");
+const std::string SQLChannel::PROP_ASYNC("async");
 const std::string SQLChannel::PROP_TIMEOUT("timeout");
 const std::string SQLChannel::PROP_MIN_BATCH("minBatch");
 const std::string SQLChannel::PROP_MAX_BATCH("maxBatch");
@@ -259,6 +256,7 @@ void SQLChannel::run()
 	{
 		try
 		{
+			sleepTime = 100;
 			if (_reconnect)
 			{
 				close();
@@ -267,7 +265,6 @@ void SQLChannel::run()
 				if (_reconnect && sleepTime < 12800)
 					sleepTime *= 2;
 			}
-
 			if (!_reconnect)
 			{
 				if (_logQueue.size()) processBatch(_minBatch);

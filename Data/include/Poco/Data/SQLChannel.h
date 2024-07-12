@@ -19,7 +19,6 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/Data/Connector.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Logger.h"
@@ -218,7 +217,7 @@ public:
 	static const std::string PROP_TABLE;
 	static const std::string PROP_ARCHIVE_TABLE;
 	static const std::string PROP_MAX_AGE;
-	static const std::string PROP_ASYNC;
+	[[deprecated]] static const std::string PROP_ASYNC;
 	static const std::string PROP_TIMEOUT;
 	static const std::string PROP_MIN_BATCH;
 	static const std::string PROP_MAX_BATCH;
