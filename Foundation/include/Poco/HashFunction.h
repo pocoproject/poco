@@ -26,7 +26,7 @@ namespace Poco {
 
 
 template <class T>
-struct [[deprecated]] HashFunction
+struct [[deprecated("use Hash")]] HashFunction
 	/// A generic hash function.
 {
 	UInt32 operator () (T key, UInt32 maxValue) const
@@ -38,7 +38,7 @@ struct [[deprecated]] HashFunction
 
 
 template <>
-struct [[deprecated]] HashFunction<std::string>
+struct [[deprecated("use Hash")]] HashFunction<std::string>
 	/// A generic hash function.
 {
 	UInt32 operator () (const std::string& key, UInt32 maxValue) const
