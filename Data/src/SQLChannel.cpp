@@ -24,7 +24,10 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Format.h"
+#include "Poco/Path.h"
 #include "Poco/File.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 #include <fstream>
 #include <memory>
 
@@ -46,8 +49,10 @@ const std::string SQLChannel::PROP_ASYNC("async");
 const std::string SQLChannel::PROP_TIMEOUT("timeout");
 const std::string SQLChannel::PROP_MIN_BATCH("minBatch");
 const std::string SQLChannel::PROP_MAX_BATCH("maxBatch");
+const std::string SQLChannel::PROP_MAX_SQL("maxSQL");
 const std::string SQLChannel::PROP_BULK("bulk");
 const std::string SQLChannel::PROP_THROW("throw");
+const std::string SQLChannel::PROP_DIRECTORY("directory");
 const std::string SQLChannel::PROP_FILE("file");
 
 
@@ -57,21 +62,23 @@ const std::string SQLChannel::SQL_INSERT_STMT = "INSERT INTO %s " \
 
 
 SQLChannel::SQLChannel():
-	_name("-"),
-	_table("T_POCO_LOG"),
+	_name("SQLChannel"),
 	_tableChanged(true),
 	_timeout(1000),
 	_minBatch(DEFAULT_MIN_BATCH_SIZE),
 	_maxBatch(DEFAULT_MAX_BATCH_SIZE),
+	_maxSQL(DEFAULT_MAX_SQL_SIZE),
 	_bulk(true),
 	_throw(false),
 	_pid(),
 	_tid(),
 	_priority(),
+	_pLogThread(new Thread),
 	_reconnect(false),
 	_stop(false),
 	_logged(0)
 {
+	_pLogThread->start(*this);
 }
 
 
@@ -81,7 +88,8 @@ SQLChannel::SQLChannel(const std::string& connector,
 	const std::string& table,
 	int timeout,
 	int minBatch,
-	int maxBatch) :
+	int maxBatch,
+	int maxSQL) :
 	_connector(connector),
 	_connect(connect),
 	_name(name),
@@ -90,17 +98,18 @@ SQLChannel::SQLChannel(const std::string& connector,
 	_timeout(timeout),
 	_minBatch(minBatch),
 	_maxBatch(maxBatch),
+	_maxSQL(maxSQL),
 	_bulk(false),
 	_throw(false),
 	_pid(),
 	_tid(),
 	_priority(),
-	_pDBThread(new Thread),
+	_pLogThread(new Thread),
 	_reconnect(true),
 	_stop(false),
 	_logged(0)
 {
-	_pDBThread->start(*this);
+	_pLogThread->start(*this);
 }
 
 
@@ -185,7 +194,7 @@ size_t SQLChannel::logLocal(const std::string& message, Message::Priority prio)
 {
 	Message msg("SQLChannel"s, message, prio);
 	log(msg);
-	return logToFile(_pFileChannel);
+	return logToFile();
 }
 
 
@@ -195,11 +204,11 @@ void SQLChannel::log(const Message& msg)
 }
 
 
-size_t SQLChannel::logSync()
+size_t SQLChannel::logSync(bool flush)
 {
 	try
 	{
-		return execSQL();
+		return execSQL(flush);
 	}
 	catch (...)
 	{
@@ -212,8 +221,8 @@ size_t SQLChannel::logSync()
 
 bool SQLChannel::processOne(int minBatch)
 {
-	bool ret = false;
-	if (_logQueue.size())
+	bool ret = false, flush = (minBatch == 0);
+	while (_logQueue.size())
 	{
 		Notification::Ptr pN = _logQueue.dequeueNotification();
 		LogNotification::Ptr pLN = pN.cast<LogNotification>();
@@ -231,10 +240,12 @@ bool SQLChannel::processOne(int minBatch)
 			_text.push_back(msg.getText());
 			Poco::replaceInPlace(_text.back(), "'", "''");
 			_dateTime.emplace_back(msg.getTime());
+			if ((_source.size() >= minBatch) || flush)
+				logSync(flush);
+			ret = true;
 		}
-		ret = true;
 	}
-	if (_source.size() >= minBatch) logSync();
+	if (flush) logSync(flush);
 
 	return ret;
 }
@@ -251,16 +262,14 @@ void SQLChannel::run()
 			{
 				close();
 				open();
-				_reconnect = _pSession.isNull();
+				_reconnect = !_connector.empty() && _pSession.isNull();
 				if (_reconnect && sleepTime < 12800)
 					sleepTime *= 2;
 			}
-			if (_stop && _reconnect)
-				std::cout << "Request to stop and reconnect!" << std::endl;
 
 			if (!_reconnect)
 			{
-				processOne(_minBatch);
+				if (_logQueue.size()) processOne(_minBatch);
 				sleepTime = 100;
 			}
 		}
@@ -291,20 +300,21 @@ void SQLChannel::run()
 		}
 		Thread::sleep(sleepTime);
 	}
-	while (_logQueue.size())
+	while (_logQueue.size() || _source.size())
 		processOne();
 }
 
 
 void SQLChannel::stop()
 {
-	if (_pDBThread)
+	if (_pLogThread)
 	{
 		_reconnect = false;
 		_stop = true;
-		while (_pDBThread->isRunning())
+		while (_pLogThread->isRunning())
 			Thread::sleep(10);
-		_pDBThread->join();
+		_pLogThread->join();
+		_pLogThread.reset();
 	}
 }
 
@@ -312,11 +322,229 @@ void SQLChannel::stop()
 void SQLChannel::reconnect()
 {
 	_reconnect = true;
-	if (!_pDBThread)
+	if (!_pLogThread)
 	{
-		_pDBThread = std::make_unique<Thread>();
-		_pDBThread->start(*this);
+		_pLogThread = std::make_unique<Thread>();
+		_pLogThread->start(*this);
 	}
+}
+
+
+size_t SQLChannel::logToFile(bool flush)
+{
+	if (_source.empty()) return 0u;
+
+	static std::vector<std::string> names;
+	if (names.size() != _source.size())
+		names.resize(_source.size(), Poco::replace(_name, "'", "''"));
+
+	std::size_t n = 0;
+
+	AutoPtr<FileChannel> pFileChannel;
+	std::string file = _file;
+	if (!_pFileChannel && !_file.empty())
+	{
+		if (!Path(File(file).path()).isAbsolute())
+			file = _directory + file;
+
+		_pFileChannel = new FileChannel(file);
+		pFileChannel = _pFileChannel;
+	}
+	else
+	{
+		UUID uuid = UUIDGenerator::defaultGenerator().createRandom();
+		std::string filename(_directory);
+		filename.append(DateTimeFormatter::format(LocalDateTime(), "%Y%m%d%H%M%S%i.").append(uuid.toString()).append(".log.sql"s));
+		pFileChannel = new FileChannel(filename);
+	}
+
+	if (pFileChannel)
+	{
+		std::string sql;
+		Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
+		std::stringstream os, tmp;
+		os << sql << '\n';
+		auto it = _source.begin();
+		auto end = _source.end();
+		int idx = 0, batch = 0;
+		for (; it != end; ++idx)
+		{
+			std::string dt = DateTimeFormatter::format(_dateTime[idx], "%Y-%m-%d %H:%M:%S.%i");
+			tmp.str("");
+			tmp << "('" << *it << "','" <<
+				names[idx] << "'," <<
+				_pid[idx] << ",'" <<
+				_thread[idx] << "'," <<
+				_tid[idx] << ',' <<
+				_priority[idx] << ",'" <<
+				_text[idx] << "','" <<
+				dt << "')";
+
+			if (++batch == _maxBatch || (os.str().length() + tmp.str().length()) >= _maxSQL)
+			{
+				os << ";\n";
+				Message msg(_source[0], os.str(), Message::PRIO_FATAL);
+				pFileChannel->log(msg);
+				n += batch;
+				_logged += batch;
+				_source.erase(_source.begin(), _source.begin() + batch);
+				_pid.erase(_pid.begin(), _pid.begin() + batch);
+				_thread.erase(_thread.begin(), _thread.begin() + batch);
+				_tid.erase(_tid.begin(), _tid.begin() + batch);
+				_priority.erase(_priority.begin(), _priority.begin() + batch);
+				_text.erase(_text.begin(), _text.begin() + batch);
+				_dateTime.erase(_dateTime.begin(), _dateTime.begin() + batch);
+				os.str(""); sql.clear();
+				Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
+				os << sql << '\n' << tmp.str();
+				batch = 0;
+			}
+
+			os << tmp.str();
+
+			if (++it == end)
+			{
+				os << ";\n";
+				break;
+			}
+			os << ",\n";
+		}
+
+		if ((batch >= _minBatch) || flush)
+		{
+			Message msg(_source[0], os.str(), Message::PRIO_FATAL);
+			pFileChannel->log(msg);
+			n += batch;
+			_logged += batch;
+			_source.erase(_source.begin(), _source.begin()+batch);
+			_pid.erase(_pid.begin(), _pid.begin() + batch);
+			_thread.erase(_thread.begin(), _thread.begin() + batch);
+			_tid.erase(_tid.begin(), _tid.begin() + batch);
+			_priority.erase(_priority.begin(), _priority.begin() + batch);
+			_text.erase(_text.begin(), _text.begin() + batch);
+			_dateTime.erase(_dateTime.begin(), _dateTime.begin() + batch);
+		}
+	}
+
+	return n;
+}
+
+
+size_t SQLChannel::logToDB(bool flush)
+{
+	if (_source.empty()) return 0u;
+
+	static std::vector<std::string> names;
+	if (names.size() != _source.size())
+		names.resize(_source.size(), Poco::replace(_name, "'", "''"));
+	static std::string placeholders = "(?,?,?,?,?,?,?,?)";
+
+	Poco::FastMutex::ScopedLock l(_mutex);
+
+	if (_tableChanged)
+	{
+		Poco::format(_sql, SQL_INSERT_STMT, _table, placeholders);
+		_tableChanged = false;
+	}
+
+	std::size_t n = 0;
+
+	try
+	{
+		if (_bulk)
+		{
+			try
+			{
+				(*_pSession) << _sql,
+					use(_source, bulk),
+					use(names, bulk),
+					use(_pid, bulk),
+					use(_thread, bulk),
+					use(_tid, bulk),
+					use(_priority, bulk),
+					use(_text, bulk),
+					use(_dateTime, bulk), now;
+			}
+			// most likely bulk mode not supported, try again
+			catch (const Poco::InvalidAccessException&)
+			{
+				(*_pSession) << _sql,
+					use(_source),
+					use(names),
+					use(_pid),
+					use(_thread),
+					use(_tid),
+					use(_priority),
+					use(_text),
+					use(_dateTime), now;
+				_bulk = false;
+			}
+		}
+		else
+		{
+			(*_pSession) << _sql,
+				use(_source),
+				use(names),
+				use(_pid),
+				use(_thread),
+				use(_tid),
+				use(_priority),
+				use(_text),
+				use(_dateTime), now;
+		}
+		n = _source.size();
+	}
+	catch (const Poco::Exception& ex)
+	{
+		logLocal(ex.displayText());
+		close();
+		_reconnect = true;
+	}
+	catch (const std::exception& ex)
+	{
+		logLocal(ex.what());
+		close();
+		_reconnect = true;
+	}
+
+	if (n)
+	{
+		_logged += n;
+		_source.erase(_source.begin(), _source.begin() + n);
+		_pid.erase(_pid.begin(), _pid.begin() + n);
+		_thread.erase(_thread.begin(), _thread.begin() + n);
+		_tid.erase(_tid.begin(), _tid.begin() + n);
+		_priority.erase(_priority.begin(), _priority.begin() + n);
+		_text.erase(_text.begin(), _text.begin() + n);
+		_dateTime.erase(_dateTime.begin(), _dateTime.begin() + n);
+	}
+
+	return n;
+}
+
+
+size_t SQLChannel::execSQL(bool flush)
+{
+	if (!_connector.empty() && (!_pSession || !_pSession->isConnected())) open();
+	if (_pArchiveStrategy) _pArchiveStrategy->archive();
+
+	size_t n = _pSession ? logToDB(flush) : logToFile(flush);
+
+	return n;
+}
+
+
+std::size_t SQLChannel::wait(int ms)
+{
+	Stopwatch sw;
+	sw.start();
+	while (_logQueue.size())
+	{
+		Thread::sleep(10);
+		if (ms && sw.elapsed() * 1000 > ms)
+			break;
+	}
+	return _logQueue.size();
 }
 
 
@@ -405,6 +633,11 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 			throw Poco::InvalidArgumentException(Poco::format("SQLChannel::setProperty(%s,%s)", name, value));
 		_maxBatch = maxBatch;
 	}
+	else if (name == PROP_MAX_SQL)
+	{
+		int maxSQL = NumberParser::parse(value);
+		_maxSQL = maxSQL;
+	}
 	else if (name == PROP_BULK)
 	{
 		_bulk = isTrue(value);
@@ -412,6 +645,16 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	else if (name == PROP_THROW)
 	{
 		_throw = isTrue(value);
+	}
+	else if (name == PROP_DIRECTORY)
+	{
+		std::string dir = value;
+		if (!Path(File(dir).path()).isAbsolute())
+		{
+			Path d(dir);
+			dir = d.makeDirectory().makeAbsolute().toString();
+		}
+		_directory = dir;
 	}
 	else if (name == PROP_FILE)
 	{
@@ -465,6 +708,10 @@ std::string SQLChannel::getProperty(const std::string& name) const
 	{
 		return std::to_string(_maxBatch);
 	}
+	else if (name == PROP_MAX_SQL)
+	{
+		return std::to_string(_maxSQL);
+	}
 	else if (name == PROP_BULK)
 	{
 		if (_bulk) return "true";
@@ -475,6 +722,10 @@ std::string SQLChannel::getProperty(const std::string& name) const
 		if (_throw) return "true";
 		else return "false";
 	}
+	else if (name == PROP_DIRECTORY)
+	{
+		return _directory;
+	}
 	else if (name == PROP_FILE)
 	{
 		return _file;
@@ -483,182 +734,6 @@ std::string SQLChannel::getProperty(const std::string& name) const
 	{
 		return Channel::getProperty(name);
 	}
-}
-
-
-size_t SQLChannel::logToFile(bool clear)
-{
-	static std::vector<std::string> names;
-	if (names.size() != _source.size())
-		names.resize(_source.size(), Poco::replace(_name, "'", "''"));
-
-	std::size_t n = 0;
-
-	if (!_pFileChannel && !_file.empty()) _pFileChannel = new FileChannel(_file);
-	if (_pFileChannel)
-	{
-		std::string sql;
-		Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
-		std::stringstream os;
-		os << sql << '\n';
-		auto it = _source.begin();
-		auto end = _source.end();
-		int idx = 0, batch = 0;
-		for (; it != end; ++idx)
-		{
-			std::string dt = Poco::DateTimeFormatter::format(_dateTime[idx], "%Y-%m-%d %H:%M:%S.%i");
-			os << "('" << *it << "','" <<
-				names[idx] << "'," <<
-				_pid[idx] << ",'" <<
-				_thread[idx] << "'," <<
-				_tid[idx] << ',' <<
-				_priority[idx] << ",'" <<
-				_text[idx] << "','" <<
-				dt << "')";
-			if (++batch == _maxBatch)
-			{
-				os << ";\n";
-				Message msg(_source[0], os.str(), Message::PRIO_ERROR);
-				_pFileChannel->log(msg);
-				os.str(""); sql.clear();
-				Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
-				batch = 0;
-			}
-			if (++it == end)
-			{
-				os << ";\n";
-				break;
-			}
-			os << ",\n";
-		}
-		Message msg(_source[0], os.str(), Message::PRIO_ERROR);
-		_pFileChannel->log(msg);
-		n = _source.size();
-		if (clear && n)
-		{
-			_source.clear();
-			_pid.clear();
-			_thread.clear();
-			_tid.clear();
-			_priority.clear();
-			_text.clear();
-			_dateTime.clear();
-		}
-	}
-	return n;
-}
-
-
-size_t SQLChannel::execSQL()
-{
-	static std::vector<std::string> names;
-	if (names.size() != _source.size())
-		names.resize(_source.size(), Poco::replace(_name, "'", "''"));
-	static std::string placeholders = "(?,?,?,?,?,?,?,?)";
-
-	Poco::FastMutex::ScopedLock l(_mutex);
-
-	if (_tableChanged)
-	{
-		Poco::format(_sql, SQL_INSERT_STMT, _table, placeholders);
-		_tableChanged = false;
-	}
-
-	if (!_pSession || !_pSession->isConnected()) open();
-	if (_pArchiveStrategy) _pArchiveStrategy->archive();
-
-	size_t n = 0;
-	if (_pSession)
-	{
-		try
-		{
-			if (_bulk)
-			{
-				try
-				{
-					(*_pSession) << _sql,
-						use(_source, bulk),
-						use(names, bulk),
-						use(_pid, bulk),
-						use(_thread, bulk),
-						use(_tid, bulk),
-						use(_priority, bulk),
-						use(_text, bulk),
-						use(_dateTime, bulk), now;
-				}
-				// most likely bulk mode not supported, try again
-				catch (const Poco::InvalidAccessException&)
-				{
-					(*_pSession) << _sql,
-						use(_source),
-						use(names),
-						use(_pid),
-						use(_thread),
-						use(_tid),
-						use(_priority),
-						use(_text),
-						use(_dateTime), now;
-					_bulk = false;
-				}
-			}
-			else
-			{
-				(*_pSession) << _sql,
-					use(_source),
-					use(names),
-					use(_pid),
-					use(_thread),
-					use(_tid),
-					use(_priority),
-					use(_text),
-					use(_dateTime), now;
-			}
-			n = _source.size();
-		}
-		catch (const Poco::Exception& ex)
-		{
-			logLocal(ex.displayText());
-			close();
-			_reconnect = true;
-		}
-		catch (const std::exception& ex)
-		{
-			logLocal(ex.what());
-			close();
-			_reconnect = true;
-		}
-	}
-	else
-	{
-		n = logToFile(_pFileChannel);
-	}
-
-	if (n)
-	{
-		_logged += n;
-		_source.clear();
-		_pid.clear();
-		_thread.clear();
-		_tid.clear();
-		_priority.clear();
-		_text.clear();
-		_dateTime.clear();
-	}
-	return n;
-}
-
-
-std::size_t SQLChannel::wait(int ms)
-{
-	Stopwatch sw;
-	sw.start();
-	while (_logQueue.size())
-	{
-		Thread::sleep(10);
-		if (ms && sw.elapsed() * 1000 > ms)
-			break;
-	}
-	return _logQueue.size();
 }
 
 

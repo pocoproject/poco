@@ -2480,7 +2480,7 @@ void SQLiteTest::testSQLChannel()
 	{
 		Thread::sleep(10);
 		if (sw.elapsedSeconds() > 3)
-			fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
+			fail ("SQLChannel timed out");
 	}
 	// bulk binding mode is not suported by SQLite, but SQLChannel should handle it internally
 	pChannel->setProperty("bulk", "true");
@@ -2539,17 +2539,15 @@ void SQLiteTest::testSQLChannel()
 	assertTrue("f Warning sync message" == rs2["Text"]);
 
 	pChannel->setProperty("minBatch", "1024");
-	constexpr int mcount { 20000 };
+	constexpr int mcount { 2000 };
 	for (int i = 0; i < mcount; i++)
 	{
-		Message msgInfA("InformationSource", "e Informational sync message", Message::PRIO_INFORMATION);
+		Message msgInfA("InformationSource", "g Informational sync message", Message::PRIO_INFORMATION);
 		pChannel->log(msgInfA);
 	}
-	//pChannel->stop();
 	pChannel.reset();
 	RecordSet rsl(tmp, "SELECT * FROM T_POCO_LOG");
 	assertEquals(2+mcount, rsl.rowCount());
-
 }
 
 

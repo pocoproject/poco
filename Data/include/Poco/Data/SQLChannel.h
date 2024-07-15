@@ -33,6 +33,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
 #include <atomic>
+#include <atomic>
 
 
 namespace Poco {
@@ -56,15 +57,21 @@ class Data_API SQLChannel: public Poco::Channel, Poco::Runnable
 	///
 	/// The table name is configurable through "table" property.
 	/// Other than DateTime filed name used for optional time-based archiving purposes, currently the
-	/// field names are not mandated. However, it is recomended to use names as specified above.
+	/// field names are not mandated. However, it is recommended to use names as specified above.
 	///
-	/// To provide as non-intrusive operation as possbile, the log entries are cached and
+	/// To provide as non-intrusive operation as possible, the log entries are cached and
 	/// inserted into the target database asynchronously by default. The blocking, however, will occur
 	/// before the next entry insertion with default timeout of 1 second. The default settings can be
 	/// overridden (see async, timeout and throw properties for details).
 	/// If throw property is false, insertion timeouts are ignored, otherwise a TimeoutException is thrown.
 	/// To force insertion of every entry, set timeout to 0. This setting, however, introduces
 	/// a risk of long blocking periods in case of remote server communication delays.
+	///
+	/// A default-constructed SQLChannel operates without an active DB connection, in a store-and-forward
+	/// mode. For this mode of operation, a separate service is required to consume and execute the SQL
+	/// statements from the stored files and insert the log entries into the database. Since this setup
+	/// stores SQL inserts in the OS file system, it is strongly recommended to take the necessary
+	/// precautions to limit and secure the access to those files.
 {
 public:
 	class LogNotification : public Poco::Notification
@@ -88,9 +95,14 @@ public:
 
 	static const int DEFAULT_MIN_BATCH_SIZE = 1;
 	static const int DEFAULT_MAX_BATCH_SIZE = 1000;
+	static const int DEFAULT_MAX_SQL_SIZE = 65536;
 
 	SQLChannel();
 		/// Creates SQLChannel.
+		/// An SQLChannel without DB connector and local file name
+		/// only logs SQL inserts into local files. A separate file
+		/// is created for each insert batch; files are named
+		/// <YYYYMMDDHH24MISSmmm>.<UUID>.log.sql.
 
 	SQLChannel(const std::string& connector,
 		const std::string& connect,
@@ -98,7 +110,8 @@ public:
 		const std::string& table = "T_POCO_LOG",
 		int timeout = 1000,
 		int minBatch = DEFAULT_MIN_BATCH_SIZE,
-		int maxBatch = DEFAULT_MAX_BATCH_SIZE);
+		int maxBatch = DEFAULT_MAX_BATCH_SIZE,
+		int maxSQL = DEFAULT_MAX_SQL_SIZE);
 		/// Creates an SQLChannel with the given connector, connect string, timeout, table and name.
 		/// The connector must be already registered.
 
@@ -166,6 +179,8 @@ public:
 		///                  reaches this size, log entries are silently discarded.
 		///                  Defaults to 100, can't be zero or larger than 1000.
 		///
+		///     * maxSQL:    Maximum total length of the SQL statement. Defaults to 65536.
+		///
 		///     * bulk:      Do bulk execute (on most DBMS systems, this can speed up things
 		///                  drastically).
 		///
@@ -198,8 +213,10 @@ public:
 	static const std::string PROP_TIMEOUT;
 	static const std::string PROP_MIN_BATCH;
 	static const std::string PROP_MAX_BATCH;
+	static const std::string PROP_MAX_SQL;
 	static const std::string PROP_BULK;
 	static const std::string PROP_THROW;
+	static const std::string PROP_DIRECTORY;
 	static const std::string PROP_FILE;
 
 protected:
@@ -222,17 +239,20 @@ private:
 		/// than minBatch, sends logs to the destination.
 		/// Returns true if log entry was processed.
 
-	size_t execSQL();
+	size_t execSQL(bool flush = false);
 		/// Executes the log statement.
 
-	size_t logSync();
+	size_t logSync(bool flush = false);
 		/// Inserts entries into the target database.
 
 	bool isTrue(const std::string& value) const;
 		/// Returns true is value is "true", "t", "yes" or "y".
 		/// Case insensitive.
 
-	size_t logToFile(bool clear = false);
+	size_t logToDB(bool flush = false);
+		/// Logs cached entries to the DB.
+
+	size_t logToFile(bool flush = false);
 		/// Logs cached entries to a file. Called in case DB insertions fail.
 
 	size_t logLocal(const std::string&, Message::Priority prio = Message::PRIO_ERROR);
@@ -257,24 +277,26 @@ private:
 	int               _timeout;
 	std::atomic<int>  _minBatch;
 	int               _maxBatch;
+	int               _maxSQL;
 	bool              _bulk;
 	std::atomic<bool> _throw;
 
 	// members for log entry cache
-	std::vector<std::string>      _source;
-	std::vector<long>             _pid;
-	std::vector<std::string>      _thread;
-	std::vector<long>             _tid;
-	std::vector<int>              _priority;
-	std::vector<std::string>      _text;
-	std::vector<DateTime>         _dateTime;
+	std::deque<std::string>      _source;
+	std::deque<long>             _pid;
+	std::deque<std::string>      _thread;
+	std::deque<long>             _tid;
+	std::deque<int>              _priority;
+	std::deque<std::string>      _text;
+	std::deque<DateTime>         _dateTime;
 	Poco::NotificationQueue       _logQueue;
-	std::unique_ptr<Poco::Thread> _pDBThread;
+	std::unique_ptr<Poco::Thread> _pLogThread;
 	std::atomic<bool>             _reconnect;
 	std::atomic<bool>             _stop;
 	std::atomic<size_t>           _logged;
 	StrategyPtr                   _pArchiveStrategy;
 	std::string                   _file;
+	std::string                   _directory;
 	AutoPtr<FileChannel>          _pFileChannel;
 	Poco::Logger& _logger = Poco::Logger::get("SQLChannel");
 };
@@ -296,7 +318,7 @@ inline bool SQLChannel::isTrue(const std::string& value) const
 
 inline bool SQLChannel::isRunning() const
 {
-	return _pDBThread && _pDBThread->isRunning();
+	return _pLogThread && _pLogThread->isRunning();
 }
 
 

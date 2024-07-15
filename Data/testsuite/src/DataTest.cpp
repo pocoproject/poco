@@ -20,6 +20,7 @@
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+#include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/DataException.h"
@@ -27,12 +28,17 @@
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/DateTime.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/DynamicLOB.h"
 #include "Poco/Data/DynamicDateTime.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/Exception.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/Glob.h"
+#include "Poco/File.h"
+#include <string>
 #include <cstring>
 #include <sstream>
 #include <iomanip>
@@ -40,46 +46,13 @@
 
 
 using namespace Poco;
+using namespace Poco::Dynamic;
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
-
-
-using Poco::BinaryReader;
-using Poco::BinaryWriter;
-using Poco::UInt32;
-using Poco::Int64;
-using Poco::UInt64;
-using Poco::DateTime;
-using Poco::Latin1Encoding;
-using Poco::Dynamic::Var;
-using Poco::InvalidAccessException;
-using Poco::IllegalStateException;
-using Poco::RangeException;
-using Poco::NotFoundException;
-using Poco::InvalidArgumentException;
-using Poco::NotImplementedException;
-using Poco::Data::Session;
-using Poco::Data::SessionFactory;
-using Poco::Data::Statement;
-using Poco::Data::NotSupportedException;
-using Poco::Data::CLOB;
-using Poco::Data::CLOBInputStream;
-using Poco::Data::CLOBOutputStream;
-using Poco::Data::MetaColumn;
-using Poco::Data::Column;
-using Poco::Data::Row;
-using Poco::Data::RowFormatter;
-using Poco::Data::SimpleRowFormatter;
-using Poco::Data::JSONRowFormatter;
-using Poco::Data::Date;
-using Poco::Data::Time;
-using Poco::Data::AbstractExtractor;
-using Poco::Data::AbstractExtraction;
-using Poco::Data::AbstractExtractionVec;
-using Poco::Data::AbstractExtractionVecVec;
-using Poco::Data::AbstractBinding;
-using Poco::Data::AbstractBindingVec;
-using Poco::Data::NotConnectedException;
+using Poco::DirectoryIterator;
+using Poco::Glob;
+using Poco::File;
+using namespace std::string_literals;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -1570,6 +1543,61 @@ void DataTest::testSQLParse()
 }
 
 
+void DataTest::testSQLChannel()
+{
+	AutoPtr<SQLChannel> pChannel = new SQLChannel();
+	Stopwatch sw; sw.start();
+	while (!pChannel->isRunning())
+	{
+		Thread::sleep(10);
+		if (sw.elapsedSeconds() > 3)
+			fail("SQLChannel timed out");
+	}
+
+	Glob g("*.log.sql");
+	{
+		DirectoryIterator it(""s);
+		DirectoryIterator end;
+		while (it != end)
+		{
+			if (g.match(it->path()))
+			{
+				File(it->path()).remove();
+			}
+			++it;
+		}
+	}
+
+	constexpr int mcount{10};
+	constexpr int batch{3};
+	pChannel->setProperty("minBatch", std::to_string(batch));
+	for (int i = 0; i < mcount; i++)
+	{
+		Message msgInfA("InformationSource", Poco::format("%d Informational sync message", i), Message::PRIO_INFORMATION);
+		pChannel->log(msgInfA);
+	}
+	Thread::sleep(1000); // give it time to log
+	pChannel->stop();
+	auto logged = pChannel->logged();
+	assertEqual(mcount, logged);
+	pChannel.reset();
+
+	int count = 0;
+	DirectoryIterator it(""s);
+	DirectoryIterator end;
+	while (it != end)
+	{
+		if (g.match(it->path()))
+		{
+			++count;
+			File(it->path()).remove();
+		}
+		++it;
+	}
+	assertEqual(count, (mcount / batch) + (mcount % batch));
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1603,6 +1631,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
 
 	return pSuite;
 }

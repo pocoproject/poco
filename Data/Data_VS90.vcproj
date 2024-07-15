@@ -652,10 +652,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\SQLChannel.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Data\SQLParser.h"
 					>
 				</File>
@@ -789,10 +785,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SimpleRowFormatter.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SQLChannel.cpp"
 					>
 				</File>
 				<File
