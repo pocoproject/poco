@@ -38,6 +38,7 @@
 #include "Poco/DirectoryIterator.h"
 #include "Poco/Glob.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 #include <string>
 #include <cstring>
 #include <sstream>
@@ -46,12 +47,9 @@
 
 
 using namespace Poco;
-using namespace Poco::Dynamic;
+using Poco::Dynamic::Var;
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
-using Poco::DirectoryIterator;
-using Poco::Glob;
-using Poco::File;
 using namespace std::string_literals;
 
 
@@ -1545,7 +1543,9 @@ void DataTest::testSQLParse()
 
 void DataTest::testSQLChannel()
 {
+	std::string dir = Path::tempHome();
 	AutoPtr<SQLChannel> pChannel = new SQLChannel();
+	pChannel->setProperty("directory", dir);
 	Stopwatch sw; sw.start();
 	while (!pChannel->isRunning())
 	{
@@ -1556,7 +1556,7 @@ void DataTest::testSQLChannel()
 
 	Glob g("*.log.sql");
 	{
-		DirectoryIterator it(""s);
+		DirectoryIterator it(dir);
 		DirectoryIterator end;
 		while (it != end)
 		{
@@ -1583,7 +1583,7 @@ void DataTest::testSQLChannel()
 	pChannel.reset();
 
 	int count = 0;
-	DirectoryIterator it(""s);
+	DirectoryIterator it(dir);
 	DirectoryIterator end;
 	while (it != end)
 	{
