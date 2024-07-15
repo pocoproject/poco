@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="PostgreSQL">
-      <UniqueIdentifier>{1426fa27-35d9-4513-9f66-3537ff2d94b1}</UniqueIdentifier>
+      <UniqueIdentifier>{f6a6e4eb-409c-41d2-b4f7-a9011c2666d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="PostgreSQL\Header Files">
-      <UniqueIdentifier>{e4285a23-6fb3-43b1-889a-f81db867e93f}</UniqueIdentifier>
+      <UniqueIdentifier>{4408516c-8afa-4b61-9653-3b9e0fa70511}</UniqueIdentifier>
     </Filter>
     <Filter Include="PostgreSQL\Source Files">
-      <UniqueIdentifier>{d3c8e624-61b1-4faa-af37-a0f9fd08317a}</UniqueIdentifier>
+      <UniqueIdentifier>{ce232ce4-d90a-4c52-8d42-e9192537a9d9}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{27f4b44e-ac77-4131-837e-5af866de11f0}</UniqueIdentifier>
+      <UniqueIdentifier>{15250e56-9492-42c8-b8e7-5bec93698660}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{1a05011d-353f-46d1-9945-9b5fe29aa160}</UniqueIdentifier>
+      <UniqueIdentifier>{8676f138-fe29-47e8-b46b-8d03c77d7095}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{d0b4c31a-b0ce-497c-bf78-831d6886c8f7}</UniqueIdentifier>
+      <UniqueIdentifier>{9172a560-d3f8-48ec-aa04-bf76c823f6dc}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{37f759f0-f214-4e79-a169-5636af2ddf90}</UniqueIdentifier>
+      <UniqueIdentifier>{6b95aafd-9e40-4294-81f6-20f2ebad343e}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{c54bd706-4bc9-4fa0-b5eb-8a8c12540b09}</UniqueIdentifier>
+      <UniqueIdentifier>{85ceacef-00a7-4835-9318-fe0df3162d16}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

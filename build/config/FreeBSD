@@ -1,13 +1,20 @@
 #
 # FreeBSD
 #
-# Make settings for FreeBSD 12.x/clang
+# Make settings for FreeBSD/clang
 #
 
 #
 # General Settings
 #
 LINKMODE ?= SHARED
+
+# arm sanitizers available in >=13.3 and >=14.1
+SANITIZEFLAGS ?=
+# sanitize flags:
+#  -fsanitize=address
+#  -fsanitize=undefined
+#  -fsanitize=thread
 
 #
 # Define Tools
@@ -35,13 +42,13 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          =
+CFLAGS          = $(SANITIZEFLAGS) -std=c11
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        =
+CXXFLAGS        = $(SANITIZEFLAGS) -std=c++17 -Wall
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       =
+LINKFLAGS       = $(SANITIZEFLAGS)
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =

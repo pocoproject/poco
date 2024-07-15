@@ -20,12 +20,8 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/Buffer.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/UUID.h"
-#include <sstream>
 
 
 namespace Poco {
@@ -106,7 +102,7 @@ inline Buffer<unsigned char>& Binary::buffer()
 
 inline std::string Binary::toRawString() const
 {
-	return std::string(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
+	return {reinterpret_cast<const char*>(_buffer.begin()), _buffer.size()};
 }
 
 
@@ -145,7 +141,7 @@ inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
 {
 	_writer << (Poco::Int32) from->buffer().size();
 	_writer << from->subtype();
-	_writer.writeRaw((char*) from->buffer().begin(), from->buffer().size());
+	_writer.writeRaw(reinterpret_cast<char*>(from->buffer().begin()), from->buffer().size());
 }
 
 

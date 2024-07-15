@@ -1486,7 +1486,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 
 #include <sys/types.h>
-#if POCO_OS != POCO_OS_ANDROID // Android doesn't have <ifaddrs.h>
+#if POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24 // old Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
@@ -1521,7 +1521,7 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
-#if (POCO_OS != POCO_OS_ANDROID) && !defined(POCO_EMSCRIPTEN)
+#if (POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24) && !defined(POCO_EMSCRIPTEN)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
@@ -1580,7 +1580,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
-#if (POCO_OS != POCO_OS_ANDROID) && !defined(POCO_EMSCRIPTEN)
+#if (POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24) && !defined(POCO_EMSCRIPTEN)
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;

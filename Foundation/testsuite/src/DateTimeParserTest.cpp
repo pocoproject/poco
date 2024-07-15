@@ -177,6 +177,7 @@ void DateTimeParserTest::testISO8601Frac()
 	assertTrue (dt.microsecond() == 0);
 	assertTrue (tzd == 0);
 	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.1J", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.Z", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.123+01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -616,6 +617,15 @@ void DateTimeParserTest::testCustom()
 	catch (SyntaxException&)
 	{
 	}
+
+	// bad year (not a number)
+	testBad("%y", "YY", tzd);
+
+	// bad year (number too big)
+	testBad("%r", "123456789101112131415", tzd);
+
+	// check that an invalid millisecond is detected with a custom format
+	testBad("T%H:%M:%s %z", "T12:30:00.Z", tzd);
 }
 
 

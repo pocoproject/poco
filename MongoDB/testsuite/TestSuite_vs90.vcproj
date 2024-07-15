@@ -448,6 +448,8 @@
 			<File
 				RelativePath=".\src\MongoDBTest.cpp"/>
 			<File
+				RelativePath=".\src\MongoDBTestOpMsg.cpp"/>
+			<File
 				RelativePath=".\src\MongoDBTestSuite.cpp"/>
 			<File
 				RelativePath=".\src\Driver.cpp"/>

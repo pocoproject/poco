@@ -160,6 +160,16 @@ using namespace std::literals;
 #define POCO_DEPRECATED
 #endif
 
+//
+// MS Visual Studio can use type long for __LINE__ macro
+// when /ZI compilation flag is used - https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170#zi-1
+// This breaks some poco interfaces, for ex. logger
+// We should fix type for line number
+namespace Poco {
+
+using LineNumber = decltype(__LINE__);
+
+}
 
 //
 // Pull in basic definitions

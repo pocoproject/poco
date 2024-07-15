@@ -25,7 +25,6 @@
 #include "Poco/Nullable.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/UTF8String.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
@@ -115,9 +114,9 @@ struct ElementTraits<std::string>
 
 		oss << '"';
 
-		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+		for (char it : value)
 		{
-			switch (*it)
+			switch (it)
 			{
 			case '"':
 				oss << "\\\"";
@@ -142,13 +141,13 @@ struct ElementTraits<std::string>
 				break;
 			default:
 				{
-					if ( *it > 0 && *it <= 0x1F )
+					if ( it > 0 && it <= 0x1F )
 					{
-						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
+						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(it);
 					}
 					else
 					{
-						oss << *it;
+						oss << it;
 					}
 					break;
 				}
@@ -360,34 +359,32 @@ public:
 	{
 	}
 
-	virtual ~ConcreteElement()
-	{
-	}
+	~ConcreteElement() override = default;
 
 
-	T value() const
+	const T& value() const
 	{
 		return _value;
 	}
 
 
-	std::string toString(int indent = 0) const
+	std::string toString(int indent = 0) const override
 	{
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
 
-	int type() const
+	int type() const override
 	{
 		return ElementTraits<T>::TypeId;
 	}
 
-	void read(BinaryReader& reader)
+	void read(BinaryReader& reader) override
 	{
 		BSONReader(reader).read(_value);
 	}
 
-	void write(BinaryWriter& writer)
+	void write(BinaryWriter& writer) override
 	{
 		BSONWriter(writer).write(_value);
 	}

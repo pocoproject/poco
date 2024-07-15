@@ -11,7 +11,7 @@
 #include "Poco/Platform.h"
 // see https://www.openssl.org/docs/faq.html
 // and https://github.com/openssl/openssl/blob/master/doc/man3/OPENSSL_Applink.pod
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(OPENSSL_REQUIRE_APPLINK)
 #include "openssl/applink.c"
 #endif
 #include "CryptoTestSuite.h"

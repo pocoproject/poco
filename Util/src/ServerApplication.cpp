@@ -392,6 +392,13 @@ void ServerApplication::defineOptions(OptionSet& options)
 			.repeatable(false)
 			.argument("automatic|manual"s)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleStartup)));
+	
+	options.addOption(
+		Option("pidfile"s, ""s, "Write the process ID of the application to given file."s)
+			.required(false)
+			.repeatable(false)
+			.argument("path")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handlePidFile)));
 }
 
 

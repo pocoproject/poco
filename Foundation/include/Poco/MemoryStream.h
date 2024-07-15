@@ -140,6 +140,12 @@ public:
 
 		return newoff;
 	}
+	
+	virtual pos_type seekpos(pos_type pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+	{
+		const off_type off = pos;
+		return seekoff(off, std::ios::beg, which);
+	}
 
 	virtual int sync()
 	{

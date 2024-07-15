@@ -43,7 +43,7 @@ class Foundation_API Message
 	/// caused the message.
 {
 public:
-	typedef std::map<std::string, std::string> StringMap;
+	using StringMap = std::map<std::string, std::string>;
 
 	enum Priority
 	{
@@ -65,7 +65,7 @@ public:
 		/// Creates a Message with the given source, text and priority.
 		/// The thread and process ids are set.
 
-	Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line);
+	Message(const std::string& source, const std::string& text, Priority prio, const char* file, LineNumber line);
 		/// Creates a Message with the given source, text, priority,
 		/// source file path and line.
 		///
@@ -155,14 +155,14 @@ public:
 		/// Returns the source file path of the code creating
 		/// the message. May be 0 if not set.
 
-	void setSourceLine(int line);
+	void setSourceLine(LineNumber line);
 		/// Sets the source file line of the statement
 		/// generating the log message.
 		///
 		/// This is usually the result of the __LINE__
 		/// macro.
 
-	int getSourceLine() const;
+	LineNumber getSourceLine() const;
 		/// Returns the source file line of the statement
 		/// generating the log message. May be 0
 		/// if not set.
@@ -211,7 +211,7 @@ private:
 	std::string _thread;
 	long        _pid;
 	const char* _file;
-	int         _line;
+	LineNumber _line;
 	StringMap*  _pMap;
 };
 
@@ -271,7 +271,7 @@ inline const char* Message::getSourceFile() const
 }
 
 
-inline int Message::getSourceLine() const
+inline LineNumber Message::getSourceLine() const
 {
 	return _line;
 }

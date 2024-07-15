@@ -485,7 +485,7 @@ public:
 		if (!_pPool)
 		{
 			_pPool = new ThreadPool("default");
-			if (POCO_THREAD_STACK_SIZE > 0)
+			if constexpr (POCO_THREAD_STACK_SIZE > 0)
 				_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
 		}
 		return _pPool;

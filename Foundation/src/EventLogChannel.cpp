@@ -234,9 +234,9 @@ std::wstring EventLogChannel::findLibrary(const wchar_t* name)
 	if (dll)
 	{
 		const DWORD maxPathLen = MAX_PATH + 1;
-		wchar_t name[maxPathLen];
-		int n = GetModuleFileNameW(dll, name, maxPathLen);
-		if (n > 0) path = name;
+		wchar_t moduleName[maxPathLen];
+		int n = GetModuleFileNameW(dll, moduleName, maxPathLen);
+		if (n > 0) path = moduleName;
 		FreeLibrary(dll);
 	}
 	return path;

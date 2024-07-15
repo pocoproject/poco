@@ -4,6 +4,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "genrsakey", "genrsakey\genr
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|ARM64 = debug_shared|ARM64
+		release_shared|ARM64 = release_shared|ARM64
+		debug_static_mt|ARM64 = debug_static_mt|ARM64
+		release_static_mt|ARM64 = release_static_mt|ARM64
+		debug_static_md|ARM64 = debug_static_md|ARM64
+		release_static_md|ARM64 = release_static_md|ARM64
 		debug_shared|Win32 = debug_shared|Win32
 		release_shared|Win32 = release_shared|Win32
 		debug_static_mt|Win32 = debug_static_mt|Win32
@@ -18,6 +24,24 @@ Global
 		release_static_md|x64 = release_static_md|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_shared|ARM64.ActiveCfg = debug_shared|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_shared|ARM64.Build.0 = debug_shared|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_shared|ARM64.Deploy.0 = debug_shared|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_shared|ARM64.ActiveCfg = release_shared|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_shared|ARM64.Build.0 = release_shared|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_shared|ARM64.Deploy.0 = release_shared|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_static_mt|ARM64.ActiveCfg = debug_static_mt|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_static_mt|ARM64.Build.0 = debug_static_mt|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_static_mt|ARM64.Deploy.0 = debug_static_mt|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_static_mt|ARM64.ActiveCfg = release_static_mt|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_static_mt|ARM64.Build.0 = release_static_mt|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_static_mt|ARM64.Deploy.0 = release_static_mt|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_static_md|ARM64.ActiveCfg = debug_static_md|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_static_md|ARM64.Build.0 = debug_static_md|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_static_md|ARM64.Deploy.0 = debug_static_md|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_static_md|ARM64.ActiveCfg = release_static_md|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_static_md|ARM64.Build.0 = release_static_md|ARM64
+		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.release_static_md|ARM64.Deploy.0 = release_static_md|ARM64
 		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
 		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{D6BE1AD9-4CB6-3184-8DF8-5210AE7D6947}.debug_shared|Win32.Deploy.0 = debug_shared|Win32

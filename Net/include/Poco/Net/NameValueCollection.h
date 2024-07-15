@@ -109,8 +109,17 @@ public:
 	void erase(const std::string& name);
 		/// Removes all name-value pairs with the given name.
 
+	void secureErase(const std::string& name);
+		/// Securely erases all name-value pairs with the given name
+		/// by first overwriting the value with zeroes before
+		/// removing it.
+
 	void clear();
 		/// Removes all name-value pairs and their values.
+
+	void secureClear();
+		/// Removes all name-value pairs and their values. 
+		/// Additionally, all values are also overwritten with zeroes.
 
 private:
 	HeaderMap _map;
