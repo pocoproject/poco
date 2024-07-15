@@ -20,7 +20,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Hash.h"
-#include <functional>
 #include <algorithm>
 #include <vector>
 #include <cstddef>
@@ -55,16 +54,16 @@ class LinearHashTable
 	/// elements in a bucket should not exceed 3.
 {
 public:
-	typedef Value               ValueType;
-	typedef Value&              Reference;
-	typedef const Value&        ConstReference;
-	typedef Value*              Pointer;
-	typedef const Value*        ConstPointer;
-	typedef HashFunc            Hash;
-	typedef std::vector<Value>  Bucket;
-	typedef std::vector<Bucket> BucketVec;
-	typedef typename Bucket::iterator    BucketIterator;
-	typedef typename BucketVec::iterator BucketVecIterator;
+	using ValueType = Value;
+	using Reference = Value &;
+	using ConstReference = const Value &;
+	using Pointer = Value *;
+	using ConstPointer = const Value *;
+	using Hash = HashFunc;
+	using Bucket = std::vector<Value>;
+	using BucketVec = std::vector<Bucket>;
+	using BucketIterator = typename Bucket::iterator;
+	using BucketVecIterator = typename BucketVec::iterator;
 
 	class ConstIterator
 	{
@@ -176,9 +175,7 @@ public:
 	class Iterator: public ConstIterator
 	{
 	public:
-		Iterator()
-		{
-		}
+		Iterator() = default;
 
 		Iterator(const BucketVecIterator& vecIt, const BucketVecIterator& endIt, const BucketIterator& buckIt):
 			ConstIterator(vecIt, endIt, buckIt)
@@ -238,10 +235,7 @@ public:
 		friend class LinearHashTable;
 	};
 
-	LinearHashTable(std::size_t initialReserve = 64):
-		_split(0),
-		_front(1),
-		_size(0)
+	LinearHashTable(std::size_t initialReserve = 64)
 		/// Creates the LinearHashTable, using the given initialReserve.
 	{
 		_buckets.reserve(calcSize(initialReserve));
@@ -257,10 +251,8 @@ public:
 	{
 	}
 
-	~LinearHashTable()
+	~LinearHashTable() = default;
 		/// Destroys the LinearHashTable.
-	{
-	}
 
 	LinearHashTable& operator = (const LinearHashTable& table)
 		/// Assigns another LinearHashTable.
@@ -495,9 +487,9 @@ private:
 	// Evil hack: _buckets must be mutable because both ConstIterator and Iterator hold
 	// ordinary iterator's (not const_iterator's).
 	mutable BucketVec _buckets;
-	std::size_t _split;
-	std::size_t _front;
-	std::size_t _size;
+	std::size_t _split{0};
+	std::size_t _front{1};
+	std::size_t _size{0};
 	HashFunc    _hash;
 };
 
