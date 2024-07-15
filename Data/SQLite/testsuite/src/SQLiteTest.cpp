@@ -2542,8 +2542,8 @@ void SQLiteTest::testSQLChannel()
 	constexpr int mcount { 2000 };
 	for (int i = 0; i < mcount; i++)
 	{
-		Message msgInfA("InformationSource", "g Informational sync message", Message::PRIO_INFORMATION);
-		pChannel->log(msgInfA);
+		Message msgInfG("InformationSource", "g Informational sync message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInfG);
 	}
 	pChannel.reset();
 	RecordSet rsl(tmp, "SELECT * FROM T_POCO_LOG");
@@ -3524,7 +3524,7 @@ void SQLiteTest::testIllegalFilePath()
 	}
 }
 
-void SQLiteTest::testTransactionTypeProperty() 
+void SQLiteTest::testTransactionTypeProperty()
 {
 	try {
 		using namespace Poco::Data::SQLite;
