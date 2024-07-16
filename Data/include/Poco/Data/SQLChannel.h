@@ -350,7 +350,8 @@ inline size_t SQLChannel::logged() const
 
 inline bool SQLChannel::shouldFlush() const
 {
-	return (_source.size() && _flushTimer.elapsedSeconds());
+	return (_flush > 0 && _source.size() &&
+		(_flushTimer.elapsedSeconds() >= _flush));
 }
 
 
