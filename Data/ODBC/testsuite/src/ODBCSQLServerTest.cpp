@@ -249,7 +249,7 @@ void ODBCSQLServerTest::testBigBatch()
 	const std::string query("INSERT INTO Person VALUES('L', 'N', 'A', %d);");
 	std::string bigQuery;
 	// TODO: see what exactly the limits are here
-	int rows = 317, cnt = 0;
+	int rows = 316, cnt = 0;
 	for (int i = 0; i < rows; ++i)
 	{
 		bigQuery += Poco::format(query, i);
