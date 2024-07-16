@@ -32,6 +32,7 @@
 #include "Poco/NotificationQueue.h"
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/Stopwatch.h"
 #include <atomic>
 #include <atomic>
 
@@ -96,6 +97,7 @@ public:
 	static const int DEFAULT_MIN_BATCH_SIZE = 1;
 	static const int DEFAULT_MAX_BATCH_SIZE = 1000;
 	static const int DEFAULT_MAX_SQL_SIZE = 65536;
+	static const int DEFAULT_FLUSH_SECONDS = 10;
 
 	SQLChannel();
 		/// Creates SQLChannel.
@@ -162,8 +164,7 @@ public:
 		///                  is asynchronous since the 1.13.0. release.
 		///
 		///     * timeout:   Timeout (ms) to wait for previous log operation completion.
-		///                  Values "0" and "" mean no timeout. Only valid when logging
-		///                  is asynchronous, otherwise ignored.
+		///                  Values "0" and "" mean no timeout.
 		///
 		///     * throw:     Boolean value indicating whether to throw in case of timeout.
 		///                  Setting this property to false may result in log entries being lost.
@@ -186,6 +187,14 @@ public:
 		///
 		///     * file       Destination file name for the backup FileChannel, used when DB
 		///                  connection is not present to log not executed SQL statements.
+		///
+		///     * flush      Time in seconds to flush outstanding log entries; since logging
+		///                  is performed in batches of entries, the entries that do not make
+		///                  it into the last logged batch may remain unlogged for a long time
+		///                  during an extened period of inactivity. This setting ensures that
+		///                  unlogged entries are flushed in such circumstances, even when the
+		///                  minimum batch size was not reached.
+		///                  Zero value means no flushing.
 
 	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
@@ -218,6 +227,7 @@ public:
 	static const std::string PROP_THROW;
 	static const std::string PROP_DIRECTORY;
 	static const std::string PROP_FILE;
+	static const std::string PROP_FLUSH;
 
 protected:
 	~SQLChannel() override;
@@ -233,7 +243,7 @@ private:
 	void reconnect();
 		/// Closes and opens the DB connection.
 
-	bool processOne(int minBatch = 0);
+	bool processBatch(int minBatch = 0);
 		/// Processes one message.
 		/// If the number of acummulated messages is greater
 		/// than minBatch, sends logs to the destination.
@@ -265,6 +275,10 @@ private:
 		/// bullet-proof method; if not succesful,
 		/// empty string is returned.
 
+	bool shouldFlush() const;
+		/// Returns true if there are unflushed log entries
+		/// and the flush timer has expired.
+
 	mutable Poco::FastMutex _mutex;
 
 	std::string       _connector;
@@ -273,13 +287,14 @@ private:
 	std::string       _sql;
 	std::string       _name;
 	std::string       _table;
-	bool              _tableChanged;
-	int               _timeout;
+	std::atomic<bool> _tableChanged;
+	std::atomic<int>  _timeout;
 	std::atomic<int>  _minBatch;
-	int               _maxBatch;
-	int               _maxSQL;
-	bool              _bulk;
+	std::atomic<int>  _maxBatch;
+	std::atomic<int>  _maxSQL;
+	std::atomic<bool> _bulk;
 	std::atomic<bool> _throw;
+	std::atomic<int>  _flush;
 
 	// members for log entry cache
 	std::deque<std::string>      _source;
@@ -298,6 +313,7 @@ private:
 	std::string                   _file;
 	std::string                   _directory;
 	AutoPtr<FileChannel>          _pFileChannel;
+	Poco::Stopwatch               _flushTimer;
 	Poco::Logger& _logger = Poco::Logger::get("SQLChannel");
 };
 
@@ -325,6 +341,12 @@ inline bool SQLChannel::isRunning() const
 inline size_t SQLChannel::logged() const
 {
 	return _logged;
+}
+
+
+inline bool SQLChannel::shouldFlush() const
+{
+	return (_source.size() && _flushTimer.elapsedSeconds());
 }
 
 

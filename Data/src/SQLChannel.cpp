@@ -22,7 +22,6 @@
 #include "Poco/Instantiator.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/Stopwatch.h"
 #include "Poco/Format.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
@@ -54,6 +53,7 @@ const std::string SQLChannel::PROP_BULK("bulk");
 const std::string SQLChannel::PROP_THROW("throw");
 const std::string SQLChannel::PROP_DIRECTORY("directory");
 const std::string SQLChannel::PROP_FILE("file");
+const std::string SQLChannel::PROP_FLUSH("flush");
 
 
 const std::string SQLChannel::SQL_INSERT_STMT = "INSERT INTO %s " \
@@ -219,7 +219,7 @@ size_t SQLChannel::logSync(bool flush)
 }
 
 
-bool SQLChannel::processOne(int minBatch)
+bool SQLChannel::processBatch(int minBatch)
 {
 	bool ret = false, flush = (minBatch == 0);
 	while (_logQueue.size())
@@ -253,6 +253,7 @@ bool SQLChannel::processOne(int minBatch)
 
 void SQLChannel::run()
 {
+	_flushTimer.start();
 	long sleepTime = 100; // milliseconds
 	while (!_stop)
 	{
@@ -269,7 +270,8 @@ void SQLChannel::run()
 
 			if (!_reconnect)
 			{
-				if (_logQueue.size()) processOne(_minBatch);
+				if (_logQueue.size()) processBatch(_minBatch);
+				if (shouldFlush()) processBatch();
 				sleepTime = 100;
 			}
 		}
@@ -301,7 +303,7 @@ void SQLChannel::run()
 		Thread::sleep(sleepTime);
 	}
 	while (_logQueue.size() || _source.size())
-		processOne();
+		processBatch();
 }
 
 
@@ -398,6 +400,7 @@ size_t SQLChannel::logToFile(bool flush)
 				Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
 				os << sql << '\n' << tmp.str();
 				batch = 0;
+				_flushTimer.restart();
 			}
 
 			os << tmp.str();
@@ -423,6 +426,7 @@ size_t SQLChannel::logToFile(bool flush)
 			_priority.erase(_priority.begin(), _priority.begin() + batch);
 			_text.erase(_text.begin(), _text.begin() + batch);
 			_dateTime.erase(_dateTime.begin(), _dateTime.begin() + batch);
+			_flushTimer.restart();
 		}
 	}
 
@@ -517,6 +521,7 @@ size_t SQLChannel::logToDB(bool flush)
 		_priority.erase(_priority.begin(), _priority.begin() + n);
 		_text.erase(_text.begin(), _text.begin() + n);
 		_dateTime.erase(_dateTime.begin(), _dateTime.begin() + n);
+		_flushTimer.restart();
 	}
 
 	return n;
@@ -660,6 +665,10 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		_file = value;
 	}
+	else if (name == PROP_FLUSH)
+	{
+		_flush.store(NumberParser::parse(value));
+	}
 	else
 	{
 		Channel::setProperty(name, value);
@@ -729,6 +738,10 @@ std::string SQLChannel::getProperty(const std::string& name) const
 	else if (name == PROP_FILE)
 	{
 		return _file;
+	}
+	else if (name == PROP_FLUSH)
+	{
+		return std::to_string(_flush);
 	}
 	else
 	{

@@ -1571,13 +1571,15 @@ void DataTest::testSQLChannel()
 	constexpr int mcount{10};
 	constexpr int batch{3};
 	pChannel->setProperty("minBatch", std::to_string(batch));
+	constexpr int flush{1};
+	pChannel->setProperty("flush", std::to_string(flush));
+	assertEqual(flush, NumberParser::parse(pChannel->getProperty("flush")));
 	for (int i = 0; i < mcount; i++)
 	{
 		Message msgInfA("InformationSource", Poco::format("%d Informational sync message", i), Message::PRIO_INFORMATION);
 		pChannel->log(msgInfA);
 	}
-	Thread::sleep(1000); // give it time to log
-	pChannel->stop();
+	Thread::sleep(2000*flush); // give it time to flush
 	auto logged = pChannel->logged();
 	assertEqual(mcount, logged);
 	pChannel.reset();
