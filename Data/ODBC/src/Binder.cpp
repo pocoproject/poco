@@ -528,8 +528,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 		if (actualSize > colSize)
 		{
-			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
-					pos, actualSize, static_cast<long>(colSize)));
+			throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
+					__LINE__, pos, actualSize, static_cast<long>(colSize)));
 		}
 		foundPrec = _pTypeInfo->tryGetInfo(cDataType, "MAXIMUM_SCALE", tmp);
 		if (foundPrec) decDigits = tmp;
@@ -565,8 +565,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	// last check, just in case
 	if ((0 != colSize) && (actualSize > colSize))
 	{
-		throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
-				pos, actualSize, static_cast<long>(colSize)));
+		throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
+			__LINE__, pos, actualSize, static_cast<long>(colSize)));
 	}
 
 	return;

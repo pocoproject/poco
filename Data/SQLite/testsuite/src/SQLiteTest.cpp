@@ -2480,7 +2480,7 @@ void SQLiteTest::testSQLChannel()
 	{
 		Thread::sleep(10);
 		if (sw.elapsedSeconds() > 3)
-			fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
+			fail ("SQLChannel timed out");
 	}
 	// bulk binding mode is not suported by SQLite, but SQLChannel should handle it internally
 	pChannel->setProperty("bulk", "true");
@@ -2537,6 +2537,17 @@ void SQLiteTest::testSQLChannel()
 	rs2.moveNext();
 	assertTrue("WarningSource" == rs2["Source"]);
 	assertTrue("f Warning sync message" == rs2["Text"]);
+
+	pChannel->setProperty("minBatch", "1024");
+	constexpr int mcount { 2000 };
+	for (int i = 0; i < mcount; i++)
+	{
+		Message msgInfG("InformationSource", "g Informational sync message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInfG);
+	}
+	pChannel.reset();
+	RecordSet rsl(tmp, "SELECT * FROM T_POCO_LOG");
+	assertEquals(2+mcount, rsl.rowCount());
 }
 
 
@@ -3513,7 +3524,7 @@ void SQLiteTest::testIllegalFilePath()
 	}
 }
 
-void SQLiteTest::testTransactionTypeProperty() 
+void SQLiteTest::testTransactionTypeProperty()
 {
 	try {
 		using namespace Poco::Data::SQLite;
