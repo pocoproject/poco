@@ -190,17 +190,17 @@ void SQLChannel::close()
 }
 
 
-size_t SQLChannel::logLocal(const std::string& message, Message::Priority prio)
+void SQLChannel::logLocal(const std::string& message, Message::Priority prio)
 {
 	Message msg("SQLChannel"s, message, prio);
 	log(msg);
-	return logToFile();
 }
 
 
 void SQLChannel::log(const Message& msg)
 {
 	_logQueue.enqueueNotification(new LogNotification(msg));
+	_event.set();
 }
 
 
@@ -300,7 +300,7 @@ void SQLChannel::run()
 		{
 			break;
 		}
-		Thread::sleep(sleepTime);
+		_event.tryWait(sleepTime);
 	}
 	while (_logQueue.size() || _source.size())
 		processBatch();
@@ -317,6 +317,7 @@ void SQLChannel::stop()
 			Thread::sleep(10);
 		_pLogThread->join();
 		_pLogThread.reset();
+		_event.set();
 	}
 }
 
@@ -340,7 +341,7 @@ size_t SQLChannel::logToFile(bool flush)
 	if (names.size() != _source.size())
 		names.resize(_source.size(), Poco::replace(_name, "'", "''"));
 
-	std::size_t n = 0;
+	std::size_t n = 0, batch = 0;
 
 	AutoPtr<FileChannel> pFileChannel;
 	std::string file = _file;
@@ -360,15 +361,32 @@ size_t SQLChannel::logToFile(bool flush)
 		pFileChannel = new FileChannel(filename);
 	}
 
+	std::stringstream os;
+	auto doLog = [&]
+	{
+		Message msg(_source[0], os.str(), Message::PRIO_FATAL);
+		pFileChannel->log(msg);
+		n += batch;
+		_logged += batch;
+		_source.erase(_source.begin(), _source.begin()+batch);
+		_pid.erase(_pid.begin(), _pid.begin() + batch);
+		_thread.erase(_thread.begin(), _thread.begin() + batch);
+		_tid.erase(_tid.begin(), _tid.begin() + batch);
+		_priority.erase(_priority.begin(), _priority.begin() + batch);
+		_text.erase(_text.begin(), _text.begin() + batch);
+		_dateTime.erase(_dateTime.begin(), _dateTime.begin() + batch);
+		_flushTimer.restart();
+	};
+
 	if (pFileChannel)
 	{
 		std::string sql;
 		Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
-		std::stringstream os, tmp;
+		std::stringstream tmp;
 		os << sql << '\n';
 		auto it = _source.begin();
 		auto end = _source.end();
-		int idx = 0, batch = 0;
+		int idx = 0;
 		for (; it != end; ++idx)
 		{
 			std::string dt = DateTimeFormatter::format(_dateTime[idx], "%Y-%m-%d %H:%M:%S.%i");
@@ -385,22 +403,11 @@ size_t SQLChannel::logToFile(bool flush)
 			if (++batch == _maxBatch || (os.str().length() + tmp.str().length()) >= _maxSQL)
 			{
 				os << ";\n";
-				Message msg(_source[0], os.str(), Message::PRIO_FATAL);
-				pFileChannel->log(msg);
-				n += batch;
-				_logged += batch;
-				_source.erase(_source.begin(), _source.begin() + batch);
-				_pid.erase(_pid.begin(), _pid.begin() + batch);
-				_thread.erase(_thread.begin(), _thread.begin() + batch);
-				_tid.erase(_tid.begin(), _tid.begin() + batch);
-				_priority.erase(_priority.begin(), _priority.begin() + batch);
-				_text.erase(_text.begin(), _text.begin() + batch);
-				_dateTime.erase(_dateTime.begin(), _dateTime.begin() + batch);
+				doLog();
 				os.str(""); sql.clear();
 				Poco::format(sql, SQL_INSERT_STMT, _table, std::string());
 				os << sql << '\n' << tmp.str();
 				batch = 0;
-				_flushTimer.restart();
 			}
 
 			os << tmp.str();
@@ -413,21 +420,7 @@ size_t SQLChannel::logToFile(bool flush)
 			os << ",\n";
 		}
 
-		if ((batch >= _minBatch) || flush)
-		{
-			Message msg(_source[0], os.str(), Message::PRIO_FATAL);
-			pFileChannel->log(msg);
-			n += batch;
-			_logged += batch;
-			_source.erase(_source.begin(), _source.begin()+batch);
-			_pid.erase(_pid.begin(), _pid.begin() + batch);
-			_thread.erase(_thread.begin(), _thread.begin() + batch);
-			_tid.erase(_tid.begin(), _tid.begin() + batch);
-			_priority.erase(_priority.begin(), _priority.begin() + batch);
-			_text.erase(_text.begin(), _text.begin() + batch);
-			_dateTime.erase(_dateTime.begin(), _dateTime.begin() + batch);
-			_flushTimer.restart();
-		}
+		if ((batch >= _minBatch) || flush) doLog();
 	}
 
 	return n;

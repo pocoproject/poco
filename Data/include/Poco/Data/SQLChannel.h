@@ -31,8 +31,8 @@
 #include "Poco/String.h"
 #include "Poco/NotificationQueue.h"
 #include "Poco/Thread.h"
-#include "Poco/Mutex.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Event.h"
 #include <atomic>
 #include <atomic>
 
@@ -244,10 +244,11 @@ private:
 		/// Closes and opens the DB connection.
 
 	bool processBatch(int minBatch = 0);
-		/// Processes one message.
+		/// Processes a batch of messages.
 		/// If the number of acummulated messages is greater
 		/// than minBatch, sends logs to the destination.
-		/// Returns true if log entry was processed.
+		/// Returns true if at least one log entry was sent
+		/// to the destination.
 
 	size_t execSQL(bool flush = false);
 		/// Executes the log statement.
@@ -263,9 +264,11 @@ private:
 		/// Logs cached entries to the DB.
 
 	size_t logToFile(bool flush = false);
-		/// Logs cached entries to a file. Called in case DB insertions fail.
+		/// Logs cached entries to a file.
+		/// Called in case DB insertions fail or
+		/// in the store-and-forward mode of operation.
 
-	size_t logLocal(const std::string&, Message::Priority prio = Message::PRIO_ERROR);
+	void logLocal(const std::string&, Message::Priority prio = Message::PRIO_ERROR);
 		/// Adds the message to the local SQLChannel log queue, and logs it to the file.
 		/// Typically used to log DB connection/execution erors.
 
@@ -314,6 +317,7 @@ private:
 	std::string                   _directory;
 	AutoPtr<FileChannel>          _pFileChannel;
 	Poco::Stopwatch               _flushTimer;
+	Poco::Event                   _event;
 	Poco::Logger& _logger = Poco::Logger::get("SQLChannel");
 };
 
