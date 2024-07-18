@@ -64,7 +64,7 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			*buffer++ = (char) ch; ++n;
 		}
 		ch = buf.sgetc();
-		if (ch == '\r' || ch == '\n') return n;
+		if (ch == eof || ch == '\r' || ch == '\n') return n;
 		*buffer++ = (char) buf.sbumpc(); ++n;
 		if (ch == '-' && buf.sgetc() == '-')
 		{
