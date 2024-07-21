@@ -102,8 +102,6 @@ set_target_properties(Foundation
 if(POCO_UNBUNDLED)
 	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
-else()
-	target_compile_definitions(Foundation PRIVATE PCRE2_CODE_UNIT_WIDTH=8)
 endif(POCO_UNBUNDLED)
 
 target_include_directories(Foundation

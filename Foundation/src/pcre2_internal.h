@@ -51,21 +51,8 @@ pcre2test.c with CODE_UNIT_WIDTH == 0. */
 #error The use of both EBCDIC and SUPPORT_UNICODE is not supported.
 #endif
 
-/* When compiling one of the libraries, the value of PCRE2_CODE_UNIT_WIDTH must
-be 8, 16, or 32. AutoTools and CMake ensure that this is always the case, but
-other other building methods may not, so here is a check. It is cut out when
-building pcre2test, bcause that sets the value to zero. No other source should
-be including this file. There is no explicit way of forcing a compile to be
-abandoned, but trying to include a non-existent file seems cleanest. Otherwise
-there will be many irrelevant consequential errors. */
-
-#if (!defined PCRE2_BUILDING_PCRE2TEST && !defined PCRE2_DFTABLES) && \
-  (!defined PCRE2_CODE_UNIT_WIDTH ||     \
-    (PCRE2_CODE_UNIT_WIDTH != 8 &&       \
-     PCRE2_CODE_UNIT_WIDTH != 16 &&      \
-     PCRE2_CODE_UNIT_WIDTH != 32))
-#error PCRE2_CODE_UNIT_WIDTH must be defined as 8, 16, or 32.
-#include <AbandonCompile>
+#ifndef PCRE2_CODE_UNIT_WIDTH
+#define PCRE2_CODE_UNIT_WIDTH 8
 #endif
 
 

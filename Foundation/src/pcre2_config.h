@@ -55,4 +55,8 @@
 #define MAX_NAME_SIZE	128
 #define MAX_NAME_COUNT	10000
 
+#ifndef PCRE2_CODE_UNIT_WIDTH
+#define PCRE2_CODE_UNIT_WIDTH 8
+#endif
+
 /* end config.h for CMake builds */
