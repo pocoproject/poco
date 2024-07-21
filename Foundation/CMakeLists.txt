@@ -41,6 +41,7 @@ else()
 	POCO_SOURCES(SRCS pcre2
 		src/pcre2_auto_possess.c
 		src/pcre2_chartables.c
+		src/pcre2_chkdint.c
 		src/pcre2_compile.c
 		src/pcre2_config.c
 		src/pcre2_context.c
@@ -101,6 +102,8 @@ set_target_properties(Foundation
 if(POCO_UNBUNDLED)
 	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+else()
+	target_compile_definitions(Foundation PRIVATE PCRE2_CODE_UNIT_WIDTH=8)
 endif(POCO_UNBUNDLED)
 
 target_include_directories(Foundation
