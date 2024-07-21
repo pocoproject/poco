@@ -17,12 +17,16 @@ else()
 		src/compress.c
 		src/crc32.c
 		src/deflate.c
-		src/gzio.c
-		src/infback.c
-		src/inffast.c
+		src/gzclose.c
+		src/gzlib.c
+		src/gzread.c
+		src/gzwrite.c
 		src/inflate.c
+		src/infback.c
 		src/inftrees.c
+		src/inffast.c
 		src/trees.c
+		src/uncompr.c
 		src/zutil.c
 	)
 endif(POCO_UNBUNDLED)
