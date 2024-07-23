@@ -649,6 +649,10 @@ void ODBCOracleTest::testAutoTransaction()
 	Session localSession("ODBC", _connectString);
 	bool ac = session().getFeature("autoCommit");
 	int count = 0;
+	// enabing SQL parsing is necessary to prevent
+	// starting a transaction for a simple select
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	recreateIntsTable();
 
@@ -675,10 +679,19 @@ void ODBCOracleTest::testAutoTransaction()
 		session() << "INSERT INTO Strings VALUES (1)", now;
 		session() << "INSERT INTO Strings VALUES (2)", now;
 		session() << "BAD QUERY", now;
-	} catch (Poco::Exception&) {}
+		failmsg("Bad SQL statement must throw");
+	}
+	catch (Poco::Exception&) {}
+
+	assertFalse (session().isTransaction());
 
 	session() << "SELECT count(*) FROM Strings", into(count), now;
 	assertTrue (0 == count);
+	assertFalse (session().isTransaction());
+
+	session() << "SELECT count(*) FROM Strings", into(count), now;
+	assertTrue (0 == count);
+	assertFalse (session().isTransaction());
 
 	AutoTransaction at(session());
 
@@ -694,6 +707,7 @@ void ODBCOracleTest::testAutoTransaction()
 	localSession << "SELECT count(*) FROM Strings", into(count), now;
 	assertTrue (3 == count);
 
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", ac);
 }
 
