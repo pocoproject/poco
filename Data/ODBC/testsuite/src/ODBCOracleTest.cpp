@@ -725,8 +725,9 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 		StatementDiagnostics::Iterator it = flds.begin();
 		for (; it != flds.end(); ++it)
 		{
-			if (4043 == it->_nativeError || //ORA-04043 (object does not exist)
-				942 == it->_nativeError || 1433808584/*DevArt*/== it->_nativeError) //ORA-00942 (table does not exist)
+			std::string errMsg((char*)it->_message);
+			if ((errMsg.find("ORA-00942") != std::string::npos) || // table does not exist
+				(errMsg.find("ORA-04043") != std::string::npos)) // object does not exist
 			{
 				ignoreError = true;
 				break;
