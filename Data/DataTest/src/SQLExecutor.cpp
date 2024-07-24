@@ -3857,6 +3857,8 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	}
 
 	bool autoCommit = session().getFeature("autoCommit");
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	Session local(connector, connect);
 
@@ -3925,6 +3927,7 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	// end autoCommit = true
 
 	// restore the original transaction state
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", autoCommit);
 }
 
@@ -3932,6 +3935,8 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, const std::string& connect)
 {
 	bool autoCommit = session().getFeature("autoCommit");
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	Session local(connector, connect);
 	local.setFeature("autoCommit", false);
@@ -4019,6 +4024,8 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	session().commit();
 	local.commit();
 #endif
+
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", autoCommit);
 }
 
@@ -4033,9 +4040,12 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 
 	Session local(connector, connect);
 	local.setFeature("autoCommit", true);
+	local.setFeature("sqlParse", true);
 
 	bool autoCommit = session().getFeature("autoCommit");
 	auto ti = session().getTransactionIsolation();
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 	if (local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED))
@@ -4157,6 +4167,7 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 	session().commit();
 
 	// restore the original transaction state
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", autoCommit);
 	setTransactionIsolation(session(), ti);
 }
@@ -4192,6 +4203,8 @@ void SQLExecutor::transactor()
 
 		session().setFeature("autoCommit", false);
 		session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+		bool sqlParse = session().getFeature("sqlParse");
+		session().setFeature("sqlParse", true);
 
 		TestCommitTransactor ct;
 		Transaction t1(session(), ct);
@@ -4249,6 +4262,7 @@ void SQLExecutor::transactor()
 		session().commit();
 
 		// restore the original transaction state
+		session().setFeature("sqlParse", sqlParse);
 		session().setFeature("autoCommit", autoCommit);
 		setTransactionIsolation(session(), ti);
 	}
