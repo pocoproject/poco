@@ -2,7 +2,6 @@
 #define SQLPARSER_SQLPARSER_H
 
 #include "SQLParserResult.h"
-#include "sql/statements.h"
 
 namespace hsql {
 
@@ -19,11 +18,11 @@ class SQLParser_API SQLParser {
   static bool tokenize(const std::string& sql, std::vector<int16_t>* tokens);
 
   // Old method to parse SQL strings. Replaced by parse().
-  [[deprecated("Use parse()")]]
+  POCO_DEPRECATED("Use parse()")
   static bool parseSQLString(const char* sql, SQLParserResult* result);
 
   // Old method to parse SQL strings. Replaced by parse().
-  [[deprecated("Use parse()")]]
+  POCO_DEPRECATED("Use parse()")
   static bool parseSQLString(const std::string& sql, SQLParserResult* result);
 
  private:

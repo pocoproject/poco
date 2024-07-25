@@ -27,7 +27,7 @@ namespace Poco {
 
 
 template <class TArgs, class TMutex = FastMutex>
-class [[deprecated("use BasicEvent")]] FIFOEvent: public AbstractEvent <
+class POCO_DEPRECATED("use BasicEvent") FIFOEvent: public AbstractEvent <
 	TArgs,
 	FIFOStrategy<TArgs, AbstractDelegate<TArgs>>,
 	AbstractDelegate<TArgs>,

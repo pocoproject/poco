@@ -140,7 +140,7 @@ public:
 		/// execution.
 		/// The number of rows reported is independent of filtering.
 
-	[[deprecated("Replaced with subTotalRowCount() and getTotalRowCount()")]]
+	POCO_DEPRECATED("Replaced with subTotalRowCount() and getTotalRowCount()")
 	std::size_t totalRowCount() const;
 
 	std::size_t getTotalRowCount() const;

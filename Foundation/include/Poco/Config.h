@@ -183,6 +183,13 @@
 
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
 
+// Option to silence deprecation warnings.
+#ifndef POCO_SILENCE_DEPRECATED
+	#define POCO_DEPRECATED(reason) [[deprecated(reason)]]
+#else
+	#define POCO_DEPRECATED(reason)
+#endif
+
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
 

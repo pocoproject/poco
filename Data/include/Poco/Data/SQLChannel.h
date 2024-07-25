@@ -217,7 +217,7 @@ public:
 	static const std::string PROP_TABLE;
 	static const std::string PROP_ARCHIVE_TABLE;
 	static const std::string PROP_MAX_AGE;
-	[[deprecated]] static const std::string PROP_ASYNC;
+	POCO_DEPRECATED("") static const std::string PROP_ASYNC;
 	static const std::string PROP_TIMEOUT;
 	static const std::string PROP_MIN_BATCH;
 	static const std::string PROP_MAX_BATCH;

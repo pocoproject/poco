@@ -32,7 +32,7 @@ namespace Poco {
 
 
 template <class Key, class Value, class KeyHashFunction = HashFunction<Key>>
-class [[deprecated("use LinearHashTable")]] SimpleHashTable
+class POCO_DEPRECATED("use LinearHashTable") SimpleHashTable
 	/// A SimpleHashTable stores a key value pair that can be looked up via a hashed key.
 	///
 	/// In comparison to a HashTable, this class handles collisions by sequentially searching the next

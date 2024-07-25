@@ -480,7 +480,7 @@ public:
 		/// If demangling is available and emangle is true,
 		/// the returnsed string will be demangled.
 
-	[[deprecated("Use clear() instead")]]
+	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
 		/// This function is deprecated and will be removed.
@@ -2288,7 +2288,7 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 } // namespace Dynamic
 
 
-using DynamicAny [[deprecated]] = Dynamic::Var;
+using DynamicAny POCO_DEPRECATED("") = Dynamic::Var;
 
 
 } // namespace Poco

@@ -157,7 +157,7 @@ using LineNumber = decltype(__LINE__);
 //
 #include "Poco/Bugcheck.h"
 #include "Poco/Types.h"
-#include <string>
+
 
 
 #endif // Foundation_Foundation_INCLUDED
