@@ -188,7 +188,7 @@ public:
 	bool isArray(const std::string& key) const;
 		/// Returns true when the given property contains an array.
 
-	bool isArray(ConstIterator& it) const;
+	bool isArray(const ConstIterator& it) const;
 		/// Returns true when the given property contains an array.
 
 	bool isNull(const std::string& key) const;
@@ -197,7 +197,7 @@ public:
 	bool isObject(const std::string& key) const;
 		/// Returns true when the given property contains an object.
 
-	bool isObject(ConstIterator& it) const;
+	bool isObject(const ConstIterator& it) const;
 		/// Returns true when the given property contains an object.
 
 	template<typename T>
@@ -207,7 +207,7 @@ public:
 		/// def will be returned.
 	{
 		T value = def;
-		ValueMap::const_iterator it = _values.find(key);
+		auto it = _values.find(key);
 		if (it != _values.end() && ! it->second.isEmpty())
 		{
 			try
@@ -255,9 +255,9 @@ public:
 		/// Insertion order preservation property is left intact.
 
 private:
-	typedef std::deque<ValueMap::const_iterator>  KeyList;
-	typedef Poco::DynamicStruct::Ptr              StructPtr;
-	typedef Poco::OrderedDynamicStruct::Ptr       OrdStructPtr;
+	using KeyList = std::deque<ValueMap::const_iterator>;
+	using StructPtr = Poco::DynamicStruct::Ptr;
+	using OrdStructPtr = Poco::OrderedDynamicStruct::Ptr;
 
 	void syncKeys(const KeyList& keys);
 
@@ -311,30 +311,28 @@ private:
 
 		if (obj->_preserveInsOrder)
 		{
-			KeyList::const_iterator it = obj->_keys.begin();
-			KeyList::const_iterator end = obj->_keys.end();
-			for (; it != end; ++it)
+			for (const auto& it: obj->_keys)
 			{
-				if (obj->isObject((*it)->first))
+				if (obj->isObject(it->first))
 				{
-					Object::Ptr pObj = obj->getObject((*it)->first);
+					Object::Ptr pObj = obj->getObject(it->first);
 					S str = makeStructImpl<S>(pObj);
-					ds.insert((*it)->first, str);
+					ds.insert(it->first, str);
 				}
-				else if (obj->isArray((*it)->first))
+				else if (obj->isArray(it->first))
 				{
-					Array::Ptr pArr = obj->getArray((*it)->first);
+					Array::Ptr pArr = obj->getArray(it->first);
 					std::vector<Poco::Dynamic::Var> v = Poco::JSON::Array::makeArray(pArr);
-					ds.insert((*it)->first, v);
+					ds.insert(it->first, v);
 				}
 				else
-					ds.insert((*it)->first, (*it)->second);
+					ds.insert(it->first, it->second);
 			}
 		}
 		else
 		{
-			ConstIterator it = obj->begin();
-			ConstIterator end = obj->end();
+			auto it = obj->begin();
+			const auto end = obj->end();
 			for (; it != end; ++it)
 			{
 				if (obj->isObject(it))
@@ -430,19 +428,19 @@ inline Object::ConstIterator Object::end() const
 
 inline bool Object::has(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	const auto it = _values.find(key);
 	return it != _values.end();
 }
 
 
 inline bool Object::isArray(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	const auto it = _values.find(key);
 	return isArray(it);
 }
 
 
-inline bool Object::isArray(ConstIterator& it) const
+inline bool Object::isArray(const ConstIterator& it) const
 {
 	return it != _values.end() && (it->second.type() == typeid(Array::Ptr) || it->second.type() == typeid(Array));
 }
@@ -450,19 +448,19 @@ inline bool Object::isArray(ConstIterator& it) const
 
 inline bool Object::isNull(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	const auto it = _values.find(key);
 	return it == _values.end() || it->second.isEmpty();
 }
 
 
 inline bool Object::isObject(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	const auto it = _values.find(key);
 	return isObject(it);
 }
 
 
-inline bool Object::isObject(ConstIterator& it) const
+inline bool Object::isObject(const ConstIterator& it) const
 {
 	return it != _values.end() && (it->second.type() == typeid(Object::Ptr) || it->second.type() == typeid(Object));
 }
@@ -478,8 +476,8 @@ inline void Object::remove(const std::string& key)
 {
 	if (_preserveInsOrder)
 	{
-		KeyList::iterator it = _keys.begin();
-		KeyList::iterator end = _keys.end();
+		auto it = _keys.begin();
+		const auto end = _keys.end();
 		for (; it != end; ++it)
 		{
 			if (key == (*it)->first)
@@ -508,7 +506,7 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 
 inline const Dynamic::Var& Object::getValue(KeyList::const_iterator& it) const
 {
-	ValueMap::const_iterator itv = _values.find((*it)->first);
+	const auto itv = _values.find((*it)->first);
 	if (itv != _values.end())
 		return itv->second;
 	else
@@ -531,101 +529,99 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Object::Ptr);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
 		value = !_val.isNull() && _val->size() > 0;
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
 		_val->stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		//TODO: val = _val;
 		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		//TODO: ldt = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		//TODO: ts = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -635,27 +631,27 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
@@ -673,101 +669,99 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Object);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
 		value = _val.size() > 0;
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
 		_val.stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		//TODO: val = _val;
 		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		//TODO: ldt = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		//TODO: ts = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -777,27 +771,27 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}

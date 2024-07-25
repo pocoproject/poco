@@ -147,7 +147,7 @@ public:
 				// An empty string must result in false, otherwise true
 				// Which is not the case when we convert to bool with Var
 			{
-				std::string s = value.convert<std::string>();
+				auto s = value.convert<std::string>();
 				logic = !s.empty();
 			}
 			else
@@ -566,7 +566,7 @@ std::string Template::readText(std::istream& in)
 				break;
 			}
 		}
-		text += c;
+		text += static_cast<char>(c);
 
 		c = in.get();
 	}
@@ -588,7 +588,7 @@ std::string Template::readTemplateCommand(std::istream& in)
 
 		if (c == '?' && in.peek() == '>')
 		{
-			in.putback(c);
+			in.putback(static_cast<char>(c));
 			break;
 		}
 
@@ -598,7 +598,7 @@ std::string Template::readTemplateCommand(std::istream& in)
 			break;
 		}
 
-		command += c;
+		command += static_cast<char>(c);
 
 		c = in.get();
 	}
@@ -614,7 +614,7 @@ std::string Template::readWord(std::istream& in)
 	while ((c = in.peek()) != -1 && !Ascii::isSpace(c))
 	{
 		in.get();
-		word += c;
+		word += static_cast<char>(c);
 	}
 	return word;
 }
@@ -628,7 +628,7 @@ std::string Template::readQuery(std::istream& in)
 	{
 		if (c == '?' && in.peek() == '>')
 		{
-			in.putback(c);
+			in.putback(static_cast<char>(c));
 			break;
 		}
 
@@ -636,7 +636,7 @@ std::string Template::readQuery(std::istream& in)
 		{
 			break;
 		}
-		word += c;
+		word += static_cast<char>(c);
 	}
 	return word;
 }
@@ -661,7 +661,7 @@ std::string Template::readString(std::istream& in)
 	{
 		while ((c = in.get()) != -1 && c != '"')
 		{
-			str += c;
+			str += static_cast<char>(c);
 		}
 	}
 	return str;

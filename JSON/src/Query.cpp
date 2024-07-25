@@ -148,7 +148,7 @@ Var Query::find(const std::string& path) const
 
 			if (!result.isEmpty() && !indexes.empty())
 			{
-				for (auto i: indexes)
+				for (const auto& i: indexes)
 				{
 					if (result.type() == typeid(Array::Ptr))
 					{

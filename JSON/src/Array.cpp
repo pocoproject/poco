@@ -208,7 +208,7 @@ Array::operator const Poco::Dynamic::Array& () const
 	else if (_modified)
 	{
 		auto it = _values.begin();
-		auto end = _values.end();
+		const auto end = _values.end();
 		resetDynArray();
 		int index = 0;
 		for (; it != end; ++it, ++index)
@@ -238,7 +238,7 @@ Poco::Dynamic::Array Array::makeArray(const JSON::Array::Ptr& arr)
 	Poco::Dynamic::Array vec;
 
 	auto it  = arr->begin();
-	auto end = arr->end();
+	const auto end = arr->end();
 	int index = 0;
 	for (; it != end; ++it, ++index)
 	{

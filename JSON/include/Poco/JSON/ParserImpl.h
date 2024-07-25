@@ -19,11 +19,7 @@
 
 
 #include "Poco/JSON/JSON.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
 #include "Poco/JSON/ParseHandler.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
 #include <string>
 
@@ -183,7 +179,7 @@ inline Dynamic::Var ParserImpl::asVarImpl() const
 {
 	if (_pHandler) return _pHandler->asVar();
 
-	return Dynamic::Var();
+	return {};
 }
 
 

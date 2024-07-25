@@ -13,7 +13,6 @@
 
 
 #include "Poco/JSON/Handler.h"
-#include "Poco/JSON/Object.h"
 
 
 namespace Poco {

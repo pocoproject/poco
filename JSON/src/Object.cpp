@@ -14,7 +14,6 @@
 
 #include "Poco/JSON/Object.h"
 #include <iostream>
-#include <sstream>
 
 
 using Poco::Dynamic::Var;
@@ -43,9 +42,11 @@ Object::Object(int options):
 }
 
 
-Object::Object(const Object& other) : _values(other._values),
+Object::Object(const Object& other) :
+	_values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex),
 	_pStruct(!other._modified ? other._pStruct : nullptr),
 	_modified(other._modified)
 {
@@ -77,6 +78,7 @@ Object &Object::operator = (const Object &other)
 		_keys = other._keys;
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
+		_lowercaseHex = other._lowercaseHex;
 		_pStruct = !other._modified ? other._pStruct : nullptr;
 		_modified = other._modified;
 	}
@@ -104,11 +106,10 @@ void Object::syncKeys(const KeyList& keys)
 	if(_preserveInsOrder)
 	{
 		// update iterators in _keys to point to copied _values
-		for(auto it = keys.begin(); it != keys.end(); ++it)
-		{
-			ValueMap::const_iterator itv = _values.find((*it)->first);
-			poco_assert (itv != _values.end());
-			_keys.push_back(itv);
+		for (const auto& key : keys) {
+			auto itv = _values.find(key->first);
+			poco_assert(itv != _values.end());
+			_keys.emplace_back(itv);
 		}
 	}
 }
@@ -155,16 +156,14 @@ void Object::getNames(NameList& names) const
 	names.clear();
 	if (_preserveInsOrder)
 	{
-		for(auto it = _keys.begin(); it != _keys.end(); ++it)
-		{
-			names.push_back((*it)->first);
+		for (const auto& _key : _keys) {
+			names.push_back(_key->first);
 		}
 	}
 	else
 	{
-		for(auto it = _values.begin(); it != _values.end(); ++it)
-		{
-			names.push_back(it->first);
+		for (const auto& _value : _values) {
+			names.push_back(_value.first);
 		}
 	}
 }
@@ -209,7 +208,7 @@ Object& Object::set(const std::string& key, const Dynamic::Var& value)
 	if (_preserveInsOrder)
 	{
 		auto it = _keys.begin();
-		auto end = _keys.end();
+		const auto end = _keys.end();
 		for (; it != end; ++it)
 		{
 			if (key == (*it)->first) return *this;
@@ -262,7 +261,7 @@ Object::operator const Poco::DynamicStruct& () const
 	else if (_modified)
 	{
 		auto it = _values.begin();
-		auto end = _values.end();
+		const auto end = _values.end();
 		resetDynStruct(_pStruct);
 		for (; it != end; ++it)
 		{
@@ -296,7 +295,7 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 		if (_preserveInsOrder)
 		{
 			auto it = _keys.begin();
-			auto end = _keys.end();
+			const auto end = _keys.end();
 			resetDynStruct(_pOrdStruct);
 			for (; it != end; ++it)
 			{
@@ -317,7 +316,7 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 		else
 		{
 			auto it = _values.begin();
-			auto end = _values.end();
+			const auto end = _values.end();
 			resetDynStruct(_pOrdStruct);
 			for (; it != end; ++it)
 			{

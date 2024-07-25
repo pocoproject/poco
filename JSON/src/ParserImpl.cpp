@@ -11,19 +11,16 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#include <Poco/JSON/ParserImpl.h>
+#include <Poco/JSON/JSONException.h>
+#include <Poco/StreamCopier.h>
 
-#include "Poco/JSON/Parser.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/Ascii.h"
-#include "Poco/Token.h"
-#include "Poco/UTF8Encoding.h"
-#include "Poco/String.h"
-#include "Poco/StreamCopier.h"
 #undef min
 #undef max
-#include <limits>
-#include <clocale>
+
 #include <istream>
+#include <streambuf>
+#include <clocale>
 #include "pdjson.h"
 
 
