@@ -384,7 +384,14 @@ void ODBCOracleTest::testStoredProcedureDynamicVar()
 				" BEGIN outParam := inParam*inParam; "
 				"END storedProcedure;" , now;
 
-		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		auto inI = in(i);
+		auto outJ = out(j);
+		assertTrue (nullptr != inI);
+		assertTrue (inI->canBind());
+		assertTrue (nullptr != outJ);
+		assertTrue (outJ->canBind());
+
+		*_pSession << "{call storedProcedure(?, ?)}", inI, outJ, now;
 		assertTrue (4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -394,7 +401,12 @@ void ODBCOracleTest::testStoredProcedureDynamicVar()
 			" END storedProcedure;" , now;
 
 		i = 2;
-		*_pSession << "{call storedProcedure(?)}", io(i), now;
+
+		auto ioI = io(j);
+		assertTrue (nullptr != ioI);
+		assertTrue (ioI->canBind());
+
+		*_pSession << "{call storedProcedure(?)}", ioI, now;
 		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
