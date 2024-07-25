@@ -30,9 +30,7 @@ ParseHandler::ParseHandler(bool preserveObjectOrder) : Handler(),
 }
 
 
-ParseHandler::~ParseHandler()
-{
-}
+ParseHandler::~ParseHandler() = default;
 
 
 void ParseHandler::reset()
@@ -67,7 +65,7 @@ void ParseHandler::startObject()
 		}
 	}
 
-	_stack.push(newObj);
+	_stack.emplace(newObj);
 }
 
 
@@ -102,7 +100,7 @@ void ParseHandler::startArray()
 		}
 	}
 
-	_stack.push(newArr);
+	_stack.emplace(newArr);
 }
 
 
@@ -120,7 +118,7 @@ void ParseHandler::key(const std::string& k)
 
 void ParseHandler::setValue(const Var& value)
 {
-	if (_stack.size())
+	if (!_stack.empty())
 	{
 		Var parent = _stack.top();
 
