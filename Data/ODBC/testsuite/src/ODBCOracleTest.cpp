@@ -402,7 +402,7 @@ void ODBCOracleTest::testStoredProcedureDynamicVar()
 
 		i = 2;
 
-		auto ioI = io(j);
+		auto ioI = io(i);
 		assertTrue (nullptr != ioI);
 		assertTrue (ioI->canBind());
 
@@ -1000,7 +1000,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);

@@ -265,7 +265,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 }
 
 
-void ODBCDB2Test::testStoredProcedureDynamicAny()
+void ODBCDB2Test::testStoredProcedureDynamicVar()
 {
 	if (!_pSession) fail ("Test not available.");
 
@@ -659,7 +659,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNull);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testRowIterator);

@@ -55,7 +55,7 @@ public:
 	void testStoredProcedure();
 	void testCursorStoredProcedure();
 	void testStoredProcedureAny();
-	void testStoredProcedureDynamicAny();
+	void testStoredProcedureDynamicVar();
 
 	void testStoredProcedureReturn();
 	void testStoredFunction();

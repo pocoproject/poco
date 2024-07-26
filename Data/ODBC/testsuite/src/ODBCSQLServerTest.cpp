@@ -554,7 +554,7 @@ void ODBCSQLServerTest::testStoredProcedureAny()
 }
 
 
-void ODBCSQLServerTest::testStoredProcedureDynamicAny()
+void ODBCSQLServerTest::testStoredProcedureDynamicVar()
 {
 	try
 	{
@@ -590,8 +590,8 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 		}
 		dropObject("PROCEDURE", "storedProcedure");
 	}
-	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
-	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicVar()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicVar()"); }
 }
 
 
@@ -1033,7 +1033,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureReturn);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
