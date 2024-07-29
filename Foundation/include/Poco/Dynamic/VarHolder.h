@@ -323,17 +323,17 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<(std::is_integral<F>::value && std::is_signed<F>::value) ||
-			std::is_floating_point<F>::value, F>::type* = nullptr,
-		typename std::enable_if<(std::is_integral<T>::value && std::is_signed<T>::value) ||
-			std::is_floating_point<F>::value, T>::type* = nullptr>
+		typename std::enable_if_t<(std::is_integral_v<F> && std::is_signed_v<F>) ||
+			std::is_floating_point_v<F>, F>* = nullptr,
+		typename std::enable_if_t<(std::is_integral_v<T> && std::is_signed_v<T>) ||
+			std::is_floating_point_v<F>, T>* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts signed integral, as well as floating-point, values from
 		/// larger to smaller type. It checks the upper and lower bound and
 		/// if from value is within limits of type T (i.e. check calls do not throw),
 		/// it is converted.
 	{
-		if constexpr((std::is_integral<F>::value) && (std::is_floating_point<T>::value))
+		if constexpr((std::is_integral_v<F>) && (std::is_floating_point_v<T>))
 		{
 			if (isPrecisionLost<F, T>(from))
 				POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
@@ -344,8 +344,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && std::is_signed<T>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_floating_point<T>::value, T>::type* = nullptr>
+		typename std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<T>, F>* = nullptr,
+		typename std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts signed integral values from integral to floating-point type. Checks for
 		/// the loss of precision and if from value is within limits of type T (i.e. check calls do not throw),
@@ -357,8 +357,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<std::is_same<F, bool>::value>::type* = nullptr,
-		typename std::enable_if<std::is_floating_point<T>::value, T>::type* = nullptr>
+		typename std::enable_if_t<std::is_same_v<F, bool>>* = nullptr,
+		typename std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts boolean values to floating-point type.
 	{
@@ -366,8 +366,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<(std::is_integral<T>::value && !std::is_signed<T>::value) || std::is_floating_point<T>::value, T>::type* = nullptr>
+		typename std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
+		typename std::enable_if_t<(std::is_integral_v<T> && !std::is_signed_v<T>) || std::is_floating_point_v<T>, T>* = nullptr>
 	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// Converts unsigned integral data types from larger to smaller, as well as to floating-point, types.
 		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked, thus
@@ -380,8 +380,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value, T>::type* = nullptr>
+		typename std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<F>, F>* = nullptr,
+		typename std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
 	static void convertSignedToUnsigned(const F& from, T& to)
 		/// Converts signed integral data types to unsigned data types.
 		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
@@ -393,8 +393,8 @@ protected:
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true,
-		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value, T>::type* = nullptr>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true,
+		typename std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
 	static void convertSignedFloatToUnsigned(const F& from, T& to)
 		/// Converts floating point data types to unsigned integral data types. Negative values
 		/// can not be converted and if one is encountered, RangeException is thrown.
@@ -407,8 +407,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type* = nullptr>
+		typename std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
+		typename std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>* = nullptr>
 	static void convertUnsignedToSigned(const F& from, T& to)
 		/// Converts unsigned integral data types to signed integral data types.
 		/// If upper limit is within the target data type limits, the conversion is performed.
@@ -416,46 +416,46 @@ protected:
 		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
-	
-	template <typename F, typename T, std::enable_if_t<std::is_signed<F>::value && std::is_signed<T>::value && (sizeof(F) <= sizeof(T))>* = nullptr>
+
+	template <typename F, typename T, std::enable_if_t<std::is_signed_v<F> && std::is_signed_v<T> && (sizeof(F) <= sizeof(T))>* = nullptr>
 	void convertToSigned(const F& from, T& to) const
 	{
 		to = static_cast<T>(from);
 	}
-	
-	template <typename F, typename T, std::enable_if_t<std::is_signed<F>::value && std::is_signed<T>::value && (sizeof(F) > sizeof(T))>* = nullptr>
+
+	template <typename F, typename T, std::enable_if_t<std::is_signed_v<F> && std::is_signed_v<T> && (sizeof(F) > sizeof(T))>* = nullptr>
 	void convertToSigned(const F& from, T& to) const
 	{
 		convertToSmaller(from, to);
 	}
-	
-	template <typename F, typename T, std::enable_if_t<!std::is_signed<F>::value && std::is_signed<T>::value>* = nullptr>
+
+	template <typename F, typename T, std::enable_if_t<!std::is_signed_v<F> && std::is_signed_v<T>>* = nullptr>
 	void convertToSigned(const F& from, T& to) const
 	{
 		convertUnsignedToSigned(from, to);
 	}
-	
-	template <typename F, typename T, std::enable_if_t<!std::is_signed<F>::value && !std::is_signed<T>::value && (sizeof(F) <= sizeof(T))>* = nullptr>
+
+	template <typename F, typename T, std::enable_if_t<!std::is_signed_v<F> && !std::is_signed_v<T> && (sizeof(F) <= sizeof(T))>* = nullptr>
 	void convertToUnsigned(const F& from, T& to) const
 	{
 		to = static_cast<T>(from);
 	}
-	
-	template <typename F, typename T, std::enable_if_t<!std::is_signed<F>::value && !std::is_signed<T>::value && (sizeof(F) > sizeof(T))>* = nullptr>
+
+	template <typename F, typename T, std::enable_if_t<!std::is_signed_v<F> && !std::is_signed_v<T> && (sizeof(F) > sizeof(T))>* = nullptr>
 	void convertToUnsigned(const F& from, T& to) const
 	{
 		convertToSmallerUnsigned(from, to);
 	}
-	
-	template <typename F, typename T, std::enable_if_t<std::is_signed<F>::value && !std::is_signed<T>::value>* = nullptr>
+
+	template <typename F, typename T, std::enable_if_t<std::is_signed_v<F> && !std::is_signed_v<T>>* = nullptr>
 	void convertToUnsigned(const F& from, T& to) const
 	{
 		convertSignedToUnsigned(from, to);
 	}
 
 	template <typename F, typename T,
-		std::enable_if_t<std::is_integral<F>::value, bool> = true,
-		std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+		std::enable_if_t<std::is_integral_v<F>, bool> = true,
+		std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	static void convertToFP(F& from, T& to)
 		/// Converts unsigned integral data types to floating-point data types.
 		/// If the number of significant digits used for the integer vaue exceeds the number
@@ -469,7 +469,7 @@ protected:
 
 private:
 
-	template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	static constexpr int numValDigits(const T& value)
 	{
 		using U = std::make_unsigned_t<T>;
@@ -480,58 +480,58 @@ private:
 		return digitCount;
 	}
 
-	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	static constexpr int numValDigits(T value)
 	{
 		return numValDigits<int64_t>(static_cast<int64_t>(value));
 	}
 
-	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	static constexpr int numTypeDigits()
 	{
 		return std::numeric_limits<T>::digits;
 	}
 
-	template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	static constexpr int numTypeDigits()
 	{
 		return numValDigits(std::numeric_limits<T>::max());
 	}
 
 	template <typename F, typename T,
-		std::enable_if_t<std::is_integral<F>::value, bool> = true,
-		std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+		std::enable_if_t<std::is_integral_v<F>, bool> = true,
+		std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	static bool isPrecisionLost(const F& from)
 		// Checks for loss of precision in integral -> floating point conversion.
 	{
 		return numValDigits(from) > numTypeDigits<T>();
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
 	static void checkUpperLimit(const F& from)
 	{
 		if (from > static_cast<F>(std::numeric_limits<T>::max()))
 			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
 	static void checkLowerLimit(const F& from)
 	{
 		if (from < static_cast<F>(std::numeric_limits<T>::min()))
 			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
 	static void checkUpperLimit(const F& from)
 	{
 		if ((from > static_cast<F>(std::numeric_limits<T>::max())))
 			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
 	static void checkLowerLimit(const F& from)
 	{
-		if constexpr(std::is_floating_point<T>::value)
+		if constexpr(std::is_floating_point_v<T>)
 		{
 			if (static_cast<F>(-std::numeric_limits<T>::max()) > from)
 				POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
@@ -825,7 +825,7 @@ public:
 
 	void convert(Int8& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -837,7 +837,7 @@ public:
 
 	void convert(Int16& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -849,7 +849,7 @@ public:
 
 	void convert(Int32& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -861,7 +861,7 @@ public:
 
 	void convert(Int64& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -873,7 +873,7 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -885,7 +885,7 @@ public:
 
 	void convert(UInt16& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -897,7 +897,7 @@ public:
 
 	void convert(UInt32& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -909,7 +909,7 @@ public:
 
 	void convert(UInt64& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -923,7 +923,7 @@ public:
 
 	void convert(long long& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToSigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -935,7 +935,7 @@ public:
 
 	void convert(unsigned long long& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			convertToUnsigned(std::underlying_type_t<T>(_val), val);
 		}
@@ -949,7 +949,7 @@ public:
 
 	void convert(bool& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			val = (std::underlying_type_t<T>(_val) != 0);
 		}
@@ -961,7 +961,7 @@ public:
 
 	void convert(float& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			val = static_cast<float>(_val);
 		}
@@ -973,7 +973,7 @@ public:
 
 	void convert(double& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			val = static_cast<double>(_val);
 		}
@@ -985,7 +985,7 @@ public:
 
 	void convert(char& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			val = static_cast<char>(_val);
 		}
@@ -997,7 +997,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			val = NumberFormatter::format(std::underlying_type_t<T>(_val));
 		}
@@ -1009,7 +1009,7 @@ public:
 
 	void convert(Poco::UTF16String& val) const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			std::string str = NumberFormatter::format(std::underlying_type_t<T>(_val));
 			Poco::UnicodeConverter::convert(str, val);
@@ -1022,7 +1022,7 @@ public:
 
 	bool isArray() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return false;
 		}
@@ -1034,7 +1034,7 @@ public:
 
 	bool isStruct() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return false;
 		}
@@ -1046,7 +1046,7 @@ public:
 
 	bool isInteger() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return std::numeric_limits<std::underlying_type_t<T>>::is_integer;
 		}
@@ -1058,7 +1058,7 @@ public:
 
 	bool isSigned() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return std::numeric_limits<std::underlying_type_t<T>>::is_signed;
 		}
@@ -1070,7 +1070,7 @@ public:
 
 	bool isNumeric() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return std::numeric_limits<std::underlying_type_t<T>>::is_specialized;
 		}
@@ -1082,7 +1082,7 @@ public:
 
 	bool isBoolean() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return false;
 		}
@@ -1094,7 +1094,7 @@ public:
 
 	bool isString() const
 	{
-		if constexpr (std::is_enum<T>::value)
+		if constexpr (std::is_enum_v<T>)
 		{
 			return false;
 		}
@@ -1103,7 +1103,7 @@ public:
 			return VarHolder::isString();
 		}
 	}
-	
+
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
 		return cloneHolder(pVarHolder, _val);
