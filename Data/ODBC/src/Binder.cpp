@@ -518,7 +518,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	// Hence the funky flow control.
 	if (_pTypeInfo)
 	{
-		DynamicAny tmp;
+		Dynamic::Var tmp;
 		bool foundSize(false);
 		bool foundPrec(false);
 		foundSize = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);

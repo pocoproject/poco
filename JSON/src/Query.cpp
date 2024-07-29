@@ -142,7 +142,7 @@ Var Query::find(const std::string& path) const
 					result = o.get(name);
 					found = true;
 				}
-				else result.empty();
+				else result.clear();
 
 			}
 
@@ -166,7 +166,7 @@ Var Query::find(const std::string& path) const
 			}
 		}
 	}
-	if (!found) result.empty();
+	if (!found) result.clear();
 	return result;
 }
 

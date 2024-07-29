@@ -517,14 +517,14 @@ public:
 // Deprecated functions
 //
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(int value, bool prefix);
 		/// Formats an int value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(int value, int width, bool prefix);
 		/// Formats an int value in hexadecimal notation,
 		/// right justified and zero-padded in
@@ -533,13 +533,13 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned value, bool prefix);
 		/// Formats an unsigned int value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned value, int width, bool prefix);
 		/// Formats an unsigned value in hexadecimal notation,
 		/// right justified and zero-padded in
@@ -547,14 +547,14 @@ public:
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long value, bool prefix);
 		/// Formats a long value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long value, int width, bool prefix);
 		/// Formats a long value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least the
@@ -563,13 +563,13 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long value, bool prefix);
 		/// Formats an unsigned long value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long value, int width, bool prefix);
 		/// Formats an unsigned long value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least the
@@ -580,14 +580,14 @@ public:
 #ifdef POCO_HAVE_INT64
 #ifdef POCO_INT64_IS_LONG
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long long value, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long long value, int width, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -595,13 +595,13 @@ public:
 		/// The value is treated as unsigned.
 		/// If prefix is true, "0x" prefix is prepended to the resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long long value, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long long value, int width, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -610,14 +610,14 @@ public:
 
 #else // ifndef POCO_INT64_IS_LONG
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(Int64 value, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(Int64 value, int width, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -625,13 +625,13 @@ public:
 		/// The value is treated as unsigned.
 		/// If prefix is true, "0x" prefix is prepended to the resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(UInt64 value, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
-	[[deprecated("use formatHex with options instead")]]
+	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(UInt64 value, int width, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least

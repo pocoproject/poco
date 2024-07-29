@@ -45,10 +45,10 @@ class Diagnostics
 {
 public:
 
-	static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
-	static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
-	static const unsigned int SQL_NAME_LENGTH = 128;
-	static const std::string  DATA_TRUNCATED;
+	inline static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
+	inline static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
+	inline static const unsigned int SQL_NAME_LENGTH = 128;
+	inline static const std::string  DATA_TRUNCATED;
 
 	struct DiagnosticFields
 	{

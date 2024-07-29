@@ -132,7 +132,7 @@ public:
 
 	virtual void testStoredProcedure();
 	virtual void testStoredProcedureAny();
-	virtual void testStoredProcedureDynamicAny();
+	virtual void testStoredProcedureDynamicVar();
 
 	virtual void testStoredFunction();
 	virtual void testStoredFunctionAny();
@@ -251,9 +251,9 @@ inline void ODBCTest::testStoredProcedureAny()
 }
 
 
-inline void ODBCTest::testStoredProcedureDynamicAny()
+inline void ODBCTest::testStoredProcedureDynamicVar()
 {
-	throw Poco::NotImplementedException("ODBCTest::testStoredProcedureDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::testStoredProcedureDynamicVar()");
 }
 
 

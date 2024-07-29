@@ -31,9 +31,8 @@
 namespace Poco {
 
 
-//@ deprecated
 template <class Key, class Value, class KeyHashFunction = HashFunction<Key>>
-class HashTable
+class POCO_DEPRECATED("use LinearHashTable") HashTable
 	/// A HashTable stores a key value pair that can be looked up via a hashed key.
 	///
 	/// Collision handling is done via overflow maps(!). With small hash tables performance of this

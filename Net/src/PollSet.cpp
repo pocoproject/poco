@@ -14,7 +14,6 @@
 
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
-#include "Poco/TemporaryFile.h"
 #include "Poco/Mutex.h"
 #include <set>
 
@@ -395,13 +394,13 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
-		for (auto it = _pollfds.begin(); it != _pollfds.end(); ++it)
+		for (auto& _pollfd : _pollfds)
 		{
-			if (it->fd == fd)
+			if (_pollfd.fd == fd)
 			{
-				it->events = 0;
-				it->revents = 0;
-				setMode(it->events, mode);
+				_pollfd.events = 0;
+				_pollfd.revents = 0;
+				setMode(_pollfd.events, mode);
 			}
 		}
 	}
@@ -436,13 +435,13 @@ public:
 			}
 
 			_pollfds.reserve(_pollfds.size() + _addMap.size());
-			for (auto it = _addMap.begin(); it != _addMap.end(); ++it)
+			for (auto& it : _addMap)
 			{
 				pollfd pfd;
-				pfd.fd = it->first;
+				pfd.fd = it.first;
 				pfd.events = 0;
 				pfd.revents = 0;
-				setMode(pfd.events, it->second);
+				setMode(pfd.events, it.second);
 				_pollfds.push_back(pfd);
 			}
 			_addMap.clear();
@@ -482,7 +481,7 @@ public:
 			{
 				for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
 				{
-					std::map<poco_socket_t, Socket>::const_iterator its = _socketMap.find(it->fd);
+					auto its = _socketMap.find(it->fd);
 					if (its != _socketMap.end())
 					{
 						if (it->revents & POLLIN)

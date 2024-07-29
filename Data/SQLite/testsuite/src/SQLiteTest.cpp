@@ -32,7 +32,7 @@
 #include "Poco/Any.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Logger.h"
 #include "Poco/Message.h"
@@ -68,7 +68,7 @@ using Poco::Nullable;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 using Poco::Logger;
 using Poco::Message;
@@ -86,7 +86,6 @@ using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
 using Poco::Int64;
-using Poco::Dynamic::Var;
 using Poco::Data::SQLite::Utility;
 using Poco::delegate;
 using Poco::Stopwatch;
@@ -2394,10 +2393,10 @@ void SQLiteTest::testDynamicAny()
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR, empty INTEGER)", now;
 
-	DynamicAny i = Int32(42);
-	DynamicAny f = double(42.5);
-	DynamicAny s = std::string("42");
-	DynamicAny e;
+	Var i = Int32(42);
+	Var f = double(42.5);
+	Var s = std::string("42");
+	Var e;
 	assertTrue (e.isEmpty());
 
 	tmp << "INSERT INTO Anys VALUES (?, ?, ?, null)", use(i), use(f), use(s), now;

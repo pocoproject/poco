@@ -39,6 +39,11 @@ ClassLoaderTest::~ClassLoaderTest()
 {
 }
 
+namespace Poco {
+
+template class ClassLoader<TestPlugin>;
+
+}
 
 void ClassLoaderTest::testClassLoader1()
 {
@@ -126,7 +131,7 @@ void ClassLoaderTest::testClassLoader2()
 		TestPlugin& POCO_UNUSED plgB = cl.instance("PluginB");
 		fail("not a singleton - must throw");
 	}
-	catch (InvalidAccessException&)
+	catch (const Poco::InvalidAccessException&)
 	{
 	}
 
@@ -135,7 +140,7 @@ void ClassLoaderTest::testClassLoader2()
 		TestPlugin* POCO_UNUSED pPluginC = cl.create("PluginC");
 		fail("cannot create a singleton - must throw");
 	}
-	catch (InvalidAccessException&)
+	catch (const Poco::InvalidAccessException&)
 	{
 	}
 
@@ -145,7 +150,7 @@ void ClassLoaderTest::testClassLoader2()
 		meta.autoDelete(&(meta.instance()));
 		fail("cannot take ownership of a singleton - must throw");
 	}
-	catch (InvalidAccessException&)
+	catch (const Poco::InvalidAccessException&)
 	{
 	}
 

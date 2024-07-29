@@ -210,7 +210,7 @@ public:
 
 		if (pHolder && pHolder->type() == typeid(T))
 		{
-			VarHolderImpl<T>* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
+			auto* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
 			return pHolderImpl->value();
 		}
 		else if (!pHolder)
@@ -480,7 +480,7 @@ public:
 		/// If demangling is available and emangle is true,
 		/// the returnsed string will be demangled.
 
-	//@ deprecated
+	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
 		/// This function is deprecated and will be removed.
@@ -733,7 +733,7 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == content();
+	return nullptr == content();
 }
 
 
@@ -2288,8 +2288,7 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 } // namespace Dynamic
 
 
-//@ deprecated
-typedef Dynamic::Var DynamicAny;
+using DynamicAny POCO_DEPRECATED("") = Dynamic::Var;
 
 
 } // namespace Poco

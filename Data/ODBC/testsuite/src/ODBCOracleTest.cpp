@@ -15,7 +15,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/AutoTransaction.h"
@@ -37,7 +37,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 
 
@@ -370,21 +370,28 @@ void ODBCOracleTest::testStoredProcedureAny()
 }
 
 
-void ODBCOracleTest::testStoredProcedureDynamicAny()
+void ODBCOracleTest::testStoredProcedureDynamicVar()
 {
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 
-		DynamicAny i = 2;
-		DynamicAny j = 0;
+		Var i = 2;
+		Var j = 0;
 
 		*_pSession << "CREATE OR REPLACE "
 				"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
 				" BEGIN outParam := inParam*inParam; "
 				"END storedProcedure;" , now;
 
-		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		auto inI = in(i);
+		auto outJ = out(j);
+		assertTrue (nullptr != inI);
+		assertTrue (inI->canBind());
+		assertTrue (nullptr != outJ);
+		assertTrue (outJ->canBind());
+
+		*_pSession << "{call storedProcedure(?, ?)}", inI, outJ, now;
 		assertTrue (4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -394,7 +401,12 @@ void ODBCOracleTest::testStoredProcedureDynamicAny()
 			" END storedProcedure;" , now;
 
 		i = 2;
-		*_pSession << "{call storedProcedure(?)}", io(i), now;
+
+		auto ioI = io(i);
+		assertTrue (nullptr != ioI);
+		assertTrue (ioI->canBind());
+
+		*_pSession << "{call storedProcedure(?)}", ioI, now;
 		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -988,7 +1000,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);

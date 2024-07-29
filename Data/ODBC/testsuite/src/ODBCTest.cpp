@@ -14,7 +14,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
@@ -43,7 +43,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 using Poco::NotFoundException;
 

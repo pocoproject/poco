@@ -37,7 +37,7 @@ void ParseHandler::reset()
 {
 	while (!_stack.empty()) _stack.pop();
 	_key = "";
-	_result.empty();
+	_result.clear();
 }
 
 

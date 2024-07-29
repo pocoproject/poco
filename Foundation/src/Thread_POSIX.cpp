@@ -17,8 +17,6 @@
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
-#include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include "Poco/Error.h"
 #include <signal.h>

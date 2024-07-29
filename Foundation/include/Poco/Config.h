@@ -175,10 +175,6 @@
 // to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
 // #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
 
-
-// Disarm POCO_DEPRECATED macro.
-// #define POCO_NO_DEPRECATED
-
 // Enable usage of Poco::Mutex and Poco::FastMutex
 // as wrappers for std::recursive_mutex and std::mutex
 #ifndef POCO_ENABLE_STD_MUTEX
@@ -186,6 +182,13 @@
 #endif
 
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+
+// Option to silence deprecation warnings.
+#ifndef POCO_SILENCE_DEPRECATED
+	#define POCO_DEPRECATED(reason) [[deprecated(reason)]]
+#else
+	#define POCO_DEPRECATED(reason)
+#endif
 
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
