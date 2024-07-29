@@ -48,7 +48,7 @@ public:
 		PATH_GUESS    /// Guess the style by examining the path
 	};
 
-	typedef std::vector<std::string> StringVec;
+	using StringVec = std::vector<std::string>;
 
 	Path();
 		/// Creates an empty relative path.

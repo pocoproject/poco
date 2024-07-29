@@ -389,6 +389,9 @@ private:
 	friend ValueType* AnyCast(Any*);
 
 	template <typename ValueType>
+	friend const ValueType* AnyCast(const Any*);
+
+	template <typename ValueType>
 	friend ValueType* UnsafeAnyCast(Any*);
 
 	template <typename ValueType>
@@ -426,7 +429,9 @@ const ValueType* AnyCast(const Any* operand)
 	///	 const MyType* pTmp = AnyCast<MyType>(pAny).
 	/// Returns nullptr if the types don't match.
 {
-	return AnyCast<ValueType>(const_cast<Any*>(operand));
+	return operand && operand->type() == typeid(ValueType)
+				? &static_cast<const Any::Holder<ValueType>*>(operand->content())->_held
+				: nullptr;
 }
 
 
