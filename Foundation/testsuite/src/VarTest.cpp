@@ -1644,6 +1644,103 @@ void VarTest::testULongLong()
 }
 
 
+void VarTest::testEnumType()
+{
+	enum class src {
+		value = 32
+	};
+
+	Var a1 = src::value;
+
+	assertTrue (a1.type() == typeid(src));
+
+	std::string s1;
+	Poco::Int8 s2;
+	Poco::Int16 s3;
+	Poco::Int32 s4;
+	Poco::Int64 s5;
+	Poco::UInt8 s6;
+	Poco::UInt16 s7;
+	Poco::UInt32 s8;
+	Poco::UInt64 s9;
+	float s10;
+	double s11;
+	bool s12;
+	char s13;
+	a1.convert(s1);
+	a1.convert(s2);
+	a1.convert(s3);
+	a1.convert(s4);
+	a1.convert(s5);
+	a1.convert(s6);
+	a1.convert(s7);
+	a1.convert(s8);
+	a1.convert(s9);
+	a1.convert(s10);
+	a1.convert(s11);
+	a1.convert(s12);
+	a1.convert(s13);
+	long s14;
+	unsigned long s15;
+	long long s16;
+	unsigned long long s17;
+	a1.convert(s14);
+	a1.convert(s15);
+	a1.convert(s16);
+	a1.convert(s17);
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s16 == 32);
+	assertTrue (s17 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
+	Var a2(a1);
+	std::string t2;
+	a2.convert(t2);
+	assertTrue (s1 == t2);
+
+	src value = a1.extract<src>();
+	assertTrue (value == src::value);
+
+	try
+	{
+		POCO_UNUSED Int16 value2; value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+
+	Var a3 = a1 + 1;
+	assertTrue (a3 == 33);
+	a3 = a1 - 1;
+	assertTrue (a3 == 31);
+	a3 += 1;
+	assertTrue (a3 == 32);
+	a3 -= 1;
+	assertTrue (a3 == 31);
+	a3 = a1 / 2;
+	assertTrue (a3 == 16);
+	a3 = a1 * 2;
+	assertTrue (a3 == 64);
+	a3 /= 2;
+	assertTrue (a3 == 32);
+	a3 *= 2;
+	assertTrue (a3 == 64);
+}
+
+
 void VarTest::testUDT()
 {
 	Dummy d0;
@@ -3375,6 +3472,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
 	CppUnit_addTest(pSuite, VarTest, testVarVisitor);
+	CppUnit_addTest(pSuite, VarTest, testEnumType);
 
 	return pSuite;
 }
