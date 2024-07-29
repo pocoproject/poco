@@ -27,7 +27,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Types.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/UTFString.h"
@@ -369,17 +369,17 @@ public:
 	void prepare(std::size_t pos, const std::list<Poco::Any>& val);
 		/// Prepares an Any list.
 
-	void prepare(std::size_t pos, const Poco::DynamicAny& val);
-		/// Prepares a DynamicAny.
+	void prepare(std::size_t pos, const Poco::Dynamic::Var& val);
+		/// Prepares a Dynamic::Var.
 
-	void prepare(std::size_t pos, const std::vector<Poco::DynamicAny>& val);
-		/// Prepares a DynamicAny vector.
+	void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val);
+		/// Prepares a Dynamic::Var vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::DynamicAny>& val);
-		/// Prepares a DynamicAny deque.
+	void prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val);
+		/// Prepares a Dynamic::Var deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::DynamicAny>& val);
-		/// Prepares a DynamicAny list.
+	void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val);
+		/// Prepares a Dynamic::Var list.
 
 	std::size_t columns() const;
 		/// Returns the number of columns.
@@ -429,7 +429,7 @@ private:
 
 	template <typename C>
 	void prepareImpl(std::size_t pos, const C* pVal = 0)
-		/// Utility function to prepare Any and DynamicAny.
+		/// Utility function to prepare Any and Dynamic::Var.
 	{
 		ODBCMetaColumn col(_rStmt, pos);
 
@@ -1213,27 +1213,27 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Any>& val
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const Poco::DynamicAny& val)
+inline void Preparator::prepare(std::size_t pos, const Poco::Dynamic::Var& val)
 {
-	prepareImpl<std::vector<Poco::DynamicAny> >(pos);
+	prepareImpl<std::vector<Poco::Dynamic::Var> >(pos);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::DynamicAny>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val)
 {
-	prepareImpl<std::vector<Poco::DynamicAny> >(pos, &val);
+	prepareImpl<std::vector<Poco::Dynamic::Var> >(pos, &val);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::DynamicAny>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val)
 {
-	prepareImpl<std::deque<Poco::DynamicAny> >(pos, &val);
+	prepareImpl<std::deque<Poco::Dynamic::Var> >(pos, &val);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::list<Poco::DynamicAny>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val)
 {
-	prepareImpl<std::list<Poco::DynamicAny> >(pos, &val);
+	prepareImpl<std::list<Poco::Dynamic::Var> >(pos, &val);
 }
 
 

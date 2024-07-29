@@ -21,8 +21,7 @@
 #include "Poco/KeyValueArgs.h"
 #include "Poco/ValidArgs.h"
 #include "Poco/Mutex.h"
-#include "Poco/Exception.h"
-#include "Poco/FIFOEvent.h"
+#include "Poco/BasicEvent.h"
 #include "Poco/EventArgs.h"
 #include "Poco/Delegate.h"
 #include "Poco/SharedPtr.h"
@@ -39,16 +38,16 @@ class AbstractCache
 	/// An AbstractCache is the interface of all caches.
 {
 public:
-	FIFOEvent<const KeyValueArgs<TKey, TValue>, TEventMutex> Add;
-	FIFOEvent<const KeyValueArgs<TKey, TValue>, TEventMutex> Update;
-	FIFOEvent<const TKey, TEventMutex>                       Remove;
-	FIFOEvent<const TKey, TEventMutex>                       Get;
-	FIFOEvent<const EventArgs, TEventMutex>                  Clear;
+	BasicEvent<const KeyValueArgs<TKey, TValue>, TEventMutex> Add;
+	BasicEvent<const KeyValueArgs<TKey, TValue>, TEventMutex> Update;
+	BasicEvent<const TKey, TEventMutex>                       Remove;
+	BasicEvent<const TKey, TEventMutex>                       Get;
+	BasicEvent<const EventArgs, TEventMutex>                  Clear;
 
-	typedef std::map<TKey, SharedPtr<TValue>>   DataHolder;
-	typedef typename DataHolder::iterator       Iterator;
-	typedef typename DataHolder::const_iterator ConstIterator;
-	typedef std::set<TKey>                      KeySet;
+	using DataHolder = std::map<TKey, SharedPtr<TValue>>;
+	using Iterator = typename DataHolder::iterator;
+	using ConstIterator = typename DataHolder::const_iterator;
+	using KeySet = std::set<TKey>;
 
 	AbstractCache()
 	{
@@ -71,6 +70,9 @@ public:
 			poco_unexpected();
 		}
 	}
+
+	AbstractCache(const AbstractCache& aCache) = delete;
+	AbstractCache& operator = (const AbstractCache& aCache) = delete;
 
 	void add(const TKey& key, const TValue& val)
 		/// Adds the key value pair to the cache.
@@ -194,8 +196,8 @@ public:
 	}
 
 protected:
-	mutable FIFOEvent<ValidArgs<TKey>> IsValid;
-	mutable FIFOEvent<KeySet>          Replace;
+	mutable BasicEvent<ValidArgs<TKey>> IsValid;
+	mutable BasicEvent<KeySet>          Replace;
 
 	void initialize()
 		/// Sets up event registration.
@@ -371,9 +373,6 @@ protected:
 	mutable DataHolder _data;
 	mutable TMutex  _mutex;
 
-private:
-	AbstractCache(const AbstractCache& aCache);
-	AbstractCache& operator = (const AbstractCache& aCache);
 };
 
 

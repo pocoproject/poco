@@ -41,6 +41,9 @@ public:
 	void open(const std::string& path, std::ios::openmode mode);
 		/// Opens the given file in the given mode.
 
+	void openHandle(NativeHandle handle, std::ios::openmode mode);
+		/// Take ownership of the given HANDLE.
+
 	bool close();
 		/// Closes the File stream buffer. Returns true if successful,
 		/// false otherwise.

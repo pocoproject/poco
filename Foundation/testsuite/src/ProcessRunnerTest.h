@@ -37,7 +37,7 @@ public:
 
 private:
 	std::string cmdLine(const std::string& cmd, const Poco::ProcessRunner::Args& args);
-	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg, int timeoutMS, int line);
+	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg, int timeoutMS, Poco::LineNumber line);
 };
 
 

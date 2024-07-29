@@ -122,6 +122,37 @@ private:
 };
 
 
+class JoinRunnable : public Runnable
+{
+public:
+	JoinRunnable() : _stop(false), _running(false)
+	{
+	}
+
+	void run()
+	{
+		_running = true;
+		while (!_stop)
+			Thread::sleep(100);
+		_running = false;
+	}
+
+	void stop()
+	{
+		_stop = true;
+	}
+
+	bool running() const
+	{
+		return _running;
+	}
+
+private:
+	std::atomic<bool> _stop;
+	std::atomic<bool> _running;
+};
+
+
 class TrySleepRunnable : public Runnable
 {
 public:
@@ -268,7 +299,7 @@ void ThreadTest::testThreads()
 }
 
 
-void ThreadTest::testJoin()
+void ThreadTest::testTryJoin()
 {
 	Thread thread;
 	MyRunnable r;
@@ -280,6 +311,22 @@ void ThreadTest::testJoin()
 	r.notify();
 	assertTrue (thread.tryJoin(500));
 	assertTrue (!thread.isRunning());
+}
+
+
+void ThreadTest::testJoin()
+{
+	Thread thread;
+	JoinRunnable r;
+	assertTrue(!thread.isRunning());
+	thread.start(r);
+	Thread::sleep(200);
+	assertTrue(thread.isRunning());
+	assertTrue(!thread.tryJoin(100));
+	r.stop();
+	thread.join();
+	assertTrue(!thread.isRunning());
+	assertTrue(!r.running());
 }
 
 
@@ -371,10 +418,11 @@ void ThreadTest::testThreadFunction()
 
 	assertTrue (!thread.isRunning());
 
-	int tmp = MyRunnable::_staticVar;
+	MyRunnable::_staticVar = 0;
+	int tmp = 1;
 	thread.start(freeFunc, &tmp);
 	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	assertTrue (tmp == MyRunnable::_staticVar);
 
 	assertTrue (!thread.isRunning());
 
@@ -432,15 +480,16 @@ void ThreadTest::testThreadStackSize()
 	assertTrue (0 == thread.getStackSize());
 	thread.setStackSize(stackSize);
 	assertTrue (stackSize <= thread.getStackSize());
-	int tmp = MyRunnable::_staticVar;
+	MyRunnable::_staticVar = 0;
+	int tmp = 1;
 	thread.start(freeFunc, &tmp);
 	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	assertTrue (1 == MyRunnable::_staticVar);
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
 
-#if !defined(POCO_OS_FAMILY_BSD) // on BSD family, stack size is rounded
+#if defined(POCO_OS_FAMILY_BSD) // on BSD family, stack size is rounded
 	#ifdef PTHREAD_STACK_MIN
 		assertTrue (PTHREAD_STACK_MIN == thread.getStackSize());
 	#else
@@ -448,17 +497,22 @@ void ThreadTest::testThreadStackSize()
 	#endif
 #endif
 
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
-
-	thread.setStackSize(0);
-	assertTrue (0 == thread.getStackSize());
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+// disabled on FreeBSD; segfaults due to stack overflow,
+// possibly happens on other BSD OSes)
+#if (POCO_OS == POCO_OS_FREE_BSD)
+	{
+		int tmp = MyRunnable::_staticVar;
+		thread.start(freeFunc, &tmp);
+		thread.join();
+		assertTrue (tmp * 2 == MyRunnable::_staticVar);
+		thread.setStackSize(0);
+		assertTrue (0 == thread.getStackSize());
+		tmp = MyRunnable::_staticVar;
+		thread.start(freeFunc, &tmp);
+		thread.join();
+		assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	}
+#endif
 }
 
 
@@ -505,6 +559,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testNamedThread);
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
+	CppUnit_addTest(pSuite, ThreadTest, testTryJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotRun);

@@ -131,12 +131,12 @@ class Foundation_API VarHolder
 	/// throw BadCastException.
 {
 public:
-	typedef Var ArrayValueType;
+	using ArrayValueType = Var;
 
 	virtual ~VarHolder();
 		/// Destroys the VarHolder.
 
-	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = 0) const = 0;
+	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
 		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
 		/// If small object optimization is enabled (i.e. if
@@ -323,9 +323,9 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if_t<(std::is_integral_v<F> && std::is_signed_v<F>) ||
+		std::enable_if_t<(std::is_integral_v<F> && std::is_signed_v<F>) ||
 			std::is_floating_point_v<F>, F>* = nullptr,
-		typename std::enable_if_t<(std::is_integral_v<T> && std::is_signed_v<T>) ||
+		std::enable_if_t<(std::is_integral_v<T> && std::is_signed_v<T>) ||
 			std::is_floating_point_v<F>, T>* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts signed integral, as well as floating-point, values from
@@ -344,8 +344,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<T>, F>* = nullptr,
-		typename std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
+		std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<T>, F>* = nullptr,
+		std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts signed integral values from integral to floating-point type. Checks for
 		/// the loss of precision and if from value is within limits of type T (i.e. check calls do not throw),
@@ -357,8 +357,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if_t<std::is_same_v<F, bool>>* = nullptr,
-		typename std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
+		std::enable_if_t<std::is_same_v<F, bool>>* = nullptr,
+		std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
 	static void convertToSmaller(const F& from, T& to)
 		/// Converts boolean values to floating-point type.
 	{
@@ -366,8 +366,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
-		typename std::enable_if_t<(std::is_integral_v<T> && !std::is_signed_v<T>) || std::is_floating_point_v<T>, T>* = nullptr>
+		std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
+		std::enable_if_t<(std::is_integral_v<T> && !std::is_signed<T>::value) || std::is_floating_point<T>::value, T>* = nullptr>
 	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// Converts unsigned integral data types from larger to smaller, as well as to floating-point, types.
 		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked, thus
@@ -380,8 +380,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<F>, F>* = nullptr,
-		typename std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
+		std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<F>, F>* = nullptr,
+		std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
 	static void convertSignedToUnsigned(const F& from, T& to)
 		/// Converts signed integral data types to unsigned data types.
 		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
@@ -394,7 +394,7 @@ protected:
 	}
 
 	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true,
-		typename std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
+		std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
 	static void convertSignedFloatToUnsigned(const F& from, T& to)
 		/// Converts floating point data types to unsigned integral data types. Negative values
 		/// can not be converted and if one is encountered, RangeException is thrown.
@@ -407,8 +407,8 @@ protected:
 	}
 
 	template <typename F, typename T,
-		typename std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
-		typename std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>* = nullptr>
+		std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
+		std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>* = nullptr>
 	static void convertUnsignedToSigned(const F& from, T& to)
 		/// Converts unsigned integral data types to signed integral data types.
 		/// If upper limit is within the target data type limits, the conversion is performed.
@@ -4693,10 +4693,10 @@ private:
 };
 
 
-typedef std::vector<Var> Vector;
-typedef std::deque<Var>  Deque;
-typedef std::list<Var>   List;
-typedef Vector           Array;
+using Vector = std::vector<Var>;
+using Deque = std::deque<Var>;
+using List = std::list<Var>;
+using Array = Vector;
 
 
 } } // namespace Poco::Dynamic

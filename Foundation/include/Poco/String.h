@@ -763,6 +763,18 @@ struct CILess
 };
 
 
+template <typename T>
+void secureClear(T& str)
+	/// Securely clears a string's contents by first overwriting
+	/// the entire buffer (up to capacity) with zeroes, then
+	/// clearing the string.
+{
+	str.resize(str.capacity());
+	std::fill(str.begin(), str.end(), typename T::value_type());
+	str.clear();
+}
+
+
 } // namespace Poco
 
 #if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))

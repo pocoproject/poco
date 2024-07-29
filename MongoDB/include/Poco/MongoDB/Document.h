@@ -108,7 +108,7 @@ public:
 		/// Returns true if the document has an element with the given name.
 
 	template<typename T>
-	T get(const std::string& name) const
+	const T& get(const std::string& name) const
 		/// Returns the element with the given name and tries to convert
 		/// it to the template type. When the element is not found, a
 		/// NotFoundException will be thrown. When the element can't be
@@ -123,7 +123,7 @@ public:
 		{
 			if (ElementTraits<T>::TypeId == element->type())
 			{
-				ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
+				auto* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
 				if (concrete != 0)
 				{
 					return concrete->value();
@@ -134,7 +134,7 @@ public:
 	}
 
 	template<typename T>
-	T get(const std::string& name, const T& def) const
+	const T& get(const std::string& name, const T& def) const
 		/// Returns the element with the given name and tries to convert
 		/// it to the template type. When the element is not found, or
 		/// has the wrong type, the def argument will be returned.
@@ -147,7 +147,7 @@ public:
 
 		if (ElementTraits<T>::TypeId == element->type())
 		{
-			ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
+			auto* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
 			if (concrete != 0)
 			{
 				return concrete->value();
@@ -232,9 +232,9 @@ inline bool Document::empty() const
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	for (const auto & _element : _elements)
 	{
-		keys.push_back((*it)->name());
+		keys.push_back(_element->name());
 	}
 }
 

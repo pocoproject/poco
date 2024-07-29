@@ -37,7 +37,7 @@ public:
 
 	void testStoredProcedure();
 	void testStoredProcedureAny();
-	void testStoredProcedureDynamicAny();
+	void testStoredProcedureDynamicVar();
 	void testStoredFunction();
 
 	static CppUnit::Test* suite();

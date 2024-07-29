@@ -113,7 +113,12 @@ function InvokeProgenSamples
 			Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 			$sampleProgenPath = "$($poco_base)\$($componentDir)\samples\$($sampleName)\$($_)"
 		}
-		InvokeProcess $progenPath "/tool=vs$vs $sampleProgenPath"
+		if (Test-Path -Path $sampleProgenPath) {
+			InvokeProcess $progenPath "/tool=vs$vs $sampleProgenPath"
+		}
+		else {
+			Write-Host "NOTICE: No .progen file for $sampleName"
+		}
 	}
 }
 
@@ -151,7 +156,7 @@ function InvokeProgenComponents([string] $type)
 				$componentsArray += $_.Trim()
 		}
 
-		if ($omitArray -NotContains $component -and (-not ($component -Contains "Foundation")) -and (($componentsArray -Contains $component) -or ($components -eq '')))
+		if ($omitArray -NotContains $component -and ((-not ($component -Contains "Foundation")) -or ($type -eq "sample")) -and (($componentsArray -Contains $component) -or ($components -eq '')))
 		{
 			if($type -eq "lib") {
 				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -161,19 +166,27 @@ function InvokeProgenComponents([string] $type)
 				InvokeProcess $progenPath "/tool=vs$vs $componentProgenPath"
 			}
 			ElseIf ($tests -and ($type -eq "test")) {
-				$componentTestProgenPath = "$poco_base\$componentDir\testsuite\TestSuite.Progen"
-				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-				Write-Host "| Running Progen for $componentDir\testsuite"
-				Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-				InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
+				if (Test-Path -Path "$poco_base\$componentDir\testsuite") {
+					$componentTestProgenPath = "$poco_base\$componentDir\testsuite\TestSuite.Progen"
+					if (Test-Path -Path $componentTestProgenPath) {
+						Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+						Write-Host "| Running Progen for $componentDir\testsuite"
+						Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+						InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
 
-				if ($component -eq "Data") # special case for Data
-				{
-					$componentTestProgenPath = "$poco_base\$componentDir\DataTest\DataTest.progen"
-					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					Write-Host "| Running Progen for $componentDir\DataTest"
-					Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
+						if ($component -eq "Data") # special case for Data
+						{
+							$componentTestProgenPath = "$poco_base\$componentDir\DataTest\DataTest.progen"
+							Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+							Write-Host "| Running Progen for $componentDir\DataTest"
+							Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+							InvokeProcess $progenPath "/tool=vs$vs $componentTestProgenPath"
+
+						}
+					}
+					Else {
+						Write-Host "NOTICE: Missing .progen file for $componentDir\testsuite"
+					}
 				}
 			}
 			ElseIf ($samples -and ($type -eq "sample")) {

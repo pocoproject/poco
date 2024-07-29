@@ -24,9 +24,9 @@ public:
 	TextTestResult(std::ostream& ostr);
 	TextTestResult(std::ostream& ostr, const std::string& ignore);
 
-	virtual void addError(Test* test, CppUnitException* e);
-	virtual void addFailure(Test* test, CppUnitException* e);
-	virtual void startTest(Test* test);
+	void addError(Test* test, CppUnitException* e) override;
+	void addFailure(Test* test, CppUnitException* e) override;
+	void startTest(Test* test) override;
 	virtual void print(std::ostream& stream);
 	virtual void printErrors(std::ostream& stream);
 	virtual void printFailures(std::ostream& stream);

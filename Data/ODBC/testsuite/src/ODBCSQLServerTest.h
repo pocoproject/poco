@@ -47,13 +47,15 @@ public:
 	void testTempTable();
 
 	void testBLOB();
+	void testBigString();
+	void testBigBatch();
 	void testNull();
 	void testBulk();
 
 	void testStoredProcedure();
 	void testCursorStoredProcedure();
 	void testStoredProcedureAny();
-	void testStoredProcedureDynamicAny();
+	void testStoredProcedureDynamicVar();
 
 	void testStoredProcedureReturn();
 	void testStoredFunction();
@@ -65,6 +67,7 @@ private:
 	void recreateNullableTable();
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonBigStringTable();
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable() { /* no-op */ };
 	void recreatePersonTimeTable() { /* no-op */ };

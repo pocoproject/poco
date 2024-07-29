@@ -147,7 +147,7 @@ private:
 		try { TU POCO_UNUSED i; i = dMin.convert<TU>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 
-		if(sizeof(TS) == sizeof(TU))
+		if constexpr (sizeof(TS) == sizeof(TU))
 		{
 			TU iMax = std::numeric_limits<TU>::max();
 			Poco::Dynamic::Var dMax = iMax;

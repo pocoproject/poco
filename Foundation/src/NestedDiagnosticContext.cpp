@@ -53,7 +53,7 @@ void NestedDiagnosticContext::push(const std::string& info)
 }
 
 
-void NestedDiagnosticContext::push(const std::string& info, int line, const char* filename)
+void NestedDiagnosticContext::push(const std::string& info, LineNumber line, const char* filename)
 {
 	Context ctx;
 	ctx.info = info;

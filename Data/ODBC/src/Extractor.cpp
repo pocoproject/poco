@@ -1328,13 +1328,13 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Any>& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
+bool Extractor::extract(std::size_t pos, Poco::Dynamic::Var& val)
 {
 	return extractImpl(pos, val);
 }
 
 
-bool Extractor::extract(std::size_t pos, std::vector<Poco::DynamicAny>& val)
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val)
 {
 	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
@@ -1343,7 +1343,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::DynamicAny>& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, std::deque<Poco::DynamicAny>& val)
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val)
 {
 	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
@@ -1352,7 +1352,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::DynamicAny>& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, std::list<Poco::DynamicAny>& val)
+bool Extractor::extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val)
 {
 	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);

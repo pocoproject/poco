@@ -77,7 +77,7 @@ void CppParserTest::testExtractName()
 	decl = "void func(int arg1, int arg2)";
 	name = Symbol::extractName(decl);
 	assertTrue (name == "func");
-	
+
 	decl = "std::function<bool> func";
 	name = Symbol::extractName(decl);
 	assertTrue (name == "func");

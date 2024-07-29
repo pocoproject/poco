@@ -45,7 +45,7 @@ public:
 		/// Writes a message to the debugger log, if available, otherwise to
 		/// standard error output.
 
-	static void message(const std::string& msg, const char* file, int line);
+	static void message(const std::string& msg, const char* file, LineNumber line);
 		/// Writes a message to the debugger log, if available, otherwise to
 		/// standard error output.
 
@@ -57,10 +57,10 @@ public:
 	static void enter(const std::string& msg);
 		/// Writes a debug message to the debugger log and breaks into it.
 
-	static void enter(const std::string& msg, const char* file, int line);
+	static void enter(const std::string& msg, const char* file, LineNumber line);
 		/// Writes a debug message to the debugger log and breaks into it.
 
-	static void enter(const char* file, int line);
+	static void enter(const char* file, LineNumber line);
 		/// Writes a debug message to the debugger log and breaks into it.
 
 	static constexpr std::string_view sourceFile(const std::string_view& fileName)

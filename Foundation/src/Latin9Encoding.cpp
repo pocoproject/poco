@@ -97,17 +97,20 @@ int Latin9Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes = ch;
 		return 1;
 	}
-	else switch (ch)
+	else
 	{
-	case 0x0152: if (bytes && length >= 1) *bytes = 0xbc; return 1;
-	case 0x0153: if (bytes && length >= 1) *bytes = 0xbd; return 1;
-	case 0x0160: if (bytes && length >= 1) *bytes = 0xa6; return 1;
-	case 0x0161: if (bytes && length >= 1) *bytes = 0xa8; return 1;
-	case 0x017d: if (bytes && length >= 1) *bytes = 0xb4; return 1;
-	case 0x017e: if (bytes && length >= 1) *bytes = 0xb8; return 1;
-	case 0x0178: if (bytes && length >= 1) *bytes = 0xbe; return 1;
-	case 0x20ac: if (bytes && length >= 1) *bytes = 0xa4; return 1;
-	default: return 0;
+		switch (ch)
+		{
+			case 0x0152: if (bytes && length >= 1) *bytes = 0xbc; return 1;
+			case 0x0153: if (bytes && length >= 1) *bytes = 0xbd; return 1;
+			case 0x0160: if (bytes && length >= 1) *bytes = 0xa6; return 1;
+			case 0x0161: if (bytes && length >= 1) *bytes = 0xa8; return 1;
+			case 0x017d: if (bytes && length >= 1) *bytes = 0xb4; return 1;
+			case 0x017e: if (bytes && length >= 1) *bytes = 0xb8; return 1;
+			case 0x0178: if (bytes && length >= 1) *bytes = 0xbe; return 1;
+			case 0x20ac: if (bytes && length >= 1) *bytes = 0xa4; return 1;
+			default: return 0;
+		}
 	}
 }
 

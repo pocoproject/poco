@@ -26,6 +26,8 @@
 namespace Poco {
 namespace MongoDB {
 
+//class [[deprecated]] QueryRequest;
+class QueryRequest;
 
 class MongoDB_API QueryRequest: public RequestMessage
 	/// A request to query documents in a MongoDB database

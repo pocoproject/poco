@@ -21,7 +21,6 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Template.h"
 #include "Poco/Path.h"
-#include "Poco/SharedPtr.h"
 #include "Poco/Logger.h"
 #include <vector>
 #include <map>

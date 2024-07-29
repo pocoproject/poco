@@ -26,6 +26,8 @@
 namespace Poco {
 namespace MongoDB {
 
+//class [[deprecated]] RequestMessage;
+class RequestMessage;
 
 class MongoDB_API RequestMessage: public Message
 	/// Base class for a request sent to the MongoDB server.

@@ -37,9 +37,7 @@ Query::Query(const Var& source): _source(source)
 }
 
 
-Query::~Query()
-{
-}
+Query::~Query() = default;
 
 
 Object::Ptr Query::findObject(const std::string& path) const
@@ -51,7 +49,7 @@ Object::Ptr Query::findObject(const std::string& path) const
 	else if (result.type() == typeid(Object))
 		return new Object(result.extract<Object>());
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -79,7 +77,7 @@ Array::Ptr Query::findArray(const std::string& path) const
 	else if (result.type() == typeid(Array))
 		return new Array(result.extract<Array>());
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -144,13 +142,13 @@ Var Query::find(const std::string& path) const
 					result = o.get(name);
 					found = true;
 				}
-				else result.empty();
+				else result.clear();
 
 			}
 
 			if (!result.isEmpty() && !indexes.empty())
 			{
-				for (auto i: indexes)
+				for (const auto& i: indexes)
 				{
 					if (result.type() == typeid(Array::Ptr))
 					{
@@ -168,7 +166,7 @@ Var Query::find(const std::string& path) const
 			}
 		}
 	}
-	if (!found) result.empty();
+	if (!found) result.clear();
 	return result;
 }
 

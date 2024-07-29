@@ -13,6 +13,7 @@
 
 
 #include "Poco/MongoDB/Database.h"
+#include "Poco/Base64Encoder.h"
 #include "Poco/MongoDB/Binary.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"

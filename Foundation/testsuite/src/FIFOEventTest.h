@@ -13,6 +13,7 @@
 #ifndef FIFOEventTest_INCLUDED
 #define FIFOEventTest_INCLUDED
 
+#if defined(POCO_TEST_DEPRECATED)
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
@@ -68,5 +69,6 @@ private:
 	std::atomic<Poco::Int64> _count;
 };
 
+#endif
 
 #endif // FIFOEventTest_INCLUDED

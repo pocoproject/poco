@@ -2,67 +2,67 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{c111f2b8-0fe5-45cf-bcf5-6717f913f4d1}</UniqueIdentifier>
+      <UniqueIdentifier>{a99a8840-8abb-4ead-b884-e9448b217938}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{a429278e-282a-48ad-a6e9-4673ad994ef6}</UniqueIdentifier>
+      <UniqueIdentifier>{07ed166c-bff5-472f-ae5a-0bbf4bca23a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{34cb5ff3-8959-4b44-b06a-6a371e903043}</UniqueIdentifier>
+      <UniqueIdentifier>{0a3369a4-0535-4016-a241-3f8a35f9dde1}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{56b9dadb-359a-44e8-af9d-67dd5d8cadd2}</UniqueIdentifier>
+      <UniqueIdentifier>{4720c5de-1df4-4868-97b0-85dadbf54ae0}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{d775c737-421f-45a3-ba6e-a47034ca0c93}</UniqueIdentifier>
+      <UniqueIdentifier>{3d34c960-25c4-415d-9fdc-47a26158cd3b}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{c282924f-b59d-4fee-b202-c6c567572666}</UniqueIdentifier>
+      <UniqueIdentifier>{3ecd6aa2-6f21-45a2-b228-585e93a5ee54}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser">
-      <UniqueIdentifier>{fcca3d29-3bf5-47f1-be8a-2fe1a0773a9e}</UniqueIdentifier>
+      <UniqueIdentifier>{693a3aab-c204-4bfc-99c7-835095ad71c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\Header Files">
-      <UniqueIdentifier>{ce5fcae6-0135-4453-9d16-acf8ce133fff}</UniqueIdentifier>
+      <UniqueIdentifier>{c444424e-b19c-4470-9e6d-d762b4afd387}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\Source Files">
-      <UniqueIdentifier>{51152c9c-3e67-47f2-965d-4f8b5528df0f}</UniqueIdentifier>
+      <UniqueIdentifier>{7f620fc7-4c53-4d38-9a13-949a0bfe6a0d}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\parser">
-      <UniqueIdentifier>{6886ee17-8a9c-4cf4-820f-cd96ed915c74}</UniqueIdentifier>
+      <UniqueIdentifier>{2a8d714e-2399-415e-8997-ec2e0cb32857}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\parser\Header Files">
-      <UniqueIdentifier>{4c76e1c2-dbd6-4090-9c9f-d09fcc8521c4}</UniqueIdentifier>
+      <UniqueIdentifier>{fbb9a005-c715-4a69-8beb-78ba9e6dd66e}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\parser\Source Files">
-      <UniqueIdentifier>{85d4c9a3-827b-450b-a4f0-56db8cf5da12}</UniqueIdentifier>
+      <UniqueIdentifier>{5e3877cb-2d0e-4bdf-a442-3e0b01a8f636}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\sql">
-      <UniqueIdentifier>{903ed189-9ddf-44c6-b600-ea212371ea3c}</UniqueIdentifier>
+      <UniqueIdentifier>{7ee7ed4e-9d9d-4ee8-a78f-85afdba1cb56}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\sql\Header Files">
-      <UniqueIdentifier>{b2f5f062-3106-4301-8e49-7b242ae66efe}</UniqueIdentifier>
+      <UniqueIdentifier>{a0f79fdf-3eba-4b6f-aa28-f5674b3958f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\sql\Source Files">
-      <UniqueIdentifier>{2dda7dbb-8a31-4869-87d3-374c7effd007}</UniqueIdentifier>
+      <UniqueIdentifier>{e6b4b310-43aa-4cb7-9b76-99fe989f8b3b}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\util">
-      <UniqueIdentifier>{574a99ce-a7ea-4221-bdcb-318456d50f0e}</UniqueIdentifier>
+      <UniqueIdentifier>{166811fe-bbdd-48d6-8d0d-2b65790ca667}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\util\Header Files">
-      <UniqueIdentifier>{e07a89d7-c43c-425f-8bb0-eec2ef4c5763}</UniqueIdentifier>
+      <UniqueIdentifier>{86ae6af4-a272-46df-ba81-3efd821de785}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\util\Source Files">
-      <UniqueIdentifier>{c9455486-7d6c-4732-a11f-513a24cb954e}</UniqueIdentifier>
+      <UniqueIdentifier>{19fcc5b0-d962-4d7d-8143-5b23fd56e47d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{6d03dc65-89e5-4dac-a6be-0ad2e761adc1}</UniqueIdentifier>
+      <UniqueIdentifier>{e5daf827-3d59-4831-a6d6-32561c72816d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{2fc9ede0-fc29-4e59-ba50-a587575c2cc2}</UniqueIdentifier>
+      <UniqueIdentifier>{6b600afe-6a9f-41c5-9d4b-026152a0235f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{b5c53c80-25ce-4a87-8634-2808040e62ab}</UniqueIdentifier>
+      <UniqueIdentifier>{b0f57e4a-5a7f-4c32-9f16-e29c3a73be40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -180,9 +180,6 @@
     <ClInclude Include="include\Poco\Data\SimpleRowFormatter.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\Data\SQLChannel.h">
-      <Filter>DataCore\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\Data\SQLParser.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
@@ -297,6 +294,9 @@
     <ClInclude Include="include\Poco\Data\ArchiveStrategy.h">
       <Filter>Logging\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\SQLChannel.h">
+      <Filter>Logging\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AbstractBinder.cpp">
@@ -374,9 +374,6 @@
     <ClCompile Include="src\SimpleRowFormatter.cpp">
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SQLChannel.cpp">
-      <Filter>DataCore\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Statement.cpp">
       <Filter>DataCore\Source Files</Filter>
     </ClCompile>
@@ -438,6 +435,9 @@
       <Filter>SQLParser\util\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ArchiveStrategy.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SQLChannel.cpp">
       <Filter>Logging\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

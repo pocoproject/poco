@@ -133,7 +133,7 @@ private:
 	void getIndexes(std::string& name, std::vector<int>& indexes);
 
 
-	void setValue(const std::string& key, const Poco::DynamicAny& value);
+	void setValue(const std::string& key, const Poco::Dynamic::Var& value);
 
 
  	JSON::Object::Ptr _object;

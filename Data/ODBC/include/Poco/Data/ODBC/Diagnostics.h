@@ -33,6 +33,10 @@ namespace ODBC {
 
 
 template <typename H, SQLSMALLINT handleType>
+class Error;
+
+
+template <typename H, SQLSMALLINT handleType>
 class Diagnostics
 	/// Utility class providing functionality for retrieving ODBC diagnostic
 	/// records. Diagnostics object must be created with corresponding handle
@@ -41,10 +45,10 @@ class Diagnostics
 {
 public:
 
-	static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
-	static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
-	static const unsigned int SQL_NAME_LENGTH = 128;
-	static const std::string  DATA_TRUNCATED;
+	inline static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
+	inline static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
+	inline static const unsigned int SQL_NAME_LENGTH = 128;
+	inline static const std::string  DATA_TRUNCATED;
 
 	struct DiagnosticFields
 	{
@@ -213,6 +217,12 @@ public:
 		return *this;
 	}
 
+protected:
+	const H& handle() const
+	{
+		return _handle;
+	}
+
 private:
 
 	Diagnostics();
@@ -226,13 +236,22 @@ private:
 
 	/// Context handle
 	const H& _handle;
+
+	friend class Error<H, handleType>;
 };
 
 
-typedef Diagnostics<SQLHENV, SQL_HANDLE_ENV> EnvironmentDiagnostics;
-typedef Diagnostics<SQLHDBC, SQL_HANDLE_DBC> ConnectionDiagnostics;
-typedef Diagnostics<SQLHSTMT, SQL_HANDLE_STMT> StatementDiagnostics;
-typedef Diagnostics<SQLHDESC, SQL_HANDLE_DESC> DescriptorDiagnostics;
+// explicit instantiation definition
+template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+template class Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+template class Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+
+
+using EnvironmentDiagnostics = Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+using ConnectionDiagnostics = Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+using StatementDiagnostics = Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+using DescriptorDiagnostics = Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
 
 
 } } } // namespace Poco::Data::ODBC
