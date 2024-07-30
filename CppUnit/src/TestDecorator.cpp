@@ -15,9 +15,7 @@ TestDecorator::TestDecorator(Test* test)
 }
 
 
-TestDecorator::~TestDecorator()
-{
-}
+TestDecorator::~TestDecorator() = default;
 
 
 int TestDecorator::countTestCases() const

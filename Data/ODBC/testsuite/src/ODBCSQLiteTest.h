@@ -28,29 +28,29 @@ class ODBCSQLiteTest: public ODBCTest
 {
 public:
 	ODBCSQLiteTest(const std::string& name);
-	~ODBCSQLiteTest();
+	~ODBCSQLiteTest() override;
 
-	void testBareboneODBC();
-	void testAffectedRows();
-	void testNull();
+	void testBareboneODBC() override;
+	void testAffectedRows() override;
+	void testNull() override;
 
 	static CppUnit::Test* suite();
 
 private:
-	void dropObject(const std::string& type, const std::string& name);
-	void recreateNullableTable();
-	void recreatePersonTable();
-	void recreatePersonBLOBTable();
-	void recreatePersonDateTimeTable();
-	void recreateStringsTable();
-	void recreateIntsTable();
-	void recreateFloatsTable();
-	void recreateTuplesTable();
-	void recreateVectorsTable();
-	void recreateAnysTable();
-	void recreateNullsTable(const std::string& notNull = "");
-	void recreateMiscTable();
-	void recreateLogTable();
+	void dropObject(const std::string& type, const std::string& name) override;
+	void recreateNullableTable() override;
+	void recreatePersonTable() override;
+	void recreatePersonBLOBTable() override;
+	void recreatePersonDateTimeTable() override;
+	void recreateStringsTable() override;
+	void recreateIntsTable() override;
+	void recreateFloatsTable() override;
+	void recreateTuplesTable() override;
+	void recreateVectorsTable() override;
+	void recreateAnysTable() override;
+	void recreateNullsTable(const std::string& notNull = "") override;
+	void recreateMiscTable() override;
+	void recreateLogTable() override;
 
 	static ODBCTest::SessionPtr _pSession;
 	static ODBCTest::ExecPtr    _pExecutor;

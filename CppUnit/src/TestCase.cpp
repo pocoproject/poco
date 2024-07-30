@@ -4,7 +4,7 @@
 
 
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestResult.h"
 #include "CppUnit/estring.h"
@@ -117,7 +117,7 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 	}
 	catch (CppUnitException& e)
 	{
-		CppUnitException* copy = new CppUnitException(e);
+		auto* copy = new CppUnitException(e);
 		result->addFailure(this, copy);
 	}
 	catch (std::exception& e)
@@ -128,7 +128,7 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 	}
 	catch (...)
 	{
-		CppUnitException *e = new CppUnitException ("unknown exception");
+		auto* e = new CppUnitException ("unknown exception");
 		result->addError (this, e);
 	}
 	tearDown ();

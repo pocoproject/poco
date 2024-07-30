@@ -13,7 +13,6 @@
 #include "CppUnit/TestResult.h"
 #include "CppUnit/CppUnitException.h"
 #include <string>
-#include <utility>
 #include <vector>
 #include <typeinfo>
 

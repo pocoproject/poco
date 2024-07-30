@@ -40,51 +40,51 @@ class ODBCSQLServerTest: public ODBCTest
 {
 public:
 	ODBCSQLServerTest(const std::string& name);
-	~ODBCSQLServerTest();
+	~ODBCSQLServerTest() override;
 
-	void testBareboneODBC();
+	void testBareboneODBC() override;
 
-	void testTempTable();
+	void testTempTable() override;
 
-	void testBLOB();
+	void testBLOB() override;
 	void testBigString();
 	void testBigBatch();
-	void testNull();
-	void testBulk();
+	void testNull() override;
+	void testBulk() override;
 
-	void testStoredProcedure();
+	void testStoredProcedure() override;
 	void testCursorStoredProcedure();
-	void testStoredProcedureAny();
-	void testStoredProcedureDynamicVar();
+	void testStoredProcedureAny() override;
+	void testStoredProcedureDynamicVar() override;
 
 	void testStoredProcedureReturn();
-	void testStoredFunction();
+	void testStoredFunction() override;
 
 	static CppUnit::Test* suite();
 
 private:
-	void dropObject(const std::string& type, const std::string& name);
-	void recreateNullableTable();
-	void recreatePersonTable();
-	void recreatePersonBLOBTable();
+	void dropObject(const std::string& type, const std::string& name) override;
+	void recreateNullableTable() override;
+	void recreatePersonTable() override;
+	void recreatePersonBLOBTable() override;
 	void recreatePersonBigStringTable();
-	void recreatePersonDateTimeTable();
-	void recreatePersonDateTable() { /* no-op */ };
-	void recreatePersonTimeTable() { /* no-op */ };
-	void recreateStringsTable();
-	void recreateIntsTable();
-	void recreateFloatsTable();
-	void recreateUUIDsTable();
-	void recreateTuplesTable();
+	void recreatePersonDateTimeTable() override;
+	void recreatePersonDateTable() override { /* no-op */ };
+	void recreatePersonTimeTable() override { /* no-op */ };
+	void recreateStringsTable() override;
+	void recreateIntsTable() override;
+	void recreateFloatsTable() override;
+	void recreateUUIDsTable() override;
+	void recreateTuplesTable() override;
 	void recreateVectorTable();
-	void recreateVectorsTable();
-	void recreateAnysTable();
-	void recreateNullsTable(const std::string& notNull = "");
-	void recreateBoolTable();
-	void recreateMiscTable();
-	void recreateLogTable();
-	void recreateUnicodeTable();
-	void recreateEncodingTables();
+	void recreateVectorsTable() override;
+	void recreateAnysTable() override;
+	void recreateNullsTable(const std::string& notNull = "") override;
+	void recreateBoolTable() override;
+	void recreateMiscTable() override;
+	void recreateLogTable() override;
+	void recreateUnicodeTable() override;
+	void recreateEncodingTables() override;
 
 	static SessionPtr  _pSession;
 	static SessionPtr  _pEncSession;

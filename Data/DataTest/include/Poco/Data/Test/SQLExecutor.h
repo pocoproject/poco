@@ -14,15 +14,13 @@
 #define DataTest_SQLExecutor_INCLUDED
 
 
+#include "CppUnit/TestCase.h"
 #include "Poco/Data/Test/DataTest.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
-#include <string_view>
 
 
 namespace Poco {
@@ -55,7 +53,7 @@ public:
 	};
 
 	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = nullptr, bool numberedPlaceHolders = false);
-	~SQLExecutor();
+	~SQLExecutor() override;
 
 	template <typename C>
 	void connection(C& c, const std::string& connectString)
