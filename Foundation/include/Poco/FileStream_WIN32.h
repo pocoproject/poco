@@ -25,7 +25,6 @@
 
 namespace Poco {
 
-
 class Foundation_API FileStreamBuf: public BufferedBidirectionalStreamBuf
 	/// This stream buffer handles Fileio
 {
@@ -48,10 +47,16 @@ public:
 		/// Closes the File stream buffer. Returns true if successful,
 		/// false otherwise.
 
-	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out);
+	bool resizeBuffer(std::streamsize bufferSize) override;
+		/// Resizes internal buffer. Minimum size is BUFFER_SIZE.
+		/// Minimum is used when requested size is smaller.
+		/// Buffer can be resized only when the file is not open.
+		/// Returns true if resize succeeded.
+
+	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out) override;
 		/// change position by offset, according to way and mode
 
-	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out);
+	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out) override;
 		/// change to specified position, according to mode
 
 	void flushToDisk();
@@ -69,13 +74,13 @@ protected:
 		BUFFER_SIZE = 4096
 	};
 
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	std::string _path;
 	NativeHandle _handle;
-	UInt64 _pos;
+	UInt64 _pos {0};
 };
 
 
