@@ -32,8 +32,8 @@ const std::string SimpleFileChannel::PROP_FLUSH         = "flush";
 
 SimpleFileChannel::SimpleFileChannel():
 	_limit(0),
-	_flush(true),
-	_pFile(0)
+	_flush(false),
+	_pFile(nullptr)
 {
 }
 
@@ -42,8 +42,8 @@ SimpleFileChannel::SimpleFileChannel(const std::string& path):
 	_path(path),
 	_secondaryPath(path + ".0"),
 	_limit(0),
-	_flush(true),
-	_pFile(0)
+	_flush(false),
+	_pFile(nullptr)
 {
 }
 
@@ -86,7 +86,7 @@ void SimpleFileChannel::close()
 	FastMutex::ScopedLock lock(_mutex);
 
 	delete _pFile;
-	_pFile = 0;
+	_pFile = nullptr;
 }
 
 
@@ -134,7 +134,7 @@ std::string SimpleFileChannel::getProperty(const std::string& name) const
 	else if (name == PROP_ROTATION)
 		return _rotation;
 	else if (name == PROP_FLUSH)
-		return std::string(_flush ? "true" : "false");
+		return (_flush ? "true"s : "false"s);
 	else
 		return Channel::getProperty(name);
 }
