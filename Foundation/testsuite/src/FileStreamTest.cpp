@@ -15,6 +15,8 @@
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/Exception.h"
+#include "Poco/Stopwatch.h"
+#include <iostream>
 
 
 FileStreamTest::FileStreamTest(const std::string& name): CppUnit::TestCase(name)
@@ -336,6 +338,120 @@ void FileStreamTest::testMultiOpen()
 	str.close();
 }
 
+void FileStreamTest::testBufferSize()
+{
+	// Tests correctness of stream operation when buffer is resized.
+	Poco::FileStream str("test.txt", std::ios::out | std::ios::trunc);
+	str << "0123456789\n";
+	str << "abcdefghij\n";
+	str << "klmnopqrst\n";
+
+	// Can't resize buffer when file is open.
+	assertFalse(str.rdbuf()->resizeBuffer(8000));
+	str.close();
+
+	std::string s;
+	assertTrue(str.rdbuf()->resizeBuffer(8000));
+	str.open("test.txt", std::ios::in);
+	std::getline(str, s);
+	assertTrue (s == "0123456789");
+	std::getline(str, s);
+	assertTrue (s == "abcdefghij");
+	str.close();
+
+	assertTrue(str.rdbuf()->resizeBuffer(8000));
+	str.open("test.txt", std::ios::out | std::ios::trunc);
+	str << "0123456789\n";
+	str << "abcdefghij\n";
+	str << "klmnopqrst\n";
+	str.close();
+
+	assertTrue(str.rdbuf()->resizeBuffer(4000));
+	str.open("test.txt", std::ios::in);
+	std::getline(str, s);
+	assertTrue (s == "0123456789");
+	std::getline(str, s);
+	assertTrue (s == "abcdefghij");
+	str.close();
+}
+
+void FileStreamTest::testBufferSizePerformance()
+{
+	Poco::Stopwatch watch;
+
+	// Write with default buffer size
+	Poco::FileStream str("test.txt", std::ios::out | std::ios::trunc);
+	const std::string outStrBuf(150LL*1024LL, '#');
+	watch.start();
+	for (int r{0}; r < 10; r++)
+	{
+		for (int i{0}; i < 4000; i++)
+		{
+			str.write(outStrBuf.data(), outStrBuf.size());
+		}
+		str.seekp(0);
+	}
+	const auto writeDefUs { watch.elapsed() };
+	str.close();
+
+	// Read with default buffer size
+	std::string strBuf(150LL*1024LL, '0');
+	str.open("test.txt", std::ios::in);
+
+	watch.restart();
+	for (int r{0}; r < 10; r++)
+	{
+		for (int i{0}; i < 4000; i++)
+		{
+			str.read(strBuf.data(), strBuf.size());
+		}
+		str.seekg(0);
+	}
+	const auto readDefUs { watch.elapsed() };
+	str.close();
+
+	// Write with increased buffer
+	str.rdbuf()->resizeBuffer(128LL*1024LL);
+
+	str.open("test.txt", std::ios::out | std::ios::trunc);
+	watch.restart();
+	for (int r{0}; r < 10; r++)
+	{
+		for (int i{0}; i < 4000; i++)
+		{
+			str.write(outStrBuf.data(), outStrBuf.size());
+		}
+		str.seekp(0);
+	}
+	const auto writeLargeUs { watch.elapsed() };
+	str.close();
+
+	// Read with increased buffer size
+	str.open("test.txt", std::ios::in);
+	watch.restart();
+	for (int r{0}; r < 10; r++)
+	{
+		for (int i{0}; i < 4000; i++)
+		{
+			str.read(strBuf.data(), strBuf.size());
+		}
+		str.seekg(0);
+	}
+	const auto readLargeUs { watch.elapsed() };
+	str.close();
+
+	watch.stop();
+
+	Poco::File("test.txt").remove();
+
+	std::cout << std::endl;
+	std::cout << "Write (us) default/128k: " << writeDefUs << "/" << writeLargeUs << std::endl;
+	std::cout << "Read  (us) default/128k: " << readDefUs << "/" << readLargeUs << std::endl;
+
+	// Measurements in test environment are not reliable enough.
+	//assertTrue(writeDefUs > writeLargeUs);
+	//assertTrue(readDefUs > readLargeUs);
+}
 
 void FileStreamTest::setUp()
 {
@@ -363,6 +479,8 @@ CppUnit::Test* FileStreamTest::suite()
 	CppUnit_addTest(pSuite, FileStreamTest, testOpenModeApp);
 	CppUnit_addTest(pSuite, FileStreamTest, testSeek);
 	CppUnit_addTest(pSuite, FileStreamTest, testMultiOpen);
+	CppUnit_addTest(pSuite, FileStreamTest, testBufferSize);
+	CppUnit_addTest(pSuite, FileStreamTest, testBufferSizePerformance);
 
 	return pSuite;
 }

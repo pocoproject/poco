@@ -36,6 +36,8 @@ public:
 	void testOpenModeApp();
 	void testSeek();
 	void testMultiOpen();
+	void testBufferSize();
+	void testBufferSizePerformance();
 
 	void setUp();
 	void tearDown();
