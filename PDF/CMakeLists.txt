@@ -17,12 +17,16 @@ else()
 		src/compress.c
 		src/crc32.c
 		src/deflate.c
-		src/gzio.c
-		src/infback.c
-		src/inffast.c
+		src/gzclose.c
+		src/gzlib.c
+		src/gzread.c
+		src/gzwrite.c
 		src/inflate.c
+		src/infback.c
 		src/inftrees.c
+		src/inffast.c
 		src/trees.c
+		src/uncompr.c
 		src/zutil.c
 	)
 endif(POCO_UNBUNDLED)
@@ -94,23 +98,20 @@ POCO_SOURCES(SRCS hpdf
 # with an unbundled version of libpng
 POCO_SOURCES(SRCS libpng
 	src/png.c
-	src/pngerror.c
-	src/pnggccrd.c
-	src/pngget.c
-	src/pngmem.c
-	src/pngpread.c
-	src/pngread.c
-	src/pngrio.c
-	src/pngrtran.c
-	src/pngrutil.c
-	src/pngset.c
-	src/pngtest.c
-	src/pngtrans.c
-	src/pngvcrd.c
-	src/pngwio.c
-	src/pngwrite.c
-	src/pngwtran.c
-	src/pngwutil.c
+    src/pngerror.c
+    src/pngget.c
+    src/pngmem.c
+    src/pngpread.c
+    src/pngread.c
+    src/pngrio.c
+    src/pngrtran.c
+    src/pngrutil.c
+    src/pngset.c
+    src/pngtrans.c
+    src/pngwio.c
+    src/pngwrite.c
+    src/pngwtran.c
+    src/pngwutil.c
 )
 
 # Version Resource
