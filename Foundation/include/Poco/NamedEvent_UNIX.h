@@ -43,6 +43,7 @@ private:
 	sem_t* _sem;
 #else
 	int _semid;  // semaphore id
+	bool _createdId; // semaphore id was created with this instance
 #endif
 };
 
