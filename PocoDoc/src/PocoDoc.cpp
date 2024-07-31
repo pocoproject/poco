@@ -233,7 +233,7 @@ protected:
 			for (StringTokenizer::Iterator itg = excTokenizer.begin(); itg != excTokenizer.end(); ++itg)
 			{
 				Glob glob(*itg);
-				if (glob.match(p.getFileName()))
+				if (glob.match(p.getFileName()) || glob.match(p.toString()))
 					include = false;
 			}
 			if (include)
@@ -321,11 +321,6 @@ protected:
 				logger().log(exc);
 				++errors;
 			}
-			catch (std::exception& exc)
-			{
-				logger().error(std::string(exc.what()));
-				++errors;
-			}
 		}
 		return errors;
 	}
@@ -351,7 +346,23 @@ protected:
 		File file(path);
 		file.createDirectories();
 
-		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC);
+		bool searchIndex = false;
+
+		if (config().getBool("PocoDoc.searchIndex", false))
+		{
+#if defined(POCO_ENABLE_SQLITE_FTS5)
+			std::string dbDirectory = path.toString() + DocWriter::DATABASE_DIR;
+			Path dbPath(dbDirectory);
+			dbPath.makeDirectory();
+			File dbFile(dbPath);
+			dbFile.createDirectories();
+			searchIndex = true;
+#else
+			logger().error("FTS5 is not enabled, search is not supported");
+#endif
+		}
+
+		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC, searchIndex);
 
 		if (config().hasProperty("PocoDoc.pages"))
 		{

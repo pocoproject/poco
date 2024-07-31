@@ -42,7 +42,7 @@ class DocWriter
 	/// to a directory.
 {
 public:
-	DocWriter(const Poco::CppParser::NameSpace::SymbolTable& symbols, const std::string& path, bool prettifyCode = true, bool noFrames = false);
+	DocWriter(const Poco::CppParser::NameSpace::SymbolTable& symbols, const std::string& path, bool prettifyCode = true, bool noFrames = false, bool searchIndex = false);
 		/// Creates the DocWriter.
 
 	~DocWriter();
@@ -56,6 +56,9 @@ public:
 
 	void addPage(const std::string& path);
 		/// Adds a page.
+	
+	static const std::string DATABASE_DIR;
+	static const std::string DATABASE_NAME;
 
 protected:
 	enum TextState
@@ -100,6 +103,10 @@ protected:
 	typedef std::map<std::string, std::string> StringMap;
 	typedef std::map<std::string, Page> PageMap;
 
+	void initDatabase();
+	void writeSearchIndex(std::string link, std::string content);
+	static void writeSearchBox(std::ostream& ostr);
+	
 	void writePages();
 	void writePage(Page& page);
 	void scanTOC(const std::string& text, TOC& toc);
@@ -134,18 +141,18 @@ protected:
 	static void endBody(std::ostream& ostr);
 	static void beginContent(std::ostream& ostr);
 	static void endContent(std::ostream& ostr);
-	void writeDescription(std::ostream& ostr, const std::string& text);
-	void writeDescriptionLine(std::ostream& ostr, const std::string& text, TextState& state);
+	void writeDescription(std::ostream& ostr, const std::string& text, std::ostream* pSstr = nullptr);
+	void writeDescriptionLine(std::ostream& ostr, const std::string& text, TextState& state, std::ostream* pSstr = nullptr);
 	void writeSummary(std::ostream& ostr, const std::string& text, const std::string& uri);
 	static std::string htmlize(const std::string& str);
 	static std::string htmlize(char c);
 	static TextState analyzeLine(const std::string& line);
 	static std::string htmlizeName(const std::string& name);
-	void writeText(std::ostream& ostr, const std::string& text);
-	void writeText(std::ostream& ostr, std::string::const_iterator begin, const std::string::const_iterator& end);
+	void writeText(std::ostream& ostr, const std::string& text, std::ostream* pSstr = nullptr);
+	void writeText(std::ostream& ostr, std::string::const_iterator begin, const std::string::const_iterator& end, std::ostream* pSstr = nullptr);
 	void writeDecl(std::ostream& ostr, const std::string& decl);
 	void writeDecl(std::ostream& ostr, std::string::const_iterator begin, const std::string::const_iterator& end);
-	bool writeSymbol(std::ostream& ostr, std::string& token, std::string::const_iterator& begin, const std::string::const_iterator& end);
+	bool writeSymbol(std::ostream& ostr, std::string& token, std::string::const_iterator& begin, const std::string::const_iterator& end, std::ostream* pSstr = nullptr);
 	bool writeSpecial(std::ostream& ostr, std::string& token, std::string::const_iterator& begin, const std::string::const_iterator& end);
 	void nextToken(std::string::const_iterator& it, const std::string::const_iterator& end, std::string& token);
 	void writeListItem(std::ostream& ostr, const std::string& text);
@@ -155,31 +162,31 @@ protected:
 	void writeInheritance(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeMethodSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeNestedClasses(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
-	void writeNameSpacesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeNameSpaces(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeClassesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
+	void writeNameSpacesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeNameSpaces(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeClassesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeClassSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
-	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType);
-	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum);
+	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType, std::ostream* pSstr = nullptr);
+	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum, std::ostream* pSstr);
 	void writeConstructors(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeDestructor(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeMethods(std::ostream& ostr, const Poco::CppParser::Struct* pNameSpace);
-	void writeFunctionsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeFunctions(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeFunction(std::ostream& ostr, const Poco::CppParser::Function* pFunc);
-	void writeVariables(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
-	void writeVariable(std::ostream& ostr, const Poco::CppParser::Variable* pVar);
+	void writeFunctionsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeFunctions(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeFunction(std::ostream& ostr, const Poco::CppParser::Function* pFunc, std::ostream* pSstr = nullptr);
+	void writeVariables(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeVariable(std::ostream& ostr, const Poco::CppParser::Variable* pVar, std::ostream* pSstr = nullptr);
 	static void writeNameListItem(std::ostream& ostr, const std::string& name, const Poco::CppParser::Symbol* pSymbol, const Poco::CppParser::NameSpace* pNameSpace, bool& first);
 	static void writeLink(std::ostream& ostr, const std::string& uri, const std::string& text);
-	static void writeLink(std::ostream& ostr, const Poco::CppParser::Symbol* pSymbol, const std::string& text);
+	static void writeLink(std::ostream& ostr, const Poco::CppParser::Symbol* pSymbol, const std::string& text, std::ostream* pSstr = nullptr);
 	static void writeLink(std::ostream& ostr, const std::string& uri, const std::string& text, const std::string& linkClass);
-	void writeTargetLink(std::ostream& ostr, const std::string& uri, const std::string& text, const std::string& target);
+	void writeTargetLink(std::ostream& ostr, const std::string& uri, const std::string& text, const std::string& target, std::ostream* pSstr = nullptr);
 	static void writeImageLink(std::ostream& ostr, const std::string& uri, const std::string& image, const std::string& alt);
 	static void writeImage(std::ostream& ostr, const std::string& uri, const std::string& caption);
 	static void writeIcon(std::ostream& ostr, const std::string& icon);
@@ -212,6 +219,7 @@ private:
 	bool _pendingLine;
 	int  _indent;
 	int  _titleId;
+	bool _searchIndex;
 
 	static std::string _language;
 	static StringMap   _strings;
