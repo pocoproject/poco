@@ -41,16 +41,19 @@ class Foundation_API ActiveThreadPool
 	/// The thread pool always keeps fixed number of threads running.
 	/// Use case for this pool is running many (more than os-max-thread-count) short live tasks
 	/// Round-robin model allow efficiently utilize cpu cores
+	/// Using redistributeTasks option allows optimize reusage of idle threads
 {
 public:
 	ActiveThreadPool(int capacity = static_cast<int>(Environment::processorCount()) + 1,
-		int stackSize = POCO_THREAD_STACK_SIZE);
+		int stackSize = POCO_THREAD_STACK_SIZE,
+		bool redistributeTasks = false);
 		/// Creates a thread pool with fixed capacity threads.
 		/// Threads are created with given stack size.
 
 	ActiveThreadPool(std::string  name,
 		int capacity = static_cast<int>(Environment::processorCount()) + 1,
-		int stackSize = POCO_THREAD_STACK_SIZE);
+		int stackSize = POCO_THREAD_STACK_SIZE,
+		bool redistributeTasks = false);
 		/// Creates a thread pool with the given name and fixed capacity threads.
 		/// Threads are created with given stack size.
 
@@ -107,11 +110,11 @@ public:
 		/// Returns a reference to the default
 		/// thread pool.
 
-protected:
+private:
 	ActiveThread* getThread();
 	ActiveThread* createThread();
+	void recreateThreads();
 
-private:
 	ActiveThreadPool(const ActiveThreadPool& pool);
 	ActiveThreadPool& operator = (const ActiveThreadPool& pool);
 
@@ -124,6 +127,7 @@ private:
 	ThreadVec _threads;
 	mutable FastMutex _mutex;
 	std::atomic<size_t> _lastThreadIndex{0};
+	bool _redistributeTasks;
 };
 
 

@@ -27,6 +27,7 @@ public:
 	~ActiveThreadPoolTest();
 
 	void testActiveThreadPool();
+	void testActiveThreadLoadBalancing();
 
 	void setUp();
 	void tearDown();
