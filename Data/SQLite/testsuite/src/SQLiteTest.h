@@ -132,7 +132,10 @@ public:
 	void testRollbackCallback();
 	void testNotifier();
 
-	void testSessionTransaction();
+	void testSessionTransactionReadCommitted();
+	void testSessionTransactionReadUncommitted();
+	void testSessionTransactionSerializable();
+	void testSessionTransactionRepeatableRead();
 	void testTransaction();
 	void testTransactor();
 
