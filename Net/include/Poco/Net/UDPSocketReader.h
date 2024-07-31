@@ -20,7 +20,9 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/DatagramSocket.h"
-
+#include "Poco/Net/UDPHandler.h"
+#include "Poco/Net/UDPServerParams.h"
+#include "Poco/Error.h"
 
 namespace Poco {
 namespace Net {
@@ -99,10 +101,10 @@ public:
 		/// for replying to sender and data or error backlog threshold is
 		/// exceeded, sender is notified of the current backlog size.
 	{
-		typedef typename UDPHandlerImpl<S>::MsgSizeT RT;
-		char* p = 0;
-		struct sockaddr* pSA = 0;
-		poco_socklen_t* pAL = 0;
+		using RT = typename UDPHandlerImpl<S>::MsgSizeT;
+		char* p = nullptr;
+		struct sockaddr* pSA = nullptr;
+		poco_socklen_t* pAL = nullptr;
 		poco_socket_t sockfd = sock.impl()->sockfd();
 		nextHandler();
 		try
@@ -110,10 +112,10 @@ public:
 			p = handler().next(sockfd);
 			if (p)
 			{
-				Poco::UInt16 off = handler().offset();
-				poco_socklen_t* pAL = reinterpret_cast<poco_socklen_t*>(p + sizeof(RT));
+				Poco::UInt16 off = handler().payloadOffset();
+				pAL = reinterpret_cast<poco_socklen_t*>(p + handler().addressLengthOffset());
 				*pAL = SocketAddress::MAX_ADDRESS_LENGTH;
-				struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(p + sizeof(RT) + sizeof(poco_socklen_t));
+				pSA = reinterpret_cast<struct sockaddr*>(p + handler().addressOffset());
 				RT ret = sock.receiveFrom(p + off, S - off - 1, &pSA, &pAL);
 				if (ret < 0)
 				{
@@ -137,7 +139,7 @@ public:
 			}
 			else return;
 		}
-		catch (Poco::Exception& exc)
+		catch (const Poco::Exception& exc)
 		{
 			AtomicCounter::ValueType errors = setError(sock.impl()->sockfd(), p, exc.displayText());
 			if (_backlogThreshold > 0 && errors > _backlogThreshold && errors != _errorBacklog[sockfd] && pSA && pAL)
@@ -154,34 +156,33 @@ public:
 		/// Returns true if all handlers are stopped.
 	{
 		bool stopped = true;
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
-		for (; it != end; ++it) stopped = stopped && (*it)->stopped();
+		for (auto& h: _handlers)
+			stopped = stopped && h->stopped();
+
 		return stopped;
 	}
 
 	void stopHandler()
 		/// Stops all handlers.
 	{
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
-		for (; it != end; ++it) (*it)->stop();
+		for (auto& h: _handlers)
+			h->stop();
 	}
 
 	bool handlerDone() const
 		/// Returns true if all handlers are done processing data.
 	{
 		bool done = true;
-		typename UDPHandlerImpl<S>::List::iterator it = _handlers.begin();
-		typename UDPHandlerImpl<S>::List::iterator end = _handlers.end();
-		for (; it != end; ++it) done = done && (*it)->done();
+		for (auto& h: _handlers)
+			done = done && h->done();
+
 		return done;
 	}
 
-	AtomicCounter::ValueType setError(poco_socket_t sock, char* buf = 0, const std::string& err = "")
+	AtomicCounter::ValueType setError(poco_socket_t sock, char* buf = nullptr, const std::string& err = "")
 		/// Sets error to the provided buffer buf. If the buffer is null, a new buffer is obtained
 		/// from handler.
-		/// If successful, returns the handler's eror backlog size, otherwise returns zero.
+		/// If successful, returns the handler's error backlog size, otherwise returns zero.
 	{
 		if (!buf) buf = handler().next(sock);
 		if (buf) return handler().setError(buf, err.empty() ? Error::getMessage(Error::last()) : err);
@@ -204,9 +205,9 @@ private:
 		return **_handler;
 	}
 
-	typedef typename UDPHandlerImpl<S>::List           HandlerList;
-	typedef typename UDPHandlerImpl<S>::List::iterator HandlerIterator;
-	typedef std::map<poco_socket_t, Counter>           CounterMap;
+	using HandlerList = typename UDPHandlerImpl<S>::List;
+	using HandlerIterator = typename HandlerList::iterator;
+	using CounterMap = std::map<poco_socket_t, Counter>;
 
 	HandlerList&    _handlers;
 	HandlerIterator _handler;
