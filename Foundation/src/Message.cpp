@@ -52,7 +52,7 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 }
 
 
-Message::Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line):
+Message::Message(const std::string& source, const std::string& text, Priority prio, const char* file, LineNumber line):
 	_source(source),
 	_text(text),
 	_prio(prio),
@@ -238,7 +238,7 @@ void Message::setSourceFile(const char* file)
 }
 
 
-void Message::setSourceLine(int line)
+void Message::setSourceLine(LineNumber line)
 {
 	_line = line;
 }

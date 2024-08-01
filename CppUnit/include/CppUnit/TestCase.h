@@ -88,14 +88,14 @@ class CppUnit_API TestCase: public Test
     REFERENCEOBJECT (TestCase)
 
 public:
-	TestCase(const std::string& Name, Test::Type testType = Test::Normal);
-	~TestCase();
+	TestCase(const std::string& name, Test::Type testType = Test::Normal);
+	~TestCase() override;
 
-	virtual void run(TestResult* result, const Test::Callback& callback = nullptr);
+	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 	virtual TestResult* run();
-	virtual int countTestCases() const;
-	virtual std::string toString() const;
-	virtual Test::Type getType() const;
+	int countTestCases() const override;
+	std::string toString() const override;
+	Test::Type getType() const override;
 	void setType(Test::Type testType);
 	const std::string& name() const;
 
@@ -126,8 +126,8 @@ protected:
 	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	template <typename T1, typename T2,
-		typename = typename std::enable_if<std::is_arithmetic<T1>::value, T1>::type,
-		typename = typename std::enable_if<std::is_arithmetic<T2>::value, T2>::type>
+		typename = std::enable_if_t<std::is_arithmetic_v<T1>, T1>,
+		typename = std::enable_if_t<std::is_arithmetic_v<T2>, T2>>
 	void assertEquals(T1 expected,
 	                  T2 actual,
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
@@ -159,8 +159,8 @@ protected:
 	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	template <typename T1, typename T2,
-		typename = typename std::enable_if<std::is_arithmetic<T1>::value, T1>::type,
-		typename = typename std::enable_if<std::is_arithmetic<T2>::value, T2>::type>
+		typename = std::enable_if_t<std::is_arithmetic_v<T1>, T1>,
+		typename = std::enable_if_t<std::is_arithmetic_v<T2>, T2>>
 	std::string notEqualsMessage(T1 expected, T2 actual)
 	{
 		return "expected: " + std::to_string(expected) + " but was: " + std::to_string(actual);
@@ -203,9 +203,7 @@ inline TestCase::TestCase(const std::string& name, Test::Type testType)
 
 
 // Destructs a test case
-inline TestCase::~TestCase()
-{
-}
+inline TestCase::~TestCase() = default;
 
 
 // Returns a count of all the tests executed
@@ -229,7 +227,7 @@ inline void TestCase::setUp()
 
 
 // A hook for fixture set up with command line arguments
-inline void TestCase::setUp(const std::vector<std::string>& setup)
+inline void TestCase::setUp(const std::vector<std::string>&)
 {
 }
 

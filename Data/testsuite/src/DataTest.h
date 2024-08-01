@@ -46,6 +46,7 @@ public:
 	void testExternalBindingAndExtraction();
 	void testTranscode();
 	void testSQLParse();
+	void testSQLChannel();
 
 	void setUp();
 	void tearDown();

@@ -397,7 +397,7 @@ private:
 	void newIPv6(const void* hostAddr, Poco::UInt32 scope);
 	void newIPv6(unsigned prefix);
 	static std::string& compressV6(std::string& v6addr);
-	static std::string trimIPv6(const std::string v6Addr);
+	static std::string trimIPv6(const std::string& v6Addr);
 #endif
 	Ptr _pImpl;
 };
@@ -474,12 +474,11 @@ inline void IPAddress::newIPv6(unsigned prefix)
 #endif // POCO_HAVE_IPv6
 
 
-} } // namespace Poco::Net
-
-
 Net_API Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::IPAddress& value);
 Net_API Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::IPAddress& value);
 Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr);
+
+} } // namespace Poco::Net
 
 
 #endif // Net_IPAddress_INCLUDED

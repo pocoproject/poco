@@ -32,8 +32,8 @@ class CppParser_API Attributes
 	/// name and values are strings.
 {
 public:
-	typedef std::map<std::string, std::string> AttrMap;
-	typedef AttrMap::const_iterator Iterator;
+	using AttrMap = std::map<std::string, std::string>;
+	using Iterator = AttrMap::const_iterator;
 
 	Attributes();
 		/// Creates the Attributes object.

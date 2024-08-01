@@ -15,6 +15,8 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -95,9 +97,74 @@ void File::swap(File& file) noexcept
 }
 
 
+std::string File::absolutePath() const
+{
+	std::string ret;
+
+	if (Path(path()).isAbsolute())
+		// TODO: Should this return empty string if file does not exists to be consistent
+		// with the function documentation?
+		ret = getPathImpl();
+	else
+	{
+		Path curPath(Path::current());
+		curPath.append(path());
+		if (File(curPath).exists())
+			ret = curPath.toString();
+		else
+		{
+			const std::string envPath = Environment::get("PATH", "");
+			const std::string pathSeparator(1, Path::pathSeparator());
+			if (!envPath.empty())
+			{
+				const StringTokenizer st(envPath, pathSeparator,
+					StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
+				for (const auto& p: st)
+				{
+					try
+					{
+						std::string fileName(p);
+						if (p.size() && p.back() != Path::separator())
+							fileName.append(1, Path::separator());
+						fileName.append(path());
+						if (File(fileName).exists())
+						{
+							ret = fileName;
+							break;
+						}
+					}
+					catch (const Poco::PathSyntaxException&)
+					{
+						// shield against bad PATH environment entries
+					}
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+
 bool File::exists() const
 {
+	if (path().empty()) return false;
 	return existsImpl();
+}
+
+
+bool File::existsAnywhere() const
+{
+	if (path().empty()) return false;
+
+	if (Path(path()).isAbsolute())
+		return existsImpl();
+
+	if (File(absolutePath()).exists())
+		return true;
+
+	return false;
 }
 
 
@@ -115,7 +182,14 @@ bool File::canWrite() const
 
 bool File::canExecute() const
 {
-	return canExecuteImpl();
+	// Resolve (platform-specific) executable path and absolute path from relative.
+	const auto execPath { getExecutablePathImpl() };
+	const auto absPath { File(execPath).absolutePath() };
+	if (absPath.empty() || !File(absPath).exists())
+	{
+		return false;
+	}
+	return canExecuteImpl(absPath);
 }
 
 

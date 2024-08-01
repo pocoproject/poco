@@ -23,7 +23,7 @@
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
-#include <iostream>
+
 
 using Poco::Net::HTTPSClientSession;
 using Poco::Net::HTTPRequest;
@@ -55,13 +55,14 @@ namespace
 				do
 				{
 					n = ws.receiveFrame(pBuffer.get(), static_cast<int>(_bufSize), flags);
+					Poco::Thread::current()->sleep(handleDelay.totalMilliseconds());
 					if (n == 0)
 						break;
 					ws.sendFrame(pBuffer.get(), n, flags);
 				}
 				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
-			catch (WebSocketException& exc)
+			catch (const WebSocketException& exc)
 			{
 				switch (exc.code())
 				{
@@ -79,9 +80,16 @@ namespace
 			}
 		}
 
+	public:
+
+		static Poco::Timespan	handleDelay;
+
 	private:
 		std::size_t _bufSize;
 	};
+
+	Poco::Timespan WebSocketRequestHandler::handleDelay {0};
+
 
 	class WebSocketRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 	{
@@ -90,7 +98,7 @@ namespace
 		{
 		}
 
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) override
 		{
 			return new WebSocketRequestHandler(_bufSize);
 		}
@@ -108,6 +116,46 @@ WebSocketTest::WebSocketTest(const std::string& name): CppUnit::TestCase(name)
 
 WebSocketTest::~WebSocketTest()
 {
+}
+
+
+void WebSocketTest::testWebSocketTimeout()
+{
+	Poco::Net::SecureServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	Poco::Thread::sleep(200);
+
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+	ws.setSendTimeout( Poco::Timespan(2, 0));
+	ws.setReceiveTimeout( Poco::Timespan(2, 0));
+
+	Poco::Timestamp sendStart;
+	char buffer[1024] = {};
+	int flags;
+	try
+	{
+		// Server will take long to process and cause WS timeout
+		WebSocketRequestHandler::handleDelay.assign(3, 0);
+
+		std::string payload("x");
+		ws.sendFrame(payload.data(), (int) payload.size());
+		ws.receiveFrame(buffer, sizeof(buffer), flags);
+
+		failmsg("Data exchange shall time out.");
+	}
+	catch (const Poco::TimeoutException& te)
+	{
+		assertTrue(sendStart.elapsed() < Poco::Timespan(4, 0).totalMicroseconds());
+	}
+
+	ws.shutdown();
+	ws.receiveFrame(buffer, sizeof(buffer), flags);
+	server.stop();
 }
 
 
@@ -227,6 +275,7 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("WebSocketTest");
 
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocket);
+	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketTimeout);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
 
 	return pSuite;

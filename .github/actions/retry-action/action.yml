@@ -1,5 +1,5 @@
 name: Retry Step
-description: 'Retry a step on failure or timeout'
+description: "Retry a step on failure or timeout"
 inputs:
   timeout_minutes:
     description: Minutes to wait before attempt times out.  Must only specify either minutes or seconds
@@ -50,5 +50,5 @@ outputs:
   exit_error:
     description: The final error returned by the command
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

@@ -157,8 +157,32 @@ void NameValueCollection::erase(const std::string& name)
 }
 
 
+void NameValueCollection::secureErase(const std::string& name)
+{
+	Iterator it = _map.find(name);
+	while (it != _map.end())
+	{
+		Poco::secureClear(it->second);
+		_map.erase(it);
+		it = _map.find(name);
+	}
+}
+
+
 void NameValueCollection::clear()
 {
+	_map.clear();
+}
+
+
+void NameValueCollection::secureClear()
+{
+	Iterator it = _map.begin();
+	while (it != _map.end())
+	{
+		Poco::secureClear(it->second);
+		++it;
+	}
 	_map.clear();
 }
 

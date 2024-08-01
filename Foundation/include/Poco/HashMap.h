@@ -85,26 +85,23 @@ class HashMap
 	/// A HashMap can be used just like a std::map.
 {
 public:
-	typedef Key                 KeyType;
-	typedef Mapped              MappedType;
-	typedef Mapped&             Reference;
-	typedef const Mapped&       ConstReference;
-	typedef Mapped*             Pointer;
-	typedef const Mapped*       ConstPointer;
+	using KeyType = Key;
+	using MappedType = Mapped;
+	using Reference = Mapped &;
+	using ConstReference = const Mapped &;
+	using Pointer = Mapped *;
+	using ConstPointer = const Mapped *;
 
-	typedef HashMapEntry<Key, Mapped>      ValueType;
-	typedef std::pair<KeyType, MappedType> PairType;
+	using ValueType = HashMapEntry<Key, Mapped>;
+	using PairType = std::pair<KeyType, MappedType>;
 
-	typedef HashMapEntryHash<ValueType, HashFunc> HashType;
-	typedef LinearHashTable<ValueType, HashType>  HashTable;
+	using HashType = HashMapEntryHash<ValueType, HashFunc>;
+	using HashTable = LinearHashTable<ValueType, HashType>;
 
-	typedef typename HashTable::Iterator      Iterator;
-	typedef typename HashTable::ConstIterator ConstIterator;
+	using Iterator = typename HashTable::Iterator;
+	using ConstIterator = typename HashTable::ConstIterator;
 
-	HashMap()
-		/// Creates an empty HashMap.
-	{
-	}
+	HashMap() = default;
 
 	HashMap(std::size_t initialReserve):
 		_table(initialReserve)

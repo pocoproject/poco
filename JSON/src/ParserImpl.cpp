@@ -11,23 +11,20 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#include <Poco/JSON/ParserImpl.h>
+#include <Poco/JSON/JSONException.h>
+#include <Poco/StreamCopier.h>
 
-#include "Poco/JSON/Parser.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/Ascii.h"
-#include "Poco/Token.h"
-#include "Poco/UTF8Encoding.h"
-#include "Poco/String.h"
-#include "Poco/StreamCopier.h"
 #undef min
 #undef max
-#include <limits>
-#include <clocale>
+
 #include <istream>
+#include <streambuf>
+#include <clocale>
 #include "pdjson.h"
 
 
-typedef struct json_stream json_stream;
+using json_stream = struct json_stream;
 
 
 namespace Poco {
@@ -38,13 +35,13 @@ extern "C"
 {
 	static int istream_get(void* ptr)
 	{
-		std::streambuf* pBuf = reinterpret_cast<std::streambuf*>(ptr);
+		auto pBuf = reinterpret_cast<std::streambuf*>(ptr);
 		return pBuf->sbumpc();
 	}
 
 	static int istream_peek(void* ptr)
 	{
-		std::streambuf* pBuf = reinterpret_cast<std::streambuf*>(ptr);
+		auto pBuf = reinterpret_cast<std::streambuf*>(ptr);
 		return pBuf->sgetc();
 	}
 }
@@ -167,8 +164,7 @@ void ParserImpl::stripComments(std::string& json)
 		std::string::iterator it = json.begin();
 		for (; it != json.end();)
 		{
-			if (*it == '"' && !inString) inString = true;
-			else inString = false;
+			inString = *it == '"' && !inString;
 			if (!inString)
 			{
 				if (*it == '/' && it + 1 != json.end() && *(it + 1) == '*')
@@ -220,7 +216,7 @@ void ParserImpl::handleObject()
 	while (tok != JSON_OBJECT_END && checkError())
 	{
 		json_next(_pJSON);
-		if (_pHandler) _pHandler->key(std::string(json_get_string(_pJSON, NULL)));
+		if (_pHandler) _pHandler->key(std::string(json_get_string(_pJSON, nullptr)));
 		handle();
 		tok = json_peek(_pJSON);
 	}
@@ -252,7 +248,7 @@ void ParserImpl::handle()
 	case JSON_NUMBER:
 		if (_pHandler)
 		{
-			std::string str(json_get_string(_pJSON, NULL));
+			std::string str(json_get_string(_pJSON, nullptr));
 			if (str.find(_decimalPoint) != str.npos || str.find('e') != str.npos || str.find('E') != str.npos)
 			{
 				_pHandler->value(NumberParser::parseFloat(str));

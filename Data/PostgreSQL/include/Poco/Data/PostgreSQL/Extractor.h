@@ -25,7 +25,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Types.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Var.h"
 
 
@@ -325,7 +325,7 @@ private:
 
 	template <typename T>
 	bool extractStringImpl(std::size_t pos, T& val)
-		/// Utility function for extraction of Any and DynamicAny.
+		/// Utility function for extraction of Any and Dynamic::Var.
 	{
 		OutputParameter outputParameter = extractPreamble(pos);
 

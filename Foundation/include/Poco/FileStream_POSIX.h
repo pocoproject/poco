@@ -42,6 +42,9 @@ public:
 	void open(const std::string& path, std::ios::openmode mode);
 		/// Opens the given file in the given mode.
 
+	void openHandle(NativeHandle fd, std::ios::openmode mode);
+		/// Take ownership of the given file descriptor.
+
 	bool close();
 		/// Closes the File stream buffer. Returns true if successful,
 		/// false otherwise.
@@ -51,6 +54,9 @@ public:
 
 	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out);
 		/// Change to specified position, according to mode.
+
+	void flushToDisk();
+		/// Forces buffered data to be written to the disk
 
 	NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle

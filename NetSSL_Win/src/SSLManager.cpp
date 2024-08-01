@@ -22,7 +22,6 @@
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/Net/RejectCertificateHandler.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
@@ -81,15 +80,10 @@ SSLManager::~SSLManager()
 }
 
 
-namespace
-{
-	static Poco::SingletonHolder<SSLManager> singleton;
-}
-
-
 SSLManager& SSLManager::instance()
 {
-	return *singleton.get();
+	static SSLManager sm;
+	return sm;
 }
 
 

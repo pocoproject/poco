@@ -67,8 +67,7 @@ public:
 		/// Creates the SessionImpl. Opens a connection to the database.
 		/// Throws NotConnectedException if connection was not succesful.
 
-	//@ deprecated
-	SessionImpl(const std::string& connect,
+	POCO_DEPRECATED("") SessionImpl(const std::string& connect,
 		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
@@ -160,6 +159,14 @@ public:
 
 	int maxStatementLength() const;
 		/// Returns maximum length of SQL statement allowed by driver.
+
+	void setLoginTimeout(const std::string&, const Poco::Any& value);
+		/// Sets the timeout (in seconds) for the session login.
+		/// Value must be of type (unsigned) int.
+		/// It must be set prior to logging in.
+
+	Poco::Any getLoginTimeout(const std::string&) const;
+		/// Returns the timeout (in seconds) for the session login.
 
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
@@ -309,6 +316,12 @@ inline const std::string& SessionImpl::connectorName() const
 inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	return 0 != (ti & getTransactionIsolation());
+}
+
+
+inline Poco::Any SessionImpl::getLoginTimeout(const std::string&) const
+{
+	return _db.getLoginTimeout();
 }
 
 

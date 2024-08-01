@@ -56,6 +56,16 @@ public:
 	~FileIOS();
 		/// Destroys the stream.
 
+	virtual void open(const std::string& path, std::ios::openmode mode);
+		/// Opens the file specified by path, using the given mode.
+		///
+		/// Throws a FileException (or a similar exception) if the file 
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
+
+	void openHandle(NativeHandle handle, std::ios::openmode mode);
+		/// Takes ownership of the handle.
+
 	void close();
 		/// Closes the file stream.
 		///
@@ -71,6 +81,9 @@ public:
 
 	UIntPtr size() const;
 		/// Returns file size
+
+	void flushToDisk();
+		/// Forces buffered data to be written to the disk
 
 protected:
 	FileStreamBuf _buf;
@@ -105,7 +118,7 @@ public:
 	~FileInputStream();
 		/// Destroys the stream.
 
-	void open(const std::string& path, std::ios::openmode mode = std::ios::in);
+	void open(const std::string& path, std::ios::openmode mode = std::ios::in) override;
 		/// Opens the file specified by path, using the given mode, which
 		/// will always include std::ios::in (even if not specified).
 		///
@@ -148,7 +161,7 @@ public:
 	~FileOutputStream();
 		/// Destroys the FileOutputStream.
 
-	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::trunc);
+	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::trunc) override;
 		/// Opens the file specified by path, using the given mode, which
 		/// always includes std::ios::out, even if not specified.
 		///
@@ -193,7 +206,7 @@ public:
 	~FileStream();
 		/// Destroys the FileOutputStream.
 
-	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in);
+	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in) override;
 		/// Opens the file specified by path, using the given mode.
 		///
 		/// Throws a FileException (or a similar exception) if the file

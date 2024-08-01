@@ -67,13 +67,13 @@ extern "C"	\
 #define POCO_BEGIN_MANIFEST_IMPL(fnName, base) \
 	bool fnName(Poco::ManifestBase* pManifest_)										\
 	{																				\
-		typedef base _Base;															\
-		typedef Poco::Manifest<_Base> _Manifest;									\
-		std::string requiredType(typeid(_Manifest).name());							\
-		std::string actualType(pManifest_->className());							\
+		using BaseType = base;														\
+		using ManifestType = Poco::Manifest<BaseType>;								\
+		const std::string requiredType(typeid(ManifestType).name());				\
+		const std::string actualType(pManifest_->className());						\
 		if (requiredType == actualType)												\
 		{																			\
-			Poco::Manifest<_Base>* pManifest = static_cast<_Manifest*>(pManifest_);
+			Poco::Manifest<BaseType>* pManifest = static_cast<ManifestType*>(pManifest_);
 
 
 #define POCO_BEGIN_MANIFEST(base) \
@@ -93,15 +93,15 @@ extern "C"	\
 
 
 #define POCO_EXPORT_CLASS(cls) \
-    pManifest->insert(new Poco::MetaObject<cls, _Base>(#cls));
+	pManifest->insert(new Poco::MetaObject<cls, BaseType>(#cls));
 
 
 #define POCO_EXPORT_INTERFACE(cls, itf) \
-    pManifest->insert(new Poco::MetaObject<cls, _Base>(itf));
+	pManifest->insert(new Poco::MetaObject<cls, BaseType>(itf));
 
 
 #define POCO_EXPORT_SINGLETON(cls) \
-	pManifest->insert(new Poco::MetaSingleton<cls, _Base>(#cls));
+	pManifest->insert(new Poco::MetaSingleton<cls, BaseType>(#cls));
 
 
 #endif // Foundation_ClassLibrary_INCLUDED

@@ -85,7 +85,6 @@ mkdir -p ${target}/cmake
 #
 echo ${version} "(`date +%Y-%m-%d`)" >${target}/VERSION
 cp ${POCO_BASE}/LICENSE ${target}
-cp ${POCO_BASE}/NEWS ${target}
 cp ${POCO_BASE}/README ${target}
 cp ${POCO_BASE}/CHANGELOG ${target}
 cp ${POCO_BASE}/CONTRIBUTORS ${target}
@@ -112,6 +111,7 @@ cp ${POCO_BASE}/build/config/* ${target}/build/config
 cp ${POCO_BASE}/build/rules/* ${target}/build/rules
 cp ${POCO_BASE}/build/script/* ${target}/build/script
 cp ${POCO_BASE}/buildwin.cmd ${target}
+cp ${POCO_BASE}/buildwin.ps1 ${target}
 cp ${POCO_BASE}/configure ${target}
 cp ${POCO_BASE}/libversion ${target}
 
@@ -162,6 +162,13 @@ done
 # Make all files writeable
 #
 chmod -R +w ${target}
+
+
+#
+# Remove VS90 and progen
+#
+find ${target} -name '*.progen' -exec rm {} \;
+find ${target} -iname '*_vs90.sln' -exec rm {} \;
 
 
 #
@@ -341,9 +348,18 @@ ${comp}-libexec: $dependencies
 ENDOFSCRIPT
 
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
+		tdependencies=""
+		if [ -f "${POCO_BASE}/${comp}/testsuite/dependencies" ] ; then
+			for dep in `cat "${POCO_BASE}/${comp}/testsuite/dependencies"` ;
+			do
+				# get rid of surrounding whitespace (trailing \r on Cygwin)
+				read dep <<< ${dep}
+				tdependencies="$tdependencies ${dep}-libexec"
+			done
+		fi
 		cat >>${target}/Makefile <<ENDOFSCRIPT
 
-${comp}-tests: ${comp}-libexec cppunit
+${comp}-tests: ${comp}-libexec $tdependencies cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
 ENDOFSCRIPT
 	fi
@@ -397,24 +413,6 @@ ENDOFSCRIPT
 
 
 #
-# Create Visual Studio 14 build script
-#
-cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 140 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
-# Create Visual Studio 15 build script
-#
-cat >${target}/build_vs150.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 150 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
 # Create Visual Studio 16 build script
 #
 cat >${target}/build_vs160.cmd <<'ENDOFSCRIPT'
@@ -436,8 +434,6 @@ ENDOFSCRIPT
 # Fix line endings
 #
 if [ "$lineEndConv" != "" ] ; then
-	$lineEndConv ${target}/build_vs140.cmd
-	$lineEndConv ${target}/build_vs150.cmd
 	$lineEndConv ${target}/build_vs160.cmd
 	$lineEndConv ${target}/build_vs170.cmd
 	$lineEndConv ${target}/Makefile

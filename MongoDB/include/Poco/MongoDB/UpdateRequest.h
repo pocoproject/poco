@@ -26,8 +26,10 @@
 namespace Poco {
 namespace MongoDB {
 
+//class [[deprecated]] UpdateRequest;
+class UpdateRequest;
 
-class UpdateRequest: public RequestMessage
+class MongoDB_API UpdateRequest: public RequestMessage
 	/// This request is used to update a document in a database
 	/// using the OP_UPDATE client request.
 {

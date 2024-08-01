@@ -16,6 +16,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
+#include "Poco/Path.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -80,6 +81,12 @@ void FileImpl::setPathImpl(const std::string& path)
 }
 
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	return _path;
+}
+
+
 bool FileImpl::existsImpl() const
 {
 	poco_assert (!_path.empty());
@@ -127,12 +134,12 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	poco_assert (!_path.empty());
+	poco_assert (!absolutePath.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (stat(absolutePath.c_str(), &st) == 0)
 	{
 		if (st.st_uid == geteuid() || geteuid() == 0)
 			return (st.st_mode & S_IXUSR) != 0;
@@ -212,15 +219,24 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
+	using TV = Timestamp::TimeVal;
+
+	// Nanosecond to timestamp resolution factor
+	static constexpr TV nsk = 1'000'000'000ll / Timestamp::resolution();
+
+	struct stat st;
+	if (::stat(_path.c_str(), &st) == 0)
+	{
 #if defined(__FreeBSD__) || (defined(__APPLE__) && defined(_DARWIN_FEATURE_64_BIT_INODE))
-	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_birthtime);
+		const TV tv = static_cast<TV>(st.st_birthtimespec.tv_sec) * Timestamp::resolution() + st.st_birthtimespec.tv_nsec/nsk;
+		return Timestamp(tv);
+#elif POCO_OS == POCO_OS_LINUX
+		const TV tv = static_cast<TV>(st.st_ctim.tv_sec) * Timestamp::resolution() + st.st_ctim.tv_nsec/nsk;
+		return Timestamp(tv);
 #else
-	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_ctime);
 #endif
+	}
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -231,9 +247,24 @@ Timestamp FileImpl::getLastModifiedImpl() const
 {
 	poco_assert (!_path.empty());
 
+	using TV = Timestamp::TimeVal;
+
+	// Nanosecond to timestamp resolution factor
+	static constexpr TV nsk = 1'000'000'000ll / Timestamp::resolution();
+
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
+	{
+#if defined(__FreeBSD__) || (defined(__APPLE__) && defined(_DARWIN_FEATURE_64_BIT_INODE))
+		const TV tv = static_cast<TV>(st.st_mtimespec.tv_sec) * Timestamp::resolution() + st.st_mtimespec.tv_nsec/nsk;
+		return Timestamp(tv);
+#elif POCO_OS == POCO_OS_LINUX
+		const TV tv = static_cast<TV>(st.st_mtim.tv_sec) * Timestamp::resolution() + st.st_mtim.tv_nsec/nsk;
+		return Timestamp(tv);
+#else
 		return Timestamp::fromEpochTime(st.st_mtime);
+#endif
+	}
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -244,10 +275,11 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 {
 	poco_assert (!_path.empty());
 
-	struct utimbuf tb;
-	tb.actime  = ts.epochTime();
-	tb.modtime = ts.epochTime();
-	if (utime(_path.c_str(), &tb) != 0)
+	const ::time_t s = ts.epochTime();
+	const ::suseconds_t us = ts.epochMicroseconds() % 1'000'000;
+	const ::timeval times[2] = { {s, us}, {s, us} };
+
+	if (::utimes(_path.c_str(), times) != 0)
 		handleLastErrorImpl(_path);
 }
 

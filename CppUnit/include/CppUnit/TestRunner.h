@@ -37,8 +37,8 @@ namespace CppUnit {
  */
 class CppUnit_API TestRunner
 {
-	typedef std::pair<std::string, Test*> Mapping;
-	typedef std::vector<Mapping> Mappings;
+	using Mapping = std::pair<std::string, Test *>;
+	using Mappings = std::vector<Mapping>;
 
 public:
 	TestRunner();

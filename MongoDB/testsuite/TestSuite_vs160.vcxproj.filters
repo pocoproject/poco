@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{069413b5-4c2d-4dc8-a59d-769df94f4119}</UniqueIdentifier>
+      <UniqueIdentifier>{000c9ef3-b713-466a-a0c0-dce4cb7caba8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{66d016d4-8f2a-453b-b5bf-483f32dee7e8}</UniqueIdentifier>
+      <UniqueIdentifier>{0a3f8398-eddc-4c35-b7d5-3d2e16c95909}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -16,6 +16,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MongoDBTestOpMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

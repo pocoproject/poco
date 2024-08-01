@@ -13,7 +13,6 @@
 
 
 #include "Poco/NestedDiagnosticContext.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/ThreadLocal.h"
 
 
@@ -54,7 +53,7 @@ void NestedDiagnosticContext::push(const std::string& info)
 }
 
 
-void NestedDiagnosticContext::push(const std::string& info, int line, const char* filename)
+void NestedDiagnosticContext::push(const std::string& info, LineNumber line, const char* filename)
 {
 	Context ctx;
 	ctx.info = info;
@@ -114,15 +113,10 @@ void NestedDiagnosticContext::clear()
 }
 
 
-namespace
-{
-	static ThreadLocal<NestedDiagnosticContext> ndc;
-}
-
-
 NestedDiagnosticContext& NestedDiagnosticContext::current()
 {
-	return ndc.get();
+	static NestedDiagnosticContext ndc;
+	return ndc;
 }
 
 

@@ -857,7 +857,8 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 	}
 	else _port = 0;
 	_host = host;
-	toLowerInPlace(_host);
+	if (_host.size() && _host[0] != '%')
+		toLowerInPlace(_host);
 }
 
 

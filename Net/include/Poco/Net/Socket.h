@@ -134,7 +134,7 @@ public:
 	void close();
 		/// Closes the socket.
 
-	//@deprecated
+	POCO_DEPRECATED("Use PollSet instead")
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
 		/// Determines the status of one or more sockets,
 		/// using a call to select().
@@ -216,7 +216,7 @@ public:
 		/// as the system is free to adjust the value.
 
 	void setReceiveTimeout(const Poco::Timespan& timeout);
-		/// Sets the send timeout for the socket.
+		/// Sets the receive timeout for the socket.
 		///
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.

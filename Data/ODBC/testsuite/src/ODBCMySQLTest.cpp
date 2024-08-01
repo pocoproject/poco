@@ -164,7 +164,7 @@ void ODBCMySQLTest::testNull()
 		recreateNullsTable("NOT NULL");
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HY000");
+		_pExecutor->notNulls({"HY000"});
 		i += 2;
 	}
 

@@ -1,6 +1,3 @@
-#ifndef Foundation_VarVisitor_INCLUDED
-#define Foundation_VarVisitor_INCLUDED
-
 //
 // VarVisitor.h
 //
@@ -17,17 +14,27 @@
 //
 
 
+#ifndef Foundation_VarVisitor_INCLUDED
+#define Foundation_VarVisitor_INCLUDED
+
+
 #include "Poco/Dynamic/Var.h"
 #include <unordered_map>
 #include <functional>
 
+
 namespace Poco {
 namespace Details {
+
+
+#ifndef POCO_DOC
+
 
 struct TypeInfoHash
 {
 	inline std::size_t operator()(std::type_info const& t) const { return t.hash_code(); }
 };
+
 
 struct EqualRef
 {
@@ -38,19 +45,27 @@ struct EqualRef
 	}
 };
 
-using TypeInfoRef = std::reference_wrapper<std::type_info const>;
 
+using TypeInfoRef = std::reference_wrapper<std::type_info const>;
 using HandlerCaller = std::function<void(const Poco::Dynamic::Var&)>;
 
+
 template <typename T>
-using HandlerPointer = void (*)(const T &);
+using HandlerPointer = void (*)(const T&);
+
 
 template <typename T>
 using Handler = std::function<void(const T&)>;
 
-}	// Details
+
+#endif // POCO_DOC
+
+
+} // Details
+
 
 namespace Dynamic {
+
 
 class Foundation_API Visitor
 	/// VarVisitor class.
@@ -62,10 +77,10 @@ class Foundation_API Visitor
 	
 public:
 	template <typename T>
-	bool addHandler(const Details::Handler<T> &f)
-	/// Add handler for specific type T which holds in Var
-	/// This method is more safe, because it saves copy of handler : lambda or std::function
-	/// Returns true if handler was added
+	bool addHandler(const Details::Handler<T>& f)
+		/// Add handler for specific type T which holds in Var.
+		/// This method is more safe, because it saves copy of handler : lambda or std::function.
+		/// Returns true if handler was added.
 	{
 		auto result = _handlers.emplace(std::ref(typeid(T)),
 			Details::HandlerCaller([handler = f](const Poco::Dynamic::Var& x)
@@ -77,9 +92,9 @@ public:
 	
 	template <typename T>
 	bool addHandler(Details::HandlerPointer<T> f)
-	/// Add handler for specific type T which holds in Var
-	/// This method is less safe, because it saves only copy of function pointer
-	/// Returns true if handler was added
+		/// Add handler for specific type T which holds in Var.
+		/// This method is less safe, because it saves only copy of function pointer.
+		/// Returns true if handler was added.
 	{
 		auto result = _handlers.emplace(std::ref(typeid(T)),
 			Details::HandlerCaller([handlerPointer = f](const Poco::Dynamic::Var& x)
@@ -90,10 +105,12 @@ public:
 	}
 	
 	bool visit(const Poco::Dynamic::Var& x) const;
-	/// Find handler for holded type and if it exists call handler
-	/// Returns true if hanler was found othrewise returns false
+		/// Find handler for held type and if it exists call handler.
+		/// Returns true if hanlder was found othrewise returns false.
 };
 
+
 } } // namespace Poco::Dynamic
+
 
 #endif // Foundation_VarVisitor_INCLUDED

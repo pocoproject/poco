@@ -19,6 +19,9 @@
 #include "Poco/Exception.h"
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Util {
 
@@ -95,12 +98,12 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 	if (fullPath.empty())
 	{
 		// return all root level keys
-		range.push_back("HKEY_CLASSES_ROOT");
-		range.push_back("HKEY_CURRENT_CONFIG");
-		range.push_back("HKEY_CURRENT_USER");
-		range.push_back("HKEY_LOCAL_MACHINE");
-		range.push_back("HKEY_PERFORMANCE_DATA");
-		range.push_back("HKEY_USERS");
+		range.push_back("HKEY_CLASSES_ROOT"s);
+		range.push_back("HKEY_CURRENT_CONFIG"s);
+		range.push_back("HKEY_CURRENT_USER"s);
+		range.push_back("HKEY_LOCAL_MACHINE"s);
+		range.push_back("HKEY_PERFORMANCE_DATA"s);
+		range.push_back("HKEY_USERS"s);
 	}
 	else
 	{

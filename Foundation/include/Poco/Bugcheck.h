@@ -39,38 +39,38 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	[[noreturn]] static void assertion(const char* cond, const char* file, int line, const char* text = 0);
+	[[noreturn]] static void assertion(const char* cond, const char* file, LineNumber line, const char* text = 0);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	[[noreturn]] static void nullPointer(const char* ptr, const char* file, int line);
+	[[noreturn]] static void nullPointer(const char* ptr, const char* file, LineNumber line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	[[noreturn]] static void bugcheck(const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	[[noreturn]] static void bugcheck(const char* msg, const char* file, int line);
+	[[noreturn]] static void bugcheck(const char* msg, const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void unexpected(const char* file, int line);
+	static void unexpected(const char* file, LineNumber line);
 		/// An exception was caught in a destructor. Break into debugger,
 		/// if possible and report exception. Must only be called from
 		/// within a catch () block as it rethrows the exception to
 		/// determine its class.
 
-	static void debugger(const char* file, int line);
+	static void debugger(const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible.
 
-	static void debugger(const char* msg, const char* file, int line);
+	static void debugger(const char* msg, const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible.
 
 protected:
-	static std::string what(const char* msg, const char* file, int line, const char* text = 0);
+	static std::string what(const char* msg, const char* file, LineNumber line, const char* text = 0);
 };
 
 
@@ -165,42 +165,16 @@ protected:
 #endif
 
 
-//
-// poco_static_assert
-//
-// The following was ported from <boost/static_assert.hpp>
-//
+#define poco_static_assert(B) static_assert(B)
 
 
-template <bool x>
-struct POCO_STATIC_ASSERTION_FAILURE;
-
-
-template <>
-struct POCO_STATIC_ASSERTION_FAILURE<true>
-{
-	enum
-	{
-		value = 1
-	};
-};
-
-
-template <int x>
-struct poco_static_assert_test
-{
-};
-
-
-#if defined(__GNUC__) && (__GNUC__ == 3) && ((__GNUC_MINOR__ == 3) || (__GNUC_MINOR__ == 4))
-#define poco_static_assert(B) \
-	typedef char POCO_JOIN(poco_static_assert_typedef_, __LINE__) \
-        [POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>::value]
-#else
-#define poco_static_assert(B) \
-	typedef poco_static_assert_test<sizeof(POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>)> \
-		POCO_JOIN(poco_static_assert_typedef_, __LINE__) POCO_UNUSED
-#endif
+#define poco_static_assert_ptr(T) \
+	static_assert(std::is_pointer_v<T> || \
+	std::is_same_v<T, std::nullptr_t> || \
+	std::is_member_pointer_v<T> || \
+	std::is_member_function_pointer_v<T> || \
+	std::is_member_object_pointer_v<T>, \
+	"not a pointer")
 
 
 #endif // Foundation_Bugcheck_INCLUDED

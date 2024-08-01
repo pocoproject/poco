@@ -35,6 +35,20 @@ FileIOS::~FileIOS()
 }
 
 
+void FileIOS::open(const std::string& path, std::ios::openmode mode)
+{
+	clear();
+	_buf.open(path, mode);
+}
+
+
+void FileIOS::openHandle(NativeHandle handle, std::ios::openmode mode)
+{
+	clear();
+	_buf.openHandle(handle, mode);
+}
+
+
 void FileIOS::close()
 {
 	if (!_buf.close())
@@ -56,9 +70,17 @@ FileIOS::NativeHandle FileIOS::nativeHandle() const
 }
 
 
-Poco::UIntPtr FileIOS::size() const {
+Poco::UInt64 FileIOS::size() const
+{
 	return _buf.size();
 }
+
+
+void FileIOS::flushToDisk()
+{
+	_buf.flushToDisk();
+}
+
 
 FileInputStream::FileInputStream():
 	std::istream(&_buf)
@@ -69,7 +91,7 @@ FileInputStream::FileInputStream():
 FileInputStream::FileInputStream(const std::string& path, std::ios::openmode mode):
 	std::istream(&_buf)
 {
-	open(path, mode | std::ios::in);
+	open(path, mode);
 }
 
 
@@ -80,8 +102,7 @@ FileInputStream::~FileInputStream()
 
 void FileInputStream::open(const std::string& path, std::ios::openmode mode)
 {
-	clear();
-	_buf.open(path, mode | std::ios::in);
+	FileIOS::open(path, mode | std::ios::in);
 }
 
 
@@ -94,7 +115,7 @@ FileOutputStream::FileOutputStream():
 FileOutputStream::FileOutputStream(const std::string& path, std::ios::openmode mode):
 	std::ostream(&_buf)
 {
-	open(path, mode | std::ios::out);
+	open(path, mode);
 }
 
 
@@ -105,8 +126,7 @@ FileOutputStream::~FileOutputStream()
 
 void FileOutputStream::open(const std::string& path, std::ios::openmode mode)
 {
-	clear();
-	_buf.open(path, mode | std::ios::out);
+	FileIOS::open(path, mode | std::ios::out);
 }
 
 
@@ -130,8 +150,7 @@ FileStream::~FileStream()
 
 void FileStream::open(const std::string& path, std::ios::openmode mode)
 {
-	clear();
-	_buf.open(path, mode);
+	FileIOS::open(path, mode);
 }
 
 

@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5.0)
+cmake_policy(VERSION 3.15.0)
 
 project(Poco)
 
@@ -16,17 +17,17 @@ set(RELEASE_NAME "Unstable-trunk")
 # top of the build tree rather than in hard-to-find leaf
 # directories. This simplifies manual testing and the use of the build
 # tree rather than installed Boost libraries.
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "Library output")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "Archive output")
 # Windows DLLs are "runtime" for CMake. Output them to "bin" like the Visual Studio projects do.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE PATH "Runtime output")
 
 # Reset output dirs for multi-config builds
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
+	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin CACHE PATH "Runtime output for ${OUTPUTCONFIG}")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib CACHE PATH "Library output for ${OUTPUTCONFIG}")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib CACHE PATH "Archive output for ${OUTPUTCONFIG}")
 endforeach(OUTPUTCONFIG)
 
 # Append our module directory to CMake
@@ -64,12 +65,7 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-if(POCO_STATIC)
-	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
-	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
@@ -172,7 +168,7 @@ else()
 endif()
 
 # Allow enabling and disabling components
-option(ENABLE_FOUNDATION "Enable Foundation, required by all components except CppUnit" ON)
+option(ENABLE_FOUNDATION "Enable Foundation" ON)
 option(ENABLE_ENCODINGS "Enable Encodings" ON)
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_XML "Enable XML" ON)
@@ -180,6 +176,12 @@ option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
 option(ENABLE_REDIS "Enable Redis" ON)
+option(ENABLE_DNSSD "Enable DNSSD" OFF)
+option(ENABLE_DNSSD_DEFAULT "Enable DNSSD Default" OFF)
+
+option(ENABLE_DNSSD_AVAHI "Enable DNSSD Avahi" OFF)
+option(ENABLE_DNSSD_BONJOUR "Enable DNSSD Bonjour" OFF)
+
 option(ENABLE_PROMETHEUS "Enable Prometheus" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
@@ -206,6 +208,9 @@ endif()
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
+option(ENABLE_TEST_DEPRECATED
+	"Set to OFF|ON (default is OFF) to enable build of tests for deprecated functionality" OFF)
+
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
 
@@ -219,6 +224,9 @@ if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
 	message(STATUS "Building with unittests & samples")
+	if(ENABLE_TEST_DEPRECATED)
+		add_compile_definitions(POCO_TEST_DEPRECATED)
+	endif()
 else()
 	message(STATUS "Building without tests & samples")
 endif()
@@ -367,6 +375,11 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Redis AND ENABLE_REDIS)
 	list(APPEND Poco_COMPONENTS "Redis")
 endif()
 
+if(ENABLE_DNSSD)
+	add_subdirectory(DNSSD)
+	list(APPEND Poco_COMPONENTS "DNSSD")
+endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/Prometheus AND ENABLE_PROMETHEUS)
 	add_subdirectory(Prometheus)
 	list(APPEND Poco_COMPONENTS "Prometheus")
@@ -419,8 +432,8 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Data/MySQL AND ENABLE_DATA_MYSQL)
 	list(APPEND Poco_COMPONENTS "Data/MySQL")
 endif()
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgresSQL AND ENABLE_DATA_POSTGRESQL)
-	list(APPEND Poco_COMPONENTS "Data/PostgresSQL")
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgreSQL AND ENABLE_DATA_POSTGRESQL)
+	list(APPEND Poco_COMPONENTS "Data/PostgreSQL")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord AND ENABLE_ACTIVERECORD)
@@ -558,6 +571,7 @@ message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
 message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] C++ symbol visibility:  ${CMAKE_CXX_VISIBILITY_PRESET}")
 
 foreach(component ${Poco_COMPONENTS})
 	message(STATUS "Building: ${component}")

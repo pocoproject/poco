@@ -171,40 +171,9 @@
 // #define POCO_LOG_DEBUG
 
 
-// OpenSSL on Windows
-//
-// Poco has its own OpenSSL build system.
-// See <https://github.com/pocoproject/openssl/blob/master/README.md>
-// for details.
-//
-// These options are Windows only.
-//
-// To disable the use of Poco-provided OpenSSL binaries,
-// define POCO_EXTERNAL_OPENSSL.
-//
-// Possible values:
-//   POCO_EXTERNAL_OPENSSL_SLPRO:
-//     Automatically link OpenSSL libraries from OpenSSL Windows installer provided
-//     by Shining Light Productions <http://slproweb.com/products/Win32OpenSSL.html>
-//     The (global) library search path must be set accordingly.
-//   POCO_EXTERNAL_OPENSSL_DEFAULT:
-//     Automatically link OpenSSL libraries from standard OpenSSL Windows build.
-//     The (global) library search path must be set accordingly.
-//   empty or other value:
-//     Do not link any OpenSSL libraries automatically. You will have to edit the
-//     Visual C++ project files for Crypto and NetSSL_OpenSSL.
-#if !defined(POCO_EXTERNAL_OPENSSL) && defined(POCO_EXTERNAL_OPENSSL_SLPRO)
-	#define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
-#endif
-
-
 // Define to prevent changing the suffix for shared libraries
 // to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
 // #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
-
-
-// Disarm POCO_DEPRECATED macro.
-// #define POCO_NO_DEPRECATED
 
 // Enable usage of Poco::Mutex and Poco::FastMutex
 // as wrappers for std::recursive_mutex and std::mutex
@@ -217,6 +186,13 @@
 #endif
 
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+
+// Option to silence deprecation warnings.
+#ifndef POCO_SILENCE_DEPRECATED
+	#define POCO_DEPRECATED(reason) [[deprecated(reason)]]
+#else
+	#define POCO_DEPRECATED(reason)
+#endif
 
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER

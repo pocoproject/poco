@@ -573,6 +573,9 @@
     <ClCompile Include="src\AbstractObserver.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AsyncNotificationCenter.cpp">
+      <Filter>Notifications\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Notification.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
@@ -921,6 +924,8 @@
     <ClCompile Include="src\pcre2_xclass.c">
       <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActiveThreadPool.cpp" />
+    <ClCompile Include="src\VarVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1446,6 +1451,12 @@
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\NObserver.h">
+      <Filter>Notifications\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\AsyncObserver.h">
+      <Filter>Notifications\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\AsyncNotificationCenter.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Notification.h">

@@ -75,7 +75,7 @@ public:
 
 	virtual DirectoryIterator& operator ++ ();   // prefix
 
-	//@ deprecated
+	POCO_DEPRECATED("")
 	DirectoryIterator operator ++ (int); // postfix
 		/// Please use the prefix increment operator instead.
 

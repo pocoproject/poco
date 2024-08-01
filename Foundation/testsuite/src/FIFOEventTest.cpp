@@ -7,6 +7,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#if defined(POCO_TEST_DEPRECATED)
 
 #include "FIFOEventTest.h"
 #include "DummyDelegate.h"
@@ -377,7 +378,7 @@ void FIFOEventTest::testAsyncNotifyBenchmark()
 			assertTrue (vresult[i].data() == (i*2));
 		}
 		sw.stop();
-		times.push_back(sw.elapsed()/1000);
+		times.push_back(static_cast<int>(sw.elapsed()/1000));
 		vresult.clear();
 	}
 
@@ -451,7 +452,7 @@ void FIFOEventTest::onAsyncBench(const void* pSender, int& i)
 
 int FIFOEventTest::getCount() const
 {
-	return _count;
+	return static_cast<int>(_count.load());
 }
 
 
@@ -495,3 +496,5 @@ CppUnit::Test* FIFOEventTest::suite()
 	//CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
 	return pSuite;
 }
+
+#endif

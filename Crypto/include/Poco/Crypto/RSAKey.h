@@ -30,8 +30,8 @@ namespace Crypto {
 class X509Certificate;
 class PKCS12Container;
 
+//class [[deprecated]] RSAKey;
 
-//@ deprecated
 class Crypto_API RSAKey: public KeyPair
 	/// This class stores an RSA key pair, consisting
 	/// of private and public key. Storage of the private
@@ -81,7 +81,7 @@ public:
 		/// OpenSSL will auto-create the public key from the private key.
 
 	RSAKey(std::istream* pPublicKeyStream,
-		std::istream* pPrivateKeyStream = 0,
+		std::istream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "");
 		/// Creates the RSAKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.

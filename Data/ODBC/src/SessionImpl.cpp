@@ -123,6 +123,10 @@ void SessionImpl::addFeatures()
 		&SessionImpl::setMaxFieldSize,
 		&SessionImpl::getMaxFieldSize);
 
+	addProperty("loginTimeout",
+		&SessionImpl::setLoginTimeout,
+		&SessionImpl::getLoginTimeout);
+
 	addProperty("queryTimeout",
 		&SessionImpl::setQueryTimeout,
 		&SessionImpl::getQueryTimeout);
@@ -153,9 +157,7 @@ void SessionImpl::open(const std::string& connect)
 	if (connectionString().empty())
 		throw InvalidArgumentException("SessionImpl::open(): Connection string empty");
 
-	SQLULEN tout = static_cast<SQLULEN>(getLoginTimeout());
-
-	if (_db.connect(connectionString(), tout))
+	if (_db.connect(connectionString()))
 	{
 		setProperty("handle", _db.handle());
 
@@ -245,26 +247,30 @@ inline Poco::Any SessionImpl::getCursorUse(const std::string&) const
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	SQLUINTEGER value = static_cast<SQLUINTEGER>(timeout);
-
-	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db,
-		SQL_ATTR_CONNECTION_TIMEOUT,
-		&value,
-		SQL_IS_UINTEGER), "Failed to set connection timeout.");
+	SQLULEN value = static_cast<SQLUINTEGER>(timeout);
+	_db.setTimeout(static_cast<int>(value));
 }
 
 
 std::size_t SessionImpl::getConnectionTimeout() const
 {
-	SQLULEN value = 0;
+	return _db.getTimeout();
+}
 
-	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
-		SQL_ATTR_CONNECTION_TIMEOUT,
-		&value,
-		0,
-		0), "Failed to get connection timeout.");
 
-	return value;
+void SessionImpl::setLoginTimeout(const std::string&, const Poco::Any& value)
+{
+	int timeout = 0;
+	try
+	{
+		timeout = Poco::AnyCast<int>(value);
+	}
+	catch(const Poco::BadCastException&)
+	{
+		timeout = Poco::AnyCast<unsigned int>(value);
+	}
+
+	_db.setLoginTimeout(timeout);
 }
 
 
@@ -352,8 +358,10 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	if (isTransaction()) throw InvalidAccessException();
 
-	bool retval = true;
 	Poco::UInt32 old = getTransactionIsolation();
+	if (old == ti) return true;
+
+	bool retval = true;
 	try { setTransactionIsolationImpl(ti); }
 	catch (Poco::Exception&) { retval = false; }
 	setTransactionIsolationImpl(old);

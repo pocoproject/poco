@@ -1569,15 +1569,10 @@ void SecureSocketImpl::stateMachine()
 }
 
 
-namespace
-{
-	static Poco::SingletonHolder<StateMachine> stateMachineSingleton;
-}
-
-
 StateMachine& StateMachine::instance()
 {
-	return *stateMachineSingleton.get();
+	static StateMachine sm;
+	return sm;
 }
 
 

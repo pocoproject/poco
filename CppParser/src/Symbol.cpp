@@ -31,7 +31,8 @@ Symbol::Symbol():
 	_id(_nextId++),
 	_pNameSpace(0),
 	_access(ACC_PUBLIC),
-	_line(-1)
+	_line(-1),
+	_order(0)
 {
 }
 
@@ -41,7 +42,8 @@ Symbol::Symbol(const std::string& name, NameSpace* pNameSpace):
 	_name(name),
 	_pNameSpace(pNameSpace),
 	_access(ACC_PUBLIC),
-	_line(-1)
+	_line(-1),
+	_order(0)
 {
 	if (_pNameSpace)
 		_pNameSpace->addSymbol(this);
@@ -56,6 +58,12 @@ Symbol::~Symbol()
 void Symbol::setAccess(Access access)
 {
 	_access = access;
+}
+
+
+void Symbol::setAttributeList(const std::string& attrs)
+{
+	_attributeList = attrs;
 }
 
 
@@ -94,6 +102,12 @@ void Symbol::setPackage(const std::string& package)
 void Symbol::setLibrary(const std::string& library)
 {
 	_library = library;
+}
+
+
+void Symbol::setOrder(std::size_t order)
+{
+	_order = order;
 }
 
 

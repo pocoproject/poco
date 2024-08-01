@@ -62,7 +62,7 @@ public:
 		HTTP_SEE_OTHER                       = 303,
 		HTTP_NOT_MODIFIED                    = 304,
 		HTTP_USE_PROXY                       = 305,
-		HTTP_USEPROXY                        = 305, /// @deprecated
+		HTTP_USEPROXY POCO_DEPRECATED("use HTTP_USE_PROXY") = 305,
 		// UNUSED: 306
 		HTTP_TEMPORARY_REDIRECT              = 307,
 		HTTP_PERMANENT_REDIRECT              = 308,
@@ -80,11 +80,11 @@ public:
 		HTTP_LENGTH_REQUIRED                 = 411,
 		HTTP_PRECONDITION_FAILED             = 412,
 		HTTP_REQUEST_ENTITY_TOO_LARGE        = 413,
-		HTTP_REQUESTENTITYTOOLARGE           = 413, /// @deprecated
+		HTTP_REQUESTENTITYTOOLARGE POCO_DEPRECATED("") = 413,
 		HTTP_REQUEST_URI_TOO_LONG            = 414,
-		HTTP_REQUESTURITOOLONG               = 414, /// @deprecated
+		HTTP_REQUESTURITOOLONG POCO_DEPRECATED("") = 414,
 		HTTP_UNSUPPORTED_MEDIA_TYPE          = 415,
-		HTTP_UNSUPPORTEDMEDIATYPE            = 415, /// @deprecated
+		HTTP_UNSUPPORTEDMEDIATYPE POCO_DEPRECATED("") = 415,
 		HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
 		HTTP_EXPECTATION_FAILED              = 417,
 		HTTP_IM_A_TEAPOT                     = 418,
@@ -134,7 +134,7 @@ public:
 	HTTPResponse(const HTTPResponse& other);
 		/// Creates the HTTPResponse by copying another one.
 
-	virtual ~HTTPResponse();
+	~HTTPResponse() override;
 		/// Destroys the HTTPResponse.
 
 	HTTPResponse& operator = (const HTTPResponse& other);
@@ -185,11 +185,11 @@ public:
 		/// May throw an exception in case of a malformed
 		/// Set-Cookie header.
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP response to the given
 		/// output stream.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP response from the
 		/// given input stream.
 		///

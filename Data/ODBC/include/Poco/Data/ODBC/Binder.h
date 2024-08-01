@@ -394,6 +394,7 @@ private:
 	{
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
+
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
 		_lengthIndicator.push_back(0);
@@ -998,7 +999,7 @@ private:
 		{
 			std::size_t sz = it->size() * typeSize;
 			if (sz > _maxFieldSize)
-				throw LengthExceededException();
+				throw LengthExceededException("ODBC::Binder::getMinValueSize(%s, %d)", std::string(typeid(T).name()), static_cast<int>(size));
 
 			if (sz == _maxFieldSize)
 			{

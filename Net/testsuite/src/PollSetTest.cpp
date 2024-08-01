@@ -361,7 +361,6 @@ void PollSetTest::testPollNoServer()
 	catch (Poco::Exception&) {}
 
 	assertEqual(2, ps.poll(Timespan(1000000)).size());
-	
 }
 
 

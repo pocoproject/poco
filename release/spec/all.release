@@ -6,6 +6,7 @@ Data/SQLite
 Data/ODBC
 Data/MySQL
 Data/PostgreSQL
+Data/DataTest
 Zip
 PageCompiler
 PageCompiler/File2Page

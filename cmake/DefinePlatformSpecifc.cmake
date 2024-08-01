@@ -49,10 +49,6 @@ else(MSVC)
     set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
 endif(MSVC)
 
-if(MINGW)
-    add_link_options("-municode")
-endif()
-
 if (ENABLE_COMPILER_WARNINGS)
     message(STATUS "Enabling additional compiler warning flags.")
     # Additional compiler-specific warning flags

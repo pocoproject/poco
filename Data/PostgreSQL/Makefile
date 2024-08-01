@@ -12,9 +12,8 @@ objects = Extractor BinaryExtractor Binder SessionImpl Connector \
 	PostgreSQLStatementImpl PostgreSQLException \
 	SessionHandle StatementExecutor PostgreSQLTypes Utility
 
-ifndef POCO_DATA_NO_SQL_PARSER
-	target_includes = $(POCO_BASE)/Data/src
-endif
+
+target_includes = $(POCO_BASE)/Data/testsuite/include
 
 target         = PocoDataPostgreSQL
 target_version = $(LIBVERSION)

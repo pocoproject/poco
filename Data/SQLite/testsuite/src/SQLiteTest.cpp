@@ -32,7 +32,7 @@
 #include "Poco/Any.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Logger.h"
 #include "Poco/Message.h"
@@ -68,7 +68,7 @@ using Poco::Nullable;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 using Poco::Logger;
 using Poco::Message;
@@ -86,7 +86,6 @@ using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
 using Poco::Int64;
-using Poco::Dynamic::Var;
 using Poco::Data::SQLite::Utility;
 using Poco::delegate;
 using Poco::Stopwatch;
@@ -2394,10 +2393,10 @@ void SQLiteTest::testDynamicAny()
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR, empty INTEGER)", now;
 
-	DynamicAny i = Int32(42);
-	DynamicAny f = double(42.5);
-	DynamicAny s = std::string("42");
-	DynamicAny e;
+	Var i = Int32(42);
+	Var f = double(42.5);
+	Var s = std::string("42");
+	Var e;
 	assertTrue (e.isEmpty());
 
 	tmp << "INSERT INTO Anys VALUES (?, ?, ?, null)", use(i), use(f), use(s), now;
@@ -2480,7 +2479,7 @@ void SQLiteTest::testSQLChannel()
 	{
 		Thread::sleep(10);
 		if (sw.elapsedSeconds() > 3)
-			fail ("SQLExecutor::sqlLogger(): SQLChannel timed out");
+			fail ("SQLChannel timed out");
 	}
 	// bulk binding mode is not suported by SQLite, but SQLChannel should handle it internally
 	pChannel->setProperty("bulk", "true");
@@ -2537,6 +2536,17 @@ void SQLiteTest::testSQLChannel()
 	rs2.moveNext();
 	assertTrue("WarningSource" == rs2["Source"]);
 	assertTrue("f Warning sync message" == rs2["Text"]);
+
+	pChannel->setProperty("minBatch", "1024");
+	constexpr int mcount { 2000 };
+	for (int i = 0; i < mcount; i++)
+	{
+		Message msgInfG("InformationSource", "g Informational sync message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInfG);
+	}
+	pChannel.reset();
+	RecordSet rsl(tmp, "SELECT * FROM T_POCO_LOG");
+	assertEquals(2+mcount, rsl.rowCount());
 }
 
 
@@ -3513,7 +3523,7 @@ void SQLiteTest::testIllegalFilePath()
 	}
 }
 
-void SQLiteTest::testTransactionTypeProperty() 
+void SQLiteTest::testTransactionTypeProperty()
 {
 	try {
 		using namespace Poco::Data::SQLite;

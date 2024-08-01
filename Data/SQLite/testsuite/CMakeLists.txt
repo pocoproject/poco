@@ -4,7 +4,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 
 # Headers
 file(GLOB_RECURSE HDRS_G "src/*.h")
-file(GLOB HDRS_E ${CMAKE_SOURCE_DIR}/Data/testsuite/DataTest/include/*.h)
+file(GLOB HDRS_E ${CMAKE_SOURCE_DIR}/Data/DataTest/include/*.h)
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_E})
 
 POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
@@ -28,4 +28,4 @@ else()
 endif()
 
 target_link_libraries(DataSQLite-testrunner PUBLIC Poco::DataSQLite Poco::DataTest CppUnit)
-target_include_directories(DataSQLite-testrunner PUBLIC ${CMAKE_SOURCE_DIR}/Data/testsuite/DataTest/include/)
+target_include_directories(DataSQLite-testrunner PUBLIC ${CMAKE_SOURCE_DIR}/Data/DataTest/include/)

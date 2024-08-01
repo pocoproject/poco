@@ -177,6 +177,7 @@ void DateTimeParserTest::testISO8601Frac()
 	assertTrue (dt.microsecond() == 0);
 	assertTrue (tzd == 0);
 	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.1J", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.Z", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.123+01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -616,6 +617,15 @@ void DateTimeParserTest::testCustom()
 	catch (SyntaxException&)
 	{
 	}
+
+	// bad year (not a number)
+	testBad("%y", "YY", tzd);
+
+	// bad year (number too big)
+	testBad("%r", "123456789101112131415", tzd);
+
+	// check that an invalid millisecond is detected with a custom format
+	testBad("T%H:%M:%s %z", "T12:30:00.Z", tzd);
 }
 
 
@@ -751,6 +761,28 @@ void DateTimeParserTest::testGuess()
 	assertTrue (tzd == 0);
 }
 
+void DateTimeParserTest::testCleanup()
+{
+	int tzd;
+
+	DateTime dt = DateTimeParser::parse("2005-01-08T12:30:00Z", tzd);
+	DateTime dt2 = DateTimeParser::parse(" 	2005-01-08T12:30:00Z ", tzd);
+
+	assertTrue (dt == dt2);
+
+	assertTrue(DateTimeParser::tryParse("		2005-01-08T12:30:00Z  ", dt, tzd));
+
+	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.1Z", tzd);
+	dt2 = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.1Z	", tzd);
+
+	assertTrue (dt == dt2);
+
+	assertTrue(DateTimeParser::tryParse(DateTimeFormat::ISO8601_FRAC_FORMAT, "		2005-01-08T12:30:00Z  ", dt, tzd));
+
+	assertFalse(DateTimeParser::tryParse(DateTimeFormat::ISO8601_FRAC_FORMAT, "  		", dt, tzd));
+
+}
+
 
 void DateTimeParserTest::testParseMonth()
 {
@@ -790,7 +822,7 @@ void DateTimeParserTest::testParseMonth()
 		month = DateTimeParser::parseMonth(it, str.end());
 		fail("Not a valid month name - must throw");
 	}
-	catch (SyntaxException&)
+	catch (const SyntaxException&)
 	{
 	}
 }
@@ -834,7 +866,7 @@ void DateTimeParserTest::testParseDayOfWeek()
 		dow = DateTimeParser::parseDayOfWeek(it, str.end());
 		fail("Not a valid weekday name - must throw");
 	}
-	catch (SyntaxException&)
+	catch (const SyntaxException&)
 	{
 	}
 }
@@ -877,6 +909,7 @@ CppUnit::Test* DateTimeParserTest::suite()
 	CppUnit_addTest(pSuite, DateTimeParserTest, testSORTABLE);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCustom);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testGuess);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testCleanup);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseMonth);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseDayOfWeek);
 

@@ -9,13 +9,21 @@
 
 
 #include "SQLParserTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
-#include <sstream>
 
 #ifndef POCO_DATA_NO_SQL_PARSER
 
-#include "Poco/Data/SQLParser.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
+#include <sstream>
+#include "SQLParser.h"
+
+
+namespace Poco {
+namespace Data {
+
+namespace Parser = hsql; // namespace Poco::Data::Parser
+
+}}
 
 
 using namespace Poco::Data::Parser;

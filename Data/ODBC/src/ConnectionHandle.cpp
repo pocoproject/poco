@@ -24,12 +24,18 @@ namespace Data {
 namespace ODBC {
 
 
-ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN timeout): _pEnvironment(nullptr),
+const std::string ConnectionHandle::UNSUPPORTED_SQLSTATE = "HYC00";
+const std::string ConnectionHandle::GEN_ERR_SQLSTATE = "HY000";
+const std::string ConnectionHandle::CANT_SET_ATTR_SQLSTATE = "HY011";
+
+
+ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout):
+	_pEnvironment(nullptr),
 	_hdbc(SQL_NULL_HDBC),
 	_connectString(connectString)
 {
 	alloc();
-	setTimeout(timeout);
+	setTimeouts(loginTimeout, timeout);
 }
 
 
@@ -76,7 +82,29 @@ void ConnectionHandle::free()
 }
 
 
-bool ConnectionHandle::connect(const std::string& connectString, SQLULEN timeout)
+void ConnectionHandle::setTimeouts(SQLULEN loginTimeout, SQLULEN timeout)
+{
+	if (loginTimeout)
+	{
+		try
+		{
+			setLoginTimeout(loginTimeout);
+		}
+		catch(const NotSupportedException&) {}
+	}
+
+	if (timeout)
+	{
+		try
+		{
+			setTimeout(static_cast<int>(timeout));
+		}
+		catch(const NotSupportedException&) {}
+	}
+}
+
+
+bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout)
 {
 	if (isConnected())
 		throw Poco::InvalidAccessException("ODBC: connection already established.");
@@ -91,6 +119,9 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN timeout
 	SQLSMALLINT result;
 
 	if (!_pEnvironment) alloc();
+
+	setTimeouts(loginTimeout, timeout);
+
 	if (Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_hdbc
 		, NULL
 		,(SQLCHAR*) _connectString.c_str()
@@ -100,12 +131,28 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN timeout
 		, &result
 		, SQL_DRIVER_NOPROMPT)))
 	{
-		disconnect();
 		ConnectionError err(_hdbc);
+		disconnect();
 		throw ConnectionFailedException(err.toString());
 	}
 
-	return _hdbc != SQL_NULL_HDBC;;
+	try
+	{
+		// Setting timeouts before connection is valid by standard (as it makes sense for login timeout),
+		// but not all drivers comply, so we have to check and try again after succesful connection.
+		// Furthermore, it appears that Oracle has only one timeout, so it is not possible to have
+		// different login and connection timeouts. Last but not least, some ODBC drivers (eg. DataDirect
+		// for Oracle) flat out refuse to set login timeout and return error - that's why these calls
+		// are wrapped in try/catch and silently ignore errors.
+		if (getTimeout() != timeout)
+			setTimeout(static_cast<int>(timeout));
+		if (getLoginTimeout() != loginTimeout)
+			setLoginTimeout(loginTimeout);
+	}
+	catch(NotSupportedException&){}
+	catch(InvalidAccessException&){}
+
+	return _hdbc != SQL_NULL_HDBC;
 }
 
 
@@ -120,25 +167,94 @@ bool ConnectionHandle::disconnect()
 }
 
 
-void ConnectionHandle::setTimeout(SQLULEN timeout)
+void ConnectionHandle::setTimeoutImpl(SQLULEN timeout, SQLINTEGER attribute)
 {
-	if (Utility::isError(SQLSetConnectAttr(_hdbc, SQL_ATTR_LOGIN_TIMEOUT, (SQLPOINTER) timeout, 0)))
+	if (attribute != SQL_ATTR_LOGIN_TIMEOUT && attribute != SQL_ATTR_CONNECTION_TIMEOUT)
+		throw InvalidArgumentException(Poco::format("ODBC::ConnectionHandle::setTimeoutImpl(%d)", attribute));
+
+	if (Utility::isError(SQLSetConnectAttr(_hdbc, attribute, (SQLPOINTER) timeout, 0)))
 	{
 		ConnectionError e(_hdbc);
+		std::string name;
+		switch (attribute)
+		{
+			case SQL_ATTR_LOGIN_TIMEOUT:
+				name = "LOGIN"s;
+				break;
+			case SQL_ATTR_CONNECTION_TIMEOUT:
+				name = "CONNECTION"s;
+				break;
+			default:
+				break;
+		}
+
+		if (isUnsupported(e))
+			throw NotSupportedException(Poco::format("ConnectionHandle::setTimeoutImpl(%s)", name));
+		else if (isGenError(e) || cantSetAttr(e))
+			throw InvalidAccessException(Poco::format("ConnectionHandle::setTimeoutImpl(%s)", name));
+
 		throw ConnectionFailedException(e.toString());
 	}
 }
 
 
-int ConnectionHandle::getTimeout() const
+int ConnectionHandle::getTimeoutImpl(SQLINTEGER attribute) const
 {
-	SQLULEN timeout = 0;
-	if (Utility::isError(SQLGetConnectAttr(_hdbc, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0)))
+	SQLUINTEGER timeout = 0;
+	if (Utility::isError(SQLGetConnectAttr(_hdbc, attribute, &timeout, sizeof(timeout), 0)))
 	{
 		ConnectionError e(_hdbc);
+		if (isUnsupported(e))
+			throw NotSupportedException("ConnectionHandle::getTimeoutImpl(%s)");
+
 		throw ConnectionFailedException(e.toString());
 	}
 	return static_cast<int>(timeout);
+}
+
+
+bool ConnectionHandle::isUnsupported(const ConnectionError& e) const
+{
+	const ConnectionDiagnostics& cd = e.diagnostics();
+	int diagRecs = cd.count();
+	for (int i = 0; i < diagRecs; ++i)
+	{
+		if (cd.sqlState(i) == UNSUPPORTED_SQLSTATE)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+bool ConnectionHandle::isGenError(const ConnectionError& e) const
+{
+	const ConnectionDiagnostics& cd = e.diagnostics();
+	int diagRecs = cd.count();
+	for (int i = 0; i < diagRecs; ++i)
+	{
+		if (cd.sqlState(i) == GEN_ERR_SQLSTATE)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+bool ConnectionHandle::cantSetAttr(const ConnectionError& e) const
+{
+	const ConnectionDiagnostics& cd = e.diagnostics();
+	int diagRecs = cd.count();
+	for (int i = 0; i < diagRecs; ++i)
+	{
+		if (cd.sqlState(i) == CANT_SET_ATTR_SQLSTATE)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -146,12 +262,12 @@ bool ConnectionHandle::isConnected() const
 {
 	if (!*this) return false;
 
-	SQLULEN value = 0;
+	SQLINTEGER value = -1;
 
 	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_hdbc,
 		SQL_ATTR_CONNECTION_DEAD,
 		&value,
-		0,
+		sizeof(value),
 		0))) return false;
 
 	return (SQL_CD_FALSE == value);

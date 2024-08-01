@@ -147,7 +147,7 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 		return new StreamSocketImpl(sd);
 	}
 	error(); // will throw
-	return 0;
+	return nullptr;
 }
 
 
@@ -527,7 +527,7 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 		msgHdr.msg_namelen = address.length();
 		msgHdr.msg_iov = const_cast<iovec*>(&buffers[0]);
 		msgHdr.msg_iovlen = buffers.size();
-		msgHdr.msg_control = 0;
+		msgHdr.msg_control = nullptr;
 		msgHdr.msg_controllen = 0;
 		msgHdr.msg_flags = flags;
 		rc = sendmsg(_sockfd, &msgHdr, flags);
@@ -613,7 +613,7 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_s
 		msgHdr.msg_namelen = **ppSALen;
 		msgHdr.msg_iov = &buffers[0];
 		msgHdr.msg_iovlen = buffers.size();
-		msgHdr.msg_control = 0;
+		msgHdr.msg_control = nullptr;
 		msgHdr.msg_controllen = 0;
 		msgHdr.msg_flags = flags;
 		rc = recvmsg(_sockfd, &msgHdr, flags);
@@ -652,7 +652,7 @@ int SocketImpl::available()
 	if (result && (type() == SOCKET_TYPE_DATAGRAM))
 	{
 		std::vector<char> buf(result);
-		result = recvfrom(sockfd(), &buf[0], result, MSG_PEEK, NULL, NULL);
+		result = recvfrom(sockfd(), &buf[0], result, MSG_PEEK, nullptr, nullptr);
 	}
 #endif
 	return result;
@@ -1114,7 +1114,7 @@ void SocketImpl::setReusePort(bool flag)
 		int value = flag ? 1 : 0;
 		setOption(SOL_SOCKET, SO_REUSEPORT, value);
 	}
-	catch (IOException&)
+	catch (const IOException&)
 	{
 		// ignore error, since not all implementations
 		// support SO_REUSEPORT, even if the macro

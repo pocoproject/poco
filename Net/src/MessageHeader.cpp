@@ -413,10 +413,10 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 std::string MessageHeader::decodeWord(const std::string& text, const std::string& charset)
 {
 	std::string outs, tmp = text;
+	size_t pos = tmp.find("=?");
 	do {
 		std::string tmp2;
 		// find the begining of the next rfc2047 chunk
-		size_t pos = tmp.find("=?");
 		if (pos == std::string::npos) {
 			// No more found, return
 			outs += tmp;
@@ -453,14 +453,24 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 			// not found.
 			outs += tmp;
 			break;
-
 		}
+
 		// At this place, there are a valid rfc2047 chunk, so decode and copy the result.
 		decodeRFC2047(tmp.substr(0, pos3), tmp2, charset);
 		outs += tmp2;
 
 		// Jump at the rest of the string and repeat the whole process.
 		tmp = tmp.substr(pos3 + 2);
+		pos = tmp.find("=?");
+		if (pos != std::string::npos)
+		{
+			std::string betweenChunks = tmp.substr(0, pos);
+			if (betweenChunks.find_first_not_of(" \t\v\n") == std::string::npos)
+			{
+				tmp = tmp.substr(pos);
+				pos = 0;
+			}
+		}
 	} while (true);
 
 	return outs;

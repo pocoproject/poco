@@ -20,6 +20,8 @@
 class AnyTest: public CppUnit::TestCase
 {
 public:
+	class Dummy{};
+
 	AnyTest(const std::string& name);
 	~AnyTest();
 
@@ -33,6 +35,7 @@ public:
 	void testAnyEmptyCopy();
 	void testAnyCastToReference();
 
+	void testAnyPointer();
 	void testAnyInt();
 	void testAnyComplexType();
 	void testAnyVector();
@@ -42,6 +45,10 @@ public:
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();
+
+private:
+	int _dummy = 0;
+	Dummy _dummyObject;
 };
 
 

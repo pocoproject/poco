@@ -30,6 +30,9 @@
 #include <set>
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Util {
 
@@ -37,14 +40,14 @@ namespace Util {
 XMLConfiguration::XMLConfiguration():
 	_delim('.')
 {
-	loadEmpty("config");
+	loadEmpty("config"s);
 }
 
 
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {
-	loadEmpty("config");
+	loadEmpty("config"s);
 }
 
 
@@ -199,7 +202,7 @@ void XMLConfiguration::save(const std::string& path) const
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	Poco::XML::DOMWriter writer;
-	writer.setNewLine("\n");
+	writer.setNewLine("\n"s);
 	writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
 	writer.writeNode(path, _pDocument);
 }
@@ -210,7 +213,7 @@ void XMLConfiguration::save(std::ostream& ostr) const
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	Poco::XML::DOMWriter writer;
-	writer.setNewLine("\n");
+	writer.setNewLine("\n"s);
 	writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
 	writer.writeNode(ostr, _pDocument);
 }

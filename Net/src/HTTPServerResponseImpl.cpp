@@ -40,6 +40,7 @@ using Poco::OpenFileException;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
 using Poco::Error;
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -115,7 +116,7 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	File f(path);
 	Timestamp dateTime    = f.getLastModified();
 	File::FileSize length = f.getSize();
-	set("Last-Modified", DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
+	set("Last-Modified"s, DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
 #if defined(POCO_HAVE_INT64)
 	setContentLength64(length);
 #else
@@ -174,7 +175,7 @@ void HTTPServerResponseImpl::redirect(const std::string& uri, HTTPStatus status)
 	setChunkedTransferEncoding(false);
 
 	setStatusAndReason(status);
-	set("Location", uri);
+	set("Location"s, uri);
 
 	_pStream = new HTTPHeaderOutputStream(_session);
 	write(*_pStream);
@@ -189,7 +190,7 @@ void HTTPServerResponseImpl::requireAuthentication(const std::string& realm)
 	std::string auth("Basic realm=\"");
 	auth.append(realm);
 	auth.append("\"");
-	set("WWW-Authenticate", auth);
+	set("WWW-Authenticate"s, auth);
 }
 
 

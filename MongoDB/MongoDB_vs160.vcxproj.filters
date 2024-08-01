@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{79291374-e43c-410c-9abb-27856b414425}</UniqueIdentifier>
+      <UniqueIdentifier>{70ee55d8-dce7-4e79-b2d6-3a64dcb9fd30}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{b5f2e9d3-009b-4027-b9c2-043999b8ec92}</UniqueIdentifier>
+      <UniqueIdentifier>{33749c14-0ceb-4ad4-b5ec-04dba76f741f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -52,6 +52,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ObjectId.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpMsgCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpMsgMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\QueryRequest.cpp">

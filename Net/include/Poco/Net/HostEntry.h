@@ -76,14 +76,6 @@ public:
 		/// for the host.
 
 private:
-	template <typename C>
-	void removeDuplicates(C& list)
-	{
-		std::sort(list.begin(), list.end());
-		auto last = std::unique(list.begin(), list.end());
-		list.erase(last, list.end());
-	}
-
 	std::string _name;
 	AliasList   _aliases;
 	AddressList _addresses;

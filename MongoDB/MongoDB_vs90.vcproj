@@ -557,6 +557,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\OpMsgCursor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\OpMsgMessage.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\QueryRequest.cpp"
 				>
 			</File>
