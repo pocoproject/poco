@@ -15,347 +15,504 @@
 #include "Poco/ActiveThreadPool.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
-#include "Poco/Event.h"
 #include "Poco/ThreadLocal.h"
 #include "Poco/ErrorHandler.h"
-#include "Poco/NotificationQueue.h"
+#include "Poco/Condition.h"
 #include <sstream>
-#include <utility>
+#include <set>
+#include <list>
 
 namespace Poco {
 
-class NewActionNotification: public Notification
+class QueuePage
 {
 public:
-	using Ptr = AutoPtr<NewActionNotification>;
-
-	NewActionNotification(Thread::Priority priority, Runnable& runnable, const std::string& name) :
-		_priority(priority),
-		_runnable(runnable),
-		_name(name)
+	enum
 	{
+		MaxPageSize = 256
+	};
+
+	QueuePage(Runnable* runnable, int priority):
+		_priority(priority)
+	{
+		push(runnable);
 	}
 
-	~NewActionNotification() override = default;
-
-	Runnable& runnable() const
+	bool isFull()
 	{
-		return _runnable;
+		return _lastIndex >= MaxPageSize - 1;
 	}
 
-	Thread::Priority priority() const
+	bool isFinished()
+	{
+		return _firstIndex > _lastIndex;
+	}
+
+	void push(Runnable* runnable)
+	{
+		poco_assert(runnable);
+		poco_assert(!isFull());
+		_lastIndex += 1;
+		_entries[_lastIndex] = runnable;
+	}
+
+	void skipToNextOrEnd()
+	{
+		while (!isFinished() && _entries[_firstIndex] == nullptr)
+		{
+			_firstIndex += 1;
+		}
+	}
+
+	Runnable* first()
+	{
+		poco_assert(!isFinished());
+		Runnable* runnable = _entries[_firstIndex];
+		poco_assert(runnable);
+		return runnable;
+	}
+
+	Runnable* pop()
+	{
+		poco_assert(!isFinished());
+		Runnable* runnable = first();
+		poco_assert(runnable);
+
+		// clear the entry although this should not be necessary
+		_entries[_firstIndex] = nullptr;
+		_firstIndex += 1;
+
+		// make sure the next runnable returned by first() is not a nullptr
+		skipToNextOrEnd();
+
+		return runnable;
+	}
+
+	bool tryTake(Runnable* runnable)
+	{
+		poco_assert(!isFinished());
+		for (int i = _firstIndex; i <= _lastIndex; i++)
+		{
+			if (_entries[i] == runnable)
+			{
+				_entries[i] = nullptr;
+				if (i == _firstIndex)
+				{
+					// make sure first() does not return a nullptr
+					skipToNextOrEnd();
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	int priority() const
 	{
 		return _priority;
 	}
 
-	const std::string &threadName() const
-	{
-		return _name;
-	}
-
-	std::string threadFullName() const
-	{
-		std::string fullName(_name);
-		if (_name.empty())
-		{
-		  fullName = _name;
-		}
-		else
-		{
-			fullName.append(" (");
-			fullName.append(_name);
-			fullName.append(")");
-		}
-		return fullName;
-	}
-
 private:
-	std::atomic<Thread::Priority> _priority;
-	Runnable& _runnable;
-	std::string _name;
+	int _priority = 0;
+	int _firstIndex = 0;
+	int _lastIndex = -1;
+	Runnable* _entries[MaxPageSize];
 };
 
-class ActiveThread: public Runnable
+
+class ActivePooledThread: public Runnable
 {
 public:
-	ActiveThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
-	~ActiveThread() override = default;
+	ActivePooledThread(ActiveThreadPoolPrivate* pool);
 
 	void start();
-	void start(Thread::Priority priority, Runnable& target);
-	void start(Thread::Priority priority, Runnable& target, const std::string& name);
 	void join();
-	void release();
-	void run() override;
+	bool isRunning() const;
+
+	void setRunnable(Runnable* runnable);
+	void notifyRunnableReady();
+	void registerThreadInactive();
+
+	virtual void run() override;
 
 private:
-	NotificationQueue _pTargetQueue;
-	std::string       _name;
-	Thread            _thread;
-	Event             _targetCompleted;
-	FastMutex         _mutex;
-	const long        JOIN_TIMEOUT = 10000;
-	std::atomic<bool> _needToStop{false};
+	ActiveThreadPoolPrivate* _pool;
+	Runnable* _runnable;
+	Condition _runnableReady;
+	Thread _thread;
 };
 
 
-ActiveThread::ActiveThread(const std::string& name, int stackSize):
-	_name(name),
-	_thread(name),
-	_targetCompleted(Event::EVENT_MANUALRESET)
+class ActiveThreadPoolPrivate
 {
-	poco_assert_dbg (stackSize >= 0);
-	_thread.setStackSize(stackSize);
+public:
+	ActiveThreadPoolPrivate(int capacity, int stackSize);
+	ActiveThreadPoolPrivate(int capacity, int stackSize, const std::string& name);
+	~ActiveThreadPoolPrivate();
+
+	bool tryStart(Runnable* runnable);
+	void enqueueTask(Runnable* runnable, int priority = 0);
+	void startThread(Runnable* runnable);
+	void joinAll();
+
+	int activeThreadCount() const;
+
+public:
+	mutable FastMutex mutex;
+	std::string name;
+	std::set<ActivePooledThread*> allThreads;
+	std::list<ActivePooledThread*> waitingThreads;
+	std::list<ActivePooledThread*> expiredThreads;
+	std::list<QueuePage*> runnables;
+	Condition noActiveThreads;
+
+	int expiryTimeout = 30000;
+	int maxThreadCount;
+	int stackSize;
+	int activeThreads = 0;
+	int serial = 0;
+};
+
+
+ActivePooledThread::ActivePooledThread(ActiveThreadPoolPrivate* pool):
+	_pool(pool),
+	_runnable(nullptr)
+{
+	poco_assert(_pool != nullptr);
+	std::ostringstream name;
+	name << _pool->name << "[#" << ++_pool->serial << "]";
+	_thread.setName(name.str());
+	_thread.setStackSize(_pool->stackSize);
 }
 
-void ActiveThread::start()
+
+void ActivePooledThread::start()
 {
-	_needToStop = false;
 	_thread.start(*this);
 }
 
 
-void ActiveThread::start(Thread::Priority priority, Runnable& target)
+void ActivePooledThread::setRunnable(Runnable* runnable)
 {
-	_pTargetQueue.enqueueNotification(Poco::makeAuto<NewActionNotification>(priority, target, _name));
+	_runnable = runnable;
 }
 
 
-void ActiveThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
+void ActivePooledThread::notifyRunnableReady()
 {
-	_pTargetQueue.enqueueNotification(Poco::makeAuto<NewActionNotification>(priority, target, name));
-}
-
-void ActiveThread::join()
-{
-	_pTargetQueue.wakeUpAll();
-	if (!_pTargetQueue.empty())
-	{
-		_targetCompleted.wait();
-	}
-
+	_runnableReady.signal();
 }
 
 
-void ActiveThread::release()
+bool ActivePooledThread::isRunning() const
 {
-	// In case of a statically allocated thread pool (such
-	// as the default thread pool), Windows may have already
-	// terminated the thread before we got here.
-	if (_thread.isRunning())
-	{
-		_needToStop = true;
-		_pTargetQueue.wakeUpAll();
-		if (!_pTargetQueue.empty())
-			_targetCompleted.wait(JOIN_TIMEOUT);
-	}
-
-	if (_thread.tryJoin(JOIN_TIMEOUT))
-	{
-		delete this;
-	}
+	return _thread.isRunning();
 }
 
 
-void ActiveThread::run()
+void ActivePooledThread::join()
 {
-	do
+	_thread.join();
+}
+
+
+void ActivePooledThread::run()
+{
+	FastMutex::ScopedLock lock(_pool->mutex);
+	for (;;)
 	{
-		AutoPtr<Notification> pN = _pTargetQueue.waitDequeueNotification();
-		while (pN)
+		Runnable* r = _runnable;
+		_runnable = nullptr;
+
+		do
 		{
-			NewActionNotification::Ptr pNAN = pN.cast<NewActionNotification>();
-			Runnable& target = pNAN->runnable();
-			_thread.setPriority(pNAN->priority());
-			_thread.setName(pNAN->name());
-			try
+			if (r)
 			{
-				target.run();
+				_pool->mutex.unlock();
+				try
+				{
+					r->run();
+				}
+				catch (Exception& exc)
+				{
+					ErrorHandler::handle(exc);
+				}
+				catch (std::exception& exc)
+				{
+					ErrorHandler::handle(exc);
+				}
+				catch (...)
+				{
+					ErrorHandler::handle();
+				}
+				ThreadLocalStorage::clear();
+				_pool->mutex.lock();
 			}
-			catch (Exception& exc)
+
+			if (_pool->runnables.empty())
 			{
-				ErrorHandler::handle(exc);
+				r = nullptr;
+				break;
 			}
-			catch (std::exception& exc)
-			{
-				ErrorHandler::handle(exc);
+
+			QueuePage* page = _pool->runnables.front();
+			r = page->pop();
+
+			if (page->isFinished()) {
+				_pool->runnables.pop_front();
+				delete page;
 			}
-			catch (...)
-			{
-				ErrorHandler::handle();
-			}
-			_thread.setName(_name);
-			_thread.setPriority(Thread::PRIO_NORMAL);
-			ThreadLocalStorage::clear();
-			pN = _pTargetQueue.waitDequeueNotification(1000);
+		} while (true);
+
+		_pool->waitingThreads.push_back(this);
+		registerThreadInactive();
+		// wait for work, exiting after the expiry timeout is reached
+		_runnableReady.tryWait(_pool->mutex, _pool->expiryTimeout);
+		++_pool->activeThreads;
+
+		auto it = std::find(_pool->waitingThreads.begin(), _pool->waitingThreads.end(), this);
+		if (it != _pool->waitingThreads.end())
+		{
+			_pool->waitingThreads.erase(it);
+			_pool->expiredThreads.push_back(this);
+			registerThreadInactive();
+			break;
 		}
-		_targetCompleted.set();
+
+		if (!_pool->allThreads.count(this))
+		{
+			registerThreadInactive();
+			break;
+		}
 	}
-	while (_needToStop == false);
+}
+
+
+void ActivePooledThread::registerThreadInactive()
+{
+	if (--_pool->activeThreads == 0)
+	{
+		_pool->noActiveThreads.broadcast();
+	}
+}
+
+
+ActiveThreadPoolPrivate::ActiveThreadPoolPrivate(int capacity, int stackSize_):
+	maxThreadCount(capacity),
+	stackSize(stackSize_)
+{
+}
+
+
+ActiveThreadPoolPrivate::ActiveThreadPoolPrivate(int capacity, int stackSize_, const std::string& name_):
+	name(name_),
+	maxThreadCount(capacity),
+	stackSize(stackSize_)
+{
+}
+
+
+ActiveThreadPoolPrivate::~ActiveThreadPoolPrivate()
+{
+	joinAll();
+}
+
+
+bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
+{
+	poco_assert(runnable != nullptr);
+	if (allThreads.empty())
+	{
+		startThread(runnable);
+		return true;
+	}
+
+	if (activeThreadCount() >= maxThreadCount)
+	{
+		return false;
+	}
+
+	if (!waitingThreads.empty()) {
+		// recycle an available thread
+		enqueueTask(runnable);
+		ActivePooledThread* pThread = waitingThreads.front();
+		waitingThreads.pop_front();
+		pThread->notifyRunnableReady();
+		return true;
+	}
+
+	if (!expiredThreads.empty()) {
+		// restart an expired thread
+		ActivePooledThread* pThread = expiredThreads.front();
+		expiredThreads.pop_front();
+
+		++activeThreads;
+
+		pThread->setRunnable(runnable);
+		pThread->start();
+		return true;
+	}
+
+	// start a new thread
+	startThread(runnable);
+	return true;
+}
+
+
+inline bool comparePriority(int priority, const QueuePage* p)
+{
+	return p->priority() < priority;
+}
+
+
+void ActiveThreadPoolPrivate::enqueueTask(Runnable* runnable, int priority)
+{
+	poco_assert(runnable != nullptr);
+	for (QueuePage* page : runnables) {
+		if (page->priority() == priority && !page->isFull()) {
+			page->push(runnable);
+			return;
+		}
+	}
+	auto it = std::upper_bound(runnables.begin(), runnables.end(), priority, comparePriority);
+	runnables.insert(it, new QueuePage(runnable, priority));
+}
+
+
+int ActiveThreadPoolPrivate::activeThreadCount() const
+{
+	return (int)(allThreads.size() - expiredThreads.size() - waitingThreads.size());
+}
+
+
+void ActiveThreadPoolPrivate::startThread(Runnable* runnable)
+{
+	poco_assert(runnable != nullptr);
+	auto pThread = new ActivePooledThread(this);
+	allThreads.insert(pThread);
+	++activeThreads;
+	pThread->setRunnable(runnable);
+	pThread->start();
+}
+
+
+void ActiveThreadPoolPrivate::joinAll()
+{
+	FastMutex::ScopedLock lock(mutex);
+
+	do {
+		while (!runnables.empty() || activeThreads != 0)
+		{
+			noActiveThreads.wait(mutex);
+		}
+
+		// move the contents of the set out so that we can iterate without the lock
+		std::set<ActivePooledThread*> allThreadsCopy;
+		allThreadsCopy.swap(allThreads);
+		expiredThreads.clear();
+		waitingThreads.clear();
+		mutex.unlock();
+
+		for (ActivePooledThread* pThread : allThreadsCopy) {
+			if (pThread->isRunning()) {
+				pThread->notifyRunnableReady();
+				pThread->join();
+			}
+			delete pThread;
+		}
+
+		mutex.lock();
+
+		// More threads can be started during reset(), in that case continue
+		// waiting if we still have time left.
+	} while (!runnables.empty() || activeThreads != 0);
+
+	while (!runnables.empty() || activeThreads != 0)
+	{
+		noActiveThreads.wait(mutex);
+	}
 }
 
 
 ActiveThreadPool::ActiveThreadPool(int capacity, int stackSize):
-	_capacity(capacity),
-	_serial(0),
-	_stackSize(stackSize),
-	_lastThreadIndex(0)
+	m_impl(new ActiveThreadPoolPrivate(capacity, stackSize))
 {
-	poco_assert (_capacity >= 1);
-
-	_threads.reserve(_capacity);
-
-	for (int i = 0; i < _capacity; i++)
-	{
-		ActiveThread* pThread = createThread();
-		_threads.push_back(pThread);
-		pThread->start();
-	}
 }
 
 
-ActiveThreadPool::ActiveThreadPool(std::string  name, int capacity, int stackSize):
-	_name(std::move(name)),
-	_capacity(capacity),
-	_serial(0),
-	_stackSize(stackSize),
-	_lastThreadIndex(0)
+ActiveThreadPool::ActiveThreadPool(const std::string& name, int capacity, int stackSize):
+	m_impl(new ActiveThreadPoolPrivate(capacity, stackSize, name))
 {
-	poco_assert (_capacity >= 1);
-
-	_threads.reserve(_capacity);
-
-	for (int i = 0; i < _capacity; i++)
-	{
-		ActiveThread* pThread = createThread();
-		_threads.push_back(pThread);
-		pThread->start();
-	}
 }
 
 
 ActiveThreadPool::~ActiveThreadPool()
 {
-	try
-	{
-		stopAll();
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
+	delete m_impl;
+	m_impl = nullptr;
 }
 
 
 int ActiveThreadPool::capacity() const
 {
-	return _capacity;
+	return m_impl->maxThreadCount;
 }
 
 
-void ActiveThreadPool::start(Runnable& target)
+void ActiveThreadPool::start(Runnable& target, int priority)
 {
-	getThread()->start(Thread::PRIO_NORMAL, target);
-}
+	FastMutex::ScopedLock lock(m_impl->mutex);
 
+	if (!m_impl->tryStart(&target)) {
+		m_impl->enqueueTask(&target, priority);
 
-void ActiveThreadPool::start(Runnable& target, const std::string& name)
-{
-	getThread()->start(Thread::PRIO_NORMAL, target, name);
-}
-
-
-void ActiveThreadPool::startWithPriority(Thread::Priority priority, Runnable& target)
-{
-	getThread()->start(priority, target);
-}
-
-
-void ActiveThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name)
-{
-	getThread()->start(priority, target, name);
-}
-
-
-void ActiveThreadPool::stopAll()
-{
-	FastMutex::ScopedLock lock(_mutex);
-
-	for (auto pThread: _threads)
-	{
-		pThread->release();
+		if (!m_impl->waitingThreads.empty())
+		{
+			ActivePooledThread* pThread = m_impl->waitingThreads.front();
+			m_impl->waitingThreads.pop_front();
+			pThread->notifyRunnableReady();
+		}
 	}
-	_threads.clear();
 }
 
 
 void ActiveThreadPool::joinAll()
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	for (auto pThread: _threads)
-	{
-		pThread->join();
-	}
-
-	_threads.clear();
-	_threads.reserve(_capacity);
-
-	for (int i = 0; i < _capacity; i++)
-	{
-		ActiveThread* pThread = createThread();
-		_threads.push_back(pThread);
-		pThread->start();
-	}
+	m_impl->joinAll();
 }
-
-ActiveThread* ActiveThreadPool::getThread()
-{
-	auto thrSize = _threads.size();
-	auto i = (_lastThreadIndex++) % thrSize;
-	ActiveThread* pThread = _threads[i];
-	return pThread;
-}
-
-
-ActiveThread* ActiveThreadPool::createThread()
-{
-	std::ostringstream name;
-	name << _name << "[#active-thread-" << ++_serial << "]";
-	return new ActiveThread(name.str(), _stackSize);
-}
-
-
-class ActiveThreadPoolSingletonHolder
-{
-public:
-	ActiveThreadPoolSingletonHolder() = default;
-	~ActiveThreadPoolSingletonHolder()
-	{
-		delete _pPool;
-	}
-	ActiveThreadPool* pool()
-	{
-		FastMutex::ScopedLock lock(_mutex);
-
-		if (!_pPool)
-		{
-			_pPool = new ActiveThreadPool("default-active");
-		}
-		return _pPool;
-	}
-
-private:
-	ActiveThreadPool* _pPool{nullptr};
-	FastMutex   _mutex;
-};
 
 
 ActiveThreadPool& ActiveThreadPool::defaultPool()
 {
-	static ActiveThreadPoolSingletonHolder sh;
-	return *sh.pool();
+	static ActiveThreadPool thePool;
+	return thePool;
 }
 
+
+int ActiveThreadPool::getStackSize() const
+{
+	return m_impl->stackSize;
+}
+
+
+int ActiveThreadPool::expiryTimeout() const
+{
+	return m_impl->expiryTimeout;
+}
+
+
+void ActiveThreadPool::setExpiryTimeout(int expiryTimeout)
+{
+	if (m_impl->expiryTimeout != expiryTimeout)
+	{
+		m_impl->expiryTimeout = expiryTimeout;
+	}
+}
+
+
+const std::string& ActiveThreadPool::name() const
+{
+	return m_impl->name;
+}
 
 } // namespace Poco
