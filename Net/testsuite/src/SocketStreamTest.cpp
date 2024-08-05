@@ -124,6 +124,7 @@ void SocketStreamTest::testEOF()
 	ss.close();
 }
 
+#ifdef POCO_HAVE_SENDFILE
 void SocketStreamTest::testSendFile()
 {
 	const int fileSize = 64000;
@@ -147,11 +148,11 @@ void SocketStreamTest::testSendFile()
 	
 	SocketStream str(ss);
 
-	Poco::UInt64 offset = 0;
-	Poco::Int64 sent = 0;
+	Poco::UIntPtr offset = 0;
+	Poco::IntPtr  sent = 0;
 	try
 	{
-	sent = ss.sendFile(fin);
+		sent = ss.sendFile(fin);
 	}
 	catch (Poco::NotImplementedException &)
 	{
@@ -162,8 +163,7 @@ void SocketStreamTest::testSendFile()
 	while (sent < fileSize)
 	{
 		offset = sent;
-		sent = ss.sendFile(fin, offset);
-		assertTrue(sent >= 0);
+		sent += ss.sendFile(fin, offset);
 	}
 	str.flush();
 	assertTrue (str.good());
@@ -180,6 +180,7 @@ void SocketStreamTest::testSendFile()
 	File f(fileName);
 	f.remove();
 }
+#endif
 
 void SocketStreamTest::setUp()
 {
@@ -198,7 +199,9 @@ CppUnit::Test* SocketStreamTest::suite()
 	CppUnit_addTest(pSuite, SocketStreamTest, testStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testLargeStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testEOF);
+#ifdef POCO_HAVE_SENDFILE
 	CppUnit_addTest(pSuite, SocketStreamTest, testSendFile);
+#endif
 
 	return pSuite;
 }
