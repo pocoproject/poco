@@ -201,7 +201,7 @@ FileStreamBuf::NativeHandle FileStreamBuf::nativeHandle() const
 	return _fd;
 }
 
-Poco::UIntPtr FileStreamBuf::size() const
+Poco::UInt64 FileStreamBuf::size() const
 {
 	struct stat stat_buf;
 	int rc = fstat(_fd, &stat_buf);

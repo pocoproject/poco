@@ -1374,10 +1374,10 @@ void SocketImpl::error(int code, const std::string& arg)
 }
 #ifdef POCO_HAVE_SENDFILE
 #ifdef POCO_OS_FAMILY_WINDOWS
-IntPtr SocketImpl::sendFile(FileInputStream &fileInputStream, UIntPtr offset)
+Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset)
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
-	UIntPtr fileSize = fileInputStream.size();
+	UInt64 fileSize = fileInputStream.size();
 	std::streamoff sentSize = fileSize - offset;
 	LARGE_INTEGER offsetHelper;
 	offsetHelper.QuadPart = offset;
@@ -1405,9 +1405,9 @@ IntPtr SocketImpl::sendFile(FileInputStream &fileInputStream, UIntPtr offset)
 	return sentSize;
 }
 #else
-IntPtr _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, UIntPtr offset, std::streamoff sentSize)
+Int64 _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, UInt64 offset, std::streamoff sentSize)
 {
-	IntPtr sent = 0;
+	Int64 sent = 0;
 #ifdef __USE_LARGEFILE64
 	sent = sendfile64(sd, fd, (off64_t *)&offset, sentSize);
 #else
@@ -1434,12 +1434,12 @@ IntPtr _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, UIntPtr offset, std
 	return sent;
 }
 
-IntPtr SocketImpl::sendFile(FileInputStream &fileInputStream, UIntPtr offset)
+Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, UInt64 offset)
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
-	UIntPtr fileSize = fileInputStream.size();
+	UInt64 fileSize = fileInputStream.size();
 	std::streamoff sentSize = fileSize - offset;
-	IntPtr sent = 0;
+	Int64 sent = 0;
 	sighandler_t sigPrev = signal(SIGPIPE, SIG_IGN);
 	while (sent == 0)
 	{

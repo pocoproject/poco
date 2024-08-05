@@ -478,7 +478,7 @@ public:
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 #ifdef POCO_HAVE_SENDFILE
-	IntPtr sendFile(FileInputStream &FileInputStream, UIntPtr offset = 0);
+	Int64 sendFile(FileInputStream &FileInputStream, UInt64 offset = 0);
 		/// Sends file using system function
 		/// for posix systems - with sendfile[64](...)
 		/// for windows - with TransmitFile(...)
