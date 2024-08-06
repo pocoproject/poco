@@ -258,7 +258,8 @@ void ActivePooledThread::run()
 			QueuePage* page = _pool->runnables.front();
 			r = page->pop();
 
-			if (page->isFinished()) {
+			if (page->isFinished())
+			{
 				_pool->runnables.pop_front();
 				delete page;
 			}
@@ -332,7 +333,8 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
 		return false;
 	}
 
-	if (!waitingThreads.empty()) {
+	if (!waitingThreads.empty())
+	{
 		// recycle an available thread
 		enqueueTask(runnable);
 		ActivePooledThread* pThread = waitingThreads.front();
@@ -341,7 +343,8 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
 		return true;
 	}
 
-	if (!expiredThreads.empty()) {
+	if (!expiredThreads.empty())
+	{
 		// restart an expired thread
 		ActivePooledThread* pThread = expiredThreads.front();
 		expiredThreads.pop_front();
@@ -368,8 +371,10 @@ inline bool comparePriority(int priority, const QueuePage* p)
 void ActiveThreadPoolPrivate::enqueueTask(Runnable* runnable, int priority)
 {
 	poco_assert(runnable != nullptr);
-	for (QueuePage* page : runnables) {
-		if (page->priority() == priority && !page->isFull()) {
+	for (QueuePage* page : runnables)
+	{
+		if (page->priority() == priority && !page->isFull())
+		{
 			page->push(runnable);
 			return;
 		}
@@ -413,10 +418,11 @@ void ActiveThreadPoolPrivate::joinAll()
 		waitingThreads.clear();
 		mutex.unlock();
 
-		for (ActivePooledThread* pThread : allThreadsCopy) {
-			if (pThread->isRunning()) {
+		for (ActivePooledThread* pThread : allThreadsCopy)
+		{
+			if (pThread->isRunning())
+			{
 				pThread->notifyRunnableReady();
-				pThread->join();
 			}
 			delete pThread;
 		}
@@ -463,7 +469,8 @@ void ActiveThreadPool::start(Runnable& target, int priority)
 {
 	FastMutex::ScopedLock lock(m_impl->mutex);
 
-	if (!m_impl->tryStart(&target)) {
+	if (!m_impl->tryStart(&target))
+	{
 		m_impl->enqueueTask(&target, priority);
 
 		if (!m_impl->waitingThreads.empty())
