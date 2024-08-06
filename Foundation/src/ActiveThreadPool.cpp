@@ -351,6 +351,8 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
 
 		++activeThreads;
 
+		// an expired thread must call join() before restart it, or it will cost thread leak
+		pThread->join();
 		pThread->setRunnable(runnable);
 		pThread->start();
 		return true;
@@ -424,6 +426,9 @@ void ActiveThreadPoolPrivate::joinAll()
 			{
 				pThread->notifyRunnableReady();
 			}
+
+			// we must call join() before thread destruction, or it will cost thread leak
+			pThread->join();
 			delete pThread;
 		}
 
