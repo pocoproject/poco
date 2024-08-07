@@ -87,25 +87,6 @@ public:
 		return runnable;
 	}
 
-	bool tryTake(Runnable* runnable)
-	{
-		poco_assert(!isFinished());
-		for (int i = _firstIndex; i <= _lastIndex; i++)
-		{
-			if (_entries[i] == runnable)
-			{
-				_entries[i] = nullptr;
-				if (i == _firstIndex)
-				{
-					// make sure first() does not return a nullptr
-					skipToNextOrEnd();
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-
 	int priority() const
 	{
 		return _priority;
