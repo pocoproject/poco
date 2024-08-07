@@ -32,7 +32,7 @@ public:
 		MaxPageSize = 256
 	};
 
-	QueuePage(Runnable* runnable, int priority):
+	QueuePage(Runnable& runnable, int priority):
 		_priority(priority)
 	{
 		push(runnable);
@@ -48,12 +48,11 @@ public:
 		return _firstIndex > _lastIndex;
 	}
 
-	void push(Runnable* runnable)
+	void push(Runnable& runnable)
 	{
-		poco_assert(runnable);
 		poco_assert(!isFull());
 		_lastIndex += 1;
-		_entries[_lastIndex] = runnable;
+		_entries[_lastIndex] = &runnable;
 	}
 
 	void skipToNextOrEnd()
@@ -129,7 +128,7 @@ public:
 	void join();
 	bool isRunning() const;
 
-	void setRunnable(Runnable* runnable);
+	void setRunnable(Runnable& target);
 	void notifyRunnableReady();
 	void registerThreadInactive();
 
@@ -137,7 +136,7 @@ public:
 
 private:
 	ActiveThreadPoolPrivate* _pool;
-	Runnable* _runnable;
+	Runnable* _pTarget;
 	Condition _runnableReady;
 	Thread _thread;
 };
@@ -150,9 +149,9 @@ public:
 	ActiveThreadPoolPrivate(int capacity, int stackSize, const std::string& name);
 	~ActiveThreadPoolPrivate();
 
-	bool tryStart(Runnable* runnable);
-	void enqueueTask(Runnable* runnable, int priority = 0);
-	void startThread(Runnable* runnable);
+	bool tryStart(Runnable& target);
+	void enqueueTask(Runnable& target, int priority = 0);
+	void startThread(Runnable& target);
 	void joinAll();
 
 	int activeThreadCount() const;
@@ -176,7 +175,7 @@ public:
 
 ActivePooledThread::ActivePooledThread(ActiveThreadPoolPrivate* pool):
 	_pool(pool),
-	_runnable(nullptr)
+	_pTarget(nullptr)
 {
 	poco_assert(_pool != nullptr);
 	std::ostringstream name;
@@ -192,9 +191,9 @@ void ActivePooledThread::start()
 }
 
 
-void ActivePooledThread::setRunnable(Runnable* runnable)
+void ActivePooledThread::setRunnable(Runnable& target)
 {
-	_runnable = runnable;
+	_pTarget = &target;
 }
 
 
@@ -221,8 +220,8 @@ void ActivePooledThread::run()
 	FastMutex::ScopedLock lock(_pool->mutex);
 	for (;;)
 	{
-		Runnable* r = _runnable;
-		_runnable = nullptr;
+		Runnable* r = _pTarget;
+		_pTarget = nullptr;
 
 		do
 		{
@@ -319,12 +318,11 @@ ActiveThreadPoolPrivate::~ActiveThreadPoolPrivate()
 }
 
 
-bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
+bool ActiveThreadPoolPrivate::tryStart(Runnable& target)
 {
-	poco_assert(runnable != nullptr);
 	if (allThreads.empty())
 	{
-		startThread(runnable);
+		startThread(target);
 		return true;
 	}
 
@@ -336,7 +334,7 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
 	if (!waitingThreads.empty())
 	{
 		// recycle an available thread
-		enqueueTask(runnable);
+		enqueueTask(target);
 		ActivePooledThread* pThread = waitingThreads.front();
 		waitingThreads.pop_front();
 		pThread->notifyRunnableReady();
@@ -353,13 +351,13 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable* runnable)
 
 		// an expired thread must call join() before restart it, or it will cost thread leak
 		pThread->join();
-		pThread->setRunnable(runnable);
+		pThread->setRunnable(target);
 		pThread->start();
 		return true;
 	}
 
 	// start a new thread
-	startThread(runnable);
+	startThread(target);
 	return true;
 }
 
@@ -370,19 +368,18 @@ inline bool comparePriority(int priority, const QueuePage* p)
 }
 
 
-void ActiveThreadPoolPrivate::enqueueTask(Runnable* runnable, int priority)
+void ActiveThreadPoolPrivate::enqueueTask(Runnable& target, int priority)
 {
-	poco_assert(runnable != nullptr);
 	for (QueuePage* page : runnables)
 	{
 		if (page->priority() == priority && !page->isFull())
 		{
-			page->push(runnable);
+			page->push(target);
 			return;
 		}
 	}
 	auto it = std::upper_bound(runnables.begin(), runnables.end(), priority, comparePriority);
-	runnables.insert(it, new QueuePage(runnable, priority));
+	runnables.insert(it, new QueuePage(target, priority));
 }
 
 
@@ -392,13 +389,12 @@ int ActiveThreadPoolPrivate::activeThreadCount() const
 }
 
 
-void ActiveThreadPoolPrivate::startThread(Runnable* runnable)
+void ActiveThreadPoolPrivate::startThread(Runnable& target)
 {
-	poco_assert(runnable != nullptr);
 	auto pThread = new ActivePooledThread(this);
 	allThreads.insert(pThread);
 	++activeThreads;
-	pThread->setRunnable(runnable);
+	pThread->setRunnable(target);
 	pThread->start();
 }
 
@@ -474,9 +470,9 @@ void ActiveThreadPool::start(Runnable& target, int priority)
 {
 	FastMutex::ScopedLock lock(m_impl->mutex);
 
-	if (!m_impl->tryStart(&target))
+	if (!m_impl->tryStart(target))
 	{
-		m_impl->enqueueTask(&target, priority);
+		m_impl->enqueueTask(target, priority);
 
 		if (!m_impl->waitingThreads.empty())
 		{
