@@ -203,8 +203,8 @@ int DateTime::daysOfMonth(int year, int month)
 
 	if (month == 2 && isLeapYear(year))
 		return 29;
-	else
-		return daysOfMonthTable[month];
+	else if (month < 1 || month > 12)
+		return 0;
 	return daysOfMonthTable[month];
 }
 
