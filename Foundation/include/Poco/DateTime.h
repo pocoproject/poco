@@ -254,6 +254,12 @@ public:
 		/// Returns true if all arguments are valid, false otherwise.
 
 protected:
+	void checkValid();
+		/// Checks if the given date and time is valid (all arguments are within a proper range).
+		/// Expects all members to be set.
+		///
+		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
+
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 

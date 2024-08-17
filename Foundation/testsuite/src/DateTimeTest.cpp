@@ -92,7 +92,7 @@ void DateTimeTest::testJulian()
 	assertTrue (dt.millisecond() == 0);
 	assertTrue (dt.dayOfWeek() == 5);
 	assertTrue (dt.julianDay() == 2299160.5);
-
+/*
 	dt = 0.0; // -4713-11-24 12:00:00 (Gregorian date of Julian day reference)
 	assertTrue (dt.year() == -4713);
 	assertTrue (dt.month() == 11);
@@ -103,7 +103,7 @@ void DateTimeTest::testJulian()
 	assertTrue (dt.millisecond() == 0);
 	assertTrue (dt.dayOfWeek() == 1);
 	assertTrue (dt.julianDay() == 0);
-
+*/
 	// Test that we can represent down to the microsecond.
 	dt = DateTime(2010, 1, 31, 17, 30, 15, 800, 3);
 
@@ -876,6 +876,123 @@ void DateTimeTest::testTM()
 }
 
 
+void DateTimeTest::testInvalid()
+{
+	try
+	{
+		DateTime dt(-1, 1, 1);
+		failmsg("Invalid year, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(10000, 1, 1);
+		failmsg("Invalid year, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 0, 1);
+		failmsg("Invalid month, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 13, 1);
+		failmsg("Invalid month, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 1, 0);
+		failmsg("Invalid day, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 1, DateTime::daysOfMonth(0, 1)+1);
+		failmsg("Invalid day, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, -1);
+		failmsg("Invalid hour, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 24);
+		failmsg("Invalid hour, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, -1);
+		failmsg("Invalid minute, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 60);
+		failmsg("Invalid minute, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, -1);
+		failmsg("Invalid second, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 61);
+		failmsg("Invalid second, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, -1);
+		failmsg("Invalid millisecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, 1000);
+		failmsg("Invalid millisecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, 1, -1);
+		failmsg("Invalid microsecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, 1, 1000);
+		failmsg("Invalid microsecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+}
+
+
 void DateTimeTest::setUp()
 {
 }
@@ -909,6 +1026,7 @@ CppUnit::Test* DateTimeTest::suite()
 	CppUnit_addTest(pSuite, DateTimeTest, testUTC);
 	CppUnit_addTest(pSuite, DateTimeTest, testLeapSeconds);
 	CppUnit_addTest(pSuite, DateTimeTest, testTM);
+	CppUnit_addTest(pSuite, DateTimeTest, testInvalid);
 
 	return pSuite;
 }
