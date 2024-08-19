@@ -505,7 +505,15 @@ read_string(json_stream *json)
                 return JSON_ERROR;
         } else {
             if (char_needs_escaping(c)) {
-                json_error(json, "%s", "unescaped control character in string");
+                int length = 0;
+                const char* val = json_get_string(json, &length);
+
+                char msgbuf[1024];
+                int msglen = (length < 1023) ? length : 1023;
+                memcpy(msgbuf, val, msglen);
+                msgbuf[msglen] = '\0';
+
+                json_error(json, "unescaped control character at line %d in input [%s]", json_get_lineno(json), msgbuf);
                 return JSON_ERROR;
             }
 
