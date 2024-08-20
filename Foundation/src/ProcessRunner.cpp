@@ -185,7 +185,6 @@ void ProcessRunner::stop()
 			if (!_pidFile.empty())
 			{
 				File pidFile(_pidFile);
-				_pidFile.clear();
 				std::string msg;
 				Poco::format(msg, "Waiting for PID file (pidFile: '%s')", _pidFile);
 				_sw.restart();
