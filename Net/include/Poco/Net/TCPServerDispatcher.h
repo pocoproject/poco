@@ -68,7 +68,7 @@ public:
 	int maxThreads() const;
 		/// Returns the maximum number of threads available.
 
-	int totalConnections() const;
+	Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
 
 	int currentConnections() const;
@@ -103,12 +103,12 @@ private:
 
 	std::atomic<int> _rc;
 	TCPServerParams::Ptr _pParams;
-	std::atomic<int>  _currentThreads;
-	std::atomic<int>  _totalConnections;
-	std::atomic<int>  _currentConnections;
-	std::atomic<int>  _maxConcurrentConnections;
-	std::atomic<int>  _refusedConnections;
-	std::atomic<bool> _stopped;
+	std::atomic<int>   _currentThreads;
+	std::atomic<Int64> _totalConnections;
+	std::atomic<int>   _currentConnections;
+	std::atomic<int>   _maxConcurrentConnections;
+	std::atomic<int>   _refusedConnections;
+	std::atomic<bool>  _stopped;
 	Poco::NotificationQueue         _queue;
 	TCPServerConnectionFactory::Ptr _pConnectionFactory;
 	Poco::ThreadPool&               _threadPool;
