@@ -175,7 +175,7 @@ public:
 	int maxThreads() const;
 		/// Returns the maximum number of threads available.
 
-	int totalConnections() const;
+	Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
 
 	int currentConnections() const;
