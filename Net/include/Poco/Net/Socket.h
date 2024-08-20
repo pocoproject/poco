@@ -411,11 +411,12 @@ class FDCompare
 {
 public:
 	FDCompare(int fd): _fd(fd) { }
+	FDCompare() = delete;
+
 	inline bool operator()(const Socket& socket) const
 	{ return socket.sockfd() == _fd; }
 
 private:
-	FDCompare();
 	int _fd;
 };
 #endif
