@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Thread.h"
 #include "Poco/Environment.h"
+#include <memory>
 
 
 namespace Poco {
@@ -88,7 +89,7 @@ private:
 	ActiveThreadPool& operator = (const ActiveThreadPool& pool);
 
 private:
-	ActiveThreadPoolPrivate* m_impl;
+	std::unique_ptr<ActiveThreadPoolPrivate> m_impl;
 };
 
 } // namespace Poco

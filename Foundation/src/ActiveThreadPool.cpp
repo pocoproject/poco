@@ -436,8 +436,6 @@ ActiveThreadPool::ActiveThreadPool(const std::string& name, int capacity, int st
 
 ActiveThreadPool::~ActiveThreadPool()
 {
-	delete m_impl;
-	m_impl = nullptr;
 }
 
 
