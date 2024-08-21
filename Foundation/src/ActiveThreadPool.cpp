@@ -24,6 +24,7 @@
 #include <set>
 #include <list>
 #include <queue>
+#include <optional>
 
 namespace Poco {
 
@@ -32,7 +33,8 @@ class RunnableList
 	/// A list of the same priority runnables
 {
 public:
-	RunnableList(Runnable& target, int priority): _priority(priority)
+	RunnableList(Runnable& target, int priority):
+		_priority(priority)
 	{
 		push(target);
 	}
@@ -44,12 +46,12 @@ public:
 
 	void push(Runnable& r)
 	{
-		_runnables.push_back(&r);
+		_runnables.push_back(std::ref(r));
 	}
 
-	Runnable* pop()
+	Runnable& pop()
 	{
-		Runnable* r = _runnables.front();
+		auto r = _runnables.front();
 		_runnables.pop_front();
 		return r;
 	}
@@ -67,7 +69,7 @@ public:
 
 private:
 	int _priority = 0;
-	std::list<Runnable*> _runnables;
+	std::list<std::reference_wrapper<Runnable>> _runnables;
 };
 
 
@@ -85,15 +87,15 @@ public:
 				return;
 			}
 		}
-		auto q = std::make_shared<RunnableList>(target, priority);
+		auto q = std::make_shared<RunnableList>(std::ref(target), priority);
 		_queues.push_back(q);
 		std::push_heap(_queues.begin(), _queues.end());
 	}
 
-	Runnable* pop()
+	Runnable& pop()
 	{
 		auto q = _queues.front();
-		Runnable* r = q->pop();
+		auto& r = q->pop();
 		if (q->empty())
 		{
 			std::pop_heap(_queues.begin(), _queues.end());
@@ -131,7 +133,7 @@ public:
 
 private:
 	ActiveThreadPoolPrivate& _pool;
-	Runnable* _pTarget;
+	std::optional<std::reference_wrapper<Runnable>> _target{};
 	Condition _runnableReady;
 	Thread _thread;
 };
@@ -169,8 +171,7 @@ public:
 
 
 ActivePooledThread::ActivePooledThread(ActiveThreadPoolPrivate& pool):
-	_pool(pool),
-	_pTarget(nullptr)
+	_pool(pool)
 {
 	std::ostringstream name;
 	name << _pool.name << "[#" << ++_pool.serial << "]";
@@ -187,8 +188,8 @@ void ActivePooledThread::start()
 
 void ActivePooledThread::setRunnable(Runnable& target)
 {
-	poco_assert(_pTarget == nullptr);
-	_pTarget = &target;
+	poco_assert(_target.has_value() == false);
+	_target = std::ref(target);
 }
 
 
@@ -215,17 +216,17 @@ void ActivePooledThread::run()
 	FastMutex::ScopedLock lock(_pool.mutex);
 	for (;;)
 	{
-		Runnable* r = _pTarget;
-		_pTarget = nullptr;
+		auto r = _target;
+		_target.reset();
 
 		do
 		{
-			if (r)
+			if (r.has_value())
 			{
 				_pool.mutex.unlock();
 				try
 				{
-					r->run();
+					r.value().get().run();
 				}
 				catch (Exception& exc)
 				{
@@ -245,11 +246,11 @@ void ActivePooledThread::run()
 
 			if (_pool.runnables.empty())
 			{
-				r = nullptr;
+				r.reset();
 				break;
 			}
 
-			r = _pool.runnables.pop();
+			r = std::ref(_pool.runnables.pop());
 		} while (true);
 
 		ActivePooledThread::Ptr thisCopy(this, true);
