@@ -73,6 +73,40 @@ void ActiveThreadPoolTest::testActiveThreadPool()
 	pool.joinAll();
 
 	assertTrue (_count == 1000);
+
+	pool.setExpiryTimeout(10);
+	assertTrue (pool.expiryTimeout() == 10);
+
+	try
+	{
+		for (int i = 0; i < pool.capacity(); ++i)
+		{
+			pool.start(ra);
+		}
+	}
+	catch (...)
+	{
+		failmsg("wrong exception thrown");
+	}
+
+	// wait for the threads to expire
+	Poco::Thread::sleep(pool.expiryTimeout() * pool.capacity());
+
+	try
+	{
+		for (int i = 0; i < pool.capacity(); ++i)
+		{
+			pool.start(ra); // reuse expired threads
+		}
+	}
+	catch (...)
+	{
+		failmsg("wrong exception thrown");
+	}
+
+	// wait for the threads to expire
+	Poco::Thread::sleep(pool.expiryTimeout() * pool.capacity());
+	pool.joinAll(); // join with no active threads
 }
 
 
