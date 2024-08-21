@@ -113,7 +113,7 @@ private:
 class ActivePooledThread: public Runnable
 {
 public:
-	ActivePooledThread(ActiveThreadPoolPrivate* pool);
+	ActivePooledThread(ActiveThreadPoolPrivate& pool);
 
 	void start();
 	void join();
@@ -126,7 +126,7 @@ public:
 	virtual void run() override;
 
 private:
-	ActiveThreadPoolPrivate* _pool;
+	ActiveThreadPoolPrivate& _pool;
 	Runnable* _pTarget;
 	Condition _runnableReady;
 	Thread _thread;
@@ -164,15 +164,14 @@ public:
 };
 
 
-ActivePooledThread::ActivePooledThread(ActiveThreadPoolPrivate* pool):
+ActivePooledThread::ActivePooledThread(ActiveThreadPoolPrivate& pool):
 	_pool(pool),
 	_pTarget(nullptr)
 {
-	poco_assert(_pool != nullptr);
 	std::ostringstream name;
-	name << _pool->name << "[#" << ++_pool->serial << "]";
+	name << _pool.name << "[#" << ++_pool.serial << "]";
 	_thread.setName(name.str());
-	_thread.setStackSize(_pool->stackSize);
+	_thread.setStackSize(_pool.stackSize);
 }
 
 
@@ -208,7 +207,7 @@ void ActivePooledThread::join()
 
 void ActivePooledThread::run()
 {
-	FastMutex::ScopedLock lock(_pool->mutex);
+	FastMutex::ScopedLock lock(_pool.mutex);
 	for (;;)
 	{
 		Runnable* r = _pTarget;
@@ -218,7 +217,7 @@ void ActivePooledThread::run()
 		{
 			if (r)
 			{
-				_pool->mutex.unlock();
+				_pool.mutex.unlock();
 				try
 				{
 					r->run();
@@ -236,34 +235,34 @@ void ActivePooledThread::run()
 					ErrorHandler::handle();
 				}
 				ThreadLocalStorage::clear();
-				_pool->mutex.lock();
+				_pool.mutex.lock();
 			}
 
-			if (_pool->runnables.empty())
+			if (_pool.runnables.empty())
 			{
 				r = nullptr;
 				break;
 			}
 
-			r = _pool->runnables.pop();
+			r = _pool.runnables.pop();
 		} while (true);
 
-		_pool->waitingThreads.push_back(this);
+		_pool.waitingThreads.push_back(this);
 		registerThreadInactive();
 		// wait for work, exiting after the expiry timeout is reached
-		_runnableReady.tryWait(_pool->mutex, _pool->expiryTimeout);
-		++_pool->activeThreads;
+		_runnableReady.tryWait(_pool.mutex, _pool.expiryTimeout);
+		++_pool.activeThreads;
 
-		auto it = std::find(_pool->waitingThreads.begin(), _pool->waitingThreads.end(), this);
-		if (it != _pool->waitingThreads.end())
+		auto it = std::find(_pool.waitingThreads.begin(), _pool.waitingThreads.end(), this);
+		if (it != _pool.waitingThreads.end())
 		{
-			_pool->waitingThreads.erase(it);
-			_pool->expiredThreads.push_back(this);
+			_pool.waitingThreads.erase(it);
+			_pool.expiredThreads.push_back(this);
 			registerThreadInactive();
 			break;
 		}
 
-		if (!_pool->allThreads.count(this))
+		if (!_pool.allThreads.count(this))
 		{
 			registerThreadInactive();
 			break;
@@ -274,9 +273,9 @@ void ActivePooledThread::run()
 
 void ActivePooledThread::registerThreadInactive()
 {
-	if (--_pool->activeThreads == 0)
+	if (--_pool.activeThreads == 0)
 	{
-		_pool->noActiveThreads.broadcast();
+		_pool.noActiveThreads.broadcast();
 	}
 }
 
@@ -361,7 +360,7 @@ int ActiveThreadPoolPrivate::activeThreadCount() const
 
 void ActiveThreadPoolPrivate::startThread(Runnable& target)
 {
-	auto pThread = new ActivePooledThread(this);
+	auto pThread = new ActivePooledThread(*this);
 	allThreads.insert(pThread);
 	++activeThreads;
 	pThread->setRunnable(target);
