@@ -18,6 +18,8 @@
 #include "Poco/ThreadLocal.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Condition.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 #include <sstream>
 #include <set>
 #include <list>
@@ -30,7 +32,7 @@ class RunnableList
 	/// A list of the same priority runnables
 {
 public:
-	RunnableList(Runnable& target, int priority) : _priority(priority)
+	RunnableList(Runnable& target, int priority): _priority(priority)
 	{
 		push(target);
 	}
@@ -110,10 +112,12 @@ private:
 };
 
 
-class ActivePooledThread: public Runnable
+class ActivePooledThread: public Runnable, public RefCountedObject
 {
 public:
-	ActivePooledThread(ActiveThreadPoolPrivate& pool);
+	using Ptr = Poco::AutoPtr<ActivePooledThread>;
+
+	explicit ActivePooledThread(ActiveThreadPoolPrivate& pool);
 
 	void start();
 	void join();
@@ -150,9 +154,9 @@ public:
 public:
 	mutable FastMutex mutex;
 	std::string name;
-	std::set<ActivePooledThread*> allThreads;
-	std::list<ActivePooledThread*> waitingThreads;
-	std::list<ActivePooledThread*> expiredThreads;
+	std::set<ActivePooledThread::Ptr> allThreads;
+	std::list<ActivePooledThread::Ptr> waitingThreads;
+	std::list<ActivePooledThread::Ptr> expiredThreads;
 	RunnablePriorityQueue runnables;
 	Condition noActiveThreads;
 
@@ -183,6 +187,7 @@ void ActivePooledThread::start()
 
 void ActivePooledThread::setRunnable(Runnable& target)
 {
+	poco_assert(_pTarget == nullptr);
 	_pTarget = &target;
 }
 
@@ -247,22 +252,23 @@ void ActivePooledThread::run()
 			r = _pool.runnables.pop();
 		} while (true);
 
-		_pool.waitingThreads.push_back(this);
+		ActivePooledThread::Ptr thisCopy(this, true);
+		_pool.waitingThreads.push_back(thisCopy);
 		registerThreadInactive();
 		// wait for work, exiting after the expiry timeout is reached
 		_runnableReady.tryWait(_pool.mutex, _pool.expiryTimeout);
 		++_pool.activeThreads;
 
-		auto it = std::find(_pool.waitingThreads.begin(), _pool.waitingThreads.end(), this);
+		auto it = std::find(_pool.waitingThreads.begin(), _pool.waitingThreads.end(), thisCopy);
 		if (it != _pool.waitingThreads.end())
 		{
 			_pool.waitingThreads.erase(it);
-			_pool.expiredThreads.push_back(this);
+			_pool.expiredThreads.push_back(thisCopy);
 			registerThreadInactive();
 			break;
 		}
 
-		if (!_pool.allThreads.count(this))
+		if (!_pool.allThreads.count(thisCopy))
 		{
 			registerThreadInactive();
 			break;
@@ -318,7 +324,7 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable& target)
 	{
 		// recycle an available thread
 		enqueueTask(target);
-		ActivePooledThread* pThread = waitingThreads.front();
+		auto pThread = waitingThreads.front();
 		waitingThreads.pop_front();
 		pThread->notifyRunnableReady();
 		return true;
@@ -327,7 +333,7 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable& target)
 	if (!expiredThreads.empty())
 	{
 		// restart an expired thread
-		ActivePooledThread* pThread = expiredThreads.front();
+		auto pThread = expiredThreads.front();
 		expiredThreads.pop_front();
 
 		++activeThreads;
@@ -360,7 +366,7 @@ int ActiveThreadPoolPrivate::activeThreadCount() const
 
 void ActiveThreadPoolPrivate::startThread(Runnable& target)
 {
-	auto pThread = new ActivePooledThread(*this);
+	ActivePooledThread::Ptr pThread = new ActivePooledThread(*this);
 	allThreads.insert(pThread);
 	++activeThreads;
 	pThread->setRunnable(target);
@@ -379,13 +385,13 @@ void ActiveThreadPoolPrivate::joinAll()
 		}
 
 		// move the contents of the set out so that we can iterate without the lock
-		std::set<ActivePooledThread*> allThreadsCopy;
+		std::set<ActivePooledThread::Ptr> allThreadsCopy;
 		allThreadsCopy.swap(allThreads);
 		expiredThreads.clear();
 		waitingThreads.clear();
 		mutex.unlock();
 
-		for (ActivePooledThread* pThread : allThreadsCopy)
+		for (auto pThread : allThreadsCopy)
 		{
 			if (pThread->isRunning())
 			{
@@ -394,7 +400,7 @@ void ActiveThreadPoolPrivate::joinAll()
 
 			// we must call join() before thread destruction, or it will cost thread leak
 			pThread->join();
-			delete pThread;
+			poco_assert(2 == pThread->referenceCount());
 		}
 
 		mutex.lock();
@@ -443,7 +449,7 @@ void ActiveThreadPool::start(Runnable& target, int priority)
 
 		if (!m_impl->waitingThreads.empty())
 		{
-			ActivePooledThread* pThread = m_impl->waitingThreads.front();
+			auto pThread = m_impl->waitingThreads.front();
 			m_impl->waitingThreads.pop_front();
 			pThread->notifyRunnableReady();
 		}
