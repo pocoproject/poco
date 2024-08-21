@@ -21,70 +21,18 @@
 #include <sstream>
 #include <set>
 #include <list>
+#include <queue>
 
 namespace Poco {
 
-class QueuePage
+
+class RunnableList
+	/// A list of the same priority runnables
 {
 public:
-	enum
+	RunnableList(Runnable& target, int priority) : _priority(priority)
 	{
-		MaxPageSize = 256
-	};
-
-	QueuePage(Runnable& runnable, int priority):
-		_priority(priority)
-	{
-		push(runnable);
-	}
-
-	bool isFull()
-	{
-		return _lastIndex >= MaxPageSize - 1;
-	}
-
-	bool isFinished()
-	{
-		return _firstIndex > _lastIndex;
-	}
-
-	void push(Runnable& runnable)
-	{
-		poco_assert(!isFull());
-		_lastIndex += 1;
-		_entries[_lastIndex] = &runnable;
-	}
-
-	void skipToNextOrEnd()
-	{
-		while (!isFinished() && _entries[_firstIndex] == nullptr)
-		{
-			_firstIndex += 1;
-		}
-	}
-
-	Runnable* first()
-	{
-		poco_assert(!isFinished());
-		Runnable* runnable = _entries[_firstIndex];
-		poco_assert(runnable);
-		return runnable;
-	}
-
-	Runnable* pop()
-	{
-		poco_assert(!isFinished());
-		Runnable* runnable = first();
-		poco_assert(runnable);
-
-		// clear the entry although this should not be necessary
-		_entries[_firstIndex] = nullptr;
-		_firstIndex += 1;
-
-		// make sure the next runnable returned by first() is not a nullptr
-		skipToNextOrEnd();
-
-		return runnable;
+		push(target);
 	}
 
 	int priority() const
@@ -92,11 +40,73 @@ public:
 		return _priority;
 	}
 
+	void push(Runnable& r)
+	{
+		_runnables.push_back(&r);
+	}
+
+	Runnable* pop()
+	{
+		Runnable* r = _runnables.front();
+		_runnables.pop_front();
+		return r;
+	}
+
+	bool empty() const
+	{
+		return _runnables.empty();
+	}
+
+	// for std::push_heap
+	bool operator< (const RunnableList& rhs) const
+	{
+		return this->_priority < rhs._priority;
+	}
+
 private:
 	int _priority = 0;
-	int _firstIndex = 0;
-	int _lastIndex = -1;
-	Runnable* _entries[MaxPageSize];
+	std::list<Runnable*> _runnables;
+};
+
+
+class RunnablePriorityQueue
+	/// A priority queue of runnables
+{
+public:
+	void push(Runnable& target, int priority)
+	{
+		for (auto& q : _queues)
+		{
+			if (q->priority() == priority)
+			{
+				q->push(target);
+				return;
+			}
+		}
+		auto q = std::make_shared<RunnableList>(target, priority);
+		_queues.push_back(q);
+		std::push_heap(_queues.begin(), _queues.end());
+	}
+
+	Runnable* pop()
+	{
+		auto q = _queues.front();
+		Runnable* r = q->pop();
+		if (q->empty())
+		{
+			std::pop_heap(_queues.begin(), _queues.end());
+			_queues.pop_back();
+		}
+		return r;
+	}
+
+	bool empty() const
+	{
+		return _queues.empty();
+	}
+
+private:
+	std::vector<std::shared_ptr<RunnableList>> _queues;
 };
 
 
@@ -143,7 +153,7 @@ public:
 	std::set<ActivePooledThread*> allThreads;
 	std::list<ActivePooledThread*> waitingThreads;
 	std::list<ActivePooledThread*> expiredThreads;
-	std::list<QueuePage*> runnables;
+	RunnablePriorityQueue runnables;
 	Condition noActiveThreads;
 
 	int expiryTimeout = 30000;
@@ -235,14 +245,7 @@ void ActivePooledThread::run()
 				break;
 			}
 
-			QueuePage* page = _pool->runnables.front();
-			r = page->pop();
-
-			if (page->isFinished())
-			{
-				_pool->runnables.pop_front();
-				delete page;
-			}
+			r = _pool->runnables.pop();
 		} while (true);
 
 		_pool->waitingThreads.push_back(this);
@@ -343,24 +346,9 @@ bool ActiveThreadPoolPrivate::tryStart(Runnable& target)
 }
 
 
-inline bool comparePriority(int priority, const QueuePage* p)
-{
-	return p->priority() < priority;
-}
-
-
 void ActiveThreadPoolPrivate::enqueueTask(Runnable& target, int priority)
 {
-	for (QueuePage* page : runnables)
-	{
-		if (page->priority() == priority && !page->isFull())
-		{
-			page->push(target);
-			return;
-		}
-	}
-	auto it = std::upper_bound(runnables.begin(), runnables.end(), priority, comparePriority);
-	runnables.insert(it, new QueuePage(target, priority));
+	runnables.push(target, priority);
 }
 
 
