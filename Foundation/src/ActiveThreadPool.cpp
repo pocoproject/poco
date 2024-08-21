@@ -366,7 +366,8 @@ void ActiveThreadPoolPrivate::enqueueTask(Runnable& target, int priority)
 
 int ActiveThreadPoolPrivate::activeThreadCount() const
 {
-	return (int)(allThreads.size() - expiredThreads.size() - waitingThreads.size());
+	std::size_t count = allThreads.size() - expiredThreads.size() - waitingThreads.size();
+	return static_cast<int>(count);
 }
 
 
