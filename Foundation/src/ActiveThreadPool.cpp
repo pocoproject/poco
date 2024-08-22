@@ -60,15 +60,19 @@ public:
 		return _runnables.empty();
 	}
 
-	// for std::push_heap
-	bool operator< (const RunnableList& rhs) const
-	{
-		return this->_priority < rhs._priority;
-	}
-
 private:
 	int _priority = 0;
 	std::list<std::reference_wrapper<Runnable>> _runnables;
+};
+
+
+struct RunnablePriorityCompare
+{
+	// for make heap
+	bool operator()(const std::shared_ptr<RunnableList>& left, const std::shared_ptr<RunnableList>& right) const
+	{
+		return left->priority() < right->priority();
+	}
 };
 
 
@@ -88,7 +92,7 @@ public:
 		}
 		auto q = std::make_shared<RunnableList>(std::ref(target), priority);
 		_queues.push_back(q);
-		std::push_heap(_queues.begin(), _queues.end());
+		std::push_heap(_queues.begin(), _queues.end(), _comp);
 	}
 
 	Runnable& pop()
@@ -97,7 +101,7 @@ public:
 		auto& r = q->pop();
 		if (q->empty())
 		{
-			std::pop_heap(_queues.begin(), _queues.end());
+			std::pop_heap(_queues.begin(), _queues.end(), _comp);
 			_queues.pop_back();
 		}
 		return r;
@@ -110,6 +114,7 @@ public:
 
 private:
 	std::vector<std::shared_ptr<RunnableList>> _queues;
+	RunnablePriorityCompare _comp;
 };
 
 
