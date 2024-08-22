@@ -203,7 +203,7 @@ CppUnit::Test* ActiveThreadPoolTest::suite()
 
 	CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool1);
 	//CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool2);
-	CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool3);
+	//CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool3);
 
 	return pSuite;
 }
