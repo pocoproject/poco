@@ -66,7 +66,7 @@ ActiveThreadPoolTest::~ActiveThreadPoolTest()
 }
 
 
-void ActiveThreadPoolTest::testSimpleCount()
+void ActiveThreadPoolTest::testActiveThreadPool1()
 {
 	ActiveThreadPool pool;
 	assertTrue (pool.capacity() == static_cast<int>(Environment::processorCount()) + 1);
@@ -104,7 +104,7 @@ void ActiveThreadPoolTest::testSimpleCount()
 }
 
 
-void ActiveThreadPoolTest::testExpiryTimeout()
+void ActiveThreadPoolTest::testActiveThreadPool2()
 {
 	ActiveThreadPool pool;
 	RunnableAdapter<ActiveThreadPoolTest> ra(*this, &ActiveThreadPoolTest::count);
@@ -146,23 +146,30 @@ void ActiveThreadPoolTest::testExpiryTimeout()
 	assertTrue (_count == pool.capacity() * 2);
 }
 
-void ActiveThreadPoolTest::testPriority()
+void ActiveThreadPoolTest::testActiveThreadPool3()
 {
 	Poco::FastMutex mutex;
 	std::vector<int> result;
 	ActiveThreadPool pool(1);
 	std::vector<TestPriorityRunnable::Ptr> runnables;
 
-	Poco::FastMutex::ScopedLock lock(mutex); // lock, to make sure runnables are queued
-	for (int priority = 0; priority < 1000; ++priority)
+	mutex.lock(); // lock, to make sure runnables are queued
+	try
 	{
-		TestPriorityRunnable::Ptr r = new TestPriorityRunnable(priority, mutex, result);
-		runnables.push_back(r);
-		pool.start(*r, priority);
+		for (int priority = 0; priority < 1000; ++priority)
+		{
+			TestPriorityRunnable::Ptr r = new TestPriorityRunnable(priority, mutex, result);
+			runnables.push_back(r);
+			pool.start(*r, priority);
+		}
+	}
+	catch (...)
+	{
+		failmsg("wrong exception thrown");
 	}
 	mutex.unlock(); // unlock, to let runnables go
-	pool.joinAll();
 
+	pool.joinAll();
 	std::vector<int> mock;
 	mock.push_back(0); // 0 is the first result
 	for (int i = 999; i > 0; --i)
@@ -194,9 +201,9 @@ CppUnit::Test* ActiveThreadPoolTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ActiveThreadPoolTest");
 
-	CppUnit_addTest(pSuite, ActiveThreadPoolTest, testSimpleCount);
-    CppUnit_addTest(pSuite, ActiveThreadPoolTest, testExpiryTimeout);
-    CppUnit_addTest(pSuite, ActiveThreadPoolTest, testPriority);
+	CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool1);
+    CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool2);
+    CppUnit_addTest(pSuite, ActiveThreadPoolTest, testActiveThreadPool3);
 
 	return pSuite;
 }

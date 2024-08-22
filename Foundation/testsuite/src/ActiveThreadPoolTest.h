@@ -26,9 +26,9 @@ public:
 	ActiveThreadPoolTest(const std::string& name);
 	~ActiveThreadPoolTest();
 
-	void testSimpleCount();
-	void testExpiryTimeout();
-	void testPriority();
+	void testActiveThreadPool1();
+	void testActiveThreadPool2();
+	void testActiveThreadPool3();
 
 	void setUp();
 	void tearDown();
