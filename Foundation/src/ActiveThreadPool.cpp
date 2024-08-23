@@ -258,23 +258,22 @@ void ActivePooledThread::run()
 			r = &_pool.runnables.pop();
 		} while (true);
 
-		ActivePooledThread::Ptr thisCopy(this, true);
-		_pool.waitingThreads.push_back(thisCopy);
+		_pool.waitingThreads.push_back(ActivePooledThread::Ptr{ this, true });
 		registerThreadInactive();
 		// wait for work, exiting after the expiry timeout is reached
 		_runnableReady.tryWait(_pool.mutex, _pool.expiryTimeout);
 		++_pool.activeThreads;
 
-		auto it = std::find(_pool.waitingThreads.begin(), _pool.waitingThreads.end(), thisCopy);
+		auto it = std::find(_pool.waitingThreads.begin(), _pool.waitingThreads.end(), ActivePooledThread::Ptr{ this, true });
 		if (it != _pool.waitingThreads.end())
 		{
 			_pool.waitingThreads.erase(it);
-			_pool.expiredThreads.push_back(thisCopy);
+			_pool.expiredThreads.push_back(ActivePooledThread::Ptr{ this, true });
 			registerThreadInactive();
 			break;
 		}
 
-		if (!_pool.allThreads.count(thisCopy))
+		if (!_pool.allThreads.count(ActivePooledThread::Ptr{ this, true }))
 		{
 			registerThreadInactive();
 			break;
