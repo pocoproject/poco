@@ -358,6 +358,10 @@ void SocketImpl::checkBrokenTimeout(SelectMode mode)
 	}
 }
 
+int SocketImpl::peekBytes(void* buffer, int length, int flags) const
+{
+    return ((SocketImpl*)this)->receiveBytes(buffer, length, flags | MSG_PEEK);
+}
 
 int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 {

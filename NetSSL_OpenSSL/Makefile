@@ -6,9 +6,9 @@
 
 include $(POCO_BASE)/build/rules/global
 ifeq ($(findstring AIX, $(POCO_CONFIG)), AIX)
-SYSLIBS += -lssl_a -lcrypto_a
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB)
 else
-SYSLIBS += -lssl -lcrypto
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB)
 endif
 
 objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHandler \

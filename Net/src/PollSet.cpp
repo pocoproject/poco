@@ -17,6 +17,7 @@
 #include "Poco/TemporaryFile.h"
 #include "Poco/Mutex.h"
 #include <set>
+#include <cstring>
 
 
 #if defined(POCO_HAVE_FD_EPOLL)

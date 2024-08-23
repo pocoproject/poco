@@ -17,6 +17,8 @@
 #ifndef Foundation_Config_INCLUDED
 #define Foundation_Config_INCLUDED
 
+// Disable SignalHandler
+#define POCO_NO_SIGNAL_HANDLER
 
 // Define to disable implicit linking
 // #define POCO_NO_AUTOMATIC_LIBS
@@ -57,6 +59,11 @@
 #define POCO_MAX_THREAD_NAME_LEN 15
 #endif
 
+// Uncomment define below to disable thread_name
+// calls on POSIX platforms.
+#ifndef OOKLA_DISABLE_THREAD_NAME
+// #define OOKLA_DISABLE_THREAD_NAME 1
+#endif
 
 // Define to override system-provided
 // minimum thread priority value on POSIX

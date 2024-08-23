@@ -26,6 +26,9 @@
 namespace Poco {
 namespace Net {
 
+// OOKLA MODIFICATION
+int MessageHeader::_totalHeaderLimit = MessageHeader::DFL_HEADER_LIMIT;
+// END MODIFICATION
 
 MessageHeader::MessageHeader():
 	_fieldLimit(DFL_FIELD_LIMIT),
@@ -80,32 +83,38 @@ void MessageHeader::read(std::istream& istr)
 	value.reserve(64);
 	int ch = buf.sbumpc();
 	int fields = 0;
+    int totalBytes = 1;
+    auto checkByteLimit = [&](bool increment = true) {
+        if(increment) { ++totalBytes; }
+        if(totalBytes > _totalHeaderLimit) {
+            throw MessageException("Too many total bytes in headers.");
+        }
+    };
 	while (ch != eof && ch != '\r' && ch != '\n')
 	{
 		if (_fieldLimit > 0 && fields == _fieldLimit)
 			throw MessageException("Too many header fields");
 		name.clear();
 		value.clear();
-		while (ch != eof && ch != ':' && ch != '\n' && name.length() < _nameLengthLimit) { name += ch; ch = buf.sbumpc(); }
-		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
+		while (ch != eof && ch != ':' && ch != '\n' && name.length() < _nameLengthLimit) { checkByteLimit(); name += ch; ch = buf.sbumpc(); }
+		if (ch == '\n') { ++totalBytes; ch = buf.sbumpc(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
-		if (ch != eof) ch = buf.sbumpc(); // ':'
-		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
-		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < _valueLengthLimit) { value += ch; ch = buf.sbumpc(); }
-		if (ch == '\r') ch = buf.sbumpc();
-		if (ch == '\n')
-			ch = buf.sbumpc();
+		if (ch != eof) { ++totalBytes; ch = buf.sbumpc(); } // ':'
+		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') { checkByteLimit(); ch = buf.sbumpc(); }
+		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < _valueLengthLimit) { checkByteLimit(); value += ch; ch = buf.sbumpc(); }
+		if (ch == '\r') { ++totalBytes; ch = buf.sbumpc(); }
+		if (ch == '\n') { ++totalBytes; ch = buf.sbumpc(); }
 		else if (ch != eof)
 			throw MessageException("Field value too long/no CRLF found");
 		while (ch == ' ' || ch == '\t') // folding
 		{
-			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < _valueLengthLimit) { value += ch; ch = buf.sbumpc(); }
-			if (ch == '\r') ch = buf.sbumpc();
-			if (ch == '\n')
-				ch = buf.sbumpc();
+			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < _valueLengthLimit) { checkByteLimit(); value += ch; ch = buf.sbumpc(); }
+			if (ch == '\r') { ++totalBytes; ch = buf.sbumpc(); }
+			if (ch == '\n') { ++totalBytes; ch = buf.sbumpc(); }
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
+        checkByteLimit(false);
 
 		// TODO: Add to the if below?
 		Poco::trimRightInPlace(value);
@@ -157,6 +166,9 @@ std::string MessageHeader::getDecoded(const std::string& name, const std::string
 	return getDecoded(name);
 }
 
+void MessageHeader::setTotalHeaderLimit(int max) {
+    _totalHeaderLimit = max;
+}
 
 int MessageHeader::getFieldLimit() const
 {

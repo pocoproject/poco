@@ -8,18 +8,18 @@ include $(POCO_BASE)/build/rules/global
 
 # Note: linking order is important, do not change it.
 ifeq ($(POCO_CONFIG),FreeBSD)
-SYSLIBS += -lssl -lcrypto -lz
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz
 else
 ifeq ($(POCO_CONFIG),QNX)
-SYSLIBS += -lssl -lcrypto -lz
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz
 else
 ifeq ($(findstring AIX, $(POCO_CONFIG)), AIX)
-SYSLIBS += -lssl_a -lcrypto_a -lz -ldl
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz -ldl
 else
 ifeq ($(POCO_CONFIG),Darwin)
-SYSLIBS += -lssl -lcrypto -lz
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz
 else
-SYSLIBS += -lssl -lcrypto -lz -ldl
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz -ldl
 endif # Darwin
 endif # AIX
 endif # QNX

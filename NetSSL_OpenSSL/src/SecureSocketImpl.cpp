@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/SecureSocketImpl.h"
+#include "Poco/Net/SocketImpl.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
@@ -331,6 +332,11 @@ void SecureSocketImpl::close()
 	_pSocket->close();
 }
 
+bool SecureSocketImpl::poll(const Poco::Timespan& timeout, int mode)
+{
+    return (((mode & SocketImpl::SELECT_READ) == SocketImpl::SELECT_READ) && SSL_pending(_pSSL) > 0)
+           ||  _pSocket->poll(timeout, mode);
+}
 
 void SecureSocketImpl::setBlocking(bool flag)
 {
@@ -386,6 +392,11 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	return rc;
 }
 
+int SecureSocketImpl::peekBytes(void* buffer, int length, int flags)
+{
+    return receiveBytes(buffer, length, flags | MSG_PEEK);
+}
+
 
 int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
@@ -409,7 +420,11 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		rc = ::SSL_read(_pSSL, buffer, length);
+        if (flags & MSG_PEEK) {
+            rc = ::SSL_peek(_pSSL, buffer, length);
+        } else {
+            rc = ::SSL_read(_pSSL, buffer, length);
+        }
 		if (!mustRetry(rc))
 			break;
 

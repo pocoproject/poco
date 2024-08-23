@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.5.0)
 
+# Ookla Addition
+# Uncomment to enable verbose makefiles
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON")
+
 project(Poco)
 
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
@@ -11,6 +16,16 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_
 
 set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
+
+## OOKLA CHANGES ##
+include(shared/cmake/macros.cmake)
+configure_ccache()
+message("--+ Toolchain information:")
+message("  +--> C Compiler: ${CMAKE_C_COMPILER}")
+message("  +--> CXX Compiler: ${CMAKE_CXX_COMPILER}")
+
+enable_hardening_flags()
+## END OOKLA CHANGES ##
 
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
@@ -240,6 +255,12 @@ option(POCO_NO_FORK_EXEC "Set to OFF|ON (default is OFF) to disable use of fork(
 
 if(POCO_NO_FORK_EXEC)
   add_definitions(-DPOCO_NO_FORK_EXEC=1)
+endif()
+
+# OOKLA CHANGES Disable Thread Name
+# This will only apply if DOOKLA_DISABLE_THREAD_NAME has been specified in the build/config file
+if(OOKLA_DISABLE_THREAD_NAME)
+	add_definitions(-DOOKLA_DISABLE_THREAD_NAME=1)
 endif()
 
 option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)

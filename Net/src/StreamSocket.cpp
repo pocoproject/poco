@@ -179,6 +179,10 @@ int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
 	return ret;
 }
 
+int StreamSocket::peekBytes(void* buffer, int length, int flags) const
+{
+    return impl()->peekBytes(buffer, length, flags);
+}
 
 int StreamSocket::receiveBytes(void* buffer, int length, int flags)
 {
