@@ -77,6 +77,8 @@ else(BUILD_SHARED_LIBS)
 	set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
 endif()
 
+# MacOS version that has full support for C++17
+set(CMAKE_OSX_DEPLOYMENT_TARGET, 10.15)
 
 # OS Detection
 include(CheckTypeSize)
