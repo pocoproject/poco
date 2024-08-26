@@ -24,6 +24,7 @@
 #include <set>
 #include <list>
 #include <queue>
+#include <optional>
 
 namespace Poco {
 
@@ -137,7 +138,7 @@ public:
 
 private:
 	ActiveThreadPoolPrivate& _pool;
-	Runnable* _pTarget;
+	std::optional<std::reference_wrapper<Runnable>> _target{};
 	Condition _runnableReady;
 	Thread _thread;
 };
@@ -175,8 +176,7 @@ public:
 
 
 ActivePooledThread::ActivePooledThread(ActiveThreadPoolPrivate& pool):
-	_pool(pool),
-	_pTarget(nullptr)
+	_pool(pool)
 {
 	std::ostringstream name;
 	name << _pool.name << "[#" << ++_pool.serial << "]";
@@ -193,8 +193,8 @@ void ActivePooledThread::start()
 
 void ActivePooledThread::setRunnable(Runnable& target)
 {
-	poco_assert(_pTarget == nullptr);
-	_pTarget = &target;
+	poco_assert(_target.has_value() == false);
+	_target = std::ref(target);
 }
 
 
@@ -221,17 +221,17 @@ void ActivePooledThread::run()
 	FastMutex::ScopedLock lock(_pool.mutex);
 	for (;;)
 	{
-		auto r = _pTarget;
-		_pTarget = nullptr;
+		auto r = _target;
+		_target.reset();
 
 		do
 		{
-			if (r)
+			if (r.has_value())
 			{
 				_pool.mutex.unlock();
 				try
 				{
-					r->run();
+					r.value().get().run();
 				}
 				catch (Exception& exc)
 				{
@@ -251,11 +251,11 @@ void ActivePooledThread::run()
 
 			if (_pool.runnables.empty())
 			{
-				r = nullptr;
+				r.reset();
 				break;
 			}
 
-			r = &_pool.runnables.pop();
+			r = std::ref(_pool.runnables.pop());
 		} while (true);
 
 		_pool.waitingThreads.push_back(ActivePooledThread::Ptr{ this, true });
