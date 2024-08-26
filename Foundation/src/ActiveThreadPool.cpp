@@ -422,13 +422,13 @@ void ActiveThreadPoolPrivate::joinAll()
 
 
 ActiveThreadPool::ActiveThreadPool(int capacity, int stackSize):
-	m_impl(new ActiveThreadPoolPrivate(capacity, stackSize))
+	_impl(new ActiveThreadPoolPrivate(capacity, stackSize))
 {
 }
 
 
 ActiveThreadPool::ActiveThreadPool(const std::string& name, int capacity, int stackSize):
-	m_impl(new ActiveThreadPoolPrivate(capacity, stackSize, name))
+	_impl(new ActiveThreadPoolPrivate(capacity, stackSize, name))
 {
 }
 
@@ -440,22 +440,22 @@ ActiveThreadPool::~ActiveThreadPool()
 
 int ActiveThreadPool::capacity() const
 {
-	return m_impl->maxThreadCount;
+	return _impl->maxThreadCount;
 }
 
 
 void ActiveThreadPool::start(Runnable& target, int priority)
 {
-	FastMutex::ScopedLock lock(m_impl->mutex);
+	FastMutex::ScopedLock lock(_impl->mutex);
 
-	if (!m_impl->tryStart(target))
+	if (!_impl->tryStart(target))
 	{
-		m_impl->enqueueTask(target, priority);
+		_impl->enqueueTask(target, priority);
 
-		if (!m_impl->waitingThreads.empty())
+		if (!_impl->waitingThreads.empty())
 		{
-			auto pThread = m_impl->waitingThreads.front();
-			m_impl->waitingThreads.pop_front();
+			auto pThread = _impl->waitingThreads.front();
+			_impl->waitingThreads.pop_front();
 			pThread->notifyRunnableReady();
 		}
 	}
@@ -464,7 +464,7 @@ void ActiveThreadPool::start(Runnable& target, int priority)
 
 void ActiveThreadPool::joinAll()
 {
-	m_impl->joinAll();
+	_impl->joinAll();
 }
 
 
@@ -477,28 +477,28 @@ ActiveThreadPool& ActiveThreadPool::defaultPool()
 
 int ActiveThreadPool::getStackSize() const
 {
-	return m_impl->stackSize;
+	return _impl->stackSize;
 }
 
 
 int ActiveThreadPool::expiryTimeout() const
 {
-	return m_impl->expiryTimeout;
+	return _impl->expiryTimeout;
 }
 
 
 void ActiveThreadPool::setExpiryTimeout(int expiryTimeout)
 {
-	if (m_impl->expiryTimeout != expiryTimeout)
+	if (_impl->expiryTimeout != expiryTimeout)
 	{
-		m_impl->expiryTimeout = expiryTimeout;
+		_impl->expiryTimeout = expiryTimeout;
 	}
 }
 
 
 const std::string& ActiveThreadPool::name() const
 {
-	return m_impl->name;
+	return _impl->name;
 }
 
 } // namespace Poco

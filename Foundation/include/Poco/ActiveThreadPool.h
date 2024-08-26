@@ -89,7 +89,7 @@ private:
 	ActiveThreadPool& operator = (const ActiveThreadPool& pool);
 
 private:
-	std::unique_ptr<ActiveThreadPoolPrivate> m_impl;
+	std::unique_ptr<ActiveThreadPoolPrivate> _impl;
 };
 
 } // namespace Poco
