@@ -138,7 +138,7 @@ public:
 
 private:
 	ActiveThreadPoolPrivate& _pool;
-	std::optional<std::reference_wrapper<Runnable>> _target{};
+	std::optional<std::reference_wrapper<Runnable>> _target;
 	Condition _runnableReady;
 	Thread _thread;
 };
