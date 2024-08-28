@@ -90,28 +90,30 @@ POCO_SOURCES(SRCS hpdf
 	src/hpdf_xref.c
 )
 
-# TODO: Currently only bundled is supported, in future this should also be possible
-# with an unbundled version of libpng
-POCO_SOURCES(SRCS libpng
-	src/png.c
-	src/pngerror.c
-	src/pnggccrd.c
-	src/pngget.c
-	src/pngmem.c
-	src/pngpread.c
-	src/pngread.c
-	src/pngrio.c
-	src/pngrtran.c
-	src/pngrutil.c
-	src/pngset.c
-	src/pngtest.c
-	src/pngtrans.c
-	src/pngvcrd.c
-	src/pngwio.c
-	src/pngwrite.c
-	src/pngwtran.c
-	src/pngwutil.c
-)
+if(POCO_UNBUNDLED)
+	find_package(LIBPNG REQUIRED)
+else()
+	POCO_SOURCES(SRCS libpng
+		src/png.c
+		src/pngerror.c
+		src/pnggccrd.c
+		src/pngget.c
+		src/pngmem.c
+		src/pngpread.c
+		src/pngread.c
+		src/pngrio.c
+		src/pngrtran.c
+		src/pngrutil.c
+		src/pngset.c
+		src/pngtest.c
+		src/pngtrans.c
+		src/pngvcrd.c
+		src/pngwio.c
+		src/pngwrite.c
+		src/pngwtran.c
+		src/pngwutil.c
+	)
+endif(POCO_UNBUNDLED)
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
@@ -133,6 +135,7 @@ set_target_properties(PDF
 
 if(POCO_UNBUNDLED)
 	target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
+	target_link_libraries(PDF PUBLIC PNG::PNG)
 	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
 endif(POCO_UNBUNDLED)
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)

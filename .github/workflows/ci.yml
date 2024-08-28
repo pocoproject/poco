@@ -190,7 +190,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libpng-dev
       - run: cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:

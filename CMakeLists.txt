@@ -232,9 +232,9 @@ else()
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
 
 # Disable fork exec
