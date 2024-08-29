@@ -77,12 +77,16 @@ class ScopedLockWithUnlock
 public:
 	explicit ScopedLockWithUnlock(M& mutex): _pMutex(&mutex)
 	{
+		poco_assert(_pMutex != nullptr);
+
 		_pMutex->lock();
 		_locked = true;
 	}
 
 	ScopedLockWithUnlock(M& mutex, long milliseconds): _pMutex(&mutex)
 	{
+		poco_assert(_pMutex != nullptr);
+
 		_pMutex->lock(milliseconds);
 		_locked = true;
 	}
@@ -102,6 +106,7 @@ public:
 	void lock()
 	{
 		poco_assert(_locked == false);
+
 		_pMutex->lock();
 		_locked = true;
 	}
@@ -110,7 +115,6 @@ public:
 	{
 		if (_locked)
 		{
-			poco_assert(_pMutex != nullptr);
 			_pMutex->unlock();
 			_locked = false;
 		}
