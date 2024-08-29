@@ -105,6 +105,7 @@ public:
 
 	void lock()
 	{
+		poco_assert(_pMutex != nullptr);
 		poco_assert(_locked == false);
 
 		_pMutex->lock();
@@ -115,6 +116,8 @@ public:
 	{
 		if (_locked)
 		{
+			poco_assert(_pMutex != nullptr);
+
 			_pMutex->unlock();
 			_locked = false;
 		}
