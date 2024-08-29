@@ -91,7 +91,7 @@ POCO_SOURCES(SRCS hpdf
 )
 
 if(POCO_UNBUNDLED)
-	find_package(LIBPNG REQUIRED)
+	find_package(PNG REQUIRED)
 else()
 	POCO_SOURCES(SRCS libpng
 		src/png.c
@@ -134,10 +134,14 @@ set_target_properties(PDF
 )
 
 if(POCO_UNBUNDLED)
+	include_directories(${PNG_INCLUDE_DIR})
+
 	target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
-	target_link_libraries(PDF PUBLIC PNG::PNG)
+	target_link_libraries(PDF PUBLIC ${PNG_LIBRARY})
 	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+
 endif(POCO_UNBUNDLED)
+
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF
 	PUBLIC
