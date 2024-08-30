@@ -20,38 +20,35 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Thread.h"
-#include "Poco/Mutex.h"
 #include "Poco/Environment.h"
-#include <vector>
+#include <memory>
 
 
 namespace Poco {
 
 
 class Runnable;
-class ActiveThread;
+class ActiveThreadPoolPrivate;
 
 
 class Foundation_API ActiveThreadPool
-	/// A thread pool always keeps a number of threads running, ready
-	/// to accept work.
-	/// Threads in an active thread pool are re-used
-	/// Every thread in the pool has own notification-queue with Runnable
-	/// Every Runnable executes on next thread (round-robin model)
-	/// The thread pool always keeps fixed number of threads running.
+	/// A thread pool manages and recycles individual Poco::Thread objects
+	/// to help reduce thread creation costs in programs that use threads.
+	/// 
+	/// The thread pool supports a task queue.
+	/// When there are no idle threads, tasks are placed in the task queue to wait for execution.
 	/// Use case for this pool is running many (more than os-max-thread-count) short live tasks
-	/// Round-robin model allow efficiently utilize cpu cores
 {
 public:
 	ActiveThreadPool(int capacity = static_cast<int>(Environment::processorCount()) + 1,
 		int stackSize = POCO_THREAD_STACK_SIZE);
-		/// Creates a thread pool with fixed capacity threads.
+		/// Creates a thread pool with a maximum thread count of capacity.
 		/// Threads are created with given stack size.
 
-	ActiveThreadPool(std::string  name,
+	ActiveThreadPool(const std::string& name,
 		int capacity = static_cast<int>(Environment::processorCount()) + 1,
 		int stackSize = POCO_THREAD_STACK_SIZE);
-		/// Creates a thread pool with the given name and fixed capacity threads.
+		/// Creates a thread pool with the given name and a maximum thread count of capacity.
 		/// Threads are created with given stack size.
 
 	~ActiveThreadPool();
@@ -64,39 +61,19 @@ public:
 	int getStackSize() const;
 		/// Returns the stack size used to create new threads.
 
-	void start(Runnable& target);
+	int expiryTimeout() const;
+		/// Returns the thread expiry timeout value in milliseconds.
+		/// The default expiryTimeout is 30000 milliseconds (30 seconds).
+
+	void setExpiryTimeout(int expiryTimeout);
+		/// Set the thread expiry timeout value in milliseconds.
+		/// The default expiryTimeout is 30000 milliseconds (30 seconds).
+
+	void start(Runnable& target, int priority = 0);
 		/// Obtains a thread and starts the target.
-
-	void start(Runnable& target, const std::string& name);
-		/// Obtains a thread and starts the target.
-		/// Assigns the given name to the thread.
-
-	void startWithPriority(Thread::Priority priority, Runnable& target);
-		/// Obtains a thread, adjusts the thread's priority, and starts the target.
-
-	void startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name);
-		/// Obtains a thread, adjusts the thread's priority, and starts the target.
-		/// Assigns the given name to the thread.
-
-	void stopAll();
-		/// Stops all running threads and waits for their completion.
-		///
-		/// Will also delete all thread objects.
-		/// If used, this method should be the last action before
-		/// the thread pool is deleted.
-		///
-		/// Note: If a thread fails to stop within 10 seconds
-		/// (due to a programming error, for example), the
-		/// underlying thread object will not be deleted and
-		/// this method will return anyway. This allows for a
-		/// more or less graceful shutdown in case of a misbehaving
-		/// thread.
 
 	void joinAll();
-		/// Waits for all threads to complete.
-		///
-		/// Note that this will join() underlying
-		/// threads and restart them for next tasks.
+		/// Waits for all threads to exit and removes all threads from the thread pool.
 
 	const std::string& name() const;
 		/// Returns the name of the thread pool,
@@ -107,37 +84,13 @@ public:
 		/// Returns a reference to the default
 		/// thread pool.
 
-protected:
-	ActiveThread* getThread();
-	ActiveThread* createThread();
-
 private:
 	ActiveThreadPool(const ActiveThreadPool& pool);
 	ActiveThreadPool& operator = (const ActiveThreadPool& pool);
 
-	typedef std::vector<ActiveThread*> ThreadVec;
-
-	std::string _name;
-	int _capacity;
-	int _serial;
-	int _stackSize;
-	ThreadVec _threads;
-	mutable FastMutex _mutex;
-	std::atomic<size_t> _lastThreadIndex{0};
+private:
+	std::unique_ptr<ActiveThreadPoolPrivate> _impl;
 };
-
-
-inline int ActiveThreadPool::getStackSize() const
-{
-	return _stackSize;
-}
-
-
-inline const std::string& ActiveThreadPool::name() const
-{
-	return _name;
-}
-
 
 } // namespace Poco
 
