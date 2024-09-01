@@ -249,6 +249,7 @@ option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (d
 if (POCO_ENABLE_STD_MUTEX)
 	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
+
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file

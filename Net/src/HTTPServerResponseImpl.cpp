@@ -28,6 +28,8 @@
 #include "Poco/FileStream.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
+#include "Poco/Error.h"
+#include "Poco/Net/NetException.h"
 
 
 using Poco::File;
@@ -37,6 +39,7 @@ using Poco::StreamCopier;
 using Poco::OpenFileException;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
+using Poco::Error;
 using namespace std::string_literals;
 
 
@@ -129,7 +132,19 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 		write(*_pStream);
 		if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
 		{
+#ifdef POCO_HAVE_SENDFILE
+			_pStream->flush(); // flush the HTTP headers to the socket, required by HTTP 1.0 and above
+
+			Poco::IntPtr sent = 0;
+			Poco::IntPtr offset = 0;
+			while (sent < length)
+			{
+				offset = sent;
+				sent += _session.socket().sendFile(istr, offset);
+			}
+#else
 			StreamCopier::copyStream(istr, *_pStream);
+#endif
 		}
 	}
 	else throw OpenFileException(path);

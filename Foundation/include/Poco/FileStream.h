@@ -79,7 +79,7 @@ public:
 	NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 
-	Poco::UInt64 size() const;
+	UInt64 size() const;
 		/// Returns file size
 
 	void flushToDisk();
