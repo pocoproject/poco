@@ -47,8 +47,10 @@ Context::Params::Params(KeyDHGroup dhBits):
 	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
 	dhGroup(dhBits),
-	securityLevel(SECURITY_LEVEL_NONE),
-	libctx(0)
+	securityLevel(SECURITY_LEVEL_NONE)
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	,libctx(0)
+#endif
 {
 }
 
@@ -114,6 +116,8 @@ Context::Context(
 }
 
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
 Context::Context(
 	Usage usage,
 	OSSL_LIB_CTX *libctx,
@@ -138,6 +142,8 @@ Context::Context(
 
 	init( params );
 }
+
+#endif
 
 
 Context::~Context()
@@ -590,12 +596,16 @@ void Context::setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalid
 }
 
 void Context::initContext(const Params& params, const SSL_METHOD *method) {
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	if ( nullptr != params.libctx && !params.providerName.empty() ) {
 		_pSSLContext = SSL_CTX_new_ex( params.libctx, params.providerName.c_str(), method );
 	}
 	else {
 		_pSSLContext = SSL_CTX_new( method );
 	}
+#else
+	_pSSLContext = SSL_CTX_new( method );
+#endif
 }
 
 void Context::createSSLContext( const Params &params )

@@ -28,7 +28,11 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/types.h>
+#endif
+
 #include <cstdlib>
 
 
@@ -156,8 +160,10 @@ public:
 		Params(KeyDHGroup dhBits = KEY_DH_GROUP_2048);
 			/// Initializes the struct with default values.
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 		std::string providerName;
 		OSSL_LIB_CTX *libctx = nullptr;
+#endif
 
 		std::string privateKeyFile;
 			/// Path to the private key file used for encryption.
@@ -308,6 +314,7 @@ public:
 		/// Note that a private key and/or certificate must be specified with
 		/// usePrivateKey()/useCertificate() before the Context can be used.
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	Context( Usage usage,
 			 OSSL_LIB_CTX *libctx,
 			 const std::string &provider,
@@ -345,6 +352,7 @@ public:
 		///   * OSSL_PROVIDER_unload( provider );
 		///   * OSSL_PROVIDER_unload( providerDefault );
 		///   * OSSL_LIB_CTX_free( ctx );
+#endif
 
 	~Context();
 		/// Destroys the Context.
