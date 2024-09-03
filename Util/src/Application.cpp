@@ -27,6 +27,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionProcessor.h"
 #include "Poco/Util/Validator.h"
+#include "Poco/Util/OptionException.h"
 #include "Poco/Environment.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -76,7 +77,8 @@ Application::Application():
 	_initialized(false),
 	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup"s)),
-	_stopOptionsProcessing(false)
+	_stopOptionsProcessing(false),
+	_ignoreUnknownOptions(false)
 {
 	setup();
 }
@@ -87,7 +89,8 @@ Application::Application(int argc, char* argv[]):
 	_initialized(false),
 	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup"s)),
-	_stopOptionsProcessing(false)
+	_stopOptionsProcessing(false),
+	_ignoreUnknownOptions(false)
 {
 	setup();
 	init(argc, argv);
@@ -330,6 +333,11 @@ void Application::stopOptionsProcessing()
 }
 
 
+void Application::ignoreUnknownOptions()
+{
+	_ignoreUnknownOptions = true;
+}
+
 Application::WindowSize Application::windowSize()
 {
 	WindowSize size{0, 0};
@@ -430,7 +438,21 @@ void Application::processOptions()
 	{
 		std::string name;
 		std::string value;
-		if (processor.process(*it, name, value))
+		bool success = false;
+
+		try
+		{
+			success = processor.process(*it, name, value);
+		}
+		catch (const Poco::Util::UnknownOptionException&)
+		{
+			if (!_ignoreUnknownOptions)
+			{
+				throw;
+			}
+		}
+
+		if (success)
 		{
 			if (!name.empty()) // "--" option to end options processing or deferred argument
 			{
@@ -438,10 +460,15 @@ void Application::processOptions()
 			}
 			it = _unprocessedArgs.erase(it);
 		}
-		else ++it;
+		else
+		{
+			++it;
+		}
 	}
 	if (!_stopOptionsProcessing)
+	{
 		processor.checkRequired();
+	}
 }
 
 

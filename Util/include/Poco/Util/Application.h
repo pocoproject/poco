@@ -300,6 +300,14 @@ public:
 		/// help information has been encountered and no other things
 		/// besides displaying help shall be done.
 
+	void ignoreUnknownOptions();
+		/// Ignore unknown options. So that we can skip those options
+		/// we don't care about.
+		///
+		/// When your application command line has many options,
+		/// calling this function can help you handle only the options
+		/// you want to handle
+
 	static WindowSize windowSize();
 		/// Returns the current window size of the console window,
 		/// if available.
@@ -404,6 +412,7 @@ private:
 	Logger*           _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
+	bool            _ignoreUnknownOptions;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;
