@@ -858,10 +858,13 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 		throw SSLContextException(Poco::format("Context::initDH(%s):EVP_PKEY*", dhParamsFile));
 	}
 
-	SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey);
+	if (!SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey))
+	{
+		if (freeEVPPKey) EVP_PKEY_free(pKey);
+		std::string err = "Context::initDH():SSL_CTX_set0_tmp_dh_pkey()\n";
+		throw SSLContextException(Poco::Crypto::getError(err));
+	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
-
-	if (freeEVPPKey) EVP_PKEY_free(pKey);
 
 #else // OPENSSL_VERSION_NUMBER >= 0x30000000L
 
