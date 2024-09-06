@@ -12,10 +12,14 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/NestedDiagnosticContext.h"
+#include "Poco/ActiveThreadPool.h"
+#include "Poco/RunnableAdapter.h"
 #include <iostream>
 
 
 using Poco::NDC;
+using Poco::ActiveThreadPool;
+using Poco::RunnableAdapter;
 
 
 NDCTest::NDCTest(const std::string& name): CppUnit::TestCase(name)
@@ -64,6 +68,25 @@ void NDCTest::testNDCScope()
 }
 
 
+void NDCTest::testNDCMultiThread()
+{
+	ActiveThreadPool pool;
+	RunnableAdapter<NDCTest> ra(*this, &NDCTest::runInThread);
+	for (int i = 0; i < 1000; i++)
+	{
+		pool.start(ra);
+	}
+	pool.joinAll();
+}
+
+
+void NDCTest::runInThread()
+{
+	testNDC();
+	testNDCScope();
+}
+
+
 void NDCTest::setUp()
 {
 }
@@ -80,6 +103,7 @@ CppUnit::Test* NDCTest::suite()
 
 	CppUnit_addTest(pSuite, NDCTest, testNDC);
 	CppUnit_addTest(pSuite, NDCTest, testNDCScope);
+	CppUnit_addTest(pSuite, NDCTest, testNDCMultiThread);
 
 	return pSuite;
 }
