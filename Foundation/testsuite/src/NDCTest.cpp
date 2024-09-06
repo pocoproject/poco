@@ -15,6 +15,7 @@
 #include "Poco/ActiveThreadPool.h"
 #include "Poco/RunnableAdapter.h"
 #include <iostream>
+#include <sstream>
 
 
 using Poco::NDC;
@@ -60,7 +61,8 @@ void NDCTest::testNDCScope()
 		{
 			poco_ndc("item3");
 			assertTrue (NDC::current().depth() == 3);
-			NDC::current().dump(std::cout);
+			std::ostringstream ostr;
+			NDC::current().dump(ostr);
 		}
 		assertTrue (NDC::current().depth() == 2);
 	}
