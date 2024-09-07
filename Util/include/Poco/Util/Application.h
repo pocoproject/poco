@@ -378,6 +378,12 @@ protected:
 		/// Returns an exit code which should be one of the values
 		/// from the ExitCode enumeration.
 
+	virtual bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
+		/// Find the application config file.
+		///
+		/// loadConfiguration will call this function to find config file,
+		/// you can override this function to find your own config file.
+
 	bool findFile(Poco::Path& path) const;
 		/// Searches for the file in path in the application directory.
 		///
@@ -401,7 +407,6 @@ private:
 	void setArgs(int argc, char* argv[]);
 	void setArgs(const ArgVec& args);
 	void processOptions();
-	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
 	typedef LayeredConfiguration::Ptr ConfigPtr;
 	typedef Poco::Logger::Ptr LoggerPtr;
