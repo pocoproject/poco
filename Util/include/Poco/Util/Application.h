@@ -419,7 +419,7 @@ private:
 	ArgVec          _unprocessedArgs;
 	OptionSet       _options;
 	bool            _unixOptions;
-	Logger*           _pLogger;
+	Logger*         _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
 	bool            _ignoreUnknownOptions;
