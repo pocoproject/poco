@@ -240,6 +240,12 @@ public:
 		/// will be propagated to the caller. If uninitialize() throws
 		/// an exception, the exception will be propagated to the caller.
 
+	void getApplicationPath(Poco::Path& path) const;
+		/// Returns the file path of the application executable.
+
+	void getApplicationDirectory(Poco::Path& dir) const;
+		/// Returns the directory that contains the application executable.
+
 	std::string commandName() const;
 		/// Returns the command name used to invoke the application.
 
@@ -394,7 +400,6 @@ private:
 	void setup();
 	void setArgs(int argc, char* argv[]);
 	void setArgs(const ArgVec& args);
-	void getApplicationPath(Poco::Path& path) const;
 	void processOptions();
 	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
 

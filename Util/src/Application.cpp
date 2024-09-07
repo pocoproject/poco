@@ -510,6 +510,14 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 }
 
 
+void Application::getApplicationDirectory(Poco::Path& dir) const
+{
+	Path appPath;
+	getApplicationPath(appPath);
+	dir = appPath.parent();
+}
+
+
 bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
