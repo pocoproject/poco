@@ -53,7 +53,7 @@ public:
 	FileIOS();
 		/// Creates the basic stream.
 
-	~FileIOS();
+	~FileIOS() override;
 		/// Destroys the stream.
 
 	virtual void open(const std::string& path, std::ios::openmode mode);
@@ -115,7 +115,7 @@ public:
 		/// Throws a FileNotFoundException (or a similar exception) if the file
 		/// does not exist or is not accessible for other reasons.
 
-	~FileInputStream();
+	~FileInputStream() override;
 		/// Destroys the stream.
 
 	void open(const std::string& path, std::ios::openmode mode = std::ios::in) override;
@@ -158,7 +158,7 @@ public:
 		/// for std::ofstream, which is std::ios::out only. This is for backwards compatibility
 		/// with earlier POCO versions.
 
-	~FileOutputStream();
+	~FileOutputStream() override;
 		/// Destroys the FileOutputStream.
 
 	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::trunc) override;
@@ -203,7 +203,7 @@ public:
 		/// for std::fstream, which is std::ios::out only. This is for backwards compatibility
 		/// with earlier POCO versions.
 
-	~FileStream();
+	~FileStream() override;
 		/// Destroys the FileOutputStream.
 
 	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in) override;
