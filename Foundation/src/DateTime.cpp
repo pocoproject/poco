@@ -126,7 +126,6 @@ DateTime& DateTime::operator = (const DateTime& dateTime)
 		_millisecond = dateTime._millisecond;
 		_microsecond = dateTime._microsecond;
 	}
-	checkValid();
 	return *this;
 }
 
@@ -214,7 +213,7 @@ void DateTime::checkValid()
 	if (!isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
 		throw Poco::InvalidArgumentException(Poco::format("Date time is %hd-%hd-%hdT%hd:%hd:%hd.%hd.%hd\n"
 				"Valid values:\n"
-				"0 <= year <= 9999\n"
+				"-4713 <= year <= 9999\n"
 				"1 <= month <= 12\n"
 				"1 <= day <=  %d\n"
 				"0 <= hour <= 23\n"
@@ -231,7 +230,7 @@ void DateTime::checkValid()
 bool DateTime::isValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
 {
 	return
-		(year >= 0 && year <= 9999) &&
+		(year >= -4713 && year <= 9999) &&
 		(month >= 1 && month <= 12) &&
 		(day >= 1 && day <= daysOfMonth(year, month)) &&
 		(hour >= 0 && hour <= 23) &&

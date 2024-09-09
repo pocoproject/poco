@@ -92,7 +92,7 @@ void DateTimeTest::testJulian()
 	assertTrue (dt.millisecond() == 0);
 	assertTrue (dt.dayOfWeek() == 5);
 	assertTrue (dt.julianDay() == 2299160.5);
-/*
+
 	dt = 0.0; // -4713-11-24 12:00:00 (Gregorian date of Julian day reference)
 	assertTrue (dt.year() == -4713);
 	assertTrue (dt.month() == 11);
@@ -103,7 +103,7 @@ void DateTimeTest::testJulian()
 	assertTrue (dt.millisecond() == 0);
 	assertTrue (dt.dayOfWeek() == 1);
 	assertTrue (dt.julianDay() == 0);
-*/
+
 	// Test that we can represent down to the microsecond.
 	dt = DateTime(2010, 1, 31, 17, 30, 15, 800, 3);
 
@@ -880,7 +880,7 @@ void DateTimeTest::testInvalid()
 {
 	try
 	{
-		DateTime dt(-1, 1, 1);
+		DateTime dt(-4714, 1, 1);
 		failmsg("Invalid year, must throw");
 	}
 	catch(const Poco::InvalidArgumentException&) { }
