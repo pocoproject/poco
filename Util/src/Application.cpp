@@ -440,16 +440,16 @@ void Application::processOptions()
 		std::string value;
 		bool success = false;
 
-		try
+		if (_ignoreUnknownOptions)
+		{
+			try
+			{
+				success = processor.process(*it, name, value);
+			} catch (Poco::Util::UnknownOptionException&) { }
+		}
+		else
 		{
 			success = processor.process(*it, name, value);
-		}
-		catch (const Poco::Util::UnknownOptionException&)
-		{
-			if (!_ignoreUnknownOptions)
-			{
-				throw;
-			}
 		}
 
 		if (success)
