@@ -66,10 +66,12 @@ void NDCTest::testNDCScope()
 			NDC::current().dump(ostr);
 
 			assertEqual(ostr.str(), Poco::format(
-R"("item1" (in "src/NDCTest.cpp", line %d)
-"item2" (in "src/NDCTest.cpp", line %d)
-"item3" (in "src/NDCTest.cpp", line %d)
-)", line1, line2, line3));
+R"("item1" (in "%s", line %d)
+"item2" (in "%s", line %d)
+"item3" (in "%s", line %d)
+)", std::string(__FILE__), line1,
+	std::string(__FILE__), line2,
+	std::string(__FILE__), line3));
 
 		}
 		assertTrue (NDC::current().depth() == 2);
