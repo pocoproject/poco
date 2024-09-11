@@ -72,7 +72,7 @@ else()
 	POCO_HEADERS(SRCS zlib
 		include/Poco/zconf.h
 		include/Poco/zlib.h
-		)
+	)
 
 	POCO_SOURCES(SRCS zlib
 		src/adler32.c

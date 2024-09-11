@@ -17,7 +17,6 @@ else()
 		src/compress.c
 		src/crc32.c
 		src/deflate.c
-		src/gzio.c
 		src/infback.c
 		src/inffast.c
 		src/inflate.c
