@@ -139,7 +139,9 @@ if(POCO_UNBUNDLED)
 	target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
 	target_link_libraries(PDF PUBLIC ${PNG_LIBRARY})
 	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
-
+else()
+	# libpng: Do not try to use ARM intrinsics on ARM architecture: source files not included
+	target_compile_definitions(PDF PRIVATE PNG_ARM_NEON_OPT=0)
 endif(POCO_UNBUNDLED)
 
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
