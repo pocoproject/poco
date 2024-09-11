@@ -240,6 +240,12 @@ public:
 		/// will be propagated to the caller. If uninitialize() throws
 		/// an exception, the exception will be propagated to the caller.
 
+	void getApplicationPath(Poco::Path& path) const;
+		/// Returns the file path of the application executable.
+
+	void getApplicationDirectory(Poco::Path& dir) const;
+		/// Returns the directory that contains the application executable.
+
 	std::string commandName() const;
 		/// Returns the command name used to invoke the application.
 
@@ -299,6 +305,14 @@ public:
 		/// This is useful, for example, if an option for displaying
 		/// help information has been encountered and no other things
 		/// besides displaying help shall be done.
+
+	void ignoreUnknownOptions();
+		/// Ignore unknown options. So that we can skip those options
+		/// we don't care about.
+		///
+		/// When your application command line has many options,
+		/// calling this function can help you handle only the options
+		/// you want to handle
 
 	static WindowSize windowSize();
 		/// Returns the current window size of the console window,
@@ -364,6 +378,12 @@ protected:
 		/// Returns an exit code which should be one of the values
 		/// from the ExitCode enumeration.
 
+	virtual bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
+		/// Find the application config file.
+		///
+		/// loadConfiguration will call this function to find config file,
+		/// you can override this function to find your own config file.
+
 	bool findFile(Poco::Path& path) const;
 		/// Searches for the file in path in the application directory.
 		///
@@ -386,10 +406,7 @@ private:
 	void setup();
 	void setArgs(int argc, char* argv[]);
 	void setArgs(const ArgVec& args);
-	void getApplicationPath(Poco::Path& path) const;
 	void processOptions();
-	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
-	bool findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
 	typedef LayeredConfiguration::Ptr ConfigPtr;
 	typedef Poco::Logger::Ptr LoggerPtr;
@@ -402,9 +419,10 @@ private:
 	ArgVec          _unprocessedArgs;
 	OptionSet       _options;
 	bool            _unixOptions;
-	Logger*           _pLogger;
+	Logger*         _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
+	bool            _ignoreUnknownOptions;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;
