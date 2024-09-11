@@ -113,14 +113,10 @@ void NestedDiagnosticContext::clear()
 }
 
 
-namespace {
-	static ThreadLocal<NestedDiagnosticContext> ndc;
-}
-
-
 NestedDiagnosticContext& NestedDiagnosticContext::current()
 {
-	return ndc.get();
+	static thread_local NestedDiagnosticContext ndc;
+	return ndc;
 }
 
 
