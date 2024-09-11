@@ -14,6 +14,7 @@
 #include "Poco/NestedDiagnosticContext.h"
 #include "Poco/ActiveThreadPool.h"
 #include "Poco/RunnableAdapter.h"
+#include "Poco/Format.h"
 #include <iostream>
 #include <sstream>
 
@@ -53,16 +54,23 @@ void NDCTest::testNDC()
 
 void NDCTest::testNDCScope()
 {
-	poco_ndc("item1");
+	poco_ndc("item1"); int line1 = __LINE__;
 	assertTrue (NDC::current().depth() == 1);
 	{
-		poco_ndc("item2");
+		poco_ndc("item2"); int line2 = __LINE__;
 		assertTrue (NDC::current().depth() == 2);
 		{
-			poco_ndc("item3");
+			poco_ndc("item3"); int line3 = __LINE__;
 			assertTrue (NDC::current().depth() == 3);
 			std::ostringstream ostr;
 			NDC::current().dump(ostr);
+
+			assertEqual(ostr.str(), Poco::format(
+R"("item1" (in "src/NDCTest.cpp", line %d)
+"item2" (in "src/NDCTest.cpp", line %d)
+"item3" (in "src/NDCTest.cpp", line %d)
+)", line1, line2, line3));
+
 		}
 		assertTrue (NDC::current().depth() == 2);
 	}
