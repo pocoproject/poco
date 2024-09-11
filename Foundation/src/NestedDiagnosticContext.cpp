@@ -13,7 +13,6 @@
 
 
 #include "Poco/NestedDiagnosticContext.h"
-#include "Poco/ThreadLocal.h"
 
 
 namespace Poco {
