@@ -74,7 +74,7 @@ void JSONConfiguration::load(std::istream& istr)
 
 	JSON::Parser parser;
 	parser.parse(istr);
-	DynamicAny result = parser.result();
+	Dynamic::Var result = parser.result();
 	if (result.type() == typeid(JSON::Object::Ptr))
 	{
 		_object = result.extract<JSON::Object::Ptr>();
@@ -95,7 +95,7 @@ void JSONConfiguration::loadEmpty(const std::string& root)
 bool JSONConfiguration::getRaw(const std::string & key, std::string & value) const
 {
 	JSON::Query query(_object);
-	Poco::DynamicAny result = query.find(key);
+	Poco::Dynamic::Var result = query.find(key);
 	if (!result.isEmpty())
 	{
 		value = result.convert<std::string>();
@@ -144,7 +144,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 		std::string name = tokenizer[i];
 		getIndexes(name, indexes);
 
-		DynamicAny result = currentObject->get(name);
+		Dynamic::Var result = currentObject->get(name);
 
 		if (result.isEmpty()) // Not found
 		{
@@ -174,7 +174,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 
 					for(int i = 0; i <= *it - 1; ++i)
 					{
-						Poco::DynamicAny nullValue;
+						Poco::Dynamic::Var nullValue;
 						newArray->add(nullValue);
 					}
 
@@ -246,7 +246,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 }
 
 
-void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny& value)
+void JSONConfiguration::setValue(const std::string& key, const Dynamic::Var& value)
 {
 	std::string sValue;
 
@@ -270,7 +270,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 	}
 	else
 	{
-		DynamicAny result = parentObject->get(lastPart);
+		Dynamic::Var result = parentObject->get(lastPart);
 		if (result.isEmpty())
 		{
 			result = JSON::Array::Ptr(new JSON::Array());
@@ -289,7 +289,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 			{
 				for (int i = static_cast<int>(arr->size()); i <= *it; ++i)
 				{
-					Poco::DynamicAny nullValue;
+					Poco::Dynamic::Var nullValue;
 					arr->add(nullValue);
 				}
 				nextArray = new JSON::Array();
@@ -340,7 +340,7 @@ void JSONConfiguration::setDouble(const std::string& key, double value)
 void JSONConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	JSON::Query query(_object);
-	Poco::DynamicAny result = query.find(key);
+	Poco::Dynamic::Var result = query.find(key);
 	if (result.type() == typeid(JSON::Object::Ptr))
 	{
 		JSON::Object::Ptr object = result.extract<JSON::Object::Ptr>();
@@ -370,7 +370,7 @@ void JSONConfiguration::removeRaw(const std::string& key)
 	}
 	else
 	{
-		DynamicAny result = parentObject->get(lastPart);
+		Dynamic::Var result = parentObject->get(lastPart);
 		if (!result.isEmpty() && result.type() == typeid(JSON::Array::Ptr))
 		{
 			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();

@@ -24,8 +24,8 @@
 
 namespace Poco {
 
+class POCO_DEPRECATED("") HashStatistic;
 
-//@ deprecated
 class Foundation_API HashStatistic
 	/// HashStatistic class bundles statistical information on the current state of a HashTable
 {

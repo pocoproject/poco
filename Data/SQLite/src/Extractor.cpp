@@ -224,7 +224,7 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
+bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 {
 	return extractImpl(pos, val);
 }

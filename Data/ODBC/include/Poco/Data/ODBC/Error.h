@@ -41,8 +41,13 @@ class Error
 	/// as well as individual diagnostic records.
 {
 public:
-	explicit Error(const H& handle) : _diagnostics(handle)
+	explicit Error(const H& handle) : _pDiag(new Diagnostics<H, handleType>(handle))
 		/// Creates the Error.
+	{
+	}
+
+	Error(const Error& other) : Error(other.diagnostics().handle())
+		/// Creates the Error from another one.
 	{
 	}
 
@@ -51,16 +56,23 @@ public:
 	{
 	}
 
+	Error& operator = (const Error& other)
+		/// Assigns another Error to this one.
+	{
+		_pDiag.reset(new Diagnostics<H, handleType>(other.diagnostics().handle()));
+		return *this;
+	}
+
 	const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns the associated diagnostics.
 	{
-		return _diagnostics;
+		return *_pDiag;
 	}
 
 	int count() const
 		/// Returns the count of diagnostic records.
 	{
-		return (int) _diagnostics.count();
+		return (int) _pDiag->count();
 	}
 
 	std::string& toString(int index, std::string& str) const
@@ -76,9 +88,9 @@ public:
 			"===========================\n"
 			"SQLSTATE = %s\nNative Error Code = %ld\n%s\n\n",
 			index + 1,
-			_diagnostics.sqlState(index),
-			_diagnostics.nativeError(index),
-			_diagnostics.message(index));
+			_pDiag->sqlState(index),
+			_pDiag->nativeError(index),
+			_pDiag->message(index));
 
 		str.append(s);
 
@@ -92,8 +104,8 @@ public:
 
 		Poco::format(str,
 			"Connection:%s\nServer:%s\n",
-			_diagnostics.connectionName(),
-			_diagnostics.serverName());
+			_pDiag->connectionName(),
+			_pDiag->serverName());
 
 		std::string s;
 		for (int i = 0; i < count(); ++i)
@@ -108,14 +120,21 @@ public:
 private:
 	Error();
 
-	Diagnostics<H, handleType> _diagnostics;
+	std::unique_ptr<Diagnostics<H, handleType>> _pDiag;
 };
 
 
-typedef Error<SQLHENV, SQL_HANDLE_ENV> EnvironmentError;
-typedef Error<SQLHDBC, SQL_HANDLE_DBC> ConnectionError;
-typedef Error<SQLHSTMT, SQL_HANDLE_STMT> StatementError;
-typedef Error<SQLHSTMT, SQL_HANDLE_DESC> DescriptorError;
+// explicit instantiation definition
+template class Error<SQLHENV, SQL_HANDLE_ENV>;
+template class Error<SQLHDBC, SQL_HANDLE_DBC>;
+template class Error<SQLHSTMT, SQL_HANDLE_STMT>;
+template class Error<SQLHDESC, SQL_HANDLE_DESC>;
+
+
+using EnvironmentError = Error<SQLHENV, SQL_HANDLE_ENV>;
+using ConnectionError = Error<SQLHDBC, SQL_HANDLE_DBC>;
+using StatementError = Error<SQLHSTMT, SQL_HANDLE_STMT>;
+using DescriptorError = Error<SQLHSTMT, SQL_HANDLE_DESC>;
 
 
 } } } // namespace Poco::Data::ODBC

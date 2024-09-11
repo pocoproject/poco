@@ -924,8 +924,10 @@
     <ClCompile Include="src\pcre2_xclass.c">
       <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ActiveThreadPool.cpp" />
     <ClCompile Include="src\VarVisitor.cpp" />
+    <ClCompile Include="src\ActiveThreadPool.cpp">
+      <Filter>Threading\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1875,6 +1877,9 @@
     </ClInclude>
     <ClInclude Include="src\pcre2_intmodedep.h">
       <Filter>RegularExpression\PCRE2 Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveThreadPool.h">
+      <Filter>Threading\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

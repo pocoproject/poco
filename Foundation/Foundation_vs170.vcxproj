@@ -2122,6 +2122,7 @@
     <ClInclude Include="include\Poco\ActiveResult.h" />
     <ClInclude Include="include\Poco\ActiveRunnable.h" />
     <ClInclude Include="include\Poco\ActiveStarter.h" />
+    <ClInclude Include="include\Poco\ActiveThreadPool.h" />
     <ClInclude Include="include\Poco\Activity.h" />
     <ClInclude Include="include\Poco\Any.h" />
     <ClInclude Include="include\Poco\ArchiveStrategy.h" />

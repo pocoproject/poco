@@ -32,12 +32,12 @@ class ODBCAccessTest: public CppUnit::TestCase
 {
 public:
 	ODBCAccessTest(const std::string& name);
-	~ODBCAccessTest();
+	~ODBCAccessTest() override;
 
 	void testSimpleAccess();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

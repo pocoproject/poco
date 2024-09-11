@@ -9,17 +9,22 @@
 
 
 #include "EventTestSuite.h"
+#if defined(POCO_TEST_DEPRECATED)
 #include "FIFOEventTest.h"
+#endif
 #include "BasicEventTest.h"
 #include "PriorityEventTest.h"
 
 CppUnit::Test* EventTestSuite::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("EventTestSuite");
+	auto* pSuite = new CppUnit::TestSuite("EventTestSuite");
 
 	pSuite->addTest(BasicEventTest::suite());
 	pSuite->addTest(PriorityEventTest::suite());
+
+#if defined(POCO_TEST_DEPRECATED)
 	pSuite->addTest(FIFOEventTest::suite());
+#endif
 
 	return pSuite;
 }

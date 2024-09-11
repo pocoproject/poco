@@ -13,16 +13,13 @@
 #ifndef SQLExecutor_INCLUDED
 #define SQLExecutor_INCLUDED
 
-
-#include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
 #include "Poco/Data/Test/SQLExecutor.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -88,8 +85,10 @@ public:
 		DE_BOUND
 	};
 
-	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = 0);
-	~SQLExecutor();
+	SQLExecutor(const std::string& name,
+				Poco::Data::Session* pSession,
+				Poco::Data::Session* pEncSession = nullptr);
+	~SQLExecutor() override;
 
 	void execute(const std::string& sql);
 		/// Execute a query.

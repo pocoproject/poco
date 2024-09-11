@@ -25,6 +25,8 @@
 namespace Poco {
 namespace MongoDB {
 
+//class [[deprecated]] GetMoreRequest;
+class GetMoreRequest;
 
 class MongoDB_API GetMoreRequest: public RequestMessage
 	/// A GetMoreRequest is used to query the database for more documents in a collection

@@ -65,12 +65,7 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-if(POCO_STATIC)
-	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
-	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
@@ -237,9 +232,9 @@ else()
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
 
 # Disable fork exec
@@ -254,6 +249,7 @@ option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (d
 if (POCO_ENABLE_STD_MUTEX)
 	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
+
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file

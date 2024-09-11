@@ -22,17 +22,20 @@ class LinearHashTableTest: public CppUnit::TestCase
 {
 public:
 	LinearHashTableTest(const std::string& name);
-	~LinearHashTableTest();
+	~LinearHashTableTest() override;
 
 	void testInsert();
 	void testErase();
 	void testIterator();
 	void testConstIterator();
+
+#if defined(POCO_TEST_DEPRECATED)
 	void testPerformanceInt();
 	void testPerformanceStr();
+#endif
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

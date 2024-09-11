@@ -29,7 +29,7 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "sqlite3.h"
 #include <vector>
 #include <utility>
@@ -122,8 +122,8 @@ public:
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
-	bool extract(std::size_t pos, Poco::DynamicAny& val);
-		/// Extracts a DynamicAny.
+	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
+		/// Extracts a Dynamic::Var.
 
 	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW);
 		/// Returns true if the current row value at pos column is null.
@@ -147,7 +147,7 @@ public:
 private:
 	template <typename T>
 	bool extractImpl(std::size_t pos, T& val)
-		/// Utility function for extraction of Any and DynamicAny.
+		/// Utility function for extraction of Any and Dynamic::Var.
 	{
 		if (isNull(pos)) return false;
 

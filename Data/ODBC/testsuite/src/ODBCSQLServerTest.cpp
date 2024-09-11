@@ -14,7 +14,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
@@ -38,7 +38,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 
 
@@ -554,7 +554,7 @@ void ODBCSQLServerTest::testStoredProcedureAny()
 }
 
 
-void ODBCSQLServerTest::testStoredProcedureDynamicAny()
+void ODBCSQLServerTest::testStoredProcedureDynamicVar()
 {
 	try
 	{
@@ -562,8 +562,8 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 		{
 			session().setFeature("autoBind", bindValue(k));
 
-			DynamicAny i = 2;
-			DynamicAny j = 0;
+			Var i = 2;
+			Var j = 0;
 
 			dropObject("PROCEDURE", "storedProcedure");
 			session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
@@ -590,8 +590,8 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 		}
 		dropObject("PROCEDURE", "storedProcedure");
 	}
-	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
-	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicVar()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicVar()"); }
 }
 
 
@@ -1033,7 +1033,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureReturn);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);

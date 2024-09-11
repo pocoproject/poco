@@ -28,6 +28,8 @@
 namespace Poco {
 namespace MongoDB {
 
+//class [[deprecated]] ResponseMessage;
+class ResponseMessage;
 
 class MongoDB_API ResponseMessage: public Message
 	/// This class represents a response (OP_REPLY) from MongoDB.
