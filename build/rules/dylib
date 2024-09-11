@@ -56,21 +56,25 @@ shared_debug:   bindirs $(DYLIB_DEBUG)
 shared_release: bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
+	$(prebuild)
 	@echo "** Building dynamic library (debug, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
+	$(prebuild)
 	@echo "** Building dynamic library (release, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
+	$(prebuild)
 	@echo "** Building dynamic library (debug, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
+	$(prebuild)
 	@echo "** Building dynamic library (release, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
