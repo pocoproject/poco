@@ -74,15 +74,6 @@ if(MSVC)
 		message(FATAL_ERROR "Cannot have both BUILD_SHARED_LIBS and POCO_MT")
 	endif()
 
-	# allow disabling of internally built OpenSSL# (see below for details)
-	# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
-	# the internal OpenSSL build will be used
-	option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" ON)
-
-	if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (ENABLE_NETSSL OR ENABLE_CRYPTO OR (ENABLE_DATA_MYSQL AND MINGW)))
-		include(UseEmbeddedOpenSSL)
-	endif()
-
 	if(POCO_SANITIZE_ASAN)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address")
 	endif()
@@ -90,7 +81,11 @@ if(MSVC)
 endif()
 
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
-option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
+
+#
+# Path to OpenSSL installation root can be provided by setting a variable
+# OPENSSL_ROOT_DIR.
+#
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
 	find_package(OpenSSL REQUIRED)
