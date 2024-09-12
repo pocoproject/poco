@@ -54,14 +54,25 @@ void NDCTest::testNDC()
 
 void NDCTest::testNDCScope()
 {
-	poco_ndc("item1"); int line1 = __LINE__;
-	assertTrue (NDC::current().depth() == 1);
+	poco_ndc("item1");
+	auto line1 = __LINE__ - 1;
+	if (NDC::current().depth() != 1)
 	{
-		poco_ndc("item2"); int line2 = __LINE__;
+		int y = 10;
+		int x = y;
+	}
+	assertTrue (NDC::current().depth() == 1);
+
+	{
+		poco_ndc("item2");
+		auto line2 = __LINE__ - 1;
 		assertTrue (NDC::current().depth() == 2);
+
 		{
-			poco_ndc("item3"); int line3 = __LINE__;
+			poco_ndc("item3");
+			auto line3 = __LINE__ - 1;
 			assertTrue (NDC::current().depth() == 3);
+
 			std::ostringstream ostr;
 			NDC::current().dump(ostr);
 
@@ -72,7 +83,6 @@ R"("item1" (in "%s", line %d)
 )", std::string(__FILE__), line1,
 	std::string(__FILE__), line2,
 	std::string(__FILE__), line3));
-
 		}
 		assertTrue (NDC::current().depth() == 2);
 	}
