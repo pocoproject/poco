@@ -1046,6 +1046,7 @@
     <ClCompile Include="src\PatternFormatter.cpp" />
     <ClCompile Include="src\pcre2_auto_possess.c" />
     <ClCompile Include="src\pcre2_chartables.c" />
+    <ClCompile Include="src\pcre2_chkdint.c" />
     <ClCompile Include="src\pcre2_compile.c" />
     <ClCompile Include="src\pcre2_config.c" />
     <ClCompile Include="src\pcre2_context.c" />
