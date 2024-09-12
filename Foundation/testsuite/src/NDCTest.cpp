@@ -15,6 +15,7 @@
 #include "Poco/ActiveThreadPool.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/Format.h"
+#include "Poco/Path.h"
 #include <iostream>
 #include <sstream>
 
@@ -22,6 +23,7 @@
 using Poco::NDC;
 using Poco::ActiveThreadPool;
 using Poco::RunnableAdapter;
+using Poco::Path;
 
 
 NDCTest::NDCTest(const std::string& name): CppUnit::TestCase(name)
@@ -68,16 +70,26 @@ void NDCTest::testNDCScope()
 			auto line3 = __LINE__ - 1;
 			assertTrue (NDC::current().depth() == 3);
 
-			std::ostringstream ostr;
-			NDC::current().dump(ostr);
+ 			std::ostringstream ostr1;
+			NDC::current().dump(ostr1);
+			assertEqual (ostr1.str(), Poco::format(
+				"\"item1\" (in \"%s\", line %d)\n"
+				"\"item2\" (in \"%s\", line %d)\n"
+				"\"item3\" (in \"%s\", line %d)",
+				std::string(__FILE__), line1,
+				std::string(__FILE__), line2,
+				std::string(__FILE__), line3));
 
-			assertEqual(ostr.str(), Poco::format(
-R"("item1" (in "%s", line %d)
-"item2" (in "%s", line %d)
-"item3" (in "%s", line %d)
-)", std::string(__FILE__), line1,
-	std::string(__FILE__), line2,
-	std::string(__FILE__), line3));
+			std::ostringstream ostr2;
+			NDC::current().dump(ostr2, "\n", true);
+			std::string fileName = Path(__FILE__).getFileName();
+			assertEqual(ostr2.str(), Poco::format(
+				"\"item1\" (in \"%s\", line %d)\n"
+				"\"item2\" (in \"%s\", line %d)\n"
+				"\"item3\" (in \"%s\", line %d)",
+				fileName, line1,
+				fileName, line2,
+				fileName, line3));
 		}
 		assertTrue (NDC::current().depth() == 2);
 	}
