@@ -79,6 +79,7 @@ push(json_stream *json, enum json_type type)
     return type;
 }
 
+/* Note: c is assumed not to be EOF. */
 static enum json_type
 pop(json_stream *json, int c, enum json_type expected)
 {
@@ -101,14 +102,17 @@ static int buffer_peek(struct json_source *source)
 static int buffer_get(struct json_source *source)
 {
     int c = source->peek(source);
-    source->position++;
+    if (c != EOF)
+        source->position++;
     return c;
 }
 
 static int stream_get(struct json_source *source)
 {
-    source->position++;
-    return fgetc(source->source.stream.stream);
+    int c = fgetc(source->source.stream.stream);
+    if (c != EOF)
+        source->position++;
+    return c;
 }
 
 static int stream_peek(struct json_source *source)
@@ -146,7 +150,11 @@ is_match(json_stream *json, const char *pattern, enum json_type type)
     int c;
     for (const char *p = pattern; *p; p++) {
         if (*p != (c = json->source.get(&json->source))) {
-            json_error(json, "expected '%c' instead of byte '%c'", *p, c);
+            if (c != EOF) {
+                json_error(json, "expected '%c' instead of byte '%c'", *p, c);
+            } else {
+                json_error(json, "expected '%c' instead of end of text", *p);
+            }
             return JSON_ERROR;
         }
     }
@@ -465,7 +473,7 @@ read_utf8(json_stream* json, int next_char)
     int i;
     for (i = 1; i < count; ++i)
     {
-        buffer[i] = json->source.get(&json->source);;
+        buffer[i] = json->source.get(&json->source);
     }
 
     if (!is_legal_utf8((unsigned char*) buffer, count))
@@ -535,7 +543,11 @@ read_digits(json_stream *json)
     }
 
     if (nread == 0) {
-        json_error(json, "expected digit instead of byte '%c'", c);
+        if (c != EOF) {
+            json_error(json, "expected digit instead of byte '%c'", c);
+        } else {
+            json_error(json, "%s", "expected digit instead of end of text");
+        }
         return -1;
     }
 
@@ -552,10 +564,14 @@ read_number(json_stream *json, int c)
         if (is_digit(c)) {
             return read_number(json, c);
         } else {
-            json_error(json, "unexpected byte '%c' in number", c);
+            if (c != EOF) {
+                json_error(json, "unexpected byte '%c' in number", c);
+            } else {
+                json_error(json, "%s", "unexpected end of text in number");
+            }
             return JSON_ERROR;
         }
-    } else if (c >= '1' && c <= '9') {
+    } else if (strchr("123456789", c) != NULL) {
         c = json->source.peek(&json->source);
         if (is_digit(c)) {
             if (read_digits(json) != 0)
@@ -594,7 +610,11 @@ read_number(json_stream *json, int c)
             if (read_digits(json) != 0)
                 return JSON_ERROR;
         } else {
-            json_error(json, "unexpected byte '%c' in number", c);
+            if (c != EOF) {
+                json_error(json, "unexpected byte '%c' in number", c);
+            } else {
+                json_error(json, "%s", "unexpected end of text in number");
+            }
             return JSON_ERROR;
         }
     }
@@ -732,7 +752,11 @@ enum json_type json_next(json_stream *json)
         } else if (c == ']') {
             return pop(json, c, JSON_ARRAY);
         } else {
-            json_error(json, "unexpected byte '%c'", c);
+            if (c != EOF) {
+                json_error(json, "unexpected byte '%c'", c);
+            } else {
+                json_error(json, "%s", "unexpected end of text");
+            }
             return JSON_ERROR;
         }
     } else if (json->stack[json->stack_top].type == JSON_OBJECT) {
@@ -927,7 +951,10 @@ void json_open_stream(json_stream *json, FILE * stream)
 
 static int user_get(struct json_source *json)
 {
-    return json->source.user.get(json->source.user.ptr);
+    int c = json->source.user.get(json->source.user.ptr);
+    if (c != EOF)
+        json->position++;
+    return c;
 }
 
 static int user_peek(struct json_source *json)
