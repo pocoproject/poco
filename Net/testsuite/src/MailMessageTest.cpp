@@ -558,6 +558,42 @@ void MailMessageTest::testReadMultiPartMixedCaseHeaders()
 }
 
 
+void MailMessageTest::testReadMultiPartInvalidContentDisposition()
+{
+        std::istringstream istr(
+                "Content-type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+                "Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+                "From: poco@appinf.com\r\n"
+                "Mime-Version: 1.0\r\n"
+                "Subject: Test Message\r\n"
+                "To: John Doe <john.doe@no.where>\r\n"
+                "\r\n"
+                "\r\n"
+                "Hello World!\r\n"
+                "\r\n"
+                "--MIME_boundary_01234567\r\n"
+                "Content-Disposition: \r\n"
+                "Content-Transfer-Encoding: base64\r\n"
+                "Content-Type: application/octet-stream; name=sample\r\n"
+                "\r\n"
+                "VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+                "--MIME_boundary_01234567--\r\n"
+        );
+
+        MailMessage message;
+        MailInputStream mis(istr);
+        message.read(mis);
+
+        assertTrue (message.isMultipart());
+        assertTrue (message.parts().size() == 1);
+        assertTrue (message.get(MailMessage::HEADER_CONTENT_TYPE) == "multipart/mixed; boundary=MIME_boundary_01234567");
+
+        assertTrue (message.parts()[0].encoding == MailMessage::ContentTransferEncoding::ENCODING_BASE64);
+        assertTrue (message.parts()[0].disposition == MailMessage::ContentDisposition::CONTENT_INLINE);
+        assertTrue (message.parts()[0].pSource->headers().get(MailMessage::HEADER_CONTENT_TYPE) == "application/octet-stream; name=sample");
+}
+
+
 void MailMessageTest::testReadMultiPartNoFinalBoundaryFromFile()
 {
 	std::string data(
@@ -758,6 +794,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartMixedCaseHeaders);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartInvalidContentDisposition);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartNoFinalBoundaryFromFile);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
