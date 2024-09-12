@@ -56,11 +56,6 @@ void NDCTest::testNDCScope()
 {
 	poco_ndc("item1");
 	auto line1 = __LINE__ - 1;
-	if (NDC::current().depth() != 1)
-	{
-		int y = 10;
-		int x = y;
-	}
 	assertTrue (NDC::current().depth() == 1);
 
 	{
