@@ -1,0 +1,37 @@
+#
+# Makefile
+#
+# Makefile for backtrace
+#
+
+.PHONY: all install configure clean distclean
+
+#
+# Determine operating system and architecture
+#
+ifndef OSNAME
+OSNAME := $(shell uname)
+endif
+ifndef OSARCH
+OSARCH := $(subst /,-,$(shell uname -m | tr ' ' _))
+endif
+
+INCPREFIX := $(POCO_BASE)/Trace/include/Poco/Trace/backtrace
+LIBPREFIX := $(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)
+
+all: install
+
+install: configure
+	$(MAKE) -C libbacktrace $(MAKECMDGOALS) $(MAKEARGS)
+
+configure:
+	$(shell [ ! -f "libbacktrace/Makefile" ] && \
+	cd libbacktrace && \
+	./configure --bindir=$(LIBPREFIX) --exec-prefix=$(LIBPREFIX) --libexecdir=$(LIBPREFIX) --includedir=$(INCPREFIX) --enable-shared=yes && \
+	cd..)
+
+clean:
+	$(MAKE) -C libbacktrace clean
+
+distclean:
+	$(MAKE) -C libbacktrace distclean
