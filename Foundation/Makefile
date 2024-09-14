@@ -6,6 +6,10 @@
 
 include $(POCO_BASE)/build/rules/global
 
+ifdef POCO_ENABLE_TRACE
+INCLUDE += -I $(POCO_BASE)/Trace/include/Poco/Trace
+endif
+
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCenter ActiveThreadPool\
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
@@ -60,6 +64,9 @@ endif
 target         = PocoFoundation
 target_version = $(LIBVERSION)
 target_libs    =
+ifdef POCO_ENABLE_TRACE
+target_libs   += PocoTrace
+endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
     $(shell cd src; $(WINDMC) pocomsg.mc)

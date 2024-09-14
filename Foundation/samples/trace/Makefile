@@ -4,10 +4,14 @@
 # Makefile for Poco Trace sample
 #
 
+
+# disable strip of release build to get a meaningful backtrace
+POCO_ENABLE_TRACE=1
 include $(POCO_BASE)/build/rules/global
 
 INCLUDE += -I $(POCO_BASE)/Trace/include/Poco/Trace
 LIBRARY += -L$(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)/lib
+SYSLIBS += -lbacktrace
 
 objects = trace
 

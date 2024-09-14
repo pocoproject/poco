@@ -67,6 +67,22 @@ jobs:
             EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
             ./ci/runtests.sh
 
+  linux-gcc-make-trace:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: ./configure --everything --trace && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
+            ./ci/runtests.sh
+
   linux-gcc-make-cxx20:
     runs-on: ubuntu-22.04
     steps:

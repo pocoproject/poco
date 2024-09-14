@@ -87,6 +87,16 @@ cppunit:
 CppUnit-clean:
 	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
+trace:
+ifdef POCO_ENABLE_TRACE
+	$(MAKE) -C $(POCO_BASE)/Trace
+endif
+
+Trace-clean:
+ifdef POCO_ENABLE_TRACE
+	$(MAKE) -C $(POCO_BASE)/Trace clean
+endif
+
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
 	mkdir -p $(INSTALLDIR)/lib
@@ -131,13 +141,13 @@ tests: $(filter-out $(foreach f,$(OMIT),$f%),$(tests))
 samples: $(filter-out $(foreach f,$(OMIT),$f%),$(samples))
 cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))
 
-Foundation-libexec:
+Foundation-libexec: trace
 	$(MAKE) -C $(POCO_BASE)/Foundation
 
 Foundation-tests: Foundation-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite
 
-Foundation-samples: Foundation-libexec
+Foundation-samples: Foundation-libexec trace
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples
 
 Foundation-clean:

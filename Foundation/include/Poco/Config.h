@@ -197,4 +197,7 @@
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
 
+// Uncomment to enable stack trace autogeneration in Exception
+//#define POCO_ENABLE_TRACE 1
+
 #endif // Foundation_Config_INCLUDED
