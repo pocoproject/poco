@@ -5,13 +5,9 @@
 #
 
 
-# disable strip of release build to get a meaningful backtrace
-POCO_ENABLE_TRACE=1
-include $(POCO_BASE)/build/rules/global
+ifdef POCO_ENABLE_TRACE
 
-INCLUDE += -I $(POCO_BASE)/Trace/include/Poco/Trace
-LIBRARY += -L$(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)/lib
-SYSLIBS += -lbacktrace
+include $(POCO_BASE)/build/rules/global
 
 objects = trace
 
@@ -21,3 +17,9 @@ target_libs     = PocoTrace PocoFoundation
 target_includes = $(POCO_BASE)/Trace/include
 
 include $(POCO_BASE)/build/rules/exec
+
+else
+
+all:
+
+endif

@@ -428,7 +428,7 @@ Prometheus-clean:
 	$(MAKE) -C $(POCO_BASE)/Prometheus/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Prometheus/samples clean
 
-clean: cleans CppUnit-clean
+clean: cleans Trace-clean CppUnit-clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib

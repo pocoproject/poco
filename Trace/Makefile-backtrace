@@ -16,19 +16,27 @@ ifndef OSARCH
 OSARCH := $(subst /,-,$(shell uname -m | tr ' ' _))
 endif
 
-INCPREFIX := $(POCO_BASE)/Trace/include/Poco/Trace/backtrace
-LIBPREFIX := $(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)
+BTINCPREFIX := $(POCO_BASE)/Trace/include/Poco/Trace/backtrace
+BTLIBPREFIX := $(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)
+BTLIBNAME   := libbacktrace
+BTEXTENSION := so.0.0.0
+BTCOPYFILES := cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).a" "$(BTLIBPREFIX)/" && \
+cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).la" "$(BTLIBPREFIX)/" && \
+cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).$(BTEXTENSION)" "$(BTLIBPREFIX)/" && \
+ln -sf "$(BTLIBPREFIX)/$(BTLIBNAME).$(BTEXTENSION)" "$(BTLIBPREFIX)/$(BTLIBNAME).so.0" && \
+ln -sf "$(BTLIBPREFIX)/$(BTLIBNAME).$(BTEXTENSION)" "$(BTLIBPREFIX)/$(BTLIBNAME).so"
 
 all: install
 
 install: configure
-	$(MAKE) -C libbacktrace $(MAKECMDGOALS) $(MAKEARGS)
+	$(MAKE) -C $(BTLIBNAME) $(MAKECMDGOALS) $(MAKEARGS)
+	$(BTCOPYFILES)
 
 configure:
-	$(shell [ ! -f "libbacktrace/Makefile" ] && \
-	cd libbacktrace && \
-	./configure --bindir=$(LIBPREFIX) --exec-prefix=$(LIBPREFIX) --libexecdir=$(LIBPREFIX) --includedir=$(INCPREFIX) --enable-shared=yes && \
-	cd..)
+	$(shell [ ! -f "$(BTLIBNAME)/Makefile" ] && \
+	cd $(BTLIBNAME) && \
+	./configure --bindir=$(BTLIBPREFIX) --exec-prefix=$(BTLIBPREFIX) --libexecdir=$(BTLIBPREFIX) --includedir=$(BTINCPREFIX) --enable-shared=yes && \
+	"cd ..")
 
 clean:
 	$(MAKE) -C libbacktrace clean
