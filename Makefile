@@ -72,7 +72,7 @@ ifdef POCO_VERBOSE
 $(info OSARCH              = $(OSARCH))
 endif
 
-.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install uninstall
+.PHONY: poco all libexecs cppunit trace tests samples cleans clean distclean install uninstall
 
 # TESTS and SAMPLES are set in config.make
 poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
@@ -147,7 +147,7 @@ Foundation-libexec: trace
 Foundation-tests: Foundation-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite
 
-Foundation-samples: Foundation-libexec trace
+Foundation-samples: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples
 
 Foundation-clean:

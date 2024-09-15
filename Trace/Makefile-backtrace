@@ -20,11 +20,20 @@ BTINCPREFIX := $(POCO_BASE)/Trace/include/Poco/Trace/backtrace
 BTLIBPREFIX := $(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)
 BTLIBNAME   := libbacktrace
 BTEXTENSION := so.0.0.0
+ifeq ($(OSNAME), Linux)
 BTCOPYFILES := cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).a" "$(BTLIBPREFIX)/" && \
 cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).la" "$(BTLIBPREFIX)/" && \
 cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).$(BTEXTENSION)" "$(BTLIBPREFIX)/" && \
 ln -sf "$(BTLIBPREFIX)/$(BTLIBNAME).$(BTEXTENSION)" "$(BTLIBPREFIX)/$(BTLIBNAME).so.0" && \
 ln -sf "$(BTLIBPREFIX)/$(BTLIBNAME).$(BTEXTENSION)" "$(BTLIBPREFIX)/$(BTLIBNAME).so"
+else
+ifeq ($(OSNAME), Darwin)
+BTCOPYFILES := cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).a" "$(BTLIBPREFIX)/" && \
+cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).la" "$(BTLIBPREFIX)/" && \
+cp -f "$(BTLIBPREFIX)/lib/$(BTLIBNAME).0.dylib" "$(BTLIBPREFIX)/" && \
+ln -sf "$(BTLIBPREFIX)/$(BTLIBNAME).dylib" "$(BTLIBPREFIX)/$(BTLIBNAME).0.dylib"
+endif
+endif
 
 all: install
 
