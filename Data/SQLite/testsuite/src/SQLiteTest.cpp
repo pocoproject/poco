@@ -3362,8 +3362,9 @@ void SQLiteTest::testTransaction()
 	status = trans.execute(sql, &info);
 
 	assertFalse (status);
+#ifndef POCO_ENABLE_TRACE
 	assertEqual (info, "Invalid SQL statement: no such table: Pers: no such table: Pers");
-
+#endif
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 

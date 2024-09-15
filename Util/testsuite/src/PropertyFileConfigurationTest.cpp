@@ -94,8 +94,10 @@ void PropertyFileConfigurationTest::testLoad()
 	}
 	catch (Poco::IOException& exc)
 	{
+#ifndef POCO_ENABLE_TRACE
 		std::string s(exc.message());
 		assertTrue (s == "Broken input stream");
+#endif
 	}
 }
 
