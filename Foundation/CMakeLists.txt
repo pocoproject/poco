@@ -168,6 +168,10 @@ else()
 	endif(UNIX AND NOT ANDROID)
 endif(CYGWIN)
 
+if(ENABLE_TRACE)
+	target_link_libraries(Foundation PUBLIC Poco::Trace)
+endif()
+
 if(CMAKE_SYSTEM MATCHES "SunOS")
 	target_compile_definitions(Foundation
 		PUBLIC

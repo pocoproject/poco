@@ -21,13 +21,12 @@ set_target_properties(Trace
 		DEFINE_SYMBOL Trace_EXPORTS
 )
 
-target_include_directories (Trace PRIVATE include/Poco/Trace)
+target_compile_definitions (Trace PRIVATE cpptrace_lib_EXPORTS)
 
-target_compile_definitions (Trace PRIVATE CPPTRACE_STATIC_DEFINE)
-
-if (LINUX)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_CXXABI CPPTRACE_UNWIND_WITH_UNWIND)
 	target_compile_definitions (Trace PRIVATE CPPTRACE_GET_SYMBOLS_WITH_LIBBACKTRACE)
+	target_link_libraries(Trace PRIVATE backtrace)
 elseif (APPLE)
 	target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_CXXABI CPPTRACE_UNWIND_WITH_UNWIND)
 	target_compile_definitions (Trace PRIVATE CPPTRACE_GET_SYMBOLS_WITH_LIBDL)
@@ -35,12 +34,16 @@ elseif(WIN32)
 	target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_WINAPI CPPTRACE_UNWIND_WITH_WINAPI)
 	target_compile_definitions (Trace PRIVATE CPPTRACE_GET_SYMBOLS_WITH_DBGHELP NOMINMAX)
 	target_link_libraries(Trace PRIVATE dbghelp)
+else()
+	message(FATAL_ERROR "Poco::Trace: Unsupported platform.")
 endif()
 
-target_link_libraries(Trace PUBLIC Poco::Foundation)
+target_compile_definitions (Trace PUBLIC POCO_ENABLE_TRACE)
+
 target_include_directories(Trace
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/Poco/Trace>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
