@@ -20,6 +20,7 @@
 #include "ActiveDispatcherTest.h"
 #include "ConditionTest.h"
 #include "ActiveThreadPoolTest.h"
+#include "FileStreamRWLockTest.h"
 
 
 CppUnit::Test* ThreadingTestSuite::suite()
@@ -37,6 +38,7 @@ CppUnit::Test* ThreadingTestSuite::suite()
 	pSuite->addTest(ActiveDispatcherTest::suite());
 	pSuite->addTest(ConditionTest::suite());
 	pSuite->addTest(ActiveThreadPoolTest::suite());
+	pSuite->addTest(FileStreamRWLockTest::suite());
 
 	return pSuite;
 }

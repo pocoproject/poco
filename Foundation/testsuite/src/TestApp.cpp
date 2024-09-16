@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include <signal.h>
 
+#include "Poco/FileStreamRWLock.h"
+
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
@@ -222,6 +224,143 @@ int main(int argc, char** argv)
 			}
 		}
 #endif
+		else if (argc > 2 && arg.find("--lock-file") != std::string::npos && std::string(argv[2]).find("--pidfile") != std::string::npos) 
+		{
+			std::string pidfArg = std::string(argv[2]);
+			std::unique_ptr<PIDFile> pidF;
+			size_t equals_pos = pidfArg.find('=');
+			if (equals_pos != std::string::npos)
+			{
+				std::string pidPath = pidfArg.substr(equals_pos + 1);
+				pidF = std::make_unique<PIDFile>(pidPath, true);
+			}
+			if (pidF == nullptr)
+			{
+				return -1;
+			}
+			equals_pos = arg.find('=');
+			if (equals_pos != std::string::npos)
+			{
+				std::string fl = arg.substr(equals_pos + 1);
+				FileStream fs(fl, std::ios::out | std::ios::in | std::ios::binary);
+				Poco::Int32 ok = 1;
+				Poco::Int32 lastCount = 0;
+				Poco::Int32 counter = 0;
+				FileStreamRWLock lock(fs, 0, sizeof(counter));
+				for (int i = 0; i < 10000; ++i)
+				{
+					lock.readLock();
+					fs.seekg(0, std::ios::beg);
+					fs.read((char *)&counter, sizeof(counter));
+					lastCount = counter;
+					for (int k = 0; k < 100; ++k)
+					{
+						if (counter != lastCount) ok = -1;
+					}
+					lock.unlock();
+					lock.writeLock();
+					for (int k = 0; k < 100; ++k)
+					{
+						counter = 0;
+						fs.seekg(0, std::ios::beg);
+						fs.read((char *)&counter, sizeof(counter));
+						--counter;
+						fs.seekp(0, std::ios::beg);
+						fs.write((char *)&counter, sizeof(counter));
+						fs.flushToDisk();
+					}
+					for (int k = 0; k < 100; ++k)
+					{
+						fs.seekg(0, std::ios::beg);
+						fs.read((char *)&counter, sizeof(counter));
+						++counter;
+						fs.seekp(0, std::ios::beg);
+						fs.write((char *)&counter, sizeof(counter));
+						fs.flushToDisk();
+					}
+					fs.seekg(0, std::ios::beg);
+					fs.read((char *)&counter, sizeof(counter));
+					++counter;
+					fs.seekp(0, std::ios::beg);
+					fs.write((char *)&counter, sizeof(counter));
+					fs.flushToDisk();
+					if (counter <= lastCount) ok = -1;
+					lock.unlock();
+				}
+				return ok * counter;
+			}
+			return -1;
+		}
+		else if (argc > 2 && arg.find("--trylock-file") != std::string::npos && std::string(argv[2]).find("--pidfile") != std::string::npos) 
+		{
+			std::string pidfArg = std::string(argv[2]);
+			std::unique_ptr<PIDFile> pidF;
+			size_t equals_pos = pidfArg.find('=');
+			if (equals_pos != std::string::npos)
+			{
+				std::string pidPath = pidfArg.substr(equals_pos + 1);
+				pidF = std::make_unique<PIDFile>(pidPath, true);
+			}
+			if (pidF == nullptr)
+			{
+				return -1;
+			}
+			equals_pos = arg.find('=');
+			if (equals_pos != std::string::npos)
+			{
+				std::string fl = arg.substr(equals_pos + 1);
+				FileStream fs(fl, std::ios::out | std::ios::in | std::ios::binary);
+				Poco::Int32 ok = 1;
+				Poco::Int32 lastCount = 0;
+				Poco::Int32 counter = 0;
+				FileStreamRWLock lock(fs, 0, sizeof(counter));
+				for (int i = 0; i < 10000; ++i)
+				{
+					while (!lock.tryReadLock()) Thread::yield();
+					fs.seekg(0, std::ios::beg);
+					fs.read((char *)&counter, sizeof(counter));
+					lastCount = counter;
+					for (int k = 0; k < 100; ++k)
+					{
+						if (counter != lastCount) ok = -1;
+						Thread::yield();
+					}
+					lock.unlock();
+					while (!lock.tryWriteLock()) Thread::yield();
+					for (int k = 0; k < 100; ++k)
+					{
+						counter = 0;
+						fs.seekg(0, std::ios::beg);
+						fs.read((char *)&counter, sizeof(counter));
+						--counter;
+						fs.seekp(0, std::ios::beg);
+						fs.write((char *)&counter, sizeof(counter));
+						fs.flushToDisk();
+						Thread::yield();
+					}
+					for (int k = 0; k < 100; ++k)
+					{
+						fs.seekg(0, std::ios::beg);
+						fs.read((char *)&counter, sizeof(counter));
+						++counter;
+						fs.seekp(0, std::ios::beg);
+						fs.write((char *)&counter, sizeof(counter));
+						fs.flushToDisk();
+						Thread::yield();
+					}
+					fs.seekg(0, std::ios::beg);
+					fs.read((char *)&counter, sizeof(counter));
+					++counter;
+					fs.seekp(0, std::ios::beg);
+					fs.write((char *)&counter, sizeof(counter));
+					fs.flushToDisk();
+					if (counter <= lastCount) ok = -1;
+					lock.unlock();
+				}
+				return ok * counter;
+			}
+			return -1;
+		}
 	}
 	return argc - 1;
 }
