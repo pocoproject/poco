@@ -47,11 +47,3 @@ target_include_directories(Trace
 
 POCO_INSTALL(Trace)
 POCO_GENERATE_PACKAGE(Trace)
-
-if(ENABLE_SAMPLES)
-#	add_subdirectory(samples)
-endif()
-
-if(ENABLE_TESTS)
-#	add_subdirectory(testsuite)
-endif()
