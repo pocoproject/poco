@@ -5,7 +5,6 @@ POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
-POCO_SOURCES(SRCS pdjson src/pdjson.c)
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
@@ -22,6 +21,17 @@ set_target_properties(Trace
 		DEFINE_SYMBOL Trace_EXPORTS
 )
 
+target_include_directories (Trace PRIVATE include/Poco/Trace)
+target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_CXXABI CPPTRACE_UNWIND_WITH_UNWIND)
+
+if (LINUX)
+	target_compile_definitions (Trace PRIVATE CPPTRACE_GET_SYMBOLS_WITH_LIBBACKTRACE)
+else()
+	if (APPLE)
+		target_compile_definitions (Trace PRIVATE CPPTRACE_GET_SYMBOLS_WITH_LIBDL)
+	endif()
+endif()
+
 target_link_libraries(Trace PUBLIC Poco::Foundation)
 target_include_directories(Trace
 	PUBLIC
@@ -30,21 +40,13 @@ target_include_directories(Trace
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-if(WIN32)
-	target_compile_definitions(Trace PRIVATE _CRT_SECURE_NO_WARNINGS)
-	set_source_files_properties(src/pdjson.c PROPERTIES LANGUAGE CXX)
-	set_property(TARGET Trace PROPERTY C_STANDARD 99)
-else()
-	target_compile_features(Trace PUBLIC c_variadic_macros)
-endif()
-
 POCO_INSTALL(Trace)
 POCO_GENERATE_PACKAGE(Trace)
 
 if(ENABLE_SAMPLES)
-	add_subdirectory(samples)
+#	add_subdirectory(samples)
 endif()
 
 if(ENABLE_TESTS)
-	add_subdirectory(testsuite)
+#	add_subdirectory(testsuite)
 endif()

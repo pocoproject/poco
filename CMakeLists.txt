@@ -192,6 +192,8 @@ option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
+option(ENABLE_TRACE "Enable stack tracing" OFF)
+
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
   set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
@@ -480,6 +482,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
 	add_subdirectory(Encodings/Compiler)
 	list(APPEND Poco_COMPONENTS "EncodingsCompiler")
+endif()
+
+if(ENABLE_TRACE)
+	add_subdirectory(Trace)
+	list(APPEND Poco_COMPONENTS "Trace")
 endif()
 
 
