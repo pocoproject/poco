@@ -12,7 +12,7 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-add_library(Trace ${SRCS})
+add_library(Trace STATIC ${SRCS})
 add_library(Poco::Trace ALIAS Trace)
 set_target_properties(Trace
 	PROPERTIES
@@ -21,7 +21,14 @@ set_target_properties(Trace
 		DEFINE_SYMBOL Trace_EXPORTS
 )
 
-target_compile_definitions (Trace PRIVATE cpptrace_lib_EXPORTS)
+#
+# Build as static library. Primary usage is from PocoFoundation and is not intended to
+# be provided as general purpose Poco module
+#
+target_compile_definitions (Trace PUBLIC CPPTRACE_STATIC_DEFINE)
+#target_compile_definitions (Trace PRIVATE cpptrace_lib_EXPORTS)
+
+set_property(TARGET Trace PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_CXXABI CPPTRACE_UNWIND_WITH_UNWIND)
@@ -48,5 +55,5 @@ target_include_directories(Trace
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-POCO_INSTALL(Trace)
-POCO_GENERATE_PACKAGE(Trace)
+#POCO_INSTALL(Trace)
+#POCO_GENERATE_PACKAGE(Trace)
