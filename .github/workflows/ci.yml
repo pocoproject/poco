@@ -202,12 +202,12 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
-  linux-gcc-cmake-unbundled:
+  linux-gcc-cmake-unbundled-trace:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libpng-dev
-      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DENABLE_PDF=ON && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DENABLE_PDF=ON -DENABLE_TRACE=ON && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -314,13 +314,13 @@ jobs:
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
-  macos-clang-cmake-openssl:
+  macos-clang-cmake-openssl-trace:
     # macos-14 runs on Apple Silicon
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TRACE=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
