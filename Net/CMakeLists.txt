@@ -29,7 +29,7 @@ endif()
 
 if (DEFINED HAVE_SENDFILE)
 	message(STATUS "OS has native sendfile function")
-	add_definitions(-DPOCO_HAVE_SENDFILE)
+	add_compile_definitions(POCO_HAVE_SENDFILE)
 endif()
 
 # Version Resource

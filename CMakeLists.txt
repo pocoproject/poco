@@ -238,13 +238,13 @@ endif()
 option(POCO_NO_FORK_EXEC "Set to OFF|ON (default is OFF) to disable use of fork() and exec*() which are not allowed on some Apple platforms (iOS, watchOS, iPadOS, tvOS)." OFF)
 
 if(POCO_NO_FORK_EXEC)
-  add_definitions(-DPOCO_NO_FORK_EXEC=1)
+  add_compile_definitions(POCO_NO_FORK_EXEC=1)
 endif()
 
 option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
 
 if (POCO_ENABLE_STD_MUTEX)
-	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
+	add_compile_definitions(POCO_ENABLE_STD_MUTEX)
 endif ()
 
 include(DefinePlatformSpecifc)
@@ -415,7 +415,7 @@ option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
 	if(POCO_DATA_NO_SQL_PARSER)
-		add_definitions(-DPOCO_DATA_NO_SQL_PARSER=1)
+		add_compile_definitions(POCO_DATA_NO_SQL_PARSER=1)
 	endif()
 	add_subdirectory(Data)
 	list(APPEND Poco_COMPONENTS "Data")
