@@ -30,7 +30,20 @@ target_compile_definitions (Trace PUBLIC CPPTRACE_STATIC_DEFINE)
 
 set_property(TARGET Trace PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		# Find backtrace header provided by gcc with a package like "libgcc-11-dev"
+		file(GLOB_RECURSE BACKTRACE_H /usr/lib/gcc/*backtrace.h)
+		if (NOT BACKTRACE_H)
+			message(FATAL_ERROR "Poco::Trace: backtrace.h not found. GCC development package not installed.")
+		endif()
+		list(GET BACKTRACE_H 0 FIRST_BACKTRACE)
+		cmake_path(GET FIRST_BACKTRACE PARENT_PATH BACKTRACE_INCLUDE)
+		message(STATUS "Clang on Linux uses libbacktrace provided by gcc. backtrace.h found in ${BACKTRACE_INCLUDE}.")
+		target_include_directories(Trace PRIVATE /usr/lib/gcc/aarch64-linux-gnu/11/include/)
+	endif()
+
 	target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_CXXABI CPPTRACE_UNWIND_WITH_UNWIND)
 	target_compile_definitions (Trace PRIVATE CPPTRACE_GET_SYMBOLS_WITH_LIBBACKTRACE)
 	target_link_libraries(Trace PRIVATE backtrace)
