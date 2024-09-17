@@ -8,20 +8,12 @@ ifndef OSNAME
 OSNAME := $(shell uname)
 endif
 
-.PHONY: clean distclean backtrace trace all
+.PHONY: clean distclean trace all
 
 all: trace
 
-trace: backtrace
+trace:
 	$(MAKE) -f Makefile-Trace $(MAKECMDGOALS) $(MAKEARGS)
-
-backtrace:
-ifeq ($(OSNAME), Linux)
-	$(MAKE) -f Makefile-backtrace $(MAKECMDGOALS) $(MAKEARGS) install
-endif
 
 clean distclean:
 	$(MAKE) -f Makefile-Trace $(MAKECMDGOALS) $(MAKEARGS)
-ifeq ($(OSNAME), Linux)
-	$(MAKE) -f Makefile-backtrace $(MAKECMDGOALS) $(MAKEARGS)
-endif
