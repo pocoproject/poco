@@ -58,8 +58,6 @@ else()
 	message(FATAL_ERROR "Poco::Trace: Unsupported platform.")
 endif()
 
-target_compile_definitions (Trace PUBLIC POCO_ENABLE_TRACE)
-
 target_include_directories(Trace
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

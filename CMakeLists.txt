@@ -247,6 +247,10 @@ if (POCO_ENABLE_STD_MUTEX)
 	add_compile_definitions(POCO_ENABLE_STD_MUTEX)
 endif ()
 
+if(ENABLE_TRACE)
+	add_compile_definitions(POCO_ENABLE_TRACE)
+endif()
+
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
