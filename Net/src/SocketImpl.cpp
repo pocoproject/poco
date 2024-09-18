@@ -395,6 +395,18 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 }
 
 
+int SocketImpl::receiveBytesNoBlock(void* buffer, int length, bool &shouldRetry, int flags)
+{
+    shouldRetry = true;
+    int ret = 0;
+
+    ret = receiveBytes(buffer, length, flags);
+    if (ret == 0)
+        shouldRetry = false;
+
+    return ret;
+}
+
 int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 {
 	checkBrokenTimeout(SELECT_READ);

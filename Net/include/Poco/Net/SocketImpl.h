@@ -182,7 +182,9 @@ public:
 		///
 		/// Always returns zero for platforms where not implemented.
 
-	virtual int receiveBytes(void* buffer, int length, int flags = 0);
+    virtual int receiveBytesNoBlock(void* buffer, int length, bool &shouldRetry, int flags = 0);
+
+    virtual int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///

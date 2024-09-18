@@ -171,6 +171,12 @@ int WebSocket::receiveFrame(Poco::Buffer<char>& buffer, int& flags)
 	return n;
 }
 
+int WebSocket::receiveFrameNoBlock(Poco::Buffer<char>& buffer, int& flags, bool &shouldRetry)
+{
+    int n = static_cast<WebSocketImpl*>(impl())->receiveFrameNoBlock(buffer, flags, shouldRetry);
+    flags = static_cast<WebSocketImpl*>(impl())->frameFlags();
+    return n;
+}
 
 WebSocket::Mode WebSocket::mode() const
 {
