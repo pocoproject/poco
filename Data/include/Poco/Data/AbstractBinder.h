@@ -45,7 +45,7 @@ class Transcoder;
 namespace Keywords {
 
 
-static const NullData null = NULL_GENERIC;
+static const NullData null = std::nullopt;
 
 
 } // namespace Keywords
