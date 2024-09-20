@@ -2,7 +2,7 @@
 // FileStreamRWLock_POSIX.h
 //
 // Library: Foundation
-// Package: Threading
+// Package: Processes
 // Module:  FileStreamRWLock
 //
 // Definition of the FileStreamRWLockImpl class for POSIX FileStream.
@@ -69,7 +69,7 @@ inline bool FileStreamRWLockImpl::tryReadLockImpl()
 	else if (errno == EAGAIN || errno == EACCES)
 		return false;
 	else
-		throw SystemException("cannot lock reader lock", errno);
+		throw SystemException("cannot lock try-reader lock", errno);
 
 }
 
@@ -105,7 +105,7 @@ inline void FileStreamRWLockImpl::unlockImpl()
 	_lockMode = F_SETLKW;
 	int rc = fcntl(_fd, _lockMode, &_flock);
 	if (rc == -1 && errno == EDEADLK)
-		throw SystemException("cannot lock writer lock", EDEADLK);
+		throw SystemException("cannot unlock", EDEADLK);
 }
 
 

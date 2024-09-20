@@ -2,7 +2,7 @@
 // FileStreamRWLock.h
 //
 // Library: Foundation
-// Package: Threading
+// Package: Processes
 // Module:  FileStreamRWLock
 //
 // Definition of the FileStreamRWLock class.

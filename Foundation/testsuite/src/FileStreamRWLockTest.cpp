@@ -30,21 +30,47 @@ using Poco::ProcessRunner;
 using Poco::Path;
 using Poco::Stopwatch;
 
+static std::string getTestAppName()
+{
+	std::string name("TestApp");
+	std::string ext;
+#if POCO_OS == POCO_OS_WINDOWS_NT
+	ext = ".exe";
+#endif // POCO_OS == POCO_OS_WINDOWS_NT
+
+#if defined(_DEBUG)
+	Poco::File testapp(name + ext);
+	if (!testapp.exists())
+	{
+		name += "d";
+	}
+#endif
+	return (name + ext);
+}
+
+#if POCO_OS == POCO_OS_WINDOWS_NT
+
+#include "Poco/File_WIN32U.h"
+
+HANDLE createFileForSahredRWAccess(const std::string &path)
+{
+	DWORD access = GENERIC_READ | GENERIC_WRITE;
+	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+
+	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (handle == INVALID_HANDLE_VALUE)
+		Poco::File::handleLastError(path);
+
+	return handle;
+}
+#endif
+
 class FileStreamRWLockRunnable: public Runnable
 {
 public:
-	FileStreamRWLockRunnable(std::string fileLock): _fileLock(std::move(fileLock)) 
+	FileStreamRWLockRunnable(std::string fileLock): _fileLock(std::move(fileLock)), _cmd(getTestAppName())
 	{
-		std::string name("TestApp");
-#if defined(_DEBUG)
-		Poco::File testapp(name);
-		if (!testapp.exists())
-		{
-			name += "d";
-		}
-#endif
-		_cmd = name;
-		
 	}
 
 	void run() override
@@ -78,18 +104,8 @@ class FileStreamRWTryLockRunnable: public Runnable
 {
 public:
 
-	FileStreamRWTryLockRunnable(std::string fileLock): _fileLock(std::move(fileLock))
+	FileStreamRWTryLockRunnable(std::string fileLock): _fileLock(std::move(fileLock)), _cmd(getTestAppName())
 	{
-		std::string name("TestApp");
-#if defined(_DEBUG)
-		Poco::File testapp(name);
-		if (!testapp.exists())
-		{
-			name += "d";
-		}
-#endif
-		_cmd = name;
-		
 	}
 
 	void run() override
@@ -132,7 +148,13 @@ FileStreamRWLockTest::~FileStreamRWLockTest()
 void FileStreamRWLockTest::testFSLock()
 {
 	TemporaryFile fl;
-	FileStream fs(fl.path(), std::ios::out | std::ios::in | std::ios::binary);
+#if POCO_OS != POCO_OS_WINDOWS_NT
+	FileStream fs(fl.path(), std::ios::in | std::ios::out | std::ios::binary);
+#else
+	FileStream fs;
+	fs.openHandle(createFileForSahredRWAccess(fl.path()), std::ios::in | std::ios::out | std::ios::binary);
+#endif // POCO_OS != POCO_OS_WINDOWS_NT
+
 	Poco::Int32 i32 = 0;
 	fs.seekp(0, std::ios::beg);
 	fs.write((const char *)&i32, sizeof(i32));
@@ -162,7 +184,7 @@ void FileStreamRWLockTest::testFSLock()
 
 	fs.seekp(0, std::ios::beg);
 	fs.read((char *)&i32, sizeof(i32));
-	assertEquals(50000, i32);
+	assertEqual(500, i32);
 	assertTrue (r1.ok());
 	assertTrue (r2.ok());
 	assertTrue (r3.ok());
@@ -174,7 +196,13 @@ void FileStreamRWLockTest::testFSLock()
 void FileStreamRWLockTest::testFSTryLock()
 {
 	TemporaryFile fl;
-	FileStream fs(fl.path(), std::ios::out | std::ios::in | std::ios::binary);
+#if POCO_OS != POCO_OS_WINDOWS_NT
+	FileStream fs(fl.path(), std::ios::in | std::ios::out | std::ios::binary);
+#else
+	FileStream fs;
+	fs.openHandle(createFileForSahredRWAccess(fl.path()), std::ios::in | std::ios::out | std::ios::binary);
+#endif // POCO_OS != POCO_OS_WINDOWS_NT
+
 	Poco::Int32 i32 = 0;
 	fs.seekp(0, std::ios::beg);
 	fs.write((const char *)&i32, sizeof(i32));
@@ -204,7 +232,7 @@ void FileStreamRWLockTest::testFSTryLock()
 	
 	fs.seekp(0, std::ios::beg);
 	fs.read((char *)&i32, sizeof(i32));
-	assertTrue (i32 == 50000);
+	assertEqual(500, i32);
 	assertTrue (r1.ok());
 	assertTrue (r2.ok());
 	assertTrue (r3.ok());

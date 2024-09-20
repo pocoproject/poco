@@ -2,7 +2,7 @@
 // FileStreamRWLock.cpp
 //
 // Library: Foundation
-// Package: Threading
+// Package: Processes
 // Module:  FileStreamRWLock
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

@@ -25,6 +25,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/Thread.h"
 #include "Poco/Process.h"
 #include "Poco/Event.h"
 #include "Poco/NamedEvent.h"
@@ -100,6 +101,7 @@ public:
 		_terminate.wait();
 		_terminated.set();
 	}
+
 #elif defined(POCO_OS_FAMILY_UNIX)
 	void waitForTerminationRequest()
 	{
@@ -158,6 +160,22 @@ public:
 #if defined(POCO_OS_FAMILY_WINDOWS)
 Poco::Event MyApp::_terminated;
 Poco::NamedEvent      MyApp::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
+
+#include "Poco/File.h"
+#include "Poco/File_WIN32U.h"
+
+HANDLE openFileForSahredRWAccess(const std::string& path)
+{
+	DWORD access = GENERIC_READ | GENERIC_WRITE;
+	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+
+	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (handle == INVALID_HANDLE_VALUE)
+		Poco::File::handleLastError(path);
+
+	return handle;
+}
 #endif
 
 int main(int argc, char** argv)
@@ -242,12 +260,17 @@ int main(int argc, char** argv)
 			if (equals_pos != std::string::npos)
 			{
 				std::string fl = arg.substr(equals_pos + 1);
-				FileStream fs(fl, std::ios::out | std::ios::in | std::ios::binary);
+#if POCO_OS != POCO_OS_WINDOWS_NT
+				FileStream fs(fl, std::ios::in | std::ios::out | std::ios::binary);
+#else
+				FileStream fs;
+				fs.openHandle(openFileForSahredRWAccess(fl), std::ios::in | std::ios::out | std::ios::binary);
+#endif // POCO_OS != POCO_OS_WINDOWS_NT
 				Poco::Int32 ok = 1;
 				Poco::Int32 lastCount = 0;
 				Poco::Int32 counter = 0;
 				FileStreamRWLock lock(fs, 0, sizeof(counter));
-				for (int i = 0; i < 10000; ++i)
+				for (int i = 0; i < 100; ++i)
 				{
 					lock.readLock();
 					fs.seekg(0, std::ios::beg);
@@ -309,12 +332,17 @@ int main(int argc, char** argv)
 			if (equals_pos != std::string::npos)
 			{
 				std::string fl = arg.substr(equals_pos + 1);
-				FileStream fs(fl, std::ios::out | std::ios::in | std::ios::binary);
+#if POCO_OS != POCO_OS_WINDOWS_NT
+				FileStream fs(fl, std::ios::in | std::ios::out | std::ios::binary);
+#else
+				FileStream fs;
+				fs.openHandle(openFileForSahredRWAccess(fl), std::ios::in | std::ios::out | std::ios::binary);
+#endif // POCO_OS != POCO_OS_WINDOWS_NT
 				Poco::Int32 ok = 1;
 				Poco::Int32 lastCount = 0;
 				Poco::Int32 counter = 0;
 				FileStreamRWLock lock(fs, 0, sizeof(counter));
-				for (int i = 0; i < 10000; ++i)
+				for (int i = 0; i < 100; ++i)
 				{
 					while (!lock.tryReadLock()) Thread::yield();
 					fs.seekg(0, std::ios::beg);

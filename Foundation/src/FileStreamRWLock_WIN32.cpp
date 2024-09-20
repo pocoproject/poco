@@ -1,5 +1,5 @@
 //
-// FileStreamRWLock_POSIX.cpp
+// FileStreamRWLock_WIN32.cpp
 //
 // Library: Foundation
 // Package: Processes
@@ -12,19 +12,22 @@
 //
 
 
-#include "Poco/FileStreamRWLock_POSIX.h"
+#include "Poco/FileStreamRWLock_WIN32.h"
 
 
 namespace Poco {
 
 
 FileStreamRWLockImpl::FileStreamRWLockImpl(const FileStream::NativeHandle &fd, Poco::UInt64 offset, Poco::UInt64 size):
-	_fd(fd), _lockMode(0)
+	_fd(fd)
 {
-	_flock.l_whence = SEEK_SET;
-	_flock.l_start = offset;
-	_flock.l_len = size;
-	_flock.l_pid = 0;
+	LARGE_INTEGER offt;
+	offt.QuadPart = offset;
+	memset(&_overlapped, 0, sizeof(OVERLAPPED));
+
+	_overlapped.Offset = offt.LowPart;
+	_overlapped.OffsetHigh = offt.HighPart;
+	_size.QuadPart = size;
 }
 
 
