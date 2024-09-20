@@ -41,7 +41,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 		list(GET BACKTRACE_H 0 FIRST_BACKTRACE)
 		cmake_path(GET FIRST_BACKTRACE PARENT_PATH BACKTRACE_INCLUDE)
 		message(STATUS "Clang on Linux uses libbacktrace provided by gcc. backtrace.h found in ${BACKTRACE_INCLUDE}.")
-		target_include_directories(Trace PRIVATE /usr/lib/gcc/aarch64-linux-gnu/11/include/)
+		target_include_directories(Trace PRIVATE ${BACKTRACE_INCLUDE})
 	endif()
 
 	target_compile_definitions (Trace PRIVATE CPPTRACE_DEMANGLE_WITH_CXXABI CPPTRACE_UNWIND_WITH_UNWIND)
