@@ -30,7 +30,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCent
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF32Encoding UTF16Encoding UTF8Encoding UTF8String \
 	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UUID UUIDGenerator Void Var VarHolder VarIterator VarVisitor Format Pipe PipeImpl PipeStream SharedMemory \
-	MemoryStream FileStream AtomicCounter DataURIStream DataURIStreamFactory
+	MemoryStream FileStream AtomicCounter DataURIStream DataURIStreamFactory FileStreamRWLock FileStreamRWLock_POSIX
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil
