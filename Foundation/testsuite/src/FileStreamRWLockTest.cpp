@@ -45,7 +45,9 @@ static std::string getTestAppName()
 		name += "d";
 	}
 #endif
-	return (name + ext);
+	Poco::Path testAppPath = Poco::Path::current();
+	testAppPath.append(name + ext).makeFile();
+	return testAppPath.toString();
 }
 
 #if POCO_OS == POCO_OS_WINDOWS_NT
