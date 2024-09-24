@@ -806,6 +806,7 @@
     <ClInclude Include="src\FIFOEventTest.h" />
     <ClInclude Include="src\FileChannelTest.h" />
     <ClInclude Include="src\FileStreamTest.h" />
+    <ClInclude Include="src\FileStreamRWLockTest.h" />
     <ClInclude Include="src\FilesystemTestSuite.h" />
     <ClInclude Include="src\FilesystemRWLockTest.h" />
     <ClInclude Include="src\FileTest.h" />

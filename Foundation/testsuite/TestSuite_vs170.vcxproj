@@ -1140,7 +1140,7 @@
     <ClInclude Include="src\FileChannelTest.h" />
     <ClInclude Include="src\FileStreamTest.h" />
     <ClInclude Include="src\FilesystemTestSuite.h" />
-    <ClCompile Include="src\FileStreamRWLockTest.h" />
+    <ClInclude Include="src\FileStreamRWLockTest.h" />
     <ClInclude Include="src\FileTest.h" />
     <ClInclude Include="src\FormatTest.h" />
     <ClInclude Include="src\FoundationTestSuite.h" />
