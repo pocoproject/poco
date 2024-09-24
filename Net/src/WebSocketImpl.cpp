@@ -227,6 +227,197 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 	return receivePayload(buffer.begin() + oldSize, payloadLength, mask, useMask);
 }
 
+int WebSocketImpl::receivePayloadNoBlock(char *buffer, int payloadLength, char mask[4], bool useMask, bool &shouldRetry)
+{
+	int received = receiveNBytesNoBlock(reinterpret_cast<char*>(buffer), payloadLength, shouldRetry);
+	if (received <= 0)
+		// Don't care; Caller can grab complete payload once it's there
+		return received;
+
+	if (useMask)
+	{
+		for (int i = 0; i < received; i++)
+		{
+			buffer[i] ^= mask[i % 4];
+		}
+	}
+	return received;
+}
+
+int WebSocketImpl::receiveSomeBytesNoBlock(char* buffer, int bytes, bool &shouldRetry)
+{
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
+	if (n >= bytes)
+	{
+		if (bytes < n)
+			n = bytes;
+
+		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
+		// Consume but don't rewind:
+		// we leverage the buffer control operations to the caller,
+		// which means if HEADER / MASK / PAYLOAD is being consumed,
+		// it's up to the caller to rewind buffer pointers / shift
+		// data etc.
+		return n;
+	}
+	else
+	{
+		int receivedBytes;
+
+		if (bytes < n)
+			n = bytes;
+
+		if (n == 0) {
+			receivedBytes = _pStreamSocketImpl->receiveBytesNoBlock(buffer, bytes, shouldRetry);
+			if (receivedBytes > 0) {
+				_buffer.append(buffer, receivedBytes);
+			} else if (receivedBytes == 0)
+				shouldRetry = false;
+		} else {
+			std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
+
+			receivedBytes = _pStreamSocketImpl->receiveBytesNoBlock(buffer + n, bytes - n, shouldRetry);
+			if (receivedBytes > 0) {
+				_buffer.append(buffer + n, receivedBytes);
+				receivedBytes += n;
+			} else if (receivedBytes == 0)
+				shouldRetry = false;
+		}
+
+		return receivedBytes;
+	}
+}
+
+int WebSocketImpl::receiveNBytesNoBlock(void* buffer, int bytes, bool &shouldRetry)
+{
+	return receiveSomeBytesNoBlock(reinterpret_cast<char*>(buffer), bytes, shouldRetry);
+}
+
+int WebSocketImpl::receiveHeaderNoBlock(char mask[4], bool& useMask, size_t &totalRewind, bool &shouldRetry)
+{
+	char header[MAX_HEADER_LENGTH];
+	int n = receiveNBytesNoBlock(header, 2, shouldRetry);
+	if (n <= 0)
+	{
+		_frameFlags = 0;
+		return n;
+	}
+
+	totalRewind += 2;
+	_bufferOffset += 2;
+
+	poco_assert (n == 2);
+	Poco::UInt8 flags = static_cast<Poco::UInt8>(header[0]);
+	_frameFlags = flags;
+	Poco::UInt8 lengthByte = static_cast<Poco::UInt8>(header[1]);
+	useMask = ((lengthByte & FRAME_FLAG_MASK) != 0);
+	int payloadLength;
+	lengthByte &= 0x7f;
+	if (lengthByte == 127)
+	{
+		n = receiveNBytesNoBlock(header + 2, 8, shouldRetry);
+		_bufferOffset += 8;
+		totalRewind += 8;
+
+		if (n <= 0)
+		{
+			_frameFlags = 0;
+			return n;
+		}
+
+		Poco::MemoryInputStream istr(header + 2, 8);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
+		Poco::UInt64 l;
+		reader >> l;
+		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		payloadLength = static_cast<int>(l);
+	}
+	else if (lengthByte == 126)
+	{
+		n = receiveNBytesNoBlock(header + 2, 2, shouldRetry);
+		totalRewind += 2;
+		_bufferOffset += 2;
+
+		if (n <= 0)
+		{
+			_frameFlags = 0;
+			return n;
+		}
+		Poco::MemoryInputStream istr(header + 2, 2);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
+		Poco::UInt16 l;
+		reader >> l;
+		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		payloadLength = static_cast<int>(l);
+	}
+	else
+	{
+		if (lengthByte > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		payloadLength = lengthByte;
+	}
+
+	if (useMask)
+	{
+		n = receiveNBytesNoBlock(mask, 4, shouldRetry);
+		_bufferOffset += 4;
+		totalRewind += 4;
+
+		if (n <= 0)
+		{
+			_frameFlags = 0;
+			return n;
+		}
+	}
+
+	return payloadLength;
+}
+
+int WebSocketImpl::receiveFrameNoBlock(Poco::Buffer<char>& buffer, int &flags, bool &shouldRetry)
+{
+	size_t totalRewind = 0;
+	int frameSize;
+	char mask[4];
+	bool useMask;
+	_frameFlags = 0;
+	int payloadLength = receiveHeaderNoBlock(mask, useMask, totalRewind, shouldRetry);
+
+	if (payloadLength <= 0)
+		return payloadLength;
+
+	std::size_t oldSize = buffer.size();
+	buffer.resize(oldSize + payloadLength);
+
+	frameSize = receivePayloadNoBlock(buffer.begin() + oldSize, payloadLength, mask, useMask, shouldRetry);
+	if (frameSize > 0) {
+		totalRewind += frameSize;
+		_bufferOffset += frameSize;
+	}
+
+	if (frameSize == 0 || frameSize != payloadLength) {
+		_bufferOffset -= totalRewind;
+		_frameFlags = 0;
+		return 0;
+	} else if (frameSize < 0) {
+		_bufferOffset -= totalRewind;
+		_frameFlags = 0;
+		return frameSize;
+	}
+
+	// clear internal buffer from received frame;
+	size_t bytesToMove = totalRewind;
+	if (bytesToMove) {
+		size_t newSize = _buffer.size() - _bufferOffset;
+		if (newSize)
+			std::memcpy(_buffer.begin(),
+				    _buffer.begin() + _bufferOffset,
+				    _buffer.size() - _bufferOffset);
+
+		_buffer.resize(newSize);
+		_bufferOffset = 0;
+	}
+
+	return frameSize;
+}
 
 int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 {

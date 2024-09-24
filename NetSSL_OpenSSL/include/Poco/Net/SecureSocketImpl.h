@@ -177,6 +177,8 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	int receiveBytesNoBlock(void* buffer, int length, bool &shouldRetry, int flags = 0);
+
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.

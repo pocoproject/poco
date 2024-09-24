@@ -315,6 +315,8 @@ public:
 		/// the received data is stored starting at the beginning of the
 		/// buffer.
 
+	int receiveFrameNoBlock(Poco::Buffer<char>& buffer, int& flags, bool &shouldRetry);
+
 	Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side
 		/// WebSocket, or WS_CLIENT otherwise.

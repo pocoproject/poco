@@ -46,6 +46,9 @@ public:
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
 
+	int receiveFrameNoBlock(Poco::Buffer<char>& buffer, int& flags, bool &shouldRetry);
+		/// Receives a WebSocket protocol frame in a non-blocking fashion.
+
 	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
 		/// Receives a WebSocket protocol frame.
 
@@ -100,6 +103,12 @@ protected:
 	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
 	int receiveNBytes(void* buffer, int bytes);
 	int receiveSomeBytes(char* buffer, int bytes);
+
+	int receiveHeaderNoBlock(char mask[4], bool& useMask, size_t &totalRewind, bool &shouldRetry);
+	int receivePayloadNoBlock(char *buffer, int payloadLength, char mask[4], bool useMask, bool &shouldRetry);
+	int receiveNBytesNoBlock(void* buffer, int bytes, bool &shouldRetry);
+	int receiveSomeBytesNoBlock(char* buffer, int bytes, bool &shouldRetry);
+
 	virtual ~WebSocketImpl();
 
 private:
