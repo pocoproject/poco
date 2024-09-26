@@ -91,6 +91,58 @@ void UUIDGeneratorTest::testNameBased()
 }
 
 
+void UUIDGeneratorTest::testV6()
+{
+	UUIDGenerator& gen = UUIDGenerator::defaultGenerator();
+
+	Poco::UUID uuid1 = gen.createV6();
+	assertTrue (uuid1.version() == Poco::UUID::UUID_TIME_BASED_V6);
+	assertTrue (uuid1.variant() == 2);
+}
+
+
+void UUIDGeneratorTest::testV7()
+{
+	UUIDGenerator& gen = UUIDGenerator::defaultGenerator();
+
+	Poco::UUID uuid1 = gen.createV7();
+	assertTrue (uuid1.version() == Poco::UUID::UUID_TIME_BASED_V7);
+	assertTrue (uuid1.variant() == 2);
+}
+
+
+void UUIDGeneratorTest::testV6Uniqueness()
+{
+	UUIDGenerator& gen = UUIDGenerator::defaultGenerator();
+
+	const int ROUNDS = 1000;
+
+	std::set<Poco::UUID> uuids;
+	for (int i = 0; i < ROUNDS; i++)
+	{
+		uuids.insert(gen.createV6());
+	}
+
+	assertTrue (uuids.size() == ROUNDS);
+}
+
+
+void UUIDGeneratorTest::testV7Uniqueness()
+{
+	UUIDGenerator& gen = UUIDGenerator::defaultGenerator();
+
+	const int ROUNDS = 1000;
+
+	std::set<Poco::UUID> uuids;
+	for (int i = 0; i < ROUNDS; i++)
+	{
+		uuids.insert(gen.createV7());
+	}
+
+	assertTrue (uuids.size() == ROUNDS);
+}
+
+
 void UUIDGeneratorTest::setUp()
 {
 }
@@ -108,6 +160,10 @@ CppUnit::Test* UUIDGeneratorTest::suite()
 	CppUnit_addTest(pSuite, UUIDGeneratorTest, testTimeBased);
 	CppUnit_addTest(pSuite, UUIDGeneratorTest, testRandom);
 	CppUnit_addTest(pSuite, UUIDGeneratorTest, testNameBased);
+	CppUnit_addTest(pSuite, UUIDGeneratorTest, testV6);
+	CppUnit_addTest(pSuite, UUIDGeneratorTest, testV7);
+	CppUnit_addTest(pSuite, UUIDGeneratorTest, testV6Uniqueness);
+	CppUnit_addTest(pSuite, UUIDGeneratorTest, testV7Uniqueness);
 
 	return pSuite;
 }
