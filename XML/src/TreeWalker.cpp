@@ -73,7 +73,7 @@ Node* TreeWalker::parentNode()
 	if (pParent && accept(pParent) == NodeFilter::FILTER_ACCEPT)
 		_pCurrent = pParent;
 	else
-		pParent = 0;
+		pParent = nullptr;
 	return pParent;
 }
 
