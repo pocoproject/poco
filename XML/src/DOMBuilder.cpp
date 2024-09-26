@@ -28,6 +28,7 @@
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/XMLReader.h"
 #include "Poco/SAX/AttributesImpl.h"
+#include "Poco/XML/XMLException.h"
 
 
 namespace Poco {
@@ -37,14 +38,16 @@ namespace XML {
 const XMLString DOMBuilder::EMPTY_STRING;
 
 
-DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
+DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool, std::size_t maxDepth):
 	_xmlReader(xmlReader),
 	_pNamePool(pNamePool),
+	_maxDepth(maxDepth),
 	_pDocument(0),
 	_pParent(0),
 	_pPrevious(0),
 	_inCDATA(false),
-	_namespaces(true)
+	_namespaces(true),
+	_depth(0)
 {
 	_xmlReader.setContentHandler(this);
 	_xmlReader.setDTDHandler(this);
@@ -188,6 +191,9 @@ void DOMBuilder::endDocument()
 
 void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
+	++_depth;
+	if (_maxDepth > 0 && _depth > _maxDepth) throw XMLException("Maximum element depth exceeded");
+
 	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
 	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
@@ -204,6 +210,8 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 
 void DOMBuilder::endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
 {
+	--_depth;
+
 	_pPrevious = _pParent;
 	_pParent   = static_cast<AbstractContainerNode*>(_pParent->parentNode());
 }
