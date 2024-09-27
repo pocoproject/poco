@@ -1275,6 +1275,7 @@
     <ClCompile Include="src\inflate.c" />
     <ClCompile Include="src\InflatingStream.cpp" />
     <ClCompile Include="src\inftrees.c" />
+    <ClCompile Include="src\JSONFormatter.cpp" />
     <ClCompile Include="src\JSONString.cpp" />
     <ClCompile Include="src\Latin1Encoding.cpp" />
     <ClCompile Include="src\Latin2Encoding.cpp" />
@@ -2255,6 +2256,7 @@
     <ClInclude Include="include\Poco\HMACEngine.h" />
     <ClInclude Include="include\Poco\InflatingStream.h" />
     <ClInclude Include="include\Poco\Instantiator.h" />
+    <ClInclude Include="include\Poco\JSONFormatter.h" />
     <ClInclude Include="include\Poco\JSONString.h" />
     <ClInclude Include="include\Poco\KeyValueArgs.h" />
     <ClInclude Include="include\Poco\Latin1Encoding.h" />
