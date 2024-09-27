@@ -12,7 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/UTF8String.h"
-#include <iostream>
+
 
 using Poco::UTF8;
 
