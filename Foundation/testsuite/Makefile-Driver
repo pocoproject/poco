@@ -20,8 +20,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
-	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest ProcessRunnerTest RWLockTest \
-	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest \
+	NumberParserTest PathTest PatternFormatterTest JSONFormatterTest PBKDF2EngineTest ProcessRunnerTest \
+	RWLockTest RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest \
 	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
