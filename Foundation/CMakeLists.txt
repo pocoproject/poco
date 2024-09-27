@@ -29,6 +29,7 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 if(POCO_UNBUNDLED)
 	find_package(PCRE2 REQUIRED)
 	find_package(ZLIB REQUIRED)
+	find_package(Utf8Proc REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES(SRCS RegExp
@@ -86,6 +87,10 @@ else()
 		src/trees.c
 		src/zutil.c
 	)
+
+	POCO_SOURCES(SRCS utf8proc
+		src/utf8proc.c
+	)
 endif(POCO_UNBUNDLED)
 
 
@@ -99,7 +104,7 @@ set_target_properties(Foundation
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
+	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB Utf8Proc::Utf8Proc)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif(POCO_UNBUNDLED)
 

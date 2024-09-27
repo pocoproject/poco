@@ -30,6 +30,8 @@ public:
 	void testEscape();
 	void testUnescape();
 
+	void testNormalize();
+
 	void setUp();
 	void tearDown();
 
