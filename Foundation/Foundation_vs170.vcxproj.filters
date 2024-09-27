@@ -940,6 +940,9 @@
     <ClCompile Include="src\utf8proc_data.c">
       <Filter>Text\Utf8Proc Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\JSONFormatter.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1895,6 +1898,9 @@
     </ClInclude>
     <ClInclude Include="src\utf8proc.h">
       <Filter>Text\Utf8Proc Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\JSONFormatter.h">
+      <Filter>Logging\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
