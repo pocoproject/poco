@@ -20,7 +20,17 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Ascii.h"
+#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <algorithm>
+#include <iterator>
+
+
+#if defined(POCO_UNBUNDLED)
+#include <utf8proc.h>
+#else
+#include "utf8proc.h"
+#endif
 
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
@@ -407,6 +417,54 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 	}
 
 	return result;
+}
+
+
+namespace 
+{
+	std::string doNormalize(const char* str, std::size_t size, utf8proc_option_t options)
+	{
+		utf8proc_ssize_t n = utf8proc_decompose_custom(reinterpret_cast<const utf8proc_uint8_t*>(str), size, NULL, 0, options, NULL, NULL);
+		if (n < 0) throw Poco::RuntimeException("Normalization decompose failed"s, utf8proc_errmsg(n));
+
+		Poco::Buffer<utf8proc_int32_t> buffer(n + 1); // utf8proc_reencode() needs space for terminating NUL
+		n = utf8proc_decompose_custom(reinterpret_cast<const utf8proc_uint8_t*>(str), size, buffer.begin(), n, options, NULL, NULL);
+		if (n < 0) throw Poco::RuntimeException("Normalization decompose failed"s, utf8proc_errmsg(n));
+	
+		n = utf8proc_reencode(buffer.begin(), n, options);
+		if (n < 0) throw Poco::RuntimeException("Normalization reeencode failed"s, utf8proc_errmsg(n));
+
+		return std::string(reinterpret_cast<char*>(buffer.begin()), n);
+	}
+
+	int formToOptions(UTF8::NormalizationForm form)
+	{
+		switch (form)
+		{
+		case UTF8::NORMALIZATION_FORM_D:
+			return UTF8PROC_STABLE | UTF8PROC_DECOMPOSE;
+		case UTF8::NORMALIZATION_FORM_C:
+			return UTF8PROC_STABLE | UTF8PROC_COMPOSE;
+		case UTF8::NORMALIZATION_FORM_KD:
+			return UTF8PROC_STABLE | UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
+		case UTF8::NORMALIZATION_FORM_KC:
+			return UTF8PROC_STABLE | UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
+		default:
+			return 0;
+		}
+	}
+}
+
+
+std::string UTF8::normalize(const std::string& s, NormalizationForm form)
+{
+	return doNormalize(s.data(), s.size(), static_cast<utf8proc_option_t>(formToOptions(form)));
+}
+
+
+std::string UTF8::normalize(const std::string::const_iterator& begin, const std::string::const_iterator& end, NormalizationForm form)
+{
+	return doNormalize(&*begin, static_cast<std::size_t>(std::distance(begin, end)), static_cast<utf8proc_option_t>(formToOptions(form)));
 }
 
 

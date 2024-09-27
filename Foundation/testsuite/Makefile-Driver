@@ -47,5 +47,5 @@ target_libs    = PocoFoundation CppUnit
 include $(POCO_BASE)/build/rules/exec
 
 ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre
+        SYSLIBS += -lz -lpcre2-8 -lutf8proc
 endif
