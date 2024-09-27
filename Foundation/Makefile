@@ -50,6 +50,7 @@ ifdef POCO_UNBUNDLED
 	SYSLIBS += -lpcre2-8 -lutf8proc -lz
 	objects += $(pcre_utf8_objects)
 else
+	COMMONFLAGS += -DUTF8PROC_STATIC
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(utf8proc_objects)
 endif
 
