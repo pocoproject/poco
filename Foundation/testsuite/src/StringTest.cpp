@@ -431,6 +431,10 @@ void StringTest::testReplaceInPlace()
 
 	replaceInPlace(s, std::string("aa"), std::string("xx"));
 	assertTrue (s == "xxbbccdd");
+	
+	s = "aabbccdd";
+	replaceInPlace(s, "aa", "xx");
+	assertTrue (s == "xxbbccdd");
 
 	s = "aabbccdd";
 	replaceInPlace(s, 'a', 'x');
