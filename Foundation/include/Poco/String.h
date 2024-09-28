@@ -21,7 +21,9 @@
 #include "Poco/Foundation.h"
 #include "Poco/Ascii.h"
 #include <cstring>
+#if !defined(POCO_NO_WSTRING)
 #include <cwchar>
+#endif
 #include <algorithm>
 
 
@@ -55,12 +57,18 @@ inline std::size_t cstrlen(const char* str)
 }
 
 
+#if !defined(POCO_NO_WSTRING)
+
+
 inline std::size_t cstrlen(const wchar_t* str)
 	/// Returns the length of a zero-terminated C string.
 	/// This implementation calls std::wcslen().
 {
 	return std::wcslen(str);
 }
+
+
+#endif
 
 
 template <class S>
@@ -808,8 +816,10 @@ void secureClear(T& str)
 
 } // namespace Poco
 
+
 #if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
 #	pragma clang diagnostic pop
 #endif
+
 
 #endif // Foundation_String_INCLUDED
