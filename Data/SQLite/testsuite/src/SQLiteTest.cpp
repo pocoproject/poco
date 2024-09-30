@@ -3284,12 +3284,14 @@ void SQLiteTest::testSessionTransactionReadUncommitted()
 	
 	session << "SELECT COUNT(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
-	assertTrue (session.isTransaction());
-	session.rollback();
-	assertTrue (!session.isTransaction());
-	assertTrue (session.getFeature("autoCommit"));
 	
 	stmt.wait();
+	assertTrue (session.isTransaction());
+	session.rollback();
+	
+	assertTrue (!session.isTransaction());
+	assertTrue (session.getFeature("autoCommit"));
+
 	assertEqual(2, locCount);
 	
 	session << "SELECT count(*) FROM Person", into(count), now;
