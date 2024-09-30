@@ -212,6 +212,9 @@ option(ENABLE_COMPILER_WARNINGS
 option(ENABLE_SAMPLES
 	"Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
+option(ENABLE_FUZZING
+	"Set to OFF|ON (default is OFF) to control build of fuzzing targets for oss-fuzz (Clang compiler is required)" OFF)
+
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
@@ -224,6 +227,14 @@ if(ENABLE_TESTS)
 	endif()
 else()
 	message(STATUS "Building without tests & samples")
+endif()
+
+if(ENABLE_FUZZING)
+	if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		message(FATAL_ERROR "ENABLE_FUZZING flag requires using Clang compiler")
+	else()
+		message(STATUS "Building fuzzing test targets with engine $ENV{LIB_FUZZING_ENGINE}")
+	endif()
 endif()
 
 if(POCO_UNBUNDLED)

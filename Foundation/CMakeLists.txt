@@ -243,3 +243,7 @@ if(ENABLE_TESTS)
 	endif()
 	add_subdirectory(testsuite)
 endif()
+
+if(ENABLE_FUZZING)
+	add_subdirectory(fuzzing)
+endif()
