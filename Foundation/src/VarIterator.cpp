@@ -83,8 +83,7 @@ void VarIterator::increment() const
 {
 	if (POSITION_END == _position)
 		throw RangeException("End of iterator reached.");
-
-	if (_position < _pVar->size() - 1)
+	else if (_position < _pVar->size() - 1)
 		++_position;
 	else
 		_position = POSITION_END;

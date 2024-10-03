@@ -69,6 +69,18 @@ public:
 	bool operator != (const VarIterator& other) const;
 		/// Inequality operator.
 
+	bool operator < (const VarIterator& other) const;
+		/// Less than operator.
+
+	bool operator > (const VarIterator& other) const;
+		/// Greater than operator.
+
+	bool operator <= (const VarIterator& other) const;
+		/// Less than or equal to operator.
+
+	bool operator >= (const VarIterator& other) const;
+		/// Greater than or equal to operator.
+
 	Var& operator * () const;
 		/// Returns value at the current position.
 
@@ -135,6 +147,30 @@ inline bool VarIterator::operator == (const VarIterator& other) const
 inline bool VarIterator::operator != (const VarIterator& other) const
 {
 	return _pVar != other._pVar || _position != other._position;
+}
+
+
+inline bool VarIterator::operator < (const VarIterator& other) const
+{
+	return _position < other._position;
+}
+
+
+inline bool VarIterator::operator > (const VarIterator& other) const
+{
+	return _position > other._position;
+}
+
+
+inline bool VarIterator::operator <= (const VarIterator& other) const
+{
+	return _position <= other._position;
+}
+
+
+inline bool VarIterator::operator >= (const VarIterator& other) const
+{
+	return _position >= other._position;
 }
 
 
