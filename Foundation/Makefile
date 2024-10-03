@@ -23,7 +23,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCent
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
-	Path PatternFormatter PIDFile Process ProcessRunner PurgeStrategy RWLock Random RandomStream \
+	Path PatternFormatter JSONFormatter PIDFile Process ProcessRunner PurgeStrategy RWLock Random RandomStream \
 	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
 	SHA1Engine SHA2Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \
@@ -48,11 +48,14 @@ pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_compile pcre2_config \
 
 pcre_utf8_objects = pcre2_ucd pcre2_tables
 
+utf8proc_objects = utf8proc
+
 ifdef POCO_UNBUNDLED
-	SYSLIBS += -lpcre2-8 -lz
+	SYSLIBS += -lpcre2-8 -lutf8proc -lz
 	objects += $(pcre_utf8_objects)
 else
-	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
+	COMMONFLAGS += -DUTF8PROC_STATIC
+	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(utf8proc_objects)
 endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)

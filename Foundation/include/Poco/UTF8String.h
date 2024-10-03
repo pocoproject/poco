@@ -37,6 +37,15 @@ struct Foundation_API UTF8
 	/// removeBOM() removes the UTF-8 Byte Order Mark sequence (0xEF, 0xBB, 0xBF)
 	/// from the beginning of the given string, if it's there.
 {
+	enum NormalizationForm
+		/// Normalization form for normalize().
+	{
+		NORMALIZATION_FORM_D,  /// Canonical Decomposition
+		NORMALIZATION_FORM_C,  /// Canonical Decomposition, followed by Canonical Composition
+		NORMALIZATION_FORM_KD, /// Compatibility Decomposition
+		NORMALIZATION_FORM_KC  /// Compatibility Decomposition, followed by Canonical Composition
+	};
+
 	static int icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2);
 	static int icompare(const std::string& str1, const std::string& str2);
 	static int icompare(const std::string& str1, std::string::size_type n1, const std::string& str2, std::string::size_type n2);
@@ -74,6 +83,14 @@ struct Foundation_API UTF8
 
 	static std::string unescape(const std::string::const_iterator& begin, const std::string::const_iterator& end);
 		/// Creates an UTF8 string from a string that contains escaped characters.
+
+	static std::string normalize(const std::string& s, NormalizationForm form);
+		/// Normalizes the given UTF8 string according to the given normalization form.
+		/// Returns the normalized UTF8 string.
+
+	static std::string normalize(const std::string::const_iterator& begin, const std::string::const_iterator& end, NormalizationForm form);
+		/// Normalizes the given UTF8 string range according to the given normalization form.
+		/// Returns the normalized UTF8 string.
 };
 
 

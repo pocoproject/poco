@@ -1007,6 +1007,7 @@
     <ClCompile Include="src\HashTableTest.cpp" />
     <ClCompile Include="src\HexBinaryTest.cpp" />
     <ClCompile Include="src\HMACEngineTest.cpp" />
+    <ClCompile Include="src\JSONFormatterTest.cpp" />
     <ClCompile Include="src\LinearHashTableTest.cpp" />
     <ClCompile Include="src\LineEndingConverterTest.cpp" />
     <ClCompile Include="src\ListMapTest.cpp" />
@@ -1150,6 +1151,7 @@
     <ClInclude Include="src\HashTableTest.h" />
     <ClInclude Include="src\HexBinaryTest.h" />
     <ClInclude Include="src\HMACEngineTest.h" />
+    <ClInclude Include="src\JSONFormatterTest.h" />
     <ClInclude Include="src\LinearHashTableTest.h" />
     <ClInclude Include="src\LineEndingConverterTest.h" />
     <ClInclude Include="src\ListMapTest.h" />
