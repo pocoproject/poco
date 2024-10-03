@@ -44,6 +44,17 @@ public:
 		STREAM_GZIP  /// Create a gzip header, use CRC-32 checksum.
 	};
 
+	enum CompressionLevel
+		/// Constants for compression levels.
+		/// Note to maintainers: These must be kept in sync with the constants
+		/// defined by zlib.
+	{
+		DEFAULT_COMPRESSION = -1,
+		NO_COMPRESSION      =  0,
+		BEST_SPEED          =  1,
+		BEST_COMPRESSION    =  9
+	};
+
 	DeflatingStreamBuf(std::istream& istr, StreamType type, int level);
 		/// Creates a DeflatingStreamBuf for compressing data read
 		/// from the given input stream.
@@ -101,7 +112,7 @@ class Foundation_API DeflatingIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	DeflatingIOS(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = -1);
+	DeflatingIOS(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = DeflatingStreamBuf::DEFAULT_COMPRESSION);
 		/// Creates a DeflatingIOS for compressing data passed
 		/// through and forwarding it to the given output stream.
 
@@ -112,7 +123,7 @@ public:
 		/// Please refer to the zlib documentation of deflateInit2() for a description
 		/// of the windowBits parameter.
 
-	DeflatingIOS(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = -1);
+	DeflatingIOS(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = DeflatingStreamBuf::DEFAULT_COMPRESSION);
 		/// Creates a DeflatingIOS for compressing data read
 		/// from the given input stream.
 
@@ -147,7 +158,7 @@ class Foundation_API DeflatingOutputStream: public std::ostream, public Deflatin
 	///     ostr.close();
 {
 public:
-	DeflatingOutputStream(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = -1);
+	DeflatingOutputStream(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = DeflatingStreamBuf::DEFAULT_COMPRESSION);
 		/// Creates a DeflatingOutputStream for compressing data passed
 		/// through and forwarding it to the given output stream.
 
@@ -176,7 +187,7 @@ class Foundation_API DeflatingInputStream: public std::istream, public Deflating
 	/// using zlib's deflate algorithm.
 {
 public:
-	DeflatingInputStream(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = -1);
+	DeflatingInputStream(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = DeflatingStreamBuf::DEFAULT_COMPRESSION);
 		/// Creates a DeflatingIOS for compressing data read
 		/// from the given input stream.
 

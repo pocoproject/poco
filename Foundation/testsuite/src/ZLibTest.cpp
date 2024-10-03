@@ -17,13 +17,6 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Buffer.h"
 #include <sstream>
-#if defined(POCO_UNBUNDLED)
-#include <zlib.h>
-#else
-// Quirk before we move zlib to external libs.
-#include "../../src/zlib.h"
-#endif
-
 
 using Poco::InflatingInputStream;
 using Poco::InflatingOutputStream;
@@ -103,7 +96,7 @@ void ZLibTest::testDeflate4()
 {
 	Poco::Buffer<char> buffer(1024);
 	Poco::MemoryOutputStream ostr(buffer.begin(), static_cast<std::streamsize>(buffer.size()));
-	DeflatingOutputStream deflater(ostr, -10, Z_BEST_SPEED);
+	DeflatingOutputStream deflater(ostr, -10, DeflatingStreamBuf::BEST_SPEED);
 	std::string data(36828, 'x');
 	deflater << data;
 	deflater.close();
