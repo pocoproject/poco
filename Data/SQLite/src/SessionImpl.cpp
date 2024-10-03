@@ -49,7 +49,7 @@ const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName, loginTimeout),
 	_connector(Connector::KEY),
-	_pDB(0),
+	_pDB(nullptr),
 	_connected(false),
 	_isTransaction(false),
 	_transactionType(TransactionType::DEFERRED)
@@ -174,7 +174,7 @@ void SessionImpl::open(const std::string& connect)
 		while (true)
 		{
 			rc = sqlite3_open_v2(connectionString().c_str(), &_pDB,
-				SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
+				SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, nullptr);
 			if (rc == SQLITE_OK) break;
 			if (!_pDB)
 				throw ConnectionFailedException(std::string(sqlite3_errstr(rc)));
@@ -201,7 +201,7 @@ void SessionImpl::close()
 	if (_pDB)
 	{
 		sqlite3_close_v2(_pDB);
-		_pDB = 0;
+		_pDB = nullptr;
 	}
 
 	_connected = false;
