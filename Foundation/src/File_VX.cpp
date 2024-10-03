@@ -62,6 +62,12 @@ void FileImpl::setPathImpl(const std::string& path)
 }
 
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	return _path;
+}
+
+
 bool FileImpl::existsImpl() const
 {
 	poco_assert (!_path.empty());
@@ -87,7 +93,7 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
 	return false;
 }

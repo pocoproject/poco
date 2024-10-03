@@ -605,6 +605,8 @@
     </ClCompile>
     <ClCompile Include="src\FileStreamRWLockTest.cpp">
       <Filter>Processes\Source Files</Filter>
+    <ClCompile Include="src\JSONFormatterTest.cpp">
+      <Filter>Logging\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1033,6 +1035,8 @@
     </ClInclude>
     <ClInclude Include="src\FileStreamRWLockTest.h">
       <Filter>Processes\Header Files</Filter>
+    <ClInclude Include="src\JSONFormatterTest.h">
+      <Filter>Logging\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

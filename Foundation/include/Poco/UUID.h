@@ -40,6 +40,8 @@ class Foundation_API UUID
 	/// draft by Leach/Salz from February, 1998
 	/// (http://www.ics.uci.edu/~ejw/authoring/uuid-guid/draft-leach-uuids-guids-01.txt)
 	/// and also http://tools.ietf.org/html/draft-mealling-uuid-urn-05
+	///
+	/// Version 6 and 7 UUIDs are based on RFC 9562.
 {
 public:
 	enum Version
@@ -48,8 +50,9 @@ public:
 		UUID_DCE_UID         = 0x02,
 		UUID_NAME_BASED      = 0x03,
 		UUID_RANDOM          = 0x04,
-		UUID_NAME_BASED_SHA1 = 0x05
-
+		UUID_NAME_BASED_SHA1 = 0x05,
+		UUID_TIME_BASED_V6   = 0x06,
+		UUID_TIME_BASED_V7   = 0x07
 	};
 
 	UUID();

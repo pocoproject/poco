@@ -192,6 +192,22 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime)
 }
 
 
+void HTTPCookieTest::testIgnoreExtraAttributes()
+{
+	NameValueCollection nvc;
+	nvc.add("test", "foo");
+	nvc.add("Version", "1");
+	nvc.add("Path", "/test/path");
+	nvc.add("Discard", "");
+	nvc.add("HttpOnly", "");
+
+	HTTPCookie cookie(nvc);
+	assert (cookie.getName() == "test");
+	assert (cookie.getValue() == "foo");
+	assert (cookie.getHttpOnly());
+}
+
+
 void HTTPCookieTest::setUp()
 {
 }
@@ -211,6 +227,7 @@ CppUnit::Test* HTTPCookieTest::suite()
 	CppUnit_addTest(pSuite, HTTPCookieTest, testUnescape);
 	CppUnit_addTest(pSuite, HTTPCookieTest, testExpiryFuture);
 	CppUnit_addTest(pSuite, HTTPCookieTest, testExpiryPast);
+	CppUnit_addTest(pSuite, HTTPCookieTest, testIgnoreExtraAttributes);
 
 	return pSuite;
 }

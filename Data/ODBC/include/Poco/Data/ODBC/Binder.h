@@ -999,7 +999,7 @@ private:
 		{
 			std::size_t sz = it->size() * typeSize;
 			if (sz > _maxFieldSize)
-				throw LengthExceededException();
+				throw LengthExceededException("ODBC::Binder::getMinValueSize(%s, %d)", std::string(typeid(T).name()), static_cast<int>(size));
 
 			if (sz == _maxFieldSize)
 			{

@@ -14,7 +14,6 @@
 
 #include "Poco/JSON/Object.h"
 #include <iostream>
-#include <sstream>
 
 
 using Poco::Dynamic::Var;
@@ -43,11 +42,12 @@ Object::Object(int options):
 }
 
 
-Object::Object(const Object& other) : _values(other._values),
+Object::Object(const Object& other) :
+	_values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._modified ? other._pStruct : 0),
+	_pStruct(!other._modified ? other._pStruct : nullptr),
 	_modified(other._modified)
 {
 	syncKeys(other._keys);
@@ -67,9 +67,7 @@ Object::Object(Object&& other) noexcept:
 }
 
 
-Object::~Object()
-{
-}
+Object::~Object() = default;
 
 
 Object &Object::operator = (const Object &other)
@@ -81,7 +79,7 @@ Object &Object::operator = (const Object &other)
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
 		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._modified ? other._pStruct : 0;
+		_pStruct = !other._modified ? other._pStruct : nullptr;
 		_modified = other._modified;
 	}
 	return *this;
@@ -108,11 +106,10 @@ void Object::syncKeys(const KeyList& keys)
 	if(_preserveInsOrder)
 	{
 		// update iterators in _keys to point to copied _values
-		for(KeyList::const_iterator it = keys.begin(); it != keys.end(); ++it)
-		{
-			ValueMap::const_iterator itv = _values.find((*it)->first);
-			poco_assert (itv != _values.end());
-			_keys.push_back(itv);
+		for (const auto& key : keys) {
+			auto itv = _values.find(key->first);
+			poco_assert(itv != _values.end());
+			_keys.emplace_back(itv);
 		}
 	}
 }
@@ -120,37 +117,37 @@ void Object::syncKeys(const KeyList& keys)
 
 Var Object::get(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	auto it = _values.find(key);
 	if (it != _values.end())
 	{
 		return it->second;
 	}
 
-	return Var();
+	return {};
 }
 
 
 Array::Ptr Object::getArray(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	auto it = _values.find(key);
 	if ((it != _values.end()) && (it->second.type() == typeid(Array::Ptr)))
 	{
 		return it->second.extract<Array::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
 Object::Ptr Object::getObject(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	auto it = _values.find(key);
 	if ((it != _values.end()) && (it->second.type() == typeid(Object::Ptr)))
 	{
 		return it->second.extract<Object::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -159,16 +156,14 @@ void Object::getNames(NameList& names) const
 	names.clear();
 	if (_preserveInsOrder)
 	{
-		for(KeyList::const_iterator it = _keys.begin(); it != _keys.end(); ++it)
-		{
-			names.push_back((*it)->first);
+		for (const auto& _key : _keys) {
+			names.push_back(_key->first);
 		}
 	}
 	else
 	{
-		for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
-		{
-			names.push_back(it->first);
+		for (const auto& _value : _values) {
+			names.push_back(_value.first);
 		}
 	}
 }
@@ -195,8 +190,8 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 
 const std::string& Object::getKey(KeyList::const_iterator& iter) const
 {
-	ValueMap::const_iterator it = _values.begin();
-	ValueMap::const_iterator end = _values.end();
+	auto it = _values.begin();
+	auto end = _values.end();
 	for (; it != end; ++it)
 	{
 		if (it == *iter) return it->first;
@@ -212,13 +207,13 @@ Object& Object::set(const std::string& key, const Dynamic::Var& value)
 	if (!ret.second) ret.first->second = value;
 	if (_preserveInsOrder)
 	{
-		KeyList::iterator it = _keys.begin();
-		KeyList::iterator end = _keys.end();
+		auto it = _keys.begin();
+		const auto end = _keys.end();
 		for (; it != end; ++it)
 		{
 			if (key == (*it)->first) return *this;
 		}
-		_keys.push_back(ret.first);
+		_keys.emplace_back(ret.first);
 	}
 	_modified = true;
 	return *this;
@@ -259,14 +254,14 @@ void Object::resetDynStruct() const
 
 Object::operator const Poco::DynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pStruct);
 	}
 	else if (_modified)
 	{
-		ValueMap::const_iterator it = _values.begin();
-		ValueMap::const_iterator end = _values.end();
+		auto it = _values.begin();
+		const auto end = _values.end();
 		resetDynStruct(_pStruct);
 		for (; it != end; ++it)
 		{
@@ -291,7 +286,7 @@ Object::operator const Poco::DynamicStruct& () const
 
 Object::operator const Poco::OrderedDynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pOrdStruct);
 	}
@@ -299,8 +294,8 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 	{
 		if (_preserveInsOrder)
 		{
-			KeyList::const_iterator it = _keys.begin();
-			KeyList::const_iterator end = _keys.end();
+			auto it = _keys.begin();
+			const auto end = _keys.end();
 			resetDynStruct(_pOrdStruct);
 			for (; it != end; ++it)
 			{
@@ -320,8 +315,8 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 		}
 		else
 		{
-			ValueMap::const_iterator it = _values.begin();
-			ValueMap::const_iterator end = _values.end();
+			auto it = _values.begin();
+			const auto end = _values.end();
 			resetDynStruct(_pOrdStruct);
 			for (; it != end; ++it)
 			{
@@ -349,7 +344,7 @@ void Object::clear()
 {
 	_values.clear();
 	_keys.clear();
-	_pStruct = 0;
+	_pStruct = nullptr;
 	_modified = true;
 }
 

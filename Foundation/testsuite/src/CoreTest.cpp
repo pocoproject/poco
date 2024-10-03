@@ -30,6 +30,7 @@
 #include <vector>
 #include <cstring>
 
+using namespace std::string_literals;
 
 using Poco::Bugcheck;
 using Poco::Exception;
@@ -966,7 +967,7 @@ void CoreTest::testNullable()
 
 	assertTrue (i == 1);
 	assertTrue (f == 1.5);
-	assertTrue (s == "abc");
+	assertTrue (s == "abc"s);
 
 	i.clear();
 	f.clear();
@@ -1035,7 +1036,7 @@ void CoreTest::testNullable()
 	assertTrue (n2 != n1);
 	assertTrue (n1 > n2);
 
-	NullType nd{};
+	const auto nd {std::nullopt};
 	assertTrue (n1 != nd);
 	assertTrue (nd != n1);
 	n1.clear();

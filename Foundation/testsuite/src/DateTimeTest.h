@@ -42,6 +42,7 @@ public:
 	void testUTC();
 	void testLeapSeconds();
 	void testTM();
+	void testInvalid();
 
 	void setUp();
 	void tearDown();

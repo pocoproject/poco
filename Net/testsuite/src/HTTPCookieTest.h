@@ -31,6 +31,7 @@ public:
 	void testExpiryFuture();
 	void testExpiryPast();
 	void testCookieExpiry(Poco::DateTime expiryTime);
+	void testIgnoreExtraAttributes();
 
 	void setUp();
 	void tearDown();

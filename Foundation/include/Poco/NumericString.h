@@ -536,7 +536,7 @@ bool intToStr(T value,
 
 
 template <typename T>
-[[deprecated("use intToStr instead")]]
+POCO_DEPRECATED("use intToStr instead")
 bool uIntToStr(T value,
 	unsigned short base,
 	char* result,
@@ -581,7 +581,7 @@ bool intToStr (T number,
 
 
 template <typename T>
-[[deprecated("use intToStr instead")]]
+POCO_DEPRECATED("use intToStr instead")
 bool uIntToStr (T number,
 	unsigned short base,
 	std::string& result,

@@ -167,7 +167,7 @@ void TypeInfo::fillTypeInfo(const SQLHDBC* pHDBC)
 }
 
 
-DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
+Dynamic::Var TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
 {
 	TypeInfoVec::const_iterator it = _typeInfo.begin();
 	TypeInfoVec::const_iterator end = _typeInfo.end();
@@ -181,7 +181,7 @@ DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
 }
 
 
-bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const
+bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, Dynamic::Var& result) const
 {
 	TypeInfoVec::const_iterator it = _typeInfo.begin();
 	TypeInfoVec::const_iterator end = _typeInfo.end();

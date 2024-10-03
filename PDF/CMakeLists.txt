@@ -17,7 +17,6 @@ else()
 		src/compress.c
 		src/crc32.c
 		src/deflate.c
-		src/gzio.c
 		src/infback.c
 		src/inffast.c
 		src/inflate.c
@@ -90,28 +89,30 @@ POCO_SOURCES(SRCS hpdf
 	src/hpdf_xref.c
 )
 
-# TODO: Currently only bundled is supported, in future this should also be possible
-# with an unbundled version of libpng
-POCO_SOURCES(SRCS libpng
-	src/png.c
-	src/pngerror.c
-	src/pnggccrd.c
-	src/pngget.c
-	src/pngmem.c
-	src/pngpread.c
-	src/pngread.c
-	src/pngrio.c
-	src/pngrtran.c
-	src/pngrutil.c
-	src/pngset.c
-	src/pngtest.c
-	src/pngtrans.c
-	src/pngvcrd.c
-	src/pngwio.c
-	src/pngwrite.c
-	src/pngwtran.c
-	src/pngwutil.c
-)
+if(POCO_UNBUNDLED)
+	find_package(PNG REQUIRED)
+else()
+	POCO_SOURCES(SRCS libpng
+		src/png.c
+		src/pngerror.c
+		src/pnggccrd.c
+		src/pngget.c
+		src/pngmem.c
+		src/pngpread.c
+		src/pngread.c
+		src/pngrio.c
+		src/pngrtran.c
+		src/pngrutil.c
+		src/pngset.c
+		src/pngtest.c
+		src/pngtrans.c
+		src/pngvcrd.c
+		src/pngwio.c
+		src/pngwrite.c
+		src/pngwtran.c
+		src/pngwutil.c
+	)
+endif(POCO_UNBUNDLED)
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
@@ -132,9 +133,16 @@ set_target_properties(PDF
 )
 
 if(POCO_UNBUNDLED)
+	include_directories(${PNG_INCLUDE_DIR})
+
 	target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
+	target_link_libraries(PDF PUBLIC ${PNG_LIBRARY})
 	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+else()
+	# libpng: Do not try to use ARM intrinsics on ARM architecture: source files not included
+	target_compile_definitions(PDF PRIVATE PNG_ARM_NEON_OPT=0)
 endif(POCO_UNBUNDLED)
+
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF
 	PUBLIC

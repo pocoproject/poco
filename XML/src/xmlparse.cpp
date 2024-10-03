@@ -1,4 +1,4 @@
-/* 2a14271ad4d35e82bde8ba210b4edb7998794bcbae54deab114046a300f9639a (2.6.2+)
+/* ba4cdf9bdb534f355a9def4c9e25d20ee8e72f95b0a4d930be52e563f5080196 (2.6.3+)
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -39,6 +39,7 @@
    Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
    Copyright (c) 2023      Owain Davies <owaind@bath.edu>
    Copyright (c) 2023-2024 Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2024      Berkay Eren Ürün <berkay.ueruen@siemens.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -301,7 +302,7 @@ typedef struct {
    The name of the element is stored in both the document and API
    encodings.  The memory buffer 'buf' is a separately-allocated
    memory area which stores the name.  During the XML_Parse()/
-   XMLParseBuffer() when the element is open, the memory for the 'raw'
+   XML_ParseBuffer() when the element is open, the memory for the 'raw'
    version of the name (in the document encoding) is shared with the
    document buffer.  If the element is open across calls to
    XML_Parse()/XML_ParseBuffer(), the buffer is re-allocated to
@@ -2056,6 +2057,12 @@ XML_ParseBuffer(XML_Parser parser, int len, int isFinal) {
 
   if (parser == NULL)
     return XML_STATUS_ERROR;
+
+  if (len < 0) {
+    parser->m_errorCode = XML_ERROR_INVALID_ARGUMENT;
+    return XML_STATUS_ERROR;
+  }
+
   switch (parser->m_parsingStatus.parsing) {
   case XML_SUSPENDED:
     parser->m_errorCode = XML_ERROR_SUSPENDED;
@@ -5864,18 +5871,17 @@ processInternalEntity(XML_Parser parser, ENTITY *entity, XML_Bool betweenDecl) {
   /* Set a safe default value in case 'next' does not get set */
   next = textStart;
 
-#ifdef XML_DTD
   if (entity->is_param) {
     int tok
         = XmlPrologTok(parser->m_internalEncoding, textStart, textEnd, &next);
     result = doProlog(parser, parser->m_internalEncoding, textStart, textEnd,
                       tok, next, &next, XML_FALSE, XML_FALSE,
                       XML_ACCOUNT_ENTITY_EXPANSION);
-  } else
-#endif /* XML_DTD */
+  } else {
     result = doContent(parser, parser->m_tagLevel, parser->m_internalEncoding,
                        textStart, textEnd, &next, XML_FALSE,
                        XML_ACCOUNT_ENTITY_EXPANSION);
+  }
 
   if (result == XML_ERROR_NONE) {
     if (textEnd != next && parser->m_parsingStatus.parsing == XML_SUSPENDED) {
@@ -5912,18 +5918,17 @@ internalEntityProcessor(XML_Parser parser, const char *s, const char *end,
   /* Set a safe default value in case 'next' does not get set */
   next = textStart;
 
-#ifdef XML_DTD
   if (entity->is_param) {
     int tok
         = XmlPrologTok(parser->m_internalEncoding, textStart, textEnd, &next);
     result = doProlog(parser, parser->m_internalEncoding, textStart, textEnd,
                       tok, next, &next, XML_FALSE, XML_TRUE,
                       XML_ACCOUNT_ENTITY_EXPANSION);
-  } else
-#endif /* XML_DTD */
+  } else {
     result = doContent(parser, openEntity->startTagLevel,
                        parser->m_internalEncoding, textStart, textEnd, &next,
                        XML_FALSE, XML_ACCOUNT_ENTITY_EXPANSION);
+  }
 
   if (result != XML_ERROR_NONE)
     return result;
@@ -5950,7 +5955,6 @@ internalEntityProcessor(XML_Parser parser, const char *s, const char *end,
     return XML_ERROR_NONE;
   }
 
-#ifdef XML_DTD
   if (entity->is_param) {
     int tok;
     parser->m_processor = prologProcessor;
@@ -5958,9 +5962,7 @@ internalEntityProcessor(XML_Parser parser, const char *s, const char *end,
     return doProlog(parser, parser->m_encoding, s, end, tok, next, nextPtr,
                     (XML_Bool)! parser->m_parsingStatus.finalBuffer, XML_TRUE,
                     XML_ACCOUNT_DIRECT);
-  } else
-#endif /* XML_DTD */
-  {
+  } else {
     parser->m_processor = contentProcessor;
     /* see externalEntityContentProcessor vs contentProcessor */
     result = doContent(parser, parser->m_parentParser ? 1 : 0,
@@ -7034,6 +7036,16 @@ dtdCopy(XML_Parser oldParser, DTD *newDtd, const DTD *oldDtd,
     if (! newE)
       return 0;
     if (oldE->nDefaultAtts) {
+      /* Detect and prevent integer overflow.
+       * The preprocessor guard addresses the "always false" warning
+       * from -Wtype-limits on platforms where
+       * sizeof(int) < sizeof(size_t), e.g. on x86_64. */
+#if UINT_MAX >= SIZE_MAX
+      if ((size_t)oldE->nDefaultAtts
+          > ((size_t)(-1) / sizeof(DEFAULT_ATTRIBUTE))) {
+        return 0;
+      }
+#endif
       newE->defaultAtts
           = (DEFAULT_ATTRIBUTE*) ms->malloc_fcn(oldE->nDefaultAtts * sizeof(DEFAULT_ATTRIBUTE));
       if (! newE->defaultAtts) {
@@ -7576,6 +7588,15 @@ nextScaffoldPart(XML_Parser parser) {
   int next;
 
   if (! dtd->scaffIndex) {
+    /* Detect and prevent integer overflow.
+     * The preprocessor guard addresses the "always false" warning
+     * from -Wtype-limits on platforms where
+     * sizeof(unsigned int) < sizeof(size_t), e.g. on x86_64. */
+#if UINT_MAX >= SIZE_MAX
+    if (parser->m_groupSize > ((size_t)(-1) / sizeof(int))) {
+      return -1;
+    }
+#endif
     dtd->scaffIndex = (int *)MALLOC(parser, parser->m_groupSize * sizeof(int));
     if (! dtd->scaffIndex)
       return -1;

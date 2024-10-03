@@ -89,9 +89,11 @@ public:
 		/// to the given stream. The entries are delimited by
 		/// a newline.
 
-	void dump(std::ostream& ostr, const std::string& delimiter) const;
+	void dump(std::ostream& ostr, const std::string& delimiter, bool nameOnly = false) const;
 		/// Dumps the stack (including line number and filenames)
 		/// to the given stream.
+		/// If nameOnly is false (default), the whole path to file is printed,
+		/// otherwise only the file name.
 
 	void clear();
 		/// Clears the NDC stack.

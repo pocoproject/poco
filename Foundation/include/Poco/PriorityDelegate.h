@@ -52,7 +52,6 @@ public:
 	{
 		if (&delegate != this)
 		{
-			this->_pTarget        = delegate._pTarget;
 			this->_receiverObject = delegate._receiverObject;
 			this->_receiverMethod = delegate._receiverMethod;
 			this->_priority       = delegate._priority;
@@ -126,7 +125,6 @@ public:
 	{
 		if (&delegate != this)
 		{
-			this->_pTarget        = delegate._pTarget;
 			this->_receiverObject = delegate._receiverObject;
 			this->_receiverMethod = delegate._receiverMethod;
 			this->_priority       = delegate._priority;
@@ -200,7 +198,6 @@ public:
 	{
 		if (&delegate != this)
 		{
-			this->_pTarget        = delegate._pTarget;
 			this->_receiverObject = delegate._receiverObject;
 			this->_receiverMethod = delegate._receiverMethod;
 			this->_priority       = delegate._priority;
@@ -274,7 +271,6 @@ public:
 	{
 		if (&delegate != this)
 		{
-			this->_pTarget        = delegate._pTarget;
 			this->_receiverObject = delegate._receiverObject;
 			this->_receiverMethod = delegate._receiverMethod;
 			this->_priority       = delegate._priority;

@@ -29,6 +29,7 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 if(POCO_UNBUNDLED)
 	find_package(PCRE2 REQUIRED)
 	find_package(ZLIB REQUIRED)
+	find_package(Utf8Proc REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES(SRCS RegExp
@@ -41,6 +42,7 @@ else()
 	POCO_SOURCES(SRCS pcre2
 		src/pcre2_auto_possess.c
 		src/pcre2_chartables.c
+		src/pcre2_chkdint.c
 		src/pcre2_compile.c
 		src/pcre2_config.c
 		src/pcre2_context.c
@@ -72,7 +74,7 @@ else()
 	POCO_HEADERS(SRCS zlib
 		include/Poco/zconf.h
 		include/Poco/zlib.h
-		)
+	)
 
 	POCO_SOURCES(SRCS zlib
 		src/adler32.c
@@ -85,6 +87,10 @@ else()
 		src/inftrees.c
 		src/trees.c
 		src/zutil.c
+	)
+
+	POCO_SOURCES(SRCS utf8proc
+		src/utf8proc.c
 	)
 endif(POCO_UNBUNDLED)
 
@@ -99,8 +105,10 @@ set_target_properties(Foundation
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
+	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB Utf8Proc::Utf8Proc)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+else()
+	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
 endif(POCO_UNBUNDLED)
 
 target_include_directories(Foundation
@@ -162,7 +170,7 @@ else()
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
 			else()
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
-				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+				target_link_libraries(Foundation PUBLIC pthread atomic ${CMAKE_DL_LIBS} rt)
 			endif()
 		endif(APPLE)
 	endif(UNIX AND NOT ANDROID)

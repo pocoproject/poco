@@ -162,19 +162,18 @@ void TextTestResult::printErrors(std::ostream& stream)
 			stream << "There were " << testErrors() << " errors: " << std::endl;
 
 		int i = 1;
-		for (std::vector<TestFailure*>::iterator it = errors().begin(); it != errors().end(); ++it)
+		for (const auto& failure : errors())
 		{
-			TestFailure* failure = *it;
 			CppUnitException* e = failure->thrownException();
 
 			stream << std::setw(2) << i
 			       << ": "
 			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
+				   << "    \"" << (e ? e->what() : "") << "\"\n"
 			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
-			if (e == 0)
+			if (e == nullptr)
 			{
 				stream << "0";
 			}
@@ -210,10 +209,9 @@ void TextTestResult::printFailures(std::ostream& stream)
 
 		int i = 1;
 
-		for (std::vector<TestFailure*>::iterator it = failures().begin(); it != failures().end(); ++it)
+		for (const auto& failure : failures())
 		{
-			TestFailure* failure = *it;
-			CppUnitException* e = failure->thrownException();
+				CppUnitException* e = failure->thrownException();
 
 			stream << std::setw(2) << i
 			       << ": "
@@ -222,7 +220,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
-			if (e == 0)
+			if (e == nullptr)
 			{
 				stream << "0";
 			}

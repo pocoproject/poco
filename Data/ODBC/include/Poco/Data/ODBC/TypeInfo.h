@@ -20,7 +20,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/NamedTuple.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include <vector>
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -85,12 +85,12 @@ public:
 	void fillTypeInfo(const SQLHDBC* pHDBC);
 		/// Fills the data type info structure for the database.
 
-	DynamicAny getInfo(SQLSMALLINT type, const std::string& param) const;
+	Dynamic::Var getInfo(SQLSMALLINT type, const std::string& param) const;
 		/// Returns information about specified data type as specified by parameter 'type'.
 		/// The requested information is specified by parameter 'param'.
 		/// Will fail with a Poco::NotFoundException thrown if the param is not found
 
-	bool tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const;
+	bool tryGetInfo(SQLSMALLINT type, const std::string& param, Dynamic::Var& result) const;
 		/// Returns information about specified data type as specified by parameter 'type' in param result.
 		/// The requested information is specified by parameter 'param'.
 		/// Will return false if the param is not found. The value of result will be not changed in this case.

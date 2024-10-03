@@ -186,6 +186,23 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
+  linux-gcc-cmake-unbundled:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
+      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DENABLE_PDF=ON && cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
   linux-emscripten-cmake:
     runs-on: ubuntu-22.04
     steps:
@@ -555,7 +572,9 @@ jobs:
         class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
         class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
         class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
+        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
+        class CppUnit::TestCaller<class FileTest>.testExists,
+        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
       - uses: actions/checkout@v4
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
@@ -700,12 +719,12 @@ jobs:
       #    POSTGRES_PASSWORD: postgres
       #  ports:
       #    - 5432:5432
-      #oracle:
-      #  image: container-registry.oracle.com/database/express:21.3.0-xe
-      #  env:
-      #    ORACLE_PWD: poco
-      #  ports:
-      #    - 1521:1521
+      oracle:
+       image: container-registry.oracle.com/database/express:21.3.0-xe
+       env:
+         ORACLE_PWD: poco
+       ports:
+         - 1521:1521
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
@@ -716,25 +735,17 @@ jobs:
           - 1433:1433
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev alien libaio1 gnupg2 curl # libmysqlclient-dev mysql-client odbc-postgresql
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev alien libaio1 gnupg2 curl odbcinst1debian2 libodbc1 odbcinst # libmysqlclient-dev mysql-client odbc-postgresql
       - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
       # - name: Setup MySQL ODBC connector
       #   run: |
       #     wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
       #     wget https://dev.mysql.com/get/Downloads/MySQL-8.2/mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb
       #     sudo dpkg -i mysql-community-client-plugins_8.2.0-1ubuntu22.04_amd64.deb mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
-      # - name: Setup Oracle ODBC connector
-      #   run: |
-      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
-      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
-      #     wget https://download.oracle.com/otn_software/linux/instantclient/2112000/oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
-      #     sudo alien --scripts ./oracle-instantclient-basic-21.12.0.0.0-1.x86_64.rpm
-      #     sudo alien --scripts ./oracle-instantclient-sqlplus-21.12.0.0.0-1.x86_64.rpm
-      #     sudo alien --scripts ./oracle-instantclient-odbc-21.12.0.0.0-1.x86_64.rpm
-      #     sudo apt install ./oracle-instantclient-basic_21.12.0.0.0-2_amd64.deb
-      #     sudo apt install ./oracle-instantclient-sqlplus_21.12.0.0.0-2_amd64.deb
-      #     sudo apt install ./oracle-instantclient-odbc_21.12.0.0.0-2_amd64.deb
-      #     sudo /usr/lib/oracle/21/client64/bin/odbc_update_ini.sh / "/usr/lib/oracle/21/client64/lib" "" ""  "/etc/odbc.ini"
+      - name: Setup Oracle ODBC connector
+        run: |
+          wget https://www.devart.com/odbc/oracle/devartodbcoracle_amd64.deb
+          sudo dpkg -i devartodbcoracle_amd64.deb
       - name: Setup SQL Server ODBC connector
         run: |
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc

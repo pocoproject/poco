@@ -254,7 +254,7 @@ public:
 			if (itm != pManif->end())
 				return *itm;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	const Meta& classFor(const std::string& className) const

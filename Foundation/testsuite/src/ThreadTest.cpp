@@ -122,6 +122,37 @@ private:
 };
 
 
+class JoinRunnable : public Runnable
+{
+public:
+	JoinRunnable() : _stop(false), _running(false)
+	{
+	}
+
+	void run()
+	{
+		_running = true;
+		while (!_stop)
+			Thread::sleep(100);
+		_running = false;
+	}
+
+	void stop()
+	{
+		_stop = true;
+	}
+
+	bool running() const
+	{
+		return _running;
+	}
+
+private:
+	std::atomic<bool> _stop;
+	std::atomic<bool> _running;
+};
+
+
 class TrySleepRunnable : public Runnable
 {
 public:
@@ -268,7 +299,7 @@ void ThreadTest::testThreads()
 }
 
 
-void ThreadTest::testJoin()
+void ThreadTest::testTryJoin()
 {
 	Thread thread;
 	MyRunnable r;
@@ -280,6 +311,22 @@ void ThreadTest::testJoin()
 	r.notify();
 	assertTrue (thread.tryJoin(500));
 	assertTrue (!thread.isRunning());
+}
+
+
+void ThreadTest::testJoin()
+{
+	Thread thread;
+	JoinRunnable r;
+	assertTrue(!thread.isRunning());
+	thread.start(r);
+	Thread::sleep(200);
+	assertTrue(thread.isRunning());
+	assertTrue(!thread.tryJoin(100));
+	r.stop();
+	thread.join();
+	assertTrue(!thread.isRunning());
+	assertTrue(!r.running());
 }
 
 
@@ -512,6 +559,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testNamedThread);
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
+	CppUnit_addTest(pSuite, ThreadTest, testTryJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotRun);

@@ -29,34 +29,34 @@ namespace
 	class MatchData
 	{
 	public:
-		MatchData(pcre2_code_8* code):
-			_match(pcre2_match_data_create_from_pattern_8(reinterpret_cast<pcre2_code_8*>(code), nullptr))
+		MatchData(pcre2_code* code):
+			_match(pcre2_match_data_create_from_pattern(reinterpret_cast<pcre2_code*>(code), nullptr))
 		{
 			if (!_match) throw Poco::RegularExpressionException("cannot create match data");
 		}
 
 		~MatchData()
 		{
-			if (_match) pcre2_match_data_free_8(_match);
+			if (_match) pcre2_match_data_free(_match);
 		}
 
 		std::uint32_t count() const
 		{
-			return pcre2_get_ovector_count_8(_match);
+			return pcre2_get_ovector_count(_match);
 		}
 
 		const PCRE2_SIZE* data() const
 		{
-			return pcre2_get_ovector_pointer_8(_match);
+			return pcre2_get_ovector_pointer(_match);
 		}
 
-		operator pcre2_match_data_8*()
+		operator pcre2_match_data*()
 		{
 			return _match;
 		}
 
 	private:
-		pcre2_match_data_8* _match;
+		pcre2_match_data* _match;
 	};
 }
 
@@ -72,40 +72,40 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	unsigned nameEntrySize;
 	unsigned char* nameTable;
 
-	pcre2_compile_context_8* context = pcre2_compile_context_create_8(nullptr);
+	pcre2_compile_context* context = pcre2_compile_context_create(nullptr);
 	if (!context) throw Poco::RegularExpressionException("cannot create compile context");
 
 	if (options & RE_NEWLINE_LF)
-		pcre2_set_newline_8(context, PCRE2_NEWLINE_LF);
+		pcre2_set_newline(context, PCRE2_NEWLINE_LF);
 	else if (options & RE_NEWLINE_CRLF)
-		pcre2_set_newline_8(context, PCRE2_NEWLINE_CRLF);
+		pcre2_set_newline(context, PCRE2_NEWLINE_CRLF);
 	else if (options & RE_NEWLINE_ANY)
-		pcre2_set_newline_8(context, PCRE2_NEWLINE_ANY);
+		pcre2_set_newline(context, PCRE2_NEWLINE_ANY);
 	else if (options & RE_NEWLINE_ANYCRLF)
-		pcre2_set_newline_8(context, PCRE2_NEWLINE_ANYCRLF);
+		pcre2_set_newline(context, PCRE2_NEWLINE_ANYCRLF);
 	else // default RE_NEWLINE_CR
-		pcre2_set_newline_8(context, PCRE2_NEWLINE_CR);
+		pcre2_set_newline(context, PCRE2_NEWLINE_CR);
 
-	_pcre = pcre2_compile_8(reinterpret_cast<const PCRE2_SPTR>(pattern.c_str()), pattern.length(), compileOptions(options), &errorCode, &errorOffset, context);
-	pcre2_compile_context_free_8(context);
+	_pcre = pcre2_compile(reinterpret_cast<const PCRE2_SPTR>(pattern.c_str()), pattern.length(), compileOptions(options), &errorCode, &errorOffset, context);
+	pcre2_compile_context_free(context);
 
 	if (!_pcre)
 	{
 		PCRE2_UCHAR buffer[256];
-		pcre2_get_error_message_8(errorCode, buffer, sizeof(buffer));
+		pcre2_get_error_message(errorCode, buffer, sizeof(buffer));
 		std::ostringstream msg;
 		msg << reinterpret_cast<char*>(buffer) << " (at offset " << errorOffset << ")";
 		throw RegularExpressionException(msg.str());
 	}
 
-	pcre2_pattern_info_8(reinterpret_cast<pcre2_code_8*>(_pcre), PCRE2_INFO_NAMECOUNT, &nameCount);
-	pcre2_pattern_info_8(reinterpret_cast<pcre2_code_8*>(_pcre), PCRE2_INFO_NAMEENTRYSIZE, &nameEntrySize);
-	pcre2_pattern_info_8(reinterpret_cast<pcre2_code_8*>(_pcre), PCRE2_INFO_NAMETABLE, &nameTable);
+	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMECOUNT, &nameCount);
+	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMEENTRYSIZE, &nameEntrySize);
+	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMETABLE, &nameTable);
 
 	for (int i = 0; i < nameCount; i++)
 	{
 		unsigned char* group = nameTable + 2 + (nameEntrySize * i);
-		int n = pcre2_substring_number_from_name_8(reinterpret_cast<pcre2_code_8*>(_pcre), group);
+		int n = pcre2_substring_number_from_name(reinterpret_cast<pcre2_code*>(_pcre), group);
 		_groups[n] = std::string(reinterpret_cast<char*>(group));
 	}
 }
@@ -113,7 +113,7 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 
 RegularExpression::~RegularExpression()
 {
-	if (_pcre) pcre2_code_free_8(reinterpret_cast<pcre2_code_8*>(_pcre));
+	if (_pcre) pcre2_code_free(reinterpret_cast<pcre2_code*>(_pcre));
 }
 
 
@@ -121,8 +121,8 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 {
 	poco_assert (offset <= subject.length());
 
-	MatchData matchData(reinterpret_cast<pcre2_code_8*>(_pcre));
-	int rc = pcre2_match_8(reinterpret_cast<pcre2_code_8*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
+	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		mtch.offset = std::string::npos;
@@ -140,7 +140,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	else if (rc < 0)
 	{
 		PCRE2_UCHAR buffer[256];
-		pcre2_get_error_message_8(rc, buffer, sizeof(buffer));
+		pcre2_get_error_message(rc, buffer, sizeof(buffer));
 		throw RegularExpressionException(std::string(reinterpret_cast<char*>(buffer)));
 	}
 	const PCRE2_SIZE* ovec = matchData.data();
@@ -156,8 +156,8 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 
 	matches.clear();
 
-	MatchData matchData(reinterpret_cast<pcre2_code_8*>(_pcre));
-	int rc = pcre2_match_8(reinterpret_cast<pcre2_code_8*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, options & 0xFFFF, matchData, nullptr);
+	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, options & 0xFFFF, matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		return 0;
@@ -173,7 +173,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	else if (rc < 0)
 	{
 		PCRE2_UCHAR buffer[256];
-		pcre2_get_error_message_8(rc, buffer, sizeof(buffer));
+		pcre2_get_error_message(rc, buffer, sizeof(buffer));
 		throw RegularExpressionException(std::string(reinterpret_cast<char*>(buffer)));
 	}
 	matches.reserve(rc);
@@ -279,8 +279,8 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 {
 	if (offset >= subject.length()) return std::string::npos;
 
-	MatchData matchData(reinterpret_cast<pcre2_code_8*>(_pcre));
-	int rc = pcre2_match_8(reinterpret_cast<pcre2_code_8*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
+	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		return std::string::npos;
@@ -296,7 +296,7 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 	else if (rc < 0)
 	{
 		PCRE2_UCHAR buffer[256];
-		pcre2_get_error_message_8(rc, buffer, sizeof(buffer));
+		pcre2_get_error_message(rc, buffer, sizeof(buffer));
 		throw RegularExpressionException(std::string(reinterpret_cast<char*>(buffer)));
 	}
 	const PCRE2_SIZE* ovec = matchData.data();

@@ -119,7 +119,7 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 		{
 			setHttpOnly(true);
 		}
-		else
+		else if (_name.empty())
 		{
 			setName(name);
 			setValue(value);

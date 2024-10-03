@@ -21,7 +21,7 @@ objects = AttributedString Cell Destination Document Encoder Font Image Outline 
 	hpdf_image_png hpdf_info hpdf_list hpdf_mmgr hpdf_name hpdf_namedict hpdf_null \
 	hpdf_number hpdf_objects hpdf_outline hpdf_page_label hpdf_page_operator \
 	hpdf_pages hpdf_pdfa hpdf_real hpdf_streams hpdf_string hpdf_u3d hpdf_utils hpdf_xref \
-	adler32 compress crc32 deflate gzio \
+	adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil \
 	png pngerror pnggccrd pngget pngmem pngpread \
 	pngread pngrio pngrtran pngrutil pngset pngtest \

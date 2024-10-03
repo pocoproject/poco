@@ -54,6 +54,7 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 {
 public:
 	using ScopedLock = Poco::ScopedLock<NamedMutex>;
+	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<NamedMutex>;
 
 	NamedMutex(const std::string& name);
 		/// creates the Mutex.

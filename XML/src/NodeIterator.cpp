@@ -88,8 +88,8 @@ Node* NodeIterator::previousNode()
 
 void NodeIterator::detach()
 {
-	_pRoot    = 0;
-	_pCurrent = 0;
+	_pRoot    = nullptr;
+	_pCurrent = nullptr;
 }
 
 
@@ -163,7 +163,7 @@ Node* NodeIterator::previous() const
 Node* NodeIterator::last()
 {
 	_pCurrent = _pRoot;
-	Node* pLast = 0;
+	Node* pLast = nullptr;
 	while (_pCurrent)
 	{
 		pLast = _pCurrent;

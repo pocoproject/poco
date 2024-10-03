@@ -65,27 +65,13 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-if(POCO_STATIC)
-	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
-	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
 
 	if(BUILD_SHARED_LIBS AND POCO_MT)
 		message(FATAL_ERROR "Cannot have both BUILD_SHARED_LIBS and POCO_MT")
-	endif()
-
-	# allow disabling of internally built OpenSSL# (see below for details)
-	# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
-	# the internal OpenSSL build will be used
-	option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" ON)
-
-	if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (ENABLE_NETSSL OR ENABLE_CRYPTO OR (ENABLE_DATA_MYSQL AND MINGW)))
-		include(UseEmbeddedOpenSSL)
 	endif()
 
 	if(POCO_SANITIZE_ASAN)
@@ -95,7 +81,11 @@ if(MSVC)
 endif()
 
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
-option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
+
+#
+# Path to OpenSSL installation root can be provided by setting a variable
+# OPENSSL_ROOT_DIR.
+#
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
 	find_package(OpenSSL REQUIRED)
@@ -237,9 +227,9 @@ else()
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
 
 # Disable fork exec
@@ -254,6 +244,7 @@ option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (d
 if (POCO_ENABLE_STD_MUTEX)
 	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
+
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file

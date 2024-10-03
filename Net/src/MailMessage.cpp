@@ -105,6 +105,12 @@ namespace
 				NameValueCollection::ConstIterator end = header.end();
 				bool added = false;
 
+				if (contentDisp.empty())
+				{
+					_pMsg->addContent(pPS, cte);
+					added = true;
+				}
+
 				static const auto lcContentDisposition = Poco::toLower(MailMessage::HEADER_CONTENT_DISPOSITION);
 
 				for (; it != end; ++it)
@@ -120,12 +126,6 @@ namespace
 					}
 
 					pPS->headers().set(it->first, it->second);
-				}
-
-				if (contentDisp.empty())
-				{
-					_pMsg->addContent(pPS, cte);
-					added = true;
 				}
 
 				if (!added) delete pPS;
