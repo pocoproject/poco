@@ -42,6 +42,7 @@ else()
 	POCO_SOURCES(SRCS pcre2
 		src/pcre2_auto_possess.c
 		src/pcre2_chartables.c
+		src/pcre2_chkdint.c
 		src/pcre2_compile.c
 		src/pcre2_config.c
 		src/pcre2_context.c
