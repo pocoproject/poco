@@ -39,8 +39,8 @@ class ScopedFStreamWriteRWLock;
 
 
 class Foundation_API FileStreamRWLock: private FileStreamRWLockImpl
-	/// A reader writer file lock allows multiple concurrent
-	/// readers or one exclusive writer.
+	/// A reader writer lock on the file region allows multiple concurrent
+	/// process-readers or one exclusive process-writer.
 {
 public:
 	using ScopedLock = ScopedFStreamRWLock;
@@ -56,20 +56,20 @@ public:
 		/// Destroys the Reader/Writer lock on the file region.
 
 	void readLock();
-		/// Acquires a read lock. If another thread or process currently holds a write lock,
+		/// Acquires a read lock. If another process currently holds a write lock,
 		/// waits until the write lock is released.
 
 	bool tryReadLock();
 		/// Tries to acquire a read lock. Immediately returns true if successful, or
-		/// false if another thread or process currently holds a write lock.
+		/// false if another process currently holds a write lock.
 
 	void writeLock();
-		/// Acquires a write lock on the file region. If one or more other threads or processes currently hold
+		/// Acquires a write lock on the file region. If one or more other processes currently hold
 		/// locks, waits until all locks are released.
 
 	bool tryWriteLock();
 		/// Tries to acquire a write lock on the file region. Immediately returns true if successful,
-		/// or false if one or more other threads or processes currently hold
+		/// or false if one or more other processes currently hold
 		/// locks.
 
 	void unlock();
