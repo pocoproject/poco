@@ -168,6 +168,12 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleEclipse)));
+
+		options.addOption(
+			Option("search-index", "s", "Enable search index (requires FTS5 support).")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleSearchIndex)));
 	}
 
 	void handleHelp(const std::string& name, const std::string& value)
@@ -199,6 +205,12 @@ protected:
 	void handleEclipse(const std::string& name, const std::string& value)
 	{
 		_writeEclipseTOC = true;
+	}
+
+	void handleSearchIndex(const std::string& name, const std::string& value)
+	{
+		config().setBool("PocoDoc.searchIndex", true);
+		logger().information("Search index enabled via command-line option.");
 	}
 
 	void handleConfig(const std::string& name, const std::string& value)
