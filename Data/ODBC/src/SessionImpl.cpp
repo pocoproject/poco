@@ -158,10 +158,7 @@ void SessionImpl::open(const std::string& connect)
 		throw InvalidArgumentException("SessionImpl::open(): Connection string empty");
 
 	const auto ctout = getConnectionTimeout();
-	const auto ltoutAny = getLoginTimeout("");
-	const int ltout = ltoutAny.empty() ? 0 : Poco::AnyCast<int>(ltoutAny);
-
-	if (_db.connect(connectionString(), ltout, ctout))
+	if (_db.connect(connectionString(), 0, ctout))
 	{
 		setProperty("handle", _db.handle());
 
