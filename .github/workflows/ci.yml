@@ -68,7 +68,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-cxx20:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
@@ -84,7 +84,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-asan:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -108,7 +108,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-asan-no-soo:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -132,7 +132,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-ubsan:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
@@ -148,7 +148,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-tsan:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -170,7 +170,7 @@ jobs:
             sudo -s ./ci/runtests.sh TSAN
 
   linux-gcc-cmake:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
@@ -187,7 +187,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   linux-gcc-cmake-unbundled:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
