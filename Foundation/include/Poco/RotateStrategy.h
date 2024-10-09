@@ -83,9 +83,11 @@ public:
 				_day = DateTimeParser::parseDayOfWeek(it, timestr[index].end());
 				++index;
 			}
+			[[fallthrough]];
 		case 2: // hh:mm
 			_hour = NumberParser::parse(timestr[index]);
 			++index;
+			[[fallthrough]];
 		case 1: // mm
 			_minute = NumberParser::parse(timestr[index]);
 			break;
@@ -118,8 +120,8 @@ private:
 			_threshold += tsp;
 		}
 		while (!(_threshold.minute() == _minute &&
-		        (-1 == _hour || _threshold.hour() == _hour) &&
-		        (-1 == _day  || _threshold.dayOfWeek() == _day)));
+				 (-1 == _hour || _threshold.hour() == _hour) &&
+				 (-1 == _day  || _threshold.dayOfWeek() == _day)));
 		// round to :00.0 seconds
 		_threshold.assign(_threshold.year(), _threshold.month(), _threshold.day(), _threshold.hour(), _threshold.minute());
 	}
