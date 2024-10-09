@@ -83,9 +83,11 @@ public:
 				_day = DateTimeParser::parseDayOfWeek(it, timestr[index].end());
 				++index;
 			}
+            [[fallthrough]];
 		case 2: // hh:mm
 			_hour = NumberParser::parse(timestr[index]);
 			++index;
+            [[fallthrough]];
 		case 1: // mm
 			_minute = NumberParser::parse(timestr[index]);
 			break;
