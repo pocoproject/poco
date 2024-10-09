@@ -979,10 +979,10 @@ void Path::parseGuess(const std::string& path)
 			{
 			case '\\': hasBackslash = true; break;
 			case '/':  hasSlash = true; break;
-            case '[':  hasOpenBracket = true;
-                [[fallthrough]];
-            case ']':  hasClosBracket = hasOpenBracket;
-                [[fallthrough]];
+			case '[':  hasOpenBracket = true;
+				[[fallthrough]];
+			case ']':  hasClosBracket = hasOpenBracket;
+				[[fallthrough]];
 			case ';':  semiIt = it; break;
 			}
 		}

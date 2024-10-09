@@ -407,11 +407,11 @@ void DateTimeTest::testArithmetics()
 		Poco::LineNumber lineNum;		// source line number
 		int year1;						// operand/result date1 year
 		int month1;						// operand/result date1 month
-        int day1;                       // operand/result date1 day
+		int day1;                       // operand/result date1 day
 		int numDays;					// operand/result 'int' number of days
 		int year2;						// operand/result date2 year
 		int month2;						// operand/result date2 month
-        int day2;                       // operand/result date2 day
+		int day2;                       // operand/result date2 day
 	} data[] =
 	{
 		//          - - - -first- - - -           - - - second - - -
@@ -476,10 +476,10 @@ void DateTimeTest::testIncrementDecrement()
 		int lineNum;		// source line number
 		int year1;			// (first) date year
 		int month1;			// (first) date month
-        int day1;           // (first) date day
+		int day1;           // (first) date day
 		int year2;			// (second) date year
 		int month2;			// (second) date month
-        int day2;           // (second) date day
+		int day2;           // (second) date day
 	} data[] =
 	{
 		 //          - - - -first- - - -    - - - second - - -

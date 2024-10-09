@@ -208,48 +208,48 @@ void CoreTest::testEnvironment()
 
 void CoreTest::testBuffer()
 {
-    std::size_t const s = 10;
+	std::size_t const s = 10;
 	Buffer<int> b(s);
 	assertTrue (b.size() == s);
 	assertTrue (b.sizeBytes() == s * sizeof(int));
 	assertTrue (b.capacity() == s);
 	assertTrue (b.capacityBytes() == s * sizeof(int));
 	std::vector<int> v;
-    for (std::size_t i = 0; i < s; ++i)
-    {
+	for (std::size_t i = 0; i < s; ++i)
+	{
 		v.push_back(i);
-    }
+	}
 
-    std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
 
 	assertTrue (s == b.size());
-    for (std::size_t i = 0; i < s; ++i)
-    {
-        assertTrue (b[i] == static_cast<int>(i));
-    }
+	for (std::size_t i = 0; i < s; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	b.resize(s/2);
-    for (std::size_t i = 0; i < s/2; ++i)
-    {
-        assertTrue (b[i] == static_cast<int>(i));
-    }
+	for (std::size_t i = 0; i < s/2; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	assertTrue (b.size() == s/2);
 	assertTrue (b.capacity() == s);
 
 	b.resize(s*2);
 	v.clear();
-    for (std::size_t i = 0; i < s*2; ++i)
-    {
+	for (std::size_t i = 0; i < s*2; ++i)
+	{
 		v.push_back(i);
-    }
+	}
 
-    std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
 
-    for (std::size_t i = 0; i < s*2; ++i)
-    {
-        assertTrue (b[i] == static_cast<int>(i));
-    }
+	for (std::size_t i = 0; i < s*2; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	assertTrue (b.size() == s*2);
 	assertTrue (b.capacity() == s*2);
@@ -345,7 +345,7 @@ void CoreTest::testFIFOBufferEOFAndError()
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
-    std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	assertTrue (0 == _notToReadable);
 	assertTrue (0 == _readableToNot);
 	assertTrue (10 == f.write(b));
@@ -451,7 +451,7 @@ void CoreTest::testFIFOBufferChar()
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
-    std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	assertTrue (0 == _notToReadable);
 	assertTrue (0 == _readableToNot);
 	f.write(b);
@@ -489,7 +489,7 @@ void CoreTest::testFIFOBufferChar()
 		v.push_back(c);
 
 	b.resize(10);
-    std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (15 == f.used());
@@ -782,7 +782,7 @@ void CoreTest::testFIFOBufferInt()
 	for (T c = 0; c < 10; ++c)
 		v.push_back(c);
 
-    std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (10 == f.used());
@@ -816,7 +816,7 @@ void CoreTest::testFIFOBufferInt()
 		v.push_back(c);
 
 	b.resize(10);
-    std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (15 == f.used());
