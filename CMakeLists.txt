@@ -245,7 +245,7 @@ if (POCO_ENABLE_STD_MUTEX)
 	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
 
-include(DefinePlatformSpecifc)
+include(DefinePlatformSpecific)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
