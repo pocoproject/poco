@@ -39,7 +39,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCent
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil
 
-pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_compile pcre2_config \
+pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_chkdint pcre2_compile pcre2_config \
 	pcre2_context pcre2_convert pcre2_dfa_match pcre2_error pcre2_extuni \
 	pcre2_find_bracket pcre2_jit_compile pcre2_maketables pcre2_match \
 	pcre2_match_data pcre2_newline pcre2_ord2utf pcre2_pattern_info \

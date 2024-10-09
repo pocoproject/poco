@@ -42,6 +42,7 @@ else()
 	POCO_SOURCES(SRCS pcre2
 		src/pcre2_auto_possess.c
 		src/pcre2_chartables.c
+		src/pcre2_chkdint.c
 		src/pcre2_compile.c
 		src/pcre2_config.c
 		src/pcre2_context.c
@@ -67,12 +68,6 @@ else()
 		src/pcre2_ucd.c
 		src/pcre2_valid_utf.c
 		src/pcre2_xclass.c
-	)
-
-	# zlib
-	POCO_HEADERS(SRCS zlib
-		include/Poco/zconf.h
-		include/Poco/zlib.h
 	)
 
 	POCO_SOURCES(SRCS zlib

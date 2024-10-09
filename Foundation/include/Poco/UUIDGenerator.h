@@ -99,7 +99,6 @@ public:
 
 protected:
 	Timestamp::UtcTimeVal timeStamp();
-	void getNode();
 
 private:
 	FastMutex           _mutex;

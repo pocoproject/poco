@@ -846,6 +846,9 @@
     <ClCompile Include="src\pcre2_chartables.c">
       <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\pcre2_chkdint.c">
+      <Filter>RegularExpression\PCRE2 Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\pcre2_compile.c">
       <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>

@@ -254,7 +254,7 @@ jobs:
             make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
   macos-clang-make:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -284,8 +284,8 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-make-visibility-hidden:
-    # macos-12 runs on Intel CPU
-    runs-on: macos-12
+    # macos-13 runs on Intel CPU
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -314,9 +314,9 @@ jobs:
             EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
             ./ci/runtests.sh
 
-  macos-clang-cmake-openssl-trace:
-    # macos-14 runs on Apple Silicon
-    runs-on: macos-14
+  macos-clang-cmake-openssl:
+    # macos-latest runs on Apple Silicon
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -341,7 +341,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -366,7 +366,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3-visibility-hidden:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -391,7 +391,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-make-openssl3-tsan:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
@@ -421,7 +421,7 @@ jobs:
             ./ci/runtests.sh TSAN
 
   macos-clang-make-openssl3-ubsan:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -451,7 +451,7 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-make-openssl3-asan:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
