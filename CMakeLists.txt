@@ -67,17 +67,15 @@ include(PocoMacros)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
+set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
+
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
 
 	if(BUILD_SHARED_LIBS AND POCO_MT)
 		message(FATAL_ERROR "Cannot have both BUILD_SHARED_LIBS and POCO_MT")
 	endif()
-
-	if(POCO_SANITIZE_ASAN)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address")
-	endif()
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
 
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
@@ -193,11 +191,11 @@ option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
-  set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
 
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
-  set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 option(ENABLE_TESTS
@@ -236,7 +234,7 @@ endif()
 option(POCO_NO_FORK_EXEC "Set to OFF|ON (default is OFF) to disable use of fork() and exec*() which are not allowed on some Apple platforms (iOS, watchOS, iPadOS, tvOS)." OFF)
 
 if(POCO_NO_FORK_EXEC)
-  add_definitions(-DPOCO_NO_FORK_EXEC=1)
+	add_definitions(-DPOCO_NO_FORK_EXEC=1)
 endif()
 
 option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
@@ -564,8 +562,8 @@ message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
-message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
-message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] Build with C++ flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
+message(STATUS "[cmake] Build with C flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
 message(STATUS "[cmake] C++ symbol visibility:  ${CMAKE_CXX_VISIBILITY_PRESET}")
 
 foreach(component ${Poco_COMPONENTS})
