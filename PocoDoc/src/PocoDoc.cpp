@@ -113,7 +113,8 @@ class PocoDocApp: public Application
 public:
 	PocoDocApp():
 		_helpRequested(false),
-		_writeEclipseTOC(false)
+		_writeEclipseTOC(false),
+		_searchIndexEnabled(false)
 	{
 		std::setlocale(LC_ALL, "");
 	}
@@ -209,8 +210,7 @@ protected:
 
 	void handleSearchIndex(const std::string& name, const std::string& value)
 	{
-		config().setBool("PocoDoc.searchIndex", true);
-		logger().information("Search index enabled via command-line option.");
+		_searchIndexEnabled = true;
 	}
 
 	void handleConfig(const std::string& name, const std::string& value)
@@ -358,9 +358,7 @@ protected:
 		File file(path);
 		file.createDirectories();
 
-		bool searchIndex = false;
-
-		if (config().getBool("PocoDoc.searchIndex", false))
+		if (_searchIndexEnabled || config().getBool("PocoDoc.searchIndex", false))
 		{
 #if defined(POCO_ENABLE_SQLITE_FTS5)
 			std::string dbDirectory = path.toString() + DocWriter::DATABASE_DIR;
@@ -368,13 +366,13 @@ protected:
 			dbPath.makeDirectory();
 			File dbFile(dbPath);
 			dbFile.createDirectories();
-			searchIndex = true;
+			_searchIndexEnabled = true;
 #else
 			logger().error("FTS5 is not enabled, search is not supported");
 #endif
 		}
 
-		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC, searchIndex);
+		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC, _searchIndexEnabled);
 
 		if (config().hasProperty("PocoDoc.pages"))
 		{
@@ -543,6 +541,7 @@ protected:
 private:
 	bool _helpRequested;
 	bool _writeEclipseTOC;
+	bool _searchIndexEnabled;
 	Poco::CppParser::NameSpace::SymbolTable _gst;
 };
 
