@@ -43,8 +43,12 @@ config.build
 config.make
 
 # CLion #
-########
+#########
 .idea/
+
+# Qt Creator #
+#########
+build/
 
 # CMake #
 ########

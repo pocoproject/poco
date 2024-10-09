@@ -54,7 +54,7 @@ bool TestRunner::run(const std::vector<std::string>& args, const Test::Callback&
 	std::vector<std::string>	setup;
 
 	std::vector<Test*> tests;
-	for (int i = 1; i < args.size(); i++)
+    for (std::size_t i = 1; i < args.size(); i++)
 	{
 		const std::string& arg = args[i];
 		if (arg == "-wait")

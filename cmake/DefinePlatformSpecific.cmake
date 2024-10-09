@@ -23,45 +23,57 @@
 #   - PocoXmtd.lib for /MT debug build
 
 if(MSVC)
-    if(POCO_MT)
-        set(CompilerFlags
-            CMAKE_CXX_FLAGS
-            CMAKE_CXX_FLAGS_DEBUG
-            CMAKE_CXX_FLAGS_RELEASE
-            CMAKE_CXX_FLAGS_RELWITHDEBINFO
-            CMAKE_CXX_FLAGS_MINSIZEREL
-            CMAKE_C_FLAGS
-            CMAKE_C_FLAGS_DEBUG
-            CMAKE_C_FLAGS_RELEASE
-            CMAKE_C_FLAGS_RELWITHDEBINFO
-            CMAKE_C_FLAGS_MINSIZEREL
-        )
-        foreach(CompilerFlag ${CompilerFlags})
-            string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-        endforeach()
+	if(POCO_MT)
+		set(CompilerFlags
+			CMAKE_CXX_FLAGS
+			CMAKE_CXX_FLAGS_DEBUG
+			CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_RELWITHDEBINFO
+			CMAKE_CXX_FLAGS_MINSIZEREL
+			CMAKE_C_FLAGS
+			CMAKE_C_FLAGS_DEBUG
+			CMAKE_C_FLAGS_RELEASE
+			CMAKE_C_FLAGS_RELWITHDEBINFO
+			CMAKE_C_FLAGS_MINSIZEREL
+		)
+		foreach(CompilerFlag ${CompilerFlags})
+			string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+		endforeach()
 
-        set(STATIC_POSTFIX "mt" CACHE STRING "Set static library postfix" FORCE)
-    else(POCO_MT)
-        set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
-    endif(POCO_MT)
+		set(STATIC_POSTFIX "mt" CACHE STRING "Set static library postfix" FORCE)
+	else(POCO_MT)
+		set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
+	endif(POCO_MT)
+
+	if(POCO_SANITIZE_ASAN)
+		message(WARNING "Use POCO_SANITIZEFLAGS instead of POCO_SANITIZE_ASAN")
+		add_compile_options("/fsanitize=address")
+	endif()
+
 else(MSVC)
-    # Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
-    set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
+	# Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
+	set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
 endif(MSVC)
 
+if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
+	message(STATUS "Using sanitize flags: ${POCO_SANITIZEFLAGS}")
+	add_compile_options(${POCO_SANITIZEFLAGS})
+	add_link_options(${POCO_SANITIZEFLAGS})
+endif()
+
 if (ENABLE_COMPILER_WARNINGS)
-    message(STATUS "Enabling additional compiler warning flags.")
-    # Additional compiler-specific warning flags
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        # using clang
-        add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        # using GCC
-        add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        # using Visual Studio C++
-        add_compile_options(/W4)
-    endif()
+	message(STATUS "Enabling additional compiler warning flags.")
+	# Additional compiler-specific warning flags
+	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		# using clang
+		add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		# using GCC
+		add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		# using Visual Studio C++
+		add_compile_options(/W4)
+	endif()
 endif()
 
 # Add a d postfix to the debug libraries

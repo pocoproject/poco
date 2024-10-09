@@ -462,7 +462,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 				_qualifiedName = &_qname;
 				break; // No more declarations.
 			}
-			// Fall through.
+			[[fallthrough]];
 		}
 		case EV_START_ELEMENT:
 		{
@@ -507,7 +507,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 				_pvalue = &_value;
 				break; // No more attributes.
 			}
-			// Fall through.
+			[[fallthrough]];
 		}
 		case EV_START_ELEMENT:
 		case EV_START_NAMESPACE_DECL:
@@ -541,7 +541,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 				_qualifiedName = &_qname;
 				break; // No more declarations.
 			}
-			// Fall through.
+			[[fallthrough]];
 		}
 			// The end namespace declaration comes before the end element
 			// which means it can follow pretty much any other event.
