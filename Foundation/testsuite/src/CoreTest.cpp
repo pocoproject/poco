@@ -690,7 +690,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue (1 == _notToWritable);
 	assertTrue (1 == _writableToNot);
 
-	const char arr[3] = {'4', '5', '6' };
+	const char arr[4] = {'4', '5', '6', '7' };
 	try
 	{
 		f.copy(&arr[0], 8);
