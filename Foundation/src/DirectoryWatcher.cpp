@@ -54,9 +54,11 @@ public:
 	{
 	}
 
-	virtual ~DirectoryWatcherStrategy()
-	{
-	}
+	virtual ~DirectoryWatcherStrategy() = default;
+
+	DirectoryWatcherStrategy() = delete;
+	DirectoryWatcherStrategy(const DirectoryWatcherStrategy&) = delete;
+	DirectoryWatcherStrategy& operator = (const DirectoryWatcherStrategy&) = delete;
 
 	DirectoryWatcher& owner()
 	{
@@ -75,12 +77,11 @@ protected:
 		{
 		}
 
-		ItemInfo(const ItemInfo& other):
-			path(other.path),
-			size(other.size),
-			lastModified(other.lastModified)
-		{
-		}
+		ItemInfo(const ItemInfo& other) = default;
+		ItemInfo& operator=(const ItemInfo& ) = default;
+
+		ItemInfo(ItemInfo&& other) = default;
+		ItemInfo& operator=(ItemInfo&& ) = default;
 
 		explicit ItemInfo(const File& f):
 			path(f.path()),
@@ -93,12 +94,12 @@ protected:
 		File::FileSize size;
 		Timestamp lastModified;
 	};
-	typedef std::map<std::string, ItemInfo> ItemInfoMap;
+	using ItemInfoMap = std::map<std::string, ItemInfo>;
 
 	void scan(ItemInfoMap& entries)
 	{
 		DirectoryIterator it(owner().directory());
-		DirectoryIterator end;
+		const DirectoryIterator end;
 		while (it != end)
 		{
 			entries[it.path().getFileName()] = ItemInfo(*it);
@@ -110,14 +111,14 @@ protected:
 	{
 		for (auto& np: newEntries)
 		{
-			ItemInfoMap::iterator ito = oldEntries.find(np.first);
+			const auto ito = oldEntries.find(np.first);
 			if (ito != oldEntries.end())
 			{
 				if ((owner().eventMask() & DirectoryWatcher::DW_ITEM_MODIFIED) && !owner().eventsSuspended())
 				{
 					if (np.second.size != ito->second.size || np.second.lastModified != ito->second.lastModified)
 					{
-						Poco::File f(np.second.path);
+						const Poco::File f(np.second.path);
 						DirectoryWatcher::DirectoryEvent ev(f, DirectoryWatcher::DW_ITEM_MODIFIED);
 						owner().itemModified(&owner(), ev);
 					}
@@ -143,10 +144,6 @@ protected:
 	}
 
 private:
-	DirectoryWatcherStrategy();
-	DirectoryWatcherStrategy(const DirectoryWatcherStrategy&);
-	DirectoryWatcherStrategy& operator = (const DirectoryWatcherStrategy&);
-
 	DirectoryWatcher& _owner;
 };
 

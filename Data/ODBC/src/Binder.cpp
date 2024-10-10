@@ -526,7 +526,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		else foundSize = _pTypeInfo->tryGetInfo(sqlDataType, "COLUMN_SIZE", tmp);
 		if (foundSize) colSize = tmp;
 
-		if (actualSize > colSize)
+		if (actualSize > static_cast<std::size_t>(colSize))
 		{
 			throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
 					__LINE__, pos, actualSize, static_cast<long>(colSize)));

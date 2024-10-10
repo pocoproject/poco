@@ -223,7 +223,7 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 	}
 	_output->flush();
 
-	for (int i = 0; i < commands.size(); ++i)
+	for (std::size_t i = 0; i < commands.size(); ++i)
 	{
 		results.addRedisType(readReply());
 	}

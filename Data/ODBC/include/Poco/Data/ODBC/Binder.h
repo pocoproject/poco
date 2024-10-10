@@ -575,11 +575,11 @@ private:
 		getColumnOrParameterSize(pos, size);
 		poco_assert (size > 0);
 
-		if (size == _maxFieldSize)
+		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
 			getMinValueSize(*pVal, size);
 			// accommodate for terminating zero
-			if (size != _maxFieldSize) ++size;
+			if (static_cast<std::size_t>(size) != _maxFieldSize) ++size;
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
@@ -601,7 +601,7 @@ private:
 		for (; it != end; ++it)
 		{
 			strSize = it->size();
-			if (strSize > size)
+			if (strSize > static_cast<std::size_t>(size))
 			{
 				if (transcodeRequired()) delete pVal;
 				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
@@ -646,11 +646,11 @@ private:
 		getColumnOrParameterSize(pos, size);
 		poco_assert(size > 0);
 
-		if (size == _maxFieldSize)
+		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
 			getMinValueSize(val, size);
 			// accomodate for terminating zero
-			if (size != _maxFieldSize) size += sizeof(UTF16Char);
+			if (static_cast<std::size_t>(size) != _maxFieldSize) size += sizeof(UTF16Char);
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
@@ -672,7 +672,7 @@ private:
 		for (; it != end; ++it)
 		{
 			strSize = it->size() * sizeof(UTF16Char);
-			if (strSize > size)
+			if (strSize > static_cast<std::size_t>(size))
 				throw LengthExceededException("ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
 			std::memcpy(pBuf + offset, it->data(), strSize);
 			offset += size;
@@ -742,7 +742,7 @@ private:
 		for (; cIt != cEnd; ++cIt)
 		{
 			blobSize = cIt->size();
-			if (blobSize > size)
+			if (blobSize > static_cast<std::size_t>(size))
 				throw LengthExceededException("ODBC::Binder::bindImplContainerLOB():SQLBindParameter(std::vector<BLOB>)");
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;

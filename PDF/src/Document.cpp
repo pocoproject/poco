@@ -85,7 +85,7 @@ void Document::save(const std::string fileName)
 }
 
 
-const Document::DataPtr Document::data(SizeType& sz)
+Document::DataPtr Document::data(SizeType& sz)
 {
 	sz = size();
 	delete _pRawData;
