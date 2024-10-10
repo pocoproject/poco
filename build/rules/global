@@ -14,9 +14,11 @@
 # POCO_TARGET_OSARCH: Target system architecture (forr cross builds)
 #
 
+ifndef POCO_ENABLE_TRACE
 target := $(strip $(target))
 target_version := $(strip $(target_version))
 target_libs := $(strip $(target_libs))
+endif
 
 #
 # Check for POCO_BASE
@@ -338,12 +340,15 @@ LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(MACCHINA_LIBRARY) $(foreach p,$(POCO_AD
 #
 # Strip Command definition
 #
+ifndef POCO_ENABLE_TRACE
 ifeq ($(strip $(STRIP)),)
 STRIPCMD =
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
-
+else
+STRIPCMD =
+endif
 #
 # Make CC and CXX environment vars
 #

@@ -190,6 +190,8 @@ option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
+option(ENABLE_TRACE "Enable stack tracing" OFF)
+
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
@@ -240,8 +242,12 @@ endif()
 option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
 
 if (POCO_ENABLE_STD_MUTEX)
-	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
+	add_compile_definitions(POCO_ENABLE_STD_MUTEX)
 endif ()
+
+if(ENABLE_TRACE)
+	add_compile_definitions(POCO_ENABLE_TRACE)
+endif()
 
 include(DefinePlatformSpecific)
 
@@ -411,7 +417,7 @@ option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
 	if(POCO_DATA_NO_SQL_PARSER)
-		add_definitions(-DPOCO_DATA_NO_SQL_PARSER=1)
+		add_compile_definitions(POCO_DATA_NO_SQL_PARSER=1)
 	endif()
 	add_subdirectory(Data)
 	list(APPEND Poco_COMPONENTS "Data")
@@ -478,6 +484,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
 	add_subdirectory(Encodings/Compiler)
 	list(APPEND Poco_COMPONENTS "EncodingsCompiler")
+endif()
+
+if(ENABLE_TRACE)
+	add_subdirectory(Trace)
+	list(APPEND Poco_COMPONENTS "Trace")
 endif()
 
 
