@@ -131,7 +131,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 	else if (rc == ETIMEDOUT)
 		return false;
 	else
-		throw SystemException("cannot lock mutex");
+		throw SystemException("cannot lock mutex", Error::getMessage(rc));
 #else
 	const int sleepMillis = 5;
 	Timestamp now;
@@ -142,7 +142,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 		if (rc == 0)
 			return true;
 		else if (rc != EBUSY)
-			throw SystemException("cannot lock mutex");
+			throw SystemException("cannot lock mutex", Error::getMessage(rc));
 #if defined(POCO_VXWORKS)
 		struct timespec ts;
 		ts.tv_sec = 0;
