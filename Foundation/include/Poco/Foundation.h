@@ -159,5 +159,4 @@ using LineNumber = decltype(__LINE__);
 #include "Poco/Types.h"
 
 
-
 #endif // Foundation_Foundation_INCLUDED
