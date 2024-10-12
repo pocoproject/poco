@@ -605,7 +605,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	}
 	else if (name == PROP_ASYNC)
 	{
-		// no-op
+		// no-op, deprecated
 	}
 	else if (name == PROP_TIMEOUT)
 	{
