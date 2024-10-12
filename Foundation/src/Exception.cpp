@@ -17,6 +17,7 @@
 #ifdef POCO_ENABLE_TRACE
 #include <sstream>
 #include "cpptrace/cpptrace.hpp"
+#include "Poco/Trace/Trace.h"
 #endif
 
 

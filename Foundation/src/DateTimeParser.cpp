@@ -66,7 +66,7 @@ namespace {
 		{
 			return std::stoi(number);
 		}
-		catch(const std::exception& e)
+		catch(const std::exception&)
 		{
 			throw Poco::SyntaxException("Invalid DateTimeString: " + dtStr + ", invalid number: " + number);
 		}
@@ -111,7 +111,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 		{
 			return std::stoi(number);
 		}
-		catch(const std::exception& e)
+		catch(const std::exception&)
 		{
 			throw SyntaxException("Invalid DateTimeString: " + dtStr + ", invalid number: " + number);
 		}
@@ -143,7 +143,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 		{
 			result = std::stoi(number);
 		}
-		catch(const std::exception& e)
+		catch(const std::exception&)
 		{
 			throw SyntaxException("Invalid DateTimeString: " + dtStr + ", invalid number: " + number);
 		}
@@ -448,7 +448,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			{
 				hours = parseNumberN("", it, end, 2);
 			}
-			catch(const SyntaxException& e)
+			catch(const SyntaxException&)
 			{
 				throw SyntaxException("Timezone invalid number: hours");
 			}
@@ -461,7 +461,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			{
 				minutes = parseNumberN("", it, end, 2);
 			}
-			catch(const SyntaxException& e)
+			catch(const SyntaxException&)
 			{
 				throw SyntaxException("Timezone invalid number: minutes");
 			}

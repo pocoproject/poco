@@ -158,7 +158,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>17.0.34714.143</_ProjectFileVersion>
+    <_ProjectFileVersion>17.0.35219.272</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoDataTestd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoDataTestmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoDataTestmtd</TargetName>
@@ -585,8 +585,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\DataTest\DataTest.h"/>
-    <ClInclude Include="include\Poco\DataTest\SQLExecutor.h"/>
+    <ClInclude Include="include\Poco\Data\Test\DataTest.h"/>
+    <ClInclude Include="include\Poco\Data\Test\SQLExecutor.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\SQLExecutor.cpp">

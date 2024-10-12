@@ -497,11 +497,67 @@
 			Name="Source Files"
 			>
 			<File
-				RelativePath=".\src\StackTrace.cpp"
+				RelativePath=".\src\cpptrace.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\StackTraceException.cpp"
+				RelativePath=".\src\ctrace.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\cpptrace.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\debug_map_resolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\demangle_with_winapi.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\from_current.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\module_base.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\object.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\pe.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\safe_dl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\snippet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\symbols_core.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\symbols_with_dbghelp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\symbols_with_nothing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unwind_with_dbghelp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unwind_with_nothing.cpp"
 				>
 			</File>
 		</Filter>
@@ -509,11 +565,55 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath=".\include\Poco\Trace\StackTrace.h"
+				RelativePath=".\src\demangle\demangle.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Poco\Trace\StackTraceException.h"
+				RelativePath=".\src\platform\dbghelp_syminit_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\platform\exception_type.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\platform\path.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\platform\platform.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\platform\program_name.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\snippets\snippet.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\symbols\symbols.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unwind\unwind.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\utils\common.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\utils\error.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\utils\microfmt.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\utils\utils.hpp"
 				>
 			</File>
 		</Filter>
