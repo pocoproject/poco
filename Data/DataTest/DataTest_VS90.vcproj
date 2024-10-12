@@ -497,11 +497,11 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath=".\include\Poco\DataTest\DataTest.h"
+				RelativePath=".\include\Poco\Data\Test\DataTest.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Poco\DataTest\SQLExecutor.h"
+				RelativePath=".\include\Poco\Data\Test\SQLExecutor.h"
 				>
 			</File>
 		</Filter>
