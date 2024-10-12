@@ -67,7 +67,7 @@ public:
 		/// Creates the DatagramSocket with the SocketImpl
 		/// from another socket.
 
-	~DatagramSocket();
+	~DatagramSocket() override;
 		/// Destroys the DatagramSocket.
 
 	DatagramSocket& operator = (const Socket& socket);

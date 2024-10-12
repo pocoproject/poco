@@ -69,7 +69,7 @@ public:
 		/// Creates the StreamSocket with the SocketImpl
 		/// from another socket.
 
-	virtual ~StreamSocket();
+	~StreamSocket() override;
 		/// Destroys the StreamSocket.
 
 	StreamSocket& operator = (const Socket& socket);

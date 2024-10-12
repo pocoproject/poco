@@ -179,7 +179,7 @@ public:
 	WebSocket(const WebSocket& socket);
 		/// Creates a WebSocket from another WebSocket.
 
-	virtual ~WebSocket();
+	~WebSocket() override;
 		/// Destroys the WebSocket.
 
 	WebSocket& operator = (const Socket& socket);
