@@ -20,9 +20,11 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/HTTPSessionFactory.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
 #include "Poco/Net/HTTPDigestCredentials.h"
 #include "Poco/Net/HTTPNTLMCredentials.h"
+#include "Poco/Net/ProxyConfig.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/SharedPtr.h"
 #include <istream>
@@ -31,7 +33,6 @@
 
 namespace Poco {
 namespace Net {
-
 
 class HTTPRequest;
 class HTTPResponse;
@@ -65,40 +66,6 @@ class Net_API HTTPClientSession: public HTTPSession
 	/// set up a session through a proxy.
 {
 public:
-	enum ProxyAuthentication
-	{
-		PROXY_AUTH_NONE,        /// No proxy authentication
-		PROXY_AUTH_HTTP_BASIC,  /// HTTP Basic proxy authentication (default, if username and password are supplied)
-		PROXY_AUTH_HTTP_DIGEST, /// HTTP Digest proxy authentication
-		PROXY_AUTH_NTLM         /// NTLMv2 proxy authentication
-	};
-
-	struct ProxyConfig
-		/// HTTP proxy server configuration.
-	{
-		ProxyConfig():
-			port(HTTP_PORT),
-			authMethod(PROXY_AUTH_HTTP_BASIC)
-		{
-		}
-
-		std::string  host;
-			/// Proxy server host name or IP address.
-		Poco::UInt16 port;
-			/// Proxy server TCP port.
-		std::string  username;
-			/// Proxy server username.
-		std::string  password;
-			/// Proxy server password.
-		std::string  nonProxyHosts;
-			/// A regular expression defining hosts for which the proxy should be bypassed,
-			/// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
-			/// string to disable proxy bypassing.
-
-		ProxyAuthentication authMethod;
-			/// The authentication method to use - HTTP Basic or NTLM.
-	};
-
 	HTTPClientSession();
 		/// Creates an unconnected HTTPClientSession.
 
@@ -167,8 +134,8 @@ public:
 	const SocketAddress& getSourceAddress6();
 		/// Returns the last IPV6 source address set with setSourceAddress
 
-	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
-		/// Sets the proxy host name and port number.
+	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT, const std::string& protocol = "http", bool tunnel = true);
+		/// Sets the proxy host name, port number, protocol (http or https) and tunnel behaviour.
 
 	void setProxyHost(const std::string& host);
 		/// Sets the host name of the proxy server.
@@ -176,11 +143,23 @@ public:
 	void setProxyPort(Poco::UInt16 port);
 		/// Sets the port number of the proxy server.
 
+	void setProxyProtocol(const std::string& protocol);
+	        /// Sets the proxy protocol (http or https).
+
+	void setProxyTunnel(bool tunnel);
+		/// If 'true' proxy will be used as tunnel.
+
 	const std::string& getProxyHost() const;
 		/// Returns the proxy host name.
 
 	Poco::UInt16 getProxyPort() const;
 		/// Returns the proxy port number.
+
+	const std::string& getProxyProtocol() const;
+	        /// Returns the proxy protocol.
+
+	bool isProxyTunnel() const;
+		/// Returns 'true' if proxy is configured as tunnel.
 
 	void setProxyCredentials(const std::string& username, const std::string& password);
 		/// Sets the username and password for proxy authentication.
@@ -363,6 +342,8 @@ protected:
 		/// Calls proxyConnect() and attaches the resulting StreamSocket
 		/// to the HTTPClientSession.
 
+        HTTPSessionFactory _proxySessionFactory;
+                /// Factory to create HTTPClientSession to proxy.
 private:
 	using OStreamPtr = Poco::SharedPtr<std::ostream>;
 	using IStreamPtr = Poco::SharedPtr<std::istream>;
@@ -422,6 +403,18 @@ inline Poco::UInt16 HTTPClientSession::getProxyPort() const
 }
 
 
+inline const std::string& HTTPClientSession::getProxyProtocol() const
+{
+        return _proxyConfig.protocol;
+}
+
+
+inline bool HTTPClientSession::isProxyTunnel() const
+{
+        return _proxyConfig.tunnel;
+}
+
+
 inline const std::string& HTTPClientSession::getProxyUsername() const
 {
 	return _proxyConfig.username;
@@ -434,13 +427,13 @@ inline const std::string& HTTPClientSession::getProxyPassword() const
 }
 
 
-inline const HTTPClientSession::ProxyConfig& HTTPClientSession::getProxyConfig() const
+inline const ProxyConfig& HTTPClientSession::getProxyConfig() const
 {
 	return _proxyConfig;
 }
 
 
-inline const HTTPClientSession::ProxyConfig& HTTPClientSession::getGlobalProxyConfig()
+inline const ProxyConfig& HTTPClientSession::getGlobalProxyConfig()
 {
 	return _globalProxyConfig;
 }
