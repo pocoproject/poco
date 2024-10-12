@@ -19,9 +19,11 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
+using namespace Poco::Data::Keywords;
 
 namespace Poco {
 namespace Data {
@@ -325,7 +327,7 @@ public:
 		assertTrue(d.isNull());
 
 		sql = "SELECT * FROM NullableTest";
-		RecordSet rs(session(), sql);
+		Poco::Data::RecordSet rs(session(), sql);
 
 		rs.moveFirst();
 		assertTrue(rs.isNull("EmptyString"));
@@ -333,10 +335,10 @@ public:
 		assertTrue(rs.isNull("EmptyFloat"));
 		assertTrue(rs.isNull(emptyName));
 
-		Var di = 1;
-		Var df = 1.5;
-		Var ds = "abc";
-		Var dd = T();
+		Poco::Dynamic::Var di = 1;
+		Poco::Dynamic::Var df = 1.5;
+		Poco::Dynamic::Var ds = "abc";
+		Poco::Dynamic::Var dd = T();
 
 		assertTrue(!di.isEmpty());
 		assertTrue(!df.isEmpty());

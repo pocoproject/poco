@@ -32,7 +32,6 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
@@ -46,7 +45,6 @@
 #include <iterator>
 
 
-using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::SessionPool;
 using Poco::Data::Statement;
