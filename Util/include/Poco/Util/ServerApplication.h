@@ -124,7 +124,7 @@ class Util_API ServerApplication: public Application
 	/// the daemon in a file. The PID file will be removed when the daemon process
 	/// terminates (but not, if it crashes).
 	/// 
-	/// An aplication can register a callback to be called at termination time.
+	/// An application can register a callback to be called at termination time.
 	/// An example of the termination callback registration at some point
 	/// during the ServerApplication initialization time:
 	/// 
