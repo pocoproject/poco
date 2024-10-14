@@ -19,7 +19,7 @@
 
 
 #include "Poco/Foundation.h"
-#include <mysql.h>
+#include <mysql/mysql.h>
 
 
 //

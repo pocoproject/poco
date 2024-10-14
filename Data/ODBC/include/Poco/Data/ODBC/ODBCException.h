@@ -138,10 +138,10 @@ private:
 };
 
 
-typedef HandleException<SQLHENV, SQL_HANDLE_ENV>   EnvironmentException;
-typedef HandleException<SQLHDBC, SQL_HANDLE_DBC>   ConnectionException;
-typedef HandleException<SQLHSTMT, SQL_HANDLE_STMT> StatementException;
-typedef HandleException<SQLHDESC, SQL_HANDLE_DESC> DescriptorException;
+using EnvironmentException = HandleException<SQLHENV, SQL_HANDLE_ENV>;
+using ConnectionException = HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+using StatementException = HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+using DescriptorException = HandleException<SQLHDESC, SQL_HANDLE_DESC>;
 
 
 } } } // namespace Poco::Data::ODBC

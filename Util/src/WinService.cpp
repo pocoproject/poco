@@ -12,9 +12,6 @@
 //
 
 
-#if !defined(_WIN32_WCE)
-
-
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Thread.h"
@@ -421,6 +418,3 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 
 
 } } // namespace Poco::Util
-
-
-#endif // !defined(_WIN32_WCE)

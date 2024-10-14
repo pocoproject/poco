@@ -19,6 +19,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <typeinfo>
 
 
@@ -300,10 +301,10 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 			&len); //length indicator
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
-			throw StatementException(_rStmt, "SQLGetData()");
+			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(string):SQLGetData()");
 
 		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("Could not determine returned data length.");
+			throw UnknownDataLengthException("ODBC::Extractor::extractManualImpl(string):Could not determine returned data length.");
 
 		if (isNullLengthIndicator(len))
 		{
@@ -355,10 +356,10 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 			&len); //length indicator
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
-			throw StatementException(_rStmt, "SQLGetData()");
+			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(UTF16String):SQLGetData()");
 
 		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("Could not determine returned data length.");
+			throw UnknownDataLengthException("ODBC::Extractor::extractManualImpl(UTF16String):Could not determine returned data length.");
 
 		if (isNullLengthIndicator(len))
 		{
@@ -414,10 +415,10 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 		_lengths[pos] += len;
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
-			throw StatementException(_rStmt, "SQLGetData()");
+			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(CLOB):SQLGetData()");
 
 		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("Could not determine returned data length.");
+			throw UnknownDataLengthException("ODBC::Extractor::extractManualImpl(CLOB):Could not determine returned data length.");
 
 		if (isNullLengthIndicator(len))
 			return false;
@@ -454,7 +455,7 @@ bool Extractor::extractManualImpl<Poco::Data::Date>(std::size_t pos,
 		&_lengths[pos]); //length indicator
 
 	if (Utility::isError(rc))
-		throw StatementException(_rStmt, "SQLGetData()");
+		throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(Date):SQLGetData()");
 
 	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
@@ -481,7 +482,7 @@ bool Extractor::extractManualImpl<Poco::Data::Time>(std::size_t pos,
 		&_lengths[pos]); //length indicator
 
 	if (Utility::isError(rc))
-		throw StatementException(_rStmt, "SQLGetData()");
+		throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(Time):SQLGetData()");
 
 	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
@@ -508,7 +509,7 @@ bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos,
 		&_lengths[pos]); //length indicator
 
 	if (Utility::isError(rc))
-		throw StatementException(_rStmt, "SQLGetData()");
+		throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(DateTime):SQLGetData()");
 
 	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
@@ -720,7 +721,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 		else
 			ret = extractBoundImpl(pos, result);
 		transcode(result, val);
-		
+
 	}
 
 	return ret;

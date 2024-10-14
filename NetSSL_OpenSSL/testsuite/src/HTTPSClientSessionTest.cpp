@@ -25,6 +25,8 @@
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/StreamCopier.h"
@@ -285,6 +287,44 @@ void HTTPSClientSessionTest::testKeepAlive()
 }
 
 
+void HTTPSClientSessionTest::testMultipleSSLInit()
+{
+
+	auto initSSL = []()
+	{
+		initializeSSL();
+		Poco::SharedPtr<InvalidCertificateHandler> ptrCert = new AcceptCertificateHandler(false);
+		Context::Ptr context(new Context(Context::CLIENT_USE, "", "", "",
+				Context::VerificationMode::VERIFY_STRICT, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
+			)
+		);
+		SSLManager::instance().initializeClient(0, ptrCert, context);
+	};
+
+	auto deinitSSL = []()
+	{
+		uninitializeSSL();
+	};
+
+	try
+	{
+		initSSL();
+		deinitSSL();
+
+		initSSL();
+
+		HTTPSClientSession session("secure.appinf.com");
+		HTTPRequest request(HTTPRequest::HTTP_GET, "", HTTPMessage::HTTP_1_1);
+		(void)session.sendRequest(request);
+		deinitSSL();
+	}
+	catch(...)
+	{
+		failmsg("Double SSL init failed");
+	}
+}
+
+
 void HTTPSClientSessionTest::testInterop()
 {
 	HTTPSClientSession s("secure.appinf.com");
@@ -459,6 +499,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testMultipleSSLInit);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);

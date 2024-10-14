@@ -82,6 +82,20 @@ Notification* TimedNotificationQueue::dequeueNotification()
 }
 
 
+Notification* TimedNotificationQueue::dequeueNextNotification()
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	NfQueue::iterator it = _nfQueue.begin();
+	if (it != _nfQueue.end())
+	{
+		Notification::Ptr pNf = it->second;
+		_nfQueue.erase(it);
+		return pNf.duplicate();
+	}
+	return 0;
+}
+
 Notification* TimedNotificationQueue::waitDequeueNotification()
 {
 	for (;;)

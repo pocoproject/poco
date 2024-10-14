@@ -652,6 +652,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\SQLChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\SQLParser.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Statement.h"
 					>
 				</File>
@@ -784,6 +792,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\SQLChannel.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Statement.cpp"
 					>
 				</File>
@@ -851,6 +863,194 @@
 					RelativePath=".\src\SessionPoolContainer.cpp"
 					>
 				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="SQLParser"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\SQLParser\src\SQLParser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLParser\src\SQLParserResult.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLParser\src\sqlparser_win.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\SQLParser\src\SQLParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLParser\src\SQLParserResult.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="parser"
+				>
+				<Filter
+					Name="Header Files"
+					>
+					<File
+						RelativePath=".\SQLParser\src\parser\bison_parser.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\parser\flex_lexer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\parser\parser_typedef.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Source Files"
+					>
+					<File
+						RelativePath=".\SQLParser\src\parser\bison_parser.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\parser\flex_lexer.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="sql"
+				>
+				<Filter
+					Name="Header Files"
+					>
+					<File
+						RelativePath=".\SQLParser\src\sql\AlterStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\ColumnType.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\CreateStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\DeleteStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\DropStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\ExecuteStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\ExportStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\Expr.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\ImportStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\InsertStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\PrepareStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\SelectStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\ShowStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\SQLStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\statements.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\Table.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\TransactionStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\UpdateStatement.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Source Files"
+					>
+					<File
+						RelativePath=".\SQLParser\src\sql\CreateStatement.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\Expr.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\PrepareStatement.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\SQLStatement.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\SQLParser\src\sql\statements.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="util"
+				>
+				<Filter
+					Name="Header Files"
+					>
+					<File
+						RelativePath=".\SQLParser\src\util\sqlhelper.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Source Files"
+					>
+					<File
+						RelativePath=".\SQLParser\src\util\sqlhelper.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

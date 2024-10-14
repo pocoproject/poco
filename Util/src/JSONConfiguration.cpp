@@ -27,6 +27,9 @@
 #include "Poco/NumberParser.h"
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Util {
 
@@ -67,6 +70,8 @@ void JSONConfiguration::load(const std::string& path)
 
 void JSONConfiguration::load(std::istream& istr)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	JSON::Parser parser;
 	parser.parse(istr);
 	DynamicAny result = parser.result();
@@ -79,6 +84,8 @@ void JSONConfiguration::load(std::istream& istr)
 
 void JSONConfiguration::loadEmpty(const std::string& root)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	_object = new JSON::Object();
 	JSON::Object::Ptr rootObject = new JSON::Object();
 	_object->set(root, rootObject);
@@ -105,8 +112,8 @@ void JSONConfiguration::getIndexes(std::string& name, std::vector<int>& indexes)
 	RegularExpression::MatchVec matches;
 	int firstOffset = -1;
 	int offset = 0;
-	RegularExpression regex("\\[([0-9]+)\\]");
-	while(regex.match(name, offset, matches) > 0)
+	RegularExpression regex("\\[([0-9]+)\\]"s);
+	while (regex.match(name, offset, matches) > 0)
 	{
 		if (firstOffset == -1)
 		{
@@ -131,7 +138,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 	StringTokenizer tokenizer(key, ".");
 	lastPart = tokenizer[tokenizer.count() - 1];
 
-	for(int i = 0; i < tokenizer.count() - 1; ++i)
+	for (int i = 0; i < tokenizer.count() - 1; ++i)
 	{
 		std::vector<int> indexes;
 		std::string name = tokenizer[i];
@@ -241,7 +248,6 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 
 void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny& value)
 {
-
 	std::string sValue;
 
 	value.convert<std::string>(sValue);
@@ -276,12 +282,12 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 		}
 
 		JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
-		for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
+		for (std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
 		{
 			JSON::Array::Ptr nextArray = arr->getArray(*it);
 			if (nextArray.isNull())
 			{
-				for(int i = static_cast<int>(arr->size()); i <= *it; ++i)
+				for (int i = static_cast<int>(arr->size()); i <= *it; ++i)
 				{
 					Poco::DynamicAny nullValue;
 					arr->add(nullValue);
@@ -345,14 +351,14 @@ void JSONConfiguration::enumerate(const std::string& key, Keys& range) const
 
 void JSONConfiguration::save(std::ostream& ostr, unsigned int indent) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	_object->stringify(ostr, indent);
 }
 
 
 void JSONConfiguration::removeRaw(const std::string& key)
-
 {
-
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
 	std::vector<int> indexes;
@@ -367,7 +373,6 @@ void JSONConfiguration::removeRaw(const std::string& key)
 		DynamicAny result = parentObject->get(lastPart);
 		if (!result.isEmpty() && result.type() == typeid(JSON::Array::Ptr))
 		{
-
 			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
 			for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
 			{
@@ -376,7 +381,6 @@ void JSONConfiguration::removeRaw(const std::string& key)
 			arr->remove(indexes.back());
 		}
 	}
-
 }
 
 

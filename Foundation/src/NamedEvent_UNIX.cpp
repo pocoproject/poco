@@ -18,7 +18,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 #include <semaphore.h>
 #else
 #include <unistd.h>
@@ -53,7 +53,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	_name(name)
 {
 	std::string fileName = getFileName();
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
 	if ((long) _sem == (long) SEM_FAILED)
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
@@ -80,13 +80,13 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 		_semid = semget(key, 1, 0);
 	}
 	else throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
-#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 }
 
 
 NamedEventImpl::~NamedEventImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	sem_close(_sem);
 #endif
 }
@@ -94,7 +94,7 @@ NamedEventImpl::~NamedEventImpl()
 
 void NamedEventImpl::setImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	if (sem_post(_sem) != 0)
 	   	throw SystemException("cannot set named event", _name);
 #else
@@ -110,7 +110,7 @@ void NamedEventImpl::setImpl()
 
 void NamedEventImpl::waitImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	int err;
 	do
 	{

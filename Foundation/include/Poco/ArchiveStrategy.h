@@ -23,6 +23,9 @@
 #include "Poco/File.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Mutex.h"
+#include "Poco/Condition.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -42,10 +45,15 @@ public:
 	ArchiveStrategy();
 	virtual ~ArchiveStrategy();
 
+	virtual LogFile* open(LogFile* pFile) = 0;
+		/// Open a new log file and return it.
+
 	virtual LogFile* archive(LogFile* pFile) = 0;
 		/// Renames the given log file for archiving
 		/// and creates and returns a new log file.
 		/// The given LogFile object is deleted.
+
+	void close();
 
 	void compress(bool flag = true);
 		/// Enables or disables compression of archived files.
@@ -54,12 +62,23 @@ protected:
 	void moveFile(const std::string& oldName, const std::string& newName);
 	bool exists(const std::string& name);
 
+	Poco::FastMutex _rotateMutex;
+
+	// Log rotation must wait until all of the compression tasks complete
+	int _compressingCount;
+	Poco::Condition _compressingComplete;
+
 private:
+
+	friend class ArchiveCompressor;
+
 	ArchiveStrategy(const ArchiveStrategy&);
 	ArchiveStrategy& operator = (const ArchiveStrategy&);
 
-	bool _compress;
-	ArchiveCompressor* _pCompressor;
+	void compressFile(const std::string& path);
+
+	std::atomic<bool> _compress;
+	std::atomic<ArchiveCompressor*> _pCompressor;
 };
 
 
@@ -71,6 +90,8 @@ class Foundation_API ArchiveByNumberStrategy: public ArchiveStrategy
 public:
 	ArchiveByNumberStrategy();
 	~ArchiveByNumberStrategy();
+
+	LogFile* open(LogFile* pFile);
 	LogFile* archive(LogFile* pFile);
 };
 
@@ -87,6 +108,11 @@ public:
 
 	~ArchiveByTimestampStrategy()
 	{
+	}
+
+	LogFile* open(LogFile* pFile)
+	{
+		return pFile;
 	}
 
 	LogFile* archive(LogFile* pFile)

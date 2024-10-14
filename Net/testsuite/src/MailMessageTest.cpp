@@ -368,55 +368,6 @@ void MailMessageTest::testReadDefaultTransferEncoding()
 }
 
 
-void MailMessageTest::testContentDisposition()
-{
-	/*
-	// see https://github.com/pocoproject/poco/issues/3650
-	// Note "Content-disposition" casing,
-	// "Content-type" or "Content-transfer-encoding" do not cause problem
-	auto rawMessage =
-		"Date: Wed, 29 Jun 2022 08:25:48 GMT" "\r\n"
-		"Content-Type: multipart/mixed; boundary=MIME_boundary_5DBC66DE2780DE93" "\r\n"
-		"From: mySenderName<sender@send.pl>" "\r\n"
-		"Subject: mySubjct" "\r\n"
-		"To: <aja@o.pl>" "\r\n"
-		"Mime-Version: 1.0" "\r\n"
-		"\r\n"
-		"--MIME_boundary_5DBC66DE2780DE93" "\r\n"
-		"Content-Type: text/plain; charset=UTF-8" "\r\n"
-		"Content-Transfer-Encoding: quoted-printable" "\r\n"
-		"Content-Disposition: inline" "\r\n"
-		"\r\n"
-		"MyRealContent" "\r\n"
-		"--MIME_boundary_5DBC66DE2780DE93" "\r\n"
-		"Content-Type: text/plain; name=Plik" "\r\n"
-		"Content-Transfer-Encoding: base64" "\r\n"
-		"Content-disposition: attachment; filename=attachment.txt" "\r\n"
-		"\r\n"
-		"TXlBdHRhY2htZW50" "\r\n"
-		"--MIME_boundary_5DBC66DE2780DE93--" "\r\n"
-		"." "\r\n";
-
-	Poco::Net::MailMessage  message;
-	//Convert raw message to message
-	std::istringstream is(rawMessage);
-	MailInputStream mis(is);
-	message.read(mis);
-
-	//get raw message again:
-	std::ostringstream oss;
-	MailOutputStream mos(oss);
-	message.write(mos);
-	mos.close();
-	auto plainMessage = oss.str();
-
-	assertEqual(rawMessage, plainMessage);
-
-	//std::cout << plain_message <<std::endl;
-*/
-}
-
-
 void MailMessageTest::testRead8Bit()
 {
 	std::istringstream istr(
@@ -559,6 +510,51 @@ void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 	assertTrue (handler.data()[1] == "This is some binary data. Really.");
 	assertTrue (handler.type()[1] == "application/octet-stream; name=sample");
 	assertTrue (handler.disp()[1] == "attachment; filename=sample.dat");
+}
+
+
+void MailMessageTest::testReadMultiPartMixedCaseHeaders()
+{
+	std::istringstream istr(
+		"Content-type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"content-disposition: inline\r\n"
+		"Content-type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-DISposition: attachment; filename=sample.dat\r\n"
+		"content-Transfer-encodING: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	MailMessage message;
+  	MailInputStream mis(istr);
+  	message.read(mis);
+
+	assertTrue (message.isMultipart());
+	assertTrue (message.parts().size() == 2);
+	assertTrue (message.get(MailMessage::HEADER_CONTENT_TYPE) == "multipart/mixed; boundary=MIME_boundary_01234567");
+
+	assertTrue (message.parts()[0].encoding == MailMessage::ContentTransferEncoding::ENCODING_7BIT);
+	assertTrue (message.parts()[0].disposition == MailMessage::ContentDisposition::CONTENT_INLINE);
+	assertTrue (message.parts()[0].pSource->headers().get(MailMessage::HEADER_CONTENT_TYPE) == "text/plain");
+
+	assertTrue (message.parts()[1].encoding == MailMessage::ContentTransferEncoding::ENCODING_BASE64);
+	assertTrue (message.parts()[1].disposition == MailMessage::ContentDisposition::CONTENT_ATTACHMENT);
+	assertTrue (message.parts()[1].pSource->filename() == "sample.dat");
+	assertTrue (message.parts()[1].pSource->headers().get(MailMessage::HEADER_CONTENT_TYPE) == "application/octet-stream; name=sample");
 }
 
 
@@ -758,10 +754,10 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadDefaultTransferEncoding);
-	CppUnit_addTest(pSuite, MailMessageTest, testContentDisposition);
 	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartMixedCaseHeaders);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartNoFinalBoundaryFromFile);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);

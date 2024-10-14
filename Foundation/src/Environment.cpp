@@ -20,7 +20,7 @@
 #include "Poco/Environment.h"
 #include "Poco/Version.h"
 #include <cstdlib>
-#include <cstdio> // sprintf()
+#include <cstdio> // snprintf()
 
 
 #if defined(POCO_VXWORKS)
@@ -28,11 +28,7 @@
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Environment_WINCE.cpp"
-#else
 #include "Environment_WIN32U.cpp"
-#endif
 #endif
 
 
@@ -101,7 +97,7 @@ std::string Environment::nodeId()
 	NodeId id;
 	nodeId(id);
 	char result[18];
-	std::sprintf(result, "%02x:%02x:%02x:%02x:%02x:%02x",
+	std::snprintf(result, sizeof(result), "%02x:%02x:%02x:%02x:%02x:%02x",
 		id[0],
 		id[1],
 		id[2],

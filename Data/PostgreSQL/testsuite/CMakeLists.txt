@@ -17,4 +17,5 @@ add_test(
 	COMMAND DataPostgreSQL-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
 )
 set_tests_properties(DataPostgreSQL PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
-target_link_libraries(DataPostgreSQL-testrunner PUBLIC Poco::DataPostgreSQL CppUnit)
+target_link_libraries(DataPostgreSQL-testrunner PUBLIC Poco::DataPostgreSQL Poco::DataTest CppUnit)
+target_include_directories(DataPostgreSQL-testrunner PUBLIC ${CMAKE_SOURCE_DIR}/Data/DataTest/include/)

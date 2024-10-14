@@ -52,6 +52,13 @@ public:
 		ODBC_TXN_CAPABILITY_TRUE = 1
 	};
 
+	enum CursorUse
+	{
+		ODBC_CURSOR_USE_ALWAYS = Poco::Data::SessionImpl::CURSOR_USE_ALWAYS,
+		ODBC_CURSOR_USE_IF_NEEDED = Poco::Data::SessionImpl::CURSOR_USE_IF_NEEDED,
+		ODBC_CURSOR_USE_NEVER = Poco::Data::SessionImpl::CURSOR_USE_NEVER
+	};
+
 	SessionImpl(const std::string& connect,
 		std::size_t loginTimeout,
 		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
@@ -73,6 +80,9 @@ public:
 
 	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
 		/// Returns an ODBC StatementImpl
+
+	void addFeatures();
+		/// Adds the ODBC session features and properties.
 
 	void open(const std::string& connect = "");
 		/// Opens a connection to the Database
@@ -151,6 +161,14 @@ public:
 	int maxStatementLength() const;
 		/// Returns maximum length of SQL statement allowed by driver.
 
+	void setLoginTimeout(const std::string&, const Poco::Any& value);
+		/// Sets the timeout (in seconds) for the session login.
+		/// Value must be of type (unsigned) int.
+		/// It must be set prior to logging in.
+
+	Poco::Any getLoginTimeout(const std::string&) const;
+		/// Returns the timeout (in seconds) for the session login.
+
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
 		/// Value must be of type int.
@@ -158,6 +176,15 @@ public:
 	Poco::Any getQueryTimeout(const std::string&) const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
+
+	void setCursorUse(const std::string&, const Poco::Any& value);
+		/// Sets the use of cursors:
+		///   - SQL_CUR_USE_ODBC - always
+		///   - SQL_CUR_USE_IF_NEEDED - if needed
+		///   - SQL_CUR_USE_DRIVER - never
+
+	Poco::Any getCursorUse(const std::string&) const;
+		/// Returns the use of cursors.
 
 	int queryTimeout() const;
 		/// Returns the timeout (in seconds) for queries,
@@ -172,6 +199,14 @@ public:
 
 	const std::string& dbEncoding() const;
 		/// Returns the database encoding.
+
+	void setMultiActiveResultset(const std::string&, bool value);
+		/// Sets the multiple active resultset capability, if available.
+		/// Does nothing, if feature is not available.
+
+	bool getMultiActiveResultset(const std::string&) const;
+		/// Returns the multiple active resultset capability, if available.
+		/// Returns false, if feature is not available.
 
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
@@ -195,17 +230,17 @@ private:
 		/// Sets the transaction isolation level.
 		/// Called internally from getTransactionIsolation()
 
-	std::string            _connector;
-	mutable ConnectionHandle _db;
-	Poco::Any              _maxFieldSize;
-	bool                   _autoBind;
-	bool                   _autoExtract;
-	TypeInfo               _dataTypes;
-	mutable char           _canTransact;
-	bool                   _inTransaction;
-	int                    _queryTimeout;
-	std::string            _dbEncoding;
-	Poco::FastMutex        _mutex;
+	std::string                   _connector;
+	mutable ConnectionHandle      _db;
+	Poco::Any                     _maxFieldSize;
+	bool                          _autoBind;
+	bool                          _autoExtract;
+	TypeInfo                      _dataTypes;
+	mutable TransactionCapability _canTransact;
+	std::atomic<bool>             _inTransaction;
+	int                           _queryTimeout;
+	std::string                   _dbEncoding;
+	Poco::FastMutex               _mutex;
 };
 
 
@@ -282,6 +317,12 @@ inline const std::string& SessionImpl::connectorName() const
 inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	return 0 != (ti & getTransactionIsolation());
+}
+
+
+inline Poco::Any SessionImpl::getLoginTimeout(const std::string&) const
+{
+	return _db.getLoginTimeout();
 }
 
 

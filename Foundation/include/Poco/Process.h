@@ -22,11 +22,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Process_WINCE.h"
-#else
 #include "Poco/Process_WIN32U.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/Process_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -98,7 +94,7 @@ public:
 		/// Returns the number of seconds spent by the
 		/// current process in user and kernel mode.
 
-	static ProcessHandle launch(const std::string& command, const Args& args);
+	static ProcessHandle launch(const std::string& command, const Args& args, int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -106,7 +102,8 @@ public:
 	static ProcessHandle launch(
 		const std::string& command,
 		const Args& args,
-		const std::string& initialDirectory);
+		const std::string& initialDirectory,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -117,7 +114,8 @@ public:
 		const Args& args,
 		Pipe* inPipe,
 		Pipe* outPipe,
-		Pipe* errPipe);
+		Pipe* errPipe,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -150,7 +148,8 @@ public:
 		const std::string& initialDirectory,
 		Pipe* inPipe,
 		Pipe* outPipe,
-		Pipe* errPipe);
+		Pipe* errPipe,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -184,7 +183,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const Env& env);
+		const Env& env,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -202,7 +202,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const Env& env);
+		const Env& env,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.

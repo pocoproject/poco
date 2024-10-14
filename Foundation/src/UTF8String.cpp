@@ -13,6 +13,7 @@
 
 
 #include "Poco/UTF8String.h"
+#include "Poco/UTFString.h"
 #include "Poco/Unicode.h"
 #include "Poco/TextIterator.h"
 #include "Poco/TextConverter.h"
@@ -21,6 +22,18 @@
 #include "Poco/Ascii.h"
 #include <algorithm>
 
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+
+#if defined(POCO_USE_STRING16)
+template class std::basic_string<Poco::UTF16Char, Poco::UTF16CharTraits>;
+#endif
+
+#if defined(POCO_USE_STRING32)
+template class std::basic_string<Poco::UTF32Char, Poco::UTF32CharTraits>;
+#endif
+
+#endif
 
 namespace Poco {
 
@@ -178,7 +191,7 @@ std::string UTF8::escape(const std::string &s, bool strictJSON)
 }
 
 
-std::string UTF8::escape(const std::string::const_iterator& begin, const std::string::const_iterator& end, bool strictJSON)
+std::string UTF8::escape(const std::string::const_iterator& begin, const std::string::const_iterator& end, bool strictJSON, bool lowerCaseHex)
 {
 	static Poco::UInt32 offsetsFromUTF8[6] = {
 		0x00000000UL, 0x00003080UL, 0x000E2080UL,
@@ -208,7 +221,7 @@ std::string UTF8::escape(const std::string::const_iterator& begin, const std::st
 		else if (ch == '\r') result += "\\r";
 		else if (ch == '\b') result += "\\b";
 		else if (ch == '\f') result += "\\f";
-		else if (ch == '\v') result += (strictJSON ? "\\u000B" : "\\v");
+		else if (ch == '\v') result += (strictJSON ? (lowerCaseHex ? "\\u000b" : "\\u000B") : "\\v");
 		else if (ch == '\a') result += (strictJSON ? "\\u0007" : "\\a");
 		else if (ch == '\\') result +=  "\\\\";
 		else if (ch == '\"') result +=  "\\\"";
@@ -217,20 +230,20 @@ std::string UTF8::escape(const std::string::const_iterator& begin, const std::st
 		else if (ch < 32 || ch == 0x7f)
 		{
 			result += "\\u";
-			NumberFormatter::appendHex(result, (unsigned short) ch, 4);
+			NumberFormatter::appendHex(result, (unsigned short) ch, 4, lowerCaseHex);
 		}
 		else if (ch > 0xFFFF)
 		{
 			ch -= 0x10000;
 			result += "\\u";
-			NumberFormatter::appendHex(result, (unsigned short) (( ch >> 10 ) & 0x03ff ) + 0xd800, 4);
+			NumberFormatter::appendHex(result, (unsigned short) (( ch >> 10 ) & 0x03ff ) + 0xd800, 4, lowerCaseHex);
 			result += "\\u";
-			NumberFormatter::appendHex(result, (unsigned short) (ch & 0x03ff ) + 0xdc00, 4);
+			NumberFormatter::appendHex(result, (unsigned short) (ch & 0x03ff ) + 0xdc00, 4, lowerCaseHex);
 		}
 		else if (ch >= 0x80 && ch <= 0xFFFF)
 		{
 			result += "\\u";
-			NumberFormatter::appendHex(result, (unsigned short) ch, 4);
+			NumberFormatter::appendHex(result, (unsigned short) ch, 4, lowerCaseHex);
 		}
 		else
 		{

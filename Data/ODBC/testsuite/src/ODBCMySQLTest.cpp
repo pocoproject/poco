@@ -38,13 +38,13 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.3 Unicode Driver"
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 8.2 Unicode Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
-#define MYSQL_DB "test"
-#define MYSQL_UID "root"
-#define MYSQL_PWD "poco"
-#define MYSQL_DB "test"
+#define MYSQL_DB "pocotest"
+#define MYSQL_UID "pocotest"
+#define MYSQL_PWD "pocotest"
+#define MYSQL_DB "pocotest"
 
 
 ODBCTest::SessionPtr ODBCMySQLTest::_pSession;
@@ -164,7 +164,7 @@ void ODBCMySQLTest::testNull()
 		recreateNullsTable("NOT NULL");
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HY000");
+		_pExecutor->notNulls({"HY000"});
 		i += 2;
 	}
 
@@ -421,6 +421,9 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCMySQLTest");
 
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSession);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexType);
@@ -491,6 +494,9 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransactor);

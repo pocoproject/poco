@@ -18,7 +18,6 @@
 #include "Poco/DigestEngine.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
-#include "Poco/SingletonHolder.h"
 #include <cstring>
 
 
@@ -152,15 +151,10 @@ void UUIDGenerator::seed(UInt32 n)
 }
 
 
-namespace
-{
-	static SingletonHolder<UUIDGenerator> sh;
-}
-
-
 UUIDGenerator& UUIDGenerator::defaultGenerator()
 {
-	return *sh.get();
+	static UUIDGenerator g;
+	return g;
 }
 
 

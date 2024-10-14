@@ -4,14 +4,11 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 
 # Headers
 file(GLOB_RECURSE HDRS_G "src/*.h")
-POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
+file(GLOB HDRS_E ${CMAKE_SOURCE_DIR}/Data/DataTest/include/*.h)
+POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_E})
 
 POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 	src/WinDriver.cpp
-)
-
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS WINCE
-	src/WinCEDriver.cpp
 )
 
 add_executable(DataSQLite-testrunner ${TEST_SRCS})
@@ -29,4 +26,6 @@ else()
 	)
 	set_tests_properties(DataSQLite PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 endif()
-target_link_libraries(DataSQLite-testrunner PUBLIC Poco::DataSQLite CppUnit)
+
+target_link_libraries(DataSQLite-testrunner PUBLIC Poco::DataSQLite Poco::DataTest CppUnit)
+target_include_directories(DataSQLite-testrunner PUBLIC ${CMAKE_SOURCE_DIR}/Data/DataTest/include/)

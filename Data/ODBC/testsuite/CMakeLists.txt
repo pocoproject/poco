@@ -25,4 +25,6 @@ else()
 	)
 	set_tests_properties(DataODBC PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 endif()
-target_link_libraries(DataODBC-testrunner PUBLIC Poco::DataODBC CppUnit)
+
+target_link_libraries(DataODBC-testrunner PUBLIC Poco::DataTest Poco::DataODBC Poco::Data CppUnit)
+target_include_directories(DataODBC-testrunner PUBLIC ${CMAKE_SOURCE_DIR}/Data/DataTest/include/)

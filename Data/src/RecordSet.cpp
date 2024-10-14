@@ -13,6 +13,7 @@
 
 
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/Extraction.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
@@ -132,6 +133,258 @@ void RecordSet::reset(const Statement& stmt)
 }
 
 
+template <class C>
+const Column<C>& RecordSet::column(const std::string& name) const
+	/// Returns the reference to the first Column with the specified name.
+{
+	if (isBulkExtraction())
+	{
+		using E = InternalBulkExtraction<C>;
+		return columnImpl<C,E>(name);
+	}
+	else
+	{
+		using E = InternalExtraction<C>;
+		return columnImpl<C,E>(name);
+	}
+}
+
+
+template Data_API const Column<std::vector<bool>>& RecordSet::column<std::vector<bool>>(const std::string& name) const;
+template Data_API const Column<std::vector<UInt8>>& RecordSet::column<std::vector<UInt8>>(const std::string& name) const;
+template Data_API const Column<std::vector<Int16>>& RecordSet::column<std::vector<Int16>>(const std::string& name) const;
+template Data_API const Column<std::vector<UInt16>>& RecordSet::column<std::vector<UInt16>>(const std::string& name) const;
+template Data_API const Column<std::vector<Int32>>& RecordSet::column<std::vector<Int32>>(const std::string& name) const;
+template Data_API const Column<std::vector<UInt32>>& RecordSet::column<std::vector<UInt32>>(const std::string& name) const;
+template Data_API const Column<std::vector<Int64>>& RecordSet::column<std::vector<Int64>>(const std::string& name) const;
+template Data_API const Column<std::vector<UInt64>>& RecordSet::column<std::vector<UInt64>>(const std::string& name) const;
+template Data_API const Column<std::vector<float>>& RecordSet::column<std::vector<float>>(const std::string& name) const;
+template Data_API const Column<std::vector<double>>& RecordSet::column<std::vector<double>>(const std::string& name) const;
+template Data_API const Column<std::vector<std::string>>& RecordSet::column<std::vector<std::string>>(const std::string& name) const;
+template Data_API const Column<std::vector<UTF16String>>& RecordSet::column<std::vector<UTF16String>>(const std::string& name) const;
+template Data_API const Column<std::vector<BLOB>>& RecordSet::column<std::vector<BLOB>>(const std::string& name) const;
+template Data_API const Column<std::vector<CLOB>>& RecordSet::column<std::vector<CLOB>>(const std::string& name) const;
+template Data_API const Column<std::vector<Date>>& RecordSet::column<std::vector<Date>>(const std::string& name) const;
+template Data_API const Column<std::vector<Time>>& RecordSet::column<std::vector<Time>>(const std::string& name) const;
+template Data_API const Column<std::vector<DateTime>>& RecordSet::column<std::vector<DateTime>>(const std::string& name) const;
+template Data_API const Column<std::vector<UUID>>& RecordSet::column<std::vector<UUID>>(const std::string& name) const;
+
+template Data_API const Column<std::list<bool>>& RecordSet::column<std::list<bool>>(const std::string& name) const;
+template Data_API const Column<std::list<UInt8>>& RecordSet::column<std::list<UInt8>>(const std::string& name) const;
+template Data_API const Column<std::list<Int16>>& RecordSet::column<std::list<Int16>>(const std::string& name) const;
+template Data_API const Column<std::list<UInt16>>& RecordSet::column<std::list<UInt16>>(const std::string& name) const;
+template Data_API const Column<std::list<Int32>>& RecordSet::column<std::list<Int32>>(const std::string& name) const;
+template Data_API const Column<std::list<UInt32>>& RecordSet::column<std::list<UInt32>>(const std::string& name) const;
+template Data_API const Column<std::list<Int64>>& RecordSet::column<std::list<Int64>>(const std::string& name) const;
+template Data_API const Column<std::list<UInt64>>& RecordSet::column<std::list<UInt64>>(const std::string& name) const;
+template Data_API const Column<std::list<float>>& RecordSet::column<std::list<float>>(const std::string& name) const;
+template Data_API const Column<std::list<double>>& RecordSet::column<std::list<double>>(const std::string& name) const;
+template Data_API const Column<std::list<std::string>>& RecordSet::column<std::list<std::string>>(const std::string& name) const;
+template Data_API const Column<std::list<UTF16String>>& RecordSet::column<std::list<UTF16String>>(const std::string& name) const;
+template Data_API const Column<std::list<BLOB>>& RecordSet::column<std::list<BLOB>>(const std::string& name) const;
+template Data_API const Column<std::list<CLOB>>& RecordSet::column<std::list<CLOB>>(const std::string& name) const;
+template Data_API const Column<std::list<Date>>& RecordSet::column<std::list<Date>>(const std::string& name) const;
+template Data_API const Column<std::list<Time>>& RecordSet::column<std::list<Time>>(const std::string& name) const;
+template Data_API const Column<std::list<DateTime>>& RecordSet::column<std::list<DateTime>>(const std::string& name) const;
+template Data_API const Column<std::list<UUID>>& RecordSet::column<std::list<UUID>>(const std::string& name) const;
+
+template Data_API const Column<std::deque<bool>>& RecordSet::column<std::deque<bool>>(const std::string& name) const;
+template Data_API const Column<std::deque<UInt8>>& RecordSet::column<std::deque<UInt8>>(const std::string& name) const;
+template Data_API const Column<std::deque<Int16>>& RecordSet::column<std::deque<Int16>>(const std::string& name) const;
+template Data_API const Column<std::deque<UInt16>>& RecordSet::column<std::deque<UInt16>>(const std::string& name) const;
+template Data_API const Column<std::deque<Int32>>& RecordSet::column<std::deque<Int32>>(const std::string& name) const;
+template Data_API const Column<std::deque<UInt32>>& RecordSet::column<std::deque<UInt32>>(const std::string& name) const;
+template Data_API const Column<std::deque<Int64>>& RecordSet::column<std::deque<Int64>>(const std::string& name) const;
+template Data_API const Column<std::deque<UInt64>>& RecordSet::column<std::deque<UInt64>>(const std::string& name) const;
+template Data_API const Column<std::deque<float>>& RecordSet::column<std::deque<float>>(const std::string& name) const;
+template Data_API const Column<std::deque<double>>& RecordSet::column<std::deque<double>>(const std::string& name) const;
+template Data_API const Column<std::deque<std::string>>& RecordSet::column<std::deque<std::string>>(const std::string& name) const;
+template Data_API const Column<std::deque<UTF16String>>& RecordSet::column<std::deque<UTF16String>>(const std::string& name) const;
+template Data_API const Column<std::deque<BLOB>>& RecordSet::column<std::deque<BLOB>>(const std::string& name) const;
+template Data_API const Column<std::deque<CLOB>>& RecordSet::column<std::deque<CLOB>>(const std::string& name) const;
+template Data_API const Column<std::deque<Date>>& RecordSet::column<std::deque<Date>>(const std::string& name) const;
+template Data_API const Column<std::deque<Time>>& RecordSet::column<std::deque<Time>>(const std::string& name) const;
+template Data_API const Column<std::deque<DateTime>>& RecordSet::column<std::deque<DateTime>>(const std::string& name) const;
+template Data_API const Column<std::deque<UUID>>& RecordSet::column<std::deque<UUID>>(const std::string& name) const;
+
+
+template <class C>
+const Column<C>& RecordSet::column(std::size_t pos) const
+	/// Returns the reference to column at specified position.
+{
+	if (isBulkExtraction())
+	{
+		using E = InternalBulkExtraction<C>;
+		return columnImpl<C,E>(pos);
+	}
+	else
+	{
+		using E = InternalExtraction<C>;
+		return columnImpl<C,E>(pos);
+	}
+}
+
+
+template Data_API const Column<std::vector<bool>>& RecordSet::column<std::vector<bool>>(std::size_t pos) const;
+template Data_API const Column<std::vector<UInt8>>& RecordSet::column<std::vector<UInt8>>(std::size_t pos) const;
+template Data_API const Column<std::vector<Int16>>& RecordSet::column<std::vector<Int16>>(std::size_t pos) const;
+template Data_API const Column<std::vector<UInt16>>& RecordSet::column<std::vector<UInt16>>(std::size_t pos) const;
+template Data_API const Column<std::vector<Int32>>& RecordSet::column<std::vector<Int32>>(std::size_t pos) const;
+template Data_API const Column<std::vector<UInt32>>& RecordSet::column<std::vector<UInt32>>(std::size_t pos) const;
+template Data_API const Column<std::vector<Int64>>& RecordSet::column<std::vector<Int64>>(std::size_t pos) const;
+template Data_API const Column<std::vector<UInt64>>& RecordSet::column<std::vector<UInt64>>(std::size_t pos) const;
+template Data_API const Column<std::vector<float>>& RecordSet::column<std::vector<float>>(std::size_t pos) const;
+template Data_API const Column<std::vector<double>>& RecordSet::column<std::vector<double>>(std::size_t pos) const;
+template Data_API const Column<std::vector<std::string>>& RecordSet::column<std::vector<std::string>>(std::size_t pos) const;
+template Data_API const Column<std::vector<UTF16String>>& RecordSet::column<std::vector<UTF16String>>(std::size_t pos) const;
+template Data_API const Column<std::vector<BLOB>>& RecordSet::column<std::vector<BLOB>>(std::size_t pos) const;
+template Data_API const Column<std::vector<CLOB>>& RecordSet::column<std::vector<CLOB>>(std::size_t pos) const;
+template Data_API const Column<std::vector<Date>>& RecordSet::column<std::vector<Date>>(std::size_t pos) const;
+template Data_API const Column<std::vector<Time>>& RecordSet::column<std::vector<Time>>(std::size_t pos) const;
+template Data_API const Column<std::vector<DateTime>>& RecordSet::column<std::vector<DateTime>>(std::size_t pos) const;
+template Data_API const Column<std::vector<UUID>>& RecordSet::column<std::vector<UUID>>(std::size_t pos) const;
+
+template Data_API const Column<std::list<bool>>& RecordSet::column<std::list<bool>>(std::size_t pos) const;
+template Data_API const Column<std::list<UInt8>>& RecordSet::column<std::list<UInt8>>(std::size_t pos) const;
+template Data_API const Column<std::list<Int16>>& RecordSet::column<std::list<Int16>>(std::size_t pos) const;
+template Data_API const Column<std::list<UInt16>>& RecordSet::column<std::list<UInt16>>(std::size_t pos) const;
+template Data_API const Column<std::list<Int32>>& RecordSet::column<std::list<Int32>>(std::size_t pos) const;
+template Data_API const Column<std::list<UInt32>>& RecordSet::column<std::list<UInt32>>(std::size_t pos) const;
+template Data_API const Column<std::list<Int64>>& RecordSet::column<std::list<Int64>>(std::size_t pos) const;
+template Data_API const Column<std::list<UInt64>>& RecordSet::column<std::list<UInt64>>(std::size_t pos) const;
+template Data_API const Column<std::list<float>>& RecordSet::column<std::list<float>>(std::size_t pos) const;
+template Data_API const Column<std::list<double>>& RecordSet::column<std::list<double>>(std::size_t pos) const;
+template Data_API const Column<std::list<std::string>>& RecordSet::column<std::list<std::string>>(std::size_t pos) const;
+template Data_API const Column<std::list<UTF16String>>& RecordSet::column<std::list<UTF16String>>(std::size_t pos) const;
+template Data_API const Column<std::list<BLOB>>& RecordSet::column<std::list<BLOB>>(std::size_t pos) const;
+template Data_API const Column<std::list<CLOB>>& RecordSet::column<std::list<CLOB>>(std::size_t pos) const;
+template Data_API const Column<std::list<Date>>& RecordSet::column<std::list<Date>>(std::size_t pos) const;
+template Data_API const Column<std::list<Time>>& RecordSet::column<std::list<Time>>(std::size_t pos) const;
+template Data_API const Column<std::list<DateTime>>& RecordSet::column<std::list<DateTime>>(std::size_t pos) const;
+template Data_API const Column<std::list<UUID>>& RecordSet::column<std::list<UUID>>(std::size_t pos) const;
+
+template Data_API const Column<std::deque<bool>>& RecordSet::column<std::deque<bool>>(std::size_t pos) const;
+template Data_API const Column<std::deque<UInt8>>& RecordSet::column<std::deque<UInt8>>(std::size_t pos) const;
+template Data_API const Column<std::deque<Int16>>& RecordSet::column<std::deque<Int16>>(std::size_t pos) const;
+template Data_API const Column<std::deque<UInt16>>& RecordSet::column<std::deque<UInt16>>(std::size_t pos) const;
+template Data_API const Column<std::deque<Int32>>& RecordSet::column<std::deque<Int32>>(std::size_t pos) const;
+template Data_API const Column<std::deque<UInt32>>& RecordSet::column<std::deque<UInt32>>(std::size_t pos) const;
+template Data_API const Column<std::deque<Int64>>& RecordSet::column<std::deque<Int64>>(std::size_t pos) const;
+template Data_API const Column<std::deque<UInt64>>& RecordSet::column<std::deque<UInt64>>(std::size_t pos) const;
+template Data_API const Column<std::deque<float>>& RecordSet::column<std::deque<float>>(std::size_t pos) const;
+template Data_API const Column<std::deque<double>>& RecordSet::column<std::deque<double>>(std::size_t pos) const;
+template Data_API const Column<std::deque<std::string>>& RecordSet::column<std::deque<std::string>>(std::size_t pos) const;
+template Data_API const Column<std::deque<UTF16String>>& RecordSet::column<std::deque<UTF16String>>(std::size_t pos) const;
+template Data_API const Column<std::deque<BLOB>>& RecordSet::column<std::deque<BLOB>>(std::size_t pos) const;
+template Data_API const Column<std::deque<CLOB>>& RecordSet::column<std::deque<CLOB>>(std::size_t pos) const;
+template Data_API const Column<std::deque<Date>>& RecordSet::column<std::deque<Date>>(std::size_t pos) const;
+template Data_API const Column<std::deque<Time>>& RecordSet::column<std::deque<Time>>(std::size_t pos) const;
+template Data_API const Column<std::deque<DateTime>>& RecordSet::column<std::deque<DateTime>>(std::size_t pos) const;
+template Data_API const Column<std::deque<UUID>>& RecordSet::column<std::deque<UUID>>(std::size_t pos) const;
+
+
+template <class T>
+const T& RecordSet::value(std::size_t col, std::size_t row, bool useFilter) const
+	/// Returns the reference to data value at [col, row] location.
+{
+	if (useFilter && isFiltered() && !isAllowed(row))
+		throw InvalidAccessException("Row not allowed");
+
+	switch (storage())
+	{
+		case STORAGE_VECTOR:
+		{
+			using C = typename std::vector<T>;
+			return column<C>(col).value(row);
+		}
+		case STORAGE_LIST:
+		{
+			using C = typename std::list<T>;
+			return column<C>(col).value(row);
+		}
+		case STORAGE_DEQUE:
+		case STORAGE_UNKNOWN:
+		{
+			using C = typename std::deque<T>;
+			return column<C>(col).value(row);
+		}
+		default:
+			throw IllegalStateException("Invalid storage setting.");
+	}
+}
+
+
+template Data_API const bool& RecordSet::value<bool>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const UInt8& RecordSet::value<UInt8>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const Int16& RecordSet::value<Int16>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const UInt16& RecordSet::value<UInt16>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const Int32& RecordSet::value<Int32>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const UInt32& RecordSet::value<UInt32>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const Int64& RecordSet::value<Int64>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const UInt64& RecordSet::value<UInt64>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const float& RecordSet::value<float>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const double& RecordSet::value<double>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const std::string& RecordSet::value<std::string>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const UTF16String& RecordSet::value<UTF16String>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const BLOB& RecordSet::value<BLOB>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const CLOB& RecordSet::value<CLOB>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const Date& RecordSet::value<Date>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const Time& RecordSet::value<Time>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const DateTime& RecordSet::value<DateTime>(std::size_t col, std::size_t row, bool useFilter) const;
+template Data_API const UUID& RecordSet::value<UUID>(std::size_t col, std::size_t row, bool useFilter) const;
+
+
+template <class T>
+const T& RecordSet::value(const std::string& name, std::size_t row, bool useFilter) const
+	/// Returns the reference to data value at named column, row location.
+{
+	if (useFilter && isFiltered() && !isAllowed(row))
+		throw InvalidAccessException("Row not allowed");
+
+	switch (storage())
+	{
+		case STORAGE_VECTOR:
+		{
+			using C = typename std::vector<T>;
+			return column<C>(name).value(row);
+		}
+		case STORAGE_LIST:
+		{
+			using C = typename std::list<T>;
+			return column<C>(name).value(row);
+		}
+		case STORAGE_DEQUE:
+		case STORAGE_UNKNOWN:
+		{
+			using C = typename std::deque<T>;
+			return column<C>(name).value(row);
+		}
+		default:
+			throw IllegalStateException("Invalid storage setting.");
+	}
+}
+
+
+template Data_API const bool& RecordSet::value<bool>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const UInt8& RecordSet::value<UInt8>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const Int16& RecordSet::value<Int16>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const UInt16& RecordSet::value<UInt16>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const Int32& RecordSet::value<Int32>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const UInt32& RecordSet::value<UInt32>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const Int64& RecordSet::value<Int64>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const UInt64& RecordSet::value<UInt64>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const float& RecordSet::value<float>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const double& RecordSet::value<double>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const std::string& RecordSet::value<std::string>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const UTF16String& RecordSet::value<UTF16String>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const BLOB& RecordSet::value<BLOB>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const CLOB& RecordSet::value<CLOB>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const Date& RecordSet::value<Date>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const Time& RecordSet::value<Time>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const DateTime& RecordSet::value<DateTime>(const std::string& name, std::size_t row, bool useFilter) const;
+template Data_API const UUID& RecordSet::value<UUID>(const std::string& name, std::size_t row, bool useFilter) const;
+
+
 Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFilter) const
 {
 	if (useFilter && isFiltered() && !isAllowed(row))
@@ -244,7 +497,8 @@ Row& RecordSet::row(std::size_t pos)
 
 std::size_t RecordSet::rowCount() const
 {
-	poco_assert (extractions().size());
+	if (extractions().size() == 0) return 0;
+
 	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;
 
@@ -255,6 +509,12 @@ std::size_t RecordSet::rowCount() const
 	}
 
 	return counter;
+}
+
+
+std::size_t RecordSet::affectedRowCount() const
+{
+	return Statement::affectedRowCount();
 }
 
 

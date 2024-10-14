@@ -60,6 +60,16 @@ private:
 };
 
 
+class Foundation_API NullPurgeStrategy : public PurgeStrategy
+{
+public:
+	NullPurgeStrategy();
+	~NullPurgeStrategy();
+
+	void purge(const std::string& path);
+};
+
+
 class Foundation_API PurgeByAgeStrategy: public PurgeStrategy
 	/// This purge strategy purges all files that have
 	/// exceeded a given age (given in seconds).

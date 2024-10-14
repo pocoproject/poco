@@ -20,7 +20,6 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Session.h"
-#include "Poco/Data/Extraction.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
@@ -133,6 +132,9 @@ public:
 		/// for large recordsets, so it should be used judiciously.
 		/// Use totalRowCount() to obtain the total number of rows.
 
+	std::size_t affectedRowCount() const;
+		/// Returns the number of rows affected by the statement execution.
+
 	std::size_t extractedRowCount() const;
 		/// Returns the number of rows extracted during the last statement
 		/// execution.
@@ -163,100 +165,23 @@ public:
 		/// Returns the number of columns in the recordset.
 
 	template <class C>
-	const Column<C>& column(const std::string& name) const
+	const Column<C>& column(const std::string& name) const;
 		/// Returns the reference to the first Column with the specified name.
-	{
-		if (isBulkExtraction())
-		{
-			using E = InternalBulkExtraction<C>;
-			return columnImpl<C,E>(name);
-		}
-		else
-		{
-			using E = InternalExtraction<C>;
-			return columnImpl<C,E>(name);
-		}
-	}
 
 	template <class C>
-	const Column<C>& column(std::size_t pos) const
-		/// Returns the reference to column at specified position.
-	{
-		if (isBulkExtraction())
-		{
-			using E = InternalBulkExtraction<C>;
-			return columnImpl<C,E>(pos);
-		}
-		else
-		{
-			using E = InternalExtraction<C>;
-			return columnImpl<C,E>(pos);
-		}
-	}
+	const Column<C>& column(std::size_t pos) const;
 
 	Row& row(std::size_t pos);
 		/// Returns reference to row at position pos.
 		/// Rows are lazy-created and cached.
 
 	template <class T>
-	const T& value(std::size_t col, std::size_t row, bool useFilter = true) const
+	const T& value(std::size_t col, std::size_t row, bool useFilter = true) const;
 		/// Returns the reference to data value at [col, row] location.
-	{
-		if (useFilter && isFiltered() && !isAllowed(row))
-			throw InvalidAccessException("Row not allowed");
-
-		switch (storage())
-		{
-			case STORAGE_VECTOR:
-			{
-				using C = typename std::vector<T>;
-				return column<C>(col).value(row);
-			}
-			case STORAGE_LIST:
-			{
-				using C = typename std::list<T>;
-				return column<C>(col).value(row);
-			}
-			case STORAGE_DEQUE:
-			case STORAGE_UNKNOWN:
-			{
-				using C = typename std::deque<T>;
-				return column<C>(col).value(row);
-			}
-			default:
-				throw IllegalStateException("Invalid storage setting.");
-		}
-	}
 
 	template <class T>
-	const T& value(const std::string& name, std::size_t row, bool useFilter = true) const
+	const T& value(const std::string& name, std::size_t row, bool useFilter = true) const;
 		/// Returns the reference to data value at named column, row location.
-	{
-		if (useFilter && isFiltered() && !isAllowed(row))
-			throw InvalidAccessException("Row not allowed");
-
-		switch (storage())
-		{
-			case STORAGE_VECTOR:
-			{
-				using C = typename std::vector<T>;
-				return column<C>(name).value(row);
-			}
-			case STORAGE_LIST:
-			{
-				using C = typename std::list<T>;
-				return column<C>(name).value(row);
-			}
-			case STORAGE_DEQUE:
-			case STORAGE_UNKNOWN:
-			{
-				using C = typename std::deque<T>;
-				return column<C>(name).value(row);
-			}
-			default:
-				throw IllegalStateException("Invalid storage setting.");
-		}
-	}
 
 	Poco::Dynamic::Var value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at column, row location.
@@ -452,27 +377,22 @@ private:
 	const Column<C>& columnImpl(std::size_t pos) const
 		/// Returns the reference to column at specified position.
 	{
-		using T = typename C::value_type;
-		using ExtractionVecPtr = const E*;
-
 		const AbstractExtractionVec& rExtractions = extractions();
 
 		std::size_t s = rExtractions.size();
 		if (0 == s || pos >= s)
 			throw RangeException(Poco::format("Invalid column index: %z", pos));
 
-		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
-
-		if (pExtraction)
+		auto pExtraction = rExtractions[pos].cast<E>();
+		if (!pExtraction)
 		{
-			return pExtraction->column();
-		}
-		else
-		{
-			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",
+			throw Poco::BadCastException(Poco::format("Type dynamic cast failed!\n"
+				"Column: %z\nConversion:\n%s\n%s",
 				pos,
-				std::string(typeid(T).name())));
+				Poco::demangle(typeid(typename E::ValType).name()),
+				rExtractions[pos]->getHeldType()));
 		}
+		return pExtraction->column();
 	}
 
 	bool isAllowed(std::size_t row) const;

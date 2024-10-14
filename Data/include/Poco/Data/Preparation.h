@@ -50,7 +50,8 @@ public:
 	void prepare()
 		/// Prepares data.
 	{
-		TypeHandler<T>::prepare(_pos, _val, preparation());
+		auto pPrep = preparation();
+		TypeHandler<T>::prepare(_pos, _val, pPrep);
 	}
 
 private:

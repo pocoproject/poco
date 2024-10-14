@@ -334,6 +334,111 @@ void AnyTest::testAnyInt()
 }
 
 
+class A
+{
+public:
+    void f() {}
+	int m;
+};
+
+
+void AnyTest::testAnyPointer()
+{
+	int i = 13;
+
+	Any a = &i;
+	assertTrue (a.type() == typeid(int*));
+	assertFalse (AnyHoldsNullPtr<int*>(a));
+	assertFalse (AnyHoldsNullPtr<int*>(&a));
+	int* p = AnyCast<int*>(&i);
+	assertTrue (*p == 13);
+	Any b = a;
+	assertTrue (b.type() == typeid(int*));
+	int* cpyI = AnyCast<int*>(b);
+	assertTrue (*cpyI == *p);
+	*cpyI = 20;
+	assertTrue (*cpyI == *p);
+	std::string* s = AnyCast<std::string>(&a);
+	assertTrue (s == NULL);
+	assertTrue (AnyCast<std::nullptr_t>(&a) == nullptr);
+
+	int* POCO_UNUSED tmp = AnyCast<int*>(a);
+	const Any c = a;
+	tmp = AnyCast<int*>(a);
+
+	Any nullPtr(nullptr);
+	assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullptr));
+	assertFalse (AnyHoldsNullPtr<void*>(0));
+	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
+	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(&nullPtr));
+	try
+	{
+		AnyHoldsNullPtr<void*>(nullPtr);
+		fail ("AnyCast must fail", __LINE__, __FILE__);
+	}
+	catch(const Poco::BadCastException&) {}
+	nullPtr = &i;
+	try
+	{
+		assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
+		fail ("AnyCast must fail", __LINE__, __FILE__);
+	}
+	catch(const Poco::BadCastException&) {}
+	assertFalse (AnyHoldsNullPtr<int*>(nullPtr));
+
+	void* voidPtr = nullptr;
+	Any nullVoidPtr(voidPtr);
+	assertTrue (AnyHoldsNullPtr<void*>(nullVoidPtr));
+	try
+	{
+		AnyHoldsNullPtr<std::nullptr_t>(voidPtr);
+		fail ("AnyCast must fail", __LINE__, __FILE__);
+	}
+	catch(const Poco::BadCastException&) {}
+
+	using FP = void (AnyTest::*)();
+	FP fp = nullptr;
+	Any funcPtr(fp);
+	assertTrue (AnyHoldsNullPtr<FP>(funcPtr));
+	try
+	{
+		AnyHoldsNullPtr<FP>(voidPtr);
+		fail ("AnyCast must fail", __LINE__, __FILE__);
+	}
+	catch(const Poco::BadCastException&) {}
+	funcPtr = &AnyTest::testAnyPointer;
+	assertFalse (AnyHoldsNullPtr<FP>(funcPtr));
+
+	using OP = decltype(&AnyTest::_dummyObject);
+	OP op = nullptr;
+	Any objPtr(op);
+	assertTrue (AnyHoldsNullPtr<OP>(objPtr));
+	objPtr = &AnyTest::_dummyObject;
+	try
+	{
+		AnyHoldsNullPtr<OP>(funcPtr);
+		fail ("AnyCast must fail", __LINE__, __FILE__);
+	}
+	catch(const Poco::BadCastException&) {}
+
+	assertFalse (AnyHoldsNullPtr<OP>(objPtr));
+
+	using MP = decltype(&AnyTest::_dummy);
+	MP mp = nullptr;
+	Any memPtr(mp);
+	assertTrue (AnyHoldsNullPtr<MP>(memPtr));
+	memPtr = &AnyTest::_dummy;
+	try
+	{
+		AnyHoldsNullPtr<MP>(objPtr);
+		fail ("AnyCast must fail", __LINE__, __FILE__);
+	}
+	catch(const Poco::BadCastException&) {}
+
+	assertFalse (AnyHoldsNullPtr<MP>(memPtr));
+}
+
+
 void AnyTest::testAnyComplexType()
 {
 	SomeClass str(13,std::string("hello"));
@@ -456,6 +561,7 @@ CppUnit::Test* AnyTest::suite()
 	CppUnit_addTest(pSuite, AnyTest, testAnySwap);
 	CppUnit_addTest(pSuite, AnyTest, testAnyEmptyCopy);
 	CppUnit_addTest(pSuite, AnyTest, testAnyCastToReference);
+	CppUnit_addTest(pSuite, AnyTest, testAnyPointer);
 	CppUnit_addTest(pSuite, AnyTest, testAnyInt);
 	CppUnit_addTest(pSuite, AnyTest, testAnyComplexType);
 	CppUnit_addTest(pSuite, AnyTest, testAnyVector);

@@ -37,6 +37,7 @@ public:
 	Node* firstChild() const;
 	Node* lastChild() const;
 	Node* insertBefore(Node* newChild, Node* refChild);
+	Node* insertAfterNP(Node* newChild, Node* refChild);
 	Node* replaceChild(Node* newChild, Node* oldChild);
 	Node* removeChild(Node* oldChild);
 	Node* appendChild(Node* newChild);

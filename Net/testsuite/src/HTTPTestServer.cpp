@@ -37,6 +37,17 @@ HTTPTestServer::HTTPTestServer():
 }
 
 
+HTTPTestServer::HTTPTestServer(const std::string& addr) :
+	_socket(SocketAddress(addr)),
+	_thread("HTTPTestServer"),
+	_stop(false)
+{
+	_thread.start(*this);
+	_ready.wait();
+	_lastRequest.reserve(4000);
+}
+
+
 HTTPTestServer::~HTTPTestServer()
 {
 	_stop = true;
@@ -74,13 +85,15 @@ void HTTPTestServer::run()
 				{
 					_lastRequest.append(buffer, n);
 					if (!requestComplete())
+					{
 						n = ss.receiveBytes(buffer, sizeof(buffer));
+					}
 					else
 						n = 0;
 				}
 				std::string response = handleRequest();
-				ss.sendBytes(response.data(), (int) response.size());
-				Poco::Thread::sleep(1000);
+				n = ss.sendBytes(response.data(), (int) response.size());
+				if (n) Poco::Thread::sleep(1000);
 				try
 				{
 					ss.shutdown();
@@ -164,9 +177,6 @@ std::string HTTPTestServer::handleRequest() const
 	}
 	else if (_lastRequest.substr(0, 10) == "POST /fail")
 	{
-		std::string::size_type pos = _lastRequest.find("\r\n\r\n");
-		pos += 4;
-		std::string body = _lastRequest.substr(pos);
 		response.append("HTTP/1.1 400 Bad Request\r\n");
 		response.append("Connection: Close\r\n");
 		response.append("\r\n");
@@ -251,7 +261,7 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("\r\n");
 	}
 	else if (_lastRequest.substr(0, 5) == "GET /" ||
-	    _lastRequest.substr(0, 6) == "HEAD /")
+	         _lastRequest.substr(0, 6) == "HEAD /")
 	{
 		std::string body(SMALL_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");

@@ -579,6 +579,9 @@
     <ClCompile Include="src\NotificationCenter.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AsyncNotificationCenter.cpp">
+      <Filter>Notifications\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\NotificationQueue.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
@@ -642,6 +645,9 @@
     <ClCompile Include="src\NamedMutex_WIN32U.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PIDFile.cpp">
+      <Filter>Processes\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Pipe.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
@@ -667,6 +673,9 @@
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Process_WIN32U.cpp">
+      <Filter>Processes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessRunner.cpp">
       <Filter>Processes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SharedMemory.cpp">
@@ -915,6 +924,8 @@
     <ClCompile Include="src\pcre2_xclass.c">
       <Filter>RegularExpression\PCRE2 Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActiveThreadPool.cpp" />
+    <ClCompile Include="src\VarVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1439,6 +1450,12 @@
     <ClInclude Include="include\Poco\AbstractObserver.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\AsyncObserver.h">
+      <Filter>Notifications\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\AsyncNotificationCenter.h">
+      <Filter>Notifications\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\NObserver.h">
       <Filter>Notifications\Header Files</Filter>
     </ClInclude>
@@ -1514,6 +1531,9 @@
     <ClInclude Include="include\Poco\NamedMutex_WIN32U.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PIDFile.h">
+      <Filter>Processes\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Pipe.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
@@ -1539,6 +1559,9 @@
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Process_WIN32U.h">
+      <Filter>Processes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ProcessRunner.h">
       <Filter>Processes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\SharedMemory.h">

@@ -15,10 +15,23 @@
 #include "Poco/Net/HostEntry.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <set>
 
 
 namespace Poco {
 namespace Net {
+
+
+template <typename T>
+void removeDuplicates(std::vector<T>& list)
+{
+	std::set<T> uniqueValues;
+	// Remove duplicates and preserve order
+	list.erase(
+		std::remove_if(list.begin(), list.end(), [&uniqueValues](const T& value) { return !uniqueValues.insert(value).second; }),
+		list.end()
+	);
+}
 
 
 HostEntry::HostEntry()

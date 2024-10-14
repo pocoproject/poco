@@ -31,7 +31,8 @@ Symbol::Symbol():
 	_id(_nextId++),
 	_pNameSpace(0),
 	_access(ACC_PUBLIC),
-	_line(-1)
+	_line(-1),
+	_order(0)
 {
 }
 
@@ -41,7 +42,8 @@ Symbol::Symbol(const std::string& name, NameSpace* pNameSpace):
 	_name(name),
 	_pNameSpace(pNameSpace),
 	_access(ACC_PUBLIC),
-	_line(-1)
+	_line(-1),
+	_order(0)
 {
 	if (_pNameSpace)
 		_pNameSpace->addSymbol(this);
@@ -56,6 +58,12 @@ Symbol::~Symbol()
 void Symbol::setAccess(Access access)
 {
 	_access = access;
+}
+
+
+void Symbol::setAttributeList(const std::string& attrs)
+{
+	_attributeList = attrs;
 }
 
 
@@ -97,6 +105,12 @@ void Symbol::setLibrary(const std::string& library)
 }
 
 
+void Symbol::setOrder(std::size_t order)
+{
+	_order = order;
+}
+
+
 std::string Symbol::fullName() const
 {
 	std::string fullName;
@@ -121,6 +135,34 @@ std::string Symbol::extractName(const std::string& decl)
 		return "operator []";
 
 	std::string::size_type pos = decl.find('(');
+	if (pos != std::string::npos)
+	{
+		// special case std::function<void(int)> a
+		//                                ^   ^^
+		// In case the marked patterns are found,
+		// reset pos to npos to make sure "(" is not seen as the beginning of a function
+		int bracket = 1;
+		std::string::size_type i = pos + 1;
+		while (i < decl.size() && bracket != 0)
+		{
+			if (decl[i] == '(')
+			{
+				bracket++;
+			}
+			else if (decl[i] == ')')
+			{
+				bracket--;
+			}
+			i++;
+		}
+
+		while (i < decl.size() && std::isspace(decl[i])) i++;
+		if (i < decl.size() && decl[i] == '>')
+		{
+			pos = std::string::npos;
+		}
+	}
+
 	// another special case: function pointer
 	if (pos != std::string::npos && pos < decl.size() - 1)
 	{

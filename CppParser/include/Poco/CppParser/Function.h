@@ -49,8 +49,8 @@ public:
 		FN_DELETE       = 1024 /// The function has been deleted.
 	};
 
-	typedef std::vector<Parameter*> Parameters;
-	typedef Parameters::const_iterator Iterator;
+	using Parameters = std::vector<Parameter*>;
+	using Iterator = Parameters::const_iterator;
 
 	Function(const std::string& decl, NameSpace* pNameSpace);
 		/// Creates the Function.
@@ -119,16 +119,19 @@ public:
 	bool isDeleted() const;
 		/// Returns true iff the method has been deleted.
 
+	bool isVirtual() const;
+		/// Returns true if the method is virtual. Also examines base
+		/// classes to check for a virtual function with the same
+		/// signature.
+
+	bool isStatic() const;
+		/// Returns true iff the method is static.
+
 	int countParameters() const;
 		/// Returns the number of parameters.
 
 	std::string signature() const;
 		/// Returns the signature of the function.
-
-	bool isVirtual() const;
-		/// Returns true if the method is virtual. Also examines base
-		/// classes to check for a virtual function with the same
-		/// signature.
 
 	Function* getOverridden() const;
 		/// If the function is virtual and overrides a function in a
@@ -175,6 +178,12 @@ inline bool Function::isDefault() const
 inline bool Function::isDeleted() const
 {
 	return (flags() & FN_DELETE) != 0;
+}
+
+
+inline bool Function::isStatic() const
+{
+	return (flags() & FN_STATIC) != 0;
 }
 
 

@@ -26,11 +26,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Thread_WINCE.h"
-#else
 #include "Poco/Thread_WIN32.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/Thread_VX.h"
 #else
@@ -74,11 +70,23 @@ public:
 		POLICY_DEFAULT = POLICY_DEFAULT_IMPL
 	};
 
-	Thread();
+	Thread(uint32_t sigMask = 0);
 		/// Creates a thread. Call start() to start it.
+		///
+		/// The optional sigMask parameter specifies which signals should be blocked.
+		/// To block a specific signal, set the corresponding bit in the sigMask.
+		/// Multiple bits can be set in the mask to block multiple signals if needed.
+		///
+		/// Available on POSIX platforms only
 
-	Thread(const std::string& name);
+	Thread(const std::string& name, uint32_t sigMask = 0);
 		/// Creates a named thread. Call start() to start it.
+		///
+		/// The optional sigMask parameter specifies which signals should be blocked.
+		/// To block a specific signal, set the corresponding bit in the sigMask.
+		/// Multiple bits can be set in the mask to block multiple signals if needed.
+		///
+		/// Available on POSIX platforms only
 
 	~Thread();
 		/// Destroys the thread.
@@ -235,6 +243,7 @@ public:
 
 	static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
+		/// On error, or if the platform does not support this functionality, it returns zero.
 
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.

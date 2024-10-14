@@ -76,6 +76,7 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setSignalMaskImpl(uint32_t sigMask);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -144,8 +145,8 @@ private:
 		int           policy;
 		Event         done;
 		std::size_t   stackSize;
-		bool          started;
-		bool          joined;
+		std::atomic<bool> started;
+		std::atomic<bool> joined;
 		std::string   name;
 		int           affinity;
 		mutable FastMutex mutex;

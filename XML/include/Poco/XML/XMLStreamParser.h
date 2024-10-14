@@ -280,6 +280,7 @@ private:
 	EventType nextBody();
 	void handleError();
 
+#ifndef POCO_DOC
 	// If _size is 0, then data is std::istream. Otherwise, it is a buffer.
 	union
 	{
@@ -287,6 +288,13 @@ private:
 		const void* buf;
 	}
 	_data;
+#endif
+
+	enum ParserState
+	{
+		state_next, 
+		state_peek 
+	};
 
 	std::size_t _size;
 	const std::string _inputName;
@@ -294,7 +302,7 @@ private:
 	XML_Parser _parser;
 	std::size_t _depth;
 	bool _accumulateContent; // Whether we are accumulating character content.
-	enum { state_next, state_peek } _parserState;
+	ParserState _parserState;
 	EventType _currentEvent;
 	EventType _queue;
 	QName _qname;

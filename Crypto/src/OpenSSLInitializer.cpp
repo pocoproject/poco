@@ -137,7 +137,7 @@ void OpenSSLInitializer::initialize()
 		if (!_legacyProvider)
 		{
 			_legacyProvider = OSSL_PROVIDER_load(NULL, "legacy");
-			if (!_legacyProvider) throw CryptoException("Failed to load OpenSSL legacy provider");
+			// Note: use haveLegacyProvider() to check if legacy provider has been loaded
 		}
 #endif
 	}

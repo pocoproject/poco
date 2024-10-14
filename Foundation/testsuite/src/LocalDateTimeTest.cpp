@@ -25,9 +25,6 @@
 #include "Poco/DateTimeFormatter.h"
 #include <ctime>
 #include <iostream>
-#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
-#include "wce_time.h"
-#endif
 
 
 using Poco::LocalDateTime;
@@ -35,9 +32,7 @@ using Poco::DateTime;
 using Poco::Timestamp;
 using Poco::Timespan;
 using Poco::Timezone;
-#ifndef _WIN32_WCE
 using std::strftime;
-#endif
 
 
 LocalDateTimeTest::LocalDateTimeTest(const std::string& name): CppUnit::TestCase(name)
@@ -368,7 +363,6 @@ void LocalDateTimeTest::testSwap()
 
 void LocalDateTimeTest::testTimezone()
 {
-#if !defined(_WIN32_WCE)
 	std::time_t   tINCREMENT = (30 * 24 * 60 * 60); // 30 days
 	Timespan      tsINCREMENT(30*Timespan::DAYS);
 	LocalDateTime now;
@@ -450,7 +444,6 @@ void LocalDateTimeTest::testTimezone()
 			<< " - failed to locate DST boundary, timezone test skipped."
 			<< std::endl;
 	}
-#endif
 }
 
 
@@ -477,7 +470,11 @@ void LocalDateTimeTest::testTimezone2()
 			std::time_t t = ldt.timestamp().epochTime();
 			std::tm then;
 			then = *std::localtime(&t);
+#if POCO_OS == POCO_OS_SOLARIS
+			assertTrue((mktime(&then)-t) * 1000 == ldt.tzd());
+#else
 			assertTrue (then.tm_gmtoff == ldt.tzd());
+#endif
 		}
 		unsetenv("TZ");
 	}

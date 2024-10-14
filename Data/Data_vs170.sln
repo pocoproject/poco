@@ -7,6 +7,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\Test
 		{240E83C3-368D-11DB-9FBC-00123FC423B5} = {240E83C3-368D-11DB-9FBC-00123FC423B5}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataTest", "DataTest\DataTest_vs170.vcxproj", "{240E83C3-368D-11DB-9FBC-00123FC423B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{240E83C3-368D-11DB-9FBC-00123FC423B5} = {240E83C3-368D-11DB-9FBC-00123FC423B5}
+		{1813A463-E349-4FEA-8A8E-4A41E41C0DC7} = {1813A463-E349-4FEA-8A8E-4A41E41C0DC7}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|ARM64 = debug_shared|ARM64
@@ -137,6 +143,60 @@ Global
 		{1813A463-E349-4FEA-8A8E-4A41E41C0DC7}.release_static_md|x64.ActiveCfg = release_static_md|x64
 		{1813A463-E349-4FEA-8A8E-4A41E41C0DC7}.release_static_md|x64.Build.0 = release_static_md|x64
 		{1813A463-E349-4FEA-8A8E-4A41E41C0DC7}.release_static_md|x64.Deploy.0 = release_static_md|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|ARM64.ActiveCfg = debug_shared|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|ARM64.Build.0 = debug_shared|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|ARM64.Deploy.0 = debug_shared|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|ARM64.ActiveCfg = release_shared|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|ARM64.Build.0 = release_shared|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|ARM64.Deploy.0 = release_shared|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|ARM64.ActiveCfg = debug_static_mt|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|ARM64.Build.0 = debug_static_mt|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|ARM64.Deploy.0 = debug_static_mt|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|ARM64.ActiveCfg = release_static_mt|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|ARM64.Build.0 = release_static_mt|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|ARM64.Deploy.0 = release_static_mt|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|ARM64.ActiveCfg = debug_static_md|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|ARM64.Build.0 = debug_static_md|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|ARM64.Deploy.0 = debug_static_md|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|ARM64.ActiveCfg = release_static_md|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|ARM64.Build.0 = release_static_md|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|ARM64.Deploy.0 = release_static_md|ARM64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|Win32.Deploy.0 = debug_shared|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|Win32.Build.0 = release_shared|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|Win32.Deploy.0 = release_shared|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|Win32.ActiveCfg = debug_static_mt|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|Win32.Build.0 = debug_static_mt|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|Win32.Deploy.0 = debug_static_mt|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|Win32.ActiveCfg = release_static_mt|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|Win32.Build.0 = release_static_mt|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|Win32.Deploy.0 = release_static_mt|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|Win32.ActiveCfg = debug_static_md|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|Win32.Build.0 = debug_static_md|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|Win32.Deploy.0 = debug_static_md|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|Win32.ActiveCfg = release_static_md|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|Win32.Build.0 = release_static_md|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|Win32.Deploy.0 = release_static_md|Win32
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|x64.Build.0 = debug_shared|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|x64.ActiveCfg = release_shared|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|x64.Build.0 = release_shared|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_shared|x64.Deploy.0 = release_shared|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|x64.ActiveCfg = debug_static_mt|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|x64.Build.0 = debug_static_mt|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_mt|x64.Deploy.0 = debug_static_mt|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|x64.ActiveCfg = release_static_mt|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|x64.Build.0 = release_static_mt|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_mt|x64.Deploy.0 = release_static_mt|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|x64.ActiveCfg = debug_static_md|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|x64.Build.0 = debug_static_md|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.debug_static_md|x64.Deploy.0 = debug_static_md|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|x64.ActiveCfg = release_static_md|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|x64.Build.0 = release_static_md|x64
+		{240E83C3-368D-11DB-9FBC-00123FC423B5}.release_static_md|x64.Deploy.0 = release_static_md|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

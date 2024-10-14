@@ -20,6 +20,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/Test/SQLExecutor.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
@@ -48,7 +49,7 @@
 	if (!SQL_SUCCEEDED(r))	\
 	{ \
 		Poco::Data::ODBC::StatementException se(h); \
-		std::cout << se.toString() << std::endl; \
+		std::cout << se.displayText() << std::endl; \
 	} \
 	assert (SQL_SUCCEEDED(r))
 
@@ -57,7 +58,7 @@
 	if (!SQL_SUCCEEDED(r))	\
 	{ \
 		Poco::Data::ODBC::DescriptorException de(h); \
-		std::cout << de.toString() << std::endl; \
+		std::cout << de.displayText() << std::endl; \
 	} \
 	assert (SQL_SUCCEEDED(r))
 
@@ -105,13 +106,25 @@ public:
 		SQLExecutor::DataBinding bindMode,
 		SQLExecutor::DataExtraction extractMode,
 		const std::string& insert = MULTI_INSERT,
-		const std::string& select = MULTI_SELECT);
-		/// The above two functions use "bare bone" ODBC API calls
+		const std::string& select = MULTI_SELECT,
+		const std::string& procCreateString = "");
+
+	void bareboneODBCStoredFuncTest(const std::string& dbConnString,
+		const std::string& tableCreateString,
+		const std::string& procExecuteString,
+		SQLExecutor::DataBinding bindMode,
+		SQLExecutor::DataExtraction extractMode);
+		/// The above three functions use "bare bone" ODBC API calls
 		/// (i.e. calls are not "wrapped" in PocoData framework structures).
 		/// The purpose of the functions is to verify that a driver behaves
 		/// correctly as well as to determine its capabilities
 		/// (e.g. SQLGetData() restrictions relaxation policy, if any).
 		/// If these test pass, subsequent tests failures are likely ours.
+
+	void connection(const std::string& connectString);
+	void session(const std::string& connectString, int timeout);
+	void sessionPool(const std::string& connectString,
+		int minSessions, int maxSessions, int idleTime, int timeout);
 
 	void zeroRows();
 	void simpleAccess();
@@ -463,6 +476,7 @@ public:
 	}
 
 	void blobStmt();
+	void recordSet();
 
 	void dateTime();
 	void date();
@@ -482,7 +496,7 @@ public:
 	void internalBulkExtractionUTF16();
 	void internalStorageType();
 	void nulls();
-	void notNulls(const std::string& sqlState = "23502");
+	void notNulls(const std::vector<std::string>& sqlStates = {std::string("23502")});
 	void rowIterator();
 	void stdVectorBool();
 
@@ -499,8 +513,12 @@ public:
 	void sqlChannel(const std::string& connect);
 	void sqlLogger(const std::string& connect);
 
+	void autoCommit(const std::string& connect);
+	void transactionIsolation();
+
 	void sessionTransaction(const std::string& connect);
-	void transaction(const std::string& connect);
+	void sessionTransactionNoAutoCommit(const std::string& connect);
+	void transaction(const std::string& connect, bool readUncommitted = true);
 	void transactor();
 	void nullable();
 
@@ -518,21 +536,498 @@ private:
 	Poco::Data::Session& session(bool enc = false);
 	Poco::Data::Session* _pSession;
 	Poco::Data::Session* _pEncSession;
+	Poco::Data::Test::SQLExecutor _dataExecutor;
 };
 
 
-inline Poco::Data::Session& SQLExecutor::session(bool enc)
+inline void SQLExecutor::sessionPool(const std::string& connectString, int minSessions, int maxSessions, int idleTime, int timeout)
 {
-	if (!enc)
-	{
-		poco_check_ptr(_pSession);
-		return *_pSession;
-	}
-	else
-	{
-		poco_check_ptr(_pEncSession);
-		return *_pEncSession;
-	}
+	_dataExecutor.sessionPool("ODBC", connectString, minSessions, maxSessions, idleTime, timeout);
+}
+
+
+inline void SQLExecutor::zeroRows()
+{
+	_dataExecutor.zeroRows();
+}
+
+
+inline void SQLExecutor::simpleAccess()
+{
+	_dataExecutor.simpleAccess();
+}
+
+
+inline void SQLExecutor::complexType()
+{
+	_dataExecutor.complexType();
+}
+
+
+inline void SQLExecutor::complexTypeTuple()
+{
+	_dataExecutor.complexTypeTuple();
+}
+
+
+inline void SQLExecutor::simpleAccessVector()
+{
+	_dataExecutor.simpleAccessVector();
+}
+
+
+inline void SQLExecutor::complexTypeVector()
+{
+	_dataExecutor.complexTypeVector();
+}
+
+
+inline void SQLExecutor::sharedPtrComplexTypeVector()
+{
+	_dataExecutor.sharedPtrComplexTypeVector();
+}
+
+
+inline void SQLExecutor::autoPtrComplexTypeVector()
+{
+	_dataExecutor.autoPtrComplexTypeVector();
+}
+
+
+inline void SQLExecutor::insertVector()
+{
+	_dataExecutor.insertVector();
+}
+
+
+inline void SQLExecutor::insertEmptyVector()
+{
+	_dataExecutor.insertEmptyVector();
+}
+
+
+inline void SQLExecutor::simpleAccessList()
+{
+	_dataExecutor.simpleAccessList();
+}
+
+
+inline void SQLExecutor::complexTypeList()
+{
+	_dataExecutor.complexTypeList();
+}
+
+
+inline void SQLExecutor::insertList()
+{
+	_dataExecutor.insertList();
+}
+
+
+inline void SQLExecutor::insertEmptyList()
+{
+	_dataExecutor.insertEmptyList();
+}
+
+
+inline void SQLExecutor::simpleAccessDeque()
+{
+	_dataExecutor.simpleAccessDeque();
+}
+
+
+inline void SQLExecutor::complexTypeDeque()
+{
+	_dataExecutor.complexTypeDeque();
+}
+
+
+inline void SQLExecutor::insertDeque()
+{
+	_dataExecutor.insertDeque();
+}
+
+
+inline void SQLExecutor::insertEmptyDeque()
+{
+	_dataExecutor.insertEmptyDeque();
+}
+
+
+inline void SQLExecutor::affectedRows(const std::string& whereClause)
+{
+	_dataExecutor.affectedRows();
+}
+
+
+inline void SQLExecutor::insertSingleBulk()
+{
+	_dataExecutor.insertSingleBulk();
+}
+
+
+inline void SQLExecutor::floats()
+{
+	_dataExecutor.floats();
+}
+
+
+inline void SQLExecutor::doubles()
+{
+	_dataExecutor.doubles();
+}
+
+
+inline void SQLExecutor::uuids()
+{
+	_dataExecutor.uuids();
+}
+
+
+inline void SQLExecutor::insertSingleBulkVec()
+{
+	_dataExecutor.insertSingleBulkVec();
+}
+
+
+inline void SQLExecutor::limits()
+{
+	_dataExecutor.limits();
+}
+
+
+inline void SQLExecutor::limitZero()
+{
+	_dataExecutor.limitZero();
+}
+
+
+inline void SQLExecutor::limitOnce()
+{
+	_dataExecutor.limitOnce();
+}
+
+
+inline void SQLExecutor::limitPrepare()
+{
+	_dataExecutor.limitPrepare();
+}
+
+
+inline void SQLExecutor::prepare()
+{
+	_dataExecutor.prepare();
+}
+
+
+inline void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
+{
+	_dataExecutor.doBulkPerformance(size);
+}
+
+
+inline void SQLExecutor::setSimple()
+{
+	_dataExecutor.setSimple();
+}
+
+
+inline void SQLExecutor::setComplex()
+{
+	_dataExecutor.setComplex();
+}
+
+
+inline void SQLExecutor::setComplexUnique()
+{
+	_dataExecutor.setComplexUnique();
+}
+
+inline void SQLExecutor::multiSetSimple()
+{
+	_dataExecutor.multiSetSimple();
+}
+
+
+inline void SQLExecutor::multiSetComplex()
+{
+	_dataExecutor.multiSetComplex();
+}
+
+
+inline void SQLExecutor::mapComplex()
+{
+	_dataExecutor.mapComplex();
+}
+
+
+inline void SQLExecutor::mapComplexUnique()
+{
+	_dataExecutor.mapComplexUnique();
+}
+
+
+inline void SQLExecutor::multiMapComplex()
+{
+	_dataExecutor.multiMapComplex();
+}
+
+
+inline void SQLExecutor::selectIntoSingle()
+{
+	_dataExecutor.selectIntoSingle();
+}
+
+
+inline void SQLExecutor::selectIntoSingleStep()
+{
+	_dataExecutor.selectIntoSingleStep();
+}
+
+
+inline void SQLExecutor::selectIntoSingleFail()
+{
+	_dataExecutor.selectIntoSingleFail();
+}
+
+
+inline void SQLExecutor::lowerLimitOk()
+{
+	_dataExecutor.lowerLimitOk();
+}
+
+
+inline void SQLExecutor::singleSelect()
+{
+	_dataExecutor.singleSelect();
+}
+
+
+inline void SQLExecutor::lowerLimitFail()
+{
+	_dataExecutor.lowerLimitFail();
+}
+
+
+inline void SQLExecutor::combinedLimits()
+{
+	_dataExecutor.combinedLimits();
+}
+
+
+
+inline void SQLExecutor::ranges()
+{
+	_dataExecutor.ranges();
+}
+
+
+inline void SQLExecutor::combinedIllegalLimits()
+{
+	_dataExecutor.combinedIllegalLimits();
+}
+
+
+inline void SQLExecutor::illegalRange()
+{
+	_dataExecutor.illegalRange();
+}
+
+
+inline void SQLExecutor::emptyDB()
+{
+	_dataExecutor.emptyDB();
+}
+
+
+inline void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
+{
+	_dataExecutor.blob(bigSize, blobPlaceholder);
+}
+
+
+inline void SQLExecutor::blobStmt()
+{
+	_dataExecutor.blobStmt();
+}
+
+
+inline void SQLExecutor::recordSet()
+{
+	_dataExecutor.recordSet();
+}
+
+
+inline void SQLExecutor::dateTime()
+{
+	_dataExecutor.dateTime();
+}
+
+
+inline void SQLExecutor::date()
+{
+	_dataExecutor.date();
+}
+
+
+inline void SQLExecutor::time()
+{
+	_dataExecutor.time();
+}
+
+
+inline void SQLExecutor::tuples()
+{
+	_dataExecutor.tuples();
+}
+
+inline void SQLExecutor::tupleVector()
+{
+	_dataExecutor.tupleVector();
+}
+
+
+inline void SQLExecutor::internalExtraction()
+{
+	_dataExecutor.internalExtraction();
+}
+
+
+inline void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
+{
+	_dataExecutor.filter();
+}
+
+
+inline void SQLExecutor::internalBulkExtraction()
+{
+	_dataExecutor.internalBulkExtraction();
+}
+
+
+inline void SQLExecutor::internalBulkExtractionUTF16()
+{
+	_dataExecutor.internalBulkExtractionUTF16();
+}
+
+
+inline void SQLExecutor::internalStorageType()
+{
+	_dataExecutor.internalStorageType();
+}
+
+
+inline void SQLExecutor::nulls()
+{
+	_dataExecutor.nulls();
+}
+
+
+inline void SQLExecutor::rowIterator()
+{
+	_dataExecutor.rowIterator();
+}
+
+
+inline void SQLExecutor::stdVectorBool()
+{
+	_dataExecutor.stdVectorBool();
+}
+
+
+inline void SQLExecutor::asynchronous(int rowCount)
+{
+	_dataExecutor.asynchronous();
+}
+
+
+inline void SQLExecutor::dynamicAny()
+{
+	_dataExecutor.dynamicAny();
+}
+
+
+inline void SQLExecutor::multipleResults(const std::string& sql)
+{
+	_dataExecutor.multipleResults();
+}
+
+
+inline void SQLExecutor::sqlChannel(const std::string& connect)
+{
+	_dataExecutor.sqlChannel("odbc", connect);
+}
+
+
+inline void SQLExecutor::sqlLogger(const std::string& connect)
+{
+	_dataExecutor.sqlLogger("odbc", connect);
+}
+
+
+inline void SQLExecutor::setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti)
+{
+	_dataExecutor.setTransactionIsolation(session, ti);
+}
+
+
+inline void SQLExecutor::autoCommit(const std::string&)
+{
+	_dataExecutor.autoCommit();
+}
+
+
+inline void SQLExecutor::transactionIsolation()
+{
+	_dataExecutor.transactionIsolation();
+}
+
+
+inline void SQLExecutor::sessionTransaction(const std::string& connect)
+{
+	_dataExecutor.sessionTransaction("odbc", connect);
+}
+
+
+inline void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connect)
+{
+	_dataExecutor.sessionTransactionNoAutoCommit("odbc", connect);
+}
+
+
+inline void SQLExecutor::transaction(const std::string& connect, bool readUncommitted)
+{
+	_dataExecutor.transaction("odbc", connect, readUncommitted);
+}
+
+
+inline void SQLExecutor::transactor()
+{
+	_dataExecutor.transactor();
+}
+
+
+inline void SQLExecutor::nullable()
+{
+	_dataExecutor.nullable();
+}
+
+
+inline void SQLExecutor::reconnect()
+{
+	_dataExecutor.reconnect();
+}
+
+
+inline void SQLExecutor::unicode(const std::string& dbConnString)
+{
+	_dataExecutor.unicode(dbConnString);
+}
+
+
+inline void SQLExecutor::encoding(const std::string& dbConnString)
+{
+	_dataExecutor.encoding(dbConnString);
 }
 
 

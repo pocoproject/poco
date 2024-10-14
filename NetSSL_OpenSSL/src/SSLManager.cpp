@@ -24,7 +24,6 @@
 #include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
@@ -77,7 +76,8 @@ const bool        SSLManager::VAL_FIPS_MODE(false);
 
 
 SSLManager::SSLManager():
-	_contextIndex(SSL_CTX_get_ex_new_index(0, NULL, NULL, NULL, NULL))
+	_contextIndex(SSL_CTX_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr)),
+	_socketIndex(SSL_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr))
 {
 }
 
@@ -100,20 +100,15 @@ void SSLManager::shutdown()
 	PrivateKeyPassphraseRequired.clear();
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
-	_ptrDefaultServerContext = 0;
-	_ptrDefaultClientContext = 0;
-}
-
-
-namespace
-{
-	static Poco::SingletonHolder<SSLManager> singleton;
+	_ptrDefaultServerContext = nullptr;
+	_ptrDefaultClientContext = nullptr;
 }
 
 
 SSLManager& SSLManager::instance()
 {
-	return *singleton.get();
+	static SSLManager sm;
+	return sm;
 }
 
 
@@ -294,7 +289,7 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return ocspVerifyFlag ? 0 : 1;
 	}
 
-	OCSP_RESPONSE* pOcspResp = d2i_OCSP_RESPONSE(NULL, &pResp, len);
+	OCSP_RESPONSE* pOcspResp = d2i_OCSP_RESPONSE(nullptr, &pResp, len);
 	if (!pOcspResp) return 0;
 
 	if (OCSP_response_status(pOcspResp) != OCSP_RESPONSE_STATUS_SUCCESSFUL)
@@ -318,7 +313,7 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
-	X509* pPeerIssuerCert = NULL;
+	X509* pPeerIssuerCert = nullptr;
 	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
 	unsigned certChainLen = sk_X509_num(pCertChain);
 	for (int i= 0; i < certChainLen ; i++)
@@ -349,7 +344,7 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		{
 			X509_free(pCert);
 			sk_X509_free(pCerts);
-			pCerts = NULL;
+			pCerts = nullptr;
 		}
 	}
 
@@ -367,7 +362,7 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
-	OCSP_CERTID* pCertId = OCSP_cert_to_id(NULL, pPeerCert, pPeerIssuerCert);
+	OCSP_CERTID* pCertId = OCSP_cert_to_id(nullptr, pPeerCert, pPeerIssuerCert);
 	if (!pCertId)
 	{
 		X509_free(pPeerCert);

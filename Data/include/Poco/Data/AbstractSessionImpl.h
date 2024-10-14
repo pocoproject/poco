@@ -55,7 +55,9 @@ public:
 			_storage(std::string("deque")),
 			_bulk(false),
 			_emptyStringIsNull(false),
-			_forceEmptyString(false)
+			_forceEmptyString(false),
+			_sqlParse(false),
+			_autoCommit(true)
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -88,6 +90,18 @@ public:
 		/// While these features can not both be true at the same time, they can both be false,
 		/// resulting in default underlying database behavior.
 		///
+		/// Adds "sqlParse" feature and sets it to false; this property enables parsing of the SQL queries,
+		/// to help the Data framework to determine whether to start a transaction automatically in
+		/// non-autocomit mode (ie. not to start transaction if all the queries in an SQL statement are SELECTs).
+		/// Note that the property is not a bullet-proof way to ensure this behavior, because not all SQL dialects
+		/// are supported by the parser. When enabled, the parsing has performance cost, but it is otherwise
+		/// non-intrusive, ie. on parse failure Statement only internally records parsing errors, but does not throw.
+		/// See Poco::Data::Statement documentation for more information.
+		/// This property has no effect when Poco::Data library is compiled with POCO_DATA_NO_SQL_PARSER.
+		///
+		/// Adds "autoCommit" feature and sets it to true. This property enables automatic commit.
+		/// Setting this feature to  true renders the `sqlParse` property meaningless, because every query
+		/// is automatically commited.
 	{
 		addProperty("storage",
 			&AbstractSessionImpl<C>::setStorage,
@@ -108,11 +122,29 @@ public:
 		addFeature("forceEmptyString",
 			&AbstractSessionImpl<C>::setForceEmptyString,
 			&AbstractSessionImpl<C>::getForceEmptyString);
+
+		addFeature("sqlParse",
+			&AbstractSessionImpl<C>::setSQLParse,
+			&AbstractSessionImpl<C>::getSQLParse);
+
+		addFeature("autoCommit",
+			&AbstractSessionImpl<C>::setAutoCommit,
+			&AbstractSessionImpl<C>::getAutoCommit);
 	}
 
 	~AbstractSessionImpl()
 		/// Destroys the AbstractSessionImpl.
 	{
+	}
+
+	bool hasFeature(const std::string& name) const
+		/// Looks a feature up in the features map
+		/// and returns true if there is one.
+	{
+		auto it = _features.find(name);
+		return it != _features.end() &&
+			it->second.getter &&
+			it->second.setter;
 	}
 
 	void setFeature(const std::string& name, bool state)
@@ -130,7 +162,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool getFeature(const std::string& name)
+	bool getFeature(const std::string& name) const
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
 	{
@@ -138,11 +170,21 @@ public:
 		if (it != _features.end())
 		{
 			if (it->second.getter)
-				return (static_cast<C*>(this)->*it->second.getter)(name);
+				return (static_cast<const C*>(this)->*it->second.getter)(name);
 			else
 				throw NotImplementedException("get", name);
 		}
 		else throw NotSupportedException(name);
+	}
+
+	bool hasProperty(const std::string& name) const
+		/// Looks a property up in the properties map
+		/// and returns true if there is one.
+	{
+		auto it = _properties.find(name);
+		return it != _properties.end() &&
+			it->second.getter &&
+			it->second.setter;
 	}
 
 	void setProperty(const std::string& name, const Poco::Any& value)
@@ -160,7 +202,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	Poco::Any getProperty(const std::string& name)
+	Poco::Any getProperty(const std::string& name) const
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
 	{
@@ -168,7 +210,7 @@ public:
 		if (it != _properties.end())
 		{
 			if (it->second.getter)
-				return (static_cast<C*>(this)->*it->second.getter)(name);
+				return (static_cast<const C*>(this)->*it->second.getter)(name);
 			else
 				throw NotImplementedException("set", name);
 		}
@@ -237,7 +279,7 @@ public:
 		return _emptyStringIsNull;
 	}
 
-	void setForceEmptyString(const std::string& name, bool forceEmptyString)
+	void setForceEmptyString(const std::string&, bool forceEmptyString)
 		/// Sets the behavior regarding empty variable length strings.
 		/// Those are treated as NULL by Oracle and as empty string by
 		/// most other databases.
@@ -256,6 +298,25 @@ public:
 		/// and this class documentation for feature rationale and details.
 	{
 		return _forceEmptyString;
+	}
+
+	void setSQLParse(const std::string&, bool doParse)
+		/// Enables the SQL parsing. Value must be of type bool.
+		/// When SQL parsing is enabled (default), the Statement attempts
+		/// to parse the SQL prior to executing it. The parsing is done
+		/// in non-autocommit mode only, with purpose to determine the
+		/// type of query and whether to start the transaction automatically.
+		///
+		/// See Statement documentation for more information.
+	{
+		_sqlParse = doParse;
+	}
+
+
+	bool getSQLParse(const std::string& name = "") const
+		/// Returns the value of the SQL parsing flag.
+	{
+		return _sqlParse;
 	}
 
 protected:
@@ -283,6 +344,32 @@ protected:
 		_properties[name] = property;
 	}
 
+	// most, if not all, back ends support the autocommit feature
+	// these handlers are added in this class by default,
+	// but an implementation can easily replace them by registering
+	// early its own handlers with:
+	//    addFeature("autoCommit", setter, getter)");
+	//
+	// these are here to be used by any back end DBMS client that
+	// does not provide its own autocommit get/set capabilities
+
+	void setAutoCommit(const std::string&, bool autoCommit)
+		/// Enables automatic commit. When this feature is true,
+		/// every query is automatically commited. When false,
+		/// every query starts a transaction, except SELECT queries
+		/// (if properly detected by parser, see set/getSQLParse() and
+		/// Statement::checkBeginTransaction() documentation).
+	{
+		_autoCommit = autoCommit;
+	}
+
+	bool getAutoCommit(const std::string& name = "") const
+		/// Returns the value of the automatic commit flag.
+		/// See setAutoCommit() documentation for more details.
+	{
+		return _autoCommit;
+	}
+
 private:
 	struct Feature
 	{
@@ -305,6 +392,8 @@ private:
 	bool        _bulk;
 	bool        _emptyStringIsNull;
 	bool        _forceEmptyString;
+	bool        _sqlParse;
+	bool        _autoCommit;
 	Poco::Any   _handle;
 };
 

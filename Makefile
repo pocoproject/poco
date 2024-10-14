@@ -6,6 +6,7 @@
 
 sinclude config.make
 sinclude config.build
+POCO_CONFIG_INCLUDED = 1
 
 ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
@@ -196,7 +197,7 @@ Util-samples: Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Util/samples
 
 Util-clean:
-	$(MAKE)  -C $(POCO_BASE)/Util clean
+	$(MAKE) -C $(POCO_BASE)/Util clean
 	$(MAKE) -C $(POCO_BASE)/Util/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Util/samples clean
 
@@ -245,7 +246,10 @@ NetSSL_OpenSSL-clean:
 Data-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
-Data-tests: Data-libexec cppunit
+DataTest-libexec: Data-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/DataTest
+
+Data-tests: Data-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite
 
 Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec Net-libexec
@@ -259,7 +263,7 @@ Data-clean:
 Data/SQLite-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite
 
-Data/SQLite-tests: Data/SQLite-libexec cppunit
+Data/SQLite-tests: Data/SQLite-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
 
 Data/SQLite-clean:
@@ -269,7 +273,7 @@ Data/SQLite-clean:
 Data/ODBC-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC
 
-Data/ODBC-tests: Data/ODBC-libexec cppunit
+Data/ODBC-tests: Data/ODBC-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
 
 Data/ODBC-clean:
@@ -279,7 +283,7 @@ Data/ODBC-clean:
 Data/MySQL-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL
 
-Data/MySQL-tests: Data/MySQL-libexec cppunit
+Data/MySQL-tests: Data/MySQL-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
 
 Data/MySQL-clean:
@@ -289,7 +293,7 @@ Data/MySQL-clean:
 Data/PostgreSQL-libexec: Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL
 
-Data/PostgreSQL-tests: Data/PostgreSQL-libexec cppunit
+Data/PostgreSQL-tests: Data/PostgreSQL-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite
 
 Data/PostgreSQL-clean:
@@ -406,7 +410,7 @@ Prometheus-libexec: Foundation-libexec Net-libexec
 Prometheus-tests: Prometheus-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Prometheus/testsuite
 
-Prometheus-samples: Prometheus-libexec
+Prometheus-samples: Prometheus-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Prometheus/samples
 
 Prometheus-clean:

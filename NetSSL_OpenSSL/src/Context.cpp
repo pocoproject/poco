@@ -15,6 +15,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/File.h"
@@ -32,7 +33,6 @@
 #include <openssl/core_names.h>
 #include <openssl/decoder.h>
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
-#include <iostream>
 
 
 namespace Poco {
@@ -195,6 +195,11 @@ void Context::init(const Params& params)
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 		SSL_CTX_set_ex_data(_pSSLContext, SSLManager::instance().contextIndex(), this);
 
+		if (!isForServerUse())
+		{
+			SSL_CTX_sess_set_new_cb(_pSSLContext, &SecureSocketImpl::onSessionCreated);
+		}
+
 		if (!isForServerUse() && params.ocspStaplingVerification)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
@@ -224,6 +229,26 @@ void Context::setSecurityLevel(SecurityLevel level)
 #endif
 }
 
+void Context::ignoreUnexpectedEof(bool flag)
+{
+	if (flag)
+	{
+#if defined(SSL_OP_IGNORE_UNEXPECTED_EOF)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_IGNORE_UNEXPECTED_EOF);
+#endif
+	}
+	else
+	{
+#if defined(SSL_OP_IGNORE_UNEXPECTED_EOF)
+		SSL_CTX_clear_options(_pSSLContext, SSL_OP_IGNORE_UNEXPECTED_EOF);
+#endif
+	}
+}
+
+void Context::setQuietShutdown(bool flag)
+{
+	SSL_CTX_set_quiet_shutdown(_pSSLContext, flag ? 1 : 0);
+}
 
 void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 {

@@ -12,6 +12,7 @@
 //
 
 
+#include "Poco/ProcessOptions.h"
 #include "Poco/Process_WIN32U.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -227,7 +228,7 @@ std::string ProcessImpl::escapeArg(const std::string& arg)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 	std::string commandLine = escapeArg(command);
 	for (const auto& a: args)
@@ -279,6 +280,12 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		startupInfo.hStdInput = 0;
 	}
+	if (options & PROCESS_CLOSE_STDIN)
+	{
+		HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+		if (hStdIn) CloseHandle(hStdIn);
+	}
+
 	// outPipe may be the same as errPipe, so we duplicate first and close later.
 	if (outPipe)
 	{
@@ -309,7 +316,17 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		startupInfo.hStdError = 0;
 	}
 	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+	if (options & PROCESS_CLOSE_STDOUT) 
+	{
+		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+		if (hStdOut) CloseHandle(hStdOut);
+	}
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+	if (options & PROCESS_CLOSE_STDERR) 
+	{
+		HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
+		if (hStdErr) CloseHandle(hStdErr);
+	}
 
 	if (mustInheritHandles)
 	{

@@ -32,7 +32,7 @@ class AtomicFloat
 {
 public:
 	AtomicFloat():
-		_value{0}
+		_value(0.0)
 	{
 	}
 

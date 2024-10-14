@@ -20,6 +20,15 @@
 
 using Poco::Dynamic::Var;
 
+// Explicitly instatiated shared pointer in JSON library is required to
+// have known instance of the pointer to be used with VarHolder when
+// compiling with -fvisibility=hidden
+#if defined(POCO_OS_FAMILY_WINDOWS)
+template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
+#else
+template class Poco::SharedPtr<Poco::JSON::Array>;
+#endif
+
 
 namespace Poco {
 namespace JSON {
@@ -27,7 +36,8 @@ namespace JSON {
 
 Array::Array(int options):
 	_modified(false),
-	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0)
+	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),
+	_lowercaseHex((options & Poco::JSON_LOWERCASE_HEX) != 0)
 {
 }
 
@@ -36,7 +46,8 @@ Array::Array(const Array& other) :
 	_values(other._values),
 	_pArray(other._pArray),
 	_modified(other._modified),
-	_escapeUnicode(other._escapeUnicode)
+	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex)
 {
 }
 
@@ -45,7 +56,8 @@ Array::Array(Array&& other) noexcept:
 	_values(std::move(other._values)),
 	_pArray(std::move(other._pArray)),
 	_modified(other._modified),
-	_escapeUnicode(other._escapeUnicode)
+	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex)
 {
 }
 
@@ -58,6 +70,7 @@ Array& Array::operator = (const Array& other)
 		_pArray = other._pArray;
 		_modified = other._modified;
 		_escapeUnicode = other._escapeUnicode;
+		_lowercaseHex = other._lowercaseHex;
 	}
 	return *this;
 }
@@ -69,6 +82,7 @@ Array& Array::operator = (Array&& other) noexcept
 	_pArray = std::move(other._pArray);
 	_modified = other._modified;
 	_escapeUnicode = other._escapeUnicode;
+	_lowercaseHex = other._lowercaseHex;
 
 	return *this;
 }
@@ -154,6 +168,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 {
 	int options = Poco::JSON_WRAP_STRINGS;
 	options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
+	options |= _lowercaseHex ? Poco::JSON_LOWERCASE_HEX : 0;
 
 	if (step == -1) step = indent;
 

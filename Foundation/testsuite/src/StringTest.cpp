@@ -58,7 +58,7 @@ using Poco::strToInt;
 using Poco::strToFloat;
 using Poco::strToDouble;
 using Poco::intToStr;
-using Poco::uIntToStr;
+using Poco::intToStr;
 using Poco::floatToStr;
 using Poco::doubleToStr;
 using Poco::thousandSeparator;
@@ -944,65 +944,90 @@ void StringTest::testIntToString()
 	assertTrue (result == "1001001100101100000001011010010");
 	assertTrue (intToStr(1234567890, 2, result, true, 35, '0'));
 	assertTrue (result == "00001001001100101100000001011010010");
-	assertTrue (uIntToStr(0xFF, 2, result));
+	assertTrue (intToStr(0xFF, 2, result));
 	assertTrue (result == "11111111");
-	assertTrue (uIntToStr(0x0F, 2, result, false, 8, '0'));
+	assertTrue (intToStr(0x0F, 2, result, false, 8, '0'));
 	assertTrue (result == "00001111");
-	assertTrue (uIntToStr(0x0F, 2, result));
+	assertTrue (intToStr(0x0F, 2, result));
 	assertTrue (result == "1111");
-	assertTrue (uIntToStr(0xF0, 2, result));
+	assertTrue (intToStr(0xF0, 2, result));
 	assertTrue (result == "11110000");
-	assertTrue (uIntToStr(0xFFFF, 2, result));
+	assertTrue (intToStr(0xFFFF, 2, result));
 	assertTrue (result == "1111111111111111");
-	assertTrue (uIntToStr(0xFF00, 2, result));
+	assertTrue (intToStr(0xFF00, 2, result));
 	assertTrue (result == "1111111100000000");
-	assertTrue (uIntToStr(0xFFFFFFFF, 2, result));
+	assertTrue (intToStr(0xFFFFFFFF, 2, result));
 	assertTrue (result == "11111111111111111111111111111111");
-	assertTrue (uIntToStr(0xFF00FF00, 2, result));
+	assertTrue (intToStr(0xFF00FF00, 2, result));
 	assertTrue (result == "11111111000000001111111100000000");
-	assertTrue (uIntToStr(0xF0F0F0F0, 2, result));
+	assertTrue (intToStr(0xF0F0F0F0, 2, result));
 	assertTrue (result == "11110000111100001111000011110000");
 #if defined(POCO_HAVE_INT64)
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 2, result));
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 2, result));
 	assertTrue (result == "1111111111111111111111111111111111111111111111111111111111111111");
-	assertTrue (uIntToStr(0xFF00000FF00000FF, 2, result));
+	assertTrue (intToStr(0xFF00000FF00000FF, 2, result));
 	assertTrue (result == "1111111100000000000000000000111111110000000000000000000011111111");
 #endif
 
 	// octal
-	assertTrue (uIntToStr(1234567890, 010, result));
+	assertTrue (intToStr(1234567890, 010, result));
 	assertTrue (result == "11145401322");
-	assertTrue (uIntToStr(1234567890, 010, result, true));
+	assertTrue (intToStr(1234567890, 010, result, true));
 	assertTrue (result == "011145401322");
-	assertTrue (uIntToStr(1234567890, 010, result, true, 15, '0'));
+	assertTrue (intToStr(1234567890, 010, result, true, 15, '0'));
 	assertTrue (result == "000011145401322");
-	assertTrue (uIntToStr(012345670, 010, result, true));
+	assertTrue (intToStr(012345670, 010, result, true));
 	assertTrue (result == "012345670");
-	assertTrue (uIntToStr(012345670, 010, result));
+	assertTrue (intToStr(012345670, 010, result));
 	assertTrue (result == "12345670");
 
 	// hexadecimal
-	assertTrue (uIntToStr(0, 0x10, result, true));
+	// uppercase
+	assertTrue (intToStr(0, 0x10, result, true));
 	assertTrue (result == "0x0");
-	assertTrue (uIntToStr(0, 0x10, result, true, 4, '0'));
+	assertTrue (intToStr(0, 0x10, result, true, 4, '0'));
 	assertTrue (result == "0x00");
-	assertTrue (uIntToStr(0, 0x10, result, false, 4, '0'));
+	assertTrue (intToStr(0, 0x10, result, false, 4, '0'));
 	assertTrue (result == "0000");
-	assertTrue (uIntToStr(1234567890, 0x10, result));
+	assertTrue (intToStr(1234567890, 0x10, result));
 	assertTrue (result == "499602D2");
-	assertTrue (uIntToStr(1234567890, 0x10, result, true));
+	assertTrue (intToStr(1234567890, 0x10, result, true));
 	assertTrue (result == "0x499602D2");
-	assertTrue (uIntToStr(1234567890, 0x10, result, true, 15, '0'));
+	assertTrue (intToStr(1234567890, 0x10, result, true, 15, '0'));
 	assertTrue (result == "0x00000499602D2");
-	assertTrue (uIntToStr(0x1234567890ABCDEF, 0x10, result, true));
+	assertTrue (intToStr(0x1234567890ABCDEF, 0x10, result, true));
 	assertTrue (result == "0x1234567890ABCDEF");
-	assertTrue (uIntToStr(0xDEADBEEF, 0x10, result));
+	assertTrue (intToStr(0xDEADBEEF, 0x10, result));
 	assertTrue (result == "DEADBEEF");
 #if defined(POCO_HAVE_INT64)
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, result));
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result));
 	assertTrue (result == "FFFFFFFFFFFFFFFF");
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true));
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true));
 	assertTrue (result == "0xFFFFFFFFFFFFFFFF");
+#endif
+
+	// lowercase
+	assertTrue (intToStr(0, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0x0");
+	assertTrue (intToStr(0, 0x10, result, true, 4, '0', 0, true));
+	assertTrue (result == "0x00");
+	assertTrue (intToStr(0, 0x10, result, false, 4, '0', 0, true));
+	assertTrue (result == "0000");
+	assertTrue (intToStr(1234567890, 0x10, result, false, -1, (char)32, 0, true));
+	assertTrue (result == "499602d2");
+	assertTrue (intToStr(1234567890, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0x499602d2");
+	assertTrue (intToStr(1234567890, 0x10, result, true, 15, '0', 0, true));
+	assertTrue (result == "0x00000499602d2");
+	assertTrue (intToStr(0x1234567890ABCDEF, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0x1234567890abcdef");
+	assertTrue (intToStr(0xDEADBEEF, 0x10, result, false, -1, (char)32, 0, true));
+	assertTrue (result == "deadbeef");
+#if defined(POCO_HAVE_INT64)
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, false, -1, (char)32, 0, true));
+	assertTrue (result == "ffffffffffffffff");
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0xffffffffffffffff");
 #endif
 
 	try
@@ -1238,23 +1263,24 @@ void formatStream(double value, std::string& str)
 void formatSprintf(double value, std::string& str)
 {
 	char buffer[128];
-	std::sprintf(buffer, "%.*g", 16, value);
+	std::snprintf(buffer, sizeof(buffer), "%.*g", 16, value);
 	str = buffer;
 }
 
 
 void StringTest::testJSONString()
 {
-	assertTrue (toJSON("\\", false) == "\\\\");
-	assertTrue (toJSON("\"", false) == "\\\"");
-	assertTrue (toJSON("\a", false) == "\\u0007");
-	assertTrue (toJSON("\b", false) == "\\b");
-	assertTrue (toJSON("\f", false) == "\\f");
-	assertTrue (toJSON("\n", false) == "\\n");
-	assertTrue (toJSON("\r", false) == "\\r");
-	assertTrue (toJSON("\t", false) == "\\t");
-	assertTrue (toJSON("\v", false) == "\\u000B");
-	assertTrue (toJSON("a", false) == "a");
+	assertTrue (toJSON("\\", 0) == "\\\\");
+	assertTrue (toJSON("\"", 0) == "\\\"");
+	assertTrue (toJSON("\a", 0) == "\\u0007");
+	assertTrue (toJSON("\b", 0) == "\\b");
+	assertTrue (toJSON("\f", 0) == "\\f");
+	assertTrue (toJSON("\n", 0) == "\\n");
+	assertTrue (toJSON("\r", 0) == "\\r");
+	assertTrue (toJSON("\t", 0) == "\\t");
+	assertTrue (toJSON("\v", 0) == "\\u000B");
+	assertTrue (toJSON("\v", Poco::JSON_LOWERCASE_HEX) == "\\u000b");
+	assertTrue (toJSON("a", 0) == "a");
 	assertTrue (toJSON("\xD0\x82", 0) == "\xD0\x82");
 	assertTrue (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
 
@@ -1296,12 +1322,34 @@ void StringTest::testJSONString()
 	ostr.str("");
 	toJSON("tb\t", ostr);
 	assertTrue (ostr.str() == "\"tb\\t\"");
+
 	ostr.str("");
 	toJSON("\xD0\x82", ostr);
 	assertTrue (ostr.str() == "\"\xD0\x82\"");
 	ostr.str("");
 	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS);
 	assertTrue (ostr.str() == "\"\xD0\x82\"");
+
+	// wrap
+	// uppercase (default)
+	ostr.str("");
+	toJSON("\v", ostr);
+	assertTrue (ostr.str() == "\"\\u000B\"");
+	// lowercase
+	ostr.str("");
+	toJSON("\v", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_LOWERCASE_HEX);
+	assertTrue (ostr.str() == "\"\\u000b\"");
+
+	// no wrap
+	// uppercase
+	ostr.str("");
+	toJSON("\v", ostr, 0);
+	assertTrue (ostr.str() == "\\u000B");
+	// lowercase
+	ostr.str("");
+	toJSON("\v", ostr, Poco::JSON_LOWERCASE_HEX);
+	assertTrue (ostr.str() == "\\u000b");
+
 	ostr.str("");
 	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE);
 	assertTrue (ostr.str() == "\"\\u0402\"");

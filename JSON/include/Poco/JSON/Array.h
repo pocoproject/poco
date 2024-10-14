@@ -26,8 +26,23 @@
 
 
 namespace Poco {
+
 namespace JSON {
 
+class JSON_API Array;
+
+}
+
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+// Explicitly instantiated shared pointer in JSON library
+extern template class Poco::SharedPtr<Poco::JSON::Array>;
+#else
+// Explicitly instantiated shared pointer in JSON library
+extern template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
+#endif
+
+namespace JSON {
 
 class Object;
 
@@ -46,7 +61,7 @@ class JSON_API Array
 	///    Array::Ptr arr = result.extract<Array::Ptr>();
 	///    Object::Ptr object = arr->getObject(0); // object == {\"test\" : 0}
 	///    int i = object->getElement<int>("test"); // i == 0;
-	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
+	///    Object::Ptr subObject = arr->getObject(1); // subObject == {\"test\" : 0}
 	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
 	///    i = result = subArr->get(0); // i == 1;
 	///
@@ -90,6 +105,12 @@ public:
 
 	bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.
+	
+	void setLowercaseHex(bool lowercaseHex);
+		/// Sets the flag for using lowercase hex numbers
+
+	bool getLowercaseHex() const;
+		/// Returns the flag for using lowercase hex numbers
 
 	ValueVec::const_iterator begin() const;
 		/// Returns the begin iterator for values.
@@ -206,6 +227,7 @@ private:
 	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
 	//  so it must know whether to escape unicode or not.
 	bool             _escapeUnicode;
+	bool             _lowercaseHex;
 };
 
 
@@ -222,6 +244,17 @@ inline void Array::setEscapeUnicode(bool escape)
 inline bool Array::getEscapeUnicode() const
 {
 	return _escapeUnicode;
+}
+
+inline void Array::setLowercaseHex(bool lowercaseHex)
+{
+	_lowercaseHex = lowercaseHex;
+}
+
+
+inline bool Array::getLowercaseHex() const
+{
+	return _lowercaseHex;
 }
 
 

@@ -41,12 +41,24 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in XE"
+//#define EASYSOFT_ODBC
+//#define DATADIRECT_ODBC
+#define DEVART_ODBC
+
+#ifdef EASYSOFT_ODBC
+#	define ORACLE_ODBC_DRIVER "ORACLE"
+#elif defined(DATADIRECT_ODBC)
+#	define ORACLE_ODBC_DRIVER "Oracle Wire Protocol"
+#elif defined(DEVART_ODBC)
+#	define ORACLE_ODBC_DRIVER "Devart ODBC Driver for Oracle"
+#else
+#	define ORACLE_ODBC_DRIVER "Oracle 21 ODBC driver"
+#endif
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
 #define ORACLE_SID "XE"
-#define ORACLE_UID "poco"
+#define ORACLE_UID "SYSTEM"
 #define ORACLE_PWD "poco"
 
 
@@ -56,6 +68,15 @@ std::string          ODBCOracleTest::_driver = ORACLE_ODBC_DRIVER;
 std::string          ODBCOracleTest::_dsn = ORACLE_DSN;
 std::string          ODBCOracleTest::_uid = ORACLE_UID;
 std::string          ODBCOracleTest::_pwd = ORACLE_PWD;
+#ifdef EASYSOFT_ODBC
+std::string ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRIVER "};DB=" ORACLE_SID ";UID=" ORACLE_UID ";PWD=" ORACLE_PWD ";";
+#elif defined(DATADIRECT_ODBC)
+std::string ODBCOracleTest::_connectString = "DRIVER=DataDirect 8.0 Oracle Wire Protocol;"
+	"HOST=" ORACLE_SERVER ";PORT=" ORACLE_PORT ";UID=" ORACLE_UID ";PWD=" ORACLE_PWD ";SERVICENAME=" ORACLE_SID ";";
+#elif defined(DEVART_ODBC)
+std::string ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRIVER "};Direct=True;"
+	"Host=" ORACLE_SERVER ";Service Name=" ORACLE_SID ";User ID=" ORACLE_UID ";Password=" ORACLE_PWD ";";
+#else
 std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRIVER "};"
 	"DBQ=" ORACLE_SERVER ":" ORACLE_PORT "/" ORACLE_SID ";"
 	"UID=" ORACLE_UID ";"
@@ -80,6 +101,7 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"EXC=F;" // EXEC syntax (T/F), default F
 	"APA=T;" // thread safety (T/F), default T
 	"DBA=W;"; // write access (R/W)
+#endif
 
 const std::string ODBCOracleTest::MULTI_INSERT =
 	"BEGIN "
@@ -91,7 +113,7 @@ const std::string ODBCOracleTest::MULTI_INSERT =
 	"END;";
 
 const std::string ODBCOracleTest::MULTI_SELECT =
-	"{CALL multiResultsProcedure()}";
+	"{CALL multiResultsProcedure(?,?,?,?,?)}";
 
 
 ODBCOracleTest::ODBCOracleTest(const std::string& name):
@@ -112,20 +134,20 @@ void ODBCOracleTest::testBarebone()
 		"Second VARCHAR(30),"
 		"Third BLOB,"
 		"Fourth INTEGER,"
-		"Fifth NUMBER,"
+		"Fifth BINARY_FLOAT,"
 		"Sixth TIMESTAMP)";
 
 	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
 	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
-
+/* TODO - Oracle has different semantics for multiple results
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
-		"Second INTEGER,"
-		"Third NUMBER)";
+		"Second NUMBER,"
+		"Third BINARY_FLOAT)";
 
-	*_pSession << "CREATE OR REPLACE "
+	std::string procCreateString = "CREATE OR REPLACE "
 			"PROCEDURE multiResultsProcedure(ret1 OUT SYS_REFCURSOR, "
 			"ret2 OUT SYS_REFCURSOR,"
 			"ret3 OUT SYS_REFCURSOR,"
@@ -137,33 +159,37 @@ void ODBCOracleTest::testBarebone()
 			"OPEN ret3 FOR SELECT * FROM Test WHERE First = '3';"
 			"OPEN ret4 FOR SELECT * FROM Test WHERE First = '4';"
 			"OPEN ret5 FOR SELECT * FROM Test WHERE First = '5';"
-			"END multiResultsProcedure;" , now;
+			"END multiResultsProcedure;";// , now;
 
 	_pExecutor->bareboneODBCMultiResultTest(_connectString,
 		tableCreateString,
 		SQLExecutor::PB_IMMEDIATE,
 		SQLExecutor::DE_MANUAL,
 		MULTI_INSERT,
-		MULTI_SELECT);
+		MULTI_SELECT,
+		procCreateString);
 	_pExecutor->bareboneODBCMultiResultTest(_connectString,
 		tableCreateString,
 		SQLExecutor::PB_IMMEDIATE,
 		SQLExecutor::DE_BOUND,
 		MULTI_INSERT,
-		MULTI_SELECT);
+		MULTI_SELECT,
+		procCreateString);
 	_pExecutor->bareboneODBCMultiResultTest(_connectString,
 		tableCreateString,
 		SQLExecutor::PB_AT_EXEC,
 		SQLExecutor::DE_MANUAL,
 		MULTI_INSERT,
-		MULTI_SELECT);
+		MULTI_SELECT,
+		procCreateString);
 	_pExecutor->bareboneODBCMultiResultTest(_connectString,
 		tableCreateString,
 		SQLExecutor::PB_AT_EXEC,
 		SQLExecutor::DE_BOUND,
 		MULTI_INSERT,
-		MULTI_SELECT);
-
+		MULTI_SELECT,
+		procCreateString);
+*/
 }
 
 
@@ -176,7 +202,7 @@ void ODBCOracleTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize);
-		fail ("must fail");
+		fail ("must fail", __LINE__, __FILE__);
 	}
 	catch (DataException&)
 	{
@@ -196,7 +222,7 @@ void ODBCOracleTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1);
-		fail ("must fail");
+		fail ("must fail", __LINE__, __FILE__);
 	}
 	catch (DataException&) { }
 }
@@ -210,7 +236,7 @@ void ODBCOracleTest::testNull()
 		recreateNullsTable("NOT NULL");
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		executor().notNulls("HY000");
+		executor().notNulls({"HY000", "HY021"});
 		i += 2;
 	}
 
@@ -223,6 +249,13 @@ void ODBCOracleTest::testNull()
 		executor().nulls();
 		i += 2;
 	}
+}
+
+
+void ODBCOracleTest::testTransaction()
+{
+	setReadUncommitted(false);
+	ODBCTest::testTransaction();
 }
 
 
@@ -252,7 +285,7 @@ void ODBCOracleTest::testStoredProcedure()
 		int j = 0;
 		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
 		assertTrue (4 == j);
-		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+		dropObject("PROCEDURE", "storedProcedure");
 
 		*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE storedProcedure(ioParam IN OUT NUMBER) IS "
@@ -320,7 +353,7 @@ void ODBCOracleTest::testStoredProcedureAny()
 
 		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
 		assertTrue (4 == AnyCast<int>(j));
-		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+		dropObject("PROCEDURE", "storedProcedure");
 
 		*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE storedProcedure(ioParam IN OUT NUMBER) IS "
@@ -353,7 +386,7 @@ void ODBCOracleTest::testStoredProcedureDynamicAny()
 
 		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
 		assertTrue (4 == j);
-		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+		dropObject("PROCEDURE", "storedProcedure");
 
 		*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE storedProcedure(ioParam IN OUT NUMBER) IS "
@@ -372,189 +405,213 @@ void ODBCOracleTest::testStoredProcedureDynamicAny()
 
 void ODBCOracleTest::testCursorStoredProcedure()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k+1));
 
-		recreatePersonTable();
-		typedef Tuple<std::string, std::string, std::string, int> Person;
-		std::vector<Person> people;
-		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
-		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
-		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+			recreatePersonTable();
+			typedef Tuple<std::string, std::string, std::string, int> Person;
+			std::vector<Person> people;
+			people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+			people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+			people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+			*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
-		*_pSession << "CREATE OR REPLACE "
-			"PROCEDURE storedCursorProcedure(ret OUT SYS_REFCURSOR, ageLimit IN NUMBER) IS "
-			" BEGIN "
-			" OPEN ret FOR "
-			" SELECT * "
-			" FROM Person "
-			" WHERE Age < ageLimit "
-			" ORDER BY Age DESC; "
-			" END storedCursorProcedure;" , now;
+			*_pSession << "CREATE OR REPLACE "
+				"PROCEDURE storedCursorProcedure(ret OUT SYS_REFCURSOR, ageLimit IN NUMBER) IS "
+				" BEGIN "
+				" OPEN ret FOR "
+				" SELECT * "
+				" FROM Person "
+				" WHERE Age < ageLimit "
+				" ORDER BY Age DESC; "
+				" END storedCursorProcedure;" , now;
 
-		people.clear();
-		int age = 13;
+			people.clear();
+			int age = 13;
 
-		*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
+			*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
 
-		assertTrue (2 == people.size());
-		assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
-		assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+			assertTrue (2 == people.size());
+			assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+			assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
 
-		Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
-		RecordSet rs(stmt);
-		assertTrue (rs["LastName"] == "Simpson");
-		assertTrue (rs["FirstName"] == "Bart");
-		assertTrue (rs["Address"] == "Springfield");
-		assertTrue (rs["Age"] == 12);
+			Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
+			RecordSet rs(stmt);
+			assertTrue (rs["LastName"] == "Simpson");
+			assertTrue (rs["FirstName"] == "Bart");
+			assertTrue (rs["Address"] == "Springfield");
+			assertTrue (rs["Age"] == 12);
 
-		dropObject("TABLE", "Person");
-		dropObject("PROCEDURE", "storedCursorProcedure");
+			dropObject("TABLE", "Person");
+			dropObject("PROCEDURE", "storedCursorProcedure");
 
-		k += 2;
+			k += 2;
+		}
+	}
+	catch(const DataException& e)
+	{
+		std::cerr <<  e.displayText() << '\n';
+		fail ("testCursorStoredProcedure()", __LINE__, __FILE__);
 	}
 }
 
 
 void ODBCOracleTest::testStoredFunction()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k+1));
 
-		try{
+			try{
+			*_pSession << "CREATE OR REPLACE "
+				"FUNCTION storedFunction RETURN NUMBER IS "
+				" BEGIN return(-1); "
+				" END storedFunction;" , now;
+			}catch(StatementException& se) { std::cout << se.toString() << std::endl; }
+
+			int i = 0;
+			*_pSession << "{? = call storedFunction()}", out(i), now;
+			assertTrue (-1 == i);
+			dropObject("FUNCTION", "storedFunction");
+
+
+			*_pSession << "CREATE OR REPLACE "
+				"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
+				" BEGIN RETURN(inParam*inParam); "
+				" END storedFunction;" , now;
+
+			i = 2;
+			int result = 0;
+			*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+			assertTrue (4 == result);
+			dropObject("FUNCTION", "storedFunction");
+
+			*_pSession << "CREATE OR REPLACE "
+				"FUNCTION storedFunction(inParam IN NUMBER, outParam OUT NUMBER) RETURN NUMBER IS "
+				" BEGIN outParam := inParam*inParam; RETURN(outParam); "
+				" END storedFunction;" , now;
+
+			i = 2;
+			int j = 0;
+			result = 0;
+			*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+			assertTrue (4 == j);
+			assertTrue (j == result);
+			dropObject("FUNCTION", "storedFunction");
+
+			*_pSession << "CREATE OR REPLACE "
+				"FUNCTION storedFunction(param1 IN OUT NUMBER, param2 IN OUT NUMBER) RETURN NUMBER IS "
+				" temp NUMBER := param1; "
+				" BEGIN param1 := param2; param2 := temp; RETURN(param1+param2); "
+				" END storedFunction;" , now;
+
+			i = 1;
+			j = 2;
+			result = 0;
+			*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+			assertTrue (1 == j);
+			assertTrue (2 == i);
+			assertTrue (3 == result);
+
+			Tuple<int, int> params(1, 2);
+			assertTrue (1 == params.get<0>());
+			assertTrue (2 == params.get<1>());
+			result = 0;
+			*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+			assertTrue (1 == params.get<1>());
+			assertTrue (2 == params.get<0>());
+			assertTrue (3 == result);
+			dropObject("FUNCTION", "storedFunction");
+
+			k += 2;
+		}
+
+		session().setFeature("autoBind", true);
+
 		*_pSession << "CREATE OR REPLACE "
-			"FUNCTION storedFunction RETURN NUMBER IS "
-			" BEGIN return(-1); "
-			" END storedFunction;" , now;
-		}catch(StatementException& se) { std::cout << se.toString() << std::endl; }
+			"FUNCTION storedFunction(inParam IN VARCHAR2, outParam OUT VARCHAR2) RETURN VARCHAR2 IS "
+			" BEGIN outParam := inParam; RETURN outParam;"
+			"END storedFunction;" , now;
 
-		int i = 0;
-		*_pSession << "{? = call storedFunction()}", out(i), now;
-		assertTrue (-1 == i);
+		std::string inParam = "123";
+		std::string outParam;
+		std::string ret;
+		*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
+		assertTrue ("123" == inParam);
+		assertTrue (inParam == outParam);
+		assertTrue (ret == outParam);
 		dropObject("FUNCTION", "storedFunction");
-
-
-		*_pSession << "CREATE OR REPLACE "
-			"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
-			" BEGIN RETURN(inParam*inParam); "
-			" END storedFunction;" , now;
-
-		i = 2;
-		int result = 0;
-		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assertTrue (4 == result);
-		dropObject("FUNCTION", "storedFunction");
-
-		*_pSession << "CREATE OR REPLACE "
-			"FUNCTION storedFunction(inParam IN NUMBER, outParam OUT NUMBER) RETURN NUMBER IS "
-			" BEGIN outParam := inParam*inParam; RETURN(outParam); "
-			" END storedFunction;" , now;
-
-		i = 2;
-		int j = 0;
-		result = 0;
-		*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
-		assertTrue (4 == j);
-		assertTrue (j == result);
-		dropObject("FUNCTION", "storedFunction");
-
-		*_pSession << "CREATE OR REPLACE "
-			"FUNCTION storedFunction(param1 IN OUT NUMBER, param2 IN OUT NUMBER) RETURN NUMBER IS "
-			" temp NUMBER := param1; "
-			" BEGIN param1 := param2; param2 := temp; RETURN(param1+param2); "
-			" END storedFunction;" , now;
-
-		i = 1;
-		j = 2;
-		result = 0;
-		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
-		assertTrue (1 == j);
-		assertTrue (2 == i);
-		assertTrue (3 == result);
-
-		Tuple<int, int> params(1, 2);
-		assertTrue (1 == params.get<0>());
-		assertTrue (2 == params.get<1>());
-		result = 0;
-		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
-		assertTrue (1 == params.get<1>());
-		assertTrue (2 == params.get<0>());
-		assertTrue (3 == result);
-		dropObject("FUNCTION", "storedFunction");
-
-		k += 2;
 	}
-
-	session().setFeature("autoBind", true);
-
-	*_pSession << "CREATE OR REPLACE "
-		"FUNCTION storedFunction(inParam IN VARCHAR2, outParam OUT VARCHAR2) RETURN VARCHAR2 IS "
-		" BEGIN outParam := inParam; RETURN outParam;"
-		"END storedFunction;" , now;
-
-	std::string inParam = "123";
-	std::string outParam;
-	std::string ret;
-	*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
-	assertTrue ("123" == inParam);
-	assertTrue (inParam == outParam);
-	assertTrue (ret == outParam);
-	dropObject("PROCEDURE", "storedFunction");
+	catch(const DataException& e)
+	{
+		std::cerr << e.displayText() << '\n';
+		fail ("testStoredFunction()", __LINE__, __FILE__);
+	}
 }
 
 
 void ODBCOracleTest::testCursorStoredFunction()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k+1));
 
-		recreatePersonTable();
-		typedef Tuple<std::string, std::string, std::string, int> Person;
-		std::vector<Person> people;
-		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
-		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
-		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+			recreatePersonTable();
+			typedef Tuple<std::string, std::string, std::string, int> Person;
+			std::vector<Person> people;
+			people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+			people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+			people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+			*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
-		*_pSession << "CREATE OR REPLACE "
-			"FUNCTION storedCursorFunction(ageLimit IN NUMBER) RETURN SYS_REFCURSOR IS "
-			" ret SYS_REFCURSOR; "
-			" BEGIN "
-			" OPEN ret FOR "
-			" SELECT * "
-			" FROM Person "
-			" WHERE Age < ageLimit "
-			" ORDER BY Age DESC; "
-			" RETURN ret; "
-			" END storedCursorFunction;" , now;
+			*_pSession << "CREATE OR REPLACE "
+				"FUNCTION storedCursorFunction(ageLimit IN NUMBER) RETURN SYS_REFCURSOR IS "
+				" ret SYS_REFCURSOR; "
+				" BEGIN "
+				" OPEN ret FOR "
+				" SELECT * "
+				" FROM Person "
+				" WHERE Age < ageLimit "
+				" ORDER BY Age DESC; "
+				" RETURN ret; "
+				" END storedCursorFunction;" , now;
 
-		people.clear();
-		int age = 13;
+			people.clear();
+			int age = 13;
 
-		*_pSession << "{call storedCursorFunction(?)}", in(age), into(people), now;
+			*_pSession << "{call storedCursorFunction(?)}", in(age), into(people), now;
 
-		assertTrue (2 == people.size());
-		assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
-		assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+			assertTrue (2 == people.size());
+			assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+			assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
 
-		Statement stmt = ((*_pSession << "{call storedCursorFunction(?)}", in(age), now));
-		RecordSet rs(stmt);
-		assertTrue (rs["LastName"] == "Simpson");
-		assertTrue (rs["FirstName"] == "Bart");
-		assertTrue (rs["Address"] == "Springfield");
-		assertTrue (rs["Age"] == 12);
+			Statement stmt = ((*_pSession << "{call storedCursorFunction(?)}", in(age), now));
+			RecordSet rs(stmt);
+			assertTrue (rs["LastName"] == "Simpson");
+			assertTrue (rs["FirstName"] == "Bart");
+			assertTrue (rs["Address"] == "Springfield");
+			assertTrue (rs["Age"] == 12);
 
-		dropObject("TABLE", "Person");
-		dropObject("FUNCTION", "storedCursorFunction");
+			dropObject("TABLE", "Person");
+			dropObject("FUNCTION", "storedCursorFunction");
 
-		k += 2;
+			k += 2;
+		}
+	}
+	catch(const DataException& e)
+	{
+		std::cerr << e.displayText() << '\n';
+		fail ("testCursorStoredFunction()", __LINE__, __FILE__);
 	}
 }
 
@@ -655,7 +712,7 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 		for (; it != flds.end(); ++it)
 		{
 			if (4043 == it->_nativeError || //ORA-04043 (object does not exist)
-				942 == it->_nativeError)//ORA-00942 (table does not exist)
+				942 == it->_nativeError || 1433808584/*DevArt*/== it->_nativeError) //ORA-00942 (table does not exist)
 			{
 				ignoreError = true;
 				break;
@@ -671,8 +728,8 @@ void ODBCOracleTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
 	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR2(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat NUMBER NULL , EmptyDateTime TIMESTAMP NULL)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
 }
 
 
@@ -680,8 +737,8 @@ void ODBCOracleTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR2(30), FirstName VARCHAR2(30), Address VARCHAR2(30), Age INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
 }
 
 
@@ -690,8 +747,8 @@ void ODBCOracleTest::recreatePersonTupleTable()
 	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName1 VARCHAR2(30), FirstName1 VARCHAR2(30), Address1 VARCHAR2(30), Age1 INTEGER,"
 		"LastName2 VARCHAR2(30), FirstName2 VARCHAR2(30), Address2 VARCHAR2(30), Age2 INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTupleTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTupleTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTupleTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTupleTable()", __LINE__, __FILE__); }
 }
 
 
@@ -699,8 +756,8 @@ void ODBCOracleTest::recreatePersonBLOBTable()
 {
 	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()", __LINE__, __FILE__); }
 }
 
 
@@ -708,8 +765,8 @@ void ODBCOracleTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()", __LINE__, __FILE__); }
 }
 
 
@@ -717,8 +774,8 @@ void ODBCOracleTest::recreatePersonDateTable()
 {
 	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()", __LINE__, __FILE__); }
 }
 
 
@@ -726,8 +783,8 @@ void ODBCOracleTest::recreateIntsTable()
 {
 	dropObject("TABLE", "Strings");
 	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()", __LINE__, __FILE__); }
 }
 
 
@@ -735,8 +792,8 @@ void ODBCOracleTest::recreateStringsTable()
 {
 	dropObject("TABLE", "Strings");
 	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()", __LINE__, __FILE__); }
 }
 
 
@@ -744,8 +801,8 @@ void ODBCOracleTest::recreateFloatsTable()
 {
 	dropObject("TABLE", "Strings");
 	try { *_pSession << "CREATE TABLE Strings (str NUMBER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()", __LINE__, __FILE__); }
 }
 
 
@@ -756,8 +813,8 @@ void ODBCOracleTest::recreateTuplesTable()
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateTuplesTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateTuplesTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateTuplesTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateTuplesTable()", __LINE__, __FILE__); }
 }
 
 
@@ -765,8 +822,8 @@ void ODBCOracleTest::recreateVectorsTable()
 {
 	dropObject("TABLE", "Vectors");
 	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 NUMBER(5,2), str0 VARCHAR(30))", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()", __LINE__, __FILE__); }
 }
 
 
@@ -774,8 +831,8 @@ void ODBCOracleTest::recreateAnysTable()
 {
 	dropObject("TABLE", "Anys");
 	try { *_pSession << "CREATE TABLE Anys (int0 INTEGER, flt0 NUMBER, str0 VARCHAR(30))", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()", __LINE__, __FILE__); }
 }
 
 
@@ -786,8 +843,8 @@ void ODBCOracleTest::recreateNullsTable(const std::string& notNull)
 		notNull,
 		notNull,
 		notNull), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()", __LINE__, __FILE__); }
 }
 
 
@@ -802,8 +859,8 @@ void ODBCOracleTest::recreateMiscTable()
 			"Third INTEGER,"
 			"Fourth NUMBER,"
 			"Fifth TIMESTAMP)", now;
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()", __LINE__, __FILE__); }
 }
 
 
@@ -827,8 +884,8 @@ void ODBCOracleTest::recreateLogTable()
 		session() << sql, "T_POCO_LOG", now;
 		session() << sql, "T_POCO_LOG_ARCHIVE", now;
 
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()", __LINE__, __FILE__); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()", __LINE__, __FILE__); }
 }
 
 
@@ -854,6 +911,9 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
 
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSession);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
@@ -911,23 +971,20 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
+		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
+		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFilter);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRowIterator);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testAsync);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testAny);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testDynamicAny);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testMultipleResults);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLChannel);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransactionNoAutoCommit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransaction);

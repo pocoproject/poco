@@ -33,11 +33,11 @@ public:
 	                 long data2lineNumber,
 	                 const std::string& fileName);
 	CppUnitException(const CppUnitException& other);
-	virtual ~CppUnitException() throw();
+	virtual ~CppUnitException() noexcept;
 
 	CppUnitException& operator = (const CppUnitException& other);
 
-	const char* what() const throw ();
+	const char* what() const noexcept;
 
 	long lineNumber() const;
 	long data1LineNumber() const;
@@ -81,7 +81,7 @@ inline CppUnitException::CppUnitException (const std::string& message, long line
 }
 
 
-inline CppUnitException::~CppUnitException () throw()
+inline CppUnitException::~CppUnitException () noexcept
 {
 }
 
@@ -102,7 +102,7 @@ inline CppUnitException& CppUnitException::operator = (const CppUnitException& o
 }
 
 
-inline const char* CppUnitException::what() const throw ()
+inline const char* CppUnitException::what() const noexcept
 {
 	return _message.c_str();
 }

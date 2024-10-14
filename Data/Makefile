@@ -15,8 +15,16 @@ objects = AbstractBinder AbstractBinding AbstractExtraction AbstractExtractor \
 	SessionPool SessionPoolContainer SQLChannel \
 	Statement StatementCreator StatementImpl Time Transcoder
 
-target         = PocoData
-target_version = $(LIBVERSION)
-target_libs    = PocoFoundation
+ifndef POCO_DATA_NO_SQL_PARSER
+	objects += SQLParser SQLParserResult \
+		bison_parser flex_lexer \
+		CreateStatement PrepareStatement SQLStatement \
+		Expr statements sqlhelper
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
+endif
+
+target          = PocoData
+target_version  = $(LIBVERSION)
+target_libs     = PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

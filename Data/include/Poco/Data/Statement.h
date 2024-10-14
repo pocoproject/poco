@@ -30,12 +30,25 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/Format.h"
+#include "Poco/Optional.h"
 #include <algorithm>
 
+#ifndef POCO_DATA_NO_SQL_PARSER
+
+namespace hsql {
+	class SQLParserResult;
+}
+
+#endif // POCO_DATA_NO_SQL_PARSER
 
 namespace Poco {
 namespace Data {
 
+#ifndef POCO_DATA_NO_SQL_PARSER
+
+namespace Parser = hsql; // namespace Poco::Data::Parser
+
+#endif // POCO_DATA_NO_SQL_PARSER
 
 class AbstractBinding;
 class AbstractExtraction;
@@ -70,6 +83,18 @@ class Data_API Statement
 	/// member function.
 	/// If no formatter is externally supplied to the statement, the SimpleRowFormatter is lazy
 	/// created and used.
+	///
+	/// If compiled with SQLParser support, Statement knows the number and type of the SQL statement(s)
+	/// it contains, to the extent that the SQL string is a standard SQL and the staement type is supported.
+	/// No proprietary SQL extensions are supported.
+	///
+	/// Supported statement types are:
+	///
+	///   - SELECT
+	///   - INSERT
+	///   - UPDATE
+	///   - DELETE
+	///
 {
 public:
 	typedef void (*Manipulator)(Statement&);
@@ -189,9 +214,9 @@ public:
 		/// Registers extraction container with the Statement.
 	{
 		if (reset) _pImpl->resetExtraction();
-		typename C::iterator itAE = val.begin();
-		typename C::iterator itAEEnd = val.end();
-		for (; itAE != itAEEnd; ++itAE) addExtract(*itAE);
+		typename C::iterator it = val.begin();
+		typename C::iterator end = val.end();
+		for (; it != end; ++it) addExtract(*it);
 		return *this;
 	}
 
@@ -200,9 +225,9 @@ public:
 		/// Registers container of extraction containers with the Statement.
 	{
 		_pImpl->resetExtraction();
-		typename C::iterator itAEV = val.begin();
-		typename C::iterator itAEVEnd = val.end();
-		for (; itAEV != itAEVEnd; ++itAEV) addExtraction(*itAEV, false);
+		typename C::iterator it = val.begin();
+		typename C::iterator end = val.end();
+		for (; it != end; ++it) addExtraction(*it, false);
 		return *this;
 	}
 
@@ -291,6 +316,57 @@ public:
 	const std::string& toString() const;
 		/// Creates a string from the accumulated SQL statement.
 
+	Optional<std::size_t> statementsCount() const;
+		/// Returns the total number of SQL statements held in the accummulated SQL statement.
+		///
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> parse();
+		/// Parses the SQL statement and returns true if successful.
+		///
+		/// Note that parsing is not guaranteed to succeed, as some backends have proprietary
+		/// keywords not supported by the parser. Parsing failures are silent in terms of
+		/// throwing exceptions or logging, but it is possible to get error information by
+		/// calling parseError().
+		///
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	const std::string& parseError();
+		/// Returns the SQL statement parse error message, if any.
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns an empty string.
+
+	Optional<bool> isSelect() const;
+		/// Returns true if the statement consists only of SELECT statement(s).
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> isInsert() const;
+		/// Returns true if the statement consists only of INSERT statement(s).
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> isUpdate() const;
+		/// Returns true if the statement consists only of UPDATE statement(s).
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> isDelete() const;
+		/// Returns true if the statement consists only of DELETE statement(s).
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> hasSelect() const;
+		/// Returns true if the statement contains a SELECT statement.
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> hasInsert() const;
+		/// Returns true if the statement contains an INSERT statement.
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> hasUpdate() const;
+		/// Returns true if the statement contains an UPDATE statement.
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
+	Optional<bool> hasDelete() const;
+		/// Returns true if the statement contains a DELETE statement.
+		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+
 	std::size_t execute(bool reset = true);
 		/// Executes the statement synchronously or asynchronously.
 		/// Stops when either a limit is hit or the whole statement was executed.
@@ -298,11 +374,35 @@ public:
 		/// returning data) or number of rows affected (for all other statements).
 		/// If reset is true (default), associated storage is reset and reused.
 		/// Otherwise, the results from this execution step are appended.
-		/// Reset argument has no meaning for unlimited statements that return all rows.
+		/// The reset argument has no meaning for unlimited statements that return all rows.
 		/// If isAsync() returns  true, the statement is executed asynchronously
 		/// and the return value from this function is zero.
 		/// The result of execution (i.e. number of returned or affected rows) can be
 		/// obtained by calling wait() on the statement at a later point in time.
+		///
+		/// When Poco::Data is compiled with SQL parsing support, if session is not already in
+		/// a transaction and not in autocommit mode, an attempt to parse the SQL is made before
+		/// statement execution, and if (1) successful, and (2) the statement does not consist
+		/// only of SELECT statements, a transaction is started.
+		///
+		/// Note that parsing is not guaranteed to succeed, as some backends have proprietary
+		/// keywords not supported by the parser. Parsing failures are silent in terms of
+		/// throwing exceptions or logging, but it is possible to get error information by calling
+		/// Statement::parseError().
+		/// When parsing does not succeed, transaction is not started, and Poco::Data::Session will
+		/// not reflect its state accurately. The underlying database session, however, will be in
+		/// transaction state. In such state, in order to complete the transaction and unlock the
+		/// resources, commit() or rollback() must be called on the Poco::Data::Session; this is
+		/// true even for a single SELECT statement in non-autocommit mode when parsing does not
+		/// succeed.
+		///
+		/// For Poco::Data builds without SQLParser support, the behavior is the same as
+		/// for unsuccesful parsing.
+
+	void executeDirect(const std::string& query);
+		/// Executes the query synchronously and directly.
+		/// Even when isAsync() returns true, the statement is still executed synchronously.
+		/// For transactional behavior, see execute() documentation.
 
 	const Result& executeAsync(bool reset = true);
 		/// Executes the statement asynchronously.
@@ -312,6 +412,7 @@ public:
 		/// of rows affected by the statement execution.
 		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
+		/// For transactional behavior, see execute() documentation.
 
 	void setAsync(bool async = true);
 		/// Sets the asynchronous flag. If this flag is true, executeAsync() is called
@@ -339,7 +440,10 @@ public:
 		/// and there is more work to do. When no limit is set, it will always return true after calling execute().
 
 	Statement& reset(Session& session);
-		/// Resets the Statement so that it can be filled with a new SQL command.
+		/// Resets the Statement and assigns it a new session, so that it can be filled with a new SQL query.
+
+	Statement& reset();
+		/// Resets the Statement so that it can be filled with a new SQL query.
 
 	bool canModifyStorage();
 		/// Returns true if statement is in a state that allows the internal storage to be modified.
@@ -364,6 +468,10 @@ public:
 	std::size_t subTotalRowCount(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
+
+	std::size_t affectedRowCount() const;
+		/// Returns the number of affected rows.
+		/// Used to find out the number of rows affected by insert, delete or update.
 
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
@@ -426,6 +534,34 @@ private:
 		_arguments.push_back(val);
 		return *this;
 	}
+
+	void formatQuery();
+		/// Formats the query string.
+
+	void checkBeginTransaction();
+		/// Checks if the transaction needs to be started
+		/// and starts it if not.
+		/// Transaction is automatically started for the first
+		/// statement on a non-autocommit session.
+		/// The best effort is made to detect if the query
+		/// consists of SELECT statements only, in which case
+		/// transaction does not need to started.
+		/// However, due to many SQL dialects, this logic is
+		/// not 100% accurate and transaction MAY be started
+		/// for SELECT-only queries.
+
+#ifndef POCO_DATA_NO_SQL_PARSER
+
+	bool isType(unsigned int type) const;
+		/// Returns true if the statement is of the argument type.
+
+	bool hasType(unsigned int type) const;
+		/// Returns true if the statement is of the argument type.
+
+	Poco::SharedPtr<Parser::SQLParserResult> _pParseResult;
+	std::string _parseError;
+
+#endif // POCO_DATA_NO_SQL_PARSER
 
 	StatementImpl::Ptr _pImpl;
 
@@ -702,6 +838,12 @@ inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 inline void Statement::setStorage(const std::string& storage)
 {
 	_pImpl->setStorage(storage);
+}
+
+
+inline std::size_t Statement::affectedRowCount() const
+{
+	return static_cast<std::size_t>(_pImpl->affectedRowCount());
 }
 
 

@@ -25,6 +25,7 @@
 #include "Poco/Data/AbstractPreparator.h"
 #include "Poco/Data/Constants.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Types.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
@@ -583,7 +584,7 @@ private:
 			(SQLINTEGER) dataSize,
 			&_lengths[pos])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareFixedSize():SQLBindCol()");
 		}
 	}
 
@@ -612,7 +613,7 @@ private:
 			(SQLINTEGER) dataSize,
 			&_lenLengths[pos][0])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareFixedSize():SQLBindCol()");
 		}
 	}
 
@@ -637,7 +638,7 @@ private:
 			(SQLINTEGER) size*sizeof(T),
 			&_lengths[pos])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareVariableLen():SQLBindCol()");
 		}
 	}
 
@@ -664,7 +665,7 @@ private:
 			(SQLINTEGER) size,
 			&_lenLengths[pos][0])))
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			throw StatementException(_rStmt, "ODBC::Preparator::prepareCharArray():SQLBindCol()");
 		}
 	}
 
@@ -895,7 +896,7 @@ inline void Preparator::prepare(std::size_t pos, const long&)
 
 inline void Preparator::prepare(std::size_t pos, const unsigned long&)
 {
-	prepareFixedSize<long>(pos, SQL_C_SLONG);
+	prepareFixedSize<unsigned long>(pos, SQL_C_ULONG);
 }
 
 

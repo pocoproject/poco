@@ -47,43 +47,30 @@ using Poco::DateTime;
 // uncomment to use native SQL driver
 //#define POCO_ODBC_USE_SQL_NATIVE
 
-// FreeTDS version selection guide (from http://www.freetds.org/userguide/choosingtdsprotocol.htm)
+// FreeTDS version selection guide: http://www.freetds.org/userguide/choosingtdsprotocol.htm
 // (see #define FREE_TDS_VERSION below)
-// Product												TDS Version	Comment
-// ---------------------------------------------------+------------+------------------------------------------------------------
-// Sybase before System 10, Microsoft SQL Server 6.x	4.2			Still works with all products, subject to its limitations.
-// Sybase System 10 and above							5.0			Still the most current protocol used by Sybase.
-// Sybase System SQL Anywhere							5.0 only 	Originally Watcom SQL Server, a completely separate codebase.
-// 																	Our best information is that SQL Anywhere first supported TDS
-// 																	in version 5.5.03 using the OpenServer Gateway (OSG), and native
-// 																	TDS 5.0 support arrived with version 6.0.
-// Microsoft SQL Server 7.0								7.0			Includes support for the extended datatypes in SQL Server 7.0
-// 																	(such as char/varchar fields of more than 255 characters), and
-// 																	support for Unicode.
-// Microsoft SQL Server 2000							8.0			Include support for bigint (64 bit integers), variant and collation
-// 																	on all fields. variant is not supported; collation is not widely used.
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(FORCE_FREE_TDS)
+#if !defined(FORCE_FREE_TDS)
 	#ifdef POCO_ODBC_USE_SQL_NATIVE
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server Native Client 10.0"
 	#else
-		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server"
+		#define MS_SQL_SERVER_ODBC_DRIVER "ODBC Driver 18 for SQL Server"
 	#endif
 	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver")
 #else
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
-	#define FREE_TDS_VERSION "8.0"
+	#define FREE_TDS_VERSION "7.4"
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
 	#endif
 #endif
 
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
-#define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER "\\SQLEXPRESS"
+#define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MS_SQL_SERVER_PORT "1433"
-#define MS_SQL_SERVER_DB "poco"
-#define MS_SQL_SERVER_UID "poco"
-#define MS_SQL_SERVER_PWD "poco"
+#define MS_SQL_SERVER_DB "model"
+#define MS_SQL_SERVER_UID "sa"
+#define MS_SQL_SERVER_PWD "Pocopoco1"
 
 
 ODBCTest::SessionPtr ODBCSQLServerTest::_pSession;
@@ -101,6 +88,8 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	"DATABASE=" MS_SQL_SERVER_DB ";"
 	"SERVER=" MS_SQL_SERVER_SERVER ";"
 	"PORT=" MS_SQL_SERVER_PORT ";"
+	"TrustServerCertificate=yes;"
+	"Encrypt=no"
 #ifdef FREE_TDS_VERSION
 	"TDS_Version=" FREE_TDS_VERSION ";"
 #endif
@@ -120,7 +109,7 @@ ODBCSQLServerTest::~ODBCSQLServerTest()
 
 void ODBCSQLServerTest::testBareboneODBC()
 {
-	std::string tableCreateString = "CREATE TABLE Test "
+	std::string createString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
 		"Third VARBINARY(30),"
@@ -128,24 +117,67 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	executor().bareboneODBCTest(dbConnString(), tableCreateString,
+	executor().bareboneODBCTest(dbConnString(), createString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString,
+	executor().bareboneODBCTest(dbConnString(), createString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString,
+	executor().bareboneODBCTest(dbConnString(), createString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString,
+	executor().bareboneODBCTest(dbConnString(), createString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
 
-	tableCreateString = "CREATE TABLE Test "
+	createString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
 
-	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCMultiResultTest(dbConnString(), createString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCMultiResultTest(dbConnString(), createString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCMultiResultTest(dbConnString(), createString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCMultiResultTest(dbConnString(), createString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+
+	dropObject("PROCEDURE", "TestStoredProcedure");
+	createString = "CREATE PROCEDURE TestStoredProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
+		"BEGIN "
+		" DECLARE @retVal int;"
+		" SET @outParam = @inParam; "
+		" SET @retVal = @outParam;"
+		" RETURN @retVal;"
+		"END;";
+
+	std::string execString = "{? = CALL TestStoredProcedure(?, ?)}";
+
+	executor().bareboneODBCStoredFuncTest(dbConnString(), createString, execString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCStoredFuncTest(dbConnString(), createString, execString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	// data at exec fails for the SNAC driver - for some reason, SQLParamData() never reports the return parameter
+	// newer drivers work fine
+	if (std::string(MS_SQL_SERVER_ODBC_DRIVER) != "SQL Server")
+	{
+		executor().bareboneODBCStoredFuncTest(dbConnString(), createString, execString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+		executor().bareboneODBCStoredFuncTest(dbConnString(), createString, execString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	}
+	else
+		std::cout << "Parameter at exec binding tests disabled for " << MS_SQL_SERVER_ODBC_DRIVER << std::endl;
+}
+
+void ODBCSQLServerTest::testTempTable()
+{
+	session() << "IF(OBJECT_ID('tempdb..#test') is not null) drop table #test;", now;
+
+	std::string query("create table #test (s1 int,s2 int ,s3 int);");
+	Statement stmt(session());
+	stmt.executeDirect(query);
+	session() << "insert into #test select 1,2,3;", now;
+
+	typedef Poco::Tuple<int, int, int> testParam;
+	std::vector<testParam> testParams;
+	session() << ("select * from #test;"), into(testParams), now;
+
+	assertEquals(1, static_cast<long>(testParams.size()));
+
+	assertEquals(1, testParams.front().get<0>());
+	assertEquals(2, testParams.front().get<1>());
+	assertEquals(3, testParams.front().get<2>());
 }
 
 
@@ -158,7 +190,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&)
 	{
@@ -178,7 +210,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
-		fail ("must fail");
+		fail (__func__, __LINE__, __FILE__);
 	}
 	catch (DataException&) { }
 }
@@ -192,7 +224,7 @@ void ODBCSQLServerTest::testNull()
 		recreateNullsTable("NOT NULL");
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		executor().notNulls("23000");
+		executor().notNulls({"23000"});
 		i += 2;
 	}
 
@@ -243,285 +275,386 @@ void ODBCSQLServerTest::testBulk()
 
 void ODBCSQLServerTest::testStoredProcedure()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k + 1));
 
+			dropObject("PROCEDURE", "storedProcedure");
+
+			session() << "CREATE PROCEDURE storedProcedure(@outParam int OUTPUT) AS "
+				"BEGIN "
+				" SET @outParam = -1; "
+				"END;"
+			, now;
+
+			int i = 0;
+			session() << "{call storedProcedure(?)}", out(i), now;
+			assertTrue (-1 == i);
+
+			dropObject("PROCEDURE", "storedProcedure");
+			session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+				"BEGIN "
+				" SET @outParam = @inParam*@inParam; "
+				"END;"
+			, now;
+
+			i = 2;
+			int j = 0;
+			session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+			assertTrue (4 == j);
+
+			dropObject("PROCEDURE", "storedProcedure");
+			session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+				"BEGIN "
+				" SET @ioParam = @ioParam*@ioParam; "
+				"END;"
+			, now;
+
+			i = 2;
+			session() << "{call storedProcedure(?)}", io(i), now;
+			assertTrue (4 == i);
+			dropObject("PROCEDURE", "storedProcedure");
+
+			session() << "CREATE PROCEDURE storedProcedure(@ioParam DATETIME OUTPUT) AS "
+				"BEGIN "
+				" SET @ioParam = @ioParam + 1; "
+				"END;" , now;
+
+			DateTime dt(1965, 6, 18, 5, 35, 1);
+			session() << "{call storedProcedure(?)}", io(dt), now;
+			assertTrue (19 == dt.day());
+			dropObject("PROCEDURE", "storedProcedure");
+
+			session().setFeature("autoBind", true);
+			session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
+				"BEGIN "
+				" SET @outParam = @inParam; "
+				"END;"
+				, now;
+
+			std::string inParam = "123";
+			std::string outParam(4, 0);
+			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+			assertTrue(outParam == inParam);
+
+			k += 2;
+		}
 		dropObject("PROCEDURE", "storedProcedure");
-
-		session() << "CREATE PROCEDURE storedProcedure(@outParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @outParam = -1; "
-			"END;"
-		, now;
-
-		int i = 0;
-		session() << "{call storedProcedure(?)}", out(i), now;
-		assertTrue (-1 == i);
-		dropObject("PROCEDURE", "storedProcedure");
-
-		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @outParam = @inParam*@inParam; "
-			"END;"
-		, now;
-
-		i = 2;
-		int j = 0;
-		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assertTrue (4 == j);
-		dropObject("PROCEDURE", "storedProcedure");
-
-		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @ioParam = @ioParam*@ioParam; "
-			"END;"
-		, now;
-
-		i = 2;
-		session() << "{call storedProcedure(?)}", io(i), now;
-		assertTrue (4 == i);
-		dropObject("PROCEDURE", "storedProcedure");
-
-		session() << "CREATE PROCEDURE storedProcedure(@ioParam DATETIME OUTPUT) AS "
-			"BEGIN "
-			" SET @ioParam = @ioParam + 1; "
-			"END;" , now;
-
-		DateTime dt(1965, 6, 18, 5, 35, 1);
-		session() << "{call storedProcedure(?)}", io(dt), now;
-		assertTrue (19 == dt.day());
-		dropObject("PROCEDURE", "storedProcedure");
-
-		k += 2;
 	}
-/*TODO - currently fails with following error:
-
-[Microsoft][ODBC SQL Server Driver][SQL Server]Invalid parameter
-2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.
-Deprecated types are not supported as output parameters.  Use current large object types instead.
-
-	session().setFeature("autoBind", true);
-	session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
-		"BEGIN "
-		"SET @outParam = @inParam; "
-		"END;"
-	, now;
-
-	std::string inParam = "123";
-	std::string outParam;
-	try{
-	session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
-	}catch(StatementException& ex){std::cout << ex.toString();}
-	assertTrue (outParam == inParam);
-	dropObject("PROCEDURE", "storedProcedure");
-	*/
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedure()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedure()"); }
 }
 
 
 void ODBCSQLServerTest::testCursorStoredProcedure()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k+1));
 
-		recreatePersonTable();
-		typedef Tuple<std::string, std::string, std::string, int> Person;
-		std::vector<Person> people;
-		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
-		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
-		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+			recreatePersonTable();
+			typedef Tuple<std::string, std::string, std::string, int> Person;
+			std::vector<Person> people;
+			people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+			people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+			people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+			session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
+			dropObject("PROCEDURE", "storedCursorProcedure");
+			session() << "CREATE PROCEDURE storedCursorProcedure(@ageLimit int) AS "
+				"BEGIN "
+				" SELECT * "
+				" FROM Person "
+				" WHERE Age < @ageLimit "
+				" ORDER BY Age DESC; "
+				"END;"
+			, now;
+
+			people.clear();
+			int age = 13;
+
+			session() << "{call storedCursorProcedure(?)}", in(age), into(people), now;
+
+			assertTrue (2 == people.size());
+			assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+			assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+			Statement stmt = ((session() << "{call storedCursorProcedure(?)}", in(age), now));
+			RecordSet rs(stmt);
+			assertTrue (rs["LastName"] == "Simpson");
+			assertTrue (rs["FirstName"] == "Bart");
+			assertTrue (rs["Address"] == "Springfield");
+			assertTrue (rs["Age"] == 12);
+
+			dropObject("PROCEDURE", "storedCursorProcedure");
+
+			// procedure that suppresses row counts and recordsets
+			session() << "CREATE PROCEDURE storedCursorProcedure(@outStr varchar(64) OUTPUT) AS "
+				"BEGIN "
+				" SET NOCOUNT ON;"
+				" DECLARE @PersonTable TABLE (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER); "
+				" INSERT INTO @PersonTable SELECT * FROM Person; "
+				" UPDATE Person SET FirstName = 'Dart' WHERE FirstName = 'Bart';"
+				" SELECT @outStr = FirstName FROM Person WHERE Age = 12;"
+				" RETURN -1;"
+				"END;"
+				, now;
+
+			std::string outStr(64, 0);
+			int ret = 0;
+			session() << "{? = call storedCursorProcedure(?)}", out(ret), out(outStr), now;
+			assertTrue(ret == -1);
+			assertTrue(outStr == "Dart");
+
+			dropObject("PROCEDURE", "storedCursorProcedure");
+
+			// procedure that suppresses row counts and recordsets
+			session() << "CREATE PROCEDURE storedCursorProcedure(@name varchar(30)) AS "
+				"BEGIN "
+				" SET NOCOUNT ON;"
+				" DECLARE @count int; "
+				" SELECT @count = count(*) FROM Person WHERE FirstName = @name;"
+				" RETURN @count;"
+				"END;"
+				, now;
+
+			std::string name = "Dart";
+			ret = 0;
+			session() << "{? = call storedCursorProcedure(?)}", out(ret), in(name), now;
+			assertTrue(ret == 1);
+
+			dropObject("TABLE", "Person");
+
+			k += 2;
+		}
 		dropObject("PROCEDURE", "storedCursorProcedure");
-		session() << "CREATE PROCEDURE storedCursorProcedure(@ageLimit int) AS "
-			"BEGIN "
-			" SELECT * "
-			" FROM Person "
-			" WHERE Age < @ageLimit "
-			" ORDER BY Age DESC; "
-			"END;"
-		, now;
-
-		people.clear();
-		int age = 13;
-
-		session() << "{call storedCursorProcedure(?)}", in(age), into(people), now;
-
-		assertTrue (2 == people.size());
-		assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
-		assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
-
-		Statement stmt = ((session() << "{call storedCursorProcedure(?)}", in(age), now));
-		RecordSet rs(stmt);
-		assertTrue (rs["LastName"] == "Simpson");
-		assertTrue (rs["FirstName"] == "Bart");
-		assertTrue (rs["Address"] == "Springfield");
-		assertTrue (rs["Age"] == 12);
-
-		dropObject("TABLE", "Person");
-		dropObject("PROCEDURE", "storedCursorProcedure");
-
-		k += 2;
 	}
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testCursorStoredProcedure()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testCursorStoredProcedure()"); }
 }
 
 
 void ODBCSQLServerTest::testStoredProcedureAny()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k+1));
 
-		Any i = 2;
-		Any j = 0;
+			Any i = 2;
+			Any j = 0;
 
-		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @outParam = @inParam*@inParam; "
-			"END;"
-		, now;
+			dropObject("PROCEDURE", "storedProcedure");
+			session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+				"BEGIN "
+				"SET @outParam = @inParam*@inParam; "
+				"END;"
+			, now;
 
-		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assertTrue (4 == AnyCast<int>(j));
-		session() << "DROP PROCEDURE storedProcedure;", now;
+			session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+			assertTrue (4 == AnyCast<int>(j));
 
-		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @ioParam = @ioParam*@ioParam; "
-			"END;"
-		, now;
+			dropObject("PROCEDURE", "storedProcedure");
+			session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+				"BEGIN "
+				"SET @ioParam = @ioParam*@ioParam; "
+				"END;"
+			, now;
 
-		i = 2;
-		session() << "{call storedProcedure(?)}", io(i), now;
-		assertTrue (4 == AnyCast<int>(i));
+			i = 2;
+			session() << "{call storedProcedure(?)}", io(i), now;
+			assertTrue (4 == AnyCast<int>(i));
+			dropObject("PROCEDURE", "storedProcedure");
+
+			k += 2;
+		}
 		dropObject("PROCEDURE", "storedProcedure");
-
-		k += 2;
 	}
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureAny()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureAny()"); }
 }
 
 
 void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
 
-		DynamicAny i = 2;
-		DynamicAny j = 0;
+			DynamicAny i = 2;
+			DynamicAny j = 0;
 
-		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @outParam = @inParam*@inParam; "
-			"END;"
-		, now;
+			dropObject("PROCEDURE", "storedProcedure");
+			session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+				"BEGIN "
+				"SET @outParam = @inParam*@inParam; "
+				"END;"
+			, now;
 
-		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assertTrue (4 == j);
-		session() << "DROP PROCEDURE storedProcedure;", now;
+			session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+			assertTrue (4 == j);
 
-		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @ioParam = @ioParam*@ioParam; "
-			"END;"
-		, now;
+			dropObject("PROCEDURE", "storedProcedure");
+			session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+				"BEGIN "
+				"SET @ioParam = @ioParam*@ioParam; "
+				"END;"
+			, now;
 
-		i = 2;
-		session() << "{call storedProcedure(?)}", io(i), now;
-		assertTrue (4 == i);
+			i = 2;
+			session() << "{call storedProcedure(?)}", io(i), now;
+			assertTrue (4 == i);
+
+			k += 2;
+		}
 		dropObject("PROCEDURE", "storedProcedure");
-
-		k += 2;
 	}
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
+}
+
+
+void ODBCSQLServerTest::testStoredProcedureReturn()
+{
+	try
+	{
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k+1));
+
+			dropObject("PROCEDURE", "storedProcedureReturn");
+			session() << "CREATE PROCEDURE storedProcedureReturn AS "
+				"BEGIN "
+				"DECLARE @retVal int;"
+				"SET @retVal = -1;"
+				"RETURN @retVal;"
+				"END;"
+			, now;
+
+			int i = 0;
+			session() << "{? = call storedProcedureReturn}", out(i), now;
+			assertTrue (-1 == i);
+
+			dropObject("PROCEDURE", "storedProcedureReturn");
+			session() << "CREATE PROCEDURE storedProcedureReturn(@inParam int) AS "
+				"BEGIN "
+				"RETURN @inParam*@inParam;"
+				"END;"
+			, now;
+
+			i = 2;
+			int result = 0;
+			session() << "{? = call storedProcedureReturn(?)}", out(result), in(i), now;
+			assertTrue (4 == result);
+
+			dropObject("PROCEDURE", "storedProcedureReturn");
+			session() << "CREATE PROCEDURE storedProcedureReturn(@inParam int, @outParam int OUTPUT) AS "
+				"BEGIN "
+				"SET @outParam = @inParam*@inParam;"
+				"RETURN @outParam;"
+				"END"
+			, now;
+
+			i = 2;
+			int j = 0;
+			result = 0;
+			session() << "{? = call storedProcedureReturn(?, ?)}", out(result), in(i), out(j), now;
+			assertTrue (4 == j);
+			assertTrue (j == result);
+
+			dropObject("PROCEDURE", "storedProcedureReturn");
+			session() << "CREATE PROCEDURE storedProcedureReturn(@param1 int OUTPUT,@param2 int OUTPUT) AS "
+				"BEGIN "
+				"DECLARE @temp int; "
+				"SET @temp = @param1;"
+				"SET @param1 = @param2;"
+				"SET @param2 = @temp;"
+				"RETURN @param1 + @param2; "
+				"END"
+			, now;
+
+			i = 1;
+			j = 2;
+			result = 0;
+			session() << "{? = call storedProcedureReturn(?, ?)}", out(result), io(i), io(j), now;
+			assertTrue (1 == j);
+			assertTrue (2 == i);
+			assertTrue (3 == result);
+
+			Tuple<int, int> params(1, 2);
+			assertTrue (1 == params.get<0>());
+			assertTrue (2 == params.get<1>());
+			result = 0;
+			session() << "{? = call storedProcedureReturn(?, ?)}", out(result), io(params), now;
+			assertTrue (1 == params.get<1>());
+			assertTrue (2 == params.get<0>());
+			assertTrue (3 == result);
+
+			k += 2;
+		}
+		dropObject("PROCEDURE", "storedProcedureReturn");
+	}
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureReturn()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureReturn()"); }
 }
 
 
 void ODBCSQLServerTest::testStoredFunction()
 {
-	for (int k = 0; k < 8;)
+	try
 	{
-		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		for (int k = 0; k < 8;)
+		{
+			session().setFeature("autoBind", bindValue(k));
+			session().setFeature("autoExtract", bindValue(k + 1));
 
-		dropObject("PROCEDURE", "storedFunction");
-		session() << "CREATE PROCEDURE storedFunction AS "
-			"BEGIN "
-			"DECLARE @retVal int;"
-			"SET @retVal = -1;"
-			"RETURN @retVal;"
-			"END;"
-		, now;
+			dropObject("FUNCTION", "storedFunction");
+			session() << "CREATE FUNCTION storedFunction() "
+				" RETURNS int AS "
+				"BEGIN "
+				" DECLARE @retVal int;"
+				" SET @retVal = -1;"
+				" RETURN @retVal;"
+				"END;"
+				, now;
 
-		int i = 0;
-		session() << "{? = call storedFunction}", out(i), now;
-		assertTrue (-1 == i);
-		dropObject("PROCEDURE", "storedFunction");
+			int i = 0;
+			session() << "{? = call dbo.storedFunction}", out(i), now;
+			assertTrue(-1 == i);
 
+			dropObject("FUNCTION", "storedFunction");
+			session() << "CREATE FUNCTION storedFunction(@inParam int) "
+				"RETURNS int AS "
+				"BEGIN "
+				"  RETURN @inParam*@inParam;"
+				"END;"
+				, now;
 
-		session() << "CREATE PROCEDURE storedFunction(@inParam int) AS "
-			"BEGIN "
-			"RETURN @inParam*@inParam;"
-			"END;"
-		, now;
+			i = 2;
+			int result = 0;
+			session() << "{? = call dbo.storedFunction(?)}", out(result), in(i), now;
+			assertTrue(4 == result);
+			result = 0;
+			session() << "SELECT dbo.storedFunction(?)", into(result), in(i), now;
+			assertTrue(4 == result);
 
-		i = 2;
-		int result = 0;
-		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assertTrue (4 == result);
-		dropObject("PROCEDURE", "storedFunction");
-
-
-		session() << "CREATE PROCEDURE storedFunction(@inParam int, @outParam int OUTPUT) AS "
-			"BEGIN "
-			"SET @outParam = @inParam*@inParam;"
-			"RETURN @outParam;"
-			"END"
-		, now;
-
-		i = 2;
-		int j = 0;
-		result = 0;
-		session() << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
-		assertTrue (4 == j);
-		assertTrue (j == result);
-		dropObject("PROCEDURE", "storedFunction");
-
-
-		session() << "CREATE PROCEDURE storedFunction(@param1 int OUTPUT,@param2 int OUTPUT) AS "
-			"BEGIN "
-			"DECLARE @temp int; "
-			"SET @temp = @param1;"
-			"SET @param1 = @param2;"
-			"SET @param2 = @temp;"
-			"RETURN @param1 + @param2; "
-			"END"
-		, now;
-
-		i = 1;
-		j = 2;
-		result = 0;
-		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
-		assertTrue (1 == j);
-		assertTrue (2 == i);
-		assertTrue (3 == result);
-
-		Tuple<int, int> params(1, 2);
-		assertTrue (1 == params.get<0>());
-		assertTrue (2 == params.get<1>());
-		result = 0;
-		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
-		assertTrue (1 == params.get<1>());
-		assertTrue (2 == params.get<0>());
-		assertTrue (3 == result);
-
-		dropObject("PROCEDURE", "storedFunction");
-
-		k += 2;
+			k += 2;
+		}
+		dropObject("FUNCTION", "storedFunction");
 	}
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredFunction()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredFunction()"); }
 }
 
 
@@ -533,19 +666,15 @@ void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& n
 	}
 	catch (StatementException& ex)
 	{
-		bool ignoreError = false;
 		const StatementDiagnostics::FieldVec& flds = ex.diagnostics().fields();
 		StatementDiagnostics::Iterator it = flds.begin();
 		for (; it != flds.end(); ++it)
 		{
-			if (3701 == it->_nativeError)//(table does not exist)
-			{
-				ignoreError = true;
-				break;
-			}
+			if (3701 == it->_nativeError) // (does not exist)
+				return;
 		}
 
-		if (!ignoreError) throw;
+		throw;
 	}
 }
 
@@ -706,13 +835,13 @@ void ODBCSQLServerTest::recreateLogTable()
 	try
 	{
 		std::string sql = "CREATE TABLE %s "
-			"(Source VARCHAR(max),"
-			"Name VARCHAR(max),"
+			"(Source VARCHAR(256),"
+			"Name VARCHAR(256),"
 			"ProcessId INTEGER,"
-			"Thread VARCHAR(max), "
+			"Thread VARCHAR(256), "
 			"ThreadId INTEGER,"
 			"Priority INTEGER,"
-			"Text VARCHAR(max),"
+			"Text VARCHAR(1024),"
 			"DateTime DATETIME)";
 
 		session() << sql, "T_POCO_LOG", now;
@@ -760,6 +889,9 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSession);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);
@@ -809,6 +941,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
@@ -819,6 +952,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureReturn);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFilter);
@@ -833,8 +967,11 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransactionNoAutoCommit);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactionIsolation);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);

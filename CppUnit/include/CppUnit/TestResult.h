@@ -97,6 +97,8 @@ public:
 		}
 	};
 
+	static std::string demangle(const char* name);
+
 protected:
 	virtual void setSynchronizationObject(SynchronizationObject* syncObject);
 

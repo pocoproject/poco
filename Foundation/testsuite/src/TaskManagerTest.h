@@ -33,6 +33,7 @@ public:
 	void testFinish();
 	void testCancel();
 	void testError();
+	void testCancelNoStart();
 	void testCustom();
 	void testMultiTasks();
 	void testCustomThreadPool();

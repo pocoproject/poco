@@ -26,11 +26,7 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Path_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Path_WINCE.cpp"
-#else
 #include "Path_WIN32U.cpp"
-#endif
 #endif
 
 
@@ -537,7 +533,7 @@ Path& Path::setBaseName(const std::string& name)
 std::string Path::getBaseName() const
 {
 	std::string::size_type pos = _name.rfind('.');
-	if (pos != std::string::npos)
+	if (pos != std::string::npos && pos != 0)
 		return _name.substr(0, pos);
 	else
 		return _name;
@@ -559,7 +555,7 @@ Path& Path::setExtension(const std::string& extension)
 std::string Path::getExtension() const
 {
 	std::string::size_type pos = _name.rfind('.');
-	if (pos != std::string::npos)
+	if (pos != std::string::npos && pos != 0)
 		return _name.substr(pos + 1);
 	else
 		return std::string();
@@ -575,6 +571,12 @@ Path& Path::clear()
 	_version.clear();
 	_absolute = false;
 	return *this;
+}
+
+
+std::string Path::self()
+{
+	return PathImpl::selfImpl();
 }
 
 

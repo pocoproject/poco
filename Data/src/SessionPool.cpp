@@ -64,9 +64,9 @@ Session SessionPool::get(const std::string& name, bool value)
 
 Session SessionPool::get()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
-    if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
+	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
+	Poco::Mutex::ScopedLock lock(_mutex);
 	purgeDeadSessions();
 
 	if (_idleSessions.empty())
@@ -78,7 +78,7 @@ Session SessionPool::get()
 			customizeSession(newSession);
 
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
-			_idleSessions.push_front(pHolder);
+			_idleSessions.push_back(pHolder);
 			++_nSessions;
 		}
 		else throw SessionPoolExhaustedException(_connector);
@@ -95,7 +95,6 @@ Session SessionPool::get()
 
 void SessionPool::purgeDeadSessions()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
 	SessionList::iterator it = _idleSessions.begin();
@@ -139,9 +138,9 @@ int SessionPool::connTimeout() const
 
 int SessionPool::dead()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	int count = 0;
 
+	Poco::Mutex::ScopedLock lock(_mutex);
 	SessionList::iterator it = _activeSessions.begin();
 	SessionList::iterator itEnd = _activeSessions.end();
 	for (; it != itEnd; ++it)
@@ -156,7 +155,6 @@ int SessionPool::dead()
 
 int SessionPool::allocated() const
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	return _nSessions;
 }
 
@@ -170,20 +168,23 @@ int SessionPool::available() const
 
 void SessionPool::setFeature(const std::string& name, bool state)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_nSessions > 0)
 		throw InvalidAccessException("Features can not be set after the first session was created.");
 
+	Poco::Mutex::ScopedLock lock(_mutex);
 	_featureMap.insert(FeatureMap::ValueType(name, state));
 }
 
 
-bool SessionPool::getFeature(const std::string& name)
+bool SessionPool::getFeature(const std::string& name) const
 {
-	FeatureMap::ConstIterator it = _featureMap.find(name);
+
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
+
+	Poco::Mutex::ScopedLock lock(_mutex);
+	FeatureMap::ConstIterator it = _featureMap.find(name);
 
 	if (_featureMap.end() == it)
 		throw NotFoundException("Feature not found:" + name);
@@ -194,18 +195,19 @@ bool SessionPool::getFeature(const std::string& name)
 
 void SessionPool::setProperty(const std::string& name, const Poco::Any& value)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_nSessions > 0)
 		throw InvalidAccessException("Properties can not be set after first session was created.");
 
+	Poco::Mutex::ScopedLock lock(_mutex);
 	_propertyMap.insert(PropertyMap::ValueType(name, value));
 }
 
 
-Poco::Any SessionPool::getProperty(const std::string& name)
+Poco::Any SessionPool::getProperty(const std::string& name) const
 {
+	Poco::Mutex::ScopedLock lock(_mutex);
 	PropertyMap::ConstIterator it = _propertyMap.find(name);
 
 	if (_propertyMap.end() == it)
@@ -234,9 +236,9 @@ void SessionPool::customizeSession(Session&)
 
 void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
+	Poco::Mutex::ScopedLock lock(_mutex);
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
 	if (it != _activeSessions.end())
 	{
@@ -259,7 +261,7 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 				applySettings(pHolder->session());
 
 				pHolder->access();
-				_idleSessions.push_front(pHolder);
+				_idleSessions.push_back(pHolder);
 			}
 			else --_nSessions;
 
@@ -287,9 +289,9 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 
 void SessionPool::onJanitorTimer(Poco::Timer&)
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
+	Poco::Mutex::ScopedLock lock(_mutex);
 	SessionList::iterator it = _idleSessions.begin();
 	while (_nSessions > _minSessions && it != _idleSessions.end())
 	{
@@ -312,10 +314,11 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 
 void SessionPool::shutdown()
 {
-	Poco::Mutex::ScopedLock lock(_mutex);
-	if (_shutdown) return;
+	if (_shutdown.exchange(true)) return;
 	_shutdown = true;
 	_janitorTimer.stop();
+
+	Poco::Mutex::ScopedLock lock(_mutex);
 	closeAll(_idleSessions);
 	closeAll(_activeSessions);
 }

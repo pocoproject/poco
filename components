@@ -1,5 +1,5 @@
-CppUnit
 Foundation
+CppUnit
 Encodings
 XML
 JSON
@@ -13,6 +13,7 @@ Data/SQLite
 Data/ODBC
 Data/MySQL
 Data/PostgreSQL
+Data/DataTest
 Zip
 PageCompiler
 PageCompiler/File2Page
@@ -24,5 +25,8 @@ Redis
 Prometheus
 ActiveRecord
 ActiveRecord/Compiler
+DNSSD
+DNSSD/Avahi
+DNSSD/Bonjour
 PocoDoc
 ProGen

@@ -33,10 +33,10 @@ class CppParser_API NameSpace: public Symbol
 	/// This class represents a namespace.
 {
 public:
-	typedef std::multimap<std::string, Symbol*> SymbolTable;
-	typedef SymbolTable::const_iterator Iterator;
-	typedef std::map<std::string, std::string> AliasMap;
-	typedef std::vector<std::string> NameSpaceVec;
+	using SymbolTable = std::multimap<std::string, Symbol*>;
+	using Iterator = SymbolTable::const_iterator;
+	using AliasMap = std::map<std::string, std::string>;
+	using NameSpaceVec = std::vector<std::string>;
 
 	NameSpace();
 		/// Creates the NameSpace.
@@ -61,8 +61,8 @@ public:
 
 	Iterator end() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
-
-	Symbol* lookup(const std::string& name) const;
+	
+	virtual Symbol* lookup(const std::string& name) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include

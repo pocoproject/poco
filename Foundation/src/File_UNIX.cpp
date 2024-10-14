@@ -212,19 +212,24 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
-#if defined(__APPLE__) && defined(st_birthtime) && !defined(POCO_NO_STAT64) // st_birthtime is available only on 10.5
-	struct stat64 st;
-	if (stat64(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_birthtime);
-#elif defined(__FreeBSD__)
+	using TV = Timestamp::TimeVal;
+
+	// Nanosecond to timestamp resolution factor
+	static constexpr TV nsk = 1'000'000'000ll / Timestamp::resolution();
+
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_birthtime);
+	if (::stat(_path.c_str(), &st) == 0)
+	{
+#if defined(__FreeBSD__) || (defined(__APPLE__) && defined(_DARWIN_FEATURE_64_BIT_INODE))
+		const TV tv = static_cast<TV>(st.st_birthtimespec.tv_sec) * Timestamp::resolution() + st.st_birthtimespec.tv_nsec/nsk;
+		return Timestamp(tv);
+#elif POCO_OS == POCO_OS_LINUX
+		const TV tv = static_cast<TV>(st.st_ctim.tv_sec) * Timestamp::resolution() + st.st_ctim.tv_nsec/nsk;
+		return Timestamp(tv);
 #else
-	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_ctime);
 #endif
+	}
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -235,9 +240,24 @@ Timestamp FileImpl::getLastModifiedImpl() const
 {
 	poco_assert (!_path.empty());
 
+	using TV = Timestamp::TimeVal;
+
+	// Nanosecond to timestamp resolution factor
+	static constexpr TV nsk = 1'000'000'000ll / Timestamp::resolution();
+
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
+	{
+#if defined(__FreeBSD__) || (defined(__APPLE__) && defined(_DARWIN_FEATURE_64_BIT_INODE))
+		const TV tv = static_cast<TV>(st.st_mtimespec.tv_sec) * Timestamp::resolution() + st.st_mtimespec.tv_nsec/nsk;
+		return Timestamp(tv);
+#elif POCO_OS == POCO_OS_LINUX
+		const TV tv = static_cast<TV>(st.st_mtim.tv_sec) * Timestamp::resolution() + st.st_mtim.tv_nsec/nsk;
+		return Timestamp(tv);
+#else
 		return Timestamp::fromEpochTime(st.st_mtime);
+#endif
+	}
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -248,10 +268,11 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 {
 	poco_assert (!_path.empty());
 
-	struct utimbuf tb;
-	tb.actime  = ts.epochTime();
-	tb.modtime = ts.epochTime();
-	if (utime(_path.c_str(), &tb) != 0)
+	const ::time_t s = ts.epochTime();
+	const ::suseconds_t us = ts.epochMicroseconds() % 1'000'000;
+	const ::timeval times[2] = { {s, us}, {s, us} };
+
+	if (::utimes(_path.c_str(), times) != 0)
 		handleLastErrorImpl(_path);
 }
 

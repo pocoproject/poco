@@ -176,7 +176,7 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 		std::string facility;
 		if (Poco::icompare(value, 4, "LOG_") == 0)
 			facility = Poco::toUpper(value.substr(4));
-		else if (Poco::icompare(value, 4, "SYSLOG_") == 0)
+		else if (Poco::icompare(value, 7, "SYSLOG_") == 0)
 			facility = Poco::toUpper(value.substr(7));
 		else
 			facility = Poco::toUpper(value);

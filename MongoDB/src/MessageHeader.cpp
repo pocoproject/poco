@@ -42,7 +42,7 @@ void MessageHeader::read(BinaryReader& reader)
 
 	Int32 opCode;
 	reader >> opCode;
-	_opCode = (OpCode) opCode;
+	_opCode = static_cast<OpCode>(opCode);
 
 	if (!reader.good())
 	{
@@ -56,7 +56,7 @@ void MessageHeader::write(BinaryWriter& writer)
 	writer << _messageLength;
 	writer << _requestID;
 	writer << _responseTo;
-	writer << (Int32) _opCode;
+	writer << static_cast<Int32>(_opCode);
 }
 
 

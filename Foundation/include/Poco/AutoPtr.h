@@ -110,34 +110,23 @@ public:
 	{
 		if (_ptr != ptr)
 		{
-			if (_ptr) _ptr->release();
-			_ptr = ptr;
-			if (shared && _ptr) _ptr->duplicate();
+			if (shared && ptr) ptr->duplicate();
+			std::swap(_ptr, ptr);
+			if (ptr) ptr->release();
 		}
 		return *this;
 	}
 
 	AutoPtr& assign(const AutoPtr& ptr)
 	{
-		if (&ptr != this)
-		{
-			if (_ptr) _ptr->release();
-			_ptr = ptr._ptr;
-			if (_ptr) _ptr->duplicate();
-		}
-		return *this;
+		return assign(ptr._ptr, true);
 	}
 
 	template <class Other>
 	AutoPtr& assign(const AutoPtr<Other>& ptr)
 	{
-		if (ptr.get() != _ptr)
-		{
-			if (_ptr) _ptr->release();
-			_ptr = const_cast<Other*>(ptr.get());
-			if (_ptr) _ptr->duplicate();
-		}
-		return *this;
+		C* nptr = const_cast<Other*>(ptr.get());
+		return assign(nptr, true);
 	}
 
 	void reset()

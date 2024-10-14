@@ -65,12 +65,19 @@ public:
 	~TaskManager();
 		/// Destroys the TaskManager.
 
-	void start(Task* pTask);
+	bool start(Task* pTask);
 		/// Starts the given task in a thread obtained
-		/// from the thread pool.
+		/// from the thread pool; returns true if successful.
+		///
+		/// If this method returns false, the task was cancelled
+		/// before it could be started, or it was already running;
+		/// in any case, a false return means refusal of ownership
+		/// and indicates that the task pointer may not be valid
+		/// anymore (it will only be valid if it was duplicated
+		/// prior to this call).
 		///
 		/// The TaskManager takes ownership of the Task object
-		/// and deletes it when it it finished.
+		/// and deletes it when it is finished.
 
 	void cancelAll();
 		/// Requests cancellation of all tasks.
@@ -122,7 +129,7 @@ private:
 	TaskList           _taskList;
 	Timestamp          _lastProgressNotification;
 	NotificationCenter _nc;
-	mutable MutexT  _mutex;
+	mutable MutexT     _mutex;
 
 	friend class Task;
 };

@@ -104,11 +104,11 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// Finally, when the SocketReactor is about to shut down (as a result
 	/// of stop() being called), it dispatches a ShutdownNotification
 	/// to all event handlers. This is done in the onShutdown() method
-	/// which can be overridded by subclasses to perform custom
+	/// which can be overridden by subclasses to perform custom
 	/// shutdown processing.
 	///
 	/// The SocketReactor is implemented so that it can run in its own thread.
-	/// Moreover, the thread affinity to a CPU core can optionally  be set for the
+	/// Moreover, the thread affinity to a CPU core can optionally be set for the
 	/// thread on platforms where that functionality is supported and implemented.
 	/// It is also possible to run multiple SocketReactors in parallel, as long
 	/// as they work on different sockets.

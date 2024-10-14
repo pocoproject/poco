@@ -37,6 +37,9 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="3"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
+		LanguageStandard="${vc.project.compiler.std.cpp}"
+		LanguageStandard_C="${vc.project.compiler.std.c}"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
@@ -56,7 +59,7 @@
 		LinkIncremental="2"
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
-		ProgramDatabaseFile="${project.outdir}\bin64\${project.target}64d.pdb"
+		ProgramDatabaseFile="$(OutDir)$(TargetName).pdb"
 		AdditionalLibraryDirectories="${project.pocobase}\lib64"
 		SubSystem="1"
 		ImportLibrary="${project.outdir}\lib64\${project.target}d.lib"

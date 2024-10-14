@@ -279,6 +279,102 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 } // namespace Poco
 
 
+#elif defined(__GNU__)
+//
+// GNU Hurd
+//
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <netinet/in.h>
+
+
+namespace Poco {
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	std::memset(&id, 0, sizeof(id));
+	struct ifreq ifr;
+	struct ifconf ifc;
+	char buf[1024];
+
+	int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+	if (sock == -1) return;
+
+	ifc.ifc_len = sizeof(buf);
+	ifc.ifc_buf = buf;
+	if (ioctl(sock, SIOCGIFCONF, &ifc) == -1) return;
+
+	struct ifreq* it = ifc.ifc_req;
+	const struct ifreq* const end = it + (ifc.ifc_len / sizeof(struct ifreq));
+
+	for (; it != end; ++it) {
+		std::strcpy(ifr.ifr_name, it->ifr_name);
+		if (ioctl(sock, SIOCGIFFLAGS, &ifr) == 0) {
+			if (! (ifr.ifr_flags & IFF_LOOPBACK)) { // don't count loopback
+				if (ioctl(sock, SIOCGIFHWADDR, &ifr) == 0) {
+					std::memcpy(&id, ifr.ifr_hwaddr.sa_data, sizeof(id));
+					break;
+				}
+			}
+		}
+		else return;
+	}
+}
+
+
+} // namespace Poco
+
+
+#elif defined(__GNU__)
+//
+// GNU Hurd
+//
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <netinet/in.h>
+
+
+namespace Poco {
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	std::memset(&id, 0, sizeof(id));
+	struct ifreq ifr;
+	struct ifconf ifc;
+	char buf[1024];
+
+	int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+	if (sock == -1) return;
+
+	ifc.ifc_len = sizeof(buf);
+	ifc.ifc_buf = buf;
+	if (ioctl(sock, SIOCGIFCONF, &ifc) == -1) return;
+
+	struct ifreq* it = ifc.ifc_req;
+	const struct ifreq* const end = it + (ifc.ifc_len / sizeof(struct ifreq));
+
+	for (; it != end; ++it) {
+		std::strcpy(ifr.ifr_name, it->ifr_name);
+		if (ioctl(sock, SIOCGIFFLAGS, &ifr) == 0) {
+			if (! (ifr.ifr_flags & IFF_LOOPBACK)) { // don't count loopback
+				if (ioctl(sock, SIOCGIFHWADDR, &ifr) == 0) {
+					std::memcpy(&id, ifr.ifr_hwaddr.sa_data, sizeof(id));
+					break;
+				}
+			}
+		}
+		else return;
+	}
+}
+
+
+} // namespace Poco
+
+
 #elif defined(POCO_OS_FAMILY_UNIX)
 //
 // General Unix
@@ -304,15 +400,16 @@ namespace Poco {
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
+
 	char name[MAXHOSTNAMELEN];
 	if (gethostname(name, sizeof(name)))
-		return;
+		throw SystemException("unable to get hostname");
 
 	struct hostent* pHost = gethostbyname(name);
-	if (!pHost) return;
+	if (!pHost) throw SystemException("unable to get host");
 
 	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s == -1) return;
+	if (s == -1) throw SystemException("unable to open socket");
 
 	struct arpreq ar;
 	std::memset(&ar, 0, sizeof(ar));
@@ -321,7 +418,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
 	int rc = ioctl(s, SIOCGARP, &ar);
 	close(s);
-	if (rc < 0) return;
+	if (rc < 0) throw SystemException("unable to get socket data");
 	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
 }
 

@@ -106,7 +106,7 @@ public:
 	void startTransaction();
 		/// Start transaction
 
-	bool isTransaction();
+	bool isTransaction() const;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	void commit();
@@ -115,13 +115,13 @@ public:
 	void rollback();
 		/// Rollback trabsaction
 
-	bool isAutoCommit();
+	bool isAutoCommit() const;
 		/// is the connection in auto commit mode?
 
-	void setAutoCommit(bool aShouldAutoCommit = true);
+	void autoCommit(bool val);
 		/// is the connection in auto commit mode?
 
-	bool isAsynchronousCommit();
+	bool isAsynchronousCommit() const;
 		/// is the connection in Asynchronous commit mode?
 
 	void setAsynchronousCommit(bool aShouldAsynchronousCommit = true);
@@ -133,10 +133,10 @@ public:
 	void setTransactionIsolation(Poco::UInt32 aTI);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 transactionIsolation();
+	Poco::UInt32 transactionIsolation() const;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 aTI);
+	static bool hasTransactionIsolation(Poco::UInt32 aTI);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
@@ -193,7 +193,6 @@ private:
 	PGconn*                   _pConnection;
 	std::string               _connectionString;
 	bool                      _inTransaction;
-	bool                      _isAutoCommit;
 	bool                      _isAsynchronousCommit;
 	Poco::UInt32              _tranactionIsolationLevel;
 	std::vector <std::string> _preparedStatementsToBeDeallocated;
@@ -288,7 +287,7 @@ inline SessionHandle::operator PGconn * ()
 }
 
 
-inline Poco::FastMutex&SessionHandle::mutex()
+inline Poco::FastMutex& SessionHandle::mutex()
 {
 	return _sessionMutex;
 }
@@ -300,19 +299,13 @@ inline std::string SessionHandle::connectionString() const
 }
 
 
-inline bool SessionHandle::isTransaction()
+inline bool SessionHandle::isTransaction() const
 {
 	return _inTransaction;
 }
 
 
-inline bool SessionHandle::isAutoCommit()
-{
-	return _isAutoCommit;
-}
-
-
-inline bool SessionHandle::isAsynchronousCommit()
+inline bool SessionHandle::isAsynchronousCommit() const
 {
 	return _isAsynchronousCommit;
 }

@@ -1009,7 +1009,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 	}
 	else
 	{
-#if !defined(_WIN32_WCE)
 		std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
 		subKey += name;
 		std::string netmask;
@@ -1031,9 +1030,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
 		RegCloseKey(hKey);
 		return IPAddress::parse(netmask);
-#else
-		return IPAddress();
-#endif // !defined(_WIN32_WCE)
 	}
 }
 
@@ -1088,9 +1084,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
-	#if defined(_WIN32_WCE)
-		ifIndex = pAddress->Ipv6IfIndex;
-	#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+	#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 		#if defined (IP_ADAPTER_IPV6_ENABLED) // Vista
 			if(osvi.dwMajorVersion>=6)//vista
 			{
@@ -1190,24 +1184,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
 						ULONG prefixLength = 0;
-#if defined(_WIN32_WCE)
-	#if _WIN32_WCE >= 0x0800
-						prefixLength = pUniAddr->OnLinkPrefixLength;
-						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
-	#else
-						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
-	#endif
-						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
-						if (prefixLength == 0 && pAddress->FirstPrefix)
-							prefixLength = pAddress->FirstPrefix->PrefixLength;
-						poco_assert (prefixLength <= 32);
-						if (broadcastAddress.isWildcard())
-						{
-							IPAddress mask(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
-							IPAddress host(mask & address);
-							broadcastAddress = host | ~mask;
-						}
-#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+
+#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
 						if (osvi.dwMajorVersion >= 6)
 						{
@@ -1508,11 +1486,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 
 #include <sys/types.h>
-#if POCO_OS != POCO_OS_ANDROID // Android doesn't have <ifaddrs.h>
+#if POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24 // old Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
-#ifndef POCO_NO_LINUX_IF_PACKET_H
+#if !defined(POCO_NO_LINUX_IF_PACKET_H) && !defined(POCO_EMSCRIPTEN)
 #include <linux/if_packet.h>
 #endif
 #include <net/if_arp.h>
@@ -1543,7 +1521,7 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
-#if POCO_OS != POCO_OS_ANDROID
+#if (POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24) && !defined(POCO_EMSCRIPTEN)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
@@ -1552,7 +1530,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
-#ifndef POCO_NO_LINUX_IF_PACKET_H
+#if !defined(POCO_NO_LINUX_IF_PACKET_H)
 	if (iface->ifa_addr->sa_family == AF_PACKET)
 	{
 		struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
@@ -1602,7 +1580,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
-#if POCO_OS != POCO_OS_ANDROID
+#if (POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24) && !defined(POCO_EMSCRIPTEN)
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;

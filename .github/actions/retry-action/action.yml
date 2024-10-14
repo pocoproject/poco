@@ -1,0 +1,54 @@
+name: Retry Step
+description: "Retry a step on failure or timeout"
+inputs:
+  timeout_minutes:
+    description: Minutes to wait before attempt times out.  Must only specify either minutes or seconds
+    required: false
+  timeout_seconds:
+    description: Seconds to wait before attempt times out.  Must only specify either minutes or seconds
+    required: false
+  max_attempts:
+    description: Number of attempts to make before failing the step
+    required: true
+    default: 3
+  command:
+    description: The command to run
+    required: true
+  retry_wait_seconds:
+    description: Number of seconds to wait before attempting the next retry
+    required: false
+    default: 10
+  shell:
+    description: Alternate shell to use (defaults to powershell on windows, bash otherwise).  Supports bash, python, pwsh, sh, cmd, and powershell
+    required: false
+  polling_interval_seconds:
+    description: Number of seconds to wait for each check that command has completed running
+    required: false
+    default: 1
+  retry_on:
+    description: Event to retry on.  Currently supported [any, timeout, error]
+  warning_on_retry:
+    description: Whether to output a warning on retry, or just output to info. Defaults to true
+    default: true
+  on_retry_command:
+    description: Command to run before a retry (such as a cleanup script).  Any error thrown from retry command is caught and surfaced as a warning.
+    required: false
+  continue_on_error:
+    description: Exits successfully even if an error occurs.  Same as native continue-on-error behavior, but for use in composite actions. Default is false
+    default: false
+  new_command_on_retry:
+    description: Command to run if the first attempt fails. This command will be called on all subsequent attempts.
+    required: false
+  retry_on_exit_code:
+    description: Specific exit code to retry on. This will only retry for the given error code and fail immediately other error codes.
+    required: false
+outputs:
+  total_attempts:
+    description: The final number of attempts made
+  exit_code:
+    description: The final exit code returned by the command
+  exit_error:
+    description: The final error returned by the command
+runs:
+  using: "node20"
+  main: "dist/index.js"

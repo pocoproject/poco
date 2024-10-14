@@ -129,7 +129,7 @@ public:
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
 		///
-		/// Calls to connect cannot() come before calls to bind().
+		/// Calls to connect() cannot come before calls to bind().
 
 	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
 		/// Bind a local address to the socket.
@@ -143,7 +143,7 @@ public:
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 		///
-		/// Calls to connect cannot() come before calls to bind().
+		/// Calls to connect() cannot come before calls to bind().
 
 	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only = false);
 		/// Bind a local address to the socket.
@@ -160,7 +160,7 @@ public:
 		/// Sets the IPV6_V6ONLY socket option in accordance with
 		/// the supplied ipV6Only value.
 		///
-		/// Calls to connect cannot() come before calls to bind().
+		/// Calls to connect() cannot come before calls to bind().
 
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through

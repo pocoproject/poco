@@ -10,18 +10,10 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 POCO_SOURCES_AUTO_PLAT(SRCS UNIX src/SyslogChannel.cpp)
 POCO_HEADERS_AUTO(SRCS include/Poco/SyslogChannel.h)
 
-# For Windows CE we need to disable these
-if(WINCE)
-POCO_SOURCES_AUTO_PLAT(SRCS OFF
-	src/WindowsConsoleChannel.cpp
-	src/EventLogChannel.cpp
-	)
-else()
 POCO_SOURCES_AUTO_PLAT(SRCS WIN32
 	src/WindowsConsoleChannel.cpp
 	src/EventLogChannel.cpp
 	)
-endif()
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
@@ -159,13 +151,13 @@ else()
 			target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS})
 		else()
 			target_compile_definitions(Foundation PUBLIC _REENTRANT _THREAD_SAFE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64)
-			if(QNX)
-				target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
+			if("${CMAKE_SYSTEM_NAME}" STREQUAL "QNX")
+				target_compile_definitions(Foundation PUBLIC _QNX_SOURCE=1 POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC m socket)
 			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
 				target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
-			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX")
+			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX"  OR "${CMAKE_SYSTEM_NAME}" STREQUAL "GNU")
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
 			else()
@@ -189,7 +181,7 @@ if(CMAKE_SYSTEM MATCHES "SunOS")
 	target_link_libraries(Foundation PUBLIC pthread socket xnet nsl resolv rt ${CMAKE_DL_LIBS})
 endif()
 
-if(CMAKE_COMPILER_IS_MINGW)
+if(MINGW)
 	target_compile_definitions(Foundation
 		PUBLIC
 			WC_NO_BEST_FIT_CHARS=0x400
@@ -234,10 +226,13 @@ endif()
 POCO_INSTALL(Foundation)
 POCO_GENERATE_PACKAGE(Foundation)
 
+if(ENABLE_SAMPLES)
+	add_subdirectory(samples)
+endif()
+
 if(ENABLE_TESTS)
 	if(NOT BUILD_SHARED_LIBS)
 		set_property(TARGET Foundation PROPERTY POSITION_INDEPENDENT_CODE ON) # This is needed to build TestLibrary.so as shared.
 	endif()
-	add_subdirectory(samples)
 	add_subdirectory(testsuite)
 endif()

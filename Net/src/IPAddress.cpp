@@ -549,7 +549,7 @@ std::string& IPAddress::compressV6(std::string& v6addr)
 }
 
 
-std::string IPAddress::trimIPv6(const std::string v6Addr)
+std::string IPAddress::trimIPv6(const std::string& v6Addr)
 {
 	std::string v6addr(v6Addr);
 	std::string::size_type len = v6addr.length();
@@ -674,9 +674,6 @@ std::vector<unsigned char> IPAddress::toBytes() const
 }
 
 
-} } // namespace Poco::Net
-
-
 Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::IPAddress& value)
 {
 	writer << static_cast<Poco::UInt8>(value.length());
@@ -701,3 +698,7 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr)
 	ostr << addr.toString();
 	return ostr;
 }
+
+
+} } // namespace Poco::Net
+

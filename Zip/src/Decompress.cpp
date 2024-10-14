@@ -79,7 +79,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		// directory have 0 size, nth to read
 		if (!_flattenDirs)
 		{
-			std::string dirName = hdr.getFileName();
+			const std::string& dirName = hdr.getFileName();
 			if (!ZipCommon::isValidPath(dirName))
 				throw ZipException("Illegal entry name", dirName);
 			Poco::Path dir(_outDir, dirName);

@@ -53,7 +53,7 @@ void ODBCMetaColumn::getDescription()
 		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::getDescription()");
 	}
 }
 
@@ -69,7 +69,7 @@ bool ODBCMetaColumn::isUnsigned() const
 		0,
 		&val)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::isUnsigned()");
 	}
 	return (val == SQL_TRUE);
 }
@@ -87,7 +87,7 @@ void ODBCMetaColumn::init()
 			0,
 			&_dataLength)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::init()");
 	}
 
 	setName(std::string((char*) _columnDesc.name));
@@ -160,6 +160,7 @@ void ODBCMetaColumn::init()
 		setType(MetaColumn::FDT_DATE); break;
 
 	case SQL_TYPE_TIME:
+	case -154: //MS SQL Server custom type SQL_SS_TIME2
 		setType(MetaColumn::FDT_TIME); break;
 
 	case SQL_TYPE_TIMESTAMP:

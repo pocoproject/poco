@@ -58,15 +58,18 @@ else()
 		target_compile_definitions(XML PUBLIC XML_STATIC)
 	endif()
 	target_compile_definitions(XML
-		PUBLIC XML_DTD
+		PUBLIC XML_DTD XML_GE
 		PRIVATE XML_NS HAVE_EXPAT_CONFIG_H)
 endif()
 
 POCO_INSTALL(XML)
 POCO_GENERATE_PACKAGE(XML)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

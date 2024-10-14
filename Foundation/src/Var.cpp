@@ -368,6 +368,24 @@ Var& Var::getAt(const std::string& name)
 }
 
 
+std::string Var::toString() const
+{
+	VarHolder* pHolder = content();
+
+	if (!pHolder)
+		throw InvalidAccessException("Can not convert empty value.");
+
+	if (typeid(std::string) == pHolder->type())
+		return extract<std::string>();
+	else
+	{
+		std::string result;
+		pHolder->convert(result);
+		return result;
+	}
+}
+
+
 Var Var::parse(const std::string& val)
 {
 	std::string::size_type t = 0;

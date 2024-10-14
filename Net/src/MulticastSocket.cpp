@@ -53,7 +53,7 @@ MulticastSocket::MulticastSocket()
 
 MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(family)
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (family == SocketAddress::UNIX_LOCAL)
 		throw Poco::InvalidArgumentException("Cannot create a MulticastSocket with UNIX_LOCAL socket");
 #endif
@@ -257,8 +257,7 @@ NetworkInterface MulticastSocket::findFirstInterface(const IPAddress& groupAddre
 
 void MulticastSocket::leaveGroup(const IPAddress& groupAddress)
 {
-	NetworkInterface intf;
-	leaveGroup(groupAddress, intf);
+	leaveGroup(groupAddress, findFirstInterface(groupAddress));
 }
 
 

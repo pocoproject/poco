@@ -20,12 +20,23 @@
 
 #include "Poco/Foundation.h"
 #include <cstdint>
+#include <type_traits>
+#if defined(__clang__) || (defined (__GNUC__) && (__GNUC__ >= 3))
+#	if (__cplusplus >= 201703L)
+#		if __has_include(<cxxabi.h>)
+#			include <typeinfo>
+#			include <cxxabi.h>
+#			include <cstdlib>
+#			define POCO_HAVE_CXXABI_H
+#		endif // __has_include(<cxxabi.h>)
+#	endif // __cplusplus >= 201703L
+#endif // defined(__clang__) || (defined (__GNUC__) && (__GNUC__ >= 3))
 
 
 namespace Poco {
 
 
-using Int8    = std::int8_t;
+using Int8    = std::conditional<std::is_same<signed char, std::int8_t>::value, std::int8_t, signed char>::type;
 using UInt8   = std::uint8_t;
 using Int16   = std::int16_t;
 using UInt16  = std::uint16_t;
@@ -42,14 +53,14 @@ using UIntPtr = std::uintptr_t;
 		#define POCO_PTR_IS_64_BIT 1
 	#endif
 	#define POCO_HAVE_INT64 1
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) || defined(__QNX__)
 	#if defined(_WIN64)
 		#define POCO_PTR_IS_64_BIT 1
 	#else
 		#if defined(__LP64__)
 			#define POCO_PTR_IS_64_BIT 1
 			#define POCO_LONG_IS_64_BIT 1
-			#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_ANDROID
+			#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_AIX || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_SOLARIS
 				#define POCO_INT64_IS_LONG 1
 			#endif
 		#endif
@@ -70,6 +81,40 @@ using UIntPtr = std::uintptr_t;
 #elif defined(_DIAB_TOOL)
 	#define POCO_HAVE_INT64 1
 #endif
+
+
+inline std::string Foundation_API demangle(const char* typeName)
+{
+	std::string result(typeName);
+#ifdef POCO_HAVE_CXXABI_H
+	int status;
+	char* demangled = abi::__cxa_demangle(typeName, nullptr, nullptr, &status);
+	if (demangled)
+	{
+		if (status == 0) result = demangled;
+		else
+		{
+			switch (status)
+			{
+				case -1: result = "[ERRMEM]";  break;
+				case -2: result = "[ERRNAME]"; break;
+				case -3: result = "[ERRARG]";  break;
+				default: result = "[ERRUNK]";
+			}
+		}
+
+		std::free(demangled);
+	}
+#endif
+	return result;
+}
+
+
+template <typename T>
+std::string demangle()
+{
+	return demangle(typeid(T).name());
+}
 
 
 } // namespace Poco

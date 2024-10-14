@@ -334,6 +334,15 @@ void BinaryWriter::writeRaw(const char* buffer, std::streamsize length)
 }
 
 
+void BinaryWriter::writeCString(const char* cString, std::streamsize maxLength)
+{
+	const std::size_t len = ::strnlen(cString, static_cast<std::size_t>(maxLength));
+	writeRaw(cString, len);
+	static const char zero = '\0';
+	_ostr.write(&zero, sizeof(zero));
+}
+
+
 void BinaryWriter::writeBOM()
 {
 	UInt16 value = 0xFEFF;

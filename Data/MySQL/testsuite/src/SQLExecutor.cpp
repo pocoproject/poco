@@ -21,6 +21,7 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/SessionPool.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
@@ -30,6 +31,7 @@
 #endif
 
 
+#include <mysql/mysql.h>
 #include <iostream>
 #include <limits>
 
@@ -203,7 +205,12 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	bind_param[4].buffer		= &fifth;
 	bind_param[4].buffer_type   = MYSQL_TYPE_FLOAT;
 
+#if LIBMYSQL_VERSION_ID >= 80300
+	rc = mysql_stmt_bind_named_param(hstmt, bind_param, 5, nullptr);
+#else
 	rc = mysql_stmt_bind_param(hstmt, bind_param);
+#endif
+
 	assertTrue (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);
@@ -1371,7 +1378,7 @@ void SQLExecutor::timestamp()
 	std::string firstName("Simpson");
 	std::string address("Springfield");
 	DateTime birthday(1980, 4, 1, 5, 45, 12, 354, 879);
-	
+
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1380,14 +1387,14 @@ void SQLExecutor::timestamp()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (count == 1);
-	
+
 	DateTime bd;
 	assertTrue (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (bd == birthday);
-	
+
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
 
@@ -1848,9 +1855,11 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (0 == count);
-	assertTrue (!_pSession->isTransaction());
 
-	_pSession->begin();
+	if (_pSession->impl()->shouldParse()) {
+		assertTrue (!_pSession->isTransaction());
+		_pSession->begin();
+	}
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -1934,11 +1943,13 @@ void SQLExecutor::transaction(const std::string& connect)
 	}
 	assertTrue (!_pSession->isTransaction());
 
-	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assertTrue (0 == count);
-	assertTrue (!_pSession->isTransaction());
+	if (_pSession->impl()->shouldParse()) {
+		try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+		assertTrue (0 == count);
+		assertTrue (!_pSession->isTransaction());
+	}
 
 	{
 		Transaction trans((*_pSession));
@@ -1963,7 +1974,8 @@ void SQLExecutor::transaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (2 == count);
 
-	_pSession->begin();
+	if (_pSession->impl()->shouldParse())
+		_pSession->begin();
 	try { (*_pSession) << "DELETE FROM Person", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -1985,6 +1997,8 @@ void SQLExecutor::transaction(const std::string& connect)
 	std::vector<std::string> sql;
 	sql.push_back(sql1);
 	sql.push_back(sql2);
+
+	assertTrue (!_pSession->isTransaction());
 
 	Transaction trans((*_pSession));
 
@@ -2036,6 +2050,8 @@ void SQLExecutor::reconnect()
 	int count = 0;
 	std::string result;
 
+	_pSession->setFeature("autoCommit", true);
+
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -2064,4 +2080,32 @@ void SQLExecutor::reconnect()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (count == age);
 	assertTrue (_pSession->isConnected());
+}
+
+
+void SQLExecutor::sessionPoolAndUnicode(const std::string& connString)
+{
+	std::string funct = "unicode()";
+	std::string text = "ěščřžťďůň";
+	std::string text2;
+
+	// Test uses session from SessionPool instead of _pSession to prove session
+	// obtained and returned into pool is valid.
+
+	// Min/Max 1 session - ensures that when get() is called, same session should be returned
+	Poco::SharedPtr<Poco::Data::SessionPool> sp = new Poco::Data::SessionPool(MySQL::Connector::KEY, connString, 1, 1);
+
+	{
+		Poco::Data::Session session = sp->get();
+		try { session << "INSERT INTO Strings VALUES (?)", use(text), now; }
+		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	} // parentheses to ensure session is returned into pool
+
+	Poco::Data::Session session2 = sp->get();
+	try { session2 << "SELECT str FROM Strings", into(text2), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assertTrue (text == text2);
 }

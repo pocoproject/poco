@@ -72,6 +72,30 @@ Poco::Path SharedMemoryTest::findDataFile(const std::string& afile)
 }
 
 
+void SharedMemoryTest::testCreateLarge()
+{
+#if POCO_OS == POCO_OS_WINDOWS_NT
+	try
+	{
+#ifdef _WIN64
+		const size_t size = 0x03FFFFFFFFULL;
+#else
+		const size_t size = 0xDFFFFFFFUL;
+#endif
+		SharedMemory mem("hiLarge", size, SharedMemory::AM_WRITE);
+		assertTrue((mem.end() - mem.begin()) == size);
+		mem.begin()[0] = 'A';
+		mem.end()[-1] = 'Z';
+	}
+	catch (Poco::SystemException& ex)
+	{
+		// no memory, quite posible to happen
+		assertEqual(ERROR_NOT_ENOUGH_MEMORY, ex.code());
+	}
+#endif
+}
+
+
 void SharedMemoryTest::setUp()
 {
 }
@@ -89,6 +113,7 @@ CppUnit::Test* SharedMemoryTest::suite()
 #if !defined(POCO_NO_SHAREDMEMORY)
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreate);
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreateFromFile);
+	CppUnit_addTest(pSuite, SharedMemoryTest, testCreateLarge);
 #endif
 	return pSuite;
 }

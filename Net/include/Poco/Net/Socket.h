@@ -85,6 +85,10 @@ public:
 
 #endif // POCO_NEW_STATE_ON_MOVE
 
+	static Socket fromFileDescriptor(poco_socket_t fd);
+		// Creates a socket from an existing file descriptor.
+		// Ownership is taken by poco
+
 	virtual ~Socket();
 		/// Destroys the Socket and releases the
 		/// SocketImpl.
@@ -212,7 +216,7 @@ public:
 		/// as the system is free to adjust the value.
 
 	void setReceiveTimeout(const Poco::Timespan& timeout);
-		/// Sets the send timeout for the socket.
+		/// Sets the receive timeout for the socket.
 		///
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.

@@ -37,8 +37,11 @@ class IPAddress;
 class Net_API SocketAddress
 	/// This class represents an internet (IP) endpoint/socket
 	/// address. The address can belong either to the
-	/// IPv4 or the IPv6 address family and consists of a
-	/// host address and a port number.
+	/// IPv4, IPv6 or Unix local family.
+	/// IP addresses consist of a host address and a port number.
+	/// An Unix local socket address consists of a path to socket file.
+	/// Abstract local sockets, which operate without the need for
+	/// interaction with the filesystem, are supported on Linux only.
 {
 public:
 	// The following declarations keep the Family type
@@ -49,7 +52,7 @@ public:
 #if defined(POCO_HAVE_IPv6)
 	static const Family IPv6 = AddressFamily::IPv6;
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	static const Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
 #endif
 
@@ -124,16 +127,30 @@ public:
 		///     [::ffff:192.168.1.120]:2040
 		///     www.appinf.com:8080
 		///
-		/// On POSIX platforms supporting UNIX_LOCAL sockets, hostAndPort
-		/// can also be the absolute path of a local socket, starting with a
-		/// slash, e.g. "/tmp/local.socket".
+		/// On platforms supporting UNIX_LOCAL sockets, hostAndPort
+		/// can also be a valid absolute local socket file path.
+		///
+		/// Examples:
+		///     /tmp/local.sock
+		///     C:\Temp\local.sock
+		///
+		/// On Linux, abstract local sockets are supported as well.
+		/// Abstract local sockets operate in a namespace that has
+		/// no need for a filesystem. They are identified by
+		/// a null byte at the beginning of the path.
+		///
+		/// Example:
+		///     \0abstract.sock
+		///
 
 	SocketAddress(Family family, const std::string& addr);
 		/// Creates a SocketAddress of the given family from a
 		/// string representation of the address, which is
-		/// either an IP address and port number, separated by
-		/// a colon for IPv4 or IPv6 addresses, or a path for
+		/// either (1) an IP address and port number, separated by
+		/// a colon for IPv4 or IPv6 addresses, or (2) path for
 		/// UNIX_LOCAL sockets.
+		/// See `SocketAddress(const string&)` documentation
+		/// for more details.
 
 	SocketAddress(const SocketAddress& addr);
 		/// Creates a SocketAddress by copying another one.
@@ -181,7 +198,7 @@ public:
 	enum
 	{
 		MAX_ADDRESS_LENGTH =
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 			sizeof(struct sockaddr_un)
 #elif defined(POCO_HAVE_IPv6)
 			sizeof(struct sockaddr_in6)
@@ -190,6 +207,9 @@ public:
 #endif
 			/// Maximum length in bytes of a socket address.
 	};
+
+	static bool isUnixLocal(const std::string& hostAndPort);
+		/// Returns true iff `hostAndPort` is an absolute file path.
 
 protected:
 	void init(const IPAddress& hostAddress, Poco::UInt16 portNumber);
@@ -214,7 +234,7 @@ private:
 	void newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 #endif
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	void newLocal(const sockaddr_un* sockAddr);
 	void newLocal(const std::string& path);
 #endif
@@ -265,7 +285,7 @@ inline void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 po
 #endif // POCO_HAVE_IPv6
 
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 inline void SocketAddress::newLocal(const sockaddr_un* sockAddr)
 {
 	_pImpl = new Poco::Net::Impl::LocalSocketAddressImpl(sockAddr);
@@ -276,12 +296,12 @@ inline void SocketAddress::newLocal(const std::string& path)
 {
 	_pImpl = new Poco::Net::Impl::LocalSocketAddressImpl(path.c_str(), path.size());
 }
-#endif // POCO_OS_FAMILY_UNIX
+#endif // POCO_HAS_UNIX_SOCKET
 
 
 inline 	bool SocketAddress::operator == (const SocketAddress& socketAddress) const
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (family() == UNIX_LOCAL)
 		return toString() == socketAddress.toString();
 	else
@@ -296,12 +316,12 @@ inline bool SocketAddress::operator != (const SocketAddress& socketAddress) cons
 }
 
 
-} } // namespace Poco::Net
-
-
 Net_API Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value);
 Net_API Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value);
 Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address);
+
+
+} } // namespace Poco::Net
 
 
 #endif // Net_SocketAddress_INCLUDED

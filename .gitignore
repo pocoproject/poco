@@ -131,6 +131,9 @@ lib/
 lib64/
 pocomsg.h
 **/UpgradeLog*.XML
+/out/build/x64-Debug
+.vs/
+vcpkg_installed/
 
 # Eclipse generated files #
 ###########################
@@ -144,6 +147,7 @@ cmake-build/
 *.bak
 stage/
 releases/
+poco_build_stderr.out
 
 # vim #
 #######
@@ -151,3 +155,18 @@ releases/
 *.swp
 *.vim
 tags
+
+# Javascript #
+##############
+package-lock.json
+node_modules
+
+# Old Visual Studio files #
+###########################
+*_vs1[45]0.sln
+*_vs1[45]0.vcxproj
+*_vs1[45]0.vcxproj.filters
+
+# Debug files #
+##############
+*.core

@@ -21,7 +21,7 @@ Options:
     Use the given build configuration.
     Available configurations are:
 
-`ls -C $base/build/config/`
+$(ls -C "$base"/build/config/)
 
   --prefix=<install_prefix>
     Use the given install directory for make install.
@@ -77,6 +77,10 @@ Options:
   --no-soo
     Compile with -DPOCO_NO_SOO.
     Disables small object optimization.
+
+  --no-sqlparser
+    Compile with -DPOCO_DATA_NO_SQL_PARSER
+    Disables compilation of the SQLParser.
 
   --sqlite-fts=<path>
     Compile with -DPOCO_DATA_SQLITE_FTS.
@@ -148,11 +152,11 @@ ENDHELP
 }
 
 # save cwd
-build=`pwd`
+build=$(pwd)
 # get directory where we are located
-cd `dirname $0`
-base=`pwd`
-cd $build
+cd "$(dirname "$0")" || exit
+base=$(pwd)
+cd "$build" || exit
 
 tests=1
 samples=1
@@ -166,56 +170,57 @@ odbcinclude=""
 unbundled=""
 static=""
 shared=""
-omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL MongoDB PDF CppParser PageCompiler"
-omitTypical="Data/ODBC Data/MySQL MongoDB PDF CppParser"
+nosqlparser=
+omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler"
+omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser"
 omit=$omitTypical
 # parse arguments
 while [ $# -ge 1 ]; do
 	case "$1" in
 	--config=*)
-		config="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+		config="$(echo "${1}" | awk '{print substr($0,10)}')" ;;
 
 	--prefix=*)
-		prefix="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+		prefix="$(echo "${1}" | awk '{print substr($0,10)}')" ;;
 
 	--no-prefix)
 		noprefix=1 ;;
 
 	--stdcxx-base=*)
-		stdcxx_base="`echo ${1} | awk '{print substr($0,15)}'`" ;;
+		stdcxx_base="$(echo "${1}" | awk '{print substr($0,15)}')" ;;
 
 	--omit=*)
-		omit="`echo ${1} | awk '{print substr($0,8)}' | tr ',;' '  '`" ;;
+		omit="$(echo "${1}" | awk '{print substr($0,8)}' | tr ',;' '  ')" ;;
 
 	--include-path=*)
-		includepath="`echo ${1} | awk '{print substr($0,16)}' | tr ',;' '  '`" ;;
+		includepath="$(echo "${1}" | awk '{print substr($0,16)}' | tr ',;' '  ')" ;;
 
 	--library-path=*)
-		librarypath="`echo ${1} | awk '{print substr($0,16)}' | tr ',;' '  '`" ;;
+		librarypath="$(echo "${1}" | awk '{print substr($0,16)}' | tr ',;' '  ')" ;;
 
 	--odbc-lib=*)
-		odbclib="`echo ${1} | awk '{print substr($0,12)}'`" ;;
+		odbclib="$(echo "${1}" | awk '{print substr($0,12)}')" ;;
 
 	--odbc-include=*)
-		odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
+		odbcinclude="$(echo "${1}" | awk '{print substr($0,16)}')" ;;
 
 	--mysql-lib=*)
-		mysqllib="`echo ${1} | awk '{print substr($0,13)}'`" ;;
+		mysqllib="$(echo "${1}" | awk '{print substr($0,13)}')" ;;
 
 	--mysql-include=*)
-		mysqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
+		mysqlinclude="$(echo "${1}" | awk '{print substr($0,17)}')" ;;
 
 	--pgsql-lib=*)
- 		pgsqllib="`echo ${1} | awk '{print substr($0,13)}'`" ;;
+		pgsqllib="$(echo "${1}" | awk '{print substr($0,13)}')" ;;
 
 	--pgsql-include=*)
-		pgsqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
+		pgsqlinclude="$(echo "${1}" | awk '{print substr($0,17)}')" ;;
 
 	--cflags=*)
-		flags="$flags `echo ${1} | awk '{print substr($0,10)}'`" ;;
+		flags="$flags $(echo "${1}" | awk '{print substr($0,10)}')" ;;
 
 	--ldflags=*)
-		ldflags="$ldflags `echo ${1} | awk '{print substr($0,11)}'`" ;;
+		ldflags="$ldflags $(echo "${1}" | awk '{print substr($0,11)}')" ;;
 
 	--no-samples)
 		samples="" ;;
@@ -241,11 +246,16 @@ while [ $# -ge 1 ]; do
 	--no-soo)
 		flags="$flags -DPOCO_NO_SOO" ;;
 
+	--no-sqlparser)
+		flags="$flags -DPOCO_DATA_NO_SQL_PARSER"
+		nosqlparser=1
+		;;
+
 	--sqlite-thread-safe=*)
-		flags="$flags -DSQLITE_THREADSAFE=`echo ${1} | awk '{print substr($0,22)}'`" ;;
+		flags="$flags -DSQLITE_THREADSAFE=$(echo "${1}" | awk '{print substr($0,22)}')" ;;
 
 	--sqlite-fts)
-		flags="$flags -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS" ;;
+		flags="$flags -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_FTS3_PARENTHESIS" ;;
 
 	--poquito)
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
@@ -256,7 +266,7 @@ while [ $# -ge 1 ]; do
 		;;
 
 	--minimal)
-	  	omit=$omitMinimal ;;
+		omit=$omitMinimal ;;
 
 	--typical)
 		omit=$omitTypical ;;
@@ -286,7 +296,7 @@ done
 # autodetect build environment
 # ...special cases for CYGWIN or MinGW
 if [ "$config" = "" ] ; then
- 	config=`uname`
+	config=$(uname)
 	case "$config" in
 	CYGWIN*)
 		config=CYGWIN ;;
@@ -299,7 +309,7 @@ if [ ! -f "$base/build/config/$config" ] ; then
 	echo "Unknown configuration: $config"
 	echo "Please use the --config option to specify another build configuration"
 	echo "The following configurations are available:"
-	ls $base/build/config
+	ls "$base"/build/config
 	exit 1
 fi
 
@@ -310,16 +320,16 @@ if [ -z "$prefix" ] ; then
 fi
 
 # check for patches
-if [ -d $base/patches/$config ] ; then
+if [ -d "$base"/patches/"$config" ] ; then
 	echo "NOTE: There are patches for your configuration available. Please apply them before compiling."
 fi
 
 # copy Makefile to build dir
 if [ "$base" != "$build" ] ; then
-	cp $base/Makefile $build
+	cp "$base"/Makefile "$build"
 fi
 
-if [ -n "$static" -a -n "$shared" ] ; then
+if [ -n "$static" ] && [ -n "$shared" ] ; then
 	linkmode=BOTH
 elif [ -n "$static" ] ; then
 	linkmode=STATIC
@@ -330,51 +340,57 @@ else
 fi
 
 # create config.make
-echo '# config.make generated by configure script' >$build/config.make
-echo "POCO_CONFIG = $config" >>$build/config.make
-echo "POCO_BASE = $base" >>$build/config.make
-echo "POCO_BUILD = $build" >>$build/config.make
-echo "POCO_FLAGS = $flags" >>$build/config.make
-echo "POCO_LDFLAGS = $ldflags" >>$build/config.make
+echo '# config.make generated by configure script' > "$build"/config.make
+{
+	echo "POCO_CONFIG = $config"
+	echo "POCO_BASE = $base"
+	echo "POCO_BUILD = $build"
+	echo "POCO_FLAGS = $flags"
+	echo "POCO_LDFLAGS = $ldflags"
+} >> "$build"/config.make
+
 if [ -n "$prefix" ] ; then
-	echo "POCO_PREFIX = $prefix" >>$build/config.make
+	echo "POCO_PREFIX = $prefix" >>"$build"/config.make
 fi
-echo "OMIT = $omit" >>$build/config.make
+echo "OMIT = $omit" >>"$build"/config.make
 if [ -n "$stdcxx_base" ] ; then
-	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
+	echo "STDCXX_BASE = $stdcxx_base" >>"$build"/config.make
 fi
 if [ -n "$includepath" ] ; then
-	echo "POCO_ADD_INCLUDE = $includepath" >>$build/config.make
+	echo "POCO_ADD_INCLUDE = $includepath" >>"$build"/config.make
 fi
 if [ -n "$librarypath" ] ; then
-	echo "POCO_ADD_LIBRARY = $librarypath" >>$build/config.make
+	echo "POCO_ADD_LIBRARY = $librarypath" >>"$build"/config.make
 fi
 if [ -n "$odbclib" ] ; then
-	echo "POCO_ODBC_LIB = $odbclib" >>$build/config.make
+	echo "POCO_ODBC_LIB = $odbclib" >>"$build"/config.make
 fi
 if [ -n "$odbcinclude" ] ; then
-	echo "POCO_ODBC_INCLUDE = $odbcinclude" >>$build/config.make
+	echo "POCO_ODBC_INCLUDE = $odbcinclude" >>"$build"/config.make
 fi
 if [ -n "$mysqllib" ] ; then
-	echo "POCO_MYSQL_LIB = $mysqllib" >>$build/config.make
+	echo "POCO_MYSQL_LIB = $mysqllib" >>"$build"/config.make
 fi
 if [ -n "$mysqlinclude" ] ; then
-	echo "POCO_MYSQL_INCLUDE = $mysqlinclude" >>$build/config.make
+	echo "POCO_MYSQL_INCLUDE = $mysqlinclude" >>"$build"/config.make
 fi
 if [ -n "$pgsqllib" ] ; then
-	echo "POCO_PGSQL_LIB = $pgsqllib" >>$build/config.make
+	echo "POCO_PGSQL_LIB = $pgsqllib" >>"$build"/config.make
 fi
 if [ -n "$pgsqlinclude" ] ; then
-	echo "POCO_PGSQL_INCLUDE = $pgsqlinclude" >>$build/config.make
+	echo "POCO_PGSQL_INCLUDE = $pgsqlinclude" >>"$build"/config.make
 fi
 if [ -n "$unbundled" ] ; then
-	echo "POCO_UNBUNDLED = 1" >>$build/config.make
+	echo "POCO_UNBUNDLED = 1" >>"$build"/config.make
 fi
 if [ -n "$linkmode" ] ; then
-	echo "LINKMODE = $linkmode" >>$build/config.make
+	echo "LINKMODE = $linkmode" >>"$build"/config.make
+fi
+if [ -n "$nosqlparser" ] ; then
+	echo "POCO_DATA_NO_SQL_PARSER = $nosqlparser" >>"$build"/config.make
 fi
 
-cat <<__EOF__ >>$build/config.make
+cat <<__EOF__ >>"$build"/config.make
 export POCO_CONFIG
 export POCO_BASE
 export POCO_BUILD
@@ -383,47 +399,57 @@ export POCO_LDFLAGS
 __EOF__
 
 if [ -n "$prefix" ] ; then
-	echo "export POCO_PREFIX" >>$build/config.make
+	echo "export POCO_PREFIX" >>"$build"/config.make
 fi
 if [ -n "$stdcxx_base" ] ; then
-	echo "export STDCXX_BASE" >>$build/config.make
+	echo "export STDCXX_BASE" >>"$build"/config.make
 fi
 if [ -n "$includepath" ] ; then
-	echo "export POCO_ADD_INCLUDE" >>$build/config.make
+	echo "export POCO_ADD_INCLUDE" >>"$build"/config.make
 fi
 if [ -n "$librarypath" ] ; then
-	echo "export POCO_ADD_LIBRARY" >>$build/config.make
+	echo "export POCO_ADD_LIBRARY" >>"$build"/config.make
 fi
 if [ -n "$odbclib" ] ; then
-	echo "export POCO_ODBC_LIB" >>$build/config.make
+	echo "export POCO_ODBC_LIB" >>"$build"/config.make
 fi
 if [ -n "$odbcinclude" ] ; then
-	echo "export POCO_ODBC_INCLUDE" >>$build/config.make
+	echo "export POCO_ODBC_INCLUDE" >>"$build"/config.make
 fi
 if [ -n "$mysqllib" ] ; then
-	echo "export POCO_MYSQL_LIB" >>$build/config.make
+	echo "export POCO_MYSQL_LIB" >>"$build"/config.make
 fi
 if [ -n "$mysqlinclude" ] ; then
-	echo "export POCO_MYSQL_INCLUDE" >>$build/config.make
+	echo "export POCO_MYSQL_INCLUDE" >>"$build"/config.make
 fi
 if [ -n "$pgsqllib" ] ; then
-	echo "export POCO_PGSQL_LIB" >>$build/config.make
+	echo "export POCO_PGSQL_LIB" >>"$build"/config.make
 fi
 if [ -n "$pgsqlinclude" ] ; then
-	echo "export POCO_PGSQL_INCLUDE" >>$build/config.make
+	echo "export POCO_PGSQL_INCLUDE" >>"$build"/config.make
 fi
 if [ -n "$unbundled" ] ; then
-	echo "export POCO_UNBUNDLED" >>$build/config.make
+	echo "export POCO_UNBUNDLED" >>"$build"/config.make
 fi
 if [ -n "$linkmode" ] ; then
-	echo "export LINKMODE" >>$build/config.make
+	echo "export LINKMODE" >>"$build"/config.make
+fi
+if [ -n "$nosqlparser" ] ; then
+	echo "export POCO_DATA_NO_SQL_PARSER" >>"$build"/config.make
 fi
 
 # create config.build
-echo '# config.build generated by configure script' >$build/config.build
-cat <<__EOF__ >>$build/config.build
+echo '# config.build generated by configure script' >"$build"/config.build
+cat <<__EOF__ >>"$build"/config.build
 TESTS = $tests
 SAMPLES = $samples
 __EOF__
 
 echo "Configured for $config"
+echo "======================"
+echo
+cat "$build"/config.make
+echo
+cat "$build"/config.build
+echo
+echo "======================"

@@ -35,6 +35,7 @@ public:
 	void testSORTABLE();
 	void testCustom();
 	void testGuess();
+	void testCleanup();
 	void testParseMonth();
 	void testParseDayOfWeek();
 
@@ -44,6 +45,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void testBad(const std::string& fmt, const std::string& dateStr, int tzd);
 };
 
 

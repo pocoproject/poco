@@ -14,7 +14,6 @@
 
 #include "Poco/Data/MySQL/SessionHandle.h"
 #include "Poco/Data/DataException.h"
-#include "Poco/SingletonHolder.h"
 #ifdef POCO_OS_FAMILY_UNIX
 #include <pthread.h>
 #endif
@@ -51,7 +50,8 @@ public:
 
 	static ThreadCleanupHelper& instance()
 	{
-		return *_sh.get();
+		static ThreadCleanupHelper tch;
+		return tch;
 	}
 
 	static void cleanup(void* data)
@@ -61,11 +61,9 @@ public:
 
 private:
 	pthread_key_t _key;
-	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
 };
 
 
-Poco::SingletonHolder<ThreadCleanupHelper> ThreadCleanupHelper::_sh;
 #endif
 
 
@@ -153,14 +151,14 @@ void SessionHandle::close()
 
 void SessionHandle::startTransaction()
 {
-	int rc = mysql_autocommit(_pHandle, false);
+	int rc = mysql_query(_pHandle, "BEGIN");
 	if (rc != 0)
 	{
 		// retry if connection lost
 		int err = mysql_errno(_pHandle);
 		if (err == 2006 /* CR_SERVER_GONE_ERROR */ || err == 2013 /* CR_SERVER_LOST */)
 		{
-			rc = mysql_autocommit(_pHandle, false);
+			rc = mysql_query(_pHandle, "BEGIN");
 		}
 	}
 	if (rc != 0) throw TransactionException("Start transaction failed.", _pHandle);
@@ -178,6 +176,13 @@ void SessionHandle::rollback()
 {
 	if (mysql_rollback(_pHandle) != 0)
 		throw TransactionException("Rollback failed.", _pHandle);
+}
+
+
+void SessionHandle::autoCommit(bool val)
+{
+	if (mysql_autocommit(_pHandle, val) != 0)
+		throw TransactionException("Setting autocommit mode failed.", _pHandle);
 }
 
 

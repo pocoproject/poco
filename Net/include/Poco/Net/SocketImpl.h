@@ -27,6 +27,11 @@
 
 
 namespace Poco {
+
+
+class FileInputStream;
+
+
 namespace Net {
 
 
@@ -142,6 +147,13 @@ public:
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
 
+	void useFileDescriptor(poco_socket_t fd);
+		/// Use a external file descriptor for the socket. Required to be careful
+		/// about what kind of file descriptor you're passing to make sure it's compatible
+		/// with how you plan on using it. These specifics are platform-specific.
+		/// Not valid to call this if the internal socket is already initialized.
+		/// Poco takes ownership of the file descriptor, closing it when this socket is closed.
+
 	virtual void listen(int backlog = 64);
 		/// Puts the socket into listening state.
 		///
@@ -176,7 +188,8 @@ public:
 		/// value denoting a certain condition.
 
 	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
-		/// Receives data from the socket and stores it in buffers.
+		/// Sends the contents of the given buffers through
+		/// the socket.
 		///
 		/// Returns the number of bytes received.
 		///
@@ -465,6 +478,11 @@ public:
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 
+	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0);
+		/// Sends file using system function
+		/// for posix systems - with sendfile[64](...)
+		/// for windows - with TransmitFile(...)
+
 protected:
 	SocketImpl();
 		/// Creates a SocketImpl.
@@ -580,5 +598,9 @@ inline bool SocketImpl::getBlocking() const
 
 } } // namespace Poco::Net
 
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#pragma comment(lib, "mswsock.lib") 
+#endif 
 
 #endif // Net_SocketImpl_INCLUDED

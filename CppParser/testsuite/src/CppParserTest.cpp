@@ -33,7 +33,7 @@ std::string options("/I \"C:\\Program Files\\Microsoft Visual Studio 8\\VC\\INCL
 				"/D \"_WINDOWS\", "
 				"/D \"_MBCS\", "
 				"/C, /P, /TP");
-std::string path("C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\IDE;C:\\Program Files\\Microsoft Visual Studio 8\\VC\\BIN;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools;;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\bin");
+std::string path("C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\IDE;C:\\Program Files\\Microsoft Visual Studio 8\\VC\\BIN;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\bin");
 
 
 CppParserTest::CppParserTest(const std::string& name): CppUnit::TestCase(name)
@@ -75,6 +75,38 @@ void CppParserTest::testExtractName()
 	assertTrue (name == "_var");
 
 	decl = "void func(int arg1, int arg2)";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<bool> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<void(bool)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<std::vector<int>(std::vector<bool>)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<void*(std::function<const int*(void)>)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<bool> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<void(bool)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<std::vector<int>(std::vector<bool>)> func";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "func");
+
+	decl = "std::function<void*(std::function<const int*(void)>)> func";
 	name = Symbol::extractName(decl);
 	assertTrue (name == "func");
 

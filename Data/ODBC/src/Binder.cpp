@@ -85,7 +85,7 @@ void Binder::freeMemory()
 
 	UUIDMap::iterator itUUID = _uuids.begin();
 	UUIDMap::iterator itUUIDEnd = _uuids.end();
-	for(; itUUID != itUUIDEnd; ++itUUID) std::free(itUUID->first);
+	for(; itUUID != itUUIDEnd; ++itUUID) delete [] itUUID->first;
 
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();
@@ -152,7 +152,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		}
 	}
 	else
-		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
+		throw InvalidArgumentException("ODBC::Binder::bind(string):Parameter must be [in] OR [out] bound.");
 
 	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
 
@@ -165,14 +165,14 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_CHAR,
-		Connector::stringBoundToLongVarChar() ? SQL_LONGVARCHAR : SQL_VARCHAR,
+		Utility::sqlDataType(SQL_C_CHAR),
 		(SQLUINTEGER) colSize,
 		0,
 		pVal,
 		(SQLINTEGER) size,
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, "SQLBindParameter(std::string)");
+		throw StatementException(_rStmt, "ODBC::Binder::bind(string):SQLBindParameter(std::string)");
 	}
 }
 
@@ -201,7 +201,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 		_inParams.insert(ParamMap::value_type(pVal, size));
 	}
 	else
-		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
+		throw InvalidArgumentException("ODBC::Binder::bind():Parameter must be [in] OR [out] bound.");
 
 	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
 
@@ -216,14 +216,14 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 		(SQLUSMALLINT)pos + 1,
 		toODBCDirection(dir),
 		SQL_C_WCHAR,
-		SQL_WLONGVARCHAR,
+		Utility::sqlDataType(SQL_C_WCHAR),
 		(SQLUINTEGER)colSize,
 		0,
 		pVal,
 		(SQLINTEGER)size,
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, "SQLBindParameter(std::string)");
+		throw StatementException(_rStmt, "ODBC::Binder::bind(UTF16String):SQLBindParameter(std::string)");
 	}
 }
 
@@ -249,14 +249,14 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_TYPE_DATE,
-		SQL_TYPE_DATE,
+		Utility::sqlDataType(SQL_C_TYPE_DATE),
 		colSize,
 		decDigits,
 		(SQLPOINTER) pDS,
 		0,
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, "SQLBindParameter(Date)");
+		throw StatementException(_rStmt, "ODBC::Binder::bind(Date):SQLBindParameter(Date)");
 	}
 }
 
@@ -282,14 +282,14 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_TYPE_TIME,
-		SQL_TYPE_TIME,
+		Utility::sqlDataType(SQL_C_TYPE_TIME),
 		colSize,
 		decDigits,
 		(SQLPOINTER) pTS,
 		0,
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, "SQLBindParameter(Time)");
+		throw StatementException(_rStmt, "ODBC::Binder::bind(Time):SQLBindParameter(Time)");
 	}
 }
 
@@ -315,14 +315,14 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_TYPE_TIMESTAMP,
-		SQL_TYPE_TIMESTAMP,
+		Utility::sqlDataType(SQL_C_TYPE_TIMESTAMP),
 		colSize,
 		decDigits,
 		(SQLPOINTER) pTS,
 		0,
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, "SQLBindParameter(DateTime)");
+		throw StatementException(_rStmt, "ODBC::Binder::bind(DateTime):SQLBindParameter(DateTime)");
 	}
 }
 
@@ -386,7 +386,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 		0,
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, "SQLBindParameter()");
+		throw StatementException(_rStmt, "ODBC::Binder::bind(NullData):SQLBindParameter()");
 	}
 }
 
@@ -510,25 +510,34 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	SQLSMALLINT& decDigits,
 	std::size_t actualSize)
 {
+	SQLSMALLINT sqlDataType = Utility::sqlDataType(cDataType);
+	colSize = 0;
+	decDigits = 0;
+
 	// Not all drivers are equally willing to cooperate in this matter.
 	// Hence the funky flow control.
-	DynamicAny tmp;
-	bool found(false);
 	if (_pTypeInfo)
 	{
-		found = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
-		if (found) colSize = tmp;
+		DynamicAny tmp;
+		bool foundSize(false);
+		bool foundPrec(false);
+		foundSize = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
+		if (foundSize) colSize = tmp;
+		else foundSize = _pTypeInfo->tryGetInfo(sqlDataType, "COLUMN_SIZE", tmp);
+		if (foundSize) colSize = tmp;
+
 		if (actualSize > colSize)
 		{
 			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
 					pos, actualSize, static_cast<long>(colSize)));
 		}
-		found = _pTypeInfo->tryGetInfo(cDataType, "MINIMUM_SCALE", tmp);
-		if (found)
-		{
-			decDigits = tmp;
+		foundPrec = _pTypeInfo->tryGetInfo(cDataType, "MAXIMUM_SCALE", tmp);
+		if (foundPrec) decDigits = tmp;
+		else foundPrec = _pTypeInfo->tryGetInfo(sqlDataType, "MAXIMUM_SCALE", tmp);
+		if (foundPrec) decDigits = tmp;
+
+		if (foundSize && foundPrec)
 			return;
-		}
 	}
 
 	try
@@ -560,11 +569,27 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 				pos, actualSize, static_cast<long>(colSize)));
 	}
 
-	// no success, set to zero and hope for the best
-	// (most drivers do not require these most of the times anyway)
-	colSize = 0;
-	decDigits = 0;
 	return;
+}
+
+
+std::size_t Binder::getParamSizeDirect(std::size_t pos, SQLINTEGER& size)
+{
+//On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
+#ifdef POCO_OS_FAMILY_WINDOWS
+	size = DEFAULT_PARAM_SIZE;
+	SQLHDESC hIPD = 0;
+	if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
+	{
+		SQLULEN sz = 0;
+		if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT)pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) &&
+			sz > 0)
+		{
+			size = (SQLINTEGER)sz;
+		}
+	}
+#endif
+	return static_cast<std::size_t>(size);
 }
 
 
@@ -585,23 +610,10 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 		Parameter p(_rStmt, pos);
 		paramSize = p.columnSize();
 	}
-	catch (StatementException&)
-	{
-		size = DEFAULT_PARAM_SIZE;
-//On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
-#ifdef POCO_OS_FAMILY_WINDOWS
-		SQLHDESC hIPD = 0;
-		if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
-		{
-			SQLUINTEGER sz = 0;
-			if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) &&
-				sz > 0)
-			{
-				size = sz;
-			}
-		}
-#endif
-	}
+	catch (StatementException&) {}
+
+	if (colSize == 0 && paramSize == 0)
+		paramSize = getParamSizeDirect(pos, size);
 
 	if (colSize > 0 && paramSize > 0)
 		size = colSize < paramSize ? static_cast<SQLINTEGER>(colSize) : static_cast<SQLINTEGER>(paramSize);
@@ -620,7 +632,7 @@ void Binder::setParamSetSize(std::size_t length)
 	{
 		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, SQL_IS_UINTEGER)) ||
 			Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) length, SQL_IS_UINTEGER)))
-				throw StatementException(_rStmt, "SQLSetStmtAttr()");
+				throw StatementException(_rStmt, "ODBC::Binder::setParamSetSize():SQLSetStmtAttr()");
 
 		_paramSetSize = static_cast<SQLINTEGER>(length);
 	}

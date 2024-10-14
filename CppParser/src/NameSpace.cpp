@@ -49,7 +49,8 @@ NameSpace::~NameSpace()
 void NameSpace::addSymbol(Symbol* pSymbol)
 {
 	poco_check_ptr (pSymbol);
-
+	
+	pSymbol->setOrder(_symbols.size());
 	_symbols.insert(SymbolTable::value_type(pSymbol->name(), pSymbol));
 }
 
@@ -65,7 +66,7 @@ void NameSpace::importSymbol(const std::string& fullName)
 	}
 }
 
-
+	
 void NameSpace::importNameSpace(const std::string& nameSpace)
 {
 	_importedNameSpaces.push_back(nameSpace);
@@ -94,21 +95,21 @@ Symbol* NameSpace::lookup(const std::string& name) const
 Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const
 {
 	Symbol* pSymbol = 0;
-
+	
 	if (name.empty())
 		return pSymbol;
 
 	if (alreadyVisited.find(this) != alreadyVisited.end())
-			return pSymbol;
+		return pSymbol;
+	
 	std::string head;
 	std::string tail;
 	splitName(name, head, tail);
-
+	
 	alreadyVisited.insert(this);
 	bool currentNSInserted = true;
 
-
-	if (head.empty())
+	if (head.empty()) 
 	{
 		alreadyVisited.insert(this);
 		return root()->lookup(tail, alreadyVisited);
@@ -161,13 +162,13 @@ void NameSpace::nameSpaces(SymbolTable& table) const
 	extract(Symbol::SYM_NAMESPACE, table);
 }
 
-
+	
 void NameSpace::typeDefs(SymbolTable& table) const
 {
 	extract(Symbol::SYM_TYPEDEF, table);
 }
 
-
+	
 void NameSpace::typeAliases(SymbolTable& table) const
 {
 	extract(Symbol::SYM_TYPEALIAS, table);
@@ -179,19 +180,19 @@ void NameSpace::enums(SymbolTable& table) const
 	extract(Symbol::SYM_ENUM, table);
 }
 
-
+	
 void NameSpace::classes(SymbolTable& table) const
 {
 	extract(Symbol::SYM_STRUCT, table);
 }
 
-
+	
 void NameSpace::functions(SymbolTable& table) const
 {
 	extract(Symbol::SYM_FUNCTION, table);
 }
 
-
+	
 void NameSpace::variables(SymbolTable& table) const
 {
 	extract(Symbol::SYM_VARIABLE, table);
@@ -226,7 +227,7 @@ void NameSpace::splitName(const std::string& name, std::string& head, std::strin
 		head.assign(name, 0, pos);
 		pos += 2;
 		poco_assert (pos < name.length());
-		tail.assign(name, pos, name.length() - pos);
+		tail.assign(name, pos, name.length() - pos); 
 	}
 	else head = name;
 }

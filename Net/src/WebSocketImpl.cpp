@@ -11,8 +11,9 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
-#define NOMINMAX
+#ifndef NOMINMAX
+	#define NOMINMAX
+#endif // NOMINMAX
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"

@@ -1,6 +1,331 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.13.3
+
+!!Summary of Changes
+
+This is a bugfix release.
+
+!!Security Fixes
+
+  - GH #4496 Upgrade bundled libexpat to 2.6.2
+
+!!Features, Enhancements and Third Party Updates
+
+  - GH #4488 Add Poco::Util::Timer::idle() method to check if timer has any tasks scheduled
+  - GH #3807 DNS.resolve() should not be sorted in HostEntry::removeDuplicates()
+  - GH #4515 Upgrade bundled SQLite to 3.45.2
+  - PR #4517 Optimize Net module for Android
+
+!!Bug Fixes and Improvements:
+
+  - GH #4505 ODBC Unicode wrappers do not check for null length pointers
+  - GH #4492 Poco::BasicMemoryStreamBuf is missing seekpos()
+  - GH #4486 DateTimeFormat RFC1036 Sunday name is short (should be long)
+  - GH #4468 Poco::URI: don't lowercase host part if it's a Unix domain socket
+  - GH #4450 Error between Poco::ActiveRecord and Poco::Data::PostgreSQL
+  - GH #4435 SecureStreamSocket is not thread-safe
+  - GH #4415 SecureSocketImpl::reset shouldn't close socket
+  - GH #3857 Thread_POSIX.cpp shouldn't convert thread IDs to long
+  - GH #3725 secure socket receiveTimeout throwing after configured timeout * 2
+
+
+!!!Release 1.13.2
+
+!!Summary of Changes
+
+This is a bugfix release.
+
+!!Breaking Changes
+
+  - GH #4378 [Data] Unconditionally includes of SQLParser.h
+
+!!Bug fixes and Improvements
+
+  - GH #4462 Disable SQL parsing by default
+
+
+!!!Release 1.13.1
+
+!!Summary of Changes
+
+This is a bugfix release.
+
+!!Features and Enhancements
+
+  - GH #4367 `SQLite` `FTS5` (full text search)
+  - GH #4335 Implement patches that Debian/Ubuntu applies when preparing deb packages
+  - GH #4216 Replace C string literals (const char*) with C++ std::string literals for std::string parameters.
+  - GH #3890 Get rid of SingletonHolder
+  - GH #2450 Why does it take the ThreadPool 10+ seconds to shutdown when there is nothing running.
+  - GH #2443 FileChannel doesn't flush to disk on unix until close
+  - GH #4437 Add arm cross-compile config and CI
+  - PR #4422 enh(File): Linux, macOS: microsecond precision for file times
+  - PR #4390 enh(DateTimeParser): option to cleanup input string before parsing (#569)
+
+!!Bug Fixes and Improvements
+
+  - GH #4443 Upgrade libexpat to 2.6.0 
+  - GH #4425 Unit tests: optional testing of deprecated functionality
+  - GH #4421 Multiple calls to initializeSSL/uninitializeSSL cause assert failure during certificate validation
+  - GH #4411 NULL pointer: strategy when setting rotation never in FileChannel
+  - GH #4404 qnx build error: 'prctl' was not declared in this scope
+  - GH #4400 SocketReactor deadlock test intermittently hangs
+  - GH #4398 Can not install CppUnit target
+  - GH #4393 iOS ARM64 : Invalid access: Can not convert empty value.
+  - GH #4392 Environment_WIN32U nodeIdImpl access violation in 1.13.0
+  - GH #4375 UUID parser silently ignores too long strings
+  - GH #4347 github check job on macOS: testEncryptDecryptGCM occasionally fails
+  - GH #4313 Add macos sanitizer CI jobs
+  - GH #4019 MSYS2/mingw cmake linking problem
+  - GH #4018 cmake MSYS2 compile error for poco/net project
+  - GH #3908 JWT token unitest fail with POCO_NO_SOO on vs 2019
+  - GH #3650 MailMessage::read() chokes on "Content-disposition"
+  - GH #3331 Apple Silicon ARM64 :  Invalid access: Can not convert empty value.
+  - GH #3213 NetSSL_Win\src\SecureSocketImpl.cpp CertFreeCertificateContext on nullptr
+  - GH #661 Automatic Lib Init (NetworkInitializer) is not working on MinGW
+  - PR #4427 enh(tests): Ability to enable/disable testing of deprecated functionality
+  - PR #4381 fix(Crypto): Compile error if EVP_CIPHER_CTX_init not defined.
+
+
+!!!Release 1.13.0
+
+!!Summary of Changes
+
+  - Support for MongoDB 5.1 and newer
+  - C++17 is the lowest supported standard
+  - Poco::Data SQLParser (experimental, optional at build and runtime)
+
+!!Breaking Changes
+
+  - GH #4305 Remove deprecated `toJSON` functions
+  - GH #4304 NumericString conversions inconsistencies
+  - GH #4235 Minimum standards: C++17 and C11
+  - GH #4230 Poco::Data fixes and improvements
+  - GH #3701 SocketReactor: Remove not useful handlers calls
+  - GH #569 SyntaxException for DateTimeParser::parse not working
+
+!!Features and Enhancements
+
+  - GH #4276 MongoDB default function deleted clang warning
+  - GH #4261 Move autoCommit to AbstractSessionImpl
+  - GH #4254 MessageHeader: provide original HTTP header values before RFC2047 decoding
+  - GH #4249 Separate CI ODBC tests into separate job
+  - GH #4217 Protect Reactor stop() and wakeUp() from reentrance
+  - GH #4208 Add Unix socket support on windows
+  - GH #4206 Improve Data::SessionPool thread safety
+  - GH #4205 Data CI Improvements
+  - GH #4198 Poco::Data fixes and improvements
+  - GH #4183 Return Transaction execution status and error
+  - GH #4181 Virtualize ServerApplication::handlePidFile()
+  - GH #4160 Allow row count statements in Data::Recordset
+  - GH #4148 SQL server stored procedures fail
+  - GH #4146 ODBC max field size fails with int
+  - GH #4129 make clean and distclean should not trigger dependencies creation
+  - GH #4112 Redirect build stderr to a file
+  - GH #4107 SQLChannel fixes and improvements
+  - GH #4064 Add ProcessRunner and PIDFile
+  - GH #4063 pthread_setname_np was not declared in this scope
+  - GH #3951 Poco::Data::SessionPool: avoid sessions staying idle too long
+  - GH #3833 DynamicStruct::toString() escaping
+  - GH #3808 ICMPEventArgs Statistics bugs
+  - GH #3740 buildwin.ps1 failed to build x64
+  - GH #3713 SocketReactor improvements
+  - GH #3710 Thread::trySleep() assertion
+  - GH #3703 POSIX Thread::sleep() poor performance
+  - GH #3702 SocketReactor: post ErrorNotification on exception
+  - GH #3667 NumberFormatter: add Options enum for controlling prefix and lowercase
+  - GH #2967 build Poco Net failed MinGW [TIMESTAMP_REQUEST enum vs macro]
+  - GH #2770 Support for AF_UNIX on windows in recent windows builds.
+  - GH #2707 Trying to Compile with emscripten: Target architecture was not detected as supported by Double-Conversion
+  - GH #2578 HTTPClientSession not working with UNIX_LOCAL SocketAddress
+  - GH #2403 File::exists() wrong result
+  - GH #2331 Improve implementation of logging macros.
+  - GH #2282 Add Path::self()
+  - GH #1258 Poco::DateTimeParser::tryParse issue
+  - GH #3845 Poco::XML::Node `insertAfter` API
+  - GH #3659 Add thread name support
+  - GH #2291 Visitor Pattern for Dynamic::Var
+  - PR #4059 Update ICMPv4PacketImpl.h
+  - PR #4021 Fix compile with `-DPOCO_NET_NO_IPv6`
+  - PR #3885 Use map from key to count instead of multiset
+  - PR #3864 Remove unnecessary dup. of std::string in NumberParser::tryParseFloat
+  - PR #3802 ODBC: Fix DataFormatException getting Time value from SQL Server
+  - PR #3797 HTTPServer Applications Slow to Terminate #3796
+  - PR #3787 fix(Crypto) Update method to extract friendlyName from certificate
+  - PR #3705 Fix/posix sleep
+  - PR #3664 set thread name
+  - PR #3657 Add lower case format for `NumberFormatter`
+  - PR #4144 add visitor pattern implementation for Poco::Dynamic::Var
+  - PR #3476 add separate accessors and mutators for connect, send and receive tim…
+
+!!Bug Fixes and Improvements
+
+  - GH #4328 Environment::nodeId Should Throw SystemException When Node ID is 0
+  - GH #4311 Canceled `Task` shouldn't start running
+  - GH #4310 `ActiveThread` data race
+  - GH #4309 `ArchiveStrategy` data race
+  - GH #4308 `DirectoryWatcher` data race
+  - GH #4307 `NotificationCenter` data race
+  - GH #4274 Remove VS 140, 150 Projects
+  - GH #4259 Progen uses wrong AdditionalOptions separator
+  - GH #4252 SecureSocketImpl::currentSession() always return null
+  - GH #4244 Poco::Data::PostgreSQL::SessionHandle::setAutoCommit(bool) should not call commit() or startTransaction()
+  - GH #4241 Poco::FileInputStream broken in 1.12.5 and 1.11.8.
+  - GH #4231 Poco::Data::PostgreSQL::SessionHandle::disconnect() leaks memory for failed connections
+  - GH #4207 VS170 binary names mismatch on ARM
+  - GH #4187 Sync 1.11.-1.12-devel(1.13)
+  - GH #4109 Skip reset for null Binder
+  - GH #4106 ODBC Binder does not retrieve proper type precision
+  - GH #4093 PostgreSQL get sqlcode
+  - GH #4028 Incompatibility with gcc 13.1
+  - GH #3923 UDP Multicast : `leaveGroup()` method always throw an exception
+  - GH #3835 DynamicStruct::toString not wrapping empty strings
+  - GH #3823 Possibility of memory leak in Windows Environment nodeIdImpl?
+  - GH #3812 Poco::Data::Session::reconnect throw Connection in use
+  - GH #3704 TaskManager waits for all threads in the ThreadPool
+  - GH #3557 HTTPSClientSession read infinite loop on IOS
+  - GH #3484 Poco::MongoDB support for MongoDB 5.0?
+  - GH #3331 Apple Silicon ARM64 :  Invalid access: Can not convert empty value.
+  - GH #3277 Use sendfile system call on Linux in HTTPServerResponseImpl::sendFile
+  - GH #3165 Can't reuse Poco::Data::Statement with a new set of bindings
+  - GH #2978 waitForTermination is unreliable on Linux.
+  - GH #2976 SharedMemoryImpl x64 size error
+  - GH #2965 Net fails to build with MinGW 9.20
+  - GH #2634 Data race in Poco::Net::HTTPServerConnection::onServerStopped
+  - GH #2366 Poco::Process::launch (UNIX) - possible memory leak when launching invalid command
+  - GH #2332 Optimize multi-arg logger methods to only call format() if log level allows
+  - PR #4353 Fix some issues found with clang-tidy
+  - PR #4345 Build.macos.openssl@1.1
+  - PR #4339 Fix RemoteSyslogChannel setProperty value check
+  - PR #4333 enh(NumberFormatter): Introduce backward compatible options for formatHex functions
+  - PR #4321 Github Action for Android NDK
+  - PR #4319 Implementation of Path::self()
+  - PR #4317 enh(ci): Add ENABLE_COMPILER_WARNINGS to cmake
+  - PR #4306 3102 json lowercase hex
+  - PR #4275 fix(NetSSL_Win): Error during handshake: failed to read data
+  - PR #4270 SplitterChannel addChannel - Prevent Duplicate Channels
+  - PR #4256 Implement MySQL::SessionHandle::startTransaction as submitting the SQL statement 'BEGIN'
+  - PR #4223 Virtualize ServerApplication::handlePidFile()
+  - PR #4211 Improve FifoEvent, ActiveMethod, ActiveResult
+  - PR #4200 fixed infinite loops
+  - PR #4199 fix(Poco::Data): fixes and improvements #4198
+  - PR #4190 CMake: Use CMAKE_INSTALL_* variables from GNUInstallDirs
+  - PR #4156 Allow passing raw fd's into ServerSocket
+  - PR #4138 add missing check when activerecord is enabled
+  - PR #4137 Fix platform when building for iPhoneSimulator
+  - PR #4103 Fix openssl session resumption, FTPS certificate validation vs hostname
+  - PR #4099 added new memeber SqlState to PostgreSQLException and made use of it.
+  - PR #4068 AutoPtr: do 'duplicate' before 'release'
+  - PR #4061 Adding API XML::AbstractContainerNode::insertAfterNP()
+  - PR #4025 EVPPKey constructor for modulus/exponent
+  - PR #4022 Make Binding and CopyBinding specializations final
+  - PR #4020 MongoDB: add missing name accessor to get database name.
+  - PR #4007 add sendfile method for streamsocket
+  - PR #4004 Mongodb op msg database commands fix
+  - PR #3989 Fix thread compilation issues on FreeBSD
+  - PR #3976 fix(devel): add missing 1.11 releases commits
+  - PR #3954 Complimentary to #3918 (std::*mutex wrapper)
+  - PR #3946 Add GNU Hurd support
+  - PR #3939 Solaris.build fix #3843 and #3643
+  - PR #3932 Cross-compiling with ming32-w64 on Linux #3815
+  - PR #3929 Fix multicast leave group
+  - PR #3863 testDynamicStructEmptyString always failed
+  - PR #3861 Do not incur insane stack limit in Foundation-ThreadPool test.
+  - PR #3860 Fix Aix Build
+  - PR #3842 hasMicrosecond is undefined
+  - PR #3821 chore(Net): correct spelling, remove some unused codes fix(SocketProactor): missing adding sock to read pollset fix(DialogServer): _lastCommands data race
+  - PR #3810 Custom rotate, archive and purge strategies for FileChannel
+  - PR #3749 buildwin.ps1 script error building the x64 version of Poco
+  - PR #3502 Add ODBC DirectExec public API
+  - PR #3102 Made it possible to use lowercase hex numbers, also when encoding JSON
+  - PR #3009 switching iPhoneSimulator arch to 64 bit
+
+
+!!!Release 1.12.5p2
+
+!! Summary of Changes
+
+  - GH #4320: Integer overflow in Poco::UTF32Encoding
+
+
+!!!Release 1.12.5p1
+
+!! Summary of Changes
+
+  - GH #4241: Poco::FileInputStream broken in 1.12.5 and 1.11.8
+
+
+!!!Release 1.12.5
+
+!!Summary of Changes
+
+  - Merge changes from 1.11.5 to 1.11.8.
+  - Upgrade double-conversion to 3.3.0
+  - Upgrade bundled pcre2 to 10.42
+
+- GH #4219 Make POSIX event thread safe
+- GH #4215 Remove SocketReactor dependency on Poco::Thread for sleeping
+- GH #4197 ODBC::Binder UUID new/free mismatch
+- GH #4194 PollSet filters out some events
+- GH #4189 Use after free warnings
+- GH #4180 receiveResponse() may not return response body stream
+- GH #4177 Upgrade bundled pcre2 to 10.42
+- GH #4147 missing \r\n when setting trailer header in chunked response
+- GH #4134 Initialisation of _socketIndex in SSLManager (OpenSSL)
+- GH #3867 Add options to disable STDIO in child process
+- GH #3832 pthread_getname_np' was not declared in this scope
+- GH #3786 FileChannel::setRotation overflow
+- GH #2776 Shutdown TLS1.3 connection
+- GH #4176 PCRE2 10.40 version has security vulnerabilities（CVE-2022-41409）, when is the plan to fix it third-party
+- GH #4150 Use Poco format instead of sprintf in Util
+- GH #4116 Logging should evaluate only if the logging level is active
+- GH #4071 PageCompiler: add referrerPolicy to page directive feature
+- GH #4057 ODBC: SQL Anywhere Support
+- GH #4031 Classes with virtual functions missing virtual destructors (compilation issues)
+- GH #4023 CPPParser: Losing data if parameter std::function<void(bool)> is used
+- GH #4014 wrong string offset in HTTPCredentials::isNTLMCredentials
+- GH #4005 On UNIX platform, Poco::Path::getExtension() returns name of the hidden file if no extension is present
+- GH #3986 Fix dead lock on Timer destructor
+- GH #3968 Poco::Net::SocketConnector constructor should take SocketAddress by const reference
+- GH #3935 The extractor in postgresql drops milliseconds
+- GH #3926 CppParser throws exception when return value is specified to be in global namespace
+- GH #3921 Deadlock in Timer when one sync and one async cancel requests are issued
+- GH #3918 Static FastMutex fails to lock when issued from another thread on linux
+- GH #3880 NetSSL_OpenSSL: Support session resumption with TLSv1.3
+- GH #3876 Replace sprintf with snprintf in Environment and NumberFormatter to avoid deprecation warnings
+- GH #3859 zlib headers not updated
+- GH #3806 HTTPClientSession::receiveResponse() gives NoMessage instead of Timeout exception for SSL connection on Windows when using OpenSSL 3.0.x
+- GH #3723 DateTimeFormatter creates invalid ISO8601 string
+- GH #3147 Reading from request stream hangs when "Transfer-Encoding: chunked" is used
+- GH #4218 Upgrade double-conversion to 3.3.0
+- PR #4210 Fix pthread_setname not declared
+- PR #4072 optimize checkUpperLimit and checkLowerLimit in VarHolder.h  enhancement
+- PR #4050 rename arc -> poco_arc
+- PR #4038 Fixed Poco::format specifier for error code  bug platform_specific
+- PR #4011 fix #4005 Poco::Path::getExtension()
+- PR #3999 Fix hang in destructor
+- PR #3992 Fix thread counter leak
+- PR #3987 Fix dead lock on Timer destructor
+- PR #3971 Fix error handling with OpenSSL 3.0 in SecureSocketImpl.cpp (fixes #3806)
+- PR #3943 Fix build for QNX  platform_specific
+- PR #3942 Fix data race when create POSIX thread
+- PR #3912 Fixed compile error for OpenSSL 1.0 systems (#3739)
+- PR #3883 Added system_error header to SockerProactor for std::error_code
+- PR #3855 Fix epollfd validity checks when compiling with wepoll
+- PR #3809 improve Windows OpenSSL 3.0.x error handling #3806
+- PR #3769 Fixed converting/correcting pre-gregorian dates (#3723)
+
+
+
+!!!Release 1.12.4
+
+!!Summary of Changes
+
+  - GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+  - GH #3852: SocketReactor - 100 % CPU usage on single-core system
+
 
 !!!Release 1.12.3
 
@@ -188,6 +513,63 @@ AAAIntroduction
   - PollSet::add() is mode-cumulative now
   - UDPServer now requires explicit starting
   - Move semantics for sockets and SocketAddress (compile-time option, disabled by default)
+
+
+!!!Release 1.11.8
+
+!!Summary of Changes
+
+  - GH #1372: Possible deadlock in SessionPool
+  - GH #4170: Poco::FileStream is always opened with std::ios::in | std::ios::out bug
+  - GH #4169: Upgrade bundled zlib to 1.3.
+  - GH #4171: Upgrade bundled sqlite to 3.43.1
+  - GH #4162: [Bug] class KeylessActiveRecord is missing export macro
+  - GH #4164: [Bug] SharedLibraryImpl::loadImpl uses an incorrect format specifier
+  - GH #4173: AbstractConfiguration: when expanding property references, allow specifying a default value
+  - GH #4174: AbstractConfiguration: support Int16/UInt16 and Int32/UInt32
+  - GH #4182: Util: Make load()/save()/clear() operations on configurations thread-safe
+  - GH #4184: Poco::TemporaryFile: make filenames less predictable
+  - GH #4195: Poco::File::created() on macOS should use birthtime
+
+
+!!!Release 1.11.7
+
+!!Summary of Changes
+
+  - GH #4023: CPPParser: Losing data if parameter std::function<void(bool)> is used
+  - GH #4031: Classes with virtual functions missing virtual destructors (compilation issues)
+  - GH #4014: wrong string offset in HTTPCredentials::isNTLMCredentials
+  - GH #4071: PageCompiler: add referrerPolicy to page directive
+  - GH #4077: OpenSSL 3: Don't throw if legacy provider is not available
+  - GH #4078: Upgrade bundled SQLite to 3.42
+  - GH #4079: SocketConnector: constructor should take SocketAddress by const reference
+  - GH #4082: Logger performance improvement with formatting
+
+
+!!!Release 1.11.6
+
+!!Summary of Changes
+
+  - GH #3147: Reading from request stream hangs when "Transfer-Encoding: chunked" is used
+  - GH #3859: zlib headers not updated
+  - Build system fixes for Xcode on Apple Silicon.
+  - Upgrade bundled SQLite to 3.40.0
+
+
+!!!Release 1.11.5
+
+!!Summary of Changes
+
+  - GH #3849: Upgrade bundled libexpat to 2.5.0 [fixes CVE]
+
+
+!!!Release 1.11.4
+
+!!Summary of Changes
+
+  - GH #3805: Upgrade expat to 2.4.9
+  - GH #3846: Upgrade bundled zlib to 1.2.13 [fixes CVE]
+  - GH #3847: Upgrade bundled SQLite to 3.39.4
 
 
 !!!Release 1.11.3

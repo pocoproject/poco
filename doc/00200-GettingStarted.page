@@ -168,11 +168,21 @@ system. This requires Windows PowerShell.
 
 Usage:
 
-    C:\%POCO_BASE%\openssl\build.ps1 [-openssl_release 1.0.0 | 1.1.0]
-                                     [-vs_version 150 | 140 | 120 | 110 | 100 | 90]
-                                     [-config     release | debug | both]
-                                     [-platform   Win32 | x64]
-                                     [-library    shared | static]
+    C:\%POCO_BASE%\openssl\buildwin.ps1 [-poco_base    dir]
+                                        [-vs           160| 170]
+                                        [-action       build | rebuild | clean]
+                                        [-linkmode     shared | static_mt | static_md | all]
+                                        [-config       release | debug | both]
+                                        [-platform     Win32 | x64 | ARM64 | WEC2013]
+                                        [-samples]
+                                        [-tests]
+                                        [-omit         "Lib1X,LibY,LibZ,..."]
+                                        [-components   "Lib1X,LibY,LibZ,..."]
+                                        [-tool         msbuild | devenv]
+                                        [-useenv       env | noenv]
+                                        [-verbosity    minimal | quiet | normal | detailed | diagnostic]
+                                        [-openssl_base dir]
+                                        [-mysql_base   dir]
 ----
 
 Example: Building OpenSSL 1.1.0, DLL release build for x64 with Visual Studio 2015:
@@ -389,6 +399,7 @@ Here an overview of POCO build options:
     * ENABLE_PAGECOMPILER_FILE2PAGE    Set to OFF|ON (default is ON) to build File2Page
     * ENABLE_POCODOC                   Set to OFF|ON (default is OFF) to build Poco Documentation Generator
     * ENABLE_TESTS                     Set to OFF|ON (default is OFF) to build Unit tests
+    * ENABLE_SAMPLES                   Set to OFF|ON (default is OFF) to build samples
     * ENABLE_LONG_RUNNING_TESTS	       Set to OFF|ON (default is ON) to use long running test
     * POCO_UNBUNDLED                   Set to OFF|ON (default is OFF) to control linking dependencies as external
 

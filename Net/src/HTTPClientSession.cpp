@@ -459,7 +459,12 @@ void HTTPClientSession::reconnect()
 {
 	SocketAddress addr;
 	if (_proxyConfig.host.empty() || bypassProxy())
-		addr = SocketAddress(_host, _port);
+	{
+		if (SocketAddress::isUnixLocal(_host))
+			addr = SocketAddress(_host);
+		else
+			addr = SocketAddress(_host, _port);
+	}
 	else
 		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
 

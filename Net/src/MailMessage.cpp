@@ -83,7 +83,7 @@ namespace
 				MailMessage::ContentTransferEncoding cte = MailMessage::ENCODING_7BIT;
 				if (header.has(MailMessage::HEADER_CONTENT_TRANSFER_ENCODING))
 				{
-					std::string enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
+					const std::string& enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
 					if (enc == MailMessage::CTE_8BIT)
 						cte = MailMessage::ENCODING_8BIT;
 					else if (enc == MailMessage::CTE_QUOTED_PRINTABLE)
@@ -104,9 +104,13 @@ namespace
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
 				bool added = false;
+
+				static const auto lcContentDisposition = Poco::toLower(MailMessage::HEADER_CONTENT_DISPOSITION);
+
 				for (; it != end; ++it)
 				{
-					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
+					const auto lcHdr = Poco::toLower(it->first);
+					if (!added && lcContentDisposition == lcHdr)
 					{
 						if (it->second == "inline")
 							_pMsg->addContent(pPS, cte);
@@ -692,7 +696,7 @@ PartSource* MailMessage::createPartStore(const std::string& content, const std::
 }
 
 
-MultipartSource::MultipartSource(const std::string contentType):
+MultipartSource::MultipartSource(const std::string& contentType):
 	PartSource(contentTypeWithBoundary(contentType))
 {
 }

@@ -51,13 +51,13 @@ public:
 		Struct*        pClass;
 	};
 
-	typedef std::vector<Base>           BaseClasses;
-	typedef BaseClasses::const_iterator BaseIterator;
-	typedef std::vector<Struct*>        StructVec;
-	typedef StructVec::const_iterator   DerivedIterator;
-	typedef std::vector<Function*>      Functions;
-	typedef std::set<Function*>         FunctionSet;
-	typedef std::set<Struct*>           StructSet;
+	using BaseClasses = std::vector<Base>;
+	using BaseIterator = BaseClasses::const_iterator;
+	using StructVec = std::vector<Struct*>;
+	using DerivedIterator = StructVec::const_iterator;
+	using Functions = std::vector<Function*>;
+	using FunctionSet = std::set<Function*>;
+	using StructSet = std::set<Struct*>;
 
 	Struct(const std::string& decl, bool isClass, NameSpace* pNameSpace);
 		/// Creates the Struct.
@@ -139,6 +139,9 @@ public:
 	Symbol::Kind kind() const;
 	std::string toString() const;
 
+	// Namespace
+	Symbol* lookup(const std::string& name) const;
+	
 private:
 	std::string _decl;
 	BaseClasses _bases;

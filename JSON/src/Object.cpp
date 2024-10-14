@@ -19,14 +19,25 @@
 
 using Poco::Dynamic::Var;
 
+// Explicitly instatiated shared pointer in JSON library is required to
+// have known instance of the pointer to be used with VarHolder when
+// compiling with -fvisibility=hidden
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+template class JSON_API Poco::SharedPtr<Poco::JSON::Object>;
+#else
+template class Poco::SharedPtr<Poco::JSON::Object>;
+#endif
 
 namespace Poco {
+
 namespace JSON {
 
 
 Object::Object(int options):
 	_preserveInsOrder((options & Poco::JSON_PRESERVE_KEY_ORDER) != 0),
 	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),
+	_lowercaseHex((options & Poco::JSON_LOWERCASE_HEX) != 0),
 	_modified(false)
 {
 }
@@ -35,6 +46,7 @@ Object::Object(int options):
 Object::Object(const Object& other) : _values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex),
 	_pStruct(!other._modified ? other._pStruct : 0),
 	_modified(other._modified)
 {
@@ -47,6 +59,7 @@ Object::Object(Object&& other) noexcept:
 	_keys(std::move(other._keys)),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
+	_lowercaseHex(other._lowercaseHex),
 	_pStruct(std::move(other._pStruct)),
 	_pOrdStruct(std::move(other._pOrdStruct)),
 	_modified(other._modified)
@@ -67,6 +80,7 @@ Object &Object::operator = (const Object &other)
 		_keys = other._keys;
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
+		_lowercaseHex = other._lowercaseHex;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
 	}
@@ -80,6 +94,7 @@ Object& Object::operator = (Object&& other) noexcept
 	_keys = std::move(other._keys);
 	_preserveInsOrder = other._preserveInsOrder;
 	_escapeUnicode = other._escapeUnicode;
+	_lowercaseHex = other._lowercaseHex;
 	_pStruct = std::move(other._pStruct);
 	_pOrdStruct = std::move(other._pOrdStruct);
 	_modified = other._modified;

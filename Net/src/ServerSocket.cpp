@@ -57,6 +57,14 @@ ServerSocket::ServerSocket(SocketImpl* pImpl, bool ignore): Socket(pImpl)
 }
 
 
+ServerSocket ServerSocket::fromFileDescriptor(poco_socket_t fd)
+{
+	ServerSocket s;
+	s.impl()->useFileDescriptor(fd);
+	return s;
+}
+
+
 ServerSocket::~ServerSocket()
 {
 }

@@ -1,0 +1,82 @@
+#
+# AIX-GCC
+#
+# Make settings for AIX6.x/gcc 5.5
+#
+#
+
+#
+# General Settings
+#
+LINKMODE ?= SHARED
+
+SANITIZEFLAGS ?=
+
+#
+# Define Tools
+#
+CC      = ${CROSS_COMPILE}gcc
+CXX     = ${CROSS_COMPILE}g++
+LINK    = $(CXX)
+LIB     = $(CROSS_COMPILE)ar -cr -X32_64
+RANLIB  = $(CROSS_COMPILE)ranlib
+## Please note: AIX does NOT have library versioning per se (there is no 'SONAME' capability).
+SHLIB   = $(CXX) $(LDFLAGS) -shared -Wl,-bexpfull -o $@
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   = $(CROSS_COMPILE)strip -X32_64
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+LDFLAGS += -Wl,-bbigtoc
+
+## http://www.ibm.com/developerworks/aix/library/au-gnu.html:
+## > "/Using -brtl, the AIX linker will look for libraries with both the .a and
+## > .so extensions, such as libfoo.a and libfoo.so.
+## > Without -brtl, the AIX linker looks only for libfoo.a
+#
+# Extension for Shared Libraries
+#
+SHAREDLIBEXT     = .so.$(target_version)
+SHAREDLIBLINKEXT = .a
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = $(SANITIZEFLAGS) -std=c11
+CFLAGS32        = -maix32
+CFLAGS64        = -maix64
+CXXFLAGS        = $(SANITIZEFLAGS) -std=c++17 -Wno-sign-compare
+CXXFLAGS32      = -maix32
+CXXFLAGS64      = -maix64
+SHLIBFLAGS      = -Wl,-bh:5 -Wl,-bnoipath -Wl,-blibpath:/usr/lib:/lib -Wl,-blibsuff:so -Wl,-bautoexp -Wl,-bnoentry -Wl,-bM:SRE
+SHLIBFLAGS32    = -maix32
+SHLIBFLAGS64    = -maix64
+LINKFLAGS       = $(SANITIZEFLAGS) -Wl,-bh:5 -Wl,-bnoipath -Wl,-blibpath:/usr/lib:/lib -Wl,-blibsuff:so -Wl,-brtl
+LINKFLAGS32     = -maix32
+LINKFLAGS64     = -maix64
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  =
+SHAREDOPT_CC    = -fPIC
+SHAREDOPT_CXX   = -fPIC
+SHAREDOPT_LINK  =
+DEBUGOPT_CC     = -g -D_DEBUG
+DEBUGOPT_CXX    = -g -D_DEBUG
+DEBUGOPT_LINK   = -g
+RELEASEOPT_CC   = -O2 -DNDEBUG
+RELEASEOPT_CXX  = -O2 -DNDEBUG
+RELEASEOPT_LINK = -O2
+
+#
+# System Specific Flags
+#
+# Please note: add -v flag : print out how gcc performs compilation on the screen.
+# see https://github.com/pocoproject/poco/issues/3795
+SYSFLAGS = -D_REENTRANT -D_THREAD_SAFE -D__STDC_FORMAT_MACROS
+#
+# System Specific Libraries
+#
+# -pthread is just that it should always be passed for a program using threads on AIX. -lpthread is not enough most of the time
+SYSLIBS  = -pthread -latomic -ldl

@@ -39,6 +39,8 @@
 #include <set>
 
 
+using namespace Poco;
+using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 
 
@@ -181,6 +183,47 @@ void DataTest::testFeatures()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
+	// AbstractSession features
+	assertTrue (sess.hasFeature("bulk"));
+	assertTrue (!sess.getFeature("bulk"));
+	sess.setFeature("bulk", true);
+	assertTrue (sess.getFeature("bulk"));
+	sess.setFeature("bulk", false);
+	assertTrue (!sess.getFeature("bulk"));
+
+	assertTrue (sess.hasFeature("emptyStringIsNull"));
+	assertTrue (!sess.getFeature("emptyStringIsNull"));
+	sess.setFeature("emptyStringIsNull", true);
+	assertTrue (sess.getFeature("emptyStringIsNull"));
+	sess.setFeature("emptyStringIsNull", false);
+	assertTrue (!sess.getFeature("emptyStringIsNull"));
+
+	assertTrue (sess.hasFeature("forceEmptyString"));
+	assertTrue (!sess.getFeature("forceEmptyString"));
+	sess.setFeature("forceEmptyString", true);
+	assertTrue (sess.getFeature("forceEmptyString"));
+	sess.setFeature("forceEmptyString", false);
+	assertTrue (!sess.getFeature("forceEmptyString"));
+
+	assertTrue (sess.hasFeature("sqlParse"));
+	assertFalse (sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", true);
+	assertTrue (sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", false);
+	assertFalse (sess.getFeature("sqlParse"));
+
+	assertTrue (sess.hasFeature("autoCommit"));
+	assertTrue (sess.getFeature("autoCommit"));
+	sess.setFeature("autoCommit", false);
+	assertTrue (!sess.getFeature("autoCommit"));
+	sess.setFeature("autoCommit", true);
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// Session implementation features
+	sess.setFeature("f1", true);
+	assertTrue (sess.getFeature("f1"));
+	assertTrue (sess.getFeature("f2"));
+
 	sess.setFeature("f1", true);
 	assertTrue (sess.getFeature("f1"));
 	assertTrue (sess.getFeature("f2"));
@@ -218,6 +261,16 @@ void DataTest::testProperties()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
+	// AbstractSession properties
+	sess.setProperty("storage", "myStorage"s);
+	Poco::Any s1 = sess.getProperty("storage");
+	assertTrue (Poco::AnyCast<std::string>(s1) == "myStorage"s);
+
+	sess.setProperty("handle", 1);
+	Poco::Any h1 = sess.getProperty("handle");
+	assertTrue (Poco::AnyCast<int>(h1) == 1);
+
+	// Session implementation properties
 	sess.setProperty("p1", 1);
 	Poco::Any v1 = sess.getProperty("p1");
 	assertTrue (Poco::AnyCast<int>(v1) == 1);
@@ -1437,6 +1490,86 @@ void DataTest::testTranscode()
 }
 
 
+void DataTest::testSQLParse()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	assertTrue (sess.getFeature("autoCommit"));
+	sess.setFeature("autoCommit", false);
+	assertTrue (!sess.getFeature("autoCommit"));
+
+	assertFalse (sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", true);
+	assertTrue (sess.getFeature("sqlParse"));
+
+	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'",
+		"'",'a',"'",-1, 1u, 1.5, "42", now);
+
+	assertTrue ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
+
+#ifndef POCO_DATA_NO_SQL_PARSER
+
+	assertEqual (1u, stmt.statementsCount().value());
+	assertTrue (stmt.isSelect().value());
+	assertTrue (stmt.hasSelect().value());
+	assertTrue (!stmt.isUpdate().value());
+	assertTrue (!stmt.hasUpdate().value());
+	assertTrue (!stmt.isInsert().value());
+	assertTrue (!stmt.hasInsert().value());
+	assertTrue (!stmt.isDelete().value());
+	assertTrue (!stmt.hasDelete().value());
+
+	stmt.reset();
+	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
+		"SELECT * FROM Test WHERE First = ?;"
+		"UPDATE Test SET value=1 WHERE First = '1';"
+		"DELETE FROM Test WHERE First = ?;"
+		"DROP TABLE table_name;"
+		"ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn;"
+		"PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';"
+		"EXECUTE prep_inst(1, 2, 3);");
+	stmt.execute();
+	assertEqual (8u, stmt.statementsCount().value());
+	assertTrue (!stmt.isSelect().value());
+	assertTrue (stmt.hasSelect().value());
+	assertTrue (!stmt.isUpdate().value());
+	assertTrue (stmt.hasUpdate().value());
+	assertTrue (!stmt.isInsert().value());
+	assertTrue (stmt.hasInsert().value());
+	assertTrue (!stmt.isDelete().value());
+	assertTrue (stmt.hasDelete().value());
+
+	sess.setFeature("sqlParse", false);
+	assertTrue (!sess.getFeature("sqlParse"));
+
+#else
+
+	std::cout << "partial test (parser not available)";
+
+#endif // POCO_DATA_NO_SQL_PARSER
+
+	stmt.reset();
+	stmt = (sess << "INSERT INTO Test VALUES ('1', 2, 3.5);"
+		"SELECT * FROM Test WHERE First = ?;"
+		"UPDATE Test SET value=1 WHERE First = '1';"
+		"DELETE FROM Test WHERE First = ?;"
+		"DROP TABLE table_name;"
+		"ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn;"
+		"PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';"
+		"EXECUTE prep_inst(1, 2, 3);");
+
+	stmt.execute();
+	assertTrue (!stmt.isSelect().isSpecified());
+	assertTrue (!stmt.hasSelect().isSpecified());
+	assertTrue (!stmt.isUpdate().isSpecified());
+	assertTrue (!stmt.hasUpdate().isSpecified());
+	assertTrue (!stmt.isInsert().isSpecified());
+	assertTrue (!stmt.hasInsert().isSpecified());
+	assertTrue (!stmt.isDelete().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1469,6 +1602,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
+	CppUnit_addTest(pSuite, DataTest, testSQLParse);
 
 	return pSuite;
 }

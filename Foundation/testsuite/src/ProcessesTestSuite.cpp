@@ -13,6 +13,7 @@
 #include "NamedMutexTest.h"
 #include "NamedEventTest.h"
 #include "SharedMemoryTest.h"
+#include "ProcessRunnerTest.h"
 
 
 CppUnit::Test* ProcessesTestSuite::suite()
@@ -23,6 +24,7 @@ CppUnit::Test* ProcessesTestSuite::suite()
 	pSuite->addTest(NamedMutexTest::suite());
 	pSuite->addTest(NamedEventTest::suite());
 	pSuite->addTest(SharedMemoryTest::suite());
+	pSuite->addTest(ProcessRunnerTest::suite());
 
 	return pSuite;
 }

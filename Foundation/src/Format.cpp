@@ -20,6 +20,7 @@
 #include <locale>
 #endif
 #include <cstddef>
+#include <string_view>
 
 
 namespace Poco {
@@ -221,6 +222,9 @@ namespace
 					break;
 				case 's':
 					str << RefAnyCast<std::string>(*itVal++);
+					break;
+				case 'v':
+					str << RefAnyCast<std::string_view>(*itVal++);
 					break;
 				case 'z':
 					str << AnyCast<std::size_t>(*itVal++);

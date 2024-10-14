@@ -31,6 +31,7 @@ public:
 	void testMatch4();
 	void testMatch5();
 	void testMatch6();
+	void testMatchDateTime();
 	void testExtract();
 	void testSplit1();
 	void testSplit2();

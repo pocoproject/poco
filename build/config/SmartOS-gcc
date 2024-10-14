@@ -36,7 +36,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -std=gnu99
+CFLAGS          = -std=c11
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare

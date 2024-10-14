@@ -37,6 +37,9 @@
 		Detect64BitPortabilityProblems="false"
 		DebugInformationFormat="3"
 		CompileAs="0"
+		ProgramDatabaseFileName="$(OutDir)$(TargetName).pdb"
+		LanguageStandard="${vc.project.compiler.std.cpp}"
+		LanguageStandard_C="${vc.project.compiler.std.c}"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
@@ -57,7 +60,7 @@
 		AdditionalLibraryDirectories="${project.pocobase}\lib64"
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
-		ProgramDatabaseFile="bin64\static_mt\${project.target}d.pdb"
+		ProgramDatabaseFile="$(OutDir)$(TargetName).pdb"
 		SubSystem="1"
 		TargetMachine="17"
 		AdditionalOptions="${configuration.linker.additionalOptions}"

@@ -304,8 +304,8 @@ void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 
 	if (qop.empty())
 	{
-		/// Assume that https://tools.ietf.org/html/rfc7616 does not supported 
-		/// and still using https://tools.ietf.org/html/rfc2069#section-2.4	
+		/// Assume that https://tools.ietf.org/html/rfc7616 is not supported
+		/// and still using https://tools.ietf.org/html/rfc2069#section-2.4
 
 		MD5Engine engine;
 
@@ -334,8 +334,8 @@ void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 			ha1 = digest(engine, ha1, nonce, cnonce);
 		}
 
-		const std::string ha2 = digest(engine, request.getMethod(), request.getURI());  
-		
+		const std::string ha2 = digest(engine, request.getMethod(), request.getURI());
+
 		_requestAuthParams.set(NC_PARAM, nc);
 		_requestAuthParams.set(CNONCE_PARAM, cnonce);
 		_requestAuthParams.set(RESPONSE_PARAM, digest(engine, ha1, nonce, nc, cnonce, qop, ha2));
@@ -367,7 +367,7 @@ bool HTTPDigestCredentials::verifyAuthParams(const HTTPRequest& request, const H
 	else if (icompare(qop, AUTH_PARAM) == 0)
 	{
 		const std::string& algorithm = params.get(ALGORITHM_PARAM, MD_5_ALGORITHM);
-		
+
 		if (!isAlgorithmSupported(algorithm)) {
 			throw NotImplementedException("Unsupported digest algorithm", algorithm);
 		}
@@ -406,9 +406,10 @@ int HTTPDigestCredentials::updateNonceCounter(const std::string& nonce)
 
 bool HTTPDigestCredentials::isAlgorithmSupported(const std::string& algorithm) const
 {
-	bool isAlgorithmSupported = std::find_if(std::begin(SUPPORTED_ALGORITHMS), 
-											std::end(SUPPORTED_ALGORITHMS),
-											[&algorithm](const std::string& supportedAlgorithm) {
+	bool isAlgorithmSupported = std::find_if(std::begin(SUPPORTED_ALGORITHMS),
+			std::end(SUPPORTED_ALGORITHMS),
+			[&algorithm](const std::string& supportedAlgorithm)
+	{
 		return icompare(algorithm, supportedAlgorithm) == 0;
 	}) != std::end(SUPPORTED_ALGORITHMS);
 

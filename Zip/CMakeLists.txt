@@ -32,8 +32,11 @@ target_include_directories(Zip
 POCO_INSTALL(Zip)
 POCO_GENERATE_PACKAGE(Zip)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

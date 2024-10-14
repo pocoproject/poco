@@ -13,7 +13,6 @@
 
 
 #include "Poco/LoggingRegistry.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -102,15 +101,10 @@ void LoggingRegistry::clear()
 }
 
 
-namespace
-{
-	static SingletonHolder<LoggingRegistry> sh;
-}
-
-
 LoggingRegistry& LoggingRegistry::defaultRegistry()
 {
-	return *sh.get();
+	static LoggingRegistry lr;
+	return lr;
 }
 
 

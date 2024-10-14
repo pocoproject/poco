@@ -22,7 +22,9 @@
             "${POCO_BASE}/JWT/include",
             "${POCO_BASE}/Redis/include",
             "${POCO_BASE}/MongoDB/include",
-            "${POCO_BASE}/ApacheConnector/include"
+            "${POCO_BASE}/ApacheConnector/include",
+            "${POCO_BASE}/Data/src",
+            "${POCO_BASE}/Data/DataTest/include"
         ]
     },
     "configurations": [
@@ -40,7 +42,7 @@
             "forcedInclude": [],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cppStandard": "c++17",
             "compileCommands": "",
             "browse": {
                 "path": [
@@ -61,7 +63,7 @@
             "forcedInclude": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cppStandard": "c++17",
             "compileCommands": "",
             "browse": {
                 "path": [

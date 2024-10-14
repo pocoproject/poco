@@ -21,14 +21,14 @@
 #include <algorithm>
 #include <typeinfo>
 #include <cstring>
-
-
-#define poco_any_assert(cond) do { if (!(cond)) std::abort(); } while (0)
+#include <cstddef>
 
 
 namespace Poco {
 
 class Any;
+
+using namespace std::string_literals;
 
 namespace Dynamic {
 
@@ -39,6 +39,7 @@ template <class T> class VarHolderImpl;
 }
 
 
+#ifndef POCO_DOC
 template <class T, std::size_t S>
 struct TypeSizeLE:
 	std::integral_constant<bool, (sizeof(T) <= S)>{};
@@ -47,6 +48,7 @@ struct TypeSizeLE:
 template <class T, std::size_t S>
 struct TypeSizeGT:
 	std::integral_constant<bool, (sizeof(T) > S)>{};
+#endif
 
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
@@ -137,7 +139,8 @@ public:
 	}
 
 private:
-	typedef typename std::aligned_storage<SizeV+1>::type AlignerType;
+	typedef std::max_align_t AlignerType;
+	static_assert(sizeof(AlignerType) <= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
 
 	void setLocal(bool local) const
 	{
@@ -405,12 +408,12 @@ ValueType* AnyCast(Any* operand)
 	/// to the stored value.
 	///
 	/// Example Usage:
-	///	 MyType* pTmp = AnyCast<MyType*>(pAny).
-	/// Will return NULL if the cast fails, i.e. types don't match.
+	///	 MyType* pTmp = AnyCast<MyType>(pAny).
+	/// Returns nullptr if the types don't match.
 {
 	return operand && operand->type() == typeid(ValueType)
 				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
-				: 0;
+				: nullptr;
 }
 
 
@@ -420,8 +423,8 @@ const ValueType* AnyCast(const Any* operand)
 	/// to the stored value.
 	///
 	/// Example Usage:
-	///	 const MyType* pTmp = AnyCast<MyType*>(pAny).
-	/// Will return NULL if the cast fails, i.e. types don't match.
+	///	 const MyType* pTmp = AnyCast<MyType>(pAny).
+	/// Returns nullptr if the types don't match.
 {
 	return AnyCast<ValueType>(const_cast<Any*>(operand));
 }
@@ -438,18 +441,19 @@ ValueType AnyCast(Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
+	using NonRef = typename TypeWrapper<ValueType>::TYPE;
 
 	NonRef* result = AnyCast<NonRef>(&operand);
 	if (!result)
 	{
-		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		std::string s(__func__);
+		s.append(": Failed to convert between Any types "s);
 		if (operand.content())
 		{
 			s.append(1, '(');
-			s.append(operand.content()->type().name());
+			s.append(Poco::demangle(operand.content()->type().name()));
 			s.append(" => ");
-			s.append(typeid(ValueType).name());
+			s.append(Poco::demangle<ValueType>());
 			s.append(1, ')');
 		}
 		throw BadCastException(s);
@@ -469,7 +473,7 @@ ValueType AnyCast(const Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
+	using NonRef = typename TypeWrapper<ValueType>::TYPE;
 
 	return AnyCast<NonRef&>(const_cast<Any&>(operand));
 }
@@ -485,13 +489,14 @@ const ValueType& RefAnyCast(const Any & operand)
 	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
 	if (!result)
 	{
-		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		std::string s(__func__);
+		s.append(": Failed to convert between Any types "s);
 		if (operand.content())
 		{
 			s.append(1, '(');
-			s.append(operand.content()->type().name());
+			s.append(Poco::demangle(operand.content()->type().name()));
 			s.append(" => ");
-			s.append(typeid(ValueType).name());
+			s.append(Poco::demangle<ValueType>());
 			s.append(1, ')');
 		}
 		throw BadCastException(s);
@@ -510,13 +515,14 @@ ValueType& RefAnyCast(Any& operand)
 	ValueType* result = AnyCast<ValueType>(&operand);
 	if (!result)
 	{
-		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		std::string s(__func__);
+		s.append(": Failed to convert between Any types "s);
 		if (operand.content())
 		{
 			s.append(1, '(');
-			s.append(operand.content()->type().name());
+			s.append(Poco::demangle(operand.content()->type().name()));
 			s.append(" => ");
-			s.append(typeid(ValueType).name());
+			s.append(Poco::demangle<ValueType>());
 			s.append(1, ')');
 		}
 		throw BadCastException(s);
@@ -546,6 +552,26 @@ const ValueType* UnsafeAnyCast(const Any* operand)
 	/// different shared libraries.
 {
 	return AnyCast<ValueType>(const_cast<Any*>(operand));
+}
+
+
+template <typename ValueType>
+bool AnyHoldsNullPtr(const Any& any)
+	/// Returns true if any holds a null pointer.
+	/// Fails to compile if `ValueType` is not a pointer.
+{
+	poco_static_assert_ptr(ValueType);
+	return (AnyCast<ValueType>(any) == nullptr);
+}
+
+
+template <typename ValueType>
+bool AnyHoldsNullPtr(const Any* pAny)
+	/// Returns true if the Any pointed to holds a null pointer.
+	/// Returns false if `pAny` is a null pointer.
+{
+	if (!pAny) return false;
+	return (AnyHoldsNullPtr<ValueType>(*pAny));
 }
 
 

@@ -34,18 +34,22 @@ class MongoDB_API MessageHeader
 	/// MongoDB request or response message.
 {
 public:
-	static const unsigned int MSG_HEADER_SIZE = 16;
+	static constexpr Int32 MSG_HEADER_SIZE = 16;
 
 	enum OpCode
 	{
+		// Opcodes deprecated in MongoDB 5.0
 		OP_REPLY = 1,
-		OP_MSG = 1000,
 		OP_UPDATE = 2001,
 		OP_INSERT = 2002,
 		OP_QUERY = 2004,
 		OP_GET_MORE = 2005,
 		OP_DELETE = 2006,
-		OP_KILL_CURSORS = 2007
+		OP_KILL_CURSORS = 2007,
+
+		/// Opcodes supported in MongoDB 5.1 and later
+		OP_COMPRESSED = 2012,
+		OP_MSG = 2013
 	};
 
 	explicit MessageHeader(OpCode);
