@@ -754,7 +754,7 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 void ODBCOracleTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR2(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat NUMBER NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR2(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat NUMBER NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
 }

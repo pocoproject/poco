@@ -49,14 +49,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install g++-arm-linux-gnueabihf
-      - run: ./configure --config=X-Linux-gcc-arm --everything --omit=ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/ODBC,JWT,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,SevenZip && make all -s -j4
+      - run: ./configure --config=X-Linux-gcc-arm --everything --omit=ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/ODBC,JWT,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,SevenZip && make all -s -j6
 
   linux-gcc-make:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
-      - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: ./configure --everything --omit=PDF && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -67,12 +67,28 @@ jobs:
             EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
             ./ci/runtests.sh
 
-  linux-gcc-make-cxx20:
+  linux-gcc-make-trace:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
-      - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: ./configure --everything --trace && make all -s -j4 && sudo make install
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            sudo -s
+            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
+            ./ci/runtests.sh "" d
+
+  linux-gcc-make-cxx20:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -84,7 +100,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-asan:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -95,8 +111,8 @@ jobs:
       - run: sysctl kernel.randomize_va_space
       - run: sudo sysctl vm.mmap_rnd_bits
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=PDF && make all -s -j6 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -108,7 +124,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-asan-no-soo:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -119,8 +135,8 @@ jobs:
       - run: sysctl kernel.randomize_va_space
       - run: sudo sysctl vm.mmap_rnd_bits
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --no-samples --omit=PDF --no-soo && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=PDF --no-soo && make all -s -j6 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -132,11 +148,11 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-ubsan:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --no-samples --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=PDF && make all -s -j6 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -148,7 +164,7 @@ jobs:
             ./ci/runtests.sh
 
   linux-gcc-make-tsan:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -159,8 +175,8 @@ jobs:
       - run: sysctl kernel.randomize_va_space
       - run: sudo sysctl vm.mmap_rnd_bits
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j4 SANITIZEFLAGS=-fsanitize=thread && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: ./configure --everything --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip && make all -s -j6 SANITIZEFLAGS=-fsanitize=thread && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -170,7 +186,7 @@ jobs:
             sudo -s ./ci/runtests.sh TSAN
 
   linux-gcc-cmake:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
@@ -187,10 +203,10 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   linux-gcc-cmake-unbundled:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
       - run: cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DENABLE_PDF=ON && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -208,7 +224,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
-      - run: emcmake cmake -H. -B cmake-build -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off && emmake cmake --build cmake-build --target all -j4
+      - run: emcmake cmake -H. -B cmake-build -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off && emmake cmake --build cmake-build --target all -j6
   # TODO: How to run unit tests in emscripten?
   #      - uses: ./.github/actions/retry-action
   #        with:
@@ -235,10 +251,10 @@ jobs:
           retry_on: any
           command: >-
             ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
-            make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
+            make all -s -j6 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
   macos-clang-make:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -247,7 +263,7 @@ jobs:
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
           --include-path="/usr/local/opt/openssl@1.1/include" --library-path="/usr/local/opt/openssl@1.1/lib" &&
-          make all -s -j4
+          make all -s -j6
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -268,8 +284,8 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-make-visibility-hidden:
-    # macos-12 runs on Intel CPU
-    runs-on: macos-12
+    # macos-13 runs on Intel CPU
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
@@ -278,7 +294,7 @@ jobs:
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
           --include-path="/usr/local/opt/openssl@1.1/include" --library-path="/usr/local/opt/openssl@1.1/lib" &&
-          make all -s -j4
+          make all -s -j6
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -299,12 +315,12 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-cmake-openssl:
-    # macos-14 runs on Apple Silicon
-    runs-on: macos-14
+    # macos-latest runs on Apple Silicon
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TRACE=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -325,7 +341,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -350,7 +366,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3-visibility-hidden:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -375,7 +391,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-make-openssl3-tsan:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
@@ -384,7 +400,7 @@ jobs:
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
           --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
-          make all -s -j4 SANITIZEFLAGS=-fsanitize=thread
+          make all -s -j6 SANITIZEFLAGS=-fsanitize=thread
 
       - uses: ./.github/actions/retry-action
         with:
@@ -405,7 +421,7 @@ jobs:
             ./ci/runtests.sh TSAN
 
   macos-clang-make-openssl3-ubsan:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -414,7 +430,7 @@ jobs:
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
           --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
-          make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined
+          make all -s -j6 SANITIZEFLAGS=-fsanitize=undefined
 
       - uses: ./.github/actions/retry-action
         with:
@@ -435,7 +451,7 @@ jobs:
             ./ci/runtests.sh
 
   macos-clang-make-openssl3-asan:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -444,7 +460,7 @@ jobs:
           --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
           --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
           --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
-          make all -s -j4 SANITIZEFLAGS=-fsanitize=address
+          make all -s -j6 SANITIZEFLAGS=-fsanitize=address
 
       - uses: ./.github/actions/retry-action
         with:
@@ -628,7 +644,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev  mysql-client
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/SQLite,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/SQLite,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -652,7 +668,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -673,7 +689,7 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
           sudo apt-get -y update
           sudo apt-get -y install redis
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -690,7 +706,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: supercharge/mongodb-github-action@1.10.0
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -736,7 +752,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev alien libaio1 gnupg2 curl odbcinst1debian2 libodbc1 odbcinst # libmysqlclient-dev mysql-client odbc-postgresql
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
       # - name: Setup MySQL ODBC connector
       #   run: |
       #     wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
@@ -777,7 +793,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update
-      - run: ./configure --everything --no-samples --no-sqlparser --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/MySQL,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j4 && sudo make install
+      - run: ./configure --everything --no-samples --no-sqlparser --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/MySQL,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90

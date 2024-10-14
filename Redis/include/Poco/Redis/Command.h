@@ -57,8 +57,11 @@ public:
 	Command(const Command& copy);
 		/// Creates a command by copying another one.
 
-	virtual ~Command();
+	~Command() override;
 		/// Destroys the command.
+
+	Command& operator=(const Command&) = default;
+	Command& operator=(Command&&) = default;
 
 	static Command append(const std::string& key, const std::string& value);
 		/// Creates and returns an APPEND command.
@@ -282,7 +285,8 @@ public:
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Redis
+} // namespace Poco
 
 
 #endif // Redis_Command_INCLUDED

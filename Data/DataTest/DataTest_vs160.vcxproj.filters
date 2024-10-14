@@ -2,17 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{8d9a4482-80ee-4508-8c18-9ee12221523b}</UniqueIdentifier>
+      <UniqueIdentifier>{4c24d70b-68a3-46b9-b53b-12df1bd2c68a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{7c9c33b5-8f07-4ab1-b37a-b1849384cf3c}</UniqueIdentifier>
+      <UniqueIdentifier>{adb15fe4-732e-4d82-80f0-c0f9f34e25cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\DataTest\DataTest.h">
+    <ClInclude Include="include\Poco\Data\Test\DataTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\DataTest\SQLExecutor.h">
+    <ClInclude Include="include\Poco\Data\Test\SQLExecutor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

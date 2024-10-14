@@ -70,12 +70,6 @@ else()
 		src/pcre2_xclass.c
 	)
 
-	# zlib
-	POCO_HEADERS(SRCS zlib
-		include/Poco/zconf.h
-		include/Poco/zlib.h
-	)
-
 	POCO_SOURCES(SRCS zlib
 		src/adler32.c
 		src/compress.c
@@ -176,6 +170,10 @@ else()
 	endif(UNIX AND NOT ANDROID)
 endif(CYGWIN)
 
+if(ENABLE_TRACE)
+	target_link_libraries(Foundation PRIVATE Poco::Trace)
+endif()
+
 if(CMAKE_SYSTEM MATCHES "SunOS")
 	target_compile_definitions(Foundation
 		PUBLIC
@@ -243,4 +241,8 @@ if(ENABLE_TESTS)
 		set_property(TARGET Foundation PROPERTY POSITION_INDEPENDENT_CODE ON) # This is needed to build TestLibrary.so as shared.
 	endif()
 	add_subdirectory(testsuite)
+endif()
+
+if(ENABLE_FUZZING)
+	add_subdirectory(fuzzing)
 endif()

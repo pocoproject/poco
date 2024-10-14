@@ -44,6 +44,9 @@ const std::string SessionImpl::EXCLUSIVE_BEGIN_TRANSACTION("BEGIN EXCLUSIVE");
 const std::string SessionImpl::IMMEDIATE_BEGIN_TRANSACTION("BEGIN IMMEDIATE");
 const std::string SessionImpl::COMMIT_TRANSACTION("COMMIT");
 const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
+const std::string SessionImpl::SQLITE_READ_UNCOMMITTED = "PRAGMA read_uncommitted = true";
+const std::string SessionImpl::SQLITE_READ_COMMITTED  = "PRAGMA read_uncommitted = false";
+
 
 
 SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
@@ -52,7 +55,8 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_pDB(0),
 	_connected(false),
 	_isTransaction(false),
-	_transactionType(TransactionType::DEFERRED)
+	_transactionType(TransactionType::DEFERRED),
+	_transactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
 	open();
 	setConnectionTimeout(loginTimeout);
@@ -128,28 +132,57 @@ void SessionImpl::rollback()
 
 void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 {
-	if (ti != Session::TRANSACTION_READ_COMMITTED)
-		throw Poco::InvalidArgumentException("setTransactionIsolation()");
+	Poco::Mutex::ScopedLock l(_mutex);
+	SQLiteStatementImpl tmp(*this, _pDB);
+	switch (ti)
+	{
+	case Session::TRANSACTION_READ_COMMITTED:
+		tmp.add(SQLITE_READ_COMMITTED);
+		_transactionIsolationLevel = Session::TRANSACTION_READ_COMMITTED;
+		break;
+	case Session::TRANSACTION_READ_UNCOMMITTED:
+		tmp.add(SQLITE_READ_UNCOMMITTED);
+		_transactionIsolationLevel = Session::TRANSACTION_READ_UNCOMMITTED;
+		break;
+	case Session::TRANSACTION_REPEATABLE_READ:
+		throw Poco::InvalidArgumentException("setTransactionIsolation(TRANSACTION_REPEATABLE_READ) - unsupported");
+	case Session::TRANSACTION_SERIALIZABLE:
+		throw Poco::InvalidArgumentException("setTransactionIsolation(TRANSACTION_SERIALIZABLE) - unsupported [SQLite transactions are serializable by design]");
+	default:
+		throw Poco::InvalidArgumentException(Poco::format("setTransactionIsolation(%u) - unsupported", ti));
+		break;
+	}
+	tmp.execute();
 }
 
 
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
-	return Session::TRANSACTION_READ_COMMITTED;
+	return _transactionIsolationLevel;
 }
 
 
 bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
-	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
+	switch (ti)
+	{
+	case Session::TRANSACTION_READ_COMMITTED:
+		return true;
+	case Session::TRANSACTION_READ_UNCOMMITTED:
+		return true;
+	case Session::TRANSACTION_REPEATABLE_READ:
+		return false;
+	case Session::TRANSACTION_SERIALIZABLE:
+		return false;
+	}
+
 	return false;
 }
 
 
 bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
-	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
-	return false;
+	return getTransactionIsolation() == ti;
 }
 
 

@@ -63,7 +63,15 @@ public:
 	{
 	}
 
-	LOB(const std::basic_string<T>& content):
+	template<typename U = T>
+	LOB(const std::enable_if_t<std::is_same_v<T, U> && std::is_same_v<U, char>, std::string>& content):
+		_pContent(new std::vector<T>(content.begin(), content.end()))
+		/// Creates a LOB from a string.
+	{
+	}
+
+	template<typename U = T>
+	LOB(const std::enable_if_t<std::is_same_v<T, U> && std::is_same_v<U, wchar_t>, std::wstring>& content):
 		_pContent(new std::vector<T>(content.begin(), content.end()))
 		/// Creates a LOB from a string.
 	{
