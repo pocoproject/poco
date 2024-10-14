@@ -21,7 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/FileStream.h"
-
+#include <atomic>
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/FileStreamRWLock_WIN32.h"
