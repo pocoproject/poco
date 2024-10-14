@@ -54,7 +54,7 @@ static std::string getTestAppName()
 
 #include "Poco/File_WIN32U.h"
 
-HANDLE createFileForSahredRWAccess(const std::string &path)
+HANDLE createFileWithRWAccess(const std::string &path)
 {
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
 	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;

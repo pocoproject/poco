@@ -164,7 +164,7 @@ Poco::NamedEvent      MyApp::_terminate(Poco::ProcessImpl::terminationEventName(
 #include "Poco/File.h"
 #include "Poco/File_WIN32U.h"
 
-HANDLE openFileForSahredRWAccess(const std::string& path)
+HANDLE openFileWithRWAccess(const std::string& path)
 {
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
 	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;

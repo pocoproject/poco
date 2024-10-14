@@ -76,6 +76,7 @@ public:
 		/// Releases the read or write lock.
 
 private:
+	std::atomic_bool _locked = false;
 	FileStreamRWLock(const FileStreamRWLock&);
 	FileStreamRWLock& operator = (const FileStreamRWLock&);
 };
@@ -121,30 +122,37 @@ public:
 inline void FileStreamRWLock::readLock()
 {
 	readLockImpl();
+	_locked = true;
 }
 
 
 inline bool FileStreamRWLock::tryReadLock()
 {
-	return tryReadLockImpl();
+	bool locked = tryReadLockImpl();
+	if (locked) _locked = true; // assign only if success lock
+	return locked;
 }
 
 
 inline void FileStreamRWLock::writeLock()
 {
 	writeLockImpl();
+	_locked = true;
 }
 
 
 inline bool FileStreamRWLock::tryWriteLock()
 {
-	return tryWriteLockImpl();
+	bool locked = tryWriteLockImpl();
+	if (locked) _locked = true; // assign only if success lock
+	return locked;
 }
 
 
 inline void FileStreamRWLock::unlock()
 {
 	unlockImpl();
+	_locked = false;
 }
 
 

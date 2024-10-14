@@ -33,6 +33,11 @@ FileStreamRWLock::FileStreamRWLock(const FileStream &fs, Poco::UInt64 offset, Po
 
 FileStreamRWLock::~FileStreamRWLock()
 {
+	if (_locked)
+	{
+		unlockImpl();
+		_locked = false;
+	}
 }
 
 
