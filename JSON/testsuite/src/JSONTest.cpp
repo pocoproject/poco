@@ -1583,6 +1583,34 @@ void JSONTest::testStringify()
 		"    }\n"
 		"}";
 	assertTrue (ostr.str() == str);
+
+	{
+		std::string jsonStr = R"json({"default":"\u0007\u0007"})json";
+		auto jsonStrUnescape = Poco::UTF8::unescape(jsonStr);
+		Poco::JSON::Parser parser;
+		Poco::Dynamic::Var result = parser.parse(jsonStr);
+		const auto & obj = result.extract<Poco::JSON::Object::Ptr>();
+		auto default_val = obj->get("default");
+		Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+		json->set("default", default_val);
+		std::stringstream ss;
+		json->stringify(ss);
+		assertEqual(ss.str(), jsonStr);
+	}
+
+	{
+		std::string jsonStr = R"json({"default":"\u0050\u0050"})json";
+		auto jsonStrUnescape = Poco::UTF8::unescape(jsonStr);
+		Poco::JSON::Parser parser;
+		Poco::Dynamic::Var result = parser.parse(jsonStr);
+		const auto & obj = result.extract<Poco::JSON::Object::Ptr>();
+		auto default_val = obj->get("default");
+		Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+		json->set("default", default_val);
+		std::stringstream ss;
+		json->stringify(ss);
+		assertEqual(ss.str(), jsonStrUnescape);
+	}
 }
 
 
@@ -2375,52 +2403,52 @@ void JSONTest::testEnum()
 	{
 		SE_VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_I8: Poco::Int8
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_I16: Poco::Int16
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_I32: Poco::Int32
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_I64: Poco::Int64
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_UI8: Poco::UInt8
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_UI16: Poco::UInt16
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_UI32: Poco::UInt32
 	{
 		VALUE = 42
 	};
-	
+
 	enum class SAMPLE_ENUM_CLASS_UI64: Poco::UInt64
 	{
 		VALUE = 42
 	};
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("simple_enum", SE_VALUE);
@@ -2428,11 +2456,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"simple_enum\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM se = obj->get("simple_enum").extract<SAMPLE_ENUM>();
 		assertTrue(se == SE_VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class", SAMPLE_ENUM_CLASS::VALUE);
@@ -2440,11 +2468,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS se = obj->get("enum_class").extract<SAMPLE_ENUM_CLASS>();
 		assertTrue(se == SAMPLE_ENUM_CLASS::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_i8", SAMPLE_ENUM_CLASS_I8::VALUE);
@@ -2452,11 +2480,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_i8\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_I8 se = obj->get("enum_class_i8").extract<SAMPLE_ENUM_CLASS_I8>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_I8::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_i16", SAMPLE_ENUM_CLASS_I16::VALUE);
@@ -2464,11 +2492,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_i16\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_I16 se = obj->get("enum_class_i16").extract<SAMPLE_ENUM_CLASS_I16>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_I16::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_i32", SAMPLE_ENUM_CLASS_I32::VALUE);
@@ -2476,11 +2504,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_i32\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_I32 se = obj->get("enum_class_i32").extract<SAMPLE_ENUM_CLASS_I32>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_I32::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_i64", SAMPLE_ENUM_CLASS_I64::VALUE);
@@ -2488,11 +2516,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_i64\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_I64 se = obj->get("enum_class_i64").extract<SAMPLE_ENUM_CLASS_I64>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_I64::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_ui8", SAMPLE_ENUM_CLASS_UI8::VALUE);
@@ -2500,11 +2528,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_ui8\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_UI8 se = obj->get("enum_class_ui8").extract<SAMPLE_ENUM_CLASS_UI8>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_UI8::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_ui16", SAMPLE_ENUM_CLASS_UI16::VALUE);
@@ -2512,11 +2540,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_ui16\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_UI16 se = obj->get("enum_class_ui16").extract<SAMPLE_ENUM_CLASS_UI16>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_UI16::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_ui32", SAMPLE_ENUM_CLASS_UI32::VALUE);
@@ -2524,11 +2552,11 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_ui32\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_UI32 se = obj->get("enum_class_ui32").extract<SAMPLE_ENUM_CLASS_UI32>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_UI32::VALUE);
 	}
-	
+
 	{
 		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
 		obj->set("enum_class_ui64", SAMPLE_ENUM_CLASS_UI64::VALUE);
@@ -2536,7 +2564,7 @@ void JSONTest::testEnum()
 		std::string expected = "{\"enum_class_ui64\":42}";
 		std::string result = var.convert<std::string>();
 		assertEquals(expected, result);
-		
+
 		SAMPLE_ENUM_CLASS_UI64 se = obj->get("enum_class_ui64").extract<SAMPLE_ENUM_CLASS_UI64>();
 		assertTrue(se == SAMPLE_ENUM_CLASS_UI64::VALUE);
 	}
