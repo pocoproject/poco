@@ -256,6 +256,8 @@ void ODBCSQLServerTest::testBigString()
 		}
 		i += 2;
 	}
+#else
+	std::cout << "SQL Server extensions not enabled.";
 #endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT && POCO_DATA_SQL_SERVER_BIG_STRINGS
 }
 

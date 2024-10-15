@@ -277,8 +277,6 @@ template<>
 bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val, SQLSMALLINT cType)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
-	std::size_t fetchedSize = 0;
-	std::size_t totalSize = 0;
 
 	SQLLEN len;
 	Poco::Buffer<char> apChar(CHUNK_SIZE);
