@@ -58,6 +58,12 @@
 	#if __has_include(<msodbcsql.h>)
 		#include <msodbcsql.h>
 		#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+
+		// To disable varchar(max) > 8000 bytes, set to 0.
+		// Note that this setting works in conjunction with
+		// the session "maxFieldSize" property, which ultimately
+		// determines the max string length available.
+		#define POCO_DATA_SQL_SERVER_BIG_STRINGS 1
 	#endif
 #endif
 

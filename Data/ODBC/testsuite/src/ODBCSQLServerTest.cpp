@@ -191,7 +191,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
-		fail (__func__, __LINE__, __FILE__);
+		failmsg(__func__);
 	}
 	catch (DataException&)
 	{
@@ -211,7 +211,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 	catch (DataException&) { }
 }
@@ -219,8 +219,10 @@ void ODBCSQLServerTest::testBLOB()
 
 void ODBCSQLServerTest::testBigString()
 {
-	std::string lastName(8000, 'l');
-	std::string firstName(8000, 'f');
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+	const int limitSize = 8000, overLimitSize = 16002;
+	std::string lastName(overLimitSize, 'l');
+	std::string firstName(limitSize, 'f');
 	std::string address("Address");
 	int age = 42;
 
@@ -229,18 +231,32 @@ void ODBCSQLServerTest::testBigString()
 		recreatePersonBigStringTable();
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i + 1));
+		session().setProperty("maxFieldSize", overLimitSize+1);
 		try
 		{
+			session() << "DELETE FROM Person"s, now;
 			session() << "INSERT INTO Person VALUES (?,?,?,?)"s,
 				use(lastName), use(firstName), use(address), use(age), now;
+			lastName.clear();
+			firstName.clear();
+			address.clear();
+			age = 0;
+			session() << "SELECT LastName /*VARCHAR(MAX)*/, FirstName /*VARCHAR(8000)*/, Address /*VARCHAR(30)*/, Age FROM Person"s,
+				into(lastName), into(firstName), into(address), into(age), now;
+
+			assertEqual(lastName, std::string(overLimitSize, 'l'));
+			assertEqual(firstName, std::string(limitSize, 'f'));
+			assertEqual(address, "Address"s);
+			assertEqual(age, 42);
 		}
 		catch (DataException& ce)
 		{
 			std::cout << ce.displayText() << std::endl;
-			failmsg(__func__);
+			failmsg (__func__);
 		}
 		i += 2;
 	}
+#endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT && POCO_DATA_SQL_SERVER_BIG_STRINGS
 }
 
 
