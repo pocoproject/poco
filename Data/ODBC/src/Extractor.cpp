@@ -370,7 +370,7 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 				if (d.sqlState(i) == "01004"s)
 				{
 					if (len == SQL_NO_TOTAL || len > CHUNK_SIZE) // only part of data was returned
-						len = CHUNK_SIZE;
+						len = CHUNK_SIZE - 2;
 				}
 			}
 		}
