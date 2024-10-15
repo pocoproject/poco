@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
-cmake_policy(VERSION 3.15.0)
+cmake_minimum_required(VERSION 3.15.0)
 
 project(Poco)
 
@@ -33,12 +32,6 @@ endforeach(OUTPUTCONFIG)
 # Append our module directory to CMake
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-if(CMAKE_VERSION VERSION_LESS "3.10")
-	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/V39)
-endif()
-if(CMAKE_VERSION VERSION_LESS "3.14")
-	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/V313)
-endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
@@ -562,10 +555,6 @@ install(
 if(POCO_UNBUNDLED)
 	install(FILES cmake/FindPCRE2.cmake
 			DESTINATION "${PocoConfigPackageLocation}")
-	install(FILES cmake/V39/FindEXPAT.cmake
-			DESTINATION "${PocoConfigPackageLocation}/V39")
-	install(FILES cmake/V313/FindSQLite3.cmake
-			DESTINATION "${PocoConfigPackageLocation}/V313")
 endif()
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
