@@ -127,13 +127,12 @@ class Util_API ServerApplication: public Application
 	/// An application can register a callback to be called at termination time.
 	/// An example of the termination callback registration at some point
 	/// during the ServerApplication initialization time:
-	/// 
-	///     static const std::string cbMsg = "Termination custom message"s;
+	///
 	///     auto tCB = [](const std::string& message)
 	///     {
 	///         std::cout << message << std::endl;
 	///     };
-	///     ServerApplication::registerTerminateCallback(tCB, cbMsg);
+	///     ServerApplication::registerTerminateCallback(tCB, "custom termination message"s);
 {
 public:
 	using TerminateCallback = std::function<void(const std::string&)>;
@@ -175,7 +174,8 @@ public:
 	static void registerTerminateCallback(TerminateCallback tCB,
 		const std::string& message = _terminateMessage);
 		/// Registers a termination callback.
-		/// Used to notify all interested users about system shutdown.
+		/// Used to register a function to be executed when the system
+		/// shutdown starts.
 
 protected:
 	int run();
