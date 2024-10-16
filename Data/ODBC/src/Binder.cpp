@@ -532,6 +532,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		bool foundSize(false);
 		bool foundPrec(false);
 
+// SQLServer driver reports COLUMN_SIZE 8000 for VARCHAR(MAX),
+// so the size check must be skipped when big strings are enabled
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 		bool isVarchar(false);
 		switch (sqlDataType)

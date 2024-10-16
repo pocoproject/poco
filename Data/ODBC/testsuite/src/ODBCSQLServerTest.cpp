@@ -66,6 +66,12 @@ using Poco::DateTime;
 	#endif
 #endif
 
+#if POCO_DATA_SQL_SERVER_BIG_STRINGS
+	#pragma message ("MS SQLServer ODBC big string capability ENABLED")
+#else
+	#pragma message ("MS SQLServer ODBC big string capability DISABLED")
+#endif
+
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
 #define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MS_SQL_SERVER_PORT "1433"
@@ -241,6 +247,7 @@ void ODBCSQLServerTest::testBigString()
 			firstName.clear();
 			address.clear();
 			age = 0;
+
 			session() << "SELECT LastName /*VARCHAR(MAX)*/, FirstName /*VARCHAR(8000)*/, Address /*VARCHAR(30)*/, Age FROM Person"s,
 				into(lastName), into(firstName), into(address), into(age), now;
 
