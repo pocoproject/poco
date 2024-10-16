@@ -60,7 +60,7 @@ RecordSet::RecordSet(Session& rSession,
 
 
 RecordSet::RecordSet(const RecordSet& other):
-	Statement(other.impl()),
+	Statement(other),
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
@@ -72,17 +72,18 @@ RecordSet::RecordSet(const RecordSet& other):
 
 
 RecordSet::RecordSet(RecordSet&& other) noexcept:
-	Statement(other.impl()),
+	Statement(std::move(other)),
 	_currentRow(other._currentRow),
-	_pBegin(other._pBegin),
-	_pEnd(other._pEnd),
+	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
+	_pEnd(new RowIterator(this, true)),
 	_rowMap(std::move(other._rowMap)),
 	_pFilter(other._pFilter),
-	_totalRowCount(std::move(other._totalRowCount))
+	_totalRowCount(other._totalRowCount)
 {
-	other.clear();
 	other._currentRow = 0;
+	delete other._pBegin;
 	other._pBegin = nullptr;
+	delete other._pEnd;
 	other._pEnd = nullptr;
 	other._rowMap.clear();
 	other._pFilter.reset();
@@ -108,10 +109,19 @@ RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 {
 	Statement::operator = (std::move(other));
 	_currentRow = std::move(other._currentRow);
-	_pBegin = std::move(other._pBegin);
-	_pEnd = std::move(other._pEnd);
+	other._currentRow = 0;
+	_pBegin = new RowIterator(this, 0 == rowsExtracted());
+	delete other._pBegin;
+	other._pBegin = nullptr;
+	_pEnd = new RowIterator(this, true);
+	delete other._pEnd;
+	other._pEnd = nullptr;
+	_rowMap = std::move(other._rowMap);
+	other._rowMap.clear();
 	_pFilter = std::move(other._pFilter);
+	other._pFilter.reset();
 	_totalRowCount = std::move(other._totalRowCount);
+	other._totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 
 	return *this;
 }
@@ -499,7 +509,7 @@ Row& RecordSet::row(std::size_t pos)
 
 std::size_t RecordSet::rowCount() const
 {
-	if (extractions().size() == 0) return 0;
+	if (!impl() || extractions().size() == 0) return 0;
 
 	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;

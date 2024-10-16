@@ -70,7 +70,7 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_parseError(std::move(stmt._parseError)),
 #endif
 	_pImpl(std::move(stmt._pImpl)),
-	_async(std::move(stmt._async)),
+	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
 	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
@@ -96,6 +96,7 @@ void Statement::clear() noexcept
 	_pRowFormatter = nullptr;
 	_stmtString.clear();
 #ifndef POCO_DATA_NO_SQL_PARSER
+	_pParseResult = nullptr;
 	_parseError.clear();
 #endif
 }
@@ -129,7 +130,7 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 	_pRowFormatter = std::move(stmt._pRowFormatter);
 	stmt._pRowFormatter = nullptr;
 	_stmtString = std::move(stmt._stmtString);
-	_stmtString.clear();
+	stmt._stmtString.clear();
 
 	return *this;
 }

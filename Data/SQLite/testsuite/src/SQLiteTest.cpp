@@ -3684,7 +3684,6 @@ void SQLiteTest::testRecordsetCopyMove()
 	session << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now;
 
 	RecordSet rset(session, "SELECT * FROM Vectors");
-
 	std::ostringstream osLoop;
 	RecordSet::Iterator it = rset.begin();
 	RecordSet::Iterator end = rset.end();
@@ -3694,11 +3693,11 @@ void SQLiteTest::testRecordsetCopyMove()
 		osLoop << *it;
 	}
 	assertTrue(!osLoop.str().empty());
-
 	std::ostringstream osCopy;
 	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
 	assertTrue(osLoop.str() == osCopy.str());
 
+	// copy
 	RecordSet rsetCopy(rset);
 	osLoop.str("");
 	it = rsetCopy.begin();
@@ -3713,10 +3712,9 @@ void SQLiteTest::testRecordsetCopyMove()
 	osCopy.str("");
 	std::copy(rsetCopy.begin(), rsetCopy.end(), std::ostream_iterator<Row>(osCopy));
 	assertTrue(osLoop.str() == osCopy.str());
-	/*
+
+	// move
 	RecordSet rsetMove(std::move(rsetCopy));
-	rsetCopy.reset(session);
-	assertEqual(0, rsetCopy.rowCount());
 	osLoop.str("");
 	it = rsetMove.begin();
 	end = rsetMove.end();
@@ -3730,7 +3728,24 @@ void SQLiteTest::testRecordsetCopyMove()
 	osCopy.str("");
 	std::copy(rsetMove.begin(), rsetMove.end(), std::ostream_iterator<Row>(osCopy));
 	assertTrue(osLoop.str() == osCopy.str());
-	*/
+
+	// moved from object must remain in valid unspecified state
+	// and can be reused
+	assertEqual(0, rsetCopy.rowCount());
+	rsetCopy = (session << "SELECT * FROM Vectors", now);
+	assertEqual(v.size(), rsetCopy.rowCount());
+	osLoop.str("");
+	it = rsetCopy.begin();
+	end = rsetCopy.end();
+	for (int i = 1; it != end; ++it, ++i)
+	{
+		assertTrue(it->get(0) == i);
+		osLoop << *it;
+	}
+	assertTrue(!osLoop.str().empty());
+	osCopy.str("");
+	std::copy(rsetCopy.begin(), rsetCopy.end(), std::ostream_iterator<Row>(osCopy));
+	assertTrue(osLoop.str() == osCopy.str());
 }
 
 
