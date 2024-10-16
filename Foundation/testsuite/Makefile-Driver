@@ -38,7 +38,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
-	DataURIStreamTest
+	DataURIStreamTest FileStreamRWLockTest
 
 target         = testrunner
 target_version = 1
