@@ -113,7 +113,8 @@ class PocoDocApp: public Application
 public:
 	PocoDocApp():
 		_helpRequested(false),
-		_writeEclipseTOC(false)
+		_writeEclipseTOC(false),
+		_searchIndexEnabled(false)
 	{
 		std::setlocale(LC_ALL, "");
 	}
@@ -168,6 +169,12 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleEclipse)));
+
+		options.addOption(
+			Option("search-index", "s", "Enable search index (requires FTS5 support).")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleSearchIndex)));
 	}
 
 	void handleHelp(const std::string& name, const std::string& value)
@@ -199,6 +206,11 @@ protected:
 	void handleEclipse(const std::string& name, const std::string& value)
 	{
 		_writeEclipseTOC = true;
+	}
+
+	void handleSearchIndex(const std::string& name, const std::string& value)
+	{
+		_searchIndexEnabled = true;
 	}
 
 	void handleConfig(const std::string& name, const std::string& value)
@@ -233,7 +245,7 @@ protected:
 			for (StringTokenizer::Iterator itg = excTokenizer.begin(); itg != excTokenizer.end(); ++itg)
 			{
 				Glob glob(*itg);
-				if (glob.match(p.getFileName()))
+				if (glob.match(p.getFileName()) || glob.match(p.toString()))
 					include = false;
 			}
 			if (include)
@@ -321,11 +333,6 @@ protected:
 				logger().log(exc);
 				++errors;
 			}
-			catch (std::exception& exc)
-			{
-				logger().error(std::string(exc.what()));
-				++errors;
-			}
 		}
 		return errors;
 	}
@@ -351,7 +358,21 @@ protected:
 		File file(path);
 		file.createDirectories();
 
-		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC);
+		if (_searchIndexEnabled || config().getBool("PocoDoc.searchIndex", false))
+		{
+#if defined(POCO_ENABLE_SQLITE_FTS5)
+			std::string dbDirectory = path.toString() + DocWriter::DATABASE_DIR;
+			Path dbPath(dbDirectory);
+			dbPath.makeDirectory();
+			File dbFile(dbPath);
+			dbFile.createDirectories();
+			_searchIndexEnabled = true;
+#else
+			logger().error("FTS5 is not enabled, search is not supported");
+#endif
+		}
+
+		DocWriter writer(_gst, path.toString(), config().getBool("PocoDoc.prettifyCode", false), _writeEclipseTOC, _searchIndexEnabled);
 
 		if (config().hasProperty("PocoDoc.pages"))
 		{
@@ -520,6 +541,7 @@ protected:
 private:
 	bool _helpRequested;
 	bool _writeEclipseTOC;
+	bool _searchIndexEnabled;
 	Poco::CppParser::NameSpace::SymbolTable _gst;
 };
 
