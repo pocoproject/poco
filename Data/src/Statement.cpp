@@ -77,21 +77,27 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_pRowFormatter(std::move(stmt._pRowFormatter)),
 	_stmtString(std::move(stmt._stmtString))
 {
-	stmt._pImpl = nullptr;
-	stmt._async = false;
-	stmt._pResult = nullptr;
-	stmt._pAsyncExec = nullptr;
-	stmt._arguments.clear();
-	stmt._pRowFormatter = nullptr;
-	_stmtString.clear();
-#ifndef POCO_DATA_NO_SQL_PARSER
-	_parseError.clear();
-#endif
+	stmt.clear();
 }
 
 
 Statement::~Statement()
 {
+}
+
+
+void Statement::clear() noexcept
+{
+	_pImpl.reset();
+	_async = false;
+	_pResult = nullptr;
+	_pAsyncExec = nullptr;
+	_arguments.clear();
+	_pRowFormatter = nullptr;
+	_stmtString.clear();
+#ifndef POCO_DATA_NO_SQL_PARSER
+	_parseError.clear();
+#endif
 }
 
 
