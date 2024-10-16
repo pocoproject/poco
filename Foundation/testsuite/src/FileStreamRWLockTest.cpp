@@ -154,7 +154,7 @@ void FileStreamRWLockTest::testFSLock()
 	FileStream fs(fl.path(), std::ios::in | std::ios::out | std::ios::binary);
 #else
 	FileStream fs;
-	fs.openHandle(createFileForSahredRWAccess(fl.path()), std::ios::in | std::ios::out | std::ios::binary);
+	fs.openHandle(createFileWithRWAccess(fl.path()), std::ios::in | std::ios::out | std::ios::binary);
 #endif // POCO_OS != POCO_OS_WINDOWS_NT
 
 	Poco::Int32 i32 = 0;

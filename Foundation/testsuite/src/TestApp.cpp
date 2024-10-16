@@ -264,7 +264,7 @@ int main(int argc, char** argv)
 				FileStream fs(fl, std::ios::in | std::ios::out | std::ios::binary);
 #else
 				FileStream fs;
-				fs.openHandle(openFileForSahredRWAccess(fl), std::ios::in | std::ios::out | std::ios::binary);
+				fs.openHandle(openFileWithRWAccess(fl), std::ios::in | std::ios::out | std::ios::binary);
 #endif // POCO_OS != POCO_OS_WINDOWS_NT
 				Poco::Int32 ok = 1;
 				Poco::Int32 lastCount = 0;
