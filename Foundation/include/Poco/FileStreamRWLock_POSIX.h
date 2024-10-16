@@ -54,7 +54,7 @@ inline void FileStreamRWLockImpl::readLockImpl()
 	_flock.l_type = F_RDLCK;
 	_lockMode = F_SETLKW;
 	int rc = fcntl(_fd, _lockMode, &_flock);
-	if (rc == -1 && errno == EDEADLK)
+	if (rc == -1)
 		throw SystemException("cannot lock reader lock", errno);
 }
 
@@ -79,8 +79,8 @@ inline void FileStreamRWLockImpl::writeLockImpl()
 	_flock.l_type = F_WRLCK;
 	_lockMode = F_SETLKW;
 	int rc = fcntl(_fd, _lockMode, &_flock);
-	if (rc == -1 && errno == EDEADLK)
-		throw SystemException("cannot lock writer lock", EDEADLK);
+	if (rc == -1)
+		throw SystemException("cannot lock writer lock", errno);
 }
 
 
@@ -104,8 +104,8 @@ inline void FileStreamRWLockImpl::unlockImpl()
 	_flock.l_type = F_UNLCK;
 	_lockMode = F_SETLKW;
 	int rc = fcntl(_fd, _lockMode, &_flock);
-	if (rc == -1 && errno == EDEADLK)
-		throw SystemException("cannot unlock", EDEADLK);
+	if (rc == -1)
+		throw SystemException("cannot unlock", errno);
 }
 
 
