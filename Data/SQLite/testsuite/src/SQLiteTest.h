@@ -144,6 +144,8 @@ public:
 	void testIllegalFilePath();
 	void testTransactionTypeProperty();
 
+	void testRecordsetCopyMove();
+
 	void setUp();
 	void tearDown();
 

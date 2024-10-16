@@ -238,6 +238,29 @@ private:
 } } // namespace Poco::Data
 
 
+RecordSet getRecordsetMove(Session& session, const std::string& sql)
+{
+	Statement select(session);
+	select << sql;
+	select.execute();
+
+	// return directly
+	return RecordSet(select);
+}
+
+
+RecordSet getRecordsetCopyRVO(Session& session, const std::string& sql)
+{
+	Statement select(session);
+	select << sql;
+	select.execute();
+
+	// return temp copy (RVO)
+	RecordSet recordSet(select);
+	return recordSet;
+}
+
+
 int SQLiteTest::_insertCounter;
 int SQLiteTest::_updateCounter;
 int SQLiteTest::_deleteCounter;
@@ -3636,6 +3659,96 @@ void SQLiteTest::testTransactionTypeProperty()
 }
 
 
+void SQLiteTest::testRecordsetCopyMove()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+
+	{
+		auto recordSet = getRecordsetMove(session, "SELECT sqlite_version()");
+		assertTrue(recordSet.moveFirst());
+	}
+
+	{
+		auto recordSet = getRecordsetCopyRVO(session, "SELECT sqlite_version()");
+		assertTrue(recordSet.moveFirst());
+	}
+
+	session << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	session << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now;
+
+	RecordSet rset(session, "SELECT * FROM Vectors");
+	std::ostringstream osLoop;
+	RecordSet::Iterator it = rset.begin();
+	RecordSet::Iterator end = rset.end();
+	for (int i = 1; it != end; ++it, ++i)
+	{
+		assertTrue(it->get(0) == i);
+		osLoop << *it;
+	}
+	assertTrue(!osLoop.str().empty());
+	std::ostringstream osCopy;
+	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
+	assertTrue(osLoop.str() == osCopy.str());
+
+	// copy
+	RecordSet rsetCopy(rset);
+	osLoop.str("");
+	it = rsetCopy.begin();
+	end = rsetCopy.end();
+	for (int i = 1; it != end; ++it, ++i)
+	{
+		assertTrue(it->get(0) == i);
+		osLoop << *it;
+	}
+	assertTrue(!osLoop.str().empty());
+
+	osCopy.str("");
+	std::copy(rsetCopy.begin(), rsetCopy.end(), std::ostream_iterator<Row>(osCopy));
+	assertTrue(osLoop.str() == osCopy.str());
+
+	// move
+	RecordSet rsetMove(std::move(rsetCopy));
+	osLoop.str("");
+	it = rsetMove.begin();
+	end = rsetMove.end();
+	for (int i = 1; it != end; ++it, ++i)
+	{
+		assertTrue(it->get(0) == i);
+		osLoop << *it;
+	}
+	assertTrue(!osLoop.str().empty());
+
+	osCopy.str("");
+	std::copy(rsetMove.begin(), rsetMove.end(), std::ostream_iterator<Row>(osCopy));
+	assertTrue(osLoop.str() == osCopy.str());
+
+	// moved from object must remain in valid unspecified state
+	// and can be reused
+	assertEqual(0, rsetCopy.rowCount());
+	rsetCopy = (session << "SELECT * FROM Vectors", now);
+	assertEqual(v.size(), rsetCopy.rowCount());
+	osLoop.str("");
+	it = rsetCopy.begin();
+	end = rsetCopy.end();
+	for (int i = 1; it != end; ++it, ++i)
+	{
+		assertTrue(it->get(0) == i);
+		osLoop << *it;
+	}
+	assertTrue(!osLoop.str().empty());
+	osCopy.str("");
+	std::copy(rsetCopy.begin(), rsetCopy.end(), std::ostream_iterator<Row>(osCopy));
+	assertTrue(osLoop.str() == osCopy.str());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -3746,6 +3859,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactionTypeProperty);
+	CppUnit_addTest(pSuite, SQLiteTest, testRecordsetCopyMove);
 
 	return pSuite;
 }
