@@ -59,10 +59,18 @@
 		#include <msodbcsql.h>
 		#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 
-		// To disable varchar(max) > 8000 bytes, set to 0.
-		// Note that this setting works in conjunction with
-		// the session "maxFieldSize" property, which ultimately
-		// determines the max string length available.
+		// To enable varchar(max) > 8000 bytes, set to 1.
+		//
+		// Notes:
+		//
+		// - this setting works in conjunction with
+		//   the session "maxFieldSize" property, which
+		//   ultimately determines the max string length.
+		//
+		// - increasing the "maxFieldSize" property may
+		//   affect performance (more memory preallocated
+		//   for prepared statements in order to safely
+		//   accomodate data returned at execution)
 		#define POCO_DATA_SQL_SERVER_BIG_STRINGS 1
 	#endif
 #endif

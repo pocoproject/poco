@@ -616,7 +616,11 @@ private:
 			toODBCDirection(dir),
 			SQL_C_CHAR,
 			Utility::sqlDataType(SQL_C_CHAR),
-			(SQLUINTEGER) size - 1,
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+			SQL_SS_LENGTH_UNLIMITED,
+#else
+			(SQLUINTEGER)size - 1,
+#endif
 			0,
 			_charPtrs[pos],
 			(SQLINTEGER) size,
@@ -683,7 +687,11 @@ private:
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
 			Utility::sqlDataType(SQL_C_WCHAR),
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+			SQL_SS_LENGTH_UNLIMITED,
+#else
 			(SQLUINTEGER)size - 1,
+#endif
 			0,
 			_utf16CharPtrs[pos],
 			(SQLINTEGER)size,

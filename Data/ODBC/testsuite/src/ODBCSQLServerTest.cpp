@@ -269,6 +269,69 @@ void ODBCSQLServerTest::testBigString()
 }
 
 
+void ODBCSQLServerTest::testBigStringVector()
+{
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+	const int limitSize = 8000, overLimitSize = 16002, entries = 10;
+	std::string lastName(overLimitSize, 'l');
+	std::vector<std::string> lastNameVec(entries, lastName);
+	std::string firstName(limitSize, 'f');
+	std::vector<std::string> firstNameVec(entries, firstName);
+	std::string address("Address");
+	std::vector<std::string> addressVec(entries, address);
+	int age = 42;
+	std::vector<int> ageVec(10, age);
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBigStringTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+		session().setProperty("maxFieldSize", overLimitSize + 1);
+		try
+		{
+			session() << "DELETE FROM Person"s, now;
+			session() << "INSERT INTO Person VALUES (?,?,?,?)"s,
+				use(lastNameVec), use(firstNameVec), use(addressVec), use(ageVec), now;
+			lastNameVec.clear();
+			firstNameVec.clear();
+			addressVec.clear();
+			ageVec.clear();
+
+			assertEqual(lastNameVec.size(), 0);
+			assertEqual(firstNameVec.size(), 0);
+			assertEqual(addressVec.size(), 0);
+			assertEqual(ageVec.size(), 0);
+
+			session() << "SELECT LastName /*VARCHAR(MAX)*/, FirstName /*VARCHAR(8000)*/, Address /*VARCHAR(30)*/, Age FROM Person"s,
+				into(lastNameVec), into(firstNameVec), into(addressVec), into(ageVec), now;
+
+			assertEqual(lastNameVec.size(), entries);
+			assertEqual(firstNameVec.size(), entries);
+			assertEqual(addressVec.size(), entries);
+			assertEqual(ageVec.size(), entries);
+
+			for (int i = 0; i < entries; ++i)
+			{
+				assertEqual(lastNameVec[i], std::string(overLimitSize, 'l'));
+				assertEqual(firstNameVec[i], std::string(limitSize, 'f'));
+				assertEqual(addressVec[i], "Address"s);
+				assertEqual(ageVec[i], 42);
+			}
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+		i += 2;
+	}
+#else
+	std::cout << "SQL Server extensions not enabled.";
+#endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT && POCO_DATA_SQL_SERVER_BIG_STRINGS
+}
+
+
 void ODBCSQLServerTest::testBigBatch()
 {
 	const std::string query("INSERT INTO Person VALUES('L', 'N', 'A', %d);");
@@ -1045,6 +1108,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigString);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigBatch);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
