@@ -89,7 +89,7 @@ void Logger::log(const Exception& exc)
 }
 
 
-void Logger::log(const Exception& exc, const char* file, int line)
+void Logger::log(const Exception& exc, const char* file, LineNumber line)
 {
 	error(exc.displayText(), file, line);
 }

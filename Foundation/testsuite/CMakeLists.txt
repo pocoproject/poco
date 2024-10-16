@@ -47,6 +47,10 @@ if(UNIX AND NOT ANDROID)
 	target_link_libraries(Foundation-testrunner PUBLIC pthread)
 endif(UNIX AND NOT ANDROID)
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+	target_link_libraries(Foundation-testrunner PUBLIC atomic)
+endif()
+
 # TestApp
 add_executable(TestApp src/TestApp.cpp)
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests

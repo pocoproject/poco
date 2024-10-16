@@ -1,0 +1,5 @@
+POST /resource/1/update HTTP/1.1
+Authorization: Bearer RsT5OjbzRn430zqMLgV3Ia"
+Host: api.authorization-server.com
+ 
+description=Hello+World

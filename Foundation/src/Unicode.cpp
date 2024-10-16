@@ -29,7 +29,7 @@ void Unicode::properties(int ch, CharacterProperties& props)
 {
 	if (ch > UCP_MAX_CODEPOINT) ch = 0;
 	const ucd_record* ucd = GET_UCD(ch);
-	props.category = static_cast<CharacterCategory>(PRIV(ucp_gentype_8)[ucd->chartype]);
+	props.category = static_cast<CharacterCategory>(PRIV(ucp_gentype)[ucd->chartype]);
 	props.type     = static_cast<CharacterType>(ucd->chartype);
 	props.script   = static_cast<Script>(ucd->script);
 }

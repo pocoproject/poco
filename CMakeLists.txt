@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5.0)
+cmake_policy(VERSION 3.15.0)
 
 project(Poco)
 
@@ -24,9 +25,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE PATH "Runtime o
 # Reset output dirs for multi-config builds
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin CACHE PATH "Runtime output for ${OUTPUTCONFIG}")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib CACHE PATH "Library output for ${OUTPUTCONFIG}")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib CACHE PATH "Archive output for ${OUTPUTCONFIG}")
 endforeach(OUTPUTCONFIG)
 
 # Append our module directory to CMake
@@ -64,12 +65,9 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-if(POCO_STATIC)
-	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
-	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
+set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
 
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
@@ -77,24 +75,15 @@ if(MSVC)
 	if(BUILD_SHARED_LIBS AND POCO_MT)
 		message(FATAL_ERROR "Cannot have both BUILD_SHARED_LIBS and POCO_MT")
 	endif()
-
-	# allow disabling of internally built OpenSSL# (see below for details)
-	# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
-	# the internal OpenSSL build will be used
-	option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" ON)
-
-	if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (ENABLE_NETSSL OR ENABLE_CRYPTO OR (ENABLE_DATA_MYSQL AND MINGW)))
-		include(UseEmbeddedOpenSSL)
-	endif()
-
-	if(POCO_SANITIZE_ASAN)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address")
-	endif()
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
 
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
-option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
+
+#
+# Path to OpenSSL installation root can be provided by setting a variable
+# OPENSSL_ROOT_DIR.
+#
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
 	find_package(OpenSSL REQUIRED)
@@ -201,12 +190,14 @@ option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
+option(ENABLE_TRACE "Enable stack tracing" OFF)
+
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
-  set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
 
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
-  set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 option(ENABLE_TESTS
@@ -220,6 +211,9 @@ option(ENABLE_COMPILER_WARNINGS
 
 option(ENABLE_SAMPLES
 	"Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
+
+option(ENABLE_FUZZING
+	"Set to OFF|ON (default is OFF) to control build of fuzzing targets for oss-fuzz (Clang compiler is required)" OFF)
 
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
@@ -235,25 +229,38 @@ else()
 	message(STATUS "Building without tests & samples")
 endif()
 
+if(ENABLE_FUZZING)
+	if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		message(FATAL_ERROR "ENABLE_FUZZING flag requires using Clang compiler")
+	else()
+		message(STATUS "Building fuzzing test targets with engine $ENV{LIB_FUZZING_ENGINE}")
+	endif()
+endif()
+
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, ...")
+	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
 
 # Disable fork exec
 option(POCO_NO_FORK_EXEC "Set to OFF|ON (default is OFF) to disable use of fork() and exec*() which are not allowed on some Apple platforms (iOS, watchOS, iPadOS, tvOS)." OFF)
 
 if(POCO_NO_FORK_EXEC)
-  add_definitions(-DPOCO_NO_FORK_EXEC=1)
+	add_definitions(-DPOCO_NO_FORK_EXEC=1)
 endif()
 
 option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
 
 if (POCO_ENABLE_STD_MUTEX)
-	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
+	add_compile_definitions(POCO_ENABLE_STD_MUTEX)
 endif ()
-include(DefinePlatformSpecifc)
+
+if(ENABLE_TRACE)
+	add_compile_definitions(POCO_ENABLE_TRACE)
+endif()
+
+include(DefinePlatformSpecific)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
@@ -421,7 +428,7 @@ option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
 	if(POCO_DATA_NO_SQL_PARSER)
-		add_definitions(-DPOCO_DATA_NO_SQL_PARSER=1)
+		add_compile_definitions(POCO_DATA_NO_SQL_PARSER=1)
 	endif()
 	add_subdirectory(Data)
 	list(APPEND Poco_COMPONENTS "Data")
@@ -488,6 +495,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
 	add_subdirectory(Encodings/Compiler)
 	list(APPEND Poco_COMPONENTS "EncodingsCompiler")
+endif()
+
+if(ENABLE_TRACE)
+	add_subdirectory(Trace)
+	list(APPEND Poco_COMPONENTS "Trace")
 endif()
 
 
@@ -572,8 +584,8 @@ message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
-message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
-message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] Build with C++ flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
+message(STATUS "[cmake] Build with C flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
 message(STATUS "[cmake] C++ symbol visibility:  ${CMAKE_CXX_VISIBILITY_PRESET}")
 
 foreach(component ${Poco_COMPONENTS})

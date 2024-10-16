@@ -32,7 +32,6 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
@@ -46,7 +45,6 @@
 #include <iterator>
 
 
-using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::SessionPool;
 using Poco::Data::Statement;
@@ -2983,7 +2981,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	{
 		Statement stmt = (session() << query, now);
 		RecordSet rset(stmt);
-		assertTrue (rset.totalRowCount() == 4);
+		assertTrue (rset.getTotalRowCount() == 4);
 		RowFilter::Ptr pRF = new RowFilter(&rset);
 		assertTrue (pRF->isEmpty());
 		pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);
@@ -3857,6 +3855,8 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	}
 
 	bool autoCommit = session().getFeature("autoCommit");
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	Session local(connector, connect);
 
@@ -3925,6 +3925,7 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 	// end autoCommit = true
 
 	// restore the original transaction state
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", autoCommit);
 }
 
@@ -3932,6 +3933,8 @@ void SQLExecutor::sessionTransaction(const std::string& connector, const std::st
 void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, const std::string& connect)
 {
 	bool autoCommit = session().getFeature("autoCommit");
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	Session local(connector, connect);
 	local.setFeature("autoCommit", false);
@@ -4019,6 +4022,8 @@ void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& connector, c
 	session().commit();
 	local.commit();
 #endif
+
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", autoCommit);
 }
 
@@ -4033,9 +4038,12 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 
 	Session local(connector, connect);
 	local.setFeature("autoCommit", true);
+	local.setFeature("sqlParse", true);
 
 	bool autoCommit = session().getFeature("autoCommit");
 	auto ti = session().getTransactionIsolation();
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 	if (local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED))
@@ -4157,6 +4165,7 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 	session().commit();
 
 	// restore the original transaction state
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", autoCommit);
 	setTransactionIsolation(session(), ti);
 }
@@ -4192,6 +4201,8 @@ void SQLExecutor::transactor()
 
 		session().setFeature("autoCommit", false);
 		session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+		bool sqlParse = session().getFeature("sqlParse");
+		session().setFeature("sqlParse", true);
 
 		TestCommitTransactor ct;
 		Transaction t1(session(), ct);
@@ -4249,6 +4260,7 @@ void SQLExecutor::transactor()
 		session().commit();
 
 		// restore the original transaction state
+		session().setFeature("sqlParse", sqlParse);
 		session().setFeature("autoCommit", autoCommit);
 		setTransactionIsolation(session(), ti);
 	}
@@ -4262,49 +4274,8 @@ void SQLExecutor::transactor()
 
 void SQLExecutor::nullable()
 {
-	try { session() << "INSERT INTO NullableTest VALUES(NULL, NULL, NULL, NULL)", now; }	catch(DataException& ce){ std::cout << ce.displayText() << std::endl; fail ("nullable()", __LINE__, __FILE__); }
-
-	Nullable<int> i = 1;
-	Nullable<double> f = 1.5;
-	Nullable<std::string> s = std::string("abc");
-	Nullable<DateTime> d = DateTime();
-
-	assertTrue (!i.isNull());
-	assertTrue (!f.isNull());
-	assertTrue (!s.isNull());
-	assertTrue (!d.isNull());
-
-	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(s), into(i), into(f), into(d), now;
-
-	assertTrue (i.isNull());
-	assertTrue (f.isNull());
-	assertTrue (s.isNull());
-	assertTrue (d.isNull());
-
-	RecordSet rs(session(), "SELECT * FROM NullableTest");
-
-	rs.moveFirst();
-	assertTrue (rs.isNull("EmptyString"));
-	assertTrue (rs.isNull("EmptyInteger"));
-	assertTrue (rs.isNull("EmptyFloat"));
-	assertTrue (rs.isNull("EmptyDateTime"));
-
-	Var di = 1;
-	Var df = 1.5;
-	Var ds = "abc";
-	Var dd = DateTime();
-
-	assertTrue (!di.isEmpty());
-	assertTrue (!df.isEmpty());
-	assertTrue (!ds.isEmpty());
-	assertTrue (!dd.isEmpty());
-
-	Statement stmt = (session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(ds), into(di), into(df), into(dd), now);
-
-	assertTrue (di.isEmpty());
-	assertTrue (df.isEmpty());
-	assertTrue (ds.isEmpty());
-	assertTrue (dd.isEmpty());
+	nullableImpl<Date>("EmptyDate"s);
+	nullableImpl<DateTime>("EmptyDateTime"s);
 }
 
 
@@ -4320,17 +4291,14 @@ void SQLExecutor::reconnect()
 	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (ce.displayText());
 	}
-
 
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg(ce.displayText());
 	}
 
 	assertTrue (count == 1);
@@ -4350,8 +4318,7 @@ void SQLExecutor::reconnect()
 	try { session() << "SELECT Age FROM Person", into(count), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (ce.displayText());
 	}
 
 	assertTrue (count == age);

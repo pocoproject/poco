@@ -147,9 +147,6 @@
     <ClCompile Include="src\deflate.c">
       <Filter>3rd Party\zlib\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gzio.c">
-      <Filter>3rd Party\zlib\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infback.c">
       <Filter>3rd Party\zlib\Source Files</Filter>
     </ClCompile>

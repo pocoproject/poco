@@ -29,6 +29,7 @@
 #include "Poco/WindowsConsoleChannel.h"
 #endif
 #include "Poco/PatternFormatter.h"
+#include "Poco/JSONFormatter.h"
 
 
 using namespace std::string_literals;
@@ -112,6 +113,7 @@ void LoggingFactory::registerBuiltins()
 #endif
 
 	_formatterFactory.registerClass("PatternFormatter"s, new Instantiator<PatternFormatter, Formatter>);
+	_formatterFactory.registerClass("JSONFormatter"s, new Instantiator<JSONFormatter, Formatter>);
 }
 
 

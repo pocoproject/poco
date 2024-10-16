@@ -434,6 +434,7 @@ void SocketTest::testOptions()
 	assertTrue (!ss.getOOBInline());
 }
 
+#if defined(POCO_TEST_DEPRECATED)
 
 void SocketTest::testSelect()
 {
@@ -536,6 +537,7 @@ void SocketTest::testSelect3()
 	assertTrue (rc == 0);
 }
 
+#endif
 
 void SocketTest::testEchoUnixLocal()
 {
@@ -690,9 +692,13 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testBufferSize);
 	CppUnit_addTest(pSuite, SocketTest, testOptions);
+
+#if defined(POCO_TEST_DEPRECATED)
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
+#endif
+
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 	CppUnit_addTest(pSuite, SocketTest, testUseFd);

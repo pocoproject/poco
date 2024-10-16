@@ -13,16 +13,9 @@
 
 
 #include "Poco/JSON/Parser.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/Ascii.h"
-#include "Poco/Token.h"
-#include "Poco/UTF8Encoding.h"
-#include "Poco/String.h"
 #undef min
 #undef max
-#include <limits>
 #include <clocale>
-#include <istream>
 
 
 namespace Poco {
@@ -35,9 +28,7 @@ Parser::Parser(const Handler::Ptr& pHandler):
 }
 
 
-Parser::~Parser()
-{
-}
+Parser::~Parser() = default;
 
 
 void Parser::setHandler(const Handler::Ptr& pHandler)

@@ -100,9 +100,15 @@ protected:
 private:
 	std::string _msg;
 	Exception*  _pNested;
-	int			_code;
+	int			_code;    
 };
 
+#if defined(_HAS_EXCEPTIONS)
+    // Size of Poco::Exception depends on the exception settings (like _HAS_EXCEPTIONS)
+    // that might influence size of std::exception from which Poco::Exception is derived from.
+    // It is expected that Poco libraries and application using Poco have the same settings.
+    static_assert(_HAS_EXCEPTIONS != 0);
+#endif
 
 //
 // inlines
@@ -246,6 +252,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, CreateFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OpenFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, WriteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ReadFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ExecuteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileNotReadyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DirectoryNotEmptyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnknownURISchemeException, RuntimeException)

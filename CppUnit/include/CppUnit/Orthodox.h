@@ -55,7 +55,7 @@ public:
 
 protected:
     ClassUnderTest call(ClassUnderTest object);
-    void runTest ();
+	void runTest () override;
 };
 
 

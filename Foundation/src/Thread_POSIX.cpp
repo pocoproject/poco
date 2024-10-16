@@ -17,8 +17,6 @@
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
-#include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
 #include "Poco/Format.h"
 #include "Poco/Error.h"
 #include <signal.h>
@@ -41,6 +39,9 @@
 #	include <time.h>
 #endif
 
+#if POCO_OS == POCO_OS_QNX
+#	include <sys/neutrino.h>
+#endif
 
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 #	include <sys/prctl.h>
@@ -111,18 +112,23 @@ namespace
 
 	std::string getThreadName()
 	{
-		char name[POCO_MAX_THREAD_NAME_LEN + 1]{'\0'};
+	constexpr size_t nameSize =
+#if (POCO_OS == POCO_OS_QNX)
+			_NTO_THREAD_NAME_MAX;
+#else
+			POCO_MAX_THREAD_NAME_LEN;
+#endif
+		char name[nameSize + 1]{'\0'};
 #if (POCO_OS == POCO_OS_FREE_BSD)
-		pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
+		pthread_getname_np(pthread_self(), name, nameSize + 1);
 #elif (POCO_OS == POCO_OS_MAC_OS_X)
 	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
 		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
-			pthread_getname_np(pthread_self(), name, POCO_MAX_THREAD_NAME_LEN + 1);
+			pthread_getname_np(pthread_self(), name, nameSize + 1);
 		#endif
 	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
 #elif (POCO_OS == POCO_OS_QNX)
-		tName[_NTO_THREAD_NAME_MAX] = {'\0'};
-		pthread_getname_np(pthread_self(), tName, _NTO_THREAD_NAME_MAX);
+		pthread_getname_np(pthread_self(), name, nameSize);
 #else
 		prctl(PR_GET_NAME, name);
 #endif

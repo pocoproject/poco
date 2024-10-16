@@ -40,7 +40,7 @@ public:
 
 	virtual bool equals(const AbstractObserver& observer) const = 0;
 
-	[[deprecated("use `Poco::Any accepts(Notification*)` instead")]]
+	POCO_DEPRECATED("use `Poco::Any accepts(Notification*)` instead")
 	virtual bool accepts(Notification* pNf, const char* pName) const = 0;
 
 	virtual bool accepts(const Notification::Ptr& pNf) const = 0;

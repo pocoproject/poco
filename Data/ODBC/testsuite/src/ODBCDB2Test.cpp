@@ -14,7 +14,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
@@ -38,7 +38,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::NotFoundException;
 
 
@@ -265,7 +265,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 }
 
 
-void ODBCDB2Test::testStoredProcedureDynamicAny()
+void ODBCDB2Test::testStoredProcedureDynamicVar()
 {
 	if (!_pSession) fail ("Test not available.");
 
@@ -273,8 +273,8 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 	{
 		_pSession->setFeature("autoBind", bindValue(k));
 
-		DynamicAny i = 2;
-		DynamicAny j = 0;
+		Var i = 2;
+		Var j = 0;
 
 		*_pSession << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
@@ -422,7 +422,7 @@ void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 void ODBCDB2Test::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -659,7 +659,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNull);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testRowIterator);

@@ -36,20 +36,29 @@ public:
 	FileStreamBuf();
 		/// Creates a FileStreamBuf.
 
-	~FileStreamBuf();
+	~FileStreamBuf() override;
 		/// Destroys the FileStream.
 
 	void open(const std::string& path, std::ios::openmode mode);
 		/// Opens the given file in the given mode.
 
+	void openHandle(NativeHandle fd, std::ios::openmode mode);
+		/// Take ownership of the given file descriptor.
+
 	bool close();
 		/// Closes the File stream buffer. Returns true if successful,
 		/// false otherwise.
 
-	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out);
+	bool resizeBuffer(std::streamsize bufferSize) override;
+		/// Resizes internal buffer. Minimum size is BUFFER_SIZE.
+		/// Minimum is used when requested size is smaller.
+		/// Buffer can be resized only when the file is not open.
+		/// Returns true if resize succeeded.
+
+	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out) override;
 		/// Change position by offset, according to way and mode.
 
-	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out);
+	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out) override;
 		/// Change to specified position, according to mode.
 
 	void flushToDisk();
@@ -58,7 +67,7 @@ public:
 	NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 	
-	Poco::UInt64 size() const;
+	UInt64 size() const;
 		/// Returns file size
 
 protected:
@@ -67,13 +76,13 @@ protected:
 		BUFFER_SIZE = 4096
 	};
 
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	std::string _path;
 	NativeHandle _fd;
-	std::streamoff _pos;
+	std::streamoff _pos {0};
 };
 
 

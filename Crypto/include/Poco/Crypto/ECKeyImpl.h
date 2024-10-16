@@ -22,8 +22,6 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/KeyPairImpl.h"
-#include "Poco/Crypto/OpenSSLInitializer.h"
-#include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <istream>
 #include <ostream>

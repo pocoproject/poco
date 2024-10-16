@@ -60,14 +60,14 @@ class Net_API NetworkInterface
 	/// and XP.
 {
 public:
-	typedef std::vector<NetworkInterface>                List;
-	typedef List                                         NetworkInterfaceList;//@deprecated
-	typedef std::map<unsigned, NetworkInterface>         Map;
-	typedef Poco::Tuple<IPAddress, IPAddress, IPAddress> AddressTuple;
-	typedef std::vector<AddressTuple>                    AddressList;
-	typedef AddressList::iterator                        AddressIterator;
-	typedef AddressList::const_iterator                  ConstAddressIterator;
-	typedef std::vector<unsigned char>                   MACAddress;
+	using List = std::vector<NetworkInterface>;
+	using NetworkInterfaceList  POCO_DEPRECATED("") = List;
+	using Map = std::map<unsigned int, NetworkInterface>;
+	using AddressTuple = Poco::Tuple<IPAddress, IPAddress, IPAddress>;
+	using AddressList = std::vector<AddressTuple>;
+	using AddressIterator = AddressList::iterator;
+	using ConstAddressIterator = AddressList::const_iterator;
+	using MACAddress = std::vector<unsigned char>;
 
 	enum AddressType
 	{
@@ -281,13 +281,13 @@ public:
 		/// member of the pair.
 
 protected:
-	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name,
@@ -297,7 +297,7 @@ protected:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		MACAddress* pMACAddress = 0);
+		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name,
@@ -305,7 +305,7 @@ protected:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		MACAddress* pMACAddress = 0);
+		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;

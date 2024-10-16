@@ -4,7 +4,7 @@
 
 
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestResult.h"
 #include "CppUnit/estring.h"
@@ -81,14 +81,14 @@ void TestCase::assertEquals(const char* expected, const std::string& actual, lon
 
 void TestCase::assertNotNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer == NULL)
+	if (pointer == nullptr)
 		throw CppUnitException(pointerExpression + " must not be NULL", lineNumber, fileName);
 }
 
 
 void TestCase::assertNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer != NULL)
+	if (pointer != nullptr)
 		throw CppUnitException(pointerExpression + " must be NULL", lineNumber, fileName);
 }
 
@@ -117,7 +117,7 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 	}
 	catch (CppUnitException& e)
 	{
-		CppUnitException* copy = new CppUnitException(e);
+		auto* copy = new CppUnitException(e);
 		result->addFailure(this, copy);
 	}
 	catch (std::exception& e)
@@ -128,7 +128,7 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 	}
 	catch (...)
 	{
-		CppUnitException *e = new CppUnitException ("unknown exception");
+		auto* e = new CppUnitException ("unknown exception");
 		result->addError (this, e);
 	}
 	tearDown ();

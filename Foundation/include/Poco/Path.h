@@ -48,7 +48,7 @@ public:
 		PATH_GUESS    /// Guess the style by examining the path
 	};
 
-	typedef std::vector<std::string> StringVec;
+	using StringVec = std::vector<std::string>;
 
 	Path();
 		/// Creates an empty relative path.
@@ -289,6 +289,22 @@ public:
 		/// On Unix systems, this is the colon ':'. On Windows systems,
 		/// this is the semicolon ';'. On OpenVMS systems, this is the
 		/// comma ','.
+
+	static std::string addDirectorySeparator(const std::string& path);
+		/// Adds a separator to the end of a string to create the correct syntax for a path.
+		/// If the source path already has a trailing separator, no separator will be added.
+		///
+		/// On Unix systems, this is the slash '/'. On Windows systems,
+		/// this is the backslash '\'. On OpenVMS systems, this is the
+		/// period '.'.
+
+	static std::string addDirectorySeparator(const std::string& path, Style style);
+		/// Adds a separator to the end of a string to create the correct syntax for a path.
+		/// If the source path already has a trailing separator, no separator will be added.
+		///
+		/// On Unix systems, this is the slash '/'. On Windows systems,
+		/// this is the backslash '\'. On OpenVMS systems, this is the
+		/// period '.'.
 
 	static std::string self();
 		/// Return path to the executable file, empty string if failed.

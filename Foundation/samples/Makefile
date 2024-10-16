@@ -26,3 +26,4 @@ projects:
 	$(MAKE) -C StringTokenizer $(MAKECMDGOALS)
 	$(MAKE) -C URI $(MAKECMDGOALS)
 	$(MAKE) -C uuidgen $(MAKECMDGOALS)
+	$(MAKE) -C trace $(MAKECMDGOALS)

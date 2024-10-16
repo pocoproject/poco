@@ -138,6 +138,9 @@ $(ls -C "$base"/build/config/)
     Use system-provided zlib, pcre, expat and sqlite instead of
     bundled ones.
 
+  --trace
+    Enable stack trace. Implicitly disables stripping in release build.
+
   --static
     Build static libraries. Overrides default mode, which
     depends upon target. Can be specified together
@@ -168,6 +171,7 @@ librarypath=""
 odbclib=""
 odbcinclude=""
 unbundled=""
+trace=""
 static=""
 shared=""
 nosqlparser=
@@ -261,8 +265,13 @@ while [ $# -ge 1 ]; do
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
 
 	--unbundled)
- 		flags="$flags -DPOCO_UNBUNDLED"
- 		unbundled=1
+		flags="$flags -DPOCO_UNBUNDLED"
+		unbundled=1
+		;;
+
+	--trace)
+		flags="$flags -DPOCO_ENABLE_TRACE"
+		trace=1
 		;;
 
 	--minimal)
@@ -383,6 +392,9 @@ fi
 if [ -n "$unbundled" ] ; then
 	echo "POCO_UNBUNDLED = 1" >>"$build"/config.make
 fi
+if [ -n "$trace" ] ; then
+	echo "POCO_ENABLE_TRACE = 1" >>"$build"/config.make
+fi
 if [ -n "$linkmode" ] ; then
 	echo "LINKMODE = $linkmode" >>"$build"/config.make
 fi
@@ -430,6 +442,9 @@ if [ -n "$pgsqlinclude" ] ; then
 fi
 if [ -n "$unbundled" ] ; then
 	echo "export POCO_UNBUNDLED" >>"$build"/config.make
+fi
+if [ -n "$trace" ] ; then
+	echo "export POCO_ENABLE_TRACE" >>"$build"/config.make
 fi
 if [ -n "$linkmode" ] ; then
 	echo "export LINKMODE" >>"$build"/config.make

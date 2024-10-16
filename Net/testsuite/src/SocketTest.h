@@ -22,7 +22,7 @@ class SocketTest: public CppUnit::TestCase
 {
 public:
 	SocketTest(const std::string& name);
-	~SocketTest();
+	~SocketTest() override;
 
 	void testEcho();
 	void testMoveStreamSocket();
@@ -38,15 +38,18 @@ public:
 	void testTimeout();
 	void testBufferSize();
 	void testOptions();
+
+#if defined(POCO_TEST_DEPRECATED)
 	void testSelect();
 	void testSelect2();
 	void testSelect3();
+#endif
 	void testEchoUnixLocal();
 	void testUnixLocalAbstract();
 	void testUseFd();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

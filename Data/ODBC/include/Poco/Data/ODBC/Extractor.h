@@ -323,17 +323,17 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::Any>& val);
 		/// Extracts an Any list.
 
-	bool extract(std::size_t pos, Poco::DynamicAny& val);
-		/// Extracts a DynamicAny.
+	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
+		/// Extracts a Dynamic::Var.
 
-	bool extract(std::size_t pos, std::vector<Poco::DynamicAny>& val);
-		/// Extracts a DynamicAny vector.
+	bool extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val);
+		/// Extracts a Dynamic::Var vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::DynamicAny>& val);
-		/// Extracts a DynamicAny deque.
+	bool extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val);
+		/// Extracts a Dynamic::Var deque.
 
-	bool extract(std::size_t pos, std::list<Poco::DynamicAny>& val);
-		/// Extracts a DynamicAny list.
+	bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val);
+		/// Extracts a Dynamic::Var list.
 
 	void setDataExtraction(Preparator::DataExtraction ext);
 		/// Set data extraction mode.
@@ -515,7 +515,7 @@ private:
 
 	template <typename T>
 	bool extractImpl(std::size_t pos, T& val)
-		/// Utility function for extraction of Any and DynamicAny.
+		/// Utility function for extraction of Any and Dynamic::Var.
 	{
 		ODBCMetaColumn column(_rStmt, pos);
 

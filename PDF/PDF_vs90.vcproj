@@ -767,10 +767,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\gzio.c"
-						>
-					</File>
-					<File
 						RelativePath=".\src\infback.c"
 						>
 					</File>

@@ -53,8 +53,18 @@ public:
 	FileIOS();
 		/// Creates the basic stream.
 
-	~FileIOS();
+	~FileIOS() override;
 		/// Destroys the stream.
+
+	virtual void open(const std::string& path, std::ios::openmode mode);
+		/// Opens the file specified by path, using the given mode.
+		///
+		/// Throws a FileException (or a similar exception) if the file 
+		/// does not exist or is not accessible for other reasons and
+		/// a new file cannot be created.
+
+	void openHandle(NativeHandle handle, std::ios::openmode mode);
+		/// Takes ownership of the handle.
 
 	void close();
 		/// Closes the file stream.
@@ -69,7 +79,7 @@ public:
 	NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 
-	Poco::UInt64 size() const;
+	UInt64 size() const;
 		/// Returns file size
 
 	void flushToDisk();
@@ -105,10 +115,10 @@ public:
 		/// Throws a FileNotFoundException (or a similar exception) if the file
 		/// does not exist or is not accessible for other reasons.
 
-	~FileInputStream();
+	~FileInputStream() override;
 		/// Destroys the stream.
 
-	void open(const std::string& path, std::ios::openmode mode = std::ios::in);
+	void open(const std::string& path, std::ios::openmode mode = std::ios::in) override;
 		/// Opens the file specified by path, using the given mode, which
 		/// will always include std::ios::in (even if not specified).
 		///
@@ -148,10 +158,10 @@ public:
 		/// for std::ofstream, which is std::ios::out only. This is for backwards compatibility
 		/// with earlier POCO versions.
 
-	~FileOutputStream();
+	~FileOutputStream() override;
 		/// Destroys the FileOutputStream.
 
-	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::trunc);
+	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::trunc) override;
 		/// Opens the file specified by path, using the given mode, which
 		/// always includes std::ios::out, even if not specified.
 		///
@@ -193,10 +203,10 @@ public:
 		/// for std::fstream, which is std::ios::out only. This is for backwards compatibility
 		/// with earlier POCO versions.
 
-	~FileStream();
+	~FileStream() override;
 		/// Destroys the FileOutputStream.
 
-	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in);
+	void open(const std::string& path, std::ios::openmode mode = std::ios::out | std::ios::in) override;
 		/// Opens the file specified by path, using the given mode.
 		///
 		/// Throws a FileException (or a similar exception) if the file

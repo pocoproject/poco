@@ -147,7 +147,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			{
 				return new HTTPResponseStream(rs, pSession);
 			}
-			else if (res.getStatus() == HTTPResponse::HTTP_USEPROXY && !retry)
+			else if (res.getStatus() == HTTPResponse::HTTP_USE_PROXY && !retry)
 			{
 				// The requested resource MUST be accessed through the proxy
 				// given by the Location field. The Location field gives the

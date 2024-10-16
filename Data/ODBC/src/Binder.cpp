@@ -378,8 +378,8 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 	if (Utility::isError(SQLBindParameter(_rStmt,
 		(SQLUSMALLINT) pos + 1,
 		SQL_PARAM_INPUT,
-		SQL_C_STINYINT,
-		Utility::sqlDataType(SQL_C_STINYINT),
+		SQL_C_CHAR,
+		Utility::sqlDataType(SQL_C_CHAR),
 		colSize,
 		decDigits,
 		0,
@@ -518,7 +518,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	// Hence the funky flow control.
 	if (_pTypeInfo)
 	{
-		DynamicAny tmp;
+		Dynamic::Var tmp;
 		bool foundSize(false);
 		bool foundPrec(false);
 		foundSize = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
@@ -526,10 +526,10 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		else foundSize = _pTypeInfo->tryGetInfo(sqlDataType, "COLUMN_SIZE", tmp);
 		if (foundSize) colSize = tmp;
 
-		if (actualSize > colSize)
+		if (actualSize > static_cast<std::size_t>(colSize))
 		{
-			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
-					pos, actualSize, static_cast<long>(colSize)));
+			throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
+					__LINE__, pos, actualSize, static_cast<long>(colSize)));
 		}
 		foundPrec = _pTypeInfo->tryGetInfo(cDataType, "MAXIMUM_SCALE", tmp);
 		if (foundPrec) decDigits = tmp;
@@ -565,8 +565,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	// last check, just in case
 	if ((0 != colSize) && (actualSize > colSize))
 	{
-		throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
-				pos, actualSize, static_cast<long>(colSize)));
+		throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
+			__LINE__, pos, actualSize, static_cast<long>(colSize)));
 	}
 
 	return;

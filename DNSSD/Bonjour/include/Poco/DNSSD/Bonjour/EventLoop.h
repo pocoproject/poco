@@ -41,7 +41,7 @@ class DNSSD_Bonjour_API EventLoop: public Poco::Runnable
 	/// Bonjour machinery.
 {
 public:
-	typedef Poco::ScopedLock<EventLoop> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<EventLoop>;
 
 	enum
 	{
@@ -51,7 +51,7 @@ public:
 	EventLoop();
 		/// Creates the EventLoop.
 
-	~EventLoop();
+	~EventLoop() override;
 		/// Destroys the EventLoop.
 
 	void add(DNSServiceRef sdRef);

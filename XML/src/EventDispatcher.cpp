@@ -71,7 +71,7 @@ void EventDispatcher::removeEventListener(const XMLString& type, EventListener* 
 	{
 		if (it->type == type && it->pListener == listener && it->useCapture == useCapture)
 		{
-			it->pListener = 0;
+			it->pListener = nullptr;
 		}
 		if (!_inDispatch && !it->pListener)
 		{

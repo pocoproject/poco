@@ -15,6 +15,7 @@
 
 
 #include "Poco/DNSSD/Bonjour/EventLoop.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include <dns_sd.h>
@@ -46,11 +47,9 @@ EventLoop::~EventLoop()
 
 void EventLoop::shutdown()
 {
-	RefToSock::iterator it = _refs.begin();
-	RefToSock::iterator itEnd = _refs.end();
-	for (; it != itEnd; ++it)
+	for (auto& it: _refs)
 	{
-		DNSServiceRefDeallocate(it->first);
+		DNSServiceRefDeallocate(it.first);
 	}
 	_refs.clear();
 	_sockets.clear();
@@ -83,7 +82,7 @@ void EventLoop::remove(DNSServiceRef sdRef)
 
 void EventLoop::removeImpl(DNSServiceRef sdRef)
 {
-	RefToSock::iterator it = _refs.find(sdRef);
+	auto it = _refs.find(sdRef);
 	if (it != _refs.end())
 	{
 		_sockets.erase(it->second);
@@ -95,59 +94,52 @@ void EventLoop::removeImpl(DNSServiceRef sdRef)
 
 void EventLoop::run()
 {
-	Poco::Net::Socket::SocketList readList;
-	Poco::Net::Socket::SocketList writeList;
-	Poco::Net::Socket::SocketList errList;
+	Poco::Net::PollSet pollSet;
 
 	while (!_stop)
 	{
-		readList.clear();
 		if (!_refs.empty() || _refAdded.tryWait(EVENTLOOP_TIMEOUT))
 		{
-			Poco::Mutex::ScopedLock lock(_mutex);
-
-			RefToSock::const_iterator it = _refs.begin();
-			RefToSock::const_iterator itEnd = _refs.end();
-			for (; it != itEnd; ++it)
+			Poco::Mutex::ScopedLock lock(_mutex);			
+			for (const auto& r: _refs)
 			{
-				readList.push_back(it->second);
+				pollSet.add(r.second, Net::Socket::SELECT_READ);
 			}
 		}
 
-		if (!readList.empty())
+		if (!pollSet.empty())
 		{
-			Poco::Timespan timeout(1000*EVENTLOOP_TIMEOUT);
-			int ready = Poco::Net::Socket::select(readList, writeList, errList, timeout);
-			if (ready > 0)
+			Poco::Timespan timeout(1000LL * EVENTLOOP_TIMEOUT);
+			const auto sm = pollSet.poll(timeout);
+			if (!sm.empty())
 			{
-				Poco::Net::Socket::SocketList::iterator it = readList.begin();
-				Poco::Net::Socket::SocketList::iterator itEnd = readList.end();
-				for (; it != itEnd; ++it)
+				for (const auto& it: sm)
 				{
 					Poco::Mutex::ScopedLock lock(_mutex);
-
-					SockToRef::iterator itSock = _sockets.find(*it);
-					poco_assert_dbg (itSock != _sockets.end());
-					RefSet::iterator itSet = _invalidatedRefs.find(itSock->second);
-					if (itSet != _invalidatedRefs.end())
+					if (it.second & Net::PollSet::POLL_READ)
 					{
-						removeImpl(itSock->second);
-						_invalidatedRefs.erase(itSet);
-					}
-					else
-					{
-						DNSServiceProcessResult(itSock->second);
+						auto& socket = it.first;
+						const auto itSock = _sockets.find(socket);
+						poco_assert_dbg (itSock != _sockets.end());
+						auto itSet = _invalidatedRefs.find(itSock->second);
+						if (itSet != _invalidatedRefs.end())
+						{
+							removeImpl(itSock->second);
+							_invalidatedRefs.erase(itSet);
+						}
+						else
+						{
+							DNSServiceProcessResult(itSock->second);
+						}
 					}
 				}
 			}
 		}
 
-		Poco::Mutex::ScopedLock lock(_mutex);
-		RefSet::iterator itSet =_invalidatedRefs.begin();
-		RefSet::iterator itSetEnd = _invalidatedRefs.end();
-		for (; itSet != itSetEnd; ++itSet)
+		Poco::Mutex::ScopedLock lock(_mutex);		
+		for (auto& ir: _invalidatedRefs)
 		{
-			removeImpl(*itSet);
+			removeImpl(ir);
 		}
 		_invalidatedRefs.clear();
 	}

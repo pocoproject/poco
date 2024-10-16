@@ -46,7 +46,7 @@ std::string Array::toString(int indent) const
 
 	if (indent > 0) oss << std::endl;
 
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	for (auto it = _elements.begin(), total = _elements.end(); it != total; ++it)
 	{
 		if (it != _elements.begin())
 		{

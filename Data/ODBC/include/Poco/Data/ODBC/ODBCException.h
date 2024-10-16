@@ -138,6 +138,13 @@ private:
 };
 
 
+// explicit instantiation definition
+template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
+template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+template class HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+
+
 using EnvironmentException = HandleException<SQLHENV, SQL_HANDLE_ENV>;
 using ConnectionException = HandleException<SQLHDBC, SQL_HANDLE_DBC>;
 using StatementException = HandleException<SQLHSTMT, SQL_HANDLE_STMT>;

@@ -65,6 +65,7 @@ private:
 	{
 		ST_DATA,
 		ST_CR,
+		ST_LF,
 		ST_CR_LF,
 		ST_CR_LF_DOT,
 		ST_CR_LF_DOT_DOT,

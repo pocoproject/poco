@@ -16,6 +16,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
+#include "Poco/Path.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -80,6 +81,12 @@ void FileImpl::setPathImpl(const std::string& path)
 }
 
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	return _path;
+}
+
+
 bool FileImpl::existsImpl() const
 {
 	poco_assert (!_path.empty());
@@ -127,12 +134,12 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	poco_assert (!_path.empty());
+	poco_assert (!absolutePath.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (stat(absolutePath.c_str(), &st) == 0)
 	{
 		if (st.st_uid == geteuid() || geteuid() == 0)
 			return (st.st_mode & S_IXUSR) != 0;

@@ -99,6 +99,7 @@ int TextIterator::operator * () const
 
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
+	unsigned char* pend = p + TextEncoding::MAX_SEQUENCE_LENGTH;
 
 	if (it != _end)
 		*p++ = *it++;
@@ -112,6 +113,7 @@ int TextIterator::operator * () const
 	{
 		while (read < -n && it != _end)
 		{
+			poco_assert(p != pend);
 			*p++ = *it++;
 			read++;
 		}

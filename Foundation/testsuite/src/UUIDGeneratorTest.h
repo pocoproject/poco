@@ -27,6 +27,10 @@ public:
 	void testTimeBased();
 	void testRandom();
 	void testNameBased();
+	void testV6();
+	void testV7();
+	void testV6Uniqueness();
+	void testV7Uniqueness();
 
 	void setUp();
 	void tearDown();
