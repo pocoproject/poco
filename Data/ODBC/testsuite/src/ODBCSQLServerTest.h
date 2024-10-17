@@ -48,6 +48,7 @@ public:
 
 	void testBLOB() override;
 	void testBigString();
+	void testBigStringVector();
 	void testBigBatch();
 	void testNull() override;
 	void testBulk() override;
