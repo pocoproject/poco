@@ -12,6 +12,16 @@ POCO_ODBC_INCLUDE = /opt/homebrew/include
 endif
 endif
 
+ifndef POCO_MSSQL_INCLUDE
+ifeq (0, $(shell test -e /usr/include/msodbcsql.h; echo $$?))
+POCO_MSSQL_INCLUDE = /usr/include
+else ifeq (0, $(shell test -e /opt/microsoft/msodbcsql18/include/msodbcsql.h; echo $$?))
+POCO_MSSQL_INCLUDE = /opt/microsoft/msodbcsql18/include
+else ifeq (0, $(shell test -e /opt/homebrew/include/msodbcsql18/msodbcsql.h; echo $$?))
+POCO_MSSQL_INCLUDE = /opt/homebrew/include/msodbcsql18
+endif
+endif
+
 ifndef POCO_ODBC_LIB
 ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
 POCO_ODBC_LIB = /usr/lib/$(OSARCH)-linux-gnu
@@ -34,7 +44,7 @@ LIBLINKEXT = $(SHAREDLIBLINKEXT)
 endif
 endif
 
-INCLUDE += -I$(POCO_ODBC_INCLUDE)
+INCLUDE += -I$(POCO_ODBC_INCLUDE) -I$(POCO_MSSQL_INCLUDE)
 SYSLIBS += -L$(POCO_ODBC_LIB)
 
 ##
