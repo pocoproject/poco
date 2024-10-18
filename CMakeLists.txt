@@ -155,9 +155,11 @@ endif()
 if(ODBC_FOUND)
 	option(ENABLE_DATA "Enable Data" ON)
 	option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
+	option(ENABLE_DATA_SQL_SERVER_BIG_STRINGS "Enable MS SQL Server big strings" ON)
 else()
 	option(ENABLE_DATA "Enable Data" OFF)
 	option(ENABLE_DATA_ODBC "Enable Data ODBC" OFF)
+	option(ENABLE_DATA_SQL_SERVER_BIG_STRINGS "Enable MS SQL Server big strings" OFF)
 endif()
 
 # Allow enabling and disabling components
