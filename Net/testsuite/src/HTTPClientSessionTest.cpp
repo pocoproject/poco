@@ -24,6 +24,7 @@
 
 
 using Poco::Net::HTTPClientSession;
+using Poco::Net::ProxyConfig;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
@@ -328,7 +329,7 @@ void HTTPClientSessionTest::testProxyAuth()
 
 void HTTPClientSessionTest::testBypassProxy()
 {
-	HTTPClientSession::ProxyConfig proxyConfig;
+	ProxyConfig proxyConfig;
 	proxyConfig.host = "proxy.domain.com";
 	proxyConfig.port = 80;
 	proxyConfig.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
