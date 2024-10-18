@@ -2426,14 +2426,14 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	assertTrue (count == 1);
@@ -2444,7 +2444,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	assertTrue (res == img);
@@ -2459,7 +2459,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	try
@@ -2470,7 +2470,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	// sometimes throws (intentionally, caught in caller)

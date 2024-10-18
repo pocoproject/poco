@@ -277,12 +277,9 @@ template<>
 bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val, SQLSMALLINT cType)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
-	std::size_t fetchedSize = 0;
-	std::size_t totalSize = 0;
 
 	SQLLEN len;
-	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<char> apChar(bufSize);
+	Poco::Buffer<char> apChar(CHUNK_SIZE);
 	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 
@@ -291,14 +288,28 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 
 	do
 	{
-		std::memset(pChar, 0, bufSize);
+		std::memset(pChar, 0, CHUNK_SIZE);
 		len = 0;
 		rc = SQLGetData(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			cType, //C data type
 			pChar, //returned value
-			bufSize, //buffer length
+			CHUNK_SIZE, //buffer length
 			&len); //length indicator
+
+		if (SQL_SUCCESS_WITH_INFO == rc)
+		{
+			StatementDiagnostics d(_rStmt);
+			std::size_t fieldCount = d.fields().size();
+			for (int i = 0; i < fieldCount; ++i)
+			{
+				if (d.sqlState(i) == "01004"s)
+				{
+					if (len == SQL_NO_TOTAL || len > CHUNK_SIZE) // only part of data was returned
+						len = CHUNK_SIZE-1; // SQLGetData terminates the returned string
+				}
+			}
+		}
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(string):SQLGetData()");
@@ -316,12 +327,11 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 			break;
 
 		_lengths[pos] += len;
-		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
-		totalSize += fetchedSize;
-		if (totalSize <= maxSize)
-			val.append(pChar, fetchedSize);
+		if (_lengths[pos] <= maxSize)
+			val.append(pChar, len);
 		else
-			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
+
 	}while (true);
 
 	return true;
@@ -332,12 +342,8 @@ template<>
 bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val, SQLSMALLINT cType)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
-	std::size_t fetchedSize = 0;
-	std::size_t totalSize = 0;
-
 	SQLLEN len;
-	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<UTF16String::value_type> apChar(bufSize);
+	Poco::Buffer<UTF16String::value_type> apChar(CHUNK_SIZE);
 	UTF16String::value_type* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 
@@ -346,14 +352,28 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 
 	do
 	{
-		std::memset(pChar, 0, bufSize);
+		std::memset(pChar, 0, CHUNK_SIZE);
 		len = 0;
 		rc = SQLGetData(_rStmt,
 			(SQLUSMALLINT)pos + 1,
 			cType, //C data type
 			pChar, //returned value
-			bufSize, //buffer length
+			CHUNK_SIZE, //buffer length
 			&len); //length indicator
+
+		if (SQL_SUCCESS_WITH_INFO == rc)
+		{
+			StatementDiagnostics d(_rStmt);
+			std::size_t fieldCount = d.fields().size();
+			for (int i = 0; i < fieldCount; ++i)
+			{
+				if (d.sqlState(i) == "01004"s)
+				{
+					if (len == SQL_NO_TOTAL || len > CHUNK_SIZE) // only part of data was returned
+						len = CHUNK_SIZE - 2;
+				}
+			}
+		}
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(UTF16String):SQLGetData()");
@@ -371,12 +391,10 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 			break;
 
 		_lengths[pos] += len;
-		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
-		totalSize += fetchedSize;
-		if (totalSize <= maxSize)
-			val.append(pChar, fetchedSize / sizeof(UTF16Char));
+		if (_lengths[pos] <= maxSize)
+			val.append(pChar, len / sizeof(UTF16Char));
 		else
-			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
 	} while (true);
 
 	return true;
@@ -390,7 +408,6 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	std::size_t fetchedSize = 0;
-	std::size_t totalSize = 0;
 
 	SQLLEN len;
 	const int bufSize = CHUNK_SIZE;
@@ -406,13 +423,11 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 		std::memset(pChar, 0, bufSize);
 		len = 0;
 		rc = SQLGetData(_rStmt,
-			(SQLUSMALLINT) pos + 1,
+			(SQLUSMALLINT)pos + 1,
 			cType, //C data type
 			pChar, //returned value
 			bufSize, //buffer length
 			&len); //length indicator
-
-		_lengths[pos] += len;
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(CLOB):SQLGetData()");
@@ -427,13 +442,13 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 			break;
 
 		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
-		totalSize += fetchedSize;
-		if (totalSize <= maxSize)
+		_lengths[pos] += fetchedSize;
+		if (_lengths[pos] <= maxSize)
 			val.appendRaw(pChar, fetchedSize);
 		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 
-	}while (true);
+	} while (true);
 
 	return true;
 }

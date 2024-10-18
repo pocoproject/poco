@@ -170,6 +170,7 @@ includepath=""
 librarypath=""
 odbclib=""
 odbcinclude=""
+mssqlinclude=""
 unbundled=""
 trace=""
 static=""
@@ -207,6 +208,9 @@ while [ $# -ge 1 ]; do
 
 	--odbc-include=*)
 		odbcinclude="$(echo "${1}" | awk '{print substr($0,16)}')" ;;
+
+	--mssql-include=*)
+		mssqlinclude="$(echo "${1}" | awk '{print substr($0,16)}')" ;;
 
 	--mysql-lib=*)
 		mysqllib="$(echo "${1}" | awk '{print substr($0,13)}')" ;;
@@ -377,6 +381,9 @@ fi
 if [ -n "$odbcinclude" ] ; then
 	echo "POCO_ODBC_INCLUDE = $odbcinclude" >>"$build"/config.make
 fi
+if [ -n "$mssqlinclude" ] ; then
+	echo "POCO_MSSQL_INCLUDE = $mssqlinclude" >>"$build"/config.make
+fi
 if [ -n "$mysqllib" ] ; then
 	echo "POCO_MYSQL_LIB = $mysqllib" >>"$build"/config.make
 fi
@@ -427,6 +434,9 @@ if [ -n "$odbclib" ] ; then
 fi
 if [ -n "$odbcinclude" ] ; then
 	echo "export POCO_ODBC_INCLUDE" >>"$build"/config.make
+fi
+if [ -n "$mssqlinclude" ] ; then
+	echo "export POCO_MSSQL_INCLUDE" >>"$build"/config.make
 fi
 if [ -n "$mysqllib" ] ; then
 	echo "export POCO_MYSQL_LIB" >>"$build"/config.make
