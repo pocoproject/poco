@@ -14,6 +14,7 @@
 
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Handle.h"
+#include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTime.h"
@@ -153,6 +154,17 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 	// Fraction support is limited to milliseconds due to MS SQL Server limitation
 	// see http://support.microsoft.com/kb/263872
 	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);
+}
+
+
+std::string Utility::dbmsName(const ConnectionHandle& db)
+{
+	const SQLSMALLINT bufSize = 1024;
+	SQLCHAR dbmsName[bufSize] = {0};
+	SQLSMALLINT retSize = 0;
+	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), SQL_DBMS_NAME, dbmsName, bufSize, &retSize);
+	if (!isError(rc)) return std::string(dbmsName[0], retSize);
+	return "unknown"s;
 }
 
 

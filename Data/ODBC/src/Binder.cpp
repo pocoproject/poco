@@ -166,11 +166,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		toODBCDirection(dir),
 		SQL_C_CHAR,
 		Utility::sqlDataType(SQL_C_CHAR),
-#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
-		SQL_SS_LENGTH_UNLIMITED,
-#else
-		(SQLUINTEGER)colSize,
-#endif
+		getStringColSize(colSize),
 		0,
 		pVal,
 		(SQLINTEGER)size,
@@ -223,11 +219,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 		toODBCDirection(dir),
 		SQL_C_WCHAR,
 		Utility::sqlDataType(SQL_C_WCHAR),
-#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
-		SQL_SS_LENGTH_UNLIMITED,
-#else
-		(SQLUINTEGER)colSize,
-#endif
+		getStringColSize(colSize),
 		0,
 		pVal,
 		(SQLINTEGER)size,
@@ -514,6 +506,16 @@ void Binder::reset()
 }
 
 
+SQLUINTEGER Binder::getStringColSize(SQLUINTEGER columnSize)
+{
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+	if (Utility::dbmsName(_rStmt.connection()) == "SQLServer"s)
+		return SQL_SS_LENGTH_UNLIMITED;
+#endif
+	return columnSize;
+}
+
+
 void Binder::getColSizeAndPrecision(std::size_t pos,
 	SQLSMALLINT cDataType,
 	SQLINTEGER& colSize,
@@ -634,14 +636,14 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 		ODBCMetaColumn col(_rStmt, pos);
 		colSize = col.length();
 	}
-	catch (StatementException&) { }
+	catch (StatementException&){}
 
 	try
 	{
 		Parameter p(_rStmt, pos);
 		paramSize = p.columnSize();
 	}
-	catch (StatementException&) {}
+	catch (StatementException&){}
 
 	if (colSize == 0 && paramSize == 0)
 		paramSize = getParamSizeDirect(pos, size);

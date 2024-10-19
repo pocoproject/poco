@@ -130,6 +130,8 @@ public:
 	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
+	void setName();
+
 private:
 	std::string	          _connectorName;
 	mutable SessionHandle _sessionHandle;

@@ -37,9 +37,8 @@ CppUnit::Test* ODBCTestSuite::suite()
 	//
 	// For the time being, the workaround is to connect to DB2 after connecting to PostgreSQL and Oracle.
 
-
-	addTest(pSuite, ODBCSQLServerTest::suite());
 	addTest(pSuite, ODBCOracleTest::suite());
+	addTest(pSuite, ODBCSQLServerTest::suite());
 	addTest(pSuite, ODBCMySQLTest::suite());
 	addTest(pSuite, ODBCPostgreSQLTest::suite());
 	addTest(pSuite, ODBCSQLiteTest::suite());

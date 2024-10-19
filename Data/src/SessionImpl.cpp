@@ -21,6 +21,7 @@ namespace Data {
 
 
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout):
+	_dbmsName("unknown"s),
 	_connectionString(connectionString),
 	_loginTimeout(timeout)
 {

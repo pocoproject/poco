@@ -204,6 +204,11 @@ public:
 		return (_statementCreator << t);
 	}
 
+	const std::string& dbmsName() const;
+		/// Returns the DBMS name. The name must be set by the
+		/// implementation.
+		/// Defaults to "unknown".
+
 	SharedPtr<StatementImpl> createStatementImpl();
 		/// Creates a StatementImpl.
 
@@ -350,6 +355,12 @@ private:
 //
 // inlines
 //
+
+inline const std::string& Session::dbmsName() const
+{
+	return _pImpl->dbmsName();
+}
+
 
 inline bool Session::isAutocommit() const
 {

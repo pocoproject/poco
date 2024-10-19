@@ -70,7 +70,7 @@
 		// - increasing the "maxFieldSize" property may
 		//   affect performance (more memory preallocated
 		//   for prepared statements in order to safely
-		//   accomodate data returned at execution)
+		//   accommodate data returned at execution)
 		#if !defined(POCO_DATA_SQL_SERVER_BIG_STRINGS)
 			#define POCO_DATA_SQL_SERVER_BIG_STRINGS 1
 		#endif
