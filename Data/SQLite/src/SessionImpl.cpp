@@ -82,6 +82,12 @@ SessionImpl::~SessionImpl()
 }
 
 
+void SessionImpl::setName()
+{
+	setDBMSName("SQLite"s);
+}
+
+
 Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	poco_check_ptr (_pDB);
@@ -273,17 +279,17 @@ Poco::Any SessionImpl::getConnectionTimeout(const std::string& prop) const
 	return Poco::Any(_timeout/1000);
 }
 
-void SessionImpl::setTransactionType(TransactionType transactionType) 
+void SessionImpl::setTransactionType(TransactionType transactionType)
 {
 	_transactionType = transactionType;
 }
 
-void SessionImpl::setTransactionType(const std::string &prop, const Poco::Any& value) 
+void SessionImpl::setTransactionType(const std::string &prop, const Poco::Any& value)
 {
 	setTransactionType(Poco::RefAnyCast<TransactionType>(value));
 }
 
-Poco::Any SessionImpl::getTransactionType(const std::string& prop) const 
+Poco::Any SessionImpl::getTransactionType(const std::string& prop) const
 {
 	return Poco::Any(_transactionType);
 }

@@ -139,7 +139,10 @@ protected:
 
 	void setTransactionType(const std::string &prop, const Poco::Any& value);
 	Poco::Any getTransactionType(const std::string& prop) const;
+
 private:
+	void setName();
+
 	std::string _connector;
 	sqlite3*    _pDB;
 	bool        _connected;

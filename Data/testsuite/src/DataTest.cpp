@@ -72,6 +72,7 @@ void DataTest::testSession()
 	assertTrue (sess.connector() == sess.impl()->connectorName());
 	assertTrue ("cs" == sess.impl()->connectionString());
 	assertTrue ("test:///cs" == sess.uri());
+	assertTrue ("Test" == sess.dbmsName());
 
 	assertTrue (sess.getLoginTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
 	sess.setLoginTimeout(123);

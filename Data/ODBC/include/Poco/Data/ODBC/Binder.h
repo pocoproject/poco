@@ -616,7 +616,7 @@ private:
 			toODBCDirection(dir),
 			SQL_C_CHAR,
 			Utility::sqlDataType(SQL_C_CHAR),
-			(SQLUINTEGER) size - 1,
+			getStringColSize(size),
 			0,
 			_charPtrs[pos],
 			(SQLINTEGER) size,
@@ -683,7 +683,7 @@ private:
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
 			Utility::sqlDataType(SQL_C_WCHAR),
-			(SQLUINTEGER)size - 1,
+			getStringColSize(size),
 			0,
 			_utf16CharPtrs[pos],
 			(SQLINTEGER)size,
@@ -949,6 +949,11 @@ private:
 			throw StatementException(_rStmt, "ODBC::Binder::bindImplNullContainer():SQLBindParameter()");
 		}
 	}
+
+	SQLUINTEGER getStringColSize(SQLUINTEGER columnSize);
+		/// Returns the string column size.
+		/// If the back end is not SQL Server, it returns
+		/// the `columnSize` passed in.
 
 	void getColSizeAndPrecision(std::size_t pos,
 		SQLSMALLINT cDataType,

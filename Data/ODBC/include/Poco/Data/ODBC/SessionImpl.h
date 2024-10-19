@@ -229,6 +229,9 @@ private:
 		/// Sets the transaction isolation level.
 		/// Called internally from getTransactionIsolation()
 
+	void setName();
+		/// Sets the back end DBMS name.
+
 	std::string                   _connector;
 	mutable ConnectionHandle      _db;
 	Poco::Any                     _maxFieldSize;
