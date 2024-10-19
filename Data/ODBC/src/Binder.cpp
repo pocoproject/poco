@@ -509,7 +509,7 @@ void Binder::reset()
 SQLUINTEGER Binder::getStringColSize(SQLUINTEGER columnSize)
 {
 #if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
-	if (Utility::dbmsName(_rStmt.connection()) == "SQLServer"s)
+	if (Utility::dbmsName(_rStmt.connection()) == Utility::MS_SQL_SERVER_DBMS_NAME)
 		return SQL_SS_LENGTH_UNLIMITED;
 #endif
 	return columnSize;

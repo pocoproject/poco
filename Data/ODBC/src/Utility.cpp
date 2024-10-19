@@ -163,7 +163,10 @@ std::string Utility::dbmsName(const ConnectionHandle& db)
 	SQLCHAR dbmsName[bufSize] = {0};
 	SQLSMALLINT retSize = 0;
 	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), SQL_DBMS_NAME, dbmsName, bufSize, &retSize);
-	if (!isError(rc)) return std::string(dbmsName[0], retSize);
+	if (!isError(rc))
+	{
+		return std::string(reinterpret_cast<char*>(dbmsName), retSize);
+	}
 	return "unknown"s;
 }
 

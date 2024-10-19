@@ -40,6 +40,8 @@ class ODBC_API Utility
 	/// Various utility functions
 {
 public:
+	inline static const std::string MS_SQL_SERVER_DBMS_NAME = "Microsoft SQL Server"s;
+
 	typedef std::map<std::string, std::string> DSNMap;
 	typedef DSNMap DriverMap;
 
