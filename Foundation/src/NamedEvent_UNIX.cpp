@@ -11,20 +11,21 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
 #include "Poco/NamedEvent_UNIX.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
-#include <semaphore.h>
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	#include <semaphore.h>
 #else
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
+	// System V semaphores
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <sys/ipc.h>
+	#include <sys/sem.h>
 #endif
 
 
@@ -53,71 +54,83 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	_name(name)
 {
 	std::string fileName = getFileName();
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
-	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	_sem = ::sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
 	if ((long) _sem == (long) SEM_FAILED)
-		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
+		throw SystemException(Poco::format("cannot create named event %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
-	int fd = open(fileName.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	_createdId = false;
+	int fd = ::open(fileName.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd == -1 && errno == ENOENT)
-		fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		fd = ::open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
-		close(fd);
+		::close(fd);
 	else
 		throw SystemException(Poco::format("cannot create named event %s (lockfile)", fileName), _name);
-	key_t key = ftok(fileName.c_str(), 'p');
+
+	key_t key = ::ftok(fileName.c_str(), 'p');
 	if (key == -1)
-		throw SystemException(Poco::format("cannot create named mutex %s (ftok() failed, errno=%d)", fileName, errno), _name);
-	_semid = semget(key, 1, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | IPC_CREAT | IPC_EXCL);
+		throw SystemException(Poco::format("cannot create named event %s (ftok() failed, errno=%d)", fileName, errno), _name);
+
+	_semid = ::semget(key, 1, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | IPC_CREAT | IPC_EXCL);
 	if (_semid >= 0)
 	{
+		_createdId = true;
 		union semun arg;
 		arg.val = 0;
-		semctl(_semid, 0, SETVAL, arg);
+		::semctl(_semid, 0, SETVAL, arg);
 	}
 	else if (errno == EEXIST)
 	{
-		_semid = semget(key, 1, 0);
+		_semid = ::semget(key, 1, 0);
 	}
-	else throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
-#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
+	else
+		throw SystemException(Poco::format("cannot create named event %s (semget() failed, errno=%d)", fileName, errno), _name);
+#endif // POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
 }
 
 
 NamedEventImpl::~NamedEventImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
-	sem_close(_sem);
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	::sem_close(_sem);
+	::sem_unlink(_name.c_str());
+#else
+	if (_createdId)
+	{
+		::semctl(_semid, 0, IPC_RMID);
+	}
 #endif
 }
 
 
 void NamedEventImpl::setImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
-	if (sem_post(_sem) != 0)
-	   	throw SystemException("cannot set named event", _name);
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	if (::sem_post(_sem) != 0)
+		throw SystemException("cannot set named event", _name);
 #else
 	struct sembuf op;
 	op.sem_num = 0;
 	op.sem_op  = 1;
 	op.sem_flg = 0;
-	if (semop(_semid, &op, 1) != 0)
-	   	throw SystemException("cannot set named event", _name);
+	if (::semop(_semid, &op, 1) != 0)
+		throw SystemException("cannot set named event", _name);
 #endif
 }
 
 
 void NamedEventImpl::waitImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
 	int err;
 	do
 	{
-		err = sem_wait(_sem);
+		err = ::sem_wait(_sem);
 	}
 	while (err && errno == EINTR);
-	if (err) throw SystemException("cannot wait for named event", _name);
+	if (err)
+		throw SystemException("cannot wait for named event", _name);
 #else
 	struct sembuf op;
 	op.sem_num = 0;
@@ -126,10 +139,11 @@ void NamedEventImpl::waitImpl()
 	int err;
 	do
 	{
-		err = semop(_semid, &op, 1);
+		err = ::semop(_semid, &op, 1);
 	}
 	while (err && errno == EINTR);
-	if (err) throw SystemException("cannot wait for named event", _name);
+	if (err)
+		throw SystemException("cannot wait for named event", _name);
 #endif
 }
 
