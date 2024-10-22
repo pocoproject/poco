@@ -43,8 +43,10 @@ public:
 		if (pThread)
 		{
 			_threadName = pThread->name();
+#ifndef POCO_NO_THREADNAME
 			auto *pThreadImpl = reinterpret_cast<Poco::ThreadImpl *>(pThread);
 			_osThreadName = pThreadImpl->getOSThreadNameImpl();
+#endif
 		}
 		_ran = true;
 		_event.wait();
@@ -60,10 +62,12 @@ public:
 		return _threadName;
 	}
 
+#ifndef POCO_NO_THREADNAME
 	const std::string& osThreadName() const
 	{
 		return _osThreadName;
 	}
+#endif
 
 	void notify()
 	{
@@ -80,7 +84,9 @@ public:
 private:
 	bool _ran;
 	std::string _threadName;
+#ifndef POCO_NO_THREADNAME
 	std::string _osThreadName;
+#endif
 	Event _event;
 };
 
@@ -209,7 +215,9 @@ void ThreadTest::testThread()
 	assertTrue (!thread.isRunning());
 	assertTrue (r.ran());
 	assertTrue (!r.threadName().empty());
+#ifndef POCO_NO_THREADNAME
 	assertTrue (!r.osThreadName().empty());
+#endif
 }
 
 
@@ -222,7 +230,9 @@ void ThreadTest::testNamedThread()
 	thread.join();
 	assertTrue (r.ran());
 	assertTrue (r.threadName() == "MyThread");
+#ifndef POCO_NO_THREADNAME
 	assertTrue (r.osThreadName() == r.threadName());
+#endif
 
 	// name len > POCO_MAX_THREAD_NAME_LEN
 	Thread thread2("0123456789aaaaaaaaaa9876543210");
@@ -231,7 +241,9 @@ void ThreadTest::testNamedThread()
 	r2.notify();
 	thread2.join();
 	assertTrue (r2.ran());
+#ifndef POCO_NO_THREADNAME
 	assertTrue (r2.osThreadName() == r2.threadName());
+#endif
 	assertTrue (r2.threadName().length() <= POCO_MAX_THREAD_NAME_LEN);
 	assertTrue (std::string(r2.threadName(), 0, 7) == "0123456");
 	assertTrue (std::string(r2.threadName(), r2.threadName().size() - 7) == "6543210");

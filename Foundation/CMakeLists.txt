@@ -160,8 +160,10 @@ else()
 				target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
 			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX"  OR "${CMAKE_SYSTEM_NAME}" STREQUAL "GNU")
+				set(THREADS_PREFER_PTHREAD_FLAG ON)
+				find_package(Threads REQUIRED)
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
-				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+				target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS} rt Threads::Threads)
 			else()
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
 				target_link_libraries(Foundation PUBLIC pthread atomic ${CMAKE_DL_LIBS} rt)
@@ -204,6 +206,11 @@ endif()
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 	target_compile_definitions(Foundation PUBLIC _BSD_SOURCE)
 	target_compile_options(Foundation PUBLIC -library=stlport4)
+endif()
+
+# AIX
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX")
+	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
 endif()
 
 # iOS
