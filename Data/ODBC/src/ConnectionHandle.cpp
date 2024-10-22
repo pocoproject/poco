@@ -77,7 +77,7 @@ void ConnectionHandle::free()
 	if (_pEnvironment)
 	{
 		delete _pEnvironment;
-		_pEnvironment = 0;
+		_pEnvironment = nullptr;
 	}
 }
 
@@ -123,7 +123,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 	setTimeouts(loginTimeout, timeout);
 
 	if (Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_hdbc
-		, NULL
+		, nullptr
 		,(SQLCHAR*) _connectString.c_str()
 		,(SQLSMALLINT) SQL_NTS
 		, connectOutput
@@ -201,7 +201,7 @@ void ConnectionHandle::setTimeoutImpl(SQLULEN timeout, SQLINTEGER attribute)
 int ConnectionHandle::getTimeoutImpl(SQLINTEGER attribute) const
 {
 	SQLUINTEGER timeout = 0;
-	if (Utility::isError(SQLGetConnectAttr(_hdbc, attribute, &timeout, sizeof(timeout), 0)))
+	if (Utility::isError(SQLGetConnectAttr(_hdbc, attribute, &timeout, sizeof(timeout), nullptr)))
 	{
 		ConnectionError e(_hdbc);
 		if (isUnsupported(e))
@@ -268,7 +268,7 @@ bool ConnectionHandle::isConnected() const
 		SQL_ATTR_CONNECTION_DEAD,
 		&value,
 		sizeof(value),
-		0))) return false;
+		nullptr))) return false;
 
 	return (SQL_CD_FALSE == value);
 }

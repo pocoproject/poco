@@ -163,7 +163,8 @@ void SessionImpl::open(const std::string& connect)
 	if (connectionString().empty())
 		throw InvalidArgumentException("SessionImpl::open(): Connection string empty");
 
-	if (_db.connect(connectionString()))
+	const auto ctout = getConnectionTimeout();
+	if (_db.connect(connectionString(), 0, ctout))
 	{
 		setProperty("handle", _db.handle());
 
