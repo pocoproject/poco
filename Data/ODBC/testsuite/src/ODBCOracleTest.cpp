@@ -15,7 +15,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/AutoTransaction.h"
@@ -37,7 +37,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 
 
@@ -370,21 +370,28 @@ void ODBCOracleTest::testStoredProcedureAny()
 }
 
 
-void ODBCOracleTest::testStoredProcedureDynamicAny()
+void ODBCOracleTest::testStoredProcedureDynamicVar()
 {
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 
-		DynamicAny i = 2;
-		DynamicAny j = 0;
+		Var i = 2;
+		Var j = 0;
 
 		*_pSession << "CREATE OR REPLACE "
 				"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
 				" BEGIN outParam := inParam*inParam; "
 				"END storedProcedure;" , now;
 
-		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		auto inI = in(i);
+		auto outJ = out(j);
+		assertTrue (nullptr != inI);
+		assertTrue (inI->canBind());
+		assertTrue (nullptr != outJ);
+		assertTrue (outJ->canBind());
+
+		*_pSession << "{call storedProcedure(?, ?)}", inI, outJ, now;
 		assertTrue (4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -394,7 +401,12 @@ void ODBCOracleTest::testStoredProcedureDynamicAny()
 			" END storedProcedure;" , now;
 
 		i = 2;
-		*_pSession << "{call storedProcedure(?)}", io(i), now;
+
+		auto ioI = io(i);
+		assertTrue (nullptr != ioI);
+		assertTrue (ioI->canBind());
+
+		*_pSession << "{call storedProcedure(?)}", ioI, now;
 		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -649,6 +661,10 @@ void ODBCOracleTest::testAutoTransaction()
 	Session localSession("ODBC", _connectString);
 	bool ac = session().getFeature("autoCommit");
 	int count = 0;
+	// enabing SQL parsing is necessary to prevent
+	// starting a transaction for a simple select
+	bool sqlParse = session().getFeature("sqlParse");
+	session().setFeature("sqlParse", true);
 
 	recreateIntsTable();
 
@@ -675,10 +691,19 @@ void ODBCOracleTest::testAutoTransaction()
 		session() << "INSERT INTO Strings VALUES (1)", now;
 		session() << "INSERT INTO Strings VALUES (2)", now;
 		session() << "BAD QUERY", now;
-	} catch (Poco::Exception&) {}
+		failmsg("Bad SQL statement must throw");
+	}
+	catch (Poco::Exception&) {}
+
+	assertFalse (session().isTransaction());
 
 	session() << "SELECT count(*) FROM Strings", into(count), now;
 	assertTrue (0 == count);
+	assertFalse (session().isTransaction());
+
+	session() << "SELECT count(*) FROM Strings", into(count), now;
+	assertTrue (0 == count);
+	assertFalse (session().isTransaction());
 
 	AutoTransaction at(session());
 
@@ -694,6 +719,7 @@ void ODBCOracleTest::testAutoTransaction()
 	localSession << "SELECT count(*) FROM Strings", into(count), now;
 	assertTrue (3 == count);
 
+	session().setFeature("sqlParse", sqlParse);
 	session().setFeature("autoCommit", ac);
 }
 
@@ -711,8 +737,9 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 		StatementDiagnostics::Iterator it = flds.begin();
 		for (; it != flds.end(); ++it)
 		{
-			if (4043 == it->_nativeError || //ORA-04043 (object does not exist)
-				942 == it->_nativeError || 1433808584/*DevArt*/== it->_nativeError) //ORA-00942 (table does not exist)
+			std::string errMsg((char*)it->_message);
+			if ((errMsg.find("ORA-00942") != std::string::npos) || // table does not exist
+				(errMsg.find("ORA-04043") != std::string::npos)) // object does not exist
 			{
 				ignoreError = true;
 				break;
@@ -727,7 +754,7 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 void ODBCOracleTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR2(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat NUMBER NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR2(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat NUMBER NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()", __LINE__, __FILE__); }
 }
@@ -973,7 +1000,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);

@@ -33,11 +33,11 @@ public:
 	                 long data2lineNumber,
 	                 const std::string& fileName);
 	CppUnitException(const CppUnitException& other);
-	virtual ~CppUnitException() noexcept;
+	~CppUnitException() noexcept override;
 
 	CppUnitException& operator = (const CppUnitException& other);
 
-	const char* what() const noexcept;
+	const char* what() const noexcept override;
 
 	long lineNumber() const;
 	long data1LineNumber() const;

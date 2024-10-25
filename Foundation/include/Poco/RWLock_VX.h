@@ -20,8 +20,8 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <pthread.h>
-#include <errno.h>
 
 
 namespace Poco {
@@ -48,8 +48,9 @@ private:
 //
 inline void RWLockImpl::readLockImpl()
 {
-	if (pthread_mutex_lock(&_mutex))
-		throw SystemException("cannot lock mutex");
+	int rc = 0;
+	if ((rc = pthread_mutex_lock(&_mutex)))
+		throw SystemException("cannot lock mutex", Error::getMessage(rc));
 }
 
 
@@ -61,7 +62,7 @@ inline bool RWLockImpl::tryReadLockImpl()
 	else if (rc == EBUSY)
 		return false;
 	else
-		throw SystemException("cannot lock mutex");
+		throw SystemException("cannot lock mutex", Error::getMessage(rc));
 
 }
 
@@ -81,8 +82,9 @@ inline bool RWLockImpl::tryWriteLockImpl()
 
 inline void RWLockImpl::unlockImpl()
 {
-	if (pthread_mutex_unlock(&_mutex))
-		throw SystemException("cannot unlock mutex");
+	int rc = 0;
+	if ((rc = pthread_mutex_unlock(&_mutex)))
+		throw SystemException("cannot unlock mutex", Error::getMessage(rc));
 }
 
 

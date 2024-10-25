@@ -9,7 +9,7 @@ POCO_SOURCES_AUTO( Bonjour_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( Bonjour_SRCS ${HDRS_G})
 
-add_definitions( ${Bonjour_CFLAGS} -DTHREADSAFE)
+add_compile_definitions( ${Bonjour_CFLAGS} THREADSAFE)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${Bonjour_SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")

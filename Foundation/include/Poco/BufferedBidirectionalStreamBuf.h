@@ -43,15 +43,15 @@ class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
 	/// for implementing an iostream.
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef ba Allocator;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
-	typedef typename IOS::openmode openmode;
+	using Base = std::basic_streambuf<ch, tr>;
+	using IOS = std::basic_ios<ch, tr>;
+	using char_type = ch;
+	using char_traits = tr;
+	using Allocator = ba;
+	using int_type = typename Base::int_type;
+	using pos_type = typename Base::pos_type;
+	using off_type = typename Base::off_type;
+	using openmode = typename IOS::openmode;
 
 public:
 	BasicBufferedBidirectionalStreamBuf(std::streamsize bufferSize, openmode mode):
@@ -68,6 +68,9 @@ public:
 		Allocator::deallocate(_pReadBuffer, _bufsize);
 		Allocator::deallocate(_pWriteBuffer, _bufsize);
 	}
+
+	BasicBufferedBidirectionalStreamBuf(const BasicBufferedBidirectionalStreamBuf&) = delete;
+	BasicBufferedBidirectionalStreamBuf& operator = (const BasicBufferedBidirectionalStreamBuf&) = delete;
 
 	virtual int_type overflow(int_type c)
 	{
@@ -130,6 +133,22 @@ protected:
 		this->setp(_pWriteBuffer, _pWriteBuffer + _bufsize);
 	}
 
+	virtual bool resizeBuffer(std::streamsize bufferSize)
+	{
+		if (_bufsize != bufferSize)
+		{
+			Allocator::deallocate(_pReadBuffer, _bufsize);
+			Allocator::deallocate(_pWriteBuffer, _bufsize);
+
+			_bufsize = bufferSize;
+			_pReadBuffer = Allocator::allocate(_bufsize);
+			_pWriteBuffer = Allocator::allocate(_bufsize);
+		}
+		resetBuffers();
+
+		return true;
+	}
+
 private:
 	virtual int readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
 	{
@@ -152,13 +171,10 @@ private:
 		return -1;
 	}
 
-	std::streamsize _bufsize;
-	char_type*      _pReadBuffer;
-	char_type*      _pWriteBuffer;
-	openmode        _mode;
-
-	BasicBufferedBidirectionalStreamBuf(const BasicBufferedBidirectionalStreamBuf&);
-	BasicBufferedBidirectionalStreamBuf& operator = (const BasicBufferedBidirectionalStreamBuf&);
+	std::streamsize _bufsize {0};
+	char_type*      _pReadBuffer {nullptr};
+	char_type*      _pWriteBuffer {nullptr};
+	openmode        _mode {0};
 };
 
 
@@ -172,8 +188,8 @@ private:
 #if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
 template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 #endif
-typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>> BufferedBidirectionalStreamBuf;
-
+using BufferedBidirectionalStreamBuf
+	= BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 
 } // namespace Poco
 

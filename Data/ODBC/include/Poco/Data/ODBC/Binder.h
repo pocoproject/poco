@@ -575,11 +575,11 @@ private:
 		getColumnOrParameterSize(pos, size);
 		poco_assert (size > 0);
 
-		if (size == _maxFieldSize)
+		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
 			getMinValueSize(*pVal, size);
 			// accommodate for terminating zero
-			if (size != _maxFieldSize) ++size;
+			if (static_cast<std::size_t>(size) != _maxFieldSize) ++size;
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
@@ -601,7 +601,7 @@ private:
 		for (; it != end; ++it)
 		{
 			strSize = it->size();
-			if (strSize > size)
+			if (strSize > static_cast<std::size_t>(size))
 			{
 				if (transcodeRequired()) delete pVal;
 				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
@@ -616,7 +616,7 @@ private:
 			toODBCDirection(dir),
 			SQL_C_CHAR,
 			Utility::sqlDataType(SQL_C_CHAR),
-			(SQLUINTEGER) size - 1,
+			getStringColSize(size),
 			0,
 			_charPtrs[pos],
 			(SQLINTEGER) size,
@@ -646,11 +646,11 @@ private:
 		getColumnOrParameterSize(pos, size);
 		poco_assert(size > 0);
 
-		if (size == _maxFieldSize)
+		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
 			getMinValueSize(val, size);
 			// accomodate for terminating zero
-			if (size != _maxFieldSize) size += sizeof(UTF16Char);
+			if (static_cast<std::size_t>(size) != _maxFieldSize) size += sizeof(UTF16Char);
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
@@ -672,7 +672,7 @@ private:
 		for (; it != end; ++it)
 		{
 			strSize = it->size() * sizeof(UTF16Char);
-			if (strSize > size)
+			if (strSize > static_cast<std::size_t>(size))
 				throw LengthExceededException("ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
 			std::memcpy(pBuf + offset, it->data(), strSize);
 			offset += size;
@@ -683,7 +683,7 @@ private:
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
 			Utility::sqlDataType(SQL_C_WCHAR),
-			(SQLUINTEGER)size - 1,
+			getStringColSize(size),
 			0,
 			_utf16CharPtrs[pos],
 			(SQLINTEGER)size,
@@ -742,7 +742,7 @@ private:
 		for (; cIt != cEnd; ++cIt)
 		{
 			blobSize = cIt->size();
-			if (blobSize > size)
+			if (blobSize > static_cast<std::size_t>(size))
 				throw LengthExceededException("ODBC::Binder::bindImplContainerLOB():SQLBindParameter(std::vector<BLOB>)");
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
@@ -950,6 +950,11 @@ private:
 		}
 	}
 
+	SQLUINTEGER getStringColSize(SQLUINTEGER columnSize);
+		/// Returns the string column size.
+		/// If the back end is not SQL Server, it returns
+		/// the `columnSize` passed in.
+
 	void getColSizeAndPrecision(std::size_t pos,
 		SQLSMALLINT cDataType,
 		SQLINTEGER& colSize,
@@ -999,7 +1004,7 @@ private:
 		{
 			std::size_t sz = it->size() * typeSize;
 			if (sz > _maxFieldSize)
-				throw LengthExceededException();
+				throw LengthExceededException("ODBC::Binder::getMinValueSize(%s, %d)", std::string(typeid(T).name()), static_cast<int>(size));
 
 			if (sz == _maxFieldSize)
 			{

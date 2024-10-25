@@ -20,11 +20,7 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/ParserImpl.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
 #include "Poco/JSON/ParseHandler.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
 #include <string>
 
@@ -68,7 +64,7 @@ public:
 	Parser(const Handler::Ptr& pHandler = new ParseHandler);
 		/// Creates JSON Parser, using the given Handler and buffer size.
 
-	virtual ~Parser();
+	~Parser() override;
 		/// Destroys JSON Parser.
 
 	void reset();

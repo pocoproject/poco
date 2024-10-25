@@ -99,6 +99,12 @@ SessionImpl::~SessionImpl()
 }
 
 
+void SessionImpl::setName()
+{
+	setDBMSName(Utility::dbmsName(_db));
+}
+
+
 Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	return new ODBCStatementImpl(*this);
@@ -173,6 +179,8 @@ void SessionImpl::open(const std::string& connect)
 	else
 		throw ConnectionException(SQL_NULL_HDBC,
 			Poco::format("Connection to '%s' failed.", connectionString()));
+
+	setName();
 }
 
 

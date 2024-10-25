@@ -50,6 +50,9 @@ public:
 	~ODBCStatementImpl();
 		/// Destroys the ODBCStatementImpl.
 
+	std::string nativeSQL();
+		/// Returns the SQL string as modified by the driver.
+
 protected:
 	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
@@ -90,9 +93,6 @@ protected:
 
 	void execDirectImpl(const std::string& query);
 		/// Execute query directly impl
-
-	std::string nativeSQL();
-		/// Returns the SQL string as modified by the driver.
 
 	void printErrors(std::ostream& os) const;
 		/// Print errors, if any.

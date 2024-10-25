@@ -64,13 +64,9 @@ public:
 	class SynchronizationObject
 	{
 	public:
-		SynchronizationObject()
-		{
-		}
+		SynchronizationObject() = default;
 
-		virtual ~SynchronizationObject()
-		{
-		}
+		virtual ~SynchronizationObject() = default;
 
 		virtual void lock()
 		{
@@ -138,7 +134,7 @@ inline void TestResult::addFailure(Test* test, CppUnitException* e)
 
 
 // Informs the result that a test will be started.
-inline void TestResult::startTest(Test* test)
+inline void TestResult::startTest(Test*)
 {
 	ExclusiveZone zone(_syncObject);
 	_runTests++;
@@ -146,7 +142,7 @@ inline void TestResult::startTest(Test* test)
 
 
 // Informs the result that a test was completed.
-inline void TestResult::endTest(Test* test)
+inline void TestResult::endTest(Test*)
 {
 	ExclusiveZone zone(_syncObject);
 }

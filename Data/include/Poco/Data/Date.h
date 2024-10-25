@@ -31,7 +31,7 @@ namespace Dynamic {
 
 class Var;
 
-}
+} // namespace Dynamic
 
 namespace Data {
 
@@ -55,6 +55,9 @@ public:
 
 	~Date();
 		/// Destroys the Date.
+
+	Date(const Date & ) = default;
+	Date(Date && ) = default;
 
 	int year() const;
 		/// Returns the year.
@@ -151,7 +154,8 @@ inline bool Date::operator > (const Date& date) const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Data
+} // namespace Poco
 
 
 //
@@ -171,39 +175,38 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() = default;
+	VarHolderImpl() = delete;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::Date);
 	}
 
-	void convert(Poco::Timestamp& val) const
+	void convert(Poco::Timestamp& val) const override
 	{
 		DateTime dt;
 		dt.assign(_val.year(), _val.month(), _val.day());
 		val = dt.timestamp();
 	}
 
-	void convert(Poco::DateTime& val) const
+	void convert(Poco::DateTime& val) const override
 	{
 		val.assign(_val.year(), _val.month(), _val.day());
 	}
 
-	void convert(Poco::LocalDateTime& val) const
+	void convert(Poco::LocalDateTime& val) const override
 	{
 		val.assign(_val.year(), _val.month(), _val.day());
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
-		DateTime dt(_val.year(), _val.month(), _val.day());
+		const DateTime dt(_val.year(), _val.month(), _val.day());
 		val = DateTimeFormatter::format(dt, "%Y/%m/%d");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -214,12 +217,12 @@ public:
 	}
 
 private:
-	VarHolderImpl();
 	Poco::Data::Date _val;
 };
 
 
-} } // namespace Poco::Dynamic
+} // namespace Dynamic
+} // namespace Poco
 
 
 #endif // Data_Date_INCLUDED

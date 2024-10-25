@@ -37,37 +37,37 @@ class ODBCPostgreSQLTest: public ODBCTest
 {
 public:
 	ODBCPostgreSQLTest(const std::string& name);
-	~ODBCPostgreSQLTest();
+	~ODBCPostgreSQLTest() override;
 
-	void testBareboneODBC();
+	void testBareboneODBC() override;
 
-	void testBLOB();
+	void testBLOB() override;
 
-	void testStoredFunction();
-	void testStoredFunctionAny();
-	void testStoredFunctionDynamicAny();
+	void testStoredFunction() override;
+	void testStoredFunctionAny() override;
+	void testStoredFunctionDynamicAny() override;
 
 	static CppUnit::Test* suite();
 
 private:
-	void dropObject(const std::string& type, const std::string& name);
-	void recreateNullableTable();
-	void recreatePersonTable();
-	void recreatePersonBLOBTable();
-	void recreatePersonDateTimeTable();
-	void recreatePersonDateTable();
-	void recreatePersonTimeTable();
-	void recreateStringsTable();
-	void recreateIntsTable();
-	void recreateFloatsTable();
-	void recreateTuplesTable();
-	void recreateVectorsTable();
-	void recreateAnysTable();
-	void recreateNullsTable(const std::string& notNull="");
-	void recreateBoolTable();
-	void recreateMiscTable();
-	void recreateLogTable();
-	void recreateUnicodeTable();
+	void dropObject(const std::string& type, const std::string& name) override;
+	void recreateNullableTable() override;
+	void recreatePersonTable() override;
+	void recreatePersonBLOBTable() override;
+	void recreatePersonDateTimeTable() override;
+	void recreatePersonDateTable() override;
+	void recreatePersonTimeTable() override;
+	void recreateStringsTable() override;
+	void recreateIntsTable() override;
+	void recreateFloatsTable() override;
+	void recreateTuplesTable() override;
+	void recreateVectorsTable() override;
+	void recreateAnysTable() override;
+	void recreateNullsTable(const std::string& notNull = "") override;
+	void recreateBoolTable() override;
+	void recreateMiscTable() override;
+	void recreateLogTable() override;
+	void recreateUnicodeTable() override;
 
 	void configurePLPgSQL();
 		/// Configures PL/pgSQL in the database. A reasonable defaults

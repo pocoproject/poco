@@ -39,7 +39,7 @@ public:
 	void join();
 	void activate();
 	void release();
-	void run();
+	void run() override;
 
 private:
 	volatile bool        _idle;
@@ -57,14 +57,14 @@ private:
 PooledThread::PooledThread(const std::string& name, int stackSize):
 	_idle(true),
 	_idleTime(0),
-	_pTarget(0),
+	_pTarget(nullptr),
 	_name(name),
 	_thread(name),
-	_targetCompleted(false)
+	_targetCompleted(Event::EVENT_MANUALRESET)
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
-	_idleTime = std::time(NULL);
+	_idleTime = std::time(nullptr);
 }
 
 
@@ -84,7 +84,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	poco_assert (_pTarget == 0);
+	poco_assert (_pTarget == nullptr);
 
 	_pTarget = &target;
 	_thread.setPriority(priority);
@@ -110,7 +110,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 	_thread.setName(fullName);
 	_thread.setPriority(priority);
 
-	poco_assert (_pTarget == 0);
+	poco_assert (_pTarget == nullptr);
 
 	_pTarget = &target;
 	_targetReady.set();
@@ -128,7 +128,7 @@ int PooledThread::idleTime()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	return (int) (time(NULL) - _idleTime);
+	return (int) (time(nullptr) - _idleTime);
 }
 
 
@@ -157,7 +157,7 @@ void PooledThread::release()
 	const long JOIN_TIMEOUT = 10000;
 
 	_mutex.lock();
-	_pTarget = 0;
+	_pTarget = nullptr;
 	_mutex.unlock();
 	// In case of a statically allocated thread pool (such
 	// as the default thread pool), Windows may have already
@@ -200,8 +200,8 @@ void PooledThread::run()
 				ErrorHandler::handle();
 			}
 			FastMutex::ScopedLock lock(_mutex);
-			_pTarget  = 0;
-			_idleTime = time(NULL);
+			_pTarget  = nullptr;
+			_idleTime = time(nullptr);
 			_idle     = true;
 			_targetCompleted.set();
 			ThreadLocalStorage::clear();
@@ -430,8 +430,8 @@ PooledThread* ThreadPool::getThread()
 	if (++_age == 32)
 		housekeep();
 
-	PooledThread* pThread = 0;
-	for (ThreadVec::iterator it = _threads.begin(); !pThread && it != _threads.end(); ++it)
+	PooledThread* pThread = nullptr;
+	for (auto it = _threads.begin(); !pThread && it != _threads.end(); ++it)
 	{
 		if ((*it)->idle())
 			pThread = *it;
@@ -472,7 +472,7 @@ class ThreadPoolSingletonHolder
 public:
 	ThreadPoolSingletonHolder()
 	{
-		_pPool = 0;
+		_pPool = nullptr;
 	}
 	~ThreadPoolSingletonHolder()
 	{
@@ -485,7 +485,7 @@ public:
 		if (!_pPool)
 		{
 			_pPool = new ThreadPool("default");
-			if (POCO_THREAD_STACK_SIZE > 0)
+			if constexpr (POCO_THREAD_STACK_SIZE > 0)
 				_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
 		}
 		return _pPool;

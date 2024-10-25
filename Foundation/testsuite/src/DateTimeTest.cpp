@@ -404,14 +404,14 @@ void DateTimeTest::testArithmetics()
 
 	static const struct
 	{
-		int lineNum;		// source line number
-		int year1;			// operand/result date1 year
-		int month1;			// operand/result date1 month
-		unsigned int day1;	// operand/result date1 day
-		int numDays;		// operand/result 'int' number of days
-		int year2;			// operand/result date2 year
-		int month2;			// operand/result date2 month
-		unsigned int day2;	// operand/result date2 day
+		Poco::LineNumber lineNum;		// source line number
+		int year1;						// operand/result date1 year
+		int month1;						// operand/result date1 month
+		int day1;                       // operand/result date1 day
+		int numDays;					// operand/result 'int' number of days
+		int year2;						// operand/result date2 year
+		int month2;						// operand/result date2 month
+		int day2;                       // operand/result date2 day
 	} data[] =
 	{
 		//          - - - -first- - - -           - - - second - - -
@@ -436,7 +436,7 @@ void DateTimeTest::testArithmetics()
 	const int num_data = sizeof data / sizeof *data;
 	for (int di = 0; di < num_data; ++di)
 	{
-		const int line	 = data[di].lineNum;
+		const Poco::LineNumber line	 = data[di].lineNum;
 		const int num_days = data[di].numDays;
 		DateTime x = DateTime(data[di].year1, data[di].month1, data[di].day1);
 		const DateTime& X = x;
@@ -476,10 +476,10 @@ void DateTimeTest::testIncrementDecrement()
 		int lineNum;		// source line number
 		int year1;			// (first) date year
 		int month1;			// (first) date month
-		unsigned int day1;	// (first) date day
+		int day1;           // (first) date day
 		int year2;			// (second) date year
 		int month2;			// (second) date month
-		unsigned int day2;	// (second) date day
+		int day2;           // (second) date day
 	} data[] =
 	{
 		 //          - - - -first- - - -    - - - second - - -
@@ -513,7 +513,7 @@ void DateTimeTest::testIncrementDecrement()
 
 	for (di = 0; di < num_data; ++di)
 	{
-		const int line = data[di].lineNum;
+		const Poco::LineNumber line = data[di].lineNum;
 		DateTime x = DateTime(data[di].year1, data[di].month1,
 							  data[di].day1);
 		// Would do pre-increment of x here.
@@ -532,7 +532,7 @@ void DateTimeTest::testIncrementDecrement()
 
 	for (di = 0; di < num_data; ++di)
 	{
-		const int line = data[di].lineNum;
+		const Poco::LineNumber line = data[di].lineNum;
 		DateTime x = DateTime(data[di].year1, data[di].month1, data[di].day1);
 		DateTime x1 = DateTime(data[di].year1, data[di].month1, data[di].day1);
 		DateTime x2 = DateTime(data[di].year2, data[di].month2, data[di].day2);
@@ -552,7 +552,7 @@ void DateTimeTest::testIncrementDecrement()
 
 	for (di = 0; di < num_data; ++di)
 	{
-		const int line = data[di].lineNum;
+		const Poco::LineNumber line = data[di].lineNum;
 		DateTime x = DateTime(data[di].year2, data[di].month2, data[di].day2);
 		const DateTime& X = x;
 		x = x - Timespan(1,0,0,0,0);
@@ -569,7 +569,7 @@ void DateTimeTest::testIncrementDecrement()
 
 	for (di = 0; di < num_data; ++di)
 	{
-		const int line = data[di].lineNum;
+		const Poco::LineNumber line = data[di].lineNum;
 		DateTime x1 = DateTime(data[di].year1, data[di].month1, data[di].day1);
 		DateTime x = DateTime(data[di].year2, data[di].month2, data[di].day2);
 		DateTime y = x; DateTime Y = y;
@@ -830,7 +830,7 @@ void DateTimeTest::testDayOfWeek()
 	const int num_data = sizeof data / sizeof *data;
 	for (int di = 0; di < num_data ; ++di)
 	{
-		const int line = data[di].d_lineNum;
+		const Poco::LineNumber line = data[di].d_lineNum;
 		DateTime x = DateTime(data[di].d_year, data[di].d_month, data[di].d_day);
 		const DateTime& X = x;
 		loop_1_assert (line, data[di].d_expDay == X.dayOfWeek());
@@ -876,6 +876,123 @@ void DateTimeTest::testTM()
 }
 
 
+void DateTimeTest::testInvalid()
+{
+	try
+	{
+		DateTime dt(-4714, 1, 1);
+		failmsg("Invalid year, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(10000, 1, 1);
+		failmsg("Invalid year, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 0, 1);
+		failmsg("Invalid month, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 13, 1);
+		failmsg("Invalid month, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 1, 0);
+		failmsg("Invalid day, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(0, 1, DateTime::daysOfMonth(0, 1)+1);
+		failmsg("Invalid day, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, -1);
+		failmsg("Invalid hour, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 24);
+		failmsg("Invalid hour, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, -1);
+		failmsg("Invalid minute, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 60);
+		failmsg("Invalid minute, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, -1);
+		failmsg("Invalid second, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 61);
+		failmsg("Invalid second, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, -1);
+		failmsg("Invalid millisecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, 1000);
+		failmsg("Invalid millisecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, 1, -1);
+		failmsg("Invalid microsecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		DateTime dt(1, 1, 1, 1, 1, 1, 1, 1000);
+		failmsg("Invalid microsecond, must throw");
+	}
+	catch(const Poco::InvalidArgumentException&) { }
+
+}
+
+
 void DateTimeTest::setUp()
 {
 }
@@ -909,6 +1026,7 @@ CppUnit::Test* DateTimeTest::suite()
 	CppUnit_addTest(pSuite, DateTimeTest, testUTC);
 	CppUnit_addTest(pSuite, DateTimeTest, testLeapSeconds);
 	CppUnit_addTest(pSuite, DateTimeTest, testTM);
+	CppUnit_addTest(pSuite, DateTimeTest, testInvalid);
 
 	return pSuite;
 }

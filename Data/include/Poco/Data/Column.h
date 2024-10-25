@@ -403,19 +403,19 @@ public:
 		/// to start iteration from beginning or end,
 		/// depending on the position requested.
 	{
-		if (row <= (std::size_t) (_pData->size() / 2))
+		if (row <= (_pData->size() / 2))
 		{
 			Iterator it = _pData->begin();
 			Iterator end = _pData->end();
-			for (int i = 0; it != end; ++it, ++i)
+			for (std::size_t i = 0; it != end; ++it, ++i)
 				if (i == row) return *it;
 		}
 		else
 		{
 			row = _pData->size() - row;
 			RIterator it = _pData->rbegin();
-			RIterator end = _pData->rend();
-			for (int i = 1; it != end; ++it, ++i)
+			const RIterator end = _pData->rend();
+			for (std::size_t i = 1; it != end; ++it, ++i)
 				if (i == row) return *it;
 		}
 

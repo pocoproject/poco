@@ -34,7 +34,7 @@ public:
 
 	int countTestCases();
 	std::string toString();
-	void run(TestResult* result, const Test::Callback& callback = nullptr);
+	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 
 private:
 	const int _timesRepeat;

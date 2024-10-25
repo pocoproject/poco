@@ -104,6 +104,23 @@ void ParserWriterTest::testParseWriteSimple()
 }
 
 
+void ParserWriterTest::testMaxElementDepth()
+{
+	DOMParser parser;
+	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
+	parser.setMaxElementDepth(2);
+	try
+	{
+		AutoPtr<Document> pDoc = parser.parseString(XHTML);
+		fail("max element depth exceeded - must throw");
+	}
+	catch (const Poco::Exception&)
+	{
+		
+	}
+}
+
+
 void ParserWriterTest::setUp()
 {
 }
@@ -121,6 +138,7 @@ CppUnit::Test* ParserWriterTest::suite()
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML2);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteSimple);
+	CppUnit_addTest(pSuite, ParserWriterTest, testMaxElementDepth);
 
 	return pSuite;
 }

@@ -68,7 +68,7 @@ class Data_API RecordSet: private Statement
 	/// a limit for the Statement.
 {
 public:
-	using RowMap = std::map<std::size_t, Row*>;
+	using RowMap = std::map<std::size_t, std::shared_ptr<Row>>;
 	using ConstIterator = const RowIterator;
 	using Iterator = RowIterator;
 
@@ -140,9 +140,8 @@ public:
 		/// execution.
 		/// The number of rows reported is independent of filtering.
 
+	POCO_DEPRECATED("Replaced with subTotalRowCount() and getTotalRowCount()")
 	std::size_t totalRowCount() const;
-		//@ deprecated
-		/// Replaced with subTotalRowCount() and getTotalRowCount().
 
 	std::size_t getTotalRowCount() const;
 		/// Returns the total number of rows in the RecordSet.

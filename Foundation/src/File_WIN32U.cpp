@@ -14,6 +14,7 @@
 
 #include "Poco/File_WIN32U.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UnWindows.h"
@@ -88,6 +89,19 @@ void FileImpl::setPathImpl(const std::string& path)
 	convertPath(_path, _upath);
 }
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	// Windows specific: An executable can be invoked without
+	// the extension .exe, but the file has it nevertheless.
+	// This function appends extension "exe" if the file path does not have it.
+	Path p(_path);
+	if (!p.getExtension().empty())
+	{
+		return _path;
+	}
+	return p.setExtension("exe"s).toString();
+}
+
 
 bool FileImpl::existsImpl() const
 {
@@ -140,9 +154,9 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	Path p(_path);
+	Path p(absolutePath);
 	return icompare(p.getExtension(), "exe") == 0;
 }
 

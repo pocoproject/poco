@@ -99,12 +99,30 @@ public:
 	void setEntityResolver(EntityResolver* pEntityResolver);
 		/// Sets the entity resolver on the underlying SAXParser.
 
+	void setMaxElementDepth(std::size_t limit);
+		/// Limits the maximum element depth of the XML document to be loaded.
+		/// Setting the limit to zero disables the limit.
+		///
+		/// This can be used to prevent excessive element depth, which
+		/// could lead to a stack overflow when destroying the document.
+		///
+		/// The default limit is 256.
+
+	std::size_t getMaxElementDepth() const;
+		/// Returns the maximum element depth.
+
 	static const XMLString FEATURE_FILTER_WHITESPACE;
+
+	enum
+	{
+		DEFAULT_MAX_ELEMENT_DEPTH = 256
+	};
 
 private:
 	SAXParser _saxParser;
 	NamePool* _pNamePool;
-	bool      _filterWhitespace;
+	bool      _filterWhitespace = false;
+	std::size_t _maxElementDepth = DEFAULT_MAX_ELEMENT_DEPTH;
 };
 
 

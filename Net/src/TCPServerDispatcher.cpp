@@ -195,7 +195,7 @@ int TCPServerDispatcher::maxThreads() const
 }
 
 
-int TCPServerDispatcher::totalConnections() const
+Int64 TCPServerDispatcher::totalConnections() const
 {
 	return _totalConnections;
 }

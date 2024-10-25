@@ -14,7 +14,7 @@
 #include "ODBCTest.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
@@ -29,7 +29,7 @@ using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 
 
@@ -326,8 +326,8 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 		session().setFeature("autoBind", bindValue(k));
 		session().setFeature("autoExtract", bindValue(k+1));
 
-		DynamicAny i = 2;
-		DynamicAny result = 0;
+		Var i = 2;
+		Var result = 0;
 		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
 		assertTrue (4 == result);
 
@@ -389,7 +389,7 @@ void ODBCPostgreSQLTest::dropObject(const std::string& type, const std::string& 
 void ODBCPostgreSQLTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }

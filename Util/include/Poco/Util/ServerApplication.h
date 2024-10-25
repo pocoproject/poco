@@ -24,6 +24,7 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/NamedEvent.h"
 #endif
+#include <functional>
 
 
 namespace Poco {
@@ -122,8 +123,20 @@ class Util_API ServerApplication: public Application
 	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of
 	/// the daemon in a file. The PID file will be removed when the daemon process
 	/// terminates (but not, if it crashes).
+	/// 
+	/// An application can register a callback to be called at termination time.
+	/// An example of the termination callback registration at some point
+	/// during the ServerApplication initialization time:
+	///
+	///     auto tCB = [](const std::string& message)
+	///     {
+	///         std::cout << message << std::endl;
+	///     };
+	///     ServerApplication::registerTerminateCallback(tCB, "custom termination message"s);
 {
 public:
+	using TerminateCallback = std::function<void(const std::string&)>;
+
 	ServerApplication();
 		/// Creates the ServerApplication.
 
@@ -157,6 +170,12 @@ public:
 		/// If the application's main thread is waiting in
 		/// waitForTerminationRequest(), this method will return
 		/// and the application can shut down.
+
+	static void registerTerminateCallback(TerminateCallback tCB,
+		const std::string& message = _terminateMessage);
+		/// Registers a termination callback.
+		/// Used to register a function to be executed when the system
+		/// shutdown starts.
 
 protected:
 	int run();
@@ -207,6 +226,11 @@ private:
 	static SERVICE_STATUS_HANDLE _serviceStatusHandle;
 	static Poco::NamedEvent      _terminate;
 #endif
+
+	static void terminateCallback();
+	inline static std::atomic<bool> _terminationGuard = false;
+	inline static TerminateCallback _terminateCallback = nullptr;
+	inline static std::string       _terminateMessage = "System terminating now!";
 };
 
 

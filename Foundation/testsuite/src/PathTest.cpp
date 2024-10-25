@@ -349,6 +349,9 @@ void PathTest::testParseUnix4()
 	assertTrue (!p.isDirectory());
 	assertTrue (p.isFile());
 	assertTrue (p.toString(Path::PATH_UNIX) == "a/b/c/d");
+
+	p.makeDirectory();
+	assertTrue (p.toString(Path::PATH_UNIX) == "a/b/c/d/");
 }
 
 
@@ -1499,6 +1502,40 @@ void PathTest::testForDirectory()
 
 	p = Path::forDirectory("/usr/local/include/", Path::PATH_UNIX);
 	assertTrue (p.toString(Path::PATH_UNIX) == "/usr/local/include/");
+
+	p = Path::forDirectory("C:", Path::PATH_WINDOWS);
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
+
+	p = Path::forDirectory("C:\\", Path::PATH_WINDOWS);
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
+
+	p = Path::forDirectory("C:\\abc", Path::PATH_WINDOWS);
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\abc\\");
+
+	p = Path::forDirectory("C:\\abc\\", Path::PATH_WINDOWS);
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\abc\\");
+}
+
+
+void PathTest::testAddDirectorySeparator()
+{
+	std::string path = Path::addDirectorySeparator("C:", Path::PATH_WINDOWS);
+	assertTrue (path == "C:\\");
+
+	path = Path::addDirectorySeparator("C:\\", Path::PATH_WINDOWS);
+	assertTrue (path == "C:\\");
+
+	path = Path::addDirectorySeparator("C:\\abc", Path::PATH_WINDOWS);
+	assertTrue (path == "C:\\abc\\");
+
+	path = Path::addDirectorySeparator("C:\\abc\\", Path::PATH_WINDOWS);
+	assertTrue (path == "C:\\abc\\");
+
+	path = Path::addDirectorySeparator("/usr/local/include", Path::PATH_UNIX);
+	assertTrue (path == "/usr/local/include/");
+
+	path = Path::addDirectorySeparator("/usr/local/include/", Path::PATH_UNIX);
+	assertTrue (path == "/usr/local/include/");
 }
 
 
@@ -1672,6 +1709,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testRobustness);
 	CppUnit_addTest(pSuite, PathTest, testParent);
 	CppUnit_addTest(pSuite, PathTest, testForDirectory);
+	CppUnit_addTest(pSuite, PathTest, testAddDirectorySeparator);
 	CppUnit_addTest(pSuite, PathTest, testExpand);
 	CppUnit_addTest(pSuite, PathTest, testListRoots);
 	CppUnit_addTest(pSuite, PathTest, testFind);

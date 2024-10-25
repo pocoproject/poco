@@ -47,7 +47,6 @@ using UInt64  = std::uint64_t;
 using IntPtr  = std::intptr_t;
 using UIntPtr = std::uintptr_t;
 
-
 #if defined(_MSC_VER)
 	#if defined(_WIN64)
 		#define POCO_PTR_IS_64_BIT 1

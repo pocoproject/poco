@@ -603,6 +603,11 @@
     <ClCompile Include="src\ActiveThreadPoolTest.cpp">
       <Filter>Threading\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileStreamRWLockTest.cpp">
+      <Filter>Processes\Source Files</Filter>
+    <ClCompile Include="src\JSONFormatterTest.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AnyTest.h">
@@ -1027,6 +1032,11 @@
     </ClInclude>
     <ClInclude Include="src\ActiveThreadPoolTest.h">
       <Filter>Threading\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileStreamRWLockTest.h">
+      <Filter>Processes\Header Files</Filter>
+    <ClInclude Include="src\JSONFormatterTest.h">
+      <Filter>Logging\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

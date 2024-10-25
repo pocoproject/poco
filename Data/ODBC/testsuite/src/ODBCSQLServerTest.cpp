@@ -14,7 +14,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
@@ -24,6 +24,7 @@
 #include <iostream>
 
 
+using namespace std::string_literals;
 using namespace Poco::Data::Keywords;
 using Poco::Data::DataException;
 using Poco::Data::Statement;
@@ -37,7 +38,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 
 
@@ -63,6 +64,12 @@ using Poco::DateTime;
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
 	#endif
+#endif
+
+#if POCO_DATA_SQL_SERVER_BIG_STRINGS
+	#pragma message ("MS SQLServer ODBC big string capability ENABLED")
+#else
+	#pragma message ("MS SQLServer ODBC big string capability DISABLED")
 #endif
 
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
@@ -190,7 +197,7 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
-		fail (__func__, __LINE__, __FILE__);
+		failmsg(__func__);
 	}
 	catch (DataException&)
 	{
@@ -210,9 +217,161 @@ void ODBCSQLServerTest::testBLOB()
 	try
 	{
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 	catch (DataException&) { }
+}
+
+
+void ODBCSQLServerTest::testBigString()
+{
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+	const int limitSize = 8000, overLimitSize = 16002;
+	std::string lastName(overLimitSize, 'l');
+	std::string firstName(limitSize, 'f');
+	std::string address("Address");
+	int age = 42;
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBigStringTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+		session().setProperty("maxFieldSize", overLimitSize+1);
+		try
+		{
+			session() << "DELETE FROM Person"s, now;
+			session() << "INSERT INTO Person VALUES (?,?,?,?)"s,
+				use(lastName), use(firstName), use(address), use(age), now;
+			lastName.clear();
+			firstName.clear();
+			address.clear();
+			age = 0;
+
+			session() << "SELECT LastName /*VARCHAR(MAX)*/, FirstName /*VARCHAR(8000)*/, Address /*VARCHAR(30)*/, Age FROM Person"s,
+				into(lastName), into(firstName), into(address), into(age), now;
+
+			assertEqual(lastName, std::string(overLimitSize, 'l'));
+			assertEqual(firstName, std::string(limitSize, 'f'));
+			assertEqual(address, "Address"s);
+			assertEqual(age, 42);
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg (__func__);
+		}
+		i += 2;
+	}
+#else
+	std::cout << "SQL Server extensions not enabled.";
+#endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT && POCO_DATA_SQL_SERVER_BIG_STRINGS
+}
+
+
+void ODBCSQLServerTest::testBigStringVector()
+{
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+	const int limitSize = 8000, overLimitSize = 16002, entries = 10;
+	std::string lastName(overLimitSize, 'l');
+	std::vector<std::string> lastNameVec(entries, lastName);
+	std::string firstName(limitSize, 'f');
+	std::vector<std::string> firstNameVec(entries, firstName);
+	std::string address("Address");
+	std::vector<std::string> addressVec(entries, address);
+	int age = 42;
+	std::vector<int> ageVec(10, age);
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBigStringTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+		session().setProperty("maxFieldSize", overLimitSize + 1);
+		try
+		{
+			session() << "DELETE FROM Person"s, now;
+			session() << "INSERT INTO Person VALUES (?,?,?,?)"s,
+				use(lastNameVec), use(firstNameVec), use(addressVec), use(ageVec), now;
+			lastNameVec.clear();
+			firstNameVec.clear();
+			addressVec.clear();
+			ageVec.clear();
+
+			assertEqual(lastNameVec.size(), 0);
+			assertEqual(firstNameVec.size(), 0);
+			assertEqual(addressVec.size(), 0);
+			assertEqual(ageVec.size(), 0);
+
+			session() << "SELECT LastName /*VARCHAR(MAX)*/, FirstName /*VARCHAR(8000)*/, Address /*VARCHAR(30)*/, Age FROM Person"s,
+				into(lastNameVec), into(firstNameVec), into(addressVec), into(ageVec), now;
+
+			assertEqual(lastNameVec.size(), entries);
+			assertEqual(firstNameVec.size(), entries);
+			assertEqual(addressVec.size(), entries);
+			assertEqual(ageVec.size(), entries);
+
+			for (int i = 0; i < entries; ++i)
+			{
+				assertEqual(lastNameVec[i], std::string(overLimitSize, 'l'));
+				assertEqual(firstNameVec[i], std::string(limitSize, 'f'));
+				assertEqual(addressVec[i], "Address"s);
+				assertEqual(ageVec[i], 42);
+			}
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+		i += 2;
+	}
+#else
+	std::cout << "SQL Server extensions not enabled.";
+#endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT && POCO_DATA_SQL_SERVER_BIG_STRINGS
+}
+
+
+void ODBCSQLServerTest::testBigBatch()
+{
+	const std::string query("INSERT INTO Person VALUES('L', 'N', 'A', %d);");
+	std::string bigQuery;
+	// TODO: see what exactly the limits are here
+	int rows = 316, cnt = 0;
+	for (int i = 0; i < rows; ++i)
+	{
+		bigQuery += Poco::format(query, i);
+	}
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBigStringTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+
+		try
+		{
+			session() << bigQuery, now;
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+
+		try
+		{
+			session() << "SELECT COUNT(*) FROM Person", into(cnt), now;
+			assertEqual(rows, cnt);
+		}
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(__func__);
+		}
+
+		i += 2;
+	}
 }
 
 
@@ -483,7 +642,7 @@ void ODBCSQLServerTest::testStoredProcedureAny()
 }
 
 
-void ODBCSQLServerTest::testStoredProcedureDynamicAny()
+void ODBCSQLServerTest::testStoredProcedureDynamicVar()
 {
 	try
 	{
@@ -491,8 +650,8 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 		{
 			session().setFeature("autoBind", bindValue(k));
 
-			DynamicAny i = 2;
-			DynamicAny j = 0;
+			Var i = 2;
+			Var j = 0;
 
 			dropObject("PROCEDURE", "storedProcedure");
 			session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
@@ -519,8 +678,8 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 		}
 		dropObject("PROCEDURE", "storedProcedure");
 	}
-	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
-	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicAny()"); }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("testStoredProcedureDynamicVar()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("testStoredProcedureDynamicVar()"); }
 }
 
 
@@ -682,7 +841,7 @@ void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& n
 void ODBCSQLServerTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL, EmptyDateTime DATETIME NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -703,6 +862,15 @@ void ODBCSQLServerTest::recreatePersonBLOBTable()
 	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
+
+
+void ODBCSQLServerTest::recreatePersonBigStringTable()
+{
+	dropObject("TABLE", "Person");
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(MAX), FirstName VARCHAR(8000), Address VARCHAR(30), Age INTEGER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreatePersonBLOBTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreatePersonBLOBTable()"); }
 }
 
 
@@ -939,6 +1107,9 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigString);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigStringVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigBatch);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
@@ -951,7 +1122,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureAny);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureReturn);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);

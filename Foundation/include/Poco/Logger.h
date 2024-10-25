@@ -130,7 +130,7 @@ public:
 	void log(const Exception& exc);
 		/// Logs the given exception with priority PRIO_ERROR.
 
-	void log(const Exception& exc, const char* file, int line);
+	void log(const Exception& exc, const char* file, LineNumber line);
 		/// Logs the given exception with priority PRIO_ERROR.
 		///
 		/// File must be a static string, such as the value of
@@ -142,8 +142,8 @@ public:
 		/// creates a Message with priority PRIO_FATAL
 		/// and the given message text and sends it
 		/// to the attached channel.
-
-	void fatal(const std::string& msg, const char* file, int line);
+	
+	void fatal(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_FATAL,
 		/// creates a Message with priority PRIO_FATAL
 		/// and the given message text and sends it
@@ -166,7 +166,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void critical(const std::string& msg, const char* file, int line);
+	void critical(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_CRITICAL,
 		/// creates a Message with priority PRIO_CRITICAL
 		/// and the given message text and sends it
@@ -189,7 +189,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void error(const std::string& msg, const char* file, int line);
+	void error(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_ERROR,
 		/// creates a Message with priority PRIO_ERROR
 		/// and the given message text and sends it
@@ -212,7 +212,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void warning(const std::string& msg, const char* file, int line);
+	void warning(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_WARNING,
 		/// creates a Message with priority PRIO_WARNING
 		/// and the given message text and sends it
@@ -235,7 +235,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void notice(const std::string& msg, const char* file, int line);
+	void notice(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_NOTICE,
 		/// creates a Message with priority PRIO_NOTICE
 		/// and the given message text and sends it
@@ -258,7 +258,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void information(const std::string& msg, const char* file, int line);
+	void information(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_INFORMATION,
 		/// creates a Message with priority PRIO_INFORMATION
 		/// and the given message text and sends it
@@ -281,7 +281,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void debug(const std::string& msg, const char* file, int line);
+	void debug(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_DEBUG,
 		/// creates a Message with priority PRIO_DEBUG
 		/// and the given message text and sends it
@@ -304,7 +304,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void trace(const std::string& msg, const char* file, int line);
+	void trace(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_TRACE,
 		/// creates a Message with priority PRIO_TRACE
 		/// and the given message text and sends it
@@ -463,7 +463,7 @@ protected:
 
 	void log(const std::string& text, Message::Priority prio);
 	void logNPC(const std::string& text, Message::Priority prio);
-	void log(const std::string& text, Message::Priority prio, const char* file, int line);
+	void log(const std::string& text, Message::Priority prio, const char* file, LineNumber line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
 	static Logger& parent(const std::string& name);
@@ -799,7 +799,7 @@ inline void Logger::logNPC(const std::string& text, Message::Priority prio)
 }
 
 
-inline void Logger::log(const std::string& text, Message::Priority prio, const char* file, int line)
+inline void Logger::log(const std::string& text, Message::Priority prio, const char* file, LineNumber line)
 {
 	if (_level >= prio && _pChannel)
 	{
@@ -823,7 +823,7 @@ inline void Logger::fatal(const std::string& msg)
 }
 
 
-inline void Logger::fatal(const std::string& msg, const char* file, int line)
+inline void Logger::fatal(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_FATAL, file, line);
 }
@@ -836,7 +836,7 @@ inline void Logger::critical(const std::string& msg)
 }
 
 
-inline void Logger::critical(const std::string& msg, const char* file, int line)
+inline void Logger::critical(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_CRITICAL, file, line);
 }
@@ -848,7 +848,7 @@ inline void Logger::error(const std::string& msg)
 }
 
 
-inline void Logger::error(const std::string& msg, const char* file, int line)
+inline void Logger::error(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_ERROR, file, line);
 }
@@ -860,7 +860,7 @@ inline void Logger::warning(const std::string& msg)
 }
 
 
-inline void Logger::warning(const std::string& msg, const char* file, int line)
+inline void Logger::warning(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_WARNING, file, line);
 }
@@ -872,7 +872,7 @@ inline void Logger::notice(const std::string& msg)
 }
 
 
-inline void Logger::notice(const std::string& msg, const char* file, int line)
+inline void Logger::notice(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_NOTICE, file, line);
 }
@@ -884,7 +884,7 @@ inline void Logger::information(const std::string& msg)
 }
 
 
-inline void Logger::information(const std::string& msg, const char* file, int line)
+inline void Logger::information(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_INFORMATION, file, line);
 }
@@ -896,7 +896,7 @@ inline void Logger::debug(const std::string& msg)
 }
 
 
-inline void Logger::debug(const std::string& msg, const char* file, int line)
+inline void Logger::debug(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_DEBUG, file, line);
 }
@@ -908,7 +908,7 @@ inline void Logger::trace(const std::string& msg)
 }
 
 
-inline void Logger::trace(const std::string& msg, const char* file, int line)
+inline void Logger::trace(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_TRACE, file, line);
 }

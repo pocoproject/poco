@@ -524,6 +524,9 @@ protected:
 	Session session();
 		/// Returns the underlying session.
 
+	void clear() noexcept;
+		/// Clears the statement.
+
 private:
 	const Result& doAsyncExec(bool reset = true);
 		/// Asynchronously executes the statement.

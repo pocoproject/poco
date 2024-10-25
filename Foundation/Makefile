@@ -6,6 +6,10 @@
 
 include $(POCO_BASE)/build/rules/global
 
+ifdef POCO_ENABLE_TRACE
+INCLUDE += -I $(POCO_BASE)/Trace/include/Poco/Trace
+endif
+
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCenter ActiveThreadPool\
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
@@ -19,7 +23,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCent
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
-	Path PatternFormatter PIDFile Process ProcessRunner PurgeStrategy RWLock Random RandomStream \
+	Path PatternFormatter JSONFormatter PIDFile Process ProcessRunner PurgeStrategy RWLock Random RandomStream \
 	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
 	SHA1Engine SHA2Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \
@@ -30,12 +34,12 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCent
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF32Encoding UTF16Encoding UTF8Encoding UTF8String \
 	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UUID UUIDGenerator Void Var VarHolder VarIterator VarVisitor Format Pipe PipeImpl PipeStream SharedMemory \
-	MemoryStream FileStream AtomicCounter DataURIStream DataURIStreamFactory
+	MemoryStream FileStream AtomicCounter DataURIStream DataURIStreamFactory FileStreamRWLock
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil
 
-pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_compile pcre2_config \
+pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_chkdint pcre2_compile pcre2_config \
 	pcre2_context pcre2_convert pcre2_dfa_match pcre2_error pcre2_extuni \
 	pcre2_find_bracket pcre2_jit_compile pcre2_maketables pcre2_match \
 	pcre2_match_data pcre2_newline pcre2_ord2utf pcre2_pattern_info \
@@ -44,11 +48,14 @@ pcre_objects = pcre2_auto_possess pcre2_chartables pcre2_compile pcre2_config \
 
 pcre_utf8_objects = pcre2_ucd pcre2_tables
 
+utf8proc_objects = utf8proc
+
 ifdef POCO_UNBUNDLED
-	SYSLIBS += -lpcre2-8 -lz
+	SYSLIBS += -lpcre2-8 -lutf8proc -lz
 	objects += $(pcre_utf8_objects)
 else
-	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
+	COMMONFLAGS += -DUTF8PROC_STATIC
+	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(utf8proc_objects)
 endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
@@ -60,6 +67,9 @@ endif
 target         = PocoFoundation
 target_version = $(LIBVERSION)
 target_libs    =
+ifdef POCO_ENABLE_TRACE
+target_libs   += PocoTrace
+endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
     $(shell cd src; $(WINDMC) pocomsg.mc)

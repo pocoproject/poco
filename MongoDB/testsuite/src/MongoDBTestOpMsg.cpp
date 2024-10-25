@@ -60,7 +60,7 @@ void MongoDBTest::testOpCmdUUID()
 		Document::Ptr doc = response.documents()[0];
 		try
 		{
-			std::string name = doc->get<std::string>("name");
+			const auto& name = doc->get<std::string>("name");
 			assertEquals ("Barcelona", name );
 
 			Binary::Ptr uuidBinary = doc->get<Binary::Ptr>("uuid");
@@ -194,14 +194,14 @@ void MongoDBTest::testOpCmdFind()
 
 		try
 		{
-			std::string lastname = doc->get<std::string>("lastname");
+			const auto& lastname = doc->get<std::string>("lastname");
 			assertEquals ("Braem", lastname);
-			std::string firstname = doc->get<std::string>("firstname");
+			const auto& firstname = doc->get<std::string>("firstname");
 			assertEquals ("Franky", firstname);
-			Poco::Timestamp birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
+			const auto& birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
 			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
-			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
+			const auto& lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
 			assertTrue (doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
 			assertEquals (false, active);

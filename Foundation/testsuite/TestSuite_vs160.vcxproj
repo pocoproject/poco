@@ -663,6 +663,7 @@
     <ClCompile Include="src\FileChannelTest.cpp" />
     <ClCompile Include="src\FileStreamTest.cpp" />
     <ClCompile Include="src\FilesystemTestSuite.cpp" />
+    <ClCompile Include="src\FileStreamRWLockTest.cpp" />
     <ClCompile Include="src\FileTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\FoundationTestSuite.cpp" />
@@ -674,6 +675,7 @@
     <ClCompile Include="src\HashTableTest.cpp" />
     <ClCompile Include="src\HexBinaryTest.cpp" />
     <ClCompile Include="src\HMACEngineTest.cpp" />
+    <ClCompile Include="src\JSONFormatterTest.cpp" />
     <ClCompile Include="src\LinearHashTableTest.cpp" />
     <ClCompile Include="src\LineEndingConverterTest.cpp" />
     <ClCompile Include="src\ListMapTest.cpp" />
@@ -805,7 +807,9 @@
     <ClInclude Include="src\FIFOEventTest.h" />
     <ClInclude Include="src\FileChannelTest.h" />
     <ClInclude Include="src\FileStreamTest.h" />
+    <ClInclude Include="src\FileStreamRWLockTest.h" />
     <ClInclude Include="src\FilesystemTestSuite.h" />
+    <ClInclude Include="src\FilesystemRWLockTest.h" />
     <ClInclude Include="src\FileTest.h" />
     <ClInclude Include="src\FormatTest.h" />
     <ClInclude Include="src\FoundationTestSuite.h" />
@@ -817,6 +821,7 @@
     <ClInclude Include="src\HashTableTest.h" />
     <ClInclude Include="src\HexBinaryTest.h" />
     <ClInclude Include="src\HMACEngineTest.h" />
+    <ClInclude Include="src\JSONFormatterTest.h" />
     <ClInclude Include="src\LinearHashTableTest.h" />
     <ClInclude Include="src\LineEndingConverterTest.h" />
     <ClInclude Include="src\ListMapTest.h" />

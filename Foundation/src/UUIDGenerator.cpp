@@ -24,8 +24,12 @@
 namespace Poco {
 
 
-UUIDGenerator::UUIDGenerator(): _ticks(0), _haveNode(false)
+UUIDGenerator::UUIDGenerator(): 
+	_ticks(0), 
+	_counter(0),
+	_haveNode(false)
 {
+	seed();
 }
 
 
@@ -37,6 +41,18 @@ UUIDGenerator::~UUIDGenerator()
 UUID UUIDGenerator::create()
 {
 	FastMutex::ScopedLock lock(_mutex);
+
+	// 0                   1                   2                   3
+	// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                           time_low                            |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |           time_mid            |  ver  |       time_high       |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |var|         clock_seq         |             node              |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                              node                             |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 	if (!_haveNode)
 	{
@@ -99,6 +115,88 @@ UUID UUIDGenerator::createRandom()
 }
 
 
+UUID UUIDGenerator::createOne()
+{
+	try
+	{
+		return create();
+	}
+	catch (Exception&)
+	{
+		return createRandom();
+	}
+}
+
+
+UUID UUIDGenerator::createV6()
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	// 0                   1                   2                   3
+	// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                           time_high                           |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |           time_mid            |  ver  |       time_low        |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |var|         clock_seq         |             node              |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                              node                             |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	if (!_haveNode)
+	{
+		try
+		{
+			Environment::nodeId(_node);
+			_haveNode = true;
+		}
+		catch (Poco::Exception&)
+		{
+			RandomInputStream ris;
+			ris.read(reinterpret_cast<char*>(_node), sizeof(_node));
+		}
+	}
+	Timestamp::UtcTimeVal tv = timeStamp();
+	UInt32 timeHigh = UInt32((tv >> 28) & 0xFFFFFFFF);
+	UInt16 timeMid = UInt16((tv >> 12) & 0xFFFF);
+	UInt16 timeLoAndVersion = UInt16(tv & 0x0FFF) + (UUID::UUID_TIME_BASED_V6 << 12);
+	UInt16 clockSeq = (UInt16(_random.next() >> 4) & 0x3FFF) | 0x8000;
+	return UUID(timeHigh, timeMid, timeLoAndVersion, clockSeq, _node);
+}
+
+
+UUID UUIDGenerator::createV7()
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	//  0                   1                   2                   3
+	//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                           unix_ts_ms                          |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |          unix_ts_ms           |  ver  |       rand_a          |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |var|                        rand_b                             |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                            rand_b                             |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+	if (_counter == 0) _counter = static_cast<Poco::UInt16>(_random.next(4096));
+
+	Timestamp::TimeVal tv = Poco::Timestamp().epochMicroseconds()/1000;
+	UInt32 timeHigh = UInt32((tv >> 16) & 0xFFFFFFFF);
+	UInt16 timeMid = UInt16(tv & 0xFFFF);
+	UInt16 randAVersion = (_counter++ & 0x0FFF) + (UUID::UUID_TIME_BASED_V7 << 12);
+	UInt16 randBHiVar = (UInt16(_random.next() >> 4) & 0x3FFF) | 0x8000;
+	Poco::UInt8 randBLow[6];
+	RandomInputStream ris;
+	ris.read(reinterpret_cast<char*>(randBLow), sizeof(randBLow));
+	return UUID(timeHigh, timeMid, randAVersion, randBHiVar, randBLow);
+}
+
+
 Timestamp::UtcTimeVal UUIDGenerator::timeStamp()
 {
 	Timestamp now;
@@ -119,19 +217,6 @@ Timestamp::UtcTimeVal UUIDGenerator::timeStamp()
 	}
 	Timestamp::UtcTimeVal tv = now.utcTime();
 	return tv + _ticks;
-}
-
-
-UUID UUIDGenerator::createOne()
-{
-	try
-	{
-		return create();
-	}
-	catch (Exception&)
-	{
-		return createRandom();
-	}
 }
 
 

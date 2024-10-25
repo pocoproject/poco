@@ -21,7 +21,11 @@
 #include "Poco/Foundation.h"
 #include "Poco/Ascii.h"
 #include <cstring>
+#if !defined(POCO_NO_WSTRING)
+#include <cwchar>
+#endif
 #include <algorithm>
+
 
 // ignore loop unrolling warnings in this file
 #if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
@@ -29,7 +33,42 @@
 #	pragma clang diagnostic ignored "-Wpass-failed"
 #endif
 
+
 namespace Poco {
+
+
+template <typename C>
+std::size_t cstrlen(const C* str)
+	/// Returns the length of a zero-terminated C string.
+	/// For char and wchar_t based strings, overloads are
+	/// provided that call strlen() and wcslen().
+{
+	const C* end = str;
+    while (*end) ++end;
+    return end - str;
+}
+
+
+inline std::size_t cstrlen(const char* str)
+	/// Returns the length of a zero-terminated C string.
+	/// This implementation calls std::strlen().
+{
+	return std::strlen(str);
+}
+
+
+#if !defined(POCO_NO_WSTRING)
+
+
+inline std::size_t cstrlen(const wchar_t* str)
+	/// Returns the length of a zero-terminated C string.
+	/// This implementation calls std::wcslen().
+{
+	return std::wcslen(str);
+}
+
+
+#endif
 
 
 template <class S>
@@ -494,7 +533,7 @@ S& replaceInPlace(S& str, const typename S::value_type* from, const typename S::
 
 	S result;
 	typename S::size_type pos = 0;
-	typename S::size_type fromLen = std::strlen(from);
+	typename S::size_type fromLen = cstrlen(from);
 	result.append(str, 0, start);
 	do
 	{
@@ -763,10 +802,24 @@ struct CILess
 };
 
 
+template <typename T>
+void secureClear(T& str)
+	/// Securely clears a string's contents by first overwriting
+	/// the entire buffer (up to capacity) with zeroes, then
+	/// clearing the string.
+{
+	str.resize(str.capacity());
+	std::fill(str.begin(), str.end(), typename T::value_type());
+	str.clear();
+}
+
+
 } // namespace Poco
+
 
 #if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
 #	pragma clang diagnostic pop
 #endif
+
 
 #endif // Foundation_String_INCLUDED

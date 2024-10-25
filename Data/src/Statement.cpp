@@ -70,28 +70,35 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_parseError(std::move(stmt._parseError)),
 #endif
 	_pImpl(std::move(stmt._pImpl)),
-	_async(std::move(stmt._async)),
+	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
 	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
 	_pRowFormatter(std::move(stmt._pRowFormatter)),
 	_stmtString(std::move(stmt._stmtString))
 {
-	stmt._pImpl = nullptr;
-	stmt._async = false;
-	stmt._pResult = nullptr;
-	stmt._pAsyncExec = nullptr;
-	stmt._arguments.clear();
-	stmt._pRowFormatter = nullptr;
-	_stmtString.clear();
-#ifndef POCO_DATA_NO_SQL_PARSER
-	_parseError.clear();
-#endif
+	stmt.clear();
 }
 
 
 Statement::~Statement()
 {
+}
+
+
+void Statement::clear() noexcept
+{
+	_pImpl.reset();
+	_async = false;
+	_pResult = nullptr;
+	_pAsyncExec = nullptr;
+	_arguments.clear();
+	_pRowFormatter = nullptr;
+	_stmtString.clear();
+#ifndef POCO_DATA_NO_SQL_PARSER
+	_pParseResult = nullptr;
+	_parseError.clear();
+#endif
 }
 
 
@@ -123,7 +130,7 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 	_pRowFormatter = std::move(stmt._pRowFormatter);
 	stmt._pRowFormatter = nullptr;
 	_stmtString = std::move(stmt._stmtString);
-	_stmtString.clear();
+	stmt._stmtString.clear();
 
 	return *this;
 }

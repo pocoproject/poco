@@ -25,8 +25,8 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/StringTokenizer.h"
+#include "Poco/String.h"
 
-#include <iostream>
 
 namespace
 {
@@ -108,13 +108,17 @@ const std::string HTTPDigestCredentials::NC_PARAM("nc");
 int HTTPDigestCredentials::_nonceCounter(0);
 Poco::FastMutex HTTPDigestCredentials::_nonceMutex;
 
-class HTTPDigestCredentials::DigestEngineProvider {
+
+class HTTPDigestCredentials::DigestEngineProvider 
+{
 public:
-	DigestEngineProvider(std::string algorithm): _algorithm(algorithm) {
+	DigestEngineProvider(std::string algorithm): _algorithm(algorithm) 
+	{
 		_isSessionAlgorithm = _algorithm.find("sess") != std::string::npos;
 	}
 
-	DigestEngine& engine() {
+	DigestEngine& engine() 
+	{
 		if (icompare(_algorithm, SHA_ALGORITHM) == 0 || icompare(_algorithm, SHA_SESS_ALGORITHM) == 0)
 		{
 			return _sha1Engine;
@@ -122,21 +126,26 @@ public:
 		if (icompare(_algorithm, SHA_256_ALGORITHM) == 0 || icompare(_algorithm, SHA_256_SESS_ALGORITHM) == 0)
 		{
 			return _sha256Engine;
-		} else if (icompare(_algorithm, SHA_512_256_ALGORITHM) == 0 || icompare(_algorithm, SHA_512_256_SESS_ALGORITHM) == 0)
+		} 
+		else if (icompare(_algorithm, SHA_512_256_ALGORITHM) == 0 || icompare(_algorithm, SHA_512_256_SESS_ALGORITHM) == 0)
 		{
 			return _sha512_256Engine;
-		} else if (icompare(_algorithm, SHA_512_ALGORITHM) == 0 || icompare(_algorithm, SHA_512_SESS_ALGORITHM) == 0)
+		} 
+		else if (icompare(_algorithm, SHA_512_ALGORITHM) == 0 || icompare(_algorithm, SHA_512_SESS_ALGORITHM) == 0)
 		{
 			return _sha512;
 		}
-		else {
+		else 
+		{
 			return _md5Engine;
 		}
 	}
 
-	bool isSessionAlgorithm() {
+	bool isSessionAlgorithm() 
+	{
 		return _isSessionAlgorithm;
 	}
+
 private:
 	std::string _algorithm;
 	SHA1Engine _sha1Engine;
@@ -146,6 +155,7 @@ private:
 	SHA2Engine _sha512 { SHA2Engine::ALGORITHM::SHA_512 };
 	bool _isSessionAlgorithm;
 };
+
 
 HTTPDigestCredentials::HTTPDigestCredentials()
 {
@@ -161,6 +171,7 @@ HTTPDigestCredentials::HTTPDigestCredentials(const std::string& username, const 
 
 HTTPDigestCredentials::~HTTPDigestCredentials()
 {
+	clear();
 }
 
 
@@ -185,8 +196,8 @@ void HTTPDigestCredentials::setPassword(const std::string& password)
 
 void HTTPDigestCredentials::clear()
 {
-	_username.clear();
-	_password.clear();
+	Poco::secureClear(_username);
+	Poco::secureClear(_password);
 }
 
 
@@ -404,6 +415,7 @@ int HTTPDigestCredentials::updateNonceCounter(const std::string& nonce)
 	return iter->second;
 }
 
+
 bool HTTPDigestCredentials::isAlgorithmSupported(const std::string& algorithm) const
 {
 	bool isAlgorithmSupported = std::find_if(std::begin(SUPPORTED_ALGORITHMS),
@@ -415,5 +427,6 @@ bool HTTPDigestCredentials::isAlgorithmSupported(const std::string& algorithm) c
 
 	return isAlgorithmSupported;
 }
+
 
 } } // namespace Poco::Net

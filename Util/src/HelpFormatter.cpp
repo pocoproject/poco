@@ -180,6 +180,7 @@ void HelpFormatter::formatOption(std::ostream& ostr, const Option& option, int w
 		n += (int) shortPrefix().length() + (int) option.shortName().length();
 		if (option.takesArgument())
 		{
+			ostr << ' ';
 			if (!option.argumentRequired()) { ostr << '['; ++n; }
 			ostr << option.argumentName();
 			n += (int) option.argumentName().length();

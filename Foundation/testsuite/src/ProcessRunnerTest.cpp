@@ -111,11 +111,11 @@ void ProcessRunnerTest::testProcessRunner()
 		assertTrue (pr.cmdLine() == cmdLine(cmd, args));
 		assertFalse (pr.running());
 		pr.start();
-		
+
 		Stopwatch sw; sw.start();
 		while (!pr.running())
 			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
-		
+
 		assertTrue (pr.running());
 		try
 		{
@@ -264,6 +264,42 @@ void ProcessRunnerTest::testProcessRunner()
 		}
 		assertTrue (!File(pidFile).exists());
 	}
+
+	// non-existent executable with no PID file created
+	{
+		std::string cmd = "nonexistent_123-xyz";
+		std::vector<std::string> args;
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
+		{
+			std::unique_ptr<ProcessRunner> pr;
+			try
+			{
+				pr.reset(new ProcessRunner(cmd, args));
+				failmsg("ProcessRunner should throw an exception.");
+			} catch(const Poco::FileException& e) {}
+		}
+		assertTrue (!File(pidFile).exists());
+	}
+
+	// non-existent executable with PID file created
+	{
+		std::string cmd = "nonexistent_123-xyz";
+		std::vector<std::string> args;
+		char c = Path::separator();
+		std::string pidFile = Poco::format("run%c%s.pid", c, name);
+		args.push_back(std::string("-p=").append(pidFile));
+		{
+			std::unique_ptr<ProcessRunner> pr;
+			try
+			{
+				pr.reset(new ProcessRunner(cmd, args));
+				failmsg("ProcessRunner should throw an exception.");
+			} catch(const Poco::FileException& e) {}
+		}
+		assertTrue (!File(pidFile).exists());
+	}
+
 #if defined(POCO_OS_FAMILY_UNIX)
 	// start process launching multiple threads
 	{
@@ -312,7 +348,7 @@ std::string ProcessRunnerTest::cmdLine(const std::string& cmd, const ProcessRunn
 }
 
 
-void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg, int timeoutMS, int line)
+void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg, int timeoutMS, LineNumber line)
 {
 	if (sw.elapsedSeconds()*1000 > timeoutMS)
 	{

@@ -5,7 +5,8 @@
 /* This file was automatically written by the pcre2_dftables auxiliary
 program. It contains character tables that are used when no external
 tables are passed to PCRE2 by the application that calls it. The tables
-are used only for characters whose code values are less than 256. */
+are used only for characters whose code values are less than 256, and
+only relevant if not in UCP mode. */
 
 /* This set of tables was written in the C locale. */
 
@@ -160,7 +161,7 @@ graph, print, punct, and cntrl. Other classes are built from combinations. */
   0x02   letter
   0x04   lower case letter
   0x08   decimal digit
-  0x10   alphanumeric or '_'
+  0x10   word (alphanumeric or '_')
 */
 
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, /*   0-  7 */

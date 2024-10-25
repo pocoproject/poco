@@ -18,7 +18,9 @@
 #include "Poco/Thread.h"
 #include <fstream>
 #include <set>
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <Windows.h>
+#endif
 
 using Poco::File;
 using Poco::TemporaryFile;
@@ -189,6 +191,61 @@ void FileTest::testCreateFile()
 	assertTrue (!f.isHidden());
 	created = f.createFile();
 	assertTrue (!created);
+}
+
+
+void FileTest::testExists()
+{
+	assertFalse (File("").exists());
+	{
+		File f("testfile.dat");
+		f.createFile();
+		assertTrue (f.exists());
+		assertTrue (f.existsAnywhere());
+		assertFalse (f.canExecute());
+	}
+
+	{
+		File f("/testfile.dat");
+		assertFalse (f.exists());
+		assertFalse (f.existsAnywhere());
+		assertFalse (f.canExecute());
+	}
+
+	{
+#if defined(POCO_OS_FAMILY_UNIX)
+		File f("echo");
+		File f2("/dev/null");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+		std::string buffer(MAX_PATH, 0);
+		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
+		if (r)
+		{
+			Path p(buffer);
+			p.makeDirectory().makeAbsolute().makeParent();
+			buffer = p.toString();
+			buffer.append("win.ini");
+		}
+		else
+		{
+			buffer = R"(c:\windows\win.ini)";
+		}
+		File f("cmd.exe");
+		File f2(buffer);
+
+		File f3("cmd");
+		assertTrue (f3.canExecute());
+        File f4("cmd-nonexistent");
+        assertFalse (f4.canExecute());
+#endif
+		assertFalse (f.exists());
+		assertTrue (f.existsAnywhere());
+		assertTrue (f.canExecute());
+
+		assertTrue (f2.exists());
+		assertTrue (f2.existsAnywhere());
+		assertFalse (f2.canExecute());
+	}
 }
 
 
@@ -660,6 +717,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
 
 	CppUnit_addTest(pSuite, FileTest, testCreateFile);
+	CppUnit_addTest(pSuite, FileTest, testExists);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);

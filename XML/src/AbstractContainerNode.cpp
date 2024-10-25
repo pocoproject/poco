@@ -51,8 +51,8 @@ AbstractContainerNode::~AbstractContainerNode()
 	{
 		AbstractNode* pDelNode = pChild;
 		pChild = pChild->_pNext;
-		pDelNode->_pNext   = 0;
-		pDelNode->_pParent = 0;
+		pDelNode->_pNext   = nullptr;
+		pDelNode->_pParent = nullptr;
 		pDelNode->release();
 	}
 }
@@ -89,8 +89,8 @@ Node* AbstractContainerNode::insertBefore(Node* newChild, Node* refChild)
 	if (this == newChild)
 		throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 
-	AbstractNode* pFirst = 0;
-	AbstractNode* pLast  = 0;
+	AbstractNode* pFirst = nullptr;
+	AbstractNode* pLast  = nullptr;
 	if (newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
 	{
 		AbstractContainerNode* pFrag = static_cast<AbstractContainerNode*>(newChild);
@@ -105,7 +105,7 @@ Node* AbstractContainerNode::insertBefore(Node* newChild, Node* refChild)
 			}
 			pLast->_pParent = this;
 		}
-		pFrag->_pFirstChild = 0;
+		pFrag->_pFirstChild = nullptr;
 	}
 	else
 	{
@@ -165,8 +165,8 @@ Node* AbstractContainerNode::insertAfterNP(Node* newChild, Node* refChild)
     if (this == newChild)
         throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 
-    AbstractNode* pFirst = 0;
-    AbstractNode* pLast  = 0;
+    AbstractNode* pFirst = nullptr;
+    AbstractNode* pLast  = nullptr;
     if (newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
     {
         AbstractContainerNode* pFrag = static_cast<AbstractContainerNode*>(newChild);
@@ -181,7 +181,7 @@ Node* AbstractContainerNode::insertAfterNP(Node* newChild, Node* refChild)
             }
             pLast->_pParent = this;
         }
-        pFrag->_pFirstChild = 0;
+        pFrag->_pFirstChild = nullptr;
     }
     else
     {
@@ -259,8 +259,8 @@ Node* AbstractContainerNode::replaceChild(Node* newChild, Node* oldChild)
 			}
 			static_cast<AbstractNode*>(newChild)->_pNext   = static_cast<AbstractNode*>(oldChild)->_pNext;
 			static_cast<AbstractNode*>(newChild)->_pParent = this;
-			_pFirstChild->_pNext   = 0;
-			_pFirstChild->_pParent = 0;
+			_pFirstChild->_pNext   = nullptr;
+			_pFirstChild->_pParent = nullptr;
 			_pFirstChild = static_cast<AbstractNode*>(newChild);
 			if (doEvents)
 			{
@@ -283,8 +283,8 @@ Node* AbstractContainerNode::replaceChild(Node* newChild, Node* oldChild)
 				}
 				static_cast<AbstractNode*>(newChild)->_pNext   = static_cast<AbstractNode*>(oldChild)->_pNext;
 				static_cast<AbstractNode*>(newChild)->_pParent = this;
-				static_cast<AbstractNode*>(oldChild)->_pNext   = 0;
-				static_cast<AbstractNode*>(oldChild)->_pParent = 0;
+				static_cast<AbstractNode*>(oldChild)->_pNext   = nullptr;
+				static_cast<AbstractNode*>(oldChild)->_pParent = nullptr;
 				pCur->_pNext = static_cast<AbstractNode*>(newChild);
 				if (doEvents)
 				{
@@ -315,8 +315,8 @@ Node* AbstractContainerNode::removeChild(Node* oldChild)
 			static_cast<AbstractNode*>(oldChild)->dispatchNodeRemovedFromDocument();
 		}
 		_pFirstChild = _pFirstChild->_pNext;
-		static_cast<AbstractNode*>(oldChild)->_pNext   = 0;
-		static_cast<AbstractNode*>(oldChild)->_pParent = 0;
+		static_cast<AbstractNode*>(oldChild)->_pNext   = nullptr;
+		static_cast<AbstractNode*>(oldChild)->_pParent = nullptr;
 	}
 	else
 	{
@@ -330,8 +330,8 @@ Node* AbstractContainerNode::removeChild(Node* oldChild)
 				static_cast<AbstractNode*>(oldChild)->dispatchNodeRemovedFromDocument();
 			}
 			pCur->_pNext = pCur->_pNext->_pNext;
-			static_cast<AbstractNode*>(oldChild)->_pNext   = 0;
-			static_cast<AbstractNode*>(oldChild)->_pParent = 0;
+			static_cast<AbstractNode*>(oldChild)->_pNext   = nullptr;
+			static_cast<AbstractNode*>(oldChild)->_pParent = nullptr;
 		}
 		else throw DOMException(DOMException::NOT_FOUND_ERR);
 	}
@@ -373,7 +373,7 @@ void AbstractContainerNode::dispatchNodeInsertedIntoDocument()
 
 bool AbstractContainerNode::hasChildNodes() const
 {
-	return _pFirstChild != 0;
+	return _pFirstChild != nullptr;
 }
 
 
@@ -516,7 +516,7 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 			while (it != end && *it != '/' && *it != '[') key += *it++;
 
 			XMLString::const_iterator itStart(it);
-			const Node* pFound = 0;
+			const Node* pFound = nullptr;
 			const Node* pElem = findElement(key, pNode->firstChild(), pNSMap);
 			while (!pFound && pElem)
 			{

@@ -87,7 +87,7 @@ public:
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
-	[[deprecated("use `bool accepts(const Notification::Ptr&)` instead")]]
+	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead")
 	bool accepts(Notification* pNf, const char* pName) const
 	{
 		return (!pName || pNf->name() == pName) && (dynamic_cast<N*>(pNf) != nullptr);

@@ -40,7 +40,7 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 if (NOT POCO_STATIC)
-    add_definitions(-DTHREADSAFE)
+    add_compile_definitions(THREADSAFE)
 endif (NOT POCO_STATIC)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )

@@ -102,8 +102,13 @@ namespace Poco {
 		return helper.message();
 	}
 
-
 #endif
+
+
+std::string Error::getLastMessage()
+{
+	return getMessage(last());
+}
 
 
 } // namespace Poco
