@@ -250,7 +250,7 @@ to do build POCO C++ Libraries on any platform with any compiler. CMake is a met
 generate native makefiles and workspaces that can be used in the compiler environment of
 your choice. For a quick overview see http://cgold.readthedocs.io/en/latest/overview/cmake-can.html
 
-POCO C++ Libraries requires CMake 3.2 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
+POCO C++ Libraries requires CMake 3.15 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
 
 CMake supports out of source builds and this is the recommended way to build POCO C++ Libraries using CMake.
 
