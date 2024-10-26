@@ -1,6 +1,168 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.14.0 (2024-MM-DD)
+===========================
+
+Summary of Changes:
+
+TODO: generated with the script from all issues and PR for "Release 1.14.0".
+      List needs to be edited.
+
+Breaking Changes:
+
+- GH #4426 Remove deprecated code
+
+Security Fixes:
+
+- GH #4690 Net: stack-buffer-overflow if HTTP request contains a header with invalid UTF32 sequence
+- GH #4687 Net::MailMessage: Double free if Content-Disposition header is empty
+- GH #4665 Upgrade bundled libexpat to 2.6.3
+- GH #4629 XML: fuzzing stack overflow
+- GH #4623 Poco::Zip library should check consistency of archives before extracting
+- GH #4582 Update of libpng and zlib in component PDF
+- GH #4123 DoS vulnerability in XML/src/xmlparse.cpp
+- PR #4683 Bundled expat version 2.6.3
+- PR #4678 pcre2: Version 10.44 (#4478)
+- PR #4677 libpng version 1.6.43
+
+Features, Enhancements and Third Party Updates:
+
+- GH #4712 Error code for pthread_mutex_lock failure
+- GH #4710 UTF8::normalize()
+- GH #4680 Poco::Path::forDirectory("C:") throws if the path is disk-letter only
+- GH #4669 Upgrade JSON parser
+- GH #4556 Overriding SocketReactor::run() is not reasonably possible
+- GH #4553 Poco::Logger can not output __FILE__ and __LINE__
+- GH #4544 The load balancing issue in Poco::ActiveThreadPool
+- GH #4502 Optional and Nullable Improvements
+- GH #4478 Upgrade bundled PCRE2 to 10.44
+- GH #4442 CppParser: Support unions
+- GH #4431 Consolidate LogFile implementation to use FileOutputStream
+- GH #4423 `Dynamic::Var` silently loses precision on int->float conversion
+- GH #4366 `Session::open()` has no timeout parameter
+- GH #4230 Poco::Data fixes and improvements
+- GH #3997 operator<<() for SocketAddress doesn't work with ADL
+- GH #3656 Parse json into specified descendant class
+- GH #2808 Failed to insert Poco::Nullable< Poco::Data::Date> data into MSSQL using ODBC
+- GH #2800 MySQL session obtained from SessionPool uses invalid encoding
+- GH #1540 Poco::DateTime uses assertions for validation
+- GH #4716 Logging: JSONFormatter
+- GH #4692 Stacktrace
+- GH #4643 `ServerApplication` callbacks
+- GH #4632 Add `prebuild` action to make build
+- GH #4630 Make `Util::Application::getApplicationPath()` and `findAppConfigFile()` protected
+- GH #4580 Poco::UUID/UUIDGenerator: add support for Version 6 and Version 7 UUIDs
+- GH #4559 ServerApplication has no pidfile option on windows
+- GH #4536 Serializable Isolation level for SQLite Databases
+- GH #4529 SQLChannel stops logging on LoggingSubsystem shutdown
+- GH #4493 PocoDoc: search support
+- GH #4447 Add checkers for Any holding nullptr
+- GH #4414 Improve NotificationCenter speed and usability
+- GH #4413 StreamCopier range support
+- GH #4409 Add string_view format type spec
+- GH #4387 Make TypeHandler far more usable
+- GH #4365 `Poco::Data::Statement`: unified '?' placeholder support
+- GH #4341 1.12.4 version Json set enum value failed
+- GH #4324 Poco:Data::ODBC - MSSQL (n)varchar(max) length issue
+- GH #4001 Question. INSERT NULL (using BULK-feature)
+- GH #3281 DTLS 1.2 support
+- GH #1308 Support YAML-style configuration files in Util
+- GH #4388 Windows CMake 3.10 or newer: Building with POCO_DISABLE_INTERNAL_OPENSSL=OFF does not work
+- PR #4738 fix(ODBC): Poco:Data::ODBC - MSSQL (n)varchar(max) length issue #4324
+- PR #4724 Hide zlib and expat libs from the user of Poco libraries (replaces #4579)
+- PR #4714 Add missing relational operators to VarIterator
+- PR #4700 enh(Nullable, Optional): reimplement using std::optional (#4502)
+- PR #4699 Apply patches from Debian packaging
+- PR #4693 Serializable Isolation level for SQLite Databases
+- PR #4681 zlib: Version 1.3.1 in module PDF (#4582)
+- PR #4676 SQLite: version 3.46.1
+- PR #4640 Poco::DateTime uses assertions for validation #1540
+- PR #4624 enh(Poco::ActiveThreadPool): make it easy to use correctly
+- PR #4621 enh(FileStream): Add FileStreamBuf::resizeBuffer
+- PR #4617 enh(CI): Add unbundled build on Linux.
+- PR #4616 Cppunit and data test enhancements
+- PR #4579 RFC: Hide zlib and expat libs from the user of Poco libraries
+- PR #4578 (fix #4536) SQLite transaction isolation support
+- PR #4569 Allow ADL for swapping Optional values
+- PR #4563 enh(MongoDB): Document::get returns value by const reference
+- PR #4555 fix #4553
+- PR #3040 HTTPS proxy support
+- PR #3000 Set custom active port in FTPClientSession
+- PR #4734 File lock
+- PR #4717 Logging: JSONFormatter
+- PR #4715 Add UTF8String::normalize()
+- PR #4424 Allow using Poco::FileStream to wrap arbitrary file handles/descriptors as C++ streams
+- PR #3444 Allow using `Poco::FileStream` to wrap arbitrary file handles/descriptors as C++ streams
+- PR #2822 Add possibility to add custom headers through HTTPStreamFactory
+- PR #4685 CMake: Remove possibility to build with internal OpenSSL
+
+Bug Fixes and Improvements:
+
+- GH #4742 Poco does not build on AIX
+- GH #4722 libcxx: error: implicit instantiation of undefined template 'std::char_traits<unsigned char>'
+- GH #4713 replaceInPlace std::wstring
+- GH #4711 Poco::Placeholder initialization uses wrong size
+- GH #4703 File Channel Logs in UTC Despite ‘times = local’
+- GH #4695 Build error with GCC-15 (class Poco::PriorityDelegate<TObj, void, true>’ has no member named ‘_pTarget’)
+- GH #4689 SMTPClientSession: replace bare newlines in message content with CRLF.
+- GH #4668 Cross-module exception issue with pre-compiler define _HAS_EXCEPTIONS=0 used in an application
+- GH #4664 HTTPCookie Constructor Fails to Handle Discard Attribute Properly
+- GH #4648 ProcessRunner erases its PID file name
+- GH #4644 TryParse scoped ipv6 addressess for addresses enclosed in [  ]
+- GH #4634 Poco::ActiveThreadPool _targetCompleted event never reset
+- GH #4610 Incorrect setting of ciphersuites for TLSv1.3
+- GH #4592 Significant performance degradation of Poco::DateTimeParser
+- GH #4586 MacOS ARM64 build error: symbol `fdopen` is duplicated defined
+- GH #4585 MacOS ARM64 build warning: 'OS_CODE' macro redefined
+- GH #4557 NestedDiagnosticContext should be thread local
+- GH #4540 Postgres CMakeList.txt
+- GH #4535 decodeWord adds spaces at folding borders, when there are special characters encoded
+- GH #4525 RecordSet issue since 1.10.0
+- GH #4503 GitHub runner: Linux thread sanitizer tests fail with "unexpected memory mapping"
+- GH #4482 ProcessRunner does not detect launch errors
+- GH #4395 There is no way to resolve host in advance and connect to HTTPS server with SNI.
+- GH #4368 fix Oracle failing ODBC tests
+- GH #3957 [question] Usage of `ProcessHandleImpl::wait()` in Unix implemention
+- GH #3913 Missing sources in release package - buildwin.ps1 and NetSSL_Win
+- GH #3896 TryParse scoped ipv6 addressess
+- GH #3815 Poco can be built with ENABLE_UTIL=ON and ENABLE_XML=OFF, but use of Poco::Util requires Poco::XML
+- GH #3496 POCO mysql get emoji from database, return always ???
+- GH #3304 Windows Eventviewer not able to find PocoFoundation DLL
+- GH #3180 Poco::Environment::osDisplayName
+- GH #3132 Poco::MemoryInputStream seek issue
+- GH #2971 Poco::NamedEvent does not release System V semaphore on Linux
+- GH #2439 Issue with log purging when FileChannel compression is enabled
+- PR #4747 Version 1.14: Updated release files
+- PR #4737 fix(cmake): fix Data::PostgreSQL target include, remove unnecessary cmake modules.
+- PR #4727 GitHub runner ubuntu 24.04 and resolve some issues
+- PR #4726 Explicitly define conditional LOB constructors for const (w)string &
+- PR #4725 Exception (VS): static assert to make sure that _HAS_EXCEPTIONS is set
+- PR #4721 fix(Data::ODBC): use connection and login timeouts in ODBC session implementation
+- PR #4702 SimpleRowFormatter.h: fix the build on `gcc-15` (unsatisfied `noexcept`)
+- PR #4688 Fix double free in Net::MailMessage if Content-Disposition header is empty
+- PR #4674 4557 ndc thread local
+- PR #4657 LibPNG Unbundled
+- PR #4652 enh(ScopedLockWithUnlock): make it more alike std::unique_lock
+- PR #4647 Use Int64 for TcpServerDispatcher::totalConnections()
+- PR #4635 fix(Poco::Zip::ZipLocalFileHeader) Fix const-correctness
+- PR #4622 fix(SimpleFileChannel): unify default "flush" to be false as it is in FileChannel
+- PR #4613 Usage modern C++ features on JSON modules (enhanced)
+- PR #4597 Fix MinGW build error
+- PR #4593 DateTimeParser Validation and Performance Improvements
+- PR #4587 Upgrade bundled zlib to 1.3.1 (#4585, #4586)
+- PR #4567 enh(ServerApplication): Add --pid option to ServerApplication on Windows
+- PR #4550 enh: resolve unit test and few other warnings.
+- PR #4545 Add CACHE PATH to multi-config output directory variables
+- PR #4542 Decode word
+- PR #4530 4529 sql logger shutdown
+- PR #4522 Post 1.13.3 sync master to devel
+- PR #4417 fix(logs): synchronise log file rotation and compression.
+- PR #4410 4368 oracle odbc tests
+- PR #4357 fix(NamedEvent): Release semaphore ID in dtor when created with semget (fixes #2971)
+- PR #4085 Usage modern C++ features on JSON modules
+
+
 Release 1.13.3 (2024-04-04)
 ===========================
 
