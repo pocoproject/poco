@@ -64,10 +64,12 @@ public:
 	TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
 	std::string getNameImpl() const;
+#ifndef POCO_NO_THREADNAME
 	std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
+#endif
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);

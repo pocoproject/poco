@@ -62,6 +62,12 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 }
 
 
+void SessionImpl::setName()
+{
+	setDBMSName("MySQL"s);
+}
+
+
 void SessionImpl::open(const std::string& connect)
 {
 	if (connect != connectionString())
@@ -175,7 +181,7 @@ void SessionImpl::open(const std::string& connect)
 
 	// autocommit is initially on when a session is opened
 	AbstractSessionImpl::setAutoCommit("", true);
-
+	setName();
 	_connected = true;
 }
 

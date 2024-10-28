@@ -32,7 +32,6 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
@@ -46,7 +45,6 @@
 #include <iterator>
 
 
-using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::SessionPool;
 using Poco::Data::Statement;
@@ -2428,14 +2426,14 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	assertTrue (count == 1);
@@ -2446,7 +2444,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	assertTrue (res == img);
@@ -2461,7 +2459,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	try
@@ -2472,7 +2470,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	// sometimes throws (intentionally, caught in caller)
@@ -4276,49 +4274,8 @@ void SQLExecutor::transactor()
 
 void SQLExecutor::nullable()
 {
-	try { session() << "INSERT INTO NullableTest VALUES(NULL, NULL, NULL, NULL)", now; }	catch(DataException& ce){ std::cout << ce.displayText() << std::endl; fail ("nullable()", __LINE__, __FILE__); }
-
-	Nullable<int> i = 1;
-	Nullable<double> f = 1.5;
-	Nullable<std::string> s = std::string("abc");
-	Nullable<DateTime> d = DateTime();
-
-	assertTrue (!i.isNull());
-	assertTrue (!f.isNull());
-	assertTrue (!s.isNull());
-	assertTrue (!d.isNull());
-
-	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(s), into(i), into(f), into(d), now;
-
-	assertTrue (i.isNull());
-	assertTrue (f.isNull());
-	assertTrue (s.isNull());
-	assertTrue (d.isNull());
-
-	RecordSet rs(session(), "SELECT * FROM NullableTest");
-
-	rs.moveFirst();
-	assertTrue (rs.isNull("EmptyString"));
-	assertTrue (rs.isNull("EmptyInteger"));
-	assertTrue (rs.isNull("EmptyFloat"));
-	assertTrue (rs.isNull("EmptyDateTime"));
-
-	Var di = 1;
-	Var df = 1.5;
-	Var ds = "abc";
-	Var dd = DateTime();
-
-	assertTrue (!di.isEmpty());
-	assertTrue (!df.isEmpty());
-	assertTrue (!ds.isEmpty());
-	assertTrue (!dd.isEmpty());
-
-	Statement stmt = (session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(ds), into(di), into(df), into(dd), now);
-
-	assertTrue (di.isEmpty());
-	assertTrue (df.isEmpty());
-	assertTrue (ds.isEmpty());
-	assertTrue (dd.isEmpty());
+	nullableImpl<Date>("EmptyDate"s);
+	nullableImpl<DateTime>("EmptyDateTime"s);
 }
 
 
@@ -4334,17 +4291,14 @@ void SQLExecutor::reconnect()
 	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (ce.displayText());
 	}
-
 
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg(ce.displayText());
 	}
 
 	assertTrue (count == 1);
@@ -4364,8 +4318,7 @@ void SQLExecutor::reconnect()
 	try { session() << "SELECT Age FROM Person", into(count), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (ce.displayText());
 	}
 
 	assertTrue (count == age);

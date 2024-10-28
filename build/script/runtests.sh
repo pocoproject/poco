@@ -2,7 +2,7 @@
 #
 # A script for running the POCO testsuites.
 #
-# usage: runtests [component [test] ]
+# usage: runtests [component [test] [d]]
 #
 # If the environment variable EXCLUDE_TESTS is set, containing
 # a space-separated list of project names (as found in the
@@ -87,7 +87,7 @@ do
 				echo ""
 
 				runs=$((runs + 1))
-				if ! sh -c "export POCO_BASE='$POCO_BASE'; export OSNAME='$OSNAME'; export OSARCH='$OSARCH'; cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $IGNORE $TESTRUNNERARGS";
+				if ! sh -c "export POCO_BASE='$POCO_BASE'; export OSNAME='$OSNAME'; export OSARCH='$OSARCH'; cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER$2 $IGNORE $TESTRUNNERARGS";
 				then
 					failures=$((failures + 1))
 					failedTests="$failedTests $comp"

@@ -38,7 +38,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
-	DataURIStreamTest
+	DataURIStreamTest FileStreamRWLockTest
 
 target         = testrunner
 target_version = 1
@@ -47,5 +47,5 @@ target_libs    = PocoFoundation CppUnit
 include $(POCO_BASE)/build/rules/exec
 
 ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre2-8 -lutf8proc
+SYSLIBS += -lz -lpcre2-8 -lutf8proc
 endif

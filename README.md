@@ -24,7 +24,7 @@ and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) do
 
 ### Prerequisites
 
-- CMake 3.5 or newer
+- CMake 3.15 or newer
 - A C++17 compiler (Visual C++ 2017, GCC 8.0, Clang 5, or newer)
 - OpenSSL headers and libraries (optional, but recommended)
 - MySQL, PostgreSQL and ODBC client libraries (optional)
@@ -76,7 +76,7 @@ $ brew install cmake openssl mysql-client libpq
 
 ### Building with CMake (Linux, macOS, Windows)
 
-[CMake](https://cmake.org) (version 3.5 or newer) is the recommended build system for
+[CMake](https://cmake.org) (version 3.15 or newer) is the recommended build system for
 building the POCO C++ Libraries.
 
 ```

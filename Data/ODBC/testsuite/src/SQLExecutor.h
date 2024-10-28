@@ -171,7 +171,7 @@ public:
 		C5 dateTimes(size);
 		C6 bools;
 
-		for (int i = 0; i < size; ++i)
+		for (Poco::UInt32 i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
 			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
@@ -313,7 +313,7 @@ public:
 		C4 floats;
 		C5 dateTimes(size);
 
-		for (int i = 0; i < size; ++i)
+		for (Poco::UInt32 i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
 			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));

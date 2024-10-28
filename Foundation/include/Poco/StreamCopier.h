@@ -137,7 +137,7 @@ private:
 	{
 		poco_assert (bufferSize > 0);
 
-		if (bufferSize > rangeLength)
+		if (bufferSize > static_cast<std::size_t>(rangeLength))
 			bufferSize = rangeLength;
 
 		Buffer<char> buffer(bufferSize);
@@ -153,8 +153,9 @@ private:
 				ostr.write(buffer.begin(), n);
 				if ((len < rangeLength) && istr && ostr)
 				{
-					if (bufferSize > (rangeLength - len))
-						bufferSize = rangeLength - len;
+					const std::size_t inputLen = rangeLength - len;
+					if (bufferSize > inputLen)
+						bufferSize = inputLen;
 					istr.read(buffer.begin(), bufferSize);
 					n = istr.gcount();
 				}
@@ -211,7 +212,7 @@ private:
 		{
 			istr.seekg(rangeStart, std::ios_base::beg);
 			istr.get(c);
-			while (istr && ostr && (len < rangeLength))
+			while (istr && ostr && (static_cast<std::streamsize>(len) < rangeLength))
 			{
 				ostr.put(c);
 				++len;

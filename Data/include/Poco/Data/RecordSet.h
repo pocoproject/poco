@@ -68,7 +68,7 @@ class Data_API RecordSet: private Statement
 	/// a limit for the Statement.
 {
 public:
-	using RowMap = std::map<std::size_t, Row*>;
+	using RowMap = std::map<std::size_t, std::shared_ptr<Row>>;
 	using ConstIterator = const RowIterator;
 	using Iterator = RowIterator;
 

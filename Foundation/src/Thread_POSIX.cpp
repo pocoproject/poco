@@ -91,6 +91,7 @@ namespace
 		return name;
 	}
 
+#ifndef POCO_NO_THREADNAME
 	void setThreadName(const std::string& threadName)
 		/// Sets thread name. Support for this feature varies
 		/// on platforms. Any errors are ignored.
@@ -134,6 +135,7 @@ namespace
 #endif
 		return name;
 	}
+#endif
 }
 
 
@@ -191,10 +193,12 @@ std::string ThreadImpl::getNameImpl() const
 }
 
 
+#ifndef POCO_NO_THREADNAME
 std::string ThreadImpl::getOSThreadNameImpl()
 {
 	return isRunningImpl() ? getThreadName() : "";
 }
+#endif
 
 
 void ThreadImpl::setPriorityImpl(int prio)
@@ -430,13 +434,17 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+#ifndef POCO_NO_THREADNAME
 	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
+#endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 
+#ifndef POCO_NO_THREADNAME
 	{
 		FastMutex::ScopedLock lock(pData->mutex);
 		setThreadName(pData->name);
 	}
+#endif
 
 	try
 	{

@@ -1440,7 +1440,11 @@ Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, UInt64 offset)
 	UInt64 fileSize = fileInputStream.size();
 	std::streamoff sentSize = fileSize - offset;
 	Int64 sent = 0;
-	sighandler_t sigPrev = signal(SIGPIPE, SIG_IGN);
+	struct sigaction sa, old_sa;
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGPIPE, &sa, &old_sa);
 	while (sent == 0)
 	{
 		errno = 0;
@@ -1450,7 +1454,11 @@ Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, UInt64 offset)
 			error(errno, std::string("[sendfile error]") + Error::getMessage(errno));
 		}
 	}
-	signal(SIGPIPE, sigPrev != SIG_ERR ? sigPrev : SIG_DFL);
+	if(old_sa.sa_handler == SIG_ERR)
+	{
+		old_sa.sa_handler = SIG_DFL;
+	}
+	sigaction(SIGPIPE, &old_sa, nullptr);
 	return sent;
 }
 #endif // POCO_OS_FAMILY_WINDOWS

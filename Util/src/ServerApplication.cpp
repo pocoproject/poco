@@ -91,8 +91,22 @@ int ServerApplication::run()
 }
 
 
+void ServerApplication::terminateCallback()
+{
+	if (!_terminationGuard.exchange(true))
+	{
+		if (_terminateCallback)
+		{
+			_terminateCallback(_terminateMessage);
+			_terminateCallback = nullptr;
+		}
+	}
+}
+
+
 void ServerApplication::terminate()
 {
+	terminateCallback();
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	_terminate.set();
 #elif defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
@@ -100,6 +114,13 @@ void ServerApplication::terminate()
 #else
 	Poco::Process::requestTermination(Process::id());
 #endif
+}
+
+
+void ServerApplication::registerTerminateCallback(TerminateCallback tCB, const std::string& message)
+{
+	_terminateCallback = tCB;
+	_terminateMessage = message;
 }
 
 
@@ -196,6 +217,7 @@ void ServerApplication::waitForTerminationRequest()
 {
 	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 	_terminate.wait();
+	terminateCallback();
 	_terminated.set();
 }
 
@@ -444,6 +466,7 @@ void ServerApplication::handleStartup(const std::string& name, const std::string
 void ServerApplication::waitForTerminationRequest()
 {
 	_terminate.wait();
+	terminateCallback();
 }
 
 
@@ -503,8 +526,10 @@ void ServerApplication::waitForTerminationRequest()
 	sigprocmask(SIG_BLOCK, &sset, NULL);
 	int sig;
 	sigwait(&sset, &sig);
+	terminateCallback();
 #else // POCO_OS != POCO_OS_ANDROID
 	_terminate.wait();
+	terminateCallback();
 #endif
 }
 

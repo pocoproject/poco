@@ -518,8 +518,6 @@ X509* SecureSocketImpl::peerCertificate() const
 {
 	LockT l(_mutex);
 
-	X509* pCert = nullptr;
-
 	if (_pSSL)
 		return ::SSL_get_peer_certificate(_pSSL);
 	else

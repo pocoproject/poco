@@ -16,6 +16,12 @@
 
 
 #include "Poco/XML/XMLStreamParser.h"
+#include "Poco/XML/XMLString.h"
+#if defined(POCO_UNBUNDLED)
+#include <expat.h>
+#else
+#include "expat.h"
+#endif
 #include <new>
 #include <cstring>
 #include <istream>
@@ -456,7 +462,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 				_qualifiedName = &_qname;
 				break; // No more declarations.
 			}
-			// Fall through.
+			[[fallthrough]];
 		}
 		case EV_START_ELEMENT:
 		{
@@ -501,7 +507,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 				_pvalue = &_value;
 				break; // No more attributes.
 			}
-			// Fall through.
+			[[fallthrough]];
 		}
 		case EV_START_ELEMENT:
 		case EV_START_NAMESPACE_DECL:
@@ -535,7 +541,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 				_qualifiedName = &_qname;
 				break; // No more declarations.
 			}
-			// Fall through.
+			[[fallthrough]];
 		}
 			// The end namespace declaration comes before the end element
 			// which means it can follow pretty much any other event.
@@ -705,7 +711,7 @@ static void splitName(const XML_Char* s, QName& qn)
 }
 
 
-void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, const XML_Char** atts)
+void XMLStreamParser::handleStartElement(void* v, const XMLChar* name, const XMLChar** atts)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -789,7 +795,7 @@ void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, 
 }
 
 
-void XMLCALL XMLStreamParser::handleEndElement(void* v, const XML_Char* name)
+void XMLStreamParser::handleEndElement(void* v, const XMLChar* name)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -828,7 +834,7 @@ void XMLCALL XMLStreamParser::handleEndElement(void* v, const XML_Char* name)
 }
 
 
-void XMLCALL XMLStreamParser::handleCharacters(void* v, const XML_Char* s, int n)
+void XMLStreamParser::handleCharacters(void* v, const XMLChar* s, int n)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -899,7 +905,7 @@ void XMLCALL XMLStreamParser::handleCharacters(void* v, const XML_Char* s, int n
 }
 
 
-void XMLCALL XMLStreamParser::handleStartNamespaceDecl(void* v, const XML_Char* prefix, const XML_Char* ns)
+void XMLStreamParser::handleStartNamespaceDecl(void* v, const XMLChar* prefix, const XMLChar* ns)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -918,7 +924,7 @@ void XMLCALL XMLStreamParser::handleStartNamespaceDecl(void* v, const XML_Char* 
 }
 
 
-void XMLCALL XMLStreamParser::handleEndNamespaceDecl(void* v, const XML_Char* prefix)
+void XMLStreamParser::handleEndNamespaceDecl(void* v, const XMLChar* prefix)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 

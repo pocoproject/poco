@@ -996,6 +996,7 @@
     <ClCompile Include="src\FileChannelTest.cpp" />
     <ClCompile Include="src\FileStreamTest.cpp" />
     <ClCompile Include="src\FilesystemTestSuite.cpp" />
+    <ClCompile Include="src\FileStreamRWLockTest.cpp" />
     <ClCompile Include="src\FileTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\FoundationTestSuite.cpp" />
@@ -1140,6 +1141,7 @@
     <ClInclude Include="src\FileChannelTest.h" />
     <ClInclude Include="src\FileStreamTest.h" />
     <ClInclude Include="src\FilesystemTestSuite.h" />
+    <ClInclude Include="src\FileStreamRWLockTest.h" />
     <ClInclude Include="src\FileTest.h" />
     <ClInclude Include="src\FormatTest.h" />
     <ClInclude Include="src\FoundationTestSuite.h" />

@@ -47,7 +47,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 		}
 		catch (...)
 		{
-			throw SystemException("cannot lock mutex");
+			throw SystemException("cannot lock mutex", Error::getLastMessage());
 		}
 		Sleep(sleepMillis);
 	}

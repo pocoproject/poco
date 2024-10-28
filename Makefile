@@ -72,7 +72,7 @@ ifdef POCO_VERBOSE
 $(info OSARCH              = $(OSARCH))
 endif
 
-.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install uninstall
+.PHONY: poco all libexecs cppunit trace tests samples cleans clean distclean install uninstall
 
 # TESTS and SAMPLES are set in config.make
 poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
@@ -86,6 +86,16 @@ cppunit:
 
 CppUnit-clean:
 	$(MAKE) -C $(POCO_BASE)/CppUnit clean
+
+trace:
+ifdef POCO_ENABLE_TRACE
+	$(MAKE) -C $(POCO_BASE)/Trace
+endif
+
+Trace-clean:
+ifdef POCO_ENABLE_TRACE
+	$(MAKE) -C $(POCO_BASE)/Trace clean
+endif
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
@@ -131,7 +141,7 @@ tests: $(filter-out $(foreach f,$(OMIT),$f%),$(tests))
 samples: $(filter-out $(foreach f,$(OMIT),$f%),$(samples))
 cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))
 
-Foundation-libexec:
+Foundation-libexec: trace
 	$(MAKE) -C $(POCO_BASE)/Foundation
 
 Foundation-tests: Foundation-libexec cppunit
@@ -418,7 +428,7 @@ Prometheus-clean:
 	$(MAKE) -C $(POCO_BASE)/Prometheus/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Prometheus/samples clean
 
-clean: cleans CppUnit-clean
+clean: cleans Trace-clean CppUnit-clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib
