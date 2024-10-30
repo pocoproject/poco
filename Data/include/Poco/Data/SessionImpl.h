@@ -59,7 +59,7 @@ public:
 	static const int CURSOR_USE_NEVER = 2;
 
 	SessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
 	virtual ~SessionImpl();
