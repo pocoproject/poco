@@ -24,6 +24,7 @@ public:
 	HTTPSClientSessionTest(const std::string& name);
 	~HTTPSClientSessionTest();
 
+	void testFromSocket();
 	void testGetSmall();
 	void testGetLarge();
 	void testHead();
