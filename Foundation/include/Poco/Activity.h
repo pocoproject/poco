@@ -180,9 +180,11 @@ protected:
 		}
 		catch (...)
 		{
+			_running = false;
 			_done.set();
 			throw;
 		}
+		_running = false;
 		_done.set();
 	}
 
