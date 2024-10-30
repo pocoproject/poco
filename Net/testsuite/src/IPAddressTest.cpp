@@ -12,10 +12,14 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/IPAddress.h"
+#include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Format.h"
+#include <iostream>
 
 
 using Poco::Net::IPAddress;
+using Poco::Net::NetworkInterface;
 using Poco::Net::InvalidAddressException;
 
 
@@ -35,7 +39,7 @@ void IPAddressTest::testStringConv()
 	IPAddress ia1(std::move(ia01));
 	assertTrue (ia1.family() == IPAddress::IPv4);
 	assertTrue (ia1.toString() == "127.0.0.1");
-	
+
 	IPAddress ia02 = IPAddress("192.168.1.120");
 	IPAddress ia2(std::move(ia02));
 	assertTrue (ia2.family() == IPAddress::IPv4);
@@ -67,7 +71,7 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia1(std::move(ia01));
 	assertTrue (ia1.family() == IPAddress::IPv6);
 	assertTrue (ia1.toString() == "1080::8:600:200a:425c");
-	
+
 	IPAddress ia02 = IPAddress("1080::8:600:200A:425C");
 	IPAddress ia2(std::move(ia02));
 	assertTrue (ia2.family() == IPAddress::IPv6);
@@ -424,6 +428,44 @@ void IPAddressTest::testClassification6()
 	assertTrue (!ip10.isOrgLocalMC());
 	assertTrue (!ip10.isGlobalMC());
 
+	NetworkInterface::Map m = NetworkInterface::map(false, false);
+	for (auto it = m.begin(); it != m.end(); ++it)
+	{
+		IPAddress ip11(Poco::format("fe80::1592:96a0:88bf:d2d7%%%s",
+			it->second.adapterName())); // link local unicast scoped
+		assertEqual (ip11.scope(), it->second.index());
+		assertTrue (!ip11.isWildcard());
+		assertTrue (!ip11.isBroadcast());
+		assertTrue (!ip11.isLoopback());
+		assertTrue (!ip11.isMulticast());
+		assertTrue (ip11.isUnicast());
+		assertTrue (ip11.isLinkLocal());
+		assertTrue (!ip11.isSiteLocal());
+		assertTrue (!ip11.isWellKnownMC());
+		assertTrue (!ip11.isNodeLocalMC());
+		assertTrue (!ip11.isLinkLocalMC());
+		assertTrue (!ip11.isSiteLocalMC());
+		assertTrue (!ip11.isOrgLocalMC());
+		assertTrue (!ip11.isGlobalMC());
+
+		IPAddress ip12(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%s]",
+			it->second.adapterName())); // link local unicast scoped
+		assertEqual (ip12.scope(), it->second.index());
+		assertTrue (!ip12.isWildcard());
+		assertTrue (!ip12.isBroadcast());
+		assertTrue (!ip12.isLoopback());
+		assertTrue (!ip12.isMulticast());
+		assertTrue (ip12.isUnicast());
+		assertTrue (ip12.isLinkLocal());
+		assertTrue (!ip12.isSiteLocal());
+		assertTrue (!ip12.isWellKnownMC());
+		assertTrue (!ip12.isNodeLocalMC());
+		assertTrue (!ip12.isLinkLocalMC());
+		assertTrue (!ip12.isSiteLocalMC());
+		assertTrue (!ip12.isOrgLocalMC());
+		assertTrue (!ip12.isGlobalMC());
+	}
+
 	IPAddress ip6("fec0::21f:5bff:fec6:6707"); // site local unicast (RFC 4291)
 	assertTrue (!ip6.isWildcard());
 	assertTrue (!ip6.isBroadcast());
@@ -690,6 +732,32 @@ void IPAddressTest::testByteOrderMacros()
 }
 
 
+void IPAddressTest::testScoped()
+{
+#ifdef POCO_HAVE_IPv6
+	NetworkInterface::Map m = NetworkInterface::map(false, false);
+	if (m.size() == 0)
+	{
+		std::cout << "No network interfaces found." << std::endl;
+		return;
+	}
+
+	IPAddress ip;
+	assertFalse (IPAddress::tryParse("fe80::1592:96a0:88bf:d2d7%xyzabc123", ip));
+
+	std::string scope;
+	auto it = m.begin();
+	auto end = m.end();
+	for (; it != end; ++it)
+	{
+		scope = it->second.adapterName();
+		assertTrue (IPAddress::tryParse(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%s]", scope), ip));
+		assertTrue (IPAddress::tryParse(Poco::format("fe80::1592:96a0:88bf:d2d7%%%s", scope), ip));
+	}
+#endif
+}
+
+
 void IPAddressTest::setUp()
 {
 }
@@ -719,6 +787,7 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testPrefixLen);
 	CppUnit_addTest(pSuite, IPAddressTest, testOperators);
 	CppUnit_addTest(pSuite, IPAddressTest, testByteOrderMacros);
+	CppUnit_addTest(pSuite, IPAddressTest, testScoped);
 
 	return pSuite;
 }

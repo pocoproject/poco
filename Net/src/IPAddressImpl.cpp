@@ -673,7 +673,7 @@ IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 	{
 		std::string::size_type start = ('[' == addr[0]) ? 1 : 0;
 		std::string unscopedAddr(addr, start, pos - start);
-		std::string scope(addr, pos + 1, addr.size() - start - pos);
+		std::string scope(addr, pos + 1, addr.size() - (2*start) - pos);
 		Poco::UInt32 scopeId(0);
 		if (!(scopeId = if_nametoindex(scope.c_str())))
 			return IPv6AddressImpl();
