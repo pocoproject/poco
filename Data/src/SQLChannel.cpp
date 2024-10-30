@@ -648,6 +648,8 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 		{
 			Path d(dir);
 			dir = d.makeDirectory().makeAbsolute().toString();
+			File f(dir);
+			if (!f.exists()) f.createDirectories();
 		}
 		_directory = dir;
 	}

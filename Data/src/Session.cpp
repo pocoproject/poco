@@ -33,9 +33,9 @@ Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
 
 Session::Session(const std::string& connector,
 	const std::string& connectionString,
-	std::size_t timeout)
+	std::size_t loginTimeout)
 {
-	Session newSession(SessionFactory::instance().create(connector, connectionString, timeout));
+	Session newSession(SessionFactory::instance().create(connector, connectionString, loginTimeout));
 	swap(newSession);
 }
 

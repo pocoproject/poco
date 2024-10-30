@@ -30,7 +30,7 @@ const std::string ConnectionHandle::CANT_SET_ATTR_SQLSTATE = "HY011";
 
 
 ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout):
-	_pEnvironment(nullptr),
+	_pEnvironment(SQL_NULL_HENV),
 	_hdbc(SQL_NULL_HDBC),
 	_connectString(connectString)
 {
@@ -59,7 +59,7 @@ void ConnectionHandle::alloc()
 	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC, _pEnvironment->handle(), &_hdbc)))
 	{
 		delete _pEnvironment;
-		_pEnvironment = nullptr;
+		_pEnvironment = SQL_NULL_HENV;
 		_hdbc = SQL_NULL_HDBC;
 		throw ODBCException("ODBC: Could not allocate connection handle.");
 	}
@@ -77,7 +77,7 @@ void ConnectionHandle::free()
 	if (_pEnvironment)
 	{
 		delete _pEnvironment;
-		_pEnvironment = 0;
+		_pEnvironment = SQL_NULL_HENV;
 	}
 }
 
@@ -122,8 +122,8 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 
 	setTimeouts(loginTimeout, timeout);
 
-	if (Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_hdbc
-		, NULL
+	if (*this && Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_hdbc
+		, nullptr
 		,(SQLCHAR*) _connectString.c_str()
 		,(SQLSMALLINT) SQL_NTS
 		, connectOutput
@@ -172,7 +172,10 @@ void ConnectionHandle::setTimeoutImpl(SQLULEN timeout, SQLINTEGER attribute)
 	if (attribute != SQL_ATTR_LOGIN_TIMEOUT && attribute != SQL_ATTR_CONNECTION_TIMEOUT)
 		throw InvalidArgumentException(Poco::format("ODBC::ConnectionHandle::setTimeoutImpl(%d)", attribute));
 
-	if (Utility::isError(SQLSetConnectAttr(_hdbc, attribute, (SQLPOINTER) timeout, 0)))
+	if (attribute == SQL_ATTR_CONNECTION_TIMEOUT && !isConnected()) // can't set this on not connected session
+		return;
+
+	if (*this && Utility::isError(SQLSetConnectAttr(_hdbc, attribute, (SQLPOINTER) timeout, 0)))
 	{
 		ConnectionError e(_hdbc);
 		std::string name;
@@ -201,7 +204,7 @@ void ConnectionHandle::setTimeoutImpl(SQLULEN timeout, SQLINTEGER attribute)
 int ConnectionHandle::getTimeoutImpl(SQLINTEGER attribute) const
 {
 	SQLUINTEGER timeout = 0;
-	if (Utility::isError(SQLGetConnectAttr(_hdbc, attribute, &timeout, sizeof(timeout), 0)))
+	if (*this && Utility::isError(SQLGetConnectAttr(_hdbc, attribute, &timeout, sizeof(timeout), nullptr)))
 	{
 		ConnectionError e(_hdbc);
 		if (isUnsupported(e))
@@ -268,7 +271,7 @@ bool ConnectionHandle::isConnected() const
 		SQL_ATTR_CONNECTION_DEAD,
 		&value,
 		sizeof(value),
-		0))) return false;
+		nullptr))) return false;
 
 	return (SQL_CD_FALSE == value);
 }

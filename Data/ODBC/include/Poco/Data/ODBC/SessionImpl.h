@@ -160,14 +160,6 @@ public:
 	int maxStatementLength() const;
 		/// Returns maximum length of SQL statement allowed by driver.
 
-	void setLoginTimeout(const std::string&, const Poco::Any& value);
-		/// Sets the timeout (in seconds) for the session login.
-		/// Value must be of type (unsigned) int.
-		/// It must be set prior to logging in.
-
-	Poco::Any getLoginTimeout(const std::string&) const;
-		/// Returns the timeout (in seconds) for the session login.
-
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
 		/// Value must be of type int.
@@ -319,12 +311,6 @@ inline const std::string& SessionImpl::connectorName() const
 inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	return 0 != (ti & getTransactionIsolation());
-}
-
-
-inline Poco::Any SessionImpl::getLoginTimeout(const std::string&) const
-{
-	return _db.getLoginTimeout();
 }
 
 
