@@ -745,14 +745,19 @@ void IPAddressTest::testScoped()
 	IPAddress ip;
 	assertFalse (IPAddress::tryParse("fe80::1592:96a0:88bf:d2d7%xyzabc123", ip));
 
-	std::string scope;
 	auto it = m.begin();
 	auto end = m.end();
 	for (; it != end; ++it)
 	{
-		scope = it->second.adapterName();
+#if defined(_WIN32)
+		int scope = it->second.index();
+		assertTrue(IPAddress::tryParse(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%d]", scope), ip));
+		assertTrue(IPAddress::tryParse(Poco::format("fe80::1592:96a0:88bf:d2d7%%%d", scope), ip));
+#else
+		std::string scope = it->second.adapterName();
 		assertTrue (IPAddress::tryParse(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%s]", scope), ip));
 		assertTrue (IPAddress::tryParse(Poco::format("fe80::1592:96a0:88bf:d2d7%%%s", scope), ip));
+#endif
 	}
 #endif
 }
