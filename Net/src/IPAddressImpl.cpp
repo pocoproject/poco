@@ -658,10 +658,15 @@ IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_flags = AI_NUMERICHOST;
+	// for the reason why this is not AF_INET6, see
+	// https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/getaddrinfo-fails-error-11001-call-af-inet6-family
+	hints.ai_family = AF_UNSPEC;
 	int rc = getaddrinfo(addr.c_str(), NULL, &hints, &pAI);
 	if (rc == 0)
 	{
-		IPv6AddressImpl result = IPv6AddressImpl(&reinterpret_cast<struct sockaddr_in6*>(pAI->ai_addr)->sin6_addr, static_cast<int>(reinterpret_cast<struct sockaddr_in6*>(pAI->ai_addr)->sin6_scope_id));
+		IPv6AddressImpl result = IPv6AddressImpl(
+			&reinterpret_cast<struct sockaddr_in6*>(pAI->ai_addr)->sin6_addr,
+			static_cast<int>(reinterpret_cast<struct sockaddr_in6*>(pAI->ai_addr)->sin6_scope_id));
 		freeaddrinfo(pAI);
 		return result;
 	}
