@@ -179,6 +179,10 @@ int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
 	return ret;
 }
 
+int StreamSocket::receiveBytesNoBlock(void* buffer, int length, bool &shouldRetry, int flags)
+{
+	return impl()->receiveBytesNoBlock(buffer, length, shouldRetry, flags);
+}
 
 int StreamSocket::receiveBytes(void* buffer, int length, int flags)
 {
