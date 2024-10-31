@@ -930,19 +930,24 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 
 		BIGNUM* p = nullptr;
 		BIGNUM* g = nullptr;
-		if (use2048Bits)
+		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
 			p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
 			g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
 			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 256);
 		}
-		else
+		else if (keyDHGroup == KEY_DH_GROUP_1024)
 		{
 			p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 			g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 160);
+		}
+		else
+		{
+			throw Poco::NotImplementedException(Poco::format(
+				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
 		if (!p || !g)
 		{
@@ -952,17 +957,21 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 
 #else // OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
 
-		if (use2048Bits)
+		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
 			dh->p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
 			dh->g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
 			dh->length = 256;
 		}
-		else
+		else if (keyDHGroup == KEY_DH_GROUP_1024)
 		{
 			dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 			dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 			dh->length = 160;
+		}
+		{
+			throw Poco::NotImplementedException(Poco::format(
+				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
 		if ((!dh->p) || (!dh->g))
 		{
