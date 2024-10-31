@@ -427,12 +427,18 @@ void IPAddressTest::testClassification6()
 	assertTrue (!ip10.isSiteLocalMC());
 	assertTrue (!ip10.isOrgLocalMC());
 	assertTrue (!ip10.isGlobalMC());
-
+//#if defined(_WIN32)
+//	int scope = it->second.index();
 	NetworkInterface::Map m = NetworkInterface::map(false, false);
 	for (auto it = m.begin(); it != m.end(); ++it)
 	{
+#if defined(_WIN32)
+		IPAddress ip11(Poco::format("fe80::1592:96a0:88bf:d2d7%%%u",
+			it->second.index())); // link local unicast scoped
+#else
 		IPAddress ip11(Poco::format("fe80::1592:96a0:88bf:d2d7%%%s",
 			it->second.adapterName())); // link local unicast scoped
+#endif
 		assertEqual (ip11.scope(), it->second.index());
 		assertTrue (!ip11.isWildcard());
 		assertTrue (!ip11.isBroadcast());
@@ -448,8 +454,13 @@ void IPAddressTest::testClassification6()
 		assertTrue (!ip11.isOrgLocalMC());
 		assertTrue (!ip11.isGlobalMC());
 
-		IPAddress ip12(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%s]",
+#if defined(_WIN32)
+		IPAddress ip12(Poco::format("fe80::1592:96a0:88bf:d2d7%%%u",
+			it->second.index())); // link local unicast scoped
+#else
+		IPAddress ip12(Poco::format("fe80::1592:96a0:88bf:d2d7%%%s",
 			it->second.adapterName())); // link local unicast scoped
+#endif
 		assertEqual (ip12.scope(), it->second.index());
 		assertTrue (!ip12.isWildcard());
 		assertTrue (!ip12.isBroadcast());
@@ -750,9 +761,9 @@ void IPAddressTest::testScoped()
 	for (; it != end; ++it)
 	{
 #if defined(_WIN32)
-		int scope = it->second.index();
-		assertTrue(IPAddress::tryParse(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%d]", scope), ip));
-		assertTrue(IPAddress::tryParse(Poco::format("fe80::1592:96a0:88bf:d2d7%%%d", scope), ip));
+		unsigned scope = it->second.index();
+		assertTrue(IPAddress::tryParse(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%u]", scope), ip));
+		assertTrue(IPAddress::tryParse(Poco::format("fe80::1592:96a0:88bf:d2d7%%%u", scope), ip));
 #else
 		std::string scope = it->second.adapterName();
 		assertTrue (IPAddress::tryParse(Poco::format("[fe80::1592:96a0:88bf:d2d7%%%s]", scope), ip));
