@@ -427,8 +427,7 @@ void IPAddressTest::testClassification6()
 	assertTrue (!ip10.isSiteLocalMC());
 	assertTrue (!ip10.isOrgLocalMC());
 	assertTrue (!ip10.isGlobalMC());
-//#if defined(_WIN32)
-//	int scope = it->second.index();
+
 	NetworkInterface::Map m = NetworkInterface::map(false, false);
 	for (auto it = m.begin(); it != m.end(); ++it)
 	{
