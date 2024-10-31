@@ -41,9 +41,11 @@ RowIterator::RowIterator(const RowIterator& other):
 
 
 RowIterator::RowIterator(RowIterator&& other) noexcept:
-	_pRecordSet(std::move(other._pRecordSet)),
-	_position(std::move(other._position))
+	_pRecordSet(other._pRecordSet),
+	_position(other._position)
 {
+	other._pRecordSet = nullptr;
+	other._position = POSITION_END;
 }
 
 RowIterator::~RowIterator()

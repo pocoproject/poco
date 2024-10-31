@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include "Poco/UnWindows.h"
 
 
@@ -55,7 +56,7 @@ inline void MutexImpl::lockImpl()
 	}
 	catch (...)
 	{
-		throw SystemException("cannot lock mutex");
+		throw SystemException("cannot lock mutex", Error::getLastMessage());
 	}
 }
 
@@ -69,7 +70,7 @@ inline bool MutexImpl::tryLockImpl()
 	catch (...)
 	{
 	}
-	throw SystemException("cannot lock mutex");
+	throw SystemException("cannot lock mutex", Error::getLastMessage());
 }
 
 

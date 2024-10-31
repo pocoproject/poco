@@ -81,6 +81,12 @@ public:
 		return _handle;
 	}
 
+	const ConnectionHandle& connection() const
+		/// Returns the connection handle.
+	{
+		return _rConnection;
+	}
+
 private:
 	Handle(const Handle&);
 	const Handle& operator=(const Handle&);

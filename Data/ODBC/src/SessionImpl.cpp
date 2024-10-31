@@ -50,6 +50,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
 	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
 
+	_db.setLoginTimeout(loginTimeout);
 	open();
 }
 
@@ -76,6 +77,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
 	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
 
+	_db.setLoginTimeout(getLoginTimeout());
 	open();
 }
 
@@ -96,6 +98,12 @@ SessionImpl::~SessionImpl()
 	{
 		poco_unexpected();
 	}
+}
+
+
+void SessionImpl::setName()
+{
+	setDBMSName(Utility::dbmsName(_db));
 }
 
 
@@ -122,10 +130,6 @@ void SessionImpl::addFeatures()
 	addProperty("maxFieldSize",
 		&SessionImpl::setMaxFieldSize,
 		&SessionImpl::getMaxFieldSize);
-
-	addProperty("loginTimeout",
-		&SessionImpl::setLoginTimeout,
-		&SessionImpl::getLoginTimeout);
 
 	addProperty("queryTimeout",
 		&SessionImpl::setQueryTimeout,
@@ -157,7 +161,7 @@ void SessionImpl::open(const std::string& connect)
 	if (connectionString().empty())
 		throw InvalidArgumentException("SessionImpl::open(): Connection string empty");
 
-	if (_db.connect(connectionString()))
+	if (_db.connect(connectionString(), static_cast<SQLULEN>(getLoginTimeout())))
 	{
 		setProperty("handle", _db.handle());
 
@@ -173,6 +177,8 @@ void SessionImpl::open(const std::string& connect)
 	else
 		throw ConnectionException(SQL_NULL_HDBC,
 			Poco::format("Connection to '%s' failed.", connectionString()));
+
+	setName();
 }
 
 
@@ -255,22 +261,6 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 std::size_t SessionImpl::getConnectionTimeout() const
 {
 	return _db.getTimeout();
-}
-
-
-void SessionImpl::setLoginTimeout(const std::string&, const Poco::Any& value)
-{
-	int timeout = 0;
-	try
-	{
-		timeout = Poco::AnyCast<int>(value);
-	}
-	catch(const Poco::BadCastException&)
-	{
-		timeout = Poco::AnyCast<unsigned int>(value);
-	}
-
-	_db.setLoginTimeout(timeout);
 }
 
 

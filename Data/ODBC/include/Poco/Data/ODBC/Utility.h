@@ -33,10 +33,15 @@ namespace Data {
 namespace ODBC {
 
 
+class ConnectionHandle;
+
+
 class ODBC_API Utility
 	/// Various utility functions
 {
 public:
+	inline static const std::string MS_SQL_SERVER_DBMS_NAME = "Microsoft SQL Server"s;
+
 	typedef std::map<std::string, std::string> DSNMap;
 	typedef DSNMap DriverMap;
 
@@ -161,6 +166,10 @@ public:
 		typename C::const_iterator end = dt.end();
 		for (; it != end; ++it, ++tIt) dateTimeSync(*tIt, *it);
 	}
+
+	static std::string dbmsName(const ConnectionHandle& db);
+		/// Returns the back end DBMS name.
+		/// On error, returns "unknown".
 
 private:
 	static const TypeInfo _dataTypes;

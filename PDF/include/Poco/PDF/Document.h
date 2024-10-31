@@ -162,7 +162,7 @@ public:
 		/// _fileName is used. If member variable is empty string,
 		/// document is saved to the memory stream.
 
-	const DataPtr data(SizeType& sz);
+	DataPtr data(SizeType& sz);
 		/// Returns the document content as raw data and data size in
 		/// the sz argument.
 

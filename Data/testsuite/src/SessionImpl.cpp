@@ -31,6 +31,7 @@ SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
 	addProperty("p1", &SessionImpl::setP, &SessionImpl::getP);
 	addProperty("p2", 0, &SessionImpl::getP);
 	addProperty("p3", &SessionImpl::setP, &SessionImpl::getP);
+	setDBMSName("Test");
 }
 
 

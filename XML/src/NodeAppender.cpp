@@ -60,7 +60,7 @@ void NodeAppender::appendChild(Node* newChild)
 				pChild->_pParent = _pParent;
 				pChild = pChild->_pNext;
 			}
-			pFrag->_pFirstChild = 0;
+			pFrag->_pFirstChild = nullptr;
 		}
 	}
 	else

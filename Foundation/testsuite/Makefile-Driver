@@ -20,8 +20,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
-	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest ProcessRunnerTest RWLockTest \
-	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest \
+	NumberParserTest PathTest PatternFormatterTest JSONFormatterTest PBKDF2EngineTest ProcessRunnerTest \
+	RWLockTest RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest \
 	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
@@ -38,7 +38,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
-	DataURIStreamTest
+	DataURIStreamTest FileStreamRWLockTest
 
 target         = testrunner
 target_version = 1
@@ -47,5 +47,5 @@ target_libs    = PocoFoundation CppUnit
 include $(POCO_BASE)/build/rules/exec
 
 ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre
+SYSLIBS += -lz -lpcre2-8 -lutf8proc
 endif

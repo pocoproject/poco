@@ -79,6 +79,12 @@ SessionImpl::~SessionImpl()
 }
 
 
+void SessionImpl::setName()
+{
+	setDBMSName("PostgreSQL"s);
+}
+
+
 void SessionImpl::setConnectionTimeout(std::size_t aTimeout)
 {
 	_timeout = aTimeout;
@@ -145,6 +151,8 @@ void SessionImpl::open(const std::string& aConnectionString)
 	addFeature("binaryExtraction",
 		&SessionImpl::setBinaryExtraction,
 		&SessionImpl::isBinaryExtraction);
+
+	setName();
 }
 
 

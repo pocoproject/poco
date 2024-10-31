@@ -80,7 +80,7 @@ public:
 
 	Placeholder(): pHolder(0)
 	{
-		std::memset(holder, 0, sizeof(Placeholder));
+		std::memset(holder, 0, sizeof(holder));
 	}
 
 	~Placeholder()
@@ -101,8 +101,8 @@ public:
 
 	bool isEmpty() const
 	{
-		static char buf[SizeV+1] = {};
-		return 0 == std::memcmp(holder, buf, SizeV+1);
+		static char buf[sizeof(holder)] = {};
+		return 0 == std::memcmp(holder, buf, sizeof(holder));
 	}
 
 	bool isLocal() const
@@ -156,7 +156,7 @@ private:
 			else
 				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
 
-			if (clear) std::memset(holder, 0, sizeof(Placeholder));
+			if (clear) std::memset(holder, 0, sizeof(holder));
 		}
 	}
 

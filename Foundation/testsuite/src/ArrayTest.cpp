@@ -58,14 +58,15 @@ void ArrayTest::testConstruction()
 	typedef Poco::Array<Element,10> ElementArray;
 	ElementArray g;
 
-	for (unsigned i=0; i<g.size(); ++i) {
+	for (std::size_t i=0; i<g.size(); ++i)
+	{
 		g[i]._data = i;
 	}
 
-	for (unsigned i=0; i<g.size(); ++i) {
+	for (std::size_t i=0; i<g.size(); ++i)
+	{
 		assertTrue (g[i]._data == i);
 	}
-
 
 }
 

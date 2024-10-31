@@ -59,11 +59,16 @@ public:
 	static const int CURSOR_USE_NEVER = 2;
 
 	SessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
 	virtual ~SessionImpl();
 		/// Destroys the SessionImpl.
+
+	const std::string& dbmsName() const;
+		/// Returns the DBMS name. The name must be set by the
+		/// implementation.
+		/// Defaults to "unknown".
 
 	virtual Poco::SharedPtr<StatementImpl> createStatementImpl() = 0;
 		/// Creates a StatementImpl.
@@ -195,6 +200,9 @@ public:
 		/// not supported by the underlying implementation.
 
 protected:
+	void setDBMSName(const std::string& name);
+		/// Sets the DBMS name.
+
 	void setConnectionString(const std::string& connectionString);
 		/// Sets the connection string. Should only be called on
 		/// disconnected sessions. Throws InvalidAccessException when called on
@@ -205,6 +213,7 @@ private:
 	SessionImpl(const SessionImpl&);
 	SessionImpl& operator = (const SessionImpl&);
 
+	std::string _dbmsName;
 	std::string _connectionString;
 	std::size_t _loginTimeout;
 };
@@ -213,6 +222,19 @@ private:
 //
 // inlines
 //
+
+inline void SessionImpl::setDBMSName(const std::string& name)
+{
+	_dbmsName = name;
+}
+
+
+inline const std::string& SessionImpl::dbmsName() const
+{
+	return _dbmsName;
+}
+
+
 inline const std::string& SessionImpl::connectionString() const
 {
 	return _connectionString;

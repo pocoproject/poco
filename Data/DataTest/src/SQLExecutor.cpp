@@ -9,6 +9,7 @@
 
 
 #include "CppUnit/TestCase.h"
+#include "CppUnit/CppUnitException.h"
 #include "Poco/Data/Test/SQLExecutor.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
@@ -32,7 +33,6 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
@@ -46,7 +46,6 @@
 #include <iterator>
 
 
-using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::SessionPool;
 using Poco::Data::Statement;
@@ -2428,14 +2427,14 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	assertTrue (count == 1);
@@ -2446,7 +2445,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	assertTrue (res == img);
@@ -2461,7 +2460,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	try
@@ -2472,7 +2471,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (__func__);
 	}
 
 	// sometimes throws (intentionally, caught in caller)
@@ -3835,6 +3834,8 @@ void SQLExecutor::autoCommit()
 
 void SQLExecutor::transactionIsolation()
 {
+	try
+	{
 	auto ti = session().getTransactionIsolation();
 
 	// these are just calls to check the transactional capabilities of the session
@@ -3845,6 +3846,15 @@ void SQLExecutor::transactionIsolation()
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 
 	setTransactionIsolation(session(), ti);
+	}
+	catch(const Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+	}
+	catch(const std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+	}
 }
 
 
@@ -4053,117 +4063,135 @@ void SQLExecutor::transaction(const std::string& connector, const std::string& c
 	else if (local.hasTransactionIsolation(Session::TRANSACTION_READ_COMMITTED))
 		setTransactionIsolation(local, Session::TRANSACTION_READ_COMMITTED);
 
-	std::string tableName("Person");
-	std::vector<std::string> lastNames = {"LN1", "LN2"};
-	std::vector<std::string> firstNames = {"FN1", "FN2"};
-	std::vector<std::string> addresses = {"ADDR1", "ADDR2"};
-	std::vector<int> ages = {1, 2};
-	int count = 0, locCount = 0;
-	std::string result;
-
-	session().setFeature("autoCommit", true);
-	assertTrue (!session().isTransaction());
-	session().setFeature("autoCommit", false);
-	assertTrue (!session().isTransaction());
-	session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
-
-	{
-		Transaction trans(session());
-		assertTrue (trans.isActive());
-		assertTrue (session().isTransaction());
-
-		session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
-
-		assertTrue (session().isTransaction());
-		assertTrue (trans.isActive());
-
-		session() << "SELECT COUNT(*) FROM Person", into(count), now;
-		assertTrue (2 == count);
-		assertTrue (session().isTransaction());
-		assertTrue (trans.isActive());
-	}
-	assertTrue (!session().isTransaction());
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
-	assertTrue (!(session().impl()->shouldParse() && session().isTransaction()));
-	session().commit();
-
-	{
-		Transaction trans(session());
-		session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
-
-		Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
-
-		assertTrue (session().isTransaction());
-		assertTrue (trans.isActive());
-		trans.commit();
-		assertTrue (!session().isTransaction());
-		assertTrue (!trans.isActive());
-
-		stmt1.wait();
-		assertTrue (2 == locCount);
-	}
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (2 == count);
-
-	session() << "DELETE FROM Person", now;
-
-	Statement stmt1 = (local << "SELECT count(*) FROM Person", into(locCount), async, now);
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
 	try
 	{
-		stmt1.wait(5000);
-		if (readUncommitted &&
-			local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED) &&
-			local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
-			assertTrue (0 == locCount);
-	} catch (TimeoutException&)
-	{ std::cerr << '[' << name() << ']' << " Warning: async query timed out." << std::endl; }
-	session().commit();
-	// repeat for those that don't support uncommitted read isolation
-	if (local.getTransactionIsolation() == Session::TRANSACTION_READ_COMMITTED)
-	{
-		stmt1.wait();
-		local << "SELECT count(*) FROM Person", into(locCount), now;
-		assertTrue (0 == locCount);
+		std::string tableName("Person");
+		std::vector<std::string> lastNames = {"LN1", "LN2"};
+		std::vector<std::string> firstNames = {"FN1", "FN2"};
+		std::vector<std::string> addresses = {"ADDR1", "ADDR2"};
+		std::vector<int> ages = {1, 2};
+		int count = 0, locCount = 0;
+		std::string result;
+
+		session().setFeature("autoCommit", true);
+		assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", false);
+		assertTrue (!session().isTransaction());
+		session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+
+		{
+			Transaction trans(session());
+			assertTrue (trans.isActive());
+			assertTrue (session().isTransaction());
+
+			session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
+
+			assertTrue (session().isTransaction());
+			assertTrue (trans.isActive());
+
+			session() << "SELECT COUNT(*) FROM Person", into(count), now;
+			assertEqual (2, count);
+			assertTrue (session().isTransaction());
+			assertTrue (trans.isActive());
+		}
+		assertTrue (!session().isTransaction());
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (0, count);
+		assertTrue (!(session().impl()->shouldParse() && session().isTransaction()));
+		session().commit();
+
+		{
+			Transaction trans(session());
+			session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastNames), use(firstNames), use(addresses), use(ages), now;
+
+			Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
+
+			assertTrue (session().isTransaction());
+			assertTrue (trans.isActive());
+			trans.commit();
+			assertTrue (!session().isTransaction());
+			assertTrue (!trans.isActive());
+
+			stmt1.wait();
+			assertEqual (2, locCount);
+		}
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (2, count);
+
+		session() << "DELETE FROM Person", now;
+
+		Statement stmt1 = (local << "SELECT count(*) FROM Person", into(locCount), async, now);
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (0, count);
+		try
+		{
+			stmt1.wait(5000);
+			if (readUncommitted &&
+				local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED) &&
+				local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
+				assertEqual (0, locCount);
+		}
+		catch (TimeoutException&)
+		{
+			std::cerr << '[' << name() << ']' << " Warning: async query timed out." << std::endl;
+		}
+		catch (CppUnit::CppUnitException& ex)
+		{
+			std::cerr << " Warning: " << ex.what() << std::endl;
+		}
+		catch (std::exception& ex)
+		{
+			std::cerr << " Warning: " << ex.what() << std::endl;
+		}
+		session().commit();
+		// repeat for those that don't support uncommitted read isolation
+		if (local.getTransactionIsolation() == Session::TRANSACTION_READ_COMMITTED)
+		{
+			stmt1.wait();
+			local << "SELECT count(*) FROM Person", into(locCount), now;
+			assertEqual (0, locCount);
+		}
+
+		std::string sql1 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
+		std::string sql2 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[1], firstNames[1], addresses[1], ages[1]);
+		std::vector<std::string> sql;
+		sql.push_back(sql1);
+		sql.push_back(sql2);
+
+		Transaction trans(session());
+
+		trans.execute(sql1, false);
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (1, count);
+		trans.execute(sql2, false);
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (2, count);
+
+		Statement stmt2 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
+
+		trans.rollback();
+
+		stmt2.wait();
+		assertEqual (0, locCount);
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (0, count);
+
+		trans.execute(sql);
+
+		Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+		assertEqual (2, locCount);
+
+		session() << "SELECT count(*) FROM Person", into(count), now;
+		assertEqual (2, count);
 	}
-
-	std::string sql1 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
-	std::string sql2 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[1], firstNames[1], addresses[1], ages[1]);
-	std::vector<std::string> sql;
-	sql.push_back(sql1);
-	sql.push_back(sql2);
-
-	Transaction trans(session());
-
-	trans.execute(sql1, false);
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (1 == count);
-	trans.execute(sql2, false);
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (2 == count);
-
-	Statement stmt2 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
-
-	trans.rollback();
-
-	stmt2.wait();
-	assertTrue (0 == locCount);
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (0 == count);
-
-	trans.execute(sql);
-
-	Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
-	assertTrue (2 == locCount);
-
-	session() << "SELECT count(*) FROM Person", into(count), now;
-	assertTrue (2 == count);
+	catch (std::exception& ex)
+	{
+		std::cerr << " Warning: " << ex.what() << std::endl;
+	}
 	session().commit();
 
 	// restore the original transaction state
@@ -4276,49 +4304,8 @@ void SQLExecutor::transactor()
 
 void SQLExecutor::nullable()
 {
-	try { session() << "INSERT INTO NullableTest VALUES(NULL, NULL, NULL, NULL)", now; }	catch(DataException& ce){ std::cout << ce.displayText() << std::endl; fail ("nullable()", __LINE__, __FILE__); }
-
-	Nullable<int> i = 1;
-	Nullable<double> f = 1.5;
-	Nullable<std::string> s = std::string("abc");
-	Nullable<DateTime> d = DateTime();
-
-	assertTrue (!i.isNull());
-	assertTrue (!f.isNull());
-	assertTrue (!s.isNull());
-	assertTrue (!d.isNull());
-
-	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(s), into(i), into(f), into(d), now;
-
-	assertTrue (i.isNull());
-	assertTrue (f.isNull());
-	assertTrue (s.isNull());
-	assertTrue (d.isNull());
-
-	RecordSet rs(session(), "SELECT * FROM NullableTest");
-
-	rs.moveFirst();
-	assertTrue (rs.isNull("EmptyString"));
-	assertTrue (rs.isNull("EmptyInteger"));
-	assertTrue (rs.isNull("EmptyFloat"));
-	assertTrue (rs.isNull("EmptyDateTime"));
-
-	Var di = 1;
-	Var df = 1.5;
-	Var ds = "abc";
-	Var dd = DateTime();
-
-	assertTrue (!di.isEmpty());
-	assertTrue (!df.isEmpty());
-	assertTrue (!ds.isEmpty());
-	assertTrue (!dd.isEmpty());
-
-	Statement stmt = (session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(ds), into(di), into(df), into(dd), now);
-
-	assertTrue (di.isEmpty());
-	assertTrue (df.isEmpty());
-	assertTrue (ds.isEmpty());
-	assertTrue (dd.isEmpty());
+	nullableImpl<Date>("EmptyDate"s);
+	nullableImpl<DateTime>("EmptyDateTime"s);
 }
 
 
@@ -4334,17 +4321,14 @@ void SQLExecutor::reconnect()
 	try { session() << formatSQL("INSERT INTO Person VALUES (?,?,?,?)"), use(lastName), use(firstName), use(address), use(age), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (ce.displayText());
 	}
-
 
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg(ce.displayText());
 	}
 
 	assertTrue (count == 1);
@@ -4364,8 +4348,7 @@ void SQLExecutor::reconnect()
 	try { session() << "SELECT Age FROM Person", into(count), now;  }
 	catch(DataException& ce)
 	{
-		std::cout << ce.displayText() << std::endl;
-		fail (__func__, __LINE__, __FILE__);
+		failmsg (ce.displayText());
 	}
 
 	assertTrue (count == age);

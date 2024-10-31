@@ -72,6 +72,7 @@ void DataTest::testSession()
 	assertTrue (sess.connector() == sess.impl()->connectorName());
 	assertTrue ("cs" == sess.impl()->connectionString());
 	assertTrue ("test:///cs" == sess.uri());
+	assertTrue ("Test" == sess.dbmsName());
 
 	assertTrue (sess.getLoginTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
 	sess.setLoginTimeout(123);
@@ -354,7 +355,7 @@ void DataTest::testCLOB()
 	blobChrStr = CLOB(sss);
 	assertTrue (blobChrStr == blobNumStr);
 
-    std::string xyz = "xyz";
+	std::string xyz = "xyz";
 	vLOB = xyz;
 	blobChrStr = sss = vLOB.convert<std::string>();
 	assertTrue (0 == std::strncmp(xyz.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
@@ -1543,7 +1544,7 @@ void DataTest::testSQLParse()
 
 void DataTest::testSQLChannel()
 {
-	std::string dir = Path::tempHome();
+	const std::string dir = Path::tempHome();
 	AutoPtr<SQLChannel> pChannel = new SQLChannel();
 	pChannel->setProperty("directory", dir);
 	Stopwatch sw; sw.start();
@@ -1555,16 +1556,19 @@ void DataTest::testSQLChannel()
 	}
 
 	Glob g("*.log.sql");
+	if (File(dir).exists())
 	{
-		DirectoryIterator it(dir);
-		DirectoryIterator end;
-		while (it != end)
 		{
-			if (g.match(it->path()))
+			DirectoryIterator it(dir);
+			const DirectoryIterator end;
+			while (it != end)
 			{
-				File(it->path()).remove();
+				if (g.match(it->path()))
+				{
+					File(it->path()).remove();
+				}
+				++it;
 			}
-			++it;
 		}
 	}
 
@@ -1586,7 +1590,7 @@ void DataTest::testSQLChannel()
 
 	int count = 0;
 	DirectoryIterator it(dir);
-	DirectoryIterator end;
+	const DirectoryIterator end;
 	while (it != end)
 	{
 		if (g.match(it->path()))

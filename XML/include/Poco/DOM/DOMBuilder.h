@@ -46,9 +46,14 @@ class XML_API DOMBuilder: protected DTDHandler, protected ContentHandler, protec
 	/// must be supplied to the DOMBuilder.
 {
 public:
-	DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool = 0);
+	DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool = 0, std::size_t maxDepth = 0);
 		/// Creates a DOMBuilder using the given XMLReader.
 		/// If a NamePool is given, it becomes the Document's NamePool.
+		///
+		/// The maxDepth parameter can be used to limit the maximum element depth of the 
+		/// document. This can be used to prevent excessive element depth, which
+		/// could lead to a stack overflow when destroying the document.
+		/// A maxDepth of 0 does not limit the depth.
 
 	virtual ~DOMBuilder();
 		/// Destroys the DOMBuilder.
@@ -98,11 +103,13 @@ private:
 
 	XMLReader&             _xmlReader;
 	NamePool*              _pNamePool;
+	std::size_t            _maxDepth;
 	Document*              _pDocument;
 	AbstractContainerNode* _pParent;
 	AbstractNode*          _pPrevious;
 	bool                   _inCDATA;
 	bool                   _namespaces;
+	std::size_t            _depth;
 };
 
 

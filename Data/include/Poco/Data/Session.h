@@ -170,12 +170,12 @@ public:
 
 	Session(const std::string& connector,
 		const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connector (which must have
 		/// been registered), and connectionString.
 
 	Session(const std::string& connection,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connection (must be in
 		/// "connection:///connectionString" format).
 
@@ -203,6 +203,11 @@ public:
 	{
 		return (_statementCreator << t);
 	}
+
+	const std::string& dbmsName() const;
+		/// Returns the DBMS name. The name must be set by the
+		/// implementation.
+		/// Defaults to "unknown".
 
 	SharedPtr<StatementImpl> createStatementImpl();
 		/// Creates a StatementImpl.
@@ -350,6 +355,12 @@ private:
 //
 // inlines
 //
+
+inline const std::string& Session::dbmsName() const
+{
+	return _pImpl->dbmsName();
+}
+
 
 inline bool Session::isAutocommit() const
 {

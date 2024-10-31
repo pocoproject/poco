@@ -3161,6 +3161,8 @@ void VarTest::testIterator()
 
 	da = Poco::Dynamic::Array();
 	assertTrue(da.begin() == da.end());
+	assertTrue(da.begin() <= da.end());
+	assertTrue(da.begin() >= da.end());
 
 	da = 1;
 	assertTrue (!da.isEmpty());
@@ -3172,6 +3174,10 @@ void VarTest::testIterator()
 	}
 	catch (RangeException&) {}
 	assertTrue (da.begin() != da.end());
+	assertTrue (da.begin() <= da.end());
+	assertTrue (da.begin() < da.end());
+	assertTrue (da.end() >= da.begin());
+	assertTrue (da.end() > da.begin());
 
 	Var::Iterator it = da.begin();
 	Var::Iterator end = da.end();

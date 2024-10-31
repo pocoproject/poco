@@ -12,7 +12,7 @@
 //
 
 
-#include "Poco/XML/ParserEngine.h"
+#include "ParserEngine.h"
 #include "Poco/XML/NamespaceStrategy.h"
 #include "Poco/XML/XMLException.h"
 #include "Poco/SAX/EntityResolver.h"
@@ -748,8 +748,8 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 	if (!context && !pThis->_externalParameterEntities) return XML_STATUS_ERROR;
 	if (context && !pThis->_externalGeneralEntities) return XML_STATUS_ERROR;
 
-	InputSource* pInputSource = 0;
-	EntityResolver* pEntityResolver = 0;
+	InputSource* pInputSource = nullptr;
+	EntityResolver* pEntityResolver = nullptr;
 	EntityResolverImpl defaultResolver;
 
 	XMLString sysId(systemId);
@@ -798,7 +798,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(encodingHandlerData);
 
 	XMLString encoding(name);
-	TextEncoding* knownEncoding = 0;
+	TextEncoding* knownEncoding = nullptr;
 
 	EncodingMap::const_iterator it = pThis->_encodings.find(encoding);
 	if (it != pThis->_encodings.end())

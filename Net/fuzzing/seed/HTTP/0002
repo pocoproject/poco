@@ -1,0 +1,11 @@
+HTTP/1.1 401 Unauthorized
+Content-Length: 0
+Server: Microsoft-HTTPAPI/2.0
+WWW-Authenticate: Negotiate
+WWW-Authenticate: NTLM
+Proxy-Authenticate: Negotiate
+Proxy-Authenticate: NTLM
+Date: Tue, 10 Aug 2021 07:38:46 GMT
+Proxy-Support: Session-Based-Authentication
+
+

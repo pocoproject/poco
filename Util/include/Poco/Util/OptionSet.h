@@ -67,8 +67,8 @@ public:
 		/// The name must either match the short or full name of an
 		/// option. Comparison case sensitive for the short name and
 		/// not case sensitive for the full name.
-		/// Throws a NotFoundException if no matching option has been found.
-		/// Throws an UnknownOptionException if a partial full name matches
+		/// Throws a UnknownOptionException if no matching option has been found.
+		/// Throws an AmbiguousOptionException if a partial full name matches
 		/// more than one option.
 
 	Iterator begin() const;

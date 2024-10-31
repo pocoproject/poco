@@ -39,6 +39,8 @@ class Foundation_API UUIDGenerator
 	/// RFC 2518 (WebDAV), section 6.4.1 and the UUIDs and GUIDs internet
 	/// draft by Leach/Salz from February, 1998
 	/// (http://ftp.ics.uci.edu/pub/ietf/webdav/uuid-guid/draft-leach-uuids-guids-01.txt)
+	///
+	/// Version 6 and 7 UUIDs are based on RFC 9562.
 {
 public:
 	UUIDGenerator();
@@ -78,6 +80,13 @@ public:
 		/// The UUID::version() method can be used to determine the actual kind of
 		/// the UUID generated.
 
+	UUID createV6();
+		/// Creates a time-based version 6 UUID (according to RFC 9562) with a MAC address. 
+		/// If no MAC address is available, a random MAC address will be generated.
+
+	UUID createV7();
+		/// Creates a time-based version 7 UUID (according to RFC 9652).
+
 	void seed(UInt32 n);
 		/// Seeds the internal pseudo random generator for time-based UUIDs with the given seed.
 
@@ -90,13 +99,13 @@ public:
 
 protected:
 	Timestamp::UtcTimeVal timeStamp();
-	void getNode();
 
 private:
 	FastMutex           _mutex;
 	Random              _random;
 	Timestamp           _lastTime;
 	int                 _ticks;
+	Poco::UInt16        _counter;
 	Environment::NodeId _node;
 	bool                _haveNode;
 

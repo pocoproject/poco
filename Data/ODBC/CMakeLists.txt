@@ -29,6 +29,44 @@ target_include_directories(DataODBC
 )
 target_compile_definitions(DataODBC PUBLIC THREADSAFE)
 
+# Search for MS ODBC header file which is a pre-requisite to enable
+# ENABLE_DATA_SQL_SERVER_BIG_STRINGS
+find_file(
+	_msodbc_h
+
+	msodbcsql.h
+
+	HINTS
+
+	/usr/include
+	#macOS
+	/opt/homebrew/include/msodbcsql18
+	/opt/homebrew/include/msodbcsql17
+	#Linux
+	/opt/microsoft/msodbcsql18/include
+	/opt/microsoft/msodbcsql17/include/
+	/opt/microsoft/msodbcsql/include/
+	# Windows?
+
+	NO_CACHE
+)
+
+if (_msodbc_h)
+	get_filename_component(MSODBC_DIR ${_msodbc_h} DIRECTORY CACHE)
+	message(STATUS "ODBC: Found msodbcsql.h in: ${MSODBC_DIR}")
+	target_include_directories(DataODBC PUBLIC "${MSODBC_DIR}")
+
+	if (ENABLE_DATA_SQL_SERVER_BIG_STRINGS)
+		target_compile_definitions(DataODBC PUBLIC POCO_DATA_SQL_SERVER_BIG_STRINGS=1)
+	else()
+		target_compile_definitions(DataODBC PUBLIC POCO_DATA_SQL_SERVER_BIG_STRINGS=0)
+	endif()
+else()
+	# Disable MS SQL specific setting when msodbcsql.h is not present
+	set(ENABLE_DATA_SQL_SERVER_BIG_STRINGS OFF CACHE BOOL FORCE "Enable MS SQL Server big strings")
+endif()
+unset(_msodbc_h)
+
 POCO_INSTALL(DataODBC)
 POCO_GENERATE_PACKAGE(DataODBC)
 

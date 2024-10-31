@@ -52,7 +52,8 @@ class Foundation_API DateTime
 	/// Notes:
 	///   * Zero is a valid year (in accordance with ISO 8601 and astronomical year numbering)
 	///   * Year zero (0) is a leap year
-	///   * Negative years (years preceding 1 BC) are not supported
+	///   * Minimum date/time that can be represented is 12:00:00 UTC Monday, 1 January 4713 BC
+	///    (Julian Day 0, Gregorian -4713-11-24 12:00:00)
 	///
 	/// For more information, please see:
 	///   * http://en.wikipedia.org/wiki/Gregorian_Calendar
@@ -254,6 +255,12 @@ public:
 		/// Returns true if all arguments are valid, false otherwise.
 
 protected:
+	void checkValid();
+		/// Checks if the given date and time is valid (all arguments are within a proper range).
+		/// Expects all members to be set.
+		///
+		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
+
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 

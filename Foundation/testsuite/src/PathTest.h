@@ -45,6 +45,7 @@ public:
 	void testRobustness();
 	void testParent();
 	void testForDirectory();
+	void testAddDirectorySeparator();
 	void testExpand();
 	void testListRoots();
 	void testFind();

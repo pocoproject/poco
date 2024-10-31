@@ -19,9 +19,11 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
+using namespace Poco::Data::Keywords;
 
 namespace Poco {
 namespace Data {
@@ -267,6 +269,95 @@ public:
 	void sessionTransactionNoAutoCommit(const std::string& connector, const std::string& connect);
 	void transaction(const std::string& connector, const std::string& connect, bool readUncommitted = true);
 	void transactor();
+
+	template <typename T>
+	void nullableImpl(const std::string& emptyName)
+	{
+		std::string sql = "DELETE FROM NullableTest";
+		try { session() << sql, now; }
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(Poco::format("nullableImpl<%s>():\n%s",
+				std::string(typeid(T).name()), sql));
+		}
+
+		const std::string fields = Poco::format("EmptyString, EmptyInteger, EmptyFloat, %s", emptyName);
+		Poco::Nullable<int> ni;
+		Poco::Nullable<double> nf;
+		Poco::Nullable<std::string> ns;
+		Poco::Nullable<T> ndt;
+
+		assertTrue(ni.isNull());
+		assertTrue(nf.isNull());
+		assertTrue(ns.isNull());
+		assertTrue(ndt.isNull());
+
+		sql = Poco::format("INSERT INTO NullableTest (%s) VALUES (?,?,?,?)", fields);
+		try { session() << sql, use(ns), use(ni), use(nf), use(ndt), now; }
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(Poco::format("nullableImpl<%s>():\n%s",
+				std::string(typeid(T).name()), sql));
+		}
+
+		Nullable<int> i = 1;
+		Nullable<double> f = 1.5;
+		Nullable<std::string> s = std::string("abc");
+		Nullable<T> d = T();
+
+		assertTrue(!i.isNull());
+		assertTrue(!f.isNull());
+		assertTrue(!s.isNull());
+		assertTrue(!d.isNull());
+
+		sql = Poco::format("SELECT %s FROM NullableTest", fields);
+		try { session() << sql, into(s), into(i), into(f), into(d), now; }
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(Poco::format("nullableImpl<%s>():\n%s",
+				std::string(typeid(T).name()), sql));
+		}
+
+		assertTrue(i.isNull());
+		assertTrue(f.isNull());
+		assertTrue(s.isNull());
+		assertTrue(d.isNull());
+
+		sql = "SELECT * FROM NullableTest";
+		Poco::Data::RecordSet rs(session(), sql);
+
+		rs.moveFirst();
+		assertTrue(rs.isNull("EmptyString"));
+		assertTrue(rs.isNull("EmptyInteger"));
+		assertTrue(rs.isNull("EmptyFloat"));
+		assertTrue(rs.isNull(emptyName));
+
+		Poco::Dynamic::Var di = 1;
+		Poco::Dynamic::Var df = 1.5;
+		Poco::Dynamic::Var ds = "abc";
+		Poco::Dynamic::Var dd = T();
+
+		assertTrue(!di.isEmpty());
+		assertTrue(!df.isEmpty());
+		assertTrue(!ds.isEmpty());
+		assertTrue(!dd.isEmpty());
+
+		try { session() << sql, into(ds), into(di), into(df), into(dd), now; }
+		catch (DataException& ce)
+		{
+			std::cout << ce.displayText() << std::endl;
+			failmsg(Poco::format("nullableImpl<%s>():\n%s",
+				std::string(typeid(T).name()), sql));
+		}
+
+		assertTrue(di.isEmpty());
+		assertTrue(df.isEmpty());
+		assertTrue(ds.isEmpty());
+		assertTrue(dd.isEmpty());
+	}
 	void nullable();
 
 	void unicode(const std::string& dbConnString);

@@ -95,7 +95,7 @@ int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (getMode() & std::ios::out)
 		sync();
 
-	int n = read(_fd, buffer, length);
+	int n = ::read(_fd, buffer, length);
 	if (n == -1)
 		File::handleLastError(_path);
 	_pos += n;
@@ -108,9 +108,9 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	if (_fd == -1) return -1;
 
 #if defined(POCO_VXWORKS)
-	int n = write(_fd, const_cast<char*>(buffer), length);
+	int n = ::write(_fd, const_cast<char*>(buffer), length);
 #else
-	int n = write(_fd, buffer, length);
+	int n = ::write(_fd, buffer, length);
 #endif
 	if (n == -1)
 		File::handleLastError(_path);
@@ -136,6 +136,18 @@ bool FileStreamBuf::close()
 		_fd = -1;
 	}
 	return success;
+}
+
+
+bool FileStreamBuf::resizeBuffer(std::streamsize bufferSize)
+{
+	if (_fd != -1)
+		return false;
+
+	if (bufferSize < BUFFER_SIZE)
+		bufferSize = BUFFER_SIZE;
+
+	return BufferedBidirectionalStreamBuf::resizeBuffer(bufferSize);
 }
 
 
@@ -165,7 +177,7 @@ std::streampos FileStreamBuf::seekoff(std::streamoff off, std::ios::seekdir dir,
 	{
 		whence = SEEK_END;
 	}
-	_pos = lseek(_fd, off, whence);
+	_pos = ::lseek(_fd, off, whence);
 	return _pos;
 }
 
@@ -180,7 +192,7 @@ std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mod
 
 	resetBuffers();
 
-	_pos = lseek(_fd, pos, SEEK_SET);
+	_pos = ::lseek(_fd, pos, SEEK_SET);
 	return _pos;
 }
 
@@ -190,7 +202,7 @@ void FileStreamBuf::flushToDisk()
 	if (getMode() & std::ios::out)
 	{
 		sync();
-		if (fsync(_fd) != 0)
+		if (::fsync(_fd) != 0)
 			File::handleLastError(_path);
 	}
 }
@@ -204,7 +216,7 @@ FileStreamBuf::NativeHandle FileStreamBuf::nativeHandle() const
 Poco::UInt64 FileStreamBuf::size() const
 {
 	struct stat stat_buf;
-	int rc = fstat(_fd, &stat_buf);
+	int rc = ::fstat(_fd, &stat_buf);
 	if (rc < 0)
 	{
 		Poco::SystemException(strerror(errno), errno);

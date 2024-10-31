@@ -14,6 +14,11 @@
 
 #include "Poco/Exception.h"
 #include <typeinfo>
+#ifdef POCO_ENABLE_TRACE
+#include <sstream>
+#include "cpptrace/cpptrace.hpp"
+#include "Poco/Trace/Trace.h"
+#endif
 
 
 namespace Poco {
@@ -21,11 +26,23 @@ namespace Poco {
 
 Exception::Exception(int code): _pNested(0), _code(code)
 {
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg = ostr.str();
+#endif
 }
 
 
 Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), _code(code)
 {
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg += ostr.str();
+#endif
 }
 
 
@@ -36,11 +53,23 @@ Exception::Exception(const std::string& msg, const std::string& arg, int code): 
 		_msg.append(": ");
 		_msg.append(arg);
 	}
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg += ostr.str();
+#endif
 }
 
 
 Exception::Exception(const std::string& msg, const Exception& nested, int code): _msg(msg), _pNested(nested.clone()), _code(code)
 {
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg += ostr.str();
+#endif
 }
 
 

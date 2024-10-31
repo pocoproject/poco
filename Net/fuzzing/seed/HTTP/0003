@@ -1,0 +1,27 @@
+HTTP/1.0 401 Unauthorized
+Server: HTTPd/0.9
+Host: google
+Date: Sun, 10 Apr 2014 20:26:47 GMT
+WWW-Authenticate: Digest realm="testrealm@host.com",
+                        qop="auth,auth-int",
+                        nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",
+                        opaque="5ccc069c403ebaf9f0171e9517f40e41"
+Proxy-Authenticate: Digest realm="testrealm@host.com",
+                        qop="auth,auth-int",
+                        nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",
+                        opaque="5ccc069c403ebaf9f0171e9517f40e41"
+Content-Type: text/html
+Content-Length: 153
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Error</title>
+  </head>
+  <body>
+    <h1>401 Unauthorized.</h1>
+  </body>
+</html>
+
+
