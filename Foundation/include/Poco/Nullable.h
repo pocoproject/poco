@@ -53,6 +53,8 @@ class Nullable
 	/// default construction.
 {
 public:
+	using Type = C;
+
 	Nullable()
 		/// Creates an empty Nullable.
 	{

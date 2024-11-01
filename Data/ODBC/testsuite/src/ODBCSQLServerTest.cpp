@@ -399,6 +399,18 @@ void ODBCSQLServerTest::testNull()
 }
 
 
+void ODBCSQLServerTest::testNullBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	recreatePersonBLOBTable();
+	_pExecutor->nullBulk("CONVERT(VARBINARY(30),?)");
+}
+
+
 void ODBCSQLServerTest::testBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1086,6 +1098,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);

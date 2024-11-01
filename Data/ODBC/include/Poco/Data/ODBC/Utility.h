@@ -171,6 +171,31 @@ public:
 		/// Returns the back end DBMS name.
 		/// On error, returns "unknown".
 
+	template <typename T>
+	static constexpr SQLINTEGER sizeOf()
+		/// Returns size of the data type.
+	{
+		static_assert (
+			(std::is_same_v<T, Date>) ||
+			(std::is_same_v<T, Time>) ||
+			(std::is_same_v<T, DateTime>) ||
+			(std::is_same_v<T, UUID>), "Utility::sizeOf(): Unsupported type"s
+		);
+
+		if constexpr(std::is_same_v<T, Date    >) return sizeof(SQL_DATE_STRUCT);
+		if constexpr(std::is_same_v<T, Time    >) return sizeof(SQL_TIME_STRUCT);
+		if constexpr(std::is_same_v<T, DateTime>) return sizeof(SQL_TIMESTAMP_STRUCT);
+		if constexpr(std::is_same_v<T, UUID    >) return 16;
+		return 0;
+	}
+
+	template <typename T>
+	static constexpr SQLINTEGER sizeOf(const T&)
+		/// Returns size of the data type.
+	{
+		return sizeOf<std::remove_const_t<std::remove_reference_t<T>>>();
+	}
+
 private:
 	static const TypeInfo _dataTypes;
 		/// C <==> SQL data type mapping

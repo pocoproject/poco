@@ -198,7 +198,7 @@ bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, Dynamic::V
 }
 
 
-int TypeInfo::cDataType(int sqlDataType) const
+SQLSMALLINT TypeInfo::cDataType(SQLSMALLINT sqlDataType) const
 {
 	DataTypeMap::const_iterator it = _cDataTypes.find(sqlDataType);
 
@@ -209,7 +209,7 @@ int TypeInfo::cDataType(int sqlDataType) const
 }
 
 
-int TypeInfo::sqlDataType(int cDataType) const
+SQLSMALLINT TypeInfo::sqlDataType(SQLSMALLINT cDataType) const
 {
 	DataTypeMap::const_iterator it = _sqlDataTypes.find(cDataType);
 

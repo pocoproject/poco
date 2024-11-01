@@ -158,6 +158,8 @@ public:
 	void limitZero();
 	void prepare();
 
+	void nullBulk(const std::string& blobPlaceholder);
+
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
 	void doBulkWithBool(Poco::UInt32 size, const std::string& blobPlaceholder="?")
 	{
@@ -716,6 +718,12 @@ inline void SQLExecutor::limitPrepare()
 inline void SQLExecutor::prepare()
 {
 	_dataExecutor.prepare();
+}
+
+
+inline void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
+{
+	_dataExecutor.nullBulk(blobPlaceholder);
 }
 
 
