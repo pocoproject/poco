@@ -179,7 +179,7 @@ public:
 			(std::is_same_v<T, Date>) ||
 			(std::is_same_v<T, Time>) ||
 			(std::is_same_v<T, DateTime>) ||
-			(std::is_same_v<T, UUID>), "Utility::sizeOf(): Unsupported type"s
+			(std::is_same_v<T, UUID>), "Utility::sizeOf(): Unsupported type"
 		);
 
 		if constexpr(std::is_same_v<T, Date    >) return sizeof(SQL_DATE_STRUCT);

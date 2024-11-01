@@ -103,7 +103,7 @@ public:
 			(T == SQL_LONGVARBINARY ) ||
 			(T == SQL_TYPE_DATE     ) ||
 			(T == SQL_TYPE_TIME     ) ||
-			(T == SQL_TYPE_TIMESTAMP), "TypeInfo::cDataType(): Unknown SQL type."s
+			(T == SQL_TYPE_TIMESTAMP), "TypeInfo::cDataType(): Unknown SQL type."
 		);
 
 		if constexpr(T == SQL_CHAR          ) return SQL_C_CHAR;
@@ -156,7 +156,7 @@ public:
 			(T == SQL_C_BINARY        ) ||
 			(T == SQL_C_TYPE_DATE     ) ||
 			(T == SQL_C_TYPE_TIME     ) ||
-			(T == SQL_C_TYPE_TIMESTAMP), "TypeInfo::sqlDataType(): Unknown C type."s
+			(T == SQL_C_TYPE_TIMESTAMP), "TypeInfo::sqlDataType(): Unknown C type."
 		);
 
 		if constexpr(T == SQL_C_CHAR          ) return SQL_VARCHAR;

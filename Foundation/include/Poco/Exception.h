@@ -100,14 +100,14 @@ protected:
 private:
 	std::string _msg;
 	Exception*  _pNested;
-	int			_code;    
+	int			_code;
 };
 
 #if defined(_HAS_EXCEPTIONS)
-    // Size of Poco::Exception depends on the exception settings (like _HAS_EXCEPTIONS)
-    // that might influence size of std::exception from which Poco::Exception is derived from.
-    // It is expected that Poco libraries and application using Poco have the same settings.
-    static_assert(_HAS_EXCEPTIONS != 0);
+	// Size of Poco::Exception depends on the exception settings (like _HAS_EXCEPTIONS)
+	// that might influence size of std::exception from which Poco::Exception is derived from.
+	// It is expected that Poco libraries and application using Poco have the same settings.
+	static_assert(_HAS_EXCEPTIONS != 0);
 #endif
 
 //
