@@ -3588,48 +3588,56 @@ void SQLiteTest::testTransactor()
 }
 
 
-void SQLiteTest::testFTS3()
+void SQLiteTest::testFTS()
 {
-#ifdef SQLITE_ENABLE_FTS3
+#if defined(SQLITE_ENABLE_FTS3) || defined(SQLITE_ENABLE_FTS5)
 	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
-	assertTrue (session.isConnected());
+	assertTrue(session.isConnected());
 
 	session << "DROP TABLE IF EXISTS docs", now;
+
+#if defined(SQLITE_ENABLE_FTS5)
+	session << "CREATE VIRTUAL TABLE docs USING fts5(content)", now;
+	const std::string idColumn = "rowid";
+#elif defined(SQLITE_ENABLE_FTS3)
 	session << "CREATE VIRTUAL TABLE docs USING fts3()", now;
+	const std::string idColumn = "docid";
+#endif
 
-	session << "INSERT INTO docs(docid, content) VALUES(1, 'a database is a software system')", now;
-	session << "INSERT INTO docs(docid, content) VALUES(2, 'sqlite is a software system')", now;
-	session << "INSERT INTO docs(docid, content) VALUES(3, 'sqlite is a database')", now;
+	session << "INSERT INTO docs(" << idColumn << ", content) VALUES(1, 'a database is a software system')", now;
+	session << "INSERT INTO docs(" << idColumn << ", content) VALUES(2, 'sqlite is a software system')", now;
+	session << "INSERT INTO docs(" << idColumn << ", content) VALUES(3, 'sqlite is a database')", now;
 
-	int docid = 0;
-	session << "SELECT docid FROM docs WHERE docs MATCH 'sqlite AND database'", into(docid), now;
-	assertTrue (docid == 3);
+	int id = 0;
+	session << "SELECT " << idColumn << " FROM docs WHERE docs MATCH 'sqlite AND database'", into(id), now;
+	assertTrue(id == 3);
 
-	docid = 0;
-	session << "SELECT docid FROM docs WHERE docs MATCH 'database sqlite'", into(docid), now;
-	assertTrue (docid == 3);
+	id = 0;
+	session << "SELECT " << idColumn << " FROM docs WHERE docs MATCH 'database sqlite'", into(id), now;
+	assertTrue(id == 3);
 
-	std::vector<int> docids;
-	session << "SELECT docid FROM docs WHERE docs MATCH 'sqlite OR database' ORDER BY docid",
-		into(docids), now;
-	assertTrue (docids.size() == 3);
-	assertTrue (docids[0] == 1);
-	assertTrue (docids[1] == 2);
-	assertTrue (docids[2] == 3);
+	std::vector<int> ids;
+	session << "SELECT " << idColumn << " FROM docs WHERE docs MATCH 'sqlite OR database' ORDER BY " << idColumn,
+		into(ids), now;
+	assertTrue(ids.size() == 3);
+	assertTrue(ids[0] == 1);
+	assertTrue(ids[1] == 2);
+	assertTrue(ids[2] == 3);
 
 	std::string content;
-	docid = 0;
-	session << "SELECT docid, content FROM docs WHERE docs MATCH 'database NOT sqlite'",
-		into(docid), into(content), now;
-	assertTrue (docid == 1);
-	assertTrue (content == "a database is a software system");
+	id = 0;
+	session << "SELECT " << idColumn << ", content FROM docs WHERE docs MATCH 'database NOT sqlite'",
+		into(id), into(content), now;
+	assertTrue(id == 1);
+	assertTrue(content == "a database is a software system");
 
-	docid = 0;
-	session << "SELECT count(*) FROM docs WHERE docs MATCH 'database and sqlite'", into(docid), now;
-	assertTrue (docid == 0);
+	id = 0;
+	session << "SELECT count(*) FROM docs WHERE docs MATCH 'database and sqlite'", into(id), now;
+	assertTrue(id == 0);
+
 #else
 	std::cout << "SQLite FTS not enabled, test not executed." << std::endl;
-#endif // SQLITE_ENABLE_FTS3
+#endif
 }
 
 
@@ -3856,7 +3864,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransactionRepeatableRead);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
-	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
+	CppUnit_addTest(pSuite, SQLiteTest, testFTS);
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactionTypeProperty);
 	CppUnit_addTest(pSuite, SQLiteTest, testRecordsetCopyMove);
