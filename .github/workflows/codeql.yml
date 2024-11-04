@@ -120,8 +120,8 @@ jobs:
         path: ${{ steps.step1.outputs.sarif-output }}
         retention-days: 5
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
+    # - name: Setup Python
+    #   uses: actions/setup-python@v4
 
     # - name: Fail if an error is found
     #   run: |
