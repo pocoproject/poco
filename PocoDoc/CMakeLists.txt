@@ -4,7 +4,12 @@ POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
 add_executable(PocoDoc ${SRCS})
 
-target_link_libraries(PocoDoc PUBLIC Poco::Util Poco::XML Poco::CppParser)
+target_link_libraries(PocoDoc PUBLIC Poco::Util Poco::XML Poco::CppParser Poco::DataSQLite Poco::Data)
+
+if(ENABLE_DATA_SQLITE_FTS5)
+	target_compile_definitions(PocoDoc PRIVATE POCO_ENABLE_SQLITE_FTS5)
+endif()
+ 
 
 install(
 	TARGETS PocoDoc EXPORT PocoDocTargets
