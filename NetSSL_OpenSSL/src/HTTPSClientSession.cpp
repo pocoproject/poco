@@ -39,11 +39,12 @@ HTTPSClientSession::HTTPSClientSession():
 }
 
 
-HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket):
+HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, const std::string& host, Poco::UInt16 port):
 	HTTPClientSession(socket),
 	_pContext(socket.context())
 {
-	setPort(HTTPS_PORT);
+	setHost(host);
+	setPort(port);
 }
 
 

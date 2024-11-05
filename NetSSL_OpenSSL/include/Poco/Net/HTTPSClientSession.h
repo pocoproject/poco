@@ -78,10 +78,12 @@ public:
 	HTTPSClientSession();
 		/// Creates an unconnected HTTPSClientSession.
 
-	explicit HTTPSClientSession(const SecureStreamSocket& socket);
+	explicit HTTPSClientSession(const SecureStreamSocket& socket, const std::string& host, Poco::UInt16 port = HTTPS_PORT);
 		/// Creates a HTTPSClientSession using the given socket.
 		/// The socket must not be connected. The session
 		/// takes ownership of the socket.
+		///
+		/// The given host name is used for certificate verification.
 
 	HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession);
 		/// Creates a HTTPSClientSession using the given socket.
