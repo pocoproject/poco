@@ -161,7 +161,7 @@ public:
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
 
-	void start(Callable target, void* pData = 0);
+	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>

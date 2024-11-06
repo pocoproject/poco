@@ -15,6 +15,7 @@
 #include "Poco/DirectoryIterator.h"
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Glob.h"
+#include "Poco/Thread.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionException.h"
@@ -64,11 +65,25 @@ protected:
 		_sqlChannel = new Poco::Data::SQLChannel();
 		_sqlChannel->setProperty("directory", _directory);
 
+		_active = true;
+		_startTime.update();
+
+		_sqlSourceThread.startFunc(
+			[this]() { this->createMessages(); }
+		);
+
 		logger().information("Scanning started: %s", _dirWatcher->directory().absolutePath());
 	}
 
 	void uninitialize()
 	{
+		_sqlSourceThread.join();
+
+		logger().information(
+			"Created %z messages, processed %z messages in %Ld ms.",
+			_created, _processed, (_startTime.elapsed() / 1000)
+		);
+
 		Application::uninitialize();
 	}
 
@@ -126,7 +141,7 @@ protected:
 
 	void onItemAdded(const Poco::DirectoryWatcher::DirectoryEvent& ev)
 	{
-		logger().information("Added: %s", ev.item.path());
+		logger().trace("Added: %s", ev.item.path());
 		processFile(ev.item);
 	}
 
@@ -138,18 +153,18 @@ protected:
 
 	void onItemMovedFrom(const Poco::DirectoryWatcher::DirectoryEvent& ev)
 	{
-		logger().information("Moved from: %s", ev.item.path());
+		logger().trace("Moved from: %s", ev.item.path());
 		processFile(ev.item);
 	}
 
 	void onItemMovedTo(const Poco::DirectoryWatcher::DirectoryEvent& ev)
 	{
-		logger().information("Moved to: %s", ev.item.path());
+		logger().trace("Moved to: %s", ev.item.path());
 	}
 
 	void onItemRemoved(const Poco::DirectoryWatcher::DirectoryEvent& ev)
 	{
-		logger().information("Removed: %s", ev.item.path());
+		logger().trace("Removed: %s", ev.item.path());
 	}
 
 	void processFile(const Poco::File& file)
@@ -160,16 +175,24 @@ protected:
 
 		if (!file.isFile())
 		{
-			logger().information("Not a file: %s", file.absolutePath());
+			logger().trace("Not a file: %s", file.absolutePath());
 			return;
 		}
 		if (!_sqlNameGlob.match(file.absolutePath()))
 		{
-			logger().information("Not an SQL file: %s", file.absolutePath());
+			logger().trace("Not an SQL file: %s", file.absolutePath());
 			return;
 		}
-		logger().information("Will process: %s", file.absolutePath());
+		logger().debug("Will process: %s", file.absolutePath());
 
+		Poco::File f(file);
+		if (!f.exists())
+		{
+			logger().information("File does not exist: %s", file.absolutePath());
+			return;
+		}
+		f.remove();
+		++_processed;
 	}
 
 	void scanDirectory()
@@ -184,22 +207,48 @@ protected:
 		}
 	}
 
+	void createMessages()
+	{
+		int i {0};
+		while (_active)
+		{
+			for (int j = 0; j < 100 && _active; ++j)
+			{
+				Poco::Message msg("SQL Source", Poco::format("%d Informational message", i), Poco::Message::PRIO_INFORMATION);
+				_sqlChannel->log(msg);
+				++i;
+				++_created;
+			}
+			Poco::Thread::sleep(50);
+		}
+	}
+
 	int main(const std::vector<std::string>& args)
 	{
 		if (!_helpRequested)
 		{
 			logger().information("Press any key to stop scanning.");
 			std::cin.get();
+
+			_active = false;
 		}
 		return Application::EXIT_OK;
 	}
 
 private:
 	bool _helpRequested;
+	bool _active {false};
+
+	std::size_t _created{0};
+	std::size_t _processed{0};
+
+	Poco::Timestamp _startTime;
+
 	std::string _directory;
 	Poco::Glob _sqlNameGlob;
 	std::shared_ptr<Poco::DirectoryWatcher> _dirWatcher;
 	Poco::AutoPtr<Poco::Data::SQLChannel> _sqlChannel;
+	Poco::Thread _sqlSourceThread;
 };
 
 
