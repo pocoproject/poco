@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# POCO_STATIC=1 - for static build
+# BUILD_SHARED_LIBS=OFF - for static build
 # POCO_UNBUNDLED - for no built-in version of libs
 # CMAKE_INSTALL_PREFIX=path - for install path
 
