@@ -22,6 +22,12 @@
 #   - PocoXmdd.lib for /MD debug build
 #   - PocoXmtd.lib for /MT debug build
 
+if(BUILD_SHARED_LIBS)
+	add_compile_definitions(POCO_DLL)
+else()
+	add_compile_definitions(POCO_STATIC)
+endif()
+
 if(MSVC)
 	if(POCO_MT)
 		set(CompilerFlags

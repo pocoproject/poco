@@ -39,10 +39,6 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-if (NOT POCO_STATIC)
-    add_compile_definitions(THREADSAFE)
-endif (NOT POCO_STATIC)
-
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
@@ -60,6 +56,10 @@ target_include_directories( "${LIBNAME}"
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+
+if (BUILD_SHARED_LIBS)
+	target_compile_definitions(${LIBNAME} PUBLIC THREADSAFE)
+endif ()
 
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
