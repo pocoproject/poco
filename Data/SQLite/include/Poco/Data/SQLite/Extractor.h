@@ -156,12 +156,6 @@ public:
 	bool extract(std::size_t pos, unsigned long& val) override;
 		/// Extracts an unsigned long.
 
-	bool extract(std::size_t pos, long& val);
-		/// Extracts a long. Returns false if null was received.
-
-	bool extract(std::size_t pos, unsigned long& val);
-		/// Extracts an unsigned long. Returns false if null was received.
-
 	bool extract(std::size_t pos, std::vector<long>& val);
 		/// Extracts a long vector.
 

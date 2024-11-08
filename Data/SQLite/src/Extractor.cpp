@@ -60,20 +60,6 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 }
 
 
-#ifndef POCO_INT64_IS_LONG
-bool Extractor::extract(std::size_t pos, long& val)
-{
-	return extract(sqlite3_column_int, pos, val);
-}
-
-
-bool Extractor::extract(std::size_t pos, unsigned long& val)
-{
-	return extract(sqlite3_column_int, pos, val);
-}
-#endif
-
-
 bool Extractor::extract(std::size_t pos, double& val)
 {
 	return extract(sqlite3_column_double, pos, val);
