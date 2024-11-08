@@ -51,9 +51,6 @@ public:
 	using NullIndVec = std::vector<std::pair<bool, bool> >;
 		/// Type for null indicators container.
 
-	using ColFuncPtr = int (*)(sqlite3_stmt*, int);
-		/// SQLite column function pointer.
-
 	Extractor(sqlite3_stmt* pStmt);
 		/// Creates the Extractor.
 
