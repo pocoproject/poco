@@ -3051,11 +3051,13 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 
 void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 {
+	const int sz = 10;
+
 	{
-		std::vector<NullData> lastName(10, null);
-		std::vector<NullData> firstName(10, null);
-		std::vector<NullData> address(10, null);
-		std::vector<NullData> blob(10, null);
+		std::vector<NullData> lastName(sz, null);
+		std::vector<NullData> firstName(sz, null);
+		std::vector<NullData> address(sz, null);
+		std::vector<NullData> blob(sz, null);
 
 		try
 		{
@@ -3067,21 +3069,18 @@ void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 			std::cout << ce.displayText() << std::endl;
 			failmsg (__func__);
 		}
+	}
 
-		lastName.clear();
-		firstName.clear();
-		address.clear();
-		blob.clear();
+	{
+		std::vector<Nullable<std::string>> lastName(sz, null);
+		std::vector<Nullable<std::string>> firstName(sz, null);
+		std::vector<Nullable<std::string>> address(sz, null);
+		std::vector<Nullable<Poco::Data::CLOB>> blob(sz, null);
 
-		assertEqual (0, lastName.size());
-		assertEqual (0, firstName.size());
-		assertEqual (0, address.size());
-		assertEqual (0, blob.size());
-	/*TODO
 		try
 		{
-			session() << "SELECT * Person",
-				into(lastName, bulk), into(firstName, bulk), into(address, bulk), into(blob, bulk), now;
+			session() << "SELECT * FROM Person",
+				into(lastName), into(firstName), into(address), into(blob), now;
 		}
 		catch(DataException& ce)
 		{
@@ -3089,24 +3088,52 @@ void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 			failmsg (__func__);
 		}
 
-		assertEqual (10, lastName.size());
-		assertEqual (10, firstName.size());
-		assertEqual (10, address.size());
-		assertEqual (10, blob.size());
-	*/
+		assertEqual (sz, lastName.size());
+		assertEqual (sz, firstName.size());
+		assertEqual (sz, address.size());
+		assertEqual (sz, blob.size());
+
+		for (int i = 0; i < sz; ++i)
+		{
+			assertTrue (lastName[i].isNull());
+			assertTrue (firstName[i].isNull());
+			assertTrue (address[i].isNull());
+			assertTrue (blob[i].isNull());
+		}
 	}
 
+	session() << "DELETE FROM Person", now;
+
 	{
-		/* TODO
 		std::vector<Nullable<std::string>> lastName(10, null);
 		std::vector<Nullable<std::string>> firstName(10, null);
 		std::vector<Nullable<std::string>> address(10, null);
 		std::vector<Nullable<BLOB>> blob(10, null);
 
+		for (int i = 0; i < sz; ++i)
+		{
+			std::ostringstream ostr;
+			ostr << "abc" << i;
+			lastName[i] = ostr.str();
+
+			if (i % 2)
+			{
+				ostr.str(""s);
+				ostr << "def" << i;
+				firstName[i] = ostr.str();
+				ostr.str(""s);
+				ostr << "ghi" << i;
+				address[i] = ostr.str();
+				ostr.str(""s);
+				ostr << "jkl" << i;
+				blob[i] = BLOB((unsigned char*)ostr.str().data(), ostr.str().length());
+			}
+		}
+
 		try
 		{
-			session() << Poco::format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder),//"INSERT INTO Person (LastName) VALUES (?)",
-				use(lastName, bulk), use(firstName, bulk), use(address, bulk), use(blob, bulk), now;
+			session() << Poco::format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder),
+				use(lastName), use(firstName), use(address), use(blob), now;
 		}
 		catch(DataException& ce)
 		{
@@ -3126,8 +3153,8 @@ void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 
 		try
 		{
-			session() << "SELECT * Person",
-				into(lastName, bulk), into(firstName, bulk), into(address, bulk), into(blob, bulk), now;
+			session() << "SELECT * FROM Person ORDER BY lastName",
+				into(lastName), into(firstName), into(address), into(blob), now;
 		}
 		catch(DataException& ce)
 		{
@@ -3139,7 +3166,36 @@ void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 		assertEqual (10, firstName.size());
 		assertEqual (10, address.size());
 		assertEqual (10, blob.size());
-	*/
+
+		for (int i = 0; i < sz; ++i)
+		{
+			assertFalse(lastName[i].isNull());
+			std::ostringstream ostr;
+			ostr << "abc" << i;
+			assertEqual(ostr.str(), lastName[i].value());
+
+			if (i % 2)
+			{
+				assertFalse(firstName[i].isNull());
+				ostr.str(""s);
+				ostr << "def" << i;
+				assertEqual(ostr.str(), firstName[i].value());
+				assertFalse(address[i].isNull());
+				ostr.str(""s);
+				ostr << "ghi" << i;
+				assertEqual(ostr.str(), address[i].value());
+				assertFalse(blob[i].isNull());
+				ostr.str(""s);
+				ostr << "jkl" << i;
+				assertTrue(BLOB((unsigned char*)ostr.str().data(), ostr.str().length()) == blob[i].value());
+			}
+			else
+			{
+				assertTrue(firstName[i].isNull());
+				assertTrue(address[i].isNull());
+				assertTrue(blob[i].isNull());
+			}
+		}
 	}
 }
 

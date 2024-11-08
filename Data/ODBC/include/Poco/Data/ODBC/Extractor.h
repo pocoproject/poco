@@ -335,6 +335,80 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val);
 		/// Extracts a Dynamic::Var list.
 
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int8>& val);
+		/// Extracts a Nullable Int8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt8>& val);
+		/// Extracts a Nullable UInt8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int16>& val);
+		/// Extracts a Nullable Int16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt16>& val);
+		/// Extracts a Nullable UInt16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int32>& val);
+		/// Extracts a Nullable Int32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt32>& val);
+		/// Extracts a Nullable UInt32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int64>& val);
+		/// Extracts a Nullable Int64.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt64>& val);
+		/// Extracts a Nullable UInt64.
+
+#ifndef POCO_INT64_IS_LONG
+	bool extract(std::size_t pos, Poco::Nullable<long>& val);
+		/// Extracts a Nullable long.
+
+	bool extract(std::size_t pos, Poco::Nullable<unsigned long>& val);
+		/// Extracts a Nullable unsigned long.
+#endif
+
+	bool extract(std::size_t pos, Poco::Nullable<bool>& val);
+		/// Extracts a Nullable bool.
+
+	bool extract(std::size_t pos, Poco::Nullable<float>& val);
+		/// Extracts a Nullable float.
+
+	bool extract(std::size_t pos, Poco::Nullable<double>& val);
+		/// Extracts a Nullable double.
+
+	bool extract(std::size_t pos, Poco::Nullable<char>& val);
+		/// Extracts a Nullable char.
+
+	bool extract(std::size_t pos, Poco::Nullable<std::string>& val);
+		/// Extracts a Nullable string.
+
+	bool extract(std::size_t pos, Poco::Nullable<UTF16String>& val);
+		/// Extracts a Nullable UTF16String.
+
+	bool extract(std::size_t pos, Poco::Nullable<BLOB>& val);
+		/// Extracts a Nullable BLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<CLOB>& val);
+		/// Extracts a Nullable CLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<DateTime>& val);
+		/// Extracts a Nullable DateTime.
+
+	bool extract(std::size_t pos, Poco::Nullable<Date>& val);
+		/// Extracts a Nullable Date.
+
+	bool extract(std::size_t pos, Poco::Nullable<Time>& val);
+		/// Extracts a Nullable Time.
+
+	bool extract(std::size_t pos, Poco::Nullable<UUID>& val);
+		/// Extracts a Nullable UUID.
+
+	bool extract(std::size_t pos, Poco::Nullable<Any>& val);
+		/// Extracts a Nullable Any.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val);
+		/// Extracts a Nullable Var.
+
 	void setDataExtraction(Preparator::DataExtraction ext);
 		/// Set data extraction mode.
 
@@ -616,6 +690,15 @@ private:
 		else
 			throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
 		return ret;
+	}
+
+	template <typename T>
+	bool extractNullable(std::size_t pos, T& val)
+	{
+		typename T::Type lVal;
+		if (!extract(pos, lVal)) val.clear();
+		else val = lVal;
+		return true;
 	}
 
 	bool isNullLengthIndicator(SQLLEN val) const;

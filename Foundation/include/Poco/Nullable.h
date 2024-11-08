@@ -244,13 +244,13 @@ public:
 		return deflt;
 	}
 
-	operator C& ()
+	explicit operator C& ()
 		/// Get reference to the value
 	{
 		return value();
 	}
 
-	operator const C& () const
+	explicit operator const C& () const
 		/// Get const reference to the value
 	{
 		return value();

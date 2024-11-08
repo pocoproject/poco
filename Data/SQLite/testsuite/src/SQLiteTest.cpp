@@ -45,6 +45,7 @@
 #include <iostream>
 
 
+using namespace std::string_literals;
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::Statement;
@@ -62,6 +63,7 @@ using Poco::Data::Transaction;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
+using Poco::Data::NullData;
 using Poco::Data::NotConnectedException;
 using Poco::Data::SQLite::Notifier;
 using Poco::Nullable;
@@ -2189,6 +2191,120 @@ void SQLiteTest::testNullable()
 }
 
 
+void SQLiteTest::testNullableVector()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	ses << "DROP TABLE IF EXISTS NullableTest", now;
+
+	ses << "CREATE TABLE NullableTest (i INTEGER, r REAL, s VARCHAR, d DATETIME)", now;
+
+	const int sz = 3;
+	std::vector<NullData> nd(sz, null);
+	ses << "INSERT INTO NullableTest VALUES(:i, :r, :s, :d)", use(nd), use(nd), use(nd), use(nd), now;
+
+	std::vector<Nullable<int>> v(sz, 1);
+	std::vector<Nullable<double>> f(sz, 1.5);
+	std::vector<Nullable<std::string>> s(sz, "abc"s);
+	std::vector<Nullable<DateTime>> d(sz, DateTime());
+
+	for (int i = 0; i < sz; ++i)
+	{
+		assertFalse (v[i].isNull());
+		assertFalse (f[i].isNull());
+		assertFalse (s[i].isNull());
+		assertFalse (d[i].isNull());
+	}
+
+	v.clear();
+	f.clear();
+	s.clear();
+	d.clear();
+
+	assertEqual (0, v.size());
+	assertEqual (0, f.size());
+	assertEqual (0, s.size());
+	assertEqual (0, d.size());
+
+	ses << "SELECT i, r, s, d FROM NullableTest", into(v), into(f), into(s), into(d), now;
+
+	assertEqual (sz, v.size());
+	assertEqual (sz, f.size());
+	assertEqual (sz, s.size());
+	assertEqual (sz, d.size());
+
+	for (int i = 0; i < sz; ++i)
+	{
+		assertTrue (v[i].isNull());
+		assertTrue (f[i].isNull());
+		assertTrue (s[i].isNull());
+		assertTrue (d[i].isNull());
+	}
+
+	ses << "DELETE FROM NullableTest", now;
+	ses << "SELECT i, r, s, d FROM NullableTest", into(v), into(f), into(s), into(d), now;
+
+	assertEqual (0, v.size());
+	assertEqual (0, f.size());
+	assertEqual (0, s.size());
+	assertEqual (0, d.size());
+
+	const std::vector<Nullable<int>> nv = {null, 2, 3};
+	const std::vector<Nullable<double>> nf = {1.5, null, 3.5};
+	const std::vector<Nullable<std::string>> ns = {"123"s, "abc"s, null};
+	const std::vector<Nullable<DateTime>> ndt = {null, DateTime(1965, 6, 18), null};
+
+	v = nv;
+	f = nf;
+	s = ns;
+	d = ndt;
+
+	ses << "INSERT INTO NullableTest VALUES(:i, :r, :s, :d)", use(v), use(f), use(s), use(d), now;
+
+	v.clear();
+	f.clear();
+	s.clear();
+	d.clear();
+
+	assertEqual (0, v.size());
+	assertEqual (0, f.size());
+	assertEqual (0, s.size());
+	assertEqual (0, d.size());
+
+	ses << "SELECT i, r, s, d FROM NullableTest", into(v), into(f), into(s), into(d), now;
+
+	assertEqual (sz, v.size());
+	assertEqual (sz, f.size());
+	assertEqual (sz, s.size());
+	assertEqual (sz, d.size());
+
+	assertTrue (v == nv);
+	assertTrue (f == nf);
+	assertTrue (s == ns);
+	assertTrue (d == ndt);
+
+
+	RecordSet rs(ses, "SELECT * FROM NullableTest");
+
+	rs.moveFirst();
+	assertTrue (rs.isNull("i"));
+	assertTrue (!rs.isNull("r"));
+	assertTrue (!rs.isNull("s"));
+	assertTrue (rs.isNull("d"));
+
+	assertTrue (rs.moveNext());
+	assertTrue (!rs.isNull("i"));
+	assertTrue (rs.isNull("r"));
+	assertTrue (!rs.isNull("s"));
+	assertTrue (!rs.isNull("d"));
+
+	assertTrue (rs.moveNext());
+	assertTrue (!rs.isNull("i"));
+	assertTrue (!rs.isNull("r"));
+	assertTrue (rs.isNull("s"));
+	assertTrue (rs.isNull("d"));
+}
+
+
 void SQLiteTest::testNulls()
 {
 	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -3272,21 +3388,21 @@ void SQLiteTest::testSessionTransactionReadUncommitted()
 	Connector::enableSharedCache();
 	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assertTrue (session.isConnected());
-	
+
 	session << "DROP TABLE IF EXISTS Person", now;
 	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
-	
+
 	if (!session.canTransact())
 	{
 		std::cout << "Session not capable of transactions." << std::endl;
 		return;
 	}
-	
+
 	Session local (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assertTrue (local.isConnected());
-	
+
 	assertTrue (local.getFeature("autoCommit"));
-	
+
 	std::string funct = "transaction()";
 	std::vector<std::string> lastNames;
 	std::vector<std::string> firstNames;
@@ -3303,55 +3419,55 @@ void SQLiteTest::testSessionTransactionReadUncommitted()
 	ages.push_back(2);
 	int count = 0, locCount = 0;
 	std::string result;
-	
+
 	setTransactionIsolation(session, Session::TRANSACTION_READ_UNCOMMITTED);
 	setTransactionIsolation(local, Session::TRANSACTION_READ_UNCOMMITTED);
-	
+
 	session.begin();
 	assertTrue (!session.getFeature("autoCommit"));
 	assertTrue (session.isTransaction());
 	session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session.isTransaction());
-	
+
 	Statement stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
-	
+
 	session << "SELECT COUNT(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
-	
+
 	stmt.wait();
 	assertTrue (session.isTransaction());
 	session.rollback();
-	
+
 	assertTrue (!session.isTransaction());
 	assertTrue (session.getFeature("autoCommit"));
 
 	assertEqual(2, locCount);
-	
+
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (0 == count);
 	assertTrue (!session.isTransaction());
-	
+
 	session.begin();
 	session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
 	assertTrue (session.isTransaction());
 	assertTrue (!session.getFeature("autoCommit"));
-	
+
 	Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
 	assertTrue (2 == locCount);
-	
+
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
-	
+
 	session.commit();
 	assertTrue (!session.isTransaction());
 	assertTrue (session.getFeature("autoCommit"));
-	
+
 	session << "SELECT count(*) FROM Person", into(count), now;
 	assertTrue (2 == count);
-	
+
 	session.close();
 	assertTrue (!session.isConnected());
-	
+
 	local.close();
 	assertTrue (!local.isConnected());
 }
@@ -3833,6 +3949,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
+	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);

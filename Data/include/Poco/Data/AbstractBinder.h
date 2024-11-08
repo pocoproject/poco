@@ -368,7 +368,7 @@ protected:
 
 private:
 	using StringList = std::vector<std::string*>;
-  
+
 	std::unique_ptr<Transcoder> _pTranscoder;
 	std::unique_ptr<StringList> _pStrings;
 };

@@ -158,7 +158,7 @@ public:
 	void limitZero();
 	void prepare();
 
-	void nullBulk(const std::string& blobPlaceholder);
+	void nullBulk(const std::string& blobPlaceholder="?");
 
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
 	void doBulkWithBool(Poco::UInt32 size, const std::string& blobPlaceholder="?")

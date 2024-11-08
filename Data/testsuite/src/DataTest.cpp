@@ -39,6 +39,7 @@
 #include "Poco/Glob.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/Nullable.h"
 #include <string>
 #include <cstring>
 #include <sstream>
@@ -1164,7 +1165,6 @@ void DataTest::testRowSort()
 
 	testRowStrictWeak(row10, row9, row8);
 
-
 	Row row11;
 	row11.append("0", 2.5);
 	row11.append("1", 2.5);
@@ -1604,6 +1604,17 @@ void DataTest::testSQLChannel()
 }
 
 
+void DataTest::testNullableExtract()
+{
+	Poco::Data::Test::Extractor ext;
+	Poco::Nullable<Poco::Int32> ni;
+	assertTrue (ni.isNull());
+	assertTrue (ext.extract(0, ni));
+	assertFalse (ni.isNull());
+	assertEqual (ni.value(), 1);
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1638,6 +1649,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
+	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
 
 	return pSuite;
 }

@@ -116,6 +116,13 @@ std::string demangle()
 }
 
 
+template <typename T>
+std::string demangle(const T& t)
+{
+	return demangle(typeid(std::remove_const_t<std::remove_reference_t<decltype(t)>>).name());
+}
+
+
 } // namespace Poco
 
 

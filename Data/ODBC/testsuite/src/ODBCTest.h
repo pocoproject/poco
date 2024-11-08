@@ -83,6 +83,7 @@ public:
 	virtual void testLimitPrepare();
 	virtual void testLimitZero();
 	virtual void testPrepare();
+	virtual void testNullBulk();
 	virtual void testBulk();
 	virtual void testBulkPerformance();
 

@@ -292,20 +292,10 @@ public:
 	static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor::Ptr pExt)
 	{
 		poco_assert_dbg (!pExt.isNull());
-		T val;
-
-		if (pExt->extract(pos++, val))
-		{
-			obj = std::move(val);
-		}
-		else
-		{
-			obj.clear();
-		}
+		pExt->extract(pos++, obj);
 	}
 
 private:
-
 	TypeHandler();
 	~TypeHandler();
 	TypeHandler(const TypeHandler&);

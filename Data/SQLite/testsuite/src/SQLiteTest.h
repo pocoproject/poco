@@ -108,6 +108,7 @@ public:
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
 	void testNullable();
+	void testNullableVector();
 	void testNulls();
 	void testRowIterator();
 	void testAsync();

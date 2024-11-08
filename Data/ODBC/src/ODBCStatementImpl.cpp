@@ -403,6 +403,7 @@ std::size_t ODBCStatementImpl::next()
 	if (nextRowReady())
 	{
 		Extractions& extracts = extractions();
+		poco_assert (extracts.size());
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
 		std::size_t prevCount = 0;

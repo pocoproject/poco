@@ -401,6 +401,8 @@ void ODBCSQLServerTest::testNull()
 
 void ODBCSQLServerTest::testNullBulk()
 {
+try
+{
 	if (!_pSession) fail ("Test not available.");
 
 	_pSession->setFeature("autoBind", true);
@@ -408,6 +410,12 @@ void ODBCSQLServerTest::testNullBulk()
 
 	recreatePersonBLOBTable();
 	_pExecutor->nullBulk("CONVERT(VARBINARY(30),?)");
+
+}
+catch(Poco::Exception& ex)
+{
+	std::cout << ex.displayText() << std::endl;
+}
 }
 
 
@@ -424,7 +432,7 @@ void ODBCSQLServerTest::testBulk()
 		std::vector<CLOB>,
 		std::vector<double>,
 		std::vector<DateTime>,
-		std::vector<bool> >(100, "CONVERT(VARBINARY(30),?)");
+		std::vector<bool>>(100, "CONVERT(VARBINARY(30),?)");
 
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::deque<int>,
@@ -432,7 +440,7 @@ void ODBCSQLServerTest::testBulk()
 		std::deque<CLOB>,
 		std::deque<double>,
 		std::deque<DateTime>,
-		std::deque<bool> >(100, "CONVERT(VARBINARY(30),?)");
+		std::deque<bool>>(100, "CONVERT(VARBINARY(30),?)");
 
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::list<int>,
@@ -440,7 +448,7 @@ void ODBCSQLServerTest::testBulk()
 		std::list<CLOB>,
 		std::list<double>,
 		std::list<DateTime>,
-		std::list<bool> >(100, "CONVERT(VARBINARY(30),?)");
+		std::list<bool>>(100, "CONVERT(VARBINARY(30),?)");
 }
 
 

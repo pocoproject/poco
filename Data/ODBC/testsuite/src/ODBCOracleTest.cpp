@@ -967,6 +967,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testNullBulk);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetSimple);

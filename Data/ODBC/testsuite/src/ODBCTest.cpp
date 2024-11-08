@@ -485,6 +485,18 @@ void ODBCTest::testPrepare()
 }
 
 
+void ODBCTest::testNullBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	recreatePersonBLOBTable();
+	_pExecutor->nullBulk();
+}
+
+
 void ODBCTest::testBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -497,21 +509,21 @@ void ODBCTest::testBulk()
 		std::vector<std::string>,
 		std::vector<CLOB>,
 		std::vector<double>,
-		std::vector<DateTime> >(100);
+		std::vector<DateTime>>(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::deque<int>,
 		std::deque<std::string>,
 		std::deque<CLOB>,
 		std::deque<double>,
-		std::deque<DateTime> >(100);
+		std::deque<DateTime>>(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::list<int>,
 		std::list<std::string>,
 		std::list<CLOB>,
 		std::list<double>,
-		std::list<DateTime> >(100);
+		std::list<DateTime>>(100);
 }
 
 

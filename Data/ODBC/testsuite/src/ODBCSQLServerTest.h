@@ -51,7 +51,7 @@ public:
 	void testBigStringVector();
 	void testBigBatch();
 	void testNull() override;
-	void testNullBulk();
+	void testNullBulk() override;
 	void testBulk() override;
 
 	void testStoredProcedure() override;
