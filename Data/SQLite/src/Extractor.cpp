@@ -50,43 +50,33 @@ Extractor::~Extractor()
 
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int64, pos, val);
 }
 
 
 #ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, unsigned long& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 #endif
 
 
 bool Extractor::extract(std::size_t pos, double& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_double(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_double, pos, val);
 }
 
 
@@ -110,57 +100,43 @@ bool Extractor::extract(std::size_t pos, UTF16String& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int64, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, bool& val)
 {
-	if (isNull(pos)) return false;
-	val = (0 != sqlite3_column_int(_pStmt, (int) pos));
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
@@ -174,9 +150,7 @@ bool Extractor::extract(std::size_t pos, float& val)
 
 bool Extractor::extract(std::size_t pos, char& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
@@ -255,6 +229,71 @@ bool Extractor::extract(std::size_t pos, Nullable<Poco::Int64>& val)
 
 
 #ifndef POCO_INT64_IS_LONG
+
+bool extract(std::size_t pos, long& val)
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, unsigned long& val);
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, std::vector<long>& val);
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, std::deque<long>& val);
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, std::list<long>& val);
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, std::vector<unsigned long>& val);
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, std::deque<unsigned long>& val);
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool extract(std::size_t pos, std::list<unsigned long>& val)
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
 bool Extractor::extract(std::size_t pos, Nullable<long>& val)
 {
 	if (isNull(pos)) val.clear();
@@ -269,7 +308,8 @@ bool Extractor::extract(std::size_t pos, Nullable<unsigned long>& val)
 	else val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
-#endif
+
+#endif // POCO_INT64_IS_LONG
 
 
 bool Extractor::extract(std::size_t pos, Nullable<double>& val)

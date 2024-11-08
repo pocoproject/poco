@@ -48,8 +48,11 @@ class SQLite_API Extractor: public Poco::Data::AbstractExtractor
 	/// If NULL is received, the incoming val value is not changed and false is returned
 {
 public:
-	typedef std::vector<std::pair<bool, bool> > NullIndVec;
+	using NullIndVec = std::vector<std::pair<bool, bool> >;
 		/// Type for null indicators container.
+
+	using ColFuncPtr = int (*)(sqlite3_stmt*, int);
+		/// SQLite column function pointer.
 
 	Extractor(sqlite3_stmt* pStmt);
 		/// Creates the Extractor.
@@ -80,14 +83,6 @@ public:
 
 	bool extract(std::size_t pos, Poco::UInt64& val) override;
 		/// Extracts an UInt64.
-
-#ifndef POCO_INT64_IS_LONG
-	bool extract(std::size_t pos, long& val) override;
-		/// Extracts a long.
-
-	bool extract(std::size_t pos, unsigned long& val) override;
-		/// Extracts an unsigned long.
-#endif
 
 	bool extract(std::size_t pos, bool& val) override;
 		/// Extracts a boolean.
@@ -157,11 +152,43 @@ public:
 		/// Extracts an Nullable<UInt64>.
 
 #ifndef POCO_INT64_IS_LONG
+
+	bool extract(std::size_t pos, long& val) override;
+		/// Extracts a long.
+
+	bool extract(std::size_t pos, unsigned long& val) override;
+		/// Extracts an unsigned long.
+
+	bool extract(std::size_t pos, long& val);
+		/// Extracts a long. Returns false if null was received.
+
+	bool extract(std::size_t pos, unsigned long& val);
+		/// Extracts an unsigned long. Returns false if null was received.
+
+	bool extract(std::size_t pos, std::vector<long>& val);
+		/// Extracts a long vector.
+
+	bool extract(std::size_t pos, std::deque<long>& val);
+		/// Extracts a long deque.
+
+	bool extract(std::size_t pos, std::list<long>& val);
+		/// Extracts a long list.
+
+	bool extract(std::size_t pos, std::vector<unsigned long>& val);
+		/// Extracts an unsigned long vector.
+
+	bool extract(std::size_t pos, std::deque<unsigned long>& val);
+		/// Extracts an unsigned long deque.
+
+	bool extract(std::size_t pos, std::list<unsigned long>& val);
+		/// Extracts an unsigned long list.
+
 	bool extract(std::size_t pos, Poco::Nullable<long>& val) override;
 		/// Extracts a Nullable<long>.
 
 	bool extract(std::size_t pos, Poco::Nullable<unsigned long>& val) override;
 		/// Extracts a Nullable<unsigned long>.
+
 #endif
 
 	bool extract(std::size_t pos, Poco::Nullable<bool>& val) override;
@@ -421,10 +448,18 @@ public:
 		/// The row argument, needed for connectors with bulk capabilities,
 		/// is ignored in this implementation.
 
-	void reset();
+	void reset() override;
 		/// Clears the cached nulls indicator vector.
 
 private:
+	template <typename F, typename T>
+	bool extract(F func, std::size_t pos, T& val)
+	{
+		if (isNull(pos)) return false;
+		val = func(_pStmt, (int) pos);
+		return true;
+	}
+
 	template <typename T>
 	bool extractImpl(std::size_t pos, T& val)
 		/// Utility function for extraction of Any and Dynamic::Var.
