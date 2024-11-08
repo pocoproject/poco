@@ -156,22 +156,22 @@ public:
 	bool extract(std::size_t pos, unsigned long& val) override;
 		/// Extracts an unsigned long.
 
-	bool extract(std::size_t pos, std::vector<long>& val);
+	bool extract(std::size_t pos, std::vector<long>& val) override;
 		/// Extracts a long vector.
 
-	bool extract(std::size_t pos, std::deque<long>& val);
+	bool extract(std::size_t pos, std::deque<long>& val) override;
 		/// Extracts a long deque.
 
-	bool extract(std::size_t pos, std::list<long>& val);
+	bool extract(std::size_t pos, std::list<long>& val) override;
 		/// Extracts a long list.
 
-	bool extract(std::size_t pos, std::vector<unsigned long>& val);
+	bool extract(std::size_t pos, std::vector<unsigned long>& val) override;
 		/// Extracts an unsigned long vector.
 
-	bool extract(std::size_t pos, std::deque<unsigned long>& val);
+	bool extract(std::size_t pos, std::deque<unsigned long>& val) override;
 		/// Extracts an unsigned long deque.
 
-	bool extract(std::size_t pos, std::list<unsigned long>& val);
+	bool extract(std::size_t pos, std::list<unsigned long>& val) override;
 		/// Extracts an unsigned long list.
 
 	bool extract(std::size_t pos, Poco::Nullable<long>& val) override;
@@ -423,7 +423,7 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val) override;
 		/// Throws NotImplementedException.
 
-	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW);
+	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW) override;
 		/// Returns true if the current row value at pos column is null.
 		/// Because of the loss of information about null-ness of the
 		/// underlying database values due to the nature of SQLite engine,

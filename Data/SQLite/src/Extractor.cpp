@@ -224,7 +224,7 @@ bool extract(std::size_t pos, long& val)
 }
 
 
-bool extract(std::size_t pos, unsigned long& val);
+bool extract(std::size_t pos, unsigned long& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
@@ -232,7 +232,7 @@ bool extract(std::size_t pos, unsigned long& val);
 }
 
 
-bool extract(std::size_t pos, std::vector<long>& val);
+bool extract(std::size_t pos, std::vector<long>& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
@@ -240,7 +240,7 @@ bool extract(std::size_t pos, std::vector<long>& val);
 }
 
 
-bool extract(std::size_t pos, std::deque<long>& val);
+bool extract(std::size_t pos, std::deque<long>& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
@@ -248,7 +248,7 @@ bool extract(std::size_t pos, std::deque<long>& val);
 }
 
 
-bool extract(std::size_t pos, std::list<long>& val);
+bool extract(std::size_t pos, std::list<long>& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
@@ -256,7 +256,7 @@ bool extract(std::size_t pos, std::list<long>& val);
 }
 
 
-bool extract(std::size_t pos, std::vector<unsigned long>& val);
+bool extract(std::size_t pos, std::vector<unsigned long>& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
@@ -264,7 +264,7 @@ bool extract(std::size_t pos, std::vector<unsigned long>& val);
 }
 
 
-bool extract(std::size_t pos, std::deque<unsigned long>& val);
+bool extract(std::size_t pos, std::deque<unsigned long>& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
