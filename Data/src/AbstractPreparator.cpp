@@ -213,7 +213,7 @@ void AbstractPreparator::prepare(std::size_t pos, const std::deque<unsigned long
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, const std::list<lunsigned ong>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<unsigned long>& val)
 {
 	throw NotImplementedException(poco_src_loc);
 }
