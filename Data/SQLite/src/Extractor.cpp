@@ -234,49 +234,37 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<long>& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	throw Poco::NotImplementedException(poco_src_loc);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::deque<long>& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	throw Poco::NotImplementedException(poco_src_loc);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::list<long>& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	throw Poco::NotImplementedException(poco_src_loc);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::vector<unsigned long>& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	throw Poco::NotImplementedException(poco_src_loc);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::deque<unsigned long>& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	throw Poco::NotImplementedException(poco_src_loc);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::list<unsigned long>& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	throw Poco::NotImplementedException(poco_src_loc);
 }
 
 
