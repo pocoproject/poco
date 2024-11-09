@@ -271,25 +271,25 @@ bool Extractor::extract(std::size_t pos, long& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, std::vector<Poco::long>& val)
+bool Extractor::extract(std::size_t pos, std::vector<long>& val)
 {
 	return true;
 }
 
 
-bool Extractor::extract(std::size_t pos, std::deque<Poco::long>& val)
+bool Extractor::extract(std::size_t pos, std::deque<long>& val)
 {
 	return true;
 }
 
 
-bool Extractor::extract(std::size_t pos, std::list<Poco::long>& val)
+bool Extractor::extract(std::size_t pos, std::list<long>& val)
 {
 	return true;
 }
 
 
-bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::long>& val)
+bool Extractor::extract(std::size_t pos, Poco::Nullable<long>& val)
 {
 	return true;
 }
@@ -304,25 +304,25 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, std::vector<Poco::unsigned long>& val)
+bool Extractor::extract(std::size_t pos, std::vector<unsigned long>& val)
 {
 	return true;
 }
 
 
-bool Extractor::extract(std::size_t pos, std::deque<Poco::unsigned long>& val)
+bool Extractor::extract(std::size_t pos, std::deque<unsigned long>& val)
 {
 	return true;
 }
 
 
-bool Extractor::extract(std::size_t pos, std::list<Poco::unsigned long>& val)
+bool Extractor::extract(std::size_t pos, std::list<unsigned long>& val)
 {
 	return true;
 }
 
 
-bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::unsigned long>& val)
+bool Extractor::extract(std::size_t pos, Poco::Nullable<unsigned long>& val)
 {
 	return true;
 }
