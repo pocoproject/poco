@@ -526,33 +526,61 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	colSize = 0;
 	decDigits = 0;
 
-	// Not all drivers are equally willing to cooperate in this matter.
-	// Hence the funky flow control.
-	if (_pTypeInfo)
+	// first try to find the actual sizes
+	try
 	{
-		Dynamic::Var tmp;
-		bool foundSize(false);
-		bool foundPrec(false);
+		Parameter p(_rStmt, pos);
+		colSize = (SQLINTEGER)p.columnSize();
+		decDigits = (SQLSMALLINT)p.decimalDigits();
+	}
+	catch (StatementException&)
+	{
+	}
+
+	if (!colSize || !decDigits)
+	{
+		try
+		{
+			ODBCMetaColumn c(_rStmt, pos);
+			if (!colSize) colSize = (SQLINTEGER)c.length();
+			if (!decDigits) decDigits = (SQLSMALLINT)c.precision();
+		}
+		catch (StatementException&)
+		{
+		}
+	}
+
+	if (colSize && decDigits)
+		return;
 
 // SQLServer driver reports COLUMN_SIZE 8000 for VARCHAR(MAX),
 // so the size check must be skipped when big strings are enabled
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
-		bool isVarchar(false);
-		switch (sqlDataType)
-		{
-		case SQL_VARCHAR:
-		case SQL_WVARCHAR:
-		case SQL_WLONGVARCHAR:
-			isVarchar = true;
-			break;
-		default: break;
-		}
+	bool isVarchar(false);
+	switch (sqlDataType)
+	{
+	case SQL_VARCHAR:
+	case SQL_WVARCHAR:
+	case SQL_WLONGVARCHAR:
+		isVarchar = true;
+		break;
+	default: break;
+	}
 #endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 
-		foundSize = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
-		if (foundSize) colSize = tmp;
-		else foundSize = _pTypeInfo->tryGetInfo(sqlDataType, "COLUMN_SIZE", tmp);
-		if (foundSize) colSize = tmp;
+	// Not all drivers are equally willing to cooperate in this matter.
+	// If actual sizes are not found, fail back on the global defaults.
+	if (_pTypeInfo)
+	{
+		Dynamic::Var tmp;
+
+		if (!colSize)
+		{
+			if (_pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp))
+				colSize = tmp;
+			else if (_pTypeInfo->tryGetInfo(sqlDataType, "COLUMN_SIZE", tmp))
+				colSize = tmp;
+		}
 
 		if (actualSize > static_cast<std::size_t>(colSize)
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
@@ -564,39 +592,21 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 					__LINE__, pos, actualSize, static_cast<long>(colSize)));
 		}
 
-		foundPrec = _pTypeInfo->tryGetInfo(cDataType, "MAXIMUM_SCALE", tmp);
-		if (foundPrec) decDigits = tmp;
-		else foundPrec = _pTypeInfo->tryGetInfo(sqlDataType, "MAXIMUM_SCALE", tmp);
-		if (foundPrec) decDigits = tmp;
-
-		if (foundSize && foundPrec)
-			return;
-	}
-
-	try
-	{
-		Parameter p(_rStmt, pos);
-		colSize = (SQLINTEGER) p.columnSize();
-		decDigits = (SQLSMALLINT) p.decimalDigits();
-		return;
-	}
-	catch (StatementException&)
-	{
-	}
-
-	try
-	{
-		ODBCMetaColumn c(_rStmt, pos);
-		colSize = (SQLINTEGER) c.length();
-		decDigits = (SQLSMALLINT) c.precision();
-		return;
-	}
-	catch (StatementException&)
-	{
+		if (!decDigits)
+		{
+			if (_pTypeInfo->tryGetInfo(cDataType, "MAXIMUM_SCALE", tmp))
+				decDigits = tmp;
+			else if(_pTypeInfo->tryGetInfo(sqlDataType, "MAXIMUM_SCALE", tmp))
+				decDigits = tmp;
+		}
 	}
 
 	// last check, just in case
-	if ((0 != colSize) && (actualSize > colSize))
+	if ((0 != colSize) && (actualSize > colSize)
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+		&& !isVarchar
+#endif
+		)
 	{
 		throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
 			__LINE__, pos, actualSize, static_cast<long>(colSize)));
