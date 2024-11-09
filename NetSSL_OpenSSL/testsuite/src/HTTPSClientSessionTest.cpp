@@ -88,6 +88,23 @@ HTTPSClientSessionTest::~HTTPSClientSessionTest()
 }
 
 
+void HTTPSClientSessionTest::testFromSocket()
+{
+	HTTPSTestServer srv;
+	SecureStreamSocket sss("localhost");
+	HTTPSClientSession s(sss, "127.0.0.1", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+}
+
+
 void HTTPSClientSessionTest::testGetSmall()
 {
 	HTTPSTestServer srv;
@@ -458,6 +475,7 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
+
 void HTTPSClientSessionTest::testServerAbort()
 {
 	HTTPSTestServer srv;
@@ -471,7 +489,7 @@ void HTTPSClientSessionTest::testServerAbort()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
-	assertTrue ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
+	assertTrue (dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
 	         s.networkException()) != NULL );
 }
 
@@ -490,6 +508,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPSClientSessionTest");
 
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testFromSocket);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
