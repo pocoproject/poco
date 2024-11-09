@@ -285,13 +285,13 @@ bool Extractor::extractLongLOB(std::size_t pos)
 	// with a zero-length buffer to avoid allocating
 	// huge amounts of memory. Therefore, when extracting
 	// the buffers need to be adjusted.
-	
+
 	_metadata.adjustColumnSizeToFit(pos);
-	
+
 	MYSQL_BIND* row = _metadata.row();
 	if (!_stmt.fetchColumn(pos, &row[pos]))
 		return false;
-	
+
 	return true;
 }
 
@@ -476,6 +476,23 @@ bool Extractor::extract(std::size_t , std::deque<long>& )
 
 
 bool Extractor::extract(std::size_t , std::list<long>& )
+{
+	throw NotImplementedException("std::list extractor must be implemented.");
+}
+
+bool Extractor::extract(std::size_t , std::vector<unsigned long>& )
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool Extractor::extract(std::size_t , std::deque<unsigned long>& )
+{
+	throw NotImplementedException("std::deque extractor must be implemented.");
+}
+
+
+bool Extractor::extract(std::size_t , std::list<unsigned long>& )
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }

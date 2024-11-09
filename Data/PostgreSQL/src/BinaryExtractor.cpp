@@ -849,6 +849,23 @@ bool BinaryExtractor::extract(std::size_t, std::list<long>&)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
+
+bool BinaryExtractor::extract(std::size_t, std::vector<unsigned long>&)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool BinaryExtractor::extract(std::size_t, std::deque<unsigned long>&)
+{
+	throw NotImplementedException("std::deque extractor must be implemented.");
+}
+
+
+bool BinaryExtractor::extract(std::size_t, std::list<unsigned long>&)
+{
+	throw NotImplementedException("std::list extractor must be implemented.");
+}
 #endif
 
 
