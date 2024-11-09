@@ -679,7 +679,34 @@ bool Extractor::extract(std::size_t pos, std::list<long>& val)
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
 }
-#endif
+
+
+bool Extractor::extract(std::size_t pos, std::vector<unsigned long>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<unsigned long>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<unsigned long>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+#endif POCO_INT64_IS_LONG
 
 
 bool Extractor::extract(std::size_t pos, double& val)
