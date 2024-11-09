@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = DBLogger
+objects = DBLogger SQLLogInserter
 
 ifndef POCO_DATA_NO_SQL_PARSER
 	target_includes = $(POCO_BASE)/Data/src
