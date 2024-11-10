@@ -28,6 +28,11 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/types.h>
+#endif
+
 #include <cstdlib>
 
 
@@ -140,6 +145,11 @@ public:
 	{
 		Params();
 			/// Initializes the struct with default values.
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+		std::string providerName;
+		OSSL_LIB_CTX *libctx = nullptr;
+#endif
 
 		std::string privateKeyFile;
 			/// Path to the private key file used for encryption.
@@ -269,6 +279,46 @@ public:
 		///
 		/// Note that a private key and/or certificate must be specified with
 		/// usePrivateKey()/useCertificate() before the Context can be used.
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	Context( Usage usage,
+			 OSSL_LIB_CTX *libctx,
+			 const std::string &provider,
+			 VerificationMode verificationMode = VERIFY_RELAXED,
+			 int verificationDepth = 9,
+			 bool loadDefaultCAs = false,
+			 const std::string &cipherList  = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH" );
+		/// Creates a Context.
+		///
+		///   * usage specifies whether the context is used by a client or server.
+		///   * libctx pointer to OpenSSL library context (i.e. from OSSL_LIB_CTX_new)
+		///   * provider specifies the custom provider query string
+		///   * verificationMode specifies whether and how peer certificates are validated.
+		///   * verificationDepth sets the upper limit for verification chain sizes. Verification
+		///     will fail if a certificate chain larger than this is encountered.
+		///   * loadDefaultCAs specifies whether the builtin CA certificates from OpenSSL are used.
+		///   * cipherList specifies the supported ciphers in OpenSSL notation.
+		///
+		/// Note that a private key and/or certificate must be specified with
+		/// usePrivateKey()/useCertificate() or loaded through a registered provider before the Context can be used.
+		///
+		/// Example usage:
+		///   * // Create a OpenSSL libary context and set default provider library search path.
+		///   * auto ctx = OSSL_LIB_CTX_new();
+		///   * OSSL_PROVIDER_set_default_search_path( ctx, "<a valid path>" );
+		///   *
+		///   * // Load providers
+		///   * auto provider = OSSL_PROVIDER_load( ctx, "<a custom provider name>" );
+		///   * auto providerDefault = OSSL_PROVIDER_load( ctx, "default" );
+		///   *
+		///   * // Create context to be used by server.
+		///   * auto serverCtx = new Poco::Net::Context( Poco::Net::Context::SERVER_USE, ctx, "<a provider query string>", Poco::Net::Context::VERIFY_STRICT );
+		///   * ...
+		///   * // clean-up
+		///   * OSSL_PROVIDER_unload( provider );
+		///   * OSSL_PROVIDER_unload( providerDefault );
+		///   * OSSL_LIB_CTX_free( ctx );
+#endif
 
 	~Context();
 		/// Destroys the Context.
@@ -465,7 +515,7 @@ private:
 		/// Initializes the Context with Elliptic-Curve Diffie-Hellman key
 		/// exchange curve parameters.
 
-	void createSSLContext();
+	void createSSLContext( const Params &params );
 		/// Create a SSL_CTX object according to Context configuration.
 
 	Usage _usage;
