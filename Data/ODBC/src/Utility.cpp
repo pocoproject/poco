@@ -153,7 +153,7 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 	ts.second = dt.second();
 	// Fraction support is limited to milliseconds due to MS SQL Server limitation
 	// see http://support.microsoft.com/kb/263872
-	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);
+	ts.fraction = (dt.millisecond() * 1000000);
 }
 
 
