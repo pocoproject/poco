@@ -27,7 +27,7 @@ namespace Data {
 namespace PostgreSQL {
 
 
-Extractor::Extractor(StatementExecutor& st /*, ResultMetadata& md */):
+Extractor::Extractor(StatementExecutor& st):
 	_statementExecutor(st)
 {
 }
@@ -703,6 +703,23 @@ bool Extractor::extract(std::size_t, std::deque<long>&)
 
 
 bool Extractor::extract(std::size_t, std::list<long>&)
+{
+	throw NotImplementedException("std::list extractor must be implemented.");
+}
+
+bool Extractor::extract(std::size_t, std::vector<unsigned long>&)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool Extractor::extract(std::size_t, std::deque<unsigned long>&)
+{
+	throw NotImplementedException("std::deque extractor must be implemented.");
+}
+
+
+bool Extractor::extract(std::size_t, std::list<unsigned long>&)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }

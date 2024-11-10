@@ -209,6 +209,15 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<long>& val);
 		/// Extracts a long list.
+
+	virtual bool extract(std::size_t pos, std::vector<unsigned long>& val);
+		/// Extracts a long vector.
+
+	virtual bool extract(std::size_t pos, std::deque<unsigned long>& val);
+		/// Extracts a long deque.
+
+	virtual bool extract(std::size_t pos, std::list<unsigned long>& val);
+		/// Extracts a long list.
 #endif
 
 	virtual bool extract(std::size_t pos, std::vector<bool>& val);
