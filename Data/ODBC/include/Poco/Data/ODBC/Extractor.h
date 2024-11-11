@@ -702,11 +702,11 @@ private:
 	}
 
 	template <typename T>
-	bool extractNullable(std::size_t pos, T& val)
+	bool extractNullable(std::size_t pos, Poco::Nullable<T>& val)
 	{
-		typename T::Type lVal;
-		if (!extract(pos, lVal)) val.clear();
-		else val = lVal;
+		typename Poco::Nullable<T>::Type v;
+		if (!extract(pos, v)) val.clear();
+		else val = std::move(v);
 		return true;
 	}
 
