@@ -339,6 +339,27 @@ public:
 	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir);
 		/// Binds a null list.
 
+	template <typename T>
+	void bind(std::size_t pos, const std::vector<Nullable<T>>& val, Direction dir)
+		/// Binds a nullable vector.
+	{
+		bindImplNullableContainer(pos, val, dir);
+	}
+
+	template <typename T>
+	void bind(std::size_t pos, const std::deque<Nullable<T>>& val, Direction dir)
+		/// Binds a nullable deque.
+	{
+		bindImplNullableContainer(pos, val, dir);
+	}
+
+	template <typename T>
+	void bind(std::size_t pos, const std::list<Nullable<T>>& val, Direction dir)
+		/// Binds a nullable list.
+	{
+		bindImplNullableContainer(pos, val, dir);
+	}
+
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.
 
@@ -437,7 +458,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			SQL_PARAM_INPUT,
 			SQL_C_BINARY,
-			Utility::sqlDataType(SQL_C_BINARY),
+			TypeInfo::sqlDataType<SQL_C_BINARY>(),
 			columnSize,
 			0,
 			pVal,
@@ -615,7 +636,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_CHAR,
-			Utility::sqlDataType(SQL_C_CHAR),
+			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			getStringColSize(size),
 			0,
 			_charPtrs[pos],
@@ -682,7 +703,7 @@ private:
 			(SQLUSMALLINT)pos + 1,
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
-			Utility::sqlDataType(SQL_C_WCHAR),
+			TypeInfo::sqlDataType<SQL_C_WCHAR>(),
 			getStringColSize(size),
 			0,
 			_utf16CharPtrs[pos],
@@ -752,7 +773,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			SQL_PARAM_INPUT,
 			SQL_C_BINARY,
-			Utility::sqlDataType(SQL_C_BINARY),
+			TypeInfo::sqlDataType<SQL_C_BINARY>(),
 			(SQLUINTEGER) size,
 			0,
 			_charPtrs[pos],
@@ -801,7 +822,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_TYPE_DATE,
-			Utility::sqlDataType(SQL_C_TYPE_DATE),
+			TypeInfo::sqlDataType<SQL_C_TYPE_DATE>(),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &(*_dateVecVec[pos])[0],
@@ -849,7 +870,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_TYPE_TIME,
-			Utility::sqlDataType(SQL_C_TYPE_TIME),
+			TypeInfo::sqlDataType<SQL_C_TYPE_TIME>(),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &(*_timeVecVec[pos])[0],
@@ -898,7 +919,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_TYPE_TIMESTAMP,
-			Utility::sqlDataType(SQL_C_TYPE_TIMESTAMP),
+			TypeInfo::sqlDataType<SQL_C_TYPE_TIMESTAMP>(),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &(*_dateTimeVecVec[pos])[0],
@@ -919,6 +940,7 @@ private:
 			throw InvalidAccessException("ODBC::Binder::bindImplNullContainer():Container can only be bound immediately.");
 
 		std::size_t length = val.size();
+		poco_assert (length);
 
 		if (0 == length)
 			throw InvalidArgumentException("ODBC::Binder::bindImplNullContainer():Empty container not allowed.");
@@ -928,18 +950,68 @@ private:
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
+			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
 		}
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_C_STINYINT, colSize, decDigits);
+		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			SQL_PARAM_INPUT,
-			SQL_C_STINYINT,
-			Utility::sqlDataType(SQL_C_STINYINT),
+			SQL_C_CHAR,
+			TypeInfo::sqlDataType<SQL_C_CHAR>(),
+			colSize,
+			decDigits,
+			0,
+			0,
+			&(*_vecLengthIndicator[pos])[0])))
+		{
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplNullContainer():SQLBindParameter()");
+		}
+	}
+
+	template<typename C>
+	void bindImplNullableContainer(std::size_t pos, const C& val, Direction dir)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("ODBC::Binder::bindImplNullContainer():Null container parameter type can only be inbound.");
+
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("ODBC::Binder::bindImplNullContainer():Container can only be bound immediately.");
+
+		std::size_t length = val.size();
+		poco_assert (length);
+
+		if (0 == length)
+			throw InvalidArgumentException("ODBC::Binder::bindImplNullContainer():Empty container not allowed.");
+
+		setParamSetSize(length);
+
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
+			auto valIt = val.begin(), valEnd = val.end();
+			auto lenIt = _vecLengthIndicator[pos]->begin(), lenEnd = _vecLengthIndicator[pos]->end();
+			for (; valIt != valEnd && lenIt != lenEnd; ++valIt, ++lenIt)
+			{
+				if (valIt->isNull()) *lenIt = SQL_NULL_DATA;
+				else *lenIt = Utility::sizeOf<C>();
+			}
+
+		}
+
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
+
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			SQL_PARAM_INPUT,
+			SQL_C_CHAR,
+			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			colSize,
 			decDigits,
 			0,

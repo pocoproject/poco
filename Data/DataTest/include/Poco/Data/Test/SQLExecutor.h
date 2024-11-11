@@ -242,6 +242,7 @@ public:
 		"SELECT * FROM Vectors ORDER BY int0 ASC",
 		const std::string& intFldName = "int0");
 
+	void nullBulk(const std::string& blobPlaceholder = "?"s);
 	void internalBulkExtraction();
 	void internalBulkExtractionUTF16();
 	void internalStorageType();

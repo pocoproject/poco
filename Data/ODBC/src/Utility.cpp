@@ -153,21 +153,24 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 	ts.second = dt.second();
 	// Fraction support is limited to milliseconds due to MS SQL Server limitation
 	// see http://support.microsoft.com/kb/263872
-	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);
+	ts.fraction = (dt.millisecond() * 1000000);
 }
 
 
 std::string Utility::dbmsName(const ConnectionHandle& db)
 {
+	std::string ret = "unknown"s;
 	const SQLSMALLINT bufSize = 1024;
 	SQLCHAR dbmsName[bufSize] = {0};
 	SQLSMALLINT retSize = 0;
 	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), SQL_DBMS_NAME, dbmsName, bufSize, &retSize);
 	if (!isError(rc))
 	{
-		return std::string(reinterpret_cast<char*>(dbmsName), retSize);
+		ret.assign(reinterpret_cast<char*>(dbmsName), retSize);
+		// API returns string longer than effective length
+		ret.erase(ret.find_last_not_of('\0') + 1, std::string::npos);
 	}
-	return "unknown"s;
+	return ret;
 }
 
 

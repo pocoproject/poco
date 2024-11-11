@@ -47,6 +47,7 @@ public:
 	void testTranscode();
 	void testSQLParse();
 	void testSQLChannel();
+	void testNullableExtract();
 
 	void setUp();
 	void tearDown();

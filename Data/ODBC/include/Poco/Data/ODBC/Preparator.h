@@ -603,7 +603,7 @@ private:
 		poco_assert (0 == _lenLengths[pos].size());
 		_lenLengths[pos].resize(length);
 
-		std::vector<T>& cache = RefAnyCast<std::vector<T> >(_values[pos]);
+		std::vector<T>& cache = RefAnyCast<std::vector<T>>(_values[pos]);
 		cache.resize(length);
 
 		if (Utility::isError(SQLBindCol(_rStmt,

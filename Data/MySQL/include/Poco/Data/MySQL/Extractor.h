@@ -23,6 +23,8 @@
 #include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Dynamic/Var.h"
+#include "Poco/Nullable.h"
 
 
 namespace Poco {
@@ -48,276 +50,359 @@ public:
 	virtual ~Extractor();
 		/// Destroys the Extractor.
 
-	virtual bool extract(std::size_t pos, Poco::Int8& val);
+	bool extract(std::size_t pos, Poco::Int8& val) override;
 		/// Extracts an Int8.
 
-	virtual bool extract(std::size_t pos, Poco::UInt8& val);
+	bool extract(std::size_t pos, Poco::UInt8& val) override;
 		/// Extracts an UInt8.
 
-	virtual bool extract(std::size_t pos, Poco::Int16& val);
+	bool extract(std::size_t pos, Poco::Int16& val) override;
 		/// Extracts an Int16.
 
-	virtual bool extract(std::size_t pos, Poco::UInt16& val);
+	bool extract(std::size_t pos, Poco::UInt16& val) override;
 		/// Extracts an UInt16.
 
-	virtual bool extract(std::size_t pos, Poco::Int32& val);
+	bool extract(std::size_t pos, Poco::Int32& val) override;
 		/// Extracts an Int32.
 
-	virtual bool extract(std::size_t pos, Poco::UInt32& val);
+	bool extract(std::size_t pos, Poco::UInt32& val) override;
 		/// Extracts an UInt32.
 
-	virtual bool extract(std::size_t pos, Poco::Int64& val);
+	bool extract(std::size_t pos, Poco::Int64& val) override;
 		/// Extracts an Int64.
 
-	virtual bool extract(std::size_t pos, Poco::UInt64& val);
+	bool extract(std::size_t pos, Poco::UInt64& val) override;
 		/// Extracts an UInt64.
 
 #ifndef POCO_INT64_IS_LONG
-	virtual bool extract(std::size_t pos, long& val);
+	bool extract(std::size_t pos, long& val) override;
 		/// Extracts a long. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, unsigned long& val);
+	bool extract(std::size_t pos, unsigned long& val) override;
 		/// Extracts an unsigned long. Returns false if null was received.
 #endif
 
-	virtual bool extract(std::size_t pos, bool& val);
+	bool extract(std::size_t pos, bool& val) override;
 		/// Extracts a boolean.
 
-	virtual bool extract(std::size_t pos, float& val);
+	bool extract(std::size_t pos, float& val) override;
 		/// Extracts a float.
 
-	virtual bool extract(std::size_t pos, double& val);
+	bool extract(std::size_t pos, double& val) override;
 		/// Extracts a double.
 
-	virtual bool extract(std::size_t pos, char& val);
+	bool extract(std::size_t pos, char& val) override;
 		/// Extracts a single character.
 
-	virtual bool extract(std::size_t pos, std::string& val);
+	bool extract(std::size_t pos, std::string& val) override;
 		/// Extracts a string.
 
-	virtual bool extract(std::size_t pos, Poco::Data::BLOB& val);
+	bool extract(std::size_t pos, Poco::Data::BLOB& val) override;
 		/// Extracts a BLOB.
 
-	virtual bool extract(std::size_t pos, Poco::Data::CLOB& val);
+	bool extract(std::size_t pos, Poco::Data::CLOB& val) override;
 		/// Extracts a CLOB.
 
-	virtual bool extract(std::size_t pos, DateTime& val);
+	bool extract(std::size_t pos, DateTime& val) override;
 		/// Extracts a DateTime. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, Date& val);
+	bool extract(std::size_t pos, Date& val) override;
 		/// Extracts a Date. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, Time& val);
+	bool extract(std::size_t pos, Time& val) override;
 		/// Extracts a Time. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, UUID& val);
+	bool extract(std::size_t pos, UUID& val) override;
 		/// Extracts a UUID. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, Any& val);
+	bool extract(std::size_t pos, Any& val) override;
 		/// Extracts an Any. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, Dynamic::Var& val);
+	bool extract(std::size_t pos, Dynamic::Var& val) override;
 		/// Extracts a Dynamic::Var. Returns false if null was received.
 
-	virtual bool isNull(std::size_t col, std::size_t row);
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int8>& val) override;
+		/// Extracts a nullable nullable Int8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt8>& val) override;
+		/// Extracts a nullable nullable UInt8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int16>& val) override;
+		/// Extracts a nullable nullable Int16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt16>& val) override;
+		/// Extracts a nullable nullable UInt16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int32>& val) override;
+		/// Extracts a nullable nullable Int32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt32>& val) override;
+		/// Extracts a nullable nullable UInt32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int64>& val) override;
+		/// Extracts a nullable nullable Int64.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt64>& val) override;
+		/// Extracts a nullable nullable UInt64.
+
+#ifndef POCO_INT64_IS_LONG
+	bool extract(std::size_t pos, Poco::Nullable<long>& val) override;
+		/// Extracts a nullable long.
+
+	bool extract(std::size_t pos, Poco::Nullable<unsigned long>& val) override;
+		/// Extracts a nullable nullable unsigned long.
+#endif
+
+	bool extract(std::size_t pos, Poco::Nullable<bool>& val) override;
+		/// Extracts a nullable boolean.
+
+	bool extract(std::size_t pos, Poco::Nullable<float>& val) override;
+		/// Extracts a nullable float.
+
+	bool extract(std::size_t pos, Poco::Nullable<double>& val) override;
+		/// Extracts a nullable double.
+
+	bool extract(std::size_t pos, Poco::Nullable<char>& val) override;
+		/// Extracts a nullable single character.
+
+	bool extract(std::size_t pos, Poco::Nullable<std::string>& val) override;
+		/// Extracts a nullable string.
+
+	bool extract(std::size_t pos, Poco::Nullable<UTF16String>& val) override;
+		/// Extracts a nullable UTF16String.
+
+	bool extract(std::size_t pos, Poco::Nullable<BLOB>& val) override;
+		/// Extracts a nullable BLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<CLOB>& val) override;
+		/// Extracts a nullable CLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<DateTime>& val) override;
+		/// Extracts a nullable DateTime.
+
+	bool extract(std::size_t pos, Poco::Nullable<Date>& val) override;
+		/// Extracts a nullable Date.
+
+	bool extract(std::size_t pos, Poco::Nullable<Time>& val) override;
+		/// Extracts a nullable Time.
+
+	bool extract(std::size_t pos, Poco::Nullable<UUID>& val) override;
+		/// Extracts a nullable UUID.
+
+	bool extract(std::size_t pos, Poco::Nullable<Any>& val) override;
+		/// Extracts a nullable nullable Any.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val) override;
+		/// Extracts a nullable Var.
+
+	bool isNull(std::size_t col, std::size_t row) override;
 		/// Returns true if the value at [col,row] position is null.
 
-	virtual void reset();
+	void reset() override;
 		/// Resets any information internally cached by the extractor.
 
 	////////////
 	// Not implemented extract functions
 	////////////
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int8>& val) override;
 		/// Extracts an Int8 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::Int8>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int8>& val) override;
 		/// Extracts an Int8 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::Int8>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int8>& val) override;
 		/// Extracts an Int8 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::UInt8>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt8>& val) override;
 		/// Extracts an UInt8 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::UInt8>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt8>& val) override;
 		/// Extracts an UInt8 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::UInt8>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt8>& val) override;
 		/// Extracts an UInt8 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::Int16>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int16>& val) override;
 		/// Extracts an Int16 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::Int16>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int16>& val) override;
 		/// Extracts an Int16 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::Int16>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int16>& val) override;
 		/// Extracts an Int16 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::UInt16>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt16>& val) override;
 		/// Extracts an UInt16 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::UInt16>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt16>& val) override;
 		/// Extracts an UInt16 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::UInt16>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt16>& val) override;
 		/// Extracts an UInt16 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::Int32>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int32>& val) override;
 		/// Extracts an Int32 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::Int32>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int32>& val) override;
 		/// Extracts an Int32 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::Int32>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int32>& val) override;
 		/// Extracts an Int32 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::UInt32>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt32>& val) override;
 		/// Extracts an UInt32 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::UInt32>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt32>& val) override;
 		/// Extracts an UInt32 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::UInt32>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt32>& val) override;
 		/// Extracts an UInt32 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::Int64>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int64>& val) override;
 		/// Extracts an Int64 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::Int64>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int64>& val) override;
 		/// Extracts an Int64 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::Int64>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int64>& val) override;
 		/// Extracts an Int64 list.
 
-	virtual bool extract(std::size_t pos, std::vector<Poco::UInt64>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt64>& val) override;
 		/// Extracts an UInt64 vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Poco::UInt64>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt64>& val) override;
 		/// Extracts an UInt64 deque.
 
-	virtual bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt64>& val) override;
 		/// Extracts an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	virtual bool extract(std::size_t pos, std::vector<long>& val);
+	bool extract(std::size_t pos, std::vector<long>& val) override;
 		/// Extracts a long vector.
 
-	virtual bool extract(std::size_t pos, std::deque<long>& val);
+	bool extract(std::size_t pos, std::deque<long>& val) override;
 		/// Extracts a long deque.
 
-	virtual bool extract(std::size_t pos, std::list<long>& val);
+	bool extract(std::size_t pos, std::list<long>& val) override;
+		/// Extracts a long list.
+
+	bool extract(std::size_t pos, std::vector<unsigned long>& val) override;
+		/// Extracts a long vector.
+
+	bool extract(std::size_t pos, std::deque<unsigned long>& val) override;
+		/// Extracts a long deque.
+
+	bool extract(std::size_t pos, std::list<unsigned long>& val) override;
 		/// Extracts a long list.
 #endif
 
-	virtual bool extract(std::size_t pos, std::vector<bool>& val);
+	bool extract(std::size_t pos, std::vector<bool>& val) override;
 		/// Extracts a boolean vector.
 
-	virtual bool extract(std::size_t pos, std::deque<bool>& val);
+	bool extract(std::size_t pos, std::deque<bool>& val) override;
 		/// Extracts a boolean deque.
 
-	virtual bool extract(std::size_t pos, std::list<bool>& val);
+	bool extract(std::size_t pos, std::list<bool>& val) override;
 		/// Extracts a boolean list.
 
-	virtual bool extract(std::size_t pos, std::vector<float>& val);
+	bool extract(std::size_t pos, std::vector<float>& val) override;
 		/// Extracts a float vector.
 
-	virtual bool extract(std::size_t pos, std::deque<float>& val);
+	bool extract(std::size_t pos, std::deque<float>& val) override;
 		/// Extracts a float deque.
 
-	virtual bool extract(std::size_t pos, std::list<float>& val);
+	bool extract(std::size_t pos, std::list<float>& val) override;
 		/// Extracts a float list.
 
-	virtual bool extract(std::size_t pos, std::vector<double>& val);
+	bool extract(std::size_t pos, std::vector<double>& val) override;
 		/// Extracts a double vector.
 
-	virtual bool extract(std::size_t pos, std::deque<double>& val);
+	bool extract(std::size_t pos, std::deque<double>& val) override;
 		/// Extracts a double deque.
 
-	virtual bool extract(std::size_t pos, std::list<double>& val);
+	bool extract(std::size_t pos, std::list<double>& val) override;
 		/// Extracts a double list.
 
-	virtual bool extract(std::size_t pos, std::vector<char>& val);
+	bool extract(std::size_t pos, std::vector<char>& val) override;
 		/// Extracts a character vector.
 
-	virtual bool extract(std::size_t pos, std::deque<char>& val);
+	bool extract(std::size_t pos, std::deque<char>& val) override;
 		/// Extracts a character deque.
 
-	virtual bool extract(std::size_t pos, std::list<char>& val);
+	bool extract(std::size_t pos, std::list<char>& val) override;
 		/// Extracts a character list.
 
-	virtual bool extract(std::size_t pos, std::vector<std::string>& val);
+	bool extract(std::size_t pos, std::vector<std::string>& val) override;
 		/// Extracts a string vector.
 
-	virtual bool extract(std::size_t pos, std::deque<std::string>& val);
+	bool extract(std::size_t pos, std::deque<std::string>& val) override;
 		/// Extracts a string deque.
 
-	virtual bool extract(std::size_t pos, std::list<std::string>& val);
+	bool extract(std::size_t pos, std::list<std::string>& val) override;
 		/// Extracts a string list.
 
-	virtual bool extract(std::size_t pos, std::vector<BLOB>& val);
+	bool extract(std::size_t pos, std::vector<BLOB>& val) override;
 		/// Extracts a BLOB vector.
 
-	virtual bool extract(std::size_t pos, std::deque<BLOB>& val);
+	bool extract(std::size_t pos, std::deque<BLOB>& val) override;
 		/// Extracts a BLOB deque.
 
-	virtual bool extract(std::size_t pos, std::list<BLOB>& val);
+	bool extract(std::size_t pos, std::list<BLOB>& val) override;
 		/// Extracts a BLOB list.
 
-	virtual bool extract(std::size_t pos, std::vector<CLOB>& val);
+	bool extract(std::size_t pos, std::vector<CLOB>& val) override;
 		/// Extracts a CLOB vector.
 
-	virtual bool extract(std::size_t pos, std::deque<CLOB>& val);
+	bool extract(std::size_t pos, std::deque<CLOB>& val) override;
 		/// Extracts a CLOB deque.
 
-	virtual bool extract(std::size_t pos, std::list<CLOB>& val);
+	bool extract(std::size_t pos, std::list<CLOB>& val) override;
 		/// Extracts a CLOB list.
 
-	virtual bool extract(std::size_t pos, std::vector<DateTime>& val);
+	bool extract(std::size_t pos, std::vector<DateTime>& val) override;
 		/// Extracts a DateTime vector.
 
-	virtual bool extract(std::size_t pos, std::deque<DateTime>& val);
+	bool extract(std::size_t pos, std::deque<DateTime>& val) override;
 		/// Extracts a DateTime deque.
 
-	virtual bool extract(std::size_t pos, std::list<DateTime>& val);
+	bool extract(std::size_t pos, std::list<DateTime>& val) override;
 		/// Extracts a DateTime list.
 
-	virtual bool extract(std::size_t pos, std::vector<Date>& val);
+	bool extract(std::size_t pos, std::vector<Date>& val) override;
 		/// Extracts a Date vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Date>& val);
+	bool extract(std::size_t pos, std::deque<Date>& val) override;
 		/// Extracts a Date deque.
 
-	virtual bool extract(std::size_t pos, std::list<Date>& val);
+	bool extract(std::size_t pos, std::list<Date>& val) override;
 		/// Extracts a Date list.
 
-	virtual bool extract(std::size_t pos, std::vector<Time>& val);
+	bool extract(std::size_t pos, std::vector<Time>& val) override;
 		/// Extracts a Time vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Time>& val);
+	bool extract(std::size_t pos, std::deque<Time>& val) override;
 		/// Extracts a Time deque.
 
-	virtual bool extract(std::size_t pos, std::list<Time>& val);
+	bool extract(std::size_t pos, std::list<Time>& val) override;
 		/// Extracts a Time list.
 
-	virtual bool extract(std::size_t pos, std::vector<Any>& val);
+	bool extract(std::size_t pos, std::vector<Any>& val) override;
 		/// Extracts an Any vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Any>& val);
+	bool extract(std::size_t pos, std::deque<Any>& val) override;
 		/// Extracts an Any deque.
 
-	virtual bool extract(std::size_t pos, std::list<Any>& val);
+	bool extract(std::size_t pos, std::list<Any>& val) override;
 		/// Extracts an Any list.
 
-	virtual bool extract(std::size_t pos, std::vector<Dynamic::Var>& val);
+	bool extract(std::size_t pos, std::vector<Dynamic::Var>& val) override;
 		/// Extracts a Dynamic::Var vector.
 
-	virtual bool extract(std::size_t pos, std::deque<Dynamic::Var>& val);
+	bool extract(std::size_t pos, std::deque<Dynamic::Var>& val) override;
 		/// Extracts a Dynamic::Var deque.
 
-	virtual bool extract(std::size_t pos, std::list<Dynamic::Var>& val);
+	bool extract(std::size_t pos, std::list<Dynamic::Var>& val) override;
 		/// Extracts a Dynamic::Var list.
 
 private:
@@ -331,6 +416,15 @@ private:
 	Extractor& operator=(const Extractor&);
 
 private:
+	template <typename T>
+	bool extractNullable(std::size_t pos, Poco::Nullable<T>& val)
+	{
+		typename Poco::Nullable<T>::Type v;
+		if (!extract(pos, v)) val.clear();
+		else val = std::move(v);
+		return true;
+	}
+
 	StatementExecutor& _stmt;
 	ResultMetadata& _metadata;
 };

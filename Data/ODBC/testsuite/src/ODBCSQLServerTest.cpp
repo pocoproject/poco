@@ -51,6 +51,7 @@ using Poco::DateTime;
 // FreeTDS version selection guide: http://www.freetds.org/userguide/choosingtdsprotocol.htm
 // (see #define FREE_TDS_VERSION below)
 
+
 #if !defined(FORCE_FREE_TDS)
 	#ifdef POCO_ODBC_USE_SQL_NATIVE
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server Native Client 10.0"
@@ -61,9 +62,7 @@ using Poco::DateTime;
 #else
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
 	#define FREE_TDS_VERSION "7.4"
-	#if defined(POCO_OS_FAMILY_WINDOWS)
-		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
-	#endif
+	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
 #endif
 
 #if POCO_DATA_SQL_SERVER_BIG_STRINGS
@@ -399,6 +398,26 @@ void ODBCSQLServerTest::testNull()
 }
 
 
+void ODBCSQLServerTest::testNullBulk()
+{
+try
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	recreatePersonBLOBTable();
+	_pExecutor->nullBulk("CONVERT(VARBINARY(30),?)");
+
+}
+catch(Poco::Exception& ex)
+{
+	std::cout << ex.displayText() << std::endl;
+}
+}
+
+
 void ODBCSQLServerTest::testBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -412,7 +431,7 @@ void ODBCSQLServerTest::testBulk()
 		std::vector<CLOB>,
 		std::vector<double>,
 		std::vector<DateTime>,
-		std::vector<bool> >(100, "CONVERT(VARBINARY(30),?)");
+		std::vector<bool>>(100, "CONVERT(VARBINARY(30),?)");
 
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::deque<int>,
@@ -420,7 +439,7 @@ void ODBCSQLServerTest::testBulk()
 		std::deque<CLOB>,
 		std::deque<double>,
 		std::deque<DateTime>,
-		std::deque<bool> >(100, "CONVERT(VARBINARY(30),?)");
+		std::deque<bool>>(100, "CONVERT(VARBINARY(30),?)");
 
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::list<int>,
@@ -428,7 +447,7 @@ void ODBCSQLServerTest::testBulk()
 		std::list<CLOB>,
 		std::list<double>,
 		std::list<DateTime>,
-		std::list<bool> >(100, "CONVERT(VARBINARY(30),?)");
+		std::list<bool>>(100, "CONVERT(VARBINARY(30),?)");
 }
 
 
@@ -1086,6 +1105,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);

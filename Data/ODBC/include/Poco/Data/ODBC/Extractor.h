@@ -62,278 +62,361 @@ public:
 	~Extractor();
 		/// Destroys the Extractor.
 
-	bool extract(std::size_t pos, Poco::Int8& val);
+	bool extract(std::size_t pos, Poco::Int8& val) override;
 		/// Extracts an Int8.
 
-	bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int8>& val) override;
 		/// Extracts an Int8 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Int8>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int8>& val) override;
 		/// Extracts an Int8 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Int8>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int8>& val) override;
 		/// Extracts an Int8 list.
 
-	bool extract(std::size_t pos, Poco::UInt8& val);
+	bool extract(std::size_t pos, Poco::UInt8& val) override;
 		/// Extracts an UInt8.
 
-	bool extract(std::size_t pos, std::vector<Poco::UInt8>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt8>& val) override;
 		/// Extracts an UInt8 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::UInt8>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt8>& val) override;
 		/// Extracts an UInt8 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::UInt8>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt8>& val) override;
 		/// Extracts an UInt8 list.
 
-	bool extract(std::size_t pos, Poco::Int16& val);
+	bool extract(std::size_t pos, Poco::Int16& val) override;
 		/// Extracts an Int16.
 
-	bool extract(std::size_t pos, std::vector<Poco::Int16>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int16>& val) override;
 		/// Extracts an Int16 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Int16>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int16>& val) override;
 		/// Extracts an Int16 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Int16>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int16>& val) override;
 		/// Extracts an Int16 list.
 
-	bool extract(std::size_t pos, Poco::UInt16& val);
+	bool extract(std::size_t pos, Poco::UInt16& val) override;
 		/// Extracts an UInt16.
 
-	bool extract(std::size_t pos, std::vector<Poco::UInt16>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt16>& val) override;
 		/// Extracts an UInt16 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::UInt16>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt16>& val) override;
 		/// Extracts an UInt16 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::UInt16>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt16>& val) override;
 		/// Extracts an UInt16 list.
 
-	bool extract(std::size_t pos, Poco::Int32& val);
+	bool extract(std::size_t pos, Poco::Int32& val) override;
 		/// Extracts an Int32.
 
-	bool extract(std::size_t pos, std::vector<Poco::Int32>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int32>& val) override;
 		/// Extracts an Int32 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Int32>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int32>& val) override;
 		/// Extracts an Int32 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Int32>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int32>& val) override;
 		/// Extracts an Int32 list.
 
-	bool extract(std::size_t pos, Poco::UInt32& val);
+	bool extract(std::size_t pos, Poco::UInt32& val) override;
 		/// Extracts an UInt32.
 
-	bool extract(std::size_t pos, std::vector<Poco::UInt32>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt32>& val) override;
 		/// Extracts an UInt32 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::UInt32>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt32>& val) override;
 		/// Extracts an UInt32 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::UInt32>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt32>& val) override;
 		/// Extracts an UInt32 list.
 
-	bool extract(std::size_t pos, Poco::Int64& val);
+	bool extract(std::size_t pos, Poco::Int64& val) override;
 		/// Extracts an Int64.
 
-	bool extract(std::size_t pos, std::vector<Poco::Int64>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Int64>& val) override;
 		/// Extracts an Int64 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Int64>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Int64>& val) override;
 		/// Extracts an Int64 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Int64>& val);
+	bool extract(std::size_t pos, std::list<Poco::Int64>& val) override;
 		/// Extracts an Int64 list.
 
-	bool extract(std::size_t pos, Poco::UInt64& val);
+	bool extract(std::size_t pos, Poco::UInt64& val) override;
 		/// Extracts an UInt64.
 
-	bool extract(std::size_t pos, std::vector<Poco::UInt64>& val);
+	bool extract(std::size_t pos, std::vector<Poco::UInt64>& val) override;
 		/// Extracts an UInt64 vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::UInt64>& val);
+	bool extract(std::size_t pos, std::deque<Poco::UInt64>& val) override;
 		/// Extracts an UInt64 deque.
 
-	bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
+	bool extract(std::size_t pos, std::list<Poco::UInt64>& val) override;
 		/// Extracts an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	bool extract(std::size_t pos, long& val);
+	bool extract(std::size_t pos, long& val) override;
 		/// Extracts a long.
 
-	bool extract(std::size_t pos, unsigned long& val);
+	bool extract(std::size_t pos, unsigned long& val) override;
 		/// Extracts an unsigned long.
 
-	bool extract(std::size_t pos, std::vector<long>& val);
+	bool extract(std::size_t pos, std::vector<long>& val) override;
 		/// Extracts a long vector.
 
-	bool extract(std::size_t pos, std::deque<long>& val);
+	bool extract(std::size_t pos, std::deque<long>& val) override;
 		/// Extracts a long deque.
 
-	bool extract(std::size_t pos, std::list<long>& val);
+	bool extract(std::size_t pos, std::list<long>& val) override;
 		/// Extracts a long list.
+
+	bool extract(std::size_t pos, std::vector<unsigned long>& val) override;
+		/// Extracts an unsigned long vector.
+
+	bool extract(std::size_t pos, std::deque<unsigned long>& val) override;
+		/// Extracts an unsigned long deque.
+
+	bool extract(std::size_t pos, std::list<unsigned long>& val) override;
+		/// Extracts an unsigned long list.
 #endif
 
-	bool extract(std::size_t pos, bool& val);
+	bool extract(std::size_t pos, bool& val) override;
 		/// Extracts a boolean.
 
-	bool extract(std::size_t pos, std::vector<bool>& val);
+	bool extract(std::size_t pos, std::vector<bool>& val) override;
 		/// Extracts a boolean vector.
 
-	bool extract(std::size_t pos, std::deque<bool>& val);
+	bool extract(std::size_t pos, std::deque<bool>& val) override;
 		/// Extracts a boolean deque.
 
-	bool extract(std::size_t pos, std::list<bool>& val);
+	bool extract(std::size_t pos, std::list<bool>& val) override;
 		/// Extracts a boolean list.
 
-	bool extract(std::size_t pos, float& val);
+	bool extract(std::size_t pos, float& val) override;
 		/// Extracts a float.
 
-	bool extract(std::size_t pos, std::vector<float>& val);
+	bool extract(std::size_t pos, std::vector<float>& val) override;
 		/// Extracts a float vector.
 
-	bool extract(std::size_t pos, std::deque<float>& val);
+	bool extract(std::size_t pos, std::deque<float>& val) override;
 		/// Extracts a float deque.
 
-	bool extract(std::size_t pos, std::list<float>& val);
+	bool extract(std::size_t pos, std::list<float>& val) override;
 		/// Extracts a float list.
 
-	bool extract(std::size_t pos, double& val);
+	bool extract(std::size_t pos, double& val) override;
 		/// Extracts a double.
 
-	bool extract(std::size_t pos, std::vector<double>& val);
+	bool extract(std::size_t pos, std::vector<double>& val) override;
 		/// Extracts a double vector.
 
-	bool extract(std::size_t pos, std::deque<double>& val);
+	bool extract(std::size_t pos, std::deque<double>& val) override;
 		/// Extracts a double deque.
 
-	bool extract(std::size_t pos, std::list<double>& val);
+	bool extract(std::size_t pos, std::list<double>& val) override;
 		/// Extracts a double list.
 
-	bool extract(std::size_t pos, char& val);
+	bool extract(std::size_t pos, char& val) override;
 		/// Extracts a single character.
 
-	bool extract(std::size_t pos, std::vector<char>& val);
+	bool extract(std::size_t pos, std::vector<char>& val) override;
 		/// Extracts a single character vector.
 
-	bool extract(std::size_t pos, std::deque<char>& val);
+	bool extract(std::size_t pos, std::deque<char>& val) override;
 		/// Extracts a single character deque.
 
-	bool extract(std::size_t pos, std::list<char>& val);
+	bool extract(std::size_t pos, std::list<char>& val) override;
 		/// Extracts a single character list.
 
-	bool extract(std::size_t pos, std::string& val);
+	bool extract(std::size_t pos, std::string& val) override;
 		/// Extracts a string.
 
-	bool extract(std::size_t pos, std::vector<std::string>& val);
+	bool extract(std::size_t pos, std::vector<std::string>& val) override;
 		/// Extracts a string vector.
 
-	bool extract(std::size_t pos, std::deque<std::string>& val);
+	bool extract(std::size_t pos, std::deque<std::string>& val) override;
 		/// Extracts a string deque.
 
-	bool extract(std::size_t pos, std::list<std::string>& val);
+	bool extract(std::size_t pos, std::list<std::string>& val) override;
 		/// Extracts a string list.
 		/// Extracts a single character list.
 
-	bool extract(std::size_t pos, UTF16String& val);
+	bool extract(std::size_t pos, UTF16String& val) override;
 	/// Extracts a string.
 
-	bool extract(std::size_t pos, std::vector<UTF16String>& val);
+	bool extract(std::size_t pos, std::vector<UTF16String>& val) override;
 	/// Extracts a string vector.
 
-	bool extract(std::size_t pos, std::deque<UTF16String>& val);
+	bool extract(std::size_t pos, std::deque<UTF16String>& val) override;
 	/// Extracts a string deque.
 
-	bool extract(std::size_t pos, std::list<UTF16String>& val);
+	bool extract(std::size_t pos, std::list<UTF16String>& val) override;
 	/// Extracts a string list.
 
-	bool extract(std::size_t pos, Poco::Data::BLOB& val);
+	bool extract(std::size_t pos, Poco::Data::BLOB& val) override;
 		/// Extracts a BLOB.
 
-	bool extract(std::size_t pos, Poco::Data::CLOB& val);
+	bool extract(std::size_t pos, Poco::Data::CLOB& val) override;
 		/// Extracts a CLOB.
 
-	bool extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val) override;
 		/// Extracts a BLOB vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Data::BLOB>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Data::BLOB>& val) override;
 		/// Extracts a BLOB deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Data::BLOB>& val);
+	bool extract(std::size_t pos, std::list<Poco::Data::BLOB>& val) override;
 		/// Extracts a BLOB list.
 
-	bool extract(std::size_t pos, std::vector<Poco::Data::CLOB>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Data::CLOB>& val) override;
 		/// Extracts a CLOB vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Data::CLOB>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Data::CLOB>& val) override;
 		/// Extracts a CLOB deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Data::CLOB>& val);
+	bool extract(std::size_t pos, std::list<Poco::Data::CLOB>& val) override;
 		/// Extracts a CLOB list.
 
-	bool extract(std::size_t pos, Poco::Data::Date& val);
+	bool extract(std::size_t pos, Poco::Data::Date& val) override;
 		/// Extracts a Date.
 
-	bool extract(std::size_t pos, std::vector<Poco::Data::Date>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Data::Date>& val) override;
 		/// Extracts a Date vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Data::Date>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Data::Date>& val) override;
 		/// Extracts a Date deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Data::Date>& val);
+	bool extract(std::size_t pos, std::list<Poco::Data::Date>& val) override;
 		/// Extracts a Date list.
 
-	bool extract(std::size_t pos, Poco::Data::Time& val);
+	bool extract(std::size_t pos, Poco::Data::Time& val) override;
 		/// Extracts a Time.
 
-	bool extract(std::size_t pos, std::vector<Poco::Data::Time>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Data::Time>& val) override;
 		/// Extracts a Time vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Data::Time>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Data::Time>& val) override;
 		/// Extracts a Time deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Data::Time>& val);
+	bool extract(std::size_t pos, std::list<Poco::Data::Time>& val) override;
 		/// Extracts a Time list.
 
-	bool extract(std::size_t pos, Poco::DateTime& val);
+	bool extract(std::size_t pos, Poco::DateTime& val) override;
 		/// Extracts a DateTime.
 
-	bool extract(std::size_t pos, std::vector<Poco::DateTime>& val);
+	bool extract(std::size_t pos, std::vector<Poco::DateTime>& val) override;
 		/// Extracts a DateTime vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::DateTime>& val);
+	bool extract(std::size_t pos, std::deque<Poco::DateTime>& val) override;
 		/// Extracts a DateTime deque.
 
-	bool extract(std::size_t pos, std::list<Poco::DateTime>& val);
+	bool extract(std::size_t pos, std::list<Poco::DateTime>& val) override;
 		/// Extracts a DateTime list.
 
-	bool extract(std::size_t pos, Poco::UUID& val);
+	bool extract(std::size_t pos, Poco::UUID& val) override;
 		/// Extracts a UUID.
 
-	bool extract(std::size_t pos, Poco::Any& val);
+	bool extract(std::size_t pos, Poco::Any& val) override;
 		/// Extracts an Any.
 
-	bool extract(std::size_t pos, std::vector<Poco::Any>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Any>& val) override;
 		/// Extracts an Any vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Any>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Any>& val) override;
 		/// Extracts an Any deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Any>& val);
+	bool extract(std::size_t pos, std::list<Poco::Any>& val) override;
 		/// Extracts an Any list.
 
-	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
+	bool extract(std::size_t pos, Poco::Dynamic::Var& val) override;
 		/// Extracts a Dynamic::Var.
 
-	bool extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val);
+	bool extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val) override;
 		/// Extracts a Dynamic::Var vector.
 
-	bool extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val);
+	bool extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val) override;
 		/// Extracts a Dynamic::Var deque.
 
-	bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val);
+	bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val) override;
 		/// Extracts a Dynamic::Var list.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int8>& val) override;
+		/// Extracts a Nullable Int8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt8>& val) override;
+		/// Extracts a Nullable UInt8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int16>& val) override;
+		/// Extracts a Nullable Int16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt16>& val) override;
+		/// Extracts a Nullable UInt16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int32>& val) override;
+		/// Extracts a Nullable Int32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt32>& val) override;
+		/// Extracts a Nullable UInt32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int64>& val) override;
+		/// Extracts a Nullable Int64.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt64>& val) override;
+		/// Extracts a Nullable UInt64.
+
+#ifndef POCO_INT64_IS_LONG
+	bool extract(std::size_t pos, Poco::Nullable<long>& val) override;
+		/// Extracts a Nullable long.
+
+	bool extract(std::size_t pos, Poco::Nullable<unsigned long>& val) override;
+		/// Extracts a Nullable unsigned long.
+#endif
+
+	bool extract(std::size_t pos, Poco::Nullable<bool>& val) override;
+		/// Extracts a Nullable bool.
+
+	bool extract(std::size_t pos, Poco::Nullable<float>& val) override;
+		/// Extracts a Nullable float.
+
+	bool extract(std::size_t pos, Poco::Nullable<double>& val) override;
+		/// Extracts a Nullable double.
+
+	bool extract(std::size_t pos, Poco::Nullable<char>& val) override;
+		/// Extracts a Nullable char.
+
+	bool extract(std::size_t pos, Poco::Nullable<std::string>& val) override;
+		/// Extracts a Nullable string.
+
+	bool extract(std::size_t pos, Poco::Nullable<UTF16String>& val) override;
+		/// Extracts a Nullable UTF16String.
+
+	bool extract(std::size_t pos, Poco::Nullable<BLOB>& val) override;
+		/// Extracts a Nullable BLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<CLOB>& val) override;
+		/// Extracts a Nullable CLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<DateTime>& val) override;
+		/// Extracts a Nullable DateTime.
+
+	bool extract(std::size_t pos, Poco::Nullable<Date>& val) override;
+		/// Extracts a Nullable Date.
+
+	bool extract(std::size_t pos, Poco::Nullable<Time>& val) override;
+		/// Extracts a Nullable Time.
+
+	bool extract(std::size_t pos, Poco::Nullable<UUID>& val) override;
+		/// Extracts a Nullable UUID.
+
+	bool extract(std::size_t pos, Poco::Nullable<Any>& val) override;
+		/// Extracts a Nullable Any.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val) override;
+		/// Extracts a Nullable Var.
 
 	void setDataExtraction(Preparator::DataExtraction ext);
 		/// Set data extraction mode.
@@ -341,10 +424,10 @@ public:
 	Preparator::DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
-	bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW);
+	bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) override;
 		/// Returns true if the value at [col,row] is null.
 
-	void reset();
+	void reset() override;
 		/// Resets the internally cached length indicators.
 
 private:
@@ -616,6 +699,15 @@ private:
 		else
 			throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
 		return ret;
+	}
+
+	template <typename T>
+	bool extractNullable(std::size_t pos, Poco::Nullable<T>& val)
+	{
+		typename Poco::Nullable<T>::Type v;
+		if (!extract(pos, v)) val.clear();
+		else val = std::move(v);
+		return true;
 	}
 
 	bool isNullLengthIndicator(SQLLEN val) const;
