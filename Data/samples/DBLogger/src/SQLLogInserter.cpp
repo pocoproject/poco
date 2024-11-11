@@ -213,7 +213,7 @@ std::size_t SQLLogInserter::scanDirectory()
 		{
 			continue;
 		}
-		newEntries.push_back(entry.path());
+		newEntries.push_back(entry.path().string());
 	}
 	return insertEntries(newEntries);
 }

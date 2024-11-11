@@ -2,14 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{2a1d790b-cbc6-4838-a942-cff99bfd18c2}</UniqueIdentifier>
+      <UniqueIdentifier>{845a4900-cd19-4075-a92c-d182a22a700b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{452aef7d-9e20-4c55-bf64-dff76c90ad9d}</UniqueIdentifier>
+      <UniqueIdentifier>{55ff8e76-9650-4f9b-8917-bd714d9fcc6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\RowFormatter.cpp">
+    <ClCompile Include="src\SQLLogInserter.cpp" />
+    <ClCompile Include="src\DBLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
