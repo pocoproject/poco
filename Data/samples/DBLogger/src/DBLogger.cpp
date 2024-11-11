@@ -58,23 +58,25 @@ protected:
 
 		Poco::Data::SQLite::Connector::registerConnector();
 
-		// TODO: Only delete and create table when creating demo messages?
-		logger().information("Database connector: %s, cs: %s",
-							 _inserter.connector(), _inserter.connectionString());
-		logger().information("Directory: %s", _inserter.directory());
-		logger().information("Number of workers: %z", _inserter.numWorkers());
+		if (_demoMessagesRequested)
+		{
+			// Only delete and create table when creating demo messages
+			logger().information("Database connector: %s, cs: %s",
+								 _inserter.connector(), _inserter.connectionString());
+			logger().information("Directory: %s", _inserter.directory());
+			logger().information("Number of workers: %z", _inserter.numWorkers());
 
-		Poco::Data::Session session (_inserter.connector(), _inserter.connectionString());
+			Poco::Data::Session session (_inserter.connector(), _inserter.connectionString());
 
-		session << ("DROP TABLE IF EXISTS "s + _tableName), now;
-		const auto create {
-			"CREATE TABLE "s + _tableName +
-			" (Source VARCHAR, Name VARCHAR, ProcessId INTEGER, Thread VARCHAR,"s +
-			" ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATE)"s
-		};
+			session << ("DROP TABLE IF EXISTS "s + _tableName), now;
+			const auto create {
+				"CREATE TABLE "s + _tableName +
+				" (Source VARCHAR, Name VARCHAR, ProcessId INTEGER, Thread VARCHAR,"s +
+				" ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATE)"s
+			};
 
-		session << create, now;
-
+			session << create, now;
+		}
 
 		_active = true;
 		_startTime.update();

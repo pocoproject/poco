@@ -26,15 +26,8 @@ class SQLLogInserter
 {
 public:
 
-	using WorkSet = std::unordered_set<std::string>;
-
-	SQLLogInserter()
-	{
-	}
-
-	~SQLLogInserter()
-	{
-	}
+	SQLLogInserter() = default;
+	~SQLLogInserter() = default;
 
 	void start();
 	void stop();
@@ -54,6 +47,8 @@ public:
 	std::size_t totalProcessed() const;
 
 private:
+
+	using WorkSet = std::unordered_set<std::string>;
 
 	std::size_t insertEntries(std::vector<std::string>& entries);
 	std::string popEntry();
