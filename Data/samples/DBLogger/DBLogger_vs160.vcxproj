@@ -235,7 +235,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -272,7 +272,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -304,7 +304,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -341,7 +341,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -373,7 +373,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -410,7 +410,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -442,7 +442,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -479,7 +479,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -511,7 +511,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -548,7 +548,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -580,7 +580,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -617,7 +617,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Data\include;..\..\..\Data\SQLParser;..\Data\SQLParser\src;..\..\..\Data\SQLite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
