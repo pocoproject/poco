@@ -539,6 +539,154 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 	return success;
 }
 
+//////////////
+// Nullable
+//////////////
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::Int8>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::UInt8>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::Int16>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::UInt16>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::Int32>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::UInt32>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::Int64>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::UInt64>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+#ifndef POCO_INT64_IS_LONG
+bool Extractor::extract(std::size_t pos, Poco::Nullable<long>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<unsigned long>& val)
+{
+	return extractNullable(pos, val);
+}
+#endif
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<bool>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<float>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<double>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<char>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<std::string>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<UTF16String>& val)
+{
+	throw NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<BLOB>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<CLOB>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<DateTime>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Date>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Time>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<UUID>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Any>& val)
+{
+	return extractNullable(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val)
+{
+	return extractNullable(pos, val);
+}
+
 
 //////////////
 // Not implemented

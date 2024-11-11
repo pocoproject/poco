@@ -118,6 +118,80 @@ public:
 	bool extract(std::size_t pos, Dynamic::Var& val) override;
 		/// Extracts a Dynamic::Var. Returns false if null was received.
 
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int8>& val) override;
+		/// Extracts a nullable nullable Int8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt8>& val) override;
+		/// Extracts a nullable nullable UInt8.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int16>& val) override;
+		/// Extracts a nullable nullable Int16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt16>& val) override;
+		/// Extracts a nullable nullable UInt16.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int32>& val) override;
+		/// Extracts a nullable nullable Int32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt32>& val) override;
+		/// Extracts a nullable nullable UInt32.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Int64>& val) override;
+		/// Extracts a nullable nullable Int64.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::UInt64>& val) override;
+		/// Extracts a nullable nullable UInt64.
+
+#ifndef POCO_INT64_IS_LONG
+	bool extract(std::size_t pos, Poco::Nullable<long>& val) override;
+		/// Extracts a nullable long.
+
+	bool extract(std::size_t pos, Poco::Nullable<unsigned long>& val) override;
+		/// Extracts a nullable nullable unsigned long.
+#endif
+
+	bool extract(std::size_t pos, Poco::Nullable<bool>& val) override;
+		/// Extracts a nullable boolean.
+
+	bool extract(std::size_t pos, Poco::Nullable<float>& val) override;
+		/// Extracts a nullable float.
+
+	bool extract(std::size_t pos, Poco::Nullable<double>& val) override;
+		/// Extracts a nullable double.
+
+	bool extract(std::size_t pos, Poco::Nullable<char>& val) override;
+		/// Extracts a nullable single character.
+
+	bool extract(std::size_t pos, Poco::Nullable<std::string>& val) override;
+		/// Extracts a nullable string.
+
+	bool extract(std::size_t pos, Poco::Nullable<UTF16String>& val) override;
+		/// Extracts a nullable UTF16String.
+
+	bool extract(std::size_t pos, Poco::Nullable<BLOB>& val) override;
+		/// Extracts a nullable BLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<CLOB>& val) override;
+		/// Extracts a nullable CLOB.
+
+	bool extract(std::size_t pos, Poco::Nullable<DateTime>& val) override;
+		/// Extracts a nullable DateTime.
+
+	bool extract(std::size_t pos, Poco::Nullable<Date>& val) override;
+		/// Extracts a nullable Date.
+
+	bool extract(std::size_t pos, Poco::Nullable<Time>& val) override;
+		/// Extracts a nullable Time.
+
+	bool extract(std::size_t pos, Poco::Nullable<UUID>& val) override;
+		/// Extracts a nullable UUID.
+
+	bool extract(std::size_t pos, Poco::Nullable<Any>& val) override;
+		/// Extracts a nullable nullable Any.
+
+	bool extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val) override;
+		/// Extracts a nullable Var.
+
 	bool isNull(std::size_t col, std::size_t row) override;
 		/// Returns true if the value at [col,row] position is null.
 
@@ -336,6 +410,18 @@ private:
 	BinaryExtractor& operator = (const BinaryExtractor&);
 
 private:
+	template <typename T>
+	bool extractNullable(std::size_t pos, Poco::Nullable<T>& val)
+	{
+		typename Poco::Nullable<T>::Type v;
+		if (extract(pos, v))
+			val = v;
+		else if (val.isNull())
+			val.clear();
+
+		return true;
+	}
+
 	StatementExecutor& _statementExecutor;
 };
 
