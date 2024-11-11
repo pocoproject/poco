@@ -706,7 +706,7 @@ bool Extractor::extract(std::size_t pos, std::list<unsigned long>& val)
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
 }
-#endif POCO_INT64_IS_LONG
+#endif // POCO_INT64_IS_LONG
 
 
 bool Extractor::extract(std::size_t pos, double& val)

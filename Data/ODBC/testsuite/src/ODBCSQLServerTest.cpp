@@ -51,6 +51,7 @@ using Poco::DateTime;
 // FreeTDS version selection guide: http://www.freetds.org/userguide/choosingtdsprotocol.htm
 // (see #define FREE_TDS_VERSION below)
 
+
 #if !defined(FORCE_FREE_TDS)
 	#ifdef POCO_ODBC_USE_SQL_NATIVE
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server Native Client 10.0"
@@ -61,9 +62,7 @@ using Poco::DateTime;
 #else
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
 	#define FREE_TDS_VERSION "7.4"
-	#if defined(POCO_OS_FAMILY_WINDOWS)
-		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
-	#endif
+	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
 #endif
 
 #if POCO_DATA_SQL_SERVER_BIG_STRINGS

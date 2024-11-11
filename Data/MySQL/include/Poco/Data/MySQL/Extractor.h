@@ -420,11 +420,8 @@ private:
 	bool extractNullable(std::size_t pos, Poco::Nullable<T>& val)
 	{
 		typename Poco::Nullable<T>::Type v;
-		if (extract(pos, v))
-			val = v;
-		else if (val.isNull())
-			val.clear();
-
+		if (!extract(pos, v)) val.clear();
+		else val = std::move(v);
 		return true;
 	}
 
