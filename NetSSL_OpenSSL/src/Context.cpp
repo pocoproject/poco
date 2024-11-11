@@ -39,13 +39,13 @@ namespace Poco {
 namespace Net {
 
 
-Context::Params::Params():
+Context::Params::Params(KeyDHGroup dhBits):
 	verificationMode(VERIFY_RELAXED),
 	verificationDepth(9),
 	loadDefaultCAs(false),
 	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
-	dhUse2048Bits(false),
+	dhGroup(dhBits),
 	securityLevel(SECURITY_LEVEL_NONE)
 {
 }
@@ -215,7 +215,7 @@ void Context::init(const Params& params)
 #endif
 		}
 
-		initDH(params.dhUse2048Bits, params.dhParamsFile);
+		initDH(params.dhGroup, params.dhParamsFile);
 		initECDH(params.ecdhCurve);
 	}
 	catch (...)
@@ -596,59 +596,59 @@ void Context::createSSLContext()
  * OPENSSL_NO_TLS1 is defined in opensslconf.h or on the compiler command line
  * if TLS1.x was removed at OpenSSL library build time via Configure options.
  */
-        case TLSV1_1_CLIENT_USE:
+		case TLSV1_1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
 			minTLSVersion = TLS1_1_VERSION;
 #else
-            _pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
 #endif
-            break;
+			break;
 
-        case TLSV1_1_SERVER_USE:
+		case TLSV1_1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-            _pSSLContext = SSL_CTX_new(TLS_server_method());
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
 			minTLSVersion = TLS1_1_VERSION;
 #else
-            _pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
 #endif
-            break;
+			break;
 #endif
 
 #if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
-        case TLSV1_2_CLIENT_USE:
+		case TLSV1_2_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-            _pSSLContext = SSL_CTX_new(TLS_client_method());
-            minTLSVersion = TLS1_2_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+			minTLSVersion = TLS1_2_VERSION;
 #else
-            _pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
 #endif
-            break;
+			break;
 
-        case TLSV1_2_SERVER_USE:
+		case TLSV1_2_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-            _pSSLContext = SSL_CTX_new(TLS_server_method());
-            minTLSVersion = TLS1_2_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+			minTLSVersion = TLS1_2_VERSION;
 #else
-            _pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
 #endif
-            break;
+			break;
 #endif
 
 #if defined(SSL_OP_NO_TLSv1_3) && !defined(OPENSSL_NO_TLS1)
-        case TLSV1_3_CLIENT_USE:
+		case TLSV1_3_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10101000L
-            _pSSLContext = SSL_CTX_new(TLS_client_method());
-            minTLSVersion = TLS1_3_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+			minTLSVersion = TLS1_3_VERSION;
 #endif
-            break;
+			break;
 
-        case TLSV1_3_SERVER_USE:
+		case TLSV1_3_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10101000L
-            _pSSLContext = SSL_CTX_new(TLS_server_method());
-            minTLSVersion = TLS1_3_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+			minTLSVersion = TLS1_3_VERSION;
 #endif
-            break;
+			break;
 #endif
 
 		default:
@@ -680,7 +680,7 @@ void Context::createSSLContext()
 }
 
 
-void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
+void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 {
 #ifndef OPENSSL_NO_DH
 	static const unsigned char dh1024_p[] =
@@ -828,11 +828,39 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			throw Poco::NullPointerException(Poco::Crypto::getError(err));
 		}
 
-		size_t keyLength = use2048Bits ? 256 : 160;
-		unsigned char* pDH_p = const_cast<unsigned char*>(use2048Bits ? dh2048_p : dh1024_p);
-		std::size_t sz_p = use2048Bits ? sizeof(dh2048_p) : sizeof(dh1024_p);
-		unsigned char* pDH_g = const_cast<unsigned char*>(use2048Bits ? dh2048_g : dh1024_g);
-		std::size_t sz_g = use2048Bits ? sizeof(dh2048_g) : sizeof(dh1024_g);
+		size_t keyLength = 0;
+		unsigned char* pDH_p = nullptr;
+		std::size_t sz_p = 0;
+		unsigned char* pDH_g = nullptr;
+		std::size_t sz_g = 0;
+
+		switch(keyDHGroup)
+		{
+		case KEY_DH_GROUP_1024:
+			keyLength = 160;
+			pDH_p = const_cast<unsigned char*>(dh1024_p);
+			sz_p = sizeof(dh1024_p);
+			pDH_g = const_cast<unsigned char*>(dh1024_g);
+			sz_g = sizeof(dh1024_g);
+			break;
+		case KEY_DH_GROUP_2048:
+			keyLength = 256;
+			pDH_p = const_cast<unsigned char*>(dh2048_p);
+			sz_p = sizeof(dh2048_p);
+			pDH_g = const_cast<unsigned char*>(dh2048_g);
+			sz_g = sizeof(dh2048_g);
+			break;
+		default:
+			throw Poco::NotImplementedException(Poco::format(
+				"DH Group: %d", static_cast<int>(keyDHGroup)));
+		}
+
+		poco_assert (keyLength);
+		poco_check_ptr (pDH_p);
+		poco_assert (sz_p);
+		poco_check_ptr (pDH_g);
+		poco_assert (sz_g);
+
 		OSSL_PARAM params[]
 		{
 			OSSL_PARAM_size_t(OSSL_PKEY_PARAM_FFC_PBITS, &keyLength),
@@ -862,10 +890,13 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 		throw SSLContextException(Poco::format("Context::initDH(%s):EVP_PKEY*", dhParamsFile));
 	}
 
-	SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey);
+	if (!SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey))
+	{
+		if (freeEVPPKey) EVP_PKEY_free(pKey);
+		std::string err = "Context::initDH():SSL_CTX_set0_tmp_dh_pkey()\n";
+		throw SSLContextException(Poco::Crypto::getError(err));
+	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
-
-	if (freeEVPPKey) EVP_PKEY_free(pKey);
 
 #else // OPENSSL_VERSION_NUMBER >= 0x30000000L
 
@@ -899,19 +930,24 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 
 		BIGNUM* p = nullptr;
 		BIGNUM* g = nullptr;
-		if (use2048Bits)
+		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
 			p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
 			g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
 			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 256);
 		}
-		else
+		else if (keyDHGroup == KEY_DH_GROUP_1024)
 		{
 			p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 			g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 160);
+		}
+		else
+		{
+			throw Poco::NotImplementedException(Poco::format(
+				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
 		if (!p || !g)
 		{
@@ -921,17 +957,21 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 
 #else // OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
 
-		if (use2048Bits)
+		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
 			dh->p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
 			dh->g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
 			dh->length = 256;
 		}
-		else
+		else if (keyDHGroup == KEY_DH_GROUP_1024)
 		{
 			dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 			dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 			dh->length = 160;
+		}
+		{
+			throw Poco::NotImplementedException(Poco::format(
+				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
 		if ((!dh->p) || (!dh->g))
 		{
