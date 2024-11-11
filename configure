@@ -86,7 +86,7 @@ $(ls -C "$base"/build/config/)
     Compile with -DPOCO_DATA_SQL_SERVER_BIG_STRINGS=1
     Enables strings over 8000 bytes on MS SQL Server.
 
-  --sqlite-fts=<path>
+  --sqlite-fts
     Compile with -DPOCO_DATA_SQLITE_FTS.
     Compile SQLite with Full Text Search support.
 
@@ -276,7 +276,7 @@ while [ $# -ge 1 ]; do
 		flags="$flags -DSQLITE_THREADSAFE=$(echo "${1}" | awk '{print substr($0,22)}')" ;;
 
 	--sqlite-fts)
-		flags="$flags -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_FTS3_PARENTHESIS" ;;
+		flags="$flags -DSQLITE_ENABLE_FTS5" ;;
 
 	--poquito)
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
