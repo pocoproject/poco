@@ -58,6 +58,32 @@ protected:
 
 		Poco::Data::SQLite::Connector::registerConnector();
 
+		const auto& cfg { config() };
+
+		if (!cfg.has("DBLogger.dir"))
+		{
+			throw Poco::Util::MissingOptionException ("Missing scanning directory.");
+		}
+		_inserter.setDirectory( cfg.getString("DBLogger.dir") );
+
+		if (!cfg.has("DBLogger.connector"))
+		{
+			throw Poco::Util::MissingOptionException ("Missing database connector.");
+		}
+		_inserter.setConnector( cfg.getString("DBLogger.connector") );
+
+		if (!cfg.has("DBLogger.constring"))
+		{
+			throw Poco::Util::MissingOptionException ("Missing database connection string.");
+		}
+		_inserter.setConnectionString( cfg.getString("DBLogger.constring") );
+
+		_inserter.setNumWorkers( cfg.getUInt64("DBLogger.workers", 2) );
+
+		logger().information("Directory: %s", _inserter.directory());
+		logger().information("Database: %s, %s", _inserter.connector(), _inserter.connectionString());
+		logger().information("Number of workers: %z", _inserter.numWorkers());
+
 		if (_demoMessagesRequested)
 		{
 			// Only delete and create table when creating demo messages
@@ -130,42 +156,45 @@ protected:
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
 				.repeatable(false)
-				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleHelp)));
+				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleHelp))
+			);
 
 		options.addOption(
 			Option("?", "?", "display help information on command line arguments")
 				.required(false)
 				.repeatable(false)
-				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleHelp)));
+				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleHelp))
+			);
 
 		options.addOption(
 			Option("dir", "d", "directory path to scan for SQL log files")
-				.required(true)
 				.repeatable(false)
 				.argument("dir")
-				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleLogDirectory)));
+				.binding("DBLogger.dir")
+			);
 
 		options.addOption(
 			Option("connector", "c", "database connector")
-				.required(true)
 				.repeatable(false)
 				.argument("type")
-				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleDbConnector)));
+				.binding("DBLogger.connector")
+			);
 
 		options.addOption(
 			Option("constring", "s", "database connection string")
-				.required(true)
 				.repeatable(false)
 				.argument("cstr")
-				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleDbConnectionString)));
+				.binding("DBLogger.constring")
+			);
 
 		options.addOption(
-			Option("workers", "w", "number of workers inserting into database (default 2, max 100)")
-				.required(false)
+			Option("workers", "w", "number of workers inserting into database (default 2)")
 				.repeatable(false)
 				.argument("N")
-				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleNumberOfWorkers)));
+				.binding("DBLogger.workers")
+			);
 
+		// Only command line option
 		options.addOption(
 			Option("demo", "m", "create demo messages")
 				.required(false)
@@ -185,37 +214,6 @@ protected:
 	{
 		_demoMessagesRequested = true;
 	}
-
-	void handleLogDirectory(const std::string& name, const std::string& value)
-	{
-		if (value.empty())
-			throw Poco::Util::IncompatibleOptionsException("Expected directory name");
-
-		_inserter.setDirectory(value);
-	}
-
-	void handleDbConnector(const std::string& name, const std::string& value)
-	{
-		if (value.empty())
-			throw Poco::Util::IncompatibleOptionsException("Expected database connector name");
-
-		_inserter.setConnector(value);
-	}
-
-	void handleDbConnectionString(const std::string& name, const std::string& value)
-	{
-		if (value.empty())
-			throw Poco::Util::IncompatibleOptionsException("Expected database connection string");
-
-		_inserter.setConnectionString(value);
-	}
-
-	void handleNumberOfWorkers(const std::string& name, const std::string& value)
-	{
-		const auto num = Poco::NumberParser::parseUnsigned(value);
-		_inserter.setNumWorkers( std::min(1U, num) );
-	}
-
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
