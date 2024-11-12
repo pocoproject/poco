@@ -12,10 +12,10 @@
 
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Util/HelpFormatter.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionException.h"
 #include "Poco/Util/OptionSet.h"
-#include "Poco/Util/HelpFormatter.h"
 #include "Poco/Util/ServerApplication.h"
 
 #include "SQLLogInserter.h"
@@ -36,14 +36,8 @@ public:
 
 	using WorkSet = std::unordered_set<std::string>;
 
-	DBLogger():
-		_helpRequested(false)
-	{
-	}
-
-	~DBLogger() override
-	{
-	}
+	DBLogger() = default;
+	~DBLogger() override = default;
 
 protected:
 	void initialize(Application& self) override
@@ -79,6 +73,7 @@ protected:
 		_inserter.setConnectionString( cfg.getString("DBLogger.constring") );
 
 		_inserter.setNumWorkers( cfg.getUInt64("DBLogger.workers", 2) );
+		_demoMessagesRequested = cfg.getBool("DBLogger.demo", false);
 
 		logger().information("Directory: %s", _inserter.directory());
 		logger().information("Database: %s, %s", _inserter.connector(), _inserter.connectionString());
@@ -87,10 +82,7 @@ protected:
 		if (_demoMessagesRequested)
 		{
 			// Only delete and create table when creating demo messages
-			logger().information("Database connector: %s, cs: %s",
-								 _inserter.connector(), _inserter.connectionString());
-			logger().information("Directory: %s", _inserter.directory());
-			logger().information("Number of workers: %z", _inserter.numWorkers());
+			logger().information("Demo messages: Creating new table: %s", _tableName);
 
 			Poco::Data::Session session (_inserter.connector(), _inserter.connectionString());
 
@@ -199,6 +191,7 @@ protected:
 			Option("demo", "m", "create demo messages")
 				.required(false)
 				.repeatable(false)
+				.binding("DBLogger.demo")
 				.callback(OptionCallback<DBLogger>(this, &DBLogger::handleCreateDemoMessages)));
 
 	}
@@ -212,7 +205,7 @@ protected:
 
 	void handleCreateDemoMessages(const std::string& name, const std::string& value)
 	{
-		_demoMessagesRequested = true;
+		config().setString("DBLogger.demo", "true");
 	}
 	void displayHelp()
 	{
@@ -229,7 +222,11 @@ protected:
 		{
 			for (int j = 0; j < 100 && _active; ++j)
 			{
-				Poco::Message msg("SQL Source", Poco::format("%d Informational message", i), Poco::Message::PRIO_INFORMATION);
+				const Poco::Message msg(
+					"SQL Source",
+					Poco::format("%d Informational message", i),
+					Poco::Message::PRIO_INFORMATION
+				);
 				_sqlChannel->log(msg);
 				++i;
 				++_created;

@@ -11,11 +11,9 @@
 
 #include "SQLLogInserter.h"
 
-#include "Poco/Util/Application.h"
-
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 using namespace Poco::Data::Keywords;
 
@@ -150,7 +148,7 @@ void SQLLogInserter::processFile(std::string& entry)
 	bool success {false};
 	try
 	{
-		std::ifstream is(entry);
+		const std::ifstream is(entry);
 		std::stringstream buffer;
 		buffer << is.rdbuf();
 		const auto& sql { buffer.str() };
@@ -187,8 +185,11 @@ std::size_t SQLLogInserter::scanDirectory()
 {
 	std::vector<std::string> newEntries;
 	newEntries.reserve(1000);
-	std::filesystem::directory_iterator diriter(_directory, std::filesystem::directory_options::skip_permission_denied);
-	for (auto& entry: diriter)
+	const std::filesystem::directory_iterator diriter(
+		_directory,
+		std::filesystem::directory_options::skip_permission_denied
+	);
+	for (const auto& entry: diriter)
 	{
 		if (!_active)
 		{
