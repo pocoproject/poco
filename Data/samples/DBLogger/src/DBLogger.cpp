@@ -86,6 +86,11 @@ protected:
 
 			Poco::Data::Session session (_inserter.connector(), _inserter.connectionString());
 
+			if (!session.isGood() || !session.isConnected())
+			{
+				throw Poco::Data::NotConnectedException("Can't create demo database.");
+			}
+
 			session << ("DROP TABLE IF EXISTS "s + _tableName), now;
 			const auto create {
 				"CREATE TABLE "s + _tableName +
@@ -128,7 +133,7 @@ protected:
 		_inserter.stop();
 
 		logger().information(
-			"Created %z messages, processed %z messages in %Ld ms.",
+			"Created %z messages, processed %z files in %Ld ms.",
 			_created, _inserter.totalProcessed(), (_startTime.elapsed() / 1000)
 		);
 
@@ -205,7 +210,7 @@ protected:
 
 	void handleCreateDemoMessages(const std::string& name, const std::string& value)
 	{
-		config().setString("DBLogger.demo", "true");
+		config().setBool("DBLogger.demo", true);
 	}
 	void displayHelp()
 	{

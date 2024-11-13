@@ -11,6 +11,8 @@
 
 #include "SQLLogInserter.h"
 
+#include "Poco/Data/DataException.h"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -22,6 +24,11 @@ using namespace std::string_literals;
 void SQLLogInserter::start()
 {
 	_dataSession = std::make_shared<Poco::Data::Session>(_connector, _connectionString);
+
+	if (!_dataSession->isGood() || !_dataSession->isConnected())
+	{
+		throw Poco::Data::NotConnectedException("Can't connect to database.");
+	}
 
 	_active = true;
 	_doneProcessing = false;
