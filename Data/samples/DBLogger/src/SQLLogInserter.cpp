@@ -24,6 +24,7 @@ void SQLLogInserter::start()
 	_dataSession = std::make_shared<Poco::Data::Session>(_connector, _connectionString);
 
 	_active = true;
+	_doneProcessing = false;
 
 	_workSet.reserve(MAX_WORKSET_SIZE * 2);
 
@@ -74,10 +75,6 @@ std::size_t SQLLogInserter::insertEntries(std::vector<std::string>& entries)
 		// Prevent creating too large work set
 		_underflowCondition.wait_for(l, std::chrono::milliseconds(200));
 	}
-	if (!_active)
-	{
-		return 0;
-	}
 
 	const auto wss = _workSet.size();
 	// Do not re-insert entries that are being processed.
@@ -101,13 +98,13 @@ std::size_t SQLLogInserter::insertEntries(std::vector<std::string>& entries)
 std::string SQLLogInserter::popEntry()
 {
 	std::unique_lock<std::mutex> l(_workMutex);
-	while (_workSet.empty() && _active)
+	while (_workSet.empty() && !_doneProcessing)
 	{
 		_workCondition.wait_for(l, std::chrono::milliseconds(200));
 	}
 	if (_workSet.empty())
 	{
-		// Exited loop because of !_active
+		// Exited loop because of _doneProcessing
 		return {};
 	}
 	auto entry = (*_workSet.begin());
@@ -191,10 +188,6 @@ std::size_t SQLLogInserter::scanDirectory()
 	);
 	for (const auto& entry: diriter)
 	{
-		if (!_active)
-		{
-			return 0;
-		}
 		if (_dataSession == nullptr || !_dataSession->isGood())
 		{
 			// Do not process files if database session is not healthy.
@@ -222,9 +215,17 @@ std::size_t SQLLogInserter::scanDirectory()
 
 void SQLLogInserter::runDirectoryScan()
 {
-	while (_active)
+	while (!_doneProcessing)
 	{
-		const auto scheduled = scanDirectory();
+		auto scheduled = scanDirectory();
+		if (!_active && !_doneProcessing)
+		{
+			// Last scan directory to clean up
+			scheduled = scanDirectory();
+			_doneProcessing = true;
+			_workCondition.notify_all();
+			break;
+		}
 		if (scheduled == 0)
 		{
 			// No new files to be scheduled. Wait a bit.
@@ -236,7 +237,7 @@ void SQLLogInserter::runDirectoryScan()
 
 void SQLLogInserter::runProcessingEntries()
 {
-	while (!_workSet.empty() || _active)
+	while (!_workSet.empty() || !_doneProcessing)
 	{
 		auto entry = popEntry();
 		processFile(entry);

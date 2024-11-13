@@ -67,6 +67,7 @@ private:
 	std::size_t	_numWorkers {2};
 
 	bool _active {false};
+	bool _doneProcessing {false};
 
 	std::size_t _processed{0};
 
