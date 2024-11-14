@@ -70,6 +70,8 @@ void SQLLogInserter::stop()
 			w.join();
 		}
 	}
+
+    _dataSession->close();
 }
 
 
@@ -125,7 +127,7 @@ std::string SQLLogInserter::popEntry()
 }
 
 
-void SQLLogInserter::removeEntry(std::string entry)
+void SQLLogInserter::removeEntry(const std::string& entry)
 {
 	std::unique_lock<std::mutex> l(_workMutex);
 	auto i = _processingSet.find(entry);
@@ -136,7 +138,7 @@ void SQLLogInserter::removeEntry(std::string entry)
 }
 
 
-void SQLLogInserter::processFile(std::string& entry)
+void SQLLogInserter::processFile(const std::string &entry)
 {
 	if (entry.empty())
 	{
@@ -228,7 +230,7 @@ void SQLLogInserter::runDirectoryScan()
 		if (!_active && !_doneProcessing)
 		{
 			// Last scan directory to clean up
-			scheduled = scanDirectory();
+            (void)scanDirectory();
 			_doneProcessing = true;
 			_workCondition.notify_all();
 			break;

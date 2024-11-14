@@ -10,3 +10,5 @@ POCO_HEADERS_AUTO(DBLOGGER_SRCS ${HDRS_G})
 add_executable(DBLogger ${DBLOGGER_SRCS})
 
 target_link_libraries(DBLogger PUBLIC Poco::Util Poco::DataSQLite)
+
+add_custom_target(DBLogger-properties SOURCES DBLogger.properties)
