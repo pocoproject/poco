@@ -114,11 +114,14 @@ extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
 	#endif
 #else  // !Net_EXPORTS
-	#if defined(_WIN64)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
-	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
+	#if !defined(POCO_NETWORK_INITIALIZER_INCLUDE_PATH)
+		#if defined(_WIN64)
+			#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:"
+		#elif defined(_WIN32)
+			#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:_"
+		#endif
 	#endif
+	#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, POCO_NETWORK_INITIALIZER_INCLUDE_PATH#s))
 #endif // Net_EXPORTS
 
 POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
