@@ -419,10 +419,10 @@ public:
 	bool extract(std::size_t pos, Poco::Nullable<UUID>& val) override;
 		/// Extracts a Nullable<UUID>.
 
-	bool isNull(std::size_t col, std::size_t row = -1);
+	bool isNull(std::size_t col, std::size_t row = -1) override;
 		/// Returns true if the current row value at pos column is null.
 
-	void reset();
+	void reset() override;
 
 	void setString(const std::string& str)
 	{
