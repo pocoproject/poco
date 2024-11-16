@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="TestSuite"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="TestSuite"
 	ProjectGUID="{25E8E5AB-7B9C-4A2F-A0F6-12B6C5B11F28}"
 	RootNamespace="TestSuite"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
@@ -18,19 +22,26 @@
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;"
@@ -48,39 +59,50 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\TestSuited.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\TestSuited.pdb"
 				SubSystem="1"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
@@ -88,19 +110,26 @@
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -120,15 +149,19 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\TestSuite.exe"
 				LinkIncremental="1"
@@ -138,21 +171,28 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
@@ -160,19 +200,26 @@
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
@@ -190,40 +237,51 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\static_mt\TestSuited.exe"
 				LinkIncremental="2"
+				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\lib"
 				IgnoreDefaultLibraryNames="nafxcwd.lib"
-				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\static_mt\TestSuited.pdb"
 				SubSystem="1"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
@@ -231,19 +289,26 @@
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -263,15 +328,19 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\static_mt\TestSuite.exe"
 				LinkIncremental="1"
@@ -282,21 +351,28 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
@@ -304,19 +380,26 @@
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
@@ -334,39 +417,50 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\static_md\TestSuited.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\static_md\TestSuited.pdb"
 				SubSystem="1"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
@@ -374,19 +468,26 @@
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -406,15 +507,19 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
@@ -424,114 +529,234 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="HTTPS">
+			Name="HTTPS"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSTestServer.h"/>
+					RelativePath=".\src\HTTPSTestServer.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSTestServer.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="_Suite">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\src\NetSSLTestSuite.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\NetSSLTestSuite.cpp"/>
+					RelativePath=".\src\HTTPSTestServer.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Driver">
+			Name="_Suite"
+			>
 			<Filter
-				Name="Source Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\Driver.cpp"/>
+					RelativePath=".\src\NetSSLTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\NetSSLTestSuite.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="TCPServer">
+			Name="_Driver"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\TCPServerTest.h"/>
-				<File
-					RelativePath=".\src\TCPServerTestSuite.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\TCPServerTest.cpp"/>
-				<File
-					RelativePath=".\src\TCPServerTestSuite.cpp"/>
+					RelativePath=".\src\Driver.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTPSServer">
+			Name="TCPServer"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSServerTest.h"/>
+					RelativePath=".\src\TCPServerTest.h"
+					>
+				</File>
 				<File
-					RelativePath=".\src\HTTPSServerTestSuite.h"/>
+					RelativePath=".\src\TCPServerTestSuite.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSServerTest.cpp"/>
+					RelativePath=".\src\TCPServerTest.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\HTTPSServerTestSuite.cpp"/>
+					RelativePath=".\src\TCPServerTestSuite.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTPSClient">
+			Name="HTTPSServer"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSClientSessionTest.h"/>
+					RelativePath=".\src\HTTPSServerTest.h"
+					>
+				</File>
 				<File
-					RelativePath=".\src\HTTPSClientTestSuite.h"/>
-				<File
-					RelativePath=".\src\HTTPSStreamFactoryTest.h"/>
+					RelativePath=".\src\HTTPSServerTestSuite.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSClientSessionTest.cpp"/>
+					RelativePath=".\src\HTTPSServerTest.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\HTTPSClientTestSuite.cpp"/>
+					RelativePath=".\src\HTTPSServerTestSuite.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="HTTPSClient"
+			>
+			<Filter
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\HTTPSStreamFactoryTest.cpp"/>
+					RelativePath=".\src\HTTPSClientSessionTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSClientTestSuite.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSStreamFactoryTest.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\HTTPSClientSessionTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSClientTestSuite.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSStreamFactoryTest.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="SecureSocket"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\SecureStreamSocketTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SecureStreamSocketTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\SecureStreamSocketTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SecureStreamSocketTestSuite.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="WebSocket"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\WebSocketTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebSocketTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\WebSocketTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebSocketTestSuite.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

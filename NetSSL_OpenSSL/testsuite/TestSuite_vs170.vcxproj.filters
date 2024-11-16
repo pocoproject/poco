@@ -70,6 +70,15 @@
     <Filter Include="FTPSClient\Source Files">
       <UniqueIdentifier>{93a3a5f8-8056-435b-86ca-ef2fb15351c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SecureSocket">
+      <UniqueIdentifier>{a5fbbc5a-297c-465b-a150-e7e4f9078eef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SecureSocket\Header Files">
+      <UniqueIdentifier>{ed2ce712-70d3-45cc-a0d1-ca8823321ca6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SecureSocket\Source Files">
+      <UniqueIdentifier>{432fbf93-c96e-47a5-888f-aa786982fdb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HTTPSTestServer.h">
@@ -113,6 +122,12 @@
     </ClInclude>
     <ClInclude Include="src\FTPSClientTestSuite.h">
       <Filter>FTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SecureStreamSocketTest.h">
+      <Filter>SecureSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SecureStreamSocketTestSuite.h">
+      <Filter>SecureSocket\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +175,12 @@
     </ClCompile>
     <ClCompile Include="src\FTPSClientTestSuite.cpp">
       <Filter>FTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SecureStreamSocketTest.cpp">
+      <Filter>SecureSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SecureStreamSocketTestSuite.cpp">
+      <Filter>SecureSocket\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

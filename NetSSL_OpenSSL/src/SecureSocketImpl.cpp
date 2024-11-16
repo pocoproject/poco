@@ -332,22 +332,6 @@ void SecureSocketImpl::close()
 }
 
 
-void SecureSocketImpl::setBlocking(bool flag)
-{
-	poco_check_ptr (_pSocket);
-
-	_pSocket->setBlocking(flag);
-}
-
-
-bool SecureSocketImpl::getBlocking() const
-{
-	poco_check_ptr (_pSocket);
-
-	return _pSocket->getBlocking();
-}
-
-
 int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	poco_assert (_pSocket->initialized());
@@ -409,7 +393,14 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		rc = ::SSL_read(_pSSL, buffer, length);
+		if (flags & MSG_PEEK)
+		{
+			rc = SSL_peek(_pSSL, buffer, length);
+		}
+		else
+		{
+			rc = SSL_read(_pSSL, buffer, length);
+		}
 		if (!mustRetry(rc))
 			break;
 

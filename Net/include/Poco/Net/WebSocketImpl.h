@@ -42,12 +42,21 @@ public:
 	// StreamSocketImpl
 	virtual int sendBytes(const void* buffer, int length, int flags);
 		/// Sends a WebSocket protocol frame.
+		///
+		/// See WebSocket::sendFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
+		///
+		/// See WebSocket::receiveFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
 		/// Receives a WebSocket protocol frame.
+		///
+		/// See WebSocket::receiveFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 	virtual void connect(const SocketAddress& address);
@@ -67,10 +76,16 @@ public:
 	virtual void sendUrgent(unsigned char data);
 	virtual int available();
 	virtual bool secure() const;
+	virtual void setSendBufferSize(int size);
+	virtual int getSendBufferSize();
+	virtual void setReceiveBufferSize(int size);
+	virtual int getReceiveBufferSize();
 	virtual void setSendTimeout(const Poco::Timespan& timeout);
 	virtual Poco::Timespan getSendTimeout();
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
 	virtual Poco::Timespan getReceiveTimeout();
+	virtual void setBlocking(bool flag);
+	virtual bool getBlocking() const;
 
 	// Internal
 	int frameFlags() const;
@@ -93,13 +108,35 @@ protected:
 	enum
 	{
 		FRAME_FLAG_MASK   = 0x80,
-		MAX_HEADER_LENGTH = 14
+		MAX_HEADER_LENGTH = 14,
+		MASK_LENGTH       = 4
 	};
 
-	int receiveHeader(char mask[4], bool& useMask);
-	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
-	int receiveNBytes(void* buffer, int bytes);
-	int receiveSomeBytes(char* buffer, int bytes);
+	struct ReceiveState
+	{
+		int frameFlags = 0;
+		bool useMask = false;
+		char mask[MASK_LENGTH];
+		int headerLength = 0;
+		int payloadLength = 0;
+		int remainingPayloadLength = 0;
+		Poco::Buffer<char> payload{0};
+	};
+
+	struct SendState
+	{
+		int length = 0;
+		int remainingPayloadOffset = 0;
+		int remainingPayloadLength = 0;
+		Poco::Buffer<char> payload{0};
+	};
+
+	int peekHeader(ReceiveState& receiveState);
+	void skipHeader(int headerLength);
+	int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask);
+	int receiveNBytes(void* buffer, int length);
+	int receiveSomeBytes(char* buffer, int length);
+	int peekSomeBytes(char* buffer, int length);
 	virtual ~WebSocketImpl();
 
 private:
@@ -109,8 +146,9 @@ private:
 	int _maxPayloadSize;
 	Poco::Buffer<char> _buffer;
 	int _bufferOffset;
-	int _frameFlags;
 	bool _mustMaskPayload;
+	ReceiveState _receiveState;
+	SendState _sendState;
 	Poco::Random _rnd;
 };
 
@@ -120,7 +158,7 @@ private:
 //
 inline int WebSocketImpl::frameFlags() const
 {
-	return _frameFlags;
+	return _receiveState.frameFlags;
 }
 
 

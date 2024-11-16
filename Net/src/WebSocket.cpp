@@ -135,20 +135,20 @@ WebSocket& WebSocket::operator = (const WebSocket& socket)
 }
 
 
-void WebSocket::shutdown()
+int WebSocket::shutdown()
 {
-	shutdown(WS_NORMAL_CLOSE);
+	return shutdown(WS_NORMAL_CLOSE);
 }
 
 
-void WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessage)
+int WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessage)
 {
 	Poco::Buffer<char> buffer(statusMessage.size() + 2);
 	Poco::MemoryOutputStream ostr(buffer.begin(), buffer.size());
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
 	writer << statusCode;
 	writer.writeRaw(statusMessage);
-	sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), FRAME_FLAG_FIN | FRAME_OP_CLOSE);
+	return sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), FRAME_FLAG_FIN | FRAME_OP_CLOSE);
 }
 
 
