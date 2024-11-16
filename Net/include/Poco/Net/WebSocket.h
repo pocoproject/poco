@@ -221,15 +221,21 @@ public:
 
 #endif //POCO_NEW_STATE_ON_MOVE
 
-	void shutdown();
+	int shutdown();
 		/// Sends a Close control frame to the server end of
 		/// the connection to initiate an orderly shutdown
 		/// of the connection.
+		///
+		/// Returns the number of bytes sent or -1 if the socket
+		/// is non-blocking and the frame cannot be sent at this time.
 
-	void shutdown(Poco::UInt16 statusCode, const std::string& statusMessage = "");
+	int shutdown(Poco::UInt16 statusCode, const std::string& statusMessage = "");
 		/// Sends a Close control frame to the server end of
 		/// the connection to initiate an orderly shutdown
 		/// of the connection.
+		///
+		/// Returns the number of bytes sent or -1 if the socket
+		/// is non-blocking and the frame cannot be sent at this time.
 
 	int sendFrame(const void* buffer, int length, int flags = FRAME_TEXT);
 		/// Sends the contents of the given buffer through

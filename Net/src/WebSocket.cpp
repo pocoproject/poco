@@ -107,48 +107,20 @@ WebSocket& WebSocket::operator = (const Socket& socket)
 }
 
 
-#ifdef POCO_NEW_STATE_ON_MOVE
-
-WebSocket& WebSocket::operator = (Socket&& socket)
+int WebSocket::shutdown()
 {
-	if (dynamic_cast<WebSocketImpl*>(socket.impl()))
-		Socket::operator = (std::move(socket));
-	else
-		throw InvalidArgumentException("Cannot assign incompatible socket");
-	return *this;
+	return shutdown(WS_NORMAL_CLOSE);
 }
 
 
-WebSocket& WebSocket::operator = (WebSocket&& socket)
-{
-	Socket::operator = (std::move(socket));
-	return *this;
-}
-
-#endif // POCO_NEW_STATE_ON_MOVE
-
-
-WebSocket& WebSocket::operator = (const WebSocket& socket)
-{
-	Socket::operator = (socket);
-	return *this;
-}
-
-
-void WebSocket::shutdown()
-{
-	shutdown(WS_NORMAL_CLOSE);
-}
-
-
-void WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessage)
+int WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessage)
 {
 	Poco::Buffer<char> buffer(statusMessage.size() + 2);
 	Poco::MemoryOutputStream ostr(buffer.begin(), buffer.size());
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
 	writer << statusCode;
 	writer.writeRaw(statusMessage);
-	sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), FRAME_FLAG_FIN | FRAME_OP_CLOSE);
+	return sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), FRAME_FLAG_FIN | FRAME_OP_CLOSE);
 }
 
 
