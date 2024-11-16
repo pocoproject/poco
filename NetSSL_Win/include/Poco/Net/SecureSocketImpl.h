@@ -207,6 +207,12 @@ public:
 	int available() const;
 		/// Returns the number of bytes available in the buffer.
 
+	SocketImpl* socket();
+		/// Returns the underlying SocketImpl.
+		
+	const SocketImpl* socket() const;
+		/// Returns the underlying SocketImpl.
+
 protected:
 	enum
 	{
@@ -294,6 +300,8 @@ private:
 
 	Poco::Buffer<BYTE> _overflowBuffer;
 	Poco::Buffer<BYTE> _sendBuffer;
+	DWORD _sendBufferOffset;
+	DWORD _sendBufferPending;
 	Poco::Buffer<BYTE> _recvBuffer;
 	DWORD _recvBufferOffset;
 	DWORD _ioBufferSize;
@@ -316,6 +324,18 @@ private:
 //
 // inlines
 //
+inline SocketImpl* SecureSocketImpl::socket()
+{
+	return _pSocket.get();
+}
+
+
+inline const SocketImpl* SecureSocketImpl::socket() const
+{
+	return _pSocket.get();
+}
+
+
 inline poco_socket_t SecureSocketImpl::sockfd()
 {
 	return _pSocket->sockfd();

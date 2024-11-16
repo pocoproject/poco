@@ -71,6 +71,8 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_contextFlags(0),
 	_overflowBuffer(0),
 	_sendBuffer(0),
+	_sendBufferOffset(0),
+	_sendBufferPending(0),
 	_recvBuffer(IO_BUFFER_SIZE),
 	_recvBufferOffset(0),
 	_ioBufferSize(0),
@@ -362,6 +364,17 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 	if (_state == ST_ERROR) return 0;
 
+	if (_sendBufferPending > 0)
+	{
+		int sent = sendRawBytes(_sendBuffer.begin() + _sendBufferOffset, _sendBufferPending, flags);
+		if (sent > 0)
+		{
+			_sendBufferOffset += sent;
+			_sendBufferPending -= sent;
+		}
+		return _sendBufferPending == 0 ? length : -1;
+	}
+
 	if (_state != ST_DONE)
 	{
 		bool establish = _pSocket->getBlocking();
@@ -379,14 +392,13 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		}
 	}
 
-	int rc = 0;
 	int dataToSend = length;
 	int dataSent = 0;
 	const char* pBuffer = reinterpret_cast<const char*>(buffer);
 
-	if (_sendBuffer.capacity() != _ioBufferSize)
-		_sendBuffer.setCapacity(_ioBufferSize);
-
+	_sendBuffer.resize(length + 1024);
+	_sendBufferOffset = 0;
+	_sendBufferPending = 0;
 	while (dataToSend > 0)
 	{
 		AutoSecBufferDesc<4> msg(&_securityFunctions, false);
@@ -396,11 +408,16 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		SecBuffer* pDataBuffer  = 0;
 		SecBuffer* pExtraBuffer = 0;
 
-		std::memcpy(_sendBuffer.begin() + _streamSizes.cbHeader, pBuffer + dataSent, dataSize);
+		if (_sendBuffer.size() < _sendBufferPending + dataSize +  _streamSizes.cbHeader + _streamSizes.cbTrailer)
+		{
+			_sendBuffer.resize(_sendBufferPending + dataSize + _streamSizes.cbHeader + _streamSizes.cbTrailer, true);
+		}
 
-		msg.setSecBufferStreamHeader(0, _sendBuffer.begin(), _streamSizes.cbHeader);
-		msg.setSecBufferData(1, _sendBuffer.begin() + _streamSizes.cbHeader, dataSize);
-		msg.setSecBufferStreamTrailer(2, _sendBuffer.begin() + _streamSizes.cbHeader + dataSize, _streamSizes.cbTrailer);
+		std::memcpy(_sendBuffer.begin() + _sendBufferPending + _streamSizes.cbHeader, pBuffer + dataSent, dataSize);
+
+		msg.setSecBufferStreamHeader(0, _sendBuffer.begin() + _sendBufferPending, _streamSizes.cbHeader);
+		msg.setSecBufferData(1, _sendBuffer.begin() + _sendBufferPending + _streamSizes.cbHeader, dataSize);
+		msg.setSecBufferStreamTrailer(2, _sendBuffer.begin() + _sendBufferPending + _streamSizes.cbHeader + dataSize, _streamSizes.cbTrailer);
 		msg.setSecBufferEmpty(3);
 
 		SECURITY_STATUS securityStatus = _securityFunctions.EncryptMessage(&_hContext, 0, &msg, 0);
@@ -408,24 +425,31 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		if (FAILED(securityStatus) && securityStatus != SEC_E_CONTEXT_EXPIRED)
 			throw SSLException("Failed to encrypt message", Utility::formatError(securityStatus));
 
-		int outBufferLen = msg[0].cbBuffer + msg[1].cbBuffer + msg[2].cbBuffer;
+		poco_assert_dbg (_streamSizes.cbHeader == msg[0].cbBuffer);
+		poco_assert_dbg (_streamSizes.cbTrailer == msg[2].cbBuffer);
+		poco_assert_dbg (dataSize == msg[1].cbBuffer);
 
-		int sent = sendRawBytes(_sendBuffer.begin(), outBufferLen, flags);
-		if (_pSocket->getBlocking() && sent == -1)
-		{
-			if (dataSent == 0)
-				return -1;
-			else
-				return dataSent;
-		}
-		if (sent != outBufferLen)
-			throw SSLException("Failed to send encrypted message");
-
+		_sendBufferPending += msg[0].cbBuffer + msg[1].cbBuffer + msg[2].cbBuffer;
 		dataToSend -= dataSize;
 		dataSent += dataSize;
-		rc += sent;
+
+		poco_assert (_sendBufferPending <= _sendBuffer.size());
 	}
-	return dataSent;
+
+	int sent = sendRawBytes(_sendBuffer.begin(), _sendBufferPending, flags);
+	if (sent >= 0)
+	{
+		_sendBufferOffset += sent;
+		_sendBufferPending -= sent;
+		if (_sendBufferPending > 0)
+			return -1;
+		else
+			return dataSent;
+	}
+	else
+	{
+		return -1;
+	}
 }
 
 
@@ -463,14 +487,20 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		{
 			rc = length;
 			std::memcpy(buffer, _overflowBuffer.begin(), rc);
-			std::memmove(_overflowBuffer.begin(), _overflowBuffer.begin() + rc, overflowSize - rc);
-			_overflowBuffer.resize(overflowSize - rc);
+			if ((flags & MSG_PEEK) == 0)
+			{
+				std::memmove(_overflowBuffer.begin(), _overflowBuffer.begin() + rc, overflowSize - rc);
+				_overflowBuffer.resize(overflowSize - rc);
+			}
 		}
 		else
 		{
 			rc = static_cast<int>(overflowSize);
 			std::memcpy(buffer, _overflowBuffer.begin(), rc);
-			_overflowBuffer.resize(0);
+			if ((flags & MSG_PEEK) == 0)
+			{
+				_overflowBuffer.resize(0);
+			}
 		}
 	}
 	else
@@ -521,13 +551,21 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 				rc = bytesDecoded;
 				if (rc > length)
 					rc = length;
+
+				if (flags & MSG_PEEK)
+				{
+					// prepend returned data to overflow buffer
+					std::size_t oldSize = _overflowBuffer.size();
+					_overflowBuffer.resize(oldSize + rc);
+					std::memmove(_overflowBuffer.begin() + rc, _overflowBuffer.begin(), oldSize);
+					std::memcpy(_overflowBuffer.begin(), buffer, rc);
+				}
+
 				return rc;
 			}
 
 			if (securityStatus == SEC_E_INCOMPLETE_MESSAGE)
 			{
-				if (!_pSocket->getBlocking())
-					return -1;
 				continue;
 			}
 

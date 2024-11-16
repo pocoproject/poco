@@ -197,6 +197,12 @@ public:
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 
+	// SocketImpl
+	virtual void setBlocking(bool flag) override;
+	virtual bool getBlocking() const override;
+	virtual void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
+	virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
+	
 protected:
 	void acceptSSL();
 		/// Performs a SSL server-side handshake.
