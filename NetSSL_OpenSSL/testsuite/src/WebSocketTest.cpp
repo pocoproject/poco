@@ -57,7 +57,7 @@ namespace
 					n = ws.receiveFrame(buffer.begin(), static_cast<int>(_bufSize), flags);
 					if (n == 0)
 						break;
-					Poco::Thread::current()->sleep(static_cast<long>(handleDelay.totalMilliseconds()));
+					Poco::Thread::current()->sleep(static_cast<long>(getHandleDelay().totalMilliseconds()));
 					ws.sendFrame(buffer.begin(), n, flags);
 				}
 				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
@@ -80,15 +80,27 @@ namespace
 			}
 		}
 
-	public:
+		static void setHandleDelay(Poco::Timespan newDelay)
+		{
+			Poco::FastMutex::ScopedLock mutex(_handleDelayMutex);
+			_handleDelay = newDelay;
+		}
 
-		static Poco::Timespan	handleDelay;
+		static Poco::Timespan getHandleDelay()
+		{
+			Poco::FastMutex::ScopedLock mutex(_handleDelayMutex);
+			return _handleDelay;
+		}
 
 	private:
 		std::size_t _bufSize;
+		static Poco::FastMutex _handleDelayMutex;
+		static Poco::Timespan _handleDelay;
 	};
 
-	Poco::Timespan WebSocketRequestHandler::handleDelay {0};
+
+	Poco::FastMutex WebSocketRequestHandler::_handleDelayMutex;
+	Poco::Timespan WebSocketRequestHandler::_handleDelay;
 
 
 	class WebSocketRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
@@ -140,7 +152,7 @@ void WebSocketTest::testWebSocketTimeout()
 	try
 	{
 		// Server will take long to process and cause WS timeout
-		WebSocketRequestHandler::handleDelay.assign(3, 0);
+		WebSocketRequestHandler::setHandleDelay(Poco::Timespan(3, 0));
 
 		std::string payload("x");
 		ws.sendFrame(payload.data(), (int) payload.size());
@@ -157,7 +169,7 @@ void WebSocketTest::testWebSocketTimeout()
 	ws.receiveFrame(buffer, sizeof(buffer), flags);
 	server.stop();
 	
-	WebSocketRequestHandler::handleDelay = 0;
+	WebSocketRequestHandler::setHandleDelay(Poco::Timespan(0));
 }
 
 
