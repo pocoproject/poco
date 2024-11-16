@@ -107,6 +107,34 @@ WebSocket& WebSocket::operator = (const Socket& socket)
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
+WebSocket& WebSocket::operator = (Socket&& socket)
+{
+	if (dynamic_cast<WebSocketImpl*>(socket.impl()))
+		Socket::operator = (std::move(socket));
+	else
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
+}
+
+
+WebSocket& WebSocket::operator = (WebSocket&& socket)
+{
+	Socket::operator = (std::move(socket));
+	return *this;
+}
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+
+WebSocket& WebSocket::operator = (const WebSocket& socket)
+{
+	Socket::operator = (socket);
+	return *this;
+}
+
+
 int WebSocket::shutdown()
 {
 	return shutdown(WS_NORMAL_CLOSE);
