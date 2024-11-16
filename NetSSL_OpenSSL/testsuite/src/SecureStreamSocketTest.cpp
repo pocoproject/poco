@@ -96,9 +96,9 @@ void SecureStreamSocketTest::testSendReceive()
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), static_cast<int>(data.size()));
 	char buffer[8192];
-	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assertTrue (n > 0);
-	assertTrue (std::string(buffer, n) == data);
+	int rc = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (rc > 0);
+	assertTrue (std::string(buffer, rc) == data);
 
 	const std::vector<std::size_t> sizes = {67, 467, 7883, 19937};
 	for (const auto n: sizes)
@@ -108,7 +108,7 @@ void SecureStreamSocketTest::testSendReceive()
 		std::string received;
 		while (received.size() < n)
 		{
-			int rc = ss1.receiveBytes(buffer, sizeof(buffer));
+			rc = ss1.receiveBytes(buffer, sizeof(buffer));
 			if (rc > 0)
 			{
 				received.append(buffer, rc);
@@ -166,24 +166,24 @@ void SecureStreamSocketTest::testNB()
 
 	char buffer[8192];
 	const std::vector<std::size_t> sizes = {67, 467, 7883, 19937};
-	for (const auto n: sizes)
+	for (const auto s: sizes)
 	{
-		std::string data(n, 'X');
-		int rc = ss1.sendBytes(data.data(), static_cast<int>(data.size()));
-		assertTrue (rc == n);
+		std::string data(s, 'X');
+		ss1.sendBytes(data.data(), static_cast<int>(data.size()));
 
-		rc = -1;
-		while (rc < 0)
+		int rc;
+		do
 		{
 			rc = ss1.receiveBytes(buffer, sizeof(buffer), MSG_PEEK);
 		}
-		assertTrue (rc > 0 && rc <= n);
+		while (rc < 0);
+		assertTrue (rc > 0 && rc <= s);
 		assertTrue (data.compare(0, rc, buffer, rc) == 0);
 
 		std::string received;
-		while (received.size() < n)
+		while (received.size() < s)
 		{
-			int rc = ss1.receiveBytes(buffer, sizeof(buffer));
+			rc = ss1.receiveBytes(buffer, sizeof(buffer));
 			if (rc > 0)
 			{
 				received.append(buffer, rc);
