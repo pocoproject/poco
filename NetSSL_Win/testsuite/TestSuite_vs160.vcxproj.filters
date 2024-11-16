@@ -52,6 +52,24 @@
     <Filter Include="HTTPSClient\Source Files">
       <UniqueIdentifier>{fd8022c1-22bd-4625-af5a-10bd378a95bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SecureSocket">
+      <UniqueIdentifier>{7dd8cb36-bdb2-42f8-8417-55394d5fdd62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SecureSocket\Header Files">
+      <UniqueIdentifier>{9d9fc789-de25-4b65-ab74-b2fbcea13b6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SecureSocket\Source Files">
+      <UniqueIdentifier>{7d900974-e475-4868-a421-05e27a263725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket">
+      <UniqueIdentifier>{d10f11d0-44f3-4926-8117-2403b24bbd58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Header Files">
+      <UniqueIdentifier>{c4a90c4a-ab95-4d8d-9bef-780bdc8225b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Source Files">
+      <UniqueIdentifier>{e0400fb5-388e-4d4d-aae6-f987e019c57e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HTTPSTestServer.h">
@@ -80,6 +98,18 @@
     </ClInclude>
     <ClInclude Include="src\HTTPSStreamFactoryTest.h">
       <Filter>HTTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTest.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTestSuite.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SecureStreamSocketTest.h">
+      <Filter>SecureSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SecureStreamSocketTestSuite.h">
+      <Filter>SecureSocket\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +142,18 @@
     </ClCompile>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp">
       <Filter>HTTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTest.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTestSuite.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SecureStreamSocketTestSuite.cpp">
+      <Filter>SecureSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SecureStreamSocketTest.cpp">
+      <Filter>SecureSocket\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

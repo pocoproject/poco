@@ -764,6 +764,34 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="SecureSocket"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\SecureStreamSocketTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SecureStreamSocketTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\SecureStreamSocketTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SecureStreamSocketTestSuite.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
