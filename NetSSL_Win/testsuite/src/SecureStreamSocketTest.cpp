@@ -113,7 +113,7 @@ void SecureStreamSocketTest::testSendReceive()
 			{
 				received.append(buffer, rc);
 			}
-			else if (n == 0)
+			else if (rc == 0)
 			{
 				break;
 			}
@@ -188,7 +188,7 @@ void SecureStreamSocketTest::testNB()
 			{
 				received.append(buffer, rc);
 			}
-			else if (n == 0)
+			else if (rc == 0)
 			{
 				break;
 			}
