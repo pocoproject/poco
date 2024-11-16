@@ -42,12 +42,21 @@ public:
 	// StreamSocketImpl
 	virtual int sendBytes(const void* buffer, int length, int flags);
 		/// Sends a WebSocket protocol frame.
+		///
+		/// See WebSocket::sendFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
+		///
+		/// See WebSocket::receiveFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
 		/// Receives a WebSocket protocol frame.
+		///
+		/// See WebSocket::receiveFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 	virtual void connect(const SocketAddress& address);
