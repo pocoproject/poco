@@ -25,6 +25,7 @@ public:
 	~SocketTest() override;
 
 	void testEcho();
+	void testPeek();
 	void testMoveStreamSocket();
 	void testPoll();
 	void testAvailable();

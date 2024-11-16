@@ -67,6 +67,27 @@ void SocketTest::testEcho()
 }
 
 
+void SocketTest::testPeek()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	int n = ss.sendBytes("hello, world!", 13);
+	assertTrue (n == 13);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, 5, MSG_PEEK);
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	n = ss.receiveBytes(buffer, sizeof(buffer), MSG_PEEK);
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
+	ss.close();
+}
+
+
 void SocketTest::testMoveStreamSocket()
 {
 	EchoServer echoServer;
@@ -679,6 +700,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SocketTest");
 
 	CppUnit_addTest(pSuite, SocketTest, testEcho);
+	CppUnit_addTest(pSuite, SocketTest, testPeek);
 	CppUnit_addTest(pSuite, SocketTest, testMoveStreamSocket);
 	CppUnit_addTest(pSuite, SocketTest, testPoll);
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
