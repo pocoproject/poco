@@ -57,7 +57,7 @@ namespace
 					n = ws.receiveFrame(buffer.begin(), static_cast<int>(_bufSize), flags);
 					if (n == 0)
 						break;
-					Poco::Thread::current()->sleep(handleDelay.totalMilliseconds());
+					Poco::Thread::current()->sleep(static_cast<long>(handleDelay.totalMilliseconds()));
 					ws.sendFrame(buffer.begin(), n, flags);
 				}
 				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
@@ -148,7 +148,7 @@ void WebSocketTest::testWebSocketTimeout()
 
 		failmsg("Data exchange shall time out.");
 	}
-	catch (const Poco::TimeoutException& te)
+	catch (const Poco::TimeoutException&)
 	{
 		assertTrue(sendStart.elapsed() < Poco::Timespan(4, 0).totalMicroseconds());
 	}
@@ -222,7 +222,8 @@ void WebSocketTest::testWebSocket()
 	assertTrue (n == 2);
 	assertTrue ((flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE);
 
-	server.stopAll(true);
+	ws.close();
+	server.stop();
 }
 
 
@@ -258,7 +259,9 @@ void WebSocketTest::testWebSocketLarge()
 	assertTrue (n == payload.size());
 	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
 
-	server.stopAll(true);
+	ws.shutdown();
+	ws.close();
+	server.stop();
 }
 
 
@@ -325,7 +328,8 @@ void WebSocketTest::testWebSocketNB()
 	assertTrue (n == 2);
 	assertTrue ((flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE);
 	
-	server.stopAll(true);
+	ws.close();
+	server.stop();
 }
 
 
