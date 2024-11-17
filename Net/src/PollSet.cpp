@@ -167,7 +167,7 @@ public:
 		while (true)
 		{
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, &_events[0], static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
 			if (rc == 0)
 			{
 				if (keepWaiting(start, remainingTime)) continue;
@@ -242,10 +242,10 @@ public:
 #endif
 	}
 
-	int count() const
+	std::size_t size() const
 	{
 		ScopedLock lock(_mutex);
-		return static_cast<int>(_socketMap.size());
+		return _socketMap.size();
 	}
 
 private:
@@ -454,7 +454,7 @@ public:
 		do
 		{
 			Poco::Timestamp start;
-			rc = ::poll(&_pollfds[0], _pollfds.size(), remainingTime.totalMilliseconds());
+			rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
 			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
 				Poco::Timestamp end;
@@ -505,10 +505,10 @@ public:
 		_pipe.writeBytes(&c, 1);
 	}
 
-	int count() const
+	std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		return static_cast<int>(_socketMap.size());
+		return _socketMap.size();
 	}
 
 private:
@@ -669,10 +669,10 @@ public:
 		// TODO
 	}
 
-	int count() const
+	std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		return static_cast<int>(_map.size());
+		return _map.size();
 	}
 
 private:
@@ -740,7 +740,13 @@ PollSet::SocketModeMap PollSet::poll(const Poco::Timespan& timeout)
 
 int PollSet::count() const
 {
-	return _pImpl->count();
+	return static_cast<int>(_pImpl->size());
+}
+
+
+std::size_t PollSet::size() const
+{
+	return _pImpl->size();
 }
 
 

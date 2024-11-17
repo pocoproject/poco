@@ -93,6 +93,14 @@ public:
 	bool empty() const;
 		/// Returns true if no socket is registered for polling.
 
+	std::size_t size() const;
+		/// Returns the number of sockets monitored.
+
+	//@ deprecated
+	int count() const;
+		/// Returns the number of sockets monitored.
+		/// This method is deprecated. Use size() instead.
+
 	void clear();
 		/// Removes all sockets from the PollSet.
 
@@ -102,14 +110,12 @@ public:
 		/// Returns a PollMap containing the sockets that have had
 		/// their state changed.
 
-	int count() const;
-		/// Returns the number of sockets monitored.
-
 	void wakeUp();
 		/// Wakes up a waiting PollSet.
 		/// Any errors that occur during this call are ignored.
 		/// On platforms/implementations where this functionality
 		/// is not available, it does nothing.
+
 private:
 	PollSetImpl* _pImpl;
 
