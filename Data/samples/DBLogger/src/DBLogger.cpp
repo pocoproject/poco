@@ -36,11 +36,11 @@ public:
 
 	using WorkSet = std::unordered_set<std::string>;
 
-    DBLogger()
-    {
-        Poco::Data::SQLite::Connector::registerConnector();
-        Poco::Data::SQLChannel::registerChannel();
-    }
+	DBLogger()
+	{
+		Poco::Data::SQLite::Connector::registerConnector();
+		Poco::Data::SQLChannel::registerChannel();
+	}
 
 	~DBLogger() override = default;
 
@@ -57,25 +57,25 @@ protected:
 
 		const auto& cfg { config() };
 
-        if (!cfg.has("logging.channels.sql.directory"))
+		if (!cfg.has("logging.channels.sql.directory"))
 		{
 			throw Poco::Util::MissingOptionException ("Missing scanning directory.");
 		}
-        _inserter.setDirectory( cfg.getString("logging.channels.sql.directory") );
+		_inserter.setDirectory(cfg.getString("logging.channels.sql.directory") );
 
 		if (!cfg.has("DBLogger.connector"))
 		{
 			throw Poco::Util::MissingOptionException ("Missing database connector.");
 		}
-		_inserter.setConnector( cfg.getString("DBLogger.connector") );
+		_inserter.setConnector(cfg.getString("DBLogger.connector") );
 
 		if (!cfg.has("DBLogger.constring"))
 		{
 			throw Poco::Util::MissingOptionException ("Missing database connection string.");
 		}
-		_inserter.setConnectionString( cfg.getString("DBLogger.constring") );
+		_inserter.setConnectionString(cfg.getString("DBLogger.constring") );
 
-		_inserter.setNumWorkers( cfg.getUInt64("DBLogger.workers", 2) );
+		_inserter.setNumWorkers(cfg.getUInt64("DBLogger.workers", 2) );
 		_demoMessagesRequested = cfg.getBool("DBLogger.demo", false);
 
 		logger().information("Directory: %s", _inserter.directory());
@@ -84,14 +84,14 @@ protected:
 
 		if (_demoMessagesRequested)
 		{
-            auto& dl = Poco::Logger::get("SQLDemo");
-            auto* sqlChannel = dynamic_cast<Poco::Data::SQLChannel*>(dl.getChannel().get());
-            if (sqlChannel == nullptr)
-            {
-                throw Poco::Util::UnexpectedArgumentException ("SQLDemo logger does not have SQL channel.");
-            }
+			auto& dl = Poco::Logger::get("SQLDemo");
+			auto* sqlChannel = dynamic_cast<Poco::Data::SQLChannel*>(dl.getChannel().get());
+			if (sqlChannel == nullptr)
+			{
+				throw Poco::Util::UnexpectedArgumentException ("SQLDemo logger does not have SQL channel.");
+			}
 
-            _tableName = cfg.getString("logging.channels.sql.table");
+			_tableName = cfg.getString("logging.channels.sql.table");
 
 			// Only delete and create table when creating demo messages
 			logger().information("Demo messages: Creating new table: %s", _tableName);
@@ -122,7 +122,7 @@ protected:
 
 		if (_demoMessagesRequested)
 		{
-			_sqlSourceThread = std::move(std::thread(&DBLogger::createMessages, this));
+			_sqlSourceThread = std::thread(&DBLogger::createMessages, this);
 			logger().information("Started creating demo messages.");
 		}
 	}
@@ -135,7 +135,7 @@ protected:
 			return;
 		}
 
-        logger().information("Request to stop processing.");
+		logger().information("Request to stop processing.");
 
 		if (_demoMessagesRequested)
 		{
@@ -180,7 +180,7 @@ protected:
 			Option("dir", "d", "directory path to scan for SQL log files")
 				.repeatable(false)
 				.argument("dir")
-                .binding("logging.channels.sql.directory")
+				.binding("logging.channels.sql.directory")
 			);
 
 		options.addOption(
@@ -241,13 +241,13 @@ protected:
 	void createMessages()
 	{
 		int i {0};
-        auto& dl = Poco::Logger::get("SQLDemo");
+		auto& dl = Poco::Logger::get("SQLDemo");
 
 		while (_active)
 		{
 			for (int j = 0; j < 100 && _active; ++j)
 			{
-                dl.debug("%d Informational message", i);
+				dl.debug("%d Informational message", i);
 				++i;
 				++_created;
 			}
@@ -278,7 +278,7 @@ private:
 
 	std::size_t _created{0};
 	std::thread _sqlSourceThread;
-    std::string _tableName{"T_POCO_LOG"};
+	std::string _tableName{"T_POCO_LOG"};
 };
 
 

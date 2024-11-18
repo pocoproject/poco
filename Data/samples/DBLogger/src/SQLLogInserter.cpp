@@ -17,9 +17,10 @@
 #include <fstream>
 #include <iostream>
 
-using namespace Poco::Data::Keywords;
 
+using namespace Poco::Data::Keywords;
 using namespace std::string_literals;
+
 
 void SQLLogInserter::start()
 {
@@ -41,8 +42,9 @@ void SQLLogInserter::start()
 	}
 
 	// Thread to scan the directory
-	_dirScanThread = std::move(std::thread(&SQLLogInserter::runDirectoryScan, this));
+	_dirScanThread = std::thread(&SQLLogInserter::runDirectoryScan, this);
 }
+
 
 void SQLLogInserter::stop()
 {
@@ -71,7 +73,7 @@ void SQLLogInserter::stop()
 		}
 	}
 
-    _dataSession->close();
+	_dataSession->close();
 }
 
 
@@ -230,7 +232,7 @@ void SQLLogInserter::runDirectoryScan()
 		if (!_active && !_doneProcessing)
 		{
 			// Last scan directory to clean up
-            (void)scanDirectory();
+			(void)scanDirectory();
 			_doneProcessing = true;
 			_workCondition.notify_all();
 			break;
@@ -253,5 +255,3 @@ void SQLLogInserter::runProcessingEntries()
 	}
 	_completedCondition.notify_all();
 }
-
-
