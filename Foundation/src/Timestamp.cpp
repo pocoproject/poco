@@ -133,7 +133,7 @@ void Timestamp::update()
 #else
 
 	struct timeval tv;
-	if (gettimeofday(&tv, NULL))
+	if (gettimeofday(&tv, nullptr))
 		throw SystemException("cannot get time of day");
 	_ts = TimeVal(tv.tv_sec)*resolution() + tv.tv_usec;
 

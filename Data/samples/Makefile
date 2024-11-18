@@ -13,3 +13,4 @@ projects:
 	$(MAKE) -C RowFormatter $(MAKECMDGOALS)
 	$(MAKE) -C Tuple $(MAKECMDGOALS)
 	$(MAKE) -C WebNotifier $(MAKECMDGOALS)
+	$(MAKE) -C DBLogger $(MAKECMDGOALS)

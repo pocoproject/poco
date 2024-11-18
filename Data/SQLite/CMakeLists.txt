@@ -13,10 +13,6 @@ else()
 	POCO_SOURCES(SQLITE_SRCS sqlite3
 		src/sqlite3.c
 	)
-
-	POCO_HEADERS(SQLITE_SRCS sqlite3
-		src/sqlite3.h
-	)
 endif()
 
 # Version Resource

@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TypeHandler", "TypeHandler\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebNotifier", "WebNotifier\WebNotifier_vs160.vcxproj", "{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBLogger", "DBLogger\DBLogger_vs160.vcxproj", "{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|Win32 = debug_shared|Win32

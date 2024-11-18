@@ -523,7 +523,7 @@ void ServerApplication::waitForTerminationRequest()
 	}
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
-	sigprocmask(SIG_BLOCK, &sset, NULL);
+	sigprocmask(SIG_BLOCK, &sset, nullptr);
 	int sig;
 	sigwait(&sset, &sig);
 	terminateCallback();
