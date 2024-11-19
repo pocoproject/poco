@@ -229,6 +229,12 @@ public:
 		/// Returns true if socket is registered with this rector.
 
 protected:
+	using NotifierPtr = Poco::AutoPtr<SocketNotifier>;
+	using NotificationPtr = Poco::AutoPtr<SocketNotification>;
+	using EventHandlerMap = std::map<poco_socket_t, NotifierPtr>;
+	using MutexType = Poco::FastMutex;
+	using ScopedLock = MutexType::ScopedLock;
+
 	virtual void onTimeout();
 		/// Called if the timeout expires and no other events are available.
 		///
@@ -256,14 +262,21 @@ protected:
 	void dispatch(SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers.
 
-private:
-	typedef Poco::AutoPtr<SocketNotifier>        NotifierPtr;
-	typedef Poco::AutoPtr<SocketNotification>    NotificationPtr;
-	typedef std::map<poco_socket_t, NotifierPtr> EventHandlerMap;
-	typedef Poco::FastMutex                      MutexType;
-	typedef MutexType::ScopedLock                ScopedLock;
-
 	bool hasSocketHandlers();
+
+	const Params& getParams() const;
+	int getThreadAffinity() const;
+	const std::atomic<bool>& mustStop() const;
+	const EventHandlerMap& getHandlers() const;
+	const PollSet& getPollSet() const;
+	Notification* getReadableNotification();
+	Notification* getWritableNotification();
+	Notification* getErrorNotification();
+	Notification* getTimeoutNotification();
+	Notification* getShutdownNotification();
+
+private:
+
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
 	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
@@ -331,6 +344,66 @@ inline void SocketReactor::onError(int code, const std::string& description)
 inline void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
 {
 	pNotifier->dispatch(pNotification);
+}
+
+
+inline const SocketReactor::Params& SocketReactor::getParams() const
+{
+	return _params;
+}
+
+
+inline int SocketReactor::getThreadAffinity() const
+{
+	return _threadAffinity;
+}
+
+
+inline const std::atomic<bool>& SocketReactor::mustStop() const
+{
+	return _stop;
+}
+
+
+inline const SocketReactor::EventHandlerMap& SocketReactor::getHandlers() const
+{
+	return _handlers;
+}
+
+
+inline const PollSet& SocketReactor::getPollSet() const
+{
+	return _pollSet;
+}
+
+
+inline Notification* SocketReactor::getReadableNotification()
+{
+	return _pReadableNotification;
+}
+
+
+inline Notification* SocketReactor::getWritableNotification()
+{
+	return _pWritableNotification;
+}
+
+
+inline Notification* SocketReactor::getErrorNotification()
+{
+	return _pErrorNotification;
+}
+
+
+inline Notification* SocketReactor::getTimeoutNotification()
+{
+	return _pTimeoutNotification;
+}
+
+
+inline Notification* SocketReactor::getShutdownNotification()
+{
+	return _pShutdownNotification;
 }
 
 
