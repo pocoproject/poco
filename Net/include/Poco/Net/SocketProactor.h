@@ -79,7 +79,7 @@ public:
 	SocketProactor& operator=(const SocketProactor&) = delete;
 	SocketProactor& operator=(SocketProactor&&) = delete;
 
-	~SocketProactor();
+	~SocketProactor() override;
 		/// Destroys the SocketProactor.
 
 	void addWork(const Work& ch, Timestamp::TimeDiff ms = PERMANENT_COMPLETION_HANDLER);
@@ -113,7 +113,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all functions.
 
-	int poll(int* pHandled = 0);
+	int poll(int* pHandled = nullptr);
 		/// Polls all registered sockets and calls their respective handlers.
 		/// If pHandled is not null, after the call it contains the total number
 		/// of read/write/error socket handlers called.
@@ -126,7 +126,7 @@ public:
 		/// Returns 1 on successful handler invocation, 0 on
 		/// exception.
 
-	void run();
+	void run() override;
 		/// Runs the SocketProactor. The reactor will run
 		/// until stop() is called (in a separate thread).
 
@@ -157,13 +157,13 @@ public:
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout.
 
-	void addSocket(Socket sock, int mode);
+	void addSocket(const Socket& sock, int mode);
 		/// Adds the socket to the poll set.
 
-	void updateSocket(Socket sock, int mode);
+	void updateSocket(const Socket& sock, int mode);
 		/// Updates the socket mode in the poll set.
 
-	void removeSocket(Socket sock);
+	void removeSocket(const Socket& sock);
 		/// Removes the socket from the poll set.
 
 	void addReceiveFrom(Socket sock, Buffer& buf, SocketAddress& addr, Callback&& onCompletion);
@@ -212,8 +212,8 @@ private:
 		/// If expiredOnly is true, only expired temporary functions
 		/// are called.
 
-	typedef Poco::Mutex MutexType;
-	typedef MutexType::ScopedLock ScopedLock;
+	using MutexType = Poco::Mutex;
+	using ScopedLock = MutexType::ScopedLock;
 
 	static const long DEFAULT_MAX_TIMEOUT_MS = 250;
 
@@ -245,7 +245,7 @@ private:
 		{
 		}
 
-		~IONotification() = default;
+		~IONotification() override = default;
 
 		void call()
 			/// Calls the completion handler.
@@ -319,7 +319,7 @@ private:
 		bool runOne()
 			/// Runs the next I/O completion handler in the queue.
 		{
-			IONotification* pNf = dynamic_cast<IONotification*>(_nq.waitDequeueNotification());
+			auto* pNf = dynamic_cast<IONotification*>(_nq.waitDequeueNotification());
 			if (_activity.isStopped()) return false;
 			if (pNf)
 			{
@@ -462,19 +462,19 @@ private:
 // inlines
 //
 
-inline void SocketProactor::addSocket(Socket sock, int mode)
+inline void SocketProactor::addSocket(const Socket& sock, int mode)
 {
 	_pollSet.add(sock, mode | PollSet::POLL_ERROR);
 }
 
 
-inline void SocketProactor::updateSocket(Socket sock, int mode)
+inline void SocketProactor::updateSocket(const Socket& sock, int mode)
 {
 	_pollSet.update(sock, mode);
 }
 
 
-inline void SocketProactor::removeSocket(Socket sock)
+inline void SocketProactor::removeSocket(const Socket& sock)
 {
 	_pollSet.remove(sock);
 }

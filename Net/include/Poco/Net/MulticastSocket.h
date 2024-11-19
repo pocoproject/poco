@@ -67,7 +67,7 @@ public:
 		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	~MulticastSocket();
+	~MulticastSocket() override;
 		/// Destroys the DatagramSocket.
 
 	MulticastSocket& operator = (const Socket& socket);

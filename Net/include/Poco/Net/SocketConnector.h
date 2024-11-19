@@ -74,14 +74,14 @@ class SocketConnector
 {
 public:
 	explicit SocketConnector(const SocketAddress& address):
-		_pReactor(0)
+		_pReactor(nullptr)
 		/// Creates a SocketConnector, using the given Socket.
 	{
 		_socket.connectNB(address);
 	}
 
 	SocketConnector(const SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
-		_pReactor(0)
+		_pReactor(nullptr)
 		/// Creates an connector, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
@@ -101,6 +101,10 @@ public:
 			poco_unexpected();
 		}
 	}
+
+	SocketConnector() = delete;
+	SocketConnector(const SocketConnector&) = delete;
+	SocketConnector& operator = (const SocketConnector&) = delete;
 
 	virtual void registerConnector(SocketReactor& reactor)
 		/// Registers the SocketConnector with a SocketReactor.
@@ -193,9 +197,6 @@ protected:
 	}
 
 private:
-	SocketConnector();
-	SocketConnector(const SocketConnector&);
-	SocketConnector& operator = (const SocketConnector&);
 
 	StreamSocket   _socket;
 	SocketReactor* _pReactor;

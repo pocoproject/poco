@@ -52,7 +52,7 @@ public:
 		const std::string& threadName = ""):
 		_threadName(threadName),
 		_socket(socket),
-		_pReactor(0),
+		_pReactor(nullptr),
 		_threads(threads),
 		_next(0)
 		/// Creates a ParallelSocketAcceptor using the given ServerSocket,
@@ -92,6 +92,10 @@ public:
 			poco_unexpected();
 		}
 	}
+
+	ParallelSocketAcceptor() = delete;
+	ParallelSocketAcceptor(const ParallelSocketAcceptor&) = delete;
+	ParallelSocketAcceptor& operator = (const ParallelSocketAcceptor&) = delete;
 
 	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
@@ -140,7 +144,7 @@ public:
 	}
 
 protected:
-	typedef std::vector<typename ParallelReactor::Ptr> ReactorVec;
+	using ReactorVec = std::vector<typename ParallelReactor::Ptr>;
 
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
@@ -172,7 +176,7 @@ protected:
 		{
 			if ((*it)->has(socket)) return it->get();
 		}
-		return 0;
+		return nullptr;
 	}
 
 	SocketReactor* reactor()
@@ -218,9 +222,6 @@ protected:
 	}
 
 private:
-	ParallelSocketAcceptor();
-	ParallelSocketAcceptor(const ParallelSocketAcceptor&);
-	ParallelSocketAcceptor& operator = (const ParallelSocketAcceptor&);
 
 	std::string _threadName;
 		/// Name prefix of sub SocketReactor threads
