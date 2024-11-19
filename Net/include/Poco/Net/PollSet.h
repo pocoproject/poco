@@ -97,7 +97,7 @@ public:
 		/// Returns the number of sockets monitored.
 
 	//@ deprecated
-	int count() const;
+	POCO_DEPRECATED("Use size() instead") int count() const;
 		/// Returns the number of sockets monitored.
 		/// This method is deprecated. Use size() instead.
 

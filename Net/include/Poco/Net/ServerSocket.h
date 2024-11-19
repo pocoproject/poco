@@ -64,7 +64,7 @@ public:
 		// Creates a socket from an existing file descriptor.
 		// Ownership is taken by poco
 
-	virtual ~ServerSocket();
+	~ServerSocket() override;
 		/// Destroys the ServerSocket.
 
 	ServerSocket& operator = (const Socket& socket);

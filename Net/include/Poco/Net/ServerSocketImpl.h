@@ -34,7 +34,7 @@ public:
 		/// Creates the ServerSocketImpl.
 
 protected:
-	virtual ~ServerSocketImpl();
+	~ServerSocketImpl() override;
 		/// Destroys the ServerSocketImpl.
 };
 

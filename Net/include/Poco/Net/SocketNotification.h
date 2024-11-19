@@ -38,7 +38,7 @@ public:
 	explicit SocketNotification(SocketReactor* pReactor);
 		/// Creates the SocketNotification for the given SocketReactor.
 
-	virtual ~SocketNotification();
+	~SocketNotification() override;
 		/// Destroys the SocketNotification.
 
 	SocketReactor& source() const;
@@ -65,7 +65,7 @@ public:
 	ReadableNotification(SocketReactor* pReactor);
 		/// Creates the ReadableNotification for the given SocketReactor.
 
-	~ReadableNotification();
+	~ReadableNotification() override;
 		/// Destroys the ReadableNotification.
 };
 
@@ -77,7 +77,7 @@ public:
 	WritableNotification(SocketReactor* pReactor);
 		/// Creates the WritableNotification for the given SocketReactor.
 
-	~WritableNotification();
+	~WritableNotification() override;
 		/// Destroys the WritableNotification.
 };
 
@@ -93,7 +93,7 @@ public:
 		int code = 0, const std::string& description = "");
 		/// Creates the ErrorNotification for the given SocketReactor.
 
-	~ErrorNotification();
+	~ErrorNotification() override;
 		/// Destroys the ErrorNotification.
 
 	int code() const;
@@ -128,7 +128,7 @@ public:
 	TimeoutNotification(SocketReactor* pReactor);
 		/// Creates the TimeoutNotification for the given SocketReactor.
 
-	~TimeoutNotification();
+	~TimeoutNotification() override;
 		/// Destroys the TimeoutNotification.
 };
 
@@ -141,7 +141,7 @@ public:
 	IdleNotification(SocketReactor* pReactor);
 		/// Creates the IdleNotification for the given SocketReactor.
 
-	~IdleNotification();
+	~IdleNotification() override;
 		/// Destroys the IdleNotification.
 };
 
@@ -154,7 +154,7 @@ public:
 	ShutdownNotification(SocketReactor* pReactor);
 		/// Creates the ShutdownNotification for the given SocketReactor.
 
-	~ShutdownNotification();
+	~ShutdownNotification() override;
 		/// Destroys the ShutdownNotification.
 };
 

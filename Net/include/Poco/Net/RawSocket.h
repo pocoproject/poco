@@ -57,7 +57,7 @@ public:
 		/// Creates the RawSocket with the SocketImpl
 		/// from another socket.
 
-	~RawSocket();
+	~RawSocket() override;
 		/// Destroys the RawSocket.
 
 	RawSocket& operator = (const Socket& socket);

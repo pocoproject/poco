@@ -72,7 +72,7 @@ public:
 
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
-		_pReactor(0)
+		_pReactor(nullptr)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 	{
 	}
@@ -101,6 +101,10 @@ public:
 			poco_unexpected();
 		}
 	}
+
+	SocketAcceptor() = delete;
+	SocketAcceptor(const SocketAcceptor&) = delete;
+	SocketAcceptor& operator = (const SocketAcceptor&) = delete;
 
 	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
@@ -176,9 +180,6 @@ protected:
 	}
 
 private:
-	SocketAcceptor();
-	SocketAcceptor(const SocketAcceptor&);
-	SocketAcceptor& operator = (const SocketAcceptor&);
 
 	ServerSocket   _socket;
 	SocketReactor* _pReactor;

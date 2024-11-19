@@ -65,13 +65,13 @@ public:
 		/// Returns the number of subscribers;
 
 protected:
-	~SocketNotifier();
+	~SocketNotifier() override;
 		/// Destroys the SocketNotifier.
 
 private:
-	typedef std::multiset<SocketNotification*> EventSet;
-	typedef Poco::FastMutex                    MutexType;
-	typedef MutexType::ScopedLock              ScopedLock;
+	using EventSet = std::multiset<SocketNotification *>;
+	using MutexType = Poco::FastMutex;
+	using ScopedLock = MutexType::ScopedLock;
 
 	EventSet                 _events;
 	Poco::NotificationCenter _nc;
