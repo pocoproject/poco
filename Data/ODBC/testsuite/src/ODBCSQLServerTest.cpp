@@ -836,6 +836,19 @@ void ODBCSQLServerTest::testStoredFunction()
 }
 
 
+void ODBCSQLServerTest::testSQLServerTime()
+{
+	Poco::Data::Time t;
+	dropObject("TABLE", "TimeTestTable");
+	session() << "CREATE TABLE TimeTestTable (t time)", now;
+	session() << "INSERT INTO TimeTestTable (t) VALUES ('12:34:56')", now;
+	session() << "SELECT t FROM TimeTestTable", into(t), now;
+	std::ostringstream os;
+	os << t.hour() << ':' << t.minute() << ':' << t.second();
+	assertEqual(os.str(), "12:34:56"s);
+}
+
+
 void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1168,6 +1181,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEncoding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLServerTime);
 
 		return pSuite;
 	}
