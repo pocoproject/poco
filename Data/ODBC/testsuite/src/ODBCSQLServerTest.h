@@ -62,6 +62,8 @@ public:
 	void testStoredProcedureReturn();
 	void testStoredFunction() override;
 
+	void testSQLServerTime();
+
 	static CppUnit::Test* suite();
 
 private:
