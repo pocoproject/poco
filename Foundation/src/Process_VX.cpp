@@ -67,6 +67,13 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
+void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	userTime   = 0;
+	kernelTime = 0;
+}
+
+
 ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory,Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 	throw Poco::NotImplementedException("Process::launch()");

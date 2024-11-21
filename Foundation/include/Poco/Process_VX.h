@@ -57,6 +57,7 @@ public:
 
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
+	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
 	static ProcessHandleImpl* launchImpl(
 		const std::string& command,
 		const ArgsImpl& args,

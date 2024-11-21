@@ -94,6 +94,10 @@ public:
 		/// Returns the number of seconds spent by the
 		/// current process in user and kernel mode.
 
+	static void timesMicroseconds(Poco::Int64& userTime, Poco::Int64& kernelTime);
+		/// Returns the number of microseconds spent by the
+		/// current process in user and kernel mode.
+
 	static ProcessHandle launch(const std::string& command, const Args& args, int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
@@ -265,6 +269,12 @@ inline Process::PID Process::id()
 inline void Process::times(long& userTime, long& kernelTime)
 {
 	ProcessImpl::timesImpl(userTime, kernelTime);
+}
+
+
+inline void Process::timesMicroseconds(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	ProcessImpl::timesMicrosecondsImpl(userTime, kernelTime);
 }
 
 

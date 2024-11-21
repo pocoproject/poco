@@ -161,6 +161,30 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
+void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	FILETIME ftCreation;
+	FILETIME ftExit;
+	FILETIME ftKernel;
+	FILETIME ftUser;
+
+	if (GetProcessTimes(GetCurrentProcess(), &ftCreation, &ftExit, &ftKernel, &ftUser) != 0)
+	{
+		ULARGE_INTEGER time;
+		time.LowPart = ftKernel.dwLowDateTime;
+		time.HighPart = ftKernel.dwHighDateTime;
+		kernelTime = Poco::Int64(time.QuadPart/10);
+		time.LowPart = ftUser.dwLowDateTime;
+		time.HighPart = ftUser.dwHighDateTime;
+		userTime = Poco::Int64(time.QuadPart/10);
+	}
+	else
+	{
+		userTime = kernelTime = -1;
+	}
+}
+
+
 bool ProcessImpl::mustEscapeArg(const std::string& arg)
 {
 	bool result = false;

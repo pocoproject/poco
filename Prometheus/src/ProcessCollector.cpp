@@ -56,16 +56,16 @@ void ProcessCollector::exportTo(Exporter& exporter) const
 
 void ProcessCollector::buildMetrics()
 {
-	_metrics.push_back(std::make_unique<CallbackIntGauge>(
+	_metrics.push_back(std::make_unique<CallbackGauge>(
 		name() + "_cpu_seconds_total"s,
 		"Total user and system CPU time spent in seconds"s,
 		nullptr,
 		[]()
 		{
-			long user;
-			long system;
-			Poco::Process::times(user, system);
-			return static_cast<Poco::Int64>(user) + static_cast<Poco::Int64>(system);
+			Poco::Int64 user;
+			Poco::Int64 system;
+			Poco::Process::timesMicroseconds(user, system);
+			return static_cast<double>(user/1000 + system/1000)/1000.0;
 		}));
 
 #ifdef POCO_OS_FAMILY_UNIX

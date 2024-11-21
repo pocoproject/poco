@@ -113,6 +113,15 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
+void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	struct rusage usage;
+	getrusage(RUSAGE_SELF, &usage);
+	userTime   = static_cast<Poco::Int64>(usage.ru_utime.tv_sec)*1000000 + usage.ru_utime.tv_usec;
+	kernelTime = static_cast<Poco::Int64>(usage.ru_stime.tv_sec)*1000000 + usage.ru_stime.tv_usec;
+}
+
+
 ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if defined(__QNX__)
