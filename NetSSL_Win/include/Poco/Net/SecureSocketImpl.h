@@ -236,6 +236,12 @@ protected:
 		ST_ERROR
 	};
 
+	enum TLSShutdown
+	{
+		TLS_SHUTDOWN_SENT = 1,
+		TLS_SHUTDOWN_RECEIVED = 2
+	};
+
 	int sendRawBytes(const void* buffer, int length, int flags = 0);
 	int receiveRawBytes(void* buffer, int length, int flags = 0);
 	void clientConnectVerify();
@@ -245,8 +251,8 @@ protected:
 	void clientVerifyCertificate(const std::string& hostName);
 	void verifyCertificateChainClient(PCCERT_CONTEXT pServerCert);
 	void serverVerifyCertificate();
-	LONG serverDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
-	LONG clientDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
+	int serverShutdown(PCredHandle phCreds, CtxtHandle* phContext);
+	int clientShutdown(PCredHandle phCreds, CtxtHandle* phContext);
 	bool loadSecurityLibrary();
 	void initClientContext();
 	void initServerContext();
@@ -286,6 +292,7 @@ private:
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr   _pContext;
 	Mode           _mode;
+	int            _shutdownFlags;
 	std::string    _peerHostName;
 	bool           _useMachineStore;
 	bool           _clientAuthRequired;
