@@ -265,7 +265,7 @@ void SecureSocketImpl::listen(int backlog)
 }
 
 
-void SecureSocketImpl::shutdown()
+int SecureSocketImpl::shutdown()
 {
 	if (_mode == MODE_SERVER)
 		serverDisconnect(&_hCreds, &_hContext);
@@ -273,16 +273,22 @@ void SecureSocketImpl::shutdown()
 		clientDisconnect(&_hCreds, &_hContext);
 
 	_pSocket->shutdown();
+	return 0;
 }
 
 
 void SecureSocketImpl::close()
 {
-	if (_mode == MODE_SERVER)
-		serverDisconnect(&_hCreds, &_hContext);
-	else
-		clientDisconnect(&_hCreds, &_hContext);
-
+	try
+	{
+		if (_mode == MODE_SERVER)
+			serverDisconnect(&_hCreds, &_hContext);
+		else
+			clientDisconnect(&_hCreds, &_hContext);
+	}
+	catch (Poco::Exception&)
+	{
+	}
 	_pSocket->close();
 	cleanup();
 }

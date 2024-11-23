@@ -154,10 +154,11 @@ public:
 		/// number of connections that can be queued
 		/// for this socket.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down the connection by attempting
 		/// an orderly SSL shutdown, then actually
-		/// shutting down the TCP connection.
+		/// shutting down the TCP connection in the
+		/// send direction.
 
 	void close();
 		/// Close the socket.

@@ -156,14 +156,15 @@ void SecureStreamSocketImpl::shutdownReceive()
 }
 
 
-void SecureStreamSocketImpl::shutdownSend()
+int SecureStreamSocketImpl::shutdownSend()
 {
+	return _impl.shutdown();
 }
 
 
-void SecureStreamSocketImpl::shutdown()
+int SecureStreamSocketImpl::shutdown()
 {
-	_impl.shutdown();
+	return _impl.shutdown();
 }
 
 

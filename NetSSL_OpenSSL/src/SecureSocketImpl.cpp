@@ -253,69 +253,33 @@ void SecureSocketImpl::listen(int backlog)
 }
 
 
-void SecureSocketImpl::shutdown()
+int SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
 		UnLockT l(_mutex);
 
-		// Don't shut down the socket more than once.
 		int shutdownState = ::SSL_get_shutdown(_pSSL);
 		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
 		if (!shutdownSent)
 		{
-			// A proper clean shutdown would require us to
-			// retry the shutdown if we get a zero return
-			// value, until SSL_shutdown() returns 1.
-			// However, this will lead to problems with
-			// most web browsers, so we just set the shutdown
-			// flag by calling SSL_shutdown() once and be
-			// done with it.
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-			int rc = 0;
-			if (!_bidirectShutdown)
-				rc = ::SSL_shutdown(_pSSL);
-			else
-			{
-				Poco::Timespan recvTimeout = _pSocket->getReceiveTimeout();
-				Poco::Timespan pollTimeout(0, 100000);
-				Poco::Timestamp tsNow;
-				do
-				{
-					rc = ::SSL_shutdown(_pSSL);
-					if (rc == 1) break;
-					if (rc < 0)
-					{
-						int err = ::SSL_get_error(_pSSL, rc);
-						if (err == SSL_ERROR_WANT_READ)
-							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
-						else if (err == SSL_ERROR_WANT_WRITE)
-							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
-						else
-						{
-							int socketError = SocketImpl::lastError();
-							long lastError = ::ERR_get_error();
-							if ((err == SSL_ERROR_SSL) && (socketError == 0) && (lastError == 0x0A000123))
-								rc = 0;
-							break;
-						}
-					}
-					else _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
-				} while (!tsNow.isElapsed(recvTimeout.totalMicroseconds()));
-			}
-#else
 			int rc = ::SSL_shutdown(_pSSL);
-#endif
-			if (rc < 0) handleError(rc);
+			if (rc < 0) rc = handleError(rc);
 
 			l.unlock();
 
-			if (_pSocket->getBlocking())
+			if (rc >= 0)
 			{
-				_pSocket->shutdown();
+				_pSocket->shutdownSend();
 			}
+			return rc;
+		}
+		else 
+		{
+			return (shutdownState & SSL_RECEIVED_SHUTDOWN) == SSL_RECEIVED_SHUTDOWN;
 		}
 	}
+	return 1;
 }
 
 
@@ -407,7 +371,6 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
 			throw Poco::TimeoutException();
 	};
-	_bidirectShutdown = false;
 	if (rc <= 0)
 	{
 		return handleError(rc);
