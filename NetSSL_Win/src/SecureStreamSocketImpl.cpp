@@ -151,12 +151,13 @@ void SecureStreamSocketImpl::shutdownReceive()
 
 void SecureStreamSocketImpl::shutdownSend()
 {
+	return _impl.shutdown();
 }
 
 
 void SecureStreamSocketImpl::shutdown()
 {
-	_impl.shutdown();
+	return _impl.shutdown();
 }
 
 

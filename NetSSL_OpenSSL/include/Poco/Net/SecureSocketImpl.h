@@ -148,10 +148,11 @@ public:
 		/// number of connections that can be queued
 		/// for this socket.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down the connection by attempting
 		/// an orderly SSL shutdown, then actually
-		/// shutting down the TCP connection.
+		/// shutting down the TCP connection in the
+		/// send direction.
 
 	void close();
 		/// Close the socket.
@@ -294,7 +295,6 @@ private:
 	bool _needHandshake;
 	std::string _peerHostName;
 	Session::Ptr _pSession;
-	bool _bidirectShutdown = true;
 	mutable MutexT _mutex;
 
 	friend class SecureStreamSocketImpl;
