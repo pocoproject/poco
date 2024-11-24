@@ -224,16 +224,23 @@ protected:
 	enum State
 	{
 		ST_INITIAL = 0,
+		// Client
 		ST_CONNECTING,
-		ST_CLIENTHANDSHAKESTART,
-		ST_CLIENTHANDSHAKECONDREAD,
-		ST_CLIENTHANDSHAKEINCOMPLETE,
-		ST_CLIENTHANDSHAKEOK,
-		ST_CLIENTHANDSHAKEEXTERROR,
-		ST_CLIENTHANDSHAKECONTINUE,
-		ST_VERIFY,
+		ST_CLIENT_HSK_START,
+		ST_CLIENT_HSK_SEND_TOKEN,
+		ST_CLIENT_HSK_LOOP_INIT,
+		ST_CLIENT_HSK_LOOP_RECV,
+		ST_CLIENT_HSK_LOOP_PROCESS,
+		ST_CLIENT_HSK_LOOP_CONTINUE,
+		ST_CLIENT_HSK_LOOP_SEND,
+		ST_CLIENT_HSK_LOOP_INCOMPLETE,
+		ST_CLIENT_HSK_LOOP_DONE,
+		ST_CLIENT_HSK_SEND_FINAL,
+		ST_CLIENT_HSK_SEND_ERROR,
+		ST_CLIENT_VERIFY,
 		ST_DONE,
-		ST_ERROR
+		ST_ERROR,
+		ST_MAX
 	};
 
 	enum TLSShutdown
@@ -245,7 +252,6 @@ protected:
 	int sendRawBytes(const void* buffer, int length, int flags = 0);
 	int receiveRawBytes(void* buffer, int length, int flags = 0);
 	void clientConnectVerify();
-	void sendInitialTokenOutBuffer();
 	void performServerHandshake();
 	bool serverHandshakeLoop(PCtxtHandle phContext, PCredHandle phCred, bool requireClientAuth, bool doInitialRead, bool newContext);
 	void clientVerifyCertificate(const std::string& hostName);
@@ -253,25 +259,32 @@ protected:
 	void serverVerifyCertificate();
 	int serverShutdown(PCredHandle phCreds, CtxtHandle* phContext);
 	int clientShutdown(PCredHandle phCreds, CtxtHandle* phContext);
-	bool loadSecurityLibrary();
 	void initClientContext();
 	void initServerContext();
 	PCCERT_CONTEXT loadCertificate(bool mustFindCertificate);
 	void initCommon();
 	void cleanup();
-	void performClientHandshake();
+
+	void performClientHandshakeStart();
 	void performInitialClientHandshake();
-	SECURITY_STATUS performClientHandshakeLoop();
+	void performClientHandshakeSendToken();
 	void performClientHandshakeLoopIncompleteMessage();
-	void performClientHandshakeLoopCondReceive();
-	void performClientHandshakeLoopReceive();
-	void performClientHandshakeLoopOK();
 	void performClientHandshakeLoopInit();
+	void performClientHandshakeLoopRecv();
+	void performClientHandshakeLoopProcess();
+	void performClientHandshakeLoopSend();
+	void performClientHandshakeLoopDone();
+	void performClientHandshakeSendFinal();
 	void performClientHandshakeExtraBuffer();
-	void performClientHandshakeSendOutBuffer();
-	void performClientHandshakeLoopContinueNeeded();
-	void performClientHandshakeLoopError();
-	void performClientHandshakeLoopExtError();
+	void performClientHandshakeLoopContinue();
+	void performClientHandshakeError();
+	void performClientHandshakeSendError();
+	void sendOutSecBufferAndAdvanceState(State state);
+
+	void performClientHandshake();
+	SECURITY_STATUS performClientHandshakeLoop();
+	void performClientHandshakeLoopCondReceive();
+
 	SECURITY_STATUS decodeMessage(BYTE* pBuffer, DWORD bufSize, AutoSecBufferDesc<4>& msg, SecBuffer*& pData, SecBuffer*& pExtra);
 	SECURITY_STATUS decodeBufferFull(BYTE* pBuffer, DWORD bufSize, char* pOutBuffer, int outLength, int& bytesDecoded);
 	void stateIllegal();
