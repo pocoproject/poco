@@ -32,7 +32,6 @@ namespace Net {
 class StateMachine
 {
 public:
-	typedef bool (StateMachine::*ConditionMethod)(SOCKET sockfd);
 	typedef void (SecureSocketImpl::*StateImpl)(void);
 
 	StateMachine();
@@ -40,21 +39,13 @@ public:
 
 	static StateMachine& instance();
 
-	// Conditions
-	bool readable(SOCKET sockfd);
-	bool writable(SOCKET sockfd);
-	bool readOrWritable(SOCKET sockfd);
-	bool none(SOCKET sockfd);
-	void select(fd_set* fdRead, fd_set* fdWrite, SOCKET sockfd);
-
 	bool execute(SecureSocketImpl* pSock);
 
 private:
-	StateMachine(const StateMachine&);
-	StateMachine& operator = (const StateMachine&);
+	StateMachine(const StateMachine&) = delete;
+	StateMachine& operator = (const StateMachine&) = delete;
 
-	typedef std::pair<ConditionMethod, StateImpl> ConditionState;
-	std::vector<ConditionState> _states;
+	std::vector<StateImpl> _states;
 };
 
 
@@ -1704,87 +1695,25 @@ StateMachine& StateMachine::instance()
 }
 
 
-bool StateMachine::readable(SOCKET sockfd)
-{
-	fd_set fdRead;
-	FD_ZERO(&fdRead);
-	FD_SET(sockfd, &fdRead);
-	select(&fdRead, 0, sockfd);
-	return (FD_ISSET(sockfd, &fdRead) != 0);
-}
-
-
-bool StateMachine::writable(SOCKET sockfd)
-{
-	fd_set fdWrite;
-	FD_ZERO(&fdWrite);
-	FD_SET(sockfd, &fdWrite);
-	select(0, &fdWrite, sockfd);
-	return (FD_ISSET(sockfd, &fdWrite) != 0);
-}
-
-
-bool StateMachine::readOrWritable(SOCKET sockfd)
-{
-	fd_set fdRead, fdWrite;
-	FD_ZERO(&fdRead);
-	FD_SET(sockfd, &fdRead);
-	fdWrite = fdRead;
-	select(&fdRead, &fdWrite, sockfd);
-	return (FD_ISSET(sockfd, &fdRead) != 0 || FD_ISSET(sockfd, &fdWrite) != 0);
-}
-
-
-bool StateMachine::none(SOCKET sockfd)
-{
-	return true;
-}
-
-
-void StateMachine::select(fd_set* fdRead, fd_set* fdWrite, SOCKET sockfd)
-{
-	Poco::Timespan remainingTime(((Poco::Timestamp::TimeDiff)SecureSocketImpl::TIMEOUT_MILLISECS)*1000);
-	int rc(0);
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(int(sockfd) + 1, fdRead, fdWrite, 0, &tv);
-		if (rc < 0 && SecureSocketImpl::lastError() == POCO_EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && SecureSocketImpl::lastError() == POCO_EINTR);
-}
-
-
 StateMachine::StateMachine():
 	_states(SecureSocketImpl::ST_MAX)
 {														     
-	_states[SecureSocketImpl::ST_INITIAL]                    = std::make_pair(&StateMachine::none,     &SecureSocketImpl::stateIllegal);
-	_states[SecureSocketImpl::ST_CONNECTING]                 = std::make_pair(&StateMachine::writable, &SecureSocketImpl::stateConnected);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_START]           = std::make_pair(&StateMachine::none,     &SecureSocketImpl::performClientHandshakeStart); 
-	_states[SecureSocketImpl::ST_CLIENT_HSK_SEND_TOKEN]      = std::make_pair(&StateMachine::writable, &SecureSocketImpl::performClientHandshakeSendToken); 
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_INIT]       = std::make_pair(&StateMachine::readable, &SecureSocketImpl::performClientHandshakeLoopInit);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_RECV]       = std::make_pair(&StateMachine::readable, &SecureSocketImpl::performClientHandshakeLoopRecv);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_PROCESS]    = std::make_pair(&StateMachine::none,     &SecureSocketImpl::performClientHandshakeLoopProcess);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_SEND]       = std::make_pair(&StateMachine::writable, &SecureSocketImpl::performClientHandshakeLoopSend);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_INCOMPLETE] = std::make_pair(&StateMachine::none,     &SecureSocketImpl::performClientHandshakeLoopIncompleteMessage);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_CONTINUE]   = std::make_pair(&StateMachine::none,     &SecureSocketImpl::performClientHandshakeLoopContinue);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_DONE]       = std::make_pair(&StateMachine::none,     &SecureSocketImpl::performClientHandshakeLoopDone);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_SEND_FINAL]      = std::make_pair(&StateMachine::writable, &SecureSocketImpl::performClientHandshakeSendFinal);
-	_states[SecureSocketImpl::ST_CLIENT_HSK_SEND_ERROR]      = std::make_pair(&StateMachine::writable, &SecureSocketImpl::performClientHandshakeSendError);
-	_states[SecureSocketImpl::ST_CLIENT_VERIFY]              = std::make_pair(&StateMachine::none,     &SecureSocketImpl::clientConnectVerify);
-	_states[SecureSocketImpl::ST_DONE]                       = std::make_pair(&StateMachine::none,     &SecureSocketImpl::stateIllegal);
-	_states[SecureSocketImpl::ST_ERROR]                      = std::make_pair(&StateMachine::none,     &SecureSocketImpl::performClientHandshakeError);
+	_states[SecureSocketImpl::ST_INITIAL]                    = &SecureSocketImpl::stateIllegal;
+	_states[SecureSocketImpl::ST_CONNECTING]                 = &SecureSocketImpl::stateConnected;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_START]           = &SecureSocketImpl::performClientHandshakeStart; 
+	_states[SecureSocketImpl::ST_CLIENT_HSK_SEND_TOKEN]      = &SecureSocketImpl::performClientHandshakeSendToken; 
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_INIT]       = &SecureSocketImpl::performClientHandshakeLoopInit;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_RECV]       = &SecureSocketImpl::performClientHandshakeLoopRecv;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_PROCESS]    = &SecureSocketImpl::performClientHandshakeLoopProcess;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_SEND]       = &SecureSocketImpl::performClientHandshakeLoopSend;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_INCOMPLETE] = &SecureSocketImpl::performClientHandshakeLoopIncompleteMessage;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_CONTINUE]   = &SecureSocketImpl::performClientHandshakeLoopContinue;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_LOOP_DONE]       = &SecureSocketImpl::performClientHandshakeLoopDone;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_SEND_FINAL]      = &SecureSocketImpl::performClientHandshakeSendFinal;
+	_states[SecureSocketImpl::ST_CLIENT_HSK_SEND_ERROR]      = &SecureSocketImpl::performClientHandshakeSendError;
+	_states[SecureSocketImpl::ST_CLIENT_VERIFY]              = &SecureSocketImpl::clientConnectVerify;
+	_states[SecureSocketImpl::ST_DONE]                       = &SecureSocketImpl::stateIllegal;
+	_states[SecureSocketImpl::ST_ERROR]                      = &SecureSocketImpl::performClientHandshakeError;
 }
 
 
@@ -1793,14 +1722,10 @@ bool StateMachine::execute(SecureSocketImpl* pSock)
 	try
 	{
 		poco_assert_dbg (pSock);
-		ConditionState& state = _states[pSock->getState()];
-		ConditionMethod& meth = state.first;
-		if ((this->*state.first)(pSock->sockfd()))
-		{
-			(pSock->*(state.second))();
-			return true;
-		}
-		else return false;
+		auto curState = pSock->getState();
+		StateImpl& stateImpl = _states[curState];
+		(pSock->*(stateImpl))();
+		return pSock->getState() != curState;
 	}
 	catch (...)
 	{
