@@ -264,7 +264,13 @@ int SecureSocketImpl::shutdown()
 		if (!shutdownSent)
 		{
 			int rc = ::SSL_shutdown(_pSSL);
-			if (rc < 0) rc = handleError(rc);
+			if (rc < 0) 
+			{
+				if (SocketImpl::lastError() == POCO_EWOULDBLOCK)
+					rc = SecureStreamSocket::ERR_SSL_WANT_WRITE;
+				else
+					rc = handleError(rc);
+			}
 
 			l.unlock();
 
