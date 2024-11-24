@@ -281,9 +281,7 @@ protected:
 	void performClientHandshakeSendError();
 	void sendOutSecBufferAndAdvanceState(State state);
 
-	void performClientHandshake();
-	SECURITY_STATUS performClientHandshakeLoop();
-	void performClientHandshakeLoopCondReceive();
+	SECURITY_STATUS performClientHandshake();
 
 	SECURITY_STATUS decodeMessage(BYTE* pBuffer, DWORD bufSize, AutoSecBufferDesc<4>& msg, SecBuffer*& pData, SecBuffer*& pExtra);
 	SECURITY_STATUS decodeBufferFull(BYTE* pBuffer, DWORD bufSize, char* pOutBuffer, int outLength, int& bytesDecoded);
@@ -293,7 +291,7 @@ protected:
 	void connectSSL(bool completeHandshake);
 	void completeHandshake();
 	static int lastError();
-	void stateMachine();
+	bool stateMachine();
 	State getState() const;
 	void setState(State st);
 	static bool isLocalHost(const std::string& hostName);
