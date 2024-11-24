@@ -372,17 +372,16 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 	if (_state != ST_DONE)
 	{
-		bool establish = _pSocket->getBlocking();
-		if (establish)
+		if (_pSocket->getBlocking())
 		{
-			while (_state != ST_DONE)
-			{
-				stateMachine();
-			}
+			performClientHandshake();
 		}
 		else
 		{
-			stateMachine();
+			while (_state != ST_DONE && stateMachine()) 
+			{
+				// no-op
+			}
 			if (_state != ST_DONE) return -1;
 		}
 	}
@@ -470,17 +469,16 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	if (_state == ST_ERROR) return 0;
 	if (_state != ST_DONE)
 	{
-		bool establish = _pSocket->getBlocking();
-		if (establish)
+		if (_pSocket->getBlocking())
 		{
-			while (_state != ST_DONE)
-			{
-				stateMachine();
-			}
+			performClientHandshake();
 		}
 		else
 		{
-			stateMachine();
+			while (_state != ST_DONE && stateMachine()) 
+			{
+				// no-op
+			}
 			if (_state != ST_DONE) return -1;
 		}
 	}
@@ -591,9 +589,9 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 				_needData = false;
 				setState(ST_CLIENT_HSK_LOOP_INIT);
 				if (!_pSocket->getBlocking())
-					return -1;
+					return bytesDecoded > 0 ? bytesDecoded : -1;
 
-				securityStatus = performClientHandshakeLoop();
+				securityStatus = performClientHandshake();
 
 				if (securityStatus != SEC_E_OK)
 					break;
@@ -725,9 +723,7 @@ SECURITY_STATUS SecureSocketImpl::decodeBufferFull(BYTE* pBuffer, DWORD bufSize,
 		if (securityStatus == SEC_I_RENEGOTIATE)
 		{
 			_needData = false;
-			securityStatus = performClientHandshakeLoop();
-			if (securityStatus != SEC_E_OK)
-				break;
+			return securityStatus;
 		}
 	}
 	while (securityStatus == SEC_E_OK && pBuffer);
@@ -782,7 +778,7 @@ void SecureSocketImpl::connectSSL(bool completeHandshake)
 		_peerHostName = _pSocket->peerAddress().host().toString();
 	}
 
-	initClientContext();
+	setState(ST_CONNECTING);
 	if (completeHandshake)
 	{
 		performClientHandshake();
@@ -843,12 +839,13 @@ void SecureSocketImpl::initClientContext()
 }
 
 
-void SecureSocketImpl::performClientHandshake()
+SECURITY_STATUS SecureSocketImpl::performClientHandshake()
 {
-	performInitialClientHandshake();
-	performClientHandshakeSendToken();
-	performClientHandshakeLoop();
-	clientConnectVerify();
+	while (_state != ST_DONE)
+	{
+		stateMachine();
+	}
+	return _securityStatus;
 }
 
 
@@ -931,55 +928,6 @@ void SecureSocketImpl::performClientHandshakeSendToken()
 		setState(ST_CLIENT_HSK_LOOP_INIT);
 		_securityStatus = SEC_E_INCOMPLETE_MESSAGE;
 	}
-}
-
-
-SECURITY_STATUS SecureSocketImpl::performClientHandshakeLoop()
-{
-	_recvBufferOffset = 0;
-	_securityStatus = SEC_E_INCOMPLETE_MESSAGE;
-
-	while (_securityStatus == SEC_I_CONTINUE_NEEDED || _securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_INCOMPLETE_CREDENTIALS)
-	{
-		performClientHandshakeLoopCondReceive();
-
-		if (_securityStatus == SEC_E_OK)
-		{
-			performClientHandshakeLoopDone();
-			performClientHandshakeSendFinal();
-		}
-		else if (_securityStatus == SEC_I_CONTINUE_NEEDED)
-		{
-			performClientHandshakeLoopContinue();
-			performClientHandshakeLoopSend();
-		}
-		else if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE)
-		{
-			performClientHandshakeLoopIncompleteMessage();
-		}
-		else if (FAILED(_securityStatus))
-		{
-			if (_outFlags & ISC_RET_EXTENDED_ERROR)
-			{
-				performClientHandshakeSendError();
-			}
-			else
-			{
-				performClientHandshakeError();
-			}
-		}
-		else
-		{
-			performClientHandshakeLoopIncompleteMessage();
-		}
-	}
-
-	if (FAILED(_securityStatus))
-	{
-		performClientHandshakeError();
-	}
-
-	return _securityStatus;
 }
 
 
@@ -1114,21 +1062,6 @@ void SecureSocketImpl::performClientHandshakeLoopProcess()
 	{
 		setState(ST_CLIENT_HSK_LOOP_INCOMPLETE);
 	}
-}
-
-
-void SecureSocketImpl::performClientHandshakeLoopCondReceive()
-{
-	poco_assert_dbg (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || SEC_I_CONTINUE_NEEDED);
-
-	performClientHandshakeLoopInit();
-
-	if (_state == ST_CLIENT_HSK_LOOP_RECV)
-	{
-		performClientHandshakeLoopRecv();
-	}
-
-	performClientHandshakeLoopProcess();
 }
 
 
@@ -1682,9 +1615,9 @@ void SecureSocketImpl::performClientHandshakeStart()
 }
 
 
-void SecureSocketImpl::stateMachine()
+bool SecureSocketImpl::stateMachine()
 {
-	StateMachine::instance().execute(this);
+	return StateMachine::instance().execute(this);
 }
 
 
