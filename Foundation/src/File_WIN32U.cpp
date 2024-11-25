@@ -381,6 +381,12 @@ bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
 
+	if (!existsImpl())
+	{
+		if (!createDirectoryImpl())
+			return false;
+	}
+
 	HANDLE hFile = CreateFileW(_upath.c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0);
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
