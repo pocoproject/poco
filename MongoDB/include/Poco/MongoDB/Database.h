@@ -81,7 +81,7 @@ public:
 		/// Creates a QueryRequest to count the given collection.
 		/// The collectionname must not contain the database name. (old wire protocol)
 
-	//[[deprecated]]
+	POCO_DEPRECATED("Use new wire protocol")
 	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
 		/// Creates a DeleteRequest to delete documents in the given collection.
 		/// The collectionname must not contain the database name. (old wire protocol)
@@ -96,7 +96,7 @@ public:
 		/// Creates a QueryRequest. (old wire protocol)
 		/// The collectionname must not contain the database name.
 
-	//[[deprecated]]
+	POCO_DEPRECATED("Use new wire protocol")
 	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
 		/// Creates an UpdateRequest. (old wire protocol)
 		/// The collectionname must not contain the database name.
