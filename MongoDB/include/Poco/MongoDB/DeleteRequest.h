@@ -26,8 +26,7 @@
 namespace Poco {
 namespace MongoDB {
 
-//class [[deprecated]] DeleteRequest;
-class DeleteRequest;
+//class POCO_DEPRECATED("Use new wire protocol") DeleteRequest;
 
 class MongoDB_API DeleteRequest: public RequestMessage
 	/// A DeleteRequest is used to delete one ore more documents from a database.
