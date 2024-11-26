@@ -24,9 +24,6 @@ namespace Poco {
 namespace Net {
 
 
-Poco::FastMutex Utility::_mutex;
-
-
 Context::VerificationMode Utility::convertVerificationMode(const std::string& vMode)
 {
 	std::string mode = Poco::toLower(vMode);
@@ -54,6 +51,7 @@ inline void add(std::map<long, const std::string>& messageMap, long key, const s
 std::map<long, const std::string> Utility::initSSPIErr()
 {
 	std::map<long, const std::string> messageMap;
+	add(messageMap, SEC_E_OK, "OK");
 	add(messageMap, NTE_BAD_UID, "Bad UID");
 	add(messageMap, NTE_BAD_HASH, "Bad Hash");
 	add(messageMap, NTE_BAD_KEY, "Bad Key");
@@ -185,18 +183,15 @@ std::map<long, const std::string> Utility::initSSPIErr()
 }
 
 
-const std::string& Utility::formatError(long errCode)
+std::string Utility::formatError(long errCode)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
-	static const std::string def("Internal SSPI error");
 	static const std::map<long, const std::string> errs(initSSPIErr());
 
 	const std::map<long, const std::string>::const_iterator it = errs.find(errCode);
 	if (it != errs.end())
 		return it->second;
 	else
-		return def;
+		return "0x" + Poco::NumberFormatter::formatHex(errCode, 8);
 }
 
 
