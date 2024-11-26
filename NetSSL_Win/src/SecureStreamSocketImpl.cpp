@@ -209,8 +209,7 @@ void SecureStreamSocketImpl::verifyPeerCertificate(const std::string& hostName)
 
 int SecureStreamSocketImpl::completeHandshake()
 {
-	_impl.completeHandshake();
-	return 0;
+	return _impl.completeHandshake();
 }
 
 
