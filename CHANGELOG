@@ -4,9 +4,11 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.14.0 (2024-MM-DD)
 ===========================
 
-Summary of Changes:
 
 TODO: Complete draft of overview summary.
+
+
+Summary of Changes:
 
 This release marks many functions and classes as deprecated with C++ [[deprecated]]
 attribute. Warnings can be silenced by defining POCO_SILENCE_DEPRECATED.
@@ -18,6 +20,9 @@ header files are modernised in this release.
 
 Bundled software libraries are updated to latest versions.
 
+Poco::MongoDB: Obsolete wire-protocol (pre 3.6) that was removed from MongoDB in version 5.1
+is obsolete in this version of Poco. It will be removed in of next versions. Update code to use
+OpMsg-based interface.
 
 
 Breaking Changes:
