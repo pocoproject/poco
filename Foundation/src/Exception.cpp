@@ -180,6 +180,7 @@ POCO_IMPLEMENT_EXCEPTION(PropertyNotSupportedException, RuntimeException, "Prope
 POCO_IMPLEMENT_EXCEPTION(PoolOverflowException, RuntimeException, "Pool overflow")
 POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission")
 POCO_IMPLEMENT_EXCEPTION(OutOfMemoryException, RuntimeException, "Out of memory")
+POCO_IMPLEMENT_EXCEPTION(ResourceLimitException, RuntimeException, "Resource limit")
 POCO_IMPLEMENT_EXCEPTION(DataException, RuntimeException, "Data error")
 
 POCO_IMPLEMENT_EXCEPTION(DataFormatException, DataException, "Bad data format")

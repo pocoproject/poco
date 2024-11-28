@@ -234,6 +234,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, PropertyNotSupportedException, RuntimeExc
 POCO_DECLARE_EXCEPTION(Foundation_API, PoolOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoPermissionException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OutOfMemoryException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ResourceLimitException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DataException, RuntimeException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, DataFormatException, DataException)
