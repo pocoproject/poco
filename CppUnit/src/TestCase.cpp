@@ -123,7 +123,10 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 	catch (std::exception& e)
 	{
 		std::string msg(TestResult::demangle(typeid(e).name()));
-		msg.append(":\n").append(callback(e));
+		if (callback)
+		{
+			msg.append(": ").append(callback(e));
+		}
 		result->addError(this, new CppUnitException(msg));
 	}
 	catch (...)
