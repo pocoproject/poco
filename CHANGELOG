@@ -47,7 +47,6 @@ Security Fixes:
 - GH #4760 Upgrade libexpat to release 2.6.4
 - GH #4690 Net: stack-buffer-overflow if HTTP request contains a header with invalid UTF32 sequence
 - GH #4687 Net::MailMessage: Double free if Content-Disposition header is empty
-- GH #4665 Upgrade bundled libexpat to 2.6.3
 - GH #4629 XML: fuzzing stack overflow
 - GH #4123 DoS vulnerability in XML/src/xmlparse.cpp
 - GH #4478 Upgrade bundled PCRE2 to 10.44
@@ -152,7 +151,6 @@ Bug Fixes and Improvements:
 - GH #3896 TryParse scoped ipv6 addressess
 - GH #3815 Poco can be built with ENABLE_UTIL=ON and ENABLE_XML=OFF, but use of Poco::Util requires Poco::XML
 - GH #3180 Poco::Environment::osDisplayName
-- GH #3132 Poco::MemoryInputStream seek issue
 - GH #2971 Poco::NamedEvent does not release System V semaphore on Linux
 - GH #2439 Issue with log purging when FileChannel compression is enabled
 - PR #4762 Properly define POCO_DLL and POCO_STATIC based on BUILD_SHARED_LIBS
