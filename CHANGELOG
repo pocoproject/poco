@@ -4,7 +4,7 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.14.0 (2024-MM-DD)
 ===========================
 
-Highlights:
+Summary of Changes:
 
 This release marks many functions and classes as deprecated with C++ [[deprecated]]
 attribute. Warnings can be silenced by defining POCO_SILENCE_DEPRECATED.
