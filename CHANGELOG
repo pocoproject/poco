@@ -113,10 +113,8 @@ Features, Enhancements and Third Party Updates:
 - PR #4569 Allow ADL for swapping Optional values
 - PR #4563 enh(MongoDB): Document::get returns value by const reference
 - PR #3040 HTTPS proxy support
-- PR #3000 Set custom active port in FTPClientSession
 - PR #4734 File lock
 - PR #4424 Allow using Poco::FileStream to wrap arbitrary file handles/descriptors as C++ streams
-- PR #2822 Add possibility to add custom headers through HTTPStreamFactory
 - PR #4685 CMake: Remove possibility to build with internal OpenSSL
 
 Bug Fixes and Improvements:
@@ -149,7 +147,6 @@ Bug Fixes and Improvements:
 - GH #4368 fix Oracle failing ODBC tests
 - GH #3913 Missing sources in release package - buildwin.ps1 and NetSSL_Win
 - GH #3896 TryParse scoped ipv6 addressess
-- GH #3815 Poco can be built with ENABLE_UTIL=ON and ENABLE_XML=OFF, but use of Poco::Util requires Poco::XML
 - GH #3180 Poco::Environment::osDisplayName
 - GH #2971 Poco::NamedEvent does not release System V semaphore on Linux
 - GH #2439 Issue with log purging when FileChannel compression is enabled
