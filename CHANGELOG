@@ -4,30 +4,43 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.14.0 (2024-MM-DD)
 ===========================
 
-
-TODO: Complete draft of overview summary.
-
-
-Summary of Changes:
+Highlights:
 
 This release marks many functions and classes as deprecated with C++ [[deprecated]]
 attribute. Warnings can be silenced by defining POCO_SILENCE_DEPRECATED.
 
-Deprecated function will be removed in one of the next releases.
+Deprecated functionality will be removed in one of the next releases.
 
 Minimal supported standard is C++17 since version 1.13. Decent part of the
-header files are modernised in this release.
+source code is modernised in this release.
 
-Bundled software libraries are updated to latest versions.
+Bundled software libraries are updated to latest versions:
 
-Poco::MongoDB: Obsolete wire-protocol (pre 3.6) that was removed from MongoDB in version 5.1
-is obsolete in this version of Poco. It will be removed in of next versions. Update code to use
+- zlib 1.3.1
+- expat 2.6.4
+- pcre2 10.44
+- libpng 1.6.43
+- SQLite 3.47.1
+
+Poco::Foundation:
+
+- Support for Version 6 and Version 7 UUIDs
+
+Poco::MongoDB:
+
+- Obsolete wire-protocol (pre 3.6) that was removed from MongoDB in version 5.1
+is obsolete in this version of Poco. It will be removed in one of next versions. Update code to use
 OpMsg-based interface.
+
+Poco::Data:
+
+- Full Nullable support (including bulk inserts)
+- ODBC SQL Server big strings support
 
 
 Breaking Changes:
 
-- GH #4426 Remove deprecated code
+- GH #4426 Mark deprecated code for removal
 
 Security Fixes:
 
@@ -42,8 +55,9 @@ Security Fixes:
 
 Features, Enhancements and Third Party Updates:
 
+- PR #4787 NetSSL_OpenSSL and NetSSL_Win: non-blocking support, shutdown behavior fix
 - PR #4681 zlib: Version 1.3.1 in module PDF (#4582)
-- PR #4676 SQLite: version 3.46.1
+- PR #4788 Update bundled SQLite to version 3.47.1 (released 2024-11-25)
 - GH #4669 Upgrade JSON parser
 - GH #4580 Poco::UUID/UUIDGenerator: add support for Version 6 and Version 7 UUIDs
 - PR #4724 Hide zlib and expat libs from the user of Poco libraries (replaces #4579)
