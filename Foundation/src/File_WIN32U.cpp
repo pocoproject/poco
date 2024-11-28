@@ -377,14 +377,13 @@ void FileImpl::removeImpl()
 }
 
 
-bool FileImpl::createFileImpl()
+bool FileImpl::createFileImpl(bool createDirectories = false)
 {
 	poco_assert (!_path.empty());
 
-	if (!existsImpl())
-	{
-		if (!createDirectoryImpl())
-			return false;
+	if(createDirectories) {
+		Path p(_path);
+		p.makeDirectory();
 	}
 
 	HANDLE hFile = CreateFileW(_upath.c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0);
