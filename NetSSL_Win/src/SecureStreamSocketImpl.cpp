@@ -149,14 +149,15 @@ void SecureStreamSocketImpl::shutdownReceive()
 }
 
 
-void SecureStreamSocketImpl::shutdownSend()
+int SecureStreamSocketImpl::shutdownSend()
 {
+	return _impl.shutdown();
 }
 
 
-void SecureStreamSocketImpl::shutdown()
+int SecureStreamSocketImpl::shutdown()
 {
-	_impl.shutdown();
+	return _impl.shutdown();
 }
 
 
@@ -208,8 +209,7 @@ void SecureStreamSocketImpl::verifyPeerCertificate(const std::string& hostName)
 
 int SecureStreamSocketImpl::completeHandshake()
 {
-	_impl.completeHandshake();
-	return 0;
+	return _impl.completeHandshake();
 }
 
 

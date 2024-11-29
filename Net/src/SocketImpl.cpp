@@ -327,21 +327,23 @@ void SocketImpl::shutdownReceive()
 }
 
 
-void SocketImpl::shutdownSend()
+int SocketImpl::shutdownSend()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 	int rc = ::shutdown(_sockfd, 1);
 	if (rc != 0) error();
+	return 0;
 }
 
 
-void SocketImpl::shutdown()
+int SocketImpl::shutdown()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 	int rc = ::shutdown(_sockfd, 2);
 	if (rc != 0) error();
+	return 0;
 }
 
 

@@ -157,12 +157,22 @@ public:
 	void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
 
-	void shutdownSend();
+	int shutdownSend();
 		/// Shuts down the sending part of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down both the receiving and the sending part
 		/// of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through

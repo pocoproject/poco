@@ -69,8 +69,8 @@ public:
 	virtual void listen(int backlog = 64);
 	virtual void close();
 	virtual void shutdownReceive();
-	virtual void shutdownSend();
-	virtual void shutdown();
+	virtual int shutdownSend();
+	virtual int shutdown();
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 	virtual void sendUrgent(unsigned char data);

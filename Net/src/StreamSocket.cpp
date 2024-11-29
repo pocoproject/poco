@@ -146,15 +146,15 @@ void StreamSocket::shutdownReceive()
 }
 
 
-void StreamSocket::shutdownSend()
+int StreamSocket::shutdownSend()
 {
-	impl()->shutdownSend();
+	return impl()->shutdownSend();
 }
 
 
-void StreamSocket::shutdown()
+int StreamSocket::shutdown()
 {
-	impl()->shutdown();
+	return impl()->shutdown();
 }
 
 

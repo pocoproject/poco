@@ -117,14 +117,25 @@ public:
 		/// Since SSL does not support a half shutdown, this does
 		/// nothing.
 
-	void shutdownSend();
+	int shutdownSend();
 		/// Shuts down the receiving part of the socket connection.
 		///
-		/// Since SSL does not support a half shutdown, this does
-		/// nothing.
+		/// Sends a close notify shutdown alert message to the peer
+		/// (if not sent yet), then calls shutdownSend() on the
+		/// underlying socket.
+		///
+		/// Returns 0 if the message has been sent.
+		/// Returns 1 if the message has been sent, but the peer
+		/// has not yet sent its shutdown alert message.
+		/// In case of a non-blocking socket, returns < 0 if the
+		/// message cannot be sent at the moment. In this case,
+		/// the call to shutdownSend() must be retried after the
+		/// underlying socket becomes writable again.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down the SSL connection.
+		///
+		/// Same as shutdownSend().
 
 	void abort();
 		/// Aborts the connection by closing the underlying
