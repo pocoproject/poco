@@ -15,6 +15,8 @@
 
 
 using Poco::ByteOrder;
+using Poco::Int8;
+using Poco::UInt8;
 using Poco::Int16;
 using Poco::UInt16;
 using Poco::Int32;
@@ -37,6 +39,16 @@ ByteOrderTest::~ByteOrderTest()
 
 void ByteOrderTest::testByteOrderFlip()
 {
+	{
+		Int8 norm = (Int8) 0xAB;
+		Int8 flip = ByteOrder::flipBytes(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = (UInt8) 0xAB;
+		UInt8 flip = ByteOrder::flipBytes(norm);
+		assertTrue (norm == flip);
+	}
 	{
 		Int16 norm = (Int16) 0xAABB;
 		Int16 flip = ByteOrder::flipBytes(norm);
@@ -86,6 +98,29 @@ void ByteOrderTest::testByteOrderFlip()
 
 void ByteOrderTest::testByteOrderBigEndian()
 {
+	//
+	// all systems
+	//
+	{
+		Int8 norm = 4;
+		Int8 flip = ByteOrder::toBigEndian(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = 4;
+		UInt8 flip = ByteOrder::toBigEndian(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		Int8 norm = 4;
+		Int8 flip = ByteOrder::fromBigEndian(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = 4;
+		UInt8 flip = ByteOrder::fromBigEndian(norm);
+		assertTrue (norm == flip);
+	}
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	//
 	// big-endian systems
@@ -254,6 +289,29 @@ void ByteOrderTest::testByteOrderBigEndian()
 
 void ByteOrderTest::testByteOrderLittleEndian()
 {
+	// 
+	// all systems
+	//
+	{
+		Int8 norm = 4;
+		Int8 flip = ByteOrder::toLittleEndian(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = 4;
+		UInt8 flip = ByteOrder::toLittleEndian(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		Int8 norm = 4;
+		Int8 flip = ByteOrder::fromLittleEndian(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = 4;
+		UInt8 flip = ByteOrder::fromLittleEndian(norm);
+		assertTrue (norm == flip);
+	}
 #if defined(POCO_ARCH_LITTLE_ENDIAN)
 	//
 	// big-endian systems
@@ -422,6 +480,26 @@ void ByteOrderTest::testByteOrderLittleEndian()
 
 void ByteOrderTest::testByteOrderNetwork()
 {
+	{
+		Int8 norm = 4;
+		Int8 flip = ByteOrder::toNetwork(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = 4;
+		UInt8 flip = ByteOrder::toNetwork(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		Int8 norm = 4;
+		Int8 flip = ByteOrder::fromNetwork(norm);
+		assertTrue (norm == flip);
+	}
+	{
+		UInt8 norm = 4;
+		UInt8 flip = ByteOrder::fromNetwork(norm);
+		assertTrue (norm == flip);
+	}
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	//
 	// big-endian systems
