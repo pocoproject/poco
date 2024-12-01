@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.14.0 (2024-MM-DD)
+Release 1.14.0 (2024-12-01)
 ===========================
 
 Summary of Changes:
@@ -267,13 +267,13 @@ Bug Fixes and Improvements:
 Release 1.13.0 (2023-12-22)
 ===========================
 
-Highlights:
+Highlights
 
 - Support for MongoDB 5.1 and newer
 - C++17 is the lowest supported standard
 - Poco::Data SQLParser (experimental, optional at build and runtime)
 
-Breaking Changes:
+Breaking Changes
 
 - GH #4305 Remove deprecated `toJSON` functions
 - GH #4304 NumericString conversions inconsistencies
@@ -336,7 +336,7 @@ Features and Enhancements
 - PR #4144 add visitor pattern implementation for Poco::Dynamic::Var
 - PR #3476 add separate accessors and mutators for connect, send and receive tim…
 
-Bug fixes and Improvements:
+Bug fixes and Improvements
 
 - GH #4328 Environment::nodeId Should Throw SystemException When Node ID is 0
 - GH #4311 Canceled `Task` shouldn't start running

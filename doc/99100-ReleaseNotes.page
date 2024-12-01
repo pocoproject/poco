@@ -3,7 +3,7 @@ AAAIntroduction
 
 !!!Release 1.14.0
 
-!!Summary of Changes:
+!!Summary of Changes
 
 This release marks many functions and classes as deprecated with C++ [[deprecated]]
 attribute. Warnings can be silenced by defining POCO_SILENCE_DEPRECATED.
@@ -28,8 +28,8 @@ Poco::Foundation:
 Poco::MongoDB:
 
   - Obsolete wire-protocol (pre 3.6) that was removed from MongoDB in version 5.1
-is obsolete in this version of Poco. It will be removed in one of next versions. Update code to use
-OpMsg-based interface.
+    is obsolete in this version of Poco. It will be removed in one of next versions. Update code to use
+    OpMsg-based interface.
 
 Poco::Data:
 
@@ -37,11 +37,11 @@ Poco::Data:
   - ODBC SQL Server big strings support
 
 
-!!Breaking Changes:
+!!Breaking Changes
 
   - GH #4426 Mark deprecated code for removal
 
-!!Security Fixes:
+!!Security Fixes
 
   - GH #4760 Upgrade libexpat to release 2.6.4
   - GH #4690 Net: stack-buffer-overflow if HTTP request contains a header with invalid UTF32 sequence
@@ -51,7 +51,7 @@ Poco::Data:
   - GH #4478 Upgrade bundled PCRE2 to 10.44
   - PR #4677 libpng version 1.6.43
 
-!!Features, Enhancements and Third Party Updates:
+!!Features, Enhancements and Third Party Updates
 
   - PR #4787 NetSSL_OpenSSL and NetSSL_Win: non-blocking support, shutdown behavior fix
   - PR #4681 zlib: Version 1.3.1 in module PDF (#4582)
@@ -116,7 +116,7 @@ Poco::Data:
   - PR #4424 Allow using Poco::FileStream to wrap arbitrary file handles/descriptors as C++ streams
   - PR #4685 CMake: Remove possibility to build with internal OpenSSL
 
-!!Bug Fixes and Improvements:
+!!Bug Fixes and Improvements
 
   - GH #4773 Non-blocking sockets support (TLS, WebSocket)
   - GH #4768 Data:  warning: 'isNull' overrides a member function but is not marked 'override'
@@ -189,7 +189,7 @@ This is a bugfix release.
   - GH #4515 Upgrade bundled SQLite to 3.45.2
   - PR #4517 Optimize Net module for Android
 
-!!Bug Fixes and Improvements:
+!!Bug Fixes and Improvements
 
   - GH #4505 ODBC Unicode wrappers do not check for null length pointers
   - GH #4492 Poco::BasicMemoryStreamBuf is missing seekpos()
@@ -237,7 +237,7 @@ This is a bugfix release.
 
 !!Bug Fixes and Improvements
 
-  - GH #4443 Upgrade libexpat to 2.6.0 
+  - GH #4443 Upgrade libexpat to 2.6.0
   - GH #4425 Unit tests: optional testing of deprecated functionality
   - GH #4421 Multiple calls to initializeSSL/uninitializeSSL cause assert failure during certificate validation
   - GH #4411 NULL pointer: strategy when setting rotation never in FileChannel
