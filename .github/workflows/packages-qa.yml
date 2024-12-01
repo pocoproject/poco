@@ -8,6 +8,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  mkdoc:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Install packages
+        run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev libpq-dev
+      -
+        name: Build documentation
+        run: |
+          export POCO_BASE=`pwd`
+          export PATH=$POCO_BASE/release/script:$PATH
+          export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/lib/Linux/x86_64
+          mkdoc all
+
   mkrelease_win:
     runs-on: ubuntu-latest
     steps:
@@ -64,7 +81,7 @@ jobs:
           name: posix-archives
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
       - run: rm poco-*-all.tar.gz
-      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1 
+      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1
       - run: cd poco && ./configure --everything && make all -s -j`nproc`
 
   linux-gcc-make-mkrelease-all:
@@ -75,7 +92,7 @@ jobs:
         with:
           name: posix-archives
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
-      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1 
+      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1
       - run: cd poco && ./configure --everything && make all -s -j`nproc`
 
   linux-gcc-cmake-mkrelease:
@@ -85,9 +102,9 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: posix-archives
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev 
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev
       - run: rm poco-*-all.tar.gz
-      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1 
+      - run: mkdir poco && cd poco && tar xfz ../poco-*.tar.gz --strip-components=1
       - run: cmake -Spoco -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
 
   linux-gcc-cmake-mkrelease-all:
@@ -97,8 +114,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: posix-archives
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev 
-      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1 
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: mkdir poco && cd poco && tar xfz ../poco-*-all.tar.gz --strip-components=1
       - run: cmake -Spoco -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
 
   windows-2022-msvc-buildwin-x64-mkrelease-all:
