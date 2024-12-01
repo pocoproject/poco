@@ -1264,7 +1264,7 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 				}
 				begin = it;
 			}
-			if (token == "GH")
+			if (token == "GH" || token == "PR")
 			{
 				std::string uri(GITHUB_POCO_URI);
 				std::string::const_iterator it(begin);
@@ -1287,7 +1287,7 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 						nextToken(begin, end, n);
 						if (!n.empty() && std::isdigit(n[0]))
 						{
-							uri += "/issues/";
+							uri += token == "GH" ? "/issues/" : "/pull/";
 							uri += n;
 							writeTargetLink(ostr, uri, token + " #" + n, "_blank");
 							nextToken(begin, end, token);
