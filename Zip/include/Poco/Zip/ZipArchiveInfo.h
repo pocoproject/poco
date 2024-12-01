@@ -134,10 +134,10 @@ public:
 	~ZipArchiveInfo64();
 		/// Destroys the ZipArchiveInfo64.
 
-	void getVersionMadeBy(int& major, int& minor);
+	Poco::UInt16 getVersionMadeBy() const;
 		/// The ZIP version used to create the file
 
-	void getRequiredVersion(int& major, int& minor);
+	Poco::UInt16 getRequiredVersion() const;
 		/// The minimum version required to extract the data
 
 	Poco::UInt32 getDiskNumber() const;
@@ -232,6 +232,15 @@ private:
 // inlines
 //
 
+inline Poco::UInt16 ZipArchiveInfo64::getVersionMadeBy() const
+{
+	return ZipUtil::get16BitValue(_rawInfo, VERSIONMADEBY_POS);
+}
+
+inline Poco::UInt16 ZipArchiveInfo64::getRequiredVersion() const
+{
+	return ZipUtil::get16BitValue(_rawInfo, VERSION_NEEDED_POS);
+}
 
 inline Poco::UInt16 ZipArchiveInfo::getDiskNumber() const
 {
