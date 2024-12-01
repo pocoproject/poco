@@ -191,6 +191,15 @@ public:
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
 			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
+			/// Note: The cipher list only applies for TLS 1.2 and 
+			/// earlier versions. To configure TLS 1.3 cipher suites, 
+			/// please use the cipherSuites member variable.
+
+		std::string cipherSuites;
+			/// Specifies the supported TLS 1.3 cipher suites.
+			/// If left empty, the OpenSSL default cipher suites
+			/// are used. Please refer to the OpenSSL documentation
+			/// for available cipher suite names.
 
 		std::string dhParamsFile;
 			/// Specifies a file containing Diffie-Hellman parameters.

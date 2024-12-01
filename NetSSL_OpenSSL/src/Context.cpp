@@ -189,11 +189,14 @@ void Context::init(const Params& params)
 		else
 			SSL_CTX_set_verify(_pSSLContext, params.verificationMode, &SSLManager::verifyClientCallback);
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-		SSL_CTX_set_ciphersuites(_pSSLContext, params.cipherList.c_str());
-#else
+#if OPENSSL_VERSION_NUMBER >= 0x10101000L
+		if (!params.cipherSuites.empty())
+		{
+			SSL_CTX_set_ciphersuites(_pSSLContext, params.cipherSuites.c_str());
+		}
+#endif
 		SSL_CTX_set_cipher_list(_pSSLContext, params.cipherList.c_str());
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
