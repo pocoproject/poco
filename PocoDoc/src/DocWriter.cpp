@@ -248,7 +248,7 @@ void DocWriter::writeNavigation()
 	ostr << "<div>&nbsp;</div>\n"; // workaround to avoid cutting off a few pixels from last line
 	endBody(ostr);
 	ostr << "<script>CollapsibleLists.apply(true)</script>" << std::endl;
-	writeFooter(ostr, NO_TRACKING);
+	writeFooter(ostr, NO_TRACKING | NO_CUSTOM_HTML);
 }
 
 
@@ -922,7 +922,7 @@ void DocWriter::writeNavigationFrame(std::ostream& ostr, const std::string& grou
 		query += item;
 	}
 	ostr << "<div id=\"navigation\">\n";
-	ostr << "<iframe src=\"navigation.html" << query << "\" onload=\"iFrameResize(this);\" scrolling=\"no\"></iframe>\n";
+	ostr << "<iframe sandbox=\"allow-scripts allow-top-navigation-by-user-activation allow-same-origin\" src=\"navigation.html" << query << "\" onload=\"iFrameResize(this);\" scrolling=\"no\"></iframe>\n";
 	ostr << "</div>\n";
 }
 
@@ -1416,7 +1416,7 @@ bool DocWriter::writeSpecial(std::ostream& ostr, std::string& token, std::string
 	{
 		_htmlMode = false;
 	}
-	else if (token == "<?")
+	else if (token == "<?" || token == "<?=")
 	{
 		std::string prop;
 		nextToken(begin, end, token);
@@ -1428,6 +1428,19 @@ bool DocWriter::writeSpecial(std::ostream& ostr, std::string& token, std::string
 		Poco::trimInPlace(prop);
 		Application& app = Application::instance();
 		ostr << htmlize(app.config().getString(prop, std::string("NOT FOUND: ") + prop));
+	}
+	else if (token == "<?-")
+	{
+		std::string prop;
+		nextToken(begin, end, token);
+		while (!token.empty() && token != "?>")
+		{
+			prop.append(token);
+			nextToken(begin, end, token);
+		}
+		Poco::trimInPlace(prop);
+		Application& app = Application::instance();
+		ostr << app.config().getString(prop, "");
 	}
 	else if (_htmlMode)
 	{
@@ -1504,7 +1517,10 @@ void DocWriter::nextToken(std::string::const_iterator& it, const std::string::co
 	{
 		token += *it++;
 		if (it != end && std::ispunct(*it)) token += *it++;
-		if (it != end && std::ispunct(*it)) token += *it++;
+		if (token != "<[" && token != "<*" && token != "<!")
+		{
+			if (it != end && std::ispunct(*it)) token += *it++;
+		}
 	}
 	else if (it != end && *it == '[')
 	{
@@ -2079,6 +2095,12 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc, std::os
 		writeIcon(ostr, "inline");
 	ostr << "</h3>\n";
 	ostr << "<p class=\"decl\">";
+
+	const std::string& attrs = pFunc->getAttributeList();
+	if (!attrs.empty())
+	{
+		ostr << "<i>" << htmlize(attrs) << "</i><br />";
+	}
 	const std::string& decl = pFunc->declaration();
 	writeDecl(ostr, decl);
 	if (!std::isalnum(decl[decl.length() - 1]))
@@ -2116,7 +2138,7 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc, std::os
 		ostr << " = 0";
 	ostr << ";</p>\n";
 
-	if (pFunc->attrs().has("deprecated"))
+	if (pFunc->attrs().has("deprecated") || pFunc->getAttributeList().compare(0, 12, "[[deprecated") == 0)
 	{
 		writeDeprecated(ostr, "function");
 	}
