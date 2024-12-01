@@ -86,7 +86,7 @@ echo "Building tools"
 tools=$POCO_BASE/stage/tools
 rm -rf $tools
 mkdir -p $tools
-mkrelease -o $tools $version CppParser PocoDoc
+mkrelease -o $tools $version Data Data/SQLite CppParser PocoDoc
 
 cd $tools
 ./configure --no-tests --no-samples --no-prefix

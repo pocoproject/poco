@@ -36,7 +36,8 @@
 				-E,
 				-C,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
-				-DPOCO_DOC
+				-DPOCO_DOC,
+				-DPOCO_SILENCE_DEPRECATED
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>

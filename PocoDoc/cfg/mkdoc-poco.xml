@@ -39,6 +39,7 @@
 				-DPOCO_NO_WINDOWS_H,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
 				-DPOCO_DOC,
+				-DPOCO_SILENCE_DEPRECATED,
 				-xc++
 			</options>
 			<path></path>
