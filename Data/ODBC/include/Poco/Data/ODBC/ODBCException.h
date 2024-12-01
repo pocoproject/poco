@@ -139,10 +139,12 @@ private:
 
 
 // explicit instantiation definition
+#ifndef POCO_DOC
 template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
 template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
 template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
 template class HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
 
 
 using EnvironmentException = HandleException<SQLHENV, SQL_HANDLE_ENV>;

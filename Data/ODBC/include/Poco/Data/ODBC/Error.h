@@ -125,10 +125,12 @@ private:
 
 
 // explicit instantiation definition
+#ifndef POCO_DOC
 template class Error<SQLHENV, SQL_HANDLE_ENV>;
 template class Error<SQLHDBC, SQL_HANDLE_DBC>;
 template class Error<SQLHSTMT, SQL_HANDLE_STMT>;
 template class Error<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
 
 
 using EnvironmentError = Error<SQLHENV, SQL_HANDLE_ENV>;

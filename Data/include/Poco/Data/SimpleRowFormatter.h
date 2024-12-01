@@ -107,6 +107,7 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
 } } // namespace Poco::Data
 
 
+#ifndef POCO_DOC
 namespace std
 {
 	template<>
@@ -118,6 +119,7 @@ namespace std
 		s1.swap(s2);
 	}
 }
+#endif
 
 
 #endif // Data_SimpleRowFormatter_INCLUDED

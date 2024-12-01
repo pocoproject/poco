@@ -242,10 +242,12 @@ private:
 
 
 // explicit instantiation definition
+#ifndef POCO_DOC
 template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
 template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
 template class Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
 template class Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
 
 
 using EnvironmentDiagnostics = Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
