@@ -518,6 +518,15 @@ void EVPTest::testECEVPSaveLoadFile()
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
 			assertTrue (pubFromPrivate == pubKey);
+
+			// Create new key with empty password
+			EVPPKey key4(curveName);
+
+			key4.save(filePub.path(), filePriv.path(), "");
+
+			// Load key from file with empty password.
+			// No input string should be prompted
+			EVPPKey key4LoadEmptyPass { "", filePriv.path(), "" };
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
