@@ -62,6 +62,8 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * e signed floating-point value in the form [-]d.dddde[<sign>]dd[d]
 	///   * E signed floating-point value in the form [-]d.ddddE[<sign>]dd[d]
 	///   * f signed floating-point value in the form [-]dddd.dddd
+	///   * g use the shortest representation: %e or %f
+	///   * G use the shortest representation: %E or %F
 	///   * s std::string
 	///   * v std::string_view
 	///   * z std::size_t
