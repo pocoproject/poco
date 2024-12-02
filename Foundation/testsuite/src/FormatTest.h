@@ -29,6 +29,7 @@ public:
 	void testFloatSci();
 	void testString();
 	void testStringView();
+	void testShortestRepr();
 	void testMultiple();
 	void testIndex();
 	void testAny();

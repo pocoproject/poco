@@ -325,6 +325,80 @@ void FormatTest::testAnyInt()
 	assertTrue (s == "42");
 }
 
+void FormatTest::testShortestRepr()
+{
+	std::string str;
+
+	//
+	// uppercase tests
+	//
+	{
+		str = format("%G", 123.456);
+		assertEquals("123.456", str);
+
+		str = format("%G", 12345.6789);
+		assertEquals("12345.7", str);
+
+		str = format("%G", 0.000123);
+		assertEquals("0.000123", str);
+
+		str = format("%G", 1234567890.123);
+		assertEquals("1.23457E+09", str);
+
+		str = format("%G", 0.0);
+		assertEquals("0", str);
+
+		str = format("%G", -9876.54321);
+		assertEquals("-9876.54", str);
+
+		str = format("%.2G", 123.456);
+		assertEquals("1.2E+02", str);
+
+		str = format("%G", 1.0);
+		assertEquals("1", str);
+
+		str = format("%G", 0.00000000123);
+		assertEquals("1.23E-09", str);
+
+		str = format("%G", 0.00000000000123);
+		assertEquals("1.23E-12", str);
+	}
+
+	//
+	// lowercase tests
+	//
+	{
+		str = format("%g", 123.456);
+		assertEquals("123.456", str);
+
+		str = format("%g", 12345.6789);
+		assertEquals("12345.7", str);
+
+		str = format("%g", 0.000123);
+		assertEquals("0.000123", str);
+
+		str = format("%g", 1234567890.123);
+		assertEquals("1.23457e+09", str);
+
+		str = format("%g", 0.0);
+		assertEquals("0", str);
+
+		str = format("%g", -9876.54321);
+		assertEquals("-9876.54", str);
+
+		str = format("%.2g", 123.456);
+		assertEquals("1.2e+02", str);
+
+		str = format("%g", 1.0);
+		assertEquals("1", str);
+
+		str = format("%g", 0.00000000123);
+		assertEquals("1.23e-09", str);
+
+		str = format("%g", 0.00000000000123);
+		assertEquals("1.23e-12", str);
+	}
+}
 
 void FormatTest::testFloatFix()
 {
@@ -527,6 +601,7 @@ CppUnit::Test* FormatTest::suite()
 	CppUnit_addTest(pSuite, FormatTest, testMultiple);
 	CppUnit_addTest(pSuite, FormatTest, testIndex);
 	CppUnit_addTest(pSuite, FormatTest, testAny);
+	CppUnit_addTest(pSuite, FormatTest, testShortestRepr);
 
 	return pSuite;
 }

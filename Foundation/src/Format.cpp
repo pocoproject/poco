@@ -128,6 +128,8 @@ namespace
 		case 'e': str << std::scientific; break;
 		case 'E': str << std::scientific << std::uppercase; break;
 		case 'f': str << std::fixed; break;
+		case 'g': str << std::defaultfloat; break;
+		case 'G': str << std::defaultfloat << std::uppercase; break;
 		}
 	}
 
@@ -212,6 +214,8 @@ namespace
 				case 'e':
 				case 'E':
 				case 'f':
+				case 'g': 
+				case 'G': 
 					switch (mod)
 					{
 					case 'l': str << AnyCast<long double>(*itVal++); break;
