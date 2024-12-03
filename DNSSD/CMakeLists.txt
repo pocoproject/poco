@@ -75,7 +75,7 @@ if(ENABLE_DNSSD_DEFAULT)
 	endif()
 endif()
 
-if(ENABLE_DNSSD_AVHAI)
+if(ENABLE_DNSSD_AVAHI)
 	ADD_AVAHI()
 endif()
 
