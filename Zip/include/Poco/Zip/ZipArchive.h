@@ -52,6 +52,9 @@ public:
 	~ZipArchive();
 		/// Destroys the ZipArchive.
 
+	void checkConsistency();
+		/// Check archive's consistency
+
 	FileInfos::const_iterator fileInfoBegin() const;
 
 	FileInfos::const_iterator fileInfoEnd() const;
