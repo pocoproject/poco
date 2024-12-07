@@ -19,11 +19,14 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Event.h"
+#include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
 #include <unistd.h>
 #include <vector>
 #include <map>
 #include <atomic>
+#include <optional>
 
 
 namespace Poco {
@@ -40,10 +43,13 @@ public:
 
 	pid_t id() const;
 	int wait() const;
+	int wait(int options) const;
 	int tryWait() const;
 
 private:
-	std::atomic<pid_t> _pid;
+	const std::atomic<pid_t> _pid;
+	mutable Event _event;
+	mutable std::optional<std::atomic<int>> _status;
 };
 
 

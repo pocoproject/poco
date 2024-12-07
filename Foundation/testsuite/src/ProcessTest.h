@@ -33,6 +33,8 @@ public:
 	void testLaunchInvalidCommand();
 	void testIsRunning();
 	void testLaunchCloseHandles();
+	void testIsRunningAllowsForTermination();
+	void testSignalExitCode();
 
 	void setUp();
 	void tearDown();
