@@ -40,7 +40,8 @@ namespace Poco {
 // ProcessHandleImpl
 //
 ProcessHandleImpl::ProcessHandleImpl(pid_t pid):
-	_pid(pid)
+	_pid(pid),
+	_event(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -58,20 +59,40 @@ pid_t ProcessHandleImpl::id() const
 
 int ProcessHandleImpl::wait() const
 {
+	if (wait(0) != _pid)
+		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+
+	return WEXITSTATUS(_status.value());
+}
+
+
+int ProcessHandleImpl::wait(int options) const
+{
+	if (_status.has_value()) return _pid;
 	int status;
 	int rc;
 	do
 	{
-		rc = waitpid(_pid, &status, 0);
+		rc = waitpid(_pid, &status, options);
 	}
 	while (rc < 0 && errno == EINTR);
-	if (rc != _pid)
-		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+	if (rc == _pid)
+	{
+		_status = status;
+		_event.set();
+	}
+	else if (rc < 0 && errno == ECHILD)
+	{
+		// Looks like another thread was lucky and it should update the status for us shortly
+		_event.wait();
 
-	if (WIFEXITED(status)) // normal termination
-		return WEXITSTATUS(status);
-	else // termination by a signal
-		return 256 + WTERMSIG(status);
+		if (_status.has_value())
+		{
+			rc = _pid;
+		}
+	}
+
+	return rc;
 }
 
 
