@@ -152,9 +152,16 @@ private:
 		if (!isEmpty())
 		{
 			if (!isLocal())
-				delete pHolder;
+			{
+				auto* h { pHolder };
+				pHolder = nullptr;
+				delete h;
+			}
 			else
-				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
+			{
+				auto* h { reinterpret_cast<PlaceholderT*>(holder) };
+				h->~PlaceholderT();
+			}
 
 			if (clear) std::memset(holder, 0, sizeof(holder));
 		}
