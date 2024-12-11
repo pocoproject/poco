@@ -369,10 +369,10 @@ namespace Impl {
 };
 
 template <typename T>
-using EnableSigned = typename std::enable_if< std::is_signed<T>::value >::type*;
+using EnableSigned = typename std::enable_if_t< std::is_signed<T>::value >*;
 
 template <typename T>
-using EnableUnsigned = typename std::enable_if< std::is_unsigned<T>::value >::type*;
+using EnableUnsigned = typename std::enable_if_t< std::is_unsigned<T>::value >*;
 
 } // namespace Impl
 

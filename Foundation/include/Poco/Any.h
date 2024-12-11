@@ -78,7 +78,7 @@ public:
 
 #ifndef POCO_NO_SOO
 
-	Placeholder(): pHolder(0)
+	Placeholder(): pHolder(nullptr)
 	{
 		std::memset(holder, 0, sizeof(holder));
 	}
@@ -111,7 +111,7 @@ public:
 	}
 
 	template<typename T, typename V,
-		typename std::enable_if<TypeSizeLE<T, Placeholder::Size::value>::value>::type* = nullptr>
+		typename std::enable_if_t<TypeSizeLE<T, Placeholder::Size::value>::value>* = nullptr>
 	PlaceholderT* assign(const V& value)
 	{
 		erase();
@@ -121,7 +121,7 @@ public:
 	}
 
 	template<typename T, typename V,
-		typename std::enable_if<TypeSizeGT<T, Placeholder::Size::value>::value>::type* = nullptr>
+		typename std::enable_if_t<TypeSizeGT<T, Placeholder::Size::value>::value>* = nullptr>
 	PlaceholderT* assign(const V& value)
 	{
 		erase();
@@ -139,7 +139,7 @@ public:
 	}
 
 private:
-	typedef std::max_align_t AlignerType;
+	using AlignerType = std::max_align_t;
 	static_assert(sizeof(AlignerType) <= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
 
 	void setLocal(bool local) const
@@ -172,7 +172,7 @@ private:
 
 #else // POCO_NO_SOO
 
-	Placeholder(): pHolder(0)
+	Placeholder(): pHolder(nullptr)
 	{
 	}
 
@@ -189,12 +189,12 @@ private:
 	void erase()
 	{
 		delete pHolder;
-		pHolder = 0;
+		pHolder = nullptr;
 	}
 
 	bool isEmpty() const
 	{
-		return 0 == pHolder;
+		return nullptr == pHolder;
 	}
 
 	bool isLocal() const
@@ -232,10 +232,8 @@ class Any
 {
 public:
 
-	Any()
+	Any() = default;
 		/// Creates an empty any type.
-	{
-	}
 
 	template<typename ValueType>
 	Any(const ValueType & value)
@@ -255,11 +253,9 @@ public:
 			construct(other);
 	}
 
-	~Any()
+	~Any() = default;
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
-	{
-	}
 
 	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.
@@ -354,21 +350,19 @@ private:
 		{
 		}
 
-		virtual const std::type_info& type() const
+		Holder & operator = (const Holder &) = delete;
+
+		const std::type_info& type() const override
 		{
 			return typeid(ValueType);
 		}
 
-		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
+		void clone(Placeholder<ValueHolder>* pPlaceholder) const override
 		{
 			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}
 
 		ValueType _held;
-
-	private:
-
-		Holder & operator = (const Holder &);
 	};
 
 	ValueHolder* content() const
