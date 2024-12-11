@@ -48,7 +48,7 @@ config.make
 
 # Qt Creator #
 #########
-build/
+build/Qt_*
 
 # CMake #
 ########

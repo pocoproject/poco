@@ -557,8 +557,8 @@ install(
 )
 
 if(POCO_UNBUNDLED)
-	install(FILES cmake/FindPCRE2.cmake
-			DESTINATION "${PocoConfigPackageLocation}")
+	install(FILES cmake/FindPCRE2.cmake DESTINATION "${PocoConfigPackageLocation}")
+	install(FILES cmake/FindUtf8Proc.cmake DESTINATION "${PocoConfigPackageLocation}")
 endif()
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
