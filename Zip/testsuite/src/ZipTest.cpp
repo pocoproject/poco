@@ -318,6 +318,26 @@ void ZipTest::testDecompressConsistency()
 			}
 		}
 
+		
+		//
+		// test decompressing all files (ignore consistency check)
+		//
+		{
+			Poco::FileInputStream inputStream(getTestFile("data", archive));
+			assertTrue (inputStream.good());
+
+			Decompress dec(inputStream, Poco::Path::temp());
+
+			// should not throw since consistency checks are ignored
+			try {
+				dec.decompressAllFiles(false);
+			}
+			catch (const ZipException &e)
+			{
+				assertTrue (false);
+			}
+		}
+
 
 		//
 		// test decompressing single file
