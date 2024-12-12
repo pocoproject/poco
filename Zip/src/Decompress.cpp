@@ -64,12 +64,13 @@ Decompress::~Decompress()
 }
 
 
-ZipArchive Decompress::decompressAllFiles()
+ZipArchive Decompress::decompressAllFiles(const bool checkConsistency)
 {
 	poco_assert (_mapping.empty());
 	ZipArchive arch(_in, *this);
 
-	arch.checkConsistency();
+	if (checkConsistency)
+		arch.checkConsistency();
 
 	return arch;
 }
