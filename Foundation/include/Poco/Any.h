@@ -18,9 +18,9 @@
 
 #include "Poco/Exception.h"
 #include "Poco/MetaProgramming.h"
+#include "Poco/Bugcheck.h"
 #include <algorithm>
 #include <typeinfo>
-#include <cstring>
 #include <cstddef>
 
 
@@ -80,7 +80,10 @@ public:
 
 	Placeholder(): pHolder(nullptr)
 	{
-		std::memset(holder, 0, sizeof(holder));
+		// Forces to use optimised memset internally
+		// https://travisdowns.github.io/blog/2020/01/20/zero.html
+		std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
+		setAllocation(Allocation::EMPTY);
 	}
 
 	~Placeholder()
@@ -101,13 +104,12 @@ public:
 
 	bool isEmpty() const
 	{
-		static char buf[sizeof(holder)] = {};
-		return 0 == std::memcmp(holder, buf, sizeof(holder));
+		return holder[SizeV] == Allocation::EMPTY;
 	}
 
 	bool isLocal() const
 	{
-		return holder[SizeV] != 0;
+		return holder[SizeV] == Allocation::LOCAL;
 	}
 
 	template<typename T, typename V,
@@ -116,7 +118,7 @@ public:
 	{
 		erase();
 		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
-		setLocal(true);
+		setAllocation(Allocation::LOCAL);
 		return reinterpret_cast<PlaceholderT*>(holder);
 	}
 
@@ -126,7 +128,7 @@ public:
 	{
 		erase();
 		pHolder = new T(value);
-		setLocal(false);
+		setAllocation(Allocation::EXTERNAL);
 		return pHolder;
 	}
 
@@ -142,29 +144,46 @@ private:
 	using AlignerType = std::max_align_t;
 	static_assert(sizeof(AlignerType) <= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
 
-	void setLocal(bool local) const
+	enum Allocation : unsigned char {
+		EMPTY = 0,
+		LOCAL = 1,
+		EXTERNAL = 2
+	};
+
+	void setAllocation(Allocation state) const
 	{
-		holder[SizeV] = local ? 1 : 0;
+		holder[SizeV] = state;
 	}
 
 	void destruct(bool clear)
 	{
-		if (!isEmpty())
+		switch (holder[SizeV])
 		{
-			if (!isLocal())
+		case Allocation::EMPTY:
+			break;
+		case Allocation::LOCAL:
+			{
+				auto* h { reinterpret_cast<PlaceholderT*>(holder) };
+				h->~PlaceholderT();
+			}
+			break;
+		case Allocation::EXTERNAL:
 			{
 				auto* h { pHolder };
 				pHolder = nullptr;
 				delete h;
 			}
-			else
-			{
-				auto* h { reinterpret_cast<PlaceholderT*>(holder) };
-				h->~PlaceholderT();
-			}
-
-			if (clear) std::memset(holder, 0, sizeof(holder));
+			break;
+		default:
+			poco_bugcheck();
+			break;
 		}
+		if (clear)
+		{
+			// Force to use optimised memset internally
+			std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
+		}
+		setAllocation(Allocation::EMPTY);
 	}
 
 	mutable unsigned char holder[SizeV+1];
@@ -253,6 +272,12 @@ public:
 			construct(other);
 	}
 
+	Any(Any&& other)
+		/// Move constructor, works with both empty and initialized Any values.
+	{
+		construct(other);
+	}
+
 	~Any() = default;
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
@@ -301,11 +326,23 @@ public:
 	Any& operator = (const Any& rhs)
 		/// Assignment operator for Any.
 	{
-		if ((this != &rhs) && !rhs.empty())
-			construct(rhs);
-		else if ((this != &rhs) && rhs.empty())
-			_valueHolder.erase();
+		if (this != &rhs)
+		{
+			if (!rhs.empty())
+				construct(rhs);
+			else
+				_valueHolder.erase();
+		}
+		return *this;
+	}
 
+	Any& operator = (Any&& rhs)
+		/// Move operator for Any.
+	{
+		if (!rhs.empty())
+			construct(rhs);
+		else
+			_valueHolder.erase();
 		return *this;
 	}
 
