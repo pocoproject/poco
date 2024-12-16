@@ -21,6 +21,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
+
+#include <type_traits>
 #include <vector>
 #include <ostream>
 
@@ -81,6 +83,19 @@ public:
 	BinaryWriter& operator << (unsigned long value);
 	BinaryWriter& operator << (float value);
 	BinaryWriter& operator << (double value);
+
+	template <class T,
+		std::enable_if_t<
+			(std::is_same_v<T, Poco::UInt8> && !std::is_same_v<T, unsigned char>) ||
+			(std::is_same_v<T, Poco::Int8> && !std::is_same_v<T, signed char>),
+			int> = 0>
+	BinaryWriter& operator << (T value)
+		/// Operator << for Poco::Int8/UInt8 when their underlying types
+		/// differ from signed/unsigned char.
+	{
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
+		return *this;
+	}
 
 #if defined(POCO_HAVE_INT64)
 	BinaryWriter& operator << (long long value);
