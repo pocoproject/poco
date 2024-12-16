@@ -64,6 +64,8 @@ static const std::string keyCursor		{"cursor"};
 static const std::string keyFirstBatch	{"firstBatch"};
 static const std::string keyNextBatch	{"nextBatch"};
 
+constexpr static Poco::UInt8 PAYLOAD_TYPE_0 { 0 };
+constexpr static Poco::UInt8 PAYLOAD_TYPE_1 { 1 };
 
 OpMsgMessage::OpMsgMessage() :
 	Message(MessageHeader::OP_MSG)

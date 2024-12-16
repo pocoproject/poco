@@ -139,12 +139,6 @@ public:
 
 private:
 
-	enum PayloadType : UInt8
-	{
-		PAYLOAD_TYPE_0	= 0,
-		PAYLOAD_TYPE_1	= 1
-	};
-
 	std::string			_databaseName;
 	std::string			_collectionName;
 	UInt32				_flags { MSG_FLAGS_DEFAULT };
