@@ -54,28 +54,28 @@ BinaryWriter::~BinaryWriter()
 
 BinaryWriter& BinaryWriter::operator << (bool value)
 {
-	_ostr.write((const char*) &value, sizeof(value));
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	return *this;
 }
 
 
 BinaryWriter& BinaryWriter::operator << (char value)
 {
-	_ostr.write((const char*) &value, sizeof(value));
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	return *this;
 }
 
 
 BinaryWriter& BinaryWriter::operator << (unsigned char value)
 {
-	_ostr.write((const char*) &value, sizeof(value));
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	return *this;
 }
 
 
 BinaryWriter& BinaryWriter::operator << (signed char value)
 {
-	_ostr.write((const char*) &value, sizeof(value));
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	return *this;
 }
 
@@ -89,7 +89,7 @@ BinaryWriter& BinaryWriter::operator << (short value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -104,7 +104,7 @@ BinaryWriter& BinaryWriter::operator << (unsigned short value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -119,7 +119,7 @@ BinaryWriter& BinaryWriter::operator << (int value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -134,7 +134,7 @@ BinaryWriter& BinaryWriter::operator << (unsigned int value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -153,7 +153,7 @@ BinaryWriter& BinaryWriter::operator << (long value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -172,7 +172,7 @@ BinaryWriter& BinaryWriter::operator << (unsigned long value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -182,14 +182,14 @@ BinaryWriter& BinaryWriter::operator << (float value)
 {
 	if (_flipBytes)
 	{
-		const char* ptr = (const char*) &value;
+		const char* ptr = reinterpret_cast<const char*>(&value);
 		ptr += sizeof(value);
 		for (unsigned i = 0; i < sizeof(value); ++i)
 			_ostr.write(--ptr, 1);
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -199,18 +199,37 @@ BinaryWriter& BinaryWriter::operator << (double value)
 {
 	if (_flipBytes)
 	{
-		const char* ptr = (const char*) &value;
+		const char* ptr = reinterpret_cast<const char*>(&value);
 		ptr += sizeof(value);
 		for (unsigned i = 0; i < sizeof(value); ++i)
 			_ostr.write(--ptr, 1);
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
 
+template<class T,
+		 typename std::enable_if<
+			 std::is_same<T, Poco::UInt8>{} && !std::is_same<T, unsigned char>{},
+			 BinaryWriter&>::type >
+BinaryWriter& BinaryWriter::operator << (T value)
+{
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
+	return *this;
+}
+
+template<class T,
+		 typename std::enable_if<
+			 std::is_same<T, Poco::Int8>{} && !std::is_same<T, signed char>{},
+			 BinaryWriter&>::type >
+BinaryWriter& BinaryWriter::operator << (T value)
+{
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
+	return *this;
+}
 
 #if defined(POCO_HAVE_INT64)
 
@@ -224,7 +243,7 @@ BinaryWriter& BinaryWriter::operator << (long long value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -239,7 +258,7 @@ BinaryWriter& BinaryWriter::operator << (unsigned long long value)
 	}
 	else
 	{
-		_ostr.write((const char*) &value, sizeof(value));
+		_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 	}
 	return *this;
 }
@@ -347,7 +366,7 @@ void BinaryWriter::writeBOM()
 {
 	UInt16 value = 0xFEFF;
 	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	_ostr.write((const char*) &value, sizeof(value));
+	_ostr.write(reinterpret_cast<const char*>(&value), sizeof(value));
 }
 
 

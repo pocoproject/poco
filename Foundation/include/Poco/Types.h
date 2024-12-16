@@ -36,7 +36,7 @@
 namespace Poco {
 
 
-using Int8    = std::conditional<std::is_same<signed char, std::int8_t>::value, std::int8_t, signed char>::type;
+using Int8    = std::conditional_t<std::is_same_v<signed char, std::int8_t>, std::int8_t, signed char>;
 using UInt8   = std::uint8_t;
 using Int16   = std::int16_t;
 using UInt16  = std::uint16_t;

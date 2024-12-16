@@ -186,6 +186,7 @@
 #endif
 
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+#define POCO_HAVE_CPP20_COMPILER (__cplusplus >= 202002L)
 
 // Option to silence deprecation warnings.
 #ifndef POCO_SILENCE_DEPRECATED
