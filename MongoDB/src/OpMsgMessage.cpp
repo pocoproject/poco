@@ -23,47 +23,49 @@ namespace Poco {
 namespace MongoDB {
 
 // Query and write
-const std::string OpMsgMessage::CMD_INSERT { "insert" };
-const std::string OpMsgMessage::CMD_DELETE { "delete" };
-const std::string OpMsgMessage::CMD_UPDATE { "update" };
-const std::string OpMsgMessage::CMD_FIND { "find" };
-const std::string OpMsgMessage::CMD_FIND_AND_MODIFY { "findAndModify" };
-const std::string OpMsgMessage::CMD_GET_MORE { "getMore" };
+const std::string OpMsgMessage::CMD_INSERT { "insert"s };
+const std::string OpMsgMessage::CMD_DELETE { "delete"s };
+const std::string OpMsgMessage::CMD_UPDATE { "update"s };
+const std::string OpMsgMessage::CMD_FIND { "find"s };
+const std::string OpMsgMessage::CMD_FIND_AND_MODIFY { "findAndModify"s };
+const std::string OpMsgMessage::CMD_GET_MORE { "getMore"s };
 
 // Aggregation
-const std::string OpMsgMessage::CMD_AGGREGATE { "aggregate" };
-const std::string OpMsgMessage::CMD_COUNT { "count" };
-const std::string OpMsgMessage::CMD_DISTINCT { "distinct" };
-const std::string OpMsgMessage::CMD_MAP_REDUCE { "mapReduce" };
+const std::string OpMsgMessage::CMD_AGGREGATE { "aggregate"s };
+const std::string OpMsgMessage::CMD_COUNT { "count"s };
+const std::string OpMsgMessage::CMD_DISTINCT { "distinct"s };
+const std::string OpMsgMessage::CMD_MAP_REDUCE { "mapReduce"s };
 
 // Replication and administration
-const std::string OpMsgMessage::CMD_HELLO { "hello" };
-const std::string OpMsgMessage::CMD_REPL_SET_GET_STATUS { "replSetGetStatus" };
-const std::string OpMsgMessage::CMD_REPL_SET_GET_CONFIG { "replSetGetConfig" };
+const std::string OpMsgMessage::CMD_HELLO { "hello"s };
+const std::string OpMsgMessage::CMD_REPL_SET_GET_STATUS { "replSetGetStatus"s };
+const std::string OpMsgMessage::CMD_REPL_SET_GET_CONFIG { "replSetGetConfig"s };
 
-const std::string OpMsgMessage::CMD_CREATE { "create" };
-const std::string OpMsgMessage::CMD_CREATE_INDEXES { "createIndexes" };
-const std::string OpMsgMessage::CMD_DROP { "drop" };
-const std::string OpMsgMessage::CMD_DROP_DATABASE { "dropDatabase" };
-const std::string OpMsgMessage::CMD_KILL_CURSORS { "killCursors" };
-const std::string OpMsgMessage::CMD_LIST_DATABASES { "listDatabases" };
-const std::string OpMsgMessage::CMD_LIST_INDEXES { "listIndexes" };
+const std::string OpMsgMessage::CMD_CREATE { "create"s };
+const std::string OpMsgMessage::CMD_CREATE_INDEXES { "createIndexes"s };
+const std::string OpMsgMessage::CMD_DROP { "drop"s };
+const std::string OpMsgMessage::CMD_DROP_DATABASE { "dropDatabase"s };
+const std::string OpMsgMessage::CMD_KILL_CURSORS { "killCursors"s };
+const std::string OpMsgMessage::CMD_LIST_DATABASES { "listDatabases"s };
+const std::string OpMsgMessage::CMD_LIST_INDEXES { "listIndexes"s };
 
 // Diagnostic
-const std::string OpMsgMessage::CMD_BUILD_INFO { "buildInfo" };
-const std::string OpMsgMessage::CMD_COLL_STATS { "collStats" };
-const std::string OpMsgMessage::CMD_DB_STATS { "dbStats" };
-const std::string OpMsgMessage::CMD_HOST_INFO { "hostInfo" };
+const std::string OpMsgMessage::CMD_BUILD_INFO { "buildInfo"s };
+const std::string OpMsgMessage::CMD_COLL_STATS { "collStats"s };
+const std::string OpMsgMessage::CMD_DB_STATS { "dbStats"s };
+const std::string OpMsgMessage::CMD_HOST_INFO { "hostInfo"s };
 
 
 static const std::string& commandIdentifier(const std::string& command);
 	/// Commands have different names for the payload that is sent in a separate section
 
 
-static const std::string keyCursor		{"cursor"};
-static const std::string keyFirstBatch	{"firstBatch"};
-static const std::string keyNextBatch	{"nextBatch"};
+static const std::string keyCursor		{ "cursor"s };
+static const std::string keyFirstBatch	{ "firstBatch"s };
+static const std::string keyNextBatch	{ "nextBatch"s };
 
+constexpr static Poco::UInt8 PAYLOAD_TYPE_0 { 0 };
+constexpr static Poco::UInt8 PAYLOAD_TYPE_1 { 1 };
 
 OpMsgMessage::OpMsgMessage() :
 	Message(MessageHeader::OP_MSG)
@@ -112,7 +114,7 @@ void OpMsgMessage::setCommandName(const std::string& command)
 	{
 		_body.add(_commandName, _collectionName);
 	}
-	_body.add("$db", _databaseName);
+	_body.add("$db"s, _databaseName);
 }
 
 
@@ -123,11 +125,11 @@ void OpMsgMessage::setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize)
 
 	// IMPORTANT: Command name must be first
 	_body.add(_commandName, cursorID);
-	_body.add("$db", _databaseName);
-	_body.add("collection", _collectionName);
+	_body.add("$db"s, _databaseName);
+	_body.add("collection"s, _collectionName);
 	if (batchSize > 0)
 	{
-		_body.add("batchSize", batchSize);
+		_body.add("batchSize"s, batchSize);
 	}
 }
 
@@ -146,7 +148,7 @@ void OpMsgMessage::setAcknowledgedRequest(bool ack)
 
 	_acknowledged = ack;
 
-	auto writeConcern = _body.get<Document::Ptr>("writeConcern", nullptr);
+	auto writeConcern = _body.get<Document::Ptr>("writeConcern"s, nullptr);
 	if (writeConcern)
 		writeConcern->remove("w");
 
@@ -158,9 +160,9 @@ void OpMsgMessage::setAcknowledgedRequest(bool ack)
 	{
 		_flags = _flags | MSG_MORE_TO_COME;
 		if (!writeConcern)
-			_body.addNewDocument("writeConcern").add("w", 0);
+			_body.addNewDocument("writeConcern"s).add("w"s, 0);
 		else
-			writeConcern->add("w", 0);
+			writeConcern->add("w"s, 0);
 	}
 
 }
@@ -205,9 +207,9 @@ const Document::Vector& OpMsgMessage::documents() const
 bool OpMsgMessage::responseOk() const
 {
 	Poco::Int64 ok {false};
-	if (_body.exists("ok"))
+	if (_body.exists("ok"s))
 	{
-		ok = _body.getInteger("ok");
+		ok = _body.getInteger("ok"s);
 	}
 	return (ok != 0);
 }
@@ -387,13 +389,13 @@ const std::string& commandIdentifier(const std::string& command)
 {
 	// Names of identifiers for commands that send bulk documents in the request
 	// The identifier is set in the section type 1.
-	static std::map<std::string, std::string> identifiers {
-		{ OpMsgMessage::CMD_INSERT, "documents" },
-		{ OpMsgMessage::CMD_DELETE, "deletes" },
-		{ OpMsgMessage::CMD_UPDATE, "updates" },
+	static const std::map<std::string, std::string> identifiers {
+		{ OpMsgMessage::CMD_INSERT, "documents"s },
+		{ OpMsgMessage::CMD_DELETE, "deletes"s },
+		{ OpMsgMessage::CMD_UPDATE, "updates"s },
 
 		// Not sure if create index can send document section
-		{ OpMsgMessage::CMD_CREATE_INDEXES, "indexes" }
+		{ OpMsgMessage::CMD_CREATE_INDEXES, "indexes"s }
 	};
 
 	const auto i = identifiers.find(command);
