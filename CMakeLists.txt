@@ -63,7 +63,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
 
 if(MSVC)
-	option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
+	option(POCO_MT "Set to OFF|ON (default is OFF) to control static build of POCO as /MT instead of /MD" OFF)
 
 	if(BUILD_SHARED_LIBS AND POCO_MT)
 		message(FATAL_ERROR "Cannot have both BUILD_SHARED_LIBS and POCO_MT")
