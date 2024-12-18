@@ -9,6 +9,7 @@
 #    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
 
 # Setting CXX Flag /MD or /MT and POSTFIX values i.e MDd / MD / MTd / MT / d
+# using CMake variable CMAKE_MSVC_RUNTIME_LIBRARY.
 #
 # For visual studio the library naming is as following:
 #  Dynamic libraries:
@@ -30,24 +31,10 @@ endif()
 
 if(MSVC)
 	if(POCO_MT)
-		set(CompilerFlags
-			CMAKE_CXX_FLAGS
-			CMAKE_CXX_FLAGS_DEBUG
-			CMAKE_CXX_FLAGS_RELEASE
-			CMAKE_CXX_FLAGS_RELWITHDEBINFO
-			CMAKE_CXX_FLAGS_MINSIZEREL
-			CMAKE_C_FLAGS
-			CMAKE_C_FLAGS_DEBUG
-			CMAKE_C_FLAGS_RELEASE
-			CMAKE_C_FLAGS_RELWITHDEBINFO
-			CMAKE_C_FLAGS_MINSIZEREL
-		)
-		foreach(CompilerFlag ${CompilerFlags})
-			string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-		endforeach()
-
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 		set(STATIC_POSTFIX "mt" CACHE STRING "Set static library postfix" FORCE)
 	else(POCO_MT)
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 		set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
 	endif(POCO_MT)
 
