@@ -14,6 +14,7 @@
 
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <algorithm>
 
 
@@ -121,39 +122,15 @@ bool NameValueCollection::has(const std::string& name) const
 }
 
 
-NameValueCollection::ConstIterator NameValueCollection::find(const std::string& name) const
-{
-	return _map.find(name);
-}
-
-
-NameValueCollection::ConstIterator NameValueCollection::begin() const
-{
-	return _map.begin();
-}
-
-
-NameValueCollection::ConstIterator NameValueCollection::end() const
-{
-	return _map.end();
-}
-
-
-bool NameValueCollection::empty() const
-{
-	return _map.empty();
-}
-
-
-std::size_t NameValueCollection::size() const
-{
-	return _map.size();
-}
-
-
 void NameValueCollection::erase(const std::string& name)
 {
 	_map.erase(name);
+}
+
+
+void NameValueCollection::erase(Iterator it)
+{
+	_map.erase(it);
 }
 
 
@@ -166,6 +143,13 @@ void NameValueCollection::secureErase(const std::string& name)
 		_map.erase(it);
 		it = _map.find(name);
 	}
+}
+
+
+void NameValueCollection::secureErase(Iterator it)
+{
+	Poco::secureClear(it->second);
+	_map.erase(it);
 }
 
 

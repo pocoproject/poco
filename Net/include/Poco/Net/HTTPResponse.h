@@ -178,6 +178,15 @@ public:
 		/// Adds the cookie to the response by
 		/// adding a Set-Cookie header.
 
+	void removeCookie(const std::string& cookieName);
+		/// Removes the Set-Cookie header for the cookie with the given name,
+		/// if the header is present. Otherwise does nothing.
+
+	void replaceCookie(const HTTPCookie& cookie);
+		/// Replaces a Set-Cookie header for the given cookie with the
+		/// updated cookie, or adds a new Set-Cookie header of none
+		/// is present for the given cookie.
+
 	void getCookies(std::vector<HTTPCookie>& cookies) const;
 		/// Returns a vector with all the cookies
 		/// set in the response header.
