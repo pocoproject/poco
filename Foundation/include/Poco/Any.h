@@ -60,7 +60,7 @@ union Placeholder
 	/// it will be placement-new-allocated into the local buffer
 	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
 	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
-	/// where the object was allocated (0 => heap, 1 => local).
+	/// where the object was allocated. See enum Allocation.
 	///
 	/// Important: for SOO builds, only same-type (or trivial both-empty no-op)
 	/// swap operation is allowed.
@@ -83,7 +83,7 @@ public:
 		// Forces to use optimised memset internally
 		// https://travisdowns.github.io/blog/2020/01/20/zero.html
 		std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
-		setAllocation(Allocation::EMPTY);
+		setAllocation(Allocation::POCO_ANY_EMPTY);
 	}
 
 	~Placeholder()
@@ -104,12 +104,12 @@ public:
 
 	bool isEmpty() const
 	{
-		return holder[SizeV] == Allocation::EMPTY;
+		return holder[SizeV] == Allocation::POCO_ANY_EMPTY;
 	}
 
 	bool isLocal() const
 	{
-		return holder[SizeV] == Allocation::LOCAL;
+		return holder[SizeV] == Allocation::POCO_ANY_LOCAL;
 	}
 
 	template<typename T, typename V,
@@ -118,7 +118,7 @@ public:
 	{
 		erase();
 		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
-		setAllocation(Allocation::LOCAL);
+		setAllocation(Allocation::POCO_ANY_LOCAL);
 		return reinterpret_cast<PlaceholderT*>(holder);
 	}
 
@@ -128,7 +128,7 @@ public:
 	{
 		erase();
 		pHolder = new T(value);
-		setAllocation(Allocation::EXTERNAL);
+		setAllocation(Allocation::POCO_ANY_EXTERNAL);
 		return pHolder;
 	}
 
@@ -142,32 +142,38 @@ public:
 
 private:
 	using AlignerType = std::max_align_t;
-	static_assert(sizeof(AlignerType) <= SizeV + 1, "Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory.");
+	static_assert(
+		sizeof(AlignerType) < SizeV,
+		"Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory."
+	);
 
-	enum Allocation : unsigned char {
-		EMPTY = 0,
-		LOCAL = 1,
-		EXTERNAL = 2
+	enum Allocation : unsigned char
+	{
+		POCO_ANY_EMPTY = 0,
+		POCO_ANY_LOCAL = 1,
+		POCO_ANY_EXTERNAL = 2
 	};
 
-	void setAllocation(Allocation state) const
+	void setAllocation(Allocation alloc) const
 	{
-		holder[SizeV] = state;
+		holder[SizeV] = alloc;
 	}
 
 	void destruct(bool clear)
 	{
-		switch (holder[SizeV])
+		const auto allocation {holder[SizeV]};
+		switch (allocation)
 		{
-		case Allocation::EMPTY:
+		case Allocation::POCO_ANY_EMPTY:
 			break;
-		case Allocation::LOCAL:
+		case Allocation::POCO_ANY_LOCAL:
 			{
+				// Do not deallocate, just explicitly call destructor
 				auto* h { reinterpret_cast<PlaceholderT*>(holder) };
 				h->~PlaceholderT();
 			}
 			break;
-		case Allocation::EXTERNAL:
+		case Allocation::POCO_ANY_EXTERNAL:
 			{
 				auto* h { pHolder };
 				pHolder = nullptr;
@@ -178,12 +184,12 @@ private:
 			poco_bugcheck();
 			break;
 		}
+		setAllocation(Allocation::POCO_ANY_EMPTY);
 		if (clear)
 		{
 			// Force to use optimised memset internally
 			std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
 		}
-		setAllocation(Allocation::EMPTY);
 	}
 
 	mutable unsigned char holder[SizeV+1];
@@ -279,8 +285,11 @@ public:
 	}
 
 	~Any() = default;
-		/// Destructor. If Any is locally held, calls ValueHolder destructor;
-		/// otherwise, deletes the placeholder from the heap.
+		/// Destructor.
+		/// Small Object Optimization mode behavior:
+		/// Invokes the Placeholder destructor, which calls the
+		/// ValueHolder destructor explicitly (locally held Any), or
+		/// deletes the ValueHolder heap memory (heap-allocated Any).
 
 	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.

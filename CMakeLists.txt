@@ -58,7 +58,7 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
 
