@@ -33,6 +33,8 @@ public:
 	void testInvalid2();
 	void testInvalid3();
 	void testCookies();
+	void testReplaceCookie();
+	void testRemoveCookie();
 
 	void setUp();
 	void tearDown();
