@@ -38,6 +38,8 @@ if(MSVC)
 		set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
 	endif(POCO_MT)
 
+	message(STATUS "MSVC runtime library: ${CMAKE_MSVC_RUNTIME_LIBRARY}")
+
 	if(POCO_SANITIZE_ASAN)
 		message(WARNING "Use POCO_SANITIZEFLAGS instead of POCO_SANITIZE_ASAN")
 		add_compile_options("/fsanitize=address")
