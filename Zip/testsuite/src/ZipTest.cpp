@@ -11,6 +11,7 @@
 #include "ZipTest.h"
 #include "Poco/Zip/SkipCallback.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
+#include "Poco/Zip/ZipException.h"
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/ZipStream.h"
 #include "Poco/Zip/Decompress.h"
@@ -287,6 +288,80 @@ void ZipTest::testDecompressZip64()
 }
 
 
+void ZipTest::testDecompressConsistency()
+{
+	// test archives with borked file headers, but correct directory
+	const std::string testArchives[] =
+	{
+		"consistency-crc32.zip",
+		"consistency-uncompressed.zip"
+	};
+
+
+	for (const std::string &archive : testArchives)
+	{
+		//
+		// test decompressing all files
+		//
+		{
+			Poco::FileInputStream inputStream(getTestFile("data", archive));
+			assertTrue (inputStream.good());
+
+			Decompress dec(inputStream, Poco::Path::temp());
+
+			try {
+				dec.decompressAllFiles();
+				assertTrue (false);
+			}
+			catch (const ZipException &e)
+			{
+			}
+		}
+
+		
+		//
+		// test decompressing all files (ignore consistency check)
+		//
+		{
+			Poco::FileInputStream inputStream(getTestFile("data", archive));
+			assertTrue (inputStream.good());
+
+			Decompress dec(inputStream, Poco::Path::temp());
+
+			// should not throw since consistency checks are ignored
+			try {
+				dec.decompressAllFiles(false);
+			}
+			catch (const ZipException &e)
+			{
+				assertTrue (false);
+			}
+		}
+
+
+		//
+		// test decompressing single file
+		//
+		{
+			Poco::FileInputStream inputStream(getTestFile("data", archive));
+			assertTrue (inputStream.good());
+
+			ZipArchive archive(inputStream);
+
+			// File decompression code is skipped since
+			// we are not expecting archive to be processed further
+			try
+			{
+				archive.checkConsistency();
+				assertTrue (false);
+			}
+			catch (const ZipException &e)
+			{
+			}
+		}
+	};
+}
+
 void ZipTest::testValidPath()
 {
 	assertTrue (ZipCommon::isValidPath("."));
@@ -357,6 +432,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataEncapsulated);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
 	CppUnit_addTest(pSuite, ZipTest, testValidPath);
+	CppUnit_addTest(pSuite, ZipTest, testDecompressConsistency);
 
 	return pSuite;
 }

@@ -29,6 +29,7 @@ public:
 	void testDecompressSingleFile();
 	void testDecompressSingleFileInDir();
 	void testDecompress();
+	void testDecompressConsistency();
 	void testDecompressFlat();
 	void testDecompressVuln();
 	void testDecompressFlatVuln();

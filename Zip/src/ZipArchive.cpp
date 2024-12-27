@@ -14,6 +14,7 @@
 
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/SkipCallback.h"
+#include "Poco/Zip/ZipException.h"
 #include "Poco/Exception.h"
 #include <cstring>
 
@@ -59,6 +60,32 @@ ZipArchive::ZipArchive(std::istream& in, ParseCallback& pc):
 
 ZipArchive::~ZipArchive()
 {
+}
+
+
+void ZipArchive::checkConsistency()
+{
+	for (const auto& [filename, dirHeader]: _infos)
+	{
+		Poco::UInt32 dirCRC = dirHeader.getCRC();
+		Poco::UInt64 dirUncompressedSize = dirHeader.getUncompressedSize();
+
+		const auto dataIt = _entries.find(filename);
+		if (dataIt != _entries.end())
+		{
+			const ZipLocalFileHeader &dataHeader = dataIt->second;
+
+			Poco::UInt32 dataCRC = dataHeader.getCRC();
+			Poco::UInt64 dataUncompressedSize = dataHeader.getUncompressedSize();
+
+			if (dataCRC != dirCRC)
+				throw ZipException("CRC-32 mismatch: ", filename);
+
+			if (dataUncompressedSize != dirUncompressedSize)
+				throw ZipException("Uncompressed size mismatch: ", filename);
+		}
+	}
+
 }
 
 

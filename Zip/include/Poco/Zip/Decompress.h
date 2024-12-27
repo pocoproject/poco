@@ -55,9 +55,10 @@ public:
 	~Decompress() override;
 		/// Destroys the Decompress.
 
-	ZipArchive decompressAllFiles();
+	ZipArchive decompressAllFiles(const bool checkConsistency = true);
 		/// Decompresses all files stored in the zip File. Can only be called once per Decompress object.
 		/// Use mapping to retrieve the location of the decompressed files
+		/// if checkConsistency is set to false, archive won't be checked for consistency before decompression
 
 	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr) override;
 
