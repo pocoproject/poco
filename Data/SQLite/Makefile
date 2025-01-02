@@ -15,6 +15,10 @@ SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS \
 objects = Binder Extractor Notifier SessionImpl Connector \
 	SQLiteException SQLiteStatementImpl Utility
 
+ifdef POCO_ENABLE_SQLITE_FTS5
+		SYSFLAGS += -DSQLITE_ENABLE_FTS5
+endif
+
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lsqlite3
 else
