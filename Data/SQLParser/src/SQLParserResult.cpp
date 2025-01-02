@@ -67,7 +67,7 @@ int SQLParserResult::errorColumn() const { return errorColumn_; }
 void SQLParserResult::setIsValid(bool isValid) { isValid_ = isValid; }
 
 void SQLParserResult::setErrorDetails(char* errorMsg, int errorLine, int errorColumn) {
-  if (errorMsg_) free(errorMsg);
+  if (errorMsg_) free(errorMsg_);
   errorMsg_ = errorMsg;
   errorLine_ = errorLine;
   errorColumn_ = errorColumn;
