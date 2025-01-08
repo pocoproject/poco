@@ -150,7 +150,7 @@ namespace Poco {
 
 using LineNumber = decltype(__LINE__);
 
-}
+} // namespace Poco
 
 //
 // Pull in basic definitions
