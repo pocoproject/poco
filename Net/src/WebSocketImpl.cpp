@@ -262,14 +262,14 @@ void WebSocketImpl::setMaxPayloadSize(int maxPayloadSize)
 }
 
 
-int WebSocketImpl::receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask)
+int WebSocketImpl::receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset)
 {
 	int received = receiveNBytes(reinterpret_cast<char*>(buffer), payloadLength);
 	if (received > 0 && useMask)
 	{
 		for (int i = 0; i < received; i++)
 		{
-			buffer[i] ^= mask[i % MASK_LENGTH];
+			buffer[i] ^= mask[(i + maskOffset) % MASK_LENGTH];
 		}
 	}
 	return received;
@@ -297,7 +297,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 
 		skipHeader(_receiveState.headerLength);
 
-		if (receivePayload(reinterpret_cast<char*>(buffer), payloadLength, _receiveState.mask, _receiveState.useMask) != payloadLength)
+		if (receivePayload(reinterpret_cast<char*>(buffer), payloadLength, _receiveState.mask, _receiveState.useMask, 0) != payloadLength)
 			throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
 
 		return payloadLength;
@@ -326,17 +326,19 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 			throw WebSocketException(Poco::format("Insufficient buffer for payload size %d", _receiveState.payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		}
 		int payloadOffset = _receiveState.payloadLength - _receiveState.remainingPayloadLength;
-		int n = receivePayload(_receiveState.payload.begin() + payloadOffset, _receiveState.remainingPayloadLength, _receiveState.mask, _receiveState.useMask);
+		int n = receivePayload(_receiveState.payload.begin() + payloadOffset, _receiveState.remainingPayloadLength, _receiveState.mask, _receiveState.useMask, _receiveState.maskOffset);
 		if (n > 0)
 		{
 			_receiveState.remainingPayloadLength -= n;
 			if (_receiveState.remainingPayloadLength == 0)
 			{
+				_receiveState.maskOffset = 0;
 				std::memcpy(buffer, _receiveState.payload.begin(), _receiveState.payloadLength);
 				return _receiveState.payloadLength;
 			}
 			else
 			{
+				_receiveState.maskOffset += n;
 				return -1;
 			}
 		}
@@ -369,7 +371,7 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 		std::size_t oldSize = buffer.size();
 		buffer.resize(oldSize + payloadLength);
 
-		if (receivePayload(buffer.begin() + oldSize, payloadLength, _receiveState.mask, _receiveState.useMask) != payloadLength)
+		if (receivePayload(buffer.begin() + oldSize, payloadLength, _receiveState.mask, _receiveState.useMask, 0) != payloadLength)
 			throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
 
 		return payloadLength;
@@ -387,12 +389,13 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 			_receiveState.payload.resize(payloadLength, false);
 		}
 		int payloadOffset = _receiveState.payloadLength - _receiveState.remainingPayloadLength;
-		int n = receivePayload(_receiveState.payload.begin() + payloadOffset, _receiveState.remainingPayloadLength, _receiveState.mask, _receiveState.useMask);
+		int n = receivePayload(_receiveState.payload.begin() + payloadOffset, _receiveState.remainingPayloadLength, _receiveState.mask, _receiveState.useMask, _receiveState.maskOffset);
 		if (n > 0)
 		{
 			_receiveState.remainingPayloadLength -= n;
 			if (_receiveState.remainingPayloadLength == 0)
 			{
+				_receiveState.maskOffset = 0;
 				std::size_t oldSize = buffer.size();
 				buffer.resize(oldSize + _receiveState.payloadLength);
 
@@ -401,6 +404,7 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 			}
 			else
 			{
+				_receiveState.maskOffset += n;
 				return -1;
 			}
 		}
