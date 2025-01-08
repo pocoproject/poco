@@ -157,6 +157,12 @@ void SocketReactor::sleep()
 }
 
 
+void SocketReactor::start()
+{
+	_stop.exchange(false);
+}
+
+
 void SocketReactor::stop()
 {
 	if (_stop.exchange(true)) return;
