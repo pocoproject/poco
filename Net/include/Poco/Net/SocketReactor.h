@@ -186,6 +186,9 @@ public:
 		/// until stop() is called (in a separate thread).
 		/// Can be overriden by inheriting classes.
 
+	void start();
+		/// Starts the SocketReactor.
+
 	void stop();
 		/// Stops the SocketReactor.
 		///
