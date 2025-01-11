@@ -213,7 +213,7 @@ bool NTLMCredentials::parseChallengeMessage(const unsigned char* buffer, std::si
 	reader >> zero;
 	if (zero != 0) return false;
 
-	Poco::UInt32 type;
+	Poco::UInt32 type = 0;
 	reader >> type;
 	if (type != NTLM_MESSAGE_TYPE_CHALLENGE) return false;
 
