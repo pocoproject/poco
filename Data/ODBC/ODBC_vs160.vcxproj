@@ -677,7 +677,17 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\Unicode_UNIXODBC.cpp">
+	<ClCompile Include="src\Diagnostics.cpp">
+	  <MultiProcessorCompilation>true</MultiProcessorCompilation>
+	  <LanguageStandard>stdcpp17</LanguageStandard>
+	  <LanguageStandard_C>stdc11</LanguageStandard_C>
+	</ClCompile>
+	<ClCompile Include="src\Error.cpp">
+	  <MultiProcessorCompilation>true</MultiProcessorCompilation>
+	  <LanguageStandard>stdcpp17</LanguageStandard>
+	  <LanguageStandard_C>stdc11</LanguageStandard_C>
+	</ClCompile>
+	<ClCompile Include="src\Unicode_UNIXODBC.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>

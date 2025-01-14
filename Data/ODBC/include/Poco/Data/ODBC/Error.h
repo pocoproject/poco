@@ -126,12 +126,20 @@ private:
 
 // explicit instantiation definition
 #ifndef POCO_DOC
-template class Error<SQLHENV, SQL_HANDLE_ENV>;
-template class Error<SQLHDBC, SQL_HANDLE_DBC>;
-template class Error<SQLHSTMT, SQL_HANDLE_STMT>;
-template class Error<SQLHDESC, SQL_HANDLE_DESC>;
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class Error<SQLHENV, SQL_HANDLE_ENV>;
+extern template class Error<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class Error<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class Error<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API Error<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API Error<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API Error<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API Error<SQLHDESC, SQL_HANDLE_DESC>;
 #endif
 
+#endif
 
 using EnvironmentError = Error<SQLHENV, SQL_HANDLE_ENV>;
 using ConnectionError = Error<SQLHDBC, SQL_HANDLE_DBC>;
