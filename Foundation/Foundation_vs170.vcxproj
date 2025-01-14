@@ -1415,7 +1415,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|ARM64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\FileStreamRWLock.cpp" />
+	<ClCompile Include="src\BufferedBidirectionalStreamBuf.cpp" />
+	<ClCompile Include="src\BufferedStreamBuf.cpp" />
+	<ClCompile Include="src\UnbufferedStreamBuf.cpp" />
+	<ClCompile Include="src\FileStreamRWLock.cpp" />
     <ClCompile Include="src\FileStreamRWLock_POSIX.cpp">
     <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
     <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>

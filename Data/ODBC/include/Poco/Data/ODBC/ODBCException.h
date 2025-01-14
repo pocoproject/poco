@@ -140,10 +140,19 @@ private:
 
 // explicit instantiation definition
 #ifndef POCO_DOC
-template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
-template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
-template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
-template class HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
+extern template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API HandleException<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
+
 #endif
 
 
