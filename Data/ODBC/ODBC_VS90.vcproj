@@ -636,6 +636,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Diagnostics.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Error.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Unicode_UNIXODBC.cpp"
 					>
 					<FileConfiguration

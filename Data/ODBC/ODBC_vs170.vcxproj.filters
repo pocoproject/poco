@@ -122,6 +122,12 @@
     <ClCompile Include="src\Utility.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
+	<ClCompile Include="src\Diagnostics.cpp">
+	  <Filter>ODBC\Source Files</Filter>
+	</ClCompile>
+	<ClCompile Include="src\Error.cpp">
+	  <Filter>ODBC\Source Files</Filter>
+	</ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\DLLVersion.rc" />

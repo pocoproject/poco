@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/ODBC/Utility.h"
 #include <vector>
 #include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -243,10 +244,19 @@ private:
 
 // explicit instantiation definition
 #ifndef POCO_DOC
-template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
-template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
-template class Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
-template class Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+extern template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
+
 #endif
 
 
