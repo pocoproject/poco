@@ -464,14 +464,27 @@ int WebSocketImpl::peekSomeBytes(char* buffer, int length)
 		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
 		if (length > n)
 		{
-			int rc = _pStreamSocketImpl->receiveBytes(buffer + n, length - n, MSG_PEEK);
-			if (rc > 0) n += rc;
+			int rc = _pStreamSocketImpl->receiveBytes(buffer + n, length - n);
+			if (rc > 0) 
+			{
+				std::size_t currentSize = _buffer.size();
+				_buffer.resize(currentSize + rc);
+				std::memcpy(_buffer.begin() + currentSize, buffer + n, rc);
+				n += rc;
+			}
 		}
 		return n;
 	}
 	else
 	{
-		return _pStreamSocketImpl->receiveBytes(buffer, length, MSG_PEEK);
+		int rc = _pStreamSocketImpl->receiveBytes(buffer, length);
+		if (rc > 0)
+		{
+			_buffer.resize(rc);
+			std::memcpy(_buffer.begin(), buffer, rc);
+			_bufferOffset = 0;
+		}
+		return rc;
 	}
 }
 
