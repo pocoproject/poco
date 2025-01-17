@@ -85,6 +85,7 @@ using UIntPtr = std::uintptr_t;
 inline std::string Foundation_API demangle(const char* typeName)
 {
 	std::string result(typeName);
+#if __has_include(<cxxabi.h>)
 #ifdef POCO_HAVE_CXXABI_H
 	int status;
 	char* demangled = abi::__cxa_demangle(typeName, nullptr, nullptr, &status);
@@ -104,6 +105,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 		std::free(demangled);
 	}
+#endif
 #endif
 	return result;
 }
