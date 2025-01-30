@@ -15,10 +15,14 @@ POCO_SOURCES_AUTO_PLAT(SRCS WIN32
 	src/EventLogChannel.cpp
 	)
 
+
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
+	# Empty File needed otherwise cmake does not find it.
+	file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pocomsg.rc CONTENT "")
 	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND SRCS ${CMAKE_CURRENT_BINARY_DIR}/pocomsg.rc)
 endif()
 
 # Messages
