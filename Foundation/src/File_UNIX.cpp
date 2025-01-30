@@ -459,9 +459,14 @@ void FileImpl::removeImpl()
 }
 
 
-bool FileImpl::createFileImpl()
+bool FileImpl::createFileImpl(bool createDirectories = false)
 {
 	poco_assert (!_path.empty());
+
+	if(createDirectories) {
+		Path p(_path);
+		p.makeDirectory();
+	}
 
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
