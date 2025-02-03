@@ -162,6 +162,9 @@ public:
 	bool idle() const;
 		/// Returns true if the task queue is empty, otherwise false.
 
+	std::size_t taskCount() const;
+		/// Returns the number of tasks currently scheduled in the timer.
+
 	template <typename Fn>
 	static TimerTask::Ptr func(const Fn& fn)
 		/// Helper function template to use a functor or lambda
@@ -197,6 +200,12 @@ private:
 inline bool Timer::idle() const
 {
 	return _queue.empty();
+}
+
+
+inline std::size_t Timer::taskCount() const
+{
+	return _queue.size();
 }
 
 
