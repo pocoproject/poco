@@ -33,6 +33,7 @@ class Net_API HTTPBufferAllocator
 public:
 	static char* allocate(std::streamsize size);
 	static void deallocate(char* ptr, std::streamsize size);
+	static const Poco::MemoryPool& pool();
 
 	enum
 	{
@@ -42,6 +43,17 @@ public:
 private:
 	static Poco::MemoryPool _pool;
 };
+
+
+//
+// inlines
+//
+
+
+inline const Poco::MemoryPool& HTTPBufferAllocator::pool()
+{
+	return _pool;
+}
 
 
 } } // namespace Poco::Net
