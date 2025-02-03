@@ -98,6 +98,12 @@ void NumberParserTest::testParse()
 	assertTrue (NumberParser::parseOct64("0123") == 0123);
 #endif
 
+	unsigned int u;
+	assertFalse (NumberParser::tryParseHex("1,000", u));
+
+	int i;
+	assertTrue (NumberParser::tryParse("1,000", i));
+
 #ifndef POCO_NO_FPENVIRONMENT
 	for (int i = 0; i < 2; ++i)
 	{
