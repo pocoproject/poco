@@ -99,6 +99,9 @@ private:
 
 		assertTrue (Poco::strToInt("0", result, 010)); assertTrue (result == 0);
 		assertTrue (Poco::strToInt("000", result, 010)); assertTrue (result == 0);
+
+		assertFalse (Poco::strToInt("1,000", result, 0x10));
+		assertFalse (Poco::strToInt("ABCDEFG", result, 0x10));
 	}
 
 	template <typename Larger, typename Smaller>

@@ -242,7 +242,8 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		if (*pStr == thSep)
 		{
 			if (base == 10) continue;
-			throw Poco::SyntaxException("strToInt: thousand separators only allowed for base 10");
+			// thousand separators only allowed for base 10
+			return false;
 		}
 		if (result > (limitCheck / base)) return false;
 		if (!safeMultiply(result, result, base)) return false;
