@@ -247,12 +247,16 @@
 
 #if defined(__clang__)
 	#define POCO_COMPILER_CLANG
-	#define POCO_HAVE_CXXABI_H
+	#if __has_include(<cxxabi.h>)
+		#define POCO_HAVE_CXXABI_H
+	#endif
 #elif defined(_MSC_VER)
 	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
-	#define POCO_HAVE_CXXABI_H
+	#if __has_include(<cxxabi.h>)
+		#define POCO_HAVE_CXXABI_H
+	#endif
 	#if defined (__MINGW32__) || defined (__MINGW64__)
 		#define POCO_COMPILER_MINGW
 	#endif
