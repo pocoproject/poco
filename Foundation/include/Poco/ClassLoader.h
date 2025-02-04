@@ -139,7 +139,7 @@ public:
 		}
 	}
 
-	void loadLibrary(const std::string& path, const std::string& manifest)
+	void loadLibrary(const std::string& path, const std::string& manifest, int flags = 0)
 		/// Loads a library from the given path, using the given manifest.
 		/// Does nothing if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
@@ -161,7 +161,7 @@ public:
 			li.refCount  = 1;
 			try
 			{
-				li.pLibrary  = new SharedLibrary(path);
+				li.pLibrary  = new SharedLibrary(path, flags);
 				li.pManifest = new Manif();
 				std::string pocoBuildManifestSymbol("pocoBuildManifest");
 				pocoBuildManifestSymbol.append(manifest);
