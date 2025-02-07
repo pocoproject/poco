@@ -128,6 +128,12 @@ if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER "3.8")
 	target_compile_features(Foundation PUBLIC cxx_std_14)
 endif()
 
+if(NOT BUILD_SHARED_LIBS)
+	# The define must be set here to be included in the generated CMake files
+	# and properly detect build in the installed files.
+	target_compile_definitions(Foundation PUBLIC POCO_STATIC)
+endif()
+
 if(WIN32)
 	target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
