@@ -135,8 +135,8 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 #ifdef POCO_HAVE_SENDFILE
 			_pStream->flush(); // flush the HTTP headers to the socket, required by HTTP 1.0 and above
 
-			Poco::IntPtr sent = 0;
-			Poco::IntPtr offset = 0;
+			std::streamsize sent = 0;
+			std::streamoff offset = 0;
 			while (sent < length)
 			{
 				offset = sent;

@@ -696,6 +696,27 @@ void SocketImpl::sendUrgent(unsigned char data)
 }
 
 
+
+
+std::streamsize SocketImpl::sendFile(FileInputStream& fileInputStream, std::streamoff offset)
+{
+	if (!getBlocking()) throw NetException("sendFile() not supported for non-blocking sockets");
+
+#ifdef POCO_HAVE_SENDFILE
+	if (secure())
+	{
+		return sendFileBlockwise(fileInputStream, offset);
+	}
+	else
+	{
+		return sendFileNative(fileInputStream, offset);
+	}
+#else
+	return sendFileBlockwise(fileInputStream, offset);
+#endif
+}
+
+
 int SocketImpl::available()
 {
 	int result = 0;
@@ -1424,9 +1445,13 @@ void SocketImpl::error(int code, const std::string& arg)
 		throw IOException(NumberFormatter::format(code), arg, code);
 	}
 }
+
+
 #ifdef POCO_HAVE_SENDFILE
 #ifdef POCO_OS_FAMILY_WINDOWS
-Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset)
+
+
+std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std::streamoff offset)
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
 	UInt64 fileSize = fileInputStream.size();
@@ -1441,52 +1466,61 @@ Poco::Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, Poco::UInt64 
 	if (overlapped.hEvent == nullptr)
 	{
 		int err = GetLastError();
-		error(err, std::string("[sendfile error]") + Error::getMessage(err));
+		error(err);
 	}
 	bool result = TransmitFile(_sockfd, fd, sentSize, 0, &overlapped, nullptr, 0);
 	if (!result)
 	{
 		int err = WSAGetLastError();
-		if ((err != ERROR_IO_PENDING) && (WSAGetLastError() != WSA_IO_PENDING)) {
+		if ((err != ERROR_IO_PENDING) && (WSAGetLastError() != WSA_IO_PENDING)) 
+		{
 			CloseHandle(overlapped.hEvent);
-			error(err, std::string("[sendfile error]") + Error::getMessage(err));
+			error(err);
 		}
 		WaitForSingleObject(overlapped.hEvent, INFINITE);
 	}
 	CloseHandle(overlapped.hEvent);
 	return sentSize;
 }
+
+
 #else
-Int64 _sendfile(poco_socket_t sd, FileIOS::NativeHandle fd, UInt64 offset, std::streamoff sentSize)
+
+
+namespace
 {
-	Int64 sent = 0;
-#ifdef __USE_LARGEFILE64
-	sent = sendfile64(sd, fd, (off64_t *)&offset, sentSize);
-#else
-#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
-	sent = sendfile(sd, fd, (off_t *)&offset, sentSize);
-#elif POCO_OS == POCO_OS_MAC_OS_X
-	int result = sendfile(fd, sd, offset, &sentSize, nullptr, 0);
-	if (result < 0)
+	std::streamsize sendFilePosix(poco_socket_t sd, FileIOS::NativeHandle fd, std::streamsize offset, std::streamoff sentSize)
 	{
-		sent = -1;
-	} 
-	else 
-	{
-		sent = sentSize;
-	}
-#else
-	throw Poco::NotImplementedException("sendfile not implemented for this platform");
-#endif
-#endif
-	if (errno == EAGAIN || errno == EWOULDBLOCK) 
-	{
-		sent = 0;
-	}
-	return sent;
+		Int64 sent = 0;
+	#ifdef __USE_LARGEFILE64
+		sent = sendfile64(sd, fd, (off64_t*) &offset, sentSize);
+	#else
+		#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
+			sent = sendfile(sd, fd, (off_t*) &offset, sentSize);
+		#elif POCO_OS == POCO_OS_MAC_OS_X
+			int result = sendfile(fd, sd, offset, &sentSize, nullptr, 0);
+			if (result < 0)
+			{
+				sent = -1;
+			} 
+			else 
+			{
+				sent = sentSize;
+			}
+		#else
+			throw Poco::NotImplementedException("sendfile not implemented for this platform");
+		#endif
+	#endif
+		if (errno == EAGAIN || errno == EWOULDBLOCK) 
+		{
+			sent = 0;
+		}
+		return sent;
+	}	
 }
 
-Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, UInt64 offset)
+
+std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std::streamoff offset)
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
 	UInt64 fileSize = fileInputStream.size();
@@ -1500,20 +1534,46 @@ Int64 SocketImpl::sendFile(FileInputStream &fileInputStream, UInt64 offset)
 	while (sent == 0)
 	{
 		errno = 0;
-		sent = _sendfile(_sockfd, fd, offset, sentSize);
+		sent = sendFilePosix(_sockfd, fd, offset, sentSize);
 		if (sent < 0)
 		{
-			error(errno, std::string("[sendfile error]") + Error::getMessage(errno));
+			error(errno);
 		}
 	}
-	if(old_sa.sa_handler == SIG_ERR)
+	if (old_sa.sa_handler == SIG_ERR)
 	{
 		old_sa.sa_handler = SIG_DFL;
 	}
 	sigaction(SIGPIPE, &old_sa, nullptr);
 	return sent;
 }
+
+
 #endif // POCO_OS_FAMILY_WINDOWS
 #endif // POCO_HAVE_SENDFILE
+
+
+std::streamsize SocketImpl::sendFileBlockwise(FileInputStream& fileInputStream, std::streamoff offset)
+{
+	fileInputStream.seekg(offset);
+	Poco::Buffer<char> buffer(8192);
+
+	std::streamsize len = 0;
+	fileInputStream.read(buffer.begin(), buffer.size());
+	std::streamsize n = fileInputStream.gcount();
+	while (n > 0)
+	{
+		len += n;
+		sendBytes(buffer.begin(), n);
+		if (fileInputStream)
+		{
+			fileInputStream.read(buffer.begin(), buffer.size());
+			n = fileInputStream.gcount();
+		}
+		else n = 0;
+	}
+	return len;
+}
+
 
 } } // namespace Poco::Net
