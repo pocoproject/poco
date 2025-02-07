@@ -221,7 +221,6 @@ void SecureStreamSocketTest::testSendFile()
 	
 	Poco::FileInputStream istr(file.path());
 	std::streamsize sent = 0;
-	std::streamoff off = 0;
 	while (sent < file.getSize())
 	{
 		sent += ss.sendFile(istr, sent);
