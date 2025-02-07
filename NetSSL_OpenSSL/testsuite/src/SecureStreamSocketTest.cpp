@@ -25,6 +25,9 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
+#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
 #include <iostream>
 
 
@@ -200,6 +203,49 @@ void SecureStreamSocketTest::testNB()
 }
 
 
+void SecureStreamSocketTest::testSendFile()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData = "Hello, world!";
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr.write(sentData.data(), sentData.size());
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	std::streamsize sent = 0;
+	std::streamoff off = 0;
+	while (sent < file.getSize())
+	{
+		sent += ss.sendFile(istr, sent);
+	}
+	istr.close();
+
+	std::string receivedData;
+	char buffer[1024];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	while (n > 0)
+	{
+		receivedData.append(buffer, n);
+		if (receivedData.size() < sentData.size())
+			n = ss.receiveBytes(buffer, sizeof(buffer));
+		else
+			n = 0;
+	}
+
+	assertTrue (receivedData == sentData);
+
+	ss.close();
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -217,6 +263,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendReceive);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeek);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFile);
 
 	return pSuite;
 }

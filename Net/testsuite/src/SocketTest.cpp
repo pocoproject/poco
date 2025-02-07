@@ -22,6 +22,8 @@
 #include "Poco/FIFOBuffer.h"
 #include "Poco/Delegate.h"
 #include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
 #include "Poco/Path.h"
 #include <iostream>
 
@@ -667,6 +669,46 @@ void SocketTest::testUseFd()
 }
 
 
+void SocketTest::testSendFile()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+
+	std::string sentData = "Hello, world!";
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr.write(sentData.data(), sentData.size());
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	std::streamsize sent = 0;
+	std::streamoff off = 0;
+	while (sent < file.getSize())
+	{
+		sent += ss.sendFile(istr, sent);
+	}
+	istr.close();
+
+	std::string receivedData;
+	char buffer[1024];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	while (n > 0)
+	{
+		receivedData.append(buffer, n);
+		if (receivedData.size() < sentData.size())
+			n = ss.receiveBytes(buffer, sizeof(buffer));
+		else
+			n = 0;
+	}
+
+	assertTrue (receivedData == sentData);
+
+	ss.close();
+}
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -724,6 +766,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 	CppUnit_addTest(pSuite, SocketTest, testUseFd);
+	CppUnit_addTest(pSuite, SocketTest, testSendFile);
 
 	return pSuite;
 }
