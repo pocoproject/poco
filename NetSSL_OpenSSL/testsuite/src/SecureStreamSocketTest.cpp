@@ -274,6 +274,7 @@ void SecureStreamSocketTest::testSendFile()
 	istr.close();
 	ss.close();
 
+	Poco::Thread::sleep(200);
 	while (srv.currentConnections() > 0) 
 	{
 		Poco::Thread::sleep(100);
@@ -312,6 +313,7 @@ void SecureStreamSocketTest::testSendFileLarge()
 	istr.close();
 	ss.close();
 
+	Poco::Thread::sleep(200);
 	while (srv.currentConnections() > 0) 
 	{
 		Poco::Thread::sleep(100);
@@ -353,6 +355,7 @@ void SecureStreamSocketTest::testSendFileRange()
 	istr.close();
 	ss.close();
 
+	Poco::Thread::sleep(200);
 	while (srv.currentConnections() > 0) 
 	{
 		Poco::Thread::sleep(100);
