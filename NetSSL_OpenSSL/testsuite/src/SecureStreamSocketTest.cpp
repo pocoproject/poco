@@ -259,7 +259,9 @@ void SecureStreamSocketTest::testSendFile()
 	ostr.close();
 	
 	Poco::FileInputStream istr(file.path());
-	ss.sendFile(istr);
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+
 	istr.close();
 	ss.close();
 
@@ -294,7 +296,9 @@ void SecureStreamSocketTest::testSendFileLarge()
 	ostr.close();
 	
 	Poco::FileInputStream istr(file.path());
-	ss.sendFile(istr);
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+
 	istr.close();
 	ss.close();
 
@@ -332,7 +336,9 @@ void SecureStreamSocketTest::testSendFileRange()
 	const std::streamsize count = 10000;
 
 	Poco::FileInputStream istr(file.path());
-	ss.sendFile(istr, offset, count);
+	std::streamsize n = ss.sendFile(istr, offset, count);
+	assertTrue (n == count);
+
 	istr.close();
 	ss.close();
 
@@ -340,9 +346,6 @@ void SecureStreamSocketTest::testSendFileRange()
 	{
 		Poco::Thread::sleep(100);
 	}
-
-	std::cout << "\n" << fileData.size() << std::endl;
-	std::cout << "\n" << CopyToStringConnection::data().size() << std::endl;
 
 	assertTrue (CopyToStringConnection::data() == fileData.substr(offset, count));
 }

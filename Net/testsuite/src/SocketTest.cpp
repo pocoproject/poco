@@ -736,7 +736,9 @@ void SocketTest::testSendFile()
 	ostr.close();
 	
 	Poco::FileInputStream istr(file.path());
-	ss.sendFile(istr);
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+
 	istr.close();
 	ss.close();
 
@@ -771,7 +773,9 @@ void SocketTest::testSendFileLarge()
 	ostr.close();
 	
 	Poco::FileInputStream istr(file.path());
-	ss.sendFile(istr);
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+	
 	istr.close();
 	ss.close();
 
@@ -809,7 +813,9 @@ void SocketTest::testSendFileRange()
 	const std::streamsize count = 10000;
 
 	Poco::FileInputStream istr(file.path());
-	ss.sendFile(istr, offset, count);
+	std::streamsize n = ss.sendFile(istr, offset, count);
+	assertTrue (n == count);
+
 	istr.close();
 	ss.close();
 
