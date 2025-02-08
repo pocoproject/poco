@@ -267,17 +267,26 @@ public:
 		///
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
-#ifdef POCO_HAVE_SENDFILE
-	IntPtr sendFile(FileInputStream &FileInputStream, UIntPtr offset = 0);
-		/// Sends file using system function
-		/// for posix systems - with sendfile[64](...)
-		/// for windows - with TransmitFile(...)
+
+	std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
+		/// Sends the contents of a file in an optimized way, if possible.
+		///
+		/// If count is != 0, sends the given number of bytes, otherwise
+		/// sends all bytes, starting from the given offset.
+		///
+		/// On POSIX systems, this means using sendfile() or sendfile64().
+		/// On Windows, this means using TransmitFile().
+		///
+		/// If neither is available, or the socket is a SecureSocketImpl() 
+		/// (secure() returns true), falls back to reading the file
+		/// block by block and callind sendBytes().
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 		///
 		/// Throws NetException (or a subclass) in case of any errors.
-#endif
+		/// Also throws if the socket is non-blocking.
+
 	StreamSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
 		/// The socket takes ownership of the SocketImpl.

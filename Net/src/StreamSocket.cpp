@@ -212,10 +212,12 @@ void StreamSocket::sendUrgent(unsigned char data)
 {
 	impl()->sendUrgent(data);
 }
-#ifdef POCO_HAVE_SENDFILE
-IntPtr StreamSocket::sendFile(FileInputStream &fileInputStream, UIntPtr offset)
+
+
+std::streamsize StreamSocket::sendFile(Poco::FileInputStream& fileInputStream, std::streamoff offset, std::streamsize count)
 {
-	return impl()->sendFile(fileInputStream, offset);
+	return impl()->sendFile(fileInputStream, offset, count);
 }
-#endif
+
+
 } } // namespace Poco::Net
