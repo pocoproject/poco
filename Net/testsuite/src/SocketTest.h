@@ -45,9 +45,13 @@ public:
 	void testSelect2();
 	void testSelect3();
 #endif
+
 	void testEchoUnixLocal();
 	void testUnixLocalAbstract();
 	void testUseFd();
+	void testSendFile();
+	void testSendFileLarge();
+	void testSendFileRange();
 
 	void setUp() override;
 	void tearDown() override;

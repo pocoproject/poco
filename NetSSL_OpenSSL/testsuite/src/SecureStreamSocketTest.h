@@ -27,6 +27,9 @@ public:
 	void testSendReceive();
 	void testPeek();
 	void testNB();
+	void testSendFile();
+	void testSendFileLarge();
+	void testSendFileRange();
 
 	void setUp();
 	void tearDown();

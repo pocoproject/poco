@@ -287,6 +287,25 @@ public:
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
 
+	virtual std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
+		/// Sends the contents of a file in an optimized way, if possible.
+		///
+		/// If count is != 0, sends the given number of bytes, otherwise
+		/// sends all bytes, starting from the given offset.
+		///
+		/// On POSIX systems, this means using sendfile() or sendfile64().
+		/// On Windows, this means using TransmitFile().
+		///
+		/// If neither is available, or the socket is a SecureSocketImpl() 
+		/// (secure() returns true), falls back to reading the file
+		/// block by block and callind sendBytes().
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+		///
+		/// Throws NetException (or a subclass) in case of any errors.
+		/// Also throws if the socket is non-blocking.
+
 	virtual int available();
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
@@ -487,17 +506,7 @@ public:
 
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
-#ifdef POCO_HAVE_SENDFILE
-	Int64 sendFile(FileInputStream &FileInputStream, UInt64 offset = 0);
-		/// Sends file using system function
-		/// for posix systems - with sendfile[64](...)
-		/// for windows - with TransmitFile(...)
-		///
-		/// Returns the number of bytes sent, which may be
-		/// less than the number of bytes specified.
-		///
-		/// Throws NetException (or a subclass) in case of any errors.
-#endif
+
 protected:
 	SocketImpl();
 		/// Creates a SocketImpl.
@@ -537,6 +546,14 @@ protected:
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
 
 	void checkBrokenTimeout(SelectMode mode);
+
+	std::streamsize sendFileNative(Poco::FileInputStream& FileInputStream, std::streamoff offset, std::streamsize count);
+		/// Implements sendFile() using an OS-specific API like
+		/// sendfile() or TransmitFile().
+
+	std::streamsize sendFileBlockwise(Poco::FileInputStream& FileInputStream, std::streamoff offset, std::streamsize count);
+		/// Implements sendFile() by reading the file blockwise and
+		/// calling sendBytes() for each block.
 
 	static int lastError();
 		/// Returns the last error code.
