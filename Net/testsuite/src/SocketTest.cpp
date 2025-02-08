@@ -15,6 +15,9 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServer.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
@@ -25,6 +28,7 @@
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include "Poco/Path.h"
+#include "Poco/Thread.h"
 #include <iostream>
 
 
@@ -33,6 +37,9 @@ using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::ConnectionRefusedException;
+using Poco::Net::TCPServerConnection;
+using Poco::Net::TCPServerConnectionFactoryImpl;
+using Poco::Net::TCPServer;
 using Poco::Timespan;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
@@ -42,6 +49,49 @@ using Poco::FIFOBuffer;
 using Poco::Path;
 using Poco::File;
 using Poco::delegate;
+
+
+namespace
+{
+	class CopyToStringConnection: public TCPServerConnection
+	{
+	public:
+		CopyToStringConnection(const StreamSocket& s): 
+			TCPServerConnection(s)
+		{
+		}
+
+		void run()
+		{
+			_data.clear();
+			StreamSocket& ss = socket();
+			try
+			{
+				char buffer[256];
+				int n = ss.receiveBytes(buffer, sizeof(buffer));
+				while (n > 0)
+				{
+					_data.append(buffer, n);
+					n = ss.receiveBytes(buffer, sizeof(buffer));
+				}
+			}
+			catch (Poco::Exception& exc)
+			{
+				std::cerr << "CopyToStringConnection: " << exc.displayText() << std::endl;
+			}
+		}
+
+		static const std::string& data()
+		{
+			return _data;
+		}
+
+	private:
+		static std::string _data;
+	};
+
+	std::string CopyToStringConnection::_data;
+}
 
 
 SocketTest::SocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -671,9 +721,12 @@ void SocketTest::testUseFd()
 
 void SocketTest::testSendFile()
 {
-	EchoServer echoServer;
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();	
+
 	StreamSocket ss;
-	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
 
 	std::string sentData = "Hello, world!";
 
@@ -683,28 +736,89 @@ void SocketTest::testSendFile()
 	ostr.close();
 	
 	Poco::FileInputStream istr(file.path());
-	std::streamsize sent = 0;
-	while (sent < file.getSize())
-	{
-		sent += ss.sendFile(istr, sent);
-	}
+	ss.sendFile(istr);
 	istr.close();
+	ss.close();
 
-	std::string receivedData;
-	char buffer[1024];
-	int n = ss.receiveBytes(buffer, sizeof(buffer));
-	while (n > 0)
+	while (srv.currentConnections() > 0) 
 	{
-		receivedData.append(buffer, n);
-		if (receivedData.size() < sentData.size())
-			n = ss.receiveBytes(buffer, sizeof(buffer));
-		else
-			n = 0;
+		Poco::Thread::sleep(100);
 	}
 
-	assertTrue (receivedData == sentData);
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
 
+
+void SocketTest::testSendFileLarge()
+{
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();	
+
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 10000; i++)
+	{
+		ostr.write(data.data(), data.size());
+		sentData += data;
+	}
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	ss.sendFile(istr);
+	istr.close();
 	ss.close();
+
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SocketTest::testSendFileRange()
+{
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();	
+
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 1024; i++)
+	{
+		ostr.write(data.data(), data.size());
+		sentData += data;
+	}
+	ostr.close();
+	
+	const std::streamoff offset = 4000;
+	const std::streamsize count = 10000;
+
+	Poco::FileInputStream istr(file.path());
+	ss.sendFile(istr, offset, count);
+	istr.close();
+	ss.close();
+
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+
+	assertTrue (CopyToStringConnection::data() == sentData.substr(offset, count));
 }
 
 
@@ -766,6 +880,8 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 	CppUnit_addTest(pSuite, SocketTest, testUseFd);
 	CppUnit_addTest(pSuite, SocketTest, testSendFile);
+	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
+	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);
 
 	return pSuite;
 }

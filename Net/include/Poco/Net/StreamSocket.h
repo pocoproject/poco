@@ -268,8 +268,11 @@ public:
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
 
-	std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0);
+	std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
 		/// Sends the contents of a file in an optimized way, if possible.
+		///
+		/// If count is != 0, sends the given number of bytes, otherwise
+		/// sends all bytes, starting from the given offset.
 		///
 		/// On POSIX systems, this means using sendfile() or sendfile64().
 		/// On Windows, this means using TransmitFile().

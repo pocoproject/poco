@@ -50,6 +50,8 @@ public:
 	void testUnixLocalAbstract();
 	void testUseFd();
 	void testSendFile();
+	void testSendFileLarge();
+	void testSendFileRange();
 
 	void setUp() override;
 	void tearDown() override;

@@ -214,9 +214,9 @@ void StreamSocket::sendUrgent(unsigned char data)
 }
 
 
-std::streamsize StreamSocket::sendFile(Poco::FileInputStream& fileInputStream, std::streamoff offset)
+std::streamsize StreamSocket::sendFile(Poco::FileInputStream& fileInputStream, std::streamoff offset, std::streamsize count)
 {
-	return impl()->sendFile(fileInputStream, offset);
+	return impl()->sendFile(fileInputStream, offset, count);
 }
 
 

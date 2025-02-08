@@ -75,6 +75,45 @@ namespace
 			}
 		}
 	};
+
+	class CopyToStringConnection: public TCPServerConnection
+	{
+	public:
+		CopyToStringConnection(const StreamSocket& s): 
+			TCPServerConnection(s)
+		{
+		}
+
+		void run()
+		{
+			_data.clear();
+			StreamSocket& ss = socket();
+			try
+			{
+				char buffer[256];
+				int n = ss.receiveBytes(buffer, sizeof(buffer));
+				while (n > 0)
+				{
+					_data.append(buffer, n);
+					n = ss.receiveBytes(buffer, sizeof(buffer));
+				}
+			}
+			catch (Poco::Exception& exc)
+			{
+				std::cerr << "CopyToStringConnection: " << exc.displayText() << std::endl;
+			}
+		}
+
+		static const std::string& data()
+		{
+			return _data;
+		}
+
+	private:
+		static std::string _data;
+	};
+
+	std::string CopyToStringConnection::_data;
 }
 
 
@@ -206,7 +245,7 @@ void SecureStreamSocketTest::testNB()
 void SecureStreamSocketTest::testSendFile()
 {
 	SecureServerSocket svs(0);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
 	srv.start();
 
 	SecureStreamSocket ss;
@@ -220,28 +259,92 @@ void SecureStreamSocketTest::testSendFile()
 	ostr.close();
 	
 	Poco::FileInputStream istr(file.path());
-	std::streamsize sent = 0;
-	while (sent < file.getSize())
-	{
-		sent += ss.sendFile(istr, sent);
-	}
+	ss.sendFile(istr);
 	istr.close();
+	ss.close();
 
-	std::string receivedData;
-	char buffer[1024];
-	int n = ss.receiveBytes(buffer, sizeof(buffer));
-	while (n > 0)
+	while (srv.currentConnections() > 0) 
 	{
-		receivedData.append(buffer, n);
-		if (receivedData.size() < sentData.size())
-			n = ss.receiveBytes(buffer, sizeof(buffer));
-		else
-			n = 0;
+		Poco::Thread::sleep(100);
 	}
 
-	assertTrue (receivedData == sentData);
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
 
+
+void SecureStreamSocketTest::testSendFileLarge()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 10000; i++)
+	{
+		ostr.write(data.data(), data.size());
+		sentData += data;
+	}
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	ss.sendFile(istr);
+	istr.close();
 	ss.close();
+
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SecureStreamSocketTest::testSendFileRange()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string fileData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 1024; i++)
+	{
+		ostr.write(data.data(), data.size());
+		fileData += data;
+	}
+	ostr.close();
+	
+	const std::streamoff offset = 4000;
+	const std::streamsize count = 10000;
+
+	Poco::FileInputStream istr(file.path());
+	ss.sendFile(istr, offset, count);
+	istr.close();
+	ss.close();
+
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+
+	std::cout << "\n" << fileData.size() << std::endl;
+	std::cout << "\n" << CopyToStringConnection::data().size() << std::endl;
+
+	assertTrue (CopyToStringConnection::data() == fileData.substr(offset, count));
 }
 
 
@@ -263,6 +366,8 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeek);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFile);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileLarge);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileRange);
 
 	return pSuite;
 }
