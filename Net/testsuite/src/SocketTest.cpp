@@ -63,7 +63,10 @@ namespace
 
 		void run()
 		{
-			_data.clear();
+			{
+				Poco::FastMutex::ScopedLock lock(_mutex);
+				_data.clear();
+			}
 			StreamSocket& ss = socket();
 			try
 			{
@@ -71,7 +74,10 @@ namespace
 				int n = ss.receiveBytes(buffer, sizeof(buffer));
 				while (n > 0)
 				{
-					_data.append(buffer, n);
+					{
+						Poco::FastMutex::ScopedLock lock(_mutex);
+						_data.append(buffer, n);
+					}
 					n = ss.receiveBytes(buffer, sizeof(buffer));
 				}
 			}
@@ -81,15 +87,18 @@ namespace
 			}
 		}
 
-		static const std::string& data()
+		static const std::string data()
 		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
 			return _data;
 		}
 
 	private:
+		static Poco::FastMutex _mutex;
 		static std::string _data;
 	};
 
+	Poco::FastMutex CopyToStringConnection::_mutex;
 	std::string CopyToStringConnection::_data;
 }
 
@@ -746,6 +755,7 @@ void SocketTest::testSendFile()
 	{
 		Poco::Thread::sleep(100);
 	}
+	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);
 }
@@ -783,6 +793,7 @@ void SocketTest::testSendFileLarge()
 	{
 		Poco::Thread::sleep(100);
 	}
+	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);
 }
@@ -823,6 +834,7 @@ void SocketTest::testSendFileRange()
 	{
 		Poco::Thread::sleep(100);
 	}
+	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData.substr(offset, count));
 }
