@@ -400,7 +400,8 @@ int icompare(
 	typename S::size_type pos,
 	const typename S::value_type* ptr)
 {
-	return icompare(str, pos, str.size() - pos, ptr);
+	int n = pos < str.size() ? str.size() - pos : 0;
+	return icompare(str, pos, n, ptr);
 }
 
 
