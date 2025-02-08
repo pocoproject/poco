@@ -35,7 +35,9 @@ else()
 	)
 endif()
 target_link_libraries(NetSSL-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML CppUnit)
-
+if(MSVC)
+	target_link_libraries(NetSSL-testrunner PRIVATE OpenSSL::applink)
+endif()
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-server.cpp)
 	add_executable(NetSSL-server ping/websocket-server.cpp)
