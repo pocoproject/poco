@@ -1521,10 +1521,6 @@ namespace
 				throw Poco::NotImplementedException("native sendfile not implemented for this platform");
 			#endif
 		#endif
-		if (errno == EAGAIN || errno == EWOULDBLOCK) 
-		{
-			sent = 0;
-		}
 		return sent;
 	}	
 }
@@ -1534,12 +1530,17 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
 	if (count == 0) count = fileInputStream.size() - offset;
-	std::streamoff sent = 0;
-	while (sent == 0)
+	std::streamsize sent = 0;
+	while (count > 0)
 	{
-		errno = 0;
-		sent = sendFileUnix(_sockfd, fd, offset, count);
-		if (sent < 0)
+		std::streamoff rc = sendFileUnix(_sockfd, fd, offset, count);
+		if (rc >= 0)
+		{
+			sent += rc;
+			offset += rc;
+			count -= rc;
+		}
+		else
 		{
 			error(errno);
 		}

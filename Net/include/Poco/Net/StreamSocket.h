@@ -269,23 +269,27 @@ public:
 		/// is by enabling the SO_OOBINLINE option.
 
 	std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
-		/// Sends the contents of a file in an optimized way, if possible.
+		/// Sends the contents of a file over the socket, using operating
+		/// system-specific APIs, if available. The socket must not have
+		/// been set to non-blocking.
 		///
 		/// If count is != 0, sends the given number of bytes, otherwise
 		/// sends all bytes, starting from the given offset.
 		///
-		/// On POSIX systems, this means using sendfile() or sendfile64().
-		/// On Windows, this means using TransmitFile().
+		/// On Linux, macOS and FreeBSD systems, the implementation 
+		/// uses sendfile() or sendfile64().
+		/// On Windows, the implementation uses TransmitFile().
 		///
-		/// If neither is available, or the socket is a SecureSocketImpl() 
-		/// (secure() returns true), falls back to reading the file
-		/// block by block and callind sendBytes().
+		/// If neither sendfile() nor TransmitFile() is available, 
+		/// or the socket is a SecureStreamSocket (secure() returne true),
+		/// falls back to reading the file block by block and calling sendBytes().
 		///
-		/// Returns the number of bytes sent, which may be
-		/// less than the number of bytes specified.
+		/// Returns the number of bytes sent, which should be the same
+		/// as count, unless count is 0.
 		///
 		/// Throws NetException (or a subclass) in case of any errors.
-		/// Also throws if the socket is non-blocking.
+		/// Also throws a NetException if the socket has been set to 
+		/// non-blocking.
 
 	StreamSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
