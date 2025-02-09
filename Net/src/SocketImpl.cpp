@@ -50,15 +50,16 @@
 #endif
 
 
-#if POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FAMILY_BSD
+#if POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
 #include <sys/uio.h>
 #include <sys/types.h>
-using sighandler_t = sig_t;
 #endif
+
 
 #if POCO_OS == POCO_OS_LINUX && defined(POCO_HAVE_SENDFILE) && !defined(POCO_EMSCRIPTEN)
 #include <sys/sendfile.h>
 #endif
+
 
 #if defined(_MSC_VER)
 #pragma warning(disable:4996) // deprecation warnings
@@ -73,7 +74,6 @@ using Poco::Timespan;
 
 
 #ifdef WEPOLL_H_
-
 namespace {
 
 	int close(HANDLE h)
@@ -82,7 +82,6 @@ namespace {
 	}
 
 }
-
 #endif // WEPOLL_H_
 
 
@@ -694,8 +693,6 @@ void SocketImpl::sendUrgent(unsigned char data)
 	int rc = ::send(_sockfd, reinterpret_cast<const char*>(&data), sizeof(data), MSG_OOB);
 	if (rc < 0) error();
 }
-
-
 
 
 std::streamsize SocketImpl::sendFile(FileInputStream& fileInputStream, std::streamoff offset, std::streamsize count)
@@ -1488,38 +1485,42 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 
 namespace
 {
-	std::streamsize sendFileUnix(poco_socket_t sd, FileIOS::NativeHandle fd, std::streamsize offset, std::streamoff count)
+	std::streamoff sendFileUnix(poco_socket_t sd, FileIOS::NativeHandle fd, std::streamoff offset, std::streamsize count)
 	{
-		Int64 sent = 0;
-	#ifdef __USE_LARGEFILE64
-		sent = sendfile64(sd, fd, (off64_t*) &offset, count);
-	#else
-		#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
-			sent = sendfile(sd, fd, (off_t*) &offset, count);
-		#elif POCO_OS == POCO_OS_MAC_OS_X
-			int result = sendfile(fd, sd, offset, &count, NULL, 0);
-			if (result < 0)
-			{
-				sent = -1;
-			} 
-			else 
-			{
-				sent = count;
-			}
-		#elif POCO_OS == POCO_OS_FREE_BSD
-			int result = sendfile(fd, sd, offset, &count, NULL, NULL, 0);
-			if (result < 0)
-			{
-				sent = -1;
-			} 
-			else 
-			{
-				sent = count;
-			}
+		std::streamoff sent = 0;
+		#ifdef __USE_LARGEFILE64
+			off_t noffset = offset;
+			sent = sendfile64(sd, fd, &noffset, count);
 		#else
-			throw Poco::NotImplementedException("sendfile not implemented for this platform");
+			#if POCO_OS == POCO_OS_LINUX && !defined(POCO_EMSCRIPTEN)
+				off_t noffset = offset;
+				sent = sendfile(sd, fd, &noffset, count);
+			#elif POCO_OS == POCO_OS_MAC_OS_X
+				off_t len = count;
+				int result = sendfile(fd, sd, offset, &len, NULL, 0);
+				if (result < 0)
+				{
+					sent = -1;
+				} 
+				else 
+				{
+					sent = len;
+				}
+			#elif POCO_OS == POCO_OS_FREE_BSD
+				off_t sbytes;
+				int result = sendfile(fd, sd, offset, count, NULL, &sbytes, 0);
+				if (result < 0)
+				{
+					sent = -1;
+				} 
+				else 
+				{
+					sent = sbytes;
+				}
+			#else
+				throw Poco::NotImplementedException("native sendfile not implemented for this platform");
+			#endif
 		#endif
-	#endif
 		if (errno == EAGAIN || errno == EWOULDBLOCK) 
 		{
 			sent = 0;
@@ -1533,12 +1534,7 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
 	if (count == 0) count = fileInputStream.size() - offset;
-	std::streamsize sent = 0;
-	struct sigaction sa, old_sa;
-	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGPIPE, &sa, &old_sa);
+	std::streamoff sent = 0;
 	while (sent == 0)
 	{
 		errno = 0;
@@ -1548,11 +1544,6 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 			error(errno);
 		}
 	}
-	if (old_sa.sa_handler == SIG_ERR)
-	{
-		old_sa.sa_handler = SIG_DFL;
-	}
-	sigaction(SIGPIPE, &old_sa, nullptr);
 	return sent;
 }
 
