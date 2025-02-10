@@ -82,7 +82,7 @@ private:
 		bool   ignore;
 	};
 
-	typedef std::vector<TokenInfo> TokenVec;
+	using TokenVec = std::vector<TokenInfo>;
 
 	TokenVec      _tokens;
 	std::istream* _pIstr;

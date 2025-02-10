@@ -89,10 +89,10 @@ class Foundation_API ArchiveByNumberStrategy: public ArchiveStrategy
 {
 public:
 	ArchiveByNumberStrategy();
-	~ArchiveByNumberStrategy();
+	~ArchiveByNumberStrategy() override;
 
-	LogFile* open(LogFile* pFile);
-	LogFile* archive(LogFile* pFile);
+	LogFile *open(LogFile *pFile) override;
+	LogFile *archive(LogFile *pFile) override;
 };
 
 
@@ -102,23 +102,19 @@ class ArchiveByTimestampStrategy: public ArchiveStrategy
 	/// log files.
 {
 public:
-	ArchiveByTimestampStrategy()
-	{
-	}
+	ArchiveByTimestampStrategy() = default;
 
-	~ArchiveByTimestampStrategy()
-	{
-	}
+	~ArchiveByTimestampStrategy() override = default;
 
-	LogFile* open(LogFile* pFile)
+	LogFile* open(LogFile* pFile) override
 	{
 		return pFile;
 	}
 
-	LogFile* archive(LogFile* pFile)
-		/// Archives the file by appending the current timestamp to the
-		/// file name. If the new file name exists, additionally a monotonic
-		/// increasing number is appended to the log file name.
+	LogFile *archive(LogFile* pFile) override
+	/// Archives the file by appending the current timestamp to the
+	/// file name. If the new file name exists, additionally a monotonic
+	/// increasing number is appended to the log file name.
 	{
 		std::string path = pFile->path();
 		delete pFile;

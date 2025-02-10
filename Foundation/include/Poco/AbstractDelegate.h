@@ -29,17 +29,12 @@ class AbstractDelegate
 	/// Base class for Delegate and Expire.
 {
 public:
-	AbstractDelegate()
-	{
-	}
+	AbstractDelegate() = default;
 
-	AbstractDelegate(const AbstractDelegate& /*del*/)
-	{
-	}
+	AbstractDelegate(const AbstractDelegate & /*del*/) = default;
+	AbstractDelegate& operator=(const AbstractDelegate &) = default;
 
-	virtual ~AbstractDelegate()
-	{
-	}
+	virtual ~AbstractDelegate() = default;
 
 	virtual bool notify(const void* sender, TArgs& arguments) = 0;
 		/// Invokes the delegate's callback function.
@@ -69,17 +64,12 @@ class AbstractDelegate<void>
 	/// Base class for Delegate and Expire.
 {
 public:
-	AbstractDelegate()
-	{
-	}
+	AbstractDelegate() = default;
 
-	AbstractDelegate(const AbstractDelegate&)
-	{
-	}
+	AbstractDelegate(const AbstractDelegate &) = default;
+	AbstractDelegate& operator=(const AbstractDelegate &) = default;
 
-	virtual ~AbstractDelegate()
-	{
-	}
+	virtual ~AbstractDelegate() = default;
 
 	virtual bool notify(const void* sender) = 0;
 		/// Invokes the delegate's callback function.

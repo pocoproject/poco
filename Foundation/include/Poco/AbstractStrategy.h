@@ -32,13 +32,9 @@ class AbstractStrategy
 	/// An AbstractStrategy is the interface for all strategies.
 {
 public:
-	AbstractStrategy()
-	{
-	}
+	AbstractStrategy() = default;
 
-	virtual ~AbstractStrategy()
-	{
-	}
+	virtual ~AbstractStrategy() = default;
 
 	virtual void onUpdate(const void* pSender, const KeyValueArgs <TKey, TValue>& args)
 		/// Updates an existing entry.

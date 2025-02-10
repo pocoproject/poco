@@ -114,7 +114,7 @@ class SharedPtr
 	/// is required.
 {
 public:
-	typedef C Type;
+	using Type = C;
 
 	SharedPtr():
 		_pCounter(nullptr),
@@ -473,7 +473,7 @@ inline void swap(SharedPtr<C, RC, RP>& p1, SharedPtr<C, RC, RP>& p2)
 template <typename T, typename... Args>
 SharedPtr<T> makeShared(Args&&... args)
 {
-    return SharedPtr<T>(new T(std::forward<Args>(args)...));
+	return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 

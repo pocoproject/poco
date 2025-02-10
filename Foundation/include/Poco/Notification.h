@@ -46,7 +46,7 @@ public:
 		/// The default implementation returns the class name.
 
 protected:
-	virtual ~Notification();
+	~Notification() override;
 	std::unique_ptr<std::string> _pName;
 };
 

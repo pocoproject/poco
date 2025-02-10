@@ -57,13 +57,13 @@ public:
 	JSONFormatter() = default;
 		/// Creates a JSONFormatter.
 
-	~JSONFormatter() = default;
+	~JSONFormatter() override = default;
 		/// Destroys the JSONFormatter.
 
-	void format(const Message& msg, std::string& text);
+	void format(const Message& msg, std::string& text) override;
 		/// Formats the message as a JSON string.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name to the given value.
 		///
 		/// The following properties are supported:
@@ -77,7 +77,7 @@ public:
 		/// If any other property name is given, a PropertyNotSupported
 		/// exception is thrown.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name or
 		/// throws a PropertyNotSupported exception if the given
 		/// name is not recognized.

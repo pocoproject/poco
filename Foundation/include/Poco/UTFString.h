@@ -28,12 +28,12 @@ namespace Poco {
 
 struct UTF16CharTraits
 {
-	typedef std::fpos<std::mbstate_t> u16streampos;
-	typedef UInt16                    char_type;
-	typedef int                       int_type;
-	typedef std::streamoff            off_type;
-	typedef u16streampos              pos_type;
-	typedef std::mbstate_t            state_type;
+	using u16streampos = std::fpos<std::mbstate_t>;
+	using char_type = UInt16;
+	using int_type = int;
+	using off_type = std::streamoff;
+	using pos_type = u16streampos;
+	using state_type = std::mbstate_t;
 
 	static void assign(char_type& c1, const char_type& c2)
 	{
@@ -78,7 +78,7 @@ struct UTF16CharTraits
 				return s;
 			++s;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	static char_type* move(char_type* s1, const char_type* s2, std::size_t n)
@@ -145,12 +145,12 @@ struct UTF16CharTraits
 
 struct UTF32CharTraits
 {
-	typedef std::fpos<std::mbstate_t> u32streampos;
-	typedef UInt32                    char_type;
-	typedef int                       int_type;
-	typedef std::streamoff            off_type;
-	typedef u32streampos              pos_type;
-	typedef std::mbstate_t            state_type;
+	using u32streampos = std::fpos<std::mbstate_t>;
+	using char_type = UInt32;
+	using int_type = int;
+	using off_type = std::streamoff;
+	using pos_type = u32streampos;
+	using state_type = std::mbstate_t;
 
 	static void assign(char_type& c1, const char_type& c2)
 	{
@@ -195,7 +195,7 @@ struct UTF32CharTraits
 				return s;
 			++s;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	static char_type* move(char_type* s1, const char_type* s2, std::size_t n)
@@ -261,43 +261,43 @@ struct UTF32CharTraits
 
 
 //#if defined(POCO_ENABLE_CPP11) //TODO
-	//	typedef char16_t       UTF16Char;
-	//	typedef std::u16string UTF16String;
-	//	typedef char32_t       UTF32Char;
-	//	typedef std::u32string UTF32String;
+	//	using char16_t       UTF16Char;
+	//	using std::u16string UTF16String;
+	//	using char32_t       UTF32Char;
+	//	using std::u32string UTF32String;
 //#else
 	#ifdef POCO_NO_WSTRING
-		typedef Poco::UInt16                                  UTF16Char;
-		typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
-		typedef UInt32                                        UTF32Char;
-		typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
+		using UTF16Char = Poco::UInt16;
+		using UTF16String = std::basic_string<UTF16Char, UTF16CharTraits>;
+		using UTF32Char = UInt32;
+		using UTF32String = std::basic_string<UTF32Char, UTF32CharTraits>;
 		#define POCO_USE_STRING16
 		#define POCO_USE_STRING32
 	#else // POCO_NO_WSTRING
 		#if defined(POCO_OS_FAMILY_WINDOWS)
-			typedef wchar_t                                       UTF16Char;
-			typedef std::wstring                                  UTF16String;
-			typedef UInt32                                        UTF32Char;
-			typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
+			using UTF16Char = wchar_t;
+			using UTF16String = std::wstring;
+			using UTF32Char = UInt32;
+			using UTF32String = std::basic_string<UTF32Char, UTF32CharTraits>;
 		#elif defined(__SIZEOF_WCHAR_T__) //gcc
 			#if (__SIZEOF_WCHAR_T__ == 2)
-				typedef wchar_t                                       UTF16Char;
-				typedef std::wstring                                  UTF16String;
-				typedef UInt32                                        UTF32Char;
-				typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
+				using UTF16Char = wchar_t;
+				using UTF16String = std::wstring;
+				using UTF32Char = UInt32;
+				using UTF32String = std::basic_string<UTF32Char, UTF32CharTraits>;
 				#define POCO_USE_STRING32
 			#elif (__SIZEOF_WCHAR_T__ == 4)
-				typedef Poco::UInt16                                  UTF16Char;
-				typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
-				typedef wchar_t                                       UTF32Char;
-				typedef std::wstring                                  UTF32String;
+				using UTF16Char = Poco::UInt16;
+				using UTF16String = std::basic_string<UTF16Char, UTF16CharTraits>;
+				using UTF32Char = wchar_t;
+				using UTF32String = std::wstring;
 				#define POCO_USE_STRING16
 			#endif
 		#else // default to 32-bit wchar_t
-			typedef Poco::UInt16                                  UTF16Char;
-			typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
-			typedef wchar_t                                       UTF32Char;
-			typedef std::wstring                                  UTF32String;
+			using UTF16Char = Poco::UInt16;
+			using UTF16String = std::basic_string<UTF16Char, UTF16CharTraits>;
+			using UTF32Char = wchar_t;
+			using UTF32String = std::wstring;
 			#define POCO_USE_STRING16
 		#endif //POCO_OS_FAMILY_WINDOWS
 	#endif //POCO_NO_WSTRING

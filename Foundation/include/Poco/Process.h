@@ -44,7 +44,7 @@ class Foundation_API ProcessHandle
 	/// the completion of a process.
 {
 public:
-	typedef ProcessImpl::PIDImpl PID;
+	using PID = ProcessImpl::PIDImpl;
 
 	ProcessHandle(const ProcessHandle& handle);
 		/// Creates a ProcessHandle by copying another one.
@@ -83,9 +83,9 @@ class Foundation_API Process: public ProcessImpl
 	/// This class provides methods for working with processes.
 {
 public:
-	typedef PIDImpl  PID;
-	typedef ArgsImpl Args;
-	typedef EnvImpl  Env;
+	using PID = PIDImpl;
+	using Args = ArgsImpl;
+	using Env = EnvImpl;
 
 	static PID id();
 		/// Returns the process ID of the current process.

@@ -124,7 +124,7 @@ private:
 	Condition(const Condition&);
 	Condition& operator = (const Condition&);
 
-	typedef std::deque<Event*> WaitQueue;
+	using WaitQueue = std::deque<Event *>;
 
 	FastMutex _mutex;
 	WaitQueue _waitQueue;

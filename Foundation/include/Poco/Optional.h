@@ -53,10 +53,8 @@ class Optional
 	/// nillable == true.
 {
 public:
-	Optional()
+	Optional() = default;
 		/// Creates an empty Optional.
-	{
-	}
 
 	Optional(const C& value):
 		/// Creates a Optional with the given value.
@@ -82,10 +80,8 @@ public:
 	{
 	}
 
-	~Optional()
+	~Optional() = default;
 		/// Destroys the Optional.
-	{
-	}
 
 	Optional& assign(const C& value)
 		/// Assigns a value to the Optional.

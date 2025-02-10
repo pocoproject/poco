@@ -42,9 +42,9 @@ public:
 	{
 	}
 
-	~KeyValueArgs()
-	{
-	}
+	~KeyValueArgs() = default;
+
+	KeyValueArgs& operator=(const KeyValueArgs& args) = delete;
 
 	const TKey& key() const
 		/// Returns a reference to the key,
@@ -61,9 +61,6 @@ public:
 protected:
 	const TKey&   _key;
 	const TValue& _value;
-
-private:
-	KeyValueArgs& operator = (const KeyValueArgs& args);
 };
 
 

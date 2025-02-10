@@ -53,7 +53,7 @@ public:
 		}
 	};
 
-	typedef std::vector<HashEntry*> HashTableVector;
+	using HashTableVector = std::vector<HashEntry *>;
 
 	SimpleHashTable(UInt32 capacity = 251): _entries(capacity, 0), _size(0), _capacity(capacity)
 		/// Creates the SimpleHashTable.

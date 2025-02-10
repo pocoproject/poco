@@ -51,11 +51,11 @@ public:
 	ConsoleChannel(std::ostream& str);
 		/// Creates the channel using the given stream.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Logs the given message to the channel's stream.
 
 protected:
-	~ConsoleChannel();
+	~ConsoleChannel() override;
 
 private:
 	std::ostream& _str;
@@ -123,10 +123,10 @@ public:
 	ColorConsoleChannel(std::ostream& str);
 		/// Creates the channel using the given stream.
 
-	void log(const Message& msg);
-		/// Logs the given message to the channel's stream.
+	void log(const Message& msg) override;
+	/// Logs the given message to the channel's stream.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name.
 		///
 		/// The following properties are supported:
@@ -142,7 +142,7 @@ public:
 		///
 		/// See the class documentation for a list of supported color values.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 		/// See setProperty() for a description of the supported
 		/// properties.
@@ -169,7 +169,7 @@ protected:
 		CC_WHITE        = 0x0125
 	};
 
-	~ColorConsoleChannel();
+	~ColorConsoleChannel() override;
 	Color parseColor(const std::string& color) const;
 	std::string formatColor(Color color) const;
 	void initColors();

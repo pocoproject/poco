@@ -48,9 +48,10 @@ public:
 	{
 	}
 
-	~TLSSlot()
-	{
-	}
+	~TLSSlot() override = default;
+
+	TLSSlot(const TLSSlot&) = delete;
+	TLSSlot& operator=(const TLSSlot&) = delete;
 
 	C& value()
 	{
@@ -58,9 +59,6 @@ public:
 	}
 
 private:
-	TLSSlot(const TLSSlot&);
-	TLSSlot& operator = (const TLSSlot&);
-
 	C _value;
 };
 
@@ -89,7 +87,7 @@ public:
 		/// Does nothing in the main thread.
 
 private:
-	typedef std::map<const void*, TLSAbstractSlot*> TLSMap;
+	using TLSMap = std::map<const void *, TLSAbstractSlot *>;
 
 	TLSMap _map;
 
@@ -112,16 +110,15 @@ class ThreadLocal
 	/// thread local data. There is no way for a thread
 	/// to access another thread's local data.
 {
-	typedef TLSSlot<C> Slot;
+	using Slot = TLSSlot<C>;
 
 public:
-	ThreadLocal()
-	{
-	}
+	ThreadLocal() = default;
 
-	~ThreadLocal()
-	{
-	}
+	~ThreadLocal() = default;
+
+	ThreadLocal(const ThreadLocal&) = delete;
+	ThreadLocal& operator=(const ThreadLocal&) = delete;
 
 	C* operator -> ()
 	{
@@ -144,10 +141,6 @@ public:
 		if (!p) p = new Slot;
 		return static_cast<Slot*>(p)->value();
 	}
-
-private:
-	ThreadLocal(const ThreadLocal&);
-	ThreadLocal& operator = (const ThreadLocal&);
 };
 
 

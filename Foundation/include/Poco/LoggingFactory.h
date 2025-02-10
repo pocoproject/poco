@@ -44,8 +44,8 @@ class Foundation_API LoggingFactory
 	///   - PatternFormatter
 {
 public:
-	typedef AbstractInstantiator<Channel>   ChannelInstantiator;
-	typedef AbstractInstantiator<Formatter> FormatterFactory;
+	using ChannelInstantiator = AbstractInstantiator<Channel>;
+	using FormatterFactory = AbstractInstantiator<Formatter>;
 
 	LoggingFactory();
 		/// Creates the LoggingFactory.

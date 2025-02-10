@@ -60,14 +60,14 @@ public:
 		/// If the channel has not been opened yet, the log()
 		/// method will open it.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Throws a PropertyNotSupportedException.
 
-	std::string getProperty(const std::string& name) const;
+	std::string getProperty(const std::string& name) const override;
 		/// Throws a PropertyNotSupportedException.
 
 protected:
-	virtual ~Channel();
+	~Channel() override;
 
 private:
 	Channel(const Channel&);

@@ -35,12 +35,12 @@ public:
 	NullStreamBuf();
 		/// Creates a NullStreamBuf.
 
-	~NullStreamBuf();
-		/// Destroys the NullStreamBuf.
+	~NullStreamBuf() override;
+	/// Destroys the NullStreamBuf.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 };
 
 
@@ -52,7 +52,7 @@ class Foundation_API NullIOS: public virtual std::ios
 {
 public:
 	NullIOS();
-	~NullIOS();
+	~NullIOS() override;
 
 protected:
 	NullStreamBuf _buf;
@@ -67,8 +67,8 @@ public:
 	NullInputStream();
 		/// Creates the NullInputStream.
 
-	~NullInputStream();
-		/// Destroys the NullInputStream.
+	~NullInputStream() override;
+	/// Destroys the NullInputStream.
 };
 
 
@@ -79,8 +79,8 @@ public:
 	NullOutputStream();
 		/// Creates the NullOutputStream.
 
-	~NullOutputStream();
-		/// Destroys the NullOutputStream.
+	~NullOutputStream() override;
+	/// Destroys the NullOutputStream.
 };
 
 

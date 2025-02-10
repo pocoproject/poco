@@ -29,7 +29,7 @@ namespace Poco {
 class Foundation_API EnvironmentImpl
 {
 public:
-	typedef UInt8 NodeId[6]; /// Ethernet address.
+	using NodeId = UInt8[6]; /// Ethernet address.
 
 	static std::string getImpl(const std::string& name);
 	static bool hasImpl(const std::string& name);
@@ -43,7 +43,7 @@ public:
 	static unsigned processorCountImpl();
 
 private:
-	typedef std::map<std::string, std::string> StringMap;
+	using StringMap = std::map<std::string, std::string>;
 
 	static StringMap _map;
 	static FastMutex _mutex;

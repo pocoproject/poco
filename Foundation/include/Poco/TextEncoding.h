@@ -48,7 +48,7 @@ public:
 		MAX_SEQUENCE_LENGTH = 4 /// The maximum character byte sequence length supported.
 	};
 
-	typedef int CharacterMap[256];
+	using CharacterMap = int[256];
 		/// The map[b] member gives information about byte sequences
 		/// whose first byte is b.
 		/// If map[b] is c where c is >= 0, then b by itself encodes the Unicode scalar value c.

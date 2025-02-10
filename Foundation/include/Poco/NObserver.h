@@ -73,9 +73,7 @@ public:
 	{
 	}
 
-	~NObserver()
-	{
-	}
+	~NObserver() override = default;
 
 	NObserver& operator = (const NObserver& observer)
 	{
@@ -88,34 +86,34 @@ public:
 		return *this;
 	}
 
-	virtual void notify(Notification* pNf) const
+	void notify(Notification* pNf) const override
 	{
 		handle(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	virtual bool equals(const AbstractObserver& abstractObserver) const
+	bool equals(const AbstractObserver& abstractObserver) const override
 	{
 		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler && pObs->_matcher == _matcher;
 	}
 
 	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead")
-	virtual bool accepts(Notification* pNf, const char* pName) const
+	bool accepts(Notification* pNf, const char* pName) const override
 	{
 		return (!pName || pNf->name() == pName) && dynamic_cast<N*>(pNf) != nullptr;
 	}
 
-	virtual bool accepts(const Notification::Ptr& pNf) const
+	bool accepts(const Notification::Ptr& pNf) const override
 	{
 		return (match(pNf) && (pNf.template cast<N>() != nullptr));
 	}
 
-	virtual AbstractObserver* clone() const
+	AbstractObserver* clone() const override
 	{
 		return new NObserver(*this);
 	}
 
-	virtual void disable()
+	void disable() override
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 

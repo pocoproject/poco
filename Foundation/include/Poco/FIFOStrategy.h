@@ -31,9 +31,7 @@ class POCO_DEPRECATED("") FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
 	/// for backwards compatibility only.
 {
 public:
-	FIFOStrategy()
-	{
-	}
+	FIFOStrategy() = default;
 
 	FIFOStrategy(const FIFOStrategy& s):
 		DefaultStrategy<TArgs, TDelegate>(s)
@@ -45,9 +43,7 @@ public:
 	{
 	}
 
-	~FIFOStrategy()
-	{
-	}
+	~FIFOStrategy() = default;
 
 	FIFOStrategy& operator = (const FIFOStrategy& s)
 	{

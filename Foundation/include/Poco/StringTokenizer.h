@@ -39,8 +39,8 @@ public:
 		TOK_TRIM         = 2  /// remove leading and trailing whitespace from tokens
 	};
 
-	typedef std::vector<std::string> TokenVec;
-	typedef TokenVec::const_iterator Iterator;
+	using TokenVec = std::vector<std::string>;
+	using Iterator = TokenVec::const_iterator;
 
 	StringTokenizer(const std::string& str, const std::string& separators, int options = 0);
 		/// Splits the given string into tokens. The tokens are expected to be

@@ -41,13 +41,13 @@ class Array
 	/// His original implementation can be found at http://www.josuttis.com/cppcode/array.html .
 {
 public:
-	typedef T				value_type;
-	typedef T*				iterator;
-	typedef const T*		const_iterator;
-	typedef T&				reference;
-	typedef const T&		const_reference;
-	typedef std::size_t		size_type;
-	typedef std::ptrdiff_t  difference_type;
+	using value_type = T;
+	using iterator = T *;
+	using const_iterator = const T *;
+	using reference = T &;
+	using const_reference = const T &;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
 
 	iterator begin()
 	{
@@ -69,8 +69,8 @@ public:
 		return elems+N;
 	}
 
-	typedef std::reverse_iterator<iterator>			reverse_iterator;
-	typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
+	using reverse_iterator = std::reverse_iterator<iterator>;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	reverse_iterator rbegin()
 	{

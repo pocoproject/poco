@@ -47,14 +47,14 @@ public:
 	};
 
 	SHA2Engine(ALGORITHM algorithm = SHA_256);
-	virtual ~SHA2Engine();
+	~SHA2Engine() override;
 
-	std::size_t digestLength() const;
-	void reset();
-	const DigestEngine::Digest& digest();
+	std::size_t digestLength() const override;
+	void reset() override;
+	const DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void *data, std::size_t length) override;
 
 private:
 	void transform();
@@ -81,9 +81,7 @@ public:
 	{
 	}
 
-	virtual ~SHA2Engine224()
-	{
-	}
+	~SHA2Engine224() override = default;
 };
 
 
@@ -100,9 +98,7 @@ public:
 	{
 	}
 
-	virtual ~SHA2Engine256()
-	{
-	}
+	~SHA2Engine256() override = default;
 };
 
 
@@ -119,9 +115,7 @@ public:
 	{
 	}
 
-	virtual ~SHA2Engine384()
-	{
-	}
+	~SHA2Engine384() override = default;
 };
 
 
@@ -138,9 +132,7 @@ public:
 	{
 	}
 
-	virtual ~SHA2Engine512()
-	{
-	}
+	~SHA2Engine512() override = default;
 };
 
 

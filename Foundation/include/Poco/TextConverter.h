@@ -32,8 +32,8 @@ class Foundation_API TextConverter
 	/// into another.
 {
 public:
-	typedef int (*Transform)(int);
-		/// Transform function for convert.
+	using Transform = int (*)(int);
+	/// Transform function for convert.
 
 	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 		/// Creates the TextConverter. The encoding objects must not be deleted while the

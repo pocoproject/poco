@@ -52,6 +52,8 @@ public:
 		delete _pDelegate;
 	}
 
+	PriorityExpire() = delete;
+
 	PriorityExpire& operator = (const PriorityExpire& expire)
 	{
 		if (&expire != this)
@@ -102,9 +104,6 @@ protected:
 	AbstractPriorityDelegate<TArgs>* _pDelegate;
 	Timestamp::TimeDiff _expire;
 	Timestamp _creationTime;
-
-private:
-	PriorityExpire();
 };
 
 
@@ -129,10 +128,12 @@ public:
 	{
 	}
 
-	~PriorityExpire()
+	~PriorityExpire() override
 	{
 		delete _pDelegate;
 	}
+
+	PriorityExpire() = delete;
 
 	PriorityExpire& operator = (const PriorityExpire& expire)
 	{
@@ -146,7 +147,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void* sender) override
 	{
 		if (!expired())
 			return this->_pDelegate->notify(sender);
@@ -154,22 +155,22 @@ public:
 			return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		return other.equals(*_pDelegate);
 	}
 
-	AbstractPriorityDelegate<void>* clone() const
+	AbstractPriorityDelegate<void>* clone() const override
 	{
 		return new PriorityExpire(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		_pDelegate->disable();
 	}
 
-	const AbstractPriorityDelegate<void>* unwrap() const
+	const AbstractPriorityDelegate<void>* unwrap() const override
 	{
 		return this->_pDelegate;
 	}
@@ -183,9 +184,6 @@ protected:
 	AbstractPriorityDelegate<void>* _pDelegate;
 	Timestamp::TimeDiff _expire;
 	Timestamp _creationTime;
-
-private:
-	PriorityExpire();
 };
 
 

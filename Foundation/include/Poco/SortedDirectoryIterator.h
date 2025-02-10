@@ -48,10 +48,10 @@ public:
 	SortedDirectoryIterator(const Path& path);
 		/// Creates a directory iterator for the given path.
 
-	virtual ~SortedDirectoryIterator();
-		/// Destroys the DirsFirstDirectoryIterator.
+	~SortedDirectoryIterator() override;
+	/// Destroys the DirsFirstDirectoryIterator.
 
-	virtual SortedDirectoryIterator& operator ++();   // prefix
+	SortedDirectoryIterator& operator++() override; // prefix
 
 private:
 	bool _is_finished;

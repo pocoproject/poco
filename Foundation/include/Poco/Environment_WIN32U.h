@@ -27,7 +27,7 @@ namespace Poco {
 class Foundation_API EnvironmentImpl
 {
 public:
-	typedef UInt8 NodeId[6]; /// Ethernet address.
+	using NodeId = UInt8[6]; /// Ethernet address.
 
 	static std::string getImpl(const std::string& name);
 	static bool hasImpl(const std::string& name);

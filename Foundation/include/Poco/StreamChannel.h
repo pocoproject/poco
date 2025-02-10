@@ -43,11 +43,11 @@ public:
 	StreamChannel(std::ostream& str);
 		/// Creates the channel.
 
-	void log(const Message& msg);
-		/// Logs the given message to the channel's stream.
+	void log(const Message& msg) override;
+	/// Logs the given message to the channel's stream.
 
 protected:
-	virtual ~StreamChannel();
+	~StreamChannel() override;
 
 private:
 	std::ostream& _str;

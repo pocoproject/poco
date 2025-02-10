@@ -32,7 +32,7 @@ template <class TObj, class TArgs, bool useSender = true>
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
+	using NotifyMethod = void (TObj::*)(const void *, TArgs &);
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -59,9 +59,9 @@ public:
 		return *this;
 	}
 
-	~PriorityDelegate()
-	{
-	}
+	~PriorityDelegate() = default;
+
+	PriorityDelegate() = delete;
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
@@ -95,9 +95,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex _mutex;
-
-private:
-	PriorityDelegate();
 };
 
 
@@ -105,7 +102,7 @@ template <class TObj, class TArgs>
 class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(TArgs&);
+	using NotifyMethod = void (TObj::*)(TArgs &);
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -132,9 +129,9 @@ public:
 		return *this;
 	}
 
-	~PriorityDelegate()
-	{
-	}
+	~PriorityDelegate() = default;
+
+	PriorityDelegate() = delete;
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
@@ -168,9 +165,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex _mutex;
-
-private:
-	PriorityDelegate();
 };
 
 
@@ -178,7 +172,7 @@ template <class TObj>
 class PriorityDelegate<TObj, void, true>: public AbstractPriorityDelegate<void>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*);
+	using NotifyMethod = void (TObj::*)(const void *);
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -205,11 +199,11 @@ public:
 		return *this;
 	}
 
-	~PriorityDelegate()
-	{
-	}
+	~PriorityDelegate() override = default;
 
-	bool notify(const void* sender)
+	PriorityDelegate() = delete;
+
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -220,18 +214,18 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new PriorityDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = 0;
@@ -241,9 +235,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex _mutex;
-
-private:
-	PriorityDelegate();
 };
 
 
@@ -251,7 +242,7 @@ template <class TObj>
 class PriorityDelegate<TObj, void, false>: public AbstractPriorityDelegate<void>
 {
 public:
-	typedef void (TObj::*NotifyMethod)();
+	using NotifyMethod = void (TObj::*)();
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -278,11 +269,11 @@ public:
 		return *this;
 	}
 
-	~PriorityDelegate()
-	{
-	}
+	~PriorityDelegate() override = default;
 
-	bool notify(const void* sender)
+	PriorityDelegate() = delete;
+
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -293,18 +284,18 @@ public:
 		return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new PriorityDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = 0;
@@ -314,9 +305,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex _mutex;
-
-private:
-	PriorityDelegate();
 };
 
 
