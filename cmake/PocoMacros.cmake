@@ -188,8 +188,10 @@ macro(POCO_MESSAGES out name)
 			POCO_HEADERS( ${out} ${name} ${CMAKE_CURRENT_BINARY_DIR}/${hdr})
 
 			# Add the generated .rc 
-			source_group("${name}\\Resource Files" FILES ${CMAKE_CURRENT_BINARY_DIR}/${rc})
-			list(APPEND ${out} ${CMAKE_CURRENT_BINARY_DIR}/${rc})
+			if(BUILD_SHARED_LIBS)
+				source_group("${name}\\Resource Files" FILES ${CMAKE_CURRENT_BINARY_DIR}/${rc})
+				list(APPEND ${out} ${CMAKE_CURRENT_BINARY_DIR}/${rc})
+			endif()
 		endforeach()
 
 		set_source_files_properties(${ARGN} PROPERTIES HEADER_FILE_ONLY TRUE)
