@@ -168,8 +168,10 @@ macro(POCO_MESSAGES out name)
 			get_filename_component(msg_path ${msg} ABSOLUTE)
 			string(REPLACE ".mc" ".h" hdr ${msg_name})
 			set_source_files_properties(${hdr} PROPERTIES GENERATED TRUE)
+			string(REPLACE ".mc" ".rc" rc ${msg_name})
+			set_source_files_properties(${rc} PROPERTIES GENERATED TRUE)
 			add_custom_command(
-				OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${hdr}
+				OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${hdr} ${CMAKE_CURRENT_BINARY_DIR}/${rc}
 				DEPENDS ${msg}
 				COMMAND ${CMAKE_MC_COMPILER}
 				ARGS
@@ -185,6 +187,9 @@ macro(POCO_MESSAGES out name)
 			# Add the generated headers to POCO_HEADERS of the component
 			POCO_HEADERS( ${out} ${name} ${CMAKE_CURRENT_BINARY_DIR}/${hdr})
 
+			# Add the generated .rc 
+			source_group("${name}\\Resource Files" FILES ${CMAKE_CURRENT_BINARY_DIR}/${rc})
+			list(APPEND ${out} ${CMAKE_CURRENT_BINARY_DIR}/${rc})
 		endforeach()
 
 		set_source_files_properties(${ARGN} PROPERTIES HEADER_FILE_ONLY TRUE)
