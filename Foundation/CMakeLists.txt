@@ -105,6 +105,8 @@ else()
 	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
 endif(POCO_UNBUNDLED)
 
+target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
+
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
