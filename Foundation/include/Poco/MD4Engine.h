@@ -60,14 +60,14 @@ public:
 	};
 
 	MD4Engine();
-	~MD4Engine();
+	~MD4Engine() override;
 
-	std::size_t digestLength() const;
-	void reset();
-	const DigestEngine::Digest& digest();
+	std::size_t digestLength() const override;
+	void reset() override;
+	const DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void* data, std::size_t length) override;
 
 private:
 	static void transform(UInt32 state[4], const unsigned char block[64]);

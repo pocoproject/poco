@@ -66,8 +66,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingStreamBuf();
-		/// Destroys the InflatingStreamBuf.
+	~InflatingStreamBuf() override;
+	/// Destroys the InflatingStreamBuf.
 
 	int close();
 		/// Finishes up the stream.
@@ -78,9 +78,9 @@ public:
 		/// Resets the stream buffer.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
-	int sync();
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
+	int sync() override;
 
 private:
 	enum
@@ -127,8 +127,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingIOS();
-		/// Destroys the InflatingIOS.
+	~InflatingIOS() override;
+	/// Destroys the InflatingIOS.
 
 	InflatingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying stream buffer.
@@ -157,8 +157,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingOutputStream();
-		/// Destroys the InflatingOutputStream.
+	~InflatingOutputStream() override;
+	/// Destroys the InflatingOutputStream.
 
 	int close();
 		/// Finishes up the stream.
@@ -193,8 +193,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingInputStream();
-		/// Destroys the InflatingInputStream.
+	~InflatingInputStream() override;
+	/// Destroys the InflatingInputStream.
 
 	void reset();
 		/// Resets the zlib machinery so that another zlib stream can be read from

@@ -68,7 +68,7 @@ protected:
 	void close();
 		/// Releases the handle for the shared memory segment.
 
-	~SharedMemoryImpl();
+	~SharedMemoryImpl() override;
 		/// Destroys the SharedMemoryImpl.
 
 private:

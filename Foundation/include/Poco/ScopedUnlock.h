@@ -49,12 +49,12 @@ public:
 		}
 	}
 
+	ScopedUnlock() = delete;
+	ScopedUnlock(const ScopedUnlock&) = delete;
+	ScopedUnlock& operator=(const ScopedUnlock&) = delete;
+
 private:
 	M& _mutex;
-
-	ScopedUnlock();
-	ScopedUnlock(const ScopedUnlock&);
-	ScopedUnlock& operator = (const ScopedUnlock&);
 };
 
 

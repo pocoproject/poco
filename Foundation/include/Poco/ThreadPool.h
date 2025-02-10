@@ -167,7 +167,7 @@ private:
 	ThreadPool(const ThreadPool& pool);
 	ThreadPool& operator = (const ThreadPool& pool);
 
-	typedef std::vector<PooledThread*> ThreadVec;
+	using ThreadVec = std::vector<PooledThread *>;
 
 	std::string _name;
 	int _minCapacity;

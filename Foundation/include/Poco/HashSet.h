@@ -32,22 +32,20 @@ class HashSet
 	/// A HashSet can be used just like a std::set.
 {
 public:
-	typedef Value        ValueType;
-	typedef Value&       Reference;
-	typedef const Value& ConstReference;
-	typedef Value*       Pointer;
-	typedef const Value* ConstPointer;
-	typedef HashFunc     Hash;
+	using ValueType = Value;
+	using Reference = Value &;
+	using ConstReference = const Value &;
+	using Pointer = Value *;
+	using ConstPointer = const Value *;
+	using Hash = HashFunc;
 
-	typedef LinearHashTable<ValueType, Hash> HashTable;
+	using HashTable = LinearHashTable<ValueType, Hash>;
 
-	typedef typename HashTable::Iterator      Iterator;
-	typedef typename HashTable::ConstIterator ConstIterator;
+	using Iterator = typename HashTable::Iterator;
+	using ConstIterator = typename HashTable::ConstIterator;
 
-	HashSet()
+	HashSet() = default;
 		/// Creates an empty HashSet.
-	{
-	}
 
 	HashSet(std::size_t initialReserve):
 		_table(initialReserve)
@@ -61,10 +59,8 @@ public:
 	{
 	}
 
-	~HashSet()
+	~HashSet() = default;
 		/// Destroys the HashSet.
-	{
-	}
 
 	HashSet& operator = (const HashSet& table)
 		/// Assigns another HashSet.

@@ -50,6 +50,10 @@ public:
 		}
 	}
 
+	AbstractMetaObject() = delete;
+	AbstractMetaObject(const AbstractMetaObject&) = delete;
+	AbstractMetaObject& operator=(const AbstractMetaObject&) = delete;
+
 	const char* name() const
 	{
 		return _name;
@@ -110,11 +114,7 @@ public:
 	}
 
 private:
-	AbstractMetaObject();
-	AbstractMetaObject(const AbstractMetaObject&);
-	AbstractMetaObject& operator = (const AbstractMetaObject&);
-
-	typedef std::set<B*> ObjectSet;
+	using ObjectSet = std::set<B *>;
 
 	const char* _name;
 	mutable ObjectSet _deleteSet;
@@ -134,9 +134,7 @@ public:
 	{
 	}
 
-	~MetaObject()
-	{
-	}
+	~MetaObject() = default;
 
 	B* create() const
 	{
@@ -166,9 +164,7 @@ public:
 	{
 	}
 
-	~MetaSingleton()
-	{
-	}
+	~MetaSingleton() = default;
 
 	B* create() const
 	{

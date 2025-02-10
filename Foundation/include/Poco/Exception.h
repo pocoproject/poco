@@ -43,7 +43,7 @@ public:
 	Exception(const Exception& exc);
 		/// Copy constructor.
 
-	~Exception() noexcept;
+	~Exception() noexcept override;
 		/// Destroys the exception and deletes the nested exception.
 
 	Exception& operator = (const Exception& exc);
@@ -55,7 +55,7 @@ public:
 	virtual const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	virtual const char* what() const noexcept;
+	const char* what() const noexcept override;
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.

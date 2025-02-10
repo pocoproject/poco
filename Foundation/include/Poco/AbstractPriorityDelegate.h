@@ -43,9 +43,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractPriorityDelegate()
-	{
-	}
+	virtual ~AbstractPriorityDelegate() = default;
 
 	int priority() const
 	{

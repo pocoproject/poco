@@ -57,8 +57,8 @@ public:
 		/// Returns the one-past-end end address of the shared memory segment.
 
 protected:
-	~SharedMemoryImpl();
-		/// Destroys the SharedMemoryImpl.
+	~SharedMemoryImpl() override;
+	/// Destroys the SharedMemoryImpl.
 
 private:
 	SharedMemoryImpl();
@@ -72,13 +72,13 @@ private:
 //
 inline char* SharedMemoryImpl::begin() const
 {
-	return 0;
+	return nullptr;
 }
 
 
 inline char* SharedMemoryImpl::end() const
 {
-	return 0;
+	return nullptr;
 }
 
 

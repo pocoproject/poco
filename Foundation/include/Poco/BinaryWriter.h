@@ -225,9 +225,7 @@ private:
 	MemoryOutputStream _ostr;
 };
 
-
-typedef BasicMemoryBinaryWriter<char> MemoryBinaryWriter;
-
+using MemoryBinaryWriter = BasicMemoryBinaryWriter<char>;
 
 //
 // inlines

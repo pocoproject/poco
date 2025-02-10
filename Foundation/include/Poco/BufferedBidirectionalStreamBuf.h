@@ -63,7 +63,7 @@ public:
 		resetBuffers();
 	}
 
-	~BasicBufferedBidirectionalStreamBuf()
+	~BasicBufferedBidirectionalStreamBuf() override
 	{
 		Allocator::deallocate(_pReadBuffer, _bufsize);
 		Allocator::deallocate(_pWriteBuffer, _bufsize);
@@ -72,7 +72,7 @@ public:
 	BasicBufferedBidirectionalStreamBuf(const BasicBufferedBidirectionalStreamBuf&) = delete;
 	BasicBufferedBidirectionalStreamBuf& operator = (const BasicBufferedBidirectionalStreamBuf&) = delete;
 
-	virtual int_type overflow(int_type c)
+	int_type overflow(int_type c) override
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
@@ -86,7 +86,7 @@ public:
 		return c;
 	}
 
-	virtual int_type underflow()
+	int_type underflow() override
 	{
 		if (!(_mode & IOS::in)) return char_traits::eof();
 
@@ -107,7 +107,7 @@ public:
 		return char_traits::to_int_type(*this->gptr());
 	}
 
-	virtual int sync()
+	int sync() override
 	{
 		if (this->pptr() && this->pptr() > this->pbase())
 		{

@@ -47,13 +47,10 @@ public:
 	{
 	}
 
-	~AccessExpireCache()
-	{
-	}
+	~AccessExpireCache() = default;
 
-private:
-	AccessExpireCache(const AccessExpireCache& aCache);
-	AccessExpireCache& operator = (const AccessExpireCache& aCache);
+	AccessExpireCache(const AccessExpireCache& aCache) = delete;
+	AccessExpireCache& operator=(const AccessExpireCache& aCache) = delete;
 };
 
 

@@ -57,13 +57,10 @@ public:
 	{
 	}
 
-	~UniqueAccessExpireCache()
-	{
-	}
+	~UniqueAccessExpireCache() = default;
 
-private:
-	UniqueAccessExpireCache(const UniqueAccessExpireCache& aCache);
-	UniqueAccessExpireCache& operator = (const UniqueAccessExpireCache& aCache);
+	UniqueAccessExpireCache(const UniqueAccessExpireCache& aCache) = delete;
+	UniqueAccessExpireCache& operator=(const UniqueAccessExpireCache& aCache) = delete;
 };
 
 

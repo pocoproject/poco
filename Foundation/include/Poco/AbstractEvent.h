@@ -149,8 +149,8 @@ class AbstractEvent
 	/// to create the PriorityDelegate.
 {
 public:
-	typedef TDelegate* DelegateHandle;
-	typedef TArgs Args;
+	using DelegateHandle = TDelegate *;
+	using Args = TArgs;
 
 	AbstractEvent():
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
@@ -165,9 +165,10 @@ public:
 	{
 	}
 
-	virtual ~AbstractEvent()
-	{
-	}
+	virtual ~AbstractEvent() = default;
+
+	AbstractEvent(const AbstractEvent &other) = delete;
+	AbstractEvent &operator=(const AbstractEvent &other) = delete;
 
 	void operator += (const TDelegate& aDelegate)
 		/// Adds a delegate to the event.
@@ -347,10 +348,6 @@ protected:
 	bool      _enabled;  /// Stores if an event is enabled. Notifies on disabled events have no effect
 	                     /// but it is possible to change the observers.
 	mutable TMutex _mutex;
-
-private:
-	AbstractEvent(const AbstractEvent& other);
-	AbstractEvent& operator = (const AbstractEvent& other);
 };
 
 
@@ -358,7 +355,7 @@ template <class TStrategy, class TDelegate, class TMutex>
 class AbstractEvent<void, TStrategy, TDelegate, TMutex>
 {
 public:
-	typedef TDelegate* DelegateHandle;
+	using DelegateHandle = TDelegate *;
 
 	AbstractEvent():
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
@@ -373,9 +370,10 @@ public:
 	{
 	}
 
-	virtual ~AbstractEvent()
-	{
-	}
+	virtual ~AbstractEvent() = default;
+
+	AbstractEvent(const AbstractEvent &other) = delete;
+	AbstractEvent &operator=(const AbstractEvent &other) = delete;
 
 	void operator += (const TDelegate& aDelegate)
 		/// Adds a delegate to the event.
@@ -547,10 +545,6 @@ protected:
 	bool      _enabled;  /// Stores if an event is enabled. Notifies on disabled events have no effect
 	                     /// but it is possible to change the observers.
 	mutable TMutex _mutex;
-
-private:
-	AbstractEvent(const AbstractEvent& other);
-	AbstractEvent& operator = (const AbstractEvent& other);
 };
 
 

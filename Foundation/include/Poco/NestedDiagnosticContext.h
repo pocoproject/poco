@@ -51,7 +51,7 @@ class Foundation_API NestedDiagnosticContext
 	/// source code line number and file name.
 {
 public:
-	typedef NDCScope Scope;
+	using Scope = NDCScope;
 
 	NestedDiagnosticContext();
 		/// Creates the NestedDiagnosticContext.
@@ -108,14 +108,12 @@ private:
 		const char* file;
 		LineNumber  line;
 	};
-	typedef std::vector<Context> Stack;
+	using Stack = std::vector<Context>;
 
 	Stack _stack;
 };
 
-
-typedef NestedDiagnosticContext NDC;
-
+using NDC = NestedDiagnosticContext;
 
 class Foundation_API NDCScope
 	/// This class can be used to automatically push a context onto

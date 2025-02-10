@@ -51,10 +51,7 @@ public:
 	{
 	}
 
-
-	~AccessExpirationDecorator()
-	{
-	}
+	~AccessExpirationDecorator() = default;
 
 	const Poco::Timespan& getTimeout() const
 	{

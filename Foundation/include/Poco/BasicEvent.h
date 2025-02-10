@@ -40,17 +40,12 @@ class BasicEvent: public AbstractEvent <
 	/// for more information.
 {
 public:
-	BasicEvent()
-	{
-	}
+	BasicEvent() = default;
 
-	~BasicEvent()
-	{
-	}
+	~BasicEvent() = default;
 
-private:
-	BasicEvent(const BasicEvent& e);
-	BasicEvent& operator = (const BasicEvent& e);
+	BasicEvent(const BasicEvent& e) = delete;
+	BasicEvent& operator=(const BasicEvent& e) = delete;
 };
 
 

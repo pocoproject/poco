@@ -49,7 +49,7 @@ class BasicFIFOBuffer
 	/// is needed.
 {
 public:
-	typedef T Type;
+	using Type = T;
 
 	mutable Poco::BasicEvent<bool> writable;
 		/// Event indicating "writability" of the buffer,
@@ -108,10 +108,12 @@ public:
 	{
 	}
 
-	~BasicFIFOBuffer()
+	~BasicFIFOBuffer() = default;
 		/// Destroys the FIFOBuffer.
-	{
-	}
+
+	BasicFIFOBuffer() = delete;
+	BasicFIFOBuffer(const BasicFIFOBuffer&) = delete;
+	BasicFIFOBuffer& operator=(const BasicFIFOBuffer&) = delete;
 
 	void resize(std::size_t newSize, bool preserveContent = true)
 		/// Resizes the buffer. If preserveContent is true,
@@ -531,10 +533,6 @@ private:
 			writable.notify(this, f);
 	}
 
-	BasicFIFOBuffer();
-	BasicFIFOBuffer(const BasicFIFOBuffer&);
-	BasicFIFOBuffer& operator = (const BasicFIFOBuffer&);
-
 	Buffer<T>     _buffer;
 	std::size_t   _begin;
 	std::size_t   _used;
@@ -548,8 +546,7 @@ private:
 //
 // We provide an instantiation for char
 //
-typedef BasicFIFOBuffer<char> FIFOBuffer;
-
+using FIFOBuffer = BasicFIFOBuffer<char>;
 
 } // namespace Poco
 

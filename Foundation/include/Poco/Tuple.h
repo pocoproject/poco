@@ -7,7 +7,7 @@
 //
 // Definition of the Tuple class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2006,Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -74,7 +74,7 @@ template <class T0,
 	class T39 = NullTypeList>
 struct Tuple
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -245,9 +245,9 @@ template <class T0,
 	class T36,
 	class T37,
 	class T38>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -415,9 +415,9 @@ template <class T0,
 	class T35,
 	class T36,
 	class T37>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -582,9 +582,9 @@ template <class T0,
 	class T34,
 	class T35,
 	class T36>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -746,9 +746,9 @@ template <class T0,
 	class T33,
 	class T34,
 	class T35>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -907,9 +907,9 @@ template <class T0,
 	class T32,
 	class T33,
 	class T34>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1065,9 +1065,9 @@ template <class T0,
 	class T31,
 	class T32,
 	class T33>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1220,9 +1220,9 @@ template <class T0,
 	class T30,
 	class T31,
 	class T32>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1372,9 +1372,9 @@ template <class T0,
 	class T29,
 	class T30,
 	class T31>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1521,9 +1521,9 @@ template <class T0,
 	class T28,
 	class T29,
 	class T30>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1667,9 +1667,9 @@ template <class T0,
 	class T27,
 	class T28,
 	class T29>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1810,9 +1810,9 @@ template <class T0,
 	class T26,
 	class T27,
 	class T28>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -1950,9 +1950,9 @@ template <class T0,
 	class T25,
 	class T26,
 	class T27>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2087,9 +2087,9 @@ template <class T0,
 	class T24,
 	class T25,
 	class T26>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2221,9 +2221,9 @@ template <class T0,
 	class T23,
 	class T24,
 	class T25>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2352,9 +2352,9 @@ template <class T0,
 	class T22,
 	class T23,
 	class T24>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2480,9 +2480,9 @@ template <class T0,
 	class T21,
 	class T22,
 	class T23>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2605,9 +2605,9 @@ template <class T0,
 	class T20,
 	class T21,
 	class T22>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2727,9 +2727,9 @@ template <class T0,
 	class T19,
 	class T20,
 	class T21>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2846,9 +2846,9 @@ template <class T0,
 	class T18,
 	class T19,
 	class T20>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -2962,9 +2962,9 @@ template <class T0,
 	class T17,
 	class T18,
 	class T19>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3075,9 +3075,9 @@ template <class T0,
 	class T16,
 	class T17,
 	class T18>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3185,9 +3185,9 @@ template <class T0,
 	class T15,
 	class T16,
 	class T17>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3292,9 +3292,9 @@ template <class T0,
 	class T14,
 	class T15,
 	class T16>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3396,9 +3396,9 @@ template <class T0,
 	class T13,
 	class T14,
 	class T15>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3497,9 +3497,9 @@ template <class T0,
 	class T12,
 	class T13,
 	class T14>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3595,9 +3595,9 @@ template <class T0,
 	class T11,
 	class T12,
 	class T13>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3692,7 +3692,7 @@ template <class T0,
 	class T12>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3782,9 +3782,9 @@ template <class T0,
 	class T9,
 	class T10,
 	class T11>
-struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3871,9 +3871,9 @@ template <class T0,
 	class T8,
 	class T9,
 	class T10>
-struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -3957,9 +3957,9 @@ template <class T0,
 	class T7,
 	class T8,
 	class T9>
-struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9, NullTypeList>
 {
-	typedef typename TypeListType<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4040,9 +4040,9 @@ template <class T0,
 	class T6,
 	class T7,
 	class T8>
-struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4120,9 +4120,9 @@ template <class T0,
 	class T5,
 	class T6,
 	class T7>
-struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4197,9 +4197,9 @@ template <class T0,
 	class T4,
 	class T5,
 	class T6>
-struct Tuple<T0, T1,T2,T3,T4,T5,T6, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5,T6, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5,T6>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4271,9 +4271,9 @@ template <class T0,
 	class T3,
 	class T4,
 	class T5>
-struct Tuple<T0, T1,T2,T3,T4,T5, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4,T5, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4,T5>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4,T5>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4342,9 +4342,9 @@ template <class T0,
 	class T2,
 	class T3,
 	class T4>
-struct Tuple<T0, T1,T2,T3,T4, NullTypeList>
+struct Tuple<T0,T1,T2,T3,T4, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3,T4>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3,T4>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4410,9 +4410,9 @@ template <class T0,
 	class T1,
 	class T2,
 	class T3>
-struct Tuple<T0, T1,T2,T3, NullTypeList>
+struct Tuple<T0,T1,T2,T3, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2,T3>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2,T3>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4475,9 +4475,9 @@ private:
 template <class T0,
 	class T1,
 	class T2>
-struct Tuple<T0, T1,T2, NullTypeList>
+struct Tuple<T0,T1,T2, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1,T2>::HeadType Type;
+	using Type = typename TypeListType<T0,T1,T2>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4537,9 +4537,9 @@ private:
 
 template <class T0,
 	class T1>
-struct Tuple<T0, T1, NullTypeList>
+struct Tuple<T0,T1, NullTypeList>
 {
-	typedef typename TypeListType<T0,T1>::HeadType Type;
+	using Type = typename TypeListType<T0,T1>::HeadType;
 
 	enum TupleLengthType
 	{
@@ -4597,7 +4597,7 @@ private:
 template <class T0>
 struct Tuple<T0, NullTypeList>
 {
-	typedef TypeList<T0, NullTypeList> Type;
+	using Type = TypeList<T0, NullTypeList>;
 
 	enum TupleLengthType
 	{

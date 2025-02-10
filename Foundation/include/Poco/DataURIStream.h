@@ -39,7 +39,7 @@ class Foundation_API DataURIStreamIOS: public virtual std::ios
 {
 public:
 	DataURIStreamIOS(const URI& uri);
-	~DataURIStreamIOS();
+	~DataURIStreamIOS() override;
 	std::streambuf* rdbuf();
 
 protected:
@@ -63,7 +63,7 @@ public:
 		/// Creates a DataURIStream for the given data URI,
 		/// ready for reading data.
 		/// Throws a DataFormatException exception if the data is incorrect format.
-	~DataURIStream();
+	~DataURIStream() override;
 		/// Destroys the DataURIStream.
 
 private:

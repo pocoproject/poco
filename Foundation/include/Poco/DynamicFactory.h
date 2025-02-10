@@ -34,12 +34,11 @@ class DynamicFactory
 	/// A factory that creates objects by class name.
 {
 public:
-	typedef AbstractInstantiator<Base> AbstractFactory;
+	using AbstractFactory = AbstractInstantiator<Base>;
 
 	DynamicFactory()
 		/// Creates the DynamicFactory.
-	{
-	}
+		= default;
 
 	~DynamicFactory()
 		/// Destroys the DynamicFactory and deletes the instantiators for
@@ -50,6 +49,9 @@ public:
 			delete p.second;
 		}
 	}
+
+	DynamicFactory(const DynamicFactory&) = delete;
+	DynamicFactory& operator=(const DynamicFactory&) = delete;
 
 	Base* createInstance(const std::string& className) const
 		/// Creates a new instance of the class with the given name.
@@ -121,10 +123,7 @@ public:
 	}
 
 private:
-	DynamicFactory(const DynamicFactory&);
-	DynamicFactory& operator = (const DynamicFactory&);
-
-	typedef std::map<std::string, AbstractFactory*> FactoryMap;
+	using FactoryMap = std::map<std::string, AbstractFactory *>;
 
 	FactoryMap _map;
 	mutable FastMutex _mutex;

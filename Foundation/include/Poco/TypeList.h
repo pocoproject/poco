@@ -61,10 +61,10 @@ template <class Head, class Tail>
 struct TypeList
 	/// Compile Time List of Types
 {
-	typedef Head HeadType;
-	typedef Tail TailType;
-	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
-	typedef typename TypeWrapper<TailType>::CONSTTYPE ConstTailType;
+	using HeadType = Head;
+	using TailType = Tail;
+	using ConstHeadType = typename TypeWrapper<HeadType>::CONSTTYPE;
+	using ConstTailType = typename TypeWrapper<TailType>::CONSTTYPE;
 	enum
 	{
 		length = TailType::length+1
@@ -165,21 +165,21 @@ struct TypeListType
 	/// typeList is a TypeList of T0, T1, ... , Tn
 {
 private:
-	typedef typename
+	using TailType = typename
 		TypeListType<T1,T2, T3, T4, T5, T6, T7, T8, T9, T10,
 					T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,
 					T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,
-					T31,T32,T33,T34,T35,T36,T37,T38,T39>::HeadType TailType;
+					T31,T32,T33,T34,T35,T36,T37,T38,T39>::HeadType ;
 
 public:
-	typedef TypeList<T0, TailType> HeadType;
+	using HeadType = TypeList<T0, TailType>;
 };
 
 
 template <>
 struct TypeListType<>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
@@ -224,16 +224,16 @@ struct TypeGetter;
 template <int N, class Head, class Tail>
 struct TypeGetter<N, TypeList<Head, Tail>>
 {
-	typedef typename TypeGetter<N-1, Tail>::HeadType HeadType;
-	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
+	using HeadType = typename TypeGetter<N - 1, Tail>::HeadType;
+	using ConstHeadType = typename TypeWrapper<HeadType>::CONSTTYPE;
 };
 
 
 template <class Head, class Tail>
 struct TypeGetter<0, TypeList<Head, Tail>>
 {
-	typedef typename TypeList<Head, Tail>::HeadType HeadType;
-	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
+	using HeadType = typename TypeList<Head, Tail>::HeadType;
+	using ConstHeadType = typename TypeWrapper<HeadType>::CONSTTYPE;
 };
 
 
@@ -293,28 +293,28 @@ struct TypeAppender;
 template <>
 struct TypeAppender<NullTypeList, NullTypeList>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
 template <class T>
 struct TypeAppender<NullTypeList, T>
 {
-	typedef TypeList<T, NullTypeList> HeadType;
+	using HeadType = TypeList<T, NullTypeList>;
 };
 
 
 template <class Head, class Tail>
 struct TypeAppender<NullTypeList, TypeList<Head, Tail>>
 {
-	typedef TypeList<Head, Tail> HeadType;
+	using HeadType = TypeList<Head, Tail>;
 };
 
 
 template <class Head, class Tail, class T>
 struct TypeAppender<TypeList<Head, Tail>, T>
 {
-	typedef TypeList<Head, typename TypeAppender<Tail, T>::HeadType> HeadType;
+	using HeadType = TypeList<Head, typename TypeAppender<Tail, T>::HeadType>;
 };
 
 
@@ -332,21 +332,21 @@ struct TypeOneEraser;
 template <class T>
 struct TypeOneEraser<NullTypeList, T>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
 template <class T, class Tail>
 struct TypeOneEraser<TypeList<T, Tail>, T>
 {
-	typedef Tail HeadType;
+	using HeadType = Tail;
 };
 
 
 template <class Head, class Tail, class T>
 struct TypeOneEraser<TypeList<Head, Tail>, T>
 {
-	typedef TypeList <Head, typename TypeOneEraser<Tail, T>::HeadType> HeadType;
+	using HeadType = TypeList<Head, typename TypeOneEraser<Tail, T>::HeadType>;
 };
 
 
@@ -364,21 +364,21 @@ struct TypeAllEraser;
 template <class T>
 struct TypeAllEraser<NullTypeList, T>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
 template <class T, class Tail>
 struct TypeAllEraser<TypeList<T, Tail>, T>
 {
-	typedef typename TypeAllEraser<Tail, T>::HeadType HeadType;
+	using HeadType = typename TypeAllEraser<Tail, T>::HeadType;
 };
 
 
 template <class Head, class Tail, class T>
 struct TypeAllEraser<TypeList<Head, Tail>, T>
 {
-	typedef TypeList <Head, typename TypeAllEraser<Tail, T>::HeadType> HeadType;
+	using HeadType = TypeList<Head, typename TypeAllEraser<Tail, T>::HeadType>;
 };
 
 
@@ -396,7 +396,7 @@ struct TypeDuplicateEraser;
 template <>
 struct TypeDuplicateEraser<NullTypeList>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
@@ -404,10 +404,11 @@ template <class Head, class Tail>
 struct TypeDuplicateEraser<TypeList<Head, Tail>>
 {
 private:
-	typedef typename TypeDuplicateEraser<Tail>::HeadType L1;
-	typedef typename TypeOneEraser<L1, Head>::HeadType L2;
+	using L1 = typename TypeDuplicateEraser<Tail>::HeadType;
+	using L2 = typename TypeOneEraser<L1, Head>::HeadType;
+
 public:
-	typedef TypeList<Head, L2> HeadType;
+	using HeadType = TypeList<Head, L2>;
 };
 
 
@@ -426,21 +427,21 @@ struct TypeOneReplacer;
 template <class T, class R>
 struct TypeOneReplacer<NullTypeList, T, R>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
 template <class T, class Tail, class R>
 struct TypeOneReplacer<TypeList<T, Tail>, T, R>
 {
-	typedef TypeList<R, Tail> HeadType;
+	using HeadType = TypeList<R, Tail>;
 };
 
 
 template <class Head, class Tail, class T, class R>
 struct TypeOneReplacer<TypeList<Head, Tail>, T, R>
 {
-	typedef TypeList<Head, typename TypeOneReplacer<Tail, T, R>::HeadType> HeadType;
+	using HeadType = TypeList<Head, typename TypeOneReplacer<Tail, T, R>::HeadType>;
 };
 
 
@@ -459,21 +460,21 @@ struct TypeAllReplacer;
 template <class T, class R>
 struct TypeAllReplacer<NullTypeList, T, R>
 {
-	typedef NullTypeList HeadType;
+	using HeadType = NullTypeList;
 };
 
 
 template <class T, class Tail, class R>
 struct TypeAllReplacer<TypeList<T, Tail>, T, R>
 {
-	typedef TypeList<R, typename TypeAllReplacer<Tail, T, R>::HeadType> HeadType;
+	using HeadType = TypeList<R, typename TypeAllReplacer<Tail, T, R>::HeadType>;
 };
 
 
 template <class Head, class Tail, class T, class R>
 struct TypeAllReplacer<TypeList<Head, Tail>, T, R>
 {
-	typedef TypeList<Head, typename TypeAllReplacer<Tail, T, R>::HeadType> HeadType;
+	using HeadType = TypeList<Head, typename TypeAllReplacer<Tail, T, R>::HeadType>;
 };
 
 

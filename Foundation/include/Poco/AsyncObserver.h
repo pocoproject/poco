@@ -66,7 +66,7 @@ public:
 		_started(false),
 		_done(false)
 	{
-		poco_assert(observer._nq.size() == 0);
+		poco_assert(observer._nq.empty());
 	}
 
 	~AsyncObserver()
@@ -78,7 +78,7 @@ public:
 	{
 		if (&observer != this)
 		{
-			poco_assert(observer._nq.size() == 0);
+			poco_assert(observer._nq.empty());
 			setObject(observer._pObject);
 			setHandler(observer._handler);
 			setMatcher(observer._matcher);

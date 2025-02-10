@@ -55,12 +55,12 @@ public:
 		}
 	}
 
+	ScopedLock() = delete;
+	ScopedLock(const ScopedLock&) = delete;
+	ScopedLock& operator=(const ScopedLock&) = delete;
+
 private:
 	M& _mutex;
-
-	ScopedLock();
-	ScopedLock(const ScopedLock&);
-	ScopedLock& operator = (const ScopedLock&);
 };
 
 
@@ -103,6 +103,10 @@ public:
 		}
 	}
 
+	ScopedLockWithUnlock() = delete;
+	ScopedLockWithUnlock(const ScopedLockWithUnlock&) = delete;
+	ScopedLockWithUnlock& operator=(const ScopedLockWithUnlock&) = delete;
+
 	void lock()
 	{
 		poco_assert(_pMutex != nullptr);
@@ -126,10 +130,6 @@ public:
 private:
 	M* _pMutex;
 	bool _locked = false;
-
-	ScopedLockWithUnlock();
-	ScopedLockWithUnlock(const ScopedLockWithUnlock&);
-	ScopedLockWithUnlock& operator = (const ScopedLockWithUnlock&);
 };
 
 

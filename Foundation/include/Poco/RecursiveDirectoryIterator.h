@@ -60,7 +60,7 @@ class RecursiveDirectoryIterator
 	/// parameter maxDepth (which sets the infinite depth by default).
 {
 public:
-	typedef RecursiveDirectoryIterator<TTravStr> MyType;
+	using MyType = RecursiveDirectoryIterator<TTravStr>;
 
 	enum
 	{
@@ -217,7 +217,7 @@ public:
 	friend inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b);
 
 private:
-	typedef RecursiveDirectoryIteratorImpl<TTravStr> ImplType;
+	using ImplType = RecursiveDirectoryIteratorImpl<TTravStr>;
 
 	ImplType* _pImpl;
 	Path _path;
@@ -244,9 +244,8 @@ inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const Recursive
 //
 // typedefs
 //
-typedef RecursiveDirectoryIterator<ChildrenFirstTraverse> SimpleRecursiveDirectoryIterator;
-typedef RecursiveDirectoryIterator<SiblingsFirstTraverse> SiblingsFirstRecursiveDirectoryIterator;
-
+using SimpleRecursiveDirectoryIterator = RecursiveDirectoryIterator<ChildrenFirstTraverse>;
+using SiblingsFirstRecursiveDirectoryIterator = RecursiveDirectoryIterator<SiblingsFirstTraverse>;
 
 } // namespace Poco
 

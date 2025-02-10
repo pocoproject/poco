@@ -38,10 +38,10 @@ class Foundation_API Base32DecoderBuf: public UnbufferedStreamBuf
 {
 public:
 	Base32DecoderBuf(std::istream& istr);
-	~Base32DecoderBuf();
+	~Base32DecoderBuf() override;
 
 private:
-	int readFromDevice();
+	int readFromDevice() override;
 	int readOne();
 
 	unsigned char   _group[8];
@@ -66,7 +66,7 @@ class Foundation_API Base32DecoderIOS: public virtual std::ios
 {
 public:
 	Base32DecoderIOS(std::istream& istr);
-	~Base32DecoderIOS();
+	~Base32DecoderIOS() override;
 	Base32DecoderBuf* rdbuf();
 
 protected:
@@ -92,7 +92,7 @@ class Foundation_API Base32Decoder: public Base32DecoderIOS, public std::istream
 {
 public:
 	Base32Decoder(std::istream& istr);
-	~Base32Decoder();
+	~Base32Decoder() override;
 
 private:
 	Base32Decoder(const Base32Decoder&);

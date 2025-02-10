@@ -18,10 +18,10 @@
 #define Foundation_ExpireStrategy_INCLUDED
 
 
+#include "Poco/Exception.h"
 #include "Poco/KeyValueArgs.h"
 #include "Poco/ValidArgs.h"
 #include "Poco/AbstractStrategy.h"
-#include "Poco/Bugcheck.h"
 #include "Poco/Timestamp.h"
 #include "Poco/EventArgs.h"
 #include <set>
@@ -39,11 +39,11 @@ class ExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// An ExpireStrategy implements time based expiration of cache entries
 {
 public:
-	typedef std::multimap<Timestamp, TKey>     TimeIndex;
-	typedef typename TimeIndex::iterator       IndexIterator;
-	typedef typename TimeIndex::const_iterator ConstIndexIterator;
-	typedef std::map<TKey, IndexIterator>      Keys;
-	typedef typename Keys::iterator            Iterator;
+	using TimeIndex = std::multimap<Timestamp, TKey>;
+	using IndexIterator = typename TimeIndex::iterator;
+	using ConstIndexIterator = typename TimeIndex::const_iterator;
+	using Keys = std::map<TKey, IndexIterator>;
+	using Iterator = typename Keys::iterator;
 
 public:
 	ExpireStrategy(Timestamp::TimeDiff expireTimeInMilliSec): _expireTime(expireTimeInMilliSec * 1000)
@@ -53,9 +53,7 @@ public:
 		if (_expireTime < 25000) throw InvalidArgumentException("expireTime must be at least 25 ms");
 	}
 
-	~ExpireStrategy()
-	{
-	}
+	~ExpireStrategy() = default;
 
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{
