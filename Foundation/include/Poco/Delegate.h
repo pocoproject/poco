@@ -32,7 +32,7 @@ template <class TObj, class TArgs, bool withSender = true>
 class Delegate: public AbstractDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
+	using NotifyMethod = void (TObj::*)(const void *, TArgs &);
 
 	Delegate(TObj* obj, NotifyMethod method):
 		_receiverObject(obj),
@@ -47,9 +47,9 @@ public:
 	{
 	}
 
-	~Delegate()
-	{
-	}
+	~Delegate() = default;
+
+	Delegate() = delete;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -93,9 +93,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex        _mutex;
-
-private:
-	Delegate();
 };
 
 
@@ -103,7 +100,7 @@ template <class TObj, class TArgs>
 class Delegate<TObj, TArgs, false>: public AbstractDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(TArgs&);
+	using NotifyMethod = void (TObj::*)(TArgs &);
 
 	Delegate(TObj* obj, NotifyMethod method):
 		_receiverObject(obj),
@@ -118,9 +115,9 @@ public:
 	{
 	}
 
-	~Delegate()
-	{
-	}
+	~Delegate() = default;
+
+	Delegate() = delete;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -164,9 +161,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex        _mutex;
-
-private:
-	Delegate();
 };
 
 
@@ -244,7 +238,7 @@ template <class TObj>
 class Delegate<TObj,void,true>: public AbstractDelegate<void>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*);
+	using NotifyMethod = void (TObj::*)(const void *);
 
 	Delegate(TObj* obj, NotifyMethod method):
 		_receiverObject(obj),
@@ -259,9 +253,9 @@ public:
 	{
 	}
 
-	~Delegate()
-	{
-	}
+	~Delegate() override = default;
+
+	Delegate() = delete;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -273,7 +267,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void *sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -284,18 +278,18 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void> &other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void> *clone() const override
 	{
 		return new Delegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = 0;
@@ -305,9 +299,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex        _mutex;
-
-private:
-	Delegate();
 };
 
 
@@ -315,7 +306,7 @@ template <class TObj>
 class Delegate<TObj, void, false>: public AbstractDelegate<void>
 {
 public:
-	typedef void (TObj::*NotifyMethod)();
+	using NotifyMethod = void (TObj::*)();
 
 	Delegate(TObj* obj, NotifyMethod method):
 		_receiverObject(obj),
@@ -330,9 +321,9 @@ public:
 	{
 	}
 
-	~Delegate()
-	{
-	}
+	~Delegate() override = default;
+
+	Delegate() = delete;
 
 	Delegate& operator = (const Delegate& delegate)
 	{
@@ -344,7 +335,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void*)
+	bool notify(const void *) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
@@ -355,18 +346,17 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void> &other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
-	{
+	AbstractDelegate<void> *clone() const override {
 		return new Delegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = 0;
@@ -376,9 +366,6 @@ protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex        _mutex;
-
-private:
-	Delegate();
 };
 
 

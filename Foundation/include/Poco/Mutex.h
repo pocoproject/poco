@@ -214,15 +214,11 @@ public:
 	using ScopedLock = Poco::ScopedLock<NullMutex>;
 	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<NullMutex>;
 
-	NullMutex()
+	NullMutex() = default;
 		/// Creates the NullMutex.
-	{
-	}
 
-	~NullMutex()
+	~NullMutex() = default;
 		/// Destroys the NullMutex.
-	{
-	}
 
 	void lock()
 		/// Does nothing.

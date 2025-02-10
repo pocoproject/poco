@@ -82,10 +82,10 @@ public:
 		/// LoggingRegistry.
 
 private:
-	typedef Channel::Ptr ChannelPtr;
-	typedef AutoPtr<Formatter> FormatterPtr;
-	typedef std::map<std::string, ChannelPtr> ChannelMap;
-	typedef std::map<std::string, FormatterPtr> FormatterMap;
+	using ChannelPtr = Channel::Ptr;
+	using FormatterPtr = AutoPtr<Formatter>;
+	using ChannelMap = std::map<std::string, ChannelPtr>;
+	using FormatterMap = std::map<std::string, FormatterPtr>;
 
 	ChannelMap   _channelMap;
 	FormatterMap _formatterMap;

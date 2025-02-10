@@ -42,17 +42,12 @@ class POCO_DEPRECATED("use BasicEvent") FIFOEvent: public AbstractEvent <
 	/// for backwards compatibility only.
 {
 public:
-	FIFOEvent()
-	{
-	}
+	FIFOEvent() = default;
 
-	~FIFOEvent()
-	{
-	}
+	~FIFOEvent() = default;
 
-private:
-	FIFOEvent(const FIFOEvent& e);
-	FIFOEvent& operator = (const FIFOEvent& e);
+	FIFOEvent(const FIFOEvent& e) = delete;
+	FIFOEvent& operator=(const FIFOEvent& e) = delete;
 };
 
 

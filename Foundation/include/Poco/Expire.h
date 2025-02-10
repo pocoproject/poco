@@ -51,6 +51,8 @@ public:
 		delete _pDelegate;
 	}
 
+	Expire() = delete;
+
 	Expire& operator = (const Expire& expire)
 	{
 		if (&expire != this)
@@ -101,9 +103,6 @@ protected:
 	AbstractDelegate<TArgs>* _pDelegate;
 	Timestamp::TimeDiff _expire;
 	Timestamp _creationTime;
-
-private:
-	Expire();
 };
 
 
@@ -127,10 +126,12 @@ public:
 	{
 	}
 
-	~Expire()
+	~Expire() override
 	{
 		delete _pDelegate;
 	}
+
+	Expire() = delete;
 
 	Expire& operator = (const Expire& expire)
 	{
@@ -145,7 +146,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void* sender) override
 	{
 		if (!expired())
 			return this->_pDelegate->notify(sender);
@@ -153,22 +154,22 @@ public:
 			return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		return other.equals(*_pDelegate);
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new Expire(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		_pDelegate->disable();
 	}
 
-	const AbstractDelegate<void>* unwrap() const
+	const AbstractDelegate<void>* unwrap() const override
 	{
 		return this->_pDelegate;
 	}
@@ -182,9 +183,6 @@ protected:
 	AbstractDelegate<void>* _pDelegate;
 	Timestamp::TimeDiff _expire;
 	Timestamp _creationTime;
-
-private:
-	Expire();
 };
 
 

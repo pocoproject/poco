@@ -32,7 +32,7 @@ class FunctionPriorityDelegate: public AbstractPriorityDelegate<TArgs>
 	/// for use as a PriorityDelegate.
 {
 public:
-	typedef void (*NotifyFunction)(const void*, TArgs&);
+	using NotifyFunction = void (*)(const void *, TArgs &);
 
 	FunctionPriorityDelegate(NotifyFunction function, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -56,9 +56,9 @@ public:
 		return *this;
 	}
 
-	~FunctionPriorityDelegate()
-	{
-	}
+	~FunctionPriorityDelegate() = default;
+
+	FunctionPriorityDelegate() = delete;
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
@@ -91,9 +91,6 @@ public:
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionPriorityDelegate();
 };
 
 
@@ -101,7 +98,7 @@ template <class TArgs>
 class FunctionPriorityDelegate<TArgs, true, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
-	typedef void (*NotifyFunction)(void*, TArgs&);
+	using NotifyFunction = void (*)(void *, TArgs &);
 
 	FunctionPriorityDelegate(NotifyFunction function, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -125,9 +122,9 @@ public:
 		return *this;
 	}
 
-	~FunctionPriorityDelegate()
-	{
-	}
+	~FunctionPriorityDelegate() = default;
+
+	FunctionPriorityDelegate() = delete;
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
@@ -160,9 +157,6 @@ public:
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionPriorityDelegate();
 };
 
 
@@ -170,7 +164,7 @@ template <class TArgs>
 class FunctionPriorityDelegate<TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
-	typedef void (*NotifyFunction)(TArgs&);
+	using NotifyFunction = void (*)(TArgs &);
 
 	FunctionPriorityDelegate(NotifyFunction function, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -194,9 +188,9 @@ public:
 		return *this;
 	}
 
-	~FunctionPriorityDelegate()
-	{
-	}
+	~FunctionPriorityDelegate() = default;
+
+	FunctionPriorityDelegate() = delete;
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
@@ -229,9 +223,6 @@ public:
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionPriorityDelegate();
 };
 
 
@@ -241,7 +232,7 @@ class FunctionPriorityDelegate<void, true, true>: public AbstractPriorityDelegat
 	/// for use as a PriorityDelegate.
 {
 public:
-	typedef void (*NotifyFunction)(const void*);
+	using NotifyFunction = void (*)(const void *);
 
 	FunctionPriorityDelegate(NotifyFunction function, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -255,6 +246,8 @@ public:
 	{
 	}
 
+	FunctionPriorityDelegate() = delete;
+
 	FunctionPriorityDelegate& operator = (const FunctionPriorityDelegate& delegate)
 	{
 		if (&delegate != this)
@@ -265,11 +258,9 @@ public:
 		return *this;
 	}
 
-	~FunctionPriorityDelegate()
-	{
-	}
+	~FunctionPriorityDelegate() override = default;
 
-	bool notify(const void* sender)
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
@@ -280,29 +271,26 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const FunctionPriorityDelegate* pOtherDelegate = dynamic_cast<const FunctionPriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new FunctionPriorityDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionPriorityDelegate();
 };
 
 
@@ -310,7 +298,7 @@ template <>
 class FunctionPriorityDelegate<void, true, false>: public AbstractPriorityDelegate<void>
 {
 public:
-	typedef void (*NotifyFunction)(void*);
+	using NotifyFunction = void (*)(void *);
 
 	FunctionPriorityDelegate(NotifyFunction function, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -334,11 +322,11 @@ public:
 		return *this;
 	}
 
-	~FunctionPriorityDelegate()
-	{
-	}
+	~FunctionPriorityDelegate() override = default;
 
-	bool notify(const void* sender)
+	FunctionPriorityDelegate() = delete;
+
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
@@ -349,29 +337,26 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const FunctionPriorityDelegate* pOtherDelegate = dynamic_cast<const FunctionPriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new FunctionPriorityDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionPriorityDelegate();
 };
 
 
@@ -379,7 +364,7 @@ template <>
 class FunctionPriorityDelegate<void, false>: public AbstractPriorityDelegate<void>
 {
 public:
-	typedef void (*NotifyFunction)();
+	using NotifyFunction = void (*)();
 
 	FunctionPriorityDelegate(NotifyFunction function, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -403,11 +388,11 @@ public:
 		return *this;
 	}
 
-	~FunctionPriorityDelegate()
-	{
-	}
+	~FunctionPriorityDelegate() override = default;
 
-	bool notify(const void* sender)
+	FunctionPriorityDelegate() = delete;
+
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
@@ -418,29 +403,26 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const FunctionPriorityDelegate* pOtherDelegate = dynamic_cast<const FunctionPriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new FunctionPriorityDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionPriorityDelegate();
 };
 
 

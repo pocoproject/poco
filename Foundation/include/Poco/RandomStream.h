@@ -36,8 +36,8 @@ class Foundation_API RandomBuf: public BufferedStreamBuf
 {
 public:
 	RandomBuf();
-	~RandomBuf();
-	int readFromDevice(char* buffer, std::streamsize length);
+	~RandomBuf() override;
+	int readFromDevice(char* buffer, std::streamsize length) override;
 };
 
 
@@ -49,7 +49,7 @@ class Foundation_API RandomIOS: public virtual std::ios
 {
 public:
 	RandomIOS();
-	~RandomIOS();
+	~RandomIOS() override;
 	RandomBuf* rdbuf();
 
 protected:
@@ -63,7 +63,7 @@ class Foundation_API RandomInputStream: public RandomIOS, public std::istream
 {
 public:
 	RandomInputStream();
-	~RandomInputStream();
+	~RandomInputStream() override;
 };
 
 

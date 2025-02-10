@@ -48,7 +48,7 @@ class Foundation_API Pipe
 	/// to a reference-counted PipeImpl object.
 {
 public:
-	typedef PipeImpl::Handle Handle; /// The read/write handle or file descriptor.
+	using Handle = PipeImpl::Handle; /// The read/write handle or file descriptor.
 
 	enum CloseMode /// used by close()
 	{

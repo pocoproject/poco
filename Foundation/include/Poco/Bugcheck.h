@@ -39,7 +39,7 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	[[noreturn]] static void assertion(const char* cond, const char* file, LineNumber line, const char* text = 0);
+	[[noreturn]] static void assertion(const char* cond, const char* file, LineNumber line, const char* text = nullptr);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
@@ -70,7 +70,7 @@ public:
 		/// possible.
 
 protected:
-	static std::string what(const char* msg, const char* file, LineNumber line, const char* text = 0);
+	static std::string what(const char* msg, const char* file, LineNumber line, const char* text = nullptr);
 };
 
 

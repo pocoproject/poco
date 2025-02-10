@@ -43,11 +43,11 @@ class Foundation_API Clock
 	/// to the time of day.
 {
 public:
-	typedef Int64 ClockVal;
-		/// Monotonic clock value in microsecond resolution.
+	using ClockVal = Int64;
+	/// Monotonic clock value in microsecond resolution.
 
-	typedef Int64 ClockDiff;
-		/// Difference between two ClockVal values in microseconds.
+	using ClockDiff = Int64;
+	/// Difference between two ClockVal values in microseconds.
 
 	static const ClockVal CLOCKVAL_MIN; /// Minimum clock value.
 	static const ClockVal CLOCKVAL_MAX; /// Maximum clock value.

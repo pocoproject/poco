@@ -139,13 +139,13 @@ protected:
 	Notification::Ptr dequeueOne();
 
 private:
-	typedef std::deque<Notification::Ptr> NfQueue;
+	using NfQueue = std::deque<Notification::Ptr>;
 	struct WaitInfo
 	{
 		Notification::Ptr pNf;
 		Event             nfAvailable;
 	};
-	typedef std::deque<WaitInfo*> WaitQueue;
+	using WaitQueue = std::deque<WaitInfo *>;
 
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;

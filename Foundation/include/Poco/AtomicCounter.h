@@ -34,7 +34,7 @@ class Foundation_API AtomicCounter
 	/// reference counting and similar functionality.
 {
 public:
-	typedef int ValueType; /// The underlying integer type.
+	using ValueType = int; /// The underlying integer type.
 
 	AtomicCounter();
 		/// Creates a new AtomicCounter and initializes it to zero.

@@ -41,11 +41,11 @@ public:
 	EventChannel();
 		/// Creates the EventChannel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Fires the messageLogged event.
 
 protected:
-	~EventChannel();
+	~EventChannel() override;
 		/// Destroys the EventChannel.
 };
 

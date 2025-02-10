@@ -48,7 +48,7 @@ public:
 		/// indicated by the given byte-order mark, which is the Unicode
 		/// character 0xFEFF.
 
-	~UTF32Encoding();
+	~UTF32Encoding() override;
 
 	ByteOrderType getByteOrder() const;
 		/// Returns the byte-order currently in use.
@@ -61,13 +61,13 @@ public:
 		/// byte order mark, which is the Unicode
 		/// character 0xFEFF.
 
-	const char* canonicalName() const;
-	bool isA(const std::string& encodingName) const;
-	const CharacterMap& characterMap() const;
-	int convert(const unsigned char* bytes) const;
-	int convert(int ch, unsigned char* bytes, int length) const;
-	int queryConvert(const unsigned char* bytes, int length) const;
-	int sequenceLength(const unsigned char* bytes, int length) const;
+	const char* canonicalName() const override;
+	bool isA(const std::string& encodingName) const override;
+	const CharacterMap& characterMap() const override;
+	int convert(const unsigned char* bytes) const override;
+	int convert(int ch, unsigned char* bytes, int length) const override;
+	int queryConvert(const unsigned char* bytes, int length) const override;
+	int sequenceLength(const unsigned char* bytes, int length) const override;
 
 protected:
 	static int safeToInt(Poco::UInt32 value)

@@ -49,13 +49,10 @@ public:
 	{
 	}
 
-	~ExpireCache()
-	{
-	}
+	~ExpireCache() = default;
 
-private:
-	ExpireCache(const ExpireCache& aCache);
-	ExpireCache& operator = (const ExpireCache& aCache);
+	ExpireCache(const ExpireCache& aCache) = delete;
+	ExpireCache& operator=(const ExpireCache& aCache) = delete;
 };
 
 

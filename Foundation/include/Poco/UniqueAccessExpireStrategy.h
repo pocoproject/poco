@@ -48,22 +48,18 @@ class UniqueAccessExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// which returns the timespan for how long an object will be valid without being accessed.
 {
 public:
-	typedef std::pair<TKey, Timespan>           KeyExpire;
-	typedef std::multimap<Timestamp, KeyExpire> TimeIndex;
-	typedef typename TimeIndex::iterator        IndexIterator;
-	typedef typename TimeIndex::const_iterator  ConstIndexIterator;
-	typedef std::map<TKey, IndexIterator>       Keys;
-	typedef typename Keys::iterator             Iterator;
+	using KeyExpire = std::pair<TKey, Timespan>;
+	using TimeIndex = std::multimap<Timestamp, KeyExpire>;
+	using IndexIterator = typename TimeIndex::iterator;
+	using ConstIndexIterator = typename TimeIndex::const_iterator;
+	using Keys = std::map<TKey, IndexIterator>;
+	using Iterator = typename Keys::iterator;
 
 public:
-	UniqueAccessExpireStrategy()
+	UniqueAccessExpireStrategy() = default;
 		/// Create an unique expire strategy.
-	{
-	}
 
-	~UniqueAccessExpireStrategy()
-	{
-	}
+	~UniqueAccessExpireStrategy() = default;
 
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{

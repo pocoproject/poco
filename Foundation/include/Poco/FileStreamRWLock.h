@@ -89,12 +89,13 @@ public:
 	ScopedFStreamRWLock(FileStreamRWLock& rwl, bool write = false);
 	~ScopedFStreamRWLock();
 
+	ScopedFStreamRWLock() = delete;
+	ScopedFStreamRWLock(const ScopedFStreamRWLock&) = delete;
+	ScopedFStreamRWLock& operator=(const ScopedFStreamRWLock&) = delete;
+
 private:
 	FileStreamRWLock& _rwl;
 
-	ScopedFStreamRWLock();
-	ScopedFStreamRWLock(const ScopedFStreamRWLock&);
-	ScopedFStreamRWLock& operator = (const ScopedFStreamRWLock&);
 };
 
 
@@ -182,21 +183,13 @@ inline ScopedFStreamReadRWLock::ScopedFStreamReadRWLock(FileStreamRWLock& rwl): 
 {
 }
 
-
-inline ScopedFStreamReadRWLock::~ScopedFStreamReadRWLock()
-{
-}
-
+inline ScopedFStreamReadRWLock::~ScopedFStreamReadRWLock() = default;
 
 inline ScopedFStreamWriteRWLock::ScopedFStreamWriteRWLock(FileStreamRWLock& rwl): ScopedFStreamRWLock(rwl, true)
 {
 }
 
-
-inline ScopedFStreamWriteRWLock::~ScopedFStreamWriteRWLock()
-{
-}
-
+inline ScopedFStreamWriteRWLock::~ScopedFStreamWriteRWLock() = default;
 
 } // namespace Poco
 

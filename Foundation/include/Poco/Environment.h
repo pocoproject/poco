@@ -29,7 +29,7 @@ class Foundation_API Environment
 	/// and some general system information.
 {
 public:
-	typedef UInt8 NodeId[6]; /// Ethernet address.
+	using NodeId = UInt8[6]; /// Ethernet address.
 
 	static std::string get(const std::string& name);
 		/// Returns the value of the environment variable

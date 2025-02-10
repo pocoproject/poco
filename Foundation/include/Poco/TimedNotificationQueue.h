@@ -136,7 +136,7 @@ public:
 		/// behavior.
 
 protected:
-	typedef std::multimap<Clock, Notification::Ptr> NfQueue;
+	using NfQueue = std::multimap<Clock, Notification::Ptr>;
 	Notification::Ptr dequeueOne(NfQueue::iterator& it);
 	bool wait(Clock::ClockDiff interval);
 

@@ -46,13 +46,10 @@ public:
 		this->_strategy.pushBack(new ExpireStrategy<TKey, TValue>(expire));
 	}
 
-	~ExpireLRUCache()
-	{
-	}
+	~ExpireLRUCache() = default;
 
-private:
-	ExpireLRUCache(const ExpireLRUCache& aCache);
-	ExpireLRUCache& operator = (const ExpireLRUCache& aCache);
+	ExpireLRUCache(const ExpireLRUCache& aCache) = delete;
+	ExpireLRUCache& operator=(const ExpireLRUCache& aCache) = delete;
 };
 
 

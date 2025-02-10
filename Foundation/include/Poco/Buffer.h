@@ -158,6 +158,8 @@ public:
 		if (_ownMem) delete [] _ptr;
 	}
 
+	Buffer() = delete;
+
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer capacity and size. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
@@ -362,8 +364,6 @@ public:
 	}
 
 private:
-	Buffer();
-
 	std::size_t _capacity;
 	std::size_t _used;
 	T*          _ptr;

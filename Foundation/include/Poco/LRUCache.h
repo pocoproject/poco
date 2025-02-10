@@ -40,13 +40,10 @@ public:
 	{
 	}
 
-	~LRUCache()
-	{
-	}
+	~LRUCache() = default;
 
-private:
-	LRUCache(const LRUCache& aCache);
-	LRUCache& operator = (const LRUCache& aCache);
+	LRUCache(const LRUCache& aCache) = delete;
+	LRUCache& operator=(const LRUCache& aCache) = delete;
 };
 
 

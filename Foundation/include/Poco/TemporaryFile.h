@@ -52,7 +52,7 @@ public:
 	TemporaryFile(const std::string& tempDir);
 		/// Creates the TemporaryFile using the given directory.
 
-	~TemporaryFile();
+	~TemporaryFile() override;
 		/// Destroys the TemporaryFile and
 		/// deletes the corresponding file on
 		/// disk unless keep() or keepUntilExit()

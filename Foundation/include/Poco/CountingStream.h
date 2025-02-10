@@ -43,7 +43,7 @@ public:
 		/// Creates the CountingStreamBuf and connects it
 		/// to the given output stream.
 
-	~CountingStreamBuf();
+	~CountingStreamBuf() override;
 		/// Destroys the CountingStream.
 
 	std::streamsize chars() const;
@@ -77,8 +77,8 @@ public:
 		/// Add to the number of characters on the current line.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream* _pIstr;
@@ -107,7 +107,7 @@ public:
 		/// Creates the basic stream and connects it
 		/// to the given output stream.
 
-	~CountingIOS();
+	~CountingIOS() override;
 		/// Destroys the stream.
 
 	std::streamsize chars() const;
@@ -158,7 +158,7 @@ public:
 		/// Creates the CountingInputStream and connects it
 		/// to the given input stream.
 
-	~CountingInputStream();
+	~CountingInputStream() override;
 		/// Destroys the stream.
 };
 
@@ -175,7 +175,7 @@ public:
 		/// Creates the CountingOutputStream and connects it
 		/// to the given output stream.
 
-	~CountingOutputStream();
+	~CountingOutputStream() override;
 		/// Destroys the CountingOutputStream.
 };
 

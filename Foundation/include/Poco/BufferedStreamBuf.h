@@ -43,15 +43,15 @@ class BasicBufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// ostream, but not for an iostream.
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef ba Allocator;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
-	typedef typename IOS::openmode openmode;
+	using Base = std::basic_streambuf<ch, tr>;
+	using IOS = std::basic_ios<ch, tr>;
+	using char_type = ch;
+	using char_traits = tr;
+	using Allocator = ba;
+	using int_type = typename Base::int_type;
+	using pos_type = typename Base::pos_type;
+	using off_type = typename Base::off_type;
+	using openmode = typename IOS::openmode;
 
 public:
 	BasicBufferedStreamBuf(std::streamsize bufferSize, openmode mode):
@@ -63,7 +63,7 @@ public:
 		this->setp(_pBuffer, _pBuffer + _bufsize);
 	}
 
-	~BasicBufferedStreamBuf()
+	~BasicBufferedStreamBuf() override
 	{
 		try
 		{
@@ -75,7 +75,10 @@ public:
 		}
 	}
 
-	virtual int_type overflow(int_type c)
+	BasicBufferedStreamBuf(const BasicBufferedStreamBuf&) = delete;
+	BasicBufferedStreamBuf& operator=(const BasicBufferedStreamBuf&) = delete;
+
+	int_type overflow(int_type c) override
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
@@ -89,7 +92,7 @@ public:
 		return c;
 	}
 
-	virtual int_type underflow()
+	int_type underflow() override
 	{
 		if (!(_mode & IOS::in)) return char_traits::eof();
 
@@ -110,7 +113,7 @@ public:
 		return char_traits::to_int_type(*this->gptr());
 	}
 
-	virtual int sync()
+	int sync() override
 	{
 		if (this->pptr() && this->pptr() > this->pbase())
 		{
@@ -155,9 +158,6 @@ private:
 	std::streamsize _bufsize;
 	char_type*      _pBuffer;
 	openmode        _mode;
-
-	BasicBufferedStreamBuf(const BasicBufferedStreamBuf&);
-	BasicBufferedStreamBuf& operator = (const BasicBufferedStreamBuf&);
 };
 
 //

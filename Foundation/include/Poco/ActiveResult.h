@@ -40,7 +40,7 @@ class ActiveResultHolder: public RefCountedObject
 public:
 	ActiveResultHolder():
 		_pData(0),
-		_pExc(0),
+		_pExc(nullptr),
 		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.
 	{
@@ -91,7 +91,7 @@ public:
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
-		return _pExc != 0;
+		return _pExc != nullptr;
 	}
 
 	std::string error() const
@@ -127,7 +127,7 @@ public:
 	}
 
 protected:
-	~ActiveResultHolder()
+	~ActiveResultHolder() override
 	{
 		delete _pData;
 		delete _pExc;
@@ -146,7 +146,7 @@ class ActiveResultHolder<void>: public RefCountedObject
 {
 public:
 	ActiveResultHolder():
-		_pExc(0),
+		_pExc(nullptr),
 		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.
 	{
@@ -184,7 +184,7 @@ public:
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
-		return _pExc != 0;
+		return _pExc != nullptr;
 	}
 
 	std::string error() const
@@ -220,7 +220,7 @@ public:
 	}
 
 protected:
-	~ActiveResultHolder()
+	~ActiveResultHolder() override
 	{
 		delete _pExc;
 	}
@@ -238,8 +238,8 @@ class ActiveResult
 	/// result from the execution thread back to the invocation thread.
 {
 public:
-	typedef RT ResultType;
-	typedef ActiveResultHolder<ResultType> ActiveResultHolderType;
+	using ResultType = RT;
+	using ActiveResultHolderType = ActiveResultHolder<ResultType>;
 
 	ActiveResult(ActiveResultHolderType* pHolder):
 		_pHolder(pHolder)
@@ -260,6 +260,8 @@ public:
 	{
 		_pHolder->release();
 	}
+
+	ActiveResult() = delete;
 
 	ActiveResult& operator = (const ActiveResult& result)
 		/// Assignment operator.
@@ -363,8 +365,6 @@ public:
 	}
 
 private:
-	ActiveResult();
-
 	ActiveResultHolderType* _pHolder;
 };
 
@@ -377,7 +377,7 @@ class ActiveResult<void>
 	/// result from the execution thread back to the invocation thread.
 {
 public:
-	typedef ActiveResultHolder<void> ActiveResultHolderType;
+	using ActiveResultHolderType = ActiveResultHolder<void>;
 
 	ActiveResult(ActiveResultHolderType* pHolder):
 		_pHolder(pHolder)
@@ -398,6 +398,8 @@ public:
 	{
 		_pHolder->release();
 	}
+
+	ActiveResult() = delete;
 
 	ActiveResult& operator = (const ActiveResult& result)
 		/// Assignment operator.
@@ -483,8 +485,6 @@ public:
 	}
 
 private:
-	ActiveResult();
-
 	ActiveResultHolderType* _pHolder;
 };
 

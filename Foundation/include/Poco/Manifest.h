@@ -50,8 +50,8 @@ class Manifest: public ManifestBase
 	/// iterate over all the classes in a Manifest.
 {
 public:
-	typedef AbstractMetaObject<B> Meta;
-	typedef std::map<std::string, const Meta*> MetaMap;
+	using Meta = AbstractMetaObject<B>;
+	using MetaMap = std::map<std::string, const Meta *>;
 
 	class Iterator
 		/// The Manifest's very own iterator class.
@@ -65,15 +65,10 @@ public:
 		{
 			_it = it._it;
 		}
-		~Iterator()
-		{
-		}
-		Iterator& operator = (const Iterator& it)
-		{
-			_it = it._it;
-			return *this;
-		}
-		inline bool operator == (const Iterator& it) const
+		~Iterator() = default;
+		Iterator& operator=(const Iterator &it) = default;
+
+		inline bool operator==(const Iterator &it) const
 		{
 			return _it == it._it;
 		}
@@ -105,13 +100,11 @@ public:
 		typename MetaMap::const_iterator _it;
 	};
 
-	Manifest()
+	Manifest() = default;
 		/// Creates an empty Manifest.
-	{
-	}
 
-	virtual ~Manifest()
-		/// Destroys the Manifest.
+	~Manifest() override
+	/// Destroys the Manifest.
 	{
 		clear();
 	}
@@ -164,7 +157,7 @@ public:
 		return _metaMap.empty();
 	}
 
-	const char* className() const
+	const char* className() const override
 	{
 		return typeid(*this).name();
 	}

@@ -177,9 +177,7 @@ public:
 	{
 	}
 
-	~BasicMemoryBinaryReader()
-	{
-	}
+	~BasicMemoryBinaryReader() = default;
 
 	const Buffer<T>& data() const
 	{
@@ -201,9 +199,7 @@ private:
 	MemoryInputStream _istr;
 };
 
-
-typedef BasicMemoryBinaryReader<char> MemoryBinaryReader;
-
+using MemoryBinaryReader = BasicMemoryBinaryReader<char>;
 
 //
 // inlines

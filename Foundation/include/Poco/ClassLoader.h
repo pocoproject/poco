@@ -51,11 +51,11 @@ class ClassLoader
 	/// library.
 {
 public:
-	typedef AbstractMetaObject<Base> Meta;
-	typedef Manifest<Base> Manif;
-	typedef void (*InitializeLibraryFunc)();
-	typedef void (*UninitializeLibraryFunc)();
-	typedef bool (*BuildManifestFunc)(ManifestBase*);
+	using Meta = AbstractMetaObject<Base>;
+	using Manif = Manifest<Base>;
+	using InitializeLibraryFunc = void (*)();
+	using UninitializeLibraryFunc = void (*)();
+	using BuildManifestFunc = bool (*)(ManifestBase *);
 
 	struct LibraryInfo
 	{
@@ -63,13 +63,13 @@ public:
 		const Manif*   pManifest;
 		int            refCount;
 	};
-	typedef std::map<std::string, LibraryInfo> LibraryMap;
+	using LibraryMap = std::map<std::string, LibraryInfo>;
 
 	class Iterator
 		/// The ClassLoader's very own iterator class.
 	{
 	public:
-		typedef std::pair<std::string, const Manif*> Pair;
+		using Pair = std::pair<std::string, const Manif *>;
 
 		Iterator(const typename LibraryMap::const_iterator& it)
 		{
@@ -79,9 +79,7 @@ public:
 		{
 			_it = it._it;
 		}
-		~Iterator()
-		{
-		}
+		~Iterator() = default;
 		Iterator& operator = (const Iterator& it)
 		{
 			_it = it._it;
@@ -124,10 +122,8 @@ public:
 		mutable Pair _pair;
 	};
 
-	ClassLoader()
+	ClassLoader() = default;
 		/// Creates the ClassLoader.
-	{
-	}
 
 	virtual ~ClassLoader()
 		/// Destroys the ClassLoader.

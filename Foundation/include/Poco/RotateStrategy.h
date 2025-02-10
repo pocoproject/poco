@@ -52,7 +52,7 @@ private:
 class Foundation_API NullRotateStrategy : public RotateStrategy
 {
 public:
-	bool mustRotate(LogFile* pFile);
+	bool mustRotate(LogFile *pFile) override;
 };
 
 
@@ -97,11 +97,9 @@ public:
 		getNextRollover();
 	}
 
-	~RotateAtTimeStrategy()
-	{
-	}
+	~RotateAtTimeStrategy() override = default;
 
-	bool mustRotate(LogFile* /*pFile*/)
+	bool mustRotate(LogFile* /*pFile*/) override
 	{
 		if (DT() >= _threshold)
 		{
@@ -144,8 +142,8 @@ class Foundation_API RotateByIntervalStrategy: public RotateStrategy
 {
 public:
 	RotateByIntervalStrategy(const Timespan& span);
-	~RotateByIntervalStrategy();
-	bool mustRotate(LogFile* pFile);
+	~RotateByIntervalStrategy() override;
+	bool mustRotate(LogFile* pFile) override;
 
 private:
 	Timespan _span;
@@ -160,8 +158,8 @@ class Foundation_API RotateBySizeStrategy: public RotateStrategy
 {
 public:
 	RotateBySizeStrategy(UInt64 size);
-	~RotateBySizeStrategy();
-	bool mustRotate(LogFile* pFile);
+	~RotateBySizeStrategy() override;
+	bool mustRotate(LogFile* pFile) override;
 
 private:
 	UInt64 _size;

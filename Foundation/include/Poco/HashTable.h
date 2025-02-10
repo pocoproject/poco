@@ -44,11 +44,11 @@ class POCO_DEPRECATED("use LinearHashTable") HashTable
 	/// This class is NOT thread safe.
 {
 public:
-	typedef std::map<Key, Value> HashEntryMap;
-	typedef HashEntryMap**       HashTableVector;
+	using HashEntryMap = std::map<Key, Value>;
+	using HashTableVector = HashEntryMap **;
 
-	typedef typename HashEntryMap::const_iterator ConstIterator;
-	typedef typename HashEntryMap::iterator Iterator;
+	using ConstIterator = typename HashEntryMap::const_iterator;
+	using Iterator = typename HashEntryMap::iterator;
 
 	HashTable(UInt32 initialSize = 251):
 		_entries(0),

@@ -42,10 +42,8 @@ class AutoReleasePool
 	///    arp.add(ptr.duplicate());
 {
 public:
-	AutoReleasePool()
+	AutoReleasePool() = default;
 		/// Creates the AutoReleasePool.
-	{
-	}
 
 	~AutoReleasePool()
 		/// Destroys the AutoReleasePool and releases
@@ -74,7 +72,7 @@ public:
 	}
 
 private:
-	typedef std::list<C*> ObjectList;
+	using ObjectList = std::list<C *>;
 
 	ObjectList _list;
 };

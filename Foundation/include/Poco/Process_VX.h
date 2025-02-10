@@ -37,7 +37,7 @@ class Foundation_API ProcessHandleImpl: public RefCountedObject
 {
 public:
 	ProcessHandleImpl(int pid);
-	~ProcessHandleImpl();
+	~ProcessHandleImpl() override;
 
 	int id() const;
 	int wait() const;
@@ -51,9 +51,9 @@ private:
 class Foundation_API ProcessImpl
 {
 public:
-	typedef int PIDImpl;
-	typedef std::vector<std::string> ArgsImpl;
-	typedef std::map<std::string, std::string> EnvImpl;
+	using PIDImpl = int;
+	using ArgsImpl = std::vector<std::string>;
+	using EnvImpl = std::map<std::string, std::string>;
 
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);

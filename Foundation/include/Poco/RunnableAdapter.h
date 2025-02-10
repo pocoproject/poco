@@ -38,7 +38,7 @@ class RunnableAdapter: public Runnable
 	/// target, please see the ThreadTarget class.
 {
 public:
-	typedef void (C::*Callback)();
+	using Callback = void (C::*)();
 
 	RunnableAdapter(C& object, Callback method): _pObject(&object), _method(method)
 	{
@@ -48,9 +48,9 @@ public:
 	{
 	}
 
-	~RunnableAdapter()
-	{
-	}
+	~RunnableAdapter() override = default;
+
+	RunnableAdapter() = delete;
 
 	RunnableAdapter& operator = (const RunnableAdapter& ra)
 	{
@@ -59,14 +59,9 @@ public:
 		return *this;
 	}
 
-	void run()
-	{
-		(_pObject->*_method)();
-	}
+	void run() override { (_pObject->*_method)(); }
 
 private:
-	RunnableAdapter();
-
 	C*       _pObject;
 	Callback _method;
 };

@@ -41,18 +41,14 @@ public:
 	using Iterator = typename Delegates::iterator;
 
 public:
-	DefaultStrategy()
-	{
-	}
+	DefaultStrategy() = default;
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
 	{
 	}
 
-	~DefaultStrategy()
-	{
-	}
+	~DefaultStrategy() = default;
 
 	void notify(const void* sender, TArgs& arguments)
 	{
@@ -138,9 +134,7 @@ public:
 	using Iterator = typename Delegates::iterator;
 
 public:
-	DefaultStrategy()
-	{
-	}
+	DefaultStrategy() = default;
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
@@ -152,9 +146,7 @@ public:
 	{
 	}
 
-	~DefaultStrategy()
-	{
-	}
+	~DefaultStrategy() = default;
 
 	void notify(const void* sender)
 	{

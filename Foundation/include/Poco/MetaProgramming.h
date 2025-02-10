@@ -101,40 +101,40 @@ template <typename T>
 struct TypeWrapper
 	/// Use the type wrapper if you want to decouple constness and references from template types.
 {
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
+	using TYPE = T;
+	using CONSTTYPE = const T;
+	using REFTYPE = T &;
+	using CONSTREFTYPE = const T &;
 };
 
 
 template <typename T>
 struct TypeWrapper<const T>
 {
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
+	using TYPE = T;
+	using CONSTTYPE = const T;
+	using REFTYPE = T &;
+	using CONSTREFTYPE = const T &;
 };
 
 
 template <typename T>
 struct TypeWrapper<const T&>
 {
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
+	using TYPE = T;
+	using CONSTTYPE = const T;
+	using REFTYPE = T &;
+	using CONSTREFTYPE = const T &;
 };
 
 
 template <typename T>
 struct TypeWrapper<T&>
 {
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
+	using TYPE = T;
+	using CONSTTYPE = const T;
+	using REFTYPE = T &;
+	using CONSTREFTYPE = const T &;
 };
 
 

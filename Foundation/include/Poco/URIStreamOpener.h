@@ -122,7 +122,7 @@ private:
 	URIStreamOpener(const URIStreamOpener&);
 	URIStreamOpener& operator = (const URIStreamOpener&);
 
-	typedef std::map<std::string, URIStreamFactory*> FactoryMap;
+	using FactoryMap = std::map<std::string, URIStreamFactory *>;
 
 	FactoryMap        _map;
 	mutable FastMutex _mutex;

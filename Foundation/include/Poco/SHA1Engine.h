@@ -43,20 +43,20 @@ public:
 	};
 
 	SHA1Engine();
-	~SHA1Engine();
+	~SHA1Engine() override;
 
-	std::size_t digestLength() const;
-	void reset();
-	const DigestEngine::Digest& digest();
+	std::size_t digestLength() const override;
+	void reset() override;
+	const DigestEngine::Digest& digest() override;
 
 protected:
-	void updateImpl(const void* data, std::size_t length);
+	void updateImpl(const void *data, std::size_t length) override;
 
 private:
 	void transform();
 	static void byteReverse(UInt32* buffer, int byteCount);
 
-	typedef UInt8 BYTE;
+	using BYTE = UInt8;
 
 	struct Context
 	{

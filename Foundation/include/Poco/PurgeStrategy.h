@@ -64,9 +64,9 @@ class Foundation_API NullPurgeStrategy : public PurgeStrategy
 {
 public:
 	NullPurgeStrategy();
-	~NullPurgeStrategy();
+	~NullPurgeStrategy() override;
 
-	void purge(const std::string& path);
+	void purge(const std::string& path) override;
 };
 
 
@@ -76,9 +76,9 @@ class Foundation_API PurgeByAgeStrategy: public PurgeStrategy
 {
 public:
 	PurgeByAgeStrategy(const Timespan& age);
-	~PurgeByAgeStrategy();
+	~PurgeByAgeStrategy() override;
 
-	void purge(const std::string& path);
+	void purge(const std::string& path) override;
 
 private:
 	Timespan _age;
@@ -92,9 +92,9 @@ class Foundation_API PurgeByCountStrategy: public PurgeStrategy
 {
 public:
 	PurgeByCountStrategy(int count);
-	~PurgeByCountStrategy();
+	~PurgeByCountStrategy() override;
 
-	void purge(const std::string& path);
+	void purge(const std::string& path) override;
 
 private:
 	int _count;

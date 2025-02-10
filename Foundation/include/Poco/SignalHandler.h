@@ -98,7 +98,7 @@ protected:
 	{
 		sigjmp_buf buf;
 	};
-	typedef std::vector<JumpBuffer> JumpBufferVec;
+	using JumpBufferVec = std::vector<JumpBuffer>;
 
 	static JumpBufferVec& jumpBufferVec();
 		/// Returns the JumpBufferVec for the current thread.

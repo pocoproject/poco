@@ -42,19 +42,19 @@ public:
 	AsyncNotificationCenter();
 		/// Creates the AsyncNotificationCenter and starts the notifying thread.
 
-	~AsyncNotificationCenter();
-		/// Stops the notifying thread and destroys the AsyncNotificationCenter.
+	~AsyncNotificationCenter() override;
+	/// Stops the notifying thread and destroys the AsyncNotificationCenter.
 
 	AsyncNotificationCenter& operator = (const AsyncNotificationCenter&) = delete;
 	AsyncNotificationCenter(const AsyncNotificationCenter&) = delete;
 	AsyncNotificationCenter& operator = (AsyncNotificationCenter&&) = delete;
 	AsyncNotificationCenter(AsyncNotificationCenter&&) = delete;
 
-	virtual void postNotification(Notification::Ptr pNotification);
-		/// Enqueues notification into the notification queue.
+	void postNotification(Notification::Ptr pNotification) override;
+	/// Enqueues notification into the notification queue.
 
-	virtual int backlog() const;
-		/// Returns the numbner of notifications in the notification queue.
+	int backlog() const override;
+	/// Returns the numbner of notifications in the notification queue.
 
 private:
 	void start();

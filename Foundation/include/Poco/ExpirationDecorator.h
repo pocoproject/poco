@@ -60,10 +60,7 @@ public:
 	{
 	}
 
-
-	~ExpirationDecorator()
-	{
-	}
+	~ExpirationDecorator() = default;
 
 	const Poco::Timestamp& getExpiration() const
 	{

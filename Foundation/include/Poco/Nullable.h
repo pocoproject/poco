@@ -55,10 +55,8 @@ class Nullable
 public:
 	using Type = C;
 
-	Nullable()
+	Nullable() = default;
 		/// Creates an empty Nullable.
-	{
-	}
 
 	Nullable(const NullType&)
 		/// Creates an empty Nullable.

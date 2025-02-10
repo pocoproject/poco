@@ -49,15 +49,15 @@ public:
 	explicit FIFOBufferStreamBuf(std::size_t length);
 		/// Creates a FIFOBufferStreamBuf of the given length.
 
-	~FIFOBufferStreamBuf();
-		/// Destroys the FIFOBufferStreamBuf.
+	~FIFOBufferStreamBuf() override;
+	/// Destroys the FIFOBufferStreamBuf.
 
 	FIFOBuffer& fifoBuffer();
 		/// Returns the underlying FIFO buffer reference.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum
@@ -90,10 +90,10 @@ public:
 	explicit FIFOIOS(std::size_t length);
 		/// Creates a FIFOIOS of the given length.
 
-	~FIFOIOS();
-		/// Destroys the FIFOIOS.
-		///
-		/// Flushes the buffer.
+	~FIFOIOS() override;
+	/// Destroys the FIFOIOS.
+	///
+	/// Flushes the buffer.
 
 	FIFOBufferStreamBuf* rdbuf();
 		/// Returns a pointer to the internal FIFOBufferStreamBuf.
@@ -125,10 +125,10 @@ public:
 	explicit FIFOBufferStream(std::size_t length);
 		/// Creates a FIFOBufferStream of the given length.
 
-	~FIFOBufferStream();
-		/// Destroys the FIFOBufferStream.
-		///
-		/// Flushes the buffer.
+	~FIFOBufferStream() override;
+	/// Destroys the FIFOBufferStream.
+	///
+	/// Flushes the buffer.
 
 private:
 	FIFOBufferStream();

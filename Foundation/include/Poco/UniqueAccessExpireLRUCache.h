@@ -55,13 +55,10 @@ public:
 		this->_strategy.pushBack(new UniqueAccessExpireStrategy<TKey, TValue>());
 	}
 
-	~UniqueAccessExpireLRUCache()
-	{
-	}
+	~UniqueAccessExpireLRUCache() = default;
 
-private:
-	UniqueAccessExpireLRUCache(const UniqueAccessExpireLRUCache& aCache);
-	UniqueAccessExpireLRUCache& operator = (const UniqueAccessExpireLRUCache& aCache);
+	UniqueAccessExpireLRUCache(const UniqueAccessExpireLRUCache& aCache) = delete;
+	UniqueAccessExpireLRUCache& operator=(const UniqueAccessExpireLRUCache& aCache) = delete;
 };
 
 

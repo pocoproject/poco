@@ -129,7 +129,7 @@ public:
 		/// Returns true if dateTime validates against at least one supported format.
 
 private:
-	typedef std::unordered_set<std::string> Formatlist;
+	using Formatlist = std::unordered_set<std::string>;
 	static Formatlist FORMAT_LIST;
 };
 

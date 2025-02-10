@@ -32,7 +32,7 @@ class FunctionDelegate: public AbstractDelegate<TArgs>
 	/// for use as a Delegate.
 {
 public:
-	typedef void (*NotifyFunction)(const void*, TArgs&);
+	using NotifyFunction = void (*)(const void *, TArgs &);
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -45,9 +45,9 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
+	~FunctionDelegate() = default;
+
+	FunctionDelegate() = delete;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -89,9 +89,6 @@ public:
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 
@@ -99,7 +96,7 @@ template <class TArgs>
 class FunctionDelegate<TArgs, true, false>: public AbstractDelegate<TArgs>
 {
 public:
-	typedef void (*NotifyFunction)(void*, TArgs&);
+	using NotifyFunction = void (*)(void *, TArgs &);
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -112,9 +109,9 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
+	~FunctionDelegate() = default;
+
+	FunctionDelegate() = delete;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -156,9 +153,6 @@ public:
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 
@@ -166,7 +160,7 @@ template <class TArgs, bool senderIsConst>
 class FunctionDelegate<TArgs, false, senderIsConst>: public AbstractDelegate<TArgs>
 {
 public:
-	typedef void (*NotifyFunction)(TArgs&);
+	using NotifyFunction = void (*)(TArgs &);
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -179,9 +173,9 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
+	~FunctionDelegate() = default;
+
+	FunctionDelegate() = delete;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -223,9 +217,6 @@ public:
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 
@@ -235,7 +226,7 @@ class FunctionDelegate<void, true, true>: public AbstractDelegate<void>
 	/// for use as a Delegate.
 {
 public:
-	typedef void (*NotifyFunction)(const void*);
+	using NotifyFunction = void (*)(const void *);
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -248,9 +239,9 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
+	~FunctionDelegate() override = default;
+
+	FunctionDelegate() = delete;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -261,7 +252,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void *sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
@@ -272,29 +263,26 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void> &other) const override
 	{
 		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
 		return pOtherDelegate && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void> *clone() const override
 	{
 		return new FunctionDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 
@@ -302,7 +290,7 @@ template <>
 class FunctionDelegate<void, true, false>: public AbstractDelegate<void>
 {
 public:
-	typedef void (*NotifyFunction)(void*);
+	using NotifyFunction = void (*)(void *);
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -315,9 +303,9 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
+	~FunctionDelegate() override = default;
+
+	FunctionDelegate() = delete;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -328,7 +316,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void *sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
@@ -339,29 +327,26 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void> &other) const override
 	{
 		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
 		return pOtherDelegate && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void> *clone() const override
 	{
 		return new FunctionDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 
@@ -369,7 +354,7 @@ template <bool senderIsConst>
 class FunctionDelegate<void, false, senderIsConst>: public AbstractDelegate<void>
 {
 public:
-	typedef void (*NotifyFunction)();
+	using NotifyFunction = void (*)();
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -382,9 +367,9 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
+	~FunctionDelegate() override = default;
+
+	FunctionDelegate() = delete;
 
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
@@ -395,7 +380,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* /*sender*/)
+	bool notify(const void * /*sender*/) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
@@ -406,29 +391,26 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void> &other) const override
 	{
 		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
 		return pOtherDelegate && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void> *clone() const override
 	{
 		return new FunctionDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 

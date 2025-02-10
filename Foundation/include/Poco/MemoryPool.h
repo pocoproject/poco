@@ -79,7 +79,7 @@ private:
 		BLOCK_RESERVE = 128
 	};
 
-	typedef std::vector<char*> BlockVec;
+	using BlockVec = std::vector<char *>;
 
 	std::size_t _blockSize;
 	int         _maxAlloc;
@@ -229,6 +229,9 @@ private:
 			_memory.next = next;
 		}
 
+		Block(const Block&) = delete;
+		Block& operator=(const Block&) = delete;
+
 #ifndef POCO_DOC
 		union
 			/// Memory block storage.
@@ -244,18 +247,14 @@ private:
 			Block* next;
 		} _memory;
 #endif
-
-	private:
-		Block(const Block&);
-		Block& operator = (const Block&);
 	};
 
 public:
-	typedef M MutexType;
-	typedef typename M::ScopedLock ScopedLock;
+	using MutexType = M;
+	using ScopedLock = typename M::ScopedLock;
 
-	typedef Block* Bucket;
-	typedef std::vector<Bucket> BucketVec;
+	using Bucket = Block *;
+	using BucketVec = std::vector<Bucket>;
 
 	FastMemoryPool(std::size_t blocksPerBucket = POCO_FAST_MEMORY_POOL_PREALLOC, std::size_t bucketPreAlloc = 10, std::size_t maxAlloc = 0):
 			_blocksPerBucket(blocksPerBucket),
@@ -290,6 +289,9 @@ public:
 	{
 		clear();
 	}
+
+	FastMemoryPool(const FastMemoryPool&) = delete;
+	FastMemoryPool& operator=(const FastMemoryPool&) = delete;
 
 	void* get()
 		/// Returns pointer to the next available
@@ -342,9 +344,6 @@ public:
 	}
 
 private:
-	FastMemoryPool(const FastMemoryPool&);
-	FastMemoryPool& operator = (const FastMemoryPool&);
-
 	void resize()
 		/// Creates new bucket and initializes it for internal use.
 		/// Sets the previously next block to point to the new bucket's
@@ -371,7 +370,7 @@ private:
 		for (; it != end; ++it) delete[] *it;
 	}
 
-	typedef Poco::AtomicCounter Counter;
+	using Counter = Poco::AtomicCounter;
 
 	const
 	std::size_t _blocksPerBucket;

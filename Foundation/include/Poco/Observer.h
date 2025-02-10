@@ -42,7 +42,7 @@ class Observer: public AbstractObserver
 	/// you from memory management issues.
 {
 public:
-	typedef void (C::*Callback)(N*);
+	using Callback = void (C::*)(N *);
 
 	Observer(C& object, Callback method):
 		_pObject(&object),
@@ -57,9 +57,9 @@ public:
 	{
 	}
 
-	~Observer()
-	{
-	}
+	~Observer() override = default;
+
+	Observer() = delete;
 
 	Observer& operator = (const Observer& observer)
 	{
@@ -71,7 +71,7 @@ public:
 		return *this;
 	}
 
-	void notify(Notification* pNf) const
+	void notify(Notification *pNf) const override
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
 		if (_pObject)
@@ -81,38 +81,35 @@ public:
 		}
 	}
 
-	bool equals(const AbstractObserver& abstractObserver) const
+	bool equals(const AbstractObserver& abstractObserver) const override
 	{
 		const Observer* pObs = dynamic_cast<const Observer*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
 	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead")
-	bool accepts(Notification* pNf, const char* pName) const
+	bool accepts(Notification* pNf, const char* pName) const override
 	{
 		return (!pName || pNf->name() == pName) && (dynamic_cast<N*>(pNf) != nullptr);
 	}
 
-	bool accepts(const Notification::Ptr& pNf) const
+	bool accepts(const Notification::Ptr& pNf) const override
 	{
 		return (pNf.cast<N>() != nullptr);
 	}
 
-	AbstractObserver* clone() const
+	AbstractObserver *clone() const override
 	{
 		return new Observer(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
-
-		_pObject = 0;
+		_pObject = nullptr;
 	}
 
 private:
-	Observer();
-
 	C*       _pObject;
 	Callback _method;
 	mutable Poco::Mutex _mutex;

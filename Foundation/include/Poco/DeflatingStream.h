@@ -77,8 +77,8 @@ public:
 		/// Please refer to the zlib documentation of deflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~DeflatingStreamBuf();
-		/// Destroys the DeflatingStreamBuf.
+	~DeflatingStreamBuf() override;
+	/// Destroys the DeflatingStreamBuf.
 
 	int close();
 		/// Finishes up the stream.
@@ -86,9 +86,9 @@ public:
 		/// Must be called when deflating to an output stream.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
-	virtual int sync();
+	int readFromDevice(char* buffer, std::streamsize length) override;
+	int writeToDevice(const char* buffer, std::streamsize length) override;
+	int sync() override;
 
 private:
 	enum
@@ -134,8 +134,8 @@ public:
 		/// Please refer to the zlib documentation of deflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~DeflatingIOS();
-		/// Destroys the DeflatingIOS.
+	~DeflatingIOS() override;
+	/// Destroys the DeflatingIOS.
 
 	DeflatingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying stream buffer.
@@ -169,8 +169,8 @@ public:
 		/// Please refer to the zlib documentation of deflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~DeflatingOutputStream();
-		/// Destroys the DeflatingOutputStream.
+	~DeflatingOutputStream() override;
+	/// Destroys the DeflatingOutputStream.
 
 	int close();
 		/// Finishes up the stream.
@@ -198,8 +198,8 @@ public:
 		/// Please refer to the zlib documentation of deflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~DeflatingInputStream();
-		/// Destroys the DeflatingInputStream.
+	~DeflatingInputStream() override;
+	/// Destroys the DeflatingInputStream.
 };
 
 

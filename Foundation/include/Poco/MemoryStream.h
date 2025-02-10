@@ -42,13 +42,13 @@ class BasicMemoryStreamBuf: public std::basic_streambuf<ch, tr>
 	/// ostream, but not for an iostream.
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
+	using Base = std::basic_streambuf<ch, tr>;
+	using IOS = std::basic_ios<ch, tr>;
+	using char_type = ch;
+	using char_traits = tr;
+	using int_type = typename Base::int_type;
+	using pos_type = typename Base::pos_type;
+	using off_type = typename Base::off_type;
 
 public:
 	BasicMemoryStreamBuf(char_type* pBuffer, std::streamsize bufferSize):
@@ -59,21 +59,23 @@ public:
 		this->setp(_pBuffer, _pBuffer + _bufferSize);
 	}
 
-	~BasicMemoryStreamBuf()
-	{
-	}
+	~BasicMemoryStreamBuf() override = default;
 
-	virtual int_type overflow(int_type /*c*/)
-	{
-		return char_traits::eof();
-	}
+	BasicMemoryStreamBuf() = delete;
+	BasicMemoryStreamBuf(const BasicMemoryStreamBuf&) = delete;
+	BasicMemoryStreamBuf& operator=(const BasicMemoryStreamBuf&) = delete;
 
-	virtual int_type underflow()
+	int_type overflow(int_type /*c*/) override
 	{
 		return char_traits::eof();
 	}
 
-	virtual pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+	int_type underflow() override
+	{
+		return char_traits::eof();
+	}
+
+	pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
 	{
 		const pos_type fail = off_type(-1);
 		off_type newoff = off_type(-1);
@@ -140,14 +142,14 @@ public:
 
 		return newoff;
 	}
-	
-	virtual pos_type seekpos(pos_type pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+
+	pos_type seekpos(pos_type pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
 	{
 		const off_type off = pos;
 		return seekoff(off, std::ios::beg, which);
 	}
 
-	virtual int sync()
+	int sync() override
 	{
 		return 0;
 	}
@@ -168,18 +170,13 @@ public:
 private:
 	char_type*      _pBuffer;
 	std::streamsize _bufferSize;
-
-	BasicMemoryStreamBuf();
-	BasicMemoryStreamBuf(const BasicMemoryStreamBuf&);
-	BasicMemoryStreamBuf& operator = (const BasicMemoryStreamBuf&);
 };
 
 
 //
 // We provide an instantiation for char
 //
-typedef BasicMemoryStreamBuf<char, std::char_traits<char>> MemoryStreamBuf;
-
+using MemoryStreamBuf = BasicMemoryStreamBuf<char, std::char_traits<char>>;
 
 class Foundation_API MemoryIOS: public virtual std::ios
 	/// The base class for MemoryInputStream and MemoryOutputStream.
@@ -191,8 +188,8 @@ public:
 	MemoryIOS(char* pBuffer, std::streamsize bufferSize);
 		/// Creates the basic stream.
 
-	~MemoryIOS();
-		/// Destroys the stream.
+	~MemoryIOS() override;
+	/// Destroys the stream.
 
 	MemoryStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
@@ -210,8 +207,8 @@ public:
 		/// Creates a MemoryInputStream for the given memory area,
 		/// ready for reading.
 
-	~MemoryInputStream();
-		/// Destroys the MemoryInputStream.
+	~MemoryInputStream() override;
+	/// Destroys the MemoryInputStream.
 };
 
 
@@ -223,8 +220,8 @@ public:
 		/// Creates a MemoryOutputStream for the given memory area,
 		/// ready for writing.
 
-	~MemoryOutputStream();
-		/// Destroys the MemoryInputStream.
+	~MemoryOutputStream() override;
+	/// Destroys the MemoryInputStream.
 
 	std::streamsize charsWritten() const;
 		/// Returns the number of chars written to the buffer.

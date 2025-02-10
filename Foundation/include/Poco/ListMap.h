@@ -51,10 +51,8 @@ public:
 	using Iterator = typename Container::iterator;
 	using ConstIterator = typename Container::const_iterator;
 
-	ListMap()
+	ListMap() = default;
 		/// Creates an empty ListMap.
-	{
-	}
 
 	explicit ListMap(std::size_t initialReserve):
 		_container(initialReserve)

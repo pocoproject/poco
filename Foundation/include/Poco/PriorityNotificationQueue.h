@@ -138,13 +138,13 @@ protected:
 	Notification::Ptr dequeueOne();
 
 private:
-	typedef std::multimap<int, Notification::Ptr> NfQueue;
+	using NfQueue = std::multimap<int, Notification::Ptr>;
 	struct WaitInfo
 	{
 		Notification::Ptr pNf;
 		Event nfAvailable;
 	};
-	typedef std::deque<WaitInfo*> WaitQueue;
+	using WaitQueue = std::deque<WaitInfo *>;
 
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;

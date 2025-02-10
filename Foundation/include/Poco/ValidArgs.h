@@ -40,9 +40,9 @@ public:
 	{
 	}
 
-	~ValidArgs()
-	{
-	}
+	~ValidArgs() = default;
+
+	ValidArgs &operator=(const ValidArgs& args) = delete;
 
 	const TKey&	key() const
 	{
@@ -62,9 +62,6 @@ public:
 protected:
 	const TKey& _key;
 	bool        _isValid;
-
-private:
-	ValidArgs& operator = (const ValidArgs& args);
 };
 
 

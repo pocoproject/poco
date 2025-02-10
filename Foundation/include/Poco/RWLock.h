@@ -91,12 +91,12 @@ public:
 	ScopedRWLock(RWLock& rwl, bool write = false);
 	~ScopedRWLock();
 
+	ScopedRWLock() = delete;
+	ScopedRWLock(const ScopedRWLock&) = delete;
+	ScopedRWLock& operator=(const ScopedRWLock&) = delete;
+
 private:
 	RWLock& _rwl;
-
-	ScopedRWLock();
-	ScopedRWLock(const ScopedRWLock&);
-	ScopedRWLock& operator = (const ScopedRWLock&);
 };
 
 
@@ -177,21 +177,13 @@ inline ScopedReadRWLock::ScopedReadRWLock(RWLock& rwl): ScopedRWLock(rwl, false)
 {
 }
 
-
-inline ScopedReadRWLock::~ScopedReadRWLock()
-{
-}
-
+inline ScopedReadRWLock::~ScopedReadRWLock() = default;
 
 inline ScopedWriteRWLock::ScopedWriteRWLock(RWLock& rwl): ScopedRWLock(rwl, true)
 {
 }
 
-
-inline ScopedWriteRWLock::~ScopedWriteRWLock()
-{
-}
-
+inline ScopedWriteRWLock::~ScopedWriteRWLock() = default;
 
 } // namespace Poco
 

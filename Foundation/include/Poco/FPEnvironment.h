@@ -123,8 +123,7 @@ public:
 // For convenience, we provide a shorter name for
 // the FPEnvironment class.
 //
-typedef FPEnvironment FPE;
-
+using FPE = FPEnvironment;
 
 //
 // inline's
