@@ -1,6 +1,48 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.14.1 (2025-02-11)
+===========================
+
+Summary of Changes:
+
+This is a bugfix release.
+
+Features, Enhancements and Third Party Updates:
+
+- GH #4833 Add start() method to the SocketReactor
+- GH #4825 Poco::Net::HTTPResponse: add replaceCookie() and removeCookie()
+
+Bug Fixes and Improvements:
+
+- GH #4866 Poco::icompare(str, pos, ptr) out of bounds error if pos > str.size()
+- GH #4864 OpenSSL: Need to add openssl/applink.c to Windows executables using OpenSSL
+- GH #4859 Poco::NumberParser::tryParseHex raise Poco::SyntaxException exception.
+- GH #4852 Issue concerning Net/CMakeLists.txt detection of HAVE_SENDFILE
+- GH #4850 WebSocket: non-blocking receiveFrame()/receiveBytes() with TLS connection may get stuck receiving header
+- GH #4840 latest 1.14.0 release fails to build on armv7hl
+- GH #4832 Missing parameter for enabling FTS5
+- GH #4831 httpS server seems to not work in v1.14
+- GH #4828 POCO_HAVE_CXXABI_H does not check for existence of header file
+- GH #4817 Windows Static Build Problem / Changed behaviour of POCO_MT (CMake 3.15)
+- GH #4806 Poco 1.14.0 now requires libatomic
+- GH #4798 PocoFoundationConfig.cmake is missing Utf8Proc dependency
+- GH #3304 Windows Eventviewer not able to find PocoFoundation DLL
+- PR #4865 Fix openssl cmake applink
+- PR #4863 Fix StreamSocket::sendFile()
+- PR #4862 fix(cmake): Add back missing compiler definitions for static_build in the generated CMake files
+- PR #4845 fix(Net) Use of Uninitialized value in NTLMCredentials::parseChallengeMessage
+- PR #4838 fix(Net) bad mask with odd number of bytes
+- PR #4836 Fix typo that leads to the use of freed memory
+- PR #4834 Missing parameter for enabling FTS5
+- PR #4822 MongoDB: use constants instead of typed enum in OpMsgMessage
+- PR #4818 Modifications of Poco::Any in an attempt to fix OSS Fuzz report
+- PR #4849 fix(templates): Corrected explicit template instantiations
+- PR #4811 fix(cmake): remove libatomic dependency
+- PR #4805 fix(cmake): correct typo AVHAI -> AVAHI
+- PR #4803 Updated CMake to also include the generated pocomessage.rc File
+
+
 Release 1.14.0 (2024-12-01)
 ===========================
 
