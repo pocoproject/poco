@@ -142,10 +142,12 @@ public:
 
 private:
 	using AlignerType = std::max_align_t;
+#ifndef POCO_DOC
 	static_assert(
 		sizeof(AlignerType) < SizeV,
 		"Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory."
 	);
+#endif
 
 	enum Allocation : unsigned char
 	{
