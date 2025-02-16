@@ -219,6 +219,23 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
+  linux-gcc-cmake-unbundled-static:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
+      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DBUILD_SHARED_LIBS=OFF && cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
   linux-emscripten-cmake:
     runs-on: ubuntu-22.04
     steps:
