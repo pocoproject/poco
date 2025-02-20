@@ -31,11 +31,22 @@ if(POCO_UNBUNDLED)
 	find_package(ZLIB REQUIRED)
 	find_package(Utf8Proc REQUIRED)
 
-	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
-	POCO_SOURCES(SRCS RegExp
-		src/pcre2_ucd.c
-		src/pcre2_tables.c
-	)
+	# pcre2 source files are linked with Foundation when shared library pcre2 is linked.
+	# When linking pcre2 as static library the symbols are accessible.
+	get_target_property(_PCRE2TYPE Pcre2::Pcre2 TYPE)
+	if("${_PCRE2TYPE}" STREQUAL "SHARED_LIBRARY")
+		#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
+		POCO_SOURCES(SRCS RegExp
+			src/pcre2_ucd.c
+			src/pcre2_tables.c
+		)
+	elseif ("${_PCRE2TYPE}" STREQUAL "STATIC_LIBRARY")
+		message(STATUS "PCRE2: linking static library.")
+	else()
+		message(WARNING "PCRE2: unknown library type: ${_PCRE2TYPE}")
+	endif()
+
+	unset(_PCRE2TYPE)
 
 else()
 	# pcre2

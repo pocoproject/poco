@@ -93,12 +93,24 @@ if(PCRE2_FOUND)
 endif()
 
 if(PCRE2_FOUND AND NOT TARGET Pcre2::Pcre2)
-  add_library(Pcre2::Pcre2 UNKNOWN IMPORTED)
+
+  # Determine PCRE2 library type
+  set(_PCRE2_LIB_TYPE UNKNOWN)
+  get_filename_component(_PCRE2_SUFFIX ${PCRE2_LIBRARY} LAST_EXT)
+  if ("${_PCRE2_SUFFIX}" STREQUAL "${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(_PCRE2_LIB_TYPE STATIC)
+  elseif ("${_PCRE2_SUFFIX}" STREQUAL "${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(_PCRE2_LIB_TYPE SHARED)
+  endif()
+
+  add_library(Pcre2::Pcre2 ${_PCRE2_LIB_TYPE} IMPORTED)
   set_target_properties(Pcre2::Pcre2 PROPERTIES
     IMPORTED_LOCATION "${PCRE2_LIBRARY}"
     INTERFACE_COMPILE_OPTIONS "${PC_PCRE2_CFLAGS_OTHER}"
     INTERFACE_INCLUDE_DIRECTORIES "${PCRE2_INCLUDE_DIR}"
   )
+  unset(_PCRE2_LIB_TYPE)
+  unset(_PCRE2_SUFFIX)
 endif()
 
 mark_as_advanced(
