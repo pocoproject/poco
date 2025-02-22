@@ -972,6 +972,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 			dh->length = 160;
 		}
+		else
 		{
 			throw Poco::NotImplementedException(Poco::format(
 				"DH Group: %d", static_cast<int>(keyDHGroup)));
