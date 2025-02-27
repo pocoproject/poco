@@ -633,6 +633,14 @@ void SecureSocketImpl::abort()
 
 Session::Ptr SecureSocketImpl::currentSession()
 {
+	if (!_pSession && _pSSL)
+	{
+		SSL_SESSION* pSession = SSL_get1_session(_pSSL);
+		if (pSession)
+		{
+			_pSession = new Session(pSession);
+		}
+	}
 	return _pSession;
 }
 
