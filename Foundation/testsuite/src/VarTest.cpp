@@ -131,7 +131,7 @@ void VarTest::testInt8()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -225,7 +225,7 @@ void VarTest::testInt16()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -319,7 +319,7 @@ void VarTest::testInt32()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -413,7 +413,7 @@ void VarTest::testInt64()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -450,6 +450,14 @@ void VarTest::testInt64()
 	assertTrue (a3 == 32);
 	a3 *= 2;
 	assertTrue (a3 == 64);
+
+	{
+		// Convert a negative integer to a double
+		Poco::Int64 src = -32;
+		Var a1 = src;
+		double value = a1.convert<double>();
+		assertTrue (value == -32.0F);
+	}
 }
 
 
@@ -507,7 +515,7 @@ void VarTest::testUInt8()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -601,7 +609,7 @@ void VarTest::testUInt16()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -695,7 +703,7 @@ void VarTest::testUInt32()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -789,7 +797,7 @@ void VarTest::testUInt64()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -960,7 +968,7 @@ void VarTest::testChar()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -988,7 +996,7 @@ void VarTest::testFloat()
 	Var any("0");
 	float POCO_UNUSED f = any;
 
-	float src = 32.0f;
+	float src = 32.0F;
 	Var a1 = src;
 
 	assertTrue (a1.type() == typeid(float));
@@ -1040,7 +1048,7 @@ void VarTest::testFloat()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -1050,7 +1058,7 @@ void VarTest::testFloat()
 	assertTrue (s1 == t2);
 
 	float value = a1.extract<float>();
-	assertTrue (value == 32.0f);
+	assertTrue (value == 32.0F);
 
 	try
 	{
@@ -1066,7 +1074,7 @@ void VarTest::testFloat()
 	a3 = a1 - 1.0f;
 	assertTrue (a3 == 31.0f);
 	a3 += 1.0f;
-	assertTrue (a3 == 32.0f);
+	assertTrue (a3 == 32.0F);
 	a3 -= 1.0f;
 	assertTrue (a3 == 31.0f);
 	a3 = a1 / 2.0f;
@@ -1074,7 +1082,7 @@ void VarTest::testFloat()
 	a3 = a1 * 2.0f;
 	assertTrue (a3 == 64.0f);
 	a3 /= 2.0f;
-	assertTrue (a3 == 32.0f);
+	assertTrue (a3 == 32.0F);
 	a3 *= 2.0f;
 	assertTrue (a3 == 64.0f);
 }
@@ -1138,7 +1146,7 @@ void VarTest::testDouble()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -1232,7 +1240,7 @@ void VarTest::testString()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == '3');
@@ -1323,7 +1331,7 @@ void VarTest::testLong()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -1417,7 +1425,7 @@ void VarTest::testULong()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -1510,7 +1518,7 @@ void VarTest::testLongLong()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -1604,7 +1612,7 @@ void VarTest::testULongLong()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');
@@ -1701,7 +1709,7 @@ void VarTest::testEnumType()
 	assertTrue (s7 == 32);
 	assertTrue (s8 == 32);
 	assertTrue (s9 == 32);
-	assertTrue (s10 == 32.0f);
+	assertTrue (s10 == 32.0F);
 	assertTrue (s11 == 32.0);
 	assertTrue (s12);
 	assertTrue (s13 == ' ');

@@ -475,7 +475,7 @@ private:
 		using U = std::make_unsigned_t<T>;
 		if (value == 0) return 0;
 		int digitCount = 0;
-		U locVal = llabs(value); // to prevent sign preservation
+		U locVal = (std::is_signed_v<T> && value < 0) ? -value : value; // to prevent sign preservation
 		while (locVal >>= 1) ++digitCount;
 		return digitCount;
 	}
