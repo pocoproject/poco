@@ -453,10 +453,10 @@ void VarTest::testInt64()
 
 	{
 		// Convert a negative integer to a double
-		Poco::Int64 src = -32;
-		Var a1 = src;
-		double value = a1.convert<double>();
-		assertTrue (value == -32.0F);
+		const Poco::Int64 srcNegative = -32;
+		const Var aNegative = srcNegative;
+		const double valueFloat = aNegative.convert<double>();
+		assertTrue (valueFloat == -32.0F);
 	}
 }
 
