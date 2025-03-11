@@ -295,11 +295,11 @@ public:
 		/// If count is != 0, sends the given number of bytes, otherwise
 		/// sends all bytes, starting from the given offset.
 		///
-		/// On Linux, macOS and FreeBSD systems, the implementation 
+		/// On Linux, macOS and FreeBSD systems, the implementation
 		/// uses sendfile() or sendfile64().
 		/// On Windows, the implementation uses TransmitFile().
 		///
-		/// If neither sendfile() nor TransmitFile() is available, 
+		/// If neither sendfile() nor TransmitFile() is available,
 		/// or the socket is a secure one (secure() returne true),
 		/// falls back to reading the file block by block and calling sendBytes().
 		///
@@ -307,7 +307,7 @@ public:
 		/// as count, unless count is 0.
 		///
 		/// Throws NetException (or a subclass) in case of any errors.
-		/// Also throws a NetException if the socket has been set to 
+		/// Also throws a NetException if the socket has been set to
 		/// non-blocking.
 
 	virtual int available();
@@ -578,7 +578,7 @@ private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
 
-	poco_socket_t  _sockfd;
+	std::atomic<poco_socket_t>  _sockfd;
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
 	bool           _blocking;
@@ -636,7 +636,7 @@ inline bool SocketImpl::getBlocking() const
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	#pragma comment(lib, "mswsock.lib") 
-#endif 
+	#pragma comment(lib, "mswsock.lib")
+#endif
 
 #endif // Net_SocketImpl_INCLUDED
