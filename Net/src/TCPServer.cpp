@@ -116,7 +116,6 @@ void TCPServer::stop()
 {
 	if (!_stopped)
 	{
-		_socket.close();
 		_stopped = true;
 		_thread.join();
 		_pDispatcher->stop();
@@ -133,6 +132,8 @@ void TCPServer::run()
 		{
 			if (_socket.poll(timeout, Socket::SELECT_READ))
 			{
+				if (_stopped) return;
+
 				try
 				{
 					StreamSocket ss = _socket.acceptConnection();
