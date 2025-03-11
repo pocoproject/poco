@@ -73,7 +73,7 @@ void SocketAddressTest::testSocketAddress()
 
 	SocketAddress sa04 = SocketAddress("pocoproject.org", 80);
 	SocketAddress sa4(std::move(sa04));
-	assertTrue (sa4.host().toString() == "54.93.62.90");
+	assertTrue (sa4.host().toString() == "157.90.17.168");
 	assertTrue (sa4.port() == 80);
 
 	try

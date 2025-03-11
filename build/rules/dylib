@@ -50,31 +50,30 @@ distclean: clean
 	$(RM) obj
 	$(RM) .dep
 
-static_debug:   static_bindirs $(DYLIB_S_DEBUG)
-static_release: static_bindirs $(DYLIB_S_RELEASE)
-shared_debug:   bindirs $(DYLIB_DEBUG)
-shared_release: bindirs $(DYLIB_RELEASE)
+PREBUILD_STEP:
+	$(prebuild)
+
+static_debug:   PREBUILD_STEP static_bindirs $(DYLIB_S_DEBUG)
+static_release: PREBUILD_STEP static_bindirs $(DYLIB_S_RELEASE)
+shared_debug:   PREBUILD_STEP bindirs $(DYLIB_DEBUG)
+shared_release: PREBUILD_STEP bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
-	$(prebuild)
 	@echo "** Building dynamic library (debug, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
-	$(prebuild)
 	@echo "** Building dynamic library (release, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
-	$(prebuild)
 	@echo "** Building dynamic library (debug, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
-	$(prebuild)
 	@echo "** Building dynamic library (release, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
