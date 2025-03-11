@@ -116,6 +116,7 @@ void TCPServer::stop()
 {
 	if (!_stopped)
 	{
+		_socket.close();
 		_stopped = true;
 		_thread.join();
 		_pDispatcher->stop();
@@ -150,24 +151,30 @@ void TCPServer::run()
 				}
 				catch (Poco::Exception& exc)
 				{
-					ErrorHandler::handle(exc);
+					if (!_stopped)
+						ErrorHandler::handle(exc);
 				}
 				catch (std::exception& exc)
 				{
-					ErrorHandler::handle(exc);
+					if (!_stopped)
+						ErrorHandler::handle(exc);
 				}
 				catch (...)
 				{
-					ErrorHandler::handle();
+					if (!_stopped)
+						ErrorHandler::handle();
 				}
 			}
 		}
 		catch (Poco::Exception& exc)
 		{
-			ErrorHandler::handle(exc);
-			// possibly a resource issue since poll() failed;
-			// give some time to recover before trying again
-			Poco::Thread::sleep(50);
+			if (!_stopped)
+			{
+				ErrorHandler::handle(exc);
+				// possibly a resource issue since poll() failed;
+				// give some time to recover before trying again
+				Poco::Thread::sleep(50);
+			}
 		}
 	}
 }
