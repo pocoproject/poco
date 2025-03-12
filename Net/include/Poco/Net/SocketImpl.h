@@ -578,7 +578,7 @@ private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
 
-	std::atomic<poco_socket_t>  _sockfd;
+	poco_socket_t  _sockfd;
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
 	bool           _blocking;
