@@ -112,10 +112,12 @@ void TCPServerDispatcher::run()
 				if (pCNf)
 				{
 					std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-					poco_check_ptr(pConnection.get());
-					beginConnection();
-					pConnection->start();
-					endConnection();
+					if (pConnection)
+					{
+						beginConnection();
+						pConnection->start();
+						endConnection();
+					}
 				}
 			}
 		}
@@ -173,6 +175,7 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 void TCPServerDispatcher::stop()
 {
 	FastMutex::ScopedLock lock(_mutex);
+	_pConnectionFactory->stop();
 	_stopped = true;
 	_queue.clear();
 	for (int i = 0; i < _threadPool.allocated(); i++)
