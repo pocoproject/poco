@@ -132,6 +132,8 @@ void TCPServer::run()
 		{
 			if (_socket.poll(timeout, Socket::SELECT_READ))
 			{
+				if (_stopped) return;
+
 				try
 				{
 					StreamSocket ss = _socket.acceptConnection();
@@ -150,24 +152,30 @@ void TCPServer::run()
 				}
 				catch (Poco::Exception& exc)
 				{
-					ErrorHandler::handle(exc);
+					if (!_stopped)
+						ErrorHandler::handle(exc);
 				}
 				catch (std::exception& exc)
 				{
-					ErrorHandler::handle(exc);
+					if (!_stopped)
+						ErrorHandler::handle(exc);
 				}
 				catch (...)
 				{
-					ErrorHandler::handle();
+					if (!_stopped)
+						ErrorHandler::handle();
 				}
 			}
 		}
 		catch (Poco::Exception& exc)
 		{
-			ErrorHandler::handle(exc);
-			// possibly a resource issue since poll() failed;
-			// give some time to recover before trying again
-			Poco::Thread::sleep(50);
+			if (!_stopped)
+			{
+				ErrorHandler::handle(exc);
+				// possibly a resource issue since poll() failed;
+				// give some time to recover before trying again
+				Poco::Thread::sleep(50);
+			}
 		}
 	}
 }
