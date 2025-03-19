@@ -469,23 +469,32 @@ protected:
 
 private:
 
-	template <typename T, std::enable_if_t<std::is_integral_v<T>&& std::is_unsigned_v<T>, bool> = true>
-	static constexpr int numValDigits(const T& value)
+	template <typename T, std::enable_if_t<std::is_signed_v<T>, bool> = true>
+	static constexpr T unpreserveSign(const T& value)
 	{
-		if (value == 0) return 0;
-		int digitCount = 0;
-		T locVal = value;
-		while (locVal >>= 1) ++digitCount;
-		return digitCount;
+		if (value < 0) return -value;
+		return value;
 	}
 
-	template <typename T, std::enable_if_t<std::is_integral_v<T>&& std::is_signed_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool> = true>
+	static constexpr T unpreserveSign(const T& value)
+	{
+		return value;
+	}
+
+	template <typename T, std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
+	static constexpr int numValDigits(const T& value)
+	{
+		return 1;
+	}
+
+	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	static constexpr int numValDigits(const T& value)
 	{
 		using U = std::make_unsigned_t<T>;
 		if (value == 0) return 0;
 		int digitCount = 0;
-		U locVal = -value;
+		U locVal = static_cast<U>(unpreserveSign(value)); // to prevent sign preservation
 		while (locVal >>= 1) ++digitCount;
 		return digitCount;
 	}
