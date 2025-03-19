@@ -1566,7 +1566,7 @@ std::streamsize SocketImpl::sendFileBlockwise(FileInputStream& fileInputStream, 
 	while (n > 0 && (count == 0 || len < count))
 	{
 		len += n;
-		sendBytes(buffer.begin(), n);
+		sendBytes(buffer.begin(), static_cast<int>(n));
 		if (count > 0 && len < count)
 		{
 			const std::size_t remaining = count - len;
