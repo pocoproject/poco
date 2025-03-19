@@ -472,10 +472,9 @@ private:
 	template <typename T, std::enable_if_t<std::is_integral_v<T>&& std::is_unsigned_v<T>, bool> = true>
 	static constexpr int numValDigits(const T& value)
 	{
-		using U = std::make_unsigned_t<T>;
 		if (value == 0) return 0;
 		int digitCount = 0;
-		U locVal = value;
+		T locVal = value;
 		while (locVal >>= 1) ++digitCount;
 		return digitCount;
 	}
