@@ -60,7 +60,7 @@ void ArrayTest::testConstruction()
 
 	for (std::size_t i=0; i<g.size(); ++i)
 	{
-		g[i]._data = i;
+		g[i]._data = static_cast<int>(i);
 	}
 
 	for (std::size_t i=0; i<g.size(); ++i)
