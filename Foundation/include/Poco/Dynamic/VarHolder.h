@@ -469,17 +469,17 @@ protected:
 
 private:
 
-	template <typename T, std::enable_if_t<std::is_signed_v<T>, bool> = true>
+	template <typename T>
 	static constexpr T unpreserveSign(const T& value)
 	{
-		if (value < 0) return -value;
-		return value;
-	}
-
-	template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool> = true>
-	static constexpr T unpreserveSign(const T& value)
-	{
-		return value;
+		if constexpr (std::is_signed_v<T>)
+		{
+			return (value < 0) ? -value : value;
+		}
+		else
+		{
+			return value;
+		}
 	}
 
 	template <typename T, std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
