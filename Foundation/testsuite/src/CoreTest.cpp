@@ -217,7 +217,7 @@ void CoreTest::testBuffer()
 	std::vector<int> v;
 	for (std::size_t i = 0; i < s; ++i)
 	{
-		v.push_back(i);
+		v.push_back(static_cast<int>(i));
 	}
 
 	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
@@ -241,7 +241,7 @@ void CoreTest::testBuffer()
 	v.clear();
 	for (std::size_t i = 0; i < s*2; ++i)
 	{
-		v.push_back(i);
+		v.push_back(static_cast<int>(i));
 	}
 
 	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
