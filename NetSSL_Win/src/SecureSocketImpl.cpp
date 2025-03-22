@@ -16,6 +16,7 @@
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Utility.h"
+#include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
@@ -342,6 +343,29 @@ void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 }
 
 
+int SecureSocketImpl::stateToReturnValue(State state)
+{
+	switch (state)
+	{
+	case ST_DONE:
+		return 0;
+
+	case ST_CLIENT_HSK_SEND_TOKEN:
+	case ST_CLIENT_HSK_SEND_FINAL:
+	case ST_CLIENT_HSK_SEND_ERROR:
+	case ST_SERVER_HSK_LOOP_SEND:
+		return SecureStreamSocket::ERR_SSL_WANT_WRITE;
+
+	case ST_CLIENT_HSK_LOOP_RECV:
+	case ST_SERVER_HSK_LOOP_RECV:
+		return SecureStreamSocket::ERR_SSL_WANT_READ;
+
+	default:
+		return SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
+	}
+}
+
+
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 {
 	SocketAddress addr(hostName, 0);
@@ -383,7 +407,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 			{
 				// no-op
 			}
-			if (_state != ST_DONE) return -1;
+			if (_state != ST_DONE) return stateToReturnValue(_state);
 		}
 	}
 
@@ -395,7 +419,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 			_sendBufferOffset += sent;
 			_sendBufferPending -= sent;
 		}
-		return _sendBufferPending == 0 ? length : -1;
+		return _sendBufferPending == 0 ? length : SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 	}
 
 	int dataToSend = length;
@@ -448,13 +472,13 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		_sendBufferOffset += sent;
 		_sendBufferPending -= sent;
 		if (_sendBufferPending > 0)
-			return -1;
+			return SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 		else
 			return dataSent;
 	}
 	else
 	{
-		return -1;
+		return SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 	}
 }
 
@@ -480,7 +504,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 			{
 				// no-op
 			}
-			if (_state != ST_DONE) return -1;
+			if (_state != ST_DONE) return stateToReturnValue(_state);
 		}
 	}
 
@@ -524,7 +548,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 				int numBytes = receiveRawBytes(_recvBuffer.begin() + _recvBufferOffset, _ioBufferSize - _recvBufferOffset);
 
 				if (numBytes == -1)
-					return -1;
+					return SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 				else if (numBytes == 0)
 					break;
 				else
@@ -590,7 +614,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 				_needData = false;
 				setState(ST_CLIENT_HSK_LOOP_INIT);
 				if (!_pSocket->getBlocking())
-					return bytesDecoded > 0 ? bytesDecoded : -1;
+					return bytesDecoded > 0 ? bytesDecoded : SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 
 				securityStatus = doHandshake();
 
@@ -1315,7 +1339,7 @@ int SecureSocketImpl::completeHandshake()
 		{
 			// no-op
 		}
-		return (_state == ST_DONE) ? 0 : -1;
+		return stateToReturnValue(_state);
 	}
 }
 
