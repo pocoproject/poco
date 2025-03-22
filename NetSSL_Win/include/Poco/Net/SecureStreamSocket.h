@@ -53,8 +53,9 @@ class NetSSL_Win_API SecureStreamSocket: public StreamSocket
 public:
 	enum
 	{
-		ERR_SSL_WANT_READ  = -1,
-		ERR_SSL_WANT_WRITE = -2
+		ERR_SSL_WOULD_BLOCK = -1,
+		ERR_SSL_WANT_READ  = -2,
+		ERR_SSL_WANT_WRITE = -3
 	};
 
 	SecureStreamSocket();

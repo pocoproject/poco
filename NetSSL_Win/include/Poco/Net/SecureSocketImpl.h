@@ -320,6 +320,7 @@ protected:
 	bool stateMachine();
 	State getState() const;
 	void setState(State st);
+	static int stateToReturnValue(State state);
 	static bool isLocalHost(const std::string& hostName);
 
 #ifdef ENABLE_PRINT_STATE
