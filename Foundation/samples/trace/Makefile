@@ -20,6 +20,6 @@ include $(POCO_BASE)/build/rules/exec
 
 else
 
-all:
+all clean:
 
 endif
