@@ -16,6 +16,7 @@
 #include "Poco/PipeStream.h"
 #include "Poco/Path.h"
 #include "Poco/Format.h"
+#include "Poco/Thread.h"
 
 
 using namespace std::string_literals;
@@ -25,6 +26,7 @@ using Poco::Pipe;
 using Poco::Path;
 using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
+using Poco::Thread;
 
 
 ProcessTest::ProcessTest(const std::string& name): CppUnit::TestCase(name)
@@ -283,6 +285,45 @@ void ProcessTest::testIsRunning()
 }
 
 
+void ProcessTest::testIsRunningAllowsForTermination()
+{
+#if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd = "./";
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
+	while (Process::isRunning(ph))
+		Thread::sleep(100);
+#endif // !defined(_WIN32_WCE)
+}
+
+
+void ProcessTest::testSignalExitCode()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string name("TestApp");
+	std::string cmd;
+
+	cmd = "./";
+	cmd += name;
+
+	std::vector<std::string> args;
+	args.push_back("-raise-int");
+	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
+	int rc = ph.wait();
+	assertEqual (-SIGINT, rc);
+#endif // defined(POCO_OS_FAMILY_UNIX)
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -305,6 +346,8 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchArgs);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchInvalidCommand);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
+	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAllowsForTermination);
+	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
 
 	return pSuite;
 }
