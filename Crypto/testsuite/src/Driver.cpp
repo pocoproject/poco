@@ -43,3 +43,8 @@ int main(int ac, char **av)
 	CppUnitPocoExceptionText (exc);
 	return runner.run(args, exc) ? 0 : 1;
 }
+
+
+#if defined(_WIN32) && defined(_DLL)
+#include <openssl/applink.c>
+#endif
