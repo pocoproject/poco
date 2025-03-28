@@ -16,6 +16,7 @@
 #include "Poco/PipeStream.h"
 #include "Poco/Path.h"
 #include "Poco/Format.h"
+#include "Poco/Environment.h"
 
 
 using namespace std::string_literals;
@@ -152,6 +153,9 @@ void ProcessTest::testLaunchEnv()
 	Pipe outPipe;
 	Process::Env env;
 	env["TESTENV"] = "test";
+#if defined(_WIN32)
+	env["PATH"] = Poco::Environment::get("PATH"); // required for VS
+#endif
 	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0, env);
 	PipeInputStream istr(outPipe);
 	std::string s;

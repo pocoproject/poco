@@ -1667,7 +1667,7 @@ void PathTest::testSelf()
 
 	assertTrue(p.isAbsolute());
 	assertTrue(p.isFile());
-	assertTrue(self.find("testrunner") != std::string::npos);
+	assertTrue(self.find("testrunner") != std::string::npos || self.find("TestSuite") != std::string::npos);
 #else
 	std::cout << "Path::self() not implemented for this platform."
 #endif
