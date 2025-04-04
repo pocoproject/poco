@@ -141,8 +141,8 @@ int SessionPool::dead()
 	int count = 0;
 
 	Poco::Mutex::ScopedLock lock(_mutex);
-	SessionList::iterator it = _activeSessions.begin();
-	SessionList::iterator itEnd = _activeSessions.end();
+	SessionList::iterator it = _idleSessions.begin();
+	SessionList::iterator itEnd = _idleSessions.end();
 	for (; it != itEnd; ++it)
 	{
 		if (!(*it)->session()->isGood())
