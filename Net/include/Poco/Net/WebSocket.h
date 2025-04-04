@@ -87,9 +87,9 @@ public:
 	enum SendFlags
 		/// Combined header flags and opcodes for use with sendFrame().
 	{
-		FRAME_TEXT   = FRAME_FLAG_FIN | FRAME_OP_TEXT,
+                FRAME_TEXT   = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_TEXT),
 			/// Use this for sending a single text (UTF-8) payload frame.
-		FRAME_BINARY = FRAME_FLAG_FIN | FRAME_OP_BINARY
+                FRAME_BINARY = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_BINARY)
 			/// Use this for sending a single binary payload frame.
 	};
 
