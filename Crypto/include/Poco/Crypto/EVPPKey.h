@@ -237,7 +237,7 @@ private:
 				if (pFile)
 				{
 					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
-					void* pPassword = pass.empty() ? (void*)0 : (void*)pass.c_str();
+					void* pPassword = (void*)pass.c_str();
 					if (readFunc(pFile, &pKey, pCB, pPassword))
 					{
 						fclose(pFile); pFile = 0;
@@ -302,7 +302,7 @@ private:
 				if (pKey)
 				{
 					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
-					void* pPassword = pass.empty() ? (void*)0 : (void*)pass.c_str();
+					void* pPassword = (void*)pass.c_str();
 					if (readFunc(pBIO, &pKey, pCB, pPassword))
 					{
 						BIO_free(pBIO); pBIO = 0;
