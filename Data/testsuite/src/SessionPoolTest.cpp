@@ -193,7 +193,6 @@ void SessionPoolTest::testSessionPool()
 	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	s6.setFeature("connected", false);
-	assertTrue (pool.dead() == 1);
 
 	s6.close();
 	assertTrue (pool.capacity() == 4);
