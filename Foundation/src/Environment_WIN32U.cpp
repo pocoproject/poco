@@ -160,27 +160,39 @@ std::string EnvironmentImpl::osVersionImpl()
 std::string EnvironmentImpl::osArchitectureImpl()
 {
 	SYSTEM_INFO si;
-	GetSystemInfo(&si);
+	GetNativeSystemInfo(&si);
 	switch (si.wProcessorArchitecture)
 	{
 	case PROCESSOR_ARCHITECTURE_INTEL:
-		return "IA32";
+		return "IA32"s;
 	case PROCESSOR_ARCHITECTURE_MIPS:
-		return "MIPS";
+		return "MIPS"s;
 	case PROCESSOR_ARCHITECTURE_ALPHA:
-		return "ALPHA";
+		return "ALPHA"s;
 	case PROCESSOR_ARCHITECTURE_PPC:
-		return "PPC";
+		return "PPC"s;
+	case PROCESSOR_ARCHITECTURE_SHX:
+		return "SHX"s;
+	case PROCESSOR_ARCHITECTURE_ARM:
+		return "ARM"s;
 	case PROCESSOR_ARCHITECTURE_IA64:
 		return "IA64";
-#ifdef PROCESSOR_ARCHITECTURE_IA32_ON_WIN64
-	case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
-		return "IA64/32";
-#endif
-#ifdef PROCESSOR_ARCHITECTURE_AMD64
+	case PROCESSOR_ARCHITECTURE_ALPHA64:
+		return "ALPHA64"s;
+	case PROCESSOR_ARCHITECTURE_MSIL:
+		return "MSIL"s;
 	case PROCESSOR_ARCHITECTURE_AMD64:
-		return "AMD64";
-#endif
+		return "AMD64"s;
+	case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
+		return "IA64/32"s;
+	case PROCESSOR_ARCHITECTURE_NEUTRAL:
+		return "NEUTRAL"s;
+	case PROCESSOR_ARCHITECTURE_ARM64:
+		return "ARM64"s;
+	case PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64:
+		return "IA64/ARM"s;
+	case PROCESSOR_ARCHITECTURE_IA32_ON_ARM64:
+		return "ARM64/IA32"s;
 	default:
 		return "Unknown";
 	}
@@ -262,7 +274,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 unsigned EnvironmentImpl::processorCountImpl()
 {
 	SYSTEM_INFO si;
-	GetSystemInfo(&si);
+	GetNativeSystemInfo(&si);
 	return si.dwNumberOfProcessors;
 }
 
