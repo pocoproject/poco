@@ -177,7 +177,7 @@ public:
 			// if we are hitting the events limit, resize it; even without resizing, the subseqent
 			// calls would round-robin through the remaining ready sockets, but it's better to give
 			// the call enough room once we start hitting the boundary
-			if (rc >= _events.size()) 
+			if (rc > 0 && static_cast<size_t>(rc) >= _events.size()) 
 			{
 				_events.resize(_events.size()*2);
 			}
