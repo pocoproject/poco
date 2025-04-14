@@ -241,7 +241,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
-      - run: emcmake cmake -H. -B cmake-build -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off && emmake cmake --build cmake-build --target all -j6
+
+#
+# Option "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" is added to resolve the following issue.
+#
+# CMake Error at /usr/share/emscripten/cmake/Modules/CheckTypeSize.cmake:85 (cmake_policy):
+#  Compatibility with CMake < 3.5 has been removed from CMake.
+#
+#  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+#  to tell CMake that the project requires at least <min> but has been updated
+#  to work with policies introduced by <max> or earlier.
+#
+#  Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway.
+
+      - run: emcmake cmake -H. -B cmake-build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off && emmake cmake --build cmake-build --target all -j6
   # TODO: How to run unit tests in emscripten?
   #      - uses: ./.github/actions/retry-action
   #        with:
