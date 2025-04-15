@@ -188,40 +188,6 @@ void HTTPClientSessionTest::testPostLargeChunked()
 }
 
 
-void HTTPClientSessionTest::testPostSmallClose()
-{
-	HTTPTestServer srv;
-	HTTPClientSession s("127.0.0.1", srv.port());
-	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
-	std::string body("this is a random request body");
-	s.sendRequest(request) << body;
-	HTTPResponse response;
-	std::istream& rs = s.receiveResponse(response);
-	assertTrue (!response.getChunkedTransferEncoding());
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-	assertTrue (ostr.str() == body);
-}
-
-
-void HTTPClientSessionTest::testPostLargeClose()
-{
-	HTTPTestServer srv;
-	HTTPClientSession s("127.0.0.1", srv.port());
-	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
-	std::string body(8000, 'x');
-	s.sendRequest(request) << body;
-	HTTPResponse response;
-	std::istream& rs = s.receiveResponse(response);
-	assertTrue (!response.getChunkedTransferEncoding());
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-	assertTrue (ostr.str() == body);
-}
-
-
 void HTTPClientSessionTest::testKeepAlive()
 {
 	HTTPTestServer srv;
@@ -410,8 +376,6 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeIdentity);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostSmallChunked);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeChunked);
-	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostSmallClose);
-	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeClose);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testTrailer);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);

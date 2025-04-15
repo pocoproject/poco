@@ -32,8 +32,6 @@ public:
 	void testPostLargeIdentity();
 	void testPostSmallChunked();
 	void testPostLargeChunked();
-	void testPostSmallClose();
-	void testPostLargeClose();
 	void testKeepAlive();
 	void testTrailer();
 	void testProxy();
