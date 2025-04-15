@@ -236,7 +236,7 @@ bool NTLMCredentials::parseChallengeMessage(const unsigned char* buffer, std::si
 	if (message.flags & NTLM_FLAG_NEGOTIATE_TARGET)
 	{
 		readBufferDesc(reader, targetInfoDesc);
-		if (targetDesc.offset > size || targetInfoDesc.offset + targetInfoDesc.length > size) return false;
+		if (targetInfoDesc.offset > size || targetInfoDesc.offset + targetInfoDesc.length > size) return false;
 	}
 
 	if (targetDesc.length > 0)
