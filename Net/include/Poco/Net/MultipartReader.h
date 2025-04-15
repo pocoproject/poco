@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/BufferedStreamBuf.h"
+#include <memory>
 #include <istream>
 
 
@@ -150,7 +151,7 @@ private:
 
 	std::istream&         _istr;
 	std::string           _boundary;
-	MultipartInputStream* _pMPI;
+	std::unique_ptr<MultipartInputStream> _pMPI;
 };
 
 

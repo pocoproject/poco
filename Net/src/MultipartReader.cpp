@@ -175,23 +175,20 @@ MultipartInputStream::~MultipartInputStream()
 
 
 MultipartReader::MultipartReader(std::istream& istr):
-	_istr(istr),
-	_pMPI(0)
+	_istr(istr)
 {
 }
 
 
 MultipartReader::MultipartReader(std::istream& istr, const std::string& boundary):
 	_istr(istr),
-	_boundary(boundary),
-	_pMPI(0)
+	_boundary(boundary)
 {
 }
 
 
 MultipartReader::~MultipartReader()
 {
-	delete _pMPI;
 }
 
 
@@ -209,8 +206,7 @@ void MultipartReader::nextPart(MessageHeader& messageHeader)
 		throw MultipartException("No more parts available");
 	}
 	parseHeader(messageHeader);
-	delete _pMPI;
-	_pMPI = new MultipartInputStream(_istr, _boundary);
+	_pMPI = std::make_unique<MultipartInputStream>(_istr, _boundary);
 }
 
 
