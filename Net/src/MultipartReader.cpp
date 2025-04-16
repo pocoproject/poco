@@ -36,7 +36,6 @@ MultipartStreamBuf::MultipartStreamBuf(std::istream& istr, const std::string& bo
 	_boundary(boundary),
 	_lastPart(false)
 {
-	poco_assert (!boundary.empty() && boundary.length() < STREAM_BUFFER_SIZE - 6);
 }
 
 
@@ -47,7 +46,7 @@ MultipartStreamBuf::~MultipartStreamBuf()
 
 int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	poco_assert_dbg (length >= _boundary.length() + 6);
+	poco_assert (!_boundary.empty() && _boundary.length() < length - 6);
 
 	static const int eof = std::char_traits<char>::eof();
 	std::streambuf& buf = *_istr.rdbuf();
