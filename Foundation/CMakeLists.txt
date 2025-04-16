@@ -110,7 +110,7 @@ set_target_properties(Foundation
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB Utf8Proc::Utf8Proc)
+	target_link_libraries(Foundation PRIVATE Pcre2::Pcre2 ZLIB::ZLIB Utf8Proc::Utf8Proc)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 else()
 	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
