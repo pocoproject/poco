@@ -50,7 +50,7 @@ target_include_directories(XML
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(XML PUBLIC EXPAT::EXPAT)
+	target_link_libraries(XML PRIVATE EXPAT::EXPAT)
 	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
 else()
 	if(WIN32)
