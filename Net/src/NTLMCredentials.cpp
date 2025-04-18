@@ -209,7 +209,7 @@ bool NTLMCredentials::parseChallengeMessage(const unsigned char* buffer, std::si
 	reader.readRaw(7, signature);
 	if (signature != NTLMSSP) return false;
 
-	Poco::UInt8 zero;
+	Poco::UInt8 zero = 1;
 	reader >> zero;
 	if (zero != 0) return false;
 
