@@ -34,7 +34,25 @@ CppUnit::Test* FoundationTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FoundationTestSuite");
 
+	pSuite->addTest(CoreTestSuite::suite());
+	pSuite->addTest(DateTimeTestSuite::suite());
+	pSuite->addTest(StreamsTestSuite::suite());
+	pSuite->addTest(CryptTestSuite::suite());
+	pSuite->addTest(NotificationsTestSuite::suite());
 	pSuite->addTest(ThreadingTestSuite::suite());
+	pSuite->addTest(SharedLibraryTestSuite::suite());
+	pSuite->addTest(LoggingTestSuite::suite());
+	pSuite->addTest(FilesystemTestSuite::suite());
+	pSuite->addTest(UUIDTestSuite::suite());
+	pSuite->addTest(TextTestSuite::suite());
+	pSuite->addTest(URITestSuite::suite());
+#if !defined(POCO_VXWORKS)
+	pSuite->addTest(ProcessesTestSuite::suite());
+#endif
+	pSuite->addTest(TaskTestSuite::suite());
+	pSuite->addTest(EventTestSuite::suite());
+	pSuite->addTest(CacheTestSuite::suite());
+	pSuite->addTest(HashingTestSuite::suite());
 
 	return pSuite;
 }
