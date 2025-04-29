@@ -85,7 +85,8 @@ private:
 Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
 	_pTLS(nullptr),
-	_event(Event::EVENT_AUTORESET)
+	_event(Event::EVENT_AUTORESET),
+	_interruptionRequested(false)
 {
 	setNameImpl(makeName());
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -97,7 +98,8 @@ Thread::Thread(uint32_t sigMask):
 Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
 	_pTLS(nullptr),
-	_event(Event::EVENT_AUTORESET)
+	_event(Event::EVENT_AUTORESET),
+	_interruptionRequested(false)
 {
 	setNameImpl(name);
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -172,6 +174,35 @@ bool Thread::trySleep(long milliseconds)
 void Thread::wakeUp()
 {
 	_event.set();
+}
+
+
+bool Thread::isInterrupted()
+{
+	return _interruptionRequested.load(std::memory_order_relaxed);
+}
+
+
+void Thread::checkInterrupted()
+{
+	bool expected = true;
+	if (_interruptionRequested.compare_exchange_strong(expected, false))
+	{
+		throw Poco::ThreadInterruptedException("Thread interrupted");
+	}
+}
+
+
+void Thread::interrupt()
+{
+	_interruptionRequested.store(true, std::memory_order_relaxed);
+	wakeUp();
+}
+
+
+void Thread::clearInterrupt()
+{
+	_interruptionRequested.store(false, std::memory_order_relaxed);
 }
 
 

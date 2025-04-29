@@ -192,6 +192,63 @@ private:
 };
 
 
+class InterruptionRunnable : public Runnable
+{
+public:
+	virtual void run() override
+	{
+		_sleep = !Thread::trySleep(300000);
+		_interrupted = Thread::current()->isInterrupted();
+
+		try
+		{
+			Thread::current()->checkInterrupted();
+		}
+		catch (const Poco::ThreadInterruptedException&)
+		{
+			_exception = true;
+		}
+
+		// interrupt state should be cleared
+		if (!Thread::current()->isInterrupted())
+		{
+			_interruptCleared = true;
+		}
+
+		// interrupt state should be cleared
+		try
+		{
+			Thread::current()->checkInterrupted();
+			_exceptionCleared = true;
+		}
+		catch (const Poco::ThreadInterruptedException&)
+		{
+			_exceptionCleared = false;
+		}
+	}
+
+	bool isTestOK() const
+	{
+		if (_sleep &&
+			_interrupted &&
+			_exception &&
+			_interruptCleared &&
+			_exceptionCleared)
+		{
+			return true;
+		}
+		return false;
+	}
+
+private:
+	bool _sleep = false;
+	bool _interrupted = false;
+	bool _exception = false;
+	bool _interruptCleared = false;
+	bool _exceptionCleared = false;
+};
+
+
 ThreadTest::ThreadTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -553,6 +610,39 @@ void ThreadTest::testAffinity()
 }
 
 
+void ThreadTest::testInterrupt()
+{
+	Thread thread;
+
+	for (int i = 0; i < 2; i++)
+	{
+		InterruptionRunnable r;
+
+		thread.start(r);
+		assertTrue (!thread.tryJoin(2000));
+
+		// interrupt
+		thread.interrupt();
+		thread.join();
+
+		// clear the interrupt state to re-use the thread
+		thread.clearInterrupt();
+		assertTrue (!thread.isInterrupted());
+
+		try
+		{
+			thread.checkInterrupted();
+		}
+		catch (const std::exception&)
+		{
+			assertTrue (false);
+		}
+
+		assertTrue (r.isTestOK());
+	}
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -583,6 +673,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
 	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
+	CppUnit_addTest(pSuite, ThreadTest, testInterrupt);
 
 	return pSuite;
 }

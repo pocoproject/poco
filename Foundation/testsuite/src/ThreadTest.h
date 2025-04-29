@@ -40,6 +40,7 @@ public:
 	void testThreadStackSize();
 	void testSleep();
 	void testAffinity();
+	void testInterrupt();
 
 	void setUp();
 	void tearDown();
