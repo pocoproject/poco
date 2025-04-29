@@ -324,6 +324,7 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 	{
 		FastMutex::ScopedLock l(_pData->mutex);
 		_pData->pRunnableTarget = pTarget;
+		_pData->done.reset();
 		int errorCode;
 		if ((errorCode = pthread_create(&_pData->thread, &attributes, runnableEntry, this)))
 		{
