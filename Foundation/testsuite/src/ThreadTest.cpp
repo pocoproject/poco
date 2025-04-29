@@ -621,7 +621,7 @@ void ThreadTest::testInterrupt()
 		thread.start(r);
 		Thread::sleep(200);
 		assertTrue (thread.isRunning());
-		assertTrue (!thread.tryJoin(1000));
+		assertTrue (!thread.tryJoin(100));
 
 		// interrupt
 		thread.interrupt();
