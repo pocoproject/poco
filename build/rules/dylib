@@ -29,9 +29,10 @@ DYLIB_RELEASE      = $(BINPATH)/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
 DYLIB_S_DEBUG      = $(BINPATH)/static/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
 DYLIB_S_RELEASE    = $(BINPATH)/static/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
 
-TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
-TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
-TARGET_LIBS_EXT     = $(foreach l,$(target_extlibs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_DEBUG       = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
+TARGET_LIBS_RELEASE     = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_EXT_DEBUG   = $(foreach l,$(target_extlibs),-l$(l)d$(OSARCH_POSTFIX))
+TARGET_LIBS_EXT_RELEASE = $(foreach l,$(target_extlibs),-l$(l)$(OSARCH_POSTFIX))
 
 #
 # Include the compile rules
@@ -57,22 +58,22 @@ shared_release: bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(prebuild) $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, shared)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT_DEBUG) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_RELEASE): $(prebuild) $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, shared)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT_RELEASE) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(prebuild) $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, static)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT_DEBUG) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(prebuild) $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, static)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT_RELEASE) $(SYSLIBS)
 	$(postbuild)
 
 #

@@ -35,7 +35,8 @@ endif
 
 TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
 TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
-TARGET_LIBS_EXT     = $(foreach l,$(target_extlibs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_EXT_DEBUG     = $(foreach l,$(target_extlibs),-l$(l)d$(OSARCH_POSTFIX))
+TARGET_LIBS_EXT_RELEASE     = $(foreach l,$(target_extlibs),-l$(l)$(OSARCH_POSTFIX))
 
 #
 # Include the compile rules
@@ -74,7 +75,7 @@ $(LIB_RELEASE_STATIC): $(prebuild) $(foreach o,$(objects),$(OBJPATH_RELEASE_STAT
 
 $(LIB_DEBUG_SHARED): $(prebuild) $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared library (debug)" $@
-	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
+	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT_DEBUG) $(SYSLIBS)
 ifeq ($(OSNAME), CYGWIN)
 	$(SHLIBLN) $(IMP_DEBUG_SHARED) $(IMP_DEBUG_SHARED_LINK)
 endif
@@ -83,7 +84,7 @@ endif
 
 $(LIB_RELEASE_SHARED): $(prebuild) $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared library (release)" $@
-	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
+	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT_RELEASE) $(SYSLIBS)
 ifeq ($(OSNAME), CYGWIN)
 	$(SHLIBLN) $(IMP_RELEASE_SHARED) $(IMP_RELEASE_SHARED_LINK)
 endif
