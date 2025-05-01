@@ -55,27 +55,24 @@ distclean: clean
 	$(RM) obj
 	$(RM) .dep
 
-PREBUILD_STEP:
-	$(prebuild)
+static_debug:   libdirs $(LIB_DEBUG_STATIC)
+static_release: libdirs $(LIB_RELEASE_STATIC)
+shared_debug:   libdirs $(LIB_DEBUG_SHARED)
+shared_release: libdirs $(LIB_RELEASE_SHARED)
 
-static_debug:   PREBUILD_STEP libdirs $(LIB_DEBUG_STATIC)
-static_release: PREBUILD_STEP libdirs $(LIB_RELEASE_STATIC)
-shared_debug:   PREBUILD_STEP libdirs $(LIB_DEBUG_SHARED)
-shared_release: PREBUILD_STEP libdirs $(LIB_RELEASE_SHARED)
-
-$(LIB_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
+$(LIB_DEBUG_STATIC): $(prebuild) $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	@echo "** Building library (debug)" $@
 	$(LIB) $@ $^
 	$(RANLIB) $@
 	$(postbuild)
 
-$(LIB_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
+$(LIB_RELEASE_STATIC): $(prebuild) $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 	@echo "** Building library (release)" $@
 	$(LIB) $@ $^
 	$(RANLIB) $@
 	$(postbuild)
 
-$(LIB_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
+$(LIB_DEBUG_SHARED): $(prebuild) $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared library (debug)" $@
 	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 ifeq ($(OSNAME), CYGWIN)
@@ -84,7 +81,7 @@ endif
 	$(SHLIBLN) $(LIB_DEBUG_SHARED) $(LIB_DEBUG_SHARED_LINK)
 	$(postbuild)
 
-$(LIB_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
+$(LIB_RELEASE_SHARED): $(prebuild) $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared library (release)" $@
 	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 ifeq ($(OSNAME), CYGWIN)
