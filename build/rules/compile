@@ -127,7 +127,7 @@ $(OBJPATH_DEBUG_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/c
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) $(POCO_BUILD_STDERR)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
 	@echo "** Compiling" $< "(release, shared)"
 	@echo "** Compiling" $@ "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
