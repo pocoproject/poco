@@ -247,6 +247,12 @@ option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (d
 if (POCO_ENABLE_STD_MUTEX)
 	add_definitions(-DPOCO_ENABLE_STD_MUTEX)
 endif ()
+
+option(POCO_ENABLE_SIG_LOCK "Set to ON if signal handlers use code that lock mutexes to prevent deadlocks (default OFF)" OFF)
+
+if (POCO_ENABLE_SIG_LOCK)
+	add_definitions(-DPOCO_ENABLE_SIG_LOCK)
+endif ()
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
