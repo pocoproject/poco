@@ -23,6 +23,10 @@
 #include <pthread.h>
 #include <errno.h>
 
+#ifdef POCO_ENABLE_SIG_LOCK
+#include <signal.h>
+#endif
+
 
 namespace Poco {
 
@@ -40,6 +44,7 @@ protected:
 
 private:
 	pthread_mutex_t _mutex;
+	sigset_t set, oldset;
 };
 
 
@@ -56,6 +61,10 @@ protected:
 //
 inline void MutexImpl::lockImpl()
 {
+#ifdef POCO_ENABLE_SIG_LOCK
+	sigfillset(&set);
+	pthread_sigmask(SIG_BLOCK, &set, &oldset);
+#endif
 	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot lock mutex");
 }
@@ -77,6 +86,10 @@ inline void MutexImpl::unlockImpl()
 {
 	if (pthread_mutex_unlock(&_mutex))
 		throw SystemException("cannot unlock mutex");
+	
+#ifdef POCO_ENABLE_SIG_LOCK
+	pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+#endif
 }
 
 
