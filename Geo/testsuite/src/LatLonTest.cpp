@@ -82,6 +82,52 @@ void LatLonTest::testLatLon()
 }
 
 
+void LatLonTest::testToCartesian()
+{
+	const LatLon ref = LatLon::fromDegrees(52.247041, 10.575830);
+
+	LatLon pos = LatLon::fromDegrees(52.247041, 10.575830);
+
+	auto result = pos.toCartesian(ref);
+
+	assertEquals(0, result.x, 0);
+	assertEquals(0, result.y, 0);
+
+
+	pos = LatLon::fromDegrees(52.248091, 10.57417);
+	
+	result = pos.toCartesian(ref);
+
+	assertEquals(-113.3742031902, result.x, 0.0001);
+	assertEquals(116.8369533306, result.y, 0.0001);
+
+
+	pos = LatLon::fromDegrees(52.251011, 10.573568);
+
+	result = pos.toCartesian(ref);
+
+	assertEquals(-154.48, result.x, 0.01);
+	assertEquals(441.75, result.y, 0.01);
+}
+
+
+void LatLonTest::testFromCartesian()
+{
+	const LatLon ref = LatLon::fromDegrees(52.247041, 10.575830);
+
+	auto result = LatLon::fromCartesian(ref, -154.48, 441.75);
+
+	assertEquals(52.251011, result.latitude().degrees(), 0.000001);
+	assertEquals(10.573568, result.longitude().degrees(), 0.000001);
+
+
+	result = LatLon::fromCartesian(ref, -208.57, 431.07);
+
+	assertEquals(52.250915, result.latitude().degrees(), 0.000001);
+	assertEquals(10.572776, result.longitude().degrees(), 0.000001);
+}
+
+
 void LatLonTest::setUp()
 {
 }
@@ -97,6 +143,8 @@ CppUnit::Test* LatLonTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LatLonTest");
 
 	CppUnit_addTest(pSuite, LatLonTest, testLatLon);
+	CppUnit_addTest(pSuite, LatLonTest, testToCartesian);
+	CppUnit_addTest(pSuite, LatLonTest, testFromCartesian);
 
 	return pSuite;
 }

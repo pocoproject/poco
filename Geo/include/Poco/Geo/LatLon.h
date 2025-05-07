@@ -25,6 +25,14 @@ namespace Poco {
 namespace Geo {
 
 
+struct Cartesian
+	/// Cartesian coordinates, given in meters.
+{
+	double x = 0.0;
+	double y = 0.0;
+};
+
+
 class Geo_API LatLon
 	/// LatLon represents a point on the two-dimensional surface of a globe. 
 	/// Latitude is the degrees North and ranges between [-90, 90]
@@ -34,15 +42,18 @@ class Geo_API LatLon
 	/// class from the NASA World Wind Java source code released
 	/// under the NOSA license.
 	///
+	/// fromCartesian() and toCartesian() are based on WGS84toCartesian.hpp by Christian Berger,
+	/// partially based on the work from Gerald I. Evenden on proj 4.3 released under public domain terms.
+	///
 	/// Note: when comparing LatLons for equality, the usual
 	/// issues when comparing floating-point numbers should 
 	/// be considered.
 {
 public:
 	static const LatLon ZERO; /// Zero LatLon (for Earth, the crossing of equator and Greenwich meridian)
-	static const double EARTH_EQUATORIAL_RADIUS; /// Earth equatorial radius in meters (6378137.0 m, derived from WGS-84 ellipsoid)
-	static const double EARTH_POLAR_RADIUS; /// Earth polar radius in meters (6356752.3 m, derived from WGS-84 ellipsoid)
-	static const double EARTH_MEAN_RADIUS; /// Earth mean radius according to IUGG in meters (6371009 m)
+	static constexpr double EARTH_EQUATORIAL_RADIUS = 6378137.0; /// Earth equatorial radius in meters (6378137.0 m, derived from WGS-84 ellipsoid)
+	static constexpr double EARTH_POLAR_RADIUS = 6356752.3; /// Earth polar radius in meters (6356752.3 m, derived from WGS-84 ellipsoid)
+	static constexpr double EARTH_MEAN_RADIUS = 6371009.0; /// Earth mean radius according to IUGG in meters (6371009 m)
 	
 	LatLon();
 		/// Creates a zero LatLon.
@@ -73,6 +84,22 @@ public:
 
 	static LatLon fromRadians(double latitude, double longitude);
 		/// Creates a LatLon from the given latitude and longitude in radians.
+
+	static LatLon fromCartesian(const LatLon& reference, const Cartesian& xy);
+		/// Creates a LatLon from the given cartesian coordinates (in meters),
+		/// relative to the given reference position.
+
+	static LatLon fromCartesian(const LatLon& reference, double x, double y);
+		/// Creates a LatLon from the given cartesian coordinates (in meters),
+		/// relative to the given reference position.
+
+	Cartesian toCartesian(const LatLon& reference);
+		/// Converts the LatLon to cartesian coordinates (in meters),
+		/// relative to the given reference position.
+
+	static Cartesian toCartesian(const LatLon& reference, const LatLon& latLon);
+		/// Converts the LatLon to cartesian coordinates (in meters),
+		/// relative to the given reference position.
 
 	const Angle& latitude() const;
 		/// Returns the latitude.
