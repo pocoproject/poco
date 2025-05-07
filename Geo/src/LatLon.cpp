@@ -14,6 +14,7 @@
 #include "Poco/Geo/LatLon.h"
 #include "Poco/FPEnvironment.h"
 #include <cmath>
+#include <limits>
 
 
 using Poco::FPEnvironment;
@@ -24,9 +25,6 @@ namespace Geo {
 
 
 const LatLon LatLon::ZERO; 
-const double LatLon::EARTH_EQUATORIAL_RADIUS(6378137.0); 
-const double LatLon::EARTH_POLAR_RADIUS(6356752.3); 
-const double LatLon::EARTH_MEAN_RADIUS(6371009.0);
 
 
 LatLon::LatLon()
@@ -244,6 +242,136 @@ bool LatLon::equals(const LatLon& other, double delta) const
 	double dLat = std::fabs(_latitude.degrees() - other._latitude.degrees());
 	double dLon = std::fabs(_longitude.degrees() - other._longitude.degrees());
 	return dLat <= delta && dLon <= delta;
+}
+
+
+LatLon LatLon::fromCartesian(const LatLon& reference, const Cartesian& xy)
+{
+	return fromCartesian(reference, xy.x, xy.y);
+}
+
+
+LatLon LatLon::fromCartesian(const LatLon& reference, double x, double y)
+{
+    constexpr double EPSILON10{1.0e-4};
+    const int32_t signLon{(x < 0) ? -1 : 1};
+    const int32_t signLat{(y < 0) ? -1 : 1};
+
+    double approxLat(reference.latitude().degrees());
+	double approxLon(reference.longitude().degrees());
+    Cartesian cartesianResult{toCartesian(reference, reference)};
+
+    double dPrev{(std::numeric_limits<double>::max)()};
+    double d = std::abs(y - cartesianResult.y);
+    double incLat{1e-6};
+    while ((d < dPrev) && (d > EPSILON10)) 
+	{
+        incLat = std::max(1e-6 * d, static_cast<double>(1e-9));
+        approxLat += signLat * incLat;
+        cartesianResult = toCartesian(reference, LatLon::fromDegrees(approxLat, approxLon));
+        dPrev = d;
+        d = std::abs(y - cartesianResult.y);
+    }
+
+    dPrev = (std::numeric_limits<double>::max)();
+    d = std::abs(x - cartesianResult.x);
+    double incLon{1e-6};
+    while ((d < dPrev) && (d > EPSILON10)) 
+	{
+        incLon = std::max(1e-6 * d, static_cast<double>(1e-9));
+        approxLon += signLon * incLon;
+        cartesianResult = toCartesian(reference, LatLon::fromDegrees(approxLat, approxLon));
+        dPrev = d;
+        d = std::abs(x - cartesianResult.x);
+    }
+
+    return LatLon::fromDegrees(approxLat, approxLon);
+}
+
+
+Cartesian LatLon::toCartesian(const LatLon& reference)
+{
+	return toCartesian(reference, *this);
+}
+
+
+Cartesian LatLon::toCartesian(const LatLon& reference, const LatLon& latLon)
+{
+#ifndef M_PI
+	constexpr double M_PI = 3.141592653589793;
+#endif
+	constexpr double HALF_PI{M_PI / 2.0};
+	constexpr double EPSILON10{1.0e-10};
+	constexpr double EPSILON12{1.0e-12};
+
+	constexpr double FLATTENING{1.0 / 298.257223563};
+	constexpr double SQUARED_ECCENTRICITY{2.0 * FLATTENING - FLATTENING * FLATTENING};
+
+	constexpr double C00{1.0};
+	constexpr double C02{0.25};
+	constexpr double C04{0.046875};
+	constexpr double C06{0.01953125};
+	constexpr double C08{0.01068115234375};
+	constexpr double C22{0.75};
+	constexpr double C44{0.46875};
+	constexpr double C46{0.01302083333333333333};
+	constexpr double C48{0.00712076822916666666};
+	constexpr double C66{0.36458333333333333333};
+	constexpr double C68{0.00569661458333333333};
+	constexpr double C88{0.3076171875};
+
+	constexpr double R0{C00 - SQUARED_ECCENTRICITY * (C02 + SQUARED_ECCENTRICITY * (C04 + SQUARED_ECCENTRICITY * (C06 + SQUARED_ECCENTRICITY * C08)))};
+	constexpr double R1{SQUARED_ECCENTRICITY * (C22 - SQUARED_ECCENTRICITY * (C04 + SQUARED_ECCENTRICITY * (C06 + SQUARED_ECCENTRICITY * C08)))};
+	constexpr double R2T{SQUARED_ECCENTRICITY * SQUARED_ECCENTRICITY};
+	constexpr double R2{R2T * (C44 - SQUARED_ECCENTRICITY * (C46 + SQUARED_ECCENTRICITY * C48))};
+	constexpr double R3T{R2T * SQUARED_ECCENTRICITY};
+	constexpr double R3{R3T * (C66 - SQUARED_ECCENTRICITY * C68)};
+	constexpr double R4{R3T * SQUARED_ECCENTRICITY * C88};
+
+	auto mlfn = [&](const double &lat) 
+	{
+		const double sin_phi{std::sin(lat)};
+		const double cos_phi{std::cos(lat) * sin_phi};
+		const double squared_sin_phi = sin_phi * sin_phi;
+		return (R0 * lat - cos_phi * (R1 + squared_sin_phi * (R2 + squared_sin_phi * (R3 + squared_sin_phi * R4))));
+	};
+
+	const double ML0{mlfn(reference.latitude().radians())};
+
+	auto msfn = [&](double sinPhi, double cosPhi, double es) 
+	{
+		return (cosPhi / std::sqrt(1.0 - es * sinPhi * sinPhi));
+	};
+
+	auto project = [&](double lat, double lon) 
+	{
+		Cartesian xy{lon, -1.0 * ML0};
+		if (!(std::abs(lat) < EPSILON10)) 
+		{
+			const double ms{(std::abs(std::sin(lat)) > EPSILON10) ? msfn(std::sin(lat), std::cos(lat), SQUARED_ECCENTRICITY) / std::sin(lat) : 0.0};
+			xy.x = ms * std::sin(lon *= std::sin(lat));
+			xy.y = (mlfn(lat) - ML0) + ms * (1.0 - std::cos(lon));
+		}
+		return xy;
+	};
+
+	auto fwd = [&](double lat, double lon) 
+	{
+		const double D = std::abs(lat) - HALF_PI;
+		if ((D > EPSILON12) || (std::abs(lon) > 10.0)) 
+		{
+			return Cartesian{0.0, 0.0};
+		}
+		if (std::abs(D) < EPSILON12) 
+		{
+			lat = (lat < 0.0) ? -1.0 * HALF_PI : HALF_PI;
+		}
+		lon -= reference.longitude().radians();
+		const auto projected{project(lat, lon)};
+		return Cartesian{EARTH_EQUATORIAL_RADIUS * projected.x, EARTH_EQUATORIAL_RADIUS * projected.y};
+	};
+
+	return fwd(latLon.latitude().radians(), latLon.longitude().radians());
 }
 
 

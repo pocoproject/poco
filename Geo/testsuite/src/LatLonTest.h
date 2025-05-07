@@ -24,7 +24,8 @@ public:
 	~LatLonTest();
 
 	void testLatLon();
-
+	void testToCartesian();
+	void testFromCartesian();
 	void setUp();
 	void tearDown();
 
