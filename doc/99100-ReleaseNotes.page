@@ -7,13 +7,30 @@ AAAIntroduction
 
 This is a bugfix release.
 
+!!Breaking Changes
+
+- GH #4906 NetSSL_OpenSSL: non-blocking functions return value
+
+!!Security Fixes
+
+- GH #4899 Upgrade bundled libexpat to 2.7.0 [fixes CVE]
+
 !!Features, Enhancements and Third Party Updates
 
-  - TODO
+- GH #4892 TCPServer continues to accept connections after stop()
+- GH #4911 Upgrade bundled libexpat to 2.7.1
+- GH #4907 Upgrade bundled SQLite to 3.49.1
+- GH #4905 XML fuzzing memory leak
 
 !!Bug Fixes and Improvements
 
-  - TODO
+- GH #4923 Poco::Data::SessionPool::dead() must check idle, not active, sessions
+- GH #4886 Poco::Dynamic::Var conversion to floating point does not handle precision checks correctly for negative numbers.
+- GH #4884 WebSocket receiveFrame() keeps returning the same frame when no payload (flags/header only)
+- GH #4882 SecureSocketImpl::currentSession() regression since 1.12.4
+- GH #4875 prebuild does not work as intended
+- PR #4896 fix(TCPServer): continues to accept connections after stop()
+- GH #4935 HTTP server/client request body RFC compliance
 
 
 !!!Release 1.14.1

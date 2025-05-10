@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.14.2 (2025-04-XX)
+Release 1.14.2 (2025-05-12)
 ===========================
 
 Summary of Changes:
@@ -15,7 +15,6 @@ Breaking Changes:
 Security Fixes:
 
 - GH #4899 Upgrade bundled libexpat to 2.7.0 [fixes CVE]
-- PR #4902 enh(expat): Upgrade to version 2.7.0
 
 Features, Enhancements and Third Party Updates:
 
@@ -31,7 +30,8 @@ Bug Fixes and Improvements:
 - GH #4884 WebSocket receiveFrame() keeps returning the same frame when no payload (flags/header only)
 - GH #4882 SecureSocketImpl::currentSession() regression since 1.12.4
 - GH #4875 prebuild does not work as intended
-- PR #4896 fix(TCPServer): continues to accept connections after stop() #4892
+- PR #4896 fix(TCPServer): continues to accept connections after stop()
+- GH #4935 HTTP server/client request body RFC compliance
 
 
 Release 1.14.1 (2025-02-11)
