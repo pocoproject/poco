@@ -13,7 +13,8 @@ This is a bugfix release.
 
 !!Security Fixes
 
-- GH #4899 Upgrade bundled libexpat to 2.7.0 [fixes CVE]
+- GH #4899 Upgrade bundled libexpat to 2.7.1 [fixes CVE]
+- GH #4926 Crash in Poco::Net::NTLMCredentials::parseChallengeMessage
 
 !!Features, Enhancements and Third Party Updates
 
@@ -21,16 +22,20 @@ This is a bugfix release.
 - GH #4911 Upgrade bundled libexpat to 2.7.1
 - GH #4907 Upgrade bundled SQLite to 3.49.1
 - GH #4905 XML fuzzing memory leak
+- PR #4937 CMake: make utf8proc, PCRE2, zlib and expat private dependencies
 
 !!Bug Fixes and Improvements
 
 - GH #4923 Poco::Data::SessionPool::dead() must check idle, not active, sessions
 - GH #4886 Poco::Dynamic::Var conversion to floating point does not handle precision checks correctly for negative numbers.
 - GH #4884 WebSocket receiveFrame() keeps returning the same frame when no payload (flags/header only)
-- GH #4882 SecureSocketImpl::currentSession() regression since 1.12.4
 - GH #4875 prebuild does not work as intended
-- PR #4896 fix(TCPServer): continues to accept connections after stop()
 - GH #4935 HTTP server/client request body RFC compliance
+- GH #4930 Poco::Net::PollSet.cpp:188 compare between int and size_t is not correct.
+- GH #4920 Adapt to avoid Clang warning deprecated-enum-enum-conversion
+- GH #4915 [BUG] A SEGV at `Net/src/MultipartReader.cpp:164:1`
+- PR #4933 Windows: report strings for all PROCESSOR_ARCHITECTURE_* constants in osArchitectureImpl()
+- PR #4896 fix(TCPServer): continues to accept connections after stop()
 
 
 !!!Release 1.14.1
