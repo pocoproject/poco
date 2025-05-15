@@ -91,6 +91,28 @@ public:
 	Poco::Thread::Priority getThreadPriority() const;
 		/// Returns the priority of TCP server threads
 		/// created by TCPServer.
+	//reactor
+	bool getReactorMode() const;
+		/// Returns the reactor mode.
+		///
+		/// If true, use reactor mode, else use thread pool mode.
+	void setReactorMode(bool reactorMode);
+		/// Sets the reactor mode.
+		///
+		/// If true, use reactor mode, else use thread pool mode.
+	int getAcceptorNum() const;
+		/// Returns the number of acceptors.
+	void setAcceptorNum(int acceptorNum);
+		/// Sets the number of acceptors.
+		///
+		/// The number of acceptors must be greater than 0.
+		/// The default is 1.
+	bool getUseSelfReactor() const;
+		/// Returns true if acceptor's self reactor is used.
+	void setUseSelfReactor(bool useSelfReactor);
+		/// Sets the acceptor's self reactor.
+		///
+		/// If true, use acceptor's self reactor, else create {_maxThreads} threads to use
 
 protected:
 	virtual ~TCPServerParams();
@@ -101,6 +123,10 @@ private:
 	int _maxThreads;
 	int _maxQueued;
 	Poco::Thread::Priority _threadPriority;
+
+	bool _reactorMode;
+	int _acceptorNum;
+	bool _useSelfReactor;
 };
 
 

@@ -5,9 +5,9 @@
 namespace Poco {
 	namespace Net{
 
-			TCPReactorAcceptor::TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams, bool useSelfReactor):
+			TCPReactorAcceptor::TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams):
 				Poco::Net::SocketAcceptor<TCPReactorServerConnection>(socket, reactor),
-				_pParams(pParams),_selfReactor(reactor),_useSelfReactor(useSelfReactor)
+				_pParams(pParams),_selfReactor(reactor),_useSelfReactor(pParams->getUseSelfReactor())
 			{
 				int workerThreads = _useSelfReactor? 0 : _pParams->getMaxThreads();
 				if (workerThreads > 0) {

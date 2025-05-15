@@ -16,7 +16,7 @@ namespace Poco {
 		class TCPReactorAcceptor: public Poco::Net::SocketAcceptor<TCPReactorServerConnection>
 		{
 		public:
-			TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams, bool useSelfReactor = false);
+			TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams);
 		
 			~TCPReactorAcceptor();
 			SocketReactor& reactor();

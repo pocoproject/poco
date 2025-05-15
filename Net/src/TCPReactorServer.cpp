@@ -8,13 +8,13 @@
 namespace Poco {
 	namespace Net {
 
-		TCPReactorServer::TCPReactorServer(int port, TCPServerParams::Ptr pParams, int lisenerNum):	
-		_threadPool("TCPR",lisenerNum),_reactors(lisenerNum),_port(port),_pParams(pParams)
+		TCPReactorServer::TCPReactorServer(int port, TCPServerParams::Ptr pParams):	
+		_threadPool("TCPR",pParams->getAcceptorNum()),_reactors(pParams->getAcceptorNum()),_port(port),_pParams(pParams)
 		{
 			for (auto& reactor: _reactors) {
 				ServerSocket socket(_port);
-				_socket.push_back(socket);
-				auto acceptor = std::make_shared<TCPReactorAcceptor>(socket, reactor,_pParams, true);
+				_sockets.push_back(socket);
+				auto acceptor = std::make_shared<TCPReactorAcceptor>(socket, reactor,_pParams);
 				_acceptors.push_back(acceptor);
 				
 			}

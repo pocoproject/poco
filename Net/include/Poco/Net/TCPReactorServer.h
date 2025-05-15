@@ -21,7 +21,7 @@ class TCPReactorServer
 	/// loop, while the TCPReactorAcceptor accepts incoming connections
 	/// and creates TCPReactorServerConnection objects to handle them.
 public:
-	TCPReactorServer(int port, TCPServerParams::Ptr pParams, int lisenerNum = 1);
+	TCPReactorServer(int port, TCPServerParams::Ptr pParams);
 	
 		/// Creates the TCPReactorServer using the given
 		/// stream socket.
@@ -42,7 +42,7 @@ private:
 	ThreadPool _threadPool;
 	std::vector<SocketReactor> _reactors;
 	std::vector<std::shared_ptr<TCPReactorAcceptor>> _acceptors;
-	std::vector<ServerSocket> _socket;
+	std::vector<ServerSocket> _sockets;
 	TCPServerParams::Ptr _pParams;
 	int _port;
 };

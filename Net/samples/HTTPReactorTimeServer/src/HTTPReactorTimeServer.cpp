@@ -185,12 +185,15 @@ protected:
 			unsigned short port = (unsigned short) config().getInt("HTTPReactorTimeServer.port", 9980);
 			std::string format(config().getString("HTTPReactorTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
 			int maxQueued  = config().getInt("HTTPReactorTimeServer.maxQueued", 100);
-			int maxThreads = config().getInt("HTTPReactorTimeServer.maxThreads", 16);
+			int maxThreads = config().getInt("HTTPReactorTimeServer.maxThreads", 4);
 			ThreadPool::defaultPool().addCapacity(maxThreads);
 
 			HTTPServerParams* pParams = new HTTPServerParams;
 			pParams->setMaxQueued(maxQueued);
 			pParams->setMaxThreads(maxThreads);
+			pParams->setReactorMode(true);
+			pParams->setAcceptorNum(1);
+			pParams->setUseSelfReactor(false);
 
 			Poco::Net::HTTPReactorServer server(port, pParams, new TimeRequestHandlerFactory(format));
 			server.start();

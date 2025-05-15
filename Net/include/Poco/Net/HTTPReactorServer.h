@@ -9,30 +9,27 @@
 namespace Poco {
 	namespace Net {
 
+		class HTTPReactorServer 
+		{
+		public:
+			HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
+			~HTTPReactorServer();
+			void start();
+			void stop();
+			void onMessage(const TcpReactorConnectionPtr & conn);
+			void onError(const Poco::Exception& ex);
+			void sendErrorResponse(HTTPSession& session, HTTPResponse::HTTPStatus status) ;
 
-class HTTPReactorServerConnection;
+		private:
 
-class HTTPReactorServer 
-{
-public:
-	HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
-	~HTTPReactorServer();
-	void start();
-	void stop();
-	void onMessage(const TcpReactorConnectionPtr & conn);
-	void onError(const Poco::Exception& ex);
-	void sendErrorResponse(HTTPSession& session, HTTPResponse::HTTPStatus status) ;
+			TCPReactorServer _tcpReactorServer;
+			HTTPServerParams::Ptr _pParams; 
+			HTTPRequestHandlerFactory::Ptr _pFactory;
+			Poco::Logger* _logger;
+			
 
-private:
+			ThreadPool _threadPool;
+		};
 
-	TCPReactorServer _tcpReactorServer;
-	HTTPServerParams::Ptr _pParams; 
-	HTTPRequestHandlerFactory::Ptr _pFactory;
-	Poco::Logger* _logger;
-    
-
-    ThreadPool _threadPool;
-};
-
-}
+	}
 };
