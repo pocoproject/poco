@@ -16,7 +16,6 @@ namespace Poco {
 			/// Creates the HTTPReactorServerSession.
 	
 		HTTPReactorServerSession::~HTTPReactorServerSession() {
-			popCompletedRequest();
 		};
 		/// Destroys the HTTPReactorServerSession.
 		
