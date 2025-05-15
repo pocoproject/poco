@@ -60,6 +60,9 @@ namespace Poco {
 			
 			void TCPReactorServerConnection::handleClose() {
 				_logger->information("handleClose " + _socket.peerAddress().toString());
+				// here must keep _socket to delay the _socket destrcutor
+				StreamSocket keepSocket = _socket;
+				// here will delete this, so memberships' destructor will be invoked
 				_reactor.removeEventHandler(_socket, HTTPObserver<TCPReactorServerConnection, ReadableNotification>(shared_from_this(), &TCPReactorServerConnection::onRead));
 
 			}
