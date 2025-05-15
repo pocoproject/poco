@@ -38,7 +38,9 @@ namespace Poco {
 			}
 			
 			void onRead(const AutoPtr<ReadableNotification>& pNf) {
-				size_t n = _socket.available();
+				_logger->information("onRead begin");
+				char tmp[1024]={0};
+				size_t n = _socket.receiveBytes(tmp, sizeof(tmp));
 				_logger->information("onRead: " + std::to_string(n));
 
 				if (n==0) {
@@ -47,7 +49,10 @@ namespace Poco {
 					
 					handleClose();
 				} else {
-					_rcvCallback(shared_from_this());
+					_logger->information("rcvmsg call back");
+					char rs[100]="HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello, World!";
+					_socket.sendBytes(rs, strlen(rs));
+					// _rcvCallback(shared_from_this());
 				}
 			}
 			void onWrite(const AutoPtr<WritableNotification>& pNf) {}
