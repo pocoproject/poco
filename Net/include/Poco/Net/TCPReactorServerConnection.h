@@ -2,12 +2,13 @@
 #define Net_TCPReactorServerConnection_INCLUDED
 
 
-#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include "Poco/Logger.h"
 #include "Poco/Net/HTTPObserver.h"
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/StreamSocket.h"
-#include <cstddef>
+#include <cstring>
+#include <exception>
 #include <netinet/in.h>
 #include <string>
 #include <unistd.h>
@@ -26,6 +27,7 @@ namespace Poco {
 			TCPReactorServerConnection(StreamSocket socket, SocketReactor& reactor):_reactor(reactor), _socket(socket)
 			{
 				_logger = &Poco::Logger::root();
+				_buf.reserve(4096);
 				
 			}
 			~TCPReactorServerConnection(){}
@@ -39,10 +41,22 @@ namespace Poco {
 			
 			void onRead(const AutoPtr<ReadableNotification>& pNf) {
 				_logger->information("onRead begin");
-				char tmp[1024]={0};
-				size_t n = _socket.receiveBytes(tmp, sizeof(tmp));
+				char tmp[4096]={0};
+				int n =0;
+				try {
+				
+					n = _socket.receiveBytes(tmp, sizeof(tmp));
+				}catch (Poco::Exception &e) {
+					_logger->error("exp:"+e.displayText());
+				}catch (std::exception &e) {
+					_logger->error("exp:"+std::string(e.what()));
+				
+				} catch (...) {
+					_logger->error("unknow exp");
+				}
 				_logger->information("onRead: " + std::to_string(n));
-
+				
+				
 				if (n==0) {
 					handleClose();
 				} else if (n<0) {
@@ -50,9 +64,10 @@ namespace Poco {
 					handleClose();
 				} else {
 					_logger->information("rcvmsg call back");
-					char rs[100]="HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello, World!";
-					_socket.sendBytes(rs, strlen(rs));
-					// _rcvCallback(shared_from_this());
+					_buf.assign(tmp, n);
+					// char rs[100]="HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello, World!";
+					// _socket.sendBytes(rs, strlen(rs));
+					_rcvCallback(shared_from_this());
 				}
 			}
 			void onWrite(const AutoPtr<WritableNotification>& pNf) {}
@@ -63,12 +78,16 @@ namespace Poco {
 			void onShutdown(const AutoPtr<ShutdownNotification>& pNf) {}
 			
 			void handleClose() {
-				_logger->information("handleClose");
+				_logger->information("handleClose " + _socket.peerAddress().toString());
 				_reactor.removeEventHandler(_socket, HTTPObserver<TCPReactorServerConnection, ReadableNotification>(shared_from_this(), &TCPReactorServerConnection::onRead));
 
 			}
-			StreamSocket socket() {
+			const StreamSocket& socket() {
 				return _socket;
+			}
+
+			const std::string& buffer() {
+				return _buf;
 			}
 
 			void setRecvMessageCallback(const RecvMessageCallback & cb) {
@@ -78,6 +97,7 @@ namespace Poco {
 			Poco::Net::SocketReactor& _reactor;
 			Poco::Net::StreamSocket _socket;
 			RecvMessageCallback _rcvCallback;
+			std::string _buf;
 		
 			Logger* _logger;
 		

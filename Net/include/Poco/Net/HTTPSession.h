@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
@@ -149,7 +150,8 @@ public:
 		/// Returns the trailer for a response sent using chunked
 		/// transfer encoding. The trailer fields to be sent must be set
 		/// before the response body has been fully written.
-
+	virtual SocketAddress clientAddress() = 0;
+	virtual SocketAddress serverAddress() = 0;
 protected:
 	HTTPSession();
 		/// Creates a HTTP session using an
@@ -171,12 +173,12 @@ protected:
 		/// Destroys the HTTPSession and closes the
 		/// underlying socket.
 
-	int get();
+	virtual int get();
 		/// Returns the next byte in the buffer.
 		/// Reads more data from the socket if there are
 		/// no bytes left in the buffer.
 
-	int peek();
+	virtual int peek();
 		/// Peeks at the next character in the buffer.
 		/// Reads more data from the socket if there are
 		/// no bytes left in the buffer.

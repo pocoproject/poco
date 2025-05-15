@@ -18,6 +18,7 @@
 #define Net_HTTPClientSession_INCLUDED
 
 
+#include "Poco/Net/IPAddress.h"
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
@@ -315,6 +316,8 @@ public:
 		/// Returns true if the proxy should be bypassed
 		/// for the current host.
 
+	SocketAddress clientAddress() {return _sourceAddress;}
+	SocketAddress serverAddress() {return SocketAddress(IPAddress(_host), _port);}
 protected:
 	enum
 	{
