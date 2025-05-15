@@ -4,7 +4,10 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAcceptor.h"
 #include "Poco/Net/TCPReactorAcceptor.h"
+#include "Poco/Net/TCPServerParams.h"
 #include "Poco/Runnable.h"
+#include "Poco/ThreadPool.h"
+#include <vector>
 namespace Poco {
 namespace Net {
 class TCPReactorServer
@@ -18,25 +21,30 @@ class TCPReactorServer
 	/// loop, while the TCPReactorAcceptor accepts incoming connections
 	/// and creates TCPReactorServerConnection objects to handle them.
 public:
-	TCPReactorServer(int port);
+	TCPReactorServer(int port, TCPServerParams::Ptr pParams, int lisenerNum = 1);
 	
 		/// Creates the TCPReactorServer using the given
 		/// stream socket.
 	~TCPReactorServer();
 
-	void start();
+	void start(bool acceptorUseSelfReactor = false);
+		/// Starts the TCPReactorServer.
+		/// The server will listen for incoming connections
+		/// on the given port.
+		/// The acceptorUseSelfReactor parameter specifies
+		/// whether the acceptor should use its own reactor
 	void stop();
 	
-	void setRecvMessageCallback(const RecvMessageCallback & cb) {
-		_acceptor->setRecvMessageCallback(cb);
-	}
+	void setRecvMessageCallback(const RecvMessageCallback & cb);
 private:
 
 
-	Thread _thread;
-	SocketReactor _reactor;
-	std::shared_ptr<TCPReactorAcceptor> _acceptor;
-	ServerSocket _socket;
+	ThreadPool _threadPool;
+	std::vector<SocketReactor> _reactors;
+	std::vector<std::shared_ptr<TCPReactorAcceptor>> _acceptors;
+	std::vector<ServerSocket> _socket;
+	TCPServerParams::Ptr _pParams;
+	int _port;
 };
 } // namespace Net
 } // namespace Poco

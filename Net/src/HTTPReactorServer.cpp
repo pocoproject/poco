@@ -12,7 +12,7 @@ namespace Poco {
 class HTTPReactorServerConnection;
 
 
-HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):_tcpReactorServer(port){
+HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):_tcpReactorServer(port, pParams){
         _pParams = pParams;
 		_pFactory = pFactory;
 		_logger = &Poco::Logger::root();
