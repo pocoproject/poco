@@ -11,6 +11,7 @@
 #include "Poco/ThreadPool.h"
 #include "Poco/Net/SocketAcceptor.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/TCPReactorServer.h"
 #include <memory>
 #include <vector>
 namespace Poco {
@@ -26,11 +27,16 @@ public:
 	~HTTPReactorServer();
 	void start();
 	void stop();
+	void onMessage(const TcpReactorConnectionPtr & conn);
+	void onError(const Poco::Exception& ex);
+	void sendErrorResponse(HTTPServerSession& session, HTTPResponse::HTTPStatus status) ;
 
 private:
-	std::vector<std::shared_ptr<SocketReactor>> _reactors;
-	std::vector<ServerSocket> _serverSockets;
-	std::vector<std::shared_ptr<SocketAcceptor<HTTPReactorServerConnection>>> _acceptors;
+
+	TCPReactorServer _tcpReactorServer;
+	HTTPServerParams::Ptr _pParams; 
+	HTTPRequestHandlerFactory::Ptr _pFactory;
+	Poco::Logger* _logger;
     
 
     ThreadPool _threadPool;

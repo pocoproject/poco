@@ -18,6 +18,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
+#include "Poco/Logger.h"
 #include "Poco/Mutex.h"
 #include <memory>
 
@@ -66,18 +67,25 @@ public:
 		_handler(method),
 		_matcher(matcher)
 	{
+		_logger = &Poco::Logger::root();
+		_logger->information("HTTPObserver created");
+		_logger->information("HTTPObserver object: " + std::to_string(_pObject.use_count()));
 	}
-
+	
 	HTTPObserver(const HTTPObserver& observer):
-		AbstractObserver(observer),
-		_pObject(observer._pObject),
-		_handler(observer._handler),
-		_matcher(observer._matcher)
+	AbstractObserver(observer),
+	_pObject(observer._pObject),
+	_handler(observer._handler),
+	_matcher(observer._matcher)
 	{
+		_logger = &Poco::Logger::root();
+		_logger->information("HTTPObserver copied");
+		_logger->information("HTTPObserver object: " + std::to_string(_pObject.use_count()));
 	}
-
+	
 	~HTTPObserver()
 	{
+		_logger->information("~HTTPObserver object: " + std::to_string(_pObject.use_count()));
 	}
 
 	HTTPObserver& operator = (const HTTPObserver& observer)
@@ -132,14 +140,14 @@ protected:
 		Mutex::ScopedLock lock(_mutex);
 
 		if (_pObject)
-			(_pObject->*_handler)(ptr);
+			(_pObject.get()->*_handler)(ptr);
 	}
 
 	bool match(const Notification::Ptr& ptr) const
 	{
 		Mutex::ScopedLock l(_mutex);
 
-		return _pObject && (!_matcher || (_pObject->*_matcher)(ptr->name()));
+		return _pObject && (!_matcher || (_pObject.get()->*_matcher)(ptr->name()));
 	}
 
 	Mutex& mutex() const
@@ -152,6 +160,11 @@ private:
 	Callback _handler;
 	Matcher _matcher;
 	mutable Poco::Mutex _mutex;
+	Logger* _logger = nullptr;
+		/// Logger for this observer
+		/// This is not thread safe, but it is not needed to be.
+		/// It is only used for logging purposes and does not
+		/// affect the functionality of the observer.
 };
 
 	}

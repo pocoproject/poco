@@ -18,23 +18,17 @@ class TCPReactorServer
 	/// loop, while the TCPReactorAcceptor accepts incoming connections
 	/// and creates TCPReactorServerConnection objects to handle them.
 public:
-	TCPReactorServer(int port):
-		_thread("TCPReactorServer")
-		{
-			_socket.bind(port);
-			_socket.listen();
-			_acceptor = std::make_shared<TCPReactorAcceptor>(_socket, _reactor);
-		};
+	TCPReactorServer(int port);
+	
 		/// Creates the TCPReactorServer using the given
 		/// stream socket.
 	~TCPReactorServer();
 
-	void start() {
-		_thread.start(_reactor);
-	}
-	void stop() {
-		_reactor.stop();
-		_thread.join();
+	void start();
+	void stop();
+	
+	void setRecvMessageCallback(const RecvMessageCallback & cb) {
+		_acceptor->setRecvMessageCallback(cb);
 	}
 private:
 

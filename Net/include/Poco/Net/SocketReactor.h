@@ -18,6 +18,7 @@
 #define Net_SocketReactor_INCLUDED
 
 
+#include "Poco/Logger.h"
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/SocketNotification.h"
@@ -305,6 +306,8 @@ private:
 	NotificationPtr   _pShutdownNotification;
 	MutexType         _mutex;
 	Poco::Event       _event;
+	Logger* _logger = nullptr;
+		/// Logger for this reactor
 
 	friend class SocketNotifier;
 };

@@ -1,26 +1,25 @@
 #include "Poco/Net/TCPReactorServer.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
 	namespace Net {
 
-		TCPReactorServer::TCPReactorServer(){
-		
-		}
-		
+		TCPReactorServer::TCPReactorServer(int port):	_thread("TCPReactorServer")
+		{
+			_socket.bind(port);
+			_socket.listen();
+			_acceptor = std::make_shared<TCPReactorAcceptor>(_socket, _reactor);
+		};
 		TCPReactorServer::~TCPReactorServer(){
 			stop();
 		}
 		void TCPReactorServer::start(){
-			for (auto& reactor : _reactors) {
-				reactor->start();
-			}
+			_thread.start(_reactor);
 		}
 		void TCPReactorServer::stop(){
-			for (auto& reactor : _reactors) {
-				reactor->stop();
-			}
-			_threadPool.stopAll();
+			_reactor.stop();
+			_thread.join();
 		}
 }
 }
