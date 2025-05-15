@@ -1,5 +1,5 @@
 //
-// HTTPTimeServer.cpp
+// HTTPReactorTimeServer.cpp
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -27,7 +27,10 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/HelpFormatter.h"
+#include <cstdio>
 #include <iostream>
+
+#include "Poco/Net/HTTPReactorServer.h"
 
 
 using Poco::Net::ServerSocket;
@@ -70,7 +73,7 @@ public:
 		response.set("Clear-Site-Data", "\"cookies\"");
 
 		std::ostream& ostr = response.send();
-		ostr << "<html><head><title>HTTPTimeServer powered by POCO C++ Libraries</title>";
+		ostr << "<html><head><title>HTTPReactorTimeServer powered by POCO C++ Libraries</title>";
 		ostr << "</head>";
 		ostr << "<body><p style=\"text-align: center; font-size: 48px;\">";
 		ostr << dt;
@@ -103,31 +106,31 @@ private:
 };
 
 
-class HTTPTimeServer: public Poco::Util::ServerApplication
+class HTTPReactorTimeServer: public Poco::Util::ServerApplication
 	/// The main application class.
 	///
 	/// This class handles command-line arguments and
 	/// configuration files.
-	/// Start the HTTPTimeServer executable with the help
+	/// Start the HTTPReactorTimeServer executable with the help
 	/// option (/help on Windows, --help on Unix) for
 	/// the available command line options.
 	///
-	/// To use the sample configuration file (HTTPTimeServer.properties),
-	/// copy the file to the directory where the HTTPTimeServer executable
-	/// resides. If you start the debug version of the HTTPTimeServer
-	/// (HTTPTimeServerd[.exe]), you must also create a copy of the configuration
-	/// file named HTTPTimeServerd.properties. In the configuration file, you
+	/// To use the sample configuration file (HTTPReactorTimeServer.properties),
+	/// copy the file to the directory where the HTTPReactorTimeServer executable
+	/// resides. If you start the debug version of the HTTPReactorTimeServer
+	/// (HTTPReactorTimeServerd[.exe]), you must also create a copy of the configuration
+	/// file named HTTPReactorTimeServerd.properties. In the configuration file, you
 	/// can specify the port on which the server is listening (default
 	/// 9980) and the format of the date/time string sent back to the client.
 	///
 	/// To test the TimeServer you can use any web browser (http://localhost:9980/).
 {
 public:
-	HTTPTimeServer(): _helpRequested(false)
+	HTTPReactorTimeServer(): _helpRequested(false)
 	{
 	}
 
-	~HTTPTimeServer()
+	~HTTPReactorTimeServer()
 	{
 	}
 
@@ -179,26 +182,30 @@ protected:
 		else
 		{
 			// get parameters from configuration file
-			unsigned short port = (unsigned short) config().getInt("HTTPTimeServer.port", 9980);
-			std::string format(config().getString("HTTPTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
-			int maxQueued  = config().getInt("HTTPTimeServer.maxQueued", 100);
-			int maxThreads = config().getInt("HTTPTimeServer.maxThreads", 16);
+			unsigned short port = (unsigned short) config().getInt("HTTPReactorTimeServer.port", 9980);
+			std::string format(config().getString("HTTPReactorTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
+			int maxQueued  = config().getInt("HTTPReactorTimeServer.maxQueued", 100);
+			int maxThreads = config().getInt("HTTPReactorTimeServer.maxThreads", 16);
 			ThreadPool::defaultPool().addCapacity(maxThreads);
 
 			HTTPServerParams* pParams = new HTTPServerParams;
 			pParams->setMaxQueued(maxQueued);
 			pParams->setMaxThreads(maxThreads);
 
+			Poco::Net::HTTPReactorServer server(port, pParams, new TimeRequestHandlerFactory(format));
+			server.start();
+
 			// set-up a server socket
-			ServerSocket svs(port);
-			// set-up a HTTPServer instance
-			HTTPServer srv(new TimeRequestHandlerFactory(format), svs, pParams);
-			// start the HTTPServer
-			srv.start();
+			// ServerSocket svs(port);
+			// // set-up a HTTPServer instance
+			// HTTPServer srv(new TimeRequestHandlerFactory(format), svs, pParams);
+			// // start the HTTPServer
+			// srv.start();
 			// wait for CTRL-C or kill
 			waitForTerminationRequest();
 			// Stop the HTTPServer
-			srv.stop();
+			// srv.stop();
+			server.stop();
 		}
 		return Application::EXIT_OK;
 	}
@@ -210,6 +217,6 @@ private:
 
 int main(int argc, char** argv)
 {
-	HTTPTimeServer app;
+	HTTPReactorTimeServer app;
 	return app.run(argc, argv);
 }
