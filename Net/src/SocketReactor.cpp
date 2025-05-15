@@ -35,7 +35,6 @@ SocketReactor::SocketReactor():
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this))
 {
-	_logger = &Poco::Logger::root();
 }
 
 
