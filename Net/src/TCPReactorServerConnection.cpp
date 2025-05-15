@@ -23,18 +23,8 @@ namespace Poco {
 			void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf) {
 				_logger->information("onRead begin");
 				char tmp[4096]={0};
-				int n =0;
-				try {
-				
-					n = _socket.receiveBytes(tmp, sizeof(tmp));
-				}catch (Poco::Exception &e) {
-					_logger->error("exp:"+e.displayText());
-				}catch (std::exception &e) {
-					_logger->error("exp:"+std::string(e.what()));
-				
-				} catch (...) {
-					_logger->error("unknow exp");
-				}
+				int n = _socket.receiveBytes(tmp, sizeof(tmp));
+			
 				_logger->information("onRead: " + std::to_string(n));
 				
 				
