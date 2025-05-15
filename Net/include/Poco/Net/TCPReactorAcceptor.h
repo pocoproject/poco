@@ -44,6 +44,7 @@ namespace Poco {
 			TCPReactorServerConnection* createServiceHandler(Poco::Net::StreamSocket& socket) override
 			{
 				_logger->information("createServiceHandler");
+				socket.setNoDelay(true);
 				auto tmpConnPtr =  std::make_shared<TCPReactorServerConnection>(socket, *reactor());
 				tmpConnPtr->setRecvMessageCallback(_recvMessageCallback);
 				tmpConnPtr->initialize();
