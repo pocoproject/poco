@@ -3,7 +3,6 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPSession.h"
 #include <cstring>
-#include <string>
 
 namespace Poco {
 	namespace Net {
@@ -31,13 +30,10 @@ namespace Poco {
 	}
 
 	void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr & conn) {
-		_logger->information("onMessage: " + std::to_string(conn->buffer().size())+" use:"+std::to_string(conn.use_count()));
-
 		try {
 			// Handle read event
 			HTTPReactorServerSession session(conn->socket(), conn->buffer(), _pParams);
 			if(!session.checkRequestComplete()) {
-				_logger->information("onMessage: checkRequestComplete false, not complete.");
 				return;
 			}
 			// session.detach();
@@ -59,7 +55,6 @@ namespace Poco {
 #else
 					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
 #endif
-					_logger->information("onMessage: before handle");
 					if (pHandler.get())
 					{
 						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
@@ -69,7 +64,6 @@ namespace Poco {
 					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
 					}
 					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
-					_logger->information("onMessage: end handle");
 
 				}
 				catch (Poco::Exception& e)
@@ -103,7 +97,7 @@ namespace Poco {
 	}
 	void HTTPReactorServer::onError(const Poco::Exception& ex) {
 		// Handle error
-		_logger->error("onerr:"+ex.displayText());
+		throw ex;
 	}
 
 }

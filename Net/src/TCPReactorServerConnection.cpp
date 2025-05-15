@@ -7,49 +7,38 @@ namespace Poco {
 
 			TCPReactorServerConnection::TCPReactorServerConnection(StreamSocket socket, SocketReactor& reactor):_reactor(reactor), _socket(socket)
 			{
-				_logger = &Poco::Logger::root();
-				_buf.reserve(4096);
+				_buf.reserve(BUFFER_SIZE);
 				
 			}
 			TCPReactorServerConnection::~TCPReactorServerConnection(){}
 			
 			void TCPReactorServerConnection::initialize() {
-				_logger->information("initialize");
 				_reactor.addEventHandler(_socket, HTTPObserver<TCPReactorServerConnection, ReadableNotification>(shared_from_this(), &TCPReactorServerConnection::onRead));
-				_logger->information("initialize end " + std::to_string( weak_from_this().use_count()));
-
 			}
 			
 			void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf) {
-				_logger->information("onRead begin");
-				char tmp[4096]={0};
+				char tmp[BUFFER_SIZE]={0};
 				int n = _socket.receiveBytes(tmp, sizeof(tmp));
-			
-				_logger->information("onRead: " + std::to_string(n));
-				
-				
 				if (n==0) {
 					handleClose();
 				} else if (n<0) {
-					
+					// TODO
 					handleClose();
 				} else {
-					_logger->information("rcvmsg call back");
 					_buf.append(tmp, n);
-					// char rs[100]="HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello, World!";
-					// _socket.sendBytes(rs, strlen(rs));
 					_rcvCallback(shared_from_this());
 				}
 			}
-			void TCPReactorServerConnection::onWrite(const AutoPtr<WritableNotification>& pNf) {}
+
 			void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf) {
-				_logger->error("onError: " + std::to_string(pNf->code()) + " " + pNf->description());
 				handleClose();
 			}
-			void TCPReactorServerConnection::onShutdown(const AutoPtr<ShutdownNotification>& pNf) {}
+
+			void TCPReactorServerConnection::onShutdown(const AutoPtr<ShutdownNotification>& pNf) {
+				handleClose();
+			}
 			
 			void TCPReactorServerConnection::handleClose() {
-				_logger->information("handleClose " + _socket.peerAddress().toString());
 				// here must keep _socket to delay the _socket destrcutor
 				StreamSocket keepSocket = _socket;
 				// here will delete this, so memberships' destructor will be invoked

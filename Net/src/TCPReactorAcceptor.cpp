@@ -19,7 +19,6 @@ namespace Poco {
 					_wokerReactors.push_back(workerReactor);
 					_threadPool->start(*workerReactor);
 				}
-				_logger = &Poco::Logger::root();
 			}
 		
 			TCPReactorAcceptor::~TCPReactorAcceptor()
@@ -31,13 +30,11 @@ namespace Poco {
 					return _selfReactor;
 				}
 				static std::atomic_uint index(0);
-				_logger->information("reactor index: " + std::to_string(index));
 				return  *_wokerReactors[index++ % _wokerReactors.size()];
 			}
 
 			TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::StreamSocket& socket) 
 			{
-				_logger->information("createServiceHandler");
 				// enable nodelay per default: OSX really needs that
 #if defined(POCO_HAS_UNIX_SOCKET)
 				if (socket.address().family() != AddressFamily::UNIX_LOCAL)

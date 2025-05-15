@@ -35,8 +35,6 @@ namespace Poco {
 			std::shared_ptr<ThreadPool> _threadPool;
 			RecvMessageCallback _recvMessageCallback;
 			TCPServerParams::Ptr _pParams;
-
-			Logger *_logger;
 		};
 	}
 }

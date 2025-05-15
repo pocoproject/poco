@@ -12,6 +12,7 @@
 
 namespace Poco {
 	namespace Net {
+		const int BUFFER_SIZE = 4096;
 		class TCPReactorServerConnection;
 		using TcpReactorConnectionPtr = std::shared_ptr<TCPReactorServerConnection>;
 		using RecvMessageCallback =
@@ -26,7 +27,6 @@ namespace Poco {
 			void initialize();
 			
 			void onRead(const AutoPtr<ReadableNotification>& pNf);
-			void onWrite(const AutoPtr<WritableNotification>& pNf);
 			void onError(const AutoPtr<ErrorNotification>& pNf);
 			void onShutdown(const AutoPtr<ShutdownNotification>& pNf);
 			
@@ -40,8 +40,6 @@ namespace Poco {
 			Poco::Net::StreamSocket _socket;
 			RecvMessageCallback _rcvCallback;
 			std::string _buf;
-		
-			Logger* _logger;
 		
 		};
 	}

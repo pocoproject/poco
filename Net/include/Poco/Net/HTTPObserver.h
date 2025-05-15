@@ -67,9 +67,6 @@ public:
 		_handler(method),
 		_matcher(matcher)
 	{
-		_logger = &Poco::Logger::root();
-		_logger->information("HTTPObserver created");
-		_logger->information("HTTPObserver object: " + std::to_string(_pObject.use_count()));
 	}
 	
 	HTTPObserver(const HTTPObserver& observer):
@@ -78,14 +75,10 @@ public:
 	_handler(observer._handler),
 	_matcher(observer._matcher)
 	{
-		_logger = &Poco::Logger::root();
-		_logger->information("HTTPObserver copied");
-		_logger->information("HTTPObserver object: " + std::to_string(_pObject.use_count()));
 	}
 	
 	~HTTPObserver()
 	{
-		_logger->information("~HTTPObserver object: " + std::to_string(_pObject.use_count()));
 	}
 
 	HTTPObserver& operator = (const HTTPObserver& observer)
@@ -160,11 +153,6 @@ private:
 	Callback _handler;
 	Matcher _matcher;
 	mutable Poco::Mutex _mutex;
-	Logger* _logger = nullptr;
-		/// Logger for this observer
-		/// This is not thread safe, but it is not needed to be.
-		/// It is only used for logging purposes and does not
-		/// affect the functionality of the observer.
 };
 
 	}
