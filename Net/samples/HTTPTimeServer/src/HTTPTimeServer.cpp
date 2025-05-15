@@ -29,6 +29,8 @@
 #include "Poco/Util/HelpFormatter.h"
 #include <iostream>
 
+#include "Poco/Net/HTTPReactorServer.h"
+
 
 using Poco::Net::ServerSocket;
 using Poco::Net::HTTPRequestHandler;
@@ -189,16 +191,20 @@ protected:
 			pParams->setMaxQueued(maxQueued);
 			pParams->setMaxThreads(maxThreads);
 
+			Poco::Net::HTTPReactorServer server(port, pParams, new TimeRequestHandlerFactory(format));
+			server.start();
+
 			// set-up a server socket
-			ServerSocket svs(port);
-			// set-up a HTTPServer instance
-			HTTPServer srv(new TimeRequestHandlerFactory(format), svs, pParams);
-			// start the HTTPServer
-			srv.start();
+			// ServerSocket svs(port);
+			// // set-up a HTTPServer instance
+			// HTTPServer srv(new TimeRequestHandlerFactory(format), svs, pParams);
+			// // start the HTTPServer
+			// srv.start();
 			// wait for CTRL-C or kill
 			waitForTerminationRequest();
 			// Stop the HTTPServer
-			srv.stop();
+			// srv.stop();
+			server.stop();
 		}
 		return Application::EXIT_OK;
 	}
