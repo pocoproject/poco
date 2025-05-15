@@ -32,7 +32,7 @@ namespace Poco {
 			
 			void handleClose();
 			const StreamSocket& socket();
-			const std::string& buffer();
+			std::string& buffer();
 
 			void setRecvMessageCallback(const RecvMessageCallback & cb);
 		private:

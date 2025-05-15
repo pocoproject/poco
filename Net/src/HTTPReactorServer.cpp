@@ -36,6 +36,10 @@ namespace Poco {
 		try {
 			// Handle read event
 			HTTPReactorServerSession session(conn->socket(), conn->buffer(), _pParams);
+			if(!session.checkRequestComplete()) {
+				_logger->information("onMessage: checkRequestComplete false, not complete.");
+				return;
+			}
 			// session.detach();
 			// Create request and response objects
 			HTTPServerResponseImpl response(session);

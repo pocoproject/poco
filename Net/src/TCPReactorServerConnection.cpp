@@ -45,7 +45,7 @@ namespace Poco {
 					handleClose();
 				} else {
 					_logger->information("rcvmsg call back");
-					_buf.assign(tmp, n);
+					_buf.append(tmp, n);
 					// char rs[100]="HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello, World!";
 					// _socket.sendBytes(rs, strlen(rs));
 					_rcvCallback(shared_from_this());
@@ -70,7 +70,7 @@ namespace Poco {
 				return _socket;
 			}
 
-			const std::string& TCPReactorServerConnection::buffer() {
+			std::string& TCPReactorServerConnection::buffer() {
 				return _buf;
 			}
 
