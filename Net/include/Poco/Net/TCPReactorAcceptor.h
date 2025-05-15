@@ -7,7 +7,6 @@
 #include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/ThreadPool.h"
-#include "Poco/Void.h"
 #include <memory>
 #include <vector>
 namespace Poco {

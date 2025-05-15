@@ -17,7 +17,9 @@ namespace Poco {
 		/// HTTPServer.
 	{
 	public:
-		HTTPReactorServerSession(const StreamSocket& socket, const std::string& buf, HTTPServerParams::Ptr pParams):HTTPSession(), 
+		HTTPReactorServerSession(const StreamSocket& socket, const std::string& buf, HTTPServerParams::Ptr pParams):
+		// do not deliver socket to HTTPSession
+		HTTPSession(), 
 		_buf(buf),_realsocket(socket){
 			_logger = &Logger::root();
 			_pcur = const_cast<char*>(_buf.c_str());

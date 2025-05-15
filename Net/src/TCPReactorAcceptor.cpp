@@ -1,4 +1,5 @@
 #include "Poco/Net/TCPReactorAcceptor.h"
+#include <atomic>
 #include <string>
 
 
@@ -29,7 +30,7 @@ namespace Poco {
 				if (_useSelfReactor) {
 					return _selfReactor;
 				}
-				static std::atomic_int index(0);
+				static std::atomic_uint index(0);
 				_logger->information("reactor index: " + std::to_string(index));
 				return  *_wokerReactors[index++ % _wokerReactors.size()];
 			}
