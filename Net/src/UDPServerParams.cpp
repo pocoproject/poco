@@ -21,7 +21,7 @@ namespace Net {
 
 UDPServerParams::UDPServerParams(const Poco::Net::SocketAddress& sa,
 	int nSockets,
-	Poco::Timespan timeout,
+	const Timespan& timeout,
 	std::size_t handlerBufListSize,
 	bool notifySender,
 	int  backlogThreshold): _sa(sa),
