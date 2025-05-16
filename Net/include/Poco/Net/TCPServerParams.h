@@ -102,13 +102,16 @@ public:
 		/// If true, use reactor mode, else use thread pool mode.
 	int getAcceptorNum() const;
 		/// Returns the number of acceptors.
+
 	void setAcceptorNum(int acceptorNum);
 		/// Sets the number of acceptors.
 		///
 		/// The number of acceptors must be greater than 0.
 		/// The default is 1.
+
 	bool getUseSelfReactor() const;
 		/// Returns true if acceptor's self reactor is used.
+		
 	void setUseSelfReactor(bool useSelfReactor);
 		/// Sets the acceptor's self reactor.
 		///

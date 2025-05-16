@@ -2,15 +2,16 @@
 #define Net_TCPReactorServer_INCLUDED
 
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/Net/SocketAcceptor.h"
 #include "Poco/Net/TCPReactorAcceptor.h"
 #include "Poco/Net/TCPServerParams.h"
-#include "Poco/Runnable.h"
 #include "Poco/ThreadPool.h"
 #include <vector>
+
 namespace Poco {
 namespace Net {
-class TCPReactorServer
+
+
+	class TCPReactorServer
 {
 	/// This class implements a TCP server using the Reactor pattern.
 	/// It uses a SocketReactor to handle incoming connections and
@@ -22,31 +23,29 @@ class TCPReactorServer
 	/// and creates TCPReactorServerConnection objects to handle them.
 public:
 	TCPReactorServer(int port, TCPServerParams::Ptr pParams);
-	
-		/// Creates the TCPReactorServer using the given
-		/// stream socket.
+
 	~TCPReactorServer();
 
 	void start(bool acceptorUseSelfReactor = false);
-		/// Starts the TCPReactorServer.
-		/// The server will listen for incoming connections
-		/// on the given port.
-		/// The acceptorUseSelfReactor parameter specifies
-		/// whether the acceptor should use its own reactor
+	/// Starts the TCPReactorServer.
+	/// The server will listen for incoming connections
+	/// on the given port.
+	/// The acceptorUseSelfReactor parameter specifies
+	/// whether the acceptor should use its own reactor
 	void stop();
-	
-	void setRecvMessageCallback(const RecvMessageCallback & cb);
+
+	void setRecvMessageCallback(const RecvMessageCallback& cb);
+
 private:
-
-
-	ThreadPool _threadPool;
-	std::vector<SocketReactor> _reactors;
+	ThreadPool                                       _threadPool;
+	std::vector<SocketReactor>                       _reactors;
 	std::vector<std::shared_ptr<TCPReactorAcceptor>> _acceptors;
-	std::vector<ServerSocket> _sockets;
-	TCPServerParams::Ptr _pParams;
-	int _port;
+	std::vector<ServerSocket>                        _sockets;
+	TCPServerParams::Ptr                             _pParams;
+	int                                              _port;
 };
-} // namespace Net
-} // namespace Poco
+
+}} // namespace Poco::Net
 
 #endif // Net_TCPReactorServer_INCLUDED
+

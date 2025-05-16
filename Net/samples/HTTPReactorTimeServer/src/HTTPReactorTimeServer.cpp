@@ -195,19 +195,14 @@ protected:
 			pParams->setAcceptorNum(1);
 			pParams->setUseSelfReactor(false);
 
+			// set-up a reactor HTTPServer instance
 			Poco::Net::HTTPReactorServer server(port, pParams, new TimeRequestHandlerFactory(format));
+			// start the HTTPServer
 			server.start();
 
-			// set-up a server socket
-			// ServerSocket svs(port);
-			// // set-up a HTTPServer instance
-			// HTTPServer srv(new TimeRequestHandlerFactory(format), svs, pParams);
-			// // start the HTTPServer
-			// srv.start();
 			// wait for CTRL-C or kill
 			waitForTerminationRequest();
 			// Stop the HTTPServer
-			// srv.stop();
 			server.stop();
 		}
 		return Application::EXIT_OK;
