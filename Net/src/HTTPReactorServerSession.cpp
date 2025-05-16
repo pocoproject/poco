@@ -25,16 +25,18 @@ namespace Poco {
 				PARSING_HEADERS,
 				PARSING_CHUNK_SIZE,
 				PARSING_CHUNK_DATA,
+				PARSING_TRAILER,
 				PARSING_BODY,
 				COMPLETE
 			};
-
+		
 			State state = PARSING_HEADERS;
 			std::size_t pos = 0;
 			std::size_t bodyStart = 0;
 			std::size_t contentLength = 0;
 			std::size_t chunkSize = 0;
-
+			bool hasTrailer = false;
+		
 			while (pos < _buf.size()) {
 				switch (state) {
 					case PARSING_HEADERS: {
@@ -44,6 +46,11 @@ namespace Poco {
 							bodyStart = headerEnd + 4; // "\r\n\r\n" is 4 characters
 							std::size_t chunkedPos = _buf.find("Transfer-Encoding: chunked", pos);
 							if (chunkedPos != std::string::npos) {
+								// Check if there's a Trailer header
+								std::size_t trailerPos = _buf.find("Trailer:", pos);
+								if (trailerPos != std::string::npos) {
+									hasTrailer = true;
+								}
 								state = PARSING_CHUNK_SIZE;
 								pos = bodyStart;
 							} else {
@@ -75,15 +82,22 @@ namespace Poco {
 							std::string chunkSizeStr = _buf.substr(pos, chunkSizeEnd - pos);
 							chunkSize = std::stoi(chunkSizeStr, nullptr, 16); // Parse hex chunk size
 							if (chunkSize == 0) {
-								// Last chunk found, check for trailing "\r\n"
-								if (_buf.find("\r\n", chunkSizeEnd + 2) == chunkSizeEnd + 2) {
-									_complete = chunkSizeEnd + 3; // End of the last chunk
-									return true;
+								// Last chunk found
+								if (hasTrailer) {
+									state = PARSING_TRAILER;
+									pos = chunkSizeEnd + 2; // Move past the "0\r\n"
+								} else {
+									// No trailer, check for final "\r\n\r\n"
+									if (_buf.find("\r\n\r\n", chunkSizeEnd + 2) == chunkSizeEnd + 2) {
+										_complete = chunkSizeEnd + 4; // End of "0\r\n\r\n"
+										return true;
+									}
+									return false; // Incomplete final "\r\n\r\n"
 								}
-								return false; // Incomplete trailing "\r\n"
+							} else {
+								state = PARSING_CHUNK_DATA;
+								pos = chunkSizeEnd + 2; // Move to the chunk data
 							}
-							state = PARSING_CHUNK_DATA;
-							pos = chunkSizeEnd + 2; // Move to the chunk data
 						} else {
 							return false; // Incomplete chunk size
 						}
@@ -95,6 +109,17 @@ namespace Poco {
 							state = PARSING_CHUNK_SIZE;
 						} else {
 							return false; // Incomplete chunk data
+						}
+						break;
+					}
+					case PARSING_TRAILER: {
+						std::size_t trailerEnd = _buf.find("\r\n\r\n", pos);
+						if (trailerEnd != std::string::npos) {
+							// Trailer is complete
+							_complete = trailerEnd + 3; // End of the trailer
+							return true;
+						} else {
+							return false; // Incomplete trailer
 						}
 						break;
 					}

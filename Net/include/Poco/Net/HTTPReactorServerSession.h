@@ -22,8 +22,7 @@ namespace Poco {
 		virtual ~HTTPReactorServerSession();
 		/// Destroys the HTTPReactorServerSession.
 		
-		bool canKeepAlive() const;
-		/// Returns true if the session can be kept alive.
+
 		SocketAddress clientAddress() override{
 			return _realsocket.peerAddress();
 		}
@@ -54,11 +53,6 @@ namespace Poco {
 		int _complete;
 		StreamSocket _realsocket;
 	};
-
-	inline bool HTTPReactorServerSession::canKeepAlive() const
-	{
-		return _maxKeepAliveRequests != 0;
-	}
 }
 }
 

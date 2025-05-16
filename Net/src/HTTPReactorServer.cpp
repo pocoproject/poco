@@ -36,7 +36,6 @@ namespace Poco {
 			if(!session.checkRequestComplete()) {
 				return;
 			}
-			// session.detach();
 			// Create request and response objects
 			HTTPServerResponseImpl response(session);
 			HTTPServerRequestImpl request(response, session, _pParams);
@@ -44,7 +43,7 @@ namespace Poco {
             Poco::Timestamp now;
 			response.setDate(now);
 			response.setVersion(request.getVersion());
-			response.setKeepAlive( request.getKeepAlive() && session.canKeepAlive());
+			response.setKeepAlive( request.getKeepAlive());
             try
 				{
 
@@ -61,7 +60,7 @@ namespace Poco {
 						response.sendContinue();
 					
 					pHandler->handleRequest(request, response);
-					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive());
 					}
 					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
 
