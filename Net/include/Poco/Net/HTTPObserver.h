@@ -121,9 +121,7 @@ public:
 
 	virtual void disable()
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
-
-		// _pObject = nullptr;
+		// do nothing
 	}
 
 protected:
