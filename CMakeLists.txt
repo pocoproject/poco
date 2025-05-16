@@ -262,6 +262,7 @@ if(ENABLE_TRACE)
 endif()
 
 include(DefinePlatformSpecific)
+add_compile_definitions(POCO_CMAKE)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
