@@ -15,6 +15,7 @@ namespace Net {
 class TCPReactorServerConnection;
 using TcpReactorConnectionPtr = std::shared_ptr<TCPReactorServerConnection>;
 using RecvMessageCallback = std::function<void(const TcpReactorConnectionPtr&)>;
+
 class TCPReactorServerConnection : public std::enable_shared_from_this<TCPReactorServerConnection>
 {
 public:

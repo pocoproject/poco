@@ -26,7 +26,7 @@ TCPReactorServer::~TCPReactorServer()
 	stop();
 }
 
-void TCPReactorServer::start(bool acceptorUseSelfReactor)
+void TCPReactorServer::start()
 {
 	for (auto& reactor : _reactors)
 	{

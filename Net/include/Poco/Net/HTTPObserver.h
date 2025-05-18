@@ -24,11 +24,9 @@
 
 
 namespace Poco {
-
-	namespace Net {
+namespace Net {
 	
 	
-
 template <class C, class N>
 class HTTPObserver: public AbstractObserver
 	/// This template class implements an adapter that sits between
@@ -153,8 +151,7 @@ private:
 	mutable Poco::Mutex _mutex;
 };
 
-	}
-} // namespace Poco
+}} // namespace Poco:Net
 
 
 #endif // Net_HTTPObserver_INCLUDED

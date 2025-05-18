@@ -7,12 +7,9 @@
 #include "Poco/ThreadPool.h"
 #include <vector>
 
-namespace Poco {
-namespace Net {
+namespace Poco { namespace Net {
 
-
-	class TCPReactorServer
-{
+class TCPReactorServer
 	/// This class implements a TCP server using the Reactor pattern.
 	/// It uses a SocketReactor to handle incoming connections and
 	/// dispatches them to TCPReactorServerConnection objects.
@@ -21,17 +18,17 @@ namespace Net {
 	/// and a TCPReactorAcceptor. The SocketReactor handles the event
 	/// loop, while the TCPReactorAcceptor accepts incoming connections
 	/// and creates TCPReactorServerConnection objects to handle them.
+{
 public:
 	TCPReactorServer(int port, TCPServerParams::Ptr pParams);
 
 	~TCPReactorServer();
 
-	void start(bool acceptorUseSelfReactor = false);
-	/// Starts the TCPReactorServer.
-	/// The server will listen for incoming connections
-	/// on the given port.
-	/// The acceptorUseSelfReactor parameter specifies
-	/// whether the acceptor should use its own reactor
+	void start();
+		/// Starts the TCPReactorServer.
+		/// The server will listen for incoming connections
+		/// on the given port.
+
 	void stop();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb);
