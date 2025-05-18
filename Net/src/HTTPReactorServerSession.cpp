@@ -37,6 +37,7 @@ bool HTTPReactorServerSession::checkRequestComplete()
 			if (headerEnd != std::string::npos)
 			{
 				// Headers are complete
+				headerEnd = headerEnd - 1;
 				bodyStart = headerEnd + 4; // "\r\n\r\n" is 4 characters
 				std::size_t chunkedPos = _buf.find("Transfer-Encoding: chunked", pos);
 				if (chunkedPos != std::string::npos)
@@ -68,7 +69,7 @@ bool HTTPReactorServerSession::checkRequestComplete()
 					} else
 					{
 						// No Content-Length, assume no body (e.g., GET request)
-						_complete = headerEnd + 3;
+						_complete = headerEnd + 4;
 						return true;
 					}
 				}
@@ -82,7 +83,7 @@ bool HTTPReactorServerSession::checkRequestComplete()
 			std::size_t chunkSizeEnd = _buf.find("\r\n", pos);
 			if (chunkSizeEnd != std::string::npos)
 			{
-				std::string chunkSizeStr = _buf.substr(pos, chunkSizeEnd - pos);
+				std::string chunkSizeStr = _buf.substr(pos + 1, chunkSizeEnd - pos - 1);
 				chunkSize = std::stoi(chunkSizeStr, nullptr, 16); // Parse hex chunk size
 				if (chunkSize == 0)
 				{
@@ -90,13 +91,13 @@ bool HTTPReactorServerSession::checkRequestComplete()
 					if (hasTrailer)
 					{
 						state = PARSING_TRAILER;
-						pos = chunkSizeEnd + 2; // Move past the "0\r\n"
+						pos = chunkSizeEnd + 1; // Move past the "0\r\n"
 					} else
 					{
 						// No trailer, check for final "\r\n\r\n"
-						if (_buf.find("\r\n\r\n", chunkSizeEnd + 2) == chunkSizeEnd + 2)
+						if (_buf.find("\r\n\r\n", chunkSizeEnd) == chunkSizeEnd)
 						{
-							_complete = chunkSizeEnd + 4; // End of "0\r\n\r\n"
+							_complete = chunkSizeEnd + 3; // End of "0\r\n\r\n"
 							return true;
 						}
 						return false; // Incomplete final "\r\n\r\n"
@@ -104,7 +105,7 @@ bool HTTPReactorServerSession::checkRequestComplete()
 				} else
 				{
 					state = PARSING_CHUNK_DATA;
-					pos = chunkSizeEnd + 2; // Move to the chunk data
+					pos = chunkSizeEnd + 1; // Move to the chunk data
 				}
 			} else
 			{
@@ -139,7 +140,7 @@ bool HTTPReactorServerSession::checkRequestComplete()
 		case PARSING_BODY: {
 			if (_buf.size() >= bodyStart + contentLength)
 			{
-				_complete = bodyStart + contentLength - 1;
+				_complete = bodyStart + contentLength;
 				return true;
 			}
 			return false; // Incomplete body
@@ -153,7 +154,6 @@ bool HTTPReactorServerSession::checkRequestComplete()
 
 void HTTPReactorServerSession::popCompletedRequest()
 {
-	poco_assert(_complete + 1 == _idx);
 	if (_complete + 1 >= _buf.length())
 	{
 		// All data has been processed
@@ -170,7 +170,7 @@ void HTTPReactorServerSession::popCompletedRequest()
 
 int HTTPReactorServerSession::get()
 {
-	if (_idx < _buf.length())
+	if (_idx <= _complete)
 	{
 		return _buf[_idx++];
 	} else
@@ -181,7 +181,7 @@ int HTTPReactorServerSession::get()
 
 int HTTPReactorServerSession::peek()
 {
-	if (_idx < _buf.length())
+	if (_idx <= _complete)
 	{
 
 		return _buf[_idx];
