@@ -7,14 +7,20 @@ namespace Net {
 HTTPReactorServerSession::HTTPReactorServerSession(
 	const StreamSocket& socket, std::string& buf, HTTPServerParams::Ptr pParams)
 	: // do not deliver socket to HTTPSession
-	  HTTPSession(), _buf(buf), _realsocket(socket)
+	  HTTPSession(), _buf(buf), _realsocket(socket), _complete(-1), _idx(0)
 {
 	_pcur = const_cast<char*>(_buf.c_str());
 	_idx = 0;
 }
 /// Creates the HTTPReactorServerSession.
 
-HTTPReactorServerSession::~HTTPReactorServerSession(){};
+HTTPReactorServerSession::~HTTPReactorServerSession()
+{
+	if (_complete >= 0)
+	{
+		popCompletedRequest();
+	}
+};
 /// Destroys the HTTPReactorServerSession.
 
 bool HTTPReactorServerSession::checkRequestComplete()
@@ -42,12 +48,6 @@ bool HTTPReactorServerSession::checkRequestComplete()
 				std::size_t chunkedPos = _buf.find("Transfer-Encoding: chunked", pos);
 				if (chunkedPos != std::string::npos)
 				{
-					// Check if there's a Trailer header
-					std::size_t trailerPos = _buf.find("Trailer:", pos);
-					if (trailerPos != std::string::npos)
-					{
-						hasTrailer = true;
-					}
 					state = PARSING_CHUNK_SIZE;
 					pos = bodyStart;
 				} else
@@ -87,21 +87,14 @@ bool HTTPReactorServerSession::checkRequestComplete()
 				chunkSize = std::stoi(chunkSizeStr, nullptr, 16); // Parse hex chunk size
 				if (chunkSize == 0)
 				{
-					// Last chunk found
-					if (hasTrailer)
+
+					if (_buf.find("\r\n\r\n", chunkSizeEnd) == chunkSizeEnd)
 					{
-						state = PARSING_TRAILER;
-						pos = chunkSizeEnd + 1; // Move past the "0\r\n"
+						_complete = chunkSizeEnd + 3; // End of "0\r\n\r\n"
+						return true;
 					} else
-					{
-						// No trailer, check for final "\r\n\r\n"
-						if (_buf.find("\r\n\r\n", chunkSizeEnd) == chunkSizeEnd)
-						{
-							_complete = chunkSizeEnd + 3; // End of "0\r\n\r\n"
-							return true;
-						}
-						return false; // Incomplete final "\r\n\r\n"
-					}
+					return false; // Incomplete final "\r\n\r\n"
+					
 				} else
 				{
 					state = PARSING_CHUNK_DATA;
@@ -121,19 +114,6 @@ bool HTTPReactorServerSession::checkRequestComplete()
 			} else
 			{
 				return false; // Incomplete chunk data
-			}
-			break;
-		}
-		case PARSING_TRAILER: {
-			std::size_t trailerEnd = _buf.find("\r\n\r\n", pos);
-			if (trailerEnd != std::string::npos)
-			{
-				// Trailer is complete
-				_complete = trailerEnd + 3; // End of the trailer
-				return true;
-			} else
-			{
-				return false; // Incomplete trailer
 			}
 			break;
 		}
@@ -162,7 +142,7 @@ void HTTPReactorServerSession::popCompletedRequest()
 	{
 		_buf = _buf.substr(_complete + 1);
 	}
-	_complete = 0;
+	_complete = -1;
 	_idx = 0;
 	_pcur = const_cast<char*>(_buf.c_str());
 	_pend = _pcur + _buf.length();

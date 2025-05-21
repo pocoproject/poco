@@ -46,9 +46,6 @@ private:
 	int write(const char* buffer, std::streamsize length) override;
 
 private:
-	bool           _firstRequest;
-	Poco::Timespan _keepAliveTimeout;
-	int            _maxKeepAliveRequests;
 	std::string&   _buf;
 	char*          _pcur;
 	char*          _pend;

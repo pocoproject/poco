@@ -86,7 +86,6 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 			}
 			throw;
 		}
-		session.popCompletedRequest();
 	} catch (const Poco::Exception& ex)
 	{
 		onError(ex);
