@@ -18,6 +18,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
@@ -55,7 +56,8 @@ class TimeRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	TimeRequestHandler(const std::string& format):
+	TimeRequestHandler(const std::string& format, long delay):
+		_delay(delay),
 		_format(format)
 	{
 	}
@@ -72,6 +74,8 @@ public:
 		response.setContentType("text/html");
 		response.set("Clear-Site-Data", "\"cookies\"");
 
+		Poco::Thread::sleep(_delay);
+
 		std::ostream& ostr = response.send();
 		ostr << "<html><head><title>HTTPReactorTimeServer powered by POCO C++ Libraries</title>";
 		ostr << "</head>";
@@ -82,13 +86,16 @@ public:
 
 private:
 	std::string _format;
+	long _delay;
+	HTTPServerParams::Ptr _params;
 };
 
 
 class TimeRequestHandlerFactory: public HTTPRequestHandlerFactory
 {
 public:
-	TimeRequestHandlerFactory(const std::string& format):
+	TimeRequestHandlerFactory(const std::string& format, long delay):
+		_delay(delay),
 		_format(format)
 	{
 	}
@@ -96,13 +103,14 @@ public:
 	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
 	{
 		if (request.getURI() == "/")
-			return new TimeRequestHandler(_format);
+			return new TimeRequestHandler(_format, _delay);
 		else
 			return 0;
 	}
 
 private:
 	std::string _format;
+	long _delay;
 };
 
 
@@ -184,6 +192,7 @@ protected:
 			// get parameters from configuration file
 			unsigned short port = (unsigned short) config().getInt("HTTPReactorTimeServer.port", 9980);
 			std::string format(config().getString("HTTPReactorTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
+			int delay  = config().getInt("HTTPReactorTimeServer.delay", 0);
 			int maxQueued  = config().getInt("HTTPReactorTimeServer.maxQueued", 100);
 			int maxThreads = config().getInt("HTTPReactorTimeServer.maxThreads", 4);
 			ThreadPool::defaultPool().addCapacity(maxThreads);
@@ -196,7 +205,7 @@ protected:
 			pParams->setUseSelfReactor(false);
 
 			// set-up a reactor HTTPServer instance
-			Poco::Net::HTTPReactorServer server(port, pParams, new TimeRequestHandlerFactory(format));
+			Poco::Net::HTTPReactorServer server(port, pParams, new TimeRequestHandlerFactory(format, delay));
 			// start the HTTPServer
 			server.start();
 
