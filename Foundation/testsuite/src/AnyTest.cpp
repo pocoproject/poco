@@ -233,7 +233,7 @@ void AnyTest::testAnySwap()
 		Poco::UInt64 eight = 8;
 		Poco::UInt64 nine = 9;
 
-		bool operator==(const BigObject& other)
+		bool operator==(const BigObject& other) const
 		{
 			return one == other.one &&
 				two == other.two &&

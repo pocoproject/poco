@@ -29,9 +29,7 @@ FormatTest::FormatTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-FormatTest::~FormatTest()
-{
-}
+FormatTest::~FormatTest() = default;
 
 
 void FormatTest::testChar()
@@ -256,7 +254,7 @@ void FormatTest::testBool()
 	bv.push_back(true);
 
 	s.clear();
-	format(s, "%b%b%b%b%b%b%b%b%b%b", bv);
+	Poco::format(s, "%b%b%b%b%b%b%b%b%b%b", bv);
 	assertTrue (s == "0101010101");
 }
 
@@ -571,7 +569,7 @@ void FormatTest::testAny()
 
 	s.clear();
 	std::vector<Any> av{ 42, std::string("42"), 42. };
-	format(s, "%d '%s' %f", av);
+	Poco::format(s, "%d '%s' %f", av);
 	assertTrue (s.find("42 '42' 42.0") == 0);
 }
 

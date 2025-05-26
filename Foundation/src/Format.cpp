@@ -252,23 +252,23 @@ namespace
 std::string format(const std::string& fmt, const Any& value)
 {
 	std::string result;
-	format(result, fmt, value);
+	Poco::format(result, fmt, value);
 	return result;
 }
 
 
 void format(std::string& result, const char *fmt, const std::vector<Any>& values)
 {
-	format(result, std::string(fmt), values);
+	Poco::format(result, std::string(fmt), values);
 }
 
 
 void format(std::string& result, const std::string& fmt, const std::vector<Any>& values)
 {
-	std::string::const_iterator itFmt  = fmt.begin();
-	std::string::const_iterator endFmt = fmt.end();
-	std::vector<Any>::const_iterator itVal  = values.begin();
-	std::vector<Any>::const_iterator endVal = values.end();
+	auto itFmt  = fmt.begin();
+	const auto endFmt = fmt.end();
+	auto itVal  = values.begin();
+	const auto endVal = values.end();
 	while (itFmt != endFmt)
 	{
 		switch (*itFmt)
@@ -283,7 +283,7 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 					std::size_t index = parseIndex(itFmt, endFmt);
 					if (index < values.size())
 					{
-						std::vector<Any>::const_iterator it = values.begin() + index;
+						auto it = values.begin() + index;
 						formatOne(result, itFmt, endFmt, it);
 					}
 					else throw InvalidArgumentException("format argument index out of range", fmt);

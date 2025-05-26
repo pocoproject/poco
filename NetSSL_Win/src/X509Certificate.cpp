@@ -396,7 +396,8 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	if (!hCertStore) throw CertificateException("Failed to open certificate store", certStoreName, GetLastError());
 
 	CERT_RDN_ATTR cert_rdn_attr;
-	cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
+    char cmnName[] = szOID_COMMON_NAME;
+    cert_rdn_attr.pszObjId = cmnName;
 	cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
 	cert_rdn_attr.Value.cbData = static_cast<DWORD>(certName.size());
 	cert_rdn_attr.Value.pbData = reinterpret_cast<BYTE*>(const_cast<char*>(certName.c_str()));

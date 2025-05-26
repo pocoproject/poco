@@ -260,12 +260,6 @@ struct UTF32CharTraits
 };
 
 
-//#if defined(POCO_ENABLE_CPP11) //TODO
-	//	using char16_t       UTF16Char;
-	//	using std::u16string UTF16String;
-	//	using char32_t       UTF32Char;
-	//	using std::u32string UTF32String;
-//#else
 	#ifdef POCO_NO_WSTRING
 		using UTF16Char = Poco::UInt16;
 		using UTF16String = std::basic_string<UTF16Char, UTF16CharTraits>;
@@ -301,7 +295,6 @@ struct UTF32CharTraits
 			#define POCO_USE_STRING16
 		#endif //POCO_OS_FAMILY_WINDOWS
 	#endif //POCO_NO_WSTRING
-//#endif // POCO_ENABLE_CPP11
 
 
 } // namespace Poco

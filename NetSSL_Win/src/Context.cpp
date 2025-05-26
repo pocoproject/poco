@@ -174,8 +174,10 @@ void Context::loadCertificate()
 	}
 	if (!_hCertStore) throw CertificateException("Failed to open certificate store", _certStoreName, GetLastError());
 
+
 	CERT_RDN_ATTR cert_rdn_attr;
-	cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
+    char cmnName[] = szOID_COMMON_NAME;
+    cert_rdn_attr.pszObjId = cmnName;
 	cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
 	cert_rdn_attr.Value.cbData = (DWORD) _certNameOrPath.size();
 	cert_rdn_attr.Value.pbData = (BYTE *) _certNameOrPath.c_str();
@@ -270,7 +272,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	if (_pCert)
 	{
 		schannelCred.cCreds = 1; // how many cred are stored in &pCertContext
-		schannelCred.paCred = &const_cast<PCCERT_CONTEXT>(_pCert);
+        schannelCred.paCred = const_cast<PCCERT_CONTEXT*>(&_pCert);
 	}
 
 	schannelCred.grbitEnabledProtocols = proto();
@@ -312,9 +314,10 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
+    ::SEC_WCHAR name[] = UNISP_NAME_W;
 	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
 		NULL,
-		UNISP_NAME_W,
+        name,
 		isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
 		NULL,
 		&schannelCred,
