@@ -176,8 +176,8 @@ void Context::loadCertificate()
 
 
 	CERT_RDN_ATTR cert_rdn_attr;
-    char cmnName[] = szOID_COMMON_NAME;
-    cert_rdn_attr.pszObjId = cmnName;
+	char cmnName[] = szOID_COMMON_NAME;
+	cert_rdn_attr.pszObjId = cmnName;
 	cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
 	cert_rdn_attr.Value.cbData = (DWORD) _certNameOrPath.size();
 	cert_rdn_attr.Value.pbData = (BYTE *) _certNameOrPath.c_str();
