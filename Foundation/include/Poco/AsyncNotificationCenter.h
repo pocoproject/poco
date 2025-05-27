@@ -36,6 +36,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <optional>
 
 namespace Poco {
 
@@ -44,6 +45,16 @@ class Foundation_API AsyncNotificationCenter: public NotificationCenter
 	/// AsyncNotificationCenter decouples posting of notifications
 	/// from notifying subscribers by calling observers' notification
 	/// handler in a dedicated thread.
+	/// It supports multiple modes of operation:
+	/// - ENQUEUE: Notifications are added to a queue, separate single thread
+	///            asynchronously dispatches them to observers sequentially
+	/// - NOTIFY: Notifications are added to a list for each observer, multiple
+	///           worker threads process notifications in parallel
+	/// - BOTH: Combination of both modes, notifications are enqueued and worker
+	///         threads dispatch them to observers in parallel.
+	///
+	/// Note about using AsyncObserver: although it is possible to use them with
+	/// AsyncNotificationCenter, it is more efficient to use NObserver.
 {
 public:
 
@@ -65,7 +76,7 @@ public:
 #endif
 
 	~AsyncNotificationCenter() override;
-	/// Stops the notifying thread and destroys the AsyncNotificationCenter.
+		/// Stops the notifying thread and destroys the AsyncNotificationCenter.
 
 	AsyncNotificationCenter& operator = (const AsyncNotificationCenter&) = delete;
 	AsyncNotificationCenter(const AsyncNotificationCenter&) = delete;
@@ -73,10 +84,10 @@ public:
 	AsyncNotificationCenter(AsyncNotificationCenter&&) = delete;
 
 	void postNotification(Notification::Ptr pNotification) override;
-	/// Enqueues notification into the notification queue.
+		/// Enqueues notification into the notification queue.
 
 	int backlog() const override;
-	/// Returns the numbner of notifications in the notification queue.
+		/// Returns the number of notifications in the notification queue.
 
 protected:
 
@@ -107,7 +118,7 @@ private:
 
 	std::optional<NotificationTuple> nextNotification();
 
-	void dispatchNotifications(std::stop_token& stopToken);
+	void dispatchNotifications(std::stop_token& stopToken, int workerId);
 		/// Dispatching function executed by each worker thread.
 
 	constexpr static std::size_t DEFAULT_WORKERS_COUNT { 5 };
@@ -134,7 +145,10 @@ private:
 		/// It is used to ensure that workers process observers in a round robin fashion.
 
 	std::mutex _listsMutex;
-	std::condition_variable	_listsCondition;
+		/// Mutex to protect access to the lists of notifications.
+		/// It is used to ensure that workers can safely access the lists.
+	bool _listsEmpty { true };
+	std::condition_variable	_listsEmptyCondition;
 		// Condition variable to notify workers when new notifications are added to lists.
 
 #endif

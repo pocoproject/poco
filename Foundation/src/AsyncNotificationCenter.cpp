@@ -95,7 +95,8 @@ void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 			auto& list = _lists[o];
 			list.push_back(pNotification);
 		}
-		_listsCondition.notify_all();
+		_listsEmpty = false;
+		_listsEmptyCondition.notify_all();
 	}
 	else
 	{
@@ -129,13 +130,13 @@ void AsyncNotificationCenter::start()
 #if (POCO_HAVE_CPP20_COMPILER)
 	_workerIterator = _lists.begin();
 
-	auto dispatch = [this](std::stop_token stopToken) {
-		this->dispatchNotifications(stopToken);
+	auto dispatch = [this](std::stop_token stopToken, int id) {
+		this->dispatchNotifications(stopToken, id);
 	};
 
 	for (std::size_t i {0}; i < _workersCount; ++i)
 	{
-		auto worker = std::jthread(dispatch);
+		auto worker = std::jthread(dispatch, i);
 		_workers.push_back(std::move(worker));
 	}
 #endif
@@ -216,10 +217,11 @@ std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCente
 		l.pop_front();
 		return { {o, n} };
 	}
+	_listsEmpty = true;
 	return {};
 }
 
-void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken)
+void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken, int workerId)
 {
 	while (!stopToken.stop_requested())
 	{
@@ -227,15 +229,15 @@ void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken)
 		auto no = nextNotification();
 		if (no.has_value())
 		{
-			auto [a, n] = *no;
-			a->notify(n);
+			auto [o, n] = *no;
+			o->notify(n);
 			continue;
 		}
 		// No notification available, wait for a while
 		std::unique_lock<std::mutex> lock(_listsMutex);
-		_listsCondition.wait_for(
+		_listsEmptyCondition.wait_for(
 			lock, 1s,
-			[&stopToken] { return stopToken.stop_requested(); }
+			[&stopToken, this] { return !_listsEmpty || stopToken.stop_requested(); }
 		);
 		if (stopToken.stop_requested())
 			break;
