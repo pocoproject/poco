@@ -5,7 +5,7 @@
 //
 
 
-#include "ORM/Role.h"
+#include <ORM/Role.h>
 
 
 using namespace std::string_literals;
@@ -52,11 +52,11 @@ void Role::insert()
 	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
 	context()->session()
-		<< "INSERT INTO roles (id, name, description)"
-		<< "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ")",
+		<< "INSERT INTO roles (name, description)"
+		<< "  VALUES (" << pSPP->next() << ", " << pSPP->next() << ")",
 		use(*this),
 		now;
-	updateID(context()->session());
+	updateID(context()->session(), "roles"s, "id"s); 
 }
 
 
