@@ -31,8 +31,7 @@ using Poco::AutoPtr;
 class TestNotification: public Notification
 {
 public:
-	TestNotification()
-	{}
+	TestNotification() = default;
 
 	TestNotification(const std::string& name):
 		Notification(name)
@@ -50,9 +49,7 @@ NotificationCenterTest::NotificationCenterTest(const std::string& name):
 }
 
 
-NotificationCenterTest::~NotificationCenterTest()
-{
-}
+NotificationCenterTest::~NotificationCenterTest() = default;
 
 
 void NotificationCenterTest::testNotificationCenter1()
@@ -216,6 +213,32 @@ void NotificationCenterTest::testAsyncNotificationCenter()
 }
 
 
+void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
+{
+	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
+
+	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
+
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	nc.postNotification(new TestNotification("asyncNotification"));
+	nc.postNotification(new TestNotification("anotherNotification"));
+	nc.postNotification(new Notification);
+
+	while (!_handleAsync1Done || !_handleAsync2Done)
+		Poco::Thread::sleep(100);
+
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	Poco::Mutex::ScopedLock l(_mutex);
+	assertTrue(_set.size() == 2);
+	assertTrue(_set.find("handleAsync1") != _set.end());
+	assertTrue(_set.find("handleAsync2") != _set.end());
+}
+
+
 void NotificationCenterTest::testDefaultNotificationCenter()
 {
 	NotificationCenter& nc = NotificationCenter::defaultCenter();
@@ -339,6 +362,7 @@ CppUnit::Test* NotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenterAuto);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncObserver);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenter);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotify);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultNotificationCenter);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testMixedObservers);
 
