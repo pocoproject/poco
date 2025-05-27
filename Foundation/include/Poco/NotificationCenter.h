@@ -141,7 +141,7 @@ protected:
 	}
 
 	ObserverList observersToNotify(const Notification::Ptr& pNotification) const;
-	void notifyObservers(Notification::Ptr& pNotification);
+	virtual void notifyObservers(Notification::Ptr& pNotification);
 
 private:
 
