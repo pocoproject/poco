@@ -28,14 +28,18 @@ using Poco::Notification;
 using Poco::AutoPtr;
 
 
+static std::size_t notificationCounter {0};
+
 class TestNotification: public Notification
 {
 public:
 	TestNotification() = default;
 
-	TestNotification(const std::string& name):
-		Notification(name)
+	TestNotification(const std::string& name, int num = 0):
+		Notification(name), num(num)
 	{}
+
+	int num {0};
 };
 
 
@@ -189,7 +193,7 @@ void NotificationCenterTest::testAsyncObserver()
 
 void NotificationCenterTest::testAsyncNotificationCenter()
 {
-	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
+	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
 	AsyncNotificationCenter nc;
 
@@ -217,7 +221,13 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 {
 #if (POCO_HAVE_CPP20_COMPILER)
 
-	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
+	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
+
+	_set.clear();
+	_handleAsync1Done = false;
+	_handleAsync2Done = false;
+	_handleAsync1Counter  = 0;
+	_handleAsync2Counter  = 0;
 
 	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
 
@@ -238,6 +248,131 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 	assertTrue(_set.size() == 2);
 	assertTrue(_set.find("handleAsync1") != _set.end());
 	assertTrue(_set.find("handleAsync2") != _set.end());
+#endif
+}
+
+
+void NotificationCenterTest::testAsyncNotificationCenterAsyncBoth()
+{
+#if (POCO_HAVE_CPP20_COMPILER)
+
+	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
+
+	_set.clear();
+	_handleAsync1Done = false;
+	_handleAsync2Done = false;
+	_handleAsync1Counter  = 0;
+	_handleAsync2Counter  = 0;
+
+	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::BOTH);
+
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	nc.postNotification(new TestNotification("asyncNotification"));
+	nc.postNotification(new TestNotification("anotherNotification"));
+	nc.postNotification(new Notification);
+
+	while (!_handleAsync1Done || !_handleAsync2Done)
+		Poco::Thread::sleep(100);
+
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	Poco::Mutex::ScopedLock l(_mutex);
+	assertTrue(_set.size() == 2);
+	assertTrue(_set.find("handleAsync1") != _set.end());
+	assertTrue(_set.find("handleAsync2") != _set.end());
+#endif
+}
+
+
+void NotificationCenterTest::testAsyncNotificationCenterAsyncNotifyStress()
+{
+#if (POCO_HAVE_CPP20_COMPILER)
+
+	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
+
+	_set.clear();
+	_handleAsync1Done = false;
+	_handleAsync2Done = false;
+	_handleAsync1Counter  = 0;
+	_handleAsync2Counter  = 0;
+
+	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
+
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	for (int i {0}; i < 1000; ++i)
+	{
+		nc.postNotification(new TestNotification("asyncNotification", i));
+		nc.postNotification(new TestNotification("anotherNotification", i));
+		nc.postNotification(new Notification);
+	}
+
+	// Give enough time for the notifications to be delivered
+	Poco::Thread::sleep(2000);
+
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	Poco::Mutex::ScopedLock l(_mutex);
+	assertTrue(_set.size() == 2);
+	assertTrue(_set.find("handleAsync1") != _set.end());
+	assertTrue(_set.find("handleAsync2") != _set.end());
+
+	assertTrue(_handleAsync1Counter == 1000ul);
+	assertTrue(_handleAsync2Counter == 1000ul);
+
+#endif
+}
+
+
+void NotificationCenterTest::testAsyncNotificationCenterAsyncRemoveObserver()
+{
+#if (POCO_HAVE_CPP20_COMPILER)
+
+	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
+
+	_set.clear();
+	_handleAsync1Done = false;
+	_handleAsync2Done = false;
+	_handleAsync1Counter  = 0;
+	_handleAsync2Counter  = 0;
+
+	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
+
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+
+	for (int i {0}; i < 1000; ++i)
+	{
+		nc.postNotification(new TestNotification("asyncNotification", i));
+		nc.postNotification(new TestNotification("anotherNotification", i));
+
+		if (i == 100)
+		{
+			while (!_handleAsync2Done)
+				Poco::Thread::sleep(50);
+			// Remove one observer while notifications are still being posted
+			nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync2, &NotificationCenterTest::matchAsync));
+		}
+	}
+
+	// Give enough time for the notifications to be delivered
+	Poco::Thread::sleep(2000);
+
+	nc.removeObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
+
+	Poco::Mutex::ScopedLock l(_mutex);
+	assertTrue(_set.size() == 2);
+	assertTrue(_set.find("handleAsync1") != _set.end());
+	assertTrue(_set.find("handleAsync2") != _set.end());
+
+	assertTrue(_handleAsync1Counter == 1000ul);
+	assertTrue(_handleAsync2Counter < 1000ul);
+
 #endif
 }
 
@@ -325,6 +460,7 @@ void NotificationCenterTest::handleAsync1(const AutoPtr<TestNotification>& pNf)
 	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAsync1");
 	_handleAsync1Done = true;
+	_handleAsync1Counter++;
 }
 
 
@@ -333,6 +469,7 @@ void NotificationCenterTest::handleAsync2(const AutoPtr<TestNotification>& pNf)
 	Poco::Mutex::ScopedLock l(_mutex);
 	_set.insert("handleAsync2");
 	_handleAsync2Done = true;
+	_handleAsync2Counter++;
 }
 
 
@@ -366,6 +503,10 @@ CppUnit::Test* NotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncObserver);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenter);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotify);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncBoth);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotifyStress);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotifyStress);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncRemoveObserver);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultNotificationCenter);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testMixedObservers);
 

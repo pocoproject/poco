@@ -40,6 +40,9 @@ public:
 	void testAsyncObserver();
 	void testAsyncNotificationCenter();
 	void testAsyncNotificationCenterAsyncNotify();
+	void testAsyncNotificationCenterAsyncBoth();
+	void testAsyncNotificationCenterAsyncNotifyStress();
+	void testAsyncNotificationCenterAsyncRemoveObserver();
 	void testDefaultNotificationCenter();
 	void testMixedObservers();
 
@@ -64,6 +67,10 @@ private:
 	std::atomic<bool> _handleAuto1Done;
 	std::atomic<bool> _handleAsync1Done;
 	std::atomic<bool> _handleAsync2Done;
+
+	std::atomic<std::size_t> _handleAsync1Counter {0};
+	std::atomic<std::size_t> _handleAsync2Counter {0};
+
 	Poco::Mutex _mutex;
 };
 
