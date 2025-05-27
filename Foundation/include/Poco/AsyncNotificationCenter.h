@@ -25,8 +25,8 @@
 #include "Poco/NotificationQueue.h"
 
 #if (POCO_HAVE_CPP20_COMPILER)
-	#if !defined(__cpp_lib_jthread)
-		#error ("std::jthread is expected but is not available. Please check your compiler version and settings.")
+	#if !defined(POCO_HAVE_JTHREAD)
+		#pragma message ("NOTE: std::jthread is expected but is not available. Please check your compiler version and settings.")
 	#endif
 #endif
 
@@ -64,7 +64,7 @@ public:
 		/// BOTH: Notifications are enqueued and dispatched to observers in worker threads.
 		/// NOTIFY and BOTH are only available if the compiler supports C++20.
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 	AsyncNotificationCenter(AsyncMode mode = AsyncMode::ENQUEUE, std::size_t workersCount = AsyncNotificationCenter::DEFAULT_WORKERS_COUNT);
 		/// Creates the AsyncNotificationCenter and starts the notifying thread and workers.
@@ -109,7 +109,7 @@ private:
 	std::atomic<bool> _started;
 	std::atomic<bool> _done;
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 	// Async notification dispatching
 
 	using NotificationList = std::list<Notification::Ptr>;

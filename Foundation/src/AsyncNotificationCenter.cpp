@@ -23,7 +23,7 @@
 
 namespace Poco {
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 AsyncNotificationCenter::AsyncNotificationCenter(AsyncMode mode, std::size_t workersCount) :
 	_mode(mode),
@@ -55,7 +55,7 @@ AsyncNotificationCenter::~AsyncNotificationCenter()
 
 void AsyncNotificationCenter::postNotification(Notification::Ptr pNotification)
 {
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 	if (_mode == AsyncMode::ENQUEUE || _mode == AsyncMode::BOTH)
 	{
 		_nq.enqueueNotification(pNotification);
@@ -80,7 +80,7 @@ void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 {
 	poco_check_ptr (pNotification);
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
 	{
@@ -127,7 +127,7 @@ void AsyncNotificationCenter::start()
 		Thread::sleep(100);
 	}
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 	_workerIterator = _lists.begin();
 
 	auto dispatch = [this](std::stop_token stopToken, int id) {
@@ -150,7 +150,7 @@ void AsyncNotificationCenter::stop()
 	while (!_done) Thread::sleep(100);
 	_thread.join();
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 	for (auto& t: _workers)
 	{
 		t.request_stop();
@@ -187,7 +187,7 @@ void AsyncNotificationCenter::dequeue()
 	_started = false;
 }
 
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCenter::nextNotification()
 {
@@ -208,7 +208,8 @@ std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCente
 			++_workerIterator;
 			continue;
 		};
-		if (!hasObserver(*o)) {
+		if (!hasObserver(*o))
+		{
 			// Observer is not registered anymore, remove its list
 			_workerIterator = _lists.erase(_workerIterator);
 			continue;

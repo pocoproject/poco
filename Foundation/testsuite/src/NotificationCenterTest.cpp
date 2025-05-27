@@ -27,16 +27,13 @@ using Poco::AsyncObserver;
 using Poco::Notification;
 using Poco::AutoPtr;
 
-
-static std::size_t notificationCounter {0};
-
 class TestNotification: public Notification
 {
 public:
 	TestNotification() = default;
 
-	TestNotification(const std::string& name, int num = 0):
-		Notification(name), num(num)
+	TestNotification(const std::string& name, int n = 0):
+		Notification(name), num(n)
 	{}
 
 	int num {0};
@@ -219,7 +216,7 @@ void NotificationCenterTest::testAsyncNotificationCenter()
 
 void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 {
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
@@ -254,7 +251,7 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 
 void NotificationCenterTest::testAsyncNotificationCenterAsyncBoth()
 {
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
@@ -289,7 +286,7 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncBoth()
 
 void NotificationCenterTest::testAsyncNotificationCenterAsyncNotifyStress()
 {
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
@@ -331,7 +328,7 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotifyStress()
 
 void NotificationCenterTest::testAsyncNotificationCenterAsyncRemoveObserver()
 {
-#if (POCO_HAVE_CPP20_COMPILER)
+#if (POCO_HAVE_JTHREAD)
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
