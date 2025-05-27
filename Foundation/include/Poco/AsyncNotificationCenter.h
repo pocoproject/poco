@@ -46,17 +46,22 @@ class Foundation_API AsyncNotificationCenter: public NotificationCenter
 {
 public:
 
-#if (POCO_HAVE_CPP20_COMPILER)
 	enum class AsyncMode { ENQUEUE,	NOTIFY, BOTH };
 		/// ENQUEUE: Notifications are enqueued in a separate thread.
 		/// NOTIFY: Notifications are dispatched to observers from worker threads
 		/// BOTH: Notifications are enqueued and dispatched to observers in worker threads.
-#else
-	enum class AsyncMode { ENQUEUE };
-#endif
+		/// NOTIFY and BOTH are only available if the compiler supports C++20.
+
+#if (POCO_HAVE_CPP20_COMPILER)
 
 	AsyncNotificationCenter(AsyncMode mode = AsyncMode::ENQUEUE, std::size_t workersCount = AsyncNotificationCenter::DEFAULT_WORKERS_COUNT);
+		/// Creates the AsyncNotificationCenter and starts the notifying thread and workers.
+#else
+
+	AsyncNotificationCenter();
 		/// Creates the AsyncNotificationCenter and starts the notifying thread.
+
+#endif
 
 	~AsyncNotificationCenter() override;
 	/// Stops the notifying thread and destroys the AsyncNotificationCenter.

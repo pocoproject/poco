@@ -23,6 +23,7 @@
 
 namespace Poco {
 
+#if (POCO_HAVE_CPP20_COMPILER)
 
 AsyncNotificationCenter::AsyncNotificationCenter(AsyncMode mode, std::size_t workersCount) :
 	_mode(mode),
@@ -34,6 +35,17 @@ AsyncNotificationCenter::AsyncNotificationCenter(AsyncMode mode, std::size_t wor
 	start();
 }
 
+#else
+
+AsyncNotificationCenter::AsyncNotificationCenter() :
+	_ra(*this, &AsyncNotificationCenter::dequeue),
+	_started(false),
+	_done(false)
+{
+	start();
+}
+
+#endif
 
 AsyncNotificationCenter::~AsyncNotificationCenter()
 {
@@ -43,6 +55,7 @@ AsyncNotificationCenter::~AsyncNotificationCenter()
 
 void AsyncNotificationCenter::postNotification(Notification::Ptr pNotification)
 {
+#if (POCO_HAVE_CPP20_COMPILER)
 	if (_mode == AsyncMode::ENQUEUE || _mode == AsyncMode::BOTH)
 	{
 		_nq.enqueueNotification(pNotification);
@@ -52,6 +65,9 @@ void AsyncNotificationCenter::postNotification(Notification::Ptr pNotification)
 		// Notification enqueue is synchronous
 		notifyObservers(pNotification);
 	}
+#else
+	_nq.enqueueNotification(pNotification);
+#endif
 }
 
 
@@ -63,6 +79,8 @@ int AsyncNotificationCenter::backlog() const
 void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 {
 	poco_check_ptr (pNotification);
+
+#if (POCO_HAVE_CPP20_COMPILER)
 
 	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
 	{
@@ -84,6 +102,9 @@ void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 		// Notification is synchronous
 		NotificationCenter::notifyObservers(pNotification);
 	}
+#else
+	NotificationCenter::notifyObservers(pNotification);
+#endif
 }
 
 
@@ -105,6 +126,7 @@ void AsyncNotificationCenter::start()
 		Thread::sleep(100);
 	}
 
+#if (POCO_HAVE_CPP20_COMPILER)
 	_workerIterator = _lists.begin();
 
 	auto dispatch = [this](std::stop_token stopToken) {
@@ -116,6 +138,7 @@ void AsyncNotificationCenter::start()
 		auto worker = std::jthread(dispatch);
 		_workers.push_back(std::move(worker));
 	}
+#endif
 }
 
 
@@ -126,10 +149,12 @@ void AsyncNotificationCenter::stop()
 	while (!_done) Thread::sleep(100);
 	_thread.join();
 
+#if (POCO_HAVE_CPP20_COMPILER)
 	for (auto& t: _workers)
 	{
 		t.request_stop();
 	}
+#endif
 }
 
 
@@ -160,6 +185,8 @@ void AsyncNotificationCenter::dequeue()
 	_done = true;
 	_started = false;
 }
+
+#if (POCO_HAVE_CPP20_COMPILER)
 
 std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCenter::nextNotification()
 {
@@ -215,5 +242,6 @@ void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken)
 	}
 }
 
+#endif
 
 } // namespace Poco
