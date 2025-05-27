@@ -29,7 +29,7 @@ class NotificationCenterTest: public CppUnit::TestCase
 {
 public:
 	NotificationCenterTest(const std::string& name);
-	~NotificationCenterTest();
+	~NotificationCenterTest() override;
 
 	void testNotificationCenter1();
 	void testNotificationCenter2();
@@ -39,11 +39,12 @@ public:
 	void testNotificationCenterAuto();
 	void testAsyncObserver();
 	void testAsyncNotificationCenter();
+	void testAsyncNotificationCenterAsyncNotify();
 	void testDefaultNotificationCenter();
 	void testMixedObservers();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 
