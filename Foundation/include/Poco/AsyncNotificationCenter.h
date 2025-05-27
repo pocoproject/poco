@@ -23,7 +23,6 @@
 #include "Poco/Thread.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/NotificationQueue.h"
-#include <condition_variable>
 
 #if (POCO_HAVE_CPP20_COMPILER)
 	#if !defined(__cpp_lib_jthread)
@@ -32,6 +31,8 @@
 #endif
 
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <vector>
 #include <list>
 #include <map>
