@@ -215,6 +215,8 @@ void NotificationCenterTest::testAsyncNotificationCenter()
 
 void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 {
+#if (POCO_HAVE_CPP20_COMPILER)
+
 	using ObserverT = AsyncObserver<NotificationCenterTest, TestNotification>::Type;
 
 	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
@@ -236,6 +238,7 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 	assertTrue(_set.size() == 2);
 	assertTrue(_set.find("handleAsync1") != _set.end());
 	assertTrue(_set.find("handleAsync2") != _set.end());
+#endif
 }
 
 
