@@ -28,8 +28,8 @@ namespace Poco {
 AsyncNotificationCenter::AsyncNotificationCenter(AsyncMode mode, std::size_t workersCount) :
 	_mode(mode),
 	_ra(*this, &AsyncNotificationCenter::dequeue),
-	_started(false),
-	_done(false),
+	_enqueueThreadStarted(false),
+	_enqueueThreadDone(false),
 	_workersCount(workersCount)
 {
 	start();
@@ -112,32 +112,39 @@ void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 void AsyncNotificationCenter::start()
 {
 	Poco::ScopedLock l(mutex());
-	if (_started)
+
+	if (_mode == AsyncMode::ENQUEUE || _mode == AsyncMode::BOTH)
 	{
-		throw Poco::InvalidAccessException(
-			Poco::format("thread already started %s", poco_src_loc));
-	}
-	_thread.start(_ra);
-	Poco::Stopwatch sw;
-	sw.start();
-	while (!_started)
-	{
-		if (sw.elapsedSeconds() > 5)
-			throw Poco::TimeoutException(poco_src_loc);
-		Thread::sleep(100);
+		if (_enqueueThreadStarted)
+		{
+			throw Poco::InvalidAccessException(
+				Poco::format("thread already started %s", poco_src_loc));
+		}
+		_enqueueThread.start(_ra);
+		Poco::Stopwatch sw;
+		sw.start();
+		while (!_enqueueThreadStarted)
+		{
+			if (sw.elapsedSeconds() > 5)
+				throw Poco::TimeoutException(poco_src_loc);
+			Thread::sleep(20);
+		}
 	}
 
 #if (POCO_HAVE_JTHREAD)
 	_workerIterator = _lists.begin();
 
-	auto dispatch = [this](std::stop_token stopToken, int id) {
-		this->dispatchNotifications(stopToken, id);
-	};
-
-	for (std::size_t i {0}; i < _workersCount; ++i)
+	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
 	{
-		auto worker = std::jthread(dispatch, i);
-		_workers.push_back(std::move(worker));
+		auto dispatch = [this](std::stop_token stopToken, int id) {
+			this->dispatchNotifications(stopToken, id);
+		};
+
+		for (std::size_t i {0}; i < _workersCount; ++i)
+		{
+			auto worker = std::jthread(dispatch, i);
+			_workers.push_back(std::move(worker));
+		}
 	}
 #endif
 }
@@ -145,16 +152,24 @@ void AsyncNotificationCenter::start()
 
 void AsyncNotificationCenter::stop()
 {
-	if (!_started.exchange(false)) return;
-	_nq.wakeUpAll();
-	while (!_done) Thread::sleep(100);
-	_thread.join();
+	if (_mode == AsyncMode::ENQUEUE || _mode == AsyncMode::BOTH)
+	{
+		if (_enqueueThreadStarted.exchange(false))
+		{
+			_nq.wakeUpAll();
+			while (!_enqueueThreadDone) Thread::sleep(100);
+			_enqueueThread.join();
+		}
+	}
 
 #if (POCO_HAVE_JTHREAD)
 	for (auto& t: _workers)
 	{
 		t.request_stop();
 	}
+
+// TODO: Should the observer lists be cleared here or
+//       shall the workers send all of them to observers and then finish?
 #endif
 }
 
@@ -162,8 +177,8 @@ void AsyncNotificationCenter::stop()
 void AsyncNotificationCenter::dequeue()
 {
 	Notification::Ptr pNf;
-	_started = true;
-	_done = false;
+	_enqueueThreadStarted = true;
+	_enqueueThreadDone = false;
 	while ((pNf = _nq.waitDequeueNotification()))
 	{
 		try
@@ -183,8 +198,8 @@ void AsyncNotificationCenter::dequeue()
 			Poco::ErrorHandler::handle();
 		}
 	}
-	_done = true;
-	_started = false;
+	_enqueueThreadDone = true;
+	_enqueueThreadStarted = false;
 }
 
 #if (POCO_HAVE_JTHREAD)
