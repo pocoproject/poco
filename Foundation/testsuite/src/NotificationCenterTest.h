@@ -66,10 +66,10 @@ protected:
 
 private:
 	std::set<std::string> _set;
-	std::atomic<bool> _handle1Done;
-	std::atomic<bool> _handleAuto1Done;
-	std::atomic<bool> _handleAsync1Done;
-	std::atomic<bool> _handleAsync2Done;
+	std::atomic<bool> _handle1Done {false};
+	std::atomic<bool> _handleAuto1Done {false};
+	std::atomic<bool> _handleAsync1Done {false};
+	std::atomic<bool> _handleAsync2Done {false};
 
 	std::atomic<std::size_t> _handleAsync1Counter {0};
 	std::atomic<std::size_t> _handleAsync2Counter {0};

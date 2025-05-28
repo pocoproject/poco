@@ -63,23 +63,16 @@ public:
 	NObserver(C& object, Handler method, Matcher matcher = nullptr, SyncHandler syncMethod = nullptr):
 		_pObject(&object),
 		_handler(method),
+		_matcher(matcher),
 		_syncHandler(syncMethod)
 	{
-		if (matcher)
-		{
-			_matcherFunc = [this, matcher](const std::string& s) -> bool
-			{
-				if (!_pObject)
-					return false;
-				return (_pObject->*matcher)(s);
-			};
-		}
 	}
 
 	NObserver(C& object, Handler method, MatcherFunc matcherFunc, SyncHandler syncMethod = nullptr):
 		_pObject(&object),
 		_handler(method),
 		_syncHandler(syncMethod),
+		_matcher(nullptr),
 		_matcherFunc(matcherFunc)
 	{
 	}
@@ -89,6 +82,7 @@ public:
 		_pObject(observer._pObject),
 		_handler(observer._handler),
 		_syncHandler(observer._syncHandler),
+		_matcher(observer._matcher),
 		_matcherFunc(observer._matcherFunc)
 	{
 	}
@@ -98,6 +92,7 @@ public:
 		_pObject(std::move(observer._pObject)),
 		_handler(std::move(observer._handler)),
 		_syncHandler(std::move(observer._syncHandler)),
+		_matcher(std::move(observer._matcher)),
 		_matcherFunc(std::move(observer._matcherFunc))
 	{
 	}
@@ -111,6 +106,7 @@ public:
 			_pObject = observer._pObject;
 			_handler = observer._handler;
 			_syncHandler = observer._syncHandler;
+			_matcher = observer._matcher;
 			_matcherFunc = observer._matcherFunc;
 		}
 		return *this;
@@ -123,6 +119,7 @@ public:
 			_pObject = std::move(observer._pObject);
 			_handler = std::move(observer._handler);
 			_syncHandler = std::move(observer._syncHandler);
+			_matcher = std::move(observer._matcher);
 			_matcherFunc = std::move(observer._matcherFunc);
 		}
 		return *this;
@@ -197,13 +194,21 @@ protected:
 
 	bool hasMatcher() const
 	{
-		return _pObject && _matcherFunc != nullptr;
+		return _pObject != nullptr &&
+			   (_matcher != nullptr || _matcherFunc != nullptr);
 	}
 
 	bool match(const Notification::Ptr& ptr) const
 	{
-		Mutex::ScopedLock l(_mutex);		
-		return _matcherFunc(ptr->name());
+		Mutex::ScopedLock l(_mutex);
+		if (_pObject == nullptr)
+			return false;
+
+		if (_matcher)
+			return (_pObject->*_matcher)(ptr->name());
+
+		if (_matcherFunc)
+			return _matcherFunc(ptr->name());
 	}
 
 	Mutex& mutex() const
@@ -215,6 +220,7 @@ private:
 	C*       _pObject {nullptr};
 	Handler _handler {nullptr};
 	SyncHandler _syncHandler {nullptr};
+	Matcher _matcher {nullptr};
 	MatcherFunc _matcherFunc;
 
 	mutable Poco::Mutex _mutex;

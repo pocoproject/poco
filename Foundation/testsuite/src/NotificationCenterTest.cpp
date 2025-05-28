@@ -43,11 +43,7 @@ public:
 
 
 NotificationCenterTest::NotificationCenterTest(const std::string& name):
-	CppUnit::TestCase(name),
-	_handle1Done(false),
-	_handleAuto1Done(false),
-	_handleAsync1Done(false),
-	_handleAsync2Done(false)
+	CppUnit::TestCase(name)
 {
 }
 
@@ -220,12 +216,6 @@ void NotificationCenterTest::testAsyncNotificationCenter2()
 {
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
-	_set.clear();
-	_handleAsync1Done = false;
-	_handleAsync2Done = false;
-	_handleAsync1Counter  = 0;
-	_handleAsync2Counter  = 0;
-
 	AsyncNotificationCenter nc;
 
 	const auto matchAsync = [](const std::string& s) -> bool
@@ -281,12 +271,6 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotify()
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
-	_set.clear();
-	_handleAsync1Done = false;
-	_handleAsync2Done = false;
-	_handleAsync1Counter  = 0;
-	_handleAsync2Counter  = 0;
-
 	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
 
 	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
@@ -316,12 +300,6 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncBoth()
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
 
-	_set.clear();
-	_handleAsync1Done = false;
-	_handleAsync2Done = false;
-	_handleAsync1Counter  = 0;
-	_handleAsync2Counter  = 0;
-
 	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::BOTH);
 
 	nc.addObserver(ObserverT(*this, &NotificationCenterTest::handleAsync1, &NotificationCenterTest::matchAsync));
@@ -350,12 +328,6 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncNotifyStress()
 #if (POCO_HAVE_JTHREAD)
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
-
-	_set.clear();
-	_handleAsync1Done = false;
-	_handleAsync2Done = false;
-	_handleAsync1Counter  = 0;
-	_handleAsync2Counter  = 0;
 
 	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
 
@@ -392,12 +364,6 @@ void NotificationCenterTest::testAsyncNotificationCenterAsyncRemoveObserver()
 #if (POCO_HAVE_JTHREAD)
 
 	using ObserverT = NObserver<NotificationCenterTest, TestNotification>::Type;
-
-	_set.clear();
-	_handleAsync1Done = false;
-	_handleAsync2Done = false;
-	_handleAsync1Counter  = 0;
-	_handleAsync2Counter  = 0;
 
 	AsyncNotificationCenter nc(AsyncNotificationCenter::AsyncMode::NOTIFY);
 
@@ -548,6 +514,13 @@ bool NotificationCenterTest::matchAsync(const std::string& name) const
 void NotificationCenterTest::setUp()
 {
 	_set.clear();
+	_handle1Done = false;
+	_handleAuto1Done = false;
+	_handleAsync1Done = false;
+	_handleAsync2Done = false;
+
+	_handleAsync1Counter  = 0;
+	_handleAsync2Counter  = 0;
 }
 
 
