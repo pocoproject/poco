@@ -52,8 +52,8 @@ if (EMSCRIPTEN)
 	set(POCO_ENABLE_CPP20 OFF CACHE BOOL "Build Poco with C++20 standard" FORCE)
 else()
 
-# https://libcxx.llvm.org/Status/Cxx20.html
-# https://en.wikipedia.org/wiki/Xcode#Toolchain_versions
+	# https://libcxx.llvm.org/Status/Cxx20.html
+	# https://en.wikipedia.org/wiki/Xcode#Toolchain_versions
 
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0)

@@ -40,8 +40,8 @@ AsyncNotificationCenter::AsyncNotificationCenter(AsyncMode mode, std::size_t wor
 
 AsyncNotificationCenter::AsyncNotificationCenter() :
 	_ra(*this, &AsyncNotificationCenter::dequeue),
-	_started(false),
-	_done(false)
+	_enqueueThreadStarted(false),
+	_enqueueThreadDone(false)
 {
 	start();
 }
