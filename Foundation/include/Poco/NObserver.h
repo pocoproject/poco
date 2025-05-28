@@ -22,6 +22,7 @@
 #include "Poco/AbstractObserver.h"
 #include "Poco/Mutex.h"
 
+#include <functional>
 
 namespace Poco {
 
@@ -52,16 +53,31 @@ class NObserver: public AbstractObserver
 public:
 	using Type = NObserver<C, N>;
 	using NotificationPtr = AutoPtr<N>;
-	using Callback = void (C::*)(const NotificationPtr&);
-	using Handler = Callback;
+	using Handler = void (C::*)(const NotificationPtr&);
 	using Matcher = bool (C::*)(const std::string&) const;
+	using MatcherFunc = std::function<bool(const std::string&)>;
 
 	NObserver() = delete;
 
 	NObserver(C& object, Handler method, Matcher matcher = nullptr):
 		_pObject(&object),
+		_handler(method)
+	{
+		if (matcher)
+		{
+			_matcherFunc = [this, matcher](const std::string& s) -> bool
+			{
+				if (!_pObject)
+					return false;
+				return (_pObject->*_matcher)(s);
+			};
+		}
+	}
+
+	NObserver(C& object, Handler method, MatcherFunc matcherFunc):
+		_pObject(&object),
 		_handler(method),
-		_matcher(matcher)
+		_matcherFunc(matcherFunc)
 	{
 	}
 
@@ -69,8 +85,17 @@ public:
 		AbstractObserver(observer),
 		_pObject(observer._pObject),
 		_handler(observer._handler),
-		_matcher(observer._matcher)
+		_matcherFunc(observer._matcherFunc)
 	{
+	}
+
+	NObserver(NObserver&& observer):
+		AbstractObserver(observer),
+		_pObject(std::move(observer._pObject)),
+		_handler(std::move(observer._handler)),
+		_matcherFunc(std::move(observer._matcherFunc))
+	{
+		std::cout << "NOBserver moved" << std::endl;
 	}
 
 	~NObserver() override = default;
@@ -80,9 +105,21 @@ public:
 		if (&observer != this)
 		{
 			_pObject = observer._pObject;
-			_handler  = observer._handler;
-			_matcher  = observer._matcher;
+			_handler = observer._handler;
+			_matcherFunc = observer._matcherFunc;
 		}
+		return *this;
+	}
+
+	NObserver& operator = (NObserver&& observer)
+	{
+		if (&observer != this)
+		{
+			_pObject = std::move(observer._pObject);
+			_handler = std::move(observer._handler);
+			_matcherFunc = std::move(observer._matcherFunc);
+		}
+		std::cout << "NOBserver move assigned" << std::endl;
 		return *this;
 	}
 
@@ -93,11 +130,11 @@ public:
 
 	bool equals(const AbstractObserver& abstractObserver) const override
 	{
-		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
-		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler && pObs->_matcher == _matcher;
+		const auto* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
+		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler;
 	}
 
-	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead")
+	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead with matcher function if needed")
 	bool accepts(Notification* pNf, const char* pName) const override
 	{
 		return (!pName || pNf->name() == pName) && dynamic_cast<N*>(pNf) != nullptr;
@@ -105,7 +142,10 @@ public:
 
 	bool accepts(const Notification::Ptr& pNf) const override
 	{
-		return (match(pNf) && (pNf.template cast<N>() != nullptr));
+		if (hasMatcher())
+			return match(pNf);
+		else
+			return pNf.template cast<N>() != nullptr;
 	}
 
 	AbstractObserver* clone() const override
@@ -130,11 +170,15 @@ protected:
 			(_pObject->*_handler)(ptr);
 	}
 
+	bool hasMatcher() const
+	{
+		return _pObject && _matcherFunc != nullptr;
+	}
+
 	bool match(const Notification::Ptr& ptr) const
 	{
-		Mutex::ScopedLock l(_mutex);
-
-		return _pObject && (!_matcher || (_pObject->*_matcher)(ptr->name()));
+		Mutex::ScopedLock l(_mutex);		
+		return _matcherFunc(ptr->name());
 	}
 
 	Mutex& mutex() const
@@ -143,9 +187,11 @@ protected:
 	}
 
 private:
-	C*       _pObject;
-	Callback _handler;
-	Matcher _matcher;
+	C*       _pObject {nullptr};
+	Handler _handler {nullptr};
+	SyncHandler _syncHandler {nullptr};
+	MatcherFunc _matcherFunc;
+
 	mutable Poco::Mutex _mutex;
 };
 
