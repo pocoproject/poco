@@ -17,26 +17,12 @@
 
 namespace Poco {
 
-
-AbstractObserver::AbstractObserver()
-{
-}
-
-
-AbstractObserver::AbstractObserver(const AbstractObserver& /*observer*/)
-{
-}
-
-
-AbstractObserver::~AbstractObserver()
-{
-}
-
-
-AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/)
-{
-	return *this;
-}
+AbstractObserver::AbstractObserver() = default;
+AbstractObserver::AbstractObserver(const AbstractObserver& /*observer*/) = default;
+AbstractObserver::AbstractObserver(AbstractObserver&& /*observer*/) = default;
+AbstractObserver::~AbstractObserver() = default;
+AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/) = default;
+AbstractObserver& AbstractObserver::operator = (AbstractObserver&& /*observer*/) = default;
 
 
 } // namespace Poco

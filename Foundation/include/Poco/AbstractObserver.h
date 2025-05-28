@@ -32,9 +32,11 @@ class Foundation_API AbstractObserver
 public:
 	AbstractObserver();
 	AbstractObserver(const AbstractObserver& observer);
+	AbstractObserver(AbstractObserver&& observer);
 	virtual ~AbstractObserver();
 
 	AbstractObserver& operator = (const AbstractObserver& observer);
+	AbstractObserver& operator = (AbstractObserver&& observer);
 
 	virtual void notify(Notification* pNf) const = 0;
 

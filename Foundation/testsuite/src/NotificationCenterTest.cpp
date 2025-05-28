@@ -502,7 +502,6 @@ CppUnit::Test* NotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotify);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncBoth);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotifyStress);
-	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncNotifyStress);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testAsyncNotificationCenterAsyncRemoveObserver);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultNotificationCenter);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testMixedObservers);
