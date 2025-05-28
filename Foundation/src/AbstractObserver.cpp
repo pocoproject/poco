@@ -13,6 +13,7 @@
 
 
 #include "Poco/AbstractObserver.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -24,5 +25,14 @@ AbstractObserver::~AbstractObserver() = default;
 AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/) = default;
 AbstractObserver& AbstractObserver::operator = (AbstractObserver&& /*observer*/) = default;
 
+NotificationResult AbstractObserver::notifySynchronously(Notification* pNf) const
+{
+	throw Poco::NotImplementedException("Synchronous notification not implemented.");
+}
+
+bool AbstractObserver::acceptsSynchronously() const
+{
+	return false;
+}
 
 } // namespace Poco

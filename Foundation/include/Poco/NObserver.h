@@ -54,14 +54,16 @@ public:
 	using Type = NObserver<C, N>;
 	using NotificationPtr = AutoPtr<N>;
 	using Handler = void (C::*)(const NotificationPtr&);
+	using SyncHandler = NotificationResult (C::*)(const NotificationPtr&);
 	using Matcher = bool (C::*)(const std::string&) const;
 	using MatcherFunc = std::function<bool(const std::string&)>;
 
 	NObserver() = delete;
 
-	NObserver(C& object, Handler method, Matcher matcher = nullptr):
+	NObserver(C& object, Handler method, Matcher matcher = nullptr, SyncHandler syncMethod = nullptr):
 		_pObject(&object),
-		_handler(method)
+		_handler(method),
+		_syncHandler(syncMethod)
 	{
 		if (matcher)
 		{
@@ -69,14 +71,15 @@ public:
 			{
 				if (!_pObject)
 					return false;
-				return (_pObject->*_matcher)(s);
+				return (_pObject->*matcher)(s);
 			};
 		}
 	}
 
-	NObserver(C& object, Handler method, MatcherFunc matcherFunc):
+	NObserver(C& object, Handler method, MatcherFunc matcherFunc, SyncHandler syncMethod = nullptr):
 		_pObject(&object),
 		_handler(method),
+		_syncHandler(syncMethod),
 		_matcherFunc(matcherFunc)
 	{
 	}
@@ -85,6 +88,7 @@ public:
 		AbstractObserver(observer),
 		_pObject(observer._pObject),
 		_handler(observer._handler),
+		_syncHandler(observer._syncHandler),
 		_matcherFunc(observer._matcherFunc)
 	{
 	}
@@ -93,9 +97,9 @@ public:
 		AbstractObserver(observer),
 		_pObject(std::move(observer._pObject)),
 		_handler(std::move(observer._handler)),
+		_syncHandler(std::move(observer._syncHandler)),
 		_matcherFunc(std::move(observer._matcherFunc))
 	{
-		std::cout << "NOBserver moved" << std::endl;
 	}
 
 	~NObserver() override = default;
@@ -106,6 +110,7 @@ public:
 		{
 			_pObject = observer._pObject;
 			_handler = observer._handler;
+			_syncHandler = observer._syncHandler;
 			_matcherFunc = observer._matcherFunc;
 		}
 		return *this;
@@ -117,15 +122,20 @@ public:
 		{
 			_pObject = std::move(observer._pObject);
 			_handler = std::move(observer._handler);
+			_syncHandler = std::move(observer._syncHandler);
 			_matcherFunc = std::move(observer._matcherFunc);
 		}
-		std::cout << "NOBserver move assigned" << std::endl;
 		return *this;
 	}
 
 	void notify(Notification* pNf) const override
 	{
 		handle(NotificationPtr(static_cast<N*>(pNf), true));
+	}
+
+	NotificationResult notifySynchronously(Notification* pNf) const override
+	{
+		return handleSync(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
 	bool equals(const AbstractObserver& abstractObserver) const override
@@ -148,6 +158,11 @@ public:
 			return pNf.template cast<N>() != nullptr;
 	}
 
+	bool acceptsSynchronously() const override
+	{
+		return _pObject != nullptr && _syncHandler != nullptr;
+	}
+
 	AbstractObserver* clone() const override
 	{
 		return new NObserver(*this);
@@ -166,8 +181,18 @@ protected:
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		if (_pObject)
+		if (_pObject != nullptr)
 			(_pObject->*_handler)(ptr);
+	}
+
+	NotificationResult handleSync(const NotificationPtr& ptr) const
+	{
+		Mutex::ScopedLock lock(_mutex);
+
+		if (_pObject == nullptr || _syncHandler == nullptr)
+			return {};
+
+		return (_pObject->*_syncHandler)(ptr);
 	}
 
 	bool hasMatcher() const

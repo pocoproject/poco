@@ -90,6 +90,12 @@ public:
 	int backlog() const override;
 		/// Returns the number of notifications in the notification queue.
 
+	std::vector<NotificationResult> synchronousDispatch(Notification::Ptr pNotification);
+		/// Dispatches the notification synchronously to all observers that have a function
+		/// for synchronous notification processing and accept the notification.
+		/// This method blocks until the notification is processed by
+		/// all observers. Returns results from all observers that accepted the notification.
+
 protected:
 
 	void notifyObservers(Notification::Ptr& pNotification) override;
