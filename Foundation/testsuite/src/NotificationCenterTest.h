@@ -39,6 +39,8 @@ public:
 	void testNotificationCenterAuto();
 	void testAsyncObserver();
 	void testAsyncNotificationCenter();
+	void testAsyncNotificationCenter2();
+	void testAsyncNotificationCenterSyncronousNotify();
 	void testAsyncNotificationCenterAsyncNotify();
 	void testAsyncNotificationCenterAsyncBoth();
 	void testAsyncNotificationCenterAsyncNotifyStress();
@@ -59,6 +61,7 @@ protected:
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
 	void handleAsync1(const Poco::AutoPtr<TestNotification>& pNf);
 	void handleAsync2(const Poco::AutoPtr<TestNotification>& pNf);
+	Poco::NotificationResult handleSync(const Poco::AutoPtr<TestNotification>& pNf);
 	bool matchAsync(const std::string& name) const;
 
 private:

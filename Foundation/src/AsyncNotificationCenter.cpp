@@ -20,6 +20,7 @@
 #include "Poco/Debugger.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Format.h"
+#include <vector>
 
 namespace Poco {
 
@@ -75,6 +76,29 @@ int AsyncNotificationCenter::backlog() const
 {
 	return _nq.size();
 }
+
+
+std::vector<NotificationResult> AsyncNotificationCenter::synchronousDispatch(Notification::Ptr pNotification)
+{
+	poco_check_ptr (pNotification);
+
+	auto observers = observersToNotify(pNotification);
+	if (observers.empty())
+		return {};
+
+	std::vector<NotificationResult> results;
+	results.reserve(observers.size());
+	for (auto& o : observers)
+	{
+		if (!o->acceptsSynchronously())
+			continue;
+
+		results.push_back(o->notifySynchronously(pNotification));
+	}
+
+	return results;
+}
+
 
 void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 {

@@ -19,14 +19,20 @@
 
 
 #include "Poco/Foundation.h"
-#include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Any.h"
+
 #include <memory>
 
 
 namespace Poco {
 
+using NotificationResult = std::pair<std::string, Poco::Any>;
+	/// Used for synchronous notification processing.
+	/// Observer shall return a pair containing a string identifier
+	/// that is interpreted by the caller and an Any object for
+	/// the payload (result).
 
 class Foundation_API Notification: public RefCountedObject
 	/// The base class for all notification classes used
