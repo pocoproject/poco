@@ -459,7 +459,7 @@ void FileImpl::removeImpl()
 }
 
 
-bool FileImpl::createFileImpl(bool createDirectories = false)
+bool FileImpl::createFileImpl(bool createDirectories)
 {
 	poco_assert (!_path.empty());
 
