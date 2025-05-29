@@ -45,17 +45,31 @@ class Foundation_API AsyncNotificationCenter: public NotificationCenter
 	/// AsyncNotificationCenter decouples posting of notifications
 	/// from notifying subscribers by calling observers' notification
 	/// handler in a dedicated thread.
+	///
 	/// It supports multiple modes of operation:
 	///
 	/// - ENQUEUE: Notifications are added to a queue, separate single thread
 	///            asynchronously dispatches them to observers sequentially
+	///
 	/// - NOTIFY: Notifications are added to a list for each observer, multiple
 	///           worker threads process notifications in parallel
+	///
 	/// - BOTH: Combination of both modes, notifications are enqueued and worker
 	///         threads dispatch them to observers in parallel.
 	///
-	/// Note about using AsyncObserver: although it is possible to use them with
-	/// AsyncNotificationCenter, it is more efficient to use NObserver.
+	/// NOTIFY and BOTH mode:
+	///
+	/// These modes are only available if the compiler supports C++20 std::jthread.
+	///
+	/// Notifications can be delivered to observers in a different order than they
+	/// were posted, as they are processed by multiple worker threads. Observer
+	/// handlers must also be thread-safe as multiple notifications can be dispatched
+	/// to the same observer in parallel.
+	///
+	/// Note about using AsyncObserver
+	///
+	/// Although it is possible to use them with AsyncNotificationCenter,
+	/// it is more efficient to use NObserver.
 {
 public:
 
@@ -63,7 +77,6 @@ public:
 		/// ENQUEUE: Notifications are enqueued in a separate thread.
 		/// NOTIFY: Notifications are dispatched to observers from worker threads
 		/// BOTH: Notifications are enqueued and dispatched to observers in worker threads.
-		/// NOTIFY and BOTH are only available if the compiler supports C++20 std::jthread.
 
 #if (POCO_HAVE_JTHREAD)
 
