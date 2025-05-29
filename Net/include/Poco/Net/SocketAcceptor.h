@@ -23,7 +23,7 @@
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 
 
 namespace Poco {
@@ -68,7 +68,7 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	using Observer = Poco::Observer<SocketAcceptor, ReadableNotification>;
+	using Observer = Poco::NObserver<SocketAcceptor, ReadableNotification>;
 
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
@@ -146,10 +146,9 @@ public:
 		}
 	}
 
-	void onAccept(ReadableNotification* pNotification)
+	void onAccept(const AutoPtr<ReadableNotification>& pNotification)
 		/// Accepts connection and creates event handler.
 	{
-		pNotification->release();
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
 		createServiceHandler(sock);

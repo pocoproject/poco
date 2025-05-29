@@ -19,7 +19,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
@@ -39,7 +39,7 @@ using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
 using Poco::Net::ErrorNotification;
 using Poco::Net::ShutdownNotification;
-using Poco::Observer;
+using Poco::NObserver;
 using Poco::Stopwatch;
 using Poco::IllegalStateException;
 using Poco::Thread;
@@ -58,16 +58,13 @@ namespace
 			_socket(socket),
 			_reactor(reactor)
 		{
-			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 		}
 
-		~EchoServiceHandler()
-		{
-		}
+		~EchoServiceHandler() = default;
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[8];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			if (n > 0)
@@ -76,7 +73,7 @@ namespace
 			}
 			else
 			{
-				_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+				_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 				delete this;
 			}
 		}
@@ -121,9 +118,8 @@ namespace
 			_reactor.removeEventHandler(_socket, _os);
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[32];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			if (n > 0)
@@ -135,7 +131,7 @@ namespace
 			else
 			{
 				checkReadableObserverCount(1);
-				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
+				_reactor.removeEventHandler(_socket, NObserver<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
 				checkReadableObserverCount(0);
 				if (_once)
 				{
@@ -151,20 +147,18 @@ namespace
 			}
 		}
 
-		void onWritable(WritableNotification* pNf)
+		void onWritable(const AutoPtr<WritableNotification>& pNf)
 		{
-			pNf->release();
 			checkWritableObserverCount(1);
-			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
+			_reactor.removeEventHandler(_socket, NObserver<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
 			checkWritableObserverCount(0);
 			std::string data(DATA_SIZE, 'x');
 			_socket.sendBytes(data.data(), (int) data.length());
 			_socket.shutdownSend();
 		}
 
-		void onTimeout(TimeoutNotification* pNf)
+		void onTimeout(const AutoPtr<TimeoutNotification>& pNf)
 		{
-			pNf->release();
 			_timeout = true;
 			if (_closeOnTimeout)
 			{
@@ -173,9 +167,8 @@ namespace
 			}
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			delete this;
 		}
 
@@ -254,10 +247,10 @@ namespace
 
 		StreamSocket                                         _socket;
 		SocketReactor&                                       _reactor;
-		Observer<ClientServiceHandler, ReadableNotification> _or;
-		Observer<ClientServiceHandler, WritableNotification> _ow;
-		Observer<ClientServiceHandler, TimeoutNotification>  _ot;
-		Observer<ClientServiceHandler, ShutdownNotification> _os;
+		NObserver<ClientServiceHandler, ReadableNotification> _or;
+		NObserver<ClientServiceHandler, WritableNotification> _ow;
+		NObserver<ClientServiceHandler, TimeoutNotification>  _ot;
+		NObserver<ClientServiceHandler, ShutdownNotification> _os;
 		std::stringstream                                    _str;
 		static std::string                                   _data;
 		static bool                                          _readableError;
@@ -285,19 +278,17 @@ namespace
 			_failed(false),
 			_shutdown(false)
 		{
-			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
-			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
+			reactor.addEventHandler(socket(), NObserver<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
+			reactor.addEventHandler(socket(), NObserver<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			_shutdown = true;
 		}
 
-		void onTimeout(TimeoutNotification* pNf)
+		void onTimeout(const AutoPtr<TimeoutNotification>& pNf)
 		{
-			pNf->release();
 			_failed = true;
 			reactor()->stop();
 		}
@@ -320,7 +311,7 @@ namespace
 	class DataServiceHandler
 	{
 	public:
-		typedef std::vector<std::string> Data;
+		using Data = std::vector<std::string>;
 
 		DataServiceHandler(StreamSocket& socket, SocketReactor& reactor):
 				_socket(socket),
@@ -328,20 +319,19 @@ namespace
 				_pos(0)
 		{
 			_data.resize(1);
-			_reactor.addEventHandler(_socket, Observer<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
-			_reactor.addEventHandler(_socket, Observer<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
+			_reactor.addEventHandler(_socket, NObserver<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
 			_socket.setBlocking(false);
 		}
 
 		~DataServiceHandler()
 		{
-			_reactor.removeEventHandler(_socket, Observer<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
-			_reactor.removeEventHandler(_socket, Observer<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
+			_reactor.removeEventHandler(_socket, NObserver<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
+			_reactor.removeEventHandler(_socket, NObserver<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[64];
 			int n = 0;
 			do
@@ -371,9 +361,8 @@ namespace
 			} while (true);
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			delete this;
 		}
 
@@ -402,20 +391,19 @@ namespace
 		DummyServiceHandler(StreamSocket& socket, SocketReactor& reactor) : _socket(socket),
 			_reactor(reactor)
 		{
-			_reactor.addEventHandler(_socket, Observer<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
-			_reactor.addEventHandler(_socket, Observer<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
+			_reactor.addEventHandler(_socket, NObserver<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
 			_socket.setBlocking(false);
 		}
 
 		~DummyServiceHandler()
 		{
-			_reactor.removeEventHandler(_socket, Observer<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
-			_reactor.removeEventHandler(_socket, Observer<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
+			_reactor.removeEventHandler(_socket, NObserver<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
+			_reactor.removeEventHandler(_socket, NObserver<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			std::vector<char> buffer;
 			int n = 0;
 			while ((n = _socket.available()))
@@ -426,9 +414,8 @@ namespace
 			}
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			delete this;
 		}
 
@@ -444,9 +431,7 @@ SocketReactorTest::SocketReactorTest(const std::string& name): CppUnit::TestCase
 }
 
 
-SocketReactorTest::~SocketReactorTest()
-{
-}
+SocketReactorTest::~SocketReactorTest() = default;
 
 
 void SocketReactorTest::testSocketReactor()
