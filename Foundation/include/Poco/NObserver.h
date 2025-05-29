@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
 
 #include <functional>
@@ -209,6 +210,8 @@ protected:
 
 		if (_matcherFunc)
 			return _matcherFunc(ptr->name());
+
+		return false;
 	}
 
 	Mutex& mutex() const
@@ -217,7 +220,7 @@ protected:
 	}
 
 private:
-	C*       _pObject {nullptr};
+	C* _pObject {nullptr};
 	Handler _handler {nullptr};
 	SyncHandler _syncHandler {nullptr};
 	Matcher _matcher {nullptr};
