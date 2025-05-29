@@ -27,7 +27,7 @@ namespace Poco {
 
 
 template <class C, class N>
-class Observer: public AbstractObserver
+class POCO_DEPRECATED("use `NObserver` instead") Observer: public AbstractObserver
 	/// This template class implements an adapter that sits between
 	/// a NotificationCenter and an object receiving notifications
 	/// from it. It is quite similar in concept to the

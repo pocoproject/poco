@@ -18,7 +18,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 #include <iostream>
 
 
@@ -33,7 +33,7 @@ using Poco::Net::ReadableNotification;
 using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
 using Poco::Net::ShutdownNotification;
-using Poco::Observer;
+using Poco::NObserver;
 
 
 namespace
@@ -45,17 +45,16 @@ namespace
 			_socket(socket),
 			_reactor(reactor)
 		{
-			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 		}
 		
 		~EchoServiceHandler()
 		{
-			_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+			_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 		}
 		
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[8];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			if (n > 0) _socket.sendBytes(buffer, n);
@@ -96,24 +95,21 @@ namespace
 			Thread::sleep(100);
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			if (pNf) pNf->release();
 			_reactor.removeEventHandler(_socket, _os);
 			delete this;
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			if (pNf) pNf->release();
 			char buffer[32];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			if (n <= 0) onShutdown(0);
 		}
 		
-		void onWritable(WritableNotification* pNf)
+		void onWritable(const AutoPtr<WritableNotification>& pNf)
 		{
-			if (pNf) pNf->release();
 			_reactor.removeEventHandler(_socket, _ow);
 			std::string data(5, 'x');
 			_socket.sendBytes(data.data(), (int) data.length());
@@ -122,9 +118,9 @@ namespace
 		
 		StreamSocket                                         _socket;
 		SocketReactor&                                       _reactor;
-		Observer<ClientServiceHandler, ReadableNotification> _or;
-		Observer<ClientServiceHandler, WritableNotification> _ow;
-		Observer<ClientServiceHandler, ShutdownNotification> _os;
+		NObserver<ClientServiceHandler, ReadableNotification> _or;
+		NObserver<ClientServiceHandler, WritableNotification> _ow;
+		NObserver<ClientServiceHandler, ShutdownNotification> _os;
 	};
 }
 
