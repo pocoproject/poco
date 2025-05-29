@@ -115,9 +115,9 @@ public:
 		/// The overriding method must call the baseclass implementation first.
 	{
 		_pReactor = &reactor;
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 	}
 
 	virtual void unregisterConnector()
@@ -130,32 +130,29 @@ public:
 	{
 		if (_pReactor)
 		{
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 		}
 	}
 
-	void onReadable(ReadableNotification* pNotification)
+	void onReadable(const AutoPtr<ReadableNotification>& pNotification)
 	{
 		unregisterConnector();
-		pNotification->release();
 		int err = _socket.impl()->socketError(); 
 		if (err) onError(err);
 		else onConnect();
 	}
 
-	void onWritable(WritableNotification* pNotification)
+	void onWritable(const AutoPtr<WritableNotification>& pNotification)
 	{
 		unregisterConnector();
-		pNotification->release();
 		onConnect();
 	}
 
-	void onError(ErrorNotification* pNotification)
+	void onError(const AutoPtr<ErrorNotification>& pNotification)
 	{
 		unregisterConnector();
-		pNotification->release();
 		onError(_socket.impl()->socketError());
 	}
 
