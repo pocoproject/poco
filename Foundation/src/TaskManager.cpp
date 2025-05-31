@@ -67,14 +67,20 @@ bool TaskManager::start(Task* pTask)
 		pTask->setState(Task::TASK_STARTING);
 		try
 		{
+			{
+				ScopedLockT lock(_mutex);
+				_taskList.push_back(pAutoTask);
+			}
 			_threadPool.start(*pTask, pTask->name());
-			ScopedLockT lock(_mutex);
-			_taskList.push_back(pAutoTask);
 			return true;
 		}
 		catch (...)
 		{
 			pTask->setOwner(nullptr);
+
+			ScopedLockT lock(_mutex);
+			auto it = std::find(_taskList.begin(), _taskList.end(), pTask);
+			if (it != _taskList.end()) _taskList.erase(it);
 			throw;
 		}
 	}

@@ -62,7 +62,7 @@ protected:
 	void renameToImpl(const std::string& path, int options = 0);
 	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
-	bool createFileImpl();
+	bool createFileImpl(bool createDirectories = false);
 	bool createDirectoryImpl();
 	FileSizeImpl totalSpaceImpl() const;
 	FileSizeImpl usableSpaceImpl() const;

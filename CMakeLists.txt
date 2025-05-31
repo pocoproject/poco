@@ -36,17 +36,47 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
-# C++17 compiler flags
+# Detect if compiler supports at least C++17 standard
 include(CXX1x)
 check_for_cxx17_compiler(CXX17_COMPILER)
 
-# If a C++17 compiler is available, then set the appropriate flags
-if(CXX17_COMPILER)
-	set(CMAKE_CXX_STANDARD 17)
-	set(CMAKE_CXX_STANDARD_REQUIRED ON)
-else()
+if(NOT CXX17_COMPILER)
 	message(FATAL_ERROR "Compiler does not support C++17.")
 endif()
+
+# If a C++17 compiler is available, then set the appropriate flags
+
+option(POCO_ENABLE_CPP20 "Build Poco with C++20 standard" ON)
+
+if (EMSCRIPTEN)
+	set(POCO_ENABLE_CPP20 OFF CACHE BOOL "Build Poco with C++20 standard" FORCE)
+else()
+
+# https://libcxx.llvm.org/Status/Cxx20.html
+# https://en.wikipedia.org/wiki/Xcode#Toolchain_versions
+
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0)
+			# Does not fully support C++20 yet
+			set(POCO_ENABLE_CPP20 OFF CACHE BOOL "Build Poco with C++20 standard" FORCE)
+		endif ()
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0)
+			# Does not fully support C++20 yet
+			set(POCO_ENABLE_CPP20 OFF CACHE BOOL "Build Poco with C++20 standard" FORCE)
+		endif ()
+	endif()
+endif()
+
+if (POCO_ENABLE_CPP20)
+	set(CMAKE_CXX_STANDARD 20)
+	message(STATUS "Building Poco with C++20 standard")
+else()
+	set(CMAKE_CXX_STANDARD 17)
+	message(STATUS "Building Poco with C++17 standard")
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -262,6 +292,7 @@ if(ENABLE_TRACE)
 endif()
 
 include(DefinePlatformSpecific)
+add_compile_definitions(POCO_CMAKE)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
@@ -459,12 +490,12 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord/Compiler AND ENABLE_ACTIVERECORD_CO
 	list(APPEND Poco_COMPONENTS "ActiveRecordCompiler")
 endif()
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/SevenZip AND ENABLE_SEVENZIP AND ENABLE_XML)
+if(EXISTS ${PROJECT_SOURCE_DIR}/SevenZip AND ENABLE_SEVENZIP)
 	add_subdirectory(SevenZip)
 	list(APPEND Poco_COMPONENTS "SevenZip")
 endif()
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP AND ENABLE_XML)
+if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP)
 	add_subdirectory(Zip)
 	list(APPEND Poco_COMPONENTS "Zip")
 endif()
@@ -513,7 +544,7 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
 	IMMEDIATE @ONLY)
 
-add_custom_target(uninstall
+add_custom_target(uninstall-poco
 	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
 )
 

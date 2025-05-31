@@ -45,6 +45,6 @@ int main(int ac, char **av)
 }
 
 
-#if defined(_WIN32) && defined(_DLL)
+#if defined(_WIN32) && defined(_DLL) && !defined(POCO_CMAKE)
 #include <openssl/applink.c>
 #endif

@@ -128,17 +128,33 @@ target_include_directories(Foundation
 target_compile_definitions(Foundation
 	PUBLIC
 		$<$<CONFIG:Debug>:_DEBUG>
-		$<$<BOOL:${DISABLE_CPP14}>:POCO_DISABLE_CPP14>
-		$<$<NOT:$<BOOL:${DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
-		$<$<BOOL:${DISABLE_CPP11}>:POCO_DISABLE_CPP11>
-		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:POCO_ENABLE_CPP11>
+		$<$<BOOL:${POCO_ENABLE_CPP20}>:POCO_ENABLE_CPP20>
 )
 target_compile_features(Foundation
 	PUBLIC
 		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_defaulted_move_initializers>
 )
-if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER "3.8")
-	target_compile_features(Foundation PUBLIC cxx_std_14)
+
+#
+# Set target C++ standard compile features for exported target.
+#
+target_compile_features(Foundation PUBLIC cxx_std_17)
+if (POCO_ENABLE_CPP20)
+	target_compile_features(Foundation PUBLIC cxx_std_20)
+endif()
+
+if (POCO_ENABLE_CPP20 AND NOT EMSCRIPTEN)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 20.0)
+			# Some C++20 features must be enabled explicitly in clang
+			target_compile_options(Foundation PUBLIC -fexperimental-library)
+		endif ()
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0)
+			# Some C++20 features must be enabled explicitly in clang
+			target_compile_options(Foundation PUBLIC -fexperimental-library)
+		endif ()
+	endif()
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
