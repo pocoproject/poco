@@ -13,7 +13,7 @@ namespace Net {
 class Net_API HTTPReactorServerSession : public HTTPSession
 /// This class handles the server side of a
 /// HTTP session. It is used internally by
-/// HTTPServer.
+/// HTTPReactorServer.
 {
 public:
 	HTTPReactorServerSession(const StreamSocket& socket, std::string& buf, HTTPServerParams::Ptr pParams);
@@ -44,6 +44,10 @@ private:
 	int peek() override;
 
 	int write(const char* buffer, std::streamsize length) override;
+
+	bool parseHeaders(std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked);
+
+	bool parseChunkSize(std::size_t& pos, std::size_t& chunkSize, int&);
 
 private:
 	std::string&   _buf;
