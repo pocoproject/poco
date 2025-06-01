@@ -1,4 +1,6 @@
 #include "Poco/Net/HTTPReactorServerSession.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/String.h"
 #include <cstddef>
 
 namespace Poco { 
@@ -105,13 +107,24 @@ bool HTTPReactorServerSession::parseHeaders(
 	}
 
 	bodyStart = headerEnd + 4; // "\r\n\r\n" is 4 characters
-	std::size_t chunkedPos = _buf.find("Transfer-Encoding: chunked", pos);
-	if (chunkedPos != std::string::npos)
+	std::size_t chunkedPos = _buf.find(HTTPMessage::TRANSFER_ENCODING, pos);
+	if (chunkedPos == std::string::npos)
+	{
+		chunkedPos = _buf.find(toLower(HTTPMessage::TRANSFER_ENCODING), pos);
+	}
+	std::size_t chunkedVal = _buf.find(HTTPMessage::CHUNKED_TRANSFER_ENCODING, chunkedPos);
+	std::size_t chunkedLineEnd = _buf.find("\r\n", chunkedPos);
+	if (chunkedPos != std::string::npos && chunkedVal != std::string::npos &&
+		chunkedLineEnd != std::string::npos && chunkedVal < chunkedLineEnd)
 	{
 		isChunked = true;
 		return true;
 	}
-	std::size_t contentLengthPos = _buf.find("Content-Length:", pos);
+	std::size_t contentLengthPos = _buf.find(HTTPMessage::CONTENT_LENGTH, pos);
+	if(contentLengthPos == std::string::npos)
+	{
+		contentLengthPos = _buf.find(toLower(HTTPMessage::CONTENT_LENGTH), pos);
+	}
 	if (contentLengthPos != std::string::npos)
 	{
 		std::size_t valueStart = contentLengthPos + 15; // "Content-Length:" is 15 characters
