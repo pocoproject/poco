@@ -309,7 +309,7 @@ void MessageHeaderTest::testSplitParameters()
 	assertTrue (p.size() == 1);
 	assertTrue (p["boundary"] == "MIME_boundary_01234567");
 
-	s = "multipart/related; boundary=\"MIME_boundary_76543210\"";
+	s = "multipart/related; boundary=MIME_boundary_76543210";
 	MessageHeader::splitParameters(s, v, p);
 	assertTrue (v == "multipart/related");
 	assertTrue (p.size() == 1);

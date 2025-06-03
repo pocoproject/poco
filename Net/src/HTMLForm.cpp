@@ -219,9 +219,8 @@ void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 		{
 			_boundary = MultipartWriter::createBoundary();
 			std::string ct(_encoding);
-			ct.append("; boundary=\"");
+			ct.append("; boundary=");
 			ct.append(_boundary);
-			ct.append("\"");
 			request.setContentType(ct);
 		}
 		if (request.getVersion() == HTTPMessage::HTTP_1_0)
