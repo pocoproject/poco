@@ -283,6 +283,9 @@ public:
 	const OptionSet& options() const;
 		/// Returns the application's option set.
 
+	static bool exists();
+		/// Returns true iff instance exists.
+
 	static Application& instance();
 		/// Returns a reference to the Application singleton.
 		///
@@ -491,6 +494,12 @@ inline const Application::ArgVec& Application::argv() const
 inline const OptionSet& Application::options() const
 {
 	return _options;
+}
+
+
+inline bool Application::exists()
+{
+	return _pInstance != nullptr;
 }
 
 
