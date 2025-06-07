@@ -18,6 +18,7 @@
 #define Net_HTTPServerRequestImpl_INCLUDED
 
 
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponseImpl.h"
@@ -43,7 +44,7 @@ class Net_API HTTPServerRequestImpl: public HTTPServerRequest
 	/// handleRequest() method of HTTPRequestHandler.
 {
 public:
-	HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams);
+	HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPSession& session, HTTPServerParams* pParams);
 		/// Creates the HTTPServerRequestImpl, using the
 		/// given HTTPServerSession.
 
@@ -82,12 +83,12 @@ public:
 		/// Returns the underlying socket after detaching
 		/// it from the server session.
 
-	HTTPServerSession& session();
+	HTTPSession& session();
 		/// Returns the underlying HTTPServerSession.
 
 private:
 	HTTPServerResponseImpl&         _response;
-	HTTPServerSession&              _session;
+	HTTPSession&              _session;
 	std::istream*                   _pStream;
 	Poco::AutoPtr<HTTPServerParams> _pParams;
 	SocketAddress                   _clientAddress;
@@ -130,7 +131,7 @@ inline HTTPServerResponse& HTTPServerRequestImpl::response() const
 }
 
 
-inline HTTPServerSession& HTTPServerRequestImpl::session()
+inline HTTPSession& HTTPServerRequestImpl::session()
 {
 	return _session;
 }
