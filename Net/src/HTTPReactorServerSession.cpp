@@ -3,7 +3,7 @@
 #include "Poco/String.h"
 #include <cstddef>
 
-namespace Poco { 
+namespace Poco {
 namespace Net {
 
 

@@ -25,7 +25,6 @@ private:
 	TCPReactorServer               _tcpReactorServer;
 	HTTPServerParams::Ptr          _pParams;
 	HTTPRequestHandlerFactory::Ptr _pFactory;
-	Poco::Logger*                  _logger;
 
 	ThreadPool _threadPool;
 };

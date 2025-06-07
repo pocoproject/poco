@@ -4,16 +4,13 @@
 #include "Poco/Net/HTTPSession.h"
 #include <cstring>
 
-namespace Poco {
-namespace Net {
-
+namespace Poco { namespace Net {
 
 HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory)
 	: _tcpReactorServer(port, pParams)
 {
 	_pParams = pParams;
 	_pFactory = pFactory;
-	_logger = &Poco::Logger::root();
 	_tcpReactorServer.setRecvMessageCallback([this](const TcpReactorConnectionPtr& conn) {
 		// Handle incoming message
 		this->onMessage(conn);
@@ -52,14 +49,16 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 		response.setDate(now);
 		response.setVersion(request.getVersion());
 		response.setKeepAlive(request.getKeepAlive());
+		std::string server = _pParams->getSoftwareVersion();
+		if (!server.empty())
+		{
+			response.set("Server", server);
+		}
 		try
 		{
-
-#ifndef POCO_ENABLE_CPP11
-			std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-#else
+			session.requestTrailer().clear();
+			session.responseTrailer().clear();
 			std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-#endif
 			if (pHandler.get())
 			{
 				if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
@@ -67,12 +66,12 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 
 				pHandler->handleRequest(request, response);
 				session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive());
-			} else
+			}
+			else
 				sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
-
-		} catch (Poco::Exception& e)
+		}
+		catch (Poco::Exception& e)
 		{
-			_logger->error(e.displayText());
 			if (!response.sent())
 			{
 				try
@@ -80,13 +79,15 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 					sendErrorResponse(
 						session,
 						e.code() == 0 ? HTTPResponse::HTTP_INTERNAL_SERVER_ERROR : HTTPResponse::HTTPStatus(e.code()));
-				} catch (...)
+				}
+				catch (...)
 				{
 				}
 			}
 			throw;
 		}
-	} catch (const Poco::Exception& ex)
+	}
+	catch (const Poco::Exception& ex)
 	{
 		onError(ex);
 	}
