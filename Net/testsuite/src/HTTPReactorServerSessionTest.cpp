@@ -169,3 +169,4 @@ CppUnit::Test* HTTPReactorServerSessionTest::suite()
 
 	return pSuite;
 }
+

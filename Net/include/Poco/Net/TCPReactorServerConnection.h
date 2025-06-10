@@ -4,7 +4,7 @@
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/StreamSocket.h"
 #include <cstring>
-#include <netinet/in.h>
+#include <functional>
 #include <string>
 #include <unistd.h>
 
@@ -29,9 +29,9 @@ public:
 	void onError(const AutoPtr<ErrorNotification>& pNf);
 	void onShutdown(const AutoPtr<ShutdownNotification>& pNf);
 
-	void                handleClose();
+	void handleClose();
 	const StreamSocket& socket();
-	std::string&        buffer();
+	std::string& buffer();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb);
 

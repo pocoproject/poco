@@ -9,4 +9,5 @@ public:
 	static CppUnit::Test* suite();
 };
 
-#endif // HTTPReactorServerTestSuite.h_INCLUDED
+#endif // HTTPReactorServerTestSuite_INCLUDED
+

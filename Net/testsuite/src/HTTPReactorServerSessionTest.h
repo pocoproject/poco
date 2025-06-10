@@ -29,6 +29,5 @@ public:
 private:
 };
 
+#endif // HTTPReactorServerSessionTest_INCLUDED
 
-
-#endif // HTTPReactorServerSessionTest.h_INCLUDED

@@ -2,7 +2,7 @@
 // HTTPObserver.h
 //
 // Library: Foundation
-// Package: Notifications
+// Package: Net
 // Module:  HTTPObserver
 //
 // Definition of the HTTPObserver class template.
@@ -16,9 +16,7 @@
 #define Net_HTTPObserver_INCLUDED
 
 
-#include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
-#include "Poco/Logger.h"
 #include "Poco/Mutex.h"
 #include <memory>
 
@@ -43,6 +41,8 @@ class HTTPObserver: public AbstractObserver
 	///   - HTTPObserver expects the callback function to accept a const AutoPtr&
 	///     instead of a plain pointer as argument, thus simplifying memory
 	///     management.
+	///
+	///   - HTTPObserver expects the object to accept a shared pointer.
 	///
 	///   - In addition to dispatching notifications based on the Notification runtime
 	///     type, HTTPObserver can also notify subscribers based on the Notification name.

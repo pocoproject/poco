@@ -11,3 +11,4 @@ CppUnit::Test* HTTPReactorServerTestSuite::suite()
 
 	return pSuite;
 }
+
