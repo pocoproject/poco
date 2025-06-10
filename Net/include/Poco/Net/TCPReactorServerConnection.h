@@ -3,10 +3,8 @@
 
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/StreamSocket.h"
-#include <cstring>
-#include <functional>
 #include <string>
-#include <unistd.h>
+#include <functional>
 
 namespace Poco {
 namespace Net {

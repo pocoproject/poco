@@ -56,9 +56,7 @@ class TimeRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	TimeRequestHandler(const std::string& format, long delay):
-		_delay(delay),
-		_format(format)
+	TimeRequestHandler(const std::string& format, long delay) : _format(format), _delay(delay)
 	{
 	}
 
@@ -94,9 +92,7 @@ private:
 class TimeRequestHandlerFactory: public HTTPRequestHandlerFactory
 {
 public:
-	TimeRequestHandlerFactory(const std::string& format, long delay):
-		_delay(delay),
-		_format(format)
+	TimeRequestHandlerFactory(const std::string& format, long delay) : _format(format), _delay(delay)
 	{
 	}
 
