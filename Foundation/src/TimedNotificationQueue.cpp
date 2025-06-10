@@ -20,9 +20,7 @@
 namespace Poco {
 
 
-TimedNotificationQueue::TimedNotificationQueue()
-{
-}
+TimedNotificationQueue::TimedNotificationQueue() = default;
 
 
 TimedNotificationQueue::~TimedNotificationQueue()
@@ -67,7 +65,7 @@ Notification* TimedNotificationQueue::dequeueNotification()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	NfQueue::iterator it = _nfQueue.begin();
+	auto it = _nfQueue.begin();
 	if (it != _nfQueue.end())
 	{
 		Clock::ClockDiff sleep = -it->first.elapsed();
@@ -78,7 +76,7 @@ Notification* TimedNotificationQueue::dequeueNotification()
 			return pNf.duplicate();
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -86,14 +84,14 @@ Notification* TimedNotificationQueue::dequeueNextNotification()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	NfQueue::iterator it = _nfQueue.begin();
+	auto it = _nfQueue.begin();
 	if (it != _nfQueue.end())
 	{
 		Notification::Ptr pNf = it->second;
 		_nfQueue.erase(it);
 		return pNf.duplicate();
 	}
-	return 0;
+	return nullptr;
 }
 
 Notification* TimedNotificationQueue::waitDequeueNotification()
@@ -101,7 +99,7 @@ Notification* TimedNotificationQueue::waitDequeueNotification()
 	for (;;)
 	{
 		_mutex.lock();
-		NfQueue::iterator it = _nfQueue.begin();
+		auto it = _nfQueue.begin();
 		if (it != _nfQueue.end())
 		{
 			_mutex.unlock();
@@ -130,7 +128,7 @@ Notification* TimedNotificationQueue::waitDequeueNotification(long milliseconds)
 	while (milliseconds >= 0)
 	{
 		_mutex.lock();
-		NfQueue::iterator it = _nfQueue.begin();
+		auto it = _nfQueue.begin();
 		if (it != _nfQueue.end())
 		{
 			_mutex.unlock();
@@ -163,9 +161,9 @@ Notification* TimedNotificationQueue::waitDequeueNotification(long milliseconds)
 			_nfAvailable.tryWait(milliseconds);
 			milliseconds -= static_cast<long>((now.elapsed() + 999)/1000);
 		}
-		else return 0;
+		else return nullptr;
 	}
-	return 0;
+	return nullptr;
 }
 
 
