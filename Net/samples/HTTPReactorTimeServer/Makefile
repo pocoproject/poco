@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# Makefile for Poco HTTPTimeServer
+# Makefile for Poco HTTPReactorTimeServer
 #
 
 include $(POCO_BASE)/build/rules/global

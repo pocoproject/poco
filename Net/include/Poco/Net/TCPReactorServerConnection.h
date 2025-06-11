@@ -1,6 +1,7 @@
 #ifndef Net_TCPReactorServerConnection_INCLUDED
 #define Net_TCPReactorServerConnection_INCLUDED
 
+#include "Poco/Net/Net.h"
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/StreamSocket.h"
 #include <string>
@@ -14,7 +15,7 @@ class TCPReactorServerConnection;
 using TcpReactorConnectionPtr = std::shared_ptr<TCPReactorServerConnection>;
 using RecvMessageCallback = std::function<void(const TcpReactorConnectionPtr&)>;
 
-class TCPReactorServerConnection : public std::enable_shared_from_this<TCPReactorServerConnection>
+class Net_API TCPReactorServerConnection : public std::enable_shared_from_this<TCPReactorServerConnection>
 {
 public:
 	TCPReactorServerConnection(StreamSocket socket, SocketReactor& reactor);

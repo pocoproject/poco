@@ -10,7 +10,7 @@ namespace Poco {
 namespace Net {
 
 
-class HTTPReactorServer
+class Net_API HTTPReactorServer
 {
 public:
 	HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);

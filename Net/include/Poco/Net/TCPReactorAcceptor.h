@@ -1,6 +1,7 @@
 #ifndef Net_TCPReactorAcceptor_INCLUDED
 #define Net_TCPReactorAcceptor_INCLUDED
 
+#include "Poco/Net/Net.h"
 #include "Poco/Net/SocketAcceptor.h"
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/TCPReactorServerConnection.h"
@@ -13,7 +14,7 @@ namespace Poco {
 namespace Net {
 
 
-class TCPReactorAcceptor : public Poco::Net::SocketAcceptor<TCPReactorServerConnection>
+class Net_API TCPReactorAcceptor : public Poco::Net::SocketAcceptor<TCPReactorServerConnection>
 {
 public:
 	TCPReactorAcceptor(

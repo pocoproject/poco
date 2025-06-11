@@ -1,6 +1,7 @@
 #ifndef Net_TCPReactorServer_INCLUDED
 #define Net_TCPReactorServer_INCLUDED
 
+#include "Poco/Net/Net.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/TCPReactorAcceptor.h"
 #include "Poco/Net/TCPServerParams.h"
@@ -9,7 +10,7 @@
 
 namespace Poco { namespace Net {
 
-class TCPReactorServer
+class Net_API TCPReactorServer
 	/// This class implements a TCP server using the Reactor pattern.
 	/// It uses a SocketReactor to handle incoming connections and
 	/// dispatches them to TCPReactorServerConnection objects.
