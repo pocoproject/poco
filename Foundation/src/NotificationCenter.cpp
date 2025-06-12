@@ -54,7 +54,7 @@ void NotificationCenter::addObserver(const AbstractObserver& observer)
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
 	Mutex::ScopedLock lock(_mutex);
-	for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
+	for (auto it = _observers.begin(); it != _observers.end(); ++it)
 	{
 		if (observer.equals(**it))
 		{

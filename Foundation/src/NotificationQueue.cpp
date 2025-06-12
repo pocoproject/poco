@@ -20,9 +20,7 @@
 namespace Poco {
 
 
-NotificationQueue::NotificationQueue()
-{
-}
+NotificationQueue::NotificationQueue() = default;
 
 
 NotificationQueue::~NotificationQueue()
@@ -84,7 +82,7 @@ Notification* NotificationQueue::dequeueNotification()
 Notification* NotificationQueue::waitDequeueNotification()
 {
 	Notification::Ptr pNf;
-	WaitInfo* pWI = 0;
+	WaitInfo* pWI = nullptr;
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
@@ -102,7 +100,7 @@ Notification* NotificationQueue::waitDequeueNotification()
 Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 {
 	Notification::Ptr pNf;
-	WaitInfo* pWI = 0;
+	WaitInfo* pWI = nullptr;
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
@@ -118,7 +116,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = pWI->pNf;
-		for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+		for (auto it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
 		{
 			if (*it == pWI)
 			{
@@ -179,7 +177,7 @@ void NotificationQueue::clear()
 bool NotificationQueue::remove(Notification::Ptr pNotification)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	NfQueue::iterator it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
+	auto it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
 	if (it == _nfQueue.end())
 	{
 		return false;

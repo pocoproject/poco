@@ -30,20 +30,30 @@ class Foundation_API AbstractObserver
 	/// the Observer and NObserver template classes.
 {
 public:
+
 	AbstractObserver();
 	AbstractObserver(const AbstractObserver& observer);
+	AbstractObserver(AbstractObserver&& observer);
 	virtual ~AbstractObserver();
 
 	AbstractObserver& operator = (const AbstractObserver& observer);
+	AbstractObserver& operator = (AbstractObserver&& observer);
 
 	virtual void notify(Notification* pNf) const = 0;
 
+	virtual NotificationResult notifySync(Notification* pNf) const;
+		/// Synchronous notification processing. Blocks and returns a result.
+		/// Default implementation throws NotImplementedException.
+
 	virtual bool equals(const AbstractObserver& observer) const = 0;
 
-	POCO_DEPRECATED("use `Poco::Any accepts(Notification*)` instead")
+	POCO_DEPRECATED("use `bool accepts(Notification::Ptr&)` instead")
 	virtual bool accepts(Notification* pNf, const char* pName) const = 0;
 
 	virtual bool accepts(const Notification::Ptr& pNf) const = 0;
+
+	virtual bool acceptsSync() const;
+		/// Returns true if this observer supports synchronous notification processing.
 
 	virtual AbstractObserver* clone() const = 0;
 
