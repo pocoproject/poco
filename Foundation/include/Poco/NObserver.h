@@ -131,7 +131,7 @@ public:
 		handle(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	NotificationResult notifySynchronously(Notification* pNf) const override
+	NotificationResult notifySync(Notification* pNf) const override
 	{
 		return handleSync(NotificationPtr(static_cast<N*>(pNf), true));
 	}
@@ -156,7 +156,7 @@ public:
 			return pNf.template cast<N>() != nullptr;
 	}
 
-	bool acceptsSynchronously() const override
+	bool acceptsSync() const override
 	{
 		return _pObject != nullptr && _syncHandler != nullptr;
 	}

@@ -41,7 +41,7 @@ public:
 
 	virtual void notify(Notification* pNf) const = 0;
 
-	virtual NotificationResult notifySynchronously(Notification* pNf) const;
+	virtual NotificationResult notifySync(Notification* pNf) const;
 		/// Synchronous notification processing. Blocks and returns a result.
 		/// Default implementation throws NotImplementedException.
 
@@ -52,7 +52,7 @@ public:
 
 	virtual bool accepts(const Notification::Ptr& pNf) const = 0;
 
-	virtual bool acceptsSynchronously() const;
+	virtual bool acceptsSync() const;
 		/// Returns true if this observer supports synchronous notification processing.
 
 	virtual AbstractObserver* clone() const = 0;

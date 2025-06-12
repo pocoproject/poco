@@ -25,12 +25,12 @@ AbstractObserver::~AbstractObserver() = default;
 AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/) = default;
 AbstractObserver& AbstractObserver::operator = (AbstractObserver&& /*observer*/) = default;
 
-NotificationResult AbstractObserver::notifySynchronously(Notification* pNf) const
+NotificationResult AbstractObserver::notifySync(Notification* pNf) const
 {
 	throw Poco::NotImplementedException("Synchronous notification not implemented.");
 }
 
-bool AbstractObserver::acceptsSynchronously() const
+bool AbstractObserver::acceptsSync() const
 {
 	return false;
 }

@@ -90,10 +90,10 @@ std::vector<NotificationResult> AsyncNotificationCenter::synchronousDispatch(Not
 	results.reserve(observers.size());
 	for (auto& o : observers)
 	{
-		if (!o->acceptsSynchronously())
+		if (!o->acceptsSync())
 			continue;
 
-		results.push_back(o->notifySynchronously(pNotification));
+		results.push_back(o->notifySync(pNotification));
 	}
 
 	return results;
