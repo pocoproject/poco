@@ -40,7 +40,7 @@ public:
 	void testAsyncObserver();
 	void testAsyncNotificationCenter();
 	void testAsyncNotificationCenter2();
-	void testAsyncNotificationCenterSyncronousNotify();
+	void testAsyncNotificationCenterSyncNotify();
 	void testAsyncNotificationCenterAsyncNotify();
 	void testAsyncNotificationCenterAsyncBoth();
 	void testAsyncNotificationCenterAsyncNotifyStress();
@@ -54,10 +54,10 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
-	void handle1(Poco::Notification* pNf);
-	void handle2(Poco::Notification* pNf);
-	void handle3(Poco::Notification* pNf);
-	void handleTest(TestNotification* pNf);
+	void handle1(const Poco::AutoPtr<Poco::Notification>& pNf);
+	void handle2(const Poco::AutoPtr<Poco::Notification>& pNf);
+	void handle3(const Poco::AutoPtr<Poco::Notification>& pNf);
+	void handleTest(const Poco::AutoPtr<TestNotification>& pNf);
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
 	void handleAsync1(const Poco::AutoPtr<TestNotification>& pNf);
 	void handleAsync2(const Poco::AutoPtr<TestNotification>& pNf);
