@@ -92,6 +92,13 @@ option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
 # OPENSSL_ROOT_DIR.
 #
 
+# CMake pre-4.1 does not have fixes to find ARM Windows OpenSSL built-in yet.
+# Corrected find script is included with Poco for older version of CMake.
+if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0") 
+    message("Custom FindOpenSSL with updates for ARM64 Windows is used.")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl)
+endif()
+
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
 	find_package(OpenSSL REQUIRED)
 else()
