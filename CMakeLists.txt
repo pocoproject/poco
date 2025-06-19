@@ -209,6 +209,9 @@ if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
+option(ENABLE_CPPUNIT
+	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
+
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
@@ -231,6 +234,9 @@ if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
 	message(STATUS "Building with unit tests")
+	
+	set(ENABLE_CPPUNIT ON CACHE BOOL "Enable CppUnit" FORCE)
+	
 	if(ENABLE_TEST_DEPRECATED)
 		add_compile_definitions(POCO_TEST_DEPRECATED)
 	endif()
@@ -285,6 +291,7 @@ if(ENABLE_TESTS)
 	add_subdirectory(CppUnit)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+	list(APPEND Poco_COMPONENTS "CppUnit")
 endif()
 
 if(ENABLE_ENCODINGS_COMPILER OR ENABLE_APACHECONNECTOR)
@@ -366,6 +373,7 @@ endif()
 
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
+	list(APPEND Poco_COMPONENTS "Foundation")
 endif()
 
 if(ENABLE_ENCODINGS)
