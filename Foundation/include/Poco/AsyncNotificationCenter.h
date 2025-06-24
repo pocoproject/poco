@@ -25,7 +25,7 @@
 #include "Poco/NotificationQueue.h"
 
 #if (POCO_HAVE_CPP20_COMPILER)
-	#if !defined(POCO_HAVE_JTHREAD)
+	#if !(POCO_HAVE_JTHREAD)
 		#pragma message ("NOTE: std::jthread is expected but is not available. Please check your compiler version and settings.")
 	#endif
 #endif
