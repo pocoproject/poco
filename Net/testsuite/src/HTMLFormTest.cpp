@@ -254,7 +254,7 @@ void HTMLFormTest::testReadMultipart()
 		"--MIME_boundary_0123456789--\r\n"
 	);
 	HTTPRequest req("POST", "/form.cgi");
-	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=\"MIME_boundary_0123456789\"");
+	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=MIME_boundary_0123456789");
 	StringPartHandler sah;
 	HTMLForm form(req, istr, sah);
 	assertTrue (form.size() == 4);
@@ -309,9 +309,8 @@ void HTMLFormTest::testSubmit3()
 	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
 	form.prepareSubmit(req);
 	std::string expCT(HTMLForm::ENCODING_MULTIPART);
-	expCT.append("; boundary=\"");
+	expCT.append("; boundary=");
 	expCT.append(form.boundary());
-	expCT.append("\"");
 	assertTrue (req.getContentType() == expCT);
 	assertTrue (req.getChunkedTransferEncoding());
 }
@@ -343,9 +342,8 @@ void HTMLFormTest::testSubmit5()
 	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
 	form.prepareSubmit(req, HTMLForm::OPT_USE_CONTENT_LENGTH);
 	std::string expCT(HTMLForm::ENCODING_MULTIPART);
-	expCT.append("; boundary=\"");
+	expCT.append("; boundary=");
 	expCT.append(form.boundary());
-	expCT.append("\"");
 	assertTrue (req.getContentType() == expCT);
 	assertTrue (req.getContentLength() == 403);
 }
@@ -395,7 +393,7 @@ void HTMLFormTest::testFieldLimitMultipart()
 		"--MIME_boundary_0123456789--\r\n"
 	);
 	HTTPRequest req("POST", "/form.cgi");
-	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=\"MIME_boundary_0123456789\"");
+	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=MIME_boundary_0123456789");
 	StringPartHandler sah;
 	HTMLForm form;
 	form.setFieldLimit(3);
