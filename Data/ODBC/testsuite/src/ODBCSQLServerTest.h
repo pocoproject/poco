@@ -52,6 +52,7 @@ public:
 	void testBigBatch();
 	void testNull() override;
 	void testNullBulk() override;
+	void testUUIDsBulk();
 	void testBulk() override;
 
 	void testStoredProcedure() override;

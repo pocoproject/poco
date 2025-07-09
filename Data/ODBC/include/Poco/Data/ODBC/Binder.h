@@ -327,6 +327,15 @@ public:
 	void bind(std::size_t pos, const UUID& val, Direction dir);
 		/// Binds a UUID.
 
+	void bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir);
+		/// Binds a UUID vector.
+
+	void bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir);
+		/// Binds a UUID deque.
+
+	void bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir);
+		/// Binds a UUID list.
+
 	void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null. In-bound only.
 
@@ -927,6 +936,63 @@ private:
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerDateTime():SQLBindParameter(Time[])");
+		}
+	}
+
+	template<typename C>
+	void bindImplContainerUUID(std::size_t pos, const C& val, Direction dir)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("ODBC::Binder::bindImplContainerUUID():UUID container parameter type can only be inbound.");
+
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerUUID():Containers can only be bound immediately.");
+
+		std::size_t length = val.size();
+
+		if (0 == length)
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerUUID():Empty Containers not allowed.");
+
+		setParamSetSize(length);
+
+		SQLINTEGER size = 16; // UUID is fixed 16 bytes
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, size);
+		}
+
+		if (_charPtrs.size() <= pos)
+			_charPtrs.resize(pos + 1, 0);
+
+		_charPtrs[pos] = (char*)std::calloc(val.size() * size, sizeof(char));
+		std::size_t offset = 0;
+		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
+		{
+			std::vector<char> bytes(16);
+			it->copyTo(bytes.data()); // Extract 16-byte binary data
+			if (bytes.size() != static_cast<std::size_t>(size))
+				throw LengthExceededException("Invalid UUID size");
+			std::memcpy(_charPtrs[pos] + offset, bytes.data(), size);
+			offset += size;
+		}
+
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_BINARY, colSize, decDigits);
+
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT)pos + 1,
+			toODBCDirection(dir),
+			SQL_C_BINARY,
+			SQL_GUID,
+			colSize,
+			decDigits,
+			_charPtrs[pos],
+			(SQLINTEGER)size,
+			&(*_vecLengthIndicator[pos])[0])))
+		{
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerUUID():SQLBindParameter(UUID[])");
 		}
 	}
 
@@ -1576,6 +1642,24 @@ inline void Binder::bind(std::size_t pos, const std::deque<DateTime>& val, Direc
 inline void Binder::bind(std::size_t pos, const std::list<DateTime>& val, Direction dir)
 {
 	bindImplContainerDateTime(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
 }
 
 
