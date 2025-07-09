@@ -20,6 +20,8 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 #include "SQLExecutor.h"
 
 
