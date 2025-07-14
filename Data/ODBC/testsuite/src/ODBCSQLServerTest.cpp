@@ -1143,6 +1143,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUUIDsBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
