@@ -417,6 +417,30 @@ catch(Poco::Exception& ex)
 }
 }
 
+void ODBCSQLServerTest::testUUIDsBulk()
+{
+	try
+	{
+		if (!_pSession) fail("Test not available.");
+
+		_pSession->setFeature("autoBind", true);
+		_pSession->setFeature("autoExtract", true);
+
+		recreateUUIDsTable();
+		int rows = 1000;
+		std::vector<Poco::UUID> uuids(rows);
+		for (int i = 0; i < rows; ++i) {
+			uuids[i]= Poco::UUIDGenerator::defaultGenerator().createRandom();
+		}
+
+		*_pSession << "INSERT INTO Strings VALUES (?)"s, use(uuids, bulk), Poco::Data::Keywords::now;
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+	}
+}
+
 
 void ODBCSQLServerTest::testBulk()
 {
@@ -1119,6 +1143,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUUIDsBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
