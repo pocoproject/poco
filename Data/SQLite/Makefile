@@ -21,6 +21,8 @@ endif
 
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lsqlite3
+else ifdef POCO_SQLITE_UNBUNDLED
+	SYSLIBS += -lsqlite3
 else
 	objects += sqlite3
 endif

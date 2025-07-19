@@ -15,7 +15,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_SQLITE_UNBUNDLED)
 #include <sqlite3.h>
 #else
 #include "sqlite3.h"
