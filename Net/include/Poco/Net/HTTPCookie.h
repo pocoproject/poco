@@ -40,9 +40,15 @@ class Net_API HTTPCookie
 	/// as a comment, path and domain qualifiers, a maximum age, and a
 	/// version number.
 	///
-	/// This class supports both the Version 0 (by Netscape) and Version 1
-	/// (by RFC 2109) cookie specifications. By default, cookies are created
-	/// using Version 0 to ensure the best interoperability.
+	/// This class supports cookies according to RFC 6265.
+	/// Support for RFC 2109 ("Version 1") has been deprecated.
+	///
+	/// Note: "Version 0" cookies were formerly referred to as "Netscape"
+	/// cookies, but were supposed to be replaced with "Version 1" cookies
+	/// defined in RFC 2109 (and later obsoleted by RFC 2965). However,
+	/// However, as stated in RFC 6265, "none of these documents describe 
+	/// how the Cookie and Set-Cookie headers are actually
+	/// used on the Internet".
 {
 public:
 	enum SameSite
@@ -80,10 +86,11 @@ public:
 	HTTPCookie& operator = (const HTTPCookie& cookie);
 		/// Assigns a cookie.
 
+	POCO_DEPRECATED("Support for RFC 2109 cookies has been deprecated")
 	void setVersion(int version);
 		/// Sets the version of the cookie.
 		///
-		/// Version must be either 0 (denoting a Netscape cookie)
+		/// Version must be either 0 (denoting a RFC6265 cookie)
 		/// or 1 (denoting a RFC 2109 cookie).
 
 	int getVersion() const;
@@ -109,6 +116,7 @@ public:
 	const std::string& getValue() const;
 		/// Returns the value of the cookie.
 
+	POCO_DEPRECATED("Support for RFC 2109 cookies has been deprecated")
 	void setComment(const std::string& comment);
 		/// Sets the comment for the cookie.
 		///
@@ -126,11 +134,13 @@ public:
 	void setPath(const std::string& path);
 		/// Sets the path for the cookie.
 
-	void setPriority(const std::string& priority);
-		/// Sets the priority for the cookie.
-
 	const std::string& getPath() const;
 		/// Returns the path for the cookie.
+
+	void setPriority(const std::string& priority);
+		/// Sets the priority for the cookie.
+		///
+		/// This is a non-standard field.
 
 	const std::string& getPriority() const;
 		/// Returns the priority for the cookie.
