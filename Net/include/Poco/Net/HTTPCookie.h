@@ -19,7 +19,6 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/DateTime.h"
 
 
 namespace Poco {
@@ -224,7 +223,6 @@ private:
 	std::string _priority;
 	bool        _secure;
 	int         _maxAge;
-	Poco::DateTime _expires;
 	bool        _httpOnly;
 	SameSite    _sameSite;
 };
