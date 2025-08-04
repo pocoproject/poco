@@ -241,6 +241,11 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX")
 	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
 endif()
 
+# Emscripten currently doesn't support thread names
+if(EMSCRIPTEN)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
+endif()
+
 # iOS
 if(IOS)
 	target_compile_definitions(Foundation
