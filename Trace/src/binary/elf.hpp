@@ -4,7 +4,7 @@
 #include "utils/common.hpp"
 #include "utils/utils.hpp"
 
-#if IS_LINUX
+#if IS_LINUX || IS_FREEBSD
 
 #include <cstdint>
 #include <string>
