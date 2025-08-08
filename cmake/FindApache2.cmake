@@ -28,6 +28,7 @@ find_path(APACHE2_INCLUDE_DIR httpd.h
 		${PC_APACHE2_INCLUDE_DIRS}
 		/usr/include/httpd
 		/usr/local/include/apache2
+		/usr/local/include/apache24
 		/usr/include/apache2
 )
 
