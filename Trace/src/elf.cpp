@@ -1,6 +1,6 @@
 #include "binary/elf.hpp"
 
-#if IS_LINUX
+#if IS_LINUX || IS_FREEBSD
 
 #include <array>
 #include <cstdint>
