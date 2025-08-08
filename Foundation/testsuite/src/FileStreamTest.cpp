@@ -56,6 +56,7 @@ void FileStreamTest::testRead()
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnicodeConverter.h"
 #else
+#include <sys/stat.h>
 #include <fcntl.h>
 #endif
 
