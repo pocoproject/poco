@@ -29,10 +29,10 @@
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/HelpFormatter.h"
 #include "Poco/DNSSD/DNSSDResponder.h"
-#if POCO_OS == POCO_OS_LINUX && !defined(POCO_DNSSD_USE_BONJOUR)
-#include "Poco/DNSSD/Avahi/Avahi.h"
-#else
+#if POCO_OS == POCO_OS_MAC_OS_X
 #include "Poco/DNSSD/Bonjour/Bonjour.h"
+#else
+#include "Poco/DNSSD/Avahi/Avahi.h"
 #endif
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
