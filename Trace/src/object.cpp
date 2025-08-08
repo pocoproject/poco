@@ -9,7 +9,7 @@
 #include <mutex>
 #include <unordered_map>
 
-#if IS_LINUX || IS_APPLE
+#if IS_LINUX || IS_APPLE || IS_FREEBSD
  #include <unistd.h>
  #include <dlfcn.h>
  #if IS_LINUX
@@ -21,7 +21,7 @@
 
 namespace cpptrace {
 namespace detail {
-    #if IS_LINUX || IS_APPLE
+    #if IS_LINUX || IS_APPLE || IS_FREEBSD
     #if defined(CPPTRACE_HAS_DL_FIND_OBJECT) || defined(CPPTRACE_HAS_DLADDR1)
     std::string resolve_l_name(const char* l_name) {
         if(l_name != nullptr && l_name[0] != 0) {

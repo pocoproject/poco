@@ -14,6 +14,9 @@
 #elif defined(__APPLE__)
  #undef IS_APPLE
  #define IS_APPLE 1
+#elif defined(__FreeBSD__)
+ #undef IS_FREEBSD
+ #define IS_FREEBSD 1
 #else
  #error "Unexpected platform"
 #endif
