@@ -43,8 +43,10 @@
 #	include <sys/neutrino.h>
 #endif
 
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
-#	include <sys/prctl.h>
+#ifndef POCO_NO_THREADNAME
+	#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	#	include <sys/prctl.h>
+	#endif
 #endif
 
 #if POCO_OS == POCO_OS_LINUX
