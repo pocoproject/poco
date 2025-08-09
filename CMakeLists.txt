@@ -237,14 +237,12 @@ option(ENABLE_FUZZING
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
-# turn on unbundled sqlite if everything is unbundled
-if(POCO_UNBUNDLED)
-	# set a variable with the same name as the option to avoid caching the option as OFF
-	set(POCO_SQLITE_UNBUNDLED ON)
-endif()
-
 option(POCO_SQLITE_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
+
+if (POCO_UNBUNDLED)
+	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
+endif()
 
 if(ENABLE_TESTS)
 	include(CTest)
