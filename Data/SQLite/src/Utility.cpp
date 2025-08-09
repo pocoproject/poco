@@ -20,7 +20,7 @@
 #include "Poco/String.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_SQLITE_UNBUNDLED)
 #include <sqlite3.h>
 #else
 #include "sqlite3.h"

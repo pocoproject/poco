@@ -18,7 +18,7 @@
 #include "Poco/String.h"
 #include <cstdlib>
 #include <cstring>
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_SQLITE_UNBUNDLED)
 #include <sqlite3.h>
 #else
 #include "sqlite3.h"
