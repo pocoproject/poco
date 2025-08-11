@@ -2288,7 +2288,7 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 } // namespace Dynamic
 
 
-using DynamicAny POCO_DEPRECATED("") = Dynamic::Var;
+using DynamicAny POCO_DEPRECATED("Replace with Poco::Dynamic::Var") = Dynamic::Var;
 
 
 } // namespace Poco
