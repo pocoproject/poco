@@ -96,11 +96,14 @@ if(PCRE2_FOUND AND NOT TARGET Pcre2::Pcre2)
 
   # Determine PCRE2 library type
   set(_PCRE2_LIB_TYPE UNKNOWN)
+#  cmake_path(GET PCRE2_LIBRARY EXTENSION LAST_ONLY _PCRE2_SUFFIX) # CMake 3.20+
   get_filename_component(_PCRE2_SUFFIX ${PCRE2_LIBRARY} LAST_EXT)
   if ("${_PCRE2_SUFFIX}" STREQUAL "${CMAKE_STATIC_LIBRARY_SUFFIX}")
     set(_PCRE2_LIB_TYPE STATIC)
   elseif ("${_PCRE2_SUFFIX}" STREQUAL "${CMAKE_SHARED_LIBRARY_SUFFIX}")
     set(_PCRE2_LIB_TYPE SHARED)
+  elseif ("${_PCRE2_SUFFIX}" STREQUAL ".tbd") # new versions of macOS
+	  set(_PCRE2_LIB_TYPE SHARED)
   endif()
 
   add_library(Pcre2::Pcre2 ${_PCRE2_LIB_TYPE} IMPORTED)
