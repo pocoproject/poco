@@ -17,12 +17,8 @@ target_include_directories(_BUNDLED_ZLIB
 
 if(POCO_UNBUNDLED)
 	find_package(ZLIB REQUIRED)
-
-	message(STATUS "ZLIB UNBUNDLED: ${ZLIB_VERSION}")
 	set_target_properties(ZLIB::ZLIB PROPERTIES IMPORTED_GLOBAL TRUE)
 else()
 	add_library(ZLIB::ZLIB ALIAS _BUNDLED_ZLIB)
-
-	message(STATUS "ZLIB BUNDLED: ${ZLIB_VERSION}")
 endif()
 
