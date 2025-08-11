@@ -28,7 +28,6 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 # The configuration will fail if the packages are not found
 if(POCO_UNBUNDLED)
 	find_package(PCRE2 REQUIRED)
-	find_package(ZLIB REQUIRED)
 	find_package(Utf8Proc REQUIRED)
 
 	# pcre2 source files are linked with Foundation when shared library pcre2 is linked.
@@ -81,19 +80,6 @@ else()
 		src/pcre2_xclass.c
 	)
 
-	POCO_SOURCES(SRCS zlib
-		src/adler32.c
-		src/compress.c
-		src/crc32.c
-		src/deflate.c
-		src/infback.c
-		src/inffast.c
-		src/inflate.c
-		src/inftrees.c
-		src/trees.c
-		src/zutil.c
-	)
-
 	POCO_SOURCES(SRCS utf8proc
 		src/utf8proc.c
 	)
@@ -110,11 +96,13 @@ set_target_properties(Foundation
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PRIVATE Pcre2::Pcre2 ZLIB::ZLIB Utf8Proc::Utf8Proc)
+	target_link_libraries(Foundation PRIVATE Pcre2::Pcre2 Utf8Proc::Utf8Proc)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 else()
 	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
 endif(POCO_UNBUNDLED)
+
+target_link_libraries(Foundation PRIVATE ZLIB::ZLIB)
 
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 

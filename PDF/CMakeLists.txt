@@ -6,26 +6,6 @@ POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
-# If POCO_UNBUNDLED is enabled we try to find the required packages
-# The configuration will fail if the packages are not found
-if(POCO_UNBUNDLED)
-	find_package(ZLIB REQUIRED)
-else()
-	# zlib
-	POCO_SOURCES(SRCS zlib
-		src/adler32.c
-		src/compress.c
-		src/crc32.c
-		src/deflate.c
-		src/infback.c
-		src/inffast.c
-		src/inflate.c
-		src/inftrees.c
-		src/trees.c
-		src/zutil.c
-	)
-endif(POCO_UNBUNDLED)
-
 # TODO: Currently only bundled is supported, in future this should also be possible
 # with an unbundled version of hpdf
 # hpdf
@@ -135,13 +115,14 @@ set_target_properties(PDF
 if(POCO_UNBUNDLED)
 	include_directories(${PNG_INCLUDE_DIR})
 
-	target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
 	target_link_libraries(PDF PUBLIC ${PNG_LIBRARY})
 	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
 else()
 	# libpng: Do not try to use ARM intrinsics on ARM architecture: source files not included
 	target_compile_definitions(PDF PRIVATE PNG_ARM_NEON_OPT=0)
 endif(POCO_UNBUNDLED)
+
+target_link_libraries(PDF PRIVATE ZLIB::ZLIB)
 
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF

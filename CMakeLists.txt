@@ -231,6 +231,8 @@ if (POCO_UNBUNDLED)
 	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
 endif()
 
+add_subdirectory(dependencies)
+
 if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
