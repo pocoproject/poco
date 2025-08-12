@@ -804,6 +804,32 @@ void DatagramSocketTest::testGatherScatterVariableUNIX()
 }
 
 
+void DatagramSocketTest::testLocalUDPConnectionResetWin()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// create a local UDP socket and connect to another local port which doesn't have a UDP socket
+	DatagramSocket socket(SocketAddress("127.0.0.1", 0), true, true);
+
+	socket.connect(SocketAddress("127.0.0.1", 2345));
+
+	// send some data to the socket
+	unsigned char values[5]{};
+	socket.sendBytes(values, 5);
+
+	try
+	{
+		// available calls recvfrom which can cause a "Connection Reset by Peer" error for UDP sockets in Windows due to ICMP packets for remote destination not existing
+		socket.available();
+
+		fail();
+	}
+	catch (const Poco::Net::ConnectionResetException&)
+	{
+	}
+#endif
+}
+
+
 void DatagramSocketTest::setUp()
 {
 }
@@ -831,6 +857,8 @@ CppUnit::Test* DatagramSocketTest::suite()
 #endif
 	CppUnit_addTest(pSuite, DatagramSocketTest, testGatherScatterFixed);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testGatherScatterVariable);
+
+	CppUnit_addTest(pSuite, DatagramSocketTest, testLocalUDPConnectionResetWin);
 
 	return pSuite;
 }
