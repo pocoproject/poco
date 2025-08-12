@@ -17,20 +17,6 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-# If POCO_UNBUNDLED is enabled we try to find the required packages
-# The configuration will fail if the packages are not found
-if(POCO_UNBUNDLED)
-	find_package(EXPAT REQUIRED)
-else()
-	POCO_SOURCES(SRCS expat
-		src/xmlparse.cpp
-		src/xmlrole.c
-		src/xmltok.c
-		src/xmltok_impl.c
-		src/xmltok_ns.c
-	)
-endif(POCO_UNBUNDLED)
-
 add_library(XML ${SRCS})
 
 add_library(Poco::XML ALIAS XML)
@@ -49,17 +35,10 @@ target_include_directories(XML
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_link_libraries(XML PRIVATE EXPAT::EXPAT)
+
 if(POCO_UNBUNDLED)
-	target_link_libraries(XML PRIVATE EXPAT::EXPAT)
 	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
-else()
-	if(WIN32)
-		#TODO: Is XML_STATIC only required with Windows? What does it do?
-		target_compile_definitions(XML PUBLIC XML_STATIC)
-	endif()
-	target_compile_definitions(XML
-		PUBLIC XML_DTD XML_GE
-		PRIVATE XML_NS HAVE_EXPAT_CONFIG_H)
 endif()
 
 POCO_INSTALL(XML)
