@@ -28,7 +28,7 @@ objects = \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
-	PollSetTest UDPServerTest UDPServerTestSuite \
+	PollSetTest UDPServerTest AsyncServerTestSuite \
 	NTLMCredentialsTest
 
 target         = testrunner

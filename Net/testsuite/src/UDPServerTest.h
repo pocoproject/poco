@@ -16,7 +16,6 @@
 
 #include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#include "Poco/Thread.h"
 
 class UDPServerTest: public CppUnit::TestCase
 {
@@ -24,7 +23,13 @@ public:
 	UDPServerTest(const std::string& name);
 	~UDPServerTest();
 
-	void testServer();
+	void testUDPSingleSocket();
+	void testUDPMultiSocket();
+	void testUDPSingleSocketMultipleHandlers();
+	void testUDPMultiSocketMultipleHandlers();
+	void testUDPMultiSocketMultipleHandlersLessSockets();
+	void testUDPMultiSocketMultipleHandlersMoreSockets();
+	void testUDPMultiSocketMultipleHandlersMultipleClients();
 
 	void setUp();
 	void tearDown();
