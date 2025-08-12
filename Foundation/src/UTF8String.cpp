@@ -24,13 +24,7 @@
 #include "Poco/Exception.h"
 #include <algorithm>
 #include <iterator>
-
-
-#if defined(POCO_UNBUNDLED)
 #include <utf8proc.h>
-#else
-#include "utf8proc.h"
-#endif
 
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
