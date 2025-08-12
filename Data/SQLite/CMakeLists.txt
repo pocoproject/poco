@@ -6,15 +6,6 @@ POCO_SOURCES_AUTO(SQLITE_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SQLITE_SRCS ${HDRS_G})
 
-if(POCO_SQLITE_UNBUNDLED)
-	find_package(SQLite3 REQUIRED)
-else()
-	# sqlite3
-	POCO_SOURCES(SQLITE_SRCS sqlite3
-		src/sqlite3.c
-	)
-endif()
-
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
 	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
@@ -38,26 +29,11 @@ target_include_directories(DataSQLite
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_link_libraries(DataSQLite PRIVATE SQLite::SQLite3)
+
 if(POCO_SQLITE_UNBUNDLED)
 	target_link_libraries(DataSQLite PUBLIC SQLite::SQLite3)
 	target_compile_definitions(DataSQLite PUBLIC POCO_SQLITE_UNBUNDLED)
-	target_compile_definitions(DataSQLite PRIVATE
-		SQLITE_THREADSAFE=1
-)
-else()
-	target_compile_definitions(DataSQLite PRIVATE
-		SQLITE_THREADSAFE=1
-		SQLITE_DISABLE_LFS
-		SQLITE_OMIT_UTF16
-		SQLITE_OMIT_PROGRESS_CALLBACK
-		SQLITE_OMIT_COMPLETE
-		SQLITE_OMIT_TCL_VARIABLE
-		SQLITE_OMIT_DEPRECATED
-	)
-	option(ENABLE_DATA_SQLITE_FTS5 "Enable SQLite FTS5 Extension" OFF)
-	if(ENABLE_DATA_SQLITE_FTS5)
-		target_compile_definitions(DataSQLite PRIVATE SQLITE_ENABLE_FTS5)
-	endif()
 endif()
 
 POCO_INSTALL(DataSQLite)
