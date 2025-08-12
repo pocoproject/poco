@@ -3,6 +3,9 @@
 if(POCO_SQLITE_UNBUNDLED)
 	find_package(SQLite3 REQUIRED)
 	set_target_properties(SQLite::SQLite3 PROPERTIES IMPORTED_GLOBAL TRUE)
+
+	message(WARNING "Unbundled SQLite3: Assuming that it was compiled with SQLITE_THREADSAFE=1")
+	target_compile_definitions(SQLite::SQLite3 INTERFACE SQLITE_THREADSAFE=1)
 else()
 
 	# Sources
