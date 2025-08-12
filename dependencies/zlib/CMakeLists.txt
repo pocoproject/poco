@@ -15,6 +15,8 @@ else()
 
 	add_library(_BUNDLED_ZLIB STATIC ${SRCS})
 
+	set_property(TARGET _BUNDLED_ZLIB PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 	target_include_directories(_BUNDLED_ZLIB
 		PUBLIC
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>

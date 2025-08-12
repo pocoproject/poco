@@ -15,6 +15,8 @@ else()
 
 	add_library(_BUNDLED_EXPAT STATIC ${SRCS})
 
+	set_property(TARGET _BUNDLED_EXPAT PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 	target_compile_definitions(
 		_BUNDLED_EXPAT
 		PUBLIC XML_DTD XML_GE XML_STATIC
