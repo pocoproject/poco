@@ -27,7 +27,6 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
 if(POCO_UNBUNDLED)
-	find_package(Utf8Proc REQUIRED)
 
 	# pcre2 source files are linked with Foundation when shared library pcre2 is linked.
 	# When linking pcre2 as static library the symbols are accessible.
@@ -44,11 +43,6 @@ if(POCO_UNBUNDLED)
 
 	unset(_PCRE2TYPE)
 
-else()
-
-	POCO_SOURCES(SRCS utf8proc
-		src/utf8proc.c
-	)
 endif(POCO_UNBUNDLED)
 
 
@@ -62,14 +56,13 @@ set_target_properties(Foundation
 )
 
 if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PRIVATE Utf8Proc::Utf8Proc)
 	target_include_directories(Foundation PRIVATE ${EMBEDDED_PCRE2_INCLUDE})
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 else()
 	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
 endif(POCO_UNBUNDLED)
 
-target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2)
+target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
 
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 
