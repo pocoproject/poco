@@ -237,6 +237,13 @@ option(ENABLE_FUZZING
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
+option(POCO_SQLITE_UNBUNDLED
+	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
+
+if (POCO_UNBUNDLED)
+	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
+endif()
+
 if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
@@ -267,6 +274,9 @@ endif()
 
 if(POCO_UNBUNDLED)
 	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
+elseif (POCO_SQLITE_UNBUNDLED)
+	message(STATUS "Using external sqlite")
+	message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
 else()
 	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
