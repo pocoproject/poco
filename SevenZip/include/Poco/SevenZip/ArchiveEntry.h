@@ -2,7 +2,7 @@
 // ArchiveEntry.h
 //
 // Library: SevenZip
-// Package: Archive
+// Package: SevenZip
 // Module:  ArchiveEntry
 //
 // Definition of the ArchiveEntry class.
