@@ -37,6 +37,8 @@ else()
 
 	set_property(TARGET _BUNDLED_PCRE2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+	target_compile_definitions(_BUNDLED_PCRE2 PUBLIC PCRE2_STATIC)
+
 	target_include_directories(_BUNDLED_PCRE2
 		PUBLIC
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
