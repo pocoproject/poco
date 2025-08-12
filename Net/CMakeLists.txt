@@ -6,10 +6,6 @@ POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
-# Platform Specific
-POCO_SOURCES_AUTO_PLAT(SRCS WIN32 src/wepoll.c)
-POCO_HEADERS_AUTO(SRCS src/wepoll.h)
-
 if (MSVC OR MINGW)
 	set(HAVE_SENDFILE ON)
 else()
@@ -55,6 +51,7 @@ if(WIN32)
 	if (MINGW)
 		target_link_libraries(Net PUBLIC "mswsock.lib")
 	endif()
+	target_link_libraries(Net PRIVATE WEPoll::WEPoll)
 endif(WIN32)
 
 target_include_directories(Net
