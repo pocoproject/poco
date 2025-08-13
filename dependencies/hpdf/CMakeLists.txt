@@ -1,0 +1,25 @@
+
+
+# Sources
+file(GLOB SRCS_G "src/*.c")
+POCO_SOURCES(SRCS hpdf ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "src/*.h")
+POCO_HEADERS(SRCS hpdf ${HDRS_G})
+
+add_library(_BUNDLED_HPDF STATIC ${SRCS})
+
+target_include_directories(_BUNDLED_HPDF
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+)
+
+if (POCO_UNBUNDLED)
+	target_link_libraries(_BUNDLED_HPDF PRIVATE PNG::PNG)
+else()
+	target_link_libraries(_BUNDLED_HPDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>")
+endif()
+
+
+add_library(HPDF::HPDF ALIAS _BUNDLED_HPDF)
