@@ -231,8 +231,6 @@ if (POCO_UNBUNDLED)
 	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
 endif()
 
-add_subdirectory(dependencies)
-
 if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
@@ -259,10 +257,12 @@ if(ENABLE_FUZZING)
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
-elseif (POCO_SQLITE_UNBUNDLED)
-	message(STATUS "Using external sqlite")
-	message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	if (POCO_SQLITE_UNBUNDLED)
+		message(STATUS "Using external sqlite")
+		message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	else()
+		message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
+	endif()
 else()
 	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
@@ -286,6 +286,8 @@ endif()
 
 include(DefinePlatformSpecific)
 add_compile_definitions(POCO_CMAKE)
+
+add_subdirectory(dependencies)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
