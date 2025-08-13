@@ -836,7 +836,7 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure
 
-  linux-gcc-make-odbc:
+  linux-gcc-cmake-odbc:
     runs-on: ubuntu-22.04
     services:
       #mysql:
@@ -890,16 +890,26 @@ jobs:
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
           ls /opt/microsoft/msodbcsql18/include
       - run: ls -l /etc/apt/sources.list.d/
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
+            -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF \
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON
+          cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/PostgreSQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-            ./ci/runtests.sh
+            PWD=`pwd`
+            ctest --output-on-failure
 
   linux-gcc-cmake-sqlite-no-sqlparser:
     runs-on: ubuntu-24.04
