@@ -14,6 +14,9 @@ endif()
 
 add_library(SevenZip ${SRCS})
 add_library(Poco::SevenZip ALIAS SevenZip)
+
+target_link_libraries(SevenZip PRIVATE "$<BUILD_LOCAL_INTERFACE:7Zip::7Zip>")
+
 set_target_properties(SevenZip
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
@@ -22,7 +25,6 @@ set_target_properties(SevenZip
 )
 
 target_link_libraries(SevenZip PUBLIC Poco::Foundation)
-target_link_libraries(SevenZip PRIVATE 7Zip::7Zip)
 
 target_include_directories(SevenZip
 	PUBLIC

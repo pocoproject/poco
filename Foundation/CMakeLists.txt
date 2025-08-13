@@ -42,11 +42,29 @@ if(POCO_UNBUNDLED)
 	endif()
 
 	unset(_PCRE2TYPE)
-
 endif(POCO_UNBUNDLED)
 
-
 add_library(Foundation ${SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
+	target_include_directories(Foundation PRIVATE ${EMBEDDED_PCRE2_INCLUDE})
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+else()
+	# BUILD_LOCAL_INTERFACE is used to ensure that the dependent libraries are used
+	# only in the build process and are not exported.
+	# See also:
+	# https://discourse.cmake.org/t/cmake-error-install-export-projecttargets-includes-target-xxx-which-requires-target-yyy-that-is-not-in-any-export-set/7344/2
+	# https://cmake.org/cmake/help/latest/release/3.26.html#generator-expressions
+	target_link_libraries(
+		Foundation
+		PRIVATE
+			"$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>"
+			"$<BUILD_LOCAL_INTERFACE:Pcre2::Pcre2>"
+			"$<BUILD_LOCAL_INTERFACE:Utf8Proc::Utf8Proc>"
+	)
+	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
+endif()
+
 add_library(Poco::Foundation ALIAS Foundation)
 set_target_properties(Foundation
 	PROPERTIES
@@ -54,15 +72,6 @@ set_target_properties(Foundation
 	OUTPUT_NAME PocoFoundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 )
-
-if(POCO_UNBUNDLED)
-	target_include_directories(Foundation PRIVATE ${EMBEDDED_PCRE2_INCLUDE})
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
-else()
-	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
-endif(POCO_UNBUNDLED)
-
-target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
 
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 

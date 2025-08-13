@@ -16,7 +16,8 @@ else()
 	file(GLOB_RECURSE HDRS_G "src/*.h")
 	POCO_HEADERS(SRCS sqlite3 ${HDRS_G})
 
-	add_library(_BUNDLED_SQLITE3 STATIC ${SRCS})
+	# NOTE: We use object library to be able to link it with static or shared libraries
+	add_library(_BUNDLED_SQLITE3 OBJECT ${SRCS})
 
 	set_property(TARGET _BUNDLED_SQLITE3 PROPERTY POSITION_INDEPENDENT_CODE ON)
 

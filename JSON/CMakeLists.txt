@@ -14,6 +14,9 @@ endif()
 
 add_library(JSON ${SRCS})
 add_library(Poco::JSON ALIAS JSON)
+
+target_link_libraries(JSON PRIVATE "$<BUILD_LOCAL_INTERFACE:PDJson::PDJson>")
+
 set_target_properties(JSON
 	PROPERTIES
 		VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
@@ -28,8 +31,6 @@ target_include_directories(JSON
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-
-target_link_libraries(JSON PRIVATE PDJson::PDJson)
 
 POCO_INSTALL(JSON)
 POCO_GENERATE_PACKAGE(JSON)

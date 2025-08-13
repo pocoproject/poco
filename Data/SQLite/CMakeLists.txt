@@ -13,6 +13,12 @@ if(MSVC AND BUILD_SHARED_LIBS)
 endif()
 
 add_library(DataSQLite ${SQLITE_SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(DataSQLite PRIVATE SQLite::SQLite3)
+	target_compile_definitions(DataSQLite PUBLIC POCO_SQLITE_UNBUNDLED)
+else()
+	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLite::SQLite3>")
+endif()
 
 add_library(Poco::DataSQLite ALIAS DataSQLite)
 set_target_properties(DataSQLite
@@ -28,13 +34,6 @@ target_include_directories(DataSQLite
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-
-target_link_libraries(DataSQLite PRIVATE SQLite::SQLite3)
-
-if(POCO_SQLITE_UNBUNDLED)
-	target_link_libraries(DataSQLite PUBLIC SQLite::SQLite3)
-	target_compile_definitions(DataSQLite PUBLIC POCO_SQLITE_UNBUNDLED)
-endif()
 
 POCO_INSTALL(DataSQLite)
 POCO_GENERATE_PACKAGE(DataSQLite)

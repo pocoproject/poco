@@ -13,7 +13,8 @@ else()
 	file(GLOB_RECURSE HDRS_G "src/*.h")
 	POCO_HEADERS(SRCS expat ${HDRS_G})
 
-	add_library(_BUNDLED_EXPAT STATIC ${SRCS})
+	# NOTE: We use object library to be able to link it with static or shared libraries
+	add_library(_BUNDLED_EXPAT OBJECT ${SRCS})
 
 	set_property(TARGET _BUNDLED_EXPAT PROPERTY POSITION_INDEPENDENT_CODE ON)
 

@@ -34,7 +34,12 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
+
 add_library(Net ${SRCS})
+if(WIN32)
+	target_link_libraries(Net PRIVATE "$<BUILD_LOCAL_INTERFACE:WEPoll::WEPoll>")
+endif()
+
 add_library(Poco::Net ALIAS Net)
 set_target_properties(Net
 	PROPERTIES
@@ -51,7 +56,6 @@ if(WIN32)
 	if (MINGW)
 		target_link_libraries(Net PUBLIC "mswsock.lib")
 	endif()
-	target_link_libraries(Net PRIVATE WEPoll::WEPoll)
 endif(WIN32)
 
 target_include_directories(Net

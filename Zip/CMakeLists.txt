@@ -13,6 +13,13 @@ if(MSVC AND BUILD_SHARED_LIBS)
 endif()
 
 add_library(Zip ${SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(Zip PRIVATE ZLIB::ZLIB)
+	target_compile_definitions(Zip PUBLIC POCO_UNBUNDLED)
+else()
+	target_link_libraries(Zip PRIVATE "$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>")
+endif()
+
 add_library(Poco::Zip ALIAS Zip)
 set_target_properties(Zip
 	PROPERTIES
@@ -28,8 +35,6 @@ target_include_directories(Zip
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-
-target_link_libraries(Zip PRIVATE ZLIB::ZLIB)
 
 POCO_INSTALL(Zip)
 POCO_GENERATE_PACKAGE(Zip)

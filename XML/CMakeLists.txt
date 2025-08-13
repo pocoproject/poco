@@ -18,6 +18,12 @@ if(MSVC AND BUILD_SHARED_LIBS)
 endif()
 
 add_library(XML ${SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(XML PRIVATE EXPAT::EXPAT)
+	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
+else()
+	target_link_libraries(XML PRIVATE "$<BUILD_LOCAL_INTERFACE:EXPAT::EXPAT>")
+endif()
 
 add_library(Poco::XML ALIAS XML)
 set_target_properties(XML
@@ -34,12 +40,6 @@ target_include_directories(XML
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-
-target_link_libraries(XML PRIVATE EXPAT::EXPAT)
-
-if(POCO_UNBUNDLED)
-	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
-endif()
 
 POCO_INSTALL(XML)
 POCO_GENERATE_PACKAGE(XML)

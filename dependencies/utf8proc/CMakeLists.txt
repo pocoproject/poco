@@ -14,7 +14,8 @@ else()
 	file(GLOB_RECURSE HDRS_G "src/*.h")
 	POCO_HEADERS(SRCS utf8proc ${HDRS_G})
 
-	add_library(_BUNDLED_UTF8PROC STATIC ${SRCS})
+	# NOTE: We use object library to be able to link it with static or shared libraries
+	add_library(_BUNDLED_UTF8PROC OBJECT ${SRCS})
 
 	set_property(TARGET _BUNDLED_UTF8PROC PROPERTY POSITION_INDEPENDENT_CODE ON)
 

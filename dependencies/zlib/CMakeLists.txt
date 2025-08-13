@@ -13,7 +13,8 @@ else()
 	file(GLOB_RECURSE HDRS_G "src/*.h")
 	POCO_HEADERS(SRCS zlib ${HDRS_G})
 
-	add_library(_BUNDLED_ZLIB STATIC ${SRCS})
+	# NOTE: We use object library to be able to link it with static or shared libraries
+	add_library(_BUNDLED_ZLIB OBJECT ${SRCS})
 
 	set_property(TARGET _BUNDLED_ZLIB PROPERTY POSITION_INDEPENDENT_CODE ON)
 
