@@ -29,7 +29,7 @@
 #endif
 
 #include "Poco/Foundation.h"
-#include "hpdf.h"
+#include <hpdf.h>
 
 
 //
