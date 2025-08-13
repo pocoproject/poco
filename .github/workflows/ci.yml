@@ -729,12 +729,15 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_MYSQL=ON  -DENABLE_PDF=OFF -DENABLE_TESTS=ON \
-            -DENABLE_ACTIVERECORD=OFF -DENABLE_APACHECONNECTOR=OFF -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF \
-            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF -DENABLE_XML=OFF \
-            -DENABLE_MONGODB=OFF -DENABLE_REDIS=OFF -DENABLE_PDF=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF \
-            -DENABLE_SEVENZIP=OFF -DENABLE_UTIL=OFF -DENABLE_ZIP=OFF \
+          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_MYSQL=ON -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
+            -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF \
             -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_ODBC=OFF
+
           cmake --build cmake-build --target all
 
       - uses: ./.github/actions/retry-action
@@ -773,43 +776,65 @@ jobs:
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
 
-  linux-gcc-make-redis:
-    runs-on: ubuntu-22.04
+  linux-gcc-cmake-redis:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: |
           curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
           sudo apt-get -y update
           sudo apt-get -y install redis
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_REDIS=ON -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
+            -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_MONGODB=OFF \
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=OFF
+          cmake --build cmake-build --target all
+
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus SevenZip Util XML Zip"
-            ./ci/runtests.sh
+            PWD=`pwd`
+            ctest --output-on-failure
 
-  linux-gcc-make-mongodb:
+  linux-gcc-cmake-mongodb:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: supercharge/mongodb-github-action@1.10.0
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL,Encodings,JSON,JWT,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_MONGODB=ON -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
+            -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_REDIS=OFF \
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=OFF
+          cmake --build cmake-build --target all
+
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Data/PostgreSQL Encodings Foundation JSON JWT Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-            ./ci/runtests.sh
+            PWD=`pwd`
+            ctest --output-on-failure
 
   linux-gcc-make-odbc:
     runs-on: ubuntu-22.04
@@ -876,28 +901,30 @@ jobs:
             EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/MySQL Data/PostgreSQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
             ./ci/runtests.sh
 
-  linux-gcc-make-sqlite-no-sqlparser:
-    runs-on: ubuntu-22.04
-    services:
-      mysql:
-        image: mysql:8.1.0
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: pocotest
-          MYSQL_PASSWORD: pocotest
-          MYSQL_DATABASE: pocotest
-        ports:
-          - 3306:3306
+  linux-gcc-cmake-sqlite-no-sqlparser:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: supercharge/mongodb-github-action@1.10.0
       - run: sudo apt -y update
-      - run: ./configure --everything --no-samples --no-sqlparser --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/MySQL,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_SQLITE=ON -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
+            -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF \
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=OFF
+          cmake --build cmake-build --target all
+
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/ODBC Data/MySQL Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-            ./ci/runtests.sh
+            PWD=`pwd`
+            ctest --output-on-failure
