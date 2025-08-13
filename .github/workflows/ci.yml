@@ -713,8 +713,8 @@ jobs:
   #          cd cmake-build;
   #          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Debug
 
-  linux-gcc-make-mysql:
-    runs-on: ubuntu-22.04
+  linux-gcc-cmake-mysql:
+    runs-on: ubuntu-24.04
     services:
       mysql:
         image: mysql:8.1.0
@@ -727,17 +727,27 @@ jobs:
           - 3306:3306
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev  mysql-client
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/PostgreSQL,Data/SQLite,Data/ODBC,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_MYSQL=ON  -DENABLE_PDF=OFF -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_APACHECONNECTOR=OFF -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF -DENABLE_XML=OFF \
+            -DENABLE_MONGODB=OFF -DENABLE_REDIS=OFF -DENABLE_PDF=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_UTIL=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_ODBC=OFF
+          cmake --build cmake-build --target all
+
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/PostgreSQL Data/ODBC Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-            ./ci/runtests.sh
+            PWD=`pwd`
+            ctest --output-on-failure
+
 
   # TODO tests sometimes failing on testTransaction and testReconnect
   linux-gcc-make-postgres:
