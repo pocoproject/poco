@@ -903,7 +903,7 @@ jobs:
       - uses: supercharge/mongodb-github-action@1.10.0
       - run: sudo apt -y update
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_SQLITE=ON -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON \
+          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_SQLITE=ON -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON \
             -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
             -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
             -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
