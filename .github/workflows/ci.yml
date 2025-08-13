@@ -282,102 +282,16 @@ jobs:
             ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
             make all -s -j6 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
-  macos-clang-make:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          ./configure --everything --no-prefix --omit=PDF
-          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
-          --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
-          make all -s -j6
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            sudo -s
-            CPPUNIT_IGNORE="
-            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<SyslogTest>.testOldBSD,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
-            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
-            ./ci/runtests.sh
-
-  macos-clang-make-visibility-hidden:
-    # macos-13 runs on Intel CPU
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          ./configure --everything --no-prefix --cflags="-fvisibility=hidden" --omit=PDF
-          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
-          --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
-          make all -s -j6
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            sudo -s
-            CPPUNIT_IGNORE="
-            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<SyslogTest>.testOldBSD,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
-            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
-            ./ci/runtests.sh
-
-#
-# https://github.com/pocoproject/poco/issues/4764
-#
-#  macos-clang-cmake-openssl:
-#    # macos-latest runs on Apple Silicon
-#    runs-on: macos-latest
-#    steps:
-#      - uses: actions/checkout@v4
-#      - run: brew install openssl@1.1 mysql-client unixodbc libpq
-#      - run: cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TRACE=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
-#      - uses: ./.github/actions/retry-action
-#        with:
-#          timeout_minutes: 90
-#          max_attempts: 3
-#          retry_on: any
-#          command: >-
-#            cd cmake-build &&
-#            sudo -s
-#            CPPUNIT_IGNORE="
-#            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-#            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-#            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-#            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-#            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-#            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-#            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
-#            PWD=`pwd`
-#            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
-
   macos-clang-18-cmake-openssl3:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: CXX=$(brew --prefix llvm@18)/bin/clang++ CC=$(brew --prefix llvm@18)/bin/clang cmake -S. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: >-
+          CXX=$(brew --prefix llvm@18)/bin/clang++ CC=$(brew --prefix llvm@18)/bin/clang \
+            cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_PDF=OFF -DENABLE_TESTS=ON \
+            -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client
+          cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -402,7 +316,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_ENCODINGS_COMPILER=ON -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: >-
+          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_ENCODINGS_COMPILER=ON -DENABLE_PDF=ON \
+            -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_TESTS=ON \
+            -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
+            -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client
+          cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            CPPUNIT_IGNORE="
+            CppUnit::TestCaller<ThreadTest>.testTrySleep,
+            CppUnit::TestCaller<TimestampTest>.testTimestamp,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
+            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
+            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+
+  macos-clang-cmake-openssl3-visibility-hidden-intel:
+    runs-on: macos-13
+    # macos-13 runs on Intel CPU
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: >-
+          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_ENCODINGS_COMPILER=ON -DENABLE_PDF=ON \
+            -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_TESTS=ON \
+            -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
+            -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client
+          cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -734,7 +684,7 @@ jobs:
             -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
             -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
             -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
-            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
             -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF \
             -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_ODBC=OFF
 
@@ -753,7 +703,7 @@ jobs:
 
 
   # TODO tests sometimes failing on testTransaction and testReconnect
-  linux-gcc-make-postgres:
+  linux-gcc-cmake-postgres:
     runs-on: ubuntu-22.04
     services:
       postgres:
@@ -765,16 +715,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
-      - run: ./configure --everything --no-samples --omit=ActiveRecord,ApacheConnector,CppParser,Crypto,Data/MySQL,Data/ODBC,Data/SQLite,Encodings,JSON,JWT,MongoDB,Net,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,Prometheus,Redis,SevenZip,Util,XML,Zip && make all -s -j6 && sudo make install
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_POSTGRESQL=ON -DENABLE_TESTS=ON \
+            -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF \
+            -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
+            -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
+            -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
+            -DENABLE_MONGODB=OFF -DENABLE_REDIS=OFF \
+            -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
+          cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            EXCLUDE_TESTS="ActiveRecord ApacheConnector CppParser CppUnit Crypto Data Data/ODBC Data/MySQL Data/SQLite Encodings Foundation JSON JWT MongoDB Net NetSSL_OpenSSL NetSSL_Win PDF PageCompiler PocoDoc ProGen Prometheus Redis SevenZip Util XML Zip"
-            ./ci/runtests.sh
+            PWD=`pwd`
+            ctest --output-on-failure
 
   linux-gcc-cmake-redis:
     runs-on: ubuntu-24.04
@@ -792,11 +752,10 @@ jobs:
             -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
             -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
             -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
-            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
             -DENABLE_MONGODB=OFF \
-            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=OFF
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
           cmake --build cmake-build --target all
-
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -820,9 +779,9 @@ jobs:
             -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
             -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
             -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
-            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
             -DENABLE_REDIS=OFF \
-            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=OFF
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
           cmake --build cmake-build --target all
 
       - uses: ./.github/actions/retry-action
@@ -896,9 +855,9 @@ jobs:
             -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
             -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
             -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
-            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
             -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF \
-            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
           cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -923,9 +882,9 @@ jobs:
             -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF \
             -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF \
             -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF \
-            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_FILE2PAGE=OFF \
+            -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
             -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF \
-            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=OFF
+            -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
           cmake --build cmake-build --target all
 
       - uses: ./.github/actions/retry-action
