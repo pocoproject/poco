@@ -19,6 +19,13 @@ add_library(PDF ${SRCS})
 
 target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:HPDF::HPDF>")
 
+if (POCO_UNBUNDLED)
+	target_link_libraries(PDF PRIVATE PNG::PNG)
+else()
+	target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>")
+endif()
+
+
 add_library(Poco::PDF ALIAS PDF)
 set_target_properties(PDF
 	PROPERTIES
