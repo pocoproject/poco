@@ -287,8 +287,6 @@ endif()
 include(DefinePlatformSpecific)
 add_compile_definitions(POCO_CMAKE)
 
-add_subdirectory(dependencies)
-
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
@@ -405,6 +403,8 @@ if(ENABLE_DATA_ODBC)
 endif()
 
 # - add required subdirectories
+
+add_subdirectory(dependencies)
 
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
