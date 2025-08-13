@@ -14,7 +14,7 @@ else()
 	POCO_HEADERS(SRCS zlib ${HDRS_G})
 
 	# NOTE: We use object library to be able to link it with static or shared libraries
-	add_library(_BUNDLED_ZLIB OBJECT ${SRCS})
+	add_library(_BUNDLED_ZLIB OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 	set_property(TARGET _BUNDLED_ZLIB PROPERTY POSITION_INDEPENDENT_CODE ON)
 

@@ -8,7 +8,7 @@ POCO_SOURCES(SRCS hpdf ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS(SRCS hpdf ${HDRS_G})
 
-add_library(_BUNDLED_HPDF STATIC ${SRCS})
+add_library(_BUNDLED_HPDF OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 target_include_directories(_BUNDLED_HPDF
 	PUBLIC
@@ -20,6 +20,5 @@ if (POCO_UNBUNDLED)
 else()
 	target_link_libraries(_BUNDLED_HPDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>")
 endif()
-
 
 add_library(HPDF::HPDF ALIAS _BUNDLED_HPDF)

@@ -1,8 +1,14 @@
 
 
-if(POCO_UNBUNDLED)
-	find_package(PNG REQUIRED)
-	set_target_properties(PNG::PNG PROPERTIES IMPORTED_GLOBAL TRUE)
+if(POCO_UNBUNDLED)	
+	if (ENABLE_PDF)
+		find_package(PNG REQUIRED)
+	else()
+		find_package(PNG)
+	endif()
+	if (PNG_FOUND)
+		set_target_properties(PNG::PNG PROPERTIES IMPORTED_GLOBAL TRUE)
+	endif()
 else()
 
 	# Sources
@@ -14,7 +20,7 @@ else()
 	POCO_HEADERS(SRCS png ${HDRS_G})
 
 	# NOTE: We use object library to be able to link it with static or shared libraries
-	add_library(_BUNDLED_PNG OBJECT ${SRCS})
+	add_library(_BUNDLED_PNG OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 	set_property(TARGET _BUNDLED_PNG PROPERTY POSITION_INDEPENDENT_CODE ON)
 

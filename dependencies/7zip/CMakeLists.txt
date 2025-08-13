@@ -50,7 +50,7 @@ file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS(SRCS 7zip ${HDRS_G})
 
 # NOTE: We use object library to be able to link it with static or shared libraries
-add_library(_BUNDLED_7ZIP OBJECT ${SRCS})
+add_library(_BUNDLED_7ZIP OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 set_property(TARGET _BUNDLED_7ZIP PROPERTY POSITION_INDEPENDENT_CODE ON)
 

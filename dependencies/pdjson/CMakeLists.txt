@@ -9,7 +9,7 @@ file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS(SRCS pdjson ${HDRS_G})
 
 # NOTE: We use object library to be able to link it with static or shared libraries
-add_library(_BUNDLED_PDJSON OBJECT ${SRCS})
+add_library(_BUNDLED_PDJSON OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 set_property(TARGET _BUNDLED_PDJSON PROPERTY POSITION_INDEPENDENT_CODE ON)
 

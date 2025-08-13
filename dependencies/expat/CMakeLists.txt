@@ -1,8 +1,14 @@
 
 
 if(POCO_UNBUNDLED)
-	find_package(EXPAT REQUIRED)
-	set_target_properties(EXPAT::EXPAT PROPERTIES IMPORTED_GLOBAL TRUE)
+	if (ENABLE_XML)
+		find_package(EXPAT REQUIRED)
+	else()
+		find_package(EXPAT)
+	endif()
+	if (EXPAT_FOUND)
+		set_target_properties(EXPAT::EXPAT PROPERTIES IMPORTED_GLOBAL TRUE)
+	endif()
 else()
 
 	# Sources
@@ -14,7 +20,7 @@ else()
 	POCO_HEADERS(SRCS expat ${HDRS_G})
 
 	# NOTE: We use object library to be able to link it with static or shared libraries
-	add_library(_BUNDLED_EXPAT OBJECT ${SRCS})
+	add_library(_BUNDLED_EXPAT OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 	set_property(TARGET _BUNDLED_EXPAT PROPERTY POSITION_INDEPENDENT_CODE ON)
 

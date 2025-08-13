@@ -1,11 +1,16 @@
 
 
 if(POCO_SQLITE_UNBUNDLED)
-	find_package(SQLite3 REQUIRED)
-	set_target_properties(SQLite::SQLite3 PROPERTIES IMPORTED_GLOBAL TRUE)
-
-	message(WARNING "Unbundled SQLite3: Assuming that it was compiled with SQLITE_THREADSAFE=1")
-	target_compile_definitions(SQLite::SQLite3 INTERFACE SQLITE_THREADSAFE=1)
+	if (ENABLE_DATA_SQLITE)
+		find_package(SQLite3 REQUIRED)
+	else()
+		find_package(SQLite3)
+	endif()
+	if (SQLite3_FOUND)
+		set_target_properties(SQLite::SQLite3 PROPERTIES IMPORTED_GLOBAL TRUE)
+		message(WARNING "Unbundled SQLite3: Assuming that it was compiled with SQLITE_THREADSAFE=1")
+		target_compile_definitions(SQLite::SQLite3 INTERFACE SQLITE_THREADSAFE=1)
+	endif()
 else()
 
 	# Sources
@@ -17,7 +22,7 @@ else()
 	POCO_HEADERS(SRCS sqlite3 ${HDRS_G})
 
 	# NOTE: We use object library to be able to link it with static or shared libraries
-	add_library(_BUNDLED_SQLITE3 OBJECT ${SRCS})
+	add_library(_BUNDLED_SQLITE3 OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 	set_property(TARGET _BUNDLED_SQLITE3 PROPERTY POSITION_INDEPENDENT_CODE ON)
 

@@ -34,7 +34,7 @@ else()
 	POCO_HEADERS(SRCS pcre2 ${HDRS_G})
 
 	# NOTE: We use object library to be able to link it with static or shared libraries
-	add_library(_BUNDLED_PCRE2 OBJECT ${SRCS})
+	add_library(_BUNDLED_PCRE2 OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 	set_property(TARGET _BUNDLED_PCRE2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 
