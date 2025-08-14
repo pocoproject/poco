@@ -73,6 +73,10 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 )
 
+if (NOT POCO_SOO)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_SOO)
+endif()
+
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 
 target_include_directories(Foundation

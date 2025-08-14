@@ -227,6 +227,9 @@ option(POCO_UNBUNDLED
 option(POCO_SQLITE_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
 
+option(POCO_SOO
+	"Set to OFF|ON (default is ON) to control small object optimization in Poco::Foundation" ON)
+
 if (POCO_UNBUNDLED)
 	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
 endif()
