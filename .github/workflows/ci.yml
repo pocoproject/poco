@@ -66,22 +66,6 @@ jobs:
             EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
             ./ci/runtests.sh
 
-  linux-gcc-make-trace:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
-      - run: ./configure --everything --trace && make all -s -j4 && sudo make install
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            sudo -s
-            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
-            ./ci/runtests.sh "" d
-
   linux-gcc-make-cxx20:
     runs-on: ubuntu-24.04
     steps:
@@ -255,6 +239,28 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
+  linux-gcc-cmake-trace:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
+      - run: >-
+          cmake -S. -Bcmake-build -DENABLE_TRACE=ON -DENABLE_TESTS=ON \
+            -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON \
+            -DENABLE_SEVENZIP=ON -DENABLE_MONGODB=ON \
+            -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
+          cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
   linux-emscripten-cmake:
     runs-on: ubuntu-24.04
     steps:
@@ -398,35 +404,56 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
-  macos-clang-make-openssl3-tsan:
+  macos-clang-cmake-trace:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - run: brew install openssl@3
+      - run: brew install openssl@3 mysql-client unixodbc libpq
       - run: >-
-          ./configure --everything --no-prefix --no-samples --omit=CppParser,Encodings,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,PageCompiler,PDF,PocoDoc,ProGen,Redis,SevenZip
-          --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib
-          --mysql-include=/usr/local/opt/mysql-client/include --mysql-lib=/usr/local/opt/mysql-client/lib
-          --include-path="/usr/local/opt/openssl@3/include" --library-path="/usr/local/opt/openssl@3/lib" &&
-          make all -s -j6 SANITIZEFLAGS=-fsanitize=thread
-
+          cmake -S. -Bcmake-build -DENABLE_TRACE=ON -DENABLE_TESTS=ON \
+            -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON \
+            -DENABLE_SEVENZIP=ON -DENABLE_REDIS=ON \
+            -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON \
+            -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/ \
+            -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
+          cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
+            cd cmake-build &&
             sudo -s
-            CPPUNIT_IGNORE="
-            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
-            EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
-            ./ci/runtests.sh TSAN
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
+  macos-clang-cmake-openssl3-tsan:
+    runs-on: macos-15
+    env:
+      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: >-
+          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON \
+            -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON \
+            -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON \
+            -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON \
+            -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/ \
+            -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
+          cmake --build cmake-build --target all
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            echo TSAN options: ${TSAN_OPTIONS}
+            sudo -s
+            PWD=`pwd`
+            ctest -V -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   macos-clang-make-openssl3-ubsan:
     runs-on: macos-13
