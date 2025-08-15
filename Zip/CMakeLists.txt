@@ -17,7 +17,10 @@ if (POCO_UNBUNDLED)
 	target_link_libraries(Zip PRIVATE ZLIB::ZLIB)
 	target_compile_definitions(Zip PUBLIC POCO_UNBUNDLED)
 else()
-	target_link_libraries(Zip PRIVATE "$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>")
+	# zlib is already linked with Foundation, we only needs headers.
+	target_include_directories(Zip
+		PRIVATE $<TARGET_PROPERTY:ZLIB::ZLIB,INCLUDE_DIRECTORIES>
+	)
 endif()
 
 add_library(Poco::Zip ALIAS Zip)
