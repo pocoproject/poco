@@ -263,8 +263,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev
+      # Foundation tests do not link with vptr sanitizer. Disable it.
+      # /usr/bin/ld: CMakeFiles/Foundation-testrunner.dir/src/ClassLoaderTest.cpp.o:(.data.rel+0x18): undefined reference to `typeinfo for TestPlugin'
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=undefined" -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -528,8 +530,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
+      # Foundation tests do not link with vptr sanitizer. Disable it.
+      # Undefined symbols for architecture arm64:
+      #   "typeinfo for TestPlugin", referenced from:
+      #     l___unnamed_346 in ClassLoaderTest.cpp.o
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=undefined" -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
