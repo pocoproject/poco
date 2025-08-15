@@ -1,7 +1,9 @@
 CppUnit::TestCaller<ThreadTest>.testSleep
 CppUnit::TestCaller<ExpireCacheTest>.testAccessExpireN
-CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN
 CppUnit::TestCaller<ExpireCacheTest>.testExpireN
+CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN
+CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN
+CppUnit::TestCaller<UniqueExpireCacheTest>.testAccessExpireN
 CppUnit::TestCaller<UniqueExpireCacheTest>.testExpireN
 CppUnit::TestCaller<FileChannelTest>.testPurgeAge
 CppUnit::TestCaller<FileTest>.testFileAttributes2
@@ -14,6 +16,7 @@ CppUnit::TestCaller<TimerTest>.testScheduleInterval
 CppUnit::TestCaller<TimerTest>.testScheduleIntervalClock
 CppUnit::TestCaller<TimerTest>.testScheduleIntervalTimestamp
 CppUnit::TestCaller<TimerTest>.testTimer
+CppUnit::TestCaller<TimestampTest>.testTimestamp
 CppUnit::TestCaller<SocketAddressTest>.testSocketAddress
 CppUnit::TestCaller<RawSocketTest>.testEchoIPv4
 CppUnit::TestCaller<RawSocketTest>.testSendToReceiveFromIPv4
