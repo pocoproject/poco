@@ -95,7 +95,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
@@ -115,7 +114,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
@@ -137,7 +135,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
@@ -159,7 +156,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
@@ -169,7 +165,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
-          cmake -S. -Bcmake-build -DENABLE_TRACE=ON -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -GNinja -DENABLE_TRACE=ON -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
           -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
@@ -186,7 +182,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
 
@@ -204,7 +199,7 @@ jobs:
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -220,7 +215,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest -V
 
@@ -238,7 +232,7 @@ jobs:
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DPOCO_SOO=OFF -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DPOCO_SOO=OFF -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -254,7 +248,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest -V
 
@@ -266,7 +259,7 @@ jobs:
       # Foundation tests do not link with vptr sanitizer. Disable it.
       # /usr/bin/ld: CMakeFiles/Foundation-testrunner.dir/src/ClassLoaderTest.cpp.o:(.data.rel+0x18): undefined reference to `typeinfo for TestPlugin'
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -282,12 +275,13 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest -V
 
   linux-gcc-cmake-tsan:
     runs-on: ubuntu-24.04
+    env:
+      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -300,7 +294,7 @@ jobs:
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -316,8 +310,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
-            TSAN_OPTIONS="suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
             PWD=`pwd`
             ctest -V
 
@@ -382,7 +374,7 @@ jobs:
           -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=OFF
           -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
           -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -391,14 +383,6 @@ jobs:
           command: >-
             cd cmake-build &&
             sudo -s
-            CPPUNIT_IGNORE="
-            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -414,7 +398,7 @@ jobs:
           -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
           -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
           -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -423,14 +407,6 @@ jobs:
           command: >-
             cd cmake-build &&
             sudo -s
-            CPPUNIT_IGNORE="
-            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -447,7 +423,7 @@ jobs:
           -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
           -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client/
           -DPostgreSQL_ROOT=/usr/local/opt/libpq
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -456,14 +432,6 @@ jobs:
           command: >-
             cd cmake-build &&
             sudo -s
-            CPPUNIT_IGNORE="
-            CppUnit::TestCaller<ThreadTest>.testTrySleep,
-            CppUnit::TestCaller<TimestampTest>.testTimestamp,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN,
-            CppUnit::TestCaller<ExpireLRUCacheTest>.testAccessExpireN,
-            CppUnit::TestCaller<PollSetTest>.testPollClosedServer"
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -482,7 +450,7 @@ jobs:
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_SQLITE=OFF
           -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -510,15 +478,16 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
-            echo TSAN options: ${TSAN_OPTIONS} &&
             cd cmake-build &&
+            sudo -s
+            TSAN_OPTIONS=${TSAN_OPTIONS}
             PWD=`pwd`
             ctest -V
 
@@ -540,7 +509,7 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -566,7 +535,7 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -694,7 +663,7 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
           -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --config Release
+      - run: cmake --build cmake-build --config Release --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -723,7 +692,7 @@ jobs:
           cmake -S. -Bcmake-build -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
           -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --config Release
+      - run: cmake --build cmake-build --config Release --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -752,7 +721,7 @@ jobs:
           cmake -S. -Bcmake-build -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
           -DENABLE_DATA_POSTGRESQL=OFF
-      - run: cmake --build cmake-build --config Release
+      - run: cmake --build cmake-build --config Release --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -819,7 +788,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
 
@@ -854,7 +822,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
 
@@ -885,7 +852,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
 
@@ -913,7 +879,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
 
@@ -988,7 +953,6 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
 
@@ -1016,6 +980,5 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest --output-on-failure
