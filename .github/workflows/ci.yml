@@ -288,8 +288,6 @@ jobs:
 
   linux-gcc-cmake-tsan:
     runs-on: ubuntu-24.04
-    env:
-      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
     steps:
       - uses: actions/checkout@v4
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -317,9 +315,9 @@ jobs:
           max_attempts: 3
           retry_on: any
           command: >-
-            echo TSAN options: ${TSAN_OPTIONS} &&
             cd cmake-build &&
             sudo -s
+            TSAN_OPTIONS="suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
             PWD=`pwd`
             ctest -V
 
@@ -521,7 +519,6 @@ jobs:
           command: >-
             echo TSAN options: ${TSAN_OPTIONS} &&
             cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest -V
 
