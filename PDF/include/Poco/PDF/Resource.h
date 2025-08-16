@@ -19,7 +19,7 @@
 
 
 #include "Poco/PDF/PDF.h"
-#include <vector>
+#include "Poco/PDF/Declarations.h"
 
 
 namespace Poco {
@@ -31,7 +31,9 @@ class Resource
 	/// A Resource represents a PDF resource resource.
 {
 public:
-	typedef R Type;
+	using Type = R;
+
+	Resource() = delete;
 
 	Resource(HPDF_Doc* pPDF, const R& resource, const std::string& name = ""):
 		_pPDF(pPDF),
@@ -51,8 +53,7 @@ public:
 
 	virtual ~Resource()
 		/// Destroys the resource.
-	{
-	}
+		= default;
 
 	Resource& operator = (const Resource& resource)
 		/// Assignment operator.
@@ -95,31 +96,19 @@ protected:
 	}
 
 private:
-	Resource();
 
 	HPDF_Doc*   _pPDF;
 	R           _resource;
 	std::string _name;
 };
 
-
 //
 // typedefs
 //
 
 //typedef Resource<HPDF_Annotation>  Annotation;
-typedef Resource<HPDF_ExtGState>   ExtGraphicsState;
+using ExtGraphicsState = Resource<HPDF_ExtGState>;
 
-typedef HPDF_TransMatrix         TransMatrix;
-typedef HPDF_Rect                Rectangle;
-typedef HPDF_Point               Point;
-typedef HPDF_LineCap             LineCap;
-typedef HPDF_LineJoin            LineJoin;
-typedef HPDF_DashMode            DashMode;
-typedef HPDF_RGBColor            RGBColor;
-typedef HPDF_CMYKColor           CMYKColor;
-typedef std::vector<HPDF_UINT16> PatternVec;
-typedef HPDF_TextWidth           TextWidth;
 
 } } // namespace Poco::PDF
 

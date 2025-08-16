@@ -27,19 +27,14 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
 if(POCO_UNBUNDLED)
-	find_package(PCRE2 REQUIRED)
-	find_package(ZLIB REQUIRED)
-	find_package(Utf8Proc REQUIRED)
 
 	# pcre2 source files are linked with Foundation when shared library pcre2 is linked.
 	# When linking pcre2 as static library the symbols are accessible.
 	get_target_property(_PCRE2TYPE Pcre2::Pcre2 TYPE)
 	if("${_PCRE2TYPE}" STREQUAL "SHARED_LIBRARY")
-		#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
-		POCO_SOURCES(SRCS RegExp
-			src/pcre2_ucd.c
-			src/pcre2_tables.c
-		)
+		# HACK: Unicode.cpp requires functions from these files.
+		# They can't be used directly from the library
+		POCO_SOURCES(SRCS RegExp ${EMBEDDED_PCRE2_SOURCES} )
 	elseif ("${_PCRE2TYPE}" STREQUAL "STATIC_LIBRARY")
 		message(STATUS "PCRE2: linking static library.")
 	else()
@@ -47,60 +42,29 @@ if(POCO_UNBUNDLED)
 	endif()
 
 	unset(_PCRE2TYPE)
-
-else()
-	# pcre2
-	POCO_SOURCES(SRCS pcre2
-		src/pcre2_auto_possess.c
-		src/pcre2_chartables.c
-		src/pcre2_chkdint.c
-		src/pcre2_compile.c
-		src/pcre2_config.c
-		src/pcre2_context.c
-		src/pcre2_convert.c
-		src/pcre2_dfa_match.c
-		src/pcre2_error.c
-		src/pcre2_extuni.c
-		src/pcre2_find_bracket.c
-		src/pcre2_jit_compile.c
-		src/pcre2_maketables.c
-		src/pcre2_match.c
-		src/pcre2_match_data.c
-		src/pcre2_newline.c
-		src/pcre2_ord2utf.c
-		src/pcre2_pattern_info.c
-		src/pcre2_script_run.c
-		src/pcre2_serialize.c
-		src/pcre2_string_utils.c
-		src/pcre2_study.c
-		src/pcre2_substitute.c
-		src/pcre2_substring.c
-		src/pcre2_tables.c
-		src/pcre2_ucd.c
-		src/pcre2_valid_utf.c
-		src/pcre2_xclass.c
-	)
-
-	POCO_SOURCES(SRCS zlib
-		src/adler32.c
-		src/compress.c
-		src/crc32.c
-		src/deflate.c
-		src/infback.c
-		src/inffast.c
-		src/inflate.c
-		src/inftrees.c
-		src/trees.c
-		src/zutil.c
-	)
-
-	POCO_SOURCES(SRCS utf8proc
-		src/utf8proc.c
-	)
 endif(POCO_UNBUNDLED)
 
-
 add_library(Foundation ${SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
+	target_include_directories(Foundation PRIVATE ${EMBEDDED_PCRE2_INCLUDE})
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+else()
+	# BUILD_LOCAL_INTERFACE is used to ensure that the dependent libraries are used
+	# only in the build process and are not exported.
+	# See also:
+	# https://discourse.cmake.org/t/cmake-error-install-export-projecttargets-includes-target-xxx-which-requires-target-yyy-that-is-not-in-any-export-set/7344/2
+	# https://cmake.org/cmake/help/latest/release/3.26.html#generator-expressions
+	target_link_libraries(
+		Foundation
+		PRIVATE
+			"$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>"
+			"$<BUILD_LOCAL_INTERFACE:Pcre2::Pcre2>"
+			"$<BUILD_LOCAL_INTERFACE:Utf8Proc::Utf8Proc>"
+	)
+	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
+endif()
+
 add_library(Poco::Foundation ALIAS Foundation)
 set_target_properties(Foundation
 	PROPERTIES
@@ -109,12 +73,9 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 )
 
-if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PRIVATE Pcre2::Pcre2 ZLIB::ZLIB Utf8Proc::Utf8Proc)
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
-else()
-	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
-endif(POCO_UNBUNDLED)
+if (NOT POCO_SOO)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_SOO)
+endif()
 
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 

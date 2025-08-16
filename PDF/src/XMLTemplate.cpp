@@ -2,37 +2,36 @@
 // XMLTemplate.cpp
 //
 
-
 #include "Poco/PDF/XMLTemplate.h"
-#include "Poco/PDF/Table.h"
-#include "Poco/SAX/SAXParser.h"
-#include "Poco/SAX/DefaultHandler.h"
-#include "Poco/SAX/Attributes.h"
-#include "Poco/SAX/InputSource.h"
-#include "Poco/Util/PropertyFileConfiguration.h"
-#include "Poco/FileStream.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
+#include "Poco/FileStream.h"
+#include "Poco/PDF/Table.h"
 #include "Poco/Path.h"
+#include "Poco/SAX/Attributes.h"
+#include "Poco/SAX/DefaultHandler.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/SAX/SAXParser.h"
+#include "Poco/String.h"
 #include "Poco/TextConverter.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF8String.h"
-#include <vector>
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include <algorithm>
+#include <hpdf.h>
+#include <ranges>
 #include <set>
 #include <sstream>
-#include <algorithm>
-
+#include <vector>
 
 namespace Poco {
 namespace PDF {
 
-
 class StackedConfiguration : public Poco::Util::AbstractConfiguration
 {
 public:
-	typedef Poco::AutoPtr<Poco::Util::AbstractConfiguration> ConfigPtr;
-	typedef std::vector<ConfigPtr> ConfigStack;
+	using ConfigPtr = Poco::AutoPtr<Poco::Util::AbstractConfiguration>;
+	using ConfigStack = std::vector<ConfigPtr>;
 
 	void push(ConfigPtr pConfig)
 	{
@@ -61,43 +60,43 @@ public:
 	}
 
 	// AbstractConfiguration
-	bool getRaw(const std::string& key, std::string& value) const
+	bool getRaw(const std::string& key, std::string& value) const override
 	{
-		for (ConfigStack::const_reverse_iterator it = _stack.rbegin(); it != _stack.rend(); ++it)
+		for (const auto& it : std::ranges::reverse_view(_stack))
 		{
-			if ((*it)->has(key))
+			if (it->has(key))
 			{
-				value = (*it)->getRawString(key);
+				value = it->getRawString(key);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	void setRaw(const std::string& key, const std::string& value)
+	void setRaw(const std::string& key, const std::string& value) override
 	{
 		throw Poco::InvalidAccessException("not writable");
 	}
 
-	void enumerate(const std::string& key, Poco::Util::AbstractConfiguration::Keys& range) const
+	void enumerate(const std::string& key, Poco::Util::AbstractConfiguration::Keys& range) const override
 	{
 		std::set<std::string> keys;
-		for (ConfigStack::const_iterator itc = _stack.begin(); itc != _stack.end(); ++itc)
+		for (const auto& itc : _stack)
 		{
 			Poco::Util::AbstractConfiguration::Keys partRange;
-			(*itc)->keys(key, partRange);
-			for (Poco::Util::AbstractConfiguration::Keys::const_iterator itr = partRange.begin(); itr != partRange.end(); ++itr)
+			itc->keys(key, partRange);
+			for (const auto& itr : partRange)
 			{
-				if (keys.find(*itr) == keys.end())
+				if (keys.find(itr) == keys.end())
 				{
-					range.push_back(*itr);
-					keys.insert(*itr);
+					range.push_back(itr);
+					keys.insert(itr);
 				}
 			}
 		}
 	}
 
-	void removeRaw(const std::string& key)
+	void removeRaw(const std::string& key) override
 	{
 		throw Poco::InvalidAccessException("not writable");
 	}
@@ -105,7 +104,6 @@ public:
 private:
 	std::vector<ConfigPtr> _stack;
 };
-
 
 class Box
 {
@@ -127,17 +125,8 @@ public:
 
 	}
 
-	Box(const Box& box) :
-		_x(box._x),
-		_y(box._y),
-		_width(box._width),
-		_height(box._height)
-	{
-	}
-
-	~Box()
-	{
-	}
+	Box(const Box& box) = default;
+	~Box() = default;
 
 	Box& operator = (const Box& box)
 	{
@@ -216,18 +205,14 @@ private:
 class TemplateHandler : public Poco::XML::DefaultHandler
 {
 public:
-	typedef Poco::AutoPtr<Poco::Util::AbstractConfiguration> StylePtr;
+	using StylePtr = Poco::AutoPtr<Poco::Util::AbstractConfiguration>;
 
-	TemplateHandler(const Poco::Path& base) :
-		_base(base),
-		_pDocument(0),
-		_pPage(0),
-		_y(0)
+	TemplateHandler(const Poco::Path& base) : _base(base)
 	{
 		_styles.push(parseStyle("font-family: Helvetica; font-size: 12; line-height: 1.2"));
 	}
 
-	~TemplateHandler()
+	~TemplateHandler() override
 	{
 		_styles.pop();
 		delete _pPage;
@@ -237,7 +222,7 @@ public:
 	Document* document()
 	{
 		Document* pDocument = _pDocument;
-		_pDocument = 0;
+		_pDocument = nullptr;
 		return pDocument;
 	}
 
@@ -289,7 +274,7 @@ public:
 		Font font = loadFont(fontFamily, fontStyle, fontWeight);
 		_pPage->setFont(font, fontSize);
 
-		_boxes.push_back(Box(0, 0, _pPage->getWidth(), _pPage->getHeight()));
+		_boxes.emplace_back(0, 0, _pPage->getWidth(), _pPage->getHeight());
 
 		float margin = _styles.getFloat("margin", 0);
 		float marginLeft = _styles.getFloat("margin-left", margin);
@@ -306,7 +291,7 @@ public:
 	{
 		_boxes.pop_back();
 		delete _pPage;
-		_pPage = 0;
+		_pPage = nullptr;
 		popStyle();
 	}
 
@@ -426,7 +411,7 @@ public:
 
 			moveY(y);
 		}
-		_pTable = 0;
+		_pTable = nullptr;
 		popStyle();
 	}
 
@@ -548,15 +533,15 @@ public:
 	}
 
 	// DocumentHandler
-	void startDocument()
+	void startDocument() override
 	{
 	}
 
-	void endDocument()
+	void endDocument() override
 	{
 	}
 
-	void startElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname, const Poco::XML::Attributes& attributes)
+	void startElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname, const Poco::XML::Attributes& attributes) override
 	{
 		if (localName == "document")
 			startDoc(attributes);
@@ -576,7 +561,7 @@ public:
 			startHr(attributes);
 	}
 
-	void endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname)
+	void endElement(const Poco::XML::XMLString& uri, const Poco::XML::XMLString& localName, const Poco::XML::XMLString& qname) override
 	{
 		if (localName == "document")
 			endDoc();
@@ -596,7 +581,7 @@ public:
 			endHr();
 	}
 
-	void characters(const Poco::XML::XMLChar ch[], int start, int length)
+	void characters(const Poco::XML::XMLChar ch[], int start, int length) override
 	{
 		_text.append(ch + start, length);
 	}
@@ -827,8 +812,8 @@ protected:
 private:
 	Poco::Path _base;
 	std::string _encoding;
-	Document* _pDocument;
-	Page* _pPage;
+	Document* _pDocument{nullptr};
+	Page* _pPage{nullptr};
 	Table::Ptr _pTable;
 	TableRow _row;
 	StackedConfiguration _styles;
@@ -836,13 +821,13 @@ private:
 	std::string _size;
 	std::string _orientation;
 	std::string _text;
-	float _y;
+	float _y{0};
 };
 
 
 XMLTemplate::XMLTemplate(std::istream& xmlStream, const std::string& base) :
 	_base(base),
-	_pDocument(0)
+	_pDocument(nullptr)
 {
 	load(xmlStream);
 }
@@ -850,7 +835,7 @@ XMLTemplate::XMLTemplate(std::istream& xmlStream, const std::string& base) :
 
 XMLTemplate::XMLTemplate(const std::string& path) :
 	_base(path),
-	_pDocument(0)
+	_pDocument(nullptr)
 {
 	Poco::FileInputStream xmlStream(path);
 	load(xmlStream);

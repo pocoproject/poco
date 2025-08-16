@@ -21,11 +21,7 @@
 #include "Poco/DateTimeParser.h"
 #include "Poco/Exception.h"
 #include "Poco/Debugger.h"
-#if defined(POCO_SQLITE_UNBUNDLED)
 #include <sqlite3.h>
-#else
-#include "sqlite3.h"
-#endif
 #include <cstdlib>
 
 

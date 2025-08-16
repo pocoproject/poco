@@ -19,9 +19,9 @@
 
 
 #include "Poco/PDF/PDF.h"
+#include "Poco/PDF/Declarations.h"
 #include "Poco/PDF/Page.h"
 #include "Poco/PDF/Outline.h"
-#include "Poco/PDF/Resource.h"
 #include <deque>
 #include <map>
 
@@ -39,23 +39,24 @@ class PDF_API Document
 	/// A Document represents a PDF document object.
 {
 public:
-	typedef HPDF_BYTE*                     DataPtr;
-	typedef HPDF_UINT32                    SizeType;
-	typedef std::deque<Page>               PageContainer;
-	typedef std::deque<Outline>            OutlineContainer;
-	typedef std::map<std::string, Font>    FontContainer;
-	typedef std::map<std::string, Encoder> EncoderContainer;
-	typedef std::map<std::string, Image>   ImageContainer;
+	using DataPtr = HPDF_BYTE*;
+	using SizeType = HPDF_UINT32;
+	using PageContainer = std::deque<Page>;
+	using OutlineContainer = std::deque<Outline>;
+	using FontContainer = std::map<std::string, Font>;
+	using EncoderContainer = std::map<std::string, Encoder>;
+	using ImageContainer = std::map<std::string, Image>;
 
 	enum Info
 	{
-		INFO_CREATION_DATE = HPDF_INFO_CREATION_DATE,
-		INFO_MOD_DATE = HPDF_INFO_MOD_DATE,
-		INFO_AUTHOR = HPDF_INFO_AUTHOR,
-		INFO_CREATOR = HPDF_INFO_CREATOR,
-		INFO_TITLE = HPDF_INFO_TITLE,
-		INFO_SUBJECT = HPDF_INFO_SUBJECT,
-		INFO_KEYWORDS = HPDF_INFO_KEYWORDS
+		INFO_CREATION_DATE = 0,
+		INFO_MOD_DATE,
+		INFO_AUTHOR,
+		INFO_CREATOR,
+		INFO_PRODUCER,
+		INFO_TITLE,
+		INFO_SUBJECT,
+		INFO_KEYWORDS
 	};
 
 	enum Permission
@@ -74,25 +75,26 @@ public:
 
 	enum PageLayout
 	{
-		PAGE_LAYOUT_SINGLE = HPDF_PAGE_LAYOUT_SINGLE,
+		PAGE_LAYOUT_SINGLE = 0,
 			/// Only one page is displayed.
-		PAGE_LAYOUT_ONE_COLUMN = HPDF_PAGE_LAYOUT_ONE_COLUMN,
+		PAGE_LAYOUT_ONE_COLUMN,
 			/// Display the pages in one column.
-		PAGE_LAYOUT_TWO_COLUMN_LEFT = HPDF_PAGE_LAYOUT_TWO_COLUMN_LEFT,
+		PAGE_LAYOUT_TWO_COLUMN_LEFT,
 			/// Display the pages in two column. The page of the odd number is displayed left.
-		PAGE_LAYOUT_TWO_COLUMN_RIGHT = HPDF_PAGE_LAYOUT_TWO_COLUMN_RIGHT
+		PAGE_LAYOUT_TWO_COLUMN_RIGHT
 			/// Display the pages in two column. The page of the odd number is displayed right.
 	};
 
+
 	enum PageMode
 	{
-		PAGE_MODE_USE_NONE = HPDF_PAGE_MODE_USE_NONE,
+		PAGE_MODE_USE_NONE = 0,
 			/// Display the document with neither outline nor thumbnail.
-		PAGE_MODE_USE_OUTLINE = HPDF_PAGE_MODE_USE_OUTLINE,
+		PAGE_MODE_USE_OUTLINE,
 			/// Display the document with outline pain.
-		PAGE_MODE_USE_THUMBS = HPDF_PAGE_MODE_USE_THUMBS,
+		PAGE_MODE_USE_THUMBS,
 			///Display the document with thumbnail pain.
-		PAGE_MODE_FULL_SCREEN = HPDF_PAGE_MODE_FULL_SCREEN
+		PAGE_MODE_FULL_SCREEN
 			/// Display the document with full screen mode.
 	};
 
@@ -113,25 +115,25 @@ public:
 
 	enum Encryption
 	{
-		ENCRYPT_R2 = HPDF_ENCRYPT_R2,
+		ENCRYPT_R2 = 2,
 			/// Use "Revision 2" algorithm.
 			/// The length of key is automatically set to 5(40bit).
-		ENCRYPT_R3 = HPDF_ENCRYPT_R3
+		ENCRYPT_R3 = 3
 			/// Use "Revision 3" algorithm.
 			/// Between 5(40bit) and 16(128bit) can be specified for length of the key.
 	};
 
 	enum PageNumberStyle
 	{
-		PAGE_NUM_STYLE_DECIMAL = HPDF_PAGE_NUM_STYLE_DECIMAL,
+		PAGE_NUM_STYLE_DECIMAL = 0,
 			/// Page label is displayed by Arabic numerals.
-		PAGE_NUM_STYLE_UPPER_ROMAN = HPDF_PAGE_NUM_STYLE_UPPER_ROMAN,
+		PAGE_NUM_STYLE_UPPER_ROMAN,
 			/// Page label is displayed by Uppercase roman numerals.
-		PAGE_NUM_STYLE_LOWER_ROMAN = HPDF_PAGE_NUM_STYLE_LOWER_ROMAN,
+		PAGE_NUM_STYLE_LOWER_ROMAN,
 			/// Page label is displayed by Lowercase roman numerals.
-		PAGE_NUM_STYLE_UPPER_LETTERS = HPDF_PAGE_NUM_STYLE_UPPER_LETTERS,
+		PAGE_NUM_STYLE_UPPER_LETTERS,
 			/// Page label is displayed by Uppercase letters (using A to Z).
-		PAGE_NUM_STYLE_LOWER_LETTERS = HPDF_PAGE_NUM_STYLE_LOWER_LETTERS,
+		PAGE_NUM_STYLE_LOWER_LETTERS,
 			/// Page label is displayed by Lowercase letters (using a to z).
 	};
 
@@ -333,171 +335,6 @@ private:
 
 	friend class Page;
 };
-
-
-//
-// inlines
-//
-
-inline void Document::setPages(std::size_t pagePerPages)
-{
-	HPDF_SetPagesConfiguration(_pdf, static_cast<HPDF_UINT>(pagePerPages));
-}
-
-
-inline void Document::setPageLayout(PageLayout pageLayout)
-{
-	HPDF_SetPageLayout(_pdf, static_cast<HPDF_PageLayout>(pageLayout));
-}
-
-
-inline Document::PageLayout Document::getPageLayout() const
-{
-	return static_cast<PageLayout>(HPDF_GetPageLayout(_pdf));
-}
-
-
-inline void Document::setPageMode(PageMode pageMode)
-{
-	HPDF_SetPageMode(_pdf, static_cast<HPDF_PageMode>(pageMode));
-}
-
-
-inline Document::PageMode Document::getPageMode() const
-{
-	return static_cast<PageMode>(HPDF_GetPageMode(_pdf));
-}
-
-/*
-inline void openAction()
-{
-	HPDF_SetOpenAction(_pdf, HPDF_Destination open_action);
-}
-*/
-
-
-inline const Page& Document::getPage(int index)
-{
-	return _pages.at(index);
-}
-
-
-inline const Page& Document::operator [] (int index)
-{
-	return _pages[index];
-}
-
-
-inline void Document::compression(Compression mode)
-{
-	HPDF_SetCompressionMode(_pdf, mode);
-}
-
-
-inline void Document::addPageLabel(int pageNum, PageNumberStyle style, int firstPage, const std::string& prefix)
-{
-	HPDF_AddPageLabel(_pdf,
-		static_cast<HPDF_UINT>(pageNum),
-		static_cast<HPDF_PageNumStyle>(style),
-		static_cast<HPDF_UINT>(firstPage),
-		prefix.c_str());
-}
-
-
-inline void Document::useUTF8Encoding()
-{
-	HPDF_UseUTFEncodings(_pdf);
-}
-
-
-inline void Document::useJapaneseFonts()
-{
-	HPDF_UseJPFonts(_pdf);
-}
-
-
-inline void Document::useKoreanFonts()
-{
-	HPDF_UseKRFonts(_pdf);
-}
-
-
-inline void Document::useChineseFonts()
-{
-	HPDF_UseCNSFonts(_pdf);
-}
-
-
-inline void Document::useChineseTraditionalFonts()
-{
-	HPDF_UseCNTFonts(_pdf);
-}
-
-
-inline void Document::useJapaneseEncodings()
-{
-	HPDF_UseJPEncodings(_pdf);
-}
-
-
-inline void Document::useKoreanEncodings()
-{
-	HPDF_UseKREncodings(_pdf);
-}
-
-
-inline void Document::useChineseEncodings()
-{
-	HPDF_UseCNSEncodings(_pdf);
-}
-
-
-inline void Document::useChineseTraditionalEncodings()
-{
-	HPDF_UseCNTEncodings(_pdf);
-}
-
-
-inline void Document::extendedGraphicState()
-{
-	HPDF_CreateExtGState(_pdf);
-}
-
-
-inline const Image& Document::loadPNGImage(const std::string& fileName)
-{
-	return loadPNGImageImpl(fileName, true);
-}
-
-
-inline const Image& Document::loadPNGImageInfo(const std::string& fileName)
-{
-	return loadPNGImageImpl(fileName, false);
-}
-
-
-inline std::string Document::getInfo(Info info)
-{
-	return HPDF_GetInfoAttr(_pdf, static_cast<HPDF_InfoType>(info));
-}
-
-
-inline void Document::setPermission(Permission perm)
-{
-	HPDF_SetPermission(_pdf, static_cast<HPDF_UINT>(perm));
-}
-
-
-inline std::size_t Document::pageCount() const
-{
-	return _pages.size();
-}
-
-
-inline HPDF_Doc& Document::handle()
-{
-	return _pdf;
-}
 
 
 } } // namespace Poco::PDF

@@ -33,9 +33,96 @@ Cell::Cell(const AttributedString& content, FontMapPtr pFontMap, const std::stri
 	setFonts(pFontMap);
 }
 
+Cell::~Cell() = default;
 
-Cell::~Cell()
+const std::string& Cell::getName() const
 {
+	return _name;
+}
+
+
+void Cell::setName(const std::string& name)
+{
+	_name = name;
+}
+
+
+const AttributedString& Cell::getContent() const
+{
+	return _content;
+}
+
+
+void Cell::setContent(const AttributedString& content)
+{
+	_content = content;
+}
+
+
+unsigned Cell::getOutline() const
+{
+	return _outline;
+}
+
+
+void Cell::setOutline(Cell::Outline outline, bool show)
+{
+	if (show) _outline |= outline;
+	else      _outline &= ~outline;
+}
+
+
+void Cell::borderLeft(bool show)
+{
+	setOutline(OUTLINE_LEFT, show);
+}
+
+
+void Cell::borderTop(bool show)
+{
+	setOutline(OUTLINE_TOP, show);
+}
+
+
+void Cell::borderRight(bool show)
+{
+	setOutline(OUTLINE_RIGHT, show);
+}
+
+
+void Cell::borderBottom(bool show)
+{
+	setOutline(OUTLINE_BOTTOM, show);
+}
+
+
+float Cell::getLineWidth() const
+{
+	return _lineWidth;
+}
+
+
+void Cell::setLineWidth(float width)
+{
+	_lineWidth = width;
+}
+
+
+int Cell::getWidthAsPct() const
+{
+	return _widthAsPct;
+}
+
+
+void Cell::setWidthAsPct(int width)
+{
+	_widthAsPct = width;
+}
+
+
+bool Cell::hasWidth() const
+{
+	return _widthAsPct > 0;
 }
 
 

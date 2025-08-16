@@ -43,11 +43,9 @@ public:
 	{
 	}
 
-	~RunnableHolder()
-	{
-	}
+	~RunnableHolder() override = default;
 
-	void run()
+	void run() override
 	{
 		_target.run();
 	}

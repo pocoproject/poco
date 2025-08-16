@@ -43,9 +43,7 @@ namespace
 		{
 		}
 
-		~ActiveObject()
-		{
-		}
+		~ActiveObject() override = default;
 
 		ActiveMethod<int, int, ActiveObject, ActiveStarter<ActiveDispatcher> > testMethod;
 
@@ -96,9 +94,7 @@ ActiveDispatcherTest::ActiveDispatcherTest(const std::string& name): CppUnit::Te
 }
 
 
-ActiveDispatcherTest::~ActiveDispatcherTest()
-{
-}
+ActiveDispatcherTest::~ActiveDispatcherTest() = default;
 
 
 void ActiveDispatcherTest::testWait()

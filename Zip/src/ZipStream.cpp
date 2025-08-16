@@ -22,13 +22,8 @@
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
 #include "Poco/Format.h"
-#if defined(POCO_UNBUNDLED)
-#include <zlib.h>
-#else
-// Quirk before we move zlib to external libs.
-#include "../../Foundation/src/zlib.h"
-#endif
 
+#include <zlib.h>
 
 namespace Poco {
 namespace Zip {
