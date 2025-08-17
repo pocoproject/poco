@@ -8,7 +8,6 @@ set(POCO_MODULES
 	ActiveRecord.cppm
 	Crypto.cppm
 	Data.cppm
-	DOM.cppm
 	Dynamic.cppm
 	JSON.cppm
 	JWT.cppm
@@ -16,7 +15,6 @@ set(POCO_MODULES
 	Net.cppm
 	Prometheus.cppm
 	Redis.cppm
-	SAX.cppm
 	Util.cppm
 	XML.cppm
 	Zip.cppm
@@ -44,15 +42,12 @@ target_link_libraries(PocoModules PUBLIC
     Poco::ActiveRecord
 	Poco::Crypto
 	Poco::Data
-	Poco::DOM
-	Poco::Dynamic
 	Poco::JSON
 	Poco::JWT
 	Poco::MongoDB
 	Poco::Net
 	Poco::Prometheus
 	Poco::Redis
-	Poco::SAX
 	Poco::Util
 	Poco::Zip
 )

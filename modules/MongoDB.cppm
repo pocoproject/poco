@@ -1,32 +1,32 @@
 module;
 
-#include <Poco/MongoDB/Array.h>
-#include <Poco/MongoDB/Binary.h>
-#include <Poco/MongoDB/BSONReader.h>
-#include <Poco/MongoDB/BSONWriter.h>
-#include <Poco/MongoDB/Connection.h>
-#include <Poco/MongoDB/Cursor.h>
-#include <Poco/MongoDB/Database.h>
-#include <Poco/MongoDB/DeleteRequest.h>
-#include <Poco/MongoDB/Document.h>
-#include <Poco/MongoDB/Element.h>
-#include <Poco/MongoDB/GetMoreRequest.h>
-#include <Poco/MongoDB/InsertRequest.h>
-#include <Poco/MongoDB/JavaScriptCode.h>
-#include <Poco/MongoDB/KillCursorsRequest.h>
-#include <Poco/MongoDB/Message.h>
-#include <Poco/MongoDB/MessageHeader.h>
-#include <Poco/MongoDB/MongoDB.h>
-#include <Poco/MongoDB/ObjectId.h>
-#include <Poco/MongoDB/OpMsgCursor.h>
-#include <Poco/MongoDB/OpMsgMessage.h>
-#include <Poco/MongoDB/PoolableConnectionFactory.h>
-#include <Poco/MongoDB/QueryRequest.h>
-#include <Poco/MongoDB/RegularExpression.h>
-#include <Poco/MongoDB/ReplicaSet.h>
-#include <Poco/MongoDB/RequestMessage.h>
-#include <Poco/MongoDB/ResponseMessage.h>
-#include <Poco/MongoDB/UpdateRequest.h>
+#include "Poco/MongoDB/Array.h"
+#include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/BSONReader.h"
+#include "Poco/MongoDB/BSONWriter.h"
+#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/Cursor.h"
+#include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/DeleteRequest.h"
+#include "Poco/MongoDB/Document.h"
+#include "Poco/MongoDB/Element.h"
+#include "Poco/MongoDB/GetMoreRequest.h"
+#include "Poco/MongoDB/InsertRequest.h"
+#include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/MongoDB/KillCursorsRequest.h"
+#include "Poco/MongoDB/Message.h"
+#include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/MongoDB/ObjectId.h"
+#include "Poco/MongoDB/OpMsgCursor.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/PoolableConnectionFactory.h"
+#include "Poco/MongoDB/QueryRequest.h"
+#include "Poco/MongoDB/RegularExpression.h"
+#include "Poco/MongoDB/ReplicaSet.h"
+#include "Poco/MongoDB/RequestMessage.h"
+#include "Poco/MongoDB/ResponseMessage.h"
+#include "Poco/MongoDB/UpdateRequest.h"
 
 export module Poco.MongoDB;
 

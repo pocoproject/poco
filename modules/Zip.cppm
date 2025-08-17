@@ -1,28 +1,28 @@
 module;
 
-#include <Poco/Zip/Add.h>
-#include <Poco/Zip/AutoDetectStream.h>
-#include <Poco/Zip/Compress.h>
-#include <Poco/Zip/Decompress.h>
-#include <Poco/Zip/Delete.h>
-#include <Poco/Zip/Keep.h>
-#include <Poco/Zip/ParseCallback.h>
-#include <Poco/Zip/PartialStream.h>
-#include <Poco/Zip/Rename.h>
-#include <Poco/Zip/Replace.h>
-#include <Poco/Zip/SkipCallback.h>
-#include <Poco/Zip/ZipArchive.h>
-#include <Poco/Zip/ZipArchiveInfo.h>
-#include <Poco/Zip/ZipCommon.h>
-#include <Poco/Zip/ZipDataInfo.h>
-#include <Poco/Zip/ZipException.h>
-#include <Poco/Zip/ZipFileInfo.h>
-#include <Poco/Zip/Zip.h>
-#include <Poco/Zip/ZipLocalFileHeader.h>
-#include <Poco/Zip/ZipManipulator.h>
-#include <Poco/Zip/ZipOperation.h>
-#include <Poco/Zip/ZipStream.h>
-#include <Poco/Zip/ZipUtil.h>
+#include "Poco/Zip/Add.h"
+#include "Poco/Zip/AutoDetectStream.h"
+#include "Poco/Zip/Compress.h"
+#include "Poco/Zip/Decompress.h"
+#include "Poco/Zip/Delete.h"
+#include "Poco/Zip/Keep.h"
+#include "Poco/Zip/ParseCallback.h"
+#include "Poco/Zip/PartialStream.h"
+#include "Poco/Zip/Rename.h"
+#include "Poco/Zip/Replace.h"
+#include "Poco/Zip/SkipCallback.h"
+#include "Poco/Zip/ZipArchive.h"
+#include "Poco/Zip/ZipArchiveInfo.h"
+#include "Poco/Zip/ZipCommon.h"
+#include "Poco/Zip/ZipDataInfo.h"
+#include "Poco/Zip/ZipException.h"
+#include "Poco/Zip/ZipFileInfo.h"
+#include "Poco/Zip/Zip.h"
+#include "Poco/Zip/ZipLocalFileHeader.h"
+#include "Poco/Zip/ZipManipulator.h"
+#include "Poco/Zip/ZipOperation.h"
+#include "Poco/Zip/ZipStream.h"
+#include "Poco/Zip/ZipUtil.h"
 
 export module Poco.Zip;
 
