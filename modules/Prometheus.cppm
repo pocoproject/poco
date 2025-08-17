@@ -1,24 +1,24 @@
 module;
 
-#include <Poco/Prometheus/AtomicFloat.h>
-#include <Poco/Prometheus/CallbackMetric.h>
-#include <Poco/Prometheus/Collector.h>
-#include <Poco/Prometheus/Counter.h>
-#include <Poco/Prometheus/Exporter.h>
-#include <Poco/Prometheus/Gauge.h>
-#include <Poco/Prometheus/Histogram.h>
-#include <Poco/Prometheus/IntCounter.h>
-#include <Poco/Prometheus/IntGauge.h>
-#include <Poco/Prometheus/LabeledMetric.h>
-#include <Poco/Prometheus/LabeledMetricImpl.h>
-#include <Poco/Prometheus/Metric.h>
-#include <Poco/Prometheus/MetricsRequestHandler.h>
-#include <Poco/Prometheus/MetricsServer.h>
-#include <Poco/Prometheus/ProcessCollector.h>
-#include <Poco/Prometheus/Prometheus.h>
-#include <Poco/Prometheus/Registry.h>
-#include <Poco/Prometheus/TextExporter.h>
-#include <Poco/Prometheus/ThreadPoolCollector.h>
+#include "Poco/Prometheus/AtomicFloat.h"
+#include "Poco/Prometheus/CallbackMetric.h"
+#include "Poco/Prometheus/Collector.h"
+#include "Poco/Prometheus/Counter.h"
+#include "Poco/Prometheus/Exporter.h"
+#include "Poco/Prometheus/Gauge.h"
+#include "Poco/Prometheus/Histogram.h"
+#include "Poco/Prometheus/IntCounter.h"
+#include "Poco/Prometheus/IntGauge.h"
+#include "Poco/Prometheus/LabeledMetric.h"
+#include "Poco/Prometheus/LabeledMetricImpl.h"
+#include "Poco/Prometheus/Metric.h"
+#include "Poco/Prometheus/MetricsRequestHandler.h"
+#include "Poco/Prometheus/MetricsServer.h"
+#include "Poco/Prometheus/ProcessCollector.h"
+#include "Poco/Prometheus/Prometheus.h"
+#include "Poco/Prometheus/Registry.h"
+#include "Poco/Prometheus/TextExporter.h"
+#include "Poco/Prometheus/ThreadPoolCollector.h"
 
 export module Poco.Prometheus;
 

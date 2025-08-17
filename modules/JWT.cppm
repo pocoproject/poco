@@ -1,10 +1,10 @@
 module;
 
-#include <Poco/JWT/JWTException.h>
-#include <Poco/JWT/JWT.h>
-#include <Poco/JWT/Serializer.h>
-#include <Poco/JWT/Signer.h>
-#include <Poco/JWT/Token.h>
+#include "Poco/JWT/JWTException.h"
+#include "Poco/JWT/JWT.h"
+#include "Poco/JWT/Serializer.h"
+#include "Poco/JWT/Signer.h"
+#include "Poco/JWT/Token.h"
 
 export module Poco.JWT;
 

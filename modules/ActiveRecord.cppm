@@ -1,11 +1,11 @@
 module;
 
-#include <Poco/ActiveRecord/ActiveRecord.h>
-#include <Poco/ActiveRecord/ActiveRecordLib.h>
-#include <Poco/ActiveRecord/Context.h>
-#include <Poco/ActiveRecord/IDTraits.h>
-#include <Poco/ActiveRecord/Query.h>
-#include <Poco/ActiveRecord/StatementPlaceholderProvider.h>
+#include "Poco/ActiveRecord/ActiveRecord.h"
+#include "Poco/ActiveRecord/ActiveRecordLib.h"
+#include "Poco/ActiveRecord/Context.h"
+#include "Poco/ActiveRecord/IDTraits.h"
+#include "Poco/ActiveRecord/Query.h"
+#include "Poco/ActiveRecord/StatementPlaceholderProvider.h"
 
 export module Poco.ActiveRecord;
 

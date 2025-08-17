@@ -1,11 +1,11 @@
 module;
 
-#include <Poco/Dynamic/Pair.h>
-#include <Poco/Dynamic/Struct.h>
-#include <Poco/Dynamic/Var.h>
-#include <Poco/Dynamic/VarHolder.h>
-#include <Poco/Dynamic/VarIterator.h>
-#include <Poco/Dynamic/VarVisitor.h>
+#include "Poco/Dynamic/Pair.h"
+#include "Poco/Dynamic/Struct.h"
+#include "Poco/Dynamic/Var.h"
+#include "Poco/Dynamic/VarHolder.h"
+#include "Poco/Dynamic/VarIterator.h"
+#include "Poco/Dynamic/VarVisitor.h"
 
 export module Poco.Dynamic;
 
