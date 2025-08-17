@@ -208,6 +208,9 @@ option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
 option(ENABLE_TRACE "Enable stack tracing" OFF)
 
+option(POCO_BUILD_MODULES "Build Poco.* C++ modules" OFF)
+option(POCO_MODULES_EXPORT_IMPL "Export impl classes in modules" OFF)
+
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
@@ -545,6 +548,10 @@ if(ENABLE_TRACE)
 	list(APPEND Poco_COMPONENTS "Trace")
 endif()
 
+if(POCO_BUILD_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
+	add_subdirectory(modules)
+endif()
+
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
@@ -612,6 +619,13 @@ endif()
 message(STATUS "[cmake] Installation target path: ${CMAKE_INSTALL_PREFIX}")
 if(CMAKE_TOOLCHAIN_FILE)
 	message(STATUS "[cmake] Use toolchain file:		${CMAKE_TOOLCHAIN_FILE}")
+endif()
+if (POCO_BUILD_MODULES)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
+        message(STATUS "Building Poco.* C++ modules")
+    else()
+        message(WARNING "Skipping Poco.* C++ modules (requires CMake 3.28+, found ${CMAKE_VERSION})")
+    endif()
 endif()
 message(STATUS "[cmake] Build for OS type:      ${CMAKE_SYSTEM_NAME}")
 message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")

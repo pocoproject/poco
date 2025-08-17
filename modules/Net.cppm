@@ -1,0 +1,404 @@
+module;
+
+#include <Poco/Net/AbstractHTTPRequestHandler.h>
+#include <Poco/Net/AcceptCertificateHandler.h>
+#include <Poco/Net/CertificateHandlerFactory.h>
+#include <Poco/Net/CertificateHandlerFactoryMgr.h>
+#include <Poco/Net/ConsoleCertificateHandler.h>
+#include <Poco/Net/Context.h>
+#include <Poco/Net/DatagramSocket.h>
+#include <Poco/Net/DatagramSocketImpl.h>
+#include <Poco/Net/DialogSocket.h>
+#include <Poco/Net/DNS.h>
+#include <Poco/Net/EscapeHTMLStream.h>
+#include <Poco/Net/FilePartSource.h>
+#include <Poco/Net/FTPClientSession.h>
+#include <Poco/Net/FTPSClientSession.h>
+#include <Poco/Net/FTPSStreamFactory.h>
+#include <Poco/Net/FTPStreamFactory.h>
+#include <Poco/Net/HostEntry.h>
+#include <Poco/Net/HTMLForm.h>
+#include <Poco/Net/HTTPAuthenticationParams.h>
+#include <Poco/Net/HTTPBasicCredentials.h>
+#include <Poco/Net/HTTPBasicStreamBuf.h>
+#include <Poco/Net/HTTPBufferAllocator.h>
+#include <Poco/Net/HTTPChunkedStream.h>
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPCookie.h>
+#include <Poco/Net/HTTPCredentials.h>
+#include <Poco/Net/HTTPDigestCredentials.h>
+#include <Poco/Net/HTTPFixedLengthStream.h>
+#include <Poco/Net/HTTPHeaderStream.h>
+#include <Poco/Net/HTTPIOStream.h>
+#include <Poco/Net/HTTPMessage.h>
+#include <Poco/Net/HTTPNTLMCredentials.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPRequestHandler.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/Net/HTTPSClientSession.h>
+#include <Poco/Net/HTTPServerConnectionFactory.h>
+#include <Poco/Net/HTTPServerConnection.h>
+#include <Poco/Net/HTTPServer.h>
+#include <Poco/Net/HTTPServerParams.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPServerRequestImpl.h>
+#include <Poco/Net/HTTPServerResponse.h>
+#include <Poco/Net/HTTPServerResponseImpl.h>
+#include <Poco/Net/HTTPServerSession.h>
+#include <Poco/Net/HTTPSessionFactory.h>
+#include <Poco/Net/HTTPSession.h>
+#include <Poco/Net/HTTPSessionInstantiator.h>
+#include <Poco/Net/HTTPSSessionInstantiator.h>
+#include <Poco/Net/HTTPSStreamFactory.h>
+#include <Poco/Net/HTTPStreamFactory.h>
+#include <Poco/Net/HTTPStream.h>
+#include <Poco/Net/ICMPClient.h>
+#include <Poco/Net/ICMPEventArgs.h>
+#include <Poco/Net/ICMPPacket.h>
+#include <Poco/Net/ICMPPacketImpl.h>
+#include <Poco/Net/ICMPSocket.h>
+#include <Poco/Net/ICMPSocketImpl.h>
+#include <Poco/Net/ICMPv4PacketImpl.h>
+#include <Poco/Net/InvalidCertificateHandler.h>
+#include <Poco/Net/IPAddress.h>
+#include <Poco/Net/IPAddressImpl.h>
+#include <Poco/Net/KeyConsoleHandler.h>
+#include <Poco/Net/KeyFileHandler.h>
+#include <Poco/Net/MailMessage.h>
+#include <Poco/Net/MailRecipient.h>
+#include <Poco/Net/MailStream.h>
+#include <Poco/Net/MediaType.h>
+#include <Poco/Net/MessageHeader.h>
+#include <Poco/Net/MulticastSocket.h>
+#include <Poco/Net/MultipartReader.h>
+#include <Poco/Net/MultipartWriter.h>
+#include <Poco/Net/MultiSocketPoller.h>
+#include <Poco/Net/NameValueCollection.h>
+#include <Poco/Net/NetException.h>
+#include <Poco/Net/Net.h>
+#include <Poco/Net/NetSSL.h>
+#include <Poco/Net/NetworkInterface.h>
+#include <Poco/Net/NTLMCredentials.h>
+#include <Poco/Net/NTPClient.h>
+#include <Poco/Net/NTPEventArgs.h>
+#include <Poco/Net/NTPPacket.h>
+#include <Poco/Net/NullPartHandler.h>
+#include <Poco/Net/OAuth10Credentials.h>
+#include <Poco/Net/OAuth20Credentials.h>
+#include <Poco/Net/ParallelSocketAcceptor.h>
+#include <Poco/Net/ParallelSocketReactor.h>
+#include <Poco/Net/PartHandler.h>
+#include <Poco/Net/PartSource.h>
+#include <Poco/Net/PartStore.h>
+#include <Poco/Net/PollSet.h>
+#include <Poco/Net/POP3ClientSession.h>
+#include <Poco/Net/PrivateKeyFactory.h>
+#include <Poco/Net/PrivateKeyFactoryMgr.h>
+#include <Poco/Net/PrivateKeyPassphraseHandler.h>
+#include <Poco/Net/QuotedPrintableDecoder.h>
+#include <Poco/Net/QuotedPrintableEncoder.h>
+#include <Poco/Net/RawSocket.h>
+#include <Poco/Net/RawSocketImpl.h>
+#include <Poco/Net/RejectCertificateHandler.h>
+#include <Poco/Net/RemoteSyslogChannel.h>
+#include <Poco/Net/RemoteSyslogListener.h>
+#include <Poco/Net/SecureServerSocket.h>
+#include <Poco/Net/SecureServerSocketImpl.h>
+#include <Poco/Net/SecureSMTPClientSession.h>
+#include <Poco/Net/SecureSocketImpl.h>
+#include <Poco/Net/SecureStreamSocket.h>
+#include <Poco/Net/SecureStreamSocketImpl.h>
+#include <Poco/Net/ServerSocket.h>
+#include <Poco/Net/ServerSocketImpl.h>
+#include <Poco/Net/Session.h>
+#include <Poco/Net/SingleSocketPoller.h>
+#include <Poco/Net/SMTPChannel.h>
+#include <Poco/Net/SMTPClientSession.h>
+#include <Poco/Net/SocketAcceptor.h>
+#include <Poco/Net/SocketAddress.h>
+#include <Poco/Net/SocketAddressImpl.h>
+#include <Poco/Net/SocketConnector.h>
+#include <Poco/Net/SocketDefs.h>
+#include <Poco/Net/Socket.h>
+#include <Poco/Net/SocketImpl.h>
+#include <Poco/Net/SocketNotification.h>
+#include <Poco/Net/SocketNotifier.h>
+#include <Poco/Net/SocketProactor.h>
+#include <Poco/Net/SocketReactor.h>
+#include <Poco/Net/SocketStream.h>
+#include <Poco/Net/SSLException.h>
+#include <Poco/Net/SSLManager.h>
+#include <Poco/Net/SSPINTLMCredentials.h>
+#include <Poco/Net/StreamSocket.h>
+#include <Poco/Net/StreamSocketImpl.h>
+#include <Poco/Net/StringPartSource.h>
+#include <Poco/Net/TCPServerConnectionFactory.h>
+#include <Poco/Net/TCPServerConnection.h>
+#include <Poco/Net/TCPServerDispatcher.h>
+#include <Poco/Net/TCPServer.h>
+#include <Poco/Net/TCPServerParams.h>
+#include <Poco/Net/UDPClient.h>
+#include <Poco/Net/UDPHandler.h>
+#include <Poco/Net/UDPServer.h>
+#include <Poco/Net/UDPServerParams.h>
+#include <Poco/Net/UDPSocketReader.h>
+#include <Poco/Net/Utility.h>
+#include <Poco/Net/VerificationErrorArgs.h>
+#include <Poco/Net/WebSocket.h>
+#include <Poco/Net/WebSocketImpl.h>
+#include <Poco/Net/X509Certificate.h>
+
+export module Poco.Net;
+
+export namespace Poco::Net {
+	using Poco::Net::AbstractHTTPRequestHandler;
+	using Poco::Net::AcceptCertificateHandler;
+	using Poco::Net::AddressFamily;
+	using Poco::Net::AddressFamilyMismatchException;
+	using Poco::Net::CertificateHandlerFactory;
+	using Poco::Net::CertificateHandlerFactoryMgr;
+	using Poco::Net::CertificateHandlerFactoryRegistrar;
+	using Poco::Net::CertificateValidationException;
+	using Poco::Net::ConnectionAbortedException;
+	using Poco::Net::ConnectionRefusedException;
+	using Poco::Net::ConnectionResetException;
+	using Poco::Net::ConsoleCertificateHandler;
+	using Poco::Net::Context;
+	using Poco::Net::DNS;
+	using Poco::Net::DNSException;
+	using Poco::Net::DatagramSocket;
+	using Poco::Net::DialogSocket;
+	using Poco::Net::ErrorNotification;
+	using Poco::Net::EscapeHTMLIOS;
+	using Poco::Net::EscapeHTMLOutputStream;
+	using Poco::Net::EscapeHTMLStreamBuf;
+	using Poco::Net::FTPClientSession;
+	using Poco::Net::FTPException;
+	using Poco::Net::FTPPasswordProvider;
+	using Poco::Net::FTPSClientSession;
+	using Poco::Net::FTPSStreamFactory;
+	using Poco::Net::FTPStreamFactory;
+	using Poco::Net::FilePartSource;
+	using Poco::Net::FilePartStore;
+	using Poco::Net::FilePartStoreFactory;
+	using Poco::Net::HTMLForm;
+	using Poco::Net::HTMLFormException;
+	using Poco::Net::HTTPAuthenticationParams;
+	using Poco::Net::HTTPBasicCredentials;
+	using Poco::Net::HTTPBufferAllocator;
+	using Poco::Net::HTTPChunkedIOS;
+	using Poco::Net::HTTPChunkedInputStream;
+	using Poco::Net::HTTPChunkedOutputStream;
+	using Poco::Net::HTTPChunkedStreamBuf;
+	using Poco::Net::HTTPClientSession;
+	using Poco::Net::HTTPCookie;
+	using Poco::Net::HTTPCredentials;
+	using Poco::Net::HTTPDigestCredentials;
+	using Poco::Net::HTTPException;
+	using Poco::Net::HTTPFixedLengthIOS;
+	using Poco::Net::HTTPFixedLengthInputStream;
+	using Poco::Net::HTTPFixedLengthOutputStream;
+	using Poco::Net::HTTPFixedLengthStreamBuf;
+	using Poco::Net::HTTPHeaderIOS;
+	using Poco::Net::HTTPHeaderInputStream;
+	using Poco::Net::HTTPHeaderOutputStream;
+	using Poco::Net::HTTPHeaderStreamBuf;
+	using Poco::Net::HTTPIOS;
+	using Poco::Net::HTTPInputStream;
+	using Poco::Net::HTTPMessage;
+	using Poco::Net::HTTPNTLMCredentials;
+	using Poco::Net::HTTPOutputStream;
+	using Poco::Net::HTTPRequest;
+	using Poco::Net::HTTPRequestHandler;
+	using Poco::Net::HTTPRequestHandlerFactory;
+	using Poco::Net::HTTPResponse;
+	using Poco::Net::HTTPResponseIOS;
+	using Poco::Net::HTTPResponseStream;
+	using Poco::Net::HTTPResponseStreamBuf;
+	using Poco::Net::HTTPSClientSession;
+	using Poco::Net::HTTPSSessionInstantiator;
+	using Poco::Net::HTTPSStreamFactory;
+	using Poco::Net::HTTPServer;
+	using Poco::Net::HTTPServerConnection;
+	using Poco::Net::HTTPServerConnectionFactory;
+	using Poco::Net::HTTPServerParams;
+	using Poco::Net::HTTPServerRequest;
+	using Poco::Net::HTTPServerResponse;
+	using Poco::Net::HTTPServerSession;
+	using Poco::Net::HTTPSession;
+	using Poco::Net::HTTPSessionFactory;
+	using Poco::Net::HTTPSSessionInstantiator;
+	using Poco::Net::HTTPStreamBuf;
+	using Poco::Net::HTTPStreamFactory;
+	using Poco::Net::HostEntry;
+	using Poco::Net::HostNotFoundException;
+	using Poco::Net::ICMPClient;
+	using Poco::Net::ICMPEventArgs;
+	using Poco::Net::ICMPException;
+	using Poco::Net::ICMPFragmentationException;
+	using Poco::Net::ICMPPacket;
+	using Poco::Net::ICMPSocket;
+	using Poco::Net::IPAddress;
+	using Poco::Net::IdleNotification;
+	using Poco::Net::InterfaceNotFoundException;
+	using Poco::Net::InvalidAddressException;
+	using Poco::Net::InvalidCertificateException;
+	using Poco::Net::InvalidCertificateHandler;
+	using Poco::Net::InvalidSocketException;
+	using Poco::Net::KeyConsoleHandler;
+	using Poco::Net::KeyFileHandler;
+	using Poco::Net::MailIOS;
+	using Poco::Net::MailInputStream;
+	using Poco::Net::MailMessage;
+	using Poco::Net::MailOutputStream;
+	using Poco::Net::MailRecipient;
+	using Poco::Net::MailStreamBuf;
+	using Poco::Net::MediaType;
+	using Poco::Net::MessageException;
+	using Poco::Net::MessageHeader;
+	using Poco::Net::MulticastSocket;
+	using Poco::Net::MultipartException;
+	using Poco::Net::MultipartIOS;
+	using Poco::Net::MultipartInputStream;
+	using Poco::Net::MultipartReader;
+	using Poco::Net::MultipartSource;
+	using Poco::Net::MultipartStreamBuf;
+	using Poco::Net::MultipartWriter;
+	using Poco::Net::NTLMContext;
+	using Poco::Net::NTLMCredentials;
+	using Poco::Net::NTPClient;
+	using Poco::Net::NTPEventArgs;
+	using Poco::Net::NTPException;
+	using Poco::Net::NTPPacket;
+	using Poco::Net::NameValueCollection;
+	using Poco::Net::NetException;
+	using Poco::Net::NetworkInterface;
+	using Poco::Net::NoAddressFoundException;
+	using Poco::Net::NoMessageException;
+	using Poco::Net::NotAuthenticatedException;
+	using Poco::Net::NullPartHandler;
+	using Poco::Net::OAuth10Credentials;
+	using Poco::Net::OAuth20Credentials;
+	using Poco::Net::POP3ClientSession;
+	using Poco::Net::POP3Exception;
+	using Poco::Net::ParallelSocketAcceptor;
+	using Poco::Net::ParallelSocketReactor;
+	using Poco::Net::PartHandler;
+	using Poco::Net::PartSource;
+	using Poco::Net::PartStore;
+	using Poco::Net::PartStoreFactory;
+	using Poco::Net::PollSet;
+	using Poco::Net::PrivateKeyFactory;
+	using Poco::Net::PrivateKeyFactoryMgr;
+	using Poco::Net::PrivateKeyFactoryRegistrar;
+	using Poco::Net::PrivateKeyPassphraseHandler;
+	using Poco::Net::QuotedPrintableDecoder;
+	using Poco::Net::QuotedPrintableDecoderBuf;
+	using Poco::Net::QuotedPrintableEncoderIOS;
+	using Poco::Net::QuotedPrintableEncoder;
+	using Poco::Net::QuotedPrintableEncoderBuf;
+	using Poco::Net::QuotedPrintableEncoderIOS;
+	using Poco::Net::RawSocket;
+	using Poco::Net::ReadableNotification;
+	using Poco::Net::RejectCertificateHandler;
+	using Poco::Net::RemoteSyslogChannel;
+	using Poco::Net::RemoteSyslogListener;
+	using Poco::Net::SMTPChannel;
+	using Poco::Net::SMTPClientSession;
+	using Poco::Net::SMTPException;
+	using Poco::Net::SSLConnectionUnexpectedlyClosedException;
+	using Poco::Net::SSLContextException;
+	using Poco::Net::SSLException;
+	using Poco::Net::SSLManager;
+	using Poco::Net::SSPINTLMCredentials;
+	using Poco::Net::SecureSMTPClientSession;
+	using Poco::Net::SecureServerSocket;
+	using Poco::Net::SecureStreamSocket;
+	using Poco::Net::ServerSocket;
+	using Poco::Net::ServiceNotFoundException;
+	using Poco::Net::Session;
+	using Poco::Net::ShutdownNotification;
+	using Poco::Net::Socket;
+	using Poco::Net::SocketAcceptor;
+	using Poco::Net::SocketAddress;
+	using Poco::Net::SocketConnector;
+	using Poco::Net::SocketIOS;
+	using Poco::Net::SocketInputStream;
+	using Poco::Net::SocketNotification;
+	using Poco::Net::SocketNotifier;
+	using Poco::Net::SocketOutputStream;
+	using Poco::Net::SocketProactor;
+	using Poco::Net::SocketReactor;
+	using Poco::Net::SocketStream;
+	using Poco::Net::SocketStreamBuf;
+	using Poco::Net::StreamSocket;
+	using Poco::Net::StringPartSource;
+	using Poco::Net::TCPServer;
+	using Poco::Net::TCPServerConnection;
+	using Poco::Net::TCPServerConnectionFactory;
+	using Poco::Net::TCPServerConnectionFilter;
+	using Poco::Net::TCPServerDispatcher;
+	using Poco::Net::TCPServerParams;
+	using Poco::Net::TimeoutNotification;
+	using Poco::Net::UDPClient;
+	using Poco::Net::UDPServerParams;
+	using Poco::Net::UDPSocketReader;
+	using Poco::Net::UnsupportedFamilyException;
+	using Poco::Net::UnsupportedRedirectException;
+	using Poco::Net::Utility;
+	using Poco::Net::VerificationErrorArgs;
+	using Poco::Net::WebSocket;
+	using Poco::Net::WebSocketException;
+	using Poco::Net::WritableNotification;
+	using Poco::Net::X509Certificate;
+
+	#ifdef POCO_MODULES_EXPORT_IMPL
+	using Poco::Net::CertificateHandlerFactoryImpl;
+	using Poco::Net::DatagramSocketImpl;
+	using Poco::Net::HTTPServerRequestImpl;
+	using Poco::Net::HTTPServerResponseImpl;
+	using Poco::Net::ICMPPacketImpl;
+	using Poco::Net::ICMPSocketImpl;
+	using Poco::Net::ICMPv4PacketImpl;
+	using Poco::Net::PrivateKeyFactoryImpl;
+	using Poco::Net::RawSocketImpl;
+	using Poco::Net::SecureServerSocketImpl;
+	using Poco::Net::SecureSocketImpl;
+	using Poco::Net::SecureStreamSocketImpl;
+	using Poco::Net::ServerSocketImpl;
+	using Poco::Net::SocketImpl;
+	using Poco::Net::StreamSocketImpl;
+	using Poco::Net::TCPServerConnectionFactoryImpl;
+	using Poco::Net::WebSocketImpl;
+	#endif
+
+	using Poco::Net::SocketBufVec;
+	using Poco::Net::UDPMsgSizeT;
+	
+	using Poco::Net::HTTPBasicStreamBuf;
+	using Poco::Net::UDPMultiServer;
+	using Poco::Net::UDPServer;
+
+	using Poco::Net::SocketBufVecSize;
+	using Poco::Net::htmlize;
+	using Poco::Net::initializeNetwork;
+	using Poco::Net::initializeSSL;
+	using Poco::Net::operator<<;
+	using Poco::Net::operator>>;
+	using Poco::Net::swap;
+	using Poco::Net::uninitializeNetwork;
+	using Poco::Net::uninitializeSSL;
+
+	#ifdef POCO_MODULES_EXPORT_IMPL
+	namespace Impl {
+		using Poco::Net::Impl::IPAddressImpl;
+		using Poco::Net::Impl::IPv4AddressImpl;
+		using Poco::Net::Impl::IPv4SocketAddressImpl;
+		using Poco::Net::Impl::IPv6AddressImpl;
+		using Poco::Net::Impl::IPv6SocketAddressImpl;
+		using Poco::Net::Impl::LocalSocketAddressImpl;
+		using Poco::Net::Impl::SocketAddressImpl;
+	}
+	#endif
+}
