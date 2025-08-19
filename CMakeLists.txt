@@ -208,8 +208,9 @@ option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
 
 option(ENABLE_TRACE "Enable stack tracing" OFF)
 
-option(POCO_BUILD_MODULES "Build Poco.* C++ modules" OFF)
-option(POCO_MODULES_EXPORT_IMPL "Export impl classes in modules" OFF)
+if(POCO_ENABLE_CPP20)
+	option(POCO_BUILD_MODULES "Build Poco.* C++ modules" ON)
+endif()
 
 if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)

@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_NET
+
+#ifdef ENABLE_NET
 #include "Poco/Net/AbstractHTTPRequestHandler.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/CertificateHandlerFactory.h"
@@ -148,15 +151,18 @@ module;
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/X509Certificate.h"
+#endif
 
 export module Poco.Net;
 
 export namespace Poco::Net {
+	#ifdef ENABLE_NET
 	using Poco::Net::AbstractHTTPRequestHandler;
 	using Poco::Net::AcceptCertificateHandler;
 	using Poco::Net::AddressFamily;
 	using Poco::Net::AddressFamilyMismatchException;
 	using Poco::Net::CertificateHandlerFactory;
+	using Poco::Net::CertificateHandlerFactoryImpl;
 	using Poco::Net::CertificateHandlerFactoryMgr;
 	using Poco::Net::CertificateHandlerFactoryRegistrar;
 	using Poco::Net::CertificateValidationException;
@@ -168,6 +174,7 @@ export namespace Poco::Net {
 	using Poco::Net::DNS;
 	using Poco::Net::DNSException;
 	using Poco::Net::DatagramSocket;
+	using Poco::Net::DatagramSocketImpl;
 	using Poco::Net::DialogSocket;
 	using Poco::Net::ErrorNotification;
 	using Poco::Net::EscapeHTMLIOS;
@@ -224,7 +231,9 @@ export namespace Poco::Net {
 	using Poco::Net::HTTPServerConnectionFactory;
 	using Poco::Net::HTTPServerParams;
 	using Poco::Net::HTTPServerRequest;
+	using Poco::Net::HTTPServerRequestImpl;
 	using Poco::Net::HTTPServerResponse;
+	using Poco::Net::HTTPServerResponseImpl;
 	using Poco::Net::HTTPServerSession;
 	using Poco::Net::HTTPSession;
 	using Poco::Net::HTTPSessionFactory;
@@ -238,7 +247,10 @@ export namespace Poco::Net {
 	using Poco::Net::ICMPException;
 	using Poco::Net::ICMPFragmentationException;
 	using Poco::Net::ICMPPacket;
+	using Poco::Net::ICMPPacketImpl;
 	using Poco::Net::ICMPSocket;
+	using Poco::Net::ICMPSocketImpl;
+	using Poco::Net::ICMPv4PacketImpl;
 	using Poco::Net::IPAddress;
 	using Poco::Net::IdleNotification;
 	using Poco::Net::InterfaceNotFoundException;
@@ -290,6 +302,7 @@ export namespace Poco::Net {
 	using Poco::Net::PartStoreFactory;
 	using Poco::Net::PollSet;
 	using Poco::Net::PrivateKeyFactory;
+	using Poco::Net::PrivateKeyFactoryImpl;
 	using Poco::Net::PrivateKeyFactoryMgr;
 	using Poco::Net::PrivateKeyFactoryRegistrar;
 	using Poco::Net::PrivateKeyPassphraseHandler;
@@ -300,6 +313,7 @@ export namespace Poco::Net {
 	using Poco::Net::QuotedPrintableEncoderBuf;
 	using Poco::Net::QuotedPrintableEncoderIOS;
 	using Poco::Net::RawSocket;
+	using Poco::Net::RawSocketImpl;
 	using Poco::Net::ReadableNotification;
 	using Poco::Net::RejectCertificateHandler;
 	using Poco::Net::RemoteSyslogChannel;
@@ -314,8 +328,11 @@ export namespace Poco::Net {
 	using Poco::Net::SSPINTLMCredentials;
 	using Poco::Net::SecureSMTPClientSession;
 	using Poco::Net::SecureServerSocket;
+	using Poco::Net::SecureServerSocketImpl;
 	using Poco::Net::SecureStreamSocket;
+	using Poco::Net::SecureSocketImpl;
 	using Poco::Net::ServerSocket;
+	using Poco::Net::ServerSocketImpl;
 	using Poco::Net::ServiceNotFoundException;
 	using Poco::Net::Session;
 	using Poco::Net::ShutdownNotification;
@@ -324,6 +341,7 @@ export namespace Poco::Net {
 	using Poco::Net::SocketAddress;
 	using Poco::Net::SocketConnector;
 	using Poco::Net::SocketIOS;
+	using Poco::Net::SocketImpl;
 	using Poco::Net::SocketInputStream;
 	using Poco::Net::SocketNotification;
 	using Poco::Net::SocketNotifier;
@@ -333,10 +351,12 @@ export namespace Poco::Net {
 	using Poco::Net::SocketStream;
 	using Poco::Net::SocketStreamBuf;
 	using Poco::Net::StreamSocket;
+	using Poco::Net::StreamSocketImpl;
 	using Poco::Net::StringPartSource;
 	using Poco::Net::TCPServer;
 	using Poco::Net::TCPServerConnection;
 	using Poco::Net::TCPServerConnectionFactory;
+	using Poco::Net::TCPServerConnectionFactoryImpl;
 	using Poco::Net::TCPServerConnectionFilter;
 	using Poco::Net::TCPServerDispatcher;
 	using Poco::Net::TCPServerParams;
@@ -350,28 +370,9 @@ export namespace Poco::Net {
 	using Poco::Net::VerificationErrorArgs;
 	using Poco::Net::WebSocket;
 	using Poco::Net::WebSocketException;
+	using Poco::Net::WebSocketImpl;
 	using Poco::Net::WritableNotification;
 	using Poco::Net::X509Certificate;
-
-	#ifdef POCO_MODULES_EXPORT_IMPL
-	using Poco::Net::CertificateHandlerFactoryImpl;
-	using Poco::Net::DatagramSocketImpl;
-	using Poco::Net::HTTPServerRequestImpl;
-	using Poco::Net::HTTPServerResponseImpl;
-	using Poco::Net::ICMPPacketImpl;
-	using Poco::Net::ICMPSocketImpl;
-	using Poco::Net::ICMPv4PacketImpl;
-	using Poco::Net::PrivateKeyFactoryImpl;
-	using Poco::Net::RawSocketImpl;
-	using Poco::Net::SecureServerSocketImpl;
-	using Poco::Net::SecureSocketImpl;
-	using Poco::Net::SecureStreamSocketImpl;
-	using Poco::Net::ServerSocketImpl;
-	using Poco::Net::SocketImpl;
-	using Poco::Net::StreamSocketImpl;
-	using Poco::Net::TCPServerConnectionFactoryImpl;
-	using Poco::Net::WebSocketImpl;
-	#endif
 
 	using Poco::Net::SocketBufVec;
 	using Poco::Net::UDPMsgSizeT;
@@ -390,7 +391,6 @@ export namespace Poco::Net {
 	using Poco::Net::uninitializeNetwork;
 	using Poco::Net::uninitializeSSL;
 
-	#ifdef POCO_MODULES_EXPORT_IMPL
 	namespace Impl {
 		using Poco::Net::Impl::IPAddressImpl;
 		using Poco::Net::Impl::IPv4AddressImpl;

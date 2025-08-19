@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_ZIP
+
+#ifdef ENABLE_ZIP
 #include "Poco/Zip/Add.h"
 #include "Poco/Zip/AutoDetectStream.h"
 #include "Poco/Zip/Compress.h"
@@ -23,10 +26,12 @@ module;
 #include "Poco/Zip/ZipOperation.h"
 #include "Poco/Zip/ZipStream.h"
 #include "Poco/Zip/ZipUtil.h"
+#endif
 
 export module Poco.Zip;
 
 export namespace Poco::Zip {
+	#ifdef ENABLE_ZIP
 	using Poco::Zip::Add;
 	using Poco::Zip::AutoDetectIOS;
 	using Poco::Zip::AutoDetectInputStream;
@@ -60,4 +65,5 @@ export namespace Poco::Zip {
 	using Poco::Zip::ZipOutputStream;
 	using Poco::Zip::ZipStreamBuf;
 	using Poco::Zip::ZipUtil;
+	#endif
 }

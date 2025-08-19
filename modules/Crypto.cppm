@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_CRYPTO
+
+#ifdef ENABLE_CRYPTO
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherImpl.h"
@@ -25,15 +28,19 @@ module;
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/RSAKeyImpl.h"
 #include "Poco/Crypto/X509Certificate.h"
+#endif
 
 export module Poco.Crypto;
 
 export namespace Poco::Crypto {
+	#ifdef ENABLE_CRYPTO
 	using Poco::Crypto::Cipher;
 	using Poco::Crypto::CipherFactory;
 	using Poco::Crypto::CipherKey;
+	using Poco::Crypto::CipherKeyImpl;
 	using Poco::Crypto::CryptoException;
 	using Poco::Crypto::CryptoIOS;
+	using Poco::Crypto::CipherImpl;
 	using Poco::Crypto::CryptoInputStream;
 	using Poco::Crypto::CryptoOutputStream;
 	using Poco::Crypto::CryptoStreamBuf;
@@ -44,29 +51,25 @@ export namespace Poco::Crypto {
 	using Poco::Crypto::ECDSADigestEngine;
 	using Poco::Crypto::ECDSASignature;
 	using Poco::Crypto::ECKey;
+	using Poco::Crypto::ECKeyImpl;
+	using Poco::Crypto::EVPCipherImpl;
 	using Poco::Crypto::EVPPKey;
 	using Poco::Crypto::EncryptingInputStream;
 	using Poco::Crypto::EncryptingOutputStream;
 	using Poco::Crypto::Envelope;
 	using Poco::Crypto::KeyPair;
+	using Poco::Crypto::KeyPairImpl;
 	using Poco::Crypto::OpenSSLException;
 	using Poco::Crypto::OpenSSLInitializer;
 	using Poco::Crypto::PKCS12Container;
+	using Poco::Crypto::RSACipherImpl;
 	using Poco::Crypto::RSADigestEngine;
 	using Poco::Crypto::RSAKey;
+	using Poco::Crypto::RSAKeyImpl;
 	using Poco::Crypto::X509Certificate;
 
 	using Poco::Crypto::getError;
 	using Poco::Crypto::initializeCrypto;
 	using Poco::Crypto::uninitializeCrypto;
-
-	#ifdef POCO_MODULES_EXPORT_IMPL
-	using Poco::Crypto::CipherImpl;
-	using Poco::Crypto::CipherKeyImpl;
-	using Poco::Crypto::ECKeyImpl;
-	using Poco::Crypto::EVPCipherImpl;
-	using Poco::Crypto::KeyPairImpl;
-	using Poco::Crypto::RSACipherImpl;
-	using Poco::Crypto::RSAKeyImpl;
 	#endif
 }

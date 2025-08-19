@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_XML
+
+#ifdef ENABLE_XML
 #include "Poco/DOM/AbstractContainerNode.h"
 #include "Poco/DOM/AbstractNode.h"
 #include "Poco/DOM/Attr.h"
@@ -74,10 +77,12 @@ module;
 #include "Poco/XML/XMLStreamParser.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/XMLWriter.h"
+#endif
 
 export module Poco.XML;
 
 export namespace Poco::XML {
+	#ifdef ENABLE_XML
 	// DOM
 	using Poco::XML::AbstractContainerNode;
 	using Poco::XML::AbstractNode;
@@ -170,4 +175,5 @@ export namespace Poco::XML {
 	using Poco::XML::operator==;
 	using Poco::XML::swap;
 	using Poco::XML::toXMLString;
+	#endif
 }

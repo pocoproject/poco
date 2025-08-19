@@ -4,7 +4,18 @@ add_library(PocoModules)
 add_library(Poco::PocoModules ALIAS PocoModules)
 
 set(POCO_MODULES
-    Foundation.cppm
+	Poco.cppm
+)
+
+if (ENABLE_FOUNDATION)
+	list(APPEND POCO_MODULES
+		Foundation.cppm
+	)
+	target_compile_definitions(PocoModules PUBLIC ENABLE_FOUNDATION)
+endif()
+
+
+
 	ActiveRecord.cppm
 	Crypto.cppm
 	Data.cppm
@@ -18,8 +29,6 @@ set(POCO_MODULES
 	Util.cppm
 	XML.cppm
 	Zip.cppm
-	Poco.cppm
-)
 
 if(NOT COMMAND configure_cpp_module_target)
     function(configure_cpp_module_target target)

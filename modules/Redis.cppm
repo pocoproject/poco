@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_REDIS
+
+#ifdef ENABLE_REDIS
 #include "Poco/Redis/Array.h"
 #include "Poco/Redis/AsyncReader.h"
 #include "Poco/Redis/Client.h"
@@ -11,10 +14,12 @@ module;
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/RedisStream.h"
 #include "Poco/Redis/Type.h"
+#endif
 
 export module Poco.Redis;
 
 export namespace Poco::Redis {
+	#ifdef ENABLE_REDIS
 	using Poco::Redis::Array;
 	using Poco::Redis::AsyncReader;
 	using Poco::Redis::Client;
@@ -32,4 +37,5 @@ export namespace Poco::Redis {
 	using Poco::Redis::Type;
 
 	using Poco::Redis::BulkString;
+	#endif
 }

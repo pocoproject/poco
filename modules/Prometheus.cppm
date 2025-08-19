@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_PROMETHEUS
+
+#ifdef ENABLE_PROMETHEUS
 #include "Poco/Prometheus/AtomicFloat.h"
 #include "Poco/Prometheus/CallbackMetric.h"
 #include "Poco/Prometheus/Collector.h"
@@ -19,10 +22,12 @@ module;
 #include "Poco/Prometheus/Registry.h"
 #include "Poco/Prometheus/TextExporter.h"
 #include "Poco/Prometheus/ThreadPoolCollector.h"
+#endif
 
 export module Poco.Prometheus;
 
 export namespace Poco::Prometheus {
+	#ifdef ENABLE_PROMETHEUS
 	using Poco::Prometheus::AtomicFloat;
 	using Poco::Prometheus::CallbackMetric;
 	using Poco::Prometheus::Collector;
@@ -37,6 +42,7 @@ export namespace Poco::Prometheus {
 	using Poco::Prometheus::IntCounter;
 	using Poco::Prometheus::IntGauge;
 	using Poco::Prometheus::LabeledMetric;
+	using Poco::Prometheus::LabeledMetricImpl;
 	using Poco::Prometheus::Metric;
 	using Poco::Prometheus::MetricsRequestHandler;
 	using Poco::Prometheus::MetricsServer;
@@ -45,12 +51,9 @@ export namespace Poco::Prometheus {
 	using Poco::Prometheus::TextExporter;
 	using Poco::Prometheus::ThreadPoolCollector;
 
-	#ifdef POCO_MODULES_EXPORT_IMPL
-	using Poco::Prometheus::LabeledMetricImpl;
-	#endif
-
 	using Poco::Prometheus::CallbackCounter;
 	using Poco::Prometheus::CallbackGauge;
 	using Poco::Prometheus::CallbackIntCounter;
 	using Poco::Prometheus::CallbackIntGauge;
+	#endif
 }
