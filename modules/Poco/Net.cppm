@@ -2,11 +2,16 @@ module;
 
 #ifdef ENABLE_NET
 #include "Poco/Net/AbstractHTTPRequestHandler.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/AcceptCertificateHandler.h"
+#ifdef ENABLE_NETSSL_WIN
+#include "Poco/Net/AutoSecBufferDesc.h"
+#endif
 #include "Poco/Net/CertificateHandlerFactory.h"
 #include "Poco/Net/CertificateHandlerFactoryMgr.h"
 #include "Poco/Net/ConsoleCertificateHandler.h"
 #include "Poco/Net/Context.h"
+#endif
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/DatagramSocketImpl.h"
 #include "Poco/Net/DialogSocket.h"
@@ -14,8 +19,10 @@ module;
 #include "Poco/Net/EscapeHTMLStream.h"
 #include "Poco/Net/FilePartSource.h"
 #include "Poco/Net/FTPClientSession.h"
+#ifdef ENABLE_SSL_OPENSSL
 #include "Poco/Net/FTPSClientSession.h"
 #include "Poco/Net/FTPSStreamFactory.h"
+#endif
 #include "Poco/Net/FTPStreamFactory.h"
 #include "Poco/Net/HostEntry.h"
 #include "Poco/Net/HTMLForm.h"
@@ -37,7 +44,9 @@ module;
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPResponse.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/HTTPSClientSession.h"
+#endif
 #include "Poco/Net/HTTPServerConnectionFactory.h"
 #include "Poco/Net/HTTPServerConnection.h"
 #include "Poco/Net/HTTPServer.h"
@@ -50,8 +59,10 @@ module;
 #include "Poco/Net/HTTPSessionFactory.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/HTTPSessionInstantiator.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/HTTPSSessionInstantiator.h"
 #include "Poco/Net/HTTPSStreamFactory.h"
+#endif
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/ICMPClient.h"
@@ -61,11 +72,15 @@ module;
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/ICMPSocketImpl.h"
 #include "Poco/Net/ICMPv4PacketImpl.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/InvalidCertificateHandler.h"
+#endif
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/IPAddressImpl.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/KeyConsoleHandler.h"
 #include "Poco/Net/KeyFileHandler.h"
+#endif
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/MailStream.h"
@@ -78,7 +93,9 @@ module;
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/Net.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/NetSSL.h"
+#endif
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/NTLMCredentials.h"
 #include "Poco/Net/NTPClient.h"
@@ -94,25 +111,33 @@ module;
 #include "Poco/Net/PartStore.h"
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/POP3ClientSession.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/PrivateKeyFactory.h"
 #include "Poco/Net/PrivateKeyFactoryMgr.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#endif
 #include "Poco/Net/QuotedPrintableDecoder.h"
 #include "Poco/Net/QuotedPrintableEncoder.h"
 #include "Poco/Net/RawSocket.h"
 #include "Poco/Net/RawSocketImpl.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/RejectCertificateHandler.h"
+#endif
 #include "Poco/Net/RemoteSyslogChannel.h"
 #include "Poco/Net/RemoteSyslogListener.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/SecureServerSocketImpl.h"
 #include "Poco/Net/SecureSMTPClientSession.h"
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
+#endif
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/ServerSocketImpl.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/Session.h"
+#endif
 #include "Poco/Net/SingleSocketPoller.h"
 #include "Poco/Net/SMTPChannel.h"
 #include "Poco/Net/SMTPClientSession.h"
@@ -128,8 +153,10 @@ module;
 #include "Poco/Net/SocketProactor.h"
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/SocketStream.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/SSLManager.h"
+#endif
 #include "Poco/Net/SSPINTLMCredentials.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
@@ -144,11 +171,15 @@ module;
 #include "Poco/Net/UDPServer.h"
 #include "Poco/Net/UDPServerParams.h"
 #include "Poco/Net/UDPSocketReader.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/VerificationErrorArgs.h"
+#endif
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/WebSocketImpl.h"
+#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 #include "Poco/Net/X509Certificate.h"
+#endif
 #endif
 
 export module Poco.Net;
@@ -156,19 +187,28 @@ export module Poco.Net;
 export namespace Poco::Net {
 	#ifdef ENABLE_NET
 	using Poco::Net::AbstractHTTPRequestHandler;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::AcceptCertificateHandler;
+	#endif
 	using Poco::Net::AddressFamily;
 	using Poco::Net::AddressFamilyMismatchException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
+	#ifdef ENABLE_NETSSL_WIN
+	using Poco::Net::AutoSecBufferDesc;
+	#endif
 	using Poco::Net::CertificateHandlerFactory;
 	using Poco::Net::CertificateHandlerFactoryImpl;
 	using Poco::Net::CertificateHandlerFactoryMgr;
 	using Poco::Net::CertificateHandlerFactoryRegistrar;
 	using Poco::Net::CertificateValidationException;
+	#endif
 	using Poco::Net::ConnectionAbortedException;
 	using Poco::Net::ConnectionRefusedException;
 	using Poco::Net::ConnectionResetException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::ConsoleCertificateHandler;
 	using Poco::Net::Context;
+	#endif
 	using Poco::Net::DNS;
 	using Poco::Net::DNSException;
 	using Poco::Net::DatagramSocket;
@@ -181,8 +221,10 @@ export namespace Poco::Net {
 	using Poco::Net::FTPClientSession;
 	using Poco::Net::FTPException;
 	using Poco::Net::FTPPasswordProvider;
+	#ifdef ENABLE_NETSSL_OPENSSL
 	using Poco::Net::FTPSClientSession;
 	using Poco::Net::FTPSStreamFactory;
+	#endif
 	using Poco::Net::FTPStreamFactory;
 	using Poco::Net::FilePartSource;
 	using Poco::Net::FilePartStore;
@@ -221,9 +263,11 @@ export namespace Poco::Net {
 	using Poco::Net::HTTPResponseIOS;
 	using Poco::Net::HTTPResponseStream;
 	using Poco::Net::HTTPResponseStreamBuf;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::HTTPSClientSession;
 	using Poco::Net::HTTPSSessionInstantiator;
 	using Poco::Net::HTTPSStreamFactory;
+	#endif
 	using Poco::Net::HTTPServer;
 	using Poco::Net::HTTPServerConnection;
 	using Poco::Net::HTTPServerConnectionFactory;
@@ -235,7 +279,9 @@ export namespace Poco::Net {
 	using Poco::Net::HTTPServerSession;
 	using Poco::Net::HTTPSession;
 	using Poco::Net::HTTPSessionFactory;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::HTTPSSessionInstantiator;
+	#endif
 	using Poco::Net::HTTPStreamBuf;
 	using Poco::Net::HTTPStreamFactory;
 	using Poco::Net::HostEntry;
@@ -253,11 +299,15 @@ export namespace Poco::Net {
 	using Poco::Net::IdleNotification;
 	using Poco::Net::InterfaceNotFoundException;
 	using Poco::Net::InvalidAddressException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::InvalidCertificateException;
 	using Poco::Net::InvalidCertificateHandler;
+	#endif
 	using Poco::Net::InvalidSocketException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::KeyConsoleHandler;
 	using Poco::Net::KeyFileHandler;
+	#endif
 	using Poco::Net::MailIOS;
 	using Poco::Net::MailInputStream;
 	using Poco::Net::MailMessage;
@@ -299,11 +349,13 @@ export namespace Poco::Net {
 	using Poco::Net::PartStore;
 	using Poco::Net::PartStoreFactory;
 	using Poco::Net::PollSet;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::PrivateKeyFactory;
 	using Poco::Net::PrivateKeyFactoryImpl;
 	using Poco::Net::PrivateKeyFactoryMgr;
 	using Poco::Net::PrivateKeyFactoryRegistrar;
 	using Poco::Net::PrivateKeyPassphraseHandler;
+	#endif
 	using Poco::Net::QuotedPrintableDecoder;
 	using Poco::Net::QuotedPrintableDecoderBuf;
 	using Poco::Net::QuotedPrintableEncoderIOS;
@@ -313,26 +365,34 @@ export namespace Poco::Net {
 	using Poco::Net::RawSocket;
 	using Poco::Net::RawSocketImpl;
 	using Poco::Net::ReadableNotification;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::RejectCertificateHandler;
+	#endif
 	using Poco::Net::RemoteSyslogChannel;
 	using Poco::Net::RemoteSyslogListener;
 	using Poco::Net::SMTPChannel;
 	using Poco::Net::SMTPClientSession;
 	using Poco::Net::SMTPException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::SSLConnectionUnexpectedlyClosedException;
 	using Poco::Net::SSLContextException;
 	using Poco::Net::SSLException;
 	using Poco::Net::SSLManager;
+	#endif
 	using Poco::Net::SSPINTLMCredentials;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::SecureSMTPClientSession;
 	using Poco::Net::SecureServerSocket;
 	using Poco::Net::SecureServerSocketImpl;
 	using Poco::Net::SecureStreamSocket;
 	using Poco::Net::SecureSocketImpl;
+	#endif
 	using Poco::Net::ServerSocket;
 	using Poco::Net::ServerSocketImpl;
 	using Poco::Net::ServiceNotFoundException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::Session;
+	#endif
 	using Poco::Net::ShutdownNotification;
 	using Poco::Net::Socket;
 	using Poco::Net::SocketAcceptor;
@@ -364,13 +424,17 @@ export namespace Poco::Net {
 	using Poco::Net::UDPSocketReader;
 	using Poco::Net::UnsupportedFamilyException;
 	using Poco::Net::UnsupportedRedirectException;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::Utility;
 	using Poco::Net::VerificationErrorArgs;
+	#endif
 	using Poco::Net::WebSocket;
 	using Poco::Net::WebSocketException;
 	using Poco::Net::WebSocketImpl;
 	using Poco::Net::WritableNotification;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::X509Certificate;
+	#endif
 
 	using Poco::Net::SocketBufVec;
 	using Poco::Net::UDPMsgSizeT;
@@ -382,12 +446,16 @@ export namespace Poco::Net {
 	using Poco::Net::SocketBufVecSize;
 	using Poco::Net::htmlize;
 	using Poco::Net::initializeNetwork;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::initializeSSL;
+	#endif
 	using Poco::Net::operator<<;
 	using Poco::Net::operator>>;
 	using Poco::Net::swap;
 	using Poco::Net::uninitializeNetwork;
+	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::uninitializeSSL;
+	#endif
 
 	namespace Impl {
 		using Poco::Net::Impl::IPAddressImpl;

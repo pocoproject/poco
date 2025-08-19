@@ -165,6 +165,14 @@ if(ENABLE_NET)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_NET)
 
 	target_link_libraries(PocoModules PUBLIC Poco::Net)
+
+	if(ENABLE_NETSSL_OPENSSL)
+		target_compile_definitions(PocoModules PUBLIC ENABLE_NETSSL_OPENSSL)
+	endif()
+
+	if(ENABLE_NETSSL_WIN)
+		target_compile_definitions(PocoModules PUBLIC ENABLE_NETSSL_WIN)
+	endif()
 endif()
 
 if(ENABLE_PDF)
