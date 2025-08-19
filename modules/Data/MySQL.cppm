@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_DATA_MYSQL
-
 #ifdef ENABLE_DATA_MYSQL
 #include "Poco/Data/MySQL/Binder.h"
 #include "Poco/Data/MySQL/Connector.h"

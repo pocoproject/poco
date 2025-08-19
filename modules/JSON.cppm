@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_JSON
-
 #ifdef ENABLE_JSON
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Handler.h"

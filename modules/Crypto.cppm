@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_CRYPTO
-
 #ifdef ENABLE_CRYPTO
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"

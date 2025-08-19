@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_ACTIVERECORD
-
 #ifdef ENABLE_ACTIVERECORD
 #include "Poco/ActiveRecord/ActiveRecord.h"
 #include "Poco/ActiveRecord/ActiveRecordLib.h"

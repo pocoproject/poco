@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_DATA
-
 #ifdef ENABLE_DATA
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/AbstractBinding.h"

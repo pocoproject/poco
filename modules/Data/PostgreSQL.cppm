@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_DATA_POSTGRESQL
-
 #ifdef ENABLE_DATA_POSTGRESQL
 #include "Poco/Data/PostgreSQL/BinaryExtractor.h"
 #include "Poco/Data/PostgreSQL/Binder.h"

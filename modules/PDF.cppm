@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_PDF
-
 #ifdef ENABLE_PDF
 #include "Poco/PDF/AttributedString.h"
 #include "Poco/PDF/Cell.h"

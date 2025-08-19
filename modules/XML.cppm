@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_XML
-
 #ifdef ENABLE_XML
 #include "Poco/DOM/AbstractContainerNode.h"
 #include "Poco/DOM/AbstractNode.h"
