@@ -9,20 +9,23 @@ set(POCO_MODULES
 
 if(ENABLE_FOUNDATION)
 	list(APPEND POCO_MODULES
-		Foundation.cppm
-		Dynamic.cppm
+		Poco/Foundation.cppm
+		Poco/Dynamic.cppm
 	)
+
 	target_compile_definitions(PocoModules PUBLIC ENABLE_FOUNDATION)
-	if(ENABLE_ENCODINGS)
-		target_compile_definitions(PocoModules PUBLIC ENABLE_ENCODINGS)
-	endif()
 
 	target_link_libraries(PocoModules PUBLIC Poco::Foundation)
+	if(ENABLE_ENCODINGS)
+		target_compile_definitions(PocoModules PUBLIC ENABLE_ENCODINGS)
+
+		target_link_libraries(PocoModules PUBLIC Poco::Encodings)
+	endif()
 endif()
 
 if(ENABLE_ACTIVERECORD)
 	list(APPEND POCO_MODULES
-		ActiveRecord.cppm
+		Poco/ActiveRecord.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_ACTIVERECORD)
 	
@@ -31,16 +34,34 @@ endif()
 
 if(ENABLE_CRYPTO)
 	list(APPEND POCO_MODULES
-		Crypto.cppm
+		Poco/Crypto.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_CRYPTO)
 
 	target_link_libraries(PocoModules PUBLIC Poco::Crypto)
 endif()
 
+if(ENABLE_CPPPARSER)
+	list(APPEND POCO_MODULES
+		Poco/CppParser.cppm
+	)
+	target_compile_definitions(PocoModules PUBLIC ENABLE_CPPPARSER)
+
+	target_link_libraries(PocoModules PUBLIC Poco::CppParser)
+endif()
+
+if(ENABLE_CPPUNIT)
+	list(APPEND POCO_MODULES
+		Poco/CppUnit.cppm
+	)
+	target_compile_definitions(PocoModules PUBLIC ENABLE_CPPUNIT)
+
+	target_link_libraries(PocoModules PUBLIC Poco::CppUnit)
+endif()
+
 if(ENABLE_DATA)
 	list(APPEND POCO_MODULES
-		Data.cppm
+		Poco/Data.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_DATA)
 
@@ -48,7 +69,7 @@ if(ENABLE_DATA)
 
 	if(ENABLE_DATA_MYSQL)
 		list(APPEND POCO_MODULES
-			Data/MySQL.cppm
+			Poco/Data/MySQL.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_MYSQL)
 
@@ -57,7 +78,7 @@ if(ENABLE_DATA)
 
 	if(ENABLE_DATA_ODBC)
 		list(APPEND POCO_MODULES
-			Data/ODBC.cppm
+			Poco/Data/ODBC.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_ODBC)
 
@@ -66,7 +87,7 @@ if(ENABLE_DATA)
 
 	if(ENABLE_DATA_POSTGRESQL)
 		list(APPEND POCO_MODULES
-			Data/PostgreSQL.cppm
+			Poco/Data/PostgreSQL.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_POSTGRESQL)
 
@@ -75,7 +96,7 @@ if(ENABLE_DATA)
 
 	if(ENABLE_DATA_SQLITE)
 		list(APPEND POCO_MODULES
-			Data/SQLite.cppm
+			Poco/Data/SQLite.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_SQLITE)
 
@@ -83,9 +104,36 @@ if(ENABLE_DATA)
 	endif()
 endif()
 
+if(ENABLE_DNSSD)
+	list(APPEND POCO_MODULES
+		Poco/DNSSD.cppm
+	)
+	target_compile_definitions(PocoModules PUBLIC ENABLE_DNSSD)
+
+	target_link_libraries(PocoModules PUBLIC Poco::DNSSD)
+
+	if(ENABLE_DNSSD_AVAHI)
+		list(APPEND POCO_MODULES
+			Poco/DNSSD/Avahi.cppm
+		)
+		target_compile_definitions(PocoModules PUBLIC ENABLE_DNSSD_AVAHI)
+
+		target_link_libraries(PocoModules PUBLIC Poco::DNSSDAvahi)
+	endif()
+
+	if(ENABLE_DNSSD_BONJOUR)
+		list(APPEND POCO_MODULES
+			Poco/DNSSD/Bonjour.cppm
+		)
+		target_compile_definitions(PocoModules PUBLIC ENABLE_DNSSD_BONJOUR)
+
+		target_link_libraries(PocoModules PUBLIC Poco::DNSSDBonjour)
+	endif()
+endif()
+
 if(ENABLE_JSON)
 	list(APPEND POCO_MODULES
-		JSON.cppm
+		Poco/JSON.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_JSON)
 
@@ -94,7 +142,7 @@ endif()
 
 if(ENABLE_JWT)
 	list(APPEND POCO_MODULES
-		JWT.cppm
+		Poco/JWT.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_JWT)
 
@@ -103,7 +151,7 @@ endif()
 
 if(ENABLE_MONGODB)
 	list(APPEND POCO_MODULES
-		MongoDB.cppm
+		Poco/MongoDB.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_MONGODB)
 
@@ -112,7 +160,7 @@ endif()
 
 if(ENABLE_NET)
 	list(APPEND POCO_MODULES
-		Net.cppm
+		Poco/Net.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_NET)
 
@@ -121,7 +169,7 @@ endif()
 
 if(ENABLE_PDF)
 	list(APPEND POCO_MODULES
-		PDF.cppm
+		Poco/PDF.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_PDF)
 
@@ -130,7 +178,7 @@ endif()
 
 if(ENABLE_PROMETHEUS)
 	list(APPEND POCO_MODULES
-		Prometheus.cppm
+		Poco/Prometheus.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_PROMETHEUS)
 
@@ -139,7 +187,7 @@ endif()
 
 if(ENABLE_REDIS)
 	list(APPEND POCO_MODULES
-		Redis.cppm
+		Poco/Redis.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_REDIS)
 
@@ -148,7 +196,7 @@ endif()
 
 if(ENABLE_SEVENZIP)
 	list(APPEND POCO_MODULES
-		SevenZip.cppm
+		Poco/SevenZip.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_SEVENZIP)
 
@@ -157,7 +205,7 @@ endif()
 
 if(ENABLE_UTIL)
 	list(APPEND POCO_MODULES
-		Util.cppm
+		Poco/Util.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_UTIL)
 
@@ -166,7 +214,7 @@ endif()
 
 if(ENABLE_XML)
 	list(APPEND POCO_MODULES
-		XML.cppm
+		Poco/XML.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_XML)
 
@@ -175,7 +223,7 @@ endif()
 
 if(ENABLE_ZIP)
 	list(APPEND POCO_MODULES
-		Zip.cppm
+		Poco/Zip.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_ZIP)
 

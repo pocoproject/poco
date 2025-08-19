@@ -19,8 +19,10 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/UDPHandler.h"
+#include "Poco/Net/UDPSocketReader.h"
 
 
 namespace Poco {
