@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_FOUNDATION
-
 #ifdef ENABLE_FOUNDATION
 #include "Poco/Dynamic/Pair.h"
 #include "Poco/Dynamic/Struct.h"

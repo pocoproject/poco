@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_NET
-
 #ifdef ENABLE_NET
 #include "Poco/Net/AbstractHTTPRequestHandler.h"
 #include "Poco/Net/AcceptCertificateHandler.h"

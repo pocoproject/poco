@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_PROMETHEUS
-
 #ifdef ENABLE_PROMETHEUS
 #include "Poco/Prometheus/AtomicFloat.h"
 #include "Poco/Prometheus/CallbackMetric.h"

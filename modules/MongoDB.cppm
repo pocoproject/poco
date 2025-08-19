@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_MONGODB
-
 #ifdef ENABLE_MONGODB
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"

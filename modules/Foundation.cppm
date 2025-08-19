@@ -1,8 +1,5 @@
 module;
 
-#define ENABLE_FOUNDATION
-#define ENABLE_ENCODINGS
-
 #ifdef ENABLE_FOUNDATION
 #include "Poco/AbstractCache.h"
 #include "Poco/AbstractDelegate.h"

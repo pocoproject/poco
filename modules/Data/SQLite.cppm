@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_DATA_SQLITE
-
 #ifdef ENABLE_DATA_SQLITE
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/SQLite/Connector.h"

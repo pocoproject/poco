@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_JWT
-
 #ifdef ENABLE_JWT
 #include "Poco/JWT/JWTException.h"
 #include "Poco/JWT/JWT.h"

@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_ZIP
-
 #ifdef ENABLE_ZIP
 #include "Poco/Zip/Add.h"
 #include "Poco/Zip/AutoDetectStream.h"

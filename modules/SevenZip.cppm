@@ -1,11 +1,9 @@
 module;
 
-#define ENABLE_SEVENZIP
+#ifdef ENABLE_SEVENZIP
 #include "Poco/SevenZip/Archive.h"
 #include "Poco/SevenZip/ArchiveEntry.h"
 #include "Poco/SevenZip/SevenZip.h"
-#ifdef ENABLE_SEVENZIP
-
 #endif
 
 export module Poco.SevenZip;

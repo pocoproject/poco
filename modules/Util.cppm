@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_UTIL
-
 #ifdef ENABLE_UTIL
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/Application.h"

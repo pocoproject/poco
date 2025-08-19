@@ -13,6 +13,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  linux-clang-20-cmake-modules:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Clang 20
+        run: |
+          sudo apt -y update
+          sudo apt -y install wget lsb-release software-properties-common gnupg
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 20
+          sudo apt -y install clang-20 libc++-20-dev libc++abi-20-dev
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
+      - name: Install dependencies
+        run: sudo apt -y install cmake ninja-build
+      - name: Configure with Clang 20 and modules
+        run: |
+          export CC=clang-20
+          export CXX=clang++-20
+          cmake -S . -B build -G Ninja -DPOCO_BUILD_MODULES=ON
+      - name: Build
+        run: cmake --build build
+
   android-arm64-v8a-ndk-latest-cmake:
     runs-on: ubuntu-22.04
     steps:

@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_DATA_ODBC
-
 #ifdef ENABLE_DATA_ODBC
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/ConnectionHandle.h"

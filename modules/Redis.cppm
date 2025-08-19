@@ -1,7 +1,5 @@
 module;
 
-#define ENABLE_REDIS
-
 #ifdef ENABLE_REDIS
 #include "Poco/Redis/Array.h"
 #include "Poco/Redis/AsyncReader.h"
