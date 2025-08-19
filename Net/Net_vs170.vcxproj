@@ -900,6 +900,9 @@
     <ClInclude Include="include\Poco\Net\HTTPIOStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPMessage.h"/>
     <ClInclude Include="include\Poco\Net\HTTPNTLMCredentials.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPObserver.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPReactorServer.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPReactorServerSession.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequest.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequestHandler.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequestHandlerFactory.h"/>
@@ -986,6 +989,9 @@
     <ClInclude Include="include\Poco\Net\TCPServerConnectionFactory.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerDispatcher.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerParams.h"/>
+    <ClInclude Include="include\Poco\Net\TCPReactorAcceptor.h"/>
+    <ClInclude Include="include\Poco\Net\TCPReactorServer.h"/>
+    <ClInclude Include="include\Poco\Net\TCPReactorServerConnection.h"/>
     <ClInclude Include="include\Poco\Net\UDPClient.h"/>
     <ClInclude Include="include\Poco\Net\UDPHandler.h"/>
     <ClInclude Include="include\Poco\Net\UDPServer.h"/>
@@ -1107,6 +1113,16 @@
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <ClCompile Include="src\HTTPNTLMCredentials.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\HTTPReactorServer.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\HTTPReactorServerSession.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
@@ -1502,6 +1518,21 @@
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <ClCompile Include="src\TCPServerParams.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\TCPReactorAcceptor.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\TCPReactorServer.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\TCPReactorServerConnection.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>

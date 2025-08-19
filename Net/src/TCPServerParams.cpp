@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/TCPServerParams.h"
+#include "Poco/Bugcheck.h"
 
 
 namespace Poco {
@@ -23,7 +24,10 @@ TCPServerParams::TCPServerParams():
 	_threadIdleTime(10000000),
 	_maxThreads(0),
 	_maxQueued(64),
-	_threadPriority(Poco::Thread::PRIO_NORMAL)
+	_threadPriority(Poco::Thread::PRIO_NORMAL),
+	_reactorMode(false),
+	_acceptorNum(1),
+	_useSelfReactor(false)
 {
 }
 
@@ -58,6 +62,36 @@ void TCPServerParams::setMaxQueued(int count)
 void TCPServerParams::setThreadPriority(Poco::Thread::Priority prio)
 {
 	_threadPriority = prio;
+}
+
+bool TCPServerParams::getReactorMode() const
+{
+	return _reactorMode;
+}
+void TCPServerParams::setReactorMode(bool reactorMode)
+{
+	_reactorMode = reactorMode;
+}
+int TCPServerParams::getAcceptorNum() const
+{
+	poco_assert(_reactorMode);
+	return _acceptorNum;
+}
+void TCPServerParams::setAcceptorNum(int acceptorNum)
+{
+	poco_assert(_reactorMode);
+	poco_assert(acceptorNum > 0);
+	_acceptorNum = acceptorNum;
+}
+bool TCPServerParams::getUseSelfReactor() const
+{
+	poco_assert(_reactorMode);
+	return _useSelfReactor;
+}
+void TCPServerParams::setUseSelfReactor(bool useSelfReactor)
+{
+	poco_assert(_reactorMode);
+	_useSelfReactor = useSelfReactor;
 }
 
 
