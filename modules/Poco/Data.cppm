@@ -56,10 +56,18 @@ module;
 
 export module Poco.Data;
 
+#ifdef ENABLE_DATA_MYSQL
 export import :MySQL;
+#endif
+#ifdef ENABLE_DATA_ODBC
 export import :ODBC;
+#endif
+#ifdef ENABLE_DATA_POSTGRESQL
 export import :PostgreSQL;
+#endif
+#ifdef ENABLE_DATA_SQLITE
 export import :SQLite;
+#endif
 
 export namespace Poco::Data {
 	#ifdef ENABLE_DATA
@@ -156,7 +164,7 @@ export namespace Poco::Data {
 	using Poco::Data::JSON;
 	using Poco::Data::NullData;
 
-	constexpr std::size_t DATA_INVALID_ROW = POCO_DATA_INVALID_ROW;
+	using Poco::Data::POCO_DATA_INVALID_ROW;
 
 	using Poco::Data::operator<<;
 	using Poco::Data::swap;

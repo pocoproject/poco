@@ -7,7 +7,7 @@ module;
 #include "Poco/Data/PostgreSQL/Extractor.h"
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
-#include "Poco/Data/PostgreSQL/PostgreSQLStatement.h"
+#include "Poco/Data/PostgreSQL/PostgreSQLStatementImpl.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 #include "Poco/Data/PostgreSQL/SessionHandle.h"
 #include "Poco/Data/PostgreSQL/SessionImpl.h"
