@@ -1,5 +1,9 @@
 module;
 
+#define ENABLE_FOUNDATION
+#define ENABLE_ENCODINGS
+
+#ifdef ENABLE_FOUNDATION
 #include "Poco/AbstractCache.h"
 #include "Poco/AbstractDelegate.h"
 #include "Poco/AbstractEvent.h"
@@ -65,9 +69,13 @@ module;
 #include "Poco/DirectoryIterator.h"
 #include "Poco/DirectoryIteratorStrategy.h"
 #include "Poco/DirectoryWatcher.h"
+#ifdef ENABLE_ENCODINGS
 #include "Poco/DoubleByteEncoding.h"
+#endif
 #include "Poco/DynamicFactory.h"
+#ifdef ENABLE_ENCODINGS
 #include "Poco/Encodings.h"
+#endif
 #include "Poco/Environment.h"
 #include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
@@ -111,6 +119,7 @@ module;
 #include "Poco/HMACEngine.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/Instantiator.h"
+#ifdef ENABLE_ENCODINGS
 #include "Poco/ISO8859_10Encoding.h"
 #include "Poco/ISO8859_11Encoding.h"
 #include "Poco/ISO8859_13Encoding.h"
@@ -123,6 +132,7 @@ module;
 #include "Poco/ISO8859_7Encoding.h"
 #include "Poco/ISO8859_8Encoding.h"
 #include "Poco/ISO8859_9Encoding.h"
+#endif
 #include "Poco/JSONFormatter.h"
 #include "Poco/JSONString.h"
 #include "Poco/KeyValueArgs.h"
@@ -284,10 +294,12 @@ module;
 #ifdef _WIN32
 #include "Poco/WindowsConsoleChannel.h"
 #endif
+#endif
 
 export module Poco.Foundation;
 
 export namespace Poco {
+	#ifdef ENABLE_FOUNDATION
 	using Poco::ASCIIEncoding;
 	using Poco::AbstractCache;
 	using Poco::AbstractDelegate;
@@ -392,12 +404,14 @@ export namespace Poco {
 	using Poco::DigestInputStream;
 	using Poco::DigestOutputStream;
 	using Poco::DirectoryIterator;
+	using Poco::DirectoryIteratorImpl;
 	using Poco::DirectoryNotEmptyException;
 	using Poco::DirectoryWatcher;
 	using Poco::DoubleByteEncoding;
 	using Poco::DynamicFactory;
 	using Poco::EOFToken;
 	using Poco::Environment;
+	// using Poco::EnvironmentImpl;
 	using Poco::Error;
 	using Poco::ErrorHandler;
 	using Poco::Event;
@@ -428,6 +442,7 @@ export namespace Poco {
 	using Poco::FileException;
 	using Poco::FileExistsException;
 	using Poco::FileIOS;
+	using Poco::FileImpl;
 	using Poco::FileInputStream;
 	using Poco::FileReadOnlyException;
 	using Poco::FileStream;
@@ -525,7 +540,9 @@ export namespace Poco {
 	using Poco::NDCScope;
 	using Poco::NObserver;
 	using Poco::NamedEvent;
+	using Poco::NamedEventImpl;
 	using Poco::NamedMutex;
+	using Poco::NamedMutexImpl;
 	using Poco::NamedTuple;
 	using Poco::NestedDiagnosticContext;
 	using Poco::NoPermissionException;
@@ -560,6 +577,7 @@ export namespace Poco {
 	using Poco::PBKDF2Engine;
 	using Poco::PIDFile;
 	using Poco::Path;
+	// using Poco::PathImpl;
 	using Poco::PathNotFoundException;
 	using Poco::PathSyntaxException;
 	using Poco::PatternFormatter;
@@ -578,6 +596,8 @@ export namespace Poco {
 	using Poco::PriorityStrategy;
 	using Poco::Process;
 	using Poco::ProcessHandle;
+	using Poco::ProcessHandleImpl;
+	using Poco::ProcessImpl;
 	using Poco::ProcessRunner;
 	using Poco::PropertyNotSupportedException;
 	using Poco::ProtocolException;
@@ -592,6 +612,7 @@ export namespace Poco {
 	using Poco::RangeException;
 	using Poco::ReadFileException;
 	using Poco::RecursiveDirectoryIterator;
+	using Poco::RecursiveDirectoryIteratorImpl;
 	using Poco::RefCountedObject;
 	using Poco::ReferenceCounter;
 	using Poco::RegularExpression;
@@ -623,6 +644,7 @@ export namespace Poco {
 	using Poco::ScopedWriteRWLock;
 	using Poco::Semaphore;
 	using Poco::SharedLibrary;
+	using Poco::SharedLibraryImpl;
 	using Poco::SharedMemory;
 	using Poco::SharedPtr;
 	using Poco::SiblingsFirstTraverse;
@@ -729,19 +751,6 @@ export namespace Poco {
 	using Poco::WriteFileException;
 	using Poco::i_char_traits;
 
-	#ifdef POCO_MODULES_EXPORT_IMPL
-	using Poco::DirectoryIteratorImpl;
-	using Poco::EnvironmentImpl;
-	using Poco::FileImpl;
-	using Poco::NamedEventImpl;
-	using Poco::NamedMutexImpl;
-	using Poco::PathImpl;
-	using Poco::ProcessHandleImpl;
-	using Poco::ProcessImpl;
-	using Poco::RecursiveDirectoryIteratorImpl;
-	using Poco::SharedLibraryImpl;
-	#endif
-
 	using Poco::FIFOBuffer;
 	using Poco::FPE;
 	using Poco::MemoryBinaryReader;
@@ -844,7 +853,6 @@ export namespace Poco {
 	using Poco::trimRightInPlace;
 	using Poco::uIntToStr;
 
-	#ifdef POCO_MODULES_EXPORT_IMPL
 	namespace Impl {
 		using Poco::Impl::EnableSigned;
 		using Poco::Impl::EnableUnsigned;

@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_MONGODB
+
+#ifdef ENABLE_MONGODB
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
 #include "Poco/MongoDB/BSONReader.h"
@@ -27,10 +30,12 @@ module;
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/ResponseMessage.h"
 #include "Poco/MongoDB/UpdateRequest.h"
+#endif
 
 export module Poco.MongoDB;
 
 export namespace Poco::MongoDB {
+	#ifdef ENABLE_MONGODB
 	using Poco::MongoDB::Array;
 	using Poco::MongoDB::BSONReader;
 	using Poco::MongoDB::BSONTimestamp;
@@ -64,4 +69,5 @@ export namespace Poco::MongoDB {
 
 	using Poco::MongoDB::ElementSet;
 	using Poco::MongoDB::NullValue;
+	#endif
 }

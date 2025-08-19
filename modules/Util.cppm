@@ -1,5 +1,8 @@
 module;
 
+#define ENABLE_UTIL
+
+#ifdef ENABLE_UTIL
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/ConfigurationMapper.h"
@@ -30,14 +33,18 @@ module;
 #include "Poco/Util/Units.h"
 #include "Poco/Util/Util.h"
 #include "Poco/Util/Validator.h"
+#ifdef _WIN32
 #include "Poco/Util/WinRegistryConfiguration.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Util/WinService.h"
+#endif
 #include "Poco/Util/XMLConfiguration.h"
+#endif
 
 export module Poco.Util;
 
 export namespace Poco::Util {
+	#ifdef ENABLE_UTIL
 	using Poco::Util::AbstractConfiguration;
 	using Poco::Util::AbstractOptionCallback;
 	using Poco::Util::AmbiguousOptionException;
@@ -77,8 +84,11 @@ export namespace Poco::Util {
 	using Poco::Util::UnexpectedArgumentException;
 	using Poco::Util::UnknownOptionException;
 	using Poco::Util::Validator;
+	#ifdef _WIN32
 	using Poco::Util::WinRegistryConfiguration;
 	using Poco::Util::WinRegistryKey;
 	using Poco::Util::WinService;
+	#endif
 	using Poco::Util::XMLConfiguration;
+	#endif
 }
