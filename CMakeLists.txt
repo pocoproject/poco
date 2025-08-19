@@ -305,10 +305,8 @@ add_compile_definitions(POCO_CMAKE)
 set(Poco_COMPONENTS "")
 
 if(ENABLE_TESTS)
-	add_subdirectory(CppUnit)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
-	list(APPEND Poco_COMPONENTS "CppUnit")
 endif()
 
 if(ENABLE_ENCODINGS_COMPILER OR ENABLE_APACHECONNECTOR)
@@ -391,6 +389,11 @@ endif()
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
 	list(APPEND Poco_COMPONENTS "Foundation")
+endif()
+
+if(ENABLE_CPPUNIT)
+	add_subdirectory(CppUnit)
+	list(APPEND Poco_COMPONENTS "CppUnit")
 endif()
 
 if(ENABLE_ENCODINGS)
