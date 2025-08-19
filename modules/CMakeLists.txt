@@ -16,6 +16,8 @@ if(ENABLE_FOUNDATION)
 	if(ENABLE_ENCODINGS)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_ENCODINGS)
 	endif()
+
+	target_link_libraries(PocoModules PUBLIC Poco::Foundation)
 endif()
 
 if(ENABLE_ACTIVERECORD)
@@ -23,6 +25,8 @@ if(ENABLE_ACTIVERECORD)
 		ActiveRecord.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_ACTIVERECORD)
+	
+	target_link_libraries(PocoModules PUBLIC Poco::ActiveRecord)
 endif()
 
 if(ENABLE_CRYPTO)
@@ -30,6 +34,8 @@ if(ENABLE_CRYPTO)
 		Crypto.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_CRYPTO)
+
+	target_link_libraries(PocoModules PUBLIC Poco::Crypto)
 endif()
 
 if(ENABLE_DATA)
@@ -38,11 +44,15 @@ if(ENABLE_DATA)
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_DATA)
 
+	target_link_libraries(PocoModules PUBLIC Poco::Data)
+
 	if(ENABLE_DATA_MYSQL)
 		list(APPEND POCO_MODULES
 			Data/MySQL.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_MYSQL)
+
+		target_link_libraries(PocoModules PUBLIC Poco::DataMySQL)
 	endif()
 
 	if(ENABLE_DATA_ODBC)
@@ -50,6 +60,8 @@ if(ENABLE_DATA)
 			Data/ODBC.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_ODBC)
+
+		target_link_libraries(PocoModules PUBLIC Poco::DataODBC)
 	endif()
 
 	if(ENABLE_DATA_POSTGRESQL)
@@ -57,6 +69,8 @@ if(ENABLE_DATA)
 			Data/PostgreSQL.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_POSTGRESQL)
+
+		target_link_libraries(PocoModules PUBLIC Poco::DataPostgreSQL)
 	endif()
 
 	if(ENABLE_DATA_SQLITE)
@@ -64,6 +78,8 @@ if(ENABLE_DATA)
 			Data/SQLite.cppm
 		)
 		target_compile_definitions(PocoModules PUBLIC ENABLE_DATA_SQLITE)
+
+		target_link_libraries(PocoModules PUBLIC Poco::DataSQLite)
 	endif()
 endif()
 
@@ -72,6 +88,8 @@ if(ENABLE_JSON)
 		JSON.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_JSON)
+
+	target_link_libraries(PocoModules PUBLIC Poco::JSON)
 endif()
 
 if(ENABLE_JWT)
@@ -79,6 +97,8 @@ if(ENABLE_JWT)
 		JWT.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_JWT)
+
+	target_link_libraries(PocoModules PUBLIC Poco::JWT)
 endif()
 
 if(ENABLE_MONGODB)
@@ -86,6 +106,8 @@ if(ENABLE_MONGODB)
 		MongoDB.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_MONGODB)
+
+	target_link_libraries(PocoModules PUBLIC Poco::MongoDB)
 endif()
 
 if(ENABLE_NET)
@@ -93,6 +115,17 @@ if(ENABLE_NET)
 		Net.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_NET)
+
+	target_link_libraries(PocoModules PUBLIC Poco::Net)
+endif()
+
+if(ENABLE_PDF)
+	list(APPEND POCO_MODULES
+		PDF.cppm
+	)
+	target_compile_definitions(PocoModules PUBLIC ENABLE_PDF)
+
+	target_link_libraries(PocoModules PUBLIC Poco::PDF)
 endif()
 
 if(ENABLE_PROMETHEUS)
@@ -100,6 +133,8 @@ if(ENABLE_PROMETHEUS)
 		Prometheus.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_PROMETHEUS)
+
+	target_link_libraries(PocoModules PUBLIC Poco::Prometheus)
 endif()
 
 if(ENABLE_REDIS)
@@ -107,6 +142,17 @@ if(ENABLE_REDIS)
 		Redis.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_REDIS)
+
+	target_link_libraries(PocoModules PUBLIC Poco::Redis)
+endif()
+
+if(ENABLE_SEVENZIP)
+	list(APPEND POCO_MODULES
+		SevenZip.cppm
+	)
+	target_compile_definitions(PocoModules PUBLIC ENABLE_SEVENZIP)
+
+	target_link_libraries(PocoModules PUBLIC Poco::SevenZip)
 endif()
 
 if(ENABLE_UTIL)
@@ -114,6 +160,8 @@ if(ENABLE_UTIL)
 		Util.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_UTIL)
+
+	target_link_libraries(PocoModules PUBLIC Poco::Util)
 endif()
 
 if(ENABLE_XML)
@@ -121,6 +169,8 @@ if(ENABLE_XML)
 		XML.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_XML)
+
+	target_link_libraries(PocoModules PUBLIC Poco::XML)
 endif()
 
 if(ENABLE_ZIP)
@@ -128,6 +178,8 @@ if(ENABLE_ZIP)
 		Zip.cppm
 	)
 	target_compile_definitions(PocoModules PUBLIC ENABLE_ZIP)
+
+	target_link_libraries(PocoModules PUBLIC Poco::Zip)
 endif()
 
 if(NOT COMMAND configure_cpp_module_target)
@@ -144,21 +196,6 @@ set_target_properties(PocoModules
     SOVERSION ${SHARED_LIBRARY_VERSION}
     OUTPUT_NAME PocoModules
     DEFINE_SYMBOL POCOMODULES_EXPORTS
-)
-
-target_link_libraries(PocoModules PUBLIC 
-    Poco::Foundation
-    Poco::ActiveRecord
-	Poco::Crypto
-	Poco::Data
-	Poco::JSON
-	Poco::JWT
-	Poco::MongoDB
-	Poco::Net
-	Poco::Prometheus
-	Poco::Redis
-	Poco::Util
-	Poco::Zip
 )
 
 target_include_directories(PocoModules
