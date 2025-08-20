@@ -47,7 +47,7 @@ void MediaTypeTest::testParse()
 	assertTrue (mt3.getParameter("param1") == "value1");
 	assertTrue (mt3.getParameter("PARAM2") == "value 2");
 
-	MediaType mt4("multipart/mixed; boundary=\"MIME_boundary_01234567\"");
+	MediaType mt4("multipart/mixed; boundary=MIME_boundary_01234567");
 	assertTrue (mt4.getType() == "multipart");
 	assertTrue (mt4.getSubType() == "mixed");
 	assertTrue (mt4.parameters().size() == 1);
