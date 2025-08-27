@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <mutex>
 
 
 namespace Poco {
@@ -41,6 +42,11 @@ public:
 	ScopedLock(M& mutex, long milliseconds): _mutex(mutex)
 	{
 		_mutex.lock(milliseconds);
+	}
+
+	ScopedLock(M& mutex, std::adopt_lock_t) : _mutex(mutex)
+		/// Construct and assume already locked
+	{
 	}
 
 	~ScopedLock()
@@ -80,7 +86,7 @@ public:
 		poco_assert(_pMutex != nullptr);
 
 		_pMutex->lock();
-		_locked = true;
+		_bOwns = true;
 	}
 
 	ScopedLockWithUnlock(M& mutex, long milliseconds): _pMutex(&mutex)
@@ -88,7 +94,27 @@ public:
 		poco_assert(_pMutex != nullptr);
 
 		_pMutex->lock(milliseconds);
-		_locked = true;
+		_bOwns = true;
+	}
+
+	ScopedLockWithUnlock(M& mutex, std::adopt_lock_t) : _pMutex(&mutex), _bOwns(true)
+		/// Construct and assume already locked
+	{
+		poco_assert(_pMutex != nullptr);
+	}
+
+	ScopedLockWithUnlock(M& mutex, std::try_to_lock_t) : _pMutex(&mutex)
+		/// Construct and try to lock
+	{
+		poco_assert(_pMutex != nullptr);
+
+		_bOwns = _pMutex->tryLock();
+	}
+
+	ScopedLockWithUnlock(M& mutex, std::defer_lock_t) : _pMutex(&mutex), _bOwns(false)
+		/// Construct but don't lock
+	{
+		poco_assert(_pMutex != nullptr);
 	}
 
 	~ScopedLockWithUnlock()
@@ -110,26 +136,39 @@ public:
 	void lock()
 	{
 		poco_assert(_pMutex != nullptr);
-		poco_assert(_locked == false);
+		poco_assert(_bOwns == false);
 
 		_pMutex->lock();
-		_locked = true;
+		_bOwns = true;
+	}
+
+	bool tryLock()
+	{
+		poco_assert(_pMutex != nullptr);
+		poco_assert(_bOwns == false);
+
+		_bOwns = _pMutex->tryLock();
 	}
 
 	void unlock()
 	{
-		if (_locked)
+		if (_bOwns)
 		{
 			poco_assert(_pMutex != nullptr);
 
 			_pMutex->unlock();
-			_locked = false;
+			_bOwns = false;
 		}
+	}
+
+	bool ownsLock() const
+	{
+		return _bOwns;
 	}
 
 private:
 	M* _pMutex;
-	bool _locked = false;
+	bool _bOwns;
 };
 
 
