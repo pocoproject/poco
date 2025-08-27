@@ -25,7 +25,7 @@ namespace Poco {
 
 
 template <class TArgs, class TDelegate>
-class POCO_DEPRECATED("") FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
+class POCO_DEPRECATED("As of release 1.4.2, DefaultStrategy already implements FIFO behavior, so this class is provided for backwards compatibility only") FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
 	/// Note: As of release 1.4.2, DefaultStrategy already
 	/// implements FIFO behavior, so this class is provided
 	/// for backwards compatibility only.
