@@ -2,7 +2,7 @@
 // ArchiveEntry.cpp
 //
 // Library: SevenZip
-// Package: Archive
+// Package: SevenZip
 // Module:  ArchiveEntry
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.

@@ -3,7 +3,7 @@
 //
 
 #include "Poco/PDF/Table.h"
-
+#include <hpdf.h>
 
 namespace Poco {
 namespace PDF {
@@ -15,15 +15,34 @@ Table::Table(int columnCount, int rowCount, const std::string& name, Cell::FontM
 	setFonts(pFontMap);
 }
 
+Table::~Table() = default;
 
-Table::~Table()
+const std::string Table::name() const
 {
+	return _name;
 }
 
 
+const Table::Cells& Table::cells() const
+{
+	return _cells;
+}
+
+
+std::size_t Table::rows() const
+{
+	return _cells.size();
+}
+
+
+std::size_t Table::columns() const
+{
+	return _cells[0].size();
+}
+
 void Table::addRow()
 {
-	_cells.push_back(TableRow(columns()));
+	_cells.emplace_back(columns());
 }
 
 
@@ -67,15 +86,13 @@ void Table::draw(Page& page, float x, float y, float width, float height)
 		int rows = static_cast<int>(_cells.size());
 		int cols = static_cast<int>(_cells[0].size());
 		int r = 0;
-		for (Cells::iterator it = _cells.begin(); it != _cells.end(); ++it)
+		for (auto& row : _cells)
 		{
-			TableRow& row(*it);
 			float h = height / rows;
 			int c = 0;
 			float lastX = x;
-			for (TableRow::iterator itr = row.begin(); itr != row.end(); ++itr)
+			for (auto& cell : row)
 			{
-				Cell& cell(*itr);
 				float w = width / cols;
 				if (!cell.hasWidth())
 				{
@@ -88,7 +105,6 @@ void Table::draw(Page& page, float x, float y, float width, float height)
 					cell.draw(page, lastX, y - (h * r), w, h);
 					lastX += w;
 				}
-
 				++c;
 			}
 			++r;

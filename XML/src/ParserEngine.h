@@ -18,15 +18,11 @@
 
 
 #include "Poco/XML/XML.h"
-#if defined(POCO_UNBUNDLED)
-#include <expat.h>
-#else
-#include "expat.h"
-#endif
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/XMLStream.h"
 #include "Poco/SAX/Locator.h"
 #include "Poco/TextEncoding.h"
+#include <expat.h>
 #include <map>
 #include <vector>
 

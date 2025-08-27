@@ -16,11 +16,7 @@
 #include "Poco/Exception.h"
 #include <cstring>
 #include <memory>
-#if defined(POCO_UNBUNDLED)
 #include <zlib.h>
-#else
-#include "zlib.h"
-#endif
 
 
 namespace Poco {

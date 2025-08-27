@@ -2882,7 +2882,7 @@ void SQLiteTest::testThreadModes()
 	typedef std::vector<int> ModeVec;
 
 	assertTrue (Utility::isThreadSafe());
-	assertTrue (Utility::getThreadMode() == Utility::THREAD_MODE_SERIAL);
+	assertEqual (Utility::getThreadMode(), Utility::THREAD_MODE_SERIAL);
 
 	const int datasize = 100;
 	ModeVec mode;

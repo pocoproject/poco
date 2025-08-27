@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15.0)
+cmake_minimum_required(VERSION 3.26.0)
 
 project(Poco)
 
@@ -243,6 +243,9 @@ option(POCO_UNBUNDLED
 option(POCO_SQLITE_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
 
+option(POCO_SOO
+	"Set to OFF|ON (default is ON) to control small object optimization in Poco::Foundation" ON)
+
 if (POCO_UNBUNDLED)
 	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
 endif()
@@ -276,10 +279,12 @@ if(ENABLE_FUZZING)
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
-elseif (POCO_SQLITE_UNBUNDLED)
-	message(STATUS "Using external sqlite")
-	message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	if (POCO_SQLITE_UNBUNDLED)
+		message(STATUS "Using external sqlite")
+		message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	else()
+		message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
+	endif()
 else()
 	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
@@ -389,6 +394,8 @@ if(ENABLE_JWT)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
 endif()
 
+add_subdirectory(dependencies)
+
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
 	list(APPEND Poco_COMPONENTS "Foundation")
@@ -493,6 +500,10 @@ endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgreSQL AND ENABLE_DATA_POSTGRESQL)
 	list(APPEND Poco_COMPONENTS "Data/PostgreSQL")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/ODBC AND ENABLE_DATA_ODBC)
+	list(APPEND Poco_COMPONENTS "Data/ODBC")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord AND ENABLE_ACTIVERECORD)

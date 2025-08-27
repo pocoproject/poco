@@ -17,16 +17,11 @@
 
 #include "Poco/XML/XMLStreamParser.h"
 #include "Poco/XML/XMLString.h"
-#if defined(POCO_UNBUNDLED)
 #include <expat.h>
-#else
-#include "expat.h"
-#endif
 #include <new>
 #include <cstring>
 #include <istream>
 #include <ostream>
-#include <sstream>
 
 
 namespace Poco {

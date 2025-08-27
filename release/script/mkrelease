@@ -78,6 +78,7 @@ mkdir -p ${target}/doc
 mkdir -p ${target}/contrib
 mkdir -p ${target}/patches
 mkdir -p ${target}/cmake
+mkdir -p ${target}/dependencies
 
 
 #
@@ -98,6 +99,11 @@ cp -R ${POCO_BASE}/patches/* ${target}/patches
 
 cp -R ${POCO_BASE}/cmake/* ${target}/cmake
 cp ${POCO_BASE}/CMakeLists.txt ${target}
+
+#
+# External dependencies (non-Poco source code)
+#
+cp -R ${POCO_BASE}/dependencies/* ${target}/dependencies
 
 
 #
