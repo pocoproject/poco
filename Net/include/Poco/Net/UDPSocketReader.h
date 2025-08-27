@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/UDPServerParams.h"
 
 
 namespace Poco {

@@ -149,6 +149,7 @@ cmake-build/
 # Temporary files #
 ###################
 *.bak
+build/
 stage/
 releases/
 poco_build_stderr.out
