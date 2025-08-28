@@ -43,7 +43,7 @@ using Poco::DateTime;
 
 //#define EASYSOFT_ODBC
 //#define DATADIRECT_ODBC
-#define DEVART_ODBC
+//#define DEVART_ODBC
 
 #ifdef EASYSOFT_ODBC
 #	define ORACLE_ODBC_DRIVER "ORACLE"
@@ -52,13 +52,13 @@ using Poco::DateTime;
 #elif defined(DEVART_ODBC)
 #	define ORACLE_ODBC_DRIVER "Devart ODBC Driver for Oracle"
 #else
-#	define ORACLE_ODBC_DRIVER "Oracle 21 ODBC driver"
+#	define ORACLE_ODBC_DRIVER "Oracle 23 ODBC driver"
 #endif
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
-#define ORACLE_SID "XE"
-#define ORACLE_UID "SYSTEM"
+#define ORACLE_SID "FREEPDB1"
+#define ORACLE_UID "poco"
 #define ORACLE_PWD "poco"
 
 
