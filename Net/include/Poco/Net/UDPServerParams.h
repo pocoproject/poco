@@ -33,7 +33,7 @@ class Net_API UDPServerParams
 public:
 	UDPServerParams(const Poco::Net::SocketAddress& sa,
 		int nSockets = 10,
-		Poco::Timespan timeout = 250000,
+		const Poco::Timespan& timeout = 250000,
 		std::size_t handlerBufListSize = 1000,
 		bool notifySender = false,
 		int  backlogThreshold = 10);

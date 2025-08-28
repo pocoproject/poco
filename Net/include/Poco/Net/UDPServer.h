@@ -19,14 +19,10 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/Net/DatagramSocket.h"
-#include "Poco/Net/PollSet.h"
 #include "Poco/Net/UDPHandler.h"
 #include "Poco/Net/UDPServerParams.h"
-#include "Poco/Net/UDPSocketReader.h"
 #include "Poco/Net/SingleSocketPoller.h"
 #include "Poco/Net/MultiSocketPoller.h"
-#include <map>
 
 
 namespace Poco {
@@ -41,6 +37,9 @@ class UDPServerImpl: public Poco::Runnable
 	/// MultipleSocketPoller for more information.
 {
 public:
+
+	using ServerParams = UDPServerParams;
+
 	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa):
 		_poller(handlers, sa),
 		_thread("UDPServer"),
@@ -51,7 +50,7 @@ public:
 		_thread.start(*this);
 	}
 
-	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const UDPServerParams& params):
+	UDPServerImpl(typename UDPHandlerImpl<S>::List& handlers, const ServerParams& params):
 		_poller(handlers, params),
 		_thread("UDPServer"),
 		_stop(false)
@@ -61,7 +60,7 @@ public:
 		_thread.start(*this);
 	}
 
-	~UDPServerImpl()
+	~UDPServerImpl() override
 		/// Destroys the UDPServer.
 	{
 		_stop = true;
@@ -83,7 +82,7 @@ public:
 		return _poller.address();
 	}
 
-	void run()
+	void run() override
 		/// Does the work.
 	{
 		while (!_stop) _poller.poll();

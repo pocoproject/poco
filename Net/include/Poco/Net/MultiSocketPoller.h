@@ -19,8 +19,12 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Net/UDPHandler.h"
+#include "Poco/Net/UDPServerParams.h"
+#include "Poco/Net/UDPSocketReader.h"
 
 
 namespace Poco {
@@ -34,7 +38,7 @@ class MultiSocketPoller
 	/// state, the reading/error handling actions are delegated to the reader.
 {
 public:
-	MultiSocketPoller(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa, int nSockets = 10, Poco::Timespan timeout = 250000):
+	MultiSocketPoller(typename UDPHandlerImpl<S>::List& handlers, const Poco::Net::SocketAddress& sa, int nSockets = 10, const Poco::Timespan& timeout = 250000):
 		_address(sa),
 		_timeout(timeout),
 		_reader(handlers)
@@ -74,23 +78,20 @@ public:
 
 	void poll()
 	{
-		if (_reader.handlerStopped()) return;
+		if (_reader.handlerStopped())
+			return;
 		PollSet::SocketModeMap sm;
-		PollSet::SocketModeMap::iterator it;
-		PollSet::SocketModeMap::iterator end;
 		sm = _pollSet.poll(_timeout);
-		it = sm.begin();
-		end = sm.end();
-		for (; it != end; ++it)
+		for (auto& se: sm)
 		{
-			if (it->second & PollSet::POLL_READ)
+			if (se.second & PollSet::POLL_READ)
 			{
-				DatagramSocket ds(it->first);
+				DatagramSocket ds(se.first);
 				_reader.read(ds);
 			}
-			else if (it->second & PollSet::POLL_ERROR)
+			else if (se.second & PollSet::POLL_ERROR)
 			{
-				_reader.setError(it->first.impl()->sockfd());
+				_reader.setError(se.first.impl()->sockfd());
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 //
-// UDPServerTestSuite.h
+// AsyncServerTestSuite.h
 //
-// Definition of the UDPServerTestSuite class.
+// Definition of the AsyncServerTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -10,18 +10,18 @@
 //
 
 
-#ifndef UDPServerTestSuite_INCLUDED
-#define UDPServerTestSuite_INCLUDED
+#ifndef AsyncServerTestSuite_INCLUDED
+#define AsyncServerTestSuite_INCLUDED
 
 
 #include "CppUnit/TestSuite.h"
 
 
-class UDPServerTestSuite
+class AsyncServerTestSuite
 {
 public:
 	static CppUnit::Test* suite();
 };
 
 
-#endif // UDPServerTestSuite_INCLUDED
+#endif // AsyncServerTestSuite_INCLUDED

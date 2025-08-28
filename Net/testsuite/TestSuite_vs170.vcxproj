@@ -1025,7 +1025,7 @@
     <ClInclude Include="src\TCPServerTestSuite.h"/>
     <ClInclude Include="src\UDPEchoServer.h"/>
     <ClInclude Include="src\UDPServerTest.h"/>
-    <ClInclude Include="src\UDPServerTestSuite.h"/>
+    <ClInclude Include="src\AsyncServerTestSuite.h"/>
     <ClInclude Include="src\WebSocketTest.h"/>
     <ClInclude Include="src\WebSocketTestSuite.h"/>
   </ItemGroup>
@@ -1350,7 +1350,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
-    <ClCompile Include="src\UDPServerTestSuite.cpp">
+    <ClCompile Include="src\AsyncServerTestSuite.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
