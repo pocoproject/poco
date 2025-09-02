@@ -29,6 +29,9 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib CACHE PATH "Archive output for ${OUTPUTCONFIG}")
 endforeach(OUTPUTCONFIG)
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 # Append our module directory to CMake
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -92,13 +95,13 @@ option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
 # OPENSSL_ROOT_DIR.
 #
 
-# CMake pre-4.1 does not have fixes to find ARM Windows OpenSSL built-in yet.
-# Corrected find script is included with Poco for older version of CMake.
-if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0") 
-    message("Custom FindOpenSSL with updates for ARM64 Windows is used.")
-	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl)
+if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
+	if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM64")
+		message(STATUS "OpenSSL: Importing custom FindOpenSSL with updates for ARM64 Windows.")
+		cmake_minimum_required(VERSION 3.29.0)
+		list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl)
+	endif()
 endif()
-
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
 	find_package(OpenSSL REQUIRED)
 else()
