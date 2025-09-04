@@ -77,6 +77,8 @@ include(PocoMacros)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
+option(POCO_MINIMAL_BUILD "Build only bare minimum Poco libraries identifoed with ENABLE options." OFF)
+
 set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
 
 if(MSVC)
@@ -88,13 +90,13 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
 
-option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
-
 #
 # Path to OpenSSL installation root can be provided by setting a variable
 # OPENSSL_ROOT_DIR.
 #
 
+# CMake pre-4.1 does not have fixes to find ARM Windows OpenSSL built-in yet.
+# Corrected find script is included with Poco for older version of CMake.
 if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
 	if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM64")
 		message(STATUS "OpenSSL: Importing custom FindOpenSSL with updates for ARM64 Windows.")
@@ -102,122 +104,102 @@ if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
 		list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl)
 	endif()
 endif()
-if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
-	find_package(OpenSSL REQUIRED)
-else()
-	find_package(OpenSSL)
-endif()
 
-if(OPENSSL_FOUND)
-	option(ENABLE_NETSSL "Enable NetSSL" ON)
-	option(ENABLE_CRYPTO "Enable Crypto" ON)
-	option(ENABLE_JWT "Enable JWT" ON)
+if (NOT POCO_MINIMAL_BUILD)
+	find_package(OpenSSL)
+	find_package(MySQL)
+	find_package(PostgreSQL)
+	find_package(ODBC)
+
+	find_package(APR)
+	find_package(APRUTIL)
+	find_package(Apache2)
+
+	if(OPENSSL_FOUND)
+		option(ENABLE_NETSSL "Enable NetSSL" ON)
+		option(ENABLE_CRYPTO "Enable Crypto" ON)
+		option(ENABLE_JWT "Enable JWT" ON)
+	else()
+		option(ENABLE_NETSSL "Enable NetSSL" OFF)
+		option(ENABLE_CRYPTO "Enable Crypto" OFF)
+		option(ENABLE_JWT "Enable JWT" OFF)
+	endif()
+
+	if(APR_FOUND AND APRUTIL_FOUND AND APACHE2_FOUND AND
+		EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
+		option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
+	else()
+		option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
+	endif()
+
+	if(MYSQL_FOUND)
+		option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" ON)
+	else()
+		option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" OFF)
+	endif()
+
+	if(PostgreSQL_FOUND)
+		option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" ON)
+	else()
+		option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" OFF)
+	endif()
+
+	if(ODBC_FOUND)
+		option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
+		option(ENABLE_DATA_SQL_SERVER_BIG_STRINGS "Enable MS SQL Server big strings" ON)
+	else()
+		option(ENABLE_DATA_ODBC "Enable Data ODBC" OFF)
+		option(ENABLE_DATA_SQL_SERVER_BIG_STRINGS "Enable MS SQL Server big strings" OFF)
+	endif()
+
+	set(_enable_default ON)
 else()
 	option(ENABLE_NETSSL "Enable NetSSL" OFF)
 	option(ENABLE_CRYPTO "Enable Crypto" OFF)
 	option(ENABLE_JWT "Enable JWT" OFF)
-endif()
-
-if(ENABLE_APACHECONNECTOR)
-	find_package(APR REQUIRED)
-	find_package(APRUTIL REQUIRED)
-	find_package(Apache2 REQUIRED)
-else()
-	find_package(APR)
-	find_package(APRUTIL)
-	find_package(Apache2)
-endif()
-
-if(APR_FOUND AND APRUTIL_FOUND AND APACHE2_FOUND AND
-	EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
-	option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
-else()
 	option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
-endif()
-
-if(ENABLE_DATA_MYSQL)
-	find_package(MySQL REQUIRED)
-else()
-	find_package(MySQL)
-endif()
-
-if(MYSQL_FOUND)
-	option(ENABLE_DATA "Enable Data" ON)
-	option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" ON)
-else()
 	option(ENABLE_DATA "Enable Data" OFF)
 	option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" OFF)
-endif()
-
-if(ENABLE_DATA_POSTGRESQL)
-	find_package(PostgreSQL REQUIRED)
-else()
-	find_package(PostgreSQL)
-endif()
-
-if(PostgreSQL_FOUND)
-	option(ENABLE_DATA "Enable Data" ON)
-	option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" ON)
-else()
-	option(ENABLE_DATA "Enable Data" OFF)
 	option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" OFF)
-endif()
-
-if(ENABLE_DATA_ODBC)
-	find_package(ODBC REQUIRED)
-else()
-	find_package(ODBC)
-endif()
-
-if(ODBC_FOUND)
-	option(ENABLE_DATA "Enable Data" ON)
-	option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
-	option(ENABLE_DATA_SQL_SERVER_BIG_STRINGS "Enable MS SQL Server big strings" ON)
-else()
-	option(ENABLE_DATA "Enable Data" OFF)
 	option(ENABLE_DATA_ODBC "Enable Data ODBC" OFF)
 	option(ENABLE_DATA_SQL_SERVER_BIG_STRINGS "Enable MS SQL Server big strings" OFF)
+
+	set(_enable_default OFF)
 endif()
 
 # Allow enabling and disabling components
 option(ENABLE_FOUNDATION "Enable Foundation" ON)
-option(ENABLE_ENCODINGS "Enable Encodings" ON)
+
+option(ENABLE_ENCODINGS "Enable Encodings" ${_enable_default})
+option(ENABLE_XML "Enable XML" ${_enable_default})
+option(ENABLE_JSON "Enable JSON" ${_enable_default})
+option(ENABLE_MONGODB "Enable MongoDB" ${_enable_default})
+option(ENABLE_DATA_SQLITE "Enable Data SQlite" ${_enable_default})
+option(ENABLE_REDIS "Enable Redis" ${_enable_default})
+option(ENABLE_PROMETHEUS "Enable Prometheus" ${_enable_default})
+option(ENABLE_UTIL "Enable Util" ${_enable_default})
+option(ENABLE_NET "Enable Net" ${_enable_default})
+option(ENABLE_ZIP "Enable Zip" ${_enable_default})
+option(ENABLE_PAGECOMPILER "Enable PageCompiler" ${_enable_default})
+option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ${_enable_default})
+option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ${_enable_default})
+option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ${_enable_default})
+
+option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
-option(ENABLE_XML "Enable XML" ON)
-option(ENABLE_JSON "Enable JSON" ON)
-option(ENABLE_MONGODB "Enable MongoDB" ON)
-option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
-option(ENABLE_REDIS "Enable Redis" ON)
 option(ENABLE_DNSSD "Enable DNSSD" OFF)
 option(ENABLE_DNSSD_DEFAULT "Enable DNSSD Default" OFF)
-
 option(ENABLE_DNSSD_AVAHI "Enable DNSSD Avahi" OFF)
 option(ENABLE_DNSSD_BONJOUR "Enable DNSSD Bonjour" OFF)
-
-option(ENABLE_PROMETHEUS "Enable Prometheus" ON)
-option(ENABLE_PDF "Enable PDF" OFF)
-option(ENABLE_UTIL "Enable Util" ON)
-option(ENABLE_NET "Enable Net" ON)
-
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
-option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
-option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
-option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
-
-option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
-option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
-
+option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_TRACE "Enable stack tracing" OFF)
 
-if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
-	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
-endif()
-
-if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
-endif()
+option(ENABLE_CPPUNIT
+	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
 
 option(ENABLE_CPPUNIT
 	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
@@ -227,6 +209,8 @@ option(ENABLE_TESTS
 
 option(ENABLE_TEST_DEPRECATED
 	"Set to OFF|ON (default is OFF) to enable build of tests for deprecated functionality" OFF)
+
+option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
 
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
@@ -251,9 +235,6 @@ if(ENABLE_TESTS)
 	include(CTest)
 	enable_testing()
 	message(STATUS "Building with unit tests")
-	
-	set(ENABLE_CPPUNIT ON CACHE BOOL "Enable CppUnit" FORCE)
-	
 	if(ENABLE_TEST_DEPRECATED)
 		add_compile_definitions(POCO_TEST_DEPRECATED)
 	endif()
@@ -307,17 +288,21 @@ add_compile_definitions(POCO_CMAKE)
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
-if(ENABLE_TESTS)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
-	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/OSP)
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/OSP/cmake)
+	include (PocoProOspSetup)
 endif()
 
-if(ENABLE_ENCODINGS_COMPILER OR ENABLE_APACHECONNECTOR)
+# - resolve dependencies
+
+if(ENABLE_ENCODINGS_COMPILER)
 	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
-if(ENABLE_PAGECOMPILER_FILE2PAGE)
+if(ENABLE_APACHECONNECTOR)
+	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
@@ -326,28 +311,29 @@ if(ENABLE_PAGECOMPILER)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
-if(ENABLE_MONGODB OR ENABLE_REDIS OR ENABLE_PROMETHEUS)
+if(ENABLE_PAGECOMPILER_FILE2PAGE)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+endif()
+
+if(ENABLE_ACTIVERECORD)
+	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+endif()
+
+if(ENABLE_DATA_MYSQL OR ENABLE_DATA_ODBC OR ENABLE_DATA_POSTGRESQL)
+	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+endif()
+
+if (ENABLE_DNSSD)
 	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 endif()
 
-if(ENABLE_DATA_SQLITE OR ENABLE_DATA_MYSQL OR ENABLE_DATA_ODBC OR ENABLE_DATA_POSTGRESQL)
-	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
-	if(ENABLE_TESTS)
-		set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
-		set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
-	endif()
+if(ENABLE_JWT)
+	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
+	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
 endif()
 
-if(ENABLE_DATA AND ENABLE_TESTS)
-	set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
-endif()
-
-if(ENABLE_ACTIVERECORD AND ENABLE_TESTS)
-	set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
-endif()
-
-if(ENABLE_NETSSL_WIN)
-	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+if(ENABLE_MONGODB OR ENABLE_REDIS OR ENABLE_PROMETHEUS)
+	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 endif()
 
 if(ENABLE_NETSSL)
@@ -356,13 +342,7 @@ if(ENABLE_NETSSL)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
-if(ENABLE_CRYPTO AND ENABLE_TESTS)
-	set(ENABLE_NETSSL ON CACHE BOOL "Enable NetSSL" FORCE)
-	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
-	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-endif()
-
-if(ENABLE_NET AND ENABLE_TESTS)
+if(ENABLE_NETSSL_WIN)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
@@ -379,15 +359,48 @@ if(ENABLE_POCODOC)
 	set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQLite" FORCE)
 endif()
 
-if(ENABLE_UTIL AND ENABLE_TESTS)
-	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+if(ENABLE_TESTS)
+	set(ENABLE_CPPUNIT ON CACHE BOOL "Enable CppUnit" FORCE)
+
+	if (ENABLE_DATA OR ENABLE_ACTIVERECORD)
+		set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
+	endif()
+	if(ENABLE_UTIL)
+		set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+		set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+	endif()
+
 endif()
 
-if(ENABLE_JWT)
-	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+if(ENABLE_DATA_SQLITE)
+	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
+
+# - find external dependencies
+
+if(ENABLE_APACHECONNECTOR)
+	find_package(APR REQUIRED)
+	find_package(APRUTIL REQUIRED)
+	find_package(Apache2 REQUIRED)
+endif()
+
+if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
+	find_package(OpenSSL REQUIRED)
+endif()
+
+if(ENABLE_DATA_MYSQL)
+	find_package(MySQL REQUIRED)
+endif()
+
+if(ENABLE_DATA_POSTGRESQL)
+	find_package(PostgreSQL REQUIRED)
+endif()
+
+if(ENABLE_DATA_ODBC)
+	find_package(ODBC REQUIRED)
+endif()
+
+# - add required subdirectories
 
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
@@ -399,7 +412,7 @@ if(ENABLE_CPPUNIT)
 	list(APPEND Poco_COMPONENTS "CppUnit")
 endif()
 
-if(ENABLE_ENCODINGS)
+if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings AND ENABLE_ENCODINGS)
 	add_subdirectory(Encodings)
 	list(APPEND Poco_COMPONENTS "Encodings")
 endif()
@@ -473,8 +486,6 @@ if(OPENSSL_FOUND)
 endif(OPENSSL_FOUND)
 
 
-option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
-
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
 	if(POCO_DATA_NO_SQL_PARSER)
 		add_compile_definitions(POCO_DATA_NO_SQL_PARSER=1)
@@ -493,6 +504,10 @@ endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data/PostgreSQL AND ENABLE_DATA_POSTGRESQL)
 	list(APPEND Poco_COMPONENTS "Data/PostgreSQL")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Data/ODBC AND ENABLE_DATA_ODBC)
+	list(APPEND Poco_COMPONENTS "Data/ODBC")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord AND ENABLE_ACTIVERECORD)
