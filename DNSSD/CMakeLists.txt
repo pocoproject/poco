@@ -46,9 +46,9 @@ set_target_properties( "${LIBNAME}"
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
     OUTPUT_NAME ${POCO_LIBNAME}
     DEFINE_SYMBOL DNSSD_EXPORTS
-    )
+)
 
-target_link_libraries( "${LIBNAME}" Foundation Net)
+target_link_libraries( "${LIBNAME}" Poco::Foundation Poco::Net)
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
