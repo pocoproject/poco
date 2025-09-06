@@ -14,8 +14,8 @@ add_executable(DataPostgreSQL-testrunner ${TEST_SRCS})
 add_test(
 	NAME DataPostgreSQL
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	COMMAND DataPostgreSQL-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+	COMMAND DataPostgreSQL-testrunner -ignore ${PROJECT_SOURCE_DIR}/cppignore.lnx -all
 )
-set_tests_properties(DataPostgreSQL PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
+set_tests_properties(DataPostgreSQL PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 target_link_libraries(DataPostgreSQL-testrunner PUBLIC Poco::DataPostgreSQL Poco::DataTest CppUnit)
-target_include_directories(DataPostgreSQL-testrunner PUBLIC ${CMAKE_SOURCE_DIR}/Data/DataTest/include/)
+target_include_directories(DataPostgreSQL-testrunner PUBLIC ${PROJECT_SOURCE_DIR}/Data/DataTest/include/)

@@ -15,14 +15,14 @@ if(ANDROID)
 	add_test(
 		NAME Net
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Net-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
+		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Net-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
 	add_test(
 		NAME Net
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND Net-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+		COMMAND Net-testrunner -ignore ${PROJECT_SOURCE_DIR}/cppignore.lnx -all
 	)
-	set_tests_properties(Net PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
+	set_tests_properties(Net PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
-target_link_libraries(Net-testrunner PUBLIC Poco::Net Poco::Util Poco::XML CppUnit)
+target_link_libraries(Net-testrunner PUBLIC Poco::Net CppUnit)
