@@ -66,22 +66,6 @@ jobs:
             EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
             ./ci/runtests.sh
 
-  linux-gcc-make-cxx20:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev unixodbc-dev redis-server libmysqlclient-dev
-      - run: ./configure --config=Linux-c++20 --everything --omit=PDF && make all -s -j6 && sudo make install
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            sudo -s
-            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
-            ./ci/runtests.sh
-
   linux-gcc-cmake:
     runs-on: ubuntu-24.04
     steps:
@@ -165,15 +149,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_TRACE=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF -DENABLE_XML=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_SQLITE=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -441,15 +417,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
       - run: >-
-          cmake -S. -Bcmake-build -DENABLE_TRACE=ON -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF -DENABLE_XML=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_SQLITE=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
       - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
@@ -547,64 +516,6 @@ jobs:
             PWD=`pwd`
             ctest -V
 
-  #   windows-2019-msvc-cmake:
-  #     runs-on: windows-2019
-  #     env:
-  #       CPPUNIT_IGNORE: >-
-  #         class CppUnit::TestCaller<class PathTest>.testFind,
-  #         class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-  #         class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-  #         class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-  #         class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-  #         class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-  #         class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-  #         class CppUnit::TestCaller<class PollSetTest>.testPollClosedServer
-  #     steps:
-  #       - uses: actions/checkout@v4
-  #       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-  #       - run: cmake --build cmake-build --config Release
-  #       - uses: ./.github/actions/retry-action
-  #          with:
-  #             timeout_minutes: 90
-  #             max_attempts: 3
-  #             retry_on: any
-  #             command: >-
-  #             cd cmake-build;
-  #             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
-
-  #   windows-2019-msvc-buildwin-x64:
-  #     runs-on: windows-2019
-  #     env:
-  #       CPPUNIT_IGNORE: >-
-  #         class CppUnit::TestCaller<class PathTest>.testFind,
-  #         class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-  #         class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-  #         class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-  #         class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-  #         class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-  #         class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
-  #     steps:
-  #       - uses: actions/checkout@v4
-  #       - uses: ./.github/actions/retry-action
-  #         with:
-  #           timeout_minutes: 90
-  #           max_attempts: 3
-  #           retry_on: any
-  #           command: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
-
-  #  windows-2019-msvc-buildwin-win32:
-  #    runs-on: windows-2019
-  #    env:
-  #      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - uses: ./.github/actions/retry-action
-  #        with:
-  #          timeout_minutes: 90
-  #          max_attempts: 3
-  #          retry_on: any
-  #          command: .\buildwin.ps1 -poco_base . -vs 160 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
-
   windows-2022-msvc-buildwin-x64:
     runs-on: windows-2022
     env:
@@ -625,26 +536,6 @@ jobs:
           retry_on: any
           command: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform x64 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT,DNSSD,DNSSD/Avahi,DNSSD/Bonjour"
 
-  #  windows-2022-msvc-buildwin-win32:
-  #    runs-on: windows-2022
-  #    env:
-  #      CPPUNIT_IGNORE: >-
-  #        class CppUnit::TestCaller<class PathTest>.testFind,
-  #        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-  #        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-  #        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-  #        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-  #        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-  #        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - uses: ./.github/actions/retry-action
-  #      with:
-  #        timeout_minutes: 90
-  #        max_attempts: 3
-  #        retry_on: any
-  #        command: .\buildwin.ps1 -poco_base . -vs 170 -action build -linkmode all -config release -platform Win32 -samples -tests -omit "Crypto,NetSSL_OpenSSL,Data/MySQL,Data/PostgreSQL,JWT"
-
   windows-2025-msvc-cmake:
     runs-on: windows-2025
     env:
@@ -661,8 +552,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: >-
-          cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
-          -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
+          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON
+          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release --parallel 4
       - uses: ./.github/actions/retry-action
         with:
@@ -672,6 +564,8 @@ jobs:
           command: >-
             cd cmake-build;
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+
+# TODO: A 32-bit windows build?
 
   windows-2022-msvc-cmake-static-mt:
     runs-on: windows-2022
@@ -772,14 +666,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_MYSQL=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_SQLITE=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_MYSQL=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -806,14 +693,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_POSTGRESQL=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_MONGODB=OFF -DENABLE_REDIS=OFF
-          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_SQLITE=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -836,14 +716,7 @@ jobs:
           sudo apt-get -y update
           sudo apt-get -y install redis
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_REDIS=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_MONGODB=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_SQLITE=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_REDIS=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -862,14 +735,7 @@ jobs:
       - uses: supercharge/mongodb-github-action@1.10.0
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_MONGODB=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_REDIS=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_SQLITE=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_MONGODB=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
 
       - uses: ./.github/actions/retry-action
@@ -937,14 +803,7 @@ jobs:
           ls /opt/microsoft/msodbcsql18/include
       - run: ls -l /etc/apt/sources.list.d/
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF -DENABLE_XML=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_SQLITE=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
       - uses: ./.github/actions/retry-action
         with:
@@ -963,14 +822,8 @@ jobs:
       - uses: supercharge/mongodb-github-action@1.10.0
       - run: sudo apt -y update
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_DATA_SQLITE=ON -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=OFF -DENABLE_CRYPTO=OFF -DENABLE_PDF=OFF
-          -DENABLE_JSON=OFF -DENABLE_JWT=OFF -DENABLE_NETSSL=OFF -DENABLE_PROMETHEUS=OFF
-          -DENABLE_SEVENZIP=OFF -DENABLE_ZIP=OFF -DENABLE_XML=OFF
-          -DENABLE_PAGECOMPILER=OFF -DENABLE_POCODOC=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_SQLITE=ON
+          -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --target all
 
       - uses: ./.github/actions/retry-action
