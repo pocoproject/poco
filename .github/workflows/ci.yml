@@ -556,7 +556,7 @@ jobs:
             cd cmake-build;
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
 
-  windows-2025-msvc-cmake-32bit:
+  windows-2025-msvc-cmake-Win32:
     runs-on: windows-2025
     env:
       CPPUNIT_IGNORE: >-
