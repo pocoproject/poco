@@ -43,28 +43,19 @@ jobs:
           add-to-path: true
       - run: cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake && cmake --build $HOME/android-build --target all
 
-  linux-gcc-make-armv7l:
-    runs-on: ubuntu-22.04
+  linux-gcc-cmake-armv7l:
+    runs-on: ubuntu-24.04
+    env:
+      CC  : "arm-linux-gnueabihf-gcc"
+      CXX : "arm-linux-gnueabihf-g++"
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install g++-arm-linux-gnueabihf
-      - run: ./configure --config=X-Linux-gcc-arm --everything --omit=ApacheConnector,CppParser,Crypto,Data/MySQL,Data/PostgreSQL,Data/ODBC,JWT,NetSSL_OpenSSL,NetSSL_Win,PDF,PageCompiler,PocoDoc,ProGen,SevenZip && make all -s -j6
-
-  linux-gcc-make:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev
-      - run: ./configure --everything --omit=PDF && make all -s -j6 && sudo make install
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            sudo -s
-            EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB"
-            ./ci/runtests.sh
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_MINIMAL_BUILD=TRUE
+          -DENABLE_NET=ON -DENABLE_JSON=ON -DENABLE_XML=ON -DENABLE_ZIP=ON
+      - run: cmake --build cmake-build --target all
 
   linux-gcc-cmake:
     runs-on: ubuntu-24.04
