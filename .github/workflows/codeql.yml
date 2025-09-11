@@ -90,6 +90,7 @@ jobs:
       uses: advanced-security/filter-sarif@v1
       with:
         patterns: |
+          -dependencies/**/*
           -**:cpp/path-injection
           -**:cpp/world-writable-file-creation
           -**:cpp/poorly-documented-function
