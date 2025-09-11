@@ -191,6 +191,10 @@ void AsyncNotificationCenter::stop()
 	{
 		t.request_stop();
 	}
+	for (auto& t: _workers)
+	{
+		if (t.joinable()) t.join();
+	}
 
 // TODO: Should the observer lists be cleared here or
 //       shall the workers send all of them to observers and then finish?

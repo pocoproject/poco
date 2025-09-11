@@ -20,7 +20,7 @@
 
 #include "Poco/PDF/PDF.h"
 #include "Poco/PDF/Resource.h"
-#include "Poco/PDF/Destination.h"
+#include "Poco/PDF/Declarations.h"
 
 
 namespace Poco {
@@ -33,21 +33,21 @@ class PDF_API TextAnnotation: public Resource<HPDF_Annotation>
 public:
 	enum IconType
 	{
-		ANNOTATION_ICON_COMMENT = HPDF_ANNOT_ICON_COMMENT,
-		ANNOTATION_ICON_KEY = HPDF_ANNOT_ICON_KEY,
-		ANNOTATION_ICON_NOTE = HPDF_ANNOT_ICON_NOTE,
-		ANNOTATION_ICON_HELP = HPDF_ANNOT_ICON_HELP,
-		ANNOTATION_ICON_NEW_PARAGRAPH = HPDF_ANNOT_ICON_NEW_PARAGRAPH,
-		ANNOTATION_ICON_PARAGRAPH = HPDF_ANNOT_ICON_PARAGRAPH,
-		ANNOTATION_ICON_INSERT = HPDF_ANNOT_ICON_INSERT
-	};
+		ANNOTATION_ICON_COMMENT = 0,
+		ANNOTATION_ICON_KEY,
+		ANNOTATION_ICON_NOTE,
+		ANNOTATION_ICON_HELP,
+		ANNOTATION_ICON_NEW_PARAGRAPH,
+		ANNOTATION_ICON_PARAGRAPH,
+		ANNOTATION_ICON_INSERT
+	};	
 
 	TextAnnotation(HPDF_Doc* pPDF,
 		const HPDF_Annotation& annotation,
 		const std::string& name = "");
 		/// Creates the annotation.
 
-	virtual ~TextAnnotation();
+	~TextAnnotation() override;
 		/// Destroys the annotation.
 
 	void open();
@@ -58,28 +58,6 @@ public:
 
 	void icon(IconType iconType);
 };
-
-
-//
-// inlines
-//
-
-inline void TextAnnotation::open()
-{
-	HPDF_TextAnnot_SetOpened(handle(), HPDF_TRUE);
-}
-
-
-inline void TextAnnotation::close()
-{
-	HPDF_TextAnnot_SetOpened(handle(), HPDF_FALSE);
-}
-
-
-inline void TextAnnotation::icon(IconType iconType)
-{
-	HPDF_TextAnnot_SetIcon(handle(), static_cast<HPDF_AnnotIcon>(iconType));
-}
 
 
 } } // namespace Poco::PDF

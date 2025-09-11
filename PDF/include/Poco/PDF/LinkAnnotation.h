@@ -19,8 +19,8 @@
 
 
 #include "Poco/PDF/PDF.h"
+#include "Poco/PDF/Declarations.h"
 #include "Poco/PDF/Resource.h"
-#include "Poco/PDF/Destination.h"
 
 
 namespace Poco {
@@ -31,15 +31,17 @@ class PDF_API LinkAnnotation: public Resource<HPDF_Annotation>
 	/// A LinkAnnotation represents a PDF annotation resource.
 {
 public:
+
 	enum Highlight
+		/// Highlighting modes for the link annotation. Note: values must match HPDF_AnnotHighlightMode enum.
 	{
-		HIGHTLIGHT_NONE = HPDF_ANNOT_NO_HIGHTLIGHT,
+		HIGHTLIGHT_NONE = 0,
 			/// No highlighting.
-		HIGHTLIGHT_INVERT_BOX = HPDF_ANNOT_INVERT_BOX,
+		HIGHTLIGHT_INVERT_BOX,
 			/// Invert the contents of the area of annotation.
-		HIGHTLIGHT_INVERT_BORDER = HPDF_ANNOT_INVERT_BORDER,
-			/// Invert the annotation’s border.
-		HIGHTLIGHT_DOWN_APPEARANCE = HPDF_ANNOT_DOWN_APPEARANCE
+		HIGHTLIGHT_INVERT_BORDER,
+			/// Invert the annotationâ€™s border.
+		HIGHTLIGHT_DOWN_APPEARANCE
 			/// Dent the annotation.
 	};
 
@@ -48,7 +50,7 @@ public:
 		const std::string& name = "");
 		/// Creates the annotation.
 
-	virtual ~LinkAnnotation();
+	~LinkAnnotation() override;
 		/// Destroys the annotation.
 
 	void setHighlight(Highlight mode);
@@ -57,22 +59,6 @@ public:
 	void setBorderStyle(float width, Poco::UInt32 dashOn, Poco::UInt32 dashOff);
 		/// Sets the link border style.
 };
-
-
-//
-// inlines
-//
-
-inline void LinkAnnotation::setHighlight(Highlight mode)
-{
-	HPDF_LinkAnnot_SetHighlightMode(handle(),
-		static_cast<HPDF_AnnotHighlightMode>(mode));
-}
-
-inline void LinkAnnotation::setBorderStyle(float width, Poco::UInt32 dashOn, Poco::UInt32 dashOff)
-{
-	HPDF_LinkAnnot_SetBorderStyle(handle(), width, dashOn, dashOff);
-}
 
 
 } } // namespace Poco::PDF

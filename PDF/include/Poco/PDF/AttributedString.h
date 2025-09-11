@@ -8,7 +8,6 @@
 
 
 #include "Poco/PDF/PDF.h"
-#include "Poco/PDF/Font.h"
 #include "Poco/Dynamic/Var.h"
 
 
@@ -60,30 +59,6 @@ private:
 	std::string _fontName;
 	int         _fontSize;
 };
-
-
-//
-// inlines
-//
-
-inline AttributedString& AttributedString::operator=(const std::string& content)
-{
-	_content = content;
-	return *this;
-}
-
-
-inline AttributedString& AttributedString::operator=(const char* content)
-{
-	_content = content;
-	return *this;
-}
-
-
-inline AttributedString::operator const std::string&()
-{
-	return _content;
-}
 
 
 } } // namespace Poco::PDF

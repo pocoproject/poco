@@ -2,7 +2,7 @@
 // Archive.h
 //
 // Library: SevenZip
-// Package: Archive
+// Package: SevenZip
 // Module:  Archive
 //
 // Definition of the Archive class.

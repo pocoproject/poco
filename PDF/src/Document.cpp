@@ -20,31 +20,43 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/NumberParser.h"
+#include <hpdf.h>
 #include <utility>
 
 
 namespace Poco {
 namespace PDF {
 
+static_assert(static_cast<int>(Document::Info::INFO_CREATION_DATE) == HPDF_INFO_CREATION_DATE, "Document info value mismatch");
+static_assert(static_cast<int>(Document::Info::INFO_KEYWORDS) == HPDF_INFO_KEYWORDS, "Document info value mismatch");
+
+static_assert(static_cast<int>(Document::PageLayout::PAGE_LAYOUT_SINGLE) == HPDF_PAGE_LAYOUT_SINGLE, "Page layout value mismatch");
+static_assert(static_cast<int>(Document::PageLayout::PAGE_LAYOUT_TWO_COLUMN_RIGHT) == HPDF_PAGE_LAYOUT_TWO_COLUMN_RIGHT, "Page layout value mismatch");
+
+static_assert(static_cast<int>(Document::PageMode::PAGE_MODE_USE_NONE) == HPDF_PAGE_MODE_USE_NONE, "Page mode value mismatch");
+static_assert(static_cast<int>(Document::PageMode::PAGE_MODE_FULL_SCREEN) == HPDF_PAGE_MODE_FULL_SCREEN, "Page mode value mismatch");
+
+static_assert(static_cast<int>(Document::Encryption::ENCRYPT_R2) == HPDF_ENCRYPT_R2, "Encryption value mismatch");
+static_assert(static_cast<int>(Document::Encryption::ENCRYPT_R3) == HPDF_ENCRYPT_R3, "Encryption value mismatch");
+
+static_assert(static_cast<int>(Document::PageNumberStyle::PAGE_NUM_STYLE_DECIMAL) == HPDF_PAGE_NUM_STYLE_DECIMAL, "Page number value mismatch");
+static_assert(static_cast<int>(Document::PageNumberStyle::PAGE_NUM_STYLE_LOWER_LETTERS) == HPDF_PAGE_NUM_STYLE_LOWER_LETTERS, "Page number value mismatch");
 
 Document::Document(const std::string fileName,
-	Poco::UInt32 pageCount,
-	Page::Size pageSize,
-	Page::Orientation orientation):
-	_pdf(HPDF_New(HPDF_Error_Handler, 0)),
+				   Poco::UInt32 pageCount,
+				   Page::Size pageSize,
+				   Page::Orientation orientation) :
+	_pdf(HPDF_New(HPDF_Error_Handler, nullptr)),
 	_fileName(fileName),
-	_pRawData(0),
+	_pRawData(nullptr),
 	_size(0)
 {
 	init(pageCount, pageSize, orientation);
 }
 
-
-Document::Document(Poco::UInt32 pageCount,
-	Page::Size pageSize,
-	Page::Orientation orientation):
-	_pdf(HPDF_New(HPDF_Error_Handler, 0)),
-	_pRawData(0),
+Document::Document(Poco::UInt32 pageCount, Page::Size pageSize, Page::Orientation orientation) :
+	_pdf(HPDF_New(HPDF_Error_Handler, nullptr)),
+	_pRawData(nullptr),
 	_size(0)
 {
 	init(pageCount, pageSize, orientation);
@@ -55,6 +67,166 @@ Document::~Document()
 {
 	HPDF_Free(_pdf);
 	delete _pRawData;
+}
+
+void Document::setPages(std::size_t pagePerPages)
+{
+	HPDF_SetPagesConfiguration(_pdf, static_cast<HPDF_UINT>(pagePerPages));
+}
+
+
+void Document::setPageLayout(PageLayout pageLayout)
+{
+	HPDF_SetPageLayout(_pdf, static_cast<HPDF_PageLayout>(pageLayout));
+}
+
+
+Document::PageLayout Document::getPageLayout() const
+{
+	return static_cast<PageLayout>(HPDF_GetPageLayout(_pdf));
+}
+
+
+void Document::setPageMode(PageMode pageMode)
+{
+	HPDF_SetPageMode(_pdf, static_cast<HPDF_PageMode>(pageMode));
+}
+
+
+Document::PageMode Document::getPageMode() const
+{
+	return static_cast<PageMode>(HPDF_GetPageMode(_pdf));
+}
+
+/*
+void openAction()
+{
+	HPDF_SetOpenAction(_pdf, HPDF_Destination open_action);
+}
+*/
+
+
+const Page& Document::getPage(int index)
+{
+	return _pages.at(index);
+}
+
+
+const Page& Document::operator [] (int index)
+{
+	return _pages[index];
+}
+
+
+void Document::compression(Compression mode)
+{
+	HPDF_SetCompressionMode(_pdf, mode);
+}
+
+
+void Document::addPageLabel(int pageNum, PageNumberStyle style, int firstPage, const std::string& prefix)
+{
+	HPDF_AddPageLabel(_pdf,
+					  static_cast<HPDF_UINT>(pageNum),
+					  static_cast<HPDF_PageNumStyle>(style),
+					  static_cast<HPDF_UINT>(firstPage),
+					  prefix.c_str());
+}
+
+
+void Document::useUTF8Encoding()
+{
+	HPDF_UseUTFEncodings(_pdf);
+}
+
+
+void Document::useJapaneseFonts()
+{
+	HPDF_UseJPFonts(_pdf);
+}
+
+
+void Document::useKoreanFonts()
+{
+	HPDF_UseKRFonts(_pdf);
+}
+
+
+void Document::useChineseFonts()
+{
+	HPDF_UseCNSFonts(_pdf);
+}
+
+
+void Document::useChineseTraditionalFonts()
+{
+	HPDF_UseCNTFonts(_pdf);
+}
+
+
+void Document::useJapaneseEncodings()
+{
+	HPDF_UseJPEncodings(_pdf);
+}
+
+
+void Document::useKoreanEncodings()
+{
+	HPDF_UseKREncodings(_pdf);
+}
+
+
+void Document::useChineseEncodings()
+{
+	HPDF_UseCNSEncodings(_pdf);
+}
+
+
+void Document::useChineseTraditionalEncodings()
+{
+	HPDF_UseCNTEncodings(_pdf);
+}
+
+
+void Document::extendedGraphicState()
+{
+	HPDF_CreateExtGState(_pdf);
+}
+
+
+const Image& Document::loadPNGImage(const std::string& fileName)
+{
+	return loadPNGImageImpl(fileName, true);
+}
+
+
+const Image& Document::loadPNGImageInfo(const std::string& fileName)
+{
+	return loadPNGImageImpl(fileName, false);
+}
+
+
+std::string Document::getInfo(Info info)
+{
+	return HPDF_GetInfoAttr(_pdf, static_cast<HPDF_InfoType>(info));
+}
+
+
+void Document::setPermission(Permission perm)
+{
+	HPDF_SetPermission(_pdf, static_cast<HPDF_UINT>(perm));
+}
+
+
+std::size_t Document::pageCount() const
+{
+	return _pages.size();
+}
+
+
+HPDF_Doc& Document::handle()
+{
+	return _pdf;
 }
 
 
@@ -130,8 +302,8 @@ const Page& Document::insertPage(int index,
 const Page& Document::getCurrentPage()
 {
 	Page p(this, HPDF_GetCurrentPage(_pdf));
-	PageContainer::iterator it = _pages.begin();
-	PageContainer::iterator end = _pages.end();
+	auto it = _pages.begin();
+	auto end = _pages.end();
 	for (;it != end; ++it)
 		if (*it == p) return *it;
 
@@ -141,7 +313,8 @@ const Page& Document::getCurrentPage()
 
 const Font& Document::loadFont(const std::string& name, const std::string& encoding)
 {
-	Font font(&_pdf, HPDF_GetFont(_pdf, name.c_str(), encoding.empty() ? 0 : encoding.c_str()));
+	Font font(&_pdf,
+			  HPDF_GetFont(_pdf, name.c_str(), encoding.empty() ? nullptr : encoding.c_str()));
 	std::pair<FontContainer::iterator, bool> ret =
 		_fonts.insert(FontContainer::value_type(name, font));
 
@@ -153,7 +326,7 @@ const Font& Document::loadFont(const std::string& name, const std::string& encod
 
 const Font& Document::font(const std::string& name, const std::string& encoding)
 {
-	FontContainer::iterator it = _fonts.find(name);
+	auto it = _fonts.find(name);
 	if (_fonts.end() != it) return it->second;
 
 	return loadFont(name, encoding);
@@ -241,7 +414,7 @@ void Document::encryption(Encryption mode, Poco::UInt32 keyLength)
 
 const Encoder& Document::loadEncoder(const std::string& name)
 {
-	EncoderContainer::iterator it = _encoders.find(name);
+	auto it = _encoders.find(name);
 	if (_encoders.end() == it) return it->second;
 
 	Encoder enc(&_pdf, HPDF_GetEncoder(_pdf, name.c_str()), name);
@@ -258,7 +431,7 @@ const Encoder& Document::getCurrentEncoder()
 {
 	HPDF_Encoder enc = HPDF_GetCurrentEncoder(_pdf);
 	std::string name = enc->name;
-	EncoderContainer::iterator it = _encoders.find(name);
+	auto it = _encoders.find(name);
 	if (_encoders.end() == it)
 	{
 		std::pair<EncoderContainer::iterator, bool> ret =
@@ -281,7 +454,7 @@ const Encoder& Document::setCurrentEncoder(const std::string& name)
 
 const Outline& Document::createOutline(const std::string& title, const Outline& parent, const Encoder& encoder)
 {
-	_outlines.push_back(Outline(&_pdf, HPDF_CreateOutline(_pdf, parent, title.c_str(), encoder)));
+	_outlines.emplace_back(&_pdf, HPDF_CreateOutline(_pdf, parent, title.c_str(), encoder));
 	return _outlines.back();
 }
 

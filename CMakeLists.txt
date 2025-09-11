@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.15.0)
+cmake_minimum_required(VERSION 3.26.0)
+
+# MacOS version that has support for C++20
+# Must be set before the project.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS minimum supported target")
 
 project(Poco)
 
@@ -227,6 +231,9 @@ option(POCO_UNBUNDLED
 option(POCO_SQLITE_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
 
+option(POCO_SOO
+	"Set to OFF|ON (default is ON) to control small object optimization in Poco::Foundation" ON)
+
 if (POCO_UNBUNDLED)
 	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
 endif()
@@ -257,10 +264,12 @@ if(ENABLE_FUZZING)
 endif()
 
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
-elseif (POCO_SQLITE_UNBUNDLED)
-	message(STATUS "Using external sqlite")
-	message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	if (POCO_SQLITE_UNBUNDLED)
+		message(STATUS "Using external sqlite")
+		message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	else()
+		message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
+	endif()
 else()
 	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
@@ -401,6 +410,8 @@ if(ENABLE_DATA_ODBC)
 endif()
 
 # - add required subdirectories
+
+add_subdirectory(dependencies)
 
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
@@ -623,8 +634,8 @@ install(
 		Devel
 )
 
-message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
-message(STATUS "${PROJECT_NAME} package version: ${PROJECT_VERSION}")
+message(STATUS "CMake '${CMAKE_VERSION}' successfully configured '${PROJECT_NAME}'")
+message(STATUS "${PROJECT_NAME} package version: '${PROJECT_VERSION}'")
 if(BUILD_SHARED_LIBS)
 	message(STATUS "Building dynamic libraries")
 else()
@@ -637,6 +648,8 @@ endif()
 message(STATUS "[cmake] Build for OS type:      ${CMAKE_SYSTEM_NAME}")
 message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "[cmake] Generator:              ${CMAKE_GENERATOR}")
+message(STATUS "[cmake] Generator platorm:      ${CMAKE_GENERATOR_PLATFORM}")
 message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 message(STATUS "[cmake] Build with C++ flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")

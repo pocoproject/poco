@@ -37,9 +37,25 @@ AttributedString::AttributedString(const std::string& content, Alignment align, 
 {
 }
 
+AttributedString::~AttributedString() = default;
 
-AttributedString::~AttributedString()
+AttributedString& AttributedString::operator=(const std::string& content)
 {
+	_content = content;
+	return *this;
+}
+
+
+AttributedString& AttributedString::operator=(const char* content)
+{
+	_content = content;
+	return *this;
+}
+
+
+AttributedString::operator const std::string&()
+{
+	return _content;
 }
 
 
