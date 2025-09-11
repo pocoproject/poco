@@ -138,7 +138,7 @@ protected:
 
 
 #define poco_unexpected() \
-	Poco::Bugcheck::unexpected(__FILE__, __LINE__);
+	Poco::Bugcheck::unexpected(__FILE__, __LINE__)
 
 
 #define poco_debugger() \
