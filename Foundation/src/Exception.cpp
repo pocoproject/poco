@@ -176,6 +176,7 @@ POCO_IMPLEMENT_EXCEPTION(RegularExpressionException, RuntimeException, "Error in
 POCO_IMPLEMENT_EXCEPTION(LibraryLoadException, RuntimeException, "Cannot load library")
 POCO_IMPLEMENT_EXCEPTION(LibraryAlreadyLoadedException, RuntimeException, "Library already loaded")
 POCO_IMPLEMENT_EXCEPTION(NoThreadAvailableException, RuntimeException, "No thread available")
+POCO_IMPLEMENT_EXCEPTION(ThreadInterruptedException, RuntimeException, "Thread interrupted")
 POCO_IMPLEMENT_EXCEPTION(PropertyNotSupportedException, RuntimeException, "Property not supported")
 POCO_IMPLEMENT_EXCEPTION(PoolOverflowException, RuntimeException, "Pool overflow")
 POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission")

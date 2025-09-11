@@ -256,6 +256,35 @@ public:
 		/// Negative value means the thread has
 		/// no CPU core affinity.
 
+	bool isInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Return true if the task running on this thread should be stopped.
+		/// An interruption can be requested by interrupt().
+		///
+		/// This function can be used to make long running tasks cleanly interruptible.
+		/// Never checking or acting on the value returned by this function is safe,
+		/// however it is advisable do so regularly in long running functions.
+		/// Take care not to call it too often, to keep the overhead low.
+		/// 
+		/// See also checkInterrupted().
+
+	void checkInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Throws Poco::ThreadInterruptedException if isInterrupted() return true.
+		///
+		/// Note: The interrupted status of the thread is cleared by this method.
+
+	void interrupt();
+		/// Interrupts this thread.
+		///
+		/// This function does not stop any event loop running on the thread and
+		/// does not terminate it in any way.
+		///
+		/// See also isInterrupted().
+
+	void clearInterrupt();
+		/// Clear the the interrupted status.
+
 protected:
 	ThreadLocalStorage& tls();
 		/// Returns a reference to the thread's local storage.
@@ -301,6 +330,7 @@ private:
 	int                 _id;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
+	std::atomic_bool    _interruptionRequested;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
