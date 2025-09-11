@@ -77,9 +77,6 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 	SQLSMALLINT cbCharAttr = 0;
 	if (!pcbCharAttr) pcbCharAttr = &cbCharAttr;
 
-	SQLSMALLINT cbCharAttr;
-	if (!pcbCharAttr) pcbCharAttr = &cbCharAttr;
-
 	if (isString(pCharAttr, cbCharAttrMax))
 	{
 		Buffer<SQLWCHAR> buffer(stringLength(pCharAttr, cbCharAttrMax));
