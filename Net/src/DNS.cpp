@@ -82,7 +82,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 		freeaddrinfo(pAI);
 		return result;
 	}
-#if defined(_WIN32)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	else if(rc == WSANO_DATA && hostname == "localhost") // no data record found and is local host 
 	{
  #if defined(POCO_HAVE_IPv6)
@@ -141,7 +141,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 			freeaddrinfo(pAI);
 			return result;
 		}
-#if defined(_WIN32)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 		else if(rc == WSANO_DATA && address.isLoopback()) // no data record found and is local host 
 		{
 			return HostEntry("localhost", address);
