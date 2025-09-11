@@ -386,10 +386,10 @@ private:
 		if (!pExtraction)
 		{
 			throw Poco::BadCastException(Poco::format("Type dynamic cast failed!\n"
-				"Column: %z\nConversion:\n%s\n%s",
-				pos,
-				Poco::demangle(typeid(typename E::ValType).name()),
-				rExtractions[pos]->getHeldType()));
+				"Column: %z\nConversion:\n[%s]=>[%s]\n@%s",
+				pos, Poco::demangle<typename E::ValType>(),
+				rExtractions[pos]->getHeldType(),
+				poco_src_loc));
 		}
 		return pExtraction->column();
 	}

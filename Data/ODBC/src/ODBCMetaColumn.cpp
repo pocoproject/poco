@@ -127,25 +127,9 @@ void ODBCMetaColumn::init()
 
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
-		setType(MetaColumn::FDT_DOUBLE); break;
-
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
-		// Oracle has no INTEGER type - it's essentially NUMBER with 38 whole and
-		// 0 fractional digits. It also does not recognize SQL_BIGINT type,
-		// so the workaround here is to hardcode it to 32 or 64 bit integer
-		if (0 == _columnDesc.decimalDigits)
-		{
-			if (_columnDesc.size > 9)
-				setType(MetaColumn::FDT_INT64);
-			else
-				setType(MetaColumn::FDT_INT32);
-		}
-		else
-		{
-			setType(MetaColumn::FDT_DOUBLE);
-		}
-		break;
+		setType(MetaColumn::FDT_DOUBLE); break;
 
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
