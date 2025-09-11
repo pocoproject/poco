@@ -482,7 +482,6 @@ public:
 	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
-		/// This function is deprecated and will be removed.
 		/// Please use clear().
 
 	void clear();

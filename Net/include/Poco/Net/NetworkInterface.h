@@ -61,7 +61,7 @@ class Net_API NetworkInterface
 {
 public:
 	using List = std::vector<NetworkInterface>;
-	using NetworkInterfaceList  POCO_DEPRECATED("") = List;
+	using NetworkInterfaceList  POCO_DEPRECATED("Use NetworkInterface::List") = List;
 	using Map = std::map<unsigned int, NetworkInterface>;
 	using AddressTuple = Poco::Tuple<IPAddress, IPAddress, IPAddress>;
 	using AddressList = std::vector<AddressTuple>;
