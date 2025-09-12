@@ -554,7 +554,7 @@ private:
 
 			case MetaColumn::FDT_UUID:
 				if (pVal)
-					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY, 16);
+					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY, pVal->size());
 				else
 					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY);
 
@@ -1185,7 +1185,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::DateTime>
 
 inline void Preparator::prepare(std::size_t pos, const Poco::UUID&)
 {
-	prepareCharArray<char, DT_CHAR_ARRAY>(pos, SQL_C_BINARY, 16, 16);
+	prepareVariableLen<char>(pos, SQL_C_BINARY, 16, DT_CHAR);
 }
 
 
