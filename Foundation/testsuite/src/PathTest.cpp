@@ -840,32 +840,32 @@ void PathTest::testParseWindows5()
 {
 	Path p;
 	p.parse("C:", Path::PATH_WINDOWS);
-	assertTrue(!p.isRelative());
-	assertTrue(p.isAbsolute());
-	assertTrue(p.depth() == 0);
-	assertTrue(p.isDirectory());
-	assertTrue(p.toString(Path::PATH_WINDOWS) == "C:\\");
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 0);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
 
 	p.parse("C:\\", Path::PATH_WINDOWS);
-	assertTrue(!p.isRelative());
-	assertTrue(p.isAbsolute());
-	assertTrue(p.depth() == 0);
-	assertTrue(p.isDirectory());
-	assertTrue(p.toString(Path::PATH_WINDOWS) == "C:\\");
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 0);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
 
 	p.parse("\\\\?\\C:", Path::PATH_WINDOWS);
-	assertTrue(!p.isRelative());
-	assertTrue(p.isAbsolute());
-	assertTrue(p.depth() == 1);
-	assertTrue(p.isDirectory());
-	assertTrue(p.toString(Path::PATH_WINDOWS) == "\\\\?\\C:\\");
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 1);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "\\\\?\\C:\\");
 
 	p.parse("\\\\?\\C:\\", Path::PATH_WINDOWS);
-	assertTrue(!p.isRelative());
-	assertTrue(p.isAbsolute());
-	assertTrue(p.depth() == 1);
-	assertTrue(p.isDirectory());
-	assertTrue(p.toString(Path::PATH_WINDOWS) == "\\\\?\\C:\\");
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 1);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "\\\\?\\C:\\");
 }
 
 
