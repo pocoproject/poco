@@ -57,10 +57,25 @@ FileImpl::FileImpl()
 
 FileImpl::FileImpl(const std::string& path): _path(path)
 {
+	// If the path only has disk letter, we must make sure it ends with backslash!
+	// Or it will be failed to call Windows API GetFileAttributesW().
+	// For example:
+	//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
 	std::string::size_type n = _path.size();
-	if (n > 1 && (_path[n - 1] == '\\' || _path[n - 1] == '/') && !((n == 3 && _path[1]==':')))
+	if (n > 1)
 	{
-		_path.resize(n - 1);
+		auto ch = _path.back();
+		if (ch == ':')
+		{
+			_path.push_back('\\'); // Add backslash near to disk letter
+		}
+		else if (ch == '\\' || ch == '/')
+		{
+			if (_path[n - 2] != ':')
+			{
+				_path.pop_back(); // Remove backslash if it's a normal path
+			}
+		}
 	}
 	convertPath(_path, _upath);
 }
@@ -81,10 +96,25 @@ void FileImpl::swapImpl(FileImpl& file)
 void FileImpl::setPathImpl(const std::string& path)
 {
 	_path = path;
+	// If the path only has disk letter, we must make sure it ends with backslash!
+	// Or it will be failed to call Windows API GetFileAttributesW().
+	// For example:
+	//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
 	std::string::size_type n = _path.size();
-	if (n > 1 && (_path[n - 1] == '\\' || _path[n - 1] == '/') && !((n == 3 && _path[1]==':')))
+	if (n > 1)
 	{
-		_path.resize(n - 1);
+		auto ch = _path.back();
+		if (ch == ':')
+		{
+			_path.push_back('\\'); // Add backslash near to disk letter
+		}
+		else if (ch == '\\' || ch == '/')
+		{
+			if (_path[n - 2] != ':')
+			{
+				_path.pop_back(); // Remove backslash if it's a normal path
+			}
+		}
 	}
 	convertPath(_path, _upath);
 }
@@ -499,6 +529,14 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 {
 	UnicodeConverter::toUTF16(utf8Path, utf16Path);
+	if (utf16Path.length() > 0 && utf16Path.back() == L':')
+	{
+		// If the path only has disk letter, we must make sure it ends with backslash!
+		// Or it will be failed to call Windows API GetFileAttributesW().
+		// For example:
+		//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
+		utf16Path.push_back(L'\\');
+	}
 	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' || utf16Path[1] == ':')

@@ -330,10 +330,17 @@ void FileTest::testRootDir()
 	File f2("c:/");
 	File f3("c:\\");
 	File f4("\\");
+	File f5("c:");
+	File f6("\\\\?\\c:");
+	File f7("\\\\?\\c:\\");
+
 	assertTrue (f1.exists());
 	assertTrue (f2.exists());
 	assertTrue (f3.exists());
 	assertTrue (f4.exists());
+	assertTrue (f5.exists());
+	assertTrue (f6.exists());
+	assertTrue (f7.exists());
 #else
 	File f1("/");
 	assertTrue (f1.exists());
