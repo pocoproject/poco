@@ -89,7 +89,7 @@ void Net_API uninitializeNetwork();
 	/// (Windows only, no-op elsewhere)
 
 
-std::string htmlize(const std::string& str);
+std::string Net_API htmlize(const std::string& str);
 	/// Returns a copy of html with reserved HTML
 	/// characters (<, >, ", &) propery escaped.
 
