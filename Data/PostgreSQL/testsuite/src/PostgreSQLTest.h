@@ -113,7 +113,7 @@ public:
 	void testSessionTransactionNoAutoCommit();
 	void testTransaction();
 	void testReconnect();
-
+    void testTransactionWithReconnect();
 	void testSqlState();
 
 	void setUp();
