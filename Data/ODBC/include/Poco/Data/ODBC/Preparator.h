@@ -554,9 +554,9 @@ private:
 
 			case MetaColumn::FDT_UUID:
 				if (pVal)
-					return prepareFixedSize<DateTime>(pos, SQL_C_BINARY, 16);
+					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY, 16);
 				else
-					return prepareFixedSize<DateTime>(pos, SQL_C_BINARY);
+					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY);
 
 			default:
 				throw DataFormatException("Unsupported data type.");

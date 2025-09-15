@@ -198,9 +198,6 @@ bool SessionImpl::isConnected() const
 
 inline void SessionImpl::setCursorUse(const std::string&, const Poco::Any& value)
 {
-#if POCO_OS == POCO_OS_WINDOWS_NT
-#pragma warning (disable : 4995) // ignore marked as deprecated
-#endif
 	int cursorUse = static_cast<int>(Poco::AnyCast<CursorUse>(value));
 	int rc = 0;
 	switch (cursorUse)
@@ -217,9 +214,6 @@ inline void SessionImpl::setCursorUse(const std::string&, const Poco::Any& value
 	default:
 		throw Poco::InvalidArgumentException(Poco::format("SessionImpl::setCursorUse(%d)", cursorUse));
 	}
-#if POCO_OS == POCO_OS_WINDOWS_NT
-#pragma warning (default : 4995)
-#endif
 	if (Utility::isError(rc))
 	{
 		throw Poco::Data::ODBC::HandleException<SQLHDBC, SQL_HANDLE_DBC>(_db, Poco::format("SessionImpl::setCursorUse(%d)", cursorUse));

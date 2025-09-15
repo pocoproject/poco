@@ -33,7 +33,7 @@
 #include "Poco/UTFString.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
-#include "sqlite3.h"
+#include <sqlite3.h>
 #include <vector>
 #include <utility>
 

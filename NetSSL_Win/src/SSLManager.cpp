@@ -33,6 +33,8 @@ namespace Net {
 
 const std::string SSLManager::CFG_CERT_NAME("certificateName");
 const std::string SSLManager::VAL_CERT_NAME("");
+const std::string SSLManager::CFG_CERT_HASH("certificateHash");
+const std::string SSLManager::VAL_CERT_HASH("");
 const std::string SSLManager::CFG_CERT_PATH("certificatePath");
 const std::string SSLManager::VAL_CERT_PATH("");
 const std::string SSLManager::CFG_CERT_STORE("certificateStore");
@@ -188,7 +190,8 @@ void SSLManager::initDefaultContext(bool server)
 
 	const std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 	Poco::Util::AbstractConfiguration& config = appConfig();
-	std::string certName = config.getString(prefix + CFG_CERT_NAME, VAL_CERT_NAME);
+	std::string certInfo = config.getString(prefix + CFG_CERT_NAME, VAL_CERT_NAME);
+	std::string certHash = config.getString(prefix + CFG_CERT_HASH, VAL_CERT_HASH);
 	std::string certPath = config.getString(prefix + CFG_CERT_PATH, VAL_CERT_PATH);
 	std::string certStore = config.getString(prefix + CFG_CERT_STORE, VAL_CERT_STORE);
 
@@ -218,7 +221,12 @@ void SSLManager::initDefaultContext(bool server)
 	if (!certPath.empty())
 	{
 		options |= Context::OPT_LOAD_CERT_FROM_FILE;
-		certName = certPath;
+		certInfo = certPath;
+	}
+	if (certInfo.empty() && !certHash.empty())
+	{
+		options |= Context::OPT_USE_CERT_HASH;
+		certInfo = certHash;
 	}
 
 	Context::Usage usage;
@@ -234,7 +242,7 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_SERVER_USE;
 		else
 			usage = Context::SERVER_USE;
-		_ptrDefaultServerContext = new Context(usage, certName, verMode, options, certStore);
+		_ptrDefaultServerContext = new Context(usage, certInfo, verMode, options, certStore);
 	}
 	else
 	{
@@ -248,7 +256,7 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_CLIENT_USE;
 		else
 			usage = Context::CLIENT_USE;
-		_ptrDefaultClientContext = new Context(usage, certName, verMode, options, certStore);
+		_ptrDefaultClientContext = new Context(usage, certInfo, verMode, options, certStore);
 	}
 }
 

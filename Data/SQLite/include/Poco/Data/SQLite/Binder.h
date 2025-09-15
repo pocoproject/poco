@@ -23,7 +23,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
-#include "sqlite3.h"
+#include <sqlite3.h>
 
 
 namespace Poco {

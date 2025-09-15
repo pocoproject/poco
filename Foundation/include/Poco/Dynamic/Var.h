@@ -482,7 +482,6 @@ public:
 	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
-		/// This function is deprecated and will be removed.
 		/// Please use clear().
 
 	void clear();
@@ -2288,7 +2287,7 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 } // namespace Dynamic
 
 
-using DynamicAny POCO_DEPRECATED("") = Dynamic::Var;
+using DynamicAny POCO_DEPRECATED("Replace with Poco::Dynamic::Var") = Dynamic::Var;
 
 
 } // namespace Poco

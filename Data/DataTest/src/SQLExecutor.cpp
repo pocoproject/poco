@@ -2849,8 +2849,16 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			Poco::Int64 l = rset.value<Poco::Int64>(0,0);
-			assertTrue (1 == l);
+			try
+			{
+				Poco::Int64 l = rset.value<Poco::Int64>(0,0);
+				assertTrue (1 == l);
+			}
+			catch(BadCastException&) // Oracle really has no integers
+			{
+				double l = rset.value<double>(0,0);
+				assertTrue (0.9 < l && l < 1.1);
+			}
 		}
 
 		std::string s = rset.value(0,0).convert<std::string>();
@@ -2863,8 +2871,16 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			Poco::Int64 l = rset.value<Poco::Int64>(0,2);
-			assertTrue (3 == l);
+			try
+			{
+				Poco::Int64 l = rset.value<Poco::Int64>(0,2);
+				assertTrue (3 == l);
+			}
+			catch(BadCastException&) // Oracle really has no integers
+			{
+				double l = rset.value<double>(0,2);
+				assertTrue (2.9 < l && l < 3.1);
+			}
 		}
 
 		try
@@ -2902,11 +2918,22 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			const Column<std::deque<Poco::Int64>>& col = rset.column<std::deque<Poco::Int64> >(0);
-			Column<std::deque<Poco::Int64>>::Iterator it = col.begin();
-			Column<std::deque<Poco::Int64>>::Iterator end = col.end();
-			for (Poco::Int64 l = 1; it != end; ++it, ++l)
-				assertTrue (*it == l);
+			try
+			{
+				const Column<std::deque<Poco::Int64>>& col = rset.column<std::deque<Poco::Int64> >(0);
+				Column<std::deque<Poco::Int64>>::Iterator it = col.begin();
+				Column<std::deque<Poco::Int64>>::Iterator end = col.end();
+				for (Poco::Int64 l = 1; it != end; ++it, ++l)
+					assertTrue (*it == l);
+			}
+			catch(BadCastException&) // Oracle really has no integers
+			{
+				const Column<std::deque<double>>& col = rset.column<std::deque<double> >(0);
+				Column<std::deque<double>>::Iterator it = col.begin();
+				Column<std::deque<double>>::Iterator end = col.end();
+				for (double l = 0.9; it != end; ++it, ++l)
+					assertTrue (l < *it && *it < l + .2);
+			}
 		}
 
 		rset = (session() << "SELECT COUNT(*) AS cnt FROM Vectors", now);
@@ -3856,10 +3883,10 @@ void SQLExecutor::sqlChannel(const std::string& connector, const std::string& co
 		Message msgWarnS("WarningSource", "d Warning sync message", Message::PRIO_WARNING);
 		pChannel->log(msgWarnS);
 		while (pChannel->logged() != 4) Thread::sleep(10);
-
+		Thread::sleep(100);
 		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
 		size_t rc = rs.rowCount();
-		assertTrue (4 == rc);
+		assertEqual (4, rc);
 		assertTrue ("InformationSource" == rs["Source"]);
 		assertTrue ("a Informational async message" == rs["Text"]);
 		rs.moveNext();

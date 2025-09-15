@@ -55,7 +55,7 @@ public:
 		/// the event is automatically reset after
 		/// a wait() successfully returns.
 
-	POCO_DEPRECATED("")
+	POCO_DEPRECATED("Please use Event::Event(EventType) instead")
 	explicit Event(bool autoReset);
 		/// Please use Event::Event(EventType) instead.
 

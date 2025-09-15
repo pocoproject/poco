@@ -15,11 +15,7 @@
 #include "Poco/DeflatingStream.h"
 #include "Poco/Exception.h"
 #include <memory>
-#if defined(POCO_UNBUNDLED)
 #include <zlib.h>
-#else
-#include "zlib.h"
-#endif
 
 
 namespace Poco {

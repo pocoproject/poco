@@ -198,7 +198,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 		.add<Poco::Int32>("saslStart", 1)
 		.add<std::string>("mechanism", AUTH_SCRAM_SHA1)
 		.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
-		.add<bool>("authAuthorize", true);
+		.add<bool>("autoAuthorize", true);
 
 	ResponseMessage response;
 	connection.sendRequest(*pCommand, response);

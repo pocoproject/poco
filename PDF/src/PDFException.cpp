@@ -13,9 +13,8 @@
 
 
 #include "Poco/PDF/PDFException.h"
-#include "Poco/Format.h"
+#include <hpdf.h>
 #include <string>
-#include <typeinfo>
 
 
 namespace Poco {

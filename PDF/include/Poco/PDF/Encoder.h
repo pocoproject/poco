@@ -20,7 +20,6 @@
 
 #include "Poco/PDF/PDF.h"
 #include "Poco/PDF/Resource.h"
-#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -33,40 +32,40 @@ class PDF_API Encoder: public Resource<HPDF_Encoder>
 public:
 	enum Type
 	{
-		ENCODER_TYPE_SINGLE_BYTE = HPDF_ENCODER_TYPE_SINGLE_BYTE,
+		ENCODER_TYPE_SINGLE_BYTE = 0,
 			/// This encoder is an encoder for single byte characters.
-		ENCODER_TYPE_DOUBLE_BYTE = HPDF_ENCODER_TYPE_DOUBLE_BYTE,
+		ENCODER_TYPE_DOUBLE_BYTE,
 			/// This encoder is an encoder for multi byte characters.
-		ENCODER_TYPE_UNINITIALIZED = HPDF_ENCODER_TYPE_UNINITIALIZED,
+		ENCODER_TYPE_UNINITIALIZED,
 			/// This encoder is uninitialized. (May be it is an encoder for multi byte characters.)
-		ENCODER_TYPE_UNKNOWN = HPDF_ENCODER_UNKNOWN
+		ENCODER_TYPE_UNKNOWN
 			/// Invalid encoder.
-	};
+	};	
 
 	enum ByteType
 	{
-		ENCODER_BYTE_TYPE_SINGLE = HPDF_BYTE_TYPE_SINGLE,
+		ENCODER_BYTE_TYPE_SINGLE,
 			/// Single byte character.
-		ENCODER_BYTE_TYPE_LEAD = HPDF_BYTE_TYPE_LEAD,
+		ENCODER_BYTE_TYPE_LEAD,
 			/// Lead byte of a double-byte character.
-		ENCODER_BYTE_TYPE_TRIAL = HPDF_BYTE_TYPE_TRIAL,
+		ENCODER_BYTE_TYPE_TRIAL,
 			/// Trailing byte of a double-byte character.
-		ENCODER_BYTE_TYPE_UNKNOWN = HPDF_BYTE_TYPE_UNKNOWN
+		ENCODER_BYTE_TYPE_UNKNOWN
 			/// Invalid encoder or cannot judge the byte type.
 	};
 
 	enum WriteMode
 	{
-		WRITE_MODE_HORIZONTAL = HPDF_WMODE_HORIZONTAL,
+		WRITE_MODE_HORIZONTAL = 0,
 			/// Horizontal writing mode.
-		WRITE_MODE_VERTICAL = HPDF_WMODE_VERTICAL
+		WRITE_MODE_VERTICAL
 			/// Vertical writing mode;
 	};
 
 	Encoder(HPDF_Doc* pPDF, const HPDF_Encoder& resource, const std::string& name = "");
 		/// Creates the encoder.
 
-	~Encoder();
+	~Encoder() override;
 		/// Destroys the encoder.
 
 	Type getType() const;
@@ -78,33 +77,6 @@ public:
 	WriteMode writeMode();
 		/// Returns the writing mode for the encoding object.
 };
-
-
-//
-// inlines
-//
-
-inline Encoder::Type Encoder::getType() const
-{
-	return static_cast<Type>(HPDF_Encoder_GetType(handle()));
-}
-
-
-inline Encoder::ByteType Encoder::getByteType(const std::string& text, int index) const
-{
-	if (index < 0)
-		throw InvalidArgumentException("Negative values not allowed.");
-
-	return static_cast<ByteType>(HPDF_Encoder_GetByteType(handle(),
-		text.c_str(),
-		static_cast<HPDF_UINT>(index)));
-}
-
-
-inline Encoder::WriteMode Encoder::writeMode()
-{
-	return static_cast<WriteMode>(HPDF_Encoder_GetWritingMode(handle()));
-}
 
 
 } } // namespace Poco::PDF
