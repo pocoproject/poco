@@ -265,9 +265,9 @@ target_include_directories(PocoCppModules
 
 target_compile_features(PocoCppModules PUBLIC cxx_std_20)
 
+POCO_INSTALL(PocoCppModules)
+POCO_GENERATE_PACKAGE(PocoCppModules)
+
 if(ENABLE_TESTS)
-	if(NOT BUILD_SHARED_LIBS)
-		set_property(TARGET Foundation PROPERTY POSITION_INDEPENDENT_CODE ON) # This is needed to build TestLibrary.so as shared.
-	endif()
-	add_subdirectory(testsuite)
+	add_subdirectory(samples)
 endif()
