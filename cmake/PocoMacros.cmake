@@ -299,6 +299,79 @@ endif()
 
 endmacro()
 
+#  POCO_MODULES_INSTALL - Install C++ modules target with FILE_SET CXX_MODULES support
+#	Usage: POCO_MODULES_INSTALL(target_name)
+#	  INPUT:
+#		   target_name			 the name of the target. e.g. Modules for PocoModules
+#	Example: POCO_MODULES_INSTALL(Modules)
+macro(POCO_MODULES_INSTALL target_name)
+# Custom installation for C++ modules - handles FILE_SET CXX_MODULES
+install(
+	TARGETS "${target_name}"
+	EXPORT "${target_name}Targets"
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	FILE_SET CXX_MODULES DESTINATION ${CMAKE_INSTALL_LIBDIR}/poco/modules
+)
+
+# Custom package generation for C++ modules
+include(CMakePackageConfigHelpers)
+
+# Set config script install location
+if(WIN32)
+	set(PocoConfigPackageLocation "cmake")
+else()
+	set(PocoConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+endif()
+
+# Export the targets for build tree
+export(
+	EXPORT "${target_name}Targets"
+	FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}${target_name}Targets.cmake"
+	NAMESPACE "${PROJECT_NAME}::"
+)
+
+# Generate version file
+write_basic_package_version_file(
+	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY AnyNewerVersion
+)
+
+# Configure the config file
+configure_file(
+	"cmake/Poco${target_name}Config.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}${target_name}Config.cmake"
+	@ONLY
+)
+
+# Install the export targets
+install(
+	EXPORT "${target_name}Targets"
+	FILE "${PROJECT_NAME}${target_name}Targets.cmake"
+	NAMESPACE "${PROJECT_NAME}::"
+	DESTINATION "${PocoConfigPackageLocation}"
+)
+
+# Install the config files
+install(
+	FILES
+		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}${target_name}Config.cmake"
+		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+	DESTINATION "${PocoConfigPackageLocation}"
+	COMPONENT Devel
+)
+
+if(MSVC)
+# install the targets pdb
+	POCO_INSTALL_PDB(${target_name})
+endif()
+
+endmacro()
+
 #  POCO_INSTALL_PDB - Install the given target's companion pdb file (if present)
 #	Usage: POCO_INSTALL_PDB(target_name)
 #	  INPUT:
