@@ -278,6 +278,7 @@ Object::operator const Poco::DynamicStruct& () const
 				_pStruct->insert(it->first, it->second);
 			}
 		}
+		_modified = false;
 	}
 
 	return *_pStruct;
