@@ -1,3 +1,14 @@
+//
+// Util.cppm
+//
+// C++ module file
+//
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
 module;
 
 #ifdef ENABLE_UTIL

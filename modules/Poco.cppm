@@ -1,3 +1,14 @@
+//
+// Poco.cppm
+//
+// C++ module file, re-exporting all other modules
+//
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
 export module Poco;
 
 #ifdef ENABLE_FOUNDATION
