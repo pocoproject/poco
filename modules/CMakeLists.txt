@@ -265,7 +265,8 @@ target_include_directories(Modules
 
 target_compile_features(Modules PUBLIC cxx_std_20)
 
-POCO_MODULES_INSTALL(Modules)
+POCO_INSTALL(Modules)
+POCO_GENERATE_PACKAGE(Modules)
 
 if(ENABLE_TESTS)
 	add_subdirectory(samples)
