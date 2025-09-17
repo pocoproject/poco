@@ -1,0 +1,10 @@
+#
+# Darwin-clang
+#
+# Build settings for Mac OS X 10.11 (clang, libstdc++, x86_64)
+#
+# NOTE: This build configuration will build 64-bit binaries.
+# Use the Darwin32-clang build configuration to build 32-bit binaries.
+#
+
+include $(POCO_BASE)/build/config/Darwin-clang-libc++

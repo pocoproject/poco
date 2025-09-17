@@ -1,0 +1,77 @@
+#
+# Darwin-clang-libc++
+#
+# Build settings for Mac OS X 10.13 and later (clang, libc++, x86_64/arm64)
+# The build settings defined in this file are compatible
+# with XCode C++ projects.
+#
+
+#
+# General Settings
+#
+LINKMODE ?= SHARED
+
+ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
+SANITIZEFLAGS      ?=
+OSFLAGS            ?= -mmacosx-version-min=10.15 -isysroot $(shell xcrun --show-sdk-path)
+
+ifeq ($(POCO_HOST_OSARCH),arm64)
+OPENSSL_DIR        ?= /opt/homebrew/opt/openssl
+else
+OPENSSL_DIR        ?= /usr/local/opt/openssl
+endif
+
+#
+# Tools
+#
+CC      = $(shell xcrun -find clang)
+CXX     = $(shell xcrun -find clang++)
+LINK    = $(CXX) -bind_at_load
+LIB     = libtool -static -o
+RANLIB  = ranlib
+SHLIB   = $(CXX) -dynamiclib -Wl,-install_name,$(POCO_LIB_INSTALLDIR)/$(notdir \$@) -o $@
+DYLIB   = $(CXX) -dynamic -bundle $(RORELOCS) -Wl,-bind_at_load -o $@
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   =
+DEP     = $(POCO_BASE)/build/script/makedepend.clang
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+
+#
+# Extension for Shared Libraries
+#
+SHAREDLIBEXT     = .$(target_version).dylib
+SHAREDLIBLINKEXT = .dylib
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c11
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c++17 -stdlib=libc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  =
+SHAREDOPT_CC    = -fPIC
+SHAREDOPT_CXX   = -fPIC
+SHAREDOPT_LINK  =
+DEBUGOPT_CC     = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_LINK   =
+RELEASEOPT_CC   = -DNDEBUG -Os -fasm-blocks
+RELEASEOPT_CXX  = -DNDEBUG -O2 -fasm-blocks
+RELEASEOPT_LINK =
+
+#
+# System Specific Flags
+#
+SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -I$(OPENSSL_DIR)/include
+
+#
+# System Specific Libraries
+#
+SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl
