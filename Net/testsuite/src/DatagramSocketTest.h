@@ -55,6 +55,8 @@ private:
 	void testGatherScatterSTRFFixedUNIX();
 	void testGatherScatterVariableUNIX();
 	void testGatherScatterSTRFVariableUNIX();
+
+	void testLocalUDPConnectionResetWin();
 };
 
 
