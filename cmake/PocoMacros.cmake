@@ -210,60 +210,60 @@ endmacro()
 #		   target_name			 the name of the target. e.g. Foundation for PocoFoundation
 #	Example: POCO_GENERATE_PACKAGE(Foundation)
 macro(POCO_GENERATE_PACKAGE target_name)
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
-	VERSION ${PROJECT_VERSION}
-	COMPATIBILITY AnyNewerVersion
-)
-if("${CMAKE_VERSION}" VERSION_LESS "3.0.0")
-	if(NOT EXISTS "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake")
-		export(TARGETS "${target_name}" APPEND
+	include(CMakePackageConfigHelpers)
+	write_basic_package_version_file(
+		"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+		VERSION ${PROJECT_VERSION}
+		COMPATIBILITY AnyNewerVersion
+	)
+	if("${CMAKE_VERSION}" VERSION_LESS "3.0.0")
+		if(NOT EXISTS "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake")
+			export(TARGETS "${target_name}" APPEND
+				FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
+				NAMESPACE "${PROJECT_NAME}::"
+		)
+		endif()
+	else()
+		export(EXPORT "${target_name}Targets"
 			FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
 			NAMESPACE "${PROJECT_NAME}::"
-	)
+		)
 	endif()
-else()
-	export(EXPORT "${target_name}Targets"
-		FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
-		NAMESPACE "${PROJECT_NAME}::"
-	)
-endif()
-if("${target_name}" STREQUAL "CppUnit")
-	configure_file("cmake/${target_name}Config.cmake"
-	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
-	@ONLY
-	)
-else()
-	configure_file("cmake/Poco${target_name}Config.cmake"
+	if("${target_name}" STREQUAL "CppUnit")
+		configure_file("cmake/${target_name}Config.cmake"
 		"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
 		@ONLY
+		)
+	else()
+		configure_file("cmake/Poco${target_name}Config.cmake"
+			"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
+			@ONLY
+		)
+	endif()
+
+	# Set config script install location in a location that find_package() will
+	# look for, which is different on MS Windows than for UNIX
+	# Note: also set in root CMakeLists.txt
+	if(WIN32)
+		set(PocoConfigPackageLocation "cmake")
+	else()
+		set(PocoConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+	endif()
+
+	install(
+		EXPORT "${target_name}Targets"
+		FILE "${PROJECT_NAME}${target_name}Targets.cmake"
+		NAMESPACE "${PROJECT_NAME}::"
+		DESTINATION "${PocoConfigPackageLocation}"
 	)
-endif()
 
-# Set config script install location in a location that find_package() will
-# look for, which is different on MS Windows than for UNIX
-# Note: also set in root CMakeLists.txt
-if(WIN32)
-	set(PocoConfigPackageLocation "cmake")
-else()
-	set(PocoConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-endif()
-
-install(
-	EXPORT "${target_name}Targets"
-	FILE "${PROJECT_NAME}${target_name}Targets.cmake"
-	NAMESPACE "${PROJECT_NAME}::"
-	DESTINATION "${PocoConfigPackageLocation}"
-)
-
-install(
-	FILES
-		"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
-		"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
-	DESTINATION "${PocoConfigPackageLocation}"
-	COMPONENT Devel
-)
+	install(
+		FILES
+			"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
+			"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+		DESTINATION "${PocoConfigPackageLocation}"
+		COMPONENT Devel
+	)
 
 endmacro()
 
@@ -276,26 +276,41 @@ endmacro()
 #		   target_name			 the name of the target. e.g. Foundation for PocoFoundation
 #	Example: POCO_INSTALL(Foundation)
 macro(POCO_INSTALL target_name)
-install(
-	DIRECTORY include/Poco
-	DESTINATION include
-	COMPONENT Devel
-	PATTERN ".svn" EXCLUDE
-)
 
-install(
-	TARGETS "${target_name}" EXPORT "${target_name}Targets"
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-	BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
-	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+	if (${target_name} STREQUAL "Modules")
+		# Poco C++ Modules require slightly different install commands
+		install(
+			TARGETS "${target_name}" EXPORT "${target_name}Targets"
+			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+			BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+			INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+			FILE_SET CXX_MODULES DESTINATION ${CMAKE_INSTALL_LIBDIR}/Poco/modules
+		)
+		# Custom package generation for C++ modules
+		include(CMakePackageConfigHelpers)
+	else()
+		install(
+			DIRECTORY include/Poco
+			DESTINATION include
+			COMPONENT Devel
+		)
+		install(
+			TARGETS "${target_name}" EXPORT "${target_name}Targets"
+			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+			BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+			INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		)
+	endif()
 
-if(MSVC)
-# install the targets pdb
-	POCO_INSTALL_PDB(${target_name})
-endif()
+
+	if(MSVC)
+	# install the targets pdb
+		POCO_INSTALL_PDB(${target_name})
+	endif()
 
 endmacro()
 

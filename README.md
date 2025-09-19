@@ -28,6 +28,7 @@ and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) do
 - A C++17 compiler (Visual C++ 2017, GCC 8.0, Clang 5, or newer)
 - OpenSSL headers and libraries (optional, but recommended)
 - MySQL, PostgreSQL and ODBC client libraries (optional)
+- C++20 and CMake 3.28 or later (for C++ modules)
 
 Most Unix/Linux systems already have OpenSSL preinstalled. If your system
 does not have OpenSSL, please get it from <https://www.openssl.org> or
