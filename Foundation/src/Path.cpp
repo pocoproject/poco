@@ -821,8 +821,14 @@ void Path::parseWindows(const std::string& path)
 				_absolute = true;
 				_device += d;
 				++it;
-				if (it == end || (*it != '\\' && *it != '/')) throw PathSyntaxException(path);
-				++it;
+				if (it != end)
+				{
+					if ((*it != '\\' && *it != '/'))
+					{
+						throw PathSyntaxException(path);
+					}
+					++it;
+				}
 			}
 			else --it;
 		}
