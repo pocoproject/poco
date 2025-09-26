@@ -28,6 +28,7 @@ namespace MongoDB {
 
 class MongoDB_API OpMsgCursor: public Document
 	/// OpMsgCursor is an helper class for querying multiple documents using OpMsgMessage.
+	/// Once all of the data is read with the cursor (see isActive()) it can't be reused.
 {
 public:
 	OpMsgCursor(const std::string& dbname, const std::string& collectionName);
@@ -48,6 +49,9 @@ public:
 		/// Current batch size (zero or negative number indicates default batch size)
 
 	Int64 cursorID() const;
+
+	bool isActive() const;
+		/// Is there more data to acquire with this cursor?
 
 	OpMsgMessage& next(Connection& connection);
 		/// Tries to get the next documents. As long as response message has a
