@@ -60,9 +60,13 @@ static const std::string& commandIdentifier(const std::string& command);
 	/// Commands have different names for the payload that is sent in a separate section
 
 
+static const std::string keyDb			{ "$db"s };
+static const std::string keyCollection	{ "collection"s };
 static const std::string keyCursor		{ "cursor"s };
+static const std::string keyOk			{ "ok"s };
 static const std::string keyFirstBatch	{ "firstBatch"s };
 static const std::string keyNextBatch	{ "nextBatch"s };
+static const std::string keyBatchSize	{ "batchSize"s };
 
 constexpr static Poco::UInt8 PAYLOAD_TYPE_0 { 0 };
 constexpr static Poco::UInt8 PAYLOAD_TYPE_1 { 1 };
@@ -114,7 +118,7 @@ void OpMsgMessage::setCommandName(const std::string& command)
 	{
 		_body.add(_commandName, _collectionName);
 	}
-	_body.add("$db"s, _databaseName);
+	_body.add(keyDb, _databaseName);
 }
 
 
@@ -125,11 +129,11 @@ void OpMsgMessage::setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize)
 
 	// IMPORTANT: Command name must be first
 	_body.add(_commandName, cursorID);
-	_body.add("$db"s, _databaseName);
-	_body.add("collection"s, _collectionName);
+	_body.add(keyDb, _databaseName);
+	_body.add(keyCollection, _collectionName);
 	if (batchSize > 0)
 	{
-		_body.add("batchSize"s, batchSize);
+		_body.add(keyBatchSize, batchSize);
 	}
 }
 
@@ -207,9 +211,9 @@ const Document::Vector& OpMsgMessage::documents() const
 bool OpMsgMessage::responseOk() const
 {
 	Poco::Int64 ok {false};
-	if (_body.exists("ok"s))
+	if (_body.exists(keyOk))
 	{
-		ok = _body.getInteger("ok"s);
+		ok = _body.getInteger(keyOk);
 	}
 	return (ok != 0);
 }

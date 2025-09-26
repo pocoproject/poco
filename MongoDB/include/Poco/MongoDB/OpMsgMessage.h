@@ -42,7 +42,6 @@ public:
 	static const std::string CMD_UPDATE;
 	static const std::string CMD_FIND;
 	static const std::string CMD_FIND_AND_MODIFY;
-	static const std::string CMD_GET_MORE;
 
 	// Aggregation
 	static const std::string CMD_AGGREGATE;
@@ -98,9 +97,6 @@ public:
 	void setCommandName(const std::string& command);
 		/// Sets the command name and clears the command document
 
-	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
-		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
-
 	const std::string& commandName() const;
 		/// Current command name.
 
@@ -138,6 +134,14 @@ public:
 		/// Reads the response from the stream.
 
 private:
+
+	// Only used by the cursor
+	static const std::string CMD_GET_MORE;
+
+	friend class OpMsgCursor;
+
+	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
+		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
 
 	std::string			_databaseName;
 	std::string			_collectionName;
