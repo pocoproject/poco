@@ -22,6 +22,8 @@ objects = \
 	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface  \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
+	HTTPReactorServer HTTPReactorServerSession \
+	TCPReactorAcceptor TCPReactorServer TCPReactorServerConnection \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
 	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketProactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \

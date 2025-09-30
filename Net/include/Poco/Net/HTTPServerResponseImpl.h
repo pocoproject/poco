@@ -18,6 +18,7 @@
 #define Net_HTTPServerResponseImpl_INCLUDED
 
 
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
@@ -42,7 +43,7 @@ class Net_API HTTPServerResponseImpl: public HTTPServerResponse
 	/// as necessary, and provide a message body.
 {
 public:
-	HTTPServerResponseImpl(HTTPServerSession& session);
+	HTTPServerResponseImpl(HTTPSession& session);
 		/// Creates the HTTPServerResponseImpl.
 
 	~HTTPServerResponseImpl();
@@ -110,7 +111,7 @@ protected:
 	void attachRequest(HTTPServerRequestImpl* pRequest);
 
 private:
-	HTTPServerSession& _session;
+	HTTPSession& _session;
 	HTTPServerRequestImpl* _pRequest;
 	std::ostream*      _pStream;
 

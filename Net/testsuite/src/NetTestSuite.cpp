@@ -17,6 +17,7 @@
 #include "TCPServerTestSuite.h"
 #include "UDPServerTestSuite.h"
 #include "HTTPServerTestSuite.h"
+#include "HTTPReactorServerTestSuite.h"
 #include "HTMLTestSuite.h"
 #include "ReactorTestSuite.h"
 #include "FTPClientTestSuite.h"
@@ -40,6 +41,7 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(UDPServerTestSuite::suite());
 	pSuite->addTest(HTTPServerTestSuite::suite());
+	pSuite->addTest(HTTPReactorServerTestSuite::suite());
 	pSuite->addTest(HTMLTestSuite::suite());
 	pSuite->addTest(ReactorTestSuite::suite());
 	pSuite->addTest(FTPClientTestSuite::suite());
