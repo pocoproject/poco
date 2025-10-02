@@ -835,7 +835,9 @@ void SecureSocketImpl::stateError()
 
 void SecureSocketImpl::stateClientConnected()
 {
-	_peerHostName = _pSocket->peerAddress().host().toString();
+	if (_peerHostName.empty())
+        _peerHostName = _pSocket->peerAddress().host().toString();
+
 	setState(ST_CLIENT_HSK_START);
 }
 
