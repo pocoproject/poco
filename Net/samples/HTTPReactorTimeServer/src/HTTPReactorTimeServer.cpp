@@ -101,7 +101,7 @@ public:
 		if (request.getURI() == "/")
 			return new TimeRequestHandler(_format, _delay);
 		else
-			return 0;
+			return nullptr;
 	}
 
 private:
