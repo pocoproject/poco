@@ -292,7 +292,7 @@ public:
 	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:

@@ -104,10 +104,10 @@ protected:
 
 #if defined(_DEBUG)
 	#define poco_assert_dbg(cond) \
-		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
+		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) nullptr
 
 	#define poco_assert_msg_dbg(cond, text) \
-		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__, text); else (void) 0
+		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__, text); else (void) nullptr
 #else
 	#define poco_assert_msg_dbg(cond, text)
 	#define poco_assert_dbg(cond)
@@ -115,15 +115,15 @@ protected:
 
 
 #define poco_assert(cond) \
-	if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
+	if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) nullptr
 
 
 #define poco_assert_msg(cond, text) \
-	if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__, text); else (void) 0
+	if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__, text); else (void) nullptr
 
 
 #define poco_check_ptr(ptr) \
-	if (!(ptr)) Poco::Bugcheck::nullPointer(#ptr, __FILE__, __LINE__); else (void) 0
+	if (!(ptr)) Poco::Bugcheck::nullPointer(#ptr, __FILE__, __LINE__); else (void) nullptr
 
 
 #define poco_bugcheck() \
