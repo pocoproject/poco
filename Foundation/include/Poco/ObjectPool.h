@@ -225,14 +225,14 @@ public:
 		{
 			if (timeoutMilliseconds == 0)
 			{
-				return 0;
+				return nullptr;
 			}
 			while (_size >= _peakCapacity && _pool.empty())
 			{
 				if (!_availableCondition.tryWait(_mutex, timeoutMilliseconds))
 				{
 					// timeout
-					return 0;
+					return nullptr;
 				}
 			}
 		}

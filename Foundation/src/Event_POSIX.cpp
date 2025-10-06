@@ -57,7 +57,7 @@ EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 	std::memset(&_mutex, 0, sizeof(_mutex));
 #endif
 
-	if (pthread_mutex_init(&_mutex, NULL))
+	if (pthread_mutex_init(&_mutex, nullptr))
 		throw SystemException("cannot create event (mutex)");
 
 #if defined(POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT)
@@ -68,11 +68,11 @@ EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 		throw SystemException("cannot create event (condition attribute)");
 	}
 	if (pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
-    {
+	{
 		pthread_condattr_destroy(&attr);
 		pthread_mutex_destroy(&_mutex);
 		throw SystemException("cannot create event (condition attribute clock)");
-    }
+	}
 	if (pthread_cond_init(&_cond, &attr))
 	{
 		pthread_condattr_destroy(&attr);
@@ -81,7 +81,7 @@ EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 	}
 	pthread_condattr_destroy(&attr);
 #else
-	if (pthread_cond_init(&_cond, NULL))
+	if (pthread_cond_init(&_cond, nullptr))
 	{
 		pthread_mutex_destroy(&_mutex);
 		throw SystemException("cannot create event (condition)");
@@ -143,7 +143,7 @@ bool EventImpl::waitImpl(long milliseconds)
 	}
 #else
 	struct timeval tv;
-	gettimeofday(&tv, NULL);
+	gettimeofday(&tv, nullptr);
 	abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
 	abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
 	if (abstime.tv_nsec >= 1000000000)

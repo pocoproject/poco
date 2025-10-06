@@ -23,7 +23,7 @@ const char* UTF8Encoding::_names[] =
 {
 	"UTF-8",
 	"UTF8",
-	NULL
+	nullptr
 };
 
 
@@ -204,11 +204,11 @@ bool UTF8Encoding::isLegal(const unsigned char *bytes, int length)
 	// from ftp://ftp.unicode.org/Public/PROGRAMS/CVTUTF/ConvertUTF.c
 	// Excuse the ugliness...
 
-	if (0 == bytes || 0 == length) return false;
+	if (nullptr == bytes || 0 == length) return false;
 
-    unsigned char a;
-    const unsigned char* srcptr = bytes + length;
-    switch (length)
+	unsigned char a;
+	const unsigned char* srcptr = bytes + length;
+	switch (length)
 	{
 	default:
 		return false;
@@ -238,7 +238,7 @@ bool UTF8Encoding::isLegal(const unsigned char *bytes, int length)
 		}
 	case 1:
 		if (*bytes >= 0x80 && *bytes < 0xC2) return false;
-    }
+	}
 	return *bytes <= 0xF4;
 }
 

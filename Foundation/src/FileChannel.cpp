@@ -240,7 +240,7 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 
-	RotateStrategy* pStrategy = 0;
+	RotateStrategy* pStrategy = nullptr;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
 		if (times == "utc")

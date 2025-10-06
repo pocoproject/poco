@@ -137,22 +137,22 @@ bool DateTimeFormat::hasFormat(const std::string& fmt)
 
 bool DateTimeFormat::isValid(const std::string& dateTime)
 {
-        static const RegularExpression regexList[] = {
-                RegularExpression(DateTimeFormat::ISO8601_REGEX),
-                RegularExpression(DateTimeFormat::RFC822_REGEX),
-                RegularExpression(DateTimeFormat::RFC1123_REGEX),
-                RegularExpression(DateTimeFormat::HTTP_REGEX),
-                RegularExpression(DateTimeFormat::RFC850_REGEX),
-                RegularExpression(DateTimeFormat::RFC1036_REGEX),
-                RegularExpression(DateTimeFormat::ASCTIME_REGEX),
-                RegularExpression(DateTimeFormat::SORTABLE_REGEX)
-        };
+		static const RegularExpression regexList[] = {
+				RegularExpression(DateTimeFormat::ISO8601_REGEX),
+				RegularExpression(DateTimeFormat::RFC822_REGEX),
+				RegularExpression(DateTimeFormat::RFC1123_REGEX),
+				RegularExpression(DateTimeFormat::HTTP_REGEX),
+				RegularExpression(DateTimeFormat::RFC850_REGEX),
+				RegularExpression(DateTimeFormat::RFC1036_REGEX),
+				RegularExpression(DateTimeFormat::ASCTIME_REGEX),
+				RegularExpression(DateTimeFormat::SORTABLE_REGEX)
+		};
 		
-        for (const auto& f : regexList)
-        {
-            if (f.match(dateTime)) return true;
-        }
-        return false;
+		for (const auto& f : regexList)
+		{
+			if (f.match(dateTime)) return true;
+		}
+		return false;
 }
 
 

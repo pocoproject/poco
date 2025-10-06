@@ -143,14 +143,14 @@ void NamedMutexImpl::unlockImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
 	if (sem_post(_sem) != 0)
-	   	throw SystemException("cannot unlock named mutex", _name);
+		throw SystemException("cannot unlock named mutex", _name);
 #else
 	struct sembuf op;
 	op.sem_num = 0;
 	op.sem_op  = 1;
 	op.sem_flg = SEM_UNDO;
 	if (semop(_semid, &op, 1) != 0)
-	   	throw SystemException("cannot unlock named mutex", _name);
+		throw SystemException("cannot unlock named mutex", _name);
 #endif
 }
 

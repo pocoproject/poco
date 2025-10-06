@@ -116,22 +116,22 @@ namespace Impl {
 template <typename SizeT>
 inline void hashCombine(SizeT& seed, SizeT value)
 {
-    seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
+	seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
 }
 
 
 inline void hashCombine(Poco::UInt32& h1, Poco::UInt32 k1)
 {
-    const uint32_t c1 = 0xcc9e2d51;
-    const uint32_t c2 = 0x1b873593;
+	const uint32_t c1 = 0xcc9e2d51;
+	const uint32_t c2 = 0x1b873593;
 
-    k1 *= c1;
-    k1 = POCO_HASH_ROTL32(k1,15);
-    k1 *= c2;
+	k1 *= c1;
+	k1 = POCO_HASH_ROTL32(k1,15);
+	k1 *= c2;
 
-    h1 ^= k1;
-    h1 = POCO_HASH_ROTL32(h1,13);
-    h1 = h1*5+0xe6546b64;
+	h1 ^= k1;
+	h1 = POCO_HASH_ROTL32(h1,13);
+	h1 = h1*5+0xe6546b64;
 }
 
 
@@ -140,19 +140,19 @@ inline void hashCombine(Poco::UInt32& h1, Poco::UInt32 k1)
 
 inline void hashCombine(Poco::UInt64& h, Poco::UInt64 k)
 {
-    const Poco::UInt64 m = UINT64_C(0xc6a4a7935bd1e995);
-    const int r = 47;
+	const Poco::UInt64 m = UINT64_C(0xc6a4a7935bd1e995);
+	const int r = 47;
 
-    k *= m;
-    k ^= k >> r;
-    k *= m;
+	k *= m;
+	k ^= k >> r;
+	k *= m;
 
-    h ^= k;
-    h *= m;
+	h ^= k;
+	h *= m;
 
-    // Completely arbitrary number, to
-    // prevent zeros from hashing to 0.
-    h += 0xe6546b64;
+	// Completely arbitrary number, to
+	// prevent zeros from hashing to 0.
+	h += 0xe6546b64;
 }
 
 
@@ -165,32 +165,32 @@ inline void hashCombine(Poco::UInt64& h, Poco::UInt64 k)
 template <class T>
 inline void hashCombine(std::size_t& seed, T const& v)
 {
-    Hash<T> hasher;
-    Impl::hashCombine(seed, hasher(v));
+	Hash<T> hasher;
+	Impl::hashCombine(seed, hasher(v));
 }
 
 
 template <class It>
 inline std::size_t hashRange(It first, It last)
 {
-    std::size_t seed = 0;
+	std::size_t seed = 0;
 
-    for(; first != last; ++first)
-    {
-        hashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
-    }
+	for(; first != last; ++first)
+	{
+		hashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
+	}
 
-    return seed;
+	return seed;
 }
 
 
 template <class It>
 inline void hashRange(std::size_t& seed, It first, It last)
 {
-    for(; first != last; ++first)
-    {
-        hashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
-    }
+	for(; first != last; ++first)
+	{
+		hashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
+	}
 }
 
 

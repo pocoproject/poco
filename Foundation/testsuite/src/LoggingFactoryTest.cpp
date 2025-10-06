@@ -128,7 +128,7 @@ void LoggingFactoryTest::testCustom()
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 
 	Channel::Ptr pCustomChannel = fact->createChannel("CustomChannel");
-	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
+	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != nullptr);
 
 	Formatter::Ptr pCustomFormatter = fact->createFormatter("CustomFormatter");
 	assertTrue (!pCustomFormatter.isNull());

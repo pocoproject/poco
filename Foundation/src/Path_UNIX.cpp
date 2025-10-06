@@ -65,7 +65,7 @@ std::string PathImpl::selfImpl()
 	mib[2] = KERN_PROC_PATHNAME;
 	mib[3] = -1;
 	std::size_t size = sizeof(buf);
-	if (sysctl(mib, 4, buf, &size, NULL, 0) == 0)
+	if (sysctl(mib, 4, buf, &size, nullptr, 0) == 0)
 		path = buf;
 	else
 		throw Poco::SystemException("Cannot get path of the current process.");

@@ -141,7 +141,7 @@ public:
 
 	static TextEncoding::Ptr find(const std::string& encodingName);
 		/// Returns a pointer to the TextEncoding object for the given encodingName,
-		/// or NULL if no such TextEncoding object exists.
+		/// or nullptr if no such TextEncoding object exists.
 
 	static void add(TextEncoding::Ptr encoding);
 		/// Adds the given TextEncoding to the table of text encodings,

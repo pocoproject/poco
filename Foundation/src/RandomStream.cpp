@@ -68,7 +68,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 
 		n = 0;
 		SHA1Engine engine;
-		UInt32 t = (UInt32) std::time(NULL);
+		UInt32 t = (UInt32) std::time(nullptr);
 		engine.update(&t, sizeof(t));
 		void* p = this;
 		engine.update(&p, sizeof(p));
