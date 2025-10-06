@@ -70,7 +70,7 @@ public:
 		SQLSMALLINT> TypeInfoTup;
 	typedef std::vector<TypeInfoTup> TypeInfoVec;
 
-	explicit TypeInfo(SQLHDBC* pHDBC=0);
+	explicit TypeInfo(SQLHDBC* pHDBC=nullptr);
 		/// Creates the TypeInfo.
 
 	~TypeInfo();
