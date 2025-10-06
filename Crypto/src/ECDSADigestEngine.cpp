@@ -114,7 +114,7 @@ ECDSASignature::ECDSASignature(const ByteVec& derSignature)
 	poco_assert (!derSignature.empty());
 
 	const unsigned char* p = &derSignature[0];
-	_pSig = d2i_ECDSA_SIG(0, &p, static_cast<long>(derSignature.size()));
+	_pSig = d2i_ECDSA_SIG(nullptr, &p, static_cast<long>(derSignature.size()));
 	if (!_pSig)
 		throw OpenSSLException();
 }
@@ -131,12 +131,12 @@ ECDSASignature::ECDSASignature(const ByteVec& rawR, const ByteVec& rawS):
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		ECDSA_SIG_set0(_pSig,
-			BN_bin2bn(&rawR[0], static_cast<long>(rawR.size()), 0),
-			BN_bin2bn(&rawS[0], static_cast<long>(rawS.size()), 0));
-		const BIGNUM* pR = 0;
-		const BIGNUM* pS = 0;
+			BN_bin2bn(&rawR[0], static_cast<long>(rawR.size()), nullptr),
+			BN_bin2bn(&rawS[0], static_cast<long>(rawS.size()), nullptr));
+		const BIGNUM* pR = nullptr;
+		const BIGNUM* pS = nullptr;
 		ECDSA_SIG_get0(_pSig, &pR, &pS);
-		if (pR == 0 || pS == 0)
+		if (pR == nullptr || pS == nullptr)
 			throw Poco::Crypto::CryptoException("failed to decode R and S values");
 #else
 		if (!BN_bin2bn(&rawR[0], rawR.size(), _pSig->r))
@@ -161,7 +161,7 @@ ECDSASignature::~ECDSASignature()
 
 ECDSASignature::ByteVec ECDSASignature::toDER() const
 {
-	int size = i2d_ECDSA_SIG(_pSig, 0);
+	int size = i2d_ECDSA_SIG(_pSig, nullptr);
 	if (size > 0)
 	{
 		ByteVec buffer(size);
