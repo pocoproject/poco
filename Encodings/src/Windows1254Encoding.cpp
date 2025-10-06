@@ -24,7 +24,7 @@ const char* Windows1254Encoding::_names[] =
 	"Windows-1254",
 	"cp1254",
 	"CP1254",
-	NULL
+	nullptr
 };
 
 
