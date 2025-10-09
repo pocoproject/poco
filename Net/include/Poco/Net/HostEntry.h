@@ -48,9 +48,9 @@ public:
 		/// Creates the HostEntry from the data in an addrinfo structure.
 #endif
 
-#if defined(POCO_VXWORKS)
 	HostEntry(const std::string& name, const IPAddress& addr);
-#endif
+		/// Creates the HostEntry from pre defined data
+
 
 	HostEntry(const HostEntry& entry);
 		/// Creates the HostEntry by copying another one.

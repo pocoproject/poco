@@ -103,8 +103,6 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 #endif // POCO_HAVE_IPv6
 
 
-#if defined(POCO_VXWORKS)
-
 
 HostEntry::HostEntry(const std::string& name, const IPAddress& addr):
 	_name(name)
@@ -112,8 +110,6 @@ HostEntry::HostEntry(const std::string& name, const IPAddress& addr):
 	_addresses.push_back(addr);
 }
 
-
-#endif // POCO_VXWORKS
 
 
 HostEntry::HostEntry(const HostEntry& entry):
