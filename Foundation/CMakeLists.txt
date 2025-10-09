@@ -65,7 +65,7 @@ else()
 	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
 endif()
 
-target_link_libraries(Foundation PRIVATE V8::DoubleConversion)
+target_link_libraries(Foundation PRIVATE "$<BUILD_LOCAL_INTERFACE:V8::DoubleConversion>")
 
 add_library(Poco::Foundation ALIAS Foundation)
 set_target_properties(Foundation
