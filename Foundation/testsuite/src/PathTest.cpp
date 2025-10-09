@@ -1545,7 +1545,7 @@ void PathTest::testExpand()
 	std::string s = Path::expand("~/.bashrc");
 	assertTrue (s == Path::expand("$HOME/.bashrc"));
 	assertTrue (s == Environment::get("HOME") + "/.bashrc" ||
-	        s == Environment::get("HOME") + "//.bashrc");
+			s == Environment::get("HOME") + "//.bashrc");
 	Path p(s);
 	s = Path::expand("$HOME/.bashrc");
 	assertTrue (s == Path::expand("~/.bashrc"));
@@ -1655,12 +1655,12 @@ void PathTest::testSelf()
 	std::cout << self << std::endl;
 
 #if POCO_OS == POCO_OS_MAC_OS_X      \
-    || POCO_OS == POCO_OS_FREE_BSD   \
-    || POCO_OS == POCO_OS_NET_BSD	 \
+	|| POCO_OS == POCO_OS_FREE_BSD   \
+	|| POCO_OS == POCO_OS_NET_BSD	 \
 	|| POCO_OS == POCO_OS_SOLARIS    \
 	|| POCO_OS == POCO_OS_LINUX      \
 	|| POCO_OS == POCO_OS_ANDROID    \
-    || POCO_OS == POCO_OS_WINDOWS_NT
+	|| POCO_OS == POCO_OS_WINDOWS_NT
 
 	assertTrue(!self.empty());
 	Path p(self);

@@ -70,7 +70,7 @@ void URIStreamOpenerTest::testStreamOpenerFile()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -90,7 +90,7 @@ void URIStreamOpenerTest::testStreamOpenerRelative()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -112,7 +112,7 @@ void URIStreamOpenerTest::testStreamOpenerURI()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -138,7 +138,7 @@ void URIStreamOpenerTest::testStreamOpenerURIResolve()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString, p.getFileName());
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -155,7 +155,7 @@ void URIStreamOpenerTest::testStreamOpenerPath()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(path);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -176,7 +176,7 @@ void URIStreamOpenerTest::testStreamOpenerPathResolve()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(base, p.getFileName());
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -190,7 +190,7 @@ void URIStreamOpenerTest::testRegisterUnregister()
 	assertTrue (opener.supportsScheme("string"));
 	URI uri("string:foobar");
 	std::istream* istr = opener.open(uri);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 	opener.unregisterStreamFactory("string");

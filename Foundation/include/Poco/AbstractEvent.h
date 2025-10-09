@@ -346,7 +346,7 @@ protected:
 
 	TStrategy _strategy; /// The strategy used to notify observers.
 	bool      _enabled;  /// Stores if an event is enabled. Notifies on disabled events have no effect
-	                     /// but it is possible to change the observers.
+						 /// but it is possible to change the observers.
 	mutable TMutex _mutex;
 };
 
@@ -543,7 +543,7 @@ protected:
 
 	TStrategy _strategy; /// The strategy used to notify observers.
 	bool      _enabled;  /// Stores if an event is enabled. Notifies on disabled events have no effect
-	                     /// but it is possible to change the observers.
+						 /// but it is possible to change the observers.
 	mutable TMutex _mutex;
 };
 

@@ -50,8 +50,8 @@ namespace Net {
 
 HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPSession& session):
 	_session(session),
-	_pRequest(0),
-	_pStream(0)
+	_pRequest(nullptr),
+	_pStream(nullptr)
 {
 }
 

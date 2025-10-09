@@ -103,7 +103,7 @@ private:
 
 inline bool PKCS12Container::hasX509Certificate() const
 {
-	return _pX509Cert.get() != 0;
+	return _pX509Cert.get() != nullptr;
 }
 
 
@@ -135,7 +135,7 @@ inline const PKCS12Container::CANameList& PKCS12Container::getFriendlyNamesCA() 
 
 inline bool PKCS12Container::hasKey() const
 {
-	return _pKey != 0;
+	return _pKey != nullptr;
 }
 
 

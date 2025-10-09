@@ -44,7 +44,7 @@ public:
 		KT_EC = KeyPairImpl::KT_EC_IMPL
 	};
 
-	explicit KeyPair(KeyPairImpl::Ptr pKeyPairImpl = 0);
+	explicit KeyPair(KeyPairImpl::Ptr pKeyPairImpl = nullptr);
 		/// Extracts the RSA public key from the given certificate.
 
 	KeyPair(const KeyPair& other);
@@ -74,7 +74,7 @@ public:
 		/// is not exported.
 
 	virtual void save(std::ostream* pPublicKeyPairStream,
-		std::ostream* pPrivateKeyPairStream = 0,
+		std::ostream* pPrivateKeyPairStream = nullptr,
 		const std::string& privateKeyPairPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///

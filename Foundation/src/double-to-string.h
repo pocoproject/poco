@@ -73,14 +73,14 @@ class DoubleToStringConverter {
   static const int kMaxCharsEcmaScriptShortest = 25;
 
   enum Flags {
-    NO_FLAGS = 0,
-    EMIT_POSITIVE_EXPONENT_SIGN = 1,
-    EMIT_TRAILING_DECIMAL_POINT = 2,
-    EMIT_TRAILING_ZERO_AFTER_POINT = 4,
-    UNIQUE_ZERO = 8,
-    NO_TRAILING_ZERO = 16,
-    EMIT_TRAILING_DECIMAL_POINT_IN_EXPONENTIAL = 32,
-    EMIT_TRAILING_ZERO_AFTER_POINT_IN_EXPONENTIAL = 64
+	NO_FLAGS = 0,
+	EMIT_POSITIVE_EXPONENT_SIGN = 1,
+	EMIT_TRAILING_DECIMAL_POINT = 2,
+	EMIT_TRAILING_ZERO_AFTER_POINT = 4,
+	UNIQUE_ZERO = 8,
+	NO_TRAILING_ZERO = 16,
+	EMIT_TRAILING_DECIMAL_POINT_IN_EXPONENTIAL = 32,
+	EMIT_TRAILING_ZERO_AFTER_POINT_IN_EXPONENTIAL = 64
   };
 
   // Flags should be a bit-or combination of the possible Flags-enum.
@@ -163,29 +163,29 @@ class DoubleToStringConverter {
   // The min_exponent_width is clamped to 5.
   // As such, the exponent may never have more than 5 digits in total.
   DoubleToStringConverter(int flags,
-                          const char* infinity_symbol,
-                          const char* nan_symbol,
-                          char exponent_character,
-                          int decimal_in_shortest_low,
-                          int decimal_in_shortest_high,
-                          int max_leading_padding_zeroes_in_precision_mode,
-                          int max_trailing_padding_zeroes_in_precision_mode,
-                          int min_exponent_width = 0)
-      : flags_(flags),
-        infinity_symbol_(infinity_symbol),
-        nan_symbol_(nan_symbol),
-        exponent_character_(exponent_character),
-        decimal_in_shortest_low_(decimal_in_shortest_low),
-        decimal_in_shortest_high_(decimal_in_shortest_high),
-        max_leading_padding_zeroes_in_precision_mode_(
-            max_leading_padding_zeroes_in_precision_mode),
-        max_trailing_padding_zeroes_in_precision_mode_(
-            max_trailing_padding_zeroes_in_precision_mode),
-        min_exponent_width_(min_exponent_width) {
-    // When 'trailing zero after the point' is set, then 'trailing point'
-    // must be set too.
-    DOUBLE_CONVERSION_ASSERT(((flags & EMIT_TRAILING_DECIMAL_POINT) != 0) ||
-        !((flags & EMIT_TRAILING_ZERO_AFTER_POINT) != 0));
+						  const char* infinity_symbol,
+						  const char* nan_symbol,
+						  char exponent_character,
+						  int decimal_in_shortest_low,
+						  int decimal_in_shortest_high,
+						  int max_leading_padding_zeroes_in_precision_mode,
+						  int max_trailing_padding_zeroes_in_precision_mode,
+						  int min_exponent_width = 0)
+	  : flags_(flags),
+		infinity_symbol_(infinity_symbol),
+		nan_symbol_(nan_symbol),
+		exponent_character_(exponent_character),
+		decimal_in_shortest_low_(decimal_in_shortest_low),
+		decimal_in_shortest_high_(decimal_in_shortest_high),
+		max_leading_padding_zeroes_in_precision_mode_(
+			max_leading_padding_zeroes_in_precision_mode),
+		max_trailing_padding_zeroes_in_precision_mode_(
+			max_trailing_padding_zeroes_in_precision_mode),
+		min_exponent_width_(min_exponent_width) {
+	// When 'trailing zero after the point' is set, then 'trailing point'
+	// must be set too.
+	DOUBLE_CONVERSION_ASSERT(((flags & EMIT_TRAILING_DECIMAL_POINT) != 0) ||
+		!((flags & EMIT_TRAILING_ZERO_AFTER_POINT) != 0));
   }
 
   // Returns a converter following the EcmaScript specification.
@@ -238,12 +238,12 @@ class DoubleToStringConverter {
   //      "-1.7976931348623157e+308", "-1.7976931348623157E308"
   // In addition, the buffer must be able to hold the trailing '\0' character.
   bool ToShortest(double value, StringBuilder* result_builder) const {
-    return ToShortestIeeeNumber(value, result_builder, SHORTEST);
+	return ToShortestIeeeNumber(value, result_builder, SHORTEST);
   }
 
   // Same as ToShortest, but for single-precision floats.
   bool ToShortestSingle(float value, StringBuilder* result_builder) const {
-    return ToShortestIeeeNumber(value, result_builder, SHORTEST_SINGLE);
+	return ToShortestIeeeNumber(value, result_builder, SHORTEST_SINGLE);
   }
 
 
@@ -283,8 +283,8 @@ class DoubleToStringConverter {
   // (one additional character for the sign, and one for the decimal point).
   // In addition, the buffer must be able to hold the trailing '\0' character.
   bool ToFixed(double value,
-               int requested_digits,
-               StringBuilder* result_builder) const;
+			   int requested_digits,
+			   StringBuilder* result_builder) const;
 
   // Computes a representation in exponential format with requested_digits
   // after the decimal point. The last emitted digit is rounded.
@@ -317,8 +317,8 @@ class DoubleToStringConverter {
   // exponent's sign, and at most 3 exponent digits).
   // In addition, the buffer must be able to hold the trailing '\0' character.
   bool ToExponential(double value,
-                     int requested_digits,
-                     StringBuilder* result_builder) const;
+					 int requested_digits,
+					 StringBuilder* result_builder) const;
 
 
   // Computes 'precision' leading digits of the given 'value' and returns them
@@ -358,22 +358,22 @@ class DoubleToStringConverter {
   // exponent character, the exponent's sign, and at most 3 exponent digits).
   // In addition, the buffer must be able to hold the trailing '\0' character.
   bool ToPrecision(double value,
-                   int precision,
-                   StringBuilder* result_builder) const;
+				   int precision,
+				   StringBuilder* result_builder) const;
 
   enum DtoaMode {
-    // Produce the shortest correct representation.
-    // For example the output of 0.299999999999999988897 is (the less accurate
-    // but correct) 0.3.
-    SHORTEST,
-    // Same as SHORTEST, but for single-precision floats.
-    SHORTEST_SINGLE,
-    // Produce a fixed number of digits after the decimal point.
-    // For instance fixed(0.1, 4) becomes 0.1000
-    // If the input number is big, the output will be big.
-    FIXED,
-    // Fixed number of digits (independent of the decimal point).
-    PRECISION
+	// Produce the shortest correct representation.
+	// For example the output of 0.299999999999999988897 is (the less accurate
+	// but correct) 0.3.
+	SHORTEST,
+	// Same as SHORTEST, but for single-precision floats.
+	SHORTEST_SINGLE,
+	// Produce a fixed number of digits after the decimal point.
+	// For instance fixed(0.1, 4) becomes 0.1000
+	// If the input number is big, the output will be big.
+	FIXED,
+	// Fixed number of digits (independent of the decimal point).
+	PRECISION
   };
 
   // Converts the given double 'v' to digit characters. 'v' must not be NaN,
@@ -420,19 +420,19 @@ class DoubleToStringConverter {
   // The given length is only used in debug mode to ensure the buffer is big
   // enough.
   static void DoubleToAscii(double v,
-                            DtoaMode mode,
-                            int requested_digits,
-                            char* buffer,
-                            int buffer_length,
-                            bool* sign,
-                            int* length,
-                            int* point);
+							DtoaMode mode,
+							int requested_digits,
+							char* buffer,
+							int buffer_length,
+							bool* sign,
+							int* length,
+							int* point);
 
  private:
   // Implementation for ToShortest and ToShortestSingle.
   bool ToShortestIeeeNumber(double value,
-                            StringBuilder* result_builder,
-                            DtoaMode mode) const;
+							StringBuilder* result_builder,
+							DtoaMode mode) const;
 
   // If the value is a special value (NaN or Infinity) constructs the
   // corresponding string using the configured infinity/nan-symbol.
@@ -442,15 +442,15 @@ class DoubleToStringConverter {
   // Constructs an exponential representation (i.e. 1.234e56).
   // The given exponent assumes a decimal point after the first decimal digit.
   void CreateExponentialRepresentation(const char* decimal_digits,
-                                       int length,
-                                       int exponent,
-                                       StringBuilder* result_builder) const;
+									   int length,
+									   int exponent,
+									   StringBuilder* result_builder) const;
   // Creates a decimal representation (i.e 1234.5678).
   void CreateDecimalRepresentation(const char* decimal_digits,
-                                   int length,
-                                   int decimal_point,
-                                   int digits_after_point,
-                                   StringBuilder* result_builder) const;
+								   int length,
+								   int decimal_point,
+								   int digits_after_point,
+								   StringBuilder* result_builder) const;
 
   const int flags_;
   const char* const infinity_symbol_;

@@ -26,7 +26,7 @@ Record::Record():
 	_type(0),
 	_clazz(0),
 	_length(0),
-	_data(0),
+	_data(nullptr),
 	_ttl(0)
 {
 }

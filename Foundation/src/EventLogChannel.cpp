@@ -34,7 +34,7 @@ EventLogChannel::EventLogChannel():
 {
 	const DWORD maxPathLen = MAX_PATH + 1;
 	wchar_t name[maxPathLen];
-	int n = GetModuleFileNameW(NULL, name, maxPathLen);
+	int n = GetModuleFileNameW(nullptr, name, maxPathLen);
 	if (n > 0)
 	{
 		wchar_t* end = name + n - 1;
@@ -83,7 +83,7 @@ void EventLogChannel::open()
 	UnicodeConverter::toUTF16(_host, uhost);
 	std::wstring uname;
 	UnicodeConverter::toUTF16(_name, uname);
-	_h = RegisterEventSourceW(uhost.empty() ? NULL : uhost.c_str(), uname.c_str());
+	_h = RegisterEventSourceW(uhost.empty() ? nullptr : uhost.c_str(), uname.c_str());
 	if (!_h) throw SystemException("cannot register event source");
 }
 
@@ -101,7 +101,7 @@ void EventLogChannel::log(const Message& msg)
 	std::wstring utext;
 	UnicodeConverter::toUTF16(msg.getText(), utext);
 	const wchar_t* pMsg = utext.c_str();
-	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL);
+	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, nullptr, 1, 0, &pMsg, nullptr);
 }
 
 
@@ -188,7 +188,7 @@ void EventLogChannel::setUpRegistry() const
 	DWORD disp;
 	std::wstring ukey;
 	UnicodeConverter::toUTF16(key, ukey);
-	DWORD rc = RegCreateKeyExW(HKEY_LOCAL_MACHINE, ukey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp);
+	DWORD rc = RegCreateKeyExW(HKEY_LOCAL_MACHINE, ukey.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hKey, &disp);
 	if (rc != ERROR_SUCCESS) return;
 
 	if (disp == REG_CREATED_NEW_KEY)

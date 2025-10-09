@@ -59,7 +59,7 @@ HANDLE createFileWithRWAccess(const std::string &path)
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
 	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
-	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (handle == INVALID_HANDLE_VALUE)
 		Poco::File::handleLastError(path);

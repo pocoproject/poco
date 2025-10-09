@@ -59,19 +59,19 @@ int UTF8::icompare(const std::string& str, std::string::size_type pos, std::stri
 	TextIterator uend2(end2);
 	while (uit1 != uend1 && uit2 != uend2)
 	{
-        int c1 = Unicode::toLower(*uit1);
-        int c2 = Unicode::toLower(*uit2);
-        if (c1 < c2)
-            return -1;
-        else if (c1 > c2)
-            return 1;
-        ++uit1; ++uit2;
+		int c1 = Unicode::toLower(*uit1);
+		int c2 = Unicode::toLower(*uit2);
+		if (c1 < c2)
+			return -1;
+		else if (c1 > c2)
+			return 1;
+		++uit1; ++uit2;
 	}
 
-    if (uit1 == uend1)
+	if (uit1 == uend1)
 		return uit2 == uend2 ? 0 : -1;
-    else
-        return 1;
+	else
+		return 1;
 }
 
 
@@ -296,7 +296,7 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 				}
 				if (dno > 0)
 				{
-					ch = std::strtol(digs, NULL, 16);
+					ch = std::strtol(digs, nullptr, 16);
 				}
 				break;
 			}
@@ -359,7 +359,7 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 				while (it != end && Ascii::isHexDigit(*it) && dno < 4) digs[dno++] = *it++;
 				if (dno > 0)
 				{
-					ch = std::strtol(digs, NULL, 16);
+					ch = std::strtol(digs, nullptr, 16);
 				}
 
 				if( ch >= 0xD800 && ch <= 0xDBFF )
@@ -387,7 +387,7 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 					while (it != end && Ascii::isHexDigit(*it) && dno < 4) digs[dno++] = *it++;
 					if (dno > 0)
 					{
-						Poco::UInt32 temp = std::strtol(digs, NULL, 16);
+						Poco::UInt32 temp = std::strtol(digs, nullptr, 16);
 						if( temp >= 0xDC00 && temp <= 0xDFFF )
 						{
 							ch = ( ( ( ch - 0xD800 ) << 10 ) | ( temp - 0xDC00 ) ) + 0x10000;
@@ -418,11 +418,11 @@ namespace
 {
 	std::string doNormalize(const char* str, std::size_t size, utf8proc_option_t options)
 	{
-		utf8proc_ssize_t n = utf8proc_decompose_custom(reinterpret_cast<const utf8proc_uint8_t*>(str), size, NULL, 0, options, NULL, NULL);
+		utf8proc_ssize_t n = utf8proc_decompose_custom(reinterpret_cast<const utf8proc_uint8_t*>(str), size, nullptr, 0, options, nullptr, nullptr);
 		if (n < 0) throw Poco::RuntimeException("Normalization decompose failed"s, utf8proc_errmsg(n));
 
 		Poco::Buffer<utf8proc_int32_t> buffer(n + 1); // utf8proc_reencode() needs space for terminating NUL
-		n = utf8proc_decompose_custom(reinterpret_cast<const utf8proc_uint8_t*>(str), size, buffer.begin(), n, options, NULL, NULL);
+		n = utf8proc_decompose_custom(reinterpret_cast<const utf8proc_uint8_t*>(str), size, buffer.begin(), n, options, nullptr, nullptr);
 		if (n < 0) throw Poco::RuntimeException("Normalization decompose failed"s, utf8proc_errmsg(n));
 	
 		n = utf8proc_reencode(buffer.begin(), n, options);

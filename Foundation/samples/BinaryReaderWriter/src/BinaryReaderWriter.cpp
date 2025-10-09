@@ -26,10 +26,10 @@ int main(int argc, char** argv)
 
 	BinaryWriter writer(str);
 	writer << true
-	       << 'x'
-	       << 42
-	       << 3.14159265
-	       << "foo bar";
+		   << 'x'
+		   << 42
+		   << 3.14159265
+		   << "foo bar";
 
 	bool   b;
 	char   c;
@@ -39,16 +39,16 @@ int main(int argc, char** argv)
 
 	BinaryReader reader(str);
 	reader >> b
-	       >> c
-	       >> i
-	       >> d
-	       >> s;
+		   >> c
+		   >> i
+		   >> d
+		   >> s;
 
 	std::cout << b << std::endl
-	          << c << std::endl
-	          << i << std::endl
-	          << d << std::endl
-	          << s << std::endl;
+			  << c << std::endl
+			  << i << std::endl
+			  << d << std::endl
+			  << s << std::endl;
 
 	return 0;
 }

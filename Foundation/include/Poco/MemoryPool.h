@@ -302,7 +302,7 @@ public:
 		Block* ret;
 		{
 			ScopedLock l(_mutex);
-			if(_firstBlock == 0) resize();
+			if(_firstBlock == nullptr) resize();
 			ret = _firstBlock;
 			_firstBlock = _firstBlock->_memory.next;
 		}
@@ -359,7 +359,7 @@ private:
 		_buckets.push_back(new Block[_blocksPerBucket]);
 		_firstBlock = _buckets.back();
 		// terminate last block
-		_firstBlock[_blocksPerBucket-1]._memory.next = 0;
+		_firstBlock[_blocksPerBucket-1]._memory.next = nullptr;
 		_available = _available.value() + static_cast<AtomicCounter::ValueType>(_blocksPerBucket);
 	}
 

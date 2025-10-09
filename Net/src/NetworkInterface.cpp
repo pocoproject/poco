@@ -50,7 +50,7 @@ using Poco::format;
 
 std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
 {
-	std::ios state(0);
+	std::ios state(nullptr);
 	state.copyfmt(os);
 	for (unsigned i = 0; i < mac.size(); ++i)
 	{
@@ -78,8 +78,8 @@ public:
 	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = 0);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = nullptr);
 	NetworkInterfaceImpl(const std::string& name,
 		const std::string& displayName,
 		const std::string& adapterName,
@@ -87,7 +87,7 @@ public:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		NetworkInterface::MACAddress* pMACAddress = 0);
+		NetworkInterface::MACAddress* pMACAddress = nullptr);
 
 	unsigned index() const;
 	const std::string& name() const;
@@ -1587,8 +1587,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* iface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* iface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");

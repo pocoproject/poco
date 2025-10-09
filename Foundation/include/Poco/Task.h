@@ -139,7 +139,7 @@ protected:
 		/// Sets the (optional) owner of the task.
 
 	TaskManager* getOwner() const;
-		/// Returns the owner of the task, which may be NULL.
+		/// Returns the owner of the task, which may be nullptr.
 
 	TaskState setState(TaskState state);
 		/// Sets the task's state.

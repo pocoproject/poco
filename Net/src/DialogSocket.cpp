@@ -23,9 +23,9 @@ namespace Net {
 
 
 DialogSocket::DialogSocket():
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -33,9 +33,9 @@ DialogSocket::DialogSocket():
 
 DialogSocket::DialogSocket(const SocketAddress& address):
 	StreamSocket(address),
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -43,9 +43,9 @@ DialogSocket::DialogSocket(const SocketAddress& address):
 
 DialogSocket::DialogSocket(const Socket& socket):
 	StreamSocket(socket),
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -53,9 +53,9 @@ DialogSocket::DialogSocket(const Socket& socket):
 
 DialogSocket::DialogSocket(const DialogSocket& socket):
 	StreamSocket(socket),
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }

@@ -114,7 +114,7 @@ void Binder::freeMemory()
 
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
-	char* pTCVal = 0;
+	char* pTCVal = nullptr;
 	SQLINTEGER size = 0;
 	if (transcodeRequired())
 	{
@@ -125,7 +125,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		std::memcpy(pTCVal, tcVal.data(), size);
 	}
 	else size = static_cast<SQLINTEGER>(val.size());
-	SQLPOINTER pVal = 0;
+	SQLPOINTER pVal = nullptr;
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits, val.size());
@@ -183,7 +183,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 {
 	typedef UTF16String::value_type CharT;
 
-	SQLPOINTER pVal = 0;
+	SQLPOINTER pVal = nullptr;
 	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
@@ -366,7 +366,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 	if (isOutBound(dir) || !isInBound(dir))
 		throw NotImplementedException("NULL parameter type can only be inbound.");
 
-	_inParams.insert(ParamMap::value_type(SQLPOINTER(0), SQLINTEGER(0)));
+	_inParams.insert(ParamMap::value_type(SQLPOINTER(nullptr), SQLINTEGER(0)));
 
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = SQL_NULL_DATA;
@@ -384,7 +384,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 		TypeInfo::sqlDataType<SQL_C_CHAR>(),
 		colSize,
 		decDigits,
-		0,
+		nullptr,
 		0,
 		_lengthIndicator.back())))
 	{

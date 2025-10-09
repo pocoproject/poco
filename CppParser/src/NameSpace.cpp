@@ -94,7 +94,7 @@ Symbol* NameSpace::lookup(const std::string& name) const
 
 Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const
 {
-	Symbol* pSymbol = 0;
+	Symbol* pSymbol = nullptr;
 	
 	if (name.empty())
 		return pSymbol;
@@ -125,7 +125,7 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 			if (pNS)
 				pSymbol = static_cast<NameSpace*>(pSymbol)->lookup(tail, alreadyVisited);
 			else
-				pSymbol = 0;
+				pSymbol = nullptr;
 		}
 	}
 	else if (tail.empty())

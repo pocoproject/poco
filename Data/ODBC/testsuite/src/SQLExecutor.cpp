@@ -172,7 +172,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		SQLCHAR connectOutput[1024] = {0};
 		SQLSMALLINT result;
 		rc = SQLDriverConnect(hdbc
-			, NULL
+			, nullptr
 			,(SQLCHAR*) dbConnString.c_str()
 			,(SQLSMALLINT) SQL_NTS
 			, connectOutput
@@ -307,7 +307,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				0,
 				(SQLPOINTER) &fourth,
 				0,
-				0);
+				nullptr);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLBindParameter(hstmt,
@@ -319,7 +319,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				1,
 				(SQLPOINTER) &fifth,
 				0,
-				0);
+				nullptr);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			if (dateTimeColSize == 0 || dateTimeDecDigits == -1)
@@ -354,7 +354,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				dateTimeDecDigits,
 				(SQLPOINTER) &sixth,
 				0,
-				0);
+				nullptr);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
@@ -362,7 +362,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 			if (SQL_NEED_DATA == rc)
 			{
-				SQLPOINTER pParam = 0;
+				SQLPOINTER pParam = nullptr;
 				while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)))
 				{
 					SQLINTEGER dataSize = 0;
@@ -600,7 +600,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 		SQLCHAR connectOutput[512] = {0};
 		SQLSMALLINT result;
 		rc = SQLDriverConnect(hdbc
-			, NULL
+			, nullptr
 			,(SQLCHAR*) dbConnString.c_str()
 			,(SQLSMALLINT) SQL_NTS
 			, connectOutput
@@ -822,7 +822,7 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 	SQLCHAR connectOutput[1024] = { 0 };
 	SQLSMALLINT result;
 	rc = SQLDriverConnect(hdbc
-		, NULL
+		, nullptr
 		, (SQLCHAR*)dbConnString.c_str()
 		, (SQLSMALLINT)SQL_NTS
 		, connectOutput
@@ -944,7 +944,7 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 
 		if (SQL_NEED_DATA == rc)
 		{
-			SQLPOINTER pParam = 0;
+			SQLPOINTER pParam = nullptr;
 			while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)))
 			{
 				if ((pParam != (SQLPOINTER)retVal) &&

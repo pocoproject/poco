@@ -19,7 +19,7 @@ namespace Poco {
 
 
 TeeStreamBuf::TeeStreamBuf():
-	_pIstr(0)
+	_pIstr(nullptr)
 {
 }
 
@@ -31,7 +31,7 @@ TeeStreamBuf::TeeStreamBuf(std::istream& istr):
 
 
 TeeStreamBuf::TeeStreamBuf(std::ostream& ostr):
-	_pIstr(0)
+	_pIstr(nullptr)
 {
 	_streams.push_back(&ostr);
 }

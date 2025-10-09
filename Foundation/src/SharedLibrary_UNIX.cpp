@@ -31,7 +31,7 @@ FastMutex SharedLibraryImpl::_mutex;
 
 SharedLibraryImpl::SharedLibraryImpl()
 {
-	_handle = 0;
+	_handle = nullptr;
 }
 
 
@@ -67,7 +67,7 @@ void SharedLibraryImpl::unloadImpl()
 	if (_handle)
 	{
 		dlclose(_handle);
-		_handle = 0;
+		_handle = nullptr;
 	}
 }
 
@@ -75,7 +75,7 @@ void SharedLibraryImpl::unloadImpl()
 bool SharedLibraryImpl::isLoadedImpl() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	return _handle != 0;
+	return _handle != nullptr;
 }
 
 
@@ -83,7 +83,7 @@ void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	void* result = 0;
+	void* result = nullptr;
 	if (_handle)
 	{
 		result = dlsym(_handle, name.c_str());

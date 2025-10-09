@@ -27,13 +27,13 @@ namespace Bonjour {
 
 
 extern "C" void DNSSD_API onRegisterServiceReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    DNSServiceErrorType errorCode,
-    const char* name,
-    const char* regtype,
-    const char* domain,
-    void *context)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	DNSServiceErrorType errorCode,
+	const char* name,
+	const char* regtype,
+	const char* domain,
+	void *context)
 {
 	try
 	{
@@ -164,67 +164,67 @@ const char* BonjourResponderImpl::describeError(int code)
 {
 	switch (code)
 	{
-    case kDNSServiceErr_Unknown:
-    	return "Unknown";
-    case kDNSServiceErr_NoSuchName:
-    	return "No such name";
-    case kDNSServiceErr_NoMemory:
-    	return "No memory";
-    case kDNSServiceErr_BadParam:
-    	return "Bad parameter";
-    case kDNSServiceErr_BadReference:
-    	return "Bad reference";
-    case kDNSServiceErr_BadState:
-    	return "Bad state";
-    case kDNSServiceErr_BadFlags:
-    	return "Bad flags";
-    case kDNSServiceErr_Unsupported:
-    	return "Unsupported";
-    case kDNSServiceErr_NotInitialized:
-    	return "Not initialized";
-    case kDNSServiceErr_AlreadyRegistered:
-    	return "Already registered";
-    case kDNSServiceErr_NameConflict:
-    	return "Name conflict";
-    case kDNSServiceErr_Invalid:
-    	return "Invalid";
-    case kDNSServiceErr_Firewall:
-    	return "Firewall";
-    case kDNSServiceErr_Incompatible:
-    	return "Client library incompatible with daemon";
-    case kDNSServiceErr_BadInterfaceIndex:
-    	return "Bad interface index";
-    case kDNSServiceErr_Refused:
-    	return "Refused";
-    case kDNSServiceErr_NoSuchRecord:
-    	return "No such record";
-    case kDNSServiceErr_NoAuth:
-    	return "No auth";
-    case kDNSServiceErr_NoSuchKey:
-    	return "No such key";
-    case kDNSServiceErr_NATTraversal:
-    	return "NAT traversal";
-    case kDNSServiceErr_DoubleNAT:
-    	return "Double NAT";
-    case kDNSServiceErr_BadTime:
-    	return "Bad time";
-    case kDNSServiceErr_BadSig:
-    	return "Bad signature";
-    case kDNSServiceErr_BadKey:
-    	return "Bad key";
-    case kDNSServiceErr_Transient:
-    	return "Transient error";
-    case kDNSServiceErr_ServiceNotRunning:
-    	return "Service not running";
-    case kDNSServiceErr_NATPortMappingUnsupported:
-    	return "NAT port mapping not supported";
-    case kDNSServiceErr_NATPortMappingDisabled:
-    	return "NAT port mapping disabled";
+	case kDNSServiceErr_Unknown:
+		return "Unknown";
+	case kDNSServiceErr_NoSuchName:
+		return "No such name";
+	case kDNSServiceErr_NoMemory:
+		return "No memory";
+	case kDNSServiceErr_BadParam:
+		return "Bad parameter";
+	case kDNSServiceErr_BadReference:
+		return "Bad reference";
+	case kDNSServiceErr_BadState:
+		return "Bad state";
+	case kDNSServiceErr_BadFlags:
+		return "Bad flags";
+	case kDNSServiceErr_Unsupported:
+		return "Unsupported";
+	case kDNSServiceErr_NotInitialized:
+		return "Not initialized";
+	case kDNSServiceErr_AlreadyRegistered:
+		return "Already registered";
+	case kDNSServiceErr_NameConflict:
+		return "Name conflict";
+	case kDNSServiceErr_Invalid:
+		return "Invalid";
+	case kDNSServiceErr_Firewall:
+		return "Firewall";
+	case kDNSServiceErr_Incompatible:
+		return "Client library incompatible with daemon";
+	case kDNSServiceErr_BadInterfaceIndex:
+		return "Bad interface index";
+	case kDNSServiceErr_Refused:
+		return "Refused";
+	case kDNSServiceErr_NoSuchRecord:
+		return "No such record";
+	case kDNSServiceErr_NoAuth:
+		return "No auth";
+	case kDNSServiceErr_NoSuchKey:
+		return "No such key";
+	case kDNSServiceErr_NATTraversal:
+		return "NAT traversal";
+	case kDNSServiceErr_DoubleNAT:
+		return "Double NAT";
+	case kDNSServiceErr_BadTime:
+		return "Bad time";
+	case kDNSServiceErr_BadSig:
+		return "Bad signature";
+	case kDNSServiceErr_BadKey:
+		return "Bad key";
+	case kDNSServiceErr_Transient:
+		return "Transient error";
+	case kDNSServiceErr_ServiceNotRunning:
+		return "Service not running";
+	case kDNSServiceErr_NATPortMappingUnsupported:
+		return "NAT port mapping not supported";
+	case kDNSServiceErr_NATPortMappingDisabled:
+		return "NAT port mapping disabled";
 #if _DNS_SD_H+0 >= 2580000
-    case kDNSServiceErr_NoRouter:
-    	return "No router";
-    case kDNSServiceErr_PollingMode:
-    	return "Polling mode";
+	case kDNSServiceErr_NoRouter:
+		return "No router";
+	case kDNSServiceErr_PollingMode:
+		return "Polling mode";
 #endif
 	default:
 		return "Error";
@@ -290,12 +290,12 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 
 
 void BonjourResponderImpl::onRegisterServiceReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    DNSServiceErrorType errorCode,
-    const char* name,
-    const char* regtype,
-    const char* domain)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	DNSServiceErrorType errorCode,
+	const char* name,
+	const char* regtype,
+	const char* domain)
 {
 	if (errorCode == kDNSServiceErr_NoError)
 	{

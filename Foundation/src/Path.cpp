@@ -1114,11 +1114,11 @@ std::string Path::transcode(const std::string& path)
 #if defined(_WIN32)
 	std::wstring uniPath;
 	UnicodeConverter::toUTF16(path, uniPath);
-	DWORD len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), NULL, 0, NULL, NULL);
+	DWORD len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), nullptr, 0, nullptr, nullptr);
 	if (len > 0)
 	{
 		Buffer<char> buffer(len);
-		DWORD rc = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), buffer.begin(), static_cast<int>(buffer.size()), NULL, NULL);
+		DWORD rc = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), buffer.begin(), static_cast<int>(buffer.size()), nullptr, nullptr);
 		if (rc)
 		{
 			return std::string(buffer.begin(), buffer.size());

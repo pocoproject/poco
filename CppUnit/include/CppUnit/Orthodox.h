@@ -54,7 +54,7 @@ public:
 	}
 
 protected:
-    ClassUnderTest call(ClassUnderTest object);
+	ClassUnderTest call(ClassUnderTest object);
 	void runTest () override;
 };
 
@@ -63,29 +63,29 @@ protected:
 template <class ClassUnderTest>
 void Orthodox<ClassUnderTest>::runTest()
 {
-    // make sure we have a default constructor
-    ClassUnderTest   a, b, c;
+	// make sure we have a default constructor
+	ClassUnderTest   a, b, c;
 
-    // make sure we have an equality operator
-    assert (a == b);
+	// make sure we have an equality operator
+	assert (a == b);
 
-    // check the inverse
-    b.operator= (a.operator! ());
-    assert (a != b);
+	// check the inverse
+	b.operator= (a.operator! ());
+	assert (a != b);
 
-    // double inversion
-    b = !!a;
-    assert (a == b);
+	// double inversion
+	b = !!a;
+	assert (a == b);
 
-    // invert again
-    b = !a;
+	// invert again
+	b = !a;
 
-    // check calls
-    c = a;
-    assert (c == call (a));
+	// check calls
+	c = a;
+	assert (c == call (a));
 
-    c = b;
-    assert (c == call (b));
+	c = b;
+	assert (c == call (b));
 }
 
 
@@ -93,7 +93,7 @@ void Orthodox<ClassUnderTest>::runTest()
 template <class ClassUnderTest>
 ClassUnderTest Orthodox<ClassUnderTest>::call(ClassUnderTest object)
 {
-    return object;
+	return object;
 }
 
 

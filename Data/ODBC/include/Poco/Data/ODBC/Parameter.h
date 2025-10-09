@@ -63,9 +63,9 @@ private:
 	void init();
 
 	SQLSMALLINT _dataType;
-    SQLULEN     _columnSize;
-    SQLSMALLINT _decimalDigits;
-    SQLSMALLINT _isNullable;
+	SQLULEN     _columnSize;
+	SQLSMALLINT _decimalDigits;
+	SQLSMALLINT _isNullable;
 
 	const StatementHandle& _rStmt;
 	std::size_t _number;

@@ -24,7 +24,7 @@ const char* UTF32Encoding::_names[] =
 {
 	"UTF-32",
 	"UTF32",
-	NULL
+	nullptr
 };
 
 

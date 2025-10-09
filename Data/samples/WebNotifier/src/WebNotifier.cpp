@@ -88,7 +88,7 @@ class WebSocketRequestHandler: public HTTPRequestHandler
 	/// Handler for the WebSocket connection.
 {
 public:
-	WebSocketRequestHandler() : _pWS(0), _flags(0)
+	WebSocketRequestHandler() : _pWS(nullptr), _flags(0)
 	{
 	}
 
@@ -165,7 +165,7 @@ class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	/// Web request handler factory.
 {
 public:
-	RequestHandlerFactory() : _pHandler(0)
+	RequestHandlerFactory() : _pHandler(nullptr)
 	{
 	}
 
@@ -185,7 +185,7 @@ public:
 		if (uri != "/favicon.ico")
 			std::cout << "Unknown URI: " << uri << std::endl;
 
-		return 0;
+		return nullptr;
 	}
 
 	WebSocketRequestHandler& handler()

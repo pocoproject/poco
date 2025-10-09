@@ -157,7 +157,7 @@ public:
 	WindowsDirectoryWatcherStrategy(DirectoryWatcher& owner):
 		DirectoryWatcherStrategy(owner)
 	{
-		_hStopped = CreateEventW(NULL, FALSE, FALSE, NULL);
+		_hStopped = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 		if (!_hStopped)
 			throw SystemException("cannot create event");
 	}
@@ -303,7 +303,7 @@ public:
 			tv.tv_sec  = 0;
 			tv.tv_usec = 200000;
 
-			if (select(_fd + 1, &fds, NULL, NULL, &tv) == 1)
+			if (select(_fd + 1, &fds, nullptr, nullptr, &tv) == 1)
 			{
 				int n = read(_fd, buffer.begin(), buffer.size());
 				int i = 0;

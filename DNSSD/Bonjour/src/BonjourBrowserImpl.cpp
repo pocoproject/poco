@@ -77,12 +77,12 @@ extern "C" void DNSSD_API onResolveReply(
 
 
 extern "C" void DNSSD_API onEnumerateBrowseDomainsReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    uint32_t interfaceIndex,
-    DNSServiceErrorType errorCode,
-    const char* replyDomain,
-    void* context)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* replyDomain,
+	void* context)
 {
 	try
 	{
@@ -96,12 +96,12 @@ extern "C" void DNSSD_API onEnumerateBrowseDomainsReply(
 
 
 extern "C" void DNSSD_API onEnumerateRegistrationDomainsReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    uint32_t interfaceIndex,
-    DNSServiceErrorType errorCode,
-    const char* replyDomain,
-    void* context)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* replyDomain,
+	void* context)
 {
 	try
 	{
@@ -115,17 +115,17 @@ extern "C" void DNSSD_API onEnumerateRegistrationDomainsReply(
 
 
 extern "C" void DNSSD_API onQueryRecordReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    uint32_t interfaceIndex,
-    DNSServiceErrorType errorCode,
-    const char* fullName,
-    uint16_t rrtype,
-    uint16_t rrclass,
-    uint16_t rdlen,
-    const void* rdata,
-    uint32_t ttl,
-    void* context)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	uint32_t interfaceIndex,
+	DNSServiceErrorType errorCode,
+	const char* fullName,
+	uint16_t rrtype,
+	uint16_t rrclass,
+	uint16_t rdlen,
+	const void* rdata,
+	uint32_t ttl,
+	void* context)
 {
 	try
 	{

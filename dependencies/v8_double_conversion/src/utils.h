@@ -44,7 +44,7 @@
 #include <cassert>
 #ifndef DOUBLE_CONVERSION_ASSERT
 #define DOUBLE_CONVERSION_ASSERT(condition)         \
-    assert(condition)
+	assert(condition)
 #endif
 #if defined(DOUBLE_CONVERSION_NON_PREFIXED_MACROS) && !defined(ASSERT)
 #define ASSERT DOUBLE_CONVERSION_ASSERT
@@ -136,24 +136,24 @@ int main(int argc, char** argv) {
 //
 // If it prints "correct" then the architecture should be here, in the "correct" section.
 #if defined(_M_X64) || defined(__x86_64__) || \
-    defined(__ARMEL__) || defined(__avr32__) || defined(_M_ARM) || defined(_M_ARM64) || \
-    defined(__hppa__) || defined(__ia64__) || \
-    defined(__mips__) || \
-    defined(__loongarch__) || \
-    defined(__nios2__) || defined(__ghs) || \
-    defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
-    defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \
-    defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
-    defined(__SH4__) || defined(__alpha__) || \
-    defined(_MIPS_ARCH_MIPS32R2) || defined(__ARMEB__) ||\
-    defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
-    defined(__riscv) || defined(__e2k__) || \
-    defined(__or1k__) || defined(__arc__) || defined(__ARC64__) || \
-    defined(__microblaze__) || defined(__XTENSA__) || \
-    defined(__EMSCRIPTEN__) || defined(__wasm32__)
+	defined(__ARMEL__) || defined(__avr32__) || defined(_M_ARM) || defined(_M_ARM64) || \
+	defined(__hppa__) || defined(__ia64__) || \
+	defined(__mips__) || \
+	defined(__loongarch__) || \
+	defined(__nios2__) || defined(__ghs) || \
+	defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
+	defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \
+	defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
+	defined(__SH4__) || defined(__alpha__) || \
+	defined(_MIPS_ARCH_MIPS32R2) || defined(__ARMEB__) ||\
+	defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
+	defined(__riscv) || defined(__e2k__) || \
+	defined(__or1k__) || defined(__arc__) || defined(__ARC64__) || \
+	defined(__microblaze__) || defined(__XTENSA__) || \
+	defined(__EMSCRIPTEN__) || defined(__wasm32__)
 #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
 #elif defined(__mc68000__) || \
-    defined(__pnacl__) || defined(__native_client__)
+	defined(__pnacl__) || defined(__native_client__)
 #undef DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS
 #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)
 #if defined(_WIN32)
@@ -250,16 +250,16 @@ class Vector {
  public:
   Vector() : start_(DOUBLE_CONVERSION_NULLPTR), length_(0) {}
   Vector(T* data, int len) : start_(data), length_(len) {
-    DOUBLE_CONVERSION_ASSERT(len == 0 || (len > 0 && data != DOUBLE_CONVERSION_NULLPTR));
+	DOUBLE_CONVERSION_ASSERT(len == 0 || (len > 0 && data != DOUBLE_CONVERSION_NULLPTR));
   }
 
   // Returns a vector using the same backing storage as this one,
   // spanning from and including 'from', to but not including 'to'.
   Vector<T> SubVector(int from, int to) {
-    DOUBLE_CONVERSION_ASSERT(to <= length_);
-    DOUBLE_CONVERSION_ASSERT(from < to);
-    DOUBLE_CONVERSION_ASSERT(0 <= from);
-    return Vector<T>(start() + from, to - from);
+	DOUBLE_CONVERSION_ASSERT(to <= length_);
+	DOUBLE_CONVERSION_ASSERT(from < to);
+	DOUBLE_CONVERSION_ASSERT(0 <= from);
+	return Vector<T>(start() + from, to - from);
   }
 
   // Returns the length of the vector.
@@ -273,8 +273,8 @@ class Vector {
 
   // Access individual vector elements - checks bounds in debug mode.
   T& operator[](int index) const {
-    DOUBLE_CONVERSION_ASSERT(0 <= index && index < length_);
-    return start_[index];
+	DOUBLE_CONVERSION_ASSERT(0 <= index && index < length_);
+	return start_[index];
   }
 
   T& first() { return start_[0]; }
@@ -282,8 +282,8 @@ class Vector {
   T& last() { return start_[length_ - 1]; }
 
   void pop_back() {
-    DOUBLE_CONVERSION_ASSERT(!is_empty());
-    --length_;
+	DOUBLE_CONVERSION_ASSERT(!is_empty());
+	--length_;
   }
 
  private:
@@ -298,7 +298,7 @@ class Vector {
 class StringBuilder {
  public:
   StringBuilder(char* buffer, int buffer_size)
-      : buffer_(buffer, buffer_size), position_(0) { }
+	  : buffer_(buffer, buffer_size), position_(0) { }
 
   ~StringBuilder() { if (!is_finalized()) Finalize(); }
 
@@ -306,8 +306,8 @@ class StringBuilder {
 
   // Get the current position in the builder.
   int position() const {
-    DOUBLE_CONVERSION_ASSERT(!is_finalized());
-    return position_;
+	DOUBLE_CONVERSION_ASSERT(!is_finalized());
+	return position_;
   }
 
   // Reset the position.
@@ -317,45 +317,45 @@ class StringBuilder {
   // 0-characters; use the Finalize() method to terminate the string
   // instead.
   void AddCharacter(char c) {
-    DOUBLE_CONVERSION_ASSERT(c != '\0');
-    DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ < buffer_.length());
-    buffer_[position_++] = c;
+	DOUBLE_CONVERSION_ASSERT(c != '\0');
+	DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ < buffer_.length());
+	buffer_[position_++] = c;
   }
 
   // Add an entire string to the builder. Uses strlen() internally to
   // compute the length of the input string.
   void AddString(const char* s) {
-    AddSubstring(s, StrLength(s));
+	AddSubstring(s, StrLength(s));
   }
 
   // Add the first 'n' characters of the given string 's' to the
   // builder. The input string must have enough characters.
   void AddSubstring(const char* s, int n) {
-    DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ + n < buffer_.length());
-    DOUBLE_CONVERSION_ASSERT(static_cast<size_t>(n) <= strlen(s));
-    memmove(&buffer_[position_], s, static_cast<size_t>(n));
-    position_ += n;
+	DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ + n < buffer_.length());
+	DOUBLE_CONVERSION_ASSERT(static_cast<size_t>(n) <= strlen(s));
+	memmove(&buffer_[position_], s, static_cast<size_t>(n));
+	position_ += n;
   }
 
 
   // Add character padding to the builder. If count is non-positive,
   // nothing is added to the builder.
   void AddPadding(char c, int count) {
-    for (int i = 0; i < count; i++) {
-      AddCharacter(c);
-    }
+	for (int i = 0; i < count; i++) {
+	  AddCharacter(c);
+	}
   }
 
   // Finalize the string by 0-terminating it and returning the buffer.
   char* Finalize() {
-    DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ < buffer_.length());
-    buffer_[position_] = '\0';
-    // Make sure nobody managed to add a 0-character to the
-    // buffer while building the string.
-    DOUBLE_CONVERSION_ASSERT(strlen(buffer_.start()) == static_cast<size_t>(position_));
-    position_ = -1;
-    DOUBLE_CONVERSION_ASSERT(is_finalized());
-    return buffer_.start();
+	DOUBLE_CONVERSION_ASSERT(!is_finalized() && position_ < buffer_.length());
+	buffer_[position_] = '\0';
+	// Make sure nobody managed to add a 0-character to the
+	// buffer while building the string.
+	DOUBLE_CONVERSION_ASSERT(strlen(buffer_.start()) == static_cast<size_t>(position_));
+	position_ = -1;
+	DOUBLE_CONVERSION_ASSERT(is_finalized());
+	return buffer_.start();
   }
 
  private:
@@ -397,7 +397,7 @@ Dest BitCast(const Source& source) {
   // A compile error here means your Dest and Source have different sizes.
 #if __cplusplus >= 201103L
   static_assert(sizeof(Dest) == sizeof(Source),
-                "source and destination size mismatch");
+				"source and destination size mismatch");
 #else
   DOUBLE_CONVERSION_UNUSED
   typedef char VerifySizesAreEqual[sizeof(Dest) == sizeof(Source) ? 1 : -1];

@@ -235,8 +235,8 @@ void FileTest::testExists()
 
 		File f3("cmd");
 		assertTrue (f3.canExecute());
-        File f4("cmd-nonexistent");
-        assertFalse (f4.canExecute());
+		File f4("cmd-nonexistent");
+		assertFalse (f4.canExecute());
 #endif
 		assertFalse (f.exists());
 		assertTrue (f.existsAnywhere());
@@ -286,7 +286,7 @@ void FileTest::testFileAttributes3()
 #if POCO_OS==POCO_OS_CYGWIN
 	File f("/dev/tty");
 #else
- 	File f("/dev/null");
+	File f("/dev/null");
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	File f("CON");

@@ -105,7 +105,7 @@ namespace
 		{
 			char buffer[32];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
-			if (n <= 0) onShutdown(0);
+			if (n <= 0) onShutdown(nullptr);
 		}
 		
 		void onWritable(const AutoPtr<WritableNotification>& pNf)

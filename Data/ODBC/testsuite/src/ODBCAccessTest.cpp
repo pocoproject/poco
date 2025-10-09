@@ -35,7 +35,7 @@ using Poco::format;
 using Poco::NotFoundException;
 
 
-Session*    ODBCAccessTest::_pSession = 0;
+Session*    ODBCAccessTest::_pSession = nullptr;
 std::string ODBCAccessTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 
@@ -209,5 +209,5 @@ CppUnit::Test* ODBCAccessTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

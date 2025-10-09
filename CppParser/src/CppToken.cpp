@@ -353,8 +353,8 @@ bool IdentifierToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return (c >= 'A' && c <= 'Z') ||
-	       (c >= 'a' && c <= 'z') ||
-	       (c == '_' || c == '$');
+		   (c >= 'a' && c <= 'z') ||
+		   (c == '_' || c == '$');
 }
 
 
@@ -522,7 +522,7 @@ bool NumberLiteralToken::start(char c, std::istream& istr)
 	_value = c;
 	int next = istr.peek();
 	return (c >= '0' && c <= '9') ||
-	       (c == '.' && next >= '0' && next <= '9');
+		   (c == '.' && next >= '0' && next <= '9');
 }
 
 
@@ -670,13 +670,13 @@ void NumberLiteralToken::finishSuffix(std::istream& istr, int next)
 
 int NumberLiteralToken::asInteger() const
 {
-	return static_cast<int>(std::strtol(_value.c_str(), 0, 0));
+	return static_cast<int>(std::strtol(_value.c_str(), nullptr, 0));
 }
 
 
 double NumberLiteralToken::asFloat() const
 {
-	return std::strtod(_value.c_str(), 0);
+	return std::strtod(_value.c_str(), nullptr);
 }
 
 

@@ -148,7 +148,7 @@ private:
 	PQConnectionInfoOptionsFree& operator = (const PQConnectionInfoOptionsFree&);
 
 private:
-    PQconninfoOption* _pConnectionInfoOption;
+	PQconninfoOption* _pConnectionInfoOption;
 };
 
 
@@ -194,16 +194,16 @@ inline InputParameter::InputParameter(Poco::Data::MetaColumn::ColumnDataType fie
 	_pData(aDataPtr),
 	_size(theSize),
 	_isBinary(Poco::Data::MetaColumn::FDT_BLOB == _fieldType || Poco::Data::MetaColumn::FDT_CLOB == _fieldType),
-	_pNonStringVersionRepresentation(0)
+	_pNonStringVersionRepresentation(nullptr)
 {
 }
 
 
 inline InputParameter::InputParameter(): _fieldType(Poco::Data::MetaColumn::FDT_UNKNOWN),
-	_pData(0),
+	_pData(nullptr),
 	_size(0),
 	_isBinary(false),
-	_pNonStringVersionRepresentation(0)
+	_pNonStringVersionRepresentation(nullptr)
 {
 }
 
@@ -215,7 +215,7 @@ inline InputParameter::~InputParameter()
 
 inline const void* InputParameter::pData() const
 {
-    return _pData;
+	return _pData;
 }
 
 
@@ -239,7 +239,7 @@ inline bool InputParameter::isBinary() const
 
 inline void InputParameter::setStringVersionRepresentation(const std::string& aString)
 {
-	_pNonStringVersionRepresentation = 0;
+	_pNonStringVersionRepresentation = nullptr;
 	_stringVersionRepresentation = aString;
 	_size = _stringVersionRepresentation.size();
 }
@@ -281,8 +281,8 @@ inline const void* InputParameter::pInternalRepresentation() const
 
 	case Poco::Data::MetaColumn::FDT_UNKNOWN:
 	default:
-		return 0;
-    }
+		return nullptr;
+	}
 }
 
 
@@ -306,7 +306,7 @@ inline OutputParameter::OutputParameter():
 	_fieldType(Poco::Data::MetaColumn::FDT_UNKNOWN),
 	_internalFieldType(static_cast<Oid>(-1)),
 	_rowNumber(0),
-	_pData(0),
+	_pData(nullptr),
 	_size(0),
 	_isNull(true)
 {
@@ -325,48 +325,48 @@ inline void OutputParameter::setValues(Poco::Data::MetaColumn::ColumnDataType aF
 	std::size_t theSize,
 	bool anIsNull)
 {
-    _fieldType         = aFieldType;
-    _internalFieldType = anInternalFieldType;
-    _rowNumber         = aRowNumber;
-    _pData             = aDataPtr;
-    _size              = theSize;
-    _isNull            = anIsNull;
+	_fieldType         = aFieldType;
+	_internalFieldType = anInternalFieldType;
+	_rowNumber         = aRowNumber;
+	_pData             = aDataPtr;
+	_size              = theSize;
+	_isNull            = anIsNull;
 }
 
 
 inline Poco::Data::MetaColumn::ColumnDataType OutputParameter::fieldType() const
 {
-    return _fieldType;
+	return _fieldType;
 }
 
 
 inline Oid OutputParameter::internalFieldType() const
 {
-    return _internalFieldType;
+	return _internalFieldType;
 }
 
 
 inline std::size_t OutputParameter::rowNumber() const
 {
-    return _rowNumber;
+	return _rowNumber;
 }
 
 
 inline const char* OutputParameter::pData() const
 {
-    return _pData;
+	return _pData;
 }
 
 
 inline std::size_t OutputParameter::size() const
 {
-    return _size;
+	return _size;
 }
 
 
 inline bool OutputParameter::isNull() const
 {
-    return _isNull;
+	return _isNull;
 }
 
 
@@ -378,11 +378,11 @@ inline PQConnectionInfoOptionsFree::PQConnectionInfoOptionsFree(PQconninfoOption
 
 inline PQConnectionInfoOptionsFree::~PQConnectionInfoOptionsFree()
 {
-    if (_pConnectionInfoOption)
-    {
-        PQconninfoFree(_pConnectionInfoOption);
-        _pConnectionInfoOption = 0;
-    }
+	if (_pConnectionInfoOption)
+	{
+		PQconninfoFree(_pConnectionInfoOption);
+		_pConnectionInfoOption = nullptr;
+	}
 }
 
 
@@ -394,11 +394,11 @@ inline PQResultClear::PQResultClear(PGresult* aPQResultPtr):
 
 inline PQResultClear::~PQResultClear()
 {
-    if (_pPQResult)
-    {
-        PQclear(_pPQResult);
-        _pPQResult = 0;
-    }
+	if (_pPQResult)
+	{
+		PQclear(_pPQResult);
+		_pPQResult = nullptr;
+	}
 }
 
 
@@ -412,11 +412,11 @@ inline PGCancelFree::PGCancelFree(PGcancel* aStatementCancelPtr):
 
 inline PGCancelFree::~PGCancelFree()
 {
-    if (_pPGCancel)
-    {
-        PQfreeCancel(_pPGCancel);
-        _pPGCancel = 0;
-    }
+	if (_pPGCancel)
+	{
+		PQfreeCancel(_pPGCancel);
+		_pPGCancel = nullptr;
+	}
 }
 
 

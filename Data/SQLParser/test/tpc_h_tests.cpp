@@ -20,45 +20,45 @@ std::string readFileContents(std::string file_path) {
 
 TEST(TPCHQueryGrammarTests) {
   std::vector<std::string> files = {
-      "test/queries/tpc-h-01.sql", "test/queries/tpc-h-02.sql", "test/queries/tpc-h-03.sql",
-      "test/queries/tpc-h-04.sql", "test/queries/tpc-h-05.sql", "test/queries/tpc-h-06.sql",
-      "test/queries/tpc-h-07.sql", "test/queries/tpc-h-08.sql", "test/queries/tpc-h-09.sql",
-      "test/queries/tpc-h-10.sql", "test/queries/tpc-h-11.sql", "test/queries/tpc-h-12.sql",
-      "test/queries/tpc-h-13.sql", "test/queries/tpc-h-14.sql", "test/queries/tpc-h-15.sql",
-      "test/queries/tpc-h-16.sql", "test/queries/tpc-h-17.sql", "test/queries/tpc-h-18.sql",
-      "test/queries/tpc-h-19.sql", "test/queries/tpc-h-20.sql", "test/queries/tpc-h-21.sql",
-      "test/queries/tpc-h-22.sql",
+	  "test/queries/tpc-h-01.sql", "test/queries/tpc-h-02.sql", "test/queries/tpc-h-03.sql",
+	  "test/queries/tpc-h-04.sql", "test/queries/tpc-h-05.sql", "test/queries/tpc-h-06.sql",
+	  "test/queries/tpc-h-07.sql", "test/queries/tpc-h-08.sql", "test/queries/tpc-h-09.sql",
+	  "test/queries/tpc-h-10.sql", "test/queries/tpc-h-11.sql", "test/queries/tpc-h-12.sql",
+	  "test/queries/tpc-h-13.sql", "test/queries/tpc-h-14.sql", "test/queries/tpc-h-15.sql",
+	  "test/queries/tpc-h-16.sql", "test/queries/tpc-h-17.sql", "test/queries/tpc-h-18.sql",
+	  "test/queries/tpc-h-19.sql", "test/queries/tpc-h-20.sql", "test/queries/tpc-h-21.sql",
+	  "test/queries/tpc-h-22.sql",
   };
 
   int testsFailed = 0;
   std::string concatenated = "";
   for (const std::string& file_path : files) {
-    std::string query = readFileContents(file_path);
+	std::string query = readFileContents(file_path);
 
-    concatenated += query;
-    if (concatenated.back() != ';') concatenated += ';';
+	concatenated += query;
+	if (concatenated.back() != ';') concatenated += ';';
 
-    SQLParserResult result;
-    SQLParser::parse(query.c_str(), &result);
-    if (!result.isValid()) {
-      mt::printFailed(file_path.c_str());
-      printf("%s           %s (L%d:%d)%s\n", mt::red(), result.errorMsg(), result.errorLine(), result.errorColumn(),
-             mt::def());
-      ++testsFailed;
-    } else {
-      mt::printOk(file_path.c_str());
-    }
+	SQLParserResult result;
+	SQLParser::parse(query.c_str(), &result);
+	if (!result.isValid()) {
+	  mt::printFailed(file_path.c_str());
+	  printf("%s           %s (L%d:%d)%s\n", mt::red(), result.errorMsg(), result.errorLine(), result.errorColumn(),
+			 mt::def());
+	  ++testsFailed;
+	} else {
+	  mt::printOk(file_path.c_str());
+	}
   }
 
   SQLParserResult result;
   SQLParser::parse(concatenated.c_str(), &result);
   if (!result.isValid()) {
-    mt::printFailed("TPCHAllConcatenated");
-    printf("%s           %s (L%d:%d)%s\n", mt::red(), result.errorMsg(), result.errorLine(), result.errorColumn(),
-           mt::def());
-    ++testsFailed;
+	mt::printFailed("TPCHAllConcatenated");
+	printf("%s           %s (L%d:%d)%s\n", mt::red(), result.errorMsg(), result.errorLine(), result.errorColumn(),
+		   mt::def());
+	++testsFailed;
   } else {
-    mt::printOk("TPCHAllConcatenated");
+	mt::printOk("TPCHAllConcatenated");
   }
 
   ASSERT_EQ(testsFailed, 0);

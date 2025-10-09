@@ -115,8 +115,8 @@ void HTTPTestServer::run()
 bool HTTPTestServer::requestComplete() const
 {
 	return ((_lastRequest.substr(0, 3) == "GET" || _lastRequest.substr(0, 4) == "HEAD") &&
-	        (_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
-	        (_lastRequest.find("\r\n0\r\n") != std::string::npos);
+			(_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
+			(_lastRequest.find("\r\n0\r\n") != std::string::npos);
 }
 
 
@@ -125,7 +125,7 @@ std::string HTTPTestServer::handleRequest() const
 	std::string response;
 	response.reserve(16000);
 	if (_lastRequest.substr(0, 10) == "GET /small" ||
-	    _lastRequest.substr(0, 11) == "HEAD /small")
+		_lastRequest.substr(0, 11) == "HEAD /small")
 	{
 		std::string body(SMALL_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
@@ -139,8 +139,8 @@ std::string HTTPTestServer::handleRequest() const
 			response.append(body);
 	}
 	else if (_lastRequest.substr(0, 10) == "GET /large" ||
-	         _lastRequest.substr(0, 11) == "HEAD /large" ||
-	         _lastRequest.substr(0, 36) == "GET http://www.somehost.com:80/large")
+			 _lastRequest.substr(0, 11) == "HEAD /large" ||
+			 _lastRequest.substr(0, 36) == "GET http://www.somehost.com:80/large")
 	{
 		std::string body(LARGE_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
@@ -261,7 +261,7 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("\r\n");
 	}
 	else if (_lastRequest.substr(0, 5) == "GET /" ||
-	         _lastRequest.substr(0, 6) == "HEAD /")
+			 _lastRequest.substr(0, 6) == "HEAD /")
 	{
 		std::string body(SMALL_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");

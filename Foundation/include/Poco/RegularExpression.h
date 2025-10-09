@@ -62,8 +62,8 @@ public:
 		RE_NO_AUTO_CAPTURE = 0x00001000, /// disable numbered capturing parentheses [ctor, match]
 		RE_NO_UTF8_CHECK   = 0x00002000, /// do not check validity of UTF-8 code sequences [match]
 		RE_FIRSTLINE       = 0x00040000, /// an  unanchored  pattern  is  required  to  match
-		                                 /// before  or  at  the  first  newline  in  the subject string,
-		                                 /// though the matched text may continue over the newline [ctor]
+										 /// before  or  at  the  first  newline  in  the subject string,
+										 /// though the matched text may continue over the newline [ctor]
 		RE_DUPNAMES        = 0x00080000, /// names used to identify capturing  subpatterns need not be unique [ctor]
 		RE_NEWLINE_CR      = 0x00100000, /// assume newline is CR ('\r'), the default [ctor]
 		RE_NEWLINE_LF      = 0x00200000, /// assume newline is LF ('\n') [ctor]

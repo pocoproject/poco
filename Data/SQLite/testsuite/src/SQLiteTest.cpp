@@ -476,7 +476,7 @@ void SQLiteTest::testNullCharPointer()
 
 	try
 	{
-		const char* pc = 0;
+		const char* pc = nullptr;
 		tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
 			bind("lastname"),
 			bind("firstname"),
@@ -506,7 +506,7 @@ void SQLiteTest::testInsertCharPointer()
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 
-	const char* pc = 0;
+	const char* pc = nullptr;
 	try
 	{
 		tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", bind(pc), now;
@@ -522,7 +522,7 @@ void SQLiteTest::testInsertCharPointer()
 		bind("Address"),
 		bind(133132));
 
-	std::free((void*) pc); pc = 0;
+	std::free((void*) pc); pc = nullptr;
 	assertTrue (1 == stmt.execute());
 
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
@@ -2916,9 +2916,9 @@ void SQLiteTest::testThreadModes()
 		}
 		sw.stop();
 		std::cout << "Mode: " << ((*it == Utility::THREAD_MODE_SINGLE) ? "single,"
-                                :(*it == Utility::THREAD_MODE_MULTI) ? "multi,"
-                                :(*it == Utility::THREAD_MODE_SERIAL) ? "serial,"
-                                : "unknown,") << " Time: " << sw.elapsed() / 1000.0 << " [ms]" << std::endl;
+								:(*it == Utility::THREAD_MODE_MULTI) ? "multi,"
+								:(*it == Utility::THREAD_MODE_SERIAL) ? "serial,"
+								: "unknown,") << " Time: " << sw.elapsed() / 1000.0 << " [ms]" << std::endl;
 	}
 
 	assertTrue (Utility::setThreadMode(Utility::THREAD_MODE_SERIAL));
@@ -3005,7 +3005,7 @@ void SQLiteTest::testUpdateCallback()
 	assertTrue (_deleteCounter == 1);
 
 	// disarm callback and do the same drill
-	assertTrue (Utility::registerUpdateHandler(tmp, (Utility::UpdateCallbackType) 0, &val));
+	assertTrue (Utility::registerUpdateHandler(tmp, (Utility::UpdateCallbackType) nullptr, &val));
 
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
@@ -3074,7 +3074,7 @@ void SQLiteTest::testCommitCallback()
 	tmp.commit();
 	assertTrue (val == 2);
 
-	assertTrue (Utility::registerUpdateHandler(tmp, (Utility::CommitCallbackType) 0, &val));
+	assertTrue (Utility::registerUpdateHandler(tmp, (Utility::CommitCallbackType) nullptr, &val));
 	val = 0;
 	tmp.begin();
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -3115,7 +3115,7 @@ void SQLiteTest::testRollbackCallback()
 	tmp.rollback();
 	assertTrue (val == 2);
 
-	assertTrue (Utility::registerUpdateHandler(tmp, (Utility::RollbackCallbackType) 0, &val));
+	assertTrue (Utility::registerUpdateHandler(tmp, (Utility::RollbackCallbackType) nullptr, &val));
 	val = 0;
 	tmp.begin();
 	tmp << "DROP TABLE IF EXISTS Person", now;

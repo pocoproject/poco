@@ -108,7 +108,7 @@ class Net_API TCPServer: public Poco::Runnable
 	/// Already served connections, however, will continue being served.
 {
 public:
-	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber = 0, TCPServerParams::Ptr pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber = 0, TCPServerParams::Ptr pParams = nullptr);
 		/// Creates the TCPServer, with ServerSocket listening on the given port.
 		/// Default port is zero, allowing any available port. The port number
 		/// can be queried through TCPServer::port() member.
@@ -122,7 +122,7 @@ public:
 		///
 		/// New threads are taken from the default thread pool.
 
-	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = nullptr);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory
@@ -134,7 +134,7 @@ public:
 		///
 		/// New threads are taken from the default thread pool.
 
-	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = nullptr);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory

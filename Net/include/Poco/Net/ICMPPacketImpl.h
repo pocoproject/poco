@@ -57,7 +57,7 @@ public:
 	int getDataSize() const;
 		/// Returns data size.
 
-	virtual struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const = 0;
+	virtual struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const = 0;
 		/// Returns current epoch time if either argument is equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
 		///

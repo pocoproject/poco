@@ -86,7 +86,7 @@ void TimedNotificationQueueTest::testDequeue()
 	queue.enqueueNotification(new QTestNotification("second"), ts2);
 	assertTrue (!queue.empty());
 	assertTrue (queue.size() == 4);
-	QTestNotification* pTNf = 0;
+	QTestNotification* pTNf = nullptr;
 	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
@@ -98,7 +98,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assertTrue (!queue.empty());
 	assertTrue (queue.size() == 3);
 
-	pTNf = 0;
+	pTNf = nullptr;
 	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
@@ -110,7 +110,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assertTrue (!queue.empty());
 	assertTrue (queue.size() == 2);
 
-	pTNf = 0;
+	pTNf = nullptr;
 	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
@@ -122,7 +122,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assertTrue (!queue.empty());
 	assertTrue (queue.size() == 1);
 
-	pTNf = 0;
+	pTNf = nullptr;
 	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());

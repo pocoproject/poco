@@ -154,7 +154,7 @@ void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::s
 	encoder.close();
 
 	status = sendCommand(challengeResponseBase64.str(), response);
-  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);
+	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);
 }
 
 

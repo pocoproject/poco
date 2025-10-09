@@ -540,8 +540,8 @@ void MailMessageTest::testReadMultiPartMixedCaseHeaders()
 	);
 
 	MailMessage message;
-  	MailInputStream mis(istr);
-  	message.read(mis);
+	MailInputStream mis(istr);
+	message.read(mis);
 
 	assertTrue (message.isMultipart());
 	assertTrue (message.parts().size() == 2);
@@ -560,37 +560,37 @@ void MailMessageTest::testReadMultiPartMixedCaseHeaders()
 
 void MailMessageTest::testReadMultiPartInvalidContentDisposition()
 {
-        std::istringstream istr(
-                "Content-type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
-                "Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-                "From: poco@appinf.com\r\n"
-                "Mime-Version: 1.0\r\n"
-                "Subject: Test Message\r\n"
-                "To: John Doe <john.doe@no.where>\r\n"
-                "\r\n"
-                "\r\n"
-                "Hello World!\r\n"
-                "\r\n"
-                "--MIME_boundary_01234567\r\n"
-                "Content-Disposition: \r\n"
-                "Content-Transfer-Encoding: base64\r\n"
-                "Content-Type: application/octet-stream; name=sample\r\n"
-                "\r\n"
-                "VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
-                "--MIME_boundary_01234567--\r\n"
-        );
+		std::istringstream istr(
+				"Content-type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+				"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+				"From: poco@appinf.com\r\n"
+				"Mime-Version: 1.0\r\n"
+				"Subject: Test Message\r\n"
+				"To: John Doe <john.doe@no.where>\r\n"
+				"\r\n"
+				"\r\n"
+				"Hello World!\r\n"
+				"\r\n"
+				"--MIME_boundary_01234567\r\n"
+				"Content-Disposition: \r\n"
+				"Content-Transfer-Encoding: base64\r\n"
+				"Content-Type: application/octet-stream; name=sample\r\n"
+				"\r\n"
+				"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+				"--MIME_boundary_01234567--\r\n"
+		);
 
-        MailMessage message;
-        MailInputStream mis(istr);
-        message.read(mis);
+		MailMessage message;
+		MailInputStream mis(istr);
+		message.read(mis);
 
-        assertTrue (message.isMultipart());
-        assertTrue (message.parts().size() == 1);
-        assertTrue (message.get(MailMessage::HEADER_CONTENT_TYPE) == "multipart/mixed; boundary=MIME_boundary_01234567");
+		assertTrue (message.isMultipart());
+		assertTrue (message.parts().size() == 1);
+		assertTrue (message.get(MailMessage::HEADER_CONTENT_TYPE) == "multipart/mixed; boundary=MIME_boundary_01234567");
 
-        assertTrue (message.parts()[0].encoding == MailMessage::ContentTransferEncoding::ENCODING_BASE64);
-        assertTrue (message.parts()[0].disposition == MailMessage::ContentDisposition::CONTENT_INLINE);
-        assertTrue (message.parts()[0].pSource->headers().get(MailMessage::HEADER_CONTENT_TYPE) == "application/octet-stream; name=sample");
+		assertTrue (message.parts()[0].encoding == MailMessage::ContentTransferEncoding::ENCODING_BASE64);
+		assertTrue (message.parts()[0].disposition == MailMessage::ContentDisposition::CONTENT_INLINE);
+		assertTrue (message.parts()[0].pSource->headers().get(MailMessage::HEADER_CONTENT_TYPE) == "application/octet-stream; name=sample");
 }
 
 
@@ -758,14 +758,14 @@ void MailMessageTest::testEncodeWord()
 	assertTrue (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6?=");
 
 	plain = "This text contains German Umlauts: \304\326. "
-	        "It is also a very long text. Longer than 75 "
-	        "characters. Long enough to become three lines "
-	        "after being word-encoded.";
+			"It is also a very long text. Longer than 75 "
+			"characters. Long enough to become three lines "
+			"after being word-encoded.";
 	encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
 	assertTrue (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6=2E_It_?=\r\n"
-	                   " =?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
-	                   " =?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
-	                   " =?ISO-8859-1?q?d=2E?=");
+					   " =?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
+					   " =?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
+					   " =?ISO-8859-1?q?d=2E?=");
 }
 
 

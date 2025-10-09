@@ -265,7 +265,7 @@ void Extractor::reset()
 
 bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned)
 {
-	MYSQL_BIND bind = {0};
+	MYSQL_BIND bind = {nullptr};
 	my_bool isNull = 0;
 
 	bind.is_null     = &isNull;
