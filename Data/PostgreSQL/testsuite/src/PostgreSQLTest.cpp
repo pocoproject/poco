@@ -26,6 +26,7 @@
 #include "Poco/Data/DataException.h"
 #include <iostream>
 
+#include "Poco/Data/Transaction.h"
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -794,6 +795,37 @@ void PostgreSQLTest::testReconnect()
 }
 
 
+void PostgreSQLTest::testTransactionWithReconnect()
+{
+    if (!_pSession) fail ("Test not available.");
+
+    try
+    {
+        _pSession->begin();
+        *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now;
+        _pSession->reconnect();
+        _pSession->commit();
+    }
+    catch (Poco::Exception& e)
+    {
+        _pSession->rollback();
+        std::cout << e.displayText() << std::endl;
+    }
+
+    try
+    {
+        _pSession->begin();
+        *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now;
+        _pSession->commit();
+    }
+    catch (Poco::Exception& e)
+    {
+        _pSession->rollback();
+        std::cout << e.displayText() << std::endl;
+    }
+}
+
+
 void PostgreSQLTest::testSqlState()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1333,6 +1365,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransactionNoAutoCommit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testReconnect);
+    CppUnit_addTest(pSuite, PostgreSQLTest, testTransactionWithReconnect);
 
 	return pSuite;
 }

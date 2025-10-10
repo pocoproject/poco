@@ -78,6 +78,9 @@ void SessionHandle::connect(const std::string& aConnectionString)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
+	_inTransaction = false;
+	_preparedStatementsToBeDeallocated.clear();
+
 	if (isConnectedNoLock())
 	{
 		throw ConnectionFailedException("Already Connected");
