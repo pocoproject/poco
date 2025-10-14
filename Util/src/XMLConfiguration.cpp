@@ -419,7 +419,7 @@ Poco::XML::Node* XMLConfiguration::findElement(const std::string& name, Poco::XM
 		pNode->appendChild(pElem);
 		return pElem;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 
@@ -475,7 +475,7 @@ Poco::XML::Node* XMLConfiguration::findElement(const std::string& attr, const st
 
 Poco::XML::Node* XMLConfiguration::findAttribute(const std::string& name, Poco::XML::Node* pNode, bool create)
 {
-	Poco::XML::Node* pResult(0);
+	Poco::XML::Node* pResult(nullptr);
 	Poco::XML::Element* pElem = dynamic_cast<Poco::XML::Element*>(pNode);
 	if (pElem)
 	{
