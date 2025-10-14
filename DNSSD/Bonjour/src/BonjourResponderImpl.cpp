@@ -85,7 +85,13 @@ ServiceHandle BonjourResponderImpl::registerService(const Service& service, int 
 	if (options & DNSSDResponder::REG_NON_BROWSABLE) flags |= kDNSServiceFlagsNonBrowsable;
 #endif
 	std::string txtRecord = createTXTRecord(service.properties());
-	DNSServiceErrorType err = DNSServiceRegister(&sdRef, flags, intf, service.name().empty() ? 0 : service.name().c_str(), service.type().c_str(), service.domain().empty() ? 0 : service.domain().c_str(), service.host().empty() ? 0 : service.host().c_str(), Poco::ByteOrder::toNetwork(service.port()), txtRecord.size(), txtRecord.empty() ? 0 : txtRecord.data(), Poco::DNSSD::Bonjour::onRegisterServiceReply, this);
+	DNSServiceErrorType err = DNSServiceRegister(
+		&sdRef, flags, intf,
+		service.name().empty() ? nullptr : service.name().c_str(),
+		service.type().c_str(), service.domain().empty() ? nullptr : service.domain().c_str(),
+		service.host().empty() ? nullptr : service.host().c_str(),
+		Poco::ByteOrder::toNetwork(service.port()), txtRecord.size(), txtRecord.empty() ? nullptr : txtRecord.data(),
+		Poco::DNSSD::Bonjour::onRegisterServiceReply, this);
 	if (err == kDNSServiceErr_NoError)
 	{
 		_eventLoop.add(sdRef);
@@ -105,7 +111,7 @@ void BonjourResponderImpl::unregisterService(ServiceHandle& serviceHandle)
 
 RecordHandle BonjourResponderImpl::addRecord(ServiceHandle serviceHandle, const Record& record)
 {
-	DNSRecordRef recRef(0);
+	DNSRecordRef recRef(nullptr);
 	EventLoop::ScopedLock lock(_eventLoop);
 	DNSServiceErrorType err = DNSServiceAddRecord(serviceHandle.cast<DNSServiceRef>(), &recRef, 0, record.type(), record.length(), record.data(), record.ttl());
 	if (err == kDNSServiceErr_NoError)
@@ -119,7 +125,9 @@ RecordHandle BonjourResponderImpl::addRecord(ServiceHandle serviceHandle, const 
 void BonjourResponderImpl::updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record)
 {
 	EventLoop::ScopedLock lock(_eventLoop);
-	DNSServiceErrorType err = DNSServiceUpdateRecord(serviceHandle.cast<DNSServiceRef>(), recordHandle.cast<DNSRecordRef>(), 0, record.length(), record.data(), record.ttl());
+	DNSServiceErrorType err = DNSServiceUpdateRecord(
+		serviceHandle.cast<DNSServiceRef>(), recordHandle.cast<DNSRecordRef>(), 0,
+		record.length(), record.data(), record.ttl());
 	if (err != kDNSServiceErr_NoError)
 	{
 		throw Poco::DNSSD::DNSSDException("Failed to update record " + record.name(), describeError(err), err);
@@ -268,7 +276,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 	if (itVers != itEnd)
 	{
 		Poco::UInt8 valueSize = static_cast<Poco::UInt8>(itVers->second.size());
-		TXTRecordSetValue(&ref, itVers->first.c_str(), valueSize, valueSize == 0 ? 0 : itVers->second.c_str());
+		TXTRecordSetValue(&ref, itVers->first.c_str(), valueSize, valueSize == 0 ? nullptr : itVers->second.c_str());
 	}
 
 	it = properties.begin();
@@ -277,7 +285,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 		if (it != itVers)
 		{
 			Poco::UInt8 valueSize = static_cast<Poco::UInt8>(it->second.size());
-			TXTRecordSetValue(&ref, it->first.c_str(), valueSize, valueSize == 0 ? 0 : it->second.c_str());
+			TXTRecordSetValue(&ref, it->first.c_str(), valueSize, valueSize == 0 ? nullptr : it->second.c_str());
 		}
 	}
 	const void* txtRecord = TXTRecordGetBytesPtr(&ref);

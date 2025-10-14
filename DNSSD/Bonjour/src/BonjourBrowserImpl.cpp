@@ -174,7 +174,7 @@ BrowseHandle BonjourBrowserImpl::browse(const std::string& regType, const std::s
 {
 	DNSServiceRef sdRef(nullptr);
 	EventLoop::ScopedLock lock(_eventLoop);
-	DNSServiceErrorType err = DNSServiceBrowse(&sdRef, 0, networkInterface, regType.c_str(), domain.empty() ? 0 : domain.c_str(), Poco::DNSSD::Bonjour::onBrowseReply, this);
+	DNSServiceErrorType err = DNSServiceBrowse(&sdRef, 0, networkInterface, regType.c_str(), domain.empty() ? nullptr : domain.c_str(), Poco::DNSSD::Bonjour::onBrowseReply, this);
 	if (err == kDNSServiceErr_NoError)
 	{
 		_eventLoop.add(sdRef);
@@ -186,7 +186,7 @@ BrowseHandle BonjourBrowserImpl::browse(const std::string& regType, const std::s
 
 BrowseHandle BonjourBrowserImpl::resolve(const Service& service, int options)
 {
-	DNSServiceRef sdRef(0);
+	DNSServiceRef sdRef(nullptr);
 	Poco::Int32 ifIndex = (options & RESOLVE_ON_ALL_INTERFACES) ? 0 : service.networkInterface();
 	EventLoop::ScopedLock lock(_eventLoop);
 	DNSServiceErrorType err = DNSServiceResolve(&sdRef, 0, ifIndex, service.name().c_str(), service.type().c_str(), service.domain().c_str(), Poco::DNSSD::Bonjour::onResolveReply, this);
@@ -202,7 +202,7 @@ BrowseHandle BonjourBrowserImpl::resolve(const Service& service, int options)
 
 BrowseHandle BonjourBrowserImpl::enumerateBrowseDomains(Poco::Int32 networkInterface)
 {
-	DNSServiceRef sdRef(0);
+	DNSServiceRef sdRef(nullptr);
 	EventLoop::ScopedLock lock(_eventLoop);
 	DNSServiceErrorType err = DNSServiceEnumerateDomains(&sdRef, kDNSServiceFlagsBrowseDomains, networkInterface, Poco::DNSSD::Bonjour::onEnumerateBrowseDomainsReply, this);
 	if (err == kDNSServiceErr_NoError)
@@ -216,7 +216,7 @@ BrowseHandle BonjourBrowserImpl::enumerateBrowseDomains(Poco::Int32 networkInter
 
 BrowseHandle BonjourBrowserImpl::enumerateRegistrationDomains(Poco::Int32 networkInterface)
 {
-	DNSServiceRef sdRef(0);
+	DNSServiceRef sdRef(nullptr);
 	EventLoop::ScopedLock lock(_eventLoop);
 	DNSServiceErrorType err = DNSServiceEnumerateDomains(&sdRef, kDNSServiceFlagsRegistrationDomains, networkInterface, Poco::DNSSD::Bonjour::onEnumerateRegistrationDomainsReply, this);
 	if (err == kDNSServiceErr_NoError)
@@ -247,7 +247,7 @@ BrowseHandle BonjourBrowserImpl::queryRecord(const std::string& name, Poco::UInt
 
 BrowseHandle BonjourBrowserImpl::resolveHost(const std::string& host, int options, Poco::Int32 networkInterface)
 {
-	DNSServiceRef sdRef(0);
+	DNSServiceRef sdRef(nullptr);
 	DNSServiceFlags flags(0);
 	if (options & BROWSE_FORCE_MULTICAST) flags |= kDNSServiceFlagsForceMulticast;
 	EventLoop::ScopedLock lock(_eventLoop);
