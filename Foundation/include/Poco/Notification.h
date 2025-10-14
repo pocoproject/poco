@@ -57,6 +57,59 @@ protected:
 };
 
 
+template <typename T>
+class DataNotification: public Notification
+	/// DataNotification carries a topic and an associated payload of type T.
+{
+public:
+	using Ptr = AutoPtr<DataNotification<T>>;
+
+	template <typename U = T>
+	DataNotification(std::string topic, U&& data)
+		/// Creates the DataNotification with a topic and payload.
+		: Notification(std::move(topic)),
+		  _payload(std::forward<U>(data))
+	{
+	}
+
+	explicit DataNotification(std::string topic)
+		/// Creates the DataNotification with a topic and a default-constructed payload.
+		: Notification(std::move(topic)),
+		  _payload()
+	{
+	}
+
+	~DataNotification() override = default;
+
+	std::string topic() const
+		/// Returns the notification topic.
+	{
+		return name();
+	}
+
+	const T& payload() const
+		/// Returns the payload.
+	{
+		return _payload;
+	}
+
+	T& payload()
+		/// Returns a modifiable reference to the payload.
+	{
+		return _payload;
+	}
+
+	void setPayload(T data)
+		/// Sets the payload.
+	{
+		_payload = std::move(data);
+	}
+
+private:
+	T _payload;
+};
+
+
 } // namespace Poco
 
 
