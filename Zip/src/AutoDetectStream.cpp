@@ -48,7 +48,7 @@ AutoDetectStreamBuf::~AutoDetectStreamBuf()
 int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	poco_assert_dbg(length >= 8);
-	if (_pIstr == 0 || length == 0) return -1;
+	if (_pIstr == nullptr || length == 0) return -1;
 
 	if (_reposition)
 	{
