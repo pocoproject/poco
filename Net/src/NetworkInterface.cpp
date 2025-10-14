@@ -1369,13 +1369,13 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* currIface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* currIface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
+	for (currIface = ifaces; currIface != nullptr; currIface = currIface->ifa_next)
 	{
 		try
 		{

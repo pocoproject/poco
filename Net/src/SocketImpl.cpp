@@ -1497,7 +1497,7 @@ namespace
 				sent = sendfile(sd, fd, &noffset, count);
 			#elif POCO_OS == POCO_OS_MAC_OS_X
 				off_t len = count;
-				int result = sendfile(fd, sd, offset, &len, NULL, 0);
+				int result = sendfile(fd, sd, offset, &len, nullptr, 0);
 				if (result < 0)
 				{
 					sent = -1;

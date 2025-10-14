@@ -71,7 +71,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 	URI resolvedURI(uri);
 	URI proxyUri;
-	HTTPClientSession* pSession = 0;
+	HTTPClientSession* pSession = nullptr;
 	HTTPResponse res;
 	try
 	{
@@ -139,7 +139,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 					authorize = false;
 				}
 				delete pSession;
-				pSession = 0;
+				pSession = nullptr;
 				++redirects;
 				retry = true;
 			}
@@ -156,7 +156,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				// only use for one single request!
 				proxyUri.resolve(res.get("Location"));
 				delete pSession;
-				pSession = 0;
+				pSession = nullptr;
 				retry = true; // only allow useproxy once
 			}
 			else if (res.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED && !authorize)

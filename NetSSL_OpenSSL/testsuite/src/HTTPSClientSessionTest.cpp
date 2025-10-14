@@ -315,7 +315,7 @@ void HTTPSClientSessionTest::testMultipleSSLInit()
 				Context::VerificationMode::VERIFY_STRICT, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
 			)
 		);
-		SSLManager::instance().initializeClient(0, ptrCert, context);
+		SSLManager::instance().initializeClient(nullptr, ptrCert, context);
 	};
 
 	auto deinitSSL = []()
