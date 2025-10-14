@@ -20,9 +20,9 @@ add_library(PDF ${SRCS})
 target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:HPDF::HPDF>")
 
 if (POCO_UNBUNDLED)
-	target_link_libraries(PDF PRIVATE PNG::PNG)
+	target_link_libraries(PDF PRIVATE PNG::PNG ZLIB::ZLIB)
 else()
-	target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>")
+	target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>" "$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>")
 endif()
 
 

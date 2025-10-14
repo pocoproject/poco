@@ -20,6 +20,7 @@ target_include_directories(_BUNDLED_HPDF
 if (POCO_UNBUNDLED)
 	target_link_libraries(_BUNDLED_HPDF PRIVATE PNG::PNG)
 else()
+	target_link_libraries(_BUNDLED_HPDF PRIVATE "$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>")
 	target_link_libraries(_BUNDLED_HPDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>")
 endif()
 
