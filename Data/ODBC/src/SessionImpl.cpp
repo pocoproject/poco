@@ -318,7 +318,7 @@ bool SessionImpl::getMultiActiveResultset(const std::string&) const
 {
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 	SQLINTEGER mars;
-	Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &mars, SQL_IS_INTEGER, 0);
+	Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &mars, SQL_IS_INTEGER, nullptr);
 	return mars == SQL_MARS_ENABLED_YES;
 #else
 	return false;

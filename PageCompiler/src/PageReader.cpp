@@ -27,7 +27,7 @@ const std::string PageReader::ESC_EXPR_END(");\n");
 
 PageReader::PageReader(Page& page, const std::string& path):
 	_page(page),
-	_pParent(0),
+	_pParent(nullptr),
 	_path(path),
 	_line(0),
 	_emitLineDirectives(false)

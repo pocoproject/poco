@@ -1024,5 +1024,5 @@ CppUnit::Test* ODBCOracleTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }
