@@ -23,7 +23,7 @@ namespace Redis {
 
 RedisEventArgs::RedisEventArgs(RedisType::Ptr pMessage):
 	_message(pMessage),
-	_exception(0),
+	_exception(nullptr),
 	_stop(false)
 {
 }
@@ -31,7 +31,7 @@ RedisEventArgs::RedisEventArgs(RedisType::Ptr pMessage):
 
 RedisEventArgs::RedisEventArgs(Exception* pException):
 	_message(),
-	_exception(pException ? pException->clone() : 0),
+	_exception(pException ? pException->clone() : nullptr),
 	_stop(false)
 {
 }
