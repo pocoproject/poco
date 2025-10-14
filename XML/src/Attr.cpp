@@ -56,7 +56,7 @@ void Attr::setValue(const XMLString& value)
 
 Node* Attr::parentNode() const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -72,7 +72,7 @@ Node* Attr::previousSibling() const
 		}
 		return pSibling;
 	}
-	return 0;
+	return nullptr;
 }
 
 

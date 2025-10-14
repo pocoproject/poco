@@ -76,14 +76,14 @@ void NodeIteratorTest::testShowAll()
 	assertTrue (it.nextNode() == pText1);
 	assertTrue (it.nextNode() == pElem2);
 	assertTrue (it.nextNode() == pText2);
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
 	assertTrue (it.previousNode() == pText2);
 	assertTrue (it.previousNode() == pElem2);
 	assertTrue (it.previousNode() == pText1);
 	assertTrue (it.previousNode() == pElem1);
 	assertTrue (it.previousNode() == pRoot);
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 }
 
 
@@ -107,12 +107,12 @@ void NodeIteratorTest::testShowElements()
 	assertTrue (it.nextNode() == pRoot);
 	assertTrue (it.nextNode() == pElem1);
 	assertTrue (it.nextNode() == pElem2);
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
 	assertTrue (it.previousNode() == pElem2);
 	assertTrue (it.previousNode() == pElem1);
 	assertTrue (it.previousNode() == pRoot);
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 }
 
 
@@ -135,10 +135,10 @@ void NodeIteratorTest::testFilter()
 	NodeIterator it(pRoot, NodeFilter::SHOW_ELEMENT, &filter);
 
 	assertTrue (it.nextNode() == pElem1);
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
 	assertTrue (it.previousNode() == pElem1);
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 }
 
 
@@ -159,9 +159,9 @@ void NodeIteratorTest::testShowNothing()
 
 	NodeIterator it(pRoot, 0);
 
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 }
 
 
