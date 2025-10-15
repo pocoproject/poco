@@ -499,6 +499,14 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 {
 	UnicodeConverter::toUTF16(utf8Path, utf16Path);
+	if (utf16Path.length() > 0 && utf16Path.back() == L':')
+	{
+		// If the path only has disk letter, we must make sure it ends with backslash!
+		// Or it will be failed to call Windows API GetFileAttributesW().
+		// For example:
+		//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
+		utf16Path.push_back(L'\\');
+	}
 	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' || utf16Path[1] == ':')
