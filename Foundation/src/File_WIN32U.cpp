@@ -57,25 +57,10 @@ FileImpl::FileImpl()
 
 FileImpl::FileImpl(const std::string& path): _path(path)
 {
-	// If the path only has disk letter, we must make sure it ends with backslash!
-	// Or it will be failed to call Windows API GetFileAttributesW().
-	// For example:
-	//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
 	std::string::size_type n = _path.size();
-	if (n > 1)
+	if (n > 1 && (_path[n - 1] == '\\' || _path[n - 1] == '/') && !((n == 3 && _path[1]==':')))
 	{
-		auto ch = _path.back();
-		if (ch == ':')
-		{
-			_path.push_back('\\'); // Add backslash near to disk letter
-		}
-		else if (ch == '\\' || ch == '/')
-		{
-			if (_path[n - 2] != ':')
-			{
-				_path.pop_back(); // Remove backslash if it's a normal path
-			}
-		}
+		_path.resize(n - 1);
 	}
 	convertPath(_path, _upath);
 }
@@ -96,25 +81,10 @@ void FileImpl::swapImpl(FileImpl& file)
 void FileImpl::setPathImpl(const std::string& path)
 {
 	_path = path;
-	// If the path only has disk letter, we must make sure it ends with backslash!
-	// Or it will be failed to call Windows API GetFileAttributesW().
-	// For example:
-	//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
 	std::string::size_type n = _path.size();
-	if (n > 1)
+	if (n > 1 && (_path[n - 1] == '\\' || _path[n - 1] == '/') && !((n == 3 && _path[1]==':')))
 	{
-		auto ch = _path.back();
-		if (ch == ':')
-		{
-			_path.push_back('\\'); // Add backslash near to disk letter
-		}
-		else if (ch == '\\' || ch == '/')
-		{
-			if (_path[n - 2] != ':')
-			{
-				_path.pop_back(); // Remove backslash if it's a normal path
-			}
-		}
+		_path.resize(n - 1);
 	}
 	convertPath(_path, _upath);
 }
