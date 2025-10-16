@@ -60,7 +60,7 @@ namespace Poco {
 			struct timespec ts;
 			ts.tv_sec = 0;
 			ts.tv_nsec = sleepMillis*1000000;
-			nanosleep(&ts, NULL);
+			nanosleep(&ts, nullptr);
 #else
 			struct timeval tv;
 			tv.tv_sec  = 0;
@@ -105,12 +105,12 @@ namespace Poco {
 			struct timespec ts;
 			ts.tv_sec = 0;
 			ts.tv_nsec = sleepMillis*1000000;
-			nanosleep(&ts, NULL);
+			nanosleep(&ts, nullptr);
 #else
 			struct timeval tv;
 			tv.tv_sec  = 0;
 			tv.tv_usec = sleepMillis * 1000;
-			select(0, NULL, NULL, NULL, &tv);
+			select(0, nullptr, nullptr, nullptr, &tv);
 #endif
 		}
 		while (!now.isElapsed(diff));

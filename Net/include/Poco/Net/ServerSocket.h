@@ -114,7 +114,7 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
-        ///
+		///
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 

@@ -1588,7 +1588,7 @@ public:
 		if (!args.message().isNull())
 		{
 			Type<Array>* arrayType = dynamic_cast<Type<Array>*>(args.message().get());
-			if (arrayType != NULL)
+			if (arrayType != nullptr)
 			{
 				Array& array = arrayType->value();
 				if (array.size() == 3)

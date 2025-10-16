@@ -52,7 +52,7 @@ using namespace Poco::CppParser;
 
 std::string DocWriter::_language;
 DocWriter::StringMap DocWriter::_strings;
-Poco::Logger* DocWriter::_pLogger(0);
+Poco::Logger* DocWriter::_pLogger(nullptr);
 const std::string DocWriter::RFC_URI("https://www.ietf.org/rfc/rfc");
 const std::string DocWriter::GITHUB_POCO_URI("https://github.com/pocoproject/poco");
 const std::string DocWriter::DATABASE_DIR("/dist/");
@@ -66,7 +66,7 @@ DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& p
 	_literalMode(false),
 	_symbols(symbols),
 	_path(path),
-	_pNameSpace(0),
+	_pNameSpace(nullptr),
 	_pendingLine(false),
 	_indent(0),
 	_titleId(0),
@@ -2559,7 +2559,7 @@ NameSpace* DocWriter::rootNameSpace() const
 			return pNS;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 

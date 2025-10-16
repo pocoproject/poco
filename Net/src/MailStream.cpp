@@ -21,14 +21,14 @@ namespace Net {
 
 MailStreamBuf::MailStreamBuf(std::istream& istr):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_state(ST_CR_LF)
 {
 }
 
 
 MailStreamBuf::MailStreamBuf(std::ostream& ostr):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_state(ST_CR_LF)
 {

@@ -58,7 +58,7 @@ void Struct::addBase(const std::string& name, Symbol::Access access, bool isVirt
 	base.name      = name;
 	base.access    = access;
 	base.isVirtual = isVirtual;
-	base.pClass = 0;
+	base.pClass = nullptr;
 	_bases.push_back(base);
 }
 
@@ -154,7 +154,7 @@ Function* Struct::destructor() const
 		if (pFunc && pFunc->isDestructor())
 			return pFunc;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -220,7 +220,7 @@ Function* Struct::findFunction(const std::string& signature) const
 			if (pFunc) return pFunc;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 

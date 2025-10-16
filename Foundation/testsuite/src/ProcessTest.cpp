@@ -97,7 +97,7 @@ void ProcessTest::testLaunchRedirectIn()
 	std::vector<std::string> args;
 	args.push_back("-count");
 	Pipe inPipe;
-	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(100, 'x');
 	ostr.close();
@@ -123,7 +123,7 @@ void ProcessTest::testLaunchRedirectOut()
 	std::vector<std::string> args;
 	args.push_back("-hello");
 	Pipe outPipe;
-	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0);
+	ProcessHandle ph = Process::launch(cmd, args, nullptr, &outPipe, nullptr);
 	PipeInputStream istr(outPipe);
 	std::string s;
 	int c = istr.get();
@@ -156,7 +156,7 @@ void ProcessTest::testLaunchEnv()
 #if defined(_WIN32)
 	env["PATH"] = Poco::Environment::get("PATH"); // required for VS
 #endif
-	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0, env);
+	ProcessHandle ph = Process::launch(cmd, args, nullptr, &outPipe, nullptr, env);
 	PipeInputStream istr(outPipe);
 	std::string s;
 	int c = istr.get();
@@ -274,7 +274,7 @@ void ProcessTest::testIsRunning()
 	std::vector<std::string> args;
 	args.push_back("-count");
 	Pipe inPipe;
-	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
 	Process::PID id = ph.id();
 	assertTrue (Process::isRunning(ph));
 	assertTrue (Process::isRunning(id));

@@ -37,7 +37,7 @@ class Data_API Transaction
 	/// See Transaction for more details and purpose of this template.
 {
 public:
-	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = 0);
+	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = nullptr);
 		/// Creates the Transaction and starts it, using the given database session and logger.
 
 	Transaction(Poco::Data::Session& session, bool start);
@@ -46,7 +46,7 @@ public:
 		/// to start the transaction.
 
 	template <typename T>
-	Transaction(Poco::Data::Session& rSession, T& t, Poco::Logger* pLogger = 0):
+	Transaction(Poco::Data::Session& rSession, T& t, Poco::Logger* pLogger = nullptr):
 		_rSession(rSession),
 		_pLogger(pLogger)
 		/// Creates the Transaction, using the given database session, transactor and logger.

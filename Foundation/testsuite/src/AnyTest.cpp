@@ -57,7 +57,7 @@ void AnyTest::testAnyDefaultCtor()
 	const Any value;
 
 	assertTrue (value.empty());
-	assertTrue (0 == AnyCast<int>(&value));
+	assertTrue (nullptr == AnyCast<int>(&value));
 	assertTrue (value.type() == typeid(void));
 }
 
@@ -69,8 +69,8 @@ void AnyTest::testAnyConvertingCtor()
 
 	assertTrue (!value.empty());
 	assertTrue (value.type() == typeid(std::string));
-	assertTrue (0 == AnyCast<int>(&value));
-	assertTrue (0 != AnyCast<std::string>(&value));
+	assertTrue (nullptr == AnyCast<int>(&value));
+	assertTrue (nullptr != AnyCast<std::string>(&value));
 	assertTrue (AnyCast<std::string>(value) == text);
 	assertTrue (AnyCast<std::string>(&value) != &text);
 }
@@ -119,8 +119,8 @@ void AnyTest::testAnyConvertingAssign()
 
 	assertTrue (!value.empty());
 	assertTrue (value.type() == typeid(std::string));
-	assertTrue (0 == AnyCast<int>(&value));
-	assertTrue (0 != AnyCast<std::string>(&value));
+	assertTrue (nullptr == AnyCast<int>(&value));
+	assertTrue (nullptr != AnyCast<std::string>(&value));
 	assertTrue (AnyCast<std::string>(value) == text);
 	assertTrue (AnyCast<std::string>(&value) != &text);
 	assertTrue (assignResult == &value);
@@ -218,7 +218,7 @@ void AnyTest::testAnySwap()
 	assertTrue (!swapped.empty());
 	assertTrue (swapped.type() == typeid(std::string));
 	assertTrue (text == AnyCast<std::string>(swapped));
-	assertTrue (0 != originalPtr);
+	assertTrue (nullptr != originalPtr);
 	assertTrue (swapResult == &original);
 
 	struct BigObject
@@ -262,7 +262,7 @@ void AnyTest::testAnySwap()
 	assertTrue (!swappedBig.empty());
 	assertTrue (swappedBig.type() == typeid(BigObject));
 	assertTrue (bigObject == AnyCast<BigObject>(swappedBig));
-	assertTrue (0 != bigPtr);
+	assertTrue (nullptr != bigPtr);
 	assertTrue (swapBigResult == &bigOriginal);
 
 	// assure proper assignment behavior after swapping
@@ -326,7 +326,7 @@ void AnyTest::testAnyInt()
 	*cpyI = 20;
 	assertTrue (*cpyI != *i);
 	std::string* s = AnyCast<std::string>(&a);
-	assertTrue (s == NULL);
+	assertTrue (s == nullptr);
 
 	int POCO_UNUSED tmp = AnyCast<int>(a);
 	const Any c = a;
@@ -337,7 +337,7 @@ void AnyTest::testAnyInt()
 class A
 {
 public:
-    void f() {}
+	void f() {}
 	int m;
 };
 
@@ -359,7 +359,7 @@ void AnyTest::testAnyPointer()
 	*cpyI = 20;
 	assertTrue (*cpyI == *p);
 	std::string* s = AnyCast<std::string>(&a);
-	assertTrue (s == NULL);
+	assertTrue (s == nullptr);
 	assertTrue (AnyCast<std::nullptr_t>(&a) == nullptr);
 
 	int* POCO_UNUSED tmp = AnyCast<int*>(a);
@@ -368,7 +368,7 @@ void AnyTest::testAnyPointer()
 
 	Any nullPtr(nullptr);
 	assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullptr));
-	assertFalse (AnyHoldsNullPtr<void*>(0));
+	assertFalse (AnyHoldsNullPtr<void*>(nullptr));
 	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
 	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(&nullPtr));
 	try

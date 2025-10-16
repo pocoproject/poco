@@ -310,7 +310,7 @@ void MD5Engine::decode(UInt32* output, const unsigned char* input, std::size_t l
 
 	for (i = 0, j = 0; j < len; i++, j += 4)
 		output[i] = ((UInt32)input[j]) | (((UInt32)input[j+1]) << 8) |
-		            (((UInt32)input[j+2]) << 16) | (((UInt32)input[j+3]) << 24);
+					(((UInt32)input[j+2]) << 16) | (((UInt32)input[j+3]) << 24);
 }
 
 

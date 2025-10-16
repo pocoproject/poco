@@ -85,10 +85,10 @@ public:
 
 #if defined(POCO_HAVE_INT64)
 	virtual Int64 asInteger64() const;
-        /// Returns a 64-bit integer representation of the token.
+		/// Returns a 64-bit integer representation of the token.
 
 	virtual UInt64 asUnsignedInteger64() const;
-        /// Returns an unsigned 64-bit integer representation of the token.
+		/// Returns an unsigned 64-bit integer representation of the token.
 #endif
 
 	virtual int asInteger() const;

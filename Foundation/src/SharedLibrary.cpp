@@ -78,7 +78,7 @@ bool SharedLibrary::isLoaded() const
 
 bool SharedLibrary::hasSymbol(const std::string& name)
 {
-	return findSymbolImpl(name) != 0;
+	return findSymbolImpl(name) != nullptr;
 }
 
 

@@ -86,11 +86,11 @@ public:
 
 	char* begin() const;
 		/// Returns the start address of the shared memory segment.
-		/// Will be NULL for illegal segments.
+		/// Will be nullptr for illegal segments.
 
 	char* end() const;
 		/// Returns the one-past-end end address of the shared memory segment.
-		/// Will be NULL for illegal segments.
+		/// Will be nullptr for illegal segments.
 
 private:
 	SharedMemoryImpl* _pImpl;

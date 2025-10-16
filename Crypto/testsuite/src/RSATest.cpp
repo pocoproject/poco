@@ -101,7 +101,7 @@ void RSATest::testNewKeys()
 	RSAKey key2(&iPub, &iPriv, "testpwd");
 
 	std::istringstream iPriv2(privKey);
-	RSAKey key3(0, &iPriv2,  "testpwd");
+	RSAKey key3(nullptr, &iPriv2,  "testpwd");
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
@@ -124,7 +124,7 @@ void RSATest::testNewKeysNoPassphrase()
 	RSAKey key2(&iPub, &iPriv);
 
 	std::istringstream iPriv2(privKey);
-	RSAKey key3(0, &iPriv2);
+	RSAKey key3(nullptr, &iPriv2);
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
@@ -219,17 +219,17 @@ void RSATest::testRSACipher()
 	strPub.close();
 	strPriv.close();
 
-    Poco::Crypto::RSAKey encryptKey(pubKeyFile);
+	Poco::Crypto::RSAKey encryptKey(pubKeyFile);
 	Poco::Crypto::RSAKey decryptKey(pubKeyFile, privKeyFile);
 
-    Poco::Crypto::CipherFactory factory;
-    auto iengine = factory.createCipher(encryptKey);
-    auto oengine = factory.createCipher(decryptKey);
+	Poco::Crypto::CipherFactory factory;
+	auto iengine = factory.createCipher(encryptKey);
+	auto oengine = factory.createCipher(decryptKey);
 
-    std::string ss = "test_str";
-    auto enc = iengine->encryptString(ss);
-    auto dec = oengine->decryptString(enc);
-    assertEqual (ss, dec);
+	std::string ss = "test_str";
+	auto enc = iengine->encryptString(ss);
+	auto dec = oengine->decryptString(enc);
+	assertEqual (ss, dec);
 
 	delete iengine;
 	delete oengine;
@@ -269,7 +269,7 @@ void RSATest::testCertificate()
 	X509Certificate cert(str);
 	RSAKey publicKey(cert);
 	std::istringstream str2(anyPem);
-	RSAKey privateKey(0, &str2, "test");
+	RSAKey privateKey(nullptr, &str2, "test");
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(publicKey);
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(privateKey);
 	std::string val("lets do some encryption");

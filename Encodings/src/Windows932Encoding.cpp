@@ -25,7 +25,7 @@ const char* Windows932Encoding::_names[] =
 	"cp932",
 	"CP932",
 	"shift_jis",
-	NULL
+	nullptr
 };
 
 

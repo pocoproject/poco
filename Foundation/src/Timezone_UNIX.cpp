@@ -34,7 +34,7 @@ public:
 		std::lock_guard<std::mutex> lock(_mutex);
 
 	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID // no timezone global var
-		std::time_t now = std::time(NULL);
+		std::time_t now = std::time(nullptr);
 		struct std::tm t;
 		gmtime_r(&now, &t);
 		std::time_t utc = std::mktime(&t);

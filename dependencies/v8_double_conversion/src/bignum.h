@@ -75,27 +75,27 @@ class Bignum {
   //  +1 if a > b.
   static int Compare(const Bignum& a, const Bignum& b);
   static bool Equal(const Bignum& a, const Bignum& b) {
-    return Compare(a, b) == 0;
+	return Compare(a, b) == 0;
   }
   static bool LessEqual(const Bignum& a, const Bignum& b) {
-    return Compare(a, b) <= 0;
+	return Compare(a, b) <= 0;
   }
   static bool Less(const Bignum& a, const Bignum& b) {
-    return Compare(a, b) < 0;
+	return Compare(a, b) < 0;
   }
   // Returns Compare(a + b, c);
   static int PlusCompare(const Bignum& a, const Bignum& b, const Bignum& c);
   // Returns a + b == c
   static bool PlusEqual(const Bignum& a, const Bignum& b, const Bignum& c) {
-    return PlusCompare(a, b, c) == 0;
+	return PlusCompare(a, b, c) == 0;
   }
   // Returns a + b <= c
   static bool PlusLessEqual(const Bignum& a, const Bignum& b, const Bignum& c) {
-    return PlusCompare(a, b, c) <= 0;
+	return PlusCompare(a, b, c) <= 0;
   }
   // Returns a + b < c
   static bool PlusLess(const Bignum& a, const Bignum& b, const Bignum& c) {
-    return PlusCompare(a, b, c) < 0;
+	return PlusCompare(a, b, c) < 0;
   }
  private:
   typedef uint32_t Chunk;
@@ -112,18 +112,18 @@ class Bignum {
   static const int kBigitCapacity = kMaxSignificantBits / kBigitSize;
 
   static void EnsureCapacity(const int size) {
-    if (size > kBigitCapacity) {
-      DOUBLE_CONVERSION_UNREACHABLE();
-    }
+	if (size > kBigitCapacity) {
+	  DOUBLE_CONVERSION_UNREACHABLE();
+	}
   }
   void Align(const Bignum& other);
   void Clamp();
   bool IsClamped() const {
-    return used_bigits_ == 0 || RawBigit(used_bigits_ - 1) != 0;
+	return used_bigits_ == 0 || RawBigit(used_bigits_ - 1) != 0;
   }
   void Zero() {
-    used_bigits_ = 0;
-    exponent_ = 0;
+	used_bigits_ = 0;
+	exponent_ = 0;
   }
   // Requires this to have enough capacity (no tests done).
   // Updates used_bigits_ if necessary.

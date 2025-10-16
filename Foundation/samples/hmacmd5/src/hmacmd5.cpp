@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	if (argc != 3)
 	{
 		std::cout << "usage: " << argv[0] << ": <passphrase> <input_file>" << std::endl
-		          << "       create the HMAC-MD5 for <input_file>, using <passphrase>" << std::endl;
+				  << "       create the HMAC-MD5 for <input_file>, using <passphrase>" << std::endl;
 		return 1;
 	}
 

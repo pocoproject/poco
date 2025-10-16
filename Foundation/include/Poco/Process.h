@@ -63,9 +63,9 @@ public:
 		/// and returns the exit code of the process.
 
 	int tryWait() const;
- 		/// Checks that process is terminated
- 		/// and returns the exit code of the process.
- 		/// If the process is still running, returns -1.
+		/// Checks that process is terminated
+		/// and returns the exit code of the process.
+		/// If the process is still running, returns -1.
 
 protected:
 	ProcessHandle(ProcessHandleImpl* pImpl);
@@ -222,8 +222,8 @@ public:
 		/// and returns the exit code of the process.
 
 	static int tryWait(const ProcessHandle& handle);
- 		/// Checks that process is finished and returns the exit code of the
- 		/// process. If the process is still running, returns -1.
+		/// Checks that process is finished and returns the exit code of the
+		/// process. If the process is still running, returns -1.
 
 	static bool isRunning(const ProcessHandle& handle);
 		/// check if the process specified by handle is running or not

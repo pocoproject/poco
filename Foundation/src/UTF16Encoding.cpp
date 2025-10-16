@@ -24,7 +24,7 @@ const char* UTF16Encoding::_names[] =
 {
 	"UTF-16",
 	"UTF16",
-	NULL
+	nullptr
 };
 
 

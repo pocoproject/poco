@@ -21,17 +21,17 @@ class CppUnit_API CppUnitException: public std::exception
 {
 public:
 	CppUnitException(const std::string& message = "",
-	                 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
-	                 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
+					 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
+					 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
 	CppUnitException(const std::string& message,
-	                 long lineNumber,
-	                 long data1lineNumber,
-	                 const std::string& fileName);
+					 long lineNumber,
+					 long data1lineNumber,
+					 const std::string& fileName);
 	CppUnitException(const std::string& message,
-	                 long lineNumber,
-	                 long data1lineNumber,
-	                 long data2lineNumber,
-	                 const std::string& fileName);
+					 long lineNumber,
+					 long data1lineNumber,
+					 long data2lineNumber,
+					 const std::string& fileName);
 	CppUnitException(const CppUnitException& other);
 	~CppUnitException() noexcept override;
 
@@ -58,11 +58,11 @@ private:
 
 inline CppUnitException::CppUnitException(const CppUnitException& other): exception (other)
 {
-    _message         = other._message;
-    _lineNumber      = other._lineNumber;
-    _data1lineNumber = other._data1lineNumber;
-    _data2lineNumber = other._data2lineNumber;
-    _fileName        = other._fileName;
+	_message         = other._message;
+	_lineNumber      = other._lineNumber;
+	_data1lineNumber = other._data1lineNumber;
+	_data2lineNumber = other._data2lineNumber;
+	_fileName        = other._fileName;
 }
 
 
@@ -90,15 +90,15 @@ inline CppUnitException& CppUnitException::operator = (const CppUnitException& o
 {
 	exception::operator= (other);
 
-    if (&other != this)
-    {
-        _message    = other._message;
-        _lineNumber = other._lineNumber;
-        _data1lineNumber = other._data1lineNumber;
-        _data2lineNumber = other._data2lineNumber;
-        _fileName   = other._fileName;
-    }
-    return *this;
+	if (&other != this)
+	{
+		_message    = other._message;
+		_lineNumber = other._lineNumber;
+		_data1lineNumber = other._data1lineNumber;
+		_data2lineNumber = other._data2lineNumber;
+		_fileName   = other._fileName;
+	}
+	return *this;
 }
 
 

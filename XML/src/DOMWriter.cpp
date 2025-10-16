@@ -31,7 +31,7 @@ namespace XML {
 
 
 DOMWriter::DOMWriter():
-	_pTextEncoding(0),
+	_pTextEncoding(nullptr),
 	_options(0),
 	_indent("\t")
 {

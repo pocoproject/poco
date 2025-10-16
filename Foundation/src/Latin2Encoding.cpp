@@ -24,7 +24,7 @@ const char* Latin2Encoding::_names[] =
 	"ISO-8859-2",
 	"Latin2",
 	"Latin-2",
-	NULL
+	nullptr
 };
 
 

@@ -152,8 +152,8 @@ public:
 		if (it == _map.end())
 		{
 			LibraryInfo li;
-			li.pLibrary  = 0;
-			li.pManifest = 0;
+			li.pLibrary  = nullptr;
+			li.pManifest = nullptr;
 			li.refCount  = 1;
 			try
 			{
@@ -314,7 +314,7 @@ public:
 		if (it != _map.end())
 			return it->second.pManifest;
 		else
-			return 0;
+			return nullptr;
 	}
 
 	const Manif& manifestFor(const std::string& path) const
@@ -332,7 +332,7 @@ public:
 		/// Returns true if the library with the given name
 		/// has already been loaded.
 	{
-		return findManifest(path) != 0;
+		return findManifest(path) != nullptr;
 	}
 
 	Iterator begin() const

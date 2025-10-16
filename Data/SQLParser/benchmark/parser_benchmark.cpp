@@ -24,14 +24,14 @@ static void BM_CharacterCount(benchmark::State& st) {
   st.counters["num_tokens"] = getNumTokens(query);
   st.counters["num_chars"] = query.size();
   while (st.KeepRunning()) {
-    hsql::SQLParserResult result;
-    hsql::SQLParser::parse(query, &result);
+	hsql::SQLParserResult result;
+	hsql::SQLParser::parse(query, &result);
   }
 }
 BENCHMARK(BM_CharacterCount)
   ->RangeMultiplier(1 << 2)
   ->Ranges({{1 << 5, 1 << 15},
-            {5, 5}});
+			{5, 5}});
 
 // Benchmark the influence of increasing number of tokens, while
 // the number of characters remains unchanged.
@@ -46,42 +46,42 @@ static void BM_ConditionalTokens(benchmark::State& st) {
   std::stringstream condStream;
   size_t missingTokens = numTokens - 4;
   if (missingTokens > 0) {
-    condStream << " WHERE a";
-    missingTokens -= 2;
+	condStream << " WHERE a";
+	missingTokens -= 2;
 
-    while (missingTokens > 0) {
-      condStream << " AND a";
-      missingTokens -= 2;
-    }
+	while (missingTokens > 0) {
+	  condStream << " AND a";
+	  missingTokens -= 2;
+	}
   }
 
   query += condStream.str();
 
   if (targetSize >= query.size()) {
-    const size_t pad = targetSize - query.size();
-    const std::string filler = std::string(pad, 'a');
-    query.replace(7, 1, filler);
+	const size_t pad = targetSize - query.size();
+	const std::string filler = std::string(pad, 'a');
+	query.replace(7, 1, filler);
 
   } else {
-    // Query can't be the same length as in the other benchmarks.
-    // Running this will result in unusable data.
-    fprintf(stderr, "Too many tokens. Query too long for benchmark char limit (%lu > %lu).\n",
-      query.size(), targetSize);
-    return;
+	// Query can't be the same length as in the other benchmarks.
+	// Running this will result in unusable data.
+	fprintf(stderr, "Too many tokens. Query too long for benchmark char limit (%lu > %lu).\n",
+	  query.size(), targetSize);
+	return;
   }
 
   st.counters["num_tokens"] = getNumTokens(query);
   st.counters["num_chars"] = query.size();
   while (st.KeepRunning()) {
-    hsql::SQLParserResult result;
-    hsql::SQLParser::parse(query, &result);
-    if (!result.isValid()) st.SkipWithError("Parsing failed!");
+	hsql::SQLParserResult result;
+	hsql::SQLParser::parse(query, &result);
+	if (!result.isValid()) st.SkipWithError("Parsing failed!");
   }
 }
 BENCHMARK(BM_ConditionalTokens)
   ->RangeMultiplier(1 << 2)
   ->Ranges({{1 << 14, 1 << 14},
-            {1 << 2, 1 << 11}});
+			{1 << 2, 1 << 11}});
 
 
 

@@ -52,7 +52,7 @@ class SSPINTLMProvider
 public:
 	SSPINTLMProvider():
 		_securityLib("security.dll"),
-		_pSecFunTable(0)
+		_pSecFunTable(nullptr)
 	{
 		InitSecurityInterfaceW pInitSecurityInterface = reinterpret_cast<InitSecurityInterfaceW>(_securityLib.getSymbol("InitSecurityInterfaceW"));
 		if (pInitSecurityInterface)
@@ -94,13 +94,13 @@ public:
 
 		TimeStamp expiry;
 		status = _pSecFunTable->AcquireCredentialsHandleW(
-			NULL,
+			nullptr,
 			package,
 			SECPKG_CRED_OUTBOUND,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
 			&pContext->_pImpl->credentials,
 			&expiry);
 
@@ -132,12 +132,12 @@ public:
 		TimeStamp expiry;
 		SECURITY_STATUS status = _pSecFunTable->InitializeSecurityContextW(
 			&context._pImpl->credentials,
-			NULL,
+			nullptr,
 			const_cast<SEC_WCHAR*>(context._pImpl->spn.c_str()),
 			0,
 			0,
 			SECURITY_NETWORK_DREP,
-			NULL,
+			nullptr,
 			0,
 			&context._pImpl->context,
 			&msgBufferDesc,

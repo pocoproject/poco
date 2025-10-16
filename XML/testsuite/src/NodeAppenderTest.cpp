@@ -57,9 +57,9 @@ void NodeAppenderTest::testAppendNode()
 
 	assertTrue (pElem1->nextSibling() == pElem2);
 	assertTrue (pElem2->nextSibling() == pElem3);
-	assertTrue (pElem3->nextSibling() == 0);
+	assertTrue (pElem3->nextSibling() == nullptr);
 
-	assertTrue (pElem1->previousSibling() == 0);
+	assertTrue (pElem1->previousSibling() == nullptr);
 	assertTrue (pElem2->previousSibling() == pElem1);
 	assertTrue (pElem3->previousSibling() == pElem2);
 
@@ -93,7 +93,7 @@ void NodeAppenderTest::testAppendNodeList()
 	pFrag3->appendChild(pElem4);
 
 	appender.appendChild(pFrag1);
-	assertTrue (pRoot->firstChild() == 0);
+	assertTrue (pRoot->firstChild() == nullptr);
 
 	appender.appendChild(pFrag2);
 	assertTrue (pRoot->firstChild() == pElem1);
@@ -101,9 +101,9 @@ void NodeAppenderTest::testAppendNodeList()
 
 	assertTrue (pElem1->nextSibling() == pElem2);
 	assertTrue (pElem2->nextSibling() == pElem3);
-	assertTrue (pElem3->nextSibling() == 0);
+	assertTrue (pElem3->nextSibling() == nullptr);
 
-	assertTrue (pElem1->previousSibling() == 0);
+	assertTrue (pElem1->previousSibling() == nullptr);
 	assertTrue (pElem2->previousSibling() == pElem1);
 	assertTrue (pElem3->previousSibling() == pElem2);
 

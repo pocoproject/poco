@@ -54,7 +54,7 @@ namespace
 		{
 		}
 #endif
-    }
+	}
 }
 
 
@@ -143,10 +143,10 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
 #if defined(_DLL)
-	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
+	_thread = CreateThread(nullptr, _stackSize, ent, pData, 0, &_threadId);
 #else
 	unsigned threadId;
-	_thread = (HANDLE) _beginthreadex(NULL, _stackSize, ent, this, 0, &threadId);
+	_thread = (HANDLE) _beginthreadex(nullptr, _stackSize, ent, this, 0, &threadId);
 	_threadId = static_cast<DWORD>(threadId);
 #endif
 	if (!_thread)

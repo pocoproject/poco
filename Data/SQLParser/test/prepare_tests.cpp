@@ -22,7 +22,7 @@ using hsql::SelectStatement;
 
 TEST(PrepareSingleStatementTest) {
   TEST_PARSE_SINGLE_SQL("PREPARE test FROM 'SELECT * FROM students WHERE grade = ?';", kStmtPrepare, PrepareStatement,
-                        result, prepare);
+						result, prepare);
 
   ASSERT_STREQ(prepare->name, "test");
   ASSERT_STREQ(prepare->query, "SELECT * FROM students WHERE grade = ?");

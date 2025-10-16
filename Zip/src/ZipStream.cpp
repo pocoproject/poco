@@ -32,7 +32,7 @@ namespace Zip {
 ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEntry, bool reposition):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_ptrBuf(),
 	_ptrOBuf(),
 	_ptrHelper(),
@@ -41,7 +41,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 	_expectedCrc32(0),
 	_checkCRC(true),
 	_bytesWritten(0),
-	_pHeader(0)
+	_pHeader(nullptr)
 {
 	if (fileEntry.isDirectory())
 		return;
@@ -82,7 +82,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 
 ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bool reposition):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_ptrBuf(),
 	_ptrOBuf(),
@@ -140,10 +140,10 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 ZipStreamBuf::~ZipStreamBuf()
 {
 	// make sure destruction of streams happens in correct order
-	_ptrOBuf = 0;
-	_ptrOHelper = 0;
-	_ptrBuf = 0;
-	_ptrHelper = 0;
+	_ptrOBuf = nullptr;
+	_ptrOHelper = nullptr;
+	_ptrBuf = nullptr;
+	_ptrHelper = nullptr;
 }
 
 
@@ -207,7 +207,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 			_ptrOHelper->flush();
 			_ptrOHelper->close();
 		}
-		_ptrOBuf = 0;
+		_ptrOBuf = nullptr;
 		if (!*_pOstr) throw Poco::IOException("Bad output stream");
 
 		// write an extra datablock if required
@@ -258,7 +258,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 			_pOstr->seekp(0, std::ios_base::end);
 			if (!*_pOstr) throw Poco::IOException("Bad output stream");
 		}
-		_pHeader = 0;
+		_pHeader = nullptr;
 	}
 }
 

@@ -58,7 +58,7 @@ public:
 	void onResolveReply(AvahiServiceResolver* resolver, AvahiIfIndex interface, AvahiProtocol protocol, AvahiResolverEvent event, const char* name, const char* type, const char* domain, const char* host, const AvahiAddress* a, uint16_t port, AvahiStringList* txt, AvahiLookupResultFlags flags);
 	void onEnumerateBrowseDomainsReply(AvahiDomainBrowser* browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event, const char* domain, AvahiLookupResultFlags flags, bool isDefault);
 	void onEnumerateRegistrationDomainsReply(AvahiDomainBrowser* browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event, const char* domain, AvahiLookupResultFlags flags, bool isDefault);
-    void onQueryRecordReply(AvahiRecordBrowser* browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event, const char* name, uint16_t clazz, uint16_t type, const void* data, std::size_t size, AvahiLookupResultFlags flags);
+	void onQueryRecordReply(AvahiRecordBrowser* browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event, const char* name, uint16_t clazz, uint16_t type, const void* data, std::size_t size, AvahiLookupResultFlags flags);
 
 protected:
 	enum HandleTypes

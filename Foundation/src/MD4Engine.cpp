@@ -176,16 +176,16 @@ const DigestEngine::Digest& MD4Engine::digest()
 /* FF, GG and HH are transformations for rounds 1, 2 and 3 */
 /* Rotation is separate from addition to prevent recomputation */
 #define FF(a, b, c, d, x, s) { \
-    (a) += F ((b), (c), (d)) + (x); \
-    (a) = ROTATE_LEFT ((a), (s)); \
+	(a) += F ((b), (c), (d)) + (x); \
+	(a) = ROTATE_LEFT ((a), (s)); \
   }
 #define GG(a, b, c, d, x, s) { \
-    (a) += G ((b), (c), (d)) + (x) + (UInt32)0x5a827999; \
-    (a) = ROTATE_LEFT ((a), (s)); \
+	(a) += G ((b), (c), (d)) + (x) + (UInt32)0x5a827999; \
+	(a) = ROTATE_LEFT ((a), (s)); \
   }
 #define HH(a, b, c, d, x, s) { \
-    (a) += H ((b), (c), (d)) + (x) + (UInt32)0x6ed9eba1; \
-    (a) = ROTATE_LEFT ((a), (s)); \
+	(a) += H ((b), (c), (d)) + (x) + (UInt32)0x6ed9eba1; \
+	(a) = ROTATE_LEFT ((a), (s)); \
   }
 
 
@@ -279,7 +279,7 @@ void MD4Engine::decode(UInt32* output, const unsigned char* input, std::size_t l
 
 	for (i = 0, j = 0; j < len; i++, j += 4)
 		output[i] = ((UInt32)input[j]) | (((UInt32)input[j+1]) << 8) |
-		            (((UInt32)input[j+2]) << 16) | (((UInt32)input[j+3]) << 24);
+					(((UInt32)input[j+2]) << 16) | (((UInt32)input[j+3]) << 24);
 }
 
 

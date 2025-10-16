@@ -592,11 +592,11 @@ void FileChannelTest::testCompressedRotation()
 
 	for (uint32_t i = 1; i <= MAX_ROLLOVER_TIMES; ++i)
 	{
-	    for (uint32_t j = 0; j < LONG_MAX_FILESIZE; ++j)
-	    {
-	        Poco::Message message("ABC", text, Poco::Message::PRIO_INFORMATION);
-	        fileChannel->log(message);
-	    }
+		for (uint32_t j = 0; j < LONG_MAX_FILESIZE; ++j)
+		{
+			Poco::Message message("ABC", text, Poco::Message::PRIO_INFORMATION);
+			fileChannel->log(message);
+		}
 	}
 
 	fileChannel->close();

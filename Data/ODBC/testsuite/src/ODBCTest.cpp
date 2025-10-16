@@ -1454,7 +1454,7 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	const std::string& dbEncoding)
 {
 	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
+	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return nullptr;
 
 	try
 	{
@@ -1466,6 +1466,6 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	}catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		return nullptr;
 	}
 }

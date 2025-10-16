@@ -49,7 +49,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	const DWORD dwMaxSizeLow = static_cast<DWORD>(_size);
 	const DWORD dwMaxSizeHigh = 0UL;
 #endif
-	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
+	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
 
 	if (!_memHandle)
 	{
@@ -98,12 +98,12 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 
 	std::wstring utf16name;
 	UnicodeConverter::toUTF16(_name, utf16name);
-	_fileHandle = CreateFileW(utf16name.c_str(), fileMode, shareMode, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	_fileHandle = CreateFileW(utf16name.c_str(), fileMode, shareMode, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (_fileHandle == INVALID_HANDLE_VALUE)
 		throw OpenFileException("Cannot open memory mapped file", _name);
 
-	_memHandle = CreateFileMapping(_fileHandle, NULL, _mode, 0, 0, NULL);
+	_memHandle = CreateFileMapping(_fileHandle, nullptr, _mode, 0, 0, nullptr);
 	if (!_memHandle)
 	{
 		DWORD dwRetVal = GetLastError();

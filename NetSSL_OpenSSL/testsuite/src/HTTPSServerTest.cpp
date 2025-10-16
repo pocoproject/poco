@@ -107,7 +107,7 @@ namespace
 			else if (request.getURI() == "/auth")
 				return new AuthRequestHandler();
 			else
-				return 0;
+				return nullptr;
 		}
 	};
 }

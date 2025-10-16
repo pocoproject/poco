@@ -70,7 +70,7 @@ void NDCTest::testNDCScope()
 			auto line3 = __LINE__ - 1;
 			assertTrue (NDC::current().depth() == 3);
 
- 			std::ostringstream ostr1;
+			std::ostringstream ostr1;
 			NDC::current().dump(ostr1);
 			assertEqual (ostr1.str(), Poco::format(
 				"\"item1\" (in \"%s\", line %d)\n"

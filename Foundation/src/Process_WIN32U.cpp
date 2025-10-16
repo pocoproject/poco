@@ -85,7 +85,7 @@ void ProcessHandleImpl::closeHandle()
 	if (_hProcess)
 	{
 		CloseHandle(_hProcess);
-		_hProcess = NULL;
+		_hProcess = nullptr;
 	}
 }
 
@@ -280,12 +280,12 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	STARTUPINFOW startupInfo;
 	GetStartupInfoW(&startupInfo); // take defaults from current process
 	startupInfo.cb = sizeof(STARTUPINFOW);
-	startupInfo.lpReserved = NULL;
-	startupInfo.lpDesktop = NULL;
-	startupInfo.lpTitle = NULL;
+	startupInfo.lpReserved = nullptr;
+	startupInfo.lpDesktop = nullptr;
+	startupInfo.lpTitle = nullptr;
 	startupInfo.dwFlags = STARTF_FORCEOFFFEEDBACK;
 	startupInfo.cbReserved2 = 0;
-	startupInfo.lpReserved2 = NULL;
+	startupInfo.lpReserved2 = nullptr;
 
 	HANDLE hProc = GetCurrentProcess();
 	bool mustInheritHandles = false;
@@ -375,8 +375,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	BOOL rc = CreateProcessW(
 		applicationName,
 		const_cast<wchar_t*>(ucommandLine.c_str()),
-		NULL, // processAttributes
-		NULL, // threadAttributes
+		nullptr, // processAttributes
+		nullptr, // threadAttributes
 		mustInheritHandles,
 		creationFlags,
 		(LPVOID)pEnv,

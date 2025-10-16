@@ -45,7 +45,7 @@ private:
 //
 inline void SemaphoreImpl::setImpl()
 {
-	if (!ReleaseSemaphore(_sema, 1, NULL))
+	if (!ReleaseSemaphore(_sema, 1, nullptr))
 	{
 		throw SystemException("cannot signal semaphore");
 	}

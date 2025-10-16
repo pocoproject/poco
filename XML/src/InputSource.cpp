@@ -20,23 +20,23 @@ namespace XML {
 
 
 InputSource::InputSource():
-	_bistr(0),
-	_cistr(0)
+	_bistr(nullptr),
+	_cistr(nullptr)
 {
 }
 
 
 InputSource::InputSource(const XMLString& systemId):
 	_systemId(systemId),
-	_bistr(0),
-	_cistr(0)
+	_bistr(nullptr),
+	_cistr(nullptr)
 {
 }
 
 
 InputSource::InputSource(XMLByteInputStream& bistr):
 	_bistr(&bistr),
-	_cistr(0)
+	_cistr(nullptr)
 {
 }
 

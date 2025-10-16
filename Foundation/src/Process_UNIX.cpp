@@ -133,7 +133,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		argv[i++] = const_cast<char*>(command.c_str());
 		for (const auto& a: args)
 			argv[i++] = const_cast<char*>(a.c_str());
-		argv[i] = NULL;
+		argv[i] = nullptr;
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
 		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
@@ -204,9 +204,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		{
 			argv[i++] = const_cast<char*>(a.c_str());
 		}
-		argv[i] = NULL;
+		argv[i] = nullptr;
 
-		const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
+		const char* pInitialDirectory = initialDirectory.empty() ? nullptr : initialDirectory.c_str();
 
 		int pid = fork();
 		if (pid < 0)

@@ -376,7 +376,7 @@ template <class T0,
 	class T36,
 	class T37,
 	class T38,
-    class T39>
+	class T39>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39>>
 {
   public:
@@ -605,7 +605,7 @@ template <class T0,
 	class T35,
 	class T36,
 	class T37,
-    class T38>
+	class T38>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38>>
 {
   public:
@@ -829,7 +829,7 @@ template <class T0,
 	class T34,
 	class T35,
 	class T36,
-    class T37>
+	class T37>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37>>
 {
   public:
@@ -1049,7 +1049,7 @@ template <class T0,
 	class T33,
 	class T34,
 	class T35,
-    class T36>
+	class T36>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36>>
 {
   public:
@@ -1264,7 +1264,7 @@ template <class T0,
 	class T32,
 	class T33,
 	class T34,
-    class T35>
+	class T35>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35>>
 {
   public:
@@ -1390,7 +1390,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 			   TypeHandler<T32>::size() +
 			   TypeHandler<T33>::size() +
 			   TypeHandler<T34>::size() +
-   		       TypeHandler<T35>::size();
+			   TypeHandler<T35>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor::Ptr pExt)
@@ -1474,7 +1474,7 @@ template <class T0,
 	class T31,
 	class T32,
 	class T33,
-    class T34>
+	class T34>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34>>
 {
   public:
@@ -1597,7 +1597,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 			   TypeHandler<T31>::size() +
 			   TypeHandler<T32>::size() +
 			   TypeHandler<T33>::size() +
-    		   TypeHandler<T34>::size();
+			   TypeHandler<T34>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor::Ptr pExt)
@@ -1679,7 +1679,7 @@ template <class T0,
 	class T30,
 	class T31,
 	class T32,
-    class T33>
+	class T33>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33>>
 {
   public:
@@ -1879,7 +1879,7 @@ template <class T0,
 	class T29,
 	class T30,
 	class T31,
-    class T32>
+	class T32>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32>>
 {
   public:
@@ -2073,7 +2073,7 @@ template <class T0,
 	class T28,
 	class T29,
 	class T30,
-    class T31>
+	class T31>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31>>
 {
   public:
@@ -2187,7 +2187,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 			   TypeHandler<T28>::size() +
 			   TypeHandler<T29>::size() +
 			   TypeHandler<T30>::size() +
-		       TypeHandler<T31>::size();
+			   TypeHandler<T31>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor::Ptr pExt)
@@ -2263,7 +2263,7 @@ template <class T0,
 	class T27,
 	class T28,
 	class T29,
-    class T30>
+	class T30>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30>>
 {
   public:
@@ -3599,7 +3599,7 @@ template <class T0,
 	class T19,
 	class T20,
 	class T21,
-    class T22>
+	class T22>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22>>
 {
   public:
@@ -3685,7 +3685,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 			   TypeHandler<T18>::size() +
 			   TypeHandler<T19>::size() +
 			   TypeHandler<T20>::size() +
-	   		   TypeHandler<T21>::size() +
+			   TypeHandler<T21>::size() +
 			   TypeHandler<T22>::size();
 	}
 
@@ -3745,7 +3745,7 @@ template <class T0,
 	class T18,
 	class T19,
 	class T20,
-  	class T21>
+	class T21>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21>>
 {
   public:

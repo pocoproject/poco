@@ -33,7 +33,7 @@ FIFOBufferStreamBuf::FIFOBufferStreamBuf():
 
 FIFOBufferStreamBuf::FIFOBufferStreamBuf(FIFOBuffer& fifoBuffer):
 	BufferedBidirectionalStreamBuf(fifoBuffer.size() + 4, std::ios::in | std::ios::out),
-	_pFIFOBuffer(0),
+	_pFIFOBuffer(nullptr),
 	_fifoBuffer(fifoBuffer)
 {
 	fifoBuffer.setNotify(true);
@@ -144,7 +144,7 @@ void FIFOIOS::close()
 
 FIFOBufferStream::FIFOBufferStream(FIFOBuffer& fifoBuffer):
 	FIFOIOS(fifoBuffer),
-    std::iostream(&_buf),
+	std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
 	writable(_buf.fifoBuffer().writable)
 {
@@ -153,7 +153,7 @@ FIFOBufferStream::FIFOBufferStream(FIFOBuffer& fifoBuffer):
 
 FIFOBufferStream::FIFOBufferStream(char* pBuffer, std::size_t length):
 	FIFOIOS(pBuffer, length),
-    std::iostream(&_buf),
+	std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
 	writable(_buf.fifoBuffer().writable)
 {
@@ -162,7 +162,7 @@ FIFOBufferStream::FIFOBufferStream(char* pBuffer, std::size_t length):
 
 FIFOBufferStream::FIFOBufferStream(const char* pBuffer, std::size_t length):
 	FIFOIOS(pBuffer, length),
-    std::iostream(&_buf),
+	std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
 	writable(_buf.fifoBuffer().writable)
 {
@@ -171,7 +171,7 @@ FIFOBufferStream::FIFOBufferStream(const char* pBuffer, std::size_t length):
 
 FIFOBufferStream::FIFOBufferStream(std::size_t length):
 	FIFOIOS(length),
-    std::iostream(&_buf),
+	std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
 	writable(_buf.fifoBuffer().writable)
 {

@@ -52,7 +52,7 @@ Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::strin
 
 void Connector::registerConnector()
 {
-	if (mysql_library_init(0, 0, 0) != 0)
+	if (mysql_library_init(0, nullptr, nullptr) != 0)
 	{
 		throw Exception("mysql_library_init error");
 	}

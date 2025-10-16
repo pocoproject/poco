@@ -30,7 +30,7 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 
 
 Row::Row():
-	_pNames(0),
+	_pNames(nullptr),
 	_pSortMap(new SortMap),
 	_pFormatter(new SimpleRowFormatter)
 {
@@ -41,7 +41,7 @@ Row::Row(NameVecPtr pNames,
 	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
 {
 	if (!_pNames) throw NullPointerException();
-	init(0, pFormatter);
+	init(nullptr, pFormatter);
 }
 
 

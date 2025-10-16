@@ -27,13 +27,13 @@ namespace Bonjour {
 
 
 extern "C" void DNSSD_API onRegisterServiceReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    DNSServiceErrorType errorCode,
-    const char* name,
-    const char* regtype,
-    const char* domain,
-    void *context)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	DNSServiceErrorType errorCode,
+	const char* name,
+	const char* regtype,
+	const char* domain,
+	void *context)
 {
 	try
 	{
@@ -85,7 +85,13 @@ ServiceHandle BonjourResponderImpl::registerService(const Service& service, int 
 	if (options & DNSSDResponder::REG_NON_BROWSABLE) flags |= kDNSServiceFlagsNonBrowsable;
 #endif
 	std::string txtRecord = createTXTRecord(service.properties());
-	DNSServiceErrorType err = DNSServiceRegister(&sdRef, flags, intf, service.name().empty() ? 0 : service.name().c_str(), service.type().c_str(), service.domain().empty() ? 0 : service.domain().c_str(), service.host().empty() ? 0 : service.host().c_str(), Poco::ByteOrder::toNetwork(service.port()), txtRecord.size(), txtRecord.empty() ? 0 : txtRecord.data(), Poco::DNSSD::Bonjour::onRegisterServiceReply, this);
+	DNSServiceErrorType err = DNSServiceRegister(
+		&sdRef, flags, intf,
+		service.name().empty() ? nullptr : service.name().c_str(),
+		service.type().c_str(), service.domain().empty() ? nullptr : service.domain().c_str(),
+		service.host().empty() ? nullptr : service.host().c_str(),
+		Poco::ByteOrder::toNetwork(service.port()), txtRecord.size(), txtRecord.empty() ? nullptr : txtRecord.data(),
+		Poco::DNSSD::Bonjour::onRegisterServiceReply, this);
 	if (err == kDNSServiceErr_NoError)
 	{
 		_eventLoop.add(sdRef);
@@ -105,7 +111,7 @@ void BonjourResponderImpl::unregisterService(ServiceHandle& serviceHandle)
 
 RecordHandle BonjourResponderImpl::addRecord(ServiceHandle serviceHandle, const Record& record)
 {
-	DNSRecordRef recRef(0);
+	DNSRecordRef recRef(nullptr);
 	EventLoop::ScopedLock lock(_eventLoop);
 	DNSServiceErrorType err = DNSServiceAddRecord(serviceHandle.cast<DNSServiceRef>(), &recRef, 0, record.type(), record.length(), record.data(), record.ttl());
 	if (err == kDNSServiceErr_NoError)
@@ -119,7 +125,9 @@ RecordHandle BonjourResponderImpl::addRecord(ServiceHandle serviceHandle, const 
 void BonjourResponderImpl::updateRecord(ServiceHandle serviceHandle, RecordHandle recordHandle, const Record& record)
 {
 	EventLoop::ScopedLock lock(_eventLoop);
-	DNSServiceErrorType err = DNSServiceUpdateRecord(serviceHandle.cast<DNSServiceRef>(), recordHandle.cast<DNSRecordRef>(), 0, record.length(), record.data(), record.ttl());
+	DNSServiceErrorType err = DNSServiceUpdateRecord(
+		serviceHandle.cast<DNSServiceRef>(), recordHandle.cast<DNSRecordRef>(), 0,
+		record.length(), record.data(), record.ttl());
 	if (err != kDNSServiceErr_NoError)
 	{
 		throw Poco::DNSSD::DNSSDException("Failed to update record " + record.name(), describeError(err), err);
@@ -164,67 +172,67 @@ const char* BonjourResponderImpl::describeError(int code)
 {
 	switch (code)
 	{
-    case kDNSServiceErr_Unknown:
-    	return "Unknown";
-    case kDNSServiceErr_NoSuchName:
-    	return "No such name";
-    case kDNSServiceErr_NoMemory:
-    	return "No memory";
-    case kDNSServiceErr_BadParam:
-    	return "Bad parameter";
-    case kDNSServiceErr_BadReference:
-    	return "Bad reference";
-    case kDNSServiceErr_BadState:
-    	return "Bad state";
-    case kDNSServiceErr_BadFlags:
-    	return "Bad flags";
-    case kDNSServiceErr_Unsupported:
-    	return "Unsupported";
-    case kDNSServiceErr_NotInitialized:
-    	return "Not initialized";
-    case kDNSServiceErr_AlreadyRegistered:
-    	return "Already registered";
-    case kDNSServiceErr_NameConflict:
-    	return "Name conflict";
-    case kDNSServiceErr_Invalid:
-    	return "Invalid";
-    case kDNSServiceErr_Firewall:
-    	return "Firewall";
-    case kDNSServiceErr_Incompatible:
-    	return "Client library incompatible with daemon";
-    case kDNSServiceErr_BadInterfaceIndex:
-    	return "Bad interface index";
-    case kDNSServiceErr_Refused:
-    	return "Refused";
-    case kDNSServiceErr_NoSuchRecord:
-    	return "No such record";
-    case kDNSServiceErr_NoAuth:
-    	return "No auth";
-    case kDNSServiceErr_NoSuchKey:
-    	return "No such key";
-    case kDNSServiceErr_NATTraversal:
-    	return "NAT traversal";
-    case kDNSServiceErr_DoubleNAT:
-    	return "Double NAT";
-    case kDNSServiceErr_BadTime:
-    	return "Bad time";
-    case kDNSServiceErr_BadSig:
-    	return "Bad signature";
-    case kDNSServiceErr_BadKey:
-    	return "Bad key";
-    case kDNSServiceErr_Transient:
-    	return "Transient error";
-    case kDNSServiceErr_ServiceNotRunning:
-    	return "Service not running";
-    case kDNSServiceErr_NATPortMappingUnsupported:
-    	return "NAT port mapping not supported";
-    case kDNSServiceErr_NATPortMappingDisabled:
-    	return "NAT port mapping disabled";
+	case kDNSServiceErr_Unknown:
+		return "Unknown";
+	case kDNSServiceErr_NoSuchName:
+		return "No such name";
+	case kDNSServiceErr_NoMemory:
+		return "No memory";
+	case kDNSServiceErr_BadParam:
+		return "Bad parameter";
+	case kDNSServiceErr_BadReference:
+		return "Bad reference";
+	case kDNSServiceErr_BadState:
+		return "Bad state";
+	case kDNSServiceErr_BadFlags:
+		return "Bad flags";
+	case kDNSServiceErr_Unsupported:
+		return "Unsupported";
+	case kDNSServiceErr_NotInitialized:
+		return "Not initialized";
+	case kDNSServiceErr_AlreadyRegistered:
+		return "Already registered";
+	case kDNSServiceErr_NameConflict:
+		return "Name conflict";
+	case kDNSServiceErr_Invalid:
+		return "Invalid";
+	case kDNSServiceErr_Firewall:
+		return "Firewall";
+	case kDNSServiceErr_Incompatible:
+		return "Client library incompatible with daemon";
+	case kDNSServiceErr_BadInterfaceIndex:
+		return "Bad interface index";
+	case kDNSServiceErr_Refused:
+		return "Refused";
+	case kDNSServiceErr_NoSuchRecord:
+		return "No such record";
+	case kDNSServiceErr_NoAuth:
+		return "No auth";
+	case kDNSServiceErr_NoSuchKey:
+		return "No such key";
+	case kDNSServiceErr_NATTraversal:
+		return "NAT traversal";
+	case kDNSServiceErr_DoubleNAT:
+		return "Double NAT";
+	case kDNSServiceErr_BadTime:
+		return "Bad time";
+	case kDNSServiceErr_BadSig:
+		return "Bad signature";
+	case kDNSServiceErr_BadKey:
+		return "Bad key";
+	case kDNSServiceErr_Transient:
+		return "Transient error";
+	case kDNSServiceErr_ServiceNotRunning:
+		return "Service not running";
+	case kDNSServiceErr_NATPortMappingUnsupported:
+		return "NAT port mapping not supported";
+	case kDNSServiceErr_NATPortMappingDisabled:
+		return "NAT port mapping disabled";
 #if _DNS_SD_H+0 >= 2580000
-    case kDNSServiceErr_NoRouter:
-    	return "No router";
-    case kDNSServiceErr_PollingMode:
-    	return "Polling mode";
+	case kDNSServiceErr_NoRouter:
+		return "No router";
+	case kDNSServiceErr_PollingMode:
+		return "Polling mode";
 #endif
 	default:
 		return "Error";
@@ -268,7 +276,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 	if (itVers != itEnd)
 	{
 		Poco::UInt8 valueSize = static_cast<Poco::UInt8>(itVers->second.size());
-		TXTRecordSetValue(&ref, itVers->first.c_str(), valueSize, valueSize == 0 ? 0 : itVers->second.c_str());
+		TXTRecordSetValue(&ref, itVers->first.c_str(), valueSize, valueSize == 0 ? nullptr : itVers->second.c_str());
 	}
 
 	it = properties.begin();
@@ -277,7 +285,7 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 		if (it != itVers)
 		{
 			Poco::UInt8 valueSize = static_cast<Poco::UInt8>(it->second.size());
-			TXTRecordSetValue(&ref, it->first.c_str(), valueSize, valueSize == 0 ? 0 : it->second.c_str());
+			TXTRecordSetValue(&ref, it->first.c_str(), valueSize, valueSize == 0 ? nullptr : it->second.c_str());
 		}
 	}
 	const void* txtRecord = TXTRecordGetBytesPtr(&ref);
@@ -290,12 +298,12 @@ std::string BonjourResponderImpl::createTXTRecord(const Service::Properties& pro
 
 
 void BonjourResponderImpl::onRegisterServiceReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    DNSServiceErrorType errorCode,
-    const char* name,
-    const char* regtype,
-    const char* domain)
+	DNSServiceRef sdRef,
+	DNSServiceFlags flags,
+	DNSServiceErrorType errorCode,
+	const char* name,
+	const char* regtype,
+	const char* domain)
 {
 	if (errorCode == kDNSServiceErr_NoError)
 	{

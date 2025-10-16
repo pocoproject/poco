@@ -35,7 +35,7 @@ class SingletonHolder
 {
 public:
 	SingletonHolder():
-		_pS(0)
+		_pS(nullptr)
 		/// Creates the SingletonHolder.
 	{
 	}

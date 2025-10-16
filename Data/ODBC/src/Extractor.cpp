@@ -72,7 +72,7 @@ bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
 	typedef UTF16String::value_type CharT;
 	if (isNull(pos)) return false;
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	CharT* sp = 0;
+	CharT* sp = nullptr;
 	UTF16String us;
 	const std::type_info& ti = _pPreparator->at(pos).type();
 	if (ti == typeid(CharT*))

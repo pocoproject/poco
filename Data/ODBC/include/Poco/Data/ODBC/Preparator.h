@@ -428,7 +428,7 @@ private:
 	Preparator& operator = (const Preparator&);
 
 	template <typename C>
-	void prepareImpl(std::size_t pos, const C* pVal = 0)
+	void prepareImpl(std::size_t pos, const C* pVal = nullptr)
 		/// Utility function to prepare Any and Dynamic::Var.
 	{
 		ODBCMetaColumn col(_rStmt, pos);

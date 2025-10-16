@@ -34,7 +34,7 @@ namespace Net {
 
 
 X509Certificate::X509Certificate(const std::string& path):
-	_pCert(0)
+	_pCert(nullptr)
 {
 	importCertificate(path);
 	init();
@@ -42,7 +42,7 @@ X509Certificate::X509Certificate(const std::string& path):
 
 
 X509Certificate::X509Certificate(std::istream& istr):
-	_pCert(0)
+	_pCert(nullptr)
 {
 	importCertificate(istr);
 	init();
@@ -50,7 +50,7 @@ X509Certificate::X509Certificate(std::istream& istr):
 
 
 X509Certificate::X509Certificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore):
-	_pCert(0)
+	_pCert(nullptr)
 {
 	loadCertificate(certName, certStoreName, useMachineStore);
 	init();
@@ -217,7 +217,7 @@ std::string X509Certificate::commonName() const
 std::string X509Certificate::issuerName(NID nid) const
 {
 	std::string result;
-	DWORD size = CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, CERT_NAME_ISSUER_FLAG, nid2oid(nid), 0, 0);
+	DWORD size = CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, CERT_NAME_ISSUER_FLAG, nid2oid(nid), nullptr, 0);
 	Poco::Buffer<wchar_t> data(size);
 	CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, CERT_NAME_ISSUER_FLAG, nid2oid(nid), data.begin(), size);
 	Poco::UnicodeConverter::convert(data.begin(), result);
@@ -228,7 +228,7 @@ std::string X509Certificate::issuerName(NID nid) const
 std::string X509Certificate::subjectName(NID nid) const
 {
 	std::string result;
-	DWORD size = CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, 0, nid2oid(nid), 0, 0);
+	DWORD size = CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, 0, nid2oid(nid), nullptr, 0);
 	Poco::Buffer<wchar_t> data(size);
 	CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, 0, nid2oid(nid), data.begin(), size);
 	Poco::UnicodeConverter::convert(data.begin(), result);
@@ -257,7 +257,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 					pExt->Value.pbData,
 					pExt->Value.cbData,
 					flags,
-					0,
+					nullptr,
 					buffer.begin(),
 					&bufferSize);
 			if (!rc && GetLastError() == ERROR_MORE_DATA)
@@ -269,7 +269,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 					pExt->Value.pbData,
 					pExt->Value.cbData,
 					flags,
-					0,
+					nullptr,
 					buffer.begin(),
 					&bufferSize);
 			}
@@ -314,18 +314,18 @@ Poco::DateTime X509Certificate::expiresOn() const
 bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 {
 	CERT_CHAIN_PARA chainPara;
-	PCCERT_CHAIN_CONTEXT pChainContext = 0;
+	PCCERT_CHAIN_CONTEXT pChainContext = nullptr;
 	std::memset(&chainPara, 0, sizeof(chainPara));
 	chainPara.cbSize = sizeof(chainPara);
 
 	if (!CertGetCertificateChain(
-							NULL,
+							nullptr,
 							_pCert,
-							NULL,
-							NULL,
+							nullptr,
+							nullptr,
 							&chainPara,
 							0,
-							NULL,
+							nullptr,
 							&pChainContext))
 	{
 		throw SSLException("Cannot get certificate chain", subjectName(), GetLastError());
@@ -353,7 +353,7 @@ bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 
 void* X509Certificate::nid2oid(NID nid)
 {
-	const char* result = 0;
+	const char* result = nullptr;
 	switch (nid)
 	{
 	case NID_COMMON_NAME:
@@ -406,7 +406,7 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	cert_rdn.cRDNAttr = 1;
 	cert_rdn.rgRDNAttr = &cert_rdn_attr;
 
-	_pCert = CertFindCertificateInStore(hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
+	_pCert = CertFindCertificateInStore(hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, nullptr);
 	if (!_pCert)
 	{
 		CertCloseStore(hCertStore, 0);

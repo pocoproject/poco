@@ -512,7 +512,7 @@ CppUnit::Test* MongoDBTest::suite()
 	catch (Poco::Net::ConnectionRefusedException& e)
 	{
 		std::cout << "Couldn't connect to " << e.message() << ". " << std::endl;
-		return 0;
+		return nullptr;
 	}
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
 

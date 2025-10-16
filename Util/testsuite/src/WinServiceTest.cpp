@@ -18,7 +18,7 @@ WinServiceTest::~WinServiceTest()
 
 void WinServiceTest::testServiceCouldCreatedWithExistingConnection()
 {
-	SC_HANDLE scmHandle = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	SC_HANDLE scmHandle = OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
 
 	assertTrue(scmHandle);
 

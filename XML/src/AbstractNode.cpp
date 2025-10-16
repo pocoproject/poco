@@ -33,19 +33,19 @@ const XMLString AbstractNode::EMPTY_STRING;
 
 
 AbstractNode::AbstractNode(Document* pOwnerDocument):
-	_pParent(0),
-	_pNext(0),
+	_pParent(nullptr),
+	_pNext(nullptr),
 	_pOwner(pOwnerDocument),
-	_pEventDispatcher(0)
+	_pEventDispatcher(nullptr)
 {
 }
 
 
 AbstractNode::AbstractNode(Document* pOwnerDocument, const AbstractNode& node):
-	_pParent(0),
-	_pNext(0),
+	_pParent(nullptr),
+	_pNext(nullptr),
 	_pOwner(pOwnerDocument),
-	_pEventDispatcher(0)
+	_pEventDispatcher(nullptr)
 {
 }
 
@@ -95,13 +95,13 @@ NodeList* AbstractNode::childNodes() const
 
 Node* AbstractNode::firstChild() const
 {
-	return 0;
+	return nullptr;
 }
 
 
 Node* AbstractNode::lastChild() const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -116,7 +116,7 @@ Node* AbstractNode::previousSibling() const
 		    pSibling = pSibling->_pNext;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -128,7 +128,7 @@ Node* AbstractNode::nextSibling() const
 
 NamedNodeMap* AbstractNode::attributes() const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -223,13 +223,13 @@ XMLString AbstractNode::innerText() const
 
 Node* AbstractNode::getNodeByPath(const XMLString& path) const
 {
-	return 0;
+	return nullptr;
 }
 
 
 Node* AbstractNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -305,7 +305,7 @@ void AbstractNode::bubbleEvent(Event* evt)
 
 void AbstractNode::dispatchSubtreeModified()
 {
-	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMSubtreeModified, this, true, false, 0);
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMSubtreeModified, this, true, false, nullptr);
 	dispatchEvent(pEvent.get());
 }
 
@@ -326,14 +326,14 @@ void AbstractNode::dispatchNodeRemoved()
 
 void AbstractNode::dispatchNodeRemovedFromDocument()
 {
-	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeRemovedFromDocument, this, false, false, 0);
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeRemovedFromDocument, this, false, false, nullptr);
 	dispatchEvent(pEvent.get());
 }
 
 
 void AbstractNode::dispatchNodeInsertedIntoDocument()
 {
-	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeInsertedIntoDocument, this, false, false, 0);
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeInsertedIntoDocument, this, false, false, nullptr);
 	dispatchEvent(pEvent.get());
 }
 
@@ -347,7 +347,7 @@ void AbstractNode::dispatchAttrModified(Attr* pAttr, MutationEvent::AttrChangeTy
 
 void AbstractNode::dispatchCharacterDataModified(const XMLString& prevValue, const XMLString& newValue)
 {
-	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMCharacterDataModified, this, true, false, 0, prevValue, newValue, EMPTY_STRING, MutationEvent::MODIFICATION);
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMCharacterDataModified, this, true, false, nullptr, prevValue, newValue, EMPTY_STRING, MutationEvent::MODIFICATION);
 	dispatchEvent(pEvent.get());
 }
 

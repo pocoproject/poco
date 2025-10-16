@@ -60,7 +60,7 @@ const std::string XMLWriter::MARKUP_END_CDATA   = "]]>";
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(new Poco::UTF8Encoding),
 	_options(options),
@@ -83,9 +83,9 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(0),
+	_pOutEncoding(nullptr),
 	_options(options),
 	_encoding(encodingName),
 	_depth(-1),
@@ -106,9 +106,9 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(0),
+	_pOutEncoding(nullptr),
 	_options(options),
 	_encoding(encodingName),
 	_depth(-1),

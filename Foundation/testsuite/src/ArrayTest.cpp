@@ -126,65 +126,65 @@ void ArrayTest::testContainer()
 
 void ArrayTest::testIterator()
 {
-    // create array of four seasons
+	// create array of four seasons
 	Poco::Array<std::string,4> seasons = {
-        { "spring", "summer", "autumn", "winter" }
-    };
+		{ "spring", "summer", "autumn", "winter" }
+	};
 
-    // copy and change order
+	// copy and change order
 	Poco::Array<std::string,4> org = seasons;
-    for (size_t i=seasons.size()-1; i>0; --i) {
+	for (size_t i=seasons.size()-1; i>0; --i) {
 		swap(seasons.at(i),seasons.at((i+1)%seasons.size()));
-    }
+	}
 
-    // try swap()
-    swap(seasons,org);
+	// try swap()
+	swap(seasons,org);
 
-    // try reverse iterators
-    for (Poco::Array<std::string,4>::reverse_iterator pos
-           =seasons.rbegin(); pos<seasons.rend(); ++pos) {
-    }
+	// try reverse iterators
+	for (Poco::Array<std::string,4>::reverse_iterator pos
+		   =seasons.rbegin(); pos<seasons.rend(); ++pos) {
+	}
 }
 
 void ArrayTest::testAlgorithm()
 {
-    // create and initialize array
+	// create and initialize array
 	const int SIZE = 10;
 	typedef Poco::Array<int,SIZE> IArray;
 	IArray a = { { 1, 2, 3, 4, 5 } };
 	IArray b(a);
 
-    // modify elements directly
-    for (unsigned i=0; i<b.size(); ++i) {
-        ++b[i];
-    }
+	// modify elements directly
+	for (unsigned i=0; i<b.size(); ++i) {
+		++b[i];
+	}
 
-    // try iterators
+	// try iterators
 	for (IArray::iterator pos =b.begin(); pos<b.end(); ++pos) {
 		--(*pos);
-    }
+	}
 
-    for (unsigned i=0; i<a.size(); ++i) {
+	for (unsigned i=0; i<a.size(); ++i) {
 		assertTrue (a[i] == b[i]);
-    }
+	}
 
-    // change order using an STL algorithm
+	// change order using an STL algorithm
 	std::reverse(a.begin(),a.end());
 
-    for (unsigned i=0; i<a.size(); ++i) {
+	for (unsigned i=0; i<a.size(); ++i) {
 		assertTrue (a[SIZE-i-1] == b[i]);
-    }
+	}
 
 	std::reverse(a.begin(),a.end());
 
-    // negate elements using STL framework
+	// negate elements using STL framework
 	std::transform(	a.begin(),a.end(),    // source
 					a.begin(),            // destination
 					std::negate<int>());  // operation
 
-    for (unsigned i=0; i<a.size(); ++i) {
+	for (unsigned i=0; i<a.size(); ++i) {
 		assertTrue (a[i] == -b[i]);
-    }
+	}
 
 }
 

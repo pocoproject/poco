@@ -169,7 +169,7 @@ bool SecureStreamSocketImpl::secure() const
 
 bool SecureStreamSocketImpl::havePeerCertificate() const
 {
-	return _impl.peerCertificate() != 0;
+	return _impl.peerCertificate() != nullptr;
 }
 
 

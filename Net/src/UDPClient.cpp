@@ -22,7 +22,7 @@ namespace Net {
 
 UDPClient::UDPClient(const std::string& address, Poco::UInt16 port, bool listen):
 	_address(address, port),
-	_pThread(0),
+	_pThread(nullptr),
 	_stop(false)
 {
 	_socket.bind(SocketAddress(address, 0), true, true);

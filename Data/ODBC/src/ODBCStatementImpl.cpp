@@ -92,7 +92,7 @@ void ODBCStatementImpl::compileImpl()
 	Binder::ParameterBinding bind = session().getFeature("autoBind") ?
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
 
-	const TypeInfo* pDT = 0;
+	const TypeInfo* pDT = nullptr;
 	try
 	{
 		Poco::Any dti = session().getProperty("dataTypeInfo");
@@ -194,7 +194,7 @@ void ODBCStatementImpl::doPrepare()
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
-		AbstractPreparation::Ptr pAP = 0;
+		AbstractPreparation::Ptr pAP = nullptr;
 		Poco::Data::AbstractPreparator::Ptr pP = _preparations[curDataSet];
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
@@ -295,7 +295,7 @@ void ODBCStatementImpl::execDirectImpl(const std::string& query)
 
 void ODBCStatementImpl::putData()
 {
-	SQLPOINTER pParam = 0;
+	SQLPOINTER pParam = nullptr;
 	SQLINTEGER dataSize = 0;
 	SQLRETURN rc;
 
@@ -433,7 +433,7 @@ std::string ODBCStatementImpl::nativeSQL()
 
 	SQLINTEGER length = (SQLINTEGER) statement.size() * 2;
 
-	char* pNative = 0;
+	char* pNative = nullptr;
 	SQLINTEGER retlen = length;
 	do
 	{

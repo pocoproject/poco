@@ -29,7 +29,7 @@ namespace Poco {
 
 
 SharedMemory::SharedMemory():
-	_pImpl(0)
+	_pImpl(nullptr)
 {
 }
 
@@ -74,7 +74,7 @@ char* SharedMemory::begin() const
 	if (_pImpl)
 		return _pImpl->begin();
 	else
-		return 0;
+		return nullptr;
 }
 
 
@@ -83,7 +83,7 @@ char* SharedMemory::end() const
 	if (_pImpl)
 		return _pImpl->end();
 	else
-		return 0;
+		return nullptr;
 }
 
 

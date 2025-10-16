@@ -315,7 +315,7 @@ void HTTPSClientSessionTest::testMultipleSSLInit()
 				Context::VerificationMode::VERIFY_STRICT, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
 			)
 		);
-		SSLManager::instance().initializeClient(0, ptrCert, context);
+		SSLManager::instance().initializeClient(nullptr, ptrCert, context);
 	};
 
 	auto deinitSSL = []()
@@ -490,7 +490,7 @@ void HTTPSClientSessionTest::testServerAbort()
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 	assertTrue (dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
-	         s.networkException()) != NULL );
+			 s.networkException()) != nullptr );
 }
 
 

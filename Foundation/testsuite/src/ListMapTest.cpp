@@ -91,7 +91,7 @@ void ListMapTest::testInsertOrder()
 
 	lm.insert(StrToIntMap::ValueType("foo", 44));
 
- 	it = lm.begin();
+	it = lm.begin();
 	assertTrue (it != lm.end() && it->first == "foo" && it->second == 42);
 
 	++it;

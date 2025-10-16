@@ -29,9 +29,9 @@ Message::Message():
 	_tid(0),
 	_ostid(0),
 	_pid(0),
-	_file(0),
+	_file(nullptr),
 	_line(0),
-	_pMap(0)
+	_pMap(nullptr)
 {
 	init();
 }
@@ -44,9 +44,9 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_tid(0),
 	_ostid(0),
 	_pid(0),
-	_file(0),
+	_file(nullptr),
 	_line(0),
-	_pMap(0)
+	_pMap(nullptr)
 {
 	init();
 }
@@ -61,7 +61,7 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_pid(0),
 	_file(file),
 	_line(line),
-	_pMap(0)
+	_pMap(nullptr)
 {
 	init();
 }
@@ -82,7 +82,7 @@ Message::Message(const Message& msg):
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
 	else
-		_pMap = 0;
+		_pMap = nullptr;
 }
 
 
@@ -118,7 +118,7 @@ Message::Message(const Message& msg, const std::string& text):
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
 	else
-		_pMap = 0;
+		_pMap = nullptr;
 }
 
 
@@ -256,7 +256,7 @@ const std::string& Message::get(const std::string& param) const
 	{
 		StringMap::const_iterator it = _pMap->find(param);
 		if (it != _pMap->end())
-	 		return it->second;
+			return it->second;
 	}
 
 	throw NotFoundException();
@@ -269,7 +269,7 @@ const std::string& Message::get(const std::string& param, const std::string& def
 	{
 		StringMap::const_iterator it = _pMap->find(param);
 		if (it != _pMap->end())
-	 		return it->second;
+			return it->second;
 	}
 
 	return defaultValue;

@@ -37,16 +37,16 @@ class StringToDoubleConverter {
   // Enumeration for allowing octals and ignoring junk when converting
   // strings to numbers.
   enum Flags {
-    NO_FLAGS = 0,
-    ALLOW_HEX = 1,
-    ALLOW_OCTALS = 2,
-    ALLOW_TRAILING_JUNK = 4,
-    ALLOW_LEADING_SPACES = 8,
-    ALLOW_TRAILING_SPACES = 16,
-    ALLOW_SPACES_AFTER_SIGN = 32,
-    ALLOW_CASE_INSENSITIVITY = 64,
-    ALLOW_CASE_INSENSIBILITY = 64,  // Deprecated
-    ALLOW_HEX_FLOATS = 128,
+	NO_FLAGS = 0,
+	ALLOW_HEX = 1,
+	ALLOW_OCTALS = 2,
+	ALLOW_TRAILING_JUNK = 4,
+	ALLOW_LEADING_SPACES = 8,
+	ALLOW_TRAILING_SPACES = 16,
+	ALLOW_SPACES_AFTER_SIGN = 32,
+	ALLOW_CASE_INSENSITIVITY = 64,
+	ALLOW_CASE_INSENSIBILITY = 64,  // Deprecated
+	ALLOW_HEX_FLOATS = 128,
   };
 
   static const uc16 kNoSeparator = '\0';
@@ -165,17 +165,17 @@ class StringToDoubleConverter {
   //    StringToDouble("1.000 000") -> 1.0
   //    StringToDouble("1.0e1 000") -> NaN // junk_string_value
   StringToDoubleConverter(int flags,
-                          double empty_string_value,
-                          double junk_string_value,
-                          const char* infinity_symbol,
-                          const char* nan_symbol,
-                          uc16 separator = kNoSeparator)
-      : flags_(flags),
-        empty_string_value_(empty_string_value),
-        junk_string_value_(junk_string_value),
-        infinity_symbol_(infinity_symbol),
-        nan_symbol_(nan_symbol),
-        separator_(separator) {
+						  double empty_string_value,
+						  double junk_string_value,
+						  const char* infinity_symbol,
+						  const char* nan_symbol,
+						  uc16 separator = kNoSeparator)
+	  : flags_(flags),
+		empty_string_value_(empty_string_value),
+		junk_string_value_(junk_string_value),
+		infinity_symbol_(infinity_symbol),
+		nan_symbol_(nan_symbol),
+		separator_(separator) {
   }
 
   // Performs the conversion.
@@ -184,37 +184,37 @@ class StringToDoubleConverter {
   // Spaces than are processed with ALLOW_{LEADING|TRAILING}_SPACES are included
   // in the 'processed_characters_count'. Trailing junk is never included.
   double StringToDouble(const char* buffer,
-                        int length,
-                        int* processed_characters_count) const;
+						int length,
+						int* processed_characters_count) const;
 
   // Same as StringToDouble above but for 16 bit characters.
   double StringToDouble(const uc16* buffer,
-                        int length,
-                        int* processed_characters_count) const;
+						int length,
+						int* processed_characters_count) const;
 
   // Same as StringToDouble but reads a float.
   // Note that this is not equivalent to static_cast<float>(StringToDouble(...))
   // due to potential double-rounding.
   float StringToFloat(const char* buffer,
-                      int length,
-                      int* processed_characters_count) const;
+					  int length,
+					  int* processed_characters_count) const;
 
   // Same as StringToFloat above but for 16 bit characters.
   float StringToFloat(const uc16* buffer,
-                      int length,
-                      int* processed_characters_count) const;
+					  int length,
+					  int* processed_characters_count) const;
 
   // Same as StringToDouble for T = double, and StringToFloat for T = float.
   template <typename T>
   T StringTo(const char* buffer,
-             int length,
-             int* processed_characters_count) const;
+			 int length,
+			 int* processed_characters_count) const;
 
   // Same as StringTo above but for 16 bit characters.
   template <typename T>
   T StringTo(const uc16* buffer,
-             int length,
-             int* processed_characters_count) const;
+			 int length,
+			 int* processed_characters_count) const;
 
  private:
   const int flags_;
@@ -226,9 +226,9 @@ class StringToDoubleConverter {
 
   template <class Iterator>
   double StringToIeee(Iterator start_pointer,
-                      int length,
-                      bool read_as_double,
-                      int* processed_characters_count) const;
+					  int length,
+					  bool read_as_double,
+					  int* processed_characters_count) const;
 
   DOUBLE_CONVERSION_DISALLOW_IMPLICIT_CONSTRUCTORS(StringToDoubleConverter);
 };

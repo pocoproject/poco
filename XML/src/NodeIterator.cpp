@@ -26,7 +26,7 @@ NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFi
 	_pRoot(root),
 	_whatToShow(whatToShow),
 	_pFilter(pFilter),
-	_pCurrent(0)
+	_pCurrent(nullptr)
 {
 }
 
@@ -140,13 +140,13 @@ Node* NodeIterator::next() const
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
-	return 0;
+	return nullptr;
 }
 
 
 Node* NodeIterator::previous() const
 {
-	if (_pCurrent == _pRoot) return 0;
+	if (_pCurrent == _pRoot) return nullptr;
 	Node* pPrev = _pCurrent->previousSibling();
 	while (pPrev)
 	{

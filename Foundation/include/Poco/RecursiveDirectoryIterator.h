@@ -69,7 +69,7 @@ public:
 
 	RecursiveDirectoryIterator()
 		/// Creates the end iterator.
-		: _pImpl(0)
+		: _pImpl(nullptr)
 	{
 	}
 

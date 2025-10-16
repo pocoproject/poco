@@ -177,7 +177,7 @@ public:
 		if (redisResult->type() == RedisTypeTraits<T>::TypeId)
 		{
 			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
-			if (type != NULL) result = type->value();
+			if (type != nullptr) result = type->value();
 		}
 		else throw BadCastException();
 	}

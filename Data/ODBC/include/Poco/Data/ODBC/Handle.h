@@ -41,7 +41,7 @@ class Handle
 public:
 	Handle(const ConnectionHandle& rConnection):
 		_rConnection(rConnection),
-		_handle(0)
+		_handle(nullptr)
 			/// Creates the Handle.
 	{
 		if (Utility::isError(SQLAllocHandle(handleType,

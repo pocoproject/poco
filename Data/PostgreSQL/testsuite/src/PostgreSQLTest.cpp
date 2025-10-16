@@ -41,8 +41,8 @@ using Poco::NamedTuple;
 using Poco::Environment;
 
 
-Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
+Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = nullptr;
+Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = nullptr;
 
 
 //
@@ -1254,7 +1254,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		return nullptr;
 	}
 
 	std::cout << "*** Connected to [" << "PostgreSQL" << "] test database." << std::endl;
