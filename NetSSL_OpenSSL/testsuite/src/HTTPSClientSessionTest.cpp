@@ -490,7 +490,7 @@ void HTTPSClientSessionTest::testServerAbort()
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 	assertTrue (dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
-	         s.networkException()) != NULL );
+			 s.networkException()) != nullptr );
 }
 
 

@@ -127,8 +127,8 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			pSession->sendRequest(req);
 			std::istream& rs = pSession->receiveResponse(res);
 			bool moved = (res.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY ||
-			              res.getStatus() == HTTPResponse::HTTP_FOUND ||
-			              res.getStatus() == HTTPResponse::HTTP_SEE_OTHER ||
+						  res.getStatus() == HTTPResponse::HTTP_FOUND ||
+						  res.getStatus() == HTTPResponse::HTTP_SEE_OTHER ||
 						  res.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT);
 			if (moved)
 			{

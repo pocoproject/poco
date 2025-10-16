@@ -97,7 +97,7 @@ void OpenSSLInitializer::initialize()
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		CONF_modules_load(nullptr, nullptr, 0);
 #else
-		OPENSSL_config(NULL);
+		OPENSSL_config(nullptr);
 #endif
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L

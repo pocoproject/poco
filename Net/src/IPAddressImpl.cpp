@@ -661,7 +661,7 @@ IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 	// for the reason why this is not AF_INET6, see
 	// https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/getaddrinfo-fails-error-11001-call-af-inet6-family
 	hints.ai_family = AF_UNSPEC;
-	int rc = getaddrinfo(addr.c_str(), NULL, &hints, &pAI);
+	int rc = getaddrinfo(addr.c_str(), nullptr, &hints, &pAI);
 	if (rc == 0)
 	{
 		IPv6AddressImpl result = IPv6AddressImpl(

@@ -192,7 +192,7 @@ IPAddress::IPAddress(unsigned prefix, Family family)
 
 #if defined(_WIN32)
 IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
-	: _pImpl(0)
+	: _pImpl(nullptr)
 {
 	ADDRESS_FAMILY family = socket_address.lpSockaddr->sa_family;
 	if (family == AF_INET)

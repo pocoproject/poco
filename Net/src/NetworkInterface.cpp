@@ -948,7 +948,7 @@ namespace Net {
 namespace {
 
 
-IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = 0)
+IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = nullptr)
 	/// This function relies on (1) subnet prefix being at the position
 	/// immediately preceding and (2) broadcast address being at the position
 	/// immediately succeeding the IPv4 unicast address.
@@ -959,7 +959,7 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr,
 	/// not contain prefix length; for those platforms, this function
 	/// returns prefix through pprefix argument.
 {
-	PIP_ADAPTER_PREFIX pPrev = 0;
+	PIP_ADAPTER_PREFIX pPrev = nullptr;
 	for (int i = 0; pPrefix; pPrefix = pPrefix->Next, ++i)
 	{
 		ADDRESS_FAMILY family = pPrefix->Address.lpSockaddr->sa_family;
@@ -1019,9 +1019,9 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 			return IPAddress();
 		wchar_t unetmask[16];
 		DWORD size = sizeof(unetmask);
-		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", nullptr, nullptr, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
 		{
-			if (RegQueryValueExW(hKey, L"SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+			if (RegQueryValueExW(hKey, L"SubnetMask", nullptr, nullptr, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
 			{
 				RegCloseKey(hKey);
 				return IPAddress();
@@ -1059,12 +1059,12 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 	DWORD dwRetVal = 0;
 	ULONG iterations = 0;
-	PIP_ADAPTER_ADDRESSES pAddress = 0;
+	PIP_ADAPTER_ADDRESSES pAddress = nullptr;
 	do
 	{
 		pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin()); // leave in the loop, begin may change after resize
 		poco_assert (memory.capacity() >= outBufLen);
-		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
+		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, nullptr, pAddress, &outBufLen)))
 			memory.resize(outBufLen, false); // adjust size and try again
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
@@ -1140,7 +1140,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
 
 		bool isUp = (pAddress->OperStatus == IfOperStatusUp);
-		bool isIP = (0 != pAddress->FirstUnicastAddress);
+		bool isIP = (nullptr != pAddress->FirstUnicastAddress);
 		if (((ipOnly && isIP) || !ipOnly) && ((upOnly && isUp) || !upOnly))
 		{
 			NetworkInterface ni(name, displayName, adapterName, ifIndex);

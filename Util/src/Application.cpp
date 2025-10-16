@@ -344,18 +344,18 @@ Application::WindowSize Application::windowSize()
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
-    {
-    	size.width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
-    	size.height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
-    }
+	if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
+	{
+		size.width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+		size.height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+	}
 #elif defined(POCO_OS_FAMILY_UNIX)
 	struct winsize winsz;
-    if (ioctl(0, TIOCGWINSZ , &winsz) != -1)
-    {
-    	size.width  = winsz.ws_col;
-    	size.height = winsz.ws_row;
-    }
+	if (ioctl(0, TIOCGWINSZ , &winsz) != -1)
+	{
+		size.width  = winsz.ws_col;
+		size.height = winsz.ws_row;
+	}
 #endif
 
 	return size;
@@ -496,7 +496,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 		wchar_t path[1024];
-		int n = GetModuleFileNameW(0, path, sizeof(path)/sizeof(wchar_t));
+		int n = GetModuleFileNameW(nullptr, path, sizeof(path)/sizeof(wchar_t));
 		if (n > 0)
 		{
 			std::string p;

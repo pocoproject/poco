@@ -30,7 +30,7 @@ const std::string EventLogChannel::PROP_LOGFILE = "logfile";
 
 EventLogChannel::EventLogChannel():
 	_logFile("Application"),
-	_h(0)
+	_h(nullptr)
 {
 	const DWORD maxPathLen = MAX_PATH + 1;
 	wchar_t name[maxPathLen];
@@ -49,7 +49,7 @@ EventLogChannel::EventLogChannel():
 EventLogChannel::EventLogChannel(const std::string& name):
 	_name(name),
 	_logFile("Application"),
-	_h(0)
+	_h(nullptr)
 {
 }
 
@@ -58,7 +58,7 @@ EventLogChannel::EventLogChannel(const std::string& name, const std::string& hos
 	_name(name),
 	_host(host),
 	_logFile("Application"),
-	_h(0)
+	_h(nullptr)
 {
 }
 
@@ -91,7 +91,7 @@ void EventLogChannel::open()
 void EventLogChannel::close()
 {
 	if (_h) DeregisterEventSource(_h);
-	_h = 0;
+	_h = nullptr;
 }
 
 

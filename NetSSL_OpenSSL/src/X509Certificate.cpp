@@ -169,7 +169,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 		IPAddress ip;
 		if (IPAddress::tryParse(hostName, ip))
 		{
-		    return (X509_check_ip_asc(const_cast<X509*>(certificate.certificate()), hostName.c_str(), 0) == 1);
+			return (X509_check_ip_asc(const_cast<X509*>(certificate.certificate()), hostName.c_str(), 0) == 1);
 		}
 	}
 	return false;

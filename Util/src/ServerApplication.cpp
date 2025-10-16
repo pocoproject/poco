@@ -57,7 +57,7 @@ namespace Util {
 Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus;
-SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0;
+SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = nullptr;
 #endif
 #if defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
 Poco::Event ServerApplication::_terminate;
@@ -336,8 +336,8 @@ bool ServerApplication::isService()
 	wchar_t name[] = L"";
 	svcDispatchTable[0].lpServiceName = name;
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
-	svcDispatchTable[1].lpServiceName = NULL;
-	svcDispatchTable[1].lpServiceProc = NULL;
+	svcDispatchTable[1].lpServiceName = nullptr;
+	svcDispatchTable[1].lpServiceProc = nullptr;
 	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0;
 }
 
@@ -345,7 +345,7 @@ bool ServerApplication::isService()
 bool ServerApplication::hasConsole()
 {
 	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	return hStdOut != INVALID_HANDLE_VALUE && hStdOut != NULL;
+	return hStdOut != INVALID_HANDLE_VALUE && hStdOut != nullptr;
 }
 
 

@@ -253,29 +253,29 @@ void XMLConfiguration::setRaw(const std::string& key, const std::string& value)
 	Poco::XML::Node* pNode = findNode(it, key.end(), _pRoot, true);
 	if (pNode)
 	{
-        unsigned short nodeType = pNode->nodeType();
-        if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
-        {
-            pNode->setNodeValue(value);
-        }
-        else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
-        {
-            Poco::XML::Node* pChildNode = pNode->firstChild();
-            if (pChildNode)
-            {
-                if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
-                {
-                    pChildNode->setNodeValue(value);
-                }
-            }
-            else
-            {
+		unsigned short nodeType = pNode->nodeType();
+		if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
+		{
+			pNode->setNodeValue(value);
+		}
+		else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
+		{
+			Poco::XML::Node* pChildNode = pNode->firstChild();
+			if (pChildNode)
+			{
+				if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
+				{
+					pChildNode->setNodeValue(value);
+				}
+			}
+			else
+			{
 				Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(value);
 				pNode->appendChild(pText);
-            }
-        }
+			}
+		}
 	}
-    else throw NotFoundException("Node not found in XMLConfiguration", key);
+	else throw NotFoundException("Node not found in XMLConfiguration", key);
 }
 
 

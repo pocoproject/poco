@@ -824,7 +824,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 	}
 	else
 	{
-		pKeyCtx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
+		pKeyCtx = EVP_PKEY_CTX_new_from_name(nullptr, "DH", nullptr);
 		if (!pKeyCtx)
 		{
 			std::string err = "Context::initDH():EVP_PKEY_CTX_new_from_name()\n";
@@ -1006,22 +1006,22 @@ void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
 #if OPENSSL_VERSION_NUMBER >= 0x1000200fL
- 	const std::string groups(curve.empty() ?
+	const std::string groups(curve.empty() ?
  #if   OPENSSL_VERSION_NUMBER >= 0x1010100fL
- 				   "X448:X25519:P-521:P-384:P-256"
+				   "X448:X25519:P-521:P-384:P-256"
  #elif OPENSSL_VERSION_NUMBER >= 0x1010000fL
- 	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
- 	// it did support X25519 (ECDH using Curve25516).
- 				   "X25519:P-521:P-384:P-256"
+	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
+	// it did support X25519 (ECDH using Curve25516).
+				   "X25519:P-521:P-384:P-256"
  #else
- 				   "P-521:P-384:P-256"
+				   "P-521:P-384:P-256"
  #endif
- 				   : curve);
- 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
- 	{
- 		throw SSLContextException("Cannot set ECDH groups", groups);
- 	}
- 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
+				   : curve);
+	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
+	{
+		throw SSLContextException("Cannot set ECDH groups", groups);
+	}
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
  #else
 	int nid = 0;
 	if (!curve.empty())

@@ -401,7 +401,7 @@ int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 		DWORD sent = 0;
 		rc = WSASend(_sockfd, const_cast<LPWSABUF>(&buffers[0]),
 					static_cast<DWORD>(buffers.size()), &sent,
-					static_cast<DWORD>(flags), 0, 0);
+					static_cast<DWORD>(flags), nullptr, nullptr);
 		if (rc == SOCKET_ERROR) error();
 		rc = sent;
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -464,7 +464,7 @@ int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 		DWORD recvd = 0;
 		DWORD dwFlags = static_cast<DWORD>(flags);
 		rc = WSARecv(_sockfd, &buffers[0], static_cast<DWORD>(buffers.size()),
-					&recvd, &dwFlags, 0, 0);
+					&recvd, &dwFlags, nullptr, nullptr);
 		if (rc == SOCKET_ERROR) error();
 		rc = recvd;
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -554,7 +554,7 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 		rc = WSASendTo(_sockfd, const_cast<LPWSABUF>(&buffers[0]),
 						static_cast<DWORD>(buffers.size()), &sent,
 						static_cast<DWORD>(flags),
-						address.addr(), address.length(), 0, 0);
+						address.addr(), address.length(), nullptr, nullptr);
 		if (rc == SOCKET_ERROR) error();
 		rc = sent;
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -655,7 +655,7 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_s
 		DWORD recvd = 0;
 		DWORD dwFlags = static_cast<DWORD>(flags);
 		rc = WSARecvFrom(_sockfd, &buffers[0], static_cast<DWORD>(buffers.size()),
-						&recvd, &dwFlags, *pSA, *ppSALen, 0, 0);
+						&recvd, &dwFlags, *pSA, *ppSALen, nullptr, nullptr);
 		if (rc == SOCKET_ERROR) error();
 		rc = recvd;
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -1458,7 +1458,7 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 	memset(&overlapped, 0, sizeof(overlapped));
 	overlapped.Offset = offsetHelper.LowPart;
 	overlapped.OffsetHigh =  offsetHelper.HighPart;
-	overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	overlapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 	if (overlapped.hEvent == nullptr)
 	{
 		int err = GetLastError();
@@ -1508,7 +1508,7 @@ namespace
 				}
 			#elif POCO_OS == POCO_OS_FREE_BSD
 				off_t sbytes;
-				int result = sendfile(fd, sd, offset, count, NULL, &sbytes, 0);
+				int result = sendfile(fd, sd, offset, count, nullptr, &sbytes, 0);
 				if (result < 0)
 				{
 					sent = -1;

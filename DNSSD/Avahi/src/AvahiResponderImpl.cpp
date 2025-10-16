@@ -399,7 +399,7 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 		std::string entry(itVers->first);
 		entry += '=';
 		entry += itVers->second;
-		avahiList = avahi_string_list_new(entry.c_str(), NULL);
+		avahiList = avahi_string_list_new(entry.c_str(), nullptr);
 	}
 
 	Service::Properties::ConstIterator it = properties.begin();
@@ -423,7 +423,7 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 					entry += '=';
 					entry += it->second;
 				}
-				avahiList = avahi_string_list_new(entry.c_str(), NULL);
+				avahiList = avahi_string_list_new(entry.c_str(), nullptr);
 			}
 		}
 	}
