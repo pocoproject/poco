@@ -2,11 +2,11 @@
 
 # Sources
 file(GLOB SRCS_G "src/*.c" "src/*.cc")
-POCO_SOURCES(SRCS wepoll ${SRCS_G})
+POCO_SOURCES(SRCS v8_double_conversion ${SRCS_G})
 
 # Headers
 file(GLOB_RECURSE HDRS_G "src/*.h")
-POCO_HEADERS(SRCS wepoll ${HDRS_G})
+POCO_HEADERS(SRCS v8_double_conversion ${HDRS_G})
 
 add_library(_BUNDLED_V8_DOUBLE_CONVERSION OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
