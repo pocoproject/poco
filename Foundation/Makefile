@@ -76,4 +76,22 @@ ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
     $(shell cd src; $(WINDMC) pocomsg.mc)
 endif
 
+# poco build system looks for sources in src/
+ifndef POCO_UNBUNDLED
+	prebuild = $(shell \
+		mkdir -p src && \
+		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.c        src/ && \
+		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.h        src/ && \
+		ln -sf $(POCO_BASE)/dependencies/pcre2/src/*.c       src/ && \
+		ln -sf $(POCO_BASE)/dependencies/pcre2/src/*.h       src/ && \
+		ln -sf $(POCO_BASE)/dependencies/utf8proc/src/*.c    src/ && \
+		ln -sf $(POCO_BASE)/dependencies/utf8proc/src/*.h    src/ \
+	)
+
+	INCLUDE += -I$(POCO_BASE)/dependencies/zlib/src
+	INCLUDE += -I$(POCO_BASE)/dependencies/pcre2/src
+	INCLUDE += -I$(POCO_BASE)/dependencies/utf8proc/src
+	INCLUDE += -I$(POCO_BASE)/dependencies/v8_double_conversion/src
+endif
+
 include $(POCO_BASE)/build/rules/lib

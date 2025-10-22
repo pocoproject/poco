@@ -42,4 +42,13 @@ target         = PocoNet
 target_version = $(LIBVERSION)
 target_libs    = PocoFoundation
 
+# poco build system looks for sources in src/
+ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
+prebuild = $(shell \
+	ln -sf $(POCO_BASE)/dependencies/wepoll/wepoll.c  src/wepoll.c \
+)
+INCLUDE += -I$(POCO_BASE)/dependencies/wepoll
+objects += wepoll
+endif
+
 include $(POCO_BASE)/build/rules/lib
