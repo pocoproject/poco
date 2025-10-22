@@ -18,7 +18,6 @@ ifdef POCO_UNBUNDLED
 else
 	objects += pdjson
 	prebuild = $(shell \
-		mkdir -p src && \
 		ln -sf $(POCO_BASE)/dependencies/pdjson/src/pdjson.c  src/ && \
 		ln -sf $(POCO_BASE)/dependencies/pdjson/src/pdjson.h  src/ \
 	)

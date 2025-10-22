@@ -30,7 +30,6 @@ ifdef POCO_UNBUNDLED
 else
 	objects += $(expat_objects)
 	prebuild = $(shell \
-		mkdir -p src && \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.c     src/ && \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.cpp.  src/ && \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.h     src/ \

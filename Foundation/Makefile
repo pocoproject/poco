@@ -79,7 +79,6 @@ endif
 # poco build system looks for sources in src/
 ifndef POCO_UNBUNDLED
 	prebuild = $(shell \
-		mkdir -p src && \
 		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.c        src/ && \
 		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.h        src/ && \
 		ln -sf $(POCO_BASE)/dependencies/pcre2/src/*.c       src/ && \
