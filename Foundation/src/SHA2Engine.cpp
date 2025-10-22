@@ -352,7 +352,7 @@ std::size_t SHA2Engine::digestLength() const
 
 void SHA2Engine::reset()
 {
-	if (_context != nullptr) free(_context);
+	free(_context);
 	_context = calloc(1, sizeof(HASHCONTEXT));
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
 	if (_algorithm == SHA_224)
