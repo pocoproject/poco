@@ -56,20 +56,19 @@ if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
 	add_link_options(${POCO_SANITIZEFLAGS})
 endif()
 
-# Warn when using 0 or NULL instead of nullptr constant
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-Wzero-as-null-pointer-constant)
-endif()
-
 if (ENABLE_COMPILER_WARNINGS)
 	message(STATUS "Enabling additional compiler warning flags.")
 	# Additional compiler-specific warning flags
 	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		# using clang
 		add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
+		# Warn when using 0 or NULL instead of nullptr constant
+		add_compile_options(-Wzero-as-null-pointer-constant)
 	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# using GCC
 		add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
+		# Warn when using 0 or NULL instead of nullptr constant
+		add_compile_options(-Wzero-as-null-pointer-constant)
 	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		# using Visual Studio C++
 		add_compile_options(/W4)
