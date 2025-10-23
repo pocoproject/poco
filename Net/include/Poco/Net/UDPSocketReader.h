@@ -114,9 +114,9 @@ public:
 			if (p)
 			{
 				Poco::UInt16 off = handler().offset();
-				auto* pAL = reinterpret_cast<poco_socklen_t*>(p + sizeof(RT));
+				pAL = reinterpret_cast<poco_socklen_t*>(p + sizeof(RT));
 				*pAL = SocketAddress::MAX_ADDRESS_LENGTH;
-				auto* pSA = reinterpret_cast<struct sockaddr*>(p + sizeof(RT) + sizeof(poco_socklen_t));
+				pSA = reinterpret_cast<struct sockaddr*>(p + sizeof(RT) + sizeof(poco_socklen_t));
 				RT ret = sock.receiveFrom(p + off, S - off - 1, &pSA, &pAL);
 				if (ret < 0)
 				{
