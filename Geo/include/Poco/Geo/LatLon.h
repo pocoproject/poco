@@ -93,7 +93,7 @@ public:
 		/// Creates a LatLon from the given cartesian coordinates (in meters),
 		/// relative to the given reference position.
 
-	Cartesian toCartesian(const LatLon& reference);
+	Cartesian toCartesian(const LatLon& reference) const;
 		/// Converts the LatLon to cartesian coordinates (in meters),
 		/// relative to the given reference position.
 

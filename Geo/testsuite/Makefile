@@ -7,7 +7,7 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = GeoTestSuite Driver \
-	AngleTest LatLonTest
+	AngleTest LatLonTest GeofenceTest
 
 target         = testrunner
 target_version = 1
