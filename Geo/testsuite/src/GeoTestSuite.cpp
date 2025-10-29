@@ -10,6 +10,7 @@
 #include "GeoTestSuite.h"
 #include "AngleTest.h"
 #include "LatLonTest.h"
+#include "GeofenceTest.h"
 
 
 CppUnit::Test* GeoTestSuite::suite()
@@ -18,6 +19,7 @@ CppUnit::Test* GeoTestSuite::suite()
 
 	pSuite->addTest(AngleTest::suite());
 	pSuite->addTest(LatLonTest::suite());
+	pSuite->addTest(GeofenceTest::suite());
 
 	return pSuite;
 }

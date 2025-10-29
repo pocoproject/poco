@@ -289,7 +289,7 @@ LatLon LatLon::fromCartesian(const LatLon& reference, double x, double y)
 }
 
 
-Cartesian LatLon::toCartesian(const LatLon& reference)
+Cartesian LatLon::toCartesian(const LatLon& reference) const
 {
 	return toCartesian(reference, *this);
 }

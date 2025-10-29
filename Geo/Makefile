@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Angle LatLon
+objects = Angle LatLon CircularGeofence PolygonalGeofence
 
 target         = PocoGeo
 target_version = 1
