@@ -823,9 +823,8 @@ jobs:
           sudo df
           sudo apt autopurge
           sudo apt clean
-          sudo du -s /usr/local/lib/*
-          sudo du -s /opt/*
           sudo rm -rf /usr/share/dotnet
+          sudo npm cache clean --force
           sudo docker system prune -a --force
           sudo df
       - name: Setup Oracle ODBC connector
