@@ -35,7 +35,7 @@ jobs:
           export CXX=clang++-20
           cmake -S . -B build -G Ninja -DPOCO_BUILD_MODULES=ON
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --parallel 4
 
   android-arm64-v8a-ndk-latest-cmake:
     runs-on: ubuntu-22.04
@@ -82,7 +82,7 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_MINIMAL_BUILD=TRUE
           -DENABLE_NET=ON -DENABLE_JSON=ON -DENABLE_XML=ON -DENABLE_ZIP=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
 
   linux-gcc-cmake-cross-armhf:
     # Converted from a make job, what is essentially different from the above?
@@ -100,14 +100,14 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_MINIMAL_BUILD=TRUE
           -DENABLE_NET=ON -DENABLE_JSON=ON -DENABLE_XML=ON -DENABLE_ZIP=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all  --parallel 4
 
   linux-gcc-cmake:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+      - run: cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all  --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -126,7 +126,7 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DCMAKE_CXX_VISIBILITY_PRESET=hidden
           -DENABLE_PDF=ON -DENABLE_TESTS=ON -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -147,7 +147,7 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON
           -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=ON -DENABLE_XML=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -168,7 +168,7 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DBUILD_SHARED_LIBS=OFF
           -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=ON -DENABLE_XML=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -186,7 +186,7 @@ jobs:
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -219,7 +219,7 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -252,7 +252,7 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -279,7 +279,7 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -314,7 +314,7 @@ jobs:
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -346,7 +346,7 @@ jobs:
       - run: >-
           emcmake cmake -H. -B cmake-build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_ACTIVERECORD_COMPILER=OFF
           -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off
-      - run: emmake cmake --build cmake-build --target all -j6
+      - run: emmake cmake --build cmake-build --target all --parallel 4
   # TODO: How to run unit tests in emscripten?
   #      - uses: ./.github/actions/retry-action
   #        with:
@@ -696,7 +696,7 @@ jobs:
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_MYSQL=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -723,7 +723,7 @@ jobs:
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -746,7 +746,7 @@ jobs:
           sudo apt-get -y install redis
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_REDIS=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -765,7 +765,7 @@ jobs:
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_MONGODB=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
 
       - uses: ./.github/actions/retry-action
         with:
@@ -823,11 +823,10 @@ jobs:
           sudo df
           sudo apt autopurge
           sudo apt clean
-          sudo du -s /usr/local/*
-          sudo du -s /usr/share/*
+          sudo du -s /usr/local/lib/*
           sudo du -s /opt/*
           sudo rm -rf /usr/share/dotnet
-          sudo docker system prune -a
+          sudo docker system prune -a --force
           sudo df
       - name: Setup Oracle ODBC connector
         run: |
@@ -845,7 +844,7 @@ jobs:
       - run: ls -l /etc/apt/sources.list.d/
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -865,7 +864,7 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_SQLITE=ON
           -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all
+      - run: cmake --build cmake-build --target all --parallel 4
 
       - uses: ./.github/actions/retry-action
         with:
