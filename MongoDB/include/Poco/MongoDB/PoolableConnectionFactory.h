@@ -36,13 +36,13 @@ class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 public:
 	PoolableObjectFactory(Net::SocketAddress& address):
 		_address(address),
-		_pSocketFactory(0)
+		_pSocketFactory(nullptr)
 	{
 	}
 
 	PoolableObjectFactory(const std::string& address):
 		_address(address),
-		_pSocketFactory(0)
+		_pSocketFactory(nullptr)
 	{
 	}
 

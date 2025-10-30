@@ -83,7 +83,7 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
@@ -147,7 +147,7 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
@@ -211,7 +211,7 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:

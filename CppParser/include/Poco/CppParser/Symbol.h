@@ -62,7 +62,7 @@ public:
 		/// Creates the Symbol and assigns the symbol
 		/// a unique ID.
 
-	Symbol(const std::string& name, NameSpace* pNameSpace = 0);
+	Symbol(const std::string& name, NameSpace* pNameSpace = nullptr);
 		/// Creates the Symbol and assigns the symbol
 		/// a unique ID.
 

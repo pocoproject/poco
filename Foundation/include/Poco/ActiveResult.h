@@ -39,7 +39,7 @@ class ActiveResultHolder: public RefCountedObject
 {
 public:
 	ActiveResultHolder():
-		_pData(0),
+		_pData(nullptr),
 		_pExc(nullptr),
 		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.

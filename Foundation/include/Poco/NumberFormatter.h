@@ -654,36 +654,36 @@ private:
 
 inline NumberFormatter::Options operator | (NumberFormatter::Options lhs, NumberFormatter::Options rhs)
 {
-    using T = std::underlying_type_t<NumberFormatter::Options>;
-    return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) | static_cast<T>(rhs));
+	using T = std::underlying_type_t<NumberFormatter::Options>;
+	return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) | static_cast<T>(rhs));
 }
 
 
 inline NumberFormatter::Options& operator |= (NumberFormatter::Options& lhs, NumberFormatter::Options rhs)
 {
-    lhs = lhs | rhs;
-    return lhs;
+	lhs = lhs | rhs;
+	return lhs;
 }
 
 
 inline NumberFormatter::Options operator & (NumberFormatter::Options lhs, NumberFormatter::Options rhs)
 {
-    using T = std::underlying_type_t<NumberFormatter::Options>;
-    return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) & static_cast<T>(rhs));
+	using T = std::underlying_type_t<NumberFormatter::Options>;
+	return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) & static_cast<T>(rhs));
 }
 
 
 inline NumberFormatter::Options& operator &= (NumberFormatter::Options& lhs, NumberFormatter::Options rhs)
 {
-    lhs = lhs & rhs;
-    return lhs;
+	lhs = lhs & rhs;
+	return lhs;
 }
 
 
 inline bool NumberFormatter::isEnabled(Options options, Options opt)
 {
 	using T = std::underlying_type_t<Options>;
-    return static_cast<T>(options & opt) != 0;
+	return static_cast<T>(options & opt) != 0;
 }
 
 

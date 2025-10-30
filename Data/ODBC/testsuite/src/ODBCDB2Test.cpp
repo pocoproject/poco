@@ -681,5 +681,5 @@ CppUnit::Test* ODBCDB2Test::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

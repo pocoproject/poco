@@ -21,7 +21,6 @@
 #include "Poco/Exception.h"
 #include "Poco/DateTime.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/Path.h"
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/FTPStreamFactory.h"
 #include <iostream>
@@ -367,7 +366,7 @@ const std::string TextEncodingCompiler::IMPL_TEMPLATE(
 	"const char* ${CLASS}::_names[] =\n"
 	"{\n"
 	"${ENCODING_NAMES}"
-	"	NULL\n"
+	"	nullptr\n"
 	"};\n"
 	"\n"
 	"\n"

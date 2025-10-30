@@ -99,18 +99,18 @@ private:
 //func<cont<move_only_test, move_only_test, mod_hash<9>>>();
 
 #define testSetFuncFwd(cont, func) {                                                 \
-                                    func<cont<std::int64_t, std::hash<std::int64_t>, \
-                                                std::equal_to<std::int64_t>,         \
-                                                std::allocator<std::int64_t>,        \
-                                                std::deque<std::int64_t>>>();        \
-                                    func<cont<std::int64_t, std::hash<std::int64_t>, \
-                                            std::equal_to<std::int64_t>,             \
-                                            std::allocator<std::int64_t>,            \
-                                            std::vector<std::int64_t>>>();           \
-                                    func<cont<std::int64_t, mod_hash<9>>>();         \
-                                    func<cont<std::string>>();                       \
-                                    func<cont<std::string, mod_hash<9>>>();          \
-                                    }
+									func<cont<std::int64_t, std::hash<std::int64_t>, \
+												std::equal_to<std::int64_t>,         \
+												std::allocator<std::int64_t>,        \
+												std::deque<std::int64_t>>>();        \
+									func<cont<std::int64_t, std::hash<std::int64_t>, \
+											std::equal_to<std::int64_t>,             \
+											std::allocator<std::int64_t>,            \
+											std::vector<std::int64_t>>>();           \
+									func<cont<std::int64_t, mod_hash<9>>>();         \
+									func<cont<std::string>>();                       \
+									func<cont<std::string, mod_hash<9>>>();          \
+									}
 
 	template <typename T>
 	void testMapInsertImpl()

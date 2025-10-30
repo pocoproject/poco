@@ -44,11 +44,11 @@ void QuotedPrintableTest::testEncode()
 	encoder.close();
 	std::string txt = ostr.str();
 	assertTrue (txt == "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
-	               "Proin id odio sit amet metus dignissim porttitor.=20\r\n"
-	               "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin s=\r\n"
-	               "odales molestie arcu.\r\n"
-	               "\t=08Sed suscipit, mi in facilisis feugiat, \t  =20\r\n"
-	               "=80=81\r\n");
+				   "Proin id odio sit amet metus dignissim porttitor.=20\r\n"
+				   "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin s=\r\n"
+				   "odales molestie arcu.\r\n"
+				   "\t=08Sed suscipit, mi in facilisis feugiat, \t  =20\r\n"
+				   "=80=81\r\n");
 }
 
 
@@ -56,11 +56,11 @@ void QuotedPrintableTest::testDecode()
 {
 	std::istringstream istr(
 		"Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
-	    "Proin id odio sit amet metus dignissim porttitor.=20\r\n"
-	    "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin s=\r\n"
-	    "odales molestie arcu.\r\n"
-	    "\t=08Sed suscipit, mi in facilisis feugiat, \t  =20\r\n"
-	    "=80=81\r\n"
+		"Proin id odio sit amet metus dignissim porttitor.=20\r\n"
+		"Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin s=\r\n"
+		"odales molestie arcu.\r\n"
+		"\t=08Sed suscipit, mi in facilisis feugiat, \t  =20\r\n"
+		"=80=81\r\n"
 	);
 	QuotedPrintableDecoder decoder(istr);
 	std::string str;
@@ -71,10 +71,10 @@ void QuotedPrintableTest::testDecode()
 		c = decoder.get();
 	}
 	assertTrue (str == "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
-	               "Proin id odio sit amet metus dignissim porttitor. \r\n"
-	               "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin sodales molestie arcu.\r\n"
-	               "\t\bSed suscipit, mi in facilisis feugiat, \t   \r\n"
-	               "\200\201\r\n");
+				   "Proin id odio sit amet metus dignissim porttitor. \r\n"
+				   "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin sodales molestie arcu.\r\n"
+				   "\t\bSed suscipit, mi in facilisis feugiat, \t   \r\n"
+				   "\200\201\r\n");
 
 }
 

@@ -95,7 +95,7 @@ public:
 		if (entry.isFile())
 		{
 			Poco::UInt32 blockIndex = 0;
-			Byte* pOutBuffer = 0;
+			Byte* pOutBuffer = nullptr;
 			std::size_t outBufferSize = 0;
 			std::size_t offset = 0;
 			std::size_t extractedSize = 0;
@@ -204,7 +204,7 @@ protected:
 			Poco::UInt64 size = f->Size;
 
 			std::vector<Poco::UInt16> utf16Path;
-			std::size_t utf16PathLen = SzArEx_GetFileNameUtf16(&_db, i, 0);
+			std::size_t utf16PathLen = SzArEx_GetFileNameUtf16(&_db, i, nullptr);
 			utf16Path.resize(utf16PathLen, 0);
 			utf16PathLen--; // we don't need terminating 0 later on
 			SzArEx_GetFileNameUtf16(&_db, i, &utf16Path[0]);

@@ -34,7 +34,7 @@ const std::string SessionHandle::POSTGRESQL_SERIALIZABLE	= "SERIALIZABLE";
 
 
 SessionHandle::SessionHandle():
-	_pConnection(0),
+	_pConnection(nullptr),
 	_inTransaction(false),
 	_isAsynchronousCommit(false),
 	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
@@ -86,7 +86,7 @@ void SessionHandle::connect(const std::string& aConnectionString)
 	{
 		// free bad connection
 		PQfinish(_pConnection);
-		_pConnection = 0;
+		_pConnection = nullptr;
 	}
 
 	_pConnection = PQconnectdb(aConnectionString.c_str());
@@ -97,7 +97,7 @@ void SessionHandle::connect(const std::string& aConnectionString)
 		if (_pConnection)
 		{
 			PQfinish(_pConnection);
-			_pConnection = 0;
+			_pConnection = nullptr;
 		}
 		throw ConnectionFailedException(msg);
 	}
@@ -152,7 +152,7 @@ void SessionHandle::disconnect()
 	{
 		PQfinish(_pConnection);
 
-		_pConnection = 0;
+		_pConnection = nullptr;
 
 		_connectionString = std::string();
 		_inTransaction= false;
@@ -197,7 +197,7 @@ std::string SessionHandle::lastError() const
 std::string SessionHandle::lastErrorNoLock() const
 {
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
-	std::string lastErrorString (0 != _pConnection ? PQerrorMessage(_pConnection) : "not connected");
+	std::string lastErrorString (nullptr != _pConnection ? PQerrorMessage(_pConnection) : "not connected");
 
 	return lastErrorString;
 }
@@ -328,7 +328,7 @@ void SessionHandle::cancel()
 
 	PGCancelFree cancelFreer(ptrPGCancel);
 
-	PQcancel(ptrPGCancel, 0, 0); // no error buffer
+	PQcancel(ptrPGCancel, nullptr, 0); // no error buffer
 }
 
 
@@ -565,7 +565,7 @@ SessionParametersMap SessionHandle::connectionParameters() const
 		throw NotConnectedException();
 	}
 
-	PQconninfoOption* ptrConnInfoOptions = 0;
+	PQconninfoOption* ptrConnInfoOptions = nullptr;
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 

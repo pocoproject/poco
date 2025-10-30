@@ -191,7 +191,7 @@ public:
 	template <class Other>
 	AutoPtr<Other> cast() const
 		/// Casts the AutoPtr via a dynamic cast to the given type.
-		/// Returns an AutoPtr containing NULL if the cast fails.
+		/// Returns an AutoPtr containing nullptr if the cast fails.
 		/// Example: (assume class Sub: public Super)
 		///    AutoPtr<Super> super(new Sub());
 		///    AutoPtr<Sub> sub = super.cast<Sub>();
@@ -396,7 +396,7 @@ inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2) noexcept
 template<typename T, typename... Args>
 AutoPtr<T> makeAuto(Args&&... args)
 {
-    return AutoPtr<T>(new T(std::forward<Args>(args)...));
+	return AutoPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 

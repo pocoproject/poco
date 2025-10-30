@@ -48,7 +48,7 @@ void NestedDiagnosticContext::push(const std::string& info)
 	Context ctx;
 	ctx.info = info;
 	ctx.line = -1;
-	ctx.file = 0;
+	ctx.file = nullptr;
 	_stack.push_back(ctx);
 }
 

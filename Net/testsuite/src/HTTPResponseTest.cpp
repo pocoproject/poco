@@ -197,7 +197,7 @@ void HTTPResponseTest::testCookies()
 	response2.getCookies(cookies);
 	assertTrue (cookies.size() == 2);
 	assertTrue (((cookies[0].getName() == "name1") && (cookies[1].getName() == "name2"))
-	     || ((cookies[0].getName() == "name2") && (cookies[1].getName() == "name1")));
+		 || ((cookies[0].getName() == "name2") && (cookies[1].getName() == "name1")));
 }
 
 

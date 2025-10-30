@@ -186,7 +186,7 @@ void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 void Binder::bind(std::size_t pos, const NullData&, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, Poco::Data::MetaColumn::FDT_UNKNOWN, 0, 0);
+	realBind(pos, Poco::Data::MetaColumn::FDT_UNKNOWN, nullptr, 0);
 }
 
 

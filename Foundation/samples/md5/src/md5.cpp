@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	if (argc != 2)
 	{
 		std::cout << "usage: " << argv[0] << ": <input_file>" << std::endl
-		          << "       create the MD5 digest for <input_file>" << std::endl;
+				  << "       create the MD5 digest for <input_file>" << std::endl;
 		return 1;
 	}
 

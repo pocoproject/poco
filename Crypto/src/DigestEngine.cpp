@@ -26,7 +26,7 @@ DigestEngine::DigestEngine(const std::string& name):
 {
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
 	if (!md) throw Poco::NotFoundException(_name);
-	EVP_DigestInit_ex(_pContext, md, NULL);
+	EVP_DigestInit_ex(_pContext, md, nullptr);
 }
 
 
@@ -60,7 +60,7 @@ void DigestEngine::reset()
 #endif
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
 	if (!md) throw Poco::NotFoundException(_name);
-	EVP_DigestInit_ex(_pContext, md, NULL);
+	EVP_DigestInit_ex(_pContext, md, nullptr);
 }
 
 

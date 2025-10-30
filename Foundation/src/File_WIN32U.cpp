@@ -340,7 +340,7 @@ void FileImpl::linkToImpl(const std::string& path, int type) const
 
 	if (type == 0)
 	{
-		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), NULL) == 0)
+		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), nullptr) == 0)
 			handleLastErrorImpl(_path);
 	}
 	else
@@ -417,7 +417,7 @@ FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, &space, NULL))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), nullptr, &space, nullptr))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -428,7 +428,7 @@ FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, NULL, NULL))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, nullptr, nullptr))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -439,7 +439,7 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, NULL, &space))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), nullptr, nullptr, &space))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }

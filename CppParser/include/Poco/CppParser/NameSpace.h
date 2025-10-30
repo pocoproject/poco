@@ -41,7 +41,7 @@ public:
 	NameSpace();
 		/// Creates the NameSpace.
 
-	NameSpace(const std::string& name, NameSpace* pNameSpace = 0);
+	NameSpace(const std::string& name, NameSpace* pNameSpace = nullptr);
 		/// Creates the NameSpace.
 
 	~NameSpace();

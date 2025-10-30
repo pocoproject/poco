@@ -46,7 +46,7 @@ class XML_API NodeIterator
 	/// not conform to the DOM Level 2 Traversal specification.
 {
 public:
-	NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
+	NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter = nullptr);
 		/// Creates a NodeIterator over the subtree rooted at the specified node.
 
 	NodeIterator(const NodeIterator& iterator);

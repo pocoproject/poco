@@ -51,7 +51,7 @@ public:
 			pIS->setSystemId(systemId);
 			return pIS;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	void releaseInputSource(InputSource* pSource)

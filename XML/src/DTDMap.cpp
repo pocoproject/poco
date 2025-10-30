@@ -92,7 +92,7 @@ unsigned long DTDMap::length() const
 
 Node* DTDMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return 0;
+	return nullptr;
 }
 
 

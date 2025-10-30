@@ -20,7 +20,7 @@ namespace Poco {
 
 RWLockImpl::RWLockImpl()
 {
-	if (pthread_rwlock_init(&_rwl, NULL))
+	if (pthread_rwlock_init(&_rwl, nullptr))
 		throw SystemException("cannot create reader/writer lock");
 }
 

@@ -116,7 +116,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 	}
 #else
 	struct timeval tv;
-	gettimeofday(&tv, NULL);
+	gettimeofday(&tv, nullptr);
 	abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
 	abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
 	if (abstime.tv_nsec >= 1000000000)
@@ -147,13 +147,13 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 		struct timespec ts;
 		ts.tv_sec = 0;
 		ts.tv_nsec = sleepMillis*1000000;
-		nanosleep(&ts, NULL);
+		nanosleep(&ts, nullptr);
 
 #else
 		struct timeval tv;
 		tv.tv_sec  = 0;
 		tv.tv_usec = sleepMillis * 1000;
-		select(0, NULL, NULL, NULL, &tv);
+		select(0, nullptr, nullptr, nullptr, &tv);
 #endif
 	}
 	while (!now.isElapsed(diff));

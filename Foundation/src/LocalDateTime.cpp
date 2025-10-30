@@ -267,9 +267,9 @@ void LocalDateTime::determineTzd(bool adjust)
 		std::time_t epochTime = _dateTime.timestamp().epochTime();
 #if defined(_WIN32) || defined(POCO_NO_POSIX_TSF)
 		std::tm brokenBuf;
- 		std::tm* broken = &brokenBuf;
- 		errno_t err = localtime_s(broken, &epochTime);
- 		if (err) broken = nullptr;
+		std::tm* broken = &brokenBuf;
+		errno_t err = localtime_s(broken, &epochTime);
+		if (err) broken = nullptr;
 
 		if (!broken) throw Poco::SystemException("cannot get local time");
 		_tzd = Timezone::utcOffset() + Timezone::dst(_dateTime.timestamp());

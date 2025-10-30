@@ -72,7 +72,7 @@ namespace
 			sigset_t sset;
 			sigemptyset(&sset);
 			sigaddset(&sset, SIGPIPE);
-			pthread_sigmask(SIG_BLOCK, &sset, 0);
+			pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 		}
 		~SignalBlocker()
 		{
@@ -278,10 +278,10 @@ void ThreadImpl::setStackSizeImpl(int size)
 		const int STACK_PAGE_SIZE = 4096;
 		size = ((size + STACK_PAGE_SIZE - 1)/STACK_PAGE_SIZE)*STACK_PAGE_SIZE;
 #endif
- 		if (size < PTHREAD_STACK_MIN)
- 			size = PTHREAD_STACK_MIN;
+		if (size < PTHREAD_STACK_MIN)
+			size = PTHREAD_STACK_MIN;
 	}
- 	_pData->stackSize = size;
+	_pData->stackSize = size;
 #endif
 }
 
@@ -297,7 +297,7 @@ void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
 			sigaddset(&sset, sig);
 	}
 
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 }
 
 
@@ -330,7 +330,7 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		int errorCode;
 		if ((errorCode = pthread_create(&_pData->thread, &attributes, runnableEntry, this)))
 		{
-			_pData->pRunnableTarget = 0;
+			_pData->pRunnableTarget = nullptr;
 			pthread_attr_destroy(&attributes);
 			throw SystemException(Poco::format("cannot start thread (%s)",
 				Error::getMessage(errorCode)));
@@ -433,7 +433,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigaddset(&sset, SIGPIPE);
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
@@ -467,9 +467,9 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	}
 
 	FastMutex::ScopedLock l(pData->mutex);
-	pData->pRunnableTarget = 0;
+	pData->pRunnableTarget = nullptr;
 	pData->done.set();
-	return 0;
+	return nullptr;
 }
 
 

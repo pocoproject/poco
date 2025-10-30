@@ -149,7 +149,7 @@ public:
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "") const;
+	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = nullptr, const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and/or private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
@@ -218,7 +218,7 @@ private:
 		poco_check_ptr (ppKey);
 		poco_assert_dbg (!*ppKey);
 
-		FILE* pFile = 0;
+		FILE* pFile = nullptr;
 		if (!keyFile.empty())
 		{
 			if (!getFunc) *ppKey = (K*)EVP_PKEY_new();
@@ -236,11 +236,11 @@ private:
 
 				if (pFile)
 				{
-					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
-					void* pPassword = pass.empty() ? (void*)0 : (void*)pass.c_str();
+					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)nullptr : &passCB;
+					void* pPassword = pass.empty() ? (void*)nullptr : (void*)pass.c_str();
 					if (readFunc(pFile, &pKey, pCB, pPassword))
 					{
-						fclose(pFile); pFile = 0;
+						fclose(pFile); pFile = nullptr;
 						if(getFunc)
 						{
 							*ppKey = (K*)getFunc(pKey);
@@ -288,7 +288,7 @@ private:
 		poco_check_ptr(ppKey);
 		poco_assert_dbg(!*ppKey);
 
-		BIO* pBIO = 0;
+		BIO* pBIO = nullptr;
 		if (pIstr)
 		{
 			std::ostringstream ostr;
@@ -301,11 +301,11 @@ private:
 				EVP_PKEY* pKey = getFunc ? EVP_PKEY_new() : (EVP_PKEY*)*ppKey;
 				if (pKey)
 				{
-					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
-					void* pPassword = pass.empty() ? (void*)0 : (void*)pass.c_str();
+					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)nullptr : &passCB;
+					void* pPassword = pass.empty() ? (void*)nullptr : (void*)pass.c_str();
 					if (readFunc(pBIO, &pKey, pCB, pPassword))
 					{
-						BIO_free(pBIO); pBIO = 0;
+						BIO_free(pBIO); pBIO = nullptr;
 						if (getFunc)
 						{
 							*ppKey = (K*)getFunc(pKey);
@@ -335,7 +335,7 @@ private:
 		throw OpenSSLException(msg);
 	}
 
-	EVP_PKEY* _pEVPPKey = 0;
+	EVP_PKEY* _pEVPPKey = nullptr;
 	static const std::map<int, std::string> KNOWN_TYPES;
 
 	friend class ECKeyImpl;

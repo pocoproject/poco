@@ -110,7 +110,7 @@ AbstractConfiguration::Ptr LayeredConfiguration::find(const std::string& label) 
 	{
 		if (conf.label == label) return conf.pConfig;
 	}
-	return 0;
+	return nullptr;
 }
 
 

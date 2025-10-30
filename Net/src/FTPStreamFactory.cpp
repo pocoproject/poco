@@ -110,7 +110,7 @@ FTPPasswordProvider::~FTPPasswordProvider()
 
 
 std::string          FTPStreamFactory::_anonymousPassword("poco@localhost");
-FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(0);
+FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(nullptr);
 
 
 FTPStreamFactory::FTPStreamFactory()

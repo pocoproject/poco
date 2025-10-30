@@ -29,7 +29,7 @@ int Parameter::_count(0);
 
 
 Parameter::Parameter(const std::string& decl, Function* /*pFunction*/):
-	Decl(handleDecl(decl), 0), // handle init values
+	Decl(handleDecl(decl), nullptr), // handle init values
 	_type(),
 	_isRef(false),
 	_isPointer(false),

@@ -428,7 +428,7 @@ private:
 //
 inline bool BinaryExtractor::isColumnNull(const OutputParameter& anOutputParameter) const
 {
-	return anOutputParameter.isNull() || 0 == anOutputParameter.pData();
+	return anOutputParameter.isNull() || nullptr == anOutputParameter.pData();
 }
 
 

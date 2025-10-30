@@ -182,7 +182,7 @@ inline UInt32 ByteOrder::flipBytes(UInt32 value)
 	return __builtin_bswap32(value);
 #else
 	return ((value >> 24) & 0x000000FF) | ((value >> 8) & 0x0000FF00)
-	     | ((value << 8) & 0x00FF0000) | ((value << 24) & 0xFF000000);
+		 | ((value << 8) & 0x00FF0000) | ((value << 24) & 0xFF000000);
 #endif
 }
 

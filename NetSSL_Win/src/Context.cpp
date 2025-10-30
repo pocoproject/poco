@@ -52,11 +52,11 @@ Context::Context(Usage usage,
 	_extendedCertificateVerification(true),
 	_certInfoOrPath(certificateInfoOrPath),
 	_certStoreName(certStore),
-	_hMemCertStore(0),
-	_hCollectionCertStore(0),
-	_hRootCertStore(0),
-	_hCertStore(0),
-	_pCert(0),
+	_hMemCertStore(nullptr),
+	_hCollectionCertStore(nullptr),
+	_hRootCertStore(nullptr),
+	_hCertStore(nullptr),
+	_pCert(nullptr),
 	_securityFunctions(SSLManager::instance().securityFunctions())
 {
 	init();
@@ -94,9 +94,9 @@ void Context::init()
 	_hMemCertStore = CertOpenStore(
 					CERT_STORE_PROV_MEMORY,   // The memory provider type
 					0,                        // The encoding type is not needed
-					NULL,                     // Use the default provider
+					0,                        // Use the default provider
 					0,                        // Accept the default dwFlags
-					NULL);                    // pvPara is not used
+					nullptr);                 // pvPara is not used
 
 	if (!_hMemCertStore)
 		throw SSLException("Failed to create memory certificate store", GetLastError());
@@ -104,9 +104,9 @@ void Context::init()
 	_hCollectionCertStore = CertOpenStore(
 			CERT_STORE_PROV_COLLECTION, // A collection store
 			0,                          // Encoding type; not used with a collection store
-			NULL,                       // Use the default provider
+			0,                          // Use the default provider
 			0,                          // No flags
-			NULL);                      // Not needed
+			nullptr);                   // Not needed
 
 	if (!_hCollectionCertStore)
 		throw SSLException("Failed to create collection store", GetLastError());
@@ -137,7 +137,7 @@ void Context::enableExtendedCertificateVerification(bool flag)
 void Context::addTrustedCert(const Poco::Net::X509Certificate& cert)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	if (!CertAddCertificateContextToStore(_hMemCertStore, cert.system(), CERT_STORE_ADD_REPLACE_EXISTING, 0))
+	if (!CertAddCertificateContextToStore(_hMemCertStore, cert.system(), CERT_STORE_ADD_REPLACE_EXISTING, nullptr))
 		throw CertificateException("Failed to add certificate to store", GetLastError());
 }
 
@@ -204,7 +204,7 @@ void Context::loadCertificate()
 		chBlob.cbData = bufferSize;
 		chBlob.pbData = buffer;
 
-		_pCert = CertFindCertificateInStore(_hCertStore, PKCS_7_ASN_ENCODING | X509_ASN_ENCODING, 0, CERT_FIND_HASH, &chBlob, NULL);
+		_pCert = CertFindCertificateInStore(_hCertStore, PKCS_7_ASN_ENCODING | X509_ASN_ENCODING, 0, CERT_FIND_HASH, &chBlob, nullptr);
 		if (!_pCert) throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", _certInfoOrPath, _certStoreName));
 	}
 	else
@@ -220,7 +220,7 @@ void Context::loadCertificate()
 		cert_rdn.cRDNAttr = 1;
 		cert_rdn.rgRDNAttr = &cert_rdn_attr;
 
-		_pCert = CertFindCertificateInStore(_hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
+		_pCert = CertFindCertificateInStore(_hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, nullptr);
 		if (!_pCert) throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", _certInfoOrPath, _certStoreName));
 	}
 }
@@ -261,11 +261,11 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 
 	if (hTempStore)
 	{
-		PCCERT_CONTEXT pCert = 0;
+		PCCERT_CONTEXT pCert = nullptr;
 		pCert = CertEnumCertificatesInStore(hTempStore, pCert);
 		while (pCert)
 		{
-			PCCERT_CONTEXT pStoreCert = 0;
+			PCCERT_CONTEXT pStoreCert = nullptr;
 			BOOL res = CertAddCertificateContextToStore(_hMemCertStore, pCert, CERT_STORE_ADD_REPLACE_EXISTING, &pStoreCert);
 			if (res)
 			{
@@ -276,7 +276,7 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 				else
 				{
 					CertFreeCertificateContext(pStoreCert);
-					pStoreCert = 0;
+					pStoreCert = nullptr;
 				}
 			}
 			pCert = CertEnumCertificatesInStore(hTempStore, pCert);
@@ -308,7 +308,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	if (_pCert)
 	{
 		schannelCred.cCreds = 1; // how many cred are stored in &pCertContext
-        schannelCred.paCred = const_cast<PCCERT_CONTEXT*>(&_pCert);
+		schannelCred.paCred = const_cast<PCCERT_CONTEXT*>(&_pCert);
 	}
 
 	schannelCred.grbitEnabledProtocols = proto();
@@ -346,19 +346,19 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : NULL;
+	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
-    ::SEC_WCHAR name[] = UNISP_NAME_W;
+	::SEC_WCHAR name[] = UNISP_NAME_W;
 	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
-		NULL,
-        name,
+		nullptr,
+		name,
 		isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
-		NULL,
+		nullptr,
 		&schannelCred,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		&credHandle,
 		&tsExpiry);
 

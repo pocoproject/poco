@@ -54,7 +54,7 @@ Context::Params::Params(KeyDHGroup dhBits):
 Context::Context(Usage usage, const Params& params):
 	_usage(usage),
 	_mode(params.verificationMode),
-	_pSSLContext(0),
+	_pSSLContext(nullptr),
 	_extendedCertificateVerification(true),
 	_ocspStaplingResponseVerification(false)
 {
@@ -73,7 +73,7 @@ Context::Context(
 	const std::string& cipherList):
 	_usage(usage),
 	_mode(verificationMode),
-	_pSSLContext(0),
+	_pSSLContext(nullptr),
 	_extendedCertificateVerification(true),
 	_ocspStaplingResponseVerification(false)
 {
@@ -98,7 +98,7 @@ Context::Context(
 	const std::string& cipherList):
 	_usage(usage),
 	_mode(verificationMode),
-	_pSSLContext(0),
+	_pSSLContext(nullptr),
 	_extendedCertificateVerification(true),
 	_ocspStaplingResponseVerification(false)
 {
@@ -142,9 +142,9 @@ void Context::init(const Params& params)
 		{
 			Poco::File aFile(params.caLocation);
 			if (aFile.isDirectory())
-				errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, Poco::Path::transcode(params.caLocation).c_str());
+				errCode = SSL_CTX_load_verify_locations(_pSSLContext, nullptr, Poco::Path::transcode(params.caLocation).c_str());
 			else
-				errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(params.caLocation).c_str(), 0);
+				errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(params.caLocation).c_str(), nullptr);
 			if (errCode != 1)
 			{
 				std::string msg = Utility::getLastError();
@@ -484,7 +484,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	if (!SSL_CTX_set_min_proto_version(_pSSLContext, version))
 	{
 		unsigned long err = ERR_get_error();
-		throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, 0));
+		throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, nullptr));
 	}
 
 #else
@@ -661,7 +661,7 @@ void Context::createSSLContext()
 	if (!_pSSLContext)
 	{
 		unsigned long err = ERR_get_error();
-		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
+		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, nullptr));
 	}
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -670,9 +670,9 @@ void Context::createSSLContext()
 		if (!SSL_CTX_set_min_proto_version(_pSSLContext, minTLSVersion))
 		{
 			SSL_CTX_free(_pSSLContext);
-			_pSSLContext = 0;
+			_pSSLContext = nullptr;
 			unsigned long err = ERR_get_error();
-			throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, 0));
+			throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, nullptr));
 		}
 	}
 #endif
@@ -770,15 +770,15 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 
-	EVP_PKEY_CTX* pKeyCtx = NULL;
-	OSSL_DECODER_CTX* pOSSLDecodeCtx = NULL;
-	EVP_PKEY* pKey = NULL;
+	EVP_PKEY_CTX* pKeyCtx = nullptr;
+	OSSL_DECODER_CTX* pOSSLDecodeCtx = nullptr;
+	EVP_PKEY* pKey = nullptr;
 	bool freeEVPPKey = true;
 	if (!dhParamsFile.empty())
 	{
 		freeEVPPKey = false;
-		pOSSLDecodeCtx = OSSL_DECODER_CTX_new_for_pkey(&pKey, NULL, NULL, "DH",
-				OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS, NULL, NULL);
+		pOSSLDecodeCtx = OSSL_DECODER_CTX_new_for_pkey(&pKey, nullptr, nullptr, "DH",
+				OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS, nullptr, nullptr);
 
 		if (!pOSSLDecodeCtx)
 		{
@@ -824,7 +824,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 	}
 	else
 	{
-		pKeyCtx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
+		pKeyCtx = EVP_PKEY_CTX_new_from_name(nullptr, "DH", nullptr);
 		if (!pKeyCtx)
 		{
 			std::string err = "Context::initDH():EVP_PKEY_CTX_new_from_name()\n";
@@ -1006,22 +1006,22 @@ void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
 #if OPENSSL_VERSION_NUMBER >= 0x1000200fL
- 	const std::string groups(curve.empty() ?
+	const std::string groups(curve.empty() ?
  #if   OPENSSL_VERSION_NUMBER >= 0x1010100fL
- 				   "X448:X25519:P-521:P-384:P-256"
+				   "X448:X25519:P-521:P-384:P-256"
  #elif OPENSSL_VERSION_NUMBER >= 0x1010000fL
- 	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
- 	// it did support X25519 (ECDH using Curve25516).
- 				   "X25519:P-521:P-384:P-256"
+	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
+	// it did support X25519 (ECDH using Curve25516).
+				   "X25519:P-521:P-384:P-256"
  #else
- 				   "P-521:P-384:P-256"
+				   "P-521:P-384:P-256"
  #endif
- 				   : curve);
- 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
- 	{
- 		throw SSLContextException("Cannot set ECDH groups", groups);
- 	}
- 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
+				   : curve);
+	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
+	{
+		throw SSLContextException("Cannot set ECDH groups", groups);
+	}
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
  #else
 	int nid = 0;
 	if (!curve.empty())

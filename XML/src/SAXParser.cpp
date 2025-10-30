@@ -203,7 +203,7 @@ void SAXParser::parse(const XMLString& systemId)
 {
 	setupParse();
 	EntityResolverImpl entityResolver;
-	InputSource* pInputSource = entityResolver.resolveEntity(0, systemId);
+	InputSource* pInputSource = entityResolver.resolveEntity(nullptr, systemId);
 	if (pInputSource)
 	{
 		try

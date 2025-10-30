@@ -21,7 +21,7 @@ namespace Poco {
 const char* ISO8859_7Encoding::_names[] =
 {
 	"ISO-8859-7",
-	NULL
+	nullptr
 };
 
 

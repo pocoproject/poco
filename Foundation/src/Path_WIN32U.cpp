@@ -25,7 +25,7 @@ std::string PathImpl::selfImpl()
 {
 	std::string path;
 	Buffer<wchar_t> buf(MAX_PATH_LEN);
-	DWORD n = GetModuleFileNameW(NULL, buf.begin(), MAX_PATH_LEN);
+	DWORD n = GetModuleFileNameW(nullptr, buf.begin(), MAX_PATH_LEN);
 
 	if (n > 0  && n < MAX_PATH_LEN)
 	{
@@ -39,7 +39,7 @@ std::string PathImpl::selfImpl()
 std::string PathImpl::currentImpl()
 {
 	std::string result;
-	DWORD len = GetCurrentDirectoryW(0, NULL);
+	DWORD len = GetCurrentDirectoryW(0, nullptr);
 	if (len > 0)
 	{
 		Buffer<wchar_t> buffer(len);

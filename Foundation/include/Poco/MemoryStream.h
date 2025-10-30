@@ -82,7 +82,7 @@ public:
 
 		if ((which & std::ios_base::in) != 0)
 		{
-			if (this->gptr() == 0)
+			if (this->gptr() == nullptr)
 				return fail;
 
 			if (way == std::ios_base::beg)
@@ -112,7 +112,7 @@ public:
 
 		if ((which & std::ios_base::out) != 0)
 		{
-			if (this->pptr() == 0)
+			if (this->pptr() == nullptr)
 				return fail;
 
 			if (way == std::ios_base::beg)

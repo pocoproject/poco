@@ -179,7 +179,7 @@ void PooledThread::run()
 	{
 		_targetReady.wait();
 		_mutex.lock();
-		if (_pTarget) // a NULL target means kill yourself
+		if (_pTarget) // a nullptr target means kill yourself
 		{
 			Runnable* pTarget = _pTarget;
 			_mutex.unlock();

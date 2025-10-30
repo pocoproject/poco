@@ -109,7 +109,7 @@ typedef struct Expr Expr;
 // Description of additional fields for a window expression.
 struct SQLParser_API WindowDescription {
   WindowDescription(std::vector<Expr*>* partitionList, std::vector<OrderDescription*>* orderList,
-                    FrameDescription* frameDescription);
+					FrameDescription* frameDescription);
   virtual ~WindowDescription();
 
   std::vector<Expr*>* partitionList;
@@ -226,9 +226,9 @@ struct SQLParser_API Expr {
 #define ALLOC_EXPR(var, type)         \
   Expr* var;                          \
   do {                                \
-    Expr zero = {type};               \
-    var = (Expr*)malloc(sizeof *var); \
-    *var = zero;                      \
+	Expr zero = {type};               \
+	var = (Expr*)malloc(sizeof *var); \
+	*var = zero;                      \
   } while (0);
 #undef ALLOC_EXPR
 

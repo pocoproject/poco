@@ -65,7 +65,7 @@ protected:
 		///     {
 		///         "myencoding",
 		///         "MyEncoding",
-		///         NULL
+		///         nullptr
 		///     };
 		///
 		/// The first entry in names must be the canonical name.

@@ -21,7 +21,7 @@ namespace Poco {
 
 
 TextIterator::TextIterator():
-	_pEncoding(0)
+	_pEncoding(nullptr)
 {
 }
 
@@ -43,7 +43,7 @@ TextIterator::TextIterator(const std::string::const_iterator& begin, const std::
 
 
 TextIterator::TextIterator(const std::string& str):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(str.end()),
 	_end(str.end())
 {
@@ -51,7 +51,7 @@ TextIterator::TextIterator(const std::string& str):
 
 
 TextIterator::TextIterator(const std::string::const_iterator& end):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(end),
 	_end(end)
 {

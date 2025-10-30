@@ -78,7 +78,7 @@ public:
 
 	using PartVec = std::vector<Part>;
 
-	MailMessage(PartStoreFactory* pStoreFactory = 0);
+	MailMessage(PartStoreFactory* pStoreFactory = nullptr);
 		/// Creates an empty MailMessage.
 		///
 		/// If pStoreFactory is not null, message attachments will be
