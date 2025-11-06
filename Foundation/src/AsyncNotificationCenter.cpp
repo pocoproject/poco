@@ -180,6 +180,7 @@ void AsyncNotificationCenter::stop()
 	{
 		if (_enqueueThreadStarted.exchange(false))
 		{
+			_nq.enqueueUrgentNotification(new ShutdownNotification);
 			_nq.wakeUpAll();
 			while (!_enqueueThreadDone) Thread::sleep(100);
 			_enqueueThread.join();
@@ -207,8 +208,11 @@ void AsyncNotificationCenter::dequeue()
 	Notification::Ptr pNf;
 	_enqueueThreadStarted = true;
 	_enqueueThreadDone = false;
-	while ((pNf = _nq.waitDequeueNotification()))
+	while (true)
 	{
+		pNf = _nq.waitDequeueNotification();
+		if (!pNf) break;
+		if (pNf.cast<ShutdownNotification>()) break;
 		try
 		{
 			notifyObservers(pNf);

@@ -120,6 +120,11 @@ private:
 
 	using Adapter = RunnableAdapter<AsyncNotificationCenter>;
 
+	class ShutdownNotification: public Notification
+		/// Internal notification used to signal the dequeue loop to stop.
+	{
+	};
+
 	const AsyncMode _mode { AsyncMode::ENQUEUE };
 
 	// Async enqueue for notifications
