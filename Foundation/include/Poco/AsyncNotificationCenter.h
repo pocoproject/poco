@@ -23,6 +23,7 @@
 #include "Poco/Thread.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/NotificationQueue.h"
+#include "Poco/AsyncObserver.h"
 
 #if (POCO_HAVE_CPP20_COMPILER)
 	#if !(POCO_HAVE_JTHREAD)
@@ -80,8 +81,11 @@ public:
 
 #if (POCO_HAVE_JTHREAD)
 
-	AsyncNotificationCenter(AsyncMode mode = AsyncMode::ENQUEUE, std::size_t workersCount = AsyncNotificationCenter::DEFAULT_WORKERS_COUNT);
-		/// Creates the AsyncNotificationCenter and starts the notifying thread and workers.
+	explicit AsyncNotificationCenter(AsyncMode mode = AsyncMode::ENQUEUE);
+		/// Creates the AsyncNotificationCenter with default worker count and starts the notifying thread and workers.
+
+	AsyncNotificationCenter(AsyncMode mode, std::size_t workersCount);
+		/// Creates the AsyncNotificationCenter with explicit worker count and starts the notifying thread and workers.
 #else
 
 	AsyncNotificationCenter();
@@ -109,6 +113,33 @@ public:
 		/// This method blocks until the notification is processed by
 		/// all observers. Returns results from all observers that accepted the notification.
 
+	template <class C, class N>
+	void addAsyncObserver(C& object, void (C::*method)(const AutoPtr<N>&), bool (C::*matcher)(const std::string&) const = nullptr)
+		/// Convenience method for registering an AsyncObserver.
+		/// Creates an AsyncObserver<C, N> with optional matcher and registers it.
+		/// Usage:
+		///     asyncNotificationCenter.addAsyncObserver(*this, &MyClass::handleNotification);
+		///     asyncNotificationCenter.addAsyncObserver(*this, &MyClass::handleNotification, &MyClass::matchNotification);
+	{
+		addObserver(AsyncObserver<C, N>(object, method, matcher));
+	}
+
+	template <class C, class N>
+	void removeAsyncObserver(C& object, void (C::*method)(const AutoPtr<N>&), bool (C::*matcher)(const std::string&) const = nullptr)
+		/// Convenience method for unregistering an AsyncObserver.
+		/// Removes the AsyncObserver<C, N> with the given callback and matcher.
+	{
+		removeObserver(AsyncObserver<C, N>(object, method, matcher));
+	}
+
+#if (POCO_HAVE_JTHREAD)
+
+	static std::size_t defaultWorkersCount();
+		/// Returns the default number of worker threads based on hardware capabilities.
+		/// Scales from 2 (embedded) to 6 (server) based on available CPU cores.
+
+#endif
+
 protected:
 
 	void notifyObservers(Notification::Ptr& pNotification) override;
@@ -119,11 +150,6 @@ private:
 	void dequeue();
 
 	using Adapter = RunnableAdapter<AsyncNotificationCenter>;
-
-	class ShutdownNotification: public Notification
-		/// Internal notification used to signal the dequeue loop to stop.
-	{
-	};
 
 	const AsyncMode _mode { AsyncMode::ENQUEUE };
 
@@ -146,11 +172,7 @@ private:
 	void dispatchNotifications(std::stop_token& stopToken, int workerId);
 		/// Dispatching function executed by each worker thread.
 
-	constexpr static std::size_t DEFAULT_WORKERS_COUNT { 5 };
-		/// Default number of worker threads to process notifications.
-		/// This can be configured to a different value if needed.
-
-	const std::size_t _workersCount { DEFAULT_WORKERS_COUNT };
+	const std::size_t _workersCount { defaultWorkersCount() };
 		/// Number of worker threads to process notifications.
 		/// This can be configured to a different value if needed.
 
@@ -178,8 +200,6 @@ private:
 
 #endif
 };
-
-
 } // namespace Poco
 
 

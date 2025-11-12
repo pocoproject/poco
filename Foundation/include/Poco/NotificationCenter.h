@@ -22,6 +22,8 @@
 #include "Poco/Notification.h"
 #include "Poco/Mutex.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 #include <vector>
 #include <cstddef>
 
@@ -97,6 +99,43 @@ public:
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.
 
+	template <class C, class N>
+	void addObserver(C& object, void (C::*method)(N*))
+		/// Convenience method for registering an Observer.
+		/// Creates an Observer<C, N> and registers it.
+		/// Usage:
+		///     notificationCenter.addObserver(*this, &MyClass::handleNotification);
+	{
+		addObserver(Observer<C, N>(object, method));
+	}
+
+	template <class C, class N>
+	void removeObserver(C& object, void (C::*method)(N*))
+		/// Convenience method for unregistering an Observer.
+		/// Removes the Observer<C, N> with the given callback.
+	{
+		removeObserver(Observer<C, N>(object, method));
+	}
+
+	template <class C, class N>
+	void addNObserver(C& object, void (C::*method)(const AutoPtr<N>&), bool (C::*matcher)(const std::string&) const = nullptr)
+		/// Convenience method for registering an NObserver.
+		/// Creates an NObserver<C, N> with optional matcher and registers it.
+		/// Usage:
+		///     notificationCenter.addNObserver(*this, &MyClass::handleNotification);
+		///     notificationCenter.addNObserver(*this, &MyClass::handleNotification, &MyClass::matchNotification);
+	{
+		addObserver(NObserver<C, N>(object, method, matcher));
+	}
+
+	template <class C, class N>
+	void removeNObserver(C& object, void (C::*method)(const AutoPtr<N>&), bool (C::*matcher)(const std::string&) const = nullptr)
+		/// Convenience method for unregistering an NObserver.
+		/// Removes the NObserver<C, N> with the given callback and matcher.
+	{
+		removeObserver(NObserver<C, N>(object, method, matcher));
+	}
+
 	bool hasObserver(const AbstractObserver& observer) const;
 		/// Returns true if the observer is registered with this NotificationCenter.
 
@@ -148,8 +187,6 @@ private:
 	ObserverList  _observers;
 	mutable Mutex _mutex;
 };
-
-
 } // namespace Poco
 
 
