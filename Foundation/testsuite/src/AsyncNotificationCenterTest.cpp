@@ -2,6 +2,7 @@
 // AsyncNotificationCenterTest.cpp
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
