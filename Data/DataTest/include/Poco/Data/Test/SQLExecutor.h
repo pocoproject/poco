@@ -4,7 +4,8 @@
 // Definition of the SQLExecutor class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.,
-// Aleph ONE Software Engineering d.o.o., and Contributors.
+// Aleph ONE Software Engineering LLC,
+// and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //

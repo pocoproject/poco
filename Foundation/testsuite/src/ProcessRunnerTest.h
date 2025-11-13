@@ -4,7 +4,7 @@
 // Definition of the ProcessRunnerTest class.
 //
 // Copyright (c) 2023, Applied Informatics Software Engineering GmbH.
-// Aleph ONE Software Engineering d.o.o.,
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -26,7 +26,7 @@ class ProcessRunnerTest: public CppUnit::TestCase
 public:
 	ProcessRunnerTest(const std::string& name);
 	~ProcessRunnerTest();
-	
+
 	void testPIDFile();
 	void testProcessRunner();
 
