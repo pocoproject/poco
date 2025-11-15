@@ -18,6 +18,7 @@
 #include "Poco/Process.h"
 #endif
 #include "Poco/Thread.h"
+#include "Poco/NativeThreadInfo.h"
 #include <algorithm>
 
 
@@ -139,6 +140,11 @@ void Message::init()
 	{
 		_tid    = pThread->id();
 		_thread = pThread->name();
+	}
+	else {
+		NativeThreadInfo info;
+		_tid = info.id();
+		_thread = info.name();
 	}
 }
 

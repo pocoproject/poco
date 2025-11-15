@@ -14,13 +14,22 @@
 #include "Poco/Logger.h"
 #include "Poco/AutoPtr.h"
 #include "TestChannel.h"
-
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/FormattingChannel.h"
+#include <thread>
+#include <memory>
+#include <vector>
 
 using Poco::Logger;
 using Poco::Channel;
 using Poco::Message;
 using Poco::AutoPtr;
-
+using Poco::PatternFormatter;
+using Poco::FormattingChannel;
+using Poco::Event;
+using Poco::Thread;
 
 LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -289,6 +298,81 @@ void LoggerTest::testDump()
 	pChannel->clear();
 }
 
+namespace ThreadNameTestStrings {
+const std::string loggerName = "Logger";
+const std::string threadName = "ThreadName";
+const std::string message = "Test message";
+}
+
+template <typename ThreadFactory>
+std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
+{
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+	AutoPtr<PatternFormatter> fmt = new PatternFormatter("%s:%I:%T:%q:%t");
+	AutoPtr<FormattingChannel> pFmtChannel = new FormattingChannel(fmt, pChannel);
+
+	Logger& logger = Logger::get(ThreadNameTestStrings::loggerName);
+	logger.setChannel(pFmtChannel);
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	Event ev;
+	auto thr = makeThread(
+		ThreadNameTestStrings::threadName, 
+		[&ev, &logger] {
+			logger.information(ThreadNameTestStrings::message);
+			ev.set();
+		});
+	ev.wait();
+
+	thr->join();
+
+	const std::string logMsg = pChannel->getLastMessage().getText();
+	std::vector<std::string> parts;
+	std::size_t p = 0; 
+	while (p != std::string::npos && p < logMsg.size()) {
+		auto q = logMsg.find(':', p);
+		if (q == logMsg.npos) {
+			q = logMsg.size();
+		}
+		parts.push_back(logMsg.substr(p, q-p));
+		p = q + 1;
+	}
+	assertEqual( ThreadNameTestStrings::loggerName, parts[0] );
+	assertEqual( ThreadNameTestStrings::threadName, parts[2] );
+	assertEqual( "I", parts[3] );
+	assertEqual( ThreadNameTestStrings::message, parts[4] );
+
+	return parts[1];
+}
+
+void LoggerTest::testFormatThreadName()
+{
+	auto tidStr = doTestFormatThreadName(
+		[](std::string name, auto body) {
+			auto thr = std::make_unique<Thread>(name);
+			thr->startFunc(std::move(body));
+			return std::move(thr);
+		}
+	);	
+	assertEqual( "1", tidStr );
+}
+
+void LoggerTest::testFormatStdThreadName()
+{
+#ifdef POCO_OS_FAMILY_UNIX
+	doTestFormatThreadName(
+		[](std::string name, auto bodyIn) {
+			auto thr = std::make_unique<std::thread>( 
+				[name, body = std::move(bodyIn)] {
+					pthread_setname_np(pthread_self(), name.c_str());
+					body();
+				}
+			);
+			return std::move(thr);
+		}
+	);
+#endif
+}
 
 void LoggerTest::setUp()
 {
@@ -309,6 +393,8 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testFormat);
 	CppUnit_addTest(pSuite, LoggerTest, testFormatAny);
 	CppUnit_addTest(pSuite, LoggerTest, testDump);
+	CppUnit_addTest(pSuite, LoggerTest, testFormatThreadName);
+	CppUnit_addTest(pSuite, LoggerTest, testFormatStdThreadName);
 
 	return pSuite;
 }
