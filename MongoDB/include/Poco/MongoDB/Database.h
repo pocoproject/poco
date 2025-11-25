@@ -21,13 +21,9 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Document.h"
-#include "Poco/MongoDB/QueryRequest.h"
-#include "Poco/MongoDB/InsertRequest.h"
-#include "Poco/MongoDB/UpdateRequest.h"
-#include "Poco/MongoDB/DeleteRequest.h"
-
 #include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/MongoDB/OpMsgCursor.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -52,9 +48,9 @@ public:
 		/// Authenticates against the database using the given connection,
 		/// username and password, as well as authentication method.
 		///
-		/// "MONGODB-CR" (default prior to MongoDB 3.0) and
-		/// "SCRAM-SHA-1" (default starting in 3.0) are the only supported
-		/// authentication methods.
+		/// "SCRAM-SHA-1" (default starting in MongoDB 3.0) is the only supported
+		/// authentication method. "MONGODB-CR" is no longer supported as it
+		/// requires the legacy wire protocol.
 		///
 		/// Returns true if authentication was successful, otherwise false.
 		///
@@ -62,53 +58,24 @@ public:
 		/// invalid credentials.
 
 	Document::Ptr queryBuildInfo(Connection& connection) const;
-			/// Queries server build info (all wire protocols)
+		/// Queries server build info using OP_MSG protocol.
 
 	Document::Ptr queryServerHello(Connection& connection) const;
-			/// Queries hello response from server (all wire protocols)
+		/// Queries hello response from server using OP_MSG protocol.
 
 	Int64 count(Connection& connection, const std::string& collectionName) const;
-		/// Sends a count request for the given collection to MongoDB. (old wire protocol)
+		/// Sends a count request for the given collection to MongoDB using OP_MSG protocol.
 		///
 		/// If the command fails, -1 is returned.
 
-	//[[deprecated]]
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCommand() const;
-		/// Creates a QueryRequest for a command. (old wire protocol)
-
-	//[[deprecated]]
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest to count the given collection.
-		/// The collectionname must not contain the database name. (old wire protocol)
-
-	POCO_DEPRECATED("Use new wire protocol")
-	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
-		/// Creates a DeleteRequest to delete documents in the given collection.
-		/// The collectionname must not contain the database name. (old wire protocol)
-
-	//[[deprecated]]
-	Poco::SharedPtr<Poco::MongoDB::InsertRequest> createInsertRequest(const std::string& collectionName) const;
-		/// Creates an InsertRequest to insert new documents in the given collection.
-		/// The collectionname must not contain the database name. (old wire protocol)
-
-	//[[deprecated]]
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest. (old wire protocol)
-		/// The collectionname must not contain the database name.
-
-	POCO_DEPRECATED("Use new wire protocol")
-	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
-		/// Creates an UpdateRequest. (old wire protocol)
-		/// The collectionname must not contain the database name.
-
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
-		/// Creates OpMsgMessage. (new wire protocol)
+		/// Creates OpMsgMessage for the given collection.
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage() const;
-		/// Creates OpMsgMessage for database commands that do not require collection as an argument. (new wire protocol)
+		/// Creates OpMsgMessage for database commands that do not require collection as an argument.
 
 	Poco::SharedPtr<Poco::MongoDB::OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
-		/// Creates OpMsgCursor. (new wire protocol)
+		/// Creates OpMsgCursor for the given collection.
 
 	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
 		const std::string& collection,
@@ -118,26 +85,12 @@ public:
 		bool background = false,
 		int version = 0,
 		int ttl = 0);
-		/// Creates an index. The document returned is the result of a getLastError call.
-		/// For more info look at the ensureIndex information on the MongoDB website. (old wire protocol)
-
-	//[[deprecated]]
-	Document::Ptr getLastErrorDoc(Connection& connection) const;
-		/// Sends the getLastError command to the database and returns the error document.
-		/// (old wire protocol)
-
-	//[[deprecated]]
-	std::string getLastError(Connection& connection) const;
-		/// Sends the getLastError command to the database and returns the err element
-		/// from the error document. When err is null, an empty string is returned.
-		/// (old wire protocol)
-
-	static const std::string AUTH_MONGODB_CR;
-		/// Default authentication mechanism prior to MongoDB 3.0.
+		/// Creates an index using the createIndexes command.
+		/// Returns the response document from the server.
 
 	static const std::string AUTH_SCRAM_SHA1;
-		/// Default authentication mechanism for MongoDB 3.0.
-	
+		/// Default authentication mechanism for MongoDB 3.0 and later.
+
 	enum WireVersion
 		/// Wire version as reported by the command hello.
 		/// See details in MongoDB github, repository specifications.
@@ -160,7 +113,6 @@ public:
 	};
 
 protected:
-	bool authCR(Connection& connection, const std::string& username, const std::string& password);
 	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
 
 private:
@@ -177,48 +129,12 @@ inline const std::string& Database::name() const
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() const
-{
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> cmd = createQueryRequest("$cmd");
-	cmd->setNumberToReturn(1);
-	return cmd;
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::DeleteRequest>
-Database::createDeleteRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::DeleteRequest(_dbname + '.' + collectionName);
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::InsertRequest>
-Database::createInsertRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName);
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::QueryRequest>
-Database::createQueryRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::UpdateRequest>
-Database::createUpdateRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
-}
-
-// -- New wire protocol commands
-
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
 Database::createOpMsgMessage(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::OpMsgMessage(_dbname, collectionName);
 }
+
 
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
 Database::createOpMsgMessage() const
@@ -226,6 +142,7 @@ Database::createOpMsgMessage() const
 	// Collection name for database commands is not needed.
 	return createOpMsgMessage("");
 }
+
 
 inline Poco::SharedPtr<Poco::MongoDB::OpMsgCursor>
 Database::createOpMsgCursor(const std::string& collectionName) const

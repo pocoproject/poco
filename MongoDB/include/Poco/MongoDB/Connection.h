@@ -20,8 +20,6 @@
 
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/MongoDB/RequestMessage.h"
-#include "Poco/MongoDB/ResponseMessage.h"
 #include "Poco/MongoDB/OpMsgMessage.h"
 
 
@@ -107,8 +105,7 @@ public:
 		///     a SecureStreamSocket must be supplied.
 		///   - connectTimeoutMS: Socket connection timeout in milliseconds.
 		///   - socketTimeoutMS: Socket send/receive timeout in milliseconds.
-		///   - authMechanism: Authentication mechanism. Only "SCRAM-SHA-1" (default)
-		///     and "MONGODB-CR" are supported.
+		///   - authMechanism: Authentication mechanism. Only "SCRAM-SHA-1" is supported.
 		///
 		/// Unknown options are silently ignored.
 		///
@@ -129,24 +126,13 @@ public:
 	void disconnect();
 		/// Disconnects from the MongoDB server.
 
-	void sendRequest(RequestMessage& request);
-		/// Sends a request to the MongoDB server.
-		///
-		/// Used for one-way requests without a response.
-
-	void sendRequest(RequestMessage& request, ResponseMessage& response);
-		/// Sends a request to the MongoDB server and receives the response.
-		///
-		/// Use this when a response is expected: only a "query" or "getmore"
-		/// request will return a response.
-
 	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
 		/// Sends a request to the MongoDB server and receives the response
-		/// using newer wire protocol with OP_MSG.
+		/// using OP_MSG wire protocol.
 
 	void sendRequest(OpMsgMessage& request);
-		/// Sends an unacknowledged request to the MongoDB server using newer
-		/// wire protocol with OP_MSG.
+		/// Sends an unacknowledged request to the MongoDB server using
+		/// OP_MSG wire protocol.
 		/// No response is sent by the server.
 
 	void readResponse(OpMsgMessage& response);

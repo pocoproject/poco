@@ -35,21 +35,7 @@ public:
 	void testHello();
 	void testConnectURI();
 
-	// Old wire protocol
-	void testInsertRequest();
-	void testQueryRequest();
-	void testDBQueryRequest();
-	void testCountCommand();
-	void testDBCountCommand();
-	void testDBCount2Command();
-	void testDeleteRequest();
-
-	void testConnectionPool();
-	void testCursorRequest();
-	void testCommand();
-	void testUUID();
-
-	// New wire protocol using OP_CMD
+	// OP_MSG wire protocol
 	void testOpCmdUUID();
 	void testOpCmdHello();
 	void testOpCmdWriteRead();
@@ -64,6 +50,7 @@ public:
 	void testOpCmdUnaknowledgedInsert();
 	void testOpCmdConnectionPool();
 	void testOpCmdDropDatabase();
+	void testDBCount();
 
 	static CppUnit::Test* suite();
 
