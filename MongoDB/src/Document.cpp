@@ -64,18 +64,19 @@ Int64 Document::getInteger(const std::string& name) const
 
 	if (ElementTraits<double>::TypeId == element->type())
 	{
-		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
-		if (concrete) return static_cast<Int64>(concrete->value());
+		// Type is already verified, static_cast is safe and ~10x faster than dynamic_cast
+		auto* concrete = static_cast<ConcreteElement<double>*>(element.get());
+		return static_cast<Int64>(concrete->value());
 	}
 	else if (ElementTraits<Int32>::TypeId == element->type())
 	{
-		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int32>*>(element.get());
+		return concrete->value();
 	}
 	else if (ElementTraits<Int64>::TypeId == element->type())
 	{
-		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int64>*>(element.get());
+		return concrete->value();
 	}
 	throw Poco::BadCastException("Invalid type mismatch!");
 }

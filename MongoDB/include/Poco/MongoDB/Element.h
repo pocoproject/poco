@@ -77,7 +77,7 @@ inline const std::string& Element::name() const
 }
 
 
-using ElementSet = std::list<Element::Ptr>;
+using ElementSet = std::vector<Element::Ptr>;
 
 
 template<typename T>

@@ -44,17 +44,24 @@ namespace
 	std::map<std::string, std::string> parseKeyValueList(const std::string& str)
 	{
 		std::map<std::string, std::string> kvm;
-		std::string::const_iterator it = str.begin();
-		std::string::const_iterator end = str.end();
-		while (it != end)
+		std::string::size_type pos = 0;
+		while (pos < str.size())
 		{
-			std::string k;
-			std::string v;
-			while (it != end && *it != '=') k += *it++;
-			if (it != end) ++it;
-			while (it != end && *it != ',') v += *it++;
-			if (it != end) ++it;
-			kvm[k] = v;
+			// Find key-value separators using find() instead of character-by-character iteration
+			std::string::size_type eqPos = str.find('=', pos);
+			if (eqPos == std::string::npos)
+				break;
+
+			std::string::size_type commaPos = str.find(',', eqPos);
+			if (commaPos == std::string::npos)
+				commaPos = str.length();
+
+			// Extract key and value using substr (single allocation each)
+			std::string key = str.substr(pos, eqPos - pos);
+			std::string value = str.substr(eqPos + 1, commaPos - eqPos - 1);
+
+			kvm[std::move(key)] = std::move(value);
+			pos = commaPos + 1;
 		}
 		return kvm;
 	}
