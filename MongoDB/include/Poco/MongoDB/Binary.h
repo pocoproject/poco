@@ -36,6 +36,19 @@ class MongoDB_API Binary
 public:
 	using Ptr = SharedPtr<Binary>;
 
+	/// BSON Binary subtypes
+	enum Subtype
+	{
+		SUBTYPE_GENERIC      = 0x00,  /// Generic binary data
+		SUBTYPE_FUNCTION     = 0x01,  /// Function
+		SUBTYPE_BINARY_OLD   = 0x02,  /// Binary (Old)
+		SUBTYPE_UUID_OLD     = 0x03,  /// UUID (Old)
+		SUBTYPE_UUID         = 0x04,  /// UUID
+		SUBTYPE_MD5          = 0x05,  /// MD5
+		SUBTYPE_ENCRYPTED    = 0x06,  /// Encrypted BSON value
+		SUBTYPE_USER_DEFINED = 0x80   /// User defined (start of range)
+	};
+
 	Binary();
 		/// Creates an empty Binary with subtype 0.
 
@@ -64,7 +77,10 @@ public:
 		/// Sets the subtype.
 
 	[[nodiscard]] std::string toString(int indent = 0) const;
-		/// Returns the contents of the Binary as Base64-encoded string.
+		/// Returns the contents of the Binary as a string.
+		/// For UUID subtype (SUBTYPE_UUID), returns a formatted UUID string
+		/// wrapped in UUID() (e.g., UUID("550e8400-e29b-41d4-a716-446655440000")).
+		/// For other subtypes, returns Base64-encoded data.
 
 	[[nodiscard]] std::string toRawString() const;
 		/// Returns the raw content of the Binary as a string.
