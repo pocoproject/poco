@@ -35,6 +35,19 @@ class MongoDB_API Database
 	/// the database.
 {
 public:
+
+	enum IndexOptions {
+		INDEX_UNIQUE        = 1 << 0,
+		INDEX_SPARSE        = 1 << 1,
+		INDEX_BACKGROUND    = 1 << 2
+	};
+
+	using FieldIndex = std::tuple<std::string, bool>;
+		/// name of the field to index, ascending order (true), descending order (false)
+
+	using IndexedFields = std::vector<FieldIndex>;
+		/// Vector of fields to create index on
+
 	explicit Database(const std::string& name);
 		/// Creates a Database for the database with the given name.
 
@@ -77,16 +90,16 @@ public:
 	[[nodiscard]] SharedPtr<OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
 		/// Creates OpMsgCursor for the given collection.
 
-	Document::Ptr ensureIndex(Connection& connection,
+	Document::Ptr createIndex(
+		Connection& connection,
 		const std::string& collection,
-		const std::string& indexName,
-		Document::Ptr keys,
-		bool unique = false,
-		bool background = false,
-		int version = 0,
-		int ttl = 0);
-		/// Creates an index using the createIndexes command.
-		/// Returns the response document from the server.
+		const IndexedFields& indexedFields,
+		const std::string &indexName,
+		unsigned long options = 0,
+		int expirationSeconds = 0,
+		int version = 0);
+		/// Creates an index. The document returned is the response body..
+		/// For more info look at the createIndex information on the MongoDB website. (new wire protocol)
 
 	static const std::string AUTH_SCRAM_SHA1;
 		/// Default authentication mechanism for MongoDB 3.0 and later.
@@ -106,7 +119,7 @@ public:
 		VER_42		= 8,
 		VER_44		= 9,
 		VER_50		= 13,
-		VER_51		= 14, ///< First wire version that supports only OP_MSG
+		VER_51		= 14, ///< First wire version that supports *only* OP_MSG
 		VER_52		= 15,
 		VER_53		= 16,
 		VER_60		= 17

@@ -14,8 +14,8 @@
 
 #include "Poco/MongoDB/Database.h"
 #include "Poco/MongoDB/Array.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/Base64Encoder.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
 #include "Poco/PBKDF2Engine.h"
@@ -317,43 +317,61 @@ Int64 Database::count(Connection& connection, const std::string& collectionName)
 }
 
 
-Poco::MongoDB::Document::Ptr Database::ensureIndex(Connection& connection, const std::string& collection, const std::string& indexName, Poco::MongoDB::Document::Ptr keys, bool unique, bool background, int version, int ttl)
+Poco::MongoDB::Document::Ptr Database::createIndex(
+	Connection& connection,
+	const std::string& collection,
+	const IndexedFields& indexedFields,
+	const std::string &indexName,
+	unsigned long options,
+	int expirationSeconds,
+	int version)
 {
-	Poco::MongoDB::Document::Ptr index = new Poco::MongoDB::Document();
+// https://www.mongodb.com/docs/manual/reference/command/createIndexes/
+
+	MongoDB::Document::Ptr keys = new MongoDB::Document();
+
+	for (const auto& [name, ascending]: indexedFields) {
+		keys->add(name, ascending ? 1 : -1);
+	}
+
+	MongoDB::Document::Ptr index = new MongoDB::Document();
+	if (!indexName.empty())
+	{
+		index->add("name", indexName);
+	}
 	index->add("key", keys);
+	index->add("ns", _dbname + "." + collection);
 	index->add("name", indexName);
 
-	if (version > 0)
-	{
-		index->add("v", version);
-	}
-
-	if (unique)
-	{
+	if (options & INDEX_UNIQUE) {
 		index->add("unique", true);
 	}
-
-	if (background)
-	{
+	if (options & INDEX_BACKGROUND) {
 		index->add("background", true);
 	}
-
-	if (ttl > 0)
-	{
-		index->add("expireAfterSeconds", ttl);
+	if (options & INDEX_SPARSE) {
+		index->add("sparse", true);
 	}
-
-	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = createOpMsgMessage(collection);
-	request->setCommandName(OpMsgMessage::CMD_CREATE_INDEXES);
+	if (expirationSeconds > 0) {
+		index->add("expireAfterSeconds", static_cast<Poco::Int32>(expirationSeconds));
+	}
+	if (version > 0) {
+		index->add("version", static_cast<Poco::Int32>(version));
+	}
 
 	MongoDB::Array::Ptr indexes = new MongoDB::Array();
 	indexes->add(index);
+
+	auto request = createOpMsgMessage(collection);
+	request->setCommandName(OpMsgMessage::CMD_CREATE_INDEXES);
 	request->body().add("indexes", indexes);
 
-	Poco::MongoDB::OpMsgMessage response;
+	OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
-	return new Document(response.body());
+	MongoDB::Document::Ptr result = new MongoDB::Document(response.body());
+
+	return result;
 }
 
 
