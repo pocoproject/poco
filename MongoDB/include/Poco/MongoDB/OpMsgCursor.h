@@ -47,20 +47,20 @@ public:
 	virtual ~OpMsgCursor();
 		/// Destroys the OpMsgCursor.
 
-	void setEmptyFirstBatch(bool empty);
+	void setEmptyFirstBatch(bool empty) noexcept;
 		/// Empty first batch is used to get error response faster with little server processing
 
-	[[nodiscard]] bool emptyFirstBatch() const;
+	[[nodiscard]] bool emptyFirstBatch() const noexcept;
 
-	void setBatchSize(Int32 batchSize);
+	void setBatchSize(Int32 batchSize) noexcept;
 		/// Set non-default batch size
 
-	[[nodiscard]] Int32 batchSize() const;
+	[[nodiscard]] Int32 batchSize() const noexcept;
 		/// Current batch size (zero or negative number indicates default batch size)
 
-	[[nodiscard]] Int64 cursorID() const;
+	[[nodiscard]] Int64 cursorID() const noexcept;
 
-	[[nodiscard]] bool isActive() const;
+	[[nodiscard]] bool isActive() const noexcept;
 		/// Is there more data to acquire with this cursor?
 
 	OpMsgMessage& next(Connection& connection);
@@ -95,7 +95,7 @@ inline OpMsgMessage& OpMsgCursor::query()
 	return _query;
 }
 
-inline Int64 OpMsgCursor::cursorID() const
+inline Int64 OpMsgCursor::cursorID() const noexcept
 {
 	return _cursorID;
 }

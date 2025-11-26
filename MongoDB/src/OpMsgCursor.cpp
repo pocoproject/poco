@@ -73,31 +73,31 @@ OpMsgCursor::~OpMsgCursor()
 }
 
 
-void OpMsgCursor::setEmptyFirstBatch(bool empty)
+void OpMsgCursor::setEmptyFirstBatch(bool empty) noexcept
 {
 	_emptyFirstBatch = empty;
 }
 
 
-bool OpMsgCursor::emptyFirstBatch() const
+bool OpMsgCursor::emptyFirstBatch() const noexcept
 {
 	return _emptyFirstBatch;
 }
 
 
-void OpMsgCursor::setBatchSize(Int32 batchSize)
+void OpMsgCursor::setBatchSize(Int32 batchSize) noexcept
 {
 	_batchSize = batchSize;
 }
 
 
-Int32 OpMsgCursor::batchSize() const
+Int32 OpMsgCursor::batchSize() const noexcept
 {
 	return _batchSize;
 }
 
 
-bool OpMsgCursor::isActive() const
+bool OpMsgCursor::isActive() const noexcept
 {
 	const auto& cmd {_query.commandName()};
 	return ( _cursorID > 0 || (!cmd.empty() && cmd != OpMsgMessage::CMD_GET_MORE) );

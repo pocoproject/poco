@@ -162,11 +162,12 @@ void Document::read(BinaryReader& reader)
 std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
+	// Pre-reserve reasonable capacity for small-medium documents to reduce reallocations
+	oss.str().reserve(256);
 
 	oss << '{';
 
 	if (indent > 0) oss << std::endl;
-
 
 	for (auto it = _elements.begin(), total = _elements.end(); it != total; ++it)
 	{
@@ -176,7 +177,11 @@ std::string Document::toString(int indent) const
 			if (indent > 0) oss << std::endl;
 		}
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		if (indent > 0)
+		{
+			const std::string indentStr(indent, ' ');
+			oss << indentStr;
+		}
 
 		oss << '"' << (*it)->name() << '"';
 		oss << (indent > 0  ? " : " : ":");
@@ -189,7 +194,8 @@ std::string Document::toString(int indent) const
 		oss << std::endl;
 		if (indent >= 2) indent -= 2;
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		const std::string indentStr(indent, ' ');
+		oss << indentStr;
 	}
 
 	oss << '}';
