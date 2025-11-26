@@ -39,23 +39,44 @@ public:
 	RegularExpression(const std::string& pattern, const std::string& options);
 		/// Creates a RegularExpression using the given pattern and options.
 
+	RegularExpression(std::string&& pattern, std::string&& options);
+		/// Creates a RegularExpression using the given pattern and options (move semantics).
+
+	RegularExpression(const RegularExpression& copy) = default;
+		/// Creates a RegularExpression by copying another one.
+
+	RegularExpression(RegularExpression&& other) noexcept = default;
+		/// Creates a RegularExpression by moving another one.
+
+	RegularExpression& operator=(const RegularExpression& copy) = default;
+		/// Assigns another RegularExpression.
+
+	RegularExpression& operator=(RegularExpression&& other) noexcept = default;
+		/// Move-assigns another RegularExpression.
+
 	virtual ~RegularExpression();
 		/// Destroys the RegularExpression.
 
 	[[nodiscard]] SharedPtr<Poco::RegularExpression> createRE() const;
 		/// Tries to create a Poco::RegularExpression from the MongoDB regular expression.
 
-	[[nodiscard]] std::string getOptions() const;
+	[[nodiscard]] const std::string& getOptions() const noexcept;
 		/// Returns the options string.
 
 	void setOptions(const std::string& options);
 		/// Sets the options string.
 
-	[[nodiscard]] std::string getPattern() const;
+	void setOptions(std::string&& options) noexcept;
+		/// Sets the options string (move semantics).
+
+	[[nodiscard]] const std::string& getPattern() const noexcept;
 		/// Returns the pattern.
 
 	void setPattern(const std::string& pattern);
 		/// Sets the pattern.
+
+	void setPattern(std::string&& pattern) noexcept;
+		/// Sets the pattern (move semantics).
 
 private:
 	std::string _pattern;
@@ -66,7 +87,7 @@ private:
 ///
 /// inlines
 ///
-inline std::string RegularExpression::getPattern() const
+inline const std::string& RegularExpression::getPattern() const noexcept
 {
 	return _pattern;
 }
@@ -78,7 +99,13 @@ inline void RegularExpression::setPattern(const std::string& pattern)
 }
 
 
-inline std::string RegularExpression::getOptions() const
+inline void RegularExpression::setPattern(std::string&& pattern) noexcept
+{
+	_pattern = std::move(pattern);
+}
+
+
+inline const std::string& RegularExpression::getOptions() const noexcept
 {
 	return _options;
 }
@@ -87,6 +114,12 @@ inline std::string RegularExpression::getOptions() const
 inline void RegularExpression::setOptions(const std::string& options)
 {
 	_options = options;
+}
+
+
+inline void RegularExpression::setOptions(std::string&& options) noexcept
+{
+	_options = std::move(options);
 }
 
 
@@ -99,8 +132,19 @@ struct ElementTraits<RegularExpression::Ptr>
 
 	static std::string toString(const RegularExpression::Ptr& value, int indent = 0)
 	{
-		//TODO
-		return "RE: not implemented yet";
+		if (value.isNull())
+		{
+			return "null";
+		}
+
+		// Format as /pattern/options similar to MongoDB shell
+		std::string result;
+		result.reserve(value->getPattern().size() + value->getOptions().size() + 3);
+		result += '/';
+		result += value->getPattern();
+		result += '/';
+		result += value->getOptions();
+		return result;
 	}
 };
 

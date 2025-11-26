@@ -32,6 +32,13 @@ RegularExpression::RegularExpression(const std::string& pattern, const std::stri
 }
 
 
+RegularExpression::RegularExpression(std::string&& pattern, std::string&& options):
+	_pattern(std::move(pattern)),
+	_options(std::move(options))
+{
+}
+
+
 RegularExpression::~RegularExpression()
 {
 }
@@ -40,9 +47,9 @@ RegularExpression::~RegularExpression()
 SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 {
 	int options = 0;
-	for (std::string::const_iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
+	for (char opt : _options)
 	{
-		switch (*optIt)
+		switch (opt)
 		{
 		case 'i': // Case Insensitive
 			options |= Poco::RegularExpression::RE_CASELESS;
