@@ -51,6 +51,13 @@ private:
 
 class MongoDB_API Document
 	/// Represents a MongoDB (BSON) document.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. Document instances must not be accessed
+	/// concurrently from multiple threads without external synchronization.
+	/// Concurrent modifications to the element list will cause undefined behavior.
+	///
+	/// Each thread should use its own Document instances.
 {
 public:
 	using Ptr = SharedPtr<Document>;
@@ -101,10 +108,10 @@ public:
 	void elementNames(std::vector<std::string>& keys) const;
 		/// Puts all element names into std::vector.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if the document doesn't contain any documents.
 
-	bool exists(const std::string& name) const;
+	[[nodiscard]] bool exists(const std::string& name) const;
 		/// Returns true if the document has an element with the given name.
 
 	template<typename T>
@@ -157,11 +164,11 @@ public:
 		return def;
 	}
 
-	Element::Ptr get(const std::string& name) const;
+	[[nodiscard]] Element::Ptr get(const std::string& name) const;
 		/// Returns the element with the given name.
 		/// An empty element will be returned when the element is not found.
 
-	Int64 getInteger(const std::string& name) const;
+	[[nodiscard]] Int64 getInteger(const std::string& name) const;
 		/// Returns an integer. Useful when MongoDB returns Int32, Int64
 		/// or double for a number (count for example). This method will always
 		/// return an Int64. When the element is not found, a
@@ -186,10 +193,10 @@ public:
 	void read(BinaryReader& reader);
 		/// Reads a document from the reader
 
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Returns the number of elements in the document.
 
-	virtual std::string toString(int indent = 0) const;
+	[[nodiscard]] virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
 
 	void write(BinaryWriter& writer);

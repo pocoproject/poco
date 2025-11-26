@@ -42,16 +42,16 @@ public:
 	virtual ~RegularExpression();
 		/// Destroys the RegularExpression.
 
-	SharedPtr<Poco::RegularExpression> createRE() const;
+	[[nodiscard]] SharedPtr<Poco::RegularExpression> createRE() const;
 		/// Tries to create a Poco::RegularExpression from the MongoDB regular expression.
 
-	std::string getOptions() const;
+	[[nodiscard]] std::string getOptions() const;
 		/// Returns the options string.
 
 	void setOptions(const std::string& options);
 		/// Sets the options string.
 
-	std::string getPattern() const;
+	[[nodiscard]] std::string getPattern() const;
 		/// Returns the pattern.
 
 	void setPattern(const std::string& pattern);

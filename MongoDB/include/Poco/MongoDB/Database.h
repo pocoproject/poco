@@ -41,7 +41,7 @@ public:
 	virtual ~Database();
 		/// Destroys the Database.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Database name
 
 	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
@@ -57,30 +57,30 @@ public:
 		/// May throw a Poco::ProtocolException if authentication fails for a reason other than
 		/// invalid credentials.
 
-	Document::Ptr queryBuildInfo(Connection& connection) const;
+	[[nodiscard]] Document::Ptr queryBuildInfo(Connection& connection) const;
 		/// Queries server build info using OP_MSG protocol.
 
-	Document::Ptr queryServerHello(Connection& connection) const;
+	[[nodiscard]] Document::Ptr queryServerHello(Connection& connection) const;
 		/// Queries hello response from server using OP_MSG protocol.
 
-	Int64 count(Connection& connection, const std::string& collectionName) const;
+	[[nodiscard]] Int64 count(Connection& connection, const std::string& collectionName) const;
 		/// Sends a count request for the given collection to MongoDB using OP_MSG protocol.
 		///
 		/// If the command fails, -1 is returned.
 
-	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
+	[[nodiscard]] SharedPtr<OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
 		/// Creates OpMsgMessage for the given collection.
 
-	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage() const;
+	[[nodiscard]] SharedPtr<OpMsgMessage> createOpMsgMessage() const;
 		/// Creates OpMsgMessage for database commands that do not require collection as an argument.
 
-	Poco::SharedPtr<Poco::MongoDB::OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
+	[[nodiscard]] SharedPtr<OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
 		/// Creates OpMsgCursor for the given collection.
 
-	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
+	Document::Ptr ensureIndex(Connection& connection,
 		const std::string& collection,
 		const std::string& indexName,
-		Poco::MongoDB::Document::Ptr keys,
+		Document::Ptr keys,
 		bool unique = false,
 		bool background = false,
 		int version = 0,
@@ -129,14 +129,14 @@ inline const std::string& Database::name() const
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
+inline SharedPtr<OpMsgMessage>
 Database::createOpMsgMessage(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::OpMsgMessage(_dbname, collectionName);
+	return new OpMsgMessage(_dbname, collectionName);
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
+inline SharedPtr<OpMsgMessage>
 Database::createOpMsgMessage() const
 {
 	// Collection name for database commands is not needed.
@@ -144,10 +144,10 @@ Database::createOpMsgMessage() const
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::OpMsgCursor>
+inline SharedPtr<OpMsgCursor>
 Database::createOpMsgCursor(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::OpMsgCursor(_dbname, collectionName);
+	return new OpMsgCursor(_dbname, collectionName);
 }
 
 

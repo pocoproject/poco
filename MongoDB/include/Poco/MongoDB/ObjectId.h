@@ -56,10 +56,10 @@ public:
 	virtual ~ObjectId();
 		/// Destroys the ObjectId.
 
-	Timestamp timestamp() const;
+	[[nodiscard]] Timestamp timestamp() const;
 		/// Returns the timestamp which is stored in the first four bytes of the id
 
-	std::string toString(const std::string& fmt = "%02x") const;
+	[[nodiscard]] std::string toString(const std::string& fmt = "%02x") const;
 		/// Returns the id in string format. The fmt parameter
 		/// specifies the formatting used for individual members
 		/// of the ID char array.
@@ -67,8 +67,8 @@ public:
 private:
 	ObjectId();
 
-	static int fromHex(char c);
-	static char fromHex(const char* c);
+	static constexpr int fromHex(char c);
+	static constexpr char fromHex(const char* c);
 
 	unsigned char _id[12];
 
@@ -93,7 +93,7 @@ inline Timestamp ObjectId::timestamp() const
 }
 
 
-inline int ObjectId::fromHex(char c)
+constexpr inline int ObjectId::fromHex(char c)
 {
 	if ( '0' <= c && c <= '9' )
 		return c - '0';
@@ -105,7 +105,7 @@ inline int ObjectId::fromHex(char c)
 }
 
 
-inline char ObjectId::fromHex(const char* c)
+constexpr inline char ObjectId::fromHex(const char* c)
 {
 	return (char)((fromHex(c[0]) << 4 ) | fromHex(c[1]));
 }

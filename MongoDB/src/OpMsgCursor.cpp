@@ -65,7 +65,7 @@ OpMsgCursor::~OpMsgCursor()
 {
 	try
 	{
-		poco_assert_dbg(_cursorID == 0);
+		poco_assert_msg_dbg(_cursorID == 0, "OpMsgCursor destroyed with active cursor - call kill() before destruction");
 	}
 	catch (...)
 	{

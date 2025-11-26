@@ -55,19 +55,19 @@ public:
 	void write(BinaryWriter& writer);
 		/// Writes the header using the given BinaryWriter.
 
-	Int32 getMessageLength() const;
+	[[nodiscard]] Int32 getMessageLength() const;
 		/// Returns the message length.
 
-	OpCode opCode() const;
+	[[nodiscard]] OpCode opCode() const;
 		/// Returns the OpCode.
 
-	Int32 getRequestID() const;
+	[[nodiscard]] Int32 getRequestID() const;
 		/// Returns the request ID of the current message.
 
 	void setRequestID(Int32 id);
 		/// Sets the request ID of the current message.
 
-	Int32 responseTo() const;
+	[[nodiscard]] Int32 responseTo() const;
 		/// Returns the request id from the original request.
 
 private:

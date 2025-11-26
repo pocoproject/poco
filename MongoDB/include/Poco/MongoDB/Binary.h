@@ -57,19 +57,19 @@ public:
 	Buffer<unsigned char>& buffer();
 		/// Returns a reference to the internal buffer
 
-	unsigned char subtype() const;
+	[[nodiscard]] unsigned char subtype() const;
 		/// Returns the subtype.
 
 	void subtype(unsigned char type);
 		/// Sets the subtype.
 
-	std::string toString(int indent = 0) const;
+	[[nodiscard]] std::string toString(int indent = 0) const;
 		/// Returns the contents of the Binary as Base64-encoded string.
 
-	std::string toRawString() const;
+	[[nodiscard]] std::string toRawString() const;
 		/// Returns the raw content of the Binary as a string.
 
-	UUID uuid() const;
+	[[nodiscard]] UUID uuid() const;
 		/// Returns the UUID when the binary subtype is 0x04.
 		/// Otherwise, throws a Poco::BadCastException.
 

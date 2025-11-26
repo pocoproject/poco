@@ -81,19 +81,19 @@ public:
 		return Document::get<T>(Poco::NumberFormatter::format(pos), deflt);
 	}
 
-	Element::Ptr get(std::size_t pos) const;
+	[[nodiscard]] Element::Ptr get(std::size_t pos) const;
 		/// Returns the element at the given index.
 		/// An empty element will be returned if the element is not found.
 
 	template<typename T>
-	bool isType(std::size_t pos) const
+	[[nodiscard]] bool isType(std::size_t pos) const
 		/// Returns true if the type of the element equals the TypeId of ElementTrait,
 		/// otherwise false.
 	{
 		return Document::isType<T>(Poco::NumberFormatter::format(pos));
 	}
 
-	std::string toString(int indent = 0) const override;
+	[[nodiscard]] std::string toString(int indent = 0) const override;
 		/// Returns a string representation of the Array.
 
 private:

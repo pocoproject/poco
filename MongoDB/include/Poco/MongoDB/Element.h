@@ -50,13 +50,13 @@ public:
 	virtual ~Element();
 		/// Destructor
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name of the element.
 
-	virtual std::string toString(int indent = 0) const = 0;
+	[[nodiscard]] virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
 
-	virtual int type() const = 0;
+	[[nodiscard]] virtual int type() const = 0;
 		/// Returns the MongoDB type of the element.
 
 private:
@@ -368,13 +368,13 @@ public:
 	}
 
 
-	std::string toString(int indent = 0) const override
+	[[nodiscard]] std::string toString(int indent = 0) const override
 	{
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
 
-	int type() const override
+	[[nodiscard]] int type() const override
 	{
 		return ElementTraits<T>::TypeId;
 	}

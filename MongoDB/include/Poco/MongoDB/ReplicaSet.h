@@ -37,7 +37,7 @@ public:
 	virtual ~ReplicaSet();
 		/// Destroys the ReplicaSet.
 
-	Connection::Ptr findMaster();
+	[[nodiscard]] Connection::Ptr findMaster();
 		/// Tries to find the master MongoDB instance from the addresses
 		/// passed to the constructor.
 		///

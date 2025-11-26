@@ -49,7 +49,7 @@ public:
 		_reader >> t;
 	}
 
-	std::string readCString();
+	[[nodiscard]] std::string readCString();
 		/// Reads a cstring from the reader.
 		/// A cstring is a string terminated with a 0x00.
 
