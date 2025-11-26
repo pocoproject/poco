@@ -24,6 +24,7 @@
 #include "Poco/MongoDB/Element.h"
 #include <algorithm>
 #include <cstdlib>
+#include <unordered_map>
 
 
 namespace Poco {
@@ -203,7 +204,16 @@ public:
 		/// Writes a document to the reader
 
 protected:
+	const ElementSet& elements() const;
+		/// Returns const reference to elements for read-only access by derived classes.
+		/// Direct modification is not allowed to maintain synchronization with hash map.
+
+private:
 	ElementSet _elements;
+	std::unordered_map<std::string, Element::Ptr> _elementMap;
+		/// Hash map for O(1) element lookups by name.
+		/// Maintained in sync with _elements for fast access.
+		/// These are private to ensure derived classes cannot break synchronization.
 };
 
 
@@ -213,6 +223,7 @@ protected:
 inline Document& Document::addElement(Element::Ptr element)
 {
 	_elements.push_back(element);
+	_elementMap[element->name()] = element;  // O(1) insert for fast lookups
 	return *this;
 }
 
@@ -228,6 +239,7 @@ inline Document& Document::addNewDocument(const std::string& name)
 inline void Document::clear()
 {
 	_elements.clear();
+	_elementMap.clear();
 }
 
 
@@ -239,6 +251,7 @@ inline bool Document::empty() const
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
+	keys.reserve(keys.size() + _elements.size());  // Pre-allocate to avoid reallocations
 	for (const auto & _element : _elements)
 	{
 		keys.push_back(_element->name());
@@ -248,17 +261,25 @@ inline void Document::elementNames(std::vector<std::string>& keys) const
 
 inline bool Document::exists(const std::string& name) const
 {
-	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
+	// O(1) lookup using hash map instead of O(n) linear search
+	return _elementMap.find(name) != _elementMap.end();
 }
 
 
 inline bool Document::remove(const std::string& name)
 {
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it == _elements.end())
+	// Remove from hash map first (O(1))
+	auto mapIt = _elementMap.find(name);
+	if (mapIt == _elementMap.end())
 		return false;
 
-	_elements.erase(it);
+	_elementMap.erase(mapIt);
+
+	// Then remove from vector (O(n) but unavoidable for order preservation)
+	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	if (it != _elements.end())
+		_elements.erase(it);
+
 	return true;
 }
 
@@ -266,6 +287,12 @@ inline bool Document::remove(const std::string& name)
 inline std::size_t Document::size() const
 {
 	return _elements.size();
+}
+
+
+inline const ElementSet& Document::elements() const
+{
+	return _elements;
 }
 
 

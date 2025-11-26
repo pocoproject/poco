@@ -45,15 +45,14 @@ Array& Document::addNewArray(const std::string& name)
 
 Element::Ptr Document::get(const std::string& name) const
 {
-	Element::Ptr element;
-
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it != _elements.end())
+	// O(1) hash map lookup instead of O(n) linear search
+	auto it = _elementMap.find(name);
+	if (it != _elementMap.end())
 	{
-		return *it;
+		return it->second;
 	}
 
-	return element;
+	return Element::Ptr();  // Return empty pointer if not found
 }
 
 
@@ -153,6 +152,7 @@ void Document::read(BinaryReader& reader)
 
 		element->read(reader);
 		_elements.push_back(element);
+		_elementMap[element->name()] = element;  // Populate hash map for O(1) lookups
 
 		reader >> type;
 	}

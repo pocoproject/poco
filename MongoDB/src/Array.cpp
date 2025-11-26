@@ -46,9 +46,11 @@ std::string Array::toString(int indent) const
 
 	if (indent > 0) oss << std::endl;
 
-	for (auto it = _elements.begin(), total = _elements.end(); it != total; ++it)
+	// Use protected accessor instead of direct _elements access to maintain encapsulation
+	const ElementSet& elems = elements();
+	for (auto it = elems.begin(), total = elems.end(); it != total; ++it)
 	{
-		if (it != _elements.begin())
+		if (it != elems.begin())
 		{
 			oss << ",";
 			if (indent > 0) oss << std::endl;
