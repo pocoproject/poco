@@ -107,9 +107,23 @@ ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress>& seeds):
 
 
 ReplicaSet::ReplicaSet(const std::string& uri):
-	ReplicaSet(Config())
+	_config(),
+	_topology(),
+	_mutex(),
+	_monitorThread(),
+	_stopMonitoring(false),
+	_monitoringActive(false)
 {
+	// Parse URI first to extract seeds and configuration
 	parseURI(uri);
+
+	if (_config.seeds.empty())
+	{
+		throw Poco::InvalidArgumentException("Replica set URI must contain at least one host");
+	}
+
+	// Update topology with set name from config
+	_topology.setName(_config.setName);
 
 	// Add seed servers to topology
 	for (const auto& seed : _config.seeds)
