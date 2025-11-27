@@ -20,7 +20,10 @@ A continuous monitoring tool that performs regular read/write operations and dis
 # Basic usage with defaults
 ./ReplicaSetMonitor
 
-# Specify replica set and hosts
+# Using MongoDB URI (recommended)
+./ReplicaSetMonitor -u 'mongodb://mongo1:27017,mongo2:27017/?replicaSet=rs0'
+
+# Specify replica set and hosts (traditional method)
 ./ReplicaSetMonitor -s rs0 -H mongo1:27017,mongo2:27017,mongo3:27017
 
 # Run with 10-second intervals for 100 iterations
@@ -29,7 +32,15 @@ A continuous monitoring tool that performs regular read/write operations and dis
 # Verbose mode for detailed operation output
 ./ReplicaSetMonitor -v
 
-# Full example
+# Full example with URI
+./ReplicaSetMonitor \
+    --uri 'mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0&readPreference=primaryPreferred' \
+    --interval 5 \
+    --database test \
+    --collection health_check \
+    --verbose
+
+# Full example with traditional options
 ./ReplicaSetMonitor \
     --set rs0 \
     --hosts mongo1:27017,mongo2:27017,mongo3:27017 \
@@ -44,6 +55,7 @@ A continuous monitoring tool that performs regular read/write operations and dis
 | Option | Description | Default |
 |--------|-------------|---------|
 | `-h, --help` | Show help message | - |
+| `-u, --uri URI` | MongoDB connection URI (takes precedence) | - |
 | `-s, --set NAME` | Replica set name | `rs0` |
 | `-H, --hosts HOSTS` | Comma-separated host:port list | `localhost:27017,localhost:27018,localhost:27019` |
 | `-i, --interval SECONDS` | Check interval in seconds | `5` |
@@ -52,8 +64,11 @@ A continuous monitoring tool that performs regular read/write operations and dis
 | `-v, --verbose` | Verbose output | `false` |
 | `-n, --iterations N` | Number of iterations | unlimited |
 
+**Note:** The `--uri` option takes precedence over `--set` and `--hosts` options.
+
 ### Environment Variables
 
+- `MONGODB_URI`: MongoDB connection URI (takes precedence)
 - `MONGODB_REPLICA_SET`: Replica set name
 - `MONGODB_HOSTS`: Comma-separated host:port list
 
@@ -228,6 +243,84 @@ Demonstrates various replica set features with multiple commands.
 
 ---
 
+## URIExample - URI Parsing Demonstration
+
+Demonstrates MongoDB URI parsing and connection to replica sets.
+
+### Features
+
+- Parse MongoDB connection URIs
+- Display parsed configuration (hosts, replica set name, read preference, timeouts)
+- Connect to replica set and show topology
+- Query server information
+- Validate URI format
+
+### Usage
+
+```bash
+./URIExample <uri>
+```
+
+### Examples
+
+```bash
+# Basic replica set URI
+./URIExample 'mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0'
+
+# With read preference
+./URIExample 'mongodb://mongo1:27017,mongo2:27017/?replicaSet=rs0&readPreference=primaryPreferred'
+
+# With custom timeouts and heartbeat
+./URIExample 'mongodb://host1:27017,host2:27017/?replicaSet=rs0&connectTimeoutMS=5000&socketTimeoutMS=30000&heartbeatFrequencyMS=5000'
+```
+
+### Supported URI Options
+
+- `replicaSet=name` - Replica set name
+- `readPreference=mode` - Read preference (primary|primaryPreferred|secondary|secondaryPreferred|nearest)
+- `connectTimeoutMS=ms` - Connection timeout in milliseconds
+- `socketTimeoutMS=ms` - Socket timeout in milliseconds
+- `heartbeatFrequencyMS=ms` - Heartbeat frequency in milliseconds
+
+### Example Output
+
+```
+Parsing MongoDB Replica Set URI
+================================================================================
+URI: mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0
+
+✓ URI parsed successfully!
+
+Configuration:
+--------------------------------------------------------------------------------
+Replica Set Name: rs0
+Read Preference:  primary
+Seed Servers:     localhost:27017, localhost:27018, localhost:27019
+Monitoring:       Active
+
+Connecting to replica set...
+✓ Connected to primary: localhost:27017
+
+Server Information:
+--------------------------------------------------------------------------------
+MongoDB Version: 7.0.5
+Git Version:     7809d71e84e314b497f282ea52598668b08b84dd
+
+Replica Set Topology:
+--------------------------------------------------------------------------------
+Set Name:    rs0
+Has Primary: Yes
+Servers:     3
+
+  localhost:27017 [PRIMARY] RTT: 2.34 ms
+  localhost:27018 [SECONDARY] RTT: 3.12 ms
+  localhost:27019 [SECONDARY] RTT: 2.89 ms
+
+✓ Success!
+```
+
+---
+
 ## Building the Examples
 
 ### With CMake
@@ -238,10 +331,12 @@ mkdir build && cd build
 cmake .. -DENABLE_MONGODB=ON -DENABLE_SAMPLES=ON
 cmake --build . --target ReplicaSetMonitor
 cmake --build . --target ReplicaSet
+cmake --build . --target URIExample
 
 # Executables are in bin/
 ./bin/ReplicaSetMonitor --help
 ./bin/ReplicaSet basic
+./bin/URIExample 'mongodb://localhost:27017/?replicaSet=rs0'
 ```
 
 ### With Make

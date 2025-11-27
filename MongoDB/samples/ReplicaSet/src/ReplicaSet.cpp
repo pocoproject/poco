@@ -86,7 +86,7 @@ void basicExample()
 		ReplicaSet::Config config;
 		config.setName = setName;
 		config.seeds = parseHosts(hostsStr);
-		config.readPreference = ReadPreference::Primary;
+		config.readPreference = ReadPreference(ReadPreference::Primary);
 		config.enableMonitoring = true;
 
 		// Create replica set
@@ -164,7 +164,7 @@ void readPreferenceExample()
 
 		// Primary read preference
 		std::cout << "1. Primary read preference:" << std::endl;
-		Connection::Ptr primaryConn = rs.getConnection(ReadPreference::Primary);
+		Connection::Ptr primaryConn = rs.getConnection(ReadPreference(ReadPreference::Primary));
 		if (!primaryConn.isNull())
 		{
 			std::cout << "   Connected to: " << primaryConn->address().toString() << std::endl;
@@ -173,7 +173,7 @@ void readPreferenceExample()
 
 		// Secondary read preference
 		std::cout << "2. Secondary read preference:" << std::endl;
-		Connection::Ptr secondaryConn = rs.getConnection(ReadPreference::Secondary);
+		Connection::Ptr secondaryConn = rs.getConnection(ReadPreference(ReadPreference::Secondary));
 		if (!secondaryConn.isNull())
 		{
 			std::cout << "   Connected to: " << secondaryConn->address().toString() << std::endl;
@@ -186,7 +186,7 @@ void readPreferenceExample()
 
 		// PrimaryPreferred read preference
 		std::cout << "3. PrimaryPreferred read preference:" << std::endl;
-		Connection::Ptr prefConn = rs.getConnection(ReadPreference::PrimaryPreferred);
+		Connection::Ptr prefConn = rs.getConnection(ReadPreference(ReadPreference::PrimaryPreferred));
 		if (!prefConn.isNull())
 		{
 			std::cout << "   Connected to: " << prefConn->address().toString() << std::endl;
@@ -195,7 +195,7 @@ void readPreferenceExample()
 
 		// Nearest read preference (lowest latency)
 		std::cout << "4. Nearest read preference (lowest latency):" << std::endl;
-		Connection::Ptr nearestConn = rs.getConnection(ReadPreference::Nearest);
+		Connection::Ptr nearestConn = rs.getConnection(ReadPreference(ReadPreference::Nearest));
 		if (!nearestConn.isNull())
 		{
 			std::cout << "   Connected to: " << nearestConn->address().toString() << std::endl;
@@ -222,11 +222,11 @@ void failoverExample()
 		ReplicaSet::Config config;
 		config.setName = setName;
 		config.seeds = parseHosts(hostsStr);
-		config.readPreference = ReadPreference::PrimaryPreferred;
+		config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
 		ReplicaSet rs(config);
 
 		// Create a replica set connection with automatic failover
-		ReplicaSetConnection::Ptr rsConn = new ReplicaSetConnection(rs, ReadPreference::PrimaryPreferred);
+		ReplicaSetConnection::Ptr rsConn = new ReplicaSetConnection(rs, ReadPreference(ReadPreference::PrimaryPreferred));
 
 		std::cout << "Using ReplicaSetConnection for automatic failover" << std::endl;
 		std::cout << "Initial connection: " << rsConn->address().toString() << std::endl;
@@ -302,7 +302,7 @@ void poolExample()
 		std::cout << std::endl;
 
 		// Create connection pool
-		PoolableObjectFactory<ReplicaSetConnection, ReplicaSetConnection::Ptr> factory(*rs, ReadPreference::PrimaryPreferred);
+		PoolableObjectFactory<ReplicaSetConnection, ReplicaSetConnection::Ptr> factory(*rs, ReadPreference(ReadPreference::PrimaryPreferred));
 		ObjectPool<ReplicaSetConnection, ReplicaSetConnection::Ptr> pool(factory, 5, 10);
 
 		// Use pooled connections

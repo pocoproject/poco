@@ -17,6 +17,8 @@
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
 #include "Poco/Thread.h"
+#include "Poco/URI.h"
+#include "Poco/NumberParser.h"
 #include <chrono>
 
 
@@ -483,10 +485,122 @@ void ReplicaSet::updateTopologyFromAllServers()
 
 void ReplicaSet::parseURI(const std::string& uri)
 {
-	// Placeholder for URI parsing implementation
-	// This would parse mongodb://host1:port1,host2:port2,...?options
-	// For now, throw NotImplementedException
-	throw Poco::NotImplementedException("URI parsing not yet implemented. Use Config constructor instead.");
+	// Parse MongoDB URI: mongodb://[user:pass@]host1:port1,host2:port2[,hostN:portN]/[database][?options]
+	Poco::URI theURI(uri);
+
+	if (theURI.getScheme() != "mongodb")
+	{
+		throw Poco::UnknownURISchemeException("Replica set URI must use 'mongodb' scheme");
+	}
+
+	// Parse authority to extract multiple hosts
+	// The authority in MongoDB URIs can be: host1:port1,host2:port2,host3:port3
+	// Poco::URI will give us the full authority string, we need to parse it manually
+	std::string authority = theURI.getAuthority();
+
+	// Remove userinfo if present (username:password@)
+	std::string::size_type atPos = authority.find('@');
+	std::string hostsStr;
+	if (atPos != std::string::npos)
+	{
+		hostsStr = authority.substr(atPos + 1);
+	}
+	else
+	{
+		hostsStr = authority;
+	}
+
+	// Parse comma-separated hosts
+	_config.seeds.clear();
+	std::string::size_type start = 0;
+	std::string::size_type end;
+
+	while ((end = hostsStr.find(',', start)) != std::string::npos)
+	{
+		std::string hostPort = hostsStr.substr(start, end - start);
+		if (!hostPort.empty())
+		{
+			try
+			{
+				_config.seeds.push_back(Net::SocketAddress(hostPort));
+			}
+			catch (...)
+			{
+				// Skip invalid host addresses
+			}
+		}
+		start = end + 1;
+	}
+
+	// Parse last host
+	std::string lastHost = hostsStr.substr(start);
+	if (!lastHost.empty())
+	{
+		try
+		{
+			_config.seeds.push_back(Net::SocketAddress(lastHost));
+		}
+		catch (...)
+		{
+			// Skip invalid host address
+		}
+	}
+
+	if (_config.seeds.empty())
+	{
+		throw Poco::SyntaxException("No valid hosts found in replica set URI");
+	}
+
+	// Parse query parameters
+	Poco::URI::QueryParameters params = theURI.getQueryParameters();
+	for (const auto& param : params)
+	{
+		if (param.first == "replicaSet")
+		{
+			_config.setName = param.second;
+		}
+		else if (param.first == "readPreference")
+		{
+			// Parse read preference mode
+			if (param.second == "primary")
+			{
+				_config.readPreference = ReadPreference(ReadPreference::Primary);
+			}
+			else if (param.second == "primaryPreferred")
+			{
+				_config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
+			}
+			else if (param.second == "secondary")
+			{
+				_config.readPreference = ReadPreference(ReadPreference::Secondary);
+			}
+			else if (param.second == "secondaryPreferred")
+			{
+				_config.readPreference = ReadPreference(ReadPreference::SecondaryPreferred);
+			}
+			else if (param.second == "nearest")
+			{
+				_config.readPreference = ReadPreference(ReadPreference::Nearest);
+			}
+		}
+		else if (param.first == "connectTimeoutMS")
+		{
+			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
+			_config.connectTimeout = Poco::Timespan(timeoutMs * 1000);  // Convert ms to microseconds
+		}
+		else if (param.first == "socketTimeoutMS")
+		{
+			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
+			_config.socketTimeout = Poco::Timespan(timeoutMs * 1000);  // Convert ms to microseconds
+		}
+		else if (param.first == "heartbeatFrequencyMS")
+		{
+			Poco::Int64 freqMs = Poco::NumberParser::parse64(param.second);
+			_config.heartbeatFrequency = Poco::Timespan(freqMs * 1000);  // Convert ms to microseconds
+		}
+		// Note: readPreferenceTags and maxStalenessSeconds would require more complex parsing
+		// and are not commonly used, so we skip them for now
+	}
 }
 
 
