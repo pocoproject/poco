@@ -42,6 +42,7 @@ using namespace Poco;
 
 struct MonitorConfig
 {
+	std::string uri;
 	std::string setName;
 	std::vector<Net::SocketAddress> seeds;
 	int intervalSeconds;
@@ -51,6 +52,7 @@ struct MonitorConfig
 	int maxIterations;
 
 	MonitorConfig():
+		uri(),
 		setName("rs0"),
 		intervalSeconds(5),
 		database("test"),
@@ -88,6 +90,8 @@ void printUsage()
 	std::cout << std::endl;
 	std::cout << "Options:" << std::endl;
 	std::cout << "  -h, --help              Show this help message" << std::endl;
+	std::cout << "  -u, --uri URI           MongoDB connection URI" << std::endl;
+	std::cout << "                          (e.g., mongodb://host1:27017,host2:27017/?replicaSet=rs0)" << std::endl;
 	std::cout << "  -s, --set NAME          Replica set name (default: rs0)" << std::endl;
 	std::cout << "  -H, --hosts HOSTS       Comma-separated host:port list" << std::endl;
 	std::cout << "                          (default: localhost:27017,localhost:27018,localhost:27019)" << std::endl;
@@ -97,11 +101,18 @@ void printUsage()
 	std::cout << "  -v, --verbose           Verbose output" << std::endl;
 	std::cout << "  -n, --iterations N      Number of iterations (default: unlimited)" << std::endl;
 	std::cout << std::endl;
+	std::cout << "Note: --uri takes precedence over --set and --hosts options." << std::endl;
+	std::cout << std::endl;
 	std::cout << "Environment variables:" << std::endl;
+	std::cout << "  MONGODB_URI             MongoDB connection URI" << std::endl;
 	std::cout << "  MONGODB_REPLICA_SET     Replica set name" << std::endl;
 	std::cout << "  MONGODB_HOSTS           Comma-separated host:port list" << std::endl;
 	std::cout << std::endl;
-	std::cout << "Example:" << std::endl;
+	std::cout << "Examples:" << std::endl;
+	std::cout << "  # Using URI" << std::endl;
+	std::cout << "  ReplicaSetMonitor -u 'mongodb://mongo1:27017,mongo2:27017/?replicaSet=rs0'" << std::endl;
+	std::cout << std::endl;
+	std::cout << "  # Using separate options" << std::endl;
 	std::cout << "  ReplicaSetMonitor -s rs0 -H mongo1:27017,mongo2:27017,mongo3:27017 -i 10" << std::endl;
 	std::cout << std::endl;
 }
@@ -314,37 +325,53 @@ void runMonitor(const MonitorConfig& config)
 {
 	try
 	{
-		// Configure replica set
-		ReplicaSet::Config rsConfig;
-		rsConfig.setName = config.setName;
-		rsConfig.seeds = config.seeds;
-		rsConfig.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
-		rsConfig.enableMonitoring = true;
-		rsConfig.heartbeatFrequency = Poco::Timespan(5, 0);  // 5 seconds
+		// Create replica set - use URI if provided, otherwise use Config
+		SharedPtr<ReplicaSet> rs;
 
-		std::cout << "Connecting to replica set: " << config.setName << std::endl;
-		std::cout << "Seed servers: ";
-		for (size_t i = 0; i < config.seeds.size(); ++i)
+		if (!config.uri.empty())
 		{
-			if (i > 0) std::cout << ", ";
-			std::cout << config.seeds[i].toString();
-		}
-		std::cout << std::endl;
-		std::cout << "Check interval: " << config.intervalSeconds << " seconds" << std::endl;
-		std::cout << std::endl;
+			// Use URI constructor
+			std::cout << "Connecting to replica set via URI" << std::endl;
+			std::cout << "URI: " << config.uri << std::endl;
+			std::cout << "Check interval: " << config.intervalSeconds << " seconds" << std::endl;
+			std::cout << std::endl;
 
-		ReplicaSet rs(rsConfig);
+			rs = new ReplicaSet(config.uri);
+		}
+		else
+		{
+			// Use Config constructor
+			ReplicaSet::Config rsConfig;
+			rsConfig.setName = config.setName;
+			rsConfig.seeds = config.seeds;
+			rsConfig.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
+			rsConfig.enableMonitoring = true;
+			rsConfig.heartbeatFrequency = Poco::Timespan(5, 0);  // 5 seconds
+
+			std::cout << "Connecting to replica set: " << config.setName << std::endl;
+			std::cout << "Seed servers: ";
+			for (size_t i = 0; i < config.seeds.size(); ++i)
+			{
+				if (i > 0) std::cout << ", ";
+				std::cout << config.seeds[i].toString();
+			}
+			std::cout << std::endl;
+			std::cout << "Check interval: " << config.intervalSeconds << " seconds" << std::endl;
+			std::cout << std::endl;
+
+			rs = new ReplicaSet(rsConfig);
+		}
 
 		std::cout << "Replica set connected successfully!" << std::endl;
 		std::cout << "Background monitoring active." << std::endl;
 		std::cout << std::endl;
 
 		// Print initial topology
-		printTopology(rs.topology(), config.verbose);
+		printTopology(rs->topology(), config.verbose);
 
 		// Create replica set connections for reads and writes
-		ReplicaSetConnection::Ptr writeConn = new ReplicaSetConnection(rs, ReadPreference(ReadPreference::Primary));
-		ReplicaSetConnection::Ptr readConn = new ReplicaSetConnection(rs, ReadPreference(ReadPreference::PrimaryPreferred));
+		ReplicaSetConnection::Ptr writeConn = new ReplicaSetConnection(*rs, ReadPreference(ReadPreference::Primary));
+		ReplicaSetConnection::Ptr readConn = new ReplicaSetConnection(*rs, ReadPreference(ReadPreference::PrimaryPreferred));
 
 		// Monitoring loop
 		int iteration = 0;
@@ -410,7 +437,7 @@ void runMonitor(const MonitorConfig& config)
 			if (iteration % 10 == 0 || iteration == 1)
 			{
 				std::cout << std::endl;
-				printTopology(rs.topology(), config.verbose);
+				printTopology(rs->topology(), config.verbose);
 			}
 			else
 			{
@@ -447,6 +474,12 @@ int main(int argc, char** argv)
 	MonitorConfig config;
 
 	// Parse environment variables
+	const char* envUri = std::getenv("MONGODB_URI");
+	if (envUri)
+	{
+		config.uri = envUri;
+	}
+
 	const char* envSet = std::getenv("MONGODB_REPLICA_SET");
 	if (envSet)
 	{
@@ -468,6 +501,10 @@ int main(int argc, char** argv)
 		{
 			printUsage();
 			return 0;
+		}
+		else if ((arg == "-u" || arg == "--uri") && i + 1 < argc)
+		{
+			config.uri = argv[++i];
 		}
 		else if ((arg == "-s" || arg == "--set") && i + 1 < argc)
 		{
@@ -506,8 +543,8 @@ int main(int argc, char** argv)
 		}
 	}
 
-	// Use defaults if not configured
-	if (config.seeds.empty())
+	// Use defaults if not configured and no URI provided
+	if (config.uri.empty() && config.seeds.empty())
 	{
 		config.seeds = parseHosts("localhost:27017,localhost:27018,localhost:27019");
 	}

@@ -116,8 +116,18 @@ public:
 	explicit ReplicaSet(const std::string& uri);
 		/// Creates a ReplicaSet from a MongoDB URI.
 		/// Format: mongodb://host1:port1,host2:port2,...?options
+		///
+		/// Supported URI options:
+		///   - replicaSet=name          - Replica set name
+		///   - readPreference=mode      - primary|primaryPreferred|secondary|secondaryPreferred|nearest
+		///   - connectTimeoutMS=ms      - Connection timeout in milliseconds
+		///   - socketTimeoutMS=ms       - Socket timeout in milliseconds
+		///   - heartbeatFrequencyMS=ms  - Heartbeat frequency in milliseconds
+		///
+		/// Example: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0&readPreference=primaryPreferred
+		///
 		/// Throws Poco::SyntaxException if URI is invalid.
-		/// NOTE: This is a placeholder for future URI support.
+		/// Throws Poco::UnknownURISchemeException if scheme is not "mongodb".
 
 	virtual ~ReplicaSet();
 		/// Destroys the ReplicaSet and stops background monitoring.
@@ -186,7 +196,8 @@ private:
 		/// Queries all known servers and updates topology.
 
 	void parseURI(const std::string& uri);
-		/// Parses a MongoDB URI into configuration (future implementation).
+		/// Parses a MongoDB URI into configuration.
+		/// Extracts hosts and query parameters into _config.
 
 	Config _config;
 	TopologyDescription _topology;
