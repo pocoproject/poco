@@ -23,20 +23,20 @@ namespace MongoDB {
 
 
 // MongoDB error codes that indicate retriable errors
-namespace ErrorCodes
+enum class ErrorCode
 {
-	const int NotMaster = 10107;
-	const int NotMasterNoSlaveOk = 13435;
-	const int NotMasterOrSecondary = 13436;
-	const int InterruptedAtShutdown = 11600;
-	const int InterruptedDueToReplStateChange = 11602;
-	const int PrimarySteppedDown = 189;
-	const int ShutdownInProgress = 91;
-	const int HostNotFound = 7;
-	const int HostUnreachable = 6;
-	const int NetworkTimeout = 89;
-	const int SocketException = 9001;
-}
+	NotMaster = 10107,
+	NotMasterNoSlaveOk = 13435,
+	NotMasterOrSecondary = 13436,
+	InterruptedAtShutdown = 11600,
+	InterruptedDueToReplStateChange = 11602,
+	PrimarySteppedDown = 189,
+	ShutdownInProgress = 91,
+	HostNotFound = 7,
+	HostUnreachable = 6,
+	NetworkTimeout = 89,
+	SocketException = 9001
+};
 
 
 ReplicaSetConnection::ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref):
@@ -266,21 +266,21 @@ bool ReplicaSetConnection::isRetriableMongoDBError(const OpMsgMessage& response)
 	// Check for error code
 	if (body.exists("code"))
 	{
-		int code = body.get<int>("code");
+		ErrorCode code = static_cast<ErrorCode>(body.get<int>("code"));
 
 		switch (code)
 		{
-		case ErrorCodes::NotMaster:
-		case ErrorCodes::NotMasterNoSlaveOk:
-		case ErrorCodes::NotMasterOrSecondary:
-		case ErrorCodes::InterruptedAtShutdown:
-		case ErrorCodes::InterruptedDueToReplStateChange:
-		case ErrorCodes::PrimarySteppedDown:
-		case ErrorCodes::ShutdownInProgress:
-		case ErrorCodes::HostNotFound:
-		case ErrorCodes::HostUnreachable:
-		case ErrorCodes::NetworkTimeout:
-		case ErrorCodes::SocketException:
+		case ErrorCode::NotMaster:
+		case ErrorCode::NotMasterNoSlaveOk:
+		case ErrorCode::NotMasterOrSecondary:
+		case ErrorCode::InterruptedAtShutdown:
+		case ErrorCode::InterruptedDueToReplStateChange:
+		case ErrorCode::PrimarySteppedDown:
+		case ErrorCode::ShutdownInProgress:
+		case ErrorCode::HostNotFound:
+		case ErrorCode::HostUnreachable:
+		case ErrorCode::NetworkTimeout:
+		case ErrorCode::SocketException:
 			return true;
 		default:
 			return false;
