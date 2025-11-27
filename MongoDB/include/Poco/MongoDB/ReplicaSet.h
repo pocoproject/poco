@@ -81,26 +81,23 @@ public:
 			/// Expected replica set name.
 			/// If empty, will be discovered from servers.
 
-		ReadPreference readPreference;
+		ReadPreference readPreference{ReadPreference::Primary};
 			/// Default read preference for this replica set.
 
-		Poco::Timespan connectTimeout;
+		Poco::Timespan connectTimeout{10, 0};
 			/// Connection timeout (default: 10 seconds)
 
-		Poco::Timespan socketTimeout;
+		Poco::Timespan socketTimeout{30, 0};
 			/// Socket send/receive timeout (default: 30 seconds)
 
-		Poco::Timespan heartbeatFrequency;
+		Poco::Timespan heartbeatFrequency{10, 0};
 			/// Topology monitoring interval (default: 10 seconds)
 
-		bool enableMonitoring;
+		bool enableMonitoring{true};
 			/// Enable background topology monitoring (default: true)
 
-		Connection::SocketFactory* socketFactory;
+		Connection::SocketFactory* socketFactory{nullptr};
 			/// Optional socket factory for SSL/TLS connections
-
-		Config();
-			/// Creates default configuration.
 	};
 
 	explicit ReplicaSet(const Config& config);
@@ -203,8 +200,8 @@ private:
 	TopologyDescription _topology;
 	mutable Poco::FastMutex _mutex;
 	std::thread _monitorThread;
-	std::atomic<bool> _stopMonitoring;
-	std::atomic<bool> _monitoringActive;
+	std::atomic<bool> _stopMonitoring{false};
+	std::atomic<bool> _monitoringActive{false};
 };
 
 

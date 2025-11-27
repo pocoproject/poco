@@ -20,20 +20,11 @@ namespace Poco {
 namespace MongoDB {
 
 
-TopologyDescription::TopologyDescription():
-	_mutex(),
-	_type(Unknown),
-	_setName(),
-	_servers()
-{
-}
+TopologyDescription::TopologyDescription() = default;
 
 
 TopologyDescription::TopologyDescription(const std::string& setName):
-	_mutex(),
-	_type(Unknown),
-	_setName(setName),
-	_servers()
+	_setName(setName)
 {
 }
 
@@ -53,13 +44,10 @@ TopologyDescription::TopologyDescription(TopologyDescription&& other) noexcept
 	_type = other._type;
 	_setName = std::move(other._setName);
 	_servers = std::move(other._servers);
-	other._type = Unknown;
 }
 
 
-TopologyDescription::~TopologyDescription()
-{
-}
+TopologyDescription::~TopologyDescription() = default;
 
 
 TopologyDescription& TopologyDescription::operator=(const TopologyDescription& other)
@@ -89,7 +77,6 @@ TopologyDescription& TopologyDescription::operator=(TopologyDescription&& other)
 		_type = other._type;
 		_setName = std::move(other._setName);
 		_servers = std::move(other._servers);
-		other._type = Unknown;
 	}
 	return *this;
 }
@@ -121,9 +108,9 @@ std::vector<ServerDescription> TopologyDescription::servers() const
 	Mutex::ScopedLock lock(_mutex);
 	std::vector<ServerDescription> result;
 	result.reserve(_servers.size());
-	for (const auto& pair : _servers)
+	for (const auto& [address, server] : _servers)
 	{
-		result.push_back(pair.second);
+		result.emplace_back(server);
 	}
 	return result;
 }
@@ -132,11 +119,11 @@ std::vector<ServerDescription> TopologyDescription::servers() const
 ServerDescription TopologyDescription::findPrimary() const
 {
 	Mutex::ScopedLock lock(_mutex);
-	for (const auto& pair : _servers)
+	for (const auto& [address, server] : _servers)
 	{
-		if (pair.second.isPrimary())
+		if (server.isPrimary())
 		{
-			return pair.second;
+			return server;
 		}
 	}
 	return ServerDescription();
@@ -147,11 +134,12 @@ std::vector<ServerDescription> TopologyDescription::findSecondaries() const
 {
 	Mutex::ScopedLock lock(_mutex);
 	std::vector<ServerDescription> result;
-	for (const auto& pair : _servers)
+	result.reserve(_servers.size());
+	for (const auto& [address, server] : _servers)
 	{
-		if (pair.second.isSecondary())
+		if (server.isSecondary())
 		{
-			result.push_back(pair.second);
+			result.emplace_back(server);
 		}
 	}
 	return result;
@@ -161,9 +149,9 @@ std::vector<ServerDescription> TopologyDescription::findSecondaries() const
 bool TopologyDescription::hasPrimary() const
 {
 	Mutex::ScopedLock lock(_mutex);
-	for (const auto& pair : _servers)
+	for (const auto& [address, server] : _servers)
 	{
-		if (pair.second.isPrimary())
+		if (server.isPrimary())
 		{
 			return true;
 		}
@@ -199,7 +187,7 @@ void TopologyDescription::updateServer(const Net::SocketAddress& address, const 
 	auto it = _servers.find(address);
 	if (it == _servers.end())
 	{
-		it = _servers.insert(std::make_pair(address, ServerDescription(address))).first;
+		it = _servers.try_emplace(address, address).first;
 	}
 
 	// Update from hello response
@@ -236,9 +224,9 @@ void TopologyDescription::addServer(const Net::SocketAddress& address)
 {
 	Mutex::ScopedLock lock(_mutex);
 
-	if (_servers.find(address) == _servers.end())
+	auto [it, inserted] = _servers.try_emplace(address, address);
+	if (inserted)
 	{
-		_servers.insert(std::make_pair(address, ServerDescription(address)));
 		updateTopologyType();
 	}
 }
@@ -286,9 +274,9 @@ void TopologyDescription::updateTopologyType()
 	int unknownCount = 0;
 	int standaloneCount = 0;
 
-	for (const auto& pair : _servers)
+	for (const auto& [address, server] : _servers)
 	{
-		switch (pair.second.type())
+		switch (server.type())
 		{
 		case ServerDescription::RsPrimary:
 			primaries++;
@@ -340,13 +328,10 @@ void TopologyDescription::processNewHosts(const ServerDescription& serverDesc)
 	// This method must be called while holding the mutex
 
 	// Add newly discovered hosts to the topology
-	const std::vector<Net::SocketAddress>& hosts = serverDesc.hosts();
+	const auto& hosts = serverDesc.hosts();
 	for (const auto& host : hosts)
 	{
-		if (_servers.find(host) == _servers.end())
-		{
-			_servers.insert(std::make_pair(host, ServerDescription(host)));
-		}
+		_servers.try_emplace(host, host);
 	}
 }
 

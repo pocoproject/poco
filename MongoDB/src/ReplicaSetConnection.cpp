@@ -41,16 +41,12 @@ namespace ErrorCodes
 
 ReplicaSetConnection::ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref):
 	_replicaSet(replicaSet),
-	_readPreference(readPref),
-	_connection(),
-	_triedServers()
+	_readPreference(readPref)
 {
 }
 
 
-ReplicaSetConnection::~ReplicaSetConnection()
-{
-}
+ReplicaSetConnection::~ReplicaSetConnection() = default;
 
 
 void ReplicaSetConnection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
@@ -243,7 +239,7 @@ bool ReplicaSetConnection::isRetriableError(const std::exception& e)
 	const Poco::IOException* ioEx = dynamic_cast<const Poco::IOException*>(&e);
 	if (ioEx)
 	{
-		std::string msg = ioEx->message();
+		const auto& msg = ioEx->message();
 		// Check for specific retriable error messages
 		if (msg.find("not master") != std::string::npos ||
 			msg.find("NotMaster") != std::string::npos ||
@@ -294,7 +290,7 @@ bool ReplicaSetConnection::isRetriableMongoDBError(const OpMsgMessage& response)
 	// Check for error message patterns
 	if (body.exists("errmsg"))
 	{
-		std::string errmsg = body.get<std::string>("errmsg");
+		const auto& errmsg = body.get<std::string>("errmsg");
 		if (errmsg.find("not master") != std::string::npos ||
 			errmsg.find("NotMaster") != std::string::npos)
 		{

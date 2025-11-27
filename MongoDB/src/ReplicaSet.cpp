@@ -27,35 +27,13 @@ namespace MongoDB {
 
 
 //
-// ReplicaSet::Config
-//
-
-
-ReplicaSet::Config::Config():
-	seeds(),
-	setName(),
-	readPreference(ReadPreference::Primary),
-	connectTimeout(10, 0),       // 10 seconds
-	socketTimeout(30, 0),         // 30 seconds
-	heartbeatFrequency(10, 0),    // 10 seconds
-	enableMonitoring(true),
-	socketFactory(nullptr)
-{
-}
-
-
-//
 // ReplicaSet
 //
 
 
 ReplicaSet::ReplicaSet(const Config& config):
 	_config(config),
-	_topology(config.setName),
-	_mutex(),
-	_monitorThread(),
-	_stopMonitoring(false),
-	_monitoringActive(false)
+	_topology(config.setName)
 {
 	if (_config.seeds.empty())
 	{
@@ -106,13 +84,7 @@ ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress>& seeds):
 }
 
 
-ReplicaSet::ReplicaSet(const std::string& uri):
-	_config(),
-	_topology(),
-	_mutex(),
-	_monitorThread(),
-	_stopMonitoring(false),
-	_monitoringActive(false)
+ReplicaSet::ReplicaSet(const std::string& uri)
 {
 	// Parse URI first to extract seeds and configuration
 	parseURI(uri);
@@ -287,7 +259,7 @@ void ReplicaSet::discover()
 	// Try to discover topology from seed servers
 	bool discovered = false;
 
-	std::vector<ServerDescription> servers = _topology.servers();
+	const auto servers = _topology.servers();
 	for (const auto& server : servers)
 	{
 		try
@@ -510,19 +482,11 @@ void ReplicaSet::parseURI(const std::string& uri)
 	// Parse authority to extract multiple hosts
 	// The authority in MongoDB URIs can be: host1:port1,host2:port2,host3:port3
 	// Poco::URI will give us the full authority string, we need to parse it manually
-	std::string authority = theURI.getAuthority();
+	const auto& authority = theURI.getAuthority();
 
 	// Remove userinfo if present (username:password@)
-	std::string::size_type atPos = authority.find('@');
-	std::string hostsStr;
-	if (atPos != std::string::npos)
-	{
-		hostsStr = authority.substr(atPos + 1);
-	}
-	else
-	{
-		hostsStr = authority;
-	}
+	const auto atPos = authority.find('@');
+	const auto hostsStr = (atPos != std::string::npos) ? authority.substr(atPos + 1) : authority;
 
 	// Parse comma-separated hosts
 	_config.seeds.clear();
@@ -531,12 +495,12 @@ void ReplicaSet::parseURI(const std::string& uri)
 
 	while ((end = hostsStr.find(',', start)) != std::string::npos)
 	{
-		std::string hostPort = hostsStr.substr(start, end - start);
+		const auto hostPort = hostsStr.substr(start, end - start);
 		if (!hostPort.empty())
 		{
 			try
 			{
-				_config.seeds.push_back(Net::SocketAddress(hostPort));
+				_config.seeds.emplace_back(hostPort);
 			}
 			catch (...)
 			{
@@ -547,12 +511,12 @@ void ReplicaSet::parseURI(const std::string& uri)
 	}
 
 	// Parse last host
-	std::string lastHost = hostsStr.substr(start);
+	const auto lastHost = hostsStr.substr(start);
 	if (!lastHost.empty())
 	{
 		try
 		{
-			_config.seeds.push_back(Net::SocketAddress(lastHost));
+			_config.seeds.emplace_back(lastHost);
 		}
 		catch (...)
 		{

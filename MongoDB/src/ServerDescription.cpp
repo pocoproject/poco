@@ -22,108 +22,28 @@ namespace Poco {
 namespace MongoDB {
 
 
-ServerDescription::ServerDescription():
-	_address(),
-	_type(Unknown),
-	_lastUpdateTime(),
-	_roundTripTime(0),
-	_setName(),
-	_hosts(),
-	_tags(),
-	_error(),
-	_hasError(false)
-{
-}
+ServerDescription::ServerDescription() = default;
 
 
 ServerDescription::ServerDescription(const Net::SocketAddress& address):
-	_address(address),
-	_type(Unknown),
-	_lastUpdateTime(),
-	_roundTripTime(0),
-	_setName(),
-	_hosts(),
-	_tags(),
-	_error(),
-	_hasError(false)
+	_address(address)
 {
 }
 
 
-ServerDescription::ServerDescription(const ServerDescription& other):
-	_address(other._address),
-	_type(other._type),
-	_lastUpdateTime(other._lastUpdateTime),
-	_roundTripTime(other._roundTripTime),
-	_setName(other._setName),
-	_hosts(other._hosts),
-	_tags(other._tags),
-	_error(other._error),
-	_hasError(other._hasError)
-{
-}
+ServerDescription::ServerDescription(const ServerDescription& other) = default;
 
 
-ServerDescription::ServerDescription(ServerDescription&& other) noexcept:
-	_address(std::move(other._address)),
-	_type(other._type),
-	_lastUpdateTime(other._lastUpdateTime),
-	_roundTripTime(other._roundTripTime),
-	_setName(std::move(other._setName)),
-	_hosts(std::move(other._hosts)),
-	_tags(std::move(other._tags)),
-	_error(std::move(other._error)),
-	_hasError(other._hasError)
-{
-	other._type = Unknown;
-	other._roundTripTime = 0;
-	other._hasError = false;
-}
+ServerDescription::ServerDescription(ServerDescription&& other) noexcept = default;
 
 
-ServerDescription::~ServerDescription()
-{
-}
+ServerDescription::~ServerDescription() = default;
 
 
-ServerDescription& ServerDescription::operator=(const ServerDescription& other)
-{
-	if (this != &other)
-	{
-		_address = other._address;
-		_type = other._type;
-		_lastUpdateTime = other._lastUpdateTime;
-		_roundTripTime = other._roundTripTime;
-		_setName = other._setName;
-		_hosts = other._hosts;
-		_tags = other._tags;
-		_error = other._error;
-		_hasError = other._hasError;
-	}
-	return *this;
-}
+ServerDescription& ServerDescription::operator=(const ServerDescription& other) = default;
 
 
-ServerDescription& ServerDescription::operator=(ServerDescription&& other) noexcept
-{
-	if (this != &other)
-	{
-		_address = std::move(other._address);
-		_type = other._type;
-		_lastUpdateTime = other._lastUpdateTime;
-		_roundTripTime = other._roundTripTime;
-		_setName = std::move(other._setName);
-		_hosts = std::move(other._hosts);
-		_tags = std::move(other._tags);
-		_error = std::move(other._error);
-		_hasError = other._hasError;
-
-		other._type = Unknown;
-		other._roundTripTime = 0;
-		other._hasError = false;
-	}
-	return *this;
-}
+ServerDescription& ServerDescription::operator=(ServerDescription&& other) noexcept = default;
 
 
 void ServerDescription::updateFromHelloResponse(const Document& helloResponse, Poco::Int64 rttMicros)
@@ -220,12 +140,13 @@ void ServerDescription::parseHosts(const Document& doc)
 	if (doc.exists("hosts"))
 	{
 		Array::Ptr hostsArray = doc.get<Array::Ptr>("hosts");
-		for (int i = 0; i < hostsArray->size(); ++i)
+		_hosts.reserve(hostsArray->size());
+		for (std::size_t i = 0; i < hostsArray->size(); ++i)
 		{
 			try
 			{
 				std::string hostStr = hostsArray->get<std::string>(i);
-				_hosts.push_back(Net::SocketAddress(hostStr));
+				_hosts.emplace_back(hostStr);
 			}
 			catch (...)
 			{
@@ -238,12 +159,12 @@ void ServerDescription::parseHosts(const Document& doc)
 	if (doc.exists("passives"))
 	{
 		Array::Ptr passivesArray = doc.get<Array::Ptr>("passives");
-		for (int i = 0; i < passivesArray->size(); ++i)
+		for (std::size_t i = 0; i < passivesArray->size(); ++i)
 		{
 			try
 			{
 				std::string hostStr = passivesArray->get<std::string>(i);
-				_hosts.push_back(Net::SocketAddress(hostStr));
+				_hosts.emplace_back(hostStr);
 			}
 			catch (...)
 			{
@@ -256,12 +177,12 @@ void ServerDescription::parseHosts(const Document& doc)
 	if (doc.exists("arbiters"))
 	{
 		Array::Ptr arbitersArray = doc.get<Array::Ptr>("arbiters");
-		for (int i = 0; i < arbitersArray->size(); ++i)
+		for (std::size_t i = 0; i < arbitersArray->size(); ++i)
 		{
 			try
 			{
 				std::string hostStr = arbitersArray->get<std::string>(i);
-				_hosts.push_back(Net::SocketAddress(hostStr));
+				_hosts.emplace_back(hostStr);
 			}
 			catch (...)
 			{

@@ -135,9 +135,9 @@ private:
 	std::vector<ServerDescription> filterByMaxStaleness(const std::vector<ServerDescription>& servers, const ServerDescription& primary) const;
 	std::vector<ServerDescription> selectByNearest(const std::vector<ServerDescription>& servers) const;
 
-	Mode _mode;
+	Mode _mode{Primary};
 	Document _tags;
-	Poco::Int64 _maxStalenessSeconds;
+	Poco::Int64 _maxStalenessSeconds{NO_MAX_STALENESS};
 };
 
 

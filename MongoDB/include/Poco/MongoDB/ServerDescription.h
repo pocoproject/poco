@@ -140,14 +140,14 @@ private:
 	void parseTags(const Document& doc);
 
 	Net::SocketAddress _address;
-	ServerType _type;
+	ServerType _type{Unknown};
 	Timestamp _lastUpdateTime;
-	Poco::Int64 _roundTripTime;
+	Poco::Int64 _roundTripTime{0};
 	std::string _setName;
 	std::vector<Net::SocketAddress> _hosts;
 	Document _tags;
 	std::string _error;
-	bool _hasError;
+	bool _hasError{false};
 };
 
 

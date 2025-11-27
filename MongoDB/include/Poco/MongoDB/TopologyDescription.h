@@ -146,7 +146,7 @@ private:
 		/// Must be called while holding the mutex.
 
 	mutable Mutex _mutex;
-	TopologyType _type;
+	TopologyType _type{Unknown};
 	std::string _setName;
 	std::map<Net::SocketAddress, ServerDescription> _servers;
 };
