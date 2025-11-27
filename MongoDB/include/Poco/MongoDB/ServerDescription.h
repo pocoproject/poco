@@ -107,7 +107,8 @@ public:
 		/// Returns an empty document if no tags are configured.
 
 	[[nodiscard]] bool isPrimary() const;
-		/// Returns true if this is a primary server.
+		/// Returns true if this is a primary server (RsPrimary) or a standalone server.
+		/// Standalone servers are treated as primaries for read preference purposes.
 
 	[[nodiscard]] bool isSecondary() const;
 		/// Returns true if this is a secondary server.
@@ -205,7 +206,8 @@ inline const Document& ServerDescription::tags() const
 
 inline bool ServerDescription::isPrimary() const
 {
-	return _type == RsPrimary;
+	// Standalone servers should be treated as primary for read preference purposes
+	return _type == RsPrimary || _type == Standalone;
 }
 
 
