@@ -28,9 +28,7 @@ const Poco::Int64 ReadPreference::NO_MAX_STALENESS;
 
 
 ReadPreference::ReadPreference(Mode mode):
-	_mode(mode),
-	_tags(),
-	_maxStalenessSeconds(NO_MAX_STALENESS)
+	_mode(mode)
 {
 }
 
@@ -43,54 +41,19 @@ ReadPreference::ReadPreference(Mode mode, const Document& tags, Poco::Int64 maxS
 }
 
 
-ReadPreference::ReadPreference(const ReadPreference& other):
-	_mode(other._mode),
-	_tags(other._tags),
-	_maxStalenessSeconds(other._maxStalenessSeconds)
-{
-}
+ReadPreference::ReadPreference(const ReadPreference& other) = default;
 
 
-ReadPreference::ReadPreference(ReadPreference&& other) noexcept:
-	_mode(other._mode),
-	_tags(std::move(other._tags)),
-	_maxStalenessSeconds(other._maxStalenessSeconds)
-{
-	other._mode = Primary;
-	other._maxStalenessSeconds = NO_MAX_STALENESS;
-}
+ReadPreference::ReadPreference(ReadPreference&& other) noexcept = default;
 
 
-ReadPreference::~ReadPreference()
-{
-}
+ReadPreference::~ReadPreference() = default;
 
 
-ReadPreference& ReadPreference::operator=(const ReadPreference& other)
-{
-	if (this != &other)
-	{
-		_mode = other._mode;
-		_tags = other._tags;
-		_maxStalenessSeconds = other._maxStalenessSeconds;
-	}
-	return *this;
-}
+ReadPreference& ReadPreference::operator=(const ReadPreference& other) = default;
 
 
-ReadPreference& ReadPreference::operator=(ReadPreference&& other) noexcept
-{
-	if (this != &other)
-	{
-		_mode = other._mode;
-		_tags = std::move(other._tags);
-		_maxStalenessSeconds = other._maxStalenessSeconds;
-
-		other._mode = Primary;
-		other._maxStalenessSeconds = NO_MAX_STALENESS;
-	}
-	return *this;
-}
+ReadPreference& ReadPreference::operator=(ReadPreference&& other) noexcept = default;
 
 
 std::vector<ServerDescription> ReadPreference::selectServers(const TopologyDescription& topology) const
@@ -251,8 +214,8 @@ bool ReadPreference::matchesTags(const ServerDescription& server) const
 		}
 
 		// Get both values as strings for comparison
-		std::string requiredValue = _tags.get<std::string>(key);
-		std::string serverValue = serverTags.get<std::string>(key);
+		const auto& requiredValue = _tags.get<std::string>(key);
+		const auto& serverValue = serverTags.get<std::string>(key);
 
 		if (requiredValue != serverValue)
 		{
@@ -272,6 +235,7 @@ std::vector<ServerDescription> ReadPreference::filterByTags(const std::vector<Se
 	}
 
 	std::vector<ServerDescription> result;
+	result.reserve(servers.size());
 	for (const auto& server : servers)
 	{
 		if (matchesTags(server))
@@ -297,7 +261,8 @@ std::vector<ServerDescription> ReadPreference::filterByMaxStaleness(
 	// A full implementation would compare lastWriteDate timestamps
 
 	std::vector<ServerDescription> result;
-	Poco::Int64 maxStalenessMs = _maxStalenessSeconds * 1000000;  // Convert to microseconds
+	result.reserve(servers.size());
+	const Poco::Int64 maxStalenessMs = _maxStalenessSeconds * 1000000;  // Convert to microseconds
 
 	for (const auto& server : servers)
 	{
@@ -346,12 +311,13 @@ std::vector<ServerDescription> ReadPreference::selectByNearest(const std::vector
 	// Select servers within 15ms of minimum RTT (MongoDB spec)
 	const Poco::Int64 localThresholdMs = 15000;  // 15ms in microseconds
 	std::vector<ServerDescription> result;
+	result.reserve(servers.size());
 
 	for (const auto& server : servers)
 	{
 		if (server.roundTripTime() <= minRTT + localThresholdMs)
 		{
-			result.push_back(server);
+			result.emplace_back(server);
 		}
 	}
 
