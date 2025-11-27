@@ -224,7 +224,7 @@ void TopologyDescription::addServer(const Net::SocketAddress& address)
 {
 	Mutex::ScopedLock lock(_mutex);
 
-	auto [it, inserted] = _servers.try_emplace(address, address);
+	auto [_, inserted] = _servers.try_emplace(address, address);
 	if (inserted)
 	{
 		updateTopologyType();
@@ -271,7 +271,6 @@ void TopologyDescription::updateTopologyType()
 	int primaries = 0;
 	int secondaries = 0;
 	int mongosCount = 0;
-	int unknownCount = 0;
 	int standaloneCount = 0;
 
 	for (const auto& [address, server] : _servers)
@@ -294,7 +293,7 @@ void TopologyDescription::updateTopologyType()
 			standaloneCount++;
 			break;
 		case ServerDescription::Unknown:
-			unknownCount++;
+			// Unknown servers don't affect topology classification
 			break;
 		}
 	}
@@ -306,6 +305,8 @@ void TopologyDescription::updateTopologyType()
 	}
 	else if (standaloneCount > 0 && _servers.size() == 1)
 	{
+		// Single standalone server - treat as Single topology
+		// Standalone servers behave like a single primary for read preferences
 		_type = Single;
 	}
 	else if (primaries > 0)
