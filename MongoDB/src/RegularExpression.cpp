@@ -13,7 +13,6 @@
 
 
 #include "Poco/MongoDB/RegularExpression.h"
-#include <sstream>
 
 
 namespace Poco {

@@ -14,8 +14,6 @@
 
 #include "Poco/MongoDB/ServerDescription.h"
 #include "Poco/MongoDB/Array.h"
-#include "Poco/Exception.h"
-#include "Poco/StringTokenizer.h"
 
 
 namespace Poco {

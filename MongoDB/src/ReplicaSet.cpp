@@ -16,7 +16,6 @@
 #include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
-#include "Poco/Thread.h"
 #include "Poco/URI.h"
 #include "Poco/NumberParser.h"
 #include <chrono>
