@@ -13,7 +13,6 @@
 
 
 #include "Poco/MongoDB/TopologyDescription.h"
-#include "Poco/Exception.h"
 
 
 namespace Poco {

@@ -14,9 +14,7 @@
 
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
-#include "Poco/Random.h"
 #include "Poco/Format.h"
-#include <algorithm>
 #include <limits>
 
 
