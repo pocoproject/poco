@@ -47,16 +47,19 @@ public:
 	explicit Element(const std::string& name);
 		/// Creates the Element with the given name.
 
+	explicit Element(std::string&& name);
+		/// Creates the Element with the given name (move semantics).
+
 	virtual ~Element();
 		/// Destructor
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const noexcept;
 		/// Returns the name of the element.
 
-	virtual std::string toString(int indent = 0) const = 0;
+	[[nodiscard]] virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
 
-	virtual int type() const = 0;
+	[[nodiscard]] virtual int type() const noexcept = 0;
 		/// Returns the MongoDB type of the element.
 
 private:
@@ -71,13 +74,13 @@ private:
 //
 // inlines
 //
-inline const std::string& Element::name() const
+inline const std::string& Element::name() const noexcept
 {
 	return _name;
 }
 
 
-using ElementSet = std::list<Element::Ptr>;
+using ElementSet = std::vector<Element::Ptr>;
 
 
 template<typename T>
@@ -110,51 +113,76 @@ struct ElementTraits<std::string>
 
 	static std::string toString(const std::string& value, int indent = 0)
 	{
-		std::ostringstream oss;
-
-		oss << '"';
-
-		for (char it : value)
+		// Fast path: check if escaping is needed at all
+		bool needsEscaping = false;
+		for (char c : value)
 		{
-			switch (it)
+			if (c == '"' || c == '\\' || c == '\b' || c == '\f' ||
+			    c == '\n' || c == '\r' || c == '\t' || (c > 0 && c <= 0x1F))
 			{
-			case '"':
-				oss << "\\\"";
+				needsEscaping = true;
 				break;
-			case '\\':
-				oss << "\\\\";
-				break;
-			case '\b':
-				oss << "\\b";
-				break;
-			case '\f':
-				oss << "\\f";
-				break;
-			case '\n':
-				oss << "\\n";
-				break;
-			case '\r':
-				oss << "\\r";
-				break;
-			case '\t':
-				oss << "\\t";
-				break;
-			default:
-				{
-					if ( it > 0 && it <= 0x1F )
-					{
-						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(it);
-					}
-					else
-					{
-						oss << it;
-					}
-					break;
-				}
 			}
 		}
-		oss << '"';
-		return oss.str();
+
+		// Fast path: no escaping needed - just wrap in quotes
+		if (!needsEscaping)
+		{
+			std::string result;
+			result.reserve(value.size() + 2);
+			result += '"';
+			result += value;
+			result += '"';
+			return result;
+		}
+
+		// Slow path: escaping needed
+		std::string result;
+		result.reserve(value.size() * 2 + 2);  // Pessimistic estimate
+		result += '"';
+
+		for (char c : value)
+		{
+			switch (c)
+			{
+			case '"':
+				result += "\\\"";
+				break;
+			case '\\':
+				result += "\\\\";
+				break;
+			case '\b':
+				result += "\\b";
+				break;
+			case '\f':
+				result += "\\f";
+				break;
+			case '\n':
+				result += "\\n";
+				break;
+			case '\r':
+				result += "\\r";
+				break;
+			case '\t':
+				result += "\\t";
+				break;
+			default:
+				if (c > 0 && c <= 0x1F)
+				{
+					// Unicode escape sequence
+					char buf[7];  // "\uXXXX" + null terminator
+					std::snprintf(buf, sizeof(buf), "\\u%04X", static_cast<unsigned char>(c));
+					result += buf;
+				}
+				else
+				{
+					result += c;
+				}
+				break;
+			}
+		}
+		result += '"';
+		return result;
 	}
 };
 
@@ -233,9 +261,10 @@ struct ElementTraits<Timestamp>
 	static std::string toString(const Timestamp& value, int indent = 0)
 	{
 		std::string result;
-		result.append(1, '"');
-		result.append(DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z"));
-		result.append(1, '"');
+		result.reserve(32);  // Pre-allocate for typical timestamp string length
+		result += '"';
+		result += DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z");
+		result += '"';
 		return result;
 	}
 };
@@ -304,11 +333,12 @@ struct ElementTraits<BSONTimestamp>
 	static std::string toString(const BSONTimestamp& value, int indent = 0)
 	{
 		std::string result;
-		result.append(1, '"');
-		result.append(DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z"));
-		result.append(1, ' ');
-		result.append(NumberFormatter::format(value.inc));
-		result.append(1, '"');
+		result.reserve(48);  // Pre-allocate for timestamp + space + increment + quotes
+		result += '"';
+		result += DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z");
+		result += ' ';
+		result += NumberFormatter::format(value.inc);
+		result += '"';
 		return result;
 	}
 };
@@ -359,22 +389,28 @@ public:
 	{
 	}
 
+	ConcreteElement(std::string&& name, T&& init):
+		Element(std::move(name)),
+		_value(std::move(init))
+	{
+	}
+
 	~ConcreteElement() override = default;
 
 
-	const T& value() const
+	const T& value() const noexcept
 	{
 		return _value;
 	}
 
 
-	std::string toString(int indent = 0) const override
+	[[nodiscard]] std::string toString(int indent = 0) const override
 	{
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
 
-	int type() const override
+	[[nodiscard]] int type() const noexcept override
 	{
 		return ElementTraits<T>::TypeId;
 	}

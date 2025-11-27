@@ -50,16 +50,25 @@ public:
 		/// The string must contain a hexadecimal representation
 		/// of an object ID. This means a string of 24 characters.
 
-	ObjectId(const ObjectId& copy);
+	ObjectId(const ObjectId& copy) noexcept;
 		/// Creates an ObjectId by copying another one.
+
+	ObjectId(ObjectId&& other) noexcept;
+		/// Creates an ObjectId by moving another one.
+
+	ObjectId& operator=(const ObjectId& copy) noexcept;
+		/// Assigns another ObjectId.
+
+	ObjectId& operator=(ObjectId&& other) noexcept;
+		/// Move-assigns another ObjectId.
 
 	virtual ~ObjectId();
 		/// Destroys the ObjectId.
 
-	Timestamp timestamp() const;
+	[[nodiscard]] Timestamp timestamp() const noexcept;
 		/// Returns the timestamp which is stored in the first four bytes of the id
 
-	std::string toString(const std::string& fmt = "%02x") const;
+	[[nodiscard]] std::string toString(const std::string& fmt = "%02x") const;
 		/// Returns the id in string format. The fmt parameter
 		/// specifies the formatting used for individual members
 		/// of the ID char array.
@@ -67,8 +76,8 @@ public:
 private:
 	ObjectId();
 
-	static int fromHex(char c);
-	static char fromHex(const char* c);
+	static constexpr int fromHex(char c) noexcept;
+	static constexpr char fromHex(const char* c) noexcept;
 
 	unsigned char _id[12];
 
@@ -81,19 +90,19 @@ private:
 //
 // inlines
 //
-inline Timestamp ObjectId::timestamp() const
+inline Timestamp ObjectId::timestamp() const noexcept
 {
 	int time;
-	char* T = (char *) &time;
+	char* T = reinterpret_cast<char*>(&time);
 	T[0] = _id[3];
 	T[1] = _id[2];
 	T[2] = _id[1];
 	T[3] = _id[0];
-	return Timestamp::fromEpochTime((time_t) time);
+	return Timestamp::fromEpochTime(static_cast<time_t>(time));
 }
 
 
-inline int ObjectId::fromHex(char c)
+constexpr inline int ObjectId::fromHex(char c) noexcept
 {
 	if ( '0' <= c && c <= '9' )
 		return c - '0';
@@ -105,9 +114,9 @@ inline int ObjectId::fromHex(char c)
 }
 
 
-inline char ObjectId::fromHex(const char* c)
+constexpr inline char ObjectId::fromHex(const char* c) noexcept
 {
-	return (char)((fromHex(c[0]) << 4 ) | fromHex(c[1]));
+	return static_cast<char>((fromHex(c[0]) << 4) | fromHex(c[1]));
 }
 
 
@@ -130,14 +139,14 @@ struct ElementTraits<ObjectId::Ptr>
 template<>
 inline void BSONReader::read<ObjectId::Ptr>(ObjectId::Ptr& to)
 {
-	_reader.readRaw((char*) to->_id, 12);
+	_reader.readRaw(reinterpret_cast<char*>(to->_id), 12);
 }
 
 
 template<>
 inline void BSONWriter::write<ObjectId::Ptr>(ObjectId::Ptr& from)
 {
-	_writer.writeRaw((char*) from->_id, 12);
+	_writer.writeRaw(reinterpret_cast<char*>(from->_id), 12);
 }
 
 

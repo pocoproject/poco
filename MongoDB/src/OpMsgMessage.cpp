@@ -242,8 +242,10 @@ void OpMsgMessage::send(std::ostream& ostr)
 
 	if (!_documents.empty())
 	{
-		// Serialise attached documents
+		// Serialise attached documents directly to main stream to avoid extra buffer copy
+		const std::string& identifier = commandIdentifier(_commandName);
 
+		// Write documents to temporary buffer (still needed to calculate size)
 		std::stringstream ssdoc;
 		BinaryWriter wdoc(ssdoc, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		for (auto& doc: _documents)
@@ -252,12 +254,14 @@ void OpMsgMessage::send(std::ostream& ostr)
 		}
 		wdoc.flush();
 
-		const std::string& identifier = commandIdentifier(_commandName);
 		const Poco::Int32 size = static_cast<Poco::Int32>(sizeof(size) + identifier.size() + 1 + ssdoc.tellp());
 		writer << PAYLOAD_TYPE_1;
 		writer << size;
 		writer.writeCString(identifier.c_str());
-		StreamCopier::copyStream(ssdoc, ss);
+
+		// Use writeRaw instead of copyStream for better performance
+		const std::string& docData = ssdoc.str();
+		ss.write(docData.data(), docData.size());
 	}
 	writer.flush();
 
@@ -271,8 +275,10 @@ void OpMsgMessage::send(std::ostream& ostr)
 	messageLength(static_cast<Poco::Int32>(ss.tellp()));
 
 	_header.write(socketWriter);
-	StreamCopier::copyStream(ss, ostr);
 
+	// Write directly instead of using StreamCopier for better performance
+	const std::string& msgData = ss.str();
+	ostr.write(msgData.data(), msgData.size());
 	ostr.flush();
 }
 
@@ -377,6 +383,9 @@ void OpMsgMessage::read(std::istream& istr)
 	}
 	if (batch)
 	{
+		// Reserve space to avoid reallocations
+		_documents.reserve(_documents.size() + batch->size());
+
 		for(std::size_t i = 0; i < batch->size(); i++)
 		{
 			const auto& d = batch->get<MongoDB::Document::Ptr>(i, nullptr);
