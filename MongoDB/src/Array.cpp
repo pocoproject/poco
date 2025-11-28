@@ -42,7 +42,7 @@ std::string Array::toString(int indent) const
 {
 	std::ostringstream oss;
 
-	oss << "[";
+	oss << '[';
 
 	if (indent > 0) oss << std::endl;
 
@@ -52,7 +52,7 @@ std::string Array::toString(int indent) const
 	{
 		if (it != elems.begin())
 		{
-			oss << ",";
+			oss << ',';
 			if (indent > 0) oss << std::endl;
 		}
 
@@ -68,7 +68,7 @@ std::string Array::toString(int indent) const
 		for (int i = 0; i < indent; ++i) oss << ' ';
 	}
 
-	oss << "]";
+	oss << ']';
 
 	return oss.str();
 }

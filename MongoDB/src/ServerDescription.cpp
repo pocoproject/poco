@@ -15,6 +15,8 @@
 #include "Poco/MongoDB/ServerDescription.h"
 #include "Poco/MongoDB/Array.h"
 
+using namespace std::string_literals;
+
 
 namespace Poco {
 namespace MongoDB {
@@ -55,9 +57,9 @@ void ServerDescription::updateFromHelloResponse(const Document& helloResponse, P
 	parseServerType(helloResponse);
 
 	// Get replica set name
-	if (helloResponse.exists("setName"))
+	if (helloResponse.exists("setName"s))
 	{
-		_setName = helloResponse.get<std::string>("setName");
+		_setName = helloResponse.get<std::string>("setName"s);
 	}
 
 	// Parse hosts list
@@ -93,10 +95,10 @@ void ServerDescription::reset()
 void ServerDescription::parseServerType(const Document& doc)
 {
 	// Check for standalone
-	if (!doc.exists("setName"))
+	if (!doc.exists("setName"s))
 	{
 		// Check if it's a mongos
-		if (doc.get<std::string>("msg", "") == "isdbgrid")
+		if (doc.get<std::string>("msg"s, ""s) == "isdbgrid")
 		{
 			_type = Mongos;
 			return;
@@ -106,19 +108,19 @@ void ServerDescription::parseServerType(const Document& doc)
 	}
 
 	// It's part of a replica set - determine the role
-	if (doc.get<bool>("isWritablePrimary", false) || doc.get<bool>("ismaster", false))
+	if (doc.get<bool>("isWritablePrimary"s, false) || doc.get<bool>("ismaster"s, false))
 	{
 		_type = RsPrimary;
 	}
-	else if (doc.get<bool>("secondary", false))
+	else if (doc.get<bool>("secondary"s, false))
 	{
 		_type = RsSecondary;
 	}
-	else if (doc.get<bool>("arbiterOnly", false))
+	else if (doc.get<bool>("arbiterOnly"s, false))
 	{
 		_type = RsArbiter;
 	}
-	else if (doc.get<bool>("hidden", false) || doc.get<bool>("passive", false))
+	else if (doc.get<bool>("hidden"s, false) || doc.get<bool>("passive"s, false))
 	{
 		_type = RsOther;
 	}
@@ -135,9 +137,9 @@ void ServerDescription::parseHosts(const Document& doc)
 	_hosts.clear();
 
 	// Parse hosts array
-	if (doc.exists("hosts"))
+	if (doc.exists("hosts"s))
 	{
-		Array::Ptr hostsArray = doc.get<Array::Ptr>("hosts");
+		Array::Ptr hostsArray = doc.get<Array::Ptr>("hosts"s);
 		_hosts.reserve(hostsArray->size());
 		for (std::size_t i = 0; i < hostsArray->size(); ++i)
 		{
@@ -154,9 +156,9 @@ void ServerDescription::parseHosts(const Document& doc)
 	}
 
 	// Parse passives array (hidden/passive members)
-	if (doc.exists("passives"))
+	if (doc.exists("passives"s))
 	{
-		Array::Ptr passivesArray = doc.get<Array::Ptr>("passives");
+		Array::Ptr passivesArray = doc.get<Array::Ptr>("passives"s);
 		for (std::size_t i = 0; i < passivesArray->size(); ++i)
 		{
 			try
@@ -172,9 +174,9 @@ void ServerDescription::parseHosts(const Document& doc)
 	}
 
 	// Parse arbiters array
-	if (doc.exists("arbiters"))
+	if (doc.exists("arbiters"s))
 	{
-		Array::Ptr arbitersArray = doc.get<Array::Ptr>("arbiters");
+		Array::Ptr arbitersArray = doc.get<Array::Ptr>("arbiters"s);
 		for (std::size_t i = 0; i < arbitersArray->size(); ++i)
 		{
 			try
@@ -195,9 +197,9 @@ void ServerDescription::parseTags(const Document& doc)
 {
 	_tags.clear();
 
-	if (doc.exists("tags"))
+	if (doc.exists("tags"s))
 	{
-		Document::Ptr tagsDoc = doc.get<Document::Ptr>("tags");
+		Document::Ptr tagsDoc = doc.get<Document::Ptr>("tags"s);
 		if (!tagsDoc.isNull())
 		{
 			_tags = *tagsDoc;

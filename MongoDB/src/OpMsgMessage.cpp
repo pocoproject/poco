@@ -296,8 +296,8 @@ void OpMsgMessage::read(std::istream& istr)
 
 #if POCO_MONGODB_DUMP
 		std::cout
-			<< "Message hdr: " << _header.getMessageLength() << " " << remainingSize << " "
-			<< _header.opCode() << " " << _header.getRequestID() << " " << _header.responseTo()
+			<< "Message hdr: " << _header.getMessageLength() << ' ' << remainingSize << ' '
+			<< _header.opCode() << ' ' << _header.getRequestID() << ' ' << _header.responseTo()
 			<< std::endl;
 #endif
 
@@ -357,7 +357,7 @@ void OpMsgMessage::read(std::istream& istr)
 		while (msgss.tellg() < endOfSection)
 		{
 #if POCO_MONGODB_DUMP
-			std::cout << "section doc: " << msgss.tellg() << " " << endOfSection << std::endl;
+			std::cout << "section doc: " << msgss.tellg() << ' ' << endOfSection << std::endl;
 #endif
 			Document::Ptr doc = new Document();
 			doc->read(reader);

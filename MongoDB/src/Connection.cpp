@@ -20,6 +20,8 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
 
+using namespace std::string_literals;
+
 
 namespace Poco {
 namespace MongoDB {
@@ -165,19 +167,19 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
 	for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
 	{
-		if (it->first == "ssl")
+		if (it->first == "ssl"s)
 		{
-			ssl = (it->second == "true");
+			ssl = (it->second == "true"s);
 		}
-		else if (it->first == "connectTimeoutMS")
+		else if (it->first == "connectTimeoutMS"s)
 		{
 			connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
 		}
-		else if (it->first == "socketTimeoutMS")
+		else if (it->first == "socketTimeoutMS"s)
 		{
 			socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
 		}
-		else if (it->first == "authMechanism")
+		else if (it->first == "authMechanism"s)
 		{
 			authMechanism = it->second;
 		}
