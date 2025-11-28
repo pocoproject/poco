@@ -17,6 +17,8 @@
 #include "Poco/Format.h"
 #include <limits>
 
+using namespace std::string_literals;
+
 
 namespace Poco {
 namespace MongoDB {
@@ -179,7 +181,7 @@ std::string ReadPreference::toString() const
 
 	if (!_tags.empty())
 	{
-		result += " (tags: " + _tags.toString() + ")";
+		result += " (tags: "s + _tags.toString() + ')';
 	}
 
 	if (_maxStalenessSeconds != NO_MAX_STALENESS)

@@ -20,6 +20,8 @@
 #include "Poco/NumberParser.h"
 #include <chrono>
 
+using namespace std::string_literals;
+
 
 namespace Poco {
 namespace MongoDB {
@@ -234,13 +236,13 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 		if (response.responseOk())
 		{
 			const Document& doc = response.body();
-			if (doc.get<bool>("isWritablePrimary", false) || doc.get<bool>("ismaster", false))
+			if (doc.get<bool>("isWritablePrimary"s, false) || doc.get<bool>("ismaster"s, false))
 			{
 				return conn;
 			}
-			else if (doc.exists("primary"))
+			else if (doc.exists("primary"s))
 			{
-				return isMaster(Net::SocketAddress(doc.get<std::string>("primary")));
+				return isMaster(Net::SocketAddress(doc.get<std::string>("primary"s)));
 			}
 		}
 	}
@@ -411,9 +413,9 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 			_topology.updateServer(address, doc, rttMicros);
 
 			// Update replica set name if not set
-			if (_config.setName.empty() && doc.exists("setName"))
+			if (_config.setName.empty() && doc.exists("setName"s))
 			{
-				_config.setName = doc.get<std::string>("setName");
+				_config.setName = doc.get<std::string>("setName"s);
 				_topology.setName(_config.setName);
 			}
 		}
@@ -532,45 +534,45 @@ void ReplicaSet::parseURI(const std::string& uri)
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
 	for (const auto& param : params)
 	{
-		if (param.first == "replicaSet")
+		if (param.first == "replicaSet"s)
 		{
 			_config.setName = param.second;
 		}
-		else if (param.first == "readPreference")
+		else if (param.first == "readPreference"s)
 		{
 			// Parse read preference mode
-			if (param.second == "primary")
+			if (param.second == "primary"s)
 			{
 				_config.readPreference = ReadPreference(ReadPreference::Primary);
 			}
-			else if (param.second == "primaryPreferred")
+			else if (param.second == "primaryPreferred"s)
 			{
 				_config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
 			}
-			else if (param.second == "secondary")
+			else if (param.second == "secondary"s)
 			{
 				_config.readPreference = ReadPreference(ReadPreference::Secondary);
 			}
-			else if (param.second == "secondaryPreferred")
+			else if (param.second == "secondaryPreferred"s)
 			{
 				_config.readPreference = ReadPreference(ReadPreference::SecondaryPreferred);
 			}
-			else if (param.second == "nearest")
+			else if (param.second == "nearest"s)
 			{
 				_config.readPreference = ReadPreference(ReadPreference::Nearest);
 			}
 		}
-		else if (param.first == "connectTimeoutMS")
+		else if (param.first == "connectTimeoutMS"s)
 		{
 			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
 			_config.connectTimeout = Poco::Timespan(timeoutMs * 1000);  // Convert ms to microseconds
 		}
-		else if (param.first == "socketTimeoutMS")
+		else if (param.first == "socketTimeoutMS"s)
 		{
 			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
 			_config.socketTimeout = Poco::Timespan(timeoutMs * 1000);  // Convert ms to microseconds
 		}
-		else if (param.first == "heartbeatFrequencyMS")
+		else if (param.first == "heartbeatFrequencyMS"s)
 		{
 			Poco::Int64 freqMs = Poco::NumberParser::parse64(param.second);
 			_config.heartbeatFrequency = Poco::Timespan(freqMs * 1000);  // Convert ms to microseconds

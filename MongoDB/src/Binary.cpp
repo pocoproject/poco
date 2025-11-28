@@ -18,6 +18,8 @@
 #include "Poco/MemoryStream.h"
 #include <sstream>
 
+using namespace std::string_literals;
+
 
 namespace Poco {
 namespace MongoDB {
@@ -74,7 +76,7 @@ std::string Binary::toString(int indent) const
 	{
 		try
 		{
-			return "UUID(\"" + uuid().toString() + "\")";
+			return "UUID(\""s + uuid().toString() + "\")"s;
 		}
 		catch (...)
 		{

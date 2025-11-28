@@ -17,6 +17,8 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Exception.h"
 
+using namespace std::string_literals;
+
 
 namespace Poco {
 namespace MongoDB {
@@ -59,7 +61,7 @@ void ReplicaSetConnection::sendRequest(OpMsgMessage& request, OpMsgMessage& resp
 		if (!response.responseOk() && isRetriableMongoDBError(response))
 		{
 			markServerFailed();
-			throw Poco::IOException("MongoDB retriable error: " + response.body().toString());
+			throw Poco::IOException("MongoDB retriable error: "s + response.body().toString());
 		}
 	});
 }
@@ -241,10 +243,10 @@ bool ReplicaSetConnection::isRetriableError(const std::exception& e)
 	{
 		const auto& msg = ioEx->message();
 		// Check for specific retriable error messages
-		if (msg.find("not master") != std::string::npos ||
-			msg.find("NotMaster") != std::string::npos ||
-			msg.find("Connection") != std::string::npos ||
-			msg.find("connection") != std::string::npos)
+		if (msg.find("not master"s) != std::string::npos ||
+			msg.find("NotMaster"s) != std::string::npos ||
+			msg.find("Connection"s) != std::string::npos ||
+			msg.find("connection"s) != std::string::npos)
 		{
 			return true;
 		}
@@ -264,9 +266,9 @@ bool ReplicaSetConnection::isRetriableMongoDBError(const OpMsgMessage& response)
 	const Document& body = response.body();
 
 	// Check for error code
-	if (body.exists("code"))
+	if (body.exists("code"s))
 	{
-		ErrorCode code = static_cast<ErrorCode>(body.get<int>("code"));
+		ErrorCode code = static_cast<ErrorCode>(body.get<int>("code"s));
 
 		switch (code)
 		{
@@ -288,11 +290,11 @@ bool ReplicaSetConnection::isRetriableMongoDBError(const OpMsgMessage& response)
 	}
 
 	// Check for error message patterns
-	if (body.exists("errmsg"))
+	if (body.exists("errmsg"s))
 	{
-		const auto& errmsg = body.get<std::string>("errmsg");
-		if (errmsg.find("not master") != std::string::npos ||
-			errmsg.find("NotMaster") != std::string::npos)
+		const auto& errmsg = body.get<std::string>("errmsg"s);
+		if (errmsg.find("not master"s) != std::string::npos ||
+			errmsg.find("NotMaster"s) != std::string::npos)
 		{
 			return true;
 		}
