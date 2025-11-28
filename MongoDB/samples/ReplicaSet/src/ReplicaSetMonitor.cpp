@@ -72,11 +72,28 @@ std::vector<Net::SocketAddress> parseHosts(const std::string& hostsStr)
 
 	while (end != std::string::npos)
 	{
-		hosts.push_back(Net::SocketAddress(hostsStr.substr(start, end - start)));
+		std::string hostStr = hostsStr.substr(start, end - start);
+		try
+		{
+			hosts.push_back(Net::SocketAddress(hostStr));
+		}
+		catch (const Poco::Exception& e)
+		{
+			throw Poco::InvalidArgumentException("Invalid host address '"s + hostStr + "': "s + e.displayText() );
+		}
 		start = end + 1;
 		end = hostsStr.find(',', start);
 	}
-	hosts.push_back(Net::SocketAddress(hostsStr.substr(start)));
+
+	std::string lastHost = hostsStr.substr(start);
+	try
+	{
+		hosts.push_back(Net::SocketAddress(lastHost));
+	}
+	catch (const Poco::Exception& e)
+	{
+		throw Poco::InvalidArgumentException("Invalid host address '"s + lastHost + "': "s + e.displayText() );
+	}
 
 	return hosts;
 }
@@ -554,8 +571,19 @@ int main(int argc, char** argv)
 		runMonitor(config);
 		return 0;
 	}
+	catch (const Poco::Exception& e)
+	{
+		std::cerr << "Error: " << e.displayText() << std::endl;
+		return 1;
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+		return 1;
+	}
 	catch (...)
 	{
+		std::cerr << "Unknown error occurred" << std::endl;
 		return 1;
 	}
 }
