@@ -249,7 +249,7 @@ void ReplicaSetTest::testServerDescriptionPrimary()
 	Document::Ptr helloResponse = createPrimaryHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 5000);  // 5ms RTT
 
-	assertEqual(ServerDescription::RsPrimary, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
 	assertEqual(5000, server.roundTripTime());
 	assertTrue(server.isPrimary());
@@ -274,7 +274,7 @@ void ReplicaSetTest::testServerDescriptionSecondary()
 	Document::Ptr helloResponse = createSecondaryHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 3000);  // 3ms RTT
 
-	assertEqual(ServerDescription::RsSecondary, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
 	assertEqual(3000, server.roundTripTime());
 	assertFalse(server.isPrimary());
@@ -296,7 +296,7 @@ void ReplicaSetTest::testServerDescriptionArbiter()
 	Document::Ptr helloResponse = createArbiterHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 2000);  // 2ms RTT
 
-	assertEqual(ServerDescription::RsArbiter, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsArbiter), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
 	assertEqual(2000, server.roundTripTime());
 	assertFalse(server.isPrimary());
@@ -314,7 +314,7 @@ void ReplicaSetTest::testServerDescriptionStandalone()
 	Document::Ptr helloResponse = createStandaloneHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 1000);  // 1ms RTT
 
-	assertEqual(ServerDescription::Standalone, server.type());
+	assertEqual(static_cast<int>(ServerDescription::Standalone), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());  // No replica set name for standalone
 	assertTrue(server.isPrimary());  // Standalone treated as primary for read preferences
 	assertTrue(server.isWritable());
@@ -331,7 +331,7 @@ void ReplicaSetTest::testServerDescriptionMongos()
 	Document::Ptr helloResponse = createMongosHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 4000);  // 4ms RTT
 
-	assertEqual(ServerDescription::Mongos, server.type());
+	assertEqual(static_cast<int>(ServerDescription::Mongos), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());  // Mongos doesn't have a set name
 	assertFalse(server.isPrimary());
 	assertFalse(server.isWritable());
@@ -348,7 +348,7 @@ void ReplicaSetTest::testServerDescriptionWithTags()
 	Document::Ptr helloResponse = createTaggedSecondaryHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 7000);  // 7ms RTT
 
-	assertEqual(ServerDescription::RsSecondary, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(server.type()));
 
 	// Verify tags are parsed correctly
 	const Document& tags = server.tags();
@@ -368,7 +368,7 @@ void ReplicaSetTest::testServerDescriptionWithHosts()
 	Document::Ptr helloResponse = createHiddenMemberHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 8000);  // 8ms RTT
 
-	assertEqual(ServerDescription::RsOther, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsOther), static_cast<int>(server.type()));
 
 	// Verify hosts list includes regular hosts + passives
 	const auto& hosts = server.hosts();
@@ -396,13 +396,13 @@ void ReplicaSetTest::testServerDescriptionErrorHandling()
 	// Initially update from a valid hello response
 	Document::Ptr helloResponse = createPrimaryHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 5000);
-	assertEqual(ServerDescription::RsPrimary, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(server.type()));
 	assertFalse(server.hasError());
 
 	// Now mark it as having an error
 	server.markError("Connection timeout");
 
-	assertEqual(ServerDescription::Unknown, server.type());
+	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(server.type()));
 	assertTrue(server.hasError());
 	assertEqual("Connection timeout"s, server.error());
 	assertFalse(server.isPrimary());
@@ -418,13 +418,13 @@ void ReplicaSetTest::testServerDescriptionReset()
 	Document::Ptr helloResponse = createPrimaryHelloResponse();
 	server.updateFromHelloResponse(*helloResponse, 5000);
 
-	assertEqual(ServerDescription::RsPrimary, server.type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
 
 	// Reset the server description
 	server.reset();
 
-	assertEqual(ServerDescription::Unknown, server.type());
+	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());
 	assertEqual(0, server.roundTripTime());
 	assertTrue(server.hosts().empty());
@@ -444,7 +444,7 @@ void ReplicaSetTest::testTopologyEmpty()
 {
 	TopologyDescription topology;
 
-	assertEqual(TopologyDescription::Unknown, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
 	assertTrue(topology.setName().empty());
 	assertEqual(0, static_cast<int>(topology.serverCount()));
 	assertFalse(topology.hasPrimary());
@@ -458,7 +458,7 @@ void ReplicaSetTest::testTopologyAddServers()
 	TopologyDescription topology("rs0"s);
 
 	assertEqual("rs0"s, topology.setName());
-	assertEqual(TopologyDescription::Unknown, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
 
 	// Add first server
 	SocketAddress addr1("localhost:27017");
@@ -490,12 +490,12 @@ void ReplicaSetTest::testTopologyUpdateToPrimary()
 	topology.updateServer(addr, *helloResponse, 5000);
 
 	// Should discover it's a replica set with primary
-	assertEqual(TopologyDescription::ReplicaSetWithPrimary, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetWithPrimary), static_cast<int>(topology.type()));
 	assertEqual("rs0"s, topology.setName());
 	assertTrue(topology.hasPrimary());
 
 	ServerDescription primary = topology.findPrimary();
-	assertEqual(ServerDescription::RsPrimary, primary.type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(primary.type()));
 	assertEqual("localhost:27017"s, primary.address().toString());
 }
 
@@ -510,13 +510,13 @@ void ReplicaSetTest::testTopologyUpdateToSecondary()
 	topology.updateServer(addr, *helloResponse, 3000);
 
 	// Replica set without primary (only secondary known)
-	assertEqual(TopologyDescription::ReplicaSetNoPrimary, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
 	assertEqual("rs0"s, topology.setName());
 	assertFalse(topology.hasPrimary());
 
 	auto secondaries = topology.findSecondaries();
 	assertEqual(1, static_cast<int>(secondaries.size()));
-	assertEqual(ServerDescription::RsSecondary, secondaries[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(secondaries[0].type()));
 }
 
 
@@ -536,19 +536,19 @@ void ReplicaSetTest::testTopologyReplicaSetWithPrimary()
 	SocketAddress arbiter("localhost:27019");
 	topology.updateServer(arbiter, *createArbiterHelloResponse(), 2000);
 
-	assertEqual(TopologyDescription::ReplicaSetWithPrimary, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetWithPrimary), static_cast<int>(topology.type()));
 	assertEqual("rs0"s, topology.setName());
 	assertTrue(topology.hasPrimary());
 
 	// Verify we can find primary
 	ServerDescription primaryServer = topology.findPrimary();
-	assertEqual(ServerDescription::RsPrimary, primaryServer.type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(primaryServer.type()));
 	assertEqual("localhost:27017"s, primaryServer.address().toString());
 
 	// Verify we can find secondaries
 	auto secondaries = topology.findSecondaries();
 	assertEqual(1, static_cast<int>(secondaries.size()));
-	assertEqual(ServerDescription::RsSecondary, secondaries[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(secondaries[0].type()));
 }
 
 
@@ -575,7 +575,7 @@ void ReplicaSetTest::testTopologyReplicaSetNoPrimary()
 	SocketAddress secondary2("localhost:27019");
 	topology.updateServer(secondary2, *secondary2Response, 4000);
 
-	assertEqual(TopologyDescription::ReplicaSetNoPrimary, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
 	assertEqual("rs0"s, topology.setName());
 	assertFalse(topology.hasPrimary());
 
@@ -594,14 +594,14 @@ void ReplicaSetTest::testTopologyStandalone()
 	topology.updateServer(addr, *helloResponse, 1000);
 
 	// Single standalone server
-	assertEqual(TopologyDescription::Single, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::Single), static_cast<int>(topology.type()));
 	assertTrue(topology.setName().empty());
 	assertEqual(1, static_cast<int>(topology.serverCount()));
 
 	// Standalone servers are treated as primary for read preferences
 	assertTrue(topology.hasPrimary());
 	ServerDescription primary = topology.findPrimary();
-	assertEqual(ServerDescription::Standalone, primary.type());
+	assertEqual(static_cast<int>(ServerDescription::Standalone), static_cast<int>(primary.type()));
 }
 
 
@@ -616,7 +616,7 @@ void ReplicaSetTest::testTopologySharded()
 	SocketAddress mongos2("localhost:27018");
 	topology.updateServer(mongos2, *createMongosHelloResponse(), 6000);
 
-	assertEqual(TopologyDescription::Sharded, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::Sharded), static_cast<int>(topology.type()));
 	assertEqual(2, static_cast<int>(topology.serverCount()));
 	assertTrue(topology.setName().empty());
 
@@ -632,7 +632,7 @@ void ReplicaSetTest::testTopologyFindPrimary()
 
 	// Initially no primary
 	ServerDescription noPrimary = topology.findPrimary();
-	assertEqual(ServerDescription::Unknown, noPrimary.type());
+	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(noPrimary.type()));
 
 	// Add secondary first
 	SocketAddress secondary("localhost:27018");
@@ -640,7 +640,7 @@ void ReplicaSetTest::testTopologyFindPrimary()
 
 	// Still no primary
 	noPrimary = topology.findPrimary();
-	assertEqual(ServerDescription::Unknown, noPrimary.type());
+	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(noPrimary.type()));
 
 	// Add primary
 	SocketAddress primary("localhost:27017");
@@ -648,7 +648,7 @@ void ReplicaSetTest::testTopologyFindPrimary()
 
 	// Now we should find the primary
 	ServerDescription foundPrimary = topology.findPrimary();
-	assertEqual(ServerDescription::RsPrimary, foundPrimary.type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(foundPrimary.type()));
 	assertEqual("localhost:27017"s, foundPrimary.address().toString());
 }
 
@@ -693,19 +693,19 @@ void ReplicaSetTest::testTopologyMarkServerUnknown()
 	SocketAddress primary("localhost:27017");
 	topology.updateServer(primary, *createPrimaryHelloResponse(), 5000);
 
-	assertEqual(TopologyDescription::ReplicaSetWithPrimary, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetWithPrimary), static_cast<int>(topology.type()));
 	assertTrue(topology.hasPrimary());
 
 	// Mark primary as unknown (simulating connection failure)
 	topology.markServerUnknown(primary, "Connection failed");
 
 	// Topology should transition to no primary
-	assertEqual(TopologyDescription::ReplicaSetNoPrimary, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
 	assertFalse(topology.hasPrimary());
 
 	// Server should still exist but be Unknown
 	ServerDescription server = topology.getServer(primary);
-	assertEqual(ServerDescription::Unknown, server.type());
+	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(server.type()));
 }
 
 
@@ -727,7 +727,7 @@ void ReplicaSetTest::testTopologyRemoveServer()
 
 	topology.removeServer(addr2);
 	assertEqual(0, static_cast<int>(topology.serverCount()));
-	assertEqual(TopologyDescription::Unknown, topology.type());
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
 }
 
 
@@ -787,7 +787,7 @@ void ReplicaSetTest::testReadPreferencePrimary()
 {
 	ReadPreference pref = ReadPreference::primary();
 
-	assertEqual(ReadPreference::Primary, pref.mode());
+	assertEqual(static_cast<int>(ReadPreference::Primary), static_cast<int>(pref.mode()));
 	assertEqual("primary"s, pref.toString());
 
 	// Create topology with primary and secondaries
@@ -798,7 +798,7 @@ void ReplicaSetTest::testReadPreferencePrimary()
 	// Primary read preference should only select primary
 	auto selected = pref.selectServers(topology);
 	assertEqual(1, static_cast<int>(selected.size()));
-	assertEqual(ServerDescription::RsPrimary, selected[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(selected[0].type()));
 	assertEqual("localhost:27017"s, selected[0].address().toString());
 }
 
@@ -807,7 +807,7 @@ void ReplicaSetTest::testReadPreferencePrimaryPreferred()
 {
 	ReadPreference pref = ReadPreference::primaryPreferred();
 
-	assertEqual(ReadPreference::PrimaryPreferred, pref.mode());
+	assertEqual(static_cast<int>(ReadPreference::PrimaryPreferred), static_cast<int>(pref.mode()));
 
 	// Create topology with primary and secondary
 	TopologyDescription topology;
@@ -817,7 +817,7 @@ void ReplicaSetTest::testReadPreferencePrimaryPreferred()
 	// Should select primary when available
 	auto selected = pref.selectServers(topology);
 	assertEqual(1, static_cast<int>(selected.size()));
-	assertEqual(ServerDescription::RsPrimary, selected[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(selected[0].type()));
 
 	// Create topology with only secondary (no primary)
 	TopologyDescription topologyNoPrimary;
@@ -826,7 +826,7 @@ void ReplicaSetTest::testReadPreferencePrimaryPreferred()
 	// Should fall back to secondary
 	selected = pref.selectServers(topologyNoPrimary);
 	assertEqual(1, static_cast<int>(selected.size()));
-	assertEqual(ServerDescription::RsSecondary, selected[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(selected[0].type()));
 }
 
 
@@ -834,7 +834,7 @@ void ReplicaSetTest::testReadPreferenceSecondary()
 {
 	ReadPreference pref = ReadPreference::secondary();
 
-	assertEqual(ReadPreference::Secondary, pref.mode());
+	assertEqual(static_cast<int>(ReadPreference::Secondary), static_cast<int>(pref.mode()));
 
 	// Create topology with primary and secondaries
 	TopologyDescription topology;
@@ -844,7 +844,7 @@ void ReplicaSetTest::testReadPreferenceSecondary()
 	// Should only select secondaries
 	auto selected = pref.selectServers(topology);
 	assertEqual(1, static_cast<int>(selected.size()));
-	assertEqual(ServerDescription::RsSecondary, selected[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(selected[0].type()));
 	assertEqual("localhost:27018"s, selected[0].address().toString());
 
 	// Create topology with only primary (no secondaries)
@@ -861,7 +861,7 @@ void ReplicaSetTest::testReadPreferenceSecondaryPreferred()
 {
 	ReadPreference pref = ReadPreference::secondaryPreferred();
 
-	assertEqual(ReadPreference::SecondaryPreferred, pref.mode());
+	assertEqual(static_cast<int>(ReadPreference::SecondaryPreferred), static_cast<int>(pref.mode()));
 
 	// Create topology with primary and secondary
 	TopologyDescription topology;
@@ -871,7 +871,7 @@ void ReplicaSetTest::testReadPreferenceSecondaryPreferred()
 	// Should select secondary when available
 	auto selected = pref.selectServers(topology);
 	assertEqual(1, static_cast<int>(selected.size()));
-	assertEqual(ServerDescription::RsSecondary, selected[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(selected[0].type()));
 
 	// Create topology with only primary (no secondaries)
 	TopologyDescription topologyPrimaryOnly;
@@ -880,7 +880,7 @@ void ReplicaSetTest::testReadPreferenceSecondaryPreferred()
 	// Should fall back to primary
 	selected = pref.selectServers(topologyPrimaryOnly);
 	assertEqual(1, static_cast<int>(selected.size()));
-	assertEqual(ServerDescription::RsPrimary, selected[0].type());
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(selected[0].type()));
 }
 
 
@@ -888,7 +888,7 @@ void ReplicaSetTest::testReadPreferenceNearest()
 {
 	ReadPreference pref = ReadPreference::nearest();
 
-	assertEqual(ReadPreference::Nearest, pref.mode());
+	assertEqual(static_cast<int>(ReadPreference::Nearest), static_cast<int>(pref.mode()));
 
 	// Create topology with primary (5ms RTT) and secondaries (3ms and 8ms RTT)
 	TopologyDescription topology;
@@ -927,7 +927,7 @@ void ReplicaSetTest::testReadPreferenceWithTags()
 
 	ReadPreference pref(ReadPreference::Secondary, tags);
 
-	assertEqual(ReadPreference::Secondary, pref.mode());
+	assertEqual(static_cast<int>(ReadPreference::Secondary), static_cast<int>(pref.mode()));
 	assertFalse(pref.tags().empty());
 	assertEqual("east"s, pref.tags().get<std::string>("dc"s));
 
