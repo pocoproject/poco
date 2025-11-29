@@ -260,9 +260,19 @@ void ReplicaSetTest::testServerDescriptionPrimary()
 	// Check hosts list
 	const auto& hosts = server.hosts();
 	assertEqual(3, static_cast<int>(hosts.size()));
-	assertEqual("localhost:27017"s, hosts[0].toString());
-	assertEqual("localhost:27018"s, hosts[1].toString());
-	assertEqual("localhost:27019"s, hosts[2].toString());
+	if (addr.family() == SocketAddress::IPv6)
+	{
+		// Adjust for IPv6 format
+		assertEqual("[::1]:27017"s, hosts[0].toString());
+		assertEqual("[::1]:27018"s, hosts[1].toString());
+		assertEqual("[::1]:27019"s, hosts[2].toString());
+	}
+	else
+	{
+		assertEqual("localhost:27017"s, hosts[0].toString());
+		assertEqual("localhost:27018"s, hosts[1].toString());
+		assertEqual("localhost:27019"s, hosts[2].toString());
+	}
 }
 
 
@@ -378,7 +388,7 @@ void ReplicaSetTest::testServerDescriptionWithHosts()
 	bool foundPassive = false;
 	for (const auto& host : hosts)
 	{
-		if (host.toString() == "localhost:27020"s)
+		if (host.toString() == "localhost:27020"s || host.toString() == "[::1]:27020"s)
 		{
 			foundPassive = true;
 			break;
@@ -496,7 +506,14 @@ void ReplicaSetTest::testTopologyUpdateToPrimary()
 
 	ServerDescription primary = topology.findPrimary();
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(primary.type()));
-	assertEqual("localhost:27017"s, primary.address().toString());
+	if (addr.family() == SocketAddress::IPv6)
+	{
+		assertEqual("[::1]:27017"s, primary.address().toString());
+	}
+	else
+	{
+		assertEqual("localhost:27017"s, primary.address().toString());
+	}
 }
 
 
@@ -543,7 +560,15 @@ void ReplicaSetTest::testTopologyReplicaSetWithPrimary()
 	// Verify we can find primary
 	ServerDescription primaryServer = topology.findPrimary();
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(primaryServer.type()));
-	assertEqual("localhost:27017"s, primaryServer.address().toString());
+
+	if (primary.family() == SocketAddress::IPv6)
+	{
+		assertEqual("[::1]:27017"s, primaryServer.address().toString());
+	}
+	else
+	{
+		assertEqual("localhost:27017"s, primaryServer.address().toString());
+	}
 
 	// Verify we can find secondaries
 	auto secondaries = topology.findSecondaries();
@@ -649,7 +674,14 @@ void ReplicaSetTest::testTopologyFindPrimary()
 	// Now we should find the primary
 	ServerDescription foundPrimary = topology.findPrimary();
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(foundPrimary.type()));
-	assertEqual("localhost:27017"s, foundPrimary.address().toString());
+	if (primary.family() == SocketAddress::IPv6)
+	{
+		assertEqual("[::1]:27017"s, foundPrimary.address().toString());
+	}
+	else
+	{
+		assertEqual("localhost:27017"s, foundPrimary.address().toString());
+	}
 }
 
 
@@ -745,9 +777,18 @@ void ReplicaSetTest::testTopologyDiscoverNewHosts()
 	// Primary response includes: localhost:27017, localhost:27018, localhost:27019
 	assertEqual(3, static_cast<int>(topology.serverCount()));
 
-	assertTrue(topology.hasServer(SocketAddress("localhost:27017")));
-	assertTrue(topology.hasServer(SocketAddress("localhost:27018")));
-	assertTrue(topology.hasServer(SocketAddress("localhost:27019")));
+	if (primary.family() == SocketAddress::IPv6)
+	{
+		assertTrue(topology.hasServer(SocketAddress("[::1]:27017"s)));
+		assertTrue(topology.hasServer(SocketAddress("[::1]:27018"s)));
+		assertTrue(topology.hasServer(SocketAddress("[::1]:27019"s)));
+	}
+	else
+	{
+		assertTrue(topology.hasServer(SocketAddress("localhost:27017"s)));
+		assertTrue(topology.hasServer(SocketAddress("localhost:27018"s)));
+		assertTrue(topology.hasServer(SocketAddress("localhost:27019"s)));
+	}
 }
 
 
@@ -799,7 +840,16 @@ void ReplicaSetTest::testReadPreferencePrimary()
 	auto selected = pref.selectServers(topology);
 	assertEqual(1, static_cast<int>(selected.size()));
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(selected[0].type()));
-	assertEqual("localhost:27017"s, selected[0].address().toString());
+
+	const SocketAddress& addr = selected[0].address();
+	if (addr.family() == SocketAddress::IPv6)
+	{
+		assertEqual("[::1]:27017"s, selected[0].address().toString());
+	}
+	else
+	{
+		assertEqual("localhost:27017"s, selected[0].address().toString());
+	}
 }
 
 
@@ -845,7 +895,16 @@ void ReplicaSetTest::testReadPreferenceSecondary()
 	auto selected = pref.selectServers(topology);
 	assertEqual(1, static_cast<int>(selected.size()));
 	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(selected[0].type()));
-	assertEqual("localhost:27018"s, selected[0].address().toString());
+
+	const SocketAddress& addr = selected[0].address();
+	if (addr.family() == SocketAddress::IPv6)
+	{
+		assertEqual("[::1]:27018"s, selected[0].address().toString());
+	}
+	else
+	{
+		assertEqual("localhost:27018"s, selected[0].address().toString());
+	}
 
 	// Create topology with only primary (no secondaries)
 	TopologyDescription topologyPrimaryOnly;

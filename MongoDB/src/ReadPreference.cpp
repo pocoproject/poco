@@ -163,19 +163,19 @@ std::string ReadPreference::toString() const
 	switch (_mode)
 	{
 	case Primary:
-		result = "primary";
+		result = "primary"s;
 		break;
 	case PrimaryPreferred:
-		result = "primaryPreferred";
+		result = "primaryPreferred"s;
 		break;
 	case Secondary:
-		result = "secondary";
+		result = "secondary"s;
 		break;
 	case SecondaryPreferred:
-		result = "secondaryPreferred";
+		result = "secondaryPreferred"s;
 		break;
 	case Nearest:
-		result = "nearest";
+		result = "nearest"s;
 		break;
 	}
 
@@ -186,7 +186,7 @@ std::string ReadPreference::toString() const
 
 	if (_maxStalenessSeconds != NO_MAX_STALENESS)
 	{
-		result += Poco::format(" (maxStaleness: %?d seconds)", _maxStalenessSeconds);
+		result += Poco::format(" (maxStaleness: %?d seconds)"s, _maxStalenessSeconds);
 	}
 
 	return result;
