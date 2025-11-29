@@ -108,7 +108,7 @@ void ServerDescription::parseServerType(const Document& doc)
 	}
 
 	// It's part of a replica set - determine the role
-	if (doc.get<bool>("isWritablePrimary"s, false) || doc.get<bool>("ismaster"s, false))
+	if (doc.get<bool>("isWritablePrimary"s, false))
 	{
 		_type = RsPrimary;
 	}

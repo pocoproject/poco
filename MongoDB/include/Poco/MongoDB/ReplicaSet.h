@@ -60,6 +60,10 @@ class MongoDB_API ReplicaSet
 	///   Connection::Ptr conn = rs.getPrimaryConnection();
 	///   // Use connection...
 	///
+	/// REQUIREMENTS:
+	/// Requires MongoDB 5.1 or later. Earlier versions using the legacy
+	/// isMaster command are not supported.
+	///
 	/// THREAD SAFETY:
 	/// The ReplicaSet class is thread-safe. Multiple threads can call
 	/// getConnection() and other methods concurrently. However, the
@@ -164,14 +168,6 @@ public:
 
 	[[nodiscard]] bool hasPrimary() const;
 		/// Returns true if a primary server is known.
-
-	[[nodiscard]] Connection::Ptr findMaster();
-		/// DEPRECATED: Use getPrimaryConnection() instead.
-		/// Legacy method for backward compatibility.
-
-protected:
-	Connection::Ptr isMaster(const Net::SocketAddress& address);
-		/// DEPRECATED: Legacy method for backward compatibility.
 
 private:
 	void discover();

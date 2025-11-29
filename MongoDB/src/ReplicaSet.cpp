@@ -211,50 +211,6 @@ bool ReplicaSet::hasPrimary() const
 }
 
 
-Connection::Ptr ReplicaSet::findMaster()
-{
-	// Legacy method for backward compatibility
-	return getPrimaryConnection();
-}
-
-
-Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
-{
-	// Legacy method for backward compatibility
-	Connection::Ptr conn = new Connection();
-
-	try
-	{
-		conn->connect(address);
-
-		OpMsgMessage request("admin", "");
-		request.setCommandName(OpMsgMessage::CMD_HELLO);
-
-		OpMsgMessage response;
-		conn->sendRequest(request, response);
-
-		if (response.responseOk())
-		{
-			const Document& doc = response.body();
-			if (doc.get<bool>("isWritablePrimary"s, false) || doc.get<bool>("ismaster"s, false))
-			{
-				return conn;
-			}
-			else if (doc.exists("primary"s))
-			{
-				return isMaster(Net::SocketAddress(doc.get<std::string>("primary"s)));
-			}
-		}
-	}
-	catch (...)
-	{
-		conn = nullptr;
-	}
-
-	return nullptr;
-}
-
-
 void ReplicaSet::discover()
 {
 	// Try to discover topology from seed servers
