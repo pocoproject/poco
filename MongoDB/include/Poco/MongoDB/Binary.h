@@ -58,10 +58,13 @@ public:
 	Binary(const UUID& uuid);
 		/// Creates a Binary containing an UUID.
 
+	Binary(const char* data, unsigned char subtype = 0);
+		/// Creates a Binary with the contents of the given C-string and the given subtype.
+
 	Binary(const std::string& data, unsigned char subtype = 0);
 		/// Creates a Binary with the contents of the given string and the given subtype.
 
-	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
+	Binary(const void* data, Poco::Int32 size, unsigned char subtype);
 		/// Creates a Binary with the contents of the given buffer and the given subtype.
 
 	virtual ~Binary();

@@ -14,7 +14,9 @@
 
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/Format.h"
+#include "Poco/Exception.h"
 #include <cstring>
+#include <cctype>
 
 
 namespace Poco {
@@ -29,11 +31,18 @@ ObjectId::ObjectId()
 
 ObjectId::ObjectId(const std::string& id)
 {
-	poco_assert_dbg(id.size() == 24);
+	if (id.size() != 24)
+		throw Poco::InvalidArgumentException("ObjectId string must be exactly 24 hexadecimal characters");
 
     const char* p = id.c_str();
     for (std::size_t i = 0; i < 12; ++i)
     {
+		// Validate that both characters are valid hex digits
+		if (!std::isxdigit(static_cast<unsigned char>(p[0])) ||
+		    !std::isxdigit(static_cast<unsigned char>(p[1])))
+		{
+			throw Poco::InvalidArgumentException("ObjectId string contains invalid hexadecimal characters");
+		}
 		_id[i] = fromHex(p);
 		p += 2;
 	}

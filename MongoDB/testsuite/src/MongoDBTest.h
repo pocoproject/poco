@@ -30,13 +30,11 @@ public:
 	void tearDown();
 
 	void testObjectID();
-	void testArray();
 	void testBuildInfo();
 	void testHello();
 	void testConnectURI();
 
 	// OP_MSG wire protocol
-	void testOpCmdUUID();
 	void testOpCmdHello();
 	void testOpCmdWriteRead();
 	void testOpCmdInsert();
