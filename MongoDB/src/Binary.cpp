@@ -49,6 +49,12 @@ Binary::Binary(const UUID& uuid):
 }
 
 
+Binary::Binary(const char* data, unsigned char subtype):
+	_buffer(reinterpret_cast<const unsigned char*>(data), std::strlen(data)),
+	_subtype(subtype)
+{
+}
+
 
 Binary::Binary(const std::string& data, unsigned char subtype):
 	_buffer(reinterpret_cast<const unsigned char*>(data.data()), data.size()),
