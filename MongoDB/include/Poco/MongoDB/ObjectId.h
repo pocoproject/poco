@@ -144,9 +144,9 @@ inline void BSONReader::read<ObjectId::Ptr>(ObjectId::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<ObjectId::Ptr>(ObjectId::Ptr& from)
+inline void BSONWriter::write<ObjectId::Ptr>(const ObjectId::Ptr& from)
 {
-	_writer.writeRaw(reinterpret_cast<char*>(from->_id), 12);
+	_writer.writeRaw(reinterpret_cast<const char*>(from->_id), 12);
 }
 
 

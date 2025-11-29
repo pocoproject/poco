@@ -3,7 +3,7 @@
 //
 // Definition of the BSONTest class.
 //
-// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -14,7 +14,6 @@
 #define BSONTest_INCLUDED
 
 
-#include "Poco/MongoDB/MongoDB.h"
 #include "CppUnit/TestCase.h"
 
 

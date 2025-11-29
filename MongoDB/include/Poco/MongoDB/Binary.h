@@ -70,6 +70,9 @@ public:
 	virtual ~Binary();
 		/// Destroys the Binary.
 
+	const Buffer<unsigned char>& buffer() const;
+		/// Returns a reference to the internal buffer
+
 	Buffer<unsigned char>& buffer();
 		/// Returns a reference to the internal buffer
 
@@ -113,6 +116,12 @@ inline void Binary::subtype(unsigned char type)
 }
 
 
+inline const Buffer<unsigned char>& Binary::buffer() const
+{
+	return _buffer;
+}
+
+
 inline Buffer<unsigned char>& Binary::buffer()
 {
 	return _buffer;
@@ -151,16 +160,16 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	_reader >> subtype;
 	to->subtype(subtype);
 
-	_reader.readRaw((char*) to->buffer().begin(), size);
+	_reader.readRaw(reinterpret_cast<char*>(to->buffer().begin()), size);
 }
 
 
 template<>
-inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
+inline void BSONWriter::write<Binary::Ptr>(const Binary::Ptr& from)
 {
-	_writer << (Poco::Int32) from->buffer().size();
+	_writer << static_cast<Poco::Int32>(from->buffer().size());
 	_writer << from->subtype();
-	_writer.writeRaw(reinterpret_cast<char*>(from->buffer().begin()), from->buffer().size());
+	_writer.writeRaw(reinterpret_cast<const char*>(from->buffer().begin()), from->buffer().size());
 }
 
 

@@ -14,7 +14,6 @@
 #define MongoDBTest_INCLUDED
 
 
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 #include "CppUnit/TestCase.h"
 

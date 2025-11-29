@@ -160,7 +160,7 @@ inline void BSONReader::read<RegularExpression::Ptr>(RegularExpression::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<RegularExpression::Ptr>(RegularExpression::Ptr& from)
+inline void BSONWriter::write<RegularExpression::Ptr>(const RegularExpression::Ptr& from)
 {
 	writeCString(from->getPattern());
 	writeCString(from->getOptions());

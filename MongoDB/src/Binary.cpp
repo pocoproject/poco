@@ -44,7 +44,7 @@ Binary::Binary(const UUID& uuid):
 	_subtype(SUBTYPE_UUID)
 {
     unsigned char szUUID[16];
-    uuid.copyTo((char*) szUUID);
+    uuid.copyTo(reinterpret_cast<char*>(szUUID));
     _buffer.assign(szUUID, 16);
 }
 
@@ -93,7 +93,7 @@ std::string Binary::toString(int indent) const
 	// Default: Base64 encode the binary data
 	std::ostringstream oss;
 	Base64Encoder encoder(oss);
-	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
+	MemoryInputStream mis(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
 	StreamCopier::copyStream(mis, encoder);
 	encoder.close();
 	return oss.str();
@@ -105,7 +105,7 @@ UUID Binary::uuid() const
 	if (_subtype == SUBTYPE_UUID && _buffer.size() == 16)
 	{
 		UUID uuid;
-		uuid.copyFrom((const char*) _buffer.begin());
+		uuid.copyFrom(reinterpret_cast<const char*>(_buffer.begin()));
 		return uuid;
 	}
 	throw BadCastException("Invalid subtype");
