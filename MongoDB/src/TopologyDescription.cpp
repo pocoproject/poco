@@ -30,7 +30,7 @@ TopologyDescription::TopologyDescription(const std::string& setName):
 
 TopologyDescription::TopologyDescription(const TopologyDescription& other)
 {
-	Mutex::ScopedLock lock(other._mutex);
+	std::lock_guard<std::mutex> lock(other._mutex);
 	_type = other._type;
 	_setName = other._setName;
 	_servers = other._servers;
@@ -39,7 +39,7 @@ TopologyDescription::TopologyDescription(const TopologyDescription& other)
 
 TopologyDescription::TopologyDescription(TopologyDescription&& other) noexcept
 {
-	Mutex::ScopedLock lock(other._mutex);
+	std::lock_guard<std::mutex> lock(other._mutex);
 	_type = other._type;
 	_setName = std::move(other._setName);
 	_servers = std::move(other._servers);
@@ -54,8 +54,7 @@ TopologyDescription& TopologyDescription::operator=(const TopologyDescription& o
 	if (this != &other)
 	{
 		// Lock both mutexes to avoid deadlock (lock in consistent order)
-		Mutex::ScopedLock lock1(&_mutex < &other._mutex ? _mutex : other._mutex);
-		Mutex::ScopedLock lock2(&_mutex < &other._mutex ? other._mutex : _mutex);
+		std::scoped_lock lock(_mutex, other._mutex);
 
 		_type = other._type;
 		_setName = other._setName;
@@ -70,8 +69,7 @@ TopologyDescription& TopologyDescription::operator=(TopologyDescription&& other)
 	if (this != &other)
 	{
 		// Lock both mutexes to avoid deadlock (lock in consistent order)
-		Mutex::ScopedLock lock1(&_mutex < &other._mutex ? _mutex : other._mutex);
-		Mutex::ScopedLock lock2(&_mutex < &other._mutex ? other._mutex : _mutex);
+		std::scoped_lock lock(_mutex, other._mutex);
 
 		_type = other._type;
 		_setName = std::move(other._setName);
@@ -83,28 +81,28 @@ TopologyDescription& TopologyDescription::operator=(TopologyDescription&& other)
 
 TopologyDescription::TopologyType TopologyDescription::type() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _type;
 }
 
 
 std::string TopologyDescription::setName() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _setName;
 }
 
 
 void TopologyDescription::setName(const std::string& name)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_setName = name;
 }
 
 
 std::vector<ServerDescription> TopologyDescription::servers() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	std::vector<ServerDescription> result;
 	result.reserve(_servers.size());
 	for (const auto& [address, server] : _servers)
@@ -117,7 +115,7 @@ std::vector<ServerDescription> TopologyDescription::servers() const
 
 ServerDescription TopologyDescription::findPrimary() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	for (const auto& [address, server] : _servers)
 	{
 		if (server.isPrimary())
@@ -131,7 +129,7 @@ ServerDescription TopologyDescription::findPrimary() const
 
 std::vector<ServerDescription> TopologyDescription::findSecondaries() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	std::vector<ServerDescription> result;
 	result.reserve(_servers.size());
 	for (const auto& [address, server] : _servers)
@@ -147,7 +145,7 @@ std::vector<ServerDescription> TopologyDescription::findSecondaries() const
 
 bool TopologyDescription::hasPrimary() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	for (const auto& [address, server] : _servers)
 	{
 		if (server.isPrimary())
@@ -161,14 +159,14 @@ bool TopologyDescription::hasPrimary() const
 
 bool TopologyDescription::hasServer(const Net::SocketAddress& address) const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _servers.find(address) != _servers.end();
 }
 
 
 ServerDescription TopologyDescription::getServer(const Net::SocketAddress& address) const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	auto it = _servers.find(address);
 	if (it != _servers.end())
 	{
@@ -180,7 +178,7 @@ ServerDescription TopologyDescription::getServer(const Net::SocketAddress& addre
 
 void TopologyDescription::updateServer(const Net::SocketAddress& address, const Document& helloResponse, Poco::Int64 rttMicros)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	// Find or create server description
 	auto it = _servers.find(address);
@@ -208,7 +206,7 @@ void TopologyDescription::updateServer(const Net::SocketAddress& address, const 
 
 void TopologyDescription::markServerUnknown(const Net::SocketAddress& address, const std::string& error)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	auto it = _servers.find(address);
 	if (it != _servers.end())
@@ -221,7 +219,7 @@ void TopologyDescription::markServerUnknown(const Net::SocketAddress& address, c
 
 void TopologyDescription::addServer(const Net::SocketAddress& address)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	auto [_, inserted] = _servers.try_emplace(address, address);
 	if (inserted)
@@ -233,7 +231,7 @@ void TopologyDescription::addServer(const Net::SocketAddress& address)
 
 void TopologyDescription::removeServer(const Net::SocketAddress& address)
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_servers.erase(address);
 	updateTopologyType();
@@ -242,7 +240,7 @@ void TopologyDescription::removeServer(const Net::SocketAddress& address)
 
 void TopologyDescription::clear()
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_servers.clear();
 	_type = Unknown;
@@ -251,7 +249,7 @@ void TopologyDescription::clear()
 
 std::size_t TopologyDescription::serverCount() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _servers.size();
 }
 
