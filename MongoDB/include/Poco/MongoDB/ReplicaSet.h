@@ -23,12 +23,12 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Mutex.h"
 #include "Poco/Timespan.h"
 #include <vector>
 #include <string>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 
 namespace Poco {
@@ -194,7 +194,7 @@ private:
 
 	Config _config;
 	TopologyDescription _topology;
-	mutable Poco::FastMutex _mutex;
+	mutable std::mutex _mutex;
 	std::thread _monitorThread;
 	std::atomic<bool> _stopMonitoring{false};
 	std::atomic<bool> _monitoringActive{false};

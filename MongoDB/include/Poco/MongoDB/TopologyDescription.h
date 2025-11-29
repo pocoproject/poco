@@ -22,10 +22,10 @@
 #include "Poco/MongoDB/ServerDescription.h"
 #include "Poco/MongoDB/Document.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Mutex.h"
 #include <vector>
 #include <map>
 #include <string>
+#include <mutex>
 
 
 namespace Poco {
@@ -145,7 +145,7 @@ private:
 		/// Processes newly discovered hosts from a hello response.
 		/// Must be called while holding the mutex.
 
-	mutable Mutex _mutex;
+	mutable std::mutex _mutex;
 	TopologyType _type{Unknown};
 	std::string _setName;
 	std::map<Net::SocketAddress, ServerDescription> _servers;

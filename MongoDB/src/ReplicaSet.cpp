@@ -141,7 +141,7 @@ Connection::Ptr ReplicaSet::getSecondaryConnection()
 
 TopologyDescription ReplicaSet::topology() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _topology;
 }
 
@@ -154,7 +154,7 @@ void ReplicaSet::refreshTopology()
 
 void ReplicaSet::startMonitoring()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_monitoringActive.load())
 	{
@@ -185,28 +185,28 @@ void ReplicaSet::stopMonitoring()
 
 void ReplicaSet::setReadPreference(const ReadPreference& pref)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_config.readPreference = pref;
 }
 
 
 ReadPreference ReplicaSet::readPreference() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _config.readPreference;
 }
 
 
 std::string ReplicaSet::setName() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _topology.setName();
 }
 
 
 bool ReplicaSet::hasPrimary() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _topology.hasPrimary();
 }
 
@@ -275,7 +275,7 @@ Connection::Ptr ReplicaSet::selectServer(const ReadPreference& readPref)
 	Net::SocketAddress selectedAddress;
 
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 
 		// Select servers based on read preference
 		std::vector<ServerDescription> eligible = readPref.selectServers(_topology);
@@ -321,7 +321,7 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 	catch (...)
 	{
 		// Mark server as unknown on connection failure
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_topology.markServerUnknown(address, "Connection failed");
 		throw;
 	}
@@ -365,7 +365,7 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 			const Document& doc = response.body();
 
 			// Update topology
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_topology.updateServer(address, doc, rttMicros);
 
 			// Update replica set name if not set
@@ -378,20 +378,20 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 		else
 		{
 			// Mark server as unknown
-			Poco::FastMutex::ScopedLock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_topology.markServerUnknown(address, "Hello command failed");
 		}
 	}
 	catch (const std::exception& e)
 	{
 		// Mark server as unknown
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_topology.markServerUnknown(address, e.what());
 	}
 	catch (...)
 	{
 		// Mark server as unknown
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_topology.markServerUnknown(address, "Unknown error");
 	}
 }
@@ -402,7 +402,7 @@ void ReplicaSet::updateTopologyFromAllServers()
 	std::vector<ServerDescription> servers;
 
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		servers = _topology.servers();
 	}
 

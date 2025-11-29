@@ -25,6 +25,8 @@
 #include "Poco/ObjectPool.h"
 #include "Poco/Exception.h"
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 
 using namespace Poco::MongoDB;
@@ -265,7 +267,7 @@ void failoverExample()
 				std::cout << "Failed: " << e.displayText() << std::endl;
 			}
 
-			Poco::Thread::sleep(1000);  // Sleep 1 second between operations
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // Sleep 1 second between operations
 		}
 
 		std::cout << std::endl;
