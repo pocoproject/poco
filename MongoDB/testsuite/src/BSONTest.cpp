@@ -1,7 +1,7 @@
 //
 // BSONTest.cpp
 //
-// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -207,14 +207,15 @@ void BSONTest::testDuplicateDocumentMembers()
 	// Add duplicate field names
 	doc->add("field"s, "first"s);
 	doc->add("field"s, "second"s);
+	doc->add("field"s, 123);
 	doc->add("field"s, "third"s);
 
 	// The last value should be returned when getting by name
 	// (due to hash map overwriting)
-	assertEqual(doc->get<std::string>("field"), "third");
+	assertEqual("third", doc->get<std::string>("field"));
 
-	// Size should reflect all elements including duplicates
-	assertEqual(doc->size(), 3);
+	// Size should be 1 since duplicates are prevented
+	assertEqual(1, doc->size());
 
 	// exists should return true
 	assertTrue(doc->exists("field"));
@@ -225,8 +226,8 @@ void BSONTest::testDuplicateDocumentMembers()
 	// After removal, exists should return false
 	assertFalse(doc->exists("field"));
 
-	// Size should be reduced by 1 (only one element removed from vector)
-	assertEqual(doc->size(), 2);
+	// Size should be 0 (the only element was removed)
+	assertEqual(0, doc->size());
 }
 
 

@@ -110,7 +110,6 @@ struct ElementTraits<Array::Ptr>
 
 	static std::string toString(const Array::Ptr& value, int indent = 0)
 	{
-		//TODO:
 		return value.isNull() ? "null" : value->toString(indent);
 	}
 };
@@ -124,7 +123,7 @@ inline void BSONReader::read<Array::Ptr>(Array::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
+inline void BSONWriter::write<Array::Ptr>(const Array::Ptr& from)
 {
 	from->write(_writer);
 }

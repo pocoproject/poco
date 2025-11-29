@@ -22,7 +22,6 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
-#include <algorithm>
 #include <cstdlib>
 #include <unordered_map>
 #include <type_traits>
@@ -213,34 +212,26 @@ public:
 	[[nodiscard]] virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
 
-	void write(BinaryWriter& writer);
+	void write(BinaryWriter& writer) const;
 		/// Writes a document to the reader
 
 protected:
-	const ElementSet& elements() const noexcept;
-		/// Returns const reference to elements for read-only access by derived classes.
+	const std::vector<std::string>& orderedNames() const noexcept;
+		/// Returns const reference to element names in insertion order for read-only access by derived classes.
 		/// Direct modification is not allowed to maintain synchronization with hash map.
 
 private:
-	ElementSet _elements;
+	std::vector<std::string> _elementNames;
+		/// Vector of element names in insertion order.
 	std::unordered_map<std::string, Element::Ptr> _elementMap;
 		/// Hash map for O(1) element lookups by name.
-		/// Maintained in sync with _elements for fast access.
-		/// These are private to ensure derived classes cannot break synchronization.
+		/// Maintained in sync with _elementNames for ordered access.
 };
 
 
 //
 // inlines
 //
-inline Document& Document::addElement(Element::Ptr element)
-{
-	_elements.push_back(element);
-	_elementMap[element->name()] = element;  // O(1) insert for fast lookups
-	return *this;
-}
-
-
 inline Document& Document::addNewDocument(const std::string& name)
 {
 	Document::Ptr newDoc = new Document();
@@ -251,24 +242,21 @@ inline Document& Document::addNewDocument(const std::string& name)
 
 inline void Document::clear() noexcept
 {
-	_elements.clear();
+	_elementNames.clear();
 	_elementMap.clear();
 }
 
 
 inline bool Document::empty() const noexcept
 {
-	return _elements.empty();
+	return _elementNames.empty();
 }
 
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
-	keys.reserve(keys.size() + _elements.size());  // Pre-allocate to avoid reallocations
-	for (const auto & _element : _elements)
-	{
-		keys.push_back(_element->name());
-	}
+	keys.reserve(keys.size() + _elementNames.size());  // Pre-allocate to avoid reallocations
+	keys.insert(keys.end(), _elementNames.begin(), _elementNames.end());
 }
 
 
@@ -279,33 +267,17 @@ inline bool Document::exists(const std::string& name) const noexcept
 }
 
 
-inline bool Document::remove(const std::string& name)
-{
-	// Remove from hash map first (O(1))
-	auto mapIt = _elementMap.find(name);
-	if (mapIt == _elementMap.end())
-		return false;
-
-	_elementMap.erase(mapIt);
-
-	// Then remove from vector (O(n) but unavoidable for order preservation)
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it != _elements.end())
-		_elements.erase(it);
-
-	return true;
-}
 
 
 inline std::size_t Document::size() const noexcept
 {
-	return _elements.size();
+	return _elementNames.size();
 }
 
 
-inline const ElementSet& Document::elements() const noexcept
+inline const std::vector<std::string>& Document::orderedNames() const noexcept
 {
-	return _elements;
+	return _elementNames;
 }
 
 
@@ -331,7 +303,7 @@ inline void BSONReader::read<Document::Ptr>(Document::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<Document::Ptr>(Document::Ptr& from)
+inline void BSONWriter::write<Document::Ptr>(const Document::Ptr& from)
 {
 	from->write(_writer);
 }

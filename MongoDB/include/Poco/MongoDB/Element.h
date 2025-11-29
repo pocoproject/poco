@@ -64,7 +64,7 @@ public:
 
 private:
 	virtual void read(BinaryReader& reader) = 0;
-	virtual void write(BinaryWriter& writer) = 0;
+	virtual void write(BinaryWriter& writer) const = 0;
 
 	friend class Document;
 	std::string _name;
@@ -78,9 +78,6 @@ inline const std::string& Element::name() const noexcept
 {
 	return _name;
 }
-
-
-using ElementSet = std::vector<Element::Ptr>;
 
 
 template<typename T>
@@ -198,9 +195,9 @@ inline void BSONReader::read<std::string>(std::string& to)
 
 
 template<>
-inline void BSONWriter::write<std::string>(std::string& from)
+inline void BSONWriter::write<std::string>(const std::string& from)
 {
-	_writer << (Poco::Int32) (from.length() + 1);
+	_writer << static_cast<Poco::Int32>(from.length() + 1);
 	writeCString(from);
 }
 
@@ -229,7 +226,7 @@ inline void BSONReader::read<bool>(bool& to)
 
 
 template<>
-inline void BSONWriter::write<bool>(bool& from)
+inline void BSONWriter::write<bool>(const bool& from)
 {
 	unsigned char b = from ? 0x01 : 0x00;
 	_writer << b;
@@ -281,7 +278,7 @@ inline void BSONReader::read<Timestamp>(Timestamp& to)
 
 
 template<>
-inline void BSONWriter::write<Timestamp>(Timestamp& from)
+inline void BSONWriter::write<Timestamp>(const Timestamp& from)
 {
 	_writer << (from.epochMicroseconds() / 1000);
 }
@@ -311,7 +308,7 @@ inline void BSONReader::read<NullValue>(NullValue& to)
 
 
 template<>
-inline void BSONWriter::write<NullValue>(NullValue& from)
+inline void BSONWriter::write<NullValue>(const NullValue& from)
 {
 }
 
@@ -356,7 +353,7 @@ inline void BSONReader::read<BSONTimestamp>(BSONTimestamp& to)
 
 
 template<>
-inline void BSONWriter::write<BSONTimestamp>(BSONTimestamp& from)
+inline void BSONWriter::write<BSONTimestamp>(const BSONTimestamp& from)
 {
 	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
 	value <<= 32;
@@ -420,7 +417,7 @@ public:
 		BSONReader(reader).read(_value);
 	}
 
-	void write(BinaryWriter& writer) override
+	void write(BinaryWriter& writer) const override
 	{
 		BSONWriter(writer).write(_value);
 	}

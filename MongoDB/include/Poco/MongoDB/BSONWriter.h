@@ -42,7 +42,7 @@ public:
 	}
 
 	template<typename T>
-	void write(T& t)
+	void write(const T& t)
 		/// Writes the value to the writer. The default implementation uses
 		/// the << operator. Special types can write their own version.
 	{
@@ -64,7 +64,7 @@ private:
 inline void BSONWriter::writeCString(const std::string& value)
 {
 	_writer.writeRaw(value);
-	_writer << (unsigned char) 0x00;
+	_writer << static_cast<unsigned char>(0x00);
 }
 
 
