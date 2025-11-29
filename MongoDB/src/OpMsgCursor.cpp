@@ -39,6 +39,8 @@
 
 #define _MONGODB_EXHAUST_ALLOWED_WORKS	false
 
+using namespace std::string_literals;
+
 namespace Poco {
 namespace MongoDB {
 
@@ -184,7 +186,7 @@ void OpMsgCursor::kill(Connection& connection)
 		const auto killed = _response.body().get<MongoDB::Array::Ptr>(keyCursorsKilled, nullptr);
 		if (!killed || killed->size() != 1 || killed->get<Poco::Int64>(0, -1) != _cursorID)
 		{
-			throw Poco::ProtocolException("Cursor not killed as expected: " + std::to_string(_cursorID));
+			throw Poco::ProtocolException("Cursor not killed as expected: "s + std::to_string(_cursorID));
 		}
 
 		_cursorID = 0;

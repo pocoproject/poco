@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Binary
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -17,6 +17,8 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/MemoryStream.h"
 #include <sstream>
+
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -42,10 +44,16 @@ Binary::Binary(const UUID& uuid):
 	_subtype(SUBTYPE_UUID)
 {
     unsigned char szUUID[16];
-    uuid.copyTo((char*) szUUID);
+    uuid.copyTo(reinterpret_cast<char*>(szUUID));
     _buffer.assign(szUUID, 16);
 }
 
+
+Binary::Binary(const char* data, unsigned char subtype):
+	_buffer(reinterpret_cast<const unsigned char*>(data), std::strlen(data)),
+	_subtype(subtype)
+{
+}
 
 
 Binary::Binary(const std::string& data, unsigned char subtype):
@@ -74,7 +82,7 @@ std::string Binary::toString(int indent) const
 	{
 		try
 		{
-			return "UUID(\"" + uuid().toString() + "\")";
+			return "UUID(\""s + uuid().toString() + "\")"s;
 		}
 		catch (...)
 		{
@@ -85,7 +93,7 @@ std::string Binary::toString(int indent) const
 	// Default: Base64 encode the binary data
 	std::ostringstream oss;
 	Base64Encoder encoder(oss);
-	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
+	MemoryInputStream mis(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
 	StreamCopier::copyStream(mis, encoder);
 	encoder.close();
 	return oss.str();
@@ -97,7 +105,7 @@ UUID Binary::uuid() const
 	if (_subtype == SUBTYPE_UUID && _buffer.size() == 16)
 	{
 		UUID uuid;
-		uuid.copyFrom((const char*) _buffer.begin());
+		uuid.copyFrom(reinterpret_cast<const char*>(_buffer.begin()));
 		return uuid;
 	}
 	throw BadCastException("Invalid subtype");

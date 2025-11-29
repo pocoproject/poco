@@ -7,7 +7,7 @@
 //
 // Definition of the BSONWriter class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -42,7 +42,7 @@ public:
 	}
 
 	template<typename T>
-	void write(T& t)
+	void write(const T& t)
 		/// Writes the value to the writer. The default implementation uses
 		/// the << operator. Special types can write their own version.
 	{
@@ -64,7 +64,7 @@ private:
 inline void BSONWriter::writeCString(const std::string& value)
 {
 	_writer.writeRaw(value);
-	_writer << (unsigned char) 0x00;
+	_writer << static_cast<unsigned char>(0x00);
 }
 
 

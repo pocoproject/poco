@@ -7,7 +7,7 @@
 //
 // Definition of the JavaScriptCode class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -92,7 +92,7 @@ inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
+inline void BSONWriter::write<JavaScriptCode::Ptr>(const JavaScriptCode::Ptr& from)
 {
 	std::string code = from->getCode();
 	BSONWriter(_writer).write(code);
