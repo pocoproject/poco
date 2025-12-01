@@ -46,7 +46,7 @@ ServerDescription& ServerDescription::operator=(const ServerDescription& other) 
 ServerDescription& ServerDescription::operator=(ServerDescription&& other) noexcept = default;
 
 
-void ServerDescription::updateFromHelloResponse(const Document& helloResponse, Poco::Int64 rttMicros)
+std::vector<Net::SocketAddress> ServerDescription::updateFromHelloResponse(const Document& helloResponse, Poco::Int64 rttMicros)
 {
 	_lastUpdateTime.update();
 	_roundTripTime = rttMicros;
@@ -62,11 +62,13 @@ void ServerDescription::updateFromHelloResponse(const Document& helloResponse, P
 		_setName = helloResponse.get<std::string>("setName"s);
 	}
 
-	// Parse hosts list
-	parseHosts(helloResponse);
+	// Parse and return hosts list
+	auto hosts = parseHosts(helloResponse);
 
 	// Parse tags
 	parseTags(helloResponse);
+
+	return hosts;
 }
 
 
@@ -85,7 +87,6 @@ void ServerDescription::reset()
 	_lastUpdateTime = 0;
 	_roundTripTime = 0;
 	_setName.clear();
-	_hosts.clear();
 	_tags.clear();
 	_error.clear();
 	_hasError = false;
@@ -132,21 +133,21 @@ void ServerDescription::parseServerType(const Document& doc)
 }
 
 
-void ServerDescription::parseHosts(const Document& doc)
+std::vector<Net::SocketAddress> ServerDescription::parseHosts(const Document& doc)
 {
-	_hosts.clear();
+	std::vector<Net::SocketAddress> hosts;
 
 	// Parse hosts array
 	if (doc.exists("hosts"s))
 	{
 		Array::Ptr hostsArray = doc.get<Array::Ptr>("hosts"s);
-		_hosts.reserve(hostsArray->size());
+		hosts.reserve(hostsArray->size());
 		for (std::size_t i = 0; i < hostsArray->size(); ++i)
 		{
 			try
 			{
 				std::string hostStr = hostsArray->get<std::string>(i);
-				_hosts.emplace_back(hostStr);
+				hosts.emplace_back(hostStr);
 			}
 			catch (...)
 			{
@@ -164,7 +165,7 @@ void ServerDescription::parseHosts(const Document& doc)
 			try
 			{
 				std::string hostStr = passivesArray->get<std::string>(i);
-				_hosts.emplace_back(hostStr);
+				hosts.emplace_back(hostStr);
 			}
 			catch (...)
 			{
@@ -182,7 +183,7 @@ void ServerDescription::parseHosts(const Document& doc)
 			try
 			{
 				std::string hostStr = arbitersArray->get<std::string>(i);
-				_hosts.emplace_back(hostStr);
+				hosts.emplace_back(hostStr);
 			}
 			catch (...)
 			{
@@ -190,6 +191,8 @@ void ServerDescription::parseHosts(const Document& doc)
 			}
 		}
 	}
+
+	return hosts;
 }
 
 

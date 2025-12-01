@@ -247,7 +247,7 @@ void ReplicaSetTest::testServerDescriptionPrimary()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createPrimaryHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 5000);  // 5ms RTT
+	auto hosts = server.updateFromHelloResponse(*helloResponse, 5000);  // 5ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
@@ -258,7 +258,6 @@ void ReplicaSetTest::testServerDescriptionPrimary()
 	assertFalse(server.hasError());
 
 	// Check hosts list
-	const auto& hosts = server.hosts();
 	assertEqual(3, static_cast<int>(hosts.size()));
 	if (addr.family() == SocketAddress::IPv6)
 	{
@@ -282,7 +281,7 @@ void ReplicaSetTest::testServerDescriptionSecondary()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createSecondaryHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 3000);  // 3ms RTT
+	auto hosts = server.updateFromHelloResponse(*helloResponse, 3000);  // 3ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
@@ -293,7 +292,6 @@ void ReplicaSetTest::testServerDescriptionSecondary()
 	assertFalse(server.hasError());
 
 	// Check hosts list
-	const auto& hosts = server.hosts();
 	assertEqual(3, static_cast<int>(hosts.size()));
 }
 
@@ -304,7 +302,7 @@ void ReplicaSetTest::testServerDescriptionArbiter()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createArbiterHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 2000);  // 2ms RTT
+	(void)server.updateFromHelloResponse(*helloResponse, 2000);  // 2ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::RsArbiter), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
@@ -322,7 +320,7 @@ void ReplicaSetTest::testServerDescriptionStandalone()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createStandaloneHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 1000);  // 1ms RTT
+	(void)server.updateFromHelloResponse(*helloResponse, 1000);  // 1ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::Standalone), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());  // No replica set name for standalone
@@ -339,7 +337,7 @@ void ReplicaSetTest::testServerDescriptionMongos()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createMongosHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 4000);  // 4ms RTT
+	(void)server.updateFromHelloResponse(*helloResponse, 4000);  // 4ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::Mongos), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());  // Mongos doesn't have a set name
@@ -356,7 +354,7 @@ void ReplicaSetTest::testServerDescriptionWithTags()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createTaggedSecondaryHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 7000);  // 7ms RTT
+	(void)server.updateFromHelloResponse(*helloResponse, 7000);  // 7ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::RsSecondary), static_cast<int>(server.type()));
 
@@ -376,12 +374,11 @@ void ReplicaSetTest::testServerDescriptionWithHosts()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createHiddenMemberHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 8000);  // 8ms RTT
+	auto hosts = server.updateFromHelloResponse(*helloResponse, 8000);  // 8ms RTT
 
 	assertEqual(static_cast<int>(ServerDescription::RsOther), static_cast<int>(server.type()));
 
 	// Verify hosts list includes regular hosts + passives
-	const auto& hosts = server.hosts();
 	assertEqual(3, static_cast<int>(hosts.size()));  // 2 regular + 1 passive
 
 	// Check that passive member is included
@@ -405,7 +402,7 @@ void ReplicaSetTest::testServerDescriptionErrorHandling()
 
 	// Initially update from a valid hello response
 	Document::Ptr helloResponse = createPrimaryHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 5000);
+	(void)server.updateFromHelloResponse(*helloResponse, 5000);
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(server.type()));
 	assertFalse(server.hasError());
 
@@ -426,7 +423,7 @@ void ReplicaSetTest::testServerDescriptionReset()
 	ServerDescription server(addr);
 
 	Document::Ptr helloResponse = createPrimaryHelloResponse();
-	server.updateFromHelloResponse(*helloResponse, 5000);
+	(void)server.updateFromHelloResponse(*helloResponse, 5000);
 
 	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(server.type()));
 	assertEqual("rs0"s, server.setName());
@@ -437,7 +434,6 @@ void ReplicaSetTest::testServerDescriptionReset()
 	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());
 	assertEqual(0, server.roundTripTime());
-	assertTrue(server.hosts().empty());
 	assertTrue(server.tags().empty());
 	assertFalse(server.hasError());
 	assertFalse(server.isPrimary());

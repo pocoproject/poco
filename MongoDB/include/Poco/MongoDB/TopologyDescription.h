@@ -141,7 +141,7 @@ private:
 		/// Updates the topology type based on current server states.
 		/// Must be called while holding the mutex.
 
-	void processNewHosts(const ServerDescription& serverDesc);
+	void processNewHosts(const std::vector<Net::SocketAddress>& hosts);
 		/// Processes newly discovered hosts from a hello response.
 		/// Must be called while holding the mutex.
 

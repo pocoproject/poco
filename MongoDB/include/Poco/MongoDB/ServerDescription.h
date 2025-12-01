@@ -95,8 +95,6 @@ public:
 	[[nodiscard]] const std::string& setName() const;
 		/// Returns the replica set name, or empty string if not in a replica set.
 
-	[[nodiscard]] const std::vector<Net::SocketAddress>& hosts() const;
-		/// Returns the list of all replica set members.
 
 	[[nodiscard]] bool isWritable() const;
 		/// Returns true if this server can accept write operations.
@@ -119,10 +117,12 @@ public:
 	[[nodiscard]] const std::string& error() const;
 		/// Returns the last error message, or empty string if no error.
 
-	void updateFromHelloResponse(const Document& helloResponse, Poco::Int64 rttMicros);
+	[[nodiscard]] std::vector<Net::SocketAddress> updateFromHelloResponse(const Document& helloResponse, Poco::Int64 rttMicros);
 		/// Updates the server description from a 'hello' command response.
 		/// The rttMicros parameter should contain the round-trip time
 		/// of the hello command in microseconds.
+		/// Returns a list of all replica set members (hosts, passives, arbiters)
+		/// discovered in the hello response.
 
 	void markError(const std::string& errorMessage);
 		/// Marks this server as having an error.
@@ -136,7 +136,7 @@ public:
 
 private:
 	void parseServerType(const Document& doc);
-	void parseHosts(const Document& doc);
+	std::vector<Net::SocketAddress> parseHosts(const Document& doc);
 	void parseTags(const Document& doc);
 
 	Net::SocketAddress _address;
@@ -144,7 +144,6 @@ private:
 	Timestamp _lastUpdateTime;
 	Poco::Int64 _roundTripTime{0};
 	std::string _setName;
-	std::vector<Net::SocketAddress> _hosts;
 	Document _tags;
 	std::string _error;
 	bool _hasError{false};
@@ -183,12 +182,6 @@ inline Poco::Int64 ServerDescription::roundTripTime() const
 inline const std::string& ServerDescription::setName() const
 {
 	return _setName;
-}
-
-
-inline const std::vector<Net::SocketAddress>& ServerDescription::hosts() const
-{
-	return _hosts;
 }
 
 

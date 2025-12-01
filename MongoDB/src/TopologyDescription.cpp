@@ -187,8 +187,8 @@ void TopologyDescription::updateServer(const Net::SocketAddress& address, const 
 		it = _servers.try_emplace(address, address).first;
 	}
 
-	// Update from hello response
-	it->second.updateFromHelloResponse(helloResponse, rttMicros);
+	// Update from hello response and get discovered hosts
+	auto hosts = it->second.updateFromHelloResponse(helloResponse, rttMicros);
 
 	// Update replica set name if not set
 	if (_setName.empty() && !it->second.setName().empty())
@@ -197,7 +197,7 @@ void TopologyDescription::updateServer(const Net::SocketAddress& address, const 
 	}
 
 	// Process newly discovered hosts
-	processNewHosts(it->second);
+	processNewHosts(hosts);
 
 	// Update topology type
 	updateTopologyType();
@@ -321,12 +321,11 @@ void TopologyDescription::updateTopologyType()
 }
 
 
-void TopologyDescription::processNewHosts(const ServerDescription& serverDesc)
+void TopologyDescription::processNewHosts(const std::vector<Net::SocketAddress>& hosts)
 {
 	// This method must be called while holding the mutex
 
 	// Add newly discovered hosts to the topology
-	const auto& hosts = serverDesc.hosts();
 	for (const auto& host : hosts)
 	{
 		_servers.try_emplace(host, host);
