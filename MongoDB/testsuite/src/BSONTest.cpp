@@ -1095,7 +1095,7 @@ void BSONTest::testGetNonExistent()
 	// Test get throws NotFoundException
 	try
 	{
-		std::string value = doc->get<std::string>("nonexistent");
+		(void)doc->get<std::string>("nonexistent");
 		fail("Should have thrown NotFoundException");
 	}
 	catch (Poco::NotFoundException&)
@@ -1110,7 +1110,7 @@ void BSONTest::testGetNonExistent()
 	// Test getInteger throws NotFoundException
 	try
 	{
-		Poco::Int64 num = doc->getInteger("nonexistent");
+		(void)doc->getInteger("nonexistent");
 		fail("Should have thrown NotFoundException");
 	}
 	catch (Poco::NotFoundException&)
@@ -1129,7 +1129,7 @@ void BSONTest::testBadCast()
 	// Try to get string as number
 	try
 	{
-		Poco::Int32 num = doc->get<Poco::Int32>("string");
+		(void)doc->get<Poco::Int32>("string");
 		fail("Should have thrown BadCastException");
 	}
 	catch (Poco::BadCastException&)
@@ -1140,7 +1140,7 @@ void BSONTest::testBadCast()
 	// Try to get number as string
 	try
 	{
-		std::string str = doc->get<std::string>("number");
+		(void)doc->get<std::string>("number");
 		fail("Should have thrown BadCastException");
 	}
 	catch (Poco::BadCastException&)
