@@ -100,6 +100,12 @@ public:
 	[[nodiscard]] bool isConnected() const;
 		/// Returns true if currently connected to a server.
 
+	[[nodiscard]] bool matchesReadPreference() const;
+		/// Returns true if the currently connected server still matches the read preference.
+		/// Returns false if not connected or if the server no longer satisfies the read preference.
+		/// This is useful for connection pool validation to detect when a server role has changed
+		/// (e.g., primary became secondary).
+
 private:
 	void ensureConnection();
 		/// Ensures we have an active connection, creating one if needed.

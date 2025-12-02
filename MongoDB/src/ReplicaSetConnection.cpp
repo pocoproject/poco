@@ -116,6 +116,42 @@ bool ReplicaSetConnection::isConnected() const
 }
 
 
+bool ReplicaSetConnection::matchesReadPreference() const
+{
+	if (!isConnected())
+	{
+		return false;
+	}
+
+	// Get the current topology
+	TopologyDescription topology = _replicaSet.topology();
+
+	// Get the server description for the currently connected server
+	ServerDescription server = topology.getServer(_connection->address());
+
+	// Check if the server is Unknown or has an error
+	if (server.type() == ServerDescription::Unknown || server.hasError())
+	{
+		return false;
+	}
+
+	// Use ReadPreference::selectServers to check if our current server
+	// would be selected with the current read preference
+	std::vector<ServerDescription> eligibleServers = _readPreference.selectServers(topology);
+
+	// Check if our current server is in the list of eligible servers
+	for (const auto& eligible : eligibleServers)
+	{
+		if (eligible.address() == _connection->address())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 void ReplicaSetConnection::ensureConnection()
 {
 	if (_connection.isNull())

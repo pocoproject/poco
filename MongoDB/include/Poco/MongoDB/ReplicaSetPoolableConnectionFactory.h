@@ -62,8 +62,10 @@ public:
 
 	bool validateObject(MongoDB::ReplicaSetConnection::Ptr pObject)
 	{
-		// Check if the connection is still valid
-		return pObject->isConnected();
+		// Check if the connection is still valid and matches the read preference.
+		// This ensures that if a server changes role (e.g., primary becomes secondary),
+		// the cached connection is invalidated and a new one is created.
+		return pObject->isConnected() && pObject->matchesReadPreference();
 	}
 
 	void activateObject(MongoDB::ReplicaSetConnection::Ptr pObject)
