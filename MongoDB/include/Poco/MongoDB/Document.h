@@ -97,6 +97,9 @@ public:
 		return addElement(new ConcreteElement<T>(std::move(name), value));
 	}
 
+	void reserve(std::size_t size);
+		/// Reserves space for elements.
+
 	Document& add(const std::string& name, const char* value)
 		/// Creates an element with the given name and value and
 		/// adds it to the document.

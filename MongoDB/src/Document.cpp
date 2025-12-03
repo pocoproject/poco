@@ -233,6 +233,13 @@ void Document::write(BinaryWriter& writer) const
 }
 
 
+void Document::reserve(std::size_t size)
+{
+	_elementNames.reserve(size);
+	_elementMap.reserve(size);
+}
+
+
 Document& Document::addElement(Element::Ptr element)
 {
 	// Check if element with this name already exists
