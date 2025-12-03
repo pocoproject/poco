@@ -25,6 +25,7 @@
 namespace Poco {
 namespace MongoDB {
 
+class ReplicaSetConnection;
 
 class MongoDB_API OpMsgCursor: public Document
 	/// OpMsgCursor is an helper class for querying multiple documents using OpMsgMessage.
@@ -69,13 +70,34 @@ public:
 		///
 		/// The cursor must be killed (see kill()) when not all documents are needed.
 
+	OpMsgMessage& next(ReplicaSetConnection& connection);
+		/// Tries to get the next documents. As long as response message has a
+		/// cursor ID next can be called to retrieve the next bunch of documents.
+		///
+		/// The cursor must be killed (see kill()) when not all documents are needed.
+		///
+		/// This overload provides automatic retry and failover for replica set deployments.
+
 	OpMsgMessage& query();
 		/// Returns the associated query.
 
 	void kill(Connection& connection);
 		/// Kills the cursor and reset it so that it can be reused.
 
+	void kill(ReplicaSetConnection& connection);
+		/// Kills the cursor and reset it so that it can be reused.
+		///
+		/// This overload provides automatic retry and failover for replica set deployments.
+
 private:
+	template<typename ConnType>
+	OpMsgMessage& nextImpl(ConnType& connection);
+		/// Template implementation for next() to avoid code duplication.
+
+	template<typename ConnType>
+	void killImpl(ConnType& connection);
+		/// Template implementation for kill() to avoid code duplication.
+
 	OpMsgMessage    _query;
 	OpMsgMessage 	_response;
 

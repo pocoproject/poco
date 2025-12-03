@@ -13,6 +13,7 @@
 
 
 #include "Poco/MongoDB/OpMsgCursor.h"
+#include "Poco/MongoDB/ReplicaSetConnection.h"
 #include "Poco/MongoDB/Array.h"
 
 //
@@ -106,7 +107,8 @@ bool OpMsgCursor::isActive() const noexcept
 }
 
 
-OpMsgMessage& OpMsgCursor::next(Connection& connection)
+template<typename ConnType>
+OpMsgMessage& OpMsgCursor::nextImpl(ConnType& connection)
 {
 	if (_cursorID == 0)
 	{
@@ -155,7 +157,7 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 			connection.readResponse(_response);
 		}
 		else
-#endif		
+#endif
 		{
 			_response.clear();
 			_query.setCursor(_cursorID, _batchSize);
@@ -170,7 +172,20 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 }
 
 
-void OpMsgCursor::kill(Connection& connection)
+OpMsgMessage& OpMsgCursor::next(Connection& connection)
+{
+	return nextImpl(connection);
+}
+
+
+OpMsgMessage& OpMsgCursor::next(ReplicaSetConnection& connection)
+{
+	return nextImpl(connection);
+}
+
+
+template<typename ConnType>
+void OpMsgCursor::killImpl(ConnType& connection)
 {
 	_response.clear();
 	if (_cursorID != 0)
@@ -196,6 +211,18 @@ void OpMsgCursor::kill(Connection& connection)
 }
 
 
+void OpMsgCursor::kill(Connection& connection)
+{
+	killImpl(connection);
+}
+
+
+void OpMsgCursor::kill(ReplicaSetConnection& connection)
+{
+	killImpl(connection);
+}
+
+
 Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc)
 {
 	Poco::Int64 id {0};
@@ -206,6 +233,13 @@ Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc)
 	}
 	return id;
 }
+
+
+// Explicit template instantiation
+template OpMsgMessage& OpMsgCursor::nextImpl<Connection>(Connection& connection);
+template OpMsgMessage& OpMsgCursor::nextImpl<ReplicaSetConnection>(ReplicaSetConnection& connection);
+template void OpMsgCursor::killImpl<Connection>(Connection& connection);
+template void OpMsgCursor::killImpl<ReplicaSetConnection>(ReplicaSetConnection& connection);
 
 
 } } // Namespace Poco::MongoDB
