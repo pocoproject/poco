@@ -70,7 +70,16 @@ public:
 
 	void activateObject(MongoDB::ReplicaSetConnection::Ptr pObject)
 	{
-		// No action needed - connection is established lazily
+		if (!pObject->isConnected())
+		{
+			try {
+				pObject->reconnect();
+			}
+			catch (Poco::Exception& e)
+			{
+				// Ignore connect error. c->isConnected() can be used to determine if the connection is valid.
+			}
+		}
 	}
 
 	void deactivateObject(MongoDB::ReplicaSetConnection::Ptr pObject)

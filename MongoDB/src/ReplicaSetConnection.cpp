@@ -86,7 +86,7 @@ Net::SocketAddress ReplicaSetConnection::address() const
 {
 	if (_connection.isNull())
 	{
-		throw Poco::NullPointerException("Not connected to any server");
+		throw Poco::NullPointerException("Not connected to any server: address not available.");
 	}
 	return _connection->address();
 }
@@ -96,7 +96,7 @@ Connection& ReplicaSetConnection::connection()
 {
 	if (_connection.isNull())
 	{
-		throw Poco::NullPointerException("Not connected to any server");
+		throw Poco::NullPointerException("Not connected to any server: connection not available.");
 	}
 	return *_connection;
 }
