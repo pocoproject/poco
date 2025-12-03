@@ -16,6 +16,7 @@
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Exception.h"
+#include <set>
 
 using namespace std::string_literals;
 
@@ -105,7 +106,6 @@ Connection& ReplicaSetConnection::connection()
 void ReplicaSetConnection::reconnect()
 {
 	_connection = nullptr;
-	_triedServers.clear();
 	ensureConnection();
 }
 
@@ -161,8 +161,6 @@ void ReplicaSetConnection::ensureConnection()
 		{
 			throw Poco::IOException("No suitable server found in replica set");
 		}
-		_triedServers.clear();
-		_triedServers.insert(_connection->address());
 	}
 }
 
@@ -170,7 +168,7 @@ void ReplicaSetConnection::ensureConnection()
 void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 {
 	std::exception_ptr lastException;
-	_triedServers.clear();
+	std::set<Net::SocketAddress> triedServers;
 
 	// Retry with different servers until we've tried all available servers
 	TopologyDescription topology = _replicaSet.topology();
@@ -181,6 +179,8 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 	{
 		try
 		{
+			ensureConnection();
+			triedServers.insert(_connection->address());
 			operation();
 			return;  // Success
 		}
@@ -230,10 +230,9 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 			}
 
 			Net::SocketAddress addr = newConn->address();
-			if (_triedServers.find(addr) == _triedServers.end())
+			if (triedServers.find(addr) == triedServers.end())
 			{
 				_connection = newConn;
-				_triedServers.insert(addr);
 				foundNewServer = true;
 			}
 		}

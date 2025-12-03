@@ -25,7 +25,6 @@
 #include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/SharedPtr.h"
 #include <functional>
-#include <set>
 
 
 namespace Poco {
@@ -125,7 +124,6 @@ private:
 	ReplicaSet& _replicaSet;
 	ReadPreference _readPreference;
 	Connection::Ptr _connection;
-	std::set<Net::SocketAddress> _triedServers;
 };
 
 
