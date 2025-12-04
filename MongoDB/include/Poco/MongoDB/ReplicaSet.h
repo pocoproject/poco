@@ -90,9 +90,21 @@ public:
 
 		unsigned int connectTimeoutSeconds{10};
 			/// Connection timeout in seconds (default: 10)
+			///
+			/// NOTE: This value is currently unused by ReplicaSet itself. It is intended
+			/// for use by custom SocketFactory implementations. Custom factories can
+			/// access this value via ReplicaSet::configuration() and use it when creating
+			/// sockets. Use ReplicaSet::setSocketFactory() to set a custom factory that
+			/// utilizes this timeout value.
 
 		unsigned int socketTimeoutSeconds{30};
 			/// Socket send/receive timeout in seconds (default: 30)
+			///
+			/// NOTE: This value is currently unused by ReplicaSet itself. It is intended
+			/// for use by custom SocketFactory implementations. Custom factories can
+			/// access this value via ReplicaSet::configuration() and use it when creating
+			/// sockets. Use ReplicaSet::setSocketFactory() to set a custom factory that
+			/// utilizes this timeout value.
 
 		unsigned int heartbeatFrequencySeconds{10};
 			/// Topology monitoring interval in seconds (default: 10)
@@ -107,7 +119,9 @@ public:
 			/// Enable background topology monitoring (default: true)
 
 		Connection::SocketFactory* socketFactory{nullptr};
-			/// Optional socket factory for SSL/TLS connections
+			/// Optional socket factory for SSL/TLS connections.
+			/// Can be set via config or later using setSocketFactory().
+			/// Custom factories can access timeout config via ReplicaSet::configuration().
 
 		Logger::Ptr logger;
 			/// Optional logger to write important information about replica set activity
@@ -173,6 +187,14 @@ public:
 
 	void setLogger(Logger::Ptr logger);
 		/// Sets the logger to log important replica set activity.
+
+	void setSocketFactory(Connection::SocketFactory* factory);
+		/// Sets the socket factory for creating connections.
+		/// The factory can access timeout configuration via configuration().connectTimeoutSeconds
+		/// and configuration().socketTimeoutSeconds.
+		///
+		/// Example:
+		///   rs.setSocketFactory(&myCustomFactory);
 
 	void setReadPreference(const ReadPreference& pref);
 		/// Sets the default read preference.

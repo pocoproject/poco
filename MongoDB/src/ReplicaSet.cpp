@@ -196,6 +196,13 @@ void ReplicaSet::setLogger(Logger::Ptr logger)
 }
 
 
+void ReplicaSet::setSocketFactory(Connection::SocketFactory* factory)
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	_config.socketFactory = factory;
+}
+
+
 void ReplicaSet::setReadPreference(const ReadPreference& pref)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
@@ -290,7 +297,9 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 		if (_config.socketFactory != nullptr)
 		{
 			// Use custom socket factory (e.g., for SSL/TLS)
-			// Note: Socket timeouts should be configured in the SocketFactory
+			// Custom factories can be set via Config or using setSocketFactory().
+			// They can access timeout values via configuration().connectTimeoutSeconds
+			// and configuration().socketTimeoutSeconds to properly configure sockets.
 			conn->connect(address.toString(), *_config.socketFactory);
 		}
 		else
@@ -298,8 +307,8 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 			conn->connect(address);
 		}
 
-		// Note: Socket timeouts are configured via URI or during socket creation
-		// Connection class doesn't expose socket() accessor
+		// Note: Connection class doesn't expose socket() accessor, so socket timeouts
+		// must be configured during socket creation via custom SocketFactory.
 
 		return conn;
 	}
@@ -324,6 +333,8 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 
 		if (_config.socketFactory != nullptr)
 		{
+			// Custom factories can be set via Config or using setSocketFactory().
+			// They can access timeout values via configuration() to configure sockets.
 			conn->connect(address.toString(), *_config.socketFactory);
 		}
 		else
@@ -331,8 +342,8 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 			conn->connect(address);
 		}
 
-		// Note: Socket timeouts are configured via URI or during socket creation
-		// Connection class doesn't expose socket() accessor
+		// Note: Connection class doesn't expose socket() accessor, so socket timeouts
+		// must be configured during socket creation via custom SocketFactory.
 
 		// Send hello command
 		OpMsgMessage request("admin", "");
