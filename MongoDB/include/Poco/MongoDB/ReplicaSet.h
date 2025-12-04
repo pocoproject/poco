@@ -7,7 +7,7 @@
 //
 // Definition of the ReplicaSet class.
 //
-// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,6 +23,7 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Logger.h"
 #include "Poco/Timespan.h"
 #include <vector>
 #include <string>
@@ -97,11 +98,20 @@ public:
 		Poco::Timespan heartbeatFrequency{10, 0};
 			/// Topology monitoring interval (default: 10 seconds)
 
+		std::size_t serverReconnectRetries { 10 };
+			// Number of connection retries to a server/replica set if no server is available temporarily
+
+		std::chrono::seconds serverReconnectDelay { 1 };
+			// Delay between re-connects to a server/replica set if no server is available temporarily
+
 		bool enableMonitoring{true};
 			/// Enable background topology monitoring (default: true)
 
 		Connection::SocketFactory* socketFactory{nullptr};
 			/// Optional socket factory for SSL/TLS connections
+
+		Logger::Ptr logger;
+			/// Optional logger to write important information about replica set activity
 	};
 
 	explicit ReplicaSet(const Config& config);
@@ -145,6 +155,9 @@ public:
 		/// Returns a connection to a secondary server.
 		/// Returns null if no secondary is available.
 
+	[[nodiscard]] Config configuration() const;
+		// Returns a copy of replica set configuration.
+
 	[[nodiscard]] TopologyDescription topology() const;
 		/// Returns a copy of the current topology description.
 
@@ -156,6 +169,9 @@ public:
 
 	void stopMonitoring();
 		/// Stops the background monitoring thread.
+
+	void setLogger(Logger::Ptr logger);
+		/// Sets the logger to log important replica set activity.
 
 	void setReadPreference(const ReadPreference& pref);
 		/// Sets the default read preference.
@@ -173,7 +189,7 @@ private:
 	void discover();
 		/// Performs initial topology discovery from seed servers.
 
-	void monitor();
+	void monitor() noexcept;
 		/// Background monitoring thread function.
 
 	Connection::Ptr selectServer(const ReadPreference& readPref);
@@ -182,10 +198,10 @@ private:
 	Connection::Ptr createConnection(const Net::SocketAddress& address);
 		/// Creates a new connection to the specified address.
 
-	void updateTopologyFromHello(const Net::SocketAddress& address);
+	void updateTopologyFromHello(const Net::SocketAddress& address) noexcept;
 		/// Queries a server with 'hello' command and updates topology.
 
-	void updateTopologyFromAllServers();
+	void updateTopologyFromAllServers() noexcept;
 		/// Queries all known servers and updates topology.
 
 	void parseURI(const std::string& uri);

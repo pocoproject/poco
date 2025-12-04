@@ -7,7 +7,7 @@
 //
 // Definition of the ReplicaSetPoolableConnectionFactory class.
 //
-// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -65,7 +65,7 @@ public:
 		// Check if the connection is still valid and matches the read preference.
 		// This ensures that if a server changes role (e.g., primary becomes secondary),
 		// the cached connection is invalidated and a new one is created.
-		return pObject->isConnected() && pObject->matchesReadPreference();
+		return pObject != nullptr && pObject->isConnected() && pObject->matchesReadPreference();
 	}
 
 	void activateObject(MongoDB::ReplicaSetConnection::Ptr pObject)
@@ -75,7 +75,7 @@ public:
 			try {
 				pObject->reconnect();
 			}
-			catch (Poco::Exception& e)
+			catch (const Poco::Exception& e)
 			{
 				// Ignore connect error. c->isConnected() can be used to determine if the connection is valid.
 			}

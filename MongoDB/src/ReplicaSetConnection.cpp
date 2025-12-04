@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  ReplicaSetConnection
 //
-// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -17,8 +17,9 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Exception.h"
 #include <set>
+#include <thread>
 
-using namespace std::string_literals;
+using namespace std::literals;
 
 
 namespace Poco {
@@ -41,6 +42,9 @@ enum class ErrorCode
 	SocketException = 9001
 };
 
+// Minimum retry count to run the MongoDB command.
+static constexpr std::size_t lowExecuteRetryThreshold { 5 };
+
 
 ReplicaSetConnection::ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref):
 	_replicaSet(replicaSet),
@@ -55,7 +59,6 @@ ReplicaSetConnection::~ReplicaSetConnection() = default;
 void ReplicaSetConnection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
 {
 	executeWithRetry([&]() {
-		ensureConnection();
 		_connection->sendRequest(request, response);
 
 		// Check if response contains a retriable error
@@ -170,9 +173,12 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 	std::exception_ptr lastException;
 	std::set<Net::SocketAddress> triedServers;
 
-	// Retry with different servers until we've tried all available servers
-	TopologyDescription topology = _replicaSet.topology();
-	const std::size_t maxAttempts = topology.serverCount();
+	// Retry with different servers until we've tried all available servers with a minimum
+	// retry threshold to cover situations when single server topology or complete replica set
+	// is not available temporarily.
+	auto topology = _replicaSet.topology();
+	const auto rsConfig = _replicaSet.configuration();
+	const std::size_t maxAttempts = std::max(topology.serverCount(), lowExecuteRetryThreshold);
 	std::size_t attempt = 0;
 
 	while (attempt < maxAttempts)
@@ -182,30 +188,18 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 			ensureConnection();
 			triedServers.insert(_connection->address());
 			operation();
+			if (attempt > 0)
+				logDebug(Poco::format("Operation succeeded after %Lu retries."s, attempt));
+
 			return;  // Success
 		}
-		catch (const Poco::Net::NetException& e)
+		catch (const std::exception& e)
 		{
 			if (!isRetriableError(e))
 			{
-				throw;  // Non-retriable network error
+				throw;
 			}
-			lastException = std::current_exception();
-		}
-		catch (const Poco::TimeoutException& e)
-		{
-			if (!isRetriableError(e))
-			{
-				throw;  // Non-retriable timeout
-			}
-			lastException = std::current_exception();
-		}
-		catch (const Poco::IOException& e)
-		{
-			if (!isRetriableError(e))
-			{
-				throw;  // Non-retriable I/O error
-			}
+			// Retriable error.
 			lastException = std::current_exception();
 		}
 		catch (...)
@@ -221,17 +215,26 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 
 		// Get new connection, avoiding servers we've already tried
 		bool foundNewServer = false;
-		for (std::size_t i = 0; i < 10 && !foundNewServer; ++i)  // Try up to 10 times
+		for (std::size_t i = 0; i < rsConfig.serverReconnectRetries && !foundNewServer; ++i)  // Try several times to connect
 		{
 			Connection::Ptr newConn = _replicaSet.getConnection(_readPreference);
 			if (newConn.isNull())
 			{
-				break;  // No servers available
+				// No servers available at this moment. Wait briefly and retry.
+				std::this_thread::sleep_for(rsConfig.serverReconnectDelay);
+				triedServers.clear();
+				_replicaSet.refreshTopology();
+				topology = _replicaSet.topology();
+				if (!topology.servers().empty())
+					logInfo(Poco::format("Refreshed topology. Number of servers: %Lu"s, topology.servers().size()));
+
+				continue;
 			}
 
 			Net::SocketAddress addr = newConn->address();
 			if (triedServers.find(addr) == triedServers.end())
 			{
+				logDebug(Poco::format("Connection reconnected to server: %s"s, addr.toString()));
 				_connection = newConn;
 				foundNewServer = true;
 			}
@@ -261,30 +264,21 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 bool ReplicaSetConnection::isRetriableError(const std::exception& e)
 {
 	// Network exceptions are generally retriable
-	if (dynamic_cast<const Poco::Net::NetException*>(&e))
+	if (dynamic_cast<const Poco::Net::NetException*>(&e) != nullptr)
 	{
 		return true;
 	}
 
 	// Timeout exceptions are retriable
-	if (dynamic_cast<const Poco::TimeoutException*>(&e))
+	if (dynamic_cast<const Poco::TimeoutException*>(&e) != nullptr)
 	{
 		return true;
 	}
 
-	// I/O exceptions might be retriable
-	const Poco::IOException* ioEx = dynamic_cast<const Poco::IOException*>(&e);
-	if (ioEx)
+	// I/O exceptions are retriable
+	if (dynamic_cast<const Poco::IOException*>(&e) != nullptr)
 	{
-		const auto& msg = ioEx->message();
-		// Check for specific retriable error messages
-		if (msg.find("not master"s) != std::string::npos ||
-			msg.find("NotMaster"s) != std::string::npos ||
-			msg.find("Connection"s) != std::string::npos ||
-			msg.find("connection"s) != std::string::npos)
-		{
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -346,6 +340,24 @@ void ReplicaSetConnection::markServerFailed()
 		// Refresh topology to detect changes
 		_replicaSet.refreshTopology();
 	}
+}
+
+
+void ReplicaSetConnection::logInfo(const std::string& message)
+{
+	auto cfg { _replicaSet.configuration() };
+	if (cfg.logger == nullptr) return;
+
+	cfg.logger->information("MongoDB replica set: "s + message);
+}
+
+
+void ReplicaSetConnection::logDebug(const std::string& message)
+{
+	auto cfg { _replicaSet.configuration() };
+	if (cfg.logger == nullptr) return;
+
+	cfg.logger->debug("MongoDB replica set: "s + message);
 }
 
 

@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  ReadPreference
 //
-// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0

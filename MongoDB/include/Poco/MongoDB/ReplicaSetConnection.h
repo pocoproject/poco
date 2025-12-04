@@ -7,7 +7,7 @@
 //
 // Definition of the ReplicaSetConnection class.
 //
-// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -120,6 +120,9 @@ private:
 
 	void markServerFailed();
 		/// Marks the current server as failed in the topology.
+
+	void logInfo(const std::string& message);
+	void logDebug(const std::string& message);
 
 	ReplicaSet& _replicaSet;
 	ReadPreference _readPreference;

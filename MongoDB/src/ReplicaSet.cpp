@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  ReplicaSet
 //
-// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -146,6 +146,12 @@ TopologyDescription ReplicaSet::topology() const
 }
 
 
+ReplicaSet::Config ReplicaSet::configuration() const
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	return _config;
+}
+
 void ReplicaSet::refreshTopology()
 {
 	updateTopologyFromAllServers();
@@ -180,6 +186,13 @@ void ReplicaSet::stopMonitoring()
 	}
 
 	_monitoringActive.store(false);
+}
+
+
+void ReplicaSet::setLogger(Logger::Ptr logger)
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	_config.logger = logger;
 }
 
 
@@ -238,7 +251,7 @@ void ReplicaSet::discover()
 }
 
 
-void ReplicaSet::monitor()
+void ReplicaSet::monitor() noexcept
 {
 	while (!_stopMonitoring.load())
 	{
@@ -328,7 +341,7 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 }
 
 
-void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
+void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noexcept
 {
 	Connection::Ptr conn = new Connection();
 
@@ -397,7 +410,7 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 }
 
 
-void ReplicaSet::updateTopologyFromAllServers()
+void ReplicaSet::updateTopologyFromAllServers() noexcept
 {
 	std::vector<ServerDescription> servers;
 
