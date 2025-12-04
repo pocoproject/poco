@@ -239,9 +239,8 @@ void ReplicaSet::monitor() noexcept
 		}
 
 		// Sleep for heartbeat frequency
-		auto sleepMs = _config.heartbeatFrequency.totalMilliseconds();
 		auto sleepUntil = std::chrono::steady_clock::now() +
-			std::chrono::milliseconds(sleepMs);
+			std::chrono::seconds(_config.heartbeatFrequencySeconds);
 
 		// Check stop flag periodically during sleep
 		while (std::chrono::steady_clock::now() < sleepUntil)
@@ -507,17 +506,24 @@ void ReplicaSet::parseURI(const std::string& uri)
 		else if (param.first == "connectTimeoutMS"s)
 		{
 			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
-			_config.connectTimeout = Poco::Timespan(timeoutMs * 1000);  // Convert ms to microseconds
+			_config.connectTimeoutSeconds = static_cast<unsigned int>((timeoutMs + 999) / 1000);  // Convert ms to seconds (round up)
 		}
 		else if (param.first == "socketTimeoutMS"s)
 		{
 			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
-			_config.socketTimeout = Poco::Timespan(timeoutMs * 1000);  // Convert ms to microseconds
+			_config.socketTimeoutSeconds = static_cast<unsigned int>((timeoutMs + 999) / 1000);  // Convert ms to seconds (round up)
 		}
-		else if (param.first == "heartbeatFrequencyMS"s)
+		else if (param.first == "heartbeatFrequency"s)
 		{
-			Poco::Int64 freqMs = Poco::NumberParser::parse64(param.second);
-			_config.heartbeatFrequency = Poco::Timespan(freqMs * 1000);  // Convert ms to microseconds
+			_config.heartbeatFrequencySeconds = Poco::NumberParser::parseUnsigned(param.second);
+		}
+		else if (param.first == "reconnectRetries"s)
+		{
+			_config.serverReconnectRetries = Poco::NumberParser::parseUnsigned(param.second);
+		}
+		else if (param.first == "reconnectDelay"s)
+		{
+			_config.serverReconnectDelaySeconds = Poco::NumberParser::parseUnsigned(param.second);
 		}
 		// Note: readPreferenceTags and maxStalenessSeconds would require more complex parsing
 		// and are not commonly used, so we skip them for now

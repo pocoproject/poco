@@ -221,7 +221,7 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 			if (newConn.isNull())
 			{
 				// No servers available at this moment. Wait briefly and retry.
-				std::this_thread::sleep_for(rsConfig.serverReconnectDelay);
+				std::this_thread::sleep_for(std::chrono::seconds(rsConfig.serverReconnectDelaySeconds));
 				triedServers.clear();
 				_replicaSet.refreshTopology();
 				topology = _replicaSet.topology();

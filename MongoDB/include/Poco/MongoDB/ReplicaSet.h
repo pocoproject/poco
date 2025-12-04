@@ -24,7 +24,6 @@
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Logger.h"
-#include "Poco/Timespan.h"
 #include <vector>
 #include <string>
 #include <thread>
@@ -89,20 +88,20 @@ public:
 		ReadPreference readPreference{ReadPreference::Primary};
 			/// Default read preference for this replica set.
 
-		Poco::Timespan connectTimeout{10, 0};
-			/// Connection timeout (default: 10 seconds)
+		unsigned int connectTimeoutSeconds{10};
+			/// Connection timeout in seconds (default: 10)
 
-		Poco::Timespan socketTimeout{30, 0};
-			/// Socket send/receive timeout (default: 30 seconds)
+		unsigned int socketTimeoutSeconds{30};
+			/// Socket send/receive timeout in seconds (default: 30)
 
-		Poco::Timespan heartbeatFrequency{10, 0};
-			/// Topology monitoring interval (default: 10 seconds)
+		unsigned int heartbeatFrequencySeconds{10};
+			/// Topology monitoring interval in seconds (default: 10)
 
-		std::size_t serverReconnectRetries { 10 };
-			// Number of connection retries to a server/replica set if no server is available temporarily
+		std::size_t serverReconnectRetries{10};
+			/// Number of connection retries to a server/replica set if no server is available temporarily
 
-		std::chrono::seconds serverReconnectDelay { 1 };
-			// Delay between re-connects to a server/replica set if no server is available temporarily
+		unsigned int serverReconnectDelaySeconds{1};
+			/// Delay in seconds between re-connects to a server/replica set if no server is available temporarily
 
 		bool enableMonitoring{true};
 			/// Enable background topology monitoring (default: true)
@@ -133,7 +132,9 @@ public:
 		///   - readPreference=mode      - primary|primaryPreferred|secondary|secondaryPreferred|nearest
 		///   - connectTimeoutMS=ms      - Connection timeout in milliseconds
 		///   - socketTimeoutMS=ms       - Socket timeout in milliseconds
-		///   - heartbeatFrequencyMS=ms  - Heartbeat frequency in milliseconds
+		///   - heartbeatFrequency=sec   - Heartbeat frequency in seconds (default: 10)
+		///   - reconnectRetries=n       - Number of reconnection retries (default: 10)
+		///   - reconnectDelay=seconds   - Delay between reconnection attempts in seconds (default: 1)
 		///
 		/// Example: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0&readPreference=primaryPreferred
 		///
