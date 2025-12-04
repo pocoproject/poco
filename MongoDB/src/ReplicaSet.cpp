@@ -48,7 +48,7 @@ ReplicaSet::ReplicaSet(const Config& config):
 	}
 
 	// Perform initial discovery
-	discover();
+	updateTopologyFromAllServers();
 
 	// Start monitoring if enabled
 	if (_config.enableMonitoring)
@@ -75,7 +75,7 @@ ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress>& seeds):
 	}
 
 	// Perform initial discovery
-	discover();
+	updateTopologyFromAllServers();
 
 	// Start monitoring if enabled
 	if (_config.enableMonitoring)
@@ -105,7 +105,7 @@ ReplicaSet::ReplicaSet(const std::string& uri)
 	}
 
 	// Perform initial discovery
-	discover();
+	updateTopologyFromAllServers();
 
 	// Start monitoring if enabled
 	if (_config.enableMonitoring)
@@ -221,33 +221,6 @@ bool ReplicaSet::hasPrimary() const
 {
 	std::lock_guard<std::mutex> lock(_mutex);
 	return _topology.hasPrimary();
-}
-
-
-void ReplicaSet::discover()
-{
-	// Try to discover topology from seed servers
-	bool discovered = false;
-
-	const auto servers = _topology.servers();
-	for (const auto& server : servers)
-	{
-		try
-		{
-			updateTopologyFromHello(server.address());
-			discovered = true;
-			break;  // Successfully discovered from at least one server
-		}
-		catch (...)
-		{
-			// Continue to next server
-		}
-	}
-
-	if (!discovered)
-	{
-		throw Poco::IOException("Failed to discover replica set topology from any seed server");
-	}
 }
 
 

@@ -28,8 +28,12 @@ namespace MongoDB {
 class ReplicaSetConnection;
 
 class MongoDB_API OpMsgCursor: public Document
-	/// OpMsgCursor is an helper class for querying multiple documents using OpMsgMessage.
+	/// OpMsgCursor is a helper class for querying multiple documents using OpMsgMessage.
 	/// Once all of the data is read with the cursor (see isActive()) it can't be reused.
+	///
+	/// USAGE:
+	/// Supports both Connection and ReplicaSetConnection. When using ReplicaSetConnection,
+	/// cursor operations benefit from automatic retry and failover on retriable errors.
 	///
 	/// RESOURCE MANAGEMENT:
 	/// When a cursor is no longer needed, you should call kill() to release server-side
@@ -82,10 +86,12 @@ public:
 		/// Returns the associated query.
 
 	void kill(Connection& connection);
-		/// Kills the cursor and reset it so that it can be reused.
+		/// Kills the cursor and resets its internal state.
+		/// Call this method when you don't need all documents to release server resources.
 
 	void kill(ReplicaSetConnection& connection);
-		/// Kills the cursor and reset it so that it can be reused.
+		/// Kills the cursor and resets its internal state.
+		/// Call this method when you don't need all documents to release server resources.
 		///
 		/// This overload provides automatic retry and failover for replica set deployments.
 

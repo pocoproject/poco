@@ -122,7 +122,10 @@ private:
 		/// Marks the current server as failed in the topology.
 
 	void logInfo(const std::string& message);
+		/// Logs an informational message using the replica set's logger if configured.
+
 	void logDebug(const std::string& message);
+		/// Logs a debug message using the replica set's logger if configured.
 
 	ReplicaSet& _replicaSet;
 	ReadPreference _readPreference;

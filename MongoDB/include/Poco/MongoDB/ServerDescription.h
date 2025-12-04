@@ -34,7 +34,7 @@ class MongoDB_API ServerDescription
 	/// Represents the state of a single MongoDB server in a replica set.
 	///
 	/// This class stores metadata about a MongoDB server obtained from
-	/// the 'hello' or legacy 'isMaster' command response, including:
+	/// the 'hello' command response (requires MongoDB 5.1 or later), including:
 	/// - Server type (primary, secondary, arbiter, etc.)
 	/// - Replica set membership information
 	/// - Round-trip time for server selection

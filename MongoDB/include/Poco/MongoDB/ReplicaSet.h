@@ -186,9 +186,6 @@ public:
 		/// Returns true if a primary server is known.
 
 private:
-	void discover();
-		/// Performs initial topology discovery from seed servers.
-
 	void monitor() noexcept;
 		/// Background monitoring thread function.
 
