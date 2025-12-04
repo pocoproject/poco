@@ -176,7 +176,7 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 	// Retry with different servers until we've tried all available servers with a minimum
 	// retry threshold to cover situations when single server topology or complete replica set
 	// is not available temporarily.
-	auto topology = _replicaSet.topology();
+	const auto topology = _replicaSet.topology();
 	const auto rsConfig = _replicaSet.configuration();
 	const std::size_t maxAttempts = std::max(topology.serverCount(), lowExecuteRetryThreshold);
 	std::size_t attempt = 0;
@@ -224,9 +224,6 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 				std::this_thread::sleep_for(std::chrono::seconds(rsConfig.serverReconnectDelaySeconds));
 				triedServers.clear();
 				_replicaSet.refreshTopology();
-				topology = _replicaSet.topology();
-				if (!topology.servers().empty())
-					logInfo(Poco::format("Refreshed topology. Number of servers: %Lu"s, topology.servers().size()));
 
 				continue;
 			}

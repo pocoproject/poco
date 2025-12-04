@@ -154,7 +154,130 @@ ReplicaSet::Config ReplicaSet::configuration() const
 
 void ReplicaSet::refreshTopology()
 {
+	// Capture current topology before refresh
+	TopologyDescription oldTopology;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		oldTopology = _topology;
+	}
+
+	// Update topology from all servers
 	updateTopologyFromAllServers();
+
+	// Check if logger is registered before building log messages
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		if (_config.logger == nullptr)
+		{
+			// No logger registered, skip message preparation
+			return;
+		}
+	}
+
+	// Get new topology and compare using comparison operator
+	TopologyDescription newTopology;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		newTopology = _topology;
+	}
+
+	// Check if topology changed using comparison operator
+	if (oldTopology == newTopology)
+	{
+		// No change detected, nothing to log
+		return;
+	}
+
+	// Topology changed and logger is registered - build detailed change description for logging
+
+	std::lock_guard<std::mutex> lock(_mutex);
+
+	_config.logger->information("MongoDB replica set: ** Topology changed: ");
+
+	// Compare topology type
+	if (oldTopology.type() != newTopology.type())
+	{
+		std::string changeDescription =
+			" Type changed from " + TopologyDescription::typeToString(oldTopology.type()) +
+			" to " + TopologyDescription::typeToString(newTopology.type());
+
+		_config.logger->information("MongoDB replica set: " + changeDescription);
+	}
+
+	// Compare primary server
+	auto oldPrimary = oldTopology.findPrimary();
+	auto newPrimary = newTopology.findPrimary();
+	bool oldHadPrimary = oldPrimary.type() != ServerDescription::Unknown;
+	bool newHasPrimary = newPrimary.type() != ServerDescription::Unknown;
+
+	if (oldHadPrimary != newHasPrimary)
+	{
+		std::string changeDescription;
+		if (newHasPrimary)
+			changeDescription += " Primary elected: " + newPrimary.address().toString();
+		else
+			changeDescription += " Primary lost: " + oldPrimary.address().toString();
+
+		_config.logger->information("MongoDB replica set: " + changeDescription);
+	}
+	else if (oldHadPrimary && newHasPrimary && oldPrimary != newPrimary)
+	{
+		std::string changeDescription =
+			" Primary changed from " + oldPrimary.address().toString() +
+			" to " + newPrimary.address().toString();
+
+		_config.logger->information("MongoDB replica set: " + changeDescription);
+	}
+
+	// Compare server count
+	if (oldTopology.serverCount() != newTopology.serverCount())
+	{
+		std::string changeDescription =
+			" Server count changed from " + std::to_string(oldTopology.serverCount()) +
+			" to " + std::to_string(newTopology.serverCount()) + "; ";
+
+		_config.logger->information("MongoDB replica set: " + changeDescription);
+	}
+
+	// Compare server states using comparison operator
+	auto oldServers = oldTopology.servers();
+	auto newServers = newTopology.servers();
+	for (const auto& newServer : newServers)
+	{
+		for (const auto& oldServer : oldServers)
+		{
+			if (newServer.address() == oldServer.address())
+			{
+				if (newServer != oldServer)
+				{
+					std::string changeDescription =
+						" Server " + newServer.address().toString() +
+						" changed from " + ServerDescription::typeToString(oldServer.type()) +
+						" to " + ServerDescription::typeToString(newServer.type());
+
+					_config.logger->information("MongoDB replica set: " + changeDescription);
+				}
+				break;
+			}
+		}
+	}
+
+	_config.logger->information("MongoDB replica set: Current topology: total servers: " + std::to_string(newTopology.serverCount()) );
+	if (newTopology.hasPrimary())
+		_config.logger->information("MongoDB replica set:  PRIMARY: " + newPrimary.address().toString());
+
+	auto secondaries = newTopology.findSecondaries();
+	if (!secondaries.empty())
+	{
+		std::string logMessage = " SECONDARIES=[";
+		for (size_t i = 0; i < secondaries.size(); ++i)
+		{
+			if (i > 0) logMessage += ", ";
+			logMessage += secondaries[i].address().toString();
+		}
+		logMessage += "]";
+		_config.logger->information("MongoDB replica set: " + logMessage);
+	}
 }
 
 

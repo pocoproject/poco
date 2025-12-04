@@ -79,6 +79,13 @@ public:
 	ServerDescription& operator=(ServerDescription&& other) noexcept;
 		/// Move assignment operator.
 
+	bool operator==(const ServerDescription& other) const;
+		/// Equality comparison operator.
+		/// Compares type, address, setName, and error state.
+
+	bool operator!=(const ServerDescription& other) const;
+		/// Inequality comparison operator.
+
 	[[nodiscard]] ServerType type() const;
 		/// Returns the server type.
 
@@ -133,6 +140,11 @@ public:
 
 	void reset();
 		/// Resets the server description to Unknown state.
+
+	[[nodiscard]] static std::string typeToString(ServerType type);
+		/// Converts a server type enum to a human-readable string.
+		/// Returns "PRIMARY", "SECONDARY", "ARBITER", "STANDALONE",
+		/// "MONGOS", "OTHER", "GHOST", or "UNKNOWN".
 
 private:
 	void parseServerType(const Document& doc);

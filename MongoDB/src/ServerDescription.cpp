@@ -46,6 +46,21 @@ ServerDescription& ServerDescription::operator=(const ServerDescription& other) 
 ServerDescription& ServerDescription::operator=(ServerDescription&& other) noexcept = default;
 
 
+bool ServerDescription::operator==(const ServerDescription& other) const
+{
+	return _type == other._type &&
+	       _address == other._address &&
+	       _setName == other._setName &&
+	       _hasError == other._hasError;
+}
+
+
+bool ServerDescription::operator!=(const ServerDescription& other) const
+{
+	return !(*this == other);
+}
+
+
 std::vector<Net::SocketAddress> ServerDescription::updateFromHelloResponse(const Document& helloResponse, Poco::Int64 rttMicros)
 {
 	_lastUpdateTime.update();
@@ -207,6 +222,31 @@ void ServerDescription::parseTags(const Document& doc)
 		{
 			_tags = *tagsDoc;
 		}
+	}
+}
+
+
+std::string ServerDescription::typeToString(ServerType type)
+{
+	switch (type)
+	{
+	case RsPrimary:
+		return "PRIMARY"s;
+	case RsSecondary:
+		return "SECONDARY"s;
+	case RsArbiter:
+		return "ARBITER"s;
+	case Standalone:
+		return "STANDALONE"s;
+	case Mongos:
+		return "MONGOS"s;
+	case RsOther:
+		return "OTHER"s;
+	case RsGhost:
+		return "GHOST"s;
+	case Unknown:
+	default:
+		return "UNKNOWN"s;
 	}
 }
 

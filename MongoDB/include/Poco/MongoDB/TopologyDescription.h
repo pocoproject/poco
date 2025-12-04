@@ -83,6 +83,13 @@ public:
 	TopologyDescription& operator=(TopologyDescription&& other) noexcept;
 		/// Move assignment operator.
 
+	bool operator==(const TopologyDescription& other) const;
+		/// Equality comparison operator.
+		/// Compares topology type, set name, and all servers.
+
+	bool operator!=(const TopologyDescription& other) const;
+		/// Inequality comparison operator.
+
 	[[nodiscard]] TopologyType type() const;
 		/// Returns the current topology type.
 
@@ -135,6 +142,11 @@ public:
 
 	[[nodiscard]] std::size_t serverCount() const;
 		/// Returns the number of servers in the topology.
+
+	[[nodiscard]] static std::string typeToString(TopologyType type);
+		/// Converts a topology type enum to a human-readable string.
+		/// Returns "Unknown", "Single Server", "Replica Set (with Primary)",
+		/// "Replica Set (no Primary)", or "Sharded Cluster".
 
 private:
 	void updateTopologyType();

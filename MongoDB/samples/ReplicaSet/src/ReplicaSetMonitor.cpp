@@ -135,48 +135,6 @@ void printUsage()
 }
 
 
-std::string getServerTypeString(ServerDescription::ServerType type)
-{
-	switch (type)
-	{
-	case ServerDescription::RsPrimary:
-		return "PRIMARY";
-	case ServerDescription::RsSecondary:
-		return "SECONDARY";
-	case ServerDescription::RsArbiter:
-		return "ARBITER";
-	case ServerDescription::Standalone:
-		return "STANDALONE";
-	case ServerDescription::Mongos:
-		return "MONGOS";
-	case ServerDescription::RsOther:
-		return "OTHER";
-	case ServerDescription::RsGhost:
-		return "GHOST";
-	case ServerDescription::Unknown:
-	default:
-		return "UNKNOWN";
-	}
-}
-
-
-std::string getTopologyTypeString(TopologyDescription::TopologyType type)
-{
-	switch (type)
-	{
-	case TopologyDescription::Single:
-		return "Single Server";
-	case TopologyDescription::ReplicaSetWithPrimary:
-		return "Replica Set (with Primary)";
-	case TopologyDescription::ReplicaSetNoPrimary:
-		return "Replica Set (no Primary)";
-	case TopologyDescription::Sharded:
-		return "Sharded Cluster";
-	case TopologyDescription::Unknown:
-	default:
-		return "Unknown";
-	}
-}
 
 
 void printTopology(const TopologyDescription& topology, bool detailed = false)
@@ -186,7 +144,7 @@ void printTopology(const TopologyDescription& topology, bool detailed = false)
 	std::cout << std::string(80, '=') << std::endl;
 
 	std::cout << "Replica Set: " << (topology.setName().empty() ? "(not set)" : topology.setName()) << std::endl;
-	std::cout << "Type:        " << getTopologyTypeString(topology.type()) << std::endl;
+	std::cout << "Type:        " << TopologyDescription::typeToString(topology.type()) << std::endl;
 	std::cout << "Has Primary: " << (topology.hasPrimary() ? "Yes" : "No") << std::endl;
 	std::cout << std::endl;
 
@@ -218,7 +176,7 @@ void printTopology(const TopologyDescription& topology, bool detailed = false)
 	auto printServer = [&](const ServerDescription& server) {
 		std::cout << std::left
 		          << std::setw(30) << server.address().toString()
-		          << std::setw(12) << getServerTypeString(server.type())
+		          << std::setw(12) << ServerDescription::typeToString(server.type())
 		          << std::setw(10) << std::fixed << std::setprecision(2) << (server.roundTripTime() / 1000.0);
 
 		if (server.hasError())

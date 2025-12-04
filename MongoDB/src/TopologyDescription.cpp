@@ -79,6 +79,43 @@ TopologyDescription& TopologyDescription::operator=(TopologyDescription&& other)
 }
 
 
+bool TopologyDescription::operator==(const TopologyDescription& other) const
+{
+	std::scoped_lock lock(_mutex, other._mutex);
+
+	// Compare topology type
+	if (_type != other._type)
+		return false;
+
+	// Compare set name
+	if (_setName != other._setName)
+		return false;
+
+	// Compare servers map
+	if (_servers.size() != other._servers.size())
+		return false;
+
+	// Compare each server
+	for (const auto& [address, server] : _servers)
+	{
+		auto it = other._servers.find(address);
+		if (it == other._servers.end())
+			return false;
+
+		if (server != it->second)
+			return false;
+	}
+
+	return true;
+}
+
+
+bool TopologyDescription::operator!=(const TopologyDescription& other) const
+{
+	return !(*this == other);
+}
+
+
 TopologyDescription::TopologyType TopologyDescription::type() const
 {
 	std::lock_guard<std::mutex> lock(_mutex);
@@ -329,6 +366,25 @@ void TopologyDescription::processNewHosts(const std::vector<Net::SocketAddress>&
 	for (const auto& host : hosts)
 	{
 		_servers.try_emplace(host, host);
+	}
+}
+
+
+std::string TopologyDescription::typeToString(TopologyType type)
+{
+	switch (type)
+	{
+	case Single:
+		return "Single Server"s;
+	case ReplicaSetWithPrimary:
+		return "Replica Set (with Primary)"s;
+	case ReplicaSetNoPrimary:
+		return "Replica Set (no Primary)"s;
+	case Sharded:
+		return "Sharded Cluster"s;
+	case Unknown:
+	default:
+		return "Unknown"s;
 	}
 }
 
