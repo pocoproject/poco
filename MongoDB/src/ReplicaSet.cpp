@@ -192,87 +192,9 @@ ReplicaSet::Config ReplicaSet::configuration() const
 
 void ReplicaSet::refreshTopology()
 {
-	// Capture current topology before refresh
-	TopologyDescription oldTopology;
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		oldTopology = _topology;
-	}
-
-	// Update topology from all servers
+	// Simply delegate to updateTopologyFromAllServers which handles
+	// change detection and notification sending
 	updateTopologyFromAllServers();
-
-	// Get new topology and compare using comparison operator
-	TopologyDescription newTopology;
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		newTopology = _topology;
-	}
-
-	// Check if topology changed using comparison operator
-	if (oldTopology == newTopology)
-	{
-		// No change detected, nothing to log or notify
-		return;
-	}
-
-	// Topology changed - build brief change description
-	// Note: Build notification data outside mutex to allow handlers to access ReplicaSet methods
-	std::string changeDescription;
-
-	// Check topology type change
-	if (oldTopology.type() != newTopology.type())
-	{
-		changeDescription = "Type: " + TopologyDescription::typeToString(oldTopology.type()) +
-			" -> " + TopologyDescription::typeToString(newTopology.type());
-	}
-
-	// Check primary change
-	auto oldPrimary = oldTopology.findPrimary();
-	auto newPrimary = newTopology.findPrimary();
-	bool oldHadPrimary = oldPrimary.type() != ServerDescription::Unknown;
-	bool newHasPrimary = newPrimary.type() != ServerDescription::Unknown;
-
-	if (oldHadPrimary != newHasPrimary)
-	{
-		if (!changeDescription.empty()) changeDescription += "; ";
-		if (newHasPrimary)
-			changeDescription += "Primary elected: " + newPrimary.address().toString();
-		else
-			changeDescription += "Primary lost: " + oldPrimary.address().toString();
-	}
-	else if (oldHadPrimary && newHasPrimary && oldPrimary != newPrimary)
-	{
-		if (!changeDescription.empty()) changeDescription += "; ";
-		changeDescription += "Primary: " + oldPrimary.address().toString() +
-			" -> " + newPrimary.address().toString();
-	}
-
-	// Check server count change
-	if (oldTopology.serverCount() != newTopology.serverCount())
-	{
-		if (!changeDescription.empty()) changeDescription += "; ";
-		changeDescription += "Servers: " + std::to_string(oldTopology.serverCount()) +
-			" -> " + std::to_string(newTopology.serverCount());
-	}
-
-	// If no specific changes identified, use generic message
-	if (changeDescription.empty())
-	{
-		changeDescription = "Topology updated";
-	}
-
-	// Send notification outside mutex to allow handlers to access ReplicaSet methods
-	Poco::DynamicStruct notificationData;
-	notificationData["replicaSet"s] = newTopology.setName();
-	notificationData["timestamp"s] =
-		std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now().time_since_epoch() ).count();
-	notificationData["topologyType"s] = TopologyDescription::typeToString(newTopology.type());
-	notificationData["changeDescription"s] = changeDescription;
-
-	Poco::NotificationCenter::defaultCenter().postNotification(
-		new TopologyChangeNotification(notificationData)
-	);
 }
 
 
@@ -506,10 +428,13 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 
 void ReplicaSet::updateTopologyFromAllServers() noexcept
 {
+	// Capture current topology before refresh
+	TopologyDescription oldTopology;
 	std::vector<ServerDescription> servers;
 
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
+		oldTopology = _topology;
 		servers = _topology.servers();
 	}
 
@@ -530,8 +455,81 @@ void ReplicaSet::updateTopologyFromAllServers() noexcept
 			// Continue to next server
 		}
 	}
+
 	// Update timestamp after refreshing topology
 	_topologyRefreshTime = std::chrono::steady_clock::now();
+
+	// Get new topology and compare using comparison operator
+	TopologyDescription newTopology;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		newTopology = _topology;
+	}
+
+	// Check if topology changed using comparison operator
+	if (oldTopology == newTopology)
+	{
+		// No change detected, nothing to notify
+		return;
+	}
+
+	// Topology changed - build brief change description
+	// Note: Build notification data outside mutex to allow handlers to access ReplicaSet methods
+	std::string changeDescription;
+
+	// Check topology type change
+	if (oldTopology.type() != newTopology.type())
+	{
+		changeDescription = "Type: " + TopologyDescription::typeToString(oldTopology.type()) +
+			" -> " + TopologyDescription::typeToString(newTopology.type());
+	}
+
+	// Check primary change
+	auto oldPrimary = oldTopology.findPrimary();
+	auto newPrimary = newTopology.findPrimary();
+	bool oldHadPrimary = oldPrimary.type() != ServerDescription::Unknown;
+	bool newHasPrimary = newPrimary.type() != ServerDescription::Unknown;
+
+	if (oldHadPrimary != newHasPrimary)
+	{
+		if (!changeDescription.empty()) changeDescription += "; ";
+		if (newHasPrimary)
+			changeDescription += "Primary elected: " + newPrimary.address().toString();
+		else
+			changeDescription += "Primary lost: " + oldPrimary.address().toString();
+	}
+	else if (oldHadPrimary && newHasPrimary && oldPrimary != newPrimary)
+	{
+		if (!changeDescription.empty()) changeDescription += "; ";
+		changeDescription += "Primary: " + oldPrimary.address().toString() +
+			" -> " + newPrimary.address().toString();
+	}
+
+	// Check server count change
+	if (oldTopology.serverCount() != newTopology.serverCount())
+	{
+		if (!changeDescription.empty()) changeDescription += "; ";
+		changeDescription += "Servers: " + std::to_string(oldTopology.serverCount()) +
+			" -> " + std::to_string(newTopology.serverCount());
+	}
+
+	// If no specific changes identified, use generic message
+	if (changeDescription.empty())
+	{
+		changeDescription = "Topology updated";
+	}
+
+	// Send notification outside mutex to allow handlers to access ReplicaSet methods
+	Poco::DynamicStruct notificationData;
+	notificationData["replicaSet"s] = newTopology.setName();
+	notificationData["timestamp"s] =
+		std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now().time_since_epoch() ).count();
+	notificationData["topologyType"s] = TopologyDescription::typeToString(newTopology.type());
+	notificationData["changeDescription"s] = changeDescription;
+
+	Poco::NotificationCenter::defaultCenter().postNotification(
+		new TopologyChangeNotification(notificationData)
+	);
 }
 
 

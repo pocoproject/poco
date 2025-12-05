@@ -36,27 +36,46 @@ class MongoDB_API TopologyChangeNotification : public Notification
 	///
 	/// The notification contains a Dynamic::Struct with the following members:
 	/// - replicaSet (std::string): The replica set name
-	/// - timestamp (Poco::Int64): Timestamp in seconds since epoch
+	/// - timestamp (Poco::Int64): Timestamp in seconds since Unix epoch
 	/// - topologyType (std::string): Human-readable topology type
 	///   (e.g., "Replica Set (with Primary)", "Single Server", etc.)
+	/// - changeDescription (std::string): Brief description of what changed
+	///   (e.g., "Primary elected: mongo1:27017", "Servers: 2 -> 3")
 	///
 	/// Example usage:
-	///     void MyClass::handleTopologyChange(const AutoPtr<TopologyChangeNotification>& pNf)
+	///     class MyClass
 	///     {
-	///         const auto& data = pNf->data();
+	///     public:
+	///         MyClass()
+	///         {
+	///             // Register observer
+	///             NotificationCenter::defaultCenter().addNObserver(
+	///                 *this,
+	///                 &MyClass::handleTopologyChange
+	///             );
+	///         }
 	///
-	///         std::string rsName = data["replicaSet"];
-	///         Poco::Int64 timestamp = data["timestamp"];
-	///         std::string topologyType = data["topologyType"];
+	///         ~MyClass()
+	///         {
+	///             // Unregister observer
+	///             NotificationCenter::defaultCenter().removeNObserver(
+	///                 *this,
+	///                 &MyClass::handleTopologyChange
+	///             );
+	///         }
 	///
-	///         // Handle topology change...
-	///     }
+	///         void handleTopologyChange(const AutoPtr<TopologyChangeNotification>& pNf)
+	///         {
+	///             const auto& data = pNf->data();
 	///
-	///     // Register observer using NObserver:
-	///     NotificationCenter::defaultCenter().addNObserver(
-	///         *this,
-	///         &MyClass::handleTopologyChange
-	///     );
+	///             std::string rsName = data["replicaSet"];
+	///             Poco::Int64 timestamp = data["timestamp"];
+	///             std::string topologyType = data["topologyType"];
+	///             std::string changeDesc = data["changeDescription"];
+	///
+	///             // Handle topology change...
+	///         }
+	///     };
 {
 public:
 	using Ptr = AutoPtr<TopologyChangeNotification>;
