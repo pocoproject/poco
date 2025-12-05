@@ -1,6 +1,18 @@
 # MongoDB Replica Set Examples
 
-This directory contains examples demonstrating Poco::MongoDB replica set support.
+This directory contains comprehensive examples demonstrating Poco::MongoDB replica set support with automatic failover, read preferences, and connection pooling.
+
+**Minimum MongoDB Version**: MongoDB 5.1 or later (for replica set features)
+
+## Examples Overview
+
+| Sample | Description |
+|--------|-------------|
+| **ReplicaSetMonitor** | Production-ready monitoring tool for deployment verification and continuous health monitoring |
+| **ReplicaSet** | Feature demonstrations with multiple commands (basic, readpref, failover, pool, topology) |
+| **URIExample** | MongoDB URI parsing and connection demonstration |
+
+---
 
 ## ReplicaSetMonitor - Deployment Health Check Tool
 
@@ -271,16 +283,18 @@ Demonstrates MongoDB URI parsing and connection to replica sets.
 ./URIExample 'mongodb://mongo1:27017,mongo2:27017/?replicaSet=rs0&readPreference=primaryPreferred'
 
 # With custom timeouts and heartbeat
-./URIExample 'mongodb://host1:27017,host2:27017/?replicaSet=rs0&connectTimeoutMS=5000&socketTimeoutMS=30000&heartbeatFrequencyMS=5000'
+./URIExample 'mongodb://host1:27017,host2:27017/?replicaSet=rs0&connectTimeoutMS=5000&socketTimeoutMS=30000&heartbeatFrequency=5'
 ```
 
 ### Supported URI Options
 
 - `replicaSet=name` - Replica set name
 - `readPreference=mode` - Read preference (primary|primaryPreferred|secondary|secondaryPreferred|nearest)
-- `connectTimeoutMS=ms` - Connection timeout in milliseconds
-- `socketTimeoutMS=ms` - Socket timeout in milliseconds
-- `heartbeatFrequencyMS=ms` - Heartbeat frequency in milliseconds
+- `connectTimeoutMS=ms` - Connection timeout in milliseconds (for custom SocketFactory implementations)
+- `socketTimeoutMS=ms` - Socket timeout in milliseconds (for custom SocketFactory implementations)
+- `heartbeatFrequency=seconds` - Heartbeat frequency in seconds (default: 10)
+- `reconnectRetries=n` - Number of reconnection retries (default: 10)
+- `reconnectDelay=seconds` - Delay between reconnection attempts in seconds (default: 1)
 
 ### Example Output
 
@@ -388,7 +402,7 @@ ReadPreference pref(ReadPreference::Nearest, tags);
 
 ```cpp
 ReplicaSet::Config config;
-config.heartbeatFrequency = Poco::Timespan(30, 0);  // 30 seconds
+config.heartbeatFrequencySeconds = 30;  // 30 seconds (default: 10)
 ```
 
 ### Disable Background Monitoring
@@ -396,6 +410,14 @@ config.heartbeatFrequency = Poco::Timespan(30, 0);  // 30 seconds
 ```cpp
 ReplicaSet::Config config;
 config.enableMonitoring = false;  // Manual topology refresh only
+```
+
+### Custom Reconnection Settings
+
+```cpp
+ReplicaSet::Config config;
+config.serverReconnectRetries = 5;         // Number of retries (default: 10)
+config.serverReconnectDelaySeconds = 2;    // Delay between retries in seconds (default: 1)
 ```
 
 ---

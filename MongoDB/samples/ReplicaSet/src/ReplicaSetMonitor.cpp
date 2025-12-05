@@ -321,7 +321,7 @@ void runMonitor(const MonitorConfig& config)
 			rsConfig.seeds = config.seeds;
 			rsConfig.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
 			rsConfig.enableMonitoring = true;
-			rsConfig.heartbeatFrequency = Poco::Timespan(5, 0);  // 5 seconds
+			rsConfig.heartbeatFrequencySeconds = 5;  // 5 seconds
 
 			std::cout << "Connecting to replica set: " << config.setName << std::endl;
 			std::cout << "Seed servers: ";

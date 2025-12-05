@@ -364,7 +364,7 @@ void topologyExample()
 		ReplicaSet::Config config;
 		config.setName = setName;
 		config.seeds = parseHosts(hostsStr);
-		config.heartbeatFrequency = Poco::Timespan(5, 0);  // 5 seconds
+		config.heartbeatFrequencySeconds = 5;  // 5 seconds
 		config.enableMonitoring = true;
 		ReplicaSet rs(config);
 
@@ -408,7 +408,7 @@ void topologyExample()
 		}
 
 		std::cout << std::endl;
-		std::cout << "Background monitoring is active (heartbeat every " << config.heartbeatFrequency.totalSeconds() << "s)" << std::endl;
+		std::cout << "Background monitoring is active (heartbeat every " << config.heartbeatFrequencySeconds << "s)" << std::endl;
 		std::cout << "Topology will be automatically updated as servers change state." << std::endl;
 	}
 	catch (const Exception& e)

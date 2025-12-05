@@ -1,9 +1,19 @@
 //
-// main.cpp
+// SQLToMongo.cpp
 //
-// This sample shows SQL to MongoDB Shell to C++ examples using OP_MSG wire protocol.
+// This sample demonstrates basic MongoDB operations using the Poco::MongoDB library
+// with the OP_MSG wire protocol. Each function shows how to translate common SQL
+// operations to MongoDB commands.
 //
-// Copyright (c) 2013, Applied Informatics Software Engineering GmbH.
+// The examples use a "players" collection to demonstrate:
+// - INSERT operations (inserting documents)
+// - SELECT operations (querying with filters, projections, sorting, limits)
+// - UPDATE operations (modifying documents)
+// - DELETE operations (removing documents)
+// - Creating indexes
+// - Distinct queries and aggregations
+//
+// Copyright (c) 2013-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,11 +28,13 @@
 #include "Poco/MongoDB/Array.h"
 
 
-// INSERT INTO players
-// VALUES( "Messi", "Lionel", 1987)
+// SQL: INSERT INTO players VALUES ("Valdes", "Victor", 1982), ...
+// MongoDB: db.players.insertMany([{...}, {...}])
+//
+// This sample demonstrates inserting multiple documents at once.
 void sample1(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 1 ***" << std::endl;
+	std::cout << "*** SAMPLE 1: INSERT multiple documents ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -131,7 +143,7 @@ void sample1(Poco::MongoDB::Connection& connection)
 	doc->add("lastname", "Tello").add("firstname", "Cristian").add("birthyear", 1991);
 	docs.push_back(doc);
 
-	std::cout << request->documents().size() << std::endl;
+	std::cout << "Inserting " << request->documents().size() << " player documents..." << std::endl;
 
 	Poco::MongoDB::OpMsgMessage response;
 	connection.sendRequest(*request, response);
@@ -139,13 +151,21 @@ void sample1(Poco::MongoDB::Connection& connection)
 	{
 		std::cout << "Error: " << response.body().toString(2) << std::endl;
 	}
+	else
+	{
+		std::cout << "Successfully inserted " << request->documents().size() << " documents" << std::endl;
+	}
+	std::cout << std::endl;
 }
 
 
-// SELECT lastname, birthyear FROM players
+// SQL: SELECT lastname, birthyear FROM players
+// MongoDB: db.players.find({}, {lastname: 1, birthyear: 1})
+//
+// This sample demonstrates projection (selecting specific fields).
 void sample2(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 2 ***" << std::endl;
+	std::cout << "*** SAMPLE 2: SELECT with projection (specific fields) ***" << std::endl;
 
 	Poco::MongoDB::OpMsgCursor cursor("sample", "players");
 	cursor.query().setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
@@ -163,13 +183,17 @@ void sample2(Poco::MongoDB::Connection& connection)
 		}
 		response = cursor.next(connection);
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT * FROM players
+// SQL: SELECT * FROM players
+// MongoDB: db.players.find({})
+//
+// This sample demonstrates querying all fields from all documents.
 void sample3(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 3 ***" << std::endl;
+	std::cout << "*** SAMPLE 3: SELECT * (all fields) ***" << std::endl;
 
 	Poco::MongoDB::OpMsgCursor cursor("sample", "players");
 	cursor.query().setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
@@ -183,13 +207,17 @@ void sample3(Poco::MongoDB::Connection& connection)
 		}
 		response = cursor.next(connection);
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT * FROM players WHERE birthyear = 1978
+// SQL: SELECT * FROM players WHERE birthyear = 1978
+// MongoDB: db.players.find({birthyear: 1978})
+//
+// This sample demonstrates filtering with a WHERE clause (exact match).
 void sample4(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 4 ***" << std::endl;
+	std::cout << "*** SAMPLE 4: SELECT with WHERE clause (filter) ***" << std::endl;
 
 	Poco::MongoDB::OpMsgCursor cursor("sample", "players");
 	cursor.query().setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
@@ -204,13 +232,17 @@ void sample4(Poco::MongoDB::Connection& connection)
 		}
 		response = cursor.next(connection);
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT * FROM players WHERE birthyear = 1987 ORDER BY name
+// SQL: SELECT * FROM players WHERE birthyear = 1987 ORDER BY lastname
+// MongoDB: db.players.find({birthyear: 1987}).sort({lastname: 1})
+//
+// This sample demonstrates sorting results with ORDER BY.
 void sample5(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 5 ***" << std::endl;
+	std::cout << "*** SAMPLE 5: SELECT with ORDER BY (sorting) ***" << std::endl;
 
 	Poco::MongoDB::OpMsgCursor cursor("sample", "players");
 	cursor.query().setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
@@ -226,13 +258,17 @@ void sample5(Poco::MongoDB::Connection& connection)
 		}
 		response = cursor.next(connection);
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT * FROM players WHERE birthyear > 1969 and birthyear <= 1980
+// SQL: SELECT * FROM players WHERE birthyear > 1969 AND birthyear <= 1980
+// MongoDB: db.players.find({birthyear: {$gt: 1969, $lte: 1980}})
+//
+// This sample demonstrates range queries with comparison operators.
 void sample6(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 6 ***" << std::endl;
+	std::cout << "*** SAMPLE 6: SELECT with range query ($gt, $lte) ***" << std::endl;
 
 	Poco::MongoDB::OpMsgCursor cursor("sample", "players");
 	cursor.query().setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
@@ -250,28 +286,43 @@ void sample6(Poco::MongoDB::Connection& connection)
 		}
 		response = cursor.next(connection);
 	}
+	std::cout << std::endl;
 }
 
 
-// CREATE INDEX playername
-// ON players(lastname)
+// SQL: CREATE INDEX playername ON players(lastname)
+// MongoDB: db.players.createIndex({lastname: 1})
+//
+// This sample demonstrates creating an index on a collection.
 void sample7(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 7 ***" << std::endl;
+	std::cout << "*** SAMPLE 7: CREATE INDEX ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
-	Poco::MongoDB::Document::Ptr keys = new Poco::MongoDB::Document();
-	keys->add("lastname", 1);
-	Poco::MongoDB::Document::Ptr resultDoc = db.ensureIndex(connection, "players", "lastname", keys);
 
-	std::cout << resultDoc->toString(2);
+	// Create index on lastname field (ascending: true)
+	Poco::MongoDB::Database::IndexedFields indexedFields;
+	indexedFields.push_back(std::make_tuple("lastname", true));  // true = ascending
+
+	Poco::MongoDB::Document::Ptr resultDoc = db.createIndex(
+		connection,
+		"players",           // collection name
+		indexedFields,       // fields to index
+		"lastname_idx"       // index name
+	);
+
+	std::cout << "Index created: " << resultDoc->toString(2) << std::endl;
+	std::cout << std::endl;
 }
 
 
-// SELECT * FROM players LIMIT 10 SKIP 20
+// SQL: SELECT * FROM players LIMIT 10 OFFSET 20
+// MongoDB: db.players.find({}).skip(20).limit(10)
+//
+// This sample demonstrates pagination with LIMIT and SKIP.
 void sample8(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 8 ***" << std::endl;
+	std::cout << "*** SAMPLE 8: SELECT with LIMIT and SKIP (pagination) ***" << std::endl;
 
 	Poco::MongoDB::OpMsgCursor cursor("sample", "players");
 	cursor.query().setCommandName(Poco::MongoDB::OpMsgMessage::CMD_FIND);
@@ -288,13 +339,17 @@ void sample8(Poco::MongoDB::Connection& connection)
 		}
 		response = cursor.next(connection);
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT * FROM players LIMIT 1
+// SQL: SELECT * FROM players LIMIT 1
+// MongoDB: db.players.findOne({})
+//
+// This sample demonstrates fetching a single document.
 void sample9(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 9 ***" << std::endl;
+	std::cout << "*** SAMPLE 9: SELECT LIMIT 1 (single document) ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -305,15 +360,20 @@ void sample9(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(*request, response);
 	if (!response.documents().empty())
 	{
+		std::cout << "First document:" << std::endl;
 		std::cout << response.documents()[0]->toString(2) << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT DISTINCT birthyear FROM players WHERE birthyear > 1980
+// SQL: SELECT DISTINCT birthyear FROM players WHERE birthyear > 1980
+// MongoDB: db.players.distinct("birthyear", {birthyear: {$gt: 1980}})
+//
+// This sample demonstrates the distinct command with a filter.
 void sample10(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 10 ***" << std::endl;
+	std::cout << "*** SAMPLE 10: SELECT DISTINCT with WHERE ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -329,18 +389,25 @@ void sample10(Poco::MongoDB::Connection& connection)
 	if (response.responseOk())
 	{
 		Poco::MongoDB::Array::Ptr values = response.body().get<Poco::MongoDB::Array::Ptr>("values");
+		std::cout << "Distinct birthyears (> 1980): ";
 		for (std::size_t i = 0; i < values->size(); ++i)
 		{
-			std::cout << values->get<int>(i) << std::endl;
+			if (i > 0) std::cout << ", ";
+			std::cout << values->get<int>(i);
 		}
+		std::cout << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 
-// SELECT COUNT(*) FROM players WHERE birthyear > 1980
+// SQL: SELECT COUNT(*) FROM players WHERE birthyear > 1980
+// MongoDB: db.players.countDocuments({birthyear: {$gt: 1980}})
+//
+// This sample demonstrates the count command with a filter.
 void sample11(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 11 ***" << std::endl;
+	std::cout << "*** SAMPLE 11: SELECT COUNT with WHERE ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -355,15 +422,19 @@ void sample11(Poco::MongoDB::Connection& connection)
 
 	if (response.responseOk())
 	{
-		std::cout << "Count: " << response.body().getInteger("n") << std::endl;
+		std::cout << "Count of players born after 1980: " << response.body().getInteger("n") << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 
-// UPDATE players SET birthyear = birthyear + 1 WHERE firstname = 'Victor'
+// SQL: UPDATE players SET birthyear = birthyear + 1 WHERE firstname = 'Victor'
+// MongoDB: db.players.updateMany({firstname: "Victor"}, {$inc: {birthyear: 1}})
+//
+// This sample demonstrates the update command with the $inc operator.
 void sample12(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 12 ***" << std::endl;
+	std::cout << "*** SAMPLE 12: UPDATE with increment operator ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -377,14 +448,18 @@ void sample12(Poco::MongoDB::Connection& connection)
 	Poco::MongoDB::OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
-	std::cout << "Response: " << response.body().toString(2) << std::endl;
+	std::cout << "Update response: " << response.body().toString(2) << std::endl;
+	std::cout << std::endl;
 }
 
 
-// DELETE players WHERE firstname = 'Victor'
+// SQL: DELETE FROM players WHERE firstname = 'Victor'
+// MongoDB: db.players.deleteMany({firstname: "Victor"})
+//
+// This sample demonstrates the delete command.
 void sample13(Poco::MongoDB::Connection& connection)
 {
-	std::cout << "*** SAMPLE 13 ***" << std::endl;
+	std::cout << "*** SAMPLE 13: DELETE ***" << std::endl;
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -398,33 +473,54 @@ void sample13(Poco::MongoDB::Connection& connection)
 	Poco::MongoDB::OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
-	std::cout << "Response: " << response.body().toString(2) << std::endl;
+	std::cout << "Delete response: " << response.body().toString(2) << std::endl;
+	std::cout << std::endl;
 }
 
 
 int main(int argc, char** argv)
 {
+	// Connect to MongoDB server
+	// For replica set connections, see the ReplicaSet samples
 	Poco::MongoDB::Connection connection("localhost", 27017);
 
 	try
 	{
-		sample1(connection);
-		sample2(connection);
-		sample3(connection);
-		sample4(connection);
-		sample5(connection);
-		sample6(connection);
-		sample7(connection);
-		sample8(connection);
-		sample9(connection);
-		sample10(connection);
-		sample11(connection);
-		sample12(connection);
-		sample13(connection);
+		std::cout << "==================================================" << std::endl;
+		std::cout << "Poco::MongoDB SQL to MongoDB Examples" << std::endl;
+		std::cout << "==================================================" << std::endl;
+		std::cout << std::endl;
+		std::cout << "This sample demonstrates how to translate SQL" << std::endl;
+		std::cout << "operations to MongoDB using the OP_MSG protocol." << std::endl;
+		std::cout << std::endl;
+		std::cout << "Connected to: localhost:27017" << std::endl;
+		std::cout << "Database: sample" << std::endl;
+		std::cout << "Collection: players" << std::endl;
+		std::cout << std::endl;
+
+		sample1(connection);   // INSERT multiple documents
+		sample2(connection);   // SELECT with projection (specific fields)
+		sample3(connection);   // SELECT * (all fields)
+		sample4(connection);   // SELECT with WHERE clause (filter)
+		sample5(connection);   // SELECT with ORDER BY (sorting)
+		sample6(connection);   // SELECT with range query ($gt, $lte)
+		sample7(connection);   // CREATE INDEX
+		sample8(connection);   // SELECT with LIMIT and SKIP (pagination)
+		sample9(connection);   // SELECT LIMIT 1 (single document)
+		sample10(connection);  // SELECT DISTINCT with WHERE
+		sample11(connection);  // SELECT COUNT with WHERE
+		sample12(connection);  // UPDATE with increment operator
+		sample13(connection);  // DELETE
+
+		std::cout << std::endl;
+		std::cout << "==================================================" << std::endl;
+		std::cout << "All samples completed successfully!" << std::endl;
+		std::cout << "==================================================" << std::endl;
 	}
 	catch (Poco::Exception& exc)
 	{
-		std::cerr << exc.displayText() << std::endl;
+		std::cerr << "ERROR: " << exc.displayText() << std::endl;
+		return 1;
 	}
 
 	return 0;

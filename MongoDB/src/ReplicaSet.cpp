@@ -379,7 +379,7 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 		// must be configured during socket creation via custom SocketFactory.
 
 		// Send hello command
-		OpMsgMessage request("admin", "");
+		OpMsgMessage request("admin"s, ""s);
 		request.setCommandName(OpMsgMessage::CMD_HELLO);
 
 		OpMsgMessage response;
@@ -408,7 +408,7 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 		{
 			// Mark server as unknown
 			std::lock_guard<std::mutex> lock(_mutex);
-			_topology.markServerUnknown(address, "Hello command failed");
+			_topology.markServerUnknown(address, "Hello command failed"s);
 		}
 	}
 	catch (const std::exception& e)
@@ -421,7 +421,7 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 	{
 		// Mark server as unknown
 		std::lock_guard<std::mutex> lock(_mutex);
-		_topology.markServerUnknown(address, "Unknown error");
+		_topology.markServerUnknown(address, "Unknown error"s);
 	}
 }
 
@@ -538,7 +538,7 @@ void ReplicaSet::parseURI(const std::string& uri)
 	// Parse MongoDB URI: mongodb://[user:pass@]host1:port1,host2:port2[,hostN:portN]/[database][?options]
 	Poco::URI theURI(uri);
 
-	if (theURI.getScheme() != "mongodb")
+	if (theURI.getScheme() != "mongodb"s)
 	{
 		throw Poco::UnknownURISchemeException("Replica set URI must use 'mongodb' scheme");
 	}
