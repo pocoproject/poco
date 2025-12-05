@@ -216,46 +216,18 @@ void ReplicaSet::refreshTopology()
 		return;
 	}
 
-	// Topology changed - send notification
-	{
-		Poco::DynamicStruct notificationData;
-		notificationData["replicaSet"s] = newTopology.setName();
-		notificationData["timestamp"s] =
-			std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now().time_since_epoch() ).count();
-		notificationData["topologyType"s] = TopologyDescription::typeToString(newTopology.type());
+	// Topology changed - build brief change description
+	// Note: Build notification data outside mutex to allow handlers to access ReplicaSet methods
+	std::string changeDescription;
 
-		Poco::NotificationCenter::defaultCenter().postNotification(
-			new TopologyChangeNotification(notificationData)
-		);
-	}
-
-	// Check if logger is registered before building log messages
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		if (_config.logger == nullptr)
-		{
-			// No logger registered, skip message preparation
-			return;
-		}
-	}
-
-	// Topology changed and logger is registered - build detailed change description for logging
-
-	std::lock_guard<std::mutex> lock(_mutex);
-
-	_config.logger->information("MongoDB replica set: ** Topology changed: ");
-
-	// Compare topology type
+	// Check topology type change
 	if (oldTopology.type() != newTopology.type())
 	{
-		std::string changeDescription =
-			" Type changed from " + TopologyDescription::typeToString(oldTopology.type()) +
-			" to " + TopologyDescription::typeToString(newTopology.type());
-
-		_config.logger->information("MongoDB replica set: " + changeDescription);
+		changeDescription = "Type: " + TopologyDescription::typeToString(oldTopology.type()) +
+			" -> " + TopologyDescription::typeToString(newTopology.type());
 	}
 
-	// Compare primary server
+	// Check primary change
 	auto oldPrimary = oldTopology.findPrimary();
 	auto newPrimary = newTopology.findPrimary();
 	bool oldHadPrimary = oldPrimary.type() != ServerDescription::Unknown;
@@ -263,72 +235,44 @@ void ReplicaSet::refreshTopology()
 
 	if (oldHadPrimary != newHasPrimary)
 	{
-		std::string changeDescription;
+		if (!changeDescription.empty()) changeDescription += "; ";
 		if (newHasPrimary)
-			changeDescription += " Primary elected: " + newPrimary.address().toString();
+			changeDescription += "Primary elected: " + newPrimary.address().toString();
 		else
-			changeDescription += " Primary lost: " + oldPrimary.address().toString();
-
-		_config.logger->information("MongoDB replica set: " + changeDescription);
+			changeDescription += "Primary lost: " + oldPrimary.address().toString();
 	}
 	else if (oldHadPrimary && newHasPrimary && oldPrimary != newPrimary)
 	{
-		std::string changeDescription =
-			" Primary changed from " + oldPrimary.address().toString() +
-			" to " + newPrimary.address().toString();
-
-		_config.logger->information("MongoDB replica set: " + changeDescription);
+		if (!changeDescription.empty()) changeDescription += "; ";
+		changeDescription += "Primary: " + oldPrimary.address().toString() +
+			" -> " + newPrimary.address().toString();
 	}
 
-	// Compare server count
+	// Check server count change
 	if (oldTopology.serverCount() != newTopology.serverCount())
 	{
-		std::string changeDescription =
-			" Server count changed from " + std::to_string(oldTopology.serverCount()) +
-			" to " + std::to_string(newTopology.serverCount()) + "; ";
-
-		_config.logger->information("MongoDB replica set: " + changeDescription);
+		if (!changeDescription.empty()) changeDescription += "; ";
+		changeDescription += "Servers: " + std::to_string(oldTopology.serverCount()) +
+			" -> " + std::to_string(newTopology.serverCount());
 	}
 
-	// Compare server states using comparison operator
-	auto oldServers = oldTopology.servers();
-	auto newServers = newTopology.servers();
-	for (const auto& newServer : newServers)
+	// If no specific changes identified, use generic message
+	if (changeDescription.empty())
 	{
-		for (const auto& oldServer : oldServers)
-		{
-			if (newServer.address() == oldServer.address())
-			{
-				if (newServer != oldServer)
-				{
-					std::string changeDescription =
-						" Server " + newServer.address().toString() +
-						" changed from " + ServerDescription::typeToString(oldServer.type()) +
-						" to " + ServerDescription::typeToString(newServer.type());
-
-					_config.logger->information("MongoDB replica set: " + changeDescription);
-				}
-				break;
-			}
-		}
+		changeDescription = "Topology updated";
 	}
 
-	_config.logger->information("MongoDB replica set: Current topology: total servers: " + std::to_string(newTopology.serverCount()) );
-	if (newTopology.hasPrimary())
-		_config.logger->information("MongoDB replica set:  PRIMARY: " + newPrimary.address().toString());
+	// Send notification outside mutex to allow handlers to access ReplicaSet methods
+	Poco::DynamicStruct notificationData;
+	notificationData["replicaSet"s] = newTopology.setName();
+	notificationData["timestamp"s] =
+		std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now().time_since_epoch() ).count();
+	notificationData["topologyType"s] = TopologyDescription::typeToString(newTopology.type());
+	notificationData["changeDescription"s] = changeDescription;
 
-	auto secondaries = newTopology.findSecondaries();
-	if (!secondaries.empty())
-	{
-		std::string logMessage = " SECONDARIES=[";
-		for (size_t i = 0; i < secondaries.size(); ++i)
-		{
-			if (i > 0) logMessage += ", ";
-			logMessage += secondaries[i].address().toString();
-		}
-		logMessage += "]";
-		_config.logger->information("MongoDB replica set: " + logMessage);
-	}
+	Poco::NotificationCenter::defaultCenter().postNotification(
+		new TopologyChangeNotification(notificationData)
+	);
 }
 
 
@@ -360,13 +304,6 @@ void ReplicaSet::stopMonitoring()
 	}
 
 	_monitoringActive.store(false);
-}
-
-
-void ReplicaSet::setLogger(Logger::Ptr logger)
-{
-	std::lock_guard<std::mutex> lock(_mutex);
-	_config.logger = logger;
 }
 
 

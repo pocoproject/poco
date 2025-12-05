@@ -23,7 +23,6 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Logger.h"
 #include <vector>
 #include <string>
 #include <thread>
@@ -123,9 +122,6 @@ public:
 			/// Optional socket factory for SSL/TLS connections.
 			/// Can be set via config or later using setSocketFactory().
 			/// Custom factories can access timeout config via ReplicaSet::configuration().
-
-		Logger::Ptr logger;
-			/// Optional logger to write important information about replica set activity
 	};
 
 	explicit ReplicaSet(const Config& config);
@@ -193,9 +189,6 @@ public:
 
 	void stopMonitoring();
 		/// Stops the background monitoring thread.
-
-	void setLogger(Logger::Ptr logger);
-		/// Sets the logger to log important replica set activity.
 
 	void setSocketFactory(Connection::SocketFactory* factory);
 		/// Sets the socket factory for creating connections.

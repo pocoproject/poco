@@ -188,8 +188,6 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 			ensureConnection();
 			triedServers.insert(_connection->address());
 			operation();
-			if (attempt > 0)
-				logDebug(Poco::format("Operation succeeded after %Lu retries."s, attempt));
 
 			return;  // Success
 		}
@@ -234,7 +232,6 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 		Net::SocketAddress addr = newConn->address();
 		if (triedServers.find(addr) == triedServers.end())
 		{
-			logDebug(Poco::format("Connection reconnected to server: %s"s, addr.toString()));
 			_connection = newConn;
 			++attempt;
 		}
@@ -331,24 +328,6 @@ void ReplicaSetConnection::markServerFailed()
 		// Refresh topology to detect changes
 		_replicaSet.refreshTopology();
 	}
-}
-
-
-void ReplicaSetConnection::logInfo(const std::string& message)
-{
-	auto cfg { _replicaSet.configuration() };
-	if (cfg.logger == nullptr) return;
-
-	cfg.logger->information("MongoDB replica set: "s + message);
-}
-
-
-void ReplicaSetConnection::logDebug(const std::string& message)
-{
-	auto cfg { _replicaSet.configuration() };
-	if (cfg.logger == nullptr) return;
-
-	cfg.logger->debug("MongoDB replica set: "s + message);
 }
 
 
