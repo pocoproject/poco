@@ -1211,5 +1211,5 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

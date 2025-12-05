@@ -216,22 +216,6 @@ void Connection::disconnect()
 }
 
 
-void Connection::sendRequest(RequestMessage& request)
-{
-	Poco::Net::SocketOutputStream sos(_socket);
-	request.send(sos);
-}
-
-
-void Connection::sendRequest(RequestMessage& request, ResponseMessage& response)
-{
-	sendRequest(request);
-
-	Poco::Net::SocketInputStream sis(_socket);
-	response.read(sis);
-}
-
-
 void Connection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
 {
 	Poco::Net::SocketOutputStream sos(_socket);

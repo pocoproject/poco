@@ -205,7 +205,10 @@ BrowseHandle AvahiBrowserImpl::browse(const std::string& regType, const std::str
 	AvahiResponderImpl::ScopedLock lock(_responder);
 
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
-	AvahiServiceBrowser* browser = avahi_service_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, regType.c_str(), domain.empty() ? NULL : domain.c_str(), (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onBrowseReply, this);
+	AvahiServiceBrowser* browser = avahi_service_browser_new(
+		_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, regType.c_str(),
+		domain.empty() ? nullptr : domain.c_str(), (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onBrowseReply, this
+	);
 	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
@@ -235,13 +238,19 @@ BrowseHandle AvahiBrowserImpl::enumerateBrowseDomains(Poco::Int32 networkInterfa
 	AvahiResponderImpl::ScopedLock lock(_responder);
 
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
-	AvahiDomainBrowser* browser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_BROWSE, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateBrowseDomainsReply, this);
+	AvahiDomainBrowser* browser = avahi_domain_browser_new(
+		_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, nullptr,
+		AVAHI_DOMAIN_BROWSER_BROWSE, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateBrowseDomainsReply, this
+	);
 	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to enumerate browse domains", AvahiResponderImpl::describeError(error), error);
 	}
-	AvahiDomainBrowser* defaultBrowser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_BROWSE_DEFAULT, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateDefaultBrowseDomainsReply, this);
+	AvahiDomainBrowser* defaultBrowser = avahi_domain_browser_new(
+		_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, nullptr,
+		AVAHI_DOMAIN_BROWSER_BROWSE_DEFAULT, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateDefaultBrowseDomainsReply, this
+	);
 	if (!defaultBrowser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
@@ -257,13 +266,19 @@ BrowseHandle AvahiBrowserImpl::enumerateRegistrationDomains(Poco::Int32 networkI
 	AvahiResponderImpl::ScopedLock lock(_responder);
 
 	AvahiIfIndex ifIndex = networkInterface == 0 ? AVAHI_IF_UNSPEC : networkInterface;
-	AvahiDomainBrowser* browser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_REGISTER, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateRegistrationDomainsReply, this);
+	AvahiDomainBrowser* browser = avahi_domain_browser_new(
+		_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, nullptr,
+		AVAHI_DOMAIN_BROWSER_REGISTER, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateRegistrationDomainsReply, this
+	);
 	if (!browser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);
 		throw Poco::DNSSD::DNSSDException("Failed to enumerate registration domains", AvahiResponderImpl::describeError(error), error);
 	}
-	AvahiDomainBrowser* defaultBrowser = avahi_domain_browser_new(_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, NULL, AVAHI_DOMAIN_BROWSER_REGISTER_DEFAULT, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateDefaultRegistrationDomainsReply, this);
+	AvahiDomainBrowser* defaultBrowser = avahi_domain_browser_new(
+		_responder._avahiClient, ifIndex, AVAHI_PROTO_UNSPEC, nullptr,
+		AVAHI_DOMAIN_BROWSER_REGISTER_DEFAULT, (AvahiLookupFlags) 0, Poco::DNSSD::Avahi::onEnumerateDefaultRegistrationDomainsReply, this
+	);
 	if (!defaultBrowser)
 	{
 		int error = avahi_client_errno(_responder._avahiClient);

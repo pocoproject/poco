@@ -448,7 +448,7 @@ private:
 //
 inline bool Extractor::isColumnNull(const OutputParameter& outputParameter) const
 {
-	return outputParameter.isNull() || 0 == outputParameter.pData();
+	return outputParameter.isNull() || nullptr == outputParameter.pData();
 }
 
 

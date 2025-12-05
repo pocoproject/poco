@@ -1444,7 +1444,7 @@ void StringTest::benchmarkStrToInt()
 	std::cout << "parseStream Number: " << res[0] << std::endl;
 	double timeStream = sw.elapsed() / 1000.0;
 
-	char* pC = 0;
+	char* pC = nullptr;
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) res[1] = std::strtol(num.c_str(), &pC, 10);
 	sw.stop();
@@ -1499,7 +1499,7 @@ void StringTest::benchmarkStrToFloat()
 	double timeStream = sw.elapsed() / 1000.0;
 
 	// standard strtod
-	char* pC = 0;
+	char* pC = nullptr;
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) res[1] = std::strtod(num.c_str(), &pC);
 	sw.stop();

@@ -1,5 +1,6 @@
 add_subdirectory(zlib)
 add_subdirectory(pcre2)
+add_subdirectory(v8_double_conversion)
 add_subdirectory(utf8proc)
 add_subdirectory(pdjson)
 add_subdirectory(sqlite3)

@@ -39,7 +39,7 @@ Binary::Binary(Poco::Int32 size, unsigned char subtype):
 
 Binary::Binary(const UUID& uuid):
 	_buffer(128 / 8),
-	_subtype(0x04)
+	_subtype(SUBTYPE_UUID)
 {
     unsigned char szUUID[16];
     uuid.copyTo((char*) szUUID);
@@ -69,6 +69,20 @@ Binary::~Binary()
 
 std::string Binary::toString(int indent) const
 {
+	// Special handling for UUID subtype - format like MongoDB tools: UUID("...")
+	if (_subtype == SUBTYPE_UUID && _buffer.size() == 16)
+	{
+		try
+		{
+			return "UUID(\"" + uuid().toString() + "\")";
+		}
+		catch (...)
+		{
+			// Fall through to Base64 encoding if UUID extraction fails
+		}
+	}
+
+	// Default: Base64 encode the binary data
 	std::ostringstream oss;
 	Base64Encoder encoder(oss);
 	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
@@ -80,7 +94,7 @@ std::string Binary::toString(int indent) const
 
 UUID Binary::uuid() const
 {
-	if (_subtype == 0x04 && _buffer.size() == 16)
+	if (_subtype == SUBTYPE_UUID && _buffer.size() == 16)
 	{
 		UUID uuid;
 		uuid.copyFrom((const char*) _buffer.begin());

@@ -64,9 +64,9 @@ bool ODBCMetaColumn::isUnsigned() const
 	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
 		(SQLUSMALLINT)position() + 1, // ODBC columns are 1-based
 		SQL_DESC_UNSIGNED,
+		nullptr,
 		0,
-		0,
-		0,
+		nullptr,
 		&val)))
 	{
 		throw StatementException(_rStmt, "ODBCMetaColumn::isUnsigned()");
@@ -82,9 +82,9 @@ void ODBCMetaColumn::init()
 	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
 			(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
 			SQL_DESC_LENGTH,
+			nullptr,
 			0,
-			0,
-			0,
+			nullptr,
 			&_dataLength)))
 	{
 		throw StatementException(_rStmt, "ODBCMetaColumn::init()");

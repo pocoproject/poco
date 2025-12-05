@@ -136,7 +136,7 @@ private:
 	void setValue(const std::string& key, const Poco::Dynamic::Var& value);
 
 
- 	JSON::Object::Ptr _object;
+	JSON::Object::Ptr _object;
 };
 
 

@@ -151,7 +151,7 @@ Random::Random(int stateSize)
 
 	_pBuffer = new char[stateSize];
 
-	initState((UInt32) std::time(NULL), _pBuffer, stateSize);
+	initState((UInt32) std::time(nullptr), _pBuffer, stateSize);
 }
 
 

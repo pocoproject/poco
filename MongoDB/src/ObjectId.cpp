@@ -40,9 +40,35 @@ ObjectId::ObjectId(const std::string& id)
 }
 
 
-ObjectId::ObjectId(const ObjectId& copy)
+ObjectId::ObjectId(const ObjectId& copy) noexcept
 {
 	std::memcpy(_id, copy._id, sizeof(_id));
+}
+
+
+ObjectId::ObjectId(ObjectId&& other) noexcept
+{
+	std::memcpy(_id, other._id, sizeof(_id));
+}
+
+
+ObjectId& ObjectId::operator=(const ObjectId& copy) noexcept
+{
+	if (this != &copy)
+	{
+		std::memcpy(_id, copy._id, sizeof(_id));
+	}
+	return *this;
+}
+
+
+ObjectId& ObjectId::operator=(ObjectId&& other) noexcept
+{
+	if (this != &other)
+	{
+		std::memcpy(_id, other._id, sizeof(_id));
+	}
+	return *this;
 }
 
 
@@ -54,10 +80,11 @@ ObjectId::~ObjectId()
 std::string ObjectId::toString(const std::string& fmt) const
 {
 	std::string s;
+	s.reserve(24);  // Pre-allocate for 12 bytes * 2 hex chars
 
-	for (int i = 0; i < 12; ++i)
+	for (std::size_t i = 0; i < 12; ++i)
 	{
-		s += format(fmt, (unsigned int) _id[i]);
+		s += format(fmt, static_cast<unsigned int>(_id[i]));
 	}
 	return s;
 }

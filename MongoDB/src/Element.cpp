@@ -24,6 +24,11 @@ Element::Element(const std::string& name) : _name(name)
 }
 
 
+Element::Element(std::string&& name) : _name(std::move(name))
+{
+}
+
+
 Element::~Element()
 {
 }

@@ -603,7 +603,7 @@ int SecureSocketImpl::handleError(int rc)
 				throw SSLException(msg);
 			}
 		}
- 		break;
+		break;
 	}
 	return rc;
 }

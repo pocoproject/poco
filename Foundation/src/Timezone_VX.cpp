@@ -23,7 +23,7 @@ namespace Poco {
 
 int Timezone::utcOffset()
 {
-	std::time_t now = std::time(NULL);
+	std::time_t now = std::time(nullptr);
 	struct std::tm t;
 	gmtime_r(&now, &t);
 	std::time_t utc = std::mktime(&t);
@@ -33,7 +33,7 @@ int Timezone::utcOffset()
 
 int Timezone::dst()
 {
-	std::time_t now = std::time(NULL);
+	std::time_t now = std::time(nullptr);
 	struct std::tm t;
 #if defined(_VXWORKS_COMPATIBILITY_MODE) || (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9))))
 	if (localtime_r(&now, &t) != OK)

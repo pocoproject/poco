@@ -21,7 +21,7 @@ namespace Poco {
 
 StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_inEncoding(inEncoding),
 	_outEncoding(outEncoding),
 	_defaultChar(defaultChar),
@@ -33,7 +33,7 @@ StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& i
 
 
 StreamConverterBuf::StreamConverterBuf(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_inEncoding(inEncoding),
 	_outEncoding(outEncoding),

@@ -20,11 +20,14 @@ add_library(PDF ${SRCS})
 target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:HPDF::HPDF>")
 
 if (POCO_UNBUNDLED)
-	target_link_libraries(PDF PRIVATE PNG::PNG)
+	target_link_libraries(PDF PRIVATE PNG::PNG ZLIB::ZLIB)
 else()
 	target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:PNG::PNG>")
+	if (NOT BUILD_SHARED_LIBS OR WIN32)
+		target_link_libraries(PDF PRIVATE "$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>")
+	endif()
+	# else static zlib is already linked to Foundation
 endif()
-
 
 add_library(Poco::PDF ALIAS PDF)
 set_target_properties(PDF

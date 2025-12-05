@@ -28,9 +28,9 @@ namespace Net {
 
 
 AbstractHTTPRequestHandler::AbstractHTTPRequestHandler():
-	_pRequest(0),
-	_pResponse(0),
-	_pForm(0)
+	_pRequest(nullptr),
+	_pResponse(nullptr),
+	_pForm(nullptr)
 {
 }
 

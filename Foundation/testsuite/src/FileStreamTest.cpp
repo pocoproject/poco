@@ -72,8 +72,8 @@ void FileStreamTest::testWriteReadNativeHandle()
 	file.append(".txt");
 	std::wstring utf16Path;
 	Poco::UnicodeConverter::toUTF16(file, utf16Path);
-    outHandle = CreateFileW(utf16Path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-    assertTrue(outHandle != INVALID_HANDLE_VALUE);
+	outHandle = CreateFileW(utf16Path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	assertTrue(outHandle != INVALID_HANDLE_VALUE);
 #else
 	std::string file("testfile.txt");
 	outHandle = ::open(file.c_str(), O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
@@ -81,17 +81,17 @@ void FileStreamTest::testWriteReadNativeHandle()
 
 	Poco::TemporaryFile::registerForDeletion(file);
 
-    fos.openHandle(outHandle, std::ios::binary | std::ios::out | std::ios::trunc);
+	fos.openHandle(outHandle, std::ios::binary | std::ios::out | std::ios::trunc);
 	fos << "sometestdata";
 	fos.close();
 
-    Poco::FileIOS::NativeHandle inHandle;
+	Poco::FileIOS::NativeHandle inHandle;
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-    inHandle = CreateFileW(utf16Path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-    assertTrue(inHandle != INVALID_HANDLE_VALUE);
+	inHandle = CreateFileW(utf16Path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	assertTrue(inHandle != INVALID_HANDLE_VALUE);
 #else
-    inHandle = ::open(file.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	inHandle = ::open(file.c_str(), O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 
 	fis.openHandle(inHandle, std::ios::in);

@@ -23,7 +23,7 @@ PipeImpl::PipeImpl()
 {
 	SECURITY_ATTRIBUTES attr;
 	attr.nLength              = sizeof(attr);
-	attr.lpSecurityDescriptor = NULL;
+	attr.lpSecurityDescriptor = nullptr;
 	attr.bInheritHandle       = FALSE;
 
 	if (!CreatePipe(&_readHandle, &_writeHandle, &attr, 0))
@@ -43,7 +43,7 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 	poco_assert (_writeHandle != INVALID_HANDLE_VALUE);
 
 	DWORD bytesWritten = 0;
-	if (!WriteFile(_writeHandle, buffer, length, &bytesWritten, NULL))
+	if (!WriteFile(_writeHandle, buffer, length, &bytesWritten, nullptr))
 		throw WriteFileException("anonymous pipe");
 	return bytesWritten;
 }
@@ -54,7 +54,7 @@ int PipeImpl::readBytes(void* buffer, int length)
 	poco_assert (_readHandle != INVALID_HANDLE_VALUE);
 
 	DWORD bytesRead = 0;
-	BOOL ok = ReadFile(_readHandle, buffer, length, &bytesRead, NULL);
+	BOOL ok = ReadFile(_readHandle, buffer, length, &bytesRead, nullptr);
 	if (ok || GetLastError() == ERROR_BROKEN_PIPE)
 		return bytesRead;
 	else

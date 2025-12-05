@@ -6,10 +6,10 @@
 namespace hsql {
 
 FrameBound::FrameBound(int64_t offset, FrameBoundType type, bool unbounded)
-    : offset{offset}, type{type}, unbounded{unbounded} {}
+	: offset{offset}, type{type}, unbounded{unbounded} {}
 
 FrameDescription::FrameDescription(FrameType type, FrameBound* start, FrameBound* end)
-    : type{type}, start{start}, end{end} {}
+	: type{type}, start{start}, end{end} {}
 
 FrameDescription::~FrameDescription() {
   delete start;
@@ -17,45 +17,45 @@ FrameDescription::~FrameDescription() {
 }
 
 WindowDescription::WindowDescription(std::vector<Expr*>* partitionList, std::vector<OrderDescription*>* orderList,
-                                     FrameDescription* frameDescription)
-    : partitionList{partitionList}, orderList{orderList}, frameDescription{frameDescription} {}
+									 FrameDescription* frameDescription)
+	: partitionList{partitionList}, orderList{orderList}, frameDescription{frameDescription} {}
 
 WindowDescription::~WindowDescription() {
   if (partitionList) {
-    for (Expr* e : *partitionList) {
-      delete e;
-    }
-    delete partitionList;
+	for (Expr* e : *partitionList) {
+	  delete e;
+	}
+	delete partitionList;
   }
 
   if (orderList) {
-    for (OrderDescription* orderDescription : *orderList) {
-      delete orderDescription;
-    }
-    delete orderList;
+	for (OrderDescription* orderDescription : *orderList) {
+	  delete orderDescription;
+	}
+	delete orderList;
   }
 
   delete frameDescription;
 }
 
 Expr::Expr(ExprType type)
-    : type(type),
-      expr(nullptr),
-      expr2(nullptr),
-      exprList(nullptr),
-      select(nullptr),
-      name(nullptr),
-      table(nullptr),
-      alias(nullptr),
-      fval(0),
-      ival(0),
-      ival2(0),
-      datetimeField(kDatetimeNone),
-      columnType(DataType::UNKNOWN, 0),
-      isBoolLiteral(false),
-      opType(kOpNone),
-      distinct(false),
-      windowDescription(nullptr) {}
+	: type(type),
+	  expr(nullptr),
+	  expr2(nullptr),
+	  exprList(nullptr),
+	  select(nullptr),
+	  name(nullptr),
+	  table(nullptr),
+	  alias(nullptr),
+	  fval(0),
+	  ival(0),
+	  ival2(0),
+	  datetimeField(kDatetimeNone),
+	  columnType(DataType::UNKNOWN, 0),
+	  isBoolLiteral(false),
+	  opType(kOpNone),
+	  distinct(false),
+	  windowDescription(nullptr) {}
 
 Expr::~Expr() {
   delete expr;
@@ -68,10 +68,10 @@ Expr::~Expr() {
   free(alias);
 
   if (exprList) {
-    for (Expr* e : *exprList) {
-      delete e;
-    }
-    delete exprList;
+	for (Expr* e : *exprList) {
+	  delete e;
+	}
+	delete exprList;
   }
 }
 
@@ -284,7 +284,7 @@ bool Expr::isType(ExprType exprType) const { return exprType == type; }
 
 bool Expr::isLiteral() const {
   return isType(kExprLiteralInt) || isType(kExprLiteralFloat) || isType(kExprLiteralString) || isType(kExprParameter) ||
-         isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
+		 isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
 }
 
 bool Expr::hasAlias() const { return alias != nullptr; }
@@ -293,9 +293,9 @@ bool Expr::hasTable() const { return table != nullptr; }
 
 const char* Expr::getName() const {
   if (alias)
-    return alias;
+	return alias;
   else
-    return name;
+	return name;
 }
 
 char* substr(const char* source, int from, int to) {

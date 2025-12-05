@@ -15,9 +15,9 @@ bool SQLParser::parse(const std::string& sql, SQLParserResult* result) {
   YY_BUFFER_STATE state;
 
   if (hsql_lex_init(&scanner)) {
-    // Couldn't initialize the lexer.
-    fprintf(stderr, "SQLParser: Error when initializing lexer!\n");
-    return false;
+	// Couldn't initialize the lexer.
+	fprintf(stderr, "SQLParser: Error when initializing lexer!\n");
+	return false;
   }
   const char* text = sql.c_str();
   state = hsql__scan_string(text, scanner);
@@ -44,8 +44,8 @@ bool SQLParser::tokenize(const std::string& sql, std::vector<int16_t>* tokens) {
   // Initialize the scanner.
   yyscan_t scanner;
   if (hsql_lex_init(&scanner)) {
-    fprintf(stderr, "SQLParser: Error when initializing lexer!\n");
-    return false;
+	fprintf(stderr, "SQLParser: Error when initializing lexer!\n");
+	return false;
   }
 
   YY_BUFFER_STATE state;
@@ -58,12 +58,12 @@ bool SQLParser::tokenize(const std::string& sql, std::vector<int16_t>* tokens) {
   // Note: hsql_lex returns int, but we know that its range is within 16 bit.
   int16_t token = hsql_lex(&yylval, &yylloc, scanner);
   while (token != 0) {
-    tokens->push_back(token);
-    token = hsql_lex(&yylval, &yylloc, scanner);
+	tokens->push_back(token);
+	token = hsql_lex(&yylval, &yylloc, scanner);
 
-    if (token == SQL_IDENTIFIER || token == SQL_STRING) {
-      free(yylval.sval);
-    }
+	if (token == SQL_IDENTIFIER || token == SQL_STRING) {
+	  free(yylval.sval);
+	}
   }
 
   hsql__delete_buffer(state, scanner);

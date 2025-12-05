@@ -52,8 +52,8 @@ private:
 
 	std::size_t insertEntries(std::vector<std::string>& entries);
 	std::string popEntry();
-    void removeEntry(const std::string &entry);
-    void processFile(const std::string& entry);
+	void removeEntry(const std::string &entry);
+	void processFile(const std::string& entry);
 	std::size_t scanDirectory();
 
 	void runDirectoryScan();

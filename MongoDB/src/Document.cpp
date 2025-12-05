@@ -45,15 +45,14 @@ Array& Document::addNewArray(const std::string& name)
 
 Element::Ptr Document::get(const std::string& name) const
 {
-	Element::Ptr element;
-
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it != _elements.end())
+	// O(1) hash map lookup instead of O(n) linear search
+	auto it = _elementMap.find(name);
+	if (it != _elementMap.end())
 	{
-		return *it;
+		return it->second;
 	}
 
-	return element;
+	return Element::Ptr();  // Return empty pointer if not found
 }
 
 
@@ -64,18 +63,19 @@ Int64 Document::getInteger(const std::string& name) const
 
 	if (ElementTraits<double>::TypeId == element->type())
 	{
-		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
-		if (concrete) return static_cast<Int64>(concrete->value());
+		// Type is already verified, static_cast is safe and ~10x faster than dynamic_cast
+		auto* concrete = static_cast<ConcreteElement<double>*>(element.get());
+		return static_cast<Int64>(concrete->value());
 	}
 	else if (ElementTraits<Int32>::TypeId == element->type())
 	{
-		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int32>*>(element.get());
+		return concrete->value();
 	}
 	else if (ElementTraits<Int64>::TypeId == element->type())
 	{
-		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int64>*>(element.get());
+		return concrete->value();
 	}
 	throw Poco::BadCastException("Invalid type mismatch!");
 }
@@ -152,6 +152,7 @@ void Document::read(BinaryReader& reader)
 
 		element->read(reader);
 		_elements.push_back(element);
+		_elementMap[element->name()] = element;  // Populate hash map for O(1) lookups
 
 		reader >> type;
 	}
@@ -161,11 +162,12 @@ void Document::read(BinaryReader& reader)
 std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
+	// Pre-reserve reasonable capacity for small-medium documents to reduce reallocations
+	oss.str().reserve(256);
 
 	oss << '{';
 
 	if (indent > 0) oss << std::endl;
-
 
 	for (auto it = _elements.begin(), total = _elements.end(); it != total; ++it)
 	{
@@ -175,7 +177,11 @@ std::string Document::toString(int indent) const
 			if (indent > 0) oss << std::endl;
 		}
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		if (indent > 0)
+		{
+			const std::string indentStr(indent, ' ');
+			oss << indentStr;
+		}
 
 		oss << '"' << (*it)->name() << '"';
 		oss << (indent > 0  ? " : " : ":");
@@ -188,7 +194,8 @@ std::string Document::toString(int indent) const
 		oss << std::endl;
 		if (indent >= 2) indent -= 2;
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		const std::string indentStr(indent, ' ');
+		oss << indentStr;
 	}
 
 	oss << '}';

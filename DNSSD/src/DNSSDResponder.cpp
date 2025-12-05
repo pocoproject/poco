@@ -23,11 +23,11 @@ namespace Poco {
 namespace DNSSD {
 
 
-DNSSDResponderImplFactory* DNSSDResponder::_pImplFactory(0);
+DNSSDResponderImplFactory* DNSSDResponder::_pImplFactory(nullptr);
 
 
 DNSSDResponder::DNSSDResponder():
-	_pImpl(0)
+	_pImpl(nullptr)
 {
 	if (_pImplFactory)
 	{
@@ -102,7 +102,7 @@ void DNSSDResponder::registerImplFactory(DNSSDResponderImplFactory& factory)
 
 void DNSSDResponder::unregisterImplFactory()
 {
-	_pImplFactory = 0;
+	_pImplFactory = nullptr;
 }
 
 

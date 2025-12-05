@@ -340,7 +340,7 @@ void FileImpl::linkToImpl(const std::string& path, int type) const
 
 	if (type == 0)
 	{
-		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), NULL) == 0)
+		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), nullptr) == 0)
 			handleLastErrorImpl(_path);
 	}
 	else
@@ -417,7 +417,7 @@ FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, &space, NULL))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), nullptr, &space, nullptr))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -428,7 +428,7 @@ FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, NULL, NULL))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, nullptr, nullptr))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -439,7 +439,7 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, NULL, &space))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), nullptr, nullptr, &space))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -499,6 +499,14 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 {
 	UnicodeConverter::toUTF16(utf8Path, utf16Path);
+	if (utf16Path.length() > 0 && utf16Path.back() == L':')
+	{
+		// If the path only has disk letter, we must make sure it ends with backslash!
+		// Or it will be failed to call Windows API GetFileAttributesW().
+		// For example:
+		//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
+		utf16Path.push_back(L'\\');
+	}
 	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' || utf16Path[1] == ':')

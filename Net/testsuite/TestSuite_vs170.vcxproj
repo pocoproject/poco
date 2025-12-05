@@ -978,6 +978,8 @@
     <ClInclude Include="src\HTTPCredentialsTest.h"/>
     <ClInclude Include="src\HTTPRequestTest.h"/>
     <ClInclude Include="src\HTTPResponseTest.h"/>
+    <ClInclude Include="src\HTTPReactorServerSessionTest.h"/>
+    <ClInclude Include="src\HTTPReactorServerTestSuite.h"/>
     <ClInclude Include="src\HTTPServerTest.h"/>
     <ClInclude Include="src\HTTPServerTestSuite.h"/>
     <ClInclude Include="src\HTTPStreamFactoryTest.h"/>
@@ -1106,6 +1108,16 @@
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <ClCompile Include="src\HTTPRequestTest.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\HTTPReactorServerSessionTest.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <ClCompile Include="src\HTTPReactorServerTestSuite.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>

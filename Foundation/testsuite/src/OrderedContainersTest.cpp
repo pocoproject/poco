@@ -68,7 +68,7 @@ namespace {
 			return &x;
 		}
 
-		pointer allocate(size_type n, const void* /*hint*/ = 0)
+		pointer allocate(size_type n, const void* /*hint*/ = nullptr)
 		{
 			nb_custom_allocs++;
 

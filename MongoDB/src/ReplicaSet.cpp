@@ -13,8 +13,7 @@
 
 
 #include "Poco/MongoDB/ReplicaSet.h"
-#include "Poco/MongoDB/QueryRequest.h"
-#include "Poco/MongoDB/ResponseMessage.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
 
 
 namespace Poco {
@@ -57,32 +56,31 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 	{
 		conn->connect(address);
 
-		QueryRequest request("admin.$cmd");
-		request.setNumberToReturn(1);
-		request.selector().add("isMaster", 1);
+		OpMsgMessage request("admin", "");
+		request.setCommandName(OpMsgMessage::CMD_HELLO);
 
-		ResponseMessage response;
+		OpMsgMessage response;
 		conn->sendRequest(request, response);
 
-		if (response.documents().size() > 0)
+		if (response.responseOk())
 		{
-			Document::Ptr doc = response.documents()[0];
-			if (doc->get<bool>("ismaster"))
+			const Document& doc = response.body();
+			if (doc.get<bool>("isWritablePrimary", false) || doc.get<bool>("ismaster", false))
 			{
 				return conn;
 			}
-			else if (doc->exists("primary"))
+			else if (doc.exists("primary"))
 			{
-				return isMaster(Net::SocketAddress(doc->get<std::string>("primary")));
+				return isMaster(Net::SocketAddress(doc.get<std::string>("primary")));
 			}
 		}
 	}
 	catch (...)
 	{
-		conn = 0;
+		conn = nullptr;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 

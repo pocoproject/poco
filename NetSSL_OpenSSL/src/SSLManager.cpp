@@ -567,7 +567,7 @@ void SSLManager::initPassphraseHandler(bool server)
 
 	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
 
-	const PrivateKeyFactory* pFactory = 0;
+	const PrivateKeyFactory* pFactory = nullptr;
 	if (privateKeyFactoryMgr().hasFactory(className))
 	{
 		pFactory = privateKeyFactoryMgr().getFactory(className);
@@ -594,7 +594,7 @@ void SSLManager::initCertificateHandler(bool server)
 
 	std::string className(config.getString(prefix+CFG_CERTIFICATE_HANDLER, VAL_CERTIFICATE_HANDLER));
 
-	const CertificateHandlerFactory* pFactory = 0;
+	const CertificateHandlerFactory* pFactory = nullptr;
 	if (certificateHandlerFactoryMgr().hasFactory(className))
 	{
 		pFactory = certificateHandlerFactoryMgr().getFactory(className);

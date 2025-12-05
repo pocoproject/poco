@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	if (argc != 3)
 	{
 		std::cout << "usage: " << argv[0] << ": <input_file> <output_file>" << std::endl
-		          << "       read <input_file>, deflate (compress) it and write the result to <output_file>" << std::endl;
+				  << "       read <input_file>, deflate (compress) it and write the result to <output_file>" << std::endl;
 		return 1;
 	}
 

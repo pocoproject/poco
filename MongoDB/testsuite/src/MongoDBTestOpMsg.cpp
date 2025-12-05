@@ -281,14 +281,13 @@ void MongoDBTest::testOpCmdCursor()
 
 	int n = 0;
 	auto cresponse = cursor.next(*_mongo);
-	while(true)
+	while(cursor.isActive())
 	{
 		n += static_cast<int>(cresponse.documents().size());
-		if ( cursor.cursorID() == 0 )
-			break;
 		cresponse = cursor.next(*_mongo);
 	}
 	assertEquals (10000, n);
+	assertFalse(cursor.isActive());
 
 	request->setCommandName(OpMsgMessage::CMD_DROP);
 	_mongo->sendRequest(*request, response);
@@ -325,24 +324,22 @@ void MongoDBTest::testOpCmdCursorAggregate()
 
 	int n = 0;
 	auto cresponse = cursor->next(*_mongo);
-	while(true)
+	while(cursor->isActive())
 	{
 		int batchDocSize = cresponse.documents().size();
 		if (cursor->cursorID() != 0)
 			assertEquals (1000, batchDocSize);
 
 		n += batchDocSize;
-		if ( cursor->cursorID() == 0 )
-			break;
 		cresponse = cursor->next(*_mongo);
 	}
 	assertEquals (10000, n);
+	assertFalse(cursor->isActive());
 
 	request->setCommandName(OpMsgMessage::CMD_DROP);
 	_mongo->sendRequest(*request, response);
 	assertTrue(response.responseOk());
 }
-
 
 
 void MongoDBTest::testOpCmdKillCursor()
@@ -371,13 +368,11 @@ void MongoDBTest::testOpCmdKillCursor()
 
 	int n = 0;
 	auto cresponse = cursor.next(*_mongo);
-	while(true)
+	while(cursor.isActive())
 	{
 		n += static_cast<int>(cresponse.documents().size());
-		if ( cursor.cursorID() == 0 )
-			break;
-
 		cursor.kill(*_mongo);
+		assertFalse(cursor.isActive());
 		cresponse = cursor.next(*_mongo);
 	}
 	assertEquals (1000, n);

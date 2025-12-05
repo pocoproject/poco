@@ -28,6 +28,17 @@ namespace MongoDB {
 
 class MongoDB_API OpMsgCursor: public Document
 	/// OpMsgCursor is an helper class for querying multiple documents using OpMsgMessage.
+	/// Once all of the data is read with the cursor (see isActive()) it can't be reused.
+	///
+	/// RESOURCE MANAGEMENT:
+	/// When a cursor is no longer needed, you should call kill() to release server-side
+	/// resources. If kill() is not called explicitly, the server will keep the cursor
+	/// open until it times out.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. A cursor must not be used concurrently from
+	/// multiple threads. Each thread should have its own cursor instances.
+	/// The next() method modifies internal state and is not safe for concurrent access.
 {
 public:
 	OpMsgCursor(const std::string& dbname, const std::string& collectionName);
@@ -36,18 +47,21 @@ public:
 	virtual ~OpMsgCursor();
 		/// Destroys the OpMsgCursor.
 
-	void setEmptyFirstBatch(bool empty);
+	void setEmptyFirstBatch(bool empty) noexcept;
 		/// Empty first batch is used to get error response faster with little server processing
 
-	bool emptyFirstBatch() const;
+	[[nodiscard]] bool emptyFirstBatch() const noexcept;
 
-	void setBatchSize(Int32 batchSize);
+	void setBatchSize(Int32 batchSize) noexcept;
 		/// Set non-default batch size
 
-	Int32 batchSize() const;
+	[[nodiscard]] Int32 batchSize() const noexcept;
 		/// Current batch size (zero or negative number indicates default batch size)
 
-	Int64 cursorID() const;
+	[[nodiscard]] Int64 cursorID() const noexcept;
+
+	[[nodiscard]] bool isActive() const noexcept;
+		/// Is there more data to acquire with this cursor?
 
 	OpMsgMessage& next(Connection& connection);
 		/// Tries to get the next documents. As long as response message has a
@@ -81,7 +95,7 @@ inline OpMsgMessage& OpMsgCursor::query()
 	return _query;
 }
 
-inline Int64 OpMsgCursor::cursorID() const
+inline Int64 OpMsgCursor::cursorID() const noexcept
 {
 	return _cursorID;
 }

@@ -52,7 +52,7 @@ Parser::Parser(NameSpace::SymbolTable& gst, const std::string& file, std::istrea
 	_tokenizer(_istr),
 	_file(file),
 	_inFile(false),
-	_pCurrentSymbol(0),
+	_pCurrentSymbol(nullptr),
 	_access(Symbol::ACC_PUBLIC)
 {
 	Path p(file);
@@ -235,7 +235,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		fullName += name;
 
 		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(fullName));
-		bool undefined = (pNS == 0);
+		bool undefined = (pNS == nullptr);
 		if (undefined) pNS = new NameSpace(name, currentNameSpace());
 		pushNameSpace(pNS, -1, undefined);
 		pNext = next();
@@ -287,7 +287,7 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT) || isKeyword(pNext, IdentifierToken::KW_UNION));
 
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	bool isClass = isKeyword(pNext, IdentifierToken::KW_CLASS);
 	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	Symbol::Access prevAccess = _access;
@@ -324,7 +324,7 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 			expectOperator(pNext, OperatorToken::OP_SEMICOLON, ";");
 			pNext = next();
 			_access = prevAccess;
-			_pCurrentSymbol = 0;
+			_pCurrentSymbol = nullptr;
 			return pNext;
 		}
 		if (isOperator(pNext, OperatorToken::OP_COLON) || isOperator(pNext, OperatorToken::OP_OPENBRACE))
@@ -346,7 +346,7 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 	}
 	pNext = next();
 	_access = prevAccess;
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	return pNext;
 }
 
@@ -495,7 +495,7 @@ const Token* Parser::parseTypeDef(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_TYPEDEF));
 
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	std::string decl;
 	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
@@ -507,7 +507,7 @@ const Token* Parser::parseTypeDef(const Token* pNext)
 	addSymbol(pTypeDef, line);
 
 	pNext = next();
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	return pNext;
 }
 
@@ -516,7 +516,7 @@ const Token* Parser::parseUsing(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_USING));
 
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	pNext = next();
 	if (isKeyword(pNext, IdentifierToken::KW_NAMESPACE))
@@ -560,7 +560,7 @@ const Token* Parser::parseUsing(const Token* pNext)
 	if (!isOperator(pNext, OperatorToken::OP_SEMICOLON))
 		syntaxError("semicolon");
 	pNext = next();
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	return pNext;
 }
 
@@ -589,7 +589,7 @@ const Token* Parser::parseVarFunc(const Token* pNext)
 
 const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 {
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	std::string attrs;
 	if (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 	{
@@ -642,7 +642,7 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 			pNext = parseFunc(pNext, attrs, decl);
 		}
 	}
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	return pNext;
 }
 
@@ -674,7 +674,7 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENPARENT));
 
 	int line = static_cast<int>(_istr.getCurrentLineNumber());
-	Function* pFunc = 0;
+	Function* pFunc = nullptr;
 	std::string name = Symbol::extractName(decl);
 	if (name.find(':') == std::string::npos)
 	{
@@ -836,7 +836,7 @@ const Token* Parser::parseEnum(const Token* pNext)
 
 	std::string baseType;
 	int flags = 0;
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	pNext = next();
 
@@ -883,14 +883,14 @@ const Token* Parser::parseEnum(const Token* pNext)
 	pNext = next();
 	expectOperator(pNext, OperatorToken::OP_SEMICOLON, ";");
 	pNext = next();
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	return pNext;
 }
 
 
 const Token* Parser::parseEnumValue(const Token* pNext, Enum* pEnum)
 {
-	_pCurrentSymbol = 0;
+	_pCurrentSymbol = nullptr;
 	_doc.clear();
 	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	std::string name = pNext->tokenString();

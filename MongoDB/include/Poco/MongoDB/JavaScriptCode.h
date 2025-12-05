@@ -44,7 +44,7 @@ public:
 	void setCode(const std::string& code);
 		/// Sets the JavaScript code.
 
-	std::string getCode() const;
+	[[nodiscard]] std::string getCode() const;
 		/// Returns the JavaScript code.
 
 private:

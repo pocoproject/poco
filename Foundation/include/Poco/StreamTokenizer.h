@@ -72,7 +72,7 @@ public:
 		/// If a token is marked as ignorable, it will not
 		/// be returned, and the next token will be
 		/// examined.
-		/// Never returns a NULL pointer.
+		/// Never returns a nullptr pointer.
 		/// You must not delete the token returned by next().
 
 private:

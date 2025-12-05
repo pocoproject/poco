@@ -184,7 +184,7 @@ public:
 
 	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
 	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
-	        /// Decode RFC2047 string.
+			/// Decode RFC2047 string.
 
 
 private:

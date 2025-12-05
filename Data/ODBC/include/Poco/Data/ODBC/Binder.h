@@ -71,7 +71,7 @@ public:
 	Binder(const StatementHandle& rStmt,
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding = PB_IMMEDIATE,
-		const TypeInfo* pDataTypes = 0,
+		const TypeInfo* pDataTypes = nullptr,
 		Poco::TextEncoding::Ptr pFromEncoding = nullptr,
 		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Binder.
@@ -427,7 +427,7 @@ private:
 
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
-		_lengthIndicator.push_back(0);
+		_lengthIndicator.push_back(nullptr);
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
@@ -436,7 +436,7 @@ private:
 			Utility::sqlDataType(cDataType),
 			colSize,
 			decDigits,
-			(SQLPOINTER) &val, 0, 0)))
+			(SQLPOINTER) &val, 0, nullptr)))
 		{
 			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter()");
 		}
@@ -492,7 +492,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
@@ -544,7 +544,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
@@ -582,7 +582,7 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		const C* pVal = 0;
+		const C* pVal = nullptr;
 		if (!transcodeRequired()) pVal = &valC;
 		else
 		{
@@ -614,12 +614,12 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
 		_charPtrs[pos] = (char*) std::calloc(pVal->size() * size, sizeof(char));
 
@@ -685,12 +685,12 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_utf16CharPtrs.size() <= pos)
-			_utf16CharPtrs.resize(pos + 1, 0);
+			_utf16CharPtrs.resize(pos + 1, nullptr);
 
 		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * size, sizeof(UTF16Char));
 
@@ -745,7 +745,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
@@ -760,7 +760,7 @@ private:
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
 		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(CharType));
 		poco_check_ptr (_charPtrs[pos]);
@@ -811,13 +811,13 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_dateVecVec.size() <= pos)
 		{
-			_dateVecVec.resize(pos + 1, 0);
+			_dateVecVec.resize(pos + 1, nullptr);
 			_dateVecVec[pos] = new DateVec(length ? length : 1);
 		}
 
@@ -859,13 +859,13 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_timeVecVec.size() <= pos)
 		{
-			_timeVecVec.resize(pos + 1, 0);
+			_timeVecVec.resize(pos + 1, nullptr);
 			_timeVecVec[pos] = new TimeVec(length ? length : 1);
 		}
 
@@ -908,13 +908,13 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_dateTimeVecVec.size() <= pos)
 		{
-			_dateTimeVecVec.resize(pos + 1, 0);
+			_dateTimeVecVec.resize(pos + 1, nullptr);
 			_dateTimeVecVec[pos] = new DateTimeVec(length ? length : 1);
 		}
 
@@ -958,12 +958,12 @@ private:
 		SQLINTEGER size = 16; // UUID is fixed 16 bytes
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, size);
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
 		_charPtrs[pos] = (char*)std::calloc(val.size() * size, sizeof(char));
 		std::size_t offset = 0;
@@ -1015,7 +1015,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
 		}
 
@@ -1030,7 +1030,7 @@ private:
 			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			colSize,
 			decDigits,
-			0,
+			nullptr,
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
@@ -1057,7 +1057,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
 			auto valIt = val.begin(), valEnd = val.end();
 			auto lenIt = _vecLengthIndicator[pos]->begin(), lenEnd = _vecLengthIndicator[pos]->end();
@@ -1080,7 +1080,7 @@ private:
 			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			colSize,
 			decDigits,
-			0,
+			nullptr,
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{

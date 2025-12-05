@@ -17,7 +17,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	ListMapTest LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
 	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
-	NDCTest NotificationCenterTest NotificationQueueTest \
+	NDCTest NotificationCenterTest AsyncNotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest JSONFormatterTest PBKDF2EngineTest ProcessRunnerTest \

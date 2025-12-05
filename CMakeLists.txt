@@ -202,8 +202,18 @@ option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_TRACE "Enable stack tracing" OFF)
 
-option(ENABLE_CPPUNIT
-	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
+
+if(POCO_ENABLE_CPP20)
+	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
+endif()
+
+if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
+	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+endif()
+
+if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
 
 option(ENABLE_CPPUNIT
 	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
@@ -577,6 +587,10 @@ if(ENABLE_TRACE)
 	list(APPEND Poco_COMPONENTS "Trace")
 endif()
 
+if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
+	add_subdirectory(modules)
+endif()
+
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
@@ -644,6 +658,13 @@ endif()
 message(STATUS "[cmake] Installation target path: ${CMAKE_INSTALL_PREFIX}")
 if(CMAKE_TOOLCHAIN_FILE)
 	message(STATUS "[cmake] Use toolchain file:		${CMAKE_TOOLCHAIN_FILE}")
+endif()
+if (ENABLE_MODULES)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
+        message(STATUS "Building Poco.* C++ modules")
+    else()
+        message(WARNING "Skipping Poco.* C++ modules (requires CMake 3.28+, found ${CMAKE_VERSION})")
+    endif()
 endif()
 message(STATUS "[cmake] Build for OS type:      ${CMAKE_SYSTEM_NAME}")
 message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")

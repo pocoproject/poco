@@ -76,7 +76,7 @@ StatementExecutor::StatementExecutor(SessionHandle& sessionHandle, bool binaryEx
 	_sessionHandle(sessionHandle),
 	_binaryExtraction(binaryExtraction),
 	_state(STMT_INITED),
-	_pResultHandle(0),
+	_pResultHandle(nullptr),
 	_countPlaceholdersInSQLStatement(0),
 	_currentRow(0),
 	_affectedRowCount(0)
@@ -133,23 +133,23 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	std::replace(statementName.begin(), statementName.end(), '-', 'p');  // PostgreSQL doesn't like dashes in prepared statement names
 	const char* pStatementName = statementName.c_str();
 
-	PGresult* ptrPGResult = 0;
+	PGresult* ptrPGResult = nullptr;
 
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
 		// prepare the statement - temporary PGresult returned
-		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, (int)countPlaceholdersInSQLStatement, 0);
+		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, (int)countPlaceholdersInSQLStatement, nullptr);
 	}
 
 	{
-                // get the sqlState
-                const char* pSQLState	= PQresultErrorField(ptrPGResult, PG_DIAG_SQLSTATE);		
+		// get the sqlState
+		const char* pSQLState	= PQresultErrorField(ptrPGResult, PG_DIAG_SQLSTATE);
 
 		// setup to clear the result from PQprepare
 		PQResultClear resultClearer(ptrPGResult);
 
-                //
+				//
 		if  (!ptrPGResult || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK )
 		{
 			throw StatementException(std::string("postgresql_stmt_prepare error: ") + PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement,pSQLState);
@@ -164,8 +164,8 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	}
 
 	{
- 		// get the sqlState
-                const char* pSQLState	= PQresultErrorField(ptrPGResult, PG_DIAG_SQLSTATE);
+		// get the sqlState
+				const char* pSQLState	= PQresultErrorField(ptrPGResult, PG_DIAG_SQLSTATE);
 	
 		PQResultClear resultClearer(ptrPGResult);
 
@@ -254,15 +254,15 @@ void StatementExecutor::execute()
 	// clear out any result data.  One way or another it is now obsolete.
 	clearResults();
 
-	PGresult* ptrPGResult = 0;
+	PGresult* ptrPGResult = nullptr;
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
 		ptrPGResult = PQexecPrepared(_sessionHandle,
 			_preparedStatementName.c_str(), (int)_countPlaceholdersInSQLStatement,
-			_inputParameterVector.size() != 0 ? &pParameterVector[ 0 ] : 0,
-			_inputParameterVector.size() != 0 ? &parameterLengthVector[ 0 ] : 0,
-			_inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : 0,
+			_inputParameterVector.size() != 0 ? &pParameterVector[ 0 ] : nullptr,
+			_inputParameterVector.size() != 0 ? &parameterLengthVector[ 0 ] : nullptr,
+			_inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : nullptr,
 			_binaryExtraction ? 1 : 0);
 	}
 
@@ -279,7 +279,7 @@ void StatementExecutor::execute()
 		const char* pHint		= PQresultErrorField(ptrPGResult, PG_DIAG_MESSAGE_HINT);
 		const char* pConstraint	= PQresultErrorField(ptrPGResult, PG_DIAG_CONSTRAINT_NAME);
 
-                
+				
 		throw StatementException(std::string("postgresql_stmt_execute error: ")
 			+ PQresultErrorMessage (ptrPGResult)
 			+ " Severity: " + (pSeverity   ? pSeverity   : "N/A")
@@ -308,7 +308,7 @@ void StatementExecutor::execute()
 	{	// non Select DML statments also have an affected row count.
 		// unfortunately PostgreSQL offers up this count as a char * - go figure!
 		const char * pNonSelectAffectedRowCountString = PQcmdTuples(_pResultHandle);
-		if (0 != pNonSelectAffectedRowCountString)
+		if (nullptr != pNonSelectAffectedRowCountString)
 		{
 			if	(	Poco::NumberParser::tryParse(pNonSelectAffectedRowCountString, affectedRowCount)
 				 && affectedRowCount >= 0

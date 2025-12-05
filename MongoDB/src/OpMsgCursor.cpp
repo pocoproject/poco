@@ -43,9 +43,11 @@ namespace Poco {
 namespace MongoDB {
 
 
-static const std::string keyCursor		{"cursor"};
-static const std::string keyFirstBatch	{"firstBatch"};
-static const std::string keyNextBatch	{"nextBatch"};
+static const std::string keyCursor		{"cursor"s};
+static const std::string keyCursors		{"cursors"s};
+static const std::string keyBatchSize	{"batchSize"s};
+static const std::string keyId			{"id"s};
+static const std::string keyCursorsKilled {"cursorsKilled"s};
 
 static Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc);
 
@@ -63,7 +65,7 @@ OpMsgCursor::~OpMsgCursor()
 {
 	try
 	{
-		poco_assert_dbg(_cursorID == 0);
+		poco_assert_msg_dbg(_cursorID == 0, "OpMsgCursor destroyed with active cursor - call kill() before destruction");
 	}
 	catch (...)
 	{
@@ -71,27 +73,34 @@ OpMsgCursor::~OpMsgCursor()
 }
 
 
-void OpMsgCursor::setEmptyFirstBatch(bool empty)
+void OpMsgCursor::setEmptyFirstBatch(bool empty) noexcept
 {
 	_emptyFirstBatch = empty;
 }
 
 
-bool OpMsgCursor::emptyFirstBatch() const
+bool OpMsgCursor::emptyFirstBatch() const noexcept
 {
 	return _emptyFirstBatch;
 }
 
 
-void OpMsgCursor::setBatchSize(Int32 batchSize)
+void OpMsgCursor::setBatchSize(Int32 batchSize) noexcept
 {
 	_batchSize = batchSize;
 }
 
 
-Int32 OpMsgCursor::batchSize() const
+Int32 OpMsgCursor::batchSize() const noexcept
 {
 	return _batchSize;
+}
+
+
+bool OpMsgCursor::isActive() const noexcept
+{
+	const auto& cmd {_query.commandName()};
+	return ( _cursorID > 0 || (!cmd.empty() && cmd != OpMsgMessage::CMD_GET_MORE) );
 }
 
 
@@ -101,17 +110,30 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 	{
 		_response.clear();
 
+		if (!isActive())
+		{
+			// Cursor reached the end of data. Nothing to provide.
+			return _response;
+		}
+
 		if (_emptyFirstBatch || _batchSize > 0)
 		{
 			Int32 bsize = _emptyFirstBatch ? 0 : _batchSize;
+			auto& body { _query.body() };
 			if (_query.commandName() == OpMsgMessage::CMD_FIND)
 			{
-				_query.body().add("batchSize", bsize);
+				// Prevent duplicated fields if next() fails due to communication
+				// issues and is the used again.
+				body.remove(keyBatchSize);
+				body.add(keyBatchSize, bsize);
 			}
 			else if (_query.commandName() == OpMsgMessage::CMD_AGGREGATE)
 			{
-				auto& cursorDoc = _query.body().addNewDocument("cursor");
-				cursorDoc.add("batchSize", bsize);
+				// Prevent duplicated fields if next() fails due to communication
+				// issues and is the used again.
+				body.remove(keyCursor);
+				auto& cursorDoc = body.addNewDocument(keyCursor);
+				cursorDoc.add(keyBatchSize, bsize);
 			}
 		}
 
@@ -155,11 +177,11 @@ void OpMsgCursor::kill(Connection& connection)
 
 		MongoDB::Array::Ptr cursors = new MongoDB::Array();
 		cursors->add<Poco::Int64>(_cursorID);
-		_query.body().add("cursors", cursors);
+		_query.body().add(keyCursors, cursors);
 
 		connection.sendRequest(_query, _response);
 
-		const auto killed = _response.body().get<MongoDB::Array::Ptr>("cursorsKilled", nullptr);
+		const auto killed = _response.body().get<MongoDB::Array::Ptr>(keyCursorsKilled, nullptr);
 		if (!killed || killed->size() != 1 || killed->get<Poco::Int64>(0, -1) != _cursorID)
 		{
 			throw Poco::ProtocolException("Cursor not killed as expected: " + std::to_string(_cursorID));
@@ -178,7 +200,7 @@ Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc)
 	auto cursorDoc = doc.get<Document::Ptr>(keyCursor, nullptr);
 	if(cursorDoc)
 	{
-		id = cursorDoc->get<Poco::Int64>("id", 0);
+		id = cursorDoc->get<Poco::Int64>(keyId, 0);
 	}
 	return id;
 }

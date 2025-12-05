@@ -42,9 +42,9 @@ DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool, std::size_t ma
 	_xmlReader(xmlReader),
 	_pNamePool(pNamePool),
 	_maxDepth(maxDepth),
-	_pDocument(0),
-	_pParent(0),
-	_pPrevious(0),
+	_pDocument(nullptr),
+	_pParent(nullptr),
+	_pPrevious(nullptr),
 	_inCDATA(false),
 	_namespaces(true),
 	_depth(0)
@@ -200,7 +200,7 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 	Attr* pPrevAttr = nullptr;
 	for (const auto& attr: attrs)
 	{
-		AutoPtr<Attr> pAttr = new Attr(_pDocument, 0, attr.namespaceURI, attr.localName, attr.qname, attr.value, attr.specified);
+		AutoPtr<Attr> pAttr = new Attr(_pDocument, nullptr, attr.namespaceURI, attr.localName, attr.qname, attr.value, attr.specified);
 		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, pAttr);
 	}
 	appendNode(pElem);

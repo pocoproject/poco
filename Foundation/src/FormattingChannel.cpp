@@ -21,15 +21,15 @@ namespace Poco {
 
 
 FormattingChannel::FormattingChannel():
-	_pFormatter(0),
-	_pChannel(0)
+	_pFormatter(nullptr),
+	_pChannel(nullptr)
 {
 }
 
 
 FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter):
 	_pFormatter(pFormatter),
-	_pChannel(0)
+	_pChannel(nullptr)
 {
 }
 

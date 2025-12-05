@@ -40,7 +40,7 @@ public:
 	virtual ~Message();
 		/// Destructor
 
-	MessageHeader& header();
+	[[nodiscard]] MessageHeader& header();
 		/// Returns the message header
 
 protected:

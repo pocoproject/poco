@@ -113,7 +113,7 @@ public:
 		}
 		sigaddset(&sset, SIGQUIT);
 		sigaddset(&sset, SIGTERM);
-		sigprocmask(SIG_BLOCK, &sset, NULL);
+		sigprocmask(SIG_BLOCK, &sset, nullptr);
 		int sig;
 		sigwait(&sset, &sig);
 	}
@@ -169,7 +169,7 @@ HANDLE openFileWithRWAccess(const std::string& path)
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
 	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
-	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (handle == INVALID_HANDLE_VALUE)
 		Poco::File::handleLastError(path);

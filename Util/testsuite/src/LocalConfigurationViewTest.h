@@ -17,18 +17,18 @@
 
 class LocalConfigurationViewTest : public AbstractConfigurationTest {
    public:
-    LocalConfigurationViewTest(const std::string& name);
-    virtual ~LocalConfigurationViewTest();
+	LocalConfigurationViewTest(const std::string& name);
+	virtual ~LocalConfigurationViewTest();
 
-    void testLocalView();
+	void testLocalView();
 
-    void setUp();
-    void tearDown();
+	void setUp();
+	void tearDown();
 
-    static CppUnit::Test* suite();
+	static CppUnit::Test* suite();
 
    private:
-    virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
 };
 
 #endif  // LocalConfigurationViewTest_INCLUDED

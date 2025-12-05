@@ -174,13 +174,13 @@ void SQLExecutor::oidPostgreSQLTest(std::string host, std::string user, std::str
 	connectionString.append("port=");
 	connectionString.append(port);
 
-	PGconn *  pConnection = 0;
+	PGconn *  pConnection = nullptr;
 
 	pConnection = PQconnectdb(connectionString.c_str());
 
 	assertTrue (PQstatus(pConnection) == CONNECTION_OK);
 
-	PGresult * pResult = 0;
+	PGresult * pResult = nullptr;
 	std::string sql = "DROP TABLE IF EXISTS Test";
 
 	pResult = PQexec(pConnection, sql.c_str());
@@ -203,7 +203,7 @@ void SQLExecutor::oidPostgreSQLTest(std::string host, std::string user, std::str
 	sql = "SELECT * FROM Test";
 	std::string selectStatementName = "SELECT Statement";
 
-	pResult = PQprepare(pConnection, selectStatementName.c_str(), sql.c_str(), 0, 0);
+	pResult = PQprepare(pConnection, selectStatementName.c_str(), sql.c_str(), 0, nullptr);
 
 	assertTrue (PQresultStatus(pResult) == PGRES_COMMAND_OK);
 	PQclear(pResult);
@@ -273,20 +273,20 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 	connectionString.append("port=");
 	connectionString.append(port);
 
-	PGconn *  pConnection = 0;
+	PGconn *  pConnection = nullptr;
 
 	pConnection = PQconnectdb(connectionString.c_str());
 
 	assertTrue (PQstatus(pConnection) == CONNECTION_OK);
 
-	PGresult * pResult = 0;
+	PGresult * pResult = nullptr;
 	std::string sql = "DROP TABLE IF EXISTS Test";
 
 	pResult = PQexec(pConnection, sql.c_str());
 
 	std::cout << "Drop Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
 
-	assertTrue (	PQresultStatus(pResult) == PGRES_COMMAND_OK
+	assertTrue (PQresultStatus(pResult) == PGRES_COMMAND_OK
 			|| PQresultStatus(pResult) == PGRES_FATAL_ERROR);
 
 	PQclear(pResult);
@@ -306,7 +306,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 						insertStatementName.c_str(),
 						sql.c_str(),
 						5,
-						0
+						nullptr
 						);
 
 	assertTrue (PQresultStatus(pResult) == PGRES_COMMAND_OK);
@@ -316,7 +316,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 	int fourth = ByteOrder::toNetwork((Poco::UInt32) 4);
 	float fifth = 1.5;
 
-	const char *paramValues[5] = { 0 };
+	const char *paramValues[5] = { nullptr };
 	int paramLengths[5] = { 0 };
 	int paramFormats[5] = { 0 };
 
@@ -364,7 +364,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 
 	assertTrue (PQntuples(pResult) == 1);
 
-	char* pSelectResult[5] = { 0 };
+	char* pSelectResult[5] = { nullptr };
 	int pResultLengths[5] = { 0 };
 
 	// column 0
@@ -377,7 +377,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 										0,
 										0
 									);
-	assertTrue (pSelectResult[ 0 ] != 0);
+	assertTrue (pSelectResult[ 0 ] != nullptr);
 	assertTrue (pResultLengths[ 0 ] != 0);
 
 	// column 1
@@ -390,7 +390,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 										0,
 										1
 									);
-	assertTrue (pSelectResult[ 1 ] != 0);
+	assertTrue (pSelectResult[ 1 ] != nullptr);
 	assertTrue (pResultLengths[ 1 ] != 0);
 
 	// column 2
@@ -403,7 +403,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 										0,
 										2
 									);
-	assertTrue (pSelectResult[ 2 ] != 0);
+	assertTrue (pSelectResult[ 2 ] != nullptr);
 	assertTrue (pResultLengths[ 2 ] != 0);
 
 // column 3
@@ -416,7 +416,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 											0,
 											3
 									);
-	assertTrue (pSelectResult[ 3 ] != 0);
+	assertTrue (pSelectResult[ 3 ] != nullptr);
 	assertTrue (pResultLengths[ 3 ] != 0);
 
 	// column 4
@@ -429,7 +429,7 @@ void SQLExecutor::barebonePostgreSQLTest(std::string host, std::string user, std
 										0,
 										4
 									);
-	assertTrue (pSelectResult[ 4 ] != 0);
+	assertTrue (pSelectResult[ 4 ] != nullptr);
 	assertTrue (pResultLengths[ 4 ] != 0);
 
 /*

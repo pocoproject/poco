@@ -54,7 +54,7 @@ const PrivateKeyFactory* PrivateKeyFactoryMgr::getFactory(const std::string& nam
 	if (it != _factories.end())
 		return it->second;
 	else
-		return 0;
+		return nullptr;
 }
 
 

@@ -624,7 +624,7 @@ Foundation_API void floatToFixedStr(char* buffer,
 	int precision);
 	/// Converts a float value to string. Converted string must be shorter than bufferSize.
 	/// Computes a decimal representation with a fixed number of digits after the
-  	/// decimal point.
+	/// decimal point.
 
 
 Foundation_API std::string& floatToStr(std::string& str,
@@ -667,7 +667,7 @@ Foundation_API void doubleToFixedStr(char* buffer,
 	int precision);
 	/// Converts a double value to string. Converted string must be shorter than bufferSize.
 	/// Computes a decimal representation with a fixed number of digits after the
-  	/// decimal point.
+	/// decimal point.
 
 
 Foundation_API std::string& doubleToStr(std::string& str,

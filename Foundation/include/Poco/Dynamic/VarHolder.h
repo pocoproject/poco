@@ -3468,7 +3468,7 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const override
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3604,7 +3604,7 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const override
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

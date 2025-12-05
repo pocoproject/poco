@@ -687,5 +687,5 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

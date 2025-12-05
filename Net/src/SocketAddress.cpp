@@ -423,7 +423,7 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 #if defined(POCO_VXWORKS)
 		throw ServiceNotFoundException(service);
 #else
-		struct servent* se = getservbyname(service.c_str(), NULL);
+		struct servent* se = getservbyname(service.c_str(), nullptr);
 		if (se)
 			return ntohs(se->s_port);
 		else
@@ -431,6 +431,20 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 #endif
 	}
 }
+
+
+void SocketAddress::newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	_pImpl = new Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+}
+
+
+#if defined(POCO_HAVE_IPv6)
+void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	_pImpl = new Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+}
+#endif // POCO_HAVE_IPv6
 
 
 Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value)

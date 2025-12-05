@@ -110,7 +110,7 @@ private:
 	void generateKey(const std::string& passphrase,
 		const std::string& salt,
 		int iterationCount);
-	 	/// Generates key and IV from a password and optional salt string.
+		/// Generates key and IV from a password and optional salt string.
 
 	void generateKey();
 		/// Generates key and IV from random data.

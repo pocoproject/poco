@@ -16,6 +16,7 @@
 #include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
@@ -47,10 +48,10 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPServerSession& session):
+HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPSession& session):
 	_session(session),
-	_pRequest(0),
-	_pStream(0)
+	_pRequest(nullptr),
+	_pStream(nullptr)
 {
 }
 

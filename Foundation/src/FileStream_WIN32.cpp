@@ -63,7 +63,7 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 
 	std::wstring utf16Path;
 	FileImpl::convertPath(path, utf16Path);
-	_handle = ::CreateFileW(utf16Path.c_str(), access, shareMode, NULL, creationDisp, flags, NULL);
+	_handle = ::CreateFileW(utf16Path.c_str(), access, shareMode, nullptr, creationDisp, flags, nullptr);
 
 	if (_handle == INVALID_HANDLE_VALUE)
 		File::handleLastError(_path);
@@ -98,7 +98,7 @@ int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		sync();
 
 	DWORD bytesRead(0);
-	BOOL rc = ::ReadFile(_handle, buffer, static_cast<DWORD>(length), &bytesRead, NULL);
+	BOOL rc = ::ReadFile(_handle, buffer, static_cast<DWORD>(length), &bytesRead, nullptr);
 	if (rc == 0)
 	{
 		if (::GetLastError() == ERROR_BROKEN_PIPE)
@@ -131,7 +131,7 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	}
 
 	DWORD bytesWritten(0);
-	BOOL rc = ::WriteFile(_handle, buffer, static_cast<DWORD>(length), &bytesWritten, NULL);
+	BOOL rc = ::WriteFile(_handle, buffer, static_cast<DWORD>(length), &bytesWritten, nullptr);
 	if (rc == 0)
 		File::handleLastError(_path);
 
