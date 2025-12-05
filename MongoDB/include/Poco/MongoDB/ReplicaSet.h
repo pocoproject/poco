@@ -29,6 +29,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <chrono>
 
 
 namespace Poco {
@@ -162,6 +163,14 @@ public:
 		/// Returns a connection to a server matching the read preference.
 		/// Returns null if no suitable server is available.
 
+	Connection::Ptr waitForServerAvailability(const ReadPreference& readPref);
+		/// Waits for a server to become available for the given read preference.
+		/// This method coordinates waiting between multiple threads - only one thread
+		/// performs the actual sleep and topology refresh, while others benefit from
+		/// the refresh done by the first thread.
+		/// Returns a connection if a server becomes available, or null if still unavailable.
+		/// Thread-safe: uses internal synchronization to prevent redundant refresh attempts.
+
 	Connection::Ptr getPrimaryConnection();
 		/// Returns a connection to the primary server.
 		/// Returns null if no primary is available.
@@ -228,12 +237,17 @@ private:
 		/// Parses a MongoDB URI into configuration.
 		/// Extracts hosts and query parameters into _config.
 
+	mutable std::mutex _mutex;
+
 	Config _config;
 	TopologyDescription _topology;
-	mutable std::mutex _mutex;
+
 	std::thread _monitorThread;
 	std::atomic<bool> _stopMonitoring{false};
 	std::atomic<bool> _monitoringActive{false};
+
+	std::mutex _serverAvailabilityRetryMutex;
+	std::chrono::steady_clock::time_point _topologyRefreshTime;
 };
 
 

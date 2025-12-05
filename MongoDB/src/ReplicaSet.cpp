@@ -139,6 +139,42 @@ Connection::Ptr ReplicaSet::getSecondaryConnection()
 }
 
 
+Connection::Ptr ReplicaSet::waitForServerAvailability(const ReadPreference& readPref)
+{
+	// Timeopoint when this thread started to wait for the server to become available
+	const auto waitStartTime = std::chrono::steady_clock::now();
+
+	// Coordinate waiting between threads to avoid redundant refresh attempts
+	std::lock_guard<std::mutex> lock(_serverAvailabilityRetryMutex);
+
+	if (waitStartTime <= _topologyRefreshTime)
+	{
+		// Another thread recently refreshed, try getting connection without waiting
+		return getConnection(readPref);
+	}
+
+	// Retry up to serverReconnectRetries times to wait for servers to become available
+	for (std::size_t i = 0; i < _config.serverReconnectRetries; ++i)
+	{
+		// Sleep before refreshing topology
+		std::this_thread::sleep_for(std::chrono::seconds(_config.serverReconnectDelaySeconds));
+
+		// Refresh topology to discover available servers
+		refreshTopology();
+
+		// Try to get a connection after refresh
+		Connection::Ptr conn = getConnection(readPref);
+		if (!conn.isNull())
+		{
+			return conn;
+		}
+	}
+
+	// All retries exhausted, no servers available
+	return nullptr;
+}
+
+
 TopologyDescription ReplicaSet::topology() const
 {
 	std::lock_guard<std::mutex> lock(_mutex);
@@ -542,6 +578,8 @@ void ReplicaSet::updateTopologyFromAllServers() noexcept
 			// Continue to next server
 		}
 	}
+	// Update timestamp after refreshing topology
+	_topologyRefreshTime = std::chrono::steady_clock::now();
 }
 
 

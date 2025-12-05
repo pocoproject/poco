@@ -214,36 +214,30 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 		_connection = nullptr;
 
 		// Get new connection, avoiding servers we've already tried
-		bool foundNewServer = false;
-		for (std::size_t i = 0; i < rsConfig.serverReconnectRetries && !foundNewServer; ++i)  // Try several times to connect
+		Connection::Ptr newConn = _replicaSet.getConnection(_readPreference);
+		if (newConn.isNull())
 		{
-			Connection::Ptr newConn = _replicaSet.getConnection(_readPreference);
+			// No servers currently available - use coordinated retry logic.
+			// This ensures only one thread performs the sleep/refresh cycle.
+			newConn = _replicaSet.waitForServerAvailability(_readPreference);
+
+			// Clear tried servers since we're starting fresh after waiting
+			triedServers.clear();
+
 			if (newConn.isNull())
 			{
-				// No servers available at this moment. Wait briefly and retry.
-				std::this_thread::sleep_for(std::chrono::seconds(rsConfig.serverReconnectDelaySeconds));
-				triedServers.clear();
-				_replicaSet.refreshTopology();
-
-				continue;
-			}
-
-			Net::SocketAddress addr = newConn->address();
-			if (triedServers.find(addr) == triedServers.end())
-			{
-				logDebug(Poco::format("Connection reconnected to server: %s"s, addr.toString()));
-				_connection = newConn;
-				foundNewServer = true;
+				// No servers available even after retries
+				break;
 			}
 		}
 
-		if (!foundNewServer)
+		Net::SocketAddress addr = newConn->address();
+		if (triedServers.find(addr) == triedServers.end())
 		{
-			// No new servers to try
-			break;
+			logDebug(Poco::format("Connection reconnected to server: %s"s, addr.toString()));
+			_connection = newConn;
+			++attempt;
 		}
-
-		++attempt;
 	}
 
 	// All retries failed, rethrow the last exception
