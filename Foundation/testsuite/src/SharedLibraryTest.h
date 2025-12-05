@@ -27,6 +27,7 @@ public:
 	void testSharedLibrary1();
 	void testSharedLibrary2();
 	void testSharedLibrary3();
+	void testMissingDependencies();
 
 	void setUp();
 	void tearDown();
@@ -35,6 +36,7 @@ public:
 
 private:
 	static std::string getFullName(const std::string& libName);
+	static std::string getLibFullName(const std::string& libName);
 };
 
 

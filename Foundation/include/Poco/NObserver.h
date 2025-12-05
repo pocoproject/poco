@@ -64,8 +64,8 @@ public:
 	NObserver(C& object, Handler method, Matcher matcher = nullptr, SyncHandler syncMethod = nullptr):
 		_pObject(&object),
 		_handler(method),
-		_matcher(matcher),
-		_syncHandler(syncMethod)
+		_syncHandler(syncMethod),
+		_matcher(matcher)
 	{
 	}
 

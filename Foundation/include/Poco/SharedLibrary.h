@@ -19,6 +19,8 @@
 
 
 #include "Poco/Foundation.h"
+#include <vector>
+#include <string>
 
 
 #if defined(hpux) || defined(_hpux)
@@ -129,6 +131,19 @@ public:
 		/// Currently only supported on Windows, where it calls
 		/// SetDllDirectory(). On all other platforms, does not
 		/// do anything and returns false.
+
+	static std::vector<std::string> findMissingDependencies(const std::string& path);
+		/// Parses the shared library at the given path and returns
+		/// a list of dependent libraries that cannot be found.
+		/// If the library itself whose dependencies are checked is not found,
+		/// it returns the library itself.
+		///
+		/// Useful for diagnosing why a library fails to load.
+		/// On Windows, parses the PE import table. On Linux, parses the
+		/// ELF dynamic section. On macOS, parses the Mach-O load commands.
+		///
+		/// Returns an empty vector if the file cannot be parsed or
+		/// on unsupported platforms.
 
 private:
 	SharedLibrary(const SharedLibrary&);
