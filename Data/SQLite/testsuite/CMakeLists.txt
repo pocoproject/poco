@@ -12,6 +12,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(DataSQLite-testrunner ${TEST_SRCS})
+set_target_properties(DataSQLite-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME DataSQLite

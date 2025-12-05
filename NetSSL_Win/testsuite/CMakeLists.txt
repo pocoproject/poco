@@ -11,6 +11,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(NetSSLWin-testrunner ${TEST_SRCS})
+set_target_properties(NetSSLWin-testrunner PROPERTIES DEBUG_POSTFIX "d")
 add_test(
 	NAME NetSSLWin
 	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}

@@ -11,6 +11,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(Zip-testrunner ${TEST_SRCS})
+set_target_properties(Zip-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME Zip
