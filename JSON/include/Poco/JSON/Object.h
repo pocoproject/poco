@@ -371,7 +371,8 @@ private:
 	bool              _lowercaseHex;
 	mutable StructPtr    _pStruct;
 	mutable OrdStructPtr _pOrdStruct;
-	mutable bool         _modified;
+	mutable bool         _structModified;
+	mutable bool         _ordStructModified;
 };
 
 
@@ -488,7 +489,8 @@ inline void Object::remove(const std::string& key)
 		}
 	}
 	_values.erase(key);
-	_modified = true;
+	_structModified = true;
+	_ordStructModified = true;
 }
 
 
