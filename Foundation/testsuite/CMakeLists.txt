@@ -62,46 +62,51 @@ set_target_properties(TestApp PROPERTIES
 )
 target_link_libraries(TestApp PUBLIC Poco::Foundation)
 
-# TestLibrary
-add_library(TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h)
-set_target_properties(TestLibrary PROPERTIES
-	DEBUG_POSTFIX "d"
-	# The test requires the library named TestLibrary. By default it is prefixed with lib.
-	PREFIX ""
-)
+add_dependencies(Foundation-testrunner TestApp)
 
-# The test is run in the runtime directory. So the TestLibrary is built there too because it is used by the tests
-set_target_properties(TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-target_link_libraries(TestLibrary PUBLIC Poco::Foundation)
-
-add_dependencies(Foundation-testrunner TestApp TestLibrary)
-
-# TestLibraryMissingDeps - a library with missing dependencies for testing findMissingDependencies
-# Build a stub library that TestLibraryMissingDeps links against
-# The test will delete it at runtime to simulate a missing dependency
-add_library(NonExistentLibrary SHARED src/NonExistentStub.c)
-set_target_properties(NonExistentLibrary PROPERTIES
-	DEBUG_POSTFIX "d"
-	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
-)
-# For multi-config generators (Visual Studio), set per-configuration archive output
-foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
-	set_target_properties(NonExistentLibrary PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER}}
+# TestLibrary and related shared libraries - only for shared library builds
+# SharedLibrary and ClassLoader tests require dynamically loadable libraries
+if(BUILD_SHARED_LIBS)
+	add_library(TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h)
+	set_target_properties(TestLibrary PROPERTIES
+		DEBUG_POSTFIX "d"
+		# The test requires the library named TestLibrary. By default it is prefixed with lib.
+		PREFIX ""
 	)
-endforeach()
 
-add_library(TestLibraryMissingDeps SHARED src/TestLibraryMissingDeps.cpp)
-set_target_properties(TestLibraryMissingDeps PROPERTIES
-	DEBUG_POSTFIX "d"
-	PREFIX ""
-	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-)
-target_link_libraries(TestLibraryMissingDeps PUBLIC Poco::Foundation NonExistentLibrary)
-add_dependencies(TestLibraryMissingDeps NonExistentLibrary)
+	# The test is run in the runtime directory. So the TestLibrary is built there too because it is used by the tests
+	set_target_properties(TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+	target_link_libraries(TestLibrary PUBLIC Poco::Foundation)
 
-add_dependencies(Foundation-testrunner TestLibraryMissingDeps)
+	add_dependencies(Foundation-testrunner TestLibrary)
+
+	# TestLibraryMissingDeps - a library with missing dependencies for testing findMissingDependencies
+	# Build a stub library that TestLibraryMissingDeps links against
+	# The test will delete it at runtime to simulate a missing dependency
+	add_library(NonExistentLibrary SHARED src/NonExistentStub.c)
+	set_target_properties(NonExistentLibrary PROPERTIES
+		DEBUG_POSTFIX "d"
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+	)
+	# For multi-config generators (Visual Studio), set per-configuration archive output
+	foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+		string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
+		set_target_properties(NonExistentLibrary PROPERTIES
+			ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER}}
+		)
+	endforeach()
+
+	add_library(TestLibraryMissingDeps SHARED src/TestLibraryMissingDeps.cpp)
+	set_target_properties(TestLibraryMissingDeps PROPERTIES
+		DEBUG_POSTFIX "d"
+		PREFIX ""
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+	)
+	target_link_libraries(TestLibraryMissingDeps PUBLIC Poco::Foundation NonExistentLibrary)
+	add_dependencies(TestLibraryMissingDeps NonExistentLibrary)
+
+	add_dependencies(Foundation-testrunner TestLibraryMissingDeps)
+endif()

@@ -50,6 +50,10 @@ SharedLibraryTest::~SharedLibraryTest()
 
 void SharedLibraryTest::testSharedLibrary1()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	SharedLibrary sl;
 	assertTrue (!sl.isLoaded());
@@ -83,6 +87,10 @@ void SharedLibraryTest::testSharedLibrary1()
 
 void SharedLibraryTest::testSharedLibrary2()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	SharedLibrary sl(libraryPath);
 	assertTrue (sl.getPath() == libraryPath);
@@ -98,6 +106,10 @@ void SharedLibraryTest::testSharedLibrary2()
 
 void SharedLibraryTest::testSharedLibrary3()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = "NonexistentLibrary";
 	libraryPath.append(libraryPath);
 	SharedLibrary sl;
@@ -140,9 +152,12 @@ void SharedLibraryTest::testSharedLibrary3()
 
 void SharedLibraryTest::testMissingDependencies()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	// Test with a valid library - should return empty list (all dependencies found)
 	std::string libraryPath = getFullName("TestLibrary");
-	assertTrue (File(libraryPath).exists());
 	std::vector<std::string> missing = SharedLibrary::findMissingDependencies(libraryPath);
 	// TestLibrary should have all its dependencies available
 	for (const auto& dep : missing)

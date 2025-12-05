@@ -49,6 +49,10 @@ template class ClassLoader<TestPlugin>;
 
 void ClassLoaderTest::testClassLoader1()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	ClassLoader<TestPlugin> cl;
 
@@ -88,6 +92,10 @@ void ClassLoaderTest::testClassLoader1()
 
 void ClassLoaderTest::testClassLoader2()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	ClassLoader<TestPlugin> cl;
 	cl.loadLibrary(libraryPath);
@@ -176,6 +184,10 @@ void ClassLoaderTest::testClassLoader2()
 
 void ClassLoaderTest::testClassLoader3()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	ClassLoader<TestPlugin> cl;
 	cl.loadLibrary(libraryPath);
