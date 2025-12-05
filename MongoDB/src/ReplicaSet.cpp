@@ -14,10 +14,12 @@
 
 #include "Poco/MongoDB/ReplicaSet.h"
 #include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/TopologyChangeNotification.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
 #include "Poco/URI.h"
 #include "Poco/NumberParser.h"
+#include "Poco/NotificationCenter.h"
 #include <chrono>
 
 using namespace std::string_literals;
@@ -200,16 +202,6 @@ void ReplicaSet::refreshTopology()
 	// Update topology from all servers
 	updateTopologyFromAllServers();
 
-	// Check if logger is registered before building log messages
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		if (_config.logger == nullptr)
-		{
-			// No logger registered, skip message preparation
-			return;
-		}
-	}
-
 	// Get new topology and compare using comparison operator
 	TopologyDescription newTopology;
 	{
@@ -220,8 +212,31 @@ void ReplicaSet::refreshTopology()
 	// Check if topology changed using comparison operator
 	if (oldTopology == newTopology)
 	{
-		// No change detected, nothing to log
+		// No change detected, nothing to log or notify
 		return;
+	}
+
+	// Topology changed - send notification
+	{
+		Poco::DynamicStruct notificationData;
+		notificationData["replicaSet"s] = newTopology.setName();
+		notificationData["timestamp"s] =
+			std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now().time_since_epoch() ).count();
+		notificationData["topologyType"s] = TopologyDescription::typeToString(newTopology.type());
+
+		Poco::NotificationCenter::defaultCenter().postNotification(
+			new TopologyChangeNotification(notificationData)
+		);
+	}
+
+	// Check if logger is registered before building log messages
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		if (_config.logger == nullptr)
+		{
+			// No logger registered, skip message preparation
+			return;
+		}
 	}
 
 	// Topology changed and logger is registered - build detailed change description for logging
