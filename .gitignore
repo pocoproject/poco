@@ -205,3 +205,5 @@ Foundation/src/zconf.h
 Foundation/src/zlib.h
 Foundation/src/zutil.c
 Foundation/src/zutil.h
+Foundation/pdjson.c
+Foundation/pdjson.h

@@ -19,6 +19,7 @@
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
 #include "Poco/Event.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/NObserver.h"
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
@@ -43,6 +44,7 @@ using Poco::NoThreadAvailableException;
 using Poco::SystemException;
 using Poco::NullPointerException;
 using Poco::AutoPtr;
+using Poco::Stopwatch;
 
 
 namespace
@@ -340,12 +342,23 @@ void TaskManagerTest::testError()
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	assertTrue (tm.start(pTT.duplicate()));
-	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
+	Stopwatch sw;
+	sw.start();
+	while (pTT->state() < Task::TASK_RUNNING)
+	{
+		Thread::sleep(50);
+		assertTrue (sw.elapsed() < 5000000); // 5 second timeout
+	}
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
-	while (pTT->progress() != 0.5) Thread::sleep(50);
-	assertTrue (to.progress() == 0.5);
+	sw.restart();
+	while (to.progress() < 0.5)
+	{
+		Thread::sleep(50);
+		assertTrue (sw.elapsed() < 5000000); // 5 second timeout
+	}
+	assertTrue (to.progress() >= 0.5);
 	assertTrue (to.started());
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	TaskManager::TaskList list = tm.taskList();
@@ -353,14 +366,34 @@ void TaskManagerTest::testError()
 	assertTrue (tm.count() == 1);
 	pTT->fail();
 	pTT->cont();
-	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	sw.restart();
+	while (pTT->state() != Task::TASK_FINISHED)
+	{
+		Thread::sleep(50);
+		assertTrue (sw.elapsed() < 5000000); // 5 second timeout
+	}
 	pTT->cont();
-	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	sw.restart();
+	while (pTT->state() != Task::TASK_FINISHED)
+	{
+		Thread::sleep(50);
+		assertTrue (sw.elapsed() < 5000000); // 5 second timeout
+	}
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
-	while (!to.finished()) Thread::sleep(50);
+	sw.restart();
+	while (!to.finished())
+	{
+		Thread::sleep(50);
+		assertTrue (sw.elapsed() < 5000000); // 5 second timeout
+	}
 	assertTrue (to.finished());
 	assertTrue (to.error() != nullptr);
-	while (tm.count() == 1) Thread::sleep(50);
+	sw.restart();
+	while (tm.count() == 1)
+	{
+		Thread::sleep(50);
+		assertTrue (sw.elapsed() < 5000000); // 5 second timeout
+	}
 	list = tm.taskList();
 	assertTrue (list.empty());
 	tm.cancelAll();

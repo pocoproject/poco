@@ -180,7 +180,6 @@ std::vector<std::string> SharedLibraryImpl::findMissingDependenciesImpl(const st
 		if (!file)
 			return missingDeps;
 
-		bool is64 = false;
 		bool needsSwap = false;
 		uint32_t ncmds = 0;
 		uint32_t sizeofcmds = 0;
@@ -213,7 +212,6 @@ std::vector<std::string> SharedLibraryImpl::findMissingDependenciesImpl(const st
 
 		if (magic == MH_MAGIC_64 || magic == MH_CIGAM_64)
 		{
-			is64 = true;
 			needsSwap = (magic == MH_CIGAM_64);
 			file.seekg(-static_cast<std::streamoff>(sizeof(magic)), std::ios::cur);
 			mach_header_64 header;
@@ -225,7 +223,6 @@ std::vector<std::string> SharedLibraryImpl::findMissingDependenciesImpl(const st
 		}
 		else if (magic == MH_MAGIC || magic == MH_CIGAM)
 		{
-			is64 = false;
 			needsSwap = (magic == MH_CIGAM);
 			file.seekg(-static_cast<std::streamoff>(sizeof(magic)), std::ios::cur);
 			mach_header header;
