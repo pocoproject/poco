@@ -777,30 +777,105 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure
 
-  linux-gcc-cmake-odbc:
+  linux-gcc-cmake-odbc-oracle:
     runs-on: ubuntu-22.04
     services:
-      #mysql:
-      #  image: mysql:8.1.0
-      #  env:
-      #    MYSQL_ALLOW_EMPTY_PASSWORD: yes
-      #    MYSQL_USER: pocotest
-      #    MYSQL_PASSWORD: pocotest
-      #    MYSQL_DATABASE: pocotest
-      #  ports:
-      #    - 3306:3306
-      #postgres:
-      #  image: postgres:16.0
-      #  env:
-      #    POSTGRES_PASSWORD: postgres
-      #  ports:
-      #    - 5432:5432
       oracle:
-       image: container-registry.oracle.com/database/express:21.3.0-xe
+       image: container-registry.oracle.com/database/free:23.5.0.0-lite
        env:
          ORACLE_PWD: poco
        ports:
          - 1521:1521
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-check runner disk & cleanup
+        run: |
+          echo "Disk usage before cleanup:"
+          df -h .
+          free -h
+          sudo rm -f /var/lib/dpkg/lock-frontend /var/cache/apt/archives/lock || true
+          sudo apt-get -y autoremove --purge || true
+          sudo apt-get -y clean || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo npm cache clean --force || true
+          sudo docker system prune -a --force || true
+          echo "Disk usage after cleanup:"
+          df -h .
+
+      - name: Install basic system dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          set -euxo pipefail
+          sudo rm -f /var/lib/dpkg/lock-frontend /var/cache/apt/archives/lock || true
+          sudo apt-get update -o Acquire::Retries=3
+          for i in 1 2 3; do
+            sudo apt-get install -y --no-install-recommends \
+              -o Dpkg::Options::="--force-confdef" \
+              -o Dpkg::Options::="--force-confold" \
+              libssl-dev unixodbc-dev alien libaio1 gnupg2 curl \
+              odbcinst1debian2 libodbc1 odbcinst || {
+              echo "apt-get install attempt $i failed; retrying in 10s..."
+              sleep 10
+              continue
+            }
+            break
+          done
+
+      - name: Setup Oracle Instant Client ODBC driver
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          set -euxo pipefail
+          # Download Oracle Instant Client 23 Basic and ODBC packages
+          wget https://download.oracle.com/otn_software/linux/instantclient/2326000/instantclient-basic-linux.x64-23.26.0.0.0.zip
+          wget https://download.oracle.com/otn_software/linux/instantclient/2326000/instantclient-odbc-linux.x64-23.26.0.0.0.zip
+          # Extract to /opt/oracle
+          sudo mkdir -p /opt/oracle
+          sudo unzip -o instantclient-basic-linux.x64-23.26.0.0.0.zip -d /opt/oracle
+          sudo unzip -o instantclient-odbc-linux.x64-23.26.0.0.0.zip -d /opt/oracle
+          # Configure library path
+          echo /opt/oracle/instantclient_23_26 | sudo tee /etc/ld.so.conf.d/oracle-instantclient.conf
+          sudo ldconfig
+          # Run ODBC configuration script
+          cd /opt/oracle/instantclient_23_26
+          sudo ./odbc_update_ini.sh /
+          # Verify installation
+          cat /etc/odbcinst.ini || true
+          odbcinst -q -d || true
+
+      - name: Upload apt/dpkg logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apt-dpkg-logs-oracle
+          path: ci-apt-logs
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
+      - run: cmake --build cmake-build --target all --parallel 4
+      - name: Create Oracle test user
+        run: |
+          set -euxo pipefail
+          CONTAINER_ID=$(docker ps -q --filter ancestor=container-registry.oracle.com/database/free:23.5.0.0-lite)
+          docker exec $CONTAINER_ID bash -c "echo \"
+            CREATE USER poco IDENTIFIED BY poco;
+            GRANT CONNECT, RESOURCE, DBA TO poco;
+            GRANT UNLIMITED TABLESPACE TO poco;
+          \" | sqlplus -s sys/poco@localhost:1521/FREEPDB1 as sysdba"
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest --output-on-failure
+
+  linux-gcc-cmake-odbc-sqlserver:
+    runs-on: ubuntu-22.04
+    services:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
@@ -826,7 +901,7 @@ jobs:
           echo "Disk usage after cleanup:"
           df -h .
 
-      - name: Install basic system dependencies (robust)
+      - name: Install basic system dependencies
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -846,17 +921,6 @@ jobs:
             break
           done
 
-      - name: Setup Oracle ODBC connector (.deb) and fix deps
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          set -euxo pipefail
-          wget https://www.devart.com/odbc/oracle/devartodbcoracle_amd64.deb
-          sudo dpkg -i devartodbcoracle_amd64.deb || true
-          sudo apt-get update -o Acquire::Retries=3
-          sudo apt-get install -y -f
-          dpkg -l | grep -Ei 'devart|odbc|oracle' || true
-
       - name: Setup Microsoft packages & msodbcsql18
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -868,28 +932,11 @@ jobs:
           sudo apt-get update -o Acquire::Retries=3
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
-      - name: Capture apt/dpkg/system diagnostics on failure
-        if: failure()
-        run: |
-          set -euxo pipefail
-          echo "===== APT / DPKG DIAGNOSTICS ====="
-          sudo tail -n +1 /var/log/apt/term.log || true
-          sudo tail -n +1 /var/log/apt/history.log || true
-          sudo tail -n +1 /var/log/dpkg.log || true
-          df -h || true
-          free -h || true
-          uname -a || true
-          dmesg --level=err,warn | tail -n 200 || true
-          mkdir -p $GITHUB_WORKSPACE/ci-apt-logs
-          sudo cp /var/log/apt/* $GITHUB_WORKSPACE/ci-apt-logs/ 2>/dev/null || true
-          sudo cp /var/log/dpkg.log $GITHUB_WORKSPACE/ci-apt-logs/ 2>/dev/null || true
-          ls -l $GITHUB_WORKSPACE/ci-apt-logs || true
-
       - name: Upload apt/dpkg logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: apt-dpkg-logs
+          name: apt-dpkg-logs-sqlserver
           path: ci-apt-logs
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
