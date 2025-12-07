@@ -57,6 +57,27 @@ jobs:
             break
           done
 
+      - name: Wait for Oracle and create test user
+        run: |
+          set -euxo pipefail
+          # Wait for Oracle to be ready (up to 5 minutes)
+          for i in {1..60}; do
+            if docker exec $(docker ps -q --filter ancestor=container-registry.oracle.com/database/free:23.5.0.0-lite) sqlplus -s sys/poco@localhost:1521/FREEPDB1 as sysdba <<< "SELECT 1 FROM DUAL;" 2>/dev/null | grep -q "1"; then
+              echo "Oracle is ready!"
+              break
+            fi
+            echo "Waiting for Oracle to start... ($i/60)"
+            sleep 5
+          done
+          # Create the poco user
+          docker exec $(docker ps -q --filter ancestor=container-registry.oracle.com/database/free:23.5.0.0-lite) sqlplus -s sys/poco@localhost:1521/FREEPDB1 as sysdba <<EOF
+          CREATE USER poco IDENTIFIED BY poco;
+          GRANT CONNECT, RESOURCE, DBA TO poco;
+          GRANT UNLIMITED TABLESPACE TO poco;
+          ALTER USER poco DEFAULT TABLESPACE USERS;
+          EXIT;
+          EOF
+
       - name: Setup Oracle Instant Client ODBC driver
         env:
           DEBIAN_FRONTEND: noninteractive
