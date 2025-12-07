@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       oracle:
-       image: container-registry.oracle.com/database/express:21.3.0-xe
+       image: container-registry.oracle.com/database/free:23.5.0.0-lite
        env:
          ORACLE_PWD: poco
        ports:
