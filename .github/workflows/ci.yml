@@ -113,7 +113,6 @@ jobs:
             CREATE USER poco IDENTIFIED BY poco;
             GRANT CONNECT, RESOURCE, DBA TO poco;
             GRANT UNLIMITED TABLESPACE TO poco;
-            ALTER USER poco DEFAULT TABLESPACE USERS;
           \" | sqlplus -s sys/poco@localhost:1521/FREEPDB1 as sysdba"
       - uses: ./.github/actions/retry-action
         with:
