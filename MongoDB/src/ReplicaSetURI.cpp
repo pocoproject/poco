@@ -145,15 +145,15 @@ void ReplicaSetURI::setSocketTimeoutMS(unsigned int timeoutMS)
 }
 
 
-unsigned int ReplicaSetURI::heartbeatFrequency() const
+unsigned int ReplicaSetURI::heartbeatFrequencyMS() const
 {
-	return _heartbeatFrequency;
+	return _heartbeatFrequencyMS;
 }
 
 
-void ReplicaSetURI::setHeartbeatFrequency(unsigned int seconds)
+void ReplicaSetURI::setHeartbeatFrequencyMS(unsigned int milliseconds)
 {
-	_heartbeatFrequency = seconds;
+	_heartbeatFrequencyMS = milliseconds;
 }
 
 
@@ -410,9 +410,9 @@ void ReplicaSetURI::parseOptions(const Poco::URI::QueryParameters& params)
 		{
 			_socketTimeoutMS = Poco::NumberParser::parseUnsigned(param.second);
 		}
-		else if (param.first == "heartbeatFrequency"s)
+		else if (param.first == "heartbeatFrequencyMS"s)
 		{
-			_heartbeatFrequency = Poco::NumberParser::parseUnsigned(param.second);
+			_heartbeatFrequencyMS = Poco::NumberParser::parseUnsigned(param.second);
 		}
 		else if (param.first == "reconnectRetries"s)
 		{
@@ -451,9 +451,9 @@ std::string ReplicaSetURI::buildQueryString() const
 		params.push_back("socketTimeoutMS=" + std::to_string(_socketTimeoutMS));
 	}
 
-	if (_heartbeatFrequency != 10)  // Only add if non-default
+	if (_heartbeatFrequencyMS != 10000)  // Only add if non-default
 	{
-		params.push_back("heartbeatFrequency=" + std::to_string(_heartbeatFrequency));
+		params.push_back("heartbeatFrequencyMS=" + std::to_string(_heartbeatFrequencyMS));
 	}
 
 	if (_reconnectRetries != 10)  // Only add if non-default

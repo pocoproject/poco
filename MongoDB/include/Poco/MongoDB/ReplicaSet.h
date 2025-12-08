@@ -144,7 +144,7 @@ public:
 		///   - readPreference=mode      - primary|primaryPreferred|secondary|secondaryPreferred|nearest
 		///   - connectTimeoutMS=ms      - Connection timeout in milliseconds
 		///   - socketTimeoutMS=ms       - Socket timeout in milliseconds
-		///   - heartbeatFrequency=sec   - Heartbeat frequency in seconds (default: 10)
+		///   - heartbeatFrequencyMS=ms  - Heartbeat frequency in milliseconds (default: 10000)
 		///   - reconnectRetries=n       - Number of reconnection retries (default: 10)
 		///   - reconnectDelay=seconds   - Delay between reconnection attempts in seconds (default: 1)
 		///

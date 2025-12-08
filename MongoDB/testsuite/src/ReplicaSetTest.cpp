@@ -1128,7 +1128,7 @@ void ReplicaSetTest::testReplicaSetURIParsing()
 void ReplicaSetTest::testReplicaSetURIClass()
 {
 	// Test parsing a complex URI
-	std::string uri = "mongodb://user:pass@localhost:27017,localhost:27018,localhost:27019/testdb?replicaSet=rs0&readPreference=secondaryPreferred&connectTimeoutMS=5000&socketTimeoutMS=15000&heartbeatFrequency=20&reconnectRetries=5&reconnectDelay=3";
+	std::string uri = "mongodb://user:pass@localhost:27017,localhost:27018,localhost:27019/testdb?replicaSet=rs0&readPreference=secondaryPreferred&connectTimeoutMS=5000&socketTimeoutMS=15000&heartbeatFrequencyMS=20000&reconnectRetries=5&reconnectDelay=3";
 
 	ReplicaSetURI parsedURI(uri);
 
@@ -1144,7 +1144,7 @@ void ReplicaSetTest::testReplicaSetURIClass()
 	assertEqual(static_cast<int>(ReadPreference::SecondaryPreferred), static_cast<int>(parsedURI.readPreference().mode()));
 	assertEqual(5000u, parsedURI.connectTimeoutMS());
 	assertEqual(15000u, parsedURI.socketTimeoutMS());
-	assertEqual(20u, parsedURI.heartbeatFrequency());
+	assertEqual(20000u, parsedURI.heartbeatFrequencyMS());
 	assertEqual(5u, parsedURI.reconnectRetries());
 	assertEqual(3u, parsedURI.reconnectDelay());
 

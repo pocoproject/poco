@@ -113,7 +113,7 @@ ReplicaSet::ReplicaSet(const std::string& uri)
 	_config.readPreference = parsedURI.readPreference();
 	_config.connectTimeoutSeconds = (parsedURI.connectTimeoutMS() + 999) / 1000;  // Convert ms to seconds (round up)
 	_config.socketTimeoutSeconds = (parsedURI.socketTimeoutMS() + 999) / 1000;    // Convert ms to seconds (round up)
-	_config.heartbeatFrequencySeconds = parsedURI.heartbeatFrequency();
+	_config.heartbeatFrequencySeconds = (parsedURI.heartbeatFrequencyMS() + 999) / 1000;  // Convert ms to seconds (round up)
 	_config.serverReconnectRetries = parsedURI.reconnectRetries();
 	_config.serverReconnectDelaySeconds = parsedURI.reconnectDelay();
 
@@ -166,7 +166,7 @@ ReplicaSet::ReplicaSet(const ReplicaSetURI& uri)
 	_config.readPreference = uri.readPreference();
 	_config.connectTimeoutSeconds = (uri.connectTimeoutMS() + 999) / 1000;  // Convert ms to seconds (round up)
 	_config.socketTimeoutSeconds = (uri.socketTimeoutMS() + 999) / 1000;    // Convert ms to seconds (round up)
-	_config.heartbeatFrequencySeconds = uri.heartbeatFrequency();
+	_config.heartbeatFrequencySeconds = (uri.heartbeatFrequencyMS() + 999) / 1000;  // Convert ms to seconds (round up)
 	_config.serverReconnectRetries = uri.reconnectRetries();
 	_config.serverReconnectDelaySeconds = uri.reconnectDelay();
 

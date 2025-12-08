@@ -108,11 +108,11 @@ public:
 	void setSocketTimeoutMS(unsigned int timeoutMS);
 		/// Sets the socket timeout in milliseconds.
 
-	[[nodiscard]] unsigned int heartbeatFrequency() const;
-		/// Returns the heartbeat frequency in seconds.
+	[[nodiscard]] unsigned int heartbeatFrequencyMS() const;
+		/// Returns the heartbeat frequency in milliseconds.
 
-	void setHeartbeatFrequency(unsigned int seconds);
-		/// Sets the heartbeat frequency in seconds.
+	void setHeartbeatFrequencyMS(unsigned int milliseconds);
+		/// Sets the heartbeat frequency in milliseconds.
 
 	[[nodiscard]] unsigned int reconnectRetries() const;
 		/// Returns the number of reconnection retries.
@@ -171,7 +171,7 @@ private:
 	ReadPreference _readPreference{ReadPreference::Primary};
 	unsigned int _connectTimeoutMS{10000};
 	unsigned int _socketTimeoutMS{30000};
-	unsigned int _heartbeatFrequency{10};
+	unsigned int _heartbeatFrequencyMS{10000};
 	unsigned int _reconnectRetries{10};
 	unsigned int _reconnectDelay{1};
 	std::string _database;
