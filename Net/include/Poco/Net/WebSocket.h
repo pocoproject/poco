@@ -54,6 +54,10 @@ class Net_API WebSocket: public StreamSocket
 	/// mode, by calling setBlocking(false). 
 	/// Please refer to the sendFrame() and receiveFrame() documentation
 	/// for non-blocking behavior.
+	///
+	/// TCP_NODELAY is automatically enabled on the underlying socket
+	/// to prevent delays from Nagle's algorithm when sending small
+	/// WebSocket frames.
 {
 public:
 	enum Mode

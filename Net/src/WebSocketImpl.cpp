@@ -18,6 +18,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Buffer.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
@@ -42,6 +43,18 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 	poco_check_ptr(pStreamSocketImpl);
 	_pStreamSocketImpl->duplicate();
 	session.drainBuffer(_buffer);
+	// Enable TCP_NODELAY to prevent delays caused by Nagle's algorithm
+	// for small WebSocket frames. Skip for Unix domain sockets.
+	try
+	{
+		SocketAddress addr = _pStreamSocketImpl->address();
+		if (addr.family() != SocketAddress::UNIX_LOCAL)
+			_pStreamSocketImpl->setNoDelay(true);
+	}
+	catch (...)
+	{
+		// Ignore errors (e.g., if socket is not connected yet or doesn't support TCP options)
+	}
 }
 
 
