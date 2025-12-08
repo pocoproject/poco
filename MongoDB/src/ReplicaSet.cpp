@@ -13,12 +13,11 @@
 
 
 #include "Poco/MongoDB/ReplicaSet.h"
+#include "Poco/MongoDB/ReplicaSetURI.h"
 #include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/MongoDB/TopologyChangeNotification.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
-#include "Poco/URI.h"
-#include "Poco/NumberParser.h"
 #include "Poco/NotificationCenter.h"
 #include <chrono>
 
@@ -89,8 +88,87 @@ ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress>& seeds):
 
 ReplicaSet::ReplicaSet(const std::string& uri)
 {
-	// Parse URI first to extract seeds and configuration
-	parseURI(uri);
+	// Parse URI using ReplicaSetURI
+	ReplicaSetURI parsedURI(uri);
+
+	// Extract configuration from parsed URI
+	// Resolve server strings to SocketAddress objects here
+	_config.seeds.clear();
+	for (const auto& serverStr : parsedURI.servers())
+	{
+		try
+		{
+			_config.seeds.emplace_back(serverStr);
+		}
+		catch (const std::exception& e)
+		{
+			// Skip servers that cannot be resolved via DNS
+			// Note: URI parsing already succeeded - ReplicaSetURI stores servers as strings.
+			// Servers that fail DNS resolution are not added to the seed list.
+			// Only resolvable servers will be used for topology discovery.
+		}
+	}
+
+	_config.setName = parsedURI.replicaSet();
+	_config.readPreference = parsedURI.readPreference();
+	_config.connectTimeoutSeconds = (parsedURI.connectTimeoutMS() + 999) / 1000;  // Convert ms to seconds (round up)
+	_config.socketTimeoutSeconds = (parsedURI.socketTimeoutMS() + 999) / 1000;    // Convert ms to seconds (round up)
+	_config.heartbeatFrequencySeconds = parsedURI.heartbeatFrequency();
+	_config.serverReconnectRetries = parsedURI.reconnectRetries();
+	_config.serverReconnectDelaySeconds = parsedURI.reconnectDelay();
+
+	if (_config.seeds.empty())
+	{
+		throw Poco::InvalidArgumentException("Replica set URI must contain at least one host");
+	}
+
+	// Update topology with set name from config
+	_topology.setName(_config.setName);
+
+	// Add seed servers to topology
+	for (const auto& seed : _config.seeds)
+	{
+		_topology.addServer(seed);
+	}
+
+	// Perform initial discovery
+	updateTopologyFromAllServers();
+
+	// Start monitoring if enabled
+	if (_config.enableMonitoring)
+	{
+		startMonitoring();
+	}
+}
+
+
+ReplicaSet::ReplicaSet(const ReplicaSetURI& uri)
+{
+	// Extract configuration from ReplicaSetURI object
+	// Resolve server strings to SocketAddress objects here
+	_config.seeds.clear();
+	for (const auto& serverStr : uri.servers())
+	{
+		try
+		{
+			_config.seeds.emplace_back(serverStr);
+		}
+		catch (const std::exception& e)
+		{
+			// Skip servers that cannot be resolved via DNS
+			// Note: URI parsing already succeeded - ReplicaSetURI stores servers as strings.
+			// Servers that fail DNS resolution are not added to the seed list.
+			// Only resolvable servers will be used for topology discovery.
+		}
+	}
+
+	_config.setName = uri.replicaSet();
+	_config.readPreference = uri.readPreference();
+	_config.connectTimeoutSeconds = (uri.connectTimeoutMS() + 999) / 1000;  // Convert ms to seconds (round up)
+	_config.socketTimeoutSeconds = (uri.socketTimeoutMS() + 999) / 1000;    // Convert ms to seconds (round up)
+	_config.heartbeatFrequencySeconds = uri.heartbeatFrequency();
+	_config.serverReconnectRetries = uri.reconnectRetries();
+	_config.serverReconnectDelaySeconds = uri.reconnectDelay();
 
 	if (_config.seeds.empty())
 	{
@@ -530,157 +608,6 @@ void ReplicaSet::updateTopologyFromAllServers() noexcept
 	Poco::NotificationCenter::defaultCenter().postNotification(
 		new TopologyChangeNotification(notificationData)
 	);
-}
-
-
-void ReplicaSet::parseURI(const std::string& uri)
-{
-	// Parse MongoDB URI: mongodb://[user:pass@]host1:port1,host2:port2[,hostN:portN]/[database][?options]
-
-	// MongoDB URIs can contain comma-separated hosts which Poco::URI doesn't handle correctly.
-	// We need to extract the host list manually first, then create a simplified URI for Poco::URI
-	// to parse the scheme, path, and query parameters.
-
-	// Find the scheme delimiter
-	auto schemeEnd = uri.find("://");
-	if (schemeEnd == std::string::npos)
-	{
-		throw Poco::SyntaxException("Invalid URI: missing scheme delimiter");
-	}
-
-	std::string scheme = uri.substr(0, schemeEnd);
-	if (scheme != "mongodb"s)
-	{
-		throw Poco::UnknownURISchemeException("Replica set URI must use 'mongodb' scheme");
-	}
-
-	// Find where the authority (hosts) section ends
-	// It ends at either '/' (path) or '?' (query)
-	std::string::size_type authorityStart = schemeEnd + 3;  // Skip "://"
-	std::string::size_type authorityEnd = uri.find_first_of("/?", authorityStart);
-
-	// Extract authority and the rest of the URI
-	std::string authority;
-	std::string pathAndQuery;
-
-	if (authorityEnd != std::string::npos)
-	{
-		authority = uri.substr(authorityStart, authorityEnd - authorityStart);
-		pathAndQuery = uri.substr(authorityEnd);
-	}
-	else
-	{
-		authority = uri.substr(authorityStart);
-		pathAndQuery = "";
-	}
-
-	// Remove userinfo if present (username:password@)
-	const auto atPos = authority.find('@');
-	const auto hostsStr = (atPos != std::string::npos) ? authority.substr(atPos + 1) : authority;
-
-	// Parse comma-separated hosts
-	_config.seeds.clear();
-	std::string::size_type start = 0;
-	std::string::size_type end;
-
-	while ((end = hostsStr.find(',', start)) != std::string::npos)
-	{
-		const auto hostPort = hostsStr.substr(start, end - start);
-		if (!hostPort.empty())
-		{
-			try
-			{
-				_config.seeds.emplace_back(hostPort);
-			}
-			catch (...)
-			{
-				// Skip invalid host addresses
-			}
-		}
-		start = end + 1;
-	}
-
-	// Parse last host
-	const auto lastHost = hostsStr.substr(start);
-	if (!lastHost.empty())
-	{
-		try
-		{
-			_config.seeds.emplace_back(lastHost);
-		}
-		catch (...)
-		{
-			// Skip invalid host address
-		}
-	}
-
-	if (_config.seeds.empty())
-	{
-		throw Poco::SyntaxException("No valid hosts found in replica set URI");
-	}
-
-	// Now parse query parameters using Poco::URI
-	// Create a simplified URI with just the scheme and path/query for Poco::URI to parse
-	std::string simplifiedURI = scheme + "://localhost" + pathAndQuery;
-	Poco::URI theURI(simplifiedURI);
-
-	// Parse query parameters
-	Poco::URI::QueryParameters params = theURI.getQueryParameters();
-	for (const auto& param : params)
-	{
-		if (param.first == "replicaSet"s)
-		{
-			_config.setName = param.second;
-		}
-		else if (param.first == "readPreference"s)
-		{
-			// Parse read preference mode
-			if (param.second == "primary"s)
-			{
-				_config.readPreference = ReadPreference(ReadPreference::Primary);
-			}
-			else if (param.second == "primaryPreferred"s)
-			{
-				_config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
-			}
-			else if (param.second == "secondary"s)
-			{
-				_config.readPreference = ReadPreference(ReadPreference::Secondary);
-			}
-			else if (param.second == "secondaryPreferred"s)
-			{
-				_config.readPreference = ReadPreference(ReadPreference::SecondaryPreferred);
-			}
-			else if (param.second == "nearest"s)
-			{
-				_config.readPreference = ReadPreference(ReadPreference::Nearest);
-			}
-		}
-		else if (param.first == "connectTimeoutMS"s)
-		{
-			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
-			_config.connectTimeoutSeconds = static_cast<unsigned int>((timeoutMs + 999) / 1000);  // Convert ms to seconds (round up)
-		}
-		else if (param.first == "socketTimeoutMS"s)
-		{
-			Poco::Int64 timeoutMs = Poco::NumberParser::parse64(param.second);
-			_config.socketTimeoutSeconds = static_cast<unsigned int>((timeoutMs + 999) / 1000);  // Convert ms to seconds (round up)
-		}
-		else if (param.first == "heartbeatFrequency"s)
-		{
-			_config.heartbeatFrequencySeconds = Poco::NumberParser::parseUnsigned(param.second);
-		}
-		else if (param.first == "reconnectRetries"s)
-		{
-			_config.serverReconnectRetries = Poco::NumberParser::parseUnsigned(param.second);
-		}
-		else if (param.first == "reconnectDelay"s)
-		{
-			_config.serverReconnectDelaySeconds = Poco::NumberParser::parseUnsigned(param.second);
-		}
-		// Note: readPreferenceTags and maxStalenessSeconds would require more complex parsing
-		// and are not commonly used, so we skip them for now
-	}
 }
 
 

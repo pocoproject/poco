@@ -22,6 +22,7 @@
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
+#include "Poco/MongoDB/ReplicaSetURI.h"
 #include "Poco/Net/SocketAddress.h"
 #include <vector>
 #include <string>
@@ -135,7 +136,7 @@ public:
 		/// Throws Poco::IOException if initial discovery fails.
 
 	explicit ReplicaSet(const std::string& uri);
-		/// Creates a ReplicaSet from a MongoDB URI.
+		/// Creates a ReplicaSet from a MongoDB URI string.
 		/// Format: mongodb://host1:port1,host2:port2,...?options
 		///
 		/// Supported URI options:
@@ -151,6 +152,28 @@ public:
 		///
 		/// Throws Poco::SyntaxException if URI is invalid.
 		/// Throws Poco::UnknownURISchemeException if scheme is not "mongodb".
+
+	explicit ReplicaSet(const ReplicaSetURI& uri);
+		/// Creates a ReplicaSet from a ReplicaSetURI object.
+		/// This allows for programmatic URI construction and modification before
+		/// creating the replica set connection.
+		///
+		/// The ReplicaSetURI stores servers as strings without DNS resolution.
+		/// This constructor resolves the server strings to SocketAddress objects.
+		/// Servers that cannot be resolved are skipped and will be marked as
+		/// unavailable during topology discovery.
+		///
+		/// Example:
+		///   ReplicaSetURI uri;
+		///   uri.addServer("host1:27017");
+		///   uri.addServer("host2:27017");
+		///   uri.setReplicaSet("rs0");
+		///   uri.setReadPreference("primaryPreferred");
+		///   ReplicaSet rs(uri);
+		///
+		/// Throws Poco::InvalidArgumentException if the URI contains no servers
+		///        or if no servers can be resolved.
+		/// Throws Poco::IOException if initial discovery fails.
 
 	virtual ~ReplicaSet();
 		/// Destroys the ReplicaSet and stops background monitoring.

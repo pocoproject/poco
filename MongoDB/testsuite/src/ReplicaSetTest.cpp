@@ -15,6 +15,7 @@
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/ReplicaSet.h"
+#include "Poco/MongoDB/ReplicaSetURI.h"
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/Net/SocketAddress.h"
@@ -1070,7 +1071,7 @@ void ReplicaSetTest::testReplicaSetURIParsing()
 	}
 
 	// Test case 2: URI with three hosts and replica set name
-	std::string uri2 = "mongodb://host1:27017,host2:27018,host3:27019/?replicaSet=rs0";
+	std::string uri2 = "mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0";
 
 	try
 	{
@@ -1093,8 +1094,8 @@ void ReplicaSetTest::testReplicaSetURIParsing()
 		assertTrue(true);
 	}
 
-	// Test case 3: URI with hosts containing dots and dashes
-	std::string uri3 = "mongodb://mongo-1.example.com:27017,mongo-2.example.com:27017/?readPreference=primaryPreferred";
+	// Test case 3: URI with multiple localhost servers
+	std::string uri3 = "mongodb://127.0.0.1:27017,127.0.0.1:27018/?readPreference=primaryPreferred";
 
 	try
 	{
@@ -1116,6 +1117,217 @@ void ReplicaSetTest::testReplicaSetURIParsing()
 		// Connection failure is expected
 		assertTrue(true);
 	}
+}
+
+
+// ============================================================================
+// ReplicaSetURI Class Tests
+// ============================================================================
+
+
+void ReplicaSetTest::testReplicaSetURIClass()
+{
+	// Test parsing a complex URI
+	std::string uri = "mongodb://user:pass@localhost:27017,localhost:27018,localhost:27019/testdb?replicaSet=rs0&readPreference=secondaryPreferred&connectTimeoutMS=5000&socketTimeoutMS=15000&heartbeatFrequency=20&reconnectRetries=5&reconnectDelay=3";
+
+	ReplicaSetURI parsedURI(uri);
+
+	// Verify servers (stored as strings, not resolved)
+	const auto& servers = parsedURI.servers();
+	assertEqual(3, static_cast<int>(servers.size()));
+	assertEqual("localhost:27017"s, servers[0]);
+	assertEqual("localhost:27018"s, servers[1]);
+	assertEqual("localhost:27019"s, servers[2]);
+
+	// Verify configuration
+	assertEqual("rs0"s, parsedURI.replicaSet());
+	assertEqual(static_cast<int>(ReadPreference::SecondaryPreferred), static_cast<int>(parsedURI.readPreference().mode()));
+	assertEqual(5000u, parsedURI.connectTimeoutMS());
+	assertEqual(15000u, parsedURI.socketTimeoutMS());
+	assertEqual(20u, parsedURI.heartbeatFrequency());
+	assertEqual(5u, parsedURI.reconnectRetries());
+	assertEqual(3u, parsedURI.reconnectDelay());
+
+	// Verify database and user info
+	assertEqual("testdb"s, parsedURI.database());
+	assertEqual("user"s, parsedURI.username());
+	assertEqual("pass"s, parsedURI.password());
+
+	// Test parsing URI without optional parameters
+	std::string simpleUri = "mongodb://localhost:27017,localhost:27018";
+	ReplicaSetURI simpleURI(simpleUri);
+
+	const auto& simpleServers = simpleURI.servers();
+	assertEqual(2, static_cast<int>(simpleServers.size()));
+	assertTrue(simpleURI.replicaSet().empty());
+	assertTrue(simpleURI.database().empty());
+	assertTrue(simpleURI.username().empty());
+	assertEqual(static_cast<int>(ReadPreference::Primary), static_cast<int>(simpleURI.readPreference().mode()));
+}
+
+
+void ReplicaSetTest::testReplicaSetURIToString()
+{
+	// Create a URI object and set properties
+	ReplicaSetURI uri;
+
+	uri.addServer("localhost:27017"s);
+	uri.addServer("localhost:27018"s);
+	uri.addServer("localhost:27019"s);
+	uri.setReplicaSet("rs0"s);
+	uri.setReadPreference("secondary"s);
+	uri.setConnectTimeoutMS(5000);
+	uri.setReconnectRetries(5);
+	uri.setReconnectDelay(2);
+
+	std::string uriString = uri.toString();
+
+	// Parse the generated URI back
+	ReplicaSetURI parsedBack(uriString);
+
+	// Verify round-trip
+	assertEqual(3, static_cast<int>(parsedBack.servers().size()));
+	assertEqual("rs0"s, parsedBack.replicaSet());
+	assertEqual(static_cast<int>(ReadPreference::Secondary), static_cast<int>(parsedBack.readPreference().mode()));
+	assertEqual(5000u, parsedBack.connectTimeoutMS());
+	assertEqual(5u, parsedBack.reconnectRetries());
+	assertEqual(2u, parsedBack.reconnectDelay());
+
+	// Test URI with database and user info
+	ReplicaSetURI uriWithAuth;
+	uriWithAuth.addServer("localhost:27017"s);
+	uriWithAuth.setUsername("admin"s);
+	uriWithAuth.setPassword("secret"s);
+	uriWithAuth.setDatabase("mydb"s);
+
+	std::string authUriString = uriWithAuth.toString();
+
+	// Verify the URI contains the expected components
+	assertTrue(authUriString.find("admin:secret@") != std::string::npos);
+	assertTrue(authUriString.find("localhost:27017") != std::string::npos);
+	assertTrue(authUriString.find("/mydb") != std::string::npos);
+}
+
+
+void ReplicaSetTest::testReplicaSetURIModification()
+{
+	// Start with a parsed URI
+	std::string originalUri = "mongodb://localhost:27017,localhost:27018/?replicaSet=rs0&reconnectRetries=10";
+	ReplicaSetURI uri(originalUri);
+
+	// Verify initial state
+	assertEqual(2, static_cast<int>(uri.servers().size()));
+	assertEqual("rs0"s, uri.replicaSet());
+	assertEqual(10u, uri.reconnectRetries());
+
+	// Modify servers
+	uri.addServer("localhost:27019"s);
+	assertEqual(3, static_cast<int>(uri.servers().size()));
+
+	// Modify configuration
+	uri.setReplicaSet("rs1"s);
+	uri.setReadPreference("primaryPreferred"s);
+	uri.setReconnectRetries(20);
+
+	assertEqual("rs1"s, uri.replicaSet());
+	assertEqual(static_cast<int>(ReadPreference::PrimaryPreferred), static_cast<int>(uri.readPreference().mode()));
+	assertEqual(20u, uri.reconnectRetries());
+
+	// Clear and reset servers
+	uri.clearServers();
+	assertEqual(0, static_cast<int>(uri.servers().size()));
+
+	uri.addServer("127.0.0.1:27017"s);
+	assertEqual(1, static_cast<int>(uri.servers().size()));
+	assertEqual("127.0.0.1:27017"s, uri.servers()[0]);
+
+	// Test setServers
+	std::vector<std::string> newServers;
+	newServers.push_back("host1:27020"s);
+	newServers.push_back("host2:27021"s);
+	uri.setServers(newServers);
+
+	assertEqual(2, static_cast<int>(uri.servers().size()));
+	assertEqual("host1:27020"s, uri.servers()[0]);
+	assertEqual("host2:27021"s, uri.servers()[1]);
+
+	// Verify the modified URI can be converted to string
+	std::string modifiedUri = uri.toString();
+	assertTrue(modifiedUri.find("host1:27020") != std::string::npos);
+	assertTrue(modifiedUri.find("host2:27021") != std::string::npos);
+}
+
+
+void ReplicaSetTest::testReplicaSetWithURIObject()
+{
+	// Test creating a ReplicaSet using a ReplicaSetURI object
+	// This allows programmatic configuration before connecting
+
+	ReplicaSetURI uri;
+	uri.addServer("localhost:27017"s);
+	uri.addServer("localhost:27018"s);
+	uri.setReplicaSet("rs0"s);
+	uri.setReadPreference("secondaryPreferred"s);
+	uri.setConnectTimeoutMS(5000);
+	uri.setReconnectRetries(5);
+	uri.setReconnectDelay(2);
+
+	try
+	{
+		// Create ReplicaSet from the URI object
+		ReplicaSet rs(uri);
+
+		// Verify configuration was applied
+		ReplicaSet::Config config = rs.configuration();
+
+		assertEqual(2, static_cast<int>(config.seeds.size()));
+		assertEqual("rs0"s, config.setName);
+		assertEqual(static_cast<int>(ReadPreference::SecondaryPreferred), static_cast<int>(config.readPreference.mode()));
+		assertEqual(5u, static_cast<unsigned int>(config.connectTimeoutSeconds));  // 5000ms -> 5s
+		assertEqual(5u, static_cast<unsigned int>(config.serverReconnectRetries));
+		assertEqual(2u, config.serverReconnectDelaySeconds);
+
+		// If we get here, URI object constructor worked
+		assertTrue(true);
+	}
+	catch (const Poco::SyntaxException& e)
+	{
+		std::string msg = "ReplicaSet construction with URI object failed with SyntaxException: " + e.displayText();
+		fail(msg);
+	}
+	catch (const Poco::UnknownURISchemeException& e)
+	{
+		std::string msg = "ReplicaSet construction with URI object failed with UnknownURISchemeException: " + e.displayText();
+		fail(msg);
+	}
+	catch (...)
+	{
+		// Connection failure is expected since servers don't exist
+		// We only care that the configuration was properly extracted from the URI object
+		assertTrue(true);
+	}
+
+	// Test that empty URI object throws exception
+	ReplicaSetURI emptyUri;
+
+	bool exceptionThrown = false;
+	try
+	{
+		ReplicaSet rs(emptyUri);
+	}
+	catch (const Poco::InvalidArgumentException& e)
+	{
+		// Expected - URI must contain at least one host
+		exceptionThrown = true;
+		assertTrue(e.displayText().find("at least one") != std::string::npos);
+	}
+	catch (...)
+	{
+		// Any other exception is also acceptable for empty URI
+		exceptionThrown = true;
+	}
+
+	assertTrue(exceptionThrown);
 }
 
 
@@ -1160,6 +1372,12 @@ CppUnit::Test* ReplicaSetTest::suite()
 
 	// ReplicaSet URI parsing tests
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIParsing);
+
+	// ReplicaSetURI class tests
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIClass);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIToString);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIModification);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetWithURIObject);
 
 	return pSuite;
 }

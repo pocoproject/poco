@@ -57,6 +57,10 @@ public:
 	void testReadPreferenceWithTags();
 
 	void testReplicaSetURIParsing();
+	void testReplicaSetURIClass();
+	void testReplicaSetURIToString();
+	void testReplicaSetURIModification();
+	void testReplicaSetWithURIObject();
 
 	void setUp() override;
 	void tearDown() override;
