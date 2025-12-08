@@ -56,6 +56,8 @@ public:
 	void testReadPreferenceNearest();
 	void testReadPreferenceWithTags();
 
+	void testReplicaSetURIParsing();
+
 	void setUp() override;
 	void tearDown() override;
 

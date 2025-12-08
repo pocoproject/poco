@@ -536,17 +536,43 @@ void ReplicaSet::updateTopologyFromAllServers() noexcept
 void ReplicaSet::parseURI(const std::string& uri)
 {
 	// Parse MongoDB URI: mongodb://[user:pass@]host1:port1,host2:port2[,hostN:portN]/[database][?options]
-	Poco::URI theURI(uri);
 
-	if (theURI.getScheme() != "mongodb"s)
+	// MongoDB URIs can contain comma-separated hosts which Poco::URI doesn't handle correctly.
+	// We need to extract the host list manually first, then create a simplified URI for Poco::URI
+	// to parse the scheme, path, and query parameters.
+
+	// Find the scheme delimiter
+	auto schemeEnd = uri.find("://");
+	if (schemeEnd == std::string::npos)
+	{
+		throw Poco::SyntaxException("Invalid URI: missing scheme delimiter");
+	}
+
+	std::string scheme = uri.substr(0, schemeEnd);
+	if (scheme != "mongodb"s)
 	{
 		throw Poco::UnknownURISchemeException("Replica set URI must use 'mongodb' scheme");
 	}
 
-	// Parse authority to extract multiple hosts
-	// The authority in MongoDB URIs can be: host1:port1,host2:port2,host3:port3
-	// Poco::URI will give us the full authority string, we need to parse it manually
-	const auto& authority = theURI.getAuthority();
+	// Find where the authority (hosts) section ends
+	// It ends at either '/' (path) or '?' (query)
+	std::string::size_type authorityStart = schemeEnd + 3;  // Skip "://"
+	std::string::size_type authorityEnd = uri.find_first_of("/?", authorityStart);
+
+	// Extract authority and the rest of the URI
+	std::string authority;
+	std::string pathAndQuery;
+
+	if (authorityEnd != std::string::npos)
+	{
+		authority = uri.substr(authorityStart, authorityEnd - authorityStart);
+		pathAndQuery = uri.substr(authorityEnd);
+	}
+	else
+	{
+		authority = uri.substr(authorityStart);
+		pathAndQuery = "";
+	}
 
 	// Remove userinfo if present (username:password@)
 	const auto atPos = authority.find('@');
@@ -592,6 +618,11 @@ void ReplicaSet::parseURI(const std::string& uri)
 	{
 		throw Poco::SyntaxException("No valid hosts found in replica set URI");
 	}
+
+	// Now parse query parameters using Poco::URI
+	// Create a simplified URI with just the scheme and path/query for Poco::URI to parse
+	std::string simplifiedURI = scheme + "://localhost" + pathAndQuery;
+	Poco::URI theURI(simplifiedURI);
 
 	// Parse query parameters
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();

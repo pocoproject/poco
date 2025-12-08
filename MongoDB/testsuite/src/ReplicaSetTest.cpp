@@ -14,6 +14,7 @@
 #include "Poco/MongoDB/ServerDescription.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/MongoDB/ReadPreference.h"
+#include "Poco/MongoDB/ReplicaSet.h"
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/Net/SocketAddress.h"
@@ -1025,6 +1026,99 @@ void ReplicaSetTest::testReadPreferenceWithTags()
 }
 
 
+// ============================================================================
+// ReplicaSet URI Parsing Tests
+// ============================================================================
+
+
+void ReplicaSetTest::testReplicaSetURIParsing()
+{
+	// This test verifies that MongoDB replica set URIs with multiple comma-separated
+	// hosts are parsed correctly. The URI parsing should not throw a SyntaxException
+	// even though it will fail to connect (since there are no real servers).
+
+	// Test case 1: URI with multiple hosts and query parameters
+	std::string uri1 = "mongodb://localhost:27017,host1:27017,host2:27017/?reconnectRetries=10&reconnectDelay=2";
+
+	try
+	{
+		// This will throw an exception because there are no real servers to connect to,
+		// but it should NOT throw a SyntaxException if URI parsing works correctly
+		ReplicaSet rs(uri1);
+
+		// If we get here, the URI was parsed successfully and servers were reachable
+		// (which shouldn't happen in unit tests, but we handle it gracefully)
+		assertTrue(true);
+	}
+	catch (const Poco::SyntaxException& e)
+	{
+		// This should NOT happen - if we get a SyntaxException, the URI parsing failed
+		std::string msg = "URI parsing failed with SyntaxException: " + e.displayText();
+		fail(msg);
+	}
+	catch (const Poco::UnknownURISchemeException& e)
+	{
+		// This should NOT happen - the scheme is correct
+		std::string msg = "URI parsing failed with UnknownURISchemeException: " + e.displayText();
+		fail(msg);
+	}
+	catch (...)
+	{
+		// Any other exception (e.g., connection failure) is expected and acceptable
+		// We only care that URI parsing succeeded
+		assertTrue(true);
+	}
+
+	// Test case 2: URI with three hosts and replica set name
+	std::string uri2 = "mongodb://host1:27017,host2:27018,host3:27019/?replicaSet=rs0";
+
+	try
+	{
+		ReplicaSet rs(uri2);
+		assertTrue(true);
+	}
+	catch (const Poco::SyntaxException& e)
+	{
+		std::string msg = "URI parsing failed for uri2 with SyntaxException: " + e.displayText();
+		fail(msg);
+	}
+	catch (const Poco::UnknownURISchemeException& e)
+	{
+		std::string msg = "URI parsing failed for uri2 with UnknownURISchemeException: " + e.displayText();
+		fail(msg);
+	}
+	catch (...)
+	{
+		// Connection failure is expected
+		assertTrue(true);
+	}
+
+	// Test case 3: URI with hosts containing dots and dashes
+	std::string uri3 = "mongodb://mongo-1.example.com:27017,mongo-2.example.com:27017/?readPreference=primaryPreferred";
+
+	try
+	{
+		ReplicaSet rs(uri3);
+		assertTrue(true);
+	}
+	catch (const Poco::SyntaxException& e)
+	{
+		std::string msg = "URI parsing failed for uri3 with SyntaxException: " + e.displayText();
+		fail(msg);
+	}
+	catch (const Poco::UnknownURISchemeException& e)
+	{
+		std::string msg = "URI parsing failed for uri3 with UnknownURISchemeException: " + e.displayText();
+		fail(msg);
+	}
+	catch (...)
+	{
+		// Connection failure is expected
+		assertTrue(true);
+	}
+}
+
+
 CppUnit::Test* ReplicaSetTest::suite()
 {
 	auto* pSuite = new CppUnit::TestSuite("ReplicaSetTest");
@@ -1063,6 +1157,9 @@ CppUnit::Test* ReplicaSetTest::suite()
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReadPreferenceSecondaryPreferred);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReadPreferenceNearest);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReadPreferenceWithTags);
+
+	// ReplicaSet URI parsing tests
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIParsing);
 
 	return pSuite;
 }
