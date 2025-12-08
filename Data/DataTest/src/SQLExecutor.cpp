@@ -1593,7 +1593,8 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 			use(floats),
 			use(dateTimes), now;
 		sw.stop();
-	}	catch(DataException& ce)
+	}
+	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		failmsg (__func__);
