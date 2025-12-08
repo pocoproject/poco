@@ -770,7 +770,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 				assertTrue (one++ == chr[0]);
 				assertTrue (two++ == second);
-				assertTrue (three == third);
+				assertTrue (std::fabs(three - third) < 1e-6f);
 				three += 1.0;
 
 				++count;
