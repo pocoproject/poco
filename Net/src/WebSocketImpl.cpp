@@ -52,15 +52,11 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 	}
 	catch (NetException&)
 	{
-		// Ignore socket errors (e.g., socket not connected or doesn't support TCP options)
+		// Ignore - socket errors (e.g., not connected or doesn't support TCP options)
 	}
-	catch (IOException&)
+	catch (Poco::Exception&)
 	{
-		// Ignore I/O errors from socket configuration
-	}
-	catch (InvalidArgumentException&)
-	{
-		// Ignore invalid argument errors from socket configuration
+		// Ignore - other configuration errors (IOException, InvalidArgumentException, etc.)
 	}
 }
 
