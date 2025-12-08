@@ -292,7 +292,7 @@ const std::string SQLExecutor::MULTI_SELECT =
 
 
 const float SQLExecutor::EPSILON_FLOAT = 1e-5f;
-const double SQLExecutor::EPSILON_FLOAT = 1e-9;
+const double SQLExecutor::EPSILON_DOUBLE = 1e-9;
 
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
@@ -2956,13 +2956,13 @@ void SQLExecutor::internalExtraction()
 			{
 				//this is for Oracle
 				double d = rset.value<double>(0,0);
-				assertTrue (4, int(d));
+				assertEqual (4, int(d));
 			}
 			catch(BadCastException&)
 			{
 				//this is for PostgreSQL
 				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assertTrue (4 == big);
+				assertEqual (4, big);
 			}
 		}
 
