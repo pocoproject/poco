@@ -50,9 +50,17 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 		if (_pStreamSocketImpl->address().family() != SocketAddress::UNIX_LOCAL)
 			_pStreamSocketImpl->setNoDelay(true);
 	}
-	catch (Poco::Exception&)
+	catch (NetException&)
 	{
-		// Ignore errors (e.g., if socket is not connected yet or doesn't support TCP options)
+		// Ignore socket errors (e.g., socket not connected or doesn't support TCP options)
+	}
+	catch (IOException&)
+	{
+		// Ignore I/O errors from socket configuration
+	}
+	catch (InvalidArgumentException&)
+	{
+		// Ignore invalid argument errors from socket configuration
 	}
 }
 
