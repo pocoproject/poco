@@ -591,6 +591,23 @@ if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
 	add_subdirectory(modules)
 endif()
 
+#############################################################
+# Benchmark application (optional, requires Google Benchmark)
+
+option(ENABLE_BENCHMARK
+	"Set to OFF|ON (default is OFF) to enable Benchmark application (requires Google Benchmark library)" OFF)
+
+if(ENABLE_BENCHMARK)
+	find_package(benchmark QUIET)
+	if(benchmark_FOUND)
+		message(STATUS "Google Benchmark found - building Benchmark application")
+		add_subdirectory(Benchmark)
+	else()
+		message(STATUS "Google Benchmark not found - skipping Benchmark application")
+		message(STATUS "Install with: brew install google-benchmark (macOS) or apt install libbenchmark-dev (Linux)")
+	endif()
+endif()
+
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
