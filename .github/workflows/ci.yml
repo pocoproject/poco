@@ -360,7 +360,7 @@ jobs:
   #            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   macos-clang-18-cmake-openssl3:
-    runs-on: macos-15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -383,7 +383,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-openssl3-visibility-hidden:
-    runs-on: macos-15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3 mysql-client unixodbc libpq
@@ -432,7 +432,7 @@ jobs:
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   macos-clang-cmake-trace:
-    runs-on: macos-15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
@@ -452,7 +452,7 @@ jobs:
             ctest --output-on-failure
 
   macos-clang-cmake-openssl3-tsan:
-    runs-on: macos-15
+    runs-on: macos-latest
     env:
       TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
     steps:
@@ -481,7 +481,7 @@ jobs:
             ctest -V
 
   macos-clang-cmake-openssl3-ubsan:
-    runs-on: macos-15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
