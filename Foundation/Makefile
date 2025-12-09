@@ -76,7 +76,7 @@ ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
     $(shell cd src; $(WINDMC) pocomsg.mc)
 endif
 
-# poco build system looks for sources in src/
+# make build system looks for sources in src/
 ifndef POCO_UNBUNDLED
 	prebuild = $(shell \
 		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.c        src/ && \

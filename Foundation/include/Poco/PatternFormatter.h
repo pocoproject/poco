@@ -145,6 +145,9 @@ private:
 
 	void parsePriorityNames();
 
+	static const char* extractBasename(const char* path);
+		/// Extracts the filename from a path without creating a Path object.
+
 	static const std::string DEFAULT_PRIORITY_NAMES;
 
 	std::vector<PatternAction> _patternActions;
@@ -152,6 +155,7 @@ private:
 	std::string _pattern;
 	std::string _priorityNames;
 	std::string _priorities[9];
+	static std::string _cachedNodeName;
 };
 
 
