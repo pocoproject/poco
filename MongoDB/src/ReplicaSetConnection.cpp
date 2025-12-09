@@ -113,13 +113,13 @@ void ReplicaSetConnection::reconnect()
 }
 
 
-bool ReplicaSetConnection::isConnected() const
+bool ReplicaSetConnection::isConnected() const noexcept
 {
 	return !_connection.isNull();
 }
 
 
-bool ReplicaSetConnection::matchesReadPreference() const
+bool ReplicaSetConnection::matchesReadPreference() const noexcept
 {
 	if (!isConnected())
 	{

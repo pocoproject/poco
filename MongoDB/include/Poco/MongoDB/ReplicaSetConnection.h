@@ -96,10 +96,10 @@ public:
 		/// Forces reconnection by selecting a new server from the replica set.
 		/// Useful if you detect an error and want to explicitly retry.
 
-	[[nodiscard]] bool isConnected() const;
+	[[nodiscard]] bool isConnected() const noexcept;
 		/// Returns true if currently connected to a server.
 
-	[[nodiscard]] bool matchesReadPreference() const;
+	[[nodiscard]] bool matchesReadPreference() const noexcept;
 		/// Returns true if the currently connected server still matches the read preference.
 		/// Returns false if not connected or if the server no longer satisfies the read preference.
 		/// This is useful for connection pool validation to detect when a server role has changed
