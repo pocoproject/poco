@@ -153,6 +153,13 @@ unsigned int ReplicaSetURI::heartbeatFrequencyMS() const
 
 void ReplicaSetURI::setHeartbeatFrequencyMS(unsigned int milliseconds)
 {
+	if (milliseconds < MIN_HEARTBEAT_FREQUENCY_MS)
+	{
+		throw Poco::InvalidArgumentException(
+			"heartbeatFrequencyMS must be at least " +
+			std::to_string(MIN_HEARTBEAT_FREQUENCY_MS) +
+			" milliseconds per MongoDB SDAM specification");
+	}
 	_heartbeatFrequencyMS = milliseconds;
 }
 
@@ -396,7 +403,7 @@ void ReplicaSetURI::parseOptions(const Poco::URI::QueryParameters& params)
 	{
 		if (param.first == "replicaSet"s)
 		{
-			_replicaSet = param.second;
+			setReplicaSet(param.second);
 		}
 		else if (param.first == "readPreference"s)
 		{
@@ -404,23 +411,23 @@ void ReplicaSetURI::parseOptions(const Poco::URI::QueryParameters& params)
 		}
 		else if (param.first == "connectTimeoutMS"s)
 		{
-			_connectTimeoutMS = Poco::NumberParser::parseUnsigned(param.second);
+			setConnectTimeoutMS(Poco::NumberParser::parseUnsigned(param.second));
 		}
 		else if (param.first == "socketTimeoutMS"s)
 		{
-			_socketTimeoutMS = Poco::NumberParser::parseUnsigned(param.second);
+			setSocketTimeoutMS(Poco::NumberParser::parseUnsigned(param.second));
 		}
 		else if (param.first == "heartbeatFrequencyMS"s)
 		{
-			_heartbeatFrequencyMS = Poco::NumberParser::parseUnsigned(param.second);
+			setHeartbeatFrequencyMS(Poco::NumberParser::parseUnsigned(param.second));
 		}
 		else if (param.first == "reconnectRetries"s)
 		{
-			_reconnectRetries = Poco::NumberParser::parseUnsigned(param.second);
+			setReconnectRetries(Poco::NumberParser::parseUnsigned(param.second));
 		}
 		else if (param.first == "reconnectDelay"s)
 		{
-			_reconnectDelay = Poco::NumberParser::parseUnsigned(param.second);
+			setReconnectDelay(Poco::NumberParser::parseUnsigned(param.second));
 		}
 		// Add other options as needed
 	}
@@ -441,27 +448,27 @@ std::string ReplicaSetURI::buildQueryString() const
 		params.push_back("readPreference=" + _readPreference.toString());
 	}
 
-	if (_connectTimeoutMS != 10000)  // Only add if non-default
+	if (_connectTimeoutMS != DEFAULT_CONNECT_TIMEOUT_MS)  // Only add if non-default
 	{
 		params.push_back("connectTimeoutMS=" + std::to_string(_connectTimeoutMS));
 	}
 
-	if (_socketTimeoutMS != 30000)  // Only add if non-default
+	if (_socketTimeoutMS != DEFAULT_SOCKET_TIMEOUT_MS)  // Only add if non-default
 	{
 		params.push_back("socketTimeoutMS=" + std::to_string(_socketTimeoutMS));
 	}
 
-	if (_heartbeatFrequencyMS != 10000)  // Only add if non-default
+	if (_heartbeatFrequencyMS != DEFAULT_HEARTBEAT_FREQUENCY_MS)  // Only add if non-default
 	{
 		params.push_back("heartbeatFrequencyMS=" + std::to_string(_heartbeatFrequencyMS));
 	}
 
-	if (_reconnectRetries != 10)  // Only add if non-default
+	if (_reconnectRetries != DEFAULT_RECONNECT_RETRIES)  // Only add if non-default
 	{
 		params.push_back("reconnectRetries=" + std::to_string(_reconnectRetries));
 	}
 
-	if (_reconnectDelay != 1)  // Only add if non-default
+	if (_reconnectDelay != DEFAULT_RECONNECT_DELAY)  // Only add if non-default
 	{
 		params.push_back("reconnectDelay=" + std::to_string(_reconnectDelay));
 	}

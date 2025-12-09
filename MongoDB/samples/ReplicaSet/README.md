@@ -283,7 +283,7 @@ Demonstrates MongoDB URI parsing and connection to replica sets.
 ./URIExample 'mongodb://mongo1:27017,mongo2:27017/?replicaSet=rs0&readPreference=primaryPreferred'
 
 # With custom timeouts and heartbeat
-./URIExample 'mongodb://host1:27017,host2:27017/?replicaSet=rs0&connectTimeoutMS=5000&socketTimeoutMS=30000&heartbeatFrequency=5'
+./URIExample 'mongodb://host1:27017,host2:27017/?replicaSet=rs0&connectTimeoutMS=5000&socketTimeoutMS=30000&heartbeatFrequencyMS=5000'
 ```
 
 ### Supported URI Options
@@ -292,7 +292,7 @@ Demonstrates MongoDB URI parsing and connection to replica sets.
 - `readPreference=mode` - Read preference (primary|primaryPreferred|secondary|secondaryPreferred|nearest)
 - `connectTimeoutMS=ms` - Connection timeout in milliseconds (for custom SocketFactory implementations)
 - `socketTimeoutMS=ms` - Socket timeout in milliseconds (for custom SocketFactory implementations)
-- `heartbeatFrequency=seconds` - Heartbeat frequency in seconds (default: 10)
+- `heartbeatFrequencyMS=milliseconds` - Heartbeat frequency in milliseconds (default: 10000)
 - `reconnectRetries=n` - Number of reconnection retries (default: 10)
 - `reconnectDelay=seconds` - Delay between reconnection attempts in seconds (default: 1)
 

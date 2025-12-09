@@ -53,6 +53,26 @@ class MongoDB_API ReplicaSetURI
 	///   std::string newUri = uri.toString();
 {
 public:
+	// Configuration constants (MongoDB specification compliance)
+	static constexpr unsigned int DEFAULT_CONNECT_TIMEOUT_MS = 10000;
+		/// Default connection timeout: 10 seconds
+
+	static constexpr unsigned int DEFAULT_SOCKET_TIMEOUT_MS = 30000;
+		/// Default socket timeout: 30 seconds
+
+	static constexpr unsigned int DEFAULT_HEARTBEAT_FREQUENCY_MS = 10000;
+		/// Default heartbeat frequency: 10 seconds
+
+	static constexpr unsigned int MIN_HEARTBEAT_FREQUENCY_MS = 500;
+		/// Minimum heartbeat frequency per MongoDB SDAM specification: 500 milliseconds
+
+	static constexpr unsigned int DEFAULT_RECONNECT_RETRIES = 10;
+		/// Default number of reconnect attempts
+
+	static constexpr unsigned int DEFAULT_RECONNECT_DELAY = 1;
+		/// Default reconnect delay: 1 second
+
+public:
 	ReplicaSetURI();
 		/// Creates an empty ReplicaSetURI.
 
@@ -113,6 +133,8 @@ public:
 
 	void setHeartbeatFrequencyMS(unsigned int milliseconds);
 		/// Sets the heartbeat frequency in milliseconds.
+		/// Throws Poco::InvalidArgumentException if milliseconds < MIN_HEARTBEAT_FREQUENCY_MS (500).
+		/// Per MongoDB SDAM specification, minimum value is 500 milliseconds.
 
 	[[nodiscard]] unsigned int reconnectRetries() const;
 		/// Returns the number of reconnection retries.
@@ -169,11 +191,11 @@ private:
 
 	std::string _replicaSet;
 	ReadPreference _readPreference{ReadPreference::Primary};
-	unsigned int _connectTimeoutMS{10000};
-	unsigned int _socketTimeoutMS{30000};
-	unsigned int _heartbeatFrequencyMS{10000};
-	unsigned int _reconnectRetries{10};
-	unsigned int _reconnectDelay{1};
+	unsigned int _connectTimeoutMS{DEFAULT_CONNECT_TIMEOUT_MS};
+	unsigned int _socketTimeoutMS{DEFAULT_SOCKET_TIMEOUT_MS};
+	unsigned int _heartbeatFrequencyMS{DEFAULT_HEARTBEAT_FREQUENCY_MS};
+	unsigned int _reconnectRetries{DEFAULT_RECONNECT_RETRIES};
+	unsigned int _reconnectDelay{DEFAULT_RECONNECT_DELAY};
 	std::string _database;
 	std::string _username;
 	std::string _password;
