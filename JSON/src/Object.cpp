@@ -37,7 +37,8 @@ Object::Object(int options):
 	_preserveInsOrder((options & Poco::JSON_PRESERVE_KEY_ORDER) != 0),
 	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),
 	_lowercaseHex((options & Poco::JSON_LOWERCASE_HEX) != 0),
-	_modified(false)
+	_structModified(false),
+	_ordStructModified(false)
 {
 }
 
@@ -47,8 +48,10 @@ Object::Object(const Object& other) :
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._modified ? other._pStruct : nullptr),
-	_modified(other._modified)
+	_pStruct(!other._structModified ? other._pStruct : nullptr),
+	_pOrdStruct(!other._ordStructModified ? other._pOrdStruct : nullptr),
+	_structModified(other._structModified),
+	_ordStructModified(other._ordStructModified)
 {
 	syncKeys(other._keys);
 }
@@ -62,7 +65,8 @@ Object::Object(Object&& other) noexcept:
 	_lowercaseHex(other._lowercaseHex),
 	_pStruct(std::move(other._pStruct)),
 	_pOrdStruct(std::move(other._pOrdStruct)),
-	_modified(other._modified)
+	_structModified(other._structModified),
+	_ordStructModified(other._ordStructModified)
 {
 }
 
@@ -79,8 +83,10 @@ Object &Object::operator = (const Object &other)
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
 		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._modified ? other._pStruct : nullptr;
-		_modified = other._modified;
+		_pStruct = !other._structModified ? other._pStruct : nullptr;
+		_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
+		_structModified = other._structModified;
+		_ordStructModified = other._ordStructModified;
 	}
 	return *this;
 }
@@ -95,7 +101,8 @@ Object& Object::operator = (Object&& other) noexcept
 	_lowercaseHex = other._lowercaseHex;
 	_pStruct = std::move(other._pStruct);
 	_pOrdStruct = std::move(other._pOrdStruct);
-	_modified = other._modified;
+	_structModified = other._structModified;
+	_ordStructModified = other._ordStructModified;
 
 	return *this;
 }
@@ -215,7 +222,8 @@ Object& Object::set(const std::string& key, const Dynamic::Var& value)
 		}
 		_keys.emplace_back(ret.first);
 	}
-	_modified = true;
+	_structModified = true;
+	_ordStructModified = true;
 	return *this;
 }
 
@@ -258,7 +266,7 @@ Object::operator const Poco::DynamicStruct& () const
 	{
 		resetDynStruct(_pStruct);
 	}
-	else if (_modified)
+	else if (_structModified)
 	{
 		auto it = _values.begin();
 		const auto end = _values.end();
@@ -278,6 +286,7 @@ Object::operator const Poco::DynamicStruct& () const
 				_pStruct->insert(it->first, it->second);
 			}
 		}
+		_structModified = false;
 	}
 
 	return *_pStruct;
@@ -290,7 +299,7 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 	{
 		resetDynStruct(_pOrdStruct);
 	}
-	else if (_modified)
+	else if (_ordStructModified)
 	{
 		if (_preserveInsOrder)
 		{
@@ -334,6 +343,7 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 				}
 			}
 		}
+		_ordStructModified = false;
 	}
 
 	return *_pOrdStruct;
@@ -345,7 +355,9 @@ void Object::clear()
 	_values.clear();
 	_keys.clear();
 	_pStruct = nullptr;
-	_modified = true;
+	_pOrdStruct = nullptr;
+	_structModified = true;
+	_ordStructModified = true;
 }
 
 
