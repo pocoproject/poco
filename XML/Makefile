@@ -31,7 +31,7 @@ else
 	objects += $(expat_objects)
 	prebuild = $(shell \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.c     src/ && \
-		ln -sf $(POCO_BASE)/dependencies/expat/src/*.cpp.  src/ && \
+		ln -sf $(POCO_BASE)/dependencies/expat/src/*.cpp  src/ && \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.h     src/ \
 	)
 	INCLUDE += -I$(POCO_BASE)/dependencies/expat/src
