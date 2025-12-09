@@ -23,6 +23,7 @@
 #include "Poco/Environment.h"
 #include "Poco/NumberParser.h"
 #include "Poco/StringTokenizer.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
@@ -265,14 +266,11 @@ const char* PatternFormatter::extractBasename(const char* path)
 {
 	if (!path || !*path) return "";
 
+	const char sep = Path::separator();
 	const char* basename = path;
 	for (const char* p = path; *p; ++p)
 	{
-#if defined(_WIN32)
-		if (*p == '/' || *p == '\\')
-#else
-		if (*p == '/')
-#endif
+		if (*p == sep || *p == '/')
 			basename = p + 1;
 	}
 	return basename;

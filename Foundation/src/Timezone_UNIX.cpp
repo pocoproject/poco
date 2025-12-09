@@ -61,6 +61,7 @@ private:
 		_tzOffset = computeTimeZone();
 		cacheTZ();
 	}
+
 	void cacheTZ()
 	{
 		const char* tz = std::getenv("TZ");
@@ -76,7 +77,7 @@ private:
 
 	static int computeTimeZone()
 	{
-	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID // no timezone global var
+#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID // no timezone global var
 		// Get offset from a date when DST is not active.
 		// Check both January and July - one of them won't have DST.
 		struct std::tm jan = {};
@@ -101,11 +102,11 @@ private:
 		struct std::tm jul_local;
 		localtime_r(&jul_time, &jul_local);
 		return static_cast<int>(jul_local.tm_gmtoff);
-	#elif defined(__CYGWIN__)
+#elif defined(__CYGWIN__)
 		return -_timezone;
-	#else
+#else
 		return -timezone;
-	#endif
+#endif
 	}
 
 	std::mutex _mutex;
