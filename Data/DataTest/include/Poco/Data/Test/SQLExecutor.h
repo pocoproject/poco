@@ -67,7 +67,11 @@ public:
 		assertTrue (c.isConnected());
 		try
 		{
-			assertTrue (c.getTimeout() == 10);
+			int tout = c.getTimeout();
+			if (tout) // some drivers/DBMS (eg. postgres) do not cooperate here
+				assertEqual (10, tout);
+			else
+				std::cout << "Session timeout returned zero." << '\n';
 		}
 		catch(const NotSupportedException&)
 		{
@@ -76,7 +80,11 @@ public:
 
 		try
 		{
-			assertTrue (c.getLoginTimeout() == 10);
+			int tout = c.getLoginTimeout();
+			if (tout) // some drivers/DBMS (eg. postgres) do not cooperate here
+				assertEqual (10, tout);
+			else
+				std::cout << "Login timeout returned zero." << '\n';
 		}
 		catch(const NotSupportedException&)
 		{
@@ -373,6 +381,8 @@ public:
 private:
 	static const std::string MULTI_INSERT;
 	static const std::string MULTI_SELECT;
+	static const float EPSILON_FLOAT;
+	static const double EPSILON_DOUBLE;
 
 	Poco::Data::Session* _pSession;
 	Poco::Data::Session* _pEncSession;

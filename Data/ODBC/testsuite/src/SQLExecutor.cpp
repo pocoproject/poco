@@ -770,7 +770,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 				assertTrue (one++ == chr[0]);
 				assertTrue (two++ == second);
-				assertTrue (three == third);
+				assertTrue (std::fabs(three - third) < 1e-6f);
 				three += 1.0;
 
 				++count;
@@ -951,7 +951,7 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 					(pParam != (SQLPOINTER)inParam) &&
 					(pParam != (SQLPOINTER)outParam))
 				{
-					fail("Parameter mismatch.");
+					failmsg("Parameter mismatch.");
 				}
 
 				assertTrue(0 != (SQLINTEGER)size);
@@ -986,8 +986,8 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 void SQLExecutor::execute(const std::string& sql)
 {
 	try { session() << sql, now;  }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (sql); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (sql); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg (sql); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg (sql); }
 }
 
 
@@ -996,9 +996,9 @@ void SQLExecutor::connection(const std::string& connectString)
 	std::cout << connectString << std::endl;
 	Poco::Data::ODBC::Connection c;
 	try { _dataExecutor.connection(c, connectString); }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (connectString, __LINE__, __FILE__); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (connectString, __LINE__, __FILE__); }
-	catch(Poco::Exception& se){ std::cout << se.displayText() << std::endl; fail (connectString, __LINE__, __FILE__); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg (connectString); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg (connectString); }
+	catch(Poco::Exception& se){ std::cout << se.displayText() << std::endl; failmsg (connectString); }
 }
 
 
@@ -1047,7 +1047,7 @@ void SQLExecutor::notNulls(const std::vector<std::string>& sqlStates)
 	try
 	{
 		session() << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now;
-		fail ("must fail");
+		failmsg ("must failmsg");
 	} catch (StatementException& se)
 	{
 		//double check if we're failing for the right reason

@@ -11,6 +11,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(DataPostgreSQL-testrunner ${TEST_SRCS})
+set_target_properties(DataPostgreSQL-testrunner PROPERTIES DEBUG_POSTFIX "d")
 add_test(
 	NAME DataPostgreSQL
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

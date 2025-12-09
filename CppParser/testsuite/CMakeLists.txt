@@ -11,6 +11,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(CppParser-testrunner ${TEST_SRCS})
+set_target_properties(CppParser-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME CppParser

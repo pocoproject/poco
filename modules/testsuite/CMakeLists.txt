@@ -11,6 +11,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(Modules-testrunner ${TEST_SRCS})
+set_target_properties(Modules-testrunner PROPERTIES DEBUG_POSTFIX "d")
 target_compile_definitions(Modules-testrunner PUBLIC ENABLE_MODULES)
 target_link_libraries(Modules-testrunner PUBLIC Poco::Modules Poco::Foundation)
 

@@ -11,6 +11,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(Prometheus-testrunner ${TEST_SRCS})
+set_target_properties(Prometheus-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME Prometheus

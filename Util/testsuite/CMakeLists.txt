@@ -18,6 +18,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(Util-testrunner ${TEST_SRCS})
+set_target_properties(Util-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME Util

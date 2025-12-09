@@ -25,7 +25,7 @@
 #include "SQLExecutor.h"
 
 
-#define POCO_ODBC_TEST_DATABASE_SERVER "localhost"
+#define POCO_ODBC_TEST_DATABASE_SERVER "127.0.0.1"
 
 
 class ODBCTest: public CppUnit::TestCase

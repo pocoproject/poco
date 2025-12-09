@@ -175,3 +175,35 @@ node_modules
 # Debug files #
 ##############
 *.core
+
+# Build-time symlinks to bundled libraries #
+############################################
+Foundation/src/adler32.c
+Foundation/src/compress.c
+Foundation/src/crc32.c
+Foundation/src/crc32.h
+Foundation/src/deflate.c
+Foundation/src/deflate.h
+Foundation/src/gzguts.h
+Foundation/src/infback.c
+Foundation/src/inffast.c
+Foundation/src/inffast.h
+Foundation/src/inffixed.h
+Foundation/src/inflate.c
+Foundation/src/inflate.h
+Foundation/src/inftrees.c
+Foundation/src/inftrees.h
+Foundation/src/pcre2.h
+Foundation/src/pcre2_*.c
+Foundation/src/pcre2_*.h
+Foundation/src/trees.c
+Foundation/src/trees.h
+Foundation/src/utf8proc.c
+Foundation/src/utf8proc.h
+Foundation/src/utf8proc_data.c
+Foundation/src/zconf.h
+Foundation/src/zlib.h
+Foundation/src/zutil.c
+Foundation/src/zutil.h
+JSON/src/pdjson.c
+JSON/src/pdjson.h

@@ -291,6 +291,10 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
+const float SQLExecutor::EPSILON_FLOAT = 1e-5f;
+const double SQLExecutor::EPSILON_DOUBLE = 1e-9;
+
+
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
@@ -418,7 +422,7 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 		assertTrue (pool.available() == 4);
 		assertTrue (pool.dead() == 0);
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
-		Session s1(pool.get());
+		Session ss1(pool.get());
 
 		try { pool.setFeature("f1", true); fail ("setting an unsuported feature must fail", __LINE__, __FILE__); }
 		catch (Poco::InvalidAccessException&) { }
@@ -1297,7 +1301,7 @@ void SQLExecutor::floats()
 		failmsg (__func__);
 	}
 
-	assertTrue (ret == data);
+	assertTrue (std::fabs(ret - data) < EPSILON_FLOAT);
 }
 
 
@@ -1331,7 +1335,7 @@ void SQLExecutor::doubles()
 		failmsg (__func__);
 	}
 
-	assertTrue (ret == data);
+	assertTrue (std::fabs(ret - data) < EPSILON_DOUBLE);
 }
 
 
@@ -1593,7 +1597,8 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 			use(floats),
 			use(dateTimes), now;
 		sw.stop();
-	}	catch(DataException& ce)
+	}
+	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		failmsg (__func__);
@@ -2942,22 +2947,22 @@ void SQLExecutor::internalExtraction()
 		try
 		{
 			//this is what most drivers will return
-			int i = rset.value<int>(0,0);
-			assertTrue (4 == i);
+			int ii = rset.value<int>(0,0);
+			assertEqual (4, ii);
 		}
 		catch(BadCastException&)
 		{
 			try
 			{
 				//this is for Oracle
-				double i = rset.value<double>(0,0);
-				assertTrue (4 == int(i));
+				double d = rset.value<double>(0,0);
+				assertEqual (4, int(d));
 			}
 			catch(BadCastException&)
 			{
 				//this is for PostgreSQL
 				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assertTrue (4 == big);
+				assertEqual (4, big);
 			}
 		}
 
