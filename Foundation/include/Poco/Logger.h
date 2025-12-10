@@ -462,8 +462,11 @@ protected:
 	~Logger() override;
 
 	void log(const std::string& text, Message::Priority prio);
+	void log(std::string&& text, Message::Priority prio);
 	void logNPC(const std::string& text, Message::Priority prio);
+	void logNPC(std::string&& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, LineNumber line);
+	void log(std::string&& text, Message::Priority prio, const char* file, LineNumber line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
 	static Logger& parent(const std::string& name);
@@ -478,6 +481,7 @@ private:
 	Logger& operator = (const Logger&);
 
 	void logAlways(const std::string& text, Message::Priority prio);
+	void logAlways(std::string&& text, Message::Priority prio);
 
 	std::string _name;
 	Channel::Ptr _pChannel;
@@ -790,11 +794,29 @@ inline void Logger::log(const std::string& text, Message::Priority prio)
 }
 
 
+inline void Logger::log(std::string&& text, Message::Priority prio)
+{
+	if (_level >= prio && _pChannel)
+	{
+		_pChannel->log(Message(_name, std::move(text), prio));
+	}
+}
+
+
 inline void Logger::logNPC(const std::string& text, Message::Priority prio)
 {
 	if (_pChannel)
 	{
 		_pChannel->log(Message(_name, text, prio));
+	}
+}
+
+
+inline void Logger::logNPC(std::string&& text, Message::Priority prio)
+{
+	if (_pChannel)
+	{
+		_pChannel->log(Message(_name, std::move(text), prio));
 	}
 }
 
@@ -808,11 +830,29 @@ inline void Logger::log(const std::string& text, Message::Priority prio, const c
 }
 
 
+inline void Logger::log(std::string&& text, Message::Priority prio, const char* file, LineNumber line)
+{
+	if (_level >= prio && _pChannel)
+	{
+		_pChannel->log(Message(_name, std::move(text), prio, file, line));
+	}
+}
+
+
 inline void Logger::logAlways(const std::string& text, Message::Priority prio)
 {
 	if (_pChannel)
 	{
 		_pChannel->log(Message(_name, text, prio));
+	}
+}
+
+
+inline void Logger::logAlways(std::string&& text, Message::Priority prio)
+{
+	if (_pChannel)
+	{
+		_pChannel->log(Message(_name, std::move(text), prio));
 	}
 }
 
