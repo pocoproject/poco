@@ -137,6 +137,7 @@ Event notification for topology changes:
 ✅ **Configuration validation** - Enforces MongoDB SDAM specification constraints (e.g., minimum heartbeat frequency)
 ✅ **Robust topology handling** - Correctly handles mixed server states (unknown, primary, secondary)
 ✅ **Replica set name validation** - Validates servers belong to expected replica set, prevents cross-contamination
+✅ **Mixed server type validation** - Rejects incompatible combinations (Mongos+RS, Standalone+RS, multiple Standalones)
 ✅ **SDAM partial compliance** - Implements core SDAM specification features (see SDAM Compliance section for details)
 
 ## Files Created/Modified
@@ -1016,10 +1017,14 @@ The implementation follows the MongoDB SDAM specification:
 8. **Replica Set Name Validation and Cross-Contamination Prevention**
    - When updating a server from hello response, validates replica set name matches expected name
    - Servers reporting different replica set names are marked as Unknown with descriptive error
-   - Discovered hosts (from hosts/passives/arbiters arrays) are NOT added if server has mismatched replica set name
-   - Prevents topology poisoning from misconfigured servers or incorrect seed lists
-   - Example: If topology expects "rs0" but server reports "differentSet", server is marked Unknown and its discovered hosts are ignored
-   - Implementation: `TopologyDescription::updateServer()` performs validation before processing discovered hosts
+   - **Discovered hosts are NOT added if replica set name mismatches** (prevents cross-contamination between different replica sets)
+   - **Discovered hosts ARE added if server types are incompatible** (preserves diagnostic information)
+   - Example scenarios:
+     - Replica set name mismatch: Topology expects "rs0" but server reports "differentSet" → Server marked Unknown, discovered hosts ignored
+     - Incompatible types: Mongos + RsPrimary → Both servers tracked, topology set to Unknown by `updateTopologyType()`
+   - Implementation:
+     - Replica set name validation in `updateServer()` (blocks discovered hosts when name mismatches)
+     - Server type compatibility validation in `updateTopologyType()` (discovered hosts already added for diagnostics)
 
 ### Thread Safety
 
@@ -1449,6 +1454,7 @@ This implementation follows the [MongoDB Server Discovery and Monitoring (SDAM) 
 - **Round-Trip Time Measurement** - Tracks server latency for "nearest" read preference
 - **Server Error Tracking** - Maintains error state and messages for failed servers
 - **Automatic Failover** - Detects and recovers from server failures
+- **Mixed Server Type Validation** - Rejects incompatible server type combinations (Mongos+RS, Standalone+RS, multiple Standalones)
 
 ### Missing SDAM Features ⚠️
 
@@ -1482,15 +1488,9 @@ The following SDAM specification requirements are **not yet implemented**:
    - **Current Implementation**: Uses lastUpdateTime (when response was received) instead of server's actual write timestamp
    - **Impact**: Incorrect max staleness filtering, especially with slow networks or clock skew
 
-5. **Mixed Server Type Rejection**
-   - **Status**: Partially implemented
-   - **SDAM Requirement**: Reject topologies mixing incompatible server types (e.g., Primary + Mongos, Primary + Standalone)
-   - **Current Implementation**: Handles multiple standalones → Unknown, but doesn't validate all incompatible combinations
-   - **Impact**: Potential topology inconsistency when connecting to incorrectly configured seed lists
-
 #### Low (Features):
 
-6. **logicalSessionTimeoutMinutes**
+5. **logicalSessionTimeoutMinutes**
    - **Status**: Not implemented
    - **SDAM Requirement**: Parse and track logicalSessionTimeoutMinutes to determine if sessions are supported
    - **Impact**: Applications cannot detect if MongoDB sessions/transactions are available
@@ -1518,8 +1518,7 @@ The following enhancements are planned for full SDAM specification compliance:
 2. Add setVersion/electionId tracking for split-brain prevention
 3. Implement proper server removal logic based on primary's hello response
 4. Use lastWriteDate for accurate staleness calculations
-5. Add comprehensive mixed server type validation
-6. Parse and expose logicalSessionTimeoutMinutes for session support detection
+5. Parse and expose logicalSessionTimeoutMinutes for session support detection
 
 **Contributions welcome**: These features are well-defined in the SDAM specification and would be excellent contributions to the project.
 

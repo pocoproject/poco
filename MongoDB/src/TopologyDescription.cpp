@@ -250,14 +250,18 @@ const ServerDescription& TopologyDescription::updateServer(const Net::SocketAddr
 		_setName = serverSetName;
 	}
 
-	// Add newly discovered hosts to the topology (only if set name matches or is not validated yet)
+	// Add newly discovered hosts to the topology (only if set name matches)
 	// This prevents cross-contamination between different replica sets
+	// Note: We add ALL discovered hosts even if types might be incompatible
+	// The updateTopologyType() will detect incompatibility and set topology to Unknown
+	// This approach preserves all discovered servers for diagnostic purposes
 	for (const auto& host : hosts)
 	{
 		_servers.try_emplace(host, host);
 	}
 
 	// Update topology type
+	// This will detect any incompatible server type combinations and set topology to Unknown if needed
 	updateTopologyType();
 
 	// Return reference to the updated server
@@ -363,14 +367,40 @@ void TopologyDescription::updateTopologyType()
 		}
 	}
 
-	// Determine topology type based on discovered server types
-	// Priority order: Sharded > Single > ReplicaSetWithPrimary > ReplicaSetNoPrimary > Unknown
+	// STEP 1: Validate server type compatibility (per MongoDB SDAM specification)
+	// Incompatible combinations indicate misconfiguration and must result in Unknown topology
+	// This prevents incorrect routing and security issues
+
+	// Cannot mix mongos with replica set members
+	if (mongosCount > 0 && (primaries > 0 || otherRsMembers > 0))
+	{
+		_type = Unknown;
+		return;
+	}
+
+	// Cannot mix standalone with any other server type
+	if (standaloneCount > 0 && (primaries > 0 || otherRsMembers > 0 || mongosCount > 0))
+	{
+		_type = Unknown;
+		return;
+	}
+
+	// Multiple standalone servers is invalid (each standalone is independent)
+	if (standaloneCount > 1)
+	{
+		_type = Unknown;
+		return;
+	}
+
+	// STEP 2: Classify valid topologies
+	// At this point, server types are compatible, so we can safely determine topology type
+
 	if (mongosCount > 0)
 	{
 		// Sharded cluster: one or more mongos routers detected
 		_type = Sharded;
 	}
-	else if (standaloneCount > 0 && _servers.size() == 1)
+	else if (standaloneCount == 1 && _servers.size() == 1)
 	{
 		// Single standalone server - treat as Single topology
 		// Standalone servers behave like a single primary for read preferences

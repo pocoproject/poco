@@ -918,6 +918,140 @@ void ReplicaSetTest::testTopologyMultipleStandalone()
 }
 
 
+void ReplicaSetTest::testTopologyMixedMongosAndPrimary()
+{
+	TopologyDescription topology;
+
+	// Add a mongos server
+	SocketAddress mongosAddr("localhost:27017");
+	topology.updateServer(mongosAddr, *createMongosHelloResponse(), 1000);
+
+	// Should be Sharded topology with one mongos
+	assertEqual(static_cast<int>(TopologyDescription::Sharded), static_cast<int>(topology.type()));
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Add a replica set primary (incompatible!)
+	SocketAddress primaryAddr("localhost:27018");
+	topology.updateServer(primaryAddr, *createPrimaryHelloResponse(), 2000);
+
+	// Mixed mongos + replica set primary should result in Unknown topology
+	// Cannot mix sharded and replica set topologies
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+
+	// Server count should be >= 2 (the two servers we queried, plus any discovered hosts)
+	// Note: Discovered hosts from primary's hello response are added even when types are incompatible
+	// This preserves diagnostic information - we can see all servers that were discovered
+	assertTrue(topology.serverCount() >= 2);
+}
+
+
+void ReplicaSetTest::testTopologyMixedStandaloneAndPrimary()
+{
+	TopologyDescription topology;
+
+	// Add a standalone server
+	SocketAddress standaloneAddr("localhost:27017");
+	topology.updateServer(standaloneAddr, *createStandaloneHelloResponse(), 1000);
+
+	// Should be Single topology with one standalone
+	assertEqual(static_cast<int>(TopologyDescription::Single), static_cast<int>(topology.type()));
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Add a replica set primary (incompatible!)
+	SocketAddress primaryAddr("localhost:27018");
+	topology.updateServer(primaryAddr, *createPrimaryHelloResponse(), 2000);
+
+	// Mixed standalone + replica set primary should result in Unknown topology
+	// Standalone cannot coexist with replica set members
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+
+	// Server count should be >= 2 (the two servers we queried, plus any discovered hosts)
+	// Note: Discovered hosts from primary's hello response are added even when types are incompatible
+	// This preserves diagnostic information - we can see all servers that were discovered
+	assertTrue(topology.serverCount() >= 2);
+}
+
+
+void ReplicaSetTest::testTopologyMultipleStandaloneWithSetName()
+{
+	// Test that multiple standalones with setName configured still results in Unknown
+	// This is the critical bug fix from CodeQL analysis
+	TopologyDescription topology("rs0"s);  // setName configured
+
+	// Add first standalone server
+	SocketAddress addr1("localhost:27017");
+	topology.updateServer(addr1, *createStandaloneHelloResponse(), 1000);
+
+	// Single standalone should be "Single" topology even with setName
+	assertEqual(static_cast<int>(TopologyDescription::Single), static_cast<int>(topology.type()));
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Add second standalone server
+	SocketAddress addr2("localhost:27018");
+	topology.updateServer(addr2, *createStandaloneHelloResponse(), 2000);
+
+	// Multiple standalone servers should result in Unknown topology
+	// CRITICAL: Should be Unknown even though setName is configured
+	// Previous buggy logic would return ReplicaSetNoPrimary due to !_setName.empty()
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+	assertEqual(2, static_cast<int>(topology.serverCount()));
+}
+
+
+void ReplicaSetTest::testTopologyMixedMongosAndSecondary()
+{
+	TopologyDescription topology;
+
+	// Add a mongos server
+	SocketAddress mongosAddr("localhost:27017");
+	topology.updateServer(mongosAddr, *createMongosHelloResponse(), 1000);
+
+	// Should be Sharded topology with one mongos
+	assertEqual(static_cast<int>(TopologyDescription::Sharded), static_cast<int>(topology.type()));
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Add a replica set secondary (incompatible!)
+	SocketAddress secondaryAddr("localhost:27018");
+	topology.updateServer(secondaryAddr, *createSecondaryHelloResponse(), 2000);
+
+	// Mixed mongos + replica set secondary should result in Unknown topology
+	// Cannot mix sharded and replica set topologies
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+
+	// Server count should be >= 2 (the two servers we queried, plus any discovered hosts)
+	// Note: Discovered hosts from secondary's hello response are added even when types are incompatible
+	// This preserves diagnostic information - we can see all servers that were discovered
+	assertTrue(topology.serverCount() >= 2);
+}
+
+
+void ReplicaSetTest::testTopologyMixedStandaloneAndSecondary()
+{
+	TopologyDescription topology;
+
+	// Add a standalone server
+	SocketAddress standaloneAddr("localhost:27017");
+	topology.updateServer(standaloneAddr, *createStandaloneHelloResponse(), 1000);
+
+	// Should be Single topology with one standalone
+	assertEqual(static_cast<int>(TopologyDescription::Single), static_cast<int>(topology.type()));
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Add a replica set secondary (incompatible!)
+	SocketAddress secondaryAddr("localhost:27018");
+	topology.updateServer(secondaryAddr, *createSecondaryHelloResponse(), 2000);
+
+	// Mixed standalone + replica set secondary should result in Unknown topology
+	// Standalone cannot coexist with replica set members
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+
+	// Server count should be >= 2 (the two servers we queried, plus any discovered hosts)
+	// Note: Discovered hosts from secondary's hello response are added even when types are incompatible
+	// This preserves diagnostic information - we can see all servers that were discovered
+	assertTrue(topology.serverCount() >= 2);
+}
+
+
 void ReplicaSetTest::testTopologyTransitions()
 {
 	TopologyDescription topology;
@@ -1533,6 +1667,11 @@ CppUnit::Test* ReplicaSetTest::suite()
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMixedUnknownAndKnown);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyAllUnknown);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMultipleStandalone);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMixedMongosAndPrimary);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMixedStandaloneAndPrimary);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMultipleStandaloneWithSetName);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMixedMongosAndSecondary);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMixedStandaloneAndSecondary);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyTransitions);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyReplicaSetNoPrimaryWithSetName);
 

@@ -51,6 +51,11 @@ public:
 	void testTopologyMixedUnknownAndKnown();
 	void testTopologyAllUnknown();
 	void testTopologyMultipleStandalone();
+	void testTopologyMixedMongosAndPrimary();
+	void testTopologyMixedStandaloneAndPrimary();
+	void testTopologyMultipleStandaloneWithSetName();
+	void testTopologyMixedMongosAndSecondary();
+	void testTopologyMixedStandaloneAndSecondary();
 	void testTopologyTransitions();
 	void testTopologyReplicaSetNoPrimaryWithSetName();
 
