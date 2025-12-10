@@ -102,7 +102,6 @@ public:
 	[[nodiscard]] const std::string& setName() const;
 		/// Returns the replica set name, or empty string if not in a replica set.
 
-
 	[[nodiscard]] bool isWritable() const;
 		/// Returns true if this server can accept write operations.
 		/// Only primary servers are writable.

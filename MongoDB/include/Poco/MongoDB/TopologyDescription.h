@@ -120,10 +120,12 @@ public:
 		/// Returns the server description for the given address.
 		/// Returns an Unknown server description if not found.
 
-	void updateServer(const Net::SocketAddress& address, const Document& helloResponse, Poco::Int64 rttMicros);
+	const ServerDescription& updateServer(const Net::SocketAddress& address, const Document& helloResponse, Poco::Int64 rttMicros);
 		/// Updates a server's description from a 'hello' command response.
 		/// If the server doesn't exist in the topology, it is added.
 		/// This may also trigger topology type transitions.
+		///
+		/// Returns a const reference to the updated server description.
 
 	void markServerUnknown(const Net::SocketAddress& address, const std::string& error = "");
 		/// Marks a server as Unknown (typically after an error).
@@ -151,10 +153,6 @@ public:
 private:
 	void updateTopologyType();
 		/// Updates the topology type based on current server states.
-		/// Must be called while holding the mutex.
-
-	void processNewHosts(const std::vector<Net::SocketAddress>& hosts);
-		/// Processes newly discovered hosts from a hello response.
 		/// Must be called while holding the mutex.
 
 	mutable std::mutex _mutex;

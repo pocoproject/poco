@@ -473,12 +473,13 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 
 			// Update topology
 			std::lock_guard<std::mutex> lock(_mutex);
-			_topology.updateServer(address, doc, rttMicros);
+			const ServerDescription& server = _topology.updateServer(address, doc, rttMicros);
 
 			// Update replica set name if not set
-			if (_config.setName.empty() && doc.exists("setName"s))
+			// Get set name from the updated server instead of re-querying the document
+			if (_config.setName.empty() && !server.setName().empty())
 			{
-				_config.setName = doc.get<std::string>("setName"s);
+				_config.setName = server.setName();
 				_topology.setName(_config.setName);
 			}
 		}

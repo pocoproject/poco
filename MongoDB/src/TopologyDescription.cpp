@@ -213,7 +213,7 @@ ServerDescription TopologyDescription::getServer(const Net::SocketAddress& addre
 }
 
 
-void TopologyDescription::updateServer(const Net::SocketAddress& address, const Document& helloResponse, Poco::Int64 rttMicros)
+const ServerDescription& TopologyDescription::updateServer(const Net::SocketAddress& address, const Document& helloResponse, Poco::Int64 rttMicros)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
 
@@ -233,11 +233,17 @@ void TopologyDescription::updateServer(const Net::SocketAddress& address, const 
 		_setName = it->second.setName();
 	}
 
-	// Process newly discovered hosts
-	processNewHosts(hosts);
+	// Add newly discovered hosts to the topology
+	for (const auto& host : hosts)
+	{
+		_servers.try_emplace(host, host);
+	}
 
 	// Update topology type
 	updateTopologyType();
+
+	// Return reference to the updated server
+	return it->second;
 }
 
 
@@ -367,18 +373,6 @@ void TopologyDescription::updateTopologyType()
 	{
 		// Unable to determine topology (all servers are unknown or no clear pattern)
 		_type = Unknown;
-	}
-}
-
-
-void TopologyDescription::processNewHosts(const std::vector<Net::SocketAddress>& hosts)
-{
-	// This method must be called while holding the mutex
-
-	// Add newly discovered hosts to the topology
-	for (const auto& host : hosts)
-	{
-		_servers.try_emplace(host, host);
 	}
 }
 
