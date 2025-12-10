@@ -227,13 +227,31 @@ const ServerDescription& TopologyDescription::updateServer(const Net::SocketAddr
 	// Update from hello response and get discovered hosts
 	auto hosts = it->second.updateFromHelloResponse(helloResponse, rttMicros);
 
-	// Update replica set name if not set
-	if (_setName.empty() && !it->second.setName().empty())
+	// Validate replica set name matches
+	// Per MongoDB SDAM specification: servers with mismatching replica set names
+	// should be marked as Unknown and their discovered hosts should be ignored
+	const std::string& serverSetName = it->second.setName();
+
+	if (!serverSetName.empty() && !_setName.empty() && serverSetName != _setName)
 	{
-		_setName = it->second.setName();
+		// Replica set name mismatch - mark server as Unknown with error
+		it->second.markError("Replica set name mismatch: expected '" + _setName +
+		                     "', but server reports '" + serverSetName + "'");
+
+		// Do NOT add discovered hosts from this server (they belong to a different replica set)
+		// Do NOT update topology type yet - wait for next refresh
+		updateTopologyType();
+		return it->second;
 	}
 
-	// Add newly discovered hosts to the topology
+	// Update replica set name if not set (only if server reports a set name)
+	if (_setName.empty() && !serverSetName.empty())
+	{
+		_setName = serverSetName;
+	}
+
+	// Add newly discovered hosts to the topology (only if set name matches or is not validated yet)
+	// This prevents cross-contamination between different replica sets
 	for (const auto& host : hosts)
 	{
 		_servers.try_emplace(host, host);

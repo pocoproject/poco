@@ -796,23 +796,39 @@ void ReplicaSetTest::testTopologySetNameMismatch()
 
 	assertEqual("rs0"s, topology.setName());
 
-	// Create hello response with different set name
+	// Create hello response with different set name and discovered hosts
 	Document::Ptr wrongSetResponse = new Document();
 	wrongSetResponse->add("isWritablePrimary"s, true);
 	wrongSetResponse->add("secondary"s, false);
 	wrongSetResponse->add("setName"s, "differentSet"s);  // Wrong set name
 	wrongSetResponse->add("ok"s, 1.0);
 
+	// Add hosts array - these should NOT be added to topology due to set name mismatch
+	Array::Ptr hosts = new Array();
+	hosts->add<std::string>("localhost:27018"s);
+	hosts->add<std::string>("localhost:27019"s);
+	wrongSetResponse->add("hosts"s, hosts);
+
 	SocketAddress addr("localhost:27017");
 
 	// Update server with mismatched set name
-	// The topology keeps original set name but updates server
-	topology.updateServer(addr, *wrongSetResponse, 5000);
+	const ServerDescription& server = topology.updateServer(addr, *wrongSetResponse, 5000);
 
 	// Original set name is preserved (set in constructor)
 	assertEqual("rs0"s, topology.setName());
 
-	// Server is updated but topology maintains original expected set name
+	// Server is added to topology
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Server should be marked as Unknown due to set name mismatch
+	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(server.type()));
+	assertTrue(server.hasError());
+	assertTrue(server.error().find("Replica set name mismatch") != std::string::npos);
+	assertTrue(server.error().find("expected 'rs0'") != std::string::npos);
+	assertTrue(server.error().find("but server reports 'differentSet'") != std::string::npos);
+
+	// Discovered hosts from mismatched server should NOT be added (prevent cross-contamination)
+	// Only the queried server itself should be in topology
 	assertEqual(1, static_cast<int>(topology.serverCount()));
 }
 
