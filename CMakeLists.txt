@@ -595,6 +595,7 @@ endif()
 
 if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
 	add_subdirectory(modules)
+	list(APPEND Poco_COMPONENTS "C++ modules")
 endif()
 
 
