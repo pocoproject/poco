@@ -817,6 +817,159 @@ void ReplicaSetTest::testTopologySetNameMismatch()
 }
 
 
+void ReplicaSetTest::testTopologyMixedUnknownAndKnown()
+{
+	TopologyDescription topology("rs0"s);
+
+	// Add a primary
+	SocketAddress primary("localhost:27017");
+	topology.updateServer(primary, *createPrimaryHelloResponse(), 5000);
+
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetWithPrimary), static_cast<int>(topology.type()));
+
+	// Add an unknown server (by marking it with error)
+	SocketAddress unknown("localhost:27020");
+	topology.addServer(unknown);
+	topology.markServerUnknown(unknown, "Connection timeout");
+
+	// Topology should still be ReplicaSetWithPrimary (unknown servers don't affect classification)
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetWithPrimary), static_cast<int>(topology.type()));
+	assertEqual(4, static_cast<int>(topology.serverCount()));  // primary + 2 discovered from hello + 1 unknown
+
+	// Verify primary is still findable
+	assertTrue(topology.hasPrimary());
+	ServerDescription foundPrimary = topology.findPrimary();
+	assertEqual(static_cast<int>(ServerDescription::RsPrimary), static_cast<int>(foundPrimary.type()));
+
+	// Mark primary as unknown
+	topology.markServerUnknown(primary, "Connection failed");
+
+	// Should transition to ReplicaSetNoPrimary (we have setName and other known members)
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
+	assertFalse(topology.hasPrimary());
+}
+
+
+void ReplicaSetTest::testTopologyAllUnknown()
+{
+	TopologyDescription topology;
+
+	// Add multiple unknown servers
+	SocketAddress addr1("localhost:27017");
+	SocketAddress addr2("localhost:27018");
+	SocketAddress addr3("localhost:27019");
+
+	topology.addServer(addr1);
+	topology.addServer(addr2);
+	topology.addServer(addr3);
+
+	// All servers are unknown (not yet updated), topology should be Unknown
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+	assertEqual(3, static_cast<int>(topology.serverCount()));
+
+	// Mark all servers with errors
+	topology.markServerUnknown(addr1, "Timeout");
+	topology.markServerUnknown(addr2, "Timeout");
+	topology.markServerUnknown(addr3, "Timeout");
+
+	// Still Unknown topology (no known server types)
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+	assertFalse(topology.hasPrimary());
+	assertTrue(topology.findSecondaries().empty());
+}
+
+
+void ReplicaSetTest::testTopologyMultipleStandalone()
+{
+	TopologyDescription topology;
+
+	// Add first standalone server
+	SocketAddress addr1("localhost:27017");
+	topology.updateServer(addr1, *createStandaloneHelloResponse(), 1000);
+
+	// Single standalone should be "Single" topology
+	assertEqual(static_cast<int>(TopologyDescription::Single), static_cast<int>(topology.type()));
+	assertEqual(1, static_cast<int>(topology.serverCount()));
+
+	// Add second standalone server
+	SocketAddress addr2("localhost:27018");
+	topology.updateServer(addr2, *createStandaloneHelloResponse(), 2000);
+
+	// Multiple standalone servers should result in Unknown topology
+	// (standalone servers shouldn't be in a multi-server configuration)
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+	assertEqual(2, static_cast<int>(topology.serverCount()));
+}
+
+
+void ReplicaSetTest::testTopologyTransitions()
+{
+	TopologyDescription topology;
+
+	// Start with Unknown
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+
+	// Add a secondary -> ReplicaSetNoPrimary
+	SocketAddress secondary("localhost:27018");
+	topology.updateServer(secondary, *createSecondaryHelloResponse(), 3000);
+
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
+	assertEqual("rs0"s, topology.setName());
+
+	// Add a primary -> ReplicaSetWithPrimary
+	SocketAddress primary("localhost:27017");
+	topology.updateServer(primary, *createPrimaryHelloResponse(), 5000);
+
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetWithPrimary), static_cast<int>(topology.type()));
+	assertTrue(topology.hasPrimary());
+
+	// Mark primary as unknown -> back to ReplicaSetNoPrimary
+	topology.markServerUnknown(primary, "Network error");
+
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
+	assertFalse(topology.hasPrimary());
+
+	// Remove all servers except one unknown -> Unknown
+	topology.removeServer(secondary);
+	// Now only the unknown primary remains
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
+
+	// Clear all -> Unknown
+	topology.clear();
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+	assertEqual(0, static_cast<int>(topology.serverCount()));
+}
+
+
+void ReplicaSetTest::testTopologyReplicaSetNoPrimaryWithSetName()
+{
+	// This test verifies that a topology with a configured setName
+	// is classified as ReplicaSetNoPrimary (not Unknown) even with unknown servers
+	TopologyDescription topology("rs0"s);
+
+	// Topology has setName but no servers - should be Unknown (no servers at all)
+	assertEqual(static_cast<int>(TopologyDescription::Unknown), static_cast<int>(topology.type()));
+	assertEqual("rs0"s, topology.setName());
+
+	// Add an unknown server
+	SocketAddress addr("localhost:27017");
+	topology.addServer(addr);
+
+	// With setName configured and servers (even if all unknown),
+	// topology should be ReplicaSetNoPrimary because we know it's intended to be a replica set
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
+
+	// Now add an arbiter (which is a replica set member)
+	SocketAddress arbiter("localhost:27019");
+	topology.updateServer(arbiter, *createArbiterHelloResponse(), 2000);
+
+	// Should still be ReplicaSetNoPrimary (we have replica set members but no primary)
+	assertEqual(static_cast<int>(TopologyDescription::ReplicaSetNoPrimary), static_cast<int>(topology.type()));
+	assertFalse(topology.hasPrimary());
+	assertTrue(topology.findSecondaries().empty());  // Arbiters are not secondaries
+}
+
+
 // ============================================================================
 // ReadPreference Tests
 // ============================================================================
@@ -1361,6 +1514,11 @@ CppUnit::Test* ReplicaSetTest::suite()
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyRemoveServer);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyDiscoverNewHosts);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologySetNameMismatch);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMixedUnknownAndKnown);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyAllUnknown);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyMultipleStandalone);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyTransitions);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testTopologyReplicaSetNoPrimaryWithSetName);
 
 	// ReadPreference tests
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReadPreferencePrimary);

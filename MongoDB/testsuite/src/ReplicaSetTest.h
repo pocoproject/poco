@@ -48,6 +48,11 @@ public:
 	void testTopologyRemoveServer();
 	void testTopologyDiscoverNewHosts();
 	void testTopologySetNameMismatch();
+	void testTopologyMixedUnknownAndKnown();
+	void testTopologyAllUnknown();
+	void testTopologyMultipleStandalone();
+	void testTopologyTransitions();
+	void testTopologyReplicaSetNoPrimaryWithSetName();
 
 	void testReadPreferencePrimary();
 	void testReadPreferencePrimaryPreferred();

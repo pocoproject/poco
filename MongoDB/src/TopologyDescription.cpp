@@ -301,11 +301,14 @@ void TopologyDescription::updateTopologyType()
 		return;
 	}
 
-	// Count server types
+	// Count server types for topology classification
+	// Note: These counters are used to determine the overall topology type
+	// based on the types of servers that have been discovered and updated
 	int primaries = 0;
-	int secondaries = 0;
+	int otherRsMembers = 0;  // Non-primary replica set members (secondaries, arbiters, etc.)
 	int mongosCount = 0;
 	int standaloneCount = 0;
+	int unknownCount = 0;
 
 	for (const auto& [address, server] : _servers)
 	{
@@ -318,7 +321,9 @@ void TopologyDescription::updateTopologyType()
 		case ServerDescription::RsArbiter:
 		case ServerDescription::RsOther:
 		case ServerDescription::RsGhost:
-			secondaries++;
+			// Count all non-primary replica set members together
+			// for topology determination (they all indicate replica set membership)
+			otherRsMembers++;
 			break;
 		case ServerDescription::Mongos:
 			mongosCount++;
@@ -328,13 +333,17 @@ void TopologyDescription::updateTopologyType()
 			break;
 		case ServerDescription::Unknown:
 			// Unknown servers don't affect topology classification
+			// Count them to help with diagnostics
+			unknownCount++;
 			break;
 		}
 	}
 
-	// Determine topology type
+	// Determine topology type based on discovered server types
+	// Priority order: Sharded > Single > ReplicaSetWithPrimary > ReplicaSetNoPrimary > Unknown
 	if (mongosCount > 0)
 	{
+		// Sharded cluster: one or more mongos routers detected
 		_type = Sharded;
 	}
 	else if (standaloneCount > 0 && _servers.size() == 1)
@@ -345,14 +354,18 @@ void TopologyDescription::updateTopologyType()
 	}
 	else if (primaries > 0)
 	{
+		// Replica set with at least one primary
 		_type = ReplicaSetWithPrimary;
 	}
-	else if (secondaries > 0 || !_setName.empty())
+	else if (otherRsMembers > 0 || !_setName.empty())
 	{
+		// Replica set without primary: either we have non-primary replica set members,
+		// or we have a configured setName (indicating this is intended to be a replica set)
 		_type = ReplicaSetNoPrimary;
 	}
 	else
 	{
+		// Unable to determine topology (all servers are unknown or no clear pattern)
 		_type = Unknown;
 	}
 }
