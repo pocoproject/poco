@@ -12,13 +12,17 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/NotificationCenter.h"
+#ifdef POCO_TEST_DEPRECATED
 #include "Poco/Observer.h"
+#endif
 #include "Poco/NObserver.h"
 #include "Poco/AutoPtr.h"
 
 
 using Poco::NotificationCenter;
+#ifdef POCO_TEST_DEPRECATED
 using Poco::Observer;
+#endif
 using Poco::NObserver;
 using Poco::Notification;
 using Poco::AutoPtr;
@@ -56,6 +60,7 @@ void NotificationCenterTest::testNotificationCenter1()
 }
 
 
+#ifdef POCO_TEST_DEPRECATED
 void NotificationCenterTest::testNotificationCenter2()
 {
 	NotificationCenter nc;
@@ -72,8 +77,10 @@ void NotificationCenterTest::testNotificationCenter2()
 	assertTrue (!nc.hasObservers());
 	assertTrue (nc.countObservers() == 0);
 }
+#endif
 
 
+#ifdef POCO_TEST_DEPRECATED
 void NotificationCenterTest::testNotificationCenter3()
 {
 	NotificationCenter nc;
@@ -96,8 +103,10 @@ void NotificationCenterTest::testNotificationCenter3()
 	assertTrue (!nc.hasObservers());
 	assertTrue (nc.countObservers() == 0);
 }
+#endif
 
 
+#ifdef POCO_TEST_DEPRECATED
 void NotificationCenterTest::testNotificationCenter4()
 {
 	NotificationCenter nc;
@@ -127,8 +136,10 @@ void NotificationCenterTest::testNotificationCenter4()
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle3));
 	assertTrue (!nc.hasObserver(o3));
 }
+#endif
 
 
+#ifdef POCO_TEST_DEPRECATED
 void NotificationCenterTest::testNotificationCenter5()
 {
 	NotificationCenter nc;
@@ -145,6 +156,7 @@ void NotificationCenterTest::testNotificationCenter5()
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	nc.removeObserver(Observer<NotificationCenterTest, TestNotification>(*this, &NotificationCenterTest::handleTest));
 }
+#endif
 
 
 void NotificationCenterTest::testNotificationCenterAuto()
@@ -158,6 +170,7 @@ void NotificationCenterTest::testNotificationCenterAuto()
 }
 
 
+#ifdef POCO_TEST_DEPRECATED
 void NotificationCenterTest::testDefaultNotificationCenter()
 {
 	NotificationCenter& nc = NotificationCenter::defaultCenter();
@@ -167,8 +180,10 @@ void NotificationCenterTest::testDefaultNotificationCenter()
 	assertTrue (_set.find("handle1") != _set.end());
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 }
+#endif
 
 
+#ifdef POCO_TEST_DEPRECATED
 void NotificationCenterTest::handle1(Poco::Notification* pNf)
 {
 	Poco::Mutex::ScopedLock l(_mutex);
@@ -201,6 +216,7 @@ void NotificationCenterTest::handleTest(TestNotification* pNf)
 	AutoPtr<TestNotification> nf = pNf;
 	_set.insert("handleTest");
 }
+#endif
 
 
 void NotificationCenterTest::handleAuto(const AutoPtr<Notification>& pNf)
@@ -229,12 +245,16 @@ CppUnit::Test* NotificationCenterTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NotificationCenterTest");
 
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter1);
+#ifdef POCO_TEST_DEPRECATED
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter2);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter3);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter4);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenter5);
+#endif
 	CppUnit_addTest(pSuite, NotificationCenterTest, testNotificationCenterAuto);
+#ifdef POCO_TEST_DEPRECATED
 	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultNotificationCenter);
+#endif
 
 	return pSuite;
 }

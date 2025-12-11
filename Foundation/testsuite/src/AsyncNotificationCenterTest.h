@@ -54,8 +54,13 @@ public:
 	void testAsyncNotificationCenterParallelDispatch();
 		/// Tests that multiple workers dispatch notifications in parallel
 
+	void testMixedNObserversAndAsyncObservers();
+		/// Tests mixing NObserver and AsyncObserver in same NotificationCenter
+
+#ifdef POCO_TEST_DEPRECATED
 	void testMixedObservers();
-		/// Tests mixing Observer, NObserver, and AsyncObserver in same NotificationCenter
+		/// Tests mixing Observer, NObserver, and AsyncObserver in same NotificationCenter (deprecated)
+#endif
 
 	void testSynchronousDispatch();
 		/// Tests synchronousDispatch() method that returns results from sync observers
@@ -81,7 +86,10 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
+	void handleNObs(const Poco::AutoPtr<Poco::Notification>& pNf);
+#ifdef POCO_TEST_DEPRECATED
 	void handle1(Poco::Notification* pNf);
+#endif
 	void handleAsync1(const Poco::AutoPtr<TestNotification>& pNf);
 	void handleAsync2(const Poco::AutoPtr<TestNotification>& pNf);
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
@@ -98,13 +106,19 @@ protected:
 	void workerCount(Poco::AsyncNotificationCenter::AsyncMode mode);
 	void backlog(Poco::AsyncNotificationCenter::AsyncMode mode);
 	void parallelDispatch(Poco::AsyncNotificationCenter::AsyncMode mode);
+	void mixedNObserversAndAsyncObservers(Poco::AsyncNotificationCenter::AsyncMode mode);
+#ifdef POCO_TEST_DEPRECATED
 	void mixedObservers(Poco::AsyncNotificationCenter::AsyncMode mode);
+#endif
 	void synchronousDispatch(Poco::AsyncNotificationCenter::AsyncMode mode);
 #endif
 
 private:
 	std::set<std::string> _set;
+	std::atomic<bool> _handleNObsDone;
+#ifdef POCO_TEST_DEPRECATED
 	std::atomic<bool> _handle1Done;
+#endif
 	std::atomic<bool> _handleAuto1Done;
 	std::atomic<bool> _handleAsync1Done;
 	std::atomic<bool> _handleAsync2Done;
