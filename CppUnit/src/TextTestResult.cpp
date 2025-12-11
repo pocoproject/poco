@@ -274,6 +274,29 @@ void TextTestResult::printHeader(std::ostream& stream)
 
 std::string TextTestResult::shortName(const std::string& testName)
 {
+	// Convert "CppUnit::TestCaller<ClassName>.methodName" or "TestCaller<ClassName>.methodName"
+	// to "ClassName::methodName"
+	// On MSVC, typeid().name() includes "class " prefix, so handle "TestCaller<class ClassName>" too
+	std::string::size_type callerPos = testName.find("TestCaller<");
+	if (callerPos != std::string::npos)
+	{
+		std::string::size_type endPos = testName.find(">.", callerPos);
+		if (endPos != std::string::npos)
+		{
+			std::string className = testName.substr(callerPos + 11, endPos - callerPos - 11);
+			std::string methodName = testName.substr(endPos + 2);
+
+			// Strip "class " or "struct " prefix added by MSVC's typeid().name()
+			if (className.compare(0, 6, "class ") == 0)
+				className = className.substr(6);
+			else if (className.compare(0, 7, "struct ") == 0)
+				className = className.substr(7);
+
+			return className + "::" + methodName;
+		}
+	}
+
+	// Fallback: just return the part after the last dot
 	std::string::size_type pos = testName.rfind('.');
 	if (pos != std::string::npos)
 		return std::string(testName, pos + 1);

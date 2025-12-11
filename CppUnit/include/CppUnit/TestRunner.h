@@ -50,9 +50,11 @@ public:
 
 protected:
 	void printBanner();
-	void print(const std::string& name, Test* pTest, int indent);
+	void print(const std::string& name, Test* pTest, int indent, const std::string& parentName = "");
 	Test* find(const std::string& name, Test* pTest, const std::string& testName);
+	void findAll(const std::string& name, Test* pTest, const std::string& testName, std::vector<Test*>& results);
 	int collectAllTestCases(Test* pTest, std::vector<Test*>& tests);
+	static bool matchesName(const std::string& searchName, const std::string& testName);
 
 private:
 	std::ostream& _ostr;
