@@ -17,17 +17,6 @@
 #include <map>
 
 
-using Poco::TypeList;
-using Poco::NullTypeList;
-using Poco::TypeListType;
-using Poco::TypeGetter;
-using Poco::TypeLocator;
-using Poco::TypeAppender;
-using Poco::TypeOneEraser;
-using Poco::TypeAllEraser;
-using Poco::TypeDuplicateEraser;
-using Poco::TypeOneReplacer;
-using Poco::TypeAllReplacer;
 using Poco::Tuple;
 using Poco::Void;
 using Poco::Int8;
