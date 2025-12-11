@@ -20,7 +20,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Tuple.h"
-#include "Poco/TypeList.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Format.h"

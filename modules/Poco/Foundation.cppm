@@ -262,7 +262,6 @@ module;
 #include "Poco/Timezone.h"
 #include "Poco/Token.h"
 #include "Poco/Tuple.h"
-#include "Poco/TypeList.h"
 #include "Poco/Types.h"
 #include "Poco/UnbufferedStreamBuf.h"
 #include "Poco/UnicodeConverter.h"

@@ -12,7 +12,6 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
-#include "Poco/TypeList.h"
 #include "Poco/Void.h"
 #include <iostream>
 

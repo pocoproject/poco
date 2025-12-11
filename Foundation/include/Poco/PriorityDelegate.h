@@ -7,7 +7,7 @@
 //
 // Implementation of the PriorityDelegate template.
 //
-// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
