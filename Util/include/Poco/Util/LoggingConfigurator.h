@@ -95,6 +95,14 @@ class Util_API LoggingConfigurator
 	/// Furthermore, a "channel" property is supported, which can either refer
 	/// to a named channel, or which can contain an inline channel definition.
 	///
+	/// An optional "type" property can be used to specify the logger implementation.
+	/// If set to "fast", a FastLogger (based on Quill) will be used instead of the
+	/// standard Logger. FastLogger provides much lower latency (~9ns vs ~100ns) by
+	/// using asynchronous logging. If the "type" property is omitted or set to any
+	/// other value, the standard Logger is used. Note that FastLogger requires
+	/// POCO_ENABLE_FASTLOGGER to be defined; otherwise an InvalidAccessException
+	/// is thrown.
+	///
 	/// Examples:
 	///     logging.loggers.root.channel = c1
 	///     logging.loggers.root.level = warning
@@ -102,6 +110,10 @@ class Util_API LoggingConfigurator
 	///     logging.loggers.l1.channel.class = ConsoleChannel
 	///     logging.loggers.l1.channel.pattern = %s: [%p] %t
 	///     logging.loggers.l1.level = information
+	///     logging.loggers.l2.name = fastlogger1
+	///     logging.loggers.l2.type = fast
+	///     logging.loggers.l2.channel.class = ConsoleChannel
+	///     logging.loggers.l2.level = debug
 {
 public:
 	LoggingConfigurator();

@@ -13,8 +13,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
 	Driver DynamicFactoryTest FPETest FileChannelTest FileTest GlobTest FilesystemTestSuite \
-	FIFOBufferStreamTest FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest \
-	ListMapTest LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
+	FIFOBufferStreamTest FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest FastLoggerTest \
+	FastLoggerChannelsTest ListMapTest LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
 	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest AsyncNotificationCenterTest NotificationQueueTest \

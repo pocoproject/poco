@@ -21,6 +21,10 @@
 #include "Poco/Logger.h"
 #include "Poco/LoggingRegistry.h"
 #include "Poco/LoggingFactory.h"
+#include "Poco/String.h"
+#ifdef POCO_ENABLE_FASTLOGGER
+#include "Poco/FastLogger.h"
+#endif
 #include <map>
 
 
@@ -176,21 +180,81 @@ void LoggingConfigurator::configureChannel(Channel::Ptr pChannel, AbstractConfig
 
 void LoggingConfigurator::configureLogger(AbstractConfiguration::Ptr pConfig)
 {
-	Logger& logger = Logger::get(pConfig->getString("name"s, ""s));
+	const std::string loggerName = pConfig->getString("name"s, ""s);
+	const std::string loggerType = pConfig->getString("type"s, ""s);
+	const bool useFastLogger = icompare(loggerType, "fast"s) == 0;
+
 	AbstractConfiguration::Keys props;
 	pConfig->keys(props);
-	for (const auto& p: props)
+
+	if (useFastLogger)
 	{
-		if (p == "channel"s && pConfig->hasProperty("channel.class"s))
+#ifdef POCO_ENABLE_FASTLOGGER
+		// Process quill.* backend options BEFORE creating the logger,
+		// since FastLogger::get() starts the backend thread
+		for (const auto& p: props)
 		{
-			AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(p));
-			AutoPtr<Channel> pChannel(createChannel(pChannelConfig));
-			configureChannel(pChannel, pChannelConfig);
-			Logger::setChannel(logger.name(), pChannel);
+			if (p == "quill"s)
+			{
+				AutoPtr<AbstractConfiguration> pQuillConfig(pConfig->createView(p));
+				AbstractConfiguration::Keys quillProps;
+				pQuillConfig->keys(quillProps);
+				for (const auto& q: quillProps)
+				{
+					FastLogger::setBackendOption(q, pQuillConfig->getString(q));
+				}
+			}
 		}
-		else if (p != "name"s)
+
+		// Now create/get the logger (this starts the backend with the options set above)
+		FastLogger& logger = FastLogger::get(loggerName);
+		for (const auto& p: props)
 		{
-			Logger::setProperty(logger.name(), p, pConfig->getString(p));
+			if (p == "channel"s && pConfig->hasProperty("channel.class"s))
+			{
+				AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(p));
+				AutoPtr<Channel> pChannel(createChannel(pChannelConfig));
+				configureChannel(pChannel, pChannelConfig);
+				FastLogger::setChannel(logger.name(), pChannel);
+			}
+			else if (p != "name"s && p != "type"s && p != "quill"s)
+			{
+				FastLogger::setProperty(logger.name(), p, pConfig->getString(p));
+			}
+		}
+#else
+		throw Poco::InvalidAccessException("FastLogger is not available (POCO_ENABLE_FASTLOGGER is not defined)");
+#endif
+	}
+	else
+	{
+		Logger& logger = Logger::get(loggerName);
+		for (const auto& p: props)
+		{
+			if (p == "channel"s && pConfig->hasProperty("channel.class"s))
+			{
+				AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(p));
+				AutoPtr<Channel> pChannel(createChannel(pChannelConfig));
+				configureChannel(pChannel, pChannelConfig);
+				Logger::setChannel(logger.name(), pChannel);
+			}
+			else if (p == "quill"s)
+			{
+				// Warn about quill.* options on non-fast loggers
+				AutoPtr<AbstractConfiguration> pQuillConfig(pConfig->createView(p));
+				AbstractConfiguration::Keys quillProps;
+				pQuillConfig->keys(quillProps);
+				for (const auto& q: quillProps)
+				{
+					Logger::get("LoggingConfigurator"s).warning(
+						"Ignoring quill.%s property on logger '%s' - quill options only apply to type=fast loggers"s,
+						q, loggerName.empty() ? "(root)"s : loggerName);
+				}
+			}
+			else if (p != "name"s && p != "type"s)
+			{
+				Logger::setProperty(logger.name(), p, pConfig->getString(p));
+			}
 		}
 	}
 }

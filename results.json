@@ -1,0 +1,31 @@
+{
+  "context": {
+    "date": "2025-12-10T14:11:27-06:00",
+    "host_name": "debian13",
+    "executable": "benchmark",
+    "num_cpus": 16,
+    "mhz_per_cpu": 2000,
+    "cpu_scaling_enabled": false,
+    "aslr_enabled": true,
+    "caches": [
+    ],
+    "load_avg": [0.00683594,0.0639648,0.0727539],
+    "library_version": "v1.9.4-84-g3e7dac66",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "AsyncChannelFileFixture/BM_Comparison_Logger_AsyncChannel_File",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "AsyncChannelFileFixture/BM_Comparison_Logger_AsyncChannel_File",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1598978,
+      "real_time": 3.9791428461809193e+02,
+      "cpu_time": 3.9406188265254423e+02,
+      "time_unit": "ns"
+    }

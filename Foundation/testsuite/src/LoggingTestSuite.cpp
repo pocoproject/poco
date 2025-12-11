@@ -10,6 +10,8 @@
 
 #include "LoggingTestSuite.h"
 #include "LoggerTest.h"
+#include "FastLoggerTest.h"
+#include "FastLoggerChannelsTest.h"
 #include "ChannelTest.h"
 #include "PatternFormatterTest.h"
 #include "JSONFormatterTest.h"
@@ -25,6 +27,8 @@ CppUnit::Test* LoggingTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LoggingTestSuite");
 
 	pSuite->addTest(LoggerTest::suite());
+	pSuite->addTest(FastLoggerTest::suite());
+	pSuite->addTest(FastLoggerChannelsTest::suite());
 	pSuite->addTest(ChannelTest::suite());
 	pSuite->addTest(PatternFormatterTest::suite());
 	pSuite->addTest(JSONFormatterTest::suite());
