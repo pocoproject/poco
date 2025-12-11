@@ -115,7 +115,7 @@ Mutex FastLogger::_backendMtx;
 // Static storage for backend options set before backend starts
 namespace {
 	std::map<std::string, std::string> _pendingBackendOptions;
-	Mutex g_backendOptionsMtx;
+	Mutex _backendOptionsMtx;
 }
 
 
@@ -1354,7 +1354,7 @@ void FastLogger::shutdown()
 
 	// Clear pending backend options so they can be set again after restart
 	{
-		Mutex::ScopedLock optionsLock(g_backendOptionsMtx);
+		Mutex::ScopedLock optionsLock(_backendOptionsMtx);
 		_pendingBackendOptions.clear();
 	}
 }
@@ -1619,17 +1619,16 @@ void FastLogger::addFileSink(const std::string& filename)
 
 void FastLogger::setBackendOption(const std::string& name, const std::string& value)
 {
-	Mutex::ScopedLock lock(g_backendOptionsMtx);
+	// Lock order: _backendMtx first, then _backendOptionsMtx
+	// This matches the order in ensureBackendStarted()
+	Mutex::ScopedLock backendLock(_backendMtx);
 
-	// Check if backend is already started
+	if (_backendStarted)
 	{
-		Mutex::ScopedLock backendLock(_backendMtx);
-		if (_backendStarted)
-		{
-			throw IllegalStateException("Cannot set backend option after logging has started: " + name);
-		}
+		throw IllegalStateException("Cannot set backend option after logging has started: " + name);
 	}
 
+	Mutex::ScopedLock optionsLock(_backendOptionsMtx);
 	_pendingBackendOptions[name] = value;
 }
 
@@ -1700,7 +1699,7 @@ void FastLogger::ensureBackendStarted()
 		// Check if CPU affinity is enabled (default: false, same as Quill)
 		bool enableCpuAffinity = false;
 		{
-			Mutex::ScopedLock optionsLock(g_backendOptionsMtx);
+			Mutex::ScopedLock optionsLock(_backendOptionsMtx);
 			auto it = std::find_if(_pendingBackendOptions.begin(), _pendingBackendOptions.end(),
 				[](const auto& opt) { return opt.first == "enableCpuAffinity"; });
 			if (it != _pendingBackendOptions.end())
@@ -1736,7 +1735,7 @@ void FastLogger::ensureBackendStarted()
 
 		// Apply any pending backend options
 		{
-			Mutex::ScopedLock optionsLock(g_backendOptionsMtx);
+			Mutex::ScopedLock optionsLock(_backendOptionsMtx);
 			for (const auto& opt : _pendingBackendOptions)
 			{
 				const std::string& name = opt.first;
