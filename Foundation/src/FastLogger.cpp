@@ -1697,22 +1697,40 @@ void FastLogger::ensureBackendStarted()
 		// Use a no-op error notifier to suppress queue reallocation messages
 		options.error_notifier = [](std::string const&) { /* suppress */ };
 
+		// Check if CPU affinity is enabled (default: false, same as Quill)
+		bool enableCpuAffinity = false;
+		{
+			Mutex::ScopedLock optionsLock(g_backendOptionsMtx);
+			auto it = std::find_if(_pendingBackendOptions.begin(), _pendingBackendOptions.end(),
+				[](const auto& opt) { return opt.first == "enableCpuAffinity"; });
+			if (it != _pendingBackendOptions.end())
+			{
+				enableCpuAffinity = (icompare(it->second, "true") == 0 || it->second == "1");
+			}
+		}
+
 #if defined(__linux__)
 		// On Linux, pin the backend thread to the last CPU core to reduce
 		// contention with application threads
-		long num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
-		if (num_cpus > 1)
+		if (enableCpuAffinity)
 		{
-			options.cpu_affinity = static_cast<uint16_t>(num_cpus - 1);
+			long num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+			if (num_cpus > 1)
+			{
+				options.cpu_affinity = static_cast<uint16_t>(num_cpus - 1);
+			}
 		}
 #elif defined(_WIN32)
 		// On Windows, pin the backend thread to the last CPU core
-		SYSTEM_INFO sysInfo;
-		GetSystemInfo(&sysInfo);
-		DWORD num_cpus = sysInfo.dwNumberOfProcessors;
-		if (num_cpus > 1)
+		if (enableCpuAffinity)
 		{
-			options.cpu_affinity = static_cast<uint16_t>(num_cpus - 1);
+			SYSTEM_INFO sysInfo;
+			GetSystemInfo(&sysInfo);
+			DWORD num_cpus = sysInfo.dwNumberOfProcessors;
+			if (num_cpus > 1)
+			{
+				options.cpu_affinity = static_cast<uint16_t>(num_cpus - 1);
+			}
 		}
 #endif
 
@@ -1763,6 +1781,10 @@ void FastLogger::ensureBackendStarted()
 				else if (name == "waitForQueuesToEmptyBeforeExit")
 				{
 					options.wait_for_queues_to_empty_before_exit = (icompare(value, "true") == 0 || value == "1");
+				}
+				else if (name == "enableCpuAffinity")
+				{
+					// Already processed above, skip here
 				}
 				// Unknown options are silently ignored
 			}
