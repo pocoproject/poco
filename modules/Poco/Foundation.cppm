@@ -407,7 +407,9 @@ export namespace Poco {
 	using Poco::DirectoryIteratorImpl;
 	using Poco::DirectoryNotEmptyException;
 	using Poco::DirectoryWatcher;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::DoubleByteEncoding;
+	#endif
 	using Poco::DynamicFactory;
 	using Poco::EOFToken;
 	using Poco::Environment;
@@ -464,6 +466,7 @@ export namespace Poco {
 	using Poco::HexBinaryEncoderBuf;
 	using Poco::HexBinaryEncoderIOS;
 	using Poco::IOException;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::ISO8859_3Encoding;
 	using Poco::ISO8859_4Encoding;
 	using Poco::ISO8859_5Encoding;
@@ -476,6 +479,7 @@ export namespace Poco {
 	using Poco::ISO8859_13Encoding;
 	using Poco::ISO8859_14Encoding;
 	using Poco::ISO8859_16Encoding;
+	#endif
 	using Poco::IllegalStateException;
 	using Poco::InflatingIOS;
 	using Poco::InflatingInputStream;
