@@ -3,7 +3,8 @@
 //
 // This application runs performance benchmarks for Poco components.
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2024, Applied Informatics Software Engineering GmbH.,
+// Aleph ONE Software Engineering LLC
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -202,6 +203,18 @@ protected:
 	{
 		if (_helpRequested)
 			return Application::EXIT_OK;
+
+		// Check for unprocessed args that look like -- options (common mistake on Windows)
+		for (const auto& arg : args)
+		{
+			if (arg.substr(0, 2) == "--")
+			{
+				std::cerr << "Error: Unknown option '" << arg << "'\n"
+				          << "Note: On Windows, use '/' prefix (e.g., /filter) or single dash (e.g., -f).\n"
+				          << "Use /help or -h for usage information.\n";
+				return Application::EXIT_USAGE;
+			}
+		}
 
 		// Build argc/argv for Google Benchmark
 		std::vector<std::string> argStorage;

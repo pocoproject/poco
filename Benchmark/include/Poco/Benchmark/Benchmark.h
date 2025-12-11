@@ -7,7 +7,8 @@
 //
 // Common utilities and macros for Poco benchmarks.
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2024, Applied Informatics Software Engineering GmbH.,
+// Aleph ONE Software Engineering LLC
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0

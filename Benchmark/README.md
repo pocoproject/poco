@@ -30,31 +30,45 @@ dnf install google-benchmark-devel
 vcpkg install benchmark:x64-windows
 ```
 
-**From source:**
+**From source (Linux/macOS):**
 ```bash
 git clone https://github.com/google/benchmark.git
 cd benchmark
-cmake -E make_directory build
 cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release -S . -B build
 cmake --build build --config Release
 sudo cmake --install build
 ```
 
+**From source (Windows):**
+```powershell
+git clone https://github.com/google/benchmark.git
+cd benchmark
+cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=C:\local -S . -B build
+cmake --build build --config Release
+cmake --install build --config Release
+```
+
 ## Building
 
-**Using Make:**
+**Using Make (Linux/macOS):**
 ```bash
 cd poco
 make -C Benchmark
 ```
 
-**Using CMake:**
+**Using CMake (Linux/macOS):**
 ```bash
-cd poco
-mkdir cmake-build && cd cmake-build
-cmake .. -DENABLE_BENCHMARK=ON
-cmake --build . --target Benchmark
+cmake -B build -DENABLE_BENCHMARK=ON
+cmake --build build --target Benchmark
 ```
+
+**Using CMake (Windows):**
+```powershell
+cmake -B build -G Ninja -DENABLE_BENCHMARK=ON -DCMAKE_PREFIX_PATH=C:\local
+cmake --build build --target Benchmark
+```
+
+Note: On Windows, use Ninja generator for reliable target builds. The `CMAKE_PREFIX_PATH` should point to where Google Benchmark was installed.
 
 ## Usage
 

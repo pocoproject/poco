@@ -13,6 +13,7 @@
 set(SRCS
 	src/BenchmarkApp.cpp
 	src/PatternFormatterBench.cpp
+	src/LoggerBench.cpp
 )
 
 # Headers
