@@ -201,6 +201,10 @@ option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_TRACE "Enable stack tracing" OFF)
 option(ENABLE_FASTLOGGER "Enable FastLogger (Quill-based high-performance logger)" ON)
 
+# FastLogger uses Quill which requires x86/ARM intrinsics not available in WebAssembly
+if(EMSCRIPTEN)
+	set(ENABLE_FASTLOGGER OFF CACHE BOOL "Enable FastLogger" FORCE)
+endif()
 
 if(POCO_ENABLE_CPP20)
 	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
