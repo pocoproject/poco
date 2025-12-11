@@ -169,7 +169,7 @@ private:
 
 	std::optional<NotificationTuple> nextNotification();
 
-	void dispatchNotifications(std::stop_token& stopToken, int workerId);
+	void dispatchNotifications(std::stop_token& stopToken, std::size_t workerId);
 		/// Dispatching function executed by each worker thread.
 
 	const std::size_t _workersCount { defaultWorkersCount() };
