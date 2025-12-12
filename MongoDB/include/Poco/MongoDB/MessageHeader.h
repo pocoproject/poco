@@ -19,7 +19,6 @@
 
 
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/MessageHeader.h"
 
 
 namespace Poco {
@@ -32,6 +31,9 @@ class Message; // Required to disambiguate friend declaration in MessageHeader.
 class MongoDB_API MessageHeader
 	/// Represents the message header which is always prepended to a
 	/// MongoDB request or response message.
+	///
+	/// INTERNAL: This class is an implementation detail of the MongoDB
+	/// protocol and not intended for direct use.
 {
 public:
 	static constexpr Int32 MSG_HEADER_SIZE = 16;

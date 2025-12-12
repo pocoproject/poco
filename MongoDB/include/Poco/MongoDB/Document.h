@@ -32,23 +32,6 @@ namespace MongoDB {
 
 class Array;
 
-class MongoDB_API ElementFindByName
-{
-public:
-	ElementFindByName(const std::string& name):
-		_name(name)
-	{
-	}
-
-	bool operator()(const Element::Ptr& element)
-	{
-		return !element.isNull() && element->name() == _name;
-	}
-
-private:
-	std::string _name;
-};
-
 
 class MongoDB_API Document
 	/// Represents a MongoDB (BSON) document.

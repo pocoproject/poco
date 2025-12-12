@@ -33,7 +33,7 @@ jobs:
         run: |
           export CC=clang-20
           export CXX=clang++-20
-          cmake -S . -B build -G Ninja -DPOCO_BUILD_MODULES=ON
+          cmake -S . -B build -G Ninja -DENABLE_MODULES=ON -DENABLE_TESTS=ON
       - name: Build
         run: cmake --build build --parallel 4
 
