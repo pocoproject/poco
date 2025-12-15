@@ -47,7 +47,9 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 	// for small WebSocket frames. Skip for Unix domain sockets.
 	try
 	{
+#if defined(POCO_HAS_UNIX_SOCKET)
 		if (_pStreamSocketImpl->address().family() != SocketAddress::UNIX_LOCAL)
+#endif
 			_pStreamSocketImpl->setNoDelay(true);
 	}
 	catch (NetException&)
