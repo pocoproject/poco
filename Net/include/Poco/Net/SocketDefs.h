@@ -18,6 +18,7 @@
 #define Net_SocketDefs_INCLUDED
 
 
+#include "Poco/Config.h"
 #include <vector>
 
 
@@ -33,7 +34,7 @@
 	#include <ws2tcpip.h>
 	#include <ws2def.h>
 	#if !defined (POCO_NET_NO_UNIX_SOCKET)
-		#if (__cplusplus >= 201703L)
+		#if POCO_HAVE_CPP17_COMPILER
 			#if __has_include(<afunix.h>)
 				#include <afunix.h>
 				#define POCO_HAS_UNIX_SOCKET
