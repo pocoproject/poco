@@ -259,6 +259,15 @@ void RegularExpressionTest::testSubst4()
 }
 
 
+void RegularExpressionTest::testSubst5()
+{
+	RegularExpression re("\\s+$", RegularExpression::RE_MULTILINE | RegularExpression::RE_NEWLINE_ANYCRLF);
+	std::string s = "ABC 123  \n456 789 \nDEF  ";
+	assertTrue (re.subst(s, "", RegularExpression::RE_GLOBAL) == 3);
+	assertTrue (s == "ABC 123\n456 789\nDEF");
+}
+
+
 void RegularExpressionTest::testError()
 {
 	try
@@ -312,6 +321,7 @@ CppUnit::Test* RegularExpressionTest::suite()
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst2);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst3);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst4);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst5);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testError);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testGroup);
 

@@ -71,13 +71,14 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	pcre2_compile_context* context = pcre2_compile_context_create(nullptr);
 	if (!context) throw Poco::RegularExpressionException("cannot create compile context");
 
-	if (options & RE_NEWLINE_LF)
+	const unsigned RE_NEWLINE_MASK = 0x00f00000;
+	if ((options & RE_NEWLINE_MASK) == RE_NEWLINE_LF)
 		pcre2_set_newline(context, PCRE2_NEWLINE_LF);
-	else if (options & RE_NEWLINE_CRLF)
+	else if ((options & RE_NEWLINE_MASK) == RE_NEWLINE_CRLF)
 		pcre2_set_newline(context, PCRE2_NEWLINE_CRLF);
-	else if (options & RE_NEWLINE_ANY)
+	else if ((options & RE_NEWLINE_MASK) == RE_NEWLINE_ANY)
 		pcre2_set_newline(context, PCRE2_NEWLINE_ANY);
-	else if (options & RE_NEWLINE_ANYCRLF)
+	else if ((options & RE_NEWLINE_MASK) == RE_NEWLINE_ANYCRLF)
 		pcre2_set_newline(context, PCRE2_NEWLINE_ANYCRLF);
 	else // default RE_NEWLINE_CR
 		pcre2_set_newline(context, PCRE2_NEWLINE_CR);
