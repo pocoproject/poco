@@ -32,7 +32,7 @@
 /* buffer size which is required when we convert to character string. */
 #define HPDF_TMP_BUF_SIZ            512
 #define HPDF_SHORT_BUF_SIZ          32
-#define HPDF_REAL_LEN               11
+#define HPDF_REAL_LEN               64
 #define HPDF_INT_LEN                11
 #define HPDF_TEXT_DEFAULT_LEN       256
 #define HPDF_UNICODE_HEADER_LEN     2
@@ -64,7 +64,7 @@
 
 #define HPDF_BS_DEF_WIDTH           1
 
-/* defalt page-size */
+/* default page-size */
 #define HPDF_DEF_PAGE_WIDTH         595.276F
 #define HPDF_DEF_PAGE_HEIGHT        841.89F
 
@@ -109,14 +109,14 @@
 #define HPDF_LIMIT_MAX_INT             2147483647
 #define HPDF_LIMIT_MIN_INT             -2147483647
 
-#define HPDF_LIMIT_MAX_REAL            32767
-#define HPDF_LIMIT_MIN_REAL            -32767
+#define HPDF_LIMIT_MAX_REAL             3.4E38f // per PDF 1.7 spec, Annex C, old value  32767
+#define HPDF_LIMIT_MIN_REAL            -3.4E38f // per PDF 1.7 spec, Annex C, old value -32767
 
-#define HPDF_LIMIT_MAX_STRING_LEN      65535
+#define HPDF_LIMIT_MAX_STRING_LEN      2147483646 // per PDF 1.7 spec, limit 32767 is for strings in content stream and no limit in other cases => open the limit to max Integer, old value 65535
 #define HPDF_LIMIT_MAX_NAME_LEN        127
 
-#define HPDF_LIMIT_MAX_ARRAY           32767
-#define HPDF_LIMIT_MAX_DICT_ELEMENT    4095
+#define HPDF_LIMIT_MAX_ARRAY           8388607  // per PDF 1.7 spec, "Maximum number of indirect objects in a PDF file" is 8388607, old value 8191
+#define HPDF_LIMIT_MAX_DICT_ELEMENT    8388607  // per PDF 1.7 spec, "Maximum number of indirect objects in a PDF file" is 8388607, old value 4095
 #define HPDF_LIMIT_MAX_XREF_ELEMENT    8388607
 #define HPDF_LIMIT_MAX_GSTATE          28
 #define HPDF_LIMIT_MAX_DEVICE_N        8
@@ -533,7 +533,7 @@
 
 
 /*----------------------------------------------------------------------------*/
-/*----- Graphis mode ---------------------------------------------------------*/
+/*----- Graphics mode --------------------------------------------------------*/
 
 #define   HPDF_GMODE_PAGE_DESCRIPTION       0x0001
 #define   HPDF_GMODE_PATH_OBJECT            0x0002

@@ -18,6 +18,7 @@
 #ifndef _HPDF_PDFA_H
 #define _HPDF_PDFA_H
 
+#include "hpdf.h"
 #include "hpdf_doc.h"
 #include "hpdf_objects.h"
 
@@ -30,9 +31,19 @@ extern "C" {
 HPDF_STATUS
 HPDF_PDFA_AppendOutputIntents(HPDF_Doc pdf, const char *iccname, HPDF_Dict iccdict);
 
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_PDFA_SetPDFAConformance(HPDF_Doc pdf,
+                             HPDF_PDFAType pdfatype);
+
 HPDF_STATUS
-HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,
-			      HPDF_PDFAType pdfatype);
+HPDF_PDFA_AddXmpMetadata(HPDF_Doc pdf);
+
+HPDF_STATUS
+HPDF_PDFA_AddXmpExtension(HPDF_Doc    pdf,
+                          const char *xmp_description);
+
+void
+HPDF_PDFA_ClearXmpExtensions(HPDF_Doc pdf);
 
 HPDF_STATUS
 HPDF_PDFA_GenerateID(HPDF_Doc);

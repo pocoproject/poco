@@ -553,6 +553,7 @@ CIDFontType2_BeforeWrite_Func  (HPDF_Dict obj)
         ret += HPDF_Dict_AddName (descriptor, "Type", "FontDescriptor");
         ret += HPDF_Dict_AddNumber (descriptor, "Ascent", def->ascent);
         ret += HPDF_Dict_AddNumber (descriptor, "Descent", def->descent);
+        ret += HPDF_Dict_AddNumber (descriptor, "CapHeight", def->cap_height);
         ret += HPDF_Dict_AddNumber (descriptor, "Flags", def->flags);
 
         array = HPDF_Box_Array_New (obj->mmgr, def->font_bbox);
@@ -624,7 +625,7 @@ TextWidth  (HPDF_Font         font,
             code = (HPDF_UINT16)(code + *text);
         }
 
-        if (btype != HPDF_BYTE_TYPE_TRIAL) {
+        if (btype != HPDF_BYTE_TYPE_TRAIL) {
             if (attr->writing_mode == HPDF_WMODE_HORIZONTAL) {
                 if (attr->fontdef->type == HPDF_FONTDEF_TYPE_CID) {
                     /* cid-based font */
@@ -676,7 +677,7 @@ MeasureText  (HPDF_Font          font,
     HPDF_UINT tmp_len = 0;
     HPDF_UINT i;
     HPDF_FontAttr attr = (HPDF_FontAttr)font->attr;
-    HPDF_ByteType last_btype = HPDF_BYTE_TYPE_TRIAL;
+    HPDF_ByteType last_btype = HPDF_BYTE_TYPE_TRAIL;
     HPDF_Encoder encoder = attr->encoder;
     HPDF_ParseText_Rec  parse_state;
     HPDF_INT dw2;
@@ -725,7 +726,7 @@ MeasureText  (HPDF_Font          font,
                     *real_width = w;
             } /* else
 			//Commenting this out fixes problem with HPDF_Text_Rect() splitting the words
-            if (last_btype == HPDF_BYTE_TYPE_TRIAL ||
+            if (last_btype == HPDF_BYTE_TYPE_TRAIL ||
                     (btype == HPDF_BYTE_TYPE_LEAD &&
                     last_btype == HPDF_BYTE_TYPE_SINGLE)) {
                 if (!HPDF_Encoder_CheckJWWLineHead(encoder, code)) {
@@ -740,7 +741,7 @@ MeasureText  (HPDF_Font          font,
             w += word_space;
         }
 
-        if (btype != HPDF_BYTE_TYPE_TRIAL) {
+        if (btype != HPDF_BYTE_TYPE_TRAIL) {
             if (attr->writing_mode == HPDF_WMODE_HORIZONTAL) {
                 if (attr->fontdef->type == HPDF_FONTDEF_TYPE_CID) {
                     /* cid-based font */
@@ -767,7 +768,7 @@ MeasureText  (HPDF_Font          font,
             return tmp_len;
 
         if (HPDF_IS_WHITE_SPACE(b))
-            last_btype = HPDF_BYTE_TYPE_TRIAL;
+            last_btype = HPDF_BYTE_TYPE_TRAIL;
         else
             last_btype = btype;
     }
