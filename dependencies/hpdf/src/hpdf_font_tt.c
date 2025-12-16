@@ -113,7 +113,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
     /* singlebyte-font has a widths-array which is an array of 256 signed
      * short integer.
      * in the case of type1-font, widths-array for all letters is made in
-     * constructer. but in the case of true-type-font, the array is
+     * constructor. but in the case of true-type-font, the array is
      * initialized at 0, and set when the corresponding character was used
      * for the first time.
      */

@@ -1353,7 +1353,7 @@ BatangChe_Init  (HPDF_FontDef   fontdef)
                 HPDF_FONT_SERIF;
     fontdef->italic_angle = 0;
     fontdef->stemv = 78;
-    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, DotumChe_W_ARRAY)) !=
+    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, BatangChe_W_ARRAY)) !=
                 HPDF_OK) {
         return ret;
     }
@@ -1414,7 +1414,7 @@ Batang_Init  (HPDF_FontDef   fontdef)
     fontdef->flags = HPDF_FONT_SYMBOLIC + HPDF_FONT_SERIF;
     fontdef->italic_angle = 0;
     fontdef->stemv = 78;
-    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, Dotum_W_ARRAY)) !=
+    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, Batang_W_ARRAY)) !=
                 HPDF_OK) {
         return ret;
     }

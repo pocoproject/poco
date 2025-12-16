@@ -78,8 +78,9 @@
 
 /* alignment size of memory-pool-object
  */
-#define HPDF_ALIGN_SIZ              sizeof int;
+#define HPDF_ALIGNMENT_SIZE            sizeof(int)
 
+#define G3CODES
 
 #endif /* _HPDF_CONF_H */
 

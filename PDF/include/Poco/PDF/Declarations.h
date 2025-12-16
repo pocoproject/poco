@@ -93,7 +93,7 @@ using Point = HPDF_Point;
 using DashMode = HPDF_DashMode;
 using RGBColor = HPDF_RGBColor;
 using CMYKColor = HPDF_CMYKColor;
-using PatternVec = std::vector<HPDF_UINT16>;
+using PatternVec = std::vector<float>;
 using TextWidth = HPDF_TextWidth;
 
 // Note: constants must match the ones in hpdf_consts.h

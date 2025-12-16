@@ -72,7 +72,7 @@ typedef struct _HPDF_FontAttr_Rec {
     HPDF_Encoder                encoder;
 
     /* if the encoding-type is HPDF_ENCODER_TYPE_SINGLE_BYTE, the width of
-     * each charactors are cashed in 'widths'.
+     * each characters are cashed in 'widths'.
      * when HPDF_ENCODER_TYPE_DOUBLE_BYTE the width is calculate each time.
      */
     HPDF_INT16*                 widths;

@@ -2577,7 +2577,7 @@ HPDF_CMapEncoder_InitAttr  (HPDF_Encoder  encoder)
 
     for (i = 0; i <= 255; i++) {
         for (j = 0; j <= 255; j++) {
-            /* undefined charactors are replaced to square */
+            /* undefined characters are replaced to square */
             encoder_attr->unicode_map[i][j] = 0x25A1;
         }
     }
@@ -2713,7 +2713,7 @@ HPDF_CMapEncoder_ByteType  (HPDF_Encoder        encoder,
 
     if (state->byte_type == HPDF_BYTE_TYPE_LEAD) {
         if (attr->is_trial_byte_fn (encoder, state->text[state->index]))
-            state->byte_type = HPDF_BYTE_TYPE_TRIAL;
+            state->byte_type = HPDF_BYTE_TYPE_TRAIL;
         else
             state->byte_type = HPDF_BYTE_TYPE_UNKNOWN;
    } else {
@@ -2752,25 +2752,25 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
 
     /* Copy specified pdf_cid_range array to fRangeArray. */
     while (range->from != 0xffff || range->to != 0xffff) {
-	HPDF_CidRange_Rec *prange;
-	HPDF_STATUS ret;
+        HPDF_CidRange_Rec *prange;
+        HPDF_STATUS ret;
 
-	/*
-	 * Only if we have the default to_unicode_fn
-	 */
-	if (encoder->to_unicode_fn == HPDF_CMapEncoder_ToUnicode) {
-	    HPDF_UINT16 code = range->from;
-	    HPDF_UINT16 cid = range->cid;
+        /*
+         * Only if we have the default to_unicode_fn
+         */
+        if (encoder->to_unicode_fn == HPDF_CMapEncoder_ToUnicode) {
+            HPDF_UINT16 code = range->from;
+            HPDF_UINT16 cid = range->cid;
 
-	    while (code <= range->to) {
-		HPDF_BYTE l = code;
-		HPDF_BYTE h = code >> 8;
+            while (code <= range->to) {
+                HPDF_BYTE l = (HPDF_BYTE)code;
+                HPDF_BYTE h = code >> 8;
 
-		attr->cid_map[l][h] = cid;
-		code++;
-		cid++;
-	    }
-	}
+                attr->cid_map[l][h] = cid;
+                code++;
+                cid++;
+            }
+        }
 
         prange = HPDF_GetMem (encoder->mmgr, sizeof(HPDF_CidRange_Rec));
         if (!prange)

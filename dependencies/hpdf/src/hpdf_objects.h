@@ -46,6 +46,7 @@ extern "C" {
 #define  HPDF_OCLASS_ARRAY            0x0010
 #define  HPDF_OCLASS_DICT             0x0011
 #define  HPDF_OCLASS_PROXY            0x0012
+#define  HPDF_OCLASS_DIRECT           0x00A0
 #define  HPDF_OCLASS_ANY              0x00FF
 
 #define  HPDF_OSUBCLASS_FONT          0x0100
@@ -61,6 +62,7 @@ extern "C" {
 #define  HPDF_OSUBCLASS_EXT_GSTATE_R  0x0B00  /* read only object */
 #define  HPDF_OSUBCLASS_NAMEDICT      0x0C00
 #define  HPDF_OSUBCLASS_NAMETREE      0x0D00
+#define  HPDF_OSUBCLASS_SHADING       0x0E00
 
 
 
@@ -79,7 +81,7 @@ extern "C" {
  *  3       reserved
  *  4       shadow-object
  *  5-8     reserved
- *  9-32    object-idÅi0-8388607Åj
+ *  9-32    object-id
  *
  *  the real Object-ID is described "obj_id & 0x00FFFFFF"
  */
@@ -381,6 +383,8 @@ HPDF_STATUS
 HPDF_Array_AddReal  (HPDF_Array  array,
                      HPDF_REAL   value);
 
+HPDF_STATUS
+HPDF_Array_AddNull  (HPDF_Array       array);
 
 HPDF_STATUS
 HPDF_Array_AddName  (HPDF_Array       array,
@@ -595,6 +599,42 @@ typedef HPDF_Array HPDF_Destination;
 typedef HPDF_Dict  HPDF_U3D;
 typedef HPDF_Dict  HPDF_OutputIntent;
 typedef HPDF_Dict  HPDF_JavaScript;
+typedef HPDF_Dict  HPDF_Shading;
+
+/*---------------------------------------------------------------------------*/
+/*----- HPDF_Direct ---------------------------------------------------------*/
+
+typedef struct _HPDF_Direct_Rec  *HPDF_Direct;
+
+typedef struct _HPDF_Direct_Rec {
+    HPDF_Obj_Header  header;
+    HPDF_MMgr        mmgr;
+    HPDF_Error       error;
+    HPDF_BYTE        *value;
+    HPDF_UINT        len;
+} HPDF_Direct_Rec;
+
+
+
+HPDF_Direct
+HPDF_Direct_New  (HPDF_MMgr  mmgr,
+                  HPDF_BYTE  *value,
+                  HPDF_UINT  len);
+
+
+HPDF_STATUS
+HPDF_Direct_SetValue  (HPDF_Direct  obj,
+                       HPDF_BYTE    *value,
+                       HPDF_UINT    len);
+
+void
+HPDF_Direct_Free  (HPDF_Direct  obj);
+
+
+HPDF_STATUS
+HPDF_Direct_Write  (HPDF_Direct  obj,
+                    HPDF_Stream  stream);
+
 
 #ifdef __cplusplus
 }
