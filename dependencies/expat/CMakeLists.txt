@@ -1,6 +1,6 @@
 # Expat XML parser library
-# Version: 2.7.1
-# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_7_1
+# Version: 2.7.3
+# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_7_3
 #
 # Note: src/xmlparse.cpp is generated from expat's xmlparse.c with POCO-specific modifications.
 # Use the patch_expat_xmlparse target to regenerate it after upgrading expat.
