@@ -8,7 +8,8 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-#include <print>
+#include <format>
+#include <iostream>
 #include <string>
 
 import Poco;
@@ -32,18 +33,18 @@ int main(int argc, char** argv)
 	LocalDateTime ldt(tzd, dt);
 	URI uri1("http://www.appinf.com:81/sample?example-query#somewhere");
 
-	std::println("Scheme:    {}", uri1.getScheme());
-	std::println("Authority: {}". uri1.getAuthority());
-	std::println("Path:      {}", uri1.getPath());
-	std::println("Query:     {}", uri1.getQuery());
-	std::println("Fragment:  {}", uri1.getFragment());
+	std::cout << std::format("Scheme:    {}\n", uri1.getScheme());
+	std::cout << std::format("Authority: {}\n", uri1.getAuthority());
+	std::cout << std::format("Path:      {}\n", uri1.getPath());
+	std::cout << std::format("Query:     {}\n", uri1.getQuery());
+	std::cout << std::format("Fragment:  {}\n", uri1.getFragment());
 
 	URI uri2;
 	uri2.setScheme("https");
 	uri2.setAuthority("www.appinf.com");
 	uri2.setPath("/another sample");
 
-	std::println("{}", uri1.toString());
+	std::cout << std::format("{}\n", uri1.toString());
 
 	return 0;
 }

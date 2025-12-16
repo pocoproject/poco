@@ -7,7 +7,7 @@
 //
 // Definition of the RegularExpression class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -160,7 +160,7 @@ inline void BSONReader::read<RegularExpression::Ptr>(RegularExpression::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<RegularExpression::Ptr>(RegularExpression::Ptr& from)
+inline void BSONWriter::write<RegularExpression::Ptr>(const RegularExpression::Ptr& from)
 {
 	writeCString(from->getPattern());
 	writeCString(from->getOptions());

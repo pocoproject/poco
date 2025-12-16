@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Database
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -30,6 +30,8 @@
 #include "Poco/NumberParser.h"
 #include <sstream>
 #include <map>
+
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -337,26 +339,26 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 	MongoDB::Document::Ptr index = new MongoDB::Document();
 	if (!indexName.empty())
 	{
-		index->add("name", indexName);
+		index->add("name"s, indexName);
 	}
-	index->add("key", keys);
-	index->add("ns", _dbname + "." + collection);
-	index->add("name", indexName);
+	index->add("key"s, keys);
+	index->add("ns"s, _dbname + '.' + collection);
+	index->add("name"s, indexName);
 
 	if (options & INDEX_UNIQUE) {
-		index->add("unique", true);
+		index->add("unique"s, true);
 	}
 	if (options & INDEX_BACKGROUND) {
-		index->add("background", true);
+		index->add("background"s, true);
 	}
 	if (options & INDEX_SPARSE) {
-		index->add("sparse", true);
+		index->add("sparse"s, true);
 	}
 	if (expirationSeconds > 0) {
-		index->add("expireAfterSeconds", static_cast<Poco::Int32>(expirationSeconds));
+		index->add("expireAfterSeconds"s, static_cast<Poco::Int32>(expirationSeconds));
 	}
 	if (version > 0) {
-		index->add("version", static_cast<Poco::Int32>(version));
+		index->add("version"s, static_cast<Poco::Int32>(version));
 	}
 
 	MongoDB::Array::Ptr indexes = new MongoDB::Array();

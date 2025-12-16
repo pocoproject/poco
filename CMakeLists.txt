@@ -315,6 +315,12 @@ endif()
 
 # - resolve dependencies
 
+if(ENABLE_SAMPLES)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
 if(ENABLE_ENCODINGS_COMPILER)
 	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
@@ -589,6 +595,7 @@ endif()
 
 if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
 	add_subdirectory(modules)
+	list(APPEND Poco_COMPONENTS "C++ modules")
 endif()
 
 

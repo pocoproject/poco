@@ -51,12 +51,13 @@ if(ENABLE_CPPPARSER)
 endif()
 
 if(ENABLE_CPPUNIT)
-	list(APPEND POCO_MODULES
-		CppUnit.cppm
-	)
+	# CppUnit is test-only infrastructure and should not be part of the
+	# exported Modules interface. Tests can use CppUnit directly without
+	# it being included in POCO_MODULES or linked to the Modules library.
+	# Note: CppUnit.cppm exists but is NOT added to POCO_MODULES to avoid
+	# CMake export errors since Poco::CppUnit is not an exported target.
 	target_compile_definitions(Modules PUBLIC ENABLE_CPPUNIT)
-
-	target_link_libraries(Modules PUBLIC Poco::CppUnit)
+	# Do NOT link CppUnit to Modules - it's only needed by test executables
 endif()
 
 if(ENABLE_DATA)

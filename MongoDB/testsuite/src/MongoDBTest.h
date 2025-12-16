@@ -14,7 +14,6 @@
 #define MongoDBTest_INCLUDED
 
 
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 #include "CppUnit/TestCase.h"
 
@@ -30,13 +29,11 @@ public:
 	void tearDown();
 
 	void testObjectID();
-	void testArray();
 	void testBuildInfo();
 	void testHello();
 	void testConnectURI();
 
 	// OP_MSG wire protocol
-	void testOpCmdUUID();
 	void testOpCmdHello();
 	void testOpCmdWriteRead();
 	void testOpCmdInsert();
