@@ -1,14 +1,13 @@
 /* Lzma86Dec.c -- LZMA + x86 (BCJ) Filter Decoder
-2009-08-14 : Igor Pavlov : Public domain */
+2023-03-03 : Igor Pavlov : Public domain */
+
+#include "Precomp.h"
 
 #include "Lzma86.h"
 
 #include "Alloc.h"
 #include "Bra.h"
 #include "LzmaDec.h"
-
-static void *SzAlloc(void *p, size_t size) { p = p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { p = p; MyFree(address); }
 
 SRes Lzma86_GetUnpackSize(const Byte *src, SizeT srcLen, UInt64 *unpackSize)
 {
@@ -23,7 +22,6 @@ SRes Lzma86_GetUnpackSize(const Byte *src, SizeT srcLen, UInt64 *unpackSize)
 
 SRes Lzma86_Decode(Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen)
 {
-  ISzAlloc g_Alloc = { SzAlloc, SzFree };
   SRes res;
   int useFilter;
   SizeT inSizePure;
@@ -48,9 +46,8 @@ SRes Lzma86_Decode(Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen)
     return res;
   if (useFilter == 1)
   {
-    UInt32 x86State;
-    x86_Convert_Init(x86State);
-    x86_Convert(dest, *destLen, 0, &x86State, 0);
+    UInt32 x86State = Z7_BRANCH_CONV_ST_X86_STATE_INIT_VAL;
+    z7_BranchConvSt_X86_Dec(dest, *destLen, 0, &x86State);
   }
   return SZ_OK;
 }

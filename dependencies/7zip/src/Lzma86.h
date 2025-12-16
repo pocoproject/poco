@@ -1,10 +1,10 @@
 /* Lzma86.h -- LZMA + x86 (BCJ) Filter
-2009-08-14 : Igor Pavlov : Public domain */
+2023-03-03 : Igor Pavlov : Public domain */
 
-#ifndef __LZMA86_H
-#define __LZMA86_H
+#ifndef ZIP7_INC_LZMA86_H
+#define ZIP7_INC_LZMA86_H
 
-#include "Types.h"
+#include "7zTypes.h"
 
 EXTERN_C_BEGIN
 
