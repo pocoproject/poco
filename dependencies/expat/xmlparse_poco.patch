@@ -1,0 +1,167 @@
+# POCO modifications to expat xmlparse.c
+#
+# This patch applies POCO-specific modifications to xmlparse.c from the expat library:
+# 1. Enables EXPAT_POCO mode for POCO-specific entropy generation
+# 2. Uses Poco::RandomInputStream instead of OS-specific entropy sources
+# 3. Adds C++ casts for malloc_fcn calls (required for C++ compilation)
+# 4. Includes expat_config.h for configuration
+#
+# To apply this patch:
+#   1. Copy xmlparse.c from expat release to this directory
+#   2. Run: patch -p0 < xmlparse_poco.patch
+#   3. Rename: mv xmlparse.c xmlparse.cpp
+#
+# Or use the CMake target: cmake --build . --target patch_expat_xmlparse
+
+--- xmlparse.c
++++ xmlparse.c
+@@ -103,7 +103,12 @@
+ #include <stdint.h> /* uintptr_t */
+ #include <math.h>   /* isnan */
+
+-#ifdef _WIN32
++#define EXPAT_POCO 1
++
++#if defined(EXPAT_POCO)
++#  include "Poco/RandomStream.h"
++#  include "Poco/BinaryReader.h"
++#elif defined(_WIN32)
+ #  define getpid GetCurrentProcessId
+ #else
+ #  include <sys/time.h>  /* gettimeofday() */
+@@ -113,10 +118,12 @@
+ #  include <errno.h>
+ #endif
+
+-#ifdef _WIN32
++#ifdef EXPAT_WIN32
+ #  include "winconfig.h"
+ #endif
+
++#include "expat_config.h"
++
+ #include "ascii.h"
+ #include "expat.h"
+ #include "siphash.h"
+@@ -145,7 +152,7 @@
+ #if ! defined(HAVE_GETRANDOM) && ! defined(HAVE_SYSCALL_GETRANDOM)             \
+     && ! defined(HAVE_ARC4RANDOM_BUF) && ! defined(HAVE_ARC4RANDOM)            \
+     && ! defined(XML_DEV_URANDOM) && ! defined(_WIN32)                         \
+-    && ! defined(XML_POOR_ENTROPY)
++    && ! defined(XML_POOR_ENTROPY) && ! defined(EXPAT_POCO)
+ #  error You do not have support for any sources of high quality entropy \
+     enabled.  For end user security, that is probably not what you want. \
+     \
+@@ -804,6 +811,9 @@
+        ASCII_SLASH, ASCII_n,     ASCII_a,      ASCII_m,      ASCII_e,
+        ASCII_s,     ASCII_p,     ASCII_a,      ASCII_c,      ASCII_e,
+        '\0'};
++
++
++#if ! defined(EXPAT_POCO)
+
+ /* To avoid warnings about unused functions: */
+ #if ! defined(HAVE_ARC4RANDOM_BUF) && ! defined(HAVE_ARC4RANDOM)
+@@ -958,6 +968,8 @@
+
+ #endif /* ! defined(HAVE_ARC4RANDOM_BUF) && ! defined(HAVE_ARC4RANDOM) */
+
++#endif /* ! defined(EXPAT_POCO) */
++
+ static unsigned long
+ ENTROPY_DEBUG(const char *label, unsigned long entropy) {
+   if (getDebugLevel("EXPAT_ENTROPY_DEBUG", 0) >= 1u) {
+@@ -971,7 +983,12 @@
+ generate_hash_secret_salt(XML_Parser parser) {
+   unsigned long entropy;
+   (void)parser;
+-
++#if defined(EXPAT_POCO)
++  Poco::RandomInputStream rstr;
++  Poco::BinaryReader rrdr(rstr);
++  rrdr >> entropy;
++  return ENTROPY_DEBUG("RandomInputStream", entropy);
++#else
+   /* "Failproof" high quality providers: */
+ #if defined(HAVE_ARC4RANDOM_BUF)
+   arc4random_buf(&entropy, sizeof(entropy));
+@@ -1008,6 +1025,7 @@
+                          entropy * (unsigned long)2305843009213693951ULL);
+   }
+ #endif
++#endif /* defined(EXPAT_POCO) */
+ }
+
+ static unsigned long
+@@ -1111,7 +1129,7 @@
+
+   if (memsuite) {
+     XML_Memory_Handling_Suite *mtemp;
+-    parser = memsuite->malloc_fcn(sizeof(struct XML_ParserStruct));
++    parser = (XML_Parser)memsuite->malloc_fcn(sizeof(struct XML_ParserStruct));
+     if (parser != NULL) {
+       mtemp = (XML_Memory_Handling_Suite *)&(parser->m_mem);
+       mtemp->malloc_fcn = memsuite->malloc_fcn;
+@@ -7123,7 +7141,7 @@
+
+ static DTD *
+ dtdCreate(const XML_Memory_Handling_Suite *ms) {
+-  DTD *p = ms->malloc_fcn(sizeof(DTD));
++  DTD *p = (DTD*) ms->malloc_fcn(sizeof(DTD));
+   if (p == NULL)
+     return p;
+   poolInit(&(p->pool), ms);
+@@ -7307,7 +7325,7 @@
+       }
+ #endif
+       newE->defaultAtts
+-          = ms->malloc_fcn(oldE->nDefaultAtts * sizeof(DEFAULT_ATTRIBUTE));
++          = (DEFAULT_ATTRIBUTE*) ms->malloc_fcn(oldE->nDefaultAtts * sizeof(DEFAULT_ATTRIBUTE));
+       if (! newE->defaultAtts) {
+         return 0;
+       }
+@@ -7469,7 +7487,7 @@
+     /* table->size is a power of 2 */
+     table->size = (size_t)1 << INIT_POWER;
+     tsize = table->size * sizeof(NAMED *);
+-    table->v = table->mem->malloc_fcn(tsize);
++    table->v = (NAMED**) table->mem->malloc_fcn(tsize);
+     if (! table->v) {
+       table->size = 0;
+       return NULL;
+@@ -7509,7 +7527,7 @@
+       }
+
+       size_t tsize = newSize * sizeof(NAMED *);
+-      NAMED **newV = table->mem->malloc_fcn(tsize);
++      NAMED **newV = (NAMED**) table->mem->malloc_fcn(tsize);
+       if (! newV)
+         return NULL;
+       memset(newV, 0, tsize);
+@@ -7538,7 +7556,7 @@
+       }
+     }
+   }
+-  table->v[i] = table->mem->malloc_fcn(createSize);
++  table->v[i] = (NAMED*) table->mem->malloc_fcn(createSize);
+   if (! table->v[i])
+     return NULL;
+   memset(table->v[i], 0, createSize);
+@@ -7826,7 +7844,7 @@
+     if (bytesToAllocate == 0)
+       return XML_FALSE;
+
+-    tem = pool->mem->malloc_fcn(bytesToAllocate);
++    tem = (BLOCK*) pool->mem->malloc_fcn(bytesToAllocate);
+     if (! tem)
+       return XML_FALSE;
+     tem->size = blockSize;
+@@ -8074,7 +8092,7 @@
+   charsRequired++;
+
+   /* Now allocate space for the copy */
+-  result = memsuite->malloc_fcn(charsRequired * sizeof(XML_Char));
++  result = (XML_Char*) memsuite->malloc_fcn(charsRequired * sizeof(XML_Char));
+   if (result == NULL)
+     return NULL;
+   /* Copy the original into place */
