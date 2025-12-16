@@ -1,85 +1,187 @@
-/* Bra86.c -- Converter for x86 code (BCJ)
-2008-10-04 : Igor Pavlov : Public domain */
+/* Bra86.c -- Branch converter for X86 code (BCJ)
+2023-04-02 : Igor Pavlov : Public domain */
+
+#include "Precomp.h"
 
 #include "Bra.h"
+#include "CpuArch.h"
 
-#define Test86MSByte(b) ((b) == 0 || (b) == 0xFF)
 
-const Byte kMaskToAllowedStatus[8] = {1, 1, 1, 0, 1, 0, 0, 0};
-const Byte kMaskToBitNumber[8] = {0, 1, 2, 2, 3, 3, 3, 3};
+#if defined(MY_CPU_SIZEOF_POINTER) \
+    && ( MY_CPU_SIZEOF_POINTER == 4 \
+      || MY_CPU_SIZEOF_POINTER == 8)
+  #define BR_CONV_USE_OPT_PC_PTR
+#endif
 
-SizeT x86_Convert(Byte *data, SizeT size, UInt32 ip, UInt32 *state, int encoding)
+#ifdef BR_CONV_USE_OPT_PC_PTR
+#define BR_PC_INIT  pc -= (UInt32)(SizeT)p; // (MY_uintptr_t)
+#define BR_PC_GET   (pc + (UInt32)(SizeT)p)
+#else
+#define BR_PC_INIT  pc += (UInt32)size;
+#define BR_PC_GET   (pc - (UInt32)(SizeT)(lim - p))
+// #define BR_PC_INIT
+// #define BR_PC_GET   (pc + (UInt32)(SizeT)(p - data))
+#endif
+
+#define BR_CONVERT_VAL(v, c) if (encoding) v += c; else v -= c;
+// #define BR_CONVERT_VAL(v, c) if (!encoding) c = (UInt32)0 - c; v += c;
+
+#define Z7_BRANCH_CONV_ST(name) z7_BranchConvSt_ ## name
+
+#define BR86_NEED_CONV_FOR_MS_BYTE(b) ((((b) + 1) & 0xfe) == 0)
+
+#ifdef MY_CPU_LE_UNALIGN
+  #define BR86_PREPARE_BCJ_SCAN  const UInt32 v = GetUi32(p) ^ 0xe8e8e8e8;
+  #define BR86_IS_BCJ_BYTE(n)    ((v & ((UInt32)0xfe << (n) * 8)) == 0)
+#else
+  #define BR86_PREPARE_BCJ_SCAN
+  // bad for MSVC X86 (partial write to byte reg):
+  #define BR86_IS_BCJ_BYTE(n)    ((p[n - 4] & 0xfe) == 0xe8)
+  // bad for old MSVC (partial write to byte reg):
+  // #define BR86_IS_BCJ_BYTE(n)    (((*p ^ 0xe8) & 0xfe) == 0)
+#endif
+ 
+static
+Z7_FORCE_INLINE
+Z7_ATTRIB_NO_VECTOR
+Byte *Z7_BRANCH_CONV_ST(X86)(Byte *p, SizeT size, UInt32 pc, UInt32 *state, int encoding)
 {
-  SizeT bufferPos = 0, prevPosT;
-  UInt32 prevMask = *state & 0x7;
   if (size < 5)
-    return 0;
-  ip += 5;
-  prevPosT = (SizeT)0 - 1;
+    return p;
+ {
+  // Byte *p = data;
+  const Byte *lim = p + size - 4;
+  unsigned mask = (unsigned)*state;  // & 7;
+#ifdef BR_CONV_USE_OPT_PC_PTR
+  /* if BR_CONV_USE_OPT_PC_PTR is defined: we need to adjust (pc) for (+4),
+        because call/jump offset is relative to the next instruction.
+     if BR_CONV_USE_OPT_PC_PTR is not defined : we don't need to adjust (pc) for (+4),
+         because  BR_PC_GET uses (pc - (lim - p)), and lim was adjusted for (-4) before.
+  */
+  pc += 4;
+#endif
+  BR_PC_INIT
+  goto start;
 
-  for (;;)
+  for (;; mask |= 4)
   {
-    Byte *p = data + bufferPos;
-    Byte *limit = data + size - 4;
-    for (; p < limit; p++)
-      if ((*p & 0xFE) == 0xE8)
-        break;
-    bufferPos = (SizeT)(p - data);
-    if (p >= limit)
-      break;
-    prevPosT = bufferPos - prevPosT;
-    if (prevPosT > 3)
-      prevMask = 0;
-    else
+    // cont: mask |= 4;
+  start:
+    if (p >= lim)
+      goto fin;
     {
-      prevMask = (prevMask << ((int)prevPosT - 1)) & 0x7;
-      if (prevMask != 0)
-      {
-        Byte b = p[4 - kMaskToBitNumber[prevMask]];
-        if (!kMaskToAllowedStatus[prevMask] || Test86MSByte(b))
-        {
-          prevPosT = bufferPos;
-          prevMask = ((prevMask << 1) & 0x7) | 1;
-          bufferPos++;
-          continue;
-        }
-      }
+      BR86_PREPARE_BCJ_SCAN
+      p += 4;
+      if (BR86_IS_BCJ_BYTE(0))  { goto m0; }  mask >>= 1;
+      if (BR86_IS_BCJ_BYTE(1))  { goto m1; }  mask >>= 1;
+      if (BR86_IS_BCJ_BYTE(2))  { goto m2; }  mask = 0;
+      if (BR86_IS_BCJ_BYTE(3))  { goto a3; }
     }
-    prevPosT = bufferPos;
+    goto main_loop;
 
-    if (Test86MSByte(p[4]))
+  m0: p--;
+  m1: p--;
+  m2: p--;
+    if (mask == 0)
+      goto a3;
+    if (p > lim)
+      goto fin_p;
+   
+    // if (((0x17u >> mask) & 1) == 0)
+    if (mask > 4 || mask == 3)
     {
-      UInt32 src = ((UInt32)p[4] << 24) | ((UInt32)p[3] << 16) | ((UInt32)p[2] << 8) | ((UInt32)p[1]);
-      UInt32 dest;
-      for (;;)
-      {
-        Byte b;
-        int index;
-        if (encoding)
-          dest = (ip + (UInt32)bufferPos) + src;
-        else
-          dest = src - (ip + (UInt32)bufferPos);
-        if (prevMask == 0)
-          break;
-        index = kMaskToBitNumber[prevMask] * 8;
-        b = (Byte)(dest >> (24 - index));
-        if (!Test86MSByte(b))
-          break;
-        src = dest ^ ((1 << (32 - index)) - 1);
-      }
-      p[4] = (Byte)(~(((dest >> 24) & 1) - 1));
-      p[3] = (Byte)(dest >> 16);
-      p[2] = (Byte)(dest >> 8);
-      p[1] = (Byte)dest;
-      bufferPos += 5;
+      mask >>= 1;
+      continue; // goto cont;
     }
-    else
+    mask >>= 1;
+    if (BR86_NEED_CONV_FOR_MS_BYTE(p[mask]))
+      continue; // goto cont;
+    // if (!BR86_NEED_CONV_FOR_MS_BYTE(p[3])) continue; // goto cont;
     {
-      prevMask = ((prevMask << 1) & 0x7) | 1;
-      bufferPos++;
+      UInt32 v = GetUi32(p);
+      UInt32 c;
+      v += (1 << 24);  if (v & 0xfe000000) continue; // goto cont;
+      c = BR_PC_GET;
+      BR_CONVERT_VAL(v, c)
+      {
+        mask <<= 3;
+        if (BR86_NEED_CONV_FOR_MS_BYTE(v >> mask))
+        {
+          v ^= (((UInt32)0x100 << mask) - 1);
+          #ifdef MY_CPU_X86
+          // for X86 : we can recalculate (c) to reduce register pressure
+            c = BR_PC_GET;
+          #endif
+          BR_CONVERT_VAL(v, c)
+        }
+        mask = 0;
+      }
+      // v = (v & ((1 << 24) - 1)) - (v & (1 << 24));
+      v &= (1 << 25) - 1;  v -= (1 << 24);
+      SetUi32(p, v)
+      p += 4;
+      goto main_loop;
+    }
+
+  main_loop:
+    if (p >= lim)
+      goto fin;
+    for (;;)
+    {
+      BR86_PREPARE_BCJ_SCAN
+      p += 4;
+      if (BR86_IS_BCJ_BYTE(0))  { goto a0; }
+      if (BR86_IS_BCJ_BYTE(1))  { goto a1; }
+      if (BR86_IS_BCJ_BYTE(2))  { goto a2; }
+      if (BR86_IS_BCJ_BYTE(3))  { goto a3; }
+      if (p >= lim)
+        goto fin;
+    }
+  
+  a0: p--;
+  a1: p--;
+  a2: p--;
+  a3:
+    if (p > lim)
+      goto fin_p;
+    // if (!BR86_NEED_CONV_FOR_MS_BYTE(p[3])) continue; // goto cont;
+    {
+      UInt32 v = GetUi32(p);
+      UInt32 c;
+      v += (1 << 24);  if (v & 0xfe000000) continue; // goto cont;
+      c = BR_PC_GET;
+      BR_CONVERT_VAL(v, c)
+      // v = (v & ((1 << 24) - 1)) - (v & (1 << 24));
+      v &= (1 << 25) - 1;  v -= (1 << 24);
+      SetUi32(p, v)
+      p += 4;
+      goto main_loop;
     }
   }
-  prevPosT = bufferPos - prevPosT;
-  *state = ((prevPosT > 3) ? 0 : ((prevMask << ((int)prevPosT - 1)) & 0x7));
-  return bufferPos;
+
+fin_p:
+  p--;
+fin:
+  // the following processing for tail is optional and can be commented
+  /*
+  lim += 4;
+  for (; p < lim; p++, mask >>= 1)
+    if ((*p & 0xfe) == 0xe8)
+      break;
+  */
+  *state = (UInt32)mask;
+  return p;
+ }
 }
+
+
+#define Z7_BRANCH_CONV_ST_FUNC_IMP(name, m, encoding) \
+Z7_NO_INLINE \
+Z7_ATTRIB_NO_VECTOR \
+Byte *m(name)(Byte *data, SizeT size, UInt32 pc, UInt32 *state) \
+  { return Z7_BRANCH_CONV_ST(name)(data, size, pc, state, encoding); }
+
+Z7_BRANCH_CONV_ST_FUNC_IMP(X86, Z7_BRANCH_CONV_ST_DEC, 0)
+#ifndef Z7_EXTRACT_ONLY
+Z7_BRANCH_CONV_ST_FUNC_IMP(X86, Z7_BRANCH_CONV_ST_ENC, 1)
+#endif

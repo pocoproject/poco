@@ -1,5 +1,7 @@
 /* Lzma86Enc.c -- LZMA + x86 (BCJ) Filter Encoder
-2009-08-14 : Igor Pavlov : Public domain */
+2023-03-03 : Igor Pavlov : Public domain */
+
+#include "Precomp.h"
 
 #include <string.h>
 
@@ -9,24 +11,18 @@
 #include "Bra.h"
 #include "LzmaEnc.h"
 
-#define SZE_OUT_OVERFLOW SZE_DATA_ERROR
-
-static void *SzAlloc(void *p, size_t size) { p = p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { p = p; MyFree(address); }
-
 int Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
     int level, UInt32 dictSize, int filterMode)
 {
-  ISzAlloc g_Alloc = { SzAlloc, SzFree };
   size_t outSize2 = *destLen;
   Byte *filteredStream;
-  Bool useFilter;
+  BoolInt useFilter;
   int mainResult = SZ_ERROR_OUTPUT_EOF;
   CLzmaEncProps props;
   LzmaEncProps_Init(&props);
   props.level = level;
   props.dictSize = dictSize;
-
+  
   *destLen = 0;
   if (outSize2 < LZMA86_HEADER_SIZE)
     return SZ_ERROR_OUTPUT_EOF;
@@ -50,15 +46,14 @@ int Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
       memcpy(filteredStream, src, srcLen);
     }
     {
-      UInt32 x86State;
-      x86_Convert_Init(x86State);
-      x86_Convert(filteredStream, srcLen, 0, &x86State, 1);
+      UInt32 x86State = Z7_BRANCH_CONV_ST_X86_STATE_INIT_VAL;
+      z7_BranchConvSt_X86_Enc(filteredStream, srcLen, 0, &x86State);
     }
   }
 
   {
     size_t minSize = 0;
-    Bool bestIsFiltered = False;
+    BoolInt bestIsFiltered = False;
 
     /* passes for SZ_FILTER_AUTO:
         0 - BCJ + LZMA
@@ -73,17 +68,17 @@ int Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
       size_t outSizeProcessed = outSize2 - LZMA86_HEADER_SIZE;
       size_t outPropsSize = 5;
       SRes curRes;
-      Bool curModeIsFiltered = (numPasses > 1 && i == numPasses - 1);
+      BoolInt curModeIsFiltered = (numPasses > 1 && i == numPasses - 1);
       if (curModeIsFiltered && !bestIsFiltered)
         break;
       if (useFilter && i == 0)
         curModeIsFiltered = True;
-
+      
       curRes = LzmaEncode(dest + LZMA86_HEADER_SIZE, &outSizeProcessed,
           curModeIsFiltered ? filteredStream : src, srcLen,
           &props, dest + 1, &outPropsSize, 0,
           NULL, &g_Alloc, &g_Alloc);
-
+      
       if (curRes != SZ_ERROR_OUTPUT_EOF)
       {
         if (curRes != SZ_OK)
@@ -99,7 +94,7 @@ int Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
         }
       }
     }
-    dest[0] = (bestIsFiltered ? 1 : 0);
+    dest[0] = (Byte)(bestIsFiltered ? 1 : 0);
     *destLen = LZMA86_HEADER_SIZE + minSize;
   }
   if (useFilter)

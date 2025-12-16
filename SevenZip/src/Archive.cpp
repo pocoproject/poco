@@ -101,7 +101,7 @@ public:
 			std::size_t extractedSize = 0;
 			int err = SzArEx_Extract(
 				&_db,
-				&_lookStream.s,
+				&_lookStream.vt,
 				entry.index(),
 				&blockIndex,
 				&pOutBuffer,
@@ -148,7 +148,9 @@ protected:
 	void initialize()
 	{
 		FileInStream_CreateVTable(&_archiveStream);
-		LookToRead_CreateVTable(&_lookStream, False);
+		LookToRead2_CreateVTable(&_lookStream, False);
+		_lookStream.buf = _lookStreamBuf;
+		_lookStream.bufSize = sizeof(_lookStreamBuf);
 
 		Poco::FastMutex::ScopedLock lock(_initMutex);
 		if (!_initialized)
@@ -169,13 +171,18 @@ protected:
 		{
 			throw Poco::OpenFileException(_path);
 		}
+#else
+		if (InFile_Open(&_archiveStream.file, _path.c_str()) != SZ_OK)
+		{
+			throw Poco::OpenFileException(_path);
+		}
 #endif
 
-		_lookStream.realStream = &_archiveStream.s;
-		LookToRead_Init(&_lookStream);
+		_lookStream.realStream = &_archiveStream.vt;
+		LookToRead2_INIT(&_lookStream);
 
 		SzArEx_Init(&_db);
-		int err = SzArEx_Open(&_db, &_lookStream.s, &_szAlloc, &_szAllocTemp);
+		int err = SzArEx_Open(&_db, &_lookStream.vt, &_szAlloc, &_szAllocTemp);
 		if (err == SZ_OK)
 		{
 			loadEntries();
@@ -194,14 +201,12 @@ protected:
 
 	void loadEntries()
 	{
-		_entries.reserve(_db.db.NumFiles);
-		for (Poco::UInt32 i = 0; i < _db.db.NumFiles; i++)
+		_entries.reserve(_db.NumFiles);
+		for (Poco::UInt32 i = 0; i < _db.NumFiles; i++)
 		{
-			const CSzFileItem *f = _db.db.Files + i;
-
-			ArchiveEntry::EntryType type = f->IsDir ? ArchiveEntry::ENTRY_DIRECTORY : ArchiveEntry::ENTRY_FILE;
-			Poco::UInt32 attributes = f->AttribDefined ? f->Attrib : 0;
-			Poco::UInt64 size = f->Size;
+			ArchiveEntry::EntryType type = SzArEx_IsDir(&_db, i) ? ArchiveEntry::ENTRY_DIRECTORY : ArchiveEntry::ENTRY_FILE;
+			Poco::UInt32 attributes = SzBitWithVals_Check(&_db.Attribs, i) ? _db.Attribs.Vals[i] : 0;
+			Poco::UInt64 size = SzArEx_GetFileSize(&_db, i);
 
 			std::vector<Poco::UInt16> utf16Path;
 			std::size_t utf16PathLen = SzArEx_GetFileNameUtf16(&_db, i, nullptr);
@@ -215,10 +220,10 @@ protected:
 			converter.convert(&utf16Path[0], (int) utf16PathLen*sizeof(Poco::UInt16), utf8Path);
 
 			Poco::Timestamp lastModified(0);
-			if (f->MTimeDefined)
+			if (SzBitWithVals_Check(&_db.MTime, i))
 			{
 				Poco::Timestamp::TimeVal tv(0);
-				tv = (static_cast<Poco::UInt64>(f->MTime.High) << 32) + f->MTime.Low;
+				tv = (static_cast<Poco::UInt64>(_db.MTime.Vals[i].High) << 32) + _db.MTime.Vals[i].Low;
 				tv -= (static_cast<Poco::Int64>(0x019DB1DE) << 32) + 0xD53E8000;
 				tv /= 10;
 				lastModified = tv;
@@ -280,10 +285,12 @@ protected:
 	}
 
 private:
+	static const std::size_t LOOK_STREAM_BUF_SIZE = (1 << 14); // 16 KB buffer
 	std::string _path;
 	Archive::EntryVec _entries;
 	CFileInStream _archiveStream;
-	CLookToRead _lookStream;
+	CLookToRead2 _lookStream;
+	Byte _lookStreamBuf[LOOK_STREAM_BUF_SIZE];
 	CSzArEx _db;
 	static ISzAlloc _szAlloc;
 	static ISzAlloc _szAllocTemp;

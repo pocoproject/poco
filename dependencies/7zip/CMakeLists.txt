@@ -14,7 +14,7 @@ POCO_SOURCES(SRCS 7zip
 	src/7zCrcOpt.c
 	src/7zDec.c
 	src/7zFile.c
-	src/7zIn.c
+	src/7zArcIn.c
 	src/7zStream.c
 	src/Alloc.c
 	src/Bcj2.c
@@ -22,7 +22,7 @@ POCO_SOURCES(SRCS 7zip
 	src/Bra.c
 #	 src/BraIA64.c
 	src/CpuArch.c
-#	 src/Delta.c
+	src/Delta.c
 #	 src/LzFind.c
 #	 src/LzFindMt.c
 	src/Lzma2Dec.c
