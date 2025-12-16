@@ -101,7 +101,7 @@ UTF8PROC_DLLEXPORT const char *utf8proc_version(void) {
 }
 
 UTF8PROC_DLLEXPORT const char *utf8proc_unicode_version(void) {
-  return "15.1.0";
+  return "17.0.0";
 }
 
 UTF8PROC_DLLEXPORT const char *utf8proc_errmsg(utf8proc_ssize_t errcode) {
@@ -388,7 +388,7 @@ static utf8proc_ssize_t seqindex_write_char_decomposed(utf8proc_uint16_t seqinde
   for (; len >= 0; entry++, len--) {
     utf8proc_int32_t entry_cp = seqindex_decode_entry(&entry);
 
-    written += utf8proc_decompose_char(entry_cp, dst+written,
+    written += utf8proc_decompose_char(entry_cp, dst ? dst+written : dst,
       (bufsize > written) ? (bufsize - written) : 0, options,
     last_boundclass);
     if (written < 0) return UTF8PROC_ERROR_OVERFLOW;
@@ -578,7 +578,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_custom(
         uc = custom_func(uc, custom_data);   /* user-specified custom mapping */
       }
       decomp_result = utf8proc_decompose_char(
-        uc, buffer + wpos, (bufsize > wpos) ? (bufsize - wpos) : 0, options,
+        uc, buffer ? buffer+wpos : buffer, (bufsize > wpos) ? (bufsize - wpos) : 0, options,
         &boundclass
       );
       if (decomp_result < 0) return decomp_result;
@@ -646,15 +646,13 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_normalize_utf32(utf8proc_int32_t *b
   }
   if (options & UTF8PROC_COMPOSE) {
     utf8proc_int32_t *starter = NULL;
-    utf8proc_int32_t current_char;
-    const utf8proc_property_t *starter_property = NULL, *current_property;
+    const utf8proc_property_t *starter_property = NULL;
     utf8proc_propval_t max_combining_class = -1;
     utf8proc_ssize_t rpos;
     utf8proc_ssize_t wpos = 0;
-    utf8proc_int32_t composition;
     for (rpos = 0; rpos < length; rpos++) {
-      current_char = buffer[rpos];
-      current_property = unsafe_get_property(current_char);
+      utf8proc_int32_t current_char = buffer[rpos];
+      const utf8proc_property_t *current_property = unsafe_get_property(current_char);
       if (starter && current_property->combining_class > max_combining_class) {
         /* combination perhaps possible */
         utf8proc_int32_t hangul_lindex;
@@ -685,22 +683,29 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_normalize_utf32(utf8proc_int32_t *b
         if (!starter_property) {
           starter_property = unsafe_get_property(*starter);
         }
-        if (starter_property->comb_index < 0x8000 &&
-            current_property->comb_index != UINT16_MAX &&
-            current_property->comb_index >= 0x8000) {
-          int sidx = starter_property->comb_index;
-          int idx = current_property->comb_index & 0x3FFF;
-          if (idx >= utf8proc_combinations[sidx] && idx <= utf8proc_combinations[sidx + 1] ) {
-            idx += sidx + 2 - utf8proc_combinations[sidx];
-            if (current_property->comb_index & 0x4000) {
-              composition = (utf8proc_combinations[idx] << 16) | utf8proc_combinations[idx+1];
-            } else
-              composition = utf8proc_combinations[idx];
-
-            if (composition > 0 && (!(options & UTF8PROC_STABLE) ||
-                !(unsafe_get_property(composition)->comp_exclusion))) {
-              *starter = composition;
-              starter_property = NULL;
+        int idx = starter_property->comb_index;
+        if (idx < 0x3FF && current_property->comb_issecond) {
+          int len = starter_property->comb_length;
+          utf8proc_int32_t max_second = utf8proc_combinations_second[idx + len - 1];
+          if (current_char <= max_second) {
+            int off;
+            // TODO: binary search? arithmetic search?
+            for (off = 0; off < len; ++off) {
+              utf8proc_int32_t second = utf8proc_combinations_second[idx + off];
+              if (current_char < second) {
+                /* not found */
+                break;
+              }
+              if (current_char == second) {
+                /* found */
+                utf8proc_int32_t composition = utf8proc_combinations_combined[idx + off];
+                *starter = composition;
+                starter_property = NULL;
+                break;
+              }
+            }
+            if (starter_property == NULL) {
+              /* found */
               continue;
             }
           }
