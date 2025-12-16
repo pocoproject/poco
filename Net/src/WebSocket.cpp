@@ -148,7 +148,7 @@ int WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessag
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
 	writer << statusCode;
 	writer.writeRaw(statusMessage);
-	return sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), FRAME_FLAG_FIN | FRAME_OP_CLOSE);
+	return sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_CLOSE));
 }
 
 

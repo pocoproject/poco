@@ -45,7 +45,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
     _uncompressedSize(0)
 {
     std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
-    std::memset(_rawHeader+ZipCommon::HEADER_SIZE, 0, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+    std::memset(_rawHeader+ZipCommon::HEADER_SIZE, 0, static_cast<std::size_t>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
     setHostSystem(ZipCommon::HS_FAT);
     setEncryption(false);
     setExtraFieldSize(0);
@@ -127,7 +127,7 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     }
 
     // read the rest of the header
-    inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+    inp.read(_rawHeader + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
     poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
     poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
     poco_assert (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) < ZipCommon::CM_UNUSED);

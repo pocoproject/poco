@@ -96,7 +96,7 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	}
 
 	// read the rest of the header
-	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
 	_crc32 = getCRCFromHeader();
 	_compressedSize = getCompressedSizeFromHeader();
 	_uncompressedSize = getUncompressedSizeFromHeader();
