@@ -18,6 +18,7 @@
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NullPartHandler.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NullStream.h"
@@ -219,9 +220,8 @@ void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 		{
 			_boundary = MultipartWriter::createBoundary();
 			std::string ct(_encoding);
-			ct.append("; boundary=\"");
-			ct.append(_boundary);
-			ct.append("\"");
+			ct.append("; boundary=");
+			MessageHeader::quote(_boundary, ct);
 			request.setContentType(ct);
 		}
 		if (request.getVersion() == HTTPMessage::HTTP_1_0)
