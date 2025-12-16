@@ -41,11 +41,16 @@ class MongoDB_API ReadPreference
 	/// - PrimaryPreferred: Read from primary, fallback to secondary
 	/// - Secondary: Read from secondary only (distributes load)
 	/// - SecondaryPreferred: Read from secondary, fallback to primary
-	/// - Nearest: Read from member with lowest network latency
+	/// - Nearest: Read from any available member (primary or secondary)
 	///
 	/// Additional constraints:
 	/// - Tag sets: Target specific replica set members by tags
 	/// - Max staleness: Limit how stale secondary data can be
+	///
+	/// LIMITATIONS:
+	/// The Nearest mode does NOT measure actual network round-trip time (RTT).
+	/// It simply allows selection of any available member. True latency-based
+	/// server selection is not implemented.
 	///
 	/// Examples:
 	///   ReadPreference primary(ReadPreference::Primary);
@@ -69,7 +74,7 @@ public:
 		PrimaryPreferred,     /// Read from primary, fallback to secondary
 		Secondary,            /// Read from secondary only
 		SecondaryPreferred,   /// Read from secondary, fallback to primary
-		Nearest               /// Read from lowest-latency member (primary or secondary)
+		Nearest               /// Read from any available member (no RTT measurement)
 	};
 
 	static const Poco::Int64 NO_MAX_STALENESS = -1;

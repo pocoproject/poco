@@ -44,7 +44,7 @@ Server selection strategies for read operations:
   - PrimaryPreferred - Primary with fallback to secondary
   - Secondary - Secondary only (distributes load)
   - SecondaryPreferred - Secondary with fallback to primary
-  - Nearest - Lowest network latency (primary or secondary)
+  - Nearest - Any available member (primary or secondary)
 - Tag-based server selection for geo-distributed deployments
 - Max staleness filtering for data freshness guarantees
 - Load balancing across eligible servers
@@ -980,7 +980,7 @@ The implementation follows the MongoDB SDAM specification:
    - Secondary: Only secondary servers
    - PrimaryPreferred: Primary first, then secondaries
    - SecondaryPreferred: Secondaries first, then primary
-   - Nearest: Lowest RTT (within 15ms window)
+   - Nearest: Any available member (primary or secondary)
    - **Note**: Standalone servers are treated as primaries for read preference purposes, allowing the same code to work with both single-server and replica set deployments
 
 4. **Automatic Failover**
@@ -1451,7 +1451,7 @@ This implementation follows the [MongoDB Server Discovery and Monitoring (SDAM) 
 - **Host Discovery** - Parses hosts, passives, and arbiters arrays from hello responses
 - **Cross-Contamination Prevention** - Discovered hosts from mismatched replica sets are not added to topology
 - **Read Preference Support** - All 5 read preference modes with tag-based selection
-- **Round-Trip Time Measurement** - Tracks server latency for "nearest" read preference
+- **Round-Trip Time Measurement** - Tracks server latency (but not used for server selection, see limitations below)
 - **Server Error Tracking** - Maintains error state and messages for failed servers
 - **Automatic Failover** - Detects and recovers from server failures
 - **Mixed Server Type Validation** - Rejects incompatible server type combinations (Mongos+RS, Standalone+RS, multiple Standalones)
@@ -1490,7 +1490,13 @@ The following SDAM specification requirements are **not yet implemented**:
 
 #### Low (Features):
 
-5. **logicalSessionTimeoutMinutes**
+5. **RTT-Based Server Selection for "Nearest"**
+   - **Status**: Not implemented
+   - **SDAM Requirement**: Use round-trip time measurements to select the server with lowest latency for "nearest" read preference
+   - **Current Behavior**: RTT is measured but the "nearest" mode selects any available member randomly
+   - **Impact**: No latency-based routing; "nearest" behaves like "any available server"
+
+6. **logicalSessionTimeoutMinutes**
    - **Status**: Not implemented
    - **SDAM Requirement**: Parse and track logicalSessionTimeoutMinutes to determine if sessions are supported
    - **Impact**: Applications cannot detect if MongoDB sessions/transactions are available
@@ -1518,7 +1524,8 @@ The following enhancements are planned for full SDAM specification compliance:
 2. Add setVersion/electionId tracking for split-brain prevention
 3. Implement proper server removal logic based on primary's hello response
 4. Use lastWriteDate for accurate staleness calculations
-5. Parse and expose logicalSessionTimeoutMinutes for session support detection
+5. Implement RTT-based server selection for "nearest" read preference
+6. Parse and expose logicalSessionTimeoutMinutes for session support detection
 
 **Contributions welcome**: These features are well-defined in the SDAM specification and would be excellent contributions to the project.
 
