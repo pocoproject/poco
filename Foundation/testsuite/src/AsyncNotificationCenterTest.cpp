@@ -129,7 +129,10 @@ private:
 
 AsyncNotificationCenterTest::AsyncNotificationCenterTest(const std::string& name):
 	CppUnit::TestCase(name),
+	_handleNObsDone(false),
+#ifdef POCO_TEST_DEPRECATED
 	_handle1Done(false),
+#endif
 	_handleAuto1Done(false),
 	_handleAsync1Done(false),
 	_handleAsync2Done(false),
@@ -296,6 +299,19 @@ void AsyncNotificationCenterTest::testAsyncNotificationCenterParallelDispatch()
 }
 
 
+void AsyncNotificationCenterTest::testMixedNObserversAndAsyncObservers()
+{
+#if (POCO_HAVE_JTHREAD)
+	mixedNObserversAndAsyncObservers(AsyncMode::ENQUEUE);
+	resetState();
+	mixedNObserversAndAsyncObservers(AsyncMode::NOTIFY);
+	resetState();
+	mixedNObserversAndAsyncObservers(AsyncMode::BOTH);
+#endif
+}
+
+
+#ifdef POCO_TEST_DEPRECATED
 void AsyncNotificationCenterTest::testMixedObservers()
 {
 #if (POCO_HAVE_JTHREAD)
@@ -306,6 +322,7 @@ void AsyncNotificationCenterTest::testMixedObservers()
 	mixedObservers(AsyncMode::BOTH);
 #endif
 }
+#endif
 
 
 void AsyncNotificationCenterTest::testSynchronousDispatch()
@@ -581,6 +598,33 @@ void AsyncNotificationCenterTest::parallelDispatch(AsyncMode mode)
 }
 
 
+void AsyncNotificationCenterTest::mixedNObserversAndAsyncObservers(AsyncMode mode)
+{
+	AsyncNotificationCenter nc(mode);
+
+	nc.addNObserver<AsyncNotificationCenterTest, Notification>(*this, &AsyncNotificationCenterTest::handleNObs);
+	nc.addNObserver<AsyncNotificationCenterTest, Notification>(*this, &AsyncNotificationCenterTest::handleAuto);
+	nc.addAsyncObserver<AsyncNotificationCenterTest, TestNotification>(*this, &AsyncNotificationCenterTest::handleAsync1, &AsyncNotificationCenterTest::matchAsync);
+
+	nc.postNotification(new Notification);
+	nc.postNotification(new TestNotification("asyncNotification"));
+
+	while (!_handleNObsDone || !_handleAuto1Done || !_handleAsync1Done)
+		Poco::Thread::sleep(100);
+
+	nc.removeAsyncObserver<AsyncNotificationCenterTest, TestNotification>(*this, &AsyncNotificationCenterTest::handleAsync1, &AsyncNotificationCenterTest::matchAsync);
+	nc.removeNObserver<AsyncNotificationCenterTest, Notification>(*this, &AsyncNotificationCenterTest::handleAuto);
+	nc.removeNObserver<AsyncNotificationCenterTest, Notification>(*this, &AsyncNotificationCenterTest::handleNObs);
+
+	Poco::Mutex::ScopedLock l(_mutex);
+	assertEqual(3u, _set.size());
+	assertTrue (_set.find("handleNObs") != _set.end());
+	assertTrue (_set.find("handleAuto") != _set.end());
+	assertTrue (_set.find("handleAsync1") != _set.end());
+}
+
+
+#ifdef POCO_TEST_DEPRECATED
 void AsyncNotificationCenterTest::mixedObservers(AsyncMode mode)
 {
 	AsyncNotificationCenter nc(mode);
@@ -605,6 +649,7 @@ void AsyncNotificationCenterTest::mixedObservers(AsyncMode mode)
 	assertTrue (_set.find("handleAuto") != _set.end());
 	assertTrue (_set.find("handleAsync1") != _set.end());
 }
+#endif
 
 
 void AsyncNotificationCenterTest::synchronousDispatch(AsyncMode mode)
@@ -641,6 +686,15 @@ void AsyncNotificationCenterTest::synchronousDispatch(AsyncMode mode)
 #endif // POCO_HAVE_JTHREAD
 
 
+void AsyncNotificationCenterTest::handleNObs(const AutoPtr<Notification>& pNf)
+{
+	Poco::Mutex::ScopedLock l(_mutex);
+	_set.insert("handleNObs");
+	_handleNObsDone = true;
+}
+
+
+#ifdef POCO_TEST_DEPRECATED
 void AsyncNotificationCenterTest::handle1(Poco::Notification* pNf)
 {
 	Poco::Mutex::ScopedLock l(_mutex);
@@ -649,6 +703,7 @@ void AsyncNotificationCenterTest::handle1(Poco::Notification* pNf)
 	_set.insert("handle1");
 	_handle1Done = true;
 }
+#endif
 
 
 void AsyncNotificationCenterTest::handleAuto(const AutoPtr<Notification>& pNf)
@@ -718,7 +773,10 @@ void AsyncNotificationCenterTest::resetState()
 	_syncCallCount = 0;
 	_threadSafeCount = 0;
 	_exceptionCount = 0;
+	_handleNObsDone = false;
+#ifdef POCO_TEST_DEPRECATED
 	_handle1Done = false;
+#endif
 	_handleAuto1Done = false;
 	_handleAsync1Done = false;
 	_handleAsync2Done = false;
@@ -747,7 +805,10 @@ CppUnit::Test* AsyncNotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testAsyncNotificationCenterDefaultWorkers);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testAsyncNotificationCenterBacklog);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testAsyncNotificationCenterParallelDispatch);
+	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testMixedNObserversAndAsyncObservers);
+#ifdef POCO_TEST_DEPRECATED
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testMixedObservers);
+#endif
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testSynchronousDispatch);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testErrorHandling);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testThreadSafety);

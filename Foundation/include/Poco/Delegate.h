@@ -23,6 +23,7 @@
 #include "Poco/FunctionDelegate.h"
 #include "Poco/Expire.h"
 #include "Poco/Mutex.h"
+#include <type_traits>
 
 
 namespace Poco {
@@ -30,9 +31,13 @@ namespace Poco {
 
 template <class TObj, class TArgs, bool withSender = true>
 class Delegate: public AbstractDelegate<TArgs>
+	/// Wraps a member function for use as a Delegate.
+	/// Use withSender=true for callbacks that take sender as first parameter.
 {
 public:
-	using NotifyMethod = void (TObj::*)(const void *, TArgs &);
+	using NotifyMethod = std::conditional_t<withSender,
+		void (TObj::*)(const void*, TArgs&),
+		void (TObj::*)(TArgs&)>;
 
 	Delegate(TObj* obj, NotifyMethod method):
 		_receiverObject(obj),
@@ -66,75 +71,14 @@ public:
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
 		{
-			(_receiverObject->*_receiverMethod)(sender, arguments);
-			return true;
-		}
-		else return false;
-	}
-
-	bool equals(const AbstractDelegate<TArgs>& other) const
-	{
-		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
-		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
-	}
-
-	AbstractDelegate<TArgs>* clone() const
-	{
-		return new Delegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = nullptr;
-	}
-
-protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
-	Mutex        _mutex;
-};
-
-
-template <class TObj, class TArgs>
-class Delegate<TObj, TArgs, false>: public AbstractDelegate<TArgs>
-{
-public:
-	using NotifyMethod = void (TObj::*)(TArgs &);
-
-	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-
-	Delegate(const Delegate& delegate):
-		AbstractDelegate<TArgs>(delegate),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
-	}
-
-	~Delegate() = default;
-
-	Delegate() = delete;
-
-	Delegate& operator = (const Delegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-		}
-		return *this;
-	}
-
-	bool notify(const void*, TArgs& arguments)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_receiverObject)
-		{
-			(_receiverObject->*_receiverMethod)(arguments);
+			if constexpr (withSender)
+			{
+				(_receiverObject->*_receiverMethod)(sender, arguments);
+			}
+			else
+			{
+				(_receiverObject->*_receiverMethod)(arguments);
+			}
 			return true;
 		}
 		else return false;
@@ -234,11 +178,14 @@ inline FunctionDelegate<TArgs, false> delegate(void (*NotifyMethod)(TArgs&))
 }
 
 
-template <class TObj>
-class Delegate<TObj,void,true>: public AbstractDelegate<void>
+template <class TObj, bool withSender>
+class Delegate<TObj, void, withSender>: public AbstractDelegate<void>
+	/// Specialization for void arguments (no TArgs parameter).
 {
 public:
-	using NotifyMethod = void (TObj::*)(const void *);
+	using NotifyMethod = std::conditional_t<withSender,
+		void (TObj::*)(const void*),
+		void (TObj::*)()>;
 
 	Delegate(TObj* obj, NotifyMethod method):
 		_receiverObject(obj),
@@ -267,24 +214,31 @@ public:
 		return *this;
 	}
 
-	bool notify(const void *sender) override
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
 		{
-			(_receiverObject->*_receiverMethod)(sender);
+			if constexpr (withSender)
+			{
+				(_receiverObject->*_receiverMethod)(sender);
+			}
+			else
+			{
+				(_receiverObject->*_receiverMethod)();
+			}
 			return true;
 		}
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void> &other) const override
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void> *clone() const override
+	AbstractDelegate<void>* clone() const override
 	{
 		return new Delegate(*this);
 	}
@@ -293,73 +247,6 @@ public:
 	{
 		Mutex::ScopedLock lock(_mutex);
 		_receiverObject = nullptr;
-	}
-
-protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
-	Mutex        _mutex;
-};
-
-
-template <class TObj>
-class Delegate<TObj, void, false>: public AbstractDelegate<void>
-{
-public:
-	using NotifyMethod = void (TObj::*)();
-
-	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-
-	Delegate(const Delegate& delegate):
-		AbstractDelegate<void>(delegate),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
-	}
-
-	~Delegate() override = default;
-
-	Delegate() = delete;
-
-	Delegate& operator = (const Delegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-		}
-		return *this;
-	}
-
-	bool notify(const void *) override
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_receiverObject)
-		{
-			(_receiverObject->*_receiverMethod)();
-			return true;
-		}
-		else return false;
-	}
-
-	bool equals(const AbstractDelegate<void> &other) const override
-	{
-		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
-		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
-	}
-
-	AbstractDelegate<void> *clone() const override {
-		return new Delegate(*this);
-	}
-
-	void disable() override
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
 	}
 
 protected:

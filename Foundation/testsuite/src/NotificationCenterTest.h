@@ -32,12 +32,16 @@ public:
 	~NotificationCenterTest();
 
 	void testNotificationCenter1();
+#ifdef POCO_TEST_DEPRECATED
 	void testNotificationCenter2();
 	void testNotificationCenter3();
 	void testNotificationCenter4();
 	void testNotificationCenter5();
+#endif
 	void testNotificationCenterAuto();
+#ifdef POCO_TEST_DEPRECATED
 	void testDefaultNotificationCenter();
+#endif
 
 	void setUp();
 	void tearDown();
@@ -45,10 +49,12 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
+#ifdef POCO_TEST_DEPRECATED
 	void handle1(Poco::Notification* pNf);
 	void handle2(Poco::Notification* pNf);
 	void handle3(Poco::Notification* pNf);
 	void handleTest(TestNotification* pNf);
+#endif
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
 
 private:

@@ -91,26 +91,30 @@ public:
 	void addObserver(const AbstractObserver& observer);
 		/// Registers an observer with the NotificationCenter.
 		/// Usage:
-		///     Observer<MyClass, MyNotification> obs(*this, &MyClass::handleNotification);
+		///     NObserver<MyClass, MyNotification> obs(*this, &MyClass::handleNotification);
 		///     notificationCenter.addObserver(obs);
 		///
-		/// Alternatively, the NObserver template class can be used instead of Observer.
+		/// Note: Observer<C, N> is deprecated; use NObserver<C, N> instead.
 
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.
 
 	template <class C, class N>
 	void addObserver(C& object, void (C::*method)(N*))
+		/// @deprecated This convenience method uses the deprecated Observer class.
+		/// Use addNObserver() or construct an NObserver explicitly instead.
+		///
 		/// Convenience method for registering an Observer.
 		/// Creates an Observer<C, N> and registers it.
-		/// Usage:
-		///     notificationCenter.addObserver(*this, &MyClass::handleNotification);
 	{
 		addObserver(Observer<C, N>(object, method));
 	}
 
 	template <class C, class N>
 	void removeObserver(C& object, void (C::*method)(N*))
+		/// @deprecated This convenience method uses the deprecated Observer class.
+		/// Use removeNObserver() or construct an NObserver explicitly instead.
+		///
 		/// Convenience method for unregistering an Observer.
 		/// Removes the Observer<C, N> with the given callback.
 	{
