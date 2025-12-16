@@ -47,10 +47,12 @@
 #include <limits>
 
 
+// Throws RangeException with diagnostic info about the failed conversion.
+// Uses rangeExcCastStr() to safely show the cast value without undefined behavior.
 #define POCO_VAR_RANGE_EXCEPTION(str, from) \
 	throw RangeException(Poco::format("%v ((%s/%d) %s > (%s/%d) %s) @ %s.", \
 		std::string_view(#str), Poco::demangle<F>(), numValDigits(from), std::to_string(from), \
-		Poco::demangle<T>(), numTypeDigits<T>(), std::to_string(static_cast<T>(from)), \
+		Poco::demangle<T>(), numTypeDigits<T>(), rangeExcCastStr<F, T>(from), \
 		poco_src_loc))
 
 
@@ -136,7 +138,7 @@ public:
 	virtual ~VarHolder();
 		/// Destroys the VarHolder.
 
-	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
+	[[nodiscard]] virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
 		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
 		/// If small object optimization is enabled (i.e. if
@@ -144,7 +146,7 @@ public:
 		/// instantiated in-place if it's size is smaller
 		/// than POCO_SMALL_OBJECT_SIZE.
 
-	virtual const std::type_info& type() const = 0;
+	[[nodiscard]] virtual const std::type_info& type() const = 0;
 		/// Implementation must return the type information
 		/// (typeid) for the stored content.
 
@@ -240,66 +242,66 @@ public:
 	/// Throws BadCastException. Must be overridden in a type
 	/// specialization in order to support the conversion.
 
-	virtual bool isArray() const;
+	[[nodiscard]] virtual bool isArray() const;
 		/// Returns true.
 
-	virtual bool isVector() const;
+	[[nodiscard]] virtual bool isVector() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isList() const;
+	[[nodiscard]] virtual bool isList() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isDeque() const;
+	[[nodiscard]] virtual bool isDeque() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isStruct() const;
+	[[nodiscard]] virtual bool isStruct() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isOrdered() const;
+	[[nodiscard]] virtual bool isOrdered() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isInteger() const;
+	[[nodiscard]] virtual bool isInteger() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isSigned() const;
+	[[nodiscard]] virtual bool isSigned() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isNumeric() const;
+	[[nodiscard]] virtual bool isNumeric() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isBoolean() const;
+	[[nodiscard]] virtual bool isBoolean() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isString() const;
+	[[nodiscard]] virtual bool isString() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isDate() const;
+	[[nodiscard]] virtual bool isDate() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isTime() const;
+	[[nodiscard]] virtual bool isTime() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isDateTime() const;
+	[[nodiscard]] virtual bool isDateTime() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isUUID() const;
+	[[nodiscard]] virtual bool isUUID() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual std::size_t size() const;
+	[[nodiscard]] virtual std::size_t size() const;
 		/// Returns 1 iff Var is not empty or this function overridden.
 
 protected:
@@ -322,163 +324,131 @@ protected:
 		return pVarHolder->assign<VarHolderImpl<T>, T>(val);
 	}
 
-	template <typename F, typename T,
-		std::enable_if_t<(std::is_integral_v<F> && std::is_signed_v<F>) ||
-			std::is_floating_point_v<F>, F>* = nullptr,
-		std::enable_if_t<(std::is_integral_v<T> && std::is_signed_v<T>) ||
-			std::is_floating_point_v<F>, T>* = nullptr>
+	template <typename F, typename T>
 	static void convertToSmaller(const F& from, T& to)
-		/// Converts signed integral, as well as floating-point, values from
-		/// larger to smaller type. It checks the upper and lower bound and
-		/// if from value is within limits of type T (i.e. check calls do not throw),
-		/// it is converted.
+		/// Converts signed integral or floating-point values from larger to smaller type.
+		/// Checks bounds and precision loss where applicable.
 	{
-		if constexpr((std::is_integral_v<F>) && (std::is_floating_point_v<T>))
+		if constexpr (std::is_same_v<F, bool>)
 		{
-			if (isPrecisionLost<F, T>(from))
-				POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
+			// Boolean to floating-point: direct cast
+			to = static_cast<T>(from);
 		}
-		checkUpperLimit<F,T>(from);
-		checkLowerLimit<F,T>(from);
-		to = static_cast<T>(from);
+		else if constexpr (std::is_integral_v<F> && std::is_floating_point_v<T>)
+		{
+			// Integral to floating-point: check precision loss
+			if (isPrecisionLost<F, T>(from))
+				POCO_VAR_RANGE_EXCEPTION("Lost precision", from);
+			to = static_cast<T>(from);
+		}
+		else
+		{
+			// Signed integral/floating-point to smaller type: check bounds
+			checkUpperLimit<F, T>(from);
+			checkLowerLimit<F, T>(from);
+			to = static_cast<T>(from);
+		}
 	}
 
-	template <typename F, typename T,
-		std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<T>, F>* = nullptr,
-		std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
-	static void convertToSmaller(const F& from, T& to)
-		/// Converts signed integral values from integral to floating-point type. Checks for
-		/// the loss of precision and if from value is within limits of type T (i.e. check calls do not throw),
-		/// it is converted.
-	{
-		if (isPrecisionLost<F, T>(from))
-			POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
-		to = static_cast<T>(from);
-	}
-
-	template <typename F, typename T,
-		std::enable_if_t<std::is_same_v<F, bool>>* = nullptr,
-		std::enable_if_t<std::is_floating_point_v<T>, T>* = nullptr>
-	static void convertToSmaller(const F& from, T& to)
-		/// Converts boolean values to floating-point type.
-	{
-		to = static_cast<T>(from);
-	}
-
-	template <typename F, typename T,
-		std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
-		std::enable_if_t<(std::is_integral_v<T> && !std::is_signed_v<T>) || std::is_floating_point_v<T>, T>* = nullptr>
+	template <typename F, typename T>
 	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// Converts unsigned integral data types from larger to smaller, as well as to floating-point, types.
-		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked, thus
-		/// saving some cycles compared to the signed version of the function. If the
-		/// value to be converted is smaller than the maximum value for the target type,
-		/// the conversion is performed.
+		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked.
 	{
-		checkUpperLimit<F,T>(from);
+		checkUpperLimit<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T,
-		std::enable_if_t<std::is_integral_v<F> && std::is_signed_v<F>, F>* = nullptr,
-		std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
+	template <typename F, typename T>
 	static void convertSignedToUnsigned(const F& from, T& to)
 		/// Converts signed integral data types to unsigned data types.
 		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
-		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		if (from < 0)
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
-		checkUpperLimit<std::make_unsigned_t<F>,T>(from);
+			POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+		checkUpperLimit<std::make_unsigned_t<F>, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true,
-		std::enable_if_t<std::is_integral_v<T> && !std::is_signed_v<T>, T>* = nullptr>
+	template <typename F, typename T>
 	static void convertSignedFloatToUnsigned(const F& from, T& to)
-		/// Converts floating point data types to unsigned integral data types. Negative values
-		/// can not be converted and if one is encountered, RangeException is thrown.
-		/// If upper limit is within the target data type limits, the conversion is performed.
+		/// Converts floating point data types to unsigned integral data types.
+		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
 	{
 		if (from < 0)
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
-		checkUpperLimit<F,T>(from);
+			POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+		checkUpperLimit<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T,
-		std::enable_if_t<std::is_integral_v<F> && !std::is_signed_v<F>, F>* = nullptr,
-		std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>* = nullptr>
+	template <typename F, typename T>
 	static void convertUnsignedToSigned(const F& from, T& to)
 		/// Converts unsigned integral data types to signed integral data types.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
-		checkUpperLimit<F,T>(from);
+		checkUpperLimit<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_signed_v<F> && std::is_signed_v<T> && (sizeof(F) <= sizeof(T))>* = nullptr>
+	template <typename F, typename T>
 	void convertToSigned(const F& from, T& to) const
+		/// Converts value to signed integer type T.
 	{
-		to = static_cast<T>(from);
+		if constexpr (!std::is_signed_v<F>)
+			convertUnsignedToSigned(from, to);
+		else if constexpr (sizeof(F) <= sizeof(T))
+			to = static_cast<T>(from);
+		else
+			convertToSmaller(from, to);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_signed_v<F> && std::is_signed_v<T> && (sizeof(F) > sizeof(T))>* = nullptr>
-	void convertToSigned(const F& from, T& to) const
-	{
-		convertToSmaller(from, to);
-	}
-
-	template <typename F, typename T, std::enable_if_t<!std::is_signed_v<F> && std::is_signed_v<T>>* = nullptr>
-	void convertToSigned(const F& from, T& to) const
-	{
-		convertUnsignedToSigned(from, to);
-	}
-
-	template <typename F, typename T, std::enable_if_t<!std::is_signed_v<F> && !std::is_signed_v<T> && (sizeof(F) <= sizeof(T))>* = nullptr>
+	template <typename F, typename T>
 	void convertToUnsigned(const F& from, T& to) const
+		/// Converts value to unsigned integer type T.
 	{
-		to = static_cast<T>(from);
+		if constexpr (std::is_signed_v<F>)
+			convertSignedToUnsigned(from, to);
+		else if constexpr (sizeof(F) <= sizeof(T))
+			to = static_cast<T>(from);
+		else
+			convertToSmallerUnsigned(from, to);
 	}
 
-	template <typename F, typename T, std::enable_if_t<!std::is_signed_v<F> && !std::is_signed_v<T> && (sizeof(F) > sizeof(T))>* = nullptr>
-	void convertToUnsigned(const F& from, T& to) const
-	{
-		convertToSmallerUnsigned(from, to);
-	}
-
-	template <typename F, typename T, std::enable_if_t<std::is_signed_v<F> && !std::is_signed_v<T>>* = nullptr>
-	void convertToUnsigned(const F& from, T& to) const
-	{
-		convertSignedToUnsigned(from, to);
-	}
-
-	template <typename F, typename T,
-		std::enable_if_t<std::is_integral_v<F>, bool> = true,
-		std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	static void convertToFP(F& from, T& to)
-		/// Converts unsigned integral data types to floating-point data types.
-		/// If the number of significant digits used for the integer vaue exceeds the number
-		/// of available digits in the floatinng-point destination (ie. if precision would be lost
+	template <typename F, typename T>
+	static void convertToFP(const F& from, T& to)
+		/// Converts integral data types to floating-point data types.
+		/// If the number of significant digits used for the integer value exceeds the number
+		/// of available digits in the floating-point destination (i.e. if precision would be lost
 		/// by casting the value), RangeException is thrown.
 	{
+		static_assert(std::is_integral_v<F> && std::is_floating_point_v<T>,
+			"convertToFP requires integral source and floating-point target");
 		if (isPrecisionLost<F, T>(from))
-			POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
+			POCO_VAR_RANGE_EXCEPTION("Lost precision", from);
 		to = static_cast<T>(from);
 	}
 
 private:
 
-	template <typename T>
-	static constexpr T unpreserveSign(const T& value)
+	template <typename F, typename T>
+	static std::string rangeExcCastStr(const F& from)
+		/// Returns a string representation of 'from' cast to the largest
+		/// integer type matching T's signedness. Used in range exception messages.
+		///
+		/// For integral F: safely casts to intmax_t/uintmax_t (always fits).
+		/// For floating-point F: returns "?" since the value might overflow
+		/// even 64-bit integers (e.g., 1e20 > UINT64_MAX).
 	{
-		if constexpr (std::is_signed_v<T>)
+		if constexpr (std::is_integral_v<F>)
 		{
-			return (value < 0) ? -value : value;
+			// Integral source always fits in std::intmax_t/std::uintmax_t
+			using LargestInt = std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>;
+			return std::to_string(static_cast<LargestInt>(from));
 		}
 		else
 		{
-			return value;
+			// Floating point might overflow even 64-bit integers
+			return "float ?"s;
 		}
 	}
 
@@ -490,19 +460,41 @@ private:
 
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	static constexpr int numValDigits(const T& value)
+		/// Returns the number of binary digits (bits) needed to represent
+		/// the magnitude of the given integer value.
+		///
+		/// For signed types, computes the absolute value using unsigned
+		/// arithmetic to avoid undefined behavior when value equals the
+		/// minimum signed value (e.g., INT_MIN). The conversion to unsigned
+		/// is well-defined, and unsigned subtraction wraps safely:
+		///   U(0) - static_cast<U>(INT_MIN) == |INT_MIN|
 	{
 		using U = std::make_unsigned_t<T>;
 		if (value == 0) return 0;
+
+		// Get magnitude using unsigned arithmetic (avoids UB for INT_MIN).
+		// For negative values: U(0) - static_cast<U>(v) computes |v| safely.
+		U magnitude = (value < 0) ? U(0) - static_cast<U>(value) : static_cast<U>(value);
+
+		// Count bits by right-shifting until zero.
+		// Example: magnitude=5 (binary 101) -> shifts: 10, 1, 0 -> count=2
+		// The result is floor(log2(magnitude)), i.e., position of highest set bit.
 		int digitCount = 0;
-		U locVal = static_cast<U>(unpreserveSign(value)); // to prevent sign preservation
-		while (locVal >>= 1) ++digitCount;
+		while (magnitude >>= 1) ++digitCount;
 		return digitCount;
 	}
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	static constexpr int numValDigits(T value)
+	static int numValDigits(T value)
+		/// Returns approximate number of binary digits for a floating point value.
+		/// Uses ilogb() to get the exponent, which represents the bit position
+		/// of the most significant bit. This avoids undefined behavior when
+		/// the value exceeds the range of any integer type.
 	{
-		return numValDigits<int64_t>(static_cast<int64_t>(value));
+		if (value == 0) return 0;
+		// ilogb returns the exponent of the floating point value,
+		// which corresponds to the position of the highest bit.
+		return std::ilogb(std::fabs(value));
 	}
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
@@ -526,37 +518,30 @@ private:
 		return numValDigits(from) > numTypeDigits<T>();
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
+	template <typename F, typename T>
 	static void checkUpperLimit(const F& from)
+		/// Checks if 'from' exceeds the maximum value representable by type T.
 	{
 		if (from > static_cast<F>(std::numeric_limits<T>::max()))
-			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
+			POCO_VAR_RANGE_EXCEPTION("Value too big", from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral_v<F>, bool> = true>
+	template <typename F, typename T>
 	static void checkLowerLimit(const F& from)
+		/// Checks if 'from' is below the minimum value representable by type T.
+		/// For floating-point target types, uses -max() since min() returns
+		/// the smallest positive normalized value, not the most negative.
 	{
-		if (from < static_cast<F>(std::numeric_limits<T>::min()))
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
-	}
-
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
-	static void checkUpperLimit(const F& from)
-	{
-		if ((from > static_cast<F>(std::numeric_limits<T>::max())))
-			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
-	}
-
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point_v<F>, bool> = true>
-	static void checkLowerLimit(const F& from)
-	{
-		if constexpr(std::is_floating_point_v<T>)
+		if constexpr (std::is_floating_point_v<F> && std::is_floating_point_v<T>)
 		{
-			if (static_cast<F>(-std::numeric_limits<T>::max()) > from)
-				POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
+			if (from < static_cast<F>(-std::numeric_limits<T>::max()))
+				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
 		}
-		else if (from < static_cast<F>(std::numeric_limits<T>::min()))
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
+		else
+		{
+			if (from < static_cast<F>(std::numeric_limits<T>::min()))
+				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+		}
 	}
 };
 
