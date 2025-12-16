@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
      Original API code Copyright (c) 1997-2012 University of Cambridge
-          New API code Copyright (c) 2016-2020 University of Cambridge
+          New API code Copyright (c) 2016-2024 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -38,12 +38,14 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
+
 /* This module contains functions for serializing and deserializing
 a sequence of compiled codes. */
 
 
-#include "pcre2_config.h"
 #include "pcre2_internal.h"
+
+
 
 /* Magic number to provide a small check against being handed junk. */
 
@@ -123,7 +125,7 @@ dst_bytes += TABLES_LENGTH;
 for (i = 0; i < number_of_codes; i++)
   {
   re = (const pcre2_real_code *)(codes[i]);
-  (void)memcpy(dst_bytes, (char *)re, re->blocksize);
+  (void)memcpy(dst_bytes, (const char *)re, re->blocksize);
 
   /* Certain fields in the compiled code block are re-set during
   deserialization. In order to ensure that the serialized data stream is always

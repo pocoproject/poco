@@ -19,14 +19,6 @@ PCRE2 is configured with --enable-rebuild-chartables. However, you can run
 pcre2_dftables manually with the -L option to build tables using the LC_ALL
 locale. */
 
-/* The following #include is present because without it gcc 4.x may remove
-the array definition from the final binary if PCRE2 is built into a static
-library and dead code stripping is activated. This leads to link errors.
-Pulling in the header ensures that the array gets flagged as "someone
-outside this compilation unit might reference this" and so it will always
-be supplied to the linker. */
-
-#include "pcre2_config.h"
 #include "pcre2_internal.h"
 
 const uint8_t PRIV(default_tables)[] = {
