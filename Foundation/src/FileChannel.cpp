@@ -49,6 +49,7 @@ FileChannel::FileChannel():
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
 	_pPurgeStrategy(new NullPurgeStrategy())
 {
+	_pArchiveStrategy->setPurgeCallback([this]() { purge(); });
 }
 
 
@@ -63,6 +64,7 @@ FileChannel::FileChannel(const std::string& path):
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
 	_pPurgeStrategy(new NullPurgeStrategy())
 {
+	_pArchiveStrategy->setPurgeCallback([this]() { purge(); });
 }
 
 
@@ -94,7 +96,6 @@ void FileChannel::open()
 			try
 			{
 				_pFile = _pArchiveStrategy->archive(_pFile);
-				purge();
 			}
 			catch (...)
 			{
@@ -130,7 +131,6 @@ void FileChannel::log(const Message& msg)
 		try
 		{
 			_pFile = _pArchiveStrategy->archive(_pFile);
-			purge();
 		}
 		catch (...)
 		{
@@ -326,6 +326,7 @@ void FileChannel::setArchiveStrategy(ArchiveStrategy* strategy)
 
 	delete _pArchiveStrategy;
 	_pArchiveStrategy = strategy;
+	_pArchiveStrategy->setPurgeCallback([this]() { purge(); });
 }
 
 
@@ -348,6 +349,7 @@ void FileChannel::setArchive(const std::string& archive)
 	else throw InvalidArgumentException("archive", archive);
 	delete _pArchiveStrategy;
 	pStrategy->compress(_compress);
+	pStrategy->setPurgeCallback([this]() { purge(); });
 	_pArchiveStrategy = pStrategy;
 	_archive = archive;
 }

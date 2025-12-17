@@ -608,14 +608,13 @@ void FileChannelTest::testCompressedRotation()
 	for (const auto& f: files)
 		std::cout << "log file: " << f << std::endl;
 
-	assertEqual(5+1+1, files.size()); // 5+1 rotated files, current file
+	assertEqual(5+1, files.size()); // 5 archived files + current file
 	assertEqual("test.log", files[0]);
 	assertEqual("test.log.0.gz", files[1]);
 	assertEqual("test.log.1.gz", files[2]);
 	assertEqual("test.log.2.gz", files[3]);
 	assertEqual("test.log.3.gz", files[4]);
 	assertEqual("test.log.4.gz", files[5]);
-	assertEqual("test.log.5.gz", files[6]);
 
 	logsDir.remove(true);
 }
