@@ -196,13 +196,41 @@ void CoreTest::testEnvironment()
 	{
 	}
 
-	std::cout << "OS Name:         " << Environment::osName() << std::endl;
-	std::cout << "OS Display Name: " << Environment::osDisplayName() << std::endl;
-	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;
-	std::cout << "OS Architecture: " << Environment::osArchitecture() << std::endl;
-	std::cout << "Node Name:       " << Environment::nodeName() << std::endl;
-	std::cout << "Node ID:         " << Environment::nodeId() << std::endl;
-	std::cout << "Number of CPUs:  " << Environment::processorCount() << std::endl;
+	std::string osName = Environment::osName();
+	std::string osDisplayName = Environment::osDisplayName();
+	std::string osVersion = Environment::osVersion();
+	std::string osArch = Environment::osArchitecture();
+	std::string nodeName = Environment::nodeName();
+	std::string nodeId = Environment::nodeId();
+	unsigned int cpuCount = Environment::processorCount();
+
+	std::cout << "OS Name:         " << osName << std::endl;
+	std::cout << "OS Display Name: " << osDisplayName << std::endl;
+	std::cout << "OS Version:      " << osVersion << std::endl;
+	std::cout << "OS Architecture: " << osArch << std::endl;
+	std::cout << "Node Name:       " << nodeName << std::endl;
+	std::cout << "Node ID:         " << nodeId << std::endl;
+	std::cout << "Number of CPUs:  " << cpuCount << std::endl;
+
+	// Basic validation
+	assertTrue (!osName.empty());
+	assertTrue (!osDisplayName.empty());
+	assertTrue (!osVersion.empty());
+	assertTrue (!osArch.empty());
+	assertTrue (!nodeName.empty());
+	assertTrue (cpuCount > 0);
+
+#if defined(_WIN32)
+	// Windows-specific validation
+	// osName returns "Windows NT" for all modern Windows versions
+	assertTrue (osName == "Windows NT" || osName == "Unknown");
+	// osDisplayName returns specific version like "Windows 10", "Windows 11", etc.
+	assertTrue (osDisplayName.find("Windows") != std::string::npos || osDisplayName == "Unknown");
+#elif defined(__linux__)
+	assertTrue (osName == "Linux");
+#elif defined(__APPLE__)
+	assertTrue (osName == "Darwin");
+#endif
 }
 
 
