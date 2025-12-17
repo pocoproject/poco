@@ -383,17 +383,25 @@ public:
 		/// Returns in range the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
 
-	const Ptr createView(const std::string& prefix) const;
+	[[nodiscard]] const Ptr createView(const std::string& prefix) const;
 		/// Creates a non-mutable view (see ConfigurationView) into the configuration.
+		/// The returned Ptr must be assigned to an AbstractConfiguration::Ptr,
+		/// not a raw pointer, to prevent use-after-free.
 
-	Ptr createView(const std::string& prefix);
+	[[nodiscard]] Ptr createView(const std::string& prefix);
 		/// Creates a view (see ConfigurationView) into the configuration.
+		/// The returned Ptr must be assigned to an AbstractConfiguration::Ptr,
+		/// not a raw pointer, to prevent use-after-free.
 
-	const Ptr createLocalView(const std::string& prefix) const;
+	[[nodiscard]] const Ptr createLocalView(const std::string& prefix) const;
 		/// Creates a non-mutable view (see LocalConfigurationView) into the configuration.
+		/// The returned Ptr must be assigned to an AbstractConfiguration::Ptr,
+		/// not a raw pointer, to prevent use-after-free.
 
-	Ptr createLocalView(const std::string& prefix);
+	[[nodiscard]] Ptr createLocalView(const std::string& prefix);
 		/// Creates a view (see LocalConfigurationView) into the configuration.
+		/// The returned Ptr must be assigned to an AbstractConfiguration::Ptr,
+		/// not a raw pointer, to prevent use-after-free.
 	
 	std::string expand(const std::string& value) const;
 		/// Replaces all occurrences of ${<property>} in value with the
