@@ -65,8 +65,6 @@ public:
 	EVPPKey(const PKCS12Container& cert);
 		/// Constructs EVPPKey from the given container.
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-
 	EVPPKey(int type, int param);
 		/// Creates the EVPPKey.
 		/// Creates a new public/private keypair using the given parameters.
@@ -79,10 +77,6 @@ public:
 		/// Parameters:
 		///   - for EVP_PKEY_RSA: key length in bits
 		///   - for EVP_PKEY_EC: curve NID
-		///
-		/// This constructor is not available for OpenSSL version < 1.0.0
-
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	explicit EVPPKey(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey, unsigned long exponent, int type);

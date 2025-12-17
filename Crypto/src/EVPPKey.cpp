@@ -172,7 +172,6 @@ EVPPKey::EVPPKey(const std::vector<unsigned char>* public_key, const std::vector
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 {
@@ -231,8 +230,6 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 	EVP_PKEY_CTX_free(pCtx);
 	checkType();
 }
-
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 
 EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey) : _pEVPPKey(nullptr)

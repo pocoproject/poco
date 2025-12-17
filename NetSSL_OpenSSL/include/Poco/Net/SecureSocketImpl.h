@@ -23,6 +23,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Net/Session.h"
+#include "Poco/Mutex.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 

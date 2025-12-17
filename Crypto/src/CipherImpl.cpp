@@ -77,11 +77,7 @@ namespace
 
 	private:
 		const EVP_CIPHER* _pCipher;
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		EVP_CIPHER_CTX*   _pContext;
-#else
-		EVP_CIPHER_CTX    _context;
-#endif
 		ByteVec           _key;
 		ByteVec           _iv;
 	};
@@ -96,7 +92,6 @@ namespace
 		_key(key),
 		_iv(iv)
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		_pContext = EVP_CIPHER_CTX_new();
 		if (!_pContext) throwError();
 		int rc = EVP_CipherInit(
@@ -105,87 +100,49 @@ namespace
 			&_key[0],
 			_iv.empty() ? nullptr : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
-#else
-		int rc = EVP_CipherInit(
-			&_context,
-			_pCipher,
-			&_key[0],
-			_iv.empty() ? 0 : &_iv[0],
-			(dir == DIR_ENCRYPT) ? 1 : 0);
-#endif
 		if (rc == 0) throwError();
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		if (static_cast<int>(_iv.size()) != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
 		{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
-#else
-			int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
-#endif
+			rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
 			if (rc == 0) throwError();
 		}
-#endif
 	}
 
 
 	CryptoTransformImpl::~CryptoTransformImpl()
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		EVP_CIPHER_CTX_reset(_pContext);
 		EVP_CIPHER_CTX_free(_pContext);
-#else
-		EVP_CIPHER_CTX_cleanup(&_context);
-#endif
 	}
 
 
 	std::size_t CryptoTransformImpl::blockSize() const
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		return EVP_CIPHER_CTX_block_size(_pContext);
-#else
-		return EVP_CIPHER_CTX_block_size(&_context);
-#endif
 	}
 
 
 	int CryptoTransformImpl::setPadding(int padding)
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		return EVP_CIPHER_CTX_set_padding(_pContext, padding);
-#else
-		return EVP_CIPHER_CTX_set_padding(&_context, padding);
-#endif
 	}
 
 
 	std::string CryptoTransformImpl::getTag(std::size_t tagSize)
 	{
 		std::string tag;
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		Poco::Buffer<char> buffer(tagSize);
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_GET_TAG, static_cast<int>(tagSize), buffer.begin());
-#else
-		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_GET_TAG, static_cast<int>(tagSize), buffer.begin());
-#endif
 		if (rc == 0) throwError();
 		tag.assign(buffer.begin(), tagSize);
-#endif
 		return tag;
 	}
 
 
 	void CryptoTransformImpl::setTag(const std::string& tag)
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_TAG, static_cast<int>(tag.size()), const_cast<char*>(tag.data()));
-#elif OPENSSL_VERSION_NUMBER >= 0x10001000L
-		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_TAG, static_cast<int>(tag.size()), const_cast<char*>(tag.data()));
-#else
-		int rc = 0;
-#endif
 		if (rc == 0) throwError();
 	}
 
@@ -199,21 +156,12 @@ namespace
 		poco_assert (outputLength >= (inputLength + static_cast<std::streamsize>(blockSize()) - 1));
 
 		int outLen = static_cast<int>(outputLength);
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		int rc = EVP_CipherUpdate(
 			_pContext,
 			output,
 			&outLen,
 			input,
 			static_cast<int>(inputLength));
-#else
-		int rc = EVP_CipherUpdate(
-			&_context,
-			output,
-			&outLen,
-			input,
-			static_cast<int>(inputLength));
-#endif
 		if (rc == 0)
 			throwError();
 
@@ -230,13 +178,9 @@ namespace
 		int len = static_cast<int>(length);
 
 		// Use the '_ex' version that does not perform implicit cleanup since we
-		// will call EVP_CIPHER_CTX_cleanup() from the dtor as there is no
+		// will call EVP_CIPHER_CTX_reset() from the dtor as there is no
 		// guarantee that finalize() will be called if an error occurred.
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		int rc = EVP_CipherFinal_ex(_pContext, output, &len);
-#else
-		int rc = EVP_CipherFinal_ex(&_context, output, &len);
-#endif
 
 		if (rc == 0)
 			throwError();
