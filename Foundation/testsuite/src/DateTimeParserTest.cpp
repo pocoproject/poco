@@ -626,6 +626,15 @@ void DateTimeParserTest::testCustom()
 
 	// check that an invalid millisecond is detected with a custom format
 	testBad("T%H:%M:%s %z", "T12:30:00.Z", tzd);
+
+	// Issue #5030: trailing garbage should be rejected
+	dt = DateTimeParser::parse("%H:%M", "13:13", tzd);
+	assertTrue (dt.hour() == 13);
+	assertTrue (dt.minute() == 13);
+
+	testBad("%H:%M", "xxx", tzd);
+	testBad("%H:%M", "12345", tzd);  // trailing '5' is garbage
+	testBad("????", "12345", tzd);   // invalid format
 }
 
 

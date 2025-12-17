@@ -285,8 +285,33 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 				++itf;
 			}
 		}
-		else ++itf;
+		else
+		{
+			// Match literal characters from format against input
+			if (Ascii::isSpace(*itf))
+			{
+				// Whitespace in format: skip whitespace in both
+				while (itf != endf && Ascii::isSpace(*itf)) ++itf;
+				while (it != end && Ascii::isSpace(*it)) ++it;
+			}
+			else if (it != end && *it == *itf)
+			{
+				// Non-whitespace literal matches - advance both
+				++it;
+				++itf;
+			}
+			else
+			{
+				// Literal doesn't match - just skip format char (lenient mode for backwards compatibility)
+				++itf;
+			}
+		}
 	}
+	// Skip trailing whitespace
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	// Check for unconsumed input
+	if (it != end)
+		throw SyntaxException("Invalid DateTimeString: " + dtStr + ", unexpected trailing characters");
 	if (!monthParsed) month = 1;
 	if (!dayParsed) day = 1;
 	if (DateTime::isValid(year, month, day, hour, minute, second, millis, micros))
