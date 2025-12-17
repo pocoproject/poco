@@ -209,13 +209,9 @@ void Context::init(const Params& params)
 
 		if (!isForServerUse() && params.ocspStaplingVerification)
 		{
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 			_ocspStaplingResponseVerification = true;
 			SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponseCallback);
 			SSL_CTX_set_tlsext_status_arg(_pSSLContext, this);
-#else
-			throw SSLContextException("OCSP Stapling is not supported by this OpenSSL version");
-#endif
 		}
 
 		initDH(params.dhGroup, params.dhParamsFile);
@@ -231,9 +227,7 @@ void Context::init(const Params& params)
 
 void Context::setSecurityLevel(SecurityLevel level)
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 	SSL_CTX_set_security_level(_pSSLContext, static_cast<int>(level));
-#endif
 }
 
 void Context::ignoreUnexpectedEof(bool flag)
@@ -459,7 +453,6 @@ void Context::disableProtocols(int protocols)
 
 void Context::requireMinimumProtocol(Protocols protocol)
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 	int version = 0;
 	switch (protocol)
 	{
@@ -486,43 +479,6 @@ void Context::requireMinimumProtocol(Protocols protocol)
 		unsigned long err = ERR_get_error();
 		throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, nullptr));
 	}
-
-#else
-
-	switch (protocol)
-	{
-	case PROTO_SSLV2:
-		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
-
-	case PROTO_SSLV3:
-		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
-		break;
-
-	case PROTO_TLSV1:
-		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3);
-		break;
-
-	case PROTO_TLSV1_1:
-#if defined(SSL_OP_NO_TLSv1_1) && !defined(OPENSSL_NO_TLS1)
-		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1);
-#else
-		throw Poco::InvalidArgumentException("TLSv1.1 is not supported by the available OpenSSL library");
-#endif
-		break;
-
-	case PROTO_TLSV1_2:
-#if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
-		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1);
-#else
-		throw Poco::InvalidArgumentException("TLSv1.2 is not supported by the available OpenSSL library");
-#endif
-		break;
-
-	case PROTO_TLSV1_3:
-		throw Poco::InvalidArgumentException("TLSv1.3 is not supported by the available OpenSSL library");
-		break;
-	}
-#endif
 }
 
 
@@ -546,11 +502,7 @@ void Context::createSSLContext()
 
 	if (SSLManager::isFIPSEnabled())
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		_pSSLContext = SSL_CTX_new(TLS_method());
-#else
-		_pSSLContext = SSL_CTX_new(TLSv1_method());
-#endif
 	}
 	else
 	{
@@ -558,99 +510,55 @@ void Context::createSSLContext()
 		{
 		case CLIENT_USE:
 		case TLS_CLIENT_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
 			minTLSVersion = TLS1_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(SSLv23_client_method());
-#endif
 			break;
 
 		case SERVER_USE:
 		case TLS_SERVER_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_server_method());
 			minTLSVersion = TLS1_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(SSLv23_server_method());
-#endif
 			break;
 
 		case TLSV1_CLIENT_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
 			minTLSVersion = TLS1_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(TLSv1_client_method());
-#endif
 			break;
 
 		case TLSV1_SERVER_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_server_method());
 			minTLSVersion = TLS1_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
-#endif
 			break;
 
-#if defined(SSL_OP_NO_TLSv1_1) && !defined(OPENSSL_NO_TLS1)
-/* SSL_OP_NO_TLSv1_1 is defined in ssl.h if the library version supports TLSv1.1.
- * OPENSSL_NO_TLS1 is defined in opensslconf.h or on the compiler command line
- * if TLS1.x was removed at OpenSSL library build time via Configure options.
- */
+#if !defined(OPENSSL_NO_TLS1)
 		case TLSV1_1_CLIENT_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
 			minTLSVersion = TLS1_1_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
-#endif
 			break;
 
 		case TLSV1_1_SERVER_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_server_method());
 			minTLSVersion = TLS1_1_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
-#endif
 			break;
-#endif
 
-#if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_2_CLIENT_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
 			minTLSVersion = TLS1_2_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
-#endif
 			break;
 
 		case TLSV1_2_SERVER_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_server_method());
 			minTLSVersion = TLS1_2_VERSION;
-#else
-			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
-#endif
 			break;
-#endif
 
-#if defined(SSL_OP_NO_TLSv1_3) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_3_CLIENT_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
 			minTLSVersion = TLS1_3_VERSION;
-#endif
 			break;
 
 		case TLSV1_3_SERVER_USE:
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 			_pSSLContext = SSL_CTX_new(TLS_server_method());
 			minTLSVersion = TLS1_3_VERSION;
-#endif
 			break;
 #endif
 
@@ -664,7 +572,6 @@ void Context::createSSLContext()
 		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, nullptr));
 	}
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 	if (minTLSVersion)
 	{
 		if (!SSL_CTX_set_min_proto_version(_pSSLContext, minTLSVersion))
@@ -675,7 +582,6 @@ void Context::createSSLContext()
 			throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, nullptr));
 		}
 	}
-#endif
 
 	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
 	Utility::clearErrorStack();
@@ -1005,47 +911,12 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
-#if OPENSSL_VERSION_NUMBER >= 0x1000200fL
-	const std::string groups(curve.empty() ?
- #if   OPENSSL_VERSION_NUMBER >= 0x1010100fL
-				   "X448:X25519:P-521:P-384:P-256"
- #elif OPENSSL_VERSION_NUMBER >= 0x1010000fL
-	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
-	// it did support X25519 (ECDH using Curve25516).
-				   "X25519:P-521:P-384:P-256"
- #else
-				   "P-521:P-384:P-256"
- #endif
-				   : curve);
+	const std::string groups(curve.empty() ? "X448:X25519:P-521:P-384:P-256" : curve);
 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
 	{
 		throw SSLContextException("Cannot set ECDH groups", groups);
 	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
- #else
-	int nid = 0;
-	if (!curve.empty())
-	{
-		nid = OBJ_sn2nid(curve.c_str());
-	}
-	else
-	{
-		nid = OBJ_sn2nid("prime256v1");
-	}
-	if (nid == 0)
-	{
-		throw SSLContextException("Unknown ECDH curve name", curve);
-	}
-
-	EC_KEY* ecdh = EC_KEY_new_by_curve_name(nid);
-	if (!ecdh)
-	{
-		throw SSLContextException("Cannot create ECDH curve");
-	}
-	SSL_CTX_set_tmp_ecdh(_pSSLContext, ecdh);
-	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
-	EC_KEY_free(ecdh);
-#endif
 #endif
 }
 

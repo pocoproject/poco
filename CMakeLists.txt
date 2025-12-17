@@ -110,7 +110,7 @@ if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
 endif()
 
 if (NOT POCO_MINIMAL_BUILD)
-	find_package(OpenSSL)
+	find_package(OpenSSL 1.1.1)
 	find_package(MySQL)
 	find_package(PostgreSQL)
 	find_package(ODBC)
@@ -410,7 +410,7 @@ if(ENABLE_APACHECONNECTOR)
 endif()
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
-	find_package(OpenSSL REQUIRED)
+	find_package(OpenSSL 1.1.1 REQUIRED)
 endif()
 
 if(ENABLE_DATA_MYSQL)
