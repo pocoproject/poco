@@ -24,8 +24,18 @@ else()
 	# Sources
 	file(GLOB SRCS_G "src/*.c")
 
+	# Exclude JIT files (not included in object files)
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2_jit_compile.c")
 	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2_jit_match.c")
 	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2_jit_misc.c")
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2_jit_test.c")
+	# Exclude test/tool files
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2test.c")
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2posix_test.c")
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2grep.c")
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2demo.c")
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2_dftables.c")
+	list(FILTER SRCS_G EXCLUDE REGEX ".*pcre2_fuzzsupport.c")
 
 	POCO_SOURCES(SRCS pcre2 ${SRCS_G})
 
@@ -38,7 +48,7 @@ else()
 
 	set_property(TARGET _BUNDLED_PCRE2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-	target_compile_definitions(_BUNDLED_PCRE2 PUBLIC PCRE2_STATIC)
+	target_compile_definitions(_BUNDLED_PCRE2 PUBLIC PCRE2_STATIC HAVE_CONFIG_H)
 
 	target_include_directories(_BUNDLED_PCRE2
 		PUBLIC
