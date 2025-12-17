@@ -51,8 +51,24 @@ public:
 		CM_DEFLATE = 8,
 		CM_ENHANCEDDEFLATE = 9,
 		CM_DATECOMPRIMPLODING = 10,
-		CM_UNUSED = 11,
-		CM_AUTO = 255 /// automatically select DM_DEFLATE or CM_STORE based on file type (extension)
+		CM_RESERVED11 = 11,
+		CM_BZIP2 = 12,
+		CM_RESERVED13 = 13,
+		CM_LZMA = 14,
+		CM_RESERVED15 = 15,
+		CM_IBM_CMPSC = 16,
+		CM_RESERVED17 = 17,
+		CM_IBM_TERSE = 18,
+		CM_IBM_LZ77 = 19,
+		CM_ZSTD_DEPRECATED = 20,
+		CM_ZSTD = 93,
+		CM_MP3 = 94,
+		CM_XZ = 95,
+		CM_JPEG = 96,
+		CM_WAVPACK = 97,
+		CM_PPMD = 98,
+		CM_AES = 99,
+		CM_AUTO = 255 /// automatically select CM_DEFLATE or CM_STORE based on file type (extension)
 	};
 
 	enum CompressionLevel
