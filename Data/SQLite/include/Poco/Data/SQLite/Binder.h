@@ -35,6 +35,8 @@ class SQLite_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	using AbstractBinder::bind;
+
 	Binder(sqlite3_stmt* pStmt);
 		/// Creates the Binder.
 
