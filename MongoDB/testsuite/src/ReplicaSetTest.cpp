@@ -1314,7 +1314,7 @@ void ReplicaSetTest::testReadPreferenceWithTags()
 	auto selected = pref.selectServers(topology);
 
 	// At least the tagged server should be selected
-	bool foundTaggedServer = false;
+	[[maybe_unused]] bool foundTaggedServer = false;
 	for (const auto& server : selected)
 	{
 		if (server.address().toString() == "localhost:27018"s)

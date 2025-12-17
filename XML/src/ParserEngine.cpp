@@ -27,6 +27,7 @@
 #include "Poco/SAX/LocatorImpl.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/URI.h"
+#include <algorithm>
 #include <cstring>
 
 
@@ -262,7 +263,7 @@ void ParserEngine::parse(const char* pBuffer, std::size_t size)
 	std::size_t processed = 0;
 	while (processed < size)
 	{
-		const int bufferSize = processed + PARSE_BUFFER_SIZE < size ? PARSE_BUFFER_SIZE : static_cast<int>(size - processed);
+		const int bufferSize = static_cast<int>(std::min(static_cast<std::size_t>(PARSE_BUFFER_SIZE), size - processed));
 		if (!XML_Parse(_parser, pBuffer + processed, bufferSize, 0))
 			handleError(XML_GetErrorCode(_parser));
 		processed += bufferSize;

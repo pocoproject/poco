@@ -68,7 +68,7 @@ void HTTPChunkedStreamBuf::close()
 }
 
 
-int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	static const int eof = std::char_traits<char>::eof();
 
@@ -94,7 +94,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (_chunk > 0)
 	{
 		if (length > _chunk) length = _chunk;
-		int n = _session.read(buffer, length);
+		std::streamsize n = _session.read(buffer, length);
 		if (n > 0) _chunk -= n;
 		return n;
 	}
@@ -126,7 +126,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	_chunkBuffer.clear();
 	NumberFormatter::appendHex(_chunkBuffer, length);
@@ -134,7 +134,7 @@ int HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize leng
 	_chunkBuffer.append(buffer, static_cast<std::string::size_type>(length));
 	_chunkBuffer.append("\r\n", 2);
 	_session.write(_chunkBuffer.data(), static_cast<std::streamsize>(_chunkBuffer.size()));
-	return static_cast<int>(length);
+	return length;
 }
 
 

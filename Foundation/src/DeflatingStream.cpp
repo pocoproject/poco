@@ -180,7 +180,7 @@ int DeflatingStreamBuf::sync()
 }
 
 
-int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_pIstr) return 0;
 	if (_pZstr->avail_in == 0 && !_eof)
@@ -211,12 +211,12 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (_eof && rc == Z_STREAM_END)
 		{
 			_pIstr = nullptr;
-			return static_cast<int>(length) - _pZstr->avail_out;
+			return length - _pZstr->avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc));
 		if (_pZstr->avail_out == 0)
 		{
-			return static_cast<int>(length);
+			return length;
 		}
 		if (_pZstr->avail_in == 0)
 		{
@@ -242,7 +242,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (length == 0 || !_pOstr) return 0;
 
@@ -270,7 +270,7 @@ int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 			break;
 		}
 	}
-	return static_cast<int>(length);
+	return length;
 }
 
 

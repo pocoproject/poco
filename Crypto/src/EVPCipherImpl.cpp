@@ -150,8 +150,8 @@ namespace
 
 		std::streamsize finalize(unsigned char*	output, std::streamsize length)
 		{
-			poco_assert (length >= blockSize());
-			poco_assert (_pos <= maxDataSize(output, length));
+			poco_assert (length >= static_cast<std::streamsize>(blockSize()));
+			poco_assert (static_cast<std::size_t>(_pos) <= maxDataSize(output, length));
 			std::string fmt = "EVPEncryptImpl::finalize():%s()";
 			std::size_t outLen = 0;
 			if (_pos > 0)
@@ -265,7 +265,7 @@ namespace
 			std::size_t outLen = 0;
 			if (EVP_PKEY_decrypt(_pCtx, nullptr, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)
 					throwError(Poco::format(fmt, std::string("EVP_PKEY_decrypt(NULL)")));
-			poco_assert (length >= outLen);
+			poco_assert (static_cast<std::size_t>(length) >= outLen);
 			if (_pos > 0)
 			{
 				if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<std::size_t>(_pos)) <= 0)

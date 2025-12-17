@@ -189,7 +189,7 @@ void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 				ZipDataInfo64 nfo(in, true);
 				if (nfo.isValid())
 				{
-					if (end - start == nfo.getCompressedSize() + 4)
+					if (static_cast<Poco::UInt64>(end - start) == nfo.getCompressedSize() + 4)
 					{
 						in.seekg(-static_cast<int>(ZipDataInfo64::getFullHeaderSize()), std::ios::cur);
 						if (!in.good()) throw Poco::IOException("Failed to seek on input stream");

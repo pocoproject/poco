@@ -38,14 +38,14 @@ HTTPHeaderStreamBuf::~HTTPHeaderStreamBuf()
 }
 
 
-int HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	// read line-by-line; an empty line denotes the end of the headers.
 	static const int eof = std::char_traits<char>::eof();
 
 	if (_end) return 0;
 
-	int n = 0;
+	std::streamsize n = 0;
 	int ch = _session.get();
 	while (ch != eof && ch != '\n' && n < length - 1)
 	{
@@ -61,7 +61,7 @@ int HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int HTTPHeaderStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize HTTPHeaderStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	return _session.write(buffer, length);
 }

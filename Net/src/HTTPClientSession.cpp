@@ -304,7 +304,6 @@ std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 	clearException();
 	_responseReceived = false;
 	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
-	const std::string& method = request.getMethod();
 	if (request.getChunkedTransferEncoding())
 	{
 		HTTPHeaderOutputStream hos(*this);

@@ -40,7 +40,7 @@ public:
 	bool lastPart() const;
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 
 private:
 	enum

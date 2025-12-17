@@ -37,8 +37,8 @@ public:
 	DigestBuf(DigestEngine& eng, std::istream& istr);
 	DigestBuf(DigestEngine& eng, std::ostream& ostr);
 	~DigestBuf() override;
-	int readFromDevice(char *buffer, std::streamsize length) override;
-	int writeToDevice(const char *buffer, std::streamsize length) override;
+	std::streamsize readFromDevice(char *buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char *buffer, std::streamsize length) override;
 	void close();
 
 private:

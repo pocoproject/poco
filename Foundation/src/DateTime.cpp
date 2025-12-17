@@ -35,12 +35,14 @@ DateTime::DateTime()
 
 
 DateTime::DateTime(const tm& tmStruct):
-	_year(tmStruct.tm_year + 1900),
-	_month(tmStruct.tm_mon + 1),
-	_day(tmStruct.tm_mday),
-	_hour(tmStruct.tm_hour),
-	_minute(tmStruct.tm_min),
-	_second(tmStruct.tm_sec),
+	// Note: Member variables are short to minimize memory footprint.
+	// All valid DateTime values fit within short range; inputs are validated by checkValid().
+	_year(static_cast<short>(tmStruct.tm_year + 1900)),
+	_month(static_cast<short>(tmStruct.tm_mon + 1)),
+	_day(static_cast<short>(tmStruct.tm_mday)),
+	_hour(static_cast<short>(tmStruct.tm_hour)),
+	_minute(static_cast<short>(tmStruct.tm_min)),
+	_second(static_cast<short>(tmStruct.tm_sec)),
 	_millisecond(0),
 	_microsecond(0)
 {
@@ -60,14 +62,14 @@ DateTime::DateTime(const Timestamp& timestamp):
 
 
 DateTime::DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond):
-	_year(year),
-	_month(month),
-	_day(day),
-	_hour(hour),
-	_minute(minute),
-	_second(second),
-	_millisecond(millisecond),
-	_microsecond(microsecond)
+	_year(static_cast<short>(year)),
+	_month(static_cast<short>(month)),
+	_day(static_cast<short>(day)),
+	_hour(static_cast<short>(hour)),
+	_minute(static_cast<short>(minute)),
+	_second(static_cast<short>(second)),
+	_millisecond(static_cast<short>(millisecond)),
+	_microsecond(static_cast<short>(microsecond))
 {
 	checkValid();
 	_utcTime = toUtcTime(toJulianDay(year, month, day)) +
@@ -152,14 +154,14 @@ DateTime& DateTime::operator = (double julianDay)
 DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
 {
 	_utcTime     = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
-	_year        = year;
-	_month       = month;
-	_day         = day;
-	_hour        = hour;
-	_minute      = minute;
-	_second      = second;
-	_millisecond = millisecond;
-	_microsecond = microsecond;
+	_year        = static_cast<short>(year);
+	_month       = static_cast<short>(month);
+	_day         = static_cast<short>(day);
+	_hour        = static_cast<short>(hour);
+	_minute      = static_cast<short>(minute);
+	_second      = static_cast<short>(second);
+	_millisecond = static_cast<short>(millisecond);
+	_microsecond = static_cast<short>(microsecond);
 	checkValid();
 
 	return *this;
@@ -373,7 +375,7 @@ void DateTime::normalize()
 
 	if (_day > daysOfMonth(_year, _month))
 	{
-		_day -= daysOfMonth(_year, _month);
+		_day = static_cast<short>(_day - daysOfMonth(_year, _month));
 		if (++_month > 12)
 		{
 			++_year;
@@ -443,7 +445,7 @@ void DateTime::computeDaytime()
 				_month = 12;
 				_year--;
 			}
-			_day = daysOfMonth(_year, _month);
+			_day = static_cast<short>(daysOfMonth(_year, _month));
 		}
 	}
 	else if (hour == 0 && _hour == 23)
@@ -460,11 +462,11 @@ void DateTime::computeDaytime()
 			_day = 1;
 		}
 	}
-	_hour        = hour;
-	_minute      = span.minutes();
-	_second      = span.seconds();
-	_millisecond = span.milliseconds();
-	_microsecond = span.microseconds();
+	_hour        = static_cast<short>(hour);
+	_minute      = static_cast<short>(span.minutes());
+	_second      = static_cast<short>(span.seconds());
+	_millisecond = static_cast<short>(span.milliseconds());
+	_microsecond = static_cast<short>(span.microseconds());
 }
 
 

@@ -159,7 +159,7 @@ void Binder::bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir)
 void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	mt.year = val.year();
 	mt.month = val.month();
@@ -180,7 +180,7 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	mt.year  = val.year();
 	mt.month = val.month();
@@ -197,7 +197,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	mt.hour   = val.hour();
 	mt.minute = val.minute();
@@ -286,7 +286,7 @@ void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer
 		std::memset(&_bindArray[s], 0, sizeof(MYSQL_BIND) * (_bindArray.size() - s));
 	}
 
-	MYSQL_BIND b = {nullptr};
+	MYSQL_BIND b = {};
 
 	b.buffer_type   = type;
 	b.buffer  = const_cast<void*>(buffer);

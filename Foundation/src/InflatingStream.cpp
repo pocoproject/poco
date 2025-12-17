@@ -140,7 +140,7 @@ void InflatingStreamBuf::reset()
 }
 
 
-int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_eof || !_pIstr) return 0;
 
@@ -173,11 +173,11 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (rc == Z_STREAM_END)
 		{
 			_eof = true;
-			return static_cast<int>(length) - _pZstr->avail_out;
+			return length - _pZstr->avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc));
 		if (_pZstr->avail_out == 0)
-			return static_cast<int>(length);
+			return length;
 		if (_pZstr->avail_in == 0)
 		{
 			int n = 0;
@@ -191,13 +191,13 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				_pZstr->next_in  = (unsigned char*) _buffer;
 				_pZstr->avail_in = n;
 			}
-			else return static_cast<int>(length) - _pZstr->avail_out;
+			else return length - _pZstr->avail_out;
 		}
 	}
 }
 
 
-int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (length == 0 || !_pOstr) return 0;
 
@@ -231,7 +231,7 @@ int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 			break;
 		}
 	}
-	return static_cast<int>(length);
+	return length;
 }
 
 

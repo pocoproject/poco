@@ -19,6 +19,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <sql.h>
 
 
@@ -649,7 +650,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 		paramSize = getParamSizeDirect(pos, size);
 
 	if (colSize > 0 && paramSize > 0)
-		size = colSize < paramSize ? static_cast<SQLINTEGER>(colSize) : static_cast<SQLINTEGER>(paramSize);
+		size = static_cast<SQLINTEGER>(std::min(colSize, paramSize));
 	else if (colSize > 0)
 		size = static_cast<SQLINTEGER>(colSize);
 	else if (paramSize > 0)

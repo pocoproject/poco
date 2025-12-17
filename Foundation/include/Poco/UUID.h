@@ -138,7 +138,7 @@ public:
 		/// Returns the namespace identifier for the X500 namespace.
 
 protected:
-	UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]);
+	UUID(UInt32 timeLow, UInt16 timeMid, UInt16 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]);
 	UUID(const char* bytes, Version version);
 	int compare(const UUID& uuid) const;
 	static void appendHex(std::string& str, UInt8 n);
