@@ -152,7 +152,7 @@ void ZipUtil::sync(std::istream& in)
 			++tempPos;
 		}
 
-		if (tempPos > (BUFFER_SIZE - ZipCommon::HEADER_SIZE))
+		if (tempPos > (static_cast<std::size_t>(BUFFER_SIZE) - ZipCommon::HEADER_SIZE))
 		{
 			std::memcpy(temp, &temp[tempPos - ZipCommon::HEADER_SIZE], ZipCommon::HEADER_SIZE);
 			tempPos = ZipCommon::HEADER_SIZE;

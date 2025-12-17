@@ -1049,3 +1049,62 @@ jobs:
             cd cmake-build &&
             PWD=`pwd`
             ctest --output-on-failure
+
+  macos-clang-cmake-warnings:
+    # Compile as many modules as possible with additional compiler warnings enabled (build tests but don't run them)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: >-
+          cmake -S. -Bcmake-build -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
+          -DENABLE_ENCODINGS=ON -DENABLE_ENCODINGS_COMPILER=ON
+          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
+          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON -DENABLE_XML=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+          -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON
+          -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
+          -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
+          -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
+      - run: cmake --build cmake-build --target all --parallel 4
+
+  windows-msvc-cmake-warnings:
+    # Compile with additional compiler warnings enabled (build tests but don't run them)
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - run: >-
+          cmake -S. -Bcmake-build -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_CPPPARSER=ON -DENABLE_PDF=ON
+          -DENABLE_ENCODINGS=ON -DENABLE_ENCODINGS_COMPILER=ON
+          -DENABLE_JSON=ON -DENABLE_NETSSL_WIN=ON -DENABLE_PROMETHEUS=ON
+          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON -DENABLE_XML=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+          -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
+          -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
+          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF
+      - run: cmake --build cmake-build --config Release --parallel 4
+
+  linux-gcc-cmake-deprecated-tests:
+    # Run tests for deprecated functionality
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TEST_DEPRECATED=ON
+      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"

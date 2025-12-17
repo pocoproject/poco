@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include <stdexcept>
+#include <typeinfo>
 
 
 namespace Poco {
