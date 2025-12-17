@@ -22,6 +22,8 @@
 #include "Poco/AbstractObserver.h"
 #include "Poco/Mutex.h"
 
+#include <atomic>
+
 
 namespace Poco {
 
@@ -52,7 +54,7 @@ public:
 
 	Observer(const Observer& observer):
 		AbstractObserver(observer),
-		_pObject(observer._pObject),
+		_pObject(observer._pObject.load()),
 		_method(observer._method)
 	{
 	}
@@ -110,7 +112,7 @@ public:
 	}
 
 private:
-	C*       _pObject;
+	std::atomic<C*> _pObject;
 	Callback _method;
 	mutable Poco::Mutex _mutex;
 };
