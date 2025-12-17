@@ -28,15 +28,6 @@
 #include <memory>
 #include <atomic>
 #include <mutex>
-#include <version>
-
-
-// Check for std::atomic<std::shared_ptr<T>> support (C++20 feature)
-#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
-	#define POCO_REDIS_HAVE_ATOMIC_SHARED_PTR 1
-#else
-	#define POCO_REDIS_HAVE_ATOMIC_SHARED_PTR 0
-#endif
 
 
 namespace Poco {
@@ -231,7 +222,7 @@ private:
 	std::unique_ptr<RedisInputStream> _pInput{};
 	std::unique_ptr<RedisOutputStream> _pOutput{};
 
-#if POCO_REDIS_HAVE_ATOMIC_SHARED_PTR
+#if POCO_HAVE_ATOMIC_SHARED_PTR
 	std::atomic<NotificationCenterPtr> _pNC{};
 #else
 	std::atomic<AsyncNotificationCenter*> _pNC{nullptr};
