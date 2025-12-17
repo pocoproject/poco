@@ -1,6 +1,21 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.15.0 (TBD)
+====================
+
+Summary of Changes:
+
+- TBD
+
+reaking Changes and Migration Notes:
+
+- GH #4844 AbstractConfiguration::createView() and createLocalView() now return
+  AbstractConfiguration::Ptr (AutoPtr). Code that assigns the return value to a
+  raw pointer (AbstractConfiguration*) will compile but cause use-after-free crashes.
+  Always use AbstractConfiguration::Ptr or auto for the return value.
+
+
 Release 1.14.2 (2025-05-12)
 ===========================
 
