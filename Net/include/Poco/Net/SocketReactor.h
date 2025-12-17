@@ -334,7 +334,7 @@ inline bool SocketReactor::has(const Socket& socket) const
 
 inline void SocketReactor::onError(const Socket& socket, int code, const std::string& description)
 {
-	dispatch(new ErrorNotification(this, socket, code, description));
+	dispatch(socket, new ErrorNotification(this, socket, code, description));
 }
 
 
