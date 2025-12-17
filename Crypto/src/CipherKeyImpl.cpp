@@ -168,7 +168,7 @@ void CipherKeyImpl::getRandomBytes(ByteVec& vec, std::size_t count)
 	vec.clear();
 	vec.reserve(count);
 
-	for (int i = 0; i < count; ++i)
+	for (std::size_t i = 0; i < count; ++i)
 		vec.push_back(static_cast<unsigned char>(random.get()));
 }
 

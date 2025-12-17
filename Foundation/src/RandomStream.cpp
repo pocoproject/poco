@@ -38,16 +38,16 @@ RandomBuf::~RandomBuf()
 }
 
 
-int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	int n = 0;
+	std::streamsize n = 0;
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	HCRYPTPROV hProvider = 0;
 	CryptAcquireContext(&hProvider, nullptr, nullptr, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
 	CryptGenRandom(hProvider, (DWORD) length, (BYTE*) buffer);
 	CryptReleaseContext(hProvider, 0);
-	n = static_cast<int>(length);
+	n = length;
 #else
 	#if defined(POCO_OS_FAMILY_UNIX)
 	int fd = open("/dev/urandom", O_RDONLY, 0);

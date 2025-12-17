@@ -10,10 +10,9 @@ namespace Net {
 HTTPReactorServerSession::HTTPReactorServerSession(
 	const StreamSocket& socket, std::string& buf, HTTPServerParams::Ptr pParams)
 	: // do not deliver socket to HTTPSession
-	  HTTPSession(), _buf(buf), _realsocket(socket), _complete(0), _idx(0)
+	  HTTPSession(), _buf(buf), _realsocket(socket)
 {
 	_pcur = const_cast<char*>(_buf.c_str());
-	_idx = 0;
 }
 /// Creates the HTTPReactorServerSession.
 

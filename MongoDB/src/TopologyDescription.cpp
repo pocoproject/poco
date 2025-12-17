@@ -336,7 +336,7 @@ void TopologyDescription::updateTopologyType()
 	int otherRsMembers = 0;  // Non-primary replica set members (secondaries, arbiters, etc.)
 	int mongosCount = 0;
 	int standaloneCount = 0;
-	int unknownCount = 0;
+	[[maybe_unused]] int unknownCount = 0;
 
 	for (const auto& [address, server] : _servers)
 	{

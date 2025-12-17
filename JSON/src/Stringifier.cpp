@@ -29,7 +29,7 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	bool escapeUnicode = ((options & Poco::JSON_ESCAPE_UNICODE) != 0);
 	bool lowercaseHex = ((options & Poco::JSON_LOWERCASE_HEX) != 0);
 
-	if (step == -1) step = indent;
+	if (step == -1) step = static_cast<int>(indent);
 
 	if (any.type() == typeid(Object))
 	{

@@ -53,24 +53,24 @@ DigestBuf::~DigestBuf()
 }
 
 
-int DigestBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize DigestBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_pIstr && _pIstr->good())
 	{
 		_pIstr->read(buffer, length);
 		std::streamsize n = _pIstr->gcount();
 		if (n > 0) _eng.update(buffer, static_cast<unsigned>(n));
-		return static_cast<int>(n);
+		return n;
 	}
 	return -1;
 }
 
 
-int DigestBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize DigestBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	_eng.update(buffer, (unsigned) length);
 	if (_pOstr) _pOstr->write(buffer, length);
-	return static_cast<int>(length);
+	return length;
 }
 
 

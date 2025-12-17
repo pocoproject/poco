@@ -67,12 +67,12 @@ const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 {
 	std::vector<Byte *> pEncKeys(_encKeys.size(), nullptr);
 	std::vector<int> encKeysSizes(_encKeys.size(), 0);
-	int i = 0;
+	std::size_t i = 0;
 	for (const auto& k : _encKeys)
 		pEncKeys[i++] = new Byte[k.size()];
 
 	int noOfKeys = static_cast<int>(_pubKeys.size());
-	if (_encKeys.size() != EVP_SealInit(_pCtx, _pCipher, &pEncKeys[0], &encKeysSizes[0], &_iv[0], &_pubKeys[0], noOfKeys))
+	if (static_cast<int>(_encKeys.size()) != EVP_SealInit(_pCtx, _pCipher, &pEncKeys[0], &encKeysSizes[0], &_iv[0], &_pubKeys[0], noOfKeys))
 	{
 		i = 0;
 		for (; i < _encKeys.size(); ++i) delete [] pEncKeys[i];
@@ -81,7 +81,7 @@ const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 	i = 0;
 	for (auto& k : _encKeys)
 	{
-		if (encKeysSizes[i] != k.size())
+		if (static_cast<std::size_t>(encKeysSizes[i]) != k.size())
 			k.resize(encKeysSizes[i]);
 		std::memcpy(&k[0], pEncKeys[i], encKeysSizes[i]);
 		++i;
@@ -95,14 +95,14 @@ const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 	_encContent.resize(plainDataSize + blockSize());
 	if (1 != EVP_SealUpdate(_pCtx, &_encContent[0], &len, &plainData[0], plainDataSize))
 		handleErrors(std::string("Envelope::seal():EVP_SealUpdate()"));
-	
+
 	cipherTextLen = len;
-	poco_assert (cipherTextLen < _encContent.size());
+	poco_assert (static_cast<std::size_t>(cipherTextLen) < _encContent.size());
 
 	if(1 != EVP_SealFinal(_pCtx, &_encContent[len], &len))
 		handleErrors(std::string("Envelope::seal():EVP_SealFinal()"));
 	cipherTextLen += len;
-	poco_assert (cipherTextLen <= _encContent.size());
+	poco_assert (static_cast<std::size_t>(cipherTextLen) <= _encContent.size());
 	_encContent.resize(cipherTextLen);
 
 	return _encContent;

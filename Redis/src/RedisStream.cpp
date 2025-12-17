@@ -39,13 +39,13 @@ RedisStreamBuf::~RedisStreamBuf()
 }
 
 
-int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
+std::streamsize RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 {
 	return _redis.receiveBytes(buffer, static_cast<int>(len));
 }
 
 
-int RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	return _redis.sendBytes(buffer, static_cast<int>(length));
 }

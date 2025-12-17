@@ -19,6 +19,7 @@
 #include "Poco/FileStream.h"
 #include "Poco/Format.h"
 #include "Poco/StreamCopier.h"
+#include <algorithm>
 #include <sstream>
 #include <openssl/evp.h>
 #include <openssl/bn.h>
@@ -229,11 +230,11 @@ int ECKeyImpl::getCurveNID(std::string& name)
 	}
 	else
 	{
-		for (int i = 0; i < len; ++i)
+		for (std::size_t i = 0; i < len; ++i)
 		{
 			std::memset(buf, 0, bufLen);
 			OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(pCurves[i].nid), 0);
-			if (strncmp(name.c_str(), buf, name.size() > bufLen ? bufLen : name.size()) == 0)
+			if (strncmp(name.c_str(), buf, std::min(name.size(), static_cast<std::size_t>(bufLen))) == 0)
 			{
 				nid = pCurves[i].nid;
 				break;

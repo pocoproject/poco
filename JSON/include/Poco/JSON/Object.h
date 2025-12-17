@@ -271,7 +271,7 @@ private:
 	}
 
 	template <typename C>
-	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
+	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
 	{
 		int options = Poco::JSON_WRAP_STRINGS;
 		options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
@@ -290,14 +290,14 @@ private:
 			Stringifier::stringify(getKey(it), out, indent, step, options);
 			out << ((indent > 0) ? ": " : ":");
 
-			Stringifier::stringify(getValue(it), out, indent + step, step, options);
+			Stringifier::stringify(getValue(it), out, indent + static_cast<unsigned int>(step), step, options);
 
 			if (++it != container.end()) out << ',';
 
 			if (step > 0) out << std::endl;
 		}
 
-		if (indent >= step) indent -= step;
+		if (step > 0 && indent >= static_cast<unsigned int>(step)) indent -= static_cast<unsigned int>(step);
 
 		for (unsigned int i = 0; i < indent; i++) out << ' ';
 

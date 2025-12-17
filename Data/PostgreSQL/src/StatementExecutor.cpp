@@ -43,7 +43,7 @@ namespace
 		std::set<std::string> placeholderSet;
 
 		Poco::RegularExpression placeholderRE("[$][0-9]+");
-		Poco::RegularExpression::Match match = { 0 , 0 }; // Match is a struct, not a class :-(
+		Poco::RegularExpression::Match match = {}; // Match is a struct, not a class :-(
 
 		std::size_t startingPosition = 0;
 		while (match.offset != std::string::npos)

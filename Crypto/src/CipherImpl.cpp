@@ -116,7 +116,7 @@ namespace
 		if (rc == 0) throwError();
 
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
-		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
+		if (static_cast<int>(_iv.size()) != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
@@ -196,7 +196,7 @@ namespace
 		unsigned char*       output,
 		std::streamsize      outputLength)
 	{
-		poco_assert (outputLength >= (inputLength + blockSize() - 1));
+		poco_assert (outputLength >= (inputLength + static_cast<std::streamsize>(blockSize()) - 1));
 
 		int outLen = static_cast<int>(outputLength);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -225,7 +225,7 @@ namespace
 		unsigned char*	output,
 		std::streamsize length)
 	{
-		poco_assert (length >= blockSize());
+		poco_assert (length >= static_cast<std::streamsize>(blockSize()));
 
 		int len = static_cast<int>(length);
 

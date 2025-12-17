@@ -147,14 +147,14 @@ ZipStreamBuf::~ZipStreamBuf()
 }
 
 
-int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_ptrBuf) return 0; // directory entry
 	_ptrBuf->read(buffer, length);
-	int cnt = static_cast<int>(_ptrBuf->gcount());
+	std::streamsize cnt = _ptrBuf->gcount();
 	if (cnt > 0)
 	{
-		_crc32.update(buffer, cnt);
+		_crc32.update(buffer, static_cast<unsigned int>(cnt));
 	}
 	else
 	{
@@ -181,7 +181,7 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (!_ptrOBuf) return 0; // directory entry
 	if (length == 0)
@@ -189,7 +189,7 @@ int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	_bytesWritten += length;
 	_ptrOBuf->write(buffer, length);
 	_crc32.update(buffer, static_cast<unsigned int>(length));
-	return static_cast<int>(length);
+	return length;
 }
 
 

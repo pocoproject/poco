@@ -1587,29 +1587,29 @@ void JSONTest::testStringify()
 	{
 		std::string jsonStr = R"json({"default":"\u0007\u0007"})json";
 		auto jsonStrUnescape = Poco::UTF8::unescape(jsonStr);
-		Poco::JSON::Parser parser;
-		Poco::Dynamic::Var result = parser.parse(jsonStr);
-		const auto & obj = result.extract<Poco::JSON::Object::Ptr>();
+		Poco::JSON::Parser parser1;
+		Poco::Dynamic::Var result1 = parser1.parse(jsonStr);
+		const auto & obj = result1.extract<Poco::JSON::Object::Ptr>();
 		auto default_val = obj->get("default");
-		Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-		json->set("default", default_val);
-		std::stringstream ss;
-		json->stringify(ss);
-		assertEqual(ss.str(), jsonStr);
+		Poco::JSON::Object::Ptr json1 = new Poco::JSON::Object();
+		json1->set("default", default_val);
+		std::stringstream ss1;
+		json1->stringify(ss1);
+		assertEqual(ss1.str(), jsonStr);
 	}
 
 	{
 		std::string jsonStr = R"json({"default":"\u0050\u0050"})json";
 		auto jsonStrUnescape = Poco::UTF8::unescape(jsonStr);
-		Poco::JSON::Parser parser;
-		Poco::Dynamic::Var result = parser.parse(jsonStr);
-		const auto & obj = result.extract<Poco::JSON::Object::Ptr>();
+		Poco::JSON::Parser parser2;
+		Poco::Dynamic::Var result2 = parser2.parse(jsonStr);
+		const auto & obj = result2.extract<Poco::JSON::Object::Ptr>();
 		auto default_val = obj->get("default");
-		Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-		json->set("default", default_val);
-		std::stringstream ss;
-		json->stringify(ss);
-		assertEqual(ss.str(), jsonStrUnescape);
+		Poco::JSON::Object::Ptr json2 = new Poco::JSON::Object();
+		json2->set("default", default_val);
+		std::stringstream ss2;
+		json2->stringify(ss2);
+		assertEqual(ss2.str(), jsonStrUnescape);
 	}
 }
 

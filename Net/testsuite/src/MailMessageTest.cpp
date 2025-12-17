@@ -22,10 +22,11 @@
 #include "Poco/FileStream.h"
 #include "Poco/String.h"
 #include "Poco/TemporaryFile.h"
-#include <sstream>
+#include <algorithm>
 #include <fstream>
-#include <vector>
 #include <iostream>
+#include <sstream>
+#include <vector>
 
 
 using Poco::Net::MailMessage;
@@ -727,7 +728,7 @@ void MailMessageTest::testReadWriteMultiPartStore()
 			std::string path = fps->path();
 			// for security reasons, the filesystem temporary
 			// filename is not the same as attachment name
-			std::size_t sz = (path.size() > filename.size()) ? filename.size() : path.size();
+			std::size_t sz = std::min(path.size(), filename.size());
 			assertTrue (0 != icompare(path, path.size() - sz, sz, path));
 
 			Poco::FileInputStream fis(path);
