@@ -230,8 +230,8 @@ private:
 
 				if (pFile)
 				{
-					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)nullptr : &passCB;
-					void* pPassword = pass.empty() ? (void*)nullptr : (void*)pass.c_str();
+					pem_password_cb* pCB = &passCB;
+					void* pPassword = const_cast<char*>(pass.c_str());
 					if (readFunc(pFile, &pKey, pCB, pPassword))
 					{
 						fclose(pFile); pFile = nullptr;
@@ -295,8 +295,8 @@ private:
 				EVP_PKEY* pKey = getFunc ? EVP_PKEY_new() : (EVP_PKEY*)*ppKey;
 				if (pKey)
 				{
-					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)nullptr : &passCB;
-					void* pPassword = pass.empty() ? (void*)nullptr : (void*)pass.c_str();
+					pem_password_cb* pCB = &passCB;
+					void* pPassword = const_cast<char*>(pass.c_str());
 					if (readFunc(pBIO, &pKey, pCB, pPassword))
 					{
 						BIO_free(pBIO); pBIO = nullptr;

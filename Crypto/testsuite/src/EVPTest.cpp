@@ -571,6 +571,53 @@ void EVPTest::testECEVPSaveLoadFileNoPass()
 }
 
 
+void EVPTest::testECEVPLoadKeyWrongPassword()
+{
+	// Test for issue #4627: Loading a password-protected key with empty password
+	// should throw an exception, not prompt stdin.
+	try
+	{
+		std::string curveName = ECKey::getCurveName();
+		if (!curveName.empty())
+		{
+			EVPPKey key(curveName);
+			TemporaryFile filePub;
+			TemporaryFile filePriv;
+			key.save(filePub.path(), filePriv.path(), "testpwd");
+
+			// Try to load with empty password - should throw, not prompt stdin
+			try
+			{
+				EVPPKey keyBadPass("", filePriv.path(), "");
+				fail("Loading password-protected key with empty password should throw");
+			}
+			catch (const Poco::Exception&)
+			{
+				// Expected - key requires password but none provided
+			}
+
+			// Try to load with wrong password - should also throw
+			try
+			{
+				EVPPKey keyBadPass("", filePriv.path(), "wrongpwd");
+				fail("Loading password-protected key with wrong password should throw");
+			}
+			catch (const Poco::Exception&)
+			{
+				// Expected - wrong password
+			}
+		}
+		else
+			std::cerr << "No elliptic curves found!" << std::endl;
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
+}
+
+
 void EVPTest::testRSAEVPKeyFromX509()
 {
 	std::istringstream str(anyPemRSA);
@@ -744,6 +791,7 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadStreamNoPass);
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadFile);
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadFileNoPass);
+	CppUnit_addTest(pSuite, EVPTest, testECEVPLoadKeyWrongPassword);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromX509);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromPKCS12);
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
