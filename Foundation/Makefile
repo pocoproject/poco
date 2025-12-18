@@ -33,7 +33,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCent
 	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF32Encoding UTF16Encoding UTF8Encoding UTF8String \
 	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
-	UUID UUIDGenerator Void Var VarHolder VarIterator VarVisitor Format Pipe PipeImpl PipeStream SharedMemory \
+	UUID UUIDGenerator ULID ULIDGenerator Void Var VarHolder VarIterator VarVisitor Format Pipe PipeImpl PipeStream SharedMemory \
 	MemoryStream FileStream AtomicCounter DataURIStream DataURIStreamFactory FileStreamRWLock \
 	BufferedBidirectionalStreamBuf BufferedStreamBuf UnbufferedStreamBuf
 
