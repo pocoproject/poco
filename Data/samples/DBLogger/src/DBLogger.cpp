@@ -107,7 +107,7 @@ protected:
 			const auto create {
 				"CREATE TABLE "s + _tableName +
 				" (Source VARCHAR, Name VARCHAR, ProcessId INTEGER, Thread VARCHAR,"s +
-				" ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATE)"s
+				" ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATETIME)"s
 			};
 
 			session << create, now;
