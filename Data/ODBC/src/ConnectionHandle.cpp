@@ -144,9 +144,9 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 		// different login and connection timeouts. Last but not least, some ODBC drivers (eg. DataDirect
 		// for Oracle) flat out refuse to set login timeout and return error - that's why these calls
 		// are wrapped in try/catch and silently ignore errors.
-		if (getTimeout() != timeout)
+		if (static_cast<SQLULEN>(getTimeout()) != timeout)
 			setTimeout(static_cast<int>(timeout));
-		if (getLoginTimeout() != loginTimeout)
+		if (static_cast<SQLULEN>(getLoginTimeout()) != loginTimeout)
 			setLoginTimeout(loginTimeout);
 	}
 	catch(NotSupportedException&){}

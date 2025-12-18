@@ -141,6 +141,14 @@ public:
 	using Iterator = typename Delegates::iterator;
 
 public:
+	PriorityStrategy() = default;
+
+	PriorityStrategy(const PriorityStrategy& s):
+		_delegates(s._delegates)
+	{
+	}
+
+	~PriorityStrategy() = default;
 
 	void notify(const void* sender)
 	{

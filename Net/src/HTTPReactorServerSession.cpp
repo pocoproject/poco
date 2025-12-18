@@ -171,7 +171,7 @@ bool HTTPReactorServerSession::parseChunkSize(std::size_t& pos, std::size_t& chu
 
 void HTTPReactorServerSession::popCompletedRequest()
 {
-	if (_complete >= _buf.length())
+	if (static_cast<std::size_t>(_complete) >= _buf.length())
 	{
 		// All data has been processed
 		_buf.clear();

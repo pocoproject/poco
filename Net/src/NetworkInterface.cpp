@@ -841,7 +841,7 @@ NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 	for (; it != end; ++it)
 	{
 		const std::size_t count = it->second.addressList().size();
-		for (int i = 0; i < count; ++i)
+		for (std::size_t i = 0; i < count; ++i)
 		{
 			if (it->second.address(i) == addr)
 				return it->second;

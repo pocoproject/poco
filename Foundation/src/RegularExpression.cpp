@@ -99,7 +99,7 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMEENTRYSIZE, &nameEntrySize);
 	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMETABLE, &nameTable);
 
-	for (int i = 0; i < nameCount; i++)
+	for (unsigned i = 0; i < nameCount; i++)
 	{
 		unsigned char* group = nameTable + 2 + (nameEntrySize * i);
 		int n = pcre2_substring_number_from_name(reinterpret_cast<pcre2_code*>(_pcre), group);

@@ -86,7 +86,7 @@ namespace
 
 namespace
 {
-	std::string truncName(const std::string& name, int nameSize = POCO_MAX_THREAD_NAME_LEN)
+	std::string truncName(const std::string& name, std::size_t nameSize = POCO_MAX_THREAD_NAME_LEN)
 	{
 		if (name.size() > nameSize)
 			return name.substr(0, nameSize).append("~");
@@ -291,7 +291,7 @@ void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
 	sigset_t sset;
 	sigemptyset(&sset);
 
-	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
+	for (std::size_t sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
 	{
 		if ((sigMask & (1 << sig)) != 0)
 			sigaddset(&sset, sig);

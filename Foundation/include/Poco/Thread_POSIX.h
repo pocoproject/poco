@@ -124,7 +124,7 @@ private:
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
-			thread(0),
+			thread{},
 			prio(PRIO_NORMAL_IMPL),
 			osPrio(),
 			policy(SCHED_OTHER),
