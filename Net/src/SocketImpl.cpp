@@ -492,7 +492,8 @@ int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::
 	if (poll(timeout, SELECT_READ))
 	{
 		int avail = available();
-		if (buffer.size() < avail) buffer.resize(avail);
+		if (avail < 0) error();
+		if (buffer.size() < static_cast<std::size_t>(avail)) buffer.resize(avail);
 
 		do
 		{

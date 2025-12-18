@@ -36,6 +36,7 @@ public:
 	void testBroadcast();
 	void testGatherScatterFixed();
 	void testGatherScatterVariable();
+	void testClosedPortError();
 
 	void setUp();
 	void tearDown();

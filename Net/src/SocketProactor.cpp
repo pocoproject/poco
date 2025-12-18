@@ -559,7 +559,8 @@ int SocketProactor::receive(Socket& sock)
 	auto end = handlers.end();
 	for (; it != end;)
 	{
-		if ((avail = sock.available()))
+		avail = sock.available();
+		if (avail > 0)
 		{
 			if (sock.isDatagram())
 				receiveFrom(*sock.impl(), it, avail);
@@ -588,7 +589,7 @@ void SocketProactor::receiveFrom(SocketImpl& sock, IOHandlerIt& it, int availabl
 	SocketAddress *pAddr = (*it)->_pAddr;
 	SocketAddress addr = *pAddr;
 	poco_check_ptr(pBuf);
-	if (pBuf->size() < available) pBuf->resize(available);
+	if (pBuf->size() < static_cast<std::size_t>(available)) pBuf->resize(available);
 	int n = 0, err = 0;
 	try
 	{
@@ -606,7 +607,7 @@ void SocketProactor::receive(SocketImpl& sock, IOHandlerIt& it, int available)
 {
 	Buffer *pBuf = (*it)->_pBuf;
 	poco_check_ptr(pBuf);
-	if (pBuf->size() < available) pBuf->resize(available);
+	if (pBuf->size() < static_cast<std::size_t>(available)) pBuf->resize(available);
 	int n = 0, err = 0;
 	try
 	{
