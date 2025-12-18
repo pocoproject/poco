@@ -15,42 +15,24 @@
 #include "Poco/Base32Decoder.h"
 #include "Poco/Base32Encoder.h"
 #include "Poco/Exception.h"
-#include "Poco/Mutex.h"
 #include <cstring>
 
 
 namespace Poco {
 
 
-unsigned char Base32DecoderBuf::IN_ENCODING[256];
-bool Base32DecoderBuf::IN_ENCODING_INIT = false;
-
-
-namespace
-{
-	static FastMutex mutex;
-}
-
-
-Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
+Base32DecoderBuf::Base32DecoderBuf(std::istream& istr, int options):
 	_groupLength(0),
 	_groupIndex(0),
 	_buf(*istr.rdbuf())
 {
-	FastMutex::ScopedLock lock(mutex);
-	if (!IN_ENCODING_INIT)
+	const unsigned char* encoding = Base32EncoderBuf::encoding(options);
+	std::memset(_encoding, 0xFF, sizeof(_encoding));
+	for (unsigned i = 0; i < 32; i++)
 	{
-		for (unsigned i = 0; i < sizeof(IN_ENCODING); i++)
-		{
-			IN_ENCODING[i] = 0xFF;
-		}
-		for (unsigned i = 0; i < sizeof(Base32EncoderBuf::OUT_ENCODING); i++)
-		{
-			IN_ENCODING[Base32EncoderBuf::OUT_ENCODING[i]] = static_cast<UInt8>(i);
-		}
-		IN_ENCODING[static_cast<unsigned char>('=')] = '\0';
-		IN_ENCODING_INIT = true;
+		_encoding[encoding[i]] = static_cast<UInt8>(i);
 	}
+	_encoding[static_cast<unsigned char>('=')] = '\0';
 }
 
 
@@ -77,35 +59,35 @@ int Base32DecoderBuf::readFromDevice()
 		do {
 			if ((c = readOne()) == -1) return -1;
 			buffer[0] = (unsigned char) c;
-			if (IN_ENCODING[buffer[0]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[0]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) throw DataFormatException();
 			buffer[1] = (unsigned char) c;
-			if (IN_ENCODING[buffer[1]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[1]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) break;
 			buffer[2] = (unsigned char) c;
-			if (IN_ENCODING[buffer[2]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[2]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) throw DataFormatException();
 			buffer[3] = (unsigned char) c;
-			if (IN_ENCODING[buffer[3]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[3]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) break;
 			buffer[4] = (unsigned char) c;
-			if (IN_ENCODING[buffer[4]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[4]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) break;
 			buffer[5] = (unsigned char) c;
-			if (IN_ENCODING[buffer[5]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[5]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) throw DataFormatException();
 			buffer[6] = (unsigned char) c;
-			if (IN_ENCODING[buffer[6]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[6]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) break;
 			buffer[7] = (unsigned char) c;
-			if (IN_ENCODING[buffer[7]] == 0xFF) throw DataFormatException();
+			if (_encoding[buffer[7]] == 0xFF) throw DataFormatException();
 		} while (false);
 
-		_group[0] = (IN_ENCODING[buffer[0]] << 3) | (IN_ENCODING[buffer[1]] >> 2);
-		_group[1] = ((IN_ENCODING[buffer[1]] & 0x03) << 6) | (IN_ENCODING[buffer[2]] << 1) | (IN_ENCODING[buffer[3]] >> 4);
-		_group[2] = ((IN_ENCODING[buffer[3]] & 0x0F) << 4) | (IN_ENCODING[buffer[4]] >> 1);
-		_group[3] = ((IN_ENCODING[buffer[4]] & 0x01) << 7) | (IN_ENCODING[buffer[5]] << 2) | (IN_ENCODING[buffer[6]] >> 3);
-		_group[4] = ((IN_ENCODING[buffer[6]] & 0x07) << 5) | IN_ENCODING[buffer[7]];
+		_group[0] = (_encoding[buffer[0]] << 3) | (_encoding[buffer[1]] >> 2);
+		_group[1] = ((_encoding[buffer[1]] & 0x03) << 6) | (_encoding[buffer[2]] << 1) | (_encoding[buffer[3]] >> 4);
+		_group[2] = ((_encoding[buffer[3]] & 0x0F) << 4) | (_encoding[buffer[4]] >> 1);
+		_group[3] = ((_encoding[buffer[4]] & 0x01) << 7) | (_encoding[buffer[5]] << 2) | (_encoding[buffer[6]] >> 3);
+		_group[4] = ((_encoding[buffer[6]] & 0x07) << 5) | _encoding[buffer[7]];
 
 		if (buffer[2] == '=')
 			_groupLength = 1;
@@ -130,7 +112,7 @@ int Base32DecoderBuf::readOne()
 }
 
 
-Base32DecoderIOS::Base32DecoderIOS(std::istream& istr): _buf(istr)
+Base32DecoderIOS::Base32DecoderIOS(std::istream& istr, int options): _buf(istr, options)
 {
 	poco_ios_init(&_buf);
 }
@@ -147,7 +129,7 @@ Base32DecoderBuf* Base32DecoderIOS::rdbuf()
 }
 
 
-Base32Decoder::Base32Decoder(std::istream& istr): Base32DecoderIOS(istr), std::istream(&_buf)
+Base32Decoder::Base32Decoder(std::istream& istr, int options): Base32DecoderIOS(istr, options), std::istream(&_buf)
 {
 }
 
