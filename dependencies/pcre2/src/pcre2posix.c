@@ -53,7 +53,7 @@ inclusion of config.h. */
 
 #if defined HAVE_CONFIG_H && !defined PCRE2_CONFIG_H_IDEMPOTENT_GUARD
 #define PCRE2_CONFIG_H_IDEMPOTENT_GUARD
-#include "config.h"
+#include "pcre2_config.h"
 #endif
 
 

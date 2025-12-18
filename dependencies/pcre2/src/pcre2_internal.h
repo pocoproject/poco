@@ -47,7 +47,7 @@ not have an include guard (although we could customise that). */
 
 #if defined HAVE_CONFIG_H && !defined PCRE2_CONFIG_H_IDEMPOTENT_GUARD
 #define PCRE2_CONFIG_H_IDEMPOTENT_GUARD
-#include "config.h"
+#include "pcre2_config.h"
 #endif
 
 /* We do not support both EBCDIC and Unicode at the same time. The "configure"
