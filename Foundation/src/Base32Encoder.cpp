@@ -109,7 +109,8 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(_encoding[idx]) == eof) return eof;
 		idx = ((_group[0] & 0x07) << 2);
 		if (_buf.sputc(_encoding[idx]) == eof) return eof;
-		if (_doPadding) {
+		if (_doPadding) 
+		{
 			if (_buf.sputc('=') == eof) return eof;
 			if (_buf.sputc('=') == eof) return eof;
 			if (_buf.sputc('=') == eof) return eof;
@@ -130,7 +131,8 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(_encoding[idx]) == eof) return eof;
 		idx = ((_group[1] & 0x01) << 4);
 		if (_buf.sputc(_encoding[idx]) == eof) return eof;
-		if (_doPadding) {
+		if (_doPadding) 
+		{
 			if (_buf.sputc('=') == eof) return eof;
 			if (_buf.sputc('=') == eof) return eof;
 			if (_buf.sputc('=') == eof) return eof;
@@ -151,7 +153,8 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(_encoding[idx]) == eof) return eof;
 		idx = ((_group[2] & 0x0F) << 1);
 		if (_buf.sputc(_encoding[idx]) == eof) return eof;
-		if (_doPadding) {
+		if (_doPadding) 
+		{
 			if (_buf.sputc('=') == eof) return eof;
 			if (_buf.sputc('=') == eof) return eof;
 			if (_buf.sputc('=') == eof) return eof;

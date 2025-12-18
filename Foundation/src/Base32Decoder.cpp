@@ -56,7 +56,8 @@ int Base32DecoderBuf::readFromDevice()
 		// per RFC-4648, Section 6, permissible block lengths are:
 		// 2, 4, 5, 7, and 8 bytes. Any other length is malformed.
 		//
-		do {
+		do 
+		{
 			if ((c = readOne()) == -1) return -1;
 			buffer[0] = (unsigned char) c;
 			if (_encoding[buffer[0]] == 0xFF) throw DataFormatException();
@@ -81,7 +82,8 @@ int Base32DecoderBuf::readFromDevice()
 			if ((c = readOne()) == -1) break;
 			buffer[7] = (unsigned char) c;
 			if (_encoding[buffer[7]] == 0xFF) throw DataFormatException();
-		} while (false);
+		} 
+		while (false);
 
 		_group[0] = (_encoding[buffer[0]] << 3) | (_encoding[buffer[1]] >> 2);
 		_group[1] = ((_encoding[buffer[1]] & 0x03) << 6) | (_encoding[buffer[2]] << 1) | (_encoding[buffer[3]] >> 4);
