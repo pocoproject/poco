@@ -248,14 +248,16 @@ private:
 						if (!*ppKey) goto error;
 						return true;
 					}
-					if (getFunc) EVP_PKEY_free(pKey);
+					EVP_PKEY_free(pKey);
+					if (!getFunc) *ppKey = nullptr;
 					goto error;
 				}
 				else
 				{
 					std::string msg = Poco::format("EVPPKey::loadKey('%s')\n", keyFile);
 					getError(msg);
-					if (getFunc) EVP_PKEY_free(pKey);
+					EVP_PKEY_free(pKey);
+					if (!getFunc) *ppKey = nullptr;
 					throw IOException(msg);
 				}
 			}
@@ -313,7 +315,8 @@ private:
 						if (!*ppKey) goto error;
 						return true;
 					}
-					if (getFunc) EVP_PKEY_free(pKey);
+					EVP_PKEY_free(pKey);
+					if (!getFunc) *ppKey = nullptr;
 					goto error;
 				}
 				else goto error;
