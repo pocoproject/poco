@@ -14,6 +14,7 @@
 #include "Poco/UUID.h"
 #include "Poco/Exception.h"
 
+
 UUIDTest::UUIDTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
