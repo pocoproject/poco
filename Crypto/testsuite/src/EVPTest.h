@@ -33,6 +33,7 @@ public:
 	void testECEVPSaveLoadStreamNoPass();
 	void testECEVPSaveLoadFile();
 	void testECEVPSaveLoadFileNoPass();
+	void testECEVPLoadKeyWrongPassword();
 
 	void testRSAEVPKeyFromX509();
 	void testRSAEVPKeyFromPKCS12();
