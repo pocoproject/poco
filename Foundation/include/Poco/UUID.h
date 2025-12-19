@@ -42,6 +42,8 @@ class Foundation_API UUID
 	/// and also http://tools.ietf.org/html/draft-mealling-uuid-urn-05
 	///
 	/// Version 6 and 7 UUIDs are based on RFC 9562.
+	///
+	/// To generate a UUID, see UUIDGenerator.
 {
 public:
 	enum Version
