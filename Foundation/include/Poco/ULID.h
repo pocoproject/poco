@@ -30,10 +30,10 @@ class Foundation_API ULID
 	/// To generate a new random ULID, see ULIDGenerator::create().
 {
 public:
-	ULID();
+	ULID() = default;
 		/// Creates a nil (all zero) ULID.
 
-	ULID(const ULID& ulid);
+	ULID(const ULID& ulid) = default;
 		/// Copy constructor.
 
 	explicit ULID(const std::string& ulid);
@@ -45,7 +45,7 @@ public:
 	ULID(UInt64 time, UInt16 randomHigh, UInt64 randomLow);
 		/// Creates a ULID from its components.
 
-	~ULID();
+	~ULID() = default;
 		/// Destroys the ULID.
 
 	ULID& operator = (const ULID& ulid);
@@ -107,6 +107,12 @@ public:
 
 protected:
 	int compare(const ULID& ulid) const;
+
+	template <typename T>
+	static T decode(char c)
+	{
+		return static_cast<T>(REVERSE_ENCODING[static_cast<unsigned char>(c)]);
+	}
 
 private:
 	UInt32 _timeHi = 0;
