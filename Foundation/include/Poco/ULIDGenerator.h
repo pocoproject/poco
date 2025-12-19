@@ -56,7 +56,7 @@ public:
 
 private:
 	FastMutex    _mutex;
-	Poco::Int64  _lastTime = 0;
+	Poco::UInt64 _lastTime = 0;
 	Poco::UInt16 _lastRandomHi = 0;
 	Poco::UInt64 _lastRandomLo = 0;
 
