@@ -340,6 +340,14 @@ void Base32Test::testDecoderCrockford()
 		decoder >> s;
 		assertTrue (s == "foobar");
 	}
+	{
+		// alternative decode symbols (lowercase, 1/l)
+		std::istringstream istr("csqpyrkle8");
+		Base32Decoder decoder(istr, Poco::BASE32_USE_CROCKFORD_ALPHABET);
+		std::string s;
+		decoder >> s;
+		assertTrue (s == "foobar");
+	}
 }
 
 

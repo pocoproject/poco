@@ -7,7 +7,7 @@
 //
 // Definition of class Base32Encoder.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -31,7 +31,7 @@ enum Base32EncodingOptions
 	BASE32_NO_PADDING = 0x00,
 		/// Don't append padding characters ('=') at end.
 		///
-		/// NOTE: This is provided for consistency with BAse64EncodingOptions.
+		/// NOTE: This is provided for consistency with Base64EncodingOptions.
 
 	BASE32_USE_PADDING = 0x01,
 		/// Append padding characters ('=') at end.
@@ -43,9 +43,13 @@ enum Base32EncodingOptions
 		/// Use the RFC 4648 Base32 Extended Hex alphabet.
 
 	BASE32_USE_CROCKFORD_ALPHABET = 0x04
-		/// Use the Crockford Base 32 alphabet for encoding
+		/// Use Crockford's Base 32 alphabet for encoding
 		/// (https://www.crockford.com/base32.html)
-		/// instead of RFC 4648 Base 32 alphabet.
+		/// instead of RFC 4648 Base32 alphabet.
+		///
+		/// Note: decoding is not case sensitive.
+		/// Furthermore characters 0/O/o and 1/I/i/L/l 
+		/// are decoded as 0 and 1, respectively.
 };
 
 
@@ -121,7 +125,7 @@ class Foundation_API Base32Encoder: public Base32EncoderIOS, public std::ostream
 	/// completion of the encoding operation.
 	///
 	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
-	/// and additionally supports Crockford Base 32.
+	/// and additionally supports Crockford's Base 32.
 	///
 	/// Note: The characters are directly written
 	/// to the ostream's streambuf, thus bypassing

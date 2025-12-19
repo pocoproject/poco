@@ -7,7 +7,7 @@
 //
 // Definition of class Base32Decoder.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -44,11 +44,17 @@ private:
 	int readFromDevice() override;
 	int readOne();
 
+	static const unsigned char* encoding(int options);
+
 	unsigned char   _group[8];
 	int             _groupLength;
 	int             _groupIndex;
 	std::streambuf& _buf;
-	unsigned char _encoding[256];
+	const unsigned char* _encoding;
+
+	static const unsigned char REVERSE_DEFAULT_ENCODING[256];
+	static const unsigned char REVERSE_HEX_ENCODING[256];
+	static const unsigned char REVERSE_CROCKFORD_ENCODING[256];
 
 private:
 	Base32DecoderBuf(const Base32DecoderBuf&);
