@@ -179,6 +179,9 @@ node_modules
 # Build-time symlinks to bundled libraries #
 ############################################
 Foundation/src/adler32.c
+Foundation/src/config.h
+Foundation/src/pcre2posix.c
+Foundation/src/pcre2posix.h
 Foundation/src/compress.c
 Foundation/src/crc32.c
 Foundation/src/crc32.h
