@@ -30,6 +30,12 @@ void ULIDTest::testParse()
 	Poco::ULID ulid("01BX5ZZKBKACTAV9WEVGEMMVRY");
 	assertTrue (ulid.toString() == "01BX5ZZKBKACTAV9WEVGEMMVRY");
 
+	ulid.parse("01bx5zzkbkactav9wevgemmvry");
+	assertTrue (ulid.toString() == "01BX5ZZKBKACTAV9WEVGEMMVRY");
+
+	ulid.parse("olbx5zzkbkactav9wevgemmvry");
+	assertTrue (ulid.toString() == "01BX5ZZKBKACTAV9WEVGEMMVRY");
+
 	ulid.parse("01KCSHHDYBY3J5VRSXHMKNYSE6");
 	assertTrue (ulid.toString() == "01KCSHHDYBY3J5VRSXHMKNYSE6");
 
@@ -59,7 +65,7 @@ void ULIDTest::testParse()
 
 	try
 	{
-		ulid.parse("01BX5ZZKBKAOTAV9WEVGEMMVRY");
+		ulid.parse("01BX5ZZKBKAUTAV9WEVGEMMVRY");
 		fail("malformed ULID - must throw");
 	}
 	catch (Poco::SyntaxException&)
