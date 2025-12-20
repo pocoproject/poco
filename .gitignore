@@ -210,3 +210,5 @@ Foundation/src/zutil.c
 Foundation/src/zutil.h
 JSON/src/pdjson.c
 JSON/src/pdjson.h
+Data/SQLite/src/sqlite3.c
+Data/SQLite/src/sqlite3.h
