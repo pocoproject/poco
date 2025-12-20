@@ -260,6 +260,10 @@ struct Tuple
 		return Detail::TupleLess<0, length>::compare(_data, other._data);
 	}
 
+	explicit operator TupleType&() { return _data; }
+
+	explicit operator const TupleType&() const { return _data; }
+
 private:
 	template <std::size_t I, typename U, typename... Us>
 	void init(const U& u, const Us&... us)
@@ -284,6 +288,7 @@ private:
 	}
 
 	TupleType _data;
+
 };
 
 
