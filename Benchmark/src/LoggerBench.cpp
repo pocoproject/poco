@@ -1072,6 +1072,61 @@ BENCHMARK_F(FastLoggerFileFixture, BM_Comparison_FastLogger_File)(benchmark::Sta
 
 
 //
+// CPU Affinity comparison: Both loggers with affinity enabled
+// This provides a fair comparison when both have their backend threads pinned
+//
+
+class AsyncChannelFileAffinityFixture : public benchmark::Fixture
+{
+public:
+	void SetUp(benchmark::State&) override
+	{
+		tempFile = TemporaryFile::tempName() + "_async_affinity.log";
+		pFileChannel = new FileChannel(tempFile);
+		pFormatter = new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t");
+		pFormattingChannel = new FormattingChannel(pFormatter, pFileChannel);
+		pAsyncChannel = new AsyncChannel(pFormattingChannel);
+		pAsyncChannel->setProperty("enableCpuAffinity", "true");
+		pAsyncChannel->open();
+
+		pLogger = &Logger::get("BenchComparison.Async.File.Affinity");
+		pLogger->setChannel(pAsyncChannel);
+		pLogger->setLevel(Message::PRIO_TRACE);
+	}
+
+	void TearDown(benchmark::State&) override
+	{
+		pAsyncChannel->close();
+		try { File(tempFile).remove(); } catch (...) {}
+	}
+
+	std::string tempFile;
+	AutoPtr<FileChannel> pFileChannel;
+	AutoPtr<PatternFormatter> pFormatter;
+	AutoPtr<FormattingChannel> pFormattingChannel;
+	AutoPtr<AsyncChannel> pAsyncChannel;
+	Logger* pLogger = nullptr;
+};
+
+// Logger + AsyncChannel with CPU affinity enabled
+BENCHMARK_F(AsyncChannelFileAffinityFixture, BM_Comparison_Logger_AsyncChannel_File_Affinity)(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		pLogger->information("This is a test log message for comparison");
+	}
+}
+
+
+// Note: FastLogger backend options (including enableCpuAffinity) can only be set
+// before the backend starts. Since all FastLogger benchmarks share the same backend,
+// we cannot have separate affinity/non-affinity FastLogger benchmarks in the same run.
+// The FastLoggerFileFixture benchmark above uses the default (no affinity) configuration.
+// To benchmark FastLogger with affinity, call FastLogger::setBackendOption("enableCpuAffinity", "true")
+// before creating any loggers.
+
+
+//
 // Throughput comparison with varying message sizes (null sink)
 //
 // These tests isolate queue/threading overhead by discarding output.

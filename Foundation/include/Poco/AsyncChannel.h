@@ -97,6 +97,14 @@ public:
 	/// removes the limit.
 	///
 	/// The "queueSize" property is set-only.
+	///
+	/// The "enableCpuAffinity" property pins the background
+	/// logging thread to a specific CPU core (the last core by
+	/// default). This can reduce latency variance by avoiding
+	/// thread migration. Values: "true" or "false" (default).
+	/// Only supported on Linux and Windows.
+	///
+	/// The "enableCpuAffinity" property is set-only.
 
 protected:
 	~AsyncChannel() override;
@@ -112,6 +120,7 @@ private:
 	std::size_t _queueSize = 0;
 	std::size_t _dropCount = 0;
 	std::atomic<bool> _closed;
+	bool _enableCpuAffinity = false;
 };
 
 

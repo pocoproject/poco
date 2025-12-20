@@ -22,6 +22,12 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#if defined(__linux__)
+#include <sched.h>
+#include <unistd.h>
+#elif defined(_WIN32)
+#include <windows.h>
+#endif
 
 
 namespace Poco {
@@ -149,6 +155,10 @@ void AsyncChannel::setProperty(const std::string& name, const std::string& value
 		else
 			_queueSize = Poco::NumberParser::parseUnsigned(value);
 	}
+	else if (name == "enableCpuAffinity")
+	{
+		_enableCpuAffinity = (Poco::icompare(value, "true") == 0 || value == "1");
+	}
 	else
 	{
 		Channel::setProperty(name, value);
@@ -158,6 +168,29 @@ void AsyncChannel::setProperty(const std::string& name, const std::string& value
 
 void AsyncChannel::run()
 {
+	// Set CPU affinity if enabled (pin to last CPU core)
+	if (_enableCpuAffinity)
+	{
+#if defined(__linux__)
+		long num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+		if (num_cpus > 1)
+		{
+			cpu_set_t cpuset;
+			CPU_ZERO(&cpuset);
+			CPU_SET(num_cpus - 1, &cpuset);
+			sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
+		}
+#elif defined(_WIN32)
+		SYSTEM_INFO sysInfo;
+		GetSystemInfo(&sysInfo);
+		DWORD num_cpus = sysInfo.dwNumberOfProcessors;
+		if (num_cpus > 1)
+		{
+			SetThreadAffinityMask(GetCurrentThread(), static_cast<DWORD_PTR>(1) << (num_cpus - 1));
+		}
+#endif
+	}
+
 	AutoPtr<Notification> nf = _queue.waitDequeueNotification();
 	while (nf)
 	{
