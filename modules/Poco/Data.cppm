@@ -179,9 +179,6 @@ export namespace Poco::Data {
 
 	using Poco::Data::operator<<;
 	using Poco::Data::swap;
-	using Poco::Data::tupleBind;
-	using Poco::Data::tupleExtract;
-	using Poco::Data::tuplePrepare;
 
 	namespace Keywords {
 		using Poco::Data::Keywords::async;
