@@ -43,10 +43,10 @@ class AbstractTypeHandler
 	/// For documentation on type handlers, see TypeHandler class.
 {
 protected:
-	AbstractTypeHandler();
-	~AbstractTypeHandler();
-	AbstractTypeHandler(const AbstractTypeHandler&);
-	AbstractTypeHandler& operator = (const AbstractTypeHandler&);
+	AbstractTypeHandler() = delete;
+	~AbstractTypeHandler() = delete;
+	AbstractTypeHandler(const AbstractTypeHandler&) = delete;
+	AbstractTypeHandler& operator = (const AbstractTypeHandler&) = delete;
 };
 
 
@@ -141,10 +141,6 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 		pPreparator->prepare(pos, obj);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 
@@ -176,10 +172,6 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 		pPreparator->prepare(pos, obj);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 
@@ -211,10 +203,6 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 		pPreparator->prepare(pos, obj);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 
@@ -246,10 +234,6 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 		pPreparator->prepare(pos, obj);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 // define this macro to nothing for smaller code size
@@ -257,78 +241,73 @@ private:
 
 
 template <typename...T>
-class TypeHandler<std::tuple<T...>>
+class TypeHandler<std::tuple<T...>>: public AbstractTypeHandler
     /// Specialization of type handler for std::tuple.
 {
 public:
     static void bind(std::size_t pos, const std::tuple<T...> & t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
     {
         poco_assert_dbg (!pBinder.isNull());
-        bindTail<0>(pos, t, pBinder, dir);
+        tupleBind<0>(pos, t, pBinder, dir);
     }
 
     static void prepare(std::size_t pos, const std::tuple<T...> & t, AbstractPreparator::Ptr pPrepare)
     {
         poco_assert_dbg (!pPrepare.isNull());
-        prepareTail<0>(pos, t, pPrepare);
+        tuplePrepare<0>(pos, t, pPrepare);
     }
 
     static std::size_t size()
     {
         std::size_t sz = 0;
-        sizeTail<0>(sz);
+        tupleSize<0>(sz);
         return sz;
     }
 
     static void extract(std::size_t pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
     {
         poco_assert_dbg (!pExt.isNull());
-        extractTail<0>(pos, t, defVal, pExt);
+        tupleExtract<0>(pos, t, defVal, pExt);
     }
 
 private:
-    TypeHandler();
-    ~TypeHandler();
-    TypeHandler(const TypeHandler&) = delete;
-    TypeHandler& operator=(const TypeHandler&) = delete;
-
     template<size_t N>
-    static POCO_TUPLE_TYPE_HANDLER_INLINE void bindTail(std::size_t& pos, const std::tuple<T...>& t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+    static POCO_TUPLE_TYPE_HANDLER_INLINE void tupleBind(std::size_t& pos, const std::tuple<T...>& t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
     {
         if constexpr (N < sizeof...(T))
         {
             using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
             TypeHandler<Type>::bind(pos, std::get<N>(t), pBinder, dir);
             pos += TypeHandler<Type>::size();
-            bindTail<N+1>(pos, t, pBinder, dir);
+            tupleBind<N+1>(pos, t, pBinder, dir);
         }
     }
 
     template<size_t N>
-    static POCO_TUPLE_TYPE_HANDLER_INLINE void prepareTail(std::size_t& pos, const std::tuple<T...>& t, AbstractPreparator::Ptr pPreparator)
+    static POCO_TUPLE_TYPE_HANDLER_INLINE void tuplePrepare(std::size_t& pos, const std::tuple<T...>& t, AbstractPreparator::Ptr pPreparator)
     {
         if constexpr (N < sizeof...(T))
         {
             using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
             TypeHandler<Type>::prepare(pos, std::get<N>(t), pPreparator);
             pos += TypeHandler<Type>::size();
-            prepareTail<N+1>(pos, t, pPreparator);
+            tuplePrepare<N+1>(pos, t, pPreparator);
         }
     }
 
     template<size_t N>
-    static POCO_TUPLE_TYPE_HANDLER_INLINE void sizeTail(std::size_t& sz)
+    static POCO_TUPLE_TYPE_HANDLER_INLINE void tupleSize(std::size_t& sz)
     {
         if constexpr (N < sizeof...(T))
         {
             using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
             sz += TypeHandler<Type>::size();
-            sizeTail<N+1>(sz);
+            tupleSize<N+1>(sz);
         }
     }
 
     template<size_t N>
-    static POCO_TUPLE_TYPE_HANDLER_INLINE void extractTail(std::size_t& pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
+    static POCO_TUPLE_TYPE_HANDLER_INLINE void tupleExtract(std::size_t& pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
     {
         if constexpr (N < sizeof...(T))
         {
@@ -336,14 +315,14 @@ private:
             auto dVal = std::get<N>(defVal);
             TypeHandler<Type>::extract(pos, std::get<N>(t), dVal, pExt);
             pos += TypeHandler<Type>::size();
-            extractTail<N+1>(pos, t, defVal, pExt);
+            tupleExtract<N+1>(pos, t, defVal, pExt);
         }
     }
 };
 
 
 template <typename T>
-class TypeHandler<Nullable<T>>
+class TypeHandler<Nullable<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for Nullable.
 {
 public:
@@ -384,17 +363,11 @@ public:
 		poco_assert_dbg (!pExt.isNull());
 		pExt->extract(pos++, obj);
 	}
-
-private:
-	TypeHandler();
-	~TypeHandler();
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator=(const TypeHandler&);
 };
 
 
 template <typename...T>
-class TypeHandler<Poco::Tuple<T...>>
+class TypeHandler<Poco::Tuple<T...>>: public AbstractTypeHandler
     /// Specialization of type handler for Tuple.
 {
 public:
@@ -453,10 +426,6 @@ public:
 		pos += TypeHandler<K>::size();
 			   TypeHandler<V>::prepare(pos, obj.second, pPreparator);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 
@@ -492,10 +461,6 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 			   TypeHandler<T>::prepare(pos, T(), pPreparator);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 
@@ -532,10 +497,6 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 			   TypeHandler<T>::prepare(pos, T(), pPreparator);
 	}
-
-private:
-	TypeHandler(const TypeHandler&);
-	TypeHandler& operator = (const TypeHandler&);
 };
 
 
