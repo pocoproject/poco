@@ -28,7 +28,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \
 	TaskManagerTest TestChannel TeeStreamTest UTF8StringTest \
 	TextConverterTest TextIteratorTest TextBufferIteratorTest TextTestSuite TextEncodingTest \
-	ThreadLocalTest ThreadPoolTest ActiveThreadPoolTest ThreadTest ThreadingTestSuite TimerTest \
+	ThreadLocalTest ThreadPoolTest ActiveThreadPoolTest ThreadTest ThreadingTestSuite TimerTest SpinlockMutexTest \
 	TimespanTest TimestampTest TimezoneTest URIStreamOpenerTest URITest \
 	URITestSuite UUIDGeneratorTest UUIDTest UUIDTestSuite \
 	ULIDTest ULIDGeneratorTest ULIDTestSuite ZLibTest \
