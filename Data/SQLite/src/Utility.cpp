@@ -178,72 +178,73 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 
 void Utility::throwException(sqlite3* pDB, int rc, const std::string& addErrMsg)
 {
+	std::string errMsg = addErrMsg.empty() ? lastError(pDB) : addErrMsg;
 	switch (rc)
 	{
 	case SQLITE_OK:
 		break;
 	case SQLITE_ERROR:
-		throw InvalidSQLStatementException(lastError(pDB), addErrMsg);
+		throw InvalidSQLStatementException(errMsg);
 	case SQLITE_INTERNAL:
-		throw InternalDBErrorException(lastError(pDB), addErrMsg);
+		throw InternalDBErrorException(errMsg);
 	case SQLITE_PERM:
-		throw DBAccessDeniedException(lastError(pDB), addErrMsg);
+		throw DBAccessDeniedException(errMsg);
 	case SQLITE_ABORT:
-		throw ExecutionAbortedException(lastError(pDB), addErrMsg);
+		throw ExecutionAbortedException(errMsg);
 	case SQLITE_BUSY:
 	case SQLITE_BUSY_RECOVERY:
 #if defined(SQLITE_BUSY_SNAPSHOT)
 	case SQLITE_BUSY_SNAPSHOT:
 #endif
-		throw DBLockedException(lastError(pDB), addErrMsg);
+		throw DBLockedException(errMsg);
 	case SQLITE_LOCKED:
-		throw TableLockedException(lastError(pDB), addErrMsg);
+		throw TableLockedException(errMsg);
 	case SQLITE_NOMEM:
-		throw NoMemoryException(lastError(pDB), addErrMsg);
+		throw NoMemoryException(errMsg);
 	case SQLITE_READONLY:
-		throw ReadOnlyException(lastError(pDB), addErrMsg);
+		throw ReadOnlyException(errMsg);
 	case SQLITE_INTERRUPT:
-		throw InterruptException(lastError(pDB), addErrMsg);
+		throw InterruptException(errMsg);
 	case SQLITE_IOERR:
-		throw IOErrorException(lastError(pDB), addErrMsg);
+		throw IOErrorException(errMsg);
 	case SQLITE_CORRUPT:
-		throw CorruptImageException(lastError(pDB), addErrMsg);
+		throw CorruptImageException(errMsg);
 	case SQLITE_NOTFOUND:
-		throw TableNotFoundException(lastError(pDB), addErrMsg);
+		throw TableNotFoundException(errMsg);
 	case SQLITE_FULL:
-		throw DatabaseFullException(lastError(pDB), addErrMsg);
+		throw DatabaseFullException(errMsg);
 	case SQLITE_CANTOPEN:
-		throw CantOpenDBFileException(lastError(pDB), addErrMsg);
+		throw CantOpenDBFileException(errMsg);
 	case SQLITE_PROTOCOL:
-		throw LockProtocolException(lastError(pDB), addErrMsg);
+		throw LockProtocolException(errMsg);
 	case SQLITE_EMPTY:
-		throw InternalDBErrorException(lastError(pDB), addErrMsg);
+		throw InternalDBErrorException(errMsg);
 	case SQLITE_SCHEMA:
-		throw SchemaDiffersException(lastError(pDB), addErrMsg);
+		throw SchemaDiffersException(errMsg);
 	case SQLITE_TOOBIG:
-		throw RowTooBigException(lastError(pDB), addErrMsg);
+		throw RowTooBigException(errMsg);
 	case SQLITE_CONSTRAINT:
-		throw ConstraintViolationException(lastError(pDB), addErrMsg);
+		throw ConstraintViolationException(errMsg);
 	case SQLITE_MISMATCH:
-		throw DataTypeMismatchException(lastError(pDB), addErrMsg);
+		throw DataTypeMismatchException(errMsg);
 	case SQLITE_MISUSE:
-		throw InvalidLibraryUseException(lastError(pDB), addErrMsg);
+		throw InvalidLibraryUseException(errMsg);
 	case SQLITE_NOLFS:
-		throw OSFeaturesMissingException(lastError(pDB), addErrMsg);
+		throw OSFeaturesMissingException(errMsg);
 	case SQLITE_AUTH:
-		throw AuthorizationDeniedException(lastError(pDB), addErrMsg);
+		throw AuthorizationDeniedException(errMsg);
 	case SQLITE_FORMAT:
-		throw CorruptImageException(lastError(pDB), addErrMsg);
+		throw CorruptImageException(errMsg);
 	case SQLITE_NOTADB:
-		throw CorruptImageException(lastError(pDB), addErrMsg);
+		throw CorruptImageException(errMsg);
 	case SQLITE_RANGE:
-		throw InvalidSQLStatementException(lastError(pDB), addErrMsg);
+		throw InvalidSQLStatementException(errMsg);
 	case SQLITE_ROW:
 		break; // sqlite_step() has another row ready
 	case SQLITE_DONE:
 		break; // sqlite_step() has finished executing
 	default:
-		throw SQLiteException(Poco::format("Unknown error code: %d", rc), addErrMsg);
+		throw SQLiteException(Poco::format("Unknown error code: %d", rc), errMsg);
 	}
 }
 
