@@ -333,7 +333,7 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 			case '<':  writeMarkup(MARKUP_LTENC); break;
 			case '>':  writeMarkup(MARKUP_GTENC); break;
 			default:
-				if (c >= 0 && c < 32)
+				if (static_cast<unsigned char>(c) < 32)
 				{
 					if (c == '\t' || c == '\r' || c == '\n')
 						writeXML(c);
@@ -923,7 +923,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			case '\r': writeMarkup(MARKUP_CRENC); break;
 			case '\n': writeMarkup(MARKUP_LFENC); break;
 			default:
-				if (c >= 0 && c < 32)
+				if (static_cast<unsigned char>(c) < 32)
 					throw XMLException("Invalid character token.");
 				else
 					writeXML(c);
@@ -961,7 +961,7 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 			case '\r': writeMarkup(MARKUP_CRENC); break;
 			case '\n': writeMarkup(MARKUP_LFENC); break;
 			default:
-				if (c >= 0 && c < 32)
+				if (static_cast<unsigned char>(c) < 32)
 					throw XMLException("Invalid character token.");
 				else
 					writeXML(c);

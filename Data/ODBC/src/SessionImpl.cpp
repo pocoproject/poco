@@ -175,7 +175,7 @@ void SessionImpl::open(const std::string& connect)
 		if (!canTransact()) autoCommit("", true);
 	}
 	else
-		throw ConnectionException(SQL_NULL_HDBC,
+		throw ConnectionException(ODBC_NULL_HDBC,
 			Poco::format("Connection to '%s' failed.", connectionString()));
 
 	setName();

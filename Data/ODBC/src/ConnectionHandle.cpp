@@ -30,8 +30,8 @@ const std::string ConnectionHandle::CANT_SET_ATTR_SQLSTATE = "HY011";
 
 
 ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout):
-	_pEnvironment(SQL_NULL_HENV),
-	_hdbc(SQL_NULL_HDBC),
+	_pEnvironment(nullptr),
+	_hdbc(ODBC_NULL_HDBC),
 	_connectString(connectString)
 {
 	alloc();
@@ -59,8 +59,8 @@ void ConnectionHandle::alloc()
 	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC, _pEnvironment->handle(), &_hdbc)))
 	{
 		delete _pEnvironment;
-		_pEnvironment = SQL_NULL_HENV;
-		_hdbc = SQL_NULL_HDBC;
+		_pEnvironment = nullptr;
+		_hdbc = ODBC_NULL_HDBC;
 		throw ODBCException("ODBC: Could not allocate connection handle.");
 	}
 }
@@ -68,16 +68,16 @@ void ConnectionHandle::alloc()
 
 void ConnectionHandle::free()
 {
-	if (_hdbc != SQL_NULL_HDBC)
+	if (_hdbc != ODBC_NULL_HDBC)
 	{
 		SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
-		_hdbc = SQL_NULL_HDBC;
+		_hdbc = ODBC_NULL_HDBC;
 	}
 
 	if (_pEnvironment)
 	{
 		delete _pEnvironment;
-		_pEnvironment = SQL_NULL_HENV;
+		_pEnvironment = nullptr;
 	}
 }
 
@@ -152,7 +152,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 	catch(NotSupportedException&){}
 	catch(InvalidAccessException&){}
 
-	return _hdbc != SQL_NULL_HDBC;
+	return _hdbc != ODBC_NULL_HDBC;
 }
 
 

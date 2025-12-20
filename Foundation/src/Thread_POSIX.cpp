@@ -170,9 +170,9 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 	{
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 #else
-	if (threadName.size() > std::min(POCO_MAX_THREAD_NAME_LEN, 15))
+	if (threadName.size() > static_cast<std::size_t>(std::min(POCO_MAX_THREAD_NAME_LEN, 15)))
 	{
-		int half = (std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
+		std::size_t half = static_cast<std::size_t>(std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
 #endif
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");

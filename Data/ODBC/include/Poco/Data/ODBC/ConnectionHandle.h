@@ -123,7 +123,7 @@ private:
 	const ConnectionHandle& operator=(const ConnectionHandle&);
 
 	const EnvironmentHandle* _pEnvironment = nullptr;
-	SQLHDBC                  _hdbc = SQL_NULL_HDBC;
+	SQLHDBC                  _hdbc = ODBC_NULL_HDBC;
 	std::string              _connectString;
 
 	friend class Poco::Data::ODBC::SessionImpl;
@@ -144,7 +144,7 @@ inline ConnectionHandle::operator const SQLHDBC& () const
 
 inline ConnectionHandle::operator bool()
 {
-	return _pEnvironment != nullptr && _hdbc != SQL_NULL_HDBC;
+	return _pEnvironment != nullptr && _hdbc != ODBC_NULL_HDBC;
 }
 
 
