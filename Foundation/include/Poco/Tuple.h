@@ -288,7 +288,6 @@ private:
 	}
 
 	TupleType _data;
-
 };
 
 

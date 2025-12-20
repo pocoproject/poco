@@ -400,7 +400,7 @@ class TypeHandler<Poco::Tuple<T...>>
 public:
     using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T...>>::CONSTREFTYPE;
 	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T...>>::REFTYPE;
-    using TupleType = Poco::Tuple<T...>::TupleType;
+    using TupleType = typename Poco::Tuple<T...>::TupleType;
 
     static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
     {
