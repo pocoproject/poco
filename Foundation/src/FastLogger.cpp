@@ -1697,6 +1697,7 @@ void FastLogger::ensureBackendStarted()
 		options.error_notifier = [](std::string const&) { /* suppress */ };
 
 		// Check if CPU affinity is enabled (default: false, same as Quill)
+		// Can be set via setBackendOption("enableCpuAffinity", "true") before first logger creation
 		bool enableCpuAffinity = false;
 		{
 			Mutex::ScopedLock optionsLock(_backendOptionsMtx);
