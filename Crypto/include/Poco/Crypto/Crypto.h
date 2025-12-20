@@ -45,8 +45,8 @@
 #endif
 
 
-#if OPENSSL_VERSION_NUMBER < 0x10000000L
-#error "OpenSSL version too old. At least OpenSSL 1.0.0 is required."
+#if OPENSSL_VERSION_NUMBER < 0x10101000L
+#error "OpenSSL version too old. At least OpenSSL 1.1.1 is required."
 #endif
 
 

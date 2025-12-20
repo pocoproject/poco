@@ -186,7 +186,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 
 bool Extractor::extract(std::size_t pos, DateTime& val)
 {
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	if (!realExtractFixed(pos, MYSQL_TYPE_DATETIME, &mt))
 		return false;
@@ -198,7 +198,7 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 
 bool Extractor::extract(std::size_t pos, Date& val)
 {
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	if (!realExtractFixed(pos, MYSQL_TYPE_DATE, &mt))
 		return false;
@@ -210,7 +210,7 @@ bool Extractor::extract(std::size_t pos, Date& val)
 
 bool Extractor::extract(std::size_t pos, Time& val)
 {
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	if (!realExtractFixed(pos, MYSQL_TYPE_TIME, &mt))
 		return false;
@@ -265,7 +265,7 @@ void Extractor::reset()
 
 bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned)
 {
-	MYSQL_BIND bind = {nullptr};
+	MYSQL_BIND bind = {};
 	my_bool isNull = 0;
 
 	bind.is_null     = &isNull;

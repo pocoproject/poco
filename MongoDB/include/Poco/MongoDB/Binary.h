@@ -7,7 +7,7 @@
 //
 // Definition of the Binary class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -58,14 +58,20 @@ public:
 	Binary(const UUID& uuid);
 		/// Creates a Binary containing an UUID.
 
+	Binary(const char* data, unsigned char subtype = 0);
+		/// Creates a Binary with the contents of the given C-string and the given subtype.
+
 	Binary(const std::string& data, unsigned char subtype = 0);
 		/// Creates a Binary with the contents of the given string and the given subtype.
 
-	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
+	Binary(const void* data, Poco::Int32 size, unsigned char subtype);
 		/// Creates a Binary with the contents of the given buffer and the given subtype.
 
 	virtual ~Binary();
 		/// Destroys the Binary.
+
+	const Buffer<unsigned char>& buffer() const;
+		/// Returns a reference to the internal buffer
 
 	Buffer<unsigned char>& buffer();
 		/// Returns a reference to the internal buffer
@@ -110,6 +116,12 @@ inline void Binary::subtype(unsigned char type)
 }
 
 
+inline const Buffer<unsigned char>& Binary::buffer() const
+{
+	return _buffer;
+}
+
+
 inline Buffer<unsigned char>& Binary::buffer()
 {
 	return _buffer;
@@ -148,16 +160,16 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	_reader >> subtype;
 	to->subtype(subtype);
 
-	_reader.readRaw((char*) to->buffer().begin(), size);
+	_reader.readRaw(reinterpret_cast<char*>(to->buffer().begin()), size);
 }
 
 
 template<>
-inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
+inline void BSONWriter::write<Binary::Ptr>(const Binary::Ptr& from)
 {
-	_writer << (Poco::Int32) from->buffer().size();
+	_writer << static_cast<Poco::Int32>(from->buffer().size());
 	_writer << from->subtype();
-	_writer.writeRaw(reinterpret_cast<char*>(from->buffer().begin()), from->buffer().size());
+	_writer.writeRaw(reinterpret_cast<const char*>(from->buffer().begin()), from->buffer().size());
 }
 
 

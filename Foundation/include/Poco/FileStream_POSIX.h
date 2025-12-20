@@ -76,8 +76,8 @@ protected:
 		BUFFER_SIZE = 4096
 	};
 
-	int readFromDevice(char* buffer, std::streamsize length) override;
-	int writeToDevice(const char* buffer, std::streamsize length) override;
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	std::string _path;

@@ -53,7 +53,7 @@ add_library(Foundation ${SRCS})
 if (POCO_UNBUNDLED)
 	target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
 	target_include_directories(Foundation PRIVATE ${EMBEDDED_PCRE2_INCLUDE})
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED PRIVATE HAVE_CONFIG_H)
 else()
 	# BUILD_LOCAL_INTERFACE is used to ensure that the dependent libraries are used
 	# only in the build process and are not exported.

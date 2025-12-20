@@ -130,7 +130,7 @@ std::string Timezone::standardName()
 {
 	std::string result;
 	TIME_ZONE_INFORMATION tzInfo;
-	DWORD dstFlag = GetTimeZoneInformation(&tzInfo);
+	(void) GetTimeZoneInformation(&tzInfo);
 	WCHAR* ptr = tzInfo.StandardName;
 	UnicodeConverter::toUTF8(ptr, result);
 	return result;
@@ -141,7 +141,7 @@ std::string Timezone::dstName()
 {
 	std::string result;
 	TIME_ZONE_INFORMATION tzInfo;
-	DWORD dstFlag = GetTimeZoneInformation(&tzInfo);
+	(void) GetTimeZoneInformation(&tzInfo);
 	WCHAR* ptr = tzInfo.DaylightName;
 	UnicodeConverter::toUTF8(ptr, result);
 	return result;

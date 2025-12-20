@@ -68,7 +68,7 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	}
 
 	// read the rest of the header
-	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
 	Poco::UInt16 len = getZipCommentSize();
 	if (len > 0)
 	{
@@ -148,7 +148,7 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
 	}
 
-	std::memset(_rawInfo + ZipCommon::HEADER_SIZE, 0, FULL_HEADER_SIZE - ZipCommon::HEADER_SIZE);
+	std::memset(_rawInfo + ZipCommon::HEADER_SIZE, 0, static_cast<std::size_t>(FULL_HEADER_SIZE) - ZipCommon::HEADER_SIZE);
 
 	// read the rest of the header
 	Poco::UInt64 offset = RECORDSIZE_POS;

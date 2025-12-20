@@ -20,17 +20,59 @@
 #include <sstream>
 #include <cstring>
 #include <memory>
+#include <mutex>
 #include "Poco/UnWindows.h"
 
 #include <winsock2.h>
 #include <iphlpapi.h>
 
-#if defined(_MSC_VER)
-#pragma warning(disable:4996) // deprecation warnings
-#endif
-
 
 namespace Poco {
+
+
+namespace {
+
+
+OSVERSIONINFOEXW cachedVersionInfo{};
+std::once_flag versionInfoFlag;
+bool versionInfoInitialized = false;
+
+
+void initVersionInfo()
+{
+	cachedVersionInfo.dwOSVersionInfoSize = sizeof(cachedVersionInfo);
+
+	// RtlGetVersion is always available in ntdll.dll (loaded in every process)
+	if (HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll"))
+	{
+		using RtlGetVersionFunc = LONG (WINAPI *)(OSVERSIONINFOEXW*);
+		if (auto pRtlGetVersion = reinterpret_cast<RtlGetVersionFunc>(
+				GetProcAddress(hNtdll, "RtlGetVersion")))
+		{
+			if (pRtlGetVersion(&cachedVersionInfo) == 0) // STATUS_SUCCESS
+			{
+				versionInfoInitialized = true;
+			}
+		}
+	}
+}
+
+
+/// Returns cached OS version information.
+/// Uses RtlGetVersion from ntdll.dll which returns accurate version info
+/// regardless of application manifest (unlike deprecated GetVersionEx).
+/// The version info is cached since it doesn't change during runtime.
+/// Throws SystemException if version info cannot be obtained.
+const OSVERSIONINFOEXW& getVersionInfo()
+{
+	std::call_once(versionInfoFlag, initVersionInfo);
+	if (!versionInfoInitialized)
+		throw SystemException("Cannot get OS version information");
+	return cachedVersionInfo;
+}
+
+
+} // namespace
 
 
 std::string EnvironmentImpl::getImpl(const std::string& name)
@@ -73,54 +115,58 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 
 std::string EnvironmentImpl::osNameImpl()
 {
-	OSVERSIONINFO vi;
-	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx(&vi) == 0) throw SystemException("Cannot get OS version information");
-	switch (vi.dwPlatformId)
-	{
-	case VER_PLATFORM_WIN32s:
-		return "Windows 3.x";
-	case VER_PLATFORM_WIN32_WINDOWS:
-		return vi.dwMinorVersion == 0 ? "Windows 95" : "Windows 98";
-	case VER_PLATFORM_WIN32_NT:
+	const auto& vi = getVersionInfo();
+
+	// All modern Windows versions are NT-based
+	if (vi.dwPlatformId == VER_PLATFORM_WIN32_NT)
 		return "Windows NT";
-	default:
-		return "Unknown";
-	}
+
+	return "Unknown";
 }
 
 
 std::string EnvironmentImpl::osDisplayNameImpl()
 {
-	OSVERSIONINFOEX vi;	// OSVERSIONINFOEX is supported starting at Windows 2000
-	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx((OSVERSIONINFO*)&vi) == 0) throw SystemException("Cannot get OS version information");
+	const auto& vi = getVersionInfo();
+	const bool isWorkstation = (vi.wProductType == VER_NT_WORKSTATION);
+
 	switch (vi.dwMajorVersion)
 	{
 	case 10:
 		switch (vi.dwMinorVersion)
 		{
 		case 0:
-			if (vi.dwBuildNumber >= 22000)
-				return "Windows 11";
-			else if (vi.dwBuildNumber >= 20348 && vi.wProductType != VER_NT_WORKSTATION)
-				return "Windows Server 2022";
-			else if (vi.dwBuildNumber >= 17763 && vi.wProductType != VER_NT_WORKSTATION)
-				return "Windows Server 2019";
+			if (isWorkstation)
+			{
+				// Windows 10 vs Windows 11 (client)
+				return (vi.dwBuildNumber >= 22000) ? "Windows 11" : "Windows 10";
+			}
 			else
-				return vi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016";
+			{
+				// Server versions based on build number
+				if (vi.dwBuildNumber >= 26100)
+					return "Windows Server 2025";
+				else if (vi.dwBuildNumber >= 20348)
+					return "Windows Server 2022";
+				else if (vi.dwBuildNumber >= 17763)
+					return "Windows Server 2019";
+				else
+					return "Windows Server 2016";
+			}
+		default:
+			return isWorkstation ? "Windows 10" : "Windows Server";
 		}
 	case 6:
 		switch (vi.dwMinorVersion)
 		{
 		case 0:
-			return vi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008";
+			return isWorkstation ? "Windows Vista" : "Windows Server 2008";
 		case 1:
-			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2";
+			return isWorkstation ? "Windows 7" : "Windows Server 2008 R2";
 		case 2:
-			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012";
+			return isWorkstation ? "Windows 8" : "Windows Server 2012";
 		case 3:
-			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2";
+			return isWorkstation ? "Windows 8.1" : "Windows Server 2012 R2";
 		default:
 			return "Unknown";
 		}
@@ -144,11 +190,9 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 
 std::string EnvironmentImpl::osVersionImpl()
 {
-	OSVERSIONINFOW vi;
-	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionExW(&vi) == 0) throw SystemException("Cannot get OS version information");
+	const auto& vi = getVersionInfo();
 	std::ostringstream str;
-	str << vi.dwMajorVersion << "." << vi.dwMinorVersion << " (Build " << (vi.dwBuildNumber & 0xFFFF);
+	str << vi.dwMajorVersion << "." << vi.dwMinorVersion << " (Build " << vi.dwBuildNumber;
 	std::string version;
 	UnicodeConverter::toUTF8(vi.szCSDVersion, version);
 	if (!version.empty()) str << ": " << version;

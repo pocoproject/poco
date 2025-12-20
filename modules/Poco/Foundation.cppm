@@ -101,8 +101,6 @@ module;
 #include "Poco/ExpireStrategy.h"
 #include "Poco/FIFOBuffer.h"
 #include "Poco/FIFOBufferStream.h"
-#include "Poco/FIFOEvent.h"
-#include "Poco/FIFOStrategy.h"
 #include "Poco/FileChannel.h"
 #include "Poco/File.h"
 #include "Poco/FileStreamFactory.h"
@@ -116,12 +114,9 @@ module;
 #include "Poco/FunctionDelegate.h"
 #include "Poco/FunctionPriorityDelegate.h"
 #include "Poco/Glob.h"
-#include "Poco/HashFunction.h"
 #include "Poco/Hash.h"
 #include "Poco/HashMap.h"
 #include "Poco/HashSet.h"
-#include "Poco/HashStatistic.h"
-#include "Poco/HashTable.h"
 #include "Poco/HexBinaryDecoder.h"
 #include "Poco/HexBinaryEncoder.h"
 #include "Poco/HMACEngine.h"
@@ -190,7 +185,6 @@ module;
 #include "Poco/NumberParser.h"
 #include "Poco/NumericString.h"
 #include "Poco/ObjectPool.h"
-#include "Poco/Observer.h"
 #include "Poco/Optional.h"
 #include "Poco/Path.h"
 #include "Poco/PatternFormatter.h"
@@ -227,7 +221,6 @@ module;
 #include "Poco/SharedPtr.h"
 #include "Poco/SignalHandler.h"
 #include "Poco/SimpleFileChannel.h"
-#include "Poco/SimpleHashTable.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/SortedDirectoryIterator.h"
 #include "Poco/SplitterChannel.h"
@@ -262,7 +255,6 @@ module;
 #include "Poco/Timezone.h"
 #include "Poco/Token.h"
 #include "Poco/Tuple.h"
-#include "Poco/TypeList.h"
 #include "Poco/Types.h"
 #include "Poco/UnbufferedStreamBuf.h"
 #include "Poco/UnicodeConverter.h"
@@ -415,7 +407,9 @@ export namespace Poco {
 	using Poco::DirectoryIteratorImpl;
 	using Poco::DirectoryNotEmptyException;
 	using Poco::DirectoryWatcher;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::DoubleByteEncoding;
+	#endif
 	using Poco::DynamicFactory;
 	using Poco::EOFToken;
 	using Poco::Environment;
@@ -438,9 +432,7 @@ export namespace Poco {
 	using Poco::ExpireStrategy;
 	using Poco::FIFOBufferStream;
 	using Poco::FIFOBufferStreamBuf;
-	using Poco::FIFOEvent;
 	using Poco::FIFOIOS;
-	using Poco::FIFOStrategy;
 	using Poco::FPEnvironment;
 	using Poco::FastMemoryPool;
 	using Poco::FastMutex;
@@ -460,17 +452,13 @@ export namespace Poco {
 	using Poco::FormattingChannel;
 	using Poco::FunctionDelegate;
 	using Poco::FunctionPriorityDelegate;
-	using Poco::Getter;
 	using Poco::Glob;
 	using Poco::HMACEngine;
 	using Poco::Hash;
-	using Poco::HashFunction;
 	using Poco::HashMap;
 	using Poco::HashMapEntry;
 	using Poco::HashMapEntryHash;
 	using Poco::HashSet;
-	using Poco::HashStatistic;
-	using Poco::HashTable;
 	using Poco::HexBinaryDecoder;
 	using Poco::HexBinaryDecoderBuf;
 	using Poco::HexBinaryDecoderIOS;
@@ -478,6 +466,7 @@ export namespace Poco {
 	using Poco::HexBinaryEncoderBuf;
 	using Poco::HexBinaryEncoderIOS;
 	using Poco::IOException;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::ISO8859_3Encoding;
 	using Poco::ISO8859_4Encoding;
 	using Poco::ISO8859_5Encoding;
@@ -490,6 +479,7 @@ export namespace Poco {
 	using Poco::ISO8859_13Encoding;
 	using Poco::ISO8859_14Encoding;
 	using Poco::ISO8859_16Encoding;
+	#endif
 	using Poco::IllegalStateException;
 	using Poco::InflatingIOS;
 	using Poco::InflatingInputStream;
@@ -576,7 +566,6 @@ export namespace Poco {
 	using Poco::NumberFormatter;
 	using Poco::NumberParser;
 	using Poco::ObjectPool;
-	using Poco::Observer;
 	using Poco::OpenFileException;
 	using Poco::Optional;
 	using Poco::OutOfMemoryException;
@@ -659,7 +648,6 @@ export namespace Poco {
 	using Poco::SignalException;
 	using Poco::SignalHandler;
 	using Poco::SimpleFileChannel;
-	using Poco::SimpleHashTable;
 	using Poco::SingletonHolder;
 	using Poco::SortedDirectoryIterator;
 	using Poco::SpinlockMutex;
@@ -862,9 +850,6 @@ export namespace Poco {
 	using Poco::uIntToStr;
 
 	namespace Impl {
-		using Poco::Impl::EnableSigned;
-		using Poco::Impl::EnableUnsigned;
-		using Poco::Impl::IsNegativeImpl;
 		using Poco::Impl::Ptr;
 		using Poco::Impl::hashCombine;
 	}

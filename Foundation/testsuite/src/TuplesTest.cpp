@@ -17,17 +17,6 @@
 #include <map>
 
 
-using Poco::TypeList;
-using Poco::NullTypeList;
-using Poco::TypeListType;
-using Poco::TypeGetter;
-using Poco::TypeLocator;
-using Poco::TypeAppender;
-using Poco::TypeOneEraser;
-using Poco::TypeAllEraser;
-using Poco::TypeDuplicateEraser;
-using Poco::TypeOneReplacer;
-using Poco::TypeAllReplacer;
 using Poco::Tuple;
 using Poco::Void;
 using Poco::Int8;
@@ -1141,12 +1130,28 @@ void TuplesTest::testTupleOrder()
 
 void TuplesTest::testMemOverhead()
 {
-	Tuple<short> smallOne(0);
-	int sz = sizeof(smallOne);
-	assertTrue (sz == 4 || sz == 8); //depending on architecture and alignment
-	Tuple<long> notSoSmall(0);
-	sz = sizeof(notSoSmall);
-	assertTrue (sz == 8 || sz == 16); //depending on architecture and alignment
+	// With std::tuple backend, sizes match exactly (optimal packing, no overhead)
+	Tuple<short> shortTuple(0);
+	assertTrue (sizeof(shortTuple) == sizeof(short));
+
+	Tuple<int> intTuple(0);
+	assertTrue (sizeof(intTuple) == sizeof(int));
+
+	Tuple<long> longTuple(0);
+	assertTrue (sizeof(longTuple) == sizeof(long));
+
+	Tuple<double> doubleTuple(0.0);
+	assertTrue (sizeof(doubleTuple) == sizeof(double));
+
+	// Multi-element tuples should have size equal to std::tuple (with alignment)
+	Tuple<int, int> twoInts(0, 0);
+	assertTrue (sizeof(twoInts) == sizeof(std::tuple<int, int>));
+
+	Tuple<char, int, double> mixed('a', 0, 0.0);
+	assertTrue (sizeof(mixed) == sizeof(std::tuple<char, int, double>));
+
+	Tuple<int, int, int, int> fourInts(0, 0, 0, 0);
+	assertTrue (sizeof(fourInts) == sizeof(std::tuple<int, int, int, int>));
 }
 
 

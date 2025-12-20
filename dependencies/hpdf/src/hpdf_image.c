@@ -183,7 +183,7 @@ HPDF_Image_LoadJpegImage  (HPDF_MMgr        mmgr,
 
     image->header.obj_class |= HPDF_OSUBCLASS_XOBJECT;
 
-    /* add requiered elements */
+    /* add required elements */
     image->filter = HPDF_STREAM_FILTER_DCT_DECODE;
     ret += HPDF_Dict_AddName (image, "Type", "XObject");
     ret += HPDF_Dict_AddName (image, "Subtype", "Image");

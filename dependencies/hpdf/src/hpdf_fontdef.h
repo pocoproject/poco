@@ -108,7 +108,7 @@ typedef struct _HPDF_FontDef_Rec {
     HPDF_UINT16   cap_height;
 
     /*  the initial value of descriptor entry is NULL.
-     *  when first font-object besed on the fontdef object is created,
+     *  when first font-object based on the fontdef object is created,
      *  the font-descriptor object is created and descriptor entry is set.
      */
     HPDF_Dict                descriptor;

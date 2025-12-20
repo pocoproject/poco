@@ -632,7 +632,7 @@ inline void Var::construct(const char* value)
 inline void Var::construct(const Var& other)
 {
 	if (!other.isEmpty())
-		other.content()->clone(&_placeholder);
+		(void) other.content()->clone(&_placeholder);
 }
 
 

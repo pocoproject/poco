@@ -49,8 +49,8 @@ public:
 		/// Returns the internal SocketImpl.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length) override;
-	int writeToDevice(const char* buffer, std::streamsize length) override;
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	enum

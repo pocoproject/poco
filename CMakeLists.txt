@@ -108,7 +108,7 @@ if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
 endif()
 
 if (NOT POCO_MINIMAL_BUILD)
-	find_package(OpenSSL)
+	find_package(OpenSSL 1.1.1)
 	find_package(MySQL)
 	find_package(PostgreSQL)
 	find_package(ODBC)
@@ -318,6 +318,12 @@ endif()
 
 # - resolve dependencies
 
+if(ENABLE_SAMPLES)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
 if(ENABLE_ENCODINGS_COMPILER)
 	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
@@ -407,7 +413,7 @@ if(ENABLE_APACHECONNECTOR)
 endif()
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
-	find_package(OpenSSL REQUIRED)
+	find_package(OpenSSL 1.1.1 REQUIRED)
 endif()
 
 if(ENABLE_DATA_MYSQL)
@@ -592,6 +598,7 @@ endif()
 
 if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
 	add_subdirectory(modules)
+	list(APPEND Poco_COMPONENTS "C++ modules")
 endif()
 
 #############################################################

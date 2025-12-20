@@ -454,9 +454,9 @@ Path& Path::setDevice(const std::string& device)
 
 const std::string& Path::directory(int n) const
 {
-	poco_assert (0 <= n && n <= _dirs.size());
+	poco_assert (0 <= n && static_cast<std::size_t>(n) <= _dirs.size());
 
-	if (n < _dirs.size())
+	if (static_cast<std::size_t>(n) < _dirs.size())
 		return _dirs[n];
 	else
 		return _name;
@@ -465,9 +465,9 @@ const std::string& Path::directory(int n) const
 
 const std::string& Path::operator [] (int n) const
 {
-	poco_assert (0 <= n && n <= _dirs.size());
+	poco_assert (0 <= n && static_cast<std::size_t>(n) <= _dirs.size());
 
-	if (n < _dirs.size())
+	if (static_cast<std::size_t>(n) < _dirs.size())
 		return _dirs[n];
 	else
 		return _name;
@@ -929,7 +929,7 @@ void Path::parseVMS(const std::string& path)
 							if (!_absolute) throw PathSyntaxException(path);
 							++it;
 							if (it != end && *it == '.') throw PathSyntaxException(path);
-							int d = int(_dirs.size());
+							auto d = _dirs.size();
 							while (it != end && *it != ']')
 							{
 								name.clear();

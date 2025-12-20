@@ -23,60 +23,7 @@
 
 
 using namespace Poco::MongoDB;
-
-
-void MongoDBTest::testOpCmdUUID()
-{
-	Database db("team");
-	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("club");
-	OpMsgMessage response;
-
-	request->setCommandName(OpMsgMessage::CMD_DROP);
-	_mongo->sendRequest(*request, response);
-
-	Document::Ptr club = new Document();
-	club->add("name", std::string("Barcelona"));
-
-	Poco::UUIDGenerator generator;
-	Poco::UUID uuid = generator.create();
-	Binary::Ptr uuidBinary = new Binary(uuid);
-	club->add("uuid", uuidBinary);
-
-	request->setCommandName(OpMsgMessage::CMD_INSERT);
-	request->documents().push_back(club);
-
-	_mongo->sendRequest(*request, response);
-
-	assertTrue(response.responseOk());
-
-	request->setCommandName(OpMsgMessage::CMD_FIND);
-	request->body().addNewDocument("filter").add("name", std::string("Barcelona"));
-
-	_mongo->sendRequest(*request, response);
-	assertTrue(response.responseOk());
-
-	if ( response.documents().size() > 0 )
-	{
-		Document::Ptr doc = response.documents()[0];
-		try
-		{
-			const auto& name = doc->get<std::string>("name");
-			assertEquals ("Barcelona", name );
-
-			Binary::Ptr uuidBinary = doc->get<Binary::Ptr>("uuid");
-			assertTrue (uuid == uuidBinary->uuid());
-		}
-		catch(Poco::NotFoundException& nfe)
-		{
-			fail(nfe.message() + " not found.");
-		}
-	}
-	else
-	{
-		fail("No document returned");
-	}
-
-}
+using namespace std::string_literals;
 
 
 void MongoDBTest::testOpCmdHello()
@@ -110,11 +57,11 @@ void MongoDBTest::testOpCmdWriteRead()
 	request->setCommandName(OpMsgMessage::CMD_INSERT);
 
 	Document::Ptr doc = new Document();
-	doc->add("name", "John").add("number", -2);
+	doc->add("name"s, "John").add("number", -2);
 	request->documents().push_back(doc);
 
 	doc = new Document();
-	doc->add("name", "Franz").add("number", -2.8);
+	doc->add("name"s, "Franz").add("number", -2.8);
 	request->documents().push_back(doc);
 
 	try
@@ -142,20 +89,20 @@ void MongoDBTest::testOpCmdWriteRead()
 void MongoDBTest::testOpCmdInsert()
 {
 	Document::Ptr player = new Document();
-	player->add("lastname", std::string("Braem"));
-	player->add("firstname", std::string("Franky"));
+	player->add("lastname"s, "Braem"s);
+	player->add("firstname"s, "Franky"s);
 
 	Poco::DateTime birthdate;
 	birthdate.assign(1969, 3, 9);
-	player->add("birthdate", birthdate.timestamp());
+	player->add("birthdate"s, birthdate.timestamp());
 
-	player->add("start", 1993);
-	player->add("active", false);
+	player->add("start"s, 1993);
+	player->add("active"s, false);
 
 	Poco::DateTime now;
-	player->add("lastupdated", now.timestamp());
+	player->add("lastupdated"s, now.timestamp());
 
-	player->add("unknown", NullValue());
+	player->add("unknown"s, NullValue());
 
 	Database db("team");
 	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -181,7 +128,7 @@ void MongoDBTest::testOpCmdFind()
 	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("players");
 	request->setCommandName(OpMsgMessage::CMD_FIND);
 
-	request->body().add("limit", 1).addNewDocument("filter").add("lastname" , std::string("Braem"));
+	request->body().add("limit"s, 1).addNewDocument("filter").add("lastname"s, "Braem"s);
 
 	OpMsgMessage response;
 	_mongo->sendRequest(*request, response);
@@ -201,7 +148,7 @@ void MongoDBTest::testOpCmdFind()
 			const auto& birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
 			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
-			const auto& lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
+			[[maybe_unused]] const auto& lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
 			assertTrue (doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
 			assertEquals (false, active);
@@ -223,20 +170,20 @@ void MongoDBTest::testOpCmdFind()
 void MongoDBTest::testOpCmdUnaknowledgedInsert()
 {
 	Document::Ptr player = new Document();
-	player->add("lastname", std::string("Braem"));
-	player->add("firstname", std::string("Franky"));
+	player->add("lastname"s, "Braem"s);
+	player->add("firstname"s, "Franky"s);
 
 	Poco::DateTime birthdate;
 	birthdate.assign(1969, 3, 9);
-	player->add("birthdate", birthdate.timestamp());
+	player->add("birthdate"s, birthdate.timestamp());
 
-	player->add("start", 1993);
-	player->add("active", false);
+	player->add("start"s, 1993);
+	player->add("active"s, false);
 
 	Poco::DateTime now;
-	player->add("lastupdated", now.timestamp());
+	player->add("lastupdated"s, now.timestamp());
 
-	player->add("unknown", NullValue());
+	player->add("unknown"s, NullValue());
 
 	Database db("team");
 	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("players");
@@ -269,7 +216,7 @@ void MongoDBTest::testOpCmdCursor()
 	for(int i = 0; i < 10000; ++i)
 	{
 		Document::Ptr doc = new Document();
-		doc->add("number", i);
+		doc->add("number"s, i);
 		request->documents().push_back(doc);
 	}
 	_mongo->sendRequest(*request, response);
@@ -309,7 +256,7 @@ void MongoDBTest::testOpCmdCursorAggregate()
 	for(int i = 0; i < 10000; ++i)
 	{
 		Document::Ptr doc = new Document();
-		doc->add("number", i);
+		doc->add("number"s, i);
 		request->documents().push_back(doc);
 	}
 	_mongo->sendRequest(*request, response);
@@ -356,7 +303,7 @@ void MongoDBTest::testOpCmdKillCursor()
 	for(int i = 0; i < 10000; ++i)
 	{
 		Document::Ptr doc = new Document();
-		doc->add("number", i);
+		doc->add("number"s, i);
 		request->documents().push_back(doc);
 	}
 	_mongo->sendRequest(*request, response);
@@ -413,7 +360,7 @@ void MongoDBTest::testOpCmdCursorEmptyFirstBatch()
 	for(int i = 0; i < 10000; ++i)
 	{
 		Document::Ptr doc = new Document();
-		doc->add("number", i);
+		doc->add("number"s, i);
 		request->documents().push_back(doc);
 	}
 	_mongo->sendRequest(*request, response);
@@ -453,7 +400,7 @@ void MongoDBTest::testOpCmdDelete()
 	request->setCommandName(OpMsgMessage::CMD_DELETE);
 
 	Document::Ptr del = new Document();
-	del->add("limit", 0).addNewDocument("q").add("lastname" , std::string("Braem"));
+	del->add("limit"s, 0).addNewDocument("q").add("lastname"s, "Braem"s);
 	request->documents().push_back(del);
 
 	OpMsgMessage response;

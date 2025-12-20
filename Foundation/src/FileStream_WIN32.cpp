@@ -89,7 +89,7 @@ void FileStreamBuf::openHandle(NativeHandle handle, std::ios::openmode mode)
 }
 
 
-int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (INVALID_HANDLE_VALUE == _handle || !(getMode() & std::ios::in))
 		return -1;
@@ -111,11 +111,11 @@ int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 	_pos += bytesRead;
 
-	return static_cast<int>(bytesRead);
+	return static_cast<std::streamsize>(bytesRead);
 }
 
 
-int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (INVALID_HANDLE_VALUE == _handle || !(getMode() & std::ios::out))
 		return -1;
@@ -137,7 +137,7 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 
 	_pos += bytesWritten;
 
-	return static_cast<int>(bytesWritten);
+	return static_cast<std::streamsize>(bytesWritten);
 }
 
 

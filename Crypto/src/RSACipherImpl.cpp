@@ -183,8 +183,8 @@ namespace
 
 	std::streamsize RSAEncryptImpl::finalize(unsigned char*	output, std::streamsize length)
 	{
-		poco_assert (length >= blockSize());
-		poco_assert (_pos <= maxDataSize());
+		poco_assert (length >= static_cast<std::streamsize>(blockSize()));
+		poco_assert (static_cast<std::size_t>(_pos) <= maxDataSize());
 		int rc = 0;
 		if (_pos > 0)
 		{
@@ -301,7 +301,7 @@ namespace
 
 	std::streamsize RSADecryptImpl::finalize(unsigned char*	output, std::streamsize length)
 	{
-		poco_assert (length >= blockSize());
+		poco_assert (length >= static_cast<std::streamsize>(blockSize()));
 		int rc = 0;
 		if (_pos > 0)
 		{

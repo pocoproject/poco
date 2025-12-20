@@ -7,7 +7,7 @@
 //
 // Definition of the Array class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -110,7 +110,6 @@ struct ElementTraits<Array::Ptr>
 
 	static std::string toString(const Array::Ptr& value, int indent = 0)
 	{
-		//TODO:
 		return value.isNull() ? "null" : value->toString(indent);
 	}
 };
@@ -124,7 +123,7 @@ inline void BSONReader::read<Array::Ptr>(Array::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
+inline void BSONWriter::write<Array::Ptr>(const Array::Ptr& from)
 {
 	from->write(_writer);
 }

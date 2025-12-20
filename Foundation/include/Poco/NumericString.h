@@ -7,7 +7,7 @@
 //
 // Numeric string utility functions.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -59,33 +59,13 @@ typedef Poco::Int64 intmax_t;
 namespace Poco {
 
 
-namespace Impl {
-
-	template<bool SIGNED, typename T>
-	class IsNegativeImpl;
-
-	template<typename T>
-	class IsNegativeImpl<true, T>
-	{
-	public:
-		bool operator()(T x) { return x < 0; }
-	};
-
-	template<typename T>
-	class IsNegativeImpl<false, T>
-	{
-	public:
-		bool operator()(T) { return false; }
-	};
-
-}
-
-
 template<typename T>
 inline bool isNegative(T x)
 {
-	using namespace Impl;
-	return IsNegativeImpl<std::numeric_limits<T>::is_signed, T>()(x);
+	if constexpr (std::is_signed_v<T>)
+		return x < 0;
+	else
+		return false;
 }
 
 
@@ -369,16 +349,10 @@ namespace Impl {
 		const char* _end;
 };
 
-template <typename T>
-using EnableSigned = typename std::enable_if_t< std::is_signed<T>::value >*;
-
-template <typename T>
-using EnableUnsigned = typename std::enable_if_t< std::is_unsigned<T>::value >*;
-
 } // namespace Impl
 
 
-template <typename T, Impl::EnableSigned<T> = nullptr>
+template <typename T>
 bool intToStr(T value,
 	unsigned short base,
 	char* result,
@@ -388,7 +362,7 @@ bool intToStr(T value,
 	char fill = ' ',
 	char thSep = 0,
 	bool lowercase = false)
-	/// Converts signed integer to string. Standard numeric bases from binary to hexadecimal
+	/// Converts integer to string. Standard numeric bases from binary to hexadecimal
 	/// are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
@@ -397,7 +371,10 @@ bool intToStr(T value,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
 {
-	poco_assert_dbg (((value < 0) && (base == 10)) || (value >= 0));
+	if constexpr (std::is_signed_v<T>)
+	{
+		poco_assert_dbg (((value < 0) && (base == 10)) || (value >= 0));
+	}
 
 	if (base < 2 || base > 0x10)
 	{
@@ -422,85 +399,10 @@ bool intToStr(T value,
 
 	if ('0' == fill)
 	{
-		if (tmpVal < 0) --width;
-		if (prefix && base == 010) --width;
-		if (prefix && base == 0x10) width -= 2;
-		while ((ptr - result) < width) *ptr++ = fill;
-	}
-
-	if (prefix && base == 010) *ptr++ = '0';
-	else if (prefix && base == 0x10)
-	{
-		*ptr++ = 'x';
-		*ptr++ = '0';
-	}
-
-	if (tmpVal < 0) *ptr++ = '-';
-
-	if ('0' != fill)
-	{
-		while ((ptr - result) < width) *ptr++ = fill;
-	}
-
-	size = ptr - result;
-	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
-	*ptr-- = '\0';
-
-	char* ptrr = result;
-	char tmp;
-	while(ptrr < ptr)
-	{
-		 tmp    = *ptr;
-		*ptr--  = *ptrr;
-		*ptrr++ = tmp;
-	}
-
-	return true;
-}
-
-
-template <typename T, Impl::EnableUnsigned<T> = nullptr>
-bool intToStr(T value,
-	unsigned short base,
-	char* result,
-	std::size_t& size,
-	bool prefix = false,
-	int width = -1,
-	char fill = ' ',
-	char thSep = 0,
-	bool lowercase = false)
-	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
-	/// If width is non-zero, it pads the return value with fill character to the specified width.
-	/// When padding is zero character ('0'), it is prepended to the number itself; all other
-	/// paddings are prepended to the formatted result with minus sign or base prefix included
-	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
-	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
-	/// Formatted string has at least [width] total length.
-{
-	if (base < 2 || base > 0x10)
-	{
-		*result = '\0';
-		return false;
-	}
-
-	Impl::Ptr ptr(result, size);
-	int thCount = 0;
-	T tmpVal;
-	do
-	{
-		tmpVal = value;
-		value /= base;
-		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
-		if (thSep && (base == 10) && (++thCount == 3))
+		if constexpr (std::is_signed_v<T>)
 		{
-			*ptr++ = thSep;
-			thCount = 0;
+			if (tmpVal < 0) --width;
 		}
-	} while (value);
-
-	if ('0' == fill)
-	{
 		if (prefix && base == 010) --width;
 		if (prefix && base == 0x10) width -= 2;
 		while ((ptr - result) < width) *ptr++ = fill;
@@ -511,6 +413,11 @@ bool intToStr(T value,
 	{
 		*ptr++ = 'x';
 		*ptr++ = '0';
+	}
+
+	if constexpr (std::is_signed_v<T>)
+	{
+		if (tmpVal < 0) *ptr++ = '-';
 	}
 
 	if ('0' != fill)
@@ -527,7 +434,7 @@ bool intToStr(T value,
 	char tmp;
 	while(ptrr < ptr)
 	{
-		tmp     = *ptr;
+		tmp    = *ptr;
 		*ptr--  = *ptrr;
 		*ptrr++ = tmp;
 	}

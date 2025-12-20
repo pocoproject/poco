@@ -13,6 +13,7 @@
 
 
 #include "Poco/MongoDB/OpMsgCursor.h"
+#include "Poco/MongoDB/ReplicaSetConnection.h"
 #include "Poco/MongoDB/Array.h"
 
 //
@@ -38,6 +39,8 @@
 //
 
 #define _MONGODB_EXHAUST_ALLOWED_WORKS	false
+
+using namespace std::string_literals;
 
 namespace Poco {
 namespace MongoDB {
@@ -104,7 +107,8 @@ bool OpMsgCursor::isActive() const noexcept
 }
 
 
-OpMsgMessage& OpMsgCursor::next(Connection& connection)
+template<typename ConnType>
+OpMsgMessage& OpMsgCursor::nextImpl(ConnType& connection)
 {
 	if (_cursorID == 0)
 	{
@@ -153,7 +157,7 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 			connection.readResponse(_response);
 		}
 		else
-#endif		
+#endif
 		{
 			_response.clear();
 			_query.setCursor(_cursorID, _batchSize);
@@ -168,7 +172,20 @@ OpMsgMessage& OpMsgCursor::next(Connection& connection)
 }
 
 
-void OpMsgCursor::kill(Connection& connection)
+OpMsgMessage& OpMsgCursor::next(Connection& connection)
+{
+	return nextImpl(connection);
+}
+
+
+OpMsgMessage& OpMsgCursor::next(ReplicaSetConnection& connection)
+{
+	return nextImpl(connection);
+}
+
+
+template<typename ConnType>
+void OpMsgCursor::killImpl(ConnType& connection)
 {
 	_response.clear();
 	if (_cursorID != 0)
@@ -184,13 +201,25 @@ void OpMsgCursor::kill(Connection& connection)
 		const auto killed = _response.body().get<MongoDB::Array::Ptr>(keyCursorsKilled, nullptr);
 		if (!killed || killed->size() != 1 || killed->get<Poco::Int64>(0, -1) != _cursorID)
 		{
-			throw Poco::ProtocolException("Cursor not killed as expected: " + std::to_string(_cursorID));
+			throw Poco::ProtocolException("Cursor not killed as expected: "s + std::to_string(_cursorID));
 		}
 
 		_cursorID = 0;
 		_query.clear();
 		_response.clear();
 	}
+}
+
+
+void OpMsgCursor::kill(Connection& connection)
+{
+	killImpl(connection);
+}
+
+
+void OpMsgCursor::kill(ReplicaSetConnection& connection)
+{
+	killImpl(connection);
 }
 
 
@@ -204,6 +233,13 @@ Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc)
 	}
 	return id;
 }
+
+
+// Explicit template instantiation
+template OpMsgMessage& OpMsgCursor::nextImpl<Connection>(Connection& connection);
+template OpMsgMessage& OpMsgCursor::nextImpl<ReplicaSetConnection>(ReplicaSetConnection& connection);
+template void OpMsgCursor::killImpl<Connection>(Connection& connection);
+template void OpMsgCursor::killImpl<ReplicaSetConnection>(ReplicaSetConnection& connection);
 
 
 } } // Namespace Poco::MongoDB

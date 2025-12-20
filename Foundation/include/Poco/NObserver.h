@@ -23,6 +23,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
 
+#include <atomic>
 #include <functional>
 
 namespace Poco {
@@ -80,7 +81,7 @@ public:
 
 	NObserver(const NObserver& observer):
 		AbstractObserver(observer),
-		_pObject(observer._pObject),
+		_pObject(observer._pObject.load()),
 		_handler(observer._handler),
 		_syncHandler(observer._syncHandler),
 		_matcher(observer._matcher),
@@ -90,7 +91,7 @@ public:
 
 	NObserver(NObserver&& observer):
 		AbstractObserver(observer),
-		_pObject(std::move(observer._pObject)),
+		_pObject(observer._pObject.exchange(nullptr)),
 		_handler(std::move(observer._handler)),
 		_syncHandler(std::move(observer._syncHandler)),
 		_matcher(std::move(observer._matcher)),
@@ -117,7 +118,7 @@ public:
 	{
 		if (&observer != this)
 		{
-			_pObject = std::move(observer._pObject);
+			_pObject = observer._pObject.exchange(nullptr);
 			_handler = std::move(observer._handler);
 			_syncHandler = std::move(observer._syncHandler);
 			_matcher = std::move(observer._matcher);
@@ -220,7 +221,7 @@ protected:
 	}
 
 private:
-	C* _pObject {nullptr};
+	std::atomic<C*> _pObject {nullptr};
 	Handler _handler {nullptr};
 	SyncHandler _syncHandler {nullptr};
 	Matcher _matcher {nullptr};

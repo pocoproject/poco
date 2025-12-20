@@ -35,7 +35,7 @@ HPDF_Image_Load1BitImageFromMem  (HPDF_MMgr  mmgr,
                           );
 
 
-#ifndef LIBHPDF_HAVE_NOPNGLIB
+#ifdef LIBHPDF_HAVE_LIBPNG
 
 HPDF_Image
 HPDF_Image_LoadPngImage  (HPDF_MMgr        mmgr,

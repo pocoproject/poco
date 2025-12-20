@@ -1685,7 +1685,7 @@ MS_Mincho_Init  (HPDF_FontDef   fontdef)
                 HPDF_FONT_SERIF;
     fontdef->italic_angle = 0;
     fontdef->stemv = 78;
-    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_Gothic_W_ARRAY)) !=
+    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_Mincho_W_ARRAY)) !=
                 HPDF_OK) {
         return ret;
     }
@@ -1746,7 +1746,7 @@ MS_PMincho_Init  (HPDF_FontDef   fontdef)
     fontdef->flags = HPDF_FONT_SYMBOLIC + HPDF_FONT_SERIF;
     fontdef->italic_angle = 0;
     fontdef->stemv = 78;
-    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_PGothic_W_ARRAY)) !=
+    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_PMincho_W_ARRAY)) !=
                 HPDF_OK) {
         return ret;
     }

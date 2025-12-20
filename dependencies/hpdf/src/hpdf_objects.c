@@ -68,6 +68,9 @@ HPDF_Obj_ForceFree  (HPDF_MMgr    mmgr,
         case HPDF_OCLASS_DICT:
             HPDF_Dict_Free (obj);
             break;
+        case HPDF_OCLASS_DIRECT:
+            HPDF_Direct_Free (obj);
+            break;
         default:
             HPDF_FreeMem (mmgr, obj);
     }
@@ -145,6 +148,9 @@ HPDF_Obj_WriteValue  (void          *obj,
             break;
         case HPDF_OCLASS_BOOLEAN:
             ret = HPDF_Boolean_Write (obj, stream);
+            break;
+        case HPDF_OCLASS_DIRECT:
+            ret = HPDF_Direct_Write (obj, stream);
             break;
         case HPDF_OCLASS_NULL:
             ret = HPDF_Stream_WriteStr (stream, "null");

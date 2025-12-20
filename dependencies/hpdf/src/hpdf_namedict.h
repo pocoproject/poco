@@ -53,6 +53,11 @@ HPDF_NameTree_Add  (HPDF_NameTree  tree,
                     HPDF_String    name,
                     void          *obj);
 
+HPDF_STATUS
+HPDF_NameTree_Add_String  (HPDF_NameTree  tree,
+                           const char    *name,
+                           const char    *value);
+
 HPDF_BOOL
 HPDF_NameTree_Validate  (HPDF_NameTree  tree);
 
@@ -73,4 +78,3 @@ HPDF_EmbeddedFile_Validate  (HPDF_EmbeddedFile  emfile);
 #endif /* __cplusplus */
 
 #endif /* _HPDF_NAMEDICT_H */
-

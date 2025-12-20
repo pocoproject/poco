@@ -55,7 +55,7 @@ UUID::UUID(const char* uuid)
 }
 
 
-UUID::UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]):
+UUID::UUID(UInt32 timeLow, UInt16 timeMid, UInt16 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]):
 	_timeLow(timeLow),
 	_timeMid(timeMid),
 	_timeHiAndVersion(timeHiAndVersion),

@@ -18,7 +18,9 @@
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf_consts.h"
+#include "hpdf_info.h"
 #include "hpdf_namedict.h"
+#include "hpdf.h"
 
 #ifndef HPDF_UNUSED
 #define HPDF_UNUSED(a) ((void)(a))
@@ -135,23 +137,9 @@ HPDF_NameTree_Add  (HPDF_NameTree  tree,
 
     icount = HPDF_Array_Items(items);
 
-    /* If we're larger than the last element, append */
-    if (icount) {
-        HPDF_String last = HPDF_Array_GetItem(items, icount - 2, HPDF_OCLASS_STRING);
-
-        if (HPDF_String_Cmp(name, last) > 0) {
-            HPDF_Array_Add(items, name);
-            HPDF_Array_Add(items, obj);
-            return HPDF_OK;
-        }
-    }
-
-    /* Walk backwards through the list until we're smaller than an element=
-     * That's the element to insert in front of. */
-    for (i = icount - 4; i >= 0; i -= 2) {
-        HPDF_String elem = HPDF_Array_GetItem(items, i, HPDF_OCLASS_STRING);
-
-        if (i == 0 || HPDF_String_Cmp(name, elem) < 0) {
+    for (i = 0; i < icount; i += 2) {
+        HPDF_String elem = HPDF_Array_GetItem( items, i, HPDF_OCLASS_STRING );
+        if (HPDF_String_Cmp(name, elem) < 0) {
             HPDF_Array_Insert(items, elem, name);
             HPDF_Array_Insert(items, elem, obj);
             return HPDF_OK;
@@ -162,6 +150,25 @@ HPDF_NameTree_Add  (HPDF_NameTree  tree,
     HPDF_Array_Add(items, name);
     HPDF_Array_Add(items, obj);
     return HPDF_OK;
+}
+
+HPDF_STATUS
+HPDF_NameTree_Add_String  (HPDF_NameTree  tree,
+                           const char    *name,
+                           const char    *value)
+{
+    HPDF_String strname;
+    HPDF_String strvalue;
+
+    strname = HPDF_String_New(tree->mmgr, name, NULL);
+    if (!strname)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+    strvalue = HPDF_String_New(tree->mmgr, value, NULL);
+    if (!strvalue) {
+        HPDF_String_Free(strname);
+        return HPDF_FAILED_TO_ALLOC_MEM;
+    }
+    return HPDF_NameTree_Add(tree, strname, strvalue);
 }
 
 HPDF_BOOL
@@ -190,6 +197,7 @@ HPDF_EmbeddedFile_New  (HPDF_MMgr  mmgr,
     HPDF_STATUS ret = HPDF_OK;
     HPDF_Dict ef;               /* the dictionary for the embedded file: /Type /EF */
     HPDF_String name;           /* the name of the file: /F (name) */
+    HPDF_String ufname;         /* the unicode name of the file: /UF (name) */
     HPDF_Dict eff;              /* ef has an /EF <<blah>> key - this is it */
     HPDF_Dict filestream;       /* the stream that /EF <</F _ _ R>> refers to */
     HPDF_Stream stream;
@@ -218,10 +226,16 @@ HPDF_EmbeddedFile_New  (HPDF_MMgr  mmgr,
     if (!name)
         return NULL;
 
-    ret += HPDF_Dict_AddName (ef, "Type", "F");
+    ufname = HPDF_String_New (mmgr, file, NULL);
+    if (!ufname)
+        return NULL;
+
+    ret += HPDF_Dict_AddName (ef, "Type", "Filespec");
     ret += HPDF_Dict_Add (ef, "F", name);
+    ret += HPDF_Dict_Add (ef, "UF", ufname);
     ret += HPDF_Dict_Add (ef, "EF", eff);
     ret += HPDF_Dict_Add (eff, "F", filestream);
+    ret += HPDF_Dict_AddName (filestream, "Type", "EmbeddedFile");
 
     if (ret != HPDF_OK)
         return NULL;
@@ -234,4 +248,156 @@ HPDF_EmbeddedFile_Validate  (HPDF_EmbeddedFile  emfile)
 {
     HPDF_UNUSED (emfile);
     return HPDF_TRUE;
+}
+
+static HPDF_Dict
+HPDF_EmbeddedFile_GetFileStream  (HPDF_EmbeddedFile  emfile)
+{
+    HPDF_Dict ef;
+
+    ef = HPDF_Dict_GetItem(emfile, "EF", HPDF_OCLASS_DICT);
+    if (!ef)
+        return NULL;
+
+    return  HPDF_Dict_GetItem(ef, "F", HPDF_OCLASS_DICT);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetName  (HPDF_EmbeddedFile  emfile,
+                            const char        *new_name)
+{
+    HPDF_Dict filestream;
+    HPDF_String name;           /* the name of the file: /F (name) */
+    HPDF_String ufname;         /* the unicode name of the file: /UF (name) */
+    HPDF_STATUS status;
+
+    filestream = HPDF_EmbeddedFile_GetFileStream(emfile);
+    if (!filestream)
+        return HPDF_INVALID_OBJECT;
+
+    name = HPDF_String_New (emfile->mmgr, new_name, NULL);
+    if (!name)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+
+    ufname = HPDF_String_New (emfile->mmgr, new_name, NULL);
+    if (!ufname)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+
+    status = HPDF_Dict_Add (emfile, "F", name);
+    if (status == HPDF_OK)
+        status = HPDF_Dict_Add (emfile, "UF", ufname);
+
+    return status;
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetDescription (HPDF_EmbeddedFile  emfile,
+                                  const char        *new_description)
+{
+    HPDF_Dict filestream;
+    HPDF_String description;           /* the name of the file: /F (name) */
+
+    filestream = HPDF_EmbeddedFile_GetFileStream(emfile);
+    if (!filestream)
+        return HPDF_INVALID_OBJECT;
+
+    description = HPDF_String_New (emfile->mmgr, new_description, NULL);
+    if (!description)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+
+    return HPDF_Dict_Add (emfile, "Desc", description);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetSubtype  (HPDF_EmbeddedFile  emfile,
+                               const char        *subtype)
+{
+    HPDF_Dict filestream;
+
+    filestream = HPDF_EmbeddedFile_GetFileStream(emfile);
+    if (!filestream)
+        return HPDF_INVALID_OBJECT;
+
+    return HPDF_Dict_AddName (filestream, "Subtype", subtype);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetAFRelationship  (HPDF_EmbeddedFile    emfile,
+                                      HPDF_AFRelationship  relationship)
+{
+    // This array has to be kept coherent with HPDF_AFRelationship enum.
+    static const char *relationships[] = {
+        "Source",
+        "Data",
+        "Alternative",
+        "Supplement",
+        "EncryptedPayload",
+        "FormData",
+        "Schema",
+        "Unspecified"
+      };
+    const char *str_relationship = NULL;
+
+    if (relationship < 0 || relationship > HPDF_AFRELATIONSHIP_UNSPECIFIED) {
+        return HPDF_INVALID_PARAMETER;
+    }
+    return HPDF_Dict_AddName(emfile, "AFRelationship", relationships[relationship]);
+}
+
+static HPDF_Dict
+HPDF_EmbeddedFile_GetParams  (HPDF_EmbeddedFile  emfile)
+{
+    HPDF_Dict filestream;
+    HPDF_Dict params;
+
+    filestream = HPDF_EmbeddedFile_GetFileStream(emfile);
+    if (!filestream)
+        return NULL;
+
+    params = HPDF_Dict_GetItem(filestream, "Params", HPDF_OCLASS_DICT);
+    if (!params) {
+        params = HPDF_Dict_New (emfile->mmgr);
+        if (!params || HPDF_Dict_Add (filestream, "Params", params) != HPDF_OK)
+            return NULL;
+    }
+    return params;
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetSize  (HPDF_EmbeddedFile  emfile,
+                            HPDF_UINT64        size)
+{
+    HPDF_Dict params;
+
+    params = HPDF_EmbeddedFile_GetParams(emfile);
+    if (!params)
+        return emfile->error->error_no;
+
+    return HPDF_Dict_AddNumber(params, "Size", (HPDF_INT32)size);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetCreationDate  (HPDF_EmbeddedFile  emfile,
+                                    HPDF_Date          creationDate)
+{
+    HPDF_Dict params;
+
+    params = HPDF_EmbeddedFile_GetParams(emfile);
+    if (!params)
+        return emfile->error->error_no;
+
+    return HPDF_Info_SetInfoDateAttr(params, HPDF_INFO_CREATION_DATE, creationDate);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_EmbeddedFile_SetLastModificationDate  (HPDF_EmbeddedFile  emfile,
+                                            HPDF_Date          lastModificationDate)
+{
+    HPDF_Dict params;
+
+    params = HPDF_EmbeddedFile_GetParams(emfile);
+    if (!params)
+        return emfile->error->error_no;
+
+    return HPDF_Info_SetInfoDateAttr(params, HPDF_INFO_MOD_DATE, lastModificationDate);
 }

@@ -86,8 +86,8 @@ public:
 		/// Must be called when deflating to an output stream.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length) override;
-	int writeToDevice(const char* buffer, std::streamsize length) override;
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
 	int sync() override;
 
 private:

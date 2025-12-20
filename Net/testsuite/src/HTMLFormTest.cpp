@@ -309,9 +309,8 @@ void HTMLFormTest::testSubmit3()
 	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
 	form.prepareSubmit(req);
 	std::string expCT(HTMLForm::ENCODING_MULTIPART);
-	expCT.append("; boundary=\"");
+	expCT.append("; boundary=");
 	expCT.append(form.boundary());
-	expCT.append("\"");
 	assertTrue (req.getContentType() == expCT);
 	assertTrue (req.getChunkedTransferEncoding());
 }
@@ -343,9 +342,8 @@ void HTMLFormTest::testSubmit5()
 	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
 	form.prepareSubmit(req, HTMLForm::OPT_USE_CONTENT_LENGTH);
 	std::string expCT(HTMLForm::ENCODING_MULTIPART);
-	expCT.append("; boundary=\"");
+	expCT.append("; boundary=");
 	expCT.append(form.boundary());
-	expCT.append("\"");
 	assertTrue (req.getContentType() == expCT);
 	assertTrue (req.getContentLength() == 403);
 }

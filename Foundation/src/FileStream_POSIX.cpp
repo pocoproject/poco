@@ -88,34 +88,34 @@ void FileStreamBuf::openHandle(NativeHandle fd, std::ios::openmode mode)
 }
 
 
-int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_fd == -1) return -1;
 
 	if (getMode() & std::ios::out)
 		sync();
 
-	int n = ::read(_fd, buffer, length);
+	auto n = ::read(_fd, buffer, length);
 	if (n == -1)
 		File::handleLastError(_path);
 	_pos += n;
-	return n;
+	return static_cast<std::streamsize>(n);
 }
 
 
-int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (_fd == -1) return -1;
 
 #if defined(POCO_VXWORKS)
-	int n = ::write(_fd, const_cast<char*>(buffer), length);
+	auto n = ::write(_fd, const_cast<char*>(buffer), length);
 #else
-	int n = ::write(_fd, buffer, length);
+	auto n = ::write(_fd, buffer, length);
 #endif
 	if (n == -1)
 		File::handleLastError(_path);
 	_pos += n;
-	return n;
+	return static_cast<std::streamsize>(n);
 }
 
 

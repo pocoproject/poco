@@ -215,8 +215,8 @@ public:
 		/// Registers an event handler with the SocketReactor.
 		///
 		/// Usage:
-		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
-		///     reactor.addEventHandler(obs);
+		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
+		///     reactor.addEventHandler(socket, obs);
 
 	bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
 		/// Returns true if the observer is registered with SocketReactor for the given socket.
@@ -225,8 +225,8 @@ public:
 		/// Unregisters an event handler with the SocketReactor.
 		///
 		/// Usage:
-		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
-		///     reactor.removeEventHandler(obs);
+		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
+		///     reactor.removeEventHandler(socket, obs);
 
 	bool has(const Socket& socket) const;
 		/// Returns true if socket is registered with this rector.
@@ -334,7 +334,7 @@ inline bool SocketReactor::has(const Socket& socket) const
 
 inline void SocketReactor::onError(const Socket& socket, int code, const std::string& description)
 {
-	dispatch(new ErrorNotification(this, socket, code, description));
+	dispatch(socket, new ErrorNotification(this, socket, code, description));
 }
 
 

@@ -42,9 +42,9 @@ HTTPFixedLengthStreamBuf::~HTTPFixedLengthStreamBuf()
 }
 
 
-int HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	int n = 0;
+	std::streamsize n = 0;
 	if (_count < _length)
 	{
 		if (_count + length > _length)
@@ -56,9 +56,9 @@ int HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize lengt
 }
 
 
-int HTTPFixedLengthStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize HTTPFixedLengthStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	int n = 0;
+	std::streamsize n = 0;
 	if (_count < _length)
 	{
 		if (_count + length > _length)

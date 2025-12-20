@@ -1,5 +1,5 @@
 /*
- * << Haru Free PDF Library >> -- fpdf_utils.h
+ * << Haru Free PDF Library >> -- hpdf_utils.h
  *
  * URL: http://libharu.org
  *

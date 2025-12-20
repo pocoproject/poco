@@ -42,8 +42,8 @@
 
 #include <stddef.h>
 
-#ifdef EXPAT_WIN32
-#include "winconfig.h"
+#ifdef _WIN32
+#  include "winconfig.h"
 #endif
 
 #include "expat_external.h"

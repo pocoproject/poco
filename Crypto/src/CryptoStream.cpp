@@ -41,7 +41,7 @@ CryptoStreamBuf::CryptoStreamBuf(std::istream& istr, CryptoTransform::Ptr pTrans
 	_buffer(static_cast<std::size_t>(bufferSize))
 {
 	poco_check_ptr (pTransform);
-	poco_assert (bufferSize > 2 * pTransform->blockSize());
+	poco_assert (bufferSize > static_cast<std::streamsize>(2 * pTransform->blockSize()));
 }
 
 
@@ -54,7 +54,7 @@ CryptoStreamBuf::CryptoStreamBuf(std::ostream& ostr, CryptoTransform::Ptr pTrans
 	_buffer(static_cast<std::size_t>(bufferSize))
 {
 	poco_check_ptr (pTransform);
-	poco_assert (bufferSize > 2 * pTransform->blockSize());
+	poco_assert (bufferSize > static_cast<std::streamsize>(2 * pTransform->blockSize()));
 }
 
 
@@ -99,16 +99,16 @@ void CryptoStreamBuf::close()
 }
 
 
-int CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_pIstr)
 		return 0;
 
-	int count = 0;
+	std::streamsize count = 0;
 
 	while (!_eof)
 	{
-		int m = (static_cast<int>(length) - count)/2 - static_cast<int>(_pTransform->blockSize());
+		std::streamsize m = (length - count)/2 - static_cast<std::streamsize>(_pTransform->blockSize());
 
 		// Make sure we can read at least one more block. Explicitely check
 		// for m < 0 since blockSize() returns an unsigned int and the
@@ -116,12 +116,12 @@ int CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (m <= 0)
 			break;
 
-		int n = 0;
+		std::streamsize n = 0;
 
 		if (_pIstr->good())
 		{
 			_pIstr->read(reinterpret_cast<char*>(_buffer.begin()), m);
-			n = static_cast<int>(_pIstr->gcount());
+			n = _pIstr->gcount();
 		}
 
 		if (n == 0)
@@ -129,18 +129,18 @@ int CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			_eof = true;
 
 			// No more data, finalize transformation
-			count += static_cast<int>(_pTransform->finalize(
+			count += _pTransform->finalize(
 				reinterpret_cast<unsigned char*>(buffer + count),
-				static_cast<int>(length) - count));
+				length - count);
 		}
 		else
 		{
 			// Transform next chunk of data
-			count += static_cast<int>(_pTransform->transform(
+			count += _pTransform->transform(
 				_buffer.begin(),
 				n,
 				reinterpret_cast<unsigned char*>(buffer + count),
-				static_cast<int>(length) - count));
+				length - count);
 		}
 	}
 
@@ -148,7 +148,7 @@ int CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (!_pOstr)
 		return 0;
@@ -156,7 +156,7 @@ int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	std::size_t maxChunkSize = _buffer.size()/2;
 	std::size_t count = 0;
 
-	while (count < length)
+	while (count < static_cast<std::size_t>(length))
 	{
 		// Truncate chunk size so that the maximum output fits into _buffer.
 		std::size_t n = static_cast<std::size_t>(length) - count;
@@ -183,7 +183,7 @@ int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 		}
 	}
 
-	return static_cast<int>(count);
+	return static_cast<std::streamsize>(count);
 }
 
 

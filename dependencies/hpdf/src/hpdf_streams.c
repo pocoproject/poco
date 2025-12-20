@@ -30,10 +30,10 @@
 #include "hpdf_utils.h"
 #include "hpdf_streams.h"
 
-#ifndef LIBHPDF_HAVE_NOZLIB
+#ifdef LIBHPDF_HAVE_ZLIB
 #include <zlib.h>
 #include <zconf.h>
-#endif /* LIBHPDF_HAVE_NOZLIB */
+#endif /* LIBHPDF_HAVE_ZLIB */
 
 HPDF_STATUS
 HPDF_MemStream_WriteFunc  (HPDF_Stream      stream,
@@ -112,7 +112,7 @@ HPDF_FileStream_FreeFunc  (HPDF_Stream  stream);
  *  ptr : Pointer to a buffer to copy read data.
  *  size : Pointer to a variable which indecates buffer size.
  *
- *  HPDF_Stream_read returns HPDF_OK when success. On failer, it returns
+ *  HPDF_Stream_read returns HPDF_OK when success. On failure, it returns
  *  error-code returned by reading function of this stream.
  *
  */
@@ -141,7 +141,7 @@ HPDF_Stream_Read  (HPDF_Stream  stream,
  *  s : Pointer to a buffer to copy read data.
  *  size : buffer-size of s.
  *
- *  Read from stream until the buffer is exhausted or line-feed charactor is
+ *  Read from stream until the buffer is exhausted or line-feed character is
  *  read.
  *
  */
@@ -226,7 +226,7 @@ HPDF_Stream_ReadLn  (HPDF_Stream  stream,
  *  ptr : Pointer to a buffer to write.
  *  siz : The size of buffer to write.
  *
- *  HPDF_Stream_Write returns HPDF_OK when success. On failer, it returns
+ *  HPDF_Stream_Write returns HPDF_OK when success. On failure, it returns
  *  error-code returned by writing function of this stream.
  *
  */
@@ -432,9 +432,9 @@ HPDF_Stream_WriteEscapeText2  (HPDF_Stream    stream,
 
     HPDF_PTRACE((" HPDF_Stream_WriteEscapeText2\n"));
 
-   /* The following block is commented out because it violates "PDF Spec 7.3.4.2 Literal Strings".
-	* It states that the two matching parentheses must still be present to represent an empty
-	* string of zero length.
+   /* The following block is commented out because it violates "PDF Spec 7.3.4.2 Literal Strings". 
+	* It states that the two matching parentheses must still be present to represent an empty 
+	* string of zero length. 
 	*/
    /*
     if (!len)
@@ -562,7 +562,7 @@ HPDF_Stream_WriteToStreamWithDeflate  (HPDF_Stream  src,
                                        HPDF_Stream  dst,
                                        HPDF_Encrypt  e)
 {
-#ifndef LIBHPDF_HAVE_NOZLIB
+#ifdef LIBHPDF_HAVE_ZLIB
 
 #define DEFLATE_BUF_SIZ  ((HPDF_INT)(HPDF_STREAM_BUF_SIZ * 1.1) + 13)
 
@@ -676,12 +676,12 @@ HPDF_Stream_WriteToStreamWithDeflate  (HPDF_Stream  src,
 
     deflateEnd(&strm);
     return HPDF_OK;
-#else /* LIBHPDF_HAVE_NOZLIB */
+#else /* LIBHPDF_HAVE_ZLIB */
     HPDF_UNUSED (e);
     HPDF_UNUSED (dst);
     HPDF_UNUSED (src);
     return HPDF_UNSUPPORTED_FUNC;
-#endif /* LIBHPDF_HAVE_NOZLIB */
+#endif /* LIBHPDF_HAVE_ZLIB */
 }
 
 HPDF_STATUS
@@ -711,10 +711,10 @@ HPDF_Stream_WriteToStream  (HPDF_Stream  src,
     if (HPDF_Stream_Size (src) == 0)
         return HPDF_OK;
 
-#ifndef LIBHPDF_HAVE_NOZLIB
+#ifdef LIBHPDF_HAVE_ZLIB
     if (filter & HPDF_STREAM_FILTER_FLATE_DECODE)
         return HPDF_Stream_WriteToStreamWithDeflate (src, dst, e);
-#endif /* LIBHPDF_HAVE_NOZLIB */
+#endif /* LIBHPDF_HAVE_ZLIB */
 
     ret = HPDF_Stream_Seek (src, 0, HPDF_SEEK_SET);
     if (ret != HPDF_OK)
@@ -808,7 +808,7 @@ HPDF_FileReader_ReadFunc  (HPDF_Stream  stream,
     HPDF_PTRACE((" HPDF_FileReader_ReadFunc\n"));
 
     HPDF_MemSet(ptr, 0, *siz);
-    rsiz = HPDF_FREAD(ptr, 1, *siz, fp);
+    rsiz = (HPDF_UINT) HPDF_FREAD(ptr, 1, *siz, fp);
 
     if (rsiz != *siz) {
         if (HPDF_FEOF(fp)) {
@@ -836,7 +836,7 @@ HPDF_FileReader_ReadFunc  (HPDF_Stream  stream,
  *                     HPDF_SEEK_CUR : Relative to the current file position
  *                     HPDF_SEEK_END : Relative to the current end of file.
  *
- *  HPDF_FileReader_seek_fn returns HPDF_OK when successful. On failer
+ *  HPDF_FileReader_seek_fn returns HPDF_OK when successful. On failure
  *  the result is HPDF_FILE_IO_ERROR and HPDF_Error_GetCode2() returns the
  *  error which returned by file seeking function of platform.
  *
@@ -975,7 +975,7 @@ HPDF_FileWriter_WriteFunc  (HPDF_Stream      stream,
     HPDF_PTRACE((" HPDF_FileWriter_WriteFunc\n"));
 
     fp = (HPDF_FILEP)stream->attr;
-    ret = HPDF_FWRITE (ptr, 1, siz, fp);
+    ret = (HPDF_UINT) HPDF_FWRITE (ptr, 1, siz, fp);
 
     if (ret != siz) {
         return HPDF_SetError (stream->error, HPDF_FILE_IO_ERROR, HPDF_FERROR(fp));
@@ -1112,10 +1112,7 @@ HPDF_MemStream_SeekFunc  (HPDF_Stream      stream,
     attr->r_ptr_idx = pos / attr->buf_siz;
     attr->r_pos = pos % attr->buf_siz;
     attr->r_ptr = (HPDF_BYTE*)HPDF_List_ItemAt (attr->buf, attr->r_ptr_idx);
-    if (attr->r_ptr == NULL) {
-        HPDF_SetError (stream->error, HPDF_INVALID_OBJECT, 0);
-        return HPDF_INVALID_OBJECT;
-    } else
+    if (attr->r_ptr != NULL)
         attr->r_ptr += attr->r_pos;
 
     return HPDF_OK;
@@ -1375,7 +1372,7 @@ HPDF_MemStream_Rewrite  (HPDF_Stream  stream,
 /*
  *  HPDF_CallbackReader_new
  *
- *  Constractor for HPDF_CallbackReader.
+ *  Constructor for HPDF_CallbackReader.
  *
  *  mmgr : Pointer to a HPDF_MMgr object.
  *  read_fn : Pointer to a user function for reading data.
@@ -1421,7 +1418,7 @@ HPDF_CallbackReader_New  (HPDF_MMgr              mmgr,
 /*
  *  HPDF_CallbackWriter_new
  *
- *  Constractor for HPDF_CallbackWriter.
+ *  Constructor for HPDF_CallbackWriter.
  *
  *  mmgr : Pointer to a HPDF_MMgr object.
  *  read_fn : Pointer to a user function for writing data.
@@ -1467,4 +1464,3 @@ HPDF_Stream_Validate  (HPDF_Stream  stream)
     else
         return HPDF_TRUE;
 }
-

@@ -54,7 +54,7 @@
 
 #include "Poco/Data/ODBC/Unicode.h"
 
-#if (__cplusplus >= 201703L)
+#if POCO_HAVE_CPP17_COMPILER
 	#if __has_include(<msodbcsql.h>)
 		#include <msodbcsql.h>
 		#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT

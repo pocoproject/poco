@@ -65,8 +65,6 @@ public:
 	EVPPKey(const PKCS12Container& cert);
 		/// Constructs EVPPKey from the given container.
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-
 	EVPPKey(int type, int param);
 		/// Creates the EVPPKey.
 		/// Creates a new public/private keypair using the given parameters.
@@ -79,10 +77,6 @@ public:
 		/// Parameters:
 		///   - for EVP_PKEY_RSA: key length in bits
 		///   - for EVP_PKEY_EC: curve NID
-		///
-		/// This constructor is not available for OpenSSL version < 1.0.0
-
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	explicit EVPPKey(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey, unsigned long exponent, int type);
@@ -236,8 +230,8 @@ private:
 
 				if (pFile)
 				{
-					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)nullptr : &passCB;
-					void* pPassword = pass.empty() ? (void*)nullptr : (void*)pass.c_str();
+					pem_password_cb* pCB = &passCB;
+					void* pPassword = const_cast<char*>(pass.c_str());
 					if (readFunc(pFile, &pKey, pCB, pPassword))
 					{
 						fclose(pFile); pFile = nullptr;
@@ -254,14 +248,16 @@ private:
 						if (!*ppKey) goto error;
 						return true;
 					}
-					if (getFunc) EVP_PKEY_free(pKey);
+					EVP_PKEY_free(pKey);
+					if (!getFunc) *ppKey = nullptr;
 					goto error;
 				}
 				else
 				{
 					std::string msg = Poco::format("EVPPKey::loadKey('%s')\n", keyFile);
 					getError(msg);
-					if (getFunc) EVP_PKEY_free(pKey);
+					EVP_PKEY_free(pKey);
+					if (!getFunc) *ppKey = nullptr;
 					throw IOException(msg);
 				}
 			}
@@ -301,8 +297,8 @@ private:
 				EVP_PKEY* pKey = getFunc ? EVP_PKEY_new() : (EVP_PKEY*)*ppKey;
 				if (pKey)
 				{
-					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)nullptr : &passCB;
-					void* pPassword = pass.empty() ? (void*)nullptr : (void*)pass.c_str();
+					pem_password_cb* pCB = &passCB;
+					void* pPassword = const_cast<char*>(pass.c_str());
 					if (readFunc(pBIO, &pKey, pCB, pPassword))
 					{
 						BIO_free(pBIO); pBIO = nullptr;
@@ -319,7 +315,8 @@ private:
 						if (!*ppKey) goto error;
 						return true;
 					}
-					if (getFunc) EVP_PKEY_free(pKey);
+					EVP_PKEY_free(pKey);
+					if (!getFunc) *ppKey = nullptr;
 					goto error;
 				}
 				else goto error;

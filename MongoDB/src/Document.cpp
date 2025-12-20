@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Document
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,6 +18,7 @@
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include <algorithm>
 #include <sstream>
 
 
@@ -142,7 +143,7 @@ void Document::read(BinaryReader& reader)
 		default:
 			{
 				std::stringstream ss;
-				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << (int) type;
+				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << static_cast<int>(type);
 				throw Poco::NotImplementedException(ss.str());
 			}
 		//TODO: x0F -> JavaScript code with scope
@@ -151,7 +152,7 @@ void Document::read(BinaryReader& reader)
 		}
 
 		element->read(reader);
-		_elements.push_back(element);
+		_elementNames.push_back(element->name());
 		_elementMap[element->name()] = element;  // Populate hash map for O(1) lookups
 
 		reader >> type;
@@ -169,9 +170,9 @@ std::string Document::toString(int indent) const
 
 	if (indent > 0) oss << std::endl;
 
-	for (auto it = _elements.begin(), total = _elements.end(); it != total; ++it)
+	for (auto it = _elementNames.begin(), total = _elementNames.end(); it != total; ++it)
 	{
-		if (it != _elements.begin())
+		if (it != _elementNames.begin())
 		{
 			oss << ',';
 			if (indent > 0) oss << std::endl;
@@ -183,10 +184,11 @@ std::string Document::toString(int indent) const
 			oss << indentStr;
 		}
 
-		oss << '"' << (*it)->name() << '"';
+		const auto& element = _elementMap.at(*it);
+		oss << '"' << *it << '"';
 		oss << (indent > 0  ? " : " : ":");
 
-		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
+		oss << element->toString(indent > 0 ? indent + 2 : 0);
 	}
 
 	if (indent > 0)
@@ -204,9 +206,9 @@ std::string Document::toString(int indent) const
 }
 
 
-void Document::write(BinaryWriter& writer)
+void Document::write(BinaryWriter& writer) const
 {
-	if (_elements.empty())
+	if (_elementNames.empty())
 	{
 		writer << 5;
 	}
@@ -214,11 +216,11 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for (const auto& name : _elementNames)
 		{
-			tempWriter << static_cast<unsigned char>((*it)->type());
-			BSONWriter(tempWriter).writeCString((*it)->name());
-			Element::Ptr element = *it;
+			const auto& element = _elementMap.at(name);
+			tempWriter << static_cast<unsigned char>(element->type());
+			BSONWriter(tempWriter).writeCString(element->name());
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
@@ -228,6 +230,50 @@ void Document::write(BinaryWriter& writer)
 		writer.writeRaw(sstream.str());
 	}
 	writer << '\0';
+}
+
+
+void Document::reserve(std::size_t size)
+{
+	_elementNames.reserve(size);
+	_elementMap.reserve(size);
+}
+
+
+Document& Document::addElement(Element::Ptr element)
+{
+	// Check if element with this name already exists
+	auto it = _elementMap.find(element->name());
+	if (it == _elementMap.end())
+	{
+		// New element - add name to vector and element to map
+		_elementNames.push_back(element->name());
+		_elementMap[element->name()] = element;
+	}
+	else
+	{
+		// Element exists - only update the map (replace existing)
+		_elementMap[element->name()] = element;
+	}
+	return *this;
+}
+
+
+bool Document::remove(const std::string& name)
+{
+	// Remove from hash map first (O(1))
+	auto mapIt = _elementMap.find(name);
+	if (mapIt == _elementMap.end())
+		return false;
+
+	_elementMap.erase(mapIt);
+
+	// Then remove from vector (O(n) but unavoidable for order preservation)
+	auto it = std::find(_elementNames.begin(), _elementNames.end(), name);
+	if (it != _elementNames.end())
+		_elementNames.erase(it);
+
+	return true;
 }
 
 

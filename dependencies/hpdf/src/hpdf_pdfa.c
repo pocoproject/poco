@@ -20,9 +20,11 @@
 #endif
 
 #include <time.h>
-#include "hpdf_utils.h"
-#include "hpdf.h"
 #include <string.h>
+
+#include "hpdf_utils.h"
+#include "hpdf_pdfa.h"
+#include "hpdf.h"
 
 
 #define HEADER                   "<?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?><x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='XMP toolkit 2.9.1-13, framework 1.6'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/'>"
@@ -50,6 +52,15 @@
 #define PDF_FOOTER               "</rdf:Description>"
 #define PDFAID_PDFA1A            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='1' pdfaid:conformance='A'/>"
 #define PDFAID_PDFA1B            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='1' pdfaid:conformance='B'/>"
+#define PDFAID_PDFA2A            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='2' pdfaid:conformance='A'/>"
+#define PDFAID_PDFA2B            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='2' pdfaid:conformance='B'/>"
+#define PDFAID_PDFA2U            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='2' pdfaid:conformance='U'/>"
+#define PDFAID_PDFA3A            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='3' pdfaid:conformance='A'/>"
+#define PDFAID_PDFA3B            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='3' pdfaid:conformance='B'/>"
+#define PDFAID_PDFA3U            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='3' pdfaid:conformance='U'/>"
+#define PDFAID_PDFA4             "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='4' pdfaid:conformance='' pdfaid:rev='2020'/>"
+#define PDFAID_PDFA4E            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='4' pdfaid:conformance='E' pdfaid:rev='2020'/>"
+#define PDFAID_PDFA4F            "<rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/' pdfaid:part='4' pdfaid:conformance='F' pdfaid:rev='2020'/>"
 #define FOOTER                   "</rdf:RDF></x:xmpmeta><?xpacket end='w'?>"
 
 
@@ -112,7 +123,7 @@ HPDF_STATUS ConvertDateToXMDate(HPDF_Stream stream, const char *pDate)
         return ret;
     pDate+=2;
     /* Write +... */
-    if(pDate[0]==0) {
+    if(pDate[0]==0 || pDate[0]=='Z') {
         ret = HPDF_Stream_Write(stream, (const HPDF_BYTE*)"Z", 1);
         return ret;
     }
@@ -132,13 +143,24 @@ HPDF_STATUS ConvertDateToXMDate(HPDF_Stream stream, const char *pDate)
     return HPDF_SetError (stream->error, HPDF_INVALID_PARAMETER, 0);
 }
 
-/* Write XMP Metadata for PDF/A */
-
+/* Set PDF/A conformance */
 HPDF_STATUS
-HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
+HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf, HPDF_PDFAType pdfatype)
 {
+    pdf->pdfa_type = pdfatype;
+    return HPDF_OK;
+}
+
+/* Add XMP Metadata for PDF/A */
+HPDF_STATUS
+HPDF_PDFA_AddXmpMetadata(HPDF_Doc pdf)
+{
+    HPDF_Dict markinfo;
+    HPDF_Dict structTreeRoot;
+    HPDF_Array k;
     HPDF_OutputIntent xmp;
     HPDF_STATUS ret;
+    HPDF_PDFVer conformanceVersion;
 
     const char *dc_title       = NULL;
     const char *dc_creator     = NULL;
@@ -156,6 +178,26 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
     if (!HPDF_HasDoc(pdf)) {
       return HPDF_INVALID_DOCUMENT;
     }
+
+    markinfo = HPDF_Dict_New(pdf->mmgr);
+    if (!markinfo)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+
+    ret = HPDF_OK;
+    ret += HPDF_Dict_Add (pdf->catalog, "MarkInfo", markinfo);
+
+    ret += HPDF_Dict_AddBoolean (markinfo, "Marked", HPDF_TRUE);
+
+    structTreeRoot = HPDF_Dict_New(pdf->mmgr);
+    if (!structTreeRoot)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+    ret += HPDF_Dict_Add (pdf->catalog, "StructTreeRoot", structTreeRoot);
+    ret += HPDF_Dict_AddName  (structTreeRoot, "Type", "StructTreeRoot");
+
+    k = HPDF_Array_New(pdf->mmgr);
+    if (!k)
+        return HPDF_FAILED_TO_ALLOC_MEM;
+    ret += HPDF_Dict_Add(structTreeRoot, "K", k);
 
     dc_title       = (const char *)HPDF_GetInfoAttr(pdf, HPDF_INFO_TITLE);
     dc_creator     = (const char *)HPDF_GetInfoAttr(pdf, HPDF_INFO_AUTHOR);
@@ -177,11 +219,8 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
           return HPDF_INVALID_STREAM;
         }
 
-        /* Update the PDF number version */
-        pdf->pdf_version = HPDF_VER_14;
-
         HPDF_Dict_AddName(xmp,"Type","Metadata");
-        HPDF_Dict_AddName(xmp,"SubType","XML");
+        HPDF_Dict_AddName(xmp,"Subtype","XML");
 
         ret = HPDF_OK;
         ret += HPDF_Stream_WriteStr(xmp->stream, HEADER);
@@ -258,13 +297,66 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
         }
 
         /* Add the pdfaid block */
-        switch(pdfatype) {
+        conformanceVersion = -1;
+        switch(pdf->pdfa_type) {
           case HPDF_PDFA_1A:
             ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA1A);
+            conformanceVersion = HPDF_VER_14;
             break;
           case HPDF_PDFA_1B:
             ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA1B);
+            conformanceVersion = HPDF_VER_14;
             break;
+          case HPDF_PDFA_2A:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA2A);
+            conformanceVersion = HPDF_VER_17;
+            break;
+          case HPDF_PDFA_2B:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA2B);
+            conformanceVersion = HPDF_VER_17;
+            break;
+          case HPDF_PDFA_2U:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA2U);
+            conformanceVersion = HPDF_VER_17;
+            break;
+          case HPDF_PDFA_3A:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA3A);
+            conformanceVersion = HPDF_VER_17;
+            break;
+          case HPDF_PDFA_3B:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA3B);
+            conformanceVersion = HPDF_VER_17;
+            break;
+          case HPDF_PDFA_3U:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA3U);
+            conformanceVersion = HPDF_VER_17;
+            break;
+          case HPDF_PDFA_4:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA4);
+            conformanceVersion = HPDF_VER_20;
+            break;
+          case HPDF_PDFA_4E:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA4E);
+            conformanceVersion = HPDF_VER_20;
+            break;
+          case HPDF_PDFA_4F:
+            ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA4F);
+            conformanceVersion = HPDF_VER_20;
+            break;
+        }
+
+        /* Update the PDF number version */
+        pdf->pdf_version = (pdf->pdf_version > conformanceVersion ? pdf->pdf_version : conformanceVersion);
+
+        /* Append additionnal specific XMP extensions */
+        {
+            HPDF_UINT i;
+            HPDF_List list;
+
+            list = pdf->xmp_extensions;
+            for (i = 0; i < list->count; i++) {
+                HPDF_Stream_WriteStr(xmp->stream, (const char *)HPDF_List_ItemAt(list, i));
+            }
         }
 
         ret += HPDF_Stream_WriteStr(xmp->stream, FOOTER);
@@ -280,7 +372,39 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
         return HPDF_PDFA_GenerateID(pdf);
     }
 
-    return HPDF_OK;
+    return ret;
+}
+
+HPDF_STATUS
+HPDF_PDFA_AddXmpExtension(HPDF_Doc    pdf,
+                          const char *xmp_extension)
+{
+    HPDF_UINT xmp_extension_size;
+    void *xmp_extension_copy;
+
+    if (xmp_extension == NULL || xmp_extension[0] == 0)
+        return HPDF_OK;
+
+    xmp_extension_size = (HPDF_UINT)strlen(xmp_extension);
+    xmp_extension_copy = HPDF_GetMem(pdf->mmgr, xmp_extension_size + 1);
+    if (xmp_extension_copy == NULL)
+        return HPDF_CheckError (&pdf->error);
+
+    strcpy(xmp_extension_copy, xmp_extension);
+    return HPDF_List_Add(pdf->xmp_extensions, xmp_extension_copy);
+}
+
+void
+HPDF_PDFA_ClearXmpExtensions(HPDF_Doc pdf)
+{
+    HPDF_UINT i;
+    HPDF_List list;
+
+    list = pdf->xmp_extensions;
+    for (i = 0; i < list->count; i++) {
+        HPDF_FreeMem(pdf->mmgr, HPDF_List_ItemAt(list, i));
+    }
+    HPDF_List_Clear(pdf->xmp_extensions);
 }
 
 /* Generate an ID for the trailer dict, PDF/A needs this.
@@ -373,7 +497,7 @@ HPDF_PDFA_AppendOutputIntents(HPDF_Doc pdf, const char *iccname, HPDF_Dict iccdi
     if (intents == NULL) {
         intents = HPDF_Array_New (pdf->mmgr);
         if (intents) {
-            HPDF_STATUS ret = HPDF_Dict_Add (pdf->catalog, "OutputIntents", intents);
+            ret = HPDF_Dict_Add (pdf->catalog, "OutputIntents", intents);
             if (ret != HPDF_OK) {
                 HPDF_CheckError (&pdf->error);
                 return HPDF_Error_GetDetailCode (&pdf->error);

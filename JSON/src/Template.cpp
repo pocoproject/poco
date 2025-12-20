@@ -225,7 +225,7 @@ public:
 
 	void render(const Var& data, std::ostream& out) const override
 	{
-		int count = 0;
+		std::size_t count = 0;
 		for (auto it = _queries.begin(); it != _queries.end(); ++it, ++count)
 		{
 			if ((*it)->apply(data) && _parts.size() > count)
@@ -260,7 +260,7 @@ public:
 			Array::Ptr array = query.findArray(_query);
 			if (!array.isNull())
 			{
-				for (int i = 0; i < array->size(); i++)
+				for (std::size_t i = 0; i < array->size(); i++)
 				{
 					Var value = array->get(i);
 					dataObject->set(_name, value);

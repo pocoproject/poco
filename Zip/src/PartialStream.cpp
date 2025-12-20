@@ -21,11 +21,11 @@ namespace Poco {
 namespace Zip {
 
 
-PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& pre, const std::string& post, bool initStream):
+PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type endPos, const std::string& pre, const std::string& post, bool initStream):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_initialized(!initStream),
 	_start(start),
-	_numBytes(end-start),
+	_numBytes(endPos-start),
 	_bytesWritten(0),
 	_pIstr(&in),
 	_pOstr(nullptr),
@@ -38,7 +38,7 @@ PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, s
 }
 
 
-PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::size_t end, bool initStream):
+PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::size_t endPos, bool initStream):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_initialized(!initStream),
 	_start(0),
@@ -47,7 +47,7 @@ PartialStreamBuf::PartialStreamBuf(std::ostream& out, std::size_t start, std::si
 	_pIstr(nullptr),
 	_pOstr(&out),
 	_ignoreStart(start),
-	_buffer(end),
+	_buffer(endPos),
 	_bufferOffset(0)
 {
 }
@@ -58,7 +58,7 @@ PartialStreamBuf::~PartialStreamBuf()
 }
 
 
-int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_pIstr == nullptr ||length == 0) return -1;
 	if (!_initialized)
@@ -71,20 +71,20 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	}
 	if (!_prefix.empty())
 	{
-		std::streamsize tmp = (_prefix.size() > length)? length: static_cast<std::streamsize>(_prefix.size());
+		std::streamsize tmp = std::min(static_cast<std::streamsize>(_prefix.size()), length);
 		std::memcpy(buffer, _prefix.c_str(), tmp);
-		_prefix = _prefix.substr(tmp);
-		return static_cast<int>(tmp);
+		_prefix = _prefix.substr(static_cast<std::size_t>(tmp));
+		return tmp;
 	}
 
 	if (_numBytes == 0)
 	{
 		if (!_postfix.empty())
 		{
-			std::streamsize tmp = (_postfix.size() > length)? length: static_cast<std::streamsize>(_postfix.size());
+			std::streamsize tmp = std::min(static_cast<std::streamsize>(_postfix.size()), length);
 			std::memcpy(buffer, _postfix.c_str(), tmp);
-			_postfix = _postfix.substr(tmp);
-			return static_cast<int>(tmp);
+			_postfix = _postfix.substr(static_cast<std::size_t>(tmp));
+			return tmp;
 		}
 		else
 			return -1;
@@ -93,18 +93,18 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (!_pIstr->good())
 		return -1;
 
-	if (_numBytes < length)
+	if (static_cast<std::streamsize>(_numBytes) < length)
 		length = static_cast<std::streamsize>(_numBytes);
 
 	_pIstr->read(buffer, length);
 	std::streamsize bytesRead = _pIstr->gcount();
 	_numBytes -= bytesRead;
-	return static_cast<int>(bytesRead);
+	return bytesRead;
 
 }
 
 
-int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (_pOstr == nullptr || length == 0) return -1;
 	if (!_initialized)
@@ -117,11 +117,11 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 
 	if (_ignoreStart > 0)
 	{
-		if (_ignoreStart > length)
+		if (static_cast<std::streamsize>(_ignoreStart) > length)
 		{
-			_ignoreStart -= length;
+			_ignoreStart -= static_cast<std::size_t>(length);
 			// fake return values
-			return static_cast<int>(length);
+			return length;
 		}
 		else
 		{
@@ -139,7 +139,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 			_bufferOffset = static_cast<Poco::UInt32>(length - cnt);
 			std::memcpy(_buffer.begin(), buffer + cnt, _bufferOffset);
 
-			return static_cast<int>(length);
+			return length;
 		}
 	}
 	if (_buffer.size() > 0)
@@ -152,7 +152,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 			static_cast<Poco::Int32>(length) - static_cast<Poco::Int32>(_buffer.size()));
 		if (cache > 0)
 		{
-			if (cache > _bufferOffset)
+			if (static_cast<Poco::UInt32>(cache) > _bufferOffset)
 				cache = _bufferOffset;
 			_pOstr->write(_buffer.begin(), cache);
 			_bytesWritten += cache;
@@ -166,7 +166,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 		if (pos <= 0)
 		{
 			// all of the message goes to _buffer
-			std::memcpy(_buffer.begin() + _bufferOffset, buffer, length);
+			std::memcpy(_buffer.begin() + _bufferOffset, buffer, static_cast<std::size_t>(length));
 		}
 		else
 		{
@@ -185,7 +185,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	}
 
 	if (_pOstr->good())
-		return static_cast<int>(length);
+		return length;
 
 	throw Poco::IOException("Failed to write to output stream");
 }
@@ -197,13 +197,13 @@ void PartialStreamBuf::close()
 }
 
 
-PartialIOS::PartialIOS(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, const std::string& pre, const std::string& post, bool initStream): _buf(istr, start, end, pre, post, initStream)
+PartialIOS::PartialIOS(std::istream& istr, std::ios::pos_type start, std::ios::pos_type endPos, const std::string& pre, const std::string& post, bool initStream): _buf(istr, start, endPos, pre, post, initStream)
 {
 	poco_ios_init(&_buf);
 }
 
 
-PartialIOS::PartialIOS(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream): _buf(ostr, start, end, initStream)
+PartialIOS::PartialIOS(std::ostream& ostr, std::size_t start, std::size_t endPos, bool initStream): _buf(ostr, start, endPos, initStream)
 {
 	poco_ios_init(&_buf);
 }
@@ -220,8 +220,8 @@ PartialStreamBuf* PartialIOS::rdbuf()
 }
 
 
-PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, bool initStream, const std::string& pre, const std::string& post):
-	PartialIOS(istr, start, end, pre, post, initStream),
+PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type endPos, bool initStream, const std::string& pre, const std::string& post):
+	PartialIOS(istr, start, endPos, pre, post, initStream),
 	std::istream(&_buf)
 {
 }
@@ -232,8 +232,8 @@ PartialInputStream::~PartialInputStream()
 }
 
 
-PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream):
-	PartialIOS(ostr, start, end, initStream),
+PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t endPos, bool initStream):
+	PartialIOS(ostr, start, endPos, initStream),
 	std::ostream(&_buf)
 {
 }

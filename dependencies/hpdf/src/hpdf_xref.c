@@ -145,7 +145,7 @@ HPDF_Xref_Add  (HPDF_Xref  xref,
     }
 
     /* in the following, we have to dispose the object when an error is
-     * occured.
+     * occurred.
      */
 
     entry = (HPDF_XrefEntry)HPDF_GetMem (xref->mmgr,
@@ -317,8 +317,13 @@ static HPDF_STATUS
 WriteTrailer  (HPDF_Xref     xref,
                HPDF_Stream   stream)
 {
-    HPDF_UINT max_obj_id = xref->entries->count + xref->start_offset;
+    HPDF_UINT max_obj_id;
     HPDF_STATUS ret;
+
+    if (!xref)
+        return HPDF_INVALID_OBJECT;
+
+    max_obj_id = xref->entries->count + xref->start_offset;
 
     HPDF_PTRACE ((" WriteTrailer\n"));
 

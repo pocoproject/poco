@@ -16,23 +16,27 @@
  */
 
 
-#include "hpdf_conf.h"
-#include "hpdf_utils.h"
-#include "hpdf_encryptdict.h"
-#include "hpdf_namedict.h"
-#include "hpdf_destination.h"
-#include "hpdf_info.h"
-#include "hpdf_page_label.h"
 #include "hpdf.h"
+#include "hpdf_conf.h"
+#include "hpdf_config.h"
+#include "hpdf_destination.h"
+#include "hpdf_encryptdict.h"
+#include "hpdf_info.h"
+#include "hpdf_namedict.h"
+#include "hpdf_page_label.h"
+#include "hpdf_pdfa.h"
+#include "hpdf_utils.h"
+#include "hpdf_version.h"
 
 
-static const char * const HPDF_VERSION_STR[6] = {
+static const char * const HPDF_VERSION_STR[] = {
                 "%PDF-1.2\012%\267\276\255\252\012",
                 "%PDF-1.3\012%\267\276\255\252\012",
                 "%PDF-1.4\012%\267\276\255\252\012",
                 "%PDF-1.5\012%\267\276\255\252\012",
                 "%PDF-1.6\012%\267\276\255\252\012",
-                "%PDF-1.7\012%\267\276\255\252\012"
+                "%PDF-1.7\012%\267\276\255\252\012",
+                "%PDF-2.0\012%\267\276\255\252\012"
 };
 
 
@@ -74,7 +78,7 @@ static const char*
 LoadTTFontFromStream (HPDF_Doc         pdf,
                       HPDF_Stream      font_data,
                       HPDF_BOOL        embedding,
-                       const char      *file_name);
+                      const char      *file_name);
 
 
 static const char*
@@ -83,7 +87,6 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
                        HPDF_UINT        index,
                        HPDF_BOOL        embedding,
                        const char      *file_name);
-
 
 /*---------------------------------------------------------------------------*/
 
@@ -121,6 +124,13 @@ HPDF_HasDoc  (HPDF_Doc  pdf)
         return HPDF_TRUE;
 }
 
+HPDF_EXPORT(HPDF_MMgr)
+HPDF_GetDocMMgr  (HPDF_Doc doc)
+{
+    HPDF_PTRACE ((" HPDF_GetDocMMgr\n"));
+
+    return doc->mmgr;
+}
 
 HPDF_EXPORT(HPDF_Doc)
 HPDF_New  (HPDF_Error_Handler    user_error_fn,
@@ -267,6 +277,9 @@ HPDF_NewDoc  (HPDF_Doc  pdf)
     if (HPDF_SetInfoAttr (pdf, HPDF_INFO_PRODUCER, buf) != HPDF_OK)
         return HPDF_CheckError (&pdf->error);
 
+    pdf->pdfa_type = HPDF_PDFA_NON_PDFA;
+    pdf->xmp_extensions = HPDF_List_New (pdf->mmgr, HPDF_DEF_ITEMS_PER_BLOCK);
+
     return HPDF_OK;
 }
 
@@ -317,6 +330,13 @@ HPDF_FreeDoc  (HPDF_Doc  pdf)
         if (pdf->stream) {
             HPDF_Stream_Free (pdf->stream);
             pdf->stream = NULL;
+        }
+
+        pdf->pdfa_type = HPDF_PDFA_NON_PDFA;
+        if (pdf->xmp_extensions) {
+            HPDF_PDFA_ClearXmpExtensions(pdf);
+            HPDF_List_Free (pdf->xmp_extensions);
+            pdf->xmp_extensions = NULL;
         }
     }
 }
@@ -497,7 +517,8 @@ HPDF_SetEncryptionMode  (HPDF_Doc           pdf,
             /* if encryption mode is specified revision-3, the version of
              * pdf file is set to 1.4
              */
-            pdf->pdf_version = HPDF_VER_14;
+            if (pdf->pdf_version < HPDF_VER_14)
+                pdf->pdf_version = HPDF_VER_14;
 
             if (key_len >= 5 && key_len <= 16)
                 e->key_len = key_len;
@@ -522,7 +543,7 @@ HPDF_Doc_SetEncryptOff  (HPDF_Doc   pdf)
     if (!pdf->encrypt_on)
         return HPDF_OK;
 
-    /* if encrypy-dict object is registered to cross-reference-table,
+    /* if encrypt-dict object is registered to cross-reference-table,
      * replace it to null-object.
      * additionally remove encrypt-dict object from trailer-object.
      */
@@ -604,6 +625,10 @@ InternalSaveToStream  (HPDF_Doc      pdf,
 {
     HPDF_STATUS ret;
 
+    /* Add metadata in case of PDF/A document */
+    if (pdf->pdfa_type != HPDF_PDFA_NON_PDFA && (ret = HPDF_PDFA_AddXmpMetadata(pdf)) != HPDF_OK)
+        return ret;
+
     if ((ret = WriteHeader (pdf, stream)) != HPDF_OK)
         return ret;
 
@@ -611,7 +636,7 @@ InternalSaveToStream  (HPDF_Doc      pdf,
     if ((ret = PrepareTrailer (pdf)) != HPDF_OK)
         return ret;
 
-    /* prepare encription */
+    /* prepare encryption */
     if (pdf->encrypt_on) {
         HPDF_Encrypt e= HPDF_EncryptDict_GetAttr (pdf->encrypt_dict);
 
@@ -1466,22 +1491,22 @@ HPDF_GetTTFontDefFromFile (HPDF_Doc      pdf,
                            const char   *file_name,
                            HPDF_BOOL     embedding)
 {
-	HPDF_Stream font_data;
-	HPDF_FontDef def;
+    HPDF_Stream font_data;
+    HPDF_FontDef def;
 
-	HPDF_PTRACE ((" HPDF_GetTTFontDefFromFile\n"));
+    HPDF_PTRACE ((" HPDF_GetTTFontDefFromFile\n"));
 
-	/* create file stream */
-	font_data = HPDF_FileReader_New (pdf->mmgr, file_name);
+    /* create file stream */
+    font_data = HPDF_FileReader_New (pdf->mmgr, file_name);
 
-	if (HPDF_Stream_Validate (font_data)) {
-		def = HPDF_TTFontDef_Load (pdf->mmgr, font_data, embedding);
-	} else {
-		HPDF_CheckError (&pdf->error);
-		return NULL;
-	}
+    if (HPDF_Stream_Validate (font_data)) {
+        def = HPDF_TTFontDef_Load (pdf->mmgr, font_data, embedding);
+    } else {
+        HPDF_CheckError (&pdf->error);
+        return NULL;
+    }
 
-	return def;
+    return def;
 }
 
 HPDF_EXPORT(const char*)
@@ -1560,6 +1585,13 @@ LoadTTFontFromStream (HPDF_Doc         pdf,
 }
 
 
+/**
+* @brief Load the specified font from a font collection file.
+* @param[in] file_name Filename of the TrueType Font collection file.
+* @param[in] index Index of the font to load from the font collection.
+* @param[in] embedding Whether to embed the font in the document.
+* @ret The font definition.
+*/
 HPDF_EXPORT(const char*)
 HPDF_LoadTTFontFromFile2 (HPDF_Doc         pdf,
                           const char      *file_name,
@@ -1635,6 +1667,39 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
     }
 
     return def->base_font;
+}
+
+HPDF_EXPORT(const char*)
+HPDF_LoadTTFontFromMemory (HPDF_Doc         pdf,
+                           const HPDF_BYTE *buffer,
+                           HPDF_UINT        size,
+                           HPDF_BOOL        embedding)
+{
+    HPDF_Stream font_data;
+    const char *ret;
+
+    HPDF_PTRACE ((" HPDF_LoadTTFontFromMemory\n"));
+
+    if (!HPDF_HasDoc (pdf))
+        return NULL;
+
+    /* create memory stream */
+    font_data = HPDF_MemStream_New (pdf->mmgr, size);
+    if (!HPDF_Stream_Validate (font_data)) {
+        HPDF_RaiseError (&pdf->error, HPDF_INVALID_STREAM, 0);
+        return NULL;
+    }
+
+    if (HPDF_Stream_Write (font_data, buffer, size) != HPDF_OK) {
+        HPDF_Stream_Free (font_data);
+        return NULL;
+    }
+
+    ret = LoadTTFontFromStream (pdf, font_data, embedding, "");
+    if (!ret) {
+        HPDF_CheckError (&pdf->error);
+    }
+    return ret;
 }
 
 
@@ -1789,7 +1854,7 @@ HPDF_SetPageLayout  (HPDF_Doc          pdf,
                 (HPDF_STATUS)layout);
 
     if ((layout == HPDF_PAGE_LAYOUT_TWO_PAGE_LEFT || layout == HPDF_PAGE_LAYOUT_TWO_PAGE_RIGHT) && pdf->pdf_version < HPDF_VER_15)
-        pdf->pdf_version = HPDF_VER_15 ;
+        pdf->pdf_version = HPDF_VER_15;
 
     ret = HPDF_Catalog_SetPageLayout (pdf->catalog, layout);
     if (ret != HPDF_OK)
@@ -1882,7 +1947,7 @@ HPDF_SetViewerPreference  (HPDF_Doc     pdf,
     if (ret != HPDF_OK)
         return HPDF_CheckError (&pdf->error);
 
-    pdf->pdf_version = HPDF_VER_16;
+    pdf->pdf_version = (pdf->pdf_version > HPDF_VER_16 ? pdf->pdf_version : HPDF_VER_16);
 
     return HPDF_OK;
 }
@@ -1928,6 +1993,7 @@ HPDF_AttachFile  (HPDF_Doc    pdf,
     HPDF_NameTree ntree;
     HPDF_EmbeddedFile efile;
     HPDF_String name;
+    HPDF_Array af;
     HPDF_STATUS ret = HPDF_OK;
 
     HPDF_PTRACE ((" HPDF_AttachFile\n"));
@@ -1965,10 +2031,20 @@ HPDF_AttachFile  (HPDF_Doc    pdf,
     if (!name)
         return NULL;
 
-    ret += HPDF_NameTree_Add (ntree, name, efile);
+    ret = HPDF_NameTree_Add (ntree, name, efile);
     if (ret != HPDF_OK)
         return NULL;
 
+    af = HPDF_Dict_GetItem(pdf->catalog, "AF", HPDF_OCLASS_ARRAY);
+    if (!af) {
+        af = HPDF_Array_New(pdf->mmgr);
+        if (!af)
+            return NULL;
+        HPDF_Dict_Add(pdf->catalog, "AF", af);
+    }
+    HPDF_Array_Add(af, efile);
+
+    pdf->pdf_version = (pdf->pdf_version > HPDF_VER_17 ? pdf->pdf_version : HPDF_VER_17);
     return efile;
 }
 
@@ -2106,7 +2182,7 @@ HPDF_CreateExtGState  (HPDF_Doc  pdf)
     if (!HPDF_HasDoc (pdf))
         return NULL;
 
-    pdf->pdf_version = HPDF_VER_14;
+    pdf->pdf_version = (pdf->pdf_version > HPDF_VER_14 ? pdf->pdf_version : HPDF_VER_14);
 
     ext_gstate = HPDF_ExtGState_New (pdf->mmgr, pdf->xref);
     if (!ext_gstate)
@@ -2126,16 +2202,16 @@ HPDF_SetCompressionMode  (HPDF_Doc    pdf,
     if (mode != (mode & HPDF_COMP_MASK))
         return HPDF_RaiseError (&pdf->error, HPDF_INVALID_COMPRESSION_MODE, 0);
 
-#ifndef LIBHPDF_HAVE_NOZLIB
+#ifdef LIBHPDF_HAVE_ZLIB
     pdf->compression_mode = mode;
 
     return HPDF_OK;
 
-#else /* LIBHPDF_HAVE_NOZLIB */
+#else /* LIBHPDF_HAVE_ZLIB */
 
     return HPDF_INVALID_COMPRESSION_MODE;
 
-#endif /* LIBHPDF_HAVE_NOZLIB */
+#endif /* LIBHPDF_HAVE_ZLIB */
 }
 
 
@@ -2336,9 +2412,9 @@ HPDF_AddColorspaceFromProfile  (HPDF_Doc pdf,
 }
 
 HPDF_EXPORT(HPDF_OutputIntent)
-HPDF_LoadIccProfileFromFile  (HPDF_Doc pdf,
-                           const char* icc_file_name,
-						           int numcomponent)
+HPDF_LoadIccProfileFromFile (HPDF_Doc pdf,
+                             const char* icc_file_name,
+                             int numcomponent)
 {
     HPDF_Stream iccdata;
     HPDF_OutputIntent iccentry;
@@ -2366,3 +2442,28 @@ HPDF_LoadIccProfileFromFile  (HPDF_Doc pdf,
     return iccentry;
 }
 
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_SetPDFAConformance  (HPDF_Doc      pdf,
+                          HPDF_PDFAType pdfa_type)
+{
+    if (pdf == NULL)
+        return HPDF_DOC_INVALID_OBJECT;
+
+    return HPDF_PDFA_SetPDFAConformance(pdf, pdfa_type);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_AddPDFAXmpExtension  (HPDF_Doc    pdf,
+                           const char *xmp_extension)
+{
+    if (pdf == NULL)
+        return HPDF_DOC_INVALID_OBJECT;
+
+    return HPDF_PDFA_AddXmpExtension(pdf, xmp_extension);
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_AppendOutputIntents(HPDF_Doc pdf, const char *iccname, HPDF_Dict iccdict)
+{
+    return HPDF_PDFA_AppendOutputIntents(pdf, iccname, iccdict);
+}

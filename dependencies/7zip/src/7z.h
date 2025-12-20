@@ -1,89 +1,57 @@
 /* 7z.h -- 7z interface
-2010-03-11 : Igor Pavlov : Public domain */
+2023-04-02 : Igor Pavlov : Public domain */
 
-#ifndef __7Z_H
-#define __7Z_H
+#ifndef ZIP7_INC_7Z_H
+#define ZIP7_INC_7Z_H
 
-#include "7zBuf.h"
+#include "7zTypes.h"
 
 EXTERN_C_BEGIN
 
 #define k7zStartHeaderSize 0x20
 #define k7zSignatureSize 6
-extern Byte k7zSignature[k7zSignatureSize];
-#define k7zMajorVersion 0
 
-enum EIdEnum
-{
-  k7zIdEnd,
-  k7zIdHeader,
-  k7zIdArchiveProperties,
-  k7zIdAdditionalStreamsInfo,
-  k7zIdMainStreamsInfo,
-  k7zIdFilesInfo,
-  k7zIdPackInfo,
-  k7zIdUnpackInfo,
-  k7zIdSubStreamsInfo,
-  k7zIdSize,
-  k7zIdCRC,
-  k7zIdFolder,
-  k7zIdCodersUnpackSize,
-  k7zIdNumUnpackStream,
-  k7zIdEmptyStream,
-  k7zIdEmptyFile,
-  k7zIdAnti,
-  k7zIdName,
-  k7zIdCTime,
-  k7zIdATime,
-  k7zIdMTime,
-  k7zIdWinAttributes,
-  k7zIdComment,
-  k7zIdEncodedHeader,
-  k7zIdStartPos,
-  k7zIdDummy
-};
+extern const Byte k7zSignature[k7zSignatureSize];
 
 typedef struct
 {
-  UInt32 NumInStreams;
-  UInt32 NumOutStreams;
-  UInt64 MethodID;
-  CBuf Props;
-} CSzCoderInfo;
+  const Byte *Data;
+  size_t Size;
+} CSzData;
 
-void SzCoderInfo_Init(CSzCoderInfo *p);
-void SzCoderInfo_Free(CSzCoderInfo *p, ISzAlloc *alloc);
+/* CSzCoderInfo & CSzFolder support only default methods */
+
+typedef struct
+{
+  size_t PropsOffset;
+  UInt32 MethodID;
+  Byte NumStreams;
+  Byte PropsSize;
+} CSzCoderInfo;
 
 typedef struct
 {
   UInt32 InIndex;
   UInt32 OutIndex;
-} CSzBindPair;
+} CSzBond;
+
+#define SZ_NUM_CODERS_IN_FOLDER_MAX 4
+#define SZ_NUM_BONDS_IN_FOLDER_MAX 3
+#define SZ_NUM_PACK_STREAMS_IN_FOLDER_MAX 4
 
 typedef struct
 {
-  CSzCoderInfo *Coders;
-  CSzBindPair *BindPairs;
-  UInt32 *PackStreams;
-  UInt64 *UnpackSizes;
   UInt32 NumCoders;
-  UInt32 NumBindPairs;
+  UInt32 NumBonds;
   UInt32 NumPackStreams;
-  int UnpackCRCDefined;
-  UInt32 UnpackCRC;
-
-  UInt32 NumUnpackStreams;
+  UInt32 UnpackStream;
+  UInt32 PackStreams[SZ_NUM_PACK_STREAMS_IN_FOLDER_MAX];
+  CSzBond Bonds[SZ_NUM_BONDS_IN_FOLDER_MAX];
+  CSzCoderInfo Coders[SZ_NUM_CODERS_IN_FOLDER_MAX];
 } CSzFolder;
 
-void SzFolder_Init(CSzFolder *p);
-UInt64 SzFolder_GetUnpackSize(CSzFolder *p);
-int SzFolder_FindBindPairForInStream(CSzFolder *p, UInt32 inStreamIndex);
-UInt32 SzFolder_GetNumOutStreams(CSzFolder *p);
-UInt64 SzFolder_GetUnpackSize(CSzFolder *p);
 
-SRes SzFolder_Decode(const CSzFolder *folder, const UInt64 *packSizes,
-    ILookInStream *stream, UInt64 startPos,
-    Byte *outBuffer, size_t outSize, ISzAlloc *allocMain);
+SRes SzGetNextFolderItem(CSzFolder *f, CSzData *sd);
 
 typedef struct
 {
@@ -93,55 +61,46 @@ typedef struct
 
 typedef struct
 {
-  CNtfsFileTime MTime;
-  UInt64 Size;
-  UInt32 Crc;
-  UInt32 Attrib;
-  Byte HasStream;
-  Byte IsDir;
-  Byte IsAnti;
-  Byte CrcDefined;
-  Byte MTimeDefined;
-  Byte AttribDefined;
-} CSzFileItem;
-
-void SzFile_Init(CSzFileItem *p);
+  Byte *Defs; /* MSB 0 bit numbering */
+  UInt32 *Vals;
+} CSzBitUi32s;
 
 typedef struct
 {
-  UInt64 *PackSizes;
-  Byte *PackCRCsDefined;
-  UInt32 *PackCRCs;
-  CSzFolder *Folders;
-  CSzFileItem *Files;
+  Byte *Defs; /* MSB 0 bit numbering */
+  // UInt64 *Vals;
+  CNtfsFileTime *Vals;
+} CSzBitUi64s;
+
+#define SzBitArray_Check(p, i) (((p)[(i) >> 3] & (0x80 >> ((i) & 7))) != 0)
+
+#define SzBitWithVals_Check(p, i) ((p)->Defs && ((p)->Defs[(i) >> 3] & (0x80 >> ((i) & 7))) != 0)
+
+typedef struct
+{
   UInt32 NumPackStreams;
   UInt32 NumFolders;
-  UInt32 NumFiles;
+
+  UInt64 *PackPositions;          // NumPackStreams + 1
+  CSzBitUi32s FolderCRCs;         // NumFolders
+
+  size_t *FoCodersOffsets;        // NumFolders + 1
+  UInt32 *FoStartPackStreamIndex; // NumFolders + 1
+  UInt32 *FoToCoderUnpackSizes;   // NumFolders + 1
+  Byte *FoToMainUnpackSizeIndex;  // NumFolders
+  UInt64 *CoderUnpackSizes;       // for all coders in all folders
+
+  Byte *CodersData;
+
+  UInt64 RangeLimit;
 } CSzAr;
 
-void SzAr_Init(CSzAr *p);
-void SzAr_Free(CSzAr *p, ISzAlloc *alloc);
+UInt64 SzAr_GetFolderUnpackSize(const CSzAr *p, UInt32 folderIndex);
 
-
-/*
-  SzExtract extracts file from archive
-
-  *outBuffer must be 0 before first call for each new archive.
-
-  Extracting cache:
-    If you need to decompress more than one file, you can send
-    these values from previous call:
-      *blockIndex,
-      *outBuffer,
-      *outBufferSize
-    You can consider "*outBuffer" as cache of solid block. If your archive is solid,
-    it will increase decompression speed.
-
-    If you use external function, you can declare these 3 cache variables
-    (blockIndex, outBuffer, outBufferSize) as static in that external function.
-
-    Free *outBuffer and set *outBuffer to 0, if you want to flush cache.
-*/
+SRes SzAr_DecodeFolder(const CSzAr *p, UInt32 folderIndex,
+    ILookInStreamPtr stream, UInt64 startPos,
+    Byte *outBuffer, size_t outSize,
+    ISzAllocPtr allocMain);
 
 typedef struct
 {
@@ -149,18 +108,32 @@ typedef struct
 
   UInt64 startPosAfterHeader;
   UInt64 dataPos;
+  
+  UInt32 NumFiles;
 
-  UInt32 *FolderStartPackStreamIndex;
-  UInt64 *PackStreamStartPositions;
-  UInt32 *FolderStartFileIndex;
-  UInt32 *FileIndexToFolderIndexMap;
+  UInt64 *UnpackPositions;  // NumFiles + 1
+  // Byte *IsEmptyFiles;
+  Byte *IsDirs;
+  CSzBitUi32s CRCs;
+
+  CSzBitUi32s Attribs;
+  // CSzBitUi32s Parents;
+  CSzBitUi64s MTime;
+  CSzBitUi64s CTime;
+
+  UInt32 *FolderToFile;   // NumFolders + 1
+  UInt32 *FileToFolder;   // NumFiles
 
   size_t *FileNameOffsets; /* in 2-byte steps */
-  CBuf FileNames;  /* UTF-16-LE */
+  Byte *FileNames;  /* UTF-16-LE */
 } CSzArEx;
 
+#define SzArEx_IsDir(p, i) (SzBitArray_Check((p)->IsDirs, i))
+
+#define SzArEx_GetFileSize(p, i) ((p)->UnpackPositions[(i) + 1] - (p)->UnpackPositions[i])
+
 void SzArEx_Init(CSzArEx *p);
-void SzArEx_Free(CSzArEx *p, ISzAlloc *alloc);
+void SzArEx_Free(CSzArEx *p, ISzAllocPtr alloc);
 UInt64 SzArEx_GetFolderStreamPos(const CSzArEx *p, UInt32 folderIndex, UInt32 indexInFolder);
 int SzArEx_GetFolderFullPackSize(const CSzArEx *p, UInt32 folderIndex, UInt64 *resSize);
 
@@ -172,17 +145,44 @@ if dest != NULL, the return value specifies the number of 16-bit characters that
 
 size_t SzArEx_GetFileNameUtf16(const CSzArEx *p, size_t fileIndex, UInt16 *dest);
 
+/*
+size_t SzArEx_GetFullNameLen(const CSzArEx *p, size_t fileIndex);
+UInt16 *SzArEx_GetFullNameUtf16_Back(const CSzArEx *p, size_t fileIndex, UInt16 *dest);
+*/
+
+
+
+/*
+  SzArEx_Extract extracts file from archive
+
+  *outBuffer must be 0 before first call for each new archive.
+
+  Extracting cache:
+    If you need to decompress more than one file, you can send
+    these values from previous call:
+      *blockIndex,
+      *outBuffer,
+      *outBufferSize
+    You can consider "*outBuffer" as cache of solid block. If your archive is solid,
+    it will increase decompression speed.
+  
+    If you use external function, you can declare these 3 cache variables
+    (blockIndex, outBuffer, outBufferSize) as static in that external function.
+    
+    Free *outBuffer and set *outBuffer to 0, if you want to flush cache.
+*/
+
 SRes SzArEx_Extract(
     const CSzArEx *db,
-    ILookInStream *inStream,
+    ILookInStreamPtr inStream,
     UInt32 fileIndex,         /* index of file */
     UInt32 *blockIndex,       /* index of solid block */
     Byte **outBuffer,         /* pointer to pointer to output buffer (allocated with allocMain) */
     size_t *outBufferSize,    /* buffer size for output buffer */
     size_t *offset,           /* offset of stream for required file in *outBuffer */
     size_t *outSizeProcessed, /* size of file in *outBuffer */
-    ISzAlloc *allocMain,
-    ISzAlloc *allocTemp);
+    ISzAllocPtr allocMain,
+    ISzAllocPtr allocTemp);
 
 
 /*
@@ -196,7 +196,8 @@ SZ_ERROR_INPUT_EOF
 SZ_ERROR_FAIL
 */
 
-SRes SzArEx_Open(CSzArEx *p, ILookInStream *inStream, ISzAlloc *allocMain, ISzAlloc *allocTemp);
+SRes SzArEx_Open(CSzArEx *p, ILookInStreamPtr inStream,
+    ISzAllocPtr allocMain, ISzAllocPtr allocTemp);
 
 EXTERN_C_END
 

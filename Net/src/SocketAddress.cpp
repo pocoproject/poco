@@ -380,11 +380,13 @@ void SocketAddress::init(const std::string& hostAndPort)
 {
 	poco_assert (!hostAndPort.empty());
 
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (isUnixLocal(hostAndPort))
 	{
 		newLocal(hostAndPort);
 		return;
 	}
+#endif
 
 	std::string host;
 	std::string port;

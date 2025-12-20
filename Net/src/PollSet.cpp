@@ -221,7 +221,7 @@ public:
 				}
 #else
 				std::uint64_t val;
-				read(_eventfd, &val, sizeof(val));
+				[[maybe_unused]] auto n = read(_eventfd, &val, sizeof(val));
 #endif
 			}
 		}
@@ -238,7 +238,7 @@ public:
 		// or 0 (meaning PollSet is being destroyed).
 		// Errors are ignored.
 		std::uint64_t val = 1;
-		write(_eventfd, &val, sizeof(val));
+		[[maybe_unused]] auto n = write(_eventfd, &val, sizeof(val));
 #endif
 	}
 

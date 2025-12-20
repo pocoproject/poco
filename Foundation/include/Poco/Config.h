@@ -196,6 +196,13 @@
 #else
 	#define POCO_HAVE_JTHREAD false
 #endif
+#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
+	#define POCO_HAVE_ATOMIC_SHARED_PTR true
+#else
+	#define POCO_HAVE_ATOMIC_SHARED_PTR false
+#endif
+#else
+	#define POCO_HAVE_ATOMIC_SHARED_PTR false
 #endif
 
 // Option to silence deprecation warnings.

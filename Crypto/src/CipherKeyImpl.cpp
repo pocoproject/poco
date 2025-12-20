@@ -134,7 +134,6 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 	case EVP_CIPH_OFB_MODE:
 		return MODE_OFB;
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 	case EVP_CIPH_CTR_MODE:
 		return MODE_CTR;
 
@@ -143,7 +142,6 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 
 	case EVP_CIPH_CCM_MODE:
 		return MODE_CCM;
-#endif
 	}
 	throw Poco::IllegalStateException("Unexpected value of EVP_CIPHER_mode()");
 }
@@ -168,7 +166,7 @@ void CipherKeyImpl::getRandomBytes(ByteVec& vec, std::size_t count)
 	vec.clear();
 	vec.reserve(count);
 
-	for (int i = 0; i < count; ++i)
+	for (std::size_t i = 0; i < count; ++i)
 		vec.push_back(static_cast<unsigned char>(random.get()));
 }
 

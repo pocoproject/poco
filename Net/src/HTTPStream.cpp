@@ -48,13 +48,13 @@ void HTTPStreamBuf::close()
 }
 
 
-int HTTPStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize HTTPStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	return _session.read(buffer, length);
 }
 
 
-int HTTPStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize HTTPStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 
 	return _session.write(buffer, length);

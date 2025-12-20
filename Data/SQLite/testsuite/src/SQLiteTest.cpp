@@ -2601,7 +2601,7 @@ void SQLiteTest::testSQLChannel()
 		"ThreadId INTEGER,"
 		"Priority INTEGER,"
 		"Text VARCHAR,"
-		"DateTime DATE)", now;
+		"DateTime DATETIME)", now;
 
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG_ARCHIVE", now;
 	tmp << "CREATE TABLE T_POCO_LOG_ARCHIVE (Source VARCHAR,"
@@ -2611,7 +2611,7 @@ void SQLiteTest::testSQLChannel()
 		"ThreadId INTEGER,"
 		"Priority INTEGER,"
 		"Text VARCHAR,"
-		"DateTime DATE)", now;
+		"DateTime DATETIME)", now;
 
 	AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
 	Stopwatch sw; sw.start();
@@ -2701,7 +2701,7 @@ void SQLiteTest::testSQLLogger()
 		"ThreadId INTEGER,"
 		"Priority INTEGER,"
 		"Text VARCHAR,"
-		"DateTime DATE)", now;
+		"DateTime DATETIME)", now;
 
 	Logger& root = Logger::root();
 	AutoPtr<SQLChannel> pSQLChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");

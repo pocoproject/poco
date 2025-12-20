@@ -285,7 +285,7 @@ void SyslogParser::parsePrio(const std::string& line, std::size_t& pos, RemoteSy
 	++pos; // skip the >
 
 	int val = Poco::NumberParser::parse(valStr);
-	poco_assert (val >= 0 && val <= (RemoteSyslogChannel::SYSLOG_LOCAL7 + RemoteSyslogChannel::SYSLOG_DEBUG));
+	poco_assert (val >= 0 && val <= (static_cast<int>(RemoteSyslogChannel::SYSLOG_LOCAL7) + static_cast<int>(RemoteSyslogChannel::SYSLOG_DEBUG)));
 
 	Poco::UInt16 pri = static_cast<Poco::UInt16>(val);
 	// now get the lowest 3 bits

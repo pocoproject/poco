@@ -30,11 +30,13 @@ NotificationCenter::~NotificationCenter()
 {
 	try
 	{
-		Mutex::ScopedLock lock(_mutex);
-		for (auto& o: _observers)
+		ObserverList observersToDisable;
+		{
+			Mutex::ScopedLock lock(_mutex);
+			observersToDisable = std::move(_observers);
+		}
+		for (auto& o: observersToDisable)
 			o->disable();
-
-		_observers.clear();
 	}
 	catch(...)
 	{
@@ -53,16 +55,21 @@ void NotificationCenter::addObserver(const AbstractObserver& observer)
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
-	for (auto it = _observers.begin(); it != _observers.end(); ++it)
+	AbstractObserverPtr pObserver;
 	{
-		if (observer.equals(**it))
+		Mutex::ScopedLock lock(_mutex);
+		for (auto it = _observers.begin(); it != _observers.end(); ++it)
 		{
-			(*it)->disable();
-			_observers.erase(it);
-			return;
+			if (observer.equals(**it))
+			{
+				pObserver = *it;
+				_observers.erase(it);
+				break;
+			}
 		}
 	}
+	if (pObserver)
+		pObserver->disable();
 }
 
 

@@ -37,8 +37,9 @@ static const char * const HPDF_ANNOT_TYPE_NAMES[] = {
                                         "Popup",
                                         "3D",
                                         "Squiggly",
-										"Line",
-										"Projection"
+                                        "Line",
+                                        "Projection",
+                                        "Widget"
                                         };
 
 static const char * const HPDF_ANNOT_ICON_NAMES_NAMES[] = {
@@ -222,6 +223,21 @@ HPDF_Annotation_SetBorderStyle  (HPDF_Annotation  annot,
     return HPDF_OK;
 }
 
+HPDF_Annotation
+HPDF_WidgetAnnot_New (HPDF_MMgr         mmgr,
+                     HPDF_Xref         xref,
+                     HPDF_Rect         rect)
+{
+    HPDF_Annotation annot;
+
+    HPDF_PTRACE((" HPDF_WidgetAnnot_New\n"));
+
+    annot = HPDF_Annotation_New (mmgr, xref, HPDF_ANNOT_WIDGET, rect);
+    if (!annot)
+        return NULL;
+
+    return annot;
+}
 
 HPDF_Annotation
 HPDF_LinkAnnot_New  (HPDF_MMgr         mmgr,
@@ -237,8 +253,11 @@ HPDF_LinkAnnot_New  (HPDF_MMgr         mmgr,
     if (!annot)
         return NULL;
 
-    if (HPDF_Dict_Add (annot, "Dest", dst) != HPDF_OK)
-        return NULL;
+    if (dst)
+    {
+        if (HPDF_Dict_Add (annot, "Dest", dst) != HPDF_OK)
+            return NULL;
+    }
 
     return annot;
 }
@@ -277,6 +296,35 @@ HPDF_URILinkAnnot_New  (HPDF_MMgr          mmgr,
         return NULL;
 
     return annot;
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_LinkAnnot_SetJavaScript(HPDF_Annotation annot, HPDF_JavaScript javascript)
+{
+   HPDF_Dict action;
+   HPDF_STATUS ret;
+
+   HPDF_PTRACE((" HPDF_LinkAnnot_SetJavaScript\n"));
+
+    if (!CheckSubType (annot, HPDF_ANNOT_LINK))
+        return HPDF_INVALID_ANNOTATION;
+
+    /* create action dictionary */
+   action = HPDF_Dict_New (annot->mmgr);
+   if (!action)
+        return HPDF_CheckError ( annot->error);
+
+    ret = HPDF_Dict_Add (annot, "A", action);
+    if (ret != HPDF_OK)
+        return HPDF_CheckError (annot->error);
+
+    ret += HPDF_Dict_Add (action, "JS", javascript);
+    ret += HPDF_Dict_AddName (action, "S", "JavaScript");
+
+    if (ret != HPDF_OK)
+        return HPDF_CheckError (annot->error);
+
+    return HPDF_OK;
 }
 
 HPDF_EXPORT(HPDF_STATUS)
@@ -366,7 +414,10 @@ HPDF_Annotation
 HPDF_3DAnnot_New    (HPDF_MMgr        mmgr,
                      HPDF_Xref        xref,
                      HPDF_Rect        rect,
-                     HPDF_U3D u3d)
+                     HPDF_BOOL        tb,
+                     HPDF_BOOL        np,
+                     HPDF_U3D         u3d,
+                     HPDF_Image       ap)
 {
     HPDF_Annotation annot;
     HPDF_Dict action, appearance, stream;
@@ -378,6 +429,13 @@ HPDF_3DAnnot_New    (HPDF_MMgr        mmgr,
     if (!annot) {
         return NULL;
     }
+
+    // include the flags
+    HPDF_Dict_AddNumber (annot, "F", 68);
+    //Bit 3:Print If set, print the annotation when the page is printed.
+    //Bit 7:If set, do not allow the annotation to interact with the user.
+    //      The annotation may be displayed or printed (depending on the settings of the NoView and Print flags)
+    //      but should not respond to mouse clicks or change its appearance in response to mouse motions.
 
     HPDF_Dict_Add(annot, "Contents", HPDF_String_New (mmgr, "3D Model", NULL));
 
@@ -391,9 +449,20 @@ HPDF_3DAnnot_New    (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    ret += HPDF_Dict_AddName (action, "A", "PV");
+    // enable visibility on page open
+    ret += HPDF_Dict_AddName (action, "A", "PO");
 
-    ret += HPDF_Dict_AddBoolean(action, "TB", HPDF_FALSE);
+    // enable visibility of ToolBar
+    ret += HPDF_Dict_AddBoolean(action, "TB", tb);
+
+    // enable visibility of Navigation Panel
+    ret += HPDF_Dict_AddBoolean(action, "NP", np);
+
+    // Set behavior of Annotation on Disabling
+    ret += HPDF_Dict_AddName(action, "DIS", "U");
+
+    // Set behavior of Annotation upon activation
+    ret += HPDF_Dict_AddName(action, "AIS", "L");
 
     if (ret != HPDF_OK) {
         return NULL;
@@ -413,33 +482,23 @@ HPDF_3DAnnot_New    (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    stream = HPDF_Dict_New (mmgr);
-    if (!stream) {
-        return NULL;
+    if (ap) {
+        if (HPDF_Dict_Add (appearance, "N", ap) != HPDF_OK)
+            return NULL;
     }
-    ret = HPDF_Dict_Add (appearance, "N", stream);
+    else {
+        stream = HPDF_Dict_New (mmgr);
+        if (!stream) {
+            return NULL;
+        }
+        ret = HPDF_Dict_Add (appearance, "N", stream);
+    }
+
     if (ret != HPDF_OK) {
         return NULL;
     }
 
     return annot;
-}
-
-HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DAnnot_Set3DView    (HPDF_Annotation  annot)
-{
-    HPDF_Boolean b;
-
-    HPDF_PTRACE((" HPDF_3DAnnot_Set3DView\n"));
-
-    if (!CheckSubType (annot, HPDF_ANNOT_3D))
-        return HPDF_INVALID_ANNOTATION;
-
-    b = HPDF_Boolean_New (annot->mmgr, 0);
-    if (!b)
-        return HPDF_CheckError (annot->error);
-
-    return  HPDF_Dict_Add (annot, "3DD", b);
 }
 
 HPDF_Annotation
@@ -767,7 +826,7 @@ HPDF_Annotation_Validate (HPDF_Annotation  annot)
 
 static HPDF_BOOL
 CheckSubType (HPDF_Annotation  annot,
-              HPDF_AnnotType  type)
+              HPDF_AnnotType   type)
 {
     HPDF_Name subtype;
 
@@ -788,10 +847,10 @@ CheckSubType (HPDF_Annotation  annot,
 }
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_Annot_Set3DView ( HPDF_MMgr mmgr,
-                     HPDF_Annotation    annot,
-                     HPDF_Annotation    annot3d,
-                     HPDF_Dict            view3d)
+HPDF_Annot_Set3DView (HPDF_MMgr        mmgr,
+                      HPDF_Annotation  annot,
+                      HPDF_Annotation  annot3d,
+                      HPDF_Dict        view3d)
 {
     HPDF_Proxy proxyView3d;
     HPDF_Dict exData = HPDF_Dict_New( mmgr);
@@ -830,12 +889,12 @@ HPDF_PopupAnnot_New (HPDF_MMgr         mmgr,
 }
 
 HPDF_Annotation
-HPDF_StampAnnot_New (HPDF_MMgr         mmgr,
-                     HPDF_Xref         xref,
-                     HPDF_Rect         rect,
+HPDF_StampAnnot_New (HPDF_MMgr           mmgr,
+                     HPDF_Xref           xref,
+                     HPDF_Rect           rect,
                      HPDF_StampAnnotName name,
-                     const char*       text,
-                     HPDF_Encoder       encoder)
+                     const char*         text,
+                     HPDF_Encoder        encoder)
 {
     HPDF_Annotation annot;
     HPDF_String s;
@@ -860,27 +919,27 @@ HPDF_StampAnnot_New (HPDF_MMgr         mmgr,
 
 HPDF_Annotation
 HPDF_ProjectionAnnot_New(HPDF_MMgr         mmgr,
-						 HPDF_Xref         xref,
-						 HPDF_Rect         rect,
-						 const char*       text,
-						 HPDF_Encoder       encoder)
+                         HPDF_Xref         xref,
+                         HPDF_Rect         rect,
+                         const char*       text,
+                         HPDF_Encoder      encoder)
 {
-	HPDF_Annotation annot;
-	HPDF_String s;
-	HPDF_PTRACE((" HPDF_StampAnnot_New\n"));
+    HPDF_Annotation annot;
+    HPDF_String s;
+    HPDF_PTRACE((" HPDF_StampAnnot_New\n"));
 
-	annot = HPDF_Annotation_New (mmgr, xref, HPDF_ANNOT_PROJECTION, rect);
-	if (!annot)
-		return NULL;
+    annot = HPDF_Annotation_New (mmgr, xref, HPDF_ANNOT_PROJECTION, rect);
+    if (!annot)
+        return NULL;
 
-	s = HPDF_String_New (mmgr, text, encoder);
-	if (!s)
-		return NULL;
+    s = HPDF_String_New (mmgr, text, encoder);
+    if (!s)
+        return NULL;
 
-	if (HPDF_Dict_Add (annot, "Contents", s) != HPDF_OK)
-		return NULL;
+    if (HPDF_Dict_Add (annot, "Contents", s) != HPDF_OK)
+        return NULL;
 
-	return annot;
+    return annot;
 }
 
 
@@ -1158,9 +1217,9 @@ HPDF_LineAnnot_SetCaption (HPDF_Annotation annot, HPDF_BOOL showCaption, HPDF_Li
 HPDF_EXPORT(HPDF_STATUS)
 HPDF_ProjectionAnnot_SetExData(HPDF_Annotation annot, HPDF_ExData exdata)
 {
-	HPDF_STATUS ret = HPDF_OK;
+    HPDF_STATUS ret = HPDF_OK;
 
-	ret = HPDF_Dict_Add(annot, "ExData", exdata);
+    ret = HPDF_Dict_Add(annot, "ExData", exdata);
 
-	return ret;
+    return ret;
 }

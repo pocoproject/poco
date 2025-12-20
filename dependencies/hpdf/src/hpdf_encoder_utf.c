@@ -70,8 +70,8 @@ UTF8_Encoder_ByteType_Func  (HPDF_Encoder        encoder,
     // When HPDF_BYTE_TYPE_SINGLE is returned, the current byte is the
     //   CODE argument in call ToUnicode_Func
     // When HPDF_BYTE_TYPE_LEAD is returned, the current byte (msb) and the
-    //   next byte (lsb) is the CODE arguement in call ToUnicodeFunc
-    // When HPDF_BYTE_TYPE_TRIAL is returned, the current byte is ignored
+    //   next byte (lsb) is the CODE argument in call ToUnicodeFunc
+    // When HPDF_BYTE_TYPE_TRAIL is returned, the current byte is ignored
 
     HPDF_CMapEncoderAttr  encoder_attr;
     HPDF_BYTE             byte;
@@ -121,7 +121,7 @@ UTF8_Encoder_ByteType_Func  (HPDF_Encoder        encoder,
 	utf8_attr->current_byte++;
     }
 
-    return HPDF_BYTE_TYPE_TRIAL;
+    return HPDF_BYTE_TYPE_TRAIL;
 }
 
 /*
@@ -133,7 +133,7 @@ UTF8_Encoder_ToUnicode_Func  (HPDF_Encoder   encoder,
                               HPDF_UINT16    code)
 {
     // Supposed to convert CODE to unicode.
-    // This function is allways called after ByteType_Func.
+    // This function is always called after ByteType_Func.
     // ByteType_Func recognizes the utf-8 bytes belonging to one character.
 
     HPDF_CMapEncoderAttr encoder_attr;
@@ -190,7 +190,7 @@ UTF8_Encoder_EncodeText_Func  (HPDF_Encoder        encoder,
 	HPDF_UNICODE tmp_unicode;
 	HPDF_ByteType btype = HPDF_Encoder_ByteType (encoder, &parse_state);
 
-	if (btype != HPDF_BYTE_TYPE_TRIAL) {
+	if (btype != HPDF_BYTE_TYPE_TRAIL) {
 	    tmp_unicode = HPDF_Encoder_ToUnicode (encoder, 0);
 
 	    HPDF_UInt16Swap (&tmp_unicode);
@@ -199,7 +199,7 @@ UTF8_Encoder_EncodeText_Func  (HPDF_Encoder        encoder,
         }
     }
 
-    *length = c - result;
+    *length = (HPDF_UINT) (c - result);
 
     return result;
 }
@@ -242,7 +242,7 @@ UTF8_Init  (HPDF_Encoder  encoder)
                 HPDF_LIMIT_MAX_NAME_LEN);
     attr->suppliment = 0;
     attr->writing_mode = HPDF_WMODE_HORIZONTAL;
-
+    
     /* Not sure about this
     attr->uid_offset = 0;
     attr->xuid[0] = 0;

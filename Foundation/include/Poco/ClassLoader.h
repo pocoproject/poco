@@ -135,7 +135,7 @@ public:
 		}
 	}
 
-	void loadLibrary(const std::string& path, const std::string& manifest)
+	void loadLibrary(const std::string& path, const std::string& manifest, int flags = SharedLibrary::SHLIB_GLOBAL)
 		/// Loads a library from the given path, using the given manifest.
 		/// Does nothing if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
@@ -145,6 +145,9 @@ public:
 		/// If called multiple times for the same library,
 		/// the number of calls to unloadLibrary() must be the same
 		/// for the library to become unloaded.
+		///
+		/// The flags parameter can be used to specify SharedLibrary loading
+		/// flags. See SharedLibrary::Flags for valid values.
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
@@ -157,7 +160,7 @@ public:
 			li.refCount  = 1;
 			try
 			{
-				li.pLibrary  = new SharedLibrary(path);
+				li.pLibrary  = new SharedLibrary(path, flags);
 				li.pManifest = new Manif();
 				std::string pocoBuildManifestSymbol("pocoBuildManifest");
 				pocoBuildManifestSymbol.append(manifest);
@@ -189,7 +192,7 @@ public:
 		}
 	}
 
-	void loadLibrary(const std::string& path)
+	void loadLibrary(const std::string& path, int flags = SharedLibrary::SHLIB_GLOBAL)
 		/// Loads a library from the given path. Does nothing
 		/// if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
@@ -200,9 +203,12 @@ public:
 		/// the number of calls to unloadLibrary() must be the same
 		/// for the library to become unloaded.
 		///
-		/// Equivalent to loadLibrary(path, "").
+		/// The flags parameter can be used to specify SharedLibrary loading
+		/// flags. See SharedLibrary::Flags for valid values.
+		///
+		/// Equivalent to loadLibrary(path, "", flags).
 	{
-		loadLibrary(path, "");
+		loadLibrary(path, "", flags);
 	}
 
 	void unloadLibrary(const std::string& path)

@@ -519,54 +519,24 @@ private:
 	if ((logger).fatal()) (logger).fatal(msg, __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
-#define poco_fatal_f1(logger, fmt, arg1) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), arg1), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_fatal_f2(logger, fmt, arg1, arg2) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_fatal_f3(logger, fmt, arg1, arg2, arg3) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_fatal_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
 #define poco_fatal_f(logger, fmt, ...) \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_fatal_f instead
+#define poco_fatal_f1(logger, fmt, arg1) \
+	poco_fatal_f(logger, fmt, arg1)
+#define poco_fatal_f2(logger, fmt, arg1, arg2) \
+	poco_fatal_f(logger, fmt, arg1, arg2)
+#define poco_fatal_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_fatal_f(logger, fmt, arg1, arg2, arg3)
+#define poco_fatal_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_fatal_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #define poco_critical(logger, msg) \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 	if ((logger).critical()) (logger).critical(msg, __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_critical_f1(logger, fmt, arg1) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_critical_f2(logger, fmt, arg1, arg2) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_critical_f3(logger, fmt, arg1, arg2, arg3) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_critical_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_critical_f(logger, fmt, ...) \
@@ -574,29 +544,19 @@ private:
 	if ((logger).critical()) (logger).critical(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_critical_f instead
+#define poco_critical_f1(logger, fmt, arg1) \
+	poco_critical_f(logger, fmt, arg1)
+#define poco_critical_f2(logger, fmt, arg1, arg2) \
+	poco_critical_f(logger, fmt, arg1, arg2)
+#define poco_critical_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_critical_f(logger, fmt, arg1, arg2, arg3)
+#define poco_critical_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_critical_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #define poco_error(logger, msg) \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 	if ((logger).error()) (logger).error(msg, __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_error_f1(logger, fmt, arg1) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_error_f2(logger, fmt, arg1, arg2) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_error_f3(logger, fmt, arg1, arg2, arg3) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_error_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_error_f(logger, fmt, ...) \
@@ -604,29 +564,19 @@ private:
 	if ((logger).error()) (logger).error(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_error_f instead
+#define poco_error_f1(logger, fmt, arg1) \
+	poco_error_f(logger, fmt, arg1)
+#define poco_error_f2(logger, fmt, arg1, arg2) \
+	poco_error_f(logger, fmt, arg1, arg2)
+#define poco_error_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_error_f(logger, fmt, arg1, arg2, arg3)
+#define poco_error_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_error_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #define poco_warning(logger, msg) \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 	if ((logger).warning()) (logger).warning(msg, __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_warning_f1(logger, fmt, arg1) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_warning_f2(logger, fmt, arg1, arg2) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_warning_f3(logger, fmt, arg1, arg2, arg3) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_warning_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_warning_f(logger, fmt, ...) \
@@ -634,29 +584,19 @@ private:
 	if ((logger).warning()) (logger).warning(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_warning_f instead
+#define poco_warning_f1(logger, fmt, arg1) \
+	poco_warning_f(logger, fmt, arg1)
+#define poco_warning_f2(logger, fmt, arg1, arg2) \
+	poco_warning_f(logger, fmt, arg1, arg2)
+#define poco_warning_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_warning_f(logger, fmt, arg1, arg2, arg3)
+#define poco_warning_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_warning_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #define poco_notice(logger, msg) \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 	if ((logger).notice()) (logger).notice(msg, __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_notice_f1(logger, fmt, arg1) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_notice_f2(logger, fmt, arg1, arg2) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_notice_f3(logger, fmt, arg1, arg2, arg3) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_notice_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_notice_f(logger, fmt, ...) \
@@ -664,29 +604,19 @@ private:
 	if ((logger).notice()) (logger).notice(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_notice_f instead
+#define poco_notice_f1(logger, fmt, arg1) \
+	poco_notice_f(logger, fmt, arg1)
+#define poco_notice_f2(logger, fmt, arg1, arg2) \
+	poco_notice_f(logger, fmt, arg1, arg2)
+#define poco_notice_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_notice_f(logger, fmt, arg1, arg2, arg3)
+#define poco_notice_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_notice_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #define poco_information(logger, msg) \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 	if ((logger).information()) (logger).information(msg, __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_information_f1(logger, fmt, arg1) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_information_f2(logger, fmt, arg1, arg2) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_information_f3(logger, fmt, arg1, arg2, arg3) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_information_f(logger, fmt, ...) \
@@ -694,30 +624,20 @@ private:
 	if ((logger).information()) (logger).information(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_information_f instead
+#define poco_information_f1(logger, fmt, arg1) \
+	poco_information_f(logger, fmt, arg1)
+#define poco_information_f2(logger, fmt, arg1, arg2) \
+	poco_information_f(logger, fmt, arg1, arg2)
+#define poco_information_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_information_f(logger, fmt, arg1, arg2, arg3)
+#define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_information_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #if defined(_DEBUG) || defined(POCO_LOG_DEBUG)
 #define poco_debug(logger, msg) \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 		if ((logger).debug()) (logger).debug(msg, __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_debug_f1(logger, fmt, arg1) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_debug_f2(logger, fmt, arg1, arg2) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_debug_f3(logger, fmt, arg1, arg2, arg3) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_debug_f(logger, fmt, ...) \
@@ -725,48 +645,50 @@ private:
 		if ((logger).debug()) (logger).debug(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
+// Deprecated: use poco_debug_f instead
+#define poco_debug_f1(logger, fmt, arg1) \
+		poco_debug_f(logger, fmt, arg1)
+#define poco_debug_f2(logger, fmt, arg1, arg2) \
+		poco_debug_f(logger, fmt, arg1, arg2)
+#define poco_debug_f3(logger, fmt, arg1, arg2, arg3) \
+		poco_debug_f(logger, fmt, arg1, arg2, arg3)
+#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+		poco_debug_f(logger, fmt, arg1, arg2, arg3, arg4)
+
 #define poco_trace(logger, msg) \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 		if ((logger).trace()) (logger).trace(msg, __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_trace_f1(logger, fmt, arg1) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1)), __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_trace_f2(logger, fmt, arg1, arg2) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_trace_f3(logger, fmt, arg1, arg2, arg3) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_END
-
-#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_trace_f(logger, fmt, ...) \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
 		if ((logger).trace()) (logger).trace(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
 		POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_trace_f instead
+#define poco_trace_f1(logger, fmt, arg1) \
+		poco_trace_f(logger, fmt, arg1)
+#define poco_trace_f2(logger, fmt, arg1, arg2) \
+		poco_trace_f(logger, fmt, arg1, arg2)
+#define poco_trace_f3(logger, fmt, arg1, arg2, arg3) \
+		poco_trace_f(logger, fmt, arg1, arg2, arg3)
+#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+		poco_trace_f(logger, fmt, arg1, arg2, arg3, arg4)
 #else
 	#define poco_debug(logger, msg)
+	#define poco_debug_f(logger, fmt, ...)
+	// Deprecated: use poco_debug_f instead
 	#define poco_debug_f1(logger, fmt, arg1)
 	#define poco_debug_f2(logger, fmt, arg1, arg2)
 	#define poco_debug_f3(logger, fmt, arg1, arg2, arg3)
 	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4)
-	#define poco_debug_f(logger, fmt, ...)
 	#define poco_trace(logger, msg)
+	#define poco_trace_f(logger, fmt, ...)
+	// Deprecated: use poco_trace_f instead
 	#define poco_trace_f1(logger, fmt, arg1)
 	#define poco_trace_f2(logger, fmt, arg1, arg2)
 	#define poco_trace_f3(logger, fmt, arg1, arg2, arg3)
 	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4)
-	#define poco_trace_f(logger, fmt, ...)
 #endif
 
 
