@@ -46,9 +46,12 @@ public:
 
 	Extractor(StatementExecutor& st, ResultMetadata& md);
 		/// Creates the Extractor.
-
-	virtual ~Extractor();
+					//
+	~Extractor() override;
 		/// Destroys the Extractor.
+
+	Extractor& operator=(const Extractor&) = delete;
+		// Prevent VC8 warning "operator= could not be generated"
 
 	bool extract(std::size_t pos, Poco::Int8& val) override;
 		/// Extracts an Int8.
@@ -412,10 +415,7 @@ private:
 #ifdef POCO_MYSQL_JSON
 	bool extractJSON(std::size_t pos);
 #endif
-	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator=(const Extractor&);
 
-private:
 	template <typename T>
 	bool extractNullable(std::size_t pos, Poco::Nullable<T>& val)
 	{

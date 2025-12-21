@@ -1396,6 +1396,22 @@ void SQLExecutor::timestamp()
 	assertTrue (bd == birthday);
 
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+
+	Statement stmt(*_pSession);
+	stmt <<  "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday);
+	lastName = "Ridley";
+	firstName = "Sam";
+	birthday = DateTime(1982, 6, 13, 5, 30, 10, 0, 0);
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT Birthday FROM Person WHERE LastName = 'Ridley'", into(bd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (bd == birthday);
+
+
 }
 
 

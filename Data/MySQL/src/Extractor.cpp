@@ -257,6 +257,7 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 	return false;
 }
 
+
 void Extractor::reset()
 {
 	AbstractExtractor::reset();
@@ -278,6 +279,7 @@ bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* b
 
 	return isNull == 0;
 }
+
 
 bool Extractor::extractLongLOB(std::size_t pos)
 {

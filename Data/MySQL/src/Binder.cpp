@@ -27,11 +27,11 @@ Binder::Binder()
 
 Binder::~Binder()
 {
-	for (std::vector<MYSQL_TIME*>::iterator it = _dates.begin(); it != _dates.end(); ++it)
-	{
-		delete *it;
-		*it = nullptr;
-	}
+    for (auto& t: _dates)
+    {
+        delete t;
+        t = nullptr;
+    }
 }
 
 
