@@ -69,25 +69,25 @@ public:
 		/// could change the character encoding used for the connection. Therefore the
 		/// reset option should be used with caution.
 
-	~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
-	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
+	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl() override;
 		/// Returns an MySQL StatementImpl
 
-	void open(const std::string& connection = "");
+	void open(const std::string& connection = "") override;
 		/// Opens a connection to the database.
 
-	void close();
+	void close() override;
 		/// Closes the connection.
 
-	void reset();
+	void reset() override;
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
-	bool isConnected() const;
+	bool isConnected() const override;
 		/// Returns true if connected, false otherwise.
 
-	bool isGood() const;
+	bool isGood() const override;
 		/// Returns true iff the database session is good.
 		/// For the session to be considered good:
 		///   - it must be connected
@@ -99,38 +99,38 @@ public:
 		/// must be false. The flag is only checked if the
 		/// session has a non-zero error code.
 
-	void setConnectionTimeout(std::size_t timeout);
+	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const;
+	std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
-	void begin();
+	void begin() override;
 		/// Starts a transaction
 
-	void commit();
+	void commit() override;
 		/// Commits and ends a transaction
 
-	void rollback();
+	void rollback() override;
 		/// Aborts a transaction
 
-	bool canTransact() const;
+	bool canTransact() const override;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction() const;
+	bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
-	void setTransactionIsolation(Poco::UInt32 ti);
+	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const;
+	Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 ti) const;
+	bool hasTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 ti) const;
+	bool isTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
@@ -163,7 +163,7 @@ public:
 	SessionHandle& handle();
 		// Get handle
 
-	const std::string& connectorName() const;
+	const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
 private:

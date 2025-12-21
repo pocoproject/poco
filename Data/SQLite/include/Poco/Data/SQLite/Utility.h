@@ -208,8 +208,8 @@ private:
 		///
 		/// Column types are case-insensitive.
 
-	Utility(const Utility&);
-	Utility& operator = (const Utility&);
+	Utility(const Utility&) = delete;
+	Utility& operator = (const Utility&) = delete;
 
 	static void* eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam);
 	static void* eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam);

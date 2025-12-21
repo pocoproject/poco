@@ -109,6 +109,8 @@ public:
 	RecordSet(RecordSet&& other) noexcept;
 		/// Move-creates the recordset.
 
+	RecordSet() = delete;
+
 	~RecordSet();
 		/// Destroys the RecordSet.
 
@@ -331,8 +333,6 @@ public:
 		/// Returns true if recordset is filtered.
 
 private:
-	RecordSet();
-
 	template<class C, class E>
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.

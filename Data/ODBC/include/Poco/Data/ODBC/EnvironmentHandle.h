@@ -53,8 +53,8 @@ private:
 	SQLHENV& handle();
 		/// Returns reference to handle.
 
-	EnvironmentHandle(const EnvironmentHandle&);
-	const EnvironmentHandle& operator=(const EnvironmentHandle&);
+	EnvironmentHandle(const EnvironmentHandle&) = delete;
+	const EnvironmentHandle& operator=(const EnvironmentHandle&) = delete;
 
 	SQLHENV _henv;
 };

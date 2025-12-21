@@ -77,8 +77,8 @@ public:
 private:
 	SessionFactory();
 	~SessionFactory();
-	SessionFactory(const SessionFactory&);
-	SessionFactory& operator = (const SessionFactory&);
+	SessionFactory(const SessionFactory&) = delete;
+	SessionFactory& operator = (const SessionFactory&) = delete;
 
 	struct SessionInfo
 	{

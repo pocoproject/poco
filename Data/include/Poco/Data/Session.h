@@ -223,13 +223,13 @@ public:
 	void close();
 		/// Closes the session.
 
-	bool isConnected();
+	bool isConnected() const;
 		/// Returns true iff session is connected, false otherwise.
 
 	void reconnect();
 		/// Closes the session and opens it.
 
-	bool isGood();
+	bool isGood() const;
 		/// Returns true iff the session is good and can be used, false otherwise.
 
 	bool isAutocommit() const;
@@ -386,7 +386,7 @@ inline void Session::close()
 }
 
 
-inline bool Session::isConnected()
+inline bool Session::isConnected() const
 {
 	return _pImpl->isConnected();
 }
@@ -398,7 +398,7 @@ inline void Session::reconnect()
 }
 
 
-inline bool Session::isGood()
+inline bool Session::isGood() const
 {
 	return _pImpl->isGood();
 }

@@ -62,7 +62,7 @@ public:
 		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
-	virtual ~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
 	const std::string& dbmsName() const;
@@ -209,9 +209,9 @@ protected:
 		/// a connected session.
 
 private:
-	SessionImpl();
-	SessionImpl(const SessionImpl&);
-	SessionImpl& operator = (const SessionImpl&);
+	SessionImpl() = delete;
+	SessionImpl(const SessionImpl&) = delete;
+	SessionImpl& operator = (const SessionImpl&) = delete;
 
 	std::string _dbmsName;
 	std::string _connectionString;

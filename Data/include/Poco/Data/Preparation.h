@@ -42,12 +42,12 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override
 		/// Destroys the Preparation.
 	{
 	}
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		auto pPrep = preparation();

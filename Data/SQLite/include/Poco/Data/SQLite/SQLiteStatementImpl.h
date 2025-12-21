@@ -45,36 +45,36 @@ public:
 	SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB);
 		/// Creates the SQLiteStatementImpl.
 
-	~SQLiteStatementImpl();
+	~SQLiteStatementImpl() override;
 		/// Destroys the SQLiteStatementImpl.
 
 protected:
-	std::size_t columnsReturned() const;
+	std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
-	int affectedRowCount() const;
+	int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT.
 		/// Changes associated with creating and dropping tables are not counted.
 
-	const MetaColumn& metaColumn(std::size_t pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
-	bool hasNext();
+	bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
-	std::size_t next();
+	std::size_t next() override;
 		/// Retrieves the next row from the resultset and returns 1.
 		/// Will throw, if the resultset is empty.
 
-	bool canBind() const;
+	bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool canCompile() const;
+	bool canCompile() const override;
 		/// Returns true if statement can compile.
 
-	void compileImpl();
+	void compileImpl() override;
 		/// Compiles the statement, doesn't bind yet.
 		/// Returns true if the statement was succesfully compiled.
 		/// The way SQLite handles batches of statmeents is by compiling
@@ -82,13 +82,13 @@ protected:
 		/// The remainder of the statement is kept in a string
 		/// buffer pointed to by _pLeftover member.
 
-	void bindImpl();
+	void bindImpl() override;
 		/// Binds parameters
 
-	AbstractExtraction::ExtractorPtr extractor();
+	AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinding::BinderPtr binder();
+	AbstractBinding::BinderPtr binder() override;
 		/// Returns the concrete binder used by the statement.
 
 private:

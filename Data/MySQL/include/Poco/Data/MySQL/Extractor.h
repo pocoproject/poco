@@ -46,7 +46,7 @@ public:
 
 	Extractor(StatementExecutor& st, ResultMetadata& md);
 		/// Creates the Extractor.
-					//
+
 	~Extractor() override;
 		/// Destroys the Extractor.
 

@@ -29,6 +29,8 @@ namespace Data {
 class Data_API Bulk
 {
 public:
+	Bulk() = delete;
+
 	Bulk(const Limit& limit);
 		/// Creates the Bulk.
 
@@ -46,8 +48,6 @@ public:
 		/// this bulk object.
 
 private:
-	Bulk();
-
 	Limit _limit;
 };
 

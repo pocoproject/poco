@@ -144,8 +144,8 @@ public:
 	~PQConnectionInfoOptionsFree();
 
 private:
-	PQConnectionInfoOptionsFree(const PQConnectionInfoOptionsFree&);
-	PQConnectionInfoOptionsFree& operator = (const PQConnectionInfoOptionsFree&);
+	PQConnectionInfoOptionsFree(const PQConnectionInfoOptionsFree&) = delete;
+	PQConnectionInfoOptionsFree& operator = (const PQConnectionInfoOptionsFree&) = delete;
 
 private:
 	PQconninfoOption* _pConnectionInfoOption;
@@ -160,8 +160,8 @@ public:
 	~PQResultClear();
 
 private:
-	PQResultClear(const PQResultClear&);
-	PQResultClear& operator = (const PQResultClear&);
+	PQResultClear(const PQResultClear&) = delete;
+	PQResultClear& operator = (const PQResultClear&) = delete;
 
 private:
 	PGresult* _pPQResult;
@@ -176,8 +176,8 @@ public:
 	~PGCancelFree();
 
 private:
-	PGCancelFree(const PGCancelFree&);
-	PGCancelFree& operator = (const PGCancelFree&);
+	PGCancelFree(const PGCancelFree&) = delete;
+	PGCancelFree& operator = (const PGCancelFree&) = delete;
 
 private:
 	PGcancel* _pPGCancel;
