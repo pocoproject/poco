@@ -1,9 +1,13 @@
 POCO C++ Libraries GNU Make Build System
 AAAIntroduction
 
+<*Note: CMake is the official build system for the POCO C++ Libraries.
+The GNU Make build system described here is an alternative for
+Unix/Linux/macOS platforms.*>
+
 !!!Introduction
 
-The POCO C++ Libraries use a built system based on
+The POCO C++ Libraries use a build system based on
 [[http://www.gnu.org/software/make/ GNU Make]] on every platform
 capable of running it. This includes Linux, Mac OS X, virtually
 every other Unix platform, as well as Cygwin and MinGW on Windows.
