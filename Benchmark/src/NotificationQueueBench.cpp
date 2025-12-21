@@ -113,7 +113,7 @@ static void Queues_NotificationQueue_Enqueue(benchmark::State& state)
 	// Drain queue
 	while (!queue.empty())
 	{
-		queue.dequeueNotification();
+		Notification::Ptr pNf = queue.dequeueNotification();
 	}
 }
 BENCHMARK(Queues_NotificationQueue_Enqueue);
