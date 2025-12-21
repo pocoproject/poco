@@ -1142,7 +1142,7 @@ jobs:
       - run: make -s -j4 -C Util/testsuite
       - name: Run Foundation LoggingTestSuite
         working-directory: Foundation/testsuite
-        run: . poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingTestSuite
+        run: . $POCO_BASE/poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingTestSuite
       - name: Run Util LoggingConfiguratorTest
         working-directory: Util/testsuite
-        run: . poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingConfiguratorTest
+        run: . $POCO_BASE/poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingConfiguratorTest
