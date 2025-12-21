@@ -13,6 +13,7 @@
 
 
 #include "Poco/Util/LoggingConfigurator.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Channel.h"
 #include "Poco/FormattingChannel.h"
@@ -22,10 +23,12 @@
 #include "Poco/LoggingRegistry.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/String.h"
+#include "Poco/Format.h"
 #ifdef POCO_ENABLE_FASTLOGGER
 #include "Poco/FastLogger.h"
 #endif
 #include <map>
+#include <sstream>
 
 
 using Poco::AutoPtr;
@@ -257,6 +260,21 @@ void LoggingConfigurator::configureLogger(AbstractConfiguration::Ptr pConfig)
 			}
 		}
 	}
+}
+
+
+void LoggingConfigurator::configure(
+	const std::string& level,
+	const std::string& pattern,
+	const std::string& configTemplate)
+{
+	std::string config = Poco::format(configTemplate, level, pattern);
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig);
 }
 
 

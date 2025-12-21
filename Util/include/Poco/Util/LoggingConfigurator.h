@@ -22,6 +22,7 @@
 #include "Poco/Formatter.h"
 #include "Poco/Channel.h"
 #include "Poco/Util/AbstractConfiguration.h"
+#include <string>
 
 
 namespace Poco {
@@ -128,6 +129,27 @@ public:
 		///
 		/// A ConfigurationView can be used to pass only
 		/// a part of a larger configuration.
+
+	static void configure(
+		const std::string& level,
+		const std::string& pattern = "%Y-%m-%d %H:%M:%S.%i [%p] %s<%I>: %t",
+		const std::string& configTemplate =
+			"logging.loggers.root.channel = c1\n"
+			"logging.loggers.root.level = %s\n"
+			"logging.channels.c1.class = ColorConsoleChannel\n"
+			"logging.channels.c1.formatter = f1\n"
+			"logging.formatters.f1.class = PatternFormatter\n"
+			"logging.formatters.f1.pattern = %s\n"
+			"logging.formatters.f1.times = local\n");
+		/// Convenience method that configures logging with the specified
+		/// log level and pattern format.
+		///
+		/// The configTemplate uses Poco::format() placeholders:
+		///   - First %s is replaced with the level
+		///   - Second %s is replaced with the pattern
+		///
+		/// Default configuration sets up a ColorConsoleChannel with a
+		/// PatternFormatter using local time.
 
 private:
 	void configureFormatters(AbstractConfiguration::Ptr pConfig);

@@ -8,10 +8,13 @@
 //
 
 
+#include "Poco/Foundation.h"
 #include "LoggingTestSuite.h"
 #include "LoggerTest.h"
+#ifdef POCO_ENABLE_FASTLOGGER
 #include "FastLoggerTest.h"
 #include "FastLoggerChannelsTest.h"
+#endif
 #include "ChannelTest.h"
 #include "PatternFormatterTest.h"
 #include "JSONFormatterTest.h"
@@ -27,8 +30,10 @@ CppUnit::Test* LoggingTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LoggingTestSuite");
 
 	pSuite->addTest(LoggerTest::suite());
+#ifdef POCO_ENABLE_FASTLOGGER
 	pSuite->addTest(FastLoggerTest::suite());
 	pSuite->addTest(FastLoggerChannelsTest::suite());
+#endif
 	pSuite->addTest(ChannelTest::suite());
 	pSuite->addTest(PatternFormatterTest::suite());
 	pSuite->addTest(JSONFormatterTest::suite());

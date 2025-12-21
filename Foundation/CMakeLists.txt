@@ -78,6 +78,9 @@ if(ENABLE_FASTLOGGER)
 	# The quill headers are needed at build time but don't need to be exported
 	target_link_libraries(Foundation PUBLIC "$<BUILD_LOCAL_INTERFACE:quill::quill>")
 	target_compile_definitions(Foundation PUBLIC POCO_ENABLE_FASTLOGGER)
+else()
+	# Prevent Config.h from auto-enabling FastLogger
+	target_compile_definitions(Foundation PUBLIC POCO_NO_FASTLOGGER)
 endif()
 
 add_library(Poco::Foundation ALIAS Foundation)

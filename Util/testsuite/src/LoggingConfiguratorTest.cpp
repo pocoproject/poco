@@ -310,10 +310,10 @@ void LoggingConfiguratorTest::testFastLoggerOptions()
 
 void LoggingConfiguratorTest::testFastLoggerOptionsWarnings()
 {
-	// Test that quill.* options on standard loggers produce warnings (not errors)
+	// Test that quill.* options on poco loggers produce warnings (not errors)
 	// and are ignored
 	static const std::string config =
-		"logging.loggers.l1.name = stdlogger_with_quill\n"
+		"logging.loggers.l1.name = poco_logger_with_quill_options\n"
 		"logging.loggers.l1.channel.class = NullChannel\n"
 		"logging.loggers.l1.level = information\n"
 		"logging.loggers.l1.quill.threadName = ShouldBeIgnored\n"
@@ -328,7 +328,7 @@ void LoggingConfiguratorTest::testFastLoggerOptionsWarnings()
 	configurator.configure(pConfig);
 
 	// Verify standard Logger was created correctly
-	Logger& logger = Logger::get("stdlogger_with_quill");
+	Logger& logger = Logger::get("poco_logger_with_quill_options");
 	assertTrue (logger.getLevel() == Message::PRIO_INFORMATION);
 	assertTrue (!logger.getChannel().cast<Poco::NullChannel>().isNull());
 }

@@ -771,7 +771,7 @@ void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info)
 		std::string filePath = pFileChannel->path();
 		if (!filePath.empty())
 		{
-// Extract rotation properties from the FileChannel
+			// Extract rotation properties from the FileChannel
 			std::string rotation = pFileChannel->getProperty(FileChannel::PROP_ROTATION);
 			std::string archive = pFileChannel->getProperty(FileChannel::PROP_ARCHIVE);
 			std::string purgeCount = pFileChannel->getProperty(FileChannel::PROP_PURGECOUNT);

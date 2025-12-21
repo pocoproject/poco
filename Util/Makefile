@@ -35,10 +35,9 @@ endif
 
 # FastLoggerConfigurator requires FastLogger - enabled by default
 # Set POCO_NO_FASTLOGGER=1 to disable
-ifndef POCO_NO_FASTLOGGER
-	POCO_ENABLE_FASTLOGGER = 1
-endif
-ifdef POCO_ENABLE_FASTLOGGER
+ifdef POCO_NO_FASTLOGGER
+COMMONFLAGS += -DPOCO_NO_FASTLOGGER
+else
 objects += FastLoggerConfigurator
 endif
 

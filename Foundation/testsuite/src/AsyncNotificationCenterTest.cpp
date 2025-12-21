@@ -382,7 +382,7 @@ void AsyncNotificationCenterTest::testThreadSafety()
 	// Launch multiple threads posting notifications concurrently
 	for (int i = 0; i < numThreads; ++i)
 	{
-		threads.emplace_back([&nc, notificationsPerThread]() {
+		threads.emplace_back([&nc]() {
 			for (int j = 0; j < notificationsPerThread; ++j)
 			{
 				nc.postNotification(new Notification);

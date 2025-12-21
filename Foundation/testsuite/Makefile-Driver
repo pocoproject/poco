@@ -13,8 +13,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
 	Driver DynamicFactoryTest FPETest FileChannelTest FileTest GlobTest FilesystemTestSuite \
-	FIFOBufferStreamTest FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest FastLoggerTest \
-	FastLoggerChannelsTest ListMapTest LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
+	FIFOBufferStreamTest FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest \
+	ListMapTest LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
 	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest AsyncNotificationCenterTest NotificationQueueTest \
@@ -40,6 +40,14 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
 	DataURIStreamTest FileStreamRWLockTest
+
+# FastLogger tests - enabled by default
+# Set POCO_NO_FASTLOGGER=1 to disable
+ifdef POCO_NO_FASTLOGGER
+COMMONFLAGS += -DPOCO_NO_FASTLOGGER
+else
+objects += FastLoggerTest FastLoggerChannelsTest
+endif
 
 target         = testrunner
 target_version = 1
