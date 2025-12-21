@@ -105,8 +105,7 @@ The easiest way to install OpenSSL on Windows is to get the pre-built
 libraries from the pocoproject/openssl Git repository at
 <https://github.com/pocoproject/openssl>. This repository is included
 as a submodule in the poco GitHub repository, but not in the release
-source code packages. You can also provide your own OpenSSL build by
-editing the Visual Studio project files.
+source code packages.
 
 Depending on where you have installed the OpenSSL libraries,
 you might have to edit the build script (buildwin.cmd), or add the
@@ -129,7 +128,7 @@ accordingly.
 BUILDING WITH CMAKE
 ===================
 
-The POCO C++ Libraries support CMake as a build system on Linux, macOS and Windows.
+CMake is the official build system for the POCO C++ Libraries on Linux, macOS and Windows.
 To build the POCO C++ Libraries with CMake:
 
 1. create a cmake-build directory (e.g. in the POCO root directory):
@@ -140,10 +139,7 @@ $ mkdir cmake-build
 
 $ cd cmake-build
 $ cmake ..
-$ make -s -j (or build the generated Visual Studio solution on Windows)
-
-If you cannot or do not want to build with CMake, there are other options,
-described in the following.
+$ cmake --build . --config Release
 
 
 BUILDING - USING VCPKG
@@ -159,78 +155,49 @@ $ ./vcpkg integrate install
 $ ./vcpkg install poco
 
 The Poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
-If the version is out of date, please create an issue or pull request(https://github.com/Microsoft/vcpkg)
-on the vcpkg repository.
+If the version is out of date, please create an issue or pull request
+(https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
 
 BUILDING - USING CONAN
 ======================
 
-You can download and install poco using the Conan(https://github.com/conan-io/conan)
-package manager. It needed to be installed first(https://conan.io/downloads.html):
+You can download and install poco using the Conan (https://github.com/conan-io/conan)
+package manager. It needs to be installed (https://conan.io/downloads.html) first.
 
-You can install Poco libraries from Conan Center(https://conan.io/center.html):
+You can install Poco libraries from Conan Center (https://conan.io/center.html):
 
-$ conan install -r conancenter poco/1.13.3@
+$ conan install --requires=poco/1.15.0
 
 Or, you can download Poco recipe and build locally:
 
-$ conan install -r conancenter poco/1.13.3@ --build=poco
+$ conan install --requires=poco/1.15.0 --build=poco
 
 The Poco recipe and packages in Conan Center are kept up to date by Conan team members and community contributors.
-If the version is out of date, or you detect any wrong behavior, please create an issue or pull request(https://github.com/conan-io/conan-center-index)
-on the Conan Center Index repository.
+If the version is out of date, or you detect any wrong behavior, please create an issue or pull request
+(https://github.com/conan-io/conan-center-index) on the Conan Center Index repository.
 
 
 BUILDING ON WINDOWS
 ===================
 
 Microsoft Visual Studio 2019 or newer is required to build the POCO C++ Libraries on
-Windows platforms. Solution and project files for Visual Studio 2019 to 2022 are included.
-64-bit (x64) builds are supported as well.
-You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
-or from the command line. To build from the command line, start the
-Developer PowerShell for Visual Studio and cd to the directory where you
-have extracted the POCO C++ Libraries sources. Then, run the buildwin.ps1 script
-and pass the desired options.
-
-To show available options, run:
-
-> buildwin.ps1 -help
-
-Example:
-
-> buildwin.ps1 -vs 170 -action build -linkmode shared -config release -platform x64 -samples -tests
+Windows platforms. Use CMake to generate Visual Studio solutions and build.
 
 Certain libraries, like NetSSL_OpenSSL, Crypto or Data/MySQL have dependencies
-to other libraries. The Visual Studio project files have been configured to
-use vcpkg to install the required packages.
+to other libraries. Use vcpkg to install the required packages.
 
 In order to run the test suite and the samples, the top-most bin directory containing
 the shared libraries must be in the PATH environment variable.
-
-IMPORTANT NOTE: Please make sure that the path to the directory containing the
-POCO C++ Libraries source tree does not contain spaces. Otherwise, the Microsoft
-message compiler may fail when building the Foundation library.
 
 
 BUILDING ON UNIX/LINUX/macOS
 ============================
 
-For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 5.0 (or newer), with the help
-from a few shell scripts. If you do not have GNU Make 5.0 (or later) installed on
-your machine, you will need to download it from
-http://directory.fsf.org/devel/build/make.html>,
-build and install it prior to building the POCO C++ Libraries.
+Use CMake to build the POCO C++ Libraries on Unix, Linux and macOS.
 
-You can check the version of GNU Make installed on your system with
-
-> make --version
-
-or
-
-> gmake --version
+Alternatively, the POCO C++ Libraries come with their own GNU Make based
+build system. The build system requires GNU Make 3.80 or newer.
 
 Once you have GNU Make up and running, the rest is quite simple.
 To extract the sources and build all libraries, testsuites and samples, simply
@@ -258,13 +225,6 @@ third-party libraries (iodbc or unixodbc, mysqlclient) installed
 on your system. To do this, use the --omit argument to configure:
 
 > ./configure --omit=Data/ODBC,Data/MySQL
-
-
-IMPORTANT: Make sure that the path to the build directory does not
-contain symbolic links. Furthermore, on macOS (or other systems
-with case insensitive filesystems), make sure that the characters in
-the path have the correct case. Otherwise you'll get an error saying
-"Current working directory not under $PROJECT_BASE.".
 
 
 BUILDING ON QNX NEUTRINO
@@ -295,7 +255,7 @@ BUILDING FOR VXWORKS
 
 Please see the VxWorks Platform Notes in the Reference Documentation for
 more information. The Reference Documentation can be found online
-at <http://pocoproject.org/docs/>.
+at <https://docs.pocoproject.org/>.
 
 
 MORE INFORMATION
