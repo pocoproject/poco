@@ -327,7 +327,8 @@ void TestRunner::findAll(const std::string& name, Test* pTest, const std::string
 	if (matchesName(name, testName))
 	{
 		results.push_back(pTest);
-		// Don't return early - continue searching for more matches within this suite
+		// Don't search children - collectAllTestCases will expand suites
+		return;
 	}
 
 	auto* pSuite = dynamic_cast<TestSuite*>(pTest);
