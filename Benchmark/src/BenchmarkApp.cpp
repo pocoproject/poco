@@ -19,6 +19,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
+#include <regex>
+#include <iomanip>
+#include <algorithm>
+#include <cmath>
+#include <set>
 
 
 using Poco::Util::Application;
@@ -26,6 +32,332 @@ using Poco::Util::Option;
 using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 using Poco::Util::OptionCallback;
+
+
+/// Custom reporter that collects benchmark results and prints a comparison summary.
+/// Groups benchmarks by prefix (e.g., "NotificationQueues_") and compares pairs.
+class SummaryReporter : public benchmark::ConsoleReporter
+{
+public:
+	struct BenchmarkResult
+	{
+		std::string name;
+		double realTimeSeconds = 0;  // Original time in seconds for comparison
+		double displayTime = 0;      // Converted time for display (wall time)
+		std::string timeUnit;        // Unit for wall time display
+		double cpuTimeSeconds = 0;   // Original CPU time in seconds for comparison
+		double cpuDisplayTime = 0;   // Converted CPU time for display
+		std::string cpuTimeUnit;     // Unit for CPU time display
+		double itemsPerSecond = 0;
+	};
+
+	void ReportRuns(const std::vector<Run>& reports) override
+	{
+		// First, let the console reporter do its normal output
+		ConsoleReporter::ReportRuns(reports);
+
+		// Collect results for summary
+		for (const auto& run : reports)
+		{
+			if (run.skipped != benchmark::internal::NotSkipped)
+				continue;
+
+			// Skip aggregate runs (mean, median, stddev)
+			if (!run.aggregate_name.empty())
+				continue;
+
+			BenchmarkResult result;
+			result.name = run.benchmark_name();
+			result.realTimeSeconds = run.real_accumulated_time / run.iterations;
+			result.cpuTimeSeconds = run.cpu_accumulated_time / run.iterations;
+
+			// Get items_per_second counter if available
+			auto it = run.counters.find("items_per_second");
+			if (it != run.counters.end())
+			{
+				result.itemsPerSecond = it->second;
+			}
+
+			// Determine wall time unit based on magnitude
+			if (result.realTimeSeconds < 1e-6)
+			{
+				result.displayTime = result.realTimeSeconds * 1e9;
+				result.timeUnit = "ns";
+			}
+			else if (result.realTimeSeconds < 1e-3)
+			{
+				result.displayTime = result.realTimeSeconds * 1e6;
+				result.timeUnit = "us";
+			}
+			else if (result.realTimeSeconds < 1)
+			{
+				result.displayTime = result.realTimeSeconds * 1e3;
+				result.timeUnit = "ms";
+			}
+			else
+			{
+				result.displayTime = result.realTimeSeconds;
+				result.timeUnit = "s";
+			}
+
+			// Determine CPU time unit based on magnitude
+			if (result.cpuTimeSeconds < 1e-6)
+			{
+				result.cpuDisplayTime = result.cpuTimeSeconds * 1e9;
+				result.cpuTimeUnit = "ns";
+			}
+			else if (result.cpuTimeSeconds < 1e-3)
+			{
+				result.cpuDisplayTime = result.cpuTimeSeconds * 1e6;
+				result.cpuTimeUnit = "us";
+			}
+			else if (result.cpuTimeSeconds < 1)
+			{
+				result.cpuDisplayTime = result.cpuTimeSeconds * 1e3;
+				result.cpuTimeUnit = "ms";
+			}
+			else
+			{
+				result.cpuDisplayTime = result.cpuTimeSeconds;
+				result.cpuTimeUnit = "s";
+			}
+
+			_results.push_back(result);
+		}
+	}
+
+	void Finalize() override
+	{
+		ConsoleReporter::Finalize();
+		printSummary();
+	}
+
+private:
+	std::vector<BenchmarkResult> _results;
+
+	void printSummary()
+	{
+		if (_results.size() < 2)
+			return;
+
+		// Group results by category prefix
+		std::map<std::string, std::vector<BenchmarkResult>> groups;
+
+		for (const auto& result : _results)
+		{
+			// Extract category (first part before underscore)
+			auto pos = result.name.find('_');
+			if (pos != std::string::npos)
+			{
+				std::string category = result.name.substr(0, pos);
+				groups[category].push_back(result);
+			}
+		}
+
+		// Print summary for each group that has comparison pairs
+		for (const auto& [category, results] : groups)
+		{
+			printGroupSummary(category, results);
+		}
+	}
+
+	void printGroupSummary(const std::string& category, const std::vector<BenchmarkResult>& results)
+	{
+		if (results.size() < 2)
+			return;
+
+		// Group results by test suffix (e.g., "File", "ShortMsg")
+		// Map: suffix -> (implementation_name -> result)
+		std::map<std::string, std::map<std::string, BenchmarkResult>> testGroups;
+
+		for (const auto& result : results)
+		{
+			std::string impl = extractImplementation(result.name);
+			std::string suffix = extractSuffix(result.name);
+			if (!suffix.empty() && !impl.empty())
+			{
+				testGroups[suffix][impl] = result;
+			}
+		}
+
+		// Need at least one test with multiple implementations
+		bool hasComparisons = false;
+		for (const auto& [suffix, impls] : testGroups)
+		{
+			if (impls.size() >= 2)
+			{
+				hasComparisons = true;
+				break;
+			}
+		}
+		if (!hasComparisons)
+			return;
+
+		// Collect all implementation names across all tests, sorted alphabetically
+		// The first one alphabetically becomes the baseline
+		std::set<std::string> allImpls;
+		for (const auto& [suffix, impls] : testGroups)
+		{
+			for (const auto& [impl, result] : impls)
+			{
+				allImpls.insert(impl);
+			}
+		}
+
+		if (allImpls.empty())
+			return;
+
+		std::string baselineImpl = *allImpls.begin();
+		std::vector<std::string> otherImpls(std::next(allImpls.begin()), allImpls.end());
+
+		// Print wall time summary
+		printTimeSummary(category, "Wall Time", testGroups, baselineImpl, otherImpls, false);
+
+		// Print CPU time summary
+		printTimeSummary(category, "CPU Time", testGroups, baselineImpl, otherImpls, true);
+	}
+
+	void printTimeSummary(
+		const std::string& category,
+		const std::string& timeType,
+		const std::map<std::string, std::map<std::string, BenchmarkResult>>& testGroups,
+		const std::string& baselineImpl,
+		const std::vector<std::string>& otherImpls,
+		bool useCpuTime)
+	{
+		// Calculate column widths
+		size_t testColWidth = 4;  // "Test"
+		for (const auto& [suffix, impls] : testGroups)
+		{
+			if (impls.size() >= 2)
+				testColWidth = std::max(testColWidth, suffix.length());
+		}
+		testColWidth += 2;  // Padding
+
+		size_t baselineColWidth = std::max(baselineImpl.length(), size_t(12)) + 2;
+		size_t implColWidth = 12;
+		for (const auto& impl : otherImpls)
+		{
+			implColWidth = std::max(implColWidth, impl.length());
+		}
+		implColWidth += 14;  // Room for " (xx.xx x)" suffix
+
+		size_t totalWidth = testColWidth + baselineColWidth + implColWidth * otherImpls.size();
+
+		std::cout << "\n";
+		std::cout << std::string(totalWidth, '=') << "\n";
+		std::cout << "  " << category << " Summary (" << timeType << ")\n";
+		std::cout << std::string(totalWidth, '=') << "\n";
+
+		// Print header
+		std::cout << std::left << std::setw(testColWidth) << "Test"
+		          << std::right << std::setw(baselineColWidth) << baselineImpl;
+		for (const auto& impl : otherImpls)
+		{
+			std::cout << std::setw(implColWidth) << impl;
+		}
+		std::cout << "\n";
+		std::cout << std::string(totalWidth, '-') << "\n";
+
+		// Print each test row
+		for (const auto& [suffix, impls] : testGroups)
+		{
+			if (impls.size() < 2)
+				continue;
+
+			std::cout << std::left << std::setw(testColWidth) << suffix;
+
+			// Print baseline time
+			auto baselineIt = impls.find(baselineImpl);
+			if (baselineIt != impls.end())
+			{
+				double dispTime = useCpuTime ? baselineIt->second.cpuDisplayTime : baselineIt->second.displayTime;
+				const std::string& unit = useCpuTime ? baselineIt->second.cpuTimeUnit : baselineIt->second.timeUnit;
+				std::ostringstream timeStr;
+				timeStr << std::fixed << std::setprecision(1) << dispTime << " " << unit;
+				std::cout << std::right << std::setw(baselineColWidth) << timeStr.str();
+			}
+			else
+			{
+				std::cout << std::right << std::setw(baselineColWidth) << "-";
+			}
+
+			// Print other implementations with speedup
+			for (const auto& impl : otherImpls)
+			{
+				auto implIt = impls.find(impl);
+				if (implIt != impls.end() && baselineIt != impls.end())
+				{
+					double baseTime = useCpuTime ? baselineIt->second.cpuTimeSeconds : baselineIt->second.realTimeSeconds;
+					double implTime = useCpuTime ? implIt->second.cpuTimeSeconds : implIt->second.realTimeSeconds;
+					double dispTime = useCpuTime ? implIt->second.cpuDisplayTime : implIt->second.displayTime;
+					const std::string& unit = useCpuTime ? implIt->second.cpuTimeUnit : implIt->second.timeUnit;
+
+					double speedup = baseTime / implTime;
+					std::ostringstream str;
+					str << std::fixed << std::setprecision(1) << dispTime << " " << unit << " (";
+					if (speedup >= 1.0)
+						str << std::setprecision(1) << speedup << "x)";
+					else
+						str << "-" << std::setprecision(2) << (1.0/speedup) << "x)";
+
+					// Use green for faster, red for slower
+					if (speedup >= 1.0)
+						std::cout << "\033[32m";  // Green
+					else
+						std::cout << "\033[31m";  // Red
+					std::cout << std::right << std::setw(implColWidth) << str.str();
+					std::cout << "\033[0m";   // Reset
+				}
+				else if (implIt != impls.end())
+				{
+					double dispTime = useCpuTime ? implIt->second.cpuDisplayTime : implIt->second.displayTime;
+					const std::string& unit = useCpuTime ? implIt->second.cpuTimeUnit : implIt->second.timeUnit;
+					std::ostringstream timeStr;
+					timeStr << std::fixed << std::setprecision(1) << dispTime << " " << unit;
+					std::cout << std::right << std::setw(implColWidth) << timeStr.str();
+				}
+				else
+				{
+					std::cout << std::right << std::setw(implColWidth) << "-";
+				}
+			}
+			std::cout << "\n";
+		}
+
+		std::cout << std::string(totalWidth, '=') << "\n";
+	}
+
+	std::string extractImplementation(const std::string& name)
+	{
+		// Extract the implementation name (second part between underscores)
+		// e.g., "Loggers_AsyncChannel_File" -> "AsyncChannel"
+		auto first = name.find('_');
+		if (first == std::string::npos)
+			return "";
+
+		auto second = name.find('_', first + 1);
+		if (second == std::string::npos)
+			return name.substr(first + 1);
+
+		return name.substr(first + 1, second - first - 1);
+	}
+
+	std::string extractSuffix(const std::string& name)
+	{
+		// Extract the part after the second underscore
+		// e.g., "Loggers_AsyncChannel_File" -> "File"
+		auto first = name.find('_');
+		if (first == std::string::npos)
+			return "";
+
+		auto second = name.find('_', first + 1);
+		if (second == std::string::npos)
+			return "";
+
+		return name.substr(second + 1);
+	}
+};
 
 
 class BenchmarkApp: public Application
@@ -286,7 +618,9 @@ protected:
 		if (benchmark::ReportUnrecognizedArguments(argc, argv))
 			return Application::EXIT_USAGE;
 
-		benchmark::RunSpecifiedBenchmarks();
+		// Use custom reporter that prints summary at end
+		SummaryReporter reporter;
+		benchmark::RunSpecifiedBenchmarks(&reporter);
 		benchmark::Shutdown();
 
 		return Application::EXIT_OK;

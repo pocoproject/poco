@@ -39,7 +39,7 @@ endif
 # Check if we found it
 ifneq ($(BENCHMARK_LIBS),)
 
-objects = BenchmarkApp PatternFormatterBench LoggerBench
+objects = BenchmarkApp PatternFormatterBench LoggerBench NotificationQueueBench
 
 target         = benchmark
 target_version = 1
