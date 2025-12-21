@@ -39,7 +39,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
-	DataURIStreamTest FileStreamRWLockTest
+	DataURIStreamTest FileStreamRWLockTest SPSCQueueTest MPSCQueueTest
 
 # FastLogger tests - enabled by default
 # Set POCO_NO_FASTLOGGER=1 to disable

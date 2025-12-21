@@ -14,6 +14,8 @@
 #include "NotificationQueueTest.h"
 #include "PriorityNotificationQueueTest.h"
 #include "TimedNotificationQueueTest.h"
+#include "SPSCQueueTest.h"
+#include "MPSCQueueTest.h"
 
 
 CppUnit::Test* NotificationsTestSuite::suite()
@@ -25,6 +27,8 @@ CppUnit::Test* NotificationsTestSuite::suite()
 	pSuite->addTest(NotificationQueueTest::suite());
 	pSuite->addTest(PriorityNotificationQueueTest::suite());
 	pSuite->addTest(TimedNotificationQueueTest::suite());
+	pSuite->addTest(SPSCQueueTest::suite());
+	pSuite->addTest(MPSCQueueTest::suite());
 
 	return pSuite;
 }
