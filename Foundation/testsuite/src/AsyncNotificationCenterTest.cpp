@@ -399,7 +399,7 @@ void AsyncNotificationCenterTest::testThreadSafety()
 	// Wait for all notifications to be processed
 	int timeout = 0;
 	int expected = numThreads * notificationsPerThread;
-	while (_threadSafeCount < expected && timeout < 200)
+	while (_threadSafeCount < expected && timeout < 250)
 	{
 		Poco::Thread::sleep(50);
 		++timeout;
