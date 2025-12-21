@@ -74,12 +74,25 @@ void Logger::setProperty(const std::string& name, const std::string& value)
 }
 
 
-void Logger::log(const Message& msg)
+template <typename M>
+void Logger::logImpl(M&& msg)
 {
 	if (_level >= msg.getPriority() && _pChannel)
 	{
-		_pChannel->log(msg);
+		_pChannel->log(std::forward<M>(msg));
 	}
+}
+
+
+void Logger::log(const Message& msg)
+{
+	logImpl(msg);
+}
+
+
+void Logger::log(Message&& msg)
+{
+	logImpl(std::move(msg));
 }
 
 

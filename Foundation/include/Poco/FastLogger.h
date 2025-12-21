@@ -122,6 +122,9 @@ public:
 		/// Logs the given message if its priority is
 		/// greater than or equal to the logger's log level.
 
+	// Bring log(Message&&) into scope; otherwise log(const Exception&) hides it
+	using Channel::log;
+
 	void log(const Exception& exc);
 		/// Logs the given exception with priority PRIO_ERROR.
 

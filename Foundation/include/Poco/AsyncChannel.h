@@ -64,8 +64,12 @@ public:
 	/// logging thread.
 
 	void log(const Message& msg) override;
-	/// Queues the message for processing by the
-	/// background thread.
+		/// Queues the message for processing by the
+		/// background thread.
+
+	void log(Message&& msg) override;
+		/// Queues the message for processing by the
+		/// background thread, moving the message to avoid copying.
 
 	void setProperty(const std::string& name, const std::string& value) override;
 	/// Sets or changes a configuration property.
@@ -112,6 +116,9 @@ protected:
 	void setPriority(const std::string& value);
 
 private:
+	template <typename M>
+	void logImpl(M&& msg);
+
 	Channel::Ptr _pChannel;
 	Thread    _thread;
 	FastMutex _threadMutex;

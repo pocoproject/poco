@@ -41,6 +41,11 @@ public:
 	{
 	}
 
+	MessageNotification(Message&& msg):
+		_msg(std::move(msg))
+	{
+	}
+
 	~MessageNotification()
 	{
 	}
@@ -117,7 +122,8 @@ void AsyncChannel::close()
 }
 
 
-void AsyncChannel::log(const Message& msg)
+template <typename M>
+void AsyncChannel::logImpl(M&& msg)
 {
 	if (_closed) return;
 	if (_queueSize != 0 && _queue.size() >= _queueSize)
@@ -134,7 +140,19 @@ void AsyncChannel::log(const Message& msg)
 
 	open();
 
-	_queue.enqueueNotification(new MessageNotification(msg));
+	_queue.enqueueNotification(new MessageNotification(std::forward<M>(msg)));
+}
+
+
+void AsyncChannel::log(const Message& msg)
+{
+	logImpl(msg);
+}
+
+
+void AsyncChannel::log(Message&& msg)
+{
+	logImpl(std::move(msg));
 }
 
 
