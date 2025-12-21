@@ -1135,14 +1135,14 @@ jobs:
       - run: ./configure --minimal --no-tests --no-samples
       - run: make -s -j4 -C CppUnit
       - run: make -s -j4 -C Foundation
+      - run: make -s -j4 -C Foundation/testsuite
       - run: make -s -j4 -C XML
       - run: make -s -j4 -C JSON
       - run: make -s -j4 -C Util
-      - run: make -s -j4 -C Foundation/testsuite
       - run: make -s -j4 -C Util/testsuite
       - name: Run Foundation LoggingTestSuite
         working-directory: Foundation/testsuite
-        run: ./bin/Linux/x86_64/testrunner LoggingTestSuite
+        run: . poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingTestSuite
       - name: Run Util LoggingConfiguratorTest
         working-directory: Util/testsuite
-        run: ./bin/Linux/x86_64/testrunner LoggingConfiguratorTest
+        run: . poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingConfiguratorTest
